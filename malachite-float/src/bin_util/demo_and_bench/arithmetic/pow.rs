@@ -7,9 +7,16 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{Pow, PowAssign};
+use malachite_base::num::basic::floats::PrimitiveFloat;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
+use malachite_base::num::float::NiceFloat;
+use malachite_base::test_util::bench::bucketers::pair_max_primitive_float_bucketer;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
+use malachite_base::test_util::generators::primitive_float_pair_gen;
 use malachite_base::test_util::runner::Runner;
+use malachite_float::Float;
+use malachite_float::arithmetic::pow::primitive_float_pow;
 use malachite_float::test_util::arithmetic::pow::{
     rug_pow, rug_pow_prec, rug_pow_prec_round, rug_pow_round,
 };
@@ -35,6 +42,7 @@ use malachite_float::test_util::generators::{
 use malachite_float::{ComparableFloat, ComparableFloatRef};
 
 pub(crate) fn register(runner: &mut Runner) {
+    register_primitive_float_demos!(runner, demo_primitive_float_pow);
     register_demo!(runner, demo_float_pow);
     register_demo!(runner, demo_float_pow_debug);
     register_demo!(runner, demo_float_pow_extreme);
@@ -92,6 +100,7 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_pow_prec_round_assign_ref);
     register_demo!(runner, demo_float_pow_prec_round_assign_ref_debug);
 
+    register_primitive_float_benches!(runner, benchmark_primitive_float_pow);
     register_bench!(runner, benchmark_float_pow_evaluation_strategy);
     register_bench!(runner, benchmark_float_pow_library_comparison);
     register_bench!(runner, benchmark_float_pow_assign_evaluation_strategy);
@@ -1290,5 +1299,45 @@ fn benchmark_float_pow_prec_round_assign_evaluation_strategy(
                 &mut |(mut x, y, prec, rm)| no_out!(x.pow_prec_round_assign_ref(&y, prec, rm)),
             ),
         ],
+    );
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn demo_primitive_float_pow<T: PrimitiveFloat>(gm: GenMode, config: &GenConfig, limit: usize)
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    for (x, y) in primitive_float_pair_gen::<T>().get(gm, config).take(limit) {
+        println!(
+            "primitive_float_pow({}, {}) = {}",
+            NiceFloat(x),
+            NiceFloat(y),
+            NiceFloat(primitive_float_pow(x, y))
+        );
+    }
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn benchmark_primitive_float_pow<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    run_benchmark(
+        &format!("primitive_float_pow({}, {})", T::NAME, T::NAME),
+        BenchmarkType::Single,
+        primitive_float_pair_gen::<T>().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_max_primitive_float_bucketer("x", "y"),
+        &mut [("malachite", &mut |(x, y)| {
+            no_out!(primitive_float_pow(x, y));
+        })],
     );
 }

@@ -6,14 +6,19 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::apply_fn_to_primitive_floats;
 use malachite_base::assert_panic;
 use malachite_base::num::arithmetic::traits::{Pow, PowAssign};
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeZero, One, Zero,
 };
-use malachite_base::num::conversion::traits::{ExactFrom, IsInteger};
+use malachite_base::num::conversion::traits::{ExactFrom, IsInteger, RoundingFrom};
+use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
+use malachite_base::test_util::generators::primitive_float_pair_gen;
+use malachite_float::arithmetic::pow::primitive_float_pow;
 use malachite_float::test_util::arithmetic::pow::{
     rug_pow, rug_pow_prec, rug_pow_prec_round, rug_pow_round,
 };
@@ -684,4 +689,140 @@ fn pow_round_properties() {
             }
         }
     });
+}
+
+#[test]
+#[allow(clippy::type_repetition_in_bounds)]
+fn test_primitive_float_pow() {
+    fn test<T: PrimitiveFloat>(x: T, y: T, out: T)
+    where
+        Float: From<T> + PartialOrd<T>,
+        for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    {
+        assert_eq!(NiceFloat(primitive_float_pow(x, y)), NiceFloat(out));
+    }
+    test::<f32>(f32::NAN, f32::NAN, f32::NAN);
+    test::<f32>(f32::NAN, f32::INFINITY, f32::NAN);
+    test::<f32>(f32::NAN, f32::NEGATIVE_INFINITY, f32::NAN);
+    test::<f32>(f32::NAN, 0.0, 1.0);
+    test::<f32>(f32::NAN, -0.0, 1.0);
+    test::<f32>(f32::NAN, 1.0, f32::NAN);
+    test::<f32>(f32::NAN, -1.0, f32::NAN);
+    test::<f32>(f32::NAN, 2.0, f32::NAN);
+    test::<f32>(f32::NAN, -3.0, f32::NAN);
+
+    test::<f32>(f32::INFINITY, f32::NAN, f32::NAN);
+    test::<f32>(f32::INFINITY, f32::INFINITY, f32::INFINITY);
+    test::<f32>(f32::INFINITY, f32::NEGATIVE_INFINITY, 0.0);
+    test::<f32>(f32::INFINITY, 0.0, 1.0);
+    test::<f32>(f32::INFINITY, -0.0, 1.0);
+    test::<f32>(f32::INFINITY, 1.0, f32::INFINITY);
+    test::<f32>(f32::INFINITY, -1.0, 0.0);
+    test::<f32>(f32::INFINITY, 2.0, f32::INFINITY);
+    test::<f32>(f32::INFINITY, -3.0, 0.0);
+
+    test::<f32>(f32::NEGATIVE_INFINITY, f32::NAN, f32::NAN);
+    test::<f32>(f32::NEGATIVE_INFINITY, f32::INFINITY, f32::INFINITY);
+    test::<f32>(f32::NEGATIVE_INFINITY, f32::NEGATIVE_INFINITY, 0.0);
+    test::<f32>(f32::NEGATIVE_INFINITY, 0.0, 1.0);
+    test::<f32>(f32::NEGATIVE_INFINITY, -0.0, 1.0);
+    test::<f32>(f32::NEGATIVE_INFINITY, 1.0, f32::NEGATIVE_INFINITY);
+    test::<f32>(f32::NEGATIVE_INFINITY, -1.0, -0.0);
+    test::<f32>(f32::NEGATIVE_INFINITY, 2.0, f32::INFINITY);
+    test::<f32>(f32::NEGATIVE_INFINITY, -3.0, -0.0);
+
+    test::<f32>(0.0, f32::NAN, f32::NAN);
+    test::<f32>(0.0, f32::INFINITY, 0.0);
+    test::<f32>(0.0, f32::NEGATIVE_INFINITY, f32::INFINITY);
+    test::<f32>(0.0, 0.0, 1.0);
+    test::<f32>(0.0, -0.0, 1.0);
+    test::<f32>(0.0, 1.0, 0.0);
+    test::<f32>(0.0, -1.0, f32::INFINITY);
+    test::<f32>(0.0, 2.0, 0.0);
+    test::<f32>(0.0, -3.0, f32::INFINITY);
+
+    test::<f32>(-0.0, f32::NAN, f32::NAN);
+    test::<f32>(-0.0, f32::INFINITY, 0.0);
+    test::<f32>(-0.0, f32::NEGATIVE_INFINITY, f32::INFINITY);
+    test::<f32>(-0.0, 0.0, 1.0);
+    test::<f32>(-0.0, -0.0, 1.0);
+    test::<f32>(-0.0, 1.0, -0.0);
+    test::<f32>(-0.0, -1.0, f32::NEGATIVE_INFINITY);
+    test::<f32>(-0.0, 2.0, 0.0);
+    test::<f32>(-0.0, -3.0, f32::NEGATIVE_INFINITY);
+
+    test::<f32>(1.0, f32::NAN, 1.0);
+    test::<f32>(1.0, f32::INFINITY, 1.0);
+    test::<f32>(1.0, f32::NEGATIVE_INFINITY, 1.0);
+    test::<f32>(1.0, 0.0, 1.0);
+    test::<f32>(1.0, -0.0, 1.0);
+    test::<f32>(1.0, 1.0, 1.0);
+    test::<f32>(1.0, -1.0, 1.0);
+    test::<f32>(1.0, 2.0, 1.0);
+    test::<f32>(1.0, -3.0, 1.0);
+
+    test::<f32>(-1.0, f32::NAN, f32::NAN);
+    test::<f32>(-1.0, f32::INFINITY, 1.0);
+    test::<f32>(-1.0, f32::NEGATIVE_INFINITY, 1.0);
+    test::<f32>(-1.0, 0.0, 1.0);
+    test::<f32>(-1.0, -0.0, 1.0);
+    test::<f32>(-1.0, 1.0, -1.0);
+    test::<f32>(-1.0, -1.0, -1.0);
+    test::<f32>(-1.0, 2.0, 1.0);
+    test::<f32>(-1.0, -3.0, -1.0);
+
+    test::<f32>(2.0, f32::NAN, f32::NAN);
+    test::<f32>(2.0, f32::INFINITY, f32::INFINITY);
+    test::<f32>(2.0, f32::NEGATIVE_INFINITY, 0.0);
+    test::<f32>(2.0, 0.0, 1.0);
+    test::<f32>(2.0, -0.0, 1.0);
+    test::<f32>(2.0, 1.0, 2.0);
+    test::<f32>(2.0, -1.0, 0.5);
+    test::<f32>(2.0, 2.0, 4.0);
+    test::<f32>(2.0, -3.0, 0.125);
+
+    test::<f32>(-3.0, f32::NAN, f32::NAN);
+    test::<f32>(-3.0, f32::INFINITY, f32::INFINITY);
+    test::<f32>(-3.0, f32::NEGATIVE_INFINITY, 0.0);
+    test::<f32>(-3.0, 0.0, 1.0);
+    test::<f32>(-3.0, -0.0, 1.0);
+    test::<f32>(-3.0, 1.0, -3.0);
+    test::<f32>(-3.0, -1.0, -0.33333334);
+    test::<f32>(-3.0, 2.0, 9.0);
+    test::<f32>(-3.0, -3.0, -0.037037037);
+
+    test::<f32>(3.0, 2.5, 15.588457);
+    test::<f32>(2.0, 0.5, 1.4142135);
+    test::<f32>(1.5, 100.0, 4.065612e17);
+    // overflow and underflow
+    test::<f32>(2.0, 128.0, f32::INFINITY);
+    test::<f32>(2.0, -150.0, 0.0);
+
+    test::<f64>(3.0, 2.5, 15.588457268119896);
+    test::<f64>(2.0, 0.5, 1.4142135623730951);
+    test::<f64>(10.0, -0.5, 0.31622776601683794);
+    test::<f64>(0.5, 0.5, 0.7071067811865476);
+    test::<f64>(1.5, 100.0, 4.065611775352152e17);
+    test::<f64>(0.9999999999, 10000000000.0, 0.36787941071456814);
+    test::<f64>(-2.0, 3.0, -8.0);
+    test::<f64>(-2.0, 0.5, f64::NAN);
+    // overflow and underflow
+    test::<f64>(1.0e300, 2.0, f64::INFINITY);
+    test::<f64>(1.0e-300, 2.0, 0.0);
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn primitive_float_pow_properties_helper<T: PrimitiveFloat>()
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    primitive_float_pair_gen::<T>().test_properties(|(x, y)| {
+        primitive_float_pow(x, y);
+    });
+}
+
+#[test]
+fn primitive_float_pow_properties() {
+    apply_fn_to_primitive_floats!(primitive_float_pow_properties_helper);
 }

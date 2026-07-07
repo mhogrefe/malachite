@@ -16,12 +16,14 @@
 
 use crate::InnerFloat::{Infinity, NaN, Zero};
 use crate::arithmetic::exp::{exp_overflow, exp_underflow, one_neighbor};
+use crate::emulate_float_float_to_float_fn;
 use crate::{Float, float_either_infinity, float_either_zero, float_nan};
 use core::cmp::Ordering::{self, *};
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     Abs, CeilingLogBase2, CheckedSqrt, IsPowerOf2, NegAssign, Parity, Pow, PowAssign,
 };
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{
     Infinity as InfinityTrait, NaN as NaNTrait, NegativeInfinity, NegativeZero, One,
     Zero as ZeroTrait,
@@ -355,10 +357,7 @@ fn pow_is_exact(x: &Float, y: &Float, prec: u64, rm: RoundingMode) -> Option<(Fl
             a <<= 1u32;
             b -= 1;
         }
-        let Some(sq) = a.checked_sqrt() else {
-            return None;
-        };
-        a = sq;
+        a = a.checked_sqrt()?;
         b >>= 1;
         d += 1;
     }
@@ -542,10 +541,9 @@ impl Float {
 
     /// Raises a [`Float`] to a [`Float`] power, rounding the result to the specified precision and
     /// with the specified rounding mode. Both [`Float`]s are taken by reference. An [`Ordering`] is
-    /// also
-    /// returned, indicating whether the rounded power is less than, equal to, or greater than
-    /// the exact power. Although `NaN`s are not comparable to any [`Float`], whenever this
-    /// function returns a `NaN` it also returns `Equal`.
+    /// also returned, indicating whether the rounded power is less than, equal to, or greater than
+    /// the exact power. Although `NaN`s are not comparable to any [`Float`], whenever this function
+    /// returns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -576,8 +574,7 @@ impl Float {
     /// - $f(-0.0,y,p,m)=-0.0$ if $y$ is a positive odd integer, $0.0$ if $y$ is positive and not an
     ///   odd integer, $-\infty$ if $y$ is a negative odd integer, and $\infty$ if $y$ is negative
     ///   and not an odd integer
-    /// - $f(x,y,p,m)=\text{NaN}$ if $x$ is finite and negative and $y$ is finite and not an
-    ///   integer
+    /// - $f(x,y,p,m)=\text{NaN}$ if $x$ is finite and negative and $y$ is finite and not an integer
     ///
     /// Overflow and underflow:
     /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
@@ -588,15 +585,15 @@ impl Float {
     /// - If $0<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
     ///   instead.
     /// - If $0<f(x,y,p,m)\leq2^{-2^{30}-1}$ and $m$ is `Nearest`, $0.0$ is returned instead.
-    /// - If $2^{-2^{30}-1}<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Nearest`, $2^{-2^{30}}$ is
-    ///   returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
     /// - Negative results (from negative $x$ and odd integer $y$) mirror the bullets above, with
     ///   the rounding directions reflected.
     ///
-    /// If you know you'll be using `Nearest`, consider using [`Float::pow_prec_ref_ref`]
-    /// instead. If you know that your target precision is the maximum of the precisions of the
-    /// two inputs, consider using [`Float::pow_round_ref_ref`] instead. If both of these things
-    /// are true, consider using [`Pow::pow`] instead.
+    /// If you know you'll be using `Nearest`, consider using [`Float::pow_prec_ref_ref`] instead.
+    /// If you know that your target precision is the maximum of the precisions of the two inputs,
+    /// consider using [`Float::pow_round_ref_ref`] instead. If both of these things are true,
+    /// consider using [`Pow::pow`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
@@ -669,14 +666,14 @@ impl Float {
                     (Self::NAN, Equal)
                 };
             }
-            (float_either_infinity!(), Float(Infinity { sign })) => {
+            (float_either_infinity!(), Self(Infinity { sign })) => {
                 return if *sign {
                     (Self::INFINITY, Equal)
                 } else {
                     (Self::ZERO, Equal)
                 };
             }
-            (_, Float(Infinity { sign })) => {
+            (_, Self(Infinity { sign })) => {
                 let mut cmp = x.partial_cmp_abs(&Self::ONE).unwrap();
                 if !*sign {
                     cmp = cmp.reverse();
@@ -687,7 +684,7 @@ impl Float {
                     Equal => Self::from_float_prec_round(Self::ONE, prec, rm),
                 };
             }
-            (Float(Infinity { sign }), _) => {
+            (Self(Infinity { sign }), _) => {
                 let negative = !*sign && float_odd_integer(y);
                 return (
                     match (y.is_sign_positive(), negative) {
@@ -699,7 +696,7 @@ impl Float {
                     Equal,
                 );
             }
-            (Float(Zero { sign }), _) => {
+            (Self(Zero { sign }), _) => {
                 let negative = !*sign && float_odd_integer(y);
                 return (
                     match (y.is_sign_negative(), negative) {
@@ -741,7 +738,7 @@ impl Float {
                     .0
                     .mul_prec_round_val_ref(y, 64, Down)
                     .0;
-                if t >= const { Self::const_from_signed(Float::MAX_EXPONENT as i64) } {
+                if t >= const { Self::const_from_signed(Self::MAX_EXPONENT as i64) } {
                     return pow_overflow(prec, rm, x.is_sign_negative() && float_odd_integer(y));
                 }
             }
@@ -802,10 +799,9 @@ impl Float {
 impl Float {
     /// Raises a [`Float`] to a [`Float`] power, rounding the result to the specified precision and
     /// with the specified rounding mode. Both [`Float`]s are taken by value. An [`Ordering`] is
-    /// also
-    /// returned, indicating whether the rounded power is less than, equal to, or greater than
-    /// the exact power. Although `NaN`s are not comparable to any [`Float`], whenever this
-    /// function returns a `NaN` it also returns `Equal`.
+    /// also returned, indicating whether the rounded power is less than, equal to, or greater than
+    /// the exact power. Although `NaN`s are not comparable to any [`Float`], whenever this function
+    /// returns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -836,8 +832,7 @@ impl Float {
     /// - $f(-0.0,y,p,m)=-0.0$ if $y$ is a positive odd integer, $0.0$ if $y$ is positive and not an
     ///   odd integer, $-\infty$ if $y$ is a negative odd integer, and $\infty$ if $y$ is negative
     ///   and not an odd integer
-    /// - $f(x,y,p,m)=\text{NaN}$ if $x$ is finite and negative and $y$ is finite and not an
-    ///   integer
+    /// - $f(x,y,p,m)=\text{NaN}$ if $x$ is finite and negative and $y$ is finite and not an integer
     ///
     /// Overflow and underflow:
     /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
@@ -848,15 +843,15 @@ impl Float {
     /// - If $0<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
     ///   instead.
     /// - If $0<f(x,y,p,m)\leq2^{-2^{30}-1}$ and $m$ is `Nearest`, $0.0$ is returned instead.
-    /// - If $2^{-2^{30}-1}<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Nearest`, $2^{-2^{30}}$ is
-    ///   returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
     /// - Negative results (from negative $x$ and odd integer $y$) mirror the bullets above, with
     ///   the rounding directions reflected.
     ///
-    /// If you know you'll be using `Nearest`, consider using [`Float::pow_prec`]
-    /// instead. If you know that your target precision is the maximum of the precisions of the
-    /// two inputs, consider using [`Float::pow_round`] instead. If both of these things
-    /// are true, consider using [`Pow::pow`] instead.
+    /// If you know you'll be using `Nearest`, consider using [`Float::pow_prec`] instead. If you
+    /// know that your target precision is the maximum of the precisions of the two inputs, consider
+    /// using [`Float::pow_round`] instead. If both of these things are true, consider using
+    /// [`Pow::pow`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
@@ -905,10 +900,9 @@ impl Float {
 
     /// Raises a [`Float`] to a [`Float`] power, rounding the result to the specified precision and
     /// with the specified rounding mode. The first [`Float`] is taken by value and the second by
-    /// reference. An [`Ordering`] is also
-    /// returned, indicating whether the rounded power is less than, equal to, or greater than
-    /// the exact power. Although `NaN`s are not comparable to any [`Float`], whenever this
-    /// function returns a `NaN` it also returns `Equal`.
+    /// reference. An [`Ordering`] is also returned, indicating whether the rounded power is less
+    /// than, equal to, or greater than the exact power. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -939,8 +933,7 @@ impl Float {
     /// - $f(-0.0,y,p,m)=-0.0$ if $y$ is a positive odd integer, $0.0$ if $y$ is positive and not an
     ///   odd integer, $-\infty$ if $y$ is a negative odd integer, and $\infty$ if $y$ is negative
     ///   and not an odd integer
-    /// - $f(x,y,p,m)=\text{NaN}$ if $x$ is finite and negative and $y$ is finite and not an
-    ///   integer
+    /// - $f(x,y,p,m)=\text{NaN}$ if $x$ is finite and negative and $y$ is finite and not an integer
     ///
     /// Overflow and underflow:
     /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
@@ -951,15 +944,15 @@ impl Float {
     /// - If $0<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
     ///   instead.
     /// - If $0<f(x,y,p,m)\leq2^{-2^{30}-1}$ and $m$ is `Nearest`, $0.0$ is returned instead.
-    /// - If $2^{-2^{30}-1}<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Nearest`, $2^{-2^{30}}$ is
-    ///   returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
     /// - Negative results (from negative $x$ and odd integer $y$) mirror the bullets above, with
     ///   the rounding directions reflected.
     ///
-    /// If you know you'll be using `Nearest`, consider using [`Float::pow_prec_val_ref`]
-    /// instead. If you know that your target precision is the maximum of the precisions of the
-    /// two inputs, consider using [`Float::pow_round_val_ref`] instead. If both of these things
-    /// are true, consider using [`Pow::pow`] instead.
+    /// If you know you'll be using `Nearest`, consider using [`Float::pow_prec_val_ref`] instead.
+    /// If you know that your target precision is the maximum of the precisions of the two inputs,
+    /// consider using [`Float::pow_round_val_ref`] instead. If both of these things are true,
+    /// consider using [`Pow::pow`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
@@ -1013,10 +1006,9 @@ impl Float {
 
     /// Raises a [`Float`] to a [`Float`] power, rounding the result to the specified precision and
     /// with the specified rounding mode. The first [`Float`] is taken by reference and the second
-    /// by value. An [`Ordering`] is also
-    /// returned, indicating whether the rounded power is less than, equal to, or greater than
-    /// the exact power. Although `NaN`s are not comparable to any [`Float`], whenever this
-    /// function returns a `NaN` it also returns `Equal`.
+    /// by value. An [`Ordering`] is also returned, indicating whether the rounded power is less
+    /// than, equal to, or greater than the exact power. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -1047,8 +1039,7 @@ impl Float {
     /// - $f(-0.0,y,p,m)=-0.0$ if $y$ is a positive odd integer, $0.0$ if $y$ is positive and not an
     ///   odd integer, $-\infty$ if $y$ is a negative odd integer, and $\infty$ if $y$ is negative
     ///   and not an odd integer
-    /// - $f(x,y,p,m)=\text{NaN}$ if $x$ is finite and negative and $y$ is finite and not an
-    ///   integer
+    /// - $f(x,y,p,m)=\text{NaN}$ if $x$ is finite and negative and $y$ is finite and not an integer
     ///
     /// Overflow and underflow:
     /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
@@ -1059,15 +1050,15 @@ impl Float {
     /// - If $0<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
     ///   instead.
     /// - If $0<f(x,y,p,m)\leq2^{-2^{30}-1}$ and $m$ is `Nearest`, $0.0$ is returned instead.
-    /// - If $2^{-2^{30}-1}<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Nearest`, $2^{-2^{30}}$ is
-    ///   returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
     /// - Negative results (from negative $x$ and odd integer $y$) mirror the bullets above, with
     ///   the rounding directions reflected.
     ///
-    /// If you know you'll be using `Nearest`, consider using [`Float::pow_prec_ref_val`]
-    /// instead. If you know that your target precision is the maximum of the precisions of the
-    /// two inputs, consider using [`Float::pow_round_ref_val`] instead. If both of these things
-    /// are true, consider using [`Pow::pow`] instead.
+    /// If you know you'll be using `Nearest`, consider using [`Float::pow_prec_ref_val`] instead.
+    /// If you know that your target precision is the maximum of the precisions of the two inputs,
+    /// consider using [`Float::pow_round_ref_val`] instead. If both of these things are true,
+    /// consider using [`Pow::pow`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
@@ -1120,14 +1111,14 @@ impl Float {
     }
 
     /// Raises a [`Float`] to a [`Float`] power, rounding the result to the specified precision and
-    /// to the nearest value. Both [`Float`]s are taken by value. An [`Ordering`] is also
-    /// returned, indicating whether the rounded power is less than, equal to, or greater than
-    /// the exact power. Although `NaN`s are not comparable to any [`Float`], whenever this
-    /// function returns a `NaN` it also returns `Equal`.
+    /// to the nearest value. Both [`Float`]s are taken by value. An [`Ordering`] is also returned,
+    /// indicating whether the rounded power is less than, equal to, or greater than the exact
+    /// power. Although `NaN`s are not comparable to any [`Float`], whenever this function returns a
+    /// `NaN` it also returns `Equal`.
     ///
-    /// If the power is equidistant from two [`Float`]s with the specified precision, the
-    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
-    /// description of the `Nearest` rounding mode.
+    /// If the power is equidistant from two [`Float`]s with the specified precision, the [`Float`]
+    /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
+    /// the `Nearest` rounding mode.
     ///
     /// $$
     /// f(x,y,p) = x^y+\varepsilon.
@@ -1147,15 +1138,14 @@ impl Float {
     /// - $f(-1.0,\pm\infty,p)=1.0$
     /// - $f(-1.0,y,p)=1.0$ if $y$ is an even integer, and $-1.0$ if $y$ is an odd integer
     /// - $f(\infty,y,p)=\infty$ if $y>0$, and $0.0$ if $y<0$
-    /// - $f(-\infty,y,p)=-\infty$ if $y$ is a positive odd integer, $\infty$ if $y$ is positive
-    ///   and not an odd integer, $-0.0$ if $y$ is a negative odd integer, and $0.0$ if $y$ is
-    ///   negative and not an odd integer
+    /// - $f(-\infty,y,p)=-\infty$ if $y$ is a positive odd integer, $\infty$ if $y$ is positive and
+    ///   not an odd integer, $-0.0$ if $y$ is a negative odd integer, and $0.0$ if $y$ is negative
+    ///   and not an odd integer
     /// - $f(0.0,y,p)=0.0$ if $y>0$, and $\infty$ if $y<0$
     /// - $f(-0.0,y,p)=-0.0$ if $y$ is a positive odd integer, $0.0$ if $y$ is positive and not an
     ///   odd integer, $-\infty$ if $y$ is a negative odd integer, and $\infty$ if $y$ is negative
     ///   and not an odd integer
-    /// - $f(x,y,p)=\text{NaN}$ if $x$ is finite and negative and $y$ is finite and not an
-    ///   integer
+    /// - $f(x,y,p)=\text{NaN}$ if $x$ is finite and negative and $y$ is finite and not an integer
     ///
     /// Overflow and underflow:
     /// - If $f(x,y,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
@@ -1164,8 +1154,8 @@ impl Float {
     /// - Negative results (from negative $x$ and odd integer $y$) mirror the bullets above.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
-    /// [`Float::pow_prec_round`] instead. If you know that your target precision is the
-    /// maximum of the precisions of the two inputs, consider using [`Pow::pow`] instead.
+    /// [`Float::pow_prec_round`] instead. If you know that your target precision is the maximum of
+    /// the precisions of the two inputs, consider using [`Pow::pow`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
@@ -1193,13 +1183,13 @@ impl Float {
 
     /// Raises a [`Float`] to a [`Float`] power, rounding the result to the specified precision and
     /// to the nearest value. Both [`Float`]s are taken by reference. An [`Ordering`] is also
-    /// returned, indicating whether the rounded power is less than, equal to, or greater than
-    /// the exact power. Although `NaN`s are not comparable to any [`Float`], whenever this
-    /// function returns a `NaN` it also returns `Equal`.
+    /// returned, indicating whether the rounded power is less than, equal to, or greater than the
+    /// exact power. Although `NaN`s are not comparable to any [`Float`], whenever this function
+    /// returns a `NaN` it also returns `Equal`.
     ///
-    /// If the power is equidistant from two [`Float`]s with the specified precision, the
-    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
-    /// description of the `Nearest` rounding mode.
+    /// If the power is equidistant from two [`Float`]s with the specified precision, the [`Float`]
+    /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
+    /// the `Nearest` rounding mode.
     ///
     /// $$
     /// f(x,y,p) = x^y+\varepsilon.
@@ -1219,15 +1209,14 @@ impl Float {
     /// - $f(-1.0,\pm\infty,p)=1.0$
     /// - $f(-1.0,y,p)=1.0$ if $y$ is an even integer, and $-1.0$ if $y$ is an odd integer
     /// - $f(\infty,y,p)=\infty$ if $y>0$, and $0.0$ if $y<0$
-    /// - $f(-\infty,y,p)=-\infty$ if $y$ is a positive odd integer, $\infty$ if $y$ is positive
-    ///   and not an odd integer, $-0.0$ if $y$ is a negative odd integer, and $0.0$ if $y$ is
-    ///   negative and not an odd integer
+    /// - $f(-\infty,y,p)=-\infty$ if $y$ is a positive odd integer, $\infty$ if $y$ is positive and
+    ///   not an odd integer, $-0.0$ if $y$ is a negative odd integer, and $0.0$ if $y$ is negative
+    ///   and not an odd integer
     /// - $f(0.0,y,p)=0.0$ if $y>0$, and $\infty$ if $y<0$
     /// - $f(-0.0,y,p)=-0.0$ if $y$ is a positive odd integer, $0.0$ if $y$ is positive and not an
     ///   odd integer, $-\infty$ if $y$ is a negative odd integer, and $\infty$ if $y$ is negative
     ///   and not an odd integer
-    /// - $f(x,y,p)=\text{NaN}$ if $x$ is finite and negative and $y$ is finite and not an
-    ///   integer
+    /// - $f(x,y,p)=\text{NaN}$ if $x$ is finite and negative and $y$ is finite and not an integer
     ///
     /// Overflow and underflow:
     /// - If $f(x,y,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
@@ -1265,10 +1254,9 @@ impl Float {
 
     /// Raises a [`Float`] to a [`Float`] power, rounding the result to the maximum of the
     /// precisions of the two inputs and with the specified rounding mode. Both [`Float`]s are taken
-    /// by value. An [`Ordering`] is also
-    /// returned, indicating whether the rounded power is less than, equal to, or greater than
-    /// the exact power. Although `NaN`s are not comparable to any [`Float`], whenever this
-    /// function returns a `NaN` it also returns `Equal`.
+    /// by value. An [`Ordering`] is also returned, indicating whether the rounded power is less
+    /// than, equal to, or greater than the exact power. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -1292,41 +1280,40 @@ impl Float {
     /// - $f(-1.0,\pm\infty,m)=1.0$
     /// - $f(-1.0,y,m)=1.0$ if $y$ is an even integer, and $-1.0$ if $y$ is an odd integer
     /// - $f(\infty,y,m)=\infty$ if $y>0$, and $0.0$ if $y<0$
-    /// - $f(-\infty,y,m)=-\infty$ if $y$ is a positive odd integer, $\infty$ if $y$ is positive
-    ///   and not an odd integer, $-0.0$ if $y$ is a negative odd integer, and $0.0$ if $y$ is
-    ///   negative and not an odd integer
+    /// - $f(-\infty,y,m)=-\infty$ if $y$ is a positive odd integer, $\infty$ if $y$ is positive and
+    ///   not an odd integer, $-0.0$ if $y$ is a negative odd integer, and $0.0$ if $y$ is negative
+    ///   and not an odd integer
     /// - $f(0.0,y,m)=0.0$ if $y>0$, and $\infty$ if $y<0$
     /// - $f(-0.0,y,m)=-0.0$ if $y$ is a positive odd integer, $0.0$ if $y$ is positive and not an
     ///   odd integer, $-\infty$ if $y$ is a negative odd integer, and $\infty$ if $y$ is negative
     ///   and not an odd integer
-    /// - $f(x,y,m)=\text{NaN}$ if $x$ is finite and negative and $y$ is finite and not an
-    ///   integer
+    /// - $f(x,y,m)=\text{NaN}$ if $x$ is finite and negative and $y$ is finite and not an integer
     ///
     /// Overflow and underflow:
     /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
     ///   returned instead.
-    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$
-    ///   is returned instead.
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead.
     /// - If $0<f(x,y,m)<2^{-2^{30}}$ and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
     /// - If $0<f(x,y,m)<2^{-2^{30}}$ and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
     ///   instead.
     /// - If $0<f(x,y,m)\leq2^{-2^{30}-1}$ and $m$ is `Nearest`, $0.0$ is returned instead.
-    /// - If $2^{-2^{30}-1}<f(x,y,m)<2^{-2^{30}}$ and $m$ is `Nearest`, $2^{-2^{30}}$ is
-    ///   returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,m)<2^{-2^{30}}$ and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
     /// - Negative results (from negative $x$ and odd integer $y$) mirror the bullets above, with
     ///   the rounding directions reflected.
     ///
-    /// If you want to specify an output precision, consider using
-    /// [`Float::pow_prec_round`] instead. If you know you'll be using the `Nearest`
-    /// rounding mode, consider using [`Pow::pow`] instead.
+    /// If you want to specify an output precision, consider using [`Float::pow_prec_round`]
+    /// instead. If you know you'll be using the `Nearest` rounding mode, consider using
+    /// [`Pow::pow`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
     /// $M(n) = O(n (\log n)^2)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
@@ -1357,10 +1344,9 @@ impl Float {
 
     /// Raises a [`Float`] to a [`Float`] power, rounding the result to the maximum of the
     /// precisions of the two inputs and with the specified rounding mode. Both [`Float`]s are taken
-    /// by reference. An [`Ordering`] is also
-    /// returned, indicating whether the rounded power is less than, equal to, or greater than
-    /// the exact power. Although `NaN`s are not comparable to any [`Float`], whenever this
-    /// function returns a `NaN` it also returns `Equal`.
+    /// by reference. An [`Ordering`] is also returned, indicating whether the rounded power is less
+    /// than, equal to, or greater than the exact power. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -1384,41 +1370,40 @@ impl Float {
     /// - $f(-1.0,\pm\infty,m)=1.0$
     /// - $f(-1.0,y,m)=1.0$ if $y$ is an even integer, and $-1.0$ if $y$ is an odd integer
     /// - $f(\infty,y,m)=\infty$ if $y>0$, and $0.0$ if $y<0$
-    /// - $f(-\infty,y,m)=-\infty$ if $y$ is a positive odd integer, $\infty$ if $y$ is positive
-    ///   and not an odd integer, $-0.0$ if $y$ is a negative odd integer, and $0.0$ if $y$ is
-    ///   negative and not an odd integer
+    /// - $f(-\infty,y,m)=-\infty$ if $y$ is a positive odd integer, $\infty$ if $y$ is positive and
+    ///   not an odd integer, $-0.0$ if $y$ is a negative odd integer, and $0.0$ if $y$ is negative
+    ///   and not an odd integer
     /// - $f(0.0,y,m)=0.0$ if $y>0$, and $\infty$ if $y<0$
     /// - $f(-0.0,y,m)=-0.0$ if $y$ is a positive odd integer, $0.0$ if $y$ is positive and not an
     ///   odd integer, $-\infty$ if $y$ is a negative odd integer, and $\infty$ if $y$ is negative
     ///   and not an odd integer
-    /// - $f(x,y,m)=\text{NaN}$ if $x$ is finite and negative and $y$ is finite and not an
-    ///   integer
+    /// - $f(x,y,m)=\text{NaN}$ if $x$ is finite and negative and $y$ is finite and not an integer
     ///
     /// Overflow and underflow:
     /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
     ///   returned instead.
-    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$
-    ///   is returned instead.
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead.
     /// - If $0<f(x,y,m)<2^{-2^{30}}$ and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
     /// - If $0<f(x,y,m)<2^{-2^{30}}$ and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
     ///   instead.
     /// - If $0<f(x,y,m)\leq2^{-2^{30}-1}$ and $m$ is `Nearest`, $0.0$ is returned instead.
-    /// - If $2^{-2^{30}-1}<f(x,y,m)<2^{-2^{30}}$ and $m$ is `Nearest`, $2^{-2^{30}}$ is
-    ///   returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,m)<2^{-2^{30}}$ and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
     /// - Negative results (from negative $x$ and odd integer $y$) mirror the bullets above, with
     ///   the rounding directions reflected.
     ///
-    /// If you want to specify an output precision, consider using
-    /// [`Float::pow_prec_round_ref_ref`] instead. If you know you'll be using the `Nearest`
-    /// rounding mode, consider using [`Pow::pow`] instead.
+    /// If you want to specify an output precision, consider using [`Float::pow_prec_round_ref_ref`]
+    /// instead. If you know you'll be using the `Nearest` rounding mode, consider using
+    /// [`Pow::pow`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
     /// $M(n) = O(n (\log n)^2)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
@@ -1449,10 +1434,10 @@ impl Float {
 
     /// Raises a [`Float`] to a [`Float`] power, rounding the result to the maximum of the
     /// precisions of the two inputs and with the specified rounding mode. The first [`Float`] is
-    /// taken by value and the second by reference. An [`Ordering`] is also
-    /// returned, indicating whether the rounded power is less than, equal to, or greater than
-    /// the exact power. Although `NaN`s are not comparable to any [`Float`], whenever this
-    /// function returns a `NaN` it also returns `Equal`.
+    /// taken by value and the second by reference. An [`Ordering`] is also returned, indicating
+    /// whether the rounded power is less than, equal to, or greater than the exact power. Although
+    /// `NaN`s are not comparable to any [`Float`], whenever this function returns a `NaN` it also
+    /// returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -1476,41 +1461,40 @@ impl Float {
     /// - $f(-1.0,\pm\infty,m)=1.0$
     /// - $f(-1.0,y,m)=1.0$ if $y$ is an even integer, and $-1.0$ if $y$ is an odd integer
     /// - $f(\infty,y,m)=\infty$ if $y>0$, and $0.0$ if $y<0$
-    /// - $f(-\infty,y,m)=-\infty$ if $y$ is a positive odd integer, $\infty$ if $y$ is positive
-    ///   and not an odd integer, $-0.0$ if $y$ is a negative odd integer, and $0.0$ if $y$ is
-    ///   negative and not an odd integer
+    /// - $f(-\infty,y,m)=-\infty$ if $y$ is a positive odd integer, $\infty$ if $y$ is positive and
+    ///   not an odd integer, $-0.0$ if $y$ is a negative odd integer, and $0.0$ if $y$ is negative
+    ///   and not an odd integer
     /// - $f(0.0,y,m)=0.0$ if $y>0$, and $\infty$ if $y<0$
     /// - $f(-0.0,y,m)=-0.0$ if $y$ is a positive odd integer, $0.0$ if $y$ is positive and not an
     ///   odd integer, $-\infty$ if $y$ is a negative odd integer, and $\infty$ if $y$ is negative
     ///   and not an odd integer
-    /// - $f(x,y,m)=\text{NaN}$ if $x$ is finite and negative and $y$ is finite and not an
-    ///   integer
+    /// - $f(x,y,m)=\text{NaN}$ if $x$ is finite and negative and $y$ is finite and not an integer
     ///
     /// Overflow and underflow:
     /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
     ///   returned instead.
-    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$
-    ///   is returned instead.
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead.
     /// - If $0<f(x,y,m)<2^{-2^{30}}$ and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
     /// - If $0<f(x,y,m)<2^{-2^{30}}$ and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
     ///   instead.
     /// - If $0<f(x,y,m)\leq2^{-2^{30}-1}$ and $m$ is `Nearest`, $0.0$ is returned instead.
-    /// - If $2^{-2^{30}-1}<f(x,y,m)<2^{-2^{30}}$ and $m$ is `Nearest`, $2^{-2^{30}}$ is
-    ///   returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,m)<2^{-2^{30}}$ and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
     /// - Negative results (from negative $x$ and odd integer $y$) mirror the bullets above, with
     ///   the rounding directions reflected.
     ///
-    /// If you want to specify an output precision, consider using
-    /// [`Float::pow_prec_round_val_ref`] instead. If you know you'll be using the `Nearest`
-    /// rounding mode, consider using [`Pow::pow`] instead.
+    /// If you want to specify an output precision, consider using [`Float::pow_prec_round_val_ref`]
+    /// instead. If you know you'll be using the `Nearest` rounding mode, consider using
+    /// [`Pow::pow`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
     /// $M(n) = O(n (\log n)^2)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
@@ -1541,10 +1525,10 @@ impl Float {
 
     /// Raises a [`Float`] to a [`Float`] power, rounding the result to the maximum of the
     /// precisions of the two inputs and with the specified rounding mode. The first [`Float`] is
-    /// taken by reference and the second by value. An [`Ordering`] is also
-    /// returned, indicating whether the rounded power is less than, equal to, or greater than
-    /// the exact power. Although `NaN`s are not comparable to any [`Float`], whenever this
-    /// function returns a `NaN` it also returns `Equal`.
+    /// taken by reference and the second by value. An [`Ordering`] is also returned, indicating
+    /// whether the rounded power is less than, equal to, or greater than the exact power. Although
+    /// `NaN`s are not comparable to any [`Float`], whenever this function returns a `NaN` it also
+    /// returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -1568,41 +1552,40 @@ impl Float {
     /// - $f(-1.0,\pm\infty,m)=1.0$
     /// - $f(-1.0,y,m)=1.0$ if $y$ is an even integer, and $-1.0$ if $y$ is an odd integer
     /// - $f(\infty,y,m)=\infty$ if $y>0$, and $0.0$ if $y<0$
-    /// - $f(-\infty,y,m)=-\infty$ if $y$ is a positive odd integer, $\infty$ if $y$ is positive
-    ///   and not an odd integer, $-0.0$ if $y$ is a negative odd integer, and $0.0$ if $y$ is
-    ///   negative and not an odd integer
+    /// - $f(-\infty,y,m)=-\infty$ if $y$ is a positive odd integer, $\infty$ if $y$ is positive and
+    ///   not an odd integer, $-0.0$ if $y$ is a negative odd integer, and $0.0$ if $y$ is negative
+    ///   and not an odd integer
     /// - $f(0.0,y,m)=0.0$ if $y>0$, and $\infty$ if $y<0$
     /// - $f(-0.0,y,m)=-0.0$ if $y$ is a positive odd integer, $0.0$ if $y$ is positive and not an
     ///   odd integer, $-\infty$ if $y$ is a negative odd integer, and $\infty$ if $y$ is negative
     ///   and not an odd integer
-    /// - $f(x,y,m)=\text{NaN}$ if $x$ is finite and negative and $y$ is finite and not an
-    ///   integer
+    /// - $f(x,y,m)=\text{NaN}$ if $x$ is finite and negative and $y$ is finite and not an integer
     ///
     /// Overflow and underflow:
     /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
     ///   returned instead.
-    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$
-    ///   is returned instead.
+    /// - If $f(x,y,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead.
     /// - If $0<f(x,y,m)<2^{-2^{30}}$ and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
     /// - If $0<f(x,y,m)<2^{-2^{30}}$ and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
     ///   instead.
     /// - If $0<f(x,y,m)\leq2^{-2^{30}-1}$ and $m$ is `Nearest`, $0.0$ is returned instead.
-    /// - If $2^{-2^{30}-1}<f(x,y,m)<2^{-2^{30}}$ and $m$ is `Nearest`, $2^{-2^{30}}$ is
-    ///   returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,m)<2^{-2^{30}}$ and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
     /// - Negative results (from negative $x$ and odd integer $y$) mirror the bullets above, with
     ///   the rounding directions reflected.
     ///
-    /// If you want to specify an output precision, consider using
-    /// [`Float::pow_prec_round_ref_val`] instead. If you know you'll be using the `Nearest`
-    /// rounding mode, consider using [`Pow::pow`] instead.
+    /// If you want to specify an output precision, consider using [`Float::pow_prec_round_ref_val`]
+    /// instead. If you know you'll be using the `Nearest` rounding mode, consider using
+    /// [`Pow::pow`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
     /// $M(n) = O(n (\log n)^2)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
@@ -1633,14 +1616,13 @@ impl Float {
 
     /// Raises a [`Float`] to a [`Float`] power, rounding the result to the specified precision and
     /// to the nearest value. The first [`Float`] is taken by value and the second by reference. An
-    /// [`Ordering`] is also
-    /// returned, indicating whether the rounded power is less than, equal to, or greater than
-    /// the exact power. Although `NaN`s are not comparable to any [`Float`], whenever this
-    /// function returns a `NaN` it also returns `Equal`.
+    /// [`Ordering`] is also returned, indicating whether the rounded power is less than, equal to,
+    /// or greater than the exact power. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
     ///
-    /// If the power is equidistant from two [`Float`]s with the specified precision, the
-    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
-    /// description of the `Nearest` rounding mode.
+    /// If the power is equidistant from two [`Float`]s with the specified precision, the [`Float`]
+    /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
+    /// the `Nearest` rounding mode.
     ///
     /// $$
     /// f(x,y,p) = x^y+\varepsilon.
@@ -1660,15 +1642,14 @@ impl Float {
     /// - $f(-1.0,\pm\infty,p)=1.0$
     /// - $f(-1.0,y,p)=1.0$ if $y$ is an even integer, and $-1.0$ if $y$ is an odd integer
     /// - $f(\infty,y,p)=\infty$ if $y>0$, and $0.0$ if $y<0$
-    /// - $f(-\infty,y,p)=-\infty$ if $y$ is a positive odd integer, $\infty$ if $y$ is positive
-    ///   and not an odd integer, $-0.0$ if $y$ is a negative odd integer, and $0.0$ if $y$ is
-    ///   negative and not an odd integer
+    /// - $f(-\infty,y,p)=-\infty$ if $y$ is a positive odd integer, $\infty$ if $y$ is positive and
+    ///   not an odd integer, $-0.0$ if $y$ is a negative odd integer, and $0.0$ if $y$ is negative
+    ///   and not an odd integer
     /// - $f(0.0,y,p)=0.0$ if $y>0$, and $\infty$ if $y<0$
     /// - $f(-0.0,y,p)=-0.0$ if $y$ is a positive odd integer, $0.0$ if $y$ is positive and not an
     ///   odd integer, $-\infty$ if $y$ is a negative odd integer, and $\infty$ if $y$ is negative
     ///   and not an odd integer
-    /// - $f(x,y,p)=\text{NaN}$ if $x$ is finite and negative and $y$ is finite and not an
-    ///   integer
+    /// - $f(x,y,p)=\text{NaN}$ if $x$ is finite and negative and $y$ is finite and not an integer
     ///
     /// Overflow and underflow:
     /// - If $f(x,y,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
@@ -1707,14 +1688,13 @@ impl Float {
 
     /// Raises a [`Float`] to a [`Float`] power, rounding the result to the specified precision and
     /// to the nearest value. The first [`Float`] is taken by reference and the second by value. An
-    /// [`Ordering`] is also
-    /// returned, indicating whether the rounded power is less than, equal to, or greater than
-    /// the exact power. Although `NaN`s are not comparable to any [`Float`], whenever this
-    /// function returns a `NaN` it also returns `Equal`.
+    /// [`Ordering`] is also returned, indicating whether the rounded power is less than, equal to,
+    /// or greater than the exact power. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
     ///
-    /// If the power is equidistant from two [`Float`]s with the specified precision, the
-    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
-    /// description of the `Nearest` rounding mode.
+    /// If the power is equidistant from two [`Float`]s with the specified precision, the [`Float`]
+    /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
+    /// the `Nearest` rounding mode.
     ///
     /// $$
     /// f(x,y,p) = x^y+\varepsilon.
@@ -1734,15 +1714,14 @@ impl Float {
     /// - $f(-1.0,\pm\infty,p)=1.0$
     /// - $f(-1.0,y,p)=1.0$ if $y$ is an even integer, and $-1.0$ if $y$ is an odd integer
     /// - $f(\infty,y,p)=\infty$ if $y>0$, and $0.0$ if $y<0$
-    /// - $f(-\infty,y,p)=-\infty$ if $y$ is a positive odd integer, $\infty$ if $y$ is positive
-    ///   and not an odd integer, $-0.0$ if $y$ is a negative odd integer, and $0.0$ if $y$ is
-    ///   negative and not an odd integer
+    /// - $f(-\infty,y,p)=-\infty$ if $y$ is a positive odd integer, $\infty$ if $y$ is positive and
+    ///   not an odd integer, $-0.0$ if $y$ is a negative odd integer, and $0.0$ if $y$ is negative
+    ///   and not an odd integer
     /// - $f(0.0,y,p)=0.0$ if $y>0$, and $\infty$ if $y<0$
     /// - $f(-0.0,y,p)=-0.0$ if $y$ is a positive odd integer, $0.0$ if $y$ is positive and not an
     ///   odd integer, $-\infty$ if $y$ is a negative odd integer, and $\infty$ if $y$ is negative
     ///   and not an odd integer
-    /// - $f(x,y,p)=\text{NaN}$ if $x$ is finite and negative and $y$ is finite and not an
-    ///   integer
+    /// - $f(x,y,p)=\text{NaN}$ if $x$ is finite and negative and $y$ is finite and not an integer
     ///
     /// Overflow and underflow:
     /// - If $f(x,y,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
@@ -1781,10 +1760,9 @@ impl Float {
 
     /// Raises a [`Float`] to a [`Float`] power in place, rounding the result to the specified
     /// precision and with the specified rounding mode. The [`Float`] on the right-hand side is
-    /// taken by value. An
-    /// [`Ordering`] is returned, indicating whether the rounded power is less than, equal to, or
-    /// greater than the exact power. Although `NaN`s are not comparable to any [`Float`], whenever
-    /// this function sets a `NaN` it also returns `Equal`.
+    /// taken by value. An [`Ordering`] is returned, indicating whether the rounded power is less
+    /// than, equal to, or greater than the exact power. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function sets a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -1799,13 +1777,13 @@ impl Float {
     ///
     /// If the output has a precision, it is `prec`.
     ///
-    /// See the [`Float::pow_prec_round`] documentation for information on special cases,
-    /// overflow, and underflow.
+    /// See the [`Float::pow_prec_round`] documentation for information on special cases, overflow,
+    /// and underflow.
     ///
-    /// If you know you'll be using `Nearest`, consider using [`Float::pow_prec_assign`]
-    /// instead. If you know that your target precision is the maximum of the precisions of the
-    /// two inputs, consider using [`Float::pow_round_assign`] instead. If both of these
-    /// things are true, consider using [`PowAssign::pow_assign`] instead.
+    /// If you know you'll be using `Nearest`, consider using [`Float::pow_prec_assign`] instead. If
+    /// you know that your target precision is the maximum of the precisions of the two inputs,
+    /// consider using [`Float::pow_round_assign`] instead. If both of these things are true,
+    /// consider using [`PowAssign::pow_assign`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
@@ -1856,10 +1834,9 @@ impl Float {
 
     /// Raises a [`Float`] to a [`Float`] power in place, rounding the result to the specified
     /// precision and with the specified rounding mode. The [`Float`] on the right-hand side is
-    /// taken by reference. An
-    /// [`Ordering`] is returned, indicating whether the rounded power is less than, equal to, or
-    /// greater than the exact power. Although `NaN`s are not comparable to any [`Float`], whenever
-    /// this function sets a `NaN` it also returns `Equal`.
+    /// taken by reference. An [`Ordering`] is returned, indicating whether the rounded power is
+    /// less than, equal to, or greater than the exact power. Although `NaN`s are not comparable to
+    /// any [`Float`], whenever this function sets a `NaN` it also returns `Equal`.
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -1874,13 +1851,13 @@ impl Float {
     ///
     /// If the output has a precision, it is `prec`.
     ///
-    /// See the [`Float::pow_prec_round`] documentation for information on special cases,
-    /// overflow, and underflow.
+    /// See the [`Float::pow_prec_round`] documentation for information on special cases, overflow,
+    /// and underflow.
     ///
     /// If you know you'll be using `Nearest`, consider using [`Float::pow_prec_assign_ref`]
-    /// instead. If you know that your target precision is the maximum of the precisions of the
-    /// two inputs, consider using [`Float::pow_round_assign_ref`] instead. If both of these
-    /// things are true, consider using [`PowAssign::pow_assign`] instead.
+    /// instead. If you know that your target precision is the maximum of the precisions of the two
+    /// inputs, consider using [`Float::pow_round_assign_ref`] instead. If both of these things are
+    /// true, consider using [`PowAssign::pow_assign`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
@@ -1936,13 +1913,13 @@ impl Float {
 
     /// Raises a [`Float`] to a [`Float`] power in place, rounding the result to the specified
     /// precision and to the nearest value. The [`Float`] on the right-hand side is taken by value.
-    /// An [`Ordering`] is returned, indicating whether the rounded power is less than, equal to,
-    /// or greater than the exact power. Although `NaN`s are not comparable to any [`Float`],
-    /// whenever this function sets a `NaN` it also returns `Equal`.
+    /// An [`Ordering`] is returned, indicating whether the rounded power is less than, equal to, or
+    /// greater than the exact power. Although `NaN`s are not comparable to any [`Float`], whenever
+    /// this function sets a `NaN` it also returns `Equal`.
     ///
-    /// If the power is equidistant from two [`Float`]s with the specified precision, the
-    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
-    /// description of the `Nearest` rounding mode.
+    /// If the power is equidistant from two [`Float`]s with the specified precision, the [`Float`]
+    /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
+    /// the `Nearest` rounding mode.
     ///
     /// $$
     /// f(x,y,p) = x^y+\varepsilon.
@@ -1953,13 +1930,13 @@ impl Float {
     ///
     /// If the output has a precision, it is `prec`.
     ///
-    /// See the [`Float::pow_prec_round`] documentation for information on special cases,
-    /// overflow, and underflow.
+    /// See the [`Float::pow_prec_round`] documentation for information on special cases, overflow,
+    /// and underflow.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::pow_prec_round_assign`] instead. If you know that your target precision is the
-    /// maximum of the precisions of the two inputs, consider using
-    /// [`PowAssign::pow_assign`] instead.
+    /// maximum of the precisions of the two inputs, consider using [`PowAssign::pow_assign`]
+    /// instead.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
@@ -1992,9 +1969,9 @@ impl Float {
     /// equal to, or greater than the exact power. Although `NaN`s are not comparable to any
     /// [`Float`], whenever this function sets a `NaN` it also returns `Equal`.
     ///
-    /// If the power is equidistant from two [`Float`]s with the specified precision, the
-    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
-    /// description of the `Nearest` rounding mode.
+    /// If the power is equidistant from two [`Float`]s with the specified precision, the [`Float`]
+    /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
+    /// the `Nearest` rounding mode.
     ///
     /// $$
     /// f(x,y,p) = x^y+\varepsilon.
@@ -2005,13 +1982,13 @@ impl Float {
     ///
     /// If the output has a precision, it is `prec`.
     ///
-    /// See the [`Float::pow_prec_round`] documentation for information on special cases,
-    /// overflow, and underflow.
+    /// See the [`Float::pow_prec_round`] documentation for information on special cases, overflow,
+    /// and underflow.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::pow_prec_round_assign_ref`] instead. If you know that your target precision is the
-    /// maximum of the precisions of the two inputs, consider using
-    /// [`PowAssign::pow_assign`] instead.
+    /// maximum of the precisions of the two inputs, consider using [`PowAssign::pow_assign`]
+    /// instead.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
@@ -2058,20 +2035,20 @@ impl Float {
     ///
     /// If the output has a precision, it is the maximum of the precisions of the inputs.
     ///
-    /// See the [`Float::pow_prec_round`] documentation for information on special cases,
-    /// overflow, and underflow.
+    /// See the [`Float::pow_prec_round`] documentation for information on special cases, overflow,
+    /// and underflow.
     ///
-    /// If you want to specify an output precision, consider using
-    /// [`Float::pow_prec_round_assign`] instead. If you know you'll be using the `Nearest`
-    /// rounding mode, consider using [`PowAssign::pow_assign`] instead.
+    /// If you want to specify an output precision, consider using [`Float::pow_prec_round_assign`]
+    /// instead. If you know you'll be using the `Nearest` rounding mode, consider using
+    /// [`PowAssign::pow_assign`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
     /// $M(n) = O(n (\log n)^2)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
@@ -2120,8 +2097,8 @@ impl Float {
     ///
     /// If the output has a precision, it is the maximum of the precisions of the inputs.
     ///
-    /// See the [`Float::pow_prec_round`] documentation for information on special cases,
-    /// overflow, and underflow.
+    /// See the [`Float::pow_prec_round`] documentation for information on special cases, overflow,
+    /// and underflow.
     ///
     /// If you want to specify an output precision, consider using
     /// [`Float::pow_prec_round_assign_ref`] instead. If you know you'll be using the `Nearest`
@@ -2132,8 +2109,8 @@ impl Float {
     ///
     /// $M(n) = O(n (\log n)^2)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
@@ -2192,8 +2169,8 @@ impl Pow<Self> for Float {
     ///
     /// $M(n) = O(n (\log n)^2)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -2238,8 +2215,8 @@ impl Pow<&Self> for Float {
     ///
     /// $M(n) = O(n (\log n)^2)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -2284,8 +2261,8 @@ impl Pow<Float> for &Float {
     ///
     /// $M(n) = O(n (\log n)^2)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -2330,8 +2307,8 @@ impl Pow<&Float> for &Float {
     ///
     /// $M(n) = O(n (\log n)^2)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -2348,56 +2325,8 @@ impl Pow<&Float> for &Float {
 }
 
 impl PowAssign<Self> for Float {
-    /// Raises a [`Float`] to a [`Float`] power in place, rounding the result to the nearest
-    /// value. The [`Float`] on the right-hand side is taken by value.
-    ///
-    /// If the output has a precision, it is the maximum of the precisions of the inputs. If the
-    /// use malachite_base::num::arithmetic::traits::Pow;
-    /// use malachite_float::Float;
-    ///
-    /// assert_eq!((&Float::from(3)).pow(&Float::from(2.5)).to_string(), "16.0");
-    /// assert_eq!(
-    ///     (&Float::from(10)).pow(&Float::from(-0.5)).to_string(),
-    ///     "0.3"
-    /// );
-    /// f(x,y) = x^y+\varepsilon.
-    /// $$
-    /// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
-    /// - If $x^y$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
-    ///   |x^y|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
-    ///
-    /// See the [`Float::pow_prec_round`] documentation for information on special cases, overflow,
-    /// and underflow.
-    ///
-    /// If you want to specify an output precision, consider using [`Float::pow_prec`] instead. If
-    /// you want both of these things, consider using [`Float::pow_prec_round`] instead.
-    ///
-    /// # Worst-case complexity
-    /// $T(n) = O(n^{3/2} \log n \log\log n)$
-    ///
-    /// $M(n) = O(n (\log n)^2)$
-    ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
-    ///
-    /// # Examples
-    /// ```
-    /// use malachite_base::num::arithmetic::traits::PowAssign;
-    /// use malachite_float::Float;
-    ///
-    /// let mut x = Float::from(3);
-    /// x.pow_assign(Float::from(2.5));
-    /// assert_eq!(x.to_string(), "16.0");
-    /// ```
-    fn pow_assign(&mut self, other: Self) {
-        let prec = self.significant_bits().max(other.significant_bits());
-        *self = self.pow_prec_ref_ref(&other, prec).0;
-    }
-}
-
-impl PowAssign<&Self> for Float {
-    /// Raises a [`Float`] to a [`Float`] power in place, rounding the result to the nearest
-    /// value. The [`Float`] on the right-hand side is taken by reference.
+    /// Raises a [`Float`] to a [`Float`] power in place, rounding the result to the nearest value.
+    /// The [`Float`] on the right-hand side is taken by value.
     ///
     /// If the output has a precision, it is the maximum of the precisions of the inputs. If the
     /// power is equidistant from two [`Float`]s with the specified precision, the [`Float`] with
@@ -2422,8 +2351,53 @@ impl PowAssign<&Self> for Float {
     ///
     /// $M(n) = O(n (\log n)^2)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `max(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::PowAssign;
+    /// use malachite_float::Float;
+    ///
+    /// let mut x = Float::from(3);
+    /// x.pow_assign(Float::from(2.5));
+    /// assert_eq!(x.to_string(), "16.0");
+    /// ```
+    fn pow_assign(&mut self, other: Self) {
+        let prec = self.significant_bits().max(other.significant_bits());
+        *self = self.pow_prec_ref_ref(&other, prec).0;
+    }
+}
+
+impl PowAssign<&Self> for Float {
+    /// Raises a [`Float`] to a [`Float`] power in place, rounding the result to the nearest value.
+    /// The [`Float`] on the right-hand side is taken by reference.
+    ///
+    /// If the output has a precision, it is the maximum of the precisions of the inputs. If the
+    /// power is equidistant from two [`Float`]s with the specified precision, the [`Float`] with
+    /// fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of the
+    /// `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,y) = x^y+\varepsilon.
+    /// $$
+    /// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^y$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |x^y|\rfloor-p}$, where $p$ is the maximum precision of the inputs.
+    ///
+    /// See the [`Float::pow_prec_round`] documentation for information on special cases, overflow,
+    /// and underflow.
+    ///
+    /// If you want to specify an output precision, consider using [`Float::pow_prec`] instead. If
+    /// you want both of these things, consider using [`Float::pow_prec_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -2438,4 +2412,68 @@ impl PowAssign<&Self> for Float {
         let prec = self.significant_bits().max(other.significant_bits());
         *self = self.pow_prec_ref_ref(other, prec).0;
     }
+}
+
+/// Raises a primitive float to a primitive float power, returning a primitive float.
+///
+/// The result is correctly rounded to the nearest value, unlike [`f32::powf`] and [`f64::powf`],
+/// which are not guaranteed to be correctly rounded.
+///
+/// $$
+/// f(x,y) = x^y+\varepsilon.
+/// $$
+/// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+/// - If $x^y$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |x^y|\rfloor-p}$, where
+///   $p$ is the precision of the output (typically 24 if `T` is a [`f32`] and 53 if `T` is a
+///   [`f64`], but less if the output is subnormal).
+///
+/// Special cases:
+/// - $f(x,\pm0.0)=1.0$ for any $x$, even `NaN`
+/// - $f(1.0,y)=1.0$ for any $y$, even `NaN`
+/// - $f(\text{NaN},y)=f(x,\text{NaN})=\text{NaN}$ otherwise
+/// - $f(x,\infty)=\infty$ if $|x|>1$, and $0.0$ if $|x|<1$
+/// - $f(x,-\infty)=0.0$ if $|x|>1$, and $\infty$ if $|x|<1$
+/// - $f(-1.0,\pm\infty)=1.0$
+/// - $f(-1.0,y)=1.0$ if $y$ is an even integer, and $-1.0$ if $y$ is an odd integer
+/// - $f(\infty,y)=\infty$ if $y>0$, and $0.0$ if $y<0$
+/// - $f(-\infty,y)=-\infty$ if $y$ is a positive odd integer, $\infty$ if $y$ is positive and not
+///   an odd integer, $-0.0$ if $y$ is a negative odd integer, and $0.0$ if $y$ is negative and not
+///   an odd integer
+/// - $f(0.0,y)=0.0$ if $y>0$, and $\infty$ if $y<0$
+/// - $f(-0.0,y)=-0.0$ if $y$ is a positive odd integer, $0.0$ if $y$ is positive and not an odd
+///   integer, $-\infty$ if $y$ is a negative odd integer, and $\infty$ if $y$ is negative and not
+///   an odd integer
+/// - $f(x,y)=\text{NaN}$ if $x$ is finite and negative and $y$ is finite and not an integer
+///
+/// If the result overflows, $\pm\infty$ is returned, and if it underflows, $\pm0.0$ is returned.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::arithmetic::pow::primitive_float_pow;
+///
+/// assert_eq!(
+///     NiceFloat(primitive_float_pow(3.0, 2.5)),
+///     NiceFloat(15.588457268119896)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_pow(2.0, 0.5)),
+///     NiceFloat(1.4142135623730951)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_pow(10.0, -0.5)),
+///     NiceFloat(0.31622776601683794)
+/// );
+/// ```
+#[allow(clippy::type_repetition_in_bounds)]
+#[inline]
+pub fn primitive_float_pow<T: PrimitiveFloat>(x: T, y: T) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_float_float_to_float_fn(Float::pow_prec, x, y)
 }
