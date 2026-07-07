@@ -534,6 +534,7 @@ impl Float {
         self.exp_x_minus_1_prec_round_ref(prec, Nearest)
     }
 
+    #[allow(clippy::needless_pass_by_value)]
     /// Computes $e^x-1$, where $x$ is a [`Rational`], rounding the result to the specified
     /// precision and with the specified rounding mode and returning the result as a [`Float`]. The
     /// [`Rational`] is taken by value. An [`Ordering`] is also returned, indicating whether the
@@ -732,6 +733,7 @@ impl Float {
         exp_x_minus_1_rational_helper(x, prec, rm)
     }
 
+    #[allow(clippy::needless_pass_by_value)]
     /// Computes $e^x-1$, where $x$ is a [`Rational`], rounding the result to the nearest value of
     /// the specified precision and returning the result as a [`Float`]. The [`Rational`] is taken
     /// by value. An [`Ordering`] is also returned, indicating whether the rounded value is less

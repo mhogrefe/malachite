@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use crate::arithmetic::ln::sliver_of_one;
+use crate::arithmetic::ln::{SliverOfOne, sliver_of_one};
 use crate::arithmetic::log_base_2::extended_log_base_2_of_rational;
 use crate::basic::extended::ExtendedFloat;
 use crate::{
@@ -48,8 +48,19 @@ fn log_base_power_of_2_prec_round_normal(
     }
     // log_{2^pow}(x) for x in a sliver of 1 can fall below the smallest positive Float; the
     // 1-plus-x form handles that underflow region.
-    if let Some(d) = sliver_of_one(x) {
-        return d.log_base_power_of_2_1_plus_x_prec_round(pow, prec, rm);
+    match sliver_of_one(x) {
+        SliverOfOne::Representable(d) => {
+            return d.log_base_power_of_2_1_plus_x_prec_round(pow, prec, rm);
+        }
+        SliverOfOne::Underflow => {
+            return Float::log_base_power_of_2_rational_prec_round(
+                Rational::exact_from(x),
+                pow,
+                prec,
+                rm,
+            );
+        }
+        SliverOfOne::No => {}
     }
     // The result is never exactly representable otherwise.
     assert_ne!(rm, Exact, "Inexact log_base_power_of_2");

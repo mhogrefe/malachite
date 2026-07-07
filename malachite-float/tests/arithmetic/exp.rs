@@ -1212,6 +1212,7 @@ fn exp_prec_properties() {
     });
 }
 
+#[allow(clippy::needless_pass_by_value)]
 fn exp_properties_helper(x: Float) {
     let e = x.clone().exp();
     assert!(e.is_valid());

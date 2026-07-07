@@ -10,13 +10,15 @@ use malachite_base::num::arithmetic::traits::{Pow, PowAssign};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
-use malachite_base::test_util::bench::bucketers::pair_max_primitive_float_bucketer;
+use malachite_base::test_util::bench::bucketers::{
+    pair_max_primitive_float_bucketer, quadruple_3_bucketer, triple_3_bucketer,
+};
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::primitive_float_pair_gen;
 use malachite_base::test_util::runner::Runner;
 use malachite_float::Float;
-use malachite_float::arithmetic::pow::primitive_float_pow;
+use malachite_float::arithmetic::pow::{primitive_float_pow, primitive_float_rational_pow};
 use malachite_float::test_util::arithmetic::pow::{
     rug_pow, rug_pow_prec, rug_pow_prec_round, rug_pow_round,
 };
@@ -38,11 +40,18 @@ use malachite_float::test_util::generators::{
     float_float_unsigned_rounding_mode_quadruple_gen_var_10, float_float_unsigned_triple_gen_var_1,
     float_float_unsigned_triple_gen_var_1_rm, float_float_unsigned_triple_gen_var_2,
     float_pair_gen, float_pair_gen_rm, float_pair_gen_var_10,
+    float_rational_unsigned_rounding_mode_quadruple_gen_var_1,
+    float_rational_unsigned_triple_gen_var_1,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef};
+use malachite_q::test_util::bench::bucketers::pair_1_rational_bit_bucketer;
+use malachite_q::test_util::generators::rational_primitive_float_pair_gen;
 
 pub(crate) fn register(runner: &mut Runner) {
+    register_demo!(runner, demo_float_rational_pow_prec_round);
+    register_demo!(runner, demo_float_rational_pow_prec);
     register_primitive_float_demos!(runner, demo_primitive_float_pow);
+    register_primitive_float_demos!(runner, demo_primitive_float_rational_pow);
     register_demo!(runner, demo_float_pow);
     register_demo!(runner, demo_float_pow_debug);
     register_demo!(runner, demo_float_pow_extreme);
@@ -100,7 +109,10 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_pow_prec_round_assign_ref);
     register_demo!(runner, demo_float_pow_prec_round_assign_ref_debug);
 
+    register_bench!(runner, benchmark_float_rational_pow_prec_round);
+    register_bench!(runner, benchmark_float_rational_pow_prec);
     register_primitive_float_benches!(runner, benchmark_primitive_float_pow);
+    register_primitive_float_benches!(runner, benchmark_primitive_float_rational_pow);
     register_bench!(runner, benchmark_float_pow_evaluation_strategy);
     register_bench!(runner, benchmark_float_pow_library_comparison);
     register_bench!(runner, benchmark_float_pow_assign_evaluation_strategy);
@@ -966,7 +978,6 @@ fn demo_float_pow_prec_round_assign_ref_debug(gm: GenMode, config: &GenConfig, l
 }
 
 #[allow(clippy::type_repetition_in_bounds)]
-#[allow(clippy::type_repetition_in_bounds)]
 #[allow(clippy::no_effect, unused_must_use)]
 fn benchmark_float_pow_evaluation_strategy(
     gm: GenMode,
@@ -992,7 +1003,6 @@ fn benchmark_float_pow_evaluation_strategy(
 }
 
 #[allow(clippy::no_effect, unused_must_use)]
-#[allow(unused_must_use, clippy::no_effect)]
 fn benchmark_float_pow_library_comparison(
     gm: GenMode,
     config: &GenConfig,
@@ -1338,6 +1348,112 @@ fn benchmark_primitive_float_pow<T: PrimitiveFloat>(
         &pair_max_primitive_float_bucketer("x", "y"),
         &mut [("malachite", &mut |(x, y)| {
             no_out!(primitive_float_pow(x, y));
+        })],
+    );
+}
+
+fn demo_float_rational_pow_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (y, x, prec, rm) in float_rational_unsigned_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (p, o) = Float::rational_pow_prec_round_ref_ref(&x, &y, prec, rm);
+        println!("rational_pow_prec_round({x}, {y}, {prec}, {rm}) = ({p}, {o:?})");
+    }
+}
+
+fn demo_float_rational_pow_prec(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (y, x, prec) in float_rational_unsigned_triple_gen_var_1::<u64>()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (p, o) = Float::rational_pow_prec_ref_ref(&x, &y, prec);
+        println!("rational_pow_prec({x}, {y}, {prec}) = ({p}, {o:?})");
+    }
+}
+
+fn benchmark_float_rational_pow_prec_round(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float::rational_pow_prec_round(Rational, Float, u64, RoundingMode)",
+        BenchmarkType::Single,
+        float_rational_unsigned_rounding_mode_quadruple_gen_var_1().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &quadruple_3_bucketer("prec"),
+        &mut [("Malachite", &mut |(y, x, prec, rm)| {
+            no_out!(Float::rational_pow_prec_round(x, y, prec, rm));
+        })],
+    );
+}
+
+fn benchmark_float_rational_pow_prec(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float::rational_pow_prec(Rational, Float, u64)",
+        BenchmarkType::Single,
+        float_rational_unsigned_triple_gen_var_1::<u64>().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &triple_3_bucketer("prec"),
+        &mut [("Malachite", &mut |(y, x, prec)| {
+            no_out!(Float::rational_pow_prec(x, y, prec));
+        })],
+    );
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn demo_primitive_float_rational_pow<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    for (x, y) in rational_primitive_float_pair_gen::<T>()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "primitive_float_rational_pow({}, {}) = {}",
+            x.clone(),
+            NiceFloat(y),
+            NiceFloat(primitive_float_rational_pow::<T>(&x, y))
+        );
+    }
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn benchmark_primitive_float_rational_pow<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    run_benchmark(
+        &format!("primitive_float_rational_pow(Rational, {})", T::NAME),
+        BenchmarkType::Single,
+        rational_primitive_float_pair_gen::<T>().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_1_rational_bit_bucketer("x"),
+        &mut [("malachite", &mut |(x, y)| {
+            no_out!(primitive_float_rational_pow::<T>(&x, y));
         })],
     );
 }

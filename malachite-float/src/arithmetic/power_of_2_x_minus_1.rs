@@ -481,6 +481,7 @@ impl Float {
         self.power_of_2_x_minus_1_prec_round_assign(prec, rm)
     }
 
+    #[allow(clippy::needless_pass_by_value)]
     /// Computes $2^x-1$, where $x$ is a [`Rational`], rounding the result to the specified
     /// precision and with the specified rounding mode and returning the result as a [`Float`]. The
     /// [`Rational`] is taken by value.

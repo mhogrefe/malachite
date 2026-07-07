@@ -45,6 +45,34 @@ use malachite_q::test_util::generators::{rational_gen, rational_unsigned_pair_ge
 use std::panic::catch_unwind;
 use std::str::FromStr;
 
+// A `Float` that is a sliver of 1 (|x - 1| at or below the smallest positive `Float`, requiring a
+// precision near 2^30) has `ln|x| ~ x - 1` at or below the smallest positive `Float`. The direct
+// `Float` `ln` once panicked (`x - 1` underflowed in the sliver detector); it is now delegated to
+// the exact-`Rational` `ln`, which brackets the value and rounds with correct underflow. The two
+// sides of 1 straddle the Nearest underflow tie 2^(MIN - 2): |ln(1 + 2^(MIN-2))| < tie (rounds to
+// 0) while |ln(1 - 2^(MIN-2))| > tie (rounds to the min positive value). Run under `--release`.
+#[test]
+fn test_ln_sliver_of_one() {
+    let p = u64::try_from(-i64::from(Float::MIN_EXPONENT) + 3).unwrap();
+    let eps = Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2);
+    let hi = Float::from_rational_prec_round(Rational::ONE + &eps, p, Exact).0;
+    let lo = Float::from_rational_prec_round(Rational::ONE - &eps, p, Exact).0;
+    let test = |x: &Float, rm: RoundingMode, out_hex: &str, o_out| {
+        let (r, o) = x.ln_prec_round_ref(64, rm);
+        assert!(r.is_valid());
+        assert_eq!(to_hex_string(&r), out_hex);
+        assert_eq!(o, o_out);
+    };
+    // ln(1 + 2^(MIN-2)) > 0, just below the tie
+    test(&hi, Floor, "0x0.0", Less);
+    test(&hi, Nearest, "0x0.0", Less);
+    test(&hi, Ceiling, "0x1.0000000000000000E-268435456#64", Greater);
+    // ln(1 - 2^(MIN-2)) < 0, magnitude just above the tie
+    test(&lo, Ceiling, "-0x0.0", Greater);
+    test(&lo, Nearest, "-0x1.0000000000000000E-268435456#64", Less);
+    test(&lo, Floor, "-0x1.0000000000000000E-268435456#64", Less);
+}
+
 #[test]
 fn test_ln() {
     let test = |s, s_hex, out: &str, out_hex: &str| {

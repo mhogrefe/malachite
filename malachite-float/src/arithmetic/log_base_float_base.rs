@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Infinity, NaN};
-use crate::arithmetic::ln::sliver_of_one;
+use crate::arithmetic::ln::{SliverOfOne, sliver_of_one};
 use crate::arithmetic::log_base::{
     dyadic_log_of_root, dyadic_primitive_root, odd_significand_and_exponent,
 };
@@ -84,8 +84,19 @@ fn log_base_float_base_normal(
     }
     // log_base(x) for x in a sliver of 1 can fall below the smallest positive Float; the 1-plus-x
     // form handles that underflow region.
-    if let Some(d) = sliver_of_one(x) {
-        return d.log_base_float_base_1_plus_x_prec_round(base, prec, rm);
+    match sliver_of_one(x) {
+        SliverOfOne::Representable(d) => {
+            return d.log_base_float_base_1_plus_x_prec_round(base, prec, rm);
+        }
+        SliverOfOne::Underflow => {
+            return Float::log_base_rational_float_base_prec_round(
+                Rational::exact_from(x),
+                base.clone(),
+                prec,
+                rm,
+            );
+        }
+        SliverOfOne::No => {}
     }
     // The result is irrational, so it is never exactly representable.
     assert_ne!(rm, Exact, "Inexact log_base_float_base");

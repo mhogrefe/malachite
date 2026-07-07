@@ -13,9 +13,10 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use crate::arithmetic::ln::sliver_of_one;
+use crate::arithmetic::ln::{SliverOfOne, ln_1_plus_rational_brackets, sliver_of_one};
 use crate::arithmetic::round_near_x::float_round_near_x;
 use crate::basic::extended::ExtendedFloat;
+use crate::{ComparableFloatRef, floor_and_ceiling};
 use crate::{
     Float, emulate_float_to_float_fn, emulate_rational_to_float_fn, float_either_zero,
     float_infinity, float_nan, float_negative_infinity,
@@ -49,8 +50,12 @@ fn log_base_2_prec_round_normal(x: &Float, prec: u64, rm: RoundingMode) -> (Floa
     }
     // log_2(x) for x in a sliver of 1 can fall below the smallest positive Float; the 1-plus-x form
     // handles that underflow region.
-    if let Some(d) = sliver_of_one(x) {
-        return d.log_base_2_1_plus_x_prec_round(prec, rm);
+    match sliver_of_one(x) {
+        SliverOfOne::Representable(d) => return d.log_base_2_1_plus_x_prec_round(prec, rm),
+        SliverOfOne::Underflow => {
+            return Float::log_base_2_rational_prec_round(Rational::exact_from(x), prec, rm);
+        }
+        SliverOfOne::No => {}
     }
     // The result is never exactly representable for other inputs.
     assert_ne!(rm, Exact, "Inexact log_base_2");
@@ -78,18 +83,61 @@ fn log_base_2_prec_round_normal(x: &Float, prec: u64, rm: RoundingMode) -> (Floa
 // Computes `log_2(1 + eps)` for a small nonzero [`Rational`] `eps` (`x - 1`, where `x` is near 1).
 // The result is near zero, so unlike the near-a-larger-power case it must be computed directly
 // rather than rounded near an integer; a Ziv loop over a [`Float`] approximation of `eps` does so
-// without the catastrophic cancellation that `ln(x)` would suffer for `x` near 1.
+// without the catastrophic cancellation that `ln(x)` would suffer for `x` near 1. Brackets of
+// log2(x') for an exact Rational x' in [1/sqrt(2), sqrt(2)) (the caller centers the mantissa on the
+// nearest power of 2, so x' is never near 2), as exact Rationals, to a relative accuracy of about
+// 2^-wprec. x' comfortably away from 1 goes through directed Float logs; x' within a sliver of 1 --
+// from either side, where a Float log would lose all precision to the exponent range -- goes
+// through the exact atanh-series brackets divided by ln(2) brackets.
+pub(crate) fn log_2_rational_brackets(x: &Rational, wprec: u64) -> (Rational, Rational) {
+    let e = x - Rational::ONE;
+    if e == 0u32 {
+        return (Rational::ZERO, Rational::ZERO);
+    }
+    if e.floor_log_base_2_abs() >= -8 {
+        // Directed Float computation: round x' outward, then take directed logs. x' is bounded away
+        // from both 1 and 2, so neither log collapses to an exact power-of-2 boundary.
+        let x_lo = Float::from_rational_prec_round_ref(x, wprec, Floor).0;
+        let x_hi = Float::from_rational_prec_round_ref(x, wprec, Ceiling).0;
+        let l_lo = x_lo.log_base_2_prec_round(wprec, Floor).0;
+        let l_hi = x_hi.log_base_2_prec_round(wprec, Ceiling).0;
+        (Rational::exact_from(&l_lo), Rational::exact_from(&l_hi))
+    } else {
+        // ln(x') as exact Rational brackets, then divide by ln(2) brackets, rounding outward. The
+        // ln brackets share the sign of e = x' - 1; the outward division depends on that sign.
+        let (ln_lo, ln_hi) = ln_1_plus_rational_brackets(&e, wprec);
+        let (ln_2_lo, ln_2_hi) = floor_and_ceiling(Float::ln_2_prec_round(wprec, Floor));
+        let ln_2_lo = Rational::exact_from(&ln_2_lo);
+        let ln_2_hi = Rational::exact_from(&ln_2_hi);
+        if e > 0u32 {
+            (ln_lo / ln_2_hi, ln_hi / ln_2_lo)
+        } else {
+            (ln_lo / ln_2_lo, ln_hi / ln_2_hi)
+        }
+    }
+}
+
+// Computes log2(1 + eps) for an exact Rational eps with 1 + eps in [1/sqrt(2), sqrt(2)) (so eps in
+// [1/sqrt(2) - 1, sqrt(2) - 1)). Brackets log2(1 + eps) between exact Rationals and rounds each end
+// via `from_rational_prec_round`, which handles the underflow region correctly -- so a sub-`MIN`
+// eps (whose log2 falls below the smallest positive Float) rounds correctly instead of flushing a
+// Float approximation of eps to zero.
 fn log_base_2_rational_near_one(eps: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    let x = Rational::ONE + eps;
     let mut working_prec = prec + 3 + prec.ceiling_log_base_2();
     let mut increment = Limb::WIDTH;
     loop {
-        // log_2(1 + eps), via a Float approximation of eps. The error comes from `eps_float`
-        // approximating `eps` (below an ulp) and from the rounding in `log_base_2_1_plus_x` (below
-        // an ulp), so a few ulps of slack suffice.
-        let eps_float = Float::from_rational_prec_ref(eps, working_prec).0;
-        let off = eps_float.log_base_2_1_plus_x_prec(working_prec).0;
-        if float_can_round(off.significand_ref().unwrap(), working_prec - 3, prec, rm) {
-            return Float::from_float_prec_round(off, prec, rm);
+        let (lo, hi) = log_2_rational_brackets(&x, working_prec);
+        let (f_lo, mut o_lo) = Float::from_rational_prec_round_ref(&lo, prec, rm);
+        let (f_hi, mut o_hi) = Float::from_rational_prec_round_ref(&hi, prec, rm);
+        if o_lo == Equal {
+            o_lo = o_hi;
+        }
+        if o_hi == Equal {
+            o_hi = o_lo;
+        }
+        if o_lo == o_hi && ComparableFloatRef(&f_lo) == ComparableFloatRef(&f_hi) {
+            return (f_lo, o_lo);
         }
         working_prec += increment;
         increment = working_prec >> 1;

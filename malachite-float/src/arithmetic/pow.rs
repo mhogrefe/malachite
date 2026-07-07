@@ -14,20 +14,27 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::ComparableFloatRef;
 use crate::InnerFloat::{Infinity, NaN, Zero};
 use crate::arithmetic::exp::{exp_overflow, exp_underflow, one_neighbor};
+use crate::arithmetic::log_base_2::log_2_rational_brackets;
 use crate::emulate_float_float_to_float_fn;
+use crate::emulate_rational_float_to_float_fn;
 use crate::{Float, float_either_infinity, float_either_zero, float_nan};
 use core::cmp::Ordering::{self, *};
+use core::cmp::max;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    Abs, CeilingLogBase2, CheckedSqrt, IsPowerOf2, NegAssign, Parity, Pow, PowAssign,
+    Abs, CeilingLogBase2, CheckedSqrt, IsPowerOf2, NegAssign, Parity, Pow, PowAssign, Square,
+    UnsignedAbs,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{
-    Infinity as InfinityTrait, NaN as NaNTrait, NegativeInfinity, NegativeZero, One,
+    Infinity as InfinityTrait, NaN as NaNTrait, NegativeInfinity, NegativeZero, One, Two,
     Zero as ZeroTrait,
 };
+use malachite_base::num::comparison::traits::OrdAbs;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{ExactFrom, IsInteger, RoundingFrom};
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
@@ -35,6 +42,8 @@ use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::float_extras::float_can_round;
+use malachite_nz::platform::{Limb, SignedLimb};
+use malachite_q::Rational;
 
 // This is MPFR_POW_EXP_THRESHOLD from `pow.c`, MPFR 4.3.0.
 const POW_EXP_THRESHOLD: i64 = 256;
@@ -536,6 +545,25 @@ fn float_to_odd_mantissa_and_exponent_natural(x: &Float) -> (Natural, i64) {
     (m >> tz, e + i64::exact_from(tz))
 }
 
+// If `|x|` is a sliver of 1 -- within a couple of binades of the smallest positive `Float`, where
+// `ln|x|` falls below the smallest positive `Float` -- returns `x`'s exact `Rational` value, and
+// otherwise `None`. Only a `Float` in `(1/2, 2)` with a precision near `2^30` can be a sliver, so
+// the exact `Rational` (which occupies ~128 MB) is built only past the cheap exponent and precision
+// tests.
+fn float_sliver_of_one(x: &Float) -> Option<Rational> {
+    let ex = i64::from(x.get_exponent().unwrap());
+    if (ex == 0 || ex == 1)
+        && x.get_prec().unwrap() >= u64::exact_from(-i64::from(Float::MIN_EXPONENT) - 8)
+    {
+        let xr = Rational::exact_from(x);
+        let d = (&xr).abs() - Rational::ONE;
+        if d != 0u32 && d.floor_log_base_2_abs() < i64::from(Float::MIN_EXPONENT) + 8 {
+            return Some(xr);
+        }
+    }
+    None
+}
+
 impl Float {
     // This is `mpfr_pow` from `pow.c`, MPFR 4.3.0.
 
@@ -724,6 +752,16 @@ impl Float {
                 rm,
             );
         }
+        // When |x| is a sliver of 1 -- within a couple of binades of the smallest positive Float --
+        // ln|x| falls below the smallest positive Float, so every Float-based route below (the
+        // early over/underflow bounds, `pow_general`) would underflow it and lose the precision
+        // needed for y * ln|x| (which can still be an ordinary, even overflowing, value). Delegate
+        // to the exact-Rational power, which brackets log2 with the atanh series over `Rational`s
+        // and never materializes a sub-`MIN_EXPONENT` Float logarithm. Only huge-precision Floats
+        // in (1/2, 2) can be slivers, so the exact Rational is built only past those cheap tests.
+        if let Some(xr) = float_sliver_of_one(x) {
+            return Self::rational_pow_prec_round_val_ref(xr, y, prec, rm);
+        }
         let ex = i64::from(x.get_exponent().unwrap());
         let ey = i64::from(y.get_exponent().unwrap());
         // Fast check for no possible overflow or underflow: |y| <= 2^15 and moderate ex means |y *
@@ -738,7 +776,7 @@ impl Float {
                     .0
                     .mul_prec_round_val_ref(y, 64, Down)
                     .0;
-                if t >= const { Self::const_from_signed(Self::MAX_EXPONENT as i64) } {
+                if t >= const { Self::const_from_signed(Self::MAX_EXPONENT as SignedLimb) } {
                     return pow_overflow(prec, rm, x.is_sign_negative() && float_odd_integer(y));
                 }
             }
@@ -797,6 +835,7 @@ impl Float {
 }
 
 impl Float {
+    #[allow(clippy::needless_pass_by_value)]
     /// Raises a [`Float`] to a [`Float`] power, rounding the result to the specified precision and
     /// with the specified rounding mode. Both [`Float`]s are taken by value. An [`Ordering`] is
     /// also returned, indicating whether the rounded power is less than, equal to, or greater than
@@ -1004,6 +1043,7 @@ impl Float {
         self.pow_prec_round_ref_ref(other, prec, rm)
     }
 
+    #[allow(clippy::needless_pass_by_value)]
     /// Raises a [`Float`] to a [`Float`] power, rounding the result to the specified precision and
     /// with the specified rounding mode. The first [`Float`] is taken by reference and the second
     /// by value. An [`Ordering`] is also returned, indicating whether the rounded power is less
@@ -1110,6 +1150,7 @@ impl Float {
         self.pow_prec_round_ref_ref(&other, prec, rm)
     }
 
+    #[allow(clippy::needless_pass_by_value)]
     /// Raises a [`Float`] to a [`Float`] power, rounding the result to the specified precision and
     /// to the nearest value. Both [`Float`]s are taken by value. An [`Ordering`] is also returned,
     /// indicating whether the rounded power is less than, equal to, or greater than the exact
@@ -1252,6 +1293,7 @@ impl Float {
         self.pow_prec_round_ref_ref(other, prec, Nearest)
     }
 
+    #[allow(clippy::needless_pass_by_value)]
     /// Raises a [`Float`] to a [`Float`] power, rounding the result to the maximum of the
     /// precisions of the two inputs and with the specified rounding mode. Both [`Float`]s are taken
     /// by value. An [`Ordering`] is also returned, indicating whether the rounded power is less
@@ -1523,6 +1565,7 @@ impl Float {
         self.pow_round_ref_ref(other, rm)
     }
 
+    #[allow(clippy::needless_pass_by_value)]
     /// Raises a [`Float`] to a [`Float`] power, rounding the result to the maximum of the
     /// precisions of the two inputs and with the specified rounding mode. The first [`Float`] is
     /// taken by reference and the second by value. An [`Ordering`] is also returned, indicating
@@ -1686,6 +1729,7 @@ impl Float {
         self.pow_prec_ref_ref(other, prec)
     }
 
+    #[allow(clippy::needless_pass_by_value)]
     /// Raises a [`Float`] to a [`Float`] power, rounding the result to the specified precision and
     /// to the nearest value. The first [`Float`] is taken by reference and the second by value. An
     /// [`Ordering`] is also returned, indicating whether the rounded power is less than, equal to,
@@ -1758,6 +1802,7 @@ impl Float {
         self.pow_prec_ref_ref(&other, prec)
     }
 
+    #[allow(clippy::needless_pass_by_value)]
     /// Raises a [`Float`] to a [`Float`] power in place, rounding the result to the specified
     /// precision and with the specified rounding mode. The [`Float`] on the right-hand side is
     /// taken by value. An [`Ordering`] is returned, indicating whether the rounded power is less
@@ -2476,4 +2521,1150 @@ where
     for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
 {
     emulate_float_float_to_float_fn(Float::pow_prec, x, y)
+}
+
+/// Raises a [`Rational`] to a primitive float power, returning a primitive float.
+///
+/// The result is correctly rounded to the nearest value. Unlike a primitive-float base, a
+/// [`Rational`] base may lie outside the primitive float's exponent range or so close to 1 that its
+/// logarithm is unrepresentable; both are handled exactly, by working with the base as an exact
+/// [`Rational`].
+///
+/// $$
+/// f(x,y) = x^y+\varepsilon.
+/// $$
+/// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+/// - If $x^y$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 |x^y|\rfloor-p}$, where
+///   $p$ is the precision of the output (typically 24 if `T` is a [`f32`] and 53 if `T` is a
+///   [`f64`], but less if the output is subnormal).
+///
+/// Special cases:
+/// - $f(x,\pm0.0)=1.0$ for any $x$
+/// - $f(1,y)=1.0$ for any $y$, even `NaN`
+/// - $f(x,\text{NaN})=\text{NaN}$ otherwise
+/// - $f(x,\infty)=\infty$ if $|x|>1$, and $0.0$ if $|x|<1$
+/// - $f(x,-\infty)=0.0$ if $|x|>1$, and $\infty$ if $|x|<1$
+/// - $f(\pm1,\pm\infty)=1.0$
+/// - $f(-1,y)=1.0$ if $y$ is an even integer, and $-1.0$ if $y$ is an odd integer
+/// - $f(0,y)=0.0$ if $y>0$, and $\infty$ if $y<0$; a [`Rational`] zero is unsigned, so the results
+///   take positive signs
+/// - $f(x,y)=\text{NaN}$ if $x<0$ and $y$ is finite and not an integer
+///
+/// If the result overflows, $\pm\infty$ is returned, and if it underflows, $\pm0.0$ is returned.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::arithmetic::pow::primitive_float_rational_pow;
+/// use malachite_q::Rational;
+///
+/// assert_eq!(
+///     NiceFloat(primitive_float_rational_pow(&Rational::from_unsigneds(3u32, 2u32), 2.5)),
+///     NiceFloat(2.7556759606310752)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_rational_pow(&Rational::from_unsigneds(9u32, 4u32), 0.5)),
+///     NiceFloat(1.5)
+/// );
+/// assert!(
+///     primitive_float_rational_pow::<f64>(&-Rational::from_unsigneds(3u32, 2u32), 0.5).is_nan()
+/// );
+/// ```
+#[allow(clippy::type_repetition_in_bounds)]
+#[inline]
+pub fn primitive_float_rational_pow<T: PrimitiveFloat>(x: &Rational, y: T) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_rational_float_to_float_fn(Float::rational_pow_prec_ref_val, x, y)
+}
+
+// Brackets of ln(1 + e) for an exact nonzero Rational e with |e| < 1/2, as exact Rationals, to a
+// relative accuracy of about 2^-wprec. Uses the atanh series ln(1 + e) = 2 atanh(u) with u = e / (2
+// + e) and |u| < 1/3: atanh(u) = sum_{k>=0} u^(2k+1)/(2k+1), whose tail after the term in u^(2k+1)
+// is bounded in magnitude by that term times u^2 / (1 - u^2) < that term * 9/8. The partial sum and
+// the tail both have the sign of e, so the exact value lies between the partial sum and (partial
+// sum + tail). Splits a positive Rational x as x' * 2^g with g the nearest integer to log2(x) and
+// x' in [1/sqrt(2), sqrt(2)), so that x' is close to 1 (never near 2, where a Float log would
+// collapse).
+fn rational_mantissa_nearest_power_of_2(x: &Rational) -> (Rational, i64) {
+    let fl = x.floor_log_base_2_abs();
+    let mant = x >> fl;
+    let g = if (&mant).square() < Rational::TWO {
+        fl
+    } else {
+        fl + 1
+    };
+    (x >> g, g)
+}
+
+// Whether x^y is a dyadic rational (and therefore possibly exactly representable), for a positive
+// non-power-of-2 Rational x = (a / b) * 2^e with a, b odd and coprime, and a finite nonzero
+// non-singular Float y = c * 2^d with c an odd Integer. If so, returns (m, z, pow) such that x^y =
+// m^z * 2^pow with m an odd Natural and z a positive Integer; otherwise returns None. Since x is
+// not a power of 2, a Ziv-style squeeze on an exact x^y would never terminate, and a nearest-mode
+// tie is possible only in the dyadic case, so this decides when the direct route is required.
+fn rational_pow_exact_decomposition(
+    a: &Natural,
+    b: &Natural,
+    e: i64,
+    y: &Float,
+) -> Option<(Natural, Integer, Integer)> {
+    let (c, d) = float_to_odd_mantissa_and_exponent(y);
+    let (mut a, mut b) = (a.clone(), b.clone());
+    let mut e = Integer::from(e);
+    // Descend the negative powers of 2 in the exponent: x must be a perfect 2^|d|-th power.
+    if d < 0 {
+        for _ in 0..-d {
+            if a != 1u32 {
+                a = a.checked_sqrt()?;
+            }
+            if b != 1u32 {
+                b = b.checked_sqrt()?;
+            }
+            if e.odd() {
+                return None;
+            }
+            e >>= 1;
+        }
+    } else {
+        e <<= d;
+    }
+    // Now x^y = (a / b)^(c * 2^max(d, 0)) * 2^(e * c), with the power of 2 in the exponent already
+    // scaled into e. Dyadic requires the denominator (after accounting for c's sign) to be 1.
+    let pow = e * &c;
+    let m = if c > 0u32 {
+        if b != 1u32 {
+            return None;
+        }
+        a
+    } else {
+        if a != 1u32 {
+            return None;
+        }
+        b
+    };
+    let mut z = Integer::from(c.unsigned_abs());
+    if d > 0 {
+        z <<= d;
+    }
+    Some((m, z, pow))
+}
+
+// The in-range squeeze: x is positive, not a dyadic rational, and comfortably within the Float
+// exponent range, and y is finite, nonzero, and not a small integer. Brackets x between dyadic
+// Floats at growing precision and applies `Float::pow` to both ends, tightening until both ends
+// round identically. Since x has an odd prime factor in its denominator, x^y is never exactly
+// representable and never a nearest-mode tie, so the squeeze terminates.
+fn rational_pow_squeeze_x(
+    x: &Rational,
+    y: &Float,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    let mut wprec = prec.saturating_add(Limb::WIDTH << 1);
+    let mut increment = Limb::WIDTH;
+    loop {
+        let x_lo = Float::from_rational_prec_round_ref(x, wprec, Floor).0;
+        let x_hi = Float::from_rational_prec_round_ref(x, wprec, Ceiling).0;
+        let (p_lo, mut o_lo) = x_lo.pow_prec_round_val_ref(y, prec, rm);
+        let (p_hi, mut o_hi) = x_hi.pow_prec_round_val_ref(y, prec, rm);
+        // A bracket end that lands exactly on a representable power rounds with `Equal`; the true
+        // value lies strictly between the ends, so the other end's ordering is the true one.
+        if o_lo == Equal {
+            o_lo = o_hi;
+        }
+        if o_hi == Equal {
+            o_hi = o_lo;
+        }
+        if o_lo == o_hi && ComparableFloatRef(&p_lo) == ComparableFloatRef(&p_hi) {
+            return (p_lo, o_lo);
+        }
+        wprec += increment;
+        increment = wprec >> 1;
+    }
+}
+
+// The extreme-regime squeeze: x = x' * 2^e with x' in [1/sqrt(2), sqrt(2)) an exact Rational (close
+// to 1) and e beyond (or near) the Float exponent range, y finite and nonzero, and x^y not a dyadic
+// rational. Brackets t = y * (e + log2(x')) between exact Rationals -- Rationals have no exponent
+// range, so no underflow or overflow can occur here -- and applies
+// `Float::power_of_2_rational_prec_round` to both ends, which itself handles results at or beyond
+// the exponent boundaries.
+fn rational_pow_squeeze_t(
+    xp: &Rational,
+    e: i64,
+    y: &Float,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    let yr = Rational::exact_from(y);
+    let er = Rational::from(e);
+    let mut wprec = prec.saturating_add(Limb::WIDTH << 1);
+    let mut increment = Limb::WIDTH;
+    loop {
+        let (l_lo, l_hi) = log_2_rational_brackets(xp, wprec);
+        let (t_lo, t_hi) = if *y > 0u32 {
+            (&yr * (&er + l_lo), &yr * (&er + l_hi))
+        } else {
+            (&yr * (&er + l_hi), &yr * (&er + l_lo))
+        };
+        let (p_lo, mut o_lo) = Float::power_of_2_rational_prec_round(t_lo, prec, rm);
+        let (p_hi, mut o_hi) = Float::power_of_2_rational_prec_round(t_hi, prec, rm);
+        if o_lo == Equal {
+            fail_on_untested_path(
+                "rational_pow, sqt_lo_eq: exact power-of-2 results (t an integer) are caught by \
+                 the exact decomposition before squeeze_t, so t is never an integer here; a \
+                 bracket end equalling an integer is a measure-zero coincidence of the log \
+                 brackets",
+            );
+            o_lo = o_hi;
+        }
+        if o_hi == Equal {
+            fail_on_untested_path(
+                "rational_pow, sqt_hi_eq: as sqt_lo_eq -- t is never an integer in squeeze_t, so a \
+                 bracket end equalling one is a measure-zero coincidence",
+            );
+            o_hi = o_lo;
+        }
+        if o_lo == o_hi && ComparableFloatRef(&p_lo) == ComparableFloatRef(&p_hi) {
+            return (p_lo, o_lo);
+        }
+        fail_on_untested_path(
+            "rational_pow, sqt_grow: the initial working precision prec + 128 resolves every \
+             non-pathological result; iterating would require x^y within 2^-(prec+128) of a \
+             rounding boundary, measure-zero for the irrational results reaching squeeze_t",
+        );
+        wprec += increment;
+        increment = wprec >> 1;
+    }
+}
+
+// The exact-dyadic route: x^y = m^z * 2^pow with m odd. If the result's odd part is small enough to
+// affect prec-bit rounding (or to be a nearest-mode tie), materialize it; otherwise the value is
+// neither representable nor a tie and the caller may squeeze safely.
+fn rational_pow_exact(
+    m: &Natural,
+    z: &Integer,
+    pow: &Integer,
+    prec: u64,
+    rm: RoundingMode,
+) -> Option<(Float, Ordering)> {
+    let zu = u64::try_from(z).ok()?;
+    let bits = m.significant_bits().checked_mul(zu)?;
+    if bits > prec + 2 {
+        return None;
+    }
+    let value = m.clone().pow(zu);
+    let (result, o) = Float::from_natural_prec_round(value, prec, rm);
+    // Scale by 2^pow. An exponent beyond i64 with a prec-bit odd part is a definite overflow or
+    // underflow.
+    let Ok(shift) = i64::try_from(pow) else {
+        return Some(if *pow > 0u32 {
+            fail_on_untested_path(
+                "rational_pow, ex_pow_overflow: reachable only with a base whose 2-adic \
+                 valuation exceeds i64::MAX / prec while its odd part fits in prec + 2 bits -- \
+                 simultaneously a ~512-MB base and a ~2^31 precision, beyond practical test \
+                 sizes",
+            );
+            exp_overflow(prec, rm)
+        } else {
+            fail_on_untested_path(
+                "rational_pow, ex_pow_underflow: as ex_pow_overflow, in the negative-exponent \
+                 direction",
+            );
+            exp_underflow(prec, if rm == Nearest { Down } else { rm })
+        });
+    };
+    let (shifted, oo) = result.shl_prec_round(shift, prec, rm);
+    Some((shifted, if oo == Equal { o } else { oo }))
+}
+
+impl Float {
+    // Raises a Rational to a Float power, returning a Float rounded to the specified precision with
+    // the specified rounding mode.
+
+    /// Raises a [`Rational`] to a [`Float`] power, returning the result as a [`Float`] rounded to
+    /// the specified precision and with the specified rounding mode. The [`Rational`] and the
+    /// [`Float`] are both taken by reference. An [`Ordering`] is also returned, indicating whether
+    /// the rounded power is less than, equal to, or greater than the exact power. Although `NaN`s
+    /// are not comparable to any [`Float`], whenever this function returns a `NaN` it also returns
+    /// `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,y,p,m) = x^y+\varepsilon.
+    /// $$
+    /// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x^y|\rfloor-p+1}$.
+    /// - If $x^y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x^y|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(x,\pm0.0,p,m)=1.0$ for any $x$, even $0$
+    /// - $f(1,y,p,m)=1.0$ for any $y$, even `NaN`
+    /// - $f(x,\text{NaN},p,m)=\text{NaN}$ otherwise
+    /// - $f(x,\infty,p,m)=\infty$ if $|x|>1$, and $0.0$ if $|x|<1$
+    /// - $f(x,-\infty,p,m)=0.0$ if $|x|>1$, and $\infty$ if $|x|<1$
+    /// - $f(\pm1,\pm\infty,p,m)=1.0$
+    /// - $f(-1,y,p,m)=1.0$ if $y$ is an even integer, and $-1.0$ if $y$ is an odd integer
+    /// - $f(0,y,p,m)=0.0$ if $y>0$, and $\infty$ if $y<0$; a [`Rational`] zero is unsigned, so the
+    ///   results take positive signs
+    /// - $f(x,y,p,m)=\text{NaN}$ if $x<0$ and $y$ is finite and not an integer
+    ///
+    /// Unlike a [`Float`] base, a [`Rational`] base may lie outside the [`Float`] exponent range or
+    /// so close to 1 that no [`Float`] can represent its logarithm; both cases are handled exactly,
+    /// by working with the base as an exact [`Rational`] throughout.
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,y,p,m)\leq2^{-2^{30}-1}$ and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - Negative results (from negative $x$ and odd integer $y$) mirror the bullets above, with
+    ///   the rounding directions reflected.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::rational_pow_prec_ref_ref`]
+    /// instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, x.significant_bits(),
+    /// y.significant_bits())`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (p, o) = Float::rational_pow_prec_round_ref_ref(&Rational::from_unsigneds(3u32, 2u32),
+    /// &Float::from(2.5), 5, Floor);
+    /// assert_eq!(p.to_string(), "2.8");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = Float::rational_pow_prec_round_ref_ref(&Rational::from_unsigneds(3u32, 2u32),
+    /// &Float::from(2.5), 5, Ceiling);
+    /// assert_eq!(p.to_string(), "2.9");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (p, o) = Float::rational_pow_prec_round_ref_ref(&Rational::from_unsigneds(3u32, 2u32),
+    /// &Float::from(2.5), 5, Nearest);
+    /// assert_eq!(p.to_string(), "2.8");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = Float::rational_pow_prec_round_ref_ref(&Rational::from_unsigneds(3u32, 2u32),
+    /// &Float::from(2.5), 20, Floor);
+    /// assert_eq!(p.to_string(), "2.755672");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = Float::rational_pow_prec_round_ref_ref(&Rational::from_unsigneds(3u32, 2u32),
+    /// &Float::from(2.5), 20, Ceiling);
+    /// assert_eq!(p.to_string(), "2.755676");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (p, o) = Float::rational_pow_prec_round_ref_ref(&Rational::from_unsigneds(3u32, 2u32),
+    /// &Float::from(2.5), 20, Nearest);
+    /// assert_eq!(p.to_string(), "2.755676");
+    /// assert_eq!(o, Greater);
+    /// ```
+    pub fn rational_pow_prec_round_ref_ref(
+        x: &Rational,
+        y: &Self,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        // Exact rounding: compute with Nearest and demand exactness.
+        if rm == Exact {
+            let (result, o) = Self::rational_pow_prec_ref_ref(x, y, prec);
+            assert_eq!(o, Equal, "Inexact rational_pow");
+            return (result, Equal);
+        }
+        // Singular y; see Section F.9.4.4 of the C standard.
+        match y {
+            // x^0 = 1 for any x, even 0
+            float_either_zero!() => {
+                return Self::from_float_prec_round(Self::ONE, prec, rm);
+            }
+            // 1^y = 1 for any y, even NaN
+            float_nan!() => {
+                return if *x == 1u32 {
+                    Self::from_float_prec_round(Self::ONE, prec, rm)
+                } else {
+                    (Self::NAN, Equal)
+                };
+            }
+            Self(Infinity { sign }) => {
+                let mut cmp = x.cmp_abs(&Rational::ONE);
+                if !*sign {
+                    cmp = cmp.reverse();
+                }
+                return match cmp {
+                    Greater => (Self::INFINITY, Equal),
+                    Less => (Self::ZERO, Equal),
+                    Equal => Self::from_float_prec_round(Self::ONE, prec, rm),
+                };
+            }
+            _ => {}
+        }
+        // x = 0: Rational zero is unsigned, so the results take positive signs.
+        if *x == 0u32 {
+            return if *y > 0u32 {
+                (Self::ZERO, Equal)
+            } else {
+                (Self::INFINITY, Equal)
+            };
+        }
+        let y_is_integer = y.is_integer();
+        // Negative x: only integer y is defined; the sign is that of (-1)^y.
+        if *x < 0u32 {
+            if !y_is_integer {
+                return (Self::NAN, Equal);
+            }
+            let negative = float_odd_integer(y);
+            let (result, o) = Self::rational_pow_prec_round_ref_ref(
+                &(-x),
+                y,
+                prec,
+                if negative { -rm } else { rm },
+            );
+            return if negative {
+                (-result, o.reverse())
+            } else {
+                (result, o)
+            };
+        }
+        if *x == 1u32 {
+            return Self::from_float_prec_round(Self::ONE, prec, rm);
+        }
+        // x = 2^e exactly: x^y = 2^(e * y) with e * y an exact Rational;
+        // `power_of_2_rational_prec_round` handles all exactness, overflow, and underflow.
+        if x.is_power_of_2() {
+            let t = Rational::from(x.floor_log_base_2_abs()) * Rational::exact_from(y);
+            return Self::power_of_2_rational_prec_round(t, prec, rm);
+        }
+        // Small integer y with a small base: materialize x^y as an exact Rational;
+        // `from_rational_prec_round` handles all rounding, including at the range boundaries.
+        let nbits = x.numerator_ref().significant_bits() + x.denominator_ref().significant_bits();
+        if y_is_integer && i64::from(y.get_exponent().unwrap()) <= 32 {
+            let z = i64::rounding_from(y, Nearest).0;
+            if z.unsigned_abs().saturating_mul(nbits) <= max(65536, prec << 2) {
+                return Self::from_rational_prec_round(x.pow(z), prec, rm);
+            }
+        }
+        let fl = x.floor_log_base_2_abs();
+        let in_range =
+            fl > i64::from(Self::MIN_EXPONENT) + 2 && fl < i64::from(Self::MAX_EXPONENT) - 2;
+        // A base within a few binades of 1 (from either side) has a logarithm at or below the
+        // smallest positive Float, where any Float-based power -- the dyadic shortcut or the
+        // x-space squeeze below, both of which call `Float::pow` -- would underflow internally
+        // (`ln` cannot represent the sub-`MIN_EXPONENT` result). Such a base goes through the
+        // exact-Rational t-space squeeze, which brackets `log2` with the atanh series over
+        // `Rational`s and never materializes a sub-`MIN_EXPONENT` Float logarithm. `x` is a sliver
+        // of 1 only when it lies in `(1/2, 2)`, i.e. `fl` is 0 or -1; the exact subtraction is
+        // skipped otherwise.
+        let sliver_fld = if fl == 0 || fl == -1 {
+            let d = x - Rational::ONE;
+            if d == 0u32 {
+                None
+            } else {
+                Some(d.floor_log_base_2_abs())
+            }
+        } else {
+            None
+        };
+        let sliver_of_one = sliver_fld.is_some_and(|fld| fld < i64::from(Self::MIN_EXPONENT) + 8);
+        // A dyadic in-range non-sliver x is exactly convertible; Float::pow does the rest,
+        // exactness and boundary behavior included.
+        if in_range && !sliver_of_one && x.denominator_ref().is_power_of_2() {
+            let xf = Self::from_rational_prec_round_ref(x, nbits, Floor).0;
+            return xf.pow_prec_round_val_ref(y, prec, rm);
+        }
+        // Possible exact dyadic results must be handled directly: a Ziv squeeze never terminates on
+        // an exactly-representable value and can stall on a nearest-mode tie.
+        let n = x.numerator_ref();
+        let d = x.denominator_ref();
+        let alpha = i64::exact_from(n.trailing_zeros().unwrap());
+        let beta = i64::exact_from(d.trailing_zeros().unwrap());
+        let a = n >> alpha;
+        let b = d >> beta;
+        if let Some((m, z, pow)) = rational_pow_exact_decomposition(&a, &b, alpha - beta, y)
+            && let Some(result) = rational_pow_exact(&m, &z, &pow, prec, rm)
+        {
+            return result;
+        }
+        if in_range && !sliver_of_one {
+            rational_pow_squeeze_x(x, y, prec, rm)
+        } else {
+            // Tiny-result shortcut for a sliver of 1: if |y * log2(x)| is far below 1, x^y rounds
+            // to 1 +/- ulp, avoiding the (up to 128-MB) log2 brackets. With fld = floor_log2|x -
+            // 1|, one has |log2(x)| < 2^(fld + 2), so |y * log2(x)| < 2^(ey + fld + 2); when that
+            // is below 2^(-prec - 1) the result is within half an ulp of 1.
+            if let Some(fld) = sliver_fld {
+                let ey = i64::from(y.get_exponent().unwrap());
+                if ey + fld + 2 < -i64::exact_from(prec) - 1 {
+                    let above = (*y > 0u32) == (*x > 1u32);
+                    return float_one_plus_tiny(prec, rm, above);
+                }
+            }
+            // Extreme x -- beyond the exponent range or a sliver of 1: split off the power of 2
+            // (rounded to the nearest, so the mantissa is close to 1) and work with exact Rationals
+            // in the exponent.
+            let (xp, g) = rational_mantissa_nearest_power_of_2(x);
+            rational_pow_squeeze_t(&xp, g, y, prec, rm)
+        }
+    }
+
+    #[allow(clippy::needless_pass_by_value)]
+    /// Raises a [`Rational`] to a [`Float`] power, returning the result as a [`Float`] rounded to
+    /// the specified precision and with the specified rounding mode. The [`Rational`] and the
+    /// [`Float`] are both taken by value. An [`Ordering`] is also returned, indicating whether the
+    /// rounded power is less than, equal to, or greater than the exact power. Although `NaN`s are
+    /// not comparable to any [`Float`], whenever this function returns a `NaN` it also returns
+    /// `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,y,p,m) = x^y+\varepsilon.
+    /// $$
+    /// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x^y|\rfloor-p+1}$.
+    /// - If $x^y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x^y|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(x,\pm0.0,p,m)=1.0$ for any $x$, even $0$
+    /// - $f(1,y,p,m)=1.0$ for any $y$, even `NaN`
+    /// - $f(x,\text{NaN},p,m)=\text{NaN}$ otherwise
+    /// - $f(x,\infty,p,m)=\infty$ if $|x|>1$, and $0.0$ if $|x|<1$
+    /// - $f(x,-\infty,p,m)=0.0$ if $|x|>1$, and $\infty$ if $|x|<1$
+    /// - $f(\pm1,\pm\infty,p,m)=1.0$
+    /// - $f(-1,y,p,m)=1.0$ if $y$ is an even integer, and $-1.0$ if $y$ is an odd integer
+    /// - $f(0,y,p,m)=0.0$ if $y>0$, and $\infty$ if $y<0$; a [`Rational`] zero is unsigned, so the
+    ///   results take positive signs
+    /// - $f(x,y,p,m)=\text{NaN}$ if $x<0$ and $y$ is finite and not an integer
+    ///
+    /// Unlike a [`Float`] base, a [`Rational`] base may lie outside the [`Float`] exponent range or
+    /// so close to 1 that no [`Float`] can represent its logarithm; both cases are handled exactly,
+    /// by working with the base as an exact [`Rational`] throughout.
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,y,p,m)\leq2^{-2^{30}-1}$ and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - Negative results (from negative $x$ and odd integer $y$) mirror the bullets above, with
+    ///   the rounding directions reflected.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::rational_pow_prec`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, x.significant_bits(),
+    /// y.significant_bits())`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (p, o) = Float::rational_pow_prec_round(Rational::from_unsigneds(3u32, 2u32),
+    /// Float::from(2.5), 5, Floor);
+    /// assert_eq!(p.to_string(), "2.8");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = Float::rational_pow_prec_round(Rational::from_unsigneds(3u32, 2u32),
+    /// Float::from(2.5), 5, Ceiling);
+    /// assert_eq!(p.to_string(), "2.9");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (p, o) = Float::rational_pow_prec_round(Rational::from_unsigneds(3u32, 2u32),
+    /// Float::from(2.5), 5, Nearest);
+    /// assert_eq!(p.to_string(), "2.8");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = Float::rational_pow_prec_round(Rational::from_unsigneds(3u32, 2u32),
+    /// Float::from(2.5), 20, Floor);
+    /// assert_eq!(p.to_string(), "2.755672");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = Float::rational_pow_prec_round(Rational::from_unsigneds(3u32, 2u32),
+    /// Float::from(2.5), 20, Ceiling);
+    /// assert_eq!(p.to_string(), "2.755676");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (p, o) = Float::rational_pow_prec_round(Rational::from_unsigneds(3u32, 2u32),
+    /// Float::from(2.5), 20, Nearest);
+    /// assert_eq!(p.to_string(), "2.755676");
+    /// assert_eq!(o, Greater);
+    /// ```
+    pub fn rational_pow_prec_round(
+        x: Rational,
+        y: Self,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        Self::rational_pow_prec_round_ref_ref(&x, &y, prec, rm)
+    }
+
+    #[allow(clippy::needless_pass_by_value)]
+    /// Raises a [`Rational`] to a [`Float`] power, returning the result as a [`Float`] rounded to
+    /// the specified precision and with the specified rounding mode. The [`Rational`] is taken by
+    /// value and the [`Float`] by reference. An [`Ordering`] is also returned, indicating whether
+    /// the rounded power is less than, equal to, or greater than the exact power. Although `NaN`s
+    /// are not comparable to any [`Float`], whenever this function returns a `NaN` it also returns
+    /// `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,y,p,m) = x^y+\varepsilon.
+    /// $$
+    /// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x^y|\rfloor-p+1}$.
+    /// - If $x^y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x^y|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(x,\pm0.0,p,m)=1.0$ for any $x$, even $0$
+    /// - $f(1,y,p,m)=1.0$ for any $y$, even `NaN`
+    /// - $f(x,\text{NaN},p,m)=\text{NaN}$ otherwise
+    /// - $f(x,\infty,p,m)=\infty$ if $|x|>1$, and $0.0$ if $|x|<1$
+    /// - $f(x,-\infty,p,m)=0.0$ if $|x|>1$, and $\infty$ if $|x|<1$
+    /// - $f(\pm1,\pm\infty,p,m)=1.0$
+    /// - $f(-1,y,p,m)=1.0$ if $y$ is an even integer, and $-1.0$ if $y$ is an odd integer
+    /// - $f(0,y,p,m)=0.0$ if $y>0$, and $\infty$ if $y<0$; a [`Rational`] zero is unsigned, so the
+    ///   results take positive signs
+    /// - $f(x,y,p,m)=\text{NaN}$ if $x<0$ and $y$ is finite and not an integer
+    ///
+    /// Unlike a [`Float`] base, a [`Rational`] base may lie outside the [`Float`] exponent range or
+    /// so close to 1 that no [`Float`] can represent its logarithm; both cases are handled exactly,
+    /// by working with the base as an exact [`Rational`] throughout.
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,y,p,m)\leq2^{-2^{30}-1}$ and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - Negative results (from negative $x$ and odd integer $y$) mirror the bullets above, with
+    ///   the rounding directions reflected.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::rational_pow_prec_val_ref`]
+    /// instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, x.significant_bits(),
+    /// y.significant_bits())`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (p, o) = Float::rational_pow_prec_round_val_ref(Rational::from_unsigneds(3u32, 2u32),
+    /// &Float::from(2.5), 5, Floor);
+    /// assert_eq!(p.to_string(), "2.8");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = Float::rational_pow_prec_round_val_ref(Rational::from_unsigneds(3u32, 2u32),
+    /// &Float::from(2.5), 5, Ceiling);
+    /// assert_eq!(p.to_string(), "2.9");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (p, o) = Float::rational_pow_prec_round_val_ref(Rational::from_unsigneds(3u32, 2u32),
+    /// &Float::from(2.5), 5, Nearest);
+    /// assert_eq!(p.to_string(), "2.8");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = Float::rational_pow_prec_round_val_ref(Rational::from_unsigneds(3u32, 2u32),
+    /// &Float::from(2.5), 20, Floor);
+    /// assert_eq!(p.to_string(), "2.755672");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = Float::rational_pow_prec_round_val_ref(Rational::from_unsigneds(3u32, 2u32),
+    /// &Float::from(2.5), 20, Ceiling);
+    /// assert_eq!(p.to_string(), "2.755676");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (p, o) = Float::rational_pow_prec_round_val_ref(Rational::from_unsigneds(3u32, 2u32),
+    /// &Float::from(2.5), 20, Nearest);
+    /// assert_eq!(p.to_string(), "2.755676");
+    /// assert_eq!(o, Greater);
+    /// ```
+    pub fn rational_pow_prec_round_val_ref(
+        x: Rational,
+        y: &Self,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        Self::rational_pow_prec_round_ref_ref(&x, y, prec, rm)
+    }
+
+    #[allow(clippy::needless_pass_by_value)]
+    /// Raises a [`Rational`] to a [`Float`] power, returning the result as a [`Float`] rounded to
+    /// the specified precision and with the specified rounding mode. The [`Rational`] is taken by
+    /// reference and the [`Float`] by value. An [`Ordering`] is also returned, indicating whether
+    /// the rounded power is less than, equal to, or greater than the exact power. Although `NaN`s
+    /// are not comparable to any [`Float`], whenever this function returns a `NaN` it also returns
+    /// `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,y,p,m) = x^y+\varepsilon.
+    /// $$
+    /// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x^y|\rfloor-p+1}$.
+    /// - If $x^y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x^y|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(x,\pm0.0,p,m)=1.0$ for any $x$, even $0$
+    /// - $f(1,y,p,m)=1.0$ for any $y$, even `NaN`
+    /// - $f(x,\text{NaN},p,m)=\text{NaN}$ otherwise
+    /// - $f(x,\infty,p,m)=\infty$ if $|x|>1$, and $0.0$ if $|x|<1$
+    /// - $f(x,-\infty,p,m)=0.0$ if $|x|>1$, and $\infty$ if $|x|<1$
+    /// - $f(\pm1,\pm\infty,p,m)=1.0$
+    /// - $f(-1,y,p,m)=1.0$ if $y$ is an even integer, and $-1.0$ if $y$ is an odd integer
+    /// - $f(0,y,p,m)=0.0$ if $y>0$, and $\infty$ if $y<0$; a [`Rational`] zero is unsigned, so the
+    ///   results take positive signs
+    /// - $f(x,y,p,m)=\text{NaN}$ if $x<0$ and $y$ is finite and not an integer
+    ///
+    /// Unlike a [`Float`] base, a [`Rational`] base may lie outside the [`Float`] exponent range or
+    /// so close to 1 that no [`Float`] can represent its logarithm; both cases are handled exactly,
+    /// by working with the base as an exact [`Rational`] throughout.
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,y,p,m)\leq2^{-2^{30}-1}$ and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - Negative results (from negative $x$ and odd integer $y$) mirror the bullets above, with
+    ///   the rounding directions reflected.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::rational_pow_prec_ref_val`]
+    /// instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, x.significant_bits(),
+    /// y.significant_bits())`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (p, o) = Float::rational_pow_prec_round_ref_val(&Rational::from_unsigneds(3u32, 2u32),
+    /// Float::from(2.5), 5, Floor);
+    /// assert_eq!(p.to_string(), "2.8");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = Float::rational_pow_prec_round_ref_val(&Rational::from_unsigneds(3u32, 2u32),
+    /// Float::from(2.5), 5, Ceiling);
+    /// assert_eq!(p.to_string(), "2.9");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (p, o) = Float::rational_pow_prec_round_ref_val(&Rational::from_unsigneds(3u32, 2u32),
+    /// Float::from(2.5), 5, Nearest);
+    /// assert_eq!(p.to_string(), "2.8");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = Float::rational_pow_prec_round_ref_val(&Rational::from_unsigneds(3u32, 2u32),
+    /// Float::from(2.5), 20, Floor);
+    /// assert_eq!(p.to_string(), "2.755672");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = Float::rational_pow_prec_round_ref_val(&Rational::from_unsigneds(3u32, 2u32),
+    /// Float::from(2.5), 20, Ceiling);
+    /// assert_eq!(p.to_string(), "2.755676");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (p, o) = Float::rational_pow_prec_round_ref_val(&Rational::from_unsigneds(3u32, 2u32),
+    /// Float::from(2.5), 20, Nearest);
+    /// assert_eq!(p.to_string(), "2.755676");
+    /// assert_eq!(o, Greater);
+    /// ```
+    pub fn rational_pow_prec_round_ref_val(
+        x: &Rational,
+        y: Self,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        Self::rational_pow_prec_round_ref_ref(x, &y, prec, rm)
+    }
+
+    #[allow(clippy::needless_pass_by_value)]
+    /// Raises a [`Rational`] to a [`Float`] power, returning the result as a [`Float`] rounded to
+    /// the specified precision and to the nearest value. The [`Rational`] and the [`Float`] are
+    /// both taken by value. An [`Ordering`] is also returned, indicating whether the rounded power
+    /// is less than, equal to, or greater than the exact power. Although `NaN`s are not comparable
+    /// to any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// If the power is equidistant from two [`Float`]s with the specified precision, the [`Float`]
+    /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
+    /// the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,y,p) = x^y+\varepsilon.
+    /// $$
+    /// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^y$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |x^y|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(x,\pm0.0,p)=1.0$ for any $x$, even $0$
+    /// - $f(1,y,p)=1.0$ for any $y$, even `NaN`
+    /// - $f(x,\text{NaN},p)=\text{NaN}$ otherwise
+    /// - $f(x,\infty,p)=\infty$ if $|x|>1$, and $0.0$ if $|x|<1$
+    /// - $f(x,-\infty,p)=0.0$ if $|x|>1$, and $\infty$ if $|x|<1$
+    /// - $f(\pm1,\pm\infty,p)=1.0$
+    /// - $f(-1,y,p)=1.0$ if $y$ is an even integer, and $-1.0$ if $y$ is an odd integer
+    /// - $f(0,y,p)=0.0$ if $y>0$, and $\infty$ if $y<0$; a [`Rational`] zero is unsigned, so the
+    ///   results take positive signs
+    /// - $f(x,y,p)=\text{NaN}$ if $x<0$ and $y$ is finite and not an integer
+    ///
+    /// Unlike a [`Float`] base, a [`Rational`] base may lie outside the [`Float`] exponent range or
+    /// so close to 1 that no [`Float`] can represent its logarithm; both cases are handled exactly,
+    /// by working with the base as an exact [`Rational`] throughout.
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $0<f(x,y,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - Negative results (from negative $x$ and odd integer $y$) mirror the bullets above.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::rational_pow_prec_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, x.significant_bits(),
+    /// y.significant_bits())`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (p, o) = Float::rational_pow_prec(Rational::from_unsigneds(3u32, 2u32),
+    /// Float::from(2.5), 5);
+    /// assert_eq!(p.to_string(), "2.8");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = Float::rational_pow_prec(Rational::from_unsigneds(3u32, 2u32),
+    /// Float::from(2.5), 20);
+    /// assert_eq!(p.to_string(), "2.755676");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn rational_pow_prec(x: Rational, y: Self, prec: u64) -> (Self, Ordering) {
+        Self::rational_pow_prec_ref_ref(&x, &y, prec)
+    }
+
+    #[allow(clippy::needless_pass_by_value)]
+    /// Raises a [`Rational`] to a [`Float`] power, returning the result as a [`Float`] rounded to
+    /// the specified precision and to the nearest value. The [`Rational`] is taken by value and the
+    /// [`Float`] by reference. An [`Ordering`] is also returned, indicating whether the rounded
+    /// power is less than, equal to, or greater than the exact power. Although `NaN`s are not
+    /// comparable to any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// If the power is equidistant from two [`Float`]s with the specified precision, the [`Float`]
+    /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
+    /// the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,y,p) = x^y+\varepsilon.
+    /// $$
+    /// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^y$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |x^y|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(x,\pm0.0,p)=1.0$ for any $x$, even $0$
+    /// - $f(1,y,p)=1.0$ for any $y$, even `NaN`
+    /// - $f(x,\text{NaN},p)=\text{NaN}$ otherwise
+    /// - $f(x,\infty,p)=\infty$ if $|x|>1$, and $0.0$ if $|x|<1$
+    /// - $f(x,-\infty,p)=0.0$ if $|x|>1$, and $\infty$ if $|x|<1$
+    /// - $f(\pm1,\pm\infty,p)=1.0$
+    /// - $f(-1,y,p)=1.0$ if $y$ is an even integer, and $-1.0$ if $y$ is an odd integer
+    /// - $f(0,y,p)=0.0$ if $y>0$, and $\infty$ if $y<0$; a [`Rational`] zero is unsigned, so the
+    ///   results take positive signs
+    /// - $f(x,y,p)=\text{NaN}$ if $x<0$ and $y$ is finite and not an integer
+    ///
+    /// Unlike a [`Float`] base, a [`Rational`] base may lie outside the [`Float`] exponent range or
+    /// so close to 1 that no [`Float`] can represent its logarithm; both cases are handled exactly,
+    /// by working with the base as an exact [`Rational`] throughout.
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $0<f(x,y,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - Negative results (from negative $x$ and odd integer $y$) mirror the bullets above.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::rational_pow_prec_round_val_ref`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, x.significant_bits(),
+    /// y.significant_bits())`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (p, o) = Float::rational_pow_prec_val_ref(Rational::from_unsigneds(3u32, 2u32),
+    /// &Float::from(2.5), 5);
+    /// assert_eq!(p.to_string(), "2.8");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = Float::rational_pow_prec_val_ref(Rational::from_unsigneds(3u32, 2u32),
+    /// &Float::from(2.5), 20);
+    /// assert_eq!(p.to_string(), "2.755676");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn rational_pow_prec_val_ref(x: Rational, y: &Self, prec: u64) -> (Self, Ordering) {
+        Self::rational_pow_prec_ref_ref(&x, y, prec)
+    }
+
+    #[allow(clippy::needless_pass_by_value)]
+    /// Raises a [`Rational`] to a [`Float`] power, returning the result as a [`Float`] rounded to
+    /// the specified precision and to the nearest value. The [`Rational`] is taken by reference and
+    /// the [`Float`] by value. An [`Ordering`] is also returned, indicating whether the rounded
+    /// power is less than, equal to, or greater than the exact power. Although `NaN`s are not
+    /// comparable to any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// If the power is equidistant from two [`Float`]s with the specified precision, the [`Float`]
+    /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
+    /// the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,y,p) = x^y+\varepsilon.
+    /// $$
+    /// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^y$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |x^y|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(x,\pm0.0,p)=1.0$ for any $x$, even $0$
+    /// - $f(1,y,p)=1.0$ for any $y$, even `NaN`
+    /// - $f(x,\text{NaN},p)=\text{NaN}$ otherwise
+    /// - $f(x,\infty,p)=\infty$ if $|x|>1$, and $0.0$ if $|x|<1$
+    /// - $f(x,-\infty,p)=0.0$ if $|x|>1$, and $\infty$ if $|x|<1$
+    /// - $f(\pm1,\pm\infty,p)=1.0$
+    /// - $f(-1,y,p)=1.0$ if $y$ is an even integer, and $-1.0$ if $y$ is an odd integer
+    /// - $f(0,y,p)=0.0$ if $y>0$, and $\infty$ if $y<0$; a [`Rational`] zero is unsigned, so the
+    ///   results take positive signs
+    /// - $f(x,y,p)=\text{NaN}$ if $x<0$ and $y$ is finite and not an integer
+    ///
+    /// Unlike a [`Float`] base, a [`Rational`] base may lie outside the [`Float`] exponent range or
+    /// so close to 1 that no [`Float`] can represent its logarithm; both cases are handled exactly,
+    /// by working with the base as an exact [`Rational`] throughout.
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $0<f(x,y,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - Negative results (from negative $x$ and odd integer $y$) mirror the bullets above.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::rational_pow_prec_round_ref_val`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, x.significant_bits(),
+    /// y.significant_bits())`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (p, o) = Float::rational_pow_prec_ref_val(&Rational::from_unsigneds(3u32, 2u32),
+    /// Float::from(2.5), 5);
+    /// assert_eq!(p.to_string(), "2.8");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = Float::rational_pow_prec_ref_val(&Rational::from_unsigneds(3u32, 2u32),
+    /// Float::from(2.5), 20);
+    /// assert_eq!(p.to_string(), "2.755676");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn rational_pow_prec_ref_val(x: &Rational, y: Self, prec: u64) -> (Self, Ordering) {
+        Self::rational_pow_prec_ref_ref(x, &y, prec)
+    }
+
+    /// Raises a [`Rational`] to a [`Float`] power, returning the result as a [`Float`] rounded to
+    /// the specified precision and to the nearest value. The [`Rational`] and the [`Float`] are
+    /// both taken by reference. An [`Ordering`] is also returned, indicating whether the rounded
+    /// power is less than, equal to, or greater than the exact power. Although `NaN`s are not
+    /// comparable to any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// If the power is equidistant from two [`Float`]s with the specified precision, the [`Float`]
+    /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
+    /// the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,y,p) = x^y+\varepsilon.
+    /// $$
+    /// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^y$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |x^y|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(x,\pm0.0,p)=1.0$ for any $x$, even $0$
+    /// - $f(1,y,p)=1.0$ for any $y$, even `NaN`
+    /// - $f(x,\text{NaN},p)=\text{NaN}$ otherwise
+    /// - $f(x,\infty,p)=\infty$ if $|x|>1$, and $0.0$ if $|x|<1$
+    /// - $f(x,-\infty,p)=0.0$ if $|x|>1$, and $\infty$ if $|x|<1$
+    /// - $f(\pm1,\pm\infty,p)=1.0$
+    /// - $f(-1,y,p)=1.0$ if $y$ is an even integer, and $-1.0$ if $y$ is an odd integer
+    /// - $f(0,y,p)=0.0$ if $y>0$, and $\infty$ if $y<0$; a [`Rational`] zero is unsigned, so the
+    ///   results take positive signs
+    /// - $f(x,y,p)=\text{NaN}$ if $x<0$ and $y$ is finite and not an integer
+    ///
+    /// Unlike a [`Float`] base, a [`Rational`] base may lie outside the [`Float`] exponent range or
+    /// so close to 1 that no [`Float`] can represent its logarithm; both cases are handled exactly,
+    /// by working with the base as an exact [`Rational`] throughout.
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $0<f(x,y,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - Negative results (from negative $x$ and odd integer $y$) mirror the bullets above.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::rational_pow_prec_round_ref_ref`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, x.significant_bits(),
+    /// y.significant_bits())`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (p, o) = Float::rational_pow_prec_ref_ref(&Rational::from_unsigneds(3u32, 2u32),
+    /// &Float::from(2.5), 5);
+    /// assert_eq!(p.to_string(), "2.8");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = Float::rational_pow_prec_ref_ref(&Rational::from_unsigneds(3u32, 2u32),
+    /// &Float::from(2.5), 20);
+    /// assert_eq!(p.to_string(), "2.755676");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn rational_pow_prec_ref_ref(x: &Rational, y: &Self, prec: u64) -> (Self, Ordering) {
+        Self::rational_pow_prec_round_ref_ref(x, y, prec, Nearest)
+    }
 }

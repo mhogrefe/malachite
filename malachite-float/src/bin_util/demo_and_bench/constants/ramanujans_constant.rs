@@ -113,7 +113,7 @@ fn benchmark_float_ramanujans_constant_prec(
         file_name,
         &unsigned_direct_bucketer(),
         &mut [("Malachite", &mut |p| {
-            no_out!(Float::ramanujans_constant_prec(p))
+            no_out!(Float::ramanujans_constant_prec(p));
         })],
     );
 }

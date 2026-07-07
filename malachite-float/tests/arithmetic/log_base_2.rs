@@ -47,6 +47,34 @@ use malachite_q::test_util::generators::{rational_gen, rational_unsigned_pair_ge
 use std::panic::catch_unwind;
 use std::str::FromStr;
 
+// log_2 of a sliver of 1 once routed a Float approximation of `x - 1` that underflowed to zero and
+// panicked (`log_base_2_rational_near_one`); it is now bracketed with exact Rationals and rounded
+// with correct underflow. Because log_2(1 + eps) ~ eps / ln(2) ~ 1.443 * eps, the Nearest underflow
+// decision can differ from `ln`\'s: eps = 2^(MIN-2) gives ~1.443 * 2^(MIN-2), above the tie
+// 2^(MIN-2), so it rounds to the min positive value, while the smaller eps = 2^(MIN-3) gives ~0.72
+// * 2^(MIN-2), below the tie, rounding to 0. Run under `--release`.
+#[test]
+fn test_log_base_2_sliver_of_one() {
+    let mi = i64::from(Float::MIN_EXPONENT);
+    let p = u64::try_from(-(mi - 4) + 1).unwrap();
+    let sliver = |k: i64| {
+        Float::from_rational_prec_round(Rational::ONE + Rational::power_of_2(k), p, Exact).0
+    };
+    let test = |x: &Float, rm: RoundingMode, out_hex: &str, o_out| {
+        let (r, o) = x.log_base_2_prec_round_ref(64, rm);
+        assert!(r.is_valid());
+        assert_eq!(to_hex_string(&r), out_hex);
+        assert_eq!(o, o_out);
+    };
+    // eps = 2^(MIN-2): log_2 ~ 1.443 * 2^(MIN-2), above the tie
+    let hi = sliver(mi - 2);
+    test(&hi, Floor, "0x0.0", Less);
+    test(&hi, Ceiling, "0x1.0000000000000000E-268435456#64", Greater);
+    test(&hi, Nearest, "0x1.0000000000000000E-268435456#64", Greater);
+    // eps = 2^(MIN-3): log_2 ~ 0.72 * 2^(MIN-2), below the tie
+    test(&sliver(mi - 3), Nearest, "0x0.0", Less);
+}
+
 #[test]
 fn test_log_base_2() {
     let test = |s, s_hex, out: &str, out_hex: &str| {

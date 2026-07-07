@@ -222,6 +222,7 @@ fn power_of_2_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Flo
 }
 
 impl Float {
+    #[allow(clippy::needless_pass_by_value)]
     /// Computes $2^x$, where $x$ is a [`Float`], rounding the result to the specified precision and
     /// with the specified rounding mode. The [`Float`] is taken by value. An [`Ordering`] is also
     /// returned, indicating whether the rounded power is less than, equal to, or greater than the
@@ -419,6 +420,7 @@ impl Float {
         }
     }
 
+    #[allow(clippy::needless_pass_by_value)]
     /// Computes $2^x$, where $x$ is a [`Float`], rounding the result to the nearest value of the
     /// specified precision. The [`Float`] is taken by value. An [`Ordering`] is also returned,
     /// indicating whether the rounded power is less than, equal to, or greater than the exact
@@ -544,6 +546,7 @@ impl Float {
         Self::power_of_2_of_float_prec_round_ref(pow, prec, Nearest)
     }
 
+    #[allow(clippy::needless_pass_by_value)]
     /// Computes $2^x$, where $x$ is a [`Float`], rounding the result with the specified rounding
     /// mode. The [`Float`] is taken by value. An [`Ordering`] is also returned, indicating whether
     /// the rounded power is less than, equal to, or greater than the exact power. Although `NaN`s
@@ -887,6 +890,7 @@ impl Float {
         self.power_of_2_of_float_prec_round_assign(prec, rm)
     }
 
+    #[allow(clippy::needless_pass_by_value)]
     /// Computes $2^x$, where $x$ is a [`Rational`], rounding the result to the specified precision
     /// and with the specified rounding mode. The [`Rational`] is taken by value.
     #[inline]
@@ -922,6 +926,7 @@ impl Float {
         power_of_2_rational_helper(x, prec, rm)
     }
 
+    #[allow(clippy::needless_pass_by_value)]
     /// Computes $2^x$, where $x$ is a [`Rational`], rounding the result to the nearest value of the
     /// specified precision. The [`Rational`] is taken by value.
     #[inline]

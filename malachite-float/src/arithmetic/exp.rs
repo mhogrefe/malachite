@@ -1482,6 +1482,7 @@ impl Float {
         self.exp_prec_round_assign(prec, rm)
     }
 
+    #[allow(clippy::needless_pass_by_value)]
     /// Computes $e^x$, the exponential of a [`Rational`], rounding the result to the specified
     /// precision and with the specified rounding mode and returning the result as a [`Float`]. The
     /// [`Rational`] is taken by value. An [`Ordering`] is also returned, indicating whether the
@@ -1639,6 +1640,7 @@ impl Float {
         exp_rational_helper(x, prec, rm)
     }
 
+    #[allow(clippy::needless_pass_by_value)]
     /// Computes $e^x$, the exponential of a [`Rational`], rounding the result to the nearest value
     /// of the specified precision and returning the result as a [`Float`]. The [`Rational`] is
     /// taken by value. An [`Ordering`] is also returned, indicating whether the rounded exponential

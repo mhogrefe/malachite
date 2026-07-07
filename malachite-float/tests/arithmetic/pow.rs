@@ -8,7 +8,7 @@
 
 use malachite_base::apply_fn_to_primitive_floats;
 use malachite_base::assert_panic;
-use malachite_base::num::arithmetic::traits::{Pow, PowAssign};
+use malachite_base::num::arithmetic::traits::{IsPowerOf2, Pow, PowAssign, PowerOf2};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeZero, One, Zero,
@@ -18,7 +18,7 @@ use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::primitive_float_pair_gen;
-use malachite_float::arithmetic::pow::primitive_float_pow;
+use malachite_float::arithmetic::pow::{primitive_float_pow, primitive_float_rational_pow};
 use malachite_float::test_util::arithmetic::pow::{
     rug_pow, rug_pow_prec, rug_pow_prec_round, rug_pow_round,
 };
@@ -29,10 +29,16 @@ use malachite_float::test_util::generators::{
     float_float_unsigned_rounding_mode_quadruple_gen_var_9,
     float_float_unsigned_rounding_mode_quadruple_gen_var_10, float_float_unsigned_triple_gen_var_1,
     float_pair_gen, float_pair_gen_var_10,
+    float_rational_unsigned_rounding_mode_quadruple_gen_var_1,
+    float_rational_unsigned_triple_gen_var_1,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
+use malachite_nz::integer::Integer;
+use malachite_q::Rational;
+use malachite_q::test_util::generators::rational_primitive_float_pair_gen;
 use std::cmp::Ordering::{self, *};
 use std::panic::catch_unwind;
+use std::str::FromStr;
 
 #[test]
 fn test_pow_special_values() {
@@ -517,6 +523,7 @@ fn test_pow_coverage() {
     );
 }
 
+#[allow(clippy::needless_pass_by_value)]
 fn pow_prec_round_properties_helper(
     x: Float,
     y: Float,
@@ -792,16 +799,16 @@ fn test_primitive_float_pow() {
     test::<f32>(-3.0, -3.0, -0.037037037);
 
     test::<f32>(3.0, 2.5, 15.588457);
-    test::<f32>(2.0, 0.5, 1.4142135);
+    test::<f32>(2.0, 0.5, core::f32::consts::SQRT_2);
     test::<f32>(1.5, 100.0, 4.065612e17);
     // overflow and underflow
     test::<f32>(2.0, 128.0, f32::INFINITY);
     test::<f32>(2.0, -150.0, 0.0);
 
     test::<f64>(3.0, 2.5, 15.588457268119896);
-    test::<f64>(2.0, 0.5, 1.4142135623730951);
+    test::<f64>(2.0, 0.5, core::f64::consts::SQRT_2);
     test::<f64>(10.0, -0.5, 0.31622776601683794);
-    test::<f64>(0.5, 0.5, 0.7071067811865476);
+    test::<f64>(0.5, 0.5, core::f64::consts::FRAC_1_SQRT_2);
     test::<f64>(1.5, 100.0, 4.065611775352152e17);
     test::<f64>(0.9999999999, 10000000000.0, 0.36787941071456814);
     test::<f64>(-2.0, 3.0, -8.0);
@@ -825,4 +832,504 @@ where
 #[test]
 fn primitive_float_pow_properties() {
     apply_fn_to_primitive_floats!(primitive_float_pow_properties_helper);
+}
+
+// A `Float` base that is a sliver of 1 -- within a couple of binades of the smallest positive
+// `Float`, requiring a precision near 2^30 -- has a logarithm below the smallest positive `Float`.
+// Such a base once made `Float::pow` panic (its `ln` underflowed on `x - 1`); it is now delegated
+// to the exact-`Rational` power. These small-exponent cases take the tiny-result shortcut (x^y
+// rounds to 1 +/- ulp), so they avoid the 128-MB log2 brackets and stay cheap. Run under
+// `--release`.
+#[test]
+fn test_pow_sliver_of_one() {
+    let p = u64::try_from(-i64::from(Float::MIN_EXPONENT) + 3).unwrap();
+    let eps = Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2);
+    let sliver = |xr: Rational| Float::from_rational_prec_round(xr, p, Exact).0;
+    let test = |x: Float, y: Float, out: &str, out_hex: &str, o_out| {
+        let (r, o) = x.pow_prec_round_ref_ref(&y, 64, Nearest);
+        assert!(r.is_valid());
+        assert_eq!(r.to_string(), out);
+        assert_eq!(to_hex_string(&r), out_hex);
+        assert_eq!(o, o_out);
+    };
+    let y = Float::power_of_2(60i64);
+    // 1 + 2^(MIN_EXPONENT - 2), just above 1
+    test(
+        sliver(Rational::ONE + &eps),
+        y.clone(),
+        "1.0",
+        "0x1.0000000000000000#64",
+        Less,
+    );
+    // 1 - 2^(MIN_EXPONENT - 2), just below 1
+    test(
+        sliver(Rational::ONE - &eps),
+        y.clone(),
+        "1.0",
+        "0x1.0000000000000000#64",
+        Greater,
+    );
+    // negative base, even integer exponent
+    test(
+        sliver(-(Rational::ONE + &eps)),
+        y,
+        "1.0",
+        "0x1.0000000000000000#64",
+        Less,
+    );
+    // negative base, odd integer exponent
+    let y_odd =
+        Float::from_rational_prec_round(Rational::power_of_2(60i64) + Rational::ONE, 61, Exact).0;
+    test(
+        sliver(-(Rational::ONE + &eps)),
+        y_odd,
+        "-1.0",
+        "-0x1.0000000000000000#64",
+        Greater,
+    );
+}
+
+#[test]
+fn test_rational_pow() {
+    let test = |s: &str,
+                t: &str,
+                t_hex: &str,
+                prec: u64,
+                rm: RoundingMode,
+                out: &str,
+                out_hex: &str,
+                o_out| {
+        let x = Rational::from_str(s).unwrap();
+        let y = parse_hex_string(t_hex);
+        assert_eq!(y.to_string(), t);
+        let (p, o) = Float::rational_pow_prec_round_ref_ref(&x, &y, prec, rm);
+        assert!(p.is_valid());
+        assert_eq!(p.to_string(), out);
+        assert_eq!(to_hex_string(&p), out_hex);
+        assert_eq!(o, o_out);
+    };
+    // - ordinary squeeze: non-dyadic base
+    test(
+        "3/2",
+        "0.5",
+        "0x0.8#1",
+        20,
+        Nearest,
+        "1.224745",
+        "0x1.3988e#20",
+        Less,
+    );
+    // - ordinary squeeze, directed
+    test(
+        "2/3",
+        "2.5",
+        "0x2.8#3",
+        20,
+        Floor,
+        "0.3628869",
+        "0x0.5ce628#20",
+        Less,
+    );
+    // - negative base, odd integer y
+    test(
+        "-3/2",
+        "3.0",
+        "0x3.0#2",
+        20,
+        Nearest,
+        "-3.375",
+        "-0x3.60000#20",
+        Equal,
+    );
+    // - negative base, non-integer y is NaN
+    test("-3/2", "0.5", "0x0.8#1", 20, Nearest, "NaN", "NaN", Equal);
+    // - exact dyadic result via descent: (9/4)^(1/2) = 3/2
+    test(
+        "9/4",
+        "0.5",
+        "0x0.8#1",
+        20,
+        Nearest,
+        "1.5",
+        "0x1.80000#20",
+        Equal,
+    );
+    // - power-of-2 base delegates to power_of_2_rational
+    test(
+        "1/4",
+        "0.8",
+        "0x0.c#2",
+        20,
+        Nearest,
+        "0.3535533",
+        "0x0.5a8278#20",
+        Less,
+    );
+    // - small integer y materializes exactly
+    test(
+        "3/7",
+        "4.0e1",
+        "0x28.0#3",
+        30,
+        Nearest,
+        "1.909539244e-15",
+        "0x8.998c820E-13#30",
+        Greater,
+    );
+    // - dyadic in-range base delegates to Float::pow
+    test(
+        "5/4",
+        "0.5",
+        "0x0.8#1",
+        20,
+        Nearest,
+        "1.118034",
+        "0x1.1e378#20",
+        Greater,
+    );
+    // - deep underflow, Nearest
+    test(
+        "2/3",
+        "1.0e12",
+        "0x1.0E+10#1",
+        32,
+        Nearest,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    // - deep underflow, Up gives the minimum positive value
+    test(
+        "2/3",
+        "1.0e12",
+        "0x1.0E+10#1",
+        32,
+        Up,
+        "too_small",
+        "0x1.00000000E-268435456#32",
+        Greater,
+    );
+
+    // Bracket ends that land exactly on a representable power in the x-space squeeze: a base just
+    // below a perfect power makes the upper bracket round to it (sqx_hi_eq), and just above makes
+    // the lower bracket round to it (sqx_lo_eq).
+    let test2 = |x: Rational, t_hex: &str, prec: u64, out_hex: &str, o_out| {
+        let y = parse_hex_string(t_hex);
+        let (r, o) = Float::rational_pow_prec_round_ref_ref(&x, &y, prec, Nearest);
+        assert!(r.is_valid());
+        assert_eq!(to_hex_string(&r), out_hex);
+        assert_eq!(o, o_out);
+    };
+    let tiny = Rational::from_unsigneds(1u32, 3u32).pow(100i64);
+    // - sqx_hi_eq: (4 - 3^-100)^(1/2), upper bracket rounds to 4 so 4^(1/2) = 2 is exact
+    test2(
+        Rational::from(4u32) - &tiny,
+        "0x0.8#1",
+        5,
+        "0x2.0#5",
+        Greater,
+    );
+    // - sqx_lo_eq: (9 + 3^-100)^(1/2), lower bracket rounds to 9 so 9^(1/2) = 3 is exact
+    test2(Rational::from(9u32) + &tiny, "0x0.8#1", 5, "0x3.0#5", Less);
+}
+
+// Bases at or beyond the Float exponent range, and bases so close to 1 that their logarithm is at
+// or below the smallest positive Float: the regimes that need the exact-Rational t-space squeeze,
+// the dyadic-result descent, or the sliver reroute. Inputs are constructed from
+// `Float::MAX_EXPONENT` and `Float::MIN_EXPONENT` (their Rational forms occupy ~128 MB), as
+// elsewhere in the extreme tests; expected values were generated through the implementation and
+// cross-checked by hand against the closed forms in the comments. Run under `--release`.
+#[test]
+fn test_rational_pow_extreme() {
+    let test = |x: &Rational,
+                t: &str,
+                t_hex: &str,
+                prec: u64,
+                rm: RoundingMode,
+                out: &str,
+                out_hex: &str,
+                o_out| {
+        let y = parse_hex_string(t_hex);
+        assert_eq!(y.to_string(), t);
+        let (p, o) = Float::rational_pow_prec_round_ref_ref(x, &y, prec, rm);
+        assert!(p.is_valid());
+        assert_eq!(p.to_string(), out);
+        assert_eq!(to_hex_string(&p), out_hex);
+        assert_eq!(o, o_out);
+    };
+    let e = i64::from(Float::MAX_EXPONENT) + 1;
+    let mi = i64::from(Float::MIN_EXPONENT);
+    // - (3 * 2^(MAX_EXPONENT + 1))^(1/4) = 3^(1/4) * 2^(2^28): base beyond the range, in-range
+    //   inexact result via the directed-log t-squeeze
+    test(
+        &(Rational::from(3u32) * Rational::power_of_2(e)),
+        "0.2",
+        "0x0.4#1",
+        20,
+        Nearest,
+        "too_big",
+        "0x1.50ea4E+67108864#20",
+        Greater,
+    );
+    // - (81 * 2^(MAX_EXPONENT + 1))^(1/4) = 3 * 2^(2^28): base beyond the range, exact via the
+    //   square-root descent
+    test(
+        &(Rational::from(81u32) * Rational::power_of_2(e)),
+        "0.2",
+        "0x0.4#1",
+        20,
+        Nearest,
+        "too_big",
+        "0x3.00000E+67108864#20",
+        Equal,
+    );
+    // - (5 / 2^(MAX_EXPONENT + 1))^(-1/2) = 5^(-1/2) * 2^(2^30): tiny base, negative power,
+    //   in-range result
+    test(
+        &(Rational::from(5u32) * Rational::power_of_2(-e)),
+        "-0.5",
+        "-0x0.8#1",
+        20,
+        Nearest,
+        "too_big",
+        "0x7.27c98E+134217727#20",
+        Greater,
+    );
+    // - (1 - 2^(MIN_EXPONENT - 2))^(2^60): a sliver of 1 from below, whose Float logarithm would
+    //   underflow; the sliver reroute sends it to the t-squeeze (via the directed branch on 2x)
+    test(
+        &(Rational::ONE - Rational::power_of_2(mi - 2)),
+        "1.0e18",
+        "0x1.0E+15#1",
+        64,
+        Nearest,
+        "1.0",
+        "0x1.0000000000000000#64",
+        Greater,
+    );
+    // - ((1 + 3^-500) * 2^(MAX_EXPONENT + 1))^(1/4): base beyond the range with a mantissa a sliver
+    //   above 1, exercising the atanh-series log2 brackets
+    test(
+        &((Rational::ONE + Rational::from_unsigneds(1u32, 3u32).pow(500i64))
+            * Rational::power_of_2(e)),
+        "0.2",
+        "0x0.4#1",
+        20,
+        Nearest,
+        "too_big",
+        "0x1.00000E+67108864#20",
+        Less,
+    );
+    // - (1 + 2^-70000)^(2^60): a moderate dyadic sliver, handled on the Float::pow path (its
+    //   logarithm is well within range)
+    test(
+        &(Rational::ONE + Rational::power_of_2(-70000i64)),
+        "1.0e18",
+        "0x1.0E+15#1",
+        64,
+        Nearest,
+        "1.0",
+        "0x1.0000000000000000#64",
+        Less,
+    );
+    // - (1 + 3^-500)^(2^700): a moderate non-dyadic sliver, in-range x-space squeeze
+    test(
+        &(Rational::ONE + Rational::from_unsigneds(1u32, 3u32).pow(500i64)),
+        "5.0e210",
+        "0x1.0E+175#1",
+        64,
+        Nearest,
+        "1.0",
+        "0x1.0000000000000000#64",
+        Less,
+    );
+    // - ((1 - 3^-500) * 2^(MAX_EXPONENT + 1))^(1/4): base beyond the range with a mantissa a sliver
+    //   BELOW 1, exercising the signed (negative-argument) atanh-series log2 brackets
+    test(
+        &((Rational::ONE - Rational::from_unsigneds(1u32, 3u32).pow(500i64))
+            * Rational::power_of_2(e)),
+        "0.2",
+        "0x0.4#1",
+        20,
+        Nearest,
+        "too_big",
+        "0x1.00000E+67108864#20",
+        Greater,
+    );
+}
+
+#[allow(clippy::needless_pass_by_value)]
+fn rational_pow_prec_round_properties_helper(x: Rational, y: Float, prec: u64, rm: RoundingMode) {
+    if rm == Exact {
+        let (p, o) = Float::rational_pow_prec_round_ref_ref(&x, &y, prec, Nearest);
+        if o == Equal {
+            let (pe, oe) = Float::rational_pow_prec_round_ref_ref(&x, &y, prec, Exact);
+            assert_eq!(ComparableFloatRef(&pe), ComparableFloatRef(&p));
+            assert_eq!(oe, Equal);
+        } else {
+            assert_panic!(Float::rational_pow_prec_round_ref_ref(&x, &y, prec, Exact));
+        }
+        return;
+    }
+    let (p, o) = Float::rational_pow_prec_round_ref_ref(&x, &y, prec, rm);
+    assert!(p.is_valid());
+    let (p_alt, o_alt) = Float::rational_pow_prec_round(x.clone(), y.clone(), prec, rm);
+    assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+    assert_eq!(o_alt, o);
+    let (p_alt, o_alt) = Float::rational_pow_prec_round_val_ref(x.clone(), &y, prec, rm);
+    assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+    assert_eq!(o_alt, o);
+    let (p_alt, o_alt) = Float::rational_pow_prec_round_ref_val(&x, y.clone(), prec, rm);
+    assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+    assert_eq!(o_alt, o);
+
+    // A dyadic base that converts exactly must agree with Float::pow.
+    if x != 0u32 && y.is_finite() {
+        let bits = x.numerator_ref().significant_bits() + x.denominator_ref().significant_bits();
+        if x.denominator_ref().is_power_of_2() && bits < 10000 {
+            let xf = Float::from_rational_prec_round_ref(&x, bits, Floor).0;
+            if Rational::exact_from(&xf) == x {
+                let (p_alt, o_alt) = xf.pow_prec_round_val_ref(&y, prec, rm);
+                assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+                assert_eq!(o_alt, o);
+            }
+        }
+    }
+    // A small integer exponent must agree with exact Rational powering.
+    if y.is_finite()
+        && !y.is_zero()
+        && (&y).is_integer()
+        && y.significant_bits() < 20
+        && let Ok(z) = i64::try_from(&Integer::rounding_from(&y, Nearest).0)
+        && z.unsigned_abs() < 100
+        && x != 0u32
+    {
+        let (p_alt, o_alt) = Float::from_rational_prec_round((&x).pow(z), prec, rm);
+        assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+        assert_eq!(o_alt, o);
+    }
+    // Exactness implies rounding-mode invariance.
+    if o == Equal && p.is_normal() {
+        for rm2 in [Floor, Ceiling, Down, Up, Nearest] {
+            let (p_alt, o_alt) = Float::rational_pow_prec_round_ref_ref(&x, &y, prec, rm2);
+            assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+            assert_eq!(o_alt, Equal);
+        }
+    }
+    // Negative base with non-integer finite y is NaN.
+    if x < 0u32 && y.is_normal() && !(&y).is_integer() {
+        assert!(p.is_nan());
+    }
+    if p.is_normal() {
+        assert_eq!(p.get_prec(), Some(prec));
+    }
+}
+
+#[test]
+fn rational_pow_prec_round_properties() {
+    float_rational_unsigned_rounding_mode_quadruple_gen_var_1().test_properties(
+        |(y, x, prec, rm)| {
+            rational_pow_prec_round_properties_helper(x, y, prec, rm);
+        },
+    );
+}
+
+#[test]
+fn rational_pow_prec_properties() {
+    float_rational_unsigned_triple_gen_var_1::<u64>().test_properties(|(y, x, prec)| {
+        let (p, o) = Float::rational_pow_prec_ref_ref(&x, &y, prec);
+        assert!(p.is_valid());
+        let (p_alt, o_alt) = Float::rational_pow_prec(x.clone(), y.clone(), prec);
+        assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+        assert_eq!(o_alt, o);
+        let (p_alt, o_alt) = Float::rational_pow_prec_val_ref(x.clone(), &y, prec);
+        assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+        assert_eq!(o_alt, o);
+        let (p_alt, o_alt) = Float::rational_pow_prec_ref_val(&x, y.clone(), prec);
+        assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+        assert_eq!(o_alt, o);
+        let (p_alt, o_alt) = Float::rational_pow_prec_round_ref_ref(&x, &y, prec, Nearest);
+        assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+        assert_eq!(o_alt, o);
+    });
+}
+
+#[test]
+#[allow(clippy::type_repetition_in_bounds)]
+fn test_primitive_float_rational_pow() {
+    fn test<T: PrimitiveFloat>(s: &str, y: T, out: T)
+    where
+        Float: From<T> + PartialOrd<T>,
+        for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    {
+        let x = Rational::from_str(s).unwrap();
+        assert_eq!(
+            NiceFloat(primitive_float_rational_pow(&x, y)),
+            NiceFloat(out)
+        );
+    }
+    test::<f32>("0", f32::NAN, f32::NAN);
+    test::<f32>("0", f32::INFINITY, 0.0);
+    test::<f32>("0", f32::NEGATIVE_INFINITY, f32::INFINITY);
+    test::<f32>("0", 0.0, 1.0);
+    test::<f32>("0", -0.0, 1.0);
+    test::<f32>("0", 2.0, 0.0);
+    test::<f32>("0", -3.0, f32::INFINITY);
+    test::<f32>("1", f32::NAN, 1.0);
+    test::<f32>("1", f32::INFINITY, 1.0);
+    test::<f32>("1", f32::NEGATIVE_INFINITY, 1.0);
+    test::<f32>("1", 0.0, 1.0);
+    test::<f32>("1", -0.0, 1.0);
+    test::<f32>("1", 2.0, 1.0);
+    test::<f32>("1", -3.0, 1.0);
+    test::<f32>("-1", f32::NAN, f32::NAN);
+    test::<f32>("-1", f32::INFINITY, 1.0);
+    test::<f32>("-1", f32::NEGATIVE_INFINITY, 1.0);
+    test::<f32>("-1", 0.0, 1.0);
+    test::<f32>("-1", -0.0, 1.0);
+    test::<f32>("-1", 2.0, 1.0);
+    test::<f32>("-1", -3.0, -1.0);
+    test::<f32>("2", f32::NAN, f32::NAN);
+    test::<f32>("2", f32::INFINITY, f32::INFINITY);
+    test::<f32>("2", f32::NEGATIVE_INFINITY, 0.0);
+    test::<f32>("2", 0.0, 1.0);
+    test::<f32>("2", -0.0, 1.0);
+    test::<f32>("2", 2.0, 4.0);
+    test::<f32>("2", -3.0, 0.125);
+    test::<f32>("1/2", f32::NAN, f32::NAN);
+    test::<f32>("1/2", f32::INFINITY, 0.0);
+    test::<f32>("1/2", f32::NEGATIVE_INFINITY, f32::INFINITY);
+    test::<f32>("1/2", 0.0, 1.0);
+    test::<f32>("1/2", -0.0, 1.0);
+    test::<f32>("1/2", 2.0, 0.25);
+    test::<f32>("1/2", -3.0, 8.0);
+
+    test::<f64>("3/2", 2.5, 2.7556759606310752);
+    test::<f64>("2/3", -2.5, 2.7556759606310752);
+    test::<f64>("9/4", 0.5, 1.5);
+    test::<f64>("1/4", 0.75, 0.3535533905932738);
+    test::<f64>("-3/2", 3.0, -3.375);
+    test::<f64>("-3/2", 0.5, f64::NAN);
+    // overflow and underflow
+    test::<f64>("3/2", 1000.0, 1.2338405969061735e176);
+    test::<f64>("2/3", 1000.0, 8.104774656527566e-177);
+    test::<f32>("3/2", 2.5, 2.755676);
+    test::<f32>("2", 200.0, f32::INFINITY);
+    test::<f32>("1/2", 200.0, 0.0);
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn primitive_float_rational_pow_properties_helper<T: PrimitiveFloat>()
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    rational_primitive_float_pair_gen::<T>().test_properties(|(x, y)| {
+        primitive_float_rational_pow::<T>(&x, y);
+    });
+}
+
+#[test]
+fn primitive_float_rational_pow_properties() {
+    apply_fn_to_primitive_floats!(primitive_float_rational_pow_properties_helper);
 }

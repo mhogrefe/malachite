@@ -123,7 +123,7 @@ fn benchmark_float_gelfond_schneider_constant_prec(
         file_name,
         &unsigned_direct_bucketer(),
         &mut [("Malachite", &mut |p| {
-            no_out!(Float::gelfond_schneider_constant_prec(p))
+            no_out!(Float::gelfond_schneider_constant_prec(p));
         })],
     );
 }

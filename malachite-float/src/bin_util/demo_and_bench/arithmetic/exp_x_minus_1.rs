@@ -302,7 +302,7 @@ fn benchmark_float_exp_x_minus_1_rational_prec_round_evaluation_strategy(
             (
                 "Float::exp_x_minus_1_rational_prec_round_ref(&Rational, u64, RoundingMode)",
                 &mut |(n, prec, rm)| {
-                    no_out!(Float::exp_x_minus_1_rational_prec_round_ref(&n, prec, rm))
+                    no_out!(Float::exp_x_minus_1_rational_prec_round_ref(&n, prec, rm));
                 },
             ),
         ],
@@ -660,7 +660,7 @@ fn benchmark_float_exp_x_minus_1_evaluation_strategy(
         &mut [
             ("Float.exp_x_minus_1()", &mut |x| no_out!(x.exp_x_minus_1())),
             ("(&Float).exp_x_minus_1()", &mut |x| {
-                no_out!((&x).exp_x_minus_1())
+                no_out!((&x).exp_x_minus_1());
             }),
         ],
     );
@@ -702,7 +702,7 @@ fn benchmark_float_exp_x_minus_1_assign(
         file_name,
         &float_complexity_bucketer("x"),
         &mut [("Float.exp_x_minus_1_assign()", &mut |mut x| {
-            x.exp_x_minus_1_assign()
+            x.exp_x_minus_1_assign();
         })],
     );
 }
@@ -827,7 +827,7 @@ fn benchmark_float_exp_x_minus_1_round_library_comparison(
                 no_out!(x.exp_x_minus_1_round_ref(rm));
             }),
             ("rug", &mut |((x, rm), _)| {
-                no_out!(rug_exp_x_minus_1_round(&x, rm))
+                no_out!(rug_exp_x_minus_1_round(&x, rm));
             }),
         ],
     );

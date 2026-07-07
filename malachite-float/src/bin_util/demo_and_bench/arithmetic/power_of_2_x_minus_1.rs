@@ -388,10 +388,10 @@ fn benchmark_float_power_of_2_x_minus_1_evaluation_strategy(
         &float_complexity_bucketer("x"),
         &mut [
             ("Float.power_of_2_x_minus_1()", &mut |x| {
-                no_out!(x.power_of_2_x_minus_1())
+                no_out!(x.power_of_2_x_minus_1());
             }),
             ("(&Float).power_of_2_x_minus_1()", &mut |x| {
-                no_out!((&x).power_of_2_x_minus_1())
+                no_out!((&x).power_of_2_x_minus_1());
             }),
         ],
     );
@@ -413,7 +413,7 @@ fn benchmark_float_power_of_2_x_minus_1_library_comparison(
         &pair_2_float_complexity_bucketer("x"),
         &mut [
             ("Malachite", &mut |(_, x)| {
-                no_out!((&x).power_of_2_x_minus_1())
+                no_out!((&x).power_of_2_x_minus_1());
             }),
             ("rug", &mut |(x, _)| no_out!(rug_power_of_2_x_minus_1(&x))),
         ],
@@ -435,7 +435,7 @@ fn benchmark_float_power_of_2_x_minus_1_assign(
         file_name,
         &float_complexity_bucketer("x"),
         &mut [("Float.power_of_2_x_minus_1_assign()", &mut |mut x| {
-            x.power_of_2_x_minus_1_assign()
+            x.power_of_2_x_minus_1_assign();
         })],
     );
 }
@@ -566,7 +566,7 @@ fn benchmark_float_power_of_2_x_minus_1_round_library_comparison(
                 no_out!(x.power_of_2_x_minus_1_round_ref(rm));
             }),
             ("rug", &mut |((x, rm), _)| {
-                no_out!(rug_power_of_2_x_minus_1_round(&x, rm))
+                no_out!(rug_power_of_2_x_minus_1_round(&x, rm));
             }),
         ],
     );
@@ -922,7 +922,7 @@ fn benchmark_float_power_of_2_x_minus_1_rational_prec_round_evaluation_strategy(
             (
                 "Float::power_of_2_x_minus_1_rational_prec_round(Rational, u64, RoundingMode)",
                 &mut |(n, prec, rm)| {
-                    no_out!(Float::power_of_2_x_minus_1_rational_prec_round(n, prec, rm))
+                    no_out!(Float::power_of_2_x_minus_1_rational_prec_round(n, prec, rm));
                 },
             ),
             (
@@ -931,7 +931,7 @@ fn benchmark_float_power_of_2_x_minus_1_rational_prec_round_evaluation_strategy(
                 &mut |(n, prec, rm)| {
                     no_out!(Float::power_of_2_x_minus_1_rational_prec_round_ref(
                         &n, prec, rm
-                    ))
+                    ));
                 },
             ),
         ],

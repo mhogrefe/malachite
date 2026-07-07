@@ -458,7 +458,7 @@ fn benchmark_float_power_of_2_of_float_prec_round_evaluation_strategy(
             (
                 "Float::power_of_2_of_float_prec_round_ref(&Float, u64, RoundingMode)",
                 &mut |(x, prec, rm)| {
-                    no_out!(Float::power_of_2_of_float_prec_round_ref(&x, prec, rm))
+                    no_out!(Float::power_of_2_of_float_prec_round_ref(&x, prec, rm));
                 },
             ),
         ],
@@ -480,7 +480,7 @@ fn benchmark_float_power_of_2_of_float_prec_round_assign(
         file_name,
         &triple_1_2_float_primitive_int_max_complexity_bucketer("x", "prec"),
         &mut [("Malachite", &mut |(mut x, prec, rm)| {
-            no_out!(x.power_of_2_of_float_prec_round_assign(prec, rm))
+            no_out!(x.power_of_2_of_float_prec_round_assign(prec, rm));
         })],
     );
 }
@@ -527,7 +527,7 @@ fn benchmark_float_power_of_2_of_float_prec_assign(
         file_name,
         &pair_float_primitive_int_max_complexity_bucketer("x", "prec"),
         &mut [("Malachite", &mut |(mut x, prec)| {
-            no_out!(x.power_of_2_of_float_prec_assign(prec))
+            no_out!(x.power_of_2_of_float_prec_assign(prec));
         })],
     );
 }
@@ -574,7 +574,7 @@ fn benchmark_float_power_of_2_of_float_round_assign(
         file_name,
         &pair_1_float_complexity_bucketer("x"),
         &mut [("Malachite", &mut |(mut x, rm)| {
-            no_out!(x.power_of_2_of_float_round_assign(rm))
+            no_out!(x.power_of_2_of_float_round_assign(rm));
         })],
     );
 }
@@ -595,10 +595,10 @@ fn benchmark_float_power_of_2_of_float_evaluation_strategy(
         &float_complexity_bucketer("x"),
         &mut [
             ("Float::power_of_2(Float)", &mut |x| {
-                no_out!(Float::power_of_2(x))
+                no_out!(Float::power_of_2(x));
             }),
             ("Float::power_of_2(&Float)", &mut |x| {
-                no_out!(Float::power_of_2(&x))
+                no_out!(Float::power_of_2(&x));
             }),
         ],
     );
@@ -798,7 +798,7 @@ fn benchmark_float_power_of_2_rational_prec_round_evaluation_strategy(
             (
                 "Float::power_of_2_rational_prec_round_ref(&Rational, u64, RoundingMode)",
                 &mut |(n, prec, rm)| {
-                    no_out!(Float::power_of_2_rational_prec_round_ref(&n, prec, rm))
+                    no_out!(Float::power_of_2_rational_prec_round_ref(&n, prec, rm));
                 },
             ),
         ],
@@ -807,6 +807,7 @@ fn benchmark_float_power_of_2_rational_prec_round_evaluation_strategy(
 
 // -------- primitive_float_power_of_2 --------
 
+#[allow(clippy::type_repetition_in_bounds)]
 fn demo_primitive_float_power_of_2<T: PrimitiveFloat>(gm: GenMode, config: &GenConfig, limit: usize)
 where
     Float: From<T> + PartialOrd<T>,
@@ -847,6 +848,7 @@ fn benchmark_primitive_float_power_of_2<T: PrimitiveFloat>(
 
 // -------- primitive_float_power_of_2_rational --------
 
+#[allow(clippy::type_repetition_in_bounds)]
 fn demo_primitive_float_power_of_2_rational<T: PrimitiveFloat>(
     gm: GenMode,
     config: &GenConfig,

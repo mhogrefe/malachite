@@ -54,14 +54,68 @@ use malachite_q::Rational;
 // `1_plus_x` functions, whose tiny-argument paths handle the underflow region correctly. Reaching
 // the sliver requires an input precision of nearly 2^30 bits, so for every other `x` the guard
 // costs only an exponent-and-precision test; the subtraction (performed only past that test) is
-// exact, since `x` is within `(1/2, 2)`.
-pub(crate) fn sliver_of_one(x: &Float) -> Option<Float> {
+// exact, since `x` is within `(1/2, 2)`. Brackets of ln(1 + e) for an exact nonzero Rational e with
+// |e| < 1/2, as exact Rationals, to a relative accuracy of about 2^-wprec. Uses the Mercator series
+// ln(1 + e) = sum_{k>=1} (-1)^(k+1) e^k / k. For e > 0 the terms strictly alternate in sign and
+// decrease in magnitude, so consecutive partial sums bracket the value; for e < 0 every term is
+// negative, so a partial sum is an upper bound and the remainder after it is bounded in magnitude
+// by |e|^(k+1) / ((k + 1)(1 - |e|)). Unlike the atanh form, this needs no `e / (2 + e)` division,
+// which is the dominant cost when e is a sub-`MIN` sliver (a ~128-MB Rational).
+pub(crate) fn ln_1_plus_rational_brackets(e: &Rational, wprec: u64) -> (Rational, Rational) {
+    let negative = *e < 0u32;
+    let mut pow = e.clone(); // e^k
+    let mut s = e.clone(); // partial sum S_k
+    let mut k = 1u64;
+    loop {
+        pow *= e; // e^(k+1)
+        k += 1;
+        let mut term = &pow / Rational::from(k); // (-1)^(k+1) e^k / k, up to sign
+        if k.even() {
+            term = -term;
+        }
+        let s_next = &s + &term; // S_{k+1}
+        let (lo, hi) = if negative {
+            // S_{k+1} is an upper bound; the remainder is bounded in magnitude by |e|^(k+2) / ((k +
+            // 2)(1 - |e|)), and 1 - |e| = 1 + e for e < 0.
+            let bound = -((&pow * e) / (Rational::from(k + 1) * (Rational::ONE + e))).abs();
+            (&s_next + &bound, s_next.clone())
+        } else if s < s_next {
+            (s.clone(), s_next.clone())
+        } else {
+            (s_next.clone(), s.clone())
+        };
+        s = s_next;
+        let width = &hi - &lo;
+        if width == 0u32
+            || width.floor_log_base_2_abs() < lo.floor_log_base_2_abs() - i64::exact_from(wprec) - 2
+        {
+            return (lo, hi);
+        }
+    }
+}
+
+pub(crate) enum SliverOfOne {
+    // `x` is not within a sliver of 1; use the ordinary logarithm path.
+    No,
+    // `x = 1 + d` with `d` representable; compute the logarithm via the `1_plus_x` form.
+    Representable(Float),
+    // `x` is so close to 1 that its logarithm falls at or below the smallest positive `Float`. The
+    // subtraction `x - 1` cannot be represented (it flushes to zero for `x > 1`, or clamps to the
+    // minimum magnitude for `x < 1`), so the caller computes the underflowing result via the
+    // exact-`Rational` logarithm of `x` (whose Rational-argument path has no exponent range).
+    Underflow,
+}
+
+pub(crate) fn sliver_of_one(x: &Float) -> SliverOfOne {
     let e = i64::from(x.get_exponent().unwrap());
     if (e == 0 || e == 1)
         && x.get_prec().unwrap() >= u64::exact_from(-i64::from(Float::MIN_EXPONENT) - 8)
     {
         let (mut d, o) = x.sub_prec_round_ref_val(Float::ONE, x.get_prec().unwrap() + 1, Floor);
-        debug_assert_eq!(o, Equal);
+        if o != Equal {
+            // `x - 1` fell below the smallest positive `Float`, so `ln(x) ~ x - 1` underflows.
+            return SliverOfOne::Underflow;
+        }
         if i64::from(d.get_exponent().unwrap()) <= i64::from(Float::MIN_EXPONENT) + 4 {
             // Shed the trailing zeros inherited from the subtraction's requested precision: d's
             // true significant span is small, and the inflated precision would defeat the
@@ -71,10 +125,10 @@ pub(crate) fn sliver_of_one(x: &Float) -> Option<Float> {
             let min_prec = significand_bits(sig) - sig.trailing_zeros().unwrap();
             let o = d.set_prec_round(min_prec, Floor);
             debug_assert_eq!(o, Equal);
-            return Some(d);
+            return SliverOfOne::Representable(d);
         }
     }
-    None
+    SliverOfOne::No
 }
 
 // This is mpfr_log from log.c, MPFR 4.2.0.
@@ -84,8 +138,12 @@ fn ln_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float, O
     }
     // ln(x) for x in a sliver of 1 can fall below the smallest positive Float; the 1-plus-x form
     // handles that underflow region.
-    if let Some(d) = sliver_of_one(x) {
-        return d.ln_1_plus_x_prec_round(prec, rm);
+    match sliver_of_one(x) {
+        SliverOfOne::Representable(d) => return d.ln_1_plus_x_prec_round(prec, rm),
+        SliverOfOne::Underflow => {
+            return Float::ln_rational_prec_round(Rational::exact_from(x), prec, rm);
+        }
+        SliverOfOne::No => {}
     }
     assert_ne!(rm, Exact, "Inexact ln");
     let x_exp = i64::from(x.get_exponent().unwrap());
@@ -142,8 +200,12 @@ fn ln_prec_round_normal(mut x: Float, prec: u64, rm: RoundingMode) -> (Float, Or
     }
     // ln(x) for x in a sliver of 1 can fall below the smallest positive Float; the 1-plus-x form
     // handles that underflow region.
-    if let Some(d) = sliver_of_one(&x) {
-        return d.ln_1_plus_x_prec_round(prec, rm);
+    match sliver_of_one(&x) {
+        SliverOfOne::Representable(d) => return d.ln_1_plus_x_prec_round(prec, rm),
+        SliverOfOne::Underflow => {
+            return Float::ln_rational_prec_round(Rational::exact_from(&x), prec, rm);
+        }
+        SliverOfOne::No => {}
     }
     assert_ne!(rm, Exact, "Inexact ln");
     let x_exp = i64::from(x.get_exponent().unwrap());
