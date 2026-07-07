@@ -350,6 +350,111 @@ fn pow_integer(x: &Float, z: &Integer, prec: u64, rm: RoundingMode) -> (Float, O
     }
 }
 
+// This is `mpfr_pow_ui` (`POW_U`) from `pow_ui.c`, MPFR 4.3.0: x^n for a `u64` n, by binary
+// exponentiation with a Ziv loop, falling back to `pow_integer` (`mpfr_pow_z`) on an internal
+// overflow or underflow.
+fn pow_u(x: &Float, n: u64, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    // x^0 = 1 for any x, even NaN
+    if n == 0 {
+        return Float::from_unsigned_prec_round(1u32, prec, rm);
+    }
+    if x.is_nan() {
+        return (Float::NAN, Equal);
+    }
+    if x.is_infinite() {
+        // Inf^n = Inf; (-Inf)^n = Inf for n even, -Inf for n odd
+        let neg = x.is_sign_negative() && n.odd();
+        return (
+            if neg {
+                Float::NEGATIVE_INFINITY
+            } else {
+                Float::INFINITY
+            },
+            Equal,
+        );
+    }
+    if x.is_zero() {
+        // 0^n = 0 for any n; positive unless x is negative and n is odd
+        let neg = x.is_sign_negative() && n.odd();
+        return (
+            if neg {
+                Float::NEGATIVE_ZERO
+            } else {
+                Float::ZERO
+            },
+            Equal,
+        );
+    }
+    if n <= 2 {
+        return if n == 1 {
+            // x^1 = x
+            Float::from_float_prec_round_ref(x, prec, rm)
+        } else {
+            // x^2 = sqr(x)
+            x.square_prec_round_ref(prec, rm)
+        };
+    }
+    // n >= 3: square-and-multiply. `nlen` is the bit length of n, so 2^(nlen - 1) <= n < 2^nlen.
+    let nlen = n.significant_bits();
+    // Multiplications round away from zero (squares round up; their results are non-negative), so
+    // that an intermediate overflow or underflow is a true exception rather than rounding noise.
+    let rnd1 = if x.is_sign_positive() { Ceiling } else { Floor };
+    let mut wprec = {
+        let p = prec + 3 + 64 + prec.ceiling_log_base_2();
+        if p <= nlen {
+            // Unreachable for a `u64` n: p >= 1 + 3 + 64 = 68 always exceeds nlen, which is at most
+            // 64. (In MPFR, where GMP_NUMB_BITS may be 32 and n may be wider, this clamp matters.)
+            fail_on_untested_path("pow_u, working precision clamped up to nlen + 1");
+            nlen + 1
+        } else {
+            p
+        }
+    };
+    loop {
+        let err = wprec - 1 - nlen;
+        let (mut res, o) = x.square_prec_round_ref(wprec, Ceiling);
+        let mut inexact = o != Equal;
+        let mut i = nlen;
+        if n.get_bit(i - 2) {
+            inexact |= res.mul_prec_round_assign_ref(x, wprec, rnd1) != Equal;
+        }
+        if i > 2 {
+            i -= 3;
+            loop {
+                if res.is_infinite() || res.is_zero() {
+                    break;
+                }
+                inexact |= res.square_prec_round_assign(wprec, Ceiling) != Equal;
+                if n.get_bit(i) {
+                    inexact |= res.mul_prec_round_assign_ref(x, wprec, rnd1) != Equal;
+                }
+                if i == 0 {
+                    break;
+                }
+                i -= 1;
+            }
+        }
+        // Internal overflow (res is infinite) or underflow (res reached the minimum exponent): the
+        // approximation error has not been accounted for, so hand off to `pow_integer`, which
+        // handles the exponent range precisely.
+        if res.is_infinite()
+            || res.is_zero()
+            || i64::from(res.get_exponent().unwrap()) <= i64::from(Float::MIN_EXPONENT)
+        {
+            if res.is_zero() {
+                // Unreachable: squares round up and multiplications round away from zero, so res is
+                // a magnitude over-estimate that never rounds to zero; underflow instead surfaces as
+                // the minimum binade, handled by the exponent check above.
+                fail_on_untested_path("pow_u, res rounded to zero");
+            }
+            return x.pow_integer_prec_round_ref_ref(&Integer::from(n), prec, rm);
+        }
+        if !inexact || float_can_round(res.significand_ref().unwrap(), err, prec, rm) {
+            return Float::from_float_prec_round(res, prec, rm);
+        }
+        wprec += wprec >> 1;
+    }
+}
 // This is `mpfr_pow_is_exact` from `pow.c`, MPFR 4.3.0: assuming x > 0, x not a power of 2, y
 // finite non-integer, decides whether x^y is exact, and if so computes it.
 fn pow_is_exact(x: &Float, y: &Float, prec: u64, rm: RoundingMode) -> Option<(Float, Ordering)> {
@@ -3628,6 +3733,105 @@ impl PowAssign<&Integer> for Float {
     fn pow_assign(&mut self, other: &Integer) {
         let prec = self.significant_bits();
         self.pow_integer_prec_assign_ref(other, prec);
+    }
+}
+
+impl Float {
+    /// Raises a [`Float`] to a [`u64`] power, rounding the result to the specified precision and
+    /// with the specified rounding mode. The [`Float`] is taken by value.
+    pub fn pow_u_prec_round(self, n: u64, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+        pow_u(&self, n, prec, rm)
+    }
+
+    /// Raises a [`Float`] to a [`u64`] power, rounding the result to the specified precision and
+    /// with the specified rounding mode. The [`Float`] is taken by reference.
+    pub fn pow_u_prec_round_ref(&self, n: u64, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+        pow_u(self, n, prec, rm)
+    }
+
+    /// Raises a [`Float`] to a [`u64`] power, rounding the result to the specified precision and to
+    /// the nearest value. The [`Float`] is taken by value.
+    #[inline]
+    pub fn pow_u_prec(self, n: u64, prec: u64) -> (Self, Ordering) {
+        pow_u(&self, n, prec, Nearest)
+    }
+
+    /// Raises a [`Float`] to a [`u64`] power, rounding the result to the specified precision and to
+    /// the nearest value. The [`Float`] is taken by reference.
+    #[inline]
+    pub fn pow_u_prec_ref(&self, n: u64, prec: u64) -> (Self, Ordering) {
+        pow_u(self, n, prec, Nearest)
+    }
+
+    /// Raises a [`Float`] to a [`u64`] power, rounding the result to the precision of the base and
+    /// with the specified rounding mode. The [`Float`] is taken by value.
+    #[inline]
+    pub fn pow_u_round(self, n: u64, rm: RoundingMode) -> (Self, Ordering) {
+        let prec = self.significant_bits();
+        pow_u(&self, n, prec, rm)
+    }
+
+    /// Raises a [`Float`] to a [`u64`] power, rounding the result to the precision of the base and
+    /// with the specified rounding mode. The [`Float`] is taken by reference.
+    #[inline]
+    pub fn pow_u_round_ref(&self, n: u64, rm: RoundingMode) -> (Self, Ordering) {
+        pow_u(self, n, self.significant_bits(), rm)
+    }
+
+    /// Raises a [`Float`] to a [`u64`] power in place, rounding the result to the specified
+    /// precision and with the specified rounding mode.
+    pub fn pow_u_prec_round_assign(&mut self, n: u64, prec: u64, rm: RoundingMode) -> Ordering {
+        let (result, o) = pow_u(self, n, prec, rm);
+        *self = result;
+        o
+    }
+
+    /// Raises a [`Float`] to a [`u64`] power in place, rounding the result to the specified
+    /// precision and to the nearest value.
+    #[inline]
+    pub fn pow_u_prec_assign(&mut self, n: u64, prec: u64) -> Ordering {
+        self.pow_u_prec_round_assign(n, prec, Nearest)
+    }
+
+    /// Raises a [`Float`] to a [`u64`] power in place, rounding the result to the precision of the
+    /// base and with the specified rounding mode.
+    #[inline]
+    pub fn pow_u_round_assign(&mut self, n: u64, rm: RoundingMode) -> Ordering {
+        let prec = self.significant_bits();
+        self.pow_u_prec_round_assign(n, prec, rm)
+    }
+}
+
+impl Pow<u64> for Float {
+    type Output = Self;
+
+    /// Raises a [`Float`] to a [`u64`] power, rounding the result to the nearest value at the
+    /// precision of the base. The [`Float`] is taken by value.
+    #[inline]
+    fn pow(self, n: u64) -> Self {
+        let prec = self.significant_bits();
+        pow_u(&self, n, prec, Nearest).0
+    }
+}
+
+impl Pow<u64> for &Float {
+    type Output = Float;
+
+    /// Raises a [`Float`] to a [`u64`] power, rounding the result to the nearest value at the
+    /// precision of the base. The [`Float`] is taken by reference.
+    #[inline]
+    fn pow(self, n: u64) -> Float {
+        pow_u(self, n, self.significant_bits(), Nearest).0
+    }
+}
+
+impl PowAssign<u64> for Float {
+    /// Raises a [`Float`] to a [`u64`] power in place, rounding the result to the nearest value at
+    /// the precision of the base.
+    #[inline]
+    fn pow_assign(&mut self, n: u64) {
+        let prec = self.significant_bits();
+        self.pow_u_prec_assign(n, prec);
     }
 }
 

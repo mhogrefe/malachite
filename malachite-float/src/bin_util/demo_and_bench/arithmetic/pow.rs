@@ -31,9 +31,11 @@ use malachite_float::test_util::bench::bucketers::{
     pair_2_triple_1_2_float_max_complexity_bucketer,
     pair_2_triple_float_float_primitive_int_max_complexity_bucketer,
     pair_float_integer_max_complexity_bucketer, pair_float_max_complexity_bucketer,
+    pair_float_unsigned_max_complexity_bucketer,
     quadruple_1_2_3_float_float_primitive_int_max_complexity_bucketer,
-    quadruple_1_2_float_integer_max_complexity_bucketer,
+    quadruple_1_2_float_integer_max_complexity_bucketer, quadruple_1_float_complexity_bucketer,
     triple_1_2_float_integer_max_complexity_bucketer, triple_1_2_float_max_complexity_bucketer,
+    triple_1_2_float_primitive_int_max_complexity_bucketer,
     triple_float_float_primitive_int_max_complexity_bucketer,
 };
 use malachite_float::test_util::generators::{
@@ -46,7 +48,9 @@ use malachite_float::test_util::generators::{
     float_integer_pair_gen, float_integer_unsigned_rounding_mode_quadruple_gen_var_1,
     float_integer_unsigned_triple_gen_var_1, float_pair_gen, float_pair_gen_rm,
     float_pair_gen_var_10, float_rational_unsigned_rounding_mode_quadruple_gen_var_1,
-    float_rational_unsigned_triple_gen_var_1,
+    float_rational_unsigned_triple_gen_var_1, float_unsigned_pair_gen,
+    float_unsigned_unsigned_rounding_mode_quadruple_gen_var_9,
+    float_unsigned_unsigned_triple_gen_var_1,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef};
 use malachite_nz::test_util::bench::bucketers::pair_1_integer_bit_bucketer;
@@ -61,6 +65,18 @@ pub(crate) fn register(runner: &mut Runner) {
     register_primitive_float_demos!(runner, demo_primitive_float_rational_pow);
     register_primitive_float_demos!(runner, demo_primitive_float_pow_integer);
     register_demo!(runner, demo_float_pow);
+    register_demo!(runner, demo_float_pow_u_prec_round);
+    register_demo!(runner, demo_float_pow_u_prec_round_debug);
+    register_demo!(runner, demo_float_pow_u_prec);
+    register_demo!(runner, demo_float_pow_u_prec_debug);
+    register_demo!(runner, demo_float_pow_u_round);
+    register_demo!(runner, demo_float_pow_u_round_debug);
+    register_demo!(runner, demo_float_pow_u);
+    register_demo!(runner, demo_float_pow_u_debug);
+    register_demo!(runner, demo_float_pow_u_assign);
+    register_bench!(runner, benchmark_float_pow_u_prec_round);
+    register_bench!(runner, benchmark_float_pow_u_prec);
+    register_bench!(runner, benchmark_float_pow_u_evaluation_strategy);
     register_demo!(runner, demo_float_pow_integer_prec_round);
     register_demo!(runner, demo_float_pow_integer_prec_round_debug);
     register_demo!(runner, demo_float_pow_integer_prec);
@@ -1729,5 +1745,194 @@ fn benchmark_primitive_float_pow_integer<T: PrimitiveFloat>(
         &mut [("malachite", &mut |(y, x)| {
             no_out!(primitive_float_pow_integer::<T>(x, &y));
         })],
+    );
+}
+
+fn demo_float_pow_u_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, n, prec, rm) in float_unsigned_unsigned_rounding_mode_quadruple_gen_var_9()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        println!(
+            "({}).pow_u_prec_round({}, {}, {}) = {:?}",
+            x_old,
+            n,
+            prec,
+            rm,
+            x.pow_u_prec_round(n, prec, rm)
+        );
+    }
+}
+
+fn demo_float_pow_u_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, n, prec, rm) in float_unsigned_unsigned_rounding_mode_quadruple_gen_var_9()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let (power, o) = x.pow_u_prec_round(n, prec, rm);
+        println!(
+            "({:#x}).pow_u_prec_round({}, {}, {}) = ({:#x}, {:?})",
+            ComparableFloat(x_old),
+            n,
+            prec,
+            rm,
+            ComparableFloat(power),
+            o
+        );
+    }
+}
+
+fn demo_float_pow_u_prec(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, n, prec) in float_unsigned_unsigned_triple_gen_var_1::<u64, u64>()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        println!(
+            "({}).pow_u_prec({}, {}) = {:?}",
+            x_old,
+            n,
+            prec,
+            x.pow_u_prec(n, prec)
+        );
+    }
+}
+
+fn demo_float_pow_u_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, n, prec) in float_unsigned_unsigned_triple_gen_var_1::<u64, u64>()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let (power, o) = x.pow_u_prec(n, prec);
+        println!(
+            "({:#x}).pow_u_prec({}, {}) = ({:#x}, {:?})",
+            ComparableFloat(x_old),
+            n,
+            prec,
+            ComparableFloat(power),
+            o
+        );
+    }
+}
+
+fn demo_float_pow_u_round(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, n, _, rm) in float_unsigned_unsigned_rounding_mode_quadruple_gen_var_9()
+        .get(gm, config)
+        .filter(|(_, _, _, rm)| *rm != Exact)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        println!(
+            "({}).pow_u_round({}, {}) = {:?}",
+            x_old,
+            n,
+            rm,
+            x.pow_u_round(n, rm)
+        );
+    }
+}
+
+fn demo_float_pow_u_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, n, _, rm) in float_unsigned_unsigned_rounding_mode_quadruple_gen_var_9()
+        .get(gm, config)
+        .filter(|(_, _, _, rm)| *rm != Exact)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let (power, o) = x.pow_u_round(n, rm);
+        println!(
+            "({:#x}).pow_u_round({}, {}) = ({:#x}, {:?})",
+            ComparableFloat(x_old),
+            n,
+            rm,
+            ComparableFloat(power),
+            o
+        );
+    }
+}
+
+fn demo_float_pow_u(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, n) in float_unsigned_pair_gen::<u64>().get(gm, config).take(limit) {
+        let x_old = x.clone();
+        println!("({}).pow({}) = {}", x_old, n, x.pow(n));
+    }
+}
+
+fn demo_float_pow_u_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, n) in float_unsigned_pair_gen::<u64>().get(gm, config).take(limit) {
+        let x_old = x.clone();
+        println!(
+            "({:#x}).pow({}) = {:#x}",
+            ComparableFloat(x_old),
+            n,
+            ComparableFloat(x.pow(n))
+        );
+    }
+}
+
+fn demo_float_pow_u_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, n) in float_unsigned_pair_gen::<u64>().get(gm, config).take(limit) {
+        let x_old = x.clone();
+        x.pow_assign(n);
+        println!("x := {x_old}; x.pow_assign({n}); x = {x}");
+    }
+}
+
+fn benchmark_float_pow_u_prec_round(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float.pow_u_prec_round(u64, u64, RoundingMode)",
+        BenchmarkType::Single,
+        float_unsigned_unsigned_rounding_mode_quadruple_gen_var_9().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &quadruple_1_float_complexity_bucketer("x"),
+        &mut [("Malachite", &mut |(x, n, prec, rm)| {
+            no_out!(x.pow_u_prec_round(n, prec, rm));
+        })],
+    );
+}
+
+fn benchmark_float_pow_u_prec(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
+    run_benchmark(
+        "Float.pow_u_prec(u64, u64)",
+        BenchmarkType::Single,
+        float_unsigned_unsigned_triple_gen_var_1::<u64, u64>().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &triple_1_2_float_primitive_int_max_complexity_bucketer("x", "n"),
+        &mut [("Malachite", &mut |(x, n, prec)| {
+            no_out!(x.pow_u_prec(n, prec));
+        })],
+    );
+}
+
+fn benchmark_float_pow_u_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float.pow(u64)",
+        BenchmarkType::EvaluationStrategy,
+        float_unsigned_pair_gen::<u64>().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_float_unsigned_max_complexity_bucketer("x", "n"),
+        &mut [
+            ("Float.pow(u64)", &mut |(x, n)| no_out!(x.pow(n))),
+            ("(&Float).pow(u64)", &mut |(x, n)| no_out!((&x).pow(n))),
+        ],
     );
 }

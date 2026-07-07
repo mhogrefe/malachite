@@ -23,7 +23,8 @@ use malachite_float::arithmetic::pow::{
 };
 use malachite_float::test_util::arithmetic::pow::{
     rug_pow, rug_pow_integer, rug_pow_integer_prec, rug_pow_integer_prec_round,
-    rug_pow_integer_round, rug_pow_prec, rug_pow_prec_round, rug_pow_round,
+    rug_pow_integer_round, rug_pow_prec, rug_pow_prec_round, rug_pow_round, rug_pow_u,
+    rug_pow_u_prec, rug_pow_u_prec_round, rug_pow_u_round,
 };
 use malachite_float::test_util::common::{
     parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
@@ -35,7 +36,10 @@ use malachite_float::test_util::generators::{
     float_integer_unsigned_rounding_mode_quadruple_gen_var_2,
     float_integer_unsigned_triple_gen_var_1, float_pair_gen, float_pair_gen_var_10,
     float_rational_unsigned_rounding_mode_quadruple_gen_var_1,
-    float_rational_unsigned_triple_gen_var_1,
+    float_rational_unsigned_triple_gen_var_1, float_unsigned_pair_gen,
+    float_unsigned_unsigned_rounding_mode_quadruple_gen_var_9,
+    float_unsigned_unsigned_rounding_mode_quadruple_gen_var_10,
+    float_unsigned_unsigned_triple_gen_var_1,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_nz::integer::Integer;
@@ -1874,4 +1878,459 @@ where
 #[test]
 fn primitive_float_pow_integer_properties() {
     apply_fn_to_primitive_floats!(primitive_float_pow_integer_properties_helper);
+}
+
+#[test]
+fn test_pow_u() {
+    let test = |s, s_hex, n: u64, prec: u64, rm, out: &str, out_hex: &str, o_out| {
+        let x = parse_hex_string(s_hex);
+        assert_eq!(x.to_string(), s);
+        let (p, o) = x.pow_u_prec_round(n, prec, rm);
+        assert!(p.is_valid());
+        assert_eq!(p.to_string(), out);
+        assert_eq!(to_hex_string(&p), out_hex);
+        assert_eq!(o, o_out);
+    };
+    // - n == 0 fast path: x^0 = 1
+    test("3.0", "0x3.0#2", 0, 10, Nearest, "1.0", "0x1.000#10", Equal);
+    // - n == 1 fast path: x^1 = x
+    test("3.0", "0x3.0#2", 1, 10, Nearest, "3.0", "0x3.00#10", Equal);
+    // - n == 1 fast path with rounding
+    test("1.2", "0x1.4#3", 1, 2, Nearest, "1.0", "0x1.0#2", Less);
+    // - n == 2 fast path: x^2 = sqr(x)
+    test("3.0", "0x3.0#2", 2, 10, Nearest, "9.0", "0x9.00#10", Equal);
+    test("3.0", "0x3.0#2", 2, 2, Nearest, "8.0", "0x8.0#2", Less);
+    // - n >= 3 square-and-multiply
+    test(
+        "3.0",
+        "0x3.0#2",
+        5,
+        20,
+        Nearest,
+        "243.0",
+        "0xf3.000#20",
+        Equal,
+    );
+    test("3.0", "0x3.0#2", 5, 2, Floor, "2.0e2", "0xc.0E+1#2", Less);
+    test(
+        "3.0",
+        "0x3.0#2",
+        5,
+        2,
+        Ceiling,
+        "3.0e2",
+        "0x1.0E+2#2",
+        Greater,
+    );
+    test(
+        "1.5",
+        "0x1.8#2",
+        3,
+        10,
+        Nearest,
+        "3.375",
+        "0x3.60#10",
+        Equal,
+    );
+    test(
+        "1.5",
+        "0x1.8#4",
+        10,
+        20,
+        Nearest,
+        "57.66504",
+        "0x39.aa40#20",
+        Equal,
+    );
+    // - negative base, odd exponent gives a negative result
+    test(
+        "-2.0",
+        "-0x2.0#1",
+        3,
+        10,
+        Nearest,
+        "-8.0",
+        "-0x8.00#10",
+        Equal,
+    );
+    // - negative base, even exponent gives a positive result
+    test(
+        "-2.0",
+        "-0x2.0#1",
+        4,
+        10,
+        Nearest,
+        "16.0",
+        "0x10.00#10",
+        Equal,
+    );
+    test(
+        "-3.0",
+        "-0x3.0#2",
+        3,
+        10,
+        Nearest,
+        "-27.0",
+        "-0x1b.00#10",
+        Equal,
+    );
+    // - inexact base: rounding accumulates (sqrt(2)^2 is just above 2)
+    test(
+        "1.4142135623730951",
+        "0x1.6a09e667f3bcd#53",
+        2,
+        53,
+        Nearest,
+        "2.0000000000000004",
+        "0x2.0000000000002#53",
+        Greater,
+    );
+    // - overflow
+    test(
+        "2.0",
+        "0x2.0#3",
+        100000000000,
+        5,
+        Nearest,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    // - overflow with Down gives the largest finite value
+    test(
+        "2.0",
+        "0x2.0#3",
+        100000000000,
+        5,
+        Down,
+        "too_big",
+        "0x7.cE+268435455#5",
+        Less,
+    );
+    // - underflow to zero
+    test(
+        "0.5",
+        "0x0.8#3",
+        100000000000,
+        5,
+        Nearest,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    // - underflow with Up gives the smallest positive value
+    test(
+        "0.5",
+        "0x0.8#3",
+        100000000000,
+        5,
+        Up,
+        "too_small",
+        "0x1.0E-268435456#5",
+        Greater,
+    );
+    // - canround: an inexact power that the initial working precision already rounds correctly
+    test(
+        "-269104312292334.303",
+        "-0xf4bfbaf113ee.4d8#57",
+        11,
+        123,
+        Floor,
+        "-5.3595364566060205383890667672492462806e158",
+        "-0x9.c253fc20bc736c88c0172ae629606cE+131#123",
+        Less,
+    );
+    // - ziv: a hard-to-round power that needs the working precision to grow
+    test(
+        "-0.0078124999999999999999999999999999",
+        "-0x0.01ffffffffffffffffffffffffff8#106",
+        72,
+        5,
+        Down,
+        "1.85e-152",
+        "0xf.8E-127#5",
+        Less,
+    );
+}
+
+#[test]
+fn test_pow_u_special_values() {
+    let test = |base: Float, n: u64, out: &str, out_hex: &str| {
+        let (p, o) = base.pow_u_prec_round(n, 1, Nearest);
+        assert!(p.is_valid());
+        assert_eq!(p.to_string(), out);
+        assert_eq!(to_hex_string(&p), out_hex);
+        assert_eq!(o, Equal);
+    };
+    test(Float::NAN, 0, "1.0", "0x1.0#1");
+    test(Float::NAN, 1, "NaN", "NaN");
+    test(Float::NAN, 2, "NaN", "NaN");
+    test(Float::NAN, 3, "NaN", "NaN");
+    test(Float::NAN, 4, "NaN", "NaN");
+
+    test(Float::INFINITY, 0, "1.0", "0x1.0#1");
+    test(Float::INFINITY, 1, "Infinity", "Infinity");
+    test(Float::INFINITY, 2, "Infinity", "Infinity");
+    test(Float::INFINITY, 3, "Infinity", "Infinity");
+    test(Float::INFINITY, 4, "Infinity", "Infinity");
+
+    test(Float::NEGATIVE_INFINITY, 0, "1.0", "0x1.0#1");
+    test(Float::NEGATIVE_INFINITY, 1, "-Infinity", "-Infinity");
+    test(Float::NEGATIVE_INFINITY, 2, "Infinity", "Infinity");
+    test(Float::NEGATIVE_INFINITY, 3, "-Infinity", "-Infinity");
+    test(Float::NEGATIVE_INFINITY, 4, "Infinity", "Infinity");
+
+    test(Float::ZERO, 0, "1.0", "0x1.0#1");
+    test(Float::ZERO, 1, "0.0", "0x0.0");
+    test(Float::ZERO, 2, "0.0", "0x0.0");
+    test(Float::ZERO, 3, "0.0", "0x0.0");
+    test(Float::ZERO, 4, "0.0", "0x0.0");
+
+    test(Float::NEGATIVE_ZERO, 0, "1.0", "0x1.0#1");
+    test(Float::NEGATIVE_ZERO, 1, "-0.0", "-0x0.0");
+    test(Float::NEGATIVE_ZERO, 2, "0.0", "0x0.0");
+    test(Float::NEGATIVE_ZERO, 3, "-0.0", "-0x0.0");
+    test(Float::NEGATIVE_ZERO, 4, "0.0", "0x0.0");
+
+    test(Float::ONE, 0, "1.0", "0x1.0#1");
+    test(Float::ONE, 1, "1.0", "0x1.0#1");
+    test(Float::ONE, 2, "1.0", "0x1.0#1");
+    test(Float::ONE, 3, "1.0", "0x1.0#1");
+    test(Float::ONE, 4, "1.0", "0x1.0#1");
+
+    test(Float::NEGATIVE_ONE, 0, "1.0", "0x1.0#1");
+    test(Float::NEGATIVE_ONE, 1, "-1.0", "-0x1.0#1");
+    test(Float::NEGATIVE_ONE, 2, "1.0", "0x1.0#1");
+    test(Float::NEGATIVE_ONE, 3, "-1.0", "-0x1.0#1");
+    test(Float::NEGATIVE_ONE, 4, "1.0", "0x1.0#1");
+}
+
+#[test]
+fn test_pow_u_extreme() {
+    let max_e = i64::from(Float::MAX_EXPONENT);
+    let min_e = i64::from(Float::MIN_EXPONENT);
+    let test = |base: Float, n: u64, prec: u64, rm, out: &str, out_hex: &str, o_out| {
+        let (p, o) = base.pow_u_prec_round(n, prec, rm);
+        assert!(p.is_valid());
+        assert_eq!(p.to_string(), out);
+        assert_eq!(to_hex_string(&p), out_hex);
+        assert_eq!(o, o_out);
+    };
+    // 2^(MAX_EXPONENT - 1) is the largest finite power of 2; raised to 1 it is itself
+    test(
+        Float::power_of_2(max_e - 1),
+        1,
+        10,
+        Nearest,
+        "too_big",
+        "0x4.00E+268435455#10",
+        Equal,
+    );
+    // squaring it overflows
+    test(
+        Float::power_of_2(max_e - 1),
+        2,
+        10,
+        Nearest,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    // overflow with Down gives the largest finite value
+    test(
+        Float::power_of_2(max_e - 1),
+        2,
+        5,
+        Down,
+        "too_big",
+        "0x7.cE+268435455#5",
+        Less,
+    );
+    test(
+        Float::power_of_2(max_e - 1),
+        3,
+        10,
+        Ceiling,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    // 2^MIN_EXPONENT squared underflows
+    test(
+        Float::power_of_2(min_e),
+        2,
+        10,
+        Nearest,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    // underflow with Up gives the smallest positive value
+    test(
+        Float::power_of_2(min_e),
+        2,
+        5,
+        Up,
+        "too_small",
+        "0x1.0E-268435456#5",
+        Greater,
+    );
+    test(
+        Float::power_of_2(min_e),
+        3,
+        10,
+        Nearest,
+        "0.0",
+        "0x0.0",
+        Less,
+    );
+    // negative base, odd exponent: overflow to -Infinity
+    test(
+        -Float::power_of_2(max_e - 1),
+        3,
+        10,
+        Nearest,
+        "-Infinity",
+        "-Infinity",
+        Less,
+    );
+}
+
+#[allow(clippy::needless_pass_by_value)]
+fn pow_u_prec_round_properties_helper(
+    x: Float,
+    n: u64,
+    prec: u64,
+    rm: RoundingMode,
+    extreme: bool,
+) {
+    if rm == Exact {
+        // Exact is only allowed when the result is exactly representable; otherwise panic.
+        let (p, o) = x.pow_u_prec_round_ref(n, prec, Nearest);
+        if o == Equal {
+            let (pe, oe) = x.pow_u_prec_round_ref(n, prec, Exact);
+            assert_eq!(ComparableFloatRef(&pe), ComparableFloatRef(&p));
+            assert_eq!(oe, Equal);
+        } else {
+            assert_panic!(x.pow_u_prec_round_ref(n, prec, Exact));
+        }
+        return;
+    }
+    let (p, o) = x.clone().pow_u_prec_round(n, prec, rm);
+    assert!(p.is_valid());
+    let (p_alt, o_alt) = x.pow_u_prec_round_ref(n, prec, rm);
+    assert!(p_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+    assert_eq!(o_alt, o);
+
+    let mut x_alt = x.clone();
+    let o_alt = x_alt.pow_u_prec_round_assign(n, prec, rm);
+    assert!(x_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&p));
+    assert_eq!(o_alt, o);
+
+    // pow_u (mpfr_pow_ui) must agree with pow_integer (mpfr_pow_z).
+    let (pi, oi) = x.pow_integer_prec_round_ref_ref(&Integer::from(n), prec, rm);
+    assert_eq!(ComparableFloatRef(&pi), ComparableFloatRef(&p));
+    assert_eq!(oi, o);
+
+    if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm) {
+        let (rug_p, rug_o) = rug_pow_u_prec_round(&rug::Float::exact_from(&x), n, prec, rug_rm);
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_p)),
+            ComparableFloatRef(&p)
+        );
+        assert_eq!(rug_o, o);
+    }
+
+    if p.is_normal() && !extreme {
+        assert_eq!(p.get_prec(), Some(prec));
+    }
+}
+
+#[test]
+fn pow_u_prec_round_properties() {
+    float_unsigned_unsigned_rounding_mode_quadruple_gen_var_9().test_properties(
+        |(x, n, prec, rm)| {
+            pow_u_prec_round_properties_helper(x, n, prec, rm, false);
+        },
+    );
+
+    float_unsigned_unsigned_rounding_mode_quadruple_gen_var_10().test_properties(
+        |(x, n, prec, rm)| {
+            pow_u_prec_round_properties_helper(x, n, prec, rm, true);
+        },
+    );
+}
+
+#[test]
+fn pow_u_prec_properties() {
+    float_unsigned_unsigned_triple_gen_var_1::<u64, u64>().test_properties(|(x, n, prec)| {
+        let (p, o) = x.clone().pow_u_prec(n, prec);
+        assert!(p.is_valid());
+        let (p_alt, o_alt) = x.pow_u_prec_ref(n, prec);
+        assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+        assert_eq!(o_alt, o);
+        let (p_alt, o_alt) = x.pow_u_prec_round_ref(n, prec, Nearest);
+        assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+        assert_eq!(o_alt, o);
+        let (pi, oi) = x.pow_integer_prec_ref_ref(&Integer::from(n), prec);
+        assert_eq!(ComparableFloatRef(&pi), ComparableFloatRef(&p));
+        assert_eq!(oi, o);
+        let (rug_p, rug_o) = rug_pow_u_prec(&rug::Float::exact_from(&x), n, prec);
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_p)),
+            ComparableFloatRef(&p)
+        );
+        assert_eq!(rug_o, o);
+    });
+}
+
+#[test]
+fn pow_u_round_properties() {
+    float_unsigned_pair_gen::<u64>().test_properties(|(x, n)| {
+        for rm in [Floor, Ceiling, Down, Up, Nearest] {
+            let (p, o) = x.clone().pow_u_round(n, rm);
+            assert!(p.is_valid());
+            let (p_alt, o_alt) = x.pow_u_round_ref(n, rm);
+            assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+            assert_eq!(o_alt, o);
+            let mut x_alt = x.clone();
+            let o_alt = x_alt.pow_u_round_assign(n, rm);
+            assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&p));
+            assert_eq!(o_alt, o);
+            if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm) {
+                let (rug_p, rug_o) = rug_pow_u_round(&rug::Float::exact_from(&x), n, rug_rm);
+                assert_eq!(
+                    ComparableFloatRef(&Float::from(&rug_p)),
+                    ComparableFloatRef(&p)
+                );
+                assert_eq!(rug_o, o);
+            }
+        }
+    });
+}
+
+#[test]
+fn pow_u_properties() {
+    float_unsigned_pair_gen::<u64>().test_properties(|(x, n)| {
+        let p = x.clone().pow(n);
+        assert!(p.is_valid());
+        let p_alt = (&x).pow(n);
+        assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+
+        let mut x_alt = x.clone();
+        x_alt.pow_assign(n);
+        assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&p));
+
+        // The trait rounds to the nearest value at the base's precision.
+        let (p_alt, _) = x.pow_u_round_ref(n, Nearest);
+        assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+
+        let rug_p = rug_pow_u(&rug::Float::exact_from(&x), n);
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_p)),
+            ComparableFloatRef(&p)
+        );
+    });
 }

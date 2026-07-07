@@ -78,3 +78,28 @@ pub fn rug_pow_integer_prec(x: &rug::Float, y: &rug::Integer, prec: u64) -> (rug
 pub fn rug_pow_integer(x: &rug::Float, y: &rug::Integer) -> rug::Float {
     rug_pow_integer_prec_round(x, y, rug_float_significant_bits(x), Round::Nearest).0
 }
+
+// rug has no direct binding to `mpfr_pow_ui`, so these oracles for `x^n` (a `u64` n) use
+// `mpfr_pow_z` via a `rug::Integer`; it is correctly rounded and so gives the same result.
+pub fn rug_pow_u_prec_round(
+    x: &rug::Float,
+    n: u64,
+    prec: u64,
+    rm: Round,
+) -> (rug::Float, Ordering) {
+    rug_pow_integer_prec_round(x, &rug::Integer::from(n), prec, rm)
+}
+
+#[inline]
+pub fn rug_pow_u_round(x: &rug::Float, n: u64, rm: Round) -> (rug::Float, Ordering) {
+    rug_pow_u_prec_round(x, n, rug_float_significant_bits(x), rm)
+}
+
+#[inline]
+pub fn rug_pow_u_prec(x: &rug::Float, n: u64, prec: u64) -> (rug::Float, Ordering) {
+    rug_pow_u_prec_round(x, n, prec, Round::Nearest)
+}
+
+pub fn rug_pow_u(x: &rug::Float, n: u64) -> rug::Float {
+    rug_pow_u_prec_round(x, n, rug_float_significant_bits(x), Round::Nearest).0
+}
