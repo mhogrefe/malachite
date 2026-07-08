@@ -48,7 +48,7 @@ use crate::test_util::generators::exhaustive::{
     signed_rounding_from_float_valid, sqrt_prec_round_valid, sqrt_rational_prec_round_valid,
     sqrt_round_valid, square_prec_round_valid, square_round_valid, sub_prec_round_valid,
     sub_rational_prec_round_valid, sub_rational_round_valid, sub_round_valid,
-    unsigned_rounding_from_float_valid,
+    unsigned_pow_unsigned_prec_round_valid, unsigned_rounding_from_float_valid,
 };
 use malachite_base::bools::random::{
     RandomBools, WeightedRandomBools, random_bools, weighted_random_bools,
@@ -5049,6 +5049,41 @@ pub fn random_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_9(
             &random_rounding_modes,
         )
         .filter(|&(ref x, n, prec, rm)| pow_u_prec_round_valid(x, n, prec, rm)),
+    )
+}
+
+// -- (PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned, RoundingMode) --
+
+pub fn random_unsigned_unsigned_unsigned_rounding_mode_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(u64, u64, u64, RoundingMode)> {
+    Box::new(
+        random_quadruples(
+            EXAMPLE_SEED,
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 32),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 32),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(x, y, prec, rm)| unsigned_pow_unsigned_prec_round_valid(x, y, prec, rm)),
     )
 }
 

@@ -56,6 +56,7 @@ use malachite_float::test_util::generators::{
     float_signed_unsigned_triple_gen_var_1, float_unsigned_pair_gen,
     float_unsigned_unsigned_rounding_mode_quadruple_gen_var_9,
     float_unsigned_unsigned_triple_gen_var_1,
+    unsigned_unsigned_unsigned_rounding_mode_quadruple_gen_var_1,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef};
 use malachite_nz::test_util::bench::bucketers::pair_1_integer_bit_bucketer;
@@ -71,6 +72,12 @@ pub(crate) fn register(runner: &mut Runner) {
     register_primitive_float_demos!(runner, demo_primitive_float_pow_integer);
     register_primitive_float_demos!(runner, demo_primitive_float_pow_u);
     register_demo!(runner, demo_float_pow);
+    register_demo!(runner, demo_float_unsigned_pow_unsigned_prec_round);
+    register_demo!(runner, demo_float_unsigned_pow_unsigned_prec_round_debug);
+    register_demo!(runner, demo_float_unsigned_pow_unsigned_prec);
+    register_demo!(runner, demo_float_unsigned_pow_unsigned_prec_debug);
+    register_bench!(runner, benchmark_float_unsigned_pow_unsigned_prec_round);
+    register_bench!(runner, benchmark_float_unsigned_pow_unsigned_prec);
     register_demo!(runner, demo_float_pow_s_prec_round);
     register_demo!(runner, demo_float_pow_s_prec_round_debug);
     register_demo!(runner, demo_float_pow_s_prec);
@@ -2185,5 +2192,115 @@ fn benchmark_float_pow_s_evaluation_strategy(
             ("Float.pow(i64)", &mut |(x, n)| no_out!(x.pow(n))),
             ("(&Float).pow(i64)", &mut |(x, n)| no_out!((&x).pow(n))),
         ],
+    );
+}
+
+fn demo_float_unsigned_pow_unsigned_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec, rm) in unsigned_unsigned_unsigned_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "Float::unsigned_pow_unsigned_prec_round({}, {}, {}, {}) = {:?}",
+            x,
+            y,
+            prec,
+            rm,
+            Float::unsigned_pow_unsigned_prec_round(x, y, prec, rm)
+        );
+    }
+}
+
+fn demo_float_unsigned_pow_unsigned_prec_round_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, prec, rm) in unsigned_unsigned_unsigned_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (power, o) = Float::unsigned_pow_unsigned_prec_round(x, y, prec, rm);
+        println!(
+            "Float::unsigned_pow_unsigned_prec_round({}, {}, {}, {}) = ({:#x}, {:?})",
+            x,
+            y,
+            prec,
+            rm,
+            ComparableFloat(power),
+            o
+        );
+    }
+}
+
+fn demo_float_unsigned_pow_unsigned_prec(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec, _) in unsigned_unsigned_unsigned_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "Float::unsigned_pow_unsigned_prec({}, {}, {}) = {:?}",
+            x,
+            y,
+            prec,
+            Float::unsigned_pow_unsigned_prec(x, y, prec)
+        );
+    }
+}
+
+fn demo_float_unsigned_pow_unsigned_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec, _) in unsigned_unsigned_unsigned_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (power, o) = Float::unsigned_pow_unsigned_prec(x, y, prec);
+        println!(
+            "Float::unsigned_pow_unsigned_prec({}, {}, {}) = ({:#x}, {:?})",
+            x,
+            y,
+            prec,
+            ComparableFloat(power),
+            o
+        );
+    }
+}
+
+fn benchmark_float_unsigned_pow_unsigned_prec_round(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float::unsigned_pow_unsigned_prec_round(u64, u64, u64, RoundingMode)",
+        BenchmarkType::Single,
+        unsigned_unsigned_unsigned_rounding_mode_quadruple_gen_var_1().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &quadruple_3_bucketer("prec"),
+        &mut [("Malachite", &mut |(x, y, prec, rm)| {
+            no_out!(Float::unsigned_pow_unsigned_prec_round(x, y, prec, rm));
+        })],
+    );
+}
+
+fn benchmark_float_unsigned_pow_unsigned_prec(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float::unsigned_pow_unsigned_prec(u64, u64, u64)",
+        BenchmarkType::Single,
+        unsigned_unsigned_unsigned_rounding_mode_quadruple_gen_var_1().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &quadruple_3_bucketer("prec"),
+        &mut [("Malachite", &mut |(x, y, prec, _)| {
+            no_out!(Float::unsigned_pow_unsigned_prec(x, y, prec));
+        })],
     );
 }

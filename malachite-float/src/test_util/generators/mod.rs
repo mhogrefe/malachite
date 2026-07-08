@@ -2795,6 +2795,19 @@ pub fn float_unsigned_rounding_mode_triple_gen_var_25_rm() -> Generator<(
     )
 }
 
+// -- (PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned, RoundingMode) --
+
+// All `(u64, u64, u64, RoundingMode)` that are valid inputs to
+// `Float::unsigned_pow_unsigned_prec_round`.
+pub fn unsigned_unsigned_unsigned_rounding_mode_quadruple_gen_var_1()
+-> Generator<(u64, u64, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_unsigned_unsigned_unsigned_rounding_mode_quadruple_gen_var_1,
+        &random_unsigned_unsigned_unsigned_rounding_mode_quadruple_gen_var_1,
+        &special_random_unsigned_unsigned_unsigned_rounding_mode_quadruple_gen_var_1,
+    )
+}
+
 // -- (Float, Rational) --
 
 pub fn float_rational_pair_gen() -> Generator<(Float, Rational)> {

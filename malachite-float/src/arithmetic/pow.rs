@@ -574,6 +574,53 @@ fn pow_s_ref(x: &Float, n: i64, prec: u64, rm: RoundingMode) -> (Float, Ordering
     }
 }
 
+// This is `mpfr_ui_pow_ui` from `ui_pow_ui.c`, MPFR 4.3.0: k^n for `u64` k and n, as a Float, by
+// binary exponentiation (all roundings up, so the result is a magnitude over-estimate), falling
+// back to `pow_integer` (`mpfr_pow_z`) on overflow. Since k, n >= 0 the result never underflows.
+fn unsigned_pow_unsigned(k: u64, n: u64, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    if n <= 1 {
+        // k^1 = k; k^0 = 1 for any k
+        return Float::from_unsigned_prec_round(if n == 1 { k } else { 1 }, prec, rm);
+    }
+    if k <= 1 {
+        // 1^n = 1 and 0^n = 0 for n >= 1; either way the value is k
+        return Float::from_unsigned_prec_round(k, prec, rm);
+    }
+    // k >= 2, n >= 2. `size_n` is the bit length of n, so 2^(size_n - 1) <= n < 2^size_n.
+    let size_n = n.significant_bits();
+    // k as an exact Float, for the multiplications.
+    let kf = Float::from_unsigned_prec(k, k.significant_bits()).0;
+    let mut wprec = prec + 3 + size_n;
+    loop {
+        // res starts as k (rounded up), contributing the most significant bit of n.
+        let (mut res, o) = Float::from_unsigned_prec_round(k, wprec, Ceiling);
+        let mut inexact = o != Equal;
+        // err counts the roundings: 1 for the initial value, plus one per squaring.
+        let mut err = 1;
+        let mut i = size_n - 2;
+        loop {
+            inexact |= res.square_prec_round_assign(wprec, Ceiling) != Equal;
+            err += 1;
+            if n.get_bit(i) {
+                inexact |= res.mul_prec_round_assign_ref(&kf, wprec, Ceiling) != Equal;
+            }
+            if i == 0 {
+                break;
+            }
+            i -= 1;
+        }
+        if res.is_infinite() {
+            // Overflow: the approximation error has not been accounted for, so hand off to
+            // `pow_integer`, which handles the exponent range precisely.
+            return kf.pow_integer_prec_round_ref_ref(&Integer::from(n), prec, rm);
+        }
+        if !inexact || float_can_round(res.significand_ref().unwrap(), wprec - err, prec, rm) {
+            return Float::from_float_prec_round(res, prec, rm);
+        }
+        wprec += wprec >> 1;
+    }
+}
+
 // This is `mpfr_pow_is_exact` from `pow.c`, MPFR 4.3.0: assuming x > 0, x not a power of 2, y
 // finite non-integer, decides whether x^y is exact, and if so computes it.
 fn pow_is_exact(x: &Float, y: &Float, prec: u64, rm: RoundingMode) -> Option<(Float, Ordering)> {
@@ -4895,6 +4942,26 @@ impl PowAssign<i64> for Float {
     fn pow_assign(&mut self, n: i64) {
         let prec = self.significant_bits();
         self.pow_s_prec_assign(n, prec);
+    }
+}
+
+impl Float {
+    /// Raises a [`u64`] to the power of a [`u64`], returning a [`Float`] rounded to the specified
+    /// precision and with the specified rounding mode.
+    pub fn unsigned_pow_unsigned_prec_round(
+        x: u64,
+        y: u64,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        unsigned_pow_unsigned(x, y, prec, rm)
+    }
+
+    /// Raises a [`u64`] to the power of a [`u64`], returning a [`Float`] rounded to the specified
+    /// precision and to the nearest value.
+    #[inline]
+    pub fn unsigned_pow_unsigned_prec(x: u64, y: u64, prec: u64) -> (Self, Ordering) {
+        unsigned_pow_unsigned(x, y, prec, Nearest)
     }
 }
 

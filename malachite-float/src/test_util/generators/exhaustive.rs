@@ -2845,6 +2845,32 @@ pub fn exhaustive_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_10()
     ))
 }
 
+// -- (PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned, RoundingMode) --
+
+// Whether `(x, y, prec, rm)` is a valid input to `Float::unsigned_pow_unsigned_prec_round`: `Exact`
+// is only allowed when x^y is exactly representable at the given precision.
+pub fn unsigned_pow_unsigned_prec_round_valid(x: u64, y: u64, prec: u64, rm: RoundingMode) -> bool {
+    rm != Exact || Float::unsigned_pow_unsigned_prec_round(x, y, prec, Floor).1 == Equal
+}
+
+pub fn exhaustive_unsigned_unsigned_unsigned_rounding_mode_quadruple_gen_var_1()
+-> It<(u64, u64, u64, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(
+        lex_pairs(
+            exhaustive_triples_custom_output(
+                exhaustive_unsigneds(),
+                exhaustive_unsigneds(),
+                exhaustive_positive_primitive_ints(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((x, y, prec), rm)| unsigned_pow_unsigned_prec_round_valid(x, y, prec, rm)),
+    ))
+}
+
 // -- (Float, Rational) --
 
 pub fn exhaustive_float_rational_pair_gen() -> It<(Float, Rational)> {

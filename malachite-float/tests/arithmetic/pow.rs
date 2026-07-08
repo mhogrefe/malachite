@@ -47,6 +47,7 @@ use malachite_float::test_util::generators::{
     float_unsigned_unsigned_rounding_mode_quadruple_gen_var_9,
     float_unsigned_unsigned_rounding_mode_quadruple_gen_var_10,
     float_unsigned_unsigned_triple_gen_var_1,
+    unsigned_unsigned_unsigned_rounding_mode_quadruple_gen_var_1,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_nz::integer::Integer;
@@ -2861,4 +2862,135 @@ fn pow_s_properties() {
             ComparableFloatRef(&p)
         );
     });
+}
+
+#[test]
+fn test_unsigned_pow_unsigned() {
+    let test = |x: u64, y: u64, prec: u64, rm, out: &str, out_hex: &str, o_out| {
+        let (p, o) = Float::unsigned_pow_unsigned_prec_round(x, y, prec, rm);
+        assert!(p.is_valid());
+        assert_eq!(p.to_string(), out);
+        assert_eq!(to_hex_string(&p), out_hex);
+        assert_eq!(o, o_out);
+    };
+    // - n == 0: k^0 = 1 for any k
+    test(0, 0, 10, Nearest, "1.0", "0x1.000#10", Equal);
+    test(5, 0, 10, Nearest, "1.0", "0x1.000#10", Equal);
+    // - n == 1: k^1 = k
+    test(5, 1, 10, Nearest, "5.0", "0x5.00#10", Equal);
+    // - n == 1 with rounding
+    test(5, 1, 2, Nearest, "4.0", "0x4.0#2", Less);
+    // - k == 0: 0^n = 0 for n >= 1
+    test(0, 3, 10, Nearest, "0.0", "0x0.0", Equal);
+    // - k == 1: 1^n = 1
+    test(1, 100, 10, Nearest, "1.0", "0x1.000#10", Equal);
+    // - square-and-multiply, exact
+    test(2, 10, 20, Nearest, "1024.0", "0x400.000#20", Equal);
+    test(3, 5, 20, Nearest, "243.0", "0xf3.000#20", Equal);
+    test(10, 3, 20, Nearest, "1000.0", "0x3e8.000#20", Equal);
+    // - inexact, rounded both ways
+    test(3, 5, 2, Floor, "2.0e2", "0xc.0E+1#2", Less);
+    test(3, 5, 2, Ceiling, "3.0e2", "0x1.0E+2#2", Greater);
+    test(
+        7,
+        20,
+        30,
+        Nearest,
+        "7.97922663e16",
+        "0x1.1b7aa4b8E+14#30",
+        Less,
+    );
+    // - a large exact power
+    test(
+        12,
+        24,
+        200,
+        Nearest,
+        "79496847203390844133441536.0",
+        "0x41c21cb8e1000000000000.00000000000000000000000000000#200",
+        Equal,
+    );
+    // - overflow falls back to pow_integer
+    test(3, 1000000000, 5, Nearest, "Infinity", "Infinity", Greater);
+    // - overflow with Down gives the largest finite value
+    test(
+        3,
+        1000000000,
+        5,
+        Down,
+        "too_big",
+        "0x7.cE+268435455#5",
+        Less,
+    );
+    test(2, 10000000000, 10, Nearest, "Infinity", "Infinity", Greater);
+    // - canround: an inexact power the initial working precision already rounds correctly
+    test(3, 6, 1, Down, "5.0e2", "0x2.0E+2#1", Less);
+}
+
+// The exact Float representation of a u64, for use as an oracle base.
+fn u64_as_float(k: u64) -> Float {
+    Float::from_unsigned_prec(k, k.significant_bits().max(1)).0
+}
+
+#[test]
+fn unsigned_pow_unsigned_prec_round_properties() {
+    unsigned_unsigned_unsigned_rounding_mode_quadruple_gen_var_1().test_properties(
+        |(x, y, prec, rm)| {
+            if rm == Exact {
+                let (p, o) = Float::unsigned_pow_unsigned_prec_round(x, y, prec, Nearest);
+                if o == Equal {
+                    let (pe, oe) = Float::unsigned_pow_unsigned_prec_round(x, y, prec, Exact);
+                    assert_eq!(ComparableFloatRef(&pe), ComparableFloatRef(&p));
+                    assert_eq!(oe, Equal);
+                } else {
+                    assert_panic!(Float::unsigned_pow_unsigned_prec_round(x, y, prec, Exact));
+                }
+                return;
+            }
+            let (p, o) = Float::unsigned_pow_unsigned_prec_round(x, y, prec, rm);
+            assert!(p.is_valid());
+
+            // unsigned_pow_unsigned (mpfr_ui_pow_ui) must agree with pow_integer (mpfr_pow_z) on
+            // the exact Float representation of the base.
+            let kf = u64_as_float(x);
+            let (pi, oi) = kf.pow_integer_prec_round_ref_ref(&Integer::from(y), prec, rm);
+            assert_eq!(ComparableFloatRef(&pi), ComparableFloatRef(&p));
+            assert_eq!(oi, o);
+
+            if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm) {
+                let (rug_p, rug_o) = rug_pow_integer_prec_round(
+                    &rug::Float::exact_from(&kf),
+                    &rug::Integer::from(y),
+                    prec,
+                    rug_rm,
+                );
+                assert_eq!(
+                    ComparableFloatRef(&Float::from(&rug_p)),
+                    ComparableFloatRef(&p)
+                );
+                assert_eq!(rug_o, o);
+            }
+
+            if p.is_normal() {
+                assert_eq!(p.get_prec(), Some(prec));
+            }
+        },
+    );
+}
+
+#[test]
+fn unsigned_pow_unsigned_prec_properties() {
+    unsigned_unsigned_unsigned_rounding_mode_quadruple_gen_var_1().test_properties(
+        |(x, y, prec, _)| {
+            let (p, o) = Float::unsigned_pow_unsigned_prec(x, y, prec);
+            assert!(p.is_valid());
+            let (p_alt, o_alt) = Float::unsigned_pow_unsigned_prec_round(x, y, prec, Nearest);
+            assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+            assert_eq!(o_alt, o);
+            let kf = u64_as_float(x);
+            let (pi, oi) = kf.pow_integer_prec_ref_ref(&Integer::from(y), prec);
+            assert_eq!(ComparableFloatRef(&pi), ComparableFloatRef(&p));
+            assert_eq!(oi, o);
+        },
+    );
 }
