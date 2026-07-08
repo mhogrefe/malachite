@@ -38,7 +38,7 @@ use malachite_base::num::basic::traits::{
 use malachite_base::num::comparison::traits::OrdAbs;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{ExactFrom, IsInteger, RoundingFrom};
-use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
+use malachite_base::num::logic::traits::{BitAccess, BitIterable, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
@@ -578,12 +578,11 @@ fn pow_s_ref(x: &Float, n: i64, prec: u64, rm: RoundingMode) -> (Float, Ordering
 // binary exponentiation (all roundings up, so the result is a magnitude over-estimate), falling
 // back to `pow_integer` (`mpfr_pow_z`) on overflow. Since k, n >= 0 the result never underflows.
 fn unsigned_pow_unsigned(k: u64, n: u64, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
-    if n <= 1 {
-        // k^1 = k; k^0 = 1 for any k
-        return Float::from_unsigned_prec_round(if n == 1 { k } else { 1 }, prec, rm);
-    }
-    if k <= 1 {
-        // 1^n = 1 and 0^n = 0 for n >= 1; either way the value is k
+    if n == 0 {
+        // k^0 = 1 for any k
+        return (Float::one_prec(prec), Equal);
+    } else if n == 1 || k <= 1 {
+        // k^1 = k; 1^n = 1 and 0^n = 0 for n >= 1; either way the value is k
         return Float::from_unsigned_prec_round(k, prec, rm);
     }
     // k >= 2, n >= 2. `size_n` is the bit length of n, so 2^(size_n - 1) <= n < 2^size_n.
@@ -596,25 +595,18 @@ fn unsigned_pow_unsigned(k: u64, n: u64, prec: u64, rm: RoundingMode) -> (Float,
         let (mut res, o) = Float::from_unsigned_prec_round(k, wprec, Ceiling);
         let mut inexact = o != Equal;
         // err counts the roundings: 1 for the initial value, plus one per squaring.
-        let mut err = 1;
-        let mut i = size_n - 2;
-        loop {
+        for bit in n.bits().rev().skip(1) {
             inexact |= res.square_prec_round_assign(wprec, Ceiling) != Equal;
-            err += 1;
-            if n.get_bit(i) {
+            if bit {
                 inexact |= res.mul_prec_round_assign_ref(&kf, wprec, Ceiling) != Equal;
             }
-            if i == 0 {
-                break;
-            }
-            i -= 1;
         }
         if res.is_infinite() {
             // Overflow: the approximation error has not been accounted for, so hand off to
             // `pow_integer`, which handles the exponent range precisely.
-            return kf.pow_integer_prec_round_ref_ref(&Integer::from(n), prec, rm);
+            return kf.pow_integer_prec_round(Integer::from(n), prec, rm);
         }
-        if !inexact || float_can_round(res.significand_ref().unwrap(), wprec - err, prec, rm) {
+        if !inexact || float_can_round(res.significand_ref().unwrap(), wprec - size_n, prec, rm) {
             return Float::from_float_prec_round(res, prec, rm);
         }
         wprec += wprec >> 1;
@@ -4947,7 +4939,58 @@ impl PowAssign<i64> for Float {
 
 impl Float {
     /// Raises a [`u64`] to the power of a [`u64`], returning a [`Float`] rounded to the specified
-    /// precision and with the specified rounding mode.
+    /// precision and with the specified rounding mode. An [`Ordering`] is also returned, indicating
+    /// whether the rounded power is less than, equal to, or greater than the exact power.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,y,p,m) = x^y+\varepsilon.
+    /// $$
+    /// - If $x^y$ is zero, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^y$ is nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2
+    ///   x^y\rfloor-p+1}$.
+    /// - If $x^y$ is nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   x^y\rfloor-p}$.
+    ///
+    /// The result is always nonnegative, so it never underflows.
+    ///
+    /// Special cases:
+    /// - $f(x,0,p,m)=1.0$ for any $x$
+    /// - $f(0,y,p,m)=0.0$ if $y>0$
+    /// - $f(1,y,p,m)=1.0$
+    ///
+    /// Overflow:
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (p, o) = Float::unsigned_pow_unsigned_prec_round(3, 5, 20, Floor);
+    /// assert_eq!(p.to_string(), "243.0");
+    /// assert_eq!(o, Equal);
+    ///
+    /// let (p, o) = Float::unsigned_pow_unsigned_prec_round(3, 5, 2, Ceiling);
+    /// assert_eq!(p.to_string(), "3.0e2");
+    /// assert_eq!(o, Greater);
+    /// ```
     pub fn unsigned_pow_unsigned_prec_round(
         x: u64,
         y: u64,
@@ -4958,7 +5001,45 @@ impl Float {
     }
 
     /// Raises a [`u64`] to the power of a [`u64`], returning a [`Float`] rounded to the specified
-    /// precision and to the nearest value.
+    /// precision and to the nearest value. An [`Ordering`] is also returned, indicating whether the
+    /// rounded power is less than, equal to, or greater than the exact power.
+    ///
+    /// If the power is equidistant from two [`Float`]s with the specified precision, the [`Float`]
+    /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
+    /// the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,y,p) = x^y+\varepsilon.
+    /// $$
+    /// - If $x^y$ is zero, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^y$ is nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 x^y\rfloor-p}$.
+    ///
+    /// See the [`Float::unsigned_pow_unsigned_prec_round`] documentation for information on special
+    /// cases and overflow.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::unsigned_pow_unsigned_prec_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (p, o) = Float::unsigned_pow_unsigned_prec(3, 5, 20);
+    /// assert_eq!(p.to_string(), "243.0");
+    /// assert_eq!(o, Equal);
+    ///
+    /// let (p, o) = Float::unsigned_pow_unsigned_prec(3, 5, 2);
+    /// assert_eq!(p.to_string(), "3.0e2");
+    /// assert_eq!(o, Greater);
+    /// ```
     #[inline]
     pub fn unsigned_pow_unsigned_prec(x: u64, y: u64, prec: u64) -> (Self, Ordering) {
         unsigned_pow_unsigned(x, y, prec, Nearest)
