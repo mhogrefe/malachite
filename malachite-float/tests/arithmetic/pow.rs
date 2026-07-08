@@ -17,9 +17,12 @@ use malachite_base::num::conversion::traits::{ExactFrom, IsInteger, RoundingFrom
 use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
-use malachite_base::test_util::generators::primitive_float_pair_gen;
+use malachite_base::test_util::generators::{
+    primitive_float_pair_gen, primitive_float_unsigned_pair_gen_var_1,
+};
 use malachite_float::arithmetic::pow::{
-    primitive_float_pow, primitive_float_pow_integer, primitive_float_rational_pow,
+    primitive_float_pow, primitive_float_pow_integer, primitive_float_pow_u,
+    primitive_float_rational_pow,
 };
 use malachite_float::test_util::arithmetic::pow::{
     rug_pow, rug_pow_integer, rug_pow_integer_prec, rug_pow_integer_prec_round,
@@ -2333,4 +2336,84 @@ fn pow_u_properties() {
             ComparableFloatRef(&p)
         );
     });
+}
+
+#[test]
+#[allow(clippy::type_repetition_in_bounds)]
+fn test_primitive_float_pow_u() {
+    fn test<T: PrimitiveFloat>(x: T, n: u64, out: T)
+    where
+        Float: From<T> + PartialOrd<T>,
+        for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    {
+        assert_eq!(NiceFloat(primitive_float_pow_u(x, n)), NiceFloat(out));
+    }
+    test::<f32>(f32::NAN, 0, 1.0);
+    test::<f32>(f32::NAN, 1, f32::NAN);
+    test::<f32>(f32::NAN, 2, f32::NAN);
+    test::<f32>(f32::NAN, 3, f32::NAN);
+    test::<f32>(f32::NAN, 4, f32::NAN);
+
+    test::<f32>(f32::INFINITY, 0, 1.0);
+    test::<f32>(f32::INFINITY, 1, f32::INFINITY);
+    test::<f32>(f32::INFINITY, 2, f32::INFINITY);
+    test::<f32>(f32::INFINITY, 3, f32::INFINITY);
+    test::<f32>(f32::INFINITY, 4, f32::INFINITY);
+
+    test::<f32>(f32::NEGATIVE_INFINITY, 0, 1.0);
+    test::<f32>(f32::NEGATIVE_INFINITY, 1, f32::NEGATIVE_INFINITY);
+    test::<f32>(f32::NEGATIVE_INFINITY, 2, f32::INFINITY);
+    test::<f32>(f32::NEGATIVE_INFINITY, 3, f32::NEGATIVE_INFINITY);
+    test::<f32>(f32::NEGATIVE_INFINITY, 4, f32::INFINITY);
+
+    test::<f32>(0.0, 0, 1.0);
+    test::<f32>(0.0, 1, 0.0);
+    test::<f32>(0.0, 2, 0.0);
+    test::<f32>(0.0, 3, 0.0);
+    test::<f32>(0.0, 4, 0.0);
+
+    test::<f32>(-0.0, 0, 1.0);
+    test::<f32>(-0.0, 1, -0.0);
+    test::<f32>(-0.0, 2, 0.0);
+    test::<f32>(-0.0, 3, -0.0);
+    test::<f32>(-0.0, 4, 0.0);
+
+    test::<f32>(1.0, 0, 1.0);
+    test::<f32>(1.0, 1, 1.0);
+    test::<f32>(1.0, 2, 1.0);
+    test::<f32>(1.0, 3, 1.0);
+    test::<f32>(1.0, 4, 1.0);
+
+    test::<f32>(-1.0, 0, 1.0);
+    test::<f32>(-1.0, 1, -1.0);
+    test::<f32>(-1.0, 2, 1.0);
+    test::<f32>(-1.0, 3, -1.0);
+    test::<f32>(-1.0, 4, 1.0);
+
+    test::<f32>(3.0, 5, 243.0);
+    test::<f32>(2.0, 10, 1024.0);
+    test::<f32>(-2.0, 3, -8.0);
+    test::<f32>(1.1, 2, 1.21);
+    test::<f32>(2.0, 200, f32::INFINITY);
+    test::<f32>(0.5, 200, 0.0);
+
+    test::<f64>(3.0, 5, 243.0);
+    test::<f64>(-2.0, 3, -8.0);
+    test::<f64>(1.1, 2, 1.2100000000000002);
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn primitive_float_pow_u_properties_helper<T: PrimitiveFloat>()
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    primitive_float_unsigned_pair_gen_var_1::<T, u64>().test_properties(|(x, n)| {
+        primitive_float_pow_u::<T>(x, n);
+    });
+}
+
+#[test]
+fn primitive_float_pow_u_properties() {
+    apply_fn_to_primitive_floats!(primitive_float_pow_u_properties_helper);
 }
