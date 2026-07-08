@@ -555,6 +555,25 @@ fn pow_u_ref(x: &Float, n: u64, prec: u64, rm: RoundingMode) -> (Float, Ordering
     }
 }
 
+// This is `mpfr_pow_si` (`POW_S`) from `pow_si.c`, MPFR 4.3.0: x^n for an `i64` n. For n >= 0 it is
+// `pow_u` (`mpfr_pow_ui`); for n < 0, x^n = (1/x)^|n| is computed by `pow_integer` (`mpfr_pow_z`),
+// whose negative-exponent path is exactly what `mpfr_pow_si` inlines.
+fn pow_s(x: Float, n: i64, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    if n >= 0 {
+        pow_u(x, n.unsigned_abs(), prec, rm)
+    } else {
+        x.pow_integer_prec_round(Integer::from(n), prec, rm)
+    }
+}
+
+fn pow_s_ref(x: &Float, n: i64, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    if n >= 0 {
+        pow_u_ref(x, n.unsigned_abs(), prec, rm)
+    } else {
+        x.pow_integer_prec_round_ref_val(Integer::from(n), prec, rm)
+    }
+}
+
 // This is `mpfr_pow_is_exact` from `pow.c`, MPFR 4.3.0: assuming x > 0, x not a power of 2, y
 // finite non-integer, decides whether x^y is exact, and if so computes it.
 fn pow_is_exact(x: &Float, y: &Float, prec: u64, rm: RoundingMode) -> Option<(Float, Ordering)> {
@@ -4299,7 +4318,7 @@ impl Float {
 impl Pow<u64> for Float {
     type Output = Self;
 
-    /// Raises a [`Float`] to the power of a [`u64`], rounding the result to the nearest value at
+    /// Raises a [`Float`] to the power of a [`i64`], rounding the result to the nearest value at
     /// the precision of the base. The [`Float`] is taken by value.
     ///
     /// If the power is equidistant from two [`Float`]s with that precision, the [`Float`] with
@@ -4313,12 +4332,12 @@ impl Pow<u64> for Float {
     /// - If $x^n$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
     ///   |x^n|\rfloor-p}$, where $p$ is the precision of the base.
     ///
-    /// See the [`Float::pow_u_prec_round`] documentation for information on special cases,
+    /// See the [`Float::pow_s_prec_round`] documentation for information on special cases,
     /// overflow, and underflow.
     ///
-    /// If you want to specify an output precision, consider using [`Float::pow_u_prec`] instead. If
+    /// If you want to specify an output precision, consider using [`Float::pow_s_prec`] instead. If
     /// you want to specify the output precision and the rounding mode, consider using
-    /// [`Float::pow_u_prec_round`] instead.
+    /// [`Float::pow_s_prec_round`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
@@ -4332,7 +4351,8 @@ impl Pow<u64> for Float {
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_float::Float;
     ///
-    /// assert_eq!(Float::from(2).pow(10u64).to_string(), "1.0e3");
+    /// assert_eq!(Float::from(2).pow(10i64).to_string(), "1.0e3");
+    /// assert_eq!(Float::from(0.5).pow(-1i64).to_string(), "2.0");
     /// ```
     #[inline]
     fn pow(self, n: u64) -> Self {
@@ -4344,7 +4364,7 @@ impl Pow<u64> for Float {
 impl Pow<u64> for &Float {
     type Output = Float;
 
-    /// Raises a [`Float`] to the power of a [`u64`], rounding the result to the nearest value at
+    /// Raises a [`Float`] to the power of a [`i64`], rounding the result to the nearest value at
     /// the precision of the base. The [`Float`] is taken by reference.
     ///
     /// If the power is equidistant from two [`Float`]s with that precision, the [`Float`] with
@@ -4358,12 +4378,12 @@ impl Pow<u64> for &Float {
     /// - If $x^n$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
     ///   |x^n|\rfloor-p}$, where $p$ is the precision of the base.
     ///
-    /// See the [`Float::pow_u_prec_round`] documentation for information on special cases,
+    /// See the [`Float::pow_s_prec_round`] documentation for information on special cases,
     /// overflow, and underflow.
     ///
-    /// If you want to specify an output precision, consider using [`Float::pow_u_prec`] instead. If
+    /// If you want to specify an output precision, consider using [`Float::pow_s_prec`] instead. If
     /// you want to specify the output precision and the rounding mode, consider using
-    /// [`Float::pow_u_prec_round`] instead.
+    /// [`Float::pow_s_prec_round`] instead.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
@@ -4377,7 +4397,8 @@ impl Pow<u64> for &Float {
     /// use malachite_base::num::arithmetic::traits::Pow;
     /// use malachite_float::Float;
     ///
-    /// assert_eq!((&Float::from(2)).pow(10u64).to_string(), "1.0e3");
+    /// assert_eq!((&Float::from(2)).pow(10i64).to_string(), "1.0e3");
+    /// assert_eq!(Float::from(0.5).pow(-1i64).to_string(), "2.0");
     /// ```
     #[inline]
     fn pow(self, n: u64) -> Float {
@@ -4386,10 +4407,10 @@ impl Pow<u64> for &Float {
 }
 
 impl PowAssign<u64> for Float {
-    /// Raises a [`Float`] to the power of a [`u64`] in place, rounding the result to the nearest
+    /// Raises a [`Float`] to the power of a [`i64`] in place, rounding the result to the nearest
     /// value at the precision of the base.
     ///
-    /// See the [`Float::pow_u_prec_round`] documentation for information on special cases,
+    /// See the [`Float::pow_s_prec_round`] documentation for information on special cases,
     /// overflow, and underflow.
     ///
     /// # Worst-case complexity
@@ -4405,13 +4426,475 @@ impl PowAssign<u64> for Float {
     /// use malachite_float::Float;
     ///
     /// let mut x = Float::from(2);
-    /// x.pow_assign(10u64);
+    /// x.pow_assign(10i64);
     /// assert_eq!(x.to_string(), "1.0e3");
     /// ```
     #[inline]
     fn pow_assign(&mut self, n: u64) {
         let prec = self.significant_bits();
         self.pow_u_prec_assign(n, prec);
+    }
+}
+
+impl Float {
+    /// Raises a [`Float`] to the power of a [`i64`], rounding the result to the specified precision
+    /// and with the specified rounding mode. The [`Float`] is taken by value. An [`Ordering`] is
+    /// also returned, indicating whether the rounded power is less than, equal to, or greater than
+    /// the exact power. Although `NaN`s are not comparable to any [`Float`], whenever this function
+    /// returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,n,p,m) = x^n+\varepsilon.
+    /// $$
+    /// - If $x^n$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^n$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x^n|\rfloor-p+1}$.
+    /// - If $x^n$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x^n|\rfloor-p}$.
+    ///
+    /// Special cases:
+    /// - $f(x,0)=1.0$ for any $x$, even `NaN`
+    /// - $f(1.0,n)=1.0$
+    /// - $f(\text{NaN},n)=\text{NaN}$ if $n \neq 0$
+    /// - $f(-1.0,n)=1.0$ if $n$ is even, and $-1.0$ if $n$ is odd
+    /// - $f(\infty,n)=\infty$ if $n>0$, and $0.0$ if $n<0$
+    /// - $f(-\infty,n)=\infty$ if $n$ is positive and even, $-\infty$ if $n$ is positive and odd,
+    ///   $0.0$ if $n$ is negative and even, and $-0.0$ if $n$ is negative and odd
+    /// - $f(0.0,n)=0.0$ if $n>0$, and $\infty$ if $n<0$
+    /// - $f(-0.0,n)=0.0$ if $n$ is positive and even, $-0.0$ if $n$ is positive and odd, $\infty$
+    ///   if $n$ is negative and even, and $-\infty$ if $n$ is negative and odd
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,n,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,n,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead.
+    /// - If $0<f(x,n,p,m)<2^{-2^{30}}$ and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,n,p,m)<2^{-2^{30}}$ and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,n,p,m)\leq2^{-2^{30}-1}$ and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,n,p,m)<2^{-2^{30}}$ and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - Negative results (from negative $x$ and odd $n$) mirror the bullets above, with the
+    ///   rounding directions reflected.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (p, o) = Float::from(3).pow_s_prec_round(5, 20, Floor);
+    /// assert_eq!(p.to_string(), "243.0");
+    /// assert_eq!(o, Equal);
+    ///
+    /// let (p, o) = Float::from(3).pow_s_prec_round(-2, 10, Ceiling);
+    /// assert_eq!(p.to_string(), "0.1112");
+    /// assert_eq!(o, Greater);
+    /// ```
+    pub fn pow_s_prec_round(self, n: i64, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+        pow_s(self, n, prec, rm)
+    }
+
+    /// Raises a [`Float`] to the power of a [`i64`], rounding the result to the specified precision
+    /// and with the specified rounding mode. The [`Float`] is taken by reference. An [`Ordering`]
+    /// is also returned, indicating whether the rounded power is less than, equal to, or greater
+    /// than the exact power. Although `NaN`s are not comparable to any [`Float`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,n,p,m) = x^n+\varepsilon.
+    /// $$
+    /// - If $x^n$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^n$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x^n|\rfloor-p+1}$.
+    /// - If $x^n$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x^n|\rfloor-p}$.
+    ///
+    /// See the [`Float::pow_s_prec_round`] documentation for information on special cases,
+    /// overflow, and underflow.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (p, o) = (&Float::from(3)).pow_s_prec_round_ref(5, 20, Floor);
+    /// assert_eq!(p.to_string(), "243.0");
+    /// assert_eq!(o, Equal);
+    ///
+    /// let (p, o) = (&Float::from(3)).pow_s_prec_round_ref(-2, 10, Ceiling);
+    /// assert_eq!(p.to_string(), "0.1112");
+    /// assert_eq!(o, Greater);
+    /// ```
+    pub fn pow_s_prec_round_ref(&self, n: i64, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+        pow_s_ref(self, n, prec, rm)
+    }
+
+    /// Raises a [`Float`] to the power of a [`i64`], rounding the result to the specified precision
+    /// and to the nearest value. The [`Float`] is taken by value. An [`Ordering`] is also returned,
+    /// indicating whether the rounded power is less than, equal to, or greater than the exact
+    /// power. Although `NaN`s are not comparable to any [`Float`], whenever this function returns a
+    /// `NaN` it also returns `Equal`.
+    ///
+    /// If the power is equidistant from two [`Float`]s with the specified precision, the [`Float`]
+    /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
+    /// the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,n,p) = x^n+\varepsilon.
+    /// $$
+    /// - If $x^n$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^n$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |x^n|\rfloor-p}$.
+    ///
+    /// See the [`Float::pow_s_prec_round`] documentation for information on special cases,
+    /// overflow, and underflow.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::pow_s_prec_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (p, o) = Float::from(3).pow_s_prec(5, 20);
+    /// assert_eq!(p.to_string(), "243.0");
+    /// assert_eq!(o, Equal);
+    ///
+    /// let (p, o) = Float::from(3).pow_s_prec(-2, 10);
+    /// assert_eq!(p.to_string(), "0.1111");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn pow_s_prec(self, n: i64, prec: u64) -> (Self, Ordering) {
+        pow_s(self, n, prec, Nearest)
+    }
+
+    /// Raises a [`Float`] to the power of a [`i64`], rounding the result to the specified precision
+    /// and to the nearest value. The [`Float`] is taken by reference. An [`Ordering`] is also
+    /// returned, indicating whether the rounded power is less than, equal to, or greater than the
+    /// exact power. Although `NaN`s are not comparable to any [`Float`], whenever this function
+    /// returns a `NaN` it also returns `Equal`.
+    ///
+    /// If the power is equidistant from two [`Float`]s with the specified precision, the [`Float`]
+    /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
+    /// the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,n,p) = x^n+\varepsilon.
+    /// $$
+    /// - If $x^n$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^n$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |x^n|\rfloor-p}$.
+    ///
+    /// See the [`Float::pow_s_prec_round`] documentation for information on special cases,
+    /// overflow, and underflow.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::pow_s_prec_round_ref`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (p, o) = (&Float::from(3)).pow_s_prec_ref(5, 20);
+    /// assert_eq!(p.to_string(), "243.0");
+    /// assert_eq!(o, Equal);
+    ///
+    /// let (p, o) = (&Float::from(3)).pow_s_prec_ref(-2, 10);
+    /// assert_eq!(p.to_string(), "0.1111");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn pow_s_prec_ref(&self, n: i64, prec: u64) -> (Self, Ordering) {
+        pow_s_ref(self, n, prec, Nearest)
+    }
+
+    /// Raises a [`Float`] to the power of a [`i64`], rounding the result to the precision of the
+    /// base and with the specified rounding mode. The [`Float`] is taken by value. An [`Ordering`]
+    /// is also returned, indicating whether the rounded power is less than, equal to, or greater
+    /// than the exact power. Although `NaN`s are not comparable to any [`Float`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The output precision is the precision of `self`. See [`RoundingMode`] for a description of
+    /// the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,n,p,m) = x^n+\varepsilon.
+    /// $$
+    /// - If $x^n$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^n$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x^n|\rfloor-p+1}$.
+    /// - If $x^n$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x^n|\rfloor-p}$.
+    ///
+    /// See the [`Float::pow_s_prec_round`] documentation for information on special cases,
+    /// overflow, and underflow.
+    ///
+    /// If you want to specify an output precision, consider using [`Float::pow_s_prec_round`]
+    /// instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the base's
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (p, o) = Float::from(3).pow_s_round(5, Floor);
+    /// assert_eq!(p.to_string(), "2.0e2");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = Float::from(3).pow_s_round(5, Ceiling);
+    /// assert_eq!(p.to_string(), "3.0e2");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn pow_s_round(self, n: i64, rm: RoundingMode) -> (Self, Ordering) {
+        let prec = self.significant_bits();
+        pow_s(self, n, prec, rm)
+    }
+
+    /// Raises a [`Float`] to the power of a [`i64`], rounding the result to the precision of the
+    /// base and with the specified rounding mode. The [`Float`] is taken by reference. An
+    /// [`Ordering`] is also returned, indicating whether the rounded power is less than, equal to,
+    /// or greater than the exact power. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The output precision is the precision of `self`. See [`RoundingMode`] for a description of
+    /// the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,n,p,m) = x^n+\varepsilon.
+    /// $$
+    /// - If $x^n$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^n$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x^n|\rfloor-p+1}$.
+    /// - If $x^n$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x^n|\rfloor-p}$.
+    ///
+    /// See the [`Float::pow_s_prec_round`] documentation for information on special cases,
+    /// overflow, and underflow.
+    ///
+    /// If you want to specify an output precision, consider using [`Float::pow_s_prec_round_ref`]
+    /// instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the base's
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (p, o) = (&Float::from(3)).pow_s_round_ref(5, Floor);
+    /// assert_eq!(p.to_string(), "2.0e2");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = (&Float::from(3)).pow_s_round_ref(5, Ceiling);
+    /// assert_eq!(p.to_string(), "3.0e2");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn pow_s_round_ref(&self, n: i64, rm: RoundingMode) -> (Self, Ordering) {
+        pow_s_ref(self, n, self.significant_bits(), rm)
+    }
+
+    /// Raises a [`Float`] to the power of a [`i64`] in place, rounding the result to the specified
+    /// precision and with the specified rounding mode.
+    ///
+    /// See the [`Float::pow_s_prec_round`] documentation for information on special cases,
+    /// overflow, and underflow.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from(3);
+    /// let o = x.pow_s_prec_round_assign(5, 20, Floor);
+    /// assert_eq!(x.to_string(), "243.0");
+    /// assert_eq!(o, Equal);
+    /// ```
+    pub fn pow_s_prec_round_assign(&mut self, n: i64, prec: u64, rm: RoundingMode) -> Ordering {
+        let mut x = Self::ZERO;
+        swap(self, &mut x);
+        let (result, o) = pow_s(x, n, prec, rm);
+        *self = result;
+        o
+    }
+
+    /// Raises a [`Float`] to the power of a [`i64`] in place, rounding the result to the specified
+    /// precision and to the nearest value.
+    ///
+    /// See the [`Float::pow_s_prec_round`] documentation for information on special cases,
+    /// overflow, and underflow.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from(3);
+    /// let o = x.pow_s_prec_assign(5, 20);
+    /// assert_eq!(x.to_string(), "243.0");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn pow_s_prec_assign(&mut self, n: i64, prec: u64) -> Ordering {
+        self.pow_s_prec_round_assign(n, prec, Nearest)
+    }
+
+    /// Raises a [`Float`] to the power of a [`i64`] in place, rounding the result to the precision
+    /// of the base and with the specified rounding mode.
+    ///
+    /// See the [`Float::pow_s_prec_round`] documentation for information on special cases,
+    /// overflow, and underflow.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the base's
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from(3);
+    /// let o = x.pow_s_round_assign(5, Floor);
+    /// assert_eq!(x.to_string(), "2.0e2");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn pow_s_round_assign(&mut self, n: i64, rm: RoundingMode) -> Ordering {
+        let prec = self.significant_bits();
+        self.pow_s_prec_round_assign(n, prec, rm)
+    }
+}
+
+impl Pow<i64> for Float {
+    type Output = Self;
+
+    /// Raises a [`Float`] to an [`i64`] power, rounding the result to the nearest value at the
+    /// precision of the base. The [`Float`] is taken by value.
+    #[inline]
+    fn pow(self, n: i64) -> Self {
+        let prec = self.significant_bits();
+        pow_s(self, n, prec, Nearest).0
+    }
+}
+
+impl Pow<i64> for &Float {
+    type Output = Float;
+
+    /// Raises a [`Float`] to an [`i64`] power, rounding the result to the nearest value at the
+    /// precision of the base. The [`Float`] is taken by reference.
+    #[inline]
+    fn pow(self, n: i64) -> Float {
+        pow_s_ref(self, n, self.significant_bits(), Nearest).0
+    }
+}
+
+impl PowAssign<i64> for Float {
+    /// Raises a [`Float`] to an [`i64`] power in place, rounding the result to the nearest value at
+    /// the precision of the base.
+    #[inline]
+    fn pow_assign(&mut self, n: i64) {
+        let prec = self.significant_bits();
+        self.pow_s_prec_assign(n, prec);
     }
 }
 

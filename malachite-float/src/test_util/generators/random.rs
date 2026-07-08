@@ -40,8 +40,8 @@ use crate::test_util::generators::exhaustive::{
     log_base_rational_float_base_prec_round_valid, log_base_rational_prec_round_valid,
     log_base_rational_rational_base_prec_round_valid, log_base_round_valid, mul_prec_round_valid,
     mul_rational_prec_round_valid, mul_rational_round_valid, mul_round_valid,
-    natural_rounding_from_float_valid, pow_integer_prec_round_valid, pow_u_prec_round_valid,
-    rational_div_float_prec_round_valid, rational_div_float_round_valid,
+    natural_rounding_from_float_valid, pow_integer_prec_round_valid, pow_s_prec_round_valid,
+    pow_u_prec_round_valid, rational_div_float_prec_round_valid, rational_div_float_round_valid,
     reciprocal_prec_round_valid, reciprocal_round_valid, reciprocal_sqrt_prec_round_valid,
     reciprocal_sqrt_rational_prec_round_valid, reciprocal_sqrt_round_valid, set_prec_round_valid,
     shl_prec_round_valid, shl_round_valid, shr_prec_round_valid, shr_round_valid,
@@ -3274,6 +3274,43 @@ pub fn random_float_signed_unsigned_rounding_mode_quadruple_gen_var_4<T: Primiti
             &random_rounding_modes,
         )
         .filter(|&(ref x, bits, prec, rm)| shr_prec_round_valid(x, bits, prec, rm)),
+    )
+}
+
+pub fn random_float_signed_unsigned_rounding_mode_quadruple_gen_var_11(
+    config: &GenConfig,
+) -> It<(Float, i64, u64, RoundingMode)> {
+    Box::new(
+        random_quadruples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_signeds(
+                    seed,
+                    config.get_or("mean_small_n", 32),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(ref x, n, prec, rm)| pow_s_prec_round_valid(x, n, prec, rm)),
     )
 }
 

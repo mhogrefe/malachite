@@ -4317,6 +4317,27 @@ pub fn float_unsigned_rounding_mode_triple_gen_var_36() -> Generator<(Float, u64
     )
 }
 
+// All `(Float, i64, u64, RoundingMode)` that are valid inputs to `Float::pow_s_prec_round`.
+pub fn float_signed_unsigned_rounding_mode_quadruple_gen_var_11()
+-> Generator<(Float, i64, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_signed_unsigned_rounding_mode_quadruple_gen_var_11,
+        &random_float_signed_unsigned_rounding_mode_quadruple_gen_var_11,
+        &special_random_float_signed_unsigned_rounding_mode_quadruple_gen_var_11,
+    )
+}
+
+// As `..._var_11`, but the `Float` may have an extreme exponent. (The random and special-random
+// generators are shared with `..._var_11`.)
+pub fn float_signed_unsigned_rounding_mode_quadruple_gen_var_12()
+-> Generator<(Float, i64, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_signed_unsigned_rounding_mode_quadruple_gen_var_12,
+        &random_float_signed_unsigned_rounding_mode_quadruple_gen_var_11,
+        &special_random_float_signed_unsigned_rounding_mode_quadruple_gen_var_11,
+    )
+}
+
 pub fn float_unsigned_rounding_mode_triple_gen_var_36_rm() -> Generator<(
     (rug::Float, u64, rug::float::Round),
     (Float, u64, RoundingMode),
