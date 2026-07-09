@@ -2795,6 +2795,27 @@ pub fn float_unsigned_rounding_mode_triple_gen_var_25_rm() -> Generator<(
     )
 }
 
+// All `(Float, u64, u64, RoundingMode)` (exponent, base, prec, rm) valid for
+// `Float::unsigned_pow_prec_round`.
+pub fn float_unsigned_unsigned_rounding_mode_quadruple_gen_var_11()
+-> Generator<(Float, u64, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_11,
+        &random_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_11,
+        &special_random_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_11,
+    )
+}
+
+// As `..._var_11`, but the `Float` may have an extreme exponent.
+pub fn float_unsigned_unsigned_rounding_mode_quadruple_gen_var_12()
+-> Generator<(Float, u64, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_12,
+        &random_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_11,
+        &special_random_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_11,
+    )
+}
+
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned, RoundingMode) --
 
 // All `(u64, u64, u64, RoundingMode)` that are valid inputs to
@@ -4206,6 +4227,17 @@ pub fn rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_1()
         &exhaustive_rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_1,
         &random_rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_1,
         &special_random_rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_1,
+    )
+}
+
+// All `(Rational, u64, u64, RoundingMode)` (exponent, base, prec, rm) valid for
+// `Float::unsigned_pow_rational_prec_round`.
+pub fn rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_2()
+-> Generator<(Rational, u64, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_2,
+        &random_rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_2,
+        &special_random_rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_2,
     )
 }
 

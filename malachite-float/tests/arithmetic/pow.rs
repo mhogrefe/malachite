@@ -8,7 +8,9 @@
 
 use malachite_base::apply_fn_to_primitive_floats;
 use malachite_base::assert_panic;
-use malachite_base::num::arithmetic::traits::{IsPowerOf2, Pow, PowAssign, PowerOf2};
+use malachite_base::num::arithmetic::traits::{
+    Abs, CheckedRoot, IsPowerOf2, Pow, PowAssign, PowerOf2,
+};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, Zero,
@@ -22,13 +24,13 @@ use malachite_base::test_util::generators::{
 };
 use malachite_float::arithmetic::pow::{
     primitive_float_pow, primitive_float_pow_integer, primitive_float_pow_u,
-    primitive_float_rational_pow,
+    primitive_float_rational_pow, primitive_float_unsigned_pow,
 };
 use malachite_float::test_util::arithmetic::pow::{
     rug_pow, rug_pow_integer, rug_pow_integer_prec, rug_pow_integer_prec_round,
     rug_pow_integer_round, rug_pow_prec, rug_pow_prec_round, rug_pow_round, rug_pow_s,
     rug_pow_s_prec, rug_pow_s_prec_round, rug_pow_s_round, rug_pow_u, rug_pow_u_prec,
-    rug_pow_u_prec_round, rug_pow_u_round,
+    rug_pow_u_prec_round, rug_pow_u_round, rug_unsigned_pow_rational_prec_round,
 };
 use malachite_float::test_util::common::{
     parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
@@ -46,7 +48,10 @@ use malachite_float::test_util::generators::{
     float_signed_unsigned_triple_gen_var_1, float_unsigned_pair_gen,
     float_unsigned_unsigned_rounding_mode_quadruple_gen_var_9,
     float_unsigned_unsigned_rounding_mode_quadruple_gen_var_10,
+    float_unsigned_unsigned_rounding_mode_quadruple_gen_var_11,
+    float_unsigned_unsigned_rounding_mode_quadruple_gen_var_12,
     float_unsigned_unsigned_triple_gen_var_1,
+    rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_2,
     unsigned_unsigned_unsigned_rounding_mode_quadruple_gen_var_1,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
@@ -2991,6 +2996,535 @@ fn unsigned_pow_unsigned_prec_properties() {
             let (pi, oi) = kf.pow_integer_prec_ref_ref(&Integer::from(y), prec);
             assert_eq!(ComparableFloatRef(&pi), ComparableFloatRef(&p));
             assert_eq!(oi, o);
+        },
+    );
+}
+
+#[test]
+fn test_unsigned_pow() {
+    let test = |x: u64, s, s_hex, prec: u64, rm, out: &str, out_hex: &str, o_out| {
+        let y = parse_hex_string(s_hex);
+        assert_eq!(y.to_string(), s);
+        let (p, o) = Float::unsigned_pow_prec_round(x, y, prec, rm);
+        assert!(p.is_valid());
+        assert_eq!(p.to_string(), out);
+        assert_eq!(to_hex_string(&p), out_hex);
+        assert_eq!(o, o_out);
+    };
+    // - a fractional exponent
+    test(
+        2,
+        "0.5",
+        "0x0.8#1",
+        53,
+        Nearest,
+        "1.4142135623730951",
+        "0x1.6a09e667f3bcd#53",
+        Greater,
+    );
+    test(
+        3,
+        "2.5",
+        "0x2.8#3",
+        53,
+        Nearest,
+        "15.588457268119896",
+        "0xf.96a522b1ab200#53",
+        Greater,
+    );
+    test(
+        3,
+        "2.5",
+        "0x2.8#3",
+        53,
+        Floor,
+        "15.588457268119894",
+        "0xf.96a522b1ab1f8#53",
+        Less,
+    );
+    // - a negative exponent (reciprocal)
+    test(
+        2,
+        "-1.0",
+        "-0x1.0#1",
+        10,
+        Nearest,
+        "0.5",
+        "0x0.800#10",
+        Equal,
+    );
+    test(
+        10,
+        "-0.5",
+        "-0x0.8#1",
+        53,
+        Nearest,
+        "0.31622776601683794",
+        "0x0.50f44d8921243c#53",
+        Greater,
+    );
+    // - an integer-valued exponent
+    test(
+        3,
+        "5.0",
+        "0x5.0#3",
+        20,
+        Nearest,
+        "243.0",
+        "0xf3.000#20",
+        Equal,
+    );
+    test(3, "5.0", "0x5.0#3", 2, Floor, "2.0e2", "0xc.0E+1#2", Less);
+    test(
+        2,
+        "1.2",
+        "0x1.4#3",
+        10,
+        Nearest,
+        "2.379",
+        "0x2.61#10",
+        Greater,
+    );
+    // - overflow
+    test(
+        2,
+        "1.0e12",
+        "0x1.0E+10#1",
+        10,
+        Nearest,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    // - a tiny exponent gives a result near 1
+    test(
+        100,
+        "9.0e-13",
+        "0x1.0E-10#1",
+        20,
+        Nearest,
+        "1.0",
+        "0x1.00000#20",
+        Less,
+    );
+}
+
+#[test]
+fn test_unsigned_pow_special_values() {
+    let test = |x: u64, y: Float, out: &str, out_hex: &str| {
+        let (p, o) = Float::unsigned_pow_prec_round(x, y, 1, Nearest);
+        assert!(p.is_valid());
+        assert_eq!(p.to_string(), out);
+        assert_eq!(to_hex_string(&p), out_hex);
+        assert_eq!(o, Equal);
+    };
+    test(0, Float::NAN, "NaN", "NaN");
+    test(0, Float::INFINITY, "0.0", "0x0.0");
+    test(0, Float::NEGATIVE_INFINITY, "Infinity", "Infinity");
+    test(0, Float::ZERO, "1.0", "0x1.0#1");
+    test(0, Float::NEGATIVE_ZERO, "1.0", "0x1.0#1");
+
+    test(1, Float::NAN, "1.0", "0x1.0#1");
+    test(1, Float::INFINITY, "1.0", "0x1.0#1");
+    test(1, Float::NEGATIVE_INFINITY, "1.0", "0x1.0#1");
+    test(1, Float::ZERO, "1.0", "0x1.0#1");
+    test(1, Float::NEGATIVE_ZERO, "1.0", "0x1.0#1");
+
+    test(2, Float::NAN, "NaN", "NaN");
+    test(2, Float::INFINITY, "Infinity", "Infinity");
+    test(2, Float::NEGATIVE_INFINITY, "0.0", "0x0.0");
+    test(2, Float::ZERO, "1.0", "0x1.0#1");
+    test(2, Float::NEGATIVE_ZERO, "1.0", "0x1.0#1");
+}
+
+// The exact Float representation of a u64.
+fn u64_exact_float(k: u64) -> Float {
+    Float::from_unsigned_prec(k, k.significant_bits().max(1)).0
+}
+
+#[allow(clippy::needless_pass_by_value)]
+fn unsigned_pow_prec_round_properties_helper(
+    y: Float,
+    x: u64,
+    prec: u64,
+    rm: RoundingMode,
+    extreme: bool,
+) {
+    if rm == Exact {
+        let (p, o) = Float::unsigned_pow_prec_round_ref(x, &y, prec, Nearest);
+        if o == Equal {
+            let (pe, oe) = Float::unsigned_pow_prec_round_ref(x, &y, prec, Exact);
+            assert_eq!(ComparableFloatRef(&pe), ComparableFloatRef(&p));
+            assert_eq!(oe, Equal);
+        } else {
+            assert_panic!(Float::unsigned_pow_prec_round_ref(x, &y, prec, Exact));
+        }
+        return;
+    }
+    let (p, o) = Float::unsigned_pow_prec_round(x, y.clone(), prec, rm);
+    assert!(p.is_valid());
+    let (p_alt, o_alt) = Float::unsigned_pow_prec_round_ref(x, &y, prec, rm);
+    assert!(p_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+    assert_eq!(o_alt, o);
+
+    // n^x is x^x on the exact Float representation of the base, computed by pow_prec_round.
+    let kf = u64_exact_float(x);
+    let (pp, op) = kf.pow_prec_round_ref_ref(&y, prec, rm);
+    assert_eq!(ComparableFloatRef(&pp), ComparableFloatRef(&p));
+    assert_eq!(op, o);
+
+    if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm) {
+        let (rug_p, rug_o) = rug_pow_prec_round(
+            &rug::Float::exact_from(&kf),
+            &rug::Float::exact_from(&y),
+            prec,
+            rug_rm,
+        );
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_p)),
+            ComparableFloatRef(&p)
+        );
+        assert_eq!(rug_o, o);
+    }
+
+    if p.is_normal() && !extreme {
+        assert_eq!(p.get_prec(), Some(prec));
+    }
+}
+
+#[test]
+fn unsigned_pow_prec_round_properties() {
+    float_unsigned_unsigned_rounding_mode_quadruple_gen_var_11().test_properties(
+        |(y, x, prec, rm)| {
+            unsigned_pow_prec_round_properties_helper(y, x, prec, rm, false);
+        },
+    );
+
+    float_unsigned_unsigned_rounding_mode_quadruple_gen_var_12().test_properties(
+        |(y, x, prec, rm)| {
+            unsigned_pow_prec_round_properties_helper(y, x, prec, rm, true);
+        },
+    );
+}
+
+#[test]
+fn unsigned_pow_prec_properties() {
+    float_unsigned_unsigned_rounding_mode_quadruple_gen_var_11().test_properties(
+        |(y, x, prec, _)| {
+            let (p, o) = Float::unsigned_pow_prec(x, y.clone(), prec);
+            assert!(p.is_valid());
+            let (p_alt, o_alt) = Float::unsigned_pow_prec_ref(x, &y, prec);
+            assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+            assert_eq!(o_alt, o);
+            let (p_alt, o_alt) = Float::unsigned_pow_prec_round_ref(x, &y, prec, Nearest);
+            assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+            assert_eq!(o_alt, o);
+        },
+    );
+}
+
+#[test]
+#[allow(clippy::type_repetition_in_bounds)]
+fn test_primitive_float_unsigned_pow() {
+    fn test<T: PrimitiveFloat>(x: u64, y: T, out: T)
+    where
+        Float: From<T> + PartialOrd<T>,
+        for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    {
+        assert_eq!(
+            NiceFloat(primitive_float_unsigned_pow(x, y)),
+            NiceFloat(out)
+        );
+    }
+    test::<f32>(0, f32::NAN, f32::NAN);
+    test::<f32>(0, f32::INFINITY, 0.0);
+    test::<f32>(0, f32::NEGATIVE_INFINITY, f32::INFINITY);
+    test::<f32>(0, 0.0, 1.0);
+    test::<f32>(0, -0.0, 1.0);
+    test::<f32>(0, 0.5, 0.0);
+    test::<f32>(0, -1.0, f32::INFINITY);
+    test::<f32>(0, 2.0, 0.0);
+
+    test::<f32>(1, f32::NAN, 1.0);
+    test::<f32>(1, f32::INFINITY, 1.0);
+    test::<f32>(1, f32::NEGATIVE_INFINITY, 1.0);
+    test::<f32>(1, 0.0, 1.0);
+    test::<f32>(1, -0.0, 1.0);
+    test::<f32>(1, 0.5, 1.0);
+    test::<f32>(1, -1.0, 1.0);
+    test::<f32>(1, 2.0, 1.0);
+
+    test::<f32>(2, f32::NAN, f32::NAN);
+    test::<f32>(2, f32::INFINITY, f32::INFINITY);
+    test::<f32>(2, f32::NEGATIVE_INFINITY, 0.0);
+    test::<f32>(2, 0.0, 1.0);
+    test::<f32>(2, -0.0, 1.0);
+    test::<f32>(2, 0.5, std::f32::consts::SQRT_2);
+    test::<f32>(2, -1.0, 0.5);
+    test::<f32>(2, 2.0, 4.0);
+    test::<f32>(3, 2.5, 15.588457);
+    test::<f32>(10, -0.5, 0.31622776);
+    test::<f32>(2, 200.0, f32::INFINITY);
+    test::<f32>(2, -200.0, 0.0);
+
+    test::<f64>(2, 0.5, std::f64::consts::SQRT_2);
+    test::<f64>(3, 2.5, 15.588457268119896);
+    test::<f64>(2, -1.0, 0.5);
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn primitive_float_unsigned_pow_properties_helper<T: PrimitiveFloat>()
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    primitive_float_unsigned_pair_gen_var_1::<T, u64>().test_properties(|(y, x)| {
+        primitive_float_unsigned_pow::<T>(x, y);
+    });
+}
+
+#[test]
+fn primitive_float_unsigned_pow_properties() {
+    apply_fn_to_primitive_floats!(primitive_float_unsigned_pow_properties_helper);
+}
+
+#[test]
+fn test_unsigned_pow_rational() {
+    let test = |x: u64, s: &str, prec: u64, rm, out: &str, out_hex: &str, o_out| {
+        let q = Rational::from_str(s).unwrap();
+        let (p, o) = Float::unsigned_pow_rational_prec_round(x, q, prec, rm);
+        assert!(p.is_valid());
+        assert_eq!(p.to_string(), out);
+        assert_eq!(to_hex_string(&p), out_hex);
+        assert_eq!(o, o_out);
+    };
+    // - exact perfect powers: k = j^b gives k^(a/b) = j^a exactly
+    test(8, "1/3", 20, Nearest, "2.0", "0x2.00000#20", Equal);
+    test(27, "1/3", 20, Floor, "3.0", "0x3.00000#20", Equal);
+    test(9, "1/2", 20, Nearest, "3.0", "0x3.00000#20", Equal);
+    test(16, "3/4", 20, Nearest, "8.0", "0x8.0000#20", Equal);
+    test(4, "-1/2", 20, Nearest, "0.5", "0x0.80000#20", Equal);
+    test(1000000, "1/3", 20, Nearest, "100.0", "0x64.0000#20", Equal);
+    test(64, "5/6", 30, Nearest, "32.0", "0x20.000000#30", Equal);
+    // - power-of-2 base: k = 2^s gives k^q = 2^(s*q)
+    test(
+        2,
+        "1/2",
+        53,
+        Nearest,
+        "1.4142135623730951",
+        "0x1.6a09e667f3bcd#53",
+        Greater,
+    );
+    test(8, "2/3", 20, Nearest, "4.0", "0x4.00000#20", Equal);
+    test(2, "-1", 10, Nearest, "0.5", "0x0.800#10", Equal);
+    test(4, "1/3", 30, Floor, "1.587401051", "0x1.965fea50#30", Less);
+    // - irrational results
+    test(
+        3,
+        "1/2",
+        53,
+        Nearest,
+        "1.7320508075688772",
+        "0x1.bb67ae8584caa#53",
+        Less,
+    );
+    test(
+        5,
+        "2/3",
+        53,
+        Nearest,
+        "2.924017738212866",
+        "0x2.ec8c6d2e8c538#53",
+        Less,
+    );
+    test(
+        7,
+        "-3/5",
+        30,
+        Nearest,
+        "0.311129489",
+        "0x0.4fa62ea4#30",
+        Less,
+    );
+    test(3, "1/2", 2, Floor, "1.5", "0x1.8#2", Less);
+    test(3, "1/2", 2, Ceiling, "2.0", "0x2.0#2", Greater);
+    // - integer-valued exponents
+    test(5, "3", 20, Nearest, "125.0", "0x7d.0000#20", Equal);
+    test(2, "10", 20, Nearest, "1024.0", "0x400.000#20", Equal);
+    // - overflow and underflow
+    test(
+        2,
+        "1000000000000",
+        10,
+        Nearest,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+    test(2, "-1000000000000", 10, Nearest, "0.0", "0x0.0", Less);
+    test(
+        3,
+        "5000000000/7",
+        5,
+        Down,
+        "too_big",
+        "0x7.cE+268435455#5",
+        Less,
+    );
+    // - Exact rounding of an exactly-representable result
+    test(8, "1/3", 20, Exact, "2.0", "0x2.00000#20", Equal);
+    test(27, "1/3", 30, Exact, "3.0", "0x3.0000000#30", Equal);
+    // - a denominator exceeding u64::MAX (the perfect-power check is skipped)
+    test(
+        3,
+        "1/18446744073709551617",
+        20,
+        Nearest,
+        "1.0",
+        "0x1.00000#20",
+        Less,
+    );
+    test(
+        3,
+        "-1/18446744073709551617",
+        20,
+        Nearest,
+        "1.0",
+        "0x1.00000#20",
+        Greater,
+    );
+}
+
+#[test]
+fn test_unsigned_pow_rational_special_values() {
+    let test = |x: u64, s: &str, out: &str, out_hex: &str| {
+        let q = Rational::from_str(s).unwrap();
+        let (p, o) = Float::unsigned_pow_rational_prec_round(x, q, 1, Nearest);
+        assert!(p.is_valid());
+        assert_eq!(p.to_string(), out);
+        assert_eq!(to_hex_string(&p), out_hex);
+        assert_eq!(o, Equal);
+    };
+    // - 0^q = 0 for q > 0, +Inf for q < 0, and 1 for q = 0
+    test(0, "0", "1.0", "0x1.0#1");
+    test(0, "1", "0.0", "0x0.0");
+    test(0, "-1", "Infinity", "Infinity");
+    test(0, "1/2", "0.0", "0x0.0");
+    test(0, "-2", "Infinity", "Infinity");
+
+    // - 1^q = 1 for any q
+    test(1, "0", "1.0", "0x1.0#1");
+    test(1, "1", "1.0", "0x1.0#1");
+    test(1, "-1", "1.0", "0x1.0#1");
+    test(1, "1/2", "1.0", "0x1.0#1");
+    test(1, "-2", "1.0", "0x1.0#1");
+
+    // - a normal base with exact integer/reciprocal exponents
+    test(2, "0", "1.0", "0x1.0#1");
+    test(2, "1", "2.0", "0x2.0#1");
+    test(2, "-1", "0.5", "0x0.8#1");
+    test(2, "-2", "0.2", "0x0.4#1");
+}
+
+#[allow(clippy::needless_pass_by_value)]
+fn unsigned_pow_rational_prec_round_properties_helper(
+    q: Rational,
+    k: u64,
+    prec: u64,
+    rm: RoundingMode,
+    extreme: bool,
+) {
+    if rm == Exact {
+        let (p, o) = Float::unsigned_pow_rational_prec_round_ref(k, &q, prec, Nearest);
+        if o == Equal {
+            let (pe, oe) = Float::unsigned_pow_rational_prec_round_ref(k, &q, prec, Exact);
+            assert_eq!(ComparableFloatRef(&pe), ComparableFloatRef(&p));
+            assert_eq!(oe, Equal);
+        } else {
+            assert_panic!(Float::unsigned_pow_rational_prec_round_ref(
+                k, &q, prec, Exact
+            ));
+        }
+        return;
+    }
+    let (p, o) = Float::unsigned_pow_rational_prec_round_ref(k, &q, prec, rm);
+    assert!(p.is_valid());
+    let (p_alt, o_alt) = Float::unsigned_pow_rational_prec_round(k, q.clone(), prec, rm);
+    assert!(p_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+    assert_eq!(o_alt, o);
+
+    // For a dyadic exponent, q is exactly a Float, so k^q must match `rational_pow` (an independent
+    // implementation) on the exact Rational base.
+    if q.denominator_ref().is_power_of_2()
+        && q.numerator_ref().significant_bits() < 4096
+        && q.denominator_ref().significant_bits() < 4096
+    {
+        let yf = Float::exact_from(&q);
+        let (pr, or) = Float::rational_pow_prec_round_ref_val(&Rational::from(k), yf, prec, rm);
+        assert_eq!(ComparableFloatRef(&pr), ComparableFloatRef(&p));
+        assert_eq!(or, o);
+    }
+
+    // The exp(q * ln k) oracle is reliable only in the "generic" regime; it is excluded where its
+    // rounding error can straddle a boundary that the direct 2^(q log2 k) computation resolves
+    // exactly:
+    // - k^q rational (k a perfect b-th power, b the denominator of q): a tie such as 7^1 = 7
+    //   rounding to 8 at precision 2;
+    // - near underflow/overflow: `too_small` vs `0.0`;
+    // - extremely close to 1: with a tiny exponent, k^q can lie within 2^-256 of 1, beyond the
+    //   oracle's resolution.
+    let k_perfect_power = u64::try_from(q.denominator_ref())
+        .ok()
+        .and_then(|b| k.checked_root(b))
+        .is_some();
+    if k >= 2 && !k_perfect_power && p.is_normal() {
+        let e = i64::from(p.get_exponent().unwrap());
+        let near_one = (e == 0 || e == 1)
+            && (prec >= 4096
+                || (Rational::exact_from(&p) - Rational::ONE).abs()
+                    < (Rational::ONE >> prec.saturating_sub(2)));
+        if e > i64::from(Float::MIN_EXPONENT) + 4
+            && e < i64::from(Float::MAX_EXPONENT) - 4
+            && !near_one
+            && let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm)
+        {
+            let (rp, _) = rug_unsigned_pow_rational_prec_round(k, &q, prec, rug_rm);
+            assert_eq!(
+                ComparableFloatRef(&Float::from(&rp)),
+                ComparableFloatRef(&p)
+            );
+        }
+    }
+
+    if p.is_normal() && !extreme {
+        assert_eq!(p.get_prec(), Some(prec));
+    }
+}
+
+#[test]
+fn unsigned_pow_rational_prec_round_properties() {
+    rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_2().test_properties(
+        |(q, k, prec, rm)| {
+            unsigned_pow_rational_prec_round_properties_helper(q, k, prec, rm, false);
+        },
+    );
+}
+
+#[test]
+fn unsigned_pow_rational_prec_properties() {
+    rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_2().test_properties(
+        |(q, k, prec, _)| {
+            let (p, o) = Float::unsigned_pow_rational_prec(k, q.clone(), prec);
+            assert!(p.is_valid());
+            let (p_alt, o_alt) = Float::unsigned_pow_rational_prec_ref(k, &q, prec);
+            assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+            assert_eq!(o_alt, o);
+            let (p_alt, o_alt) = Float::unsigned_pow_rational_prec_round_ref(k, &q, prec, Nearest);
+            assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+            assert_eq!(o_alt, o);
         },
     );
 }

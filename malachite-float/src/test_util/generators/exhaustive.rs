@@ -2845,6 +2845,43 @@ pub fn exhaustive_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_10()
     ))
 }
 
+// Whether `(exp, base, prec, rm)` is a valid input to `Float::unsigned_pow_prec_round`: `Exact` is
+// only allowed when base^exp is exactly representable at the given precision.
+pub fn unsigned_pow_prec_round_valid(exp: &Float, base: u64, prec: u64, rm: RoundingMode) -> bool {
+    rm != Exact || Float::unsigned_pow_prec_round_ref(base, exp, prec, Floor).1 == Equal
+}
+
+pub fn exhaustive_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_11()
+-> It<(Float, u64, u64, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(
+        lex_pairs(
+            exhaustive_triples(
+                exhaustive_floats(),
+                exhaustive_unsigneds(),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, n, prec), rm)| unsigned_pow_prec_round_valid(x, n, prec, rm)),
+    ))
+}
+
+// As `..._var_11`, but the `Float` may have an extreme exponent.
+pub fn exhaustive_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_12()
+-> It<(Float, u64, u64, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(
+        lex_pairs(
+            exhaustive_triples(
+                exhaustive_extreme_floats(),
+                exhaustive_unsigneds(),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, n, prec), rm)| unsigned_pow_prec_round_valid(x, n, prec, rm)),
+    ))
+}
+
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned, RoundingMode) --
 
 // Whether `(x, y, prec, rm)` is a valid input to `Float::unsigned_pow_unsigned_prec_round`: `Exact`
@@ -4840,6 +4877,35 @@ pub fn exhaustive_rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_1()
             exhaustive_rounding_modes(),
         )
         .filter(|&((ref n, base, prec), rm)| log_base_rational_prec_round_valid(n, base, prec, rm)),
+    ))
+}
+
+// Whether `(exp, base, prec, rm)` is a valid input to `Float::unsigned_pow_rational_prec_round`:
+// `Exact` is only allowed when base^exp is exactly representable at the given precision.
+pub fn unsigned_pow_rational_prec_round_valid(
+    exp: &Rational,
+    base: u64,
+    prec: u64,
+    rm: RoundingMode,
+) -> bool {
+    rm != Exact || Float::unsigned_pow_rational_prec_round_ref(base, exp, prec, Floor).1 == Equal
+}
+
+pub fn exhaustive_rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_2()
+-> It<(Rational, u64, u64, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(
+        lex_pairs(
+            exhaustive_triples_custom_output(
+                exhaustive_rationals(),
+                exhaustive_unsigneds(),
+                exhaustive_positive_primitive_ints(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref q, k, prec), rm)| unsigned_pow_rational_prec_round_valid(q, k, prec, rm)),
     ))
 }
 

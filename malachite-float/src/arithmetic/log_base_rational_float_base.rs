@@ -12,9 +12,7 @@ use crate::arithmetic::log_base::{
 };
 use crate::arithmetic::log_base_2::extended_log_base_2_of_rational;
 use crate::basic::extended::ExtendedFloat;
-use crate::{
-    Float, emulate_rational_float_to_float_fn, float_infinity, float_nan, float_negative_infinity,
-};
+use crate::{Float, emulate_float_to_float_fn, float_infinity, float_nan, float_negative_infinity};
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::CeilingLogBase2;
 use malachite_base::num::basic::floats::PrimitiveFloat;
@@ -479,9 +477,8 @@ where
     Float: From<T> + PartialOrd<T>,
     for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
 {
-    emulate_rational_float_to_float_fn(
-        |x, base, prec| Float::log_base_rational_float_base_prec_ref(x, &base, prec),
-        x,
+    emulate_float_to_float_fn(
+        |base2, prec| Float::log_base_rational_float_base_prec_ref(x, &base2, prec),
         base,
     )
 }

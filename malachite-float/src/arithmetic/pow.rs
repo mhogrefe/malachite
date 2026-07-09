@@ -20,14 +20,13 @@ use crate::arithmetic::exp::{exp_overflow, exp_underflow, one_neighbor};
 use crate::arithmetic::log_base_2::log_2_rational_brackets;
 use crate::emulate_float_float_to_float_fn;
 use crate::emulate_float_to_float_fn;
-use crate::emulate_rational_float_to_float_fn;
 use crate::{Float, float_either_infinity, float_either_zero, float_nan};
 use core::cmp::Ordering::{self, *};
 use core::cmp::max;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    Abs, CeilingLogBase2, CheckedSqrt, IsPowerOf2, NegAssign, Parity, Pow, PowAssign, Square,
-    UnsignedAbs,
+    Abs, CeilingLogBase2, CheckedRoot, CheckedSqrt, IsPowerOf2, NegAssign, Parity, Pow, PowAssign,
+    Square, UnsignedAbs,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -5044,6 +5043,379 @@ impl Float {
     pub fn unsigned_pow_unsigned_prec(x: u64, y: u64, prec: u64) -> (Self, Ordering) {
         unsigned_pow_unsigned(x, y, prec, Nearest)
     }
+
+    /// Raises a [`u64`] to the power of a [`Float`], returning a [`Float`] rounded to the specified
+    /// precision and with the specified rounding mode. The [`Float`] exponent is taken by value. An
+    /// [`Ordering`] is also returned, indicating whether the rounded power is less than, equal to,
+    /// or greater than the exact power. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,y,p,m) = x^y+\varepsilon.
+    /// $$
+    /// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 x^y\rfloor-p+1}$.
+    /// - If $x^y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 x^y\rfloor-p}$.
+    ///
+    /// Special cases:
+    /// - $f(x,0.0,p,m)=1.0$ for any $x$
+    /// - $f(1,y,p,m)=1.0$ for any $y$, even `NaN`
+    /// - $f(x,\text{NaN},p,m)=\text{NaN}$ if $x \neq 1$
+    /// - $f(x,\infty,p,m)=\infty$ if $x>1$, and $0.0$ if $x=0$
+    /// - $f(x,-\infty,p,m)=0.0$ if $x>1$, and $\infty$ if $x=0$
+    /// - $f(0,y,p,m)=0.0$ if $y>0$, and $\infty$ if $y<0$
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,y,p,m)\leq2^{-2^{30}-1}$ and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, y.significant_bits())`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (p, o) = Float::unsigned_pow_prec_round(2, Float::from(0.5), 53, Nearest);
+    /// assert_eq!(p.to_string(), "1.4142135623730951");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (p, o) = Float::unsigned_pow_prec_round(3, Float::from(2.5), 53, Floor);
+    /// assert_eq!(p.to_string(), "15.588457268119894");
+    /// assert_eq!(o, Less);
+    /// ```
+    pub fn unsigned_pow_prec_round(
+        x: u64,
+        y: Self,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        Self::from_unsigned_prec(x, x.significant_bits().max(1))
+            .0
+            .pow_prec_round(y, prec, rm)
+    }
+
+    /// Raises a [`u64`] to the power of a [`Float`], returning a [`Float`] rounded to the specified
+    /// precision and with the specified rounding mode. The [`Float`] exponent is taken by
+    /// reference. An [`Ordering`] is also returned, indicating whether the rounded power is less
+    /// than, equal to, or greater than the exact power. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,y,p,m) = x^y+\varepsilon.
+    /// $$
+    /// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 x^y\rfloor-p+1}$.
+    /// - If $x^y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 x^y\rfloor-p}$.
+    ///
+    /// See the [`Float::unsigned_pow_prec_round`] documentation for information on special cases,
+    /// overflow, and underflow.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, y.significant_bits())`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (p, o) = Float::unsigned_pow_prec_round_ref(2, &Float::from(0.5), 53, Nearest);
+    /// assert_eq!(p.to_string(), "1.4142135623730951");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (p, o) = Float::unsigned_pow_prec_round_ref(3, &Float::from(2.5), 53, Floor);
+    /// assert_eq!(p.to_string(), "15.588457268119894");
+    /// assert_eq!(o, Less);
+    /// ```
+    pub fn unsigned_pow_prec_round_ref(
+        x: u64,
+        y: &Self,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        Self::from_unsigned_prec(x, x.significant_bits().max(1))
+            .0
+            .pow_prec_round_val_ref(y, prec, rm)
+    }
+
+    /// Raises a [`u64`] to the power of a [`Float`], returning a [`Float`] rounded to the specified
+    /// precision and to the nearest value. The [`Float`] exponent is taken by value. An
+    /// [`Ordering`] is also returned, indicating whether the rounded power is less than, equal to,
+    /// or greater than the exact power. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// If the power is equidistant from two [`Float`]s with the specified precision, the [`Float`]
+    /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
+    /// the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,y,p) = x^y+\varepsilon.
+    /// $$
+    /// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^y$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 x^y\rfloor-p}$.
+    ///
+    /// See the [`Float::unsigned_pow_prec_round`] documentation for information on special cases,
+    /// overflow, and underflow.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::unsigned_pow_prec_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, y.significant_bits())`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (p, o) = Float::unsigned_pow_prec(2, Float::from(0.5), 53);
+    /// assert_eq!(p.to_string(), "1.4142135623730951");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (p, o) = Float::unsigned_pow_prec(3, Float::from(2.5), 53);
+    /// assert_eq!(p.to_string(), "15.588457268119896");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn unsigned_pow_prec(x: u64, y: Self, prec: u64) -> (Self, Ordering) {
+        Self::unsigned_pow_prec_round(x, y, prec, Nearest)
+    }
+
+    /// Raises a [`u64`] to the power of a [`Float`], returning a [`Float`] rounded to the specified
+    /// precision and to the nearest value. The [`Float`] exponent is taken by reference. An
+    /// [`Ordering`] is also returned, indicating whether the rounded power is less than, equal to,
+    /// or greater than the exact power. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// If the power is equidistant from two [`Float`]s with the specified precision, the [`Float`]
+    /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
+    /// the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,y,p) = x^y+\varepsilon.
+    /// $$
+    /// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^y$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 x^y\rfloor-p}$.
+    ///
+    /// See the [`Float::unsigned_pow_prec_round`] documentation for information on special cases,
+    /// overflow, and underflow.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::unsigned_pow_prec_round_ref`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, y.significant_bits())`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (p, o) = Float::unsigned_pow_prec_ref(2, &Float::from(0.5), 53);
+    /// assert_eq!(p.to_string(), "1.4142135623730951");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (p, o) = Float::unsigned_pow_prec_ref(3, &Float::from(2.5), 53);
+    /// assert_eq!(p.to_string(), "15.588457268119896");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn unsigned_pow_prec_ref(x: u64, y: &Self, prec: u64) -> (Self, Ordering) {
+        Self::unsigned_pow_prec_round_ref(x, y, prec, Nearest)
+    }
+
+    /// Raises a [`u64`] to the power of a [`Rational`], returning a [`Float`] rounded to the
+    /// specified precision and with the specified rounding mode. The [`Rational`] exponent is taken
+    /// by value.
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn unsigned_pow_rational_prec_round(
+        x: u64,
+        y: Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        unsigned_pow_rational(x, &y, prec, rm)
+    }
+
+    /// Raises a [`u64`] to the power of a [`Rational`], returning a [`Float`] rounded to the
+    /// specified precision and with the specified rounding mode. The [`Rational`] exponent is taken
+    /// by reference.
+    pub fn unsigned_pow_rational_prec_round_ref(
+        x: u64,
+        y: &Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        unsigned_pow_rational(x, y, prec, rm)
+    }
+
+    /// Raises a [`u64`] to the power of a [`Rational`], returning a [`Float`] rounded to the
+    /// specified precision and to the nearest value. The [`Rational`] exponent is taken by value.
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn unsigned_pow_rational_prec(x: u64, y: Rational, prec: u64) -> (Self, Ordering) {
+        unsigned_pow_rational(x, &y, prec, Nearest)
+    }
+
+    /// Raises a [`u64`] to the power of a [`Rational`], returning a [`Float`] rounded to the
+    /// specified precision and to the nearest value. The [`Rational`] exponent is taken by
+    /// reference.
+    #[inline]
+    pub fn unsigned_pow_rational_prec_ref(x: u64, y: &Rational, prec: u64) -> (Self, Ordering) {
+        unsigned_pow_rational(x, y, prec, Nearest)
+    }
+}
+
+// k^q for a u64 k and Rational q. Since MPFR has no rational-exponent power, this is not a port:
+// the value is 2^(q * log2(k)). Exact-rational results (k a perfect b-th power) and a power-of-2
+// base are peeled off first (a Ziv-style squeeze never converges on an exactly-representable
+// result); the remaining results are irrational and are bracketed by squeezing 2^(q * log2(k))
+// between exact Rationals.
+fn unsigned_pow_rational(k: u64, q: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    assert_ne!(prec, 0);
+    // Exact rounding: compute with Nearest and demand exactness.
+    if rm == Exact {
+        let (result, o) = unsigned_pow_rational(k, q, prec, Nearest);
+        assert_eq!(o, Equal, "Inexact unsigned_pow_rational");
+        return (result, Equal);
+    }
+    // k^0 = 1 for any k, even 0
+    if *q == 0u32 {
+        return Float::from_float_prec_round(Float::ONE, prec, rm);
+    }
+    // 0^q = 0 for q > 0, and +Inf for q < 0
+    if k == 0 {
+        return if *q > 0u32 {
+            (Float::ZERO, Equal)
+        } else {
+            (Float::INFINITY, Equal)
+        };
+    }
+    // 1^q = 1 for any q
+    if k == 1 {
+        return Float::from_float_prec_round(Float::ONE, prec, rm);
+    }
+    // k = 2^s: k^q = 2^(s * q), and `power_of_2_rational_prec_round` handles all exactness,
+    // overflow, and underflow.
+    if k.is_power_of_2() {
+        let t = Rational::from(k.trailing_zeros()) * q;
+        return Float::power_of_2_rational_prec_round(t, prec, rm);
+    }
+    // k = j^b (with q = a / b in lowest terms): k^q = j^a is an exact rational, obtained by raising
+    // the exact Float j to the integer power a.
+    if let Ok(b) = u64::try_from(q.denominator_ref())
+        && let Some(j) = k.checked_root(b)
+    {
+        let mut a = Integer::from(q.numerator_ref());
+        if *q < 0u32 {
+            a.neg_assign();
+        }
+        return Float::from_unsigned_prec(j, j.significant_bits().max(1))
+            .0
+            .pow_integer_prec_round(a, prec, rm);
+    }
+    // The remaining results are irrational; squeeze 2^(q * log2(k)) between exact Rationals.
+    unsigned_pow_rational_squeeze(k, q, prec, rm)
+}
+
+// The squeeze for an irrational k^q (k >= 2 not a power of 2, q nonzero and not making k^q
+// rational): brackets t = q * log2(k) between exact Rationals via `log_2_rational_brackets`, then
+// applies `Float::power_of_2_rational_prec_round` (which itself handles the exponent boundaries) to
+// both ends, growing the working precision until the ends agree. Since k >= 2, log2(k) >= 1, so
+// there is no sub-`MIN_EXPONENT` logarithm to contend with.
+fn unsigned_pow_rational_squeeze(
+    k: u64,
+    q: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    let kr = Rational::from(k);
+    let positive = *q > 0u32;
+    let mut wprec = prec.saturating_add(Limb::WIDTH << 1);
+    let mut increment = Limb::WIDTH;
+    loop {
+        let (l_lo, l_hi) = log_2_rational_brackets(&kr, wprec);
+        let (t_lo, t_hi) = if positive {
+            (q * l_lo, q * l_hi)
+        } else {
+            (q * l_hi, q * l_lo)
+        };
+        let (p_lo, mut o_lo) = Float::power_of_2_rational_prec_round(t_lo, prec, rm);
+        let (p_hi, mut o_hi) = Float::power_of_2_rational_prec_round(t_hi, prec, rm);
+        // A bracket end landing exactly on a representable power rounds with `Equal`; the true
+        // value lies strictly between the ends, so the other end's ordering is the true one.
+        if o_lo == Equal {
+            fail_on_untested_path(
+                "unsigned_pow_rational_squeeze, sq_lo_eq: exact results (t an integer) \
+                 are caught by the power-of-2 and perfect-power routes before the \
+                 squeeze, so t is never an integer here; a bracket end equalling an \
+                 integer is a measure-zero coincidence of the log brackets",
+            );
+            o_lo = o_hi;
+        }
+        if o_hi == Equal {
+            fail_on_untested_path(
+                "unsigned_pow_rational_squeeze, sq_hi_eq: as sq_lo_eq -- t is never an \
+                 integer in the squeeze, so a bracket end equalling one is a \
+                 measure-zero coincidence",
+            );
+            o_hi = o_lo;
+        }
+        if o_lo == o_hi && ComparableFloatRef(&p_lo) == ComparableFloatRef(&p_hi) {
+            return (p_lo, o_lo);
+        }
+        fail_on_untested_path(
+            "unsigned_pow_rational_squeeze, sq_grow: the initial working precision prec \
+             + 128 resolves every non-pathological result; iterating would require k^q \
+             within 2^-(prec+128) of a rounding boundary, measure-zero for the \
+             irrational results reaching the squeeze",
+        );
+        wprec += increment;
+        increment = wprec >> 1;
+    }
 }
 
 /// Raises a primitive float to a primitive float power, returning a primitive float.
@@ -5173,7 +5545,7 @@ where
     Float: From<T> + PartialOrd<T>,
     for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
 {
-    emulate_rational_float_to_float_fn(Float::rational_pow_prec_ref_val, x, y)
+    emulate_float_to_float_fn(|y2, prec| Float::rational_pow_prec_ref_val(x, y2, prec), y)
 }
 
 /// Raises a primitive float to the power of an [`Integer`], returning a primitive float.
@@ -5279,6 +5651,56 @@ where
     for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
 {
     emulate_float_to_float_fn(|x, prec| x.pow_u_prec(n, prec), x)
+}
+
+/// Raises a [`u64`] to the power of a primitive float, returning a primitive float.
+///
+/// The result is correctly rounded to the nearest value.
+///
+/// $$
+/// f(x,y) = x^y+\varepsilon.
+/// $$
+/// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+/// - If $x^y$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 x^y\rfloor-p}$, where
+///   $p$ is the precision of the output (typically 24 if `T` is a [`f32`] and 53 if `T` is a
+///   [`f64`], but less if the output is subnormal).
+///
+/// Special cases:
+/// - $f(x,0.0)=1.0$ for any $x$
+/// - $f(1,y)=1.0$ for any $y$, even `NaN`
+/// - $f(x,\text{NaN})=\text{NaN}$ if $x \neq 1$
+/// - $f(x,\infty)=\infty$ if $x>1$, and $0.0$ if $x=0$
+/// - $f(x,-\infty)=0.0$ if $x>1$, and $\infty$ if $x=0$
+/// - $f(0,y)=0.0$ if $y>0$, and $\infty$ if $y<0$
+///
+/// If the result overflows, $\infty$ is returned, and if it underflows, $0.0$ is returned.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::arithmetic::pow::primitive_float_unsigned_pow;
+///
+/// assert_eq!(
+///     NiceFloat(primitive_float_unsigned_pow(2, 0.5)),
+///     NiceFloat(1.4142135623730951)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_unsigned_pow(3, 2.5)),
+///     NiceFloat(15.588457268119896)
+/// );
+/// assert_eq!(NiceFloat(primitive_float_unsigned_pow(2, -1.0)), NiceFloat(0.5));
+/// ```
+#[allow(clippy::type_repetition_in_bounds)]
+#[inline]
+pub fn primitive_float_unsigned_pow<T: PrimitiveFloat>(x: u64, y: T) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_float_to_float_fn(|y2, prec| Float::unsigned_pow_prec(x, y2, prec), y)
 }
 
 // Brackets of ln(1 + e) for an exact nonzero Rational e with |e| < 1/2, as exact Rationals, to a
