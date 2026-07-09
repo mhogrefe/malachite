@@ -1,0 +1,35 @@
+error: `Float::ONE` rounds a value that is exact at every precision
+  --> $DIR/redundant_prec_round_of_exact_constant.rs:7:13
+   |
+LL |     let a = Float::from_float_prec_round(Float::ONE, prec, rm).0;
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: use `(Float::one_prec(prec), Equal)`; the rounding mode is dead and the ordering is always `Equal`
+   = note: `#[deny(redundant_prec_round_of_exact_constant)]` on by default
+
+error: `Float::TWO` rounds a value that is exact at every precision
+  --> $DIR/redundant_prec_round_of_exact_constant.rs:8:13
+   |
+LL |     let b = Float::from_float_prec_round(Float::TWO, prec, rm).0;
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: use `(Float::two_prec(prec), Equal)`; the rounding mode is dead and the ordering is always `Equal`
+
+error: `Float::NEGATIVE_ONE` rounds a value that is exact at every precision
+  --> $DIR/redundant_prec_round_of_exact_constant.rs:10:13
+   |
+LL |     let c = Float::from_float_prec(Float::NEGATIVE_ONE, prec).0;
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: use `(Float::negative_one_prec(prec), Equal)`; the rounding mode is dead and the ordering is always `Equal`
+
+error: `Float::ONE_HALF` rounds a value that is exact at every precision
+  --> $DIR/redundant_prec_round_of_exact_constant.rs:12:13
+   |
+LL |     let d = Float::from_float_prec_round(Float::ONE_HALF, prec, rm).0;
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: use `(Float::one_half_prec(prec), Equal)`; the rounding mode is dead and the ordering is always `Equal`
+
+error: aborting due to 4 previous errors
+

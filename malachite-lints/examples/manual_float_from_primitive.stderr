@@ -1,0 +1,22 @@
+error: this is an exact conversion, which is what `Float::from` does
+  --> $DIR/manual_float_from_primitive.rs:6:13
+   |
+LL |     let a = Float::from_unsigned_prec(x, x.significant_bits()).0;
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: use it directly: `Float::from(x)`
+   |
+   = note: `#[deny(manual_float_from_primitive)]` on by default
+
+error: this is an exact conversion, which is what `Float::from` does
+  --> $DIR/manual_float_from_primitive.rs:8:13
+   |
+LL |     let b = Float::from_unsigned_prec(x, x.significant_bits().max(1)).0;
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: use it directly: `Float::from(x)`
+
+error: this is an exact conversion, which is what `Float::from` does
+  --> $DIR/manual_float_from_primitive.rs:10:13
+   |
+LL |     let c = Float::from_signed_prec(y, y.significant_bits()).0;
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: use it directly: `Float::from(y)`
+
+error: aborting due to 3 previous errors
+

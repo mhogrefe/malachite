@@ -23,11 +23,14 @@ mod clone_with_ref_variant;
 mod compare_with_power_of_2;
 mod let_tuple_underscore_to_field;
 mod long_lines;
+mod manual_float_from_primitive;
+mod manual_from_sign_and_abs;
 mod manual_rational_significant_bits;
 mod mul_div_by_power_of_2;
 mod redundant_from_in_comparison;
 mod redundant_from_in_literal_comparison;
 mod redundant_nearest;
+mod redundant_prec_round_of_exact_constant;
 mod runtime_literal_conversion;
 mod use_assign_variant;
 mod use_named_constant;
@@ -230,11 +233,14 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         compare_with_power_of_2::COMPARE_WITH_POWER_OF_2,
         let_tuple_underscore_to_field::LET_TUPLE_UNDERSCORE_TO_FIELD,
         long_lines::LONG_LINES,
+        manual_float_from_primitive::MANUAL_FLOAT_FROM_PRIMITIVE,
+        manual_from_sign_and_abs::MANUAL_FROM_SIGN_AND_ABS,
         manual_rational_significant_bits::MANUAL_RATIONAL_SIGNIFICANT_BITS,
         mul_div_by_power_of_2::MUL_DIV_BY_POWER_OF_2,
         redundant_from_in_comparison::REDUNDANT_FROM_IN_COMPARISON,
         redundant_from_in_literal_comparison::REDUNDANT_FROM_IN_LITERAL_COMPARISON,
         redundant_nearest::REDUNDANT_NEAREST,
+        redundant_prec_round_of_exact_constant::REDUNDANT_PREC_ROUND_OF_EXACT_CONSTANT,
         runtime_literal_conversion::RUNTIME_LITERAL_CONVERSION,
         use_assign_variant::USE_ASSIGN_VARIANT,
         use_named_constant::USE_NAMED_CONSTANT,
@@ -250,6 +256,9 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
     lint_store
         .register_late_pass(|_| Box::new(let_tuple_underscore_to_field::LetTupleUnderscoreToField));
     lint_store.register_late_pass(|_| Box::new(long_lines::LongLines));
+    lint_store
+        .register_late_pass(|_| Box::new(manual_float_from_primitive::ManualFloatFromPrimitive));
+    lint_store.register_late_pass(|_| Box::new(manual_from_sign_and_abs::ManualFromSignAndAbs));
     lint_store.register_late_pass(|_| {
         Box::new(manual_rational_significant_bits::ManualRationalSignificantBits)
     });
@@ -260,6 +269,9 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         Box::new(redundant_from_in_literal_comparison::RedundantFromInLiteralComparison)
     });
     lint_store.register_late_pass(|_| Box::new(redundant_nearest::RedundantNearest));
+    lint_store.register_late_pass(|_| {
+        Box::new(redundant_prec_round_of_exact_constant::RedundantPrecRoundOfExactConstant)
+    });
     lint_store
         .register_late_pass(|_| Box::new(runtime_literal_conversion::RuntimeLiteralConversion));
     lint_store.register_late_pass(|_| Box::new(clone_with_ref_variant::CloneWithRefVariant));

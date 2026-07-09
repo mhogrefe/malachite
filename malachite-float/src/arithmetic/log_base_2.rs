@@ -176,7 +176,7 @@ fn log_base_2_rational_near_power_of_2(
     }
     // eps is nonzero since x is not a power of 2.
     let eps_exp = eps.floor_log_base_2_abs();
-    let k_float = Float::from_signed_prec(k, k.significant_bits()).0;
+    let k_float = Float::from(k);
     let exp_k = i64::from(k_float.get_exponent().unwrap());
     // |log_2(1 + eps)| < 3|eps| < 2^(eps_exp + 3), so passing err = exp_k - eps_exp - 3 to
     // `float_round_near_x` (which requires |offset| < 2^(exp_k - err)) is sound.
