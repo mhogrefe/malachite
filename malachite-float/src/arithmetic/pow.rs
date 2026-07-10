@@ -17,6 +17,7 @@
 use crate::ComparableFloatRef;
 use crate::InnerFloat::{Infinity, NaN, Zero};
 use crate::arithmetic::exp::{exp_overflow, exp_underflow, one_neighbor};
+use crate::arithmetic::ln::ln_1_plus_rational_brackets;
 use crate::arithmetic::log_base_2::log_2_rational_brackets;
 use crate::emulate_float_float_to_float_fn;
 use crate::emulate_float_to_float_fn;
@@ -189,11 +190,18 @@ fn pow_pos_natural(
             if exceptional {
                 // overflow or underflow: the sign and the exceptional value are already correct
                 if !is_zero {
-                    // The growing regime rounds toward zero (lower bounds), and the entry check
-                    // bounds the true value below 2^MAX_EXPONENT.
+                    // The growing regime rounds toward zero (lower bounds), and the callers decide
+                    // the overflow boundary exactly before descending here.
                     fail_on_untested_path("pow_pos_natural, overflow");
                 }
-                let o = if is_zero { Less } else { Greater };
+                // A zero lies toward zero from the true value and an infinity away from it, so the
+                // ternary depends on the sign: +0 and -inf are less than the true value, -0 and
+                // +inf greater.
+                let o = if is_zero == res.is_sign_positive() {
+                    Less
+                } else {
+                    Greater
+                };
                 return (res, o);
             }
             return Float::from_float_prec_round(res, prec, rm);
@@ -296,6 +304,18 @@ fn pow_integer(x: &Float, z: &Integer, prec: u64, rm: RoundingMode) -> (Float, O
     if est < const { Float::MIN_EXPONENT as f64 - 64.0 } {
         return pow_underflow(prec, if rm == Nearest { Down } else { rm }, negative);
     }
+    // Within the estimate's error margin of MAX_EXPONENT the overflow question is still open, and
+    // it must be decided here: every rounding used by `pow_pos_natural`'s growing regime and by the
+    // reciprocal path below decreases the magnitude, so an overflow would saturate at the largest
+    // finite value instead of reaching infinity, and the saturated all-ones significand is one that
+    // `float_can_round` never certifies -- the Ziv loop would grow forever. (Underflow needs no
+    // such decision: magnitude-decreasing rounding turns a true underflow into an exact zero, which
+    // the loops detect directly.) The check mirrors the role of MPFR's overflow flag.
+    if est >= const { Float::MAX_EXPONENT as f64 - 66.0 }
+        && pow_exponent_at_least(x, z, i64::from(Float::MAX_EXPONENT))
+    {
+        return pow_overflow(prec, rm, negative);
+    }
     if z_pos {
         let (result, o) = pow_pos_natural(x, z.unsigned_abs_ref(), prec, rm, true);
         if result.is_zero() {
@@ -323,15 +343,17 @@ fn pow_integer(x: &Float, z: &Integer, prec: u64, rm: RoundingMode) -> (Float, O
         loop {
             let t = Float::ONE.div_prec_round_val_ref(x, wprec, rnd1).0;
             if t.is_infinite() {
-                // For |x| < 1 the reciprocal is rounded toward zero and cannot reach infinity; for
-                // |x| >= 1 it is at most 1.
+                // For |x| < 1 the reciprocal is rounded toward zero, so an overflowing 1/x
+                // saturates at the largest finite value rather than reaching infinity (and the
+                // exact overflow decision above has already returned in that case); for |x| >= 1 it
+                // is at most 1.
                 fail_on_untested_path("pow_integer, 1/x overflow");
                 return pow_overflow(prec, rm, t.is_sign_negative());
             }
             let t = pow_pos_natural(&t, abs_z, wprec, rm, false).0;
             if t.is_infinite() {
-                // The entry check bounds |x^y| < 2^MAX_EXPONENT, and the magnitude-decreasing
-                // rounding directions keep the computed value below it.
+                // The exact overflow decision above bounds |x^z| < 2^MAX_EXPONENT, and the
+                // magnitude-decreasing rounding directions keep the computed value below it.
                 fail_on_untested_path("pow_integer, (1/x)^|z| overflow");
                 return pow_overflow(prec, rm, t.is_sign_negative());
             }
@@ -576,6 +598,15 @@ fn pow_s_ref(x: &Float, n: i64, prec: u64, rm: RoundingMode) -> (Float, Ordering
 // This is `mpfr_ui_pow_ui` from `ui_pow_ui.c`, MPFR 4.3.0: k^n for `u64` k and n, as a Float, by
 // binary exponentiation (all roundings up, so the result is a magnitude over-estimate), falling
 // back to `pow_integer` (`mpfr_pow_z`) on overflow. Since k, n >= 0 the result never underflows.
+//
+// The error budget deliberately deviates from MPFR, whose accounting (one rounding for the initial
+// value plus one per squaring, size_n in all) undercounts: the initial rounding of k is amplified
+// to the n-th power through the squarings, and the multiplications contribute up to size_n - 1 more
+// factors, for at most 2n - 1 < 2^(size_n + 1) Higham factors in all -- a relative error below
+// 2^(size_n + 2 - wprec), so size_n + 2 bits are reserved. With MPFR's budget the `float_can_round`
+// gate certifies wrongly rounded results at small precisions (upstream mpfr_ui_pow_ui reproduces
+// this: 263^15 at precision 1 under `Nearest` returns 2^121 though the true value lies below the
+// tie 1.5 * 2^120, and 205^63 at precision 4 under `Down` returns a value above the true one).
 fn unsigned_pow_unsigned(k: u64, n: u64, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
     if n == 0 {
         // k^0 = 1 for any k
@@ -588,7 +619,7 @@ fn unsigned_pow_unsigned(k: u64, n: u64, prec: u64, rm: RoundingMode) -> (Float,
     let size_n = n.significant_bits();
     // k as an exact Float, for the multiplications.
     let kf = Float::from(k);
-    let mut wprec = prec + 3 + size_n;
+    let mut wprec = prec + 5 + size_n;
     loop {
         // res starts as k (rounded up), contributing the most significant bit of n.
         let (mut res, o) = Float::from_unsigned_prec_round(k, wprec, Ceiling);
@@ -605,7 +636,8 @@ fn unsigned_pow_unsigned(k: u64, n: u64, prec: u64, rm: RoundingMode) -> (Float,
             // `pow_integer`, which handles the exponent range precisely.
             return kf.pow_integer_prec_round(Integer::from(n), prec, rm);
         }
-        if !inexact || float_can_round(res.significand_ref().unwrap(), wprec - size_n, prec, rm) {
+        if !inexact || float_can_round(res.significand_ref().unwrap(), wprec - size_n - 2, prec, rm)
+        {
             return Float::from_float_prec_round(res, prec, rm);
         }
         wprec += wprec >> 1;
@@ -642,6 +674,84 @@ fn pow_is_exact(x: &Float, y: &Float, prec: u64, rm: RoundingMode) -> Option<(Fl
     Some(pow_integer(&tmp, &c, prec, rm))
 }
 
+// Resolves |x|^y when the true product y * ln|x| lies at or below the bottom of the Float exponent
+// range. In that regime the Ziv loop's Ceiling-rounded product either underflows to -0.0 (making
+// exp return exactly 1, whose all-zero error window `float_can_round` can never certify -- an
+// infinite loop) or saturates at the minimum positive value (an overestimate whose error the loop's
+// budget does not account for, letting it certify a wrongly rounded result near the `Nearest` tie).
+// MPFR computes the product in an extended exponent range; malachite has none, so the tiny-product
+// case is resolved in exact Rational arithmetic, which has no exponent range at all.
+//
+// The true result is 1 + delta with 0 < |delta| <= 2^(MIN_EXPONENT + 1). Exact dyadic results --
+// including `Nearest` ties, which are dyadic -- are delegated to `pow_is_exact`; the remaining
+// values are irrationals strictly between any rounding boundaries, so bracketing exp(t) between the
+// exact Rationals 1 + t_lo and 1 + t_hi + t_hi^2 (valid for |t| <= 1/2) and widening the ln|x|
+// brackets Ziv-style always terminates. For |x| within a sliver of 1, ln|x| is bracketed by the
+// exact atanh-series helper -- a direct `ln` would need working precision on the order of the
+// sliver's depth (up to ~2^30 bits) to survive the cancellation.
+fn pow_general_tiny_product(
+    abs_x: &Float,
+    y: &Float,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    // y is never an integer here: the entry's sliver-of-one guard keeps |ln|x|| >= 2^(MIN_EXPONENT
+    // + 8), so an integer y (with |y| >= 1) cannot make the product underflow.
+    if let Some(result) = pow_is_exact(abs_x, y, prec, rm) {
+        return result;
+    }
+    let yr = Rational::exact_from(y);
+    let y_pos = *y > 0u32;
+    // Classify |x| as near 1 or not with a cheap low-precision subtraction; near the threshold
+    // either branch is correct, so the classification need not be exact.
+    let near_one = abs_x
+        .sub_prec_ref_val(Float::ONE, 64)
+        .0
+        .get_exponent()
+        .unwrap()
+        < -8;
+    let e = if near_one {
+        Some(Rational::exact_from(abs_x) - Rational::ONE)
+    } else {
+        None
+    };
+    let mut wp = 128;
+    loop {
+        // ln_lo <= ln|x| <= ln_hi, as exact Rationals
+        let (ln_lo, ln_hi) = if let Some(e) = &e {
+            ln_1_plus_rational_brackets(e, wp)
+        } else {
+            (
+                Rational::exact_from(abs_x.ln_prec_round_ref(wp, Floor).0),
+                Rational::exact_from(abs_x.ln_prec_round_ref(wp, Ceiling).0),
+            )
+        };
+        // t_lo <= y ln|x| <= t_hi
+        let (t_lo, t_hi) = if y_pos {
+            (&yr * ln_lo, &yr * ln_hi)
+        } else {
+            (&yr * ln_hi, &yr * ln_lo)
+        };
+        // 1 + t <= exp(t) <= 1 + t + t^2 for |t| <= 1/2
+        let lower = Rational::ONE + &t_lo;
+        let upper = Rational::ONE + &t_hi + (&t_hi).square();
+        let (p_lo, mut o_lo) = Float::from_rational_prec_round(lower, prec, rm);
+        let (p_hi, mut o_hi) = Float::from_rational_prec_round(upper, prec, rm);
+        // A bracket end landing exactly on a representable value rounds with `Equal`; the true
+        // value lies strictly between the ends, so the other end's ordering is the true one.
+        if o_lo == Equal {
+            o_lo = o_hi;
+        }
+        if o_hi == Equal {
+            o_hi = o_lo;
+        }
+        if o_lo == o_hi && ComparableFloatRef(&p_lo) == ComparableFloatRef(&p_hi) {
+            return (p_lo, o_lo);
+        }
+        wp <<= 1;
+    }
+}
+
 // This is `mpfr_pow_general` from `pow.c`, MPFR 4.3.0: the Ziv loop computing exp(y * ln|x|), with
 // a scaling factor 2^k to dodge intermediate overflow and underflow.
 fn pow_general(
@@ -661,6 +771,36 @@ fn pow_general(
         }
     }
     let mut wprec = prec + 9 + prec.ceiling_log_base_2();
+    // Pre-detect a product y * ln|x| below the exponent range, without first computing ln|x| at
+    // working precision: for |x| within a deep sliver of 1 that ln costs on the order of |log2(|x|
+    // - 1)| bits of internal precision (up to ~2^30) only for the product to underflow anyway. The
+    // exponent estimate errs on the side of not firing; the in-loop detection below is the
+    // backstop.
+    {
+        let ey = i64::from(y.get_exponent().unwrap());
+        let d = abs_x.sub_prec_ref_val(Float::ONE, 64).0;
+        let d_exp = i64::from(d.get_exponent().unwrap());
+        // the exponent of ln|x|, within ~1: for |x| near 1, ln|x| ~ |x| - 1; otherwise |ln|x|| >
+        // 2^-9 and a 64-bit ln suffices
+        let ln_exp = if d_exp < -8 {
+            d_exp
+        } else {
+            i64::from(abs_x.ln_prec_round_ref(64, Floor).0.get_exponent().unwrap())
+        };
+        // Product exponents add within 1 (exp(a * b) is exp(a) + exp(b) or one less), and ln_exp
+        // itself is accurate within ~1, so trigger with a couple of binades of margin.
+        // Over-triggering is harmless: the resolver is correct for any small product, and for the
+        // borderline (bottom-binade but representable) products the x involved is deep within a
+        // near-sliver of 1, where the loop's `ln` would need catastrophic working precision anyway.
+        if ey.saturating_add(ln_exp) <= i64::from(Float::MIN_EXPONENT) + 2 {
+            let (mut result, mut o) = pow_general_tiny_product(&abs_x, y, prec, rm);
+            if neg_result {
+                result.neg_assign();
+                o = o.reverse();
+            }
+            return (result, o);
+        }
+    }
     let mut k: Option<Integer> = None;
     let mut check_exact_case = false;
     let mut exact_case = false;
@@ -672,6 +812,17 @@ fn pow_general(
             .ln_prec_round_ref(wprec, if y.is_sign_negative() { Floor } else { Ceiling })
             .0;
         t.mul_prec_round_assign_ref(y, wprec, Ceiling);
+        // A product below the exponent range comes back as -0.0 (negative underflow) or saturated
+        // at the minimum positive value (positive underflow); both derail the loop, so resolve them
+        // exactly. (A genuine product equal to the minimum positive value takes this path too,
+        // harmlessly.)
+        if k.is_none()
+            && (t.is_zero()
+                || (t.get_exponent() == Some(Float::MIN_EXPONENT) && raw_power_of_2(&t)))
+        {
+            (result, o) = pow_general_tiny_product(&abs_x, y, prec, rm);
+            break;
+        }
         let exp_t = t.get_exponent().map_or(0, i64::from);
         if let Some(kv) = &k {
             t.sub_prec_round_assign(
@@ -806,6 +957,37 @@ fn float_to_odd_mantissa_and_exponent_natural(x: &Float) -> (Natural, i64) {
     let e = i64::from(x.get_exponent().unwrap()) - i64::exact_from(m.significant_bits());
     let tz = m.trailing_zeros().unwrap();
     (m >> tz, e + i64::exact_from(tz))
+}
+
+// Decides exactly whether z * log2|x| >= bound -- equivalently, whether |x|^z >= 2^bound -- for a
+// finite nonzero x that is not a power of 2 and a nonzero z. Writing |x| = a * 2^b with a odd (and
+// a >= 3, since x is not a power of 2), log2|x| = b + log2(a), and log2(a) is bracketed between
+// exact Rationals at widening precision. log2(a) is irrational, so z * (b + log2(a)) never equals
+// the integer bound and the comparison always resolves.
+fn pow_exponent_at_least(x: &Float, z: &Integer, bound: i64) -> bool {
+    let (a, b) = float_to_odd_mantissa_and_exponent_natural(&x.abs());
+    debug_assert!(a > 1u32);
+    let ar = Rational::from(a);
+    let zr = Rational::from(z);
+    let br = Rational::from(b);
+    let bound_r = Rational::from(bound);
+    let z_pos = *z > 0u32;
+    let mut wprec = 128;
+    loop {
+        let (l_lo, l_hi) = log_2_rational_brackets(&ar, wprec);
+        let (t_lo, t_hi) = if z_pos {
+            (&zr * (&br + l_lo), &zr * (&br + l_hi))
+        } else {
+            (&zr * (&br + l_hi), &zr * (&br + l_lo))
+        };
+        if t_lo >= bound_r {
+            return true;
+        }
+        if t_hi < bound_r {
+            return false;
+        }
+        wprec <<= 1;
+    }
 }
 
 // If `|x|` is a sliver of 1 -- within a couple of binades of the smallest positive `Float`, where
@@ -5106,6 +5288,9 @@ impl Float {
     /// assert_eq!(p.to_string(), "15.588457268119894");
     /// assert_eq!(o, Less);
     /// ```
+    ///
+    /// This is equivalent to `mpfr_ui_pow` from `ui_pow.c`, MPFR 4.3.0, which likewise converts the
+    /// integer exactly and delegates to `mpfr_pow`.
     pub fn unsigned_pow_prec_round(
         x: u64,
         y: Self,
@@ -5536,65 +5721,9 @@ fn unsigned_pow_rational(k: u64, q: &Rational, prec: u64, rm: RoundingMode) -> (
         let a = Integer::from_sign_and_abs_ref(*q >= 0, q.numerator_ref());
         return Float::from(j).pow_integer_prec_round(a, prec, rm);
     }
-    // The remaining results are irrational; squeeze 2^(q * log2(k)) between exact Rationals.
-    unsigned_pow_rational_squeeze(k, q, prec, rm)
-}
-
-// The squeeze for an irrational k^q (k >= 2 not a power of 2, q nonzero and not making k^q
-// rational): brackets t = q * log2(k) between exact Rationals via `log_2_rational_brackets`, then
-// applies `Float::power_of_2_rational_prec_round` (which itself handles the exponent boundaries) to
-// both ends, growing the working precision until the ends agree. Since k >= 2, log2(k) >= 1, so
-// there is no sub-`MIN_EXPONENT` logarithm to contend with.
-fn unsigned_pow_rational_squeeze(
-    k: u64,
-    q: &Rational,
-    prec: u64,
-    rm: RoundingMode,
-) -> (Float, Ordering) {
-    let kr = Rational::from(k);
-    let positive = *q > 0u32;
-    let mut wprec = prec.saturating_add(Limb::WIDTH << 1);
-    let mut increment = Limb::WIDTH;
-    loop {
-        let (l_lo, l_hi) = log_2_rational_brackets(&kr, wprec);
-        let (t_lo, t_hi) = if positive {
-            (q * l_lo, q * l_hi)
-        } else {
-            (q * l_hi, q * l_lo)
-        };
-        let (p_lo, mut o_lo) = Float::power_of_2_rational_prec_round(t_lo, prec, rm);
-        let (p_hi, mut o_hi) = Float::power_of_2_rational_prec_round(t_hi, prec, rm);
-        // A bracket end landing exactly on a representable power rounds with `Equal`; the true
-        // value lies strictly between the ends, so the other end's ordering is the true one.
-        if o_lo == Equal {
-            fail_on_untested_path(
-                "unsigned_pow_rational_squeeze, sq_lo_eq: exact results (t an integer) \
-                 are caught by the power-of-2 and perfect-power routes before the \
-                 squeeze, so t is never an integer here; a bracket end equalling an \
-                 integer is a measure-zero coincidence of the log brackets",
-            );
-            o_lo = o_hi;
-        }
-        if o_hi == Equal {
-            fail_on_untested_path(
-                "unsigned_pow_rational_squeeze, sq_hi_eq: as sq_lo_eq -- t is never an \
-                 integer in the squeeze, so a bracket end equalling one is a \
-                 measure-zero coincidence",
-            );
-            o_hi = o_lo;
-        }
-        if o_lo == o_hi && ComparableFloatRef(&p_lo) == ComparableFloatRef(&p_hi) {
-            return (p_lo, o_lo);
-        }
-        fail_on_untested_path(
-            "unsigned_pow_rational_squeeze, sq_grow: the initial working precision prec \
-             + 128 resolves every non-pathological result; iterating would require k^q \
-             within 2^-(prec+128) of a rounding boundary, measure-zero for the \
-             irrational results reaching the squeeze",
-        );
-        wprec += increment;
-        increment = wprec >> 1;
-    }
+    // The remaining results are irrational; squeeze 2^(q * log2(k)) between exact Rationals. Since
+    // k >= 2, log2(k) >= 1, so there is no sub-`MIN_EXPONENT` logarithm to contend with.
+    pow_squeeze_t(&Rational::from(k), 0, q, prec, rm)
 }
 
 /// Raises a primitive float to a primitive float power, returning a primitive float.
@@ -5991,44 +6120,48 @@ fn rational_pow_squeeze_x(
     }
 }
 
-// The extreme-regime squeeze: x = x' * 2^e with x' in [1/sqrt(2), sqrt(2)) an exact Rational (close
-// to 1) and e beyond (or near) the Float exponent range, y finite and nonzero, and x^y not a dyadic
-// rational. Brackets t = y * (e + log2(x')) between exact Rationals -- Rationals have no exponent
-// range, so no underflow or overflow can occur here -- and applies
-// `Float::power_of_2_rational_prec_round` to both ends, which itself handles results at or beyond
-// the exponent boundaries.
-fn rational_pow_squeeze_t(
+// The shared rational-exponent squeeze: computes (x' * 2^e)^y for an exact Rational x' whose binary
+// logarithm `log_2_rational_brackets` can bracket, an integer e, and an exact Rational exponent y
+// (finite and nonzero), assuming the true result is irrational. Brackets t = y * (e + log2(x'))
+// between exact Rationals -- Rationals have no exponent range, so no underflow or overflow can
+// occur here -- and applies `Float::power_of_2_rational_prec_round` to both ends, which itself
+// handles results at or beyond the exponent boundaries, growing the working precision until the
+// ends agree. `rational_pow` reaches this in its extreme regime with x' in [1/sqrt(2), sqrt(2));
+// `unsigned_pow_rational` reaches it with x' = k and e = 0. Growth past the initial precision is
+// rare but constructible: 6^(1 + 2^-300) lies within 2^-300 of the rounding boundary 6.0, so the
+// first bracket straddles it at any target precision below ~300.
+fn pow_squeeze_t(
     xp: &Rational,
     e: i64,
-    y: &Float,
+    y: &Rational,
     prec: u64,
     rm: RoundingMode,
 ) -> (Float, Ordering) {
-    let yr = Rational::exact_from(y);
     let er = Rational::from(e);
     let mut wprec = prec.saturating_add(Limb::WIDTH << 1);
     let mut increment = Limb::WIDTH;
     loop {
         let (l_lo, l_hi) = log_2_rational_brackets(xp, wprec);
         let (t_lo, t_hi) = if *y > 0u32 {
-            (&yr * (&er + l_lo), &yr * (&er + l_hi))
+            (y * (&er + l_lo), y * (&er + l_hi))
         } else {
-            (&yr * (&er + l_hi), &yr * (&er + l_lo))
+            (y * (&er + l_hi), y * (&er + l_lo))
         };
         let (p_lo, mut o_lo) = Float::power_of_2_rational_prec_round(t_lo, prec, rm);
         let (p_hi, mut o_hi) = Float::power_of_2_rational_prec_round(t_hi, prec, rm);
+        // A bracket end landing exactly on a representable power rounds with `Equal`; the true
+        // value lies strictly between the ends, so the other end's ordering is the true one.
         if o_lo == Equal {
             fail_on_untested_path(
-                "rational_pow, sqt_lo_eq: exact power-of-2 results (t an integer) are caught by \
-                 the exact decomposition before squeeze_t, so t is never an integer here; a \
-                 bracket end equalling an integer is a measure-zero coincidence of the log \
-                 brackets",
+                "pow_squeeze_t, lo_eq: exact results (t an integer) are caught by each caller's \
+                 exact decomposition before the squeeze, so t is never an integer here; a bracket \
+                 end equalling an integer is a measure-zero coincidence of the log brackets",
             );
             o_lo = o_hi;
         }
         if o_hi == Equal {
             fail_on_untested_path(
-                "rational_pow, sqt_hi_eq: as sqt_lo_eq -- t is never an integer in squeeze_t, so a \
+                "pow_squeeze_t, hi_eq: as lo_eq -- t is never an integer in the squeeze, so a \
                  bracket end equalling one is a measure-zero coincidence",
             );
             o_hi = o_lo;
@@ -6036,11 +6169,6 @@ fn rational_pow_squeeze_t(
         if o_lo == o_hi && ComparableFloatRef(&p_lo) == ComparableFloatRef(&p_hi) {
             return (p_lo, o_lo);
         }
-        fail_on_untested_path(
-            "rational_pow, sqt_grow: the initial working precision prec + 128 resolves every \
-             non-pathological result; iterating would require x^y within 2^-(prec+128) of a \
-             rounding boundary, measure-zero for the irrational results reaching squeeze_t",
-        );
         wprec += increment;
         increment = wprec >> 1;
     }
@@ -6057,8 +6185,18 @@ fn rational_pow_exact(
     rm: RoundingMode,
 ) -> Option<(Float, Ordering)> {
     let zu = u64::try_from(z).ok()?;
-    let bits = m.significant_bits().checked_mul(zu)?;
-    if bits > prec + 2 {
+    // The rejection must use a *lower* bound on the significant bits of m^z: returning `None`
+    // asserts that the result is neither representable at `prec` nor a `Nearest` tie (both need at
+    // most prec + 2 significant bits), and the caller then squeezes -- which never terminates on a
+    // representable value or a tie. Since m >= 2^(sb(m) - 1), m^z >= 2^(z * (sb(m) - 1)), so
+    // sb(m^z) >= z * (sb(m) - 1) + 1. (An upper bound like z * sb(m) is unsound here: it
+    // overestimates sb(m^z) by up to z - 1 bits, letting exactly-representable results and ties
+    // leak into the squeeze.) The materialization below stays cheap: the caller has peeled
+    // power-of-2 bases, so m is odd and m >= 3, hence sb(m) >= 2 and any admitted z satisfies z <=
+    // z * (sb(m) - 1) <= prec + 1, giving sb(m^z) <= z * sb(m) <= 2 * prec + 2.
+    debug_assert!(*m > 1u32 && m.odd());
+    let bits_lower = (m.significant_bits() - 1).checked_mul(zu)?.checked_add(1)?;
+    if bits_lower > prec + 2 {
         return None;
     }
     let value = m.clone().pow(zu);
@@ -6359,7 +6497,7 @@ impl Float {
             // (rounded to the nearest, so the mantissa is close to 1) and work with exact Rationals
             // in the exponent.
             let (xp, g) = rational_mantissa_nearest_power_of_2(x);
-            rational_pow_squeeze_t(&xp, g, y, prec, rm)
+            pow_squeeze_t(&xp, g, &Rational::exact_from(y), prec, rm)
         }
     }
 

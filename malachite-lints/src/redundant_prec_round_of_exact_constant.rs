@@ -50,6 +50,8 @@ declare_lint_pass!(RedundantPrecRoundOfExactConstant => [REDUNDANT_PREC_ROUND_OF
 // If `e` is a path to a named `Float` constant that is exact at every precision, returns the name
 // of its dedicated `*_prec` constructor.
 fn prec_constructor_for<'tcx>(cx: &LateContext<'tcx>, e: &'tcx Expr<'tcx>) -> Option<&'static str> {
+    // Peel `&` layers so the by-reference spelling `&Float::ONE` is recognized too.
+    let e = e.peel_borrows();
     let ExprKind::Path(qpath) = &e.kind else {
         return None;
     };
@@ -71,7 +73,7 @@ fn prec_constructor_for<'tcx>(cx: &LateContext<'tcx>, e: &'tcx Expr<'tcx>) -> Op
 
 impl<'tcx> LateLintPass<'tcx> for RedundantPrecRoundOfExactConstant {
     fn check_expr(&mut self, cx: &LateContext<'tcx>, expr: &'tcx Expr<'tcx>) {
-        if expr.span.from_expansion() || crate::in_test_code(cx, expr.span) {
+        if expr.span.from_expansion() {
             return;
         }
         let ExprKind::Call(callee, args) = expr.kind else {
@@ -88,12 +90,21 @@ impl<'tcx> LateLintPass<'tcx> for RedundantPrecRoundOfExactConstant {
             return;
         };
         let fn_name = cx.tcx.item_name(fn_did);
-        if !matches!(fn_name.as_str(), "from_float_prec_round" | "from_float_prec") {
+        if !matches!(
+            fn_name.as_str(),
+            "from_float_prec_round"
+                | "from_float_prec"
+                | "from_float_prec_round_ref"
+                | "from_float_prec_ref"
+        ) {
             return;
         }
         let Some(ctor) = prec_constructor_for(cx, c) else {
             return;
         };
+        if crate::in_test_code(cx, expr.span) {
+            return;
+        }
         span_lint_and_help(
             cx,
             REDUNDANT_PREC_ROUND_OF_EXACT_CONSTANT,

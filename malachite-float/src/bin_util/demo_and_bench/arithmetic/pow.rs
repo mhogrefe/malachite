@@ -49,13 +49,17 @@ use malachite_float::test_util::generators::{
     float_float_unsigned_rounding_mode_quadruple_gen_var_10, float_float_unsigned_triple_gen_var_1,
     float_float_unsigned_triple_gen_var_1_rm, float_float_unsigned_triple_gen_var_2,
     float_integer_pair_gen, float_integer_unsigned_rounding_mode_quadruple_gen_var_1,
+    float_integer_unsigned_rounding_mode_quadruple_gen_var_2,
     float_integer_unsigned_triple_gen_var_1, float_pair_gen, float_pair_gen_rm,
     float_pair_gen_var_10, float_rational_unsigned_rounding_mode_quadruple_gen_var_1,
     float_rational_unsigned_triple_gen_var_1, float_signed_pair_gen,
     float_signed_unsigned_rounding_mode_quadruple_gen_var_11,
+    float_signed_unsigned_rounding_mode_quadruple_gen_var_12,
     float_signed_unsigned_triple_gen_var_1, float_unsigned_pair_gen,
     float_unsigned_unsigned_rounding_mode_quadruple_gen_var_9,
+    float_unsigned_unsigned_rounding_mode_quadruple_gen_var_10,
     float_unsigned_unsigned_rounding_mode_quadruple_gen_var_11,
+    float_unsigned_unsigned_rounding_mode_quadruple_gen_var_12,
     float_unsigned_unsigned_triple_gen_var_1,
     rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_2,
     unsigned_unsigned_unsigned_rounding_mode_quadruple_gen_var_1,
@@ -75,6 +79,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_primitive_float_demos!(runner, demo_primitive_float_pow_u);
     register_primitive_float_demos!(runner, demo_primitive_float_unsigned_pow);
     register_demo!(runner, demo_float_pow);
+    register_demo!(runner, demo_float_unsigned_pow_prec_round_extreme);
+    register_demo!(runner, demo_float_unsigned_pow_prec_extreme);
     register_demo!(runner, demo_float_unsigned_pow_rational_prec_round);
     register_demo!(runner, demo_float_unsigned_pow_rational_prec_round_debug);
     register_demo!(runner, demo_float_unsigned_pow_rational_prec);
@@ -93,6 +99,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_unsigned_pow_unsigned_prec_debug);
     register_bench!(runner, benchmark_float_unsigned_pow_unsigned_prec_round);
     register_bench!(runner, benchmark_float_unsigned_pow_unsigned_prec);
+    register_demo!(runner, demo_float_pow_s_prec_round_extreme);
+    register_demo!(runner, demo_float_pow_s_prec_extreme);
     register_demo!(runner, demo_float_pow_s_prec_round);
     register_demo!(runner, demo_float_pow_s_prec_round_debug);
     register_demo!(runner, demo_float_pow_s_prec);
@@ -105,6 +113,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_float_pow_s_prec_round);
     register_bench!(runner, benchmark_float_pow_s_prec);
     register_bench!(runner, benchmark_float_pow_s_evaluation_strategy);
+    register_demo!(runner, demo_float_pow_u_prec_round_extreme);
+    register_demo!(runner, demo_float_pow_u_prec_extreme);
     register_demo!(runner, demo_float_pow_u_prec_round);
     register_demo!(runner, demo_float_pow_u_prec_round_debug);
     register_demo!(runner, demo_float_pow_u_prec);
@@ -117,6 +127,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_float_pow_u_prec_round);
     register_bench!(runner, benchmark_float_pow_u_prec);
     register_bench!(runner, benchmark_float_pow_u_evaluation_strategy);
+    register_demo!(runner, demo_float_pow_integer_prec_round_extreme);
+    register_demo!(runner, demo_float_pow_integer_prec_extreme);
     register_demo!(runner, demo_float_pow_integer_prec_round);
     register_demo!(runner, demo_float_pow_integer_prec_round_debug);
     register_demo!(runner, demo_float_pow_integer_prec);
@@ -2585,4 +2597,138 @@ fn benchmark_float_unsigned_pow_rational_prec(
             no_out!(Float::unsigned_pow_rational_prec(k, q, prec));
         })],
     );
+}
+
+fn demo_float_unsigned_pow_prec_round_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (y, x, prec, rm) in float_unsigned_unsigned_rounding_mode_quadruple_gen_var_12()
+        .get(gm, config)
+        .take(limit)
+    {
+        let y_old = y.clone();
+        println!(
+            "Float::unsigned_pow_prec_round({}, {}, {}, {}) = {:?}",
+            x,
+            y_old,
+            prec,
+            rm,
+            Float::unsigned_pow_prec_round(x, y, prec, rm)
+        );
+    }
+}
+
+fn demo_float_unsigned_pow_prec_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (y, x, prec, _) in float_unsigned_unsigned_rounding_mode_quadruple_gen_var_12()
+        .get(gm, config)
+        .take(limit)
+    {
+        let y_old = y.clone();
+        println!(
+            "Float::unsigned_pow_prec({}, {}, {}) = {:?}",
+            x,
+            y_old,
+            prec,
+            Float::unsigned_pow_prec(x, y, prec)
+        );
+    }
+}
+
+fn demo_float_pow_u_prec_round_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, n, prec, rm) in float_unsigned_unsigned_rounding_mode_quadruple_gen_var_10()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        println!(
+            "({}).pow_u_prec_round({}, {}, {}) = {:?}",
+            x_old,
+            n,
+            prec,
+            rm,
+            x.pow_u_prec_round(n, prec, rm)
+        );
+    }
+}
+
+fn demo_float_pow_u_prec_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, n, prec, _) in float_unsigned_unsigned_rounding_mode_quadruple_gen_var_10()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        println!(
+            "({}).pow_u_prec({}, {}) = {:?}",
+            x_old,
+            n,
+            prec,
+            x.pow_u_prec(n, prec)
+        );
+    }
+}
+
+fn demo_float_pow_s_prec_round_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, n, prec, rm) in float_signed_unsigned_rounding_mode_quadruple_gen_var_12()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        println!(
+            "({}).pow_s_prec_round({}, {}, {}) = {:?}",
+            x_old,
+            n,
+            prec,
+            rm,
+            x.pow_s_prec_round(n, prec, rm)
+        );
+    }
+}
+
+fn demo_float_pow_s_prec_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, n, prec, _) in float_signed_unsigned_rounding_mode_quadruple_gen_var_12()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        println!(
+            "({}).pow_s_prec({}, {}) = {:?}",
+            x_old,
+            n,
+            prec,
+            x.pow_s_prec(n, prec)
+        );
+    }
+}
+
+fn demo_float_pow_integer_prec_round_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, z, prec, rm) in float_integer_unsigned_rounding_mode_quadruple_gen_var_2()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let z_old = z.clone();
+        println!(
+            "({}).pow_integer_prec_round({}, {}, {}) = {:?}",
+            x_old,
+            z_old,
+            prec,
+            rm,
+            x.pow_integer_prec_round(z, prec, rm)
+        );
+    }
+}
+
+fn demo_float_pow_integer_prec_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, z, prec, _) in float_integer_unsigned_rounding_mode_quadruple_gen_var_2()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let z_old = z.clone();
+        println!(
+            "({}).pow_integer_prec({}, {}) = {:?}",
+            x_old,
+            z_old,
+            prec,
+            x.pow_integer_prec(z, prec)
+        );
+    }
 }

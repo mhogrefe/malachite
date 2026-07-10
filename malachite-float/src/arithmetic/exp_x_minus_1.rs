@@ -54,6 +54,16 @@ fn exp_x_minus_1_prec_round_normal(x: &Float, prec: u64, rm: RoundingMode) -> (F
             return result;
         }
     }
+    // x negative in the smallest binade: |expm1(x)| < |x| can fall below the smallest positive
+    // Float even though x is representable, and the subtraction in the general loop below would
+    // saturate at exactly -min_positive -- a power-of-2 significand whose all-zero error window
+    // `float_can_round` never certifies, so the loop would grow forever. (This mirrors
+    // `power_of_2_x_minus_1`'s smallest-binade guard; positive x needs none, since expm1(x) > x.)
+    // The rational near-zero helper computes the result exactly, underflow rounding included; it is
+    // only reached when the shortcut above failed, i.e. at prec >= -MIN_EXPONENT.
+    if x.is_sign_negative() && ex == i64::from(Float::MIN_EXPONENT) {
+        return exp_x_minus_1_rational_near_zero(&Rational::exact_from(x), prec, rm);
+    }
     // The result is never exactly representable for finite nonzero x.
     assert_ne!(rm, Exact, "Inexact exp_x_minus_1");
     const BP: u64 = 64;
@@ -69,14 +79,31 @@ fn exp_x_minus_1_prec_round_normal(x: &Float, prec: u64, rm: RoundingMode) -> (F
         // the magnitude past `MAX_EXPONENT` and overflow to -infinity, whereas `Ceiling` saturates
         // to the largest finite value.
         let t = x.div_prec_round_ref_val(log2_up, BP, Ceiling).0; // > x / ln(2)
-        // err = -ceil(t), clamped to at most MAX_EXPONENT (avoiding overflow for huge |x|).
-        let neg_ceil = -Integer::rounding_from(&t, Ceiling).0;
-        const MAX_EXP: Integer = Integer::const_from_signed(Float::MAX_EXPONENT as SignedLimb);
-        let clamped = neg_ceil >= MAX_EXP;
-        let err = if clamped {
-            u64::exact_from(Float::MAX_EXPONENT)
+        // err = -ceil(t), clamped to at most MAX_EXPONENT. When |t| >= 2^31 > MAX_EXPONENT the
+        // clamp is decided from t's exponent alone: materializing t as an Integer just to compare
+        // it against a 31-bit constant would allocate up to ~2^30 bits (~128 MB) for hugely
+        // negative x. s_est is a lower bound on |x| / ln(2), used by the deep-negative helper.
+        let exp_t = i64::from(t.get_exponent().unwrap());
+        let (clamped, err, s_est) = if exp_t > 31 {
+            (
+                true,
+                u64::exact_from(Float::MAX_EXPONENT),
+                if exp_t > 64 {
+                    u64::MAX
+                } else {
+                    1u64 << (exp_t - 1)
+                },
+            )
         } else {
-            u64::exact_from(&neg_ceil)
+            let neg_ceil = -Integer::rounding_from(&t, Ceiling).0;
+            const MAX_EXP: Integer = Integer::const_from_signed(Float::MAX_EXPONENT as SignedLimb);
+            let clamped = neg_ceil >= MAX_EXP;
+            let err = if clamped {
+                u64::exact_from(Float::MAX_EXPONENT)
+            } else {
+                u64::exact_from(&neg_ceil)
+            };
+            (clamped, err, u64::saturating_from(&neg_ceil))
         };
         if let Some(result) = float_round_near_x(&Float::NEGATIVE_ONE, err, false, prec, rm) {
             return result;
@@ -89,7 +116,7 @@ fn exp_x_minus_1_prec_round_normal(x: &Float, prec: u64, rm: RoundingMode) -> (F
         // |x| / ln(2) < neg_ceil + 2 <= 2^30 = |MIN_EXPONENT - 1|, so exp(x) does not underflow and
         // the loop below handles it.)
         if clamped {
-            return exp_x_minus_1_deep_negative(x, prec, rm, u64::saturating_from(&neg_ceil));
+            return exp_x_minus_1_deep_negative(x, prec, rm, s_est);
         }
     }
     // General case. Compute the precision of the intermediary variable: the optimal number of bits,
@@ -142,6 +169,20 @@ fn exp_x_minus_1_deep_negative(
     rm: RoundingMode,
     s_est: u64,
 ) -> (Float, Ordering) {
+    // e^x's leading bit lies |y| = |x| / ln(2) positions below 1. When it falls entirely below the
+    // output's prec-bit window (s_est, a lower bound on |y|, is at least prec + 2, so e^x <=
+    // 2^(-prec - 2) is under half the gap between -1 and its toward-zero neighbor), the result
+    // rounds directly from -1. The bracket below must then not run at all: a y beyond the Float
+    // exponent range would convert to -infinity under Floor, pinning that end at exactly (-1,
+    // Equal) at every working precision -- under Ceiling or Down the ends could never agree.
+    // (`float_round_near_x` cannot make this decision: its err argument is clamped at MAX_EXPONENT,
+    // which prec meets or exceeds here.)
+    if s_est >= prec.saturating_add(2) {
+        return match rm {
+            Ceiling | Down => (-one_neighbor(prec, false), Greater), // -1 + ulp (toward zero)
+            _ => (-Float::one_prec(prec), Less),                     // -1
+        };
+    }
     let xr = Rational::exact_from(x);
     let mut working_prec = prec.saturating_add(2).saturating_sub(s_est) + (Limb::WIDTH << 1);
     let mut increment = Limb::WIDTH;
@@ -310,6 +351,20 @@ impl Float {
     /// - $f(-\infty,p,m)=-1$
     /// - $f(\pm0.0,p,m)=\pm0.0$
     ///
+    /// Overflow and underflow:
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<0$ and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<0$ and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,p,m)<0$ and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<-2^{-2^{30}-1}$ and $m$ is `Nearest`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    ///
+    /// (A positive result never underflows: $e^x-1>x$ for positive $x$.)
+    ///
     /// If you know you'll be using `Nearest`, consider using [`Float::exp_x_minus_1_prec`] instead.
     /// If you know that your target precision is the precision of the input, consider using
     /// [`Float::exp_x_minus_1_round`] instead. If both of these things are true, consider using
@@ -374,6 +429,20 @@ impl Float {
     /// - $f(\infty,p,m)=\infty$
     /// - $f(-\infty,p,m)=-1$
     /// - $f(\pm0.0,p,m)=\pm0.0$
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<0$ and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<0$ and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,p,m)<0$ and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<-2^{-2^{30}-1}$ and $m$ is `Nearest`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    ///
+    /// (A positive result never underflows: $e^x-1>x$ for positive $x$.)
     ///
     /// If you know you'll be using `Nearest`, consider using [`Float::exp_x_minus_1_prec_ref`]
     /// instead. If you know that your target precision is the precision of the input, consider
@@ -449,6 +518,13 @@ impl Float {
     /// - $f(-\infty,p)=-1$
     /// - $f(\pm0.0,p)=\pm0.0$
     ///
+    /// Overflow and underflow:
+    /// - If $f(x,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,p)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
+    ///
+    /// (A positive result never underflows: $e^x-1>x$ for positive $x$.)
+    ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::exp_x_minus_1_prec_round`] instead. If you know that your target precision is the
     /// precision of the input, consider using [`Float::exp_x_minus_1`] instead.
@@ -503,6 +579,13 @@ impl Float {
     /// - $f(\infty,p)=\infty$
     /// - $f(-\infty,p)=-1$
     /// - $f(\pm0.0,p)=\pm0.0$
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,p)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
+    ///
+    /// (A positive result never underflows: $e^x-1>x$ for positive $x$.)
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::exp_x_minus_1_prec_round_ref`] instead. If you know that your target precision is
@@ -900,6 +983,19 @@ impl Float {
     /// - $f(-\infty,m)=-1$
     /// - $f(\pm0.0,m)=\pm0.0$
     ///
+    /// Overflow and underflow:
+    /// - If $f(x,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead.
+    /// - If $-2^{-2^{30}}<f(x,m)<0$ and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,m)<0$ and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,m)<0$ and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,m)<-2^{-2^{30}-1}$ and $m$ is `Nearest`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    ///
+    /// (A positive result never underflows: $e^x-1>x$ for positive $x$.)
+    ///
     /// If you want to specify an output precision, consider using
     /// [`Float::exp_x_minus_1_prec_round`] instead. If you know you'll be using the `Nearest`
     /// rounding mode, consider using [`Float::exp_x_minus_1`] instead.
@@ -965,6 +1061,19 @@ impl Float {
     /// - $f(\infty,m)=\infty$
     /// - $f(-\infty,m)=-1$
     /// - $f(\pm0.0,m)=\pm0.0$
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead.
+    /// - If $-2^{-2^{30}}<f(x,m)<0$ and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,m)<0$ and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,m)<0$ and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,m)<-2^{-2^{30}-1}$ and $m$ is `Nearest`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    ///
+    /// (A positive result never underflows: $e^x-1>x$ for positive $x$.)
     ///
     /// If you want to specify an output precision, consider using
     /// [`Float::exp_x_minus_1_prec_round_ref`] instead. If you know you'll be using the `Nearest`
@@ -1194,6 +1303,13 @@ impl ExpXMinus1 for Float {
     /// - $f(-\infty)=-1$
     /// - $f(\pm0.0)=\pm0.0$
     ///
+    /// Overflow and underflow:
+    /// - If $f(x)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
+    ///
+    /// (A positive result never underflows: $e^x-1>x$ for positive $x$.)
+    ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::exp_x_minus_1_round`] instead. If you want to specify the output precision,
     /// consider using [`Float::exp_x_minus_1_prec`]. If you want both of these things, consider
@@ -1246,6 +1362,13 @@ impl ExpXMinus1 for &Float {
     /// - $f(\infty)=\infty$
     /// - $f(-\infty)=-1$
     /// - $f(\pm0.0)=\pm0.0$
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
+    ///
+    /// (A positive result never underflows: $e^x-1>x$ for positive $x$.)
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::exp_x_minus_1_round_ref`] instead. If you want to specify the output precision,
@@ -1354,6 +1477,9 @@ impl ExpXMinus1Assign for Float {
 /// - $f(\infty)=\infty$
 /// - $f(-\infty)=-1$
 /// - $f(\pm0.0)=\pm0.0$
+///
+/// If the result overflows, $\infty$ is returned, and if it underflows, $-0.0$ is returned. (A
+/// positive result never underflows: $e^x-1>x$ for positive $x$.)
 ///
 /// # Worst-case complexity
 /// Constant time and additional memory.

@@ -107,15 +107,28 @@ fn power_of_2_x_minus_1_prec_round_normal(
     // result lies on.
     let ex = i64::from(x.get_exponent().unwrap());
     if ex <= i64::from(Float::MIN_EXPONENT) {
-        let ln_2 = Float::ln_2_prec(x.significant_bits() + Limb::WIDTH).0;
         // Scale x to exponent 1 before converting to a `Rational`: x itself sits in the smallest
         // binade, so an exact `Rational` for it would carry a ~2^30-bit power-of-2 denominator
         // (~128 MB). With x' = x * 2^(1 - EXP(x)), a small number, the test |x ln(2)| <
         // 2^(MIN_EXPONENT - 1) becomes |x' ln(2)| < 2^(MIN_EXPONENT - ex), which is a comparison of
-        // floor(log_2 |x' ln(2)|) against the exponent -- no power-of-2 `Rational` needed.
+        // floor(log_2 |x' ln(2)|) against the exponent -- no power-of-2 `Rational` needed. ln(2) is
+        // bracketed and the brackets widened until both ends decide the comparison the same way; a
+        // one-shot approximation would leave the decision to the table-maker's dilemma. (x ln(2) is
+        // irrational, so the widening always terminates.)
         let x_scaled = x >> (ex - 1);
-        let x_ln_2_scaled = Rational::exact_from(&x_scaled) * Rational::exact_from(&ln_2);
-        if x_ln_2_scaled.floor_log_base_2_abs() < i64::from(Float::MIN_EXPONENT) - ex {
+        let xs_r = Rational::exact_from(&x_scaled);
+        let bound = i64::from(Float::MIN_EXPONENT) - ex;
+        let mut p = x.significant_bits() + Limb::WIDTH;
+        let below = loop {
+            let (ln_2_lo, ln_2_hi) = floor_and_ceiling(Float::ln_2_prec_round(p, Floor));
+            let f_lo = (&xs_r * Rational::exact_from(&ln_2_lo)).floor_log_base_2_abs() < bound;
+            let f_hi = (&xs_r * Rational::exact_from(&ln_2_hi)).floor_log_base_2_abs() < bound;
+            if f_lo == f_hi {
+                break f_lo;
+            }
+            p <<= 1;
+        };
+        if below {
             let neg = x.is_sign_negative();
             // A magnitude in (min_positive / 2, min_positive) rounds either away from zero (to
             // +/-min_positive) or toward zero (to +/-0), depending on the rounding mode.
@@ -152,7 +165,38 @@ fn power_of_2_x_minus_1_prec_round_normal(
         // 2^x may overflow.
         let (mut t, o1) = Float::power_of_2_of_float_prec_ref(x, working_prec);
         if t.is_infinite() {
-            return exp_overflow(prec, rm);
+            // 2^x overflowed at the working precision. For prec < MAX_EXPONENT this decides the
+            // result: 2^x >= (1 - 2^-working_prec) * 2^MAX_EXPONENT, so 2^x - 1 exceeds the largest
+            // prec-bit value and rounds exactly as an overflow does. At prec >= MAX_EXPONENT the
+            // values just below 2^MAX_EXPONENT are representable, and the intermediate overflow no
+            // longer implies one in the result:
+            // - x = MAX_EXPONENT exactly (the only integer reaching this branch without a true
+            //   overflow): 2^x - 1 has exponent MAX_EXPONENT and is exactly representable;
+            //   materialize it, like the Rational path does.
+            // - x > MAX_EXPONENT: a true overflow. Even for x barely above (x = MAX_EXPONENT +
+            //   2^-k), the result exceeds max_finite and lies at least 2^(MAX_EXPONENT - k) ln(2)
+            //   above 2^MAX_EXPONENT - 1, which clears the `Nearest` overflow threshold for any k
+            //   below MAX_EXPONENT -- and reaching k >= MAX_EXPONENT would take an x of more than
+            //   2^31 bits.
+            // - x < MAX_EXPONENT (necessarily a non-integer here): 2^x < 2^MAX_EXPONENT strictly,
+            //   so the overflow is an artifact of rounding 2^x up at the working precision; growing
+            //   it far enough (past the distance from x to MAX_EXPONENT) makes 2^x finite, and the
+            //   loop proceeds normally.
+            if prec < const { Float::MAX_EXPONENT as u64 }
+                || *x > const { Float::MAX_EXPONENT as i64 }
+            {
+                return exp_overflow(prec, rm);
+            }
+            if *x == const { Float::MAX_EXPONENT as i64 } {
+                return Float::from_rational_prec_round(
+                    Rational::power_of_2(const { Float::MAX_EXPONENT as i64 }) - Rational::ONE,
+                    prec,
+                    rm,
+                );
+            }
+            working_prec += increment;
+            increment = working_prec >> 1;
+            continue;
         }
         // 2^x cannot underflow here: that would require x < MIN_EXPONENT - 1, but then the deep-
         // negative case above would already have returned. Integer x: 2^x is exact, so the result
@@ -320,22 +364,23 @@ fn power_of_2_x_minus_1_rational_helper(
             Float::power_of_2(i64::exact_from(&n)).sub_prec_round(Float::ONE, prec, rm)
         } else {
             // n <= MIN_EXPONENT - 2: the result is -1 + 2^n with 2^n below the smallest positive
-            // Float. It is exactly representable with 1 - n bits; at prec = -n it sits exactly on
-            // the midpoint between -1 and its toward-zero neighbor, so both cases materialize the
-            // exact rational (proportional to prec). (The i64 conversion would fail only for |n| >=
-            // 2^63, where prec >= |n| means the result could not be materialized at all.)
-            let bits_needed = Integer::ONE - &n;
-            if n >= -i64::exact_from(prec) {
+            // Float. It is exactly representable with -n bits; at prec = -n - 1 it sits exactly on
+            // the `Nearest` midpoint between -1 and its toward-zero neighbor. Both cases
+            // materialize the exact rational (proportional to prec). (The i64 conversion would fail
+            // only for |n| >= 2^63, where prec >= |n| - 1 means the result could not be
+            // materialized at all.)
+            if n >= -i64::exact_from(prec) - 1 {
                 Float::from_rational_prec_round(
                     Rational::power_of_2(i64::exact_from(&n)) - Rational::ONE,
                     prec,
                     rm,
                 )
             } else {
-                // The result is within 2^n < (1/4) ulp(-1) of -1, and err = 1 - n > prec + 1, so
-                // rounding from -1 always resolves.
+                // The result is within 2^n <= (1/8) ulp(-1) of -1, and err = -n >= prec + 2 exceeds
+                // prec + 1 while strictly bounding the error (|result + 1| = 2^n < 2^(1 - err)), as
+                // `float_round_near_x`'s contract requires; rounding from -1 always resolves.
                 assert_ne!(rm, Exact, "Inexact power_of_2_x_minus_1");
-                let err = u64::saturating_from(&bits_needed);
+                let err = u64::saturating_from(&-&n);
                 float_round_near_x(&Float::NEGATIVE_ONE, err, false, prec, rm).unwrap()
             }
         };

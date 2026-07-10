@@ -3062,3 +3062,44 @@ where
 fn primitive_float_exp_x_minus_1_rational_properties() {
     apply_fn_to_primitive_floats!(primitive_float_exp_x_minus_1_rational_properties_helper);
 }
+
+// Regression tests for two extreme-regime infinite loops.
+#[test]
+fn test_exp_x_minus_1_extreme_regression() {
+    let min_exp = i64::from(Float::MIN_EXPONENT);
+    let big_prec = u64::exact_from(-min_exp);
+    // - x negative in the smallest binade with prec >= -MIN_EXPONENT: |expm1(x)| falls below the
+    //   smallest positive Float, and the general loop's subtraction formerly saturated at exactly
+    //   -min_positive, which `float_can_round` can never certify (infinite loop). The result is
+    //   -min_positive itself, rounded to prec bits.
+    let x = -Float::power_of_2(min_exp - 1);
+    // the result is negative with magnitude just below min_positive (above the Nearest tie), so
+    // Floor and Up (away from zero) and Nearest give -min_positive, while Ceiling and Down (toward
+    // zero) give -0.0
+    for rm in [Floor, Up, Nearest] {
+        let (v, o) = x.exp_x_minus_1_prec_round_ref(big_prec, rm);
+        assert_eq!(
+            ComparableFloat(v),
+            ComparableFloat(-Float::power_of_2_prec(min_exp - 1, big_prec).0)
+        );
+        assert_eq!(o, Less);
+    }
+    for rm in [Ceiling, Down] {
+        let (v, o) = x.exp_x_minus_1_prec_round_ref(big_prec, rm);
+        assert!(v.is_negative_zero());
+        assert_eq!(o, Greater);
+    }
+    // - |x| > ln(2) * 2^(MAX_EXPONENT - 1) with prec >= -MIN_EXPONENT - 1: y = x / ln(2) lies
+    //   beyond the Float exponent range, and the deep-negative bracket's Floor-converted lower end
+    //   formerly became -infinity, whose 2^y - 1 is exactly (-1, Equal) at every working precision
+    //   -- under Ceiling or Down the ends could never agree (infinite loop). The result rounds
+    //   directly from -1.
+    let x = -Float::from(3u32) << ((1i64 << 30) - 3);
+    let prec = big_prec - 1;
+    let (v, o) = x.exp_x_minus_1_prec_round_ref(prec, Ceiling);
+    assert!(v > -1i32);
+    assert_eq!(o, Greater);
+    let (v, o) = x.exp_x_minus_1_prec_round_ref(prec, Floor);
+    assert_eq!(v, -1i32);
+    assert_eq!(o, Less);
+}

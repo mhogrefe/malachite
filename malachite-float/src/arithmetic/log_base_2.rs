@@ -84,9 +84,10 @@ fn log_base_2_prec_round_normal(x: &Float, prec: u64, rm: RoundingMode) -> (Floa
 // The result is near zero, so unlike the near-a-larger-power case it must be computed directly
 // rather than rounded near an integer; a Ziv loop over a [`Float`] approximation of `eps` does so
 // without the catastrophic cancellation that `ln(x)` would suffer for `x` near 1. Brackets of
-// log2(x') for an exact Rational x' in [1/sqrt(2), sqrt(2)) (the caller centers the mantissa on the
-// nearest power of 2, so x' is never near 2), as exact Rationals, to a relative accuracy of about
-// 2^-wprec. x' comfortably away from 1 goes through directed Float logs; x' within a sliver of 1 --
+// log2(x') for an exact positive Rational x', as exact Rationals, to a relative accuracy of about
+// 2^-wprec. (`rational_pow` centers x' in [1/sqrt(2), sqrt(2)) -- the mantissa is taken to the
+// nearest power of 2, so x' is never near 2 -- while `unsigned_pow_rational` passes an integer x'
+// >= 3.) x' comfortably away from 1 goes through directed Float logs; x' within a sliver of 1 --
 // from either side, where a Float log would lose all precision to the exponent range -- goes
 // through the exact atanh-series brackets divided by ln(2) brackets.
 pub(crate) fn log_2_rational_brackets(x: &Rational, wprec: u64) -> (Rational, Rational) {

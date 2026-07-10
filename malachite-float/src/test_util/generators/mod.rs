@@ -1239,8 +1239,8 @@ pub fn float_integer_unsigned_rounding_mode_quadruple_gen_var_2()
 -> Generator<(Float, Integer, u64, RoundingMode)> {
     Generator::new(
         &exhaustive_float_integer_unsigned_rounding_mode_quadruple_gen_var_2,
-        &random_float_integer_unsigned_rounding_mode_quadruple_gen_var_1,
-        &special_random_float_integer_unsigned_rounding_mode_quadruple_gen_var_1,
+        &random_float_integer_unsigned_rounding_mode_quadruple_gen_var_2,
+        &special_random_float_integer_unsigned_rounding_mode_quadruple_gen_var_2,
     )
 }
 
@@ -2144,14 +2144,13 @@ pub fn float_unsigned_unsigned_rounding_mode_quadruple_gen_var_9()
     )
 }
 
-// As `..._var_9`, but the `Float` may have an extreme exponent. (The random and special-random
-// generators are shared with `..._var_9`.)
+// As `..._var_9`, but the `Float` may have an extreme exponent.
 pub fn float_unsigned_unsigned_rounding_mode_quadruple_gen_var_10()
 -> Generator<(Float, u64, u64, RoundingMode)> {
     Generator::new(
         &exhaustive_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_10,
-        &random_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_9,
-        &special_random_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_9,
+        &random_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_10,
+        &special_random_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_10,
     )
 }
 
@@ -2811,8 +2810,8 @@ pub fn float_unsigned_unsigned_rounding_mode_quadruple_gen_var_12()
 -> Generator<(Float, u64, u64, RoundingMode)> {
     Generator::new(
         &exhaustive_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_12,
-        &random_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_11,
-        &special_random_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_11,
+        &random_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_12,
+        &special_random_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_12,
     )
 }
 
@@ -4372,14 +4371,13 @@ pub fn float_signed_unsigned_rounding_mode_quadruple_gen_var_11()
     )
 }
 
-// As `..._var_11`, but the `Float` may have an extreme exponent. (The random and special-random
-// generators are shared with `..._var_11`.)
+// As `..._var_11`, but the `Float` may have an extreme exponent.
 pub fn float_signed_unsigned_rounding_mode_quadruple_gen_var_12()
 -> Generator<(Float, i64, u64, RoundingMode)> {
     Generator::new(
         &exhaustive_float_signed_unsigned_rounding_mode_quadruple_gen_var_12,
-        &random_float_signed_unsigned_rounding_mode_quadruple_gen_var_11,
-        &special_random_float_signed_unsigned_rounding_mode_quadruple_gen_var_11,
+        &random_float_signed_unsigned_rounding_mode_quadruple_gen_var_12,
+        &special_random_float_signed_unsigned_rounding_mode_quadruple_gen_var_12,
     )
 }
 

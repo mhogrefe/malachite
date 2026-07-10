@@ -3132,3 +3132,31 @@ where
 fn primitive_float_power_of_2_x_minus_1_rational_properties() {
     apply_fn_to_primitive_floats!(primitive_float_power_of_2_x_minus_1_rational_properties_helper);
 }
+
+// Regression test: for x = MAX_EXPONENT the intermediate 2^x overflows at any working precision,
+// and the Float path formerly conflated that with overflow of the result 2^x - 1, which is exactly
+// representable at precisions of at least MAX_EXPONENT. (~128 MB results; the Rational path, which
+// always handled this case, serves as the oracle.)
+#[test]
+fn test_power_of_2_x_minus_1_max_exponent_regression() {
+    let x = Float::exact_from(i64::from(Float::MAX_EXPONENT));
+    let q = Rational::from(Float::MAX_EXPONENT);
+    let prec = u64::exact_from(Float::MAX_EXPONENT);
+    // - exactly representable at prec = MAX_EXPONENT: the two paths agree and the result is exact
+    //   (formerly the Float path returned an overflow, and Floor at prec = MAX_EXPONENT + 1
+    //   returned a value above the true one)
+    for (p, rm) in [(prec, Nearest), (prec, Floor), (prec + 1, Floor), (prec + 1, Ceiling)] {
+        let (pf, of) = x.power_of_2_x_minus_1_prec_round_ref(p, rm);
+        let (pr, or) = Float::power_of_2_x_minus_1_rational_prec_round_ref(&q, p, rm);
+        assert_eq!(ComparableFloat(pf), ComparableFloat(pr));
+        assert_eq!(of, or);
+        assert_eq!(of, Equal);
+    }
+    // - below MAX_EXPONENT bits the result still rounds like an overflow
+    let (pf, of) = x.power_of_2_x_minus_1_prec_round_ref(53, Nearest);
+    assert!(pf.is_infinite());
+    assert_eq!(of, Greater);
+    let (pf, of) = x.power_of_2_x_minus_1_prec_round_ref(53, Floor);
+    assert!(!pf.is_infinite());
+    assert_eq!(of, Less);
+}

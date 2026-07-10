@@ -8,6 +8,8 @@
 
 use clippy_utils::diagnostics::span_lint_and_help;
 use clippy_utils::path_to_local_with_projections;
+use clippy_utils::visitors::for_each_expr;
+use core::ops::ControlFlow;
 use rustc_hir::def::{DefKind, Res};
 use rustc_hir::{BindingMode, Block, ByRef, Expr, ExprKind, Mutability, PatKind, StmtKind};
 use rustc_lint::{LateContext, LateLintPass};
@@ -77,7 +79,7 @@ impl<'tcx> LateLintPass<'tcx> for ManualFromSignAndAbs {
             let Some(s2) = block.stmts.get(i + 1) else {
                 continue;
             };
-            if s1.span.from_expansion() || crate::in_test_code(cx, s1.span) {
+            if s1.span.from_expansion() {
                 continue;
             }
             // s1: `let mut a = Integer::from(<natural>);`
@@ -99,9 +101,23 @@ impl<'tcx> LateLintPass<'tcx> for ManualFromSignAndAbs {
             let (StmtKind::Semi(e) | StmtKind::Expr(e)) = s2.kind else {
                 continue;
             };
-            let ExprKind::If(_, then, None) = e.kind else {
+            let ExprKind::If(cond, then, None) = e.kind else {
                 continue;
             };
+            // The rewrite moves the sign decision before the construction, so the condition must
+            // not read the freshly built value; `if a.get_bit(0) { a.neg_assign(); }` has no
+            // `from_sign_and_abs` form.
+            if for_each_expr(cx, cond, |e: &Expr<'tcx>| {
+                if path_to_local_with_projections(e) == Some(name_hir) {
+                    ControlFlow::Break(())
+                } else {
+                    ControlFlow::Continue(())
+                }
+            })
+            .is_some()
+            {
+                continue;
+            }
             let ExprKind::Block(then_block, _) = then.kind else {
                 continue;
             };
@@ -122,6 +138,9 @@ impl<'tcx> LateLintPass<'tcx> for ManualFromSignAndAbs {
             if seg.ident.name.as_str() != "neg_assign"
                 || path_to_local_with_projections(recv) != Some(name_hir)
             {
+                continue;
+            }
+            if crate::in_test_code(cx, s1.span) {
                 continue;
             }
             span_lint_and_help(

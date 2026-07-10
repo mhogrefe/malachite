@@ -61,6 +61,25 @@ fn is_min1_significant_bits<'tcx>(
         {
             recv
         }
+        // The free-function spelling `max(x.significant_bits(), 1)`, either argument order.
+        ExprKind::Call(callee, [a, b])
+            if matches!(
+                &callee.kind,
+                ExprKind::Path(qpath)
+                    if cx
+                        .qpath_res(qpath, callee.hir_id)
+                        .opt_def_id()
+                        .is_some_and(|did| cx.tcx.item_name(did).as_str() == "max")
+            ) =>
+        {
+            if crate::literal_value(b) == Some(1) {
+                a
+            } else if crate::literal_value(a) == Some(1) {
+                b
+            } else {
+                prec
+            }
+        }
         _ => prec,
     };
     let ExprKind::MethodCall(seg, recv, [], _) = inner.kind else {
@@ -71,7 +90,7 @@ fn is_min1_significant_bits<'tcx>(
 
 impl<'tcx> LateLintPass<'tcx> for ManualFloatFromPrimitive {
     fn check_expr(&mut self, cx: &LateContext<'tcx>, expr: &'tcx Expr<'tcx>) {
-        if expr.span.from_expansion() || crate::in_test_code(cx, expr.span) {
+        if expr.span.from_expansion() {
             return;
         }
         // The whole expression is `<call>.0`, extracting the `Float` from the `(Float, Ordering)`
@@ -82,7 +101,9 @@ impl<'tcx> LateLintPass<'tcx> for ManualFloatFromPrimitive {
         if field.name.as_str() != "0" {
             return;
         }
-        let ExprKind::Call(callee, [x, prec]) = base.kind else {
+        // Both the 2-argument constructors and the 3-argument `_round` variants (whose rounding
+        // mode is equally dead for an exact conversion) are the same idiom.
+        let ExprKind::Call(callee, [x, prec] | [x, prec, _]) = base.kind else {
             return;
         };
         let ExprKind::Path(qpath) = &callee.kind else {
@@ -93,7 +114,10 @@ impl<'tcx> LateLintPass<'tcx> for ManualFloatFromPrimitive {
         };
         if !matches!(
             cx.tcx.item_name(fn_did).as_str(),
-            "from_unsigned_prec" | "from_signed_prec"
+            "from_unsigned_prec"
+                | "from_signed_prec"
+                | "from_unsigned_prec_round"
+                | "from_signed_prec_round"
         ) {
             return;
         }
@@ -101,7 +125,7 @@ impl<'tcx> LateLintPass<'tcx> for ManualFloatFromPrimitive {
         if crate::bignum_name(cx, cx.typeck_results().expr_ty(expr).peel_refs()) != Some("Float") {
             return;
         }
-        if !is_min1_significant_bits(cx, prec, x) {
+        if !is_min1_significant_bits(cx, prec, x) || crate::in_test_code(cx, expr.span) {
             return;
         }
         // Inside an `impl Float`, `Self` names the type and clippy's `use_self` prefers it, so

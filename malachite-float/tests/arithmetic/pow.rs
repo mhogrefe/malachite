@@ -8,9 +8,7 @@
 
 use malachite_base::apply_fn_to_primitive_floats;
 use malachite_base::assert_panic;
-use malachite_base::num::arithmetic::traits::{
-    Abs, CheckedRoot, IsPowerOf2, Pow, PowAssign, PowerOf2,
-};
+use malachite_base::num::arithmetic::traits::{CheckedRoot, IsPowerOf2, Pow, PowAssign, PowerOf2};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, Zero,
@@ -21,6 +19,7 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
     primitive_float_pair_gen, primitive_float_unsigned_pair_gen_var_1,
+    primitive_float_unsigned_pair_gen_var_4,
 };
 use malachite_float::arithmetic::pow::{
     primitive_float_pow, primitive_float_pow_integer, primitive_float_pow_u,
@@ -1179,6 +1178,51 @@ fn test_rational_pow_extreme() {
         "0x1.00000E+67108864#20",
         Greater,
     );
+}
+
+// Regression test: `rational_pow_exact`'s representability rejection formerly used an upper bound
+// on sb(m^z) where soundness requires a lower bound, so exactly-representable results and `Nearest`
+// ties with sb(m) * z > prec + 2 > sb(m^z) leaked past the exact route into the squeeze, which
+// never terminates on them.
+#[test]
+fn test_rational_pow_exact_bound_regression() {
+    // - a `Nearest` tie that leaked: (4/17^4)^(-3/2) = 17^6/8, whose odd part has 25 = prec + 1
+    //   bits (formerly hung)
+    let x = Rational::from_unsigneds(4u32, 83521u32);
+    let y = Float::from(-1.5);
+    let exact = Rational::from_unsigneds(24137569u32, 8u32);
+    for prec in [21u64, 24, 25, 30] {
+        for rm in [Floor, Ceiling, Down, Up, Nearest] {
+            let (p, o) = Float::rational_pow_prec_round_ref_ref(&x, &y, prec, rm);
+            let (ep, eo) = Float::from_rational_prec_round(exact.clone(), prec, rm);
+            assert_eq!(ComparableFloatRef(&p), ComparableFloatRef(&ep));
+            assert_eq!(o, eo);
+        }
+    }
+    // - an exactly representable value that leaked: (4/17^2)^(-5/2) = 17^5/32 with a 21-bit odd
+    //   part at prec 21; `Exact` formerly hung instead of succeeding
+    let x = Rational::from_unsigneds(4u32, 289u32);
+    let y = Float::from(-2.5);
+    let exact = Rational::from_unsigneds(1419857u32, 32u32);
+    for prec in [21u64, 25] {
+        let (p, o) = Float::rational_pow_prec_round_ref_ref(&x, &y, prec, Exact);
+        let (ep, _) = Float::from_rational_prec_round(exact.clone(), prec, Exact);
+        assert_eq!(ComparableFloatRef(&p), ComparableFloatRef(&ep));
+        assert_eq!(o, Equal);
+    }
+    // - the same leak in the extreme regime, reaching the shared `pow_squeeze_t` instead: (17^4 *
+    //   2^(-2^30 - 100))^(3/4) = 17^3 * 2^(-805306443), a tie at prec 12 (formerly hung)
+    let e = -(1i64 << 30) - 100;
+    let x = Rational::from(83521u32) << e;
+    let y = Float::from(0.75);
+    for prec in [12u64, 13, 20] {
+        for rm in [Floor, Ceiling, Down, Up, Nearest] {
+            let (p, o) = Float::rational_pow_prec_round_ref_ref(&x, &y, prec, rm);
+            let (ep, eo) = Float::from(4913u32).shl_prec_round(3 * e / 4, prec, rm);
+            assert_eq!(ComparableFloatRef(&p), ComparableFloatRef(&ep));
+            assert_eq!(o, eo);
+        }
+    }
 }
 
 #[allow(clippy::needless_pass_by_value)]
@@ -2930,6 +2974,14 @@ fn test_unsigned_pow_unsigned() {
     test(2, 10000000000, 10, Nearest, "Infinity", "Infinity", Greater);
     // - canround: an inexact power the initial working precision already rounds correctly
     test(3, 6, 1, Down, "5.0e2", "0x2.0E+2#1", Less);
+
+    // - error-budget regressions: with MPFR's budget (which upstream mpfr_ui_pow_ui inherits),
+    //   `float_can_round` certified wrongly rounded results at small precisions
+    test(263, 15, 1, Nearest, "1.0e36", "0x1.0E+30#1", Less);
+    test(281, 6, 2, Nearest, "4.0e14", "0x1.8E+12#2", Less);
+    test(205, 63, 4, Down, "4.1e145", "0xd.0E+120#4", Less);
+    test(205, 63, 4, Nearest, "4.4e145", "0xe.0E+120#4", Greater);
+    test(410, 63, 4, Floor, "3.7e164", "0x6.8E+136#4", Less);
 }
 
 // The exact Float representation of a u64, for use as an oracle base.
@@ -3137,11 +3189,6 @@ fn test_unsigned_pow_special_values() {
     test(2, Float::NEGATIVE_ZERO, "1.0", "0x1.0#1");
 }
 
-// The exact Float representation of a u64.
-fn u64_exact_float(k: u64) -> Float {
-    Float::from_unsigned_prec(k, k.significant_bits().max(1)).0
-}
-
 #[allow(clippy::needless_pass_by_value)]
 fn unsigned_pow_prec_round_properties_helper(
     y: Float,
@@ -3169,7 +3216,7 @@ fn unsigned_pow_prec_round_properties_helper(
     assert_eq!(o_alt, o);
 
     // n^x is x^x on the exact Float representation of the base, computed by pow_prec_round.
-    let kf = u64_exact_float(x);
+    let kf = u64_as_float(x);
     let (pp, op) = kf.pow_prec_round_ref_ref(&y, prec, rm);
     assert_eq!(ComparableFloatRef(&pp), ComparableFloatRef(&p));
     assert_eq!(op, o);
@@ -3268,6 +3315,13 @@ fn test_primitive_float_unsigned_pow() {
     test::<f32>(2, 200.0, f32::INFINITY);
     test::<f32>(2, -200.0, 0.0);
 
+    // - negative exponents with subnormal results, exercising the reduced-precision re-round
+    test::<f32>(2, -140.0, 7.17e-43);
+    test::<f32>(3, -80.0, 6.765496e-39);
+    test::<f32>(3, -80.5, 3.90606e-39);
+    test::<f64>(2, -1060.0, 8.095e-320);
+    test::<f64>(3, -660.5, 7.26793875e-316);
+
     test::<f64>(2, 0.5, std::f64::consts::SQRT_2);
     test::<f64>(3, 2.5, 15.588457268119896);
     test::<f64>(2, -1.0, 0.5);
@@ -3280,6 +3334,12 @@ where
     for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
 {
     primitive_float_unsigned_pair_gen_var_1::<T, u64>().test_properties(|(y, x)| {
+        primitive_float_unsigned_pow::<T>(x, y);
+    });
+    // The var_1 floats are positive and finite; this generator adds negative, zero, infinite, and
+    // NaN exponents, whose negative-and-large members exercise the subnormal and deep-underflow
+    // result paths.
+    primitive_float_unsigned_pair_gen_var_4::<T, u64>().test_properties(|(y, x)| {
         primitive_float_unsigned_pow::<T>(x, y);
     });
 }
@@ -3395,6 +3455,18 @@ fn test_unsigned_pow_rational() {
         "0x1.00000#20",
         Greater,
     );
+
+    // - Ziv growth in the squeeze: 6^(1 + 2^-300) lies within 2^-300 of the rounding boundary 6.0,
+    //   so the initial working precision cannot separate the brackets and must grow
+    let q = Rational::ONE + (Rational::ONE >> 300u32);
+    let (p, o) = Float::unsigned_pow_rational_prec_round(6, q.clone(), 53, Floor);
+    assert_eq!(p.to_string(), "6.0");
+    assert_eq!(to_hex_string(&p), "0x6.0000000000000#53");
+    assert_eq!(o, Less);
+    let (p, o) = Float::unsigned_pow_rational_prec_round(6, q, 53, Ceiling);
+    assert_eq!(p.to_string(), "6.000000000000001");
+    assert_eq!(to_hex_string(&p), "0x6.0000000000004#53");
+    assert_eq!(o, Greater);
 }
 
 #[test]
@@ -3468,35 +3540,24 @@ fn unsigned_pow_rational_prec_round_properties_helper(
         assert_eq!(or, o);
     }
 
-    // The exp(q * ln k) oracle is reliable only in the "generic" regime; it is excluded where its
-    // rounding error can straddle a boundary that the direct 2^(q log2 k) computation resolves
-    // exactly:
-    // - k^q rational (k a perfect b-th power, b the denominator of q): a tie such as 7^1 = 7
-    //   rounding to 8 at precision 2;
-    // - near underflow/overflow: `too_small` vs `0.0`;
-    // - extremely close to 1: with a tiny exponent, k^q can lie within 2^-256 of 1, beyond the
-    //   oracle's resolution.
+    // The bracketing exp(q * ln k) oracle handles every regime -- boundaries and near-1 results
+    // included -- except an exactly-rational k^q, which its escalating brackets could never
+    // resolve. k^q is rational exactly when k is a perfect b-th power (b the denominator of q), for
+    // example 7^1 or 8^(1/3); those cases are covered by the exact-value checks above.
     let k_perfect_power = u64::try_from(q.denominator_ref())
         .ok()
         .and_then(|b| k.checked_root(b))
         .is_some();
-    if k >= 2 && !k_perfect_power && p.is_normal() {
-        let e = i64::from(p.get_exponent().unwrap());
-        let near_one = (e == 0 || e == 1)
-            && (prec >= 4096
-                || (Rational::exact_from(&p) - Rational::ONE).abs()
-                    < (Rational::ONE >> prec.saturating_sub(2)));
-        if e > i64::from(Float::MIN_EXPONENT) + 4
-            && e < i64::from(Float::MAX_EXPONENT) - 4
-            && !near_one
-            && let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm)
-        {
-            let (rp, _) = rug_unsigned_pow_rational_prec_round(k, &q, prec, rug_rm);
-            assert_eq!(
-                ComparableFloatRef(&Float::from(&rp)),
-                ComparableFloatRef(&p)
-            );
-        }
+    if k >= 2
+        && !k_perfect_power
+        && let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm)
+    {
+        let (rp, ro) = rug_unsigned_pow_rational_prec_round(k, &q, prec, rug_rm);
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rp)),
+            ComparableFloatRef(&p)
+        );
+        assert_eq!(ro, o);
     }
 
     if p.is_normal() && !extreme {
@@ -3527,4 +3588,57 @@ fn unsigned_pow_rational_prec_properties() {
             assert_eq!(o_alt, o);
         },
     );
+}
+
+// Regression test: `pow_integer`'s estimate-based overflow pre-bound leaves a window of true
+// overflows just above MAX_EXPONENT that the entry check's 64-bit lower bound also misses. Such
+// inputs formerly reached `pow_pos_natural`, whose magnitude-decreasing roundings saturated at the
+// largest finite value -- which `float_can_round` can never certify -- and the Ziv loop grew
+// forever. The window is now decided exactly.
+#[test]
+fn test_pow_integer_overflow_window_regression() {
+    // - z * log2(x) in [MAX_EXPONENT + 2^-40, MAX_EXPONENT + 2^-33): x = 2^t rounded up at 200
+    //   bits, t = (MAX_EXPONENT + 2^-40) / z, so z * log2(x) >= MAX_EXPONENT + 2^-40 (formerly
+    //   hung)
+    let z = (1u64 << 30) + 1;
+    let t = (Rational::from(Float::MAX_EXPONENT) + (Rational::ONE >> 40u32)) / Rational::from(z);
+    let x = Float::power_of_2_rational_prec_round(t, 200, Ceiling).0;
+    let (v, o) = x.pow_integer_prec_round_ref_val(Integer::from(z), 53, Nearest);
+    assert!(v.is_infinite());
+    assert_eq!(o, Greater);
+    let (v, o) = x.pow_integer_prec_round_ref_val(Integer::from(z), 53, Floor);
+    assert!(!v.is_infinite());
+    assert_eq!(v.get_exponent(), Some(Float::MAX_EXPONENT));
+    assert_eq!(o, Less);
+}
+
+// Regression tests: the true product y * ln|x| below the Float exponent range formerly derailed
+// pow_general (MPFR computes it in an extended exponent range, which malachite lacks). A negative
+// product underflowed to -0.0, making exp return exactly 1, which `float_can_round` can never
+// certify -- an infinite loop; a positive product saturated at the minimum positive value, whose
+// unaccounted error let the loop certify a wrongly rounded result on the wrong side of the
+// `Nearest` tie. Both are ~64-128 MB computations.
+#[test]
+fn test_pow_general_tiny_product_regression() {
+    let min_exp = i64::from(Float::MIN_EXPONENT);
+    // - negative product (formerly hung): x = 1 - 2^(MIN_EXPONENT + 300) at prec -MIN_EXPONENT -
+    //   299, y = 2^-302; x^y = 1 - ~2^(MIN_EXPONENT - 2)
+    let xk = u64::exact_from(-(min_exp + 300));
+    let x = Float::from_rational_prec(Rational::ONE - (Rational::ONE >> xk), xk).0;
+    let y = Float::power_of_2(-302i64);
+    let (v, o) = Float::pow_prec_round_ref_ref(&x, &y, 301, Nearest);
+    assert_eq!(v, 1u32);
+    assert_eq!(o, Greater);
+    let (v, o) = Float::pow_prec_round_ref_ref(&x, &y, 301, Floor);
+    assert!(v < 1u32);
+    assert_eq!(o, Less);
+    // - positive product (formerly a silent wrong value, 1 + 2^(1 - 2^30) with ternary Greater): x
+    //   = 1 + 2^(-2^29) at prec 2^29 + 1, y = 2^(-2^29 - 2), prec 2^30; the true result 1 +
+    //   ~2^(-2^30 - 2) lies below the `Nearest` tie, so the answer is exactly 1 with Less
+    let s29 = 1u64 << 29;
+    let x = Float::from_rational_prec(Rational::ONE + (Rational::ONE >> s29), s29 + 1).0;
+    let y = Float::power_of_2(-(1i64 << 29) - 2);
+    let (v, o) = Float::pow_prec_round_ref_ref(&x, &y, 1u64 << 30, Nearest);
+    assert_eq!(v, 1u32);
+    assert_eq!(o, Less);
 }

@@ -2,7 +2,7 @@ use malachite_base::num::basic::traits::{NegativeOne, One, OneHalf, Two};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_float::Float;
 
-fn f(x: Float, prec: u64, rm: RoundingMode) -> (Float, Float, Float, Float, Float) {
+fn f(x: Float, prec: u64, rm: RoundingMode) -> (Float, Float, Float, Float, Float, Float) {
     // Rounding a single-significant-bit constant is a no-op: flagged.
     let a = Float::from_float_prec_round(Float::ONE, prec, rm).0;
     let b = Float::from_float_prec_round(Float::TWO, prec, rm).0;
@@ -10,9 +10,11 @@ fn f(x: Float, prec: u64, rm: RoundingMode) -> (Float, Float, Float, Float, Floa
     let c = Float::from_float_prec(Float::NEGATIVE_ONE, prec).0;
     // `ONE_HALF` is 2^-1, also exact everywhere: flagged.
     let d = Float::from_float_prec_round(Float::ONE_HALF, prec, rm).0;
+    // The by-reference variants are the same no-op rounding: flagged.
+    let e = Float::from_float_prec_round_ref(&Float::ONE, prec, rm).0;
     // An arbitrary Float may round: fine.
-    let e = Float::from_float_prec_round(x, prec, rm).0;
-    (a, b, c, d, e)
+    let f = Float::from_float_prec_round(x, prec, rm).0;
+    (a, b, c, d, e, f)
 }
 
 fn main() {

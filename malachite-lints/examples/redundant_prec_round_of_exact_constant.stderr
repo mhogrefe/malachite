@@ -31,5 +31,13 @@ LL |     let d = Float::from_float_prec_round(Float::ONE_HALF, prec, rm).0;
    |
    = help: use `(Float::one_half_prec(prec), Equal)`; the rounding mode is dead and the ordering is always `Equal`
 
-error: aborting due to 4 previous errors
+error: `&Float::ONE` rounds a value that is exact at every precision
+  --> $DIR/redundant_prec_round_of_exact_constant.rs:14:13
+   |
+LL |     let e = Float::from_float_prec_round_ref(&Float::ONE, prec, rm).0;
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: use `(Float::one_prec(prec), Equal)`; the rounding mode is dead and the ordering is always `Equal`
+
+error: aborting due to 5 previous errors
 

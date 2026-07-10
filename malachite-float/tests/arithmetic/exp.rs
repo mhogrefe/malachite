@@ -2150,3 +2150,30 @@ fn exp_rational_prec_properties() {
         assert_eq!(o, Equal);
     });
 }
+
+// Regression test: `exp_prec_round`'s 64-bit overflow bound leaves a sliver of true overflows just
+// below it, in [emax * ln(2), bound_emax). Such inputs formerly reached exp_3, whose Floor-rounded
+// final squarings saturated at the largest finite value -- which `float_can_round` can never
+// certify -- and the Ziv loop grew forever. The dispatcher now decides the sliver exactly.
+#[test]
+fn test_exp_overflow_sliver_regression() {
+    // - x inside the sliver: ln(2) rounded up at 200 bits, times MAX_EXPONENT, rounded up
+    let x = Float::ln_2_prec_round(200, Up)
+        .0
+        .mul_prec_round(Float::exact_from(i64::from(Float::MAX_EXPONENT)), 200, Up)
+        .0;
+    // x really is above the true threshold emax * ln(2)
+    assert!(
+        Rational::exact_from(&x)
+            >= Rational::exact_from(Float::ln_2_prec_round(500, Ceiling).0)
+                * Rational::from(Float::MAX_EXPONENT)
+    );
+    // prec 25000 routes to exp_3 (formerly hung); the result must round like an overflow
+    let (v, o) = x.exp_prec_round_ref(25000, Nearest);
+    assert!(v.is_infinite());
+    assert_eq!(o, Greater);
+    let (v, o) = x.exp_prec_round_ref(25000, Floor);
+    assert!(!v.is_infinite());
+    assert_eq!(v.get_exponent(), Some(Float::MAX_EXPONENT));
+    assert_eq!(o, Less);
+}

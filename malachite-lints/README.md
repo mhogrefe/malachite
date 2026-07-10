@@ -220,6 +220,39 @@ its own result; the two do not overlap, because here the binding is fresh and co
 FLINT, and MPFR's assembly-like bind-mutate-move shape reads naturally in C, but in Malachite
 chaining is the idiom.
 
+### `manual_float_from_primitive`
+
+Flags constructing a [`Float`] from a primitive integer at exactly its own significant-bit
+precision and discarding the ordering, like `Float::from_unsigned_prec(x, x.significant_bits()).0`
+(with or without a `.max(1)` or `max(.., 1)` guard, and including the `_round` variants, whose
+rounding mode is equally dead). That is an exact conversion — precisely `Float::from(x)`, which is
+shorter and also handles `x == 0`, where the unguarded spelling panics on the zero precision. The
+machine-applicable suggestion spells the type `Self` inside an `impl Float` so it does not trip
+`use_self`.
+
+### `manual_from_sign_and_abs`
+
+Flags building a signed [`Integer`] as a magnitude and then conditionally negating it in place:
+
+```rust,ignore
+let mut a = Integer::from(nat);
+if negative {
+    a.neg_assign();
+}
+```
+
+That is `Integer::from_sign_and_abs(!negative, nat)` (or `from_sign_and_abs_ref`) in one step,
+without the `mut` binding. Does not fire when the condition reads the freshly built value itself
+(then no `from_sign_and_abs` form exists).
+
+### `redundant_prec_round_of_exact_constant`
+
+Flags rounding one of the named [`Float`] constants that are exact at every precision (`ONE`,
+`TWO`, `NEGATIVE_ONE`, `ONE_HALF` — the single-significant-bit values) to a precision, like
+`Float::from_float_prec_round(Float::ONE, prec, rm)`, in all four `from_float_prec*` spellings
+(by value or by reference). The rounding is a no-op: the rounding mode is dead and the ordering is
+always `Equal`, so write the dedicated constructor, `(Float::one_prec(prec), Equal)`.
+
 ## Tests
 
 `cargo test` in this directory runs UI tests: `ui/main.rs` exercises `long_lines` (the basic

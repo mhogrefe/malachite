@@ -381,8 +381,18 @@ fn exp_rational(p: Integer, mut r: i64, m: usize, prec: u64) -> Float {
     q0 >>= diff;
     s0 /= q0; // truncating division (both positive)
     // y = (S[0] rounded to prec) * 2^(expo - r*(i-1)); MPFR sets the mantissa via set_z then
-    // overrides the exponent, which is exactly this scaling.
-    Float::from_integer_prec_round(s0, prec, Floor).0 << (expo - r * (i64::exact_from(i) - 1))
+    // overrides the exponent, which is exactly this scaling. A direct `from_integer_prec_round(s0,
+    // ..)` would pass through the intermediate exponent sb(s0) ~ 2 * prec, which exceeds
+    // MAX_EXPONENT once prec approaches it (malachite's precision range exceeds its exponent range,
+    // unlike MPFR's, whose emax dwarfs any practical precision) and would silently saturate at the
+    // largest finite value. Attaching the scaling before the conversion keeps the exponent in
+    // range: the scaled value is a factor of exp(chunk), of ordinary size.
+    Float::from_rational_prec_round(
+        Rational::from(s0) << (expo - r * (i64::exact_from(i) - 1)),
+        prec,
+        Floor,
+    )
+    .0
 }
 
 // Computes `exp(x)` rounded to precision `precy` with rounding mode `rm`. Decomposes `x` into
@@ -451,9 +461,10 @@ pub(crate) fn exp_3(x: &Float, precy: u64, rm: RoundingMode) -> (Float, Ordering
             }
             let mut t = tmp.square_prec_round_ref(prec, Floor).0;
             if t.is_infinite() {
-                // exp(x) overflowed. Reachable only for x in the narrow band between the true
-                // emax*log(2) and `normal_ref`'s conservative `bound_emax`; no test input lands
-                // there.
+                // Unreachable: `normal_ref` decides the overflow boundary exactly, so here exp(x) <
+                // 2^emax, every Floor-rounded intermediate lies below its true value, and no
+                // squaring can overflow. (Even if one somehow did, Floor rounding saturates at the
+                // largest finite value rather than reaching infinity.)
                 fail_on_untested_path("exp_3, overflow above normal_ref's bound_emax");
                 return exp_overflow(precy, rm);
             }
@@ -659,6 +670,40 @@ fn exp_prec_round_normal_ref(x: &Float, precy: u64, rm: RoundingMode) -> (Float,
     if *x >= bound_emax {
         // x > log(2^emax), so exp(x) > 2^emax
         return exp_overflow(precy, rm);
+    }
+    // `bound_emax` is an upper bound with ~2^-33 of slack, so an x just below it may still
+    // overflow. That sliver must be decided here: below the threshold, every intermediate in
+    // `exp_2` and `exp_3` stays under 2^emax, but a true overflow inside `exp_3` would saturate its
+    // Floor-rounded final squarings at the largest finite value instead of reaching infinity, and
+    // the saturated all-ones significand is one that `float_can_round` never certifies -- the Ziv
+    // loop would grow forever. Decide the sliver exactly, by comparing x with brackets of emax *
+    // log(2) as exact Rationals at widening precision; x is dyadic and the threshold is irrational,
+    // so the comparison always resolves. This mirrors the role of MPFR's overflow flag, which lets
+    // mpfr_exp detect the overflow after the fact.
+    let bound_emax_lo = Float::ln_2_prec_round(BP, Floor)
+        .0
+        .mul_prec_round_ref_val(
+            const { Float::const_from_signed(Float::MAX_EXPONENT as SignedLimb) },
+            BP,
+            Floor,
+        )
+        .0;
+    if *x >= bound_emax_lo {
+        let xr = Rational::exact_from(x);
+        let emax_r = Rational::from(Float::MAX_EXPONENT);
+        let mut p = 128;
+        loop {
+            let lo = Rational::exact_from(Float::ln_2_prec_round(p, Floor).0) * &emax_r;
+            if xr < lo {
+                break;
+            }
+            let hi = Rational::exact_from(Float::ln_2_prec_round(p, Ceiling).0) * &emax_r;
+            if xr >= hi {
+                // x > emax * log(2), so exp(x) > 2^emax
+                return exp_overflow(precy, rm);
+            }
+            p <<= 1;
+        }
     }
     let bound_emin = log2_up
         .mul_prec_round(
