@@ -3129,6 +3129,9 @@ fn primitive_float_power_of_10_x_minus_1_rational_properties() {
 #[test]
 fn test_power_of_10_x_minus_1_deep_negative_regression() {
     let prec = u64::exact_from(Float::MAX_EXPONENT);
+    // - integer x (`deep_negative` frac == 0 path): the Float path materializes -1 + 10^-s over
+    //   Rationals while the Rational integer path rounds from -1 by a different mechanism, so they
+    //   serve as independent oracles.
     let x = Float::from(-340000000i32);
     let q = Rational::from(-340000000i32);
     for rm in exhaustive_rounding_modes() {
@@ -3141,4 +3144,25 @@ fn test_power_of_10_x_minus_1_deep_negative_regression() {
         assert_eq!(ComparableFloat(pf), ComparableFloat(pr), "rm = {rm:?}");
         assert_eq!(of, or);
     }
+    // - non-integer x (`deep_negative` frac != 0 path): 10^x = 10^0.5 / 10^s is bracketed and
+    //   divided. 10^x is far below the prec-bit window (x * log2(10) ~ -1.13e9 < -prec), so the
+    //   result is -1 rounding away from zero (Floor, Up, Nearest) or its toward-zero neighbor -1 +
+    //   ulp (Ceiling, Down). The Rational path here just delegates to this same Float path, so the
+    //   expected value is checked directly.
+    let x = Float::from(-340000000.5f64);
+    let neg_one = -Float::one_prec(prec);
+    let neg_one_plus_ulp = neg_one
+        .clone()
+        .add_prec_round(Float::power_of_2(-i64::exact_from(prec)), prec, Exact)
+        .0;
+    // Away from -1 (Floor here) rounds to -1; toward zero (Ceiling) rounds to -1 + ulp. (One mode
+    // from each side suffices; each is a ~128 MB computation.)
+    let (f, o) = x.power_of_10_x_minus_1_prec_round_ref(prec, Floor);
+    assert!(f.is_valid());
+    assert_eq!(ComparableFloat(f), ComparableFloat(neg_one));
+    assert_eq!(o, Less);
+    let (f, o) = x.power_of_10_x_minus_1_prec_round_ref(prec, Ceiling);
+    assert!(f.is_valid());
+    assert_eq!(ComparableFloat(f), ComparableFloat(neg_one_plus_ulp));
+    assert_eq!(o, Greater);
 }

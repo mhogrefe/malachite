@@ -22,6 +22,7 @@ use crate::{
 };
 use core::cmp::Ordering::{self, *};
 use core::cmp::max;
+use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     CeilingLogBase2, Pow, PowerOf10XMinus1, PowerOf10XMinus1Assign, Reciprocal,
 };
@@ -255,9 +256,18 @@ fn power_of_10_x_minus_1_deep_negative(
         // lies strictly between the bounds, so the other bound's ordering is the true one; treat
         // the exact bound as agreeing with it.
         if o_lo == Equal {
+            fail_on_untested_path(
+                "deep_negative o_lo == Equal: u_lo / 10^s has a 5^s factor in its denominator (the \
+                 working-precision mantissa is smaller than 5^s in the deep regime), so it is \
+                 non-dyadic and never rounds exactly",
+            );
             o_lo = o_hi;
         }
         if o_hi == Equal {
+            fail_on_untested_path(
+                "deep_negative o_hi == Equal: as o_lo == Equal -- the bracket end is non-dyadic, \
+                 so it never rounds exactly",
+            );
             o_hi = o_lo;
         }
         if o_lo == o_hi && f_lo == f_hi {
