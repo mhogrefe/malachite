@@ -33,10 +33,14 @@ use malachite_base::num::conversion::traits::{ExactFrom, IsInteger, RoundingFrom
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::integer::Integer;
-use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::float_extras::float_can_round;
 use malachite_nz::platform::Limb;
 use malachite_q::Rational;
+
+const MAX_EXPONENT_U64: u64 = Float::MAX_EXPONENT as u64;
+const MAX_EXPONENT_I64: i64 = Float::MAX_EXPONENT as i64;
+const MIN_EXPONENT_I64: i64 = Float::MIN_EXPONENT as i64;
+const TEN: Rational = Rational::const_from_unsigned(10);
 
 // The outcome of the "small |x|" branch of `mpfr_exp10m1`.
 enum Small {
@@ -55,16 +59,16 @@ enum Small {
 fn x_log_2_10_ge(x: &Rational, bound: i64) -> bool {
     let bound = Rational::from(bound);
     let positive = *x > 0u32;
-    let mut p = Limb::WIDTH << 1;
+    let mut p = const { Limb::WIDTH << 1 };
     loop {
         let (lo, hi) = floor_and_ceiling(Float::log_2_10_prec_round(p, Floor));
-        let lo = Rational::exact_from(&lo);
-        let hi = Rational::exact_from(&hi);
+        let lo = Rational::exact_from(lo);
+        let hi = Rational::exact_from(hi);
         // log2(10) in [lo, hi], so x * log2(10) in [a_lo, a_hi].
         let (a_lo, a_hi) = if positive {
-            (x * &lo, x * &hi)
+            (x * lo, x * hi)
         } else {
-            (x * &hi, x * &lo)
+            (x * hi, x * lo)
         };
         if a_lo >= bound {
             return true;
@@ -123,7 +127,7 @@ fn power_of_10_x_minus_1_prec_round_normal(
     if x.is_sign_negative() && x.gt_abs(&(2 + (prec - 1) / 3)) {
         return match rm {
             Ceiling | Down => (-one_neighbor(prec, false), Greater),
-            Floor | Up | Nearest => (-Float::one_prec(prec), Less),
+            Floor | Up | Nearest => (Float::negative_one_prec(prec), Less),
             Exact => panic!("Inexact power_of_10_x_minus_1"),
         };
     }
@@ -136,8 +140,8 @@ fn power_of_10_x_minus_1_prec_round_normal(
     // shortcut leaves only |x| <= 2 + (prec - 1) / 3. The cheap `prec` gate below skips the (up to
     // 128 MB) `Rational::exact_from(x)` in the common case, where the branch cannot fire.
     if x.is_sign_negative()
-        && 2 + (prec - 1) / 3 >= const { Float::MAX_EXPONENT as u64 / 4 }
-        && !x_log_2_10_ge(&Rational::exact_from(x), i64::from(Float::MIN_EXPONENT))
+        && 2 + (prec - 1) / 3 >= const { MAX_EXPONENT_U64 >> 2 }
+        && !x_log_2_10_ge(&Rational::exact_from(x), MIN_EXPONENT_I64)
     {
         return power_of_10_x_minus_1_deep_negative(x, prec, rm);
     }
@@ -161,8 +165,7 @@ fn power_of_10_x_minus_1_prec_round_normal(
             //   artifact of rounding 10^x up at the working precision; growing it far enough (past
             //   the distance from x * log2(10) to MAX_EXPONENT) makes 10^x finite, and the loop
             //   proceeds normally.
-            if prec < const { Float::MAX_EXPONENT as u64 }
-                || x_log_2_10_ge(&Rational::exact_from(x), i64::from(Float::MAX_EXPONENT))
+            if prec < MAX_EXPONENT_U64 || x_log_2_10_ge(&Rational::exact_from(x), MAX_EXPONENT_I64)
             {
                 return exp_overflow(prec, rm);
             }
@@ -219,7 +222,7 @@ fn power_of_10_x_minus_1_deep_negative(
     let xr = Rational::exact_from(x);
     let neg_n = -Integer::rounding_from(&xr, Floor).0; // = |floor(x)| = s, since x < 0
     let shift = u64::exact_from(&neg_n);
-    let ten_pow_s = Rational::from(const { Natural::const_from(10) }.pow(shift)); // 10^s
+    let ten_pow_s = TEN.pow(shift); // 10^s
     let frac = xr + Rational::from(neg_n); // x - floor(x), in [0, 1)
     if frac == 0u32 {
         // x is an integer, so -1 + 10^x = -1 + 1 / 10^s is an exact rational.
@@ -239,12 +242,12 @@ fn power_of_10_x_minus_1_deep_negative(
         let u = Float::power_of_10_of_float_prec_round_ref(&frac, working_prec, Floor);
         let (u_lo, u_hi) = floor_and_ceiling(u);
         let (f_lo, mut o_lo) = Float::from_rational_prec_round(
-            Rational::exact_from(&u_lo) / &ten_pow_s - Rational::ONE,
+            Rational::exact_from(u_lo) / &ten_pow_s - Rational::ONE,
             prec,
             rm,
         );
         let (f_hi, mut o_hi) = Float::from_rational_prec_round(
-            Rational::exact_from(&u_hi) / &ten_pow_s - Rational::ONE,
+            Rational::exact_from(u_hi) / &ten_pow_s - Rational::ONE,
             prec,
             rm,
         );
@@ -282,8 +285,8 @@ fn power_of_10_x_minus_1_rational_near_zero(
     loop {
         // ln_10_lo <= ln(10) <= ln_10_hi, as exact Rationals, from a single ln(10) computation.
         let (ln_10_lo, ln_10_hi) = floor_and_ceiling(Float::ln_10_prec_round(working_prec, Floor));
-        let ln_10_lo = Rational::exact_from(&ln_10_lo);
-        let ln_10_hi = Rational::exact_from(&ln_10_hi);
+        let ln_10_lo = Rational::exact_from(ln_10_lo);
+        let ln_10_hi = Rational::exact_from(ln_10_hi);
         let (a_lo, a_hi) = if positive {
             (x * ln_10_lo, x * ln_10_hi)
         } else {
@@ -314,13 +317,11 @@ fn power_of_10_x_minus_1_rational_helper(
         return if n > 0 {
             // 10^n - 1 overflows when 10^n - 1 >= 2^MAX_EXPONENT, i.e. n * log2(10) >=
             // MAX_EXPONENT.
-            if x_log_2_10_ge(x, i64::from(Float::MAX_EXPONENT)) {
+            if x_log_2_10_ge(x, MAX_EXPONENT_I64) {
                 exp_overflow(prec, rm)
             } else {
                 // 10^n - 1 is an exact integer with at most MAX_EXPONENT bits; round it directly.
-                let value =
-                    Rational::from(const { Natural::const_from(10) }.pow(u64::exact_from(&n)))
-                        - Rational::ONE;
+                let value = TEN.pow(u64::exact_from(&n)) - Rational::ONE;
                 Float::from_rational_prec_round(value, prec, rm)
             }
         } else {
@@ -334,8 +335,7 @@ fn power_of_10_x_minus_1_rational_helper(
             // 1.
             if x_log_2_10_ge(x, -i64::exact_from(prec) - 2) {
                 let s = u64::exact_from(&-&n);
-                let value = Rational::from(const { Natural::const_from(10) }.pow(s)).reciprocal()
-                    - Rational::ONE;
+                let value = TEN.pow(s).reciprocal() - Rational::ONE;
                 Float::from_rational_prec_round(value, prec, rm)
             } else {
                 float_round_near_x(&Float::NEGATIVE_ONE, prec + 2, false, prec, rm).unwrap()
@@ -349,20 +349,21 @@ fn power_of_10_x_minus_1_rational_helper(
     // x is too small to be represented as a normal Float (|x| < 2^MIN_EXPONENT). The squeeze below
     // cannot bracket it (its Float bounds would be 0), so use the ln(10)-bracketing helper, which
     // reduces 10^x - 1 to expm1(x ln(10)) for the tiny (near-zero) argument.
-    if exp_x <= i64::from(Float::MIN_EXPONENT) {
+    if exp_x <= MIN_EXPONENT_I64 {
         return power_of_10_x_minus_1_rational_near_zero(x, prec, rm);
     }
     // |x| is too large to be a finite Float. For x > 0, 10^x - 1 overflows; for x < 0 it tends to
     // -1. Smaller x that still overflow or round to -1 are handled by the Float function inside the
     // squeeze below.
-    if exp_x >= i64::from(Float::MAX_EXPONENT) {
+    if exp_x >= MAX_EXPONENT_I64 {
         if positive {
             return exp_overflow(prec, rm);
         }
         // 10^x is far below ulp(-1) at any precision, so 10^x - 1 rounds to -1 or its toward-zero
         // neighbor.
-        let err = const { Float::MAX_EXPONENT as u64 };
-        if let Some(result) = float_round_near_x(&Float::NEGATIVE_ONE, err, false, prec, rm) {
+        if let Some(result) =
+            float_round_near_x(&Float::NEGATIVE_ONE, MAX_EXPONENT_U64, false, prec, rm)
+        {
             return result;
         }
         // `prec` is enormous (>= MAX_EXPONENT), so `float_round_near_x` cannot resolve the
@@ -420,7 +421,7 @@ impl Float {
             // 10^(-inf) - 1 = -1
             Self(Infinity { sign: false }) => (Self::from_signed_prec(-1i32, prec).0, Equal),
             // 10^(±0) - 1 = ±0
-            Self(Zero { sign }) => (Self(Zero { sign: *sign }), Equal),
+            Self(Zero { .. }) => (self.clone(), Equal),
             _ => power_of_10_x_minus_1_prec_round_normal(self, prec, rm),
         }
     }
