@@ -16,12 +16,12 @@
 
 use crate::ComparableFloatRef;
 use crate::InnerFloat::{Infinity, NaN, Zero};
-use crate::arithmetic::exp::{exp_overflow, exp_underflow, one_neighbor};
+use crate::arithmetic::exp::{exp_overflow, exp_rational_near_one, exp_underflow, one_neighbor};
 use crate::arithmetic::ln::ln_1_plus_rational_brackets;
 use crate::arithmetic::log_base_2::log_2_rational_brackets;
 use crate::emulate_float_float_to_float_fn;
 use crate::emulate_float_to_float_fn;
-use crate::{Float, float_either_infinity, float_either_zero, float_nan};
+use crate::{Float, float_either_infinity, float_either_zero, float_nan, floor_and_ceiling};
 use core::cmp::Ordering::{self, *};
 use core::cmp::max;
 use malachite_base::fail_on_untested_path;
@@ -5721,8 +5721,14 @@ fn unsigned_pow_rational(k: u64, q: &Rational, prec: u64, rm: RoundingMode) -> (
         let a = Integer::from_sign_and_abs_ref(*q >= 0, q.numerator_ref());
         return Float::from(j).pow_integer_prec_round(a, prec, rm);
     }
-    // The remaining results are irrational; squeeze 2^(q * log2(k)) between exact Rationals. Since
-    // k >= 2, log2(k) >= 1, so there is no sub-`MIN_EXPONENT` logarithm to contend with.
+    // The remaining results are irrational. When `q` is tiny enough that `k ^ q` is within a few
+    // ulps of 1, evaluating it as `2 ^ (q * log2(k))` would compute `log2(k)` to nearly `prec` bits
+    // needlessly; a dedicated near-1 path handles that case far more cheaply.
+    if let Some(result) = unsigned_pow_rational_near_one(k, q, prec, rm) {
+        return result;
+    }
+    // Otherwise squeeze 2^(q * log2(k)) between exact Rationals. Since k >= 2, log2(k) >= 1, so
+    // there is no sub-`MIN_EXPONENT` logarithm to contend with.
     pow_squeeze_t(&Rational::from(k), 0, q, prec, rm)
 }
 
@@ -6129,7 +6135,60 @@ fn rational_pow_squeeze_x(
 // ends agree. `rational_pow` reaches this in its extreme regime with x' in [1/sqrt(2), sqrt(2));
 // `unsigned_pow_rational` reaches it with x' = k and e = 0. Growth past the initial precision is
 // rare but constructible: 6^(1 + 2^-300) lies within 2^-300 of the rounding boundary 6.0, so the
-// first bracket straddles it at any target precision below ~300.
+// first bracket straddles it at any target precision below ~300. Fast path for `k ^ q` when the
+// result is extremely close to 1 (`q` so tiny that `k ^ q = exp(q * ln k)` differs from 1 by at
+// most a handful of ulps). The general squeeze in `pow_squeeze_t` evaluates `log2(k)` to about
+// `prec` bits, which is wasteful here; instead bracket `ln(k)` between two `Rational`s from a
+// single modest-precision `ln(k)` and apply `exp_rational_near_one` to the tiny products `q *
+// ln(k)`. Returns `None` when the result is not close enough to 1 for this to help (the caller then
+// squeezes). Mirrors `power_of_2_rational_near_one`, replacing the constant `ln(2)` with `ln(k)`.
+// `k >= 2` and `q` is a nonzero non-integer, so `k ^ q` is irrational.
+fn unsigned_pow_rational_near_one(
+    k: u64,
+    q: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+) -> Option<(Float, Ordering)> {
+    // `2 ^ ql <= |q| < 2 ^ (ql + 1)` and `log2(k) < kb <= 2 ^ kbb` (kbb the bit length of kb), so
+    // `|q * log2(k)| < 2 ^ (ql + 1 + kbb)`. Take this path only when that bound puts `k ^ q` within
+    // roughly a machine word's worth of ulps of 1: then `exp_rational_near_one` converges in O(1)
+    // terms and `ln(k)` is needed to only about `prec + t_exp_ub` bits. The `t_exp_ub >= 0` guard
+    // also keeps `|q * ln(k)| < 1`, which `exp_rational_near_one` requires.
+    let ql = q.floor_log_base_2_abs();
+    let kbb = i64::exact_from(k.significant_bits().significant_bits());
+    let t_exp_ub = ql + 1 + kbb;
+    if t_exp_ub >= 0 || t_exp_ub > -i64::exact_from(prec) + i64::exact_from(Limb::WIDTH) {
+        return None;
+    }
+    // `k > 1`, so `k ^ q > 1` exactly when `q > 0`. Because `q * ln(k)` is tiny, `ln(k)` needs only
+    // about `prec + t_exp_ub` bits to separate the two exp brackets at the target precision -- far
+    // below `prec`. Start a little above that and let the Ziv loop grow it.
+    let above = *q > 0u32;
+    let mut working_prec = u64::exact_from((i64::exact_from(prec) + t_exp_ub).max(0)) + Limb::WIDTH;
+    let mut increment = Limb::WIDTH;
+    let kf = Float::from(k);
+    loop {
+        // `ln_k_lo <= ln(k) <= ln_k_hi`, as exact Rationals, from a single `ln(k)` computation.
+        let (ln_k_lo, ln_k_hi) = floor_and_ceiling(kf.ln_prec_round_ref(working_prec, Floor));
+        let ln_k_lo = Rational::exact_from(&ln_k_lo);
+        let ln_k_hi = Rational::exact_from(&ln_k_hi);
+        // `q * ln(k)` lies between these two products (which end is smaller depends on the sign of
+        // `q`), and exp is increasing, so `k ^ q` lies between the exps of the two products.
+        let (p_lo, p_hi) = if above {
+            (q * ln_k_lo, q * ln_k_hi)
+        } else {
+            (q * ln_k_hi, q * ln_k_lo)
+        };
+        let (lo, o_lo) = exp_rational_near_one(&p_lo, prec, rm);
+        let (hi, o_hi) = exp_rational_near_one(&p_hi, prec, rm);
+        if o_lo == o_hi && lo == hi {
+            return Some((lo, o_lo));
+        }
+        working_prec += increment;
+        increment = working_prec >> 1;
+    }
+}
+
 fn pow_squeeze_t(
     xp: &Rational,
     e: i64,

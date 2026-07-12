@@ -497,6 +497,18 @@ pub trait PowerOf2XMinus1Assign {
     fn power_of_2_x_minus_1_assign(&mut self);
 }
 
+/// Computes $10^x-1$, ten raised to the power of a number, minus one.
+pub trait PowerOf10XMinus1 {
+    type Output;
+
+    fn power_of_10_x_minus_1(self) -> Self::Output;
+}
+
+/// Replaces a number $x$ with $10^x-1$.
+pub trait PowerOf10XMinus1Assign {
+    fn power_of_10_x_minus_1_assign(&mut self);
+}
+
 /// Takes the natural logarithm of a number.
 pub trait Ln {
     type Output;
@@ -1383,6 +1395,16 @@ pub trait PowerOf2<POW> {
 /// Replaces a number with 2 raised to the power of that number.
 pub trait PowerOf2Assign {
     fn power_of_2_assign(&mut self);
+}
+
+/// Raises 10 to a power.
+pub trait PowerOf10<POW> {
+    fn power_of_10(pow: POW) -> Self;
+}
+
+/// Replaces a number with 10 raised to the power of that number.
+pub trait PowerOf10Assign {
+    fn power_of_10_assign(&mut self);
 }
 
 pub trait Primorial {

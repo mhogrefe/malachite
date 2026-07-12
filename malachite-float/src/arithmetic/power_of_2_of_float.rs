@@ -892,7 +892,77 @@ impl Float {
 
     #[allow(clippy::needless_pass_by_value)]
     /// Computes $2^x$, where $x$ is a [`Rational`], rounding the result to the specified precision
-    /// and with the specified rounding mode. The [`Rational`] is taken by value.
+    /// and with the specified rounding mode and returning the result as a [`Float`]. The
+    /// [`Rational`] is taken by value. An [`Ordering`] is also returned, indicating whether the
+    /// rounded power is less than, equal to, or greater than the exact power.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,p,m) = 2^x+\varepsilon.
+    /// $$
+    /// - If $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 2^x\rfloor-p+1}$.
+    /// - If $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 2^x\rfloor-p}$.
+    ///
+    /// These bounds do not apply when the result overflows or underflows; see below.
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p,m)=1$.
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)<2^{-2^{30}}$ and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $f(x,p,m)<2^{-2^{30}}$ and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned instead.
+    /// - If $f(x,p,m)\leq2^{-2^{30}-1}$ and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p,m)<2^{-2^{30}}$ and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::power_of_2_rational_prec`]
+    /// instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision (which is the case whenever $x$ is not an integer).
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (p, o) =
+    ///     Float::power_of_2_rational_prec_round(Rational::from_unsigneds(3u8, 5), 5, Floor);
+    /// assert_eq!(p.to_string(), "1.5");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) =
+    ///     Float::power_of_2_rational_prec_round(Rational::from_unsigneds(3u8, 5), 5, Ceiling);
+    /// assert_eq!(p.to_string(), "1.56");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (p, o) =
+    ///     Float::power_of_2_rational_prec_round(Rational::from_unsigneds(3u8, 5), 20, Floor);
+    /// assert_eq!(p.to_string(), "1.515717");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) =
+    ///     Float::power_of_2_rational_prec_round(Rational::from_unsigneds(3u8, 5), 20, Ceiling);
+    /// assert_eq!(p.to_string(), "1.515718");
+    /// assert_eq!(o, Greater);
+    /// ```
     #[inline]
     pub fn power_of_2_rational_prec_round(
         x: Rational,
@@ -903,7 +973,83 @@ impl Float {
     }
 
     /// Computes $2^x$, where $x$ is a [`Rational`], rounding the result to the specified precision
-    /// and with the specified rounding mode. The [`Rational`] is taken by reference.
+    /// and with the specified rounding mode and returning the result as a [`Float`]. The
+    /// [`Rational`] is taken by reference. An [`Ordering`] is also returned, indicating whether the
+    /// rounded power is less than, equal to, or greater than the exact power.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,p,m) = 2^x+\varepsilon.
+    /// $$
+    /// - If $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 2^x\rfloor-p+1}$.
+    /// - If $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 2^x\rfloor-p}$.
+    ///
+    /// These bounds do not apply when the result overflows or underflows; see below.
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p,m)=1$.
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)<2^{-2^{30}}$ and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $f(x,p,m)<2^{-2^{30}}$ and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned instead.
+    /// - If $f(x,p,m)\leq2^{-2^{30}-1}$ and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p,m)<2^{-2^{30}}$ and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    ///
+    /// If you know you'll be using `Nearest`, consider using
+    /// [`Float::power_of_2_rational_prec_ref`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision (which is the case whenever $x$ is not an integer).
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (p, o) =
+    ///     Float::power_of_2_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 5, Floor);
+    /// assert_eq!(p.to_string(), "1.5");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = Float::power_of_2_rational_prec_round_ref(
+    ///     &Rational::from_unsigneds(3u8, 5),
+    ///     5,
+    ///     Ceiling,
+    /// );
+    /// assert_eq!(p.to_string(), "1.56");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (p, o) =
+    ///     Float::power_of_2_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 20, Floor);
+    /// assert_eq!(p.to_string(), "1.515717");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = Float::power_of_2_rational_prec_round_ref(
+    ///     &Rational::from_unsigneds(3u8, 5),
+    ///     20,
+    ///     Ceiling,
+    /// );
+    /// assert_eq!(p.to_string(), "1.515718");
+    /// assert_eq!(o, Greater);
+    /// ```
     pub fn power_of_2_rational_prec_round_ref(
         x: &Rational,
         prec: u64,
@@ -928,14 +1074,122 @@ impl Float {
 
     #[allow(clippy::needless_pass_by_value)]
     /// Computes $2^x$, where $x$ is a [`Rational`], rounding the result to the nearest value of the
-    /// specified precision. The [`Rational`] is taken by value.
+    /// specified precision and returning the result as a [`Float`]. The [`Rational`] is taken by
+    /// value. An [`Ordering`] is also returned, indicating whether the rounded power is less than,
+    /// equal to, or greater than the exact power.
+    ///
+    /// If the power is equidistant from two [`Float`]s with the specified precision, the [`Float`]
+    /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
+    /// the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,p) = 2^x+\varepsilon,
+    /// $$
+    /// where $|\varepsilon| \leq 2^{\lfloor\log_2 2^x\rfloor-p}$ (unless the result overflows or
+    /// underflows; see below).
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p)=1$.
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::power_of_2_rational_prec_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (p, o) = Float::power_of_2_rational_prec(Rational::from_unsigneds(3u8, 5), 5);
+    /// assert_eq!(p.to_string(), "1.5");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = Float::power_of_2_rational_prec(Rational::from_unsigneds(3u8, 5), 20);
+    /// assert_eq!(p.to_string(), "1.515717");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = Float::power_of_2_rational_prec(Rational::from(0), 10);
+    /// assert_eq!(p.to_string(), "1.0");
+    /// assert_eq!(o, Equal);
+    /// ```
     #[inline]
     pub fn power_of_2_rational_prec(x: Rational, prec: u64) -> (Self, Ordering) {
         Self::power_of_2_rational_prec_round_ref(&x, prec, Nearest)
     }
 
     /// Computes $2^x$, where $x$ is a [`Rational`], rounding the result to the nearest value of the
-    /// specified precision. The [`Rational`] is taken by reference.
+    /// specified precision and returning the result as a [`Float`]. The [`Rational`] is taken by
+    /// reference. An [`Ordering`] is also returned, indicating whether the rounded power is less
+    /// than, equal to, or greater than the exact power.
+    ///
+    /// If the power is equidistant from two [`Float`]s with the specified precision, the [`Float`]
+    /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
+    /// the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,p) = 2^x+\varepsilon,
+    /// $$
+    /// where $|\varepsilon| \leq 2^{\lfloor\log_2 2^x\rfloor-p}$ (unless the result overflows or
+    /// underflows; see below).
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p)=1$.
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::power_of_2_rational_prec_round_ref`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (p, o) = Float::power_of_2_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 5);
+    /// assert_eq!(p.to_string(), "1.5");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = Float::power_of_2_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 20);
+    /// assert_eq!(p.to_string(), "1.515717");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = Float::power_of_2_rational_prec_ref(&Rational::from(0), 10);
+    /// assert_eq!(p.to_string(), "1.0");
+    /// assert_eq!(o, Equal);
+    /// ```
     #[inline]
     pub fn power_of_2_rational_prec_ref(x: &Rational, prec: u64) -> (Self, Ordering) {
         Self::power_of_2_rational_prec_round_ref(x, prec, Nearest)

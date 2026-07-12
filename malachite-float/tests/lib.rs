@@ -87,6 +87,8 @@ pub mod arithmetic {
     pub mod mul;
     pub mod neg;
     pub mod pow;
+    pub mod power_of_10;
+    pub mod power_of_10_x_minus_1;
     pub mod power_of_2;
     pub mod power_of_2_of_float;
     pub mod power_of_2_x_minus_1;

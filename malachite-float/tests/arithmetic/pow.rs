@@ -3455,6 +3455,63 @@ fn test_unsigned_pow_rational() {
         "0x1.00000#20",
         Greater,
     );
+    // - near-1 fast path: for a tiny q, k^q is within a few ulps of 1, so it is computed as exp(q *
+    //   ln k) from a low-precision ln(k) rather than the full log2(k) squeeze. (See
+    //   `power_of_10_rational_near_one_compute_huge` for the extreme-precision version.)
+    test(
+        10,
+        "3/36028797018963968",
+        53,
+        Floor,
+        "1.0",
+        "0x1.0000000000000#53",
+        Less,
+    );
+    test(
+        10,
+        "3/36028797018963968",
+        53,
+        Ceiling,
+        "1.0000000000000002",
+        "0x1.0000000000001#53",
+        Greater,
+    );
+    test(
+        10,
+        "3/36028797018963968",
+        53,
+        Nearest,
+        "1.0000000000000002",
+        "0x1.0000000000001#53",
+        Greater,
+    );
+    test(
+        10,
+        "-3/36028797018963968",
+        53,
+        Nearest,
+        "0.9999999999999998",
+        "0x0.fffffffffffff0#53",
+        Less,
+    );
+    test(
+        7,
+        "-3/73786976294838206464",
+        64,
+        Nearest,
+        "0.99999999999999999995",
+        "0x0.ffffffffffffffff#64",
+        Greater,
+    );
+    test(
+        1000000,
+        "3/4503599627370496",
+        50,
+        Nearest,
+        "1.000000000000009",
+        "0x1.0000000000028#50",
+        Less,
+    );
 
     // - Ziv growth in the squeeze: 6^(1 + 2^-300) lies within 2^-300 of the rounding boundary 6.0,
     //   so the initial working precision cannot separate the brackets and must grow
