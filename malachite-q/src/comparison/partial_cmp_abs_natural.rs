@@ -9,7 +9,6 @@
 use crate::Rational;
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::Sign;
-use malachite_base::num::basic::traits::One;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
@@ -52,14 +51,14 @@ impl PartialOrdAbs<Natural> for Rational {
         }
         // Then check if one is < 1 and the other is > 1
         let self_cmp_one = self.numerator.cmp(&self.denominator);
-        let other_cmp_one = other.cmp(&Natural::ONE);
+        let other_cmp_one = other.partial_cmp(&1u32).unwrap();
         let one_cmp = self_cmp_one.cmp(&other_cmp_one);
         if one_cmp != Equal {
             return Some(one_cmp);
         }
         // Then compare numerators and denominators
         let n_cmp = self.numerator.cmp(other);
-        let d_cmp = self.denominator.cmp(&Natural::ONE);
+        let d_cmp = self.denominator.partial_cmp(&1u32).unwrap();
         if n_cmp == Equal && d_cmp == Equal {
             return Some(Equal);
         }

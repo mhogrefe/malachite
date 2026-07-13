@@ -1489,6 +1489,18 @@ pub trait RootAssignRem<POW> {
     fn root_assign_rem(&mut self, exp: POW) -> Self::RemOutput;
 }
 
+/// Takes the $n$th root of a number.
+pub trait Root<POW> {
+    type Output;
+
+    fn root(self, pow: POW) -> Self::Output;
+}
+
+/// Replaces a number with its $n$th root.
+pub trait RootAssign<POW> {
+    fn root_assign(&mut self, pow: POW);
+}
+
 /// Rotates a number left, inserting the leftmost bits into the right end.
 pub trait RotateLeft {
     type Output;

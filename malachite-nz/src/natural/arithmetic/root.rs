@@ -152,9 +152,10 @@ fn log_based_root(out: &mut Limb, x: Limb, mut bit_count: u64, exp: u64) -> u64 
     let len;
     let b = u64::from(V_LOG[usize::exact_from(x >> LOGROOT_USED_BITS_COMP)]);
     if bit_count.significant_bits() > LOGROOT_USED_BITS_COMP {
-        // In this branch, the input is unreasonably large. In the unlikely case, we use two
-        // divisions and a modulo.
-        fail_on_untested_path("bit_count.significant_bits() > LOGROOT_USED_BITS_COMP");
+        // In this branch, the input is very large: at least 2^(2^24) with 32-bit limbs (~2 MB,
+        // practical and covered by `test_floor_root_huge`), and at least 2^(2^56) with 64-bit
+        // limbs (beyond addressable memory). In the unlikely case, we use two divisions and a
+        // modulo.
         let r;
         (len, r) = bit_count.div_mod(exp);
         bit_count = ((r << LOGROOT_USED_BITS) | b) / exp;

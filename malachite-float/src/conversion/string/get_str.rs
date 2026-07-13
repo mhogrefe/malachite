@@ -35,10 +35,12 @@ fn ceil_mul(e: i64, beta: u64, i: usize) -> i64 {
     let (mantissa, exp) = MPFR_L2B[usize::exact_from(beta) - 2][i];
     let p = Float::from_natural_prec(Natural::from(mantissa), 128).0;
     let p = p >> u64::exact_from(128 - i64::from(exp));
-    // t = e, as a `Float` with the precision of an `mpfr_exp_t` minus one, rounded up.
-    let t = Float::from_signed_prec_round(e, i64::WIDTH - 1, Ceiling).0;
-    // t = t * p, rounded up.
-    let t = t.mul_prec_round(p, i64::WIDTH - 1, Ceiling).0;
+    // t = e * p, with e as a `Float` with the precision of an `mpfr_exp_t` minus one, both
+    // roundings up.
+    let t = Float::from_signed_prec_round(e, i64::WIDTH - 1, Ceiling)
+        .0
+        .mul_prec_round(p, i64::WIDTH - 1, Ceiling)
+        .0;
     // ceil(t).
     i64::rounding_from(&t, Ceiling).0
 }

@@ -43,11 +43,12 @@ use crate::test_util::generators::exhaustive::{
     natural_rounding_from_float_valid, pow_integer_prec_round_valid, pow_s_prec_round_valid,
     pow_u_prec_round_valid, rational_div_float_prec_round_valid, rational_div_float_round_valid,
     reciprocal_prec_round_valid, reciprocal_round_valid, reciprocal_sqrt_prec_round_valid,
-    reciprocal_sqrt_rational_prec_round_valid, reciprocal_sqrt_round_valid, set_prec_round_valid,
-    shl_prec_round_valid, shl_round_valid, shr_prec_round_valid, shr_round_valid,
-    signed_rounding_from_float_valid, sqrt_prec_round_valid, sqrt_rational_prec_round_valid,
-    sqrt_round_valid, square_prec_round_valid, square_round_valid, sub_prec_round_valid,
-    sub_rational_prec_round_valid, sub_rational_round_valid, sub_round_valid,
+    reciprocal_sqrt_rational_prec_round_valid, reciprocal_sqrt_round_valid,
+    root_s_prec_round_valid, root_s_rational_prec_round_valid, root_u_prec_round_valid,
+    root_u_rational_prec_round_valid, set_prec_round_valid, shl_prec_round_valid, shl_round_valid,
+    shr_prec_round_valid, shr_round_valid, signed_rounding_from_float_valid, sqrt_prec_round_valid,
+    sqrt_rational_prec_round_valid, sqrt_round_valid, square_prec_round_valid, square_round_valid,
+    sub_prec_round_valid, sub_rational_prec_round_valid, sub_rational_round_valid, sub_round_valid,
     unsigned_pow_prec_round_valid, unsigned_pow_rational_prec_round_valid,
     unsigned_pow_unsigned_prec_round_valid, unsigned_rounding_from_float_valid,
 };
@@ -9319,5 +9320,233 @@ pub fn special_random_float_rounding_mode_pair_gen_var_47(
             &random_rounding_modes,
         )
         .filter(|(f, rm)| exp_round_valid(f, *rm)),
+    )
+}
+
+pub fn special_random_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_13(
+    config: &GenConfig,
+) -> It<(Float, u64, u64, RoundingMode)> {
+    Box::new(
+        random_quadruples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 32),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(ref x, n, prec, rm)| root_u_prec_round_valid(x, n, prec, rm)),
+    )
+}
+
+pub fn special_random_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_14(
+    config: &GenConfig,
+) -> It<(Float, u64, u64, RoundingMode)> {
+    Box::new(
+        random_quadruples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_mixed_extreme_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 32),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(ref x, n, prec, rm)| root_u_prec_round_valid(x, n, prec, rm)),
+    )
+}
+
+pub fn special_random_float_signed_unsigned_rounding_mode_quadruple_gen_var_13(
+    config: &GenConfig,
+) -> It<(Float, i64, u64, RoundingMode)> {
+    Box::new(
+        random_quadruples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_signeds(
+                    seed,
+                    config.get_or("mean_small_n", 32),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(ref x, n, prec, rm)| root_s_prec_round_valid(x, n, prec, rm)),
+    )
+}
+
+pub fn special_random_float_signed_unsigned_rounding_mode_quadruple_gen_var_14(
+    config: &GenConfig,
+) -> It<(Float, i64, u64, RoundingMode)> {
+    Box::new(
+        random_quadruples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_mixed_extreme_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_signeds(
+                    seed,
+                    config.get_or("mean_small_n", 32),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(ref x, n, prec, rm)| root_s_prec_round_valid(x, n, prec, rm)),
+    )
+}
+
+// -- (Rational, PrimitiveUnsigned, PrimitiveUnsigned, RoundingMode) --
+pub fn special_random_rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_3(
+    config: &GenConfig,
+) -> It<(Rational, u64, u64, RoundingMode)> {
+    Box::new(
+        random_quadruples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_rationals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_base_n", 16),
+                    config.get_or("mean_base_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("small_unsigned_mean_n", 4),
+                    config.get_or("small_unsigned_mean_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(ref n, k, prec, rm)| root_u_rational_prec_round_valid(n, k, prec, rm)),
+    )
+}
+
+// -- (Rational, PrimitiveSigned, PrimitiveUnsigned, RoundingMode) --
+pub fn special_random_rational_signed_unsigned_rounding_mode_quadruple_gen_var_2(
+    config: &GenConfig,
+) -> It<(Rational, i64, u64, RoundingMode)> {
+    Box::new(
+        random_quadruples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_rationals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_signeds(
+                    seed,
+                    config.get_or("small_unsigned_mean_n", 4),
+                    config.get_or("small_unsigned_mean_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("small_unsigned_mean_n", 4),
+                    config.get_or("small_unsigned_mean_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(ref n, k, prec, rm)| root_s_rational_prec_round_valid(n, k, prec, rm)),
     )
 }

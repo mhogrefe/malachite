@@ -3699,3 +3699,102 @@ fn test_pow_general_tiny_product_regression() {
     assert_eq!(v, 1u32);
     assert_eq!(o, Less);
 }
+
+// The near-1 fast path: for x = +/-(1 + d) with |z||d| tiny, the result is rounded directly from
+// +/-1 (or the Ziv loop is jump-started) instead of ballooning through ~log(|EXP(d)|) recomputes.
+// Before the fast path, the pow_u rows here took ~milliseconds and the pow_integer rows ~seconds
+// for B = 10^6; all are now microseconds.
+#[test]
+fn test_pow_near_one_fast_path() {
+    // x = 1 +/- 2^-100, exactly representable with 101 bits
+    let xp = Float::one_prec(2)
+        .add_prec(Float::power_of_2(-100i64), 101)
+        .0;
+    let xm = Float::one_prec(2)
+        .add_prec(-Float::power_of_2(-100i64), 101)
+        .0;
+    let test = |v: (Float, Ordering), out: &str, out_hex: &str, o_out| {
+        assert!(v.0.is_valid());
+        assert_eq!(v.0.to_string(), out);
+        assert_eq!(to_hex_string(&v.0), out_hex);
+        assert_eq!(v.1, o_out);
+    };
+    // - rounded directly from 1: all rounding modes, both signs of d
+    test(
+        xp.pow_u_prec_round_ref(3, 53, Floor),
+        "1.0",
+        "0x1.0000000000000#53",
+        Less,
+    );
+    test(
+        xp.pow_u_prec_round_ref(3, 53, Ceiling),
+        "1.0000000000000002",
+        "0x1.0000000000001#53",
+        Greater,
+    );
+    test(
+        xp.pow_u_prec_round_ref(3, 53, Nearest),
+        "1.0",
+        "0x1.0000000000000#53",
+        Less,
+    );
+    test(
+        xm.pow_u_prec_round_ref(65535, 53, Floor),
+        "0.9999999999999999",
+        "0x0.fffffffffffff8#53",
+        Less,
+    );
+    test(
+        xm.pow_u_prec_round_ref(65535, 53, Nearest),
+        "1.0",
+        "0x1.0000000000000#53",
+        Greater,
+    );
+    // - negative z (the reciprocal-power path)
+    test(
+        xp.pow_integer_prec_round_ref_ref(&-Integer::from(1000), 53, Floor),
+        "0.9999999999999999",
+        "0x0.fffffffffffff8#53",
+        Less,
+    );
+    test(
+        xp.pow_integer_prec_round_ref_ref(&-Integer::from(1000), 53, Nearest),
+        "1.0",
+        "0x1.0000000000000#53",
+        Greater,
+    );
+    // - negative x with odd z: rounded from -1 with the mirrored rounding mode
+    test(
+        (-xp.clone()).pow_u_prec_round_ref(3, 53, Floor),
+        "-1.0000000000000002",
+        "-0x1.0000000000001#53",
+        Less,
+    );
+    test(
+        (-xp.clone()).pow_u_prec_round_ref(3, 53, Nearest),
+        "-1.0",
+        "-0x1.0000000000000#53",
+        Greater,
+    );
+    test(
+        (-xm.clone()).pow_integer_prec_round_ref_ref(&-Integer::from(999), 53, Nearest),
+        "-1.0",
+        "-0x1.0000000000000#53",
+        Greater,
+    );
+    // - jump start: the result's bits land within the output window ((1 + 2^-100)^3 = 1 + 3*2^-100
+    //   + ... at prec 150), so the Ziv loop runs, starting at a working precision that covers the
+    //   leading run of 0s or 9s
+    test(
+        xp.pow_u_prec_round_ref(3, 150, Nearest),
+        "1.000000000000000000000000000002366582715663035",
+        "0x1.00000000000000000000000030000000000000#150",
+        Less,
+    );
+    test(
+        xp.pow_integer_prec_round_ref_ref(&-Integer::from(3), 150, Nearest),
+        "0.9999999999999999999999999999976334172843369646",
+        "0x0.ffffffffffffffffffffffffd0000000000000#150",
+        Less,
+    );
+}

@@ -11,7 +11,7 @@ use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{
     DivAssignEuclidean, DivEuclidean, DivMod, UnsignedAbs,
 };
-use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::basic::traits::One;
 
 // Adjusts the `(quotient, remainder)` returned by `div_mod` (whose remainder has the sign of the
 // divisor) into the Euclidean `(quotient, remainder)`, whose remainder is always nonnegative and is
@@ -19,7 +19,7 @@ use malachite_base::num::basic::traits::{One, Zero};
 // adding the divisor's absolute value to the remainder and incrementing the quotient preserves $x =
 // qy + r$ while making $r$ nonnegative.
 fn make_remainder_nonnegative(q: Integer, r: Integer, other: Integer) -> (Integer, Natural) {
-    if r < Integer::ZERO {
+    if r < 0u32 {
         (q + Integer::ONE, (r - other).unsigned_abs())
     } else {
         (q, r.unsigned_abs())
@@ -122,7 +122,7 @@ impl DivEuclidean<&Self> for Integer {
     #[inline]
     fn div_euclidean(self, other: &Self) -> (Self, Natural) {
         let (q, r) = self.div_mod(other);
-        if r < Self::ZERO {
+        if r < 0u32 {
             (q + Self::ONE, (r - other).unsigned_abs())
         } else {
             (q, r.unsigned_abs())
@@ -218,7 +218,7 @@ impl DivEuclidean<&Integer> for &Integer {
     #[inline]
     fn div_euclidean(self, other: &Integer) -> (Integer, Natural) {
         let (q, r) = self.div_mod(other);
-        if r < Integer::ZERO {
+        if r < 0u32 {
             (q + Integer::ONE, (r - other).unsigned_abs())
         } else {
             (q, r.unsigned_abs())

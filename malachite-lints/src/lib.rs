@@ -21,6 +21,7 @@ mod assert_ordering_equal_prefer_exact;
 mod assign_then_consumed_once;
 mod clone_with_ref_variant;
 mod compare_with_power_of_2;
+mod compare_with_primitive;
 mod let_tuple_underscore_to_field;
 mod long_lines;
 mod manual_float_from_primitive;
@@ -231,6 +232,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         assign_then_consumed_once::ASSIGN_THEN_CONSUMED_ONCE,
         clone_with_ref_variant::CLONE_WITH_REF_VARIANT,
         compare_with_power_of_2::COMPARE_WITH_POWER_OF_2,
+        compare_with_primitive::COMPARE_WITH_PRIMITIVE,
         let_tuple_underscore_to_field::LET_TUPLE_UNDERSCORE_TO_FIELD,
         long_lines::LONG_LINES,
         manual_float_from_primitive::MANUAL_FLOAT_FROM_PRIMITIVE,
@@ -253,6 +255,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
     });
     lint_store.register_late_pass(|_| Box::new(assign_then_consumed_once::AssignThenConsumedOnce));
     lint_store.register_late_pass(|_| Box::new(compare_with_power_of_2::CompareWithPowerOf2));
+    lint_store.register_late_pass(|_| Box::new(compare_with_primitive::CompareWithPrimitive));
     lint_store
         .register_late_pass(|_| Box::new(let_tuple_underscore_to_field::LetTupleUnderscoreToField));
     lint_store.register_late_pass(|_| Box::new(long_lines::LongLines));

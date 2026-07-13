@@ -8,7 +8,7 @@
 
 use malachite_base::num::arithmetic::traits::{
     CeilingRoot, CeilingRootAssign, CeilingSqrt, CheckedRoot, CheckedSqrt, FloorRoot,
-    FloorRootAssign, FloorSqrt, Pow, RootAssignRem, RootRem, SqrtRem,
+    FloorRootAssign, FloorSqrt, Pow, PowerOf2, RootAssignRem, RootRem, SqrtRem,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
@@ -270,6 +270,19 @@ fn test_floor_root() {
     test("1000000000", 8, "13");
     test("1000000000", 9, "10");
     test("1000000000", 10, "7");
+}
+
+// With 32-bit limbs, inputs of at least 2^(2^24) (~2 MB) drive `log_based_root`'s bit count past
+// what its fast path can shift without overflowing a 32-bit `mp_bitcnt_t` in the original GMP
+// code, exercising the two-division fallback. (With 64-bit limbs the threshold is 2^(2^56) bits,
+// beyond addressable memory, so this test covers the fallback only in 32-bit builds.)
+// - in log_based_root: bit_count.significant_bits() > LOGROOT_USED_BITS_COMP (32-bit limbs only)
+#[test]
+fn test_floor_root_huge() {
+    const EXP: u64 = 1 << 24;
+    let x = Natural::power_of_2(EXP);
+    assert_eq!((&x).floor_root(EXP), 2u32);
+    assert_eq!(x.floor_root(EXP >> 1), 4u32);
 }
 
 #[test]

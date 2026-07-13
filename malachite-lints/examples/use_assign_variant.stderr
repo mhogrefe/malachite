@@ -18,5 +18,23 @@ error: use `neg_assign` (in place) instead of assigning the result of `neg`
 LL |     x = x.clone().neg();
    |     ^^^^^^^^^^^^^^^^^^^
 
-error: aborting due to 3 previous errors
+error: use `exp_prec_assign` (in place) instead of shadowing `t` with the result of `exp_prec`
+  --> $DIR/use_assign_variant.rs:22:5
+   |
+LL |     let t = t.exp_prec(p).0;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `div_prec_assign` (in place) instead of shadowing `t` with the result of `div_prec_val_ref`
+  --> $DIR/use_assign_variant.rs:23:5
+   |
+LL |     let t = t.div_prec_val_ref(&y, p).0;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `add_prec_assign` (in place) instead of shadowing `t` with the result of `add_prec_val_ref`
+  --> $DIR/use_assign_variant.rs:25:5
+   |
+LL |     let (t, o) = t.add_prec_val_ref(&y, p);
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: aborting due to 6 previous errors
 

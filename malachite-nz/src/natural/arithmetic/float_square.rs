@@ -458,16 +458,16 @@ pub(crate) fn limbs_float_square_high_scratch_len(n: usize) -> usize {
     let k = MPFR_SQRHIGH_TAB
         .get(n)
         .map_or_else(|| isize::exact_from((n + 4) >> 1), |&x| isize::from(x));
-    if k < 0 {
-        limbs_square_to_out_scratch_len(n)
-    } else if k == 0 {
-        0
-    } else {
-        let k = usize::wrapping_from(k);
-        max(
-            limbs_square_to_out_scratch_len(k),
-            limbs_float_mul_high_same_length_scratch_len(n - k),
-        )
+    match k.sign() {
+        Less => limbs_square_to_out_scratch_len(n),
+        Equal => 0,
+        Greater => {
+            let k = usize::wrapping_from(k);
+            max(
+                limbs_square_to_out_scratch_len(k),
+                limbs_float_mul_high_same_length_scratch_len(n - k),
+            )
+        }
     }
 }
 
@@ -509,23 +509,23 @@ pub(crate) fn limbs_float_square_high(out: &mut [Limb], xs: &[Limb], scratch: &m
     assert!(
         k == -1 || k == 0 || (k >= isize::exact_from((n + 4) >> 1) && k < isize::exact_from(n))
     );
-    if k < 0 {
-        limbs_square_to_out(out, xs, scratch);
-    } else if k == 0 {
-        limbs_float_sqr_high_same_length_basecase(out, xs);
-    } else {
-        let k = usize::wrapping_from(k);
-        let l = n - k;
-        limbs_square_to_out(&mut out[l << 1..], &xs[l..], scratch);
-        let (xs_lo, xs_hi) = xs.split_at(k);
-        limbs_float_mul_high_same_length(out, &xs_lo[..l], xs_hi, scratch);
-        let (out_lo, out_hi) = out.split_at_mut(n - 1);
-        let out_lo = &mut out_lo[l - 1..l << 1];
-        let mut carry = limbs_slice_shl_in_place(out_lo, 1);
-        if limbs_slice_add_same_length_in_place_left(&mut out_hi[..=l], out_lo) {
-            carry += 1;
+    match k.sign() {
+        Less => limbs_square_to_out(out, xs, scratch),
+        Equal => limbs_float_sqr_high_same_length_basecase(out, xs),
+        Greater => {
+            let k = usize::wrapping_from(k);
+            let l = n - k;
+            limbs_square_to_out(&mut out[l << 1..], &xs[l..], scratch);
+            let (xs_lo, xs_hi) = xs.split_at(k);
+            limbs_float_mul_high_same_length(out, &xs_lo[..l], xs_hi, scratch);
+            let (out_lo, out_hi) = out.split_at_mut(n - 1);
+            let out_lo = &mut out_lo[l - 1..l << 1];
+            let mut carry = limbs_slice_shl_in_place(out_lo, 1);
+            if limbs_slice_add_same_length_in_place_left(&mut out_hi[..=l], out_lo) {
+                carry += 1;
+            }
+            limbs_slice_add_limb_in_place(&mut out[n + l..n << 1], carry);
         }
-        limbs_slice_add_limb_in_place(&mut out[n + l..n << 1], carry);
     }
 }
 

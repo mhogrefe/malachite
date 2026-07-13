@@ -130,6 +130,7 @@
 )]
 #![warn(
     clippy::cast_lossless,
+    clippy::comparison_chain,
     clippy::explicit_into_iter_loop,
     clippy::explicit_iter_loop,
     clippy::filter_map_next,

@@ -5099,3 +5099,129 @@ pub fn exhaustive_float_rounding_mode_pair_gen_var_47() -> It<(Float, RoundingMo
             .filter(|(f, rm)| exp_round_valid(f, *rm)),
     )
 }
+
+// Whether `(x, k, prec, rm)` is a valid input to `Float::root_u_prec_round`: `Exact` is only
+// allowed when the root really is exact at the given precision.
+pub fn root_u_prec_round_valid(x: &Float, k: u64, prec: u64, rm: RoundingMode) -> bool {
+    rm != Exact || x.root_u_prec_round_ref(k, prec, Floor).1 == Equal
+}
+
+// Whether `(x, k, prec, rm)` is a valid input to `Float::root_s_prec_round`: `Exact` is only
+// allowed when the root really is exact at the given precision.
+pub fn root_s_prec_round_valid(x: &Float, k: i64, prec: u64, rm: RoundingMode) -> bool {
+    rm != Exact || x.root_s_prec_round_ref(k, prec, Floor).1 == Equal
+}
+
+// Whether `(x, k, prec, rm)` is a valid input to `Float::root_u_rational_prec_round`: `Exact` is
+// only allowed when the root really is exact at the given precision.
+pub fn root_u_rational_prec_round_valid(x: &Rational, k: u64, prec: u64, rm: RoundingMode) -> bool {
+    rm != Exact || Float::root_u_rational_prec_round_ref(x, k, prec, Floor).1 == Equal
+}
+
+// Whether `(x, k, prec, rm)` is a valid input to `Float::root_s_rational_prec_round`: `Exact` is
+// only allowed when the root really is exact at the given precision.
+pub fn root_s_rational_prec_round_valid(x: &Rational, k: i64, prec: u64, rm: RoundingMode) -> bool {
+    rm != Exact || Float::root_s_rational_prec_round_ref(x, k, prec, Floor).1 == Equal
+}
+
+pub fn exhaustive_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_13()
+-> It<(Float, u64, u64, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(
+        lex_pairs(
+            exhaustive_triples(
+                exhaustive_floats(),
+                exhaustive_unsigneds(),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, n, prec), rm)| root_u_prec_round_valid(x, n, prec, rm)),
+    ))
+}
+
+// As `..._var_13`, but the `Float` may have an extreme exponent.
+pub fn exhaustive_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_14()
+-> It<(Float, u64, u64, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(
+        lex_pairs(
+            exhaustive_triples(
+                exhaustive_extreme_floats(),
+                exhaustive_unsigneds(),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, n, prec), rm)| root_u_prec_round_valid(x, n, prec, rm)),
+    ))
+}
+
+pub fn exhaustive_float_signed_unsigned_rounding_mode_quadruple_gen_var_13()
+-> It<(Float, i64, u64, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(
+        lex_pairs(
+            exhaustive_triples(
+                exhaustive_floats(),
+                exhaustive_signeds(),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, n, prec), rm)| root_s_prec_round_valid(x, n, prec, rm)),
+    ))
+}
+
+// As `..._var_13`, but the `Float` may have an extreme exponent.
+pub fn exhaustive_float_signed_unsigned_rounding_mode_quadruple_gen_var_14()
+-> It<(Float, i64, u64, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(
+        lex_pairs(
+            exhaustive_triples(
+                exhaustive_extreme_floats(),
+                exhaustive_signeds(),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, n, prec), rm)| root_s_prec_round_valid(x, n, prec, rm)),
+    ))
+}
+
+// All `(Rational, u64, u64, RoundingMode)` that are valid inputs to
+// `Float::root_u_rational_prec_round`.
+pub fn exhaustive_rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_3()
+-> It<(Rational, u64, u64, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(
+        lex_pairs(
+            exhaustive_triples_custom_output(
+                exhaustive_rationals(),
+                exhaustive_unsigneds(),
+                exhaustive_positive_primitive_ints(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref n, k, prec), rm)| root_u_rational_prec_round_valid(n, k, prec, rm)),
+    ))
+}
+
+// All `(Rational, i64, u64, RoundingMode)` that are valid inputs to
+// `Float::root_s_rational_prec_round`.
+pub fn exhaustive_rational_signed_unsigned_rounding_mode_quadruple_gen_var_2()
+-> It<(Rational, i64, u64, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(
+        lex_pairs(
+            exhaustive_triples_custom_output(
+                exhaustive_rationals(),
+                exhaustive_signeds(),
+                exhaustive_positive_primitive_ints(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref n, k, prec), rm)| root_s_rational_prec_round_valid(n, k, prec, rm)),
+    ))
+}

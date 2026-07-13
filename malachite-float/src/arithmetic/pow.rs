@@ -19,6 +19,7 @@ use crate::InnerFloat::{Infinity, NaN, Zero};
 use crate::arithmetic::exp::{exp_overflow, exp_rational_near_one, exp_underflow, one_neighbor};
 use crate::arithmetic::ln::ln_1_plus_rational_brackets;
 use crate::arithmetic::log_base_2::log_2_rational_brackets;
+use crate::arithmetic::round_near_x::float_round_near_x;
 use crate::emulate_float_float_to_float_fn;
 use crate::emulate_float_to_float_fn;
 use crate::{Float, float_either_infinity, float_either_zero, float_nan, floor_and_ceiling};
@@ -32,7 +33,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{
-    Infinity as InfinityTrait, NaN as NaNTrait, NegativeInfinity, NegativeZero, One, Two,
+    Infinity as InfinityTrait, NaN as NaNTrait, NegativeInfinity, NegativeZero, One,
     Zero as ZeroTrait,
 };
 use malachite_base::num::comparison::traits::OrdAbs;
@@ -103,6 +104,88 @@ fn float_one_plus_tiny(prec: u64, rm: RoundingMode, above: bool) -> (Float, Orde
     }
 }
 
+// The outcome of `pow_near_one_fast_path`.
+enum NearOne {
+    // The result was rounded directly from 1 (or -1).
+    Rounded(Float, Ordering),
+    // The result is close to 1, but its interesting bits land within the output's window: the Ziv
+    // loop must run, but should start with this many extra bits of working precision, since the
+    // result's significand begins with about this many 0s or 1s after the leading bit. Without the
+    // jump start the loop would balloon, recomputing the power ~log(extra) times at growing
+    // precisions until the working precision covers the run.
+    JumpStart(u64),
+    // The fast path does not apply.
+    No,
+}
+
+// Fast path for x^z when x is so close to +/-1 that the result is very close to +/-1. Writing |x| =
+// 1 + d with d nonzero and fld = EXP(d), and sb_z = the bit length of |z| (z != 0, with its sign
+// given by `z_negative`), the path engages when fld + sb_z <= -3. Then |d| < 2^fld <= 2^-4 and
+// |z||d| < 2^(fld + sb_z) <= 2^-3, and with t = z ln(1 + d):
+// - |ln(1 + d)| <= |d|/(1 - |d|) <= (4/3)|d|, so |t| <= (4/3)|z||d| <= 1/6;
+// - |e^t - 1| <= |t| + t^2 <= (3/2)|t| for |t| <= 1/2;
+// so ||x|^z - 1| = |e^t - 1| <= 2|z||d| < 2^(fld + sb_z + 1), strictly (both |z| < 2^sb_z and |d| <
+// 2^fld are strict). This is exactly the error contract of `float_round_near_x` with v = 1 and err
+// = -(fld + sb_z).
+//
+// `float_round_near_x` also requires the exact result not to be representable, which holds whenever
+// it succeeds (it requires err > prec + 1): for positive z, the exact (1 + d)^z is a dyadic
+// rational whose bits span from its leading 1 down to exactly z*j, where 2^j is the lowest set bit
+// of d; since j <= fld and -fld >= err - sb_z > prec + 1 - sb_z, the span exceeds prec + 1 bits, so
+// the value is neither representable at prec nor a `Nearest` midpoint. For negative z the exact
+// value is not even dyadic (1/(1 + d)^|z| is dyadic only if (1 + d)^|z| is a power of 2, impossible
+// for 0 < |d| <= 2^-4).
+//
+// `negate` is true when the result is negative (x negative and z odd); the rounding is then
+// performed on the magnitude with the inverted rounding mode, and the ternary value is reversed.
+fn pow_near_one_fast_path(
+    x: &Float,
+    sb_z: u64,
+    z_negative: bool,
+    negate: bool,
+    prec: u64,
+    rm: RoundingMode,
+) -> NearOne {
+    // `Exact` is left entirely to the callers, so that this path never has to decide exactness.
+    if rm == Exact {
+        return NearOne::No;
+    }
+    let ex = i64::from(x.get_exponent().unwrap());
+    // |x| must be in [1/2, 2) for x to be near +/-1.
+    if ex != 0 && ex != 1 {
+        return NearOne::No;
+    }
+    // d = |x| - 1, exactly (the difference of two dyadic values whose bits span at most
+    // significant_bits(x) + 2 positions here).
+    let d = x
+        .abs()
+        .sub_prec_round(Float::ONE, x.significant_bits() + 2, Exact)
+        .0;
+    if d == 0u32 {
+        // |x| = 1 exactly; the callers' loops handle this case exactly and quickly.
+        return NearOne::No;
+    }
+    let fld = i64::from(d.get_exponent().unwrap());
+    let Some(shift) = fld.checked_add(i64::exact_from(sb_z)) else {
+        return NearOne::No;
+    };
+    if shift > -3 {
+        return NearOne::No;
+    }
+    let err = u64::exact_from(-shift);
+    // |x|^z > 1 iff |x| > 1 and z > 0, or |x| < 1 and z < 0.
+    let above = (d > 0u32) != z_negative;
+    let rm_abs = if negate { -rm } else { rm };
+    if let Some((v, o)) = float_round_near_x(&Float::ONE, err, above, prec, rm_abs) {
+        return if negate {
+            NearOne::Rounded(-v, o.reverse())
+        } else {
+            NearOne::Rounded(v, o)
+        };
+    }
+    NearOne::JumpStart(err)
+}
+
 // This is `mpfr_pow_pos_z` from `pow_z.c`, MPFR 4.3.0, with z positive. If `cr` is true the result
 // is correctly rounded; otherwise `prec` is used as the working precision. Returns the result and
 // its ordering; the result may be infinite or zero on intermediate overflow or underflow (the
@@ -113,6 +196,7 @@ fn pow_pos_natural(
     prec: u64,
     rm: RoundingMode,
     cr: bool,
+    extra_prec: u64,
 ) -> (Float, Ordering) {
     assert_ne!(*z, 0u32);
     if *z == 1u32 {
@@ -130,8 +214,9 @@ fn pow_pos_natural(
         Floor
     };
     let rnd2 = if x_exp_ge_1 { Floor } else { Up };
+    // `extra_prec` is the near-1 jump start computed by the caller; see `pow_near_one_fast_path`.
     let mut wprec = if cr {
-        prec + 3 + size_z + prec.ceiling_log_base_2()
+        prec + 3 + size_z + prec.ceiling_log_base_2() + extra_prec
     } else {
         prec
     };
@@ -288,36 +373,56 @@ fn pow_integer(x: &Float, z: &Integer, prec: u64, rm: RoundingMode) -> (Float, O
             base.shl_prec_round(sh, prec, rm)
         };
     }
-    // Pre-bound the result exponent: result_exp ~ z * log2|x|. When it is far outside the exponent
-    // range (with a wide margin for the estimate's error), report the exception directly instead of
-    // letting the exponentiation saturate; this mirrors the role of MPFR's underflow/overflow
-    // flags, which malachite does not have, and keeps the Ziv loop from ballooning on saturated
-    // values.
-    let est = f64::rounding_from(x.abs().log_base_2_prec(64).0, Nearest).0
-        * f64::rounding_from(z, Nearest).0;
     let negative = x.is_sign_negative() && z_odd;
-    if est > const { Float::MAX_EXPONENT as f64 + 64.0 } {
-        // est > MAX_EXPONENT + 64 implies the entry's early overflow check already caught it.
-        fail_on_untested_path("pow_integer, pre-bound overflow");
-        return pow_overflow(prec, rm, negative);
+    // Near-1 fast path, checked before the exponent pre-bounds below: for x very close to +/-1,
+    // computing the 64-bit log2 estimate is itself expensive (the tiny logarithm must be resolved,
+    // which costs as much as the power itself), and in this regime |x^z| lies in (5/6, 6/5), so no
+    // overflow or underflow is possible and the pre-bounds are unnecessary.
+    let mut jump_extra = 0;
+    match pow_near_one_fast_path(
+        x,
+        z.unsigned_abs_ref().significant_bits(),
+        !z_pos,
+        negative,
+        prec,
+        rm,
+    ) {
+        NearOne::Rounded(v, o) => return (v, o),
+        NearOne::JumpStart(extra) => jump_extra = extra,
+        NearOne::No => {}
     }
-    if est < const { Float::MIN_EXPONENT as f64 - 64.0 } {
-        return pow_underflow(prec, if rm == Nearest { Down } else { rm }, negative);
-    }
-    // Within the estimate's error margin of MAX_EXPONENT the overflow question is still open, and
-    // it must be decided here: every rounding used by `pow_pos_natural`'s growing regime and by the
-    // reciprocal path below decreases the magnitude, so an overflow would saturate at the largest
-    // finite value instead of reaching infinity, and the saturated all-ones significand is one that
-    // `float_can_round` never certifies -- the Ziv loop would grow forever. (Underflow needs no
-    // such decision: magnitude-decreasing rounding turns a true underflow into an exact zero, which
-    // the loops detect directly.) The check mirrors the role of MPFR's overflow flag.
-    if est >= const { Float::MAX_EXPONENT as f64 - 66.0 }
-        && pow_exponent_at_least(x, z, i64::from(Float::MAX_EXPONENT))
-    {
-        return pow_overflow(prec, rm, negative);
+    if jump_extra == 0 {
+        // Pre-bound the result exponent: result_exp ~ z * log2|x|. When it is far outside the
+        // exponent range (with a wide margin for the estimate's error), report the exception
+        // directly instead of letting the exponentiation saturate; this mirrors the role of MPFR's
+        // underflow/overflow flags, which malachite does not have, and keeps the Ziv loop from
+        // ballooning on saturated values.
+        let est = f64::rounding_from(x.abs().log_base_2_prec(64).0, Nearest).0
+            * f64::rounding_from(z, Nearest).0;
+        if est > const { Float::MAX_EXPONENT as f64 + 64.0 } {
+            // est > MAX_EXPONENT + 64 implies the entry's early overflow check already caught it.
+            fail_on_untested_path("pow_integer, pre-bound overflow");
+            return pow_overflow(prec, rm, negative);
+        }
+        if est < const { Float::MIN_EXPONENT as f64 - 64.0 } {
+            return pow_underflow(prec, if rm == Nearest { Down } else { rm }, negative);
+        }
+        // Within the estimate's error margin of MAX_EXPONENT the overflow question is still open,
+        // and it must be decided here: every rounding used by `pow_pos_natural`'s growing regime
+        // and by the reciprocal path below decreases the magnitude, so an overflow would saturate
+        // at the largest finite value instead of reaching infinity, and the saturated all-ones
+        // significand is one that `float_can_round` never certifies -- the Ziv loop would grow
+        // forever. (Underflow needs no such decision: magnitude-decreasing rounding turns a true
+        // underflow into an exact zero, which the loops detect directly.) The check mirrors the
+        // role of MPFR's overflow flag.
+        if est >= const { Float::MAX_EXPONENT as f64 - 66.0 }
+            && pow_exponent_at_least(x, z, i64::from(Float::MAX_EXPONENT))
+        {
+            return pow_overflow(prec, rm, negative);
+        }
     }
     if z_pos {
-        let (result, o) = pow_pos_natural(x, z.unsigned_abs_ref(), prec, rm, true);
+        let (result, o) = pow_pos_natural(x, z.unsigned_abs_ref(), prec, rm, true, jump_extra);
         if result.is_zero() {
             // pow_pos_natural only returns zero when the result underflowed.
             return if rm == Nearest {
@@ -332,7 +437,7 @@ fn pow_integer(x: &Float, z: &Integer, prec: u64, rm: RoundingMode) -> (Float, O
         // positive power at extended precision, with a Ziv loop.
         let abs_z = z.unsigned_abs_ref();
         let size_z = abs_z.significant_bits();
-        let mut wprec = prec + size_z + 3 + prec.ceiling_log_base_2();
+        let mut wprec = prec + size_z + 3 + prec.ceiling_log_base_2() + jump_extra;
         let rnd1 = if x.get_exponent().unwrap() < 1 {
             Down
         } else if x.is_sign_positive() {
@@ -350,7 +455,7 @@ fn pow_integer(x: &Float, z: &Integer, prec: u64, rm: RoundingMode) -> (Float, O
                 fail_on_untested_path("pow_integer, 1/x overflow");
                 return pow_overflow(prec, rm, t.is_sign_negative());
             }
-            let t = pow_pos_natural(&t, abs_z, wprec, rm, false).0;
+            let t = pow_pos_natural(&t, abs_z, wprec, rm, false, 0).0;
             if t.is_infinite() {
                 // The exact overflow decision above bounds |x^z| < 2^MAX_EXPONENT, and the
                 // magnitude-decreasing rounding directions keep the computed value below it.
@@ -430,6 +535,11 @@ fn pow_u(x: Float, n: u64, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
             p
         }
     };
+    match pow_near_one_fast_path(&x, nlen, false, x.is_sign_negative() && n.odd(), prec, rm) {
+        NearOne::Rounded(v, o) => return (v, o),
+        NearOne::JumpStart(extra) => wprec += extra,
+        NearOne::No => {}
+    }
     loop {
         let err = wprec - 1 - nlen;
         let (mut res, o) = x.square_prec_round_ref(wprec, Ceiling);
@@ -532,6 +642,11 @@ fn pow_u_ref(x: &Float, n: u64, prec: u64, rm: RoundingMode) -> (Float, Ordering
             p
         }
     };
+    match pow_near_one_fast_path(x, nlen, false, x.is_sign_negative() && n.odd(), prec, rm) {
+        NearOne::Rounded(v, o) => return (v, o),
+        NearOne::JumpStart(extra) => wprec += extra,
+        NearOne::No => {}
+    }
     loop {
         let err = wprec - 1 - nlen;
         let (mut res, o) = x.square_prec_round_ref(wprec, Ceiling);
@@ -850,7 +965,7 @@ fn pow_general(
             }
             err += 1;
         }
-        let t = t.exp_prec(wprec).0;
+        t.exp_prec_assign(wprec);
         // MPFR checks the underflow flag here, which also fires when the result rounds UP into the
         // bottom binade (e.g. to the minimum positive value); malachite has no flags, so treat any
         // bottom-binade result as "possibly spurious underflow" and take the 2^k rescue path, which
@@ -6031,11 +6146,7 @@ where
 fn rational_mantissa_nearest_power_of_2(x: &Rational) -> (Rational, i64) {
     let fl = x.floor_log_base_2_abs();
     let mant = x >> fl;
-    let g = if (&mant).square() < Rational::TWO {
-        fl
-    } else {
-        fl + 1
-    };
+    let g = if (&mant).square() < 2u32 { fl } else { fl + 1 };
     (x >> g, g)
 }
 

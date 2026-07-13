@@ -159,12 +159,10 @@ fn log_base_rational_float_base_helper(
         if *x == 0u32 {
             return (float_negative_infinity!(), Equal); // ln(0) = -inf
         }
-        return if *x == 1u32 {
-            (float_nan!(), Equal) // +0 / +0
-        } else if *x > 1u32 {
-            (float_infinity!(), Equal)
-        } else {
-            (float_negative_infinity!(), Equal)
+        return match x.partial_cmp(&1u32).unwrap() {
+            Equal => (float_nan!(), Equal), // +0 / +0
+            Greater => (float_infinity!(), Equal),
+            Less => (float_negative_infinity!(), Equal),
         };
     }
     // base is positive finite and not 1.

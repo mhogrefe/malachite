@@ -1,0 +1,46 @@
+error: compare with `1u32` directly instead of with a bignum constant
+  --> $DIR/compare_with_primitive.rs:14:13
+   |
+LL |     if x == Rational::ONE {
+   |             ^^^^^^^^^^^^^
+   |
+   = note: `#[deny(compare_with_primitive)]` on by default
+
+error: compare with `2u32` directly instead of with a bignum constant
+  --> $DIR/compare_with_primitive.rs:17:12
+   |
+LL |     if x > Rational::TWO {
+   |            ^^^^^^^^^^^^^
+
+error: compare with `-1i32` directly instead of with a bignum constant
+  --> $DIR/compare_with_primitive.rs:20:12
+   |
+LL |     if x < Rational::NEGATIVE_ONE {
+   |            ^^^^^^^^^^^^^^^^^^^^^^
+
+error: compare with `0u32` directly instead of with a bignum constant
+  --> $DIR/compare_with_primitive.rs:23:13
+   |
+LL |     if n == Natural::ZERO {
+   |             ^^^^^^^^^^^^^
+
+error: use `partial_cmp(&1u32).unwrap()` instead of comparing with a bignum constant or conversion
+  --> $DIR/compare_with_primitive.rs:27:11
+   |
+LL |     match x.cmp(&Rational::ONE) {
+   |           ^^^^^^^^^^^^^^^^^^^^^
+
+error: use `partial_cmp(&2u32)` instead of comparing with a bignum constant or conversion
+  --> $DIR/compare_with_primitive.rs:32:13
+   |
+LL |     let _ = x.partial_cmp(&Rational::TWO);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `partial_cmp(&k).unwrap()` instead of comparing with a bignum constant or conversion
+  --> $DIR/compare_with_primitive.rs:34:13
+   |
+LL |     let _ = n.cmp(&Natural::from(k));
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: aborting due to 7 previous errors
+

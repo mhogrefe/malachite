@@ -124,6 +124,9 @@ pub mod reciprocal;
 /// [`ReciprocalSqrtAssign`](malachite_base::num::arithmetic::traits::ReciprocalSqrtAssign), traits
 /// for computing the reciprocal of the square root of [`Float`](super::Float)s.
 pub mod reciprocal_sqrt;
+/// [`root_u_prec_round`](super::Float::root_u_prec_round) and related functions, for computing
+/// roots of [`Float`](super::Float)s.
+pub mod root;
 pub(crate) mod round_near_x;
 /// Left-shifting a [`Float`](super::Float) (multiplying it by a power of 2).
 ///

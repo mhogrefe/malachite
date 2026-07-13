@@ -25,6 +25,7 @@ use crate::natural::{
     LIMB_HIGH_BIT, Natural, bit_to_limb_count_ceiling, bit_to_limb_count_floor, limb_to_bit_count,
 };
 use crate::platform::{DoubleLimb, Limb};
+use core::cmp::Ordering::*;
 use core::cmp::min;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
@@ -729,24 +730,24 @@ pub_test! {limbs_get_str_aux(
             // rounding mode
             let rnd1 = if rm == Nearest {
                 let twice_last = u64::from(str1[size_s1_m1]) << 1;
-                if twice_last == b {
-                    if dir == 0 && exact {
-                        // exact: even rounding
-                        if str1[size_s1 - 2].even() {
-                            Floor
+                match twice_last.cmp(&b) {
+                    Equal => {
+                        if dir == 0 && exact {
+                            // exact: even rounding
+                            if str1[size_s1 - 2].even() {
+                                Floor
+                            } else {
+                                Ceiling
+                            }
                         } else {
-                            Ceiling
+                            // otherwise we cannot round correctly: for example if b = 10, we might
+                            // have a mantissa of xxxxxxx5.00000000 which can be rounded to nearest
+                            // to 8 digits but not to 7
+                            return (-MPFR_ROUND_FAILED, exp);
                         }
-                    } else {
-                        // otherwise we cannot round correctly: for example if b = 10, we might have
-                        // a mantissa of xxxxxxx5.00000000 which can be rounded to nearest to 8
-                        // digits but not to 7
-                        return (-MPFR_ROUND_FAILED, exp);
                     }
-                } else if twice_last < b {
-                    Floor
-                } else {
-                    Ceiling
+                    Less => Floor,
+                    Greater => Ceiling,
                 }
             } else {
                 rm
@@ -833,99 +834,103 @@ pub fn limbs_get_str(
         let mut a = vec![0; n];
         let mut exp_a: i64;
         let mut err: i64;
-        if digit_len_i == g {
-            // final exponent is 0: no multiplication or division to perform
-            err = if n < xs_len {
-                let (xs_lo, xs_hi) = xs.split_at(xs_len - n);
-                exact = slice_test_zero(xs_lo);
-                a.copy_from_slice(xs_hi);
-                i64::from(!exact)
-            } else {
-                a[n - xs_len..].copy_from_slice(xs);
-                0
-            };
-            exp_a = x_exp - i64::exact_from(limb_to_bit_count(n));
-        } else if digit_len_i > g {
-            // multiply x by abs_base ^ exp; the error on a is at most 2 ^ err ulps
-            let err_e;
-            (exp_a, err_e) = limbs_float_exp(&mut a, abs_base, exp);
-            exact = err_e == -1;
-            // x = x1 * 2 ^ (n * Limb::WIDTH): the top min(n, xs_len) limbs of x
-            let (x1, nx1) = if n < xs_len {
-                let (xs_lo, xs_hi) = xs.split_at(xs_len - n);
-                if exact {
+        match digit_len_i.cmp(&g) {
+            Equal => {
+                // final exponent is 0: no multiplication or division to perform
+                err = if n < xs_len {
+                    let (xs_lo, xs_hi) = xs.split_at(xs_len - n);
                     exact = slice_test_zero(xs_lo);
-                }
-                (xs_hi, n)
-            } else {
-                (xs, xs_len)
-            };
-            // we lose one more bit in the multiplication, except when err = 0 (two bits)
-            err = if err_e <= 0 { 2 } else { i64::from(err_e) + 1 };
-            let result = limbs_mul(&a, x1);
-            let (result_lo, result_hi) = result.split_at(nx1);
-            let result_hi = &result_hi[..n];
-            if !slice_test_zero(result_lo) {
-                exact = false;
+                    a.copy_from_slice(xs_hi);
+                    i64::from(!exact)
+                } else {
+                    a[n - xs_len..].copy_from_slice(xs);
+                    0
+                };
+                exp_a = x_exp - i64::exact_from(limb_to_bit_count(n));
             }
-            exp_a += x_exp;
-            // normalize a and truncate
-            if result_hi.last().unwrap().get_highest_bit() {
-                a.copy_from_slice(result_hi);
-            } else {
-                limbs_shl_to_out(&mut a, result_hi, 1);
-                a[0] |= Limb::from(result_lo.last().unwrap().get_highest_bit());
-                exp_a -= 1;
-            }
-        } else {
-            // digit_len < g: divide x by abs_base ^ exp
-            let err_e;
-            (exp_a, err_e) = limbs_float_exp(&mut a, abs_base, exp);
-            exact = err_e == -1;
-            let two_n = n << 1;
-            let mut scratch;
-            let rem;
-            let result;
-            let x1 = if two_n <= xs_len {
-                scratch = vec![0; two_n + 1];
-                (rem, result) = scratch.split_at_mut(n);
-                let (xs_lo, xs_hi) = xs.split_at(xs_len - two_n);
-                // we ignore the low xs_len - 2 * n limbs of x
-                if exact && !slice_test_zero(xs_lo) {
+            Greater => {
+                // multiply x by abs_base ^ exp; the error on a is at most 2 ^ err ulps
+                let err_e;
+                (exp_a, err_e) = limbs_float_exp(&mut a, abs_base, exp);
+                exact = err_e == -1;
+                // x = x1 * 2 ^ (n * Limb::WIDTH): the top min(n, xs_len) limbs of x
+                let (x1, nx1) = if n < xs_len {
+                    let (xs_lo, xs_hi) = xs.split_at(xs_len - n);
+                    if exact {
+                        exact = slice_test_zero(xs_lo);
+                    }
+                    (xs_hi, n)
+                } else {
+                    (xs, xs_len)
+                };
+                // we lose one more bit in the multiplication, except when err = 0 (two bits)
+                err = if err_e <= 0 { 2 } else { i64::from(err_e) + 1 };
+                let result = limbs_mul(&a, x1);
+                let (result_lo, result_hi) = result.split_at(nx1);
+                let result_hi = &result_hi[..n];
+                if !slice_test_zero(result_lo) {
                     exact = false;
                 }
-                xs_hi
-            } else {
-                scratch = vec![0; (two_n << 1) + 1];
-                let scratch_2;
-                (rem, scratch_2) = scratch.split_at_mut(n);
-                let x1_mut;
-                (x1_mut, result) = scratch_2.split_at_mut(two_n);
-                // copy the xs_len most significant limbs of x into the top of x1
-                x1_mut[two_n - xs_len..].copy_from_slice(xs);
-                &*x1_mut
-            };
-            // result = x / a
-            if n == 1 {
-                rem[0] = limbs_div_limb_to_out_mod(result, x1, a[0]);
-            } else {
-                limbs_div_mod_to_out(result, rem, x1, &a);
+                exp_a += x_exp;
+                // normalize a and truncate
+                if result_hi.last().unwrap().get_highest_bit() {
+                    a.copy_from_slice(result_hi);
+                } else {
+                    limbs_shl_to_out(&mut a, result_hi, 1);
+                    a[0] |= Limb::from(result_lo.last().unwrap().get_highest_bit());
+                    exp_a -= 1;
+                }
             }
-            exp_a = x_exp - exp_a - i64::exact_from(limb_to_bit_count(two_n));
-            // test if the division was exact
-            if exact {
-                exact = slice_test_zero(rem);
+            Less => {
+                // digit_len < g: divide x by abs_base ^ exp
+                let err_e;
+                (exp_a, err_e) = limbs_float_exp(&mut a, abs_base, exp);
+                exact = err_e == -1;
+                let two_n = n << 1;
+                let mut scratch;
+                let rem;
+                let result;
+                let x1 = if two_n <= xs_len {
+                    scratch = vec![0; two_n + 1];
+                    (rem, result) = scratch.split_at_mut(n);
+                    let (xs_lo, xs_hi) = xs.split_at(xs_len - two_n);
+                    // we ignore the low xs_len - 2 * n limbs of x
+                    if exact && !slice_test_zero(xs_lo) {
+                        exact = false;
+                    }
+                    xs_hi
+                } else {
+                    scratch = vec![0; (two_n << 1) + 1];
+                    let scratch_2;
+                    (rem, scratch_2) = scratch.split_at_mut(n);
+                    let x1_mut;
+                    (x1_mut, result) = scratch_2.split_at_mut(two_n);
+                    // copy the xs_len most significant limbs of x into the top of x1
+                    x1_mut[two_n - xs_len..].copy_from_slice(xs);
+                    &*x1_mut
+                };
+                // result = x / a
+                if n == 1 {
+                    rem[0] = limbs_div_limb_to_out_mod(result, x1, a[0]);
+                } else {
+                    limbs_div_mod_to_out(result, rem, x1, &a);
+                }
+                exp_a = x_exp - exp_a - i64::exact_from(limb_to_bit_count(two_n));
+                // test if the division was exact
+                if exact {
+                    exact = slice_test_zero(rem);
+                }
+                // normalize the result and copy into a
+                let (result_last, result_init) = result.split_last().unwrap();
+                if *result_last == 1 {
+                    limbs_shr_to_out(&mut a, result_init, 1);
+                    a[n - 1] |= LIMB_HIGH_BIT;
+                    exp_a += 1;
+                } else {
+                    a.copy_from_slice(result_init);
+                }
+                err = if err_e == -1 { 2 } else { i64::from(err_e) + 2 };
             }
-            // normalize the result and copy into a
-            let (result_last, result_init) = result.split_last().unwrap();
-            if *result_last == 1 {
-                limbs_shr_to_out(&mut a, result_init, 1);
-                a[n - 1] |= LIMB_HIGH_BIT;
-                exp_a += 1;
-            } else {
-                a.copy_from_slice(result_init);
-            }
-            err = if err_e == -1 { 2 } else { i64::from(err_e) + 2 };
         }
         if exact {
             err = -1;

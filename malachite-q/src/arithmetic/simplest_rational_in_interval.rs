@@ -311,7 +311,7 @@ impl SimplestRationalInInterval for Rational {
                     ((floor << 1) | Natural::ONE, Natural::TWO)
                 } else {
                     let x_1 = cf_x.next().unwrap();
-                    if x_1 > Natural::ONE {
+                    if x_1 > 1u32 {
                         if x_1 == 2u32 && cf_x.is_done() {
                             // [f; 1, 1] and [f; 1], so [f; 1, 2] is a candidate.
                             (

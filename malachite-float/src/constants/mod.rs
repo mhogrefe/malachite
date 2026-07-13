@@ -6,6 +6,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+/// Functions for approximating $\sqrt\[3\]{2}$.
+pub mod cbrt_2;
 /// Functions for approximating $e$, Euler's number.
 pub mod e;
 /// Functions for approximating Gauss's constant, $G=1/\mathrm{AGM}(1,\sqrt{2})$.

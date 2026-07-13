@@ -11,7 +11,6 @@
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{CheckedRoot, DivAssignMod, DivMod, GcdAssign};
-use malachite_base::num::basic::traits::One;
 use malachite_base::num::factorization::traits::{
     ExpressAsPower, Factor, IsPower, IsPrime, Primes,
 };
@@ -141,7 +140,7 @@ fn get_perfect_power_natural_bool(n: &Natural) -> bool {
                 return false; // we have multiplicity 1 of some factor
             }
             // As soon as pow_2 becomes prime, stop factoring
-            if q == Natural::ONE || pow_2.is_prime() {
+            if q == 1u32 || pow_2.is_prime() {
                 return n.checked_root(pow_2).is_some();
             }
         }

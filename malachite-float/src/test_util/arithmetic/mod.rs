@@ -36,6 +36,7 @@ pub mod power_of_2_of_float;
 pub mod power_of_2_x_minus_1;
 pub mod reciprocal;
 pub mod reciprocal_sqrt;
+pub mod root;
 pub mod shl;
 pub mod shl_round;
 pub mod shr;

@@ -1044,8 +1044,8 @@ fn tune_fft_small_check() {
     println!("fft small-size check: {mismatches} failures over sizes 64..=1024 x4 input sets");
 }
 
-// An algorithm entry for the unbalanced-multiplication crossovers, parameterized over
-// (xs_len, ys_len) rather than a single balanced size.
+// An algorithm entry for the unbalanced-multiplication crossovers, parameterized over (xs_len,
+// ys_len) rather than a single balanced size.
 struct UnbalancedAlgo<'a> {
     name: &'a str,
     valid: &'a dyn Fn(usize, usize) -> bool,
@@ -1147,8 +1147,8 @@ fn tune_mul_toom32_to_toom43() {
 }
 
 fn tune_mul_toom32_to_toom53() {
-    // dispatch band: 3 * y / 2 <= x < 7 * y / 4; toom32's validity (2x < 3(y + 1)) only
-    // overlaps the band's bottom edge, so the comparison runs at x = 3y/2 + 1
+    // dispatch band: 3 * y / 2 <= x < 7 * y / 4; toom32's validity (2x < 3(y + 1)) only overlaps
+    // the band's bottom edge, so the comparison runs at x = 3y/2 + 1
     tune_unbalanced_interior(
         "MUL_TOOM32_TO_TOOM53_THRESHOLD",
         &unbalanced_algo!(
@@ -1281,8 +1281,8 @@ fn tune_sqrlo_dc() {
     });
 }
 
-// Measure two Hensel (modular/bdiv) division algorithms dividing 2n limbs by an odd n-limb
-// divisor. `full_q` selects the Q-only shape, whose quotient has the dividend's full length.
+// Measure two Hensel (modular/bdiv) division algorithms dividing 2n limbs by an odd n-limb divisor.
+// `full_q` selects the Q-only shape, whose quotient has the dividend's full length.
 fn measure_bdiv_pair(
     n: usize,
     full_q: bool,
@@ -1373,9 +1373,9 @@ fn tune_dc_bdiv_q() {
     );
 }
 
-// Measure DC-vs-Barrett Hensel division at 2n / n (odd divisor). The DC side consumes its
-// dividend (refresh copy included); the Barrett side reads it directly and manages its own
-// inverse internally.
+// Measure DC-vs-Barrett Hensel division at 2n / n (odd divisor). The DC side consumes its dividend
+// (refresh copy included); the Barrett side reads it directly and manages its own inverse
+// internally.
 fn measure_mu_bdiv_pair(
     n: usize,
     full_q: bool,
@@ -1555,8 +1555,8 @@ fn tune_from_digits_dc() {
     );
 }
 
-// The measured Barrett-bdiv crossovers vs DC (120/139) fall below DC_BDIV_*_THRESHOLD (218),
-// so DC may have no winning range; these measure Barrett against the real incumbent there.
+// The measured Barrett-bdiv crossovers vs DC (120/139) fall below DC_BDIV_*_THRESHOLD (218), so DC
+// may have no winning range; these measure Barrett against the real incumbent there.
 fn tune_mu_bdiv_qr_vs_schoolbook() {
     find_crossover_spec(
         "MU_BDIV_QR_THRESHOLD",
@@ -1681,8 +1681,8 @@ fn tune_mod_1_shootout() {
     }
 }
 
-// Times limbs_invert_approx across sizes, for the INV_MULMOD_BNM1_THRESHOLD
-// rebuild-per-candidate sweep.
+// Times limbs_invert_approx across sizes, for the INV_MULMOD_BNM1_THRESHOLD rebuild-per-candidate
+// sweep.
 fn tune_invert_probe() {
     for n in [50usize, 100, 200, 400, 800, 1600] {
         let mut ds = vec![0; n];

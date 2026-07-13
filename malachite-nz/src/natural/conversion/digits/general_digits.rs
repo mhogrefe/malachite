@@ -699,14 +699,14 @@ use crate::platform::GET_STR_DC_THRESHOLD;
 
 // This is equivalent to the `pows`/`preinv` tables of `_fmpz_get_str_recursive` from
 // `fmpz/get_str.c`, FLINT 3.3.0-dev (there per-level `fmpz_preinvn_struct`s; here per-row limb
-// slices): a row's power divides the number once per chunk at its level of the
-// divide-and-conquer tree, so computing its Newton inverse once and reusing it turns each
-// division's inversion cost (roughly a third of a Barrett division) into a one-time cost per
-// row. GMP's mpn_get_str, by contrast, re-derives the inverse inside every division.
+// slices): a row's power divides the number once per chunk at its level of the divide-and-conquer
+// tree, so computing its Newton inverse once and reusing it turns each division's inversion cost
+// (roughly a third of a Barrett division) into a one-time cost per row. GMP's mpn_get_str, by
+// contrast, re-derives the inverse inside every division.
 //
-// Every division through a row is zero-padded to the fixed per-row shape
-// (2 * power_len + shift + 1) / power_len, so the quotient length, and therefore the required
-// inverse length, is a per-row constant.
+// Every division through a row is zero-padded to the fixed per-row shape (2 * power_len + shift +
+// 1) / power_len, so the quotient length, and therefore the required inverse length, is a per-row
+// constant.
 struct PowerInverse<'a> {
     // the row's power, shifted left by `bits` so its highest bit is set
     ds_shifted: &'a [Limb],
@@ -718,8 +718,8 @@ struct PowerInverse<'a> {
 
 // With the inversion precomputed, Barrett's economics change: its per-division cost is two
 // multiplications (which ride Toom/FFT), beating the schoolbook/divide-and-conquer engines'
-// quadratic kernels far below the ordinary MU_DIV_QR_THRESHOLD. Swept 2026-07: monotone
-// improvement down to ~50 limbs, flat below.
+// quadratic kernels far below the ordinary MU_DIV_QR_THRESHOLD. Swept 2026-07: monotone improvement
+// down to ~50 limbs, flat below.
 const POWER_INVERSE_THRESHOLD: usize = 50;
 
 const fn power_inverse_padded_len(power_len: usize, shift: usize) -> usize {
@@ -751,10 +751,10 @@ fn power_inverses_scratch_lens(powers: &[PowerTableRow]) -> (usize, usize) {
     (arena_len, scratch_len)
 }
 
-// Computes the normalized powers and their approximate inverses for the qualifying rows,
-// borrowing storage from `memory` (sized by power_inverses_scratch_lens). The inverse
-// construction matches limbs_div_mod_barrett_helper's: invert the top is_len + 1 limbs of the
-// normalized divisor plus one, and drop the lowest limb of the result.
+// Computes the normalized powers and their approximate inverses for the qualifying rows, borrowing
+// storage from `memory` (sized by power_inverses_scratch_lens). The inverse construction matches
+// limbs_div_mod_barrett_helper's: invert the top is_len + 1 limbs of the normalized divisor plus
+// one, and drop the lowest limb of the result.
 fn compute_power_inverses<'a>(
     powers: &[PowerTableRow],
     mut memory: &'a mut [Limb],
@@ -795,9 +795,9 @@ fn compute_power_inverses<'a>(
     out
 }
 
-// Divides `xs` by the row's power using the precomputed inverse: the quotient is written to
-// `qs` (padded_q_len limbs, zero above the true quotient) and the remainder to
-// `xs[..power_len]`, matching limbs_div_mod_qs_to_out_rs_to_ns's contract at this call shape.
+// Divides `xs` by the row's power using the precomputed inverse: the quotient is written to `qs`
+// (padded_q_len limbs, zero above the true quotient) and the remainder to `xs[..power_len]`,
+// matching limbs_div_mod_qs_to_out_rs_to_ns's contract at this call shape.
 fn divide_by_power_preinverted(
     qs: &mut [Limb],
     xs: &mut [Limb],
@@ -1031,8 +1031,8 @@ pub_crate_test! {limbs_to_digits_small_base<T: PrimitiveUnsigned>(
         let len = 1 + usize::exact_from(digits_len) / get_chars_per_limb(base);
         let (power_len, powers) =
             limbs_compute_power_table(&mut power_table_memory, len, base, forced_algorithm);
-        // Precompute Barrett inverses for the rows whose divisions run at Barrett sizes; each
-        // such row's inverse is computed once and reused by every division through the row.
+        // Precompute Barrett inverses for the rows whose divisions run at Barrett sizes; each such
+        // row's inverse is computed once and reused by every division through the row.
         let (inverse_arena_len, preinv_scratch_len) = power_inverses_scratch_lens(&powers);
         let mut inverse_arena = vec![0; inverse_arena_len];
         let mut preinv_scratch = vec![0; preinv_scratch_len];
