@@ -28,11 +28,7 @@ where
 
     fn next(&mut self) -> Option<Ordering> {
         if self.previous.is_none() {
-            if let Some(x) = self.xs.next() {
-                self.previous = Some(x);
-            } else {
-                return None;
-            }
+            self.previous = Some(self.xs.next()?);
         }
         self.xs.next().and_then(|x| {
             let result = Some(x.cmp(self.previous.as_ref().unwrap()));

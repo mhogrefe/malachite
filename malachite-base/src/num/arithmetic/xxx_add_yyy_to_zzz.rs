@@ -20,10 +20,10 @@ use crate::num::basic::integers::USIZE_IS_U32;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::WrappingFrom;
 
-// A single folded chain per word ((flag_a | flag_b), with the previous flag folded in before
-// the next word) lets LLVM fuse the whole sequence into branchless adds/adcs (or subs/sbcs) on
-// aarch64 and adc/sbb chains on x86_64; the previous per-word branches did not fuse, and this
-// kernel is hot in the fft_small CRT reconstruction.
+// A single folded chain per word ((flag_a | flag_b), with the previous flag folded in before the
+// next word) lets LLVM fuse the whole sequence into branchless adds/adcs (or subs/sbcs) on aarch64
+// and adc/sbb chains on x86_64; the previous per-word branches did not fuse, and this kernel is hot
+// in the fft_small CRT reconstruction.
 pub_test! {xxx_add_yyy_to_zzz<T: PrimitiveUnsigned>(
     x_2: T,
     x_1: T,

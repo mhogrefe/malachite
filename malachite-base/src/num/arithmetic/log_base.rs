@@ -49,11 +49,7 @@ pub_test! {checked_log_base_naive<T: PrimitiveUnsigned>(x: T, base: T) -> Option
     let mut p = T::ONE;
     while p < x {
         result += 1;
-        if let Some(next_p) = p.checked_mul(base) {
-            p = next_p;
-        } else {
-            return None;
-        }
+        p = p.checked_mul(base)?;
     }
     if p == x {
         Some(result)

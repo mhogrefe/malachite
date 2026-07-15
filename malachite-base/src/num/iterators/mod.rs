@@ -75,15 +75,12 @@ impl<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned>
 {
     fn next_with_wrapping<F: Fn(T) -> U>(&mut self, wrap: F) -> Option<Option<U>> {
         if self.counter == 0 {
-            if let Some(x) = self.xs.next() {
-                if x.significant_bits() > self.x_width {
-                    return Some(None);
-                }
-                self.x = x;
-                self.counter = self.multiple;
-            } else {
-                return None;
+            let x = self.xs.next()?;
+            if x.significant_bits() > self.x_width {
+                return Some(None);
             }
+            self.x = x;
+            self.counter = self.multiple;
         } else {
             self.x >>= self.y_width;
         }

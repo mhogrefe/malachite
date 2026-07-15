@@ -270,7 +270,10 @@ pub fn test_to_binary_string() {
     );
 }
 
+// The degenerate zero-width format specs (`{x:00b}` and the like) are deliberate: they test that a
+// width of 0 is a no-op in Malachite's formatting impls.
 #[test]
+#[allow(clippy::unused_format_specs)]
 fn to_binary_string_properties() {
     integer_gen().test_properties(|x| {
         let s = x.to_binary_string();
@@ -437,7 +440,10 @@ pub fn test_to_octal_string() {
     );
 }
 
+// The degenerate zero-width format specs (`{x:00b}` and the like) are deliberate: they test that a
+// width of 0 is a no-op in Malachite's formatting impls.
 #[test]
+#[allow(clippy::unused_format_specs)]
 fn to_octal_string_properties() {
     integer_gen().test_properties(|x| {
         let s = x.to_octal_string();
@@ -639,7 +645,10 @@ pub fn test_to_upper_hex_string() {
     );
 }
 
+// The degenerate zero-width format specs (`{x:00b}` and the like) are deliberate: they test that a
+// width of 0 is a no-op in Malachite's formatting impls.
 #[test]
+#[allow(clippy::unused_format_specs)]
 fn to_hex_string_properties() {
     integer_gen().test_properties(|x| {
         let s = x.to_lower_hex_string();

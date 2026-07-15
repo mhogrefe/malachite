@@ -278,14 +278,14 @@ where
                 write!(
                     f,
                     "{:#0width$}",
-                    &BaseFmtWrapper::new(w.x.unsigned_abs(), w.base),
+                    BaseFmtWrapper::new(w.x.unsigned_abs(), w.base),
                     width = width.saturating_sub(1)
                 )
             } else {
                 write!(
                     f,
                     "{:0width$}",
-                    &BaseFmtWrapper::new(w.x.unsigned_abs(), w.base),
+                    BaseFmtWrapper::new(w.x.unsigned_abs(), w.base),
                     width = width.saturating_sub(1)
                 )
             };

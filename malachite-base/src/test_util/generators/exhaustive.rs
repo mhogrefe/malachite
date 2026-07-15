@@ -842,16 +842,13 @@ impl<I: Iterator, P: Fn(&I::Item) -> bool> Iterator for TakeWhileExtra<I, P> {
 
     fn next(&mut self) -> Option<I::Item> {
         loop {
-            if let Some(x) = self.xs.next() {
-                if (self.p)(&x) {
-                    return Some(x);
-                } else if self.false_seen {
-                    return None;
-                }
-                self.false_seen = true;
-            } else {
+            let x = self.xs.next()?;
+            if (self.p)(&x) {
+                return Some(x);
+            } else if self.false_seen {
                 return None;
             }
+            self.false_seen = true;
         }
     }
 }

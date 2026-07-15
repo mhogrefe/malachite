@@ -53,14 +53,14 @@ impl Display for BaseFmtWrapper<&Integer> {
                     write!(
                         f,
                         "{:#0width$}",
-                        &BaseFmtWrapper::new(self.x.unsigned_abs_ref(), self.base),
+                        BaseFmtWrapper::new(self.x.unsigned_abs_ref(), self.base),
                         width = width.saturating_sub(1)
                     )
                 } else {
                     write!(
                         f,
                         "{:0width$}",
-                        &BaseFmtWrapper::new(self.x.unsigned_abs_ref(), self.base),
+                        BaseFmtWrapper::new(self.x.unsigned_abs_ref(), self.base),
                         width = width.saturating_sub(1)
                     )
                 };
