@@ -98,11 +98,20 @@ pub(crate) fn log_2_rational_brackets(x: &Rational, wprec: u64) -> (Rational, Ra
     if e.floor_log_base_2_abs() >= -8 {
         // Directed Float computation: round x' outward, then take directed logs. x' is bounded away
         // from both 1 and 2, so neither log collapses to an exact power-of-2 boundary.
-        let x_lo = Float::from_rational_prec_round_ref(x, wprec, Floor).0;
-        let x_hi = Float::from_rational_prec_round_ref(x, wprec, Ceiling).0;
-        let l_lo = x_lo.log_base_2_prec_round(wprec, Floor).0;
-        let l_hi = x_hi.log_base_2_prec_round(wprec, Ceiling).0;
-        (Rational::exact_from(&l_lo), Rational::exact_from(&l_hi))
+        (
+            Rational::exact_from(
+                &Float::from_rational_prec_round_ref(x, wprec, Floor)
+                    .0
+                    .log_base_2_round(Floor)
+                    .0,
+            ),
+            Rational::exact_from(
+                &Float::from_rational_prec_round_ref(x, wprec, Ceiling)
+                    .0
+                    .log_base_2_round(Ceiling)
+                    .0,
+            ),
+        )
     } else {
         // ln(x') as exact Rational brackets, then divide by ln(2) brackets, rounding outward. The
         // ln brackets share the sign of e = x' - 1; the outward division depends on that sign.

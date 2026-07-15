@@ -37,6 +37,7 @@ mod use_assign_variant;
 mod use_named_constant;
 mod use_parity;
 mod use_reciprocal;
+mod use_round_variant;
 mod use_square;
 
 dylint_linting::dylint_library!();
@@ -248,6 +249,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         use_named_constant::USE_NAMED_CONSTANT,
         use_parity::USE_PARITY,
         use_reciprocal::USE_RECIPROCAL,
+        use_round_variant::USE_ROUND_VARIANT,
         use_square::USE_SQUARE,
     ]);
     lint_store.register_late_pass(|_| {
@@ -282,6 +284,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
     lint_store.register_late_pass(|_| Box::new(use_named_constant::UseNamedConstant));
     lint_store.register_late_pass(|_| Box::new(use_parity::UseParity));
     lint_store.register_late_pass(|_| Box::new(use_reciprocal::UseReciprocal));
+    lint_store.register_late_pass(|_| Box::new(use_round_variant::UseRoundVariant));
     lint_store.register_late_pass(|_| Box::new(use_square::UseSquare));
 }
 

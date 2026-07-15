@@ -64,10 +64,10 @@ impl Float {
         loop {
             let (pi_lo, pi_hi) = floor_and_ceiling(Self::pi_prec_round(working_prec, Floor));
             // exp is increasing, so exp(pi_lo) <= exp(pi) <= exp(pi_hi).
-            let lo = pi_lo.exp_prec_round(working_prec, Floor).0;
-            let hi = pi_hi.exp_prec_round(working_prec, Ceiling).0;
-            let (gelfonds_constant_lo, mut o_lo) = Self::from_float_prec_round(lo, prec, rm);
-            let (gelfonds_constant_hi, mut o_hi) = Self::from_float_prec_round(hi, prec, rm);
+            let (gelfonds_constant_lo, mut o_lo) =
+                Self::from_float_prec_round(pi_lo.exp_round(Floor).0, prec, rm);
+            let (gelfonds_constant_hi, mut o_hi) =
+                Self::from_float_prec_round(pi_hi.exp_round(Ceiling).0, prec, rm);
             if o_lo == Equal {
                 o_lo = o_hi;
             }

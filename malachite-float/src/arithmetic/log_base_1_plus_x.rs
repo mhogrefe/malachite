@@ -108,7 +108,7 @@ fn log_base_1_plus_x_prec_round_normal(
         // log_2(1 + x) / log_2(base), with three correctly-rounded operations (log_base_2_1_plus_x,
         // log_base_2, and the division, each at most 1/2 ulp), so the relative error is below 2^(2
         // - working_prec) and working_prec - 4 correct bits suffice for rounding.
-        let t = num.div_prec(den, working_prec).0;
+        let t = num / den;
         if float_can_round(t.significand_ref().unwrap(), working_prec - 4, prec, rm) {
             return Float::from_float_prec_round(t, prec, rm);
         }

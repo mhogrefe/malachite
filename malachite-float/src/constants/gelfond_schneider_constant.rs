@@ -68,12 +68,16 @@ impl Float {
             let (sqrt_2_lo, sqrt_2_hi) =
                 floor_and_ceiling(Self::sqrt_2_prec_round(working_prec, Floor));
             // 2^x is increasing, so 2^sqrt_2_lo <= 2^sqrt(2) <= 2^sqrt_2_hi.
-            let lo = Self::power_of_2_of_float_prec_round(sqrt_2_lo, working_prec, Floor).0;
-            let hi = Self::power_of_2_of_float_prec_round(sqrt_2_hi, working_prec, Ceiling).0;
-            let (gelfond_schneider_constant_lo, mut o_lo) =
-                Self::from_float_prec_round(lo, prec, rm);
-            let (gelfond_schneider_constant_hi, mut o_hi) =
-                Self::from_float_prec_round(hi, prec, rm);
+            let (gelfond_schneider_constant_lo, mut o_lo) = Self::from_float_prec_round(
+                Self::power_of_2_of_float_round(sqrt_2_lo, Floor).0,
+                prec,
+                rm,
+            );
+            let (gelfond_schneider_constant_hi, mut o_hi) = Self::from_float_prec_round(
+                Self::power_of_2_of_float_round(sqrt_2_hi, Ceiling).0,
+                prec,
+                rm,
+            );
             if o_lo == Equal {
                 o_lo = o_hi;
             }

@@ -81,8 +81,8 @@ fn get_str_ndigits(base: u64, bit_len: u64) -> usize {
             // lower (`bit_len / log_hi`, rounding down) and upper (`bit_len / log_lo`, rounding up)
             // bounds on `bit_len * log(2) / log(base)`, each rounded up to an integer
             let pf = Float::from_unsigned_prec(bit_len, w).0;
-            let lo = pf.div_prec_round_ref_val(log_hi, w, Floor).0;
-            let hi = pf.div_prec_round(log_lo, w, Ceiling).0;
+            let lo = pf.div_round_ref_val(log_hi, Floor).0;
+            let hi = pf.div_round(log_lo, Ceiling).0;
             let lo = u64::rounding_from(&lo, Ceiling).0;
             let hi = u64::rounding_from(&hi, Ceiling).0;
             if lo == hi {

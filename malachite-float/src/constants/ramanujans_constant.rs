@@ -70,13 +70,18 @@ impl Float {
             );
             // pi and sqrt(163) are positive, so pi * sqrt(163) is bracketed by the products of the
             // corresponding bounds.
-            let arg_lo = pi_lo.mul_prec_round(sqrt_163_lo, working_prec, Floor).0;
-            let arg_hi = pi_hi.mul_prec_round(sqrt_163_hi, working_prec, Ceiling).0;
+            //
             // exp is increasing, so exp(arg_lo) <= exp(pi * sqrt(163)) <= exp(arg_hi).
-            let lo = arg_lo.exp_prec_round(working_prec, Floor).0;
-            let hi = arg_hi.exp_prec_round(working_prec, Ceiling).0;
-            let (ramanujans_constant_lo, mut o_lo) = Self::from_float_prec_round(lo, prec, rm);
-            let (ramanujans_constant_hi, mut o_hi) = Self::from_float_prec_round(hi, prec, rm);
+            let (ramanujans_constant_lo, mut o_lo) = Self::from_float_prec_round(
+                pi_lo.mul_round(sqrt_163_lo, Floor).0.exp_round(Floor).0,
+                prec,
+                rm,
+            );
+            let (ramanujans_constant_hi, mut o_hi) = Self::from_float_prec_round(
+                pi_hi.mul_round(sqrt_163_hi, Ceiling).0.exp_round(Ceiling).0,
+                prec,
+                rm,
+            );
             if o_lo == Equal {
                 o_lo = o_hi;
             }

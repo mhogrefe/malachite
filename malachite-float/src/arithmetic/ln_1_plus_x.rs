@@ -17,7 +17,9 @@ use crate::arithmetic::round_near_x::float_round_near_x;
 use crate::{Float, emulate_float_to_float_fn, float_infinity, float_nan, float_negative_infinity};
 use core::cmp::Ordering::{self, *};
 use malachite_base::fail_on_untested_path;
-use malachite_base::num::arithmetic::traits::{CeilingLogBase2, Ln1PlusX, Ln1PlusXAssign, Parity};
+use malachite_base::num::arithmetic::traits::{
+    CeilingLogBase2, Ln, Ln1PlusX, Ln1PlusXAssign, Parity,
+};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::One;
@@ -143,7 +145,7 @@ fn ln_1_plus_x_prec_round_normal(x: &Float, prec: u64, rm: RoundingMode) -> (Flo
                 // 1/x) < 2^(1-MAX_EXPONENT), far less than an ulp; use ln(x).
                 x.ln_prec_ref(working_prec).0
             } else {
-                t.ln_prec(working_prec).0 // ln(1+x)
+                t.ln() // ln(1+x)
             };
             // The error is bounded by (1/2 + 2^(1-EXP(t))) * ulp(t) (cf algorithms.tex). If EXP(t)
             // >= 2, then error <= ulp(t). If EXP(t) <= 1, then error <= 2^(2-EXP(t)) * ulp(t).
