@@ -1,0 +1,27 @@
+error: `exact_from` of a `max(0)` clamp into an unsigned type
+  --> $DIR/use_saturating_from.rs:5:13
+   |
+LL |     let a = u64::exact_from(err.max(0));
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: use `u64::saturating_from(err)`, which clamps both ends consistently
+   = note: `#[deny(use_saturating_from)]` on by default
+
+error: `exact_from` of a `max(0)` clamp into an unsigned type
+  --> $DIR/use_saturating_from.rs:7:13
+   |
+LL |     let b = u64::exact_from(0.max(err));
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: use `u64::saturating_from(err)`, which clamps both ends consistently
+
+error: `exact_from` of a `max(0)` clamp into an unsigned type
+  --> $DIR/use_saturating_from.rs:10:13
+   |
+LL |     let c = u64::exact_from(big.max(0));
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: use `u64::saturating_from(big)`, which clamps both ends consistently
+
+error: aborting due to 3 previous errors
+

@@ -18,5 +18,35 @@ error: use `even()` instead of `divisible_by(2)`
 LL |     let _ = (&x).divisible_by(Natural::TWO);
    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-error: aborting due to 3 previous errors
+error: use `even()` instead of comparing `% 2` with 0 or 1
+  --> $DIR/use_parity.rs:16:13
+   |
+LL |     let _ = n % 2 == 0;
+   |             ^^^^^^^^^^
+
+error: use `odd()` instead of comparing `% 2` with 0 or 1
+  --> $DIR/use_parity.rs:17:13
+   |
+LL |     let _ = n % 2 != 0;
+   |             ^^^^^^^^^^
+
+error: use `even()` instead of comparing `& 1` with 0 or 1
+  --> $DIR/use_parity.rs:19:13
+   |
+LL |     let _ = (n & 1) == 0;
+   |             ^^^^^^^^^^^^
+
+error: use `odd()` instead of comparing `& 1` with 0 or 1
+  --> $DIR/use_parity.rs:20:13
+   |
+LL |     let _ = (n & 1) == 1;
+   |             ^^^^^^^^^^^^
+
+error: use `odd()` instead of comparing `& 1` with 0 or 1
+  --> $DIR/use_parity.rs:22:13
+   |
+LL |     let _ = (s & 1) != 0;
+   |             ^^^^^^^^^^^^
+
+error: aborting due to 8 previous errors
 

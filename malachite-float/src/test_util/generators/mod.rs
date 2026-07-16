@@ -3155,6 +3155,24 @@ pub fn float_rational_unsigned_rounding_mode_quadruple_gen_var_12()
     )
 }
 
+pub fn float_rational_unsigned_rounding_mode_quadruple_gen_var_15()
+-> Generator<(Float, Rational, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_rational_unsigned_rounding_mode_quadruple_gen_var_15,
+        &random_float_rational_unsigned_rounding_mode_quadruple_gen_var_15,
+        &special_random_float_rational_unsigned_rounding_mode_quadruple_gen_var_15,
+    )
+}
+
+pub fn float_rational_unsigned_rounding_mode_quadruple_gen_var_16()
+-> Generator<(Float, Rational, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_rational_unsigned_rounding_mode_quadruple_gen_var_16,
+        &random_float_rational_unsigned_rounding_mode_quadruple_gen_var_16,
+        &special_random_float_rational_unsigned_rounding_mode_quadruple_gen_var_16,
+    )
+}
+
 // All `(Float, Rational, u64, RoundingMode)` that are valid inputs to
 // `Float.log_base_rational_base_1_plus_x_prec_round`.
 pub fn float_rational_unsigned_rounding_mode_quadruple_gen_var_13()

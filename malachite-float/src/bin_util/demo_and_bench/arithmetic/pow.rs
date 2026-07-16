@@ -34,7 +34,8 @@ use malachite_float::test_util::bench::bucketers::{
     pair_2_triple_1_2_float_max_complexity_bucketer,
     pair_2_triple_float_float_primitive_int_max_complexity_bucketer,
     pair_float_integer_max_complexity_bucketer, pair_float_max_complexity_bucketer,
-    pair_float_signed_max_complexity_bucketer, pair_float_unsigned_max_complexity_bucketer,
+    pair_float_rational_max_complexity_bucketer, pair_float_signed_max_complexity_bucketer,
+    pair_float_unsigned_max_complexity_bucketer,
     quadruple_1_2_3_float_float_primitive_int_max_complexity_bucketer,
     quadruple_1_2_float_integer_max_complexity_bucketer, quadruple_1_float_complexity_bucketer,
     triple_1_2_float_integer_max_complexity_bucketer, triple_1_2_float_max_complexity_bucketer,
@@ -51,7 +52,9 @@ use malachite_float::test_util::generators::{
     float_integer_pair_gen, float_integer_unsigned_rounding_mode_quadruple_gen_var_1,
     float_integer_unsigned_rounding_mode_quadruple_gen_var_2,
     float_integer_unsigned_triple_gen_var_1, float_pair_gen, float_pair_gen_rm,
-    float_pair_gen_var_10, float_rational_unsigned_rounding_mode_quadruple_gen_var_1,
+    float_pair_gen_var_10, float_rational_pair_gen_var_1,
+    float_rational_unsigned_rounding_mode_quadruple_gen_var_1,
+    float_rational_unsigned_rounding_mode_quadruple_gen_var_15,
     float_rational_unsigned_triple_gen_var_1, float_signed_pair_gen,
     float_signed_unsigned_rounding_mode_quadruple_gen_var_11,
     float_signed_unsigned_rounding_mode_quadruple_gen_var_12,
@@ -73,6 +76,9 @@ use malachite_q::test_util::generators::rational_primitive_float_pair_gen;
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_rational_pow_prec_round);
     register_demo!(runner, demo_float_rational_pow_prec);
+    register_demo!(runner, demo_float_pow_rational_prec_round);
+    register_demo!(runner, demo_float_pow_rational_prec);
+    register_demo!(runner, demo_float_pow_rational);
     register_primitive_float_demos!(runner, demo_primitive_float_pow);
     register_primitive_float_demos!(runner, demo_primitive_float_rational_pow);
     register_primitive_float_demos!(runner, demo_primitive_float_pow_integer);
@@ -199,6 +205,9 @@ pub(crate) fn register(runner: &mut Runner) {
 
     register_bench!(runner, benchmark_float_rational_pow_prec_round);
     register_bench!(runner, benchmark_float_rational_pow_prec);
+    register_bench!(runner, benchmark_float_pow_rational_prec_round);
+    register_bench!(runner, benchmark_float_pow_rational_prec);
+    register_bench!(runner, benchmark_float_pow_rational_evaluation_strategy);
     register_primitive_float_benches!(runner, benchmark_primitive_float_pow);
     register_primitive_float_benches!(runner, benchmark_primitive_float_rational_pow);
     register_primitive_float_benches!(runner, benchmark_primitive_float_pow_integer);
@@ -2731,4 +2740,95 @@ fn demo_float_pow_integer_prec_extreme(gm: GenMode, config: &GenConfig, limit: u
             x.pow_integer_prec(z, prec)
         );
     }
+}
+
+fn demo_float_pow_rational_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec, rm) in float_rational_unsigned_rounding_mode_quadruple_gen_var_15()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (p, o) = x.clone().pow_rational_prec_round_ref_ref(&y, prec, rm);
+        println!("pow_rational_prec_round({x}, {y}, {prec}, {rm}) = ({p}, {o:?})");
+    }
+}
+
+fn demo_float_pow_rational_prec(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in float_rational_unsigned_triple_gen_var_1::<u64>()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (p, o) = x.clone().pow_rational_prec_ref_ref(&y, prec);
+        println!("pow_rational_prec({x}, {y}, {prec}) = ({p}, {o:?})");
+    }
+}
+
+fn demo_float_pow_rational(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in float_rational_pair_gen_var_1().get(gm, config).take(limit) {
+        println!("{}.pow({}) = {}", x.clone(), y.clone(), x.pow(y));
+    }
+}
+
+fn benchmark_float_pow_rational_prec_round(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float::pow_rational_prec_round(Float, Rational, u64, RoundingMode)",
+        BenchmarkType::Single,
+        float_rational_unsigned_rounding_mode_quadruple_gen_var_15().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &quadruple_3_bucketer("prec"),
+        &mut [("Malachite", &mut |(x, y, prec, rm)| {
+            no_out!(x.pow_rational_prec_round(y, prec, rm));
+        })],
+    );
+}
+
+fn benchmark_float_pow_rational_prec(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float::pow_rational_prec(Float, Rational, u64)",
+        BenchmarkType::Single,
+        float_rational_unsigned_triple_gen_var_1::<u64>().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &triple_3_bucketer("prec"),
+        &mut [("Malachite", &mut |(x, y, prec)| {
+            no_out!(x.pow_rational_prec(y, prec));
+        })],
+    );
+}
+
+fn benchmark_float_pow_rational_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float.pow(Rational)",
+        BenchmarkType::EvaluationStrategy,
+        float_rational_pair_gen_var_1().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_float_rational_max_complexity_bucketer("x", "y"),
+        &mut [
+            ("Float.pow(Rational)", &mut |(x, y)| no_out!(x.pow(y))),
+            ("Float.pow(&Rational)", &mut |(x, y)| no_out!(x.pow(&y))),
+            ("(&Float).pow(Rational)", &mut |(x, y)| no_out!((&x).pow(y))),
+            ("(&Float).pow(&Rational)", &mut |(x, y)| {
+                no_out!((&x).pow(&y));
+            }),
+        ],
+    );
 }

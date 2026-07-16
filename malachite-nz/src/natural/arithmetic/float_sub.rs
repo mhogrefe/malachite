@@ -35,7 +35,7 @@ use core::cmp::{
 use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{
     IsPowerOf2, ModPowerOf2, ModPowerOf2Sub, NegAssign, NegModPowerOf2, OverflowingAddAssign,
-    OverflowingNegAssign, PowerOf2, SaturatingAddAssign, SaturatingSubAssign, Sign,
+    OverflowingNegAssign, Parity, PowerOf2, SaturatingAddAssign, SaturatingSubAssign, Sign,
     WrappingAddAssign, WrappingNegAssign, WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -1023,7 +1023,7 @@ fn sub_float_significands_same_prec_w(
         match rm {
             Exact => panic!("Inexact float subtraction"),
             Nearest => {
-                if round_bit == 0 || (sticky_bit == 0 && (diff & 1) == 0) {
+                if round_bit == 0 || (sticky_bit == 0 && diff.even()) {
                     (diff, x_exp, Less, neg)
                 } else if diff.overflowing_add_assign(1) {
                     (LIMB_HIGH_BIT, x_exp.saturating_add(1), Greater, neg)
@@ -1491,7 +1491,7 @@ fn sub_float_significands_same_prec_2w(
         match rm {
             Exact => panic!("Inexact float subtraction"),
             Nearest => {
-                if round_bit == 0 || (sticky_bit == 0 && (diff_0 & 1) == 0) {
+                if round_bit == 0 || (sticky_bit == 0 && diff_0.even()) {
                     (diff_0, diff_1, x_exp, Less, neg)
                 } else if diff_0.overflowing_add_assign(1) && diff_1.overflowing_add_assign(1) {
                     (diff_0, LIMB_HIGH_BIT, x_exp.saturating_add(1), Greater, neg)
@@ -4116,7 +4116,7 @@ fn sub_float_significands_general<'a>(
         if !goto_truncate && !goto_end_of_sub {
             inexact = if rm == Nearest && cmp_low != 0 {
                 // Even rounding rule
-                if (out[0] >> shift) & 1 != 0 {
+                if (out[0] >> shift).odd() {
                     if cmp_low < 0 {
                         limbs_sub_limb_in_place(out, shift_bit);
                         goto_end_of_sub = true;

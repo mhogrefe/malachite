@@ -10,7 +10,7 @@
 // Lesser General Public License (LGPL as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::num::arithmetic::traits::{CheckedSqrt, FloorSqrt, Square};
+use crate::num::arithmetic::traits::{CheckedSqrt, FloorSqrt, Parity, Square};
 use crate::num::basic::integers::PrimitiveInt;
 use crate::num::conversion::traits::{SplitInHalf, WrappingFrom};
 use crate::num::factorization::traits::IsSquare;
@@ -133,7 +133,7 @@ const fn perfsqr_mod_idx(r: u64, d: u64, inv: u64) -> u64 {
 fn perfsqr_mod_1(r: u64, d: u64, inv: u64, mask: u64) -> bool {
     assert!(d <= u64::WIDTH);
     let idx = perfsqr_mod_idx(r, d, inv);
-    if (mask >> idx) & 1 == 0 {
+    if (mask >> idx).even() {
         // non-square
         return false;
     }
@@ -146,7 +146,7 @@ fn perfsqr_mod_2(r: u64, d: u64, inv: u64, mhi: u64, mlo: u64) -> bool {
     let mut idx = perfsqr_mod_idx(r, d, inv);
     let m = if idx < u64::WIDTH { mlo } else { mhi };
     idx %= u64::WIDTH;
-    if (m >> idx) & 1 == 0 {
+    if (m >> idx).even() {
         // non-square
         return false;
     }
@@ -189,8 +189,7 @@ impl IsSquare for u128 {
         // input can be a perfect square mod 256.
         if (SQR_MOD256[(idx >> u64::LOG_WIDTH) as usize]
             >> (idx & const { u64::WIDTH_MASK as Self }))
-            & 1
-            == 0
+        .even()
         {
             return false;
         }

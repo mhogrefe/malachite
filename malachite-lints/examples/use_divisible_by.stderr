@@ -1,0 +1,27 @@
+error: testing divisibility with `% b == 0`
+  --> $DIR/use_divisible_by.rs:7:13
+   |
+LL |     let _ = n % b == 0;
+   |             ^^^^^^^^^^
+   |
+   = help: use `n.divisible_by(b)`
+   = note: `#[deny(use_divisible_by)]` on by default
+
+error: testing divisibility with `% b == 0`
+  --> $DIR/use_divisible_by.rs:8:13
+   |
+LL |     let _ = n % 3 != 0;
+   |             ^^^^^^^^^^
+   |
+   = help: use `!n.divisible_by(3)`
+
+error: testing divisibility with `% b == 0`
+  --> $DIR/use_divisible_by.rs:12:13
+   |
+LL |     let _ = &x % &three == 0u32;
+   |             ^^^^^^^^^^^^^^^^^^^
+   |
+   = help: use `x.divisible_by(&three)`
+
+error: aborting due to 3 previous errors
+

@@ -1,0 +1,19 @@
+error: taking a remainder by `T::WIDTH`
+  --> $DIR/use_width_mask.rs:7:13
+   |
+LL |     let _ = i % Limb::WIDTH;
+   |             ^^^^^^^^^^^^^^^
+   |
+   = help: use `i & Limb::WIDTH_MASK`
+   = note: `#[deny(use_width_mask)]` on by default
+
+error: taking a remainder by `T::WIDTH`
+  --> $DIR/use_width_mask.rs:8:13
+   |
+LL |     let _ = i % u64::WIDTH;
+   |             ^^^^^^^^^^^^^^
+   |
+   = help: use `i & u64::WIDTH_MASK`
+
+error: aborting due to 2 previous errors
+

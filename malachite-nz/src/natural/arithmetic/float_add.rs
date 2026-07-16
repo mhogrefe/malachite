@@ -959,7 +959,7 @@ fn add_float_significands_same_prec_w(
         match rm {
             Exact => panic!("Inexact float addition"),
             Nearest => {
-                if round_bit == 0 || (sticky_bit == 0 && (sum & 1) == 0) {
+                if round_bit == 0 || (sticky_bit == 0 && sum.even()) {
                     (sum, x_exp, Less)
                 } else if sum.overflowing_add_assign(1) {
                     (LIMB_HIGH_BIT, x_exp.saturating_add(1), Greater)
@@ -1203,7 +1203,7 @@ fn add_float_significands_same_prec_2w(
         match rm {
             Exact => panic!("Inexact float addition"),
             Nearest => {
-                if round_bit == 0 || (sticky_bit == 0 && (sum_0 & 1) == 0) {
+                if round_bit == 0 || (sticky_bit == 0 && sum_0.even()) {
                     (sum_0, sum_1, x_exp, Less)
                 } else if sum_0.overflowing_add_assign(1) && sum_1.overflowing_add_assign(1) {
                     (sum_0, LIMB_HIGH_BIT, x_exp.saturating_add(1), Greater)

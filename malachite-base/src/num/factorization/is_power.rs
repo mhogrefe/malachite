@@ -78,7 +78,7 @@ fn get_perfect_power_u32(n: u32) -> Option<(u32, u64)> {
     t &= MOD61[(n % 61) as usize];
     t &= MOD63[(n % 63) as usize];
     // Check for perfect square
-    if t & 1 != 0 {
+    if t.odd() {
         let (rt, rem) = n.sqrt_rem();
         if rem == 0 {
             return Some((rt, 2));
@@ -105,7 +105,7 @@ fn get_perfect_power_u32(n: u32) -> Option<(u32, u64)> {
     t &= MOD72[(n % 72) as usize];
 
     // Check for perfect 7th power
-    if t & 1 != 0 {
+    if t.odd() {
         let (rt, rem) = n.root_rem(7);
         if rem == 0 {
             return Some((rt, 7));
@@ -165,7 +165,7 @@ fn get_perfect_power_u32_bool(n: u32) -> bool {
     t &= MOD61[(n % 61) as usize];
     t &= MOD63[(n % 63) as usize];
     // Check for perfect square
-    if t & 1 != 0 && n.is_square() {
+    if t.odd() && n.is_square() {
         return true;
     }
     // Check for perfect cube
@@ -182,7 +182,7 @@ fn get_perfect_power_u32_bool(n: u32) -> bool {
     t |= MOD79[(n % 79) as usize];
     t &= MOD72[(n % 72) as usize];
     // Check for perfect 7th power
-    if t & 1 != 0 && n.root_rem(7).1 == 0 {
+    if t.odd() && n.root_rem(7).1 == 0 {
         return true;
     }
     // Check for perfect 11th power
@@ -216,7 +216,7 @@ fn get_perfect_power_u64(n: u64) -> Option<(u64, u64)> {
     t &= MOD61[(n % 61) as usize];
     t &= MOD63[(n % 63) as usize];
     // Check for perfect square
-    if t & 1 != 0 {
+    if t.odd() {
         let (rt, rem) = n.sqrt_rem();
         if rem == 0 {
             return Some((rt, 2));
@@ -242,7 +242,7 @@ fn get_perfect_power_u64(n: u64) -> Option<(u64, u64)> {
     t |= MOD79[(n % 79) as usize];
     t &= MOD72[(n % 72) as usize];
     // Check for perfect 7th power
-    if t & 1 != 0 {
+    if t.odd() {
         let (rt, rem) = n.root_rem(7);
         if rem == 0 {
             return Some((rt, 7));
@@ -357,7 +357,7 @@ fn get_perfect_power_u64_bool(n: u64) -> bool {
     t &= MOD61[(n % 61) as usize];
     t &= MOD63[(n % 63) as usize];
     // Check for perfect square
-    if t & 1 != 0 && n.is_square() {
+    if t.odd() && n.is_square() {
         return true;
     }
     // Check for perfect cube
@@ -374,7 +374,7 @@ fn get_perfect_power_u64_bool(n: u64) -> bool {
     t |= MOD79[(n % 79) as usize];
     t &= MOD72[(n % 72) as usize];
     // Check for perfect 7th power
-    if t & 1 != 0 && n.root_rem(7).1 == 0 {
+    if t.odd() && n.root_rem(7).1 == 0 {
         return true;
     }
     // Check for perfect 11th power

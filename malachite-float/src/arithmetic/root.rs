@@ -17,8 +17,8 @@ use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn, floa
 use core::cmp::Ordering::{self, *};
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    Abs, CeilingLogBase2, CheckedRoot, IsPowerOf2, Parity, Reciprocal, Root, RootAssign, RootRem,
-    Sign,
+    Abs, CeilingLogBase2, CheckedRoot, DivisibleBy, IsPowerOf2, Parity, Reciprocal, Root,
+    RootAssign, RootRem, Sign,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -990,7 +990,7 @@ impl Float {
                 if rm == Exact {
                     // The root is exactly representable iff |x| is 2 raised to a multiple of k.
                     let e = i64::from(self.get_exponent().unwrap()) - 1;
-                    if self.significand_ref().unwrap().is_power_of_2() && e % k == 0 {
+                    if self.significand_ref().unwrap().is_power_of_2() && e.divisible_by(k) {
                         let (root, o) =
                             Self::from_float_prec_round_ref(&(Self::ONE << (e / k)), prec, Exact);
                         debug_assert_eq!(o, Equal);
@@ -1008,7 +1008,7 @@ impl Float {
                 // detected after `float_can_round`. The root is exactly representable iff |x| is 2
                 // raised to a multiple of k.
                 let exact_representable = self.significand_ref().unwrap().is_power_of_2()
-                    && (i64::from(self.get_exponent().unwrap()) - 1) % k == 0;
+                    && (i64::from(self.get_exponent().unwrap()) - 1).divisible_by(k);
                 let mut working_prec = prec + 10;
                 let mut increment = Limb::WIDTH;
                 loop {

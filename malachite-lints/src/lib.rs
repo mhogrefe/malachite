@@ -34,11 +34,14 @@ mod redundant_nearest;
 mod redundant_prec_round_of_exact_constant;
 mod runtime_literal_conversion;
 mod use_assign_variant;
+mod use_divisible_by;
 mod use_named_constant;
 mod use_parity;
 mod use_reciprocal;
 mod use_round_variant;
+mod use_saturating_from;
 mod use_square;
+mod use_width_mask;
 
 dylint_linting::dylint_library!();
 
@@ -206,6 +209,32 @@ fn literal_value(e: &rustc_hir::Expr<'_>) -> Option<i128> {
     }
 }
 
+// Whether `e` is the integer literal `value` or a path to a constant named `name` (e.g. the value
+// 2, spelled `2` or `T::TWO`).
+fn is_int_const(
+    cx: &rustc_lint::LateContext<'_>,
+    e: &rustc_hir::Expr<'_>,
+    value: i128,
+    name: &str,
+) -> bool {
+    use rustc_hir::ExprKind;
+    use rustc_hir::def::DefKind;
+    let e = peel_clone_and_borrows(e);
+    if literal_value(e) == Some(value) {
+        return true;
+    }
+    let ExprKind::Path(qpath) = &e.kind else {
+        return false;
+    };
+    let Some(did) = cx.qpath_res(qpath, e.hir_id).opt_def_id() else {
+        return false;
+    };
+    matches!(
+        cx.tcx.def_kind(did),
+        DefKind::Const { .. } | DefKind::AssocConst { .. }
+    ) && cx.tcx.item_name(did).as_str() == name
+}
+
 // Whether the span lies in test-oriented code: tests, demos and benches (`bin_util`), test
 // utilities, or any code compiled only as part of a test harness (which covers `#[cfg(test)]`
 // modules inside `src`). Such code exercises the discouraged spellings on purpose.
@@ -246,11 +275,14 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         redundant_prec_round_of_exact_constant::REDUNDANT_PREC_ROUND_OF_EXACT_CONSTANT,
         runtime_literal_conversion::RUNTIME_LITERAL_CONVERSION,
         use_assign_variant::USE_ASSIGN_VARIANT,
+        use_divisible_by::USE_DIVISIBLE_BY,
         use_named_constant::USE_NAMED_CONSTANT,
         use_parity::USE_PARITY,
         use_reciprocal::USE_RECIPROCAL,
         use_round_variant::USE_ROUND_VARIANT,
+        use_saturating_from::USE_SATURATING_FROM,
         use_square::USE_SQUARE,
+        use_width_mask::USE_WIDTH_MASK,
     ]);
     lint_store.register_late_pass(|_| {
         Box::new(assert_ordering_equal_prefer_exact::AssertOrderingEqualPreferExact)
@@ -281,11 +313,14 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         .register_late_pass(|_| Box::new(runtime_literal_conversion::RuntimeLiteralConversion));
     lint_store.register_late_pass(|_| Box::new(clone_with_ref_variant::CloneWithRefVariant));
     lint_store.register_late_pass(|_| Box::new(use_assign_variant::UseAssignVariant));
+    lint_store.register_late_pass(|_| Box::new(use_divisible_by::UseDivisibleBy));
     lint_store.register_late_pass(|_| Box::new(use_named_constant::UseNamedConstant));
     lint_store.register_late_pass(|_| Box::new(use_parity::UseParity));
     lint_store.register_late_pass(|_| Box::new(use_reciprocal::UseReciprocal));
     lint_store.register_late_pass(|_| Box::new(use_round_variant::UseRoundVariant));
+    lint_store.register_late_pass(|_| Box::new(use_saturating_from::UseSaturatingFrom));
     lint_store.register_late_pass(|_| Box::new(use_square::UseSquare));
+    lint_store.register_late_pass(|_| Box::new(use_width_mask::UseWidthMask));
 }
 
 #[test]

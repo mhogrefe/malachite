@@ -12,6 +12,7 @@ use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::natural::arithmetic::sqrt::limbs_checked_sqrt;
 use crate::platform::Limb;
+use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
@@ -115,7 +116,7 @@ fn perfsqr_mod_1(r: Limb, d: Limb, inv: Limb, mask: Limb) -> bool {
     //   CNST_LIMB(0x202021202020213),
     assert!(d <= Limb::WIDTH as Limb);
     let idx = perfsqr_mod_idx(r, d, inv);
-    if (mask >> idx) & 1 == 0 {
+    if (mask >> idx).even() {
         // non-square
         return false;
     }
@@ -128,7 +129,7 @@ fn perfsqr_mod_2(r: Limb, d: Limb, inv: Limb, mhi: Limb, mlo: Limb) -> bool {
     let mut idx = perfsqr_mod_idx(r, d, inv);
     let m = if idx < Limb::WIDTH as Limb { mlo } else { mhi };
     idx %= Limb::WIDTH as Limb;
-    if (m >> idx) & 1 == 0 {
+    if (m >> idx).even() {
         // non-square
         return false;
     }
@@ -181,8 +182,7 @@ fn limbs_is_square(limbs: &[Limb]) -> bool {
     // can be a perfect square mod 256.
     if (SQR_MOD256[usize::exact_from(idx >> Limb::LOG_WIDTH)]
         >> (idx & const { Limb::WIDTH_MASK as Limb }))
-        & 1
-        == 0
+    .even()
     {
         return false;
     }

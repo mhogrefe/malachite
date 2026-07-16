@@ -40,7 +40,9 @@ use malachite_float::test_util::generators::{
     float_integer_pair_gen, float_integer_unsigned_rounding_mode_quadruple_gen_var_1,
     float_integer_unsigned_rounding_mode_quadruple_gen_var_2,
     float_integer_unsigned_triple_gen_var_1, float_pair_gen, float_pair_gen_var_10,
-    float_rational_unsigned_rounding_mode_quadruple_gen_var_1,
+    float_rational_pair_gen_var_1, float_rational_unsigned_rounding_mode_quadruple_gen_var_1,
+    float_rational_unsigned_rounding_mode_quadruple_gen_var_15,
+    float_rational_unsigned_rounding_mode_quadruple_gen_var_16,
     float_rational_unsigned_triple_gen_var_1, float_signed_pair_gen,
     float_signed_unsigned_rounding_mode_quadruple_gen_var_11,
     float_signed_unsigned_rounding_mode_quadruple_gen_var_12,
@@ -3797,4 +3799,359 @@ fn test_pow_near_one_fast_path() {
         "0x0.ffffffffffffffffffffffffd0000000000000#150",
         Less,
     );
+}
+
+#[test]
+fn test_pow_rational_prec_round() {
+    let test = |x_hex: &str,
+                a: i64,
+                b: u64,
+                prec: u64,
+                rm: RoundingMode,
+                out: &str,
+                out_hex: &str,
+                o_out| {
+        let x = parse_hex_string(x_hex);
+        let y = Rational::from(a) / Rational::from(b);
+        let (p, o) = x.clone().pow_rational_prec_round(y.clone(), prec, rm);
+        assert!(p.is_valid());
+        assert_eq!(p.to_string(), out);
+        assert_eq!(to_hex_string(&p), out_hex);
+        assert_eq!(o, o_out);
+
+        let (p_alt, o_alt) = x.clone().pow_rational_prec_round_val_ref(&y, prec, rm);
+        assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+        assert_eq!(o_alt, o);
+        let (p_alt, o_alt) = x
+            .clone()
+            .pow_rational_prec_round_ref_val(y.clone(), prec, rm);
+        assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+        assert_eq!(o_alt, o);
+        let (p_alt, o_alt) = x.pow_rational_prec_round_ref_ref(&y, prec, rm);
+        assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+        assert_eq!(o_alt, o);
+
+        let mut p_assign = x.clone();
+        let o_assign = p_assign.pow_rational_prec_round_assign(y.clone(), prec, rm);
+        assert_eq!(ComparableFloatRef(&p_assign), ComparableFloatRef(&p));
+        assert_eq!(o_assign, o);
+        let mut p_assign = x.clone();
+        let o_assign = p_assign.pow_rational_prec_round_assign_ref(&y, prec, rm);
+        assert_eq!(ComparableFloatRef(&p_assign), ComparableFloatRef(&p));
+        assert_eq!(o_assign, o);
+    };
+    // Irrational results, all rounding directions.
+    test("0x2.0#2", 3, 2, 20, Floor, "2.828426", "0x2.d413c#20", Less);
+    test(
+        "0x2.0#2",
+        3,
+        2,
+        20,
+        Ceiling,
+        "2.82843",
+        "0x2.d4140#20",
+        Greater,
+    );
+    test(
+        "0x2.0#2",
+        3,
+        2,
+        20,
+        Nearest,
+        "2.828426",
+        "0x2.d413c#20",
+        Less,
+    );
+    test("0x3.0#2", 5, 2, 10, Nearest, "15.59", "0xf.98#10", Greater);
+    test(
+        "0x2.0#2",
+        1,
+        2,
+        53,
+        Nearest,
+        "1.4142135623730951",
+        "0x1.6a09e667f3bcd#53",
+        Greater,
+    );
+    // Negative rational exponents.
+    test(
+        "0xa.0#4",
+        -1,
+        2,
+        20,
+        Floor,
+        "0.3162274",
+        "0x0.50f448#20",
+        Less,
+    );
+    test(
+        "0xa.0#4",
+        -1,
+        2,
+        20,
+        Ceiling,
+        "0.3162279",
+        "0x0.50f450#20",
+        Greater,
+    );
+    // A base in (1/2, 2) other than 1 reaches the near-1 branch of the exponent bound, then the
+    // squeeze.
+    // - in positive_float_pow_rational: ex == 0 || ex == 1 (near-1 expb branch), then the squeeze
+    test(
+        "0x1.8#2",
+        1,
+        2,
+        20,
+        Nearest,
+        "1.224745",
+        "0x1.3988e#20",
+        Less,
+    );
+    // Exactly-representable algebraic results (perfect powers): Ordering is Equal.
+    // - in positive_float_pow_rational: b | d && c is a perfect b-th power (exact-algebraic branch)
+    test("0x8.0#4", 1, 3, 20, Floor, "2.0", "0x2.00000#20", Equal);
+    test("0x9.0#4", 1, 2, 20, Nearest, "3.0", "0x3.00000#20", Equal);
+    test("0x1b.0#5", 2, 3, 20, Nearest, "9.0", "0x9.0000#20", Equal);
+    test("0x4.0#3", 1, 2, 10, Nearest, "2.0", "0x2.00#10", Equal);
+    // Exact rounding mode, when the result is exactly representable, succeeds.
+    // - in float_rational_pow: rm == Exact (and the result is exact)
+    test("0x8.0#4", 1, 3, 20, Exact, "2.0", "0x2.00000#20", Equal);
+    // Power-of-2 base (including a fractional one): x^(a/b) = 2^(d*a/b).
+    test(
+        "0x0.4#1",
+        1,
+        2,
+        30,
+        Nearest,
+        "0.5",
+        "0x0.80000000#30",
+        Equal,
+    );
+    // Negative base with an integer exponent is defined; with a non-integer exponent it is NaN.
+    test("-0x2.0#2", 3, 1, 10, Nearest, "-8.0", "-0x8.00#10", Equal);
+    test("-0x8.0#4", 1, 3, 10, Nearest, "NaN", "NaN", Equal);
+}
+
+#[test]
+fn test_pow_rational_special_values() {
+    let test = |x: Float, a: i64, b: u64, out: &str, o_out| {
+        let y = Rational::from(a) / Rational::from(b);
+        let (p, o) = x.pow_rational_prec_round_ref_ref(&y, 10, Nearest);
+        assert!(p.is_valid());
+        assert_eq!(to_hex_string(&p), out);
+        assert_eq!(o, o_out);
+    };
+    // x^0 = 1 for any x, even NaN.
+    for x in [Float::NAN, Float::INFINITY, Float::from(3), Float::ZERO, Float::from(-5)] {
+        let (p, o) = x.pow_rational_prec_round_ref_ref(&Rational::ZERO, 10, Nearest);
+        assert_eq!(to_hex_string(&p), "0x1.000#10");
+        assert_eq!(o, Equal);
+    }
+    // NaN base, nonzero exponent.
+    test(Float::NAN, 1, 2, "NaN", Equal);
+    // Infinities.
+    test(Float::INFINITY, 1, 2, "Infinity", Equal);
+    test(Float::INFINITY, -1, 2, "0x0.0", Equal);
+    test(Float::NEGATIVE_INFINITY, 1, 2, "Infinity", Equal); // even root -> positive
+    test(Float::NEGATIVE_INFINITY, 3, 1, "-Infinity", Equal); // positive odd integer
+    test(Float::NEGATIVE_INFINITY, 2, 1, "Infinity", Equal); // even integer
+    test(Float::NEGATIVE_INFINITY, -3, 1, "-0x0.0", Equal); // negative odd integer -> -0.0
+    // Zeros.
+    test(Float::ZERO, 1, 2, "0x0.0", Equal);
+    test(Float::ZERO, -1, 2, "Infinity", Equal);
+    test(Float::NEGATIVE_ZERO, 3, 1, "-0x0.0", Equal); // odd integer
+    test(Float::NEGATIVE_ZERO, -3, 1, "-Infinity", Equal);
+    test(Float::NEGATIVE_ZERO, 1, 2, "0x0.0", Equal); // non-integer -> positive
+    // +/-1.
+    test(Float::ONE, 1, 2, "0x1.000#10", Equal);
+    test(Float::NEGATIVE_ONE, 3, 1, "-0x1.000#10", Equal);
+    test(Float::NEGATIVE_ONE, 2, 1, "0x1.000#10", Equal);
+    test(Float::NEGATIVE_ONE, 1, 2, "NaN", Equal); // non-integer -> NaN
+}
+
+// Cases where |y * log2(x)| is far below 1, so x^y rounds to 1 +/- ulp via the tiny-result
+// shortcut. The exponent 2^-100 has a denominator too large for the `a / b` helper above, so it is
+// built directly.
+#[test]
+fn test_pow_rational_tiny() {
+    let tiny = Rational::power_of_2(-100i64);
+    // - in positive_float_pow_rational: ey + expb < -prec - 1 (tiny-result shortcut), reached with
+    //   a base bounded away from 1 (away expb branch)
+    let (p, o) = Float::from(3).pow_rational_prec_round_ref_ref(&tiny, 10, Nearest);
+    assert_eq!(to_hex_string(&p), "0x1.000#10");
+    assert_eq!(o, Less);
+    // - the tiny-result shortcut reached with a base in (1/2, 2) (near-1 expb branch)
+    let x = parse_hex_string("0x1.8#2"); // 1.5
+    let (p, o) = x.pow_rational_prec_round_ref_ref(&tiny, 10, Nearest);
+    assert_eq!(to_hex_string(&p), "0x1.000#10");
+    assert_eq!(o, Less);
+    // Rounding away from 1 gives the ulp neighbor.
+    let (p, o) = parse_hex_string("0x1.8#2").pow_rational_prec_round_ref_ref(&tiny, 10, Ceiling);
+    assert_eq!(to_hex_string(&p), "0x1.008#10");
+    assert_eq!(o, Greater);
+}
+
+#[test]
+#[should_panic]
+fn pow_rational_prec_round_fail_1() {
+    Float::from(3).pow_rational_prec_round(Rational::from_signeds(1, 2), 0, Floor);
+}
+
+#[test]
+#[should_panic]
+fn pow_rational_prec_round_fail_2() {
+    // 2^(1/2) is irrational, so it cannot be represented exactly.
+    Float::from(2).pow_rational_prec_round(Rational::from_signeds(1, 2), 10, Exact);
+}
+
+#[allow(clippy::needless_pass_by_value)]
+fn pow_rational_prec_round_properties_helper(x: Float, y: Rational, prec: u64, rm: RoundingMode) {
+    if rm == Exact {
+        let (p, o) = x.pow_rational_prec_round_ref_ref(&y, prec, Nearest);
+        if o == Equal {
+            let (pe, oe) = x.pow_rational_prec_round_ref_ref(&y, prec, Exact);
+            assert_eq!(ComparableFloatRef(&pe), ComparableFloatRef(&p));
+            assert_eq!(oe, Equal);
+        } else {
+            assert_panic!(x.pow_rational_prec_round_ref_ref(&y, prec, Exact));
+        }
+        return;
+    }
+    let (p, o) = x.pow_rational_prec_round_ref_ref(&y, prec, rm);
+    assert!(p.is_valid());
+    // Value/reference variants all agree.
+    let (p_alt, o_alt) = x.clone().pow_rational_prec_round(y.clone(), prec, rm);
+    assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+    assert_eq!(o_alt, o);
+    let (p_alt, o_alt) = x.clone().pow_rational_prec_round_val_ref(&y, prec, rm);
+    assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+    assert_eq!(o_alt, o);
+    let (p_alt, o_alt) = x.pow_rational_prec_round_ref_val(y.clone(), prec, rm);
+    assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+    assert_eq!(o_alt, o);
+    // Assign variants agree.
+    let mut p_assign = x.clone();
+    let o_assign = p_assign.pow_rational_prec_round_assign(y.clone(), prec, rm);
+    assert_eq!(ComparableFloatRef(&p_assign), ComparableFloatRef(&p));
+    assert_eq!(o_assign, o);
+    let mut p_assign = x.clone();
+    let o_assign = p_assign.pow_rational_prec_round_assign_ref(&y, prec, rm);
+    assert_eq!(ComparableFloatRef(&p_assign), ComparableFloatRef(&p));
+    assert_eq!(o_assign, o);
+
+    // A dyadic exponent is exactly a Float, so the result must agree with Float::pow.
+    if y.denominator_ref().is_power_of_2() && y.significant_bits() < 1000 {
+        let yf = Float::exact_from(&y);
+        let (p_alt, o_alt) = x.pow_prec_round_ref_val(yf, prec, rm);
+        assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+        assert_eq!(o_alt, o);
+    }
+    // An integer base agrees with `unsigned_pow_rational`.
+    if x.is_normal()
+        && x > 0u32
+        && (&x).is_integer()
+        && let Ok(k) = u64::try_from(&Integer::rounding_from(&x, Nearest).0)
+    {
+        let (p_alt, o_alt) = Float::unsigned_pow_rational_prec_round(k, y.clone(), prec, rm);
+        assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+        assert_eq!(o_alt, o);
+    }
+    // Exactness implies rounding-mode invariance.
+    if o == Equal && p.is_normal() {
+        for rm2 in [Floor, Ceiling, Down, Up, Nearest] {
+            let (p_alt, o_alt) = x.pow_rational_prec_round_ref_ref(&y, prec, rm2);
+            assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+            assert_eq!(o_alt, Equal);
+        }
+    }
+    // Negative base with a non-integer exponent is NaN.
+    if x < 0u32 && x.is_normal() && !y.is_integer() {
+        assert!(p.is_nan());
+    }
+    if p.is_normal() {
+        assert_eq!(p.get_prec(), Some(prec));
+    }
+}
+
+#[test]
+fn pow_rational_prec_round_properties() {
+    float_rational_unsigned_rounding_mode_quadruple_gen_var_15().test_properties(
+        |(x, y, prec, rm)| {
+            pow_rational_prec_round_properties_helper(x, y, prec, rm);
+        },
+    );
+}
+
+#[test]
+fn pow_rational_prec_round_properties_extreme() {
+    float_rational_unsigned_rounding_mode_quadruple_gen_var_16().test_properties_with_limit(
+        20,
+        |(x, y, prec, rm)| {
+            pow_rational_prec_round_properties_helper(x, y, prec, rm);
+        },
+    );
+}
+
+#[test]
+fn pow_rational_prec_properties() {
+    float_rational_unsigned_triple_gen_var_1::<u64>().test_properties(|(x, y, prec)| {
+        let (p, o) = x.clone().pow_rational_prec(y.clone(), prec);
+        assert!(p.is_valid());
+        let (p_alt, o_alt) = x.clone().pow_rational_prec_val_ref(&y, prec);
+        assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+        assert_eq!(o_alt, o);
+        let (p_alt, o_alt) = x.clone().pow_rational_prec_ref_val(y.clone(), prec);
+        assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+        assert_eq!(o_alt, o);
+        let (p_alt, o_alt) = x.pow_rational_prec_ref_ref(&y, prec);
+        assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+        assert_eq!(o_alt, o);
+        let (p_alt, o_alt) = x.pow_rational_prec_round_ref_ref(&y, prec, Nearest);
+        assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+        assert_eq!(o_alt, o);
+    });
+}
+
+#[test]
+fn pow_rational_round_properties() {
+    float_rational_pair_gen_var_1().test_properties(|(x, y)| {
+        for rm in [Floor, Ceiling, Down, Up, Nearest] {
+            let (p, o) = x.clone().pow_rational_round(y.clone(), rm);
+            assert!(p.is_valid());
+            let (p_alt, o_alt) = x.clone().pow_rational_round_val_ref(&y, rm);
+            assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+            assert_eq!(o_alt, o);
+            let (p_alt, o_alt) = x.pow_rational_round_ref_val(y.clone(), rm);
+            assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+            assert_eq!(o_alt, o);
+            let (p_alt, o_alt) = x.pow_rational_round_ref_ref(&y, rm);
+            assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+            assert_eq!(o_alt, o);
+            if p.is_normal() {
+                assert_eq!(p.get_prec(), Some(x.significant_bits()));
+            }
+        }
+    });
+}
+
+#[test]
+fn pow_rational_properties() {
+    float_rational_pair_gen_var_1().test_properties(|(x, y)| {
+        let p = (&x).pow(&y);
+        assert!(p.is_valid());
+        let p_alt = (&x).pow(y.clone());
+        assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+        let p_alt = x.clone().pow(&y);
+        assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+        let p_alt = x.clone().pow(y.clone());
+        assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+        let mut p_assign = x.clone();
+        p_assign.pow_assign(y.clone());
+        assert_eq!(ComparableFloatRef(&p_assign), ComparableFloatRef(&p));
+        let mut p_assign = x.clone();
+        p_assign.pow_assign(&y);
+        assert_eq!(ComparableFloatRef(&p_assign), ComparableFloatRef(&p));
+        let (p_alt, _) = x.pow_rational_round_ref_ref(&y, Nearest);
+        assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+    });
 }

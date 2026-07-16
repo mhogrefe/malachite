@@ -3314,6 +3314,48 @@ pub fn exhaustive_float_rational_unsigned_rounding_mode_quadruple_gen_var_12()
     )
 }
 
+pub fn pow_rational_prec_round_valid(x: &Float, y: &Rational, prec: u64, rm: RoundingMode) -> bool {
+    // For `Exact`, the power is representable exactly iff computing it toward negative infinity is
+    // already exact.
+    rm != Exact || Float::pow_rational_prec_round_ref_ref(x, y, prec, Floor).1 == Equal
+}
+
+pub fn exhaustive_float_rational_unsigned_rounding_mode_quadruple_gen_var_15()
+-> It<(Float, Rational, u64, RoundingMode)> {
+    Box::new(
+        reshape_3_1_to_4(Box::new(lex_pairs(
+            exhaustive_triples_custom_output(
+                exhaustive_floats(),
+                exhaustive_rationals(),
+                exhaustive_positive_primitive_ints(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, prec, rm)| pow_rational_prec_round_valid(x, y, *prec, *rm)),
+    )
+}
+
+pub fn exhaustive_float_rational_unsigned_rounding_mode_quadruple_gen_var_16()
+-> It<(Float, Rational, u64, RoundingMode)> {
+    Box::new(
+        reshape_3_1_to_4(Box::new(lex_pairs(
+            exhaustive_triples_custom_output(
+                exhaustive_extreme_floats(),
+                exhaustive_rationals(),
+                exhaustive_positive_primitive_ints(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, prec, rm)| pow_rational_prec_round_valid(x, y, *prec, *rm)),
+    )
+}
+
 pub fn log_base_rational_base_1_plus_x_prec_round_valid(
     x: &Float,
     base: &Rational,

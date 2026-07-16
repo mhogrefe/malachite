@@ -23,8 +23,8 @@ use crate::{
 use alloc::vec::Vec;
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{
-    CeilingLogBase2, CheckedLogBase, Gcd, IsPowerOf2, LogBase, LogBaseAssign, Mod, ModAdd, ModMul,
-    ModPow, Pow, Sign,
+    CeilingLogBase2, CheckedLogBase, DivisibleBy, Gcd, IsPowerOf2, LogBase, LogBaseAssign, Mod,
+    ModAdd, ModMul, ModPow, Pow, Sign,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -61,7 +61,7 @@ pub(crate) fn odd_significand_and_exponent(x: &Float) -> (Natural, i64) {
 pub(crate) fn dyadic_log_of_root(s: &Natural, t: i64, z: i64, h: &Natural) -> Option<i64> {
     if *h == 1u32 {
         // The root is 2^z, so s * 2^t = 2^(z * m) requires s = 1 and z | t.
-        return if *s == 1u32 && z != 0 && t % z == 0 {
+        return if *s == 1u32 && z != 0 && t.divisible_by(z) {
             Some(t / z)
         } else {
             None
@@ -152,7 +152,7 @@ pub(crate) fn rational_value_log_of_dyadic_root(x: &Rational, z: i64, h: &Natura
     let od = den >> den_z;
     if *h == 1u32 {
         // The root is 2^z: x = 2^(z * m) requires odd parts 1 and z | v2.
-        return if on == 1u32 && od == 1u32 && z != 0 && v2 % z == 0 {
+        return if on == 1u32 && od == 1u32 && z != 0 && v2.divisible_by(z) {
             Some(v2 / z)
         } else {
             None
@@ -244,7 +244,7 @@ pub(crate) fn dyadic_1p_log_of_root(x: &Float, z: i64, h: &Natural) -> Option<i6
         // number, checked without materializing 2^|t|).
         return if neg
             && z != 0
-            && t % z == 0
+            && t.divisible_by(z)
             && s.significant_bits() == t_abs
             && (&s + Natural::ONE).is_power_of_2()
         {
@@ -253,7 +253,7 @@ pub(crate) fn dyadic_1p_log_of_root(x: &Float, z: i64, h: &Natural) -> Option<i6
             None
         };
     }
-    if z == 0 || t % z != 0 {
+    if z == 0 || !t.divisible_by(z) {
         // An odd root can't produce the nonzero 2-adic valuation t, and a mixed root needs z | t.
         return None;
     }
