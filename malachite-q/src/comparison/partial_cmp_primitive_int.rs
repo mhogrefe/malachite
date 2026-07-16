@@ -38,9 +38,9 @@ where
     }
     // Then compare numerators and denominators
     let n_cmp = x.numerator.partial_cmp(other).unwrap();
-    // In this generic context a plain `partial_cmp(&1u32)` would resolve to the
-    // `Natural: PartialOrd<T>` bound instead of the `u32` impl, so the `Natural` constant is
-    // compared directly.
+    // In this generic context a plain `partial_cmp(&1u32)` would resolve to the `Natural:
+    // PartialOrd<T>` bound instead of the `u32` impl, so the `Natural` constant is compared
+    // directly.
     #[cfg_attr(dylint_lib = "malachite_lints", allow(compare_with_primitive))]
     let d_cmp = x.denominator.cmp(&Natural::ONE);
     if n_cmp == Equal && d_cmp == Equal {
@@ -130,9 +130,9 @@ where
     }
     // Then compare numerators and denominators
     let n_cmp = x.numerator.partial_cmp(&other_abs).unwrap();
-    // In this generic context a plain `partial_cmp(&1u32)` would resolve to the
-    // `Natural: PartialOrd<T>` bound instead of the `u32` impl, so the `Natural` constant is
-    // compared directly.
+    // In this generic context a plain `partial_cmp(&1u32)` would resolve to the `Natural:
+    // PartialOrd<T>` bound instead of the `u32` impl, so the `Natural` constant is compared
+    // directly.
     #[cfg_attr(dylint_lib = "malachite_lints", allow(compare_with_primitive))]
     let d_cmp = x.denominator.cmp(&Natural::ONE);
     if n_cmp == Equal && d_cmp == Equal {

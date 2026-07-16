@@ -11,7 +11,7 @@ use clippy_utils::path_to_local_with_projections;
 use clippy_utils::visitors::for_each_expr;
 use core::ops::ControlFlow;
 use rustc_hir::{
-    BindingMode, ByRef, Block, Expr, ExprKind, HirId, Mutability, Node, PatKind, StmtKind,
+    BindingMode, Block, ByRef, Expr, ExprKind, HirId, Mutability, Node, PatKind, StmtKind,
 };
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_session::{declare_lint, declare_lint_pass};

@@ -32,10 +32,7 @@ fn f(
         .add_prec_round(Float::one_prec(big), prec, Ceiling);
     let b = arg.exp_prec_round(prec, Ceiling).0;
     // The `Nearest` shorthand with the `Ordering` discarded: flagged, suggesting plain `exp()`.
-    let arg = Float::pi_prec(big)
-        .0
-        .mul_prec(Float::one_prec(big), prec)
-        .0;
+    let arg = Float::pi_prec(big).0.mul_prec(Float::one_prec(big), prec).0;
     let c = arg.exp_prec(prec).0;
     // Constants and constructors pin the precision as well: flagged.
     let pi = Float::pi_prec(prec).0;

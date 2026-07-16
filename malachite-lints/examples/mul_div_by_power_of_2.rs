@@ -12,8 +12,8 @@ fn main() {
     let _ = Natural::power_of_2(5) * &n;
     let mut m = n.clone();
     m *= Natural::power_of_2(5);
-    // Dividing by power_of_2: flagged; for `Integer` the advice is `shr_round`, since `/`
-    // truncates while `>>` takes the floor.
+    // Dividing by power_of_2: flagged; for `Integer` the advice is `shr_round`, since `/` truncates
+    // while `>>` takes the floor.
     let _ = &n / Natural::power_of_2(5);
     let _ = &i / Integer::power_of_2(5);
     let _ = &q / Rational::power_of_2(-5i64);

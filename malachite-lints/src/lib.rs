@@ -34,6 +34,7 @@ mod redundant_nearest;
 mod redundant_prec_round_of_exact_constant;
 mod runtime_literal_conversion;
 mod use_assign_variant;
+mod use_checked_log_base_2;
 mod use_divisible_by;
 mod use_named_constant;
 mod use_parity;
@@ -275,6 +276,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         redundant_prec_round_of_exact_constant::REDUNDANT_PREC_ROUND_OF_EXACT_CONSTANT,
         runtime_literal_conversion::RUNTIME_LITERAL_CONVERSION,
         use_assign_variant::USE_ASSIGN_VARIANT,
+        use_checked_log_base_2::USE_CHECKED_LOG_BASE_2,
         use_divisible_by::USE_DIVISIBLE_BY,
         use_named_constant::USE_NAMED_CONSTANT,
         use_parity::USE_PARITY,
@@ -313,6 +315,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         .register_late_pass(|_| Box::new(runtime_literal_conversion::RuntimeLiteralConversion));
     lint_store.register_late_pass(|_| Box::new(clone_with_ref_variant::CloneWithRefVariant));
     lint_store.register_late_pass(|_| Box::new(use_assign_variant::UseAssignVariant));
+    lint_store.register_late_pass(|_| Box::new(use_checked_log_base_2::UseCheckedLogBase2));
     lint_store.register_late_pass(|_| Box::new(use_divisible_by::UseDivisibleBy));
     lint_store.register_late_pass(|_| Box::new(use_named_constant::UseNamedConstant));
     lint_store.register_late_pass(|_| Box::new(use_parity::UseParity));

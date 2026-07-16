@@ -22,8 +22,8 @@ use malachite_base::test_util::generators::{
     primitive_float_unsigned_pair_gen_var_4,
 };
 use malachite_float::arithmetic::pow::{
-    primitive_float_pow, primitive_float_pow_integer, primitive_float_pow_u,
-    primitive_float_rational_pow, primitive_float_unsigned_pow,
+    primitive_float_pow, primitive_float_pow_integer, primitive_float_pow_rational,
+    primitive_float_pow_u, primitive_float_rational_pow, primitive_float_unsigned_pow,
 };
 use malachite_float::test_util::arithmetic::pow::{
     rug_pow, rug_pow_integer, rug_pow_integer_prec, rug_pow_integer_prec_round,
@@ -52,6 +52,7 @@ use malachite_float::test_util::generators::{
     float_unsigned_unsigned_rounding_mode_quadruple_gen_var_11,
     float_unsigned_unsigned_rounding_mode_quadruple_gen_var_12,
     float_unsigned_unsigned_triple_gen_var_1,
+    rational_rational_unsigned_rounding_mode_quadruple_gen_var_3,
     rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_2,
     unsigned_unsigned_unsigned_rounding_mode_quadruple_gen_var_1,
 };
@@ -4154,4 +4155,323 @@ fn pow_rational_properties() {
         let (p_alt, _) = x.pow_rational_round_ref_ref(&y, Nearest);
         assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
     });
+}
+
+#[test]
+#[allow(clippy::type_repetition_in_bounds)]
+fn test_primitive_float_pow_rational() {
+    fn test<T: PrimitiveFloat>(x: T, s: &str, out: T)
+    where
+        Float: From<T> + PartialOrd<T>,
+        for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    {
+        let y = Rational::from_str(s).unwrap();
+        assert_eq!(
+            NiceFloat(primitive_float_pow_rational(x, &y)),
+            NiceFloat(out)
+        );
+    }
+    test::<f32>(f32::NAN, "0", 1.0);
+    test::<f32>(f32::NAN, "1/2", f32::NAN);
+    test::<f32>(f32::NAN, "-1/2", f32::NAN);
+    test::<f32>(f32::NAN, "2", f32::NAN);
+    test::<f32>(f32::NAN, "-3", f32::NAN);
+    test::<f32>(f32::NAN, "1/3", f32::NAN);
+    test::<f32>(f32::NAN, "-1/3", f32::NAN);
+    test::<f32>(f32::INFINITY, "0", 1.0);
+    test::<f32>(f32::INFINITY, "1/2", f32::INFINITY);
+    test::<f32>(f32::INFINITY, "-1/2", 0.0);
+    test::<f32>(f32::INFINITY, "2", f32::INFINITY);
+    test::<f32>(f32::INFINITY, "-3", 0.0);
+    test::<f32>(f32::INFINITY, "1/3", f32::INFINITY);
+    test::<f32>(f32::INFINITY, "-1/3", 0.0);
+    test::<f32>(f32::NEGATIVE_INFINITY, "0", 1.0);
+    test::<f32>(f32::NEGATIVE_INFINITY, "1/2", f32::INFINITY);
+    test::<f32>(f32::NEGATIVE_INFINITY, "-1/2", 0.0);
+    test::<f32>(f32::NEGATIVE_INFINITY, "2", f32::INFINITY);
+    test::<f32>(f32::NEGATIVE_INFINITY, "-3", -0.0);
+    test::<f32>(f32::NEGATIVE_INFINITY, "1/3", f32::INFINITY);
+    test::<f32>(f32::NEGATIVE_INFINITY, "-1/3", 0.0);
+    test::<f32>(0.0, "0", 1.0);
+    test::<f32>(0.0, "1/2", 0.0);
+    test::<f32>(0.0, "-1/2", f32::INFINITY);
+    test::<f32>(0.0, "2", 0.0);
+    test::<f32>(0.0, "-3", f32::INFINITY);
+    test::<f32>(0.0, "1/3", 0.0);
+    test::<f32>(0.0, "-1/3", f32::INFINITY);
+    test::<f32>(-0.0, "0", 1.0);
+    test::<f32>(-0.0, "1/2", 0.0);
+    test::<f32>(-0.0, "-1/2", f32::INFINITY);
+    test::<f32>(-0.0, "2", 0.0);
+    test::<f32>(-0.0, "-3", f32::NEGATIVE_INFINITY);
+    test::<f32>(-0.0, "1/3", 0.0);
+    test::<f32>(-0.0, "-1/3", f32::INFINITY);
+    test::<f32>(1.0, "0", 1.0);
+    test::<f32>(1.0, "1/2", 1.0);
+    test::<f32>(1.0, "-1/2", 1.0);
+    test::<f32>(1.0, "2", 1.0);
+    test::<f32>(1.0, "-3", 1.0);
+    test::<f32>(1.0, "1/3", 1.0);
+    test::<f32>(1.0, "-1/3", 1.0);
+    test::<f32>(-1.0, "0", 1.0);
+    test::<f32>(-1.0, "1/2", f32::NAN);
+    test::<f32>(-1.0, "-1/2", f32::NAN);
+    test::<f32>(-1.0, "2", 1.0);
+    test::<f32>(-1.0, "-3", -1.0);
+    test::<f32>(-1.0, "1/3", f32::NAN);
+    test::<f32>(-1.0, "-1/3", f32::NAN);
+    test::<f32>(2.0, "0", 1.0);
+    test::<f32>(2.0, "1/2", 1.4142135);
+    test::<f32>(2.0, "-1/2", 0.70710677);
+    test::<f32>(2.0, "2", 4.0);
+    test::<f32>(2.0, "-3", 0.125);
+    test::<f32>(2.0, "1/3", 1.2599211);
+    test::<f32>(2.0, "-1/3", 0.7937005);
+    test::<f32>(-8.0, "0", 1.0);
+    test::<f32>(-8.0, "1/2", f32::NAN);
+    test::<f32>(-8.0, "-1/2", f32::NAN);
+    test::<f32>(-8.0, "2", 64.0);
+    test::<f32>(-8.0, "-3", -0.001953125);
+    test::<f32>(-8.0, "1/3", f32::NAN);
+    test::<f32>(-8.0, "-1/3", f32::NAN);
+    // normal + roots + overflow/underflow
+    test::<f64>(4.0, "1/2", 2.0);
+    test::<f64>(8.0, "1/3", 2.0);
+    test::<f64>(2.0, "3/2", 2.8284271247461903);
+    test::<f64>(4.0, "-1/2", 0.5);
+    test::<f64>(9.0, "1/2", 3.0);
+    test::<f64>(27.0, "2/3", 9.0);
+    test::<f64>(-8.0, "3", -512.0);
+    test::<f64>(3.0, "1000", f64::INFINITY);
+    test::<f64>(3.0, "-1000", 0.0);
+    test::<f32>(2.0, "3/2", 2.828427);
+    test::<f32>(2.0, "200", f32::INFINITY);
+    test::<f32>(0.5, "200", 0.0);
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn primitive_float_pow_rational_properties_helper<T: PrimitiveFloat>()
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    rational_primitive_float_pair_gen::<T>().test_properties(|(y, x)| {
+        primitive_float_pow_rational::<T>(x, &y);
+    });
+}
+
+#[test]
+fn primitive_float_pow_rational_properties() {
+    apply_fn_to_primitive_floats!(primitive_float_pow_rational_properties_helper);
+}
+
+#[test]
+fn test_rational_pow_rational() {
+    let test =
+        |xs: &str, ys: &str, prec: u64, rm: RoundingMode, out: &str, out_hex: &str, o_out| {
+            let x = Rational::from_str(xs).unwrap();
+            let y = Rational::from_str(ys).unwrap();
+            let (p, o) = Float::rational_pow_rational_prec_round_ref(&x, &y, prec, rm);
+            assert!(p.is_valid());
+            assert_eq!(p.to_string(), out);
+            assert_eq!(to_hex_string(&p), out_hex);
+            assert_eq!(o, o_out);
+
+            let (p_alt, o_alt) =
+                Float::rational_pow_rational_prec_round(x.clone(), y.clone(), prec, rm);
+            assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+            assert_eq!(o_alt, o);
+            if rm == Nearest {
+                let (p_alt, o_alt) = Float::rational_pow_rational_prec_ref(&x, &y, prec);
+                assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+                assert_eq!(o_alt, o);
+                let (p_alt, o_alt) = Float::rational_pow_rational_prec(x.clone(), y.clone(), prec);
+                assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+                assert_eq!(o_alt, o);
+            }
+        };
+    test("3/2", "0", 10, Nearest, "1.0", "0x1.000#10", Equal);
+    test("0", "1/2", 10, Nearest, "0.0", "0x0.0", Equal);
+    test("0", "-1/2", 10, Nearest, "Infinity", "Infinity", Equal);
+    test("-4", "1/2", 10, Nearest, "NaN", "NaN", Equal);
+    test("-2", "3", 10, Nearest, "-8.0", "-0x8.00#10", Equal);
+    test("-2", "2", 10, Nearest, "4.0", "0x4.00#10", Equal);
+    test("1", "1/2", 10, Nearest, "1.0", "0x1.000#10", Equal);
+    test("4", "1/3", 20, Floor, "1.5874", "0x1.965fe#20", Less);
+    test("4", "1/3", 20, Ceiling, "1.587402", "0x1.96600#20", Greater);
+    test("1/2", "1/2", 20, Nearest, "0.707107", "0x0.b504f#20", Less);
+    test("5", "3", 10, Nearest, "125.0", "0x7d.0#10", Equal);
+    test("3/2", "4", 20, Nearest, "5.0625", "0x5.10000#20", Equal);
+    test("3/4", "1/2", 20, Floor, "0.866025", "0x0.ddb3d#20", Less);
+    test(
+        "3/4",
+        "1/2",
+        20,
+        Ceiling,
+        "0.866026",
+        "0x0.ddb3e#20",
+        Greater,
+    );
+    test("1/9", "-1/2", 20, Nearest, "3.0", "0x3.00000#20", Equal);
+    test("6/5", "1/2", 20, Floor, "1.095444", "0x1.186f0#20", Less);
+    test(
+        "6/5",
+        "1/2",
+        20,
+        Ceiling,
+        "1.095446",
+        "0x1.186f2#20",
+        Greater,
+    );
+    test("3/5", "1/2", 20, Nearest, "0.774596", "0x0.c64bf#20", Less);
+    test("9/5", "1/2", 20, Nearest, "1.34164", "0x1.5775c#20", Less);
+    test("9/25", "1/2", 20, Floor, "0.599999", "0x0.99999#20", Less);
+    test("9/25", "1/2", 20, Ceiling, "0.6", "0x0.9999a#20", Greater);
+    test(
+        "9/25",
+        "-1/2",
+        20,
+        Nearest,
+        "1.666666",
+        "0x1.aaaaa#20",
+        Less,
+    );
+    test(
+        "3",
+        "1/2",
+        53,
+        Nearest,
+        "1.7320508075688772",
+        "0x1.bb67ae8584caa#53",
+        Less,
+    );
+    test(
+        "2/3",
+        "1/3",
+        20,
+        Nearest,
+        "0.873581",
+        "0x0.dfa30#20",
+        Greater,
+    );
+    test("9/4", "1/2", 10, Exact, "1.5", "0x1.800#10", Equal);
+    test(
+        "3/5",
+        "1/1180591620717411303425",
+        20,
+        Nearest,
+        "1.0",
+        "0x1.00000#20",
+        Greater,
+    );
+}
+
+#[test]
+#[should_panic]
+fn rational_pow_rational_prec_round_fail_1() {
+    Float::rational_pow_rational_prec_round(
+        Rational::from(3),
+        Rational::from_signeds(1, 2),
+        0,
+        Floor,
+    );
+}
+
+#[test]
+#[should_panic]
+fn rational_pow_rational_prec_round_fail_2() {
+    // 2^(1/2) is irrational, so it cannot be represented exactly.
+    Float::rational_pow_rational_prec_round(
+        Rational::from(2),
+        Rational::from_signeds(1, 2),
+        10,
+        Exact,
+    );
+}
+
+// An extreme dyadic base whose exponent is near 2^30 bypasses the in-range `Float::pow_rational`
+// path and exercises the exact-decomposition's positive-exponent branch: 9 * 2^(2^30), raised to
+// 1/2, is exactly 3 * 2^(2^29). The base is a ~128-MB Rational, so this is checked by value under
+// `--release`.
+#[test]
+fn test_rational_pow_rational_extreme() {
+    let k = 1i64 << 30;
+    let x = Rational::from(9) * Rational::power_of_2(k);
+    let (p, o) =
+        Float::rational_pow_rational_prec_round_ref(&x, &Rational::from_signeds(1, 2), 20, Nearest);
+    assert!(p.is_valid());
+    assert_eq!(o, Equal);
+    assert_eq!(p.get_prec(), Some(20));
+    // The value is exactly 3 * 2^(2^29) (only 2 significant bits, padded to precision 20).
+    let expected = Float::from(3) << (1i64 << 29);
+    assert_eq!(p, expected);
+}
+
+fn rational_pow_rational_prec_round_properties_helper(
+    x: &Rational,
+    y: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+) {
+    if rm == Exact {
+        let (p, o) = Float::rational_pow_rational_prec_round_ref(x, y, prec, Nearest);
+        if o == Equal {
+            let (pe, oe) = Float::rational_pow_rational_prec_round_ref(x, y, prec, Exact);
+            assert_eq!(ComparableFloatRef(&pe), ComparableFloatRef(&p));
+            assert_eq!(oe, Equal);
+        } else {
+            assert_panic!(Float::rational_pow_rational_prec_round_ref(
+                x, y, prec, Exact
+            ));
+        }
+        return;
+    }
+    let (p, o) = Float::rational_pow_rational_prec_round_ref(x, y, prec, rm);
+    assert!(p.is_valid());
+    let (p_alt, o_alt) = Float::rational_pow_rational_prec_round(x.clone(), y.clone(), prec, rm);
+    assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+    assert_eq!(o_alt, o);
+
+    // When the exponent is a dyadic Rational (hence exactly a Float), the result agrees with
+    // `rational_pow` (Rational base, Float exponent).
+    if y.denominator_ref().is_power_of_2() && y.significant_bits() < 1000 {
+        let yf = Float::exact_from(y);
+        let (p_alt, o_alt) = Float::rational_pow_prec_round_ref_ref(x, &yf, prec, rm);
+        assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+        assert_eq!(o_alt, o);
+    }
+    // A positive integer base agrees with `unsigned_pow_rational`.
+    if *x > 0u32
+        && x.denominator_ref() == &1u32
+        && let Ok(k) = u64::try_from(x.numerator_ref())
+    {
+        let (p_alt, o_alt) = Float::unsigned_pow_rational_prec_round(k, y.clone(), prec, rm);
+        assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+        assert_eq!(o_alt, o);
+    }
+    // Exactness implies rounding-mode invariance.
+    if o == Equal && p.is_normal() {
+        for rm2 in [Floor, Ceiling, Down, Up, Nearest] {
+            let (p_alt, o_alt) = Float::rational_pow_rational_prec_round_ref(x, y, prec, rm2);
+            assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+            assert_eq!(o_alt, Equal);
+        }
+    }
+    // Negative base with a non-integer exponent is NaN.
+    if *x < 0u32 && y.denominator_ref() != &1u32 {
+        assert!(p.is_nan());
+    }
+    if p.is_normal() {
+        assert_eq!(p.get_prec(), Some(prec));
+    }
+}
+
+#[test]
+fn rational_pow_rational_prec_round_properties() {
+    rational_rational_unsigned_rounding_mode_quadruple_gen_var_3().test_properties_with_limit(
+        20,
+        |(x, y, prec, rm)| {
+            rational_pow_rational_prec_round_properties_helper(&x, &y, prec, rm);
+        },
+    );
 }

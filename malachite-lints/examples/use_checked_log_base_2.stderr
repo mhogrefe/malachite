@@ -1,0 +1,19 @@
+error: computing `floor_log_base_2` under an `is_power_of_2` guard
+  --> $DIR/use_checked_log_base_2.rs:8:16
+   |
+LL |         return x.floor_log_base_2_abs();
+   |                ^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: use `if let Some(e) = x.checked_log_base_2()`, which tests and returns the exact log at once
+   = note: `#[deny(use_checked_log_base_2)]` on by default
+
+error: computing `floor_log_base_2` under an `is_power_of_2` guard
+  --> $DIR/use_checked_log_base_2.rs:12:16
+   |
+LL |         return n.floor_log_base_2() as i64;
+   |                ^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: use `if let Some(e) = n.checked_log_base_2()`, which tests and returns the exact log at once
+
+error: aborting due to 2 previous errors
+

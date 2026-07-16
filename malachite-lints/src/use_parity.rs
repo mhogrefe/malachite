@@ -47,11 +47,7 @@ declare_lint_pass!(UseParity => [USE_PARITY]);
 // Whether `ty` (a type behind any references already peeled) has `even()`/`odd()`: a primitive
 // integer, or a `Natural` or `Integer`.
 fn has_parity<'tcx>(cx: &LateContext<'tcx>, ty: Ty<'tcx>) -> bool {
-    ty.is_integral()
-        || matches!(
-            crate::bignum_name(cx, ty),
-            Some("Natural" | "Integer")
-        )
+    ty.is_integral() || matches!(crate::bignum_name(cx, ty), Some("Natural" | "Integer"))
 }
 
 // The low-bit extraction underlying a parity test: `x % 2` or `x & 1`, over an integer `x`.

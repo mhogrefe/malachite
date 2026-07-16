@@ -9,6 +9,7 @@
 use clippy_utils::diagnostics::span_lint;
 use clippy_utils::eq_expr_value;
 use clippy_utils::source::snippet;
+use rustc_ast::Mutability;
 use rustc_hir::def::{DefKind, Res};
 use rustc_hir::intravisit::{Visitor, walk_expr};
 use rustc_hir::{
@@ -16,7 +17,6 @@ use rustc_hir::{
 };
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_session::{declare_lint, declare_lint_pass};
-use rustc_ast::Mutability;
 
 declare_lint! {
     /// ### What it does
@@ -188,7 +188,12 @@ fn collect_locals(e: &Expr<'_>) -> Vec<HirId> {
     let mut collector = LocalCollector(Vec::new());
     collector.visit_expr(e);
     let mut ids = collector.0;
-    ids.sort_by_key(|id| (id.owner.def_id.local_def_index.as_u32(), id.local_id.as_u32()));
+    ids.sort_by_key(|id| {
+        (
+            id.owner.def_id.local_def_index.as_u32(),
+            id.local_id.as_u32(),
+        )
+    });
     ids.dedup();
     ids
 }
@@ -207,13 +212,19 @@ impl<'tcx> Visitor<'tcx> for MutationFinder<'_> {
         }
         match e.kind {
             ExprKind::Assign(lhs, ..) | ExprKind::AssignOp(_, lhs, _) => {
-                if collect_locals(lhs).iter().any(|id| self.watched.contains(id)) {
+                if collect_locals(lhs)
+                    .iter()
+                    .any(|id| self.watched.contains(id))
+                {
                     self.found = true;
                     return;
                 }
             }
             ExprKind::AddrOf(_, Mutability::Mut, inner) => {
-                if collect_locals(inner).iter().any(|id| self.watched.contains(id)) {
+                if collect_locals(inner)
+                    .iter()
+                    .any(|id| self.watched.contains(id))
+                {
                     self.found = true;
                     return;
                 }
@@ -396,7 +407,11 @@ impl<'tcx> LateLintPass<'tcx> for UseRoundVariant {
         // every other `Float` operand: the `*_round` variants compute at the maximum of their
         // `Float` operands' precisions, so knowing the receiver's precision alone is not enough
         // to drop the explicit one.
-        let prec_index = if has_rm { args.len() - 2 } else { args.len() - 1 };
+        let prec_index = if has_rm {
+            args.len() - 2
+        } else {
+            args.len() - 1
+        };
         let recv_peeled = crate::peel_clone_and_borrows(recv);
         let recv_ty = cx.typeck_results().expr_ty(recv_peeled).peel_refs();
         if crate::bignum_name(cx, recv_ty) != Some("Float") {

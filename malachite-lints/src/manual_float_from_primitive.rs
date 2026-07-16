@@ -135,8 +135,10 @@ impl<'tcx> LateLintPass<'tcx> for ManualFloatFromPrimitive {
         let owner = cx.tcx.hir_get_parent_item(expr.hir_id).to_def_id();
         let parent = cx.tcx.parent(owner);
         let ty_name = if matches!(cx.tcx.def_kind(parent), DefKind::Impl { .. })
-            && crate::bignum_name(cx, cx.tcx.type_of(parent).instantiate_identity().peel_refs())
-                == Some("Float")
+            && crate::bignum_name(
+                cx,
+                cx.tcx.type_of(parent).instantiate_identity().peel_refs(),
+            ) == Some("Float")
         {
             "Self"
         } else {

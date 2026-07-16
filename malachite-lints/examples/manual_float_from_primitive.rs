@@ -1,7 +1,7 @@
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::Floor;
-use std::cmp::max;
 use malachite_float::Float;
+use std::cmp::max;
 
 fn f(x: u64, y: i64) -> (Float, Float, Float, Float, Float, Float, Float) {
     // Exact conversion at the argument's significant-bit precision, ordering discarded: flagged.
