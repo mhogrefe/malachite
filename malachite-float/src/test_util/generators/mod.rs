@@ -4121,7 +4121,8 @@ pub fn unsigned_unsigned_rounding_mode_triple_gen_var_5<T: PrimitiveUnsigned>()
     )
 }
 
-// All `(n, prec, RoundingMode)` that are valid inputs to `Float::ln_unsigned_prec_round`.
+// All `(n, prec, RoundingMode)` where `Exact` is only used when n is 0 or 1; valid for both
+// `Float::ln_unsigned_prec_round` and `Float::sqrt_unsigned_prec_round`.
 pub fn unsigned_unsigned_rounding_mode_triple_gen_var_8<T: PrimitiveUnsigned>()
 -> Generator<(T, u64, RoundingMode)> {
     Generator::new(

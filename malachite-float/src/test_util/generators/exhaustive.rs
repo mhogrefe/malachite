@@ -4669,8 +4669,9 @@ pub fn exhaustive_unsigned_unsigned_rounding_mode_triple_gen_var_6<T: PrimitiveU
     ))
 }
 
-// All `(n, prec, RoundingMode)` that are valid inputs to `Float::ln_unsigned_prec_round`: `Exact`
-// is only allowed when log(n) is exact, i.e. n is 0 or 1.
+// All `(n, prec, RoundingMode)` where `Exact` is only used when n is 0 or 1. Valid for both
+// `Float::ln_unsigned_prec_round` (log(n) is exact iff n is 0 or 1) and
+// `Float::sqrt_unsigned_prec_round` (n = 0 and n = 1 are perfect squares, so sqrt(n) is exact).
 pub fn exhaustive_unsigned_unsigned_rounding_mode_triple_gen_var_8<T: PrimitiveUnsigned>()
 -> It<(T, u64, RoundingMode)> {
     reshape_2_1_to_3(Box::new(

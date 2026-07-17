@@ -34,6 +34,7 @@ use malachite_float::test_util::generators::{
     float_unsigned_rounding_mode_triple_gen_var_13_rm,
     float_unsigned_rounding_mode_triple_gen_var_14,
     rational_unsigned_rounding_mode_triple_gen_var_3,
+    unsigned_unsigned_rounding_mode_triple_gen_var_8,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_q::test_util::bench::bucketers::{
@@ -84,6 +85,10 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_sqrt_rational_prec_round_ref);
     register_demo!(runner, demo_float_sqrt_rational_prec_round_ref_debug);
     register_primitive_float_demos!(runner, demo_primitive_float_sqrt_rational);
+    register_demo!(runner, demo_float_sqrt_unsigned_prec_round);
+    register_demo!(runner, demo_float_sqrt_unsigned_prec_round_debug);
+    register_demo!(runner, demo_float_sqrt_unsigned_prec);
+    register_demo!(runner, demo_float_sqrt_unsigned_prec_debug);
 
     register_bench!(runner, benchmark_float_sqrt_evaluation_strategy);
     register_bench!(runner, benchmark_float_sqrt_library_comparison);
@@ -1026,4 +1031,66 @@ fn benchmark_primitive_float_sqrt_rational<T: PrimitiveFloat>(
             no_out!(primitive_float_sqrt_rational::<T>(&x));
         })],
     );
+}
+
+fn demo_float_sqrt_unsigned_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, prec, rm) in unsigned_unsigned_rounding_mode_triple_gen_var_8::<u64>()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "sqrt_unsigned_prec_round({}, {}, {}) = {:?}",
+            n,
+            prec,
+            rm,
+            Float::sqrt_unsigned_prec_round(n, prec, rm)
+        );
+    }
+}
+
+fn demo_float_sqrt_unsigned_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, prec, rm) in unsigned_unsigned_rounding_mode_triple_gen_var_8::<u64>()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (sqrt, o) = Float::sqrt_unsigned_prec_round(n, prec, rm);
+        println!(
+            "sqrt_unsigned_prec_round({}, {}, {}) = ({:#x}, {:?})",
+            n,
+            prec,
+            rm,
+            ComparableFloat(sqrt),
+            o
+        );
+    }
+}
+
+fn demo_float_sqrt_unsigned_prec(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, prec, _rm) in unsigned_unsigned_rounding_mode_triple_gen_var_8::<u64>()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "sqrt_unsigned_prec({}, {}) = {:?}",
+            n,
+            prec,
+            Float::sqrt_unsigned_prec(n, prec)
+        );
+    }
+}
+
+fn demo_float_sqrt_unsigned_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, prec, _rm) in unsigned_unsigned_rounding_mode_triple_gen_var_8::<u64>()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (sqrt, o) = Float::sqrt_unsigned_prec(n, prec);
+        println!(
+            "sqrt_unsigned_prec({}, {}) = ({:#x}, {:?})",
+            n,
+            prec,
+            ComparableFloat(sqrt),
+            o
+        );
+    }
 }

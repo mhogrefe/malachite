@@ -1224,6 +1224,120 @@ impl Float {
     pub fn sqrt_rational_prec_ref(x: &Rational, prec: u64) -> (Self, Ordering) {
         Self::sqrt_rational_prec_round_ref(x, prec, Nearest)
     }
+
+    /// Computes the square root of an unsigned integer, returning a [`Float`]. The result is
+    /// rounded to the specified precision and with the specified rounding mode. An [`Ordering`] is
+    /// also returned, indicating whether the rounded square root is less than, equal to, or greater
+    /// than the exact square root.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(n,p,m) = \sqrt{n}+\varepsilon.
+    /// $$
+    /// - If $\sqrt{n}$ is zero, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $\sqrt{n}$ is nonzero, and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2
+    ///   \sqrt{n}\rfloor-p+1}$.
+    /// - If $\sqrt{n}$ is nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   \sqrt{n}\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p,m)=0.0$
+    ///
+    /// Neither overflow nor underflow is possible.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::sqrt_unsigned_prec`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the square root is not exactly
+    /// representable with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (sqrt, o) = Float::sqrt_unsigned_prec_round(2, 53, Floor);
+    /// assert_eq!(sqrt.to_string(), "1.4142135623730949");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (sqrt, o) = Float::sqrt_unsigned_prec_round(2, 53, Ceiling);
+    /// assert_eq!(sqrt.to_string(), "1.4142135623730951");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (sqrt, o) = Float::sqrt_unsigned_prec_round(4, 10, Exact);
+    /// assert_eq!(sqrt.to_string(), "2.0");
+    /// assert_eq!(o, Equal);
+    /// ```
+    ///
+    /// This is `mpfr_sqrt_ui` from `sqrt_ui.c`, MPFR 4.2.2.
+    #[inline]
+    pub fn sqrt_unsigned_prec_round(n: u64, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+        Self::from(n).sqrt_prec_round(prec, rm)
+    }
+
+    /// Computes the square root of an unsigned integer, returning a [`Float`]. The result is
+    /// rounded to the specified precision and to the nearest value. An [`Ordering`] is also
+    /// returned, indicating whether the rounded square root is less than, equal to, or greater than
+    /// the exact square root.
+    ///
+    /// If the square root is equidistant from two [`Float`]s with the specified precision, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(n,p) = \sqrt{n}+\varepsilon.
+    /// $$
+    /// - If $\sqrt{n}$ is zero, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $\sqrt{n}$ is nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2 \sqrt{n}\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p)=0.0$
+    ///
+    /// Neither overflow nor underflow is possible.
+    ///
+    /// If you want to specify a rounding mode as well, consider using
+    /// [`Float::sqrt_unsigned_prec_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (sqrt, o) = Float::sqrt_unsigned_prec(2, 53);
+    /// assert_eq!(sqrt.to_string(), "1.4142135623730951");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (sqrt, o) = Float::sqrt_unsigned_prec(0, 10);
+    /// assert_eq!(sqrt.to_string(), "0.0");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn sqrt_unsigned_prec(n: u64, prec: u64) -> (Self, Ordering) {
+        Self::from(n).sqrt_prec(prec)
+    }
 }
 
 impl Sqrt for Float {

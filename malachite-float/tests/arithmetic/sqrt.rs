@@ -41,6 +41,7 @@ use malachite_float::test_util::generators::{
     float_unsigned_pair_gen_var_1, float_unsigned_pair_gen_var_4,
     float_unsigned_rounding_mode_triple_gen_var_13, float_unsigned_rounding_mode_triple_gen_var_14,
     rational_unsigned_rounding_mode_triple_gen_var_3,
+    unsigned_unsigned_rounding_mode_triple_gen_var_8,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_nz::platform::Limb;
@@ -3653,4 +3654,114 @@ where
 #[test]
 fn primitive_float_sqrt_rational_properties() {
     apply_fn_to_primitive_floats!(primitive_float_sqrt_rational_helper);
+}
+
+#[test]
+fn test_sqrt_unsigned_prec_round() {
+    let test = |n: u64, prec: u64, rm: RoundingMode, out: &str, out_hex: &str, o_out: Ordering| {
+        let (sqrt, o) = Float::sqrt_unsigned_prec_round(n, prec, rm);
+        assert!(sqrt.is_valid());
+        assert_eq!(sqrt.to_string(), out);
+        assert_eq!(to_hex_string(&sqrt), out_hex);
+        assert_eq!(o, o_out);
+
+        // sqrt_unsigned(n) agrees with the square root of the same integer as a Float.
+        let (sqrt_alt, o_alt) = Float::from(n).sqrt_prec_round(prec, rm);
+        assert_eq!(ComparableFloatRef(&sqrt_alt), ComparableFloatRef(&sqrt));
+        assert_eq!(o_alt, o_out);
+
+        if rm == Nearest {
+            let (sqrt_alt, o_alt) = Float::sqrt_unsigned_prec(n, prec);
+            assert_eq!(ComparableFloatRef(&sqrt_alt), ComparableFloatRef(&sqrt));
+            assert_eq!(o_alt, o_out);
+        }
+    };
+    // sqrt(0) = 0, exact even under Exact rounding.
+    test(0, 10, Floor, "0.0", "0x0.0", Equal);
+    test(0, 10, Exact, "0.0", "0x0.0", Equal);
+    // Perfect squares are exact (when the root fits in the precision).
+    test(1, 10, Exact, "1.0", "0x1.000#10", Equal);
+    test(4, 10, Exact, "2.0", "0x2.00#10", Equal);
+    test(9, 20, Exact, "3.0", "0x3.00000#20", Equal);
+    test(256, 30, Exact, "16.0", "0x10.0000000#30", Equal);
+    test(
+        1000000,
+        200,
+        Nearest,
+        "1000.0",
+        "0x3e8.000000000000000000000000000000000000000000000000#200",
+        Equal,
+    );
+    // Non-square integers.
+    test(
+        2,
+        53,
+        Floor,
+        "1.4142135623730949",
+        "0x1.6a09e667f3bcc#53",
+        Less,
+    );
+    test(
+        2,
+        53,
+        Ceiling,
+        "1.4142135623730951",
+        "0x1.6a09e667f3bcd#53",
+        Greater,
+    );
+    test(2, 20, Nearest, "1.414213", "0x1.6a09e#20", Less);
+    test(
+        10,
+        100,
+        Floor,
+        "3.162277660168379331998893544431",
+        "0x3.298b075b4b6a5240945790618#100",
+        Less,
+    );
+    test(
+        18446744073709551615,
+        53,
+        Nearest,
+        "4294967296.0",
+        "0x100000000.00000#53",
+        Greater,
+    );
+}
+
+#[test]
+fn sqrt_unsigned_fail() {
+    // Zero precision.
+    assert_panic!(Float::sqrt_unsigned_prec_round(2, 0, Nearest));
+    assert_panic!(Float::sqrt_unsigned_prec(2, 0));
+    // Exact rounding of an irrational square root (a non-perfect-square).
+    assert_panic!(Float::sqrt_unsigned_prec_round(2, 10, Exact));
+    // Exact rounding of a perfect square whose root (1025, 11 bits) does not fit in precision 10.
+    assert_panic!(Float::sqrt_unsigned_prec_round(1050625, 10, Exact));
+}
+
+fn sqrt_unsigned_prec_round_properties_helper(n: u64, prec: u64, rm: RoundingMode) {
+    let (sqrt, o) = Float::sqrt_unsigned_prec_round(n, prec, rm);
+    assert!(sqrt.is_valid());
+
+    // The oracle is the square root of the same integer as a Float.
+    let (sqrt_alt, o_alt) = Float::from(n).sqrt_prec_round(prec, rm);
+    assert_eq!(ComparableFloatRef(&sqrt), ComparableFloatRef(&sqrt_alt));
+    assert_eq!(o, o_alt);
+
+    if rm == Nearest {
+        let (sqrt_alt, o_alt) = Float::sqrt_unsigned_prec(n, prec);
+        assert_eq!(ComparableFloatRef(&sqrt_alt), ComparableFloatRef(&sqrt));
+        assert_eq!(o_alt, o);
+    }
+
+    if sqrt.is_normal() {
+        assert_eq!(sqrt.get_prec(), Some(prec));
+    }
+}
+
+#[test]
+fn sqrt_unsigned_prec_round_properties() {
+    unsigned_unsigned_rounding_mode_triple_gen_var_8::<u64>().test_properties(|(n, prec, rm)| {
+        sqrt_unsigned_prec_round_properties_helper(n, prec, rm);
+    });
 }
