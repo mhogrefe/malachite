@@ -724,6 +724,299 @@ fn pow_round_properties() {
 }
 
 #[test]
+fn test_powr_special_values() {
+    let test = |x: Float, y: Float, out: Float, o_out: Ordering| {
+        let (p, o) = x.powr_prec_round_ref_ref(&y, 10, Nearest);
+        assert!(p.is_valid());
+        assert_eq!(ComparableFloat(p), ComparableFloat(out));
+        assert_eq!(o, o_out);
+    };
+    let one = || Float::one_prec(10);
+    // powr(x, 0) = NaN for a singular base (+0, -0, +Inf), unlike pow which gives 1
+    test(Float::INFINITY, Float::ZERO, Float::NAN, Equal);
+    test(Float::ZERO, Float::ZERO, Float::NAN, Equal);
+    test(Float::NEGATIVE_ZERO, Float::ZERO, Float::NAN, Equal);
+    // powr(x, 0) = 1 for a finite positive nonzero base (same as pow)
+    test(Float::from(3.0), Float::ZERO, one(), Equal);
+    // powr(NaN, y) = NaN for every y, including y = 0 (unlike pow, where pow(NaN, 0) = 1)
+    test(Float::NAN, Float::ZERO, Float::NAN, Equal);
+    test(Float::NAN, Float::ONE, Float::NAN, Equal);
+    // powr(1, y) = 1, matching pow, except for an infinite y, which gives NaN. A NaN y still gives
+    // 1, since MPFR's special case (c) only covers an infinite exponent.
+    test(Float::ONE, Float::from(3.0), one(), Equal);
+    test(Float::ONE, Float::NAN, one(), Equal);
+    test(Float::ONE, Float::INFINITY, Float::NAN, Equal);
+    test(Float::ONE, Float::NEGATIVE_INFINITY, Float::NAN, Equal);
+    // A negative base is NaN, even for an integer exponent (unlike pow)
+    test(Float::from(-2.0), Float::from(3.0), Float::NAN, Equal);
+    test(Float::from(-2.0), Float::from(0.5), Float::NAN, Equal);
+    test(
+        Float::NEGATIVE_INFINITY,
+        Float::from(3.0),
+        Float::NAN,
+        Equal,
+    );
+    test(-Float::ONE, Float::INFINITY, Float::NAN, Equal);
+    // A finite base with y = +/-Inf and |base| <> 1 (same as pow)
+    test(Float::from(2.0), Float::INFINITY, Float::INFINITY, Equal);
+    test(
+        Float::from(2.0),
+        Float::NEGATIVE_INFINITY,
+        Float::ZERO,
+        Equal,
+    );
+    test(Float::from(0.5), Float::INFINITY, Float::ZERO, Equal);
+    test(
+        Float::from(0.5),
+        Float::NEGATIVE_INFINITY,
+        Float::INFINITY,
+        Equal,
+    );
+    // x = +Inf (same as pow)
+    test(Float::INFINITY, Float::from(2.0), Float::INFINITY, Equal);
+    test(Float::INFINITY, Float::from(-2.0), Float::ZERO, Equal);
+    // x = +0 with a nonzero exponent (same as pow)
+    test(Float::ZERO, Float::from(3.0), Float::ZERO, Equal);
+    test(Float::ZERO, Float::from(-3.0), Float::INFINITY, Equal);
+    // x = -0: powr treats it like +0, always giving a positive result, whereas pow returns a signed
+    // result for an odd-integer exponent
+    test(Float::NEGATIVE_ZERO, Float::from(3.0), Float::ZERO, Equal);
+    test(Float::NEGATIVE_ZERO, Float::from(2.0), Float::ZERO, Equal);
+    test(
+        Float::NEGATIVE_ZERO,
+        Float::from(-3.0),
+        Float::INFINITY,
+        Equal,
+    );
+    test(
+        Float::NEGATIVE_ZERO,
+        Float::from(-2.0),
+        Float::INFINITY,
+        Equal,
+    );
+}
+
+#[test]
+fn test_powr() {
+    let test = |s, s_hex, t, t_hex, prec: u64, rm, out: &str, out_hex: &str, o_out| {
+        let x = parse_hex_string(s_hex);
+        assert_eq!(x.to_string(), s);
+        let y = parse_hex_string(t_hex);
+        assert_eq!(y.to_string(), t);
+        let (p, o) = x.powr_prec_round(y, prec, rm);
+        assert!(p.is_valid());
+        assert_eq!(p.to_string(), out);
+        assert_eq!(to_hex_string(&p), out_hex);
+        assert_eq!(o, o_out);
+    };
+    // For a finite positive base, powr(x, y) agrees with pow(x, y).
+    test(
+        "2.0",
+        "0x2.0#1",
+        "0.5",
+        "0x0.8#1",
+        53,
+        Nearest,
+        "1.4142135623730951",
+        "0x1.6a09e667f3bcd#53",
+        Greater,
+    );
+    test(
+        "3.0",
+        "0x3.0#2",
+        "100.0",
+        "0x64.0#5",
+        53,
+        Nearest,
+        "5.153775207320113e47",
+        "0x5.a4653ca673768E+39#53",
+        Less,
+    );
+    test(
+        "2.0",
+        "0x2.0#1",
+        "10.0",
+        "0xa.0#3",
+        53,
+        Nearest,
+        "1024.0",
+        "0x400.00000000000#53",
+        Equal,
+    );
+    test(
+        "0.5",
+        "0x0.8#1",
+        "2.0",
+        "0x2.0#1",
+        53,
+        Nearest,
+        "0.25",
+        "0x0.40000000000000#53",
+        Equal,
+    );
+    test(
+        "10.0",
+        "0xa.0#3",
+        "-1.0",
+        "-0x1.0#1",
+        53,
+        Nearest,
+        "0.10000000000000001",
+        "0x0.1999999999999a#53",
+        Greater,
+    );
+}
+
+fn powr_prec_round_properties_helper(
+    x: Float,
+    y: Float,
+    prec: u64,
+    rm: RoundingMode,
+    extreme: bool,
+) {
+    if rm == Exact {
+        // Exact is only allowed when the result is exactly representable; otherwise panic.
+        let (p, o) = x.powr_prec_round_ref_ref(&y, prec, Nearest);
+        if o == Equal {
+            let (pe, oe) = x.powr_prec_round_ref_ref(&y, prec, Exact);
+            assert_eq!(ComparableFloatRef(&pe), ComparableFloatRef(&p));
+            assert_eq!(oe, Equal);
+        } else {
+            assert_panic!(x.powr_prec_round_ref_ref(&y, prec, Exact));
+        }
+        return;
+    }
+    let (p, o) = x.clone().powr_prec_round(y.clone(), prec, rm);
+    assert!(p.is_valid());
+    let (p_alt, o_alt) = x.clone().powr_prec_round_val_ref(&y, prec, rm);
+    assert!(p_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+    assert_eq!(o_alt, o);
+    let (p_alt, o_alt) = x.powr_prec_round_ref_val(y.clone(), prec, rm);
+    assert!(p_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+    assert_eq!(o_alt, o);
+    let (p_alt, o_alt) = x.powr_prec_round_ref_ref(&y, prec, rm);
+    assert!(p_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+    assert_eq!(o_alt, o);
+
+    let mut x_alt = x.clone();
+    let o_alt = x_alt.powr_prec_round_assign(y.clone(), prec, rm);
+    assert!(x_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&p));
+    assert_eq!(o_alt, o);
+
+    let mut x_alt = x.clone();
+    let o_alt = x_alt.powr_prec_round_assign_ref(&y, prec, rm);
+    assert!(x_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&p));
+    assert_eq!(o_alt, o);
+
+    // For a finite, positive, nonzero base, powr(x, y) agrees exactly with pow(x, y), except that
+    // powr(1, +/-Inf) is NaN whereas pow(1, +/-Inf) is 1.
+    if x.is_normal() && x.is_sign_positive() && !(x == 1u32 && y.is_infinite()) {
+        let (pp, op) = x.pow_prec_round_ref_ref(&y, prec, rm);
+        assert_eq!(ComparableFloatRef(&p), ComparableFloatRef(&pp));
+        assert_eq!(o, op);
+    }
+    // powr is NaN for a NaN base and for any negative base (finite negative or -Inf).
+    if x.is_nan() || (x.is_sign_negative() && x != 0u32) {
+        assert!(p.is_nan());
+    }
+    // powr treats -0 like +0, so a finite nonzero exponent gives a positive result.
+    if x == 0u32 && x.is_sign_negative() && y.is_normal() {
+        assert!(p.is_sign_positive());
+    }
+    if p.is_normal() && !extreme {
+        assert_eq!(p.get_prec(), Some(prec));
+    }
+}
+
+#[test]
+fn powr_prec_round_properties() {
+    float_float_unsigned_rounding_mode_quadruple_gen_var_9().test_properties(|(x, y, prec, rm)| {
+        powr_prec_round_properties_helper(x, y, prec, rm, false);
+    });
+
+    float_float_unsigned_rounding_mode_quadruple_gen_var_10().test_properties(
+        |(x, y, prec, rm)| {
+            powr_prec_round_properties_helper(x, y, prec, rm, true);
+        },
+    );
+}
+
+#[test]
+fn powr_prec_properties() {
+    float_float_unsigned_triple_gen_var_1().test_properties(|(x, y, prec)| {
+        let (p, o) = x.clone().powr_prec(y.clone(), prec);
+        assert!(p.is_valid());
+        let (p_alt, o_alt) = x.clone().powr_prec_val_ref(&y, prec);
+        assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+        assert_eq!(o_alt, o);
+        let (p_alt, o_alt) = x.powr_prec_ref_val(y.clone(), prec);
+        assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+        assert_eq!(o_alt, o);
+        let (p_alt, o_alt) = x.powr_prec_ref_ref(&y, prec);
+        assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+        assert_eq!(o_alt, o);
+        let mut x_alt = x.clone();
+        let o_alt = x_alt.powr_prec_assign(y.clone(), prec);
+        assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&p));
+        assert_eq!(o_alt, o);
+        let mut x_alt = x.clone();
+        let o_alt = x_alt.powr_prec_assign_ref(&y, prec);
+        assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&p));
+        assert_eq!(o_alt, o);
+        // powr_prec is powr_prec_round with Nearest.
+        let (p_alt, o_alt) = x.powr_prec_round_ref_ref(&y, prec, Nearest);
+        assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+        assert_eq!(o_alt, o);
+        // For a finite positive base, powr_prec agrees with pow_prec (except powr(1, +/-Inf) is NaN
+        // whereas pow(1, +/-Inf) is 1).
+        if x.is_normal() && x.is_sign_positive() && !(x == 1u32 && y.is_infinite()) {
+            let (pp, op) = x.pow_prec_ref_ref(&y, prec);
+            assert_eq!(ComparableFloatRef(&p), ComparableFloatRef(&pp));
+            assert_eq!(o, op);
+        }
+    });
+}
+
+#[test]
+fn powr_round_properties() {
+    float_pair_gen().test_properties(|(x, y)| {
+        for rm in [Floor, Ceiling, Down, Up, Nearest] {
+            let (p, o) = x.clone().powr_round(y.clone(), rm);
+            assert!(p.is_valid());
+            let (p_alt, o_alt) = x.clone().powr_round_val_ref(&y, rm);
+            assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+            assert_eq!(o_alt, o);
+            let (p_alt, o_alt) = x.powr_round_ref_val(y.clone(), rm);
+            assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+            assert_eq!(o_alt, o);
+            let (p_alt, o_alt) = x.powr_round_ref_ref(&y, rm);
+            assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
+            assert_eq!(o_alt, o);
+            let mut x_alt = x.clone();
+            let o_alt = x_alt.powr_round_assign(y.clone(), rm);
+            assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&p));
+            assert_eq!(o_alt, o);
+            let mut x_alt = x.clone();
+            let o_alt = x_alt.powr_round_assign_ref(&y, rm);
+            assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&p));
+            assert_eq!(o_alt, o);
+            // For a finite positive base, powr_round agrees with pow_round (except powr(1, +/-Inf)
+            // is NaN whereas pow(1, +/-Inf) is 1).
+            if x.is_normal() && x.is_sign_positive() && !(x == 1u32 && y.is_infinite()) {
+                let (pp, op) = x.pow_round_ref_ref(&y, rm);
+                assert_eq!(ComparableFloatRef(&p), ComparableFloatRef(&pp));
+                assert_eq!(o, op);
+            }
+        }
+    });
+}
+
+#[test]
 #[allow(clippy::type_repetition_in_bounds)]
 fn test_primitive_float_pow() {
     fn test<T: PrimitiveFloat>(x: T, y: T, out: T)

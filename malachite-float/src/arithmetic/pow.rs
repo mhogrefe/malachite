@@ -14,14 +14,17 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::InnerFloat::{Infinity, NaN, Zero};
+use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::arithmetic::exp::{exp_overflow, exp_rational_near_one, exp_underflow, one_neighbor};
 use crate::arithmetic::ln::ln_1_plus_rational_brackets;
 use crate::arithmetic::log_base_2::log_2_rational_brackets;
 use crate::arithmetic::round_near_x::float_round_near_x;
 use crate::emulate_float_float_to_float_fn;
 use crate::emulate_float_to_float_fn;
-use crate::{Float, float_either_infinity, float_either_zero, float_nan, floor_and_ceiling};
+use crate::{
+    Float, float_either_infinity, float_either_zero, float_nan, float_negative_zero,
+    floor_and_ceiling,
+};
 use core::cmp::Ordering::{self, *};
 use core::cmp::max;
 use malachite_base::fail_on_untested_path;
@@ -8660,5 +8663,605 @@ impl PowAssign<&Rational> for Float {
     fn pow_assign(&mut self, other: &Rational) {
         let prec = self.significant_bits();
         self.pow_rational_prec_assign_ref(other, prec);
+    }
+}
+
+impl Float {
+    /// Raises a [`Float`] to a [`Float`] power using the IEEE 754 `powr` function, rounding the
+    /// result to the specified precision and with the specified rounding mode. Both [`Float`]s are
+    /// taken by value. An [`Ordering`] is also returned, indicating whether the rounded power is
+    /// less than, equal to, or greater than the exact power. Although `NaN`s are not comparable to
+    /// any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,y) = x^y+\varepsilon.
+    /// $$
+    /// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x^y|\rfloor-p+1}$.
+    /// - If $x^y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x^y|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// `powr(x, y)` is $e^{y\ln x}$; unlike [`pow`](Float::pow_prec_round), its base is restricted
+    /// to $x\geq 0$ and it never produces a negative result.
+    ///
+    /// Special cases:
+    /// - $f(x,y)=\text{NaN}$ if $x$ is `NaN`, if $x<0$, if $x$ is $\pm0$ or $\infty$ and $y=0$, or
+    ///   if $x=1$ and $y$ is infinite
+    /// - $f(x,0)=1.0$ if $x$ is finite and positive
+    /// - $f(1.0,y)=1.0$ if $y$ is finite
+    /// - $f(\infty,y)=\infty$ if $y>0$, and $0.0$ if $y<0$
+    /// - $f(\pm0.0,y)=0.0$ if $y>0$, and $\infty$ if $y<0$
+    /// - $f(x,\infty)=\infty$ if $x>1$, and $0.0$ if $0<x<1$
+    /// - $f(x,-\infty)=0.0$ if $x>1$, and $\infty$ if $0<x<1$
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,y,p,m)\leq2^{-2^{30}-1}$ and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (p, o) = Float::from(3).powr_prec_round(Float::from(2.5), 20, Floor);
+    /// assert_eq!(p.to_string(), "15.58846");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = Float::from(3).powr_prec_round(Float::from(2.5), 20, Ceiling);
+    /// assert_eq!(p.to_string(), "15.58847");
+    /// assert_eq!(o, Greater);
+    ///
+    /// // A negative base gives NaN (unlike `pow`).
+    /// let (p, o) = Float::from(-2).powr_prec_round(Float::from(3), 10, Nearest);
+    /// assert_eq!(p.to_string(), "NaN");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn powr_prec_round(self, other: Self, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+        self.powr_prec_round_ref_ref(&other, prec, rm)
+    }
+
+    /// Raises a [`Float`] to a [`Float`] power using the IEEE 754 `powr` function, rounding the
+    /// result to the specified precision and with the specified rounding mode. The first [`Float`]
+    /// is taken by value and the second by reference. An [`Ordering`] is also returned, indicating
+    /// whether the rounded power is less than, equal to, or greater than the exact power. Although
+    /// `NaN`s are not comparable to any [`Float`], whenever this function returns a `NaN` it also
+    /// returns `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// See the [`Float::powr_prec_round`] documentation for information on special cases, overflow,
+    /// and underflow.
+    pub fn powr_prec_round_val_ref(
+        self,
+        other: &Self,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        self.powr_prec_round_ref_ref(other, prec, rm)
+    }
+
+    /// Raises a [`Float`] to a [`Float`] power using the IEEE 754 `powr` function, rounding the
+    /// result to the specified precision and with the specified rounding mode. The first [`Float`]
+    /// is taken by reference and the second by value. An [`Ordering`] is also returned, indicating
+    /// whether the rounded power is less than, equal to, or greater than the exact power. Although
+    /// `NaN`s are not comparable to any [`Float`], whenever this function returns a `NaN` it also
+    /// returns `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// See the [`Float::powr_prec_round`] documentation for information on special cases, overflow,
+    /// and underflow.
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn powr_prec_round_ref_val(
+        &self,
+        other: Self,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        self.powr_prec_round_ref_ref(&other, prec, rm)
+    }
+
+    /// Raises a [`Float`] to a [`Float`] power using the IEEE 754 `powr` function, rounding the
+    /// result to the specified precision and with the specified rounding mode. Both [`Float`]s are
+    /// taken by reference. An [`Ordering`] is also returned, indicating whether the rounded power
+    /// is less than, equal to, or greater than the exact power. Although `NaN`s are not comparable
+    /// to any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,y) = x^y+\varepsilon.
+    /// $$
+    /// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x^y|\rfloor-p+1}$.
+    /// - If $x^y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x^y|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// `powr(x, y)` is $e^{y\ln x}$; unlike [`pow`](Float::pow_prec_round), its base is restricted
+    /// to $x\geq 0$ and it never produces a negative result.
+    ///
+    /// Special cases:
+    /// - $f(x,y)=\text{NaN}$ if $x$ is `NaN`, if $x<0$, if $x$ is $\pm0$ or $\infty$ and $y=0$, or
+    ///   if $x=1$ and $y$ is infinite
+    /// - $f(x,0)=1.0$ if $x$ is finite and positive
+    /// - $f(1.0,y)=1.0$ if $y$ is finite
+    /// - $f(\infty,y)=\infty$ if $y>0$, and $0.0$ if $y<0$
+    /// - $f(\pm0.0,y)=0.0$ if $y>0$, and $\infty$ if $y<0$
+    /// - $f(x,\infty)=\infty$ if $x>1$, and $0.0$ if $0<x<1$
+    /// - $f(x,-\infty)=0.0$ if $x>1$, and $\infty$ if $0<x<1$
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,y,p,m)\leq2^{-2^{30}-1}$ and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (p, o) = Float::from(3).powr_prec_round(Float::from(2.5), 20, Floor);
+    /// assert_eq!(p.to_string(), "15.58846");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (p, o) = Float::from(3).powr_prec_round(Float::from(2.5), 20, Ceiling);
+    /// assert_eq!(p.to_string(), "15.58847");
+    /// assert_eq!(o, Greater);
+    ///
+    /// // A negative base gives NaN (unlike `pow`).
+    /// let (p, o) = Float::from(-2).powr_prec_round(Float::from(3), 10, Nearest);
+    /// assert_eq!(p.to_string(), "NaN");
+    /// assert_eq!(o, Equal);
+    /// ```
+    pub fn powr_prec_round_ref_ref(
+        &self,
+        other: &Self,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        let x = self;
+        let y = other;
+        // powr(x, y) = exp(y * ln(x)). This is `mpfr_powr` from `powr.c`, MPFR 4.3.0.
+        match (x, y) {
+            // A NaN or negative base (finite negative or -Inf) is NaN (pow allows a negative base
+            // with an integer exponent); and a singular +0, -0, or +Inf base with a zero exponent
+            // is NaN (pow gives 1).
+            (Self(NaN | Finite { sign: false, .. } | Infinity { sign: false }), _)
+            | (Self(Zero { .. } | Infinity { sign: true }), float_either_zero!()) => {
+                (Self::NAN, Equal)
+            }
+            // powr treats -0 like +0: a finite nonzero exponent gives +0 (y > 0) or +Inf (y < 0),
+            // always positive (pow gives a signed result for odd-integer y).
+            (float_negative_zero!(), Self(Finite { sign, .. })) => {
+                if *sign {
+                    (Self::ZERO, Equal)
+                } else {
+                    (Self::INFINITY, Equal)
+                }
+            }
+            // A base of exactly 1 with an infinite exponent is NaN (pow gives 1).
+            (_, float_either_infinity!()) if *x == 1u32 => (Self::NAN, Equal),
+            // Everything else defers to pow.
+            _ => self.pow_prec_round_ref_ref(y, prec, rm),
+        }
+    }
+
+    /// Raises a [`Float`] to a [`Float`] power using the IEEE 754 `powr` function, rounding the
+    /// result to the specified precision and to the nearest value. Both [`Float`]s are taken by
+    /// value. An [`Ordering`] is also returned, indicating whether the rounded power is less than,
+    /// equal to, or greater than the exact power. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// If the power is equidistant from two [`Float`]s with the specified precision, the [`Float`]
+    /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
+    /// the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,y) = x^y+\varepsilon.
+    /// $$
+    /// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x^y|\rfloor-p+1}$.
+    /// - If $x^y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x^y|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// `powr(x, y)` is $e^{y\ln x}$; unlike [`pow`](Float::pow_prec_round), its base is restricted
+    /// to $x\geq 0$ and it never produces a negative result.
+    ///
+    /// Special cases:
+    /// - $f(x,y)=\text{NaN}$ if $x$ is `NaN`, if $x<0$, if $x$ is $\pm0$ or $\infty$ and $y=0$, or
+    ///   if $x=1$ and $y$ is infinite
+    /// - $f(x,0)=1.0$ if $x$ is finite and positive
+    /// - $f(1.0,y)=1.0$ if $y$ is finite
+    /// - $f(\infty,y)=\infty$ if $y>0$, and $0.0$ if $y<0$
+    /// - $f(\pm0.0,y)=0.0$ if $y>0$, and $\infty$ if $y<0$
+    /// - $f(x,\infty)=\infty$ if $x>1$, and $0.0$ if $0<x<1$
+    /// - $f(x,-\infty)=0.0$ if $x>1$, and $\infty$ if $0<x<1$
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,y,p,m)\leq2^{-2^{30}-1}$ and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (p, o) = Float::from(9).powr_prec(Float::from(0.5), 10);
+    /// assert_eq!(p.to_string(), "3.0");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn powr_prec(self, other: Self, prec: u64) -> (Self, Ordering) {
+        self.powr_prec_round_ref_ref(&other, prec, Nearest)
+    }
+
+    /// Raises a [`Float`] to a [`Float`] power using the IEEE 754 `powr` function, rounding the
+    /// result to the specified precision and to the nearest value. The first [`Float`] is taken by
+    /// value and the second by reference. An [`Ordering`] is also returned, indicating whether the
+    /// rounded power is less than, equal to, or greater than the exact power. Although `NaN`s are
+    /// not comparable to any [`Float`], whenever this function returns a `NaN` it also returns
+    /// `Equal`.
+    ///
+    /// If the power is equidistant from two [`Float`]s with the specified precision, the [`Float`]
+    /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
+    /// the `Nearest` rounding mode.
+    ///
+    /// See the [`Float::powr_prec_round`] documentation for information on special cases, overflow,
+    /// and underflow.
+    pub fn powr_prec_val_ref(self, other: &Self, prec: u64) -> (Self, Ordering) {
+        self.powr_prec_round_ref_ref(other, prec, Nearest)
+    }
+
+    /// Raises a [`Float`] to a [`Float`] power using the IEEE 754 `powr` function, rounding the
+    /// result to the specified precision and to the nearest value. The first [`Float`] is taken by
+    /// reference and the second by value. An [`Ordering`] is also returned, indicating whether the
+    /// rounded power is less than, equal to, or greater than the exact power. Although `NaN`s are
+    /// not comparable to any [`Float`], whenever this function returns a `NaN` it also returns
+    /// `Equal`.
+    ///
+    /// If the power is equidistant from two [`Float`]s with the specified precision, the [`Float`]
+    /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
+    /// the `Nearest` rounding mode.
+    ///
+    /// See the [`Float::powr_prec_round`] documentation for information on special cases, overflow,
+    /// and underflow.
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn powr_prec_ref_val(&self, other: Self, prec: u64) -> (Self, Ordering) {
+        self.powr_prec_round_ref_ref(&other, prec, Nearest)
+    }
+
+    /// Raises a [`Float`] to a [`Float`] power using the IEEE 754 `powr` function, rounding the
+    /// result to the specified precision and to the nearest value. Both [`Float`]s are taken by
+    /// reference. An [`Ordering`] is also returned, indicating whether the rounded power is less
+    /// than, equal to, or greater than the exact power. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// If the power is equidistant from two [`Float`]s with the specified precision, the [`Float`]
+    /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
+    /// the `Nearest` rounding mode.
+    ///
+    /// See the [`Float::powr_prec_round`] documentation for information on special cases, overflow,
+    /// and underflow.
+    pub fn powr_prec_ref_ref(&self, other: &Self, prec: u64) -> (Self, Ordering) {
+        self.powr_prec_round_ref_ref(other, prec, Nearest)
+    }
+
+    /// Raises a [`Float`] to a [`Float`] power using the IEEE 754 `powr` function, rounding the
+    /// result to the maximum of the precisions of the inputs and with the specified rounding mode.
+    /// Both [`Float`]s are taken by value. An [`Ordering`] is also returned, indicating whether the
+    /// rounded power is less than, equal to, or greater than the exact power. Although `NaN`s are
+    /// not comparable to any [`Float`], whenever this function returns a `NaN` it also returns
+    /// `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,y) = x^y+\varepsilon.
+    /// $$
+    /// - If $x^y$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x^y$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |x^y|\rfloor-p+1}$.
+    /// - If $x^y$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |x^y|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// `powr(x, y)` is $e^{y\ln x}$; unlike [`pow`](Float::pow_prec_round), its base is restricted
+    /// to $x\geq 0$ and it never produces a negative result.
+    ///
+    /// Special cases:
+    /// - $f(x,y)=\text{NaN}$ if $x$ is `NaN`, if $x<0$, if $x$ is $\pm0$ or $\infty$ and $y=0$, or
+    ///   if $x=1$ and $y$ is infinite
+    /// - $f(x,0)=1.0$ if $x$ is finite and positive
+    /// - $f(1.0,y)=1.0$ if $y$ is finite
+    /// - $f(\infty,y)=\infty$ if $y>0$, and $0.0$ if $y<0$
+    /// - $f(\pm0.0,y)=0.0$ if $y>0$, and $\infty$ if $y<0$
+    /// - $f(x,\infty)=\infty$ if $x>1$, and $0.0$ if $0<x<1$
+    /// - $f(x,-\infty)=0.0$ if $x>1$, and $\infty$ if $0<x<1$
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,y,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,y,p,m)\leq2^{-2^{30}-1}$ and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,y,p,m)<2^{-2^{30}}$ and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the output
+    /// precision.
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (p, o) = Float::from(3).powr_round(Float::from(2.5), Floor);
+    /// assert_eq!(p.to_string(), "14.0");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn powr_round(self, other: Self, rm: RoundingMode) -> (Self, Ordering) {
+        let prec = self.significant_bits().max(other.significant_bits());
+        self.powr_prec_round_ref_ref(&other, prec, rm)
+    }
+
+    /// Raises a [`Float`] to a [`Float`] power using the IEEE 754 `powr` function, rounding the
+    /// result to the maximum of the precisions of the inputs and with the specified rounding mode.
+    /// The first [`Float`] is taken by value and the second by reference. An [`Ordering`] is also
+    /// returned, indicating whether the rounded power is less than, equal to, or greater than the
+    /// exact power. Although `NaN`s are not comparable to any [`Float`], whenever this function
+    /// returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// See the [`Float::powr_prec_round`] documentation for information on special cases, overflow,
+    /// and underflow.
+    pub fn powr_round_val_ref(self, other: &Self, rm: RoundingMode) -> (Self, Ordering) {
+        let prec = self.significant_bits().max(other.significant_bits());
+        self.powr_prec_round_ref_ref(other, prec, rm)
+    }
+
+    /// Raises a [`Float`] to a [`Float`] power using the IEEE 754 `powr` function, rounding the
+    /// result to the maximum of the precisions of the inputs and with the specified rounding mode.
+    /// The first [`Float`] is taken by reference and the second by value. An [`Ordering`] is also
+    /// returned, indicating whether the rounded power is less than, equal to, or greater than the
+    /// exact power. Although `NaN`s are not comparable to any [`Float`], whenever this function
+    /// returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// See the [`Float::powr_prec_round`] documentation for information on special cases, overflow,
+    /// and underflow.
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn powr_round_ref_val(&self, other: Self, rm: RoundingMode) -> (Self, Ordering) {
+        let prec = self.significant_bits().max(other.significant_bits());
+        self.powr_prec_round_ref_ref(&other, prec, rm)
+    }
+
+    /// Raises a [`Float`] to a [`Float`] power using the IEEE 754 `powr` function, rounding the
+    /// result to the maximum of the precisions of the inputs and with the specified rounding mode.
+    /// Both [`Float`]s are taken by reference. An [`Ordering`] is also returned, indicating whether
+    /// the rounded power is less than, equal to, or greater than the exact power. Although `NaN`s
+    /// are not comparable to any [`Float`], whenever this function returns a `NaN` it also returns
+    /// `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// See the [`Float::powr_prec_round`] documentation for information on special cases, overflow,
+    /// and underflow.
+    pub fn powr_round_ref_ref(&self, other: &Self, rm: RoundingMode) -> (Self, Ordering) {
+        let prec = self.significant_bits().max(other.significant_bits());
+        self.powr_prec_round_ref_ref(other, prec, rm)
+    }
+
+    /// Raises a [`Float`] to a [`Float`] power in place using the IEEE 754 `powr` function, taking
+    /// the exponent by value.
+    ///
+    /// See the [`Float::powr_prec_round`] documentation for information on special cases, overflow,
+    /// and underflow.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn powr_prec_round_assign(&mut self, other: Self, prec: u64, rm: RoundingMode) -> Ordering {
+        let (result, o) = self.powr_prec_round_ref_ref(&other, prec, rm);
+        *self = result;
+        o
+    }
+
+    /// Raises a [`Float`] to a [`Float`] power in place using the IEEE 754 `powr` function, taking
+    /// the exponent by reference.
+    ///
+    /// See the [`Float::powr_prec_round`] documentation for information on special cases, overflow,
+    /// and underflow.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    pub fn powr_prec_round_assign_ref(
+        &mut self,
+        other: &Self,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> Ordering {
+        let (result, o) = self.powr_prec_round_ref_ref(other, prec, rm);
+        *self = result;
+        o
+    }
+
+    /// Raises a [`Float`] to a [`Float`] power in place using the IEEE 754 `powr` function, taking
+    /// the exponent by value.
+    ///
+    /// See the [`Float::powr_prec_round`] documentation for information on special cases, overflow,
+    /// and underflow.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn powr_prec_assign(&mut self, other: Self, prec: u64) -> Ordering {
+        self.powr_prec_round_assign(other, prec, Nearest)
+    }
+
+    /// Raises a [`Float`] to a [`Float`] power in place using the IEEE 754 `powr` function, taking
+    /// the exponent by reference.
+    ///
+    /// See the [`Float::powr_prec_round`] documentation for information on special cases, overflow,
+    /// and underflow.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    pub fn powr_prec_assign_ref(&mut self, other: &Self, prec: u64) -> Ordering {
+        self.powr_prec_round_assign_ref(other, prec, Nearest)
+    }
+
+    /// Raises a [`Float`] to a [`Float`] power in place using the IEEE 754 `powr` function, taking
+    /// the exponent by value.
+    ///
+    /// See the [`Float::powr_prec_round`] documentation for information on special cases, overflow,
+    /// and underflow.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the output
+    /// precision.
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn powr_round_assign(&mut self, other: Self, rm: RoundingMode) -> Ordering {
+        let prec = self.significant_bits().max(other.significant_bits());
+        self.powr_prec_round_assign(other, prec, rm)
+    }
+
+    /// Raises a [`Float`] to a [`Float`] power in place using the IEEE 754 `powr` function, taking
+    /// the exponent by reference.
+    ///
+    /// See the [`Float::powr_prec_round`] documentation for information on special cases, overflow,
+    /// and underflow.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the output
+    /// precision.
+    pub fn powr_round_assign_ref(&mut self, other: &Self, rm: RoundingMode) -> Ordering {
+        let prec = self.significant_bits().max(other.significant_bits());
+        self.powr_prec_round_assign_ref(other, prec, rm)
     }
 }

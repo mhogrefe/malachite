@@ -208,6 +208,60 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_pow_prec_round_assign_debug);
     register_demo!(runner, demo_float_pow_prec_round_assign_ref);
     register_demo!(runner, demo_float_pow_prec_round_assign_ref_debug);
+    register_demo!(runner, demo_float_powr_prec);
+    register_demo!(runner, demo_float_powr_prec_debug);
+    register_demo!(runner, demo_float_powr_prec_extreme);
+    register_demo!(runner, demo_float_powr_prec_extreme_debug);
+    register_demo!(runner, demo_float_powr_prec_val_ref);
+    register_demo!(runner, demo_float_powr_prec_val_ref_debug);
+    register_demo!(runner, demo_float_powr_prec_ref_val);
+    register_demo!(runner, demo_float_powr_prec_ref_val_debug);
+    register_demo!(runner, demo_float_powr_prec_ref_ref);
+    register_demo!(runner, demo_float_powr_prec_ref_ref_debug);
+    register_demo!(runner, demo_float_powr_prec_assign);
+    register_demo!(runner, demo_float_powr_prec_assign_debug);
+    register_demo!(runner, demo_float_powr_prec_assign_ref);
+    register_demo!(runner, demo_float_powr_prec_assign_ref_debug);
+    register_demo!(runner, demo_float_powr_round);
+    register_demo!(runner, demo_float_powr_round_debug);
+    register_demo!(runner, demo_float_powr_round_extreme);
+    register_demo!(runner, demo_float_powr_round_extreme_debug);
+    register_demo!(runner, demo_float_powr_round_val_ref);
+    register_demo!(runner, demo_float_powr_round_val_ref_debug);
+    register_demo!(runner, demo_float_powr_round_ref_val);
+    register_demo!(runner, demo_float_powr_round_ref_val_debug);
+    register_demo!(runner, demo_float_powr_round_ref_ref);
+    register_demo!(runner, demo_float_powr_round_ref_ref_debug);
+    register_demo!(runner, demo_float_powr_round_assign);
+    register_demo!(runner, demo_float_powr_round_assign_debug);
+    register_demo!(runner, demo_float_powr_round_assign_ref);
+    register_demo!(runner, demo_float_powr_round_assign_ref_debug);
+    register_demo!(runner, demo_float_powr_prec_round);
+    register_demo!(runner, demo_float_powr_prec_round_debug);
+    register_demo!(runner, demo_float_powr_prec_round_extreme);
+    register_demo!(runner, demo_float_powr_prec_round_extreme_debug);
+    register_demo!(runner, demo_float_powr_prec_round_val_ref);
+    register_demo!(runner, demo_float_powr_prec_round_val_ref_debug);
+    register_demo!(runner, demo_float_powr_prec_round_ref_val);
+    register_demo!(runner, demo_float_powr_prec_round_ref_val_debug);
+    register_demo!(runner, demo_float_powr_prec_round_ref_ref);
+    register_demo!(runner, demo_float_powr_prec_round_ref_ref_debug);
+    register_demo!(runner, demo_float_powr_prec_round_assign);
+    register_demo!(runner, demo_float_powr_prec_round_assign_debug);
+    register_demo!(runner, demo_float_powr_prec_round_assign_ref);
+    register_demo!(runner, demo_float_powr_prec_round_assign_ref_debug);
+    register_bench!(runner, benchmark_float_powr_prec_evaluation_strategy);
+    register_bench!(runner, benchmark_float_powr_prec_assign_evaluation_strategy);
+    register_bench!(runner, benchmark_float_powr_round_evaluation_strategy);
+    register_bench!(
+        runner,
+        benchmark_float_powr_round_assign_evaluation_strategy
+    );
+    register_bench!(runner, benchmark_float_powr_prec_round_evaluation_strategy);
+    register_bench!(
+        runner,
+        benchmark_float_powr_prec_round_assign_evaluation_strategy
+    );
 
     register_bench!(runner, benchmark_float_rational_pow_prec_round);
     register_bench!(runner, benchmark_float_rational_pow_prec);
@@ -1415,6 +1469,907 @@ fn benchmark_float_pow_prec_round_assign_evaluation_strategy(
             (
                 "Float.pow_prec_round_assign_ref(&Float, u64, RoundingMode)",
                 &mut |(mut x, y, prec, rm)| no_out!(x.pow_prec_round_assign_ref(&y, prec, rm)),
+            ),
+        ],
+    );
+}
+
+fn demo_float_powr_prec(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in float_float_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        println!(
+            "({}).powr_prec({}, {}) = {:?}",
+            x_old,
+            y_old,
+            prec,
+            x.powr_prec(y, prec)
+        );
+    }
+}
+
+fn demo_float_powr_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in float_float_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        let (powr, o) = x.powr_prec(y, prec);
+        println!(
+            "({:#x}).powr_prec({:#x}, {}) = ({:#x}, {:?})",
+            ComparableFloat(x_old),
+            ComparableFloat(y_old),
+            prec,
+            ComparableFloat(powr),
+            o
+        );
+    }
+}
+
+fn demo_float_powr_prec_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in float_float_unsigned_triple_gen_var_2()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        println!(
+            "({}).powr_prec({}, {}) = {:?}",
+            x_old,
+            y_old,
+            prec,
+            x.powr_prec(y, prec)
+        );
+    }
+}
+
+fn demo_float_powr_prec_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in float_float_unsigned_triple_gen_var_2()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        let (powr, o) = x.powr_prec(y, prec);
+        println!(
+            "({:#x}).powr_prec({:#x}, {}) = ({:#x}, {:?})",
+            ComparableFloat(x_old),
+            ComparableFloat(y_old),
+            prec,
+            ComparableFloat(powr),
+            o
+        );
+    }
+}
+
+fn demo_float_powr_prec_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in float_float_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        println!(
+            "({}).powr_prec_val_ref(&{}, {}) = {:?}",
+            x_old,
+            y,
+            prec,
+            x.powr_prec_val_ref(&y, prec)
+        );
+    }
+}
+
+fn demo_float_powr_prec_val_ref_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in float_float_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let (powr, o) = x.powr_prec_val_ref(&y, prec);
+        println!(
+            "({:#x}).powr_prec_val_ref(&{:#x}, {}) = ({:#x}, {:?})",
+            ComparableFloat(x_old),
+            ComparableFloat(y),
+            prec,
+            ComparableFloat(powr),
+            o
+        );
+    }
+}
+
+fn demo_float_powr_prec_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in float_float_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let y_old = y.clone();
+        println!(
+            "(&{}).powr_prec_ref_val({}, {}) = {:?}",
+            x,
+            y_old,
+            prec,
+            x.powr_prec_ref_val(y, prec)
+        );
+    }
+}
+
+fn demo_float_powr_prec_ref_val_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in float_float_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let y_old = y.clone();
+        let (powr, o) = x.powr_prec_ref_val(y, prec);
+        println!(
+            "(&{:#x}).powr_prec_ref_val({:#x}, {}) = ({:#x}, {:?})",
+            ComparableFloat(x),
+            ComparableFloat(y_old),
+            prec,
+            ComparableFloat(powr),
+            o
+        );
+    }
+}
+
+fn demo_float_powr_prec_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in float_float_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "(&{}).powr_prec_ref_ref(&{}, {}) = {:?}",
+            x,
+            y,
+            prec,
+            x.powr_prec_ref_ref(&y, prec)
+        );
+    }
+}
+
+fn demo_float_powr_prec_ref_ref_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec) in float_float_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (powr, o) = x.powr_prec_ref_ref(&y, prec);
+        println!(
+            "(&{:#x}).powr_prec_ref_ref(&{:#x}, {}) = ({:#x}, {:?})",
+            ComparableFloat(x),
+            ComparableFloat(y),
+            prec,
+            ComparableFloat(powr),
+            o
+        );
+    }
+}
+
+fn demo_float_powr_prec_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y, prec) in float_float_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        x.powr_prec_assign(y, prec);
+        println!("x := {x_old}; x.powr_prec_assign({y_old}, {prec}); x = {x}");
+    }
+}
+
+fn demo_float_powr_prec_assign_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y, prec) in float_float_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        let o = x.powr_prec_assign(y, prec);
+        println!(
+            "x := {:#x}; x.powr_prec_assign({:#x}, {}) = {:?}; x = {:#x}",
+            ComparableFloat(x_old),
+            ComparableFloat(y_old),
+            prec,
+            o,
+            ComparableFloat(x)
+        );
+    }
+}
+
+fn demo_float_powr_prec_assign_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y, prec) in float_float_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        x.powr_prec_assign_ref(&y, prec);
+        println!("x := {x_old}; x.powr_prec_assign({y}, {prec}); x = {x}");
+    }
+}
+
+fn demo_float_powr_prec_assign_ref_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y, prec) in float_float_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let o = x.powr_prec_assign_ref(&y, prec);
+        println!(
+            "x := {:#x}; x.powr_prec_assign({:#x}, {}) = {:?}; x = {:#x}",
+            ComparableFloat(x_old),
+            ComparableFloat(y),
+            prec,
+            o,
+            ComparableFloat(x)
+        );
+    }
+}
+
+fn demo_float_powr_round(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, rm) in float_float_rounding_mode_triple_gen_var_33()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        println!(
+            "({}).powr_round({}, {}) = {:?}",
+            x_old,
+            y_old,
+            rm,
+            x.powr_round(y, rm)
+        );
+    }
+}
+
+fn demo_float_powr_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, rm) in float_float_rounding_mode_triple_gen_var_33()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        let (powr, o) = x.powr_round(y, rm);
+        println!(
+            "({:#x}).powr_round({:#x}, {}) = ({:#x}, {:?})",
+            ComparableFloat(x_old),
+            ComparableFloat(y_old),
+            rm,
+            ComparableFloat(powr),
+            o
+        );
+    }
+}
+
+fn demo_float_powr_round_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, rm) in float_float_rounding_mode_triple_gen_var_34()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        println!(
+            "({}).powr_round({}, {}) = {:?}",
+            x_old,
+            y_old,
+            rm,
+            x.powr_round(y, rm)
+        );
+    }
+}
+
+fn demo_float_powr_round_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, rm) in float_float_rounding_mode_triple_gen_var_34()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        let (powr, o) = x.powr_round(y, rm);
+        println!(
+            "({:#x}).powr_round({:#x}, {}) = ({:#x}, {:?})",
+            ComparableFloat(x_old),
+            ComparableFloat(y_old),
+            rm,
+            ComparableFloat(powr),
+            o
+        );
+    }
+}
+
+fn demo_float_powr_round_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, rm) in float_float_rounding_mode_triple_gen_var_33()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        println!(
+            "({}).powr_round_val_ref(&{}, {}) = {:?}",
+            x_old,
+            y,
+            rm,
+            x.powr_round_val_ref(&y, rm)
+        );
+    }
+}
+
+fn demo_float_powr_round_val_ref_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, rm) in float_float_rounding_mode_triple_gen_var_33()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let (powr, o) = x.powr_round_val_ref(&y, rm);
+        println!(
+            "({:#x}).powr_round_val_ref(&{:#x}, {}) = ({:#x}, {:?})",
+            ComparableFloat(x_old),
+            ComparableFloat(y),
+            rm,
+            ComparableFloat(powr),
+            o
+        );
+    }
+}
+
+fn demo_float_powr_round_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, rm) in float_float_rounding_mode_triple_gen_var_33()
+        .get(gm, config)
+        .take(limit)
+    {
+        let y_old = y.clone();
+        println!(
+            "(&{}).powr_round_ref_val({}, {}) = {:?}",
+            x,
+            y_old,
+            rm,
+            x.powr_round_ref_val(y, rm)
+        );
+    }
+}
+
+fn demo_float_powr_round_ref_val_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, rm) in float_float_rounding_mode_triple_gen_var_33()
+        .get(gm, config)
+        .take(limit)
+    {
+        let y_old = y.clone();
+        let (powr, o) = x.powr_round_ref_val(y, rm);
+        println!(
+            "(&{:#x}).powr_round_ref_val({:#x}, {}) = ({:#x}, {:?})",
+            ComparableFloat(x),
+            ComparableFloat(y_old),
+            rm,
+            ComparableFloat(powr),
+            o
+        );
+    }
+}
+
+fn demo_float_powr_round_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, rm) in float_float_rounding_mode_triple_gen_var_33()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "(&{}).powr_round_ref_ref(&{}, {}) = {:?}",
+            x,
+            y,
+            rm,
+            x.powr_round_ref_ref(&y, rm)
+        );
+    }
+}
+
+fn demo_float_powr_round_ref_ref_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, rm) in float_float_rounding_mode_triple_gen_var_33()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (powr, o) = x.powr_round_ref_ref(&y, rm);
+        println!(
+            "(&{:#x}).powr_round_ref_ref(&{:#x}, {}) = ({:#x}, {:?})",
+            ComparableFloat(x),
+            ComparableFloat(y),
+            rm,
+            ComparableFloat(powr),
+            o
+        );
+    }
+}
+
+fn demo_float_powr_round_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y, rm) in float_float_rounding_mode_triple_gen_var_33()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        x.powr_round_assign(y, rm);
+        println!("x := {x_old}; x.powr_round_assign({y_old}, {rm}); x = {x}");
+    }
+}
+
+fn demo_float_powr_round_assign_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y, rm) in float_float_rounding_mode_triple_gen_var_33()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        let o = x.powr_round_assign(y, rm);
+        println!(
+            "x := {:#x}; x.powr_round_assign({:#x}, {}) = {:?}; x = {:#x}",
+            ComparableFloat(x_old),
+            ComparableFloat(y_old),
+            rm,
+            o,
+            ComparableFloat(x)
+        );
+    }
+}
+
+fn demo_float_powr_round_assign_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y, rm) in float_float_rounding_mode_triple_gen_var_33()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        x.powr_round_assign_ref(&y, rm);
+        println!("x := {x_old}; x.powr_round_assign({y}, {rm}); x = {x}");
+    }
+}
+
+fn demo_float_powr_round_assign_ref_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y, rm) in float_float_rounding_mode_triple_gen_var_33()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let o = x.powr_round_assign_ref(&y, rm);
+        println!(
+            "x := {:#x}; x.powr_round_assign({:#x}, {}) = {:?}; x = {:#x}",
+            ComparableFloat(x_old),
+            ComparableFloat(y),
+            rm,
+            o,
+            ComparableFloat(x)
+        );
+    }
+}
+
+fn demo_float_powr_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec, rm) in float_float_unsigned_rounding_mode_quadruple_gen_var_9()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        println!(
+            "({}).powr_prec_round({}, {}, {}) = {:?}",
+            x_old,
+            y_old,
+            prec,
+            rm,
+            x.powr_prec_round(y, prec, rm)
+        );
+    }
+}
+
+fn demo_float_powr_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec, rm) in float_float_unsigned_rounding_mode_quadruple_gen_var_9()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        let (powr, o) = x.powr_prec_round(y, prec, rm);
+        println!(
+            "({:#x}).powr_prec_round({:#x}, {}, {}) = ({:#x}, {:?})",
+            ComparableFloat(x_old),
+            ComparableFloat(y_old),
+            prec,
+            rm,
+            ComparableFloat(powr),
+            o
+        );
+    }
+}
+
+fn demo_float_powr_prec_round_extreme(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec, rm) in float_float_unsigned_rounding_mode_quadruple_gen_var_10()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        println!(
+            "({}).powr_prec_round({}, {}, {}) = {:?}",
+            x_old,
+            y_old,
+            prec,
+            rm,
+            x.powr_prec_round(y, prec, rm)
+        );
+    }
+}
+
+fn demo_float_powr_prec_round_extreme_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec, rm) in float_float_unsigned_rounding_mode_quadruple_gen_var_10()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        let (powr, o) = x.powr_prec_round(y, prec, rm);
+        println!(
+            "({:#x}).powr_prec_round({:#x}, {}, {}) = ({:#x}, {:?})",
+            ComparableFloat(x_old),
+            ComparableFloat(y_old),
+            prec,
+            rm,
+            ComparableFloat(powr),
+            o
+        );
+    }
+}
+
+fn demo_float_powr_prec_round_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec, rm) in float_float_unsigned_rounding_mode_quadruple_gen_var_9()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        println!(
+            "({}).powr_prec_round(&{}, {}, {}) = {:?}",
+            x_old,
+            y,
+            prec,
+            rm,
+            x.powr_prec_round_val_ref(&y, prec, rm)
+        );
+    }
+}
+
+fn demo_float_powr_prec_round_val_ref_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec, rm) in float_float_unsigned_rounding_mode_quadruple_gen_var_9()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let (powr, o) = x.powr_prec_round_val_ref(&y, prec, rm);
+        println!(
+            "({:#x}).powr_prec_round_val_ref(&{:#x}, {}, {}) = ({:#x}, {:?})",
+            ComparableFloat(x_old),
+            ComparableFloat(y),
+            prec,
+            rm,
+            ComparableFloat(powr),
+            o
+        );
+    }
+}
+
+fn demo_float_powr_prec_round_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec, rm) in float_float_unsigned_rounding_mode_quadruple_gen_var_9()
+        .get(gm, config)
+        .take(limit)
+    {
+        let y_old = y.clone();
+        println!(
+            "(&{}).powr_prec_round_ref_val({}, {}, {}) = {:?}",
+            x,
+            y_old,
+            prec,
+            rm,
+            x.powr_prec_round_ref_val(y, prec, rm)
+        );
+    }
+}
+
+fn demo_float_powr_prec_round_ref_val_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec, rm) in float_float_unsigned_rounding_mode_quadruple_gen_var_9()
+        .get(gm, config)
+        .take(limit)
+    {
+        let y_old = y.clone();
+        let (powr, o) = x.powr_prec_round_ref_val(y, prec, rm);
+        println!(
+            "(&{:#x}).powr_prec_round_ref_val({:#x}, {}, {}) = ({:#x}, {:?})",
+            ComparableFloat(x),
+            ComparableFloat(y_old),
+            prec,
+            rm,
+            ComparableFloat(powr),
+            o
+        );
+    }
+}
+
+fn demo_float_powr_prec_round_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec, rm) in float_float_unsigned_rounding_mode_quadruple_gen_var_9()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "({}).powr_prec_round({}, {}, {}) = {:?}",
+            x,
+            y,
+            prec,
+            rm,
+            x.powr_prec_round_ref_ref(&y, prec, rm)
+        );
+    }
+}
+
+fn demo_float_powr_prec_round_ref_ref_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, prec, rm) in float_float_unsigned_rounding_mode_quadruple_gen_var_9()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (powr, o) = x.powr_prec_round_ref_ref(&y, prec, rm);
+        println!(
+            "({:#x}).powr_prec_round_ref_ref(&{:#x}, {}, {}) = ({:#x}, {:?})",
+            ComparableFloat(x),
+            ComparableFloat(y),
+            prec,
+            rm,
+            ComparableFloat(powr),
+            o
+        );
+    }
+}
+
+fn demo_float_powr_prec_round_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y, prec, rm) in float_float_unsigned_rounding_mode_quadruple_gen_var_9()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        let o = x.powr_prec_round_assign(y, prec, rm);
+        println!("x := {x_old}; x.powr_prec_round({y_old}, {prec}, {rm}) = {o:?}; x = {x}");
+    }
+}
+
+fn demo_float_powr_prec_round_assign_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y, prec, rm) in float_float_unsigned_rounding_mode_quadruple_gen_var_9()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        let o = x.powr_prec_round_assign(y, prec, rm);
+        println!(
+            "x := {:#x}; x.powr_prec_round({:#x}, {}, {}) = {:?}; x = {:#x}",
+            ComparableFloat(x_old),
+            ComparableFloat(y_old),
+            prec,
+            rm,
+            o,
+            ComparableFloat(x)
+        );
+    }
+}
+
+fn demo_float_powr_prec_round_assign_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y, prec, rm) in float_float_unsigned_rounding_mode_quadruple_gen_var_9()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let o = x.powr_prec_round_assign_ref(&y, prec, rm);
+        println!("x := {x_old}; x.powr_prec_round_ref(&{y}, {prec}, {rm}) = {o:?}; x = {x}");
+    }
+}
+
+fn demo_float_powr_prec_round_assign_ref_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y, prec, rm) in float_float_unsigned_rounding_mode_quadruple_gen_var_9()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let o = x.powr_prec_round_assign_ref(&y, prec, rm);
+        println!(
+            "x := {:#x}; x.powr_prec_round_ref(&{:#x}, {}, {}) = {:?}; x = {:#x}",
+            ComparableFloat(x_old),
+            ComparableFloat(y),
+            prec,
+            rm,
+            o,
+            ComparableFloat(x)
+        );
+    }
+}
+
+fn benchmark_float_powr_prec_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float.powr_prec(Float, u64)",
+        BenchmarkType::EvaluationStrategy,
+        float_float_unsigned_triple_gen_var_1().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &triple_float_float_primitive_int_max_complexity_bucketer("x", "y", "prec"),
+        &mut [
+            ("Float.powr_prec(Float, u64)", &mut |(x, y, prec)| {
+                no_out!(x.powr_prec(y, prec));
+            }),
+            ("Float.powr_prec_val_ref(&Float, u64)", &mut |(
+                x,
+                y,
+                prec,
+            )| {
+                no_out!(x.powr_prec_val_ref(&y, prec));
+            }),
+            (
+                "(&Float).powr_prec_ref_val(Float, u64)",
+                &mut |(x, y, prec)| no_out!(x.powr_prec_ref_val(y, prec)),
+            ),
+            (
+                "(&Float).powr_prec_ref_ref(&Float, u64)",
+                &mut |(x, y, prec)| no_out!(x.powr_prec_ref_ref(&y, prec)),
+            ),
+        ],
+    );
+}
+
+fn benchmark_float_powr_prec_assign_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float.powr_prec_assign(Float, u64)",
+        BenchmarkType::EvaluationStrategy,
+        float_float_unsigned_triple_gen_var_1().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &triple_float_float_primitive_int_max_complexity_bucketer("x", "y", "prec"),
+        &mut [
+            ("Float.powr_prec_assign(Float, u64)", &mut |(
+                mut x,
+                y,
+                prec,
+            )| {
+                no_out!(x.powr_prec_assign(y, prec));
+            }),
+            (
+                "Float.powr_prec_assign_ref(&Float, u64)",
+                &mut |(mut x, y, prec)| no_out!(x.powr_prec_assign_ref(&y, prec)),
+            ),
+        ],
+    );
+}
+
+fn benchmark_float_powr_round_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float.powr_round(Float, RoundingMode)",
+        BenchmarkType::EvaluationStrategy,
+        float_float_rounding_mode_triple_gen_var_33().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &triple_1_2_float_max_complexity_bucketer("x", "y"),
+        &mut [
+            (
+                "Float.powr_round(Float, RoundingMode)",
+                &mut |(x, y, rm)| {
+                    no_out!(x.powr_round(y, rm));
+                },
+            ),
+            (
+                "Float.powr_round_val_ref(&Float, RoundingMode)",
+                &mut |(x, y, rm)| no_out!(x.powr_round_val_ref(&y, rm)),
+            ),
+            (
+                "(&Float).powr_round_ref_val(Float, RoundingMode)",
+                &mut |(x, y, rm)| no_out!(x.powr_round_ref_val(y, rm)),
+            ),
+            (
+                "(&Float).powr_round_ref_ref(&Float, RoundingMode)",
+                &mut |(x, y, rm)| no_out!(x.powr_round_ref_ref(&y, rm)),
+            ),
+        ],
+    );
+}
+
+fn benchmark_float_powr_round_assign_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float.powr_round_assign(Float, RoundingMode)",
+        BenchmarkType::EvaluationStrategy,
+        float_float_rounding_mode_triple_gen_var_33().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &triple_1_2_float_max_complexity_bucketer("x", "y"),
+        &mut [
+            (
+                "Float.powr_round_assign(Float, RoundingMode)",
+                &mut |(mut x, y, rm)| no_out!(x.powr_round_assign(y, rm)),
+            ),
+            (
+                "Float.powr_round_assign_ref(&Float, RoundingMode)",
+                &mut |(mut x, y, rm)| no_out!(x.powr_round_assign_ref(&y, rm)),
+            ),
+        ],
+    );
+}
+
+fn benchmark_float_powr_prec_round_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float.powr_prec_round(Float, u64, RoundingMode)",
+        BenchmarkType::EvaluationStrategy,
+        float_float_unsigned_rounding_mode_quadruple_gen_var_9().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &quadruple_1_2_3_float_float_primitive_int_max_complexity_bucketer("x", "y", "prec"),
+        &mut [
+            (
+                "Float.powr_prec_round(Float, u64, RoundingMode)",
+                &mut |(x, y, prec, rm)| no_out!(x.powr_prec_round(y, prec, rm)),
+            ),
+            (
+                "Float.powr_prec_round_val_ref(&Float, u64, RoundingMode)",
+                &mut |(x, y, prec, rm)| no_out!(x.powr_prec_round_val_ref(&y, prec, rm)),
+            ),
+            (
+                "(&Float).powr_prec_round_ref_val(Float, u64, RoundingMode)",
+                &mut |(x, y, prec, rm)| no_out!(x.powr_prec_round_ref_val(y, prec, rm)),
+            ),
+            (
+                "(&Float).powr_prec_round_ref_ref(&Float, u64, RoundingMode)",
+                &mut |(x, y, prec, rm)| no_out!(x.powr_prec_round_ref_ref(&y, prec, rm)),
+            ),
+        ],
+    );
+}
+
+fn benchmark_float_powr_prec_round_assign_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float.powr_prec_round_assign(Float, u64, RoundingMode)",
+        BenchmarkType::EvaluationStrategy,
+        float_float_unsigned_rounding_mode_quadruple_gen_var_9().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &quadruple_1_2_3_float_float_primitive_int_max_complexity_bucketer("x", "y", "prec"),
+        &mut [
+            (
+                "Float.powr_prec_round_assign(Float, u64, RoundingMode)",
+                &mut |(mut x, y, prec, rm)| no_out!(x.powr_prec_round_assign(y, prec, rm)),
+            ),
+            (
+                "Float.powr_prec_round_assign_ref(&Float, u64, RoundingMode)",
+                &mut |(mut x, y, prec, rm)| no_out!(x.powr_prec_round_assign_ref(&y, prec, rm)),
             ),
         ],
     );
