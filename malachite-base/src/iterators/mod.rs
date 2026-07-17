@@ -207,6 +207,7 @@ where
 /// assert_eq!(first_and_last(&mut [1].iter().cloned()), Some((1, 1)));
 /// assert_eq!(first_and_last(&mut [1, 2, 3].iter().cloned()), Some((1, 3)));
 /// ```
+#[inline]
 pub fn first_and_last<I: Iterator>(xs: &mut I) -> Option<(I::Item, I::Item)>
 where
     I::Item: Clone,
@@ -241,6 +242,7 @@ where
 ///     &[(1, 2), (7, 8), (5, 5)]
 /// );
 /// ```
+#[inline]
 pub fn matching_intervals_in_iterator<I: Iterator, F: Fn(&I::Item) -> bool>(
     xs: I,
     predicate: F,

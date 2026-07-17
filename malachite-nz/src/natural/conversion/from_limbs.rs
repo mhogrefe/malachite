@@ -104,6 +104,7 @@ impl Natural {
     ///     );
     /// }
     /// ```
+    #[inline]
     pub fn from_limbs_desc(xs: &[Limb]) -> Self {
         Self::from_owned_limbs_asc(xs.iter().copied().rev().collect())
     }

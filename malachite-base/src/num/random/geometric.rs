@@ -818,6 +818,7 @@ pub fn geometric_random_natural_signeds<T: PrimitiveSigned>(
 ///     0 & \\text{otherwise}.
 /// \\end{cases}
 /// $$
+#[inline]
 pub fn geometric_random_positive_signeds<T: PrimitiveSigned>(
     seed: Seed,
     um_numerator: u64,

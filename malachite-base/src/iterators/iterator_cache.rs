@@ -106,6 +106,7 @@ impl<I: Iterator> IteratorCache<I> {
     /// assert_eq!(xs.assert_get(0), &1);
     /// assert_eq!(xs.assert_get(2), &3);
     /// ```
+    #[inline]
     pub fn assert_get(&self, index: usize) -> &I::Item {
         self.cache.get(index).unwrap()
     }

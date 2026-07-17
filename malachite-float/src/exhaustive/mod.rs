@@ -47,6 +47,7 @@ pub struct ExhaustivePositiveFloatsWithSciExponentAndPrecision {
 impl Iterator for ExhaustivePositiveFloatsWithSciExponentAndPrecision {
     type Item = Float;
 
+    #[inline]
     fn next(&mut self) -> Option<Float> {
         self.significands.next().map(|s| {
             Float(Finite {

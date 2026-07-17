@@ -17,6 +17,7 @@ use core::cmp::Ordering::{self, *};
 use core::str::FromStr;
 
 #[doc(hidden)]
+#[inline]
 pub fn parse_exponent(s: &[u8]) -> Option<i64> {
     i64::from_str(core::str::from_utf8(s).ok()?).ok()
 }

@@ -53,6 +53,7 @@ impl Neg for Natural {
     /// assert_eq!(-Natural::ZERO, 0);
     /// assert_eq!(-Natural::from(123u32), -123);
     /// ```
+    #[inline]
     fn neg(self) -> Integer {
         Integer::from_sign_and_abs(self == 0, self)
     }
@@ -82,6 +83,7 @@ impl Neg for &Natural {
     /// assert_eq!(-&Natural::ZERO, 0);
     /// assert_eq!(-&Natural::from(123u32), -123);
     /// ```
+    #[inline]
     fn neg(self) -> Integer {
         Integer::from_sign_and_abs_ref(*self == 0, self)
     }

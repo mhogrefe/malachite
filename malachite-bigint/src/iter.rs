@@ -127,6 +127,7 @@ impl Iterator for U64Digits<'_> {
 }
 
 impl DoubleEndedIterator for U64Digits<'_> {
+    #[inline]
     fn next_back(&mut self) -> Option<Self::Item> {
         self.iter.next_back()
     }

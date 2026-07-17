@@ -204,6 +204,7 @@ pub(crate) fn round_helper_even(
 
 // This is MPFR_RNDRAW and mpfr_round_raw from mpfr-impl.h, MPFR 4.2.0, returning `inexact` and a
 // `bool` signifying whether the returned exponent should be incremented.
+#[inline]
 pub fn round_helper_raw(
     out: &mut [Limb],
     out_prec: u64,
@@ -231,6 +232,7 @@ pub fn round_helper_raw(
 // This is MPFR_RNDRAW and mpfr_round_raw from mpfr-impl.h, MPFR 4.2.0, returning `inexact` and a
 // `bool` signifying whether the returned exponent should be incremented. The output is written to
 // &mut xs[out_offset..].
+#[inline]
 pub fn round_helper_raw_aliased(
     out_offset: usize,
     out_prec: u64,

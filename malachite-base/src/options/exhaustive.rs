@@ -19,6 +19,7 @@ pub struct ExhaustiveSomes<I: Iterator> {
 impl<I: Iterator> Iterator for ExhaustiveSomes<I> {
     type Item = Option<I::Item>;
 
+    #[inline]
     fn next(&mut self) -> Option<Option<I::Item>> {
         self.xs.next().map(Some)
     }

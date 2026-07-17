@@ -43,6 +43,7 @@ impl DivisibleBy<Self> for Integer {
     ///     true
     /// );
     /// ```
+    #[inline]
     fn divisible_by(self, other: Self) -> bool {
         self.abs.divisible_by(other.abs)
     }
@@ -83,6 +84,7 @@ impl DivisibleBy<&Self> for Integer {
     ///     true
     /// );
     /// ```
+    #[inline]
     fn divisible_by(self, other: &Self) -> bool {
         self.abs.divisible_by(&other.abs)
     }
@@ -125,6 +127,7 @@ impl DivisibleBy<Integer> for &Integer {
     ///     true
     /// );
     /// ```
+    #[inline]
     fn divisible_by(self, other: Integer) -> bool {
         (&self.abs).divisible_by(other.abs)
     }
@@ -166,6 +169,7 @@ impl DivisibleBy<&Integer> for &Integer {
     ///     true
     /// );
     /// ```
+    #[inline]
     fn divisible_by(self, other: &Integer) -> bool {
         (&self.abs).divisible_by(&other.abs)
     }

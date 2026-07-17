@@ -130,6 +130,7 @@ impl Rational {
     /// assert_eq!(before_point.to_debug_string(), "[3]");
     /// assert_eq!(after_point.to_string(), "[[1, 4, 2, 8, 5, 7]]");
     /// ```
+    #[inline]
     pub fn to_digits(&self, base: &Natural) -> (Vec<Natural>, RationalSequence<Natural>) {
         to_digits_helper(self.abs(), base)
     }

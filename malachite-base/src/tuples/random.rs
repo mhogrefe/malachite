@@ -26,6 +26,7 @@ use std::iter::{Repeat, repeat};
 ///
 /// assert_eq!(random_units().take(10).collect_vec(), &[(); 10]);
 /// ```
+#[inline]
 pub fn random_units() -> Repeat<()> {
     repeat(())
 }

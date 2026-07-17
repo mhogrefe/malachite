@@ -41,6 +41,7 @@ impl OrdAbs for Integer {
     /// assert!(Integer::from(-124).gt_abs(&Integer::from(-123)));
     /// assert!(Integer::from(-124).ge_abs(&Integer::from(-123)));
     /// ```
+    #[inline]
     fn cmp_abs(&self, other: &Self) -> Ordering {
         self.abs.cmp(&other.abs)
     }

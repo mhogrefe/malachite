@@ -112,6 +112,7 @@ impl Integer {
     ///     );
     /// }
     /// ```
+    #[inline]
     pub fn from_twos_complement_limbs_desc(xs: &[Limb]) -> Self {
         Self::from_owned_twos_complement_limbs_asc(xs.iter().copied().rev().collect())
     }

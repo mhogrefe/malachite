@@ -112,6 +112,7 @@ impl<T: Eq> RationalSequence<T> {
     ///     false
     /// );
     /// ```
+    #[inline]
     pub const fn is_finite(&self) -> bool {
         self.repeating.is_empty()
     }
@@ -223,6 +224,7 @@ impl<T: Eq> RationalSequence<T> {
     ///     &[1, 2, 3, 4, 3, 4, 3, 4, 3, 4]
     /// );
     /// ```
+    #[inline]
     pub fn iter(&self) -> Chain<core::slice::Iter<'_, T>, Cycle<core::slice::Iter<'_, T>>> {
         self.non_repeating
             .iter()
@@ -238,6 +240,7 @@ impl<T: Clone + Eq> RationalSequence<T> {
     // pair representing the same sequence, as is `[1, 2, 3]` and `[4, 3]`. All `RationalSequence`s
     // must be valid.
     #[cfg(feature = "test_build")]
+    #[inline]
     pub fn is_valid(&self) -> bool {
         rational_sequence_is_reduced(&self.non_repeating, &self.repeating)
     }

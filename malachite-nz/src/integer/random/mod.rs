@@ -677,6 +677,7 @@ pub struct UniformRandomIntegerRange {
 impl Iterator for UniformRandomIntegerRange {
     type Item = Integer;
 
+    #[inline]
     fn next(&mut self) -> Option<Integer> {
         self.xs.next().map(|x| &self.a + Integer::from(x))
     }

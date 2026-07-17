@@ -295,6 +295,7 @@ impl FromSciStringOptions {
     }
 
     #[cfg(feature = "test_build")]
+    #[inline]
     pub fn is_valid(&self) -> bool {
         (2..=36).contains(&self.base)
     }

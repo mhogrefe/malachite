@@ -612,6 +612,7 @@ impl Sub<Self> for Natural {
     ///     2000000000000u64
     /// );
     /// ```
+    #[inline]
     fn sub(self, other: Self) -> Self {
         self.checked_sub(other)
             .expect("Cannot subtract a Natural from a smaller Natural")
@@ -648,6 +649,7 @@ impl Sub<&Self> for Natural {
     ///     2000000000000u64
     /// );
     /// ```
+    #[inline]
     fn sub(self, other: &Self) -> Self {
         self.checked_sub(other)
             .expect("Cannot subtract a Natural from a smaller Natural")
@@ -684,6 +686,7 @@ impl Sub<Natural> for &Natural {
     ///     2000000000000u64
     /// );
     /// ```
+    #[inline]
     fn sub(self, other: Natural) -> Natural {
         self.checked_sub(other)
             .expect("Cannot subtract a Natural from a smaller Natural")
@@ -719,6 +722,7 @@ impl Sub<&Natural> for &Natural {
     ///     2000000000000u64
     /// );
     /// ```
+    #[inline]
     fn sub(self, other: &Natural) -> Natural {
         self.checked_sub(other).unwrap_or_else(|| {
             sub_panic(self, other);

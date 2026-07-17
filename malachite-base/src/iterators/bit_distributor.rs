@@ -174,6 +174,7 @@ impl BitDistributor {
     ///     ][..]
     /// );
     /// ```
+    #[inline]
     pub fn bit_map_as_slice(&self) -> &[usize] {
         self.bit_map.as_ref()
     }

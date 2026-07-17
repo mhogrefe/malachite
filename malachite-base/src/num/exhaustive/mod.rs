@@ -1011,6 +1011,7 @@ pub fn nonzero_primitive_floats_increasing<T: PrimitiveFloat>()
 ///     3.40282e38, 3.4028198e38, ...]"
 /// );
 /// ```
+#[inline]
 pub fn primitive_floats_increasing<T: PrimitiveFloat>() -> PrimitiveFloatIncreasingRange<T> {
     primitive_float_increasing_inclusive_range(T::NEGATIVE_INFINITY, T::INFINITY)
 }

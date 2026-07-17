@@ -154,6 +154,7 @@ impl Mod<Integer> for &Integer {
     /// // 2 * -10 + -3 = -23
     /// assert_eq!((&Integer::from(-23)).mod_op(Integer::from(-10)), -3);
     /// ```
+    #[inline]
     fn mod_op(self, other: Integer) -> Integer {
         Integer::from_sign_and_abs(
             other.sign,
@@ -208,6 +209,7 @@ impl Mod<&Integer> for &Integer {
     /// // 2 * -10 + -3 = -23
     /// assert_eq!((&Integer::from(-23)).mod_op(&Integer::from(-10)), -3);
     /// ```
+    #[inline]
     fn mod_op(self, other: &Integer) -> Integer {
         Integer::from_sign_and_abs(
             other.sign,
@@ -766,6 +768,7 @@ impl CeilingMod<Integer> for &Integer {
     /// // 2 * -10 + -3 = -23
     /// assert_eq!((&Integer::from(-23)).ceiling_mod(Integer::from(-10)), 7);
     /// ```
+    #[inline]
     fn ceiling_mod(self, other: Integer) -> Integer {
         Integer::from_sign_and_abs(
             !other.sign,
@@ -818,6 +821,7 @@ impl CeilingMod<&Integer> for &Integer {
     /// // 2 * -10 + -3 = -23
     /// assert_eq!((&Integer::from(-23)).ceiling_mod(&Integer::from(-10)), 7);
     /// ```
+    #[inline]
     fn ceiling_mod(self, other: &Integer) -> Integer {
         Integer::from_sign_and_abs(
             !other.sign,

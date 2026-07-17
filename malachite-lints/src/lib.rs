@@ -27,6 +27,7 @@ mod long_lines;
 mod manual_float_from_primitive;
 mod manual_from_sign_and_abs;
 mod manual_rational_significant_bits;
+mod missing_inline_on_delegator;
 mod mul_div_by_power_of_2;
 mod redundant_from_in_comparison;
 mod redundant_from_in_literal_comparison;
@@ -269,6 +270,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         manual_float_from_primitive::MANUAL_FLOAT_FROM_PRIMITIVE,
         manual_from_sign_and_abs::MANUAL_FROM_SIGN_AND_ABS,
         manual_rational_significant_bits::MANUAL_RATIONAL_SIGNIFICANT_BITS,
+        missing_inline_on_delegator::MISSING_INLINE_ON_DELEGATOR,
         mul_div_by_power_of_2::MUL_DIV_BY_POWER_OF_2,
         redundant_from_in_comparison::REDUNDANT_FROM_IN_COMPARISON,
         redundant_from_in_literal_comparison::REDUNDANT_FROM_IN_LITERAL_COMPARISON,
@@ -300,6 +302,9 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
     lint_store.register_late_pass(|_| Box::new(manual_from_sign_and_abs::ManualFromSignAndAbs));
     lint_store.register_late_pass(|_| {
         Box::new(manual_rational_significant_bits::ManualRationalSignificantBits)
+    });
+    lint_store.register_late_pass(|_| {
+        Box::new(missing_inline_on_delegator::MissingInlineOnDelegator)
     });
     lint_store.register_late_pass(|_| Box::new(mul_div_by_power_of_2::MulDivByPowerOf2));
     lint_store

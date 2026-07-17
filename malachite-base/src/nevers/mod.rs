@@ -70,6 +70,7 @@ impl FromStr for Never {
 ///
 /// assert_eq!(nevers().collect_vec(), &[]);
 /// ```
+#[inline]
 pub const fn nevers() -> Empty<Never> {
     empty()
 }

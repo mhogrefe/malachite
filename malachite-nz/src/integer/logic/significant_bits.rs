@@ -32,6 +32,7 @@ impl SignificantBits for &Integer {
     /// assert_eq!(Integer::from(100).significant_bits(), 7);
     /// assert_eq!(Integer::from(-100).significant_bits(), 7);
     /// ```
+    #[inline]
     fn significant_bits(self) -> u64 {
         self.abs.significant_bits()
     }

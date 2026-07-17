@@ -454,6 +454,7 @@ pub fn prime_indicator_sequence_less_than(limit: u64) -> PrimeIndicatorSequenceL
 ///     00000001000"
 /// )
 /// ```
+#[inline]
 pub fn prime_indicator_sequence_less_than_or_equal_to(
     limit: u64,
 ) -> PrimeIndicatorSequenceLessThan {

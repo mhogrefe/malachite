@@ -36,6 +36,7 @@ use core::mem::take;
 ///
 /// assert_eq!(exhaustive_units().collect_vec(), &[()]);
 /// ```
+#[inline]
 pub fn exhaustive_units() -> Once<()> {
     once(())
 }

@@ -46,6 +46,7 @@ impl FloorSqrt for u8 {
     ///
     /// # Notes
     /// The [`u8`] implementation uses a lookup table.
+    #[inline]
     fn floor_sqrt(self) -> Self {
         Self::wrapping_from(match U8_SQUARES.binary_search(&self) {
             Ok(i) => i,
@@ -69,6 +70,7 @@ impl CeilingSqrt for u8 {
     ///
     /// # Notes
     /// The [`u8`] implementation uses a lookup table.
+    #[inline]
     fn ceiling_sqrt(self) -> Self {
         Self::wrapping_from(match U8_SQUARES.binary_search(&self) {
             Ok(i) | Err(i) => i,
@@ -96,6 +98,7 @@ impl CheckedSqrt for u8 {
     ///
     /// # Notes
     /// The [`u8`] implementation uses a lookup table.
+    #[inline]
     fn checked_sqrt(self) -> Option<Self> {
         U8_SQUARES
             .binary_search(&self)

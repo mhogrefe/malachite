@@ -31,6 +31,7 @@ impl Parity for &Integer {
     /// assert_eq!(Integer::from(10u32).pow(12).even(), true);
     /// assert_eq!((-Integer::from(10u32).pow(12) - Integer::ONE).even(), false);
     /// ```
+    #[inline]
     fn even(self) -> bool {
         self.abs.even()
     }
@@ -56,6 +57,7 @@ impl Parity for &Integer {
     /// assert_eq!(Integer::from(10u32).pow(12).odd(), false);
     /// assert_eq!((-Integer::from(10u32).pow(12) - Integer::ONE).odd(), true);
     /// ```
+    #[inline]
     fn odd(self) -> bool {
         self.abs.odd()
     }

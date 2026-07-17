@@ -40,12 +40,14 @@ impl ParseBigIntError {
 }
 
 impl core::fmt::Display for ParseBigIntError {
+    #[inline]
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         self.__description().fmt(f)
     }
 }
 
 impl core::error::Error for ParseBigIntError {
+    #[inline]
     fn description(&self) -> &str {
         self.__description()
     }
@@ -75,12 +77,14 @@ impl<T> core::error::Error for TryFromBigIntError<T>
 where
     T: core::fmt::Debug,
 {
+    #[inline]
     fn description(&self) -> &str {
         self.__description()
     }
 }
 
 impl<T> core::fmt::Display for TryFromBigIntError<T> {
+    #[inline]
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         self.__description().fmt(f)
     }

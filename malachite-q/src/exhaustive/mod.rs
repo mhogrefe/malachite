@@ -122,6 +122,7 @@ pub const fn exhaustive_positive_rationals() -> ExhaustivePositiveRationals {
 ///     7/3, ...]"
 /// )
 /// ```
+#[inline]
 pub fn exhaustive_non_negative_rationals() -> Chain<Once<Rational>, ExhaustivePositiveRationals> {
     once(Rational::ZERO).chain(exhaustive_positive_rationals())
 }
@@ -137,6 +138,7 @@ pub struct ExhaustiveNegativeRationals {
 impl Iterator for ExhaustiveNegativeRationals {
     type Item = Rational;
 
+    #[inline]
     fn next(&mut self) -> Option<Rational> {
         self.xs.next().map(|mut q| {
             q.sign = false;
@@ -266,6 +268,7 @@ pub const fn exhaustive_nonzero_rationals() -> ExhaustiveNonzeroRationals {
 ///     -4/3, 3/5, ...]"
 /// )
 /// ```
+#[inline]
 pub fn exhaustive_rationals() -> Chain<Once<Rational>, ExhaustiveNonzeroRationals> {
     once(Rational::ZERO).chain(exhaustive_nonzero_rationals())
 }

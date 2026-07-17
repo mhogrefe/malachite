@@ -182,6 +182,7 @@ struct MOLIterator<'a, T> {
 impl<T: PrimitiveUnsigned> Iterator for MOLIterator<'_, T> {
     type Item = T;
 
+    #[inline]
     fn next(&mut self) -> Option<T> {
         self.chunks.next().map(T::from_other_type_slice)
     }
@@ -193,6 +194,7 @@ impl<T: PrimitiveUnsigned> Iterator for MOLIterator<'_, T> {
 }
 
 impl<T: PrimitiveUnsigned> DoubleEndedIterator for MOLIterator<'_, T> {
+    #[inline]
     fn next_back(&mut self) -> Option<T> {
         self.chunks.next_back().map(T::from_other_type_slice)
     }
@@ -559,6 +561,7 @@ struct NMOLIterator<'a> {
 impl Iterator for NMOLIterator<'_> {
     type Item = Natural;
 
+    #[inline]
     fn next(&mut self) -> Option<Natural> {
         self.chunks.next().map(Natural::from_limbs_asc)
     }
@@ -570,6 +573,7 @@ impl Iterator for NMOLIterator<'_> {
 }
 
 impl DoubleEndedIterator for NMOLIterator<'_> {
+    #[inline]
     fn next_back(&mut self) -> Option<Natural> {
         self.chunks.next_back().map(Natural::from_limbs_asc)
     }

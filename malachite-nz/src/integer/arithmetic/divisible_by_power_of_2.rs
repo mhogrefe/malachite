@@ -44,6 +44,7 @@ impl DivisibleByPowerOf2 for &Integer {
     ///     false
     /// );
     /// ```
+    #[inline]
     fn divisible_by_power_of_2(self, pow: u64) -> bool {
         self.abs.divisible_by_power_of_2(pow)
     }

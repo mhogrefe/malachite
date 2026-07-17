@@ -951,6 +951,7 @@ fn limbs_to_digits_small_base_divide_and_conquer<T: PrimitiveUnsigned>(
 // threshold tuner (which needs to A/B the basecase against forced divide-and-conquer at sizes where
 // the normal dispatch would choose for itself).
 #[cfg(feature = "test_build")]
+#[inline]
 pub fn limbs_to_digits_small_base_divide_and_conquer_for_tuning<T: PrimitiveUnsigned>(
     out: &mut [T],
     xs: &mut [Limb],
@@ -973,16 +974,19 @@ pub fn limbs_to_digits_small_base_divide_and_conquer_for_tuning<T: PrimitiveUnsi
 }
 
 #[cfg(feature = "test_build")]
+#[inline]
 pub const fn limbs_digits_power_table_scratch_len_for_tuning(xs_len: usize) -> usize {
     limbs_digits_power_table_scratch_len(xs_len)
 }
 
 #[cfg(feature = "test_build")]
+#[inline]
 pub fn digits_in_base_per_limb_for_tuning(limb_count: usize, base: u64) -> u64 {
     digits_in_base_per_limb(limb_count, base)
 }
 
 #[cfg(feature = "test_build")]
+#[inline]
 pub const fn limbs_to_digits_small_base_divide_and_conquer_scratch_len_for_tuning(
     xs_len: usize,
 ) -> usize {

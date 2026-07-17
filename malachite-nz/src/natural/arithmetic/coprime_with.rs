@@ -196,6 +196,7 @@ impl CoprimeWith<&Natural> for &Natural {
     ///     false
     /// );
     /// ```
+    #[inline]
     fn coprime_with(self, other: &Natural) -> bool {
         coprime_with_check_2_ref_ref(self, other)
     }

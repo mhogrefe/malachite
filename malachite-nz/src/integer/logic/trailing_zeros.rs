@@ -32,6 +32,7 @@ impl Integer {
     /// assert_eq!(Integer::from(100).trailing_zeros(), Some(2));
     /// assert_eq!((-Integer::from(10u32).pow(12)).trailing_zeros(), Some(12));
     /// ```
+    #[inline]
     pub fn trailing_zeros(&self) -> Option<u64> {
         self.abs.trailing_zeros()
     }

@@ -594,6 +594,7 @@ impl Rational {
     ///     "-2/3"
     /// );
     /// ```
+    #[inline]
     pub fn from_sign_and_unsigneds<T: PrimitiveUnsigned>(
         sign: bool,
         numerator: T,

@@ -132,6 +132,7 @@ impl Rational {
     ///     Less
     /// );
     /// ```
+    #[inline]
     pub fn cmp_complexity(&self, other: &Self) -> Ordering {
         self.denominator_ref()
             .cmp(other.denominator_ref())

@@ -310,6 +310,7 @@ impl SubMul<Self, Self> for Natural {
     ///     995705032704u64
     /// );
     /// ```
+    #[inline]
     fn sub_mul(self, y: Self, z: Self) -> Self {
         self.checked_sub_mul(y, z)
             .expect("Natural sub_mul_assign cannot have a negative result")
@@ -353,6 +354,7 @@ impl<'a> SubMul<Self, &'a Self> for Natural {
     ///     995705032704u64
     /// );
     /// ```
+    #[inline]
     fn sub_mul(self, y: Self, z: &'a Self) -> Self {
         self.checked_sub_mul(y, z)
             .expect("Natural sub_mul_assign cannot have a negative result")
@@ -396,6 +398,7 @@ impl<'a> SubMul<&'a Self, Self> for Natural {
     ///     995705032704u64
     /// );
     /// ```
+    #[inline]
     fn sub_mul(self, y: &'a Self, z: Self) -> Self {
         self.checked_sub_mul(y, z)
             .expect("Natural sub_mul_assign cannot have a negative result")
@@ -439,6 +442,7 @@ impl<'a, 'b> SubMul<&'a Self, &'b Self> for Natural {
     ///     995705032704u64
     /// );
     /// ```
+    #[inline]
     fn sub_mul(self, y: &'a Self, z: &'b Self) -> Self {
         self.checked_sub_mul(y, z)
             .expect("Natural sub_mul_assign cannot have a negative result")
@@ -481,6 +485,7 @@ impl SubMul<&Natural, &Natural> for &Natural {
     ///     995705032704u64
     /// );
     /// ```
+    #[inline]
     fn sub_mul(self, y: &Natural, z: &Natural) -> Natural {
         self.checked_sub_mul(y, z).unwrap_or_else(|| {
             sub_mul_panic(self, y, z);

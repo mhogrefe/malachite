@@ -188,6 +188,7 @@ pub struct NegativeRationals<I: Iterator<Item = Rational>> {
 impl<I: Iterator<Item = Rational>> Iterator for NegativeRationals<I> {
     type Item = Rational;
 
+    #[inline]
     fn next(&mut self) -> Option<Rational> {
         self.xs.next().map(|mut q| {
             q.sign = false;

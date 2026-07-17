@@ -126,6 +126,7 @@ impl BitConvertible for Natural {
     ///     105
     /// );
     /// ```
+    #[inline]
     fn from_bits_asc<I: Iterator<Item = bool>>(xs: I) -> Self {
         Self::from_owned_limbs_asc(
             xs.chunks(usize::wrapping_from(Limb::WIDTH))

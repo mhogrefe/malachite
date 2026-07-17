@@ -54,6 +54,7 @@ impl Float {
     /// assert_eq!(pc.to_string(), "0.4146825098511116602481096221546");
     /// assert_eq!(o, Greater);
     /// ```
+    #[inline]
     pub fn prime_constant_prec_round(prec: u64, rm: RoundingMode) -> (Self, Ordering) {
         // Strictly speaking, this call violates the preconditions for
         // `non_dyadic_from_bits_prec_round`, because the iterator passed in is finite. But since we

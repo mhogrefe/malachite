@@ -35,6 +35,7 @@ impl PowerOf2<u64> for Rational {
     ///     "1267650600228229401496703205376"
     /// );
     /// ```
+    #[inline]
     fn power_of_2(pow: u64) -> Self {
         Self::from(Natural::power_of_2(pow))
     }

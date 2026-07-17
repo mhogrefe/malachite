@@ -365,6 +365,7 @@ impl TryFrom<ExtendedFloat> for Float {
 impl TryFrom<ExtendedFloat> for Rational {
     type Error = RationalFromFloatError;
 
+    #[inline]
     fn try_from(value: ExtendedFloat) -> Result<Self, Self::Error> {
         Self::try_from(value.x).map(|x| x << value.exp)
     }
@@ -373,6 +374,7 @@ impl TryFrom<ExtendedFloat> for Rational {
 impl<'a> TryFrom<&'a ExtendedFloat> for Rational {
     type Error = RationalFromFloatError;
 
+    #[inline]
     fn try_from(value: &'a ExtendedFloat) -> Result<Self, Self::Error> {
         Self::try_from(&value.x).map(|x| x << value.exp)
     }

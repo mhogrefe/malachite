@@ -1397,6 +1397,7 @@ pub(crate) fn limbs_div_mod_barrett_preinverse_scratch_len(d_len: usize, is_len:
 // This is equivalent to `mpn_invertappr_itch` from `gmp-impl.h`, GMP 6.2.1. Public under test_build
 // for the tuner (see PORTING.md's `_for_tuning` note).
 #[cfg(feature = "test_build")]
+#[inline]
 pub const fn limbs_invert_approx_scratch_len(is_len: usize) -> usize {
     limbs_invert_approx_scratch_len_helper(is_len)
 }

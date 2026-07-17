@@ -285,6 +285,7 @@ pub struct RandomSignedRange<T: HasRandomSignedRange> {
 impl<T: HasRandomSignedRange> Iterator for RandomSignedRange<T> {
     type Item = T;
 
+    #[inline]
     fn next(&mut self) -> Option<T> {
         self.xs.next().map(T::from_unsigned_value)
     }
@@ -301,6 +302,7 @@ pub struct RandomSignedInclusiveRange<T: HasRandomSignedRange> {
 impl<T: HasRandomSignedRange> Iterator for RandomSignedInclusiveRange<T> {
     type Item = T;
 
+    #[inline]
     fn next(&mut self) -> Option<T> {
         self.xs.next().map(T::from_unsigned_value)
     }
@@ -317,6 +319,7 @@ pub struct RandomUnsignedBitChunks<T: PrimitiveUnsigned> {
 impl<T: PrimitiveUnsigned> Iterator for RandomUnsignedBitChunks<T> {
     type Item = T;
 
+    #[inline]
     fn next(&mut self) -> Option<T> {
         self.xs.next_with_wrapping(identity).map(Option::unwrap)
     }
@@ -359,6 +362,7 @@ pub struct RandomSignedBitChunks<T: RandomSignedChunkable> {
 impl<T: RandomSignedChunkable> Iterator for RandomSignedBitChunks<T> {
     type Item = T;
 
+    #[inline]
     fn next(&mut self) -> Option<T> {
         T::next_chunk(&mut self.xs)
     }
@@ -927,6 +931,7 @@ pub struct RandomPrimitiveFloatRange<T: PrimitiveFloat> {
 impl<T: PrimitiveFloat> Iterator for RandomPrimitiveFloatRange<T> {
     type Item = T;
 
+    #[inline]
     fn next(&mut self) -> Option<T> {
         self.xs.next().map(T::from_ordered_representation)
     }
@@ -945,6 +950,7 @@ pub struct RandomPrimitiveFloatInclusiveRange<T: PrimitiveFloat> {
 impl<T: PrimitiveFloat> Iterator for RandomPrimitiveFloatInclusiveRange<T> {
     type Item = T;
 
+    #[inline]
     fn next(&mut self) -> Option<T> {
         self.xs.next().map(T::from_ordered_representation)
     }
@@ -1347,6 +1353,7 @@ pub struct RandomPrimitiveFloats<T: PrimitiveFloat> {
 impl<T: PrimitiveFloat> Iterator for RandomPrimitiveFloats<T> {
     type Item = T;
 
+    #[inline]
     fn next(&mut self) -> Option<T> {
         self.xs.next().map(|x| {
             if x == self.nan {
@@ -2563,6 +2570,7 @@ impl VariableRangeGenerator {
     ///     &[true, false, true, false, true, true, true, true, true, false]
     /// );
     /// ```
+    #[inline]
     pub fn next_bool(&mut self) -> bool {
         self.xs.next().unwrap().odd()
     }

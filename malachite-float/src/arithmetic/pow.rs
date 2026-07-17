@@ -1501,6 +1501,7 @@ impl Float {
     /// assert_eq!(p.to_string(), "15.58846");
     /// assert_eq!(o, Less);
     /// ```
+    #[inline]
     pub fn pow_prec_round(self, other: Self, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
         self.pow_prec_round_ref_ref(&other, prec, rm)
     }
@@ -1602,6 +1603,7 @@ impl Float {
     /// assert_eq!(p.to_string(), "15.58846");
     /// assert_eq!(o, Less);
     /// ```
+    #[inline]
     pub fn pow_prec_round_val_ref(
         self,
         other: &Self,
@@ -1709,6 +1711,7 @@ impl Float {
     /// assert_eq!(p.to_string(), "15.58846");
     /// assert_eq!(o, Less);
     /// ```
+    #[inline]
     pub fn pow_prec_round_ref_val(
         &self,
         other: Self,
@@ -1786,6 +1789,7 @@ impl Float {
     /// assert_eq!(p.to_string(), "15.58846");
     /// assert_eq!(o, Less);
     /// ```
+    #[inline]
     pub fn pow_prec(self, other: Self, prec: u64) -> (Self, Ordering) {
         self.pow_prec_ref_ref(&other, prec)
     }
@@ -1857,6 +1861,7 @@ impl Float {
     /// assert_eq!(p.to_string(), "15.58846");
     /// assert_eq!(o, Less);
     /// ```
+    #[inline]
     pub fn pow_prec_ref_ref(&self, other: &Self, prec: u64) -> (Self, Ordering) {
         self.pow_prec_round_ref_ref(other, prec, Nearest)
     }
@@ -3110,6 +3115,7 @@ impl Float {
     /// assert_eq!(p.to_string(), "0.1112");
     /// assert_eq!(o, Greater);
     /// ```
+    #[inline]
     pub fn pow_integer_prec_round(
         self,
         other: Integer,
@@ -3167,6 +3173,7 @@ impl Float {
     /// assert_eq!(p.to_string(), "0.1112");
     /// assert_eq!(o, Greater);
     /// ```
+    #[inline]
     pub fn pow_integer_prec_round_val_ref(
         self,
         other: &Integer,
@@ -3225,6 +3232,7 @@ impl Float {
     /// assert_eq!(p.to_string(), "0.1112");
     /// assert_eq!(o, Greater);
     /// ```
+    #[inline]
     pub fn pow_integer_prec_round_ref_val(
         &self,
         other: Integer,
@@ -3306,6 +3314,7 @@ impl Float {
     /// assert_eq!(p.to_string(), "0.1112");
     /// assert_eq!(o, Greater);
     /// ```
+    #[inline]
     pub fn pow_integer_prec_round_ref_ref(
         &self,
         other: &Integer,
@@ -3785,6 +3794,7 @@ impl Float {
     /// assert_eq!(x.to_string(), "243.0");
     /// assert_eq!(o, Equal);
     /// ```
+    #[inline]
     pub fn pow_integer_prec_round_assign(
         &mut self,
         other: Integer,
@@ -3825,6 +3835,7 @@ impl Float {
     /// assert_eq!(x.to_string(), "243.0");
     /// assert_eq!(o, Equal);
     /// ```
+    #[inline]
     pub fn pow_integer_prec_round_assign_ref(
         &mut self,
         other: &Integer,
@@ -3860,6 +3871,7 @@ impl Float {
     /// assert_eq!(x.to_string(), "243.0");
     /// assert_eq!(o, Equal);
     /// ```
+    #[inline]
     pub fn pow_integer_prec_assign(&mut self, other: Integer, prec: u64) -> Ordering {
         self.pow_prec_assign(integer_to_exact_float(other), prec)
     }
@@ -3891,6 +3903,7 @@ impl Float {
     /// assert_eq!(x.to_string(), "243.0");
     /// assert_eq!(o, Equal);
     /// ```
+    #[inline]
     pub fn pow_integer_prec_assign_ref(&mut self, other: &Integer, prec: u64) -> Ordering {
         self.pow_prec_assign(integer_to_exact_float(other.clone()), prec)
     }
@@ -4298,6 +4311,7 @@ impl Float {
     /// assert_eq!(p.to_string(), "3.0e2");
     /// assert_eq!(o, Greater);
     /// ```
+    #[inline]
     pub fn pow_u_prec_round(self, n: u64, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
         pow_u(self, n, prec, rm)
     }
@@ -4347,6 +4361,7 @@ impl Float {
     /// assert_eq!(p.to_string(), "3.0e2");
     /// assert_eq!(o, Greater);
     /// ```
+    #[inline]
     pub fn pow_u_prec_round_ref(&self, n: u64, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
         pow_u_ref(self, n, prec, rm)
     }
@@ -4848,6 +4863,7 @@ impl Float {
     /// assert_eq!(p.to_string(), "0.1112");
     /// assert_eq!(o, Greater);
     /// ```
+    #[inline]
     pub fn pow_s_prec_round(self, n: i64, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
         pow_s(self, n, prec, rm)
     }
@@ -4897,6 +4913,7 @@ impl Float {
     /// assert_eq!(p.to_string(), "0.1112");
     /// assert_eq!(o, Greater);
     /// ```
+    #[inline]
     pub fn pow_s_prec_round_ref(&self, n: i64, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
         pow_s_ref(self, n, prec, rm)
     }
@@ -5295,6 +5312,7 @@ impl Float {
     /// assert_eq!(p.to_string(), "3.0e2");
     /// assert_eq!(o, Greater);
     /// ```
+    #[inline]
     pub fn unsigned_pow_unsigned_prec_round(
         x: u64,
         y: u64,
@@ -5414,6 +5432,7 @@ impl Float {
     ///
     /// This is equivalent to `mpfr_ui_pow` from `ui_pow.c`, MPFR 4.3.0, which likewise converts the
     /// integer exactly and delegates to `mpfr_pow`.
+    #[inline]
     pub fn unsigned_pow_prec_round(
         x: u64,
         y: Self,
@@ -5468,6 +5487,7 @@ impl Float {
     /// assert_eq!(p.to_string(), "15.588457268119894");
     /// assert_eq!(o, Less);
     /// ```
+    #[inline]
     pub fn unsigned_pow_prec_round_ref(
         x: u64,
         y: &Self,
@@ -5633,6 +5653,7 @@ impl Float {
     /// assert_eq!(o, Less);
     /// ```
     #[allow(clippy::needless_pass_by_value)]
+    #[inline]
     pub fn unsigned_pow_rational_prec_round(
         x: u64,
         y: Rational,
@@ -5697,6 +5718,7 @@ impl Float {
     /// assert_eq!(p.to_string(), "2.0");
     /// assert_eq!(o, Greater);
     /// ```
+    #[inline]
     pub fn unsigned_pow_rational_prec_round_ref(
         x: u64,
         y: &Rational,
@@ -7403,6 +7425,7 @@ impl Float {
     /// assert_eq!(p.to_string(), "2.755676");
     /// assert_eq!(o, Greater);
     /// ```
+    #[inline]
     pub fn rational_pow_prec_round(
         x: Rational,
         y: Self,
@@ -7539,6 +7562,7 @@ impl Float {
     /// assert_eq!(p.to_string(), "2.755676");
     /// assert_eq!(o, Greater);
     /// ```
+    #[inline]
     pub fn rational_pow_prec_round_val_ref(
         x: Rational,
         y: &Self,
@@ -7675,6 +7699,7 @@ impl Float {
     /// assert_eq!(p.to_string(), "2.755676");
     /// assert_eq!(o, Greater);
     /// ```
+    #[inline]
     pub fn rational_pow_prec_round_ref_val(
         x: &Rational,
         y: Self,
@@ -8086,6 +8111,7 @@ impl Float {
     /// assert_eq!(o, Equal);
     /// ```
     #[allow(clippy::needless_pass_by_value)]
+    #[inline]
     pub fn pow_rational_prec_round(
         self,
         other: Rational,
@@ -8105,6 +8131,7 @@ impl Float {
     ///
     /// See the [`Float::pow_rational_prec_round`] documentation for information on special cases,
     /// overflow, and underflow.
+    #[inline]
     pub fn pow_rational_prec_round_val_ref(
         self,
         other: &Rational,
@@ -8125,6 +8152,7 @@ impl Float {
     /// See the [`Float::pow_rational_prec_round`] documentation for information on special cases,
     /// overflow, and underflow.
     #[allow(clippy::needless_pass_by_value)]
+    #[inline]
     pub fn pow_rational_prec_round_ref_val(
         &self,
         other: Rational,
@@ -8144,6 +8172,7 @@ impl Float {
     ///
     /// See the [`Float::pow_rational_prec_round`] documentation for information on special cases,
     /// overflow, and underflow.
+    #[inline]
     pub fn pow_rational_prec_round_ref_ref(
         &self,
         other: &Rational,
@@ -8233,6 +8262,7 @@ impl Float {
     /// assert_eq!(p.to_string(), "9.0");
     /// assert_eq!(o, Equal);
     /// ```
+    #[inline]
     pub fn pow_rational_prec(self, other: Rational, prec: u64) -> (Self, Ordering) {
         self.pow_rational_prec_round(other, prec, Nearest)
     }
@@ -8249,6 +8279,7 @@ impl Float {
     ///
     /// See the [`Float::pow_rational_prec_round`] documentation for information on special cases,
     /// overflow, and underflow.
+    #[inline]
     pub fn pow_rational_prec_val_ref(self, other: &Rational, prec: u64) -> (Self, Ordering) {
         self.pow_rational_prec_round_val_ref(other, prec, Nearest)
     }
@@ -8265,6 +8296,7 @@ impl Float {
     ///
     /// See the [`Float::pow_rational_prec_round`] documentation for information on special cases,
     /// overflow, and underflow.
+    #[inline]
     pub fn pow_rational_prec_ref_val(&self, other: Rational, prec: u64) -> (Self, Ordering) {
         self.pow_rational_prec_round_ref_val(other, prec, Nearest)
     }
@@ -8281,6 +8313,7 @@ impl Float {
     ///
     /// See the [`Float::pow_rational_prec_round`] documentation for information on special cases,
     /// overflow, and underflow.
+    #[inline]
     pub fn pow_rational_prec_ref_ref(&self, other: &Rational, prec: u64) -> (Self, Ordering) {
         self.pow_rational_prec_round_ref_ref(other, prec, Nearest)
     }
@@ -8504,6 +8537,7 @@ impl Float {
     ///
     /// # Panics
     /// Panics if `prec` is zero.
+    #[inline]
     pub fn pow_rational_prec_assign(&mut self, other: Rational, prec: u64) -> Ordering {
         self.pow_rational_prec_round_assign(other, prec, Nearest)
     }
@@ -8524,6 +8558,7 @@ impl Float {
     ///
     /// # Panics
     /// Panics if `prec` is zero.
+    #[inline]
     pub fn pow_rational_prec_assign_ref(&mut self, other: &Rational, prec: u64) -> Ordering {
         self.pow_rational_prec_round_assign_ref(other, prec, Nearest)
     }
@@ -8741,6 +8776,7 @@ impl Float {
     /// assert_eq!(o, Equal);
     /// ```
     #[allow(clippy::needless_pass_by_value)]
+    #[inline]
     pub fn powr_prec_round(self, other: Self, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
         self.powr_prec_round_ref_ref(&other, prec, rm)
     }
@@ -8756,6 +8792,7 @@ impl Float {
     ///
     /// See the [`Float::powr_prec_round`] documentation for information on special cases, overflow,
     /// and underflow.
+    #[inline]
     pub fn powr_prec_round_val_ref(
         self,
         other: &Self,
@@ -8777,6 +8814,7 @@ impl Float {
     /// See the [`Float::powr_prec_round`] documentation for information on special cases, overflow,
     /// and underflow.
     #[allow(clippy::needless_pass_by_value)]
+    #[inline]
     pub fn powr_prec_round_ref_val(
         &self,
         other: Self,
@@ -8958,6 +8996,7 @@ impl Float {
     /// assert_eq!(o, Equal);
     /// ```
     #[allow(clippy::needless_pass_by_value)]
+    #[inline]
     pub fn powr_prec(self, other: Self, prec: u64) -> (Self, Ordering) {
         self.powr_prec_round_ref_ref(&other, prec, Nearest)
     }
@@ -8975,6 +9014,7 @@ impl Float {
     ///
     /// See the [`Float::powr_prec_round`] documentation for information on special cases, overflow,
     /// and underflow.
+    #[inline]
     pub fn powr_prec_val_ref(self, other: &Self, prec: u64) -> (Self, Ordering) {
         self.powr_prec_round_ref_ref(other, prec, Nearest)
     }
@@ -8993,6 +9033,7 @@ impl Float {
     /// See the [`Float::powr_prec_round`] documentation for information on special cases, overflow,
     /// and underflow.
     #[allow(clippy::needless_pass_by_value)]
+    #[inline]
     pub fn powr_prec_ref_val(&self, other: Self, prec: u64) -> (Self, Ordering) {
         self.powr_prec_round_ref_ref(&other, prec, Nearest)
     }
@@ -9009,6 +9050,7 @@ impl Float {
     ///
     /// See the [`Float::powr_prec_round`] documentation for information on special cases, overflow,
     /// and underflow.
+    #[inline]
     pub fn powr_prec_ref_ref(&self, other: &Self, prec: u64) -> (Self, Ordering) {
         self.powr_prec_round_ref_ref(other, prec, Nearest)
     }
@@ -9199,6 +9241,7 @@ impl Float {
     /// # Panics
     /// Panics if `prec` is zero.
     #[allow(clippy::needless_pass_by_value)]
+    #[inline]
     pub fn powr_prec_assign(&mut self, other: Self, prec: u64) -> Ordering {
         self.powr_prec_round_assign(other, prec, Nearest)
     }
@@ -9218,6 +9261,7 @@ impl Float {
     ///
     /// # Panics
     /// Panics if `prec` is zero.
+    #[inline]
     pub fn powr_prec_assign_ref(&mut self, other: &Self, prec: u64) -> Ordering {
         self.powr_prec_round_assign_ref(other, prec, Nearest)
     }

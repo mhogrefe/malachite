@@ -36,6 +36,7 @@ impl ModSquare<Self> for Natural {
     /// assert_eq!(Natural::from(2u32).mod_square(Natural::from(10u32)), 4);
     /// assert_eq!(Natural::from(100u32).mod_square(Natural::from(497u32)), 60);
     /// ```
+    #[inline]
     fn mod_square(self, m: Self) -> Self {
         (&self).mod_pow(&Self::TWO, &m)
     }
@@ -67,6 +68,7 @@ impl ModSquare<&Self> for Natural {
     /// assert_eq!(Natural::from(2u32).mod_square(&Natural::from(10u32)), 4);
     /// assert_eq!(Natural::from(100u32).mod_square(&Natural::from(497u32)), 60);
     /// ```
+    #[inline]
     fn mod_square(self, m: &Self) -> Self {
         (&self).mod_pow(&Self::TWO, m)
     }
@@ -101,6 +103,7 @@ impl ModSquare<Natural> for &Natural {
     ///     60
     /// );
     /// ```
+    #[inline]
     fn mod_square(self, m: Natural) -> Natural {
         self.mod_pow(&Natural::TWO, &m)
     }
@@ -135,6 +138,7 @@ impl ModSquare<&Natural> for &Natural {
     ///     60
     /// );
     /// ```
+    #[inline]
     fn mod_square(self, m: &Natural) -> Natural {
         self.mod_pow(&Natural::TWO, m)
     }

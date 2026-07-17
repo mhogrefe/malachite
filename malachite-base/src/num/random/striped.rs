@@ -374,6 +374,7 @@ pub fn striped_random_unsigneds<T: PrimitiveUnsigned>(
 ///     ...]"
 /// )
 /// ```
+#[inline]
 pub fn striped_random_positive_unsigneds<T: PrimitiveUnsigned>(
     seed: Seed,
     m_numerator: u64,
@@ -508,6 +509,7 @@ pub fn striped_random_natural_signeds<T: PrimitiveSigned>(
 ///     "[101100, 110000, 1111100, 1111, 1111110, 111, 11101, 1100000, 1111111, 1100000, ...]"
 /// )
 /// ```
+#[inline]
 pub fn striped_random_positive_signeds<T: PrimitiveSigned>(
     seed: Seed,
     m_numerator: u64,
@@ -601,6 +603,7 @@ pub fn striped_random_negative_signeds<T: PrimitiveSigned>(
 ///     ...]"
 /// )
 /// ```
+#[inline]
 pub fn striped_random_nonzero_signeds<T: PrimitiveSigned>(
     seed: Seed,
     m_numerator: u64,
@@ -795,6 +798,7 @@ pub fn striped_random_bool_vecs_from_length_iterator<I: Iterator<Item = u64>>(
 ///     00000, 00000, 11000, 00000, 11111, 00000, 00000, 11111, ...]"
 /// );
 /// ```
+#[inline]
 pub fn striped_random_fixed_length_bool_vecs(
     seed: Seed,
     len: u64,

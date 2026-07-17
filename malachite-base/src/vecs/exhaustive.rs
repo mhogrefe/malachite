@@ -3089,6 +3089,7 @@ pub struct UniqueIndices {
 
 impl UniqueIndices {
     #[doc(hidden)]
+    #[inline]
     pub const fn get_n(&self) -> usize {
         self.used.len()
     }

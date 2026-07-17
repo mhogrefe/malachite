@@ -105,6 +105,7 @@ impl<T: Display + Eq> Debug for RationalSequence<T> {
     ///     "[1, 2, [3, 4]]"
     /// );
     /// ```
+    #[inline]
     fn fmt(&self, f: &mut Formatter) -> Result {
         Display::fmt(self, f)
     }

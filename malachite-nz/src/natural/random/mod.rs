@@ -592,6 +592,7 @@ pub struct UniformRandomNaturalRange {
 impl Iterator for UniformRandomNaturalRange {
     type Item = Natural;
 
+    #[inline]
     fn next(&mut self) -> Option<Natural> {
         self.xs.next().map(|x| &self.a + x)
     }

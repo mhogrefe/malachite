@@ -135,6 +135,7 @@ impl Rational {
     /// assert_eq!(before_point.to_debug_string(), "[3]");
     /// assert_eq!(after_point.to_string(), "[[146, 292, 585]]");
     /// ```
+    #[inline]
     pub fn to_power_of_2_digits(&self, log_base: u64) -> (Vec<Natural>, RationalSequence<Natural>) {
         to_power_of_2_digits_helper(self.abs(), log_base)
     }

@@ -162,6 +162,7 @@ impl Float {
     /// assert_eq!(p.to_string(), "3.162281");
     /// assert_eq!(o, Greater);
     /// ```
+    #[inline]
     pub fn power_of_10_of_float_prec_round_ref(
         pow: &Self,
         prec: u64,
@@ -760,6 +761,7 @@ impl Float {
     /// assert_eq!(p.to_string(), "3.981075");
     /// assert_eq!(o, Greater);
     /// ```
+    #[inline]
     pub fn power_of_10_rational_prec_round_ref(
         x: &Rational,
         prec: u64,

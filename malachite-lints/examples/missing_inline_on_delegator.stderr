@@ -1,0 +1,19 @@
+error: this public function only delegates to another function
+  --> $DIR/missing_inline_on_delegator.rs:5:12
+   |
+LL |     pub fn delegates(&self, x: i32) -> i32 {
+   |            ^^^^^^^^^
+   |
+   = help: mark it `#[inline]` so it can be inlined across crate boundaries
+   = note: `#[deny(missing_inline_on_delegator)]` on by default
+
+error: this public function only delegates to another function
+  --> $DIR/missing_inline_on_delegator.rs:42:8
+   |
+LL | pub fn free_delegates(x: i32) -> i32 {
+   |        ^^^^^^^^^^^^^^
+   |
+   = help: mark it `#[inline]` so it can be inlined across crate boundaries
+
+error: aborting due to 2 previous errors
+
