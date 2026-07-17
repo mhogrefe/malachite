@@ -1,0 +1,19 @@
+error: this loop strips trailing zero bits one at a time
+  --> $DIR/use_trailing_zeros.rs:7:5
+   |
+LL |     while x.even() {
+   |     ^^^^^^^^^^^^^^
+   |
+   = help: compute the shift amount once with `trailing_zeros()`, then shift (and adjust any counter) by that amount
+   = note: `#[deny(use_trailing_zeros)]` on by default
+
+error: this loop strips trailing zero bits one at a time
+  --> $DIR/use_trailing_zeros.rs:17:5
+   |
+LL |     while x.even() {
+   |     ^^^^^^^^^^^^^^
+   |
+   = help: compute the shift amount once with `trailing_zeros()`, then shift (and adjust any counter) by that amount
+
+error: aborting due to 2 previous errors
+

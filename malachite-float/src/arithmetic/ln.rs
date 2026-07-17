@@ -452,29 +452,18 @@ fn log_ui_s(
         let m = (n1 >> 1) + (n2 >> 1) + (n1 & n2 & 1);
         log_ui_s(p, b, t, q, n1, m, p_val, k, true);
         let mut q1 = 0;
-        log_ui_s(
-            &mut p[1..],
-            &mut b[1..],
-            &mut t[1..],
-            &mut q1,
-            m,
-            n2,
-            p_val,
-            k,
-            need_p,
-        );
+        let (p_head, p_tail) = p.split_first_mut().unwrap();
+        let (b_head, b_tail) = b.split_first_mut().unwrap();
+        let (t_head, t_tail) = t.split_first_mut().unwrap();
+        log_ui_s(p_tail, b_tail, t_tail, &mut q1, m, n2, p_val, k, need_p);
         // T[0] <- T[0] * B[1] * 2^q1 + P[0] * B[0] * T[1]
-        let new_t1 = &t[1] * &p[0] * &b[0];
-        t[1] = new_t1;
-        let new_t0 = ((&t[0] * &b[1]) << q1) + &t[1];
-        t[0] = new_t0;
+        t_tail[0] *= &*p_head * &*b_head;
+        *t_head = ((&*t_head * &b_tail[0]) << q1) + &t_tail[0];
         if need_p {
-            let new_p0 = &p[0] * &p[1];
-            p[0] = new_p0;
+            *p_head *= &p_tail[0];
         }
         *q += q1;
-        let new_b0 = &b[0] * &b[1];
-        b[0] = new_b0;
+        *b_head *= &b_tail[0];
     }
 }
 
@@ -491,10 +480,9 @@ fn ln_unsigned_prec_round_normal(n: u64, prec: u64, rm: RoundingMode) -> (Float,
     let mut kk = k;
     if p != 0 {
         // replace p/2^kk by (p/2)/2^(kk-1) so that p is odd
-        while p.even() {
-            p >>= 1;
-            kk -= 1;
-        }
+        let zeros = p.trailing_zeros();
+        p >>= zeros;
+        kk -= u64::from(zeros);
     }
     let mut w = prec + prec.ceiling_log_base_2() + 10;
     loop {
@@ -515,26 +503,20 @@ fn ln_unsigned_prec_round_normal(n: u64, prec: u64, rm: RoundingMode) -> (Float,
         // overflow to Infinity. In that extreme-precision regime, fall back to the
         // arithmetic-geometric-mean logarithm, which is correct at any precision and produces the
         // same correctly-rounded result.
-        let integer_bits =
-            n_terms.saturating_mul(n_terms.ceiling_log_base_2().saturating_add(kk));
-        if integer_bits.saturating_add(64) >= u64::exact_from(Float::MAX_EXPONENT) {
+        let integer_bits = n_terms.saturating_mul(n_terms.ceiling_log_base_2().saturating_add(kk));
+        if integer_bits.saturating_add(64) >= const { Float::MAX_EXPONENT as u64 } {
             return Float::from(n).ln_prec_round(prec, rm);
         }
         let lg_n = usize::exact_from(n_terms.ceiling_log_base_2() + 1);
-        let mut p_arr = vec![Integer::ZERO; lg_n];
-        let mut b_arr = vec![Integer::ZERO; lg_n];
-        let mut t_arr = vec![Integer::ZERO; lg_n];
+        let mut scratch = vec![Integer::ZERO; lg_n * 3];
+        split_into_chunks_mut!(scratch, lg_n, [p_arr, b_arr], t_arr);
         let mut q0 = 0;
-        log_ui_s(
-            &mut p_arr, &mut b_arr, &mut t_arr, &mut q0, 1, n_terms, p, kk, false,
-        );
+        log_ui_s(p_arr, b_arr, t_arr, &mut q0, 1, n_terms, p, kk, false);
         // t = T[0] / (B[0] * 2^q0) = log(n/2^k) approximately
         let t_num = Float::from_integer_prec(take(&mut t_arr[0]), w).0;
         let t_den = Float::from_integer_prec(take(&mut b_arr[0]), w).0 << q0;
-        let mut t = t_num.div_prec(t_den, w).0;
         // argument reconstruction: add k * log(2)
-        let ln_2_k = Float::ln_2_prec(w).0.mul_prec(Float::from(k), w).0;
-        t.add_prec_assign(ln_2_k, w);
+        let t = t_num / t_den + Float::ln_2_prec(w).0 * Float::from_unsigned_prec(k, w).0;
         // The maximal error is at most k + 6 ulps.
         let err = (k + 6).ceiling_log_base_2() + 1;
         if float_can_round(

@@ -13,19 +13,19 @@ LL |     let b = arg.exp_prec_round(prec, Ceiling).0;
    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 error: use plain `exp()` (dropping the `.0`) instead of `exp_prec`: `arg` already has precision `prec`
-  --> $DIR/use_round_variant.rs:39:13
+  --> $DIR/use_round_variant.rs:36:13
    |
 LL |     let c = arg.exp_prec(prec).0;
    |             ^^^^^^^^^^^^^^^^^^
 
 error: use `exp_round(Floor)` instead of `exp_prec_round`: `pi` already has precision `prec`
-  --> $DIR/use_round_variant.rs:42:13
+  --> $DIR/use_round_variant.rs:39:13
    |
 LL |     let d = pi.exp_prec_round(prec, Floor).0;
    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 error: use `mul_round(v, Floor)` instead of `mul_prec_round`: `u` already has precision `prec`
-  --> $DIR/use_round_variant.rs:70:13
+  --> $DIR/use_round_variant.rs:67:13
    |
 LL |     let i = u.mul_prec_round(v, prec, Floor).0;
    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

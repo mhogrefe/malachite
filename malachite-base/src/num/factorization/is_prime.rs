@@ -509,9 +509,7 @@ fn is_probable_prime_bpsw(n: u64) -> bool {
         return is_probable_prime_fermat(n, 2) && is_probable_prime_fibonacci(n);
     }
     let mut d = n - 1;
-    while d.even() {
-        d >>= 1;
-    }
+    d >>= d.trailing_zeros();
     let result = if n.significant_bits() <= FLINT_D_BITS {
         is_strong_probable_prime_preinverted_float(n, 1.0 / (n as f64), 2, d)
     } else {
