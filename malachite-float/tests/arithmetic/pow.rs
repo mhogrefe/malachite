@@ -4452,6 +4452,8 @@ fn pow_rational_properties() {
 
 #[test]
 #[allow(clippy::type_repetition_in_bounds)]
+// Some expected outputs are deliberate approximations of math constants (e.g. 2^(1/2) = sqrt(2)).
+#[allow(clippy::approx_constant)]
 fn test_primitive_float_pow_rational() {
     fn test<T: PrimitiveFloat>(x: T, s: &str, out: T)
     where

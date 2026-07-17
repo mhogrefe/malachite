@@ -10,7 +10,9 @@ use malachite_base::num::arithmetic::traits::{Ln, LnAssign};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
-use malachite_base::test_util::bench::bucketers::primitive_float_bucketer;
+use malachite_base::test_util::bench::bucketers::{
+    primitive_float_bucketer, triple_1_2_primitive_int_bit_u64_max_bucketer,
+};
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::primitive_float_gen;
@@ -36,6 +38,7 @@ use malachite_float::test_util::generators::{
     float_unsigned_rounding_mode_triple_gen_var_19_rm,
     float_unsigned_rounding_mode_triple_gen_var_20,
     rational_unsigned_rounding_mode_triple_gen_var_6,
+    unsigned_unsigned_rounding_mode_triple_gen_var_8,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef};
 use malachite_q::test_util::bench::bucketers::{
@@ -102,6 +105,11 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_float_ln_prec_round_assign);
     register_primitive_float_benches!(runner, benchmark_primitive_float_ln);
     register_bench!(runner, benchmark_float_ln_rational_prec_evaluation_strategy);
+    register_demo!(runner, demo_float_ln_unsigned_prec_round);
+    register_demo!(runner, demo_float_ln_unsigned_prec_round_debug);
+    register_demo!(runner, demo_float_ln_unsigned_prec);
+    register_demo!(runner, demo_float_ln_unsigned_prec_debug);
+    register_bench!(runner, benchmark_float_ln_unsigned_prec_round_algorithms);
     register_bench!(
         runner,
         benchmark_float_ln_rational_prec_round_evaluation_strategy
@@ -1010,5 +1018,92 @@ fn benchmark_primitive_float_ln_rational<T: PrimitiveFloat>(
         &mut [("Malachite", &mut |x| {
             no_out!(primitive_float_ln_rational::<T>(&x));
         })],
+    );
+}
+
+fn demo_float_ln_unsigned_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, prec, rm) in unsigned_unsigned_rounding_mode_triple_gen_var_8::<u64>()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "ln_unsigned_prec_round({}, {}, {}) = {:?}",
+            n,
+            prec,
+            rm,
+            Float::ln_unsigned_prec_round(n, prec, rm)
+        );
+    }
+}
+
+fn demo_float_ln_unsigned_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, prec, rm) in unsigned_unsigned_rounding_mode_triple_gen_var_8::<u64>()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (ln, o) = Float::ln_unsigned_prec_round(n, prec, rm);
+        println!(
+            "ln_unsigned_prec_round({}, {}, {}) = ({:#x}, {:?})",
+            n,
+            prec,
+            rm,
+            ComparableFloat(ln),
+            o
+        );
+    }
+}
+
+fn demo_float_ln_unsigned_prec(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, prec, _rm) in unsigned_unsigned_rounding_mode_triple_gen_var_8::<u64>()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "ln_unsigned_prec({}, {}) = {:?}",
+            n,
+            prec,
+            Float::ln_unsigned_prec(n, prec)
+        );
+    }
+}
+
+fn demo_float_ln_unsigned_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (n, prec, _rm) in unsigned_unsigned_rounding_mode_triple_gen_var_8::<u64>()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (ln, o) = Float::ln_unsigned_prec(n, prec);
+        println!(
+            "ln_unsigned_prec({}, {}) = ({:#x}, {:?})",
+            n,
+            prec,
+            ComparableFloat(ln),
+            o
+        );
+    }
+}
+
+fn benchmark_float_ln_unsigned_prec_round_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float.ln_unsigned_prec_round(u64, u64, RoundingMode)",
+        BenchmarkType::Algorithms,
+        unsigned_unsigned_rounding_mode_triple_gen_var_8::<u64>().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &triple_1_2_primitive_int_bit_u64_max_bucketer("n", "prec"),
+        &mut [
+            ("ln_unsigned (binary splitting)", &mut |(n, prec, rm)| {
+                no_out!(Float::ln_unsigned_prec_round(n, prec, rm));
+            }),
+            ("Float::from(n).ln (AGM)", &mut |(n, prec, rm)| {
+                no_out!(Float::from(n).ln_prec_round(prec, rm));
+            }),
+        ],
     );
 }

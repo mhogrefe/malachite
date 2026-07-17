@@ -20,16 +20,17 @@ use crate::{
     significand_bits,
 };
 use core::cmp::Ordering::{self, *};
-use core::mem::swap;
+use core::mem::{swap, take};
 use malachite_base::num::arithmetic::traits::{
     Abs, Agm, CeilingLogBase2, IsPowerOf2, Ln, LnAssign, Parity, Sign,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::{One, Zero as ZeroTrait};
+use malachite_base::num::basic::traits::{NegativeInfinity, One, Zero as ZeroTrait};
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom, SaturatingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
+use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::float_extras::float_can_round;
 use malachite_nz::platform::Limb;
 use malachite_q::Rational;
@@ -421,6 +422,130 @@ fn ln_rational_helper_extended(x: &Rational, prec: u64, rm: RoundingMode) -> (Fl
         }
         working_prec += increment;
         increment = working_prec >> 1;
+    }
+}
+
+// This is the recursive function S from log_ui.c, MPFR 4.2.2. It performs the binary splitting of
+// the Taylor series of log(1 + x) for x = p/2^k, over the terms n1..n2: the sum is T[0]/(B[0] *
+// 2^q). `p`, `b`, and `t` are per-recursion-depth scratch stacks (indexed by depth); `p_val` is odd
+// or zero.
+#[allow(clippy::too_many_arguments)]
+fn log_ui_s(
+    p: &mut [Integer],
+    b: &mut [Integer],
+    t: &mut [Integer],
+    q: &mut u64,
+    n1: u64,
+    n2: u64,
+    p_val: i64,
+    k: u64,
+    need_p: bool,
+) {
+    if n2 == n1 + 1 {
+        p[0] = Integer::from(if n1 == 1 { p_val } else { -p_val });
+        *q = k;
+        b[0] = Integer::from(n1);
+        // T = B * Q * S where S = P / (B * Q), thus T = P
+        t[0] = p[0].clone();
+    } else {
+        // m = floor((n1 + n2) / 2)
+        let m = (n1 >> 1) + (n2 >> 1) + (n1 & n2 & 1);
+        log_ui_s(p, b, t, q, n1, m, p_val, k, true);
+        let mut q1 = 0;
+        log_ui_s(
+            &mut p[1..],
+            &mut b[1..],
+            &mut t[1..],
+            &mut q1,
+            m,
+            n2,
+            p_val,
+            k,
+            need_p,
+        );
+        // T[0] <- T[0] * B[1] * 2^q1 + P[0] * B[0] * T[1]
+        let new_t1 = &t[1] * &p[0] * &b[0];
+        t[1] = new_t1;
+        let new_t0 = ((&t[0] * &b[1]) << q1) + &t[1];
+        t[0] = new_t0;
+        if need_p {
+            let new_p0 = &p[0] * &p[1];
+            p[0] = new_p0;
+        }
+        *q += q1;
+        let new_b0 = &b[0] * &b[1];
+        b[0] = new_b0;
+    }
+}
+
+// This is mpfr_log_ui from log_ui.c, MPFR 4.2.2, for n >= 3.
+fn ln_unsigned_prec_round_normal(n: u64, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    assert_ne!(rm, Exact, "Inexact ln");
+    // Argument reduction: compute k such that 2/3 < n/2^k < 4/3, i.e., 2^(k+1) < 3n < 2^(k+2). So k
+    // = sizeinbase(3n, 2) - 2.
+    let three_n = 3u128 * u128::from(n);
+    let k = u64::from(128 - three_n.leading_zeros() - 2);
+    // The reduced argument is (n - 2^k)/2^k. p = n - 2^k satisfies |p| < 2^k/3 < n/2 <= i64::MAX,
+    // so it fits in an i64.
+    let mut p = i64::exact_from(i128::from(n) - (1i128 << k));
+    let mut kk = k;
+    if p != 0 {
+        // replace p/2^kk by (p/2)/2^(kk-1) so that p is odd
+        while p.even() {
+            p >>= 1;
+            kk -= 1;
+        }
+    }
+    let mut w = prec + prec.ceiling_log_base_2() + 10;
+    loop {
+        // We need at most w/log2(2^kk/|p|) = w/(kk - log2|p|) terms for an accuracy of w bits.
+        let abs_p = p.unsigned_abs();
+        let n_terms = if abs_p == 0 {
+            2
+        } else {
+            let log2_abs_p = if abs_p == 1 {
+                0
+            } else {
+                abs_p.ceiling_log_base_2()
+            };
+            w.div_ceil(kk - log2_abs_p).max(2)
+        };
+        // The binary-splitting integers T[0] and B[0] * 2^q0 have about n_terms * (log2(n_terms) +
+        // kk) bits; if that exceeds the Float exponent range, converting them to Floats would
+        // overflow to Infinity. In that extreme-precision regime, fall back to the
+        // arithmetic-geometric-mean logarithm, which is correct at any precision and produces the
+        // same correctly-rounded result.
+        let integer_bits =
+            n_terms.saturating_mul(n_terms.ceiling_log_base_2().saturating_add(kk));
+        if integer_bits.saturating_add(64) >= u64::exact_from(Float::MAX_EXPONENT) {
+            return Float::from(n).ln_prec_round(prec, rm);
+        }
+        let lg_n = usize::exact_from(n_terms.ceiling_log_base_2() + 1);
+        let mut p_arr = vec![Integer::ZERO; lg_n];
+        let mut b_arr = vec![Integer::ZERO; lg_n];
+        let mut t_arr = vec![Integer::ZERO; lg_n];
+        let mut q0 = 0;
+        log_ui_s(
+            &mut p_arr, &mut b_arr, &mut t_arr, &mut q0, 1, n_terms, p, kk, false,
+        );
+        // t = T[0] / (B[0] * 2^q0) = log(n/2^k) approximately
+        let t_num = Float::from_integer_prec(take(&mut t_arr[0]), w).0;
+        let t_den = Float::from_integer_prec(take(&mut b_arr[0]), w).0 << q0;
+        let mut t = t_num.div_prec(t_den, w).0;
+        // argument reconstruction: add k * log(2)
+        let ln_2_k = Float::ln_2_prec(w).0.mul_prec(Float::from(k), w).0;
+        t.add_prec_assign(ln_2_k, w);
+        // The maximal error is at most k + 6 ulps.
+        let err = (k + 6).ceiling_log_base_2() + 1;
+        if float_can_round(
+            t.significand_ref().unwrap(),
+            w.saturating_sub(err),
+            prec,
+            rm,
+        ) {
+            return Float::from_float_prec_round(t, prec, rm);
+        }
+        w += w >> 1;
     }
 }
 
@@ -1372,6 +1497,138 @@ impl Float {
     #[inline]
     pub fn ln_rational_prec_ref(x: &Rational, prec: u64) -> (Self, Ordering) {
         Self::ln_rational_prec_round_ref(x, prec, Nearest)
+    }
+
+    /// Computes the natural logarithm of an unsigned integer, returning a [`Float`]. The result is
+    /// rounded to the specified precision and with the specified rounding mode. An [`Ordering`] is
+    /// also returned, indicating whether the rounded logarithm is less than, equal to, or greater
+    /// than the exact logarithm.
+    ///
+    /// This is typically faster than converting the integer to a [`Float`] and taking its
+    /// logarithm, as it uses binary splitting of the Taylor series of the logarithm rather than the
+    /// arithmetic-geometric mean iteration.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(n,p,m) = \ln{n}+\varepsilon.
+    /// $$
+    /// - If $\ln{n}$ is infinite or zero, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $\ln{n}$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 (\ln{n})\rfloor-p+1}$.
+    /// - If $\ln{n}$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 (\ln{n})\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p,m)=-\infty$
+    /// - $f(1,p,m)=0.0$
+    ///
+    /// Neither overflow nor underflow is possible.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::ln_unsigned_prec`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the logarithm is irrational (that is,
+    /// whenever $n \geq 2$).
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (ln, o) = Float::ln_unsigned_prec_round(10, 100, Floor);
+    /// assert_eq!(ln.to_string(), "2.302585092994045684017991454684");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (ln, o) = Float::ln_unsigned_prec_round(10, 100, Ceiling);
+    /// assert_eq!(ln.to_string(), "2.302585092994045684017991454687");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (ln, o) = Float::ln_unsigned_prec_round(1, 10, Exact);
+    /// assert_eq!(ln.to_string(), "0.0");
+    /// assert_eq!(o, Equal);
+    /// ```
+    ///
+    /// This is `mpfr_log_ui` from `log_ui.c`, MPFR 4.2.2.
+    pub fn ln_unsigned_prec_round(n: u64, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        match n {
+            // log(0) is an exact -Infinity
+            0 => (Self::NEGATIVE_INFINITY, Equal),
+            // log(1) = 0, the only "normal" case where the result is exact
+            1 => (Self::ZERO, Equal),
+            2 => Self::ln_2_prec_round(prec, rm),
+            _ => ln_unsigned_prec_round_normal(n, prec, rm),
+        }
+    }
+
+    /// Computes the natural logarithm of an unsigned integer, returning a [`Float`]. The result is
+    /// rounded to the specified precision and to the nearest value. An [`Ordering`] is also
+    /// returned, indicating whether the rounded logarithm is less than, equal to, or greater than
+    /// the exact logarithm.
+    ///
+    /// This is typically faster than converting the integer to a [`Float`] and taking its
+    /// logarithm, as it uses binary splitting of the Taylor series of the logarithm rather than the
+    /// arithmetic-geometric mean iteration.
+    ///
+    /// If the logarithm is equidistant from two [`Float`]s with the specified precision, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(n,p) = \ln{n}+\varepsilon.
+    /// $$
+    /// - If $\ln{n}$ is infinite or zero, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $\ln{n}$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   (\ln{n})\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p)=-\infty$
+    /// - $f(1,p)=0.0$
+    ///
+    /// Neither overflow nor underflow is possible.
+    ///
+    /// If you want to specify a rounding mode as well, consider using
+    /// [`Float::ln_unsigned_prec_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n (\log n)^2)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (ln, o) = Float::ln_unsigned_prec(10, 100);
+    /// assert_eq!(ln.to_string(), "2.302585092994045684017991454684");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (ln, o) = Float::ln_unsigned_prec(0, 10);
+    /// assert_eq!(ln.to_string(), "-Infinity");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn ln_unsigned_prec(n: u64, prec: u64) -> (Self, Ordering) {
+        Self::ln_unsigned_prec_round(n, prec, Nearest)
     }
 }
 

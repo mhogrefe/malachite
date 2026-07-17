@@ -1,0 +1,15 @@
+series	size	time_ns
+ln_unsigned (binary splitting)	61	5979
+ln_unsigned (binary splitting)	62	10417
+ln_unsigned (binary splitting)	63	5844
+ln_unsigned (binary splitting)	64	5187
+ln_unsigned (binary splitting)	68	23417
+ln_unsigned (binary splitting)	82	7541
+ln_unsigned (binary splitting)	84	19521
+Float::from(n).ln (AGM)	61	3729
+Float::from(n).ln (AGM)	62	3666
+Float::from(n).ln (AGM)	63	2812
+Float::from(n).ln (AGM)	64	3284
+Float::from(n).ln (AGM)	68	7167
+Float::from(n).ln (AGM)	82	7062
+Float::from(n).ln (AGM)	84	7208

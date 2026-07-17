@@ -37,6 +37,7 @@ use malachite_float::test_util::generators::{
     float_unsigned_pair_gen_var_4, float_unsigned_rounding_mode_triple_gen_var_19,
     float_unsigned_rounding_mode_triple_gen_var_20,
     rational_unsigned_rounding_mode_triple_gen_var_6,
+    unsigned_unsigned_rounding_mode_triple_gen_var_8,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_nz::platform::Limb;
@@ -3415,4 +3416,140 @@ where
 #[test]
 fn primitive_float_ln_rational_properties() {
     apply_fn_to_primitive_floats!(primitive_float_ln_rational_properties_helper);
+}
+
+#[test]
+fn test_ln_unsigned_prec_round() {
+    let test = |n: u64, prec: u64, rm: RoundingMode, out: &str, out_hex: &str, o_out: Ordering| {
+        let (ln, o) = Float::ln_unsigned_prec_round(n, prec, rm);
+        assert!(ln.is_valid());
+        assert_eq!(ln.to_string(), out);
+        assert_eq!(to_hex_string(&ln), out_hex);
+        assert_eq!(o, o_out);
+
+        // ln_unsigned(n) agrees with the natural logarithm of the same integer as a Float.
+        let (ln_alt, o_alt) = Float::from(n).ln_prec_round(prec, rm);
+        assert_eq!(ComparableFloatRef(&ln_alt), ComparableFloatRef(&ln));
+        assert_eq!(o_alt, o_out);
+
+        if rm == Nearest {
+            let (ln_alt, o_alt) = Float::ln_unsigned_prec(n, prec);
+            assert_eq!(ComparableFloatRef(&ln_alt), ComparableFloatRef(&ln));
+            assert_eq!(o_alt, o_out);
+        }
+    };
+    // log(0) = -Infinity and log(1) = 0 are exact, even under Exact rounding.
+    test(0, 5, Floor, "-Infinity", "-Infinity", Equal);
+    test(0, 5, Nearest, "-Infinity", "-Infinity", Equal);
+    test(0, 5, Exact, "-Infinity", "-Infinity", Equal);
+    test(1, 5, Floor, "0.0", "0x0.0", Equal);
+    test(1, 5, Exact, "0.0", "0x0.0", Equal);
+    // n = 2 delegates to the ln(2) constant.
+    test(2, 20, Floor, "0.693147", "0x0.b1721#20", Less);
+    test(2, 20, Ceiling, "0.693148", "0x0.b1722#20", Greater);
+    test(2, 20, Nearest, "0.693147", "0x0.b1721#20", Less);
+    // General n >= 3.
+    test(3, 20, Floor, "1.098612", "0x1.193ea#20", Less);
+    test(3, 20, Ceiling, "1.098614", "0x1.193ec#20", Greater);
+    test(3, 1, Nearest, "1.0", "0x1.0#1", Less);
+    test(5, 20, Nearest, "1.609438", "0x1.9c042#20", Greater);
+    test(10, 30, Floor, "2.302585091", "0x2.4d76377#30", Less);
+    test(
+        100,
+        40,
+        Ceiling,
+        "4.60517018599",
+        "0x4.9aec6eed58#40",
+        Greater,
+    );
+    test(
+        1000,
+        53,
+        Nearest,
+        "6.907755278982137",
+        "0x6.e862a663ffe80#53",
+        Less,
+    );
+    // Powers of 2 exercise the p = 0 path (the Taylor part is 0, result is k * log(2)).
+    test(4, 20, Floor, "1.386293", "0x1.62e42#20", Less);
+    test(4, 20, Ceiling, "1.386295", "0x1.62e44#20", Greater);
+    test(16, 10, Floor, "2.77", "0x2.c5#10", Less);
+    // Large n: u64::MAX and u64::MAX / 3 (MPFR's slow case).
+    test(
+        18446744073709551615,
+        53,
+        Nearest,
+        "44.3614195558365",
+        "0x2c.5c85fdf473de#53",
+        Less,
+    );
+    test(
+        6148914691236517205,
+        100,
+        Nearest,
+        "43.26280726716839011125340042778",
+        "0x2b.43475649a3adc17ad4d358ac#100",
+        Greater,
+    );
+    test(
+        1000000,
+        200,
+        Nearest,
+        "13.81551055796427410410794872810618524560660893177263785619997",
+        "0xd.d0c54cc7ffd02225f824141443c8f3d53d7e376c78cf595c6#200",
+        Greater,
+    );
+}
+
+#[test]
+fn ln_unsigned_fail() {
+    // Zero precision.
+    assert_panic!(Float::ln_unsigned_prec_round(3, 0, Nearest));
+    assert_panic!(Float::ln_unsigned_prec(3, 0));
+    // Exact rounding of an irrational logarithm (n >= 2).
+    assert_panic!(Float::ln_unsigned_prec_round(2, 10, Exact));
+    assert_panic!(Float::ln_unsigned_prec_round(3, 10, Exact));
+}
+
+fn ln_unsigned_prec_round_properties_helper(n: u64, prec: u64, rm: RoundingMode) {
+    let (ln, o) = Float::ln_unsigned_prec_round(n, prec, rm);
+    assert!(ln.is_valid());
+
+    // The oracle is the natural logarithm of the same integer as a Float.
+    let (ln_alt, o_alt) = Float::from(n).ln_prec_round(prec, rm);
+    assert_eq!(ComparableFloatRef(&ln), ComparableFloatRef(&ln_alt));
+    assert_eq!(o, o_alt);
+
+    if rm == Nearest {
+        let (ln_alt, o_alt) = Float::ln_unsigned_prec(n, prec);
+        assert_eq!(ComparableFloatRef(&ln_alt), ComparableFloatRef(&ln));
+        assert_eq!(o_alt, o);
+    }
+
+    if ln.is_normal() {
+        assert_eq!(ln.get_prec(), Some(prec));
+    }
+}
+
+#[test]
+fn ln_unsigned_prec_round_properties() {
+    unsigned_unsigned_rounding_mode_triple_gen_var_8::<u64>().test_properties(|(n, prec, rm)| {
+        ln_unsigned_prec_round_properties_helper(n, prec, rm);
+    });
+}
+
+#[test]
+fn test_ln_unsigned_high_prec() {
+    // At high precision the algorithm exercises deep binary-splitting recursion and multiple Ziv
+    // iterations. Cross-check against the natural logarithm of the same integer.
+    for n in [3u64, 5, 7, 10, 1000, u64::MAX, 6148914691236517205] {
+        for prec in [1000u64, 10000, 50000] {
+            for rm in [Floor, Ceiling, Nearest] {
+                let (a, oa) = Float::ln_unsigned_prec_round(n, prec, rm);
+                let (b, ob) = Float::from(n).ln_prec_round(prec, rm);
+                assert_eq!(ComparableFloatRef(&a), ComparableFloatRef(&b));
+                assert_eq!(oa, ob);
+            }
+        }
+    }
 }

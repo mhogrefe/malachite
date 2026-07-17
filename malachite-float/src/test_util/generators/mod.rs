@@ -4121,6 +4121,16 @@ pub fn unsigned_unsigned_rounding_mode_triple_gen_var_5<T: PrimitiveUnsigned>()
     )
 }
 
+// All `(n, prec, RoundingMode)` that are valid inputs to `Float::ln_unsigned_prec_round`.
+pub fn unsigned_unsigned_rounding_mode_triple_gen_var_8<T: PrimitiveUnsigned>()
+-> Generator<(T, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_unsigned_unsigned_rounding_mode_triple_gen_var_8,
+        &random_unsigned_unsigned_rounding_mode_triple_gen_var_5,
+        &special_random_unsigned_unsigned_rounding_mode_triple_gen_var_7,
+    )
+}
+
 // All `(T, u64, RoundingMode)` that are valid inputs to `Float::from_unsigned_prec_round`,
 // excluding those with `Exact`.
 pub fn unsigned_unsigned_rounding_mode_triple_gen_var_6<T: PrimitiveUnsigned>()
@@ -4437,6 +4447,24 @@ pub fn float_rounding_mode_pair_gen_var_47() -> Generator<(Float, RoundingMode)>
         &exhaustive_float_rounding_mode_pair_gen_var_47,
         &random_float_rounding_mode_pair_gen_var_47,
         &special_random_float_rounding_mode_pair_gen_var_47,
+    )
+}
+
+// All `(Float, u64, RoundingMode)` that are valid inputs to `Float.cbrt_prec_round`.
+pub fn float_unsigned_rounding_mode_triple_gen_var_37() -> Generator<(Float, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_unsigned_rounding_mode_triple_gen_var_37,
+        &random_float_unsigned_rounding_mode_triple_gen_var_37,
+        &special_random_float_unsigned_rounding_mode_triple_gen_var_37,
+    )
+}
+
+// All `(Float, RoundingMode)` that are valid inputs to `Float.cbrt_round`.
+pub fn float_rounding_mode_pair_gen_var_48() -> Generator<(Float, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_rounding_mode_pair_gen_var_48,
+        &random_float_rounding_mode_pair_gen_var_48,
+        &special_random_float_rounding_mode_pair_gen_var_48,
     )
 }
 

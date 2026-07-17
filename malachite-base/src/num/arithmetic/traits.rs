@@ -1501,6 +1501,18 @@ pub trait RootAssign<POW> {
     fn root_assign(&mut self, pow: POW);
 }
 
+/// Takes the cube root of a number.
+pub trait Cbrt {
+    type Output;
+
+    fn cbrt(self) -> Self::Output;
+}
+
+/// Replaces a number with its cube root.
+pub trait CbrtAssign {
+    fn cbrt_assign(&mut self);
+}
+
 /// Rotates a number left, inserting the leftmost bits into the right end.
 pub trait RotateLeft {
     type Output;

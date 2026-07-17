@@ -4669,6 +4669,22 @@ pub fn exhaustive_unsigned_unsigned_rounding_mode_triple_gen_var_6<T: PrimitiveU
     ))
 }
 
+// All `(n, prec, RoundingMode)` that are valid inputs to `Float::ln_unsigned_prec_round`: `Exact`
+// is only allowed when log(n) is exact, i.e. n is 0 or 1.
+pub fn exhaustive_unsigned_unsigned_rounding_mode_triple_gen_var_8<T: PrimitiveUnsigned>()
+-> It<(T, u64, RoundingMode)> {
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(
+                exhaustive_unsigneds::<T>(),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref n, _prec), rm)| rm != Exact || n.significant_bits() <= 1),
+    ))
+}
+
 pub fn exhaustive_unsigned_unsigned_rounding_mode_triple_gen_var_7<T: PrimitiveUnsigned>()
 -> It<(T, u64, RoundingMode)> {
     reshape_2_1_to_3(Box::new(lex_pairs(
@@ -5167,6 +5183,37 @@ pub fn exhaustive_float_rounding_mode_pair_gen_var_47() -> It<(Float, RoundingMo
     Box::new(
         lex_pairs(exhaustive_floats(), exhaustive_rounding_modes())
             .filter(|(f, rm)| exp_round_valid(f, *rm)),
+    )
+}
+
+// Whether `(x, prec, rm)` is a valid input to `Float::cbrt_prec_round`: `Exact` is only allowed
+// when the cube root really is exact at the given precision.
+pub fn cbrt_prec_round_valid(x: &Float, prec: u64, rm: RoundingMode) -> bool {
+    rm != Exact || x.cbrt_prec_round_ref(prec, Floor).1 == Equal
+}
+
+// Whether `(x, rm)` is a valid input to `Float::cbrt_round`.
+pub fn cbrt_round_valid(x: &Float, rm: RoundingMode) -> bool {
+    rm != Exact || x.cbrt_round_ref(Floor).1 == Equal
+}
+
+// All `(Float, u64, RoundingMode)` that are valid inputs to `Float.cbrt_prec_round`.
+pub fn exhaustive_float_unsigned_rounding_mode_triple_gen_var_37() -> It<(Float, u64, RoundingMode)>
+{
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(exhaustive_floats(), exhaustive_positive_primitive_ints()),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, p), rm)| cbrt_prec_round_valid(x, p, rm)),
+    ))
+}
+
+// All `(Float, RoundingMode)` that are valid inputs to `Float.cbrt_round`.
+pub fn exhaustive_float_rounding_mode_pair_gen_var_48() -> It<(Float, RoundingMode)> {
+    Box::new(
+        lex_pairs(exhaustive_floats(), exhaustive_rounding_modes())
+            .filter(|(f, rm)| cbrt_round_valid(f, *rm)),
     )
 }
 

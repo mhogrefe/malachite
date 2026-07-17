@@ -14,6 +14,8 @@ pub mod add;
 /// Taking the AGM (arithmetic-geometric mean) of two [`Float`](super::Float)s, and of
 /// [`Float`](super::Float)s with [`Rational`](malachite_q::Rational)s.
 pub mod agm;
+/// Cube root of [`Float`](super::Float)s and of [`Rational`](malachite_q::Rational)s.
+pub mod cbrt;
 /// Division of [`Float`](super::Float)s, of [`Float`](super::Float)s by
 /// [`Rational`](malachite_q::Rational)s, and of [`Rational`](malachite_q::Rational)s by
 /// [`Float`](super::Float)s.

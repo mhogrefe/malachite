@@ -65,6 +65,7 @@ pub mod arithmetic {
     pub mod abs;
     pub mod add;
     pub mod agm;
+    pub mod cbrt;
     pub mod div;
     pub mod exp;
     pub mod exp_x_minus_1;
