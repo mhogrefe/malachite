@@ -801,7 +801,7 @@ fn regular_ab(np: &mut NumberParts, p: &Float, spec: &PrintfSpec) -> i32 {
         };
         // base 16: get_str's exponent is base-16 with the point before the first digit; we want
         // base-2 with the point after the first digit
-        let exp = if base == 16 { (e - 1) * 4 } else { e - 1 };
+        let exp = if base == 16 { (e - 1) << 2 } else { e - 1 };
         (digits, exp)
     } else {
         let mut e = i64::from(p.get_exponent().unwrap());

@@ -54,9 +54,9 @@ const IWIDTH: i32 = Limb::WIDTH as i32;
 const NEG_ONE: Limb = Limb::MAX;
 const NEG_TWO: Limb = Limb::MAX - 1;
 const WIDTH_P1: u64 = Limb::WIDTH + 1;
-const TWICE_WIDTH: u64 = Limb::WIDTH * 2;
+const TWICE_WIDTH: u64 = Limb::WIDTH << 1;
 const THRICE_WIDTH: u64 = Limb::WIDTH * 3;
-const TWICE_WIDTH_P1: u64 = Limb::WIDTH * 2 + 1;
+const TWICE_WIDTH_P1: u64 = (Limb::WIDTH << 1) + 1;
 
 pub fn sub_float_significands_in_place(
     mut x: &mut Natural,

@@ -438,7 +438,7 @@ fn limbs_half_gcd_jacobi(
             success = true;
         }
         if n > s + 2 {
-            let p = 2 * s - n + 1;
+            let p = (s << 1) - n + 1;
             let scratch_len = limbs_half_gcd_matrix_init_scratch_len(n - p);
             let (scratch_lo, scratch_hi) = scratch.split_at_mut(scratch_len);
             let mut m1 = HalfGcdMatrix::init(n - p, scratch_lo);

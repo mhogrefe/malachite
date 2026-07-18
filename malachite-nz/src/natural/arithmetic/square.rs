@@ -176,7 +176,7 @@ pub_const_test! {limbs_square_to_out_toom_2_scratch_len(xs_len: usize) -> usize 
 
 /// This is equivalent to `MAYBE_sqr_toom2` from `mpn/generic/toom2_sqr.c`, GMP 6.2.1.
 const TOOM2_MAYBE_SQR_TOOM2: bool =
-    TUNE_PROGRAM_BUILD || WANT_FAT_BINARY || SQR_TOOM3_THRESHOLD >= 2 * SQR_TOOM2_THRESHOLD;
+    TUNE_PROGRAM_BUILD || WANT_FAT_BINARY || SQR_TOOM3_THRESHOLD >= SQR_TOOM2_THRESHOLD << 1;
 
 // # Worst-case complexity
 // $T(n) = O(n^{\log_2 3}) \approx O(n^{1.585})$
@@ -489,13 +489,13 @@ pub_const_test! {limbs_square_to_out_toom_4_scratch_len(xs_len: usize) -> usize 
 
 // This is equivalent to `MAYBE_sqr_toom2` from `mpn/generic/toom4_sqr.c`, GMP 6.2.1.
 const TOOM4_MAYBE_SQR_TOOM2: bool =
-    TUNE_PROGRAM_BUILD || SQR_TOOM4_THRESHOLD < 4 * SQR_TOOM3_THRESHOLD;
+    TUNE_PROGRAM_BUILD || SQR_TOOM4_THRESHOLD < SQR_TOOM3_THRESHOLD << 2;
 
 // TODO tune
 
 // This is equivalent to `MAYBE_sqr_toom4` from `mpn/generic/toom4_sqr.c`, GMP 6.2.1.
 const TOOM4_MAYBE_SQR_TOOM4: bool =
-    TUNE_PROGRAM_BUILD || SQR_TOOM6_THRESHOLD >= 4 * SQR_TOOM4_THRESHOLD;
+    TUNE_PROGRAM_BUILD || SQR_TOOM6_THRESHOLD >= SQR_TOOM4_THRESHOLD << 2;
 
 // # Worst-case complexity
 // $T(n) = O(n^{\log_4 7}) \approx O(n^{1.404})$
@@ -816,7 +816,7 @@ const SQR_TOOM8_MAX: usize = if SQR_FFT_THRESHOLD <= usize::MAX - (8 * 2 - 1 + 7
 
 /// This is equivalent to `MAYBE_sqr_basecase` from `mpn/generic/toom8_sqr.c`, GMP 6.2.1.
 const TOOM8_MAYBE_SQR_BASECASE: bool =
-    TUNE_PROGRAM_BUILD || SQR_TOOM8_THRESHOLD < 8 * SQR_TOOM2_THRESHOLD;
+    TUNE_PROGRAM_BUILD || SQR_TOOM8_THRESHOLD < SQR_TOOM2_THRESHOLD << 3;
 
 // TODO tune
 
@@ -828,7 +828,7 @@ const TOOM8_MAYBE_SQR_ABOVE_BASECASE: bool =
 
 /// This is equivalent to `MAYBE_sqr_toom2` from `mpn/generic/toom8_sqr.c`, GMP 6.2.1.
 const TOOM8_MAYBE_SQR_TOOM2: bool =
-    TUNE_PROGRAM_BUILD || SQR_TOOM8_THRESHOLD < 8 * SQR_TOOM3_THRESHOLD;
+    TUNE_PROGRAM_BUILD || SQR_TOOM8_THRESHOLD < SQR_TOOM3_THRESHOLD << 3;
 
 // TODO tune
 
@@ -840,7 +840,7 @@ const TOOM8_MAYBE_SQR_ABOVE_TOOM2: bool =
 
 /// This is equivalent to `MAYBE_sqr_toom3` from `mpn/generic/toom8_sqr.c`, GMP 6.2.1.
 const TOOM8_MAYBE_SQR_TOOM3: bool =
-    TUNE_PROGRAM_BUILD || SQR_TOOM8_THRESHOLD < 8 * SQR_TOOM4_THRESHOLD;
+    TUNE_PROGRAM_BUILD || SQR_TOOM8_THRESHOLD < SQR_TOOM4_THRESHOLD << 3;
 
 // TODO tune
 
@@ -852,7 +852,7 @@ const TOOM8_MAYBE_SQR_ABOVE_TOOM3: bool =
 
 /// This is equivalent to `MAYBE_sqr_toom4` from `mpn/generic/toom8_sqr.c`, GMP 6.2.1.
 const TOOM8_MAYBE_SQR_TOOM4: bool =
-    TUNE_PROGRAM_BUILD || SQR_TOOM8_THRESHOLD < 8 * SQR_TOOM6_THRESHOLD;
+    TUNE_PROGRAM_BUILD || SQR_TOOM8_THRESHOLD < SQR_TOOM6_THRESHOLD << 3;
 
 // TODO tune
 

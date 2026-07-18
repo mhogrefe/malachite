@@ -210,9 +210,9 @@ pub_crate_test! { limbs_mul_greater_to_out_scratch_len(xs_len: usize, ys_len: us
                 limbs_mul_greater_to_out_toom_42_scratch_len(xs_len, ys_len)
             };
             max(first_mul_scratch_len, second_mul_scratch_len) + four_ys_len
-        } else if 4 * xs_len < 5 * ys_len {
+        } else if xs_len << 2 < 5 * ys_len {
             limbs_mul_greater_to_out_toom_22_scratch_len(xs_len, ys_len)
-        } else if 4 * xs_len < 7 * ys_len {
+        } else if xs_len << 2 < 7 * ys_len {
             limbs_mul_greater_to_out_toom_32_scratch_len(xs_len, ys_len)
         } else {
             limbs_mul_greater_to_out_toom_42_scratch_len(xs_len, ys_len)
@@ -360,9 +360,9 @@ pub_crate_test! {limbs_mul_greater_to_out_old(
             let (scratch_lo, scratch_hi) = scratch.split_at(ys_len);
             out[ys_len..ys_len + xs_len].copy_from_slice(&scratch_hi[..xs_len]);
             assert!(!limbs_slice_add_greater_in_place_left(out, scratch_lo));
-        } else if 4 * xs_len < 5 * ys_len {
+        } else if xs_len << 2 < 5 * ys_len {
             limbs_mul_greater_to_out_toom_22(out, xs, ys, scratch);
-        } else if 4 * xs_len < 7 * ys_len {
+        } else if xs_len << 2 < 7 * ys_len {
             limbs_mul_greater_to_out_toom_32(out, xs, ys, scratch);
         } else {
             limbs_mul_greater_to_out_toom_42(out, xs, ys, scratch);

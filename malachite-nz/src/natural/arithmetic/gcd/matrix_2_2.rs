@@ -138,7 +138,7 @@ fn limbs_add_signed_same_length_in_place_left(
 // This is equivalent to `mpn_matrix22_mul_itch` from `mpn/generic/matrix22_mul.c`, GMP 6.2.1.
 pub_const_test! {limbs_matrix_mul_2_2_scratch_len(xs_len: usize, ys_len: usize) -> usize {
     if xs_len < MATRIX22_STRASSEN_THRESHOLD || ys_len < MATRIX22_STRASSEN_THRESHOLD {
-        3 * xs_len + 2 * ys_len
+        3 * xs_len + (ys_len << 1)
     } else {
         3 * (xs_len + ys_len) + 5
     }

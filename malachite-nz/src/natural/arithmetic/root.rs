@@ -266,7 +266,7 @@ fn limbs_root_to_out_internal(
     // exp <= (3 / 2) ^ exp * S ^ exp. Since S ^ exp fits in xs_len limbs, the number of extra limbs
     // needed is bounded by ceil(exp * log_2(3 / 2) / B), where B is `Limb::WIDTH`.
     let extra = (((0.585 * (exp as f64)) / (Limb::WIDTH as f64)) as usize) + 2;
-    let mut big_scratch = vec![0; 3 * xs_len + 2 * extra + 1];
+    let mut big_scratch = vec![0; 3 * xs_len + (extra << 1) + 1];
     let (scratch, remainder) = big_scratch.split_at_mut(xs_len + 1);
     // - qs will contain quotient and remainder of R / (exp * S ^ (exp - 1)).
     // - ws will contain S ^ (k-1) and exp *S^(k-1).

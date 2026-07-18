@@ -387,7 +387,7 @@ fn mul_float_significands_same_prec_w(
     }
 }
 
-const TWICE_WIDTH: u64 = Limb::WIDTH * 2;
+const TWICE_WIDTH: u64 = Limb::WIDTH << 1;
 const THRICE_WIDTH: u64 = Limb::WIDTH * 3;
 
 // This is mpfr_mul_2 from mul.c, MPFR 4.2.0.

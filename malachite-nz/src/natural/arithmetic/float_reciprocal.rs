@@ -45,7 +45,7 @@ use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::slices::slice_test_zero;
 
-const TWICE_WIDTH: u64 = Limb::WIDTH * 2;
+const TWICE_WIDTH: u64 = Limb::WIDTH << 1;
 
 // This is mpfr_div from div.c, MPFR 4.3.0, specialized for reciprocation.
 pub fn reciprocal_float_significand_in_place(

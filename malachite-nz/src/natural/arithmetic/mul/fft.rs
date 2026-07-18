@@ -1018,9 +1018,9 @@ fn slow_mpn_to_fft_easy(
             const B: usize = BLK_SZ >> 3;
             zi_hi[0] = x_0;
             zi_hi[B] = x_1;
-            zi_hi[const { 2 * B }] = x_2;
+            zi_hi[const { B << 1 }] = x_2;
             zi_hi[const { 3 * B }] = x_3;
-            zi_hi[const { 4 * B }] = x_4;
+            zi_hi[const { B << 2 }] = x_4;
             zi_hi[const { 5 * B }] = x_5;
             zi_hi[const { 6 * B }] = x_6;
             zi_hi[const { 7 * B }] = x_7;

@@ -236,7 +236,7 @@ fn square_float_significand_same_prec_w(x: Limb, rm: RoundingMode) -> (Limb, boo
     }
 }
 
-const TWICE_WIDTH: u64 = Limb::WIDTH * 2;
+const TWICE_WIDTH: u64 = Limb::WIDTH << 1;
 const THRICE_WIDTH: u64 = Limb::WIDTH * 3;
 
 // This is mpfr_sqr_2 from sqr.c, MPFR 4.2.0.

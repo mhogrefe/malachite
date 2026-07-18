@@ -150,10 +150,10 @@ pub(crate) const WANT_FAT_BINARY: bool = true;
 // TODO tune
 #[cfg(feature = "test_build")]
 pub const TOOM22_MAYBE_MUL_TOOM22: bool =
-    TUNE_PROGRAM_BUILD || WANT_FAT_BINARY || MUL_TOOM33_THRESHOLD >= 2 * MUL_TOOM22_THRESHOLD;
+    TUNE_PROGRAM_BUILD || WANT_FAT_BINARY || MUL_TOOM33_THRESHOLD >= MUL_TOOM22_THRESHOLD << 1;
 #[cfg(not(feature = "test_build"))]
 const TOOM22_MAYBE_MUL_TOOM22: bool =
-    TUNE_PROGRAM_BUILD || WANT_FAT_BINARY || MUL_TOOM33_THRESHOLD >= 2 * MUL_TOOM22_THRESHOLD;
+    TUNE_PROGRAM_BUILD || WANT_FAT_BINARY || MUL_TOOM33_THRESHOLD >= MUL_TOOM22_THRESHOLD << 1;
 
 fn limbs_mul_same_length_to_out_toom_22_recursive_scratch_len(xs_len: usize) -> usize {
     if !TOOM22_MAYBE_MUL_TOOM22 || xs_len < MUL_TOOM22_THRESHOLD {
@@ -443,8 +443,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_32_scratch_len(
     };
     let s = xs_len - (n << 1);
     let t = ys_len - n;
-    2 * n
-        + 1
+    (n << 1) + 1
         + max(
             limbs_mul_same_length_to_out_scratch_len(n),
             limbs_mul_to_out_scratch_len(s, t),
@@ -984,7 +983,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_33(
         // size: m
         limbs_mul_same_length_to_out_toom_33_recursive(v_neg_1, asm1, bsm1, mul_scratch);
     }
-    let (v_2, mul_scratch) = scratch[2 * n + 1..].split_at_mut(3 * n + 4);
+    let (v_2, mul_scratch) = scratch[(n << 1) + 1..].split_at_mut(3 * n + 4);
     // size: m
     limbs_mul_same_length_to_out_toom_33_recursive(v_2, as2, bs2, mul_scratch);
     let v_inf = &mut out[n << 2..];
@@ -1027,14 +1026,14 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_33(
         }
         v_1_hi[0] = carry;
     } else {
-        let carry = v_1[2 * n + 1];
+        let carry = v_1[(n << 1) + 1];
         // size: m
         limbs_mul_same_length_to_out_toom_33_recursive(v_1, as1, bs1, mul_scratch);
-        v_1[2 * n + 1] = carry;
+        v_1[(n << 1) + 1] = carry;
     }
     // size: n
     limbs_mul_same_length_to_out_toom_33_recursive(out, &xs[..n], &ys[..n], mul_scratch);
-    let (v_neg_1, v_2) = scratch.split_at_mut(2 * n + 1);
+    let (v_neg_1, v_2) = scratch.split_at_mut((n << 1) + 1);
     limbs_mul_toom_interpolate_5_points(out, v_2, v_neg_1, n, s + t, v_neg_1_neg, v_inf0);
 }}
 
@@ -1203,7 +1202,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_42(
     assert!(*asm1_last <= 1);
     assert!(*as2_last <= 14);
     assert!(bs2[n] <= 2);
-    let (v_neg_1, v_2) = scratch_hi.split_at_mut(2 * n + 1);
+    let (v_neg_1, v_2) = scratch_hi.split_at_mut((n << 1) + 1);
     split_into_chunks_mut!(out, n << 1, [v_0, v_1], v_inf);
     // size: n
     limbs_mul_same_length_to_out(v_neg_1, asm1_init, bsm1, mul_scratch);
@@ -1568,8 +1567,8 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_44(
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
-    let n = xs_len.shr_round(2, Ceiling).0;
-    let m = 2 * n + 1;
+    let n: usize = xs_len.shr_round(2, Ceiling).0;
+    let m = (n << 1) + 1;
     split_into_chunks!(xs, n, [xs_0, xs_1, xs_2], xs_3);
     let s = xs_3.len();
     assert_ne!(s, 0);
@@ -2113,7 +2112,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_53(
     let (v_1, v_inf) = remainder.split_at_mut(n << 2);
     // size: n + 1
     limbs_mul_same_length_to_out(scratch, as2, bs2, mul_scratch);
-    let m = 2 * n + 1;
+    let m = (n << 1) + 1;
     // size: n + 1
     limbs_mul_same_length_to_out(&mut scratch[m..], asm2, bsm2, mul_scratch);
     // size: n + 1
@@ -2179,7 +2178,12 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_53(
             limbs_mul_same_length_to_out(v_neg_1_init, asm1_init, bsm1_init, mul_scratch);
         } else {
             // size: n + 1
-            limbs_mul_same_length_to_out(&mut scratch[3 * m..8 * n + 5], asm1, bsm1, mul_scratch);
+            limbs_mul_same_length_to_out(
+                &mut scratch[3 * m..(n << 3) + 5],
+                asm1,
+                bsm1,
+                mul_scratch,
+            );
         }
         v_1[n << 1] = 0;
         if (*as1_last | *bs1_last) == 0 {
@@ -2600,7 +2604,7 @@ pub_test! {limbs_mul_greater_to_out_toom_62(
     let (as1_last, as1_init) = as1.split_last_mut().unwrap();
     let (asm1_last, asm1_init) = asm1.split_last_mut().unwrap();
     let (bs1_last, bs1_init) = bs1.split_last_mut().unwrap();
-    let p = 2 * n + 1;
+    let p = (n << 1) + 1;
     // size: m
     limbs_mul_same_length_to_out(scratch, as2, bs2, mul_scratch);
     // size: m

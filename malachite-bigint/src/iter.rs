@@ -22,7 +22,7 @@ impl<'a> U32Digits<'a> {
     pub(crate) fn new(iter: LimbIterator<'a>) -> Self {
         let iter_len = iter.len();
         let last_hi_is_zero = iter_len != 0 && (iter[iter_len - 1] >> 32) == 0;
-        let len = iter_len * 2 - usize::from(last_hi_is_zero);
+        let len = (iter_len << 1) - usize::from(last_hi_is_zero);
         Self {
             iter,
             next_hi: None,

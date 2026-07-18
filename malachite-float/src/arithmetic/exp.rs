@@ -438,7 +438,7 @@ pub(crate) fn exp_3(x: &Float, precy: u64, rm: RoundingMode) -> (Float, Ordering
         for _ in 0..SHIFT {
             tmp.square_prec_round_assign(prec, Floor);
         }
-        twopoweri *= 2;
+        twopoweri <<= 1;
         // General case.
         let iter = k.min(prec_x);
         for i in 1..=iter {
@@ -547,7 +547,7 @@ pub(crate) fn exp_2(x: &Float, precy: u64, rm: RoundingMode) -> (Float, Ordering
     let k_param = if precy < EXP_2_THRESHOLD {
         precy.div_ceil(2).floor_sqrt() + 3
     } else {
-        (4 * precy).floor_root(3)
+        (precy << 2).floor_root(3)
     };
     let l = (precy - 1) / k_param + 1;
     let mut err = k_param + ((l << 1) + 18).ceiling_log_base_2();

@@ -34,7 +34,7 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::slices::slice_test_zero;
 
-const TWICE_WIDTH: u64 = Limb::WIDTH * 2;
+const TWICE_WIDTH: u64 = Limb::WIDTH << 1;
 const THRICE_WIDTH: u64 = Limb::WIDTH * 3;
 
 pub fn add_float_significands_in_place(

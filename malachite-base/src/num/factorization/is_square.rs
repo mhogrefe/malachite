@@ -74,7 +74,7 @@ impl_unsigned!(usize);
 
 // From mpn/generic/mod_34lsub1.c
 const B1: u64 = u64::WIDTH >> 2;
-const B2: u64 = B1 * 2;
+const B2: u64 = B1 << 1;
 const B3: u64 = B1 * 3;
 
 const M2: u64 = (1 << B2) - 1;
@@ -142,7 +142,7 @@ fn perfsqr_mod_1(r: u64, d: u64, inv: u64, mask: u64) -> bool {
 
 // Double limb. Check precomputed bitmasks to see if remainder is a quadratic residue
 fn perfsqr_mod_2(r: u64, d: u64, inv: u64, mhi: u64, mlo: u64) -> bool {
-    assert!(d <= const { 2 * u64::WIDTH });
+    assert!(d <= const { u64::WIDTH << 1 });
     let mut idx = perfsqr_mod_idx(r, d, inv);
     let m = if idx < u64::WIDTH { mlo } else { mhi };
     idx %= u64::WIDTH;

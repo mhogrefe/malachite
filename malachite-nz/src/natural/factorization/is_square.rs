@@ -18,7 +18,7 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::factorization::traits::IsSquare;
 
-const MOD34_BITS: Limb = ((Limb::WIDTH as Limb) / 4) * 3;
+const MOD34_BITS: Limb = ((Limb::WIDTH as Limb) >> 2) * 3;
 const MOD34_MASK: Limb = (1 << MOD34_BITS) - 1;
 
 // This is PERFSQR_MOD_BITS from mpn/perfsqr.h, GMP 6.3.0. Either 49 on 64 bit limb or 25 on 32 bit
@@ -27,8 +27,8 @@ const SQR_MOD_BITS: Limb = MOD34_BITS + 1;
 const SQR_MOD_MASK: Limb = (1 << SQR_MOD_BITS) - 1;
 
 // From mpn/generic/mod_34lsub1.c
-const B1: Limb = (Limb::WIDTH as Limb) / 4;
-const B2: Limb = B1 * 2;
+const B1: Limb = (Limb::WIDTH as Limb) >> 2;
+const B2: Limb = B1 << 1;
 const B3: Limb = B1 * 3;
 
 const M1: Limb = (1 << B1) - 1;
@@ -125,7 +125,7 @@ fn perfsqr_mod_1(r: Limb, d: Limb, inv: Limb, mask: Limb) -> bool {
 
 // Double limb. Check precomputed bitmasks to see if remainder is a quadratic residue
 fn perfsqr_mod_2(r: Limb, d: Limb, inv: Limb, mhi: Limb, mlo: Limb) -> bool {
-    assert!(d <= 2 * Limb::WIDTH as Limb);
+    assert!(d <= (Limb::WIDTH as Limb) << 1);
     let mut idx = perfsqr_mod_idx(r, d, inv);
     let m = if idx < Limb::WIDTH as Limb { mlo } else { mhi };
     idx %= Limb::WIDTH as Limb;

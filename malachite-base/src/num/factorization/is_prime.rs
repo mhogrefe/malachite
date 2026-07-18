@@ -375,6 +375,9 @@ fn is_probable_prime_lucas(n: u64) -> bool {
     if neg_d {
         d.wrapping_neg_assign();
     }
+    // Faithful to the C source: this signed division truncates toward zero, which `>>` (floor)
+    // would not preserve for the negative dividend here.
+    #[cfg_attr(dylint_lib = "malachite_lints", allow(mul_div_by_power_of_2_literal))]
     let mut q = u64::wrapping_from(1i64.wrapping_sub(i64::wrapping_from(d)) / 4);
     if q.get_highest_bit() {
         q.wrapping_add_assign(n);

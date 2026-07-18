@@ -276,7 +276,7 @@ pub(crate) fn limbs_mul_toom_interpolate_6_points(
     w1: &mut [Limb],
 ) {
     assert_ne!(n, 0);
-    let m = 2 * n + 1;
+    let m = (n << 1) + 1;
     assert_ne!(n_high, 0);
     assert!(n_high < m);
     assert_eq!(w1.len(), m);
@@ -488,7 +488,7 @@ pub(crate) fn limbs_mul_toom_interpolate_7_points(
     w5: &mut [Limb],
     scratch: &mut [Limb],
 ) {
-    let m = 2 * n + 1;
+    let m = (n << 1) + 1;
     assert_ne!(n_high, 0);
     assert!(n_high < m);
     assert_eq!(w1.len(), m);
@@ -990,7 +990,7 @@ pub_crate_test! {limbs_mul_toom_interpolate_12_points<'a>(
     let r4 = &mut r4[..m];
     // Interpolation
     if half {
-        let (r2, r0) = r2.split_at_mut(4 * n);
+        let (r2, r0) = r2.split_at_mut(n << 2);
         let r0 = &mut r0[..s_plus_t];
         let (r3_lo, r3_hi) = r3.split_at_mut(s_plus_t);
         if limbs_sub_same_length_in_place_left(r3_lo, r0) {
@@ -1252,7 +1252,7 @@ pub_crate_test! {limbs_mul_toom_interpolate_16_points<'a>(
         let (pp_lo_first, pp_lo_tail) = pp_lo.split_first().unwrap();
         assert!(!limbs_sub_limb_in_place(r1_hi, pp_lo_first >> 6));
         let carry = limbs_shl_and_sub_same_length(r1_hi, pp_lo_tail, Limb::WIDTH - 6, scratch);
-        limbs_sub_limb_in_place(&mut r1_hi[2 * n - 1..], carry);
+        limbs_sub_limb_in_place(&mut r1_hi[(n << 1) - 1..], carry);
     } else {
         let carry = limbs_shl_and_sub_same_length(&mut r7[n..], pp_lo, CORRECTED_WIDTH, scratch);
         r7.last_mut().unwrap().wrapping_sub_assign(carry);

@@ -147,7 +147,7 @@ fn get_perfect_power_u32(n: u32) -> Option<(u32, u64)> {
                 return Some((3, exp));
             } else if count == exp {
                 return Some((6, exp));
-            } else if count == 2 * exp {
+            } else if count == exp << 1 {
                 return Some((12, exp));
             }
         }
@@ -284,7 +284,7 @@ fn get_perfect_power_u64(n: u64) -> Option<(u64, u64)> {
                 return Some((3, exp));
             } else if count == exp {
                 return Some((6, exp));
-            } else if count == 2 * exp {
+            } else if count == exp << 1 {
                 return Some((12, exp));
             }
         }

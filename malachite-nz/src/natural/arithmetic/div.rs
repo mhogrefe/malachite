@@ -1366,7 +1366,7 @@ fn limbs_div_barrett_approx_is_len(q_len: usize, d_len: usize) -> usize {
         let b = q_len.saturating_sub(1) / d_len + 1; // ceil(q_len / d_len), number of blocks
         q_len.saturating_sub(1) / b + 1 // ceil(q_len / b) = ceil(q_len / ceil(q_len / d_len))
     } else if 3 * q_len > d_len {
-        q_len.saturating_sub(1) / 2 + 1 // b = 2
+        (q_len.saturating_sub(1) >> 1) + 1 // b = 2
     } else {
         q_len.saturating_sub(1) + 1 // b = 1
     }

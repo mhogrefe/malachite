@@ -1,0 +1,40 @@
+error: use `<< 3` instead of multiplying by `8`
+  --> $DIR/mul_div_by_power_of_2_literal.rs:3:14
+   |
+LL |     let m1 = a * 8;
+   |              ^^^^^
+   |
+   = note: `#[deny(mul_div_by_power_of_2_literal)]` on by default
+
+error: use `<< 4` instead of multiplying by `16`
+  --> $DIR/mul_div_by_power_of_2_literal.rs:5:14
+   |
+LL |     let m2 = 16 * a;
+   |              ^^^^^^
+
+error: use `>> 2` instead of dividing by `4`
+  --> $DIR/mul_div_by_power_of_2_literal.rs:7:14
+   |
+LL |     let d1 = a / 4;
+   |              ^^^^^
+
+error: use `shr_round(3, Down)` (or `>> 3`, which takes the floor) instead of dividing by `8`
+  --> $DIR/mul_div_by_power_of_2_literal.rs:9:14
+   |
+LL |     let d2 = b / 8;
+   |              ^^^^^
+
+error: use `<<= 1` instead of multiplying by `2`
+  --> $DIR/mul_div_by_power_of_2_literal.rs:12:5
+   |
+LL |     ma *= 2;
+   |     ^^^^^^^
+
+error: use `>>= 5` instead of dividing by `32`
+  --> $DIR/mul_div_by_power_of_2_literal.rs:15:5
+   |
+LL |     da /= 32;
+   |     ^^^^^^^^
+
+error: aborting due to 6 previous errors
+

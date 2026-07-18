@@ -67,7 +67,7 @@ impl Float {
     pub fn pi_prec_round(prec: u64, rm: RoundingMode) -> (Self, Ordering) {
         // we need 9 * 2 ^ kmax - 4 >= px + 2 * kmax + 8
         let mut kmax = 2;
-        while ((prec + 2 * kmax + 12) / 9) >> kmax != 0 {
+        while ((prec + (kmax << 1) + 12) / 9) >> kmax != 0 {
             kmax += 1;
         }
         // guarantees no recomputation for px <= 10000

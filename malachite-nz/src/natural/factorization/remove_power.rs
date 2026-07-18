@@ -43,7 +43,7 @@ pub fn limbs_remove(
     // Temporary work buffers
     let mut qp = vec![0; un + 1];
     let mut qp2 = vec![0; un + 1];
-    let mut tp = vec![0; (un + 1 + vn) / 2];
+    let mut tp = vec![0; (un + 1 + vn) >> 1];
 
     // Copy input into quotient buffer
     qp[..un].copy_from_slice(up);
@@ -98,7 +98,7 @@ pub fn limbs_remove(
             break;
         }
 
-        let nn = 2 * pn - 1;
+        let nn = (pn << 1) - 1;
         if nn > qn {
             break;
         }
@@ -112,7 +112,7 @@ pub fn limbs_remove(
         } else {
             powers_storage.len()
         };
-        let np_end = np_offset + 2 * pn;
+        let np_end = np_offset + (pn << 1);
         powers_storage.resize(np_end, 0);
         let mut scratch = vec![0; limbs_square_to_out_scratch_len(pn)];
         if current_power_is_vp {
@@ -132,7 +132,7 @@ pub fn limbs_remove(
                 // Source and destination don't overlap - safe to borrow both
                 let (src_part, dst_part) = powers_storage.split_at_mut(np_offset);
                 let src = &src_part[current_power_offset..src_end];
-                limbs_square_to_out(&mut dst_part[..2 * pn], src, &mut scratch);
+                limbs_square_to_out(&mut dst_part[..pn << 1], src, &mut scratch);
             } else {
                 // Fallback: copy source data to avoid overlapping borrows
                 //

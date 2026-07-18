@@ -69,6 +69,9 @@ fn cmp2_helper(b: &Float, c: &Float, cancel: &mut u64) -> Ordering {
     }
 }
 
+// The exponent-scaling divisions below halve signed exponents with truncation toward zero, faithful
+// to MPFR's agm.c and to the bound proofs in the comments; `>>` (floor) would not preserve them.
+#[cfg_attr(dylint_lib = "malachite_lints", allow(mul_div_by_power_of_2_literal))]
 fn agm_prec_round_normal(
     mut a: Float,
     mut b: Float,
@@ -226,6 +229,8 @@ fn agm_prec_round_normal(
     v.shr_prec_round(scaleop + scaleit, prec, rm)
 }
 
+// See `agm_prec_round_normal`: the signed exponent halving truncates toward zero on purpose.
+#[cfg_attr(dylint_lib = "malachite_lints", allow(mul_div_by_power_of_2_literal))]
 fn agm_prec_round_ref_ref_normal(
     a: &Float,
     b: &Float,

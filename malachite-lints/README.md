@@ -163,17 +163,18 @@ the reference operator impls exist precisely to avoid that.
 
 Flags `x.numerator_ref().significant_bits() + x.denominator_ref().significant_bits()` (in either
 order, and with the `to_numerator`/`to_denominator` accessors too) for a [`Rational`] `x`. That sum
-is exactly what `Rational::significant_bits` returns, in constant time; write `x.significant_bits()`.
+is exactly what `Rational::significant_bits` returns, in constant time; write
+`x.significant_bits()`.
 
 ### `redundant_from_in_literal_comparison`
 
 Flags widening a primitive integer with `from` only to compare the result with an integer literal,
 like `i64::from(x) <= 32`. Because `from` is an exact, value-preserving conversion, dropping it
-leaves the comparison unchanged as long as the literal is representable in the source type: `x <= 32`
-(the literal takes the source type). Fires for every comparison operator and either operand order,
-but not when the literal is out of the source type's range (then the conversion is load-bearing) or
-when the other operand is not a literal. Distinct from `redundant_from_in_comparison`, which is about
-comparing a *bignum* with `Bignum::from(primitive)`.
+leaves the comparison unchanged as long as the literal is representable in the source type:
+`x <= 32` (the literal takes the source type). Fires for every comparison operator and either
+operand order, but not when the literal is out of the source type's range (then the conversion is
+load-bearing) or when the other operand is not a literal. Distinct from
+`redundant_from_in_comparison`, which is about comparing a *bignum* with `Bignum::from(primitive)`.
 
 ### `use_square`
 
@@ -183,9 +184,11 @@ or `square_assign()`.
 
 ### `use_parity`
 
-Flags parity tests of a `Natural` or `Integer` spelled as `x % 2 == 0` (or compared with 1, with
-`% 2` written with a literal or the `TWO` constant) or as `divisible_by(2)`: use `even()` and
-`odd()`.
+Flags parity tests spelled the long way — `x % 2` or `x & 1` compared with 0 or 1 (with `% 2`
+written as a literal or the `TWO` constant), or `divisible_by(2)` — for a `Natural`, an `Integer`,
+or a primitive integer: use `even()` and `odd()`. The `% 2 == 1` / `!= 1` forms are skipped for
+*signed* primitives, whose remainder can be `-1`, so `% 2` does not test oddness there; the
+`== 0` / `!= 0` forms and every `& 1` form are safe for all integer types.
 
 ### `use_reciprocal`
 
@@ -253,9 +256,101 @@ Flags rounding one of the named [`Float`] constants that are exact at every prec
 (by value or by reference). The rounding is a no-op: the rounding mode is dead and the ordering is
 always `Equal`, so write the dedicated constructor, `(Float::one_prec(prec), Equal)`.
 
+### `compare_with_primitive`
+
+Flags comparing a bignum with a named bignum constant (`ZERO`, `ONE`, `TWO`, `NEGATIVE_ONE`) or
+with `Bignum::from(primitive)` in method position (`cmp`, `partial_cmp`, `eq`, `ne`), suggesting a
+direct comparison against the primitive: `*x == 1u32`, `x.partial_cmp(&1u32).unwrap()`. The bignum
+types implement `PartialEq`/`PartialOrd` against the primitives (a total order, since a bignum can
+represent every primitive value), so neither a constant nor a conversion is needed. Unsigned
+literals are preferred for nonnegative values. Operator-position `from` comparisons belong to
+`redundant_from_in_comparison`; this covers the method forms and the named-constant comparisons.
+
+### `use_round_variant`
+
+Flags `x.foo_prec_round(p, rm)` or `x.foo_prec(p)` when `x` is an immutable local whose `let`
+initializer already pins its precision to that same expression `p` — the explicit precision is
+redundant. Use the `foo_round(rm)` shorthand, or plain `foo()` when the `_prec` call's `Ordering`
+is discarded with `.0` (`t.ln_prec(wp).0` becomes `t.ln()`, not `t.ln_round(Nearest).0`). Binary
+operations (`x.mul_prec_round(y, p, rm)`) fire only when *every* `Float` operand is independently
+precision-pinned, since the `_round` variants compute at the maximum of the operand precisions. The
+lint tracks the binding through `.0`/tuple patterns and bails if any precision-source local is
+reassigned or mutably borrowed before the use.
+
+### `use_saturating_from`
+
+Flags `T::exact_from(EXPR.max(0))` (and `0.max(EXPR)`) for an *unsigned* `T`: use
+`T::saturating_from(EXPR)`. The `.max(0)` already commits to clamping the low end, so pairing it
+with `exact_from`'s panic-on-overflow is inconsistent; `saturating_from` clamps both ends (its low
+bound of 0 for an unsigned target is exactly what `.max(0)` does), and is equivalent whenever the
+source cannot exceed `T`'s maximum. Only unsigned targets fire — signed `saturating_from` clamps
+the low end to `MIN`, not 0, which would differ.
+
+### `use_divisible_by`
+
+Flags `x % b == 0` or `x % b != 0` for a primitive integer, `Natural`, or `Integer`: use
+`x.divisible_by(b)` (or `!x.divisible_by(b)`). Divisor 2 is excluded and left to `use_parity`.
+
+### `use_width_mask`
+
+Flags `x % T::WIDTH` for a primitive integer: since a type's bit width is a power of two, this is
+`x & T::WIDTH_MASK`, which is cheaper and states the bit-masking intent directly. `WIDTH_MASK` is a
+`u64` like `WIDTH`, so there is no type mismatch. The `% WIDTH == 0` / `!= 0` forms are left to
+`use_divisible_by`.
+
+### `use_checked_log_base_2`
+
+Flags an `if x.is_power_of_2() { .. }` whose body then takes `x.floor_log_base_2()` (or
+`floor_log_base_2_abs()`) of the same receiver: `checked_log_base_2()` returns `Some(exact log)`
+exactly when the value is a power of two, so `if let Some(e) = x.checked_log_base_2()` tests the
+condition and produces the log in one call. Fires only for receivers that have `CheckedLogBase2` —
+a primitive integer, a `Natural`, or a `Rational` (not `Integer` or `Float`).
+
+### `missing_inline_on_delegator`
+
+Flags a public function whose entire body is a single forwarding call — a thin delegator like
+`fn foo(&self) -> T { self.inner.foo() }` — that lacks `#[inline]`. Trivial wrappers are not
+inlined across crate boundaries without the attribute, defeating the point of the delegation.
+Construction (a body that is just a `Ctor` call) is not delegation and is not flagged; functions
+already carrying `#[inline]` (or `#[inline(never)]`) are left alone.
+
+### `use_trailing_zeros`
+
+Flags a loop that strips trailing zero bits one at a time — `while x.even() { x >>= 1; }`, with an
+optional `counter += 1` — and suggests `x.trailing_zeros()`, which computes the same shift count
+directly. The loop body may do the `x >>= 1` and at most one counter update on a different place;
+anything else (a `let`, a second shift) bails.
+
+### `use_exact_from`
+
+Flags `T::try_from(x).unwrap()` for an integer target `T`: use `T::exact_from(x)`, Malachite's
+idiom for a conversion that panics on an out-of-range value. The two are equivalent for integers,
+since `try_from` fails exactly when the value is out of range. The integer-target guard leaves
+`char`, `NonZero`, and other non-range `TryFrom` uses alone.
+
+### `shift_of_one`
+
+Flags shifting `1` or `T::ONE` left by an amount, where a named `malachite-base` helper reads at
+the level of the operation: `(1 << n) - 1` builds a low-`n`-bit mask, so `T::low_mask(n)`;
+`x & (1 << n) != 0` (or `== 0`) tests bit `n`, so `x.get_bit(n)` (or `!x.get_bit(n)`); and any
+other `1 << n` is two-to-the-`n`, so `T::power_of_2(n)`. A *constant* shift amount is left alone
+(`1 << 70` folds at compile time, but `power_of_2(70)` is a runtime call), as are const contexts (a
+`const`/`static` item or a `const fn`), where the helpers — not being const fns — could not be
+called anyway.
+
+### `mul_div_by_power_of_2_literal`
+
+Flags multiplying or dividing a primitive integer by a power-of-two literal (`x * 8`, `x / 16`, and
+the `*=`/`/=` forms): use a shift. This is the primitive-integer companion of
+`mul_div_by_power_of_2`, which covers the bignum `x * T::power_of_2(k)` spelling. Signed division
+truncates toward zero while `>>` takes the floor, so a signed `/` converts to `shr_round(k, Down)`
+(or plain `>>` when the floor is wanted). Unlike `*`, a shift does not detect value overflow — `<<`
+drops the high bits where `*` would panic in a debug build — so `<<` is appropriate only where
+overflow is already ruled out.
+
 ## Tests
 
 `cargo test` in this directory runs UI tests: `ui/main.rs` exercises `long_lines` (the basic
 case, `dylint.toml` exceptions and their staleness, and `allow`/`expect` attribute exemptions and
-their staleness), and the files under `examples/` exercise the two type-aware lints against real
-Malachite types.
+their staleness), and the files under `examples/` (one per lint, run by `ui_examples`) exercise the
+type-aware lints against real Malachite types.
