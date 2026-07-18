@@ -24,7 +24,9 @@ use crate::exhaustive::{
 use crate::test_util::extra_variadic::{
     exhaustive_triples_from_single, exhaustive_triples_xxy, exhaustive_triples_xxy_custom_output,
 };
-use crate::test_util::generators::common::valid_float_get_str_quadruple;
+use crate::test_util::generators::common::{
+    FLOAT_FORMAT_COMBO_COUNT, format_string_from_parts, valid_float_get_str_quadruple,
+};
 use crate::{Float, significand_bits};
 use alloc::vec::IntoIter;
 use core::cmp::Ordering::*;
@@ -44,6 +46,7 @@ use malachite_base::num::exhaustive::{
 };
 use malachite_base::num::iterators::{BitDistributorSequence, bit_distributor_sequence};
 use malachite_base::num::logic::traits::{NotAssign, SignificantBits};
+use malachite_base::options::exhaustive::exhaustive_options;
 use malachite_base::orderings::exhaustive::exhaustive_orderings;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
@@ -1613,6 +1616,22 @@ pub fn exhaustive_float_float_rounding_mode_triple_gen_var_38() -> It<(Float, Fl
 
 pub fn exhaustive_float_integer_pair_gen() -> It<(Float, Integer)> {
     Box::new(exhaustive_pairs(exhaustive_floats(), exhaustive_integers()))
+}
+
+// All `(Float, String)` where the `String` is a valid single-conversion `%R` printf format string.
+// The format strings are assembled from their parts (see `format_string_from_parts`), so every
+// output is valid by construction; the field width and precision are capped so the strings and
+// their outputs stay small.
+pub fn exhaustive_float_string_pair_gen_var_1() -> It<(Float, String)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_floats(),
+        exhaustive_triples(
+            primitive_int_increasing_inclusive_range(0, FLOAT_FORMAT_COMBO_COUNT - 1),
+            exhaustive_options(primitive_int_increasing_inclusive_range(0u64, 30)),
+            exhaustive_options(primitive_int_increasing_inclusive_range(0u64, 20)),
+        )
+        .map(|(combo, width, prec)| format_string_from_parts(combo, width, prec)),
+    ))
 }
 
 pub fn exhaustive_float_integer_pair_gen_var_1() -> It<(Float, Integer)> {

@@ -195,6 +195,7 @@ pub mod conversion {
     pub mod primitive_int_from_float;
     pub mod rational_from_float;
     pub mod string {
+        pub mod format_float;
         pub mod get_str;
     }
 }

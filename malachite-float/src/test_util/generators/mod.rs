@@ -1172,6 +1172,16 @@ pub fn float_integer_pair_gen() -> Generator<(Float, Integer)> {
     )
 }
 
+// All `(Float, String)` where the `String` is a valid single-conversion `%R` printf format string
+// (as accepted by `format_float_str`).
+pub fn float_string_pair_gen_var_1() -> Generator<(Float, String)> {
+    Generator::new(
+        &exhaustive_float_string_pair_gen_var_1,
+        &random_float_string_pair_gen_var_1,
+        &special_random_float_string_pair_gen_var_1,
+    )
+}
+
 pub fn float_integer_pair_gen_rm() -> Generator<((rug::Float, rug::Integer), (Float, Integer))> {
     Generator::new(
         &|| float_integer_pair_rm(exhaustive_float_integer_pair_gen()),

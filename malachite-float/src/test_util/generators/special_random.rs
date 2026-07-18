@@ -58,7 +58,7 @@ use crate::test_util::generators::random::{
     RandomExtremeFiniteFloats, RandomExtremeNonNegativeFiniteFloats,
     RandomExtremeNonzeroFiniteFloats, RandomExtremePositiveFiniteFloats,
     RandomMixedExtremeFiniteFloats, RandomMixedExtremeNonNegativeFiniteFloats,
-    RandomMixedExtremePositiveFiniteFloats,
+    RandomMixedExtremePositiveFiniteFloats, random_format_strings,
 };
 use malachite_base::bools::random::{random_bools, weighted_random_bools};
 use malachite_base::iterators::{WithSpecialValues, with_special_values};
@@ -2535,6 +2535,29 @@ pub fn special_random_float_integer_pair_gen(config: &GenConfig) -> It<(Float, I
                 config.get_or("mean_bits_d", 1),
             )
         },
+    ))
+}
+
+// All `(Float, String)` where the `Float` is striped and the `String` is a valid single-conversion
+// `%R` printf format string. The format string carries no bits to stripe, so it reuses the random
+// format-string generator.
+pub fn special_random_float_string_pair_gen_var_1(config: &GenConfig) -> It<(Float, String)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_floats(
+                seed,
+                config.get_or("mean_exponent_n", 64),
+                config.get_or("mean_exponent_d", 1),
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_precision_n", 64),
+                config.get_or("mean_precision_d", 1),
+                config.get_or("mean_zero_p_n", 1),
+                config.get_or("mean_zero_p_d", 64),
+            )
+        },
+        &|seed| random_format_strings(seed, config),
     ))
 }
 

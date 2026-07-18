@@ -9,9 +9,11 @@
 use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
+    format_float::register(runner);
     get_str::register(runner);
     to_string::register(runner);
 }
 
+mod format_float;
 mod get_str;
 mod to_string;

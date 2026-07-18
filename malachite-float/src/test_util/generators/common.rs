@@ -27,6 +27,50 @@ pub fn valid_float_get_str_quadruple(x: &Float, b0: i64, m: usize, rnd: Rounding
     rnd != Exact || matches!(get_str(x, b0, m, Down), Some((_, _, Equal)))
 }
 
+// The nine Float conversion specifiers, in `format_string_from_parts`'s `combo` order.
+const FLOAT_FORMAT_CONV_CHARS: &[u8; 9] = b"aAbeEfFgG";
+// The six flag characters, selected by the low six bits of `combo`.
+const FLOAT_FORMAT_FLAG_CHARS: &[u8; 6] = b"#0+ -'";
+// The five rounding characters, selected (1-indexed) by `combo`.
+const FLOAT_FORMAT_RND_CHARS: &[u8; 5] = b"DUYZN";
+// The number of distinct `combo` values: 2^6 flag subsets times 9 conversions times 6 rounding
+// choices (a rounding character or none).
+pub const FLOAT_FORMAT_COMBO_COUNT: u16 = 64 * 9 * 6;
+
+// Assembles a valid single-conversion `%R` printf format string from its parts (see
+// `format_float_str`), so that generators can build valid format strings by construction rather
+// than by filtering. `combo` (which should be less than `FLOAT_FORMAT_COMBO_COUNT`) selects, via
+// its low six bits, a subset of the flag characters, and via the rest a conversion character and an
+// optional rounding character; `width` and `prec` are the optional field width and precision. Every
+// output parses as a valid Float conversion, so no rounding mode is `Exact` (there is no format
+// character for it) and none of the `format_float_str` failure paths can be reached.
+pub fn format_string_from_parts(combo: u16, width: Option<u64>, prec: Option<u64>) -> String {
+    let flags = combo & 0x3f;
+    let selector = combo >> 6; // in 0..54
+    let conv = usize::from(selector % 9);
+    let rnd = selector / 9; // in 0..6; 0 means no rounding character
+    let mut s = vec![b'%'];
+    for (i, &c) in FLOAT_FORMAT_FLAG_CHARS.iter().enumerate() {
+        if flags & (1 << i) != 0 {
+            s.push(c);
+        }
+    }
+    if let Some(w) = width {
+        s.extend_from_slice(w.to_string().as_bytes());
+    }
+    if let Some(p) = prec {
+        s.push(b'.');
+        s.extend_from_slice(p.to_string().as_bytes());
+    }
+    s.push(b'R');
+    if rnd != 0 {
+        s.push(FLOAT_FORMAT_RND_CHARS[usize::from(rnd) - 1]);
+    }
+    s.push(FLOAT_FORMAT_CONV_CHARS[conv]);
+    // `s` is ASCII by construction
+    String::from_utf8(s).unwrap()
+}
+
 pub fn float_rm(xs: It<Float>) -> It<(rug::Float, Float)> {
     Box::new(xs.map(|x| (rug::Float::exact_from(&x), x)))
 }
