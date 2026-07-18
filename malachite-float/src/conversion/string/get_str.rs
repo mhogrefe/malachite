@@ -30,7 +30,7 @@ use malachite_nz::natural::arithmetic::float_extras::{limbs_get_str, limbs_get_s
 // log(beta)`. Both approximations are entries of `MPFR_L2B`.
 //
 // This is `mpfr_ceil_mul` from `get_str.c`, MPFR 4.2.2.
-fn ceil_mul(e: i64, beta: u64, i: usize) -> i64 {
+pub(crate) fn ceil_mul(e: i64, beta: u64, i: usize) -> i64 {
     // p = mantissa * 2 ^ (exp - 128): the l2b approximation as an exact `Float`.
     let (mantissa, exp) = MPFR_L2B[usize::exact_from(beta) - 2][i];
     let p = Float::from_natural_prec(Natural::from(mantissa), 128).0;
@@ -51,7 +51,7 @@ fn ceil_mul(e: i64, beta: u64, i: usize) -> i64 {
 // `base` must be between 2 and 62, inclusive.
 //
 // This is `mpfr_get_str_ndigits` from `get_str.c`, MPFR 4.2.2.
-fn get_str_ndigits(base: u64, bit_len: u64) -> usize {
+pub(crate) fn get_str_ndigits(base: u64, bit_len: u64) -> usize {
     assert!((2..=62).contains(&base));
     // Deal first with power-of-two bases, since even for those, `ceil_mul` might return a value too
     // large by 1. For `base = 2 ^ k`, this is `1 + ceil((bit_len - 1) / k) = 2 + floor((bit_len -
