@@ -16,8 +16,10 @@ use crate::platform::Limb;
 use alloc::vec::Vec;
 use core::cmp::Ordering::Equal;
 use core::mem::swap;
-use malachite_base::num::arithmetic::traits::Parity;
+use malachite_base::num::arithmetic::traits::{Parity, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::logic::traits::LowMask;
 use malachite_base::slices::slice_test_zero;
 
 // Remove the largest power of V from U that doesn't exceed the given cap
@@ -153,14 +155,14 @@ pub fn limbs_remove(
         current_power_offset = np_offset;
     }
 
-    let mut pwr = (1usize << npowers) - 1;
+    let mut pwr = usize::low_mask(u64::exact_from(npowers));
 
     for i in (0..npowers).rev() {
         let pn = pwpsn[i];
         if qn < pn {
             continue;
         }
-        if pwr + (1usize << i) > cap {
+        if pwr + usize::power_of_2(u64::exact_from(i)) > cap {
             continue;
         }
 
@@ -190,7 +192,7 @@ pub fn limbs_remove(
             qn += 1;
         }
 
-        pwr += 1usize << i;
+        pwr += usize::power_of_2(u64::exact_from(i));
     }
 
     wp.clear();

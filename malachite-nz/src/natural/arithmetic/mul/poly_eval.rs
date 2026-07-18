@@ -328,6 +328,9 @@ pub(crate) fn limbs_mul_toom_evaluate_poly_in_2_and_neg_2(
         v_neg_2_neg.not_assign();
     }
     limbs_slice_add_same_length_in_place_left(v_2, scratch);
+    // The shift is meant to wrap to 0 when `degree + 1` reaches the limb width, which makes the
+    // bound checks below vacuous; `power_of_2` would panic there instead.
+    #[cfg_attr(dylint_lib = "malachite_lints", allow(shift_of_one))]
     let mut shift = 1 << (degree + 1);
     if shift != 0 {
         assert!(v_2[n] < shift - 1);

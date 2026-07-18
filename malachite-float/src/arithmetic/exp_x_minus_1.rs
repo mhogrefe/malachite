@@ -22,7 +22,7 @@ use crate::{
 use core::cmp::Ordering::{self, *};
 use core::cmp::max;
 use malachite_base::num::arithmetic::traits::{
-    CeilingLogBase2, ExpXMinus1, ExpXMinus1Assign, Sign,
+    CeilingLogBase2, ExpXMinus1, ExpXMinus1Assign, PowerOf2, Sign,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -91,7 +91,7 @@ fn exp_x_minus_1_prec_round_normal(x: &Float, prec: u64, rm: RoundingMode) -> (F
                 if exp_t > 64 {
                     u64::MAX
                 } else {
-                    1u64 << (exp_t - 1)
+                    u64::power_of_2(u64::exact_from(exp_t - 1))
                 },
             )
         } else {

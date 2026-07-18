@@ -7,11 +7,11 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use clippy_utils::diagnostics::span_lint_and_help;
+use rustc_hir::attrs::InlineAttr;
 use rustc_hir::def::{DefKind, Res};
 use rustc_hir::intravisit::FnKind;
 use rustc_hir::{Body, Expr, ExprKind, FnDecl};
 use rustc_lint::{LateContext, LateLintPass};
-use rustc_hir::attrs::InlineAttr;
 use rustc_session::{declare_lint, declare_lint_pass};
 use rustc_span::Span;
 use rustc_span::def_id::LocalDefId;

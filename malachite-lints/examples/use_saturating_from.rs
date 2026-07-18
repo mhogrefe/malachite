@@ -18,5 +18,5 @@ fn f(err: i64, big: i128) -> (u64, u64, u64, i32, u64, u64) {
 }
 
 fn main() {
-    let _ = f(std::hint::black_box(-5), std::hint::black_box(1 << 70));
+    let _ = f(std::hint::black_box(-5), std::hint::black_box(1i128) << 70);
 }

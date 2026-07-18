@@ -1057,7 +1057,7 @@ pub_test! {fast_floor_root_u64(n: u64, exp: u64) -> u64 {
         return n.floor_sqrt();
     } else if exp == 3 {
         return cbrt_chebyshev_approx_u64(n);
-    } else if exp >= u64::WIDTH || (1 << exp) > n {
+    } else if exp >= u64::WIDTH || u64::power_of_2(exp) > n {
         return 1;
     }
     let exp = u32::wrapping_from(exp);

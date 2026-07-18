@@ -1,0 +1,19 @@
+error: `try_from(...).unwrap()` into an integer type
+  --> $DIR/use_exact_from.rs:5:13
+   |
+LL |     let a = usize::try_from(x).unwrap();
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: use `usize::exact_from(x)`
+   = note: `#[deny(use_exact_from)]` on by default
+
+error: `try_from(...).unwrap()` into an integer type
+  --> $DIR/use_exact_from.rs:7:13
+   |
+LL |     let b = u64::try_from(y).unwrap();
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: use `u64::exact_from(y)`
+
+error: aborting due to 2 previous errors
+

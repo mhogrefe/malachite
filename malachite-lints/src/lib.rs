@@ -34,9 +34,11 @@ mod redundant_from_in_literal_comparison;
 mod redundant_nearest;
 mod redundant_prec_round_of_exact_constant;
 mod runtime_literal_conversion;
+mod shift_of_one;
 mod use_assign_variant;
 mod use_checked_log_base_2;
 mod use_divisible_by;
+mod use_exact_from;
 mod use_named_constant;
 mod use_parity;
 mod use_reciprocal;
@@ -238,6 +240,19 @@ fn is_int_const(
     ) && cx.tcx.item_name(did).as_str() == name
 }
 
+// Whether the expression is inside a const context: the body of a `const` item, a `const` block, a
+// `static` initializer, or a `const fn` (whose body is evaluated at compile time whenever its caller
+// is).
+fn in_const_context(cx: &rustc_lint::LateContext<'_>, e: &rustc_hir::Expr<'_>) -> bool {
+    use rustc_hir::{BodyOwnerKind, Constness};
+    let owner = cx.tcx.hir_enclosing_body_owner(e.hir_id);
+    match cx.tcx.hir_body_owner_kind(owner) {
+        BodyOwnerKind::Const { .. } | BodyOwnerKind::Static(_) => true,
+        BodyOwnerKind::Fn => cx.tcx.constness(owner) == Constness::Const,
+        _ => false,
+    }
+}
+
 // Whether the span lies in test-oriented code: tests, demos and benches (`bin_util`), test
 // utilities, or any code compiled only as part of a test harness (which covers `#[cfg(test)]`
 // modules inside `src`). Such code exercises the discouraged spellings on purpose.
@@ -278,9 +293,11 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         redundant_nearest::REDUNDANT_NEAREST,
         redundant_prec_round_of_exact_constant::REDUNDANT_PREC_ROUND_OF_EXACT_CONSTANT,
         runtime_literal_conversion::RUNTIME_LITERAL_CONVERSION,
+        shift_of_one::SHIFT_OF_ONE,
         use_assign_variant::USE_ASSIGN_VARIANT,
         use_checked_log_base_2::USE_CHECKED_LOG_BASE_2,
         use_divisible_by::USE_DIVISIBLE_BY,
+        use_exact_from::USE_EXACT_FROM,
         use_named_constant::USE_NAMED_CONSTANT,
         use_parity::USE_PARITY,
         use_reciprocal::USE_RECIPROCAL,
@@ -305,9 +322,8 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
     lint_store.register_late_pass(|_| {
         Box::new(manual_rational_significant_bits::ManualRationalSignificantBits)
     });
-    lint_store.register_late_pass(|_| {
-        Box::new(missing_inline_on_delegator::MissingInlineOnDelegator)
-    });
+    lint_store
+        .register_late_pass(|_| Box::new(missing_inline_on_delegator::MissingInlineOnDelegator));
     lint_store.register_late_pass(|_| Box::new(mul_div_by_power_of_2::MulDivByPowerOf2));
     lint_store
         .register_late_pass(|_| Box::new(redundant_from_in_comparison::RedundantFromInComparison));
@@ -320,10 +336,12 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
     });
     lint_store
         .register_late_pass(|_| Box::new(runtime_literal_conversion::RuntimeLiteralConversion));
+    lint_store.register_late_pass(|_| Box::new(shift_of_one::ShiftOfOne));
     lint_store.register_late_pass(|_| Box::new(clone_with_ref_variant::CloneWithRefVariant));
     lint_store.register_late_pass(|_| Box::new(use_assign_variant::UseAssignVariant));
     lint_store.register_late_pass(|_| Box::new(use_checked_log_base_2::UseCheckedLogBase2));
     lint_store.register_late_pass(|_| Box::new(use_divisible_by::UseDivisibleBy));
+    lint_store.register_late_pass(|_| Box::new(use_exact_from::UseExactFrom));
     lint_store.register_late_pass(|_| Box::new(use_named_constant::UseNamedConstant));
     lint_store.register_late_pass(|_| Box::new(use_parity::UseParity));
     lint_store.register_late_pass(|_| Box::new(use_reciprocal::UseReciprocal));

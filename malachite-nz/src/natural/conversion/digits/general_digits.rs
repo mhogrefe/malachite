@@ -1190,7 +1190,7 @@ fn to_digits_asc_divide_and_conquer_limb<
         let start_len = digits.len();
         to_digits_asc_divide_and_conquer_limb(digits, r, base, powers, power_index - 1);
         if q != 0 {
-            for _ in digits.len() - start_len..1 << power_index {
+            for _ in digits.len() - start_len..usize::power_of_2(u64::exact_from(power_index)) {
                 digits.push(T::ZERO);
             }
             to_digits_asc_divide_and_conquer_limb(digits, q, base, powers, power_index - 1);
@@ -1219,7 +1219,7 @@ fn to_digits_asc_divide_and_conquer(
         let start_len = digits.len();
         to_digits_asc_divide_and_conquer(digits, &r, base, powers, power_index - 1);
         if q != 0 {
-            for _ in digits.len() - start_len..1 << power_index {
+            for _ in digits.len() - start_len..usize::power_of_2(u64::exact_from(power_index)) {
                 digits.push(Natural::ZERO);
             }
             to_digits_asc_divide_and_conquer(digits, &q, base, powers, power_index - 1);

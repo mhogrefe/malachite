@@ -61,7 +61,7 @@ use malachite_base::num::basic::traits::{One, OneHalf};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::string::to_string::digit_to_display_byte_lower;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::num::logic::traits::{BitAccess, LowMask, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode::{
     self, Ceiling, Down, Exact, Floor, Nearest, Up,
 };
@@ -227,75 +227,44 @@ fn parse_flags<'a>(mut format: &'a [u8], specinfo: &mut PrintfSpec) -> &'a [u8] 
 // assumed present (always true on the platforms Malachite targets).
 //
 // This is `parse_arg_type` from `vasprintf.c`, MPFR 4.2.2.
-fn parse_arg_type<'a>(mut format: &'a [u8], specinfo: &mut PrintfSpec) -> &'a [u8] {
-    match format.first() {
-        Some(b'h') => {
-            format = &format[1..];
-            if format.first() == Some(&b'h') {
-                format = &format[1..];
-                specinfo.arg_type = ArgType::Char;
+const fn parse_arg_type<'a>(format: &'a [u8], specinfo: &mut PrintfSpec) -> &'a [u8] {
+    let Some((&format_head, mut format_tail)) = format.split_first() else {
+        return format;
+    };
+    specinfo.arg_type = match format_head {
+        b'h' => {
+            if let Some((b'h', tail)) = format_tail.split_first() {
+                format_tail = tail;
+                ArgType::Char
             } else {
-                specinfo.arg_type = ArgType::Short;
+                ArgType::Short
             }
         }
-        Some(b'l') => {
-            format = &format[1..];
-            if format.first() == Some(&b'l') {
-                format = &format[1..];
-                specinfo.arg_type = ArgType::LongLong;
+        b'l' => {
+            if let Some((b'l', tail)) = format_tail.split_first() {
+                format_tail = tail;
+                ArgType::LongLong
             } else {
-                specinfo.arg_type = ArgType::Long;
+                ArgType::Long
             }
         }
-        Some(b'j') => {
-            format = &format[1..];
-            specinfo.arg_type = ArgType::IntMax;
-        }
-        Some(b'z') => {
-            format = &format[1..];
-            specinfo.arg_type = ArgType::Size;
-        }
-        Some(b't') => {
-            format = &format[1..];
-            specinfo.arg_type = ArgType::PtrDiff;
-        }
-        Some(b'L') => {
-            format = &format[1..];
-            specinfo.arg_type = ArgType::LongDouble;
-        }
-        Some(b'F') => {
-            format = &format[1..];
-            specinfo.arg_type = ArgType::Mpf;
-        }
-        Some(b'Q') => {
-            format = &format[1..];
-            specinfo.arg_type = ArgType::Mpq;
-        }
+        b'j' => ArgType::IntMax,
+        b'z' => ArgType::Size,
+        b't' => ArgType::PtrDiff,
+        b'L' => ArgType::LongDouble,
+        b'F' => ArgType::Mpf,
+        b'Q' => ArgType::Mpq,
         // The 'M' specifier was added in GMP 4.2.0.
-        Some(b'M') => {
-            format = &format[1..];
-            specinfo.arg_type = ArgType::MpLimb;
-        }
-        Some(b'N') => {
-            format = &format[1..];
-            specinfo.arg_type = ArgType::MpLimbArray;
-        }
-        Some(b'Z') => {
-            format = &format[1..];
-            specinfo.arg_type = ArgType::Mpz;
-        }
+        b'M' => ArgType::MpLimb,
+        b'N' => ArgType::MpLimbArray,
+        b'Z' => ArgType::Mpz,
         // mpfr-specific specifiers
-        Some(b'P') => {
-            format = &format[1..];
-            specinfo.arg_type = ArgType::MpfrPrec;
-        }
-        Some(b'R') => {
-            format = &format[1..];
-            specinfo.arg_type = ArgType::Mpfr;
-        }
-        _ => {}
-    }
-    format
+        b'P' => ArgType::MpfrPrec,
+        b'R' => ArgType::Mpfr,
+        // not a length modifier — leave it for the conversion parser
+        _ => return format,
+    };
+    format_tail
 }
 
 // The growable output buffer. MPFR's `struct string_buffer` tracks a manually-`realloc`-ed C buffer
@@ -330,7 +299,7 @@ fn buffer_cat(b: &mut StringBuffer, s: &[u8]) {
 // This is `buffer_pad` from `vasprintf.c`, MPFR 4.2.2.
 fn buffer_pad(b: &mut StringBuffer, c: u8, n: i64) {
     assert!(n > 0);
-    let new_len = b.chars.len() + usize::try_from(n).unwrap();
+    let new_len = b.chars.len() + usize::exact_from(n);
     b.chars.resize(new_len, c);
 }
 
@@ -449,7 +418,7 @@ fn floor_log10(x: &Float) -> i64 {
     let exp = ceil_mul(i64::from(x.get_exponent().unwrap()), 10, 1) - 1;
     // `y = 10 ^ exp`, rounded up. This is fast: `exp` is an integer (not too large), so the
     // exponentiation reduces to `pow_z` internally.
-    let y = Float::unsigned_pow_prec_round(10, Float::from(exp), prec, Up).0;
+    let y = Float::power_of_10_of_float_prec_round(Float::from(exp), prec, Up).0;
     if x.lt_abs(&y) { exp - 1 } else { exp }
 }
 
@@ -522,10 +491,10 @@ fn regular_eg(
         let str_len = frac.len();
         if str_len != 0 {
             np.fp = frac.to_vec();
-            debug_assert!(spec.prec < 0 || i64::try_from(str_len).unwrap() <= spec.prec);
-            if keep_trailing_zeros && spec.prec > 0 && i64::try_from(str_len).unwrap() < spec.prec {
+            debug_assert!(spec.prec < 0 || i64::exact_from(str_len) <= spec.prec);
+            if keep_trailing_zeros && spec.prec > 0 && i64::exact_from(str_len) < spec.prec {
                 // add missing trailing zeros
-                np.fp_trailing_zeros = spec.prec - i64::try_from(str_len).unwrap();
+                np.fp_trailing_zeros = spec.prec - i64::exact_from(str_len);
             }
         }
     }
@@ -676,7 +645,7 @@ fn regular_fg(
                     if keep_trailing_zeros {
                         // add missing trailing zeros so that fp_size + fp_trailing_zeros equals
                         // prec + exp
-                        np.fp_trailing_zeros = (spec.prec + exp) - i64::try_from(str_len).unwrap();
+                        np.fp_trailing_zeros = (spec.prec + exp) - i64::exact_from(str_len);
                         debug_assert!(np.fp_trailing_zeros >= 0);
                     }
                 }
@@ -709,12 +678,12 @@ fn regular_fg(
         let digits: &[u8] = if p.is_sign_negative() { &str[1..] } else { str };
         let str_len = digits.len();
         // integral part: `exp` (from get_str) is the number of integral digits
-        let ip_size = if exp > i64::try_from(str_len).unwrap() {
+        let ip_size = if exp > i64::exact_from(str_len) {
             // rounding up to the next power of 10 requires an added trailing zero
-            np.ip_trailing_digits = i32::try_from(exp - i64::try_from(str_len).unwrap()).unwrap();
+            np.ip_trailing_digits = i32::exact_from(exp - i64::exact_from(str_len));
             str_len
         } else {
-            usize::try_from(exp).unwrap()
+            usize::exact_from(exp)
         };
         np.ip = digits[..ip_size].to_vec();
         if spec.group {
@@ -733,10 +702,10 @@ fn regular_fg(
             np.point = b'.';
             np.fp = frac.to_vec();
         }
-        if keep_trailing_zeros && i64::try_from(frac_len).unwrap() < spec.prec {
+        if keep_trailing_zeros && i64::exact_from(frac_len) < spec.prec {
             // add missing trailing zeros
             np.point = b'.';
-            np.fp_trailing_zeros = spec.prec - i64::try_from(np.fp.len()).unwrap();
+            np.fp_trailing_zeros = spec.prec - i64::exact_from(np.fp.len());
             debug_assert!(np.fp_trailing_zeros >= 0);
         }
         if spec.alt {
@@ -784,7 +753,7 @@ fn next_base_power_p(x: &Float, base: i64, rnd: RoundingMode) -> bool {
     let sig = x.significand_ref().unwrap();
     let xm = sig.limbs().next_back().unwrap();
     // mask of the low (WIDTH - nbits) bits
-    let low_mask = (Limb::ONE << (Limb::WIDTH - nbits)) - 1;
+    let low_mask = Limb::low_mask(Limb::WIDTH - nbits);
     let high_mask = !low_mask;
     if (xm & high_mask) ^ high_mask != 0 {
         // don't round up if some of the first nbits bits are 0
@@ -792,7 +761,7 @@ fn next_base_power_p(x: &Float, base: i64, rnd: RoundingMode) -> bool {
     }
     if rnd == Nearest {
         // round up if the rounding bit is 1
-        xm & (Limb::ONE << (Limb::WIDTH - nbits - 1)) != 0
+        xm.get_bit(Limb::WIDTH - nbits - 1)
     } else {
         // an away-from-zero-like rounding mode: round up if any remaining bit is 1
         one_digit_is_inexact(sig, nbits)
@@ -887,13 +856,13 @@ fn regular_ab(np: &mut NumberParts, p: &Float, spec: &PrintfSpec) -> i32 {
         let str_len = frac.len();
         if str_len != 0 {
             np.fp = frac.to_vec();
-            if spec.prec > 0 && i64::try_from(str_len).unwrap() < spec.prec {
+            if spec.prec > 0 && i64::exact_from(str_len) < spec.prec {
                 // Unreachable: with an explicit precision, `mpfr_get_str_wrapper` returns exactly
                 // `spec.prec + 1` digits, so `str_len` (after the leading digit) equals
                 // `spec.prec`. (Unlike the decimal `regular_eg`/`regular_fg`, there is no
                 // `%g`-style path here that hands `regular_ab` a shorter cached string.)
                 fail_on_untested_path("regular_ab, trailing-zero pad");
-                np.fp_trailing_zeros = spec.prec - i64::try_from(str_len).unwrap();
+                np.fp_trailing_zeros = spec.prec - i64::exact_from(str_len);
             }
         }
     }
@@ -976,7 +945,7 @@ fn partition_number(np: &mut NumberParts, p: &Float, mut spec: PrintfSpec) -> i6
                 // Malachite zeros are precision-less (unlike MPFR); fall back to precision 1 when
                 // the zero carries none.
                 let zprec = p.get_prec().unwrap_or(1);
-                spec.prec = i64::try_from(get_str_ndigits(10, zprec)).unwrap() - 1;
+                spec.prec = i64::exact_from(get_str_ndigits(10, zprec)) - 1;
             } else if matches!(spec.spec, b'f' | b'F' | b'g' | b'G') {
                 spec.prec = DEFAULT_DECIMAL_PREC;
             }
@@ -1038,7 +1007,7 @@ fn partition_number(np: &mut NumberParts, p: &Float, mut spec: PrintfSpec) -> i6
             // most ceil(EXP(p) * log10(2)) digits, and with k = PREC(p) - EXP(p), the fractional
             // part in base 10 has at most k digits (if k > 0).
             let exp_p = i64::from(p.get_exponent().unwrap());
-            let k = i64::try_from(p.get_prec().unwrap()).unwrap() - exp_p;
+            let k = i64::exact_from(p.get_prec().unwrap()) - exp_p;
             let mut e = if exp_p <= 0 {
                 k
             } else {
@@ -1097,14 +1066,14 @@ fn partition_number(np: &mut NumberParts, p: &Float, mut spec: PrintfSpec) -> i6
 
     if i128::from(spec.width) > total {
         // pad with spaces or zeros depending on np.pad_type
-        np.pad_size = spec.width - i64::try_from(total).unwrap();
+        np.pad_size = spec.width - i64::exact_from(total);
         total = i128::from(spec.width);
     }
     if total > i128::from(i64::MAX) {
         fail_on_untested_path("partition_number, total width overflows i64");
         return -1;
     }
-    i64::try_from(total).unwrap()
+    i64::exact_from(total)
 }
 
 // Prints `p` into `buf` according to `spec`. Returns the number of characters written, or -1 if the
@@ -1143,7 +1112,7 @@ fn sprnt_fp(buf: &mut StringBuffer, p: &Float, spec: &PrintfSpec) -> i64 {
             buf,
             &np.ip,
             np.ip.len(),
-            usize::try_from(np.ip_trailing_digits).unwrap(),
+            usize::exact_from(np.ip_trailing_digits),
             np.thousands_sep,
         );
     } else {

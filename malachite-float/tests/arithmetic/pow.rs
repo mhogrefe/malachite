@@ -867,6 +867,7 @@ fn test_powr() {
     );
 }
 
+#[allow(clippy::needless_pass_by_value)]
 fn powr_prec_round_properties_helper(
     x: Float,
     y: Float,

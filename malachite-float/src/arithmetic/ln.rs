@@ -22,7 +22,7 @@ use crate::{
 use core::cmp::Ordering::{self, *};
 use core::mem::{swap, take};
 use malachite_base::num::arithmetic::traits::{
-    Abs, Agm, CeilingLogBase2, IsPowerOf2, Ln, LnAssign, Parity, Sign,
+    Abs, Agm, CeilingLogBase2, IsPowerOf2, Ln, LnAssign, Parity, PowerOf2, Sign,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -476,7 +476,7 @@ fn ln_unsigned_prec_round_normal(n: u64, prec: u64, rm: RoundingMode) -> (Float,
     let k = u64::from(128 - three_n.leading_zeros() - 2);
     // The reduced argument is (n - 2^k)/2^k. p = n - 2^k satisfies |p| < 2^k/3 < n/2 <= i64::MAX,
     // so it fits in an i64.
-    let mut p = i64::exact_from(i128::from(n) - (1i128 << k));
+    let mut p = i64::exact_from(i128::from(n) - i128::power_of_2(k));
     let mut kk = k;
     if p != 0 {
         // replace p/2^kk by (p/2)/2^(kk-1) so that p is odd

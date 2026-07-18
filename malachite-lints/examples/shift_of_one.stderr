@@ -1,0 +1,51 @@
+error: `(1 << n) - 1` builds a mask of the low `n` bits
+  --> $DIR/shift_of_one.rs:5:13
+   |
+LL |     let a = (1u64 << k) - 1;
+   |             ^^^^^^^^^^^^^^^
+   |
+   = help: use `u64::low_mask(k)`
+   = note: `#[deny(shift_of_one)]` on by default
+
+error: `x & (1 << n)` tests a single bit
+  --> $DIR/shift_of_one.rs:7:13
+   |
+LL |     let b = x & (u64::ONE << k) != 0;
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: use `x.get_bit(k)`
+
+error: `x & (1 << n)` tests a single bit
+  --> $DIR/shift_of_one.rs:9:13
+   |
+LL |     let c = x & (1u64 << k) == 0;
+   |             ^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: use `!x.get_bit(k)`
+
+error: `1 << n` constructs a power of two
+  --> $DIR/shift_of_one.rs:11:13
+   |
+LL |     let d = 1u64 << k;
+   |             ^^^^^^^^^
+   |
+   = help: use `u64::power_of_2(k)`
+
+error: `1 << n` constructs a power of two
+  --> $DIR/shift_of_one.rs:13:13
+   |
+LL |     let e = u64::ONE << k;
+   |             ^^^^^^^^^^^^^
+   |
+   = help: use `u64::power_of_2(k)`
+
+error: `1 << n` constructs a power of two
+  --> $DIR/shift_of_one.rs:15:13
+   |
+LL |     let g = (1u64 << k) - 2;
+   |             ^^^^^^^^^^^
+   |
+   = help: use `u64::power_of_2(k)`
+
+error: aborting due to 6 previous errors
+

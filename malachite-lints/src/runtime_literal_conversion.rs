@@ -8,7 +8,7 @@
 
 use clippy_utils::diagnostics::span_lint;
 use rustc_hir::def::{DefKind, Res};
-use rustc_hir::{BodyOwnerKind, Constness, Expr, ExprKind};
+use rustc_hir::{Expr, ExprKind};
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_session::{declare_lint, declare_lint_pass};
 
@@ -63,18 +63,6 @@ const CONST_FROM_FNS: [&str; 7] = [
     "const_from_signed_times_power_of_2",
 ];
 
-// Whether the expression is inside a const context: the body of a `const` item, a `const` block,
-// a `static` initializer, or a `const fn` (whose body is evaluated at compile time whenever its
-// caller is).
-fn in_const_context(cx: &LateContext<'_>, e: &Expr<'_>) -> bool {
-    let owner = cx.tcx.hir_enclosing_body_owner(e.hir_id);
-    match cx.tcx.hir_body_owner_kind(owner) {
-        BodyOwnerKind::Const { .. } | BodyOwnerKind::Static(_) => true,
-        BodyOwnerKind::Fn => cx.tcx.constness(owner) == Constness::Const,
-        _ => false,
-    }
-}
-
 impl<'tcx> LateLintPass<'tcx> for RuntimeLiteralConversion {
     fn check_expr(&mut self, cx: &LateContext<'tcx>, expr: &'tcx Expr<'tcx>) {
         if expr.span.from_expansion() {
@@ -100,7 +88,7 @@ impl<'tcx> LateLintPass<'tcx> for RuntimeLiteralConversion {
         if CONST_FROM_FNS.contains(&fn_name) {
             // `const_from*` outside a const context still runs at runtime. (Literals 0, 1, 2, and
             // -1 are left to `use_named_constant`.)
-            if in_const_context(cx, expr) {
+            if crate::in_const_context(cx, expr) {
                 return;
             }
             if let [a] = args

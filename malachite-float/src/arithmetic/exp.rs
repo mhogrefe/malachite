@@ -320,7 +320,7 @@ fn exp_rational(p: Integer, mut r: i64, m: usize, prec: u64) -> Float {
     let mut k = 0usize;
     let mut prec_i_have: u64 = 0;
     // Main loop: Q[0]*Q[1]*...*Q[k] equals i! as an invariant.
-    let n_terms = 1u64 << m;
+    let n_terms = u64::power_of_2(u64::exact_from(m));
     let mut i = 1u64;
     while prec_i_have < prec && i < n_terms {
         k += 1;
@@ -362,7 +362,7 @@ fn exp_rational(p: Integer, mut r: i64, m: usize, prec: u64) -> Float {
         let jj = log2_nb_terms[k - 1] as usize;
         s[k] *= &ptoj[jj];
         let mut t = &s[k - 1] * &q[k];
-        h += 1u64 << log2_nb_terms[k];
+        h += u64::power_of_2(log2_nb_terms[k]);
         t <<= r * i64::exact_from(h);
         t += &s[k];
         s[k - 1] = t;
