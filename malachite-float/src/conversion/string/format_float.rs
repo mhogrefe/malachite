@@ -513,11 +513,7 @@ fn regular_eg(
     let uexp = exp.unsigned_abs();
     let mut exp_part = Vec::new();
     exp_part.push(if uppercase { b'E' } else { b'e' });
-    if exp >= 0 {
-        exp_part.push(b'+');
-    } else {
-        exp_part.push(b'-');
-    }
+    exp_part.push(if exp >= 0 { b'+' } else { b'-' });
     exp_part.extend_from_slice(format!("{uexp:02}").as_bytes());
     np.exp = exp_part;
     0
@@ -550,12 +546,14 @@ fn regular_fg(
                 with 0 fractional digits",
             );
             // either 1 or 0
-            let round_up = spec.rnd_mode == Up
-                || (spec.rnd_mode == Floor && p.is_sign_negative())
-                || (spec.rnd_mode == Ceiling && p.is_sign_positive())
+            let round_up = match spec.rnd_mode {
+                Floor => p.is_sign_negative(),
+                Ceiling => p.is_sign_positive(),
+                Up => true,
                 // note that 0.5 rounds to 0 with Nearest (round ties to even)
-                || (spec.rnd_mode == Nearest
-                    && p.partial_cmp_abs(&Float::ONE_HALF).unwrap() == Greater);
+                Nearest => p.partial_cmp_abs(&Float::ONE_HALF).unwrap() == Greater,
+                _ => false,
+            };
             if round_up {
                 np.ip[0] = b'1';
             }
@@ -596,15 +594,15 @@ fn regular_fg(
                         }
                     }
                 };
-                if round_away {
+                np.fp_leading_zeros = if round_away {
                     // the last output digit is '1'
-                    np.fp_leading_zeros = spec.prec - 1;
                     np.fp = vec![b'1'];
+                    spec.prec - 1
                 } else {
                     // only zeros in the fractional part
                     debug_assert!(spec.spec == b'f' || spec.spec == b'F');
-                    np.fp_leading_zeros = spec.prec;
-                }
+                    spec.prec
+                };
             } else {
                 // exp >= -spec.prec: the significant digits are the last spec.prec + exp + 1 digits
                 // in the fractional part
@@ -813,12 +811,11 @@ fn regular_ab(np: &mut NumberParts, p: &Float, spec: &PrintfSpec) -> i32 {
             "regular_ab: Exact rounding was requested, but {p} is not exactly representable with \
             a single base-{base} digit",
         );
-        let digit_byte;
-        if next_base_power_p(p, base, spec.rnd_mode) {
-            digit_byte = b'1';
+        let digit_byte = if next_base_power_p(p, base, spec.rnd_mode) {
+            b'1'
         } else if base == 2 {
-            digit_byte = b'1';
             e -= 1;
+            b'1'
         } else {
             // base 16: form the leading digit from the top 4 bits of the top significand limb
             let msl = sig.limbs().next_back().unwrap();
@@ -836,9 +833,9 @@ fn regular_ab(np: &mut NumberParts, p: &Float, spec: &PrintfSpec) -> i32 {
                 digit += 1;
             }
             debug_assert!(digit <= 15);
-            digit_byte = digit_to_display_byte_lower(digit).unwrap();
             e -= 4;
-        }
+            digit_to_display_byte_lower(digit).unwrap()
+        };
         (vec![digit_byte], e)
     };
     // all digits in upper case for 'A'
@@ -876,11 +873,7 @@ fn regular_ab(np: &mut NumberParts, p: &Float, spec: &PrintfSpec) -> i32 {
     let uexp = exp.unsigned_abs();
     let mut exp_part = Vec::new();
     exp_part.push(if uppercase { b'P' } else { b'p' });
-    if exp >= 0 {
-        exp_part.push(b'+');
-    } else {
-        exp_part.push(b'-');
-    }
+    exp_part.push(if exp >= 0 { b'+' } else { b'-' });
     exp_part.extend_from_slice(format!("{uexp}").as_bytes());
     np.exp = exp_part;
     0
@@ -918,20 +911,12 @@ fn partition_number(np: &mut NumberParts, p: &Float, mut spec: PrintfSpec) -> i6
             // don't want "0000nan"; use left-space padding instead
             np.pad_type = PadType::Left;
         }
-        np.ip = if uppercase {
-            b"NAN".to_vec()
-        } else {
-            b"nan".to_vec()
-        };
+        np.ip = if uppercase { b"NAN" } else { b"nan" }.to_vec();
     } else if p.is_infinite() {
         if matches!(np.pad_type, PadType::LeadingZeros) {
             np.pad_type = PadType::Left;
         }
-        np.ip = if uppercase {
-            b"INF".to_vec()
-        } else {
-            b"inf".to_vec()
-        };
+        np.ip = if uppercase { b"INF" } else { b"inf" }.to_vec();
     } else if p.is_zero() {
         // Note: for 'g', zero is displayed 'f'-style with precision spec.prec - 1 and the trailing
         // zeros removed unless the '#' flag is used.
@@ -964,15 +949,9 @@ fn partition_number(np: &mut NumberParts, p: &Float, mut spec: PrintfSpec) -> i6
         if matches!(spec.spec, b'a' | b'A' | b'b' | b'e' | b'E') {
             // exponent part
             np.exp = if spec.spec == b'e' || spec.spec == b'E' {
-                if uppercase {
-                    b"E+00".to_vec()
-                } else {
-                    b"e+00".to_vec()
-                }
-            } else if uppercase {
-                b"P+0".to_vec()
+                if uppercase { b"E+00" } else { b"e+00" }.to_vec()
             } else {
-                b"p+0".to_vec()
+                if uppercase { b"P+0" } else { b"p+0" }.to_vec()
             };
         }
     } else {

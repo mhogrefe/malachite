@@ -899,30 +899,28 @@ fn pow_general(
     // - 1)| bits of internal precision (up to ~2^30) only for the product to underflow anyway. The
     // exponent estimate errs on the side of not firing; the in-loop detection below is the
     // backstop.
-    {
-        let ey = i64::from(y.get_exponent().unwrap());
-        let d = abs_x.sub_prec_ref_val(Float::ONE, 64).0;
-        let d_exp = i64::from(d.get_exponent().unwrap());
-        // the exponent of ln|x|, within ~1: for |x| near 1, ln|x| ~ |x| - 1; otherwise |ln|x|| >
-        // 2^-9 and a 64-bit ln suffices
-        let ln_exp = if d_exp < -8 {
-            d_exp
-        } else {
-            i64::from(abs_x.ln_prec_round_ref(64, Floor).0.get_exponent().unwrap())
-        };
-        // Product exponents add within 1 (exp(a * b) is exp(a) + exp(b) or one less), and ln_exp
-        // itself is accurate within ~1, so trigger with a couple of binades of margin.
-        // Over-triggering is harmless: the resolver is correct for any small product, and for the
-        // borderline (bottom-binade but representable) products the x involved is deep within a
-        // near-sliver of 1, where the loop's `ln` would need catastrophic working precision anyway.
-        if ey.saturating_add(ln_exp) <= i64::from(Float::MIN_EXPONENT) + 2 {
-            let (mut result, mut o) = pow_general_tiny_product(&abs_x, y, prec, rm);
-            if neg_result {
-                result.neg_assign();
-                o = o.reverse();
-            }
-            return (result, o);
+    let ey = i64::from(y.get_exponent().unwrap());
+    let d = abs_x.sub_prec_ref_val(Float::ONE, 64).0;
+    let d_exp = i64::from(d.get_exponent().unwrap());
+    // the exponent of ln|x|, within ~1: for |x| near 1, ln|x| ~ |x| - 1; otherwise |ln|x|| > 2^-9
+    // and a 64-bit ln suffices
+    let ln_exp = if d_exp < -8 {
+        d_exp
+    } else {
+        i64::from(abs_x.ln_prec_round_ref(64, Floor).0.get_exponent().unwrap())
+    };
+    // Product exponents add within 1 (exp(a * b) is exp(a) + exp(b) or one less), and ln_exp itself
+    // is accurate within ~1, so trigger with a couple of binades of margin. Over-triggering is
+    // harmless: the resolver is correct for any small product, and for the borderline
+    // (bottom-binade but representable) products the x involved is deep within a near-sliver of 1,
+    // where the loop's `ln` would need catastrophic working precision anyway.
+    if ey.saturating_add(ln_exp) <= i64::from(Float::MIN_EXPONENT) + 2 {
+        let (mut result, mut o) = pow_general_tiny_product(&abs_x, y, prec, rm);
+        if neg_result {
+            result.neg_assign();
+            o = o.reverse();
         }
+        return (result, o);
     }
     let mut k: Option<Integer> = None;
     let mut check_exact_case = false;
