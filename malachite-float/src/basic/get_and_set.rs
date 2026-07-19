@@ -292,17 +292,17 @@ impl Float {
     ///
     /// let mut x = original_x.clone();
     /// assert_eq!(x.set_prec_round(100, Exact), Equal);
-    /// assert_eq!(x.to_string(), "0.3333333333333333148296162562474");
+    /// assert_eq!(x.to_string(), "0.33333333333333331482961625624739");
     /// assert_eq!(x.get_prec(), Some(100));
     ///
     /// let mut x = original_x.clone();
     /// assert_eq!(x.set_prec_round(10, Floor), Less);
-    /// assert_eq!(x.to_string(), "0.333");
+    /// assert_eq!(x.to_string(), "0.33301");
     /// assert_eq!(x.get_prec(), Some(10));
     ///
     /// let mut x = original_x.clone();
     /// assert_eq!(x.set_prec_round(10, Ceiling), Greater);
-    /// assert_eq!(x.to_string(), "0.3335");
+    /// assert_eq!(x.to_string(), "0.33350");
     /// assert_eq!(x.get_prec(), Some(10));
     /// ```
     pub fn set_prec_round(&mut self, prec: u64, rm: RoundingMode) -> Ordering {
@@ -381,12 +381,12 @@ impl Float {
     ///
     /// let mut x = original_x.clone();
     /// assert_eq!(x.set_prec(100), Equal);
-    /// assert_eq!(x.to_string(), "0.3333333333333333148296162562474");
+    /// assert_eq!(x.to_string(), "0.33333333333333331482961625624739");
     /// assert_eq!(x.get_prec(), Some(100));
     ///
     /// let mut x = original_x.clone();
     /// assert_eq!(x.set_prec(10), Greater);
-    /// assert_eq!(x.to_string(), "0.3335");
+    /// assert_eq!(x.to_string(), "0.33350");
     /// assert_eq!(x.get_prec(), Some(10));
     /// ```
     #[inline]
@@ -429,17 +429,17 @@ impl Float {
     /// assert_eq!(original_x.get_prec(), Some(53));
     ///
     /// let (x, o) = Float::from_float_prec_round(original_x.clone(), 100, Exact);
-    /// assert_eq!(x.to_string(), "0.3333333333333333148296162562474");
+    /// assert_eq!(x.to_string(), "0.33333333333333331482961625624739");
     /// assert_eq!(x.get_prec(), Some(100));
     /// assert_eq!(o, Equal);
     ///
     /// let (x, o) = Float::from_float_prec_round(original_x.clone(), 10, Floor);
-    /// assert_eq!(x.to_string(), "0.333");
+    /// assert_eq!(x.to_string(), "0.33301");
     /// assert_eq!(x.get_prec(), Some(10));
     /// assert_eq!(o, Less);
     ///
     /// let (x, o) = Float::from_float_prec_round(original_x.clone(), 10, Ceiling);
-    /// assert_eq!(x.to_string(), "0.3335");
+    /// assert_eq!(x.to_string(), "0.33350");
     /// assert_eq!(x.get_prec(), Some(10));
     /// assert_eq!(o, Greater);
     /// ```
@@ -484,17 +484,17 @@ impl Float {
     /// assert_eq!(original_x.get_prec(), Some(53));
     ///
     /// let (x, o) = Float::from_float_prec_round_ref(&original_x, 100, Exact);
-    /// assert_eq!(x.to_string(), "0.3333333333333333148296162562474");
+    /// assert_eq!(x.to_string(), "0.33333333333333331482961625624739");
     /// assert_eq!(x.get_prec(), Some(100));
     /// assert_eq!(o, Equal);
     ///
     /// let (x, o) = Float::from_float_prec_round_ref(&original_x, 10, Floor);
-    /// assert_eq!(x.to_string(), "0.333");
+    /// assert_eq!(x.to_string(), "0.33301");
     /// assert_eq!(x.get_prec(), Some(10));
     /// assert_eq!(o, Less);
     ///
     /// let (x, o) = Float::from_float_prec_round_ref(&original_x, 10, Ceiling);
-    /// assert_eq!(x.to_string(), "0.3335");
+    /// assert_eq!(x.to_string(), "0.33350");
     /// assert_eq!(x.get_prec(), Some(10));
     /// assert_eq!(o, Greater);
     /// ```
@@ -575,12 +575,12 @@ impl Float {
     /// assert_eq!(original_x.get_prec(), Some(53));
     ///
     /// let (x, o) = Float::from_float_prec(original_x.clone(), 100);
-    /// assert_eq!(x.to_string(), "0.3333333333333333148296162562474");
+    /// assert_eq!(x.to_string(), "0.33333333333333331482961625624739");
     /// assert_eq!(x.get_prec(), Some(100));
     /// assert_eq!(o, Equal);
     ///
     /// let (x, o) = Float::from_float_prec(original_x.clone(), 10);
-    /// assert_eq!(x.to_string(), "0.3335");
+    /// assert_eq!(x.to_string(), "0.33350");
     /// assert_eq!(x.get_prec(), Some(10));
     /// assert_eq!(o, Greater);
     /// ```
@@ -625,12 +625,12 @@ impl Float {
     /// assert_eq!(original_x.get_prec(), Some(53));
     ///
     /// let (x, o) = Float::from_float_prec_ref(&original_x, 100);
-    /// assert_eq!(x.to_string(), "0.3333333333333333148296162562474");
+    /// assert_eq!(x.to_string(), "0.33333333333333331482961625624739");
     /// assert_eq!(x.get_prec(), Some(100));
     /// assert_eq!(o, Equal);
     ///
     /// let (x, o) = Float::from_float_prec_ref(&original_x, 10);
-    /// assert_eq!(x.to_string(), "0.3335");
+    /// assert_eq!(x.to_string(), "0.33350");
     /// assert_eq!(x.get_prec(), Some(10));
     /// assert_eq!(o, Greater);
     /// ```

@@ -31,21 +31,21 @@ fn test_is_nan() {
 
     test("1.0", "0x1.0#1", false);
     test("2.0", "0x2.0#1", false);
-    test("0.5", "0x0.8#1", false);
+    test("0.50", "0x0.8#1", false);
     test("0.33333333333333331", "0x0.55555555555554#53", false);
     test("1.4142135623730951", "0x1.6a09e667f3bcd#53", false);
     test("3.1415926535897931", "0x3.243f6a8885a30#53", false);
-    test("too_big", "0x4.0E+268435455#1", false);
-    test("too_small", "0x1.0E-268435456#1", false);
+    test("1.0e323228496", "0x4.0E+268435455#1", false);
+    test("2.4e-323228497", "0x1.0E-268435456#1", false);
 
     test("-1.0", "-0x1.0#1", false);
     test("-2.0", "-0x2.0#1", false);
-    test("-0.5", "-0x0.8#1", false);
+    test("-0.50", "-0x0.8#1", false);
     test("-0.33333333333333331", "-0x0.55555555555554#53", false);
     test("-1.4142135623730951", "-0x1.6a09e667f3bcd#53", false);
     test("-3.1415926535897931", "-0x3.243f6a8885a30#53", false);
-    test("-too_big", "-0x4.0E+268435455#1", false);
-    test("-too_small", "-0x1.0E-268435456#1", false);
+    test("-1.0e323228496", "-0x4.0E+268435455#1", false);
+    test("-2.4e-323228497", "-0x1.0E-268435456#1", false);
 }
 
 #[allow(clippy::needless_pass_by_value)]
@@ -92,21 +92,21 @@ fn test_is_finite() {
 
     test("1.0", "0x1.0#1", true);
     test("2.0", "0x2.0#1", true);
-    test("0.5", "0x0.8#1", true);
+    test("0.50", "0x0.8#1", true);
     test("0.33333333333333331", "0x0.55555555555554#53", true);
     test("1.4142135623730951", "0x1.6a09e667f3bcd#53", true);
     test("3.1415926535897931", "0x3.243f6a8885a30#53", true);
-    test("too_big", "0x4.0E+268435455#1", true);
-    test("too_small", "0x1.0E-268435456#1", true);
+    test("1.0e323228496", "0x4.0E+268435455#1", true);
+    test("2.4e-323228497", "0x1.0E-268435456#1", true);
 
     test("-1.0", "-0x1.0#1", true);
     test("-2.0", "-0x2.0#1", true);
-    test("-0.5", "-0x0.8#1", true);
+    test("-0.50", "-0x0.8#1", true);
     test("-0.33333333333333331", "-0x0.55555555555554#53", true);
     test("-1.4142135623730951", "-0x1.6a09e667f3bcd#53", true);
     test("-3.1415926535897931", "-0x3.243f6a8885a30#53", true);
-    test("-too_big", "-0x4.0E+268435455#1", true);
-    test("-too_small", "-0x1.0E-268435456#1", true);
+    test("-1.0e323228496", "-0x4.0E+268435455#1", true);
+    test("-2.4e-323228497", "-0x1.0E-268435456#1", true);
 }
 
 #[allow(clippy::needless_pass_by_value)]
@@ -152,21 +152,21 @@ fn test_is_infinite() {
 
     test("1.0", "0x1.0#1", false);
     test("2.0", "0x2.0#1", false);
-    test("0.5", "0x0.8#1", false);
+    test("0.50", "0x0.8#1", false);
     test("0.33333333333333331", "0x0.55555555555554#53", false);
     test("1.4142135623730951", "0x1.6a09e667f3bcd#53", false);
     test("3.1415926535897931", "0x3.243f6a8885a30#53", false);
-    test("too_big", "0x4.0E+268435455#1", false);
-    test("too_small", "0x1.0E-268435456#1", false);
+    test("1.0e323228496", "0x4.0E+268435455#1", false);
+    test("2.4e-323228497", "0x1.0E-268435456#1", false);
 
     test("-1.0", "-0x1.0#1", false);
     test("-2.0", "-0x2.0#1", false);
-    test("-0.5", "-0x0.8#1", false);
+    test("-0.50", "-0x0.8#1", false);
     test("-0.33333333333333331", "-0x0.55555555555554#53", false);
     test("-1.4142135623730951", "-0x1.6a09e667f3bcd#53", false);
     test("-3.1415926535897931", "-0x3.243f6a8885a30#53", false);
-    test("-too_big", "-0x4.0E+268435455#1", false);
-    test("-too_small", "-0x1.0E-268435456#1", false);
+    test("-1.0e323228496", "-0x4.0E+268435455#1", false);
+    test("-2.4e-323228497", "-0x1.0E-268435456#1", false);
 }
 
 #[allow(clippy::needless_pass_by_value)]
@@ -214,21 +214,21 @@ fn test_is_positive_zero() {
 
     test("1.0", "0x1.0#1", false);
     test("2.0", "0x2.0#1", false);
-    test("0.5", "0x0.8#1", false);
+    test("0.50", "0x0.8#1", false);
     test("0.33333333333333331", "0x0.55555555555554#53", false);
     test("1.4142135623730951", "0x1.6a09e667f3bcd#53", false);
     test("3.1415926535897931", "0x3.243f6a8885a30#53", false);
-    test("too_big", "0x4.0E+268435455#1", false);
-    test("too_small", "0x1.0E-268435456#1", false);
+    test("1.0e323228496", "0x4.0E+268435455#1", false);
+    test("2.4e-323228497", "0x1.0E-268435456#1", false);
 
     test("-1.0", "-0x1.0#1", false);
     test("-2.0", "-0x2.0#1", false);
-    test("-0.5", "-0x0.8#1", false);
+    test("-0.50", "-0x0.8#1", false);
     test("-0.33333333333333331", "-0x0.55555555555554#53", false);
     test("-1.4142135623730951", "-0x1.6a09e667f3bcd#53", false);
     test("-3.1415926535897931", "-0x3.243f6a8885a30#53", false);
-    test("-too_big", "-0x4.0E+268435455#1", false);
-    test("-too_small", "-0x1.0E-268435456#1", false);
+    test("-1.0e323228496", "-0x4.0E+268435455#1", false);
+    test("-2.4e-323228497", "-0x1.0E-268435456#1", false);
 }
 
 #[allow(clippy::needless_pass_by_value)]
@@ -279,21 +279,21 @@ fn test_is_negative_zero() {
 
     test("1.0", "0x1.0#1", false);
     test("2.0", "0x2.0#1", false);
-    test("0.5", "0x0.8#1", false);
+    test("0.50", "0x0.8#1", false);
     test("0.33333333333333331", "0x0.55555555555554#53", false);
     test("1.4142135623730951", "0x1.6a09e667f3bcd#53", false);
     test("3.1415926535897931", "0x3.243f6a8885a30#53", false);
-    test("too_big", "0x4.0E+268435455#1", false);
-    test("too_small", "0x1.0E-268435456#1", false);
+    test("1.0e323228496", "0x4.0E+268435455#1", false);
+    test("2.4e-323228497", "0x1.0E-268435456#1", false);
 
     test("-1.0", "-0x1.0#1", false);
     test("-2.0", "-0x2.0#1", false);
-    test("-0.5", "-0x0.8#1", false);
+    test("-0.50", "-0x0.8#1", false);
     test("-0.33333333333333331", "-0x0.55555555555554#53", false);
     test("-1.4142135623730951", "-0x1.6a09e667f3bcd#53", false);
     test("-3.1415926535897931", "-0x3.243f6a8885a30#53", false);
-    test("-too_big", "-0x4.0E+268435455#1", false);
-    test("-too_small", "-0x1.0E-268435456#1", false);
+    test("-1.0e323228496", "-0x4.0E+268435455#1", false);
+    test("-2.4e-323228497", "-0x1.0E-268435456#1", false);
 }
 
 #[allow(clippy::needless_pass_by_value)]
@@ -343,21 +343,21 @@ fn test_is_zero() {
 
     test("1.0", "0x1.0#1", false);
     test("2.0", "0x2.0#1", false);
-    test("0.5", "0x0.8#1", false);
+    test("0.50", "0x0.8#1", false);
     test("0.33333333333333331", "0x0.55555555555554#53", false);
     test("1.4142135623730951", "0x1.6a09e667f3bcd#53", false);
     test("3.1415926535897931", "0x3.243f6a8885a30#53", false);
-    test("too_big", "0x4.0E+268435455#1", false);
-    test("too_small", "0x1.0E-268435456#1", false);
+    test("1.0e323228496", "0x4.0E+268435455#1", false);
+    test("2.4e-323228497", "0x1.0E-268435456#1", false);
 
     test("-1.0", "-0x1.0#1", false);
     test("-2.0", "-0x2.0#1", false);
-    test("-0.5", "-0x0.8#1", false);
+    test("-0.50", "-0x0.8#1", false);
     test("-0.33333333333333331", "-0x0.55555555555554#53", false);
     test("-1.4142135623730951", "-0x1.6a09e667f3bcd#53", false);
     test("-3.1415926535897931", "-0x3.243f6a8885a30#53", false);
-    test("-too_big", "-0x4.0E+268435455#1", false);
-    test("-too_small", "-0x1.0E-268435456#1", false);
+    test("-1.0e323228496", "-0x4.0E+268435455#1", false);
+    test("-2.4e-323228497", "-0x1.0E-268435456#1", false);
 }
 
 #[allow(clippy::needless_pass_by_value)]
@@ -400,21 +400,21 @@ fn test_is_normal() {
 
     test("1.0", "0x1.0#1", true);
     test("2.0", "0x2.0#1", true);
-    test("0.5", "0x0.8#1", true);
+    test("0.50", "0x0.8#1", true);
     test("0.33333333333333331", "0x0.55555555555554#53", true);
     test("1.4142135623730951", "0x1.6a09e667f3bcd#53", true);
     test("3.1415926535897931", "0x3.243f6a8885a30#53", true);
-    test("too_big", "0x4.0E+268435455#1", true);
-    test("too_small", "0x1.0E-268435456#1", true);
+    test("1.0e323228496", "0x4.0E+268435455#1", true);
+    test("2.4e-323228497", "0x1.0E-268435456#1", true);
 
     test("-1.0", "-0x1.0#1", true);
     test("-2.0", "-0x2.0#1", true);
-    test("-0.5", "-0x0.8#1", true);
+    test("-0.50", "-0x0.8#1", true);
     test("-0.33333333333333331", "-0x0.55555555555554#53", true);
     test("-1.4142135623730951", "-0x1.6a09e667f3bcd#53", true);
     test("-3.1415926535897931", "-0x3.243f6a8885a30#53", true);
-    test("-too_big", "-0x4.0E+268435455#1", true);
-    test("-too_small", "-0x1.0E-268435456#1", true);
+    test("-1.0e323228496", "-0x4.0E+268435455#1", true);
+    test("-2.4e-323228497", "-0x1.0E-268435456#1", true);
 }
 
 #[allow(clippy::needless_pass_by_value)]
@@ -454,21 +454,21 @@ fn test_is_sign_positive() {
 
     test("1.0", "0x1.0#1", true);
     test("2.0", "0x2.0#1", true);
-    test("0.5", "0x0.8#1", true);
+    test("0.50", "0x0.8#1", true);
     test("0.33333333333333331", "0x0.55555555555554#53", true);
     test("1.4142135623730951", "0x1.6a09e667f3bcd#53", true);
     test("3.1415926535897931", "0x3.243f6a8885a30#53", true);
-    test("too_big", "0x4.0E+268435455#1", true);
-    test("too_small", "0x1.0E-268435456#1", true);
+    test("1.0e323228496", "0x4.0E+268435455#1", true);
+    test("2.4e-323228497", "0x1.0E-268435456#1", true);
 
     test("-1.0", "-0x1.0#1", false);
     test("-2.0", "-0x2.0#1", false);
-    test("-0.5", "-0x0.8#1", false);
+    test("-0.50", "-0x0.8#1", false);
     test("-0.33333333333333331", "-0x0.55555555555554#53", false);
     test("-1.4142135623730951", "-0x1.6a09e667f3bcd#53", false);
     test("-3.1415926535897931", "-0x3.243f6a8885a30#53", false);
-    test("-too_big", "-0x4.0E+268435455#1", false);
-    test("-too_small", "-0x1.0E-268435456#1", false);
+    test("-1.0e323228496", "-0x4.0E+268435455#1", false);
+    test("-2.4e-323228497", "-0x1.0E-268435456#1", false);
 }
 
 #[allow(clippy::needless_pass_by_value)]
@@ -516,21 +516,21 @@ fn test_is_sign_negative() {
 
     test("1.0", "0x1.0#1", false);
     test("2.0", "0x2.0#1", false);
-    test("0.5", "0x0.8#1", false);
+    test("0.50", "0x0.8#1", false);
     test("0.33333333333333331", "0x0.55555555555554#53", false);
     test("1.4142135623730951", "0x1.6a09e667f3bcd#53", false);
     test("3.1415926535897931", "0x3.243f6a8885a30#53", false);
-    test("too_big", "0x4.0E+268435455#1", false);
-    test("too_small", "0x1.0E-268435456#1", false);
+    test("1.0e323228496", "0x4.0E+268435455#1", false);
+    test("2.4e-323228497", "0x1.0E-268435456#1", false);
 
     test("-1.0", "-0x1.0#1", true);
     test("-2.0", "-0x2.0#1", true);
-    test("-0.5", "-0x0.8#1", true);
+    test("-0.50", "-0x0.8#1", true);
     test("-0.33333333333333331", "-0x0.55555555555554#53", true);
     test("-1.4142135623730951", "-0x1.6a09e667f3bcd#53", true);
     test("-3.1415926535897931", "-0x3.243f6a8885a30#53", true);
-    test("-too_big", "-0x4.0E+268435455#1", true);
-    test("-too_small", "-0x1.0E-268435456#1", true);
+    test("-1.0e323228496", "-0x4.0E+268435455#1", true);
+    test("-2.4e-323228497", "-0x1.0E-268435456#1", true);
 }
 
 #[allow(clippy::needless_pass_by_value)]
@@ -577,7 +577,7 @@ fn test_classify() {
 
     test("1.0", "0x1.0#1", FpCategory::Normal);
     test("2.0", "0x2.0#1", FpCategory::Normal);
-    test("0.5", "0x0.8#1", FpCategory::Normal);
+    test("0.50", "0x0.8#1", FpCategory::Normal);
     test(
         "0.33333333333333331",
         "0x0.55555555555554#53",
@@ -593,12 +593,12 @@ fn test_classify() {
         "0x3.243f6a8885a30#53",
         FpCategory::Normal,
     );
-    test("too_big", "0x4.0E+268435455#1", FpCategory::Normal);
-    test("too_small", "0x1.0E-268435456#1", FpCategory::Normal);
+    test("1.0e323228496", "0x4.0E+268435455#1", FpCategory::Normal);
+    test("2.4e-323228497", "0x1.0E-268435456#1", FpCategory::Normal);
 
     test("-1.0", "-0x1.0#1", FpCategory::Normal);
     test("-2.0", "-0x2.0#1", FpCategory::Normal);
-    test("-0.5", "-0x0.8#1", FpCategory::Normal);
+    test("-0.50", "-0x0.8#1", FpCategory::Normal);
     test(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
@@ -614,8 +614,8 @@ fn test_classify() {
         "-0x3.243f6a8885a30#53",
         FpCategory::Normal,
     );
-    test("-too_big", "-0x4.0E+268435455#1", FpCategory::Normal);
-    test("-too_small", "-0x1.0E-268435456#1", FpCategory::Normal);
+    test("-1.0e323228496", "-0x4.0E+268435455#1", FpCategory::Normal);
+    test("-2.4e-323228497", "-0x1.0E-268435456#1", FpCategory::Normal);
 }
 
 #[allow(clippy::needless_pass_by_value)]
@@ -665,7 +665,7 @@ fn test_to_non_nan() {
 
     test("1.0", "0x1.0#1", Some("1.0"), Some("0x1.0#1"));
     test("2.0", "0x2.0#1", Some("2.0"), Some("0x2.0#1"));
-    test("0.5", "0x0.8#1", Some("0.5"), Some("0x0.8#1"));
+    test("0.50", "0x0.8#1", Some("0.50"), Some("0x0.8#1"));
     test(
         "0.33333333333333331",
         "0x0.55555555555554#53",
@@ -685,21 +685,21 @@ fn test_to_non_nan() {
         Some("0x3.243f6a8885a30#53"),
     );
     test(
-        "too_big",
+        "1.0e323228496",
         "0x4.0E+268435455#1",
-        Some("too_big"),
+        Some("1.0e323228496"),
         Some("0x4.0E+268435455#1"),
     );
     test(
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
-        Some("too_small"),
+        Some("2.4e-323228497"),
         Some("0x1.0E-268435456#1"),
     );
 
     test("-1.0", "-0x1.0#1", Some("-1.0"), Some("-0x1.0#1"));
     test("-2.0", "-0x2.0#1", Some("-2.0"), Some("-0x2.0#1"));
-    test("-0.5", "-0x0.8#1", Some("-0.5"), Some("-0x0.8#1"));
+    test("-0.50", "-0x0.8#1", Some("-0.50"), Some("-0x0.8#1"));
     test(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
@@ -719,15 +719,15 @@ fn test_to_non_nan() {
         Some("-0x3.243f6a8885a30#53"),
     );
     test(
-        "-too_big",
+        "-1.0e323228496",
         "-0x4.0E+268435455#1",
-        Some("-too_big"),
+        Some("-1.0e323228496"),
         Some("-0x4.0E+268435455#1"),
     );
     test(
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
-        Some("-too_small"),
+        Some("-2.4e-323228497"),
         Some("-0x1.0E-268435456#1"),
     );
 }
@@ -784,7 +784,7 @@ fn test_to_finite() {
 
     test("1.0", "0x1.0#1", Some("1.0"), Some("0x1.0#1"));
     test("2.0", "0x2.0#1", Some("2.0"), Some("0x2.0#1"));
-    test("0.5", "0x0.8#1", Some("0.5"), Some("0x0.8#1"));
+    test("0.50", "0x0.8#1", Some("0.50"), Some("0x0.8#1"));
     test(
         "0.33333333333333331",
         "0x0.55555555555554#53",
@@ -804,21 +804,21 @@ fn test_to_finite() {
         Some("0x3.243f6a8885a30#53"),
     );
     test(
-        "too_big",
+        "1.0e323228496",
         "0x4.0E+268435455#1",
-        Some("too_big"),
+        Some("1.0e323228496"),
         Some("0x4.0E+268435455#1"),
     );
     test(
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
-        Some("too_small"),
+        Some("2.4e-323228497"),
         Some("0x1.0E-268435456#1"),
     );
 
     test("-1.0", "-0x1.0#1", Some("-1.0"), Some("-0x1.0#1"));
     test("-2.0", "-0x2.0#1", Some("-2.0"), Some("-0x2.0#1"));
-    test("-0.5", "-0x0.8#1", Some("-0.5"), Some("-0x0.8#1"));
+    test("-0.50", "-0x0.8#1", Some("-0.50"), Some("-0x0.8#1"));
     test(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
@@ -838,15 +838,15 @@ fn test_to_finite() {
         Some("-0x3.243f6a8885a30#53"),
     );
     test(
-        "-too_big",
+        "-1.0e323228496",
         "-0x4.0E+268435455#1",
-        Some("-too_big"),
+        Some("-1.0e323228496"),
         Some("-0x4.0E+268435455#1"),
     );
     test(
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
-        Some("-too_small"),
+        Some("-2.4e-323228497"),
         Some("-0x1.0E-268435456#1"),
     );
 }

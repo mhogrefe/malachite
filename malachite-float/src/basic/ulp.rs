@@ -65,18 +65,18 @@ impl Float {
     /// assert_eq!(s.as_ref().map(|s| s.as_str()), Some("1.0"));
     ///
     /// let s = Float::one_prec(100).ulp().map(|x| x.to_string());
-    /// assert_eq!(s.as_ref().map(|s| s.as_str()), Some("2.0e-30"));
+    /// assert_eq!(s.as_ref().map(|s| s.as_str()), Some("1.6e-30"));
     ///
     /// let s = Float::from(std::f64::consts::PI)
     ///     .ulp()
     ///     .map(|x| x.to_string());
-    /// assert_eq!(s.as_ref().map(|s| s.as_str()), Some("4.0e-15"));
+    /// assert_eq!(s.as_ref().map(|s| s.as_str()), Some("3.6e-15"));
     ///
     /// let s = Float::power_of_2(100u64).ulp().map(|x| x.to_string());
-    /// assert_eq!(s.as_ref().map(|s| s.as_str()), Some("1.0e30"));
+    /// assert_eq!(s.as_ref().map(|s| s.as_str()), Some("1.3e30"));
     ///
     /// let s = Float::power_of_2(-100i64).ulp().map(|x| x.to_string());
-    /// assert_eq!(s.as_ref().map(|s| s.as_str()), Some("8.0e-31"));
+    /// assert_eq!(s.as_ref().map(|s| s.as_str()), Some("7.9e-31"));
     ///
     /// let s = Float::NEGATIVE_ONE.ulp().map(|x| x.to_string());
     /// assert_eq!(s.as_ref().map(|s| s.as_str()), Some("1.0"));
@@ -140,22 +140,22 @@ impl Float {
     /// assert_eq!(x.to_string(), "2.0");
     ///
     /// let mut x = Float::one_prec(100);
-    /// assert_eq!(x.to_string(), "1.0");
+    /// assert_eq!(x.to_string(), "1.0000000000000000000000000000000");
     /// x.increment();
-    /// assert_eq!(x.to_string(), "1.000000000000000000000000000002");
+    /// assert_eq!(x.to_string(), "1.0000000000000000000000000000016");
     ///
     /// let mut x = Float::from(std::f64::consts::PI);
-    /// assert_eq!(x.to_string(), "3.141592653589793");
+    /// assert_eq!(x.to_string(), "3.1415926535897931");
     /// x.increment();
-    /// assert_eq!(x.to_string(), "3.141592653589797");
+    /// assert_eq!(x.to_string(), "3.1415926535897967");
     ///
     /// let mut x = Float::power_of_2(100u64);
-    /// assert_eq!(x.to_string(), "1.0e30");
+    /// assert_eq!(x.to_string(), "1.3e30");
     /// x.increment();
-    /// assert_eq!(x.to_string(), "3.0e30");
+    /// assert_eq!(x.to_string(), "2.5e30");
     ///
     /// let mut x = Float::power_of_2(-100i64);
-    /// assert_eq!(x.to_string(), "8.0e-31");
+    /// assert_eq!(x.to_string(), "7.9e-31");
     /// x.increment();
     /// assert_eq!(x.to_string(), "1.6e-30");
     ///
@@ -239,22 +239,22 @@ impl Float {
     /// assert_eq!(x.to_string(), "0.0");
     ///
     /// let mut x = Float::one_prec(100);
-    /// assert_eq!(x.to_string(), "1.0");
+    /// assert_eq!(x.to_string(), "1.0000000000000000000000000000000");
     /// x.decrement();
-    /// assert_eq!(x.to_string(), "0.999999999999999999999999999998");
+    /// assert_eq!(x.to_string(), "0.9999999999999999999999999999984");
     ///
     /// let mut x = Float::from(std::f64::consts::PI);
-    /// assert_eq!(x.to_string(), "3.141592653589793");
+    /// assert_eq!(x.to_string(), "3.1415926535897931");
     /// x.decrement();
-    /// assert_eq!(x.to_string(), "3.14159265358979");
+    /// assert_eq!(x.to_string(), "3.1415926535897896");
     ///
     /// let mut x = Float::power_of_2(100u64);
-    /// assert_eq!(x.to_string(), "1.0e30");
+    /// assert_eq!(x.to_string(), "1.3e30");
     /// x.decrement();
     /// assert_eq!(x.to_string(), "0.0");
     ///
     /// let mut x = Float::power_of_2(-100i64);
-    /// assert_eq!(x.to_string(), "8.0e-31");
+    /// assert_eq!(x.to_string(), "7.9e-31");
     /// x.decrement();
     /// assert_eq!(x.to_string(), "0.0");
     ///

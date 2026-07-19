@@ -28,51 +28,51 @@ fn test_test_overflow() {
     // Likewise
     test("-Infinity", "-Infinity", Greater, false);
 
-    test("too_big", "0x4.0E+268435455#1", Equal, false);
-    test("too_big", "0x4.0E+268435455#1", Less, true);
-    test("too_big", "0x6.0E+268435455#2", Less, true);
-    test("too_big", "0x7.0E+268435455#3", Less, true);
-    test("too_big", "0x7.feE+268435455#10", Less, true);
+    test("1.0e323228496", "0x4.0E+268435455#1", Equal, false);
+    test("1.0e323228496", "0x4.0E+268435455#1", Less, true);
+    test("1.6e323228496", "0x6.0E+268435455#2", Less, true);
+    test("1.8e323228496", "0x7.0E+268435455#3", Less, true);
+    test("2.0965e323228496", "0x7.feE+268435455#10", Less, true);
     test(
-        "too_big",
+        "2.0985787164673876924043581168822e323228496",
         "0x7.ffffffffffffffffffffffff8E+268435455#100",
         Less,
         true,
     );
-    test("too_big", "0x4.0E+268435454#1", Less, false);
-    test("too_big", "0x6.0E+268435454#2", Less, false);
-    test("too_big", "0x7.0E+268435454#3", Less, false);
-    test("too_big", "0x4.0E+268435455#1", Greater, false);
-    test("too_big", "0x6.0E+268435455#2", Greater, false);
-    test("too_big", "0x7.0E+268435455#3", Greater, false);
-    test("too_big", "0x7.feE+268435455#10", Greater, false);
+    test("6.6e323228494", "0x4.0E+268435454#1", Less, false);
+    test("9.8e323228494", "0x6.0E+268435454#2", Less, false);
+    test("1.1e323228495", "0x7.0E+268435454#3", Less, false);
+    test("1.0e323228496", "0x4.0E+268435455#1", Greater, false);
+    test("1.6e323228496", "0x6.0E+268435455#2", Greater, false);
+    test("1.8e323228496", "0x7.0E+268435455#3", Greater, false);
+    test("2.0965e323228496", "0x7.feE+268435455#10", Greater, false);
     test(
-        "too_big",
+        "2.0985787164673876924043581168822e323228496",
         "0x7.ffffffffffffffffffffffff8E+268435455#100",
         Greater,
         false,
     );
 
-    test("-too_big", "-0x4.0E+268435455#1", Equal, false);
-    test("-too_big", "-0x4.0E+268435455#1", Greater, true);
-    test("-too_big", "-0x6.0E+268435455#2", Greater, true);
-    test("-too_big", "-0x7.0E+268435455#3", Greater, true);
-    test("-too_big", "-0x7.feE+268435455#10", Greater, true);
+    test("-1.0e323228496", "-0x4.0E+268435455#1", Equal, false);
+    test("-1.0e323228496", "-0x4.0E+268435455#1", Greater, true);
+    test("-1.6e323228496", "-0x6.0E+268435455#2", Greater, true);
+    test("-1.8e323228496", "-0x7.0E+268435455#3", Greater, true);
+    test("-2.0965e323228496", "-0x7.feE+268435455#10", Greater, true);
     test(
-        "-too_big",
+        "-2.0985787164673876924043581168822e323228496",
         "-0x7.ffffffffffffffffffffffff8E+268435455#100",
         Greater,
         true,
     );
-    test("-too_big", "-0x4.0E+268435454#1", Greater, false);
-    test("-too_big", "-0x6.0E+268435454#2", Greater, false);
-    test("-too_big", "-0x7.0E+268435454#3", Greater, false);
-    test("-too_big", "-0x4.0E+268435455#1", Less, false);
-    test("-too_big", "-0x6.0E+268435455#2", Less, false);
-    test("-too_big", "-0x7.0E+268435455#3", Less, false);
-    test("-too_big", "-0x7.feE+268435455#10", Less, false);
+    test("-6.6e323228494", "-0x4.0E+268435454#1", Greater, false);
+    test("-9.8e323228494", "-0x6.0E+268435454#2", Greater, false);
+    test("-1.1e323228495", "-0x7.0E+268435454#3", Greater, false);
+    test("-1.0e323228496", "-0x4.0E+268435455#1", Less, false);
+    test("-1.6e323228496", "-0x6.0E+268435455#2", Less, false);
+    test("-1.8e323228496", "-0x7.0E+268435455#3", Less, false);
+    test("-2.0965e323228496", "-0x7.feE+268435455#10", Less, false);
     test(
-        "-too_big",
+        "-2.0985787164673876924043581168822e323228496",
         "-0x7.ffffffffffffffffffffffff8E+268435455#100",
         Less,
         false,
@@ -114,51 +114,51 @@ fn test_test_underflow() {
     test("-0.0", "-0x0.0", Less, true);
     test("-0.0", "-0x0.0", Greater, true);
 
-    test("too_small", "0x1.0E-268435456#1", Equal, false);
-    test("too_small", "0x1.0E-268435456#1", Greater, true);
-    test("too_small", "0x1.0E-268435456#2", Greater, true);
-    test("too_small", "0x1.0E-268435456#3", Greater, true);
-    test("too_small", "0x1.000E-268435456#10", Greater, true);
+    test("2.4e-323228497", "0x1.0E-268435456#1", Equal, false);
+    test("2.4e-323228497", "0x1.0E-268435456#1", Greater, true);
+    test("2.4e-323228497", "0x1.0E-268435456#2", Greater, true);
+    test("2.4e-323228497", "0x1.0E-268435456#3", Greater, true);
+    test("2.3826e-323228497", "0x1.000E-268435456#10", Greater, true);
     test(
-        "too_small",
+        "2.3825649048879510732161697817327e-323228497",
         "0x1.0000000000000000000000000E-268435456#100",
         Greater,
         true,
     );
-    test("too_small", "0x1.8E-268435456#2", Greater, false);
-    test("too_small", "0x2.0E-268435456#1", Greater, false);
-    test("too_small", "0x1.0E-268435455#1", Greater, false);
-    test("too_small", "0x1.0E-268435456#1", Less, false);
-    test("too_small", "0x1.0E-268435456#2", Less, false);
-    test("too_small", "0x1.0E-268435456#3", Less, false);
-    test("too_small", "0x1.000E-268435456#10", Less, false);
+    test("3.6e-323228497", "0x1.8E-268435456#2", Greater, false);
+    test("4.8e-323228497", "0x2.0E-268435456#1", Greater, false);
+    test("3.8e-323228496", "0x1.0E-268435455#1", Greater, false);
+    test("2.4e-323228497", "0x1.0E-268435456#1", Less, false);
+    test("2.4e-323228497", "0x1.0E-268435456#2", Less, false);
+    test("2.4e-323228497", "0x1.0E-268435456#3", Less, false);
+    test("2.3826e-323228497", "0x1.000E-268435456#10", Less, false);
     test(
-        "too_small",
+        "2.3825649048879510732161697817327e-323228497",
         "0x1.0000000000000000000000000E-268435456#100",
         Less,
         false,
     );
 
-    test("-too_small", "-0x1.0E-268435456#1", Equal, false);
-    test("-too_small", "-0x1.0E-268435456#1", Less, true);
-    test("-too_small", "-0x1.0E-268435456#2", Less, true);
-    test("-too_small", "-0x1.0E-268435456#3", Less, true);
-    test("-too_small", "-0x1.000E-268435456#10", Less, true);
+    test("-2.4e-323228497", "-0x1.0E-268435456#1", Equal, false);
+    test("-2.4e-323228497", "-0x1.0E-268435456#1", Less, true);
+    test("-2.4e-323228497", "-0x1.0E-268435456#2", Less, true);
+    test("-2.4e-323228497", "-0x1.0E-268435456#3", Less, true);
+    test("-2.3826e-323228497", "-0x1.000E-268435456#10", Less, true);
     test(
-        "-too_small",
+        "-2.3825649048879510732161697817327e-323228497",
         "-0x1.0000000000000000000000000E-268435456#100",
         Less,
         true,
     );
-    test("-too_small", "-0x1.8E-268435456#2", Less, false);
-    test("-too_small", "-0x2.0E-268435456#1", Less, false);
-    test("-too_small", "-0x1.0E-268435455#1", Less, false);
-    test("-too_small", "-0x1.0E-268435456#1", Greater, false);
-    test("-too_small", "-0x1.0E-268435456#2", Greater, false);
-    test("-too_small", "-0x1.0E-268435456#3", Greater, false);
-    test("-too_small", "-0x1.000E-268435456#10", Greater, false);
+    test("-3.6e-323228497", "-0x1.8E-268435456#2", Less, false);
+    test("-4.8e-323228497", "-0x2.0E-268435456#1", Less, false);
+    test("-3.8e-323228496", "-0x1.0E-268435455#1", Less, false);
+    test("-2.4e-323228497", "-0x1.0E-268435456#1", Greater, false);
+    test("-2.4e-323228497", "-0x1.0E-268435456#2", Greater, false);
+    test("-2.4e-323228497", "-0x1.0E-268435456#3", Greater, false);
+    test("-2.3826e-323228497", "-0x1.000E-268435456#10", Greater, false);
     test(
-        "-too_small",
+        "-2.3825649048879510732161697817327e-323228497",
         "-0x1.0000000000000000000000000E-268435456#100",
         Greater,
         false,
