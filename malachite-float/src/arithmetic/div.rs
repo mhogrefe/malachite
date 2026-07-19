@@ -1490,7 +1490,7 @@ impl Float {
                     };
                 } else if exp < Self::MIN_EXPONENT {
                     return if rm == Nearest
-                        && exp == Self::MIN_EXPONENT - 1
+                        && exp == Self::MIN_EXPONENT_MINUS_1
                         && (o == Less || !quotient.is_power_of_2())
                     {
                         if sign {
@@ -1724,7 +1724,7 @@ impl Float {
                     };
                 } else if exp < Self::MIN_EXPONENT {
                     return if rm == Nearest
-                        && exp == Self::MIN_EXPONENT - 1
+                        && exp == Self::MIN_EXPONENT_MINUS_1
                         && (o == Less || !quotient.is_power_of_2())
                     {
                         if sign {
@@ -2694,7 +2694,7 @@ impl Float {
                     };
                 } else if *x_exp < Self::MIN_EXPONENT {
                     return if rm == Nearest
-                        && *x_exp == Self::MIN_EXPONENT - 1
+                        && *x_exp == Self::MIN_EXPONENT_MINUS_1
                         && (o == Less || !x.is_power_of_2())
                     {
                         if sign {
@@ -2957,7 +2957,7 @@ impl Float {
                     };
                 } else if *x_exp < Self::MIN_EXPONENT {
                     return if rm == Nearest
-                        && *x_exp == Self::MIN_EXPONENT - 1
+                        && *x_exp == Self::MIN_EXPONENT_MINUS_1
                         && (o == Less || !x.is_power_of_2())
                     {
                         if sign {

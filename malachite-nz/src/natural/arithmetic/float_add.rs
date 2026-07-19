@@ -21,7 +21,8 @@ use crate::natural::arithmetic::float_add::RoundBit::*;
 use crate::natural::arithmetic::is_power_of_2::limbs_is_power_of_2;
 use crate::natural::arithmetic::shr::{limbs_shr_to_out, limbs_slice_shr_in_place};
 use crate::natural::{
-    LIMB_HIGH_BIT, Natural, bit_to_limb_count_ceiling, bit_to_limb_count_floor, limb_to_bit_count,
+    LIMB_HIGH_BIT, NOT_LIMB_HIGH_BIT, Natural, THRICE_WIDTH, TWICE_WIDTH, WIDTH_MINUS_1,
+    bit_to_limb_count_ceiling, bit_to_limb_count_floor, limb_to_bit_count,
 };
 use crate::platform::Limb;
 use core::cmp::Ordering::{self, *};
@@ -33,9 +34,6 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::slices::slice_test_zero;
-
-const TWICE_WIDTH: u64 = Limb::WIDTH << 1;
-const THRICE_WIDTH: u64 = Limb::WIDTH * 3;
 
 pub fn add_float_significands_in_place(
     mut x: &mut Natural,
@@ -816,8 +814,6 @@ fn add_float_significands_same_prec_ref_ref(
     }
 }
 
-const WIDTH_M1: u64 = Limb::WIDTH - 1;
-
 // This is mpfr_add1sp1 from add1sp.c, MPFR 4.2.0.
 fn add_float_significands_same_prec_lt_w(
     mut x: Limb,
@@ -941,7 +937,11 @@ fn add_float_significands_same_prec_w(
                 (LIMB_HIGH_BIT | (sum >> 1), sticky_bit, sum & 1)
             } else {
                 // no carry
-                (sum, sticky_bit & !LIMB_HIGH_BIT, sticky_bit & LIMB_HIGH_BIT)
+                (
+                    sum,
+                    sticky_bit & NOT_LIMB_HIGH_BIT,
+                    sticky_bit & LIMB_HIGH_BIT,
+                )
             }
         } else {
             let round = exp_diff == Limb::WIDTH;
@@ -1000,7 +1000,7 @@ fn add_float_significands_same_prec_gt_w_lt_2w(
         if overflow {
             a1.wrapping_add_assign(1);
         }
-        a0 = (a0 >> 1) | (a1 << WIDTH_M1);
+        a0 = (a0 >> 1) | (a1 << WIDTH_MINUS_1);
         x_exp.saturating_add_assign(1);
         let round_bit = a0 & shift_m1_bit;
         // Since x + y fits on prec + 1 bits, the sticky bit is zero.
@@ -1031,7 +1031,7 @@ fn add_float_significands_same_prec_gt_w_lt_2w(
                 // carry in high word
                 sticky_bit |= a0 & 1;
                 // shift a by 1
-                a0 = (a1 << WIDTH_M1) | (a0 >> 1);
+                a0 = (a1 << WIDTH_MINUS_1) | (a0 >> 1);
                 x_exp.saturating_add_assign(1);
                 LIMB_HIGH_BIT | (a1 >> 1)
             } else {
@@ -1060,7 +1060,7 @@ fn add_float_significands_same_prec_gt_w_lt_2w(
             if overflow_2 {
                 sticky_bit |= a0 & 1;
                 // shift a by 1
-                a0 = (a1 << WIDTH_M1) | (a0 >> 1);
+                a0 = (a1 << WIDTH_MINUS_1) | (a0 >> 1);
                 x_exp.saturating_add_assign(1);
                 let round_bit = a0 & shift_m1_bit;
                 (
@@ -1132,7 +1132,7 @@ fn add_float_significands_same_prec_2w(
         x_exp.saturating_add_assign(1);
         // Since x + y fits on prec + 1 bits, the sticky bit is zero.
         (
-            (a1 << WIDTH_M1) | (a0 >> 1),
+            (a1 << WIDTH_MINUS_1) | (a0 >> 1),
             LIMB_HIGH_BIT | (a1 >> 1),
             a0 & 1,
             0,
@@ -1183,11 +1183,11 @@ fn add_float_significands_same_prec_2w(
             };
             if sum_1 < x_1 {
                 // carry in high word
-                let round_bit = sum_0 << WIDTH_M1;
+                let round_bit = sum_0 << WIDTH_MINUS_1;
                 // Shift the result by 1 to the right.
                 x_exp.saturating_add_assign(1);
                 (
-                    (sum_1 << WIDTH_M1) | (sum_0 >> 1),
+                    (sum_1 << WIDTH_MINUS_1) | (sum_0 >> 1),
                     LIMB_HIGH_BIT | (sum_1 >> 1),
                     round_bit,
                     sticky_bit,
@@ -1251,13 +1251,13 @@ fn add_float_significands_same_prec_gt_2w_lt_3w(
             a2.wrapping_add_assign(1);
         }
         // Since prec < 3 * Limb::WIDTH, we lose no bit in a0 >> 1.
-        a0 = (a1 << WIDTH_M1) | (a0 >> 1);
+        a0 = (a1 << WIDTH_MINUS_1) | (a0 >> 1);
         x_exp.saturating_add_assign(1);
         let round_bit = a0 & shift_m1_bit;
         // Since x + y fits on prec + 1 bits, the sticky bit is zero.
         (
             a0 ^ round_bit,
-            (a2 << WIDTH_M1) | (a1 >> 1),
+            (a2 << WIDTH_MINUS_1) | (a1 >> 1),
             LIMB_HIGH_BIT | (a2 >> 1),
             round_bit,
             0,
@@ -1288,9 +1288,9 @@ fn add_float_significands_same_prec_gt_2w_lt_3w(
             let (sum_1, sum_2) = if overflow_3 || (a2 == x_2 && overflow_2) {
                 sticky_bit |= a0 & 1;
                 // shift a by 1
-                a0 = (a1 << WIDTH_M1) | (a0 >> 1);
+                a0 = (a1 << WIDTH_MINUS_1) | (a0 >> 1);
                 x_exp.saturating_add_assign(1);
-                ((a2 << WIDTH_M1) | (a1 >> 1), LIMB_HIGH_BIT | (a2 >> 1))
+                ((a2 << WIDTH_MINUS_1) | (a1 >> 1), LIMB_HIGH_BIT | (a2 >> 1))
             } else {
                 (a1, a2)
             };
@@ -1327,13 +1327,13 @@ fn add_float_significands_same_prec_gt_2w_lt_3w(
             if overflow_3 {
                 sticky_bit |= a0 & 1;
                 // shift a by 1
-                a0 = (a1 << WIDTH_M1) | (a0 >> 1);
+                a0 = (a1 << WIDTH_MINUS_1) | (a0 >> 1);
                 x_exp.saturating_add_assign(1);
                 let round_bit = a0 & shift_m1_bit;
                 sticky_bit |= (a0 & mask) ^ round_bit;
                 (
                     a0 & !mask,
-                    (a2 << WIDTH_M1) | (a1 >> 1),
+                    (a2 << WIDTH_MINUS_1) | (a1 >> 1),
                     LIMB_HIGH_BIT | (a2 >> 1),
                     round_bit,
                     sticky_bit,
@@ -1360,13 +1360,13 @@ fn add_float_significands_same_prec_gt_2w_lt_3w(
             if a2 == 0 {
                 sticky_bit |= a0 & 1;
                 // shift a by 1
-                a0 = (a1 << WIDTH_M1) | (a0 >> 1);
+                a0 = (a1 << WIDTH_MINUS_1) | (a0 >> 1);
                 x_exp.saturating_add_assign(1);
                 let round_bit = a0 & shift_m1_bit;
                 sticky_bit |= (a0 & mask) ^ round_bit;
                 (
                     a0 & !mask,
-                    (a2 << WIDTH_M1) | (a1 >> 1),
+                    (a2 << WIDTH_MINUS_1) | (a1 >> 1),
                     LIMB_HIGH_BIT | (a2 >> 1),
                     round_bit,
                     sticky_bit,
@@ -1844,7 +1844,7 @@ fn add_float_significands_same_prec_ge_3w_ref_ref<'a>(
         } else {
             // The round bit and possibly a part of the sticky bit are in sticky_bit
             round_bit = sticky_bit & LIMB_HIGH_BIT;
-            sticky_bit &= !LIMB_HIGH_BIT;
+            sticky_bit &= NOT_LIMB_HIGH_BIT;
         }
         out[0] &= mask;
         // Check for carry out
@@ -2016,7 +2016,7 @@ fn add_float_significands_same_prec_ge_3w_val_ref(
         } else {
             // The round bit and possibly a part of the sticky bit are in sticky_bit
             round_bit = sticky_bit & LIMB_HIGH_BIT;
-            sticky_bit &= !LIMB_HIGH_BIT;
+            sticky_bit &= NOT_LIMB_HIGH_BIT;
         }
         xs[0] &= mask;
         // Check for carry out
@@ -2179,7 +2179,7 @@ fn add_float_significands_same_prec_ge_3w_ref_val(
         } else {
             // The round bit and possibly a part of the sticky bit are in sticky_bit
             round_bit = sticky_bit & LIMB_HIGH_BIT;
-            sticky_bit &= !LIMB_HIGH_BIT;
+            sticky_bit &= NOT_LIMB_HIGH_BIT;
         }
         ys[0] &= mask;
         // Check for carry out
@@ -2458,7 +2458,7 @@ fn add_float_significands_general(
                 }
             } else {
                 if round_bit == Uninitialized {
-                    round_bit = RoundBit::from(x >> (Limb::WIDTH - 1) != 0);
+                    round_bit = RoundBit::from(x >> WIDTH_MINUS_1 != 0);
                     x |= LIMB_HIGH_BIT;
                 }
                 following_bits = True;
@@ -2510,9 +2510,9 @@ fn add_float_significands_general(
                         round_bit = False;
                     }
                     if round_bit == Uninitialized {
-                        round_bit = RoundBit::from(x >> (Limb::WIDTH - 1) != 0);
+                        round_bit = RoundBit::from(x >> WIDTH_MINUS_1 != 0);
                         x <<= 1;
-                        x |= x >> (Limb::WIDTH - 1);
+                        x |= x >> WIDTH_MINUS_1;
                     }
                     following_bits = RoundBit::from(x != 0);
                     if x != 0 && x != Limb::MAX {
@@ -2621,8 +2621,8 @@ fn add_float_significands_general(
                 xi -= 1;
                 let mut x = xs[xi];
                 if round_bit == Uninitialized {
-                    round_bit = RoundBit::from(x >> (Limb::WIDTH - 1) != 0);
-                    x &= !LIMB_HIGH_BIT;
+                    round_bit = RoundBit::from(x >> WIDTH_MINUS_1 != 0);
+                    x &= NOT_LIMB_HIGH_BIT;
                 }
                 following_bits = RoundBit::from(x != 0);
             }
@@ -2675,8 +2675,8 @@ fn add_float_significands_general(
                     ys[yi]
                 };
                 if round_bit == Uninitialized {
-                    round_bit = RoundBit::from(y >> (Limb::WIDTH - 1) != 0);
-                    y &= !LIMB_HIGH_BIT;
+                    round_bit = RoundBit::from(y >> WIDTH_MINUS_1 != 0);
+                    y &= NOT_LIMB_HIGH_BIT;
                 }
                 while y == 0 {
                     if yi == 0 {

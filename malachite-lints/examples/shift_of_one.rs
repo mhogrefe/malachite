@@ -17,9 +17,8 @@ fn f(x: u64, k: u64) -> (u64, bool, bool, u64, u64, u64, u64, u64, u64) {
     let h = x << k;
     // a constant shift amount folds at compile time, so the raw shift is preferable: fine.
     let i = 1u64 << 5;
-    // a local bound to a const expression is followed to its initializer, so also fine.
-    const W: u64 = 64;
-    let amount = W - 1;
+    // a local bound to a constant expression is followed to its initializer, so also fine.
+    let amount = 64 - 1;
     let m = 1u64 << amount;
     (a, b, c, d, e, g, h, i, m)
 }

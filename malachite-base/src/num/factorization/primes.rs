@@ -31,6 +31,10 @@ use core::marker::PhantomData;
 
 const NUM_SMALL_PRIMES: usize = 172;
 
+// The sieve bit index of the first prime past the small-prime table (1031 is the next prime after
+// 1021, the largest prime below 2^10).
+const NEXT_INDEX: u64 = n_to_bit(1031) - 1;
+
 // This is flint_primes_small from ulong_extras/compute_primes.c, FLINT 3.1.2.
 pub(crate) const SMALL_PRIMES: [u16; NUM_SMALL_PRIMES] = [
     2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97,
@@ -144,7 +148,6 @@ impl<T: PrimitiveUnsigned> PrimesLessThanIterator<T> {
                     false
                 } else {
                     self.small = false;
-                    const NEXT_INDEX: u64 = n_to_bit(1031) - 1;
                     self.i = NEXT_INDEX;
                     let next_i =
                         if let Some(next_i) = limbs_index_of_next_false_bit(&self.sieve, self.i) {
@@ -194,7 +197,6 @@ impl<T: PrimitiveUnsigned> Iterator for PrimesLessThanIterator<T> {
             self.i += 1;
             if self.i == NUM_SMALL_PRIMES as u64 {
                 self.small = false;
-                const NEXT_INDEX: u64 = n_to_bit(1031) - 1;
                 self.i = NEXT_INDEX;
             }
             Some(p)

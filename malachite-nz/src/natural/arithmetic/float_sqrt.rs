@@ -17,6 +17,8 @@ use crate::natural::arithmetic::add::limbs_slice_add_limb_in_place;
 use crate::natural::arithmetic::shr::limbs_shr_to_out;
 use crate::natural::arithmetic::sqrt::limbs_sqrt_to_out_return_inexact;
 use crate::natural::{LIMB_HIGH_BIT, Natural, bit_to_limb_count_ceiling};
+#[cfg(not(feature = "32_bit_limbs"))]
+use crate::natural::{TWICE_WIDTH, WIDTH_MINUS_1};
 use crate::platform::Limb;
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{NegModPowerOf2, Parity, PowerOf2};
@@ -278,7 +280,7 @@ fn sqrt_float_significand_in_place_same_prec(
             Some((exp, o))
         }
         Natural(Large(xs)) => match xs.as_mut_slice() {
-            [x_0, x_1] if prec != const { Limb::WIDTH << 1 } => {
+            [x_0, x_1] if prec != TWICE_WIDTH => {
                 let (sqrt_0, sqrt_1, exp, o) =
                     sqrt_float_significand_same_prec_gt_w_lt_2w(*x_0, *x_1, x_exp, prec, rm);
                 *x_0 = sqrt_0;
@@ -318,7 +320,7 @@ fn sqrt_float_significand_same_prec_ref(
             };
             Some((Natural::from(sqrt), exp, o))
         }
-        [x_0, x_1] if prec != const { Limb::WIDTH << 1 } => {
+        [x_0, x_1] if prec != TWICE_WIDTH => {
             let (sqrt_0, sqrt_1, exp, o) =
                 sqrt_float_significand_same_prec_gt_w_lt_2w(*x_0, *x_1, x_exp, prec, rm);
             Some((Natural(Large(vec![sqrt_0, sqrt_1])), exp, o))
@@ -484,7 +486,7 @@ fn sqrt_float_significand_same_prec_w(
     rm: RoundingMode,
 ) -> (Limb, i32, Ordering) {
     let low = if x_exp.odd() {
-        let low = x << (Limb::WIDTH - 1);
+        let low = x << WIDTH_MINUS_1;
         x >>= 1;
         x_exp += 1;
         low
@@ -668,7 +670,7 @@ fn limbs_2_sqrt_approx(n0: Limb, n1: Limb) -> (Limb, Limb) {
 fn two_limbs_square(x_1: Limb, x_0: Limb) -> (Limb, Limb, Limb) {
     let (x_00_1, x_00_0) = Limb::x_mul_y_to_zz(x_0, x_0);
     let (mut x_01_1, mut x_01_0) = Limb::x_mul_y_to_zz(x_0, x_1);
-    x_01_1 = (x_01_1 << 1) | (x_01_0 >> const { Limb::WIDTH - 1 });
+    x_01_1 = (x_01_1 << 1) | (x_01_0 >> WIDTH_MINUS_1);
     x_01_0 <<= 1;
     (x_01_1, x_01_0) = Limb::xx_add_yy_to_zz(x_01_1, x_01_0, 0, x_00_1);
     (x_1.wrapping_mul(x_1).wrapping_add(x_01_1), x_01_0, x_00_0)
@@ -683,11 +685,14 @@ fn sqrt_float_significand_same_prec_gt_w_lt_2w(
     prec: u64,
     rm: RoundingMode,
 ) -> (Limb, Limb, i32, Ordering) {
-    let shift = const { Limb::WIDTH << 1 } - prec;
+    let shift = TWICE_WIDTH - prec;
     let (n3, n2, n1) = if x_exp.odd() {
-        const SHIFT: u64 = Limb::WIDTH - 1;
         x_exp += 1;
-        (x_1 >> 1, (x_1 << SHIFT) | (x_0 >> 1), x_0 << SHIFT)
+        (
+            x_1 >> 1,
+            (x_1 << WIDTH_MINUS_1) | (x_0 >> 1),
+            x_0 << WIDTH_MINUS_1,
+        )
     } else {
         (x_1, x_0, 0)
     };
@@ -706,7 +711,7 @@ fn sqrt_float_significand_same_prec_gt_w_lt_2w(
         // 54*s - 676, thus it suffices to compute n - r^2 modulo 2^192
         (t2, t1, t0) = Limb::xxx_sub_yyy_to_zzz(n2, n1, 0, t2, t1, t0);
         // invariant: h:l = 2 * {rp, 2}, with upper bit implicit
-        let mut h = (r1 << 1) | (r0 >> const { Limb::WIDTH - 1 });
+        let mut h = (r1 << 1) | (r0 >> WIDTH_MINUS_1);
         let mut l = r0 << 1;
         while t2.get_highest_bit() {
             // approximation was too large
@@ -738,7 +743,7 @@ fn sqrt_float_significand_same_prec_gt_w_lt_2w(
         }
         // restore {rp, 2} from h:l
         r1 = LIMB_HIGH_BIT | (h >> 1);
-        r0 = (h << const { Limb::WIDTH - 1 }) | (l >> 1);
+        r0 = (h << WIDTH_MINUS_1) | (l >> 1);
         t2 | t0 | t1
     };
     let round_bit = r0 & (shift_bit >> 1);

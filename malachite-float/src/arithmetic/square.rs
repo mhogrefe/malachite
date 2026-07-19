@@ -233,7 +233,7 @@ impl Float {
                         Ceiling | Up | Nearest => (float_infinity!(), Greater),
                         _ => (Self::max_finite_value_with_prec(prec), Less),
                     };
-                } else if twice_exp < Self::MIN_EXPONENT - 1 {
+                } else if twice_exp < Self::MIN_EXPONENT_MINUS_1 {
                     assert!(rm != Exact, "Inexact Float squaring");
                     return match rm {
                         Floor | Down | Nearest => (float_zero!(), Less),
@@ -254,7 +254,7 @@ impl Float {
                     };
                 } else if exp < Self::MIN_EXPONENT {
                     return if rm == Nearest
-                        && exp == Self::MIN_EXPONENT - 1
+                        && exp == Self::MIN_EXPONENT_MINUS_1
                         && (o == Less || !square.is_power_of_2())
                     {
                         (Self::min_positive_value_prec(prec), Greater)
@@ -672,7 +672,7 @@ impl Float {
                             Less
                         }
                     };
-                } else if twice_exp < Self::MIN_EXPONENT - 1 {
+                } else if twice_exp < Self::MIN_EXPONENT_MINUS_1 {
                     assert!(rm != Exact, "Inexact Float squaring");
                     return match rm {
                         Floor | Down | Nearest => {
@@ -705,7 +705,7 @@ impl Float {
                     };
                 } else if *x_exp < Self::MIN_EXPONENT {
                     return if rm == Nearest
-                        && *x_exp == Self::MIN_EXPONENT - 1
+                        && *x_exp == Self::MIN_EXPONENT_MINUS_1
                         && (o == Less || !x.is_power_of_2())
                     {
                         {

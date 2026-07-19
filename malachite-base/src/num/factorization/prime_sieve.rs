@@ -15,6 +15,7 @@
 use crate::num::basic::integers::PrimitiveInt;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::ExactFrom;
+use crate::num::factorization::TWICE_U64_WIDTH;
 use crate::num::logic::traits::CountOnes;
 
 pub const SIEVE_SEED_U32: u32 = 0x69128480;
@@ -130,7 +131,6 @@ const C2U64WM110: u64 = (u64::WIDTH << 1) - 110;
 const C182MU64W: u64 = 182 - u64::WIDTH;
 const C182M2U64W: u64 = 182 - (u64::WIDTH << 1);
 const C3U64WM182: u64 = 3 * u64::WIDTH - 182;
-const C2U64W: u64 = u64::WIDTH << 1;
 
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -192,9 +192,9 @@ fn fill_bitpattern_u64(bit_array: &mut [u64], mut offset: u64) -> u64 {
                         m22 |= SIEVE_2MSK1_U64 << (C182MU64W - offset);
                         (m21, m22, SIEVE_2MSK1_U64 >> (offset - C182M2U64W))
                     }
-                } else if offset < C2U64W {
+                } else if offset < TWICE_U64_WIDTH {
                     m21 = (SIEVE_2MSK2_U64 >> (offset - u64::WIDTH))
-                        | (SIEVE_2MSKT_U64 << (C2U64W - offset));
+                        | (SIEVE_2MSKT_U64 << (TWICE_U64_WIDTH - offset));
                     if offset <= C182MU64W {
                         let mut m23 = SIEVE_2MSK2_U64 << (C182MU64W - offset);
                         if offset != C182MU64W {
@@ -218,7 +218,7 @@ fn fill_bitpattern_u64(bit_array: &mut [u64], mut offset: u64) -> u64 {
                 } else {
                     (
                         (SIEVE_2MSK1_U64 << (182 - offset))
-                            | (SIEVE_2MSKT_U64 >> (offset - C2U64W)),
+                            | (SIEVE_2MSKT_U64 >> (offset - TWICE_U64_WIDTH)),
                         (SIEVE_2MSK2_U64 << (182 - offset))
                             | (SIEVE_2MSK1_U64 >> (offset - C182MU64W)),
                         (SIEVE_2MSKT_U64 << (182 - offset))
@@ -441,7 +441,7 @@ fn limbs_prime_sieve_generic<T: PrimitiveUnsigned, F: Fn(&mut [T], u64) -> u64>(
     assert!(n > 4);
     let bits = n_to_bit(n);
     let size = usize::exact_from((bits >> T::LOG_WIDTH) + 1);
-    if size > BLOCK_SIZE << 1 {
+    if size > const { BLOCK_SIZE << 1 } {
         let mut off = BLOCK_SIZE + (size % BLOCK_SIZE);
         first_block_primesieve(
             bit_array,

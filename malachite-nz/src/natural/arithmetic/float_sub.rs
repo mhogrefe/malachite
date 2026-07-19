@@ -25,7 +25,9 @@ use crate::natural::arithmetic::sub::{
     limbs_sub_same_length_with_borrow_in_to_out, sub_with_borrow,
 };
 use crate::natural::{
-    LIMB_HIGH_BIT, Natural, bit_to_limb_count_ceiling, bit_to_limb_count_floor, limb_to_bit_count,
+    HALF_LIMB_HIGH_BIT, LIMB_HIGH_BIT, LIMB_MAX_HALF, LIMB_MAX_MINUS_1, NOT_LIMB_HIGH_BIT, Natural,
+    THRICE_WIDTH, TWICE_WIDTH, WIDTH_MINUS_1, bit_to_limb_count_ceiling, bit_to_limb_count_floor,
+    limb_to_bit_count,
 };
 use crate::platform::Limb;
 use core::cmp::{
@@ -45,17 +47,11 @@ use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::slices::{slice_set_zero, slice_test_zero};
 
-const WIDTH_M1: u64 = Limb::WIDTH - 1;
-const IWIDTH_M1: isize = WIDTH_M1 as isize;
-const WIDTH_M1_MASK: Limb = Limb::MAX >> 1;
+const IWIDTH_M1: isize = WIDTH_MINUS_1 as isize;
 const WIDTH_M2_MASK: Limb = Limb::MAX >> 2;
-const HALF_LIMB_HIGH_BIT: Limb = LIMB_HIGH_BIT >> 1;
 const IWIDTH: i32 = Limb::WIDTH as i32;
 const NEG_ONE: Limb = Limb::MAX;
-const NEG_TWO: Limb = Limb::MAX - 1;
 const WIDTH_P1: u64 = Limb::WIDTH + 1;
-const TWICE_WIDTH: u64 = Limb::WIDTH << 1;
-const THRICE_WIDTH: u64 = Limb::WIDTH * 3;
 const TWICE_WIDTH_P1: u64 = (Limb::WIDTH << 1) + 1;
 
 pub fn sub_float_significands_in_place(
@@ -960,7 +956,7 @@ fn sub_float_significands_same_prec_w(
                 sticky_bit <<= leading_zeros;
                 x_exp.saturating_sub_assign(i32::wrapping_from(leading_zeros));
                 let round_bit = sticky_bit & LIMB_HIGH_BIT;
-                (a0, sticky_bit & !LIMB_HIGH_BIT, round_bit, neg)
+                (a0, sticky_bit & NOT_LIMB_HIGH_BIT, round_bit, neg)
             }
         } else {
             // We compute x - ulp(x)
@@ -993,9 +989,9 @@ fn sub_float_significands_same_prec_w(
                 if exp_diff == Limb::WIDTH && y > LIMB_HIGH_BIT {
                     // case (b)
                     (
-                        NEG_TWO,
+                        LIMB_MAX_MINUS_1,
                         y.wrapping_neg() << 2,
-                        Limb::from(y.wrapping_neg() >= (LIMB_HIGH_BIT >> 1)),
+                        Limb::from(y.wrapping_neg() >= HALF_LIMB_HIGH_BIT),
                         neg,
                     )
                 } else {
@@ -1181,8 +1177,8 @@ fn sub_float_significands_same_prec_gt_w_lt_2w(
             // since x_1 has its most significant bit set, we can have an exponent decrease of at
             // most one
             let diff_1 = if a1 < LIMB_HIGH_BIT {
-                let diff_1 = (a1 << 1) | (a0 >> WIDTH_M1);
-                a0 = (a0 << 1) | (sticky_bit >> WIDTH_M1);
+                let diff_1 = (a1 << 1) | (a0 >> WIDTH_MINUS_1);
+                a0 = (a0 << 1) | (sticky_bit >> WIDTH_MINUS_1);
                 sticky_bit <<= 1;
                 x_exp.saturating_sub_assign(1);
                 diff_1
@@ -1369,7 +1365,7 @@ fn sub_float_significands_same_prec_2w(
                 (
                     a0,
                     a1,
-                    sticky_bit & !LIMB_HIGH_BIT,
+                    sticky_bit & NOT_LIMB_HIGH_BIT,
                     sticky_bit & LIMB_HIGH_BIT,
                     neg,
                 )
@@ -1414,16 +1410,16 @@ fn sub_float_significands_same_prec_2w(
             // we can have an exponent decrease of at most one
             if a1 < LIMB_HIGH_BIT {
                 // shift [a1, a0] left by 1 bit
-                a1 = (a1 << 1) | (a0 >> WIDTH_M1);
+                a1 = (a1 << 1) | (a0 >> WIDTH_MINUS_1);
                 assert!(a1 >= LIMB_HIGH_BIT);
-                a0 = (a0 << 1) | (sticky_bit >> WIDTH_M1);
+                a0 = (a0 << 1) | (sticky_bit >> WIDTH_MINUS_1);
                 sticky_bit <<= 1;
                 x_exp.saturating_sub_assign(1);
             }
             (
                 a0,
                 a1,
-                sticky_bit & !LIMB_HIGH_BIT,
+                sticky_bit & NOT_LIMB_HIGH_BIT,
                 sticky_bit & LIMB_HIGH_BIT,
                 neg,
             )
@@ -1462,7 +1458,7 @@ fn sub_float_significands_same_prec_2w(
                     // significant bit of t is necessarily 0), and the sticky bit is formed by the
                     // remaining bits of t, and those from -y_0.
                     (
-                        NEG_TWO,
+                        LIMB_MAX_MINUS_1,
                         Limb::MAX,
                         (t << 2) | y_0,
                         Limb::from(t >= HALF_LIMB_HIGH_BIT),
@@ -1709,11 +1705,11 @@ fn sub_float_significands_same_prec_gt_2w_lt_3w(
             // since x_2 has its most significant bit set, we can have an exponent decrease of at
             // most one
             let (diff_1, diff_2) = if a2 < LIMB_HIGH_BIT {
-                let diff_1 = (a1 << 1) | (a0 >> WIDTH_M1);
-                a0 = (a0 << 1) | (sticky_bit >> WIDTH_M1);
+                let diff_1 = (a1 << 1) | (a0 >> WIDTH_MINUS_1);
+                a0 = (a0 << 1) | (sticky_bit >> WIDTH_MINUS_1);
                 sticky_bit <<= 1;
                 x_exp.saturating_sub_assign(1);
-                (diff_1, (a2 << 1) | (a1 >> WIDTH_M1))
+                (diff_1, (a2 << 1) | (a1 >> WIDTH_MINUS_1))
             } else {
                 (a1, a2)
             };
@@ -1756,11 +1752,11 @@ fn sub_float_significands_same_prec_gt_2w_lt_3w(
                 a2.wrapping_sub_assign(1);
             }
             let (diff_1, diff_2) = if a2 < LIMB_HIGH_BIT {
-                let diff_1 = (a1 << 1) | (a0 >> WIDTH_M1);
-                a0 = (a0 << 1) | (sticky_bit >> WIDTH_M1);
+                let diff_1 = (a1 << 1) | (a0 >> WIDTH_MINUS_1);
+                a0 = (a0 << 1) | (sticky_bit >> WIDTH_MINUS_1);
                 sticky_bit <<= 1;
                 x_exp.saturating_sub_assign(1);
-                (diff_1, (a2 << 1) | (a1 >> WIDTH_M1))
+                (diff_1, (a2 << 1) | (a1 >> WIDTH_MINUS_1))
             } else {
                 (a1, a2)
             };
@@ -1880,7 +1876,7 @@ fn limbs_sub_shl1_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb])
     let mut remaining_xs_bits = 0;
     for (out, (&x, &y)) in out.iter_mut().zip(xs.iter().zip(ys.iter())) {
         let shifted_x = (x << 1) | remaining_xs_bits;
-        remaining_xs_bits = x >> WIDTH_M1;
+        remaining_xs_bits = x >> WIDTH_MINUS_1;
         (*out, borrow) = sub_with_borrow(shifted_x, y, borrow);
     }
 }
@@ -2154,7 +2150,7 @@ fn sub_float_significands_same_prec_ge_3w_ref_ref<'a>(
                 let mut yl_shifted;
                 loop {
                     // The first loop will compare x[n - 2] and y'[n - 2]
-                    yl_shifted = ys[l - 1] << WIDTH_M1;
+                    yl_shifted = ys[l - 1] << WIDTH_MINUS_1;
                     l -= 1;
                     if l == 0 {
                         break;
@@ -2222,7 +2218,7 @@ fn sub_float_significands_same_prec_ge_3w_ref_ref<'a>(
                 round_bit = 0;
                 if exp_diff == prec + 1 {
                     round_bit_2 = 1;
-                    sticky_bit_2 = ys[nm1] & WIDTH_M1_MASK;
+                    sticky_bit_2 = ys[nm1] & LIMB_MAX_HALF;
                     let mut k = nm1;
                     while sticky_bit_2 == 0 && k > 0 {
                         k -= 1;
@@ -2244,7 +2240,7 @@ fn sub_float_significands_same_prec_ge_3w_ref_ref<'a>(
             // assuming the most significant bit of Y is bit 0
             let x = prec - exp_diff;
             let mut kx = nm1 - bit_to_limb_count_floor(x);
-            let mut sx_bit = Limb::power_of_2(WIDTH_M1 - (x & Limb::WIDTH_MASK));
+            let mut sx_bit = Limb::power_of_2(WIDTH_MINUS_1 - (x & Limb::WIDTH_MASK));
             // the round bit is in ys[kx], at position sx
             assert!(prec >= exp_diff);
             round_bit = ys[kx] & sx_bit;
@@ -2379,7 +2375,7 @@ fn limbs_sub_shl1_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
     let mut remaining_xs_bits = 0;
     for (x, &y) in xs.iter_mut().zip(ys.iter()) {
         let shifted_x = (*x << 1) | remaining_xs_bits;
-        remaining_xs_bits = *x >> WIDTH_M1;
+        remaining_xs_bits = *x >> WIDTH_MINUS_1;
         (*x, borrow) = sub_with_borrow(shifted_x, y, borrow);
     }
 }
@@ -2653,7 +2649,7 @@ fn sub_float_significands_same_prec_ge_3w_val_ref_helper(
                 let mut yl_shifted;
                 loop {
                     // The first loop will compare x[n - 2] and y'[n - 2]
-                    yl_shifted = ys[l - 1] << WIDTH_M1;
+                    yl_shifted = ys[l - 1] << WIDTH_MINUS_1;
                     l -= 1;
                     if l == 0 {
                         break;
@@ -2721,7 +2717,7 @@ fn sub_float_significands_same_prec_ge_3w_val_ref_helper(
                 round_bit = 0;
                 if exp_diff == prec + 1 {
                     round_bit_2 = 1;
-                    sticky_bit_2 = ys[nm1] & WIDTH_M1_MASK;
+                    sticky_bit_2 = ys[nm1] & LIMB_MAX_HALF;
                     let mut k = nm1;
                     while sticky_bit_2 == 0 && k > 0 {
                         k -= 1;
@@ -2741,7 +2737,7 @@ fn sub_float_significands_same_prec_ge_3w_val_ref_helper(
             // assuming the most significant bit of Y is bit 0
             let x = prec - exp_diff;
             let mut kx = nm1 - bit_to_limb_count_floor(x);
-            let mut sx_bit = Limb::power_of_2(WIDTH_M1 - (x & Limb::WIDTH_MASK));
+            let mut sx_bit = Limb::power_of_2(WIDTH_MINUS_1 - (x & Limb::WIDTH_MASK));
             // the round bit is in ys[kx], at position sx
             assert!(prec >= exp_diff);
             round_bit = ys[kx] & sx_bit;
@@ -2873,7 +2869,7 @@ fn limbs_sub_shl1_same_length_in_place_right(xs: &[Limb], ys: &mut [Limb]) {
     let mut remaining_xs_bits = 0;
     for (&x, y) in xs.iter().zip(ys.iter_mut()) {
         let shifted_x = (x << 1) | remaining_xs_bits;
-        remaining_xs_bits = x >> WIDTH_M1;
+        remaining_xs_bits = x >> WIDTH_MINUS_1;
         (*y, borrow) = sub_with_borrow(shifted_x, *y, borrow);
     }
 }
@@ -3088,7 +3084,7 @@ fn sub_float_significands_same_prec_ge_3w_ref_val_helper(
                 let mut yl_shifted;
                 loop {
                     // The first loop will compare x[n - 2] and y'[n - 2]
-                    yl_shifted = ys[l - 1] << WIDTH_M1;
+                    yl_shifted = ys[l - 1] << WIDTH_MINUS_1;
                     l -= 1;
                     if l == 0 {
                         break;
@@ -3156,7 +3152,7 @@ fn sub_float_significands_same_prec_ge_3w_ref_val_helper(
                 round_bit = 0;
                 if exp_diff == prec + 1 {
                     round_bit_2 = 1;
-                    sticky_bit_2 = ys[nm1] & WIDTH_M1_MASK;
+                    sticky_bit_2 = ys[nm1] & LIMB_MAX_HALF;
                     let mut k = nm1;
                     while sticky_bit_2 == 0 && k > 0 {
                         k -= 1;
@@ -3178,7 +3174,7 @@ fn sub_float_significands_same_prec_ge_3w_ref_val_helper(
             // assuming the most significant bit of Y is bit 0
             let x = prec - exp_diff;
             let mut kx = nm1 - bit_to_limb_count_floor(x);
-            let mut sx_bit = Limb::power_of_2(WIDTH_M1 - (x & Limb::WIDTH_MASK));
+            let mut sx_bit = Limb::power_of_2(WIDTH_MINUS_1 - (x & Limb::WIDTH_MASK));
             // the round bit is in ys[kx], at position sx
             assert!(prec >= exp_diff);
             round_bit = ys[kx] & sx_bit;
@@ -3507,7 +3503,7 @@ pub fn exponent_shift_compare<'a>(
             assert_eq!(diff_exp, 1);
             assert!(lasty == 0 || lasty == LIMB_HIGH_BIT);
             yy = lasty + (ys[yi] >> 1);
-            lasty = ys[yi] << (Limb::WIDTH - 1);
+            lasty = ys[yi] << WIDTH_MINUS_1;
             if yi == 0 {
                 yi_done = true;
             } else {
@@ -4141,7 +4137,7 @@ fn sub_float_significands_general<'a>(
         }
     }
     let last_out = &mut out[out_len - 1];
-    if !goto_end_of_sub && *last_out >> WIDTH_M1 == 0 {
+    if !goto_end_of_sub && *last_out >> WIDTH_MINUS_1 == 0 {
         // case 1 - varepsilon
         *last_out = LIMB_HIGH_BIT;
         add_exp = true;

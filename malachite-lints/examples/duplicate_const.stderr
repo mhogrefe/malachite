@@ -1,0 +1,27 @@
+error: `u64::WIDTH - 1` is written out 3 times with the same value
+  --> $DIR/duplicate_const.rs:5:1
+   |
+LL | const WIDTH_MINUS_1: u64 = u64::WIDTH - 1;
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: consolidate it into one named constant (a `pub(crate)` associated constant, or a standalone `const`)
+   = note: `#[deny(duplicate_const)]` on by default
+
+error: `u64::WIDTH - 1` is written out 3 times with the same value
+  --> $DIR/duplicate_const.rs:8:10
+   |
+LL |     x >> const { u64::WIDTH - 1 }
+   |          ^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: consolidate it into one named constant (a `pub(crate)` associated constant, or a standalone `const`)
+
+error: `u64::WIDTH - 1` is written out 3 times with the same value
+  --> $DIR/duplicate_const.rs:12:9
+   |
+LL |     x & const { u64::WIDTH - 1 }
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: consolidate it into one named constant (a `pub(crate)` associated constant, or a standalone `const`)
+
+error: aborting due to 3 previous errors
+

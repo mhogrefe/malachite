@@ -577,7 +577,7 @@ pub_test! {cbrt_chebyshev_approx_u32(n: u32) -> u32 {
     const BIAS: u32 = 126;
     let (mantissa, exponent) = (n as f32).raw_mantissa_and_exponent();
     let mut mantissa = u32::wrapping_from(mantissa);
-    let table_index = usize::wrapping_from(mantissa >> (f32::MANTISSA_WIDTH - 4));
+    let table_index = usize::wrapping_from(mantissa >> const { f32::MANTISSA_WIDTH - 4 });
     mantissa |= BIAS_HEX;
     let (exponent_over_3, exponent_rem) = (u32::wrapping_from(exponent) - BIAS).div_mod(3);
 
@@ -594,7 +594,7 @@ pub_test! {cbrt_chebyshev_approx_u32(n: u32) -> u32 {
         if n >= MAX_CUBE {
             return UPPER_LIMIT;
         }
-        cbrt = UPPER_LIMIT - 1;
+        cbrt = const { UPPER_LIMIT - 1 };
     }
     while cbrt * cbrt * cbrt <= n {
         cbrt += 1;
@@ -618,7 +618,7 @@ pub_test! {cbrt_chebyshev_approx_u64(n: u64) -> u64 {
     const BIAS_HEX: u64 = 0x3fe0000000000000;
     const BIAS: u64 = 1022;
     let (mut mantissa, exponent) = (n as f64).raw_mantissa_and_exponent();
-    let table_index = usize::wrapping_from(mantissa >> (f64::MANTISSA_WIDTH - 4));
+    let table_index = usize::wrapping_from(mantissa >> const { f64::MANTISSA_WIDTH - 4 });
     mantissa |= BIAS_HEX;
     let (exponent_over_3, exponent_rem) = (exponent - BIAS).div_mod(3);
 
@@ -635,7 +635,7 @@ pub_test! {cbrt_chebyshev_approx_u64(n: u64) -> u64 {
         if n >= MAX_CUBE {
             return UPPER_LIMIT;
         }
-        cbrt = UPPER_LIMIT - 1;
+        cbrt = const { UPPER_LIMIT - 1 };
     }
     while cbrt * cbrt * cbrt <= n {
         cbrt += 1;
@@ -720,7 +720,7 @@ pub fn fast_floor_cbrt_u32(n: u32) -> u32 {
         if n >= UPPER_LIMIT_CUBE {
             return UPPER_LIMIT;
         }
-        ret = UPPER_LIMIT - 1;
+        ret = const { UPPER_LIMIT - 1 };
     }
     while ret * ret * ret <= n {
         ret += 1;
@@ -802,7 +802,7 @@ pub fn fast_floor_cbrt_u64(n: u64) -> u64 {
         if n >= UPPER_LIMIT_CUBE {
             return UPPER_LIMIT;
         }
-        ret = UPPER_LIMIT - 1;
+        ret = const { UPPER_LIMIT - 1 };
     }
     while ret * ret * ret <= n {
         ret += 1;
@@ -925,14 +925,14 @@ const MUL_FACTOR_64: [u64; 65] = [
 // This is equivalent to `n_root_estimate` from `ulong_extras/root_estimate.c`, FLINT 2.7.1, where
 // `FLINT64` is `false`.
 fn root_estimate_32(a: f64, n: usize) -> u32 {
-    let s = u32::low_mask(f32::EXPONENT_WIDTH - 1) << f32::MANTISSA_WIDTH;
+    let s = u32::low_mask(const { f32::EXPONENT_WIDTH - 1 }) << f32::MANTISSA_WIDTH;
     f32::from_bits(u32::x_mul_y_to_zz((a as f32).to_bits() - s, MUL_FACTOR_32[n]).0 + s) as u32
 }
 
 // This is equivalent to `n_root_estimate` from `ulong_extras/root_estimate.c`, FLINT 2.7.1, where
 // `FLINT64` is `true`.
 fn root_estimate_64(a: f64, n: usize) -> u64 {
-    let s = u64::low_mask(f64::EXPONENT_WIDTH - 1) << f64::MANTISSA_WIDTH;
+    let s = u64::low_mask(const { f64::EXPONENT_WIDTH - 1 }) << f64::MANTISSA_WIDTH;
     f64::from_bits(u64::x_mul_y_to_zz(a.to_bits() - s, MUL_FACTOR_64[n]).0 + s) as u64
 }
 

@@ -23,7 +23,7 @@ use crate::natural::arithmetic::mul::limbs_mul;
 use crate::natural::arithmetic::mul::product_of_limbs::limbs_product;
 use crate::natural::arithmetic::neg::limbs_neg_in_place;
 use crate::natural::arithmetic::shl::limbs_slice_shl_in_place;
-use crate::natural::{Natural, bit_to_limb_count_floor};
+use crate::natural::{LIMB_MAX_HALF, Natural, bit_to_limb_count_floor};
 use crate::platform::{
     CENTRAL_BINOMIAL_2FAC_TABLE, Limb, ODD_CENTRAL_BINOMIAL_OFFSET,
     ODD_CENTRAL_BINOMIAL_TABLE_LIMIT, ODD_FACTORIAL_EXTTABLE_LIMIT, ODD_FACTORIAL_TABLE_LIMIT,
@@ -46,6 +46,8 @@ use malachite_base::num::factorization::prime_sieve::limbs_prime_sieve_u32;
 use malachite_base::num::factorization::prime_sieve::limbs_prime_sieve_u64;
 use malachite_base::num::factorization::prime_sieve::{id_to_n, limbs_prime_sieve_size, n_to_bit};
 use malachite_base::num::logic::traits::{CountOnes, LeadingZeros, SignificantBits};
+
+const NOT_BIN_UIUI_RECURSIVE_SMALLDC: bool = !BIN_UIUI_RECURSIVE_SMALLDC;
 
 // This is similar to `mulfunc` from `mpz/bin_uiui.c`, GMP 6.2.1.
 const fn apply_mul_func(n: Limb, m: Limb) -> Limb {
@@ -97,7 +99,7 @@ pub_test! {limbs_binomial_coefficient_limb_limb_bdiv(n: Limb, k: Limb) -> Vec<Li
     assert!(k > Limb::wrapping_from(ODD_FACTORIAL_TABLE_LIMIT));
     let max_n = 1 + usize::exact_from(n >> Limb::LOG_WIDTH);
     let alloc = min(
-        SOME_THRESHOLD - 1 + max((3 * max_n) >> 1, SOME_THRESHOLD),
+        const { SOME_THRESHOLD - 1 } + max((3 * max_n) >> 1, SOME_THRESHOLD),
         usize::exact_from(k),
     ) + 1;
     let mut big_scratch = vec![0; alloc + SOME_THRESHOLD + 1];
@@ -112,7 +114,7 @@ pub_test! {limbs_binomial_coefficient_limb_limb_bdiv(n: Limb, k: Limb) -> Vec<Li
     ns[0] = 1;
     let mut n_len = 1;
     let mut num_fac = 1;
-    let mut j = Limb::wrapping_from(ODD_FACTORIAL_TABLE_LIMIT + 1);
+    let mut j = const { (ODD_FACTORIAL_TABLE_LIMIT + 1) as Limb };
     let mut jjj = ODD_FACTORIAL_TABLE_MAX;
     assert_eq!(
         ONE_LIMB_ODD_FACTORIAL_TABLE[ODD_FACTORIAL_TABLE_LIMIT],
@@ -268,7 +270,9 @@ pub_test! {limbs_binomial_coefficient_limb_limb_small_k_divide_and_conquer(
     mut k: Limb,
 ) -> Vec<Limb> {
     let half_k = k >> 1;
-    let mut out = if !BIN_UIUI_RECURSIVE_SMALLDC || half_k <= ODD_FACTORIAL_TABLE_LIMIT as Limb {
+    let mut out = if NOT_BIN_UIUI_RECURSIVE_SMALLDC
+        || half_k <= ODD_FACTORIAL_TABLE_LIMIT as Limb
+    {
         limbs_binomial_coefficient_limb_limb_small_k(n, half_k)
     } else {
         limbs_binomial_coefficient_limb_limb_small_k_divide_and_conquer(n, half_k)
@@ -287,7 +291,7 @@ pub_test! {limbs_binomial_coefficient_limb_limb_small_k_divide_and_conquer(
             out_len += 1;
         }
     } else {
-        let t = if !BIN_UIUI_RECURSIVE_SMALLDC || k <= ODD_FACTORIAL_TABLE_LIMIT as Limb {
+        let t = if NOT_BIN_UIUI_RECURSIVE_SMALLDC || k <= ODD_FACTORIAL_TABLE_LIMIT as Limb {
             limbs_binomial_coefficient_limb_limb_small_k(n, k)
         } else {
             limbs_binomial_coefficient_limb_limb_small_k_divide_and_conquer(n, k)
@@ -409,7 +413,7 @@ limbs_binomial_coefficient_limb_limb_goetgheluck(n: Limb, k: Limb) -> Vec<Limb> 
             index += 1;
         }
     }
-    assert!(max_prod <= Limb::MAX >> 1);
+    assert!(max_prod <= LIMB_MAX_HALF);
     max_prod <<= 1;
     for i in s + 2..=half_n_bit + 1 {
         if sieve[index] & mask == 0 {

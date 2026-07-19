@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::Natural;
+use crate::natural::WIDTH_MINUS_1;
 use crate::natural::conversion::to_limbs::LimbIterator;
 use crate::platform::Limb;
 use core::ops::Index;
@@ -70,7 +71,7 @@ impl DoubleEndedIterator for NaturalBitIterator<'_> {
             let bit = self.current_limb_back & self.j_mask != 0;
             self.j_mask >>= 1;
             if self.j_mask == 0 {
-                self.j_mask = Limb::power_of_2(Limb::WIDTH - 1);
+                self.j_mask = Limb::power_of_2(WIDTH_MINUS_1);
                 if let Some(next_back) = self.limbs.next_back() {
                     self.current_limb_back = next_back;
                 } else {
@@ -180,7 +181,7 @@ impl<'a> BitIterable for &'a Natural {
             j_mask: if remainder != 0 {
                 Limb::power_of_2(remainder - 1)
             } else {
-                Limb::power_of_2(Limb::WIDTH - 1)
+                Limb::power_of_2(WIDTH_MINUS_1)
             },
         };
         if let Some(next) = bits.limbs.next() {

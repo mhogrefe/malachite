@@ -22,6 +22,7 @@ use crate::natural::arithmetic::gcd::half_gcd::{
     limbs_half_gcd_matrix_init_scratch_len, limbs_half_gcd_matrix_mul_matrix,
     limbs_half_gcd_matrix_mul_matrix_1, limbs_half_gcd_matrix_update_q, limbs_half_gcd_scratch_len,
 };
+use crate::natural::{HALF_LIMB_RADIX, HALF_WIDTH};
 use crate::platform::{DoubleLimb, Limb};
 use core::cmp::max;
 use core::mem::swap;
@@ -83,9 +84,7 @@ impl GcdSubdivideStepContext for HalfGcdJacobiContext<'_, '_, '_> {
     }
 }
 
-const HALF_WIDTH: u64 = Limb::WIDTH >> 1;
-const TWO_POW_HALF_WIDTH: Limb = 1 << HALF_WIDTH;
-const TWICE_TWO_POW_HALF_WIDTH: Limb = TWO_POW_HALF_WIDTH << 1;
+const TWICE_TWO_POW_HALF_WIDTH: Limb = HALF_LIMB_RADIX << 1;
 
 // This is equivalent to `mpn_hgcd2_jacobi` from `mpn/hgcd2_jacobi.c`, GMP 6.2.1, returning `bitsp`
 // along with a bool.
@@ -129,7 +128,7 @@ fn limbs_half_gcd_2_jacobi(
                 m.data[1][1] = u11;
                 return (bits, true);
             }
-            if x_1 < TWO_POW_HALF_WIDTH {
+            if x_1 < HALF_LIMB_RADIX {
                 x_1 = (x_1 << HALF_WIDTH) + (x_0 >> HALF_WIDTH);
                 y_1 = (y_1 << HALF_WIDTH) + (y_0 >> HALF_WIDTH);
                 break;
@@ -184,7 +183,7 @@ fn limbs_half_gcd_2_jacobi(
             m.data[1][1] = u11;
             return (bits, true);
         }
-        if y_1 < TWO_POW_HALF_WIDTH {
+        if y_1 < HALF_LIMB_RADIX {
             x_1 = (x_1 << HALF_WIDTH) + (x_0 >> HALF_WIDTH);
             y_1 = (y_1 << HALF_WIDTH) + (y_0 >> HALF_WIDTH);
             subtract_a_1 = true;

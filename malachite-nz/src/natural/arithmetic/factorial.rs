@@ -18,7 +18,7 @@ use crate::natural::arithmetic::mul::{
     limbs_mul_greater_to_out, limbs_mul_greater_to_out_scratch_len,
 };
 use crate::natural::arithmetic::square::{limbs_square_to_out, limbs_square_to_out_scratch_len};
-use crate::natural::{Natural, bit_to_limb_count_floor};
+use crate::natural::{LIMB_MAX_DIV_3, Natural, bit_to_limb_count_floor};
 use crate::platform::{
     Limb, NTH_ROOT_NUMB_MASK_TABLE, ODD_DOUBLEFACTORIAL_TABLE_LIMIT, ODD_DOUBLEFACTORIAL_TABLE_MAX,
     ODD_FACTORIAL_TABLE_LIMIT, ONE_LIMB_ODD_DOUBLEFACTORIAL_TABLE, ONE_LIMB_ODD_FACTORIAL_TABLE,
@@ -39,6 +39,8 @@ use malachite_base::num::factorization::prime_sieve::limbs_prime_sieve_u32;
 use malachite_base::num::factorization::prime_sieve::limbs_prime_sieve_u64;
 use malachite_base::num::factorization::prime_sieve::{id_to_n, limbs_prime_sieve_size, n_to_bit};
 use malachite_base::num::logic::traits::{BitAccess, CountOnes, NotAssign, SignificantBits};
+
+const ODD_DOUBLEFACTORIAL_TABLE_LIMIT_PLUS_1: usize = ODD_DOUBLEFACTORIAL_TABLE_LIMIT + 1;
 
 pub_test! {subfactorial_naive(n: u64) -> Natural {
     let mut f = Natural::ONE;
@@ -153,7 +155,7 @@ fn limbs_2_multiswing_odd(
             index += 1;
         }
     }
-    assert!(max_prod <= const { Limb::MAX / 3 });
+    assert!(max_prod <= LIMB_MAX_DIV_3);
     let l_max_prod = max_prod * 3;
     for i in s + 2..=n_to_bit(n / 3) + 1 {
         if sieve[index] & mask == 0 {
@@ -267,11 +269,11 @@ pub_crate_test! {
 limbs_odd_factorial(n: usize, double: bool) -> Vec<Limb> {
     assert!(Limb::convertible_from(n));
     if double {
-        assert!(n > ODD_DOUBLEFACTORIAL_TABLE_LIMIT + 1 && n >= FAC_DSC_THRESHOLD);
+        assert!(n > ODD_DOUBLEFACTORIAL_TABLE_LIMIT_PLUS_1 && n >= FAC_DSC_THRESHOLD);
     }
     if n <= ODD_FACTORIAL_TABLE_LIMIT {
         vec![ONE_LIMB_ODD_FACTORIAL_TABLE[n]]
-    } else if n <= ODD_DOUBLEFACTORIAL_TABLE_LIMIT + 1 {
+    } else if n <= ODD_DOUBLEFACTORIAL_TABLE_LIMIT_PLUS_1 {
         let (hi, lo) = Limb::x_mul_y_to_zz(
             ONE_LIMB_ODD_DOUBLEFACTORIAL_TABLE[(n - 1) >> 1],
             ONE_LIMB_ODD_FACTORIAL_TABLE[n >> 1],
@@ -287,12 +289,11 @@ limbs_odd_factorial(n: usize, double: bool) -> Vec<Limb> {
         }
         let mut factors = vec![0; m / FACTORS_PER_LIMB + 1];
         assert!(m >= FACTORS_PER_LIMB);
-        const LIMIT_P1: usize = ODD_DOUBLEFACTORIAL_TABLE_LIMIT + 1;
-        assert!(m > LIMIT_P1);
+        assert!(m > ODD_DOUBLEFACTORIAL_TABLE_LIMIT_PLUS_1);
         let mut j = 0;
         let mut prod = 1;
         let mut max_prod = const { Limb::MAX / (FAC_DSC_THRESHOLD * FAC_DSC_THRESHOLD) as Limb };
-        assert!(m > LIMIT_P1);
+        assert!(m > ODD_DOUBLEFACTORIAL_TABLE_LIMIT_PLUS_1);
         loop {
             factors[j] = ODD_DOUBLEFACTORIAL_TABLE_MAX;
             j += 1;
@@ -309,7 +310,7 @@ limbs_odd_factorial(n: usize, double: bool) -> Vec<Limb> {
                 diff -= 2;
             }
             if diff != 0 {
-                let mut fac = (ODD_DOUBLEFACTORIAL_TABLE_LIMIT + 2)
+                let mut fac = const { ODD_DOUBLEFACTORIAL_TABLE_LIMIT + 2 }
                     * (ODD_DOUBLEFACTORIAL_TABLE_LIMIT + diff);
                 loop {
                     let f = fac as Limb;
@@ -329,7 +330,7 @@ limbs_odd_factorial(n: usize, double: bool) -> Vec<Limb> {
             }
             max_prod <<= 2;
             m >>= 1;
-            if m <= LIMIT_P1 {
+            if m <= ODD_DOUBLEFACTORIAL_TABLE_LIMIT_PLUS_1 {
                 break;
             }
         }
@@ -457,7 +458,7 @@ impl Factorial for Natural {
         } else if n < u64::from(FAC_ODD_THRESHOLD) {
             let mut factors =
                 vec![0; usize::wrapping_from(n - SMALL_FACTORIAL_LIMIT) / FACTORS_PER_LIMB + 2];
-            factors[0] = Limb::factorial(SMALL_FACTORIAL_LIMIT - 1);
+            factors[0] = Limb::factorial(const { SMALL_FACTORIAL_LIMIT - 1 });
             let mut j = 1;
             let n = Limb::wrapping_from(n);
             let mut prod = n;
@@ -544,16 +545,16 @@ impl DoubleFactorial for Natural {
         } else if n <= u64::wrapping_from(ODD_DOUBLEFACTORIAL_TABLE_LIMIT) {
             Self::from(ONE_LIMB_ODD_DOUBLEFACTORIAL_TABLE[usize::wrapping_from(n >> 1)])
         } else if n < u64::wrapping_from(FAC_2DSC_THRESHOLD) {
-            let mut factors = vec![0; usize::exact_from(n) / (FACTORS_PER_LIMB << 1) + 1];
+            let mut factors = vec![0; usize::exact_from(n) / const { FACTORS_PER_LIMB << 1 } + 1];
             factors[0] = ODD_DOUBLEFACTORIAL_TABLE_MAX;
             let mut j = 1;
             let mut n = Limb::wrapping_from(n);
             let mut prod = n;
-            let max_prod = Limb::MAX / FAC_2DSC_THRESHOLD;
+            const MAX_PROD: Limb = Limb::MAX / FAC_2DSC_THRESHOLD;
             const LIMIT: Limb = ODD_DOUBLEFACTORIAL_TABLE_LIMIT as Limb + 2;
             while n > LIMIT {
                 n -= 2;
-                if prod > max_prod {
+                if prod > MAX_PROD {
                     factors[j] = prod;
                     j += 1;
                     prod = n;

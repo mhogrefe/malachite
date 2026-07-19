@@ -348,6 +348,65 @@ truncates toward zero while `>>` takes the floor, so a signed `/` converts to `s
 drops the high bits where `*` would panic in a debug build — so `<<` is appropriate only where
 overflow is already ruled out.
 
+### `use_const_binding`
+
+Flags an immutable `let` whose initializer is a *derived* compile-time constant — arithmetic, a
+unary operation, or a cast that mentions at least one named constant, like
+`let rnd_bit = Limb::WIDTH - 5;`. Such a value reads more clearly as a named `const`, which
+announces that it is fixed at compile time, is computed once, and can be referred to by an
+unambiguous `SCREAMING_SNAKE_CASE` name — and it lets other lints (such as `shift_of_one`, which
+treats a constant shift amount specially) recognize the operand as constant without tracing the
+`let` back to its initializer. Only *derived* constants are flagged: a bare literal is already
+clear, and a bare path to an existing constant would just be a rename. Initializers that do not
+evaluate at compile time are left alone, which also excludes anything depending on a generic
+parameter, where a `const` item could not name it.
+
+### `use_const_block`
+
+Flags a *derived* compile-time constant that appears as a subexpression of a larger runtime
+expression — arithmetic, a unary operation, a comparison, or a cast built from named constants, like
+`RND_BIT + 1` in `msl >> (RND_BIT + 1)`, `Limb::ONE << RND_BIT` in `msl & (Limb::ONE << RND_BIT)`,
+or `!SOME_FLAG` in a runtime condition. Such a constant island reads as if it were recomputed each
+time; folding it to its value or wrapping it in a `const { .. }` block makes the compile-time
+evaluation explicit and guaranteed. It is the subexpression companion of `use_const_binding` (which
+covers a whole `let`). Only the *maximal* constant subexpression is flagged (the largest one whose
+enclosing expression is not itself a constructible constant), and only when it is *derived* — built
+from at least one named constant, not a bare literal computation the compiler folds anyway. A
+subexpression that does not evaluate at compile time is left alone, as is one that mentions a local
+— including a `bool` that short-circuiting makes constant-valued while it still names a runtime
+operand (`SOME_CONST && n < THRESHOLD`), which could not be lifted into a `const { .. }` block.
+Anything already inside a `const { .. }` block or a const context is skipped.
+
+### `use_const_cast`
+
+Flags a numeric conversion of a `const { .. }` block — either an `as` cast
+(`const { (A - B) << 1 } as f64`) or a `from`/`exact_from`/`wrapping_from` call
+(`u64::exact_from(const { Self::MAX_EXPONENT - 1 })`). The whole expression is a compile-time
+constant, so the conversion should be an `as` cast *inside* the block:
+`const { ((A - B) << 1) as f64 }` / `const { (Self::MAX_EXPONENT - 1) as u64 }`. Folding it in
+evaluates the whole thing once, at compile time; for a value representable in the target type
+— which a working conversion guarantees — the cast gives the same result. It complements
+`use_const_block`, which wraps the constant argument in the first place: once the argument is a
+`const { .. }` block, the conversion belongs inside it (`use_const_block` leaves it out because
+`ConstEvalCtxt` does not fold `as` casts, so the block stops at the integer operand).
+
+### `duplicate_const`
+
+Flags a *derived* compile-time constant that is written out more than once with the same value —
+whether as an inline `const { .. }` block (`const { Limb::WIDTH - 1 }`) or as a `const` item
+(`const TWICE_WIDTH: u64 = Limb::WIDTH << 1;`) — anywhere in the crate. Repeating the same
+computation invites drift and hides that the values are meant to be equal; a single named constant
+(a `pub(crate)` associated constant on the relevant type, or a standalone `const`) states it once
+and lets every site refer to it.
+
+Only computed constants are considered — a binary/unary op or a cast — so bare literals, renames,
+and array/struct/call constants are ignored. Instances are grouped by their source text *and* by
+the `DefId`s of the `const`s they reference, so two `const { UPPER_LIMIT - 1 }` blocks whose
+`UPPER_LIMIT` is a different (scope-local) constant are *not* merged: only genuinely identical
+values are flagged. Because grouping is textual, the same value written two different ways
+(`i64::WIDTH - 1` versus `Limb::WIDTH - 1`) is left alone — which is correct, since those two
+differ on 32-bit platforms.
+
 ## Tests
 
 `cargo test` in this directory runs UI tests: `ui/main.rs` exercises `long_lines` (the basic

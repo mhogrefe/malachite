@@ -7,6 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::InnerNatural::{Large, Small};
+#[cfg(feature = "float_helpers")]
+use crate::platform::DoubleLimb;
 use crate::platform::Limb;
 use alloc::string::String;
 use alloc::vec::Vec;
@@ -154,6 +156,36 @@ pub fn bit_to_limb_count_ceiling(n: u64) -> usize {
 
 #[doc(hidden)]
 pub const LIMB_HIGH_BIT: Limb = 1 << (Limb::WIDTH - 1);
+
+// Derived constants shared across the crate, so that a given compile-time value is written out
+// exactly once. Grouped by the base quantity they are derived from.
+
+// `Limb::WIDTH`-derived (a bit count, so `u64`).
+pub(crate) const WIDTH_MINUS_1: u64 = Limb::WIDTH - 1;
+pub(crate) const WIDTH_MINUS_2: u64 = Limb::WIDTH - 2;
+pub(crate) const WIDTH_MINUS_3: u64 = Limb::WIDTH - 3;
+pub(crate) const TWICE_WIDTH: u64 = Limb::WIDTH << 1;
+pub(crate) const HALF_WIDTH: u64 = Limb::WIDTH >> 1;
+pub(crate) const QUARTER_WIDTH: u64 = Limb::WIDTH >> 2;
+#[cfg(feature = "float_helpers")]
+pub(crate) const THRICE_WIDTH: u64 = Limb::WIDTH * 3;
+
+// `Limb`-valued masks and bounds.
+#[cfg(feature = "float_helpers")]
+pub(crate) const NOT_LIMB_HIGH_BIT: Limb = !LIMB_HIGH_BIT;
+#[cfg(feature = "float_helpers")]
+pub(crate) const HALF_LIMB_HIGH_BIT: Limb = LIMB_HIGH_BIT >> 1;
+pub(crate) const LIMB_MAX_HALF: Limb = Limb::MAX >> 1;
+pub(crate) const LIMB_MAX_MINUS_1: Limb = Limb::MAX - 1;
+pub(crate) const LIMB_MAX_DIV_3: Limb = Limb::MAX / 3;
+// The largest value fitting in the low half of a `Limb` (`GMP_NUMB_HALFMAX`).
+pub(crate) const HALF_LIMB_MAX: Limb = (1 << (Limb::WIDTH >> 1)) - 1;
+// Two raised to half a `Limb`'s width: the radix of a half limb.
+pub(crate) const HALF_LIMB_RADIX: Limb = 1 << HALF_WIDTH;
+
+// A `DoubleLimb` mask selecting the low `Limb`.
+#[cfg(feature = "float_helpers")]
+pub(crate) const LIMB_MASK: DoubleLimb = (1 << Limb::WIDTH) - 1;
 
 /// Traits for arithmetic.
 pub mod arithmetic;

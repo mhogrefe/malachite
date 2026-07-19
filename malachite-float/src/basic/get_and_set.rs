@@ -516,7 +516,7 @@ impl Float {
                 exponent,
                 significand,
                 ..
-            }) if significand_bits(significand) < u64::exact_from(Self::MAX_EXPONENT - 1) => {
+            }) if significand_bits(significand) < const { (Self::MAX_EXPONENT - 1) as u64 } => {
                 let (mut y, mut o) = Self::from_natural_prec_round_ref(
                     significand,
                     prec,

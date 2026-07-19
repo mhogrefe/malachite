@@ -77,6 +77,21 @@ use malachite_base::num::logic::traits::NotAssign;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::slices::{slice_set_zero, slice_test_zero};
 
+const NOT_TOOM22_MAYBE_MUL_TOOM22: bool = !TOOM22_MAYBE_MUL_TOOM22;
+const NOT_TOOM33_MAYBE_MUL_TOOM33: bool = !TOOM33_MAYBE_MUL_TOOM33;
+const NOT_TOOM_6H_MAYBE_MUL_TOOM6H: bool = !TOOM_6H_MAYBE_MUL_TOOM6H;
+const NOT_TOOM_8H_MAYBE_MUL_TOOM8H: bool = !TOOM_8H_MAYBE_MUL_TOOM8H;
+const WIDTH_LE_27: bool = Limb::WIDTH <= 9 * 3;
+const WIDTH_LE_30: bool = Limb::WIDTH <= 10 * 3;
+const WIDTH_LE_33: bool = Limb::WIDTH <= 11 * 3;
+const WIDTH_LE_36: bool = Limb::WIDTH <= 12 * 3;
+const TOOM_6H_LIMIT_DENOMINATOR_TIMES_7: usize = TOOM_6H_LIMIT_DENOMINATOR * 7;
+const TOOM_6H_LIMIT_NUMERATOR_TIMES_7: usize = TOOM_6H_LIMIT_NUMERATOR * 7;
+const TOOM_8H_HALF_LIMIT_DENOMINATOR: usize = TOOM_8H_LIMIT_DENOMINATOR >> 1;
+const TOOM_8H_LIMIT_DENOMINATOR_OVER_5: usize = TOOM_8H_LIMIT_DENOMINATOR / 5;
+const TOOM_8H_LIMIT_NUMERATOR_OVER_3: usize = TOOM_8H_LIMIT_NUMERATOR / 3;
+const TOOM_8H_LIMIT_NUMERATOR_TIMES_9_OVER_7: usize = TOOM_8H_LIMIT_NUMERATOR / 7 * 9;
+
 // TODO tune
 pub(crate) const MUL_TOOM33_THRESHOLD_LIMIT: usize = MUL_TOOM33_THRESHOLD;
 
@@ -156,7 +171,7 @@ const TOOM22_MAYBE_MUL_TOOM22: bool =
     TUNE_PROGRAM_BUILD || WANT_FAT_BINARY || MUL_TOOM33_THRESHOLD >= MUL_TOOM22_THRESHOLD << 1;
 
 fn limbs_mul_same_length_to_out_toom_22_recursive_scratch_len(xs_len: usize) -> usize {
-    if !TOOM22_MAYBE_MUL_TOOM22 || xs_len < MUL_TOOM22_THRESHOLD {
+    if NOT_TOOM22_MAYBE_MUL_TOOM22 || xs_len < MUL_TOOM22_THRESHOLD {
         0
     } else {
         limbs_mul_greater_to_out_toom_22_scratch_len(xs_len, xs_len)
@@ -180,7 +195,7 @@ fn limbs_mul_same_length_to_out_toom_22_recursive(
     scratch: &mut [Limb],
 ) {
     assert_eq!(xs.len(), ys.len());
-    if !TOOM22_MAYBE_MUL_TOOM22 || xs.len() < MUL_TOOM22_THRESHOLD {
+    if NOT_TOOM22_MAYBE_MUL_TOOM22 || xs.len() < MUL_TOOM22_THRESHOLD {
         limbs_mul_greater_to_out_basecase(out, xs, ys);
     } else {
         limbs_mul_greater_to_out_toom_22(out, xs, ys, scratch);
@@ -188,7 +203,7 @@ fn limbs_mul_same_length_to_out_toom_22_recursive(
 }
 
 fn limbs_mul_greater_to_out_toom_22_recursive_scratch_len(xs_len: usize, ys_len: usize) -> usize {
-    if !TOOM22_MAYBE_MUL_TOOM22 || ys_len < MUL_TOOM22_THRESHOLD {
+    if NOT_TOOM22_MAYBE_MUL_TOOM22 || ys_len < MUL_TOOM22_THRESHOLD {
         0
     } else if xs_len << 2 < 5 * ys_len {
         limbs_mul_greater_to_out_toom_22_scratch_len(xs_len, ys_len)
@@ -223,7 +238,7 @@ fn limbs_mul_greater_to_out_toom_22_recursive(
 ) {
     let xs_len = xs.len();
     let ys_len = ys.len();
-    if !TOOM22_MAYBE_MUL_TOOM22 || ys_len < MUL_TOOM22_THRESHOLD {
+    if NOT_TOOM22_MAYBE_MUL_TOOM22 || ys_len < MUL_TOOM22_THRESHOLD {
         limbs_mul_greater_to_out_basecase(out, xs, ys);
     } else if xs_len << 2 < 5 * ys_len {
         limbs_mul_greater_to_out_toom_22(out, xs, ys, scratch);
@@ -737,7 +752,7 @@ const TOOM33_MAYBE_MUL_TOOM33: bool =
 fn limbs_mul_same_length_to_out_toom_33_recursive_scratch_len(xs_len: usize) -> usize {
     if TOOM33_MAYBE_MUL_BASECASE && xs_len < MUL_TOOM22_THRESHOLD {
         0
-    } else if !TOOM33_MAYBE_MUL_TOOM33 || xs_len < MUL_TOOM33_THRESHOLD {
+    } else if NOT_TOOM33_MAYBE_MUL_TOOM33 || xs_len < MUL_TOOM33_THRESHOLD {
         limbs_mul_greater_to_out_toom_22_scratch_len(xs_len, xs_len)
     } else {
         limbs_mul_greater_to_out_toom_33_scratch_len(xs_len, xs_len)
@@ -764,7 +779,7 @@ pub_test! {limbs_mul_same_length_to_out_toom_33_recursive(
     assert_eq!(xs.len(), n);
     if TOOM33_MAYBE_MUL_BASECASE && n < MUL_TOOM22_THRESHOLD {
         limbs_mul_greater_to_out_basecase(out, xs, ys);
-    } else if !TOOM33_MAYBE_MUL_TOOM33 || n < MUL_TOOM33_THRESHOLD {
+    } else if NOT_TOOM33_MAYBE_MUL_TOOM33 || n < MUL_TOOM33_THRESHOLD {
         limbs_mul_greater_to_out_toom_22(out, xs, ys, scratch);
     } else {
         limbs_mul_greater_to_out_toom_33(out, xs, ys, scratch);
@@ -2966,10 +2981,12 @@ pub_test! {limbs_mul_greater_to_out_toom_6h_input_sizes_valid(
         (n5, n5)
     } else {
         let (p, q) = if xs_len * 5 * TOOM_6H_LIMIT_NUMERATOR
-            < TOOM_6H_LIMIT_DENOMINATOR * 7 * ys_len
+            < TOOM_6H_LIMIT_DENOMINATOR_TIMES_7 * ys_len
         {
             (7, 6) // xs.len() < 119 / 90 * ys.len()
-        } else if xs_len * 5 * TOOM_6H_LIMIT_DENOMINATOR < TOOM_6H_LIMIT_NUMERATOR * 7 * ys_len {
+        } else if xs_len * 5 * TOOM_6H_LIMIT_DENOMINATOR
+            < TOOM_6H_LIMIT_NUMERATOR_TIMES_7 * ys_len
+        {
             (7, 5) // xs.len() < 126 / 85 * ys.len()
         } else if xs_len * TOOM_6H_LIMIT_NUMERATOR < (TOOM_6H_LIMIT_DENOMINATOR * ys_len) << 1 {
             (8, 5) // xs.len() < 17 / 9 * ys.len()
@@ -3028,7 +3045,7 @@ fn limbs_mul_same_length_to_out_toom_6h_recursive_scratch_len(n: usize) -> usize
         limbs_mul_greater_to_out_toom_22_scratch_len(n, n)
     } else if TOOM_6H_MAYBE_MUL_TOOM33 && n < MUL_TOOM44_THRESHOLD {
         limbs_mul_greater_to_out_toom_33_scratch_len(n, n)
-    } else if !TOOM_6H_MAYBE_MUL_TOOM6H || n < MUL_TOOM6H_THRESHOLD {
+    } else if NOT_TOOM_6H_MAYBE_MUL_TOOM6H || n < MUL_TOOM6H_THRESHOLD {
         limbs_mul_greater_to_out_toom_44_scratch_len(n, n)
     } else {
         limbs_mul_greater_to_out_toom_6h_scratch_len(n, n)
@@ -3058,7 +3075,7 @@ fn limbs_mul_same_length_to_out_toom_6h_recursive(
         limbs_mul_greater_to_out_toom_22(out, xs, ys, scratch);
     } else if TOOM_6H_MAYBE_MUL_TOOM33 && n < MUL_TOOM44_THRESHOLD {
         limbs_mul_greater_to_out_toom_33(out, xs, ys, scratch);
-    } else if !TOOM_6H_MAYBE_MUL_TOOM6H || n < MUL_TOOM6H_THRESHOLD {
+    } else if NOT_TOOM_6H_MAYBE_MUL_TOOM6H || n < MUL_TOOM6H_THRESHOLD {
         limbs_mul_greater_to_out_toom_44(out, xs, ys, scratch);
     } else {
         limbs_mul_greater_to_out_toom_6h(out, xs, ys, scratch);
@@ -3086,11 +3103,13 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_6h_scratch_len(
         (n5, n5)
     } else {
         let (mut p, mut q) = if xs_len * 5 * TOOM_6H_LIMIT_NUMERATOR
-            < TOOM_6H_LIMIT_DENOMINATOR * 7 * ys_len
+            < TOOM_6H_LIMIT_DENOMINATOR_TIMES_7 * ys_len
         {
             // xs.len() < 119 / 90 * ys.len(), half
             (7, 6)
-        } else if xs_len * 5 * TOOM_6H_LIMIT_DENOMINATOR < TOOM_6H_LIMIT_NUMERATOR * 7 * ys_len {
+        } else if xs_len * 5 * TOOM_6H_LIMIT_DENOMINATOR
+            < TOOM_6H_LIMIT_NUMERATOR_TIMES_7 * ys_len
+        {
             // xs.len() < 126 / 85 * ys.len(), !half
             (7, 5)
         } else if xs_len * TOOM_6H_LIMIT_NUMERATOR < (TOOM_6H_LIMIT_DENOMINATOR * ys_len) << 1 {
@@ -3190,11 +3209,13 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_6h(
         (5, 5, n5, n5)
     } else {
         let (mut p, mut q) = if xs_len * 5 * TOOM_6H_LIMIT_NUMERATOR
-            < TOOM_6H_LIMIT_DENOMINATOR * 7 * ys_len
+            < TOOM_6H_LIMIT_DENOMINATOR_TIMES_7 * ys_len
         {
             // xs.len() < 119 / 90 * ys.len(), half
             (7, 6)
-        } else if xs_len * 5 * TOOM_6H_LIMIT_DENOMINATOR < TOOM_6H_LIMIT_NUMERATOR * 7 * ys_len {
+        } else if xs_len * 5 * TOOM_6H_LIMIT_DENOMINATOR
+            < TOOM_6H_LIMIT_NUMERATOR_TIMES_7 * ys_len
+        {
             // xs.len() < 126 / 85 * ys.len(), !half
             (7, 5)
         } else if xs_len * TOOM_6H_LIMIT_NUMERATOR < (TOOM_6H_LIMIT_DENOMINATOR * ys_len) << 1 {
@@ -3360,9 +3381,9 @@ pub_test! {limbs_mul_greater_to_out_toom_8h_input_sizes_valid(
         || ys_len < 86
         || xs_len < ys_len
         || xs_len > ys_len << 2
-        || Limb::WIDTH <= 11 * 3 && xs_len << 2 > ys_len * 11
-        || Limb::WIDTH <= 10 * 3 && xs_len > ys_len << 1
-        || Limb::WIDTH <= 9 * 3 && xs_len << 1 > ys_len * 3
+        || WIDTH_LE_33 && xs_len << 2 > ys_len * 11
+        || WIDTH_LE_30 && xs_len > ys_len << 1
+        || WIDTH_LE_27 && xs_len << 1 > ys_len * 3
     {
         return false;
     }
@@ -3371,7 +3392,8 @@ pub_test! {limbs_mul_greater_to_out_toom_8h_input_sizes_valid(
     let mut xl = xs_len;
     let mut yl = ys_len;
     let (xr, yr) = if xs_len == ys_len
-        || xs_len * (TOOM_8H_LIMIT_DENOMINATOR >> 1) < TOOM_8H_LIMIT_NUMERATOR * (ys_len >> 1)
+        || xs_len * TOOM_8H_HALF_LIMIT_DENOMINATOR
+            < TOOM_8H_LIMIT_NUMERATOR * (ys_len >> 1)
     {
         // - xs_len == ys_len || xs_len < 21 / 20 * ys_len, !half
         // - This is the slowest variation
@@ -3382,30 +3404,33 @@ pub_test! {limbs_mul_greater_to_out_toom_8h_input_sizes_valid(
         let (p, q) = if xs_len * 13 < ys_len << 4 {
             // xs_len < 16 / 13 * ys_len, half
             (9, 8)
-        } else if Limb::WIDTH <= 9 * 3
-            || xs_len * (TOOM_8H_LIMIT_DENOMINATOR >> 1)
-                < (TOOM_8H_LIMIT_NUMERATOR / 7 * 9) * (ys_len >> 1)
+        } else if WIDTH_LE_27
+            || xs_len * TOOM_8H_HALF_LIMIT_DENOMINATOR
+                < TOOM_8H_LIMIT_NUMERATOR_TIMES_9_OVER_7 * (ys_len >> 1)
         {
             // Limb::WIDTH <= 27 || xs_len < 27 / 20 * ys_len, !half
             (9, 7)
         } else if xs_len * 10 < 33 * (ys_len >> 1) {
             // xs_len < 33 / 20 * ys_len, half
             (10, 7)
-        } else if Limb::WIDTH <= 10 * 3
-            || xs_len * (TOOM_8H_LIMIT_DENOMINATOR / 5) < (TOOM_8H_LIMIT_NUMERATOR / 3) * ys_len
+        } else if WIDTH_LE_30
+            || xs_len * TOOM_8H_LIMIT_DENOMINATOR_OVER_5
+                < TOOM_8H_LIMIT_NUMERATOR_OVER_3 * ys_len
         {
             // Limb::WIDTH <= 30 || xs_len < 7 / 4 * ys_len, !half
             (10, 6)
         } else if xs_len * 6 < 13 * ys_len {
             // xs_len < 13 / 6 * ys_len, half
             (11, 6)
-        } else if Limb::WIDTH <= 11 * 3 || xs_len << 2 < 9 * ys_len {
+        } else if WIDTH_LE_33 || xs_len << 2 < 9 * ys_len {
             // Limb::WIDTH <= 33 || xs_len < 9 / 4 * ys_len, !half
             (11, 5)
-        } else if xs_len * (TOOM_8H_LIMIT_NUMERATOR / 3) < TOOM_8H_LIMIT_DENOMINATOR * ys_len {
+        } else if xs_len * TOOM_8H_LIMIT_NUMERATOR_OVER_3
+            < TOOM_8H_LIMIT_DENOMINATOR * ys_len
+        {
             // xs_len < 20 / 7 * ys_len, half
             (12, 5)
-        } else if Limb::WIDTH <= 12 * 3 || xs_len * 9 < 28 * ys_len {
+        } else if WIDTH_LE_36 || xs_len * 9 < 28 * ys_len {
             // Limb::WIDTH <= 36 || xs_len < 28 / 9 * ys_len, !half
             (12, 4)
         } else {
@@ -3473,7 +3498,7 @@ fn limbs_mul_same_length_to_out_toom_8h_recursive_scratch_len(n: usize) -> usize
         limbs_mul_greater_to_out_toom_33_scratch_len(n, n)
     } else if TOOM_8H_MAYBE_MUL_TOOM44 && n < MUL_TOOM6H_THRESHOLD {
         limbs_mul_greater_to_out_toom_44_scratch_len(n, n)
-    } else if !TOOM_8H_MAYBE_MUL_TOOM8H || n < MUL_TOOM8H_THRESHOLD {
+    } else if NOT_TOOM_8H_MAYBE_MUL_TOOM8H || n < MUL_TOOM8H_THRESHOLD {
         limbs_mul_greater_to_out_toom_6h_scratch_len(n, n)
     } else {
         limbs_mul_greater_to_out_toom_8h_scratch_len(n, n)
@@ -3508,7 +3533,7 @@ fn limbs_mul_same_length_to_out_toom_8h_recursive(
         limbs_mul_greater_to_out_toom_33(out, xs, ys, scratch);
     } else if TOOM_8H_MAYBE_MUL_TOOM44 && n < MUL_TOOM6H_THRESHOLD {
         limbs_mul_greater_to_out_toom_44(out, xs, ys, scratch);
-    } else if !TOOM_8H_MAYBE_MUL_TOOM8H || n < MUL_TOOM8H_THRESHOLD {
+    } else if NOT_TOOM_8H_MAYBE_MUL_TOOM8H || n < MUL_TOOM8H_THRESHOLD {
         limbs_mul_greater_to_out_toom_6h(out, xs, ys, scratch);
     } else {
         limbs_mul_greater_to_out_toom_8h(out, xs, ys, scratch);
@@ -3529,7 +3554,8 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_8h_scratch_len(
     let n;
     let mut half = false;
     let (pn, qn) = if xs_len == ys_len
-        || xs_len * (TOOM_8H_LIMIT_DENOMINATOR >> 1) < TOOM_8H_LIMIT_NUMERATOR * (ys_len >> 1)
+        || xs_len * TOOM_8H_HALF_LIMIT_DENOMINATOR
+            < TOOM_8H_LIMIT_NUMERATOR * (ys_len >> 1)
     {
         // - xs_len == ys_len || xs_len < 21 / 20 * ys_len, !half
         // - This is the slowest variation
@@ -3540,30 +3566,33 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_8h_scratch_len(
         let (mut p, mut q) = if xs_len * 13 < ys_len << 4 {
             // xs_len < 16 / 13 * ys_len, half
             (9, 8)
-        } else if Limb::WIDTH <= 9 * 3
-            || xs_len * (TOOM_8H_LIMIT_DENOMINATOR >> 1)
-                < (TOOM_8H_LIMIT_NUMERATOR / 7 * 9) * (ys_len >> 1)
+        } else if WIDTH_LE_27
+            || xs_len * TOOM_8H_HALF_LIMIT_DENOMINATOR
+                < TOOM_8H_LIMIT_NUMERATOR_TIMES_9_OVER_7 * (ys_len >> 1)
         {
             // Limb::WIDTH <= 27 || xs_len < 27 / 20 * ys_len, !half
             (9, 7)
         } else if xs_len * 10 < 33 * (ys_len >> 1) {
             // xs_len < 33 / 20 * ys_len, half
             (10, 7)
-        } else if Limb::WIDTH <= 10 * 3
-            || xs_len * (TOOM_8H_LIMIT_DENOMINATOR / 5) < (TOOM_8H_LIMIT_NUMERATOR / 3) * ys_len
+        } else if WIDTH_LE_30
+            || xs_len * TOOM_8H_LIMIT_DENOMINATOR_OVER_5
+                < TOOM_8H_LIMIT_NUMERATOR_OVER_3 * ys_len
         {
             // Limb::WIDTH <= 30 || xs_len < 7 / 4 * ys_len, !half
             (10, 6)
         } else if xs_len * 6 < 13 * ys_len {
             // xs_len < 13 / 6 * ys_len, half
             (11, 6)
-        } else if Limb::WIDTH <= 11 * 3 || xs_len << 2 < 9 * ys_len {
+        } else if WIDTH_LE_33 || xs_len << 2 < 9 * ys_len {
             // Limb::WIDTH <= 33 || xs_len < 9 / 4 * ys_len, !half
             (11, 5)
-        } else if xs_len * (TOOM_8H_LIMIT_NUMERATOR / 3) < TOOM_8H_LIMIT_DENOMINATOR * ys_len {
+        } else if xs_len * TOOM_8H_LIMIT_NUMERATOR_OVER_3
+            < TOOM_8H_LIMIT_DENOMINATOR * ys_len
+        {
             // xs_len < 20 / 7 * ys_len, half
             (12, 5)
-        } else if Limb::WIDTH <= 12 * 3 || xs_len * 9 < 28 * ys_len {
+        } else if WIDTH_LE_36 || xs_len * 9 < 28 * ys_len {
             // Limb::WIDTH <= 36 || xs_len < 28 / 9 * ys_len, !half
             (12, 4)
         } else {
@@ -3648,13 +3677,14 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_8h(
     assert!(ys_len >= 86);
     // Can not handle too much unbalance
     assert!(xs_len <= ys_len << 2);
-    assert!(Limb::WIDTH > 11 * 3 || xs_len << 2 <= ys_len * 11);
-    assert!(Limb::WIDTH > 10 * 3 || xs_len <= ys_len << 1);
-    assert!(Limb::WIDTH > 9 * 3 || xs_len << 1 <= ys_len * 3);
+    assert!(const { Limb::WIDTH > 11 * 3 } || xs_len << 2 <= ys_len * 11);
+    assert!(const { Limb::WIDTH > 10 * 3 } || xs_len <= ys_len << 1);
+    assert!(const { Limb::WIDTH > 9 * 3 } || xs_len << 1 <= ys_len * 3);
     let n;
     let mut half = false;
     let (p, q, pn, qn) = if xs_len == ys_len
-        || xs_len * (TOOM_8H_LIMIT_DENOMINATOR >> 1) < TOOM_8H_LIMIT_NUMERATOR * (ys_len >> 1)
+        || xs_len * TOOM_8H_HALF_LIMIT_DENOMINATOR
+            < TOOM_8H_LIMIT_NUMERATOR * (ys_len >> 1)
     {
         // - xs_len == ys_len || xs_len < 21 / 20 * ys_len, !half
         // - This is the slowest variation
@@ -3665,30 +3695,33 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_8h(
         let (mut p, mut q) = if xs_len * 13 < ys_len << 4 {
             // xs_len < 16 / 13 * ys_len, half
             (9, 8)
-        } else if Limb::WIDTH <= 9 * 3
-            || xs_len * (TOOM_8H_LIMIT_DENOMINATOR >> 1)
-                < (TOOM_8H_LIMIT_NUMERATOR / 7 * 9) * (ys_len >> 1)
+        } else if WIDTH_LE_27
+            || xs_len * TOOM_8H_HALF_LIMIT_DENOMINATOR
+                < TOOM_8H_LIMIT_NUMERATOR_TIMES_9_OVER_7 * (ys_len >> 1)
         {
             // Limb::WIDTH <= 27 || xs_len < 27 / 20 * ys_len, !half
             (9, 7)
         } else if xs_len * 10 < 33 * (ys_len >> 1) {
             // xs_len < 33 / 20 * ys_len, half
             (10, 7)
-        } else if Limb::WIDTH <= 10 * 3
-            || xs_len * (TOOM_8H_LIMIT_DENOMINATOR / 5) < (TOOM_8H_LIMIT_NUMERATOR / 3) * ys_len
+        } else if WIDTH_LE_30
+            || xs_len * TOOM_8H_LIMIT_DENOMINATOR_OVER_5
+                < TOOM_8H_LIMIT_NUMERATOR_OVER_3 * ys_len
         {
             // Limb::WIDTH <= 30 || xs_len < 7 / 4 * ys_len, !half
             (10, 6)
         } else if xs_len * 6 < 13 * ys_len {
             // xs_len < 13 / 6 * ys_len, half
             (11, 6)
-        } else if Limb::WIDTH <= 11 * 3 || xs_len << 2 < 9 * ys_len {
+        } else if WIDTH_LE_33 || xs_len << 2 < 9 * ys_len {
             // Limb::WIDTH <= 33 || xs_len < 9 / 4 * ys_len, !half
             (11, 5)
-        } else if xs_len * (TOOM_8H_LIMIT_NUMERATOR / 3) < TOOM_8H_LIMIT_DENOMINATOR * ys_len {
+        } else if xs_len * TOOM_8H_LIMIT_NUMERATOR_OVER_3
+            < TOOM_8H_LIMIT_DENOMINATOR * ys_len
+        {
             // xs_len < 20 / 7 * ys_len, half
             (12, 5)
-        } else if Limb::WIDTH <= 12 * 3 || xs_len * 9 < 28 * ys_len {
+        } else if WIDTH_LE_36 || xs_len * 9 < 28 * ys_len {
             // Limb::WIDTH <= 36 || xs_len < 28 / 9 * ys_len, !half
             (12, 4)
         } else {
@@ -3829,7 +3862,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_8h(
     // 1, -1
     let pp_lo_lo = &mut pp_lo[..m];
     let mut v_neg_1_neg = limbs_mul_toom_evaluate_poly_in_1_and_neg_1(v2, v0, p, xs, n, pp_lo_lo);
-    if if Limb::WIDTH > 36 && q == 3 {
+    if if const { Limb::WIDTH > 36 } && q == 3 {
         limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1(v3, v1, ys, n, pp_lo_lo)
     } else {
         limbs_mul_toom_evaluate_poly_in_1_and_neg_1(v3, v1, q, ys, n, pp_lo_lo)

@@ -31,7 +31,7 @@ use crate::natural::arithmetic::sub::{
     limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left,
 };
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
-use crate::natural::{LIMB_HIGH_BIT, Natural, bit_to_limb_count_ceiling};
+use crate::natural::{LIMB_HIGH_BIT, Natural, TWICE_WIDTH, bit_to_limb_count_ceiling};
 use crate::platform::{DoubleLimb, Limb};
 use alloc::vec::Vec;
 use core::cmp::Ordering::{self, *};
@@ -44,8 +44,6 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::slices::slice_test_zero;
-
-const TWICE_WIDTH: u64 = Limb::WIDTH << 1;
 
 // This is mpfr_div from div.c, MPFR 4.3.0, specialized for reciprocation.
 pub fn reciprocal_float_significand_in_place(

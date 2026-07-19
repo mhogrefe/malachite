@@ -256,7 +256,7 @@ impl Float {
                     if *x_exp < Self::MIN_EXPONENT {
                         let sign = *x_sign != neg;
                         return if rm == Nearest
-                            && *x_exp == Self::MIN_EXPONENT - 1
+                            && *x_exp == Self::MIN_EXPONENT_MINUS_1
                             && (o == Less
                                 || !(if swapped {
                                     y.is_power_of_2()
@@ -447,7 +447,7 @@ impl Float {
                     if *x_exp < Self::MIN_EXPONENT {
                         let sign = *x_sign != neg;
                         return if rm == Nearest
-                            && *x_exp == Self::MIN_EXPONENT - 1
+                            && *x_exp == Self::MIN_EXPONENT_MINUS_1
                             && (o == Less || !x.is_power_of_2())
                         {
                             if sign {
@@ -616,7 +616,7 @@ impl Float {
                     if diff_exp < Self::MIN_EXPONENT {
                         let sign = *x_sign != neg;
                         return if rm == Nearest
-                            && diff_exp == Self::MIN_EXPONENT - 1
+                            && diff_exp == Self::MIN_EXPONENT_MINUS_1
                             && (o == Less || !diff.is_power_of_2())
                         {
                             if sign {
@@ -2557,7 +2557,7 @@ impl Float {
                     };
                 }
                 if max_exponent > i64::from(Self::MAX_EXPONENT) - 2
-                    || min_exponent < i64::from(Self::MIN_EXPONENT - 2)
+                    || min_exponent < Self::MIN_EXPONENT_MINUS_2_I64
                 {
                     // If we can't rule out overflow or underflow, use slow-but-correct naive
                     // algorithm.
@@ -2772,7 +2772,7 @@ impl Float {
                     };
                 }
                 if max_exponent > i64::from(Self::MAX_EXPONENT) - 2
-                    || min_exponent < i64::from(Self::MIN_EXPONENT - 2)
+                    || min_exponent < Self::MIN_EXPONENT_MINUS_2_I64
                 {
                     // If we can't rule out overflow or underflow, use slow-but-correct naive
                     // algorithm.
@@ -3635,7 +3635,7 @@ impl Float {
                     };
                 }
                 if max_exponent > i64::from(Self::MAX_EXPONENT) - 2
-                    || min_exponent < i64::from(Self::MIN_EXPONENT - 2)
+                    || min_exponent < Self::MIN_EXPONENT_MINUS_2_I64
                 {
                     // If we can't rule out overflow or underflow, use slow-but-correct naive
                     // algorithm.
@@ -3831,7 +3831,7 @@ impl Float {
                     };
                 }
                 if max_exponent > i64::from(Self::MAX_EXPONENT) - 2
-                    || min_exponent < i64::from(Self::MIN_EXPONENT - 2)
+                    || min_exponent < Self::MIN_EXPONENT_MINUS_2_I64
                 {
                     // If we can't rule out overflow or underflow, use slow-but-correct naive
                     // algorithm.

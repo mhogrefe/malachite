@@ -22,6 +22,7 @@ mod assign_then_consumed_once;
 mod clone_with_ref_variant;
 mod compare_with_power_of_2;
 mod compare_with_primitive;
+mod duplicate_const;
 mod let_tuple_underscore_to_field;
 mod long_lines;
 mod manual_float_from_primitive;
@@ -38,6 +39,9 @@ mod runtime_literal_conversion;
 mod shift_of_one;
 mod use_assign_variant;
 mod use_checked_log_base_2;
+mod use_const_binding;
+mod use_const_block;
+mod use_const_cast;
 mod use_divisible_by;
 mod use_exact_from;
 mod use_named_constant;
@@ -254,6 +258,23 @@ fn in_const_context(cx: &rustc_lint::LateContext<'_>, e: &rustc_hir::Expr<'_>) -
     }
 }
 
+// Whether `e` mentions a named constant -- a `const` item or an associated const -- so that a const
+// expression built from it is *derived*, rather than a bare literal computation. Only the
+// const-expression shapes (paths, unary/cast, binary) are walked.
+fn references_named_const(cx: &rustc_lint::LateContext<'_>, e: &rustc_hir::Expr<'_>) -> bool {
+    use rustc_hir::ExprKind;
+    use rustc_hir::def::{DefKind, Res};
+    match e.kind {
+        ExprKind::Path(ref qpath) => matches!(
+            cx.qpath_res(qpath, e.hir_id),
+            Res::Def(DefKind::Const { .. } | DefKind::AssocConst { .. }, _)
+        ),
+        ExprKind::Unary(_, inner) | ExprKind::Cast(inner, _) => references_named_const(cx, inner),
+        ExprKind::Binary(_, l, r) => references_named_const(cx, l) || references_named_const(cx, r),
+        _ => false,
+    }
+}
+
 // Whether the span lies in test-oriented code: tests, demos and benches (`bin_util`), test
 // utilities, or any code compiled only as part of a test harness (which covers `#[cfg(test)]`
 // modules inside `src`). Such code exercises the discouraged spellings on purpose.
@@ -282,6 +303,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         clone_with_ref_variant::CLONE_WITH_REF_VARIANT,
         compare_with_power_of_2::COMPARE_WITH_POWER_OF_2,
         compare_with_primitive::COMPARE_WITH_PRIMITIVE,
+        duplicate_const::DUPLICATE_CONST,
         let_tuple_underscore_to_field::LET_TUPLE_UNDERSCORE_TO_FIELD,
         long_lines::LONG_LINES,
         manual_float_from_primitive::MANUAL_FLOAT_FROM_PRIMITIVE,
@@ -298,6 +320,9 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         shift_of_one::SHIFT_OF_ONE,
         use_assign_variant::USE_ASSIGN_VARIANT,
         use_checked_log_base_2::USE_CHECKED_LOG_BASE_2,
+        use_const_binding::USE_CONST_BINDING,
+        use_const_block::USE_CONST_BLOCK,
+        use_const_cast::USE_CONST_CAST,
         use_divisible_by::USE_DIVISIBLE_BY,
         use_exact_from::USE_EXACT_FROM,
         use_named_constant::USE_NAMED_CONSTANT,
@@ -315,6 +340,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
     lint_store.register_late_pass(|_| Box::new(assign_then_consumed_once::AssignThenConsumedOnce));
     lint_store.register_late_pass(|_| Box::new(compare_with_power_of_2::CompareWithPowerOf2));
     lint_store.register_late_pass(|_| Box::new(compare_with_primitive::CompareWithPrimitive));
+    lint_store.register_late_pass(|_| Box::new(duplicate_const::DuplicateConst::default()));
     lint_store
         .register_late_pass(|_| Box::new(let_tuple_underscore_to_field::LetTupleUnderscoreToField));
     lint_store.register_late_pass(|_| Box::new(long_lines::LongLines));
@@ -344,6 +370,9 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
     lint_store.register_late_pass(|_| Box::new(clone_with_ref_variant::CloneWithRefVariant));
     lint_store.register_late_pass(|_| Box::new(use_assign_variant::UseAssignVariant));
     lint_store.register_late_pass(|_| Box::new(use_checked_log_base_2::UseCheckedLogBase2));
+    lint_store.register_late_pass(|_| Box::new(use_const_binding::UseConstBinding));
+    lint_store.register_late_pass(|_| Box::new(use_const_block::UseConstBlock));
+    lint_store.register_late_pass(|_| Box::new(use_const_cast::UseConstCast));
     lint_store.register_late_pass(|_| Box::new(use_divisible_by::UseDivisibleBy));
     lint_store.register_late_pass(|_| Box::new(use_exact_from::UseExactFrom));
     lint_store.register_late_pass(|_| Box::new(use_named_constant::UseNamedConstant));

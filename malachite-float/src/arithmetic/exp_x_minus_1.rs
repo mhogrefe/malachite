@@ -13,6 +13,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Infinity, NaN, Zero};
+use crate::TWICE_WIDTH;
 use crate::arithmetic::exp::{exp_overflow, one_neighbor};
 use crate::arithmetic::round_near_x::float_round_near_x;
 use crate::{
@@ -184,7 +185,7 @@ fn exp_x_minus_1_deep_negative(
         };
     }
     let xr = Rational::exact_from(x);
-    let mut working_prec = prec.saturating_add(2).saturating_sub(s_est) + (Limb::WIDTH << 1);
+    let mut working_prec = prec.saturating_add(2).saturating_sub(s_est) + TWICE_WIDTH;
     let mut increment = Limb::WIDTH;
     loop {
         // ln_2_lo <= ln(2) <= ln_2_hi, as exact Rationals, from a single ln(2) computation.
@@ -277,13 +278,13 @@ fn exp_x_minus_1_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (
     // x is too small to be represented as a normal Float (|x| < 2^MIN_EXPONENT). The squeeze below
     // cannot bracket it (its Float bounds would be 0), so sum the Taylor series instead. expm1(x) ~
     // x underflows, which `from_rational_prec_round` handles in the helper.
-    if exp_x <= const { Float::MIN_EXPONENT as i64 } {
+    if exp_x <= Float::MIN_EXPONENT_I64 {
         return exp_x_minus_1_rational_near_zero(x, prec, rm);
     }
     // |x| is too large to be a finite Float. For x > 0, expm1(x) overflows to +inf; for x < 0,
     // expm1(x) = -1 + exp(x) tends to -1. Smaller x that still overflow are caught in the loop
     // below.
-    if exp_x >= const { Float::MAX_EXPONENT as i64 } {
+    if exp_x >= Float::MAX_EXPONENT_I64 {
         if positive {
             return exp_overflow(prec, rm);
         }

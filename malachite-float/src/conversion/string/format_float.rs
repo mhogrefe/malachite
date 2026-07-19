@@ -819,8 +819,8 @@ fn regular_ab(np: &mut NumberParts, p: &Float, spec: &PrintfSpec) -> i32 {
         } else {
             // base 16: form the leading digit from the top 4 bits of the top significand limb
             let msl = sig.limbs().next_back().unwrap();
-            let rnd_bit = Limb::WIDTH - 5;
-            let mut digit = u8::exact_from(msl >> (rnd_bit + 1));
+            const RND_BIT: u64 = Limb::WIDTH - 5;
+            let mut digit = u8::exact_from(msl >> const { RND_BIT + 1 });
             // Round the digit up only if the value actually has bits below the top nibble. MPFR
             // 4.2.2 omits this exactness check — an upstream bug that rounds exact values away
             // (e.g. "%.0RUa" of 1.5 gives 0xdp-3 = 1.625 instead of 0xcp-3) and overflows its digit
@@ -828,7 +828,7 @@ fn regular_ab(np: &mut NumberParts, p: &Float, spec: &PrintfSpec) -> i32 {
             // all-ones nibble with remaining bits always lands in `next_base_power_p` first, so
             // digit <= 15 here.
             if (is_like_rnda(spec.rnd_mode, p.is_sign_negative()) && one_digit_is_inexact(sig, 4))
-                || (spec.rnd_mode == Nearest && (msl & (Limb::ONE << rnd_bit)) != 0)
+                || (spec.rnd_mode == Nearest && (msl & const { Limb::ONE << RND_BIT }) != 0)
             {
                 digit += 1;
             }

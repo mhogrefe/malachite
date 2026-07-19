@@ -2061,7 +2061,7 @@ impl Float {
                     };
                 }
                 if max_exponent > i64::from(Self::MAX_EXPONENT) - 2
-                    || min_exponent < i64::from(Self::MIN_EXPONENT - 2)
+                    || min_exponent < Self::MIN_EXPONENT_MINUS_2_I64
                 {
                     // If we can't rule out overflow or underflow, use slow-but-correct naive
                     // algorithm.
@@ -2280,7 +2280,7 @@ impl Float {
                     };
                 }
                 if max_exponent > i64::from(Self::MAX_EXPONENT) - 2
-                    || min_exponent < i64::from(Self::MIN_EXPONENT - 2)
+                    || min_exponent < Self::MIN_EXPONENT_MINUS_2_I64
                 {
                     // If we can't rule out overflow or underflow, use slow-but-correct naive
                     // algorithm.
@@ -3149,7 +3149,7 @@ impl Float {
                     };
                 }
                 if max_exponent > i64::from(Self::MAX_EXPONENT) - 2
-                    || min_exponent < i64::from(Self::MIN_EXPONENT - 2)
+                    || min_exponent < Self::MIN_EXPONENT_MINUS_2_I64
                 {
                     // If we can't rule out overflow or underflow, use slow-but-correct naive
                     // algorithm.
@@ -3348,7 +3348,7 @@ impl Float {
                     };
                 }
                 if max_exponent > i64::from(Self::MAX_EXPONENT) - 2
-                    || min_exponent < i64::from(Self::MIN_EXPONENT - 2)
+                    || min_exponent < Self::MIN_EXPONENT_MINUS_2_I64
                 {
                     // If we can't rule out overflow or underflow, use slow-but-correct naive
                     // algorithm.

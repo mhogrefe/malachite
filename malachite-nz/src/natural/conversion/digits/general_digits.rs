@@ -42,7 +42,7 @@ use crate::natural::arithmetic::shl::limbs_shl_to_out;
 use crate::natural::arithmetic::shr::limbs_shr_to_out;
 use crate::natural::arithmetic::square::{limbs_square_to_out, limbs_square_to_out_scratch_len};
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
-use crate::natural::{Natural, limb_to_bit_count};
+use crate::natural::{HALF_LIMB_MAX, Natural, limb_to_bit_count};
 use crate::platform::{
     BASES, DoubleLimb, FROM_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD, Limb, MP_BASES_BIG_BASE_10,
     MP_BASES_BIG_BASE_INVERTED_10, MP_BASES_CHARS_PER_LIMB_10, MP_BASES_NORMALIZATION_STEPS_10,
@@ -360,7 +360,7 @@ pub_test! {limbs_choose_power_table_algorithm(
         power = (power + 1) >> 1;
     }
     exptab[number_of_powers] = digits_per_limb;
-    if HAVE_MPN_COMPUTE_POWTAB_MUL && HAVE_MPN_COMPUTE_POWTAB_DIV {
+    if const { HAVE_MPN_COMPUTE_POWTAB_MUL && HAVE_MPN_COMPUTE_POWTAB_DIV } {
         let power = xs_len - 1;
         let n = xs_len.shr_round(1, Ceiling).0;
         let mut mul_cost = 1;
@@ -1129,7 +1129,6 @@ pub_test! {to_digits_asc_naive(digits: &mut Vec<Natural>, x: &Natural, base: &Na
 
 // TODO tune
 const TO_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD: u64 = 50;
-const SQRT_MAX_LIMB: Limb = (1 << (Limb::WIDTH >> 1)) - 1;
 
 // # Worst-case complexity
 // $T(n) = O(n \log n \log\log n)$
@@ -1175,7 +1174,7 @@ fn to_digits_asc_divide_and_conquer_limb<
 {
     let bits = x.significant_bits();
     if bits / base.significant_bits() < TO_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD {
-        if base <= SQRT_MAX_LIMB {
+        if base <= HALF_LIMB_MAX {
             match x {
                 Natural(Small(x)) => {
                     digits.extend_from_slice(&x.to_digits_asc(&T::wrapping_from(base)));
@@ -1471,7 +1470,7 @@ pub_test! {from_digits_desc_naive(xs: &[Natural], base: &Natural) -> Option<Natu
 // `base` is not a power of 2.
 pub_test! {limbs_per_digit_in_base(digit_count: usize, base: u64) -> u64 {
     (u64::exact_from(Limb::x_mul_y_to_zz(get_log_2_of_base(base), Limb::exact_from(digit_count)).0)
-        >> (Limb::LOG_WIDTH - 3))
+        >> const { Limb::LOG_WIDTH - 3 })
         + 2
 }}
 
@@ -1815,7 +1814,7 @@ where
     let xs_len = xs.len();
     let b = u64::exact_from(xs_len) * base.significant_bits();
     if power_index == 0 || b < FROM_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD {
-        if base <= SQRT_MAX_LIMB {
+        if base <= HALF_LIMB_MAX {
             from_digits_desc_basecase(xs, base)
         } else {
             from_digits_desc_naive_primitive(xs, T::exact_from(base))

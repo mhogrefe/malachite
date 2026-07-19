@@ -111,7 +111,7 @@ pub fn exhaustive_positive_floats_with_sci_exponent_and_precision(
     prec: u64,
 ) -> ExhaustivePositiveFloatsWithSciExponentAndPrecision {
     assert!(sci_exponent < Float::MAX_EXPONENT);
-    assert!(sci_exponent >= Float::MIN_EXPONENT - 1);
+    assert!(sci_exponent >= Float::MIN_EXPONENT_MINUS_1);
     assert_ne!(prec, 0);
     ExhaustivePositiveFloatsWithSciExponentAndPrecision {
         exponent: sci_exponent + 1,
@@ -241,7 +241,7 @@ pub fn exhaustive_positive_floats_with_sci_exponent(
     sci_exponent: i32,
 ) -> ExhaustivePositiveFloatsWithSciExponent {
     assert!(sci_exponent < Float::MAX_EXPONENT);
-    assert!(sci_exponent >= Float::MIN_EXPONENT - 1);
+    assert!(sci_exponent >= Float::MIN_EXPONENT_MINUS_1);
     ExhaustivePositiveFloatsWithSciExponent(exhaustive_positive_floats_with_sci_exponent_helper(
         sci_exponent,
     ))

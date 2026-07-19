@@ -26,7 +26,10 @@ use crate::natural::arithmetic::mul::{
     limbs_mul_same_length_to_out_scratch_len, limbs_mul_to_out, limbs_mul_to_out_scratch_len,
 };
 use crate::natural::arithmetic::shl::limbs_slice_shl_in_place;
-use crate::natural::{LIMB_HIGH_BIT, Natural, bit_to_limb_count_ceiling, limb_to_bit_count};
+use crate::natural::{
+    LIMB_HIGH_BIT, LIMB_MASK, NOT_LIMB_HIGH_BIT, Natural, THRICE_WIDTH, TWICE_WIDTH, WIDTH_MINUS_1,
+    bit_to_limb_count_ceiling, limb_to_bit_count,
+};
 use crate::platform::{DoubleLimb, Limb, MUL_FFT_THRESHOLD};
 use alloc::vec::Vec;
 use core::cmp::{
@@ -298,9 +301,6 @@ fn mul_float_significands_same_prec_ref_ref(
     }
 }
 
-const WIDTH_M1: u64 = Limb::WIDTH - 1;
-const COMP_HIGH_BIT: Limb = !LIMB_HIGH_BIT;
-
 // This is mpfr_mul_1 from mul.c, MPFR 4.2.0.
 fn mul_float_significands_same_prec_lt_w(
     x: Limb,
@@ -315,7 +315,7 @@ fn mul_float_significands_same_prec_lt_w(
     let decrement_exp = !z.get_highest_bit();
     if decrement_exp {
         z <<= 1;
-        z |= sticky_bit >> WIDTH_M1;
+        z |= sticky_bit >> WIDTH_MINUS_1;
         sticky_bit <<= 1;
     }
     let round_bit = z & (shift_bit >> 1);
@@ -356,11 +356,11 @@ fn mul_float_significands_same_prec_w(
     let decrement_exp = !z.get_highest_bit();
     if decrement_exp {
         z <<= 1;
-        z |= sticky_bit >> WIDTH_M1;
+        z |= sticky_bit >> WIDTH_MINUS_1;
         sticky_bit <<= 1;
     }
     let round_bit = sticky_bit & LIMB_HIGH_BIT;
-    sticky_bit &= COMP_HIGH_BIT;
+    sticky_bit &= NOT_LIMB_HIGH_BIT;
     let mut product = z;
     if round_bit == 0 && sticky_bit == 0 {
         return (z, decrement_exp, Equal);
@@ -386,9 +386,6 @@ fn mul_float_significands_same_prec_w(
         }
     }
 }
-
-const TWICE_WIDTH: u64 = Limb::WIDTH << 1;
-const THRICE_WIDTH: u64 = Limb::WIDTH * 3;
 
 // This is mpfr_mul_2 from mul.c, MPFR 4.2.0.
 fn mul_float_significands_same_prec_gt_w_lt_2w(
@@ -439,9 +436,9 @@ fn mul_float_significands_same_prec_gt_w_lt_2w(
     let decrement_exp = !hi.get_highest_bit();
     if decrement_exp {
         hi <<= 1;
-        hi |= lo >> WIDTH_M1;
+        hi |= lo >> WIDTH_MINUS_1;
         lo <<= 1;
-        lo |= sticky_bit >> WIDTH_M1;
+        lo |= sticky_bit >> WIDTH_MINUS_1;
         sticky_bit <<= 1;
         // no need to shift sticky_bit_2 since we only want to know if it is zero or not
     }
@@ -473,8 +470,6 @@ fn mul_float_significands_same_prec_gt_w_lt_2w(
         }
     }
 }
-
-const LIMB_MASK: DoubleLimb = (1 << Limb::WIDTH) - 1;
 
 // This is mpfr_mul_3 from mul.c, MPFR 4.2.0.
 fn mul_float_significands_same_prec_gt_2w_lt_3w(
@@ -564,11 +559,11 @@ fn mul_float_significands_same_prec_gt_2w_lt_3w(
     let decrement_exp = !a2.get_highest_bit();
     if decrement_exp {
         a2 <<= 1;
-        a2 |= a1 >> WIDTH_M1;
+        a2 |= a1 >> WIDTH_MINUS_1;
         a1 <<= 1;
-        a1 |= a0 >> WIDTH_M1;
+        a1 |= a0 >> WIDTH_MINUS_1;
         a0 <<= 1;
-        a0 |= sticky_bit >> WIDTH_M1;
+        a0 |= sticky_bit >> WIDTH_MINUS_1;
         sticky_bit <<= 1;
         // no need to shift sticky_bit_2: we only need to know if it is zero or not
     }
@@ -820,7 +815,7 @@ fn mul_float_significands_general(
         // to final shift.
         let mut tmp_alloc = k;
         if out_prec > p - 5 {
-            if out_prec > p - 5 + Limb::WIDTH || xs_len <= MPFR_MUL_THRESHOLD + 1 {
+            if out_prec > p - 5 + Limb::WIDTH || xs_len <= const { MPFR_MUL_THRESHOLD + 1 } {
                 // MulHigh can't produce a roundable result.
                 goto_full_multiply = true;
                 xs = &xs[xs_len - len..];

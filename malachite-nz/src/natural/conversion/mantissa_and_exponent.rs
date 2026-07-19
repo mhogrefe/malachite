@@ -11,8 +11,9 @@ use crate::natural::arithmetic::shl::limbs_slice_shl_in_place;
 use crate::natural::arithmetic::shr::limbs_slice_shr_in_place;
 use crate::natural::logic::bit_access::limbs_get_bit;
 use crate::natural::logic::bit_scan::limbs_index_of_next_true_bit;
-use crate::natural::{LIMB_HIGH_BIT, Natural};
-use crate::natural::{bit_to_limb_count_floor, limb_to_bit_count};
+use crate::natural::{
+    LIMB_HIGH_BIT, Natural, TWICE_WIDTH, bit_to_limb_count_floor, limb_to_bit_count,
+};
 use crate::platform::Limb;
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{
@@ -26,8 +27,6 @@ use malachite_base::num::conversion::traits::{
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::slices::{slice_set_zero, slice_test_zero};
-
-const TWICE_WIDTH: u64 = Limb::WIDTH << 1;
 
 impl Natural {
     /// Returns a [`Natural`]'s scientific mantissa and exponent, rounding according to the

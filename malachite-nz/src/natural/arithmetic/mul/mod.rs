@@ -50,6 +50,8 @@ use core::ops::{Mul, MulAssign};
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::basic::traits::Zero;
 
+const MUL_TOOM33_THRESHOLD_LIMIT_MINUS_1: usize = MUL_TOOM33_THRESHOLD_LIMIT - 1;
+
 // Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns
 // the limbs of the product of the `Natural`s. `xs` must be as least as long as `ys` and `ys` cannot
 // be empty.
@@ -107,8 +109,8 @@ pub_crate_test! { limbs_mul_same_length_to_out_scratch_len(len: usize) -> usize 
         0
     } else if len < MUL_TOOM33_THRESHOLD {
         limbs_mul_greater_to_out_toom_22_scratch_len(
-            MUL_TOOM33_THRESHOLD_LIMIT - 1,
-            MUL_TOOM33_THRESHOLD_LIMIT - 1,
+            MUL_TOOM33_THRESHOLD_LIMIT_MINUS_1,
+            MUL_TOOM33_THRESHOLD_LIMIT_MINUS_1,
         )
     } else if len < MUL_TOOM44_THRESHOLD {
         limbs_mul_greater_to_out_toom_33_scratch_len(len, len)

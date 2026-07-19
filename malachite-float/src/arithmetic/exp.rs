@@ -21,6 +21,7 @@
 // The Paterson-Stockmeyer series (exp2_aux2) and the high-precision exp_3 are not yet ported.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
+use crate::WIDTH_MINUS_1;
 use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn, floor_and_ceiling};
 use core::cmp::Ordering::{self, Equal, Greater, Less};
 use core::cmp::max;
@@ -532,8 +533,8 @@ pub(crate) fn exp_2(x: &Float, precy: u64, rm: RoundingMode) -> (Float, Ordering
         // |x| <= 0.25, so n = 0
         0
     } else {
-        let log2_est = Float::ln_2_prec_round(Limb::WIDTH - 1, Down).0;
-        let r_est = x.div_prec_ref_val(log2_est, Limb::WIDTH - 1).0;
+        let log2_est = Float::ln_2_prec_round(WIDTH_MINUS_1, Down).0;
+        let r_est = x.div_prec_ref_val(log2_est, WIDTH_MINUS_1).0;
         i64::rounding_from(r_est, Nearest).0
     };
     // error_r bounds the bits cancelled in x - n*log(2)
@@ -659,14 +660,9 @@ fn exp_prec_round_normal_ref(x: &Float, precy: u64, rm: RoundingMode) -> (Float,
     // bound on emax*log(2) and `bound_emin` a lower bound on (emin - 2)*log(2), so the comparisons
     // below are sound one-sided tests.
     const BP: u64 = 64;
-    let log2_up = Float::ln_2_prec_round(BP, Up).0;
-    let bound_emax = log2_up
-        .mul_prec_round_ref_val(
-            const { Float::const_from_signed(Float::MAX_EXPONENT as SignedLimb) },
-            BP,
-            Up,
-        )
-        .0;
+    const MAX_EXPONENT_FLOAT: Float = Float::const_from_signed(Float::MAX_EXPONENT as SignedLimb);
+    let (log2_lo, log2_hi) = floor_and_ceiling(Float::ln_2_prec_round(BP, Floor));
+    let bound_emax = log2_hi.mul_prec_round_ref_val(MAX_EXPONENT_FLOAT, BP, Up).0;
     if *x >= bound_emax {
         // x > log(2^emax), so exp(x) > 2^emax
         return exp_overflow(precy, rm);
@@ -680,13 +676,8 @@ fn exp_prec_round_normal_ref(x: &Float, precy: u64, rm: RoundingMode) -> (Float,
     // log(2) as exact Rationals at widening precision; x is dyadic and the threshold is irrational,
     // so the comparison always resolves. This mirrors the role of MPFR's overflow flag, which lets
     // mpfr_exp detect the overflow after the fact.
-    let bound_emax_lo = Float::ln_2_prec_round(BP, Floor)
-        .0
-        .mul_prec_round_ref_val(
-            const { Float::const_from_signed(Float::MAX_EXPONENT as SignedLimb) },
-            BP,
-            Floor,
-        )
+    let bound_emax_lo = log2_lo
+        .mul_prec_round_ref_val(MAX_EXPONENT_FLOAT, BP, Floor)
         .0;
     if *x >= bound_emax_lo {
         let xr = Rational::exact_from(x);
@@ -705,7 +696,7 @@ fn exp_prec_round_normal_ref(x: &Float, precy: u64, rm: RoundingMode) -> (Float,
             p <<= 1;
         }
     }
-    let bound_emin = log2_up
+    let bound_emin = log2_hi
         .mul_prec_round(
             const { Float::const_from_signed((Float::MIN_EXPONENT as SignedLimb) - 2) },
             BP,
@@ -824,7 +815,7 @@ fn exp_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ord
     // x is too small to be represented as a normal Float (|x| < 2^MIN_EXPONENT). The squeeze below
     // cannot bracket it (its Float bounds would be 0 or out of range), so sum the Taylor series
     // instead. exp(x) is near 1 but, for an enormous `prec`, possibly more than one ulp away.
-    if exp_x <= const { Float::MIN_EXPONENT as i64 } {
+    if exp_x <= Float::MIN_EXPONENT_I64 {
         return exp_rational_near_one(x, prec, rm);
     }
     // Tiny x: if |x| < 2^(-prec-1) then exp(x) is within half an ulp of 1, so it rounds to 1 (or,
@@ -841,7 +832,7 @@ fn exp_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ord
     // |x| is too large to be a finite Float, so exp(x) overflows (x > 0) or underflows (x < 0).
     // Smaller x that still overflow/underflow exp are caught by `exp_prec_round_normal_ref` in the
     // loop below.
-    if exp_x >= const { Float::MAX_EXPONENT as i64 } {
+    if exp_x >= Float::MAX_EXPONENT_I64 {
         return if positive {
             exp_overflow(prec, rm)
         } else {

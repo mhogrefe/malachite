@@ -13,6 +13,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Infinity, NaN, Zero};
+use crate::TWICE_WIDTH;
 use crate::arithmetic::exp::{exp_overflow, one_neighbor};
 use crate::arithmetic::exp_x_minus_1::exp_x_minus_1_rational_near_zero;
 use crate::arithmetic::round_near_x::float_round_near_x;
@@ -38,9 +39,6 @@ use malachite_nz::natural::arithmetic::float_extras::float_can_round;
 use malachite_nz::platform::Limb;
 use malachite_q::Rational;
 
-const MAX_EXPONENT_U64: u64 = Float::MAX_EXPONENT as u64;
-const MAX_EXPONENT_I64: i64 = Float::MAX_EXPONENT as i64;
-const MIN_EXPONENT_I64: i64 = Float::MIN_EXPONENT as i64;
 const TEN: Rational = Rational::const_from_unsigned(10);
 
 // The outcome of the "small |x|" branch of `mpfr_exp10m1`.
@@ -60,7 +58,7 @@ enum Small {
 fn x_log_2_10_ge(x: &Rational, bound: i64) -> bool {
     let bound = Rational::from(bound);
     let positive = *x > 0u32;
-    let mut p = const { Limb::WIDTH << 1 };
+    let mut p = TWICE_WIDTH;
     loop {
         let (lo, hi) = floor_and_ceiling(Float::log_2_10_prec_round(p, Floor));
         let lo = Rational::exact_from(lo);
@@ -141,8 +139,8 @@ fn power_of_10_x_minus_1_prec_round_normal(
     // shortcut leaves only |x| <= 2 + (prec - 1) / 3. The cheap `prec` gate below skips the (up to
     // 128 MB) `Rational::exact_from(x)` in the common case, where the branch cannot fire.
     if x.is_sign_negative()
-        && 2 + (prec - 1) / 3 >= const { MAX_EXPONENT_U64 >> 2 }
-        && !x_log_2_10_ge(&Rational::exact_from(x), MIN_EXPONENT_I64)
+        && 2 + (prec - 1) / 3 >= const { Float::MAX_EXPONENT_U64 >> 2 }
+        && !x_log_2_10_ge(&Rational::exact_from(x), Float::MIN_EXPONENT_I64)
     {
         return power_of_10_x_minus_1_deep_negative(x, prec, rm);
     }
@@ -166,7 +164,8 @@ fn power_of_10_x_minus_1_prec_round_normal(
             //   artifact of rounding 10^x up at the working precision; growing it far enough (past
             //   the distance from x * log2(10) to MAX_EXPONENT) makes 10^x finite, and the loop
             //   proceeds normally.
-            if prec < MAX_EXPONENT_U64 || x_log_2_10_ge(&Rational::exact_from(x), MAX_EXPONENT_I64)
+            if prec < Float::MAX_EXPONENT_U64
+                || x_log_2_10_ge(&Rational::exact_from(x), Float::MAX_EXPONENT_I64)
             {
                 return exp_overflow(prec, rm);
             }
@@ -327,7 +326,7 @@ fn power_of_10_x_minus_1_rational_helper(
         return if n > 0 {
             // 10^n - 1 overflows when 10^n - 1 >= 2^MAX_EXPONENT, i.e. n * log2(10) >=
             // MAX_EXPONENT.
-            if x_log_2_10_ge(x, MAX_EXPONENT_I64) {
+            if x_log_2_10_ge(x, Float::MAX_EXPONENT_I64) {
                 exp_overflow(prec, rm)
             } else {
                 // 10^n - 1 is an exact integer with at most MAX_EXPONENT bits; round it directly.
@@ -359,21 +358,25 @@ fn power_of_10_x_minus_1_rational_helper(
     // x is too small to be represented as a normal Float (|x| < 2^MIN_EXPONENT). The squeeze below
     // cannot bracket it (its Float bounds would be 0), so use the ln(10)-bracketing helper, which
     // reduces 10^x - 1 to expm1(x ln(10)) for the tiny (near-zero) argument.
-    if exp_x <= MIN_EXPONENT_I64 {
+    if exp_x <= Float::MIN_EXPONENT_I64 {
         return power_of_10_x_minus_1_rational_near_zero(x, prec, rm);
     }
     // |x| is too large to be a finite Float. For x > 0, 10^x - 1 overflows; for x < 0 it tends to
     // -1. Smaller x that still overflow or round to -1 are handled by the Float function inside the
     // squeeze below.
-    if exp_x >= MAX_EXPONENT_I64 {
+    if exp_x >= Float::MAX_EXPONENT_I64 {
         if positive {
             return exp_overflow(prec, rm);
         }
         // 10^x is far below ulp(-1) at any precision, so 10^x - 1 rounds to -1 or its toward-zero
         // neighbor.
-        if let Some(result) =
-            float_round_near_x(&Float::NEGATIVE_ONE, MAX_EXPONENT_U64, false, prec, rm)
-        {
+        if let Some(result) = float_round_near_x(
+            &Float::NEGATIVE_ONE,
+            Float::MAX_EXPONENT_U64,
+            false,
+            prec,
+            rm,
+        ) {
             return result;
         }
         // `prec` is enormous (>= MAX_EXPONENT), so `float_round_near_x` cannot resolve the

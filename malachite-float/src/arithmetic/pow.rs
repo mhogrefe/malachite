@@ -15,6 +15,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
+use crate::TWICE_WIDTH;
 use crate::arithmetic::exp::{exp_overflow, exp_rational_near_one, exp_underflow, one_neighbor};
 use crate::arithmetic::ln::ln_1_plus_rational_brackets;
 use crate::arithmetic::log_base_2::log_2_rational_brackets;
@@ -6315,7 +6316,7 @@ fn rational_pow_squeeze_x(
     prec: u64,
     rm: RoundingMode,
 ) -> (Float, Ordering) {
-    let mut wprec = prec.saturating_add(Limb::WIDTH << 1);
+    let mut wprec = prec.saturating_add(TWICE_WIDTH);
     let mut increment = Limb::WIDTH;
     loop {
         let x_lo = Float::from_rational_prec_round_ref(x, wprec, Floor).0;
@@ -6412,7 +6413,7 @@ fn pow_squeeze_t(
     rm: RoundingMode,
 ) -> (Float, Ordering) {
     let er = Rational::from(e);
-    let mut wprec = prec.saturating_add(Limb::WIDTH << 1);
+    let mut wprec = prec.saturating_add(TWICE_WIDTH);
     let mut increment = Limb::WIDTH;
     loop {
         let (l_lo, l_hi) = log_2_rational_brackets(xp, wprec);

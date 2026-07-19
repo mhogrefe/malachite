@@ -28,12 +28,12 @@ use crate::natural::arithmetic::add::{
     limbs_add_limb_to_out, limbs_add_same_length_to_out, limbs_slice_add_same_length_in_place_left,
 };
 use crate::natural::arithmetic::div_mod::{
-    MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD, MUPI_DIV_QR_THRESHOLD, limbs_div_barrett_large_product,
-    limbs_div_mod_balanced, limbs_div_mod_barrett_helper, limbs_div_mod_barrett_is_len,
-    limbs_div_mod_barrett_scratch_len, limbs_div_mod_by_two_limb_normalized,
-    limbs_div_mod_divide_and_conquer_helper, limbs_div_mod_schoolbook,
-    limbs_div_mod_three_limb_by_two_limb, limbs_invert_approx, limbs_invert_limb,
-    limbs_two_limb_inverse_helper,
+    MU_DIV_QR_DC_SLOPE, MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD, MUPI_DIV_QR_THRESHOLD,
+    TWICE_MU_DIV_QR_THRESHOLD, limbs_div_barrett_large_product, limbs_div_mod_balanced,
+    limbs_div_mod_barrett_helper, limbs_div_mod_barrett_is_len, limbs_div_mod_barrett_scratch_len,
+    limbs_div_mod_by_two_limb_normalized, limbs_div_mod_divide_and_conquer_helper,
+    limbs_div_mod_schoolbook, limbs_div_mod_three_limb_by_two_limb, limbs_invert_approx,
+    limbs_invert_limb, limbs_two_limb_inverse_helper,
 };
 use crate::natural::arithmetic::mul::mul_mod::limbs_mul_mod_base_pow_n_minus_1_next_size;
 use crate::natural::arithmetic::mul::{
@@ -54,7 +54,6 @@ use crate::platform::{
     DC_DIV_QR_THRESHOLD, DoubleLimb, Limb, MOD_1_1_TO_MOD_1_2_THRESHOLD, MOD_1_1P_METHOD,
     MOD_1_2_TO_MOD_1_4_THRESHOLD, MOD_1_NORM_THRESHOLD, MOD_1_UNNORM_THRESHOLD,
     MOD_1N_TO_MOD_1_1_THRESHOLD, MOD_1U_TO_MOD_1_1_THRESHOLD, MU_DIV_QR_SKEW_THRESHOLD,
-    MU_DIV_QR_THRESHOLD,
 };
 use alloc::vec::Vec;
 use core::cmp::Ordering::*;
@@ -790,9 +789,9 @@ fn limbs_mod_dc_condition(n_len: usize, d_len: usize) -> bool {
     let n_64 = n_len as f64;
     let d_64 = d_len as f64;
     d_len < MUPI_DIV_QR_THRESHOLD
-        || n_len < MU_DIV_QR_THRESHOLD << 1
+        || n_len < TWICE_MU_DIV_QR_THRESHOLD
         || fma!(
-            ((MU_DIV_QR_THRESHOLD - MUPI_DIV_QR_THRESHOLD) << 1) as f64,
+            MU_DIV_QR_DC_SLOPE,
             d_64,
             MUPI_DIV_QR_THRESHOLD as f64 * n_64
         ) > d_64 * n_64

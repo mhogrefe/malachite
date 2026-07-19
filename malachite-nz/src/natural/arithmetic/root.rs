@@ -39,7 +39,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
-use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{LeadingZeros, LowMask, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::slices::{slice_set_zero, slice_trailing_zeros};
@@ -165,7 +165,7 @@ fn log_based_root(out: &mut Limb, x: Limb, mut bit_count: u64, exp: u64) -> u64 
     }
     assert!(bit_count.significant_bits() <= LOGROOT_USED_BITS);
     *out = Limb::power_of_2(LOGROOT_USED_BITS) | Limb::from(V_EXP[usize::exact_from(bit_count)]);
-    if !LOGROOT_NEEDS_TWO_CORRECTIONS {
+    if const { !LOGROOT_NEEDS_TWO_CORRECTIONS } {
         *out >>= 1;
     }
     len
@@ -256,7 +256,7 @@ fn limbs_root_to_out_internal(
     }
     out_root[0] >>= APPROX_BITS - root_bits;
     input_bits -= root_bits;
-    assert!(i < usize::wrapping_from(Limb::WIDTH + 1));
+    assert!(i < const { (Limb::WIDTH + 1) as usize });
     // We have sizes[0] = next_bits > sizes[1] > ... > sizes[ni] = 0, with sizes[i] <= 2 * sizes[i +
     // 1]. Newton iteration will first compute sizes[i - 1] extra bits, then sizes[i - 2], ..., then
     // sizes[0] = next_bits. qs and ws need enough space to store S' ^ exp, where S' is an

@@ -152,7 +152,7 @@ fn agm_prec_round_normal(
                     // = ceil((emin + 1 - e1 - e2) / 2). This is OK, as: 1. 1 <= scale <= emax. 2.
                     // e1 + scale >= emin + 1 >= emin. 3. e2 + scale <= scale <= emax.
                     assert!(e1 <= e2 && e2 <= 0);
-                    scaleop = (Float::MIN_EXPONENT + 2 - e1 - e2) / 2;
+                    scaleop = (Float::MIN_EXPONENT_PLUS_2 - e1 - e2) / 2;
                     assert!(scaleop > 0);
                 }
                 a <<= scaleop;
@@ -313,7 +313,7 @@ fn agm_prec_round_ref_ref_normal(
                     // = ceil((emin + 1 - e1 - e2) / 2). This is OK, as: 1. 1 <= scale <= emax. 2.
                     // e1 + scale >= emin + 1 >= emin. 3. e2 + scale <= scale <= emax.
                     assert!(e1 <= e2 && e2 <= 0);
-                    scaleop = (Float::MIN_EXPONENT + 2 - e1 - e2) / 2;
+                    scaleop = (Float::MIN_EXPONENT_PLUS_2 - e1 - e2) / 2;
                     assert!(scaleop > 0);
                 }
                 *a.to_mut() <<= scaleop;
@@ -2044,7 +2044,7 @@ impl Float {
             (true, true, _, _) => Self::from_rational_prec_round(x, prec, rm),
             (_, _, true, true)
                 if rm != Nearest
-                    || x_exp < Self::MIN_EXPONENT - 1 && y_exp < Self::MIN_EXPONENT - 1 =>
+                    || x_exp < Self::MIN_EXPONENT_MINUS_1 && y_exp < Self::MIN_EXPONENT_MINUS_1 =>
             {
                 Self::from_rational_prec_round(x, prec, rm)
             }
@@ -2181,7 +2181,7 @@ impl Float {
             (true, true, _, _) => Self::from_rational_prec_round(y, prec, rm),
             (_, _, true, true)
                 if rm != Nearest
-                    || x_exp < Self::MIN_EXPONENT - 1 && y_exp < Self::MIN_EXPONENT - 1 =>
+                    || x_exp < Self::MIN_EXPONENT_MINUS_1 && y_exp < Self::MIN_EXPONENT_MINUS_1 =>
             {
                 Self::from_rational_prec_round(y, prec, rm)
             }
@@ -2318,7 +2318,7 @@ impl Float {
             (true, true, _, _) => Self::from_rational_prec_round_ref(x, prec, rm),
             (_, _, true, true)
                 if rm != Nearest
-                    || x_exp < Self::MIN_EXPONENT - 1 && y_exp < Self::MIN_EXPONENT - 1 =>
+                    || x_exp < Self::MIN_EXPONENT_MINUS_1 && y_exp < Self::MIN_EXPONENT_MINUS_1 =>
             {
                 Self::from_rational_prec_round_ref(x, prec, rm)
             }

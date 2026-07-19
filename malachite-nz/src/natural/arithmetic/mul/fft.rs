@@ -38,6 +38,9 @@ use malachite_base::num::logic::traits::{LeadingZeros, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode::*;
 use wide::{f64x4, f64x8, u64x4};
 
+const VEC_SZ_2: usize = VEC_SZ << 1;
+const VEC_SZ_3: usize = 3 * VEC_SZ;
+
 // This is nmod_t from flint.h, FLINT 3.3.0-dev.
 #[derive(Debug, Default, Clone, Eq, PartialEq)]
 pub(crate) struct ModData {
@@ -875,6 +878,7 @@ apply_mpn_to_fft_func!(apply_mpn_to_fft_func_8_192, 8, 192, 2);
 
 const LG_BLK_SZ: u64 = 8;
 const BLK_SZ: usize = 256;
+const BLK_SZ_DIV_8: usize = BLK_SZ >> 3;
 
 // This is mpn_ctx_best_profile from fft_small/mpn_mul.c, FLINT 3.3.0-dev, returning the context.
 fn mpn_ctx_best_profile(r: &Context, p: &mut ProfileEntry, an: usize, bn: usize) {
@@ -965,7 +969,7 @@ fn slow_mpn_to_fft_easy(
     for iq in 0..iq_stop_easy {
         let zi = &mut zs[iq << LG_BLK_SZ..];
         let mut m = 0;
-        for ir in 0..const { BLK_SZ >> 3 } {
+        for ir in 0..BLK_SZ_DIV_8 {
             let mut k = iq * const { BLK_SZ >> 5 } * bits + (m >> 5);
             let mut j = m & 31;
             let mut ak = f64x8::from([
@@ -1015,15 +1019,14 @@ fn slow_mpn_to_fft_easy(
             x = f64x8_reduce_to_pm1n!(x, p, pinv);
             let [x_0, x_1, x_2, x_3, x_4, x_5, x_6, x_7] = x.to_array();
             let zi_hi = &mut zi[ir..];
-            const B: usize = BLK_SZ >> 3;
             zi_hi[0] = x_0;
-            zi_hi[B] = x_1;
-            zi_hi[const { B << 1 }] = x_2;
-            zi_hi[const { 3 * B }] = x_3;
-            zi_hi[const { B << 2 }] = x_4;
-            zi_hi[const { 5 * B }] = x_5;
-            zi_hi[const { 6 * B }] = x_6;
-            zi_hi[const { 7 * B }] = x_7;
+            zi_hi[BLK_SZ_DIV_8] = x_1;
+            zi_hi[const { BLK_SZ_DIV_8 << 1 }] = x_2;
+            zi_hi[const { 3 * BLK_SZ_DIV_8 }] = x_3;
+            zi_hi[const { BLK_SZ_DIV_8 << 2 }] = x_4;
+            zi_hi[const { 5 * BLK_SZ_DIV_8 }] = x_5;
+            zi_hi[const { 6 * BLK_SZ_DIV_8 }] = x_6;
+            zi_hi[const { 7 * BLK_SZ_DIV_8 }] = x_7;
             m += bits;
         }
     }
@@ -4891,8 +4894,8 @@ macro_rules! convert_block {
             for j in (0..BLK_SZ).step_by(VEC_SZ << 2) {
                 let mut x0 = read_f64x4!(ds, j);
                 let mut x1 = read_f64x4!(ds, j + VEC_SZ);
-                let mut x2 = read_f64x4!(ds, j + const { 2 * VEC_SZ });
-                let mut x3 = read_f64x4!(ds, j + const { 3 * VEC_SZ });
+                let mut x2 = read_f64x4!(ds, j + VEC_SZ_2);
+                let mut x3 = read_f64x4!(ds, j + VEC_SZ_3);
                 x0 = f64x4_reduce_to_0n!(x0, p, pinv);
                 x1 = f64x4_reduce_to_0n!(x1, p, pinv);
                 x2 = f64x4_reduce_to_0n!(x2, p, pinv);
@@ -4903,8 +4906,8 @@ macro_rules! convert_block {
                 let y3 = f64x4_to_u64x4!(x3);
                 write_f64x4!(xs_hi, j, y0);
                 write_f64x4!(xs_hi, j + VEC_SZ, y1);
-                write_f64x4!(xs_hi, j + const { 2 * VEC_SZ }, y2);
-                write_f64x4!(xs_hi, j + const { 3 * VEC_SZ }, y3);
+                write_f64x4!(xs_hi, j + VEC_SZ_2, y2);
+                write_f64x4!(xs_hi, j + VEC_SZ_3, y3);
             }
             m += $dstride;
         }

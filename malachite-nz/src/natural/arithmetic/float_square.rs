@@ -24,7 +24,10 @@ use crate::natural::arithmetic::float_mul::{
 };
 use crate::natural::arithmetic::shl::limbs_slice_shl_in_place;
 use crate::natural::arithmetic::square::{limbs_square_to_out, limbs_square_to_out_scratch_len};
-use crate::natural::{LIMB_HIGH_BIT, Natural, bit_to_limb_count_ceiling};
+use crate::natural::{
+    LIMB_HIGH_BIT, LIMB_MASK, NOT_LIMB_HIGH_BIT, Natural, THRICE_WIDTH, TWICE_WIDTH, WIDTH_MINUS_1,
+    bit_to_limb_count_ceiling,
+};
 use crate::platform::{DoubleLimb, Limb};
 use core::cmp::Ordering::{self, *};
 use core::cmp::max;
@@ -152,9 +155,6 @@ fn square_float_significand_same_prec_ref(
     }
 }
 
-const WIDTH_M1: u64 = Limb::WIDTH - 1;
-const COMP_HIGH_BIT: Limb = !LIMB_HIGH_BIT;
-
 // This is mpfr_sqr_1 from sqr.c, MPFR 4.3.0.
 fn square_float_significand_same_prec_lt_w(
     x: Limb,
@@ -168,7 +168,7 @@ fn square_float_significand_same_prec_lt_w(
     let decrement_exp = !z.get_highest_bit();
     if decrement_exp {
         z <<= 1;
-        z |= sticky_bit >> WIDTH_M1;
+        z |= sticky_bit >> WIDTH_MINUS_1;
         sticky_bit <<= 1;
     }
     let round_bit = z & (shift_bit >> 1);
@@ -205,11 +205,11 @@ fn square_float_significand_same_prec_w(x: Limb, rm: RoundingMode) -> (Limb, boo
     let decrement_exp = !z.get_highest_bit();
     if decrement_exp {
         z <<= 1;
-        z |= sticky_bit >> WIDTH_M1;
+        z |= sticky_bit >> WIDTH_MINUS_1;
         sticky_bit <<= 1;
     }
     let round_bit = sticky_bit & LIMB_HIGH_BIT;
-    sticky_bit &= COMP_HIGH_BIT;
+    sticky_bit &= NOT_LIMB_HIGH_BIT;
     let mut square = z;
     if round_bit == 0 && sticky_bit == 0 {
         return (z, decrement_exp, Equal);
@@ -235,9 +235,6 @@ fn square_float_significand_same_prec_w(x: Limb, rm: RoundingMode) -> (Limb, boo
         }
     }
 }
-
-const TWICE_WIDTH: u64 = Limb::WIDTH << 1;
-const THRICE_WIDTH: u64 = Limb::WIDTH * 3;
 
 // This is mpfr_sqr_2 from sqr.c, MPFR 4.2.0.
 fn square_float_significand_same_prec_gt_w_lt_2w(
@@ -285,9 +282,9 @@ fn square_float_significand_same_prec_gt_w_lt_2w(
     let decrement_exp = !hi.get_highest_bit();
     if decrement_exp {
         hi <<= 1;
-        hi |= lo >> WIDTH_M1;
+        hi |= lo >> WIDTH_MINUS_1;
         lo <<= 1;
-        lo |= sticky_bit >> WIDTH_M1;
+        lo |= sticky_bit >> WIDTH_MINUS_1;
         sticky_bit <<= 1;
         // no need to shift sticky_bit_2 since we only want to know if it is zero or not
     }
@@ -319,8 +316,6 @@ fn square_float_significand_same_prec_gt_w_lt_2w(
         }
     }
 }
-
-const LIMB_MASK: DoubleLimb = (1 << Limb::WIDTH) - 1;
 
 // This is mpfr_sqr_3 from sqr.c, MPFR 4.2.0.
 fn square_float_significand_same_prec_gt_2w_lt_3w(
@@ -402,11 +397,11 @@ fn square_float_significand_same_prec_gt_2w_lt_3w(
     let decrement_exp = !a2.get_highest_bit();
     if decrement_exp {
         a2 <<= 1;
-        a2 |= a1 >> WIDTH_M1;
+        a2 |= a1 >> WIDTH_MINUS_1;
         a1 <<= 1;
-        a1 |= a0 >> WIDTH_M1;
+        a1 |= a0 >> WIDTH_MINUS_1;
         a0 <<= 1;
-        a0 |= sticky_bit >> WIDTH_M1;
+        a0 |= sticky_bit >> WIDTH_MINUS_1;
         sticky_bit <<= 1;
         // no need to shift sticky_bit_2: we only need to know if it is zero or not
     }
@@ -550,7 +545,7 @@ fn square_float_significands_general(
     let mut b1 = tmp[xs_len_2 - 1];
     // now tmp[0]..tmp[2 * xs_len - 1] contains the square of the mantissa, with tmp[2 * xs_len - 1]
     // >= 2 ^ (Limb::WIDTH - 2)
-    b1 >>= const { Limb::WIDTH - 1 }; // msb from the product
+    b1 >>= WIDTH_MINUS_1; // msb from the product
     // if the mantissas of b and c are uniformly distributed in (1/2, 1], then their product is in
     // (1/4, 1/2] with probability 2 * ln(2) - 1 ~ 0.386 and in [1/2, 1] with probability 2 - 2 *
     // ln(2) ~ 0.614

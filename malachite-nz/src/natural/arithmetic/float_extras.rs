@@ -22,7 +22,8 @@ use crate::natural::arithmetic::shr::{limbs_shr_to_out, limbs_slice_shr_in_place
 use crate::natural::arithmetic::square::{limbs_square_to_out, limbs_square_to_out_scratch_len};
 use crate::natural::conversion::digits::general_digits::limbs_to_digits_small_base;
 use crate::natural::{
-    LIMB_HIGH_BIT, Natural, bit_to_limb_count_ceiling, bit_to_limb_count_floor, limb_to_bit_count,
+    LIMB_HIGH_BIT, LIMB_MAX_HALF, Natural, bit_to_limb_count_ceiling, bit_to_limb_count_floor,
+    limb_to_bit_count,
 };
 use crate::platform::{DoubleLimb, Limb};
 use core::cmp::Ordering::*;
@@ -36,6 +37,8 @@ use malachite_base::num::conversion::traits::{ExactFrom, PowerOf2Digits};
 use malachite_base::num::logic::traits::{LowMask, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::slices::{slice_leading_zeros, slice_test_zero};
+
+const WIDTH_I64: i64 = Limb::WIDTH as i64;
 
 // This is MPFR_CAN_ROUND from mpfr-impl.h, MPFR 4.2.0.
 pub fn float_can_round(x: &Natural, err0: u64, prec: u64, rm: RoundingMode) -> bool {
@@ -172,9 +175,9 @@ pub fn float_significand_leading_ones(x: &Natural) -> Option<u64> {
     }
 }
 
-const WIDTH_M1_MASK: Limb = Limb::MAX >> 1;
 pub(crate) const MPFR_EVEN_INEX: i8 = 2;
 pub(crate) const MPFR_ROUND_FAILED: i8 = 3;
+const NEG_MPFR_ROUND_FAILED: i8 = -MPFR_ROUND_FAILED;
 
 // This is MPFR_RNDRAW_EVEN from mpfr-impl.h, MPFR 4.2.0, returning `inexact` and a `bool`
 // signifying whether the returned exponent should be incremented.
@@ -306,7 +309,7 @@ fn round_helper<F: Fn(&mut [Limb], &[Limb], Limb) -> (i8, bool)>(
             // Compute rounding bit and sticky bit - see note above
             let x = xs[i - 1];
             round_bit = x & LIMB_HIGH_BIT;
-            sticky_bit = x & WIDTH_M1_MASK;
+            sticky_bit = x & LIMB_MAX_HALF;
             if rm == Nearest || round_bit == 0 {
                 let mut to = i - 1;
                 let mut n = xs_len - out_len - 1;
@@ -407,7 +410,7 @@ fn round_helper_aliased<F: Fn(&mut [Limb], Limb) -> (i8, bool)>(
             // Compute rounding bit and sticky bit - see note above
             let x = xs[out_offset - 1];
             round_bit = x & LIMB_HIGH_BIT;
-            sticky_bit = x & WIDTH_M1_MASK;
+            sticky_bit = x & LIMB_MAX_HALF;
             if rm == Nearest || round_bit == 0 {
                 let mut n = out_offset - 1;
                 while n != 0 && sticky_bit == 0 {
@@ -550,7 +553,7 @@ pub fn limbs_float_exp(xs: &mut [Limb], base: u64, e: i64) -> (i64, i32) {
     *xs_last = limb_base;
     xs_init.fill(0);
     // The initial exponent for X; the invariant is X = {xs, len} * 2 ^ f.
-    let mut f = h - (bit_len - const { Limb::WIDTH as i64 });
+    let mut f = h - (bit_len - WIDTH_I64);
     // The number of bits in e.
     let t = i32::exact_from(e.significant_bits());
     // `error == t` means that the result is still exact.
@@ -606,7 +609,7 @@ pub fn limbs_float_exp(xs: &mut [Limb], base: u64, e: i64) -> (i64, i32) {
             let carry =
                 limbs_mul_limb_to_out::<DoubleLimb, Limb>(&mut ys_init[len - 1..], xs, limb_base);
             *ys_last = carry;
-            f += h + const { Limb::WIDTH as i64 };
+            f += h + WIDTH_I64;
             let (ys_lo, ys_hi) = ys.split_at(len);
             if ys_hi.last().unwrap().get_highest_bit() {
                 xs.copy_from_slice(ys_hi);
@@ -745,7 +748,7 @@ pub_test! {limbs_get_str_aux(
                             // otherwise we cannot round correctly: for example if b = 10, we might
                             // have a mantissa of xxxxxxx5.00000000 which can be rounded to nearest
                             // to 8 digits but not to 7
-                            return (-MPFR_ROUND_FAILED, exp);
+                            return (NEG_MPFR_ROUND_FAILED, exp);
                         }
                     }
                     Less => Floor,
@@ -948,7 +951,6 @@ pub fn limbs_get_str(
             digit_len,
             rm,
         );
-        const NEG_MPFR_ROUND_FAILED: i8 = -MPFR_ROUND_FAILED;
         match ret {
             MPFR_ROUND_FAILED => {
                 // error too large: increase the working precision (MPFR_ZIV_NEXT)

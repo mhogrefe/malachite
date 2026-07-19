@@ -90,7 +90,7 @@ impl Float {
             }) => {
                 let ulp_exponent =
                     i64::from(*exponent).checked_sub(i64::try_from(*precision).ok()?)?;
-                if i32::try_from(ulp_exponent).ok()? >= Self::MIN_EXPONENT - 1 {
+                if i32::try_from(ulp_exponent).ok()? >= Self::MIN_EXPONENT_MINUS_1 {
                     Some(Self::power_of_2(ulp_exponent))
                 } else {
                     None

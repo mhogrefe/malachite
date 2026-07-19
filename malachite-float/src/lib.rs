@@ -209,6 +209,10 @@ pub(crate) fn floor_and_ceiling((floor, o): (Float, Ordering)) -> (Float, Float)
     (floor, ceiling)
 }
 
+// `Limb::WIDTH`-derived bit counts, shared across the crate so each is written out only once.
+pub(crate) const WIDTH_MINUS_1: u64 = Limb::WIDTH - 1;
+pub(crate) const TWICE_WIDTH: u64 = Limb::WIDTH << 1;
+
 impl Float {
     /// The maximum raw exponent of any [`Float`], equal to $2^{30}-1$, or $1,073,741,823$. This is
     /// one more than the maximum scientific exponent. If we write a [`Float`] as $\pm m2^e$, with
@@ -224,6 +228,14 @@ impl Float {
     /// minimum positive finite [`Float`], or the maximum negative finite [`Float`] is returned
     /// instead, depending on the rounding mode.
     pub const MIN_EXPONENT: i32 = -Self::MAX_EXPONENT;
+    // Exponent bounds derived from `MIN_EXPONENT`/`MAX_EXPONENT`, written out once and shared by
+    // the exponent-range checks throughout the crate.
+    pub(crate) const MIN_EXPONENT_MINUS_1: i32 = Self::MIN_EXPONENT - 1;
+    pub(crate) const MIN_EXPONENT_PLUS_2: i32 = Self::MIN_EXPONENT + 2;
+    pub(crate) const MIN_EXPONENT_I64: i64 = Self::MIN_EXPONENT as i64;
+    pub(crate) const MIN_EXPONENT_MINUS_2_I64: i64 = (Self::MIN_EXPONENT - 2) as i64;
+    pub(crate) const MAX_EXPONENT_I64: i64 = Self::MAX_EXPONENT as i64;
+    pub(crate) const MAX_EXPONENT_U64: u64 = Self::MAX_EXPONENT as u64;
 
     #[cfg(feature = "test_build")]
     pub fn is_valid(&self) -> bool {

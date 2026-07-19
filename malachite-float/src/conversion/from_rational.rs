@@ -77,7 +77,7 @@ pub_test! {from_rational_prec_round_direct(
         if exponent < Float::MIN_EXPONENT {
             assert!(rm != Exact, "Inexact conversion from Rational to Float");
             return if rm == Nearest
-                && exponent == Float::MIN_EXPONENT - 1
+                && exponent == Float::MIN_EXPONENT_MINUS_1
                 && (o == away_from_0.reverse() || !significand.is_power_of_2())
             {
                 if sign {
@@ -242,7 +242,7 @@ pub_test! {from_rational_prec_round_ref_direct(
         if exponent < Float::MIN_EXPONENT {
             assert!(rm != Exact, "Inexact conversion from Rational to Float");
             return if rm == Nearest
-                && exponent == Float::MIN_EXPONENT - 1
+                && exponent == Float::MIN_EXPONENT_MINUS_1
                 && (o == away_from_0.reverse() || !significand.is_power_of_2())
             {
                 if sign {

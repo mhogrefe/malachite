@@ -1406,9 +1406,9 @@ fn limbs_div_dc_condition(n_len: usize, d_len: usize) -> bool {
     let n_64 = n_len as f64;
     let d_64 = d_len as f64;
     d_len < MUPI_DIV_Q_THRESHOLD
-        || n_len < MU_DIV_Q_THRESHOLD << 1
+        || n_len < const { MU_DIV_Q_THRESHOLD << 1 }
         || fma!(
-            ((MU_DIV_Q_THRESHOLD - MUPI_DIV_Q_THRESHOLD) << 1) as f64,
+            const { ((MU_DIV_Q_THRESHOLD - MUPI_DIV_Q_THRESHOLD) << 1) as f64 },
             d_64,
             MUPI_DIV_Q_THRESHOLD as f64 * n_64
         ) > d_64 * n_64

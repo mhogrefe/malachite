@@ -8,6 +8,7 @@
 
 use crate::Float;
 use crate::InnerFloat::Finite;
+use crate::WIDTH_MINUS_1;
 use core::cmp::{
     Ordering::{self, *},
     min,
@@ -282,7 +283,7 @@ impl RawMantissaAndExponent<Natural, i32> for Float {
         let bits = raw_mantissa.significant_bits();
         assert_ne!(bits, 0);
         assert!(bits.divisible_by_power_of_2(Limb::LOG_WIDTH));
-        let precision = bits - min(raw_mantissa.trailing_zeros().unwrap(), Limb::WIDTH - 1);
+        let precision = bits - min(raw_mantissa.trailing_zeros().unwrap(), WIDTH_MINUS_1);
         Self(Finite {
             sign: true,
             exponent: raw_exponent,
@@ -1031,7 +1032,8 @@ impl SciMantissaAndExponent<Self, i32> for Float {
         assert!(!sci_mantissa.is_zero());
         if sci_mantissa.is_sign_negative()
             || (&sci_mantissa).raw_exponent() != 1
-            || !(Self::MIN_EXPONENT - 1..=Self::MAX_EXPONENT - 1).contains(&sci_exponent)
+            || !const { (Self::MIN_EXPONENT - 1)..=(Self::MAX_EXPONENT - 1) }
+                .contains(&sci_exponent)
         {
             return None;
         }

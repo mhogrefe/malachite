@@ -8,6 +8,7 @@
 
 use crate::natural::InnerNatural::Small;
 use crate::natural::Natural;
+use crate::natural::{WIDTH_MINUS_1, WIDTH_MINUS_2, WIDTH_MINUS_3};
 use crate::platform::{Limb, MAX_DIGITS_PER_LIMB};
 use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{ModPowerOf2, ShrRound};
@@ -15,6 +16,8 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::string::from_string::digit_from_display_byte;
 use malachite_base::num::conversion::traits::{Digits, ExactFrom, FromStringBase, WrappingFrom};
 use malachite_base::rounding_modes::RoundingMode::*;
+
+const LOG_WIDTH_MINUS_2: u64 = Limb::LOG_WIDTH - 2;
 
 impl FromStr for Natural {
     type Err = ();
@@ -83,7 +86,7 @@ fn from_binary_str(s: &str) -> Option<Natural> {
 
 fn from_oct_str(s: &str) -> Option<Natural> {
     let len = s.len();
-    if len <= usize::wrapping_from(Limb::WIDTH / 3) {
+    if len <= const { (Limb::WIDTH / 3) as usize } {
         Limb::from_str_radix(s, 8).ok().map(Natural::from)
     } else {
         let bit_len = len.checked_mul(3).unwrap();
@@ -105,7 +108,7 @@ fn from_oct_str(s: &str) -> Option<Natural> {
                     i -= 1;
                     x = &mut xs[i];
                     *x = digit;
-                    remaining = Limb::WIDTH - 3;
+                    remaining = WIDTH_MINUS_3;
                 }
                 1 => {
                     *x <<= 1;
@@ -113,7 +116,7 @@ fn from_oct_str(s: &str) -> Option<Natural> {
                     i -= 1;
                     x = &mut xs[i];
                     *x = digit & 3;
-                    remaining = Limb::WIDTH - 2;
+                    remaining = WIDTH_MINUS_2;
                 }
                 2 => {
                     *x <<= 2;
@@ -121,7 +124,7 @@ fn from_oct_str(s: &str) -> Option<Natural> {
                     i -= 1;
                     x = &mut xs[i];
                     *x = digit & 1;
-                    remaining = Limb::WIDTH - 1;
+                    remaining = WIDTH_MINUS_1;
                 }
                 _ => {
                     *x <<= 3;
@@ -136,11 +139,11 @@ fn from_oct_str(s: &str) -> Option<Natural> {
 
 fn from_hex_str(s: &str) -> Option<Natural> {
     let len = s.len();
-    if len <= usize::wrapping_from(Limb::WIDTH >> 2) {
+    if len <= const { (Limb::WIDTH >> 2) as usize } {
         Limb::from_str_radix(s, 16).ok().map(Natural::from)
     } else {
-        let mut xs = vec![0; len.shr_round(Limb::LOG_WIDTH - 2, Ceiling).0];
-        let mut remaining = u64::wrapping_from(len.mod_power_of_2(Limb::LOG_WIDTH - 2)) << 2;
+        let mut xs = vec![0; len.shr_round(LOG_WIDTH_MINUS_2, Ceiling).0];
+        let mut remaining = u64::wrapping_from(len.mod_power_of_2(LOG_WIDTH_MINUS_2)) << 2;
         let mut i = xs.len();
         let mut x = xs.last_mut().unwrap();
         if remaining != 0 {

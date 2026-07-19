@@ -13,6 +13,7 @@
 use crate::num::arithmetic::traits::{CheckedSqrt, FloorSqrt, Parity, Square};
 use crate::num::basic::integers::PrimitiveInt;
 use crate::num::conversion::traits::{SplitInHalf, WrappingFrom};
+use crate::num::factorization::TWICE_U64_WIDTH;
 use crate::num::factorization::traits::IsSquare;
 
 const IS_SQUARE_MOD64: [bool; 64] = [
@@ -142,7 +143,7 @@ fn perfsqr_mod_1(r: u64, d: u64, inv: u64, mask: u64) -> bool {
 
 // Double limb. Check precomputed bitmasks to see if remainder is a quadratic residue
 fn perfsqr_mod_2(r: u64, d: u64, inv: u64, mhi: u64, mlo: u64) -> bool {
-    assert!(d <= const { u64::WIDTH << 1 });
+    assert!(d <= TWICE_U64_WIDTH);
     let mut idx = perfsqr_mod_idx(r, d, inv);
     let m = if idx < u64::WIDTH { mlo } else { mhi };
     idx %= u64::WIDTH;

@@ -37,7 +37,9 @@ use crate::natural::arithmetic::sub::{
     limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left,
 };
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
-use crate::natural::{LIMB_HIGH_BIT, Natural, bit_to_limb_count_ceiling};
+use crate::natural::{
+    LIMB_HIGH_BIT, Natural, TWICE_WIDTH, WIDTH_MINUS_1, bit_to_limb_count_ceiling,
+};
 use crate::platform::{DoubleLimb, Limb};
 use alloc::vec::Vec;
 use core::cmp::Ordering::{self, *};
@@ -340,9 +342,6 @@ fn div_float_significands_same_prec_ref_ref(
     }
 }
 
-const WIDTH_M1: u64 = Limb::WIDTH - 1;
-const TWICE_WIDTH: u64 = Limb::WIDTH << 1;
-
 // This is mpfr_div_1 from mul.c, MPFR 4.3.0.
 fn div_float_significands_same_prec_lt_w(
     mut x: Limb,
@@ -631,7 +630,7 @@ fn div_float_significands_same_prec_gt_w_lt_2w(
     };
     if increment_exp {
         sticky_bit |= q_0 & 1;
-        q_0 = (q_1 << WIDTH_M1) | (q_0 >> 1);
+        q_0 = (q_1 << WIDTH_MINUS_1) | (q_0 >> 1);
         q_1 = LIMB_HIGH_BIT | (q_1 >> 1);
     }
     let round_bit = q_0 & (shift_bit >> 1);
@@ -1165,13 +1164,13 @@ pub fn cmp_helper(xs: &[Limb], ys: &[Limb], extra: bool) -> Ordering {
         if xs_len >= ys_len {
             let (xs_lo, xs_hi) = xs.split_at(xs_len - ys_len);
             for (i, x) in xs_hi.iter().enumerate().rev() {
-                let y = (ys[i + 1] << WIDTH_M1) | (ys[i] >> 1);
+                let y = (ys[i + 1] << WIDTH_MINUS_1) | (ys[i] >> 1);
                 cmp = x.cmp(&y);
                 if cmp != Equal {
                     break;
                 }
             }
-            let mut y = ys[0] << WIDTH_M1;
+            let mut y = ys[0] << WIDTH_MINUS_1;
             for x in xs_lo.iter().rev() {
                 if cmp != Equal {
                     break;
@@ -1186,7 +1185,7 @@ pub fn cmp_helper(xs: &[Limb], ys: &[Limb], extra: bool) -> Ordering {
             let k = ys_len - xs_len;
             let ys_hi = &ys[k..];
             for (i, x) in xs.iter().enumerate().rev() {
-                let y = (ys_hi[i + 1] << WIDTH_M1) | (ys_hi[i] >> 1);
+                let y = (ys_hi[i + 1] << WIDTH_MINUS_1) | (ys_hi[i] >> 1);
                 cmp = x.cmp(&y);
                 if cmp != Equal {
                     break;
@@ -1196,7 +1195,7 @@ pub fn cmp_helper(xs: &[Limb], ys: &[Limb], extra: bool) -> Ordering {
                 if cmp != Equal {
                     break;
                 }
-                let y = (ys[i + 1] << WIDTH_M1) | (ys[i] >> 1);
+                let y = (ys[i + 1] << WIDTH_MINUS_1) | (ys[i] >> 1);
                 cmp = if y != 0 { Less } else { Equal };
             }
             if cmp == Equal && extra && ys[0].odd() {
@@ -1228,7 +1227,7 @@ pub fn cmp_helper(xs: &[Limb], ys: &[Limb], extra: bool) -> Ordering {
 fn sub_helper(xs: &mut [Limb], ys: &[Limb], mut carry: bool, extra: bool) -> bool {
     if extra {
         for (i, x) in xs.iter_mut().enumerate() {
-            let y = (ys[i + 1] << WIDTH_M1) | (ys[i] >> 1);
+            let y = (ys[i + 1] << WIDTH_MINUS_1) | (ys[i] >> 1);
             let mut diff = x.wrapping_sub(y);
             if carry {
                 diff.wrapping_sub_assign(1);

@@ -23,7 +23,8 @@ use crate::natural::arithmetic::square::{limbs_square_to_out, limbs_square_to_ou
 use crate::natural::arithmetic::sub::{limbs_sub_greater_in_place_left, limbs_sub_limb_in_place};
 use crate::natural::logic::not::{limbs_not_in_place, limbs_not_to_out};
 use crate::natural::{
-    LIMB_HIGH_BIT, bit_to_limb_count_ceiling, bit_to_limb_count_floor, limb_to_bit_count,
+    HALF_LIMB_HIGH_BIT, HALF_WIDTH, LIMB_HIGH_BIT, WIDTH_MINUS_1, bit_to_limb_count_ceiling,
+    bit_to_limb_count_floor, limb_to_bit_count,
 };
 use crate::platform::Limb;
 use malachite_base::num::arithmetic::traits::{PowerOf2, Square, XMulYToZZ};
@@ -204,7 +205,7 @@ pub fn limbs_reciprocal_sqrt(
         if h << 1 <= Limb::WIDTH {
             // xn=rn=1, and since p <= 2h-3, n=1, thus ln = 0
             assert_eq!(ln, 0);
-            let cy = out_hi[0] >> const { Limb::WIDTH >> 1 };
+            let cy = out_hi[0] >> HALF_WIDTH;
             rs = &mut rs[1..];
             rs[0] = cy.square();
         } else if xs_rec_len == 1 {
@@ -255,7 +256,7 @@ pub fn limbs_reciprocal_sqrt(
         // rounding the input t toward +Inf. We could only modify the low tn - th limbs from t, but
         // it gives only a small speedup, and would make the code more complex.
         let bit = if parity {
-            const { LIMB_HIGH_BIT >> 1 }
+            HALF_LIMB_HIGH_BIT
         } else {
             LIMB_HIGH_BIT
         };
@@ -322,7 +323,7 @@ pub fn limbs_reciprocal_sqrt(
         let us_tail = &mut us_tail[..us_len];
         let cu = if shift_bit == 1 {
             // round bit is in u[-1]
-            limbs_slice_add_limb_in_place(us_tail, *us_head >> const { Limb::WIDTH - 1 })
+            limbs_slice_add_limb_in_place(us_tail, *us_head >> WIDTH_MINUS_1)
         } else {
             let uu = us_tail[0];
             let cu = limbs_slice_add_limb_in_place(us_tail, uu & (shift_bit >> 1));

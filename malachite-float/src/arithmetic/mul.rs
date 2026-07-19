@@ -1035,7 +1035,7 @@ impl Float {
                         (false, Floor | Up | Nearest) => (float_negative_infinity!(), Less),
                         (false, _) => (-Self::max_finite_value_with_prec(prec), Greater),
                     };
-                } else if exp_sum < Self::MIN_EXPONENT - 1 {
+                } else if exp_sum < Self::MIN_EXPONENT_MINUS_1 {
                     return match (sign, rm) {
                         (_, Exact) => panic!("Inexact Float multiplication"),
                         (true, Floor | Down | Nearest) => (float_zero!(), Less),
@@ -1063,7 +1063,7 @@ impl Float {
                     };
                 } else if exp < Self::MIN_EXPONENT {
                     return if rm == Nearest
-                        && exp == Self::MIN_EXPONENT - 1
+                        && exp == Self::MIN_EXPONENT_MINUS_1
                         && (o == Less || !product.is_power_of_2())
                     {
                         if sign {
@@ -1904,7 +1904,7 @@ impl Float {
                             Greater
                         }
                     };
-                } else if exp_sum < Self::MIN_EXPONENT - 1 {
+                } else if exp_sum < Self::MIN_EXPONENT_MINUS_1 {
                     return match (sign, rm) {
                         (_, Exact) => panic!("Inexact Float multiplication"),
                         (true, Floor | Down | Nearest) => {
@@ -1956,7 +1956,7 @@ impl Float {
                     };
                 } else if *x_exp < Self::MIN_EXPONENT {
                     return if rm == Nearest
-                        && *x_exp == Self::MIN_EXPONENT - 1
+                        && *x_exp == Self::MIN_EXPONENT_MINUS_1
                         && (o == Less || !x.is_power_of_2())
                     {
                         if sign {
@@ -2155,7 +2155,7 @@ impl Float {
                             Greater
                         }
                     };
-                } else if exp_sum < Self::MIN_EXPONENT - 1 {
+                } else if exp_sum < Self::MIN_EXPONENT_MINUS_1 {
                     return match (sign, rm) {
                         (_, Exact) => panic!("Inexact Float multiplication"),
                         (true, Floor | Down | Nearest) => {
@@ -2207,7 +2207,7 @@ impl Float {
                     };
                 } else if *x_exp < Self::MIN_EXPONENT {
                     return if rm == Nearest
-                        && *x_exp == Self::MIN_EXPONENT - 1
+                        && *x_exp == Self::MIN_EXPONENT_MINUS_1
                         && (o == Less || !x.is_power_of_2())
                     {
                         if sign {

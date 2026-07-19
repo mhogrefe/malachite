@@ -175,7 +175,7 @@ fn power_of_2_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Flo
     // |x| is too large to be a finite Float, so 2^x overflows (x > 0) or underflows (x < 0).
     // Smaller x that still overflow/underflow are caught by `power_of_2_of_float_prec_round_normal`
     // in the loop below.
-    if exp_x >= const { Float::MAX_EXPONENT as i64 } {
+    if exp_x >= Float::MAX_EXPONENT_I64 {
         return if positive {
             exp_overflow(prec, rm)
         } else {
@@ -184,7 +184,7 @@ fn power_of_2_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Flo
     }
     // x is too small to be represented as a normal Float (|x| < 2^MIN_EXPONENT). The squeeze below
     // cannot bracket it, so round 2^x directly from 1 instead.
-    if exp_x <= const { Float::MIN_EXPONENT as i64 } {
+    if exp_x <= Float::MIN_EXPONENT_I64 {
         return power_of_2_rational_near_one(x, exp_x, prec, rm);
     }
     // Tiny x: if |x| < 2^(-prec) then 2^x is within half an ulp of 1, so it rounds to 1 (or, for

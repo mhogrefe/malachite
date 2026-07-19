@@ -523,7 +523,7 @@ pub fn limbs_extended_gcd(
         // Final `limbs_extended_gcd_same_length_lehmer` call. Need space for u and for copies of a
         // and b.
         scratch = limbs_extended_gcd_same_length_lehmer_scratch_len(GCDEXT_DC_THRESHOLD)
-            + 3 * GCDEXT_DC_THRESHOLD;
+            + const { 3 * GCDEXT_DC_THRESHOLD };
         scratch_2 = max(scratch_2, scratch);
         // Cofactors us0 and us1
         scratch_2 += (n + 1) << 1;

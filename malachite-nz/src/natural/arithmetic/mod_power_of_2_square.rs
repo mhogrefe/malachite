@@ -26,7 +26,7 @@ use crate::natural::arithmetic::square::{
     limbs_square, limbs_square_diagonal, limbs_square_to_out, limbs_square_to_out_basecase,
     limbs_square_to_out_scratch_len,
 };
-use crate::natural::{Natural, bit_to_limb_count_ceiling};
+use crate::natural::{Natural, TWICE_WIDTH, bit_to_limb_count_ceiling};
 use crate::platform::{
     DoubleLimb, Limb, MULLO_BASECASE_THRESHOLD, MULLO_DC_THRESHOLD, SQR_TOOM2_THRESHOLD,
     SQR_TOOM3_THRESHOLD, SQR_TOOM4_THRESHOLD, SQR_TOOM8_THRESHOLD, SQRLO_DC_THRESHOLD,
@@ -187,14 +187,17 @@ limbs_square_low_divide_and_conquer(
     assert!(len > 1);
     // We need a fractional approximation of the value 0 < a <= 1/2, giving the minimum in the
     // function k = (1 - a) ^ e / (1 - 2 * a ^ e).
-    let len_small = if MAYBE_RANGE_BASECASE_MOD_SQUARE && len < SQR_TOOM2_THRESHOLD * 36 / (36 - 11)
+    let len_small = if MAYBE_RANGE_BASECASE_MOD_SQUARE
+        && len < const { SQR_TOOM2_THRESHOLD * 36 / (36 - 11) }
     {
         len >> 1
-    } else if MAYBE_RANGE_TOOM22_MOD_SQUARE && len < SQR_TOOM3_THRESHOLD * 36 / (36 - 11) {
+    } else if MAYBE_RANGE_TOOM22_MOD_SQUARE
+        && len < const { SQR_TOOM3_THRESHOLD * 36 / (36 - 11) }
+    {
         len * 11 / 36 // n1 ~= n*(1-.694...)
-    } else if len < SQR_TOOM4_THRESHOLD * 40 / (40 - 9) {
+    } else if len < const { SQR_TOOM4_THRESHOLD * 40 / (40 - 9) } {
         len * 9 / 40 // n1 ~= n*(1-.775...)
-    } else if len < SQR_TOOM8_THRESHOLD * 10 / 9 {
+    } else if len < const { SQR_TOOM8_THRESHOLD * 10 / 9 } {
         len * 7 / 39 // n1 ~= n*(1-.821...)
     } else {
         len / 10 // n1 ~= n*(1-.899...) [TOOM88]
@@ -436,7 +439,7 @@ impl ModPowerOf2Square for &Natural {
             Natural(Small(x)) if pow <= Limb::WIDTH => Natural(Small(x.mod_power_of_2_square(pow))),
             Natural(Small(x)) => {
                 let x_double = DoubleLimb::from(*x);
-                Natural::from(if pow <= Limb::WIDTH << 1 {
+                Natural::from(if pow <= TWICE_WIDTH {
                     x_double.mod_power_of_2_square(pow)
                 } else {
                     x_double.square()
@@ -495,7 +498,7 @@ impl ModPowerOf2SquareAssign for Natural {
             Self(Small(x)) if pow <= Limb::WIDTH => x.mod_power_of_2_square_assign(pow),
             Self(Small(x)) => {
                 let x_double = DoubleLimb::from(*x);
-                *self = Self::from(if pow <= Limb::WIDTH << 1 {
+                *self = Self::from(if pow <= TWICE_WIDTH {
                     x_double.mod_power_of_2_square(pow)
                 } else {
                     x_double.square()

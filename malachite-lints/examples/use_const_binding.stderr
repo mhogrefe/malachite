@@ -1,0 +1,19 @@
+error: `a` is bound to a compile-time constant
+  --> $DIR/use_const_binding.rs:8:5
+   |
+LL |     let a = u64::WIDTH - 5;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: declare it as a `const` (with a `SCREAMING_SNAKE_CASE` name and an explicit type)
+   = note: `#[deny(use_const_binding)]` on by default
+
+error: `b` is bound to a compile-time constant
+  --> $DIR/use_const_binding.rs:10:5
+   |
+LL |     let b = W - 5;
+   |     ^^^^^^^^^^^^^^
+   |
+   = help: declare it as a `const` (with a `SCREAMING_SNAKE_CASE` name and an explicit type)
+
+error: aborting due to 2 previous errors
+

@@ -48,6 +48,9 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::slices::slice_test_zero;
 
+// A `Limb` with only its top two bits set.
+const HIGH_TWO_BITS: Limb = Limb::MAX << (Limb::WIDTH - 2);
+
 // # Worst-case complexity
 // $T(n) = O(n)$
 //
@@ -829,7 +832,7 @@ pub(crate) fn limbs_mul_toom_interpolate_8_points(
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 fn limbs_div_255_in_place(xs: &mut [Limb]) {
-    limbs_div_divisor_of_limb_max_with_carry_in_place(xs, Limb::MAX / 255, 0);
+    limbs_div_divisor_of_limb_max_with_carry_in_place(xs, const { Limb::MAX / 255 }, 0);
 }
 
 fn limbs_aors_mul_or_two_sh_aors_helper(
@@ -1026,7 +1029,7 @@ pub_crate_test! {limbs_mul_toom_interpolate_12_points<'a>(
     limbs_div_exact_limb_in_place(r4, 2835 << 2);
     let r4_last = r4.last_mut().unwrap();
     if r4_last.leading_zeros() < 3 {
-        *r4_last |= Limb::MAX << (Limb::WIDTH - 2);
+        *r4_last |= HIGH_TWO_BITS;
     }
     limbs_aors_mul_or_two_sh_aors_helper(r5, r4, 60, true, 2, false, 6, true, scratch);
     limbs_div_255_in_place(r5);
@@ -1251,7 +1254,8 @@ pub_crate_test! {limbs_mul_toom_interpolate_16_points<'a>(
         limbs_shl_and_sub_same_length(&mut r7[n + 1..], pp_lo, CORRECTED_WIDTH, scratch);
         let (pp_lo_first, pp_lo_tail) = pp_lo.split_first().unwrap();
         assert!(!limbs_sub_limb_in_place(r1_hi, pp_lo_first >> 6));
-        let carry = limbs_shl_and_sub_same_length(r1_hi, pp_lo_tail, Limb::WIDTH - 6, scratch);
+        let carry =
+            limbs_shl_and_sub_same_length(r1_hi, pp_lo_tail, const { Limb::WIDTH - 6 }, scratch);
         limbs_sub_limb_in_place(&mut r1_hi[(n << 1) - 1..], carry);
     } else {
         let carry = limbs_shl_and_sub_same_length(&mut r7[n..], pp_lo, CORRECTED_WIDTH, scratch);
@@ -1278,7 +1282,7 @@ pub_crate_test! {limbs_mul_toom_interpolate_16_points<'a>(
     limbs_div_exact_limb_in_place(r5, 2835 << 6);
     let r5_last = r5.last_mut().unwrap();
     if r5_last.leading_zeros() < 7 {
-        *r5_last |= Limb::MAX << (Limb::WIDTH - 6);
+        *r5_last |= const { Limb::MAX << (Limb::WIDTH - 6) };
     }
     limbs_aors_mul_or_aors_and_sh_aors_helper(r6, r7, 4095, true, 12, scratch);
     limbs_aors_mul_or_two_sh_aors_helper(r6, r5, 240, true, 8, true, 4, false, scratch);
@@ -1286,7 +1290,7 @@ pub_crate_test! {limbs_mul_toom_interpolate_16_points<'a>(
     limbs_div_exact_limb_in_place(r6, 255 << 2);
     let r6_last = r6.last_mut().unwrap();
     if r6_last.leading_zeros() < 3 {
-        *r6_last |= Limb::MAX << (Limb::WIDTH - 2);
+        *r6_last |= HIGH_TWO_BITS;
     }
     assert_eq!(limbs_shl_and_sub_same_length(r3, r4, 7, scratch), 0);
     assert_eq!(limbs_shl_and_sub_same_length(r2, r4, 13, scratch), 0);

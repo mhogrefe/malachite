@@ -6,6 +6,12 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::num::basic::integers::PrimitiveInt;
+
+// Twice the width of a `u64`, in bits (128). Shared by the double-limb square-residue mask
+// (`is_square`) and the prime sieve.
+pub(crate) const TWICE_U64_WIDTH: u64 = u64::WIDTH << 1;
+
 /// [`Factor`](traits::Factor), a trait for computing the prime factorization of a number.
 pub mod factor;
 /// [`IsPower`](traits::IsPower) and [`ExpressAsPower`](traits::ExpressAsPower), traits for testing

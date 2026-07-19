@@ -12,6 +12,7 @@ use crate::natural::conversion::digits::general_digits::{
     limbs_digit_count, limbs_to_digits_small_base_no_alg_specified,
 };
 use crate::natural::logic::significant_bits::limbs_significant_bits;
+use crate::natural::{HALF_WIDTH, QUARTER_WIDTH, WIDTH_MINUS_1, WIDTH_MINUS_2, WIDTH_MINUS_3};
 use crate::platform::Limb;
 use alloc::string::String;
 #[cfg(feature = "test_build")]
@@ -513,9 +514,7 @@ impl Octal for NaturalAlt2 {
                 }
                 let mut result;
                 let last_i = xs.len() - 1;
-                const W_1_2: u64 = Limb::WIDTH >> 1;
-                const W_1_4: u64 = Limb::WIDTH >> 2;
-                const W_3_4: u64 = W_1_4 * 3;
+                const W_3_4: u64 = QUARTER_WIDTH * 3;
                 const MASK: Limb = (1 << W_3_4) - 1;
                 match triple_r {
                     1 => {
@@ -531,12 +530,13 @@ impl Octal for NaturalAlt2 {
                     2 => {
                         let x_1 = xs[last_i];
                         let x_2 = xs[last_i - 1];
-                        let y = x_1 >> W_1_2;
+                        let y = x_1 >> HALF_WIDTH;
                         if y == 0 {
-                            write!(f, "{:o}", ((x_1 << W_1_4) & MASK) | (x_2 >> W_3_4)).unwrap();
+                            write!(f, "{:o}", ((x_1 << QUARTER_WIDTH) & MASK) | (x_2 >> W_3_4))
+                                .unwrap();
                         } else {
                             write!(f, "{y:o}").unwrap();
-                            oz_fmt(f, ((x_1 << W_1_4) & MASK) | (x_2 >> W_3_4)).unwrap();
+                            oz_fmt(f, ((x_1 << QUARTER_WIDTH) & MASK) | (x_2 >> W_3_4)).unwrap();
                         }
                         result = oz_fmt(f, x_2 & MASK);
                     }
@@ -544,14 +544,19 @@ impl Octal for NaturalAlt2 {
                         let x_0 = xs[last_i];
                         let x_1 = xs[last_i - 1];
                         let x_2 = xs[last_i - 2];
-                        let y = x_0 >> W_1_4;
+                        let y = x_0 >> QUARTER_WIDTH;
                         if y == 0 {
-                            write!(f, "{:o}", ((x_0 << W_1_2) & MASK) | (x_1 >> W_1_2)).unwrap();
+                            write!(
+                                f,
+                                "{:o}",
+                                ((x_0 << HALF_WIDTH) & MASK) | (x_1 >> HALF_WIDTH)
+                            )
+                            .unwrap();
                         } else {
                             write!(f, "{y:o}").unwrap();
-                            oz_fmt(f, ((x_0 << W_1_2) & MASK) | (x_1 >> W_1_2)).unwrap();
+                            oz_fmt(f, ((x_0 << HALF_WIDTH) & MASK) | (x_1 >> HALF_WIDTH)).unwrap();
                         }
-                        oz_fmt(f, ((x_1 << W_1_4) & MASK) | (x_2 >> W_3_4)).unwrap();
+                        oz_fmt(f, ((x_1 << QUARTER_WIDTH) & MASK) | (x_2 >> W_3_4)).unwrap();
                         result = oz_fmt(f, x_2 & MASK);
                     }
                 }
@@ -559,9 +564,9 @@ impl Octal for NaturalAlt2 {
                     let x_0 = chunk.next().unwrap();
                     let x_1 = chunk.next().unwrap();
                     let x_2 = chunk.next().unwrap();
-                    oz_fmt(f, x_0 >> W_1_4).unwrap();
-                    oz_fmt(f, ((x_0 << W_1_2) & MASK) | (x_1 >> W_1_2)).unwrap();
-                    oz_fmt(f, ((x_1 << W_1_4) & MASK) | (x_2 >> W_3_4)).unwrap();
+                    oz_fmt(f, x_0 >> QUARTER_WIDTH).unwrap();
+                    oz_fmt(f, ((x_0 << HALF_WIDTH) & MASK) | (x_1 >> HALF_WIDTH)).unwrap();
+                    oz_fmt(f, ((x_1 << QUARTER_WIDTH) & MASK) | (x_2 >> W_3_4)).unwrap();
                     result = oz_fmt(f, x_2 & MASK);
                 }
                 result
@@ -627,7 +632,7 @@ impl Octal for Natural {
                                 limb = *limbs.next().unwrap();
                                 *digit = digit_to_display_byte_lower(u8::wrapping_from(limb & 7))
                                     .unwrap();
-                                remaining_bits = Limb::WIDTH - 3;
+                                remaining_bits = WIDTH_MINUS_3;
                                 limb >>= 3;
                             }
                             1 => {
@@ -637,7 +642,7 @@ impl Octal for Natural {
                                     ((limb & 3) << 1) | previous_limb,
                                 ))
                                 .unwrap();
-                                remaining_bits = Limb::WIDTH - 2;
+                                remaining_bits = WIDTH_MINUS_2;
                                 limb >>= 2;
                             }
                             _ => {
@@ -647,7 +652,7 @@ impl Octal for Natural {
                                     ((limb & 1) << 2) | previous_limb,
                                 ))
                                 .unwrap();
-                                remaining_bits = Limb::WIDTH - 1;
+                                remaining_bits = WIDTH_MINUS_1;
                                 limb >>= 1;
                             }
                         }
@@ -759,15 +764,14 @@ impl LowerHex for Natural {
         match self {
             Self(Small(x)) => LowerHex::fmt(x, f),
             Self(Large(xs)) => {
-                const DIGITS_PER_LIMB: u64 = Limb::WIDTH >> 2;
                 let mut digits =
                     vec![0; usize::exact_from(limbs_significant_bits(xs).shr_round(2, Ceiling).0)];
                 let mut limbs = xs.iter();
                 let mut limb = *limbs.next().unwrap();
-                let mut remaining_digits = DIGITS_PER_LIMB;
+                let mut remaining_digits = QUARTER_WIDTH;
                 for digit in digits.iter_mut().rev() {
                     if remaining_digits == 0 {
-                        remaining_digits = DIGITS_PER_LIMB;
+                        remaining_digits = QUARTER_WIDTH;
                         limb = *limbs.next().unwrap();
                     }
                     *digit = digit_to_display_byte_lower(u8::wrapping_from(limb & 15)).unwrap();
@@ -821,15 +825,14 @@ impl UpperHex for Natural {
         match self {
             Self(Small(x)) => UpperHex::fmt(x, f),
             Self(Large(xs)) => {
-                const DIGITS_PER_LIMB: u64 = Limb::WIDTH >> 2;
                 let mut digits =
                     vec![0; usize::exact_from(limbs_significant_bits(xs).shr_round(2, Ceiling).0)];
                 let mut limbs = xs.iter();
                 let mut limb = *limbs.next().unwrap();
-                let mut remaining_digits = DIGITS_PER_LIMB;
+                let mut remaining_digits = QUARTER_WIDTH;
                 for digit in digits.iter_mut().rev() {
                     if remaining_digits == 0 {
-                        remaining_digits = DIGITS_PER_LIMB;
+                        remaining_digits = QUARTER_WIDTH;
                         limb = *limbs.next().unwrap();
                     }
                     *digit = digit_to_display_byte_upper(u8::wrapping_from(limb & 15)).unwrap();

@@ -21,6 +21,7 @@
 
 use crate::integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
 use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::LIMB_MAX_DIV_3;
 use crate::natural::Natural;
 use crate::natural::arithmetic::add::{
     limbs_slice_add_greater_in_place_left, limbs_slice_add_limb_in_place,
@@ -274,12 +275,6 @@ pub_test! {limbs_div_exact_limb_in_place_no_special_3(ns: &mut [Limb], d: Limb) 
     }
 }}
 
-#[cfg(feature = "test_build")]
-pub(crate) const MAX_OVER_3: Limb = Limb::MAX / 3;
-
-#[cfg(not(feature = "test_build"))]
-const MAX_OVER_3: Limb = Limb::MAX / 3;
-
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
 // quotient limbs of the `Natural` divided by 3. The limb slice must be nonempty. The `Natural` must
 // be exactly divisible by 3. If it isn't, the behavior of this function is undefined.
@@ -358,8 +353,8 @@ pub_test! {limbs_div_exact_3_to_out<
 // `DIVEXACT_BY3_METHOD == 0`, no carry-in, and no return value, where `rp == up`.
 pub_crate_test! {limbs_div_exact_3_in_place(ns: &mut [Limb]) {
     let (ns_last, ns_init) = ns.split_last_mut().unwrap();
-    let q = limbs_div_divisor_of_limb_max_with_carry_in_place(ns_init, MAX_OVER_3, 0);
-    let lower = (DoubleLimb::from(*ns_last) * DoubleLimb::from(MAX_OVER_3)).lower_half();
+    let q = limbs_div_divisor_of_limb_max_with_carry_in_place(ns_init, LIMB_MAX_DIV_3, 0);
+    let lower = (DoubleLimb::from(*ns_last) * DoubleLimb::from(LIMB_MAX_DIV_3)).lower_half();
     *ns_last = q.wrapping_sub(lower);
 }}
 

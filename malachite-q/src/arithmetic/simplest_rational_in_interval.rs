@@ -20,6 +20,8 @@ use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::conversion::traits::IsInteger;
 use malachite_nz::natural::Natural;
 
+const THREE: Natural = Natural::const_from(3);
+
 fn min_helper_oo<'a>(ox: &'a Option<Natural>, oy: &'a Option<Natural>) -> &'a Natural {
     if let Some(x) = ox.as_ref() {
         if let Some(y) = oy.as_ref() {
@@ -283,9 +285,8 @@ impl SimplestRationalInInterval for Rational {
                     let next_denominator = (&previous_denominator).add_mul(&denominator, &y_n);
                     let (n, d) = if cf_y.is_done() && next_y_n == 2u32 {
                         (
-                            next_numerator * const { Natural::const_from(3) } + (numerator << 1),
-                            next_denominator * const { Natural::const_from(3) }
-                                + (denominator << 1),
+                            next_numerator * THREE + (numerator << 1),
+                            next_denominator * THREE + (denominator << 1),
                         )
                     } else {
                         (
@@ -315,10 +316,7 @@ impl SimplestRationalInInterval for Rational {
                     if x_1 > 1u32 {
                         if x_1 == 2u32 && cf_x.is_done() {
                             // [f; 1, 1] and [f; 1], so [f; 1, 2] is a candidate.
-                            (
-                                floor * const { Natural::const_from(3) } + Natural::TWO,
-                                const { Natural::const_from(3) },
-                            )
+                            (floor * THREE + Natural::TWO, THREE)
                         } else {
                             // If x_1 > 1, we have [f; 2] as a candidate.
                             ((floor << 1) | Natural::ONE, Natural::TWO)

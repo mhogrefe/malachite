@@ -504,7 +504,7 @@ fn ln_unsigned_prec_round_normal(n: u64, prec: u64, rm: RoundingMode) -> (Float,
         // arithmetic-geometric-mean logarithm, which is correct at any precision and produces the
         // same correctly-rounded result.
         let integer_bits = n_terms.saturating_mul(n_terms.ceiling_log_base_2().saturating_add(kk));
-        if integer_bits.saturating_add(64) >= const { Float::MAX_EXPONENT as u64 } {
+        if integer_bits.saturating_add(64) >= Float::MAX_EXPONENT_U64 {
             return Float::from(n).ln_prec_round(prec, rm);
         }
         let lg_n = usize::exact_from(n_terms.ceiling_log_base_2() + 1);
@@ -1363,7 +1363,7 @@ impl Float {
             return ln_rational_near_one(&eps, prec, rm);
         }
         let x_exp = i32::saturating_from(x.floor_log_base_2_abs()).saturating_add(1);
-        if x_exp >= Self::MAX_EXPONENT - 1 || x_exp <= Self::MIN_EXPONENT + 1 {
+        if x_exp >= const { Self::MAX_EXPONENT - 1 } || x_exp <= const { Self::MIN_EXPONENT + 1 } {
             ln_rational_helper_extended(x, prec, rm)
         } else {
             ln_rational_helper(x, prec, rm)

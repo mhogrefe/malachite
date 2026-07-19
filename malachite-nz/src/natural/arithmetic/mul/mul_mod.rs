@@ -14,6 +14,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::natural::WIDTH_MINUS_1;
 use crate::natural::arithmetic::add::{
     limbs_add_same_length_to_out, limbs_add_to_out, limbs_slice_add_limb_in_place,
     limbs_slice_add_same_length_in_place_left,
@@ -343,7 +344,7 @@ pub_crate_test! {limbs_mul_mod_base_pow_n_minus_1(
         let out_lo_last = out_lo.last_mut().unwrap();
         assert!(!out_lo_last.get_highest_bit());
         match carry {
-            1 => out_lo_last.set_bit(Limb::WIDTH - 1),
+            1 => out_lo_last.set_bit(WIDTH_MINUS_1),
             2 => {
                 assert!(!out_lo_last.get_highest_bit());
                 assert!(!limbs_slice_add_limb_in_place(out_lo, 1));

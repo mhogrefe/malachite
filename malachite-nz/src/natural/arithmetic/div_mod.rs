@@ -22,6 +22,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::InnerNatural::{Large, Small};
+use crate::natural::LIMB_MAX_MINUS_1;
 use crate::natural::Natural;
 use crate::natural::arithmetic::add::{
     limbs_add_limb_to_out, limbs_add_same_length_to_out,
@@ -1083,7 +1084,7 @@ pub_test! {limbs_invert_newton_approx(is: &mut [Limb], ds: &[Limb], scratch: &mu
             assert!(!limbs_sub_limb_in_place(is_hi, carry)); // 1 <= carry <= 4 here
         } else {
             // "negative" residue class
-            assert!(scratch[size] >= Limb::MAX - 1);
+            assert!(scratch[size] >= LIMB_MAX_MINUS_1);
             if condition {
                 assert!(!limbs_sub_limb_in_place(&mut scratch[..=size], 1));
             }
@@ -1125,7 +1126,7 @@ pub_test! {limbs_invert_newton_approx(is: &mut [Limb], ds: &[Limb], scratch: &mu
         previous_size = size;
     }
     // Check for possible carry propagation from below. Be conservative.
-    scratch[a - 1] <= Limb::MAX - 7
+    scratch[a - 1] <= const { Limb::MAX - 7 }
 }}
 
 // Takes the strictly normalized value ds (i.e., most significant bit must be set) as an input, and
@@ -1577,15 +1578,20 @@ fn limbs_div_mod_by_two_limb(qs: &mut [Limb], rs: &mut [Limb], ns: &[Limb], ds: 
 // TODO tune
 pub(crate) const MUPI_DIV_QR_THRESHOLD: usize = 74;
 
+// Derived thresholds for the divide-and-conquer condition, shared by division and remainder.
+pub(crate) const TWICE_MU_DIV_QR_THRESHOLD: usize = MU_DIV_QR_THRESHOLD << 1;
+pub(crate) const MU_DIV_QR_DC_SLOPE: f64 =
+    ((MU_DIV_QR_THRESHOLD - MUPI_DIV_QR_THRESHOLD) << 1) as f64;
+
 // # Worst-case complexity
 // Constant time and additional memory.
 fn limbs_div_mod_dc_condition(n_len: usize, d_len: usize) -> bool {
     let n_64 = n_len as f64;
     let d_64 = d_len as f64;
     d_len < MUPI_DIV_QR_THRESHOLD
-        || n_len < MU_DIV_QR_THRESHOLD << 1
+        || n_len < TWICE_MU_DIV_QR_THRESHOLD
         || fma!(
-            ((MU_DIV_QR_THRESHOLD - MUPI_DIV_QR_THRESHOLD) << 1) as f64,
+            MU_DIV_QR_DC_SLOPE,
             d_64,
             MUPI_DIV_QR_THRESHOLD as f64 * n_64
         ) > d_64 * n_64

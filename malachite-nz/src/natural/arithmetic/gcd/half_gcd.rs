@@ -31,7 +31,9 @@ use crate::natural::arithmetic::sub::{
     limbs_sub_greater_in_place_left, limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left,
 };
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
-use crate::natural::{bit_to_limb_count_floor, limb_to_bit_count};
+use crate::natural::{
+    HALF_LIMB_RADIX, HALF_WIDTH, WIDTH_MINUS_1, bit_to_limb_count_floor, limb_to_bit_count,
+};
 use crate::platform::{DoubleLimb, Limb};
 use core::cmp::{Ordering::*, max, min};
 use core::mem::swap;
@@ -1031,8 +1033,6 @@ pub(crate) fn limbs_half_gcd_2(
     }
     let mut m00 = 1;
     let mut m11 = 1;
-    const HALF_WIDTH: u64 = Limb::WIDTH >> 1;
-    const HALF_LIMIT_1: Limb = 1 << HALF_WIDTH;
     let mut subtract_a = x_high < y_high;
     let mut subtract_a1 = false;
     let mut done = false;
@@ -1045,7 +1045,7 @@ pub(crate) fn limbs_half_gcd_2(
                 done = true;
                 break;
             }
-            if x_high < HALF_LIMIT_1 {
+            if x_high < HALF_LIMB_RADIX {
                 x_high = (x_high << HALF_WIDTH) + (a_low >> HALF_WIDTH);
                 y_high = (y_high << HALF_WIDTH) + (b_low >> HALF_WIDTH);
                 break;
@@ -1082,7 +1082,7 @@ pub(crate) fn limbs_half_gcd_2(
             done = true;
             break;
         }
-        if y_high < HALF_LIMIT_1 {
+        if y_high < HALF_LIMB_RADIX {
             x_high = (x_high << HALF_WIDTH) + (a_low >> HALF_WIDTH);
             y_high = (y_high << HALF_WIDTH) + (b_low >> HALF_WIDTH);
             subtract_a1 = true;
@@ -1256,7 +1256,7 @@ pub(crate) fn limbs_half_gcd_scratch_len(n: usize) -> usize {
         n
     } else {
         // Get the recursion depth.
-        let count = LeadingZeros::leading_zeros((n - 1) / (HGCD_THRESHOLD - 1));
+        let count = LeadingZeros::leading_zeros((n - 1) / const { HGCD_THRESHOLD - 1 });
         20 * ((n + 3) >> 2) + 22 * usize::exact_from(usize::WIDTH - count) + HGCD_THRESHOLD
     }
 }
@@ -1344,7 +1344,7 @@ fn limbs_half_gcd_approx(
                     {
                         continue;
                     }
-                    extra_bits = Limb::WIDTH - 1;
+                    extra_bits = WIDTH_MINUS_1;
                     s += 1;
                 } else {
                     extra_bits -= 1;

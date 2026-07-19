@@ -1,0 +1,35 @@
+error: this converts a compile-time constant at runtime
+  --> $DIR/use_const_cast.rs:7:13
+   |
+LL |     let a = i128::from(const { u64::WIDTH - 1 });
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: do the conversion at compile time: `const { (u64::WIDTH - 1) as i128 }`
+   = note: `#[deny(use_const_cast)]` on by default
+
+error: this converts a compile-time constant at runtime
+  --> $DIR/use_const_cast.rs:9:13
+   |
+LL |     let b = u32::exact_from(const { u64::WIDTH - 2 });
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: do the conversion at compile time: `const { (u64::WIDTH - 2) as u32 }`
+
+error: this converts a compile-time constant at runtime
+  --> $DIR/use_const_cast.rs:11:13
+   |
+LL |     let c = usize::wrapping_from(const { u64::WIDTH - 3 });
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: do the conversion at compile time: `const { (u64::WIDTH - 3) as usize }`
+
+error: this converts a compile-time constant at runtime
+  --> $DIR/use_const_cast.rs:13:13
+   |
+LL |     let d = const { u64::WIDTH - 4 } as f64;
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: do the conversion at compile time: `const { (u64::WIDTH - 4) as f64 }`
+
+error: aborting due to 4 previous errors
+

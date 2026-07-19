@@ -22,7 +22,7 @@ use crate::natural::arithmetic::square::{limbs_square_to_out, limbs_square_to_ou
 use crate::natural::bit_to_limb_count_ceiling;
 #[cfg(feature = "test_build")]
 use crate::natural::logic::significant_bits::limbs_significant_bits;
-use crate::natural::{Natural, bit_to_limb_count_floor, limb_to_bit_count};
+use crate::natural::{HALF_LIMB_MAX, Natural, bit_to_limb_count_floor, limb_to_bit_count};
 #[cfg(feature = "test_build")]
 use crate::platform::DoubleLimb;
 use crate::platform::Limb;
@@ -44,9 +44,6 @@ use malachite_base::num::logic::traits::{
     BitIterable, CountOnes, LeadingZeros, SignificantBits, TrailingZeros,
 };
 use malachite_base::slices::slice_leading_zeros;
-
-/// This is equivalent to `GMP_NUMB_HALFMAX` from `mpz/n_pow_ui.c`, GMP 6.2.1.
-const HALF_MAX: Limb = (1 << (Limb::WIDTH >> 1)) - 1;
 
 // # Worst-case complexity
 // $T(n, m) = O(nm \log (nm) \log\log (nm))$
@@ -70,7 +67,7 @@ pub_crate_test! {limbs_pow(xs: &[Limb], exp: u64) -> Vec<Limb> {
 fn len_1_helper(x_0: &mut Limb, out_0: &mut Limb, trailing_zero_bits_out: &mut u64, exp: &mut u64) {
     // Power up as far as possible within `x_0`. We start here with `exp` != 0, but if `exp` is
     // small then we might reach `exp` == 0 and the whole `x` ^ `exp` in `out_0`.
-    while *x_0 <= HALF_MAX {
+    while *x_0 <= HALF_LIMB_MAX {
         assert_ne!(*exp, 0);
         if exp.odd() {
             *out_0 *= *x_0;

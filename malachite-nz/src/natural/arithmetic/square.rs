@@ -81,6 +81,9 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{SplitInHalf, WrappingFrom};
 use malachite_base::rounding_modes::RoundingMode::*;
 
+const TWICE_SQR_TOOM6_THRESHOLD: usize = SQR_TOOM6_THRESHOLD << 1;
+const SQR_TOOM8_THRESHOLD_TIMES_15_OVER_8: usize = (SQR_TOOM8_THRESHOLD * 15) >> 3;
+
 // Measured directly 2026-07 on 64-bit (FFT square vs toom6 head-to-head; the old derived heuristic
 // said 11700, 27x too high; re-measured over the full size range after the small-transform fixes:
 // 429, within plateau noise of the applied value). 32-bit keeps the original derivation,
@@ -187,7 +190,7 @@ const TOOM2_MAYBE_SQR_TOOM2: bool =
 //
 // This is equivalent to `TOOM2_SQR_REC` from `mpn/generic/toom2_sqr.c`, GMP 6.2.1.
 fn limbs_square_to_out_toom_2_recursive(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
-    if !TOOM2_MAYBE_SQR_TOOM2 || xs.len() < SQR_TOOM2_THRESHOLD {
+    if const { !TOOM2_MAYBE_SQR_TOOM2 } || xs.len() < SQR_TOOM2_THRESHOLD {
         limbs_square_to_out_basecase(out, xs);
     } else {
         limbs_square_to_out_toom_2(out, xs, scratch);
@@ -335,7 +338,7 @@ fn limbs_square_to_out_toom_3_recursive(out: &mut [Limb], xs: &[Limb], scratch: 
     let n = xs.len();
     if TOOM3_MAYBE_SQR_BASECASE && n < SQR_TOOM2_THRESHOLD {
         limbs_square_to_out_basecase(out, xs);
-    } else if !TOOM3_MAYBE_SQR_TOOM3 || n < SQR_TOOM3_THRESHOLD {
+    } else if const { !TOOM3_MAYBE_SQR_TOOM3 } || n < SQR_TOOM3_THRESHOLD {
         limbs_square_to_out_toom_2(out, xs, scratch);
     } else {
         limbs_square_to_out_toom_3(out, xs, scratch);
@@ -513,7 +516,7 @@ fn limbs_square_to_out_toom_4_recursive(out: &mut [Limb], xs: &[Limb], scratch: 
         limbs_square_to_out_basecase(out, xs);
     } else if TOOM4_MAYBE_SQR_TOOM2 && n < SQR_TOOM3_THRESHOLD {
         limbs_square_to_out_toom_2(out, xs, scratch);
-    } else if !TOOM4_MAYBE_SQR_TOOM4 || n < SQR_TOOM4_THRESHOLD {
+    } else if const { !TOOM4_MAYBE_SQR_TOOM4 } || n < SQR_TOOM4_THRESHOLD {
         limbs_square_to_out_toom_3(out, xs, scratch);
     } else {
         limbs_square_to_out_toom_4(out, xs, scratch);
@@ -626,10 +629,10 @@ pub_const_test! {limbs_square_to_out_toom_6_input_size_valid(xs_len: usize) -> b
 pub_crate_test! {limbs_square_to_out_toom_6_scratch_len(n: usize) -> usize {
     (n << 1)
         + max(
-            (SQR_TOOM6_THRESHOLD << 1) + usize::wrapping_from(Limb::WIDTH) * 6,
+            TWICE_SQR_TOOM6_THRESHOLD + usize::wrapping_from(Limb::WIDTH) * 6,
             limbs_square_to_out_toom_4_scratch_len(SQR_TOOM6_THRESHOLD),
         )
-        - (SQR_TOOM6_THRESHOLD << 1)
+        - TWICE_SQR_TOOM6_THRESHOLD
 }}
 
 // TODO tune
@@ -685,11 +688,15 @@ fn limbs_square_to_out_toom_6_recursive(out: &mut [Limb], xs: &[Limb], scratch: 
     let n = xs.len();
     if TOOM6_MAYBE_SQR_BASECASE && n < SQR_TOOM2_THRESHOLD {
         limbs_square_to_out_basecase(out, xs);
-    } else if TOOM6_MAYBE_SQR_TOOM2 && (!TOOM6_MAYBE_SQR_ABOVE_TOOM2 || n < SQR_TOOM3_THRESHOLD) {
+    } else if TOOM6_MAYBE_SQR_TOOM2
+        && (const { !TOOM6_MAYBE_SQR_ABOVE_TOOM2 } || n < SQR_TOOM3_THRESHOLD)
+    {
         limbs_square_to_out_toom_2(out, xs, scratch);
-    } else if TOOM6_MAYBE_SQR_TOOM3 && (!TOOM6_MAYBE_SQR_ABOVE_TOOM3 || n < SQR_TOOM4_THRESHOLD) {
+    } else if TOOM6_MAYBE_SQR_TOOM3
+        && (const { !TOOM6_MAYBE_SQR_ABOVE_TOOM3 } || n < SQR_TOOM4_THRESHOLD)
+    {
         limbs_square_to_out_toom_3(out, xs, scratch);
-    } else if !TOOM6_MAYBE_SQR_ABOVE_TOOM4 || n < SQR_TOOM6_THRESHOLD {
+    } else if const { !TOOM6_MAYBE_SQR_ABOVE_TOOM4 } || n < SQR_TOOM6_THRESHOLD {
         limbs_square_to_out_toom_4(out, xs, scratch);
     } else {
         limbs_square_to_out_toom_6(out, xs, scratch);
@@ -797,10 +804,10 @@ pub_const_test! {limbs_square_to_out_toom_8_input_size_valid(xs_len: usize) -> b
 pub_crate_test! {limbs_square_to_out_toom_8_scratch_len(n: usize) -> usize {
     ((n * 15) >> 3)
         + max(
-            ((SQR_TOOM8_THRESHOLD * 15) >> 3) + usize::wrapping_from(Limb::WIDTH) * 6,
+            SQR_TOOM8_THRESHOLD_TIMES_15_OVER_8 + usize::wrapping_from(Limb::WIDTH) * 6,
             limbs_square_to_out_toom_6_scratch_len(SQR_TOOM8_THRESHOLD),
         )
-        - ((SQR_TOOM8_THRESHOLD * 15) >> 3)
+        - SQR_TOOM8_THRESHOLD_TIMES_15_OVER_8
 }}
 
 // TODO tune
@@ -877,15 +884,23 @@ const TOOM8_MAYBE_SQR_ABOVE_TOOM6: bool =
 // `false`.
 fn limbs_square_to_out_toom_8_recursive(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
     let n = xs.len();
-    if TOOM8_MAYBE_SQR_BASECASE && (!TOOM8_MAYBE_SQR_ABOVE_BASECASE || n < SQR_TOOM2_THRESHOLD) {
+    if TOOM8_MAYBE_SQR_BASECASE
+        && (const { !TOOM8_MAYBE_SQR_ABOVE_BASECASE } || n < SQR_TOOM2_THRESHOLD)
+    {
         limbs_square_to_out_basecase(out, xs);
-    } else if TOOM8_MAYBE_SQR_TOOM2 && (!TOOM8_MAYBE_SQR_ABOVE_TOOM2 || n < SQR_TOOM3_THRESHOLD) {
+    } else if TOOM8_MAYBE_SQR_TOOM2
+        && (const { !TOOM8_MAYBE_SQR_ABOVE_TOOM2 } || n < SQR_TOOM3_THRESHOLD)
+    {
         limbs_square_to_out_toom_2(out, xs, scratch);
-    } else if TOOM8_MAYBE_SQR_TOOM3 && (!TOOM8_MAYBE_SQR_ABOVE_TOOM3 || n < SQR_TOOM4_THRESHOLD) {
+    } else if TOOM8_MAYBE_SQR_TOOM3
+        && (const { !TOOM8_MAYBE_SQR_ABOVE_TOOM3 } || n < SQR_TOOM4_THRESHOLD)
+    {
         limbs_square_to_out_toom_3(out, xs, scratch);
-    } else if TOOM8_MAYBE_SQR_TOOM4 && (!TOOM8_MAYBE_SQR_ABOVE_TOOM4 || n < SQR_TOOM6_THRESHOLD) {
+    } else if TOOM8_MAYBE_SQR_TOOM4
+        && (const { !TOOM8_MAYBE_SQR_ABOVE_TOOM4 } || n < SQR_TOOM6_THRESHOLD)
+    {
         limbs_square_to_out_toom_4(out, xs, scratch);
-    } else if !TOOM8_MAYBE_SQR_ABOVE_TOOM6 || n < SQR_TOOM8_THRESHOLD {
+    } else if const { !TOOM8_MAYBE_SQR_ABOVE_TOOM6 } || n < SQR_TOOM8_THRESHOLD {
         limbs_square_to_out_toom_6(out, xs, scratch);
     } else {
         limbs_square_to_out_toom_8(out, xs, scratch);

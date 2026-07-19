@@ -182,14 +182,12 @@ fn power_of_2_x_minus_1_prec_round_normal(
             //   so the overflow is an artifact of rounding 2^x up at the working precision; growing
             //   it far enough (past the distance from x to MAX_EXPONENT) makes 2^x finite, and the
             //   loop proceeds normally.
-            if prec < const { Float::MAX_EXPONENT as u64 }
-                || *x > const { Float::MAX_EXPONENT as i64 }
-            {
+            if prec < Float::MAX_EXPONENT_U64 || *x > Float::MAX_EXPONENT_I64 {
                 return exp_overflow(prec, rm);
             }
-            if *x == const { Float::MAX_EXPONENT as i64 } {
+            if *x == Float::MAX_EXPONENT_I64 {
                 return Float::from_rational_prec_round(
-                    Rational::power_of_2(const { Float::MAX_EXPONENT as i64 }) - Rational::ONE,
+                    Rational::power_of_2(Float::MAX_EXPONENT_I64) - Rational::ONE,
                     prec,
                     rm,
                 );
@@ -343,14 +341,14 @@ fn power_of_2_x_minus_1_rational_helper(
 ) -> (Float, Ordering) {
     if x.is_integer() {
         let n = Integer::exact_from(x);
-        return if n > const { Float::MAX_EXPONENT as i64 } {
+        return if n > Float::MAX_EXPONENT_I64 {
             // 2^n - 1 has exponent n, beyond the maximum.
             exp_overflow(prec, rm)
-        } else if n == const { Float::MAX_EXPONENT as i64 } {
+        } else if n == Float::MAX_EXPONENT_I64 {
             // 2^n is not representable, but 2^n - 1 (with exponent n) is -- though only with at
             // least n bits of precision. At smaller precisions it rounds exactly like an overflow:
             // down to the largest finite value, or up (and to nearest) past it.
-            if prec >= const { Float::MAX_EXPONENT as u64 } {
+            if prec >= Float::MAX_EXPONENT_U64 {
                 Float::from_rational_prec_round(
                     Rational::power_of_2(i64::exact_from(&n)) - Rational::ONE,
                     prec,
@@ -392,19 +390,19 @@ fn power_of_2_x_minus_1_rational_helper(
     // x is too small to be represented as a normal Float (|x| < 2^MIN_EXPONENT). The squeeze below
     // cannot bracket it (its Float bounds would be 0), so use the ln(2)-bracketing helper, which
     // also performs the underflow rounding that |x| ln(2) may need.
-    if exp_x <= const { Float::MIN_EXPONENT as i64 } {
+    if exp_x <= Float::MIN_EXPONENT_I64 {
         return power_of_2_x_minus_1_rational_near_zero(x, prec, rm);
     }
     // |x| is too large to be a finite Float. For x > 0, 2^x - 1 overflows; for x < 0 it tends to
     // -1. Smaller x that still overflow or round to -1 are handled by the Float function inside the
     // squeeze below.
-    if exp_x >= const { Float::MAX_EXPONENT as i64 } {
+    if exp_x >= Float::MAX_EXPONENT_I64 {
         if positive {
             return exp_overflow(prec, rm);
         }
         // 2^x is far below ulp(-1) at any precision, so 2^x - 1 rounds to -1 or its toward-zero
         // neighbor.
-        let err = const { Float::MAX_EXPONENT as u64 };
+        let err = Float::MAX_EXPONENT_U64;
         if let Some(result) = float_round_near_x(&Float::NEGATIVE_ONE, err, false, prec, rm) {
             return result;
         }

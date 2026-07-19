@@ -10,14 +10,14 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::natural::arithmetic::div_exact::MAX_OVER_3;
+use crate::natural::LIMB_MAX_DIV_3;
 use crate::platform::Limb;
 use malachite_base::num::arithmetic::traits::{WrappingMulAssign, WrappingSubAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;
 
 // This is equivalent to `MODLIMB_INVERSE_3` from `gmp-impl.h`, GMP 6.2.1.
-const MODLIMB_INVERSE_3: Limb = (MAX_OVER_3 << 1) | 1;
-const CEIL_MAX_OVER_3: Limb = MAX_OVER_3 + 1;
+const MODLIMB_INVERSE_3: Limb = (LIMB_MAX_DIV_3 << 1) | 1;
+const CEIL_MAX_OVER_3: Limb = LIMB_MAX_DIV_3 + 1;
 const CEIL_2_MAX_OVER_3: Limb = ((Limb::MAX >> 1) / 3 + 1) | (1 << (Limb::WIDTH - 1));
 
 /// Benchmarks show that this algorithm is always worse than the default.

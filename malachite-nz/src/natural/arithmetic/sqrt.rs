@@ -39,6 +39,7 @@ use crate::natural::arithmetic::sub::{
 };
 use crate::natural::arithmetic::sub_mul::limbs_sub_mul_limb_same_length_in_place_left;
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
+use crate::natural::{HALF_WIDTH, WIDTH_MINUS_1};
 use crate::platform::{DC_DIVAPPR_Q_THRESHOLD, Limb, MU_DIVAPPR_Q_THRESHOLD, SignedLimb};
 use alloc::vec::Vec;
 use core::cmp::Ordering::*;
@@ -113,7 +114,7 @@ pub_test! {limbs_sqrt_rem_helper(
     q += scratch[h1];
     let mut r_hi = scratch[0].odd();
     limbs_shr_to_out(out, &scratch[..h1], 1);
-    out[h1 - 1] |= q << (Limb::WIDTH - 1);
+    out[h1 - 1] |= q << WIDTH_MINUS_1;
     if (out[0] & approx) != 0 {
         return true;
     }
@@ -202,7 +203,7 @@ pub_test! { limbs_sqrt_helper(out: &mut [Limb], xs: &[Limb], shift: u64, odd: bo
     assert_eq!(xs.len(), (n << 1) - odd);
     assert_ne!(*xs.last().unwrap(), 0);
     assert!(n > 4);
-    assert!(shift < Limb::WIDTH >> 1);
+    assert!(shift < HALF_WIDTH);
     let h1 = (n - 1) >> 1;
     let h2 = n - h1;
     let (out_lo, out_hi) = out.split_at_mut(h1);
@@ -245,7 +246,7 @@ pub_test! { limbs_sqrt_helper(out: &mut [Limb], xs: &[Limb], shift: u64, odd: bo
     } else {
         limbs_shr_to_out(out_lo, &qs_tail[..h1], 1);
         if qs_last != 0 {
-            out_lo.last_mut().unwrap().set_bit(Limb::WIDTH - 1);
+            out_lo.last_mut().unwrap().set_bit(WIDTH_MINUS_1);
         }
         let s = (Limb::WIDTH >> odd) - shift - 1;
         if (*qs_head >> 3) | qs_tail[0].mod_power_of_2(Limb::WIDTH - s) == 0 {
@@ -306,7 +307,7 @@ pub_test! { limbs_sqrt_helper(out: &mut [Limb], xs: &[Limb], shift: u64, odd: bo
     if odd == 1 || shift != 0 {
         let mut shift = shift;
         if odd == 1 {
-            shift.set_bit(Limb::LOG_WIDTH - 1);
+            shift.set_bit(const { Limb::LOG_WIDTH - 1 });
         }
         limbs_slice_shr_in_place(out, shift);
     }
@@ -376,7 +377,7 @@ pub_test! {limbs_sqrt_to_out(out: &mut [Limb], xs: &[Limb]) {
                     limbs_shl_to_out(shifted_scratch_1, xs, two_shift);
                 }
                 if xs_len.odd() {
-                    shift += Limb::WIDTH >> 1;
+                    shift += HALF_WIDTH;
                 }
                 limbs_sqrt_rem_helper(out, scratch_1, Limb::low_mask(shift) - 1, scratch_2);
                 limbs_slice_shr_in_place(out, shift);
@@ -471,7 +472,7 @@ pub_test! {limbs_sqrt_rem_to_out(
                     limbs_shl_to_out(shifted_scratch_1, xs, two_shift);
                 }
                 if xs_len.odd() {
-                    shift += Limb::WIDTH >> 1;
+                    shift += HALF_WIDTH;
                 }
                 let r_hi = limbs_sqrt_rem_helper(out_sqrt, scratch_1, 0, scratch_2);
                 let s = out_sqrt[0] & Limb::low_mask(shift);
@@ -574,7 +575,7 @@ pub(crate) fn limbs_sqrt_to_out_return_inexact(out_sqrt: &mut [Limb], xs: &[Limb
                     limbs_shl_to_out(shifted_scratch_1, xs, two_shift);
                 }
                 if xs_len.odd() {
-                    shift += Limb::WIDTH >> 1;
+                    shift += HALF_WIDTH;
                 }
                 let r_hi = limbs_sqrt_rem_helper(out_sqrt, scratch_1, 0, scratch_2);
                 let s = out_sqrt[0] & Limb::low_mask(shift);

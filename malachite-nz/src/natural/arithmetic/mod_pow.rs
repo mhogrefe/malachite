@@ -59,6 +59,9 @@ use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, Wrappi
 use malachite_base::num::logic::traits::TrailingZeros;
 use malachite_base::slices::{slice_leading_zeros, slice_set_zero};
 
+#[allow(clippy::absurd_extreme_comparisons)]
+const MUL_TOOM22_BELOW_SQR_BASECASE: bool = MUL_TOOM22_THRESHOLD < SQR_BASECASE_THRESHOLD;
+
 // Equivalent to limbs_slice_get_bits(xs, end.saturating_sub(len), end)[0]
 //
 // # Worst-case complexity
@@ -245,11 +248,11 @@ fn select_fns(
     &'static dyn Fn(&mut [Limb], &[Limb]),
     &'static dyn Fn(&mut [Limb], &mut [Limb], &[Limb], &[Limb]),
 ) {
-    if REDC_1_TO_REDC_N_THRESHOLD < MUL_TOOM22_THRESHOLD {
+    if const { REDC_1_TO_REDC_N_THRESHOLD < MUL_TOOM22_THRESHOLD } {
         if ms_len < REDC_1_TO_REDC_N_THRESHOLD {
             (
                 &limbs_mul_greater_to_out_basecase,
-                if REDC_1_TO_REDC_N_THRESHOLD < SQR_BASECASE_THRESHOLD
+                if const { REDC_1_TO_REDC_N_THRESHOLD < SQR_BASECASE_THRESHOLD }
                     || !(SQR_BASECASE_THRESHOLD..=SQR_TOOM2_THRESHOLD).contains(&ms_len)
                 {
                     &square_using_basecase_mul
@@ -261,7 +264,7 @@ fn select_fns(
         } else if ms_len < MUL_TOOM22_THRESHOLD {
             (
                 &limbs_mul_greater_to_out_basecase,
-                if MUL_TOOM22_THRESHOLD < SQR_BASECASE_THRESHOLD
+                if MUL_TOOM22_BELOW_SQR_BASECASE
                     || !(SQR_BASECASE_THRESHOLD..=SQR_TOOM2_THRESHOLD).contains(&ms_len)
                 {
                     &square_using_basecase_mul
@@ -287,7 +290,7 @@ fn select_fns(
     } else if ms_len < MUL_TOOM22_THRESHOLD {
         (
             &limbs_mul_greater_to_out_basecase,
-            if MUL_TOOM22_THRESHOLD < SQR_BASECASE_THRESHOLD
+            if MUL_TOOM22_BELOW_SQR_BASECASE
                 || !(SQR_BASECASE_THRESHOLD..=SQR_TOOM2_THRESHOLD).contains(&ms_len)
             {
                 &square_using_basecase_mul

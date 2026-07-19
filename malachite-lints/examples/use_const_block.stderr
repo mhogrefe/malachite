@@ -1,0 +1,19 @@
+error: this subexpression is a compile-time constant embedded in a runtime expression
+  --> $DIR/use_const_block.rs:8:18
+   |
+LL |     let a = x >> (u64::WIDTH - 1);
+   |                  ^^^^^^^^^^^^^^^^
+   |
+   = help: fold it to its value, or wrap it: `const { (u64::WIDTH - 1) }`
+   = note: `#[deny(use_const_block)]` on by default
+
+error: this subexpression is a compile-time constant embedded in a runtime expression
+  --> $DIR/use_const_block.rs:10:13
+   |
+LL |     let b = !FLAG || x > 5;
+   |             ^^^^^
+   |
+   = help: fold it to its value, or wrap it: `const { !FLAG }`
+
+error: aborting due to 2 previous errors
+

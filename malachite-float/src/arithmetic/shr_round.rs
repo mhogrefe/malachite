@@ -65,7 +65,7 @@ impl Float {
             } else if rm == Nearest
                 && possibly_just_under_min
                 && *exponent - <T as SaturatingInto<i32>>::saturating_into(bits)
-                    == Self::MIN_EXPONENT - 1
+                    == Self::MIN_EXPONENT_MINUS_1
                 && (previous_o == if *sign { Less } else { Greater }
                     || !significand.is_power_of_2())
             {
@@ -434,7 +434,7 @@ fn shr_round_primitive_int_ref<T: PrimitiveInt>(
         } else if rm == Nearest
             && possibly_just_under_min
             && *exponent - <T as SaturatingInto<i32>>::saturating_into(bits)
-                == Float::MIN_EXPONENT - 1
+                == Float::MIN_EXPONENT_MINUS_1
             && !significand.is_power_of_2()
         {
             if *sign {
