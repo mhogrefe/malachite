@@ -6,75 +6,85 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use crate::alloc::string::ToString;
+use crate::InnerFloat::Finite;
+use crate::conversion::string::get_str::get_str_ndigits;
+use crate::conversion::string::to_sci::to_sci_string;
 use crate::{ComparableFloat, ComparableFloatRef, Float};
-use alloc::string::String;
-use core::fmt::{Debug, Display, Formatter, LowerHex, Result, Write};
-use malachite_base::num::arithmetic::traits::{
-    Abs, ModPowerOf2, RoundToMultipleOfPowerOf2, ShrRound,
-};
+use core::fmt::{Binary, Debug, Display, Formatter, LowerHex, Octal, Result, UpperHex, Write};
+use malachite_base::num::arithmetic::traits::{DivRound, Mod, PowerOf2};
 use malachite_base::num::conversion::string::options::ToSciOptions;
-use malachite_base::num::conversion::traits::{ExactFrom, ToSci, WrappingFrom};
-use malachite_base::rounding_modes::RoundingMode::*;
-use malachite_q::Rational;
+use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::rounding_modes::RoundingMode::Ceiling;
 
-fn replace_exponent_in_hex_string(s: &str, new_exponent: i32) -> String {
-    let exp_index = s.find('E').unwrap_or_else(|| panic!("{s}"));
-    let mut new_s = s[..exp_index].to_string();
-    if new_exponent > 0 {
-        write!(new_s, "E+{new_exponent}").unwrap();
-    } else {
-        write!(new_s, "E{new_exponent}").unwrap();
+// The number of base-2^`digit_bits` digits that exactly cover a `Float` with binary exponent
+// `exponent` and precision `precision`, with the digits aligned to the base-2^`digit_bits` point:
+// the first digit holds `exponent mod digit_bits` significant bits (all `digit_bits` of them when
+// the exponent is a multiple), and the rest of the precision fills subsequent digits.
+fn power_of_2_digit_count(exponent: i32, precision: u64, digit_bits: u64) -> u64 {
+    let m = u64::exact_from(exponent.mod_op(i32::exact_from(digit_bits)));
+    let mut count = precision.saturating_sub(m).div_round(digit_bits, Ceiling).0;
+    if m != 0 {
+        count += 1;
     }
-    new_s
+    count
+}
+
+// Writes `x` in the base 2^`digit_bits`, with exactly enough digits to represent it. When the
+// formatter's alternate flag is set, `prefix` follows the sign for zero and finite values (but not
+// NaN or the infinities).
+fn fmt_power_of_2_base(
+    x: &Float,
+    f: &mut Formatter,
+    digit_bits: u64,
+    uppercase: bool,
+    prefix: &str,
+) -> Result {
+    let mut options = ToSciOptions::default();
+    options.set_base(u8::power_of_2(digit_bits));
+    options.set_e_uppercase();
+    if uppercase {
+        options.set_uppercase();
+    }
+    if let Float(Finite {
+        exponent,
+        precision,
+        ..
+    }) = x
+    {
+        options.set_precision(power_of_2_digit_count(*exponent, *precision, digit_bits));
+        options.set_include_trailing_zeros(true);
+    }
+    let s = to_sci_string(x, options);
+    if !x.is_nan() && !x.is_infinite() {
+        let (sign, body) = match s.strip_prefix('-') {
+            Some(body) => ("-", body),
+            None => ("", s.as_str()),
+        };
+        f.write_str(sign)?;
+        if f.alternate() {
+            f.write_str(prefix)?;
+        }
+        f.write_str(body)
+    } else {
+        f.write_str(&s)
+    }
 }
 
 impl Display for Float {
+    /// Converts a [`Float`] to a [`String`](alloc::string::String).
+    ///
+    /// The output has enough base-10 digits to round-trip: `1 + ceil(p log10(2))` significant
+    /// digits for a [`Float`] of precision `p` (the same count for every value of a given
+    /// precision), correctly rounded to nearest. It always contains a decimal point, small and
+    /// large values use scientific notation, zeros are `0.0` and `-0.0`, and the special values
+    /// are `NaN`, `Infinity`, and `-Infinity`.
     fn fmt(&self, f: &mut Formatter) -> Result {
-        match self {
-            float_nan!() => write!(f, "NaN"),
-            float_infinity!() => write!(f, "Infinity"),
-            float_negative_infinity!() => write!(f, "-Infinity"),
-            float_zero!() => write!(f, "0.0"),
-            float_negative_zero!() => write!(f, "-0.0"),
-            _ => {
-                let exp = self.get_exponent().unwrap();
-                if exp.unsigned_abs() > 10000 {
-                    // The current slow implementation would take forever to try to convert a Float
-                    // with a very large or small exponent to a decimal string. Best to
-                    // short-circuit it for now.
-                    if *self < 0u32 {
-                        write!(f, "-")?;
-                    }
-                    return write!(f, "{}", if exp >= 0 { "too_big" } else { "too_small" });
-                }
-                let mut lower = self.clone();
-                let mut higher = self.clone();
-                lower.decrement();
-                higher.increment();
-                let self_q = Rational::exact_from(self);
-                let lower_q = Rational::exact_from(lower);
-                let higher_q = Rational::exact_from(higher);
-                let mut options = ToSciOptions::default();
-                for precision in 1.. {
-                    options.set_precision(precision);
-                    let s = self_q.to_sci_with_options(options).to_string();
-                    let s_lower = lower_q.to_sci_with_options(options).to_string();
-                    let s_higher = higher_q.to_sci_with_options(options).to_string();
-                    if s != s_lower && s != s_higher {
-                        return if s.contains('.') {
-                            write!(f, "{s}")
-                        } else if let Some(i) = s.find('e') {
-                            write!(f, "{}.0e{}", &s[..i], &s[i + 1..])
-                        } else {
-                            write!(f, "{s}.0")
-                        };
-                    }
-                }
-                panic!();
-            }
+        let mut options = ToSciOptions::default();
+        if let Self(Finite { precision, .. }) = self {
+            options.set_precision(u64::exact_from(get_str_ndigits(10, *precision)));
+            options.set_include_trailing_zeros(true);
         }
+        f.write_str(&to_sci_string(self, options))
     }
 }
 
@@ -85,62 +95,39 @@ impl Debug for Float {
     }
 }
 
-impl LowerHex for Float {
+impl Binary for Float {
+    /// Converts a [`Float`] to a binary [`String`](alloc::string::String); the alternate form
+    /// prefixes it with `0b`.
     #[inline]
     fn fmt(&self, f: &mut Formatter) -> Result {
-        match self {
-            float_zero!() => f.write_str(if f.alternate() { "0x0.0" } else { "0.0" }),
-            float_negative_zero!() => f.write_str(if f.alternate() { "-0x0.0" } else { "-0.0" }),
-            Self(Finite {
-                exponent,
-                precision,
-                ..
-            }) => {
-                if self.is_sign_negative() {
-                    f.write_char('-')?;
-                }
-                let mut options = ToSciOptions::default();
-                options.set_base(16);
-                let m = u64::from(exponent.mod_power_of_2(2));
-                let mut p = precision.saturating_sub(m).shr_round(2, Ceiling).0;
-                if m != 0 {
-                    p += 1;
-                }
-                options.set_precision(p);
-                options.set_e_uppercase();
-                options.set_include_trailing_zeros(true);
-                if f.alternate() {
-                    f.write_str("0x")?;
-                }
-                let pr = precision.round_to_multiple_of_power_of_2(5, Up).0;
-                let s = if u64::from(exponent.unsigned_abs()) > (pr << 2) {
-                    let new_exponent = if *exponent > 0 {
-                        i32::exact_from(pr << 1)
-                    } else {
-                        -i32::exact_from(pr << 1)
-                    } + i32::wrapping_from(exponent.mod_power_of_2(2));
-                    let mut s = Rational::exact_from(self >> (exponent - new_exponent))
-                        .abs()
-                        .to_sci_with_options(options)
-                        .to_string();
-                    s = replace_exponent_in_hex_string(&s, (exponent - 1).shr_round(2, Floor).0);
-                    s
-                } else {
-                    Rational::exact_from(self)
-                        .abs()
-                        .to_sci_with_options(options)
-                        .to_string()
-                };
-                if s.contains('.') {
-                    write!(f, "{s}")
-                } else if let Some(i) = s.find('E') {
-                    write!(f, "{}.0E{}", &s[..i], &s[i + 1..])
-                } else {
-                    write!(f, "{s}.0")
-                }
-            }
-            _ => Display::fmt(&self, f),
-        }
+        fmt_power_of_2_base(self, f, 1, false, "0b")
+    }
+}
+
+impl Octal for Float {
+    /// Converts a [`Float`] to an octal [`String`](alloc::string::String); the alternate form
+    /// prefixes it with `0o`.
+    #[inline]
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        fmt_power_of_2_base(self, f, 3, false, "0o")
+    }
+}
+
+impl LowerHex for Float {
+    /// Converts a [`Float`] to a hexadecimal [`String`](alloc::string::String); the alternate
+    /// form prefixes it with `0x`.
+    #[inline]
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        fmt_power_of_2_base(self, f, 4, false, "0x")
+    }
+}
+
+impl UpperHex for Float {
+    /// Converts a [`Float`] to a hexadecimal [`String`](alloc::string::String) with uppercase
+    /// digits; the alternate form prefixes it with `0x`.
+    #[inline]
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        fmt_power_of_2_base(self, f, 4, true, "0x")
     }
 }
 

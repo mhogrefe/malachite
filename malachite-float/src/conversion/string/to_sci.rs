@@ -6,17 +6,15 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-// The future `Display`/`ToSci` implementation for `Float`: `get_str`-based scientific-string
-// conversion, driven by `ToSciOptions`. Not yet wired into `Display` (which currently uses a slow
-// shortest-round-trip scan through `Rational`); kept separate so it can be tested on its own.
+// `get_str`-based scientific-string conversion, driven by `ToSciOptions`: the engine behind
+// `Float`'s `Display` and power-of-2-base formatting traits (to_string.rs), and eventually behind
+// a `ToSci` implementation.
 //
 // The semantics mirror `Rational::fmt_sci` (malachite-q's to_sci.rs) — the same size options,
 // negative-exponent threshold, trailing-zero handling, and digit rounding — with one addition,
 // the `Float` `Display` convention: the output of a finite value always contains a point, so a
 // string that would otherwise lack one gets `.0` appended to its mantissa (`255` becomes `255.0`,
-// `8e-7` becomes `8.0e-7`). Because the digits come from `get_str`, which rounds the value itself,
-// the least-significant digits may differ from what the current shortest-round-trip `Display`
-// produces.
+// `8e-7` becomes `8.0e-7`).
 
 use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
@@ -94,7 +92,7 @@ fn zero_to_string(neg: bool, options: ToSciOptions) -> String {
     out
 }
 
-pub_test! {
+pub_crate_test! {
 // Determines whether `x` can be converted to a string using `to_sci_string` and a particular set of
 // options; this is the future `ToSci::fmt_sci_valid`. Mirrors `Rational::fmt_sci_valid`: with the
 // `Complete` size option the expansion must terminate, and with the `Exact` rounding mode the value
@@ -125,9 +123,10 @@ to_sci_valid(x: &Float, options: ToSciOptions) -> bool {
     }
 }}
 
-pub_test! {
+pub_crate_test! {
 // Converts a `Float` to a string using a specified base, possibly using scientific notation; this
-// is the engine that `Display` (and `ToSci`) will eventually be built on. See `ToSciOptions` for
+// is the engine behind `Display` and the power-of-2-base formatting traits (and eventually
+// `ToSci`). See `ToSciOptions` for
 // details on the available options. The `Float` `Display` conventions apply on top of them: NaN and
 // the infinities are rendered as `NaN`, `Infinity`, and `-Infinity`, and the output for any finite
 // value (including zeros) always contains a point, `.0` being appended if necessary.

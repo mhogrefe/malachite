@@ -34,8 +34,8 @@
 //   per-conversion entry point), `format` (a format-string frontend over a `&[PrintfArg]` slice),
 //   and `format_float_str` (the public single-value entry point).
 // - REMAINING: the multi-argument `format` frontend is not yet public (its `PrintfArg` model would
-//   need finalizing); `Display` will be a separate `get_str`-based implementation, not built on
-//   this. Note the `'` flag divergence below for any future full-string FFI oracle.
+//   need finalizing); `Display` is a separate `get_str`-based implementation (to_sci.rs), not
+//   built on this. Note the `'` flag divergence below for any future full-string FFI oracle.
 // - Deliberate divergences from MPFR:
 //   - Malachite zeros are precision-less (unlike MPFR), so `%e`-of-zero with an empty precision
 //     falls back to precision 1.

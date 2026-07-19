@@ -10,7 +10,5 @@ pub mod format_float;
 pub mod from_string;
 pub mod get_str;
 pub(crate) mod get_str_data;
-// test-only until it becomes the `Display`/`ToSci` implementation
-#[cfg(feature = "test_build")]
 pub mod to_sci;
 pub mod to_string;

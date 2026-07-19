@@ -46,13 +46,14 @@ pub(crate) fn ceil_mul(e: i64, beta: u64, i: usize) -> i64 {
     i64::rounding_from(&t, Ceiling).0
 }
 
+pub_crate_test! {
 // Returns at least `1 + ceil(bit_len * log(2) / log(base))` digits, where `bit_len` is the number
 // of bits of the mantissa, ensuring that converting the output back gives the same `Float`.
 //
 // `base` must be between 2 and 62, inclusive.
 //
 // This is `mpfr_get_str_ndigits` from `get_str.c`, MPFR 4.2.2.
-pub(crate) fn get_str_ndigits(base: u64, bit_len: u64) -> usize {
+get_str_ndigits(base: u64, bit_len: u64) -> usize {
     assert!((2..=62).contains(&base));
     // Deal first with power-of-two bases, since even for those, `ceil_mul` might return a value too
     // large by 1. For `base = 2 ^ k`, this is `1 + ceil((bit_len - 1) / k) = 2 + floor((bit_len -
@@ -87,7 +88,7 @@ pub(crate) fn get_str_ndigits(base: u64, bit_len: u64) -> usize {
         }
     };
     usize::exact_from(1 + ret)
-}
+}}
 
 /// Converts a [`Float`] to base-`base` mantissa digits and an exponent, rounding to `digit_len`
 /// digits with the rounding mode `rm`.
