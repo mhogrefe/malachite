@@ -15,6 +15,7 @@ use crate::arithmetic::log_base_rational_base::rational_log_base_rational_base;
 use crate::arithmetic::log_base_rational_base_1_plus_x::rational_log_base_rational_base_1_plus_x;
 use crate::arithmetic::log_base_rational_float_base::log_base_rational_float_base_rational;
 use crate::arithmetic::log_base_rational_rational_base::rational_log_base_rational_rational_base;
+use crate::conversion::string::to_sci::to_sci_valid;
 use crate::exhaustive::{
     ExhaustivePositiveFiniteFloatsGenerator, ExhaustivePositiveFloatsWithSciExponent,
     exhaustive_finite_floats, exhaustive_floats, exhaustive_non_negative_finite_floats,
@@ -39,6 +40,8 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, NegativeZero, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::string::options::exhaustive::exhaustive_to_sci_options;
+use malachite_base::num::conversion::string::options::{SciSizeOptions, ToSciOptions};
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, SaturatingFrom};
 use malachite_base::num::exhaustive::{
     exhaustive_nonzero_signeds, exhaustive_positive_primitive_ints, exhaustive_primitive_floats,
@@ -4524,6 +4527,35 @@ pub fn exhaustive_float_rounding_mode_pair_gen_var_46() -> It<(Float, RoundingMo
     Box::new(
         lex_pairs(exhaustive_extreme_floats(), exhaustive_rounding_modes())
             .filter(|(f, rm)| log_base_10_1_plus_x_round_valid(f, *rm)),
+    )
+}
+
+// -- (Float, ToSciOptions) --
+
+// Whether `to_sci_string` accepts `(x, options)` and produces a string of manageable length: the
+// pair must be valid per `to_sci_valid`, and combinations that would make the digit count huge (a
+// large precision or scale, or a `Complete` or `Scale` conversion of a `Float` with a large
+// exponent) are excluded.
+pub(crate) fn float_to_sci_options_valid(x: &Float, options: ToSciOptions) -> bool {
+    const MAX_DIGITS: u64 = 10_000;
+    if !to_sci_valid(x, options) {
+        return false;
+    }
+    let exponent_small = match x.get_exponent() {
+        Some(exponent) => u64::from(exponent.unsigned_abs()) <= MAX_DIGITS,
+        None => true,
+    };
+    match options.get_size_options() {
+        SciSizeOptions::Precision(precision) => precision <= MAX_DIGITS,
+        SciSizeOptions::Scale(scale) => scale <= MAX_DIGITS && exponent_small,
+        SciSizeOptions::Complete => exponent_small,
+    }
+}
+
+pub fn exhaustive_float_to_sci_options_pair_gen_var_1() -> It<(Float, ToSciOptions)> {
+    Box::new(
+        exhaustive_pairs(exhaustive_floats(), exhaustive_to_sci_options())
+            .filter(|(x, options)| float_to_sci_options_valid(x, *options)),
     )
 }
 

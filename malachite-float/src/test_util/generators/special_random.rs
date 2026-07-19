@@ -23,12 +23,12 @@ use crate::test_util::generators::exhaustive::{
     agm_prec_round_valid, agm_rational_prec_round_valid, agm_round_valid, cbrt_prec_round_valid,
     cbrt_round_valid, div_prec_round_valid, div_rational_prec_round_valid,
     div_rational_round_valid, div_round_valid, exp_prec_round_valid, exp_rational_prec_round_valid,
-    exp_round_valid, from_primitive_float_prec_round_valid, integer_rounding_from_float_valid,
-    ln_1_plus_x_prec_round_valid, ln_1_plus_x_round_valid, ln_prec_round_valid,
-    ln_rational_prec_round_valid, ln_round_valid, log_base_1_plus_x_prec_round_valid,
-    log_base_1_plus_x_round_valid, log_base_2_1_plus_x_prec_round_valid,
-    log_base_2_1_plus_x_round_valid, log_base_2_prec_round_valid,
-    log_base_2_rational_prec_round_valid, log_base_2_round_valid,
+    exp_round_valid, float_to_sci_options_valid, from_primitive_float_prec_round_valid,
+    integer_rounding_from_float_valid, ln_1_plus_x_prec_round_valid, ln_1_plus_x_round_valid,
+    ln_prec_round_valid, ln_rational_prec_round_valid, ln_round_valid,
+    log_base_1_plus_x_prec_round_valid, log_base_1_plus_x_round_valid,
+    log_base_2_1_plus_x_prec_round_valid, log_base_2_1_plus_x_round_valid,
+    log_base_2_prec_round_valid, log_base_2_rational_prec_round_valid, log_base_2_round_valid,
     log_base_10_1_plus_x_prec_round_valid, log_base_10_1_plus_x_round_valid,
     log_base_10_prec_round_valid, log_base_10_rational_prec_round_valid, log_base_10_round_valid,
     log_base_float_base_1_plus_x_prec_round_valid, log_base_float_base_1_plus_x_round_valid,
@@ -68,6 +68,8 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::string::options::ToSciOptions;
+use malachite_base::num::conversion::string::options::random::random_to_sci_options;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, SaturatingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::num::random::geometric::{
@@ -8448,6 +8450,39 @@ pub fn special_random_float_rounding_mode_pair_gen_var_41(
             &random_rounding_modes,
         )
         .filter(|(f, rm)| log_base_2_1_plus_x_round_valid(f, *rm)),
+    )
+}
+
+// -- (Float, ToSciOptions) --
+
+pub fn special_random_float_to_sci_options_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(Float, ToSciOptions)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                random_to_sci_options(
+                    seed,
+                    config.get_or("small_mean_n", 4),
+                    config.get_or("small_mean_d", 1),
+                )
+            },
+        )
+        .filter(|(x, options)| float_to_sci_options_valid(x, *options)),
     )
 }
 

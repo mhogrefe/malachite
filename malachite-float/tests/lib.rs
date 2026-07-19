@@ -197,6 +197,7 @@ pub mod conversion {
     pub mod string {
         pub mod format_float;
         pub mod get_str;
+        pub mod to_sci;
     }
 }
 pub mod exhaustive {

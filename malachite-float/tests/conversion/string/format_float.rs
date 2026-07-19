@@ -369,8 +369,8 @@ fn test_format_float_single_digit_rounding() {
 #[test]
 fn test_format_float_exact_panics() {
     // Exact panics whenever the output does not represent the value exactly. 1.5625 = 0x1.9 needs
-    // five significant bits, so it is not representable in a single base-16 digit (unlike
-    // 1.5 = 0xcp-3, which is; the succeeding Exact cases live in `test_format_float`).
+    // five significant bits, so it is not representable in a single base-16 digit (unlike 1.5 =
+    // 0xcp-3, which is; the succeeding Exact cases live in `test_format_float`).
     assert_panic!(format_float(
         &parse_hex_string("0x1.9#5"),
         &float_conversion_spec(b'a', 0, 0, Exact)
@@ -578,12 +578,7 @@ fn test_format_float_coverage() {
         "+0.000000001",
     );
     // covers: pn_f_defprec
-    t(
-        "2.750127e-25",
-        "0x5.51cc0E-21#20",
-        "%0+ -RUf",
-        "+0.000001",
-    );
+    t("2.750127e-25", "0x5.51cc0E-21#20", "%0+ -RUf", "+0.000001");
     // covers: fl_lt
     t(
         "8.22568892594e-11",
@@ -716,9 +711,9 @@ fn test_format_int_str() {
 }
 
 // Exemplars for the frontend branches (the `format` main loop, the parsers, and the int/string
-// helpers) that the other tests do not reach. Each `// covers:` tag names a branch this case is
-// the first to exercise, found by the same branch-instrumentation pass as
-// `test_format_float_coverage` (which covers the formatting engine).
+// helpers) that the other tests do not reach. Each `// covers:` tag names a branch this case is the
+// first to exercise, found by the same branch-instrumentation pass as `test_format_float_coverage`
+// (which covers the formatting engine).
 #[test]
 fn test_format_coverage() {
     let x = Float::from(1.5);
@@ -758,8 +753,8 @@ fn test_format_coverage() {
     assert_eq!(fmt(b"%jd", &[Int(1)]), "1"); // covers: pat_j
     assert_eq!(fmt(b"%zd", &[Int(1)]), "1"); // covers: pat_z
     assert_eq!(fmt(b"%td", &[Int(1)]), "1"); // covers: pat_t
-    // length modifiers with no PrintfArg counterpart: `L` (long double) and `F` (mpf_t) make
-    // `%d` invalid (dropped); the GMP integer types make it valid-but-unsupported (fails)
+    // length modifiers with no PrintfArg counterpart: `L` (long double) and `F` (mpf_t) make `%d`
+    // invalid (dropped); the GMP integer types make it valid-but-unsupported (fails)
     assert_eq!(fmt(b"%Ld", &[]), ""); // covers: pat_l_double
     assert_eq!(fmt(b"%Fd", &[]), ""); // covers: pat_mpf
     assert!(format(b"%Qd", &[]).is_none()); // covers: pat_mpq

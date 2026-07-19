@@ -166,9 +166,9 @@ const fn integer_like_arg_type(at: ArgType) -> bool {
     )
 }
 
-// Whether `spec` is a valid (supported) conversion. (MPFR's version returns a third state for
-// `n`, which it rejects with an error rather than merely considering invalid; this port drops `%n`
-// like any other invalid conversion, so a `bool` suffices.)
+// Whether `spec` is a valid (supported) conversion. (MPFR's version returns a third state for `n`,
+// which it rejects with an error rather than merely considering invalid; this port drops `%n` like
+// any other invalid conversion, so a `bool` suffices.)
 //
 // This is `specinfo_is_valid` from `vasprintf.c`, MPFR 4.2.2.
 fn specinfo_is_valid(spec: PrintfSpec) -> bool {
@@ -357,8 +357,9 @@ struct NumberParts {
 }
 
 // Returns `s` with its trailing '0' characters removed. (This inlines the strip-trailing-zeros
-// loops that `vasprintf.c` repeats in `regular_eg`, `regular_fg`, and `regular_ab`.)
-fn strip_trailing_zeros(mut s: &[u8]) -> &[u8] {
+// loops that `vasprintf.c` repeats in `regular_eg`, `regular_fg`, and `regular_ab`; `to_sci` uses
+// it too.)
+pub(crate) fn strip_trailing_zeros(mut s: &[u8]) -> &[u8] {
     while let [rest @ .., b'0'] = s {
         s = rest;
     }
@@ -842,9 +843,8 @@ fn regular_ab(np: &mut NumberParts, p: &Float, spec: &PrintfSpec) -> Option<()> 
     Some(())
 }
 
-// Determines the different parts of the string representation of `p` according to `spec`,
-// returning them together with the total number of characters to be written, or `None` on
-// overflow.
+// Determines the different parts of the string representation of `p` according to `spec`, returning
+// them together with the total number of characters to be written, or `None` on overflow.
 //
 // This is `partition_number` from `vasprintf.c`, MPFR 4.2.2.
 fn partition_number(p: &Float, mut spec: PrintfSpec) -> Option<(NumberParts, i64)> {
@@ -943,8 +943,8 @@ fn partition_number(p: &Float, mut spec: PrintfSpec) -> Option<(NumberParts, i64
                     _ => spec.prec,
                 };
                 debug_assert!(threshold >= 1);
-                // Try a smaller threshold for get_str: |p| < 2^EXP(p), so the integer part takes
-                // at most ceil(EXP(p) * log10(2)) digits, and with k = PREC(p) - EXP(p), the
+                // Try a smaller threshold for get_str: |p| < 2^EXP(p), so the integer part takes at
+                // most ceil(EXP(p) * log10(2)) digits, and with k = PREC(p) - EXP(p), the
                 // fractional part in base 10 has at most k digits (if k > 0).
                 let exp_p = i64::from(*exponent);
                 let k = i64::exact_from(*precision) - exp_p;
@@ -968,8 +968,8 @@ fn partition_number(p: &Float, mut spec: PrintfSpec) -> Option<(NumberParts, i64
                 // get_str's significand is in [0.1, 1); we want it in [1, 10).
                 let x = dec_info.exp - 1;
                 if threshold > x && x >= -4 {
-                    // x may be as low as -4, so the subtraction can overflow for a threshold
-                    // within 3 of i64::MAX; fail like the other size overflows.
+                    // x may be as low as -4, so the subtraction can overflow for a threshold within
+                    // 3 of i64::MAX; fail like the other size overflows.
                     spec.prec = threshold.checked_sub(x)?.checked_sub(1)?;
                     regular_fg(&mut np, p, &spec, Some(&dec_info), spec.alt)?;
                 } else {

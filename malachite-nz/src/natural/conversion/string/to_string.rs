@@ -6,14 +6,14 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+#[cfg(feature = "test_build")]
+use crate::natural::HALF_WIDTH;
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::natural::conversion::digits::general_digits::{
     limbs_digit_count, limbs_to_digits_small_base_no_alg_specified,
 };
 use crate::natural::logic::significant_bits::limbs_significant_bits;
-#[cfg(feature = "test_build")]
-use crate::natural::HALF_WIDTH;
 use crate::natural::{QUARTER_WIDTH, WIDTH_MINUS_1, WIDTH_MINUS_2, WIDTH_MINUS_3};
 use crate::platform::Limb;
 use alloc::string::String;

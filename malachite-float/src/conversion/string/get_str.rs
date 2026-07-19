@@ -74,18 +74,13 @@ pub(crate) fn get_str_ndigits(base: u64, bit_len: u64) -> usize {
         loop {
             w <<= 1;
             // lower (rounding down) and upper (rounding up) approximations to `log2(base)`
-            let (log_lo, log_hi) = floor_and_ceiling(
-                Float::from_unsigned_prec(base, w)
-                    .0
-                    .log_base_2_prec_round(w, Floor),
-            );
+            let (log_lo, log_hi) =
+                floor_and_ceiling(Float::from_unsigned_prec(base, w).0.log_base_2_round(Floor));
             // lower (`bit_len / log_hi`, rounding down) and upper (`bit_len / log_lo`, rounding up)
             // bounds on `bit_len * log(2) / log(base)`, each rounded up to an integer
             let pf = Float::from_unsigned_prec(bit_len, w).0;
-            let lo = pf.div_round_ref_val(log_hi, Floor).0;
-            let hi = pf.div_round(log_lo, Ceiling).0;
-            let lo = u64::rounding_from(&lo, Ceiling).0;
-            let hi = u64::rounding_from(&hi, Ceiling).0;
+            let lo = u64::rounding_from(&pf.div_round_ref_val(log_hi, Floor).0, Ceiling).0;
+            let hi = u64::rounding_from(&pf.div_round(log_lo, Ceiling).0, Ceiling).0;
             if lo == hi {
                 break lo;
             }

@@ -22,6 +22,7 @@ use crate::test_util::generators::special_random::*;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::string::options::ToSciOptions;
 use malachite_base::num::conversion::traits::ConvertibleFrom;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::test_util::generators::common::Generator;
@@ -3988,6 +3989,18 @@ pub fn float_rounding_mode_pair_gen_var_40_rm()
         &|config| {
             float_rounding_mode_pair_rm(special_random_float_rounding_mode_pair_gen_var_40(config))
         },
+    )
+}
+
+// -- (Float, ToSciOptions) --
+
+// All `(Float, ToSciOptions)` pairs where the `Float` can be formatted using the options and the
+// resulting string has a manageable length.
+pub fn float_to_sci_options_pair_gen_var_1() -> Generator<(Float, ToSciOptions)> {
+    Generator::new(
+        &exhaustive_float_to_sci_options_pair_gen_var_1,
+        &random_float_to_sci_options_pair_gen_var_1,
+        &special_random_float_to_sci_options_pair_gen_var_1,
     )
 }
 
