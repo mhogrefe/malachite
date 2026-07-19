@@ -53,11 +53,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (log_2_e, o) = Float::log_2_e_prec_round(100, Floor);
-    /// assert_eq!(log_2_e.to_string(), "1.442695040888963407359924681001");
+    /// assert_eq!(log_2_e.to_string(), "1.4426950408889634073599246810010");
     /// assert_eq!(o, Less);
     ///
     /// let (log_2_e, o) = Float::log_2_e_prec_round(100, Ceiling);
-    /// assert_eq!(log_2_e.to_string(), "1.442695040888963407359924681003");
+    /// assert_eq!(log_2_e.to_string(), "1.4426950408889634073599246810026");
     /// assert_eq!(o, Greater);
     /// ```
     pub fn log_2_e_prec_round(prec: u64, rm: RoundingMode) -> (Self, Ordering) {
@@ -115,11 +115,11 @@ impl Float {
     /// assert_eq!(o, Less);
     ///
     /// let (log_2_e, o) = Float::log_2_e_prec(10);
-    /// assert_eq!(log_2_e.to_string(), "1.443");
+    /// assert_eq!(log_2_e.to_string(), "1.4434");
     /// assert_eq!(o, Greater);
     ///
     /// let (log_2_e, o) = Float::log_2_e_prec(100);
-    /// assert_eq!(log_2_e.to_string(), "1.442695040888963407359924681003");
+    /// assert_eq!(log_2_e.to_string(), "1.4426950408889634073599246810026");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]

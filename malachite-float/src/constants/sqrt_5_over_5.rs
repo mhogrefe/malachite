@@ -45,14 +45,14 @@ impl Float {
     /// let (sqrt_5_over_5, o) = Float::sqrt_5_over_5_prec_round(100, Floor);
     /// assert_eq!(
     ///     sqrt_5_over_5.to_string(),
-    ///     "0.447213595499957939281834733746"
+    ///     "0.44721359549995793928183473374600"
     /// );
     /// assert_eq!(o, Less);
     ///
     /// let (sqrt_5_over_5, o) = Float::sqrt_5_over_5_prec_round(100, Ceiling);
     /// assert_eq!(
     ///     sqrt_5_over_5.to_string(),
-    ///     "0.4472135954999579392818347337464"
+    ///     "0.44721359549995793928183473374639"
     /// );
     /// assert_eq!(o, Greater);
     /// ```
@@ -92,17 +92,17 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (sqrt_5_over_5, o) = Float::sqrt_5_over_5_prec(1);
-    /// assert_eq!(sqrt_5_over_5.to_string(), "0.5");
+    /// assert_eq!(sqrt_5_over_5.to_string(), "0.50");
     /// assert_eq!(o, Greater);
     ///
     /// let (sqrt_5_over_5, o) = Float::sqrt_5_over_5_prec(10);
-    /// assert_eq!(sqrt_5_over_5.to_string(), "0.4473");
+    /// assert_eq!(sqrt_5_over_5.to_string(), "0.44727");
     /// assert_eq!(o, Greater);
     ///
     /// let (sqrt_5_over_5, o) = Float::sqrt_5_over_5_prec(100);
     /// assert_eq!(
     ///     sqrt_5_over_5.to_string(),
-    ///     "0.4472135954999579392818347337464"
+    ///     "0.44721359549995793928183473374639"
     /// );
     /// assert_eq!(o, Greater);
     /// ```

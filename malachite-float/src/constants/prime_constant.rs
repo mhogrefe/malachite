@@ -47,11 +47,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (pc, o) = Float::prime_constant_prec_round(100, Floor);
-    /// assert_eq!(pc.to_string(), "0.4146825098511116602481096221542");
+    /// assert_eq!(pc.to_string(), "0.41468250985111166024810962215420");
     /// assert_eq!(o, Less);
     ///
     /// let (pc, o) = Float::prime_constant_prec_round(100, Ceiling);
-    /// assert_eq!(pc.to_string(), "0.4146825098511116602481096221546");
+    /// assert_eq!(pc.to_string(), "0.41468250985111166024810962215460");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -104,15 +104,15 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (pc, o) = Float::prime_constant_prec(1);
-    /// assert_eq!(pc.to_string(), "0.5");
+    /// assert_eq!(pc.to_string(), "0.50");
     /// assert_eq!(o, Greater);
     ///
     /// let (pc, o) = Float::prime_constant_prec(10);
-    /// assert_eq!(pc.to_string(), "0.4146");
+    /// assert_eq!(pc.to_string(), "0.41455");
     /// assert_eq!(o, Less);
     ///
     /// let (pc, o) = Float::prime_constant_prec(100);
-    /// assert_eq!(pc.to_string(), "0.4146825098511116602481096221542");
+    /// assert_eq!(pc.to_string(), "0.41468250985111166024810962215420");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]

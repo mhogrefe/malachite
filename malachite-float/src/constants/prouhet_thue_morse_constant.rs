@@ -69,11 +69,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (tmc, o) = Float::prouhet_thue_morse_constant_prec_round(100, Floor);
-    /// assert_eq!(tmc.to_string(), "0.4124540336401075977833613682584");
+    /// assert_eq!(tmc.to_string(), "0.41245403364010759778336136825838");
     /// assert_eq!(o, Less);
     ///
     /// let (tmc, o) = Float::prouhet_thue_morse_constant_prec_round(100, Ceiling);
-    /// assert_eq!(tmc.to_string(), "0.4124540336401075977833613682588");
+    /// assert_eq!(tmc.to_string(), "0.41245403364010759778336136825877");
     /// assert_eq!(o, Greater);
     /// ```
     pub fn prouhet_thue_morse_constant_prec_round(prec: u64, rm: RoundingMode) -> (Self, Ordering) {
@@ -171,15 +171,15 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (tmc, o) = Float::prouhet_thue_morse_constant_prec(1);
-    /// assert_eq!(tmc.to_string(), "0.5");
+    /// assert_eq!(tmc.to_string(), "0.50");
     /// assert_eq!(o, Greater);
     ///
     /// let (tmc, o) = Float::prouhet_thue_morse_constant_prec(10);
-    /// assert_eq!(tmc.to_string(), "0.4126");
+    /// assert_eq!(tmc.to_string(), "0.41260");
     /// assert_eq!(o, Greater);
     ///
     /// let (tmc, o) = Float::prouhet_thue_morse_constant_prec(100);
-    /// assert_eq!(tmc.to_string(), "0.4124540336401075977833613682584");
+    /// assert_eq!(tmc.to_string(), "0.41245403364010759778336136825838");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]

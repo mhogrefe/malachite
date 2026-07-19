@@ -49,7 +49,7 @@ impl Float {
     ///     Float::gelfond_schneider_constant_prec_round(100, Floor);
     /// assert_eq!(
     ///     gelfond_schneider_constant.to_string(),
-    ///     "2.665144142690225188650297249873"
+    ///     "2.6651441426902251886502972498731"
     /// );
     /// assert_eq!(o, Less);
     ///
@@ -57,7 +57,7 @@ impl Float {
     ///     Float::gelfond_schneider_constant_prec_round(100, Ceiling);
     /// assert_eq!(
     ///     gelfond_schneider_constant.to_string(),
-    ///     "2.665144142690225188650297249876"
+    ///     "2.6651441426902251886502972498762"
     /// );
     /// assert_eq!(o, Greater);
     /// ```
@@ -127,13 +127,13 @@ impl Float {
     /// assert_eq!(o, Less);
     ///
     /// let (gelfond_schneider_constant, o) = Float::gelfond_schneider_constant_prec(10);
-    /// assert_eq!(gelfond_schneider_constant.to_string(), "2.664");
+    /// assert_eq!(gelfond_schneider_constant.to_string(), "2.6641");
     /// assert_eq!(o, Less);
     ///
     /// let (gelfond_schneider_constant, o) = Float::gelfond_schneider_constant_prec(100);
     /// assert_eq!(
     ///     gelfond_schneider_constant.to_string(),
-    ///     "2.665144142690225188650297249873"
+    ///     "2.6651441426902251886502972498731"
     /// );
     /// assert_eq!(o, Less);
     /// ```

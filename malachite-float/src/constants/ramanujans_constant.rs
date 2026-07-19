@@ -49,14 +49,14 @@ impl Float {
     /// let (ramanujans_constant, o) = Float::ramanujans_constant_prec_round(100, Floor);
     /// assert_eq!(
     ///     ramanujans_constant.to_string(),
-    ///     "262537412640768743.9999999999991"
+    ///     "262537412640768743.99999999999909"
     /// );
     /// assert_eq!(o, Less);
     ///
     /// let (ramanujans_constant, o) = Float::ramanujans_constant_prec_round(100, Ceiling);
     /// assert_eq!(
     ///     ramanujans_constant.to_string(),
-    ///     "262537412640768743.9999999999993"
+    ///     "262537412640768743.99999999999932"
     /// );
     /// assert_eq!(o, Greater);
     /// ```
@@ -128,21 +128,21 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (ramanujans_constant, o) = Float::ramanujans_constant_prec(1);
-    /// assert_eq!(ramanujans_constant.to_string(), "3.0e17");
+    /// assert_eq!(ramanujans_constant.to_string(), "2.9e17");
     /// assert_eq!(o, Greater);
     ///
     /// let (ramanujans_constant, o) = Float::ramanujans_constant_prec(10);
-    /// assert_eq!(ramanujans_constant.to_string(), "2.626e17");
+    /// assert_eq!(ramanujans_constant.to_string(), "2.6262e17");
     /// assert_eq!(o, Greater);
     ///
     /// let (ramanujans_constant, o) = Float::ramanujans_constant_prec(97);
-    /// assert_eq!(ramanujans_constant.to_string(), "262537412640768744.0");
+    /// assert_eq!(ramanujans_constant.to_string(), "262537412640768744.0000000000000");
     /// assert_eq!(o, Greater);
     ///
     /// let (ramanujans_constant, o) = Float::ramanujans_constant_prec(100);
     /// assert_eq!(
     ///     ramanujans_constant.to_string(),
-    ///     "262537412640768743.9999999999993"
+    ///     "262537412640768743.99999999999932"
     /// );
     /// assert_eq!(o, Greater);
     /// ```

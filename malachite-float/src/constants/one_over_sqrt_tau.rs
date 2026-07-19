@@ -55,14 +55,14 @@ impl Float {
     /// let (one_over_sqrt_tau, o) = Float::one_over_sqrt_tau_prec_round(100, Floor);
     /// assert_eq!(
     ///     one_over_sqrt_tau.to_string(),
-    ///     "0.3989422804014326779399460599341"
+    ///     "0.39894228040143267793994605993405"
     /// );
     /// assert_eq!(o, Less);
     ///
     /// let (one_over_sqrt_tau, o) = Float::one_over_sqrt_tau_prec_round(100, Ceiling);
     /// assert_eq!(
     ///     one_over_sqrt_tau.to_string(),
-    ///     "0.3989422804014326779399460599344"
+    ///     "0.39894228040143267793994605993445"
     /// );
     /// assert_eq!(o, Greater);
     /// ```
@@ -117,17 +117,17 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (one_over_sqrt_tau, o) = Float::one_over_sqrt_tau_prec(1);
-    /// assert_eq!(one_over_sqrt_tau.to_string(), "0.5");
+    /// assert_eq!(one_over_sqrt_tau.to_string(), "0.50");
     /// assert_eq!(o, Greater);
     ///
     /// let (one_over_sqrt_tau, o) = Float::one_over_sqrt_tau_prec(10);
-    /// assert_eq!(one_over_sqrt_tau.to_string(), "0.3989");
+    /// assert_eq!(one_over_sqrt_tau.to_string(), "0.39893");
     /// assert_eq!(o, Less);
     ///
     /// let (one_over_sqrt_tau, o) = Float::one_over_sqrt_tau_prec(100);
     /// assert_eq!(
     ///     one_over_sqrt_tau.to_string(),
-    ///     "0.3989422804014326779399460599344"
+    ///     "0.39894228040143267793994605993445"
     /// );
     /// assert_eq!(o, Greater);
     /// ```

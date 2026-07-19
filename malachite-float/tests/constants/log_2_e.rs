@@ -35,16 +35,16 @@ pub fn test_log_2_e_prec() {
     test_log_2_e_prec_helper(1, "1.0", "0x1.0#1", Less);
     test_log_2_e_prec_helper(2, "1.5", "0x1.8#2", Greater);
     test_log_2_e_prec_helper(3, "1.5", "0x1.8#3", Greater);
-    test_log_2_e_prec_helper(4, "1.5", "0x1.8#4", Greater);
+    test_log_2_e_prec_helper(4, "1.50", "0x1.8#4", Greater);
     test_log_2_e_prec_helper(5, "1.44", "0x1.7#5", Less);
     test_log_2_e_prec_helper(6, "1.44", "0x1.70#6", Less);
-    test_log_2_e_prec_helper(7, "1.44", "0x1.70#7", Less);
+    test_log_2_e_prec_helper(7, "1.438", "0x1.70#7", Less);
     test_log_2_e_prec_helper(8, "1.445", "0x1.72#8", Greater);
     test_log_2_e_prec_helper(9, "1.441", "0x1.71#9", Less);
-    test_log_2_e_prec_helper(10, "1.443", "0x1.718#10", Greater);
+    test_log_2_e_prec_helper(10, "1.4434", "0x1.718#10", Greater);
     test_log_2_e_prec_helper(
         100,
-        "1.442695040888963407359924681003",
+        "1.4426950408889634073599246810026",
         "0x1.71547652b82fe1777d0ffda0e#100",
         Greater,
     );
@@ -53,7 +53,7 @@ pub fn test_log_2_e_prec() {
         "1.442695040888963407359924681001892137426645954152985934135449406931109219181185079885526\
         622893506344496997518309652544255593101687168359642720662158223479336274537369884718493630\
         701387663532015533894318916664837643128615424047478422289497904795091530351338588054968865\
-        8930969963680361105110756308441454",
+        89309699636803611051107563084414539",
         "0x1.71547652b82fe1777d0ffda0d23a7d11d6aef551bad2b4b1164a2cd9a342648fbc3887eeaa2ed9ac49b25\
         eeb82d7c167d52173cc1895213f897f5e06a7be73665fc529264c2fb3ab643687aaf3ab440c16bd777e75050a8\
         d1a39e8af56c64a7833352906deb692ce4f199e108cf392819cfc406b19abb71ec25e11f75c#1000",
@@ -94,7 +94,7 @@ pub fn test_log_2_e_prec() {
         657376260166981167685146145560638695562162638896323160272971094995069592801744350030798593\
         924157506631512149867563008065061831442109254227561277967430907171276820183902280303065724\
         252294800267075913436729080697447776799229453917140856561043148672020633912643384787632773\
-        495535569020831968308365499869958364273149",
+        49553556902083196830836549986995836427314904",
         "0x1.71547652b82fe1777d0ffda0d23a7d11d6aef551bad2b4b1164a2cd9a342648fbc3887eeaa2ed9ac49b25\
         eeb82d7c167d52173cc1895213f897f5e06a7be73665fc529264c2fb3ab643687aaf3ab440c16bd777e75050a8\
         d1a39e8af56c64a7833352906deb692ce4f199e108cf392819cfc406b19abb71ec25e11f75c6142e64ca16da20\
@@ -127,7 +127,7 @@ pub fn test_log_2_e_prec() {
     );
 
     let log_2_e_f32 = Float::log_2_e_prec(u64::from(f32::MANTISSA_DIGITS)).0;
-    assert_eq!(log_2_e_f32.to_string(), "1.442695");
+    assert_eq!(log_2_e_f32.to_string(), "1.44269502");
     assert_eq!(to_hex_string(&log_2_e_f32), "0x1.715476#24");
     assert_eq!(log_2_e_f32, f32::LOG_2_E);
 
@@ -181,16 +181,16 @@ pub fn test_log_2_e_prec_round() {
     test_log_2_e_prec_round_helper(3, Up, "1.5", "0x1.8#3", Greater);
     test_log_2_e_prec_round_helper(3, Nearest, "1.5", "0x1.8#3", Greater);
 
-    test_log_2_e_prec_round_helper(4, Floor, "1.4", "0x1.6#4", Less);
-    test_log_2_e_prec_round_helper(4, Ceiling, "1.5", "0x1.8#4", Greater);
-    test_log_2_e_prec_round_helper(4, Down, "1.4", "0x1.6#4", Less);
-    test_log_2_e_prec_round_helper(4, Up, "1.5", "0x1.8#4", Greater);
-    test_log_2_e_prec_round_helper(4, Nearest, "1.5", "0x1.8#4", Greater);
+    test_log_2_e_prec_round_helper(4, Floor, "1.38", "0x1.6#4", Less);
+    test_log_2_e_prec_round_helper(4, Ceiling, "1.50", "0x1.8#4", Greater);
+    test_log_2_e_prec_round_helper(4, Down, "1.38", "0x1.6#4", Less);
+    test_log_2_e_prec_round_helper(4, Up, "1.50", "0x1.8#4", Greater);
+    test_log_2_e_prec_round_helper(4, Nearest, "1.50", "0x1.8#4", Greater);
 
     test_log_2_e_prec_round_helper(5, Floor, "1.44", "0x1.7#5", Less);
-    test_log_2_e_prec_round_helper(5, Ceiling, "1.5", "0x1.8#5", Greater);
+    test_log_2_e_prec_round_helper(5, Ceiling, "1.50", "0x1.8#5", Greater);
     test_log_2_e_prec_round_helper(5, Down, "1.44", "0x1.7#5", Less);
-    test_log_2_e_prec_round_helper(5, Up, "1.5", "0x1.8#5", Greater);
+    test_log_2_e_prec_round_helper(5, Up, "1.50", "0x1.8#5", Greater);
     test_log_2_e_prec_round_helper(5, Nearest, "1.44", "0x1.7#5", Less);
 
     test_log_2_e_prec_round_helper(6, Floor, "1.44", "0x1.70#6", Less);
@@ -199,15 +199,15 @@ pub fn test_log_2_e_prec_round() {
     test_log_2_e_prec_round_helper(6, Up, "1.47", "0x1.78#6", Greater);
     test_log_2_e_prec_round_helper(6, Nearest, "1.44", "0x1.70#6", Less);
 
-    test_log_2_e_prec_round_helper(7, Floor, "1.44", "0x1.70#7", Less);
-    test_log_2_e_prec_round_helper(7, Ceiling, "1.45", "0x1.74#7", Greater);
-    test_log_2_e_prec_round_helper(7, Down, "1.44", "0x1.70#7", Less);
-    test_log_2_e_prec_round_helper(7, Up, "1.45", "0x1.74#7", Greater);
-    test_log_2_e_prec_round_helper(7, Nearest, "1.44", "0x1.70#7", Less);
+    test_log_2_e_prec_round_helper(7, Floor, "1.438", "0x1.70#7", Less);
+    test_log_2_e_prec_round_helper(7, Ceiling, "1.453", "0x1.74#7", Greater);
+    test_log_2_e_prec_round_helper(7, Down, "1.438", "0x1.70#7", Less);
+    test_log_2_e_prec_round_helper(7, Up, "1.453", "0x1.74#7", Greater);
+    test_log_2_e_prec_round_helper(7, Nearest, "1.438", "0x1.70#7", Less);
 
-    test_log_2_e_prec_round_helper(8, Floor, "1.44", "0x1.70#8", Less);
+    test_log_2_e_prec_round_helper(8, Floor, "1.438", "0x1.70#8", Less);
     test_log_2_e_prec_round_helper(8, Ceiling, "1.445", "0x1.72#8", Greater);
-    test_log_2_e_prec_round_helper(8, Down, "1.44", "0x1.70#8", Less);
+    test_log_2_e_prec_round_helper(8, Down, "1.438", "0x1.70#8", Less);
     test_log_2_e_prec_round_helper(8, Up, "1.445", "0x1.72#8", Greater);
     test_log_2_e_prec_round_helper(8, Nearest, "1.445", "0x1.72#8", Greater);
 
@@ -217,44 +217,44 @@ pub fn test_log_2_e_prec_round() {
     test_log_2_e_prec_round_helper(9, Up, "1.445", "0x1.72#9", Greater);
     test_log_2_e_prec_round_helper(9, Nearest, "1.441", "0x1.71#9", Less);
 
-    test_log_2_e_prec_round_helper(10, Floor, "1.441", "0x1.710#10", Less);
-    test_log_2_e_prec_round_helper(10, Ceiling, "1.443", "0x1.718#10", Greater);
-    test_log_2_e_prec_round_helper(10, Down, "1.441", "0x1.710#10", Less);
-    test_log_2_e_prec_round_helper(10, Up, "1.443", "0x1.718#10", Greater);
-    test_log_2_e_prec_round_helper(10, Nearest, "1.443", "0x1.718#10", Greater);
+    test_log_2_e_prec_round_helper(10, Floor, "1.4414", "0x1.710#10", Less);
+    test_log_2_e_prec_round_helper(10, Ceiling, "1.4434", "0x1.718#10", Greater);
+    test_log_2_e_prec_round_helper(10, Down, "1.4414", "0x1.710#10", Less);
+    test_log_2_e_prec_round_helper(10, Up, "1.4434", "0x1.718#10", Greater);
+    test_log_2_e_prec_round_helper(10, Nearest, "1.4434", "0x1.718#10", Greater);
 
     test_log_2_e_prec_round_helper(
         100,
         Floor,
-        "1.442695040888963407359924681001",
+        "1.4426950408889634073599246810010",
         "0x1.71547652b82fe1777d0ffda0c#100",
         Less,
     );
     test_log_2_e_prec_round_helper(
         100,
         Ceiling,
-        "1.442695040888963407359924681003",
+        "1.4426950408889634073599246810026",
         "0x1.71547652b82fe1777d0ffda0e#100",
         Greater,
     );
     test_log_2_e_prec_round_helper(
         100,
         Down,
-        "1.442695040888963407359924681001",
+        "1.4426950408889634073599246810010",
         "0x1.71547652b82fe1777d0ffda0c#100",
         Less,
     );
     test_log_2_e_prec_round_helper(
         100,
         Up,
-        "1.442695040888963407359924681003",
+        "1.4426950408889634073599246810026",
         "0x1.71547652b82fe1777d0ffda0e#100",
         Greater,
     );
     test_log_2_e_prec_round_helper(
         100,
         Nearest,
-        "1.442695040888963407359924681003",
+        "1.4426950408889634073599246810026",
         "0x1.71547652b82fe1777d0ffda0e#100",
         Greater,
     );

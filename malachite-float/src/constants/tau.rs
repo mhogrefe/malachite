@@ -49,11 +49,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (tau, o) = Float::tau_prec_round(100, Floor);
-    /// assert_eq!(tau.to_string(), "6.283185307179586476925286766559");
+    /// assert_eq!(tau.to_string(), "6.2831853071795864769252867665587");
     /// assert_eq!(o, Less);
     ///
     /// let (tau, o) = Float::tau_prec_round(100, Ceiling);
-    /// assert_eq!(tau.to_string(), "6.283185307179586476925286766565");
+    /// assert_eq!(tau.to_string(), "6.2831853071795864769252867665650");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -96,11 +96,11 @@ impl Float {
     /// assert_eq!(o, Greater);
     ///
     /// let (tau, o) = Float::tau_prec(10);
-    /// assert_eq!(tau.to_string(), "6.28");
+    /// assert_eq!(tau.to_string(), "6.2812");
     /// assert_eq!(o, Less);
     ///
     /// let (tau, o) = Float::tau_prec(100);
-    /// assert_eq!(tau.to_string(), "6.283185307179586476925286766559");
+    /// assert_eq!(tau.to_string(), "6.2831853071795864769252867665587");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]

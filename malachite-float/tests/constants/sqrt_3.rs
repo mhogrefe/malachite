@@ -41,16 +41,16 @@ pub fn test_sqrt_3_prec() {
     test_sqrt_3_prec_helper(1, "2.0", "0x2.0#1", Greater);
     test_sqrt_3_prec_helper(2, "1.5", "0x1.8#2", Less);
     test_sqrt_3_prec_helper(3, "1.8", "0x1.c#3", Greater);
-    test_sqrt_3_prec_helper(4, "1.8", "0x1.c#4", Greater);
+    test_sqrt_3_prec_helper(4, "1.75", "0x1.c#4", Greater);
     test_sqrt_3_prec_helper(5, "1.75", "0x1.c#5", Greater);
     test_sqrt_3_prec_helper(6, "1.72", "0x1.b8#6", Less);
-    test_sqrt_3_prec_helper(7, "1.73", "0x1.bc#7", Greater);
+    test_sqrt_3_prec_helper(7, "1.734", "0x1.bc#7", Greater);
     test_sqrt_3_prec_helper(8, "1.734", "0x1.bc#8", Greater);
-    test_sqrt_3_prec_helper(9, "1.73", "0x1.bb#9", Less);
-    test_sqrt_3_prec_helper(10, "1.732", "0x1.bb8#10", Greater);
+    test_sqrt_3_prec_helper(9, "1.730", "0x1.bb#9", Less);
+    test_sqrt_3_prec_helper(10, "1.7324", "0x1.bb8#10", Greater);
     test_sqrt_3_prec_helper(
         100,
-        "1.732050807568877293527446341506",
+        "1.7320508075688772935274463415062",
         "0x1.bb67ae8584caa73b25742d708#100",
         Greater,
     );
@@ -59,7 +59,7 @@ pub fn test_sqrt_3_prec() {
         "1.732050807568877293527446341505872366942805253810380628055806979451933016908800037081146\
         186757248575675626141415406703029969945094998952478811655512094373648528093231902305582067\
         974820101084674923265015312343266903322886650672254668921837971227047131660367861588019049\
-        9865373798593894676503475065760508",
+        98653737985938946765034750657605082",
         "0x1.bb67ae8584caa73b25742d7078b83b8925d834cc53da4798c720a6486e45a6e2490bcfd95ef15dbda9930\
         aae12228f87cc4cf24da3a1ec68d0cd33a01ad9a383b9e122e6138c3ae6de5ede3bd42db7301b6bf553af7b09f\
         d6ebef33a9a9fe57729426f30e5892ab572816ccefc5899355f7f11c3e24f3768a5c7cb90d6#1000",
@@ -100,7 +100,7 @@ pub fn test_sqrt_3_prec() {
         943938867059754315442943430957258470988215463111260766774067864571578060647447499750354544\
         559313286549189849336572747626297414738235686914837831363361283627903824840163806671607179\
         848728555842931349226093240565957553651136754644387834283313466644554180390821898983294626\
-        3450161711220169296194601693206210330397449",
+        34501617112201692961946016932062103303974487",
         "0x1.bb67ae8584caa73b25742d7078b83b8925d834cc53da4798c720a6486e45a6e2490bcfd95ef15dbda9930\
         aae12228f87cc4cf24da3a1ec68d0cd33a01ad9a383b9e122e6138c3ae6de5ede3bd42db7301b6bf553af7b09f\
         d6ebef33a9a9fe57729426f30e5892ab572816ccefc5899355f7f11c3e24f3768a5c7cb90d55302505df014c70\
@@ -133,7 +133,7 @@ pub fn test_sqrt_3_prec() {
     );
 
     let sqrt_3_f32 = Float::sqrt_3_prec(u64::from(f32::MANTISSA_DIGITS)).0;
-    assert_eq!(sqrt_3_f32.to_string(), "1.7320508");
+    assert_eq!(sqrt_3_f32.to_string(), "1.73205078");
     assert_eq!(to_hex_string(&sqrt_3_f32), "0x1.bb67ae#24");
     assert_eq!(sqrt_3_f32, f32::SQRT_3);
 
@@ -192,15 +192,15 @@ pub fn test_sqrt_3_prec_round() {
     test_sqrt_3_prec_round_helper(3, Up, "1.8", "0x1.c#3", Greater);
     test_sqrt_3_prec_round_helper(3, Nearest, "1.8", "0x1.c#3", Greater);
 
-    test_sqrt_3_prec_round_helper(4, Floor, "1.6", "0x1.a#4", Less);
-    test_sqrt_3_prec_round_helper(4, Ceiling, "1.8", "0x1.c#4", Greater);
-    test_sqrt_3_prec_round_helper(4, Down, "1.6", "0x1.a#4", Less);
-    test_sqrt_3_prec_round_helper(4, Up, "1.8", "0x1.c#4", Greater);
-    test_sqrt_3_prec_round_helper(4, Nearest, "1.8", "0x1.c#4", Greater);
+    test_sqrt_3_prec_round_helper(4, Floor, "1.62", "0x1.a#4", Less);
+    test_sqrt_3_prec_round_helper(4, Ceiling, "1.75", "0x1.c#4", Greater);
+    test_sqrt_3_prec_round_helper(4, Down, "1.62", "0x1.a#4", Less);
+    test_sqrt_3_prec_round_helper(4, Up, "1.75", "0x1.c#4", Greater);
+    test_sqrt_3_prec_round_helper(4, Nearest, "1.75", "0x1.c#4", Greater);
 
-    test_sqrt_3_prec_round_helper(5, Floor, "1.7", "0x1.b#5", Less);
+    test_sqrt_3_prec_round_helper(5, Floor, "1.69", "0x1.b#5", Less);
     test_sqrt_3_prec_round_helper(5, Ceiling, "1.75", "0x1.c#5", Greater);
-    test_sqrt_3_prec_round_helper(5, Down, "1.7", "0x1.b#5", Less);
+    test_sqrt_3_prec_round_helper(5, Down, "1.69", "0x1.b#5", Less);
     test_sqrt_3_prec_round_helper(5, Up, "1.75", "0x1.c#5", Greater);
     test_sqrt_3_prec_round_helper(5, Nearest, "1.75", "0x1.c#5", Greater);
 
@@ -210,11 +210,11 @@ pub fn test_sqrt_3_prec_round() {
     test_sqrt_3_prec_round_helper(6, Up, "1.75", "0x1.c0#6", Greater);
     test_sqrt_3_prec_round_helper(6, Nearest, "1.72", "0x1.b8#6", Less);
 
-    test_sqrt_3_prec_round_helper(7, Floor, "1.72", "0x1.b8#7", Less);
-    test_sqrt_3_prec_round_helper(7, Ceiling, "1.73", "0x1.bc#7", Greater);
-    test_sqrt_3_prec_round_helper(7, Down, "1.72", "0x1.b8#7", Less);
-    test_sqrt_3_prec_round_helper(7, Up, "1.73", "0x1.bc#7", Greater);
-    test_sqrt_3_prec_round_helper(7, Nearest, "1.73", "0x1.bc#7", Greater);
+    test_sqrt_3_prec_round_helper(7, Floor, "1.719", "0x1.b8#7", Less);
+    test_sqrt_3_prec_round_helper(7, Ceiling, "1.734", "0x1.bc#7", Greater);
+    test_sqrt_3_prec_round_helper(7, Down, "1.719", "0x1.b8#7", Less);
+    test_sqrt_3_prec_round_helper(7, Up, "1.734", "0x1.bc#7", Greater);
+    test_sqrt_3_prec_round_helper(7, Nearest, "1.734", "0x1.bc#7", Greater);
 
     test_sqrt_3_prec_round_helper(8, Floor, "1.727", "0x1.ba#8", Less);
     test_sqrt_3_prec_round_helper(8, Ceiling, "1.734", "0x1.bc#8", Greater);
@@ -222,50 +222,50 @@ pub fn test_sqrt_3_prec_round() {
     test_sqrt_3_prec_round_helper(8, Up, "1.734", "0x1.bc#8", Greater);
     test_sqrt_3_prec_round_helper(8, Nearest, "1.734", "0x1.bc#8", Greater);
 
-    test_sqrt_3_prec_round_helper(9, Floor, "1.73", "0x1.bb#9", Less);
+    test_sqrt_3_prec_round_helper(9, Floor, "1.730", "0x1.bb#9", Less);
     test_sqrt_3_prec_round_helper(9, Ceiling, "1.734", "0x1.bc#9", Greater);
-    test_sqrt_3_prec_round_helper(9, Down, "1.73", "0x1.bb#9", Less);
+    test_sqrt_3_prec_round_helper(9, Down, "1.730", "0x1.bb#9", Less);
     test_sqrt_3_prec_round_helper(9, Up, "1.734", "0x1.bc#9", Greater);
-    test_sqrt_3_prec_round_helper(9, Nearest, "1.73", "0x1.bb#9", Less);
+    test_sqrt_3_prec_round_helper(9, Nearest, "1.730", "0x1.bb#9", Less);
 
-    test_sqrt_3_prec_round_helper(10, Floor, "1.73", "0x1.bb0#10", Less);
-    test_sqrt_3_prec_round_helper(10, Ceiling, "1.732", "0x1.bb8#10", Greater);
-    test_sqrt_3_prec_round_helper(10, Down, "1.73", "0x1.bb0#10", Less);
-    test_sqrt_3_prec_round_helper(10, Up, "1.732", "0x1.bb8#10", Greater);
-    test_sqrt_3_prec_round_helper(10, Nearest, "1.732", "0x1.bb8#10", Greater);
+    test_sqrt_3_prec_round_helper(10, Floor, "1.7305", "0x1.bb0#10", Less);
+    test_sqrt_3_prec_round_helper(10, Ceiling, "1.7324", "0x1.bb8#10", Greater);
+    test_sqrt_3_prec_round_helper(10, Down, "1.7305", "0x1.bb0#10", Less);
+    test_sqrt_3_prec_round_helper(10, Up, "1.7324", "0x1.bb8#10", Greater);
+    test_sqrt_3_prec_round_helper(10, Nearest, "1.7324", "0x1.bb8#10", Greater);
 
     test_sqrt_3_prec_round_helper(
         100,
         Floor,
-        "1.732050807568877293527446341505",
+        "1.7320508075688772935274463415047",
         "0x1.bb67ae8584caa73b25742d706#100",
         Less,
     );
     test_sqrt_3_prec_round_helper(
         100,
         Ceiling,
-        "1.732050807568877293527446341506",
+        "1.7320508075688772935274463415062",
         "0x1.bb67ae8584caa73b25742d708#100",
         Greater,
     );
     test_sqrt_3_prec_round_helper(
         100,
         Down,
-        "1.732050807568877293527446341505",
+        "1.7320508075688772935274463415047",
         "0x1.bb67ae8584caa73b25742d706#100",
         Less,
     );
     test_sqrt_3_prec_round_helper(
         100,
         Up,
-        "1.732050807568877293527446341506",
+        "1.7320508075688772935274463415062",
         "0x1.bb67ae8584caa73b25742d708#100",
         Greater,
     );
     test_sqrt_3_prec_round_helper(
         100,
         Nearest,
-        "1.732050807568877293527446341506",
+        "1.7320508075688772935274463415062",
         "0x1.bb67ae8584caa73b25742d708#100",
         Greater,
     );

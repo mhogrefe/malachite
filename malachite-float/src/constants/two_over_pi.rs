@@ -49,11 +49,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (two_over_pi, o) = Float::two_over_pi_prec_round(100, Floor);
-    /// assert_eq!(two_over_pi.to_string(), "0.63661977236758134307553505349");
+    /// assert_eq!(two_over_pi.to_string(), "0.63661977236758134307553505348980");
     /// assert_eq!(o, Less);
     ///
     /// let (two_over_pi, o) = Float::two_over_pi_prec_round(100, Ceiling);
-    /// assert_eq!(two_over_pi.to_string(), "0.6366197723675813430755350534906");
+    /// assert_eq!(two_over_pi.to_string(), "0.63661977236758134307553505349059");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -92,15 +92,15 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (two_over_pi, o) = Float::two_over_pi_prec(1);
-    /// assert_eq!(two_over_pi.to_string(), "0.5");
+    /// assert_eq!(two_over_pi.to_string(), "0.50");
     /// assert_eq!(o, Less);
     ///
     /// let (two_over_pi, o) = Float::two_over_pi_prec(10);
-    /// assert_eq!(two_over_pi.to_string(), "0.637");
+    /// assert_eq!(two_over_pi.to_string(), "0.63672");
     /// assert_eq!(o, Greater);
     ///
     /// let (two_over_pi, o) = Float::two_over_pi_prec(100);
-    /// assert_eq!(two_over_pi.to_string(), "0.63661977236758134307553505349");
+    /// assert_eq!(two_over_pi.to_string(), "0.63661977236758134307553505348980");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]

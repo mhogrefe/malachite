@@ -35,16 +35,16 @@ pub fn test_sqrt_pi_prec() {
     test_sqrt_pi_prec_helper(1, "2.0", "0x2.0#1", Greater);
     test_sqrt_pi_prec_helper(2, "2.0", "0x2.0#2", Greater);
     test_sqrt_pi_prec_helper(3, "1.8", "0x1.c#3", Less);
-    test_sqrt_pi_prec_helper(4, "1.8", "0x1.c#4", Less);
+    test_sqrt_pi_prec_helper(4, "1.75", "0x1.c#4", Less);
     test_sqrt_pi_prec_helper(5, "1.75", "0x1.c#5", Less);
     test_sqrt_pi_prec_helper(6, "1.78", "0x1.c8#6", Greater);
-    test_sqrt_pi_prec_helper(7, "1.77", "0x1.c4#7", Less);
+    test_sqrt_pi_prec_helper(7, "1.766", "0x1.c4#7", Less);
     test_sqrt_pi_prec_helper(8, "1.773", "0x1.c6#8", Greater);
     test_sqrt_pi_prec_helper(9, "1.773", "0x1.c6#9", Greater);
-    test_sqrt_pi_prec_helper(10, "1.771", "0x1.c58#10", Less);
+    test_sqrt_pi_prec_helper(10, "1.7715", "0x1.c58#10", Less);
     test_sqrt_pi_prec_helper(
         100,
-        "1.772453850905516027298167483341",
+        "1.7724538509055160272981674833413",
         "0x1.c5bf891b4ef6aa79c3b0520d6#100",
         Greater,
     );
@@ -53,7 +53,7 @@ pub fn test_sqrt_pi_prec() {
         "1.772453850905516027298167483341145182797549456122387128213807789852911284591032181374950\
         656738544665416226823624282570666236152865724422602525093709602787068462037698653105122849\
         925173028950826228932095379267962800174639015351479720516700190185234018585446974494912640\
-        3139217755259062164054193325009063",
+        31392177552590621640541933250090633",
         "0x1.c5bf891b4ef6aa79c3b0520d5db9383fe3921546f63b252dca100bd3ea14746ed76ffd6f941f1dbacd8e7\
         6141e0c77476c521446ddc35851524490c34a42174dcbafdf109d1b3acfb553ade465bea6c5032aa8a111a626e\
         2c702f124d16fb3a90b8b1717835c4e1ec9c08f40a3db6d8123741ca788a38e7a619ffb5bae#1000",
@@ -94,7 +94,7 @@ pub fn test_sqrt_pi_prec() {
         420885521269510357370208661259115541320440373560864338837123962064293902378666311632616788\
         841922798194995240394245784220443030420430420710969273392946085104969289739161855607837870\
         336428902342932718872968029721581659426129728366395905041130374745743509749058016326916537\
-        5769098109748562537785034287994219223771859",
+        57690981097485625377850342879942192237718586",
         "0x1.c5bf891b4ef6aa79c3b0520d5db9383fe3921546f63b252dca100bd3ea14746ed76ffd6f941f1dbacd8e7\
         6141e0c77476c521446ddc35851524490c34a42174dcbafdf109d1b3acfb553ade465bea6c5032aa8a111a626e\
         2c702f124d16fb3a90b8b1717835c4e1ec9c08f40a3db6d8123741ca788a38e7a619ffb5baebf7b166df28b5d2\
@@ -127,7 +127,7 @@ pub fn test_sqrt_pi_prec() {
     );
 
     let sqrt_pi_f32 = Float::sqrt_pi_prec(u64::from(f32::MANTISSA_DIGITS)).0;
-    assert_eq!(sqrt_pi_f32.to_string(), "1.7724539");
+    assert_eq!(sqrt_pi_f32.to_string(), "1.77245390");
     assert_eq!(to_hex_string(&sqrt_pi_f32), "0x1.c5bf8a#24");
     assert_eq!(sqrt_pi_f32, f32::SQRT_PI);
 
@@ -181,11 +181,11 @@ pub fn test_sqrt_pi_prec_round() {
     test_sqrt_pi_prec_round_helper(3, Up, "2.0", "0x2.0#3", Greater);
     test_sqrt_pi_prec_round_helper(3, Nearest, "1.8", "0x1.c#3", Less);
 
-    test_sqrt_pi_prec_round_helper(4, Floor, "1.8", "0x1.c#4", Less);
-    test_sqrt_pi_prec_round_helper(4, Ceiling, "1.9", "0x1.e#4", Greater);
-    test_sqrt_pi_prec_round_helper(4, Down, "1.8", "0x1.c#4", Less);
-    test_sqrt_pi_prec_round_helper(4, Up, "1.9", "0x1.e#4", Greater);
-    test_sqrt_pi_prec_round_helper(4, Nearest, "1.8", "0x1.c#4", Less);
+    test_sqrt_pi_prec_round_helper(4, Floor, "1.75", "0x1.c#4", Less);
+    test_sqrt_pi_prec_round_helper(4, Ceiling, "1.88", "0x1.e#4", Greater);
+    test_sqrt_pi_prec_round_helper(4, Down, "1.75", "0x1.c#4", Less);
+    test_sqrt_pi_prec_round_helper(4, Up, "1.88", "0x1.e#4", Greater);
+    test_sqrt_pi_prec_round_helper(4, Nearest, "1.75", "0x1.c#4", Less);
 
     test_sqrt_pi_prec_round_helper(5, Floor, "1.75", "0x1.c#5", Less);
     test_sqrt_pi_prec_round_helper(5, Ceiling, "1.81", "0x1.d#5", Greater);
@@ -199,11 +199,11 @@ pub fn test_sqrt_pi_prec_round() {
     test_sqrt_pi_prec_round_helper(6, Up, "1.78", "0x1.c8#6", Greater);
     test_sqrt_pi_prec_round_helper(6, Nearest, "1.78", "0x1.c8#6", Greater);
 
-    test_sqrt_pi_prec_round_helper(7, Floor, "1.77", "0x1.c4#7", Less);
-    test_sqrt_pi_prec_round_helper(7, Ceiling, "1.78", "0x1.c8#7", Greater);
-    test_sqrt_pi_prec_round_helper(7, Down, "1.77", "0x1.c4#7", Less);
-    test_sqrt_pi_prec_round_helper(7, Up, "1.78", "0x1.c8#7", Greater);
-    test_sqrt_pi_prec_round_helper(7, Nearest, "1.77", "0x1.c4#7", Less);
+    test_sqrt_pi_prec_round_helper(7, Floor, "1.766", "0x1.c4#7", Less);
+    test_sqrt_pi_prec_round_helper(7, Ceiling, "1.781", "0x1.c8#7", Greater);
+    test_sqrt_pi_prec_round_helper(7, Down, "1.766", "0x1.c4#7", Less);
+    test_sqrt_pi_prec_round_helper(7, Up, "1.781", "0x1.c8#7", Greater);
+    test_sqrt_pi_prec_round_helper(7, Nearest, "1.766", "0x1.c4#7", Less);
 
     test_sqrt_pi_prec_round_helper(8, Floor, "1.766", "0x1.c4#8", Less);
     test_sqrt_pi_prec_round_helper(8, Ceiling, "1.773", "0x1.c6#8", Greater);
@@ -211,50 +211,50 @@ pub fn test_sqrt_pi_prec_round() {
     test_sqrt_pi_prec_round_helper(8, Up, "1.773", "0x1.c6#8", Greater);
     test_sqrt_pi_prec_round_helper(8, Nearest, "1.773", "0x1.c6#8", Greater);
 
-    test_sqrt_pi_prec_round_helper(9, Floor, "1.77", "0x1.c5#9", Less);
+    test_sqrt_pi_prec_round_helper(9, Floor, "1.770", "0x1.c5#9", Less);
     test_sqrt_pi_prec_round_helper(9, Ceiling, "1.773", "0x1.c6#9", Greater);
-    test_sqrt_pi_prec_round_helper(9, Down, "1.77", "0x1.c5#9", Less);
+    test_sqrt_pi_prec_round_helper(9, Down, "1.770", "0x1.c5#9", Less);
     test_sqrt_pi_prec_round_helper(9, Up, "1.773", "0x1.c6#9", Greater);
     test_sqrt_pi_prec_round_helper(9, Nearest, "1.773", "0x1.c6#9", Greater);
 
-    test_sqrt_pi_prec_round_helper(10, Floor, "1.771", "0x1.c58#10", Less);
-    test_sqrt_pi_prec_round_helper(10, Ceiling, "1.773", "0x1.c60#10", Greater);
-    test_sqrt_pi_prec_round_helper(10, Down, "1.771", "0x1.c58#10", Less);
-    test_sqrt_pi_prec_round_helper(10, Up, "1.773", "0x1.c60#10", Greater);
-    test_sqrt_pi_prec_round_helper(10, Nearest, "1.771", "0x1.c58#10", Less);
+    test_sqrt_pi_prec_round_helper(10, Floor, "1.7715", "0x1.c58#10", Less);
+    test_sqrt_pi_prec_round_helper(10, Ceiling, "1.7734", "0x1.c60#10", Greater);
+    test_sqrt_pi_prec_round_helper(10, Down, "1.7715", "0x1.c58#10", Less);
+    test_sqrt_pi_prec_round_helper(10, Up, "1.7734", "0x1.c60#10", Greater);
+    test_sqrt_pi_prec_round_helper(10, Nearest, "1.7715", "0x1.c58#10", Less);
 
     test_sqrt_pi_prec_round_helper(
         100,
         Floor,
-        "1.77245385090551602729816748334",
+        "1.7724538509055160272981674833397",
         "0x1.c5bf891b4ef6aa79c3b0520d4#100",
         Less,
     );
     test_sqrt_pi_prec_round_helper(
         100,
         Ceiling,
-        "1.772453850905516027298167483341",
+        "1.7724538509055160272981674833413",
         "0x1.c5bf891b4ef6aa79c3b0520d6#100",
         Greater,
     );
     test_sqrt_pi_prec_round_helper(
         100,
         Down,
-        "1.77245385090551602729816748334",
+        "1.7724538509055160272981674833397",
         "0x1.c5bf891b4ef6aa79c3b0520d4#100",
         Less,
     );
     test_sqrt_pi_prec_round_helper(
         100,
         Up,
-        "1.772453850905516027298167483341",
+        "1.7724538509055160272981674833413",
         "0x1.c5bf891b4ef6aa79c3b0520d6#100",
         Greater,
     );
     test_sqrt_pi_prec_round_helper(
         100,
         Nearest,
-        "1.772453850905516027298167483341",
+        "1.7724538509055160272981674833413",
         "0x1.c5bf891b4ef6aa79c3b0520d6#100",
         Greater,
     );

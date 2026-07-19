@@ -51,14 +51,14 @@ impl Float {
     /// let (two_over_sqrt_pi, o) = Float::two_over_sqrt_pi_prec_round(100, Floor);
     /// assert_eq!(
     ///     two_over_sqrt_pi.to_string(),
-    ///     "1.12837916709551257389615890312"
+    ///     "1.1283791670955125738961589031204"
     /// );
     /// assert_eq!(o, Less);
     ///
     /// let (two_over_sqrt_pi, o) = Float::two_over_sqrt_pi_prec_round(100, Ceiling);
     /// assert_eq!(
     ///     two_over_sqrt_pi.to_string(),
-    ///     "1.128379167095512573896158903122"
+    ///     "1.1283791670955125738961589031219"
     /// );
     /// assert_eq!(o, Greater);
     /// ```
@@ -102,13 +102,13 @@ impl Float {
     /// assert_eq!(o, Less);
     ///
     /// let (two_over_sqrt_pi, o) = Float::two_over_sqrt_pi_prec(10);
-    /// assert_eq!(two_over_sqrt_pi.to_string(), "1.129");
+    /// assert_eq!(two_over_sqrt_pi.to_string(), "1.1289");
     /// assert_eq!(o, Greater);
     ///
     /// let (two_over_sqrt_pi, o) = Float::two_over_sqrt_pi_prec(100);
     /// assert_eq!(
     ///     two_over_sqrt_pi.to_string(),
-    ///     "1.128379167095512573896158903122"
+    ///     "1.1283791670955125738961589031219"
     /// );
     /// assert_eq!(o, Greater);
     /// ```

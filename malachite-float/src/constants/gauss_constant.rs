@@ -57,12 +57,12 @@ impl Float {
     /// let (gauss_constant, o) = Float::gauss_constant_prec_round(100, Floor);
     /// assert_eq!(
     ///     gauss_constant.to_string(),
-    ///     "0.834626841674073186281429732799"
+    ///     "0.83462684167407318628142973279898"
     /// );
     /// assert_eq!(o, Less);
     ///
     /// let (gauss_constant, o) = Float::gauss_constant_prec_round(100, Ceiling);
-    /// assert_eq!(gauss_constant.to_string(), "0.8346268416740731862814297328");
+    /// assert_eq!(gauss_constant.to_string(), "0.83462684167407318628142973279977");
     /// assert_eq!(o, Greater);
     /// ```
     pub fn gauss_constant_prec_round(prec: u64, rm: RoundingMode) -> (Self, Ordering) {
@@ -133,13 +133,13 @@ impl Float {
     /// assert_eq!(o, Greater);
     ///
     /// let (gauss_constant, o) = Float::gauss_constant_prec(10);
-    /// assert_eq!(gauss_constant.to_string(), "0.835");
+    /// assert_eq!(gauss_constant.to_string(), "0.83496");
     /// assert_eq!(o, Greater);
     ///
     /// let (gauss_constant, o) = Float::gauss_constant_prec(100);
     /// assert_eq!(
     ///     gauss_constant.to_string(),
-    ///     "0.834626841674073186281429732799"
+    ///     "0.83462684167407318628142973279898"
     /// );
     /// assert_eq!(o, Less);
     /// ```

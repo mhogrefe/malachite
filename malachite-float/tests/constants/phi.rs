@@ -30,16 +30,16 @@ pub fn test_phi_prec() {
     test_phi_prec_helper(1, "2.0", "0x2.0#1", Greater);
     test_phi_prec_helper(2, "1.5", "0x1.8#2", Less);
     test_phi_prec_helper(3, "1.5", "0x1.8#3", Less);
-    test_phi_prec_helper(4, "1.6", "0x1.a#4", Greater);
+    test_phi_prec_helper(4, "1.62", "0x1.a#4", Greater);
     test_phi_prec_helper(5, "1.62", "0x1.a#5", Greater);
     test_phi_prec_helper(6, "1.62", "0x1.a0#6", Greater);
-    test_phi_prec_helper(7, "1.62", "0x1.a0#7", Greater);
+    test_phi_prec_helper(7, "1.625", "0x1.a0#7", Greater);
     test_phi_prec_helper(8, "1.617", "0x1.9e#8", Less);
     test_phi_prec_helper(9, "1.617", "0x1.9e#9", Less);
-    test_phi_prec_helper(10, "1.617", "0x1.9e0#10", Less);
+    test_phi_prec_helper(10, "1.6172", "0x1.9e0#10", Less);
     test_phi_prec_helper(
         100,
-        "1.618033988749894848204586834366",
+        "1.6180339887498948482045868343658",
         "0x1.9e3779b97f4a7c15f39cc0606#100",
         Greater,
     );
@@ -48,7 +48,7 @@ pub fn test_phi_prec() {
         "1.618033988749894848204586834365638117720309179805762862135448622705260462818902449707207\
         204189391137484754088075386891752126633862223536931793180060766726354433389086595939582905\
         638322661319928290267880675208766892501711696207032221043216269548626296313614438149758701\
-        2203408058879544547492461856953648",
+        22034080588795445474924618569536484",
         "0x1.9e3779b97f4a7c15f39cc0605cedc8341082276bf3a27251f86c6a11d0c18e952767f0b153d27b7f03470\
         45b5bf1827f01886f0928403002c1d64ba40f335e36f06ad7ae9717877e85839d6effbd7dc664d325d1c537168\
         2cadd0cccfdffbbe1626e33b8d04b4331bbf73c790d94f79d471c4ab3ed3d82a5fec507705e#1000",
@@ -89,7 +89,7 @@ pub fn test_phi_prec() {
         839128810319742631251797141432012311279551894778172691415891177991956481255800184550656329\
         528598591000908621802977563789259991649946428193022293552346674759326951654214021091363018\
         194722707890122087287361707348649998156255472811373479871656952748900814438405327483781378\
-        2466917444229634914708157007352545707089773",
+        24669174442296349147081570073525457070897730",
         "0x1.9e3779b97f4a7c15f39cc0605cedc8341082276bf3a27251f86c6a11d0c18e952767f0b153d27b7f03470\
         45b5bf1827f01886f0928403002c1d64ba40f335e36f06ad7ae9717877e85839d6effbd7dc664d325d1c537168\
         2cadd0cccfdffbbe1626e33b8d04b4331bbf73c790d94f79d471c4ab3ed3d82a5fec507705e4ae6e5e73a9b91f\
@@ -122,7 +122,7 @@ pub fn test_phi_prec() {
     );
 
     let phi_f32 = Float::phi_prec(u64::from(f32::MANTISSA_DIGITS)).0;
-    assert_eq!(phi_f32.to_string(), "1.618034");
+    assert_eq!(phi_f32.to_string(), "1.61803401");
     assert_eq!(to_hex_string(&phi_f32), "0x1.9e377a#24");
     assert_eq!(phi_f32, f32::PHI);
 
@@ -172,11 +172,11 @@ pub fn test_phi_prec_round() {
     test_phi_prec_round_helper(3, Up, "1.8", "0x1.c#3", Greater);
     test_phi_prec_round_helper(3, Nearest, "1.5", "0x1.8#3", Less);
 
-    test_phi_prec_round_helper(4, Floor, "1.5", "0x1.8#4", Less);
-    test_phi_prec_round_helper(4, Ceiling, "1.6", "0x1.a#4", Greater);
-    test_phi_prec_round_helper(4, Down, "1.5", "0x1.8#4", Less);
-    test_phi_prec_round_helper(4, Up, "1.6", "0x1.a#4", Greater);
-    test_phi_prec_round_helper(4, Nearest, "1.6", "0x1.a#4", Greater);
+    test_phi_prec_round_helper(4, Floor, "1.50", "0x1.8#4", Less);
+    test_phi_prec_round_helper(4, Ceiling, "1.62", "0x1.a#4", Greater);
+    test_phi_prec_round_helper(4, Down, "1.50", "0x1.8#4", Less);
+    test_phi_prec_round_helper(4, Up, "1.62", "0x1.a#4", Greater);
+    test_phi_prec_round_helper(4, Nearest, "1.62", "0x1.a#4", Greater);
 
     test_phi_prec_round_helper(5, Floor, "1.56", "0x1.9#5", Less);
     test_phi_prec_round_helper(5, Ceiling, "1.62", "0x1.a#5", Greater);
@@ -190,11 +190,11 @@ pub fn test_phi_prec_round() {
     test_phi_prec_round_helper(6, Up, "1.62", "0x1.a0#6", Greater);
     test_phi_prec_round_helper(6, Nearest, "1.62", "0x1.a0#6", Greater);
 
-    test_phi_prec_round_helper(7, Floor, "1.61", "0x1.9c#7", Less);
-    test_phi_prec_round_helper(7, Ceiling, "1.62", "0x1.a0#7", Greater);
-    test_phi_prec_round_helper(7, Down, "1.61", "0x1.9c#7", Less);
-    test_phi_prec_round_helper(7, Up, "1.62", "0x1.a0#7", Greater);
-    test_phi_prec_round_helper(7, Nearest, "1.62", "0x1.a0#7", Greater);
+    test_phi_prec_round_helper(7, Floor, "1.609", "0x1.9c#7", Less);
+    test_phi_prec_round_helper(7, Ceiling, "1.625", "0x1.a0#7", Greater);
+    test_phi_prec_round_helper(7, Down, "1.609", "0x1.9c#7", Less);
+    test_phi_prec_round_helper(7, Up, "1.625", "0x1.a0#7", Greater);
+    test_phi_prec_round_helper(7, Nearest, "1.625", "0x1.a0#7", Greater);
 
     test_phi_prec_round_helper(8, Floor, "1.617", "0x1.9e#8", Less);
     test_phi_prec_round_helper(8, Ceiling, "1.625", "0x1.a0#8", Greater);
@@ -208,44 +208,44 @@ pub fn test_phi_prec_round() {
     test_phi_prec_round_helper(9, Up, "1.621", "0x1.9f#9", Greater);
     test_phi_prec_round_helper(9, Nearest, "1.617", "0x1.9e#9", Less);
 
-    test_phi_prec_round_helper(10, Floor, "1.617", "0x1.9e0#10", Less);
-    test_phi_prec_round_helper(10, Ceiling, "1.619", "0x1.9e8#10", Greater);
-    test_phi_prec_round_helper(10, Down, "1.617", "0x1.9e0#10", Less);
-    test_phi_prec_round_helper(10, Up, "1.619", "0x1.9e8#10", Greater);
-    test_phi_prec_round_helper(10, Nearest, "1.617", "0x1.9e0#10", Less);
+    test_phi_prec_round_helper(10, Floor, "1.6172", "0x1.9e0#10", Less);
+    test_phi_prec_round_helper(10, Ceiling, "1.6191", "0x1.9e8#10", Greater);
+    test_phi_prec_round_helper(10, Down, "1.6172", "0x1.9e0#10", Less);
+    test_phi_prec_round_helper(10, Up, "1.6191", "0x1.9e8#10", Greater);
+    test_phi_prec_round_helper(10, Nearest, "1.6172", "0x1.9e0#10", Less);
 
     test_phi_prec_round_helper(
         100,
         Floor,
-        "1.618033988749894848204586834364",
+        "1.6180339887498948482045868343642",
         "0x1.9e3779b97f4a7c15f39cc0604#100",
         Less,
     );
     test_phi_prec_round_helper(
         100,
         Ceiling,
-        "1.618033988749894848204586834366",
+        "1.6180339887498948482045868343658",
         "0x1.9e3779b97f4a7c15f39cc0606#100",
         Greater,
     );
     test_phi_prec_round_helper(
         100,
         Down,
-        "1.618033988749894848204586834364",
+        "1.6180339887498948482045868343642",
         "0x1.9e3779b97f4a7c15f39cc0604#100",
         Less,
     );
     test_phi_prec_round_helper(
         100,
         Up,
-        "1.618033988749894848204586834366",
+        "1.6180339887498948482045868343658",
         "0x1.9e3779b97f4a7c15f39cc0606#100",
         Greater,
     );
     test_phi_prec_round_helper(
         100,
         Nearest,
-        "1.618033988749894848204586834366",
+        "1.6180339887498948482045868343658",
         "0x1.9e3779b97f4a7c15f39cc0606#100",
         Greater,
     );

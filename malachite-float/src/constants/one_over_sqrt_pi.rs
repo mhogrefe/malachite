@@ -55,14 +55,14 @@ impl Float {
     /// let (one_over_sqrt_pi, o) = Float::one_over_sqrt_pi_prec_round(100, Floor);
     /// assert_eq!(
     ///     one_over_sqrt_pi.to_string(),
-    ///     "0.56418958354775628694807945156"
+    ///     "0.56418958354775628694807945156018"
     /// );
     /// assert_eq!(o, Less);
     ///
     /// let (one_over_sqrt_pi, o) = Float::one_over_sqrt_pi_prec_round(100, Ceiling);
     /// assert_eq!(
     ///     one_over_sqrt_pi.to_string(),
-    ///     "0.564189583547756286948079451561"
+    ///     "0.56418958354775628694807945156097"
     /// );
     /// assert_eq!(o, Greater);
     /// ```
@@ -114,17 +114,17 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (one_over_sqrt_pi, o) = Float::one_over_sqrt_pi_prec(1);
-    /// assert_eq!(one_over_sqrt_pi.to_string(), "0.5");
+    /// assert_eq!(one_over_sqrt_pi.to_string(), "0.50");
     /// assert_eq!(o, Less);
     ///
     /// let (one_over_sqrt_pi, o) = Float::one_over_sqrt_pi_prec(10);
-    /// assert_eq!(one_over_sqrt_pi.to_string(), "0.564");
+    /// assert_eq!(one_over_sqrt_pi.to_string(), "0.56445");
     /// assert_eq!(o, Greater);
     ///
     /// let (one_over_sqrt_pi, o) = Float::one_over_sqrt_pi_prec(100);
     /// assert_eq!(
     ///     one_over_sqrt_pi.to_string(),
-    ///     "0.564189583547756286948079451561"
+    ///     "0.56418958354775628694807945156097"
     /// );
     /// assert_eq!(o, Greater);
     /// ```

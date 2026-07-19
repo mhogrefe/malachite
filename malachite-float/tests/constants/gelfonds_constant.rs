@@ -27,19 +27,19 @@ fn test_gelfonds_constant_prec_helper(prec: u64, out: &str, out_hex: &str, out_o
 
 #[test]
 pub fn test_gelfonds_constant_prec() {
-    test_gelfonds_constant_prec_helper(1, "2.0e1", "0x1.0E+1#1", Less);
+    test_gelfonds_constant_prec_helper(1, "16.0", "0x1.0E+1#1", Less);
     test_gelfonds_constant_prec_helper(2, "24.0", "0x18.0#2", Greater);
     test_gelfonds_constant_prec_helper(3, "24.0", "0x18.0#3", Greater);
     test_gelfonds_constant_prec_helper(4, "24.0", "0x18.0#4", Greater);
     test_gelfonds_constant_prec_helper(5, "23.0", "0x17.0#5", Less);
     test_gelfonds_constant_prec_helper(6, "23.0", "0x17.0#6", Less);
-    test_gelfonds_constant_prec_helper(7, "23.2", "0x17.4#7", Greater);
-    test_gelfonds_constant_prec_helper(8, "23.1", "0x17.2#8", Less);
+    test_gelfonds_constant_prec_helper(7, "23.25", "0x17.4#7", Greater);
+    test_gelfonds_constant_prec_helper(8, "23.12", "0x17.2#8", Less);
     test_gelfonds_constant_prec_helper(9, "23.12", "0x17.2#9", Less);
-    test_gelfonds_constant_prec_helper(10, "23.16", "0x17.28#10", Greater);
+    test_gelfonds_constant_prec_helper(10, "23.156", "0x17.28#10", Greater);
     test_gelfonds_constant_prec_helper(
         100,
-        "23.14069263277926900572908636794",
+        "23.140692632779269005729086367940",
         "0x17.24046eb093399ecda7489f9a#100",
         Less,
     );
@@ -49,7 +49,7 @@ pub fn test_gelfonds_constant_prec() {
         "23.14069263277926900572908636794854738026610624260021199344504640952434235069045278351697\
         199706754921967595270480108777314442804441469383584471744587960984936532796586366924223026\
         899101374176468440141039518386847724306805958816244984449143096677841367163196341478403821\
-        6511287637731470347353833162821293",
+        65112876377314703473538331628212929",
         "0x17.24046eb093399ecda7489f9ab7694d31fa196e922e92d71525f22b5462101f2fe65329dc0ccb33897389\
         efc492a27b2eedcb7d6314ad6a048f425828bd1354252136801ace3c0ddbb994283d926f3977fc1fc4e78d00a0\
         165822f8d6e69023e5f27556f1494741bfa2bf486b3c701cbfa86ff2bc1915b9f352ec67d80#1000",
@@ -90,7 +90,7 @@ pub fn test_gelfonds_constant_prec() {
         173683530989088617875705535009819023338259998045572785243439927128330568736470863977189362\
         176010012417529770566414179217936485567739690856358946541734849076896992356866164051822488\
         460309479056959102249586601201144560501387093048909238411447236603895750763668801624092787\
-        4382373744814916650614964417835499690440579",
+        43823737448149166506149644178354996904405785",
         "0x17.24046eb093399ecda7489f9ab7694d31fa196e922e92d71525f22b5462101f2fe65329dc0ccb33897389\
         efc492a27b2eedcb7d6314ad6a048f425828bd1354252136801ace3c0ddbb994283d926f3977fc1fc4e78d00a0\
         165822f8d6e69023e5f27556f1494741bfa2bf486b3c701cbfa86ff2bc1915b9f352ec67d80bf0790ed02d09ff\
@@ -122,12 +122,12 @@ pub fn test_gelfonds_constant_prec() {
         Greater,
     );
     let gelfonds_constant_f32 = Float::gelfonds_constant_prec(u64::from(f32::MANTISSA_DIGITS)).0;
-    assert_eq!(gelfonds_constant_f32.to_string(), "23.140692");
+    assert_eq!(gelfonds_constant_f32.to_string(), "23.1406918");
     assert_eq!(to_hex_string(&gelfonds_constant_f32), "0x17.24046#24");
     assert_eq!(gelfonds_constant_f32, f32::GELFONDS_CONSTANT);
 
     let gelfonds_constant_f64 = Float::gelfonds_constant_prec(u64::from(f64::MANTISSA_DIGITS)).0;
-    assert_eq!(gelfonds_constant_f64.to_string(), "23.14069263277927");
+    assert_eq!(gelfonds_constant_f64.to_string(), "23.140692632779270");
     assert_eq!(
         to_hex_string(&gelfonds_constant_f64),
         "0x17.24046eb0933a#53"
@@ -157,11 +157,11 @@ fn test_gelfonds_constant_prec_round_helper(
 
 #[test]
 pub fn test_gelfonds_constant_prec_round() {
-    test_gelfonds_constant_prec_round_helper(1, Floor, "2.0e1", "0x1.0E+1#1", Less);
-    test_gelfonds_constant_prec_round_helper(1, Ceiling, "3.0e1", "0x2.0E+1#1", Greater);
-    test_gelfonds_constant_prec_round_helper(1, Down, "2.0e1", "0x1.0E+1#1", Less);
-    test_gelfonds_constant_prec_round_helper(1, Up, "3.0e1", "0x2.0E+1#1", Greater);
-    test_gelfonds_constant_prec_round_helper(1, Nearest, "2.0e1", "0x1.0E+1#1", Less);
+    test_gelfonds_constant_prec_round_helper(1, Floor, "16.0", "0x1.0E+1#1", Less);
+    test_gelfonds_constant_prec_round_helper(1, Ceiling, "32.0", "0x2.0E+1#1", Greater);
+    test_gelfonds_constant_prec_round_helper(1, Down, "16.0", "0x1.0E+1#1", Less);
+    test_gelfonds_constant_prec_round_helper(1, Up, "32.0", "0x2.0E+1#1", Greater);
+    test_gelfonds_constant_prec_round_helper(1, Nearest, "16.0", "0x1.0E+1#1", Less);
 
     test_gelfonds_constant_prec_round_helper(2, Floor, "16.0", "0x10.0#2", Less);
     test_gelfonds_constant_prec_round_helper(2, Ceiling, "24.0", "0x18.0#2", Greater);
@@ -193,17 +193,17 @@ pub fn test_gelfonds_constant_prec_round() {
     test_gelfonds_constant_prec_round_helper(6, Up, "23.5", "0x17.8#6", Greater);
     test_gelfonds_constant_prec_round_helper(6, Nearest, "23.0", "0x17.0#6", Less);
 
-    test_gelfonds_constant_prec_round_helper(7, Floor, "23.0", "0x17.0#7", Less);
-    test_gelfonds_constant_prec_round_helper(7, Ceiling, "23.2", "0x17.4#7", Greater);
-    test_gelfonds_constant_prec_round_helper(7, Down, "23.0", "0x17.0#7", Less);
-    test_gelfonds_constant_prec_round_helper(7, Up, "23.2", "0x17.4#7", Greater);
-    test_gelfonds_constant_prec_round_helper(7, Nearest, "23.2", "0x17.4#7", Greater);
+    test_gelfonds_constant_prec_round_helper(7, Floor, "23.00", "0x17.0#7", Less);
+    test_gelfonds_constant_prec_round_helper(7, Ceiling, "23.25", "0x17.4#7", Greater);
+    test_gelfonds_constant_prec_round_helper(7, Down, "23.00", "0x17.0#7", Less);
+    test_gelfonds_constant_prec_round_helper(7, Up, "23.25", "0x17.4#7", Greater);
+    test_gelfonds_constant_prec_round_helper(7, Nearest, "23.25", "0x17.4#7", Greater);
 
-    test_gelfonds_constant_prec_round_helper(8, Floor, "23.1", "0x17.2#8", Less);
-    test_gelfonds_constant_prec_round_helper(8, Ceiling, "23.2", "0x17.4#8", Greater);
-    test_gelfonds_constant_prec_round_helper(8, Down, "23.1", "0x17.2#8", Less);
-    test_gelfonds_constant_prec_round_helper(8, Up, "23.2", "0x17.4#8", Greater);
-    test_gelfonds_constant_prec_round_helper(8, Nearest, "23.1", "0x17.2#8", Less);
+    test_gelfonds_constant_prec_round_helper(8, Floor, "23.12", "0x17.2#8", Less);
+    test_gelfonds_constant_prec_round_helper(8, Ceiling, "23.25", "0x17.4#8", Greater);
+    test_gelfonds_constant_prec_round_helper(8, Down, "23.12", "0x17.2#8", Less);
+    test_gelfonds_constant_prec_round_helper(8, Up, "23.25", "0x17.4#8", Greater);
+    test_gelfonds_constant_prec_round_helper(8, Nearest, "23.12", "0x17.2#8", Less);
 
     test_gelfonds_constant_prec_round_helper(9, Floor, "23.12", "0x17.2#9", Less);
     test_gelfonds_constant_prec_round_helper(9, Ceiling, "23.19", "0x17.3#9", Greater);
@@ -211,44 +211,44 @@ pub fn test_gelfonds_constant_prec_round() {
     test_gelfonds_constant_prec_round_helper(9, Up, "23.19", "0x17.3#9", Greater);
     test_gelfonds_constant_prec_round_helper(9, Nearest, "23.12", "0x17.2#9", Less);
 
-    test_gelfonds_constant_prec_round_helper(10, Floor, "23.12", "0x17.20#10", Less);
-    test_gelfonds_constant_prec_round_helper(10, Ceiling, "23.16", "0x17.28#10", Greater);
-    test_gelfonds_constant_prec_round_helper(10, Down, "23.12", "0x17.20#10", Less);
-    test_gelfonds_constant_prec_round_helper(10, Up, "23.16", "0x17.28#10", Greater);
-    test_gelfonds_constant_prec_round_helper(10, Nearest, "23.16", "0x17.28#10", Greater);
+    test_gelfonds_constant_prec_round_helper(10, Floor, "23.125", "0x17.20#10", Less);
+    test_gelfonds_constant_prec_round_helper(10, Ceiling, "23.156", "0x17.28#10", Greater);
+    test_gelfonds_constant_prec_round_helper(10, Down, "23.125", "0x17.20#10", Less);
+    test_gelfonds_constant_prec_round_helper(10, Up, "23.156", "0x17.28#10", Greater);
+    test_gelfonds_constant_prec_round_helper(10, Nearest, "23.156", "0x17.28#10", Greater);
 
     test_gelfonds_constant_prec_round_helper(
         100,
         Floor,
-        "23.14069263277926900572908636794",
+        "23.140692632779269005729086367940",
         "0x17.24046eb093399ecda7489f9a#100",
         Less,
     );
     test_gelfonds_constant_prec_round_helper(
         100,
         Ceiling,
-        "23.14069263277926900572908636796",
+        "23.140692632779269005729086367965",
         "0x17.24046eb093399ecda7489f9c#100",
         Greater,
     );
     test_gelfonds_constant_prec_round_helper(
         100,
         Down,
-        "23.14069263277926900572908636794",
+        "23.140692632779269005729086367940",
         "0x17.24046eb093399ecda7489f9a#100",
         Less,
     );
     test_gelfonds_constant_prec_round_helper(
         100,
         Up,
-        "23.14069263277926900572908636796",
+        "23.140692632779269005729086367965",
         "0x17.24046eb093399ecda7489f9c#100",
         Greater,
     );
     test_gelfonds_constant_prec_round_helper(
         100,
         Nearest,
-        "23.14069263277926900572908636794",
+        "23.140692632779269005729086367940",
         "0x17.24046eb093399ecda7489f9a#100",
         Less,
     );

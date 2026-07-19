@@ -44,11 +44,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (e, o) = Float::e_prec_round(100, Floor);
-    /// assert_eq!(e.to_string(), "2.718281828459045235360287471351");
+    /// assert_eq!(e.to_string(), "2.7182818284590452353602874713512");
     /// assert_eq!(o, Less);
     ///
     /// let (e, o) = Float::e_prec_round(100, Ceiling);
-    /// assert_eq!(e.to_string(), "2.718281828459045235360287471354");
+    /// assert_eq!(e.to_string(), "2.7182818284590452353602874713544");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -90,11 +90,11 @@ impl Float {
     /// assert_eq!(o, Less);
     ///
     /// let (e, o) = Float::e_prec(10);
-    /// assert_eq!(e.to_string(), "2.719");
+    /// assert_eq!(e.to_string(), "2.7188");
     /// assert_eq!(o, Greater);
     ///
     /// let (e, o) = Float::e_prec(100);
-    /// assert_eq!(e.to_string(), "2.718281828459045235360287471351");
+    /// assert_eq!(e.to_string(), "2.7182818284590452353602874713512");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]

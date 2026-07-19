@@ -62,7 +62,7 @@ fn test_zero() {
 fn test_min_positive_value_prec() {
     let min_positive = Float::MIN_POSITIVE;
     assert!(min_positive.is_valid());
-    assert_eq!(min_positive.to_string(), "too_small");
+    assert_eq!(min_positive.to_string(), "2.4e-323228497");
     assert_eq!(
         format!("{:#x}", ComparableFloatRef(&min_positive)),
         "0x1.0E-268435456#1"
@@ -91,13 +91,13 @@ fn test_min_positive_value_prec() {
             ComparableFloat(min_positive)
         );
     };
-    test(1, "too_small", "0x1.0E-268435456#1");
-    test(2, "too_small", "0x1.0E-268435456#2");
-    test(3, "too_small", "0x1.0E-268435456#3");
-    test(10, "too_small", "0x1.000E-268435456#10");
+    test(1, "2.4e-323228497", "0x1.0E-268435456#1");
+    test(2, "2.4e-323228497", "0x1.0E-268435456#2");
+    test(3, "2.4e-323228497", "0x1.0E-268435456#3");
+    test(10, "2.3826e-323228497", "0x1.000E-268435456#10");
     test(
         100,
-        "too_small",
+        "2.3825649048879510732161697817327e-323228497",
         "0x1.0000000000000000000000000E-268435456#100",
     );
 }
@@ -126,22 +126,22 @@ fn test_abs_is_min_positive_value_properties() {
 
         assert_eq!(x.abs_is_min_positive_value(), out);
     };
-    test("too_small", "0x1.0E-268435456#1", true);
-    test("too_small", "0x1.0E-268435456#2", true);
-    test("too_small", "0x1.0E-268435456#3", true);
-    test("too_small", "0x1.000E-268435456#10", true);
+    test("2.4e-323228497", "0x1.0E-268435456#1", true);
+    test("2.4e-323228497", "0x1.0E-268435456#2", true);
+    test("2.4e-323228497", "0x1.0E-268435456#3", true);
+    test("2.3826e-323228497", "0x1.000E-268435456#10", true);
     test(
-        "too_small",
+        "2.3825649048879510732161697817327e-323228497",
         "0x1.0000000000000000000000000E-268435456#100",
         true,
     );
 
-    test("-too_small", "-0x1.0E-268435456#1", true);
-    test("-too_small", "-0x1.0E-268435456#2", true);
-    test("-too_small", "-0x1.0E-268435456#3", true);
-    test("-too_small", "-0x1.000E-268435456#10", true);
+    test("-2.4e-323228497", "-0x1.0E-268435456#1", true);
+    test("-2.4e-323228497", "-0x1.0E-268435456#2", true);
+    test("-2.4e-323228497", "-0x1.0E-268435456#3", true);
+    test("-2.3826e-323228497", "-0x1.000E-268435456#10", true);
     test(
-        "-too_small",
+        "-2.3825649048879510732161697817327e-323228497",
         "-0x1.0000000000000000000000000E-268435456#100",
         true,
     );
@@ -154,12 +154,12 @@ fn test_abs_is_min_positive_value_properties() {
     test("1.0", "0x1.0#1", false);
     test("-1.0", "-0x1.0#1", false);
 
-    test("too_small", "0x1.8E-268435456#2", false);
-    test("too_small", "0x2.0E-268435456#1", false);
-    test("too_small", "0x1.0E-268435455#1", false);
-    test("-too_small", "-0x1.8E-268435456#2", false);
-    test("-too_small", "-0x2.0E-268435456#1", false);
-    test("-too_small", "-0x1.0E-268435455#1", false);
+    test("3.6e-323228497", "0x1.8E-268435456#2", false);
+    test("4.8e-323228497", "0x2.0E-268435456#1", false);
+    test("3.8e-323228496", "0x1.0E-268435455#1", false);
+    test("-3.6e-323228497", "-0x1.8E-268435456#2", false);
+    test("-4.8e-323228497", "-0x2.0E-268435456#1", false);
+    test("-3.8e-323228496", "-0x1.0E-268435455#1", false);
 }
 
 fn abs_is_min_positive_value_properties_helper(x: Float) {
@@ -190,13 +190,13 @@ fn test_max_finite_value_with_prec() {
         assert_eq!(max_finite.to_string(), out);
         assert_eq!(to_hex_string(&max_finite), out_hex);
     };
-    test(1, "too_big", "0x4.0E+268435455#1");
-    test(2, "too_big", "0x6.0E+268435455#2");
-    test(3, "too_big", "0x7.0E+268435455#3");
-    test(10, "too_big", "0x7.feE+268435455#10");
+    test(1, "1.0e323228496", "0x4.0E+268435455#1");
+    test(2, "1.6e323228496", "0x6.0E+268435455#2");
+    test(3, "1.8e323228496", "0x7.0E+268435455#3");
+    test(10, "2.0965e323228496", "0x7.feE+268435455#10");
     test(
         100,
-        "too_big",
+        "2.0985787164673876924043581168822e323228496",
         "0x7.ffffffffffffffffffffffff8E+268435455#100",
     );
 }
@@ -225,22 +225,22 @@ fn test_abs_is_max_finite_value_with_prec() {
 
         assert_eq!(x.abs_is_max_finite_value_with_prec(), out);
     };
-    test("too_big", "0x4.0E+268435455#1", true);
-    test("too_big", "0x6.0E+268435455#2", true);
-    test("too_big", "0x7.0E+268435455#3", true);
-    test("too_big", "0x7.feE+268435455#10", true);
+    test("1.0e323228496", "0x4.0E+268435455#1", true);
+    test("1.6e323228496", "0x6.0E+268435455#2", true);
+    test("1.8e323228496", "0x7.0E+268435455#3", true);
+    test("2.0965e323228496", "0x7.feE+268435455#10", true);
     test(
-        "too_big",
+        "2.0985787164673876924043581168822e323228496",
         "0x7.ffffffffffffffffffffffff8E+268435455#100",
         true,
     );
 
-    test("-too_big", "-0x4.0E+268435455#1", true);
-    test("-too_big", "-0x6.0E+268435455#2", true);
-    test("-too_big", "-0x7.0E+268435455#3", true);
-    test("-too_big", "-0x7.feE+268435455#10", true);
+    test("-1.0e323228496", "-0x4.0E+268435455#1", true);
+    test("-1.6e323228496", "-0x6.0E+268435455#2", true);
+    test("-1.8e323228496", "-0x7.0E+268435455#3", true);
+    test("-2.0965e323228496", "-0x7.feE+268435455#10", true);
     test(
-        "-too_big",
+        "-2.0985787164673876924043581168822e323228496",
         "-0x7.ffffffffffffffffffffffff8E+268435455#100",
         true,
     );
@@ -253,12 +253,12 @@ fn test_abs_is_max_finite_value_with_prec() {
     test("1.0", "0x1.0#1", false);
     test("-1.0", "-0x1.0#1", false);
 
-    test("too_big", "0x2.0E+268435455#1", false);
-    test("too_big", "0x4.0E+268435455#2", false);
-    test("too_big", "0x4.0E+268435454#2", false);
-    test("-too_big", "-0x2.0E+268435455#1", false);
-    test("-too_big", "-0x4.0E+268435455#2", false);
-    test("-too_big", "-0x4.0E+268435454#2", false);
+    test("5.2e323228495", "0x2.0E+268435455#1", false);
+    test("1.0e323228496", "0x4.0E+268435455#2", false);
+    test("6.6e323228494", "0x4.0E+268435454#2", false);
+    test("-5.2e323228495", "-0x2.0E+268435455#1", false);
+    test("-1.0e323228496", "-0x4.0E+268435455#2", false);
+    test("-6.6e323228494", "-0x4.0E+268435454#2", false);
 }
 
 fn abs_is_max_finite_value_with_prec_properties_helper(x: Float) {
@@ -308,8 +308,8 @@ fn test_one_prec() {
     test(1, "1.0", "0x1.0#1");
     test(2, "1.0", "0x1.0#2");
     test(3, "1.0", "0x1.0#3");
-    test(10, "1.0", "0x1.000#10");
-    test(100, "1.0", "0x1.0000000000000000000000000#100");
+    test(10, "1.0000", "0x1.000#10");
+    test(100, "1.0000000000000000000000000000000", "0x1.0000000000000000000000000#100");
 }
 
 #[test]
@@ -361,8 +361,8 @@ fn test_two_prec() {
     test(1, "2.0", "0x2.0#1");
     test(2, "2.0", "0x2.0#2");
     test(3, "2.0", "0x2.0#3");
-    test(10, "2.0", "0x2.00#10");
-    test(100, "2.0", "0x2.0000000000000000000000000#100");
+    test(10, "2.0000", "0x2.00#10");
+    test(100, "2.0000000000000000000000000000000", "0x2.0000000000000000000000000#100");
 }
 
 #[test]
@@ -417,8 +417,8 @@ fn test_negative_one_prec() {
     test(1, "-1.0", "-0x1.0#1");
     test(2, "-1.0", "-0x1.0#2");
     test(3, "-1.0", "-0x1.0#3");
-    test(10, "-1.0", "-0x1.000#10");
-    test(100, "-1.0", "-0x1.0000000000000000000000000#100");
+    test(10, "-1.0000", "-0x1.000#10");
+    test(100, "-1.0000000000000000000000000000000", "-0x1.0000000000000000000000000#100");
 }
 
 #[test]
@@ -451,7 +451,7 @@ fn test_one_half_prec() {
     let one_half = Float::ONE_HALF;
     assert!(one_half.is_valid());
     assert_eq!(one_half, 0.5);
-    assert_eq!(one_half.to_string(), "0.5");
+    assert_eq!(one_half.to_string(), "0.50");
     assert_eq!(one_half.get_prec(), Some(1));
     assert_eq!(
         ComparableFloatRef(&Float::from(&rug::Float::with_val(1, 0.5))),
@@ -472,11 +472,11 @@ fn test_one_half_prec() {
             ComparableFloat(one_half)
         );
     };
-    test(1, "0.5", "0x0.8#1");
-    test(2, "0.5", "0x0.8#2");
-    test(3, "0.5", "0x0.8#3");
-    test(10, "0.5", "0x0.800#10");
-    test(100, "0.5", "0x0.8000000000000000000000000#100");
+    test(1, "0.50", "0x0.8#1");
+    test(2, "0.50", "0x0.8#2");
+    test(3, "0.50", "0x0.8#3");
+    test(10, "0.50000", "0x0.800#10");
+    test(100, "0.50000000000000000000000000000000", "0x0.8000000000000000000000000#100");
 }
 
 #[test]

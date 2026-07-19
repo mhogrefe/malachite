@@ -44,11 +44,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (phi, o) = Float::phi_prec_round(100, Floor);
-    /// assert_eq!(phi.to_string(), "1.618033988749894848204586834364");
+    /// assert_eq!(phi.to_string(), "1.6180339887498948482045868343642");
     /// assert_eq!(o, Less);
     ///
     /// let (phi, o) = Float::phi_prec_round(100, Ceiling);
-    /// assert_eq!(phi.to_string(), "1.618033988749894848204586834366");
+    /// assert_eq!(phi.to_string(), "1.6180339887498948482045868343658");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -100,11 +100,11 @@ impl Float {
     /// assert_eq!(o, Greater);
     ///
     /// let (phi, o) = Float::phi_prec(10);
-    /// assert_eq!(phi.to_string(), "1.617");
+    /// assert_eq!(phi.to_string(), "1.6172");
     /// assert_eq!(o, Less);
     ///
     /// let (phi, o) = Float::phi_prec(100);
-    /// assert_eq!(phi.to_string(), "1.618033988749894848204586834366");
+    /// assert_eq!(phi.to_string(), "1.6180339887498948482045868343658");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]

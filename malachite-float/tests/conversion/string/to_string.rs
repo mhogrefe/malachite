@@ -6,11 +6,15 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::num::arithmetic::traits::PowerOf2;
+use malachite_base::num::basic::traits::One;
 use malachite_base::strings::{ToDebugString, string_is_subset};
 use malachite_float::ComparableFloatRef;
+use malachite_float::Float;
 use malachite_float::conversion::string::get_str::get_str_ndigits;
 use malachite_float::test_util::common::parse_hex_string;
 use malachite_float::test_util::generators::float_gen;
+use malachite_nz::natural::Natural;
 
 // The number of significant digits in a formatted mantissa: the digits of `s` up to any exponent
 // part, ignoring the sign, the point, and leading zeros (which only position the point).
@@ -54,6 +58,21 @@ pub fn test_to_string() {
     // extreme exponents are no problem for the get_str-based implementation
     test("0x1.0E+250000000#1", "4.6e301029995");
     test("0x1.0E-250000000#1", "2.2e-301029996");
+}
+
+#[test]
+fn test_to_string_high_precision() {
+    // Regression test: printing a `Float` of very high precision computes a power of 10 spanning
+    // hundreds of limbs, which used to panic in nz's `limbs_float_exp` (its squaring scratch was
+    // sized once for the full length, but `limbs_square_to_out_scratch_len` is not monotonic — the
+    // FFT range needs no scratch while the Toom range below it does — so a shorter operand inside
+    // the loop could need more than the full length did).
+    const P: u64 = 100_000;
+    let x = Float::from_natural_prec(Natural::power_of_2(P - 1) + Natural::ONE, P).0;
+    let s = x.to_string();
+    // 2^99999 + 1 has 30103 decimal digits, and is shown with one more significant digit
+    assert!(s.starts_with("499501046507192253972016382165016795490214"));
+    assert_eq!(significant_digit_count(&s), get_str_ndigits(10, P));
 }
 
 #[test]

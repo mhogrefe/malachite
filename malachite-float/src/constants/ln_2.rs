@@ -117,11 +117,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (l2, o) = Float::ln_2_prec_round(100, Floor);
-    /// assert_eq!(l2.to_string(), "0.693147180559945309417232121458");
+    /// assert_eq!(l2.to_string(), "0.69314718055994530941723212145798");
     /// assert_eq!(o, Less);
     ///
     /// let (l2, o) = Float::ln_2_prec_round(100, Ceiling);
-    /// assert_eq!(l2.to_string(), "0.693147180559945309417232121459");
+    /// assert_eq!(l2.to_string(), "0.69314718055994530941723212145877");
     /// assert_eq!(o, Greater);
     /// ```
     ///
@@ -198,15 +198,15 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (l2, o) = Float::ln_2_prec(1);
-    /// assert_eq!(l2.to_string(), "0.5");
+    /// assert_eq!(l2.to_string(), "0.50");
     /// assert_eq!(o, Less);
     ///
     /// let (l2, o) = Float::ln_2_prec(10);
-    /// assert_eq!(l2.to_string(), "0.693");
+    /// assert_eq!(l2.to_string(), "0.69336");
     /// assert_eq!(o, Greater);
     ///
     /// let (l2, o) = Float::ln_2_prec(100);
-    /// assert_eq!(l2.to_string(), "0.693147180559945309417232121458");
+    /// assert_eq!(l2.to_string(), "0.69314718055994530941723212145798");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]

@@ -43,11 +43,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (sqrt_3, o) = Float::sqrt_3_prec_round(100, Floor);
-    /// assert_eq!(sqrt_3.to_string(), "1.732050807568877293527446341505");
+    /// assert_eq!(sqrt_3.to_string(), "1.7320508075688772935274463415047");
     /// assert_eq!(o, Less);
     ///
     /// let (sqrt_3, o) = Float::sqrt_3_prec_round(100, Ceiling);
-    /// assert_eq!(sqrt_3.to_string(), "1.732050807568877293527446341506");
+    /// assert_eq!(sqrt_3.to_string(), "1.7320508075688772935274463415062");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -89,11 +89,11 @@ impl Float {
     /// assert_eq!(o, Greater);
     ///
     /// let (sqrt_3, o) = Float::sqrt_3_prec(10);
-    /// assert_eq!(sqrt_3.to_string(), "1.732");
+    /// assert_eq!(sqrt_3.to_string(), "1.7324");
     /// assert_eq!(o, Greater);
     ///
     /// let (sqrt_3, o) = Float::sqrt_3_prec(100);
-    /// assert_eq!(sqrt_3.to_string(), "1.732050807568877293527446341506");
+    /// assert_eq!(sqrt_3.to_string(), "1.7320508075688772935274463415062");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]

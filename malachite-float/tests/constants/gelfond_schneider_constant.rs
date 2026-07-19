@@ -35,16 +35,16 @@ pub fn test_gelfond_schneider_constant_prec() {
     test_gelfond_schneider_constant_prec_helper(1, "2.0", "0x2.0#1", Less);
     test_gelfond_schneider_constant_prec_helper(2, "3.0", "0x3.0#2", Greater);
     test_gelfond_schneider_constant_prec_helper(3, "2.5", "0x2.8#3", Less);
-    test_gelfond_schneider_constant_prec_helper(4, "2.8", "0x2.c#4", Greater);
-    test_gelfond_schneider_constant_prec_helper(5, "2.6", "0x2.a#5", Less);
-    test_gelfond_schneider_constant_prec_helper(6, "2.7", "0x2.b#6", Greater);
-    test_gelfond_schneider_constant_prec_helper(7, "2.66", "0x2.a8#7", Less);
-    test_gelfond_schneider_constant_prec_helper(8, "2.67", "0x2.ac#8", Greater);
+    test_gelfond_schneider_constant_prec_helper(4, "2.75", "0x2.c#4", Greater);
+    test_gelfond_schneider_constant_prec_helper(5, "2.62", "0x2.a#5", Less);
+    test_gelfond_schneider_constant_prec_helper(6, "2.69", "0x2.b#6", Greater);
+    test_gelfond_schneider_constant_prec_helper(7, "2.656", "0x2.a8#7", Less);
+    test_gelfond_schneider_constant_prec_helper(8, "2.672", "0x2.ac#8", Greater);
     test_gelfond_schneider_constant_prec_helper(9, "2.664", "0x2.aa#9", Less);
-    test_gelfond_schneider_constant_prec_helper(10, "2.664", "0x2.aa#10", Less);
+    test_gelfond_schneider_constant_prec_helper(10, "2.6641", "0x2.aa#10", Less);
     test_gelfond_schneider_constant_prec_helper(
         100,
-        "2.665144142690225188650297249873",
+        "2.6651441426902251886502972498731",
         "0x2.aa46e2f3fb0062e316c62ede4#100",
         Less,
     );
@@ -54,7 +54,7 @@ pub fn test_gelfond_schneider_constant_prec() {
         "2.665144142690225188650297249873139848274211313714659492835979593364920446178705954867609\
         180005196416941989363854235387514674242031438367407818698505487574895083114783962858356183\
         608346126643179409148910053401437395034287083311904527116973731595652905657632845729798177\
-        4346372848330862819349528549927586",
+        43463728483308628193495285499275856",
         "0x2.aa46e2f3fb0062e316c62ede41c824f90d2439ed0d4d1f3bc1f20e16c27a0fe0f243a95fd8c2c8976f7af\
         38db43c1da1f0ae28e55701957848fdaaa8eced4490c6f84e85a2b9cea35c975e9dff6efb8d2da9c7926b2e46b\
         f27a37ca31c29f35e379fada862412a3968fe0be25b46a6960039190f4f55ecdd032e397f2c#1000",
@@ -95,7 +95,7 @@ pub fn test_gelfond_schneider_constant_prec() {
         379592781567978115618427429933119768525048215239797968385305159653918996029776743888940900\
         151965975676591186311513433856455412091544630404911484375984677352083125576901150199053369\
         483012445999873563341879637702935455372122165063961654450644062817413229749577671271071361\
-        0362169044765425272448854657623575370736925",
+        03621690447654252724488546576235753707369249",
         "0x2.aa46e2f3fb0062e316c62ede41c824f90d2439ed0d4d1f3bc1f20e16c27a0fe0f243a95fd8c2c8976f7af\
         38db43c1da1f0ae28e55701957848fdaaa8eced4490c6f84e85a2b9cea35c975e9dff6efb8d2da9c7926b2e46b\
         f27a37ca31c29f35e379fada862412a3968fe0be25b46a6960039190f4f55ecdd032e397f2a016e1508077a1d3\
@@ -127,7 +127,7 @@ pub fn test_gelfond_schneider_constant_prec() {
         Greater,
     );
     let gs_f32 = Float::gelfond_schneider_constant_prec(u64::from(f32::MANTISSA_DIGITS)).0;
-    assert_eq!(gs_f32.to_string(), "2.6651442");
+    assert_eq!(gs_f32.to_string(), "2.66514421");
     assert_eq!(to_hex_string(&gs_f32), "0x2.aa46e4#24");
     assert_eq!(gs_f32, f32::GELFOND_SCHNEIDER_CONSTANT);
 
@@ -177,80 +177,80 @@ pub fn test_gelfond_schneider_constant_prec_round() {
     test_gelfond_schneider_constant_prec_round_helper(3, Up, "3.0", "0x3.0#3", Greater);
     test_gelfond_schneider_constant_prec_round_helper(3, Nearest, "2.5", "0x2.8#3", Less);
 
-    test_gelfond_schneider_constant_prec_round_helper(4, Floor, "2.5", "0x2.8#4", Less);
-    test_gelfond_schneider_constant_prec_round_helper(4, Ceiling, "2.8", "0x2.c#4", Greater);
-    test_gelfond_schneider_constant_prec_round_helper(4, Down, "2.5", "0x2.8#4", Less);
-    test_gelfond_schneider_constant_prec_round_helper(4, Up, "2.8", "0x2.c#4", Greater);
-    test_gelfond_schneider_constant_prec_round_helper(4, Nearest, "2.8", "0x2.c#4", Greater);
+    test_gelfond_schneider_constant_prec_round_helper(4, Floor, "2.50", "0x2.8#4", Less);
+    test_gelfond_schneider_constant_prec_round_helper(4, Ceiling, "2.75", "0x2.c#4", Greater);
+    test_gelfond_schneider_constant_prec_round_helper(4, Down, "2.50", "0x2.8#4", Less);
+    test_gelfond_schneider_constant_prec_round_helper(4, Up, "2.75", "0x2.c#4", Greater);
+    test_gelfond_schneider_constant_prec_round_helper(4, Nearest, "2.75", "0x2.c#4", Greater);
 
-    test_gelfond_schneider_constant_prec_round_helper(5, Floor, "2.6", "0x2.a#5", Less);
-    test_gelfond_schneider_constant_prec_round_helper(5, Ceiling, "2.8", "0x2.c#5", Greater);
-    test_gelfond_schneider_constant_prec_round_helper(5, Down, "2.6", "0x2.a#5", Less);
-    test_gelfond_schneider_constant_prec_round_helper(5, Up, "2.8", "0x2.c#5", Greater);
-    test_gelfond_schneider_constant_prec_round_helper(5, Nearest, "2.6", "0x2.a#5", Less);
+    test_gelfond_schneider_constant_prec_round_helper(5, Floor, "2.62", "0x2.a#5", Less);
+    test_gelfond_schneider_constant_prec_round_helper(5, Ceiling, "2.75", "0x2.c#5", Greater);
+    test_gelfond_schneider_constant_prec_round_helper(5, Down, "2.62", "0x2.a#5", Less);
+    test_gelfond_schneider_constant_prec_round_helper(5, Up, "2.75", "0x2.c#5", Greater);
+    test_gelfond_schneider_constant_prec_round_helper(5, Nearest, "2.62", "0x2.a#5", Less);
 
     test_gelfond_schneider_constant_prec_round_helper(6, Floor, "2.62", "0x2.a#6", Less);
-    test_gelfond_schneider_constant_prec_round_helper(6, Ceiling, "2.7", "0x2.b#6", Greater);
+    test_gelfond_schneider_constant_prec_round_helper(6, Ceiling, "2.69", "0x2.b#6", Greater);
     test_gelfond_schneider_constant_prec_round_helper(6, Down, "2.62", "0x2.a#6", Less);
-    test_gelfond_schneider_constant_prec_round_helper(6, Up, "2.7", "0x2.b#6", Greater);
-    test_gelfond_schneider_constant_prec_round_helper(6, Nearest, "2.7", "0x2.b#6", Greater);
+    test_gelfond_schneider_constant_prec_round_helper(6, Up, "2.69", "0x2.b#6", Greater);
+    test_gelfond_schneider_constant_prec_round_helper(6, Nearest, "2.69", "0x2.b#6", Greater);
 
-    test_gelfond_schneider_constant_prec_round_helper(7, Floor, "2.66", "0x2.a8#7", Less);
-    test_gelfond_schneider_constant_prec_round_helper(7, Ceiling, "2.69", "0x2.b0#7", Greater);
-    test_gelfond_schneider_constant_prec_round_helper(7, Down, "2.66", "0x2.a8#7", Less);
-    test_gelfond_schneider_constant_prec_round_helper(7, Up, "2.69", "0x2.b0#7", Greater);
-    test_gelfond_schneider_constant_prec_round_helper(7, Nearest, "2.66", "0x2.a8#7", Less);
+    test_gelfond_schneider_constant_prec_round_helper(7, Floor, "2.656", "0x2.a8#7", Less);
+    test_gelfond_schneider_constant_prec_round_helper(7, Ceiling, "2.688", "0x2.b0#7", Greater);
+    test_gelfond_schneider_constant_prec_round_helper(7, Down, "2.656", "0x2.a8#7", Less);
+    test_gelfond_schneider_constant_prec_round_helper(7, Up, "2.688", "0x2.b0#7", Greater);
+    test_gelfond_schneider_constant_prec_round_helper(7, Nearest, "2.656", "0x2.a8#7", Less);
 
-    test_gelfond_schneider_constant_prec_round_helper(8, Floor, "2.66", "0x2.a8#8", Less);
-    test_gelfond_schneider_constant_prec_round_helper(8, Ceiling, "2.67", "0x2.ac#8", Greater);
-    test_gelfond_schneider_constant_prec_round_helper(8, Down, "2.66", "0x2.a8#8", Less);
-    test_gelfond_schneider_constant_prec_round_helper(8, Up, "2.67", "0x2.ac#8", Greater);
-    test_gelfond_schneider_constant_prec_round_helper(8, Nearest, "2.67", "0x2.ac#8", Greater);
+    test_gelfond_schneider_constant_prec_round_helper(8, Floor, "2.656", "0x2.a8#8", Less);
+    test_gelfond_schneider_constant_prec_round_helper(8, Ceiling, "2.672", "0x2.ac#8", Greater);
+    test_gelfond_schneider_constant_prec_round_helper(8, Down, "2.656", "0x2.a8#8", Less);
+    test_gelfond_schneider_constant_prec_round_helper(8, Up, "2.672", "0x2.ac#8", Greater);
+    test_gelfond_schneider_constant_prec_round_helper(8, Nearest, "2.672", "0x2.ac#8", Greater);
 
     test_gelfond_schneider_constant_prec_round_helper(9, Floor, "2.664", "0x2.aa#9", Less);
-    test_gelfond_schneider_constant_prec_round_helper(9, Ceiling, "2.67", "0x2.ac#9", Greater);
+    test_gelfond_schneider_constant_prec_round_helper(9, Ceiling, "2.672", "0x2.ac#9", Greater);
     test_gelfond_schneider_constant_prec_round_helper(9, Down, "2.664", "0x2.aa#9", Less);
-    test_gelfond_schneider_constant_prec_round_helper(9, Up, "2.67", "0x2.ac#9", Greater);
+    test_gelfond_schneider_constant_prec_round_helper(9, Up, "2.672", "0x2.ac#9", Greater);
     test_gelfond_schneider_constant_prec_round_helper(9, Nearest, "2.664", "0x2.aa#9", Less);
 
-    test_gelfond_schneider_constant_prec_round_helper(10, Floor, "2.664", "0x2.aa#10", Less);
-    test_gelfond_schneider_constant_prec_round_helper(10, Ceiling, "2.668", "0x2.ab#10", Greater);
-    test_gelfond_schneider_constant_prec_round_helper(10, Down, "2.664", "0x2.aa#10", Less);
-    test_gelfond_schneider_constant_prec_round_helper(10, Up, "2.668", "0x2.ab#10", Greater);
-    test_gelfond_schneider_constant_prec_round_helper(10, Nearest, "2.664", "0x2.aa#10", Less);
+    test_gelfond_schneider_constant_prec_round_helper(10, Floor, "2.6641", "0x2.aa#10", Less);
+    test_gelfond_schneider_constant_prec_round_helper(10, Ceiling, "2.6680", "0x2.ab#10", Greater);
+    test_gelfond_schneider_constant_prec_round_helper(10, Down, "2.6641", "0x2.aa#10", Less);
+    test_gelfond_schneider_constant_prec_round_helper(10, Up, "2.6680", "0x2.ab#10", Greater);
+    test_gelfond_schneider_constant_prec_round_helper(10, Nearest, "2.6641", "0x2.aa#10", Less);
 
     test_gelfond_schneider_constant_prec_round_helper(
         100,
         Floor,
-        "2.665144142690225188650297249873",
+        "2.6651441426902251886502972498731",
         "0x2.aa46e2f3fb0062e316c62ede4#100",
         Less,
     );
     test_gelfond_schneider_constant_prec_round_helper(
         100,
         Ceiling,
-        "2.665144142690225188650297249876",
+        "2.6651441426902251886502972498762",
         "0x2.aa46e2f3fb0062e316c62ede8#100",
         Greater,
     );
     test_gelfond_schneider_constant_prec_round_helper(
         100,
         Down,
-        "2.665144142690225188650297249873",
+        "2.6651441426902251886502972498731",
         "0x2.aa46e2f3fb0062e316c62ede4#100",
         Less,
     );
     test_gelfond_schneider_constant_prec_round_helper(
         100,
         Up,
-        "2.665144142690225188650297249876",
+        "2.6651441426902251886502972498762",
         "0x2.aa46e2f3fb0062e316c62ede8#100",
         Greater,
     );
     test_gelfond_schneider_constant_prec_round_helper(
         100,
         Nearest,
-        "2.665144142690225188650297249873",
+        "2.6651441426902251886502972498731",
         "0x2.aa46e2f3fb0062e316c62ede4#100",
         Less,
     );

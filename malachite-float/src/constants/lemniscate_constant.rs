@@ -55,14 +55,14 @@ impl Float {
     /// let (lemniscate_constant, o) = Float::lemniscate_constant_prec_round(100, Floor);
     /// assert_eq!(
     ///     lemniscate_constant.to_string(),
-    ///     "2.62205755429211981046483958989"
+    ///     "2.6220575542921198104648395898902"
     /// );
     /// assert_eq!(o, Less);
     ///
     /// let (lemniscate_constant, o) = Float::lemniscate_constant_prec_round(100, Ceiling);
     /// assert_eq!(
     ///     lemniscate_constant.to_string(),
-    ///     "2.622057554292119810464839589893"
+    ///     "2.6220575542921198104648395898934"
     /// );
     /// assert_eq!(o, Greater);
     /// ```
@@ -121,13 +121,13 @@ impl Float {
     /// assert_eq!(o, Less);
     ///
     /// let (lemniscate_constant, o) = Float::lemniscate_constant_prec(10);
-    /// assert_eq!(lemniscate_constant.to_string(), "2.621");
+    /// assert_eq!(lemniscate_constant.to_string(), "2.6211");
     /// assert_eq!(o, Less);
     ///
     /// let (lemniscate_constant, o) = Float::lemniscate_constant_prec(100);
     /// assert_eq!(
     ///     lemniscate_constant.to_string(),
-    ///     "2.62205755429211981046483958989"
+    ///     "2.6220575542921198104648395898902"
     /// );
     /// assert_eq!(o, Less);
     /// ```

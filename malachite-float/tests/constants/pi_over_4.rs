@@ -28,18 +28,18 @@ fn test_pi_over_4_prec_helper(prec: u64, out: &str, out_hex: &str, out_o: Orderi
 #[test]
 pub fn test_pi_over_4_prec() {
     test_pi_over_4_prec_helper(1, "1.0", "0x1.0#1", Greater);
-    test_pi_over_4_prec_helper(2, "0.8", "0x0.c#2", Less);
-    test_pi_over_4_prec_helper(3, "0.8", "0x0.c#3", Less);
-    test_pi_over_4_prec_helper(4, "0.81", "0x0.d#4", Greater);
-    test_pi_over_4_prec_helper(5, "0.78", "0x0.c8#5", Less);
-    test_pi_over_4_prec_helper(6, "0.78", "0x0.c8#6", Less);
-    test_pi_over_4_prec_helper(7, "0.79", "0x0.ca#7", Greater);
-    test_pi_over_4_prec_helper(8, "0.785", "0x0.c9#8", Less);
-    test_pi_over_4_prec_helper(9, "0.785", "0x0.c90#9", Less);
-    test_pi_over_4_prec_helper(10, "0.785", "0x0.c90#10", Less);
+    test_pi_over_4_prec_helper(2, "0.75", "0x0.c#2", Less);
+    test_pi_over_4_prec_helper(3, "0.75", "0x0.c#3", Less);
+    test_pi_over_4_prec_helper(4, "0.812", "0x0.d#4", Greater);
+    test_pi_over_4_prec_helper(5, "0.781", "0x0.c8#5", Less);
+    test_pi_over_4_prec_helper(6, "0.781", "0x0.c8#6", Less);
+    test_pi_over_4_prec_helper(7, "0.7891", "0x0.ca#7", Greater);
+    test_pi_over_4_prec_helper(8, "0.7852", "0x0.c9#8", Less);
+    test_pi_over_4_prec_helper(9, "0.7852", "0x0.c90#9", Less);
+    test_pi_over_4_prec_helper(10, "0.78516", "0x0.c90#10", Less);
     test_pi_over_4_prec_helper(
         100,
-        "0.78539816339744830961566084582",
+        "0.78539816339744830961566084581983",
         "0x0.c90fdaa22168c234c4c6628b8#100",
         Less,
     );
@@ -48,7 +48,7 @@ pub fn test_pi_over_4_prec() {
         "0.785398163397448309615660845819875721049292349843776455243736148076954101571552249657008\
         706335529266995537021628320576661773461152387645557931339852032120279362571025675484630276\
         389911155737238732595491107202743916483361532118912058446695791317800477286412141730865087\
-        1526135816620533484018150622853184",
+        152613581662053348401815062285318400",
         "0x0.c90fdaa22168c234c4c6628b80dc1cd129024e088a67cc74020bbea63b139b22514a08798e3404ddef951\
         9b3cd3a431b302b0a6df25f14374fe1356d6d51c245e485b576625e7ec6f44c42e9a637ed6b0bff5cb6f406b7e\
         dee386bfb5a899fa5ae9f24117c4b1fe649286651ece45b3dc2007cb8a163bf0598da48361c#1000",
@@ -89,7 +89,7 @@ pub fn test_pi_over_4_prec() {
         591135714611198816466955262785338683934880778356791525533992384057860738121234296777536441\
         350897569983600935501827644634765549596861952119622420830361428467187985876607554613297762\
         120251342653670168729819547799484988015354915857188610160936280929548044999597753979890453\
-        66878567280993723522679662355799039198630201",
+        668785672809937235226796623557990391986302008",
         "0x0.c90fdaa22168c234c4c6628b80dc1cd129024e088a67cc74020bbea63b139b22514a08798e3404ddef951\
         9b3cd3a431b302b0a6df25f14374fe1356d6d51c245e485b576625e7ec6f44c42e9a637ed6b0bff5cb6f406b7e\
         dee386bfb5a899fa5ae9f24117c4b1fe649286651ece45b3dc2007cb8a163bf0598da48361c55d39a69163fa8f\
@@ -122,12 +122,12 @@ pub fn test_pi_over_4_prec() {
     );
 
     let pi_over_4_f32 = Float::pi_over_4_prec(u64::from(f32::MANTISSA_DIGITS)).0;
-    assert_eq!(pi_over_4_f32.to_string(), "0.78539819");
+    assert_eq!(pi_over_4_f32.to_string(), "0.785398185");
     assert_eq!(to_hex_string(&pi_over_4_f32), "0x0.c90fdb#24");
     assert_eq!(pi_over_4_f32, f32::PI_OVER_4);
 
     let pi_over_4_f64 = Float::pi_over_4_prec(u64::from(f64::MANTISSA_DIGITS)).0;
-    assert_eq!(pi_over_4_f64.to_string(), "0.7853981633974483");
+    assert_eq!(pi_over_4_f64.to_string(), "0.78539816339744828");
     assert_eq!(to_hex_string(&pi_over_4_f64), "0x0.c90fdaa22168c0#53");
     assert_eq!(pi_over_4_f64, f64::PI_OVER_4);
 }
@@ -154,98 +154,98 @@ fn test_pi_over_4_prec_round_helper(
 
 #[test]
 pub fn test_pi_over_4_prec_round() {
-    test_pi_over_4_prec_round_helper(1, Floor, "0.5", "0x0.8#1", Less);
+    test_pi_over_4_prec_round_helper(1, Floor, "0.50", "0x0.8#1", Less);
     test_pi_over_4_prec_round_helper(1, Ceiling, "1.0", "0x1.0#1", Greater);
-    test_pi_over_4_prec_round_helper(1, Down, "0.5", "0x0.8#1", Less);
+    test_pi_over_4_prec_round_helper(1, Down, "0.50", "0x0.8#1", Less);
     test_pi_over_4_prec_round_helper(1, Up, "1.0", "0x1.0#1", Greater);
     test_pi_over_4_prec_round_helper(1, Nearest, "1.0", "0x1.0#1", Greater);
 
-    test_pi_over_4_prec_round_helper(2, Floor, "0.8", "0x0.c#2", Less);
+    test_pi_over_4_prec_round_helper(2, Floor, "0.75", "0x0.c#2", Less);
     test_pi_over_4_prec_round_helper(2, Ceiling, "1.0", "0x1.0#2", Greater);
-    test_pi_over_4_prec_round_helper(2, Down, "0.8", "0x0.c#2", Less);
+    test_pi_over_4_prec_round_helper(2, Down, "0.75", "0x0.c#2", Less);
     test_pi_over_4_prec_round_helper(2, Up, "1.0", "0x1.0#2", Greater);
-    test_pi_over_4_prec_round_helper(2, Nearest, "0.8", "0x0.c#2", Less);
+    test_pi_over_4_prec_round_helper(2, Nearest, "0.75", "0x0.c#2", Less);
 
-    test_pi_over_4_prec_round_helper(3, Floor, "0.8", "0x0.c#3", Less);
-    test_pi_over_4_prec_round_helper(3, Ceiling, "0.9", "0x0.e#3", Greater);
-    test_pi_over_4_prec_round_helper(3, Down, "0.8", "0x0.c#3", Less);
-    test_pi_over_4_prec_round_helper(3, Up, "0.9", "0x0.e#3", Greater);
-    test_pi_over_4_prec_round_helper(3, Nearest, "0.8", "0x0.c#3", Less);
+    test_pi_over_4_prec_round_helper(3, Floor, "0.75", "0x0.c#3", Less);
+    test_pi_over_4_prec_round_helper(3, Ceiling, "0.88", "0x0.e#3", Greater);
+    test_pi_over_4_prec_round_helper(3, Down, "0.75", "0x0.c#3", Less);
+    test_pi_over_4_prec_round_helper(3, Up, "0.88", "0x0.e#3", Greater);
+    test_pi_over_4_prec_round_helper(3, Nearest, "0.75", "0x0.c#3", Less);
 
-    test_pi_over_4_prec_round_helper(4, Floor, "0.75", "0x0.c#4", Less);
-    test_pi_over_4_prec_round_helper(4, Ceiling, "0.81", "0x0.d#4", Greater);
-    test_pi_over_4_prec_round_helper(4, Down, "0.75", "0x0.c#4", Less);
-    test_pi_over_4_prec_round_helper(4, Up, "0.81", "0x0.d#4", Greater);
-    test_pi_over_4_prec_round_helper(4, Nearest, "0.81", "0x0.d#4", Greater);
+    test_pi_over_4_prec_round_helper(4, Floor, "0.750", "0x0.c#4", Less);
+    test_pi_over_4_prec_round_helper(4, Ceiling, "0.812", "0x0.d#4", Greater);
+    test_pi_over_4_prec_round_helper(4, Down, "0.750", "0x0.c#4", Less);
+    test_pi_over_4_prec_round_helper(4, Up, "0.812", "0x0.d#4", Greater);
+    test_pi_over_4_prec_round_helper(4, Nearest, "0.812", "0x0.d#4", Greater);
 
-    test_pi_over_4_prec_round_helper(5, Floor, "0.78", "0x0.c8#5", Less);
-    test_pi_over_4_prec_round_helper(5, Ceiling, "0.81", "0x0.d0#5", Greater);
-    test_pi_over_4_prec_round_helper(5, Down, "0.78", "0x0.c8#5", Less);
-    test_pi_over_4_prec_round_helper(5, Up, "0.81", "0x0.d0#5", Greater);
-    test_pi_over_4_prec_round_helper(5, Nearest, "0.78", "0x0.c8#5", Less);
+    test_pi_over_4_prec_round_helper(5, Floor, "0.781", "0x0.c8#5", Less);
+    test_pi_over_4_prec_round_helper(5, Ceiling, "0.812", "0x0.d0#5", Greater);
+    test_pi_over_4_prec_round_helper(5, Down, "0.781", "0x0.c8#5", Less);
+    test_pi_over_4_prec_round_helper(5, Up, "0.812", "0x0.d0#5", Greater);
+    test_pi_over_4_prec_round_helper(5, Nearest, "0.781", "0x0.c8#5", Less);
 
-    test_pi_over_4_prec_round_helper(6, Floor, "0.78", "0x0.c8#6", Less);
-    test_pi_over_4_prec_round_helper(6, Ceiling, "0.8", "0x0.cc#6", Greater);
-    test_pi_over_4_prec_round_helper(6, Down, "0.78", "0x0.c8#6", Less);
-    test_pi_over_4_prec_round_helper(6, Up, "0.8", "0x0.cc#6", Greater);
-    test_pi_over_4_prec_round_helper(6, Nearest, "0.78", "0x0.c8#6", Less);
+    test_pi_over_4_prec_round_helper(6, Floor, "0.781", "0x0.c8#6", Less);
+    test_pi_over_4_prec_round_helper(6, Ceiling, "0.797", "0x0.cc#6", Greater);
+    test_pi_over_4_prec_round_helper(6, Down, "0.781", "0x0.c8#6", Less);
+    test_pi_over_4_prec_round_helper(6, Up, "0.797", "0x0.cc#6", Greater);
+    test_pi_over_4_prec_round_helper(6, Nearest, "0.781", "0x0.c8#6", Less);
 
-    test_pi_over_4_prec_round_helper(7, Floor, "0.78", "0x0.c8#7", Less);
-    test_pi_over_4_prec_round_helper(7, Ceiling, "0.79", "0x0.ca#7", Greater);
-    test_pi_over_4_prec_round_helper(7, Down, "0.78", "0x0.c8#7", Less);
-    test_pi_over_4_prec_round_helper(7, Up, "0.79", "0x0.ca#7", Greater);
-    test_pi_over_4_prec_round_helper(7, Nearest, "0.79", "0x0.ca#7", Greater);
+    test_pi_over_4_prec_round_helper(7, Floor, "0.7812", "0x0.c8#7", Less);
+    test_pi_over_4_prec_round_helper(7, Ceiling, "0.7891", "0x0.ca#7", Greater);
+    test_pi_over_4_prec_round_helper(7, Down, "0.7812", "0x0.c8#7", Less);
+    test_pi_over_4_prec_round_helper(7, Up, "0.7891", "0x0.ca#7", Greater);
+    test_pi_over_4_prec_round_helper(7, Nearest, "0.7891", "0x0.ca#7", Greater);
 
-    test_pi_over_4_prec_round_helper(8, Floor, "0.785", "0x0.c9#8", Less);
-    test_pi_over_4_prec_round_helper(8, Ceiling, "0.789", "0x0.ca#8", Greater);
-    test_pi_over_4_prec_round_helper(8, Down, "0.785", "0x0.c9#8", Less);
-    test_pi_over_4_prec_round_helper(8, Up, "0.789", "0x0.ca#8", Greater);
-    test_pi_over_4_prec_round_helper(8, Nearest, "0.785", "0x0.c9#8", Less);
+    test_pi_over_4_prec_round_helper(8, Floor, "0.7852", "0x0.c9#8", Less);
+    test_pi_over_4_prec_round_helper(8, Ceiling, "0.7891", "0x0.ca#8", Greater);
+    test_pi_over_4_prec_round_helper(8, Down, "0.7852", "0x0.c9#8", Less);
+    test_pi_over_4_prec_round_helper(8, Up, "0.7891", "0x0.ca#8", Greater);
+    test_pi_over_4_prec_round_helper(8, Nearest, "0.7852", "0x0.c9#8", Less);
 
-    test_pi_over_4_prec_round_helper(9, Floor, "0.785", "0x0.c90#9", Less);
-    test_pi_over_4_prec_round_helper(9, Ceiling, "0.787", "0x0.c98#9", Greater);
-    test_pi_over_4_prec_round_helper(9, Down, "0.785", "0x0.c90#9", Less);
-    test_pi_over_4_prec_round_helper(9, Up, "0.787", "0x0.c98#9", Greater);
-    test_pi_over_4_prec_round_helper(9, Nearest, "0.785", "0x0.c90#9", Less);
+    test_pi_over_4_prec_round_helper(9, Floor, "0.7852", "0x0.c90#9", Less);
+    test_pi_over_4_prec_round_helper(9, Ceiling, "0.7871", "0x0.c98#9", Greater);
+    test_pi_over_4_prec_round_helper(9, Down, "0.7852", "0x0.c90#9", Less);
+    test_pi_over_4_prec_round_helper(9, Up, "0.7871", "0x0.c98#9", Greater);
+    test_pi_over_4_prec_round_helper(9, Nearest, "0.7852", "0x0.c90#9", Less);
 
-    test_pi_over_4_prec_round_helper(10, Floor, "0.785", "0x0.c90#10", Less);
-    test_pi_over_4_prec_round_helper(10, Ceiling, "0.786", "0x0.c94#10", Greater);
-    test_pi_over_4_prec_round_helper(10, Down, "0.785", "0x0.c90#10", Less);
-    test_pi_over_4_prec_round_helper(10, Up, "0.786", "0x0.c94#10", Greater);
-    test_pi_over_4_prec_round_helper(10, Nearest, "0.785", "0x0.c90#10", Less);
+    test_pi_over_4_prec_round_helper(10, Floor, "0.78516", "0x0.c90#10", Less);
+    test_pi_over_4_prec_round_helper(10, Ceiling, "0.78613", "0x0.c94#10", Greater);
+    test_pi_over_4_prec_round_helper(10, Down, "0.78516", "0x0.c90#10", Less);
+    test_pi_over_4_prec_round_helper(10, Up, "0.78613", "0x0.c94#10", Greater);
+    test_pi_over_4_prec_round_helper(10, Nearest, "0.78516", "0x0.c90#10", Less);
 
     test_pi_over_4_prec_round_helper(
         100,
         Floor,
-        "0.78539816339744830961566084582",
+        "0.78539816339744830961566084581983",
         "0x0.c90fdaa22168c234c4c6628b8#100",
         Less,
     );
     test_pi_over_4_prec_round_helper(
         100,
         Ceiling,
-        "0.7853981633974483096156608458206",
+        "0.78539816339744830961566084582062",
         "0x0.c90fdaa22168c234c4c6628b9#100",
         Greater,
     );
     test_pi_over_4_prec_round_helper(
         100,
         Down,
-        "0.78539816339744830961566084582",
+        "0.78539816339744830961566084581983",
         "0x0.c90fdaa22168c234c4c6628b8#100",
         Less,
     );
     test_pi_over_4_prec_round_helper(
         100,
         Up,
-        "0.7853981633974483096156608458206",
+        "0.78539816339744830961566084582062",
         "0x0.c90fdaa22168c234c4c6628b9#100",
         Greater,
     );
     test_pi_over_4_prec_round_helper(
         100,
         Nearest,
-        "0.78539816339744830961566084582",
+        "0.78539816339744830961566084581983",
         "0x0.c90fdaa22168c234c4c6628b8#100",
         Less,
     );

@@ -37,19 +37,19 @@ fn test_prouhet_thue_morse_constant_prec_helper(
 
 #[test]
 pub fn test_prouhet_thue_morse_constant_prec() {
-    test_prouhet_thue_morse_constant_prec_helper(1, "0.5", "0x0.8#1", Greater);
-    test_prouhet_thue_morse_constant_prec_helper(2, "0.4", "0x0.6#2", Less);
+    test_prouhet_thue_morse_constant_prec_helper(1, "0.50", "0x0.8#1", Greater);
+    test_prouhet_thue_morse_constant_prec_helper(2, "0.38", "0x0.6#2", Less);
     test_prouhet_thue_morse_constant_prec_helper(3, "0.44", "0x0.7#3", Greater);
-    test_prouhet_thue_morse_constant_prec_helper(4, "0.41", "0x0.68#4", Less);
-    test_prouhet_thue_morse_constant_prec_helper(5, "0.41", "0x0.68#5", Less);
+    test_prouhet_thue_morse_constant_prec_helper(4, "0.406", "0x0.68#4", Less);
+    test_prouhet_thue_morse_constant_prec_helper(5, "0.406", "0x0.68#5", Less);
     test_prouhet_thue_morse_constant_prec_helper(6, "0.414", "0x0.6a#6", Greater);
-    test_prouhet_thue_morse_constant_prec_helper(7, "0.414", "0x0.6a#7", Greater);
-    test_prouhet_thue_morse_constant_prec_helper(8, "0.412", "0x0.698#8", Less);
-    test_prouhet_thue_morse_constant_prec_helper(9, "0.412", "0x0.698#9", Less);
-    test_prouhet_thue_morse_constant_prec_helper(10, "0.4126", "0x0.69a#10", Greater);
+    test_prouhet_thue_morse_constant_prec_helper(7, "0.4141", "0x0.6a#7", Greater);
+    test_prouhet_thue_morse_constant_prec_helper(8, "0.4121", "0x0.698#8", Less);
+    test_prouhet_thue_morse_constant_prec_helper(9, "0.4121", "0x0.698#9", Less);
+    test_prouhet_thue_morse_constant_prec_helper(10, "0.41260", "0x0.69a#10", Greater);
     test_prouhet_thue_morse_constant_prec_helper(
         100,
-        "0.4124540336401075977833613682584",
+        "0.41245403364010759778336136825838",
         "0x0.69969669966969969669699668#100",
         Less,
     );
@@ -58,7 +58,7 @@ pub fn test_prouhet_thue_morse_constant_prec() {
         "0.412454033640107597783361368258455283089478374455769557573379415348793592365782588963804\
         540486212133396256366446538137487421617125193606520130996812525914093898811685058241405148\
         794923736837717681632072372543961648455116929274915967121308797839015745939416763942926546\
-        99576354558364476401478446511510844",
+        995763545583644764014784465115108441",
         "0x0.6996966996696996966969966996966996696996699696696996966996696996966969966996966969969\
         669966969966996966996696996966969966996966996696996699696696996966996696996699696699669699\
         6966969966996966969969669966969969669699669969669966969966996966969969669968#1000",
@@ -99,7 +99,7 @@ pub fn test_prouhet_thue_morse_constant_prec() {
         889263477842031146946636054226135511708407225571080034132437244605493617364337010772961383\
         884632019459005730120007550129264229222419321684701101892904472852138411474750231020219380\
         490568164815194679503954588116034274794607988054271917142826665676154809041554888257037645\
-        08626387325662901457682774568054766955037516",
+        086263873256629014576827745680547669550375158",
         "0x0.6996966996696996966969966996966996696996699696696996966996696996966969966996966969969\
         669966969966996966996696996966969966996966996696996699696696996966996696996699696699669699\
         696696996699696696996966996696996966969966996966996696996699696696996966996696996966969966\
@@ -132,7 +132,7 @@ pub fn test_prouhet_thue_morse_constant_prec() {
     );
 
     let ptmc_f32 = Float::prouhet_thue_morse_constant_prec(u64::from(f32::MANTISSA_DIGITS)).0;
-    assert_eq!(ptmc_f32.to_string(), "0.41245404");
+    assert_eq!(ptmc_f32.to_string(), "0.412454039");
     assert_eq!(to_hex_string(&ptmc_f32), "0x0.6996968#24");
     assert_eq!(ptmc_f32, f32::PROUHET_THUE_MORSE_CONSTANT);
 
@@ -168,17 +168,17 @@ fn test_prouhet_thue_morse_constant_prec_round_helper(
 
 #[test]
 pub fn test_prouhet_thue_morse_constant_prec_round() {
-    test_prouhet_thue_morse_constant_prec_round_helper(1, Floor, "0.2", "0x0.4#1", Less);
-    test_prouhet_thue_morse_constant_prec_round_helper(1, Ceiling, "0.5", "0x0.8#1", Greater);
-    test_prouhet_thue_morse_constant_prec_round_helper(1, Down, "0.2", "0x0.4#1", Less);
-    test_prouhet_thue_morse_constant_prec_round_helper(1, Up, "0.5", "0x0.8#1", Greater);
-    test_prouhet_thue_morse_constant_prec_round_helper(1, Nearest, "0.5", "0x0.8#1", Greater);
+    test_prouhet_thue_morse_constant_prec_round_helper(1, Floor, "0.25", "0x0.4#1", Less);
+    test_prouhet_thue_morse_constant_prec_round_helper(1, Ceiling, "0.50", "0x0.8#1", Greater);
+    test_prouhet_thue_morse_constant_prec_round_helper(1, Down, "0.25", "0x0.4#1", Less);
+    test_prouhet_thue_morse_constant_prec_round_helper(1, Up, "0.50", "0x0.8#1", Greater);
+    test_prouhet_thue_morse_constant_prec_round_helper(1, Nearest, "0.50", "0x0.8#1", Greater);
 
-    test_prouhet_thue_morse_constant_prec_round_helper(2, Floor, "0.4", "0x0.6#2", Less);
-    test_prouhet_thue_morse_constant_prec_round_helper(2, Ceiling, "0.5", "0x0.8#2", Greater);
-    test_prouhet_thue_morse_constant_prec_round_helper(2, Down, "0.4", "0x0.6#2", Less);
-    test_prouhet_thue_morse_constant_prec_round_helper(2, Up, "0.5", "0x0.8#2", Greater);
-    test_prouhet_thue_morse_constant_prec_round_helper(2, Nearest, "0.4", "0x0.6#2", Less);
+    test_prouhet_thue_morse_constant_prec_round_helper(2, Floor, "0.38", "0x0.6#2", Less);
+    test_prouhet_thue_morse_constant_prec_round_helper(2, Ceiling, "0.50", "0x0.8#2", Greater);
+    test_prouhet_thue_morse_constant_prec_round_helper(2, Down, "0.38", "0x0.6#2", Less);
+    test_prouhet_thue_morse_constant_prec_round_helper(2, Up, "0.50", "0x0.8#2", Greater);
+    test_prouhet_thue_morse_constant_prec_round_helper(2, Nearest, "0.38", "0x0.6#2", Less);
 
     test_prouhet_thue_morse_constant_prec_round_helper(3, Floor, "0.38", "0x0.6#3", Less);
     test_prouhet_thue_morse_constant_prec_round_helper(3, Ceiling, "0.44", "0x0.7#3", Greater);
@@ -186,17 +186,17 @@ pub fn test_prouhet_thue_morse_constant_prec_round() {
     test_prouhet_thue_morse_constant_prec_round_helper(3, Up, "0.44", "0x0.7#3", Greater);
     test_prouhet_thue_morse_constant_prec_round_helper(3, Nearest, "0.44", "0x0.7#3", Greater);
 
-    test_prouhet_thue_morse_constant_prec_round_helper(4, Floor, "0.41", "0x0.68#4", Less);
-    test_prouhet_thue_morse_constant_prec_round_helper(4, Ceiling, "0.44", "0x0.70#4", Greater);
-    test_prouhet_thue_morse_constant_prec_round_helper(4, Down, "0.41", "0x0.68#4", Less);
-    test_prouhet_thue_morse_constant_prec_round_helper(4, Up, "0.44", "0x0.70#4", Greater);
-    test_prouhet_thue_morse_constant_prec_round_helper(4, Nearest, "0.41", "0x0.68#4", Less);
+    test_prouhet_thue_morse_constant_prec_round_helper(4, Floor, "0.406", "0x0.68#4", Less);
+    test_prouhet_thue_morse_constant_prec_round_helper(4, Ceiling, "0.438", "0x0.70#4", Greater);
+    test_prouhet_thue_morse_constant_prec_round_helper(4, Down, "0.406", "0x0.68#4", Less);
+    test_prouhet_thue_morse_constant_prec_round_helper(4, Up, "0.438", "0x0.70#4", Greater);
+    test_prouhet_thue_morse_constant_prec_round_helper(4, Nearest, "0.406", "0x0.68#4", Less);
 
-    test_prouhet_thue_morse_constant_prec_round_helper(5, Floor, "0.41", "0x0.68#5", Less);
-    test_prouhet_thue_morse_constant_prec_round_helper(5, Ceiling, "0.42", "0x0.6c#5", Greater);
-    test_prouhet_thue_morse_constant_prec_round_helper(5, Down, "0.41", "0x0.68#5", Less);
-    test_prouhet_thue_morse_constant_prec_round_helper(5, Up, "0.42", "0x0.6c#5", Greater);
-    test_prouhet_thue_morse_constant_prec_round_helper(5, Nearest, "0.41", "0x0.68#5", Less);
+    test_prouhet_thue_morse_constant_prec_round_helper(5, Floor, "0.406", "0x0.68#5", Less);
+    test_prouhet_thue_morse_constant_prec_round_helper(5, Ceiling, "0.422", "0x0.6c#5", Greater);
+    test_prouhet_thue_morse_constant_prec_round_helper(5, Down, "0.406", "0x0.68#5", Less);
+    test_prouhet_thue_morse_constant_prec_round_helper(5, Up, "0.422", "0x0.6c#5", Greater);
+    test_prouhet_thue_morse_constant_prec_round_helper(5, Nearest, "0.406", "0x0.68#5", Less);
 
     test_prouhet_thue_morse_constant_prec_round_helper(6, Floor, "0.406", "0x0.68#6", Less);
     test_prouhet_thue_morse_constant_prec_round_helper(6, Ceiling, "0.414", "0x0.6a#6", Greater);
@@ -204,38 +204,38 @@ pub fn test_prouhet_thue_morse_constant_prec_round() {
     test_prouhet_thue_morse_constant_prec_round_helper(6, Up, "0.414", "0x0.6a#6", Greater);
     test_prouhet_thue_morse_constant_prec_round_helper(6, Nearest, "0.414", "0x0.6a#6", Greater);
 
-    test_prouhet_thue_morse_constant_prec_round_helper(7, Floor, "0.41", "0x0.69#7", Less);
-    test_prouhet_thue_morse_constant_prec_round_helper(7, Ceiling, "0.414", "0x0.6a#7", Greater);
-    test_prouhet_thue_morse_constant_prec_round_helper(7, Down, "0.41", "0x0.69#7", Less);
-    test_prouhet_thue_morse_constant_prec_round_helper(7, Up, "0.414", "0x0.6a#7", Greater);
-    test_prouhet_thue_morse_constant_prec_round_helper(7, Nearest, "0.414", "0x0.6a#7", Greater);
+    test_prouhet_thue_morse_constant_prec_round_helper(7, Floor, "0.4102", "0x0.69#7", Less);
+    test_prouhet_thue_morse_constant_prec_round_helper(7, Ceiling, "0.4141", "0x0.6a#7", Greater);
+    test_prouhet_thue_morse_constant_prec_round_helper(7, Down, "0.4102", "0x0.69#7", Less);
+    test_prouhet_thue_morse_constant_prec_round_helper(7, Up, "0.4141", "0x0.6a#7", Greater);
+    test_prouhet_thue_morse_constant_prec_round_helper(7, Nearest, "0.4141", "0x0.6a#7", Greater);
 
-    test_prouhet_thue_morse_constant_prec_round_helper(8, Floor, "0.412", "0x0.698#8", Less);
-    test_prouhet_thue_morse_constant_prec_round_helper(8, Ceiling, "0.414", "0x0.6a0#8", Greater);
-    test_prouhet_thue_morse_constant_prec_round_helper(8, Down, "0.412", "0x0.698#8", Less);
-    test_prouhet_thue_morse_constant_prec_round_helper(8, Up, "0.414", "0x0.6a0#8", Greater);
-    test_prouhet_thue_morse_constant_prec_round_helper(8, Nearest, "0.412", "0x0.698#8", Less);
+    test_prouhet_thue_morse_constant_prec_round_helper(8, Floor, "0.4121", "0x0.698#8", Less);
+    test_prouhet_thue_morse_constant_prec_round_helper(8, Ceiling, "0.4141", "0x0.6a0#8", Greater);
+    test_prouhet_thue_morse_constant_prec_round_helper(8, Down, "0.4121", "0x0.698#8", Less);
+    test_prouhet_thue_morse_constant_prec_round_helper(8, Up, "0.4141", "0x0.6a0#8", Greater);
+    test_prouhet_thue_morse_constant_prec_round_helper(8, Nearest, "0.4121", "0x0.698#8", Less);
 
-    test_prouhet_thue_morse_constant_prec_round_helper(9, Floor, "0.412", "0x0.698#9", Less);
-    test_prouhet_thue_morse_constant_prec_round_helper(9, Ceiling, "0.413", "0x0.69c#9", Greater);
-    test_prouhet_thue_morse_constant_prec_round_helper(9, Down, "0.412", "0x0.698#9", Less);
-    test_prouhet_thue_morse_constant_prec_round_helper(9, Up, "0.413", "0x0.69c#9", Greater);
-    test_prouhet_thue_morse_constant_prec_round_helper(9, Nearest, "0.412", "0x0.698#9", Less);
+    test_prouhet_thue_morse_constant_prec_round_helper(9, Floor, "0.4121", "0x0.698#9", Less);
+    test_prouhet_thue_morse_constant_prec_round_helper(9, Ceiling, "0.4131", "0x0.69c#9", Greater);
+    test_prouhet_thue_morse_constant_prec_round_helper(9, Down, "0.4121", "0x0.698#9", Less);
+    test_prouhet_thue_morse_constant_prec_round_helper(9, Up, "0.4131", "0x0.69c#9", Greater);
+    test_prouhet_thue_morse_constant_prec_round_helper(9, Nearest, "0.4121", "0x0.698#9", Less);
 
-    test_prouhet_thue_morse_constant_prec_round_helper(10, Floor, "0.4121", "0x0.698#10", Less);
+    test_prouhet_thue_morse_constant_prec_round_helper(10, Floor, "0.41211", "0x0.698#10", Less);
     test_prouhet_thue_morse_constant_prec_round_helper(
         10,
         Ceiling,
-        "0.4126",
+        "0.41260",
         "0x0.69a#10",
         Greater,
     );
-    test_prouhet_thue_morse_constant_prec_round_helper(10, Down, "0.4121", "0x0.698#10", Less);
-    test_prouhet_thue_morse_constant_prec_round_helper(10, Up, "0.4126", "0x0.69a#10", Greater);
+    test_prouhet_thue_morse_constant_prec_round_helper(10, Down, "0.41211", "0x0.698#10", Less);
+    test_prouhet_thue_morse_constant_prec_round_helper(10, Up, "0.41260", "0x0.69a#10", Greater);
     test_prouhet_thue_morse_constant_prec_round_helper(
         10,
         Nearest,
-        "0.4126",
+        "0.41260",
         "0x0.69a#10",
         Greater,
     );
@@ -243,35 +243,35 @@ pub fn test_prouhet_thue_morse_constant_prec_round() {
     test_prouhet_thue_morse_constant_prec_round_helper(
         100,
         Floor,
-        "0.4124540336401075977833613682584",
+        "0.41245403364010759778336136825838",
         "0x0.69969669966969969669699668#100",
         Less,
     );
     test_prouhet_thue_morse_constant_prec_round_helper(
         100,
         Ceiling,
-        "0.4124540336401075977833613682588",
+        "0.41245403364010759778336136825877",
         "0x0.69969669966969969669699670#100",
         Greater,
     );
     test_prouhet_thue_morse_constant_prec_round_helper(
         100,
         Down,
-        "0.4124540336401075977833613682584",
+        "0.41245403364010759778336136825838",
         "0x0.69969669966969969669699668#100",
         Less,
     );
     test_prouhet_thue_morse_constant_prec_round_helper(
         100,
         Up,
-        "0.4124540336401075977833613682588",
+        "0.41245403364010759778336136825877",
         "0x0.69969669966969969669699670#100",
         Greater,
     );
     test_prouhet_thue_morse_constant_prec_round_helper(
         100,
         Nearest,
-        "0.4124540336401075977833613682584",
+        "0.41245403364010759778336136825838",
         "0x0.69969669966969969669699668#100",
         Less,
     );

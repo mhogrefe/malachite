@@ -47,11 +47,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (l, o) = Float::log_10_e_prec_round(100, Floor);
-    /// assert_eq!(l.to_string(), "0.4342944819032518276511289189163");
+    /// assert_eq!(l.to_string(), "0.43429448190325182765112891891628");
     /// assert_eq!(o, Less);
     ///
     /// let (l, o) = Float::log_10_e_prec_round(100, Ceiling);
-    /// assert_eq!(l.to_string(), "0.4342944819032518276511289189167");
+    /// assert_eq!(l.to_string(), "0.43429448190325182765112891891667");
     /// assert_eq!(o, Greater);
     /// ```
     pub fn log_10_e_prec_round(prec: u64, rm: RoundingMode) -> (Self, Ordering) {
@@ -105,15 +105,15 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (l, o) = Float::log_10_e_prec(1);
-    /// assert_eq!(l.to_string(), "0.5");
+    /// assert_eq!(l.to_string(), "0.50");
     /// assert_eq!(o, Greater);
     ///
     /// let (l, o) = Float::log_10_e_prec(10);
-    /// assert_eq!(l.to_string(), "0.4341");
+    /// assert_eq!(l.to_string(), "0.43408");
     /// assert_eq!(o, Less);
     ///
     /// let (l, o) = Float::log_10_e_prec(100);
-    /// assert_eq!(l.to_string(), "0.4342944819032518276511289189167");
+    /// assert_eq!(l.to_string(), "0.43429448190325182765112891891667");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]

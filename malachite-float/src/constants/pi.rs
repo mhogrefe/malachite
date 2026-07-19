@@ -54,11 +54,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (pi, o) = Float::pi_prec_round(100, Floor);
-    /// assert_eq!(pi.to_string(), "3.141592653589793238462643383279");
+    /// assert_eq!(pi.to_string(), "3.1415926535897932384626433832793");
     /// assert_eq!(o, Less);
     ///
     /// let (pi, o) = Float::pi_prec_round(100, Ceiling);
-    /// assert_eq!(pi.to_string(), "3.141592653589793238462643383282");
+    /// assert_eq!(pi.to_string(), "3.1415926535897932384626433832825");
     /// assert_eq!(o, Greater);
     /// ```
     ///
@@ -148,11 +148,11 @@ impl Float {
     /// assert_eq!(o, Greater);
     ///
     /// let (pi, o) = Float::pi_prec(10);
-    /// assert_eq!(pi.to_string(), "3.141");
+    /// assert_eq!(pi.to_string(), "3.1406");
     /// assert_eq!(o, Less);
     ///
     /// let (pi, o) = Float::pi_prec(100);
-    /// assert_eq!(pi.to_string(), "3.141592653589793238462643383279");
+    /// assert_eq!(pi.to_string(), "3.1415926535897932384626433832793");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]

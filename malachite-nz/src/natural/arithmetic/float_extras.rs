@@ -544,11 +544,14 @@ pub fn limbs_float_exp(xs: &mut [Limb], base: u64, e: i64) -> (i64, i32) {
     let mut h = i64::from(limb_base.leading_zeros());
     limb_base <<= h;
     h.neg_assign();
-    // Allocate space for the running square or product (and a scratch buffer large enough for any
-    // of the squarings below), and set X to B.
+    // Allocate space for the running square or product, and set X to B. The scratch for the
+    // squarings is sized inside the loop: the length being squared varies with the number of zero
+    // low limbs, and `limbs_square_to_out_scratch_len` is not monotonic (the FFT range above
+    // `SQR_FFT_THRESHOLD` needs no scratch while the Toom range below it does), so a buffer sized
+    // once for `len` may be too small for a shorter operand.
     let two_len = len << 1;
-    let mut scratch = vec![0; two_len + limbs_square_to_out_scratch_len(len)];
-    let (ys, square_scratch) = scratch.split_at_mut(two_len);
+    let mut ys = vec![0; two_len];
+    let mut square_scratch: Vec<Limb> = Vec::new();
     let (xs_last, xs_init) = xs.split_last_mut().unwrap();
     *xs_last = limb_base;
     xs_init.fill(0);
@@ -568,12 +571,10 @@ pub fn limbs_float_exp(xs: &mut [Limb], base: u64, e: i64) -> (i64, i32) {
         let xs_zeros = slice_leading_zeros(xs);
         let two_n1 = xs_zeros << 1;
         // Square of X: {c + 2 * xs_zeros, 2 * (len - xs_zeros)} = {xs + xs_zeros, len - xs_zeros} ^
-        // 2.
-        limbs_square_to_out(
-            &mut ys[two_n1..],
-            &xs[xs_zeros..],
-            &mut square_scratch[..limbs_square_to_out_scratch_len(len - xs_zeros)],
-        );
+        // 2. (`resize` trims or grows the scratch to the exact length this squaring needs, reusing
+        // the allocation across iterations.)
+        square_scratch.resize(limbs_square_to_out_scratch_len(len - xs_zeros), 0);
+        limbs_square_to_out(&mut ys[two_n1..], &xs[xs_zeros..], &mut square_scratch);
         // Check for overflow on f.
         if !const { i64::MIN >> 1..=i64::MAX >> 1 }.contains(&f) {
             return (f, -2);

@@ -47,14 +47,14 @@ impl Float {
     /// let (gelfonds_constant, o) = Float::gelfonds_constant_prec_round(100, Floor);
     /// assert_eq!(
     ///     gelfonds_constant.to_string(),
-    ///     "23.14069263277926900572908636794"
+    ///     "23.140692632779269005729086367940"
     /// );
     /// assert_eq!(o, Less);
     ///
     /// let (gelfonds_constant, o) = Float::gelfonds_constant_prec_round(100, Ceiling);
     /// assert_eq!(
     ///     gelfonds_constant.to_string(),
-    ///     "23.14069263277926900572908636796"
+    ///     "23.140692632779269005729086367965"
     /// );
     /// assert_eq!(o, Greater);
     /// ```
@@ -113,17 +113,17 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (gelfonds_constant, o) = Float::gelfonds_constant_prec(1);
-    /// assert_eq!(gelfonds_constant.to_string(), "2.0e1");
+    /// assert_eq!(gelfonds_constant.to_string(), "16.0");
     /// assert_eq!(o, Less);
     ///
     /// let (gelfonds_constant, o) = Float::gelfonds_constant_prec(10);
-    /// assert_eq!(gelfonds_constant.to_string(), "23.16");
+    /// assert_eq!(gelfonds_constant.to_string(), "23.156");
     /// assert_eq!(o, Greater);
     ///
     /// let (gelfonds_constant, o) = Float::gelfonds_constant_prec(100);
     /// assert_eq!(
     ///     gelfonds_constant.to_string(),
-    ///     "23.14069263277926900572908636794"
+    ///     "23.140692632779269005729086367940"
     /// );
     /// assert_eq!(o, Less);
     /// ```

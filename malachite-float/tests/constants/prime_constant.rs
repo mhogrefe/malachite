@@ -32,19 +32,19 @@ fn test_prime_constant_prec_helper(prec: u64, out: &str, out_hex: &str, out_o: O
 
 #[test]
 pub fn test_prime_constant_prec() {
-    test_prime_constant_prec_helper(1, "0.5", "0x0.8#1", Greater);
-    test_prime_constant_prec_helper(2, "0.4", "0x0.6#2", Less);
+    test_prime_constant_prec_helper(1, "0.50", "0x0.8#1", Greater);
+    test_prime_constant_prec_helper(2, "0.38", "0x0.6#2", Less);
     test_prime_constant_prec_helper(3, "0.44", "0x0.7#3", Greater);
-    test_prime_constant_prec_helper(4, "0.41", "0x0.68#4", Less);
-    test_prime_constant_prec_helper(5, "0.42", "0x0.6c#5", Greater);
+    test_prime_constant_prec_helper(4, "0.406", "0x0.68#4", Less);
+    test_prime_constant_prec_helper(5, "0.422", "0x0.6c#5", Greater);
     test_prime_constant_prec_helper(6, "0.414", "0x0.6a#6", Less);
-    test_prime_constant_prec_helper(7, "0.414", "0x0.6a#7", Less);
-    test_prime_constant_prec_helper(8, "0.414", "0x0.6a0#8", Less);
-    test_prime_constant_prec_helper(9, "0.415", "0x0.6a4#9", Greater);
-    test_prime_constant_prec_helper(10, "0.4146", "0x0.6a2#10", Less);
+    test_prime_constant_prec_helper(7, "0.4141", "0x0.6a#7", Less);
+    test_prime_constant_prec_helper(8, "0.4141", "0x0.6a0#8", Less);
+    test_prime_constant_prec_helper(9, "0.4150", "0x0.6a4#9", Greater);
+    test_prime_constant_prec_helper(10, "0.41455", "0x0.6a2#10", Less);
     test_prime_constant_prec_helper(
         100,
-        "0.4146825098511116602481096221542",
+        "0.41468250985111166024810962215420",
         "0x0.6a28a20a08a208282282208088#100",
         Less,
     );
@@ -53,7 +53,7 @@ pub fn test_prime_constant_prec() {
         "0.414682509851111660248109622154307708365774238137916977868245414488640960619357334196290\
         048428475777939616159352082985957835749978453022009904120814650033958993701974119186285615\
         579237191637251488161071073428432480218016979856815134246794749243902778820311537783180662\
-        98787003544718107300315282293658657",
+        987870035447181073003152822936586572",
         "0x0.6a28a20a08a20828228220808a28800220a00a08220828028a00200228828020820a08a00800228800208\
         028820208220808808028028220808a20020220220800a00008200820a08020828208a00200a20828008820200\
         808020208220208808800200800a00a28020008a20008a200002202008088208002208202080#1000",
@@ -94,7 +94,7 @@ pub fn test_prime_constant_prec() {
         488746578301462245594571327626904723478958729803396726212447661231362593184418074810567100\
         150303566417543158729492869454556673124380354806665894633517169712578312518114309438722159\
         398158466744490582994391095649028975452941714271570359608073520730264326067239780059666358\
-        3765668592857275961081596601034186349684386",
+        376566859285727596108159660103418634968438600",
         "0x0.6a28a20a08a20828228220808a28800220a00a08220828028a00200228828020820a08a00800228800208\
         028820208220808808028028220808a20020220220800a00008200820a08020828208a00200a20828008820200\
         808020208220208808800200800a00a28020008a20008a20000220200808820800220820208008828028200a00\
@@ -127,7 +127,7 @@ pub fn test_prime_constant_prec() {
     );
 
     let pc_f32 = Float::prime_constant_prec(u64::from(f32::MANTISSA_DIGITS)).0;
-    assert_eq!(pc_f32.to_string(), "0.41468251");
+    assert_eq!(pc_f32.to_string(), "0.414682508");
     assert_eq!(to_hex_string(&pc_f32), "0x0.6a28a20#24");
     assert_eq!(pc_f32, f32::PRIME_CONSTANT);
 
@@ -163,17 +163,17 @@ fn test_prime_constant_prec_round_helper(
 
 #[test]
 pub fn test_prime_constant_prec_round() {
-    test_prime_constant_prec_round_helper(1, Floor, "0.2", "0x0.4#1", Less);
-    test_prime_constant_prec_round_helper(1, Ceiling, "0.5", "0x0.8#1", Greater);
-    test_prime_constant_prec_round_helper(1, Down, "0.2", "0x0.4#1", Less);
-    test_prime_constant_prec_round_helper(1, Up, "0.5", "0x0.8#1", Greater);
-    test_prime_constant_prec_round_helper(1, Nearest, "0.5", "0x0.8#1", Greater);
+    test_prime_constant_prec_round_helper(1, Floor, "0.25", "0x0.4#1", Less);
+    test_prime_constant_prec_round_helper(1, Ceiling, "0.50", "0x0.8#1", Greater);
+    test_prime_constant_prec_round_helper(1, Down, "0.25", "0x0.4#1", Less);
+    test_prime_constant_prec_round_helper(1, Up, "0.50", "0x0.8#1", Greater);
+    test_prime_constant_prec_round_helper(1, Nearest, "0.50", "0x0.8#1", Greater);
 
-    test_prime_constant_prec_round_helper(2, Floor, "0.4", "0x0.6#2", Less);
-    test_prime_constant_prec_round_helper(2, Ceiling, "0.5", "0x0.8#2", Greater);
-    test_prime_constant_prec_round_helper(2, Down, "0.4", "0x0.6#2", Less);
-    test_prime_constant_prec_round_helper(2, Up, "0.5", "0x0.8#2", Greater);
-    test_prime_constant_prec_round_helper(2, Nearest, "0.4", "0x0.6#2", Less);
+    test_prime_constant_prec_round_helper(2, Floor, "0.38", "0x0.6#2", Less);
+    test_prime_constant_prec_round_helper(2, Ceiling, "0.50", "0x0.8#2", Greater);
+    test_prime_constant_prec_round_helper(2, Down, "0.38", "0x0.6#2", Less);
+    test_prime_constant_prec_round_helper(2, Up, "0.50", "0x0.8#2", Greater);
+    test_prime_constant_prec_round_helper(2, Nearest, "0.38", "0x0.6#2", Less);
 
     test_prime_constant_prec_round_helper(3, Floor, "0.38", "0x0.6#3", Less);
     test_prime_constant_prec_round_helper(3, Ceiling, "0.44", "0x0.7#3", Greater);
@@ -181,80 +181,80 @@ pub fn test_prime_constant_prec_round() {
     test_prime_constant_prec_round_helper(3, Up, "0.44", "0x0.7#3", Greater);
     test_prime_constant_prec_round_helper(3, Nearest, "0.44", "0x0.7#3", Greater);
 
-    test_prime_constant_prec_round_helper(4, Floor, "0.41", "0x0.68#4", Less);
-    test_prime_constant_prec_round_helper(4, Ceiling, "0.44", "0x0.70#4", Greater);
-    test_prime_constant_prec_round_helper(4, Down, "0.41", "0x0.68#4", Less);
-    test_prime_constant_prec_round_helper(4, Up, "0.44", "0x0.70#4", Greater);
-    test_prime_constant_prec_round_helper(4, Nearest, "0.41", "0x0.68#4", Less);
+    test_prime_constant_prec_round_helper(4, Floor, "0.406", "0x0.68#4", Less);
+    test_prime_constant_prec_round_helper(4, Ceiling, "0.438", "0x0.70#4", Greater);
+    test_prime_constant_prec_round_helper(4, Down, "0.406", "0x0.68#4", Less);
+    test_prime_constant_prec_round_helper(4, Up, "0.438", "0x0.70#4", Greater);
+    test_prime_constant_prec_round_helper(4, Nearest, "0.406", "0x0.68#4", Less);
 
-    test_prime_constant_prec_round_helper(5, Floor, "0.41", "0x0.68#5", Less);
-    test_prime_constant_prec_round_helper(5, Ceiling, "0.42", "0x0.6c#5", Greater);
-    test_prime_constant_prec_round_helper(5, Down, "0.41", "0x0.68#5", Less);
-    test_prime_constant_prec_round_helper(5, Up, "0.42", "0x0.6c#5", Greater);
-    test_prime_constant_prec_round_helper(5, Nearest, "0.42", "0x0.6c#5", Greater);
+    test_prime_constant_prec_round_helper(5, Floor, "0.406", "0x0.68#5", Less);
+    test_prime_constant_prec_round_helper(5, Ceiling, "0.422", "0x0.6c#5", Greater);
+    test_prime_constant_prec_round_helper(5, Down, "0.406", "0x0.68#5", Less);
+    test_prime_constant_prec_round_helper(5, Up, "0.422", "0x0.6c#5", Greater);
+    test_prime_constant_prec_round_helper(5, Nearest, "0.422", "0x0.6c#5", Greater);
 
     test_prime_constant_prec_round_helper(6, Floor, "0.414", "0x0.6a#6", Less);
-    test_prime_constant_prec_round_helper(6, Ceiling, "0.42", "0x0.6c#6", Greater);
+    test_prime_constant_prec_round_helper(6, Ceiling, "0.422", "0x0.6c#6", Greater);
     test_prime_constant_prec_round_helper(6, Down, "0.414", "0x0.6a#6", Less);
-    test_prime_constant_prec_round_helper(6, Up, "0.42", "0x0.6c#6", Greater);
+    test_prime_constant_prec_round_helper(6, Up, "0.422", "0x0.6c#6", Greater);
     test_prime_constant_prec_round_helper(6, Nearest, "0.414", "0x0.6a#6", Less);
 
-    test_prime_constant_prec_round_helper(7, Floor, "0.414", "0x0.6a#7", Less);
-    test_prime_constant_prec_round_helper(7, Ceiling, "0.418", "0x0.6b#7", Greater);
-    test_prime_constant_prec_round_helper(7, Down, "0.414", "0x0.6a#7", Less);
-    test_prime_constant_prec_round_helper(7, Up, "0.418", "0x0.6b#7", Greater);
-    test_prime_constant_prec_round_helper(7, Nearest, "0.414", "0x0.6a#7", Less);
+    test_prime_constant_prec_round_helper(7, Floor, "0.4141", "0x0.6a#7", Less);
+    test_prime_constant_prec_round_helper(7, Ceiling, "0.4180", "0x0.6b#7", Greater);
+    test_prime_constant_prec_round_helper(7, Down, "0.4141", "0x0.6a#7", Less);
+    test_prime_constant_prec_round_helper(7, Up, "0.4180", "0x0.6b#7", Greater);
+    test_prime_constant_prec_round_helper(7, Nearest, "0.4141", "0x0.6a#7", Less);
 
-    test_prime_constant_prec_round_helper(8, Floor, "0.414", "0x0.6a0#8", Less);
-    test_prime_constant_prec_round_helper(8, Ceiling, "0.416", "0x0.6a8#8", Greater);
-    test_prime_constant_prec_round_helper(8, Down, "0.414", "0x0.6a0#8", Less);
-    test_prime_constant_prec_round_helper(8, Up, "0.416", "0x0.6a8#8", Greater);
-    test_prime_constant_prec_round_helper(8, Nearest, "0.414", "0x0.6a0#8", Less);
+    test_prime_constant_prec_round_helper(8, Floor, "0.4141", "0x0.6a0#8", Less);
+    test_prime_constant_prec_round_helper(8, Ceiling, "0.4160", "0x0.6a8#8", Greater);
+    test_prime_constant_prec_round_helper(8, Down, "0.4141", "0x0.6a0#8", Less);
+    test_prime_constant_prec_round_helper(8, Up, "0.4160", "0x0.6a8#8", Greater);
+    test_prime_constant_prec_round_helper(8, Nearest, "0.4141", "0x0.6a0#8", Less);
 
-    test_prime_constant_prec_round_helper(9, Floor, "0.414", "0x0.6a0#9", Less);
-    test_prime_constant_prec_round_helper(9, Ceiling, "0.415", "0x0.6a4#9", Greater);
-    test_prime_constant_prec_round_helper(9, Down, "0.414", "0x0.6a0#9", Less);
-    test_prime_constant_prec_round_helper(9, Up, "0.415", "0x0.6a4#9", Greater);
-    test_prime_constant_prec_round_helper(9, Nearest, "0.415", "0x0.6a4#9", Greater);
+    test_prime_constant_prec_round_helper(9, Floor, "0.4141", "0x0.6a0#9", Less);
+    test_prime_constant_prec_round_helper(9, Ceiling, "0.4150", "0x0.6a4#9", Greater);
+    test_prime_constant_prec_round_helper(9, Down, "0.4141", "0x0.6a0#9", Less);
+    test_prime_constant_prec_round_helper(9, Up, "0.4150", "0x0.6a4#9", Greater);
+    test_prime_constant_prec_round_helper(9, Nearest, "0.4150", "0x0.6a4#9", Greater);
 
-    test_prime_constant_prec_round_helper(10, Floor, "0.4146", "0x0.6a2#10", Less);
-    test_prime_constant_prec_round_helper(10, Ceiling, "0.415", "0x0.6a4#10", Greater);
-    test_prime_constant_prec_round_helper(10, Down, "0.4146", "0x0.6a2#10", Less);
-    test_prime_constant_prec_round_helper(10, Up, "0.415", "0x0.6a4#10", Greater);
-    test_prime_constant_prec_round_helper(10, Nearest, "0.4146", "0x0.6a2#10", Less);
+    test_prime_constant_prec_round_helper(10, Floor, "0.41455", "0x0.6a2#10", Less);
+    test_prime_constant_prec_round_helper(10, Ceiling, "0.41504", "0x0.6a4#10", Greater);
+    test_prime_constant_prec_round_helper(10, Down, "0.41455", "0x0.6a2#10", Less);
+    test_prime_constant_prec_round_helper(10, Up, "0.41504", "0x0.6a4#10", Greater);
+    test_prime_constant_prec_round_helper(10, Nearest, "0.41455", "0x0.6a2#10", Less);
 
     test_prime_constant_prec_round_helper(
         100,
         Floor,
-        "0.4146825098511116602481096221542",
+        "0.41468250985111166024810962215420",
         "0x0.6a28a20a08a208282282208088#100",
         Less,
     );
     test_prime_constant_prec_round_helper(
         100,
         Ceiling,
-        "0.4146825098511116602481096221546",
+        "0.41468250985111166024810962215460",
         "0x0.6a28a20a08a208282282208090#100",
         Greater,
     );
     test_prime_constant_prec_round_helper(
         100,
         Down,
-        "0.4146825098511116602481096221542",
+        "0.41468250985111166024810962215420",
         "0x0.6a28a20a08a208282282208088#100",
         Less,
     );
     test_prime_constant_prec_round_helper(
         100,
         Up,
-        "0.4146825098511116602481096221546",
+        "0.41468250985111166024810962215460",
         "0x0.6a28a20a08a208282282208090#100",
         Greater,
     );
     test_prime_constant_prec_round_helper(
         100,
         Nearest,
-        "0.4146825098511116602481096221542",
+        "0.41468250985111166024810962215420",
         "0x0.6a28a20a08a208282282208088#100",
         Less,
     );

@@ -32,19 +32,19 @@ fn test_one_over_sqrt_tau_prec_helper(prec: u64, out: &str, out_hex: &str, out_o
 
 #[test]
 pub fn test_one_over_sqrt_tau_prec() {
-    test_one_over_sqrt_tau_prec_helper(1, "0.5", "0x0.8#1", Greater);
-    test_one_over_sqrt_tau_prec_helper(2, "0.4", "0x0.6#2", Less);
+    test_one_over_sqrt_tau_prec_helper(1, "0.50", "0x0.8#1", Greater);
+    test_one_over_sqrt_tau_prec_helper(2, "0.38", "0x0.6#2", Less);
     test_one_over_sqrt_tau_prec_helper(3, "0.38", "0x0.6#3", Less);
-    test_one_over_sqrt_tau_prec_helper(4, "0.41", "0x0.68#4", Greater);
-    test_one_over_sqrt_tau_prec_helper(5, "0.41", "0x0.68#5", Greater);
-    test_one_over_sqrt_tau_prec_helper(6, "0.4", "0x0.66#6", Less);
-    test_one_over_sqrt_tau_prec_helper(7, "0.398", "0x0.66#7", Less);
-    test_one_over_sqrt_tau_prec_helper(8, "0.398", "0x0.660#8", Less);
-    test_one_over_sqrt_tau_prec_helper(9, "0.399", "0x0.664#9", Greater);
-    test_one_over_sqrt_tau_prec_helper(10, "0.3989", "0x0.662#10", Less);
+    test_one_over_sqrt_tau_prec_helper(4, "0.406", "0x0.68#4", Greater);
+    test_one_over_sqrt_tau_prec_helper(5, "0.406", "0x0.68#5", Greater);
+    test_one_over_sqrt_tau_prec_helper(6, "0.398", "0x0.66#6", Less);
+    test_one_over_sqrt_tau_prec_helper(7, "0.3984", "0x0.66#7", Less);
+    test_one_over_sqrt_tau_prec_helper(8, "0.3984", "0x0.660#8", Less);
+    test_one_over_sqrt_tau_prec_helper(9, "0.3994", "0x0.664#9", Greater);
+    test_one_over_sqrt_tau_prec_helper(10, "0.39893", "0x0.662#10", Less);
     test_one_over_sqrt_tau_prec_helper(
         100,
-        "0.3989422804014326779399460599344",
+        "0.39894228040143267793994605993445",
         "0x0.662114cf50d942343f2cf14030#100",
         Greater,
     );
@@ -53,7 +53,7 @@ pub fn test_one_over_sqrt_tau_prec() {
         "0.398942280401432677939946059934381868475858631164934657665925829670657925899301838501252\
         333907306936430302558862635182685510991954555837242996212730625507706345270582720499317564\
         516345807530597253642732083669593478271702999186419063456032808933388606704653652796716869\
-        34195477117721206532537536913347877",
+        341954771177212065325375369133478771",
         "0x0.662114cf50d942343f2cf1402eae38bfd3829f30512706d8c0471b4802639d2e9df8ac55447d3db723f5d\
         3abb374e88deb14277970be1513278e993445f08cff98282e1fd947ce4b4ecdbd6e65c23395cacb544de69eea3\
         2c276937b1bc567691c1cec4882c77aacefe1f6708329ab3fc8d2ab2435ee45c9150c426bbb8#1000",
@@ -94,7 +94,7 @@ pub fn test_one_over_sqrt_tau_prec() {
         406961415103750340216958051666093814503142437034516561361464323353515610162799624281647911\
         127783108359666320819610363671588870086956238204933545154454220560124064024272600360105966\
         644223437056162524970715123219160940261473588761105521231222473362842356480453287247436537\
-        04133401719034564232591496298172511220088055",
+        041334017190345642325914962981725112200880551",
         "0x0.662114cf50d942343f2cf1402eae38bfd3829f30512706d8c0471b4802639d2e9df8ac55447d3db723f5d\
         3abb374e88deb14277970be1513278e993445f08cff98282e1fd947ce4b4ecdbd6e65c23395cacb544de69eea3\
         2c276937b1bc567691c1cec4882c77aacefe1f6708329ab3fc8d2ab2435ee45c9150c426bbb49487e480d8928e\
@@ -127,12 +127,12 @@ pub fn test_one_over_sqrt_tau_prec() {
     );
 
     let one_over_sqrt_tau_f32 = Float::one_over_sqrt_tau_prec(u64::from(f32::MANTISSA_DIGITS)).0;
-    assert_eq!(one_over_sqrt_tau_f32.to_string(), "0.39894229");
+    assert_eq!(one_over_sqrt_tau_f32.to_string(), "0.398942292");
     assert_eq!(to_hex_string(&one_over_sqrt_tau_f32), "0x0.6621150#24");
     assert_eq!(one_over_sqrt_tau_f32, f32::ONE_OVER_SQRT_TAU);
 
     let one_over_sqrt_tau_f64 = Float::one_over_sqrt_tau_prec(u64::from(f64::MANTISSA_DIGITS)).0;
-    assert_eq!(one_over_sqrt_tau_f64.to_string(), "0.3989422804014327");
+    assert_eq!(one_over_sqrt_tau_f64.to_string(), "0.39894228040143270");
     assert_eq!(
         to_hex_string(&one_over_sqrt_tau_f64),
         "0x0.662114cf50d944#53"
@@ -166,17 +166,17 @@ fn test_one_over_sqrt_tau_prec_round_helper(
 
 #[test]
 pub fn test_one_over_sqrt_tau_prec_round() {
-    test_one_over_sqrt_tau_prec_round_helper(1, Floor, "0.2", "0x0.4#1", Less);
-    test_one_over_sqrt_tau_prec_round_helper(1, Ceiling, "0.5", "0x0.8#1", Greater);
-    test_one_over_sqrt_tau_prec_round_helper(1, Down, "0.2", "0x0.4#1", Less);
-    test_one_over_sqrt_tau_prec_round_helper(1, Up, "0.5", "0x0.8#1", Greater);
-    test_one_over_sqrt_tau_prec_round_helper(1, Nearest, "0.5", "0x0.8#1", Greater);
+    test_one_over_sqrt_tau_prec_round_helper(1, Floor, "0.25", "0x0.4#1", Less);
+    test_one_over_sqrt_tau_prec_round_helper(1, Ceiling, "0.50", "0x0.8#1", Greater);
+    test_one_over_sqrt_tau_prec_round_helper(1, Down, "0.25", "0x0.4#1", Less);
+    test_one_over_sqrt_tau_prec_round_helper(1, Up, "0.50", "0x0.8#1", Greater);
+    test_one_over_sqrt_tau_prec_round_helper(1, Nearest, "0.50", "0x0.8#1", Greater);
 
-    test_one_over_sqrt_tau_prec_round_helper(2, Floor, "0.4", "0x0.6#2", Less);
-    test_one_over_sqrt_tau_prec_round_helper(2, Ceiling, "0.5", "0x0.8#2", Greater);
-    test_one_over_sqrt_tau_prec_round_helper(2, Down, "0.4", "0x0.6#2", Less);
-    test_one_over_sqrt_tau_prec_round_helper(2, Up, "0.5", "0x0.8#2", Greater);
-    test_one_over_sqrt_tau_prec_round_helper(2, Nearest, "0.4", "0x0.6#2", Less);
+    test_one_over_sqrt_tau_prec_round_helper(2, Floor, "0.38", "0x0.6#2", Less);
+    test_one_over_sqrt_tau_prec_round_helper(2, Ceiling, "0.50", "0x0.8#2", Greater);
+    test_one_over_sqrt_tau_prec_round_helper(2, Down, "0.38", "0x0.6#2", Less);
+    test_one_over_sqrt_tau_prec_round_helper(2, Up, "0.50", "0x0.8#2", Greater);
+    test_one_over_sqrt_tau_prec_round_helper(2, Nearest, "0.38", "0x0.6#2", Less);
 
     test_one_over_sqrt_tau_prec_round_helper(3, Floor, "0.38", "0x0.6#3", Less);
     test_one_over_sqrt_tau_prec_round_helper(3, Ceiling, "0.44", "0x0.7#3", Greater);
@@ -184,80 +184,80 @@ pub fn test_one_over_sqrt_tau_prec_round() {
     test_one_over_sqrt_tau_prec_round_helper(3, Up, "0.44", "0x0.7#3", Greater);
     test_one_over_sqrt_tau_prec_round_helper(3, Nearest, "0.38", "0x0.6#3", Less);
 
-    test_one_over_sqrt_tau_prec_round_helper(4, Floor, "0.38", "0x0.60#4", Less);
-    test_one_over_sqrt_tau_prec_round_helper(4, Ceiling, "0.41", "0x0.68#4", Greater);
-    test_one_over_sqrt_tau_prec_round_helper(4, Down, "0.38", "0x0.60#4", Less);
-    test_one_over_sqrt_tau_prec_round_helper(4, Up, "0.41", "0x0.68#4", Greater);
-    test_one_over_sqrt_tau_prec_round_helper(4, Nearest, "0.41", "0x0.68#4", Greater);
+    test_one_over_sqrt_tau_prec_round_helper(4, Floor, "0.375", "0x0.60#4", Less);
+    test_one_over_sqrt_tau_prec_round_helper(4, Ceiling, "0.406", "0x0.68#4", Greater);
+    test_one_over_sqrt_tau_prec_round_helper(4, Down, "0.375", "0x0.60#4", Less);
+    test_one_over_sqrt_tau_prec_round_helper(4, Up, "0.406", "0x0.68#4", Greater);
+    test_one_over_sqrt_tau_prec_round_helper(4, Nearest, "0.406", "0x0.68#4", Greater);
 
-    test_one_over_sqrt_tau_prec_round_helper(5, Floor, "0.39", "0x0.64#5", Less);
-    test_one_over_sqrt_tau_prec_round_helper(5, Ceiling, "0.41", "0x0.68#5", Greater);
-    test_one_over_sqrt_tau_prec_round_helper(5, Down, "0.39", "0x0.64#5", Less);
-    test_one_over_sqrt_tau_prec_round_helper(5, Up, "0.41", "0x0.68#5", Greater);
-    test_one_over_sqrt_tau_prec_round_helper(5, Nearest, "0.41", "0x0.68#5", Greater);
+    test_one_over_sqrt_tau_prec_round_helper(5, Floor, "0.391", "0x0.64#5", Less);
+    test_one_over_sqrt_tau_prec_round_helper(5, Ceiling, "0.406", "0x0.68#5", Greater);
+    test_one_over_sqrt_tau_prec_round_helper(5, Down, "0.391", "0x0.64#5", Less);
+    test_one_over_sqrt_tau_prec_round_helper(5, Up, "0.406", "0x0.68#5", Greater);
+    test_one_over_sqrt_tau_prec_round_helper(5, Nearest, "0.406", "0x0.68#5", Greater);
 
-    test_one_over_sqrt_tau_prec_round_helper(6, Floor, "0.4", "0x0.66#6", Less);
+    test_one_over_sqrt_tau_prec_round_helper(6, Floor, "0.398", "0x0.66#6", Less);
     test_one_over_sqrt_tau_prec_round_helper(6, Ceiling, "0.406", "0x0.68#6", Greater);
-    test_one_over_sqrt_tau_prec_round_helper(6, Down, "0.4", "0x0.66#6", Less);
+    test_one_over_sqrt_tau_prec_round_helper(6, Down, "0.398", "0x0.66#6", Less);
     test_one_over_sqrt_tau_prec_round_helper(6, Up, "0.406", "0x0.68#6", Greater);
-    test_one_over_sqrt_tau_prec_round_helper(6, Nearest, "0.4", "0x0.66#6", Less);
+    test_one_over_sqrt_tau_prec_round_helper(6, Nearest, "0.398", "0x0.66#6", Less);
 
-    test_one_over_sqrt_tau_prec_round_helper(7, Floor, "0.398", "0x0.66#7", Less);
-    test_one_over_sqrt_tau_prec_round_helper(7, Ceiling, "0.402", "0x0.67#7", Greater);
-    test_one_over_sqrt_tau_prec_round_helper(7, Down, "0.398", "0x0.66#7", Less);
-    test_one_over_sqrt_tau_prec_round_helper(7, Up, "0.402", "0x0.67#7", Greater);
-    test_one_over_sqrt_tau_prec_round_helper(7, Nearest, "0.398", "0x0.66#7", Less);
+    test_one_over_sqrt_tau_prec_round_helper(7, Floor, "0.3984", "0x0.66#7", Less);
+    test_one_over_sqrt_tau_prec_round_helper(7, Ceiling, "0.4023", "0x0.67#7", Greater);
+    test_one_over_sqrt_tau_prec_round_helper(7, Down, "0.3984", "0x0.66#7", Less);
+    test_one_over_sqrt_tau_prec_round_helper(7, Up, "0.4023", "0x0.67#7", Greater);
+    test_one_over_sqrt_tau_prec_round_helper(7, Nearest, "0.3984", "0x0.66#7", Less);
 
-    test_one_over_sqrt_tau_prec_round_helper(8, Floor, "0.398", "0x0.660#8", Less);
-    test_one_over_sqrt_tau_prec_round_helper(8, Ceiling, "0.4", "0x0.668#8", Greater);
-    test_one_over_sqrt_tau_prec_round_helper(8, Down, "0.398", "0x0.660#8", Less);
-    test_one_over_sqrt_tau_prec_round_helper(8, Up, "0.4", "0x0.668#8", Greater);
-    test_one_over_sqrt_tau_prec_round_helper(8, Nearest, "0.398", "0x0.660#8", Less);
+    test_one_over_sqrt_tau_prec_round_helper(8, Floor, "0.3984", "0x0.660#8", Less);
+    test_one_over_sqrt_tau_prec_round_helper(8, Ceiling, "0.4004", "0x0.668#8", Greater);
+    test_one_over_sqrt_tau_prec_round_helper(8, Down, "0.3984", "0x0.660#8", Less);
+    test_one_over_sqrt_tau_prec_round_helper(8, Up, "0.4004", "0x0.668#8", Greater);
+    test_one_over_sqrt_tau_prec_round_helper(8, Nearest, "0.3984", "0x0.660#8", Less);
 
-    test_one_over_sqrt_tau_prec_round_helper(9, Floor, "0.398", "0x0.660#9", Less);
-    test_one_over_sqrt_tau_prec_round_helper(9, Ceiling, "0.399", "0x0.664#9", Greater);
-    test_one_over_sqrt_tau_prec_round_helper(9, Down, "0.398", "0x0.660#9", Less);
-    test_one_over_sqrt_tau_prec_round_helper(9, Up, "0.399", "0x0.664#9", Greater);
-    test_one_over_sqrt_tau_prec_round_helper(9, Nearest, "0.399", "0x0.664#9", Greater);
+    test_one_over_sqrt_tau_prec_round_helper(9, Floor, "0.3984", "0x0.660#9", Less);
+    test_one_over_sqrt_tau_prec_round_helper(9, Ceiling, "0.3994", "0x0.664#9", Greater);
+    test_one_over_sqrt_tau_prec_round_helper(9, Down, "0.3984", "0x0.660#9", Less);
+    test_one_over_sqrt_tau_prec_round_helper(9, Up, "0.3994", "0x0.664#9", Greater);
+    test_one_over_sqrt_tau_prec_round_helper(9, Nearest, "0.3994", "0x0.664#9", Greater);
 
-    test_one_over_sqrt_tau_prec_round_helper(10, Floor, "0.3989", "0x0.662#10", Less);
-    test_one_over_sqrt_tau_prec_round_helper(10, Ceiling, "0.3994", "0x0.664#10", Greater);
-    test_one_over_sqrt_tau_prec_round_helper(10, Down, "0.3989", "0x0.662#10", Less);
-    test_one_over_sqrt_tau_prec_round_helper(10, Up, "0.3994", "0x0.664#10", Greater);
-    test_one_over_sqrt_tau_prec_round_helper(10, Nearest, "0.3989", "0x0.662#10", Less);
+    test_one_over_sqrt_tau_prec_round_helper(10, Floor, "0.39893", "0x0.662#10", Less);
+    test_one_over_sqrt_tau_prec_round_helper(10, Ceiling, "0.39941", "0x0.664#10", Greater);
+    test_one_over_sqrt_tau_prec_round_helper(10, Down, "0.39893", "0x0.662#10", Less);
+    test_one_over_sqrt_tau_prec_round_helper(10, Up, "0.39941", "0x0.664#10", Greater);
+    test_one_over_sqrt_tau_prec_round_helper(10, Nearest, "0.39893", "0x0.662#10", Less);
 
     test_one_over_sqrt_tau_prec_round_helper(
         100,
         Floor,
-        "0.3989422804014326779399460599341",
+        "0.39894228040143267793994605993405",
         "0x0.662114cf50d942343f2cf14028#100",
         Less,
     );
     test_one_over_sqrt_tau_prec_round_helper(
         100,
         Ceiling,
-        "0.3989422804014326779399460599344",
+        "0.39894228040143267793994605993445",
         "0x0.662114cf50d942343f2cf14030#100",
         Greater,
     );
     test_one_over_sqrt_tau_prec_round_helper(
         100,
         Down,
-        "0.3989422804014326779399460599341",
+        "0.39894228040143267793994605993405",
         "0x0.662114cf50d942343f2cf14028#100",
         Less,
     );
     test_one_over_sqrt_tau_prec_round_helper(
         100,
         Up,
-        "0.3989422804014326779399460599344",
+        "0.39894228040143267793994605993445",
         "0x0.662114cf50d942343f2cf14030#100",
         Greater,
     );
     test_one_over_sqrt_tau_prec_round_helper(
         100,
         Nearest,
-        "0.3989422804014326779399460599344",
+        "0.39894228040143267793994605993445",
         "0x0.662114cf50d942343f2cf14030#100",
         Greater,
     );

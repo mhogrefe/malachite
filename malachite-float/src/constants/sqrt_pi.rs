@@ -53,11 +53,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (sqrt_pi, o) = Float::sqrt_pi_prec_round(100, Floor);
-    /// assert_eq!(sqrt_pi.to_string(), "1.77245385090551602729816748334");
+    /// assert_eq!(sqrt_pi.to_string(), "1.7724538509055160272981674833397");
     /// assert_eq!(o, Less);
     ///
     /// let (sqrt_pi, o) = Float::sqrt_pi_prec_round(100, Ceiling);
-    /// assert_eq!(sqrt_pi.to_string(), "1.772453850905516027298167483341");
+    /// assert_eq!(sqrt_pi.to_string(), "1.7724538509055160272981674833413");
     /// assert_eq!(o, Greater);
     /// ```
     pub fn sqrt_pi_prec_round(prec: u64, rm: RoundingMode) -> (Self, Ordering) {
@@ -114,11 +114,11 @@ impl Float {
     /// assert_eq!(o, Greater);
     ///
     /// let (sqrt_pi, o) = Float::sqrt_pi_prec(10);
-    /// assert_eq!(sqrt_pi.to_string(), "1.771");
+    /// assert_eq!(sqrt_pi.to_string(), "1.7715");
     /// assert_eq!(o, Less);
     ///
     /// let (sqrt_pi, o) = Float::sqrt_pi_prec(100);
-    /// assert_eq!(sqrt_pi.to_string(), "1.772453850905516027298167483341");
+    /// assert_eq!(sqrt_pi.to_string(), "1.7724538509055160272981674833413");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
