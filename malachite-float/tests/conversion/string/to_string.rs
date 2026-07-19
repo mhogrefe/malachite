@@ -39,8 +39,8 @@ pub fn test_to_string() {
     test("-Infinity", "-Infinity");
     test("0x0.0", "0.0");
     test("-0x0.0", "-0.0");
-    // Every Float of precision p is shown with 1 + ceil(p log10(2)) significant digits — enough to
-    // round-trip, the same count for every value of that precision, trailing zeros included.
+    // Every Float of precision p is shown with 1 + ceil(p log10(2)) significant digits — enough
+    // to round-trip, the same count for every value of that precision, trailing zeros included.
     test("0x1.0#1", "1.0");
     test("0x1.8#2", "1.5");
     test("-0x1.8#2", "-1.5");
@@ -64,9 +64,9 @@ pub fn test_to_string() {
 fn test_to_string_high_precision() {
     // Regression test: printing a `Float` of very high precision computes a power of 10 spanning
     // hundreds of limbs, which used to panic in nz's `limbs_float_exp` (its squaring scratch was
-    // sized once for the full length, but `limbs_square_to_out_scratch_len` is not monotonic — the
-    // FFT range needs no scratch while the Toom range below it does — so a shorter operand inside
-    // the loop could need more than the full length did).
+    // sized once for the full length, but `limbs_square_to_out_scratch_len` is not monotonic —
+    // the FFT range needs no scratch while the Toom range below it does — so a shorter operand
+    // inside the loop could need more than the full length did).
     const P: u64 = 100_000;
     let x = Float::from_natural_prec(Natural::power_of_2(P - 1) + Natural::ONE, P).0;
     let s = x.to_string();
@@ -93,8 +93,8 @@ fn to_string_properties() {
                 assert!(string_is_subset(&s, "-.0123456789e"));
                 // The round-trip digit count, uniform for each precision — except that when all
                 // the digits are integral, the point-forcing convention appends a `.0` whose zero
-                // is not a significant digit ("16.0" for the two-digit prec-1 value 16, but
-                // "255.0" for the genuinely four-digit prec-8 value 255).
+                // is not a significant digit ("16.0" for the two-digit prec-1 value 16, but "255.0"
+                // for the genuinely four-digit prec-8 value 255).
                 if let Some(precision) = x.get_prec() {
                     let count = significant_digit_count(&s);
                     let expected = get_str_ndigits(10, precision);
@@ -126,7 +126,11 @@ pub fn test_to_binary_string() {
     test("0xff.0#8", "11111111.0", "0b11111111.0");
     test("0x5.0#3", "101.0", "0b101.0");
     test("0x0.00008#1", "1.0E-17", "0b1.0E-17");
-    test("0x6.f70E+25#13", "1.101111011100E102", "0b1.101111011100E102");
+    test(
+        "0x6.f70E+25#13",
+        "1.101111011100E102",
+        "0b1.101111011100E102",
+    );
     test("0x0.004#1", "1.0E-10", "0b1.0E-10");
 }
 
@@ -148,8 +152,8 @@ fn to_binary_string_properties() {
             // digits 2-9 can still appear in the decimal exponent
             assert!(string_is_subset(&s, "-.01E+23456789"));
             // Binary digits represent the value exactly, one digit per bit of precision — except
-            // that the point-forcing convention's `.0` zero is not a significant digit (and can
-            // sit in the mantissa of a scientific form, as in "1.0E1" for the prec-1 value 2).
+            // that the point-forcing convention's `.0` zero is not a significant digit (and can sit
+            // in the mantissa of a scientific form, as in "1.0E1" for the prec-1 value 2).
             let count = u64::try_from(significant_digit_count(&s)).unwrap();
             let precision = x.get_prec().unwrap();
             let mantissa = s.split('E').next().unwrap();

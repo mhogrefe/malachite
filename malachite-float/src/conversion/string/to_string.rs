@@ -76,8 +76,8 @@ impl Display for Float {
     /// The output has enough base-10 digits to round-trip: `1 + ceil(p log10(2))` significant
     /// digits for a [`Float`] of precision `p` (the same count for every value of a given
     /// precision), correctly rounded to nearest. It always contains a decimal point, small and
-    /// large values use scientific notation, zeros are `0.0` and `-0.0`, and the special values
-    /// are `NaN`, `Infinity`, and `-Infinity`.
+    /// large values use scientific notation, zeros are `0.0` and `-0.0`, and the special values are
+    /// `NaN`, `Infinity`, and `-Infinity`.
     fn fmt(&self, f: &mut Formatter) -> Result {
         let mut options = ToSciOptions::default();
         if let Self(Finite { precision, .. }) = self {
@@ -114,8 +114,8 @@ impl Octal for Float {
 }
 
 impl LowerHex for Float {
-    /// Converts a [`Float`] to a hexadecimal [`String`](alloc::string::String); the alternate
-    /// form prefixes it with `0x`.
+    /// Converts a [`Float`] to a hexadecimal [`String`](alloc::string::String); the alternate form
+    /// prefixes it with `0x`.
     #[inline]
     fn fmt(&self, f: &mut Formatter) -> Result {
         fmt_power_of_2_base(self, f, 4, false, "0x")
