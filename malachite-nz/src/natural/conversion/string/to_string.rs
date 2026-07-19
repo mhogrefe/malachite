@@ -12,7 +12,9 @@ use crate::natural::conversion::digits::general_digits::{
     limbs_digit_count, limbs_to_digits_small_base_no_alg_specified,
 };
 use crate::natural::logic::significant_bits::limbs_significant_bits;
-use crate::natural::{HALF_WIDTH, QUARTER_WIDTH, WIDTH_MINUS_1, WIDTH_MINUS_2, WIDTH_MINUS_3};
+#[cfg(feature = "test_build")]
+use crate::natural::HALF_WIDTH;
+use crate::natural::{QUARTER_WIDTH, WIDTH_MINUS_1, WIDTH_MINUS_2, WIDTH_MINUS_3};
 use crate::platform::Limb;
 use alloc::string::String;
 #[cfg(feature = "test_build")]

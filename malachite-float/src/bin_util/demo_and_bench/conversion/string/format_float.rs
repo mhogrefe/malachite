@@ -16,22 +16,32 @@ use malachite_float::test_util::generators::float_string_pair_gen_var_1;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_format_float_str);
+    register_demo!(runner, demo_format_float_str_debug);
     register_bench!(runner, benchmark_format_float_str);
 }
 
 fn demo_format_float_str(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, s) in float_string_pair_gen_var_1().get(gm, config).take(limit) {
+        match format_float_str(&x, &s) {
+            Some(t) => println!("format_float_str({x}, {s:?}) = {t:?}"),
+            None => println!("format_float_str({x}, {s:?}) = None"),
+        }
+    }
+}
+
+fn demo_format_float_str_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, s) in float_string_pair_gen_var_1().get(gm, config).take(limit) {
         let cx = ComparableFloatRef(&x);
         match format_float_str(&x, &s) {
-            Some(t) => println!("format_float_str({cx:x}, {s:?}) = {t:?}"),
-            None => println!("format_float_str({cx:x}, {s:?}) = None"),
+            Some(t) => println!("format_float_str({cx:#x}, {s:?}) = {t:?}"),
+            None => println!("format_float_str({cx:#x}, {s:?}) = None"),
         }
     }
 }
 
 fn benchmark_format_float_str(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
-        "format_float_str(&Float, &[u8])",
+        "format_float_str(&Float, &str)",
         BenchmarkType::Single,
         float_string_pair_gen_var_1().get(gm, config),
         gm.name(),

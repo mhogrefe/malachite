@@ -18,16 +18,16 @@
 // rendered as a `&[u8]` slice that the parser functions advance by returning the unconsumed tail.
 //
 // `format_float_str` (below) is the public MPFR-compatible entry point, for callers who want strict
-// `mpfr_printf`-style formatting of a single `Float`. Everything else is internal: `format` is the
-// multi-conversion engine it delegates to; `format_float` / `float_conversion_spec` / `PrintfSpec`
-// are the spec-based core, exposed only under `test_build`. The `dead_code` allow covers those
-// test-only entry points, which are unused in a normal build.
+// `mpfr_printf`-style formatting of a single `Float`. Everything else is internal: `format` /
+// `PrintfArg` are the multi-conversion engine it delegates to, and `format_float` /
+// `float_conversion_spec` / `PrintfSpec` are the spec-based core; all are exposed only under
+// `test_build`, for tests/conversion/string/format_float.rs.
 //
 // Porting status (2026-07-17):
 // - DONE — the ENTIRE `%R` float path works, and `format_float_str` is public. It is validated
 //   against MPFR (via rug's `get_str` oracle) in tests/conversion/string/format_float.rs, for all
 //   of 'e'/'f'/'g' [base 10] and 'a'/'A'/'b' [bases 16/2]; printf has no other float bases. Chain:
-//   spec/flag/arg-type parsing, `StringBuffer` + buffer ops, `NumberParts`/`DecimalInfo`,
+//   spec/flag/arg-type parsing, buffer ops (on a plain `Vec<u8>`), `NumberParts`/`DecimalInfo`,
 //   `mpfr_get_str_wrapper`, `floor_log10` (on `Float::unsigned_pow`), `number_parts_init`,
 //   `regular_eg` (scientific), `regular_fg` (fixed), `next_base_power_p` + `regular_ab`
 //   (hex/binary), `partition_number` (dispatcher), `sprnt_fp` (emitter), `format_float` (a
@@ -50,9 +50,9 @@
 //     exact values away under away-rounding modes ("%.0RUa" of 1.5 gives 0xdp-3 = 1.625) and
 //     overflows its digit table when the top digit is 0xf ("%.0RUa" of 15 prints garbage), and it
 //     misses inexactness below the top significand limb ("%.0RUb" of 2^100 + 1 is not rounded up).
-#![allow(dead_code)]
 
 use crate::Float;
+use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::conversion::string::get_str::{ceil_mul, get_str, get_str_ndigits};
 use core::cmp::Ordering::{Equal, Greater, Less};
 use malachite_base::fail_on_untested_path;
@@ -70,7 +70,10 @@ use malachite_nz::platform::Limb;
 
 // All the types described by the `type` field of the format string.
 //
-// This is `enum arg_t` from `vasprintf.c`, MPFR 4.2.2.
+// This is `enum arg_t` from `vasprintf.c`, MPFR 4.2.2, without its `UNSUPPORTED` variant: MPFR
+// assigns it only in `#ifndef` fallbacks for C types its build lacks (`intmax_t`, `long long`,
+// `long double`, `ptrdiff_t`), which always exist here, so this port never constructs it —
+// unsupported conversions are instead rejected by `specinfo_is_valid` or by `format` itself.
 #[derive(Clone, Copy, Eq, PartialEq)]
 pub(crate) enum ArgType {
     None,
@@ -89,7 +92,6 @@ pub(crate) enum ArgType {
     Mpz,
     MpfrPrec,
     Mpfr,
-    Unsupported,
 }
 
 // A single conversion specification of the format string, filled in by the parser. (Adapted, like
@@ -164,26 +166,26 @@ const fn integer_like_arg_type(at: ArgType) -> bool {
     )
 }
 
-// Returns 1 if `spec` is a valid (supported) conversion, 0 if invalid, and -1 for `n` (which MPFR
-// rejects).
+// Whether `spec` is a valid (supported) conversion. (MPFR's version returns a third state for
+// `n`, which it rejects with an error rather than merely considering invalid; this port drops `%n`
+// like any other invalid conversion, so a `bool` suffices.)
 //
 // This is `specinfo_is_valid` from `vasprintf.c`, MPFR 4.2.2.
-fn specinfo_is_valid(spec: PrintfSpec) -> i32 {
+fn specinfo_is_valid(spec: PrintfSpec) -> bool {
     match spec.spec {
-        b'n' => -1,
         // 'F': see below
         b'a' | b'A' | b'e' | b'E' | b'f' | b'g' | b'G' => {
-            i32::from(spec.arg_type == ArgType::None || floating_point_arg_type(spec.arg_type))
+            spec.arg_type == ArgType::None || floating_point_arg_type(spec.arg_type)
         }
         // 'F' only supports MPFR_ARG, since GMP doesn't support it (it is the mpf_t specifier); 'b'
         // is MPFR-specific.
-        b'F' | b'b' => i32::from(spec.arg_type == ArgType::Mpfr),
+        b'F' | b'b' => spec.arg_type == ArgType::Mpfr,
         b'd' | b'i' | b'o' | b'u' | b'x' | b'X' => {
-            i32::from(spec.arg_type == ArgType::None || integer_like_arg_type(spec.arg_type))
+            spec.arg_type == ArgType::None || integer_like_arg_type(spec.arg_type)
         }
-        b'c' | b's' => i32::from(spec.arg_type == ArgType::None || spec.arg_type == ArgType::Long),
-        b'p' => i32::from(spec.arg_type == ArgType::None),
-        _ => 0,
+        b'c' | b's' => matches!(spec.arg_type, ArgType::None | ArgType::Long),
+        b'p' => spec.arg_type == ArgType::None,
+        _ => false,
     }
 }
 
@@ -267,77 +269,53 @@ const fn parse_arg_type<'a>(format: &'a [u8], specinfo: &mut PrintfSpec) -> &'a 
     format_tail
 }
 
-// The growable output buffer. MPFR's `struct string_buffer` tracks a manually-`realloc`-ed C buffer
-// (`start`/`curr`/`size`) plus a `len` that becomes -1 on overflow (for the snprintf return value);
-// a `Vec<u8>` subsumes all of that (growth is automatic, and a length exceeding `usize::MAX` is not
-// a reachable state), so neither `buffer_widen` nor the overflow bookkeeping (`buffer_incr_len`) is
-// ported. The size-0 (count-only `snprintf`) mode is likewise dropped: this engine always produces
-// the full output.
-//
-// This is `struct string_buffer` from `vasprintf.c`, MPFR 4.2.2.
-struct StringBuffer {
-    chars: Vec<u8>,
-}
+// The output buffer is a plain `Vec<u8>`, which subsumes MPFR's `struct string_buffer` and its
+// `buffer_init` / `buffer_widen` / `buffer_incr_len` machinery (a manually-`realloc`-ed C buffer
+// plus a `len` that becomes -1 on overflow, for the snprintf return value): growth is automatic,
+// and a length exceeding `usize::MAX` is not a reachable state. `buffer_cat` is
+// `extend_from_slice`. The size-0 (count-only `snprintf`) mode is likewise dropped: this engine
+// always produces the full output.
 
-// This is `buffer_init` from `vasprintf.c`, MPFR 4.2.2.
-fn buffer_init(s: usize) -> StringBuffer {
-    StringBuffer {
-        chars: Vec::with_capacity(s),
-    }
-}
-
-// Concatenates `s` to the buffer `b`. (The caller passes the already-truncated slice, so MPFR's
-// separate `len` argument is the slice length.)
-//
-// This is `buffer_cat` from `vasprintf.c`, MPFR 4.2.2.
-fn buffer_cat(b: &mut StringBuffer, s: &[u8]) {
-    b.chars.extend_from_slice(s);
-}
-
-// Adds `n` copies of the character `c` to the end of the buffer `b`.
+// Adds `n` copies of the character `c` to the end of the buffer `b` (a no-op when `n` is 0).
 //
 // This is `buffer_pad` from `vasprintf.c`, MPFR 4.2.2.
-fn buffer_pad(b: &mut StringBuffer, c: u8, n: i64) {
-    assert!(n > 0);
-    let new_len = b.chars.len() + usize::exact_from(n);
-    b.chars.resize(new_len, c);
+fn buffer_pad(b: &mut Vec<u8>, c: u8, n: i64) {
+    let new_len = b.len() + usize::exact_from(n);
+    b.resize(new_len, c);
 }
 
-// Forms a string by concatenating the first `len` characters of `str` to `tz` zero(s), inserting
-// the character `c` every 3 characters from end to beginning, and concatenates the result to the
-// buffer `b`. `c` must not be null and `tz` must be 0 or 1.
+// Concatenates the digits `str` and `tz` trailing zero(s) to the buffer `b`, inserting the
+// character `c` every 3 characters from end to beginning. `c` must not be null and `tz` must be 0
+// or 1.
 //
 // This is `buffer_sandwich` from `vasprintf.c`, MPFR 4.2.2.
-fn buffer_sandwich(b: &mut StringBuffer, str: &[u8], mut len: usize, tz: usize, c: u8) {
+fn buffer_sandwich(b: &mut Vec<u8>, mut str: &[u8], tz: usize, c: u8) {
     const STEP: usize = 3;
     assert!(tz == 0 || tz == 1);
     assert!(c != b'\0');
-    assert!(len <= str.len());
-    let size = len + tz; // number of digits
+    let size = str.len() + tz; // number of digits
     assert!(size > 0);
     let q = (size - 1) / STEP; // number of separators c
     let r = ((size - 1) % STEP) + 1; // number of digits in the leftmost block
-    let mut str = str;
     // first r significant digits (leftmost block)
-    if r <= len {
-        buffer_cat(b, &str[..r]);
+    if r <= str.len() {
+        b.extend_from_slice(&str[..r]);
         str = &str[r..];
-        len -= r;
     } else {
-        // r > len, and as a consequence: len < STEP, size <= STEP, q == 0, r == size, tz == 1
-        buffer_cat(b, &str[..len]);
-        b.chars.push(b'0'); // trailing zero
+        // r > str.len(), and as a consequence: str.len() < STEP, size <= STEP, q == 0, r == size,
+        // and tz == 1
+        b.extend_from_slice(str);
+        b.push(b'0'); // trailing zero
     }
     for _ in 0..q {
-        b.chars.push(c);
-        if len >= STEP {
-            buffer_cat(b, &str[..STEP]);
-            len -= STEP;
+        b.push(c);
+        if str.len() >= STEP {
+            b.extend_from_slice(&str[..STEP]);
             str = &str[STEP..];
         } else {
-            // last digits (i == q - 1 and STEP - len == 1)
-            buffer_cat(b, &str[..len]);
-            b.chars.push(b'0'); // trailing zero
+            // last digits (i == q - 1 and STEP - str.len() == 1)
+            b.extend_from_slice(str);
+            b.push(b'0'); // trailing zero
         }
     }
 }
@@ -385,6 +363,36 @@ fn strip_trailing_zeros(mut s: &[u8]) -> &[u8] {
         s = rest;
     }
     s
+}
+
+// `get_str` returns the digits of a negative number with a leading '-'; skips it, so that `str` is
+// pure digits.
+fn skip_sign<'a>(str: &'a [u8], p: &Float) -> &'a [u8] {
+    if p.is_sign_negative() { &str[1..] } else { str }
+}
+
+// The number of significant digits to request from `get_str` for the precision `prec`: 0 (letting
+// `get_str` decide) when the precision is unset, and otherwise one digit before the point plus
+// `prec` after it. `None` if that overflows a `usize`.
+fn nsd_for_prec(prec: i64) -> Option<usize> {
+    if prec < 0 {
+        Some(0)
+    } else {
+        let nsd = usize::try_from(prec).ok().and_then(|p| p.checked_add(1));
+        if nsd.is_none() {
+            fail_on_untested_path("nsd_for_prec, nsd overflows usize");
+        }
+        nsd
+    }
+}
+
+// The exponent part of the output: the marker letter ('e'/'E' for the decimal conversions, 'p'/'P'
+// for hexadecimal/binary), the exponent's sign, and its decimal digits, zero-padded to at least
+// `min_digits` (2 for the decimal conversions, which show at least two digits; 1 otherwise).
+fn exponent_part(marker: u8, exp: i64, min_digits: usize) -> Vec<u8> {
+    let mut out = vec![marker, if exp >= 0 { b'+' } else { b'-' }];
+    out.extend_from_slice(format!("{:0min_digits$}", exp.unsigned_abs()).as_bytes());
+    out
 }
 
 // Records the result of a `get_str` call so that this expensive function is not called more than
@@ -442,7 +450,7 @@ const fn number_parts_init() -> NumberParts {
 }
 
 // Determines the parts of the string representation of the regular number `p` when `spec.spec` is
-// 'e', 'E', 'g', or 'G'. Returns -1 in case of overflow on the sizes, 0 otherwise.
+// 'e', 'E', 'g', or 'G'. Returns `None` in case of overflow on the sizes.
 //
 // This is `regular_eg` from `vasprintf.c`, MPFR 4.2.2.
 fn regular_eg(
@@ -451,35 +459,20 @@ fn regular_eg(
     spec: &PrintfSpec,
     dec_info: Option<&DecimalInfo>,
     keep_trailing_zeros: bool,
-) -> i32 {
-    let uppercase = spec.spec == b'E' || spec.spec == b'G';
+) -> Option<()> {
+    let uppercase = matches!(spec.spec, b'E' | b'G');
     // integral part: one significant digit
     let storage;
     let (str, exp): (&[u8], i64) = match dec_info {
         None => {
             // We keep the trailing zeros, so `mpfr_get_str_wrapper` may be used.
             debug_assert!(keep_trailing_zeros);
-            // Number of significant digits: 0 (let get_str decide) if no precision, else one digit
-            // before the point plus `spec.prec` after it.
-            let nsd = if spec.prec < 0 {
-                0
-            } else {
-                let Some(n) = usize::try_from(spec.prec)
-                    .ok()
-                    .and_then(|p| p.checked_add(1))
-                else {
-                    fail_on_untested_path("regular_eg, nsd overflows usize");
-                    return -1; // overflow
-                };
-                n
-            };
-            storage = mpfr_get_str_wrapper(10, nsd, p, spec);
+            storage = mpfr_get_str_wrapper(10, nsd_for_prec(spec.prec)?, p, spec);
             (&storage.0, storage.1)
         }
         Some(d) => (&d.str, d.exp),
     };
-    // skip the sign character if any
-    let digits: &[u8] = if p.is_sign_negative() { &str[1..] } else { str };
+    let digits = skip_sign(str, p);
     np.ip = vec![digits[0]];
 
     if spec.prec != 0 {
@@ -507,21 +500,13 @@ fn regular_eg(
     // `exp` is the exponent for the decimal point BEFORE the first digit; we want it AFTER the
     // first digit. No possible overflow because exp < EXP(p) / 3.
     let exp = exp - 1;
-
-    // The exponent part is 'e' or 'E', plus the sign, plus at least two digits, plus only as many
-    // more digits as necessary.
-    let uexp = exp.unsigned_abs();
-    let mut exp_part = Vec::new();
-    exp_part.push(if uppercase { b'E' } else { b'e' });
-    exp_part.push(if exp >= 0 { b'+' } else { b'-' });
-    exp_part.extend_from_slice(format!("{uexp:02}").as_bytes());
-    np.exp = exp_part;
-    0
+    np.exp = exponent_part(if uppercase { b'E' } else { b'e' }, exp, 2);
+    Some(())
 }
 
 // Determines the parts of the string representation of the regular number `p` when `spec.spec` is
 // 'f', 'F', 'g', or 'G'. `dec_info` is the previously-computed exponent and string, or `None`.
-// Returns -1 in case of overflow on the sizes, 0 otherwise.
+// Returns `None` in case of overflow on the sizes.
 //
 // This is `regular_fg` from `vasprintf.c`, MPFR 4.2.2.
 fn regular_fg(
@@ -530,7 +515,7 @@ fn regular_fg(
     spec: &PrintfSpec,
     dec_info: Option<&DecimalInfo>,
     keep_trailing_zeros: bool,
-) -> i32 {
+) -> Option<()> {
     // An empty precision field is forbidden here (it means 6, set before the call).
     debug_assert!(spec.prec >= 0);
     if p.get_exponent().unwrap() <= 0 {
@@ -614,14 +599,14 @@ fn regular_fg(
                         debug_assert!(exp <= -1 && spec.prec + (exp + 1) >= 0);
                         let Ok(nsd) = usize::try_from(spec.prec + (exp + 1)) else {
                             fail_on_untested_path("regular_fg, sub-1 nsd overflows usize");
-                            return -1;
+                            return None;
                         };
                         storage = mpfr_get_str_wrapper(10, nsd, p, spec);
                         (&storage.0, storage.1)
                     }
                     Some(d) => (&d.str, d.exp),
                 };
-                let digits: &[u8] = if p.is_sign_negative() { &str[1..] } else { str };
+                let digits = skip_sign(str, p);
                 if exp == 1 {
                     // rounded up to 1
                     debug_assert!(digits[0] == b'1');
@@ -663,17 +648,14 @@ fn regular_fg(
                 debug_assert!(exp >= 0);
                 // MPFR computes this sum in `mpfr_uintmax_t` so that it cannot overflow the signed
                 // type; use a checked addition instead.
-                let n = match spec.prec.checked_add(exp + 1).map(usize::try_from) {
-                    Some(Ok(n)) => n,
-                    _ => return -1,
-                };
+                let n = usize::try_from(spec.prec.checked_add(exp + 1)?).ok()?;
                 storage = mpfr_get_str_wrapper(10, n, p, spec);
                 (&storage.0, storage.1)
             }
             // %g case
             Some(d) => (&d.str, d.exp),
         };
-        let digits: &[u8] = if p.is_sign_negative() { &str[1..] } else { str };
+        let digits = skip_sign(str, p);
         let str_len = digits.len();
         // integral part: `exp` (from get_str) is the number of integral digits
         let ip_size = if exp > i64::exact_from(str_len) {
@@ -710,7 +692,7 @@ fn regular_fg(
             np.point = b'.';
         }
     }
-    0
+    Some(())
 }
 
 // The default precision for the 'f'/'F'/'g'/'G' conversions (as in C, this is 6).
@@ -767,31 +749,18 @@ fn next_base_power_p(x: &Float, base: i64, rnd: RoundingMode) -> bool {
 }
 
 // Determines the parts of the string representation of the regular number `p` when `spec.spec` is
-// 'a', 'A', or 'b'. Returns -1 in case of overflow on the sizes, 0 otherwise.
+// 'a', 'A', or 'b'. Returns `None` in case of overflow on the sizes.
 //
 // This is `regular_ab` from `vasprintf.c`, MPFR 4.2.2.
-fn regular_ab(np: &mut NumberParts, p: &Float, spec: &PrintfSpec) -> i32 {
+fn regular_ab(np: &mut NumberParts, p: &Float, spec: &PrintfSpec) -> Option<()> {
     let uppercase = spec.spec == b'A';
-    if spec.spec == b'a' || spec.spec == b'A' {
+    if matches!(spec.spec, b'a' | b'A') {
         np.prefix = if uppercase { b"0X" } else { b"0x" };
     }
     let base: i64 = if spec.spec == b'b' { 2 } else { 16 };
     // the sign-skipped digit string, and the base-two exponent for a point after the first digit
     let (mut digits, exp): (Vec<u8>, i64) = if spec.prec != 0 {
-        // one digit before the point plus spec.prec after it (or 0 to let get_str decide)
-        let nsd = if spec.prec < 0 {
-            0
-        } else {
-            let Some(n) = usize::try_from(spec.prec)
-                .ok()
-                .and_then(|p| p.checked_add(1))
-            else {
-                fail_on_untested_path("regular_ab, nsd overflows usize");
-                return -1;
-            };
-            n
-        };
-        let (s, e) = mpfr_get_str_wrapper(base, nsd, p, spec);
+        let (s, e) = mpfr_get_str_wrapper(base, nsd_for_prec(spec.prec)?, p, spec);
         let digits = if p.is_sign_negative() {
             s[1..].to_vec()
         } else {
@@ -869,23 +838,17 @@ fn regular_ab(np: &mut NumberParts, p: &Float, spec: &PrintfSpec) -> i32 {
         np.point = b'.';
     }
 
-    // The exponent part is 'p' or 'P', plus the sign, plus at least one digit.
-    let uexp = exp.unsigned_abs();
-    let mut exp_part = Vec::new();
-    exp_part.push(if uppercase { b'P' } else { b'p' });
-    exp_part.push(if exp >= 0 { b'+' } else { b'-' });
-    exp_part.extend_from_slice(format!("{uexp}").as_bytes());
-    np.exp = exp_part;
-    0
+    np.exp = exponent_part(if uppercase { b'P' } else { b'p' }, exp, 1);
+    Some(())
 }
 
-// Determines the different parts of the string representation of `p` according to `spec`, filling
-// `np` (all previous information in `np` is lost). Returns the total number of characters to be
-// written, or -1 on overflow.
+// Determines the different parts of the string representation of `p` according to `spec`,
+// returning them together with the total number of characters to be written, or `None` on
+// overflow.
 //
 // This is `partition_number` from `vasprintf.c`, MPFR 4.2.2.
-fn partition_number(np: &mut NumberParts, p: &Float, mut spec: PrintfSpec) -> i64 {
-    *np = number_parts_init();
+fn partition_number(p: &Float, mut spec: PrintfSpec) -> Option<(NumberParts, i64)> {
+    let mut np = number_parts_init();
     // left justification means right space padding
     np.pad_type = if spec.left {
         PadType::Right
@@ -906,123 +869,115 @@ fn partition_number(np: &mut NumberParts, p: &Float, mut spec: PrintfSpec) -> i6
         b'\0'
     };
 
-    if p.is_nan() {
-        if matches!(np.pad_type, PadType::LeadingZeros) {
-            // don't want "0000nan"; use left-space padding instead
-            np.pad_type = PadType::Left;
-        }
-        np.ip = if uppercase { b"NAN" } else { b"nan" }.to_vec();
-    } else if p.is_infinite() {
-        if matches!(np.pad_type, PadType::LeadingZeros) {
-            np.pad_type = PadType::Left;
-        }
-        np.ip = if uppercase { b"INF" } else { b"inf" }.to_vec();
-    } else if p.is_zero() {
-        // Note: for 'g', zero is displayed 'f'-style with precision spec.prec - 1 and the trailing
-        // zeros removed unless the '#' flag is used.
-        if spec.spec == b'a' || spec.spec == b'A' {
-            np.prefix = if uppercase { b"0X" } else { b"0x" };
-        }
-        np.ip = vec![b'0'];
-        if spec.prec < 0 {
-            // empty precision field
-            if spec.spec == b'e' || spec.spec == b'E' {
-                // Malachite zeros are precision-less (unlike MPFR); fall back to precision 1 when
-                // the zero carries none.
-                let zprec = p.get_prec().unwrap_or(1);
-                spec.prec = i64::exact_from(get_str_ndigits(10, zprec)) - 1;
-            } else if matches!(spec.spec, b'f' | b'F' | b'g' | b'G') {
-                spec.prec = DEFAULT_DECIMAL_PREC;
+    match p {
+        Float(NaN) => {
+            if matches!(np.pad_type, PadType::LeadingZeros) {
+                // don't want "0000nan"; use left-space padding instead
+                np.pad_type = PadType::Left;
             }
+            np.ip = if uppercase { b"NAN" } else { b"nan" }.to_vec();
         }
-        if spec.prec > 0 && ((spec.spec != b'g' && spec.spec != b'G') || spec.alt) {
-            np.point = b'.';
-            np.fp_trailing_zeros = if spec.spec == b'g' || spec.spec == b'G' {
-                spec.prec - 1
-            } else {
-                spec.prec
-            };
-            debug_assert!(np.fp_trailing_zeros >= 0);
-        } else if spec.alt {
-            np.point = b'.';
-        }
-        if matches!(spec.spec, b'a' | b'A' | b'b' | b'e' | b'E') {
-            // exponent part
-            np.exp = if spec.spec == b'e' || spec.spec == b'E' {
-                if uppercase { b"E+00" } else { b"e+00" }.to_vec()
-            } else {
-                if uppercase { b"P+0" } else { b"p+0" }.to_vec()
-            };
-        }
-    } else {
-        // pure FP (regular number)
-        if spec.spec == b'a' || spec.spec == b'A' || spec.spec == b'b' {
-            if regular_ab(np, p, &spec) == -1 {
-                return -1;
+        Float(Infinity { .. }) => {
+            if matches!(np.pad_type, PadType::LeadingZeros) {
+                np.pad_type = PadType::Left;
             }
-        } else if spec.spec == b'f' || spec.spec == b'F' {
+            np.ip = if uppercase { b"INF" } else { b"inf" }.to_vec();
+        }
+        Float(Zero { .. }) => {
+            // Note: for 'g', zero is displayed 'f'-style with precision spec.prec - 1 and the
+            // trailing zeros removed unless the '#' flag is used.
+            if matches!(spec.spec, b'a' | b'A') {
+                np.prefix = if uppercase { b"0X" } else { b"0x" };
+            }
+            np.ip = vec![b'0'];
             if spec.prec < 0 {
-                spec.prec = DEFAULT_DECIMAL_PREC;
-            }
-            if regular_fg(np, p, &spec, None, true) == -1 {
-                return -1;
-            }
-        } else if spec.spec == b'e' || spec.spec == b'E' {
-            if regular_eg(np, p, &spec, None, true) == -1 {
-                return -1;
-            }
-        } else {
-            // %g case, using the C99 rules: with T the threshold below and X the exponent that
-            // would be displayed with style 'e' and precision T - 1, if T > X >= -4 the conversion
-            // is style 'f'/'F' with precision T - (X + 1), otherwise style 'e'/'E' with precision T
-            // - 1.
-            let threshold = match spec.prec {
-                i64::MIN..0 => DEFAULT_DECIMAL_PREC,
-                0 => 1,
-                _ => spec.prec,
-            };
-            debug_assert!(threshold >= 1);
-            // Try a smaller threshold for get_str: |p| < 2^EXP(p), so the integer part takes at
-            // most ceil(EXP(p) * log10(2)) digits, and with k = PREC(p) - EXP(p), the fractional
-            // part in base 10 has at most k digits (if k > 0).
-            let exp_p = i64::from(p.get_exponent().unwrap());
-            let k = i64::exact_from(p.get_prec().unwrap()) - exp_p;
-            let mut e = if exp_p <= 0 {
-                k
-            } else {
-                (exp_p + 2) / 3 + if k <= 0 { 0 } else { k }
-            };
-            debug_assert!(e >= 1);
-            if e > threshold {
-                e = threshold;
-            }
-            // error if e does not fit in a usize (for get_str)
-            let Ok(e) = usize::try_from(e) else {
-                fail_on_untested_path("partition_number, %g e overflows usize");
-                return -1;
-            };
-            // We need the full significand, so call get_str directly (not the wrapper).
-            let (str, dec_exp, _) = get_str(p, 10, e, spec.rnd_mode).unwrap();
-            let dec_info = DecimalInfo { exp: dec_exp, str };
-            // get_str's significand is in [0.1, 1); we want it in [1, 10).
-            let x = dec_info.exp - 1;
-            if threshold > x && x >= -4 {
-                // x may be as low as -4, so the subtraction can overflow for a threshold within 3
-                // of i64::MAX; fail like the other size overflows.
-                spec.prec = match threshold.checked_sub(x).and_then(|d| d.checked_sub(1)) {
-                    Some(prec) => prec,
-                    None => return -1,
+                // empty precision field
+                spec.prec = match spec.spec {
+                    // Malachite zeros are precision-less (unlike MPFR, which sizes this from the
+                    // zero's stored precision), so use precision 1.
+                    b'e' | b'E' => i64::exact_from(get_str_ndigits(10, 1)) - 1,
+                    b'f' | b'F' | b'g' | b'G' => DEFAULT_DECIMAL_PREC,
+                    _ => spec.prec,
                 };
-                if regular_fg(np, p, &spec, Some(&dec_info), spec.alt) == -1 {
-                    return -1;
-                }
-            } else {
-                spec.prec = threshold - 1;
-                if regular_eg(np, p, &spec, Some(&dec_info), spec.alt) == -1 {
-                    return -1;
-                }
+            }
+            if spec.prec > 0 && (!matches!(spec.spec, b'g' | b'G') || spec.alt) {
+                np.point = b'.';
+                np.fp_trailing_zeros = if matches!(spec.spec, b'g' | b'G') {
+                    spec.prec - 1
+                } else {
+                    spec.prec
+                };
+                debug_assert!(np.fp_trailing_zeros >= 0);
+            } else if spec.alt {
+                np.point = b'.';
+            }
+            // exponent part
+            match spec.spec {
+                b'e' | b'E' => np.exp = if uppercase { b"E+00" } else { b"e+00" }.to_vec(),
+                b'a' | b'A' | b'b' => np.exp = if uppercase { b"P+0" } else { b"p+0" }.to_vec(),
+                _ => {}
             }
         }
+        // pure FP (regular number)
+        Float(Finite {
+            exponent,
+            precision,
+            ..
+        }) => match spec.spec {
+            b'a' | b'A' | b'b' => regular_ab(&mut np, p, &spec)?,
+            b'f' | b'F' => {
+                if spec.prec < 0 {
+                    spec.prec = DEFAULT_DECIMAL_PREC;
+                }
+                regular_fg(&mut np, p, &spec, None, true)?;
+            }
+            b'e' | b'E' => regular_eg(&mut np, p, &spec, None, true)?,
+            _ => {
+                // %g case, using the C99 rules: with T the threshold below and X the exponent that
+                // would be displayed with style 'e' and precision T - 1, if T > X >= -4 the
+                // conversion is style 'f'/'F' with precision T - (X + 1), otherwise style 'e'/'E'
+                // with precision T - 1.
+                let threshold = match spec.prec {
+                    i64::MIN..0 => DEFAULT_DECIMAL_PREC,
+                    0 => 1,
+                    _ => spec.prec,
+                };
+                debug_assert!(threshold >= 1);
+                // Try a smaller threshold for get_str: |p| < 2^EXP(p), so the integer part takes
+                // at most ceil(EXP(p) * log10(2)) digits, and with k = PREC(p) - EXP(p), the
+                // fractional part in base 10 has at most k digits (if k > 0).
+                let exp_p = i64::from(*exponent);
+                let k = i64::exact_from(*precision) - exp_p;
+                let mut e = if exp_p <= 0 {
+                    k
+                } else {
+                    (exp_p + 2) / 3 + if k <= 0 { 0 } else { k }
+                };
+                debug_assert!(e >= 1);
+                if e > threshold {
+                    e = threshold;
+                }
+                // error if e does not fit in a usize (for get_str)
+                let Ok(e) = usize::try_from(e) else {
+                    fail_on_untested_path("partition_number, %g e overflows usize");
+                    return None;
+                };
+                // We need the full significand, so call get_str directly (not the wrapper).
+                let (str, dec_exp, _) = get_str(p, 10, e, spec.rnd_mode).unwrap();
+                let dec_info = DecimalInfo { exp: dec_exp, str };
+                // get_str's significand is in [0.1, 1); we want it in [1, 10).
+                let x = dec_info.exp - 1;
+                if threshold > x && x >= -4 {
+                    // x may be as low as -4, so the subtraction can overflow for a threshold
+                    // within 3 of i64::MAX; fail like the other size overflows.
+                    spec.prec = threshold.checked_sub(x)?.checked_sub(1)?;
+                    regular_fg(&mut np, p, &spec, Some(&dec_info), spec.alt)?;
+                } else {
+                    spec.prec = threshold - 1;
+                    regular_eg(&mut np, p, &spec, Some(&dec_info), spec.alt)?;
+                }
+            }
+        },
     }
 
     // Compute the number of characters to be written, checking against i64::MAX (MPFR_INTMAX_MAX)
@@ -1050,39 +1005,31 @@ fn partition_number(np: &mut NumberParts, p: &Float, mut spec: PrintfSpec) -> i6
     }
     if total > i128::from(i64::MAX) {
         fail_on_untested_path("partition_number, total width overflows i64");
-        return -1;
+        return None;
     }
-    i64::exact_from(total)
+    Some((np, i64::exact_from(total)))
 }
 
-// Prints `p` into `buf` according to `spec`. Returns the number of characters written, or -1 if the
-// built string is too long.
+// Prints `p` into `buf` according to `spec`, appending to any existing contents. Returns `None` on
+// a size overflow.
 //
 // This is `sprnt_fp` from `vasprintf.c`, MPFR 4.2.2.
-fn sprnt_fp(buf: &mut StringBuffer, p: &Float, spec: &PrintfSpec) -> i64 {
-    let mut np = number_parts_init();
-    let length = partition_number(&mut np, p, *spec);
-    if length < 0 {
-        return -1;
-    }
-    // MPFR sizes its buffer from `length` up front; reserve to match.
-    if let Ok(len) = usize::try_from(length) {
-        buf.chars.reserve(len);
-    }
+fn sprnt_fp(buf: &mut Vec<u8>, p: &Float, spec: &PrintfSpec) -> Option<()> {
+    let (np, length) = partition_number(p, *spec)?;
+    // MPFR sizes its buffer from the total length up front; reserve to match.
+    buf.reserve(usize::try_from(length).unwrap_or(0));
     // right justification padding with left spaces
-    if matches!(np.pad_type, PadType::Left) && np.pad_size != 0 {
+    if matches!(np.pad_type, PadType::Left) {
         buffer_pad(buf, b' ', np.pad_size);
     }
     // sign character (may be '-', '+', ' ', or '\0')
     if np.sign != b'\0' {
-        buffer_pad(buf, np.sign, 1);
+        buf.push(np.sign);
     }
     // prefix part
-    if !np.prefix.is_empty() {
-        buffer_cat(buf, np.prefix);
-    }
+    buf.extend_from_slice(np.prefix);
     // right justification padding with leading zeros
-    if matches!(np.pad_type, PadType::LeadingZeros) && np.pad_size != 0 {
+    if matches!(np.pad_type, PadType::LeadingZeros) {
         buffer_pad(buf, b'0', np.pad_size);
     }
     // integral part (never empty)
@@ -1090,43 +1037,34 @@ fn sprnt_fp(buf: &mut StringBuffer, p: &Float, spec: &PrintfSpec) -> i64 {
         buffer_sandwich(
             buf,
             &np.ip,
-            np.ip.len(),
             usize::exact_from(np.ip_trailing_digits),
             np.thousands_sep,
         );
     } else {
-        buffer_cat(buf, &np.ip);
+        buf.extend_from_slice(&np.ip);
         // possible trailing zero in the integral part
         debug_assert!(np.ip_trailing_digits <= 1);
         if np.ip_trailing_digits != 0 {
-            buffer_pad(buf, b'0', 1);
+            buf.push(b'0');
         }
     }
     // decimal point
     if np.point != b'\0' {
-        buffer_pad(buf, np.point, 1);
+        buf.push(np.point);
     }
     // leading zeros in the fractional part
-    if np.fp_leading_zeros != 0 {
-        buffer_pad(buf, b'0', np.fp_leading_zeros);
-    }
+    buffer_pad(buf, b'0', np.fp_leading_zeros);
     // significant digits in the fractional part
-    if !np.fp.is_empty() {
-        buffer_cat(buf, &np.fp);
-    }
+    buf.extend_from_slice(&np.fp);
     // trailing zeros in the fractional part
-    if np.fp_trailing_zeros != 0 {
-        buffer_pad(buf, b'0', np.fp_trailing_zeros);
-    }
+    buffer_pad(buf, b'0', np.fp_trailing_zeros);
     // exponent part
-    if !np.exp.is_empty() {
-        buffer_cat(buf, &np.exp);
-    }
+    buf.extend_from_slice(&np.exp);
     // left justification padding with right spaces
-    if matches!(np.pad_type, PadType::Right) && np.pad_size != 0 {
+    if matches!(np.pad_type, PadType::Right) {
         buffer_pad(buf, b' ', np.pad_size);
     }
-    length
+    Some(())
 }
 
 // Builds a [`PrintfSpec`] for a single `%R<conv>` conversion with the given precision (negative
@@ -1151,21 +1089,26 @@ pub_const_crate_test! {float_conversion_spec(
 // formatted string, or `None` on an internal size overflow (where MPFR returns -1). This is the
 // core of the `%R` path; [`format`] is the multi-conversion format-string frontend on top of it.
 pub_crate_test! {format_float(p: &Float, spec: &PrintfSpec) -> Option<String> {
-    let mut buf = buffer_init(0);
-    if sprnt_fp(&mut buf, p, spec) < 0 {
-        return None;
-    }
-    Some(String::from_utf8(buf.chars).unwrap())
+    let mut buf = Vec::new();
+    sprnt_fp(&mut buf, p, spec)?;
+    Some(String::from_utf8(buf).unwrap())
 }}
 
-// An argument supplied to [`format`]. The `%R<conv>` conversions consume a [`Float`]; the `*`
-// width/precision fields and the `%d`/`%i` conversions consume an [`Int`]; `%s` consumes a [`Str`].
-// This replaces the C `va_list`.
-pub(crate) enum PrintfArg<'a> {
+// An argument supplied to [`format`]. The `%R<conv>` conversions consume a `Float`; the `*`
+// width/precision fields and the `%d`/`%i` conversions consume an `Int`; `%s` consumes a `Str`.
+// This replaces the C `va_list`. The enum is `pub` under `test_build` so the tests can drive
+// [`format`] directly.
+pub_crate_test_enum! {
+PrintfArg<'a> {
     Float(&'a Float),
+    // `format` consumes `Int` and `Str` arguments, but until the multi-conversion frontend becomes
+    // public, only the tests construct them (`format_float_str` supplies a single `Float`), so in a
+    // normal build they are never-constructed variants.
+    #[allow(dead_code)]
     Int(i64),
+    #[allow(dead_code)]
     Str(&'a str),
-}
+}}
 
 // Whether `c` is one of the floating-point conversion specifiers.
 const fn is_float_conversion(c: u8) -> bool {
@@ -1179,23 +1122,27 @@ const fn is_float_conversion(c: u8) -> bool {
 // unconsumed tail. A `*` consumes the next `Int` argument. The value is `None` if a literal
 // overflows an `i64` (the C `READ_INT` macro sets an overflow flag that makes `mpfr_vasnprintf_aux`
 // fail with EOVERFLOW; here the caller bails out likewise).
-fn read_int<'a>(fmt: &'a [u8], args: &mut core::slice::Iter<PrintfArg>) -> (Option<i64>, &'a [u8]) {
-    if fmt.first() == Some(&b'*') {
+fn read_int<'a>(
+    mut fmt: &'a [u8],
+    args: &mut core::slice::Iter<PrintfArg>,
+) -> (Option<i64>, &'a [u8]) {
+    if let Some((&b'*', tail)) = fmt.split_first() {
         let n = match args.next() {
             Some(PrintfArg::Int(n)) => *n,
             _ => 0,
         };
-        (Some(n), &fmt[1..])
+        (Some(n), tail)
     } else {
         let mut n: Option<i64> = Some(0);
-        let mut i = 0;
-        while i < fmt.len() && fmt[i].is_ascii_digit() {
+        while let Some((&d, tail)) = fmt.split_first()
+            && d.is_ascii_digit()
+        {
             n = n
                 .and_then(|n| n.checked_mul(10))
-                .and_then(|n| n.checked_add(i64::from(fmt[i] - b'0')));
-            i += 1;
+                .and_then(|n| n.checked_add(i64::from(d - b'0')));
+            fmt = tail;
         }
-        (n, &fmt[i..])
+        (n, fmt)
     }
 }
 
@@ -1310,7 +1257,7 @@ fn format_str(s: &str, spec: &PrintfSpec) -> Vec<u8> {
 // This is the `%R` path of `mpfr_vasnprintf_aux`'s main loop from `vasprintf.c`, MPFR 4.2.2, recast
 // onto a Rust argument slice instead of a `va_list` (and without the `gmp_vsnprintf` delegation,
 // which has no Malachite analog).
-pub(crate) fn format(fmt: &[u8], args: &[PrintfArg]) -> Option<Vec<u8>> {
+pub_crate_test! {format(fmt: &[u8], args: &[PrintfArg]) -> Option<Vec<u8>> {
     let mut out = Vec::new();
     let mut fmt = fmt;
     let mut args = args.iter();
@@ -1342,120 +1289,94 @@ pub(crate) fn format(fmt: &[u8], args: &[PrintfArg]) -> Option<Vec<u8>> {
         }
 
         // precision
-        if fmt.first() == Some(&b'.') {
+        spec.prec = if fmt.first() == Some(&b'.') {
             fmt = &fmt[1..];
             let (pr, rest) = read_int(fmt, &mut args);
             fmt = rest;
             let pr = pr?;
-            spec.prec = if pr < 0 { -1 } else { pr };
+            if pr < 0 { -1 } else { pr }
         } else {
-            spec.prec = -1;
-        }
+            -1
+        };
 
         fmt = parse_arg_type(fmt, &mut spec);
 
-        // rounding mode (only for the mpfr argument type)
-        if spec.arg_type == ArgType::Mpfr {
-            spec.rnd_mode = match fmt.first() {
-                Some(b'D') => {
-                    fmt = &fmt[1..];
-                    Floor
-                }
-                Some(b'U') => {
-                    fmt = &fmt[1..];
-                    Ceiling
-                }
-                Some(b'Y') => {
-                    fmt = &fmt[1..];
-                    Up
-                }
-                Some(b'Z') => {
-                    fmt = &fmt[1..];
-                    Down
-                }
-                Some(b'N') => {
-                    fmt = &fmt[1..];
-                    Nearest
-                }
-                Some(b'*') => {
-                    fmt = &fmt[1..];
-                    // MPFR's rounding-mode enum: 0 = RNDN, 1 = RNDZ, 2 = RNDU, 3 = RNDD, 4 = RNDA
-                    match args.next() {
-                        Some(PrintfArg::Int(1)) => Down,
-                        Some(PrintfArg::Int(2)) => Ceiling,
-                        Some(PrintfArg::Int(3)) => Floor,
-                        Some(PrintfArg::Int(4)) => Up,
-                        _ => Nearest,
-                    }
-                }
-                _ => Nearest,
+        // rounding mode (an optional character, only for the mpfr argument type)
+        if spec.arg_type == ArgType::Mpfr
+            && let Some((&c, tail)) = fmt.split_first()
+        {
+            let rm = match c {
+                b'D' => Some(Floor),
+                b'U' => Some(Ceiling),
+                b'Y' => Some(Up),
+                b'Z' => Some(Down),
+                b'N' => Some(Nearest),
+                // MPFR's rounding-mode enum: 0 = RNDN, 1 = RNDZ, 2 = RNDU, 3 = RNDD, 4 = RNDA
+                b'*' => Some(match args.next() {
+                    Some(PrintfArg::Int(1)) => Down,
+                    Some(PrintfArg::Int(2)) => Ceiling,
+                    Some(PrintfArg::Int(3)) => Floor,
+                    Some(PrintfArg::Int(4)) => Up,
+                    _ => Nearest,
+                }),
+                _ => None,
             };
+            if let Some(rm) = rm {
+                spec.rnd_mode = rm;
+                fmt = tail;
+            }
         }
 
-        spec.spec = match fmt.first() {
-            Some(&s) => s,
-            None => {
-                break;
-            }
+        let Some((&conversion, tail)) = fmt.split_first() else {
+            break;
         };
-        if specinfo_is_valid(spec) != 1 {
+        spec.spec = conversion;
+        fmt = tail;
+        if !specinfo_is_valid(spec) {
             // invalid conversion specifier: drop it
-            fmt = &fmt[1..];
             continue;
         }
-        fmt = &fmt[1..];
 
         // Every conversion must consume exactly one argument (or fail): a valid conversion that
         // silently consumed nothing would desynchronize the argument stream for every later
         // conversion.
-        if spec.arg_type == ArgType::Mpfr && is_float_conversion(spec.spec) {
-            match args.next()? {
-                PrintfArg::Float(p) => {
-                    let mut buf = buffer_init(0);
-                    if sprnt_fp(&mut buf, p, &spec) < 0 {
-                        return None;
-                    }
-                    out.extend_from_slice(&buf.chars);
-                }
-                _ => {
+        match (spec.spec, spec.arg_type) {
+            (c, ArgType::Mpfr) if is_float_conversion(c) => {
+                let PrintfArg::Float(p) = args.next()? else {
                     return None;
-                }
+                };
+                sprnt_fp(&mut out, p, &spec)?;
             }
-        } else if matches!(spec.spec, b'd' | b'i')
-            && matches!(
-                spec.arg_type,
+            (
+                b'd' | b'i',
                 ArgType::None
-                    | ArgType::Char
-                    | ArgType::Short
-                    | ArgType::Long
-                    | ArgType::LongLong
-                    | ArgType::IntMax
-                    | ArgType::Size
-                    | ArgType::PtrDiff
-            )
-        {
-            match args.next()? {
-                PrintfArg::Int(n) => out.extend_from_slice(&format_int(*n, &spec)),
-                _ => {
+                | ArgType::Char
+                | ArgType::Short
+                | ArgType::Long
+                | ArgType::LongLong
+                | ArgType::IntMax
+                | ArgType::Size
+                | ArgType::PtrDiff,
+            ) => {
+                let PrintfArg::Int(n) = args.next()? else {
                     return None;
-                }
+                };
+                out.extend_from_slice(&format_int(*n, &spec));
             }
-        } else if spec.spec == b's' && spec.arg_type == ArgType::None {
-            match args.next()? {
-                PrintfArg::Str(s) => out.extend_from_slice(&format_str(s, &spec)),
-                _ => {
+            (b's', ArgType::None) => {
+                let PrintfArg::Str(s) = args.next()? else {
                     return None;
-                }
+                };
+                out.extend_from_slice(&format_str(s, &spec));
             }
-        } else {
             // A conversion that is valid in MPFR but has no counterpart in the `PrintfArg` model
             // (e.g. `%Zd`, `%u`, `%x`, `%c`, `%p`, `%ls`, or a float conversion without the `R`
             // prefix): fail rather than desynchronize the argument stream.
-            return None;
+            _ => return None,
         }
     }
     Some(out)
-}
+}}
 
 /// Formats a [`Float`] according to an MPFR-style `printf` format string, for strict compatibility
 /// with MPFR's `mpfr_printf` family.
@@ -1531,266 +1452,4 @@ pub(crate) fn format(fmt: &[u8], args: &[PrintfArg]) -> Option<Vec<u8>> {
 #[inline]
 pub fn format_float_str(x: &Float, fmt: &str) -> Option<String> {
     format(fmt.as_bytes(), &[PrintfArg::Float(x)]).map(|v| String::from_utf8(v).unwrap())
-}
-
-#[cfg(test)]
-mod tests {
-    use super::PrintfArg::{Float as F, Int, Str};
-    use super::{float_conversion_spec, format, format_float, format_float_str};
-    use crate::Float;
-    use malachite_base::num::arithmetic::traits::PowerOf2;
-    use malachite_base::num::basic::traits::One;
-    use malachite_base::rounding_modes::RoundingMode::{self, Nearest, Up};
-    use malachite_nz::natural::Natural;
-
-    // Convenience: format one Float with default flags.
-    fn fmt_float(p: &Float, conv: u8, prec: i64, rm: RoundingMode) -> String {
-        format_float(p, &float_conversion_spec(conv, prec, 0, rm)).unwrap()
-    }
-
-    // Convenience: run the format-string frontend and collect the result as a `String`.
-    fn fmt(f: &[u8], args: &[super::PrintfArg]) -> String {
-        String::from_utf8(format(f, args).unwrap()).unwrap()
-    }
-
-    #[test]
-    fn format_float_smoke() {
-        let e = |p: &Float, prec: i64| fmt_float(p, b'e', prec, Nearest);
-        let f = |p: &Float, prec: i64| fmt_float(p, b'f', prec, Nearest);
-        let g = |p: &Float, prec: i64| fmt_float(p, b'g', prec, Nearest);
-        // scientific
-        assert_eq!(e(&Float::from(0.0), 5), "0.00000e+00");
-        assert_eq!(e(&Float::from(1.5), 5), "1.50000e+00");
-        assert_eq!(e(&Float::from(-1.5), 5), "-1.50000e+00");
-        assert_eq!(e(&Float::from(1234.5), 3), "1.234e+03");
-        assert_eq!(e(&Float::from(0.001234), 3), "1.234e-03");
-        // fixed
-        assert_eq!(f(&Float::from(0.0), 3), "0.000");
-        assert_eq!(f(&Float::from(1.5), 3), "1.500");
-        assert_eq!(f(&Float::from(1234.5), 2), "1234.50");
-        assert_eq!(f(&Float::from(0.001234), 6), "0.001234");
-        // general
-        assert_eq!(g(&Float::from(1.5), 6), "1.5");
-        assert_eq!(g(&Float::from(1234.5), 6), "1234.5");
-        assert_eq!(g(&Float::from(0.0001), 6), "0.0001");
-        assert_eq!(g(&Float::from(1000000.0), 6), "1e+06");
-    }
-
-    #[test]
-    fn format_float_hex_bin_smoke() {
-        let a = |p: &Float, prec: i64| fmt_float(p, b'a', prec, Nearest);
-        let up_a = |p: &Float, prec: i64| fmt_float(p, b'A', prec, Nearest);
-        let b = |p: &Float, prec: i64| fmt_float(p, b'b', prec, Nearest);
-        // hexadecimal ('%a')
-        assert_eq!(a(&Float::from(0.0), -1), "0x0p+0");
-        assert_eq!(a(&Float::from(1.5), -1), "0x1.8p+0");
-        assert_eq!(a(&Float::from(-1.5), -1), "-0x1.8p+0");
-        assert_eq!(a(&Float::from(255.0), -1), "0xf.fp+4");
-        assert_eq!(a(&Float::from(1.5), 2), "0x1.80p+0");
-        assert_eq!(up_a(&Float::from(255.0), -1), "0XF.FP+4");
-        // binary ('%b')
-        assert_eq!(b(&Float::from(1.5), -1), "1.1p+0");
-        assert_eq!(b(&Float::from(5.0), -1), "1.01p+2");
-        assert_eq!(b(&Float::from(-0.25), -1), "-1p-2");
-    }
-
-    #[test]
-    fn format_float_single_digit_rounding() {
-        // Exact values must not be rounded away (MPFR 4.2.2 gets these wrong: "%.0RUa" of 15
-        // overflows its digit table and prints garbage, and of 1.5 prints 0xdp-3 = 1.625).
-        assert_eq!(fmt_float(&Float::from(15.0), b'a', 0, Up), "0xfp+0");
-        assert_eq!(fmt_float(&Float::from(1.5), b'a', 0, Up), "0xcp-3");
-        assert_eq!(
-            fmt_float(&Float::from(-15.0), b'a', 0, RoundingMode::Floor),
-            "-0xfp+0"
-        );
-        // inexact values still round away...
-        assert_eq!(fmt_float(&Float::from(12.5), b'a', 0, Up), "0xdp+0");
-        // ...including up to the next base power for an all-ones top nibble
-        assert_eq!(fmt_float(&Float::from(15.5), b'a', 0, Up), "0x1p+4");
-        // Inexactness held entirely below the top significand limb must also round up (MPFR 4.2.2
-        // only examines the top limb and misses these).
-        let big = Float::from_natural_prec(Natural::power_of_2(100) + Natural::ONE, 101).0;
-        assert_eq!(fmt_float(&big, b'b', 0, Up), "1p+101");
-        let big_hex =
-            Float::from_natural_prec((Natural::from(15u32) << 100u32) + Natural::ONE, 104).0;
-        assert_eq!(fmt_float(&big_hex, b'a', 0, Up), "0x1p+104");
-        // Nearest is unchanged
-        assert_eq!(fmt_float(&Float::from(14.0), b'a', 0, Nearest), "0xep+0");
-    }
-
-    #[test]
-    fn format_float_exact_mode() {
-        // Exact is allowed whenever the output represents the value exactly...
-        assert_eq!(
-            fmt_float(&Float::from(0.5), b'f', 1, RoundingMode::Exact),
-            "0.5"
-        );
-        assert_eq!(
-            fmt_float(&Float::from(1.5), b'a', 0, RoundingMode::Exact),
-            "0xcp-3"
-        );
-    }
-
-    #[test]
-    #[should_panic(expected = "Exact rounding was requested")]
-    fn format_float_exact_mode_fail_decimal() {
-        // ...and panics when it does not (previously this silently printed "0")
-        fmt_float(&Float::from(0.6), b'f', 0, RoundingMode::Exact);
-    }
-
-    #[test]
-    #[should_panic(expected = "Exact rounding was requested")]
-    fn format_float_exact_mode_fail_hex() {
-        fmt_float(&Float::from(15.5), b'a', 0, RoundingMode::Exact);
-    }
-
-    #[test]
-    fn format_overflow_and_errors() {
-        let x = Float::from(1.5);
-        // width/precision literals overflowing an i64 fail like MPFR's EOVERFLOW
-        assert!(format(b"%.99999999999999999999Rf", &[F(&x)]).is_none());
-        assert!(format(b"%99999999999999999999Rf", &[F(&x)]).is_none());
-        // internal size overflows fail instead of wrapping
-        assert!(format_float(&x, &float_conversion_spec(b'f', i64::MAX, 0, Nearest)).is_none());
-        assert!(
-            format_float(
-                &Float::from(0.001),
-                &float_conversion_spec(b'g', i64::MAX - 1, 0, Nearest)
-            )
-            .is_none()
-        );
-        // valid-in-MPFR conversions with no PrintfArg counterpart fail instead of silently
-        // desynchronizing the argument stream
-        assert!(format(b"%u %Rf", &[Int(5), F(&x)]).is_none());
-        assert!(format(b"%e %Rf", &[F(&x), F(&x)]).is_none());
-        // missing and wrongly-typed arguments fail
-        assert!(format(b"%d %d", &[Int(1)]).is_none());
-        assert!(format(b"%d", &[Str("x")]).is_none());
-    }
-
-    #[test]
-    fn format_float_str_smoke() {
-        let x = Float::from(1.5);
-        let s = |fmt: &str| format_float_str(&x, fmt).unwrap();
-        // a bare spec, a spec with surrounding literal text, flags/width/precision, a rounding char
-        assert_eq!(s("%.3Rf"), "1.500");
-        assert_eq!(s("x = %Rg!"), "x = 1.5!");
-        assert_eq!(s("%+08.2Re"), "+1.50e+00");
-        assert_eq!(s("%.0RUf"), "2"); // round up
-        assert_eq!(s("%Ra"), "0x1.8p+0");
-        // `*` width has no integer argument in the single-value form, so it fails
-        assert!(format_float_str(&x, "%*Rf").is_none());
-    }
-
-    #[test]
-    fn format_frontend_smoke() {
-        let x = Float::from(1.5);
-        let big = Float::from(1234.5);
-
-        // literals and escaped percent
-        assert_eq!(fmt(b"no conversions", &[]), "no conversions");
-        assert_eq!(fmt(b"100%% done", &[]), "100% done");
-
-        // a single float conversion with the `R` argument type
-        assert_eq!(fmt(b"%.3Rf", &[F(&x)]), "1.500");
-        assert_eq!(fmt(b"%.5Re", &[F(&big)]), "1.23450e+03");
-        assert_eq!(fmt(b"x = %Rg!", &[F(&big)]), "x = 1234.5!");
-
-        // hexadecimal / binary
-        assert_eq!(fmt(b"%Ra", &[F(&x)]), "0x1.8p+0");
-        assert_eq!(fmt(b"%Rb", &[F(&x)]), "1.1p+0");
-
-        // mixed float, integer, and string conversions in one call, consumed left to right
-        assert_eq!(
-            fmt(b"%s = %.2Rf (%d)", &[Str("val"), F(&big), Int(-7)]),
-            "val = 1234.50 (-7)"
-        );
-
-        // field width via `*`, then precision via `*`, then the float
-        assert_eq!(fmt(b"[%*.*Rf]", &[Int(10), Int(2), F(&x)]), "[      1.50]");
-        // negative `*` width left-justifies
-        assert_eq!(fmt(b"[%*Rf]", &[Int(-12), F(&x)]), "[1.500000    ]");
-
-        // rounding-mode characters (round 1.5 at precision 0)
-        assert_eq!(fmt(b"%.0RDf", &[F(&x)]), "1"); // toward -inf
-        assert_eq!(fmt(b"%.0RUf", &[F(&x)]), "2"); // toward +inf
-    }
-
-    #[test]
-    fn format_frontend_int_str() {
-        // width, zero-pad, precision, sign flags for `%d`
-        assert_eq!(fmt(b"%05d", &[Int(42)]), "00042");
-        assert_eq!(fmt(b"%-5d|", &[Int(42)]), "42   |");
-        assert_eq!(fmt(b"%+d", &[Int(42)]), "+42");
-        assert_eq!(fmt(b"% d", &[Int(42)]), " 42");
-        assert_eq!(fmt(b"%.4d", &[Int(-7)]), "-0007");
-        assert_eq!(fmt(b"%8.4d", &[Int(-7)]), "   -0007");
-        // width and precision (truncation) for `%s`
-        assert_eq!(fmt(b"%10s|", &[Str("hi")]), "        hi|");
-        assert_eq!(fmt(b"%-10s|", &[Str("hi")]), "hi        |");
-        assert_eq!(fmt(b"%.3s", &[Str("truncated")]), "tru");
-        // `%s` truncation stops at a character boundary rather than splitting UTF-8
-        assert_eq!(fmt(b"%.1s", &[Str("\u{e9}a")]), "");
-        assert_eq!(fmt(b"%.2s", &[Str("\u{e9}a")]), "\u{e9}");
-        assert_eq!(fmt(b"%.3s", &[Str("\u{e9}a")]), "\u{e9}a");
-        // the `'` flag groups `%d` like the float path
-        assert_eq!(fmt(b"%'d", &[Int(1234567)]), "1,234,567");
-        assert_eq!(fmt(b"%'d", &[Int(123)]), "123");
-        assert_eq!(fmt(b"%'.0Rf", &[F(&Float::from(1234567.5))]), "1,234,568");
-    }
-
-    // Exemplars for the frontend branches (the `format` main loop, the parsers, and the int/string
-    // helpers) that the other tests do not reach. Each `// covers:` tag names a branch this case is
-    // the first to exercise, found by the same branch-instrumentation pass as
-    // `test_format_float_coverage` (which covers the formatting engine).
-    #[test]
-    fn format_frontend_coverage() {
-        let x = Float::from(1.5);
-        // covers: fi_zero (precision 0 of the value 0 prints no digits)
-        assert_eq!(fmt(b"%.0d", &[Int(0)]), "");
-        // covers: fmt_break (format string ends before a conversion character)
-        assert_eq!(fmt(b"%5", &[]), "");
-        // covers: fmt_float_bad (a `%R` float conversion given a non-Float argument)
-        assert!(format(b"%Rf", &[Int(5)]).is_none());
-        // covers: fmt_str_bad (a `%s` conversion given a non-Str argument)
-        assert!(format(b"%s", &[Int(5)]).is_none());
-        // covers: siv_invalid fmt_invalid (an unknown conversion character is dropped)
-        assert_eq!(fmt(b"%y", &[]), "");
-        // covers: siv_n (`%n` is rejected, then dropped)
-        assert_eq!(fmt(b"%n", &[]), "");
-        // covers: siv_p fmt_unsupported (`%p` is valid but has no PrintfArg counterpart)
-        assert!(format(b"%p", &[]).is_none());
-        // covers: pf_alt (the `#` flag)
-        assert_eq!(fmt(b"%#Ra", &[F(&x)]), "0x1.8p+0");
-        // covers: fmt_prec_neg (a `*` precision of a negative value means "unset")
-        assert_eq!(fmt(b"%.*Rf", &[Int(-1), F(&x)]), "1.500000");
-        // the explicit rounding characters and the `*` (argument-supplied) rounding mode
-        assert_eq!(fmt(b"%RNf", &[F(&x)]), "1.500000"); // covers: fmt_rn
-        assert_eq!(fmt(b"%RYf", &[F(&x)]), "1.500000"); // covers: fmt_ry
-        assert_eq!(fmt(b"%RZf", &[F(&x)]), "1.500000"); // covers: fmt_rz
-        // covers: fmt_rstar fmt_rstar_n (`*` rounding, argument 0 or unrecognized -> nearest)
-        assert_eq!(fmt(b"%R*f", &[Int(0), F(&x)]), "1.500000");
-        assert_eq!(fmt(b"%R*f", &[Int(1), F(&x)]), "1.500000"); // covers: fmt_rstar_z
-        assert_eq!(fmt(b"%R*f", &[Int(2), F(&x)]), "1.500000"); // covers: fmt_rstar_u
-        assert_eq!(fmt(b"%R*f", &[Int(3), F(&x)]), "1.500000"); // covers: fmt_rstar_d
-        assert_eq!(fmt(b"%R*f", &[Int(4), F(&x)]), "1.500000"); // covers: fmt_rstar_a
-        // the integer length modifiers (all accepted for `%d`)
-        assert_eq!(fmt(b"%hd", &[Int(1)]), "1"); // covers: pat_h
-        assert_eq!(fmt(b"%hhd", &[Int(1)]), "1"); // covers: pat_hh
-        assert_eq!(fmt(b"%ld", &[Int(1)]), "1"); // covers: pat_l
-        assert_eq!(fmt(b"%lld", &[Int(1)]), "1"); // covers: pat_ll
-        assert_eq!(fmt(b"%jd", &[Int(1)]), "1"); // covers: pat_j
-        assert_eq!(fmt(b"%zd", &[Int(1)]), "1"); // covers: pat_z
-        assert_eq!(fmt(b"%td", &[Int(1)]), "1"); // covers: pat_t
-        // length modifiers with no PrintfArg counterpart: `L` (long double) and `F` (mpf_t) make
-        // `%d` invalid (dropped); the GMP integer types make it valid-but-unsupported (fails)
-        assert_eq!(fmt(b"%Ld", &[]), ""); // covers: pat_l_double
-        assert_eq!(fmt(b"%Fd", &[]), ""); // covers: pat_mpf
-        assert!(format(b"%Qd", &[]).is_none()); // covers: pat_mpq
-        assert!(format(b"%Md", &[]).is_none()); // covers: pat_mplimb
-        assert!(format(b"%Nd", &[]).is_none()); // covers: pat_mplimbarray
-        assert!(format(b"%Zd", &[]).is_none()); // covers: pat_mpz
-        assert!(format(b"%Pd", &[]).is_none()); // covers: pat_mpfrprec
-    }
 }

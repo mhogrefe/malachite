@@ -89,6 +89,26 @@ macro_rules! pub_crate_test_struct {
 #[doc(hidden)]
 #[cfg(feature = "test_build")]
 #[macro_export]
+macro_rules! pub_crate_test_enum {
+    ($( #[$meta:meta] )* $name:ident $( $body:tt )*) => {
+        $( #[$meta] )*
+        pub enum $name $( $body )*
+    };
+}
+
+#[doc(hidden)]
+#[cfg(not(feature = "test_build"))]
+#[macro_export]
+macro_rules! pub_crate_test_enum {
+    ($( #[$meta:meta] )* $name:ident $( $body:tt )*) => {
+        $( #[$meta] )*
+        pub(crate) enum $name $( $body )*
+    };
+}
+
+#[doc(hidden)]
+#[cfg(feature = "test_build")]
+#[macro_export]
 macro_rules! pub_const_test {
     ($( #[$meta:meta] )* $name:ident $( $body:tt )*) => {
         $( #[$meta] )*
