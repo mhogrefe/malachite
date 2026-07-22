@@ -667,6 +667,7 @@ pub mod slices {
     pub mod exhaustive_slice_permutations;
     pub mod min_repeating_len;
     pub mod random_slice_permutations;
+    pub mod random_values_from_slice;
     pub mod slice_leading_zeros;
     pub mod slice_move_left;
     pub mod slice_set_zero;

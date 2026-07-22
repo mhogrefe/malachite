@@ -46,7 +46,7 @@ fn test_partial_cmp_abs_rational() {
     test("-0.0", "-0x0.0", "0", Some(Equal));
     test("1.0", "0x1.0#1", "0", Some(Greater));
     test("2.0", "0x2.0#1", "0", Some(Greater));
-    test("0.5", "0x0.8#1", "0", Some(Greater));
+    test("0.50", "0x0.8#1", "0", Some(Greater));
     test(
         "0.33333333333333331",
         "0x0.55555555555554#53",
@@ -65,11 +65,11 @@ fn test_partial_cmp_abs_rational() {
         "0",
         Some(Greater),
     );
-    test("3.0e120", "0x1.0E+100#1", "0", Some(Greater));
-    test("4.0e-121", "0x1.0E-100#1", "0", Some(Greater));
+    test("2.6e120", "0x1.0E+100#1", "0", Some(Greater));
+    test("3.9e-121", "0x1.0E-100#1", "0", Some(Greater));
     test("-1.0", "-0x1.0#1", "0", Some(Greater));
     test("-2.0", "-0x2.0#1", "0", Some(Greater));
-    test("-0.5", "-0x0.8#1", "0", Some(Greater));
+    test("-0.50", "-0x0.8#1", "0", Some(Greater));
     test(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
@@ -88,8 +88,8 @@ fn test_partial_cmp_abs_rational() {
         "0",
         Some(Greater),
     );
-    test("-3.0e120", "-0x1.0E+100#1", "0", Some(Greater));
-    test("-4.0e-121", "-0x1.0E-100#1", "0", Some(Greater));
+    test("-2.6e120", "-0x1.0E+100#1", "0", Some(Greater));
+    test("-3.9e-121", "-0x1.0E-100#1", "0", Some(Greater));
 
     test("NaN", "NaN", "1", None);
     test("Infinity", "Infinity", "1", Some(Greater));
@@ -98,7 +98,7 @@ fn test_partial_cmp_abs_rational() {
     test("-0.0", "-0x0.0", "1", Some(Less));
     test("1.0", "0x1.0#1", "1", Some(Equal));
     test("2.0", "0x2.0#1", "1", Some(Greater));
-    test("0.5", "0x0.8#1", "1", Some(Less));
+    test("0.50", "0x0.8#1", "1", Some(Less));
     test(
         "0.33333333333333331",
         "0x0.55555555555554#53",
@@ -117,11 +117,11 @@ fn test_partial_cmp_abs_rational() {
         "1",
         Some(Greater),
     );
-    test("3.0e120", "0x1.0E+100#1", "1", Some(Greater));
-    test("4.0e-121", "0x1.0E-100#1", "1", Some(Less));
+    test("2.6e120", "0x1.0E+100#1", "1", Some(Greater));
+    test("3.9e-121", "0x1.0E-100#1", "1", Some(Less));
     test("-1.0", "-0x1.0#1", "1", Some(Equal));
     test("-2.0", "-0x2.0#1", "1", Some(Greater));
-    test("-0.5", "-0x0.8#1", "1", Some(Less));
+    test("-0.50", "-0x0.8#1", "1", Some(Less));
     test(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
@@ -140,8 +140,8 @@ fn test_partial_cmp_abs_rational() {
         "1",
         Some(Greater),
     );
-    test("-3.0e120", "-0x1.0E+100#1", "1", Some(Greater));
-    test("-4.0e-121", "-0x1.0E-100#1", "1", Some(Less));
+    test("-2.6e120", "-0x1.0E+100#1", "1", Some(Greater));
+    test("-3.9e-121", "-0x1.0E-100#1", "1", Some(Less));
 
     test("NaN", "NaN", "100", None);
     test("Infinity", "Infinity", "100", Some(Greater));
@@ -150,7 +150,7 @@ fn test_partial_cmp_abs_rational() {
     test("-0.0", "-0x0.0", "100", Some(Less));
     test("1.0", "0x1.0#1", "100", Some(Less));
     test("2.0", "0x2.0#1", "100", Some(Less));
-    test("0.5", "0x0.8#1", "100", Some(Less));
+    test("0.50", "0x0.8#1", "100", Some(Less));
     test(
         "0.33333333333333331",
         "0x0.55555555555554#53",
@@ -169,11 +169,11 @@ fn test_partial_cmp_abs_rational() {
         "100",
         Some(Less),
     );
-    test("3.0e120", "0x1.0E+100#1", "100", Some(Greater));
-    test("4.0e-121", "0x1.0E-100#1", "100", Some(Less));
+    test("2.6e120", "0x1.0E+100#1", "100", Some(Greater));
+    test("3.9e-121", "0x1.0E-100#1", "100", Some(Less));
     test("-1.0", "-0x1.0#1", "100", Some(Less));
     test("-2.0", "-0x2.0#1", "100", Some(Less));
-    test("-0.5", "-0x0.8#1", "100", Some(Less));
+    test("-0.50", "-0x0.8#1", "100", Some(Less));
     test(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
@@ -192,8 +192,8 @@ fn test_partial_cmp_abs_rational() {
         "100",
         Some(Less),
     );
-    test("-3.0e120", "-0x1.0E+100#1", "100", Some(Greater));
-    test("-4.0e-121", "-0x1.0E-100#1", "100", Some(Less));
+    test("-2.6e120", "-0x1.0E+100#1", "100", Some(Greater));
+    test("-3.9e-121", "-0x1.0E-100#1", "100", Some(Less));
 
     let s = "2582249878086908589655919172003011874329705792829223512830659356540647622016841194629\
     645353280137831435903171972747493376";
@@ -204,7 +204,7 @@ fn test_partial_cmp_abs_rational() {
     test("-0.0", "-0x0.0", s, Some(Less));
     test("1.0", "0x1.0#1", s, Some(Less));
     test("2.0", "0x2.0#1", s, Some(Less));
-    test("0.5", "0x0.8#1", s, Some(Less));
+    test("0.50", "0x0.8#1", s, Some(Less));
     test(
         "0.33333333333333331",
         "0x0.55555555555554#53",
@@ -213,11 +213,11 @@ fn test_partial_cmp_abs_rational() {
     );
     test("1.4142135623730951", "0x1.6a09e667f3bcd#53", s, Some(Less));
     test("3.1415926535897931", "0x3.243f6a8885a30#53", s, Some(Less));
-    test("3.0e120", "0x1.0E+100#1", s, Some(Equal));
-    test("4.0e-121", "0x1.0E-100#1", s, Some(Less));
+    test("2.6e120", "0x1.0E+100#1", s, Some(Equal));
+    test("3.9e-121", "0x1.0E-100#1", s, Some(Less));
     test("-1.0", "-0x1.0#1", s, Some(Less));
     test("-2.0", "-0x2.0#1", s, Some(Less));
-    test("-0.5", "-0x0.8#1", s, Some(Less));
+    test("-0.50", "-0x0.8#1", s, Some(Less));
     test(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
@@ -236,8 +236,8 @@ fn test_partial_cmp_abs_rational() {
         s,
         Some(Less),
     );
-    test("-3.0e120", "-0x1.0E+100#1", s, Some(Equal));
-    test("-4.0e-121", "-0x1.0E-100#1", s, Some(Less));
+    test("-2.6e120", "-0x1.0E+100#1", s, Some(Equal));
+    test("-3.9e-121", "-0x1.0E-100#1", s, Some(Less));
 
     // off by 1
     let s = "2582249878086908589655919172003011874329705792829223512830659356540647622016841194629\
@@ -249,7 +249,7 @@ fn test_partial_cmp_abs_rational() {
     test("-0.0", "-0x0.0", s, Some(Less));
     test("1.0", "0x1.0#1", s, Some(Less));
     test("2.0", "0x2.0#1", s, Some(Less));
-    test("0.5", "0x0.8#1", s, Some(Less));
+    test("0.50", "0x0.8#1", s, Some(Less));
     test(
         "0.33333333333333331",
         "0x0.55555555555554#53",
@@ -258,11 +258,11 @@ fn test_partial_cmp_abs_rational() {
     );
     test("1.4142135623730951", "0x1.6a09e667f3bcd#53", s, Some(Less));
     test("3.1415926535897931", "0x3.243f6a8885a30#53", s, Some(Less));
-    test("3.0e120", "0x1.0E+100#1", s, Some(Less));
-    test("4.0e-121", "0x1.0E-100#1", s, Some(Less));
+    test("2.6e120", "0x1.0E+100#1", s, Some(Less));
+    test("3.9e-121", "0x1.0E-100#1", s, Some(Less));
     test("-1.0", "-0x1.0#1", s, Some(Less));
     test("-2.0", "-0x2.0#1", s, Some(Less));
-    test("-0.5", "-0x0.8#1", s, Some(Less));
+    test("-0.50", "-0x0.8#1", s, Some(Less));
     test(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
@@ -281,8 +281,8 @@ fn test_partial_cmp_abs_rational() {
         s,
         Some(Less),
     );
-    test("-3.0e120", "-0x1.0E+100#1", s, Some(Less));
-    test("-4.0e-121", "-0x1.0E-100#1", s, Some(Less));
+    test("-2.6e120", "-0x1.0E+100#1", s, Some(Less));
+    test("-3.9e-121", "-0x1.0E-100#1", s, Some(Less));
 
     test("NaN", "NaN", "1/2", None);
     test("Infinity", "Infinity", "1/2", Some(Greater));
@@ -291,7 +291,7 @@ fn test_partial_cmp_abs_rational() {
     test("-0.0", "-0x0.0", "1/2", Some(Less));
     test("1.0", "0x1.0#1", "1/2", Some(Greater));
     test("2.0", "0x2.0#1", "1/2", Some(Greater));
-    test("0.5", "0x0.8#1", "1/2", Some(Equal));
+    test("0.50", "0x0.8#1", "1/2", Some(Equal));
     test(
         "0.33333333333333331",
         "0x0.55555555555554#53",
@@ -310,11 +310,11 @@ fn test_partial_cmp_abs_rational() {
         "1/2",
         Some(Greater),
     );
-    test("3.0e120", "0x1.0E+100#1", "1/2", Some(Greater));
-    test("4.0e-121", "0x1.0E-100#1", "1/2", Some(Less));
+    test("2.6e120", "0x1.0E+100#1", "1/2", Some(Greater));
+    test("3.9e-121", "0x1.0E-100#1", "1/2", Some(Less));
     test("-1.0", "-0x1.0#1", "1/2", Some(Greater));
     test("-2.0", "-0x2.0#1", "1/2", Some(Greater));
-    test("-0.5", "-0x0.8#1", "1/2", Some(Equal));
+    test("-0.50", "-0x0.8#1", "1/2", Some(Equal));
     test(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
@@ -333,8 +333,8 @@ fn test_partial_cmp_abs_rational() {
         "1/2",
         Some(Greater),
     );
-    test("-3.0e120", "-0x1.0E+100#1", "1/2", Some(Greater));
-    test("-4.0e-121", "-0x1.0E-100#1", "1/2", Some(Less));
+    test("-2.6e120", "-0x1.0E+100#1", "1/2", Some(Greater));
+    test("-3.9e-121", "-0x1.0E-100#1", "1/2", Some(Less));
 
     test("NaN", "NaN", "1/3", None);
     test("Infinity", "Infinity", "1/3", Some(Greater));
@@ -343,7 +343,7 @@ fn test_partial_cmp_abs_rational() {
     test("-0.0", "-0x0.0", "1/3", Some(Less));
     test("1.0", "0x1.0#1", "1/3", Some(Greater));
     test("2.0", "0x2.0#1", "1/3", Some(Greater));
-    test("0.5", "0x0.8#1", "1/3", Some(Greater));
+    test("0.50", "0x0.8#1", "1/3", Some(Greater));
     test(
         "0.33333333333333331",
         "0x0.55555555555554#53",
@@ -362,11 +362,11 @@ fn test_partial_cmp_abs_rational() {
         "1/3",
         Some(Greater),
     );
-    test("3.0e120", "0x1.0E+100#1", "1/3", Some(Greater));
-    test("4.0e-121", "0x1.0E-100#1", "1/3", Some(Less));
+    test("2.6e120", "0x1.0E+100#1", "1/3", Some(Greater));
+    test("3.9e-121", "0x1.0E-100#1", "1/3", Some(Less));
     test("-1.0", "-0x1.0#1", "1/3", Some(Greater));
     test("-2.0", "-0x2.0#1", "1/3", Some(Greater));
-    test("-0.5", "-0x0.8#1", "1/3", Some(Greater));
+    test("-0.50", "-0x0.8#1", "1/3", Some(Greater));
     test(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
@@ -385,8 +385,8 @@ fn test_partial_cmp_abs_rational() {
         "1/3",
         Some(Greater),
     );
-    test("-3.0e120", "-0x1.0E+100#1", "1/3", Some(Greater));
-    test("-4.0e-121", "-0x1.0E-100#1", "1/3", Some(Less));
+    test("-2.6e120", "-0x1.0E+100#1", "1/3", Some(Greater));
+    test("-3.9e-121", "-0x1.0E-100#1", "1/3", Some(Less));
 
     test("NaN", "NaN", "22/7", None);
     test("Infinity", "Infinity", "22/7", Some(Greater));
@@ -395,7 +395,7 @@ fn test_partial_cmp_abs_rational() {
     test("-0.0", "-0x0.0", "22/7", Some(Less));
     test("1.0", "0x1.0#1", "22/7", Some(Less));
     test("2.0", "0x2.0#1", "22/7", Some(Less));
-    test("0.5", "0x0.8#1", "22/7", Some(Less));
+    test("0.50", "0x0.8#1", "22/7", Some(Less));
     test(
         "0.33333333333333331",
         "0x0.55555555555554#53",
@@ -414,11 +414,11 @@ fn test_partial_cmp_abs_rational() {
         "22/7",
         Some(Less),
     );
-    test("3.0e120", "0x1.0E+100#1", "22/7", Some(Greater));
-    test("4.0e-121", "0x1.0E-100#1", "22/7", Some(Less));
+    test("2.6e120", "0x1.0E+100#1", "22/7", Some(Greater));
+    test("3.9e-121", "0x1.0E-100#1", "22/7", Some(Less));
     test("-1.0", "-0x1.0#1", "22/7", Some(Less));
     test("-2.0", "-0x2.0#1", "22/7", Some(Less));
-    test("-0.5", "-0x0.8#1", "22/7", Some(Less));
+    test("-0.50", "-0x0.8#1", "22/7", Some(Less));
     test(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
@@ -437,8 +437,8 @@ fn test_partial_cmp_abs_rational() {
         "22/7",
         Some(Less),
     );
-    test("-3.0e120", "-0x1.0E+100#1", "22/7", Some(Greater));
-    test("-4.0e-121", "-0x1.0E-100#1", "22/7", Some(Less));
+    test("-2.6e120", "-0x1.0E+100#1", "22/7", Some(Greater));
+    test("-3.9e-121", "-0x1.0E-100#1", "22/7", Some(Less));
 
     test("NaN", "NaN", "-1", None);
     test("Infinity", "Infinity", "-1", Some(Greater));
@@ -447,7 +447,7 @@ fn test_partial_cmp_abs_rational() {
     test("-0.0", "-0x0.0", "-1", Some(Less));
     test("1.0", "0x1.0#1", "-1", Some(Equal));
     test("2.0", "0x2.0#1", "-1", Some(Greater));
-    test("0.5", "0x0.8#1", "-1", Some(Less));
+    test("0.50", "0x0.8#1", "-1", Some(Less));
     test(
         "0.33333333333333331",
         "0x0.55555555555554#53",
@@ -466,11 +466,11 @@ fn test_partial_cmp_abs_rational() {
         "-1",
         Some(Greater),
     );
-    test("3.0e120", "0x1.0E+100#1", "-1", Some(Greater));
-    test("4.0e-121", "0x1.0E-100#1", "-1", Some(Less));
+    test("2.6e120", "0x1.0E+100#1", "-1", Some(Greater));
+    test("3.9e-121", "0x1.0E-100#1", "-1", Some(Less));
     test("-1.0", "-0x1.0#1", "-1", Some(Equal));
     test("-2.0", "-0x2.0#1", "-1", Some(Greater));
-    test("-0.5", "-0x0.8#1", "-1", Some(Less));
+    test("-0.50", "-0x0.8#1", "-1", Some(Less));
     test(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
@@ -489,8 +489,8 @@ fn test_partial_cmp_abs_rational() {
         "-1",
         Some(Greater),
     );
-    test("-3.0e120", "-0x1.0E+100#1", "-1", Some(Greater));
-    test("-4.0e-121", "-0x1.0E-100#1", "-1", Some(Less));
+    test("-2.6e120", "-0x1.0E+100#1", "-1", Some(Greater));
+    test("-3.9e-121", "-0x1.0E-100#1", "-1", Some(Less));
 
     test("NaN", "NaN", "-100", None);
     test("Infinity", "Infinity", "-100", Some(Greater));
@@ -499,7 +499,7 @@ fn test_partial_cmp_abs_rational() {
     test("-0.0", "-0x0.0", "-100", Some(Less));
     test("1.0", "0x1.0#1", "-100", Some(Less));
     test("2.0", "0x2.0#1", "-100", Some(Less));
-    test("0.5", "0x0.8#1", "-100", Some(Less));
+    test("0.50", "0x0.8#1", "-100", Some(Less));
     test(
         "0.33333333333333331",
         "0x0.55555555555554#53",
@@ -518,11 +518,11 @@ fn test_partial_cmp_abs_rational() {
         "-100",
         Some(Less),
     );
-    test("3.0e120", "0x1.0E+100#1", "-100", Some(Greater));
-    test("4.0e-121", "0x1.0E-100#1", "-100", Some(Less));
+    test("2.6e120", "0x1.0E+100#1", "-100", Some(Greater));
+    test("3.9e-121", "0x1.0E-100#1", "-100", Some(Less));
     test("-1.0", "-0x1.0#1", "-100", Some(Less));
     test("-2.0", "-0x2.0#1", "-100", Some(Less));
-    test("-0.5", "-0x0.8#1", "-100", Some(Less));
+    test("-0.50", "-0x0.8#1", "-100", Some(Less));
     test(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
@@ -541,8 +541,8 @@ fn test_partial_cmp_abs_rational() {
         "-100",
         Some(Less),
     );
-    test("-3.0e120", "-0x1.0E+100#1", "-100", Some(Greater));
-    test("-4.0e-121", "-0x1.0E-100#1", "-100", Some(Less));
+    test("-2.6e120", "-0x1.0E+100#1", "-100", Some(Greater));
+    test("-3.9e-121", "-0x1.0E-100#1", "-100", Some(Less));
 
     let s = "-258224987808690858965591917200301187432970579282922351283065935654064762201684119462\
     9645353280137831435903171972747493376";
@@ -553,7 +553,7 @@ fn test_partial_cmp_abs_rational() {
     test("-0.0", "-0x0.0", s, Some(Less));
     test("1.0", "0x1.0#1", s, Some(Less));
     test("2.0", "0x2.0#1", s, Some(Less));
-    test("0.5", "0x0.8#1", s, Some(Less));
+    test("0.50", "0x0.8#1", s, Some(Less));
     test(
         "0.33333333333333331",
         "0x0.55555555555554#53",
@@ -562,11 +562,11 @@ fn test_partial_cmp_abs_rational() {
     );
     test("1.4142135623730951", "0x1.6a09e667f3bcd#53", s, Some(Less));
     test("3.1415926535897931", "0x3.243f6a8885a30#53", s, Some(Less));
-    test("3.0e120", "0x1.0E+100#1", s, Some(Equal));
-    test("4.0e-121", "0x1.0E-100#1", s, Some(Less));
+    test("2.6e120", "0x1.0E+100#1", s, Some(Equal));
+    test("3.9e-121", "0x1.0E-100#1", s, Some(Less));
     test("-1.0", "-0x1.0#1", s, Some(Less));
     test("-2.0", "-0x2.0#1", s, Some(Less));
-    test("-0.5", "-0x0.8#1", s, Some(Less));
+    test("-0.50", "-0x0.8#1", s, Some(Less));
     test(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
@@ -585,8 +585,8 @@ fn test_partial_cmp_abs_rational() {
         s,
         Some(Less),
     );
-    test("-3.0e120", "-0x1.0E+100#1", s, Some(Equal));
-    test("-4.0e-121", "-0x1.0E-100#1", s, Some(Less));
+    test("-2.6e120", "-0x1.0E+100#1", s, Some(Equal));
+    test("-3.9e-121", "-0x1.0E-100#1", s, Some(Less));
 
     // off by 1
     let s = "-258224987808690858965591917200301187432970579282922351283065935654064762201684119462\
@@ -598,7 +598,7 @@ fn test_partial_cmp_abs_rational() {
     test("-0.0", "-0x0.0", s, Some(Less));
     test("1.0", "0x1.0#1", s, Some(Less));
     test("2.0", "0x2.0#1", s, Some(Less));
-    test("0.5", "0x0.8#1", s, Some(Less));
+    test("0.50", "0x0.8#1", s, Some(Less));
     test(
         "0.33333333333333331",
         "0x0.55555555555554#53",
@@ -607,11 +607,11 @@ fn test_partial_cmp_abs_rational() {
     );
     test("1.4142135623730951", "0x1.6a09e667f3bcd#53", s, Some(Less));
     test("3.1415926535897931", "0x3.243f6a8885a30#53", s, Some(Less));
-    test("3.0e120", "0x1.0E+100#1", s, Some(Less));
-    test("4.0e-121", "0x1.0E-100#1", s, Some(Less));
+    test("2.6e120", "0x1.0E+100#1", s, Some(Less));
+    test("3.9e-121", "0x1.0E-100#1", s, Some(Less));
     test("-1.0", "-0x1.0#1", s, Some(Less));
     test("-2.0", "-0x2.0#1", s, Some(Less));
-    test("-0.5", "-0x0.8#1", s, Some(Less));
+    test("-0.50", "-0x0.8#1", s, Some(Less));
     test(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
@@ -630,8 +630,8 @@ fn test_partial_cmp_abs_rational() {
         s,
         Some(Less),
     );
-    test("-3.0e120", "-0x1.0E+100#1", s, Some(Less));
-    test("-4.0e-121", "-0x1.0E-100#1", s, Some(Less));
+    test("-2.6e120", "-0x1.0E+100#1", s, Some(Less));
+    test("-3.9e-121", "-0x1.0E-100#1", s, Some(Less));
 
     test("NaN", "NaN", "-1/2", None);
     test("Infinity", "Infinity", "-1/2", Some(Greater));
@@ -640,7 +640,7 @@ fn test_partial_cmp_abs_rational() {
     test("-0.0", "-0x0.0", "-1/2", Some(Less));
     test("1.0", "0x1.0#1", "-1/2", Some(Greater));
     test("2.0", "0x2.0#1", "-1/2", Some(Greater));
-    test("0.5", "0x0.8#1", "-1/2", Some(Equal));
+    test("0.50", "0x0.8#1", "-1/2", Some(Equal));
     test(
         "0.33333333333333331",
         "0x0.55555555555554#53",
@@ -659,11 +659,11 @@ fn test_partial_cmp_abs_rational() {
         "-1/2",
         Some(Greater),
     );
-    test("3.0e120", "0x1.0E+100#1", "-1/2", Some(Greater));
-    test("4.0e-121", "0x1.0E-100#1", "-1/2", Some(Less));
+    test("2.6e120", "0x1.0E+100#1", "-1/2", Some(Greater));
+    test("3.9e-121", "0x1.0E-100#1", "-1/2", Some(Less));
     test("-1.0", "-0x1.0#1", "-1/2", Some(Greater));
     test("-2.0", "-0x2.0#1", "-1/2", Some(Greater));
-    test("-0.5", "-0x0.8#1", "-1/2", Some(Equal));
+    test("-0.50", "-0x0.8#1", "-1/2", Some(Equal));
     test(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
@@ -682,8 +682,8 @@ fn test_partial_cmp_abs_rational() {
         "-1/2",
         Some(Greater),
     );
-    test("-3.0e120", "-0x1.0E+100#1", "-1/2", Some(Greater));
-    test("-4.0e-121", "-0x1.0E-100#1", "-1/2", Some(Less));
+    test("-2.6e120", "-0x1.0E+100#1", "-1/2", Some(Greater));
+    test("-3.9e-121", "-0x1.0E-100#1", "-1/2", Some(Less));
 
     test("NaN", "NaN", "-1/3", None);
     test("Infinity", "Infinity", "-1/3", Some(Greater));
@@ -692,7 +692,7 @@ fn test_partial_cmp_abs_rational() {
     test("-0.0", "-0x0.0", "-1/3", Some(Less));
     test("1.0", "0x1.0#1", "-1/3", Some(Greater));
     test("2.0", "0x2.0#1", "-1/3", Some(Greater));
-    test("0.5", "0x0.8#1", "-1/3", Some(Greater));
+    test("0.50", "0x0.8#1", "-1/3", Some(Greater));
     test(
         "0.33333333333333331",
         "0x0.55555555555554#53",
@@ -711,11 +711,11 @@ fn test_partial_cmp_abs_rational() {
         "-1/3",
         Some(Greater),
     );
-    test("3.0e120", "0x1.0E+100#1", "-1/3", Some(Greater));
-    test("4.0e-121", "0x1.0E-100#1", "-1/3", Some(Less));
+    test("2.6e120", "0x1.0E+100#1", "-1/3", Some(Greater));
+    test("3.9e-121", "0x1.0E-100#1", "-1/3", Some(Less));
     test("-1.0", "-0x1.0#1", "-1/3", Some(Greater));
     test("-2.0", "-0x2.0#1", "-1/3", Some(Greater));
-    test("-0.5", "-0x0.8#1", "-1/3", Some(Greater));
+    test("-0.50", "-0x0.8#1", "-1/3", Some(Greater));
     test(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
@@ -734,8 +734,8 @@ fn test_partial_cmp_abs_rational() {
         "-1/3",
         Some(Greater),
     );
-    test("-3.0e120", "-0x1.0E+100#1", "-1/3", Some(Greater));
-    test("-4.0e-121", "-0x1.0E-100#1", "-1/3", Some(Less));
+    test("-2.6e120", "-0x1.0E+100#1", "-1/3", Some(Greater));
+    test("-3.9e-121", "-0x1.0E-100#1", "-1/3", Some(Less));
 
     test("NaN", "NaN", "-22/7", None);
     test("Infinity", "Infinity", "-22/7", Some(Greater));
@@ -744,7 +744,7 @@ fn test_partial_cmp_abs_rational() {
     test("-0.0", "-0x0.0", "-22/7", Some(Less));
     test("1.0", "0x1.0#1", "-22/7", Some(Less));
     test("2.0", "0x2.0#1", "-22/7", Some(Less));
-    test("0.5", "0x0.8#1", "-22/7", Some(Less));
+    test("0.50", "0x0.8#1", "-22/7", Some(Less));
     test(
         "0.33333333333333331",
         "0x0.55555555555554#53",
@@ -763,11 +763,11 @@ fn test_partial_cmp_abs_rational() {
         "-22/7",
         Some(Less),
     );
-    test("3.0e120", "0x1.0E+100#1", "-22/7", Some(Greater));
-    test("4.0e-121", "0x1.0E-100#1", "-22/7", Some(Less));
+    test("2.6e120", "0x1.0E+100#1", "-22/7", Some(Greater));
+    test("3.9e-121", "0x1.0E-100#1", "-22/7", Some(Less));
     test("-1.0", "-0x1.0#1", "-22/7", Some(Less));
     test("-2.0", "-0x2.0#1", "-22/7", Some(Less));
-    test("-0.5", "-0x0.8#1", "-22/7", Some(Less));
+    test("-0.50", "-0x0.8#1", "-22/7", Some(Less));
     test(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
@@ -786,8 +786,8 @@ fn test_partial_cmp_abs_rational() {
         "-22/7",
         Some(Less),
     );
-    test("-3.0e120", "-0x1.0E+100#1", "-22/7", Some(Greater));
-    test("-4.0e-121", "-0x1.0E-100#1", "-22/7", Some(Less));
+    test("-2.6e120", "-0x1.0E+100#1", "-22/7", Some(Greater));
+    test("-3.9e-121", "-0x1.0E-100#1", "-22/7", Some(Less));
 }
 
 #[allow(clippy::needless_pass_by_value)]

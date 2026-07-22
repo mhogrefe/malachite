@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use itertools::Itertools;
 use malachite_base::nevers::Never;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::slices::random_values_from_slice;
@@ -40,24 +41,14 @@ fn test_random_values_from_slice() {
     );
     test(
         &[1, 1, 1, 10],
-        &[
-            1, 1, 10, 1, 10, 10, 1, 10, 1, 1, 1, 1, 1, 10, 1, 1, 1, 1, 1, 10,
-        ],
+        &[1, 1, 10, 1, 10, 10, 1, 10, 1, 1, 1, 1, 1, 10, 1, 1, 1, 1, 1, 10],
         &[(1, 749985), (10, 250015)],
         (1, None),
     );
     test(
         &[2, 3, 5, 7, 11],
-        &[
-            3, 7, 3, 5, 11, 3, 5, 11, 2, 2, 5, 5, 2, 11, 2, 11, 5, 11, 5, 3,
-        ],
-        &[
-            (2, 200420),
-            (7, 200369),
-            (11, 200347),
-            (5, 199589),
-            (3, 199275),
-        ],
+        &[3, 7, 3, 5, 11, 3, 5, 11, 2, 2, 5, 5, 2, 11, 2, 11, 5, 11, 5, 3],
+        &[(2, 200420), (7, 200369), (11, 200347), (5, 199589), (3, 199275)],
         (5, None),
     );
 }

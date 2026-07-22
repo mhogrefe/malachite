@@ -222,9 +222,13 @@ pub mod random {
     pub mod random_non_positive_finite_floats;
     pub mod random_nonzero_finite_floats;
     pub mod random_positive_finite_floats;
+    pub mod random_positive_floats_with_precision;
+    pub mod striped_random_finite_floats;
+    pub mod striped_random_floats;
     pub mod striped_random_negative_finite_floats;
     pub mod striped_random_non_negative_finite_floats;
     pub mod striped_random_non_positive_finite_floats;
     pub mod striped_random_nonzero_finite_floats;
     pub mod striped_random_positive_finite_floats;
+    pub mod striped_random_positive_floats_with_precision;
 }

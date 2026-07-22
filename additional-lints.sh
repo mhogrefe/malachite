@@ -4,6 +4,10 @@
 # long-lines exception list, lives in dylint.toml.
 set -e
 cd "$(dirname "$0")"
+# Files that no chain of `mod` declarations reaches are invisible to the compiler, and therefore
+# to every rustc-based lint; catch them with a filesystem-level scan first.
+echo "Checking for unincluded files"
+python3 unincluded-files.py
 # A stale `#[expect(long_lines)]` exemption surfaces as an unfulfilled-expectation warning; make
 # it fail the run like any other lint hit.
 export DYLINT_RUSTFLAGS="-D unfulfilled_lint_expectations"
