@@ -181,7 +181,7 @@ fn test_get_str() {
     test("1.2", "0x1.4#3", 2, 3, Nearest, "101", 1, Equal);
     // 1/3 rounded to 4 base-10 digits: down vs up
     test(
-        "0.33333334",
+        "0.333333343",
         "0x0.5555558#25",
         10,
         4,
@@ -191,7 +191,7 @@ fn test_get_str() {
         Less,
     );
     test(
-        "0.33333334",
+        "0.333333343",
         "0x0.5555558#25",
         10,
         4,
@@ -234,9 +234,9 @@ fn test_get_str() {
     // covers: mgt_x1lo
     test("1.0", "0x1.0#1", 9, 15, Down, "100000000000000", 1, Equal);
     // covers: ax_carry ax_c_j0
-    test("0.5", "0x0.8#1", 3, 1, Up, "2", 0, Greater);
+    test("0.50", "0x0.8#1", 3, 1, Up, "2", 0, Greater);
     // covers: p2_rle
-    test("0.5", "0x0.8#1", 4, 0, Down, "2", 0, Equal);
+    test("0.50", "0x0.8#1", 4, 0, Down, "2", 0, Equal);
     // covers: mlt_g mlt_2ngt mlt_n1 mlt_remchk mlt_nonorm exact_n ax_inexact
     test("4.0", "0x4.0#1", 3, 1, Down, "1", 2, Less);
     // covers: ax_noshr
@@ -251,7 +251,16 @@ fn test_get_str() {
         Equal,
     );
     // covers: p2_nonb
-    test("0.5", "0x0.8#1", 16, 16, Down, "8000000000000000", 0, Equal);
+    test(
+        "0.50",
+        "0x0.8#1",
+        16,
+        16,
+        Down,
+        "8000000000000000",
+        0,
+        Equal,
+    );
     // covers: p2_carry p2_rpow
     test("1.5", "0x1.8#2", 2, 1, Up, "1", 2, Greater);
     // covers: mgt_norm ax_dr ax_dir ax_trunc
@@ -267,12 +276,12 @@ fn test_get_str() {
     // covers: ax_tie ax_evenC
     test("1.5", "0x1.8#2", 6, 1, Nearest, "2", 1, Greater);
     // covers: ax_awnoc
-    test("0.8", "0x0.c#2", 3, 1, Up, "1", 1, Greater);
+    test("0.75", "0x0.c#2", 3, 1, Up, "1", 1, Greater);
     // covers: mlt_renorm
     test("6.0", "0x6.0#2", 3, 1, Down, "2", 2, Equal);
     // covers: ax_t62
     test(
-        "-269104312292334.303",
+        "-269104312292334.3027",
         "-0xf4bfbaf113ee.4d8#57",
         43,
         2,
@@ -339,7 +348,7 @@ fn test_get_str() {
     );
     // covers: mlt_lo_no
     test(
-        "4.51848754413482314177292e44",
+        "4.518487544134823141772917e44",
         "0x1.442f82545e664fc1b2dcE+37#79",
         23,
         7,
@@ -350,7 +359,7 @@ fn test_get_str() {
     );
     // covers: ax_keep
     test(
-        "4.20588e17",
+        "4.205885e17",
         "0x5.d63bE+14#19",
         39,
         3,
@@ -372,7 +381,7 @@ fn test_get_str() {
     );
     // covers: meq_ngt
     test(
-        "-1.477e19",
+        "-1.4772e19",
         "-0xc.d0E+15#11",
         40,
         12,
@@ -383,7 +392,7 @@ fn test_get_str() {
     );
     // covers: ax_cprop
     test(
-        "-4.927586053829e71",
+        "-4.9275860538295e71",
         "-0x4.7656eb83f9E+59#43",
         56,
         13,
@@ -394,7 +403,7 @@ fn test_get_str() {
     );
     // covers: nfail_mle
     test(
-        "1.66650213666e30",
+        "1.666502136661e30",
         "0x1.508c2421bE+25#37",
         18,
         12,
@@ -417,7 +426,7 @@ fn test_get_str() {
     // covers: ax_fail ret_fail (Down, not Exact: this value is inexact in base 46, so Exact would
     // panic. Down takes the same truncating code path, so the branch coverage is unchanged.)
     test(
-        "7.1987e-15",
+        "7.19867e-15",
         "0x2.06b8E-12#16",
         46,
         8,

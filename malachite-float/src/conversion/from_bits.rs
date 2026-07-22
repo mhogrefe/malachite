@@ -98,11 +98,11 @@ impl Float {
     /// }
     ///
     /// let (c, o) = Float::non_dyadic_from_bits_prec_round(Bits::new(), 100, Floor);
-    /// assert_eq!(c.to_string(), "0.6416325606551538662938427702254");
+    /// assert_eq!(c.to_string(), "0.64163256065515386629384277022540");
     /// assert_eq!(o, Less);
     ///
     /// let (c, o) = Float::non_dyadic_from_bits_prec_round(Bits::new(), 100, Ceiling);
-    /// assert_eq!(c.to_string(), "0.641632560655153866293842770226");
+    /// assert_eq!(c.to_string(), "0.64163256065515386629384277022619");
     /// assert_eq!(o, Greater);
     /// ```
     pub fn non_dyadic_from_bits_prec_round<I: Iterator<Item = bool>>(
@@ -243,15 +243,15 @@ impl Float {
     /// }
     ///
     /// let (c, o) = Float::non_dyadic_from_bits_prec(Bits::new(), 1);
-    /// assert_eq!(c.to_string(), "0.5");
+    /// assert_eq!(c.to_string(), "0.50");
     /// assert_eq!(o, Less);
     ///
     /// let (c, o) = Float::non_dyadic_from_bits_prec(Bits::new(), 10);
-    /// assert_eq!(c.to_string(), "0.642");
+    /// assert_eq!(c.to_string(), "0.64160");
     /// assert_eq!(o, Less);
     ///
     /// let (c, o) = Float::non_dyadic_from_bits_prec(Bits::new(), 100);
-    /// assert_eq!(c.to_string(), "0.6416325606551538662938427702254");
+    /// assert_eq!(c.to_string(), "0.64163256065515386629384277022540");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]

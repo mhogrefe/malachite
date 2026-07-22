@@ -49,31 +49,31 @@ fn test_from_integer_prec() {
     test("0", 20, "0.0", "0x0.0", Equal);
 
     test("1", 1, "1.0", "0x1.0#1", Equal);
-    test("1", 10, "1.0", "0x1.000#10", Equal);
-    test("1", 20, "1.0", "0x1.00000#20", Equal);
+    test("1", 10, "1.0000", "0x1.000#10", Equal);
+    test("1", 20, "1.0000000", "0x1.00000#20", Equal);
 
-    test("123", 1, "1.0e2", "0x8.0E+1#1", Greater);
-    test("123", 10, "123.0", "0x7b.0#10", Equal);
-    test("123", 20, "123.0", "0x7b.0000#20", Equal);
+    test("123", 1, "1.3e2", "0x8.0E+1#1", Greater);
+    test("123", 10, "123.00", "0x7b.0#10", Equal);
+    test("123", 20, "123.00000", "0x7b.0000#20", Equal);
 
-    test("1000000000000", 1, "1.0e12", "0x1.0E+10#1", Greater);
-    test("1000000000000", 10, "9.997e11", "0xe.8cE+9#10", Less);
-    test("1000000000000", 20, "9.999997e11", "0xe.8d4aE+9#20", Less);
+    test("1000000000000", 1, "1.1e12", "0x1.0E+10#1", Greater);
+    test("1000000000000", 10, "9.9965e11", "0xe.8cE+9#10", Less);
+    test("1000000000000", 20, "9.9999967e11", "0xe.8d4aE+9#20", Less);
 
     test("-1", 1, "-1.0", "-0x1.0#1", Equal);
-    test("-1", 10, "-1.0", "-0x1.000#10", Equal);
-    test("-1", 20, "-1.0", "-0x1.00000#20", Equal);
+    test("-1", 10, "-1.0000", "-0x1.000#10", Equal);
+    test("-1", 20, "-1.0000000", "-0x1.00000#20", Equal);
 
-    test("-123", 1, "-1.0e2", "-0x8.0E+1#1", Less);
-    test("-123", 10, "-123.0", "-0x7b.0#10", Equal);
-    test("-123", 20, "-123.0", "-0x7b.0000#20", Equal);
+    test("-123", 1, "-1.3e2", "-0x8.0E+1#1", Less);
+    test("-123", 10, "-123.00", "-0x7b.0#10", Equal);
+    test("-123", 20, "-123.00000", "-0x7b.0000#20", Equal);
 
-    test("-1000000000000", 1, "-1.0e12", "-0x1.0E+10#1", Less);
-    test("-1000000000000", 10, "-9.997e11", "-0xe.8cE+9#10", Greater);
+    test("-1000000000000", 1, "-1.1e12", "-0x1.0E+10#1", Less);
+    test("-1000000000000", 10, "-9.9965e11", "-0xe.8cE+9#10", Greater);
     test(
         "-1000000000000",
         20,
-        "-9.999997e11",
+        "-9.9999967e11",
         "-0xe.8d4aE+9#20",
         Greater,
     );
@@ -98,7 +98,7 @@ fn test_from_integer_prec() {
     test_big(
         Integer::power_of_2(1000),
         10,
-        "1.072e301",
+        "1.0715e301",
         "0x1.000E+250#10",
         Equal,
     );
@@ -112,7 +112,7 @@ fn test_from_integer_prec() {
     test_big(
         Integer::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 1),
         10,
-        "too_big",
+        "1.0493e323228496",
         "0x4.00E+268435455#10",
         Equal,
     );
@@ -133,7 +133,7 @@ fn test_from_integer_prec() {
     test_big(
         Integer::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 12) * Integer::from(3071u16),
         1,
-        "too_big",
+        "1.0e323228496",
         "0x4.0E+268435455#1",
         Less,
     );
@@ -141,7 +141,7 @@ fn test_from_integer_prec() {
     test_big(
         -Integer::power_of_2(1000),
         10,
-        "-1.072e301",
+        "-1.0715e301",
         "-0x1.000E+250#10",
         Equal,
     );
@@ -155,7 +155,7 @@ fn test_from_integer_prec() {
     test_big(
         -Integer::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 1),
         10,
-        "-too_big",
+        "-1.0493e323228496",
         "-0x4.00E+268435455#10",
         Equal,
     );
@@ -176,7 +176,7 @@ fn test_from_integer_prec() {
     test_big(
         -Integer::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 12) * Integer::from(3071u16),
         1,
-        "-too_big",
+        "-1.0e323228496",
         "-0x4.0E+268435455#1",
         Greater,
     );
@@ -250,76 +250,90 @@ fn test_from_integer_prec_round() {
     test("1", 1, Nearest, "1.0", "0x1.0#1", Equal);
     test("1", 1, Exact, "1.0", "0x1.0#1", Equal);
 
-    test("1", 10, Floor, "1.0", "0x1.000#10", Equal);
-    test("1", 10, Ceiling, "1.0", "0x1.000#10", Equal);
-    test("1", 10, Down, "1.0", "0x1.000#10", Equal);
-    test("1", 10, Up, "1.0", "0x1.000#10", Equal);
-    test("1", 10, Nearest, "1.0", "0x1.000#10", Equal);
-    test("1", 10, Exact, "1.0", "0x1.000#10", Equal);
+    test("1", 10, Floor, "1.0000", "0x1.000#10", Equal);
+    test("1", 10, Ceiling, "1.0000", "0x1.000#10", Equal);
+    test("1", 10, Down, "1.0000", "0x1.000#10", Equal);
+    test("1", 10, Up, "1.0000", "0x1.000#10", Equal);
+    test("1", 10, Nearest, "1.0000", "0x1.000#10", Equal);
+    test("1", 10, Exact, "1.0000", "0x1.000#10", Equal);
 
-    test("1", 20, Floor, "1.0", "0x1.00000#20", Equal);
-    test("1", 20, Ceiling, "1.0", "0x1.00000#20", Equal);
-    test("1", 20, Down, "1.0", "0x1.00000#20", Equal);
-    test("1", 20, Up, "1.0", "0x1.00000#20", Equal);
-    test("1", 20, Nearest, "1.0", "0x1.00000#20", Equal);
-    test("1", 20, Exact, "1.0", "0x1.00000#20", Equal);
+    test("1", 20, Floor, "1.0000000", "0x1.00000#20", Equal);
+    test("1", 20, Ceiling, "1.0000000", "0x1.00000#20", Equal);
+    test("1", 20, Down, "1.0000000", "0x1.00000#20", Equal);
+    test("1", 20, Up, "1.0000000", "0x1.00000#20", Equal);
+    test("1", 20, Nearest, "1.0000000", "0x1.00000#20", Equal);
+    test("1", 20, Exact, "1.0000000", "0x1.00000#20", Equal);
 
-    test("123", 1, Floor, "6.0e1", "0x4.0E+1#1", Less);
-    test("123", 1, Ceiling, "1.0e2", "0x8.0E+1#1", Greater);
-    test("123", 1, Down, "6.0e1", "0x4.0E+1#1", Less);
-    test("123", 1, Up, "1.0e2", "0x8.0E+1#1", Greater);
-    test("123", 1, Nearest, "1.0e2", "0x8.0E+1#1", Greater);
+    test("123", 1, Floor, "64.0", "0x4.0E+1#1", Less);
+    test("123", 1, Ceiling, "1.3e2", "0x8.0E+1#1", Greater);
+    test("123", 1, Down, "64.0", "0x4.0E+1#1", Less);
+    test("123", 1, Up, "1.3e2", "0x8.0E+1#1", Greater);
+    test("123", 1, Nearest, "1.3e2", "0x8.0E+1#1", Greater);
 
-    test("123", 10, Floor, "123.0", "0x7b.0#10", Equal);
-    test("123", 10, Ceiling, "123.0", "0x7b.0#10", Equal);
-    test("123", 10, Down, "123.0", "0x7b.0#10", Equal);
-    test("123", 10, Up, "123.0", "0x7b.0#10", Equal);
-    test("123", 10, Nearest, "123.0", "0x7b.0#10", Equal);
-    test("123", 10, Exact, "123.0", "0x7b.0#10", Equal);
+    test("123", 10, Floor, "123.00", "0x7b.0#10", Equal);
+    test("123", 10, Ceiling, "123.00", "0x7b.0#10", Equal);
+    test("123", 10, Down, "123.00", "0x7b.0#10", Equal);
+    test("123", 10, Up, "123.00", "0x7b.0#10", Equal);
+    test("123", 10, Nearest, "123.00", "0x7b.0#10", Equal);
+    test("123", 10, Exact, "123.00", "0x7b.0#10", Equal);
 
-    test("123", 20, Floor, "123.0", "0x7b.0000#20", Equal);
-    test("123", 20, Ceiling, "123.0", "0x7b.0000#20", Equal);
-    test("123", 20, Down, "123.0", "0x7b.0000#20", Equal);
-    test("123", 20, Up, "123.0", "0x7b.0000#20", Equal);
-    test("123", 20, Nearest, "123.0", "0x7b.0000#20", Equal);
-    test("123", 20, Exact, "123.0", "0x7b.0000#20", Equal);
+    test("123", 20, Floor, "123.00000", "0x7b.0000#20", Equal);
+    test("123", 20, Ceiling, "123.00000", "0x7b.0000#20", Equal);
+    test("123", 20, Down, "123.00000", "0x7b.0000#20", Equal);
+    test("123", 20, Up, "123.00000", "0x7b.0000#20", Equal);
+    test("123", 20, Nearest, "123.00000", "0x7b.0000#20", Equal);
+    test("123", 20, Exact, "123.00000", "0x7b.0000#20", Equal);
 
-    test("1000000000000", 1, Floor, "5.0e11", "0x8.0E+9#1", Less);
+    test("1000000000000", 1, Floor, "5.5e11", "0x8.0E+9#1", Less);
     test(
         "1000000000000",
         1,
         Ceiling,
-        "1.0e12",
+        "1.1e12",
         "0x1.0E+10#1",
         Greater,
     );
-    test("1000000000000", 1, Down, "5.0e11", "0x8.0E+9#1", Less);
-    test("1000000000000", 1, Up, "1.0e12", "0x1.0E+10#1", Greater);
+    test("1000000000000", 1, Down, "5.5e11", "0x8.0E+9#1", Less);
+    test("1000000000000", 1, Up, "1.1e12", "0x1.0E+10#1", Greater);
     test(
         "1000000000000",
         1,
         Nearest,
-        "1.0e12",
+        "1.1e12",
         "0x1.0E+10#1",
         Greater,
     );
 
-    test("1000000000000", 10, Floor, "9.997e11", "0xe.8cE+9#10", Less);
+    test(
+        "1000000000000",
+        10,
+        Floor,
+        "9.9965e11",
+        "0xe.8cE+9#10",
+        Less,
+    );
     test(
         "1000000000000",
         10,
         Ceiling,
-        "1.001e12",
+        "1.0007e12",
         "0xe.90E+9#10",
         Greater,
     );
-    test("1000000000000", 10, Down, "9.997e11", "0xe.8cE+9#10", Less);
-    test("1000000000000", 10, Up, "1.001e12", "0xe.90E+9#10", Greater);
+    test("1000000000000", 10, Down, "9.9965e11", "0xe.8cE+9#10", Less);
+    test(
+        "1000000000000",
+        10,
+        Up,
+        "1.0007e12",
+        "0xe.90E+9#10",
+        Greater,
+    );
     test(
         "1000000000000",
         10,
         Nearest,
-        "9.997e11",
+        "9.9965e11",
         "0xe.8cE+9#10",
         Less,
     );
@@ -328,7 +342,7 @@ fn test_from_integer_prec_round() {
         "1000000000000",
         20,
         Floor,
-        "9.999997e11",
+        "9.9999967e11",
         "0xe.8d4aE+9#20",
         Less,
     );
@@ -336,7 +350,7 @@ fn test_from_integer_prec_round() {
         "1000000000000",
         20,
         Ceiling,
-        "1.000001e12",
+        "1.0000007e12",
         "0xe.8d4bE+9#20",
         Greater,
     );
@@ -344,7 +358,7 @@ fn test_from_integer_prec_round() {
         "1000000000000",
         20,
         Down,
-        "9.999997e11",
+        "9.9999967e11",
         "0xe.8d4aE+9#20",
         Less,
     );
@@ -352,7 +366,7 @@ fn test_from_integer_prec_round() {
         "1000000000000",
         20,
         Up,
-        "1.000001e12",
+        "1.0000007e12",
         "0xe.8d4bE+9#20",
         Greater,
     );
@@ -360,7 +374,7 @@ fn test_from_integer_prec_round() {
         "1000000000000",
         20,
         Nearest,
-        "9.999997e11",
+        "9.9999967e11",
         "0xe.8d4aE+9#20",
         Less,
     );
@@ -372,56 +386,56 @@ fn test_from_integer_prec_round() {
     test("-1", 1, Nearest, "-1.0", "-0x1.0#1", Equal);
     test("-1", 1, Exact, "-1.0", "-0x1.0#1", Equal);
 
-    test("-1", 10, Floor, "-1.0", "-0x1.000#10", Equal);
-    test("-1", 10, Ceiling, "-1.0", "-0x1.000#10", Equal);
-    test("-1", 10, Down, "-1.0", "-0x1.000#10", Equal);
-    test("-1", 10, Up, "-1.0", "-0x1.000#10", Equal);
-    test("-1", 10, Nearest, "-1.0", "-0x1.000#10", Equal);
-    test("-1", 10, Exact, "-1.0", "-0x1.000#10", Equal);
+    test("-1", 10, Floor, "-1.0000", "-0x1.000#10", Equal);
+    test("-1", 10, Ceiling, "-1.0000", "-0x1.000#10", Equal);
+    test("-1", 10, Down, "-1.0000", "-0x1.000#10", Equal);
+    test("-1", 10, Up, "-1.0000", "-0x1.000#10", Equal);
+    test("-1", 10, Nearest, "-1.0000", "-0x1.000#10", Equal);
+    test("-1", 10, Exact, "-1.0000", "-0x1.000#10", Equal);
 
-    test("-1", 20, Floor, "-1.0", "-0x1.00000#20", Equal);
-    test("-1", 20, Ceiling, "-1.0", "-0x1.00000#20", Equal);
-    test("-1", 20, Down, "-1.0", "-0x1.00000#20", Equal);
-    test("-1", 20, Up, "-1.0", "-0x1.00000#20", Equal);
-    test("-1", 20, Nearest, "-1.0", "-0x1.00000#20", Equal);
-    test("-1", 20, Exact, "-1.0", "-0x1.00000#20", Equal);
+    test("-1", 20, Floor, "-1.0000000", "-0x1.00000#20", Equal);
+    test("-1", 20, Ceiling, "-1.0000000", "-0x1.00000#20", Equal);
+    test("-1", 20, Down, "-1.0000000", "-0x1.00000#20", Equal);
+    test("-1", 20, Up, "-1.0000000", "-0x1.00000#20", Equal);
+    test("-1", 20, Nearest, "-1.0000000", "-0x1.00000#20", Equal);
+    test("-1", 20, Exact, "-1.0000000", "-0x1.00000#20", Equal);
 
-    test("-123", 1, Floor, "-1.0e2", "-0x8.0E+1#1", Less);
-    test("-123", 1, Ceiling, "-6.0e1", "-0x4.0E+1#1", Greater);
-    test("-123", 1, Down, "-6.0e1", "-0x4.0E+1#1", Greater);
-    test("-123", 1, Up, "-1.0e2", "-0x8.0E+1#1", Less);
-    test("-123", 1, Nearest, "-1.0e2", "-0x8.0E+1#1", Less);
+    test("-123", 1, Floor, "-1.3e2", "-0x8.0E+1#1", Less);
+    test("-123", 1, Ceiling, "-64.0", "-0x4.0E+1#1", Greater);
+    test("-123", 1, Down, "-64.0", "-0x4.0E+1#1", Greater);
+    test("-123", 1, Up, "-1.3e2", "-0x8.0E+1#1", Less);
+    test("-123", 1, Nearest, "-1.3e2", "-0x8.0E+1#1", Less);
 
-    test("-123", 10, Floor, "-123.0", "-0x7b.0#10", Equal);
-    test("-123", 10, Ceiling, "-123.0", "-0x7b.0#10", Equal);
-    test("-123", 10, Down, "-123.0", "-0x7b.0#10", Equal);
-    test("-123", 10, Up, "-123.0", "-0x7b.0#10", Equal);
-    test("-123", 10, Nearest, "-123.0", "-0x7b.0#10", Equal);
-    test("-123", 10, Exact, "-123.0", "-0x7b.0#10", Equal);
+    test("-123", 10, Floor, "-123.00", "-0x7b.0#10", Equal);
+    test("-123", 10, Ceiling, "-123.00", "-0x7b.0#10", Equal);
+    test("-123", 10, Down, "-123.00", "-0x7b.0#10", Equal);
+    test("-123", 10, Up, "-123.00", "-0x7b.0#10", Equal);
+    test("-123", 10, Nearest, "-123.00", "-0x7b.0#10", Equal);
+    test("-123", 10, Exact, "-123.00", "-0x7b.0#10", Equal);
 
-    test("-123", 20, Floor, "-123.0", "-0x7b.0000#20", Equal);
-    test("-123", 20, Ceiling, "-123.0", "-0x7b.0000#20", Equal);
-    test("-123", 20, Down, "-123.0", "-0x7b.0000#20", Equal);
-    test("-123", 20, Up, "-123.0", "-0x7b.0000#20", Equal);
-    test("-123", 20, Nearest, "-123.0", "-0x7b.0000#20", Equal);
-    test("-123", 20, Exact, "-123.0", "-0x7b.0000#20", Equal);
+    test("-123", 20, Floor, "-123.00000", "-0x7b.0000#20", Equal);
+    test("-123", 20, Ceiling, "-123.00000", "-0x7b.0000#20", Equal);
+    test("-123", 20, Down, "-123.00000", "-0x7b.0000#20", Equal);
+    test("-123", 20, Up, "-123.00000", "-0x7b.0000#20", Equal);
+    test("-123", 20, Nearest, "-123.00000", "-0x7b.0000#20", Equal);
+    test("-123", 20, Exact, "-123.00000", "-0x7b.0000#20", Equal);
 
-    test("-1000000000000", 1, Floor, "-1.0e12", "-0x1.0E+10#1", Less);
+    test("-1000000000000", 1, Floor, "-1.1e12", "-0x1.0E+10#1", Less);
     test(
         "-1000000000000",
         1,
         Ceiling,
-        "-5.0e11",
+        "-5.5e11",
         "-0x8.0E+9#1",
         Greater,
     );
-    test("-1000000000000", 1, Down, "-5.0e11", "-0x8.0E+9#1", Greater);
-    test("-1000000000000", 1, Up, "-1.0e12", "-0x1.0E+10#1", Less);
+    test("-1000000000000", 1, Down, "-5.5e11", "-0x8.0E+9#1", Greater);
+    test("-1000000000000", 1, Up, "-1.1e12", "-0x1.0E+10#1", Less);
     test(
         "-1000000000000",
         1,
         Nearest,
-        "-1.0e12",
+        "-1.1e12",
         "-0x1.0E+10#1",
         Less,
     );
@@ -430,7 +444,7 @@ fn test_from_integer_prec_round() {
         "-1000000000000",
         10,
         Floor,
-        "-1.001e12",
+        "-1.0007e12",
         "-0xe.90E+9#10",
         Less,
     );
@@ -438,7 +452,7 @@ fn test_from_integer_prec_round() {
         "-1000000000000",
         10,
         Ceiling,
-        "-9.997e11",
+        "-9.9965e11",
         "-0xe.8cE+9#10",
         Greater,
     );
@@ -446,16 +460,23 @@ fn test_from_integer_prec_round() {
         "-1000000000000",
         10,
         Down,
-        "-9.997e11",
+        "-9.9965e11",
         "-0xe.8cE+9#10",
         Greater,
     );
-    test("-1000000000000", 10, Up, "-1.001e12", "-0xe.90E+9#10", Less);
+    test(
+        "-1000000000000",
+        10,
+        Up,
+        "-1.0007e12",
+        "-0xe.90E+9#10",
+        Less,
+    );
     test(
         "-1000000000000",
         10,
         Nearest,
-        "-9.997e11",
+        "-9.9965e11",
         "-0xe.8cE+9#10",
         Greater,
     );
@@ -464,7 +485,7 @@ fn test_from_integer_prec_round() {
         "-1000000000000",
         20,
         Floor,
-        "-1.000001e12",
+        "-1.0000007e12",
         "-0xe.8d4bE+9#20",
         Less,
     );
@@ -472,7 +493,7 @@ fn test_from_integer_prec_round() {
         "-1000000000000",
         20,
         Ceiling,
-        "-9.999997e11",
+        "-9.9999967e11",
         "-0xe.8d4aE+9#20",
         Greater,
     );
@@ -480,7 +501,7 @@ fn test_from_integer_prec_round() {
         "-1000000000000",
         20,
         Down,
-        "-9.999997e11",
+        "-9.9999967e11",
         "-0xe.8d4aE+9#20",
         Greater,
     );
@@ -488,7 +509,7 @@ fn test_from_integer_prec_round() {
         "-1000000000000",
         20,
         Up,
-        "-1.000001e12",
+        "-1.0000007e12",
         "-0xe.8d4bE+9#20",
         Less,
     );
@@ -496,7 +517,7 @@ fn test_from_integer_prec_round() {
         "-1000000000000",
         20,
         Nearest,
-        "-9.999997e11",
+        "-9.9999967e11",
         "-0xe.8d4aE+9#20",
         Greater,
     );
@@ -526,7 +547,7 @@ fn test_from_integer_prec_round() {
         Integer::power_of_2(1000),
         10,
         Floor,
-        "1.072e301",
+        "1.0715e301",
         "0x1.000E+250#10",
         Equal,
     );
@@ -534,7 +555,7 @@ fn test_from_integer_prec_round() {
         Integer::power_of_2(1000),
         10,
         Ceiling,
-        "1.072e301",
+        "1.0715e301",
         "0x1.000E+250#10",
         Equal,
     );
@@ -542,7 +563,7 @@ fn test_from_integer_prec_round() {
         Integer::power_of_2(1000),
         10,
         Down,
-        "1.072e301",
+        "1.0715e301",
         "0x1.000E+250#10",
         Equal,
     );
@@ -550,7 +571,7 @@ fn test_from_integer_prec_round() {
         Integer::power_of_2(1000),
         10,
         Up,
-        "1.072e301",
+        "1.0715e301",
         "0x1.000E+250#10",
         Equal,
     );
@@ -558,7 +579,7 @@ fn test_from_integer_prec_round() {
         Integer::power_of_2(1000),
         10,
         Nearest,
-        "1.072e301",
+        "1.0715e301",
         "0x1.000E+250#10",
         Equal,
     );
@@ -566,7 +587,7 @@ fn test_from_integer_prec_round() {
         Integer::power_of_2(1000),
         10,
         Exact,
-        "1.072e301",
+        "1.0715e301",
         "0x1.000E+250#10",
         Equal,
     );
@@ -575,7 +596,7 @@ fn test_from_integer_prec_round() {
         Integer::power_of_2(u64::exact_from(Float::MAX_EXPONENT)),
         10,
         Floor,
-        "too_big",
+        "2.0965e323228496",
         "0x7.feE+268435455#10",
         Less,
     );
@@ -591,7 +612,7 @@ fn test_from_integer_prec_round() {
         Integer::power_of_2(u64::exact_from(Float::MAX_EXPONENT)),
         10,
         Down,
-        "too_big",
+        "2.0965e323228496",
         "0x7.feE+268435455#10",
         Less,
     );
@@ -616,7 +637,7 @@ fn test_from_integer_prec_round() {
         Integer::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 1),
         10,
         Floor,
-        "too_big",
+        "1.0493e323228496",
         "0x4.00E+268435455#10",
         Equal,
     );
@@ -624,7 +645,7 @@ fn test_from_integer_prec_round() {
         Integer::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 1),
         10,
         Ceiling,
-        "too_big",
+        "1.0493e323228496",
         "0x4.00E+268435455#10",
         Equal,
     );
@@ -632,7 +653,7 @@ fn test_from_integer_prec_round() {
         Integer::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 1),
         10,
         Down,
-        "too_big",
+        "1.0493e323228496",
         "0x4.00E+268435455#10",
         Equal,
     );
@@ -640,7 +661,7 @@ fn test_from_integer_prec_round() {
         Integer::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 1),
         10,
         Up,
-        "too_big",
+        "1.0493e323228496",
         "0x4.00E+268435455#10",
         Equal,
     );
@@ -648,7 +669,7 @@ fn test_from_integer_prec_round() {
         Integer::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 1),
         10,
         Nearest,
-        "too_big",
+        "1.0493e323228496",
         "0x4.00E+268435455#10",
         Equal,
     );
@@ -656,7 +677,7 @@ fn test_from_integer_prec_round() {
         Integer::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 1),
         10,
         Exact,
-        "too_big",
+        "1.0493e323228496",
         "0x4.00E+268435455#10",
         Equal,
     );
@@ -665,7 +686,7 @@ fn test_from_integer_prec_round() {
         Integer::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 2) * Integer::from(3u8),
         1,
         Floor,
-        "too_big",
+        "1.0e323228496",
         "0x4.0E+268435455#1",
         Less,
     );
@@ -681,7 +702,7 @@ fn test_from_integer_prec_round() {
         Integer::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 2) * Integer::from(3u8),
         1,
         Down,
-        "too_big",
+        "1.0e323228496",
         "0x4.0E+268435455#1",
         Less,
     );
@@ -706,7 +727,7 @@ fn test_from_integer_prec_round() {
         Integer::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 12) * Integer::from(3073u16),
         1,
         Floor,
-        "too_big",
+        "1.0e323228496",
         "0x4.0E+268435455#1",
         Less,
     );
@@ -722,7 +743,7 @@ fn test_from_integer_prec_round() {
         Integer::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 12) * Integer::from(3073u16),
         1,
         Down,
-        "too_big",
+        "1.0e323228496",
         "0x4.0E+268435455#1",
         Less,
     );
@@ -747,7 +768,7 @@ fn test_from_integer_prec_round() {
         Integer::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 12) * Integer::from(3071u16),
         1,
         Floor,
-        "too_big",
+        "1.0e323228496",
         "0x4.0E+268435455#1",
         Less,
     );
@@ -763,7 +784,7 @@ fn test_from_integer_prec_round() {
         Integer::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 12) * Integer::from(3071u16),
         1,
         Down,
-        "too_big",
+        "1.0e323228496",
         "0x4.0E+268435455#1",
         Less,
     );
@@ -779,7 +800,7 @@ fn test_from_integer_prec_round() {
         Integer::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 12) * Integer::from(3071u16),
         1,
         Nearest,
-        "too_big",
+        "1.0e323228496",
         "0x4.0E+268435455#1",
         Less,
     );
@@ -788,7 +809,7 @@ fn test_from_integer_prec_round() {
         -Integer::power_of_2(1000),
         10,
         Floor,
-        "-1.072e301",
+        "-1.0715e301",
         "-0x1.000E+250#10",
         Equal,
     );
@@ -796,7 +817,7 @@ fn test_from_integer_prec_round() {
         -Integer::power_of_2(1000),
         10,
         Ceiling,
-        "-1.072e301",
+        "-1.0715e301",
         "-0x1.000E+250#10",
         Equal,
     );
@@ -804,7 +825,7 @@ fn test_from_integer_prec_round() {
         -Integer::power_of_2(1000),
         10,
         Down,
-        "-1.072e301",
+        "-1.0715e301",
         "-0x1.000E+250#10",
         Equal,
     );
@@ -812,7 +833,7 @@ fn test_from_integer_prec_round() {
         -Integer::power_of_2(1000),
         10,
         Up,
-        "-1.072e301",
+        "-1.0715e301",
         "-0x1.000E+250#10",
         Equal,
     );
@@ -820,7 +841,7 @@ fn test_from_integer_prec_round() {
         -Integer::power_of_2(1000),
         10,
         Nearest,
-        "-1.072e301",
+        "-1.0715e301",
         "-0x1.000E+250#10",
         Equal,
     );
@@ -828,7 +849,7 @@ fn test_from_integer_prec_round() {
         -Integer::power_of_2(1000),
         10,
         Exact,
-        "-1.072e301",
+        "-1.0715e301",
         "-0x1.000E+250#10",
         Equal,
     );
@@ -845,7 +866,7 @@ fn test_from_integer_prec_round() {
         -Integer::power_of_2(u64::exact_from(Float::MAX_EXPONENT)),
         10,
         Ceiling,
-        "-too_big",
+        "-2.0965e323228496",
         "-0x7.feE+268435455#10",
         Greater,
     );
@@ -853,7 +874,7 @@ fn test_from_integer_prec_round() {
         -Integer::power_of_2(u64::exact_from(Float::MAX_EXPONENT)),
         10,
         Down,
-        "-too_big",
+        "-2.0965e323228496",
         "-0x7.feE+268435455#10",
         Greater,
     );
@@ -878,7 +899,7 @@ fn test_from_integer_prec_round() {
         -Integer::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 1),
         10,
         Floor,
-        "-too_big",
+        "-1.0493e323228496",
         "-0x4.00E+268435455#10",
         Equal,
     );
@@ -886,7 +907,7 @@ fn test_from_integer_prec_round() {
         -Integer::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 1),
         10,
         Ceiling,
-        "-too_big",
+        "-1.0493e323228496",
         "-0x4.00E+268435455#10",
         Equal,
     );
@@ -894,7 +915,7 @@ fn test_from_integer_prec_round() {
         -Integer::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 1),
         10,
         Down,
-        "-too_big",
+        "-1.0493e323228496",
         "-0x4.00E+268435455#10",
         Equal,
     );
@@ -902,7 +923,7 @@ fn test_from_integer_prec_round() {
         -Integer::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 1),
         10,
         Up,
-        "-too_big",
+        "-1.0493e323228496",
         "-0x4.00E+268435455#10",
         Equal,
     );
@@ -910,7 +931,7 @@ fn test_from_integer_prec_round() {
         -Integer::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 1),
         10,
         Nearest,
-        "-too_big",
+        "-1.0493e323228496",
         "-0x4.00E+268435455#10",
         Equal,
     );
@@ -918,7 +939,7 @@ fn test_from_integer_prec_round() {
         -Integer::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 1),
         10,
         Exact,
-        "-too_big",
+        "-1.0493e323228496",
         "-0x4.00E+268435455#10",
         Equal,
     );
@@ -935,7 +956,7 @@ fn test_from_integer_prec_round() {
         -Integer::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 2) * Integer::from(3u8),
         1,
         Ceiling,
-        "-too_big",
+        "-1.0e323228496",
         "-0x4.0E+268435455#1",
         Greater,
     );
@@ -943,7 +964,7 @@ fn test_from_integer_prec_round() {
         -Integer::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 2) * Integer::from(3u8),
         1,
         Down,
-        "-too_big",
+        "-1.0e323228496",
         "-0x4.0E+268435455#1",
         Greater,
     );
@@ -976,7 +997,7 @@ fn test_from_integer_prec_round() {
         -Integer::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 12) * Integer::from(3073u16),
         1,
         Ceiling,
-        "-too_big",
+        "-1.0e323228496",
         "-0x4.0E+268435455#1",
         Greater,
     );
@@ -984,7 +1005,7 @@ fn test_from_integer_prec_round() {
         -Integer::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 12) * Integer::from(3073u16),
         1,
         Down,
-        "-too_big",
+        "-1.0e323228496",
         "-0x4.0E+268435455#1",
         Greater,
     );
@@ -1017,7 +1038,7 @@ fn test_from_integer_prec_round() {
         -Integer::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 12) * Integer::from(3071u16),
         1,
         Ceiling,
-        "-too_big",
+        "-1.0e323228496",
         "-0x4.0E+268435455#1",
         Greater,
     );
@@ -1025,7 +1046,7 @@ fn test_from_integer_prec_round() {
         -Integer::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 12) * Integer::from(3071u16),
         1,
         Down,
-        "-too_big",
+        "-1.0e323228496",
         "-0x4.0E+268435455#1",
         Greater,
     );
@@ -1041,7 +1062,7 @@ fn test_from_integer_prec_round() {
         -Integer::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 12) * Integer::from(3071u16),
         1,
         Nearest,
-        "-too_big",
+        "-1.0e323228496",
         "-0x4.0E+268435455#1",
         Greater,
     );
@@ -1112,11 +1133,19 @@ fn test_try_from_integer() {
     test("0", Ok("0.0"), Ok("0x0.0"));
     test("1", Ok("1.0"), Ok("0x1.0#1"));
     test("123", Ok("123.0"), Ok("0x7b.0#7"));
-    test("1000000000000", Ok("1.0e12"), Ok("0xe.8d4a51E+9#28"));
+    test(
+        "1000000000000",
+        Ok("1.000000000e12"),
+        Ok("0xe.8d4a51E+9#28"),
+    );
 
     test("-1", Ok("-1.0"), Ok("-0x1.0#1"));
     test("-123", Ok("-123.0"), Ok("-0x7b.0#7"));
-    test("-1000000000000", Ok("-1.0e12"), Ok("-0xe.8d4a51E+9#28"));
+    test(
+        "-1000000000000",
+        Ok("-1.000000000e12"),
+        Ok("-0xe.8d4a51E+9#28"),
+    );
 
     let test_big = |x: Integer, out, out_hex| {
         let of = Float::try_from(x.clone());
@@ -1133,7 +1162,7 @@ fn test_try_from_integer() {
         let ofs = of.map(|f| to_hex_string(&f));
         assert_eq!(ofs.as_ref().map(String::as_str), out_hex);
     };
-    test_big(Integer::power_of_2(1000), Ok("1.0e301"), Ok("0x1.0E+250#1"));
+    test_big(Integer::power_of_2(1000), Ok("1.1e301"), Ok("0x1.0E+250#1"));
     test_big(
         Integer::power_of_2(u64::exact_from(Float::MAX_EXPONENT)),
         Err(&&FloatConversionError::Overflow),
@@ -1141,28 +1170,28 @@ fn test_try_from_integer() {
     );
     test_big(
         Integer::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 1),
-        Ok("too_big"),
+        Ok("1.0e323228496"),
         Ok("0x4.0E+268435455#1"),
     );
     test_big(
         Integer::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 2) * Integer::from(3u8),
-        Ok("too_big"),
+        Ok("1.6e323228496"),
         Ok("0x6.0E+268435455#2"),
     );
     test_big(
         Integer::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 12) * Integer::from(3073u16),
-        Ok("too_big"),
+        Ok("1.5744e323228496"),
         Ok("0x6.008E+268435455#12"),
     );
     test_big(
         Integer::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 12) * Integer::from(3071u16),
-        Ok("too_big"),
+        Ok("1.5734e323228496"),
         Ok("0x5.ff8E+268435455#12"),
     );
 
     test_big(
         -Integer::power_of_2(1000),
-        Ok("-1.0e301"),
+        Ok("-1.1e301"),
         Ok("-0x1.0E+250#1"),
     );
     test_big(
@@ -1172,22 +1201,22 @@ fn test_try_from_integer() {
     );
     test_big(
         -Integer::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 1),
-        Ok("-too_big"),
+        Ok("-1.0e323228496"),
         Ok("-0x4.0E+268435455#1"),
     );
     test_big(
         -Integer::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 2) * Integer::from(3u8),
-        Ok("-too_big"),
+        Ok("-1.6e323228496"),
         Ok("-0x6.0E+268435455#2"),
     );
     test_big(
         -Integer::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 12) * Integer::from(3073u16),
-        Ok("-too_big"),
+        Ok("-1.5744e323228496"),
         Ok("-0x6.008E+268435455#12"),
     );
     test_big(
         -Integer::power_of_2(u64::exact_from(Float::MAX_EXPONENT) - 12) * Integer::from(3071u16),
-        Ok("-too_big"),
+        Ok("-1.5734e323228496"),
         Ok("-0x5.ff8E+268435455#12"),
     );
 }

@@ -48,7 +48,7 @@ fn test_try_from_float() {
 
     test("1.0", "0x1.0#1", "Ok(1)");
     test("2.0", "0x2.0#1", "Ok(2)");
-    test("0.5", "0x0.8#1", "Err(FloatNonIntegerOrOutOfRange)");
+    test("0.50", "0x0.8#1", "Err(FloatNonIntegerOrOutOfRange)");
     test(
         "0.33333333333333331",
         "0x0.55555555555554#53",
@@ -59,7 +59,7 @@ fn test_try_from_float() {
 
     test("-1.0", "-0x1.0#1", "Err(FloatNegative)");
     test("-2.0", "-0x2.0#1", "Err(FloatNegative)");
-    test("-0.5", "-0x0.8#1", "Err(FloatNegative)");
+    test("-0.50", "-0x0.8#1", "Err(FloatNegative)");
     test(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
@@ -89,14 +89,14 @@ fn test_convertible_from_float() {
 
     test("1.0", "0x1.0#1", true);
     test("2.0", "0x2.0#1", true);
-    test("0.5", "0x0.8#1", false);
+    test("0.50", "0x0.8#1", false);
     test("0.33333333333333331", "0x0.55555555555554#53", false);
     test("123.0", "0x7b.0#7", true);
     test("1000000000000.0", "0xe8d4a51000.0#40", true);
 
     test("-1.0", "-0x1.0#1", false);
     test("-2.0", "-0x2.0#1", false);
-    test("-0.5", "-0x0.8#1", false);
+    test("-0.50", "-0x0.8#1", false);
     test("-0.33333333333333331", "-0x0.55555555555554#53", false);
     test("-123.0", "-0x7b.0#7", false);
     test("-1000000000000.0", "-0xe8d4a51000.0#40", false);
@@ -150,11 +150,11 @@ fn test_rounding_from_float() {
     test("2.0", "0x2.0#1", Nearest, "2", Equal);
     test("2.0", "0x2.0#1", Exact, "2", Equal);
 
-    test("0.5", "0x0.8#1", Floor, "0", Less);
-    test("0.5", "0x0.8#1", Ceiling, "1", Greater);
-    test("0.5", "0x0.8#1", Down, "0", Less);
-    test("0.5", "0x0.8#1", Up, "1", Greater);
-    test("0.5", "0x0.8#1", Nearest, "0", Less);
+    test("0.50", "0x0.8#1", Floor, "0", Less);
+    test("0.50", "0x0.8#1", Ceiling, "1", Greater);
+    test("0.50", "0x0.8#1", Down, "0", Less);
+    test("0.50", "0x0.8#1", Up, "1", Greater);
+    test("0.50", "0x0.8#1", Nearest, "0", Less);
 
     test(
         "0.33333333333333331",
@@ -193,35 +193,35 @@ fn test_rounding_from_float() {
     );
 
     test(
-        "0.6666666666666666",
+        "0.66666666666666663",
         "0x0.aaaaaaaaaaaaa8#53",
         Floor,
         "0",
         Less,
     );
     test(
-        "0.6666666666666666",
+        "0.66666666666666663",
         "0x0.aaaaaaaaaaaaa8#53",
         Ceiling,
         "1",
         Greater,
     );
     test(
-        "0.6666666666666666",
+        "0.66666666666666663",
         "0x0.aaaaaaaaaaaaa8#53",
         Down,
         "0",
         Less,
     );
     test(
-        "0.6666666666666666",
+        "0.66666666666666663",
         "0x0.aaaaaaaaaaaaa8#53",
         Up,
         "1",
         Greater,
     );
     test(
-        "0.6666666666666666",
+        "0.66666666666666663",
         "0x0.aaaaaaaaaaaaa8#53",
         Nearest,
         "1",
@@ -255,9 +255,9 @@ fn test_rounding_from_float() {
     test("-2.0", "-0x2.0#1", Down, "0", Greater);
     test("-2.0", "-0x2.0#1", Nearest, "0", Greater);
 
-    test("-0.5", "-0x0.8#1", Ceiling, "0", Greater);
-    test("-0.5", "-0x0.8#1", Down, "0", Greater);
-    test("-0.5", "-0x0.8#1", Nearest, "0", Greater);
+    test("-0.50", "-0x0.8#1", Ceiling, "0", Greater);
+    test("-0.50", "-0x0.8#1", Down, "0", Greater);
+    test("-0.50", "-0x0.8#1", Nearest, "0", Greater);
 
     test(
         "-0.33333333333333331",
@@ -282,21 +282,21 @@ fn test_rounding_from_float() {
     );
 
     test(
-        "-0.6666666666666666",
+        "-0.66666666666666663",
         "-0x0.aaaaaaaaaaaaa8#53",
         Ceiling,
         "0",
         Greater,
     );
     test(
-        "-0.6666666666666666",
+        "-0.66666666666666663",
         "-0x0.aaaaaaaaaaaaa8#53",
         Down,
         "0",
         Greater,
     );
     test(
-        "-0.6666666666666666",
+        "-0.66666666666666663",
         "-0x0.aaaaaaaaaaaaa8#53",
         Nearest,
         "0",

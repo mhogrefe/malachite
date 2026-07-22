@@ -62,25 +62,25 @@ fn test_from_primitive_float() {
 
     test_helper(f32::ONE, "1.0", "0x1.0#1");
     test_helper(f32::TWO, "2.0", "0x2.0#1");
-    test_helper(f32::ONE_HALF, "0.5", "0x0.8#1");
-    test_helper(1.0f32 / 3.0, "0.33333334", "0x0.5555558#24");
-    test_helper(std::f32::consts::SQRT_2, "1.4142135", "0x1.6a09e6#24");
-    test_helper(std::f32::consts::PI, "3.1415927", "0x3.243f6c#24");
-    test_helper(f32::MIN_POSITIVE_SUBNORMAL, "1.0e-45", "0x8.0E-38#1");
+    test_helper(f32::ONE_HALF, "0.50", "0x0.8#1");
+    test_helper(1.0f32 / 3.0, "0.333333343", "0x0.5555558#24");
+    test_helper(std::f32::consts::SQRT_2, "1.41421354", "0x1.6a09e6#24");
+    test_helper(std::f32::consts::PI, "3.14159274", "0x3.243f6c#24");
+    test_helper(f32::MIN_POSITIVE_SUBNORMAL, "1.4e-45", "0x8.0E-38#1");
     test_helper(f32::MAX_SUBNORMAL, "1.1754942e-38", "0x3.fffff8E-32#23");
-    test_helper(f32::MIN_POSITIVE_NORMAL, "1.0e-38", "0x4.0E-32#1");
-    test_helper(f32::MAX_FINITE, "3.4028235e38", "0xf.fffffE+31#24");
+    test_helper(f32::MIN_POSITIVE_NORMAL, "1.2e-38", "0x4.0E-32#1");
+    test_helper(f32::MAX_FINITE, "3.40282347e38", "0xf.fffffE+31#24");
 
     test_helper(f32::NEGATIVE_ONE, "-1.0", "-0x1.0#1");
     test_helper(-f32::TWO, "-2.0", "-0x2.0#1");
-    test_helper(-f32::ONE_HALF, "-0.5", "-0x0.8#1");
-    test_helper(-1.0f32 / 3.0, "-0.33333334", "-0x0.5555558#24");
-    test_helper(-std::f32::consts::SQRT_2, "-1.4142135", "-0x1.6a09e6#24");
-    test_helper(-std::f32::consts::PI, "-3.1415927", "-0x3.243f6c#24");
-    test_helper(-f32::MIN_POSITIVE_SUBNORMAL, "-1.0e-45", "-0x8.0E-38#1");
+    test_helper(-f32::ONE_HALF, "-0.50", "-0x0.8#1");
+    test_helper(-1.0f32 / 3.0, "-0.333333343", "-0x0.5555558#24");
+    test_helper(-std::f32::consts::SQRT_2, "-1.41421354", "-0x1.6a09e6#24");
+    test_helper(-std::f32::consts::PI, "-3.14159274", "-0x3.243f6c#24");
+    test_helper(-f32::MIN_POSITIVE_SUBNORMAL, "-1.4e-45", "-0x8.0E-38#1");
     test_helper(-f32::MAX_SUBNORMAL, "-1.1754942e-38", "-0x3.fffff8E-32#23");
-    test_helper(-f32::MIN_POSITIVE_NORMAL, "-1.0e-38", "-0x4.0E-32#1");
-    test_helper(-f32::MAX_FINITE, "-3.4028235e38", "-0xf.fffffE+31#24");
+    test_helper(-f32::MIN_POSITIVE_NORMAL, "-1.2e-38", "-0x4.0E-32#1");
+    test_helper(-f32::MAX_FINITE, "-3.40282347e38", "-0xf.fffffE+31#24");
 
     test_helper(f64::NAN, "NaN", "NaN");
     test_helper(f64::INFINITY, "Infinity", "Infinity");
@@ -90,7 +90,7 @@ fn test_from_primitive_float() {
 
     test_helper(f64::ONE, "1.0", "0x1.0#1");
     test_helper(f64::TWO, "2.0", "0x2.0#1");
-    test_helper(f64::ONE_HALF, "0.5", "0x0.8#1");
+    test_helper(f64::ONE_HALF, "0.50", "0x0.8#1");
     test_helper(1.0f64 / 3.0, "0.33333333333333331", "0x0.55555555555554#53");
     test_helper(
         std::f64::consts::SQRT_2,
@@ -99,16 +99,16 @@ fn test_from_primitive_float() {
     );
     test_helper(
         std::f64::consts::PI,
-        "3.141592653589793",
+        "3.1415926535897931",
         "0x3.243f6a8885a3#50",
     );
-    test_helper(f64::MIN_POSITIVE_SUBNORMAL, "5.0e-324", "0x4.0E-269#1");
+    test_helper(f64::MIN_POSITIVE_SUBNORMAL, "4.9e-324", "0x4.0E-269#1");
     test_helper(
         f64::MAX_SUBNORMAL,
         "2.2250738585072009e-308",
         "0x3.ffffffffffffcE-256#52",
     );
-    test_helper(f64::MIN_POSITIVE_NORMAL, "2.0e-308", "0x4.0E-256#1");
+    test_helper(f64::MIN_POSITIVE_NORMAL, "2.2e-308", "0x4.0E-256#1");
     test_helper(
         f64::MAX_FINITE,
         "1.7976931348623157e308",
@@ -117,7 +117,7 @@ fn test_from_primitive_float() {
 
     test_helper(f64::NEGATIVE_ONE, "-1.0", "-0x1.0#1");
     test_helper(-f64::TWO, "-2.0", "-0x2.0#1");
-    test_helper(-f64::ONE_HALF, "-0.5", "-0x0.8#1");
+    test_helper(-f64::ONE_HALF, "-0.50", "-0x0.8#1");
     test_helper(
         -1.0f64 / 3.0,
         "-0.33333333333333331",
@@ -130,16 +130,16 @@ fn test_from_primitive_float() {
     );
     test_helper(
         -std::f64::consts::PI,
-        "-3.141592653589793",
+        "-3.1415926535897931",
         "-0x3.243f6a8885a3#50",
     );
-    test_helper(-f64::MIN_POSITIVE_SUBNORMAL, "-5.0e-324", "-0x4.0E-269#1");
+    test_helper(-f64::MIN_POSITIVE_SUBNORMAL, "-4.9e-324", "-0x4.0E-269#1");
     test_helper(
         -f64::MAX_SUBNORMAL,
         "-2.2250738585072009e-308",
         "-0x3.ffffffffffffcE-256#52",
     );
-    test_helper(-f64::MIN_POSITIVE_NORMAL, "-2.0e-308", "-0x4.0E-256#1");
+    test_helper(-f64::MIN_POSITIVE_NORMAL, "-2.2e-308", "-0x4.0E-256#1");
     test_helper(
         -f64::MAX_FINITE,
         "-1.7976931348623157e308",
@@ -182,31 +182,31 @@ fn test_from_primitive_float_prec() {
     test_helper(f32::NEGATIVE_ZERO, 100, "-0.0", "-0x0.0", Equal);
 
     test_helper(f32::ONE, 1, "1.0", "0x1.0#1", Equal);
-    test_helper(f32::ONE, 10, "1.0", "0x1.000#10", Equal);
+    test_helper(f32::ONE, 10, "1.0000", "0x1.000#10", Equal);
     test_helper(
         f32::ONE,
         100,
-        "1.0",
+        "1.0000000000000000000000000000000",
         "0x1.0000000000000000000000000#100",
         Equal,
     );
 
-    test_helper(1.0f32 / 3.0, 1, "0.2", "0x0.4#1", Less);
-    test_helper(1.0f32 / 3.0, 10, "0.3335", "0x0.556#10", Greater);
+    test_helper(1.0f32 / 3.0, 1, "0.25", "0x0.4#1", Less);
+    test_helper(1.0f32 / 3.0, 10, "0.33350", "0x0.556#10", Greater);
     test_helper(
         1.0f32 / 3.0,
         100,
-        "0.3333333432674407958984375",
+        "0.33333334326744079589843750000000",
         "0x0.55555580000000000000000000#100",
         Equal,
     );
 
     test_helper(std::f32::consts::PI, 1, "4.0", "0x4.0#1", Greater);
-    test_helper(std::f32::consts::PI, 10, "3.141", "0x3.24#10", Less);
+    test_helper(std::f32::consts::PI, 10, "3.1406", "0x3.24#10", Less);
     test_helper(
         std::f32::consts::PI,
         100,
-        "3.1415927410125732421875",
+        "3.1415927410125732421875000000000",
         "0x3.243f6c0000000000000000000#100",
         Equal,
     );
@@ -214,51 +214,51 @@ fn test_from_primitive_float_prec() {
     test_helper(
         f32::MIN_POSITIVE_SUBNORMAL,
         1,
-        "1.0e-45",
+        "1.4e-45",
         "0x8.0E-38#1",
         Equal,
     );
     test_helper(
         f32::MIN_POSITIVE_SUBNORMAL,
         10,
-        "1.401e-45",
+        "1.4013e-45",
         "0x8.00E-38#10",
         Equal,
     );
     test_helper(
         f32::MIN_POSITIVE_SUBNORMAL,
         100,
-        "1.40129846432481707092372958329e-45",
+        "1.4012984643248170709237295832899e-45",
         "0x8.000000000000000000000000E-38#100",
         Equal,
     );
 
     test_helper(f32::NEGATIVE_ONE, 1, "-1.0", "-0x1.0#1", Equal);
-    test_helper(f32::NEGATIVE_ONE, 10, "-1.0", "-0x1.000#10", Equal);
+    test_helper(f32::NEGATIVE_ONE, 10, "-1.0000", "-0x1.000#10", Equal);
     test_helper(
         f32::NEGATIVE_ONE,
         100,
-        "-1.0",
+        "-1.0000000000000000000000000000000",
         "-0x1.0000000000000000000000000#100",
         Equal,
     );
 
-    test_helper(-1.0f32 / 3.0, 1, "-0.2", "-0x0.4#1", Greater);
-    test_helper(-1.0f32 / 3.0, 10, "-0.3335", "-0x0.556#10", Less);
+    test_helper(-1.0f32 / 3.0, 1, "-0.25", "-0x0.4#1", Greater);
+    test_helper(-1.0f32 / 3.0, 10, "-0.33350", "-0x0.556#10", Less);
     test_helper(
         -1.0f32 / 3.0,
         100,
-        "-0.3333333432674407958984375",
+        "-0.33333334326744079589843750000000",
         "-0x0.55555580000000000000000000#100",
         Equal,
     );
 
     test_helper(-std::f32::consts::PI, 1, "-4.0", "-0x4.0#1", Less);
-    test_helper(-std::f32::consts::PI, 10, "-3.141", "-0x3.24#10", Greater);
+    test_helper(-std::f32::consts::PI, 10, "-3.1406", "-0x3.24#10", Greater);
     test_helper(
         -std::f32::consts::PI,
         100,
-        "-3.1415927410125732421875",
+        "-3.1415927410125732421875000000000",
         "-0x3.243f6c0000000000000000000#100",
         Equal,
     );
@@ -266,21 +266,21 @@ fn test_from_primitive_float_prec() {
     test_helper(
         -f32::MIN_POSITIVE_SUBNORMAL,
         1,
-        "-1.0e-45",
+        "-1.4e-45",
         "-0x8.0E-38#1",
         Equal,
     );
     test_helper(
         -f32::MIN_POSITIVE_SUBNORMAL,
         10,
-        "-1.401e-45",
+        "-1.4013e-45",
         "-0x8.00E-38#10",
         Equal,
     );
     test_helper(
         -f32::MIN_POSITIVE_SUBNORMAL,
         100,
-        "-1.40129846432481707092372958329e-45",
+        "-1.4012984643248170709237295832899e-45",
         "-0x8.000000000000000000000000E-38#100",
         Equal,
     );
@@ -302,31 +302,31 @@ fn test_from_primitive_float_prec() {
     test_helper(f64::NEGATIVE_ZERO, 100, "-0.0", "-0x0.0", Equal);
 
     test_helper(f64::ONE, 1, "1.0", "0x1.0#1", Equal);
-    test_helper(f64::ONE, 10, "1.0", "0x1.000#10", Equal);
+    test_helper(f64::ONE, 10, "1.0000", "0x1.000#10", Equal);
     test_helper(
         f64::ONE,
         100,
-        "1.0",
+        "1.0000000000000000000000000000000",
         "0x1.0000000000000000000000000#100",
         Equal,
     );
 
-    test_helper(1.0f64 / 3.0, 1, "0.2", "0x0.4#1", Less);
-    test_helper(1.0f64 / 3.0, 10, "0.3335", "0x0.556#10", Greater);
+    test_helper(1.0f64 / 3.0, 1, "0.25", "0x0.4#1", Less);
+    test_helper(1.0f64 / 3.0, 10, "0.33350", "0x0.556#10", Greater);
     test_helper(
         1.0f64 / 3.0,
         100,
-        "0.3333333333333333148296162562474",
+        "0.33333333333333331482961625624739",
         "0x0.55555555555554000000000000#100",
         Equal,
     );
 
     test_helper(std::f64::consts::PI, 1, "4.0", "0x4.0#1", Greater);
-    test_helper(std::f64::consts::PI, 10, "3.141", "0x3.24#10", Less);
+    test_helper(std::f64::consts::PI, 10, "3.1406", "0x3.24#10", Less);
     test_helper(
         std::f64::consts::PI,
         100,
-        "3.141592653589793115997963468544",
+        "3.1415926535897931159979634685442",
         "0x3.243f6a8885a30000000000000#100",
         Equal,
     );
@@ -334,51 +334,51 @@ fn test_from_primitive_float_prec() {
     test_helper(
         f64::MIN_POSITIVE_SUBNORMAL,
         1,
-        "5.0e-324",
+        "4.9e-324",
         "0x4.0E-269#1",
         Equal,
     );
     test_helper(
         f64::MIN_POSITIVE_SUBNORMAL,
         10,
-        "4.94e-324",
+        "4.9407e-324",
         "0x4.00E-269#10",
         Equal,
     );
     test_helper(
         f64::MIN_POSITIVE_SUBNORMAL,
         100,
-        "4.94065645841246544176568792868e-324",
+        "4.9406564584124654417656879286822e-324",
         "0x4.0000000000000000000000000E-269#100",
         Equal,
     );
 
     test_helper(f64::NEGATIVE_ONE, 1, "-1.0", "-0x1.0#1", Equal);
-    test_helper(f64::NEGATIVE_ONE, 10, "-1.0", "-0x1.000#10", Equal);
+    test_helper(f64::NEGATIVE_ONE, 10, "-1.0000", "-0x1.000#10", Equal);
     test_helper(
         f64::NEGATIVE_ONE,
         100,
-        "-1.0",
+        "-1.0000000000000000000000000000000",
         "-0x1.0000000000000000000000000#100",
         Equal,
     );
 
-    test_helper(-1.0f64 / 3.0, 1, "-0.2", "-0x0.4#1", Greater);
-    test_helper(-1.0f64 / 3.0, 10, "-0.3335", "-0x0.556#10", Less);
+    test_helper(-1.0f64 / 3.0, 1, "-0.25", "-0x0.4#1", Greater);
+    test_helper(-1.0f64 / 3.0, 10, "-0.33350", "-0x0.556#10", Less);
     test_helper(
         -1.0f64 / 3.0,
         100,
-        "-0.3333333333333333148296162562474",
+        "-0.33333333333333331482961625624739",
         "-0x0.55555555555554000000000000#100",
         Equal,
     );
 
     test_helper(-std::f64::consts::PI, 1, "-4.0", "-0x4.0#1", Less);
-    test_helper(-std::f64::consts::PI, 10, "-3.141", "-0x3.24#10", Greater);
+    test_helper(-std::f64::consts::PI, 10, "-3.1406", "-0x3.24#10", Greater);
     test_helper(
         -std::f64::consts::PI,
         100,
-        "-3.141592653589793115997963468544",
+        "-3.1415926535897931159979634685442",
         "-0x3.243f6a8885a30000000000000#100",
         Equal,
     );
@@ -386,21 +386,21 @@ fn test_from_primitive_float_prec() {
     test_helper(
         -f64::MIN_POSITIVE_SUBNORMAL,
         1,
-        "-5.0e-324",
+        "-4.9e-324",
         "-0x4.0E-269#1",
         Equal,
     );
     test_helper(
         -f64::MIN_POSITIVE_SUBNORMAL,
         10,
-        "-4.94e-324",
+        "-4.9407e-324",
         "-0x4.00E-269#10",
         Equal,
     );
     test_helper(
         -f64::MIN_POSITIVE_SUBNORMAL,
         100,
-        "-4.94065645841246544176568792868e-324",
+        "-4.9406564584124654417656879286822e-324",
         "-0x4.0000000000000000000000000E-269#100",
         Equal,
     );
@@ -611,24 +611,24 @@ fn test_from_primitive_float_prec_round() {
     test_helper(f32::ONE, 1, Nearest, "1.0", "0x1.0#1", Equal);
     test_helper(f32::ONE, 1, Exact, "1.0", "0x1.0#1", Equal);
 
-    test_helper(f32::ONE, 10, Floor, "1.0", "0x1.000#10", Equal);
-    test_helper(f32::ONE, 10, Ceiling, "1.0", "0x1.000#10", Equal);
-    test_helper(f32::ONE, 10, Down, "1.0", "0x1.000#10", Equal);
-    test_helper(f32::ONE, 10, Up, "1.0", "0x1.000#10", Equal);
-    test_helper(f32::ONE, 10, Nearest, "1.0", "0x1.000#10", Equal);
-    test_helper(f32::ONE, 10, Exact, "1.0", "0x1.000#10", Equal);
+    test_helper(f32::ONE, 10, Floor, "1.0000", "0x1.000#10", Equal);
+    test_helper(f32::ONE, 10, Ceiling, "1.0000", "0x1.000#10", Equal);
+    test_helper(f32::ONE, 10, Down, "1.0000", "0x1.000#10", Equal);
+    test_helper(f32::ONE, 10, Up, "1.0000", "0x1.000#10", Equal);
+    test_helper(f32::ONE, 10, Nearest, "1.0000", "0x1.000#10", Equal);
+    test_helper(f32::ONE, 10, Exact, "1.0000", "0x1.000#10", Equal);
 
-    test_helper(1.0f32 / 3.0, 1, Floor, "0.2", "0x0.4#1", Less);
-    test_helper(1.0f32 / 3.0, 1, Ceiling, "0.5", "0x0.8#1", Greater);
-    test_helper(1.0f32 / 3.0, 1, Down, "0.2", "0x0.4#1", Less);
-    test_helper(1.0f32 / 3.0, 1, Up, "0.5", "0x0.8#1", Greater);
-    test_helper(1.0f32 / 3.0, 1, Nearest, "0.2", "0x0.4#1", Less);
+    test_helper(1.0f32 / 3.0, 1, Floor, "0.25", "0x0.4#1", Less);
+    test_helper(1.0f32 / 3.0, 1, Ceiling, "0.50", "0x0.8#1", Greater);
+    test_helper(1.0f32 / 3.0, 1, Down, "0.25", "0x0.4#1", Less);
+    test_helper(1.0f32 / 3.0, 1, Up, "0.50", "0x0.8#1", Greater);
+    test_helper(1.0f32 / 3.0, 1, Nearest, "0.25", "0x0.4#1", Less);
 
-    test_helper(1.0f32 / 3.0, 10, Floor, "0.333", "0x0.554#10", Less);
-    test_helper(1.0f32 / 3.0, 10, Ceiling, "0.3335", "0x0.556#10", Greater);
-    test_helper(1.0f32 / 3.0, 10, Down, "0.333", "0x0.554#10", Less);
-    test_helper(1.0f32 / 3.0, 10, Up, "0.3335", "0x0.556#10", Greater);
-    test_helper(1.0f32 / 3.0, 10, Nearest, "0.3335", "0x0.556#10", Greater);
+    test_helper(1.0f32 / 3.0, 10, Floor, "0.33301", "0x0.554#10", Less);
+    test_helper(1.0f32 / 3.0, 10, Ceiling, "0.33350", "0x0.556#10", Greater);
+    test_helper(1.0f32 / 3.0, 10, Down, "0.33301", "0x0.554#10", Less);
+    test_helper(1.0f32 / 3.0, 10, Up, "0.33350", "0x0.556#10", Greater);
+    test_helper(1.0f32 / 3.0, 10, Nearest, "0.33350", "0x0.556#10", Greater);
 
     test_helper(std::f32::consts::PI, 1, Floor, "2.0", "0x2.0#1", Less);
     test_helper(std::f32::consts::PI, 1, Ceiling, "4.0", "0x4.0#1", Greater);
@@ -636,61 +636,75 @@ fn test_from_primitive_float_prec_round() {
     test_helper(std::f32::consts::PI, 1, Up, "4.0", "0x4.0#1", Greater);
     test_helper(std::f32::consts::PI, 1, Nearest, "4.0", "0x4.0#1", Greater);
 
-    test_helper(std::f32::consts::PI, 10, Floor, "3.141", "0x3.24#10", Less);
+    test_helper(std::f32::consts::PI, 10, Floor, "3.1406", "0x3.24#10", Less);
     test_helper(
         std::f32::consts::PI,
         10,
         Ceiling,
-        "3.145",
+        "3.1445",
         "0x3.25#10",
         Greater,
     );
-    test_helper(std::f32::consts::PI, 10, Down, "3.141", "0x3.24#10", Less);
-    test_helper(std::f32::consts::PI, 10, Up, "3.145", "0x3.25#10", Greater);
+    test_helper(std::f32::consts::PI, 10, Down, "3.1406", "0x3.24#10", Less);
+    test_helper(std::f32::consts::PI, 10, Up, "3.1445", "0x3.25#10", Greater);
     test_helper(
         std::f32::consts::PI,
         10,
         Nearest,
-        "3.141",
+        "3.1406",
         "0x3.24#10",
         Less,
     );
 
-    test_helper(f32::MAX_FINITE, 1, Floor, "2.0e38", "0x8.0E+31#1", Less);
+    test_helper(f32::MAX_FINITE, 1, Floor, "1.7e38", "0x8.0E+31#1", Less);
     test_helper(
         f32::MAX_FINITE,
         1,
         Ceiling,
-        "3.0e38",
+        "3.4e38",
         "0x1.0E+32#1",
         Greater,
     );
-    test_helper(f32::MAX_FINITE, 1, Down, "2.0e38", "0x8.0E+31#1", Less);
-    test_helper(f32::MAX_FINITE, 1, Up, "3.0e38", "0x1.0E+32#1", Greater);
+    test_helper(f32::MAX_FINITE, 1, Down, "1.7e38", "0x8.0E+31#1", Less);
+    test_helper(f32::MAX_FINITE, 1, Up, "3.4e38", "0x1.0E+32#1", Greater);
     test_helper(
         f32::MAX_FINITE,
         1,
         Nearest,
-        "3.0e38",
+        "3.4e38",
         "0x1.0E+32#1",
         Greater,
     );
 
-    test_helper(f32::MAX_FINITE, 10, Floor, "3.4e38", "0xf.fcE+31#10", Less);
+    test_helper(
+        f32::MAX_FINITE,
+        10,
+        Floor,
+        "3.3995e38",
+        "0xf.fcE+31#10",
+        Less,
+    );
     test_helper(
         f32::MAX_FINITE,
         10,
         Ceiling,
-        "3.403e38",
+        "3.4028e38",
         "0x1.000E+32#10",
         Greater,
     );
-    test_helper(f32::MAX_FINITE, 10, Down, "3.4e38", "0xf.fcE+31#10", Less);
+    test_helper(
+        f32::MAX_FINITE,
+        10,
+        Down,
+        "3.3995e38",
+        "0xf.fcE+31#10",
+        Less,
+    );
     test_helper(
         f32::MAX_FINITE,
         10,
         Up,
-        "3.403e38",
+        "3.4028e38",
         "0x1.000E+32#10",
         Greater,
     );
@@ -698,7 +712,7 @@ fn test_from_primitive_float_prec_round() {
         f32::MAX_FINITE,
         10,
         Nearest,
-        "3.403e38",
+        "3.4028e38",
         "0x1.000E+32#10",
         Greater,
     );
@@ -710,24 +724,59 @@ fn test_from_primitive_float_prec_round() {
     test_helper(f32::NEGATIVE_ONE, 1, Nearest, "-1.0", "-0x1.0#1", Equal);
     test_helper(f32::NEGATIVE_ONE, 1, Exact, "-1.0", "-0x1.0#1", Equal);
 
-    test_helper(f32::NEGATIVE_ONE, 10, Floor, "-1.0", "-0x1.000#10", Equal);
-    test_helper(f32::NEGATIVE_ONE, 10, Ceiling, "-1.0", "-0x1.000#10", Equal);
-    test_helper(f32::NEGATIVE_ONE, 10, Down, "-1.0", "-0x1.000#10", Equal);
-    test_helper(f32::NEGATIVE_ONE, 10, Up, "-1.0", "-0x1.000#10", Equal);
-    test_helper(f32::NEGATIVE_ONE, 10, Nearest, "-1.0", "-0x1.000#10", Equal);
-    test_helper(f32::NEGATIVE_ONE, 10, Exact, "-1.0", "-0x1.000#10", Equal);
+    test_helper(
+        f32::NEGATIVE_ONE,
+        10,
+        Floor,
+        "-1.0000",
+        "-0x1.000#10",
+        Equal,
+    );
+    test_helper(
+        f32::NEGATIVE_ONE,
+        10,
+        Ceiling,
+        "-1.0000",
+        "-0x1.000#10",
+        Equal,
+    );
+    test_helper(f32::NEGATIVE_ONE, 10, Down, "-1.0000", "-0x1.000#10", Equal);
+    test_helper(f32::NEGATIVE_ONE, 10, Up, "-1.0000", "-0x1.000#10", Equal);
+    test_helper(
+        f32::NEGATIVE_ONE,
+        10,
+        Nearest,
+        "-1.0000",
+        "-0x1.000#10",
+        Equal,
+    );
+    test_helper(
+        f32::NEGATIVE_ONE,
+        10,
+        Exact,
+        "-1.0000",
+        "-0x1.000#10",
+        Equal,
+    );
 
-    test_helper(-1.0f32 / 3.0, 1, Floor, "-0.5", "-0x0.8#1", Less);
-    test_helper(-1.0f32 / 3.0, 1, Ceiling, "-0.2", "-0x0.4#1", Greater);
-    test_helper(-1.0f32 / 3.0, 1, Down, "-0.2", "-0x0.4#1", Greater);
-    test_helper(-1.0f32 / 3.0, 1, Up, "-0.5", "-0x0.8#1", Less);
-    test_helper(-1.0f32 / 3.0, 1, Nearest, "-0.2", "-0x0.4#1", Greater);
+    test_helper(-1.0f32 / 3.0, 1, Floor, "-0.50", "-0x0.8#1", Less);
+    test_helper(-1.0f32 / 3.0, 1, Ceiling, "-0.25", "-0x0.4#1", Greater);
+    test_helper(-1.0f32 / 3.0, 1, Down, "-0.25", "-0x0.4#1", Greater);
+    test_helper(-1.0f32 / 3.0, 1, Up, "-0.50", "-0x0.8#1", Less);
+    test_helper(-1.0f32 / 3.0, 1, Nearest, "-0.25", "-0x0.4#1", Greater);
 
-    test_helper(-1.0f32 / 3.0, 10, Floor, "-0.3335", "-0x0.556#10", Less);
-    test_helper(-1.0f32 / 3.0, 10, Ceiling, "-0.333", "-0x0.554#10", Greater);
-    test_helper(-1.0f32 / 3.0, 10, Down, "-0.333", "-0x0.554#10", Greater);
-    test_helper(-1.0f32 / 3.0, 10, Up, "-0.3335", "-0x0.556#10", Less);
-    test_helper(-1.0f32 / 3.0, 10, Nearest, "-0.3335", "-0x0.556#10", Less);
+    test_helper(-1.0f32 / 3.0, 10, Floor, "-0.33350", "-0x0.556#10", Less);
+    test_helper(
+        -1.0f32 / 3.0,
+        10,
+        Ceiling,
+        "-0.33301",
+        "-0x0.554#10",
+        Greater,
+    );
+    test_helper(-1.0f32 / 3.0, 10, Down, "-0.33301", "-0x0.554#10", Greater);
+    test_helper(-1.0f32 / 3.0, 10, Up, "-0.33350", "-0x0.556#10", Less);
+    test_helper(-1.0f32 / 3.0, 10, Nearest, "-0.33350", "-0x0.556#10", Less);
 
     test_helper(-std::f32::consts::PI, 1, Floor, "-4.0", "-0x4.0#1", Less);
     test_helper(
@@ -746,7 +795,7 @@ fn test_from_primitive_float_prec_round() {
         -std::f32::consts::PI,
         10,
         Floor,
-        "-3.145",
+        "-3.1445",
         "-0x3.25#10",
         Less,
     );
@@ -754,7 +803,7 @@ fn test_from_primitive_float_prec_round() {
         -std::f32::consts::PI,
         10,
         Ceiling,
-        "-3.141",
+        "-3.1406",
         "-0x3.24#10",
         Greater,
     );
@@ -762,26 +811,26 @@ fn test_from_primitive_float_prec_round() {
         -std::f32::consts::PI,
         10,
         Down,
-        "-3.141",
+        "-3.1406",
         "-0x3.24#10",
         Greater,
     );
-    test_helper(-std::f32::consts::PI, 10, Up, "-3.145", "-0x3.25#10", Less);
+    test_helper(-std::f32::consts::PI, 10, Up, "-3.1445", "-0x3.25#10", Less);
     test_helper(
         -std::f32::consts::PI,
         10,
         Nearest,
-        "-3.141",
+        "-3.1406",
         "-0x3.24#10",
         Greater,
     );
 
-    test_helper(-f32::MAX_FINITE, 1, Floor, "-3.0e38", "-0x1.0E+32#1", Less);
+    test_helper(-f32::MAX_FINITE, 1, Floor, "-3.4e38", "-0x1.0E+32#1", Less);
     test_helper(
         -f32::MAX_FINITE,
         1,
         Ceiling,
-        "-2.0e38",
+        "-1.7e38",
         "-0x8.0E+31#1",
         Greater,
     );
@@ -789,16 +838,16 @@ fn test_from_primitive_float_prec_round() {
         -f32::MAX_FINITE,
         1,
         Down,
-        "-2.0e38",
+        "-1.7e38",
         "-0x8.0E+31#1",
         Greater,
     );
-    test_helper(-f32::MAX_FINITE, 1, Up, "-3.0e38", "-0x1.0E+32#1", Less);
+    test_helper(-f32::MAX_FINITE, 1, Up, "-3.4e38", "-0x1.0E+32#1", Less);
     test_helper(
         -f32::MAX_FINITE,
         1,
         Nearest,
-        "-3.0e38",
+        "-3.4e38",
         "-0x1.0E+32#1",
         Less,
     );
@@ -807,7 +856,7 @@ fn test_from_primitive_float_prec_round() {
         -f32::MAX_FINITE,
         10,
         Floor,
-        "-3.403e38",
+        "-3.4028e38",
         "-0x1.000E+32#10",
         Less,
     );
@@ -815,7 +864,7 @@ fn test_from_primitive_float_prec_round() {
         -f32::MAX_FINITE,
         10,
         Ceiling,
-        "-3.4e38",
+        "-3.3995e38",
         "-0xf.fcE+31#10",
         Greater,
     );
@@ -823,7 +872,7 @@ fn test_from_primitive_float_prec_round() {
         -f32::MAX_FINITE,
         10,
         Down,
-        "-3.4e38",
+        "-3.3995e38",
         "-0xf.fcE+31#10",
         Greater,
     );
@@ -831,7 +880,7 @@ fn test_from_primitive_float_prec_round() {
         -f32::MAX_FINITE,
         10,
         Up,
-        "-3.403e38",
+        "-3.4028e38",
         "-0x1.000E+32#10",
         Less,
     );
@@ -839,7 +888,7 @@ fn test_from_primitive_float_prec_round() {
         -f32::MAX_FINITE,
         10,
         Nearest,
-        "-3.403e38",
+        "-3.4028e38",
         "-0x1.000E+32#10",
         Less,
     );
@@ -1005,24 +1054,24 @@ fn test_from_primitive_float_prec_round() {
     test_helper(f64::ONE, 1, Nearest, "1.0", "0x1.0#1", Equal);
     test_helper(f64::ONE, 1, Exact, "1.0", "0x1.0#1", Equal);
 
-    test_helper(f64::ONE, 10, Floor, "1.0", "0x1.000#10", Equal);
-    test_helper(f64::ONE, 10, Ceiling, "1.0", "0x1.000#10", Equal);
-    test_helper(f64::ONE, 10, Down, "1.0", "0x1.000#10", Equal);
-    test_helper(f64::ONE, 10, Up, "1.0", "0x1.000#10", Equal);
-    test_helper(f64::ONE, 10, Nearest, "1.0", "0x1.000#10", Equal);
-    test_helper(f64::ONE, 10, Exact, "1.0", "0x1.000#10", Equal);
+    test_helper(f64::ONE, 10, Floor, "1.0000", "0x1.000#10", Equal);
+    test_helper(f64::ONE, 10, Ceiling, "1.0000", "0x1.000#10", Equal);
+    test_helper(f64::ONE, 10, Down, "1.0000", "0x1.000#10", Equal);
+    test_helper(f64::ONE, 10, Up, "1.0000", "0x1.000#10", Equal);
+    test_helper(f64::ONE, 10, Nearest, "1.0000", "0x1.000#10", Equal);
+    test_helper(f64::ONE, 10, Exact, "1.0000", "0x1.000#10", Equal);
 
-    test_helper(1.0f64 / 3.0, 1, Floor, "0.2", "0x0.4#1", Less);
-    test_helper(1.0f64 / 3.0, 1, Ceiling, "0.5", "0x0.8#1", Greater);
-    test_helper(1.0f64 / 3.0, 1, Down, "0.2", "0x0.4#1", Less);
-    test_helper(1.0f64 / 3.0, 1, Up, "0.5", "0x0.8#1", Greater);
-    test_helper(1.0f64 / 3.0, 1, Nearest, "0.2", "0x0.4#1", Less);
+    test_helper(1.0f64 / 3.0, 1, Floor, "0.25", "0x0.4#1", Less);
+    test_helper(1.0f64 / 3.0, 1, Ceiling, "0.50", "0x0.8#1", Greater);
+    test_helper(1.0f64 / 3.0, 1, Down, "0.25", "0x0.4#1", Less);
+    test_helper(1.0f64 / 3.0, 1, Up, "0.50", "0x0.8#1", Greater);
+    test_helper(1.0f64 / 3.0, 1, Nearest, "0.25", "0x0.4#1", Less);
 
-    test_helper(1.0f64 / 3.0, 10, Floor, "0.333", "0x0.554#10", Less);
-    test_helper(1.0f64 / 3.0, 10, Ceiling, "0.3335", "0x0.556#10", Greater);
-    test_helper(1.0f64 / 3.0, 10, Down, "0.333", "0x0.554#10", Less);
-    test_helper(1.0f64 / 3.0, 10, Up, "0.3335", "0x0.556#10", Greater);
-    test_helper(1.0f64 / 3.0, 10, Nearest, "0.3335", "0x0.556#10", Greater);
+    test_helper(1.0f64 / 3.0, 10, Floor, "0.33301", "0x0.554#10", Less);
+    test_helper(1.0f64 / 3.0, 10, Ceiling, "0.33350", "0x0.556#10", Greater);
+    test_helper(1.0f64 / 3.0, 10, Down, "0.33301", "0x0.554#10", Less);
+    test_helper(1.0f64 / 3.0, 10, Up, "0.33350", "0x0.556#10", Greater);
+    test_helper(1.0f64 / 3.0, 10, Nearest, "0.33350", "0x0.556#10", Greater);
 
     test_helper(std::f64::consts::PI, 1, Floor, "2.0", "0x2.0#1", Less);
     test_helper(std::f64::consts::PI, 1, Ceiling, "4.0", "0x4.0#1", Greater);
@@ -1030,22 +1079,22 @@ fn test_from_primitive_float_prec_round() {
     test_helper(std::f64::consts::PI, 1, Up, "4.0", "0x4.0#1", Greater);
     test_helper(std::f64::consts::PI, 1, Nearest, "4.0", "0x4.0#1", Greater);
 
-    test_helper(std::f64::consts::PI, 10, Floor, "3.141", "0x3.24#10", Less);
+    test_helper(std::f64::consts::PI, 10, Floor, "3.1406", "0x3.24#10", Less);
     test_helper(
         std::f64::consts::PI,
         10,
         Ceiling,
-        "3.145",
+        "3.1445",
         "0x3.25#10",
         Greater,
     );
-    test_helper(std::f64::consts::PI, 10, Down, "3.141", "0x3.24#10", Less);
-    test_helper(std::f64::consts::PI, 10, Up, "3.145", "0x3.25#10", Greater);
+    test_helper(std::f64::consts::PI, 10, Down, "3.1406", "0x3.24#10", Less);
+    test_helper(std::f64::consts::PI, 10, Up, "3.1445", "0x3.25#10", Greater);
     test_helper(
         std::f64::consts::PI,
         10,
         Nearest,
-        "3.141",
+        "3.1406",
         "0x3.24#10",
         Less,
     );
@@ -1055,17 +1104,17 @@ fn test_from_primitive_float_prec_round() {
         f64::MAX_FINITE,
         1,
         Ceiling,
-        "2.0e308",
+        "1.8e308",
         "0x1.0E+256#1",
         Greater,
     );
     test_helper(f64::MAX_FINITE, 1, Down, "9.0e307", "0x8.0E+255#1", Less);
-    test_helper(f64::MAX_FINITE, 1, Up, "2.0e308", "0x1.0E+256#1", Greater);
+    test_helper(f64::MAX_FINITE, 1, Up, "1.8e308", "0x1.0E+256#1", Greater);
     test_helper(
         f64::MAX_FINITE,
         1,
         Nearest,
-        "2.0e308",
+        "1.8e308",
         "0x1.0E+256#1",
         Greater,
     );
@@ -1074,7 +1123,7 @@ fn test_from_primitive_float_prec_round() {
         f64::MAX_FINITE,
         10,
         Floor,
-        "1.796e308",
+        "1.7959e308",
         "0xf.fcE+255#10",
         Less,
     );
@@ -1082,7 +1131,7 @@ fn test_from_primitive_float_prec_round() {
         f64::MAX_FINITE,
         10,
         Ceiling,
-        "1.798e308",
+        "1.7977e308",
         "0x1.000E+256#10",
         Greater,
     );
@@ -1090,7 +1139,7 @@ fn test_from_primitive_float_prec_round() {
         f64::MAX_FINITE,
         10,
         Down,
-        "1.796e308",
+        "1.7959e308",
         "0xf.fcE+255#10",
         Less,
     );
@@ -1098,7 +1147,7 @@ fn test_from_primitive_float_prec_round() {
         f64::MAX_FINITE,
         10,
         Up,
-        "1.798e308",
+        "1.7977e308",
         "0x1.000E+256#10",
         Greater,
     );
@@ -1106,7 +1155,7 @@ fn test_from_primitive_float_prec_round() {
         f64::MAX_FINITE,
         10,
         Nearest,
-        "1.798e308",
+        "1.7977e308",
         "0x1.000E+256#10",
         Greater,
     );
@@ -1118,24 +1167,59 @@ fn test_from_primitive_float_prec_round() {
     test_helper(f64::NEGATIVE_ONE, 1, Nearest, "-1.0", "-0x1.0#1", Equal);
     test_helper(f64::NEGATIVE_ONE, 1, Exact, "-1.0", "-0x1.0#1", Equal);
 
-    test_helper(f64::NEGATIVE_ONE, 10, Floor, "-1.0", "-0x1.000#10", Equal);
-    test_helper(f64::NEGATIVE_ONE, 10, Ceiling, "-1.0", "-0x1.000#10", Equal);
-    test_helper(f64::NEGATIVE_ONE, 10, Down, "-1.0", "-0x1.000#10", Equal);
-    test_helper(f64::NEGATIVE_ONE, 10, Up, "-1.0", "-0x1.000#10", Equal);
-    test_helper(f64::NEGATIVE_ONE, 10, Nearest, "-1.0", "-0x1.000#10", Equal);
-    test_helper(f64::NEGATIVE_ONE, 10, Exact, "-1.0", "-0x1.000#10", Equal);
+    test_helper(
+        f64::NEGATIVE_ONE,
+        10,
+        Floor,
+        "-1.0000",
+        "-0x1.000#10",
+        Equal,
+    );
+    test_helper(
+        f64::NEGATIVE_ONE,
+        10,
+        Ceiling,
+        "-1.0000",
+        "-0x1.000#10",
+        Equal,
+    );
+    test_helper(f64::NEGATIVE_ONE, 10, Down, "-1.0000", "-0x1.000#10", Equal);
+    test_helper(f64::NEGATIVE_ONE, 10, Up, "-1.0000", "-0x1.000#10", Equal);
+    test_helper(
+        f64::NEGATIVE_ONE,
+        10,
+        Nearest,
+        "-1.0000",
+        "-0x1.000#10",
+        Equal,
+    );
+    test_helper(
+        f64::NEGATIVE_ONE,
+        10,
+        Exact,
+        "-1.0000",
+        "-0x1.000#10",
+        Equal,
+    );
 
-    test_helper(-1.0f64 / 3.0, 1, Floor, "-0.5", "-0x0.8#1", Less);
-    test_helper(-1.0f64 / 3.0, 1, Ceiling, "-0.2", "-0x0.4#1", Greater);
-    test_helper(-1.0f64 / 3.0, 1, Down, "-0.2", "-0x0.4#1", Greater);
-    test_helper(-1.0f64 / 3.0, 1, Up, "-0.5", "-0x0.8#1", Less);
-    test_helper(-1.0f64 / 3.0, 1, Nearest, "-0.2", "-0x0.4#1", Greater);
+    test_helper(-1.0f64 / 3.0, 1, Floor, "-0.50", "-0x0.8#1", Less);
+    test_helper(-1.0f64 / 3.0, 1, Ceiling, "-0.25", "-0x0.4#1", Greater);
+    test_helper(-1.0f64 / 3.0, 1, Down, "-0.25", "-0x0.4#1", Greater);
+    test_helper(-1.0f64 / 3.0, 1, Up, "-0.50", "-0x0.8#1", Less);
+    test_helper(-1.0f64 / 3.0, 1, Nearest, "-0.25", "-0x0.4#1", Greater);
 
-    test_helper(-1.0f64 / 3.0, 10, Floor, "-0.3335", "-0x0.556#10", Less);
-    test_helper(-1.0f64 / 3.0, 10, Ceiling, "-0.333", "-0x0.554#10", Greater);
-    test_helper(-1.0f64 / 3.0, 10, Down, "-0.333", "-0x0.554#10", Greater);
-    test_helper(-1.0f64 / 3.0, 10, Up, "-0.3335", "-0x0.556#10", Less);
-    test_helper(-1.0f64 / 3.0, 10, Nearest, "-0.3335", "-0x0.556#10", Less);
+    test_helper(-1.0f64 / 3.0, 10, Floor, "-0.33350", "-0x0.556#10", Less);
+    test_helper(
+        -1.0f64 / 3.0,
+        10,
+        Ceiling,
+        "-0.33301",
+        "-0x0.554#10",
+        Greater,
+    );
+    test_helper(-1.0f64 / 3.0, 10, Down, "-0.33301", "-0x0.554#10", Greater);
+    test_helper(-1.0f64 / 3.0, 10, Up, "-0.33350", "-0x0.556#10", Less);
+    test_helper(-1.0f64 / 3.0, 10, Nearest, "-0.33350", "-0x0.556#10", Less);
 
     test_helper(-std::f64::consts::PI, 1, Floor, "-4.0", "-0x4.0#1", Less);
     test_helper(
@@ -1154,7 +1238,7 @@ fn test_from_primitive_float_prec_round() {
         -std::f64::consts::PI,
         10,
         Floor,
-        "-3.145",
+        "-3.1445",
         "-0x3.25#10",
         Less,
     );
@@ -1162,7 +1246,7 @@ fn test_from_primitive_float_prec_round() {
         -std::f64::consts::PI,
         10,
         Ceiling,
-        "-3.141",
+        "-3.1406",
         "-0x3.24#10",
         Greater,
     );
@@ -1170,16 +1254,16 @@ fn test_from_primitive_float_prec_round() {
         -std::f64::consts::PI,
         10,
         Down,
-        "-3.141",
+        "-3.1406",
         "-0x3.24#10",
         Greater,
     );
-    test_helper(-std::f64::consts::PI, 10, Up, "-3.145", "-0x3.25#10", Less);
+    test_helper(-std::f64::consts::PI, 10, Up, "-3.1445", "-0x3.25#10", Less);
     test_helper(
         -std::f64::consts::PI,
         10,
         Nearest,
-        "-3.141",
+        "-3.1406",
         "-0x3.24#10",
         Greater,
     );
@@ -1188,7 +1272,7 @@ fn test_from_primitive_float_prec_round() {
         -f64::MAX_FINITE,
         1,
         Floor,
-        "-2.0e308",
+        "-1.8e308",
         "-0x1.0E+256#1",
         Less,
     );
@@ -1208,12 +1292,12 @@ fn test_from_primitive_float_prec_round() {
         "-0x8.0E+255#1",
         Greater,
     );
-    test_helper(-f64::MAX_FINITE, 1, Up, "-2.0e308", "-0x1.0E+256#1", Less);
+    test_helper(-f64::MAX_FINITE, 1, Up, "-1.8e308", "-0x1.0E+256#1", Less);
     test_helper(
         -f64::MAX_FINITE,
         1,
         Nearest,
-        "-2.0e308",
+        "-1.8e308",
         "-0x1.0E+256#1",
         Less,
     );
@@ -1222,7 +1306,7 @@ fn test_from_primitive_float_prec_round() {
         -f64::MAX_FINITE,
         10,
         Floor,
-        "-1.798e308",
+        "-1.7977e308",
         "-0x1.000E+256#10",
         Less,
     );
@@ -1230,7 +1314,7 @@ fn test_from_primitive_float_prec_round() {
         -f64::MAX_FINITE,
         10,
         Ceiling,
-        "-1.796e308",
+        "-1.7959e308",
         "-0xf.fcE+255#10",
         Greater,
     );
@@ -1238,7 +1322,7 @@ fn test_from_primitive_float_prec_round() {
         -f64::MAX_FINITE,
         10,
         Down,
-        "-1.796e308",
+        "-1.7959e308",
         "-0xf.fcE+255#10",
         Greater,
     );
@@ -1246,7 +1330,7 @@ fn test_from_primitive_float_prec_round() {
         -f64::MAX_FINITE,
         10,
         Up,
-        "-1.798e308",
+        "-1.7977e308",
         "-0x1.000E+256#10",
         Less,
     );
@@ -1254,7 +1338,7 @@ fn test_from_primitive_float_prec_round() {
         -f64::MAX_FINITE,
         10,
         Nearest,
-        "-1.798e308",
+        "-1.7977e308",
         "-0x1.000E+256#10",
         Less,
     );

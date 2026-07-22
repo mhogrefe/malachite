@@ -397,32 +397,32 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = Float::from_rational_prec_round(Rational::from_signeds(1, 3), 10, Floor);
-    /// assert_eq!(x.to_string(), "0.333");
+    /// assert_eq!(x.to_string(), "0.33301");
     /// assert_eq!(x.get_prec(), Some(10));
     /// assert_eq!(o, Less);
     ///
     /// let (x, o) = Float::from_rational_prec_round(Rational::from_signeds(1, 3), 10, Ceiling);
-    /// assert_eq!(x.to_string(), "0.3335");
+    /// assert_eq!(x.to_string(), "0.33350");
     /// assert_eq!(x.get_prec(), Some(10));
     /// assert_eq!(o, Greater);
     ///
     /// let (x, o) = Float::from_rational_prec_round(Rational::from_signeds(1, 3), 10, Nearest);
-    /// assert_eq!(x.to_string(), "0.3335");
+    /// assert_eq!(x.to_string(), "0.33350");
     /// assert_eq!(x.get_prec(), Some(10));
     /// assert_eq!(o, Greater);
     ///
     /// let (x, o) = Float::from_rational_prec_round(Rational::from_signeds(-1, 3), 10, Floor);
-    /// assert_eq!(x.to_string(), "-0.3335");
+    /// assert_eq!(x.to_string(), "-0.33350");
     /// assert_eq!(x.get_prec(), Some(10));
     /// assert_eq!(o, Less);
     ///
     /// let (x, o) = Float::from_rational_prec_round(Rational::from_signeds(-1, 3), 10, Ceiling);
-    /// assert_eq!(x.to_string(), "-0.333");
+    /// assert_eq!(x.to_string(), "-0.33301");
     /// assert_eq!(x.get_prec(), Some(10));
     /// assert_eq!(o, Greater);
     ///
     /// let (x, o) = Float::from_rational_prec_round(Rational::from_signeds(-1, 3), 10, Nearest);
-    /// assert_eq!(x.to_string(), "-0.3335");
+    /// assert_eq!(x.to_string(), "-0.33350");
     /// assert_eq!(x.get_prec(), Some(10));
     /// assert_eq!(o, Less);
     /// ```
@@ -481,22 +481,22 @@ impl Float {
     /// assert_eq!(o, Equal);
     ///
     /// let (x, o) = Float::from_rational_prec(Rational::from_signeds(1, 3), 10);
-    /// assert_eq!(x.to_string(), "0.3335");
+    /// assert_eq!(x.to_string(), "0.33350");
     /// assert_eq!(x.get_prec(), Some(10));
     /// assert_eq!(o, Greater);
     ///
     /// let (x, o) = Float::from_rational_prec(Rational::from_signeds(1, 3), 100);
-    /// assert_eq!(x.to_string(), "0.3333333333333333333333333333335");
+    /// assert_eq!(x.to_string(), "0.33333333333333333333333333333346");
     /// assert_eq!(x.get_prec(), Some(100));
     /// assert_eq!(o, Greater);
     ///
     /// let (x, o) = Float::from_rational_prec(Rational::from_signeds(-1, 3), 10);
-    /// assert_eq!(x.to_string(), "-0.3335");
+    /// assert_eq!(x.to_string(), "-0.33350");
     /// assert_eq!(x.get_prec(), Some(10));
     /// assert_eq!(o, Less);
     ///
     /// let (x, o) = Float::from_rational_prec(Rational::from_signeds(-1, 3), 100);
-    /// assert_eq!(x.to_string(), "-0.3333333333333333333333333333335");
+    /// assert_eq!(x.to_string(), "-0.33333333333333333333333333333346");
     /// assert_eq!(x.get_prec(), Some(100));
     /// assert_eq!(o, Less);
     /// ```
@@ -550,36 +550,36 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (x, o) = Float::from_rational_prec_round_ref(&Rational::from_signeds(1, 3), 10, Floor);
-    /// assert_eq!(x.to_string(), "0.333");
+    /// assert_eq!(x.to_string(), "0.33301");
     /// assert_eq!(x.get_prec(), Some(10));
     /// assert_eq!(o, Less);
     ///
     /// let (x, o) =
     ///     Float::from_rational_prec_round_ref(&Rational::from_signeds(1, 3), 10, Ceiling);
-    /// assert_eq!(x.to_string(), "0.3335");
+    /// assert_eq!(x.to_string(), "0.33350");
     /// assert_eq!(x.get_prec(), Some(10));
     /// assert_eq!(o, Greater);
     ///
     /// let (x, o) =
     ///     Float::from_rational_prec_round_ref(&Rational::from_signeds(1, 3), 10, Nearest);
-    /// assert_eq!(x.to_string(), "0.3335");
+    /// assert_eq!(x.to_string(), "0.33350");
     /// assert_eq!(x.get_prec(), Some(10));
     /// assert_eq!(o, Greater);
     ///
     /// let (x, o) = Float::from_rational_prec_round_ref(&Rational::from_signeds(-1, 3), 10, Floor);
-    /// assert_eq!(x.to_string(), "-0.3335");
+    /// assert_eq!(x.to_string(), "-0.33350");
     /// assert_eq!(x.get_prec(), Some(10));
     /// assert_eq!(o, Less);
     ///
     /// let (x, o) =
     ///     Float::from_rational_prec_round_ref(&Rational::from_signeds(-1, 3), 10, Ceiling);
-    /// assert_eq!(x.to_string(), "-0.333");
+    /// assert_eq!(x.to_string(), "-0.33301");
     /// assert_eq!(x.get_prec(), Some(10));
     /// assert_eq!(o, Greater);
     ///
     /// let (x, o) =
     ///     Float::from_rational_prec_round_ref(&Rational::from_signeds(-1, 3), 10, Nearest);
-    /// assert_eq!(x.to_string(), "-0.3335");
+    /// assert_eq!(x.to_string(), "-0.33350");
     /// assert_eq!(x.get_prec(), Some(10));
     /// assert_eq!(o, Less);
     /// ```
@@ -643,22 +643,22 @@ impl Float {
     /// assert_eq!(o, Equal);
     ///
     /// let (x, o) = Float::from_rational_prec_ref(&Rational::from_signeds(1, 3), 10);
-    /// assert_eq!(x.to_string(), "0.3335");
+    /// assert_eq!(x.to_string(), "0.33350");
     /// assert_eq!(x.get_prec(), Some(10));
     /// assert_eq!(o, Greater);
     ///
     /// let (x, o) = Float::from_rational_prec_ref(&Rational::from_signeds(1, 3), 100);
-    /// assert_eq!(x.to_string(), "0.3333333333333333333333333333335");
+    /// assert_eq!(x.to_string(), "0.33333333333333333333333333333346");
     /// assert_eq!(x.get_prec(), Some(100));
     /// assert_eq!(o, Greater);
     ///
     /// let (x, o) = Float::from_rational_prec_ref(&Rational::from_signeds(-1, 3), 10);
-    /// assert_eq!(x.to_string(), "-0.3335");
+    /// assert_eq!(x.to_string(), "-0.33350");
     /// assert_eq!(x.get_prec(), Some(10));
     /// assert_eq!(o, Less);
     ///
     /// let (x, o) = Float::from_rational_prec_ref(&Rational::from_signeds(-1, 3), 100);
-    /// assert_eq!(x.to_string(), "-0.3333333333333333333333333333335");
+    /// assert_eq!(x.to_string(), "-0.33333333333333333333333333333346");
     /// assert_eq!(x.get_prec(), Some(100));
     /// assert_eq!(o, Less);
     /// ```

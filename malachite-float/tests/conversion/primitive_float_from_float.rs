@@ -63,35 +63,35 @@ fn test_try_from_float() {
 
         test_helper::<T>("1.0", "0x1.0#1", "Ok(1.0)");
         test_helper::<T>("2.0", "0x2.0#1", "Ok(2.0)");
-        test_helper::<T>("0.5", "0x0.8#1", "Ok(0.5)");
+        test_helper::<T>("0.50", "0x0.8#1", "Ok(0.5)");
         test_helper::<T>("123.0", "0x7b.0#7", "Ok(123.0)");
         test_helper::<T>(
-            "0.333333333333333332",
+            "0.3333333333333333322",
             "0x0.555555555555554#57",
             "Err(Inexact)",
         );
-        test_helper::<T>("2.0e2408", "0x1.0E+2000#1", "Err(Overflow)");
-        test_helper::<T>("6.0e-2409", "0x1.0E-2000#1", "Err(Underflow)");
-        test_helper::<T>("too_big", "0x4.0E+268435455#1", "Err(Overflow)");
-        test_helper::<T>("too_small", "0x1.0E-268435456#1", "Err(Underflow)");
+        test_helper::<T>("1.7e2408", "0x1.0E+2000#1", "Err(Overflow)");
+        test_helper::<T>("5.8e-2409", "0x1.0E-2000#1", "Err(Underflow)");
+        test_helper::<T>("1.0e323228496", "0x4.0E+268435455#1", "Err(Overflow)");
+        test_helper::<T>("2.4e-323228497", "0x1.0E-268435456#1", "Err(Underflow)");
 
         test_helper::<T>("-1.0", "-0x1.0#1", "Ok(-1.0)");
         test_helper::<T>("-2.0", "-0x2.0#1", "Ok(-2.0)");
-        test_helper::<T>("-0.5", "-0x0.8#1", "Ok(-0.5)");
+        test_helper::<T>("-0.50", "-0x0.8#1", "Ok(-0.5)");
         test_helper::<T>("-123.0", "-0x7b.0#7", "Ok(-123.0)");
         test_helper::<T>(
-            "-0.333333333333333332",
+            "-0.3333333333333333322",
             "-0x0.555555555555554#57",
             "Err(Inexact)",
         );
-        test_helper::<T>("-2.0e2408", "-0x1.0E+2000#1", "Err(Overflow)");
-        test_helper::<T>("-6.0e-2409", "-0x1.0E-2000#1", "Err(Underflow)");
-        test_helper::<T>("-too_big", "-0x4.0E+268435455#1", "Err(Overflow)");
-        test_helper::<T>("-too_small", "-0x1.0E-268435456#1", "Err(Underflow)");
+        test_helper::<T>("-1.7e2408", "-0x1.0E+2000#1", "Err(Overflow)");
+        test_helper::<T>("-5.8e-2409", "-0x1.0E-2000#1", "Err(Underflow)");
+        test_helper::<T>("-1.0e323228496", "-0x4.0E+268435455#1", "Err(Overflow)");
+        test_helper::<T>("-2.4e-323228497", "-0x1.0E-268435456#1", "Err(Underflow)");
     }
     apply_fn_to_primitive_floats!(test_helper_2);
-    test_helper::<f32>("0.33333334", "0x0.5555558#24", "Ok(0.33333334)");
-    test_helper::<f64>("0.33333334", "0x0.5555558#24", "Ok(0.3333333432674408)");
+    test_helper::<f32>("0.333333343", "0x0.5555558#24", "Ok(0.33333334)");
+    test_helper::<f64>("0.333333343", "0x0.5555558#24", "Ok(0.3333333432674408)");
     test_helper::<f32>(
         "0.33333333333333331",
         "0x0.55555555555554#53",
@@ -102,13 +102,13 @@ fn test_try_from_float() {
         "0x0.55555555555554#53",
         "Ok(0.3333333333333333)",
     );
-    test_helper::<f32>("7.0e240", "0x1.0E+200#1", "Err(Overflow)");
-    test_helper::<f64>("7.0e240", "0x1.0E+200#1", "Ok(6.668014432879854e240)");
-    test_helper::<f32>("1.0e-241", "0x1.0E-200#1", "Err(Underflow)");
-    test_helper::<f64>("1.0e-241", "0x1.0E-200#1", "Ok(1.499696813895631e-241)");
+    test_helper::<f32>("6.7e240", "0x1.0E+200#1", "Err(Overflow)");
+    test_helper::<f64>("6.7e240", "0x1.0E+200#1", "Ok(6.668014432879854e240)");
+    test_helper::<f32>("1.5e-241", "0x1.0E-200#1", "Err(Underflow)");
+    test_helper::<f64>("1.5e-241", "0x1.0E-200#1", "Ok(1.499696813895631e-241)");
 
-    test_helper::<f32>("-0.33333334", "-0x0.5555558#24", "Ok(-0.33333334)");
-    test_helper::<f64>("-0.33333334", "-0x0.5555558#24", "Ok(-0.3333333432674408)");
+    test_helper::<f32>("-0.333333343", "-0x0.5555558#24", "Ok(-0.33333334)");
+    test_helper::<f64>("-0.333333343", "-0x0.5555558#24", "Ok(-0.3333333432674408)");
     test_helper::<f32>(
         "-0.33333333333333331",
         "-0x0.55555555555554#53",
@@ -119,10 +119,10 @@ fn test_try_from_float() {
         "-0x0.55555555555554#53",
         "Ok(-0.3333333333333333)",
     );
-    test_helper::<f32>("-7.0e240", "-0x1.0E+200#1", "Err(Overflow)");
-    test_helper::<f64>("-7.0e240", "-0x1.0E+200#1", "Ok(-6.668014432879854e240)");
-    test_helper::<f32>("-1.0e-241", "-0x1.0E-200#1", "Err(Underflow)");
-    test_helper::<f64>("-1.0e-241", "-0x1.0E-200#1", "Ok(-1.499696813895631e-241)");
+    test_helper::<f32>("-6.7e240", "-0x1.0E+200#1", "Err(Overflow)");
+    test_helper::<f64>("-6.7e240", "-0x1.0E+200#1", "Ok(-6.668014432879854e240)");
+    test_helper::<f32>("-1.5e-241", "-0x1.0E-200#1", "Err(Underflow)");
+    test_helper::<f64>("-1.5e-241", "-0x1.0E-200#1", "Ok(-1.499696813895631e-241)");
 }
 
 #[test]
@@ -150,40 +150,40 @@ fn test_convertible_from_float() {
 
         test_helper::<T>("1.0", "0x1.0#1", true);
         test_helper::<T>("2.0", "0x2.0#1", true);
-        test_helper::<T>("0.5", "0x0.8#1", true);
-        test_helper::<T>("0.33333334", "0x0.5555558#24", true);
+        test_helper::<T>("0.50", "0x0.8#1", true);
+        test_helper::<T>("0.333333343", "0x0.5555558#24", true);
         test_helper::<T>("123.0", "0x7b.0#7", true);
-        test_helper::<T>("0.333333333333333332", "0x0.555555555555554#57", false);
-        test_helper::<T>("2.0e2408", "0x1.0E+2000#1", false);
-        test_helper::<T>("6.0e-2409", "0x1.0E-2000#1", false);
-        test_helper::<T>("too_big", "0x4.0E+268435455#1", false);
-        test_helper::<T>("too_small", "0x1.0E-268435456#1", false);
+        test_helper::<T>("0.3333333333333333322", "0x0.555555555555554#57", false);
+        test_helper::<T>("1.7e2408", "0x1.0E+2000#1", false);
+        test_helper::<T>("5.8e-2409", "0x1.0E-2000#1", false);
+        test_helper::<T>("1.0e323228496", "0x4.0E+268435455#1", false);
+        test_helper::<T>("2.4e-323228497", "0x1.0E-268435456#1", false);
 
         test_helper::<T>("-1.0", "-0x1.0#1", true);
         test_helper::<T>("-2.0", "-0x2.0#1", true);
-        test_helper::<T>("-0.5", "-0x0.8#1", true);
-        test_helper::<T>("-0.33333334", "-0x0.5555558#24", true);
+        test_helper::<T>("-0.50", "-0x0.8#1", true);
+        test_helper::<T>("-0.333333343", "-0x0.5555558#24", true);
         test_helper::<T>("-123.0", "-0x7b.0#7", true);
-        test_helper::<T>("-0.333333333333333332", "-0x0.555555555555554#57", false);
-        test_helper::<T>("-2.0e2408", "-0x1.0E+2000#1", false);
-        test_helper::<T>("-6.0e-2409", "-0x1.0E-2000#1", false);
-        test_helper::<T>("-too_big", "-0x4.0E+268435455#1", false);
-        test_helper::<T>("-too_small", "-0x1.0E-268435456#1", false);
+        test_helper::<T>("-0.3333333333333333322", "-0x0.555555555555554#57", false);
+        test_helper::<T>("-1.7e2408", "-0x1.0E+2000#1", false);
+        test_helper::<T>("-5.8e-2409", "-0x1.0E-2000#1", false);
+        test_helper::<T>("-1.0e323228496", "-0x4.0E+268435455#1", false);
+        test_helper::<T>("-2.4e-323228497", "-0x1.0E-268435456#1", false);
     }
     apply_fn_to_primitive_floats!(test_helper_2);
     test_helper::<f32>("0.33333333333333331", "0x0.55555555555554#53", false);
     test_helper::<f64>("0.33333333333333331", "0x0.55555555555554#53", true);
-    test_helper::<f32>("7.0e240", "0x1.0E+200#1", false);
-    test_helper::<f64>("7.0e240", "0x1.0E+200#1", true);
-    test_helper::<f32>("1.0e-241", "0x1.0E-200#1", false);
-    test_helper::<f64>("1.0e-241", "0x1.0E-200#1", true);
+    test_helper::<f32>("6.7e240", "0x1.0E+200#1", false);
+    test_helper::<f64>("6.7e240", "0x1.0E+200#1", true);
+    test_helper::<f32>("1.5e-241", "0x1.0E-200#1", false);
+    test_helper::<f64>("1.5e-241", "0x1.0E-200#1", true);
 
     test_helper::<f32>("-0.33333333333333331", "-0x0.55555555555554#53", false);
     test_helper::<f64>("-0.33333333333333331", "-0x0.55555555555554#53", true);
-    test_helper::<f32>("-7.0e240", "-0x1.0E+200#1", false);
-    test_helper::<f64>("-7.0e240", "-0x1.0E+200#1", true);
-    test_helper::<f32>("-1.0e-241", "-0x1.0E-200#1", false);
-    test_helper::<f64>("-1.0e-241", "-0x1.0E-200#1", true);
+    test_helper::<f32>("-6.7e240", "-0x1.0E+200#1", false);
+    test_helper::<f64>("-6.7e240", "-0x1.0E+200#1", true);
+    test_helper::<f32>("-1.5e-241", "-0x1.0E-200#1", false);
+    test_helper::<f64>("-1.5e-241", "-0x1.0E-200#1", true);
 }
 
 #[test]
@@ -265,50 +265,62 @@ fn test_rounding_from_float() {
     }
     apply_fn_to_primitive_floats!(test_helper_2);
 
-    test_helper::<f32>("0.33333334", "0x0.5555558#24", Floor, "0.33333334", Equal);
-    test_helper::<f32>("0.33333334", "0x0.5555558#24", Ceiling, "0.33333334", Equal);
-    test_helper::<f32>("0.33333334", "0x0.5555558#24", Down, "0.33333334", Equal);
-    test_helper::<f32>("0.33333334", "0x0.5555558#24", Up, "0.33333334", Equal);
-    test_helper::<f32>("0.33333334", "0x0.5555558#24", Nearest, "0.33333334", Equal);
-    test_helper::<f32>("0.33333334", "0x0.5555558#24", Exact, "0.33333334", Equal);
+    test_helper::<f32>("0.333333343", "0x0.5555558#24", Floor, "0.33333334", Equal);
+    test_helper::<f32>(
+        "0.333333343",
+        "0x0.5555558#24",
+        Ceiling,
+        "0.33333334",
+        Equal,
+    );
+    test_helper::<f32>("0.333333343", "0x0.5555558#24", Down, "0.33333334", Equal);
+    test_helper::<f32>("0.333333343", "0x0.5555558#24", Up, "0.33333334", Equal);
+    test_helper::<f32>(
+        "0.333333343",
+        "0x0.5555558#24",
+        Nearest,
+        "0.33333334",
+        Equal,
+    );
+    test_helper::<f32>("0.333333343", "0x0.5555558#24", Exact, "0.33333334", Equal);
 
     test_helper::<f64>(
-        "0.33333334",
+        "0.333333343",
         "0x0.5555558#24",
         Floor,
         "0.3333333432674408",
         Equal,
     );
     test_helper::<f64>(
-        "0.33333334",
+        "0.333333343",
         "0x0.5555558#24",
         Ceiling,
         "0.3333333432674408",
         Equal,
     );
     test_helper::<f64>(
-        "0.33333334",
+        "0.333333343",
         "0x0.5555558#24",
         Down,
         "0.3333333432674408",
         Equal,
     );
     test_helper::<f64>(
-        "0.33333334",
+        "0.333333343",
         "0x0.5555558#24",
         Up,
         "0.3333333432674408",
         Equal,
     );
     test_helper::<f64>(
-        "0.33333334",
+        "0.333333343",
         "0x0.5555558#24",
         Nearest,
         "0.3333333432674408",
         Equal,
     );
     test_helper::<f64>(
-        "0.33333334",
+        "0.333333343",
         "0x0.5555558#24",
         Exact,
         "0.3333333432674408",
@@ -395,35 +407,35 @@ fn test_rounding_from_float() {
     );
 
     test_helper::<f32>(
-        "0.333333333333333332",
+        "0.3333333333333333322",
         "0x0.555555555555554#57",
         Floor,
         "0.3333333",
         Less,
     );
     test_helper::<f32>(
-        "0.333333333333333332",
+        "0.3333333333333333322",
         "0x0.555555555555554#57",
         Ceiling,
         "0.33333334",
         Greater,
     );
     test_helper::<f32>(
-        "0.333333333333333332",
+        "0.3333333333333333322",
         "0x0.555555555555554#57",
         Down,
         "0.3333333",
         Less,
     );
     test_helper::<f32>(
-        "0.333333333333333332",
+        "0.3333333333333333322",
         "0x0.555555555555554#57",
         Up,
         "0.33333334",
         Greater,
     );
     test_helper::<f32>(
-        "0.333333333333333332",
+        "0.3333333333333333322",
         "0x0.555555555555554#57",
         Nearest,
         "0.33333334",
@@ -431,186 +443,204 @@ fn test_rounding_from_float() {
     );
 
     test_helper::<f64>(
-        "0.333333333333333332",
+        "0.3333333333333333322",
         "0x0.555555555555554#57",
         Floor,
         "0.3333333333333333",
         Less,
     );
     test_helper::<f64>(
-        "0.333333333333333332",
+        "0.3333333333333333322",
         "0x0.555555555555554#57",
         Ceiling,
         "0.33333333333333337",
         Greater,
     );
     test_helper::<f64>(
-        "0.333333333333333332",
+        "0.3333333333333333322",
         "0x0.555555555555554#57",
         Down,
         "0.3333333333333333",
         Less,
     );
     test_helper::<f64>(
-        "0.333333333333333332",
+        "0.3333333333333333322",
         "0x0.555555555555554#57",
         Up,
         "0.33333333333333337",
         Greater,
     );
     test_helper::<f64>(
-        "0.333333333333333332",
+        "0.3333333333333333322",
         "0x0.555555555555554#57",
         Nearest,
         "0.3333333333333333",
         Less,
     );
 
-    test_helper::<f32>("7.0e240", "0x1.0E+200#1", Floor, "3.4028235e38", Less);
-    test_helper::<f32>("7.0e240", "0x1.0E+200#1", Ceiling, "Infinity", Greater);
-    test_helper::<f32>("7.0e240", "0x1.0E+200#1", Down, "3.4028235e38", Less);
-    test_helper::<f32>("7.0e240", "0x1.0E+200#1", Up, "Infinity", Greater);
-    test_helper::<f32>("7.0e240", "0x1.0E+200#1", Nearest, "Infinity", Greater);
+    test_helper::<f32>("6.7e240", "0x1.0E+200#1", Floor, "3.4028235e38", Less);
+    test_helper::<f32>("6.7e240", "0x1.0E+200#1", Ceiling, "Infinity", Greater);
+    test_helper::<f32>("6.7e240", "0x1.0E+200#1", Down, "3.4028235e38", Less);
+    test_helper::<f32>("6.7e240", "0x1.0E+200#1", Up, "Infinity", Greater);
+    test_helper::<f32>("6.7e240", "0x1.0E+200#1", Nearest, "Infinity", Greater);
 
     test_helper::<f64>(
-        "7.0e240",
+        "6.7e240",
         "0x1.0E+200#1",
         Floor,
         "6.668014432879854e240",
         Equal,
     );
     test_helper::<f64>(
-        "7.0e240",
+        "6.7e240",
         "0x1.0E+200#1",
         Ceiling,
         "6.668014432879854e240",
         Equal,
     );
     test_helper::<f64>(
-        "7.0e240",
+        "6.7e240",
         "0x1.0E+200#1",
         Down,
         "6.668014432879854e240",
         Equal,
     );
     test_helper::<f64>(
-        "7.0e240",
+        "6.7e240",
         "0x1.0E+200#1",
         Up,
         "6.668014432879854e240",
         Equal,
     );
     test_helper::<f64>(
-        "7.0e240",
+        "6.7e240",
         "0x1.0E+200#1",
         Nearest,
         "6.668014432879854e240",
         Equal,
     );
     test_helper::<f64>(
-        "7.0e240",
+        "6.7e240",
         "0x1.0E+200#1",
         Exact,
         "6.668014432879854e240",
         Equal,
     );
 
-    test_helper::<f32>("2.0e2408", "0x1.0E+2000#1", Floor, "3.4028235e38", Less);
-    test_helper::<f32>("2.0e2408", "0x1.0E+2000#1", Ceiling, "Infinity", Greater);
-    test_helper::<f32>("2.0e2408", "0x1.0E+2000#1", Down, "3.4028235e38", Less);
-    test_helper::<f32>("2.0e2408", "0x1.0E+2000#1", Up, "Infinity", Greater);
-    test_helper::<f32>("2.0e2408", "0x1.0E+2000#1", Nearest, "Infinity", Greater);
+    test_helper::<f32>("1.7e2408", "0x1.0E+2000#1", Floor, "3.4028235e38", Less);
+    test_helper::<f32>("1.7e2408", "0x1.0E+2000#1", Ceiling, "Infinity", Greater);
+    test_helper::<f32>("1.7e2408", "0x1.0E+2000#1", Down, "3.4028235e38", Less);
+    test_helper::<f32>("1.7e2408", "0x1.0E+2000#1", Up, "Infinity", Greater);
+    test_helper::<f32>("1.7e2408", "0x1.0E+2000#1", Nearest, "Infinity", Greater);
 
     test_helper::<f64>(
-        "2.0e2408",
+        "1.7e2408",
         "0x1.0E+2000#1",
         Floor,
         "1.7976931348623157e308",
         Less,
     );
-    test_helper::<f64>("2.0e2408", "0x1.0E+2000#1", Ceiling, "Infinity", Greater);
+    test_helper::<f64>("1.7e2408", "0x1.0E+2000#1", Ceiling, "Infinity", Greater);
     test_helper::<f64>(
-        "2.0e2408",
+        "1.7e2408",
         "0x1.0E+2000#1",
         Down,
         "1.7976931348623157e308",
         Less,
     );
-    test_helper::<f64>("2.0e2408", "0x1.0E+2000#1", Up, "Infinity", Greater);
-    test_helper::<f64>("2.0e2408", "0x1.0E+2000#1", Nearest, "Infinity", Greater);
-    test_helper::<f32>("1.0e-241", "0x1.0E-200#1", Floor, "0.0", Less);
-    test_helper::<f32>("1.0e-241", "0x1.0E-200#1", Ceiling, "1.0e-45", Greater);
-    test_helper::<f32>("1.0e-241", "0x1.0E-200#1", Down, "0.0", Less);
-    test_helper::<f32>("1.0e-241", "0x1.0E-200#1", Up, "1.0e-45", Greater);
-    test_helper::<f32>("1.0e-241", "0x1.0E-200#1", Nearest, "0.0", Less);
+    test_helper::<f64>("1.7e2408", "0x1.0E+2000#1", Up, "Infinity", Greater);
+    test_helper::<f64>("1.7e2408", "0x1.0E+2000#1", Nearest, "Infinity", Greater);
+    test_helper::<f32>("1.5e-241", "0x1.0E-200#1", Floor, "0.0", Less);
+    test_helper::<f32>("1.5e-241", "0x1.0E-200#1", Ceiling, "1.0e-45", Greater);
+    test_helper::<f32>("1.5e-241", "0x1.0E-200#1", Down, "0.0", Less);
+    test_helper::<f32>("1.5e-241", "0x1.0E-200#1", Up, "1.0e-45", Greater);
+    test_helper::<f32>("1.5e-241", "0x1.0E-200#1", Nearest, "0.0", Less);
 
     test_helper::<f64>(
-        "1.0e-241",
+        "1.5e-241",
         "0x1.0E-200#1",
         Floor,
         "1.499696813895631e-241",
         Equal,
     );
     test_helper::<f64>(
-        "1.0e-241",
+        "1.5e-241",
         "0x1.0E-200#1",
         Ceiling,
         "1.499696813895631e-241",
         Equal,
     );
     test_helper::<f64>(
-        "1.0e-241",
+        "1.5e-241",
         "0x1.0E-200#1",
         Down,
         "1.499696813895631e-241",
         Equal,
     );
     test_helper::<f64>(
-        "1.0e-241",
+        "1.5e-241",
         "0x1.0E-200#1",
         Up,
         "1.499696813895631e-241",
         Equal,
     );
     test_helper::<f64>(
-        "1.0e-241",
+        "1.5e-241",
         "0x1.0E-200#1",
         Nearest,
         "1.499696813895631e-241",
         Equal,
     );
     test_helper::<f64>(
-        "1.0e-241",
+        "1.5e-241",
         "0x1.0E-200#1",
         Exact,
         "1.499696813895631e-241",
         Equal,
     );
 
-    test_helper::<f32>("6.0e-2409", "0x1.0E-2000#1", Floor, "0.0", Less);
-    test_helper::<f32>("6.0e-2409", "0x1.0E-2000#1", Ceiling, "1.0e-45", Greater);
-    test_helper::<f32>("6.0e-2409", "0x1.0E-2000#1", Down, "0.0", Less);
-    test_helper::<f32>("6.0e-2409", "0x1.0E-2000#1", Up, "1.0e-45", Greater);
-    test_helper::<f32>("6.0e-2409", "0x1.0E-2000#1", Nearest, "0.0", Less);
+    test_helper::<f32>("5.8e-2409", "0x1.0E-2000#1", Floor, "0.0", Less);
+    test_helper::<f32>("5.8e-2409", "0x1.0E-2000#1", Ceiling, "1.0e-45", Greater);
+    test_helper::<f32>("5.8e-2409", "0x1.0E-2000#1", Down, "0.0", Less);
+    test_helper::<f32>("5.8e-2409", "0x1.0E-2000#1", Up, "1.0e-45", Greater);
+    test_helper::<f32>("5.8e-2409", "0x1.0E-2000#1", Nearest, "0.0", Less);
 
-    test_helper::<f64>("6.0e-2409", "0x1.0E-2000#1", Floor, "0.0", Less);
-    test_helper::<f64>("6.0e-2409", "0x1.0E-2000#1", Ceiling, "5.0e-324", Greater);
-    test_helper::<f64>("6.0e-2409", "0x1.0E-2000#1", Down, "0.0", Less);
-    test_helper::<f64>("6.0e-2409", "0x1.0E-2000#1", Up, "5.0e-324", Greater);
-    test_helper::<f64>("6.0e-2409", "0x1.0E-2000#1", Nearest, "0.0", Less);
+    test_helper::<f64>("5.8e-2409", "0x1.0E-2000#1", Floor, "0.0", Less);
+    test_helper::<f64>("5.8e-2409", "0x1.0E-2000#1", Ceiling, "5.0e-324", Greater);
+    test_helper::<f64>("5.8e-2409", "0x1.0E-2000#1", Down, "0.0", Less);
+    test_helper::<f64>("5.8e-2409", "0x1.0E-2000#1", Up, "5.0e-324", Greater);
+    test_helper::<f64>("5.8e-2409", "0x1.0E-2000#1", Nearest, "0.0", Less);
 
-    test_helper::<f32>("too_big", "0x4.0E+268435455#1", Floor, "3.4028235e38", Less);
     test_helper::<f32>(
-        "too_big",
+        "1.0e323228496",
+        "0x4.0E+268435455#1",
+        Floor,
+        "3.4028235e38",
+        Less,
+    );
+    test_helper::<f32>(
+        "1.0e323228496",
         "0x4.0E+268435455#1",
         Ceiling,
         "Infinity",
         Greater,
     );
-    test_helper::<f32>("too_big", "0x4.0E+268435455#1", Down, "3.4028235e38", Less);
-    test_helper::<f32>("too_big", "0x4.0E+268435455#1", Up, "Infinity", Greater);
     test_helper::<f32>(
-        "too_big",
+        "1.0e323228496",
+        "0x4.0E+268435455#1",
+        Down,
+        "3.4028235e38",
+        Less,
+    );
+    test_helper::<f32>(
+        "1.0e323228496",
+        "0x4.0E+268435455#1",
+        Up,
+        "Infinity",
+        Greater,
+    );
+    test_helper::<f32>(
+        "1.0e323228496",
         "0x4.0E+268435455#1",
         Nearest,
         "Infinity",
@@ -618,84 +648,108 @@ fn test_rounding_from_float() {
     );
 
     test_helper::<f64>(
-        "too_big",
+        "1.0e323228496",
         "0x4.0E+268435455#1",
         Floor,
         "1.7976931348623157e308",
         Less,
     );
     test_helper::<f64>(
-        "too_big",
+        "1.0e323228496",
         "0x4.0E+268435455#1",
         Ceiling,
         "Infinity",
         Greater,
     );
     test_helper::<f64>(
-        "too_big",
+        "1.0e323228496",
         "0x4.0E+268435455#1",
         Down,
         "1.7976931348623157e308",
         Less,
     );
-    test_helper::<f64>("too_big", "0x4.0E+268435455#1", Up, "Infinity", Greater);
     test_helper::<f64>(
-        "too_big",
+        "1.0e323228496",
+        "0x4.0E+268435455#1",
+        Up,
+        "Infinity",
+        Greater,
+    );
+    test_helper::<f64>(
+        "1.0e323228496",
         "0x4.0E+268435455#1",
         Nearest,
         "Infinity",
         Greater,
     );
 
-    test_helper::<f32>("too_small", "0x1.0E-268435456#1", Floor, "0.0", Less);
+    test_helper::<f32>("2.4e-323228497", "0x1.0E-268435456#1", Floor, "0.0", Less);
     test_helper::<f32>(
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Ceiling,
         "1.0e-45",
         Greater,
     );
-    test_helper::<f32>("too_small", "0x1.0E-268435456#1", Down, "0.0", Less);
-    test_helper::<f32>("too_small", "0x1.0E-268435456#1", Up, "1.0e-45", Greater);
-    test_helper::<f32>("too_small", "0x1.0E-268435456#1", Nearest, "0.0", Less);
+    test_helper::<f32>("2.4e-323228497", "0x1.0E-268435456#1", Down, "0.0", Less);
+    test_helper::<f32>(
+        "2.4e-323228497",
+        "0x1.0E-268435456#1",
+        Up,
+        "1.0e-45",
+        Greater,
+    );
+    test_helper::<f32>("2.4e-323228497", "0x1.0E-268435456#1", Nearest, "0.0", Less);
 
-    test_helper::<f64>("too_small", "0x1.0E-268435456#1", Floor, "0.0", Less);
+    test_helper::<f64>("2.4e-323228497", "0x1.0E-268435456#1", Floor, "0.0", Less);
     test_helper::<f64>(
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Ceiling,
         "5.0e-324",
         Greater,
     );
-    test_helper::<f64>("too_small", "0x1.0E-268435456#1", Down, "0.0", Less);
-    test_helper::<f64>("too_small", "0x1.0E-268435456#1", Up, "5.0e-324", Greater);
-    test_helper::<f64>("too_small", "0x1.0E-268435456#1", Nearest, "0.0", Less);
+    test_helper::<f64>("2.4e-323228497", "0x1.0E-268435456#1", Down, "0.0", Less);
+    test_helper::<f64>(
+        "2.4e-323228497",
+        "0x1.0E-268435456#1",
+        Up,
+        "5.0e-324",
+        Greater,
+    );
+    test_helper::<f64>("2.4e-323228497", "0x1.0E-268435456#1", Nearest, "0.0", Less);
 
     test_helper::<f32>(
-        "-0.33333334",
+        "-0.333333343",
         "-0x0.5555558#24",
         Floor,
         "-0.33333334",
         Equal,
     );
     test_helper::<f32>(
-        "-0.33333334",
+        "-0.333333343",
         "-0x0.5555558#24",
         Ceiling,
         "-0.33333334",
         Equal,
     );
-    test_helper::<f32>("-0.33333334", "-0x0.5555558#24", Down, "-0.33333334", Equal);
-    test_helper::<f32>("-0.33333334", "-0x0.5555558#24", Up, "-0.33333334", Equal);
     test_helper::<f32>(
+        "-0.333333343",
+        "-0x0.5555558#24",
+        Down,
         "-0.33333334",
+        Equal,
+    );
+    test_helper::<f32>("-0.333333343", "-0x0.5555558#24", Up, "-0.33333334", Equal);
+    test_helper::<f32>(
+        "-0.333333343",
         "-0x0.5555558#24",
         Nearest,
         "-0.33333334",
         Equal,
     );
     test_helper::<f32>(
-        "-0.33333334",
+        "-0.333333343",
         "-0x0.5555558#24",
         Exact,
         "-0.33333334",
@@ -703,42 +757,42 @@ fn test_rounding_from_float() {
     );
 
     test_helper::<f64>(
-        "-0.33333334",
+        "-0.333333343",
         "-0x0.5555558#24",
         Floor,
         "-0.3333333432674408",
         Equal,
     );
     test_helper::<f64>(
-        "-0.33333334",
+        "-0.333333343",
         "-0x0.5555558#24",
         Ceiling,
         "-0.3333333432674408",
         Equal,
     );
     test_helper::<f64>(
-        "-0.33333334",
+        "-0.333333343",
         "-0x0.5555558#24",
         Down,
         "-0.3333333432674408",
         Equal,
     );
     test_helper::<f64>(
-        "-0.33333334",
+        "-0.333333343",
         "-0x0.5555558#24",
         Up,
         "-0.3333333432674408",
         Equal,
     );
     test_helper::<f64>(
-        "-0.33333334",
+        "-0.333333343",
         "-0x0.5555558#24",
         Nearest,
         "-0.3333333432674408",
         Equal,
     );
     test_helper::<f64>(
-        "-0.33333334",
+        "-0.333333343",
         "-0x0.5555558#24",
         Exact,
         "-0.3333333432674408",
@@ -825,35 +879,35 @@ fn test_rounding_from_float() {
     );
 
     test_helper::<f32>(
-        "-0.333333333333333332",
+        "-0.3333333333333333322",
         "-0x0.555555555555554#57",
         Floor,
         "-0.33333334",
         Less,
     );
     test_helper::<f32>(
-        "-0.333333333333333332",
+        "-0.3333333333333333322",
         "-0x0.555555555555554#57",
         Ceiling,
         "-0.3333333",
         Greater,
     );
     test_helper::<f32>(
-        "-0.333333333333333332",
+        "-0.3333333333333333322",
         "-0x0.555555555555554#57",
         Down,
         "-0.3333333",
         Greater,
     );
     test_helper::<f32>(
-        "-0.333333333333333332",
+        "-0.3333333333333333322",
         "-0x0.555555555555554#57",
         Up,
         "-0.33333334",
         Less,
     );
     test_helper::<f32>(
-        "-0.333333333333333332",
+        "-0.3333333333333333322",
         "-0x0.555555555555554#57",
         Nearest,
         "-0.33333334",
@@ -861,253 +915,295 @@ fn test_rounding_from_float() {
     );
 
     test_helper::<f64>(
-        "-0.333333333333333332",
+        "-0.3333333333333333322",
         "-0x0.555555555555554#57",
         Floor,
         "-0.33333333333333337",
         Less,
     );
     test_helper::<f64>(
-        "-0.333333333333333332",
+        "-0.3333333333333333322",
         "-0x0.555555555555554#57",
         Ceiling,
         "-0.3333333333333333",
         Greater,
     );
     test_helper::<f64>(
-        "-0.333333333333333332",
+        "-0.3333333333333333322",
         "-0x0.555555555555554#57",
         Down,
         "-0.3333333333333333",
         Greater,
     );
     test_helper::<f64>(
-        "-0.333333333333333332",
+        "-0.3333333333333333322",
         "-0x0.555555555555554#57",
         Up,
         "-0.33333333333333337",
         Less,
     );
     test_helper::<f64>(
-        "-0.333333333333333332",
+        "-0.3333333333333333322",
         "-0x0.555555555555554#57",
         Nearest,
         "-0.3333333333333333",
         Greater,
     );
 
-    test_helper::<f32>("-7.0e240", "-0x1.0E+200#1", Floor, "-Infinity", Less);
+    test_helper::<f32>("-6.7e240", "-0x1.0E+200#1", Floor, "-Infinity", Less);
     test_helper::<f32>(
-        "-7.0e240",
+        "-6.7e240",
         "-0x1.0E+200#1",
         Ceiling,
         "-3.4028235e38",
         Greater,
     );
-    test_helper::<f32>("-7.0e240", "-0x1.0E+200#1", Down, "-3.4028235e38", Greater);
-    test_helper::<f32>("-7.0e240", "-0x1.0E+200#1", Up, "-Infinity", Less);
-    test_helper::<f32>("-7.0e240", "-0x1.0E+200#1", Nearest, "-Infinity", Less);
+    test_helper::<f32>("-6.7e240", "-0x1.0E+200#1", Down, "-3.4028235e38", Greater);
+    test_helper::<f32>("-6.7e240", "-0x1.0E+200#1", Up, "-Infinity", Less);
+    test_helper::<f32>("-6.7e240", "-0x1.0E+200#1", Nearest, "-Infinity", Less);
 
     test_helper::<f64>(
-        "-7.0e240",
+        "-6.7e240",
         "-0x1.0E+200#1",
         Floor,
         "-6.668014432879854e240",
         Equal,
     );
     test_helper::<f64>(
-        "-7.0e240",
+        "-6.7e240",
         "-0x1.0E+200#1",
         Ceiling,
         "-6.668014432879854e240",
         Equal,
     );
     test_helper::<f64>(
-        "-7.0e240",
+        "-6.7e240",
         "-0x1.0E+200#1",
         Down,
         "-6.668014432879854e240",
         Equal,
     );
     test_helper::<f64>(
-        "-7.0e240",
+        "-6.7e240",
         "-0x1.0E+200#1",
         Up,
         "-6.668014432879854e240",
         Equal,
     );
     test_helper::<f64>(
-        "-7.0e240",
+        "-6.7e240",
         "-0x1.0E+200#1",
         Nearest,
         "-6.668014432879854e240",
         Equal,
     );
     test_helper::<f64>(
-        "-7.0e240",
+        "-6.7e240",
         "-0x1.0E+200#1",
         Exact,
         "-6.668014432879854e240",
         Equal,
     );
 
-    test_helper::<f32>("-2.0e2408", "-0x1.0E+2000#1", Floor, "-Infinity", Less);
+    test_helper::<f32>("-1.7e2408", "-0x1.0E+2000#1", Floor, "-Infinity", Less);
     test_helper::<f32>(
-        "-2.0e2408",
+        "-1.7e2408",
         "-0x1.0E+2000#1",
         Ceiling,
         "-3.4028235e38",
         Greater,
     );
     test_helper::<f32>(
-        "-2.0e2408",
+        "-1.7e2408",
         "-0x1.0E+2000#1",
         Down,
         "-3.4028235e38",
         Greater,
     );
-    test_helper::<f32>("-2.0e2408", "-0x1.0E+2000#1", Up, "-Infinity", Less);
-    test_helper::<f32>("-2.0e2408", "-0x1.0E+2000#1", Nearest, "-Infinity", Less);
+    test_helper::<f32>("-1.7e2408", "-0x1.0E+2000#1", Up, "-Infinity", Less);
+    test_helper::<f32>("-1.7e2408", "-0x1.0E+2000#1", Nearest, "-Infinity", Less);
 
-    test_helper::<f64>("-2.0e2408", "-0x1.0E+2000#1", Floor, "-Infinity", Less);
+    test_helper::<f64>("-1.7e2408", "-0x1.0E+2000#1", Floor, "-Infinity", Less);
     test_helper::<f64>(
-        "-2.0e2408",
+        "-1.7e2408",
         "-0x1.0E+2000#1",
         Ceiling,
         "-1.7976931348623157e308",
         Greater,
     );
     test_helper::<f64>(
-        "-2.0e2408",
+        "-1.7e2408",
         "-0x1.0E+2000#1",
         Down,
         "-1.7976931348623157e308",
         Greater,
     );
-    test_helper::<f64>("-2.0e2408", "-0x1.0E+2000#1", Up, "-Infinity", Less);
-    test_helper::<f64>("-2.0e2408", "-0x1.0E+2000#1", Nearest, "-Infinity", Less);
+    test_helper::<f64>("-1.7e2408", "-0x1.0E+2000#1", Up, "-Infinity", Less);
+    test_helper::<f64>("-1.7e2408", "-0x1.0E+2000#1", Nearest, "-Infinity", Less);
 
-    test_helper::<f32>("-1.0e-241", "-0x1.0E-200#1", Floor, "-1.0e-45", Less);
-    test_helper::<f32>("-1.0e-241", "-0x1.0E-200#1", Ceiling, "-0.0", Greater);
-    test_helper::<f32>("-1.0e-241", "-0x1.0E-200#1", Down, "-0.0", Greater);
-    test_helper::<f32>("-1.0e-241", "-0x1.0E-200#1", Up, "-1.0e-45", Less);
-    test_helper::<f32>("-1.0e-241", "-0x1.0E-200#1", Nearest, "-0.0", Greater);
+    test_helper::<f32>("-1.5e-241", "-0x1.0E-200#1", Floor, "-1.0e-45", Less);
+    test_helper::<f32>("-1.5e-241", "-0x1.0E-200#1", Ceiling, "-0.0", Greater);
+    test_helper::<f32>("-1.5e-241", "-0x1.0E-200#1", Down, "-0.0", Greater);
+    test_helper::<f32>("-1.5e-241", "-0x1.0E-200#1", Up, "-1.0e-45", Less);
+    test_helper::<f32>("-1.5e-241", "-0x1.0E-200#1", Nearest, "-0.0", Greater);
 
     test_helper::<f64>(
-        "-1.0e-241",
+        "-1.5e-241",
         "-0x1.0E-200#1",
         Floor,
         "-1.499696813895631e-241",
         Equal,
     );
     test_helper::<f64>(
-        "-1.0e-241",
+        "-1.5e-241",
         "-0x1.0E-200#1",
         Ceiling,
         "-1.499696813895631e-241",
         Equal,
     );
     test_helper::<f64>(
-        "-1.0e-241",
+        "-1.5e-241",
         "-0x1.0E-200#1",
         Down,
         "-1.499696813895631e-241",
         Equal,
     );
     test_helper::<f64>(
-        "-1.0e-241",
+        "-1.5e-241",
         "-0x1.0E-200#1",
         Up,
         "-1.499696813895631e-241",
         Equal,
     );
     test_helper::<f64>(
-        "-1.0e-241",
+        "-1.5e-241",
         "-0x1.0E-200#1",
         Nearest,
         "-1.499696813895631e-241",
         Equal,
     );
     test_helper::<f64>(
-        "-1.0e-241",
+        "-1.5e-241",
         "-0x1.0E-200#1",
         Exact,
         "-1.499696813895631e-241",
         Equal,
     );
 
-    test_helper::<f32>("-6.0e-2409", "-0x1.0E-2000#1", Floor, "-1.0e-45", Less);
-    test_helper::<f32>("-6.0e-2409", "-0x1.0E-2000#1", Ceiling, "-0.0", Greater);
-    test_helper::<f32>("-6.0e-2409", "-0x1.0E-2000#1", Down, "-0.0", Greater);
-    test_helper::<f32>("-6.0e-2409", "-0x1.0E-2000#1", Up, "-1.0e-45", Less);
-    test_helper::<f32>("-6.0e-2409", "-0x1.0E-2000#1", Nearest, "-0.0", Greater);
+    test_helper::<f32>("-5.8e-2409", "-0x1.0E-2000#1", Floor, "-1.0e-45", Less);
+    test_helper::<f32>("-5.8e-2409", "-0x1.0E-2000#1", Ceiling, "-0.0", Greater);
+    test_helper::<f32>("-5.8e-2409", "-0x1.0E-2000#1", Down, "-0.0", Greater);
+    test_helper::<f32>("-5.8e-2409", "-0x1.0E-2000#1", Up, "-1.0e-45", Less);
+    test_helper::<f32>("-5.8e-2409", "-0x1.0E-2000#1", Nearest, "-0.0", Greater);
 
-    test_helper::<f64>("-6.0e-2409", "-0x1.0E-2000#1", Floor, "-5.0e-324", Less);
-    test_helper::<f64>("-6.0e-2409", "-0x1.0E-2000#1", Ceiling, "-0.0", Greater);
-    test_helper::<f64>("-6.0e-2409", "-0x1.0E-2000#1", Down, "-0.0", Greater);
-    test_helper::<f64>("-6.0e-2409", "-0x1.0E-2000#1", Up, "-5.0e-324", Less);
-    test_helper::<f64>("-6.0e-2409", "-0x1.0E-2000#1", Nearest, "-0.0", Greater);
+    test_helper::<f64>("-5.8e-2409", "-0x1.0E-2000#1", Floor, "-5.0e-324", Less);
+    test_helper::<f64>("-5.8e-2409", "-0x1.0E-2000#1", Ceiling, "-0.0", Greater);
+    test_helper::<f64>("-5.8e-2409", "-0x1.0E-2000#1", Down, "-0.0", Greater);
+    test_helper::<f64>("-5.8e-2409", "-0x1.0E-2000#1", Up, "-5.0e-324", Less);
+    test_helper::<f64>("-5.8e-2409", "-0x1.0E-2000#1", Nearest, "-0.0", Greater);
 
-    test_helper::<f32>("-too_big", "-0x4.0E+268435455#1", Floor, "-Infinity", Less);
     test_helper::<f32>(
-        "-too_big",
+        "-1.0e323228496",
+        "-0x4.0E+268435455#1",
+        Floor,
+        "-Infinity",
+        Less,
+    );
+    test_helper::<f32>(
+        "-1.0e323228496",
         "-0x4.0E+268435455#1",
         Ceiling,
         "-3.4028235e38",
         Greater,
     );
     test_helper::<f32>(
-        "-too_big",
+        "-1.0e323228496",
         "-0x4.0E+268435455#1",
         Down,
         "-3.4028235e38",
         Greater,
     );
-    test_helper::<f32>("-too_big", "-0x4.0E+268435455#1", Up, "-Infinity", Less);
     test_helper::<f32>(
-        "-too_big",
+        "-1.0e323228496",
+        "-0x4.0E+268435455#1",
+        Up,
+        "-Infinity",
+        Less,
+    );
+    test_helper::<f32>(
+        "-1.0e323228496",
         "-0x4.0E+268435455#1",
         Nearest,
         "-Infinity",
         Less,
     );
 
-    test_helper::<f64>("-too_big", "-0x4.0E+268435455#1", Floor, "-Infinity", Less);
     test_helper::<f64>(
-        "-too_big",
+        "-1.0e323228496",
+        "-0x4.0E+268435455#1",
+        Floor,
+        "-Infinity",
+        Less,
+    );
+    test_helper::<f64>(
+        "-1.0e323228496",
         "-0x4.0E+268435455#1",
         Ceiling,
         "-1.7976931348623157e308",
         Greater,
     );
     test_helper::<f64>(
-        "-too_big",
+        "-1.0e323228496",
         "-0x4.0E+268435455#1",
         Down,
         "-1.7976931348623157e308",
         Greater,
     );
-    test_helper::<f64>("-too_big", "-0x4.0E+268435455#1", Up, "-Infinity", Less);
     test_helper::<f64>(
-        "-too_big",
+        "-1.0e323228496",
+        "-0x4.0E+268435455#1",
+        Up,
+        "-Infinity",
+        Less,
+    );
+    test_helper::<f64>(
+        "-1.0e323228496",
         "-0x4.0E+268435455#1",
         Nearest,
         "-Infinity",
         Less,
     );
 
-    test_helper::<f32>("-too_small", "-0x1.0E-268435456#1", Floor, "-1.0e-45", Less);
     test_helper::<f32>(
-        "-too_small",
+        "-2.4e-323228497",
+        "-0x1.0E-268435456#1",
+        Floor,
+        "-1.0e-45",
+        Less,
+    );
+    test_helper::<f32>(
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Ceiling,
         "-0.0",
         Greater,
     );
-    test_helper::<f32>("-too_small", "-0x1.0E-268435456#1", Down, "-0.0", Greater);
-    test_helper::<f32>("-too_small", "-0x1.0E-268435456#1", Up, "-1.0e-45", Less);
     test_helper::<f32>(
-        "-too_small",
+        "-2.4e-323228497",
+        "-0x1.0E-268435456#1",
+        Down,
+        "-0.0",
+        Greater,
+    );
+    test_helper::<f32>(
+        "-2.4e-323228497",
+        "-0x1.0E-268435456#1",
+        Up,
+        "-1.0e-45",
+        Less,
+    );
+    test_helper::<f32>(
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Nearest,
         "-0.0",
@@ -1115,23 +1211,35 @@ fn test_rounding_from_float() {
     );
 
     test_helper::<f64>(
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Floor,
         "-5.0e-324",
         Less,
     );
     test_helper::<f64>(
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Ceiling,
         "-0.0",
         Greater,
     );
-    test_helper::<f64>("-too_small", "-0x1.0E-268435456#1", Down, "-0.0", Greater);
-    test_helper::<f64>("-too_small", "-0x1.0E-268435456#1", Up, "-5.0e-324", Less);
     test_helper::<f64>(
-        "-too_small",
+        "-2.4e-323228497",
+        "-0x1.0E-268435456#1",
+        Down,
+        "-0.0",
+        Greater,
+    );
+    test_helper::<f64>(
+        "-2.4e-323228497",
+        "-0x1.0E-268435456#1",
+        Up,
+        "-5.0e-324",
+        Less,
+    );
+    test_helper::<f64>(
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Nearest,
         "-0.0",

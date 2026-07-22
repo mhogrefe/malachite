@@ -74,32 +74,32 @@ impl Float {
     /// assert_eq!(o, Equal);
     ///
     /// let (x, o) = Float::from_integer_prec_round(Integer::from(123), 20, Exact);
-    /// assert_eq!(x.to_string(), "123.0");
+    /// assert_eq!(x.to_string(), "123.00000");
     /// assert_eq!(x.get_prec(), Some(20));
     /// assert_eq!(o, Equal);
     ///
     /// let (x, o) = Float::from_integer_prec_round(Integer::from(123), 4, Floor);
-    /// assert_eq!(x.to_string(), "1.2e2");
+    /// assert_eq!(x.to_string(), "120.0");
     /// assert_eq!(x.get_prec(), Some(4));
     /// assert_eq!(o, Less);
     ///
     /// let (x, o) = Float::from_integer_prec_round(Integer::from(123), 4, Ceiling);
-    /// assert_eq!(x.to_string(), "1.3e2");
+    /// assert_eq!(x.to_string(), "128.0");
     /// assert_eq!(x.get_prec(), Some(4));
     /// assert_eq!(o, Greater);
     ///
     /// let (x, o) = Float::from_integer_prec_round(Integer::from(-123), 20, Exact);
-    /// assert_eq!(x.to_string(), "-123.0");
+    /// assert_eq!(x.to_string(), "-123.00000");
     /// assert_eq!(x.get_prec(), Some(20));
     /// assert_eq!(o, Equal);
     ///
     /// let (x, o) = Float::from_integer_prec_round(Integer::from(-123), 4, Floor);
-    /// assert_eq!(x.to_string(), "-1.3e2");
+    /// assert_eq!(x.to_string(), "-128.0");
     /// assert_eq!(x.get_prec(), Some(4));
     /// assert_eq!(o, Less);
     ///
     /// let (x, o) = Float::from_integer_prec_round(Integer::from(-123), 4, Ceiling);
-    /// assert_eq!(x.to_string(), "-1.2e2");
+    /// assert_eq!(x.to_string(), "-120.0");
     /// assert_eq!(x.get_prec(), Some(4));
     /// assert_eq!(o, Greater);
     /// ```
@@ -150,32 +150,32 @@ impl Float {
     /// assert_eq!(o, Equal);
     ///
     /// let (x, o) = Float::from_integer_prec_round_ref(&Integer::from(123), 20, Exact);
-    /// assert_eq!(x.to_string(), "123.0");
+    /// assert_eq!(x.to_string(), "123.00000");
     /// assert_eq!(x.get_prec(), Some(20));
     /// assert_eq!(o, Equal);
     ///
     /// let (x, o) = Float::from_integer_prec_round_ref(&Integer::from(123), 4, Floor);
-    /// assert_eq!(x.to_string(), "1.2e2");
+    /// assert_eq!(x.to_string(), "120.0");
     /// assert_eq!(x.get_prec(), Some(4));
     /// assert_eq!(o, Less);
     ///
     /// let (x, o) = Float::from_integer_prec_round_ref(&Integer::from(123), 4, Ceiling);
-    /// assert_eq!(x.to_string(), "1.3e2");
+    /// assert_eq!(x.to_string(), "128.0");
     /// assert_eq!(x.get_prec(), Some(4));
     /// assert_eq!(o, Greater);
     ///
     /// let (x, o) = Float::from_integer_prec_round_ref(&Integer::from(-123), 20, Exact);
-    /// assert_eq!(x.to_string(), "-123.0");
+    /// assert_eq!(x.to_string(), "-123.00000");
     /// assert_eq!(x.get_prec(), Some(20));
     /// assert_eq!(o, Equal);
     ///
     /// let (x, o) = Float::from_integer_prec_round_ref(&Integer::from(-123), 4, Floor);
-    /// assert_eq!(x.to_string(), "-1.3e2");
+    /// assert_eq!(x.to_string(), "-128.0");
     /// assert_eq!(x.get_prec(), Some(4));
     /// assert_eq!(o, Less);
     ///
     /// let (x, o) = Float::from_integer_prec_round_ref(&Integer::from(-123), 4, Ceiling);
-    /// assert_eq!(x.to_string(), "-1.2e2");
+    /// assert_eq!(x.to_string(), "-120.0");
     /// assert_eq!(x.get_prec(), Some(4));
     /// assert_eq!(o, Greater);
     /// ```
@@ -232,22 +232,22 @@ impl Float {
     /// assert_eq!(o, Equal);
     ///
     /// let (x, o) = Float::from_integer_prec(Integer::from(123), 20);
-    /// assert_eq!(x.to_string(), "123.0");
+    /// assert_eq!(x.to_string(), "123.00000");
     /// assert_eq!(x.get_prec(), Some(20));
     /// assert_eq!(o, Equal);
     ///
     /// let (x, o) = Float::from_integer_prec(Integer::from(123), 4);
-    /// assert_eq!(x.to_string(), "1.2e2");
+    /// assert_eq!(x.to_string(), "120.0");
     /// assert_eq!(x.get_prec(), Some(4));
     /// assert_eq!(o, Less);
     ///
     /// let (x, o) = Float::from_integer_prec(Integer::from(-123), 20);
-    /// assert_eq!(x.to_string(), "-123.0");
+    /// assert_eq!(x.to_string(), "-123.00000");
     /// assert_eq!(x.get_prec(), Some(20));
     /// assert_eq!(o, Equal);
     ///
     /// let (x, o) = Float::from_integer_prec(Integer::from(-123), 4);
-    /// assert_eq!(x.to_string(), "-1.2e2");
+    /// assert_eq!(x.to_string(), "-120.0");
     /// assert_eq!(x.get_prec(), Some(4));
     /// assert_eq!(o, Greater);
     /// ```
@@ -295,22 +295,22 @@ impl Float {
     /// assert_eq!(o, Equal);
     ///
     /// let (x, o) = Float::from_integer_prec_ref(&Integer::from(123), 20);
-    /// assert_eq!(x.to_string(), "123.0");
+    /// assert_eq!(x.to_string(), "123.00000");
     /// assert_eq!(x.get_prec(), Some(20));
     /// assert_eq!(o, Equal);
     ///
     /// let (x, o) = Float::from_integer_prec_ref(&Integer::from(123), 4);
-    /// assert_eq!(x.to_string(), "1.2e2");
+    /// assert_eq!(x.to_string(), "120.0");
     /// assert_eq!(x.get_prec(), Some(4));
     /// assert_eq!(o, Less);
     ///
     /// let (x, o) = Float::from_integer_prec_ref(&Integer::from(-123), 20);
-    /// assert_eq!(x.to_string(), "-123.0");
+    /// assert_eq!(x.to_string(), "-123.00000");
     /// assert_eq!(x.get_prec(), Some(20));
     /// assert_eq!(o, Equal);
     ///
     /// let (x, o) = Float::from_integer_prec_ref(&Integer::from(-123), 4);
-    /// assert_eq!(x.to_string(), "-1.2e2");
+    /// assert_eq!(x.to_string(), "-120.0");
     /// assert_eq!(x.get_prec(), Some(4));
     /// assert_eq!(o, Greater);
     /// ```

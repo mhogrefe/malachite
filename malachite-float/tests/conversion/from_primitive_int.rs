@@ -82,7 +82,7 @@ fn test_from_primitive_int() {
         test_helper(T::exact_from(123u8), "123.0", "0x7b.0#7");
     }
     apply_fn_to_primitive_ints!(test_helper_ui);
-    test_helper(1000000000000u64, "1.0e12", "0xe.8d4a51E+9#28");
+    test_helper(1000000000000u64, "1.000000000e12", "0xe.8d4a51E+9#28");
 
     fn test_helper_i<T: PrimitiveSigned>()
     where
@@ -95,7 +95,7 @@ fn test_from_primitive_int() {
         test_helper(T::from(-123i8), "-123.0", "-0x7b.0#7");
     }
     apply_fn_to_signeds!(test_helper_i);
-    test_helper(-1000000000000i64, "-1.0e12", "-0xe.8d4a51E+9#28");
+    test_helper(-1000000000000i64, "-1.000000000e12", "-0xe.8d4a51E+9#28");
 }
 
 #[test]
@@ -131,17 +131,17 @@ fn test_from_primitive_int_prec() {
         test_helper_u(T::ZERO, 20, "0.0", "0x0.0", Equal);
 
         test_helper_u(T::ONE, 1, "1.0", "0x1.0#1", Equal);
-        test_helper_u(T::ONE, 10, "1.0", "0x1.000#10", Equal);
-        test_helper_u(T::ONE, 20, "1.0", "0x1.00000#20", Equal);
+        test_helper_u(T::ONE, 10, "1.0000", "0x1.000#10", Equal);
+        test_helper_u(T::ONE, 20, "1.0000000", "0x1.00000#20", Equal);
 
-        test_helper_u(T::from(123u8), 1, "1.0e2", "0x8.0E+1#1", Greater);
-        test_helper_u(T::from(123u8), 10, "123.0", "0x7b.0#10", Equal);
-        test_helper_u(T::from(123u8), 20, "123.0", "0x7b.0000#20", Equal);
+        test_helper_u(T::from(123u8), 1, "1.3e2", "0x8.0E+1#1", Greater);
+        test_helper_u(T::from(123u8), 10, "123.00", "0x7b.0#10", Equal);
+        test_helper_u(T::from(123u8), 20, "123.00000", "0x7b.0000#20", Equal);
     }
     apply_fn_to_unsigneds!(test_helper_u2);
-    test_helper_u(1000000000000u64, 1, "1.0e12", "0x1.0E+10#1", Greater);
-    test_helper_u(1000000000000u64, 10, "9.997e11", "0xe.8cE+9#10", Less);
-    test_helper_u(1000000000000u64, 20, "9.999997e11", "0xe.8d4aE+9#20", Less);
+    test_helper_u(1000000000000u64, 1, "1.1e12", "0x1.0E+10#1", Greater);
+    test_helper_u(1000000000000u64, 10, "9.9965e11", "0xe.8cE+9#10", Less);
+    test_helper_u(1000000000000u64, 20, "9.9999967e11", "0xe.8d4aE+9#20", Less);
 
     fn test_helper_i<T: PrimitiveSigned>(u: T, prec: u64, out: &str, out_hex: &str, out_o: Ordering)
     where
@@ -169,31 +169,37 @@ fn test_from_primitive_int_prec() {
         test_helper_i(T::ZERO, 20, "0.0", "0x0.0", Equal);
 
         test_helper_i(T::ONE, 1, "1.0", "0x1.0#1", Equal);
-        test_helper_i(T::ONE, 10, "1.0", "0x1.000#10", Equal);
-        test_helper_i(T::ONE, 20, "1.0", "0x1.00000#20", Equal);
+        test_helper_i(T::ONE, 10, "1.0000", "0x1.000#10", Equal);
+        test_helper_i(T::ONE, 20, "1.0000000", "0x1.00000#20", Equal);
 
-        test_helper_i(T::from(123i8), 1, "1.0e2", "0x8.0E+1#1", Greater);
-        test_helper_i(T::from(123i8), 10, "123.0", "0x7b.0#10", Equal);
-        test_helper_i(T::from(123i8), 20, "123.0", "0x7b.0000#20", Equal);
+        test_helper_i(T::from(123i8), 1, "1.3e2", "0x8.0E+1#1", Greater);
+        test_helper_i(T::from(123i8), 10, "123.00", "0x7b.0#10", Equal);
+        test_helper_i(T::from(123i8), 20, "123.00000", "0x7b.0000#20", Equal);
 
         test_helper_i(T::NEGATIVE_ONE, 1, "-1.0", "-0x1.0#1", Equal);
-        test_helper_i(T::NEGATIVE_ONE, 10, "-1.0", "-0x1.000#10", Equal);
-        test_helper_i(T::NEGATIVE_ONE, 20, "-1.0", "-0x1.00000#20", Equal);
+        test_helper_i(T::NEGATIVE_ONE, 10, "-1.0000", "-0x1.000#10", Equal);
+        test_helper_i(T::NEGATIVE_ONE, 20, "-1.0000000", "-0x1.00000#20", Equal);
 
-        test_helper_i(T::from(-123i8), 1, "-1.0e2", "-0x8.0E+1#1", Less);
-        test_helper_i(T::from(-123i8), 10, "-123.0", "-0x7b.0#10", Equal);
-        test_helper_i(T::from(-123i8), 20, "-123.0", "-0x7b.0000#20", Equal);
+        test_helper_i(T::from(-123i8), 1, "-1.3e2", "-0x8.0E+1#1", Less);
+        test_helper_i(T::from(-123i8), 10, "-123.00", "-0x7b.0#10", Equal);
+        test_helper_i(T::from(-123i8), 20, "-123.00000", "-0x7b.0000#20", Equal);
     }
     apply_fn_to_signeds!(test_helper_i2);
-    test_helper_i(1000000000000i64, 1, "1.0e12", "0x1.0E+10#1", Greater);
-    test_helper_i(1000000000000i64, 10, "9.997e11", "0xe.8cE+9#10", Less);
-    test_helper_i(1000000000000i64, 20, "9.999997e11", "0xe.8d4aE+9#20", Less);
-    test_helper_i(-1000000000000i64, 1, "-1.0e12", "-0x1.0E+10#1", Less);
-    test_helper_i(-1000000000000i64, 10, "-9.997e11", "-0xe.8cE+9#10", Greater);
+    test_helper_i(1000000000000i64, 1, "1.1e12", "0x1.0E+10#1", Greater);
+    test_helper_i(1000000000000i64, 10, "9.9965e11", "0xe.8cE+9#10", Less);
+    test_helper_i(1000000000000i64, 20, "9.9999967e11", "0xe.8d4aE+9#20", Less);
+    test_helper_i(-1000000000000i64, 1, "-1.1e12", "-0x1.0E+10#1", Less);
+    test_helper_i(
+        -1000000000000i64,
+        10,
+        "-9.9965e11",
+        "-0xe.8cE+9#10",
+        Greater,
+    );
     test_helper_i(
         -1000000000000i64,
         20,
-        "-9.999997e11",
+        "-9.9999967e11",
         "-0xe.8d4aE+9#20",
         Greater,
     );
@@ -282,57 +288,85 @@ fn test_from_primitive_int_prec_round() {
         test_helper_u(T::ONE, 1, Nearest, "1.0", "0x1.0#1", Equal);
         test_helper_u(T::ONE, 1, Exact, "1.0", "0x1.0#1", Equal);
 
-        test_helper_u(T::ONE, 10, Floor, "1.0", "0x1.000#10", Equal);
-        test_helper_u(T::ONE, 10, Ceiling, "1.0", "0x1.000#10", Equal);
-        test_helper_u(T::ONE, 10, Down, "1.0", "0x1.000#10", Equal);
-        test_helper_u(T::ONE, 10, Up, "1.0", "0x1.000#10", Equal);
-        test_helper_u(T::ONE, 10, Nearest, "1.0", "0x1.000#10", Equal);
-        test_helper_u(T::ONE, 10, Exact, "1.0", "0x1.000#10", Equal);
+        test_helper_u(T::ONE, 10, Floor, "1.0000", "0x1.000#10", Equal);
+        test_helper_u(T::ONE, 10, Ceiling, "1.0000", "0x1.000#10", Equal);
+        test_helper_u(T::ONE, 10, Down, "1.0000", "0x1.000#10", Equal);
+        test_helper_u(T::ONE, 10, Up, "1.0000", "0x1.000#10", Equal);
+        test_helper_u(T::ONE, 10, Nearest, "1.0000", "0x1.000#10", Equal);
+        test_helper_u(T::ONE, 10, Exact, "1.0000", "0x1.000#10", Equal);
 
-        test_helper_u(T::ONE, 20, Floor, "1.0", "0x1.00000#20", Equal);
-        test_helper_u(T::ONE, 20, Ceiling, "1.0", "0x1.00000#20", Equal);
-        test_helper_u(T::ONE, 20, Down, "1.0", "0x1.00000#20", Equal);
-        test_helper_u(T::ONE, 20, Up, "1.0", "0x1.00000#20", Equal);
-        test_helper_u(T::ONE, 20, Nearest, "1.0", "0x1.00000#20", Equal);
-        test_helper_u(T::ONE, 20, Exact, "1.0", "0x1.00000#20", Equal);
+        test_helper_u(T::ONE, 20, Floor, "1.0000000", "0x1.00000#20", Equal);
+        test_helper_u(T::ONE, 20, Ceiling, "1.0000000", "0x1.00000#20", Equal);
+        test_helper_u(T::ONE, 20, Down, "1.0000000", "0x1.00000#20", Equal);
+        test_helper_u(T::ONE, 20, Up, "1.0000000", "0x1.00000#20", Equal);
+        test_helper_u(T::ONE, 20, Nearest, "1.0000000", "0x1.00000#20", Equal);
+        test_helper_u(T::ONE, 20, Exact, "1.0000000", "0x1.00000#20", Equal);
 
-        test_helper_u(T::from(123u8), 1, Floor, "6.0e1", "0x4.0E+1#1", Less);
-        test_helper_u(T::from(123u8), 1, Ceiling, "1.0e2", "0x8.0E+1#1", Greater);
-        test_helper_u(T::from(123u8), 1, Down, "6.0e1", "0x4.0E+1#1", Less);
-        test_helper_u(T::from(123u8), 1, Up, "1.0e2", "0x8.0E+1#1", Greater);
-        test_helper_u(T::from(123u8), 1, Nearest, "1.0e2", "0x8.0E+1#1", Greater);
+        test_helper_u(T::from(123u8), 1, Floor, "64.0", "0x4.0E+1#1", Less);
+        test_helper_u(T::from(123u8), 1, Ceiling, "1.3e2", "0x8.0E+1#1", Greater);
+        test_helper_u(T::from(123u8), 1, Down, "64.0", "0x4.0E+1#1", Less);
+        test_helper_u(T::from(123u8), 1, Up, "1.3e2", "0x8.0E+1#1", Greater);
+        test_helper_u(T::from(123u8), 1, Nearest, "1.3e2", "0x8.0E+1#1", Greater);
 
-        test_helper_u(T::from(123u8), 10, Floor, "123.0", "0x7b.0#10", Equal);
-        test_helper_u(T::from(123u8), 10, Ceiling, "123.0", "0x7b.0#10", Equal);
-        test_helper_u(T::from(123u8), 10, Down, "123.0", "0x7b.0#10", Equal);
-        test_helper_u(T::from(123u8), 10, Up, "123.0", "0x7b.0#10", Equal);
-        test_helper_u(T::from(123u8), 10, Nearest, "123.0", "0x7b.0#10", Equal);
-        test_helper_u(T::from(123u8), 10, Exact, "123.0", "0x7b.0#10", Equal);
+        test_helper_u(T::from(123u8), 10, Floor, "123.00", "0x7b.0#10", Equal);
+        test_helper_u(T::from(123u8), 10, Ceiling, "123.00", "0x7b.0#10", Equal);
+        test_helper_u(T::from(123u8), 10, Down, "123.00", "0x7b.0#10", Equal);
+        test_helper_u(T::from(123u8), 10, Up, "123.00", "0x7b.0#10", Equal);
+        test_helper_u(T::from(123u8), 10, Nearest, "123.00", "0x7b.0#10", Equal);
+        test_helper_u(T::from(123u8), 10, Exact, "123.00", "0x7b.0#10", Equal);
 
-        test_helper_u(T::from(123u8), 20, Floor, "123.0", "0x7b.0000#20", Equal);
-        test_helper_u(T::from(123u8), 20, Ceiling, "123.0", "0x7b.0000#20", Equal);
-        test_helper_u(T::from(123u8), 20, Down, "123.0", "0x7b.0000#20", Equal);
-        test_helper_u(T::from(123u8), 20, Up, "123.0", "0x7b.0000#20", Equal);
-        test_helper_u(T::from(123u8), 20, Nearest, "123.0", "0x7b.0000#20", Equal);
-        test_helper_u(T::from(123u8), 20, Exact, "123.0", "0x7b.0000#20", Equal);
+        test_helper_u(
+            T::from(123u8),
+            20,
+            Floor,
+            "123.00000",
+            "0x7b.0000#20",
+            Equal,
+        );
+        test_helper_u(
+            T::from(123u8),
+            20,
+            Ceiling,
+            "123.00000",
+            "0x7b.0000#20",
+            Equal,
+        );
+        test_helper_u(T::from(123u8), 20, Down, "123.00000", "0x7b.0000#20", Equal);
+        test_helper_u(T::from(123u8), 20, Up, "123.00000", "0x7b.0000#20", Equal);
+        test_helper_u(
+            T::from(123u8),
+            20,
+            Nearest,
+            "123.00000",
+            "0x7b.0000#20",
+            Equal,
+        );
+        test_helper_u(
+            T::from(123u8),
+            20,
+            Exact,
+            "123.00000",
+            "0x7b.0000#20",
+            Equal,
+        );
     }
     apply_fn_to_unsigneds!(test_helper_u2);
-    test_helper_u(1000000000000u64, 1, Floor, "5.0e11", "0x8.0E+9#1", Less);
+    test_helper_u(1000000000000u64, 1, Floor, "5.5e11", "0x8.0E+9#1", Less);
     test_helper_u(
         1000000000000u64,
         1,
         Ceiling,
-        "1.0e12",
+        "1.1e12",
         "0x1.0E+10#1",
         Greater,
     );
-    test_helper_u(1000000000000u64, 1, Down, "5.0e11", "0x8.0E+9#1", Less);
-    test_helper_u(1000000000000u64, 1, Up, "1.0e12", "0x1.0E+10#1", Greater);
+    test_helper_u(1000000000000u64, 1, Down, "5.5e11", "0x8.0E+9#1", Less);
+    test_helper_u(1000000000000u64, 1, Up, "1.1e12", "0x1.0E+10#1", Greater);
     test_helper_u(
         1000000000000u64,
         1,
         Nearest,
-        "1.0e12",
+        "1.1e12",
         "0x1.0E+10#1",
         Greater,
     );
@@ -341,7 +375,7 @@ fn test_from_primitive_int_prec_round() {
         1000000000000u64,
         10,
         Floor,
-        "9.997e11",
+        "9.9965e11",
         "0xe.8cE+9#10",
         Less,
     );
@@ -349,16 +383,23 @@ fn test_from_primitive_int_prec_round() {
         1000000000000u64,
         10,
         Ceiling,
-        "1.001e12",
+        "1.0007e12",
         "0xe.90E+9#10",
         Greater,
     );
-    test_helper_u(1000000000000u64, 10, Down, "9.997e11", "0xe.8cE+9#10", Less);
+    test_helper_u(
+        1000000000000u64,
+        10,
+        Down,
+        "9.9965e11",
+        "0xe.8cE+9#10",
+        Less,
+    );
     test_helper_u(
         1000000000000u64,
         10,
         Up,
-        "1.001e12",
+        "1.0007e12",
         "0xe.90E+9#10",
         Greater,
     );
@@ -366,7 +407,7 @@ fn test_from_primitive_int_prec_round() {
         1000000000000u64,
         10,
         Nearest,
-        "9.997e11",
+        "9.9965e11",
         "0xe.8cE+9#10",
         Less,
     );
@@ -375,7 +416,7 @@ fn test_from_primitive_int_prec_round() {
         1000000000000u64,
         20,
         Floor,
-        "9.999997e11",
+        "9.9999967e11",
         "0xe.8d4aE+9#20",
         Less,
     );
@@ -383,7 +424,7 @@ fn test_from_primitive_int_prec_round() {
         1000000000000u64,
         20,
         Ceiling,
-        "1.000001e12",
+        "1.0000007e12",
         "0xe.8d4bE+9#20",
         Greater,
     );
@@ -391,7 +432,7 @@ fn test_from_primitive_int_prec_round() {
         1000000000000u64,
         20,
         Down,
-        "9.999997e11",
+        "9.9999967e11",
         "0xe.8d4aE+9#20",
         Less,
     );
@@ -399,7 +440,7 @@ fn test_from_primitive_int_prec_round() {
         1000000000000u64,
         20,
         Up,
-        "1.000001e12",
+        "1.0000007e12",
         "0xe.8d4bE+9#20",
         Greater,
     );
@@ -407,7 +448,7 @@ fn test_from_primitive_int_prec_round() {
         1000000000000u64,
         20,
         Nearest,
-        "9.999997e11",
+        "9.9999967e11",
         "0xe.8d4aE+9#20",
         Less,
     );
@@ -470,39 +511,68 @@ fn test_from_primitive_int_prec_round() {
         test_helper_i(T::ONE, 1, Nearest, "1.0", "0x1.0#1", Equal);
         test_helper_i(T::ONE, 1, Exact, "1.0", "0x1.0#1", Equal);
 
-        test_helper_i(T::ONE, 10, Floor, "1.0", "0x1.000#10", Equal);
-        test_helper_i(T::ONE, 10, Ceiling, "1.0", "0x1.000#10", Equal);
-        test_helper_i(T::ONE, 10, Down, "1.0", "0x1.000#10", Equal);
-        test_helper_i(T::ONE, 10, Up, "1.0", "0x1.000#10", Equal);
-        test_helper_i(T::ONE, 10, Nearest, "1.0", "0x1.000#10", Equal);
-        test_helper_i(T::ONE, 10, Exact, "1.0", "0x1.000#10", Equal);
+        test_helper_i(T::ONE, 10, Floor, "1.0000", "0x1.000#10", Equal);
+        test_helper_i(T::ONE, 10, Ceiling, "1.0000", "0x1.000#10", Equal);
+        test_helper_i(T::ONE, 10, Down, "1.0000", "0x1.000#10", Equal);
+        test_helper_i(T::ONE, 10, Up, "1.0000", "0x1.000#10", Equal);
+        test_helper_i(T::ONE, 10, Nearest, "1.0000", "0x1.000#10", Equal);
+        test_helper_i(T::ONE, 10, Exact, "1.0000", "0x1.000#10", Equal);
 
-        test_helper_i(T::ONE, 20, Floor, "1.0", "0x1.00000#20", Equal);
-        test_helper_i(T::ONE, 20, Ceiling, "1.0", "0x1.00000#20", Equal);
-        test_helper_i(T::ONE, 20, Down, "1.0", "0x1.00000#20", Equal);
-        test_helper_i(T::ONE, 20, Up, "1.0", "0x1.00000#20", Equal);
-        test_helper_i(T::ONE, 20, Nearest, "1.0", "0x1.00000#20", Equal);
-        test_helper_i(T::ONE, 20, Exact, "1.0", "0x1.00000#20", Equal);
+        test_helper_i(T::ONE, 20, Floor, "1.0000000", "0x1.00000#20", Equal);
+        test_helper_i(T::ONE, 20, Ceiling, "1.0000000", "0x1.00000#20", Equal);
+        test_helper_i(T::ONE, 20, Down, "1.0000000", "0x1.00000#20", Equal);
+        test_helper_i(T::ONE, 20, Up, "1.0000000", "0x1.00000#20", Equal);
+        test_helper_i(T::ONE, 20, Nearest, "1.0000000", "0x1.00000#20", Equal);
+        test_helper_i(T::ONE, 20, Exact, "1.0000000", "0x1.00000#20", Equal);
 
-        test_helper_i(T::from(123i8), 1, Floor, "6.0e1", "0x4.0E+1#1", Less);
-        test_helper_i(T::from(123i8), 1, Ceiling, "1.0e2", "0x8.0E+1#1", Greater);
-        test_helper_i(T::from(123i8), 1, Down, "6.0e1", "0x4.0E+1#1", Less);
-        test_helper_i(T::from(123i8), 1, Up, "1.0e2", "0x8.0E+1#1", Greater);
-        test_helper_i(T::from(123i8), 1, Nearest, "1.0e2", "0x8.0E+1#1", Greater);
+        test_helper_i(T::from(123i8), 1, Floor, "64.0", "0x4.0E+1#1", Less);
+        test_helper_i(T::from(123i8), 1, Ceiling, "1.3e2", "0x8.0E+1#1", Greater);
+        test_helper_i(T::from(123i8), 1, Down, "64.0", "0x4.0E+1#1", Less);
+        test_helper_i(T::from(123i8), 1, Up, "1.3e2", "0x8.0E+1#1", Greater);
+        test_helper_i(T::from(123i8), 1, Nearest, "1.3e2", "0x8.0E+1#1", Greater);
 
-        test_helper_i(T::from(123i8), 10, Floor, "123.0", "0x7b.0#10", Equal);
-        test_helper_i(T::from(123i8), 10, Ceiling, "123.0", "0x7b.0#10", Equal);
-        test_helper_i(T::from(123i8), 10, Down, "123.0", "0x7b.0#10", Equal);
-        test_helper_i(T::from(123i8), 10, Up, "123.0", "0x7b.0#10", Equal);
-        test_helper_i(T::from(123i8), 10, Nearest, "123.0", "0x7b.0#10", Equal);
-        test_helper_i(T::from(123i8), 10, Exact, "123.0", "0x7b.0#10", Equal);
+        test_helper_i(T::from(123i8), 10, Floor, "123.00", "0x7b.0#10", Equal);
+        test_helper_i(T::from(123i8), 10, Ceiling, "123.00", "0x7b.0#10", Equal);
+        test_helper_i(T::from(123i8), 10, Down, "123.00", "0x7b.0#10", Equal);
+        test_helper_i(T::from(123i8), 10, Up, "123.00", "0x7b.0#10", Equal);
+        test_helper_i(T::from(123i8), 10, Nearest, "123.00", "0x7b.0#10", Equal);
+        test_helper_i(T::from(123i8), 10, Exact, "123.00", "0x7b.0#10", Equal);
 
-        test_helper_i(T::from(123i8), 20, Floor, "123.0", "0x7b.0000#20", Equal);
-        test_helper_i(T::from(123i8), 20, Ceiling, "123.0", "0x7b.0000#20", Equal);
-        test_helper_i(T::from(123i8), 20, Down, "123.0", "0x7b.0000#20", Equal);
-        test_helper_i(T::from(123i8), 20, Up, "123.0", "0x7b.0000#20", Equal);
-        test_helper_i(T::from(123i8), 20, Nearest, "123.0", "0x7b.0000#20", Equal);
-        test_helper_i(T::from(123i8), 20, Exact, "123.0", "0x7b.0000#20", Equal);
+        test_helper_i(
+            T::from(123i8),
+            20,
+            Floor,
+            "123.00000",
+            "0x7b.0000#20",
+            Equal,
+        );
+        test_helper_i(
+            T::from(123i8),
+            20,
+            Ceiling,
+            "123.00000",
+            "0x7b.0000#20",
+            Equal,
+        );
+        test_helper_i(T::from(123i8), 20, Down, "123.00000", "0x7b.0000#20", Equal);
+        test_helper_i(T::from(123i8), 20, Up, "123.00000", "0x7b.0000#20", Equal);
+        test_helper_i(
+            T::from(123i8),
+            20,
+            Nearest,
+            "123.00000",
+            "0x7b.0000#20",
+            Equal,
+        );
+        test_helper_i(
+            T::from(123i8),
+            20,
+            Exact,
+            "123.00000",
+            "0x7b.0000#20",
+            Equal,
+        );
+
         test_helper_i(T::NEGATIVE_ONE, 1, Floor, "-1.0", "-0x1.0#1", Equal);
         test_helper_i(T::NEGATIVE_ONE, 1, Ceiling, "-1.0", "-0x1.0#1", Equal);
         test_helper_i(T::NEGATIVE_ONE, 1, Down, "-1.0", "-0x1.0#1", Equal);
@@ -510,78 +580,155 @@ fn test_from_primitive_int_prec_round() {
         test_helper_i(T::NEGATIVE_ONE, 1, Nearest, "-1.0", "-0x1.0#1", Equal);
         test_helper_i(T::NEGATIVE_ONE, 1, Exact, "-1.0", "-0x1.0#1", Equal);
 
-        test_helper_i(T::NEGATIVE_ONE, 10, Floor, "-1.0", "-0x1.000#10", Equal);
-        test_helper_i(T::NEGATIVE_ONE, 10, Ceiling, "-1.0", "-0x1.000#10", Equal);
-        test_helper_i(T::NEGATIVE_ONE, 10, Down, "-1.0", "-0x1.000#10", Equal);
-        test_helper_i(T::NEGATIVE_ONE, 10, Up, "-1.0", "-0x1.000#10", Equal);
-        test_helper_i(T::NEGATIVE_ONE, 10, Nearest, "-1.0", "-0x1.000#10", Equal);
-        test_helper_i(T::NEGATIVE_ONE, 10, Exact, "-1.0", "-0x1.000#10", Equal);
+        test_helper_i(T::NEGATIVE_ONE, 10, Floor, "-1.0000", "-0x1.000#10", Equal);
+        test_helper_i(
+            T::NEGATIVE_ONE,
+            10,
+            Ceiling,
+            "-1.0000",
+            "-0x1.000#10",
+            Equal,
+        );
+        test_helper_i(T::NEGATIVE_ONE, 10, Down, "-1.0000", "-0x1.000#10", Equal);
+        test_helper_i(T::NEGATIVE_ONE, 10, Up, "-1.0000", "-0x1.000#10", Equal);
+        test_helper_i(
+            T::NEGATIVE_ONE,
+            10,
+            Nearest,
+            "-1.0000",
+            "-0x1.000#10",
+            Equal,
+        );
+        test_helper_i(T::NEGATIVE_ONE, 10, Exact, "-1.0000", "-0x1.000#10", Equal);
 
-        test_helper_i(T::NEGATIVE_ONE, 20, Floor, "-1.0", "-0x1.00000#20", Equal);
-        test_helper_i(T::NEGATIVE_ONE, 20, Ceiling, "-1.0", "-0x1.00000#20", Equal);
-        test_helper_i(T::NEGATIVE_ONE, 20, Down, "-1.0", "-0x1.00000#20", Equal);
-        test_helper_i(T::NEGATIVE_ONE, 20, Up, "-1.0", "-0x1.00000#20", Equal);
-        test_helper_i(T::NEGATIVE_ONE, 20, Nearest, "-1.0", "-0x1.00000#20", Equal);
-        test_helper_i(T::NEGATIVE_ONE, 20, Exact, "-1.0", "-0x1.00000#20", Equal);
+        test_helper_i(
+            T::NEGATIVE_ONE,
+            20,
+            Floor,
+            "-1.0000000",
+            "-0x1.00000#20",
+            Equal,
+        );
+        test_helper_i(
+            T::NEGATIVE_ONE,
+            20,
+            Ceiling,
+            "-1.0000000",
+            "-0x1.00000#20",
+            Equal,
+        );
+        test_helper_i(
+            T::NEGATIVE_ONE,
+            20,
+            Down,
+            "-1.0000000",
+            "-0x1.00000#20",
+            Equal,
+        );
+        test_helper_i(
+            T::NEGATIVE_ONE,
+            20,
+            Up,
+            "-1.0000000",
+            "-0x1.00000#20",
+            Equal,
+        );
+        test_helper_i(
+            T::NEGATIVE_ONE,
+            20,
+            Nearest,
+            "-1.0000000",
+            "-0x1.00000#20",
+            Equal,
+        );
+        test_helper_i(
+            T::NEGATIVE_ONE,
+            20,
+            Exact,
+            "-1.0000000",
+            "-0x1.00000#20",
+            Equal,
+        );
 
-        test_helper_i(T::from(-123i8), 1, Floor, "-1.0e2", "-0x8.0E+1#1", Less);
+        test_helper_i(T::from(-123i8), 1, Floor, "-1.3e2", "-0x8.0E+1#1", Less);
+        test_helper_i(T::from(-123i8), 1, Ceiling, "-64.0", "-0x4.0E+1#1", Greater);
+        test_helper_i(T::from(-123i8), 1, Down, "-64.0", "-0x4.0E+1#1", Greater);
+        test_helper_i(T::from(-123i8), 1, Up, "-1.3e2", "-0x8.0E+1#1", Less);
+        test_helper_i(T::from(-123i8), 1, Nearest, "-1.3e2", "-0x8.0E+1#1", Less);
+
+        test_helper_i(T::from(-123i8), 10, Floor, "-123.00", "-0x7b.0#10", Equal);
+        test_helper_i(T::from(-123i8), 10, Ceiling, "-123.00", "-0x7b.0#10", Equal);
+        test_helper_i(T::from(-123i8), 10, Down, "-123.00", "-0x7b.0#10", Equal);
+        test_helper_i(T::from(-123i8), 10, Up, "-123.00", "-0x7b.0#10", Equal);
+        test_helper_i(T::from(-123i8), 10, Nearest, "-123.00", "-0x7b.0#10", Equal);
+        test_helper_i(T::from(-123i8), 10, Exact, "-123.00", "-0x7b.0#10", Equal);
+
         test_helper_i(
             T::from(-123i8),
-            1,
-            Ceiling,
-            "-6.0e1",
-            "-0x4.0E+1#1",
-            Greater,
+            20,
+            Floor,
+            "-123.00000",
+            "-0x7b.0000#20",
+            Equal,
         );
-        test_helper_i(T::from(-123i8), 1, Down, "-6.0e1", "-0x4.0E+1#1", Greater);
-        test_helper_i(T::from(-123i8), 1, Up, "-1.0e2", "-0x8.0E+1#1", Less);
-        test_helper_i(T::from(-123i8), 1, Nearest, "-1.0e2", "-0x8.0E+1#1", Less);
-
-        test_helper_i(T::from(-123i8), 10, Floor, "-123.0", "-0x7b.0#10", Equal);
-        test_helper_i(T::from(-123i8), 10, Ceiling, "-123.0", "-0x7b.0#10", Equal);
-        test_helper_i(T::from(-123i8), 10, Down, "-123.0", "-0x7b.0#10", Equal);
-        test_helper_i(T::from(-123i8), 10, Up, "-123.0", "-0x7b.0#10", Equal);
-        test_helper_i(T::from(-123i8), 10, Nearest, "-123.0", "-0x7b.0#10", Equal);
-        test_helper_i(T::from(-123i8), 10, Exact, "-123.0", "-0x7b.0#10", Equal);
-
-        test_helper_i(T::from(-123i8), 20, Floor, "-123.0", "-0x7b.0000#20", Equal);
         test_helper_i(
             T::from(-123i8),
             20,
             Ceiling,
-            "-123.0",
+            "-123.00000",
             "-0x7b.0000#20",
             Equal,
         );
-        test_helper_i(T::from(-123i8), 20, Down, "-123.0", "-0x7b.0000#20", Equal);
-        test_helper_i(T::from(-123i8), 20, Up, "-123.0", "-0x7b.0000#20", Equal);
+        test_helper_i(
+            T::from(-123i8),
+            20,
+            Down,
+            "-123.00000",
+            "-0x7b.0000#20",
+            Equal,
+        );
+        test_helper_i(
+            T::from(-123i8),
+            20,
+            Up,
+            "-123.00000",
+            "-0x7b.0000#20",
+            Equal,
+        );
         test_helper_i(
             T::from(-123i8),
             20,
             Nearest,
-            "-123.0",
+            "-123.00000",
             "-0x7b.0000#20",
             Equal,
         );
-        test_helper_i(T::from(-123i8), 20, Exact, "-123.0", "-0x7b.0000#20", Equal);
+        test_helper_i(
+            T::from(-123i8),
+            20,
+            Exact,
+            "-123.00000",
+            "-0x7b.0000#20",
+            Equal,
+        );
     }
     apply_fn_to_signeds!(test_helper_i2);
-    test_helper_i(1000000000000i64, 1, Floor, "5.0e11", "0x8.0E+9#1", Less);
+    test_helper_i(1000000000000i64, 1, Floor, "5.5e11", "0x8.0E+9#1", Less);
     test_helper_i(
         1000000000000i64,
         1,
         Ceiling,
-        "1.0e12",
+        "1.1e12",
         "0x1.0E+10#1",
         Greater,
     );
-    test_helper_i(1000000000000i64, 1, Down, "5.0e11", "0x8.0E+9#1", Less);
-    test_helper_i(1000000000000i64, 1, Up, "1.0e12", "0x1.0E+10#1", Greater);
+    test_helper_i(1000000000000i64, 1, Down, "5.5e11", "0x8.0E+9#1", Less);
+    test_helper_i(1000000000000i64, 1, Up, "1.1e12", "0x1.0E+10#1", Greater);
     test_helper_i(
         1000000000000i64,
         1,
         Nearest,
-        "1.0e12",
+        "1.1e12",
         "0x1.0E+10#1",
         Greater,
     );
@@ -590,7 +737,7 @@ fn test_from_primitive_int_prec_round() {
         1000000000000i64,
         10,
         Floor,
-        "9.997e11",
+        "9.9965e11",
         "0xe.8cE+9#10",
         Less,
     );
@@ -598,16 +745,23 @@ fn test_from_primitive_int_prec_round() {
         1000000000000i64,
         10,
         Ceiling,
-        "1.001e12",
+        "1.0007e12",
         "0xe.90E+9#10",
         Greater,
     );
-    test_helper_i(1000000000000i64, 10, Down, "9.997e11", "0xe.8cE+9#10", Less);
+    test_helper_i(
+        1000000000000i64,
+        10,
+        Down,
+        "9.9965e11",
+        "0xe.8cE+9#10",
+        Less,
+    );
     test_helper_i(
         1000000000000i64,
         10,
         Up,
-        "1.001e12",
+        "1.0007e12",
         "0xe.90E+9#10",
         Greater,
     );
@@ -615,7 +769,7 @@ fn test_from_primitive_int_prec_round() {
         1000000000000i64,
         10,
         Nearest,
-        "9.997e11",
+        "9.9965e11",
         "0xe.8cE+9#10",
         Less,
     );
@@ -624,7 +778,7 @@ fn test_from_primitive_int_prec_round() {
         1000000000000i64,
         20,
         Floor,
-        "9.999997e11",
+        "9.9999967e11",
         "0xe.8d4aE+9#20",
         Less,
     );
@@ -632,7 +786,7 @@ fn test_from_primitive_int_prec_round() {
         1000000000000i64,
         20,
         Ceiling,
-        "1.000001e12",
+        "1.0000007e12",
         "0xe.8d4bE+9#20",
         Greater,
     );
@@ -640,7 +794,7 @@ fn test_from_primitive_int_prec_round() {
         1000000000000i64,
         20,
         Down,
-        "9.999997e11",
+        "9.9999967e11",
         "0xe.8d4aE+9#20",
         Less,
     );
@@ -648,7 +802,7 @@ fn test_from_primitive_int_prec_round() {
         1000000000000i64,
         20,
         Up,
-        "1.000001e12",
+        "1.0000007e12",
         "0xe.8d4bE+9#20",
         Greater,
     );
@@ -656,16 +810,16 @@ fn test_from_primitive_int_prec_round() {
         1000000000000i64,
         20,
         Nearest,
-        "9.999997e11",
+        "9.9999967e11",
         "0xe.8d4aE+9#20",
         Less,
     );
-    test_helper_i(-1000000000000i64, 1, Floor, "-1.0e12", "-0x1.0E+10#1", Less);
+    test_helper_i(-1000000000000i64, 1, Floor, "-1.1e12", "-0x1.0E+10#1", Less);
     test_helper_i(
         -1000000000000i64,
         1,
         Ceiling,
-        "-5.0e11",
+        "-5.5e11",
         "-0x8.0E+9#1",
         Greater,
     );
@@ -673,16 +827,16 @@ fn test_from_primitive_int_prec_round() {
         -1000000000000i64,
         1,
         Down,
-        "-5.0e11",
+        "-5.5e11",
         "-0x8.0E+9#1",
         Greater,
     );
-    test_helper_i(-1000000000000i64, 1, Up, "-1.0e12", "-0x1.0E+10#1", Less);
+    test_helper_i(-1000000000000i64, 1, Up, "-1.1e12", "-0x1.0E+10#1", Less);
     test_helper_i(
         -1000000000000i64,
         1,
         Nearest,
-        "-1.0e12",
+        "-1.1e12",
         "-0x1.0E+10#1",
         Less,
     );
@@ -691,7 +845,7 @@ fn test_from_primitive_int_prec_round() {
         -1000000000000i64,
         10,
         Floor,
-        "-1.001e12",
+        "-1.0007e12",
         "-0xe.90E+9#10",
         Less,
     );
@@ -699,7 +853,7 @@ fn test_from_primitive_int_prec_round() {
         -1000000000000i64,
         10,
         Ceiling,
-        "-9.997e11",
+        "-9.9965e11",
         "-0xe.8cE+9#10",
         Greater,
     );
@@ -707,7 +861,7 @@ fn test_from_primitive_int_prec_round() {
         -1000000000000i64,
         10,
         Down,
-        "-9.997e11",
+        "-9.9965e11",
         "-0xe.8cE+9#10",
         Greater,
     );
@@ -715,7 +869,7 @@ fn test_from_primitive_int_prec_round() {
         -1000000000000i64,
         10,
         Up,
-        "-1.001e12",
+        "-1.0007e12",
         "-0xe.90E+9#10",
         Less,
     );
@@ -723,7 +877,7 @@ fn test_from_primitive_int_prec_round() {
         -1000000000000i64,
         10,
         Nearest,
-        "-9.997e11",
+        "-9.9965e11",
         "-0xe.8cE+9#10",
         Greater,
     );
@@ -732,7 +886,7 @@ fn test_from_primitive_int_prec_round() {
         -1000000000000i64,
         20,
         Floor,
-        "-1.000001e12",
+        "-1.0000007e12",
         "-0xe.8d4bE+9#20",
         Less,
     );
@@ -740,7 +894,7 @@ fn test_from_primitive_int_prec_round() {
         -1000000000000i64,
         20,
         Ceiling,
-        "-9.999997e11",
+        "-9.9999967e11",
         "-0xe.8d4aE+9#20",
         Greater,
     );
@@ -748,7 +902,7 @@ fn test_from_primitive_int_prec_round() {
         -1000000000000i64,
         20,
         Down,
-        "-9.999997e11",
+        "-9.9999967e11",
         "-0xe.8d4aE+9#20",
         Greater,
     );
@@ -756,7 +910,7 @@ fn test_from_primitive_int_prec_round() {
         -1000000000000i64,
         20,
         Up,
-        "-1.000001e12",
+        "-1.0000007e12",
         "-0xe.8d4bE+9#20",
         Less,
     );
@@ -764,7 +918,7 @@ fn test_from_primitive_int_prec_round() {
         -1000000000000i64,
         20,
         Nearest,
-        "-9.999997e11",
+        "-9.9999967e11",
         "-0xe.8d4aE+9#20",
         Greater,
     );
@@ -809,15 +963,15 @@ fn test_const_from_unsigned_times_power_of_2() {
     test_helper(0, -10, "0.0", "0x0.0");
     test_helper(1, 0, "1.0", "0x1.0#1");
     test_helper(1, 10, "1.0e3", "0x4.0E+2#1");
-    test_helper(1, -10, "0.001", "0x0.004#1");
-    test_helper(1, 1073741822, "too_big", "0x4.0E+268435455#1");
-    test_helper(1, -1073741824, "too_small", "0x1.0E-268435456#1");
+    test_helper(1, -10, "0.00098", "0x0.004#1");
+    test_helper(1, 1073741822, "1.0e323228496", "0x4.0E+268435455#1");
+    test_helper(1, -1073741824, "2.4e-323228497", "0x1.0E-268435456#1");
     #[cfg(not(feature = "32_bit_limbs"))]
     {
         test_helper(
             884279719003555,
             -48,
-            "3.141592653589793",
+            "3.1415926535897931",
             "0x3.243f6a8885a3#50",
         );
     }
@@ -842,24 +996,24 @@ fn test_const_from_signed_times_power_of_2() {
     test_helper(0, -10, "0.0", "0x0.0");
     test_helper(1, 0, "1.0", "0x1.0#1");
     test_helper(1, 10, "1.0e3", "0x4.0E+2#1");
-    test_helper(1, -10, "0.001", "0x0.004#1");
+    test_helper(1, -10, "0.00098", "0x0.004#1");
     test_helper(-1, 0, "-1.0", "-0x1.0#1");
     test_helper(-1, 10, "-1.0e3", "-0x4.0E+2#1");
-    test_helper(-1, -10, "-0.001", "-0x0.004#1");
-    test_helper(1, 1073741822, "too_big", "0x4.0E+268435455#1");
-    test_helper(1, -1073741824, "too_small", "0x1.0E-268435456#1");
+    test_helper(-1, -10, "-0.00098", "-0x0.004#1");
+    test_helper(1, 1073741822, "1.0e323228496", "0x4.0E+268435455#1");
+    test_helper(1, -1073741824, "2.4e-323228497", "0x1.0E-268435456#1");
     #[cfg(not(feature = "32_bit_limbs"))]
     {
         test_helper(
             884279719003555,
             -48,
-            "3.141592653589793",
+            "3.1415926535897931",
             "0x3.243f6a8885a3#50",
         );
         test_helper(
             -884279719003555,
             -48,
-            "-3.141592653589793",
+            "-3.1415926535897931",
             "-0x3.243f6a8885a3#50",
         );
     }

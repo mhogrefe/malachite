@@ -64,13 +64,13 @@ impl Float {
     /// );
     /// assert_eq!(
     ///     Float::const_from_unsigned_times_power_of_2(123, -1).to_string(),
-    ///     "61.5"
+    ///     "61.50"
     /// );
     /// #[cfg(not(feature = "32_bit_limbs"))]
     /// {
     ///     assert_eq!(
     ///         Float::const_from_unsigned_times_power_of_2(884279719003555, -48).to_string(),
-    ///         "3.141592653589793"
+    ///         "3.1415926535897931"
     ///     );
     /// }
     /// ```
@@ -159,7 +159,7 @@ impl Float {
     /// );
     /// assert_eq!(
     ///     Float::const_from_signed_times_power_of_2(123, -1).to_string(),
-    ///     "61.5"
+    ///     "61.50"
     /// );
     /// assert_eq!(
     ///     Float::const_from_signed_times_power_of_2(-123, 0).to_string(),
@@ -171,17 +171,17 @@ impl Float {
     /// );
     /// assert_eq!(
     ///     Float::const_from_signed_times_power_of_2(-123, -1).to_string(),
-    ///     "-61.5"
+    ///     "-61.50"
     /// );
     /// #[cfg(not(feature = "32_bit_limbs"))]
     /// {
     ///     assert_eq!(
     ///         Float::const_from_signed_times_power_of_2(884279719003555, -48).to_string(),
-    ///         "3.141592653589793"
+    ///         "3.1415926535897931"
     ///     );
     ///     assert_eq!(
     ///         Float::const_from_signed_times_power_of_2(-884279719003555, -48).to_string(),
-    ///         "-3.141592653589793"
+    ///         "-3.1415926535897931"
     ///     );
     /// }
     /// ```

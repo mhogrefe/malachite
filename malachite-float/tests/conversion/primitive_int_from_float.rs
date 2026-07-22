@@ -61,7 +61,7 @@ fn test_try_from_float() {
 
         test_helper_u::<T>("1.0", "0x1.0#1", "Ok(1)");
         test_helper_u::<T>("2.0", "0x2.0#1", "Ok(2)");
-        test_helper_u::<T>("0.5", "0x0.8#1", "Err(FloatNonIntegerOrOutOfRange)");
+        test_helper_u::<T>("0.50", "0x0.8#1", "Err(FloatNonIntegerOrOutOfRange)");
         test_helper_u::<T>(
             "0.33333333333333331",
             "0x0.55555555555554#53",
@@ -69,19 +69,19 @@ fn test_try_from_float() {
         );
         test_helper_u::<T>("123.0", "0x7b.0#7", "Ok(123)");
         test_helper_u::<T>(
-            "too_big",
+            "1.0e323228496",
             "0x4.0E+268435455#1",
             "Err(FloatNonIntegerOrOutOfRange)",
         );
         test_helper_u::<T>(
-            "too_small",
+            "2.4e-323228497",
             "0x1.0E-268435456#1",
             "Err(FloatNonIntegerOrOutOfRange)",
         );
 
         test_helper_u::<T>("-1.0", "-0x1.0#1", "Err(FloatNegative)");
         test_helper_u::<T>("-2.0", "-0x2.0#1", "Err(FloatNegative)");
-        test_helper_u::<T>("-0.5", "-0x0.8#1", "Err(FloatNegative)");
+        test_helper_u::<T>("-0.50", "-0x0.8#1", "Err(FloatNegative)");
         test_helper_u::<T>(
             "-0.33333333333333331",
             "-0x0.55555555555554#53",
@@ -93,8 +93,16 @@ fn test_try_from_float() {
             "-0xe8d4a51000.0#40",
             "Err(FloatNegative)",
         );
-        test_helper_u::<T>("-too_big", "-0x4.0E+268435455#1", "Err(FloatNegative)");
-        test_helper_u::<T>("-too_small", "-0x1.0E-268435456#1", "Err(FloatNegative)");
+        test_helper_u::<T>(
+            "-1.0e323228496",
+            "-0x4.0E+268435455#1",
+            "Err(FloatNegative)",
+        );
+        test_helper_u::<T>(
+            "-2.4e-323228497",
+            "-0x1.0E-268435456#1",
+            "Err(FloatNegative)",
+        );
     }
     apply_fn_to_unsigneds!(test_helper_u2);
     test_helper_u::<u64>("1000000000000.0", "0xe8d4a51000.0#40", "Ok(1000000000000)");
@@ -127,7 +135,7 @@ fn test_try_from_float() {
 
         test_helper_i::<T>("1.0", "0x1.0#1", "Ok(1)");
         test_helper_i::<T>("2.0", "0x2.0#1", "Ok(2)");
-        test_helper_i::<T>("0.5", "0x0.8#1", "Err(FloatNonIntegerOrOutOfRange)");
+        test_helper_i::<T>("0.50", "0x0.8#1", "Err(FloatNonIntegerOrOutOfRange)");
         test_helper_i::<T>(
             "0.33333333333333331",
             "0x0.55555555555554#53",
@@ -135,19 +143,19 @@ fn test_try_from_float() {
         );
         test_helper_i::<T>("123.0", "0x7b.0#7", "Ok(123)");
         test_helper_i::<T>(
-            "too_big",
+            "1.0e323228496",
             "0x4.0E+268435455#1",
             "Err(FloatNonIntegerOrOutOfRange)",
         );
         test_helper_i::<T>(
-            "too_small",
+            "2.4e-323228497",
             "0x1.0E-268435456#1",
             "Err(FloatNonIntegerOrOutOfRange)",
         );
 
         test_helper_i::<T>("-1.0", "-0x1.0#1", "Ok(-1)");
         test_helper_i::<T>("-2.0", "-0x2.0#1", "Ok(-2)");
-        test_helper_i::<T>("-0.5", "-0x0.8#1", "Err(FloatNonIntegerOrOutOfRange)");
+        test_helper_i::<T>("-0.50", "-0x0.8#1", "Err(FloatNonIntegerOrOutOfRange)");
         test_helper_i::<T>(
             "-0.33333333333333331",
             "-0x0.55555555555554#53",
@@ -155,12 +163,12 @@ fn test_try_from_float() {
         );
         test_helper_i::<T>("-123.0", "-0x7b.0#7", "Ok(-123)");
         test_helper_i::<T>(
-            "-too_big",
+            "-1.0e323228496",
             "-0x4.0E+268435455#1",
             "Err(FloatNonIntegerOrOutOfRange)",
         );
         test_helper_i::<T>(
-            "-too_small",
+            "-2.4e-323228497",
             "-0x1.0E-268435456#1",
             "Err(FloatNonIntegerOrOutOfRange)",
         );
@@ -199,20 +207,20 @@ fn test_convertible_from_float() {
 
         test_helper::<T>("1.0", "0x1.0#1", true);
         test_helper::<T>("2.0", "0x2.0#1", true);
-        test_helper::<T>("0.5", "0x0.8#1", false);
+        test_helper::<T>("0.50", "0x0.8#1", false);
         test_helper::<T>("0.33333333333333331", "0x0.55555555555554#53", false);
         test_helper::<T>("123.0", "0x7b.0#7", true);
-        test_helper::<T>("too_big", "0x4.0E+268435455#1", false);
-        test_helper::<T>("too_small", "0x1.0E-268435456#1", false);
+        test_helper::<T>("1.0e323228496", "0x4.0E+268435455#1", false);
+        test_helper::<T>("2.4e-323228497", "0x1.0E-268435456#1", false);
 
         test_helper::<T>("-1.0", "-0x1.0#1", false);
         test_helper::<T>("-2.0", "-0x2.0#1", false);
-        test_helper::<T>("-0.5", "-0x0.8#1", false);
+        test_helper::<T>("-0.50", "-0x0.8#1", false);
         test_helper::<T>("-0.33333333333333331", "-0x0.55555555555554#53", false);
         test_helper::<T>("-123.0", "-0x7b.0#7", false);
         test_helper::<T>("-1000000000000.0", "-0xe8d4a51000.0#40", false);
-        test_helper::<T>("-too_big", "-0x4.0E+268435455#1", false);
-        test_helper::<T>("-too_small", "-0x1.0E-268435456#1", false);
+        test_helper::<T>("-1.0e323228496", "-0x4.0E+268435455#1", false);
+        test_helper::<T>("-2.4e-323228497", "-0x1.0E-268435456#1", false);
     }
     apply_fn_to_unsigneds!(test_helper_u);
     test_helper::<u64>("1000000000000.0", "0xe8d4a51000.0#40", true);
@@ -230,19 +238,19 @@ fn test_convertible_from_float() {
 
         test_helper::<T>("1.0", "0x1.0#1", true);
         test_helper::<T>("2.0", "0x2.0#1", true);
-        test_helper::<T>("0.5", "0x0.8#1", false);
+        test_helper::<T>("0.50", "0x0.8#1", false);
         test_helper::<T>("0.33333333333333331", "0x0.55555555555554#53", false);
         test_helper::<T>("123.0", "0x7b.0#7", true);
-        test_helper::<T>("too_big", "0x4.0E+268435455#1", false);
-        test_helper::<T>("too_small", "0x1.0E-268435456#1", false);
+        test_helper::<T>("1.0e323228496", "0x4.0E+268435455#1", false);
+        test_helper::<T>("2.4e-323228497", "0x1.0E-268435456#1", false);
 
         test_helper::<T>("-1.0", "-0x1.0#1", true);
         test_helper::<T>("-2.0", "-0x2.0#1", true);
-        test_helper::<T>("-0.5", "-0x0.8#1", false);
+        test_helper::<T>("-0.50", "-0x0.8#1", false);
         test_helper::<T>("-0.33333333333333331", "-0x0.55555555555554#53", false);
         test_helper::<T>("-123.0", "-0x7b.0#7", true);
-        test_helper::<T>("-too_big", "-0x4.0E+268435455#1", false);
-        test_helper::<T>("-too_small", "-0x1.0E-268435456#1", false);
+        test_helper::<T>("-1.0e323228496", "-0x4.0E+268435455#1", false);
+        test_helper::<T>("-2.4e-323228497", "-0x1.0E-268435456#1", false);
     }
     apply_fn_to_signeds!(test_helper_i);
     test_helper::<i64>("1000000000000.0", "0xe8d4a51000.0#40", true);
@@ -309,11 +317,11 @@ fn test_rounding_from_float() {
         test_helper::<T>("2.0", "0x2.0#1", Nearest, "2", Equal);
         test_helper::<T>("2.0", "0x2.0#1", Exact, "2", Equal);
 
-        test_helper::<T>("0.5", "0x0.8#1", Floor, "0", Less);
-        test_helper::<T>("0.5", "0x0.8#1", Ceiling, "1", Greater);
-        test_helper::<T>("0.5", "0x0.8#1", Down, "0", Less);
-        test_helper::<T>("0.5", "0x0.8#1", Up, "1", Greater);
-        test_helper::<T>("0.5", "0x0.8#1", Nearest, "0", Less);
+        test_helper::<T>("0.50", "0x0.8#1", Floor, "0", Less);
+        test_helper::<T>("0.50", "0x0.8#1", Ceiling, "1", Greater);
+        test_helper::<T>("0.50", "0x0.8#1", Down, "0", Less);
+        test_helper::<T>("0.50", "0x0.8#1", Up, "1", Greater);
+        test_helper::<T>("0.50", "0x0.8#1", Nearest, "0", Less);
 
         test_helper::<T>(
             "0.33333333333333331",
@@ -352,35 +360,35 @@ fn test_rounding_from_float() {
         );
 
         test_helper::<T>(
-            "0.6666666666666666",
+            "0.66666666666666663",
             "0x0.aaaaaaaaaaaaa8#53",
             Floor,
             "0",
             Less,
         );
         test_helper::<T>(
-            "0.6666666666666666",
+            "0.66666666666666663",
             "0x0.aaaaaaaaaaaaa8#53",
             Ceiling,
             "1",
             Greater,
         );
         test_helper::<T>(
-            "0.6666666666666666",
+            "0.66666666666666663",
             "0x0.aaaaaaaaaaaaa8#53",
             Down,
             "0",
             Less,
         );
         test_helper::<T>(
-            "0.6666666666666666",
+            "0.66666666666666663",
             "0x0.aaaaaaaaaaaaa8#53",
             Up,
             "1",
             Greater,
         );
         test_helper::<T>(
-            "0.6666666666666666",
+            "0.66666666666666663",
             "0x0.aaaaaaaaaaaaa8#53",
             Nearest,
             "1",
@@ -406,11 +414,17 @@ fn test_rounding_from_float() {
         test_helper::<T>("123.0", "0x7b.0#7", Nearest, "123", Equal);
         test_helper::<T>("123.0", "0x7b.0#7", Exact, "123", Equal);
 
-        test_helper::<T>("too_small", "0x1.0E-268435456#1", Floor, "0", Less);
-        test_helper::<T>("too_small", "0x1.0E-268435456#1", Ceiling, "1", Greater);
-        test_helper::<T>("too_small", "0x1.0E-268435456#1", Down, "0", Less);
-        test_helper::<T>("too_small", "0x1.0E-268435456#1", Up, "1", Greater);
-        test_helper::<T>("too_small", "0x1.0E-268435456#1", Nearest, "0", Less);
+        test_helper::<T>("2.4e-323228497", "0x1.0E-268435456#1", Floor, "0", Less);
+        test_helper::<T>(
+            "2.4e-323228497",
+            "0x1.0E-268435456#1",
+            Ceiling,
+            "1",
+            Greater,
+        );
+        test_helper::<T>("2.4e-323228497", "0x1.0E-268435456#1", Down, "0", Less);
+        test_helper::<T>("2.4e-323228497", "0x1.0E-268435456#1", Up, "1", Greater);
+        test_helper::<T>("2.4e-323228497", "0x1.0E-268435456#1", Nearest, "0", Less);
 
         test_helper::<T>("-1.0", "-0x1.0#1", Ceiling, "0", Greater);
         test_helper::<T>("-1.0", "-0x1.0#1", Down, "0", Greater);
@@ -420,9 +434,9 @@ fn test_rounding_from_float() {
         test_helper::<T>("-2.0", "-0x2.0#1", Down, "0", Greater);
         test_helper::<T>("-2.0", "-0x2.0#1", Nearest, "0", Greater);
 
-        test_helper::<T>("-0.5", "-0x0.8#1", Ceiling, "0", Greater);
-        test_helper::<T>("-0.5", "-0x0.8#1", Down, "0", Greater);
-        test_helper::<T>("-0.5", "-0x0.8#1", Nearest, "0", Greater);
+        test_helper::<T>("-0.50", "-0x0.8#1", Ceiling, "0", Greater);
+        test_helper::<T>("-0.50", "-0x0.8#1", Down, "0", Greater);
+        test_helper::<T>("-0.50", "-0x0.8#1", Nearest, "0", Greater);
 
         test_helper::<T>(
             "-0.33333333333333331",
@@ -447,21 +461,21 @@ fn test_rounding_from_float() {
         );
 
         test_helper::<T>(
-            "-0.6666666666666666",
+            "-0.66666666666666663",
             "-0x0.aaaaaaaaaaaaa8#53",
             Ceiling,
             "0",
             Greater,
         );
         test_helper::<T>(
-            "-0.6666666666666666",
+            "-0.66666666666666663",
             "-0x0.aaaaaaaaaaaaa8#53",
             Down,
             "0",
             Greater,
         );
         test_helper::<T>(
-            "-0.6666666666666666",
+            "-0.66666666666666663",
             "-0x0.aaaaaaaaaaaaa8#53",
             Nearest,
             "0",
@@ -480,18 +494,42 @@ fn test_rounding_from_float() {
         test_helper::<T>("-123.0", "-0x7b.0#7", Down, "0", Greater);
         test_helper::<T>("-123.0", "-0x7b.0#7", Nearest, "0", Greater);
 
-        test_helper::<T>("-too_big", "-0x4.0E+268435455#1", Ceiling, "0", Greater);
-        test_helper::<T>("-too_big", "-0x4.0E+268435455#1", Down, "0", Greater);
-        test_helper::<T>("-too_big", "-0x4.0E+268435455#1", Nearest, "0", Greater);
+        test_helper::<T>(
+            "-1.0e323228496",
+            "-0x4.0E+268435455#1",
+            Ceiling,
+            "0",
+            Greater,
+        );
+        test_helper::<T>("-1.0e323228496", "-0x4.0E+268435455#1", Down, "0", Greater);
+        test_helper::<T>(
+            "-1.0e323228496",
+            "-0x4.0E+268435455#1",
+            Nearest,
+            "0",
+            Greater,
+        );
 
-        test_helper::<T>("-too_small", "-0x1.0E-268435456#1", Ceiling, "0", Greater);
-        test_helper::<T>("-too_small", "-0x1.0E-268435456#1", Down, "0", Greater);
-        test_helper::<T>("-too_small", "-0x1.0E-268435456#1", Nearest, "0", Greater);
+        test_helper::<T>(
+            "-2.4e-323228497",
+            "-0x1.0E-268435456#1",
+            Ceiling,
+            "0",
+            Greater,
+        );
+        test_helper::<T>("-2.4e-323228497", "-0x1.0E-268435456#1", Down, "0", Greater);
+        test_helper::<T>(
+            "-2.4e-323228497",
+            "-0x1.0E-268435456#1",
+            Nearest,
+            "0",
+            Greater,
+        );
     }
     apply_fn_to_unsigneds!(test_helper_u);
-    test_helper::<u8>("too_big", "0x4.0E+268435455#1", Floor, "255", Less);
-    test_helper::<u8>("too_big", "0x4.0E+268435455#1", Down, "255", Less);
-    test_helper::<u8>("too_big", "0x4.0E+268435455#1", Nearest, "255", Less);
+    test_helper::<u8>("1.0e323228496", "0x4.0E+268435455#1", Floor, "255", Less);
+    test_helper::<u8>("1.0e323228496", "0x4.0E+268435455#1", Down, "255", Less);
+    test_helper::<u8>("1.0e323228496", "0x4.0E+268435455#1", Nearest, "255", Less);
 
     #[allow(clippy::type_repetition_in_bounds)]
     fn test_helper_i<T: PrimitiveSigned + RoundingFrom<Float>>()
@@ -526,11 +564,11 @@ fn test_rounding_from_float() {
         test_helper::<T>("2.0", "0x2.0#1", Nearest, "2", Equal);
         test_helper::<T>("2.0", "0x2.0#1", Exact, "2", Equal);
 
-        test_helper::<T>("0.5", "0x0.8#1", Floor, "0", Less);
-        test_helper::<T>("0.5", "0x0.8#1", Ceiling, "1", Greater);
-        test_helper::<T>("0.5", "0x0.8#1", Down, "0", Less);
-        test_helper::<T>("0.5", "0x0.8#1", Up, "1", Greater);
-        test_helper::<T>("0.5", "0x0.8#1", Nearest, "0", Less);
+        test_helper::<T>("0.50", "0x0.8#1", Floor, "0", Less);
+        test_helper::<T>("0.50", "0x0.8#1", Ceiling, "1", Greater);
+        test_helper::<T>("0.50", "0x0.8#1", Down, "0", Less);
+        test_helper::<T>("0.50", "0x0.8#1", Up, "1", Greater);
+        test_helper::<T>("0.50", "0x0.8#1", Nearest, "0", Less);
 
         test_helper::<T>(
             "0.33333333333333331",
@@ -569,35 +607,35 @@ fn test_rounding_from_float() {
         );
 
         test_helper::<T>(
-            "0.6666666666666666",
+            "0.66666666666666663",
             "0x0.aaaaaaaaaaaaa8#53",
             Floor,
             "0",
             Less,
         );
         test_helper::<T>(
-            "0.6666666666666666",
+            "0.66666666666666663",
             "0x0.aaaaaaaaaaaaa8#53",
             Ceiling,
             "1",
             Greater,
         );
         test_helper::<T>(
-            "0.6666666666666666",
+            "0.66666666666666663",
             "0x0.aaaaaaaaaaaaa8#53",
             Down,
             "0",
             Less,
         );
         test_helper::<T>(
-            "0.6666666666666666",
+            "0.66666666666666663",
             "0x0.aaaaaaaaaaaaa8#53",
             Up,
             "1",
             Greater,
         );
         test_helper::<T>(
-            "0.6666666666666666",
+            "0.66666666666666663",
             "0x0.aaaaaaaaaaaaa8#53",
             Nearest,
             "1",
@@ -623,11 +661,17 @@ fn test_rounding_from_float() {
         test_helper::<T>("123.0", "0x7b.0#7", Nearest, "123", Equal);
         test_helper::<T>("123.0", "0x7b.0#7", Exact, "123", Equal);
 
-        test_helper::<T>("too_small", "0x1.0E-268435456#1", Floor, "0", Less);
-        test_helper::<T>("too_small", "0x1.0E-268435456#1", Ceiling, "1", Greater);
-        test_helper::<T>("too_small", "0x1.0E-268435456#1", Down, "0", Less);
-        test_helper::<T>("too_small", "0x1.0E-268435456#1", Up, "1", Greater);
-        test_helper::<T>("too_small", "0x1.0E-268435456#1", Nearest, "0", Less);
+        test_helper::<T>("2.4e-323228497", "0x1.0E-268435456#1", Floor, "0", Less);
+        test_helper::<T>(
+            "2.4e-323228497",
+            "0x1.0E-268435456#1",
+            Ceiling,
+            "1",
+            Greater,
+        );
+        test_helper::<T>("2.4e-323228497", "0x1.0E-268435456#1", Down, "0", Less);
+        test_helper::<T>("2.4e-323228497", "0x1.0E-268435456#1", Up, "1", Greater);
+        test_helper::<T>("2.4e-323228497", "0x1.0E-268435456#1", Nearest, "0", Less);
 
         test_helper::<T>("-1.0", "-0x1.0#1", Floor, "-1", Equal);
         test_helper::<T>("-1.0", "-0x1.0#1", Ceiling, "-1", Equal);
@@ -643,11 +687,11 @@ fn test_rounding_from_float() {
         test_helper::<T>("-2.0", "-0x2.0#1", Nearest, "-2", Equal);
         test_helper::<T>("-2.0", "-0x2.0#1", Exact, "-2", Equal);
 
-        test_helper::<T>("-0.5", "-0x0.8#1", Floor, "-1", Less);
-        test_helper::<T>("-0.5", "-0x0.8#1", Ceiling, "0", Greater);
-        test_helper::<T>("-0.5", "-0x0.8#1", Down, "0", Greater);
-        test_helper::<T>("-0.5", "-0x0.8#1", Up, "-1", Less);
-        test_helper::<T>("-0.5", "-0x0.8#1", Nearest, "0", Greater);
+        test_helper::<T>("-0.50", "-0x0.8#1", Floor, "-1", Less);
+        test_helper::<T>("-0.50", "-0x0.8#1", Ceiling, "0", Greater);
+        test_helper::<T>("-0.50", "-0x0.8#1", Down, "0", Greater);
+        test_helper::<T>("-0.50", "-0x0.8#1", Up, "-1", Less);
+        test_helper::<T>("-0.50", "-0x0.8#1", Nearest, "0", Greater);
 
         test_helper::<T>(
             "-0.33333333333333331",
@@ -686,35 +730,35 @@ fn test_rounding_from_float() {
         );
 
         test_helper::<T>(
-            "-0.6666666666666666",
+            "-0.66666666666666663",
             "-0x0.aaaaaaaaaaaaa8#53",
             Floor,
             "-1",
             Less,
         );
         test_helper::<T>(
-            "-0.6666666666666666",
+            "-0.66666666666666663",
             "-0x0.aaaaaaaaaaaaa8#53",
             Ceiling,
             "0",
             Greater,
         );
         test_helper::<T>(
-            "-0.6666666666666666",
+            "-0.66666666666666663",
             "-0x0.aaaaaaaaaaaaa8#53",
             Down,
             "0",
             Greater,
         );
         test_helper::<T>(
-            "-0.6666666666666666",
+            "-0.66666666666666663",
             "-0x0.aaaaaaaaaaaaa8#53",
             Up,
             "-1",
             Less,
         );
         test_helper::<T>(
-            "-0.6666666666666666",
+            "-0.66666666666666663",
             "-0x0.aaaaaaaaaaaaa8#53",
             Nearest,
             "-1",
@@ -740,20 +784,50 @@ fn test_rounding_from_float() {
         test_helper::<T>("-123.0", "-0x7b.0#7", Nearest, "-123", Equal);
         test_helper::<T>("-123.0", "-0x7b.0#7", Exact, "-123", Equal);
 
-        test_helper::<T>("-too_small", "-0x1.0E-268435456#1", Floor, "-1", Less);
-        test_helper::<T>("-too_small", "-0x1.0E-268435456#1", Ceiling, "0", Greater);
-        test_helper::<T>("-too_small", "-0x1.0E-268435456#1", Down, "0", Greater);
-        test_helper::<T>("-too_small", "-0x1.0E-268435456#1", Up, "-1", Less);
-        test_helper::<T>("-too_small", "-0x1.0E-268435456#1", Nearest, "0", Greater);
+        test_helper::<T>("-2.4e-323228497", "-0x1.0E-268435456#1", Floor, "-1", Less);
+        test_helper::<T>(
+            "-2.4e-323228497",
+            "-0x1.0E-268435456#1",
+            Ceiling,
+            "0",
+            Greater,
+        );
+        test_helper::<T>("-2.4e-323228497", "-0x1.0E-268435456#1", Down, "0", Greater);
+        test_helper::<T>("-2.4e-323228497", "-0x1.0E-268435456#1", Up, "-1", Less);
+        test_helper::<T>(
+            "-2.4e-323228497",
+            "-0x1.0E-268435456#1",
+            Nearest,
+            "0",
+            Greater,
+        );
     }
     apply_fn_to_signeds!(test_helper_i);
-    test_helper::<i8>("too_big", "0x4.0E+268435455#1", Floor, "127", Less);
-    test_helper::<i8>("too_big", "0x4.0E+268435455#1", Down, "127", Less);
-    test_helper::<i8>("too_big", "0x4.0E+268435455#1", Nearest, "127", Less);
+    test_helper::<i8>("1.0e323228496", "0x4.0E+268435455#1", Floor, "127", Less);
+    test_helper::<i8>("1.0e323228496", "0x4.0E+268435455#1", Down, "127", Less);
+    test_helper::<i8>("1.0e323228496", "0x4.0E+268435455#1", Nearest, "127", Less);
 
-    test_helper::<i8>("-too_big", "-0x4.0E+268435455#1", Ceiling, "-128", Greater);
-    test_helper::<i8>("-too_big", "-0x4.0E+268435455#1", Down, "-128", Greater);
-    test_helper::<i8>("-too_big", "-0x4.0E+268435455#1", Nearest, "-128", Greater);
+    test_helper::<i8>(
+        "-1.0e323228496",
+        "-0x4.0E+268435455#1",
+        Ceiling,
+        "-128",
+        Greater,
+    );
+    test_helper::<i8>(
+        "-1.0e323228496",
+        "-0x4.0E+268435455#1",
+        Down,
+        "-128",
+        Greater,
+    );
+    test_helper::<i8>(
+        "-1.0e323228496",
+        "-0x4.0E+268435455#1",
+        Nearest,
+        "-128",
+        Greater,
+    );
 }
 
 fn unsigned_rounding_from_float_fail_helper<T: PrimitiveUnsigned + RoundingFrom<Float>>() {

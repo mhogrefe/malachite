@@ -78,10 +78,10 @@ fn test_to_sci_string() {
     test("255.0", "0xff.0#8", default, "255.0");
     test("1000000.0", "0xf4240.0#20", default, "1000000.0");
     test("1234.5", "0x4d2.8#12", default, "1234.5");
-    test("0.5", "0x0.8#1", default, "0.5");
+    test("0.50", "0x0.8#1", default, "0.5");
     // ...but the digits may differ: Display shows the shortest string that round-trips, while these
     // are the value's actual digits. The prec-1 float 8.0e-6 is exactly 2^-17...
-    test("8.0e-6", "0x0.00008#1", default, "7.62939453125e-6");
+    test("7.6e-6", "0x0.00008#1", default, "7.62939453125e-6");
     // ...and the shortest string that round-trips this prec-53 value is "0.0012340000000000001",
     // while rounding it to 16 significant digits gives back the digits of 0.001234.
     test(
@@ -114,7 +114,7 @@ fn test_to_sci_string() {
         "1.5000",
     );
     // rounding up to a power of the base increases the exponent
-    test("9.5", "0x9.8#5", &|o| o.set_precision(1), "1.0e1");
+    test("9.50", "0x9.8#5", &|o| o.set_precision(1), "1.0e1");
 
     // scale
     test("1.5", "0x1.8#2", &|o| o.set_scale(0), "2.0");
@@ -155,9 +155,9 @@ fn test_to_sci_string() {
         "-1.0",
     );
     // values that round to 0 or to 1 in the last place
-    test("0.2", "0x0.4#1", &|o| o.set_scale(0), "0.0");
+    test("0.25", "0x0.4#1", &|o| o.set_scale(0), "0.0");
     test(
-        "0.2",
+        "0.25",
         "0x0.4#1",
         &|o| {
             o.set_scale(0);
@@ -166,14 +166,19 @@ fn test_to_sci_string() {
         "1.0",
     );
     // a tie rounds to the even option, 0
-    test("0.5", "0x0.8#1", &|o| o.set_scale(0), "0.0");
-    test("0.8", "0x0.c#2", &|o| o.set_scale(0), "1.0");
-    test("-4.928e-6", "-0x0.000052ac#13", &|o| o.set_scale(2), "-0.0");
+    test("0.50", "0x0.8#1", &|o| o.set_scale(0), "0.0");
+    test("0.75", "0x0.c#2", &|o| o.set_scale(0), "1.0");
+    test(
+        "-4.9276e-6",
+        "-0x0.000052ac#13",
+        &|o| o.set_scale(2),
+        "-0.0",
+    );
 
     // complete
     test("1.5", "0x1.8#2", &|o| o.set_size_complete(), "1.5");
     test(
-        "0.001",
+        "0.00098",
         "0x0.004#1",
         &|o| o.set_size_complete(),
         "0.0009765625",
@@ -192,7 +197,7 @@ fn test_to_sci_string() {
         },
         "FF.0",
     );
-    test("0.5", "0x0.8#1", &|o| o.set_base(16), "0.8");
+    test("0.50", "0x0.8#1", &|o| o.set_base(16), "0.8");
     // in bases 15 and up, a positive exponent always gets an explicit sign, to distinguish the
     // exponent indicator from the digit 'e'
     test(
@@ -220,7 +225,7 @@ fn test_to_sci_string() {
     // exponent indicator, as in "e.0e+2" (14 * 20^2)
     test("14.0", "0xe.0#4", &|o| o.set_base(20), "e.0");
     test(
-        "5.6e3",
+        "5600.0",
         "0x1.5eE+3#8",
         &|o| {
             o.set_base(20);
@@ -229,7 +234,7 @@ fn test_to_sci_string() {
         "e.0e+2",
     );
     test(
-        "5.6e3",
+        "5600.0",
         "0x1.5eE+3#8",
         &|o| {
             o.set_base(20);
@@ -261,9 +266,9 @@ fn test_to_sci_string() {
     );
     // base 32 is a power of 2, so any Float is exactly representable
     test("255.0", "0xff.0#8", &|o| o.set_base(32), "7v.0");
-    test("0.5", "0x0.8#1", &|o| o.set_base(32), "0.g");
+    test("0.50", "0x0.8#1", &|o| o.set_base(32), "0.g");
     test(
-        "0.001",
+        "0.00098",
         "0x0.004#1",
         &|o| {
             o.set_base(32);
@@ -283,9 +288,9 @@ fn test_to_sci_string() {
     );
     // 2^-17 is 8 * 32^-4, above the default -6 threshold in base 32 but below a -3 one (with no
     // explicit '+' on the negative exponent, even in a base above 14)
-    test("8.0e-6", "0x0.00008#1", &|o| o.set_base(32), "0.0008");
+    test("7.6e-6", "0x0.00008#1", &|o| o.set_base(32), "0.0008");
     test(
-        "8.0e-6",
+        "7.6e-6",
         "0x0.00008#1",
         &|o| {
             o.set_base(32);
@@ -305,9 +310,9 @@ fn test_to_sci_string() {
         },
         "Z.0",
     );
-    test("0.5", "0x0.8#1", &|o| o.set_base(36), "0.i");
+    test("0.50", "0x0.8#1", &|o| o.set_base(36), "0.i");
     test(
-        "0.5",
+        "0.50",
         "0x0.8#1",
         &|o| {
             o.set_base(36);
@@ -318,19 +323,19 @@ fn test_to_sci_string() {
 
     // exponent formatting
     test(
-        "8.0e-6",
+        "7.6e-6",
         "0x0.00008#1",
         &|o| o.set_e_uppercase(),
         "7.62939453125E-6",
     );
     test(
-        "8.829e30",
+        "8.8290e30",
         "0x6.f70E+25#13",
         &|o| o.set_precision(3),
         "8.83e30",
     );
     test(
-        "8.829e30",
+        "8.8290e30",
         "0x6.f70E+25#13",
         &|o| {
             o.set_precision(3);
@@ -339,7 +344,7 @@ fn test_to_sci_string() {
         "8.83e+30",
     );
     test(
-        "8.0e-6",
+        "7.6e-6",
         "0x0.00008#1",
         &|o| o.set_neg_exp_threshold(-10),
         "0.00000762939453125",
@@ -356,7 +361,7 @@ fn test_to_sci_string() {
         "1.5",
     );
     test(
-        "0.5",
+        "0.50",
         "0x0.8#1",
         &|o| {
             o.set_scale(1);
@@ -429,7 +434,7 @@ fn test_to_sci_valid() {
         true,
     );
     test(
-        "0.5",
+        "0.50",
         "0x0.8#1",
         &|o| {
             o.set_scale(0);
@@ -438,7 +443,7 @@ fn test_to_sci_valid() {
         false,
     );
     test(
-        "0.5",
+        "0.50",
         "0x0.8#1",
         &|o| {
             o.set_scale(1);
@@ -448,9 +453,9 @@ fn test_to_sci_valid() {
     );
     // Complete requires a terminating expansion: any dyadic rational terminates in an even base,
     // and only integers terminate in an odd base
-    test("0.5", "0x0.8#1", &|o| o.set_size_complete(), true);
+    test("0.50", "0x0.8#1", &|o| o.set_size_complete(), true);
     test(
-        "0.5",
+        "0.50",
         "0x0.8#1",
         &|o| {
             o.set_base(3);
@@ -469,7 +474,7 @@ fn test_to_sci_valid() {
     );
     // the same rules in bases above 16: 32 is a power of 2, 21 is odd
     test(
-        "0.5",
+        "0.50",
         "0x0.8#1",
         &|o| {
             o.set_base(32);
@@ -478,7 +483,7 @@ fn test_to_sci_valid() {
         true,
     );
     test(
-        "0.5",
+        "0.50",
         "0x0.8#1",
         &|o| {
             o.set_base(21);

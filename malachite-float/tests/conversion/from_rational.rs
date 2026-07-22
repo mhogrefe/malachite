@@ -93,32 +93,38 @@ fn test_from_rational_prec() {
     test("0", 10, "0.0", "0x0.0", Equal);
     test("0", 100, "0.0", "0x0.0", Equal);
     test("1", 1, "1.0", "0x1.0#1", Equal);
-    test("1", 10, "1.0", "0x1.000#10", Equal);
-    test("1", 100, "1.0", "0x1.0000000000000000000000000#100", Equal);
-    test("1/2", 1, "0.5", "0x0.8#1", Equal);
-    test("1/2", 10, "0.5", "0x0.800#10", Equal);
+    test("1", 10, "1.0000", "0x1.000#10", Equal);
+    test(
+        "1",
+        100,
+        "1.0000000000000000000000000000000",
+        "0x1.0000000000000000000000000#100",
+        Equal,
+    );
+    test("1/2", 1, "0.50", "0x0.8#1", Equal);
+    test("1/2", 10, "0.50000", "0x0.800#10", Equal);
     test(
         "1/2",
         100,
-        "0.5",
+        "0.50000000000000000000000000000000",
         "0x0.8000000000000000000000000#100",
         Equal,
     );
-    test("1/3", 1, "0.2", "0x0.4#1", Less);
-    test("1/3", 10, "0.3335", "0x0.556#10", Greater);
+    test("1/3", 1, "0.25", "0x0.4#1", Less);
+    test("1/3", 10, "0.33350", "0x0.556#10", Greater);
     test(
         "1/3",
         100,
-        "0.3333333333333333333333333333335",
+        "0.33333333333333333333333333333346",
         "0x0.55555555555555555555555558#100",
         Greater,
     );
     test("22/7", 1, "4.0", "0x4.0#1", Greater);
-    test("22/7", 10, "3.145", "0x3.25#10", Greater);
+    test("22/7", 10, "3.1445", "0x3.25#10", Greater);
     test(
         "22/7",
         100,
-        "3.142857142857142857142857142858",
+        "3.1428571428571428571428571428585",
         "0x3.2492492492492492492492494#100",
         Greater,
     );
@@ -172,28 +178,28 @@ fn test_from_rational_prec() {
     test_big(
         Rational::exact_from(f32::MIN_POSITIVE_SUBNORMAL),
         10,
-        "1.401e-45",
+        "1.4013e-45",
         "0x8.00E-38#10",
         Equal,
     );
     test_big(
         Rational::exact_from(f32::MIN_POSITIVE_SUBNORMAL) >> 1,
         10,
-        "7.01e-46",
+        "7.0065e-46",
         "0x4.00E-38#10",
         Equal,
     );
     test_big(
         (Rational::exact_from(f32::MIN_POSITIVE_SUBNORMAL) >> 1) + Rational::power_of_2(-1000i64),
         10,
-        "7.01e-46",
+        "7.0065e-46",
         "0x4.00E-38#10",
         Less,
     );
     test_big(
         (Rational::exact_from(f32::MIN_POSITIVE_SUBNORMAL) >> 1) - Rational::power_of_2(-1000i64),
         10,
-        "7.01e-46",
+        "7.0065e-46",
         "0x4.00E-38#10",
         Greater,
     );
@@ -201,28 +207,28 @@ fn test_from_rational_prec() {
     test_big(
         Rational::exact_from(f64::MIN_POSITIVE_SUBNORMAL),
         10,
-        "4.94e-324",
+        "4.9407e-324",
         "0x4.00E-269#10",
         Equal,
     );
     test_big(
         Rational::exact_from(f64::MIN_POSITIVE_SUBNORMAL) >> 1,
         10,
-        "2.47e-324",
+        "2.4703e-324",
         "0x2.00E-269#10",
         Equal,
     );
     test_big(
         (Rational::exact_from(f64::MIN_POSITIVE_SUBNORMAL) >> 1) + Rational::power_of_2(-2000i64),
         10,
-        "2.47e-324",
+        "2.4703e-324",
         "0x2.00E-269#10",
         Less,
     );
     test_big(
         (Rational::exact_from(f64::MIN_POSITIVE_SUBNORMAL) >> 1) - Rational::power_of_2(-2000i64),
         10,
-        "2.47e-324",
+        "2.4703e-324",
         "0x2.00E-269#10",
         Greater,
     );
@@ -230,7 +236,7 @@ fn test_from_rational_prec() {
     test_big(
         Rational::power_of_2(1000i64),
         10,
-        "1.072e301",
+        "1.0715e301",
         "0x1.000E+250#10",
         Equal,
     );
@@ -244,7 +250,7 @@ fn test_from_rational_prec() {
     test_big(
         Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
         10,
-        "too_big",
+        "1.0493e323228496",
         "0x4.00E+268435455#10",
         Equal,
     );
@@ -267,7 +273,7 @@ fn test_from_rational_prec() {
         Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
             * Rational::from_unsigneds(299u16, 200),
         1,
-        "too_big",
+        "1.0e323228496",
         "0x4.0E+268435455#1",
         Less,
     );
@@ -275,21 +281,21 @@ fn test_from_rational_prec() {
     test_big(
         Rational::power_of_2(-1000i64),
         10,
-        "9.33e-302",
+        "9.3326e-302",
         "0x1.000E-250#10",
         Equal,
     );
     test_big(
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
         10,
-        "too_small",
+        "4.7651e-323228497",
         "0x2.00E-268435456#10",
         Equal,
     );
     test_big(
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
         10,
-        "too_small",
+        "2.3826e-323228497",
         "0x1.000E-268435456#10",
         Equal,
     );
@@ -304,7 +310,7 @@ fn test_from_rational_prec() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
             * Rational::from_unsigneds(1001u16, 1000),
         10,
-        "too_small",
+        "2.3826e-323228497",
         "0x1.000E-268435456#10",
         Greater,
     );
@@ -312,7 +318,7 @@ fn test_from_rational_prec() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
             * Rational::from_unsigneds(1025u16, 1024),
         10,
-        "too_small",
+        "2.3826e-323228497",
         "0x1.000E-268435456#10",
         Greater,
     );
@@ -320,7 +326,7 @@ fn test_from_rational_prec() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
             * Rational::from_unsigneds(1024u16, 1023),
         10,
-        "too_small",
+        "2.3826e-323228497",
         "0x1.000E-268435456#10",
         Greater,
     );
@@ -328,7 +334,7 @@ fn test_from_rational_prec() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
             * Rational::from_unsigneds(1001u16, 1000),
         10,
-        "too_small",
+        "2.3826e-323228497",
         "0x1.000E-268435456#10",
         Greater,
     );
@@ -336,7 +342,7 @@ fn test_from_rational_prec() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
             * Rational::from_unsigneds(1025u16, 1024),
         10,
-        "too_small",
+        "2.3826e-323228497",
         "0x1.000E-268435456#10",
         Greater,
     );
@@ -344,21 +350,21 @@ fn test_from_rational_prec() {
     test_big(
         Rational::power_of_2(-1000i64),
         1,
-        "9.0e-302",
+        "9.3e-302",
         "0x1.0E-250#1",
         Equal,
     );
     test_big(
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
         1,
-        "too_small",
+        "4.8e-323228497",
         "0x2.0E-268435456#1",
         Equal,
     );
     test_big(
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
         1,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Equal,
     );
@@ -373,7 +379,7 @@ fn test_from_rational_prec() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
             * Rational::from_unsigneds(1001u16, 1000),
         1,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Greater,
     );
@@ -381,7 +387,7 @@ fn test_from_rational_prec() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
             * Rational::from_unsigneds(1025u16, 1024),
         1,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Greater,
     );
@@ -389,7 +395,7 @@ fn test_from_rational_prec() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
             * Rational::from_unsigneds(1024u16, 1023),
         1,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Greater,
     );
@@ -397,7 +403,7 @@ fn test_from_rational_prec() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
             * Rational::from_unsigneds(1001u16, 1000),
         1,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Greater,
     );
@@ -405,7 +411,7 @@ fn test_from_rational_prec() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
             * Rational::from_unsigneds(1025u16, 1024),
         1,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Greater,
     );
@@ -413,7 +419,7 @@ fn test_from_rational_prec() {
     test_big(
         -Rational::power_of_2(1000i64),
         10,
-        "-1.072e301",
+        "-1.0715e301",
         "-0x1.000E+250#10",
         Equal,
     );
@@ -427,7 +433,7 @@ fn test_from_rational_prec() {
     test_big(
         -Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
         10,
-        "-too_big",
+        "-1.0493e323228496",
         "-0x4.00E+268435455#10",
         Equal,
     );
@@ -451,7 +457,7 @@ fn test_from_rational_prec() {
         -Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
             * Rational::from_unsigneds(299u16, 200),
         1,
-        "-too_big",
+        "-1.0e323228496",
         "-0x4.0E+268435455#1",
         Greater,
     );
@@ -459,21 +465,21 @@ fn test_from_rational_prec() {
     test_big(
         -Rational::power_of_2(-1000i64),
         10,
-        "-9.33e-302",
+        "-9.3326e-302",
         "-0x1.000E-250#10",
         Equal,
     );
     test_big(
         -Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
         10,
-        "-too_small",
+        "-4.7651e-323228497",
         "-0x2.00E-268435456#10",
         Equal,
     );
     test_big(
         -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
         10,
-        "-too_small",
+        "-2.3826e-323228497",
         "-0x1.000E-268435456#10",
         Equal,
     );
@@ -488,7 +494,7 @@ fn test_from_rational_prec() {
         -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
             * Rational::from_unsigneds(1001u16, 1000),
         10,
-        "-too_small",
+        "-2.3826e-323228497",
         "-0x1.000E-268435456#10",
         Less,
     );
@@ -496,7 +502,7 @@ fn test_from_rational_prec() {
         -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
             * Rational::from_unsigneds(1025u16, 1024),
         10,
-        "-too_small",
+        "-2.3826e-323228497",
         "-0x1.000E-268435456#10",
         Less,
     );
@@ -504,7 +510,7 @@ fn test_from_rational_prec() {
         -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
             * Rational::from_unsigneds(1024u16, 1023),
         10,
-        "-too_small",
+        "-2.3826e-323228497",
         "-0x1.000E-268435456#10",
         Less,
     );
@@ -512,7 +518,7 @@ fn test_from_rational_prec() {
         -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
             * Rational::from_unsigneds(1001u16, 1000),
         10,
-        "-too_small",
+        "-2.3826e-323228497",
         "-0x1.000E-268435456#10",
         Less,
     );
@@ -520,7 +526,7 @@ fn test_from_rational_prec() {
         -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
             * Rational::from_unsigneds(1025u16, 1024),
         10,
-        "-too_small",
+        "-2.3826e-323228497",
         "-0x1.000E-268435456#10",
         Less,
     );
@@ -528,21 +534,21 @@ fn test_from_rational_prec() {
     test_big(
         -Rational::power_of_2(-1000i64),
         1,
-        "-9.0e-302",
+        "-9.3e-302",
         "-0x1.0E-250#1",
         Equal,
     );
     test_big(
         -Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
         1,
-        "-too_small",
+        "-4.8e-323228497",
         "-0x2.0E-268435456#1",
         Equal,
     );
     test_big(
         -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
         1,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Equal,
     );
@@ -557,7 +563,7 @@ fn test_from_rational_prec() {
         -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
             * Rational::from_unsigneds(1001u16, 1000),
         1,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Less,
     );
@@ -565,7 +571,7 @@ fn test_from_rational_prec() {
         -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
             * Rational::from_unsigneds(1025u16, 1024),
         1,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Less,
     );
@@ -573,7 +579,7 @@ fn test_from_rational_prec() {
         -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
             * Rational::from_unsigneds(1024u16, 1023),
         1,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Less,
     );
@@ -581,7 +587,7 @@ fn test_from_rational_prec() {
         -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
             * Rational::from_unsigneds(1001u16, 1000),
         1,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Less,
     );
@@ -589,7 +595,7 @@ fn test_from_rational_prec() {
         -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
             * Rational::from_unsigneds(1025u16, 1024),
         1,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Less,
     );
@@ -687,18 +693,18 @@ fn test_from_rational_prec_round() {
     test("1", 1, Nearest, "1.0", "0x1.0#1", Equal);
     test("1", 1, Exact, "1.0", "0x1.0#1", Equal);
 
-    test("1", 10, Floor, "1.0", "0x1.000#10", Equal);
-    test("1", 10, Ceiling, "1.0", "0x1.000#10", Equal);
-    test("1", 10, Down, "1.0", "0x1.000#10", Equal);
-    test("1", 10, Up, "1.0", "0x1.000#10", Equal);
-    test("1", 10, Nearest, "1.0", "0x1.000#10", Equal);
-    test("1", 10, Exact, "1.0", "0x1.000#10", Equal);
+    test("1", 10, Floor, "1.0000", "0x1.000#10", Equal);
+    test("1", 10, Ceiling, "1.0000", "0x1.000#10", Equal);
+    test("1", 10, Down, "1.0000", "0x1.000#10", Equal);
+    test("1", 10, Up, "1.0000", "0x1.000#10", Equal);
+    test("1", 10, Nearest, "1.0000", "0x1.000#10", Equal);
+    test("1", 10, Exact, "1.0000", "0x1.000#10", Equal);
 
     test(
         "1",
         100,
         Floor,
-        "1.0",
+        "1.0000000000000000000000000000000",
         "0x1.0000000000000000000000000#100",
         Equal,
     );
@@ -706,7 +712,7 @@ fn test_from_rational_prec_round() {
         "1",
         100,
         Ceiling,
-        "1.0",
+        "1.0000000000000000000000000000000",
         "0x1.0000000000000000000000000#100",
         Equal,
     );
@@ -714,7 +720,7 @@ fn test_from_rational_prec_round() {
         "1",
         100,
         Down,
-        "1.0",
+        "1.0000000000000000000000000000000",
         "0x1.0000000000000000000000000#100",
         Equal,
     );
@@ -722,7 +728,7 @@ fn test_from_rational_prec_round() {
         "1",
         100,
         Up,
-        "1.0",
+        "1.0000000000000000000000000000000",
         "0x1.0000000000000000000000000#100",
         Equal,
     );
@@ -730,7 +736,7 @@ fn test_from_rational_prec_round() {
         "1",
         100,
         Nearest,
-        "1.0",
+        "1.0000000000000000000000000000000",
         "0x1.0000000000000000000000000#100",
         Equal,
     );
@@ -738,30 +744,30 @@ fn test_from_rational_prec_round() {
         "1",
         100,
         Exact,
-        "1.0",
+        "1.0000000000000000000000000000000",
         "0x1.0000000000000000000000000#100",
         Equal,
     );
 
-    test("1/2", 1, Floor, "0.5", "0x0.8#1", Equal);
-    test("1/2", 1, Ceiling, "0.5", "0x0.8#1", Equal);
-    test("1/2", 1, Down, "0.5", "0x0.8#1", Equal);
-    test("1/2", 1, Up, "0.5", "0x0.8#1", Equal);
-    test("1/2", 1, Nearest, "0.5", "0x0.8#1", Equal);
-    test("1/2", 1, Exact, "0.5", "0x0.8#1", Equal);
+    test("1/2", 1, Floor, "0.50", "0x0.8#1", Equal);
+    test("1/2", 1, Ceiling, "0.50", "0x0.8#1", Equal);
+    test("1/2", 1, Down, "0.50", "0x0.8#1", Equal);
+    test("1/2", 1, Up, "0.50", "0x0.8#1", Equal);
+    test("1/2", 1, Nearest, "0.50", "0x0.8#1", Equal);
+    test("1/2", 1, Exact, "0.50", "0x0.8#1", Equal);
 
-    test("1/2", 10, Floor, "0.5", "0x0.800#10", Equal);
-    test("1/2", 10, Ceiling, "0.5", "0x0.800#10", Equal);
-    test("1/2", 10, Down, "0.5", "0x0.800#10", Equal);
-    test("1/2", 10, Up, "0.5", "0x0.800#10", Equal);
-    test("1/2", 10, Nearest, "0.5", "0x0.800#10", Equal);
-    test("1/2", 10, Exact, "0.5", "0x0.800#10", Equal);
+    test("1/2", 10, Floor, "0.50000", "0x0.800#10", Equal);
+    test("1/2", 10, Ceiling, "0.50000", "0x0.800#10", Equal);
+    test("1/2", 10, Down, "0.50000", "0x0.800#10", Equal);
+    test("1/2", 10, Up, "0.50000", "0x0.800#10", Equal);
+    test("1/2", 10, Nearest, "0.50000", "0x0.800#10", Equal);
+    test("1/2", 10, Exact, "0.50000", "0x0.800#10", Equal);
 
     test(
         "1/2",
         100,
         Floor,
-        "0.5",
+        "0.50000000000000000000000000000000",
         "0x0.8000000000000000000000000#100",
         Equal,
     );
@@ -769,7 +775,7 @@ fn test_from_rational_prec_round() {
         "1/2",
         100,
         Ceiling,
-        "0.5",
+        "0.50000000000000000000000000000000",
         "0x0.8000000000000000000000000#100",
         Equal,
     );
@@ -777,7 +783,7 @@ fn test_from_rational_prec_round() {
         "1/2",
         100,
         Down,
-        "0.5",
+        "0.50000000000000000000000000000000",
         "0x0.8000000000000000000000000#100",
         Equal,
     );
@@ -785,7 +791,7 @@ fn test_from_rational_prec_round() {
         "1/2",
         100,
         Up,
-        "0.5",
+        "0.50000000000000000000000000000000",
         "0x0.8000000000000000000000000#100",
         Equal,
     );
@@ -793,7 +799,7 @@ fn test_from_rational_prec_round() {
         "1/2",
         100,
         Nearest,
-        "0.5",
+        "0.50000000000000000000000000000000",
         "0x0.8000000000000000000000000#100",
         Equal,
     );
@@ -801,28 +807,28 @@ fn test_from_rational_prec_round() {
         "1/2",
         100,
         Exact,
-        "0.5",
+        "0.50000000000000000000000000000000",
         "0x0.8000000000000000000000000#100",
         Equal,
     );
 
-    test("1/3", 1, Floor, "0.2", "0x0.4#1", Less);
-    test("1/3", 1, Ceiling, "0.5", "0x0.8#1", Greater);
-    test("1/3", 1, Down, "0.2", "0x0.4#1", Less);
-    test("1/3", 1, Up, "0.5", "0x0.8#1", Greater);
-    test("1/3", 1, Nearest, "0.2", "0x0.4#1", Less);
+    test("1/3", 1, Floor, "0.25", "0x0.4#1", Less);
+    test("1/3", 1, Ceiling, "0.50", "0x0.8#1", Greater);
+    test("1/3", 1, Down, "0.25", "0x0.4#1", Less);
+    test("1/3", 1, Up, "0.50", "0x0.8#1", Greater);
+    test("1/3", 1, Nearest, "0.25", "0x0.4#1", Less);
 
-    test("1/3", 10, Floor, "0.333", "0x0.554#10", Less);
-    test("1/3", 10, Ceiling, "0.3335", "0x0.556#10", Greater);
-    test("1/3", 10, Down, "0.333", "0x0.554#10", Less);
-    test("1/3", 10, Up, "0.3335", "0x0.556#10", Greater);
-    test("1/3", 10, Nearest, "0.3335", "0x0.556#10", Greater);
+    test("1/3", 10, Floor, "0.33301", "0x0.554#10", Less);
+    test("1/3", 10, Ceiling, "0.33350", "0x0.556#10", Greater);
+    test("1/3", 10, Down, "0.33301", "0x0.554#10", Less);
+    test("1/3", 10, Up, "0.33350", "0x0.556#10", Greater);
+    test("1/3", 10, Nearest, "0.33350", "0x0.556#10", Greater);
 
     test(
         "1/3",
         100,
         Floor,
-        "0.3333333333333333333333333333331",
+        "0.33333333333333333333333333333307",
         "0x0.55555555555555555555555550#100",
         Less,
     );
@@ -830,7 +836,7 @@ fn test_from_rational_prec_round() {
         "1/3",
         100,
         Ceiling,
-        "0.3333333333333333333333333333335",
+        "0.33333333333333333333333333333346",
         "0x0.55555555555555555555555558#100",
         Greater,
     );
@@ -838,7 +844,7 @@ fn test_from_rational_prec_round() {
         "1/3",
         100,
         Down,
-        "0.3333333333333333333333333333331",
+        "0.33333333333333333333333333333307",
         "0x0.55555555555555555555555550#100",
         Less,
     );
@@ -846,7 +852,7 @@ fn test_from_rational_prec_round() {
         "1/3",
         100,
         Up,
-        "0.3333333333333333333333333333335",
+        "0.33333333333333333333333333333346",
         "0x0.55555555555555555555555558#100",
         Greater,
     );
@@ -854,7 +860,7 @@ fn test_from_rational_prec_round() {
         "1/3",
         100,
         Nearest,
-        "0.3333333333333333333333333333335",
+        "0.33333333333333333333333333333346",
         "0x0.55555555555555555555555558#100",
         Greater,
     );
@@ -865,17 +871,17 @@ fn test_from_rational_prec_round() {
     test("22/7", 1, Up, "4.0", "0x4.0#1", Greater);
     test("22/7", 1, Nearest, "4.0", "0x4.0#1", Greater);
 
-    test("22/7", 10, Floor, "3.141", "0x3.24#10", Less);
-    test("22/7", 10, Ceiling, "3.145", "0x3.25#10", Greater);
-    test("22/7", 10, Down, "3.141", "0x3.24#10", Less);
-    test("22/7", 10, Up, "3.145", "0x3.25#10", Greater);
-    test("22/7", 10, Nearest, "3.145", "0x3.25#10", Greater);
+    test("22/7", 10, Floor, "3.1406", "0x3.24#10", Less);
+    test("22/7", 10, Ceiling, "3.1445", "0x3.25#10", Greater);
+    test("22/7", 10, Down, "3.1406", "0x3.24#10", Less);
+    test("22/7", 10, Up, "3.1445", "0x3.25#10", Greater);
+    test("22/7", 10, Nearest, "3.1445", "0x3.25#10", Greater);
 
     test(
         "22/7",
         100,
         Floor,
-        "3.142857142857142857142857142855",
+        "3.1428571428571428571428571428553",
         "0x3.2492492492492492492492490#100",
         Less,
     );
@@ -883,7 +889,7 @@ fn test_from_rational_prec_round() {
         "22/7",
         100,
         Ceiling,
-        "3.142857142857142857142857142858",
+        "3.1428571428571428571428571428585",
         "0x3.2492492492492492492492494#100",
         Greater,
     );
@@ -891,7 +897,7 @@ fn test_from_rational_prec_round() {
         "22/7",
         100,
         Down,
-        "3.142857142857142857142857142855",
+        "3.1428571428571428571428571428553",
         "0x3.2492492492492492492492490#100",
         Less,
     );
@@ -899,7 +905,7 @@ fn test_from_rational_prec_round() {
         "22/7",
         100,
         Up,
-        "3.142857142857142857142857142858",
+        "3.1428571428571428571428571428585",
         "0x3.2492492492492492492492494#100",
         Greater,
     );
@@ -907,7 +913,7 @@ fn test_from_rational_prec_round() {
         "22/7",
         100,
         Nearest,
-        "3.142857142857142857142857142858",
+        "3.1428571428571428571428571428585",
         "0x3.2492492492492492492492494#100",
         Greater,
     );
@@ -919,18 +925,18 @@ fn test_from_rational_prec_round() {
     test("-1", 1, Nearest, "-1.0", "-0x1.0#1", Equal);
     test("-1", 1, Exact, "-1.0", "-0x1.0#1", Equal);
 
-    test("-1", 10, Floor, "-1.0", "-0x1.000#10", Equal);
-    test("-1", 10, Ceiling, "-1.0", "-0x1.000#10", Equal);
-    test("-1", 10, Down, "-1.0", "-0x1.000#10", Equal);
-    test("-1", 10, Up, "-1.0", "-0x1.000#10", Equal);
-    test("-1", 10, Nearest, "-1.0", "-0x1.000#10", Equal);
-    test("-1", 10, Exact, "-1.0", "-0x1.000#10", Equal);
+    test("-1", 10, Floor, "-1.0000", "-0x1.000#10", Equal);
+    test("-1", 10, Ceiling, "-1.0000", "-0x1.000#10", Equal);
+    test("-1", 10, Down, "-1.0000", "-0x1.000#10", Equal);
+    test("-1", 10, Up, "-1.0000", "-0x1.000#10", Equal);
+    test("-1", 10, Nearest, "-1.0000", "-0x1.000#10", Equal);
+    test("-1", 10, Exact, "-1.0000", "-0x1.000#10", Equal);
 
     test(
         "-1",
         100,
         Floor,
-        "-1.0",
+        "-1.0000000000000000000000000000000",
         "-0x1.0000000000000000000000000#100",
         Equal,
     );
@@ -938,7 +944,7 @@ fn test_from_rational_prec_round() {
         "-1",
         100,
         Ceiling,
-        "-1.0",
+        "-1.0000000000000000000000000000000",
         "-0x1.0000000000000000000000000#100",
         Equal,
     );
@@ -946,7 +952,7 @@ fn test_from_rational_prec_round() {
         "-1",
         100,
         Down,
-        "-1.0",
+        "-1.0000000000000000000000000000000",
         "-0x1.0000000000000000000000000#100",
         Equal,
     );
@@ -954,7 +960,7 @@ fn test_from_rational_prec_round() {
         "-1",
         100,
         Up,
-        "-1.0",
+        "-1.0000000000000000000000000000000",
         "-0x1.0000000000000000000000000#100",
         Equal,
     );
@@ -962,7 +968,7 @@ fn test_from_rational_prec_round() {
         "-1",
         100,
         Nearest,
-        "-1.0",
+        "-1.0000000000000000000000000000000",
         "-0x1.0000000000000000000000000#100",
         Equal,
     );
@@ -970,30 +976,30 @@ fn test_from_rational_prec_round() {
         "-1",
         100,
         Exact,
-        "-1.0",
+        "-1.0000000000000000000000000000000",
         "-0x1.0000000000000000000000000#100",
         Equal,
     );
 
-    test("-1/2", 1, Floor, "-0.5", "-0x0.8#1", Equal);
-    test("-1/2", 1, Ceiling, "-0.5", "-0x0.8#1", Equal);
-    test("-1/2", 1, Down, "-0.5", "-0x0.8#1", Equal);
-    test("-1/2", 1, Up, "-0.5", "-0x0.8#1", Equal);
-    test("-1/2", 1, Nearest, "-0.5", "-0x0.8#1", Equal);
-    test("-1/2", 1, Exact, "-0.5", "-0x0.8#1", Equal);
+    test("-1/2", 1, Floor, "-0.50", "-0x0.8#1", Equal);
+    test("-1/2", 1, Ceiling, "-0.50", "-0x0.8#1", Equal);
+    test("-1/2", 1, Down, "-0.50", "-0x0.8#1", Equal);
+    test("-1/2", 1, Up, "-0.50", "-0x0.8#1", Equal);
+    test("-1/2", 1, Nearest, "-0.50", "-0x0.8#1", Equal);
+    test("-1/2", 1, Exact, "-0.50", "-0x0.8#1", Equal);
 
-    test("-1/2", 10, Floor, "-0.5", "-0x0.800#10", Equal);
-    test("-1/2", 10, Ceiling, "-0.5", "-0x0.800#10", Equal);
-    test("-1/2", 10, Down, "-0.5", "-0x0.800#10", Equal);
-    test("-1/2", 10, Up, "-0.5", "-0x0.800#10", Equal);
-    test("-1/2", 10, Nearest, "-0.5", "-0x0.800#10", Equal);
-    test("-1/2", 10, Exact, "-0.5", "-0x0.800#10", Equal);
+    test("-1/2", 10, Floor, "-0.50000", "-0x0.800#10", Equal);
+    test("-1/2", 10, Ceiling, "-0.50000", "-0x0.800#10", Equal);
+    test("-1/2", 10, Down, "-0.50000", "-0x0.800#10", Equal);
+    test("-1/2", 10, Up, "-0.50000", "-0x0.800#10", Equal);
+    test("-1/2", 10, Nearest, "-0.50000", "-0x0.800#10", Equal);
+    test("-1/2", 10, Exact, "-0.50000", "-0x0.800#10", Equal);
 
     test(
         "-1/2",
         100,
         Floor,
-        "-0.5",
+        "-0.50000000000000000000000000000000",
         "-0x0.8000000000000000000000000#100",
         Equal,
     );
@@ -1001,7 +1007,7 @@ fn test_from_rational_prec_round() {
         "-1/2",
         100,
         Ceiling,
-        "-0.5",
+        "-0.50000000000000000000000000000000",
         "-0x0.8000000000000000000000000#100",
         Equal,
     );
@@ -1009,7 +1015,7 @@ fn test_from_rational_prec_round() {
         "-1/2",
         100,
         Down,
-        "-0.5",
+        "-0.50000000000000000000000000000000",
         "-0x0.8000000000000000000000000#100",
         Equal,
     );
@@ -1017,7 +1023,7 @@ fn test_from_rational_prec_round() {
         "-1/2",
         100,
         Up,
-        "-0.5",
+        "-0.50000000000000000000000000000000",
         "-0x0.8000000000000000000000000#100",
         Equal,
     );
@@ -1025,7 +1031,7 @@ fn test_from_rational_prec_round() {
         "-1/2",
         100,
         Nearest,
-        "-0.5",
+        "-0.50000000000000000000000000000000",
         "-0x0.8000000000000000000000000#100",
         Equal,
     );
@@ -1033,28 +1039,28 @@ fn test_from_rational_prec_round() {
         "-1/2",
         100,
         Exact,
-        "-0.5",
+        "-0.50000000000000000000000000000000",
         "-0x0.8000000000000000000000000#100",
         Equal,
     );
 
-    test("-1/3", 1, Floor, "-0.5", "-0x0.8#1", Less);
-    test("-1/3", 1, Ceiling, "-0.2", "-0x0.4#1", Greater);
-    test("-1/3", 1, Down, "-0.2", "-0x0.4#1", Greater);
-    test("-1/3", 1, Up, "-0.5", "-0x0.8#1", Less);
-    test("-1/3", 1, Nearest, "-0.2", "-0x0.4#1", Greater);
+    test("-1/3", 1, Floor, "-0.50", "-0x0.8#1", Less);
+    test("-1/3", 1, Ceiling, "-0.25", "-0x0.4#1", Greater);
+    test("-1/3", 1, Down, "-0.25", "-0x0.4#1", Greater);
+    test("-1/3", 1, Up, "-0.50", "-0x0.8#1", Less);
+    test("-1/3", 1, Nearest, "-0.25", "-0x0.4#1", Greater);
 
-    test("-1/3", 10, Floor, "-0.3335", "-0x0.556#10", Less);
-    test("-1/3", 10, Ceiling, "-0.333", "-0x0.554#10", Greater);
-    test("-1/3", 10, Down, "-0.333", "-0x0.554#10", Greater);
-    test("-1/3", 10, Up, "-0.3335", "-0x0.556#10", Less);
-    test("-1/3", 10, Nearest, "-0.3335", "-0x0.556#10", Less);
+    test("-1/3", 10, Floor, "-0.33350", "-0x0.556#10", Less);
+    test("-1/3", 10, Ceiling, "-0.33301", "-0x0.554#10", Greater);
+    test("-1/3", 10, Down, "-0.33301", "-0x0.554#10", Greater);
+    test("-1/3", 10, Up, "-0.33350", "-0x0.556#10", Less);
+    test("-1/3", 10, Nearest, "-0.33350", "-0x0.556#10", Less);
 
     test(
         "-1/3",
         100,
         Floor,
-        "-0.3333333333333333333333333333335",
+        "-0.33333333333333333333333333333346",
         "-0x0.55555555555555555555555558#100",
         Less,
     );
@@ -1062,7 +1068,7 @@ fn test_from_rational_prec_round() {
         "-1/3",
         100,
         Ceiling,
-        "-0.3333333333333333333333333333331",
+        "-0.33333333333333333333333333333307",
         "-0x0.55555555555555555555555550#100",
         Greater,
     );
@@ -1070,7 +1076,7 @@ fn test_from_rational_prec_round() {
         "-1/3",
         100,
         Down,
-        "-0.3333333333333333333333333333331",
+        "-0.33333333333333333333333333333307",
         "-0x0.55555555555555555555555550#100",
         Greater,
     );
@@ -1078,7 +1084,7 @@ fn test_from_rational_prec_round() {
         "-1/3",
         100,
         Up,
-        "-0.3333333333333333333333333333335",
+        "-0.33333333333333333333333333333346",
         "-0x0.55555555555555555555555558#100",
         Less,
     );
@@ -1086,7 +1092,7 @@ fn test_from_rational_prec_round() {
         "-1/3",
         100,
         Nearest,
-        "-0.3333333333333333333333333333335",
+        "-0.33333333333333333333333333333346",
         "-0x0.55555555555555555555555558#100",
         Less,
     );
@@ -1097,17 +1103,17 @@ fn test_from_rational_prec_round() {
     test("-22/7", 1, Up, "-4.0", "-0x4.0#1", Less);
     test("-22/7", 1, Nearest, "-4.0", "-0x4.0#1", Less);
 
-    test("-22/7", 10, Floor, "-3.145", "-0x3.25#10", Less);
-    test("-22/7", 10, Ceiling, "-3.141", "-0x3.24#10", Greater);
-    test("-22/7", 10, Down, "-3.141", "-0x3.24#10", Greater);
-    test("-22/7", 10, Up, "-3.145", "-0x3.25#10", Less);
-    test("-22/7", 10, Nearest, "-3.145", "-0x3.25#10", Less);
+    test("-22/7", 10, Floor, "-3.1445", "-0x3.25#10", Less);
+    test("-22/7", 10, Ceiling, "-3.1406", "-0x3.24#10", Greater);
+    test("-22/7", 10, Down, "-3.1406", "-0x3.24#10", Greater);
+    test("-22/7", 10, Up, "-3.1445", "-0x3.25#10", Less);
+    test("-22/7", 10, Nearest, "-3.1445", "-0x3.25#10", Less);
 
     test(
         "-22/7",
         100,
         Floor,
-        "-3.142857142857142857142857142858",
+        "-3.1428571428571428571428571428585",
         "-0x3.2492492492492492492492494#100",
         Less,
     );
@@ -1115,7 +1121,7 @@ fn test_from_rational_prec_round() {
         "-22/7",
         100,
         Ceiling,
-        "-3.142857142857142857142857142855",
+        "-3.1428571428571428571428571428553",
         "-0x3.2492492492492492492492490#100",
         Greater,
     );
@@ -1123,7 +1129,7 @@ fn test_from_rational_prec_round() {
         "-22/7",
         100,
         Down,
-        "-3.142857142857142857142857142855",
+        "-3.1428571428571428571428571428553",
         "-0x3.2492492492492492492492490#100",
         Greater,
     );
@@ -1131,7 +1137,7 @@ fn test_from_rational_prec_round() {
         "-22/7",
         100,
         Up,
-        "-3.142857142857142857142857142858",
+        "-3.1428571428571428571428571428585",
         "-0x3.2492492492492492492492494#100",
         Less,
     );
@@ -1139,7 +1145,7 @@ fn test_from_rational_prec_round() {
         "-22/7",
         100,
         Nearest,
-        "-3.142857142857142857142857142858",
+        "-3.1428571428571428571428571428585",
         "-0x3.2492492492492492492492494#100",
         Less,
     );
@@ -1194,7 +1200,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(1000i64),
         10,
         Floor,
-        "1.072e301",
+        "1.0715e301",
         "0x1.000E+250#10",
         Equal,
     );
@@ -1202,7 +1208,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(1000i64),
         10,
         Ceiling,
-        "1.072e301",
+        "1.0715e301",
         "0x1.000E+250#10",
         Equal,
     );
@@ -1210,7 +1216,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(1000i64),
         10,
         Down,
-        "1.072e301",
+        "1.0715e301",
         "0x1.000E+250#10",
         Equal,
     );
@@ -1218,7 +1224,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(1000i64),
         10,
         Up,
-        "1.072e301",
+        "1.0715e301",
         "0x1.000E+250#10",
         Equal,
     );
@@ -1226,7 +1232,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(1000i64),
         10,
         Nearest,
-        "1.072e301",
+        "1.0715e301",
         "0x1.000E+250#10",
         Equal,
     );
@@ -1234,7 +1240,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(1000i64),
         10,
         Exact,
-        "1.072e301",
+        "1.0715e301",
         "0x1.000E+250#10",
         Equal,
     );
@@ -1243,7 +1249,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MAX_EXPONENT)),
         10,
         Floor,
-        "too_big",
+        "2.0965e323228496",
         "0x7.feE+268435455#10",
         Less,
     );
@@ -1259,7 +1265,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MAX_EXPONENT)),
         10,
         Down,
-        "too_big",
+        "2.0965e323228496",
         "0x7.feE+268435455#10",
         Less,
     );
@@ -1284,7 +1290,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
         10,
         Floor,
-        "too_big",
+        "1.0493e323228496",
         "0x4.00E+268435455#10",
         Equal,
     );
@@ -1292,7 +1298,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
         10,
         Ceiling,
-        "too_big",
+        "1.0493e323228496",
         "0x4.00E+268435455#10",
         Equal,
     );
@@ -1300,7 +1306,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
         10,
         Down,
-        "too_big",
+        "1.0493e323228496",
         "0x4.00E+268435455#10",
         Equal,
     );
@@ -1308,7 +1314,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
         10,
         Up,
-        "too_big",
+        "1.0493e323228496",
         "0x4.00E+268435455#10",
         Equal,
     );
@@ -1316,7 +1322,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
         10,
         Nearest,
-        "too_big",
+        "1.0493e323228496",
         "0x4.00E+268435455#10",
         Equal,
     );
@@ -1324,7 +1330,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
         10,
         Exact,
-        "too_big",
+        "1.0493e323228496",
         "0x4.00E+268435455#10",
         Equal,
     );
@@ -1333,7 +1339,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1) * Rational::from_unsigneds(3u8, 2),
         1,
         Floor,
-        "too_big",
+        "1.0e323228496",
         "0x4.0E+268435455#1",
         Less,
     );
@@ -1349,7 +1355,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1) * Rational::from_unsigneds(3u8, 2),
         1,
         Down,
-        "too_big",
+        "1.0e323228496",
         "0x4.0E+268435455#1",
         Less,
     );
@@ -1375,7 +1381,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(300u16, 199),
         1,
         Floor,
-        "too_big",
+        "1.0e323228496",
         "0x4.0E+268435455#1",
         Less,
     );
@@ -1393,7 +1399,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(300u16, 199),
         1,
         Down,
-        "too_big",
+        "1.0e323228496",
         "0x4.0E+268435455#1",
         Less,
     );
@@ -1421,7 +1427,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(299u16, 200),
         1,
         Floor,
-        "too_big",
+        "1.0e323228496",
         "0x4.0E+268435455#1",
         Less,
     );
@@ -1439,7 +1445,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(299u16, 200),
         1,
         Down,
-        "too_big",
+        "1.0e323228496",
         "0x4.0E+268435455#1",
         Less,
     );
@@ -1457,7 +1463,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(299u16, 200),
         1,
         Nearest,
-        "too_big",
+        "1.0e323228496",
         "0x4.0E+268435455#1",
         Less,
     );
@@ -1466,7 +1472,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(-1000i64),
         10,
         Floor,
-        "9.33e-302",
+        "9.3326e-302",
         "0x1.000E-250#10",
         Equal,
     );
@@ -1474,7 +1480,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(-1000i64),
         10,
         Ceiling,
-        "9.33e-302",
+        "9.3326e-302",
         "0x1.000E-250#10",
         Equal,
     );
@@ -1482,7 +1488,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(-1000i64),
         10,
         Down,
-        "9.33e-302",
+        "9.3326e-302",
         "0x1.000E-250#10",
         Equal,
     );
@@ -1490,7 +1496,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(-1000i64),
         10,
         Up,
-        "9.33e-302",
+        "9.3326e-302",
         "0x1.000E-250#10",
         Equal,
     );
@@ -1498,7 +1504,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(-1000i64),
         10,
         Nearest,
-        "9.33e-302",
+        "9.3326e-302",
         "0x1.000E-250#10",
         Equal,
     );
@@ -1506,7 +1512,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(-1000i64),
         10,
         Exact,
-        "9.33e-302",
+        "9.3326e-302",
         "0x1.000E-250#10",
         Equal,
     );
@@ -1515,7 +1521,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
         10,
         Floor,
-        "too_small",
+        "4.7651e-323228497",
         "0x2.00E-268435456#10",
         Equal,
     );
@@ -1523,7 +1529,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
         10,
         Ceiling,
-        "too_small",
+        "4.7651e-323228497",
         "0x2.00E-268435456#10",
         Equal,
     );
@@ -1531,7 +1537,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
         10,
         Down,
-        "too_small",
+        "4.7651e-323228497",
         "0x2.00E-268435456#10",
         Equal,
     );
@@ -1539,7 +1545,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
         10,
         Up,
-        "too_small",
+        "4.7651e-323228497",
         "0x2.00E-268435456#10",
         Equal,
     );
@@ -1547,7 +1553,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
         10,
         Nearest,
-        "too_small",
+        "4.7651e-323228497",
         "0x2.00E-268435456#10",
         Equal,
     );
@@ -1555,7 +1561,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
         10,
         Exact,
-        "too_small",
+        "4.7651e-323228497",
         "0x2.00E-268435456#10",
         Equal,
     );
@@ -1564,7 +1570,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
         10,
         Floor,
-        "too_small",
+        "2.3826e-323228497",
         "0x1.000E-268435456#10",
         Equal,
     );
@@ -1572,7 +1578,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
         10,
         Ceiling,
-        "too_small",
+        "2.3826e-323228497",
         "0x1.000E-268435456#10",
         Equal,
     );
@@ -1580,7 +1586,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
         10,
         Down,
-        "too_small",
+        "2.3826e-323228497",
         "0x1.000E-268435456#10",
         Equal,
     );
@@ -1588,7 +1594,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
         10,
         Up,
-        "too_small",
+        "2.3826e-323228497",
         "0x1.000E-268435456#10",
         Equal,
     );
@@ -1596,7 +1602,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
         10,
         Nearest,
-        "too_small",
+        "2.3826e-323228497",
         "0x1.000E-268435456#10",
         Equal,
     );
@@ -1604,7 +1610,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
         10,
         Exact,
-        "too_small",
+        "2.3826e-323228497",
         "0x1.000E-268435456#10",
         Equal,
     );
@@ -1621,7 +1627,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2),
         10,
         Ceiling,
-        "too_small",
+        "2.3826e-323228497",
         "0x1.000E-268435456#10",
         Greater,
     );
@@ -1637,7 +1643,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2),
         10,
         Up,
-        "too_small",
+        "2.3826e-323228497",
         "0x1.000E-268435456#10",
         Greater,
     );
@@ -1664,7 +1670,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1001u16, 1000),
         10,
         Ceiling,
-        "too_small",
+        "2.3826e-323228497",
         "0x1.000E-268435456#10",
         Greater,
     );
@@ -1682,7 +1688,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1001u16, 1000),
         10,
         Up,
-        "too_small",
+        "2.3826e-323228497",
         "0x1.000E-268435456#10",
         Greater,
     );
@@ -1691,7 +1697,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1001u16, 1000),
         10,
         Nearest,
-        "too_small",
+        "2.3826e-323228497",
         "0x1.000E-268435456#10",
         Greater,
     );
@@ -1710,7 +1716,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1025u16, 1024),
         10,
         Ceiling,
-        "too_small",
+        "2.3826e-323228497",
         "0x1.000E-268435456#10",
         Greater,
     );
@@ -1728,7 +1734,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1025u16, 1024),
         10,
         Up,
-        "too_small",
+        "2.3826e-323228497",
         "0x1.000E-268435456#10",
         Greater,
     );
@@ -1737,7 +1743,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1025u16, 1024),
         10,
         Nearest,
-        "too_small",
+        "2.3826e-323228497",
         "0x1.000E-268435456#10",
         Greater,
     );
@@ -1756,7 +1762,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1024u16, 1023),
         10,
         Ceiling,
-        "too_small",
+        "2.3826e-323228497",
         "0x1.000E-268435456#10",
         Greater,
     );
@@ -1774,7 +1780,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1024u16, 1023),
         10,
         Up,
-        "too_small",
+        "2.3826e-323228497",
         "0x1.000E-268435456#10",
         Greater,
     );
@@ -1783,7 +1789,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1024u16, 1023),
         10,
         Nearest,
-        "too_small",
+        "2.3826e-323228497",
         "0x1.000E-268435456#10",
         Greater,
     );
@@ -1802,7 +1808,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1001u16, 1000),
         10,
         Ceiling,
-        "too_small",
+        "2.3826e-323228497",
         "0x1.000E-268435456#10",
         Greater,
     );
@@ -1820,7 +1826,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1001u16, 1000),
         10,
         Up,
-        "too_small",
+        "2.3826e-323228497",
         "0x1.000E-268435456#10",
         Greater,
     );
@@ -1829,7 +1835,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1001u16, 1000),
         10,
         Nearest,
-        "too_small",
+        "2.3826e-323228497",
         "0x1.000E-268435456#10",
         Greater,
     );
@@ -1848,7 +1854,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1025u16, 1024),
         10,
         Ceiling,
-        "too_small",
+        "2.3826e-323228497",
         "0x1.000E-268435456#10",
         Greater,
     );
@@ -1866,7 +1872,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1025u16, 1024),
         10,
         Up,
-        "too_small",
+        "2.3826e-323228497",
         "0x1.000E-268435456#10",
         Greater,
     );
@@ -1875,7 +1881,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1025u16, 1024),
         10,
         Nearest,
-        "too_small",
+        "2.3826e-323228497",
         "0x1.000E-268435456#10",
         Greater,
     );
@@ -1884,7 +1890,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(-1000i64),
         1,
         Floor,
-        "9.0e-302",
+        "9.3e-302",
         "0x1.0E-250#1",
         Equal,
     );
@@ -1892,7 +1898,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(-1000i64),
         1,
         Ceiling,
-        "9.0e-302",
+        "9.3e-302",
         "0x1.0E-250#1",
         Equal,
     );
@@ -1900,7 +1906,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(-1000i64),
         1,
         Down,
-        "9.0e-302",
+        "9.3e-302",
         "0x1.0E-250#1",
         Equal,
     );
@@ -1908,7 +1914,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(-1000i64),
         1,
         Up,
-        "9.0e-302",
+        "9.3e-302",
         "0x1.0E-250#1",
         Equal,
     );
@@ -1916,7 +1922,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(-1000i64),
         1,
         Nearest,
-        "9.0e-302",
+        "9.3e-302",
         "0x1.0E-250#1",
         Equal,
     );
@@ -1924,7 +1930,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(-1000i64),
         1,
         Exact,
-        "9.0e-302",
+        "9.3e-302",
         "0x1.0E-250#1",
         Equal,
     );
@@ -1933,7 +1939,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
         1,
         Floor,
-        "too_small",
+        "4.8e-323228497",
         "0x2.0E-268435456#1",
         Equal,
     );
@@ -1941,7 +1947,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
         1,
         Ceiling,
-        "too_small",
+        "4.8e-323228497",
         "0x2.0E-268435456#1",
         Equal,
     );
@@ -1949,7 +1955,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
         1,
         Down,
-        "too_small",
+        "4.8e-323228497",
         "0x2.0E-268435456#1",
         Equal,
     );
@@ -1957,7 +1963,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
         1,
         Up,
-        "too_small",
+        "4.8e-323228497",
         "0x2.0E-268435456#1",
         Equal,
     );
@@ -1965,7 +1971,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
         1,
         Nearest,
-        "too_small",
+        "4.8e-323228497",
         "0x2.0E-268435456#1",
         Equal,
     );
@@ -1973,7 +1979,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
         1,
         Exact,
-        "too_small",
+        "4.8e-323228497",
         "0x2.0E-268435456#1",
         Equal,
     );
@@ -1982,7 +1988,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
         1,
         Floor,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Equal,
     );
@@ -1990,7 +1996,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
         1,
         Ceiling,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Equal,
     );
@@ -1998,7 +2004,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
         1,
         Down,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Equal,
     );
@@ -2006,7 +2012,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
         1,
         Up,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Equal,
     );
@@ -2014,7 +2020,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
         1,
         Nearest,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Equal,
     );
@@ -2022,7 +2028,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
         1,
         Exact,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Equal,
     );
@@ -2039,7 +2045,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2),
         1,
         Ceiling,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Greater,
     );
@@ -2055,7 +2061,7 @@ fn test_from_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2),
         1,
         Up,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Greater,
     );
@@ -2082,7 +2088,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1001u16, 1000),
         1,
         Ceiling,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Greater,
     );
@@ -2100,7 +2106,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1001u16, 1000),
         1,
         Up,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Greater,
     );
@@ -2109,7 +2115,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1001u16, 1000),
         1,
         Nearest,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Greater,
     );
@@ -2128,7 +2134,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1025u16, 1024),
         1,
         Ceiling,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Greater,
     );
@@ -2146,7 +2152,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1025u16, 1024),
         1,
         Up,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Greater,
     );
@@ -2155,7 +2161,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1025u16, 1024),
         1,
         Nearest,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Greater,
     );
@@ -2174,7 +2180,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1024u16, 1023),
         1,
         Ceiling,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Greater,
     );
@@ -2192,7 +2198,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1024u16, 1023),
         1,
         Up,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Greater,
     );
@@ -2201,7 +2207,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1024u16, 1023),
         1,
         Nearest,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Greater,
     );
@@ -2220,7 +2226,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1001u16, 1000),
         1,
         Ceiling,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Greater,
     );
@@ -2238,7 +2244,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1001u16, 1000),
         1,
         Up,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Greater,
     );
@@ -2247,7 +2253,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1001u16, 1000),
         1,
         Nearest,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Greater,
     );
@@ -2266,7 +2272,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1025u16, 1024),
         1,
         Ceiling,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Greater,
     );
@@ -2284,7 +2290,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1025u16, 1024),
         1,
         Up,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Greater,
     );
@@ -2293,7 +2299,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1025u16, 1024),
         1,
         Nearest,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Greater,
     );
@@ -2302,7 +2308,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(1000i64),
         10,
         Floor,
-        "-1.072e301",
+        "-1.0715e301",
         "-0x1.000E+250#10",
         Equal,
     );
@@ -2310,7 +2316,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(1000i64),
         10,
         Ceiling,
-        "-1.072e301",
+        "-1.0715e301",
         "-0x1.000E+250#10",
         Equal,
     );
@@ -2318,7 +2324,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(1000i64),
         10,
         Down,
-        "-1.072e301",
+        "-1.0715e301",
         "-0x1.000E+250#10",
         Equal,
     );
@@ -2326,7 +2332,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(1000i64),
         10,
         Up,
-        "-1.072e301",
+        "-1.0715e301",
         "-0x1.000E+250#10",
         Equal,
     );
@@ -2334,7 +2340,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(1000i64),
         10,
         Nearest,
-        "-1.072e301",
+        "-1.0715e301",
         "-0x1.000E+250#10",
         Equal,
     );
@@ -2342,7 +2348,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(1000i64),
         10,
         Exact,
-        "-1.072e301",
+        "-1.0715e301",
         "-0x1.000E+250#10",
         Equal,
     );
@@ -2359,7 +2365,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(i64::from(Float::MAX_EXPONENT)),
         10,
         Ceiling,
-        "-too_big",
+        "-2.0965e323228496",
         "-0x7.feE+268435455#10",
         Greater,
     );
@@ -2367,7 +2373,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(i64::from(Float::MAX_EXPONENT)),
         10,
         Down,
-        "-too_big",
+        "-2.0965e323228496",
         "-0x7.feE+268435455#10",
         Greater,
     );
@@ -2392,7 +2398,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
         10,
         Floor,
-        "-too_big",
+        "-1.0493e323228496",
         "-0x4.00E+268435455#10",
         Equal,
     );
@@ -2400,7 +2406,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
         10,
         Ceiling,
-        "-too_big",
+        "-1.0493e323228496",
         "-0x4.00E+268435455#10",
         Equal,
     );
@@ -2408,7 +2414,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
         10,
         Down,
-        "-too_big",
+        "-1.0493e323228496",
         "-0x4.00E+268435455#10",
         Equal,
     );
@@ -2416,7 +2422,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
         10,
         Up,
-        "-too_big",
+        "-1.0493e323228496",
         "-0x4.00E+268435455#10",
         Equal,
     );
@@ -2424,7 +2430,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
         10,
         Nearest,
-        "-too_big",
+        "-1.0493e323228496",
         "-0x4.00E+268435455#10",
         Equal,
     );
@@ -2432,7 +2438,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
         10,
         Exact,
-        "-too_big",
+        "-1.0493e323228496",
         "-0x4.00E+268435455#10",
         Equal,
     );
@@ -2451,7 +2457,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(3u8, 2),
         1,
         Ceiling,
-        "-too_big",
+        "-1.0e323228496",
         "-0x4.0E+268435455#1",
         Greater,
     );
@@ -2460,7 +2466,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(3u8, 2),
         1,
         Down,
-        "-too_big",
+        "-1.0e323228496",
         "-0x4.0E+268435455#1",
         Greater,
     );
@@ -2497,7 +2503,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(300u16, 199),
         1,
         Ceiling,
-        "-too_big",
+        "-1.0e323228496",
         "-0x4.0E+268435455#1",
         Greater,
     );
@@ -2506,7 +2512,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(300u16, 199),
         1,
         Down,
-        "-too_big",
+        "-1.0e323228496",
         "-0x4.0E+268435455#1",
         Greater,
     );
@@ -2543,7 +2549,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(299u16, 200),
         1,
         Ceiling,
-        "-too_big",
+        "-1.0e323228496",
         "-0x4.0E+268435455#1",
         Greater,
     );
@@ -2552,7 +2558,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(299u16, 200),
         1,
         Down,
-        "-too_big",
+        "-1.0e323228496",
         "-0x4.0E+268435455#1",
         Greater,
     );
@@ -2570,7 +2576,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(299u16, 200),
         1,
         Nearest,
-        "-too_big",
+        "-1.0e323228496",
         "-0x4.0E+268435455#1",
         Greater,
     );
@@ -2579,7 +2585,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(-1000i64),
         10,
         Floor,
-        "-9.33e-302",
+        "-9.3326e-302",
         "-0x1.000E-250#10",
         Equal,
     );
@@ -2587,7 +2593,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(-1000i64),
         10,
         Ceiling,
-        "-9.33e-302",
+        "-9.3326e-302",
         "-0x1.000E-250#10",
         Equal,
     );
@@ -2595,7 +2601,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(-1000i64),
         10,
         Down,
-        "-9.33e-302",
+        "-9.3326e-302",
         "-0x1.000E-250#10",
         Equal,
     );
@@ -2603,7 +2609,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(-1000i64),
         10,
         Up,
-        "-9.33e-302",
+        "-9.3326e-302",
         "-0x1.000E-250#10",
         Equal,
     );
@@ -2611,7 +2617,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(-1000i64),
         10,
         Nearest,
-        "-9.33e-302",
+        "-9.3326e-302",
         "-0x1.000E-250#10",
         Equal,
     );
@@ -2619,7 +2625,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(-1000i64),
         10,
         Exact,
-        "-9.33e-302",
+        "-9.3326e-302",
         "-0x1.000E-250#10",
         Equal,
     );
@@ -2628,7 +2634,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
         10,
         Floor,
-        "-too_small",
+        "-4.7651e-323228497",
         "-0x2.00E-268435456#10",
         Equal,
     );
@@ -2636,7 +2642,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
         10,
         Ceiling,
-        "-too_small",
+        "-4.7651e-323228497",
         "-0x2.00E-268435456#10",
         Equal,
     );
@@ -2644,7 +2650,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
         10,
         Down,
-        "-too_small",
+        "-4.7651e-323228497",
         "-0x2.00E-268435456#10",
         Equal,
     );
@@ -2652,7 +2658,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
         10,
         Up,
-        "-too_small",
+        "-4.7651e-323228497",
         "-0x2.00E-268435456#10",
         Equal,
     );
@@ -2660,7 +2666,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
         10,
         Nearest,
-        "-too_small",
+        "-4.7651e-323228497",
         "-0x2.00E-268435456#10",
         Equal,
     );
@@ -2668,7 +2674,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
         10,
         Exact,
-        "-too_small",
+        "-4.7651e-323228497",
         "-0x2.00E-268435456#10",
         Equal,
     );
@@ -2677,7 +2683,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
         10,
         Floor,
-        "-too_small",
+        "-2.3826e-323228497",
         "-0x1.000E-268435456#10",
         Equal,
     );
@@ -2685,7 +2691,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
         10,
         Ceiling,
-        "-too_small",
+        "-2.3826e-323228497",
         "-0x1.000E-268435456#10",
         Equal,
     );
@@ -2693,7 +2699,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
         10,
         Down,
-        "-too_small",
+        "-2.3826e-323228497",
         "-0x1.000E-268435456#10",
         Equal,
     );
@@ -2701,7 +2707,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
         10,
         Up,
-        "-too_small",
+        "-2.3826e-323228497",
         "-0x1.000E-268435456#10",
         Equal,
     );
@@ -2709,7 +2715,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
         10,
         Nearest,
-        "-too_small",
+        "-2.3826e-323228497",
         "-0x1.000E-268435456#10",
         Equal,
     );
@@ -2717,7 +2723,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
         10,
         Exact,
-        "-too_small",
+        "-2.3826e-323228497",
         "-0x1.000E-268435456#10",
         Equal,
     );
@@ -2726,7 +2732,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2),
         10,
         Floor,
-        "-too_small",
+        "-2.3826e-323228497",
         "-0x1.000E-268435456#10",
         Less,
     );
@@ -2750,7 +2756,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2),
         10,
         Up,
-        "-too_small",
+        "-2.3826e-323228497",
         "-0x1.000E-268435456#10",
         Less,
     );
@@ -2768,7 +2774,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1001u16, 1000),
         10,
         Floor,
-        "-too_small",
+        "-2.3826e-323228497",
         "-0x1.000E-268435456#10",
         Less,
     );
@@ -2795,7 +2801,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1001u16, 1000),
         10,
         Up,
-        "-too_small",
+        "-2.3826e-323228497",
         "-0x1.000E-268435456#10",
         Less,
     );
@@ -2804,7 +2810,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1001u16, 1000),
         10,
         Nearest,
-        "-too_small",
+        "-2.3826e-323228497",
         "-0x1.000E-268435456#10",
         Less,
     );
@@ -2814,7 +2820,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1025u16, 1024),
         10,
         Floor,
-        "-too_small",
+        "-2.3826e-323228497",
         "-0x1.000E-268435456#10",
         Less,
     );
@@ -2841,7 +2847,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1025u16, 1024),
         10,
         Up,
-        "-too_small",
+        "-2.3826e-323228497",
         "-0x1.000E-268435456#10",
         Less,
     );
@@ -2850,7 +2856,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1025u16, 1024),
         10,
         Nearest,
-        "-too_small",
+        "-2.3826e-323228497",
         "-0x1.000E-268435456#10",
         Less,
     );
@@ -2860,7 +2866,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1024u16, 1023),
         10,
         Floor,
-        "-too_small",
+        "-2.3826e-323228497",
         "-0x1.000E-268435456#10",
         Less,
     );
@@ -2887,7 +2893,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1024u16, 1023),
         10,
         Up,
-        "-too_small",
+        "-2.3826e-323228497",
         "-0x1.000E-268435456#10",
         Less,
     );
@@ -2896,7 +2902,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1024u16, 1023),
         10,
         Nearest,
-        "-too_small",
+        "-2.3826e-323228497",
         "-0x1.000E-268435456#10",
         Less,
     );
@@ -2906,7 +2912,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1001u16, 1000),
         10,
         Floor,
-        "-too_small",
+        "-2.3826e-323228497",
         "-0x1.000E-268435456#10",
         Less,
     );
@@ -2933,7 +2939,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1001u16, 1000),
         10,
         Up,
-        "-too_small",
+        "-2.3826e-323228497",
         "-0x1.000E-268435456#10",
         Less,
     );
@@ -2942,7 +2948,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1001u16, 1000),
         10,
         Nearest,
-        "-too_small",
+        "-2.3826e-323228497",
         "-0x1.000E-268435456#10",
         Less,
     );
@@ -2952,7 +2958,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1025u16, 1024),
         10,
         Floor,
-        "-too_small",
+        "-2.3826e-323228497",
         "-0x1.000E-268435456#10",
         Less,
     );
@@ -2979,7 +2985,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1025u16, 1024),
         10,
         Up,
-        "-too_small",
+        "-2.3826e-323228497",
         "-0x1.000E-268435456#10",
         Less,
     );
@@ -2988,7 +2994,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1025u16, 1024),
         10,
         Nearest,
-        "-too_small",
+        "-2.3826e-323228497",
         "-0x1.000E-268435456#10",
         Less,
     );
@@ -2997,7 +3003,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(-1000i64),
         1,
         Floor,
-        "-9.0e-302",
+        "-9.3e-302",
         "-0x1.0E-250#1",
         Equal,
     );
@@ -3005,7 +3011,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(-1000i64),
         1,
         Ceiling,
-        "-9.0e-302",
+        "-9.3e-302",
         "-0x1.0E-250#1",
         Equal,
     );
@@ -3013,7 +3019,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(-1000i64),
         1,
         Down,
-        "-9.0e-302",
+        "-9.3e-302",
         "-0x1.0E-250#1",
         Equal,
     );
@@ -3021,7 +3027,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(-1000i64),
         1,
         Up,
-        "-9.0e-302",
+        "-9.3e-302",
         "-0x1.0E-250#1",
         Equal,
     );
@@ -3029,7 +3035,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(-1000i64),
         1,
         Nearest,
-        "-9.0e-302",
+        "-9.3e-302",
         "-0x1.0E-250#1",
         Equal,
     );
@@ -3037,7 +3043,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(-1000i64),
         1,
         Exact,
-        "-9.0e-302",
+        "-9.3e-302",
         "-0x1.0E-250#1",
         Equal,
     );
@@ -3046,7 +3052,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
         1,
         Floor,
-        "-too_small",
+        "-4.8e-323228497",
         "-0x2.0E-268435456#1",
         Equal,
     );
@@ -3054,7 +3060,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
         1,
         Ceiling,
-        "-too_small",
+        "-4.8e-323228497",
         "-0x2.0E-268435456#1",
         Equal,
     );
@@ -3062,7 +3068,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
         1,
         Down,
-        "-too_small",
+        "-4.8e-323228497",
         "-0x2.0E-268435456#1",
         Equal,
     );
@@ -3070,7 +3076,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
         1,
         Up,
-        "-too_small",
+        "-4.8e-323228497",
         "-0x2.0E-268435456#1",
         Equal,
     );
@@ -3078,7 +3084,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
         1,
         Nearest,
-        "-too_small",
+        "-4.8e-323228497",
         "-0x2.0E-268435456#1",
         Equal,
     );
@@ -3086,7 +3092,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
         1,
         Exact,
-        "-too_small",
+        "-4.8e-323228497",
         "-0x2.0E-268435456#1",
         Equal,
     );
@@ -3095,7 +3101,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
         1,
         Floor,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Equal,
     );
@@ -3103,7 +3109,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
         1,
         Ceiling,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Equal,
     );
@@ -3111,7 +3117,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
         1,
         Down,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Equal,
     );
@@ -3119,7 +3125,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
         1,
         Up,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Equal,
     );
@@ -3127,7 +3133,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
         1,
         Nearest,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Equal,
     );
@@ -3135,7 +3141,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
         1,
         Exact,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Equal,
     );
@@ -3144,7 +3150,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2),
         1,
         Floor,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Less,
     );
@@ -3168,7 +3174,7 @@ fn test_from_rational_prec_round() {
         -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2),
         1,
         Up,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Less,
     );
@@ -3186,7 +3192,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1001u16, 1000),
         1,
         Floor,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Less,
     );
@@ -3213,7 +3219,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1001u16, 1000),
         1,
         Up,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Less,
     );
@@ -3222,7 +3228,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1001u16, 1000),
         1,
         Nearest,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Less,
     );
@@ -3232,7 +3238,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1025u16, 1024),
         1,
         Floor,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Less,
     );
@@ -3259,7 +3265,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1025u16, 1024),
         1,
         Up,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Less,
     );
@@ -3268,7 +3274,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1025u16, 1024),
         1,
         Nearest,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Less,
     );
@@ -3278,7 +3284,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1024u16, 1023),
         1,
         Floor,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Less,
     );
@@ -3305,7 +3311,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1024u16, 1023),
         1,
         Up,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Less,
     );
@@ -3314,7 +3320,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1024u16, 1023),
         1,
         Nearest,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Less,
     );
@@ -3324,7 +3330,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1001u16, 1000),
         1,
         Floor,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Less,
     );
@@ -3351,7 +3357,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1001u16, 1000),
         1,
         Up,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Less,
     );
@@ -3360,7 +3366,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1001u16, 1000),
         1,
         Nearest,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Less,
     );
@@ -3370,7 +3376,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1025u16, 1024),
         1,
         Floor,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Less,
     );
@@ -3397,7 +3403,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1025u16, 1024),
         1,
         Up,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Less,
     );
@@ -3406,7 +3412,7 @@ fn test_from_rational_prec_round() {
             * Rational::from_unsigneds(1025u16, 1024),
         1,
         Nearest,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Less,
     );
@@ -3504,8 +3510,8 @@ fn test_try_from_rational() {
     };
     test("0", Ok("0.0"), Ok("0x0.0"));
     test("1", Ok("1.0"), Ok("0x1.0#1"));
-    test("1/2", Ok("0.5"), Ok("0x0.8#1"));
-    test("117/256", Ok("0.457"), Ok("0x0.75#7"));
+    test("1/2", Ok("0.50"), Ok("0x0.8#1"));
+    test("117/256", Ok("0.4570"), Ok("0x0.75#7"));
     test(
         "6369051672525773/4503599627370496",
         Ok("1.4142135623730951"),
@@ -3513,7 +3519,7 @@ fn test_try_from_rational() {
     );
     test(
         "884279719003555/281474976710656",
-        Ok("3.141592653589793"),
+        Ok("3.1415926535897931"),
         Ok("0x3.243f6a8885a3#50"),
     );
     test(
@@ -3522,8 +3528,8 @@ fn test_try_from_rational() {
         Ok("0x2.b7e151628aed2#53"),
     );
     test("-1", Ok("-1.0"), Ok("-0x1.0#1"));
-    test("-1/2", Ok("-0.5"), Ok("-0x0.8#1"));
-    test("-117/256", Ok("-0.457"), Ok("-0x0.75#7"));
+    test("-1/2", Ok("-0.50"), Ok("-0x0.8#1"));
+    test("-117/256", Ok("-0.4570"), Ok("-0x0.75#7"));
     test(
         "-6369051672525773/4503599627370496",
         Ok("-1.4142135623730951"),
@@ -3531,7 +3537,7 @@ fn test_try_from_rational() {
     );
     test(
         "-884279719003555/281474976710656",
-        Ok("-3.141592653589793"),
+        Ok("-3.1415926535897931"),
         Ok("-0x3.243f6a8885a3#50"),
     );
     test(
@@ -3578,7 +3584,7 @@ fn test_try_from_rational() {
     };
     test_big(
         Rational::power_of_2(1000i64),
-        Ok("1.0e301"),
+        Ok("1.1e301"),
         Ok("0x1.0E+250#1"),
     );
     test_big(
@@ -3588,12 +3594,12 @@ fn test_try_from_rational() {
     );
     test_big(
         Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
-        Ok("too_big"),
+        Ok("1.0e323228496"),
         Ok("0x4.0E+268435455#1"),
     );
     test_big(
         Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1) * Rational::from_unsigneds(3u8, 2),
-        Ok("too_big"),
+        Ok("1.6e323228496"),
         Ok("0x6.0E+268435455#2"),
     );
     test_big(
@@ -3605,7 +3611,7 @@ fn test_try_from_rational() {
     test_big(
         Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
             * Rational::from_unsigneds(3073u16, 2048),
-        Ok("too_big"),
+        Ok("1.5744e323228496"),
         Ok("0x6.008E+268435455#12"),
     );
     test_big(
@@ -3617,23 +3623,23 @@ fn test_try_from_rational() {
     test_big(
         Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
             * Rational::from_unsigneds(3071u16, 2048),
-        Ok("too_big"),
+        Ok("1.5734e323228496"),
         Ok("0x5.ff8E+268435455#12"),
     );
 
     test_big(
         Rational::power_of_2(-1000i64),
-        Ok("9.0e-302"),
+        Ok("9.3e-302"),
         Ok("0x1.0E-250#1"),
     );
     test_big(
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
-        Ok("too_small"),
+        Ok("4.8e-323228497"),
         Ok("0x2.0E-268435456#1"),
     );
     test_big(
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
-        Ok("too_small"),
+        Ok("2.4e-323228497"),
         Ok("0x1.0E-268435456#1"),
     );
     test_big(
@@ -3674,7 +3680,7 @@ fn test_try_from_rational() {
 
     test_big(
         Rational::power_of_2(1000i64),
-        Ok("1.0e301"),
+        Ok("1.1e301"),
         Ok("0x1.0E+250#1"),
     );
     test_big(
@@ -3684,12 +3690,12 @@ fn test_try_from_rational() {
     );
     test_big(
         Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
-        Ok("too_big"),
+        Ok("1.0e323228496"),
         Ok("0x4.0E+268435455#1"),
     );
     test_big(
         Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1) * Rational::from_unsigneds(3u8, 2),
-        Ok("too_big"),
+        Ok("1.6e323228496"),
         Ok("0x6.0E+268435455#2"),
     );
     test_big(
@@ -3707,17 +3713,17 @@ fn test_try_from_rational() {
 
     test_big(
         -Rational::power_of_2(-1000i64),
-        Ok("-9.0e-302"),
+        Ok("-9.3e-302"),
         Ok("-0x1.0E-250#1"),
     );
     test_big(
         -Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
-        Ok("-too_small"),
+        Ok("-4.8e-323228497"),
         Ok("-0x2.0E-268435456#1"),
     );
     test_big(
         -Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
-        Ok("-too_small"),
+        Ok("-2.4e-323228497"),
         Ok("-0x1.0E-268435456#1"),
     );
     test_big(
@@ -3758,7 +3764,7 @@ fn test_try_from_rational() {
 
     test_big(
         -Rational::power_of_2(1000i64),
-        Ok("-1.0e301"),
+        Ok("-1.1e301"),
         Ok("-0x1.0E+250#1"),
     );
     test_big(
@@ -3768,13 +3774,13 @@ fn test_try_from_rational() {
     );
     test_big(
         -Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
-        Ok("-too_big"),
+        Ok("-1.0e323228496"),
         Ok("-0x4.0E+268435455#1"),
     );
     test_big(
         -Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
             * Rational::from_unsigneds(3u8, 2),
-        Ok("-too_big"),
+        Ok("-1.6e323228496"),
         Ok("-0x6.0E+268435455#2"),
     );
     test_big(

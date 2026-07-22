@@ -41,11 +41,11 @@ pub mod from_natural;
 /// assert_eq!(o, Equal);
 ///
 /// let (x, o) = Float::from_primitive_float_prec(1.0 / 3.0, 4);
-/// assert_eq!(x.to_string(), "0.34");
+/// assert_eq!(x.to_string(), "0.344");
 /// assert_eq!(o, Greater);
 ///
 /// let (x, o) = Float::from_primitive_float_prec(123.0, 4);
-/// assert_eq!(x.to_string(), "1.2e2");
+/// assert_eq!(x.to_string(), "120.0");
 /// assert_eq!(o, Less);
 /// ```
 ///
@@ -60,15 +60,15 @@ pub mod from_natural;
 /// assert_eq!(o, Equal);
 ///
 /// let (x, o) = Float::from_primitive_float_prec_round(1.0 / 3.0, 4, Floor);
-/// assert_eq!(x.to_string(), "0.31");
+/// assert_eq!(x.to_string(), "0.312");
 /// assert_eq!(o, Less);
 ///
 /// let (x, o) = Float::from_primitive_float_prec_round(1.0 / 3.0, 4, Ceiling);
-/// assert_eq!(x.to_string(), "0.34");
+/// assert_eq!(x.to_string(), "0.344");
 /// assert_eq!(o, Greater);
 ///
 /// let (x, o) = Float::from_primitive_float_prec_round(1.0 / 3.0, 4, Nearest);
-/// assert_eq!(x.to_string(), "0.34");
+/// assert_eq!(x.to_string(), "0.344");
 /// assert_eq!(o, Greater);
 /// ```
 pub mod from_primitive_float;
@@ -99,12 +99,12 @@ pub mod from_primitive_float;
 /// assert_eq!(o, Equal);
 ///
 /// let (x, o) = Float::from_unsigned_prec(123u32, 20);
-/// assert_eq!(x.to_string(), "123.0");
+/// assert_eq!(x.to_string(), "123.00000");
 /// assert_eq!(x.get_prec(), Some(20));
 /// assert_eq!(o, Equal);
 ///
 /// let (x, o) = Float::from_unsigned_prec(123u32, 4);
-/// assert_eq!(x.to_string(), "1.2e2");
+/// assert_eq!(x.to_string(), "120.0");
 /// assert_eq!(x.get_prec(), Some(4));
 /// assert_eq!(o, Less);
 /// ```
@@ -119,22 +119,22 @@ pub mod from_primitive_float;
 /// assert_eq!(o, Equal);
 ///
 /// let (x, o) = Float::from_signed_prec(123i32, 20);
-/// assert_eq!(x.to_string(), "123.0");
+/// assert_eq!(x.to_string(), "123.00000");
 /// assert_eq!(x.get_prec(), Some(20));
 /// assert_eq!(o, Equal);
 ///
 /// let (x, o) = Float::from_signed_prec(123i32, 4);
-/// assert_eq!(x.to_string(), "1.2e2");
+/// assert_eq!(x.to_string(), "120.0");
 /// assert_eq!(x.get_prec(), Some(4));
 /// assert_eq!(o, Less);
 ///
 /// let (x, o) = Float::from_signed_prec(-123i32, 20);
-/// assert_eq!(x.to_string(), "-123.0");
+/// assert_eq!(x.to_string(), "-123.00000");
 /// assert_eq!(x.get_prec(), Some(20));
 /// assert_eq!(o, Equal);
 ///
 /// let (x, o) = Float::from_signed_prec(-123i32, 4);
-/// assert_eq!(x.to_string(), "-1.2e2");
+/// assert_eq!(x.to_string(), "-120.0");
 /// assert_eq!(x.get_prec(), Some(4));
 /// assert_eq!(o, Greater);
 /// ```
@@ -150,17 +150,17 @@ pub mod from_primitive_float;
 /// assert_eq!(o, Equal);
 ///
 /// let (x, o) = Float::from_unsigned_prec_round(123u32, 20, Exact);
-/// assert_eq!(x.to_string(), "123.0");
+/// assert_eq!(x.to_string(), "123.00000");
 /// assert_eq!(x.get_prec(), Some(20));
 /// assert_eq!(o, Equal);
 ///
 /// let (x, o) = Float::from_unsigned_prec_round(123u32, 4, Floor);
-/// assert_eq!(x.to_string(), "1.2e2");
+/// assert_eq!(x.to_string(), "120.0");
 /// assert_eq!(x.get_prec(), Some(4));
 /// assert_eq!(o, Less);
 ///
 /// let (x, o) = Float::from_unsigned_prec_round(123u32, 4, Ceiling);
-/// assert_eq!(x.to_string(), "1.3e2");
+/// assert_eq!(x.to_string(), "128.0");
 /// assert_eq!(x.get_prec(), Some(4));
 /// assert_eq!(o, Greater);
 /// ```
@@ -176,32 +176,32 @@ pub mod from_primitive_float;
 /// assert_eq!(o, Equal);
 ///
 /// let (x, o) = Float::from_signed_prec_round(123i32, 20, Exact);
-/// assert_eq!(x.to_string(), "123.0");
+/// assert_eq!(x.to_string(), "123.00000");
 /// assert_eq!(x.get_prec(), Some(20));
 /// assert_eq!(o, Equal);
 ///
 /// let (x, o) = Float::from_signed_prec_round(123i32, 4, Floor);
-/// assert_eq!(x.to_string(), "1.2e2");
+/// assert_eq!(x.to_string(), "120.0");
 /// assert_eq!(x.get_prec(), Some(4));
 /// assert_eq!(o, Less);
 ///
 /// let (x, o) = Float::from_signed_prec_round(123i32, 4, Ceiling);
-/// assert_eq!(x.to_string(), "1.3e2");
+/// assert_eq!(x.to_string(), "128.0");
 /// assert_eq!(x.get_prec(), Some(4));
 /// assert_eq!(o, Greater);
 ///
 /// let (x, o) = Float::from_signed_prec_round(-123i32, 20, Exact);
-/// assert_eq!(x.to_string(), "-123.0");
+/// assert_eq!(x.to_string(), "-123.00000");
 /// assert_eq!(x.get_prec(), Some(20));
 /// assert_eq!(o, Equal);
 ///
 /// let (x, o) = Float::from_signed_prec_round(-123i32, 4, Floor);
-/// assert_eq!(x.to_string(), "-1.3e2");
+/// assert_eq!(x.to_string(), "-128.0");
 /// assert_eq!(x.get_prec(), Some(4));
 /// assert_eq!(o, Less);
 ///
 /// let (x, o) = Float::from_signed_prec_round(-123i32, 4, Ceiling);
-/// assert_eq!(x.to_string(), "-1.2e2");
+/// assert_eq!(x.to_string(), "-120.0");
 /// assert_eq!(x.get_prec(), Some(4));
 /// assert_eq!(o, Greater);
 /// ```
@@ -276,7 +276,7 @@ pub mod is_integer;
 ///     )
 ///     .unwrap()
 ///     .to_string(),
-///     "3.141592653589793"
+///     "3.1415926535897931"
 /// );
 /// assert_eq!(
 ///     <&Float as SciMantissaAndExponent<f64, _, _>>::from_sci_mantissa_and_exponent(
@@ -285,7 +285,7 @@ pub mod is_integer;
 ///     )
 ///     .unwrap()
 ///     .to_string(),
-///     "7.178979876918526e23"
+///     "7.1789798769185258e23"
 /// );
 /// assert_eq!(
 ///     <&Float as SciMantissaAndExponent<f64, _, _>>::from_sci_mantissa_and_exponent(
@@ -294,7 +294,7 @@ pub mod is_integer;
 ///     )
 ///     .unwrap()
 ///     .to_string(),
-///     "1.392955569098538e-24"
+///     "1.3929555690985384e-24"
 /// );
 /// ```
 #[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]

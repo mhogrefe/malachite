@@ -905,17 +905,17 @@ impl SciMantissaAndExponent<Self, i32> for Float {
     /// assert_eq!(Float::ONE.sci_mantissa_and_exponent(), (Float::ONE, 0));
     ///
     /// let (m, e) = Float::from(std::f64::consts::PI).sci_mantissa_and_exponent();
-    /// assert_eq!(m.to_string(), "1.570796326794897");
+    /// assert_eq!(m.to_string(), "1.5707963267948966");
     /// assert_eq!(e, 1);
     ///
     /// let (m, e) = Float::exact_from(Natural::from(3u32).pow(50u64)).sci_mantissa_and_exponent();
-    /// assert_eq!(m.to_string(), "1.187662594419065093441695");
+    /// assert_eq!(m.to_string(), "1.1876625944190650934416946");
     /// assert_eq!(e, 79);
     ///
     /// let (m, e) = Float::from_rational_prec(Rational::from(3u32).pow(-50i64), 100)
     ///     .0
     ///     .sci_mantissa_and_exponent();
-    /// assert_eq!(m.to_string(), "1.683979953059212693885095551367");
+    /// assert_eq!(m.to_string(), "1.6839799530592126938850955513669");
     /// assert_eq!(e, -80);
     /// ```
     #[inline]
@@ -1080,18 +1080,18 @@ impl SciMantissaAndExponent<Float, i32, Float> for &Float {
     /// assert_eq!((&Float::ONE).sci_mantissa_and_exponent(), (Float::ONE, 0));
     ///
     /// let (m, e): (Float, i32) = (&Float::from(std::f64::consts::PI)).sci_mantissa_and_exponent();
-    /// assert_eq!(m.to_string(), "1.570796326794897");
+    /// assert_eq!(m.to_string(), "1.5707963267948966");
     /// assert_eq!(e, 1);
     ///
     /// let (m, e): (Float, i32) =
     ///     (&Float::exact_from(Natural::from(3u32).pow(50u64))).sci_mantissa_and_exponent();
-    /// assert_eq!(m.to_string(), "1.187662594419065093441695");
+    /// assert_eq!(m.to_string(), "1.1876625944190650934416946");
     /// assert_eq!(e, 79);
     ///
     /// let (m, e): (Float, i32) =
     ///     (&Float::from_rational_prec(Rational::from(3u32).pow(-50i64), 100).0)
     ///         .sci_mantissa_and_exponent();
-    /// assert_eq!(m.to_string(), "1.683979953059212693885095551367");
+    /// assert_eq!(m.to_string(), "1.6839799530592126938850955513669");
     /// assert_eq!(e, -80);
     /// ```
     #[inline]
