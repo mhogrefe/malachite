@@ -62,7 +62,16 @@ fn test_root_u() {
     // - n == 0 fast path: x^0 = 1
     test("3.0", "0x3.0#2", 0, 10, Nearest, "NaN", "NaN", Equal);
     // - n == 1 fast path: x^1 = x
-    test("3.0", "0x3.0#2", 1, 10, Nearest, "3.0", "0x3.00#10", Equal);
+    test(
+        "3.0",
+        "0x3.0#2",
+        1,
+        10,
+        Nearest,
+        "3.0000",
+        "0x3.00#10",
+        Equal,
+    );
     // - n == 1 fast path with rounding
     test("1.2", "0x1.4#3", 1, 2, Nearest, "1.0", "0x1.0#2", Less);
     // - n == 2 fast path: x^2 = sqr(x)
@@ -72,7 +81,7 @@ fn test_root_u() {
         2,
         10,
         Nearest,
-        "1.732",
+        "1.7324",
         "0x1.bb8#10",
         Greater,
     );
@@ -84,7 +93,7 @@ fn test_root_u() {
         5,
         20,
         Nearest,
-        "1.245731",
+        "1.2457314",
         "0x1.3ee84#20",
         Greater,
     );
@@ -96,17 +105,17 @@ fn test_root_u() {
         3,
         10,
         Nearest,
-        "1.145",
+        "1.1445",
         "0x1.250#10",
         Less,
     );
     test(
-        "1.5",
+        "1.50",
         "0x1.8#4",
         10,
         20,
         Nearest,
-        "1.04138",
+        "1.0413799",
         "0x1.0a97e#20",
         Greater,
     );
@@ -117,7 +126,7 @@ fn test_root_u() {
         3,
         10,
         Nearest,
-        "-1.26",
+        "-1.2598",
         "-0x1.428#10",
         Greater,
     );
@@ -129,7 +138,7 @@ fn test_root_u() {
         3,
         10,
         Nearest,
-        "-1.441",
+        "-1.4414",
         "-0x1.710#10",
         Greater,
     );
@@ -140,7 +149,7 @@ fn test_root_u() {
         2,
         53,
         Nearest,
-        "1.189207115002721",
+        "1.1892071150027210",
         "0x1.306fe0a31b715#53",
         Less,
     );
@@ -151,7 +160,7 @@ fn test_root_u() {
         100000000000,
         5,
         Nearest,
-        "1.0",
+        "1.00",
         "0x1.0#5",
         Less,
     );
@@ -162,46 +171,46 @@ fn test_root_u() {
         100000000000,
         5,
         Down,
-        "1.0",
+        "1.00",
         "0x1.0#5",
         Less,
     );
     // - underflow to zero
     test(
-        "0.5",
+        "0.50",
         "0x0.8#3",
         100000000000,
         5,
         Nearest,
-        "1.0",
+        "1.00",
         "0x1.0#5",
         Greater,
     );
     // - underflow with Up gives the smallest positive value
     test(
-        "0.5",
+        "0.50",
         "0x0.8#3",
         100000000000,
         5,
         Up,
-        "1.0",
+        "1.00",
         "0x1.0#5",
         Greater,
     );
     // - an inexact root that the integer-root path rounds directly
     test(
-        "-269104312292334.303",
+        "-269104312292334.3027",
         "-0xf4bfbaf113ee.4d8#57",
         11,
         123,
         Floor,
-        "-20.502695835577102605036400705029461424",
+        "-20.5026958355771026050364007050294614245",
         "-0x14.80b0ac9da398b6b075525e74e54a44#123",
         Less,
     );
     // - large k (the exp(ln/k) path with its Ziv loop)
     test(
-        "-0.0078124999999999999999999999999999",
+        "-0.00781249999999999999999999999999990",
         "-0x0.01ffffffffffffffffffffffffff8#106",
         72,
         5,
@@ -283,7 +292,7 @@ fn test_root_u_extreme() {
         1,
         10,
         Nearest,
-        "too_big",
+        "1.0493e323228496",
         "0x4.00E+268435455#10",
         Equal,
     );
@@ -293,7 +302,7 @@ fn test_root_u_extreme() {
         2,
         10,
         Nearest,
-        "too_big",
+        "1.0243e161614248",
         "0x8.00E+134217727#10",
         Equal,
     );
@@ -303,7 +312,7 @@ fn test_root_u_extreme() {
         2,
         5,
         Down,
-        "too_big",
+        "1.02e161614248",
         "0x8.0E+134217727#5",
         Equal,
     );
@@ -312,7 +321,7 @@ fn test_root_u_extreme() {
         3,
         10,
         Ceiling,
-        "too_big",
+        "1.0165e107742832",
         "0x1.968E+89478485#10",
         Greater,
     );
@@ -323,7 +332,7 @@ fn test_root_u_extreme() {
         2,
         10,
         Nearest,
-        "too_small",
+        "6.9023e-161614249",
         "0x1.6a0E-134217728#10",
         Less,
     );
@@ -333,7 +342,7 @@ fn test_root_u_extreme() {
         2,
         5,
         Up,
-        "too_small",
+        "7.02e-161614249",
         "0x1.7E-134217728#5",
         Greater,
     );
@@ -342,7 +351,7 @@ fn test_root_u_extreme() {
         3,
         10,
         Nearest,
-        "too_small",
+        "7.8107e-107742833",
         "0x8.00E-89478486#10",
         Equal,
     );
@@ -352,7 +361,7 @@ fn test_root_u_extreme() {
         3,
         10,
         Nearest,
-        "-too_big",
+        "-1.0165e107742832",
         "-0x1.968E+89478485#10",
         Less,
     );
@@ -607,7 +616,16 @@ fn test_root_s() {
     // - n == 0: x^0 = 1
     test("3.0", "0x3.0#2", 0, 10, Nearest, "NaN", "NaN", Equal);
     // - n == 1: x^1 = x
-    test("3.0", "0x3.0#2", 1, 10, Nearest, "3.0", "0x3.00#10", Equal);
+    test(
+        "3.0",
+        "0x3.0#2",
+        1,
+        10,
+        Nearest,
+        "3.0000",
+        "0x3.00#10",
+        Equal,
+    );
     // - k >= 0 delegates to root_u
     test(
         "3.0",
@@ -615,7 +633,7 @@ fn test_root_s() {
         5,
         20,
         Nearest,
-        "1.245731",
+        "1.2457314",
         "0x1.3ee84#20",
         Greater,
     );
@@ -627,7 +645,7 @@ fn test_root_s() {
         3,
         10,
         Nearest,
-        "-1.26",
+        "-1.2598",
         "-0x1.428#10",
         Greater,
     );
@@ -639,18 +657,27 @@ fn test_root_s() {
         -3,
         10,
         Nearest,
-        "0.794",
+        "0.79395",
         "0x0.cb4#10",
         Greater,
     );
-    test("3.0", "0x3.0#2", -2, 10, Floor, "0.577", "0x0.93c#10", Less);
+    test(
+        "3.0",
+        "0x3.0#2",
+        -2,
+        10,
+        Floor,
+        "0.57715",
+        "0x0.93c#10",
+        Less,
+    );
     test(
         "3.0",
         "0x3.0#2",
         -2,
         10,
         Ceiling,
-        "0.578",
+        "0.57812",
         "0x0.940#10",
         Greater,
     );
@@ -661,19 +688,19 @@ fn test_root_s() {
         -3,
         10,
         Nearest,
-        "-0.794",
+        "-0.79395",
         "-0x0.cb4#10",
         Less,
     );
     // - negative argument, even negative root order gives NaN
     test("-2.0", "-0x2.0#2", -4, 10, Nearest, "NaN", "NaN", Equal);
     test(
-        "1.5",
+        "1.50",
         "0x1.8#4",
         -10,
         20,
         Nearest,
-        "0.960264",
+        "0.96026421",
         "0x0.f5d3e#20",
         Less,
     );
@@ -683,12 +710,12 @@ fn test_root_s() {
         -1,
         10,
         Nearest,
-        "-0.3335",
+        "-0.33350",
         "-0x0.556#10",
         Less,
     );
     // - a power-of-2 argument whose exponent k divides has an exact reciprocal root
-    test("4.0", "0x4.0#1", -3, 5, Nearest, "0.62", "0x0.a0#5", Less);
+    test("4.0", "0x4.0#1", -3, 5, Nearest, "0.625", "0x0.a0#5", Less);
     // - a reciprocal root of a huge value is tiny but in range
     test(
         "2.0",
@@ -696,29 +723,29 @@ fn test_root_s() {
         -100000000000,
         5,
         Nearest,
-        "1.0",
+        "1.00",
         "0x1.0#5",
         Greater,
     );
     // - a reciprocal root of a tiny value is huge but in range
     test(
-        "0.5",
+        "0.50",
         "0x0.8#3",
         -100000000000,
         5,
         Nearest,
-        "1.0",
+        "1.00",
         "0x1.0#5",
         Less,
     );
     // - overflow with Down gives the largest finite value
     test(
-        "0.5",
+        "0.50",
         "0x0.8#3",
         -100000000000,
         5,
         Down,
-        "1.0",
+        "1.00",
         "0x1.0#5",
         Less,
     );
@@ -818,7 +845,7 @@ fn test_root_s_extreme() {
         -2,
         10,
         Nearest,
-        "too_small",
+        "9.7623e-161614249",
         "0x2.00E-134217728#10",
         Equal,
     );
@@ -828,7 +855,7 @@ fn test_root_s_extreme() {
         -2,
         5,
         Up,
-        "too_small",
+        "9.76e-161614249",
         "0x2.0E-134217728#5",
         Equal,
     );
@@ -847,7 +874,7 @@ fn test_root_s_extreme() {
         -3,
         10,
         Nearest,
-        "too_big",
+        "1.2803e107742832",
         "0x2.00E+89478485#10",
         Equal,
     );
@@ -1150,12 +1177,12 @@ fn test_root_u_rational() {
     // - k = 0: NaN
     test("2", 0, 10, Nearest, "NaN", "NaN", Equal);
     // - k = 1: the value itself
-    test("1/3", 1, 10, Nearest, "0.3335", "0x0.556#10", Greater);
+    test("1/3", 1, 10, Nearest, "0.33350", "0x0.556#10", Greater);
     // - exact rational roots
     test("0", 2, 10, Nearest, "0.0", "0x0.0", Equal);
-    test("8", 3, 10, Nearest, "2.0", "0x2.00#10", Equal);
-    test("27/64", 3, 10, Exact, "0.75", "0x0.c00#10", Equal);
-    test("-32", 5, 10, Nearest, "-2.0", "-0x2.00#10", Equal);
+    test("8", 3, 10, Nearest, "2.0000", "0x2.00#10", Equal);
+    test("27/64", 3, 10, Exact, "0.75000", "0x0.c00#10", Equal);
+    test("-32", 5, 10, Nearest, "-2.0000", "-0x2.00#10", Equal);
     // - negative x with even k: NaN
     test("-4", 2, 10, Nearest, "NaN", "NaN", Equal);
     // - irrational roots
@@ -1177,14 +1204,14 @@ fn test_root_u_rational() {
         "0x1.428a2f98d728b#53",
         Greater,
     );
-    test("3/5", 2, 20, Floor, "0.774596", "0x0.c64bf#20", Less);
-    test("3/5", 2, 20, Ceiling, "0.774597", "0x0.c64c0#20", Greater);
+    test("3/5", 2, 20, Floor, "0.77459621", "0x0.c64bf#20", Less);
+    test("3/5", 2, 20, Ceiling, "0.77459717", "0x0.c64c0#20", Greater);
     test(
         "-3/5",
         3,
         20,
         Nearest,
-        "-0.843432",
+        "-0.84343243",
         "-0x0.d7eb3#20",
         Greater,
     );
@@ -1230,16 +1257,16 @@ fn test_root_s_rational() {
     // - negative x with even k: NaN
     test("-4", -2, 10, Nearest, "NaN", "NaN", Equal);
     // - exact reciprocal roots
-    test("8", -3, 10, Nearest, "0.5", "0x0.800#10", Equal);
-    test("4/9", -1, 10, Nearest, "2.25", "0x2.40#10", Equal);
-    test("-32", -5, 10, Nearest, "-0.5", "-0x0.800#10", Equal);
+    test("8", -3, 10, Nearest, "0.50000", "0x0.800#10", Equal);
+    test("4/9", -1, 10, Nearest, "2.2500", "0x2.40#10", Equal);
+    test("-32", -5, 10, Nearest, "-0.50000", "-0x0.800#10", Equal);
     // - irrational reciprocal roots
     test(
         "2",
         -2,
         53,
         Nearest,
-        "0.7071067811865476",
+        "0.70710678118654757",
         "0x0.b504f333f9de68#53",
         Greater,
     );
@@ -1248,11 +1275,11 @@ fn test_root_s_rational() {
         -3,
         53,
         Nearest,
-        "0.7937005259840998",
+        "0.79370052598409979",
         "0x0.cb2ff529eb71e8#53",
         Greater,
     );
-    test("3/5", -2, 20, Floor, "1.290993", "0x1.4a7e8#20", Less);
+    test("3/5", -2, 20, Floor, "1.2909927", "0x1.4a7e8#20", Less);
 }
 
 #[test]
@@ -1385,17 +1412,17 @@ fn test_root_u_exact_large_k() {
     // 2^101 has an exact 101st root, 2
     let x = Float::power_of_2(101i64);
     let (root, o) = x.root_u_prec_round_ref(101, 10, Exact);
-    assert_eq!(root.to_string(), "2.0");
+    assert_eq!(root.to_string(), "2.0000");
     assert_eq!(o, Equal);
     // (-2)^101 = -2^101 has an exact 101st root, -2
     let x = -Float::power_of_2(101i64);
     let (root, o) = x.root_u_prec_round_ref(101, 10, Exact);
-    assert_eq!(root.to_string(), "-2.0");
+    assert_eq!(root.to_string(), "-2.0000");
     assert_eq!(o, Equal);
     // 3^101 is exactly representable (161 bits), and its 101st root is 3
     let x = Float::exact_from(Rational::from(3u32).pow(101u64));
     let (root, o) = x.root_u_prec_round_ref(101, 10, Exact);
-    assert_eq!(root.to_string(), "3.0");
+    assert_eq!(root.to_string(), "3.0000");
     assert_eq!(o, Equal);
     // 2^102 has no exact 101st root (the exponent is not divisible by 101)
     assert_panic!(Float::power_of_2(102i64).root_u_prec_round_ref(101, 10, Exact));
@@ -1409,7 +1436,7 @@ fn test_root_s_exact_negative_k() {
     // (2^-15)^(-1/5)... rather: the -5th root of 2^-15 is 2^3 = 8, exactly
     let x = Float::power_of_2(-15i64);
     let (root, o) = x.root_s_prec_round_ref(-5, 10, Exact);
-    assert_eq!(root.to_string(), "8.0");
+    assert_eq!(root.to_string(), "8.0000");
     assert_eq!(o, Equal);
     // the -5th root of 2^-16 is not exactly representable
     assert_panic!(Float::power_of_2(-16i64).root_s_prec_round_ref(-5, 10, Exact));
@@ -1435,7 +1462,7 @@ fn test_root_rational_extreme() {
         3,
         53,
         Nearest,
-        "too_big",
+        "3.7527006691002877e215485664",
         "0x9.285ff0d8417a8E+178956970#53",
         Greater,
     );
@@ -1445,7 +1472,7 @@ fn test_root_rational_extreme() {
         3,
         53,
         Nearest,
-        "too_small",
+        "5.5428983190140916e-215485665",
         "0x3.a25da15e344feE-178956971#53",
         Greater,
     );
@@ -1464,7 +1491,7 @@ fn test_root_rational_extreme() {
         2,
         10,
         Floor,
-        "too_big",
+        "2.0965e323228496",
         "0x7.feE+268435455#10",
         Less,
     );
@@ -1483,7 +1510,7 @@ fn test_root_rational_extreme() {
         2,
         10,
         Ceiling,
-        "too_small",
+        "2.3826e-323228497",
         "0x1.000E-268435456#10",
         Greater,
     );
@@ -1523,25 +1550,25 @@ fn test_root_u_wide_input_truncation() {
     );
     test(
         x.root_u_prec_round_ref(3, 53, Ceiling),
-        "1.122462048309373",
+        "1.1224620483093730",
         "0x1.1f59ac3c7d6c0#53",
         Greater,
     );
     test(
         x.root_u_prec_round_ref(3, 53, Nearest),
-        "1.122462048309373",
+        "1.1224620483093730",
         "0x1.1f59ac3c7d6c0#53",
         Greater,
     );
     test(
         x.root_u_prec_round_ref(100, 24, Nearest),
-        "1.0034717",
+        "1.00347173",
         "0x1.00e386#24",
         Less,
     );
     // a wide representation of an exact cube: the dropped bits are all zero, so the root is exact
     let x = Float::from_rational_prec(Rational::from(8u32), 5000).0;
     let (v, o) = x.root_u_prec_round_ref(3, 10, Exact);
-    assert_eq!(v.to_string(), "2.0");
+    assert_eq!(v.to_string(), "2.0000");
     assert_eq!(o, Equal);
 }

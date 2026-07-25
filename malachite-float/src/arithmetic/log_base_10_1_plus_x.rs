@@ -149,11 +149,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (log, o) = Float::from(9).log_base_10_1_plus_x_prec_round(10, Exact);
-    /// assert_eq!(log.to_string(), "1.0"); // log_10(10) = 1
+    /// assert_eq!(log.to_string(), "1.0000"); // log_10(10) = 1
     /// assert_eq!(o, Equal);
     ///
     /// let (log, o) = Float::from(1).log_base_10_1_plus_x_prec_round(20, Nearest);
-    /// assert_eq!(log.to_string(), "0.3010302"); // log_10(2)
+    /// assert_eq!(log.to_string(), "0.30103016"); // log_10(2)
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -194,11 +194,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (log, o) = (&Float::from(99)).log_base_10_1_plus_x_prec_round_ref(10, Exact);
-    /// assert_eq!(log.to_string(), "2.0"); // log_10(100) = 2
+    /// assert_eq!(log.to_string(), "2.0000"); // log_10(100) = 2
     /// assert_eq!(o, Equal);
     ///
     /// let (log, o) = (&Float::from(1)).log_base_10_1_plus_x_prec_round_ref(20, Floor);
-    /// assert_eq!(log.to_string(), "0.3010297"); // log_10(2), rounded down
+    /// assert_eq!(log.to_string(), "0.30102968"); // log_10(2), rounded down
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -239,11 +239,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (log, o) = Float::from(9).log_base_10_1_plus_x_prec(10);
-    /// assert_eq!(log.to_string(), "1.0"); // log_10(10) = 1
+    /// assert_eq!(log.to_string(), "1.0000"); // log_10(10) = 1
     /// assert_eq!(o, Equal);
     ///
     /// let (log, o) = Float::from(1).log_base_10_1_plus_x_prec(20);
-    /// assert_eq!(log.to_string(), "0.3010302"); // log_10(2)
+    /// assert_eq!(log.to_string(), "0.30103016"); // log_10(2)
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -274,11 +274,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (log, o) = (&Float::from(99)).log_base_10_1_plus_x_prec_ref(10);
-    /// assert_eq!(log.to_string(), "2.0"); // log_10(100) = 2
+    /// assert_eq!(log.to_string(), "2.0000"); // log_10(100) = 2
     /// assert_eq!(o, Equal);
     ///
     /// let (log, o) = (&Float::from(7)).log_base_10_1_plus_x_prec_ref(30);
-    /// assert_eq!(log.to_string(), "0.903089987"); // log_10(8)
+    /// assert_eq!(log.to_string(), "0.90308998711"); // log_10(8)
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -311,11 +311,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (log, o) = Float::from(9).log_base_10_1_plus_x_round(Exact);
-    /// assert_eq!(log.to_string(), "1.0"); // log_10(10) = 1
+    /// assert_eq!(log.to_string(), "1.00"); // log_10(10) = 1
     /// assert_eq!(o, Equal);
     ///
     /// let (log, o) = Float::from(99).log_base_10_1_plus_x_round(Exact);
-    /// assert_eq!(log.to_string(), "2.0"); // log_10(100) = 2
+    /// assert_eq!(log.to_string(), "2.000"); // log_10(100) = 2
     /// assert_eq!(o, Equal);
     /// ```
     #[inline]
@@ -349,11 +349,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (log, o) = (&Float::from(99)).log_base_10_1_plus_x_round_ref(Exact);
-    /// assert_eq!(log.to_string(), "2.0"); // log_10(100) = 2
+    /// assert_eq!(log.to_string(), "2.000"); // log_10(100) = 2
     /// assert_eq!(o, Equal);
     ///
     /// let (log, o) = (&Float::from(9)).log_base_10_1_plus_x_round_ref(Exact);
-    /// assert_eq!(log.to_string(), "1.0"); // log_10(10) = 1
+    /// assert_eq!(log.to_string(), "1.00"); // log_10(10) = 1
     /// assert_eq!(o, Equal);
     /// ```
     #[inline]
@@ -387,11 +387,11 @@ impl Float {
     ///
     /// let mut x = Float::from(9);
     /// assert_eq!(x.log_base_10_1_plus_x_prec_round_assign(10, Exact), Equal);
-    /// assert_eq!(x.to_string(), "1.0"); // log_10(10) = 1
+    /// assert_eq!(x.to_string(), "1.0000"); // log_10(10) = 1
     ///
     /// let mut x = Float::from(1);
     /// assert_eq!(x.log_base_10_1_plus_x_prec_round_assign(20, Floor), Less);
-    /// assert_eq!(x.to_string(), "0.3010297"); // log_10(2), rounded down
+    /// assert_eq!(x.to_string(), "0.30102968"); // log_10(2), rounded down
     /// ```
     #[inline]
     pub fn log_base_10_1_plus_x_prec_round_assign(
@@ -426,11 +426,11 @@ impl Float {
     ///
     /// let mut x = Float::from(9);
     /// x.log_base_10_1_plus_x_prec_assign(10);
-    /// assert_eq!(x.to_string(), "1.0"); // log_10(10) = 1
+    /// assert_eq!(x.to_string(), "1.0000"); // log_10(10) = 1
     ///
     /// let mut x = Float::from(99);
     /// x.log_base_10_1_plus_x_prec_assign(10);
-    /// assert_eq!(x.to_string(), "2.0"); // log_10(100) = 2
+    /// assert_eq!(x.to_string(), "2.0000"); // log_10(100) = 2
     /// ```
     #[inline]
     pub fn log_base_10_1_plus_x_prec_assign(&mut self, prec: u64) -> Ordering {
@@ -462,11 +462,11 @@ impl Float {
     ///
     /// let mut x = Float::from(9);
     /// x.log_base_10_1_plus_x_round_assign(Exact);
-    /// assert_eq!(x.to_string(), "1.0"); // log_10(10) = 1
+    /// assert_eq!(x.to_string(), "1.00"); // log_10(10) = 1
     ///
     /// let mut x = Float::from(99);
     /// x.log_base_10_1_plus_x_round_assign(Exact);
-    /// assert_eq!(x.to_string(), "2.0"); // log_10(100) = 2
+    /// assert_eq!(x.to_string(), "2.000"); // log_10(100) = 2
     /// ```
     #[inline]
     pub fn log_base_10_1_plus_x_round_assign(&mut self, rm: RoundingMode) -> Ordering {
@@ -496,8 +496,8 @@ impl LogBase10Of1PlusX for Float {
     /// use malachite_base::num::arithmetic::traits::LogBase10Of1PlusX;
     /// use malachite_float::Float;
     ///
-    /// assert_eq!(Float::from(9).log_base_10_1_plus_x().to_string(), "1.0"); // log_10(10) = 1
-    /// assert_eq!(Float::from(99).log_base_10_1_plus_x().to_string(), "2.0"); // log_10(100) = 2
+    /// assert_eq!(Float::from(9).log_base_10_1_plus_x().to_string(), "1.00"); // log_10(10) = 1
+    /// assert_eq!(Float::from(99).log_base_10_1_plus_x().to_string(), "2.000"); // log_10(100) = 2
     /// ```
     #[inline]
     fn log_base_10_1_plus_x(self) -> Self {
@@ -527,8 +527,11 @@ impl LogBase10Of1PlusX for &Float {
     /// use malachite_base::num::arithmetic::traits::LogBase10Of1PlusX;
     /// use malachite_float::Float;
     ///
-    /// assert_eq!((&Float::from(9)).log_base_10_1_plus_x().to_string(), "1.0"); // log_10(10) = 1
-    /// assert_eq!((&Float::from(99)).log_base_10_1_plus_x().to_string(), "2.0"); // log_10(100) = 2
+    /// assert_eq!((&Float::from(9)).log_base_10_1_plus_x().to_string(), "1.00"); // log_10(10) = 1
+    /// assert_eq!(
+    ///     (&Float::from(99)).log_base_10_1_plus_x().to_string(),
+    ///     "2.000"
+    /// ); // log_10(100) = 2
     /// ```
     #[inline]
     fn log_base_10_1_plus_x(self) -> Float {
@@ -558,11 +561,11 @@ impl LogBase10Of1PlusXAssign for Float {
     ///
     /// let mut x = Float::from(9);
     /// x.log_base_10_1_plus_x_assign();
-    /// assert_eq!(x.to_string(), "1.0"); // log_10(10) = 1
+    /// assert_eq!(x.to_string(), "1.00"); // log_10(10) = 1
     ///
     /// let mut x = Float::from(99);
     /// x.log_base_10_1_plus_x_assign();
-    /// assert_eq!(x.to_string(), "2.0"); // log_10(100) = 2
+    /// assert_eq!(x.to_string(), "2.000"); // log_10(100) = 2
     /// ```
     #[inline]
     fn log_base_10_1_plus_x_assign(&mut self) {

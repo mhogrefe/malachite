@@ -62,11 +62,11 @@ impl Float {
     /// assert_eq!(o, Equal);
     ///
     /// let (p, o) = Float::power_of_2_prec_round(0, 100, Nearest);
-    /// assert_eq!(p.to_string(), "1.0");
+    /// assert_eq!(p.to_string(), "1.0000000000000000000000000000000");
     /// assert_eq!(o, Equal);
     ///
     /// let (p, o) = Float::power_of_2_prec_round(100, 1, Nearest);
-    /// assert_eq!(p.to_string(), "1.0e30");
+    /// assert_eq!(p.to_string(), "1.3e30");
     /// assert_eq!(o, Equal);
     ///
     /// let (p, o) = Float::power_of_2_prec_round(100, 100, Nearest);
@@ -74,15 +74,15 @@ impl Float {
     /// assert_eq!(o, Equal);
     ///
     /// let (p, o) = Float::power_of_2_prec_round(-100, 1, Nearest);
-    /// assert_eq!(p.to_string(), "8.0e-31");
+    /// assert_eq!(p.to_string(), "7.9e-31");
     /// assert_eq!(o, Equal);
     ///
     /// let (p, o) = Float::power_of_2_prec_round(-100, 100, Nearest);
-    /// assert_eq!(p.to_string(), "7.88860905221011805411728565283e-31");
+    /// assert_eq!(p.to_string(), "7.8886090522101180541172856528279e-31");
     /// assert_eq!(o, Equal);
     ///
     /// let (p, o) = Float::power_of_2_prec_round(i64::power_of_2(30) - 1, 10, Floor);
-    /// assert_eq!(p.to_string(), "too_big");
+    /// assert_eq!(p.to_string(), "2.0965e323228496");
     /// assert_eq!(o, Less);
     ///
     /// let (p, o) = Float::power_of_2_prec_round(i64::power_of_2(30) - 1, 10, Ceiling);
@@ -94,7 +94,7 @@ impl Float {
     /// assert_eq!(o, Less);
     ///
     /// let (p, o) = Float::power_of_2_prec_round(-i64::power_of_2(30) - 1, 10, Ceiling);
-    /// assert_eq!(p.to_string(), "too_small");
+    /// assert_eq!(p.to_string(), "2.3826e-323228497");
     /// assert_eq!(o, Greater);
     /// ```
     pub fn power_of_2_prec_round(pow: i64, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
@@ -161,11 +161,11 @@ impl Float {
     /// assert_eq!(o, Equal);
     ///
     /// let (p, o) = Float::power_of_2_prec(0, 100);
-    /// assert_eq!(p.to_string(), "1.0");
+    /// assert_eq!(p.to_string(), "1.0000000000000000000000000000000");
     /// assert_eq!(o, Equal);
     ///
     /// let (p, o) = Float::power_of_2_prec(100, 1);
-    /// assert_eq!(p.to_string(), "1.0e30");
+    /// assert_eq!(p.to_string(), "1.3e30");
     /// assert_eq!(o, Equal);
     ///
     /// let (p, o) = Float::power_of_2_prec(100, 100);
@@ -173,11 +173,11 @@ impl Float {
     /// assert_eq!(o, Equal);
     ///
     /// let (p, o) = Float::power_of_2_prec(-100, 1);
-    /// assert_eq!(p.to_string(), "8.0e-31");
+    /// assert_eq!(p.to_string(), "7.9e-31");
     /// assert_eq!(o, Equal);
     ///
     /// let (p, o) = Float::power_of_2_prec(-100, 100);
-    /// assert_eq!(p.to_string(), "7.88860905221011805411728565283e-31");
+    /// assert_eq!(p.to_string(), "7.8886090522101180541172856528279e-31");
     /// assert_eq!(o, Equal);
     ///
     /// let (p, o) = Float::power_of_2_prec(i64::power_of_2(30) - 1, 10);
@@ -213,7 +213,7 @@ impl PowerOf2<u64> for Float {
     ///
     /// assert_eq!(Float::power_of_2(0u64).to_string(), "1.0");
     /// assert_eq!(Float::power_of_2(3u64).to_string(), "8.0");
-    /// assert_eq!(Float::power_of_2(100u64).to_string(), "1.0e30");
+    /// assert_eq!(Float::power_of_2(100u64).to_string(), "1.3e30");
     /// assert_eq!(
     ///     Float::power_of_2(u64::power_of_2(30) - 1).to_string(),
     ///     "Infinity"
@@ -255,9 +255,9 @@ impl PowerOf2<i64> for Float {
     ///
     /// assert_eq!(Float::power_of_2(0i64).to_string(), "1.0");
     /// assert_eq!(Float::power_of_2(3i64).to_string(), "8.0");
-    /// assert_eq!(Float::power_of_2(100i64).to_string(), "1.0e30");
-    /// assert_eq!(Float::power_of_2(-3i64).to_string(), "0.1");
-    /// assert_eq!(Float::power_of_2(-100i64).to_string(), "8.0e-31");
+    /// assert_eq!(Float::power_of_2(100i64).to_string(), "1.3e30");
+    /// assert_eq!(Float::power_of_2(-3i64).to_string(), "0.12");
+    /// assert_eq!(Float::power_of_2(-100i64).to_string(), "7.9e-31");
     /// assert_eq!(
     ///     Float::power_of_2(i64::power_of_2(30) - 1).to_string(),
     ///     "Infinity"

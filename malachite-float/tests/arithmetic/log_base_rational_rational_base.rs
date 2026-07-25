@@ -21,7 +21,7 @@ use malachite_float::arithmetic::log_base_rational_rational_base::*;
 use malachite_float::test_util::arithmetic::log_base_rational_rational_base::{
     rug_log_base_rational_rational_base_prec, rug_log_base_rational_rational_base_prec_round,
 };
-use malachite_float::test_util::common::rug_round_try_from_rounding_mode;
+use malachite_float::test_util::common::{rug_round_try_from_rounding_mode, to_hex_string};
 use malachite_float::test_util::generators::*;
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_q::Rational;
@@ -62,38 +62,76 @@ fn check(x: &Rational, base: &Rational, prec: u64, rm: RoundingMode) -> (Float, 
 
 #[test]
 fn test_log_base_rational_rational_base_prec_round() {
-    let test =
-        |xn: i64, xd: u64, bn: u64, bd: u64, prec: u64, rm: RoundingMode, out: &str, o_out| {
-            let x = Rational::from_signeds(xn, i64::exact_from(xd));
-            let base = Rational::from_unsigneds(bn, bd);
-            let (log, o) = check(&x, &base, prec, rm);
-            assert_eq!(log.to_string(), out);
-            assert_eq!(o, o_out);
-        };
+    let test = |xn: i64,
+                xd: u64,
+                bn: u64,
+                bd: u64,
+                prec: u64,
+                rm: RoundingMode,
+                out: &str,
+                out_hex: &str,
+                o_out| {
+        let x = Rational::from_signeds(xn, i64::exact_from(xd));
+        let base = Rational::from_unsigneds(bn, bd);
+        let (log, o) = check(&x, &base, prec, rm);
+        assert_eq!(log.to_string(), out);
+        assert_eq!(to_hex_string(&log), out_hex);
+        assert_eq!(o, o_out);
+    };
     // Exact, integer base.
-    test(9, 1, 3, 1, 10, Exact, "2.0", Equal); // log_3(9) = 2
-    test(8, 1, 2, 1, 10, Exact, "3.0", Equal); // log_2(8) = 3
-    test(27, 1, 3, 1, 10, Exact, "3.0", Equal); // log_3(27) = 3
+    test(9, 1, 3, 1, 10, Exact, "2.0000", "0x2.00#10", Equal); // log_3(9) = 2
+    test(8, 1, 2, 1, 10, Exact, "3.0000", "0x3.00#10", Equal); // log_2(8) = 3
+    test(27, 1, 3, 1, 10, Exact, "3.0000", "0x3.00#10", Equal); // log_3(27) = 3
     // Exact, rational base.
-    test(8, 1, 4, 1, 10, Exact, "1.5", Equal); // log_4(8) = 3/2
-    test(2, 1, 4, 1, 10, Exact, "0.5", Equal); // log_4(2) = 1/2
-    test(9, 4, 3, 2, 10, Exact, "2.0", Equal); // log_{3/2}(9/4) = 2
-    test(3, 2, 9, 4, 10, Exact, "0.5", Equal); // log_{9/4}(3/2) = 1/2
+    test(8, 1, 4, 1, 10, Exact, "1.5000", "0x1.800#10", Equal); // log_4(8) = 3/2
+    test(2, 1, 4, 1, 10, Exact, "0.50000", "0x0.800#10", Equal); // log_4(2) = 1/2
+    test(9, 4, 3, 2, 10, Exact, "2.0000", "0x2.00#10", Equal); // log_{3/2}(9/4) = 2
+    test(3, 2, 9, 4, 10, Exact, "0.50000", "0x0.800#10", Equal); // log_{9/4}(3/2) = 1/2
     // Non-dyadic rational x.
-    test(1, 3, 3, 1, 10, Exact, "-1.0", Equal); // log_3(1/3) = -1
-    test(1, 9, 3, 1, 10, Exact, "-2.0", Equal); // log_3(1/9) = -2
+    test(1, 3, 3, 1, 10, Exact, "-1.0000", "-0x1.000#10", Equal); // log_3(1/3) = -1
+    test(1, 9, 3, 1, 10, Exact, "-2.0000", "-0x2.00#10", Equal); // log_3(1/9) = -2
     // x < 1 (negative result).
-    test(1, 4, 4, 1, 10, Exact, "-1.0", Equal); // log_4(1/4) = -1
-    test(1, 8, 2, 1, 10, Exact, "-3.0", Equal); // log_2(1/8) = -3
+    test(1, 4, 4, 1, 10, Exact, "-1.0000", "-0x1.000#10", Equal); // log_4(1/4) = -1
+    test(1, 8, 2, 1, 10, Exact, "-3.0000", "-0x3.00#10", Equal); // log_2(1/8) = -3
     // Irrational (cross-checked against the oracle).
-    test(2, 1, 3, 1, 20, Floor, "0.630929", Less); // log_3(2)
-    test(2, 1, 3, 1, 20, Ceiling, "0.63093", Greater);
-    test(2, 1, 3, 1, 20, Nearest, "0.63093", Greater);
-    test(2, 1, 3, 2, 20, Nearest, "1.709511", Less); // log_{3/2}(2)
-    test(1, 3, 3, 2, 20, Nearest, "-2.709511", Greater); // log_{3/2}(1/3)
+    test(2, 1, 3, 1, 20, Floor, "0.63092899", "0x0.a1849#20", Less); // log_3(2)
+    test(
+        2,
+        1,
+        3,
+        1,
+        20,
+        Ceiling,
+        "0.63092995",
+        "0x0.a184a#20",
+        Greater,
+    );
+    test(
+        2,
+        1,
+        3,
+        1,
+        20,
+        Nearest,
+        "0.63092995",
+        "0x0.a184a#20",
+        Greater,
+    );
+    test(2, 1, 3, 2, 20, Nearest, "1.7095108", "0x1.b5a28#20", Less); // log_{3/2}(2)
+    test(
+        1,
+        3,
+        3,
+        2,
+        20,
+        Nearest,
+        "-2.7095108",
+        "-0x2.b5a28#20",
+        Greater,
+    ); // log_{3/2}(1/3)
     // x = 1.
-    test(1, 1, 3, 1, 10, Exact, "0.0", Equal);
-    test(1, 1, 7, 3, 10, Exact, "0.0", Equal);
+    test(1, 1, 3, 1, 10, Exact, "0.0", "0x0.0", Equal);
+    test(1, 1, 7, 3, 10, Exact, "0.0", "0x0.0", Equal);
 }
 
 #[test]
@@ -113,13 +151,14 @@ fn test_log_base_rational_rational_base_specials() {
 #[test]
 fn test_log_base_rational_rational_base_prec() {
     // The `_prec` methods round to nearest; cross-checked against the rug oracle.
-    let test = |xn: i64, xd: u64, bn: u64, bd: u64, prec: u64, out: &str, o_out| {
+    let test = |xn: i64, xd: u64, bn: u64, bd: u64, prec: u64, out: &str, out_hex: &str, o_out| {
         let x = Rational::from_signeds(xn, i64::exact_from(xd));
         let base = Rational::from_unsigneds(bn, bd);
 
         let (log, o) = Float::log_base_rational_rational_base_prec(x.clone(), base.clone(), prec);
         assert!(log.is_valid());
         assert_eq!(log.to_string(), out);
+        assert_eq!(to_hex_string(&log), out_hex);
         assert_eq!(o, o_out);
 
         let (log_alt, o_alt) = Float::log_base_rational_rational_base_prec_ref(&x, &base, prec);
@@ -134,13 +173,13 @@ fn test_log_base_rational_rational_base_prec() {
         );
         assert_eq!(rug_o, o);
     };
-    test(9, 1, 3, 1, 10, "2.0", Equal); // log_3(9) = 2
-    test(8, 1, 4, 1, 10, "1.5", Equal); // log_4(8) = 3/2
-    test(1, 9, 3, 1, 10, "-2.0", Equal); // log_3(1/9) = -2
-    test(9, 4, 3, 2, 10, "2.0", Equal); // log_{3/2}(9/4) = 2
-    test(2, 1, 3, 1, 20, "0.63093", Greater); // log_3(2)
-    test(2, 1, 3, 2, 20, "1.709511", Less); // log_{3/2}(2)
-    test(1, 1, 3, 1, 10, "0.0", Equal); // log_3(1) = 0
+    test(9, 1, 3, 1, 10, "2.0000", "0x2.00#10", Equal); // log_3(9) = 2
+    test(8, 1, 4, 1, 10, "1.5000", "0x1.800#10", Equal); // log_4(8) = 3/2
+    test(1, 9, 3, 1, 10, "-2.0000", "-0x2.00#10", Equal); // log_3(1/9) = -2
+    test(9, 4, 3, 2, 10, "2.0000", "0x2.00#10", Equal); // log_{3/2}(9/4) = 2
+    test(2, 1, 3, 1, 20, "0.63092995", "0x0.a184a#20", Greater); // log_3(2)
+    test(2, 1, 3, 2, 20, "1.7095108", "0x1.b5a28#20", Less); // log_{3/2}(2)
+    test(1, 1, 3, 1, 10, "0.0", "0x0.0", Equal); // log_3(1) = 0
 }
 
 // The result must match the independently-implemented integer-base `log_base_rational` (which

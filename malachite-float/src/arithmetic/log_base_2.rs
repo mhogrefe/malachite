@@ -323,37 +323,37 @@ impl Float {
     /// let (log, o) = Float::from_unsigned_prec(10u32, 100)
     ///     .0
     ///     .log_base_2_prec_round(5, Floor);
-    /// assert_eq!(log.to_string(), "3.2");
+    /// assert_eq!(log.to_string(), "3.25");
     /// assert_eq!(o, Less);
     ///
     /// let (log, o) = Float::from_unsigned_prec(10u32, 100)
     ///     .0
     ///     .log_base_2_prec_round(5, Ceiling);
-    /// assert_eq!(log.to_string(), "3.4");
+    /// assert_eq!(log.to_string(), "3.38");
     /// assert_eq!(o, Greater);
     ///
     /// let (log, o) = Float::from_unsigned_prec(10u32, 100)
     ///     .0
     ///     .log_base_2_prec_round(5, Nearest);
-    /// assert_eq!(log.to_string(), "3.4");
+    /// assert_eq!(log.to_string(), "3.38");
     /// assert_eq!(o, Greater);
     ///
     /// let (log, o) = Float::from_unsigned_prec(10u32, 100)
     ///     .0
     ///     .log_base_2_prec_round(20, Floor);
-    /// assert_eq!(log.to_string(), "3.321926");
+    /// assert_eq!(log.to_string(), "3.3219261");
     /// assert_eq!(o, Less);
     ///
     /// let (log, o) = Float::from_unsigned_prec(10u32, 100)
     ///     .0
     ///     .log_base_2_prec_round(20, Ceiling);
-    /// assert_eq!(log.to_string(), "3.32193");
+    /// assert_eq!(log.to_string(), "3.3219299");
     /// assert_eq!(o, Greater);
     ///
     /// let (log, o) = Float::from_unsigned_prec(10u32, 100)
     ///     .0
     ///     .log_base_2_prec_round(20, Nearest);
-    /// assert_eq!(log.to_string(), "3.32193");
+    /// assert_eq!(log.to_string(), "3.3219299");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -430,37 +430,37 @@ impl Float {
     /// let (log, o) = Float::from_unsigned_prec(10u32, 100)
     ///     .0
     ///     .log_base_2_prec_round_ref(5, Floor);
-    /// assert_eq!(log.to_string(), "3.2");
+    /// assert_eq!(log.to_string(), "3.25");
     /// assert_eq!(o, Less);
     ///
     /// let (log, o) = Float::from_unsigned_prec(10u32, 100)
     ///     .0
     ///     .log_base_2_prec_round_ref(5, Ceiling);
-    /// assert_eq!(log.to_string(), "3.4");
+    /// assert_eq!(log.to_string(), "3.38");
     /// assert_eq!(o, Greater);
     ///
     /// let (log, o) = Float::from_unsigned_prec(10u32, 100)
     ///     .0
     ///     .log_base_2_prec_round_ref(5, Nearest);
-    /// assert_eq!(log.to_string(), "3.4");
+    /// assert_eq!(log.to_string(), "3.38");
     /// assert_eq!(o, Greater);
     ///
     /// let (log, o) = Float::from_unsigned_prec(10u32, 100)
     ///     .0
     ///     .log_base_2_prec_round_ref(20, Floor);
-    /// assert_eq!(log.to_string(), "3.321926");
+    /// assert_eq!(log.to_string(), "3.3219261");
     /// assert_eq!(o, Less);
     ///
     /// let (log, o) = Float::from_unsigned_prec(10u32, 100)
     ///     .0
     ///     .log_base_2_prec_round_ref(20, Ceiling);
-    /// assert_eq!(log.to_string(), "3.32193");
+    /// assert_eq!(log.to_string(), "3.3219299");
     /// assert_eq!(o, Greater);
     ///
     /// let (log, o) = Float::from_unsigned_prec(10u32, 100)
     ///     .0
     ///     .log_base_2_prec_round_ref(20, Nearest);
-    /// assert_eq!(log.to_string(), "3.32193");
+    /// assert_eq!(log.to_string(), "3.3219299");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -530,11 +530,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (log, o) = Float::from_unsigned_prec(10u32, 100).0.log_base_2_prec(5);
-    /// assert_eq!(log.to_string(), "3.4");
+    /// assert_eq!(log.to_string(), "3.38");
     /// assert_eq!(o, Greater);
     ///
     /// let (log, o) = Float::from_unsigned_prec(10u32, 100).0.log_base_2_prec(20);
-    /// assert_eq!(log.to_string(), "3.32193");
+    /// assert_eq!(log.to_string(), "3.3219299");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -598,13 +598,13 @@ impl Float {
     /// let (log, o) = Float::from_unsigned_prec(10u32, 100)
     ///     .0
     ///     .log_base_2_prec_ref(5);
-    /// assert_eq!(log.to_string(), "3.4");
+    /// assert_eq!(log.to_string(), "3.38");
     /// assert_eq!(o, Greater);
     ///
     /// let (log, o) = Float::from_unsigned_prec(10u32, 100)
     ///     .0
     ///     .log_base_2_prec_ref(20);
-    /// assert_eq!(log.to_string(), "3.32193");
+    /// assert_eq!(log.to_string(), "3.3219299");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -673,19 +673,19 @@ impl Float {
     /// let (log, o) = Float::from_unsigned_prec(10u32, 100)
     ///     .0
     ///     .log_base_2_round(Floor);
-    /// assert_eq!(log.to_string(), "3.321928094887362347870319429487");
+    /// assert_eq!(log.to_string(), "3.3219280948873623478703194294867");
     /// assert_eq!(o, Less);
     ///
     /// let (log, o) = Float::from_unsigned_prec(10u32, 100)
     ///     .0
     ///     .log_base_2_round(Ceiling);
-    /// assert_eq!(log.to_string(), "3.32192809488736234787031942949");
+    /// assert_eq!(log.to_string(), "3.3219280948873623478703194294898");
     /// assert_eq!(o, Greater);
     ///
     /// let (log, o) = Float::from_unsigned_prec(10u32, 100)
     ///     .0
     ///     .log_base_2_round(Nearest);
-    /// assert_eq!(log.to_string(), "3.32192809488736234787031942949");
+    /// assert_eq!(log.to_string(), "3.3219280948873623478703194294898");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -755,19 +755,19 @@ impl Float {
     /// let (log, o) = Float::from_unsigned_prec(10u32, 100)
     ///     .0
     ///     .log_base_2_round_ref(Floor);
-    /// assert_eq!(log.to_string(), "3.321928094887362347870319429487");
+    /// assert_eq!(log.to_string(), "3.3219280948873623478703194294867");
     /// assert_eq!(o, Less);
     ///
     /// let (log, o) = Float::from_unsigned_prec(10u32, 100)
     ///     .0
     ///     .log_base_2_round_ref(Ceiling);
-    /// assert_eq!(log.to_string(), "3.32192809488736234787031942949");
+    /// assert_eq!(log.to_string(), "3.3219280948873623478703194294898");
     /// assert_eq!(o, Greater);
     ///
     /// let (log, o) = Float::from_unsigned_prec(10u32, 100)
     ///     .0
     ///     .log_base_2_round_ref(Nearest);
-    /// assert_eq!(log.to_string(), "3.32192809488736234787031942949");
+    /// assert_eq!(log.to_string(), "3.3219280948873623478703194294898");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -827,27 +827,27 @@ impl Float {
     ///
     /// let mut x = Float::from_unsigned_prec(10u32, 100).0;
     /// assert_eq!(x.log_base_2_prec_round_assign(5, Floor), Less);
-    /// assert_eq!(x.to_string(), "3.2");
+    /// assert_eq!(x.to_string(), "3.25");
     ///
     /// let mut x = Float::from_unsigned_prec(10u32, 100).0;
     /// assert_eq!(x.log_base_2_prec_round_assign(5, Ceiling), Greater);
-    /// assert_eq!(x.to_string(), "3.4");
+    /// assert_eq!(x.to_string(), "3.38");
     ///
     /// let mut x = Float::from_unsigned_prec(10u32, 100).0;
     /// assert_eq!(x.log_base_2_prec_round_assign(5, Nearest), Greater);
-    /// assert_eq!(x.to_string(), "3.4");
+    /// assert_eq!(x.to_string(), "3.38");
     ///
     /// let mut x = Float::from_unsigned_prec(10u32, 100).0;
     /// assert_eq!(x.log_base_2_prec_round_assign(20, Floor), Less);
-    /// assert_eq!(x.to_string(), "3.321926");
+    /// assert_eq!(x.to_string(), "3.3219261");
     ///
     /// let mut x = Float::from_unsigned_prec(10u32, 100).0;
     /// assert_eq!(x.log_base_2_prec_round_assign(20, Ceiling), Greater);
-    /// assert_eq!(x.to_string(), "3.32193");
+    /// assert_eq!(x.to_string(), "3.3219299");
     ///
     /// let mut x = Float::from_unsigned_prec(10u32, 100).0;
     /// assert_eq!(x.log_base_2_prec_round_assign(20, Nearest), Greater);
-    /// assert_eq!(x.to_string(), "3.32193");
+    /// assert_eq!(x.to_string(), "3.3219299");
     /// ```
     #[inline]
     pub fn log_base_2_prec_round_assign(&mut self, prec: u64, rm: RoundingMode) -> Ordering {
@@ -902,11 +902,11 @@ impl Float {
     ///
     /// let mut x = Float::from_unsigned_prec(10u32, 100).0;
     /// assert_eq!(x.log_base_2_prec_assign(5), Greater);
-    /// assert_eq!(x.to_string(), "3.4");
+    /// assert_eq!(x.to_string(), "3.38");
     ///
     /// let mut x = Float::from_unsigned_prec(10u32, 100).0;
     /// assert_eq!(x.log_base_2_prec_assign(20), Greater);
-    /// assert_eq!(x.to_string(), "3.32193");
+    /// assert_eq!(x.to_string(), "3.3219299");
     /// ```
     #[inline]
     pub fn log_base_2_prec_assign(&mut self, prec: u64) -> Ordering {
@@ -964,15 +964,15 @@ impl Float {
     ///
     /// let mut x = Float::from_unsigned_prec(10u32, 100).0;
     /// assert_eq!(x.log_base_2_round_assign(Floor), Less);
-    /// assert_eq!(x.to_string(), "3.321928094887362347870319429487");
+    /// assert_eq!(x.to_string(), "3.3219280948873623478703194294867");
     ///
     /// let mut x = Float::from_unsigned_prec(10u32, 100).0;
     /// assert_eq!(x.log_base_2_round_assign(Ceiling), Greater);
-    /// assert_eq!(x.to_string(), "3.32192809488736234787031942949");
+    /// assert_eq!(x.to_string(), "3.3219280948873623478703194294898");
     ///
     /// let mut x = Float::from_unsigned_prec(10u32, 100).0;
     /// assert_eq!(x.log_base_2_round_assign(Nearest), Greater);
-    /// assert_eq!(x.to_string(), "3.32192809488736234787031942949");
+    /// assert_eq!(x.to_string(), "3.3219280948873623478703194294898");
     /// ```
     #[inline]
     pub fn log_base_2_round_assign(&mut self, rm: RoundingMode) -> Ordering {
@@ -1039,32 +1039,32 @@ impl Float {
     ///
     /// let (log, o) =
     ///     Float::log_base_2_rational_prec_round(Rational::from_unsigneds(3u8, 5), 5, Floor);
-    /// assert_eq!(log.to_string(), "-0.75");
+    /// assert_eq!(log.to_string(), "-0.750");
     /// assert_eq!(o, Less);
     ///
     /// let (log, o) =
     ///     Float::log_base_2_rational_prec_round(Rational::from_unsigneds(3u8, 5), 5, Ceiling);
-    /// assert_eq!(log.to_string(), "-0.72");
+    /// assert_eq!(log.to_string(), "-0.719");
     /// assert_eq!(o, Greater);
     ///
     /// let (log, o) =
     ///     Float::log_base_2_rational_prec_round(Rational::from_unsigneds(3u8, 5), 5, Nearest);
-    /// assert_eq!(log.to_string(), "-0.75");
+    /// assert_eq!(log.to_string(), "-0.750");
     /// assert_eq!(o, Less);
     ///
     /// let (log, o) =
     ///     Float::log_base_2_rational_prec_round(Rational::from_unsigneds(3u8, 5), 20, Floor);
-    /// assert_eq!(log.to_string(), "-0.736966");
+    /// assert_eq!(log.to_string(), "-0.73696613");
     /// assert_eq!(o, Less);
     ///
     /// let (log, o) =
     ///     Float::log_base_2_rational_prec_round(Rational::from_unsigneds(3u8, 5), 20, Ceiling);
-    /// assert_eq!(log.to_string(), "-0.736965");
+    /// assert_eq!(log.to_string(), "-0.73696518");
     /// assert_eq!(o, Greater);
     ///
     /// let (log, o) =
     ///     Float::log_base_2_rational_prec_round(Rational::from_unsigneds(3u8, 5), 20, Nearest);
-    /// assert_eq!(log.to_string(), "-0.736965");
+    /// assert_eq!(log.to_string(), "-0.73696518");
     /// assert_eq!(o, Greater);
     /// ```
     #[allow(clippy::needless_pass_by_value)]
@@ -1136,7 +1136,7 @@ impl Float {
     ///
     /// let (log, o) =
     ///     Float::log_base_2_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 5, Floor);
-    /// assert_eq!(log.to_string(), "-0.75");
+    /// assert_eq!(log.to_string(), "-0.750");
     /// assert_eq!(o, Less);
     ///
     /// let (log, o) = Float::log_base_2_rational_prec_round_ref(
@@ -1144,7 +1144,7 @@ impl Float {
     ///     5,
     ///     Ceiling,
     /// );
-    /// assert_eq!(log.to_string(), "-0.72");
+    /// assert_eq!(log.to_string(), "-0.719");
     /// assert_eq!(o, Greater);
     ///
     /// let (log, o) = Float::log_base_2_rational_prec_round_ref(
@@ -1152,12 +1152,12 @@ impl Float {
     ///     5,
     ///     Nearest,
     /// );
-    /// assert_eq!(log.to_string(), "-0.75");
+    /// assert_eq!(log.to_string(), "-0.750");
     /// assert_eq!(o, Less);
     ///
     /// let (log, o) =
     ///     Float::log_base_2_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 20, Floor);
-    /// assert_eq!(log.to_string(), "-0.736966");
+    /// assert_eq!(log.to_string(), "-0.73696613");
     /// assert_eq!(o, Less);
     ///
     /// let (log, o) = Float::log_base_2_rational_prec_round_ref(
@@ -1165,7 +1165,7 @@ impl Float {
     ///     20,
     ///     Ceiling,
     /// );
-    /// assert_eq!(log.to_string(), "-0.736965");
+    /// assert_eq!(log.to_string(), "-0.73696518");
     /// assert_eq!(o, Greater);
     ///
     /// let (log, o) = Float::log_base_2_rational_prec_round_ref(
@@ -1173,7 +1173,7 @@ impl Float {
     ///     20,
     ///     Nearest,
     /// );
-    /// assert_eq!(log.to_string(), "-0.736965");
+    /// assert_eq!(log.to_string(), "-0.73696518");
     /// assert_eq!(o, Greater);
     /// ```
     pub fn log_base_2_rational_prec_round_ref(
@@ -1251,11 +1251,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (log, o) = Float::log_base_2_rational_prec(Rational::from_unsigneds(3u8, 5), 5);
-    /// assert_eq!(log.to_string(), "-0.75");
+    /// assert_eq!(log.to_string(), "-0.750");
     /// assert_eq!(o, Less);
     ///
     /// let (log, o) = Float::log_base_2_rational_prec(Rational::from_unsigneds(3u8, 5), 20);
-    /// assert_eq!(log.to_string(), "-0.736965");
+    /// assert_eq!(log.to_string(), "-0.73696518");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -1317,11 +1317,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (log, o) = Float::log_base_2_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 5);
-    /// assert_eq!(log.to_string(), "-0.75");
+    /// assert_eq!(log.to_string(), "-0.750");
     /// assert_eq!(o, Less);
     ///
     /// let (log, o) = Float::log_base_2_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 20);
-    /// assert_eq!(log.to_string(), "-0.736965");
+    /// assert_eq!(log.to_string(), "-0.73696518");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -1388,7 +1388,7 @@ impl LogBase2 for Float {
     ///         .0
     ///         .log_base_2()
     ///         .to_string(),
-    ///     "3.32192809488736234787031942949"
+    ///     "3.3219280948873623478703194294898"
     /// );
     /// assert!(Float::from_signed_prec(-10, 100).0.log_base_2().is_nan());
     /// ```
@@ -1456,7 +1456,7 @@ impl LogBase2 for &Float {
     ///     (&Float::from_unsigned_prec(10u32, 100).0)
     ///         .log_base_2()
     ///         .to_string(),
-    ///     "3.32192809488736234787031942949"
+    ///     "3.3219280948873623478703194294898"
     /// );
     /// assert!((&Float::from_signed_prec(-10, 100).0).log_base_2().is_nan());
     /// ```
@@ -1520,7 +1520,7 @@ impl LogBase2Assign for Float {
     ///
     /// let mut x = Float::from_unsigned_prec(10u32, 100).0;
     /// x.log_base_2_assign();
-    /// assert_eq!(x.to_string(), "3.32192809488736234787031942949");
+    /// assert_eq!(x.to_string(), "3.3219280948873623478703194294898");
     ///
     /// let mut x = Float::from_signed_prec(-10, 100).0;
     /// x.log_base_2_assign();

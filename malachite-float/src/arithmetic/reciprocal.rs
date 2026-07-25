@@ -81,27 +81,27 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (reciprocal, o) = Float::from(PI).reciprocal_prec_round(5, Floor);
-    /// assert_eq!(reciprocal.to_string(), "0.31");
+    /// assert_eq!(reciprocal.to_string(), "0.312");
     /// assert_eq!(o, Less);
     ///
     /// let (reciprocal, o) = Float::from(PI).reciprocal_prec_round(5, Ceiling);
-    /// assert_eq!(reciprocal.to_string(), "0.33");
+    /// assert_eq!(reciprocal.to_string(), "0.328");
     /// assert_eq!(o, Greater);
     ///
     /// let (reciprocal, o) = Float::from(PI).reciprocal_prec_round(5, Nearest);
-    /// assert_eq!(reciprocal.to_string(), "0.31");
+    /// assert_eq!(reciprocal.to_string(), "0.312");
     /// assert_eq!(o, Less);
     ///
     /// let (reciprocal, o) = Float::from(PI).reciprocal_prec_round(20, Floor);
-    /// assert_eq!(reciprocal.to_string(), "0.3183098");
+    /// assert_eq!(reciprocal.to_string(), "0.31830978");
     /// assert_eq!(o, Less);
     ///
     /// let (reciprocal, o) = Float::from(PI).reciprocal_prec_round(20, Ceiling);
-    /// assert_eq!(reciprocal.to_string(), "0.3183103");
+    /// assert_eq!(reciprocal.to_string(), "0.31831026");
     /// assert_eq!(o, Greater);
     ///
     /// let (reciprocal, o) = Float::from(PI).reciprocal_prec_round(20, Nearest);
-    /// assert_eq!(reciprocal.to_string(), "0.3183098");
+    /// assert_eq!(reciprocal.to_string(), "0.31830978");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -172,27 +172,27 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (reciprocal, o) = Float::from(PI).reciprocal_prec_round_ref(5, Floor);
-    /// assert_eq!(reciprocal.to_string(), "0.31");
+    /// assert_eq!(reciprocal.to_string(), "0.312");
     /// assert_eq!(o, Less);
     ///
     /// let (reciprocal, o) = Float::from(PI).reciprocal_prec_round_ref(5, Ceiling);
-    /// assert_eq!(reciprocal.to_string(), "0.33");
+    /// assert_eq!(reciprocal.to_string(), "0.328");
     /// assert_eq!(o, Greater);
     ///
     /// let (reciprocal, o) = Float::from(PI).reciprocal_prec_round_ref(5, Nearest);
-    /// assert_eq!(reciprocal.to_string(), "0.31");
+    /// assert_eq!(reciprocal.to_string(), "0.312");
     /// assert_eq!(o, Less);
     ///
     /// let (reciprocal, o) = Float::from(PI).reciprocal_prec_round_ref(20, Floor);
-    /// assert_eq!(reciprocal.to_string(), "0.3183098");
+    /// assert_eq!(reciprocal.to_string(), "0.31830978");
     /// assert_eq!(o, Less);
     ///
     /// let (reciprocal, o) = Float::from(PI).reciprocal_prec_round_ref(20, Ceiling);
-    /// assert_eq!(reciprocal.to_string(), "0.3183103");
+    /// assert_eq!(reciprocal.to_string(), "0.31831026");
     /// assert_eq!(o, Greater);
     ///
     /// let (reciprocal, o) = Float::from(PI).reciprocal_prec_round_ref(20, Nearest);
-    /// assert_eq!(reciprocal.to_string(), "0.3183098");
+    /// assert_eq!(reciprocal.to_string(), "0.31830978");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -296,11 +296,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (reciprocal, o) = Float::from(PI).reciprocal_prec(5);
-    /// assert_eq!(reciprocal.to_string(), "0.31");
+    /// assert_eq!(reciprocal.to_string(), "0.312");
     /// assert_eq!(o, Less);
     ///
     /// let (reciprocal, o) = Float::from(PI).reciprocal_prec(20);
-    /// assert_eq!(reciprocal.to_string(), "0.3183098");
+    /// assert_eq!(reciprocal.to_string(), "0.31830978");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -358,11 +358,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (reciprocal, o) = Float::from(PI).reciprocal_prec_ref(5);
-    /// assert_eq!(reciprocal.to_string(), "0.31");
+    /// assert_eq!(reciprocal.to_string(), "0.312");
     /// assert_eq!(o, Less);
     ///
     /// let (reciprocal, o) = Float::from(PI).reciprocal_prec_ref(20);
-    /// assert_eq!(reciprocal.to_string(), "0.3183098");
+    /// assert_eq!(reciprocal.to_string(), "0.31830978");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -432,15 +432,15 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (reciprocal, o) = Float::from(PI).reciprocal_round(Floor);
-    /// assert_eq!(reciprocal.to_string(), "0.3183098861837905");
+    /// assert_eq!(reciprocal.to_string(), "0.31830988618379052");
     /// assert_eq!(o, Less);
     ///
     /// let (reciprocal, o) = Float::from(PI).reciprocal_round(Ceiling);
-    /// assert_eq!(reciprocal.to_string(), "0.318309886183791");
+    /// assert_eq!(reciprocal.to_string(), "0.31830988618379097");
     /// assert_eq!(o, Greater);
     ///
     /// let (reciprocal, o) = Float::from(PI).reciprocal_round(Nearest);
-    /// assert_eq!(reciprocal.to_string(), "0.3183098861837905");
+    /// assert_eq!(reciprocal.to_string(), "0.31830988618379052");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -511,15 +511,15 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (reciprocal, o) = Float::from(PI).reciprocal_round_ref(Floor);
-    /// assert_eq!(reciprocal.to_string(), "0.3183098861837905");
+    /// assert_eq!(reciprocal.to_string(), "0.31830988618379052");
     /// assert_eq!(o, Less);
     ///
     /// let (reciprocal, o) = Float::from(PI).reciprocal_round_ref(Ceiling);
-    /// assert_eq!(reciprocal.to_string(), "0.318309886183791");
+    /// assert_eq!(reciprocal.to_string(), "0.31830988618379097");
     /// assert_eq!(o, Greater);
     ///
     /// let (reciprocal, o) = Float::from(PI).reciprocal_round_ref(Nearest);
-    /// assert_eq!(reciprocal.to_string(), "0.3183098861837905");
+    /// assert_eq!(reciprocal.to_string(), "0.31830988618379052");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -575,27 +575,27 @@ impl Float {
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.reciprocal_prec_round_assign(5, Floor), Less);
-    /// assert_eq!(x.to_string(), "0.31");
+    /// assert_eq!(x.to_string(), "0.312");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.reciprocal_prec_round_assign(5, Ceiling), Greater);
-    /// assert_eq!(x.to_string(), "0.33");
+    /// assert_eq!(x.to_string(), "0.328");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.reciprocal_prec_round_assign(5, Nearest), Less);
-    /// assert_eq!(x.to_string(), "0.31");
+    /// assert_eq!(x.to_string(), "0.312");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.reciprocal_prec_round_assign(20, Floor), Less);
-    /// assert_eq!(x.to_string(), "0.3183098");
+    /// assert_eq!(x.to_string(), "0.31830978");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.reciprocal_prec_round_assign(20, Ceiling), Greater);
-    /// assert_eq!(x.to_string(), "0.3183103");
+    /// assert_eq!(x.to_string(), "0.31831026");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.reciprocal_prec_round_assign(20, Nearest), Less);
-    /// assert_eq!(x.to_string(), "0.3183098");
+    /// assert_eq!(x.to_string(), "0.31830978");
     /// ```
     #[inline]
     pub fn reciprocal_prec_round_assign(&mut self, prec: u64, rm: RoundingMode) -> Ordering {
@@ -704,11 +704,11 @@ impl Float {
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.reciprocal_prec_assign(5), Less);
-    /// assert_eq!(x.to_string(), "0.31");
+    /// assert_eq!(x.to_string(), "0.312");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.reciprocal_prec_assign(20), Less);
-    /// assert_eq!(x.to_string(), "0.3183098");
+    /// assert_eq!(x.to_string(), "0.31830978");
     /// ```
     #[inline]
     pub fn reciprocal_prec_assign(&mut self, prec: u64) -> Ordering {
@@ -762,15 +762,15 @@ impl Float {
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.reciprocal_round_assign(Floor), Less);
-    /// assert_eq!(x.to_string(), "0.3183098861837905");
+    /// assert_eq!(x.to_string(), "0.31830988618379052");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.reciprocal_round_assign(Ceiling), Greater);
-    /// assert_eq!(x.to_string(), "0.318309886183791");
+    /// assert_eq!(x.to_string(), "0.31830988618379097");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.reciprocal_round_assign(Nearest), Less);
-    /// assert_eq!(x.to_string(), "0.3183098861837905");
+    /// assert_eq!(x.to_string(), "0.31830988618379052");
     /// ```
     #[inline]
     pub fn reciprocal_round_assign(&mut self, rm: RoundingMode) -> Ordering {
@@ -830,8 +830,8 @@ impl Reciprocal for Float {
     /// assert!(Float::NAN.reciprocal().is_nan());
     /// assert_eq!(Float::INFINITY.reciprocal().to_string(), "0.0");
     /// assert_eq!(Float::NEGATIVE_INFINITY.reciprocal().to_string(), "-0.0");
-    /// assert_eq!(Float::from(1.5).reciprocal().to_string(), "0.8");
-    /// assert_eq!(Float::from(-1.5).reciprocal().to_string(), "-0.8");
+    /// assert_eq!(Float::from(1.5).reciprocal().to_string(), "0.75");
+    /// assert_eq!(Float::from(-1.5).reciprocal().to_string(), "-0.75");
     /// ```
     #[inline]
     fn reciprocal(self) -> Self {
@@ -891,8 +891,8 @@ impl Reciprocal for &Float {
     /// assert!((&Float::NAN).reciprocal().is_nan());
     /// assert_eq!((&Float::INFINITY).reciprocal().to_string(), "0.0");
     /// assert_eq!((&Float::NEGATIVE_INFINITY).reciprocal().to_string(), "-0.0");
-    /// assert_eq!((&Float::from(1.5)).reciprocal().to_string(), "0.8");
-    /// assert_eq!((&Float::from(-1.5)).reciprocal().to_string(), "-0.8");
+    /// assert_eq!((&Float::from(1.5)).reciprocal().to_string(), "0.75");
+    /// assert_eq!((&Float::from(-1.5)).reciprocal().to_string(), "-0.75");
     /// ```
     #[inline]
     fn reciprocal(self) -> Float {
@@ -951,11 +951,11 @@ impl ReciprocalAssign for Float {
     ///
     /// let mut x = Float::from(1.5);
     /// x.reciprocal_assign();
-    /// assert_eq!(x.to_string(), "0.8");
+    /// assert_eq!(x.to_string(), "0.75");
     ///
     /// let mut x = Float::from(-1.5);
     /// x.reciprocal_assign();
-    /// assert_eq!(x.to_string(), "-0.8");
+    /// assert_eq!(x.to_string(), "-0.75");
     /// ```
     #[inline]
     fn reciprocal_assign(&mut self) {

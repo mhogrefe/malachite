@@ -501,15 +501,15 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (log, o) = Float::from(1000).log_base_prec_round(10, 10, Nearest);
-    /// assert_eq!(log.to_string(), "3.0");
+    /// assert_eq!(log.to_string(), "3.0000");
     /// assert_eq!(o, Equal);
     ///
     /// let (log, o) = Float::from(50).log_base_prec_round(10, 10, Floor);
-    /// assert_eq!(log.to_string(), "1.697");
+    /// assert_eq!(log.to_string(), "1.6973");
     /// assert_eq!(o, Less);
     ///
     /// let (log, o) = Float::from(50).log_base_prec_round(10, 10, Ceiling);
-    /// assert_eq!(log.to_string(), "1.699");
+    /// assert_eq!(log.to_string(), "1.6992");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -556,7 +556,7 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (log, o) = Float::from(1000).log_base_prec_round_ref(10, 10, Nearest);
-    /// assert_eq!(log.to_string(), "3.0");
+    /// assert_eq!(log.to_string(), "3.0000");
     /// assert_eq!(o, Equal);
     /// ```
     #[inline]
@@ -608,7 +608,7 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (log, o) = Float::from(50).log_base_prec(10, 10);
-    /// assert_eq!(log.to_string(), "1.699");
+    /// assert_eq!(log.to_string(), "1.6992");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -639,7 +639,7 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (log, o) = Float::from(50).log_base_prec_ref(10, 10);
-    /// assert_eq!(log.to_string(), "1.699");
+    /// assert_eq!(log.to_string(), "1.6992");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -672,7 +672,7 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (log, o) = Float::from(1000).log_base_round(10, Floor);
-    /// assert_eq!(log.to_string(), "3.0");
+    /// assert_eq!(log.to_string(), "3.000");
     /// assert_eq!(o, Equal);
     /// ```
     #[inline]
@@ -706,7 +706,7 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (log, o) = Float::from(81).log_base_round_ref(3, Ceiling);
-    /// assert_eq!(log.to_string(), "4.0");
+    /// assert_eq!(log.to_string(), "4.000");
     /// assert_eq!(o, Equal);
     /// ```
     #[inline]
@@ -740,7 +740,7 @@ impl Float {
     ///
     /// let mut x = Float::from(50);
     /// let o = x.log_base_prec_round_assign(10, 10, Floor);
-    /// assert_eq!(x.to_string(), "1.697");
+    /// assert_eq!(x.to_string(), "1.6973");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -779,7 +779,7 @@ impl Float {
     ///
     /// let mut x = Float::from(1000);
     /// let o = x.log_base_prec_assign(10, 10);
-    /// assert_eq!(x.to_string(), "3.0");
+    /// assert_eq!(x.to_string(), "3.0000");
     /// assert_eq!(o, Equal);
     /// ```
     #[inline]
@@ -813,7 +813,7 @@ impl Float {
     ///
     /// let mut x = Float::from(81);
     /// let o = x.log_base_round_assign(3, Nearest);
-    /// assert_eq!(x.to_string(), "4.0");
+    /// assert_eq!(x.to_string(), "4.000");
     /// assert_eq!(o, Equal);
     /// ```
     #[inline]
@@ -866,11 +866,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (log, o) = Float::log_base_rational_prec_round(Rational::from(3), 9, 10, Exact);
-    /// assert_eq!(log.to_string(), "0.5"); // log_9(3) = 1/2
+    /// assert_eq!(log.to_string(), "0.50000"); // log_9(3) = 1/2
     /// assert_eq!(o, Equal);
     ///
     /// let (log, o) = Float::log_base_rational_prec_round(Rational::from(2), 3, 20, Nearest);
-    /// assert_eq!(log.to_string(), "0.63093");
+    /// assert_eq!(log.to_string(), "0.63092995");
     /// assert_eq!(o, Greater);
     /// ```
     #[allow(clippy::needless_pass_by_value)]
@@ -914,7 +914,7 @@ impl Float {
     ///
     /// let (log, o) =
     ///     Float::log_base_rational_prec_round_ref(&Rational::from_signeds(1, 9), 3, 10, Exact);
-    /// assert_eq!(log.to_string(), "-2.0"); // log_3(1/9) = -2
+    /// assert_eq!(log.to_string(), "-2.0000"); // log_3(1/9) = -2
     /// assert_eq!(o, Equal);
     /// ```
     pub fn log_base_rational_prec_round_ref(
@@ -972,7 +972,7 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (log, o) = Float::log_base_rational_prec(Rational::from_signeds(1, 9), 3, 10);
-    /// assert_eq!(log.to_string(), "-2.0");
+    /// assert_eq!(log.to_string(), "-2.0000");
     /// assert_eq!(o, Equal);
     /// ```
     #[inline]
@@ -1005,7 +1005,7 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (log, o) = Float::log_base_rational_prec_ref(&Rational::from(2), 3, 20);
-    /// assert_eq!(log.to_string(), "0.63093");
+    /// assert_eq!(log.to_string(), "0.63092995");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -1044,8 +1044,8 @@ impl LogBase<u64> for Float {
     /// use malachite_base::num::arithmetic::traits::LogBase;
     /// use malachite_float::Float;
     ///
-    /// assert_eq!(Float::from(1000).log_base(10).to_string(), "3.0");
-    /// assert_eq!(Float::from(81).log_base(3).to_string(), "4.0");
+    /// assert_eq!(Float::from(1000).log_base(10).to_string(), "3.000");
+    /// assert_eq!(Float::from(81).log_base(3).to_string(), "4.000");
     /// ```
     #[inline]
     fn log_base(self, base: u64) -> Self {
@@ -1085,7 +1085,7 @@ impl LogBase<u64> for &Float {
     /// use malachite_base::num::arithmetic::traits::LogBase;
     /// use malachite_float::Float;
     ///
-    /// assert_eq!((&Float::from(1000)).log_base(10).to_string(), "3.0");
+    /// assert_eq!((&Float::from(1000)).log_base(10).to_string(), "3.000");
     /// ```
     #[inline]
     fn log_base(self, base: u64) -> Float {
@@ -1118,7 +1118,7 @@ impl LogBaseAssign<u64> for Float {
     ///
     /// let mut x = Float::from(1000);
     /// x.log_base_assign(10);
-    /// assert_eq!(x.to_string(), "3.0");
+    /// assert_eq!(x.to_string(), "3.000");
     /// ```
     #[inline]
     fn log_base_assign(&mut self, base: u64) {

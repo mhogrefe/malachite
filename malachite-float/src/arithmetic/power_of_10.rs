@@ -74,15 +74,14 @@ impl Float {
     /// ```
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
-    /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
     /// let (p, o) = Float::power_of_10_of_float_prec_round(Float::from(0.5), 20, Floor);
-    /// assert_eq!(p.to_string(), "3.162277");
+    /// assert_eq!(p.to_string(), "3.1622772");
     /// assert_eq!(o, Less);
     ///
     /// let (p, o) = Float::power_of_10_of_float_prec_round(Float::from(0.5), 20, Ceiling);
-    /// assert_eq!(p.to_string(), "3.162281");
+    /// assert_eq!(p.to_string(), "3.1622810");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -151,15 +150,14 @@ impl Float {
     /// ```
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
-    /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
     /// let (p, o) = Float::power_of_10_of_float_prec_round_ref(&Float::from(0.5), 20, Floor);
-    /// assert_eq!(p.to_string(), "3.162277");
+    /// assert_eq!(p.to_string(), "3.1622772");
     /// assert_eq!(o, Less);
     ///
     /// let (p, o) = Float::power_of_10_of_float_prec_round_ref(&Float::from(0.5), 20, Ceiling);
-    /// assert_eq!(p.to_string(), "3.162281");
+    /// assert_eq!(p.to_string(), "3.1622810");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -218,11 +216,10 @@ impl Float {
     /// # Examples
     /// ```
     /// use malachite_float::Float;
-    /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
     /// let (p, o) = Float::power_of_10_of_float_prec(Float::from(0.5), 20);
-    /// assert_eq!(p.to_string(), "3.162277");
+    /// assert_eq!(p.to_string(), "3.1622772");
     /// assert_eq!(o, Less);
     ///
     /// let (p, o) = Float::power_of_10_of_float_prec(Float::from(0.5), 53);
@@ -281,11 +278,10 @@ impl Float {
     /// # Examples
     /// ```
     /// use malachite_float::Float;
-    /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
     /// let (p, o) = Float::power_of_10_of_float_prec_ref(&Float::from(0.5), 20);
-    /// assert_eq!(p.to_string(), "3.162277");
+    /// assert_eq!(p.to_string(), "3.1622772");
     /// assert_eq!(o, Less);
     ///
     /// let (p, o) = Float::power_of_10_of_float_prec_ref(&Float::from(0.5), 53);
@@ -352,11 +348,11 @@ impl Float {
     /// let x = Float::from_rational_prec(Rational::from_signeds(1, 2), 20).0;
     ///
     /// let (p, o) = Float::power_of_10_of_float_round(x.clone(), Floor);
-    /// assert_eq!(p.to_string(), "3.162277");
+    /// assert_eq!(p.to_string(), "3.1622772");
     /// assert_eq!(o, Less);
     ///
     /// let (p, o) = Float::power_of_10_of_float_round(x, Ceiling);
-    /// assert_eq!(p.to_string(), "3.162281");
+    /// assert_eq!(p.to_string(), "3.1622810");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -419,11 +415,11 @@ impl Float {
     /// let x = Float::from_rational_prec(Rational::from_signeds(1, 2), 20).0;
     ///
     /// let (p, o) = Float::power_of_10_of_float_round_ref(&x, Floor);
-    /// assert_eq!(p.to_string(), "3.162277");
+    /// assert_eq!(p.to_string(), "3.1622772");
     /// assert_eq!(o, Less);
     ///
     /// let (p, o) = Float::power_of_10_of_float_round_ref(&x, Ceiling);
-    /// assert_eq!(p.to_string(), "3.162281");
+    /// assert_eq!(p.to_string(), "3.1622810");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -474,12 +470,11 @@ impl Float {
     /// ```
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
-    /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
     /// let mut x = Float::from(0.5);
     /// assert_eq!(x.power_of_10_of_float_prec_round_assign(20, Floor), Less);
-    /// assert_eq!(x.to_string(), "3.162277");
+    /// assert_eq!(x.to_string(), "3.1622772");
     /// ```
     #[inline]
     pub fn power_of_10_of_float_prec_round_assign(
@@ -531,12 +526,11 @@ impl Float {
     /// # Examples
     /// ```
     /// use malachite_float::Float;
-    /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
     /// let mut x = Float::from(0.5);
     /// assert_eq!(x.power_of_10_of_float_prec_assign(20), Less);
-    /// assert_eq!(x.to_string(), "3.162277");
+    /// assert_eq!(x.to_string(), "3.1622772");
     /// ```
     #[inline]
     pub fn power_of_10_of_float_prec_assign(&mut self, prec: u64) -> Ordering {
@@ -591,7 +585,7 @@ impl Float {
     ///
     /// let mut x = x;
     /// assert_eq!(x.power_of_10_of_float_round_assign(Ceiling), Greater);
-    /// assert_eq!(x.to_string(), "3.162281");
+    /// assert_eq!(x.to_string(), "3.1622810");
     /// ```
     #[inline]
     pub fn power_of_10_of_float_round_assign(&mut self, rm: RoundingMode) -> Ordering {
@@ -653,22 +647,22 @@ impl Float {
     ///
     /// let (p, o) =
     ///     Float::power_of_10_rational_prec_round(Rational::from_unsigneds(3u8, 5), 5, Floor);
-    /// assert_eq!(p.to_string(), "3.9");
+    /// assert_eq!(p.to_string(), "3.88");
     /// assert_eq!(o, Less);
     ///
     /// let (p, o) =
     ///     Float::power_of_10_rational_prec_round(Rational::from_unsigneds(3u8, 5), 5, Ceiling);
-    /// assert_eq!(p.to_string(), "4.0");
+    /// assert_eq!(p.to_string(), "4.00");
     /// assert_eq!(o, Greater);
     ///
     /// let (p, o) =
     ///     Float::power_of_10_rational_prec_round(Rational::from_unsigneds(3u8, 5), 20, Floor);
-    /// assert_eq!(p.to_string(), "3.981071");
+    /// assert_eq!(p.to_string(), "3.9810715");
     /// assert_eq!(o, Less);
     ///
     /// let (p, o) =
     ///     Float::power_of_10_rational_prec_round(Rational::from_unsigneds(3u8, 5), 20, Ceiling);
-    /// assert_eq!(p.to_string(), "3.981075");
+    /// assert_eq!(p.to_string(), "3.9810753");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -734,7 +728,7 @@ impl Float {
     ///
     /// let (p, o) =
     ///     Float::power_of_10_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 5, Floor);
-    /// assert_eq!(p.to_string(), "3.9");
+    /// assert_eq!(p.to_string(), "3.88");
     /// assert_eq!(o, Less);
     ///
     /// let (p, o) = Float::power_of_10_rational_prec_round_ref(
@@ -742,7 +736,7 @@ impl Float {
     ///     5,
     ///     Ceiling,
     /// );
-    /// assert_eq!(p.to_string(), "4.0");
+    /// assert_eq!(p.to_string(), "4.00");
     /// assert_eq!(o, Greater);
     ///
     /// let (p, o) = Float::power_of_10_rational_prec_round_ref(
@@ -750,7 +744,7 @@ impl Float {
     ///     20,
     ///     Floor,
     /// );
-    /// assert_eq!(p.to_string(), "3.981071");
+    /// assert_eq!(p.to_string(), "3.9810715");
     /// assert_eq!(o, Less);
     ///
     /// let (p, o) = Float::power_of_10_rational_prec_round_ref(
@@ -758,7 +752,7 @@ impl Float {
     ///     20,
     ///     Ceiling,
     /// );
-    /// assert_eq!(p.to_string(), "3.981075");
+    /// assert_eq!(p.to_string(), "3.9810753");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -816,15 +810,15 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (p, o) = Float::power_of_10_rational_prec(Rational::from_unsigneds(3u8, 5), 5);
-    /// assert_eq!(p.to_string(), "4.0");
+    /// assert_eq!(p.to_string(), "4.00");
     /// assert_eq!(o, Greater);
     ///
     /// let (p, o) = Float::power_of_10_rational_prec(Rational::from_unsigneds(3u8, 5), 20);
-    /// assert_eq!(p.to_string(), "3.981071");
+    /// assert_eq!(p.to_string(), "3.9810715");
     /// assert_eq!(o, Less);
     ///
     /// let (p, o) = Float::power_of_10_rational_prec(Rational::from(0), 10);
-    /// assert_eq!(p.to_string(), "1.0");
+    /// assert_eq!(p.to_string(), "1.0000");
     /// assert_eq!(o, Equal);
     /// ```
     #[inline]
@@ -877,15 +871,15 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (p, o) = Float::power_of_10_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 5);
-    /// assert_eq!(p.to_string(), "4.0");
+    /// assert_eq!(p.to_string(), "4.00");
     /// assert_eq!(o, Greater);
     ///
     /// let (p, o) = Float::power_of_10_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 20);
-    /// assert_eq!(p.to_string(), "3.981071");
+    /// assert_eq!(p.to_string(), "3.9810715");
     /// assert_eq!(o, Less);
     ///
     /// let (p, o) = Float::power_of_10_rational_prec_ref(&Rational::from(0), 10);
-    /// assert_eq!(p.to_string(), "1.0");
+    /// assert_eq!(p.to_string(), "1.0000");
     /// assert_eq!(o, Equal);
     /// ```
     #[inline]
@@ -937,7 +931,7 @@ impl PowerOf10<Self> for Float {
     ///
     /// let x = Float::from_rational_prec(Rational::from_signeds(1, 2), 20).0;
     ///
-    /// assert_eq!(Float::power_of_10(x).to_string(), "3.162277");
+    /// assert_eq!(Float::power_of_10(x).to_string(), "3.1622772");
     /// ```
     #[inline]
     fn power_of_10(pow: Self) -> Self {
@@ -988,7 +982,7 @@ impl PowerOf10<&Self> for Float {
     ///
     /// let x = Float::from_rational_prec(Rational::from_signeds(1, 2), 20).0;
     ///
-    /// assert_eq!(Float::power_of_10(&x).to_string(), "3.162277");
+    /// assert_eq!(Float::power_of_10(&x).to_string(), "3.1622772");
     /// ```
     #[inline]
     fn power_of_10(pow: &Self) -> Self {
@@ -1033,7 +1027,7 @@ impl PowerOf10Assign for Float {
     ///
     /// let mut x = Float::from_rational_prec(Rational::from_signeds(1, 2), 20).0;
     /// x.power_of_10_assign();
-    /// assert_eq!(x.to_string(), "3.162277");
+    /// assert_eq!(x.to_string(), "3.1622772");
     /// ```
     #[inline]
     fn power_of_10_assign(&mut self) {

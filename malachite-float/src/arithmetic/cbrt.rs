@@ -71,15 +71,15 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (cbrt, o) = Float::from(27.0).cbrt_prec_round(10, Floor);
-    /// assert_eq!(cbrt.to_string(), "3.0");
+    /// assert_eq!(cbrt.to_string(), "3.0000");
     /// assert_eq!(o, Equal);
     ///
     /// let (cbrt, o) = Float::from(2.0).cbrt_prec_round(10, Floor);
-    /// assert_eq!(cbrt.to_string(), "1.26");
+    /// assert_eq!(cbrt.to_string(), "1.2598");
     /// assert_eq!(o, Less);
     ///
     /// let (cbrt, o) = Float::from(2.0).cbrt_prec_round(10, Ceiling);
-    /// assert_eq!(cbrt.to_string(), "1.262");
+    /// assert_eq!(cbrt.to_string(), "1.2617");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -119,11 +119,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (cbrt, o) = Float::from(2.0).cbrt_prec_round_ref(10, Floor);
-    /// assert_eq!(cbrt.to_string(), "1.26");
+    /// assert_eq!(cbrt.to_string(), "1.2598");
     /// assert_eq!(o, Less);
     ///
     /// let (cbrt, o) = Float::from(2.0).cbrt_prec_round_ref(10, Ceiling);
-    /// assert_eq!(cbrt.to_string(), "1.262");
+    /// assert_eq!(cbrt.to_string(), "1.2617");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -164,11 +164,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (cbrt, o) = Float::from(27.0).cbrt_prec(10);
-    /// assert_eq!(cbrt.to_string(), "3.0");
+    /// assert_eq!(cbrt.to_string(), "3.0000");
     /// assert_eq!(o, Equal);
     ///
     /// let (cbrt, o) = Float::from(2.0).cbrt_prec(10);
-    /// assert_eq!(cbrt.to_string(), "1.26");
+    /// assert_eq!(cbrt.to_string(), "1.2598");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -205,7 +205,7 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (cbrt, o) = Float::from(2.0).cbrt_prec_ref(10);
-    /// assert_eq!(cbrt.to_string(), "1.26");
+    /// assert_eq!(cbrt.to_string(), "1.2598");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -315,7 +315,7 @@ impl Float {
     ///
     /// let mut x = Float::from(2.0);
     /// assert_eq!(x.cbrt_prec_round_assign(10, Floor), Less);
-    /// assert_eq!(x.to_string(), "1.26");
+    /// assert_eq!(x.to_string(), "1.2598");
     /// ```
     #[inline]
     pub fn cbrt_prec_round_assign(&mut self, prec: u64, rm: RoundingMode) -> Ordering {
@@ -349,7 +349,7 @@ impl Float {
     ///
     /// let mut x = Float::from(2.0);
     /// assert_eq!(x.cbrt_prec_assign(10), Less);
-    /// assert_eq!(x.to_string(), "1.26");
+    /// assert_eq!(x.to_string(), "1.2598");
     /// ```
     #[inline]
     pub fn cbrt_prec_assign(&mut self, prec: u64) -> Ordering {
@@ -416,7 +416,7 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (cbrt, o) = Float::cbrt_rational_prec_round(Rational::from(27), 10, Floor);
-    /// assert_eq!(cbrt.to_string(), "3.0");
+    /// assert_eq!(cbrt.to_string(), "3.0000");
     /// assert_eq!(o, Equal);
     /// ```
     #[inline]
@@ -450,7 +450,7 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (cbrt, o) = Float::cbrt_rational_prec_round_ref(&Rational::from(27), 10, Floor);
-    /// assert_eq!(cbrt.to_string(), "3.0");
+    /// assert_eq!(cbrt.to_string(), "3.0000");
     /// assert_eq!(o, Equal);
     /// ```
     #[inline]
@@ -487,7 +487,7 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (cbrt, o) = Float::cbrt_rational_prec(Rational::from(27), 10);
-    /// assert_eq!(cbrt.to_string(), "3.0");
+    /// assert_eq!(cbrt.to_string(), "3.0000");
     /// assert_eq!(o, Equal);
     /// ```
     #[inline]
@@ -520,7 +520,7 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (cbrt, o) = Float::cbrt_rational_prec_ref(&Rational::from(27), 10);
-    /// assert_eq!(cbrt.to_string(), "3.0");
+    /// assert_eq!(cbrt.to_string(), "3.0000");
     /// assert_eq!(o, Equal);
     /// ```
     #[inline]
@@ -715,12 +715,15 @@ impl CbrtAssign for Float {
 ///
 /// # Examples
 /// ```
-/// use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity};
+/// use malachite_base::num::basic::traits::NegativeInfinity;
 /// use malachite_float::arithmetic::cbrt::primitive_float_cbrt;
 ///
 /// assert!(primitive_float_cbrt::<f64>(f64::NAN).is_nan());
 /// assert_eq!(primitive_float_cbrt::<f64>(f64::INFINITY), f64::INFINITY);
-/// assert_eq!(primitive_float_cbrt::<f64>(f64::NEGATIVE_INFINITY), f64::NEGATIVE_INFINITY);
+/// assert_eq!(
+///     primitive_float_cbrt::<f64>(f64::NEGATIVE_INFINITY),
+///     f64::NEGATIVE_INFINITY
+/// );
 /// assert_eq!(primitive_float_cbrt::<f64>(27.0), 3.0);
 /// assert_eq!(primitive_float_cbrt::<f64>(-8.0), -2.0);
 /// ```
@@ -755,8 +758,14 @@ where
 /// use malachite_float::arithmetic::cbrt::primitive_float_cbrt_rational;
 /// use malachite_q::Rational;
 ///
-/// assert_eq!(primitive_float_cbrt_rational::<f64>(&Rational::from(27)), 3.0);
-/// assert_eq!(primitive_float_cbrt_rational::<f64>(&Rational::from(-8)), -2.0);
+/// assert_eq!(
+///     primitive_float_cbrt_rational::<f64>(&Rational::from(27)),
+///     3.0
+/// );
+/// assert_eq!(
+///     primitive_float_cbrt_rational::<f64>(&Rational::from(-8)),
+///     -2.0
+/// );
 /// ```
 #[inline]
 #[allow(clippy::type_repetition_in_bounds)]

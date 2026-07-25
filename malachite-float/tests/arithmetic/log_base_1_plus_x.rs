@@ -251,7 +251,7 @@ fn log_base_1_plus_x_underflow() {
         Float::power_of_2(i64::from(Float::MIN_EXPONENT)),
         3,
         Floor,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Less,
     );
@@ -259,7 +259,7 @@ fn log_base_1_plus_x_underflow() {
         Float::power_of_2(i64::from(Float::MIN_EXPONENT)),
         3,
         Ceiling,
-        "too_small",
+        "4.8e-323228497",
         "0x2.0E-268435456#1",
         Greater,
     );
@@ -267,7 +267,7 @@ fn log_base_1_plus_x_underflow() {
         Float::power_of_2(i64::from(Float::MIN_EXPONENT)),
         3,
         Nearest,
-        "too_small",
+        "4.8e-323228497",
         "0x2.0E-268435456#1",
         Greater,
     );
@@ -275,7 +275,7 @@ fn log_base_1_plus_x_underflow() {
         Float::power_of_2(i64::from(Float::MIN_EXPONENT)),
         3,
         Down,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Less,
     );
@@ -283,7 +283,7 @@ fn log_base_1_plus_x_underflow() {
         Float::power_of_2(i64::from(Float::MIN_EXPONENT)),
         3,
         Up,
-        "too_small",
+        "4.8e-323228497",
         "0x2.0E-268435456#1",
         Greater,
     );
@@ -299,7 +299,7 @@ fn log_base_1_plus_x_underflow() {
         Float::power_of_2(i64::from(Float::MIN_EXPONENT)),
         100,
         Ceiling,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Greater,
     );
@@ -323,7 +323,7 @@ fn log_base_1_plus_x_underflow() {
         Float::power_of_2(i64::from(Float::MIN_EXPONENT)),
         100,
         Up,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Greater,
     );
@@ -331,7 +331,7 @@ fn log_base_1_plus_x_underflow() {
         -Float::power_of_2(i64::from(Float::MIN_EXPONENT)),
         3,
         Floor,
-        "-too_small",
+        "-4.8e-323228497",
         "-0x2.0E-268435456#1",
         Less,
     );
@@ -339,7 +339,7 @@ fn log_base_1_plus_x_underflow() {
         -Float::power_of_2(i64::from(Float::MIN_EXPONENT)),
         3,
         Ceiling,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Greater,
     );
@@ -347,7 +347,7 @@ fn log_base_1_plus_x_underflow() {
         -Float::power_of_2(i64::from(Float::MIN_EXPONENT)),
         3,
         Nearest,
-        "-too_small",
+        "-4.8e-323228497",
         "-0x2.0E-268435456#1",
         Less,
     );
@@ -355,7 +355,7 @@ fn log_base_1_plus_x_underflow() {
         -Float::power_of_2(i64::from(Float::MIN_EXPONENT)),
         3,
         Down,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Greater,
     );
@@ -363,7 +363,7 @@ fn log_base_1_plus_x_underflow() {
         -Float::power_of_2(i64::from(Float::MIN_EXPONENT)),
         3,
         Up,
-        "-too_small",
+        "-4.8e-323228497",
         "-0x2.0E-268435456#1",
         Less,
     );
@@ -371,7 +371,7 @@ fn log_base_1_plus_x_underflow() {
         -Float::power_of_2(i64::from(Float::MIN_EXPONENT)),
         100,
         Floor,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Less,
     );
@@ -403,7 +403,7 @@ fn log_base_1_plus_x_underflow() {
         -Float::power_of_2(i64::from(Float::MIN_EXPONENT)),
         100,
         Up,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Less,
     );
@@ -412,66 +412,68 @@ fn log_base_1_plus_x_underflow() {
 #[test]
 fn test_log_base_1_plus_x_prec_round() {
     let test =
-        |n: i64, d: u64, base: u64, prec: u64, rm: RoundingMode, out: &str, o_out: Ordering| {
+        |n: i64, d: u64, base: u64, prec: u64, rm: RoundingMode, out: &str, out_hex: &str, o_out: Ordering| {
             let x = Float::exact_from(malachite_q::Rational::from_signeds(n, i64::exact_from(d)));
             let (log, o) = check(&x, base, prec, rm, false);
             assert_eq!(log.to_string(), out);
+        assert_eq!(to_hex_string(&log), out_hex);
             assert_eq!(o, o_out);
         };
-    test(8, 1, 9, 10, Floor, "1.0", Equal);
-    test(8, 1, 9, 10, Ceiling, "1.0", Equal);
-    test(8, 1, 9, 10, Nearest, "1.0", Equal);
-    test(8, 1, 9, 10, Exact, "1.0", Equal);
-    test(8, 1, 3, 10, Floor, "2.0", Equal);
-    test(8, 1, 3, 10, Ceiling, "2.0", Equal);
-    test(8, 1, 3, 10, Nearest, "2.0", Equal);
-    test(8, 1, 3, 10, Exact, "2.0", Equal);
-    test(2, 1, 9, 10, Floor, "0.5", Equal);
-    test(2, 1, 9, 10, Ceiling, "0.5", Equal);
-    test(2, 1, 9, 10, Nearest, "0.5", Equal);
-    test(2, 1, 9, 10, Exact, "0.5", Equal);
-    test(0, 1, 10, 10, Floor, "0.0", Equal);
-    test(0, 1, 10, 10, Ceiling, "0.0", Equal);
-    test(0, 1, 10, 10, Nearest, "0.0", Equal);
-    test(0, 1, 10, 10, Exact, "0.0", Equal);
-    test(1, 1, 3, 20, Floor, "0.630929", Less);
-    test(1, 1, 3, 20, Ceiling, "0.63093", Greater);
-    test(1, 1, 3, 20, Nearest, "0.63093", Greater);
-    test(50, 1, 3, 20, Floor, "3.578899", Less);
-    test(50, 1, 3, 20, Ceiling, "3.578903", Greater);
-    test(50, 1, 3, 20, Nearest, "3.578903", Greater);
-    test(7, 1, 5, 30, Floor, "1.292029673", Less);
-    test(7, 1, 5, 30, Ceiling, "1.292029675", Greater);
-    test(7, 1, 5, 30, Nearest, "1.292029675", Greater);
-    test(1, 8, 3, 20, Floor, "0.1072106", Less);
-    test(1, 8, 3, 20, Ceiling, "0.1072108", Greater);
-    test(1, 8, 3, 20, Nearest, "0.1072108", Greater);
-    test(-1, 2, 3, 20, Floor, "-0.63093", Less);
-    test(-1, 2, 3, 20, Ceiling, "-0.630929", Greater);
-    test(-1, 2, 3, 20, Nearest, "-0.63093", Less);
-    test(-1, 1, 10, 10, Floor, "-Infinity", Equal);
-    test(-1, 1, 10, 10, Ceiling, "-Infinity", Equal);
-    test(-1, 1, 10, 10, Nearest, "-Infinity", Equal);
-    test(-1, 1, 10, 10, Exact, "-Infinity", Equal);
-    test(-3, 1, 10, 10, Floor, "NaN", Equal);
-    test(-3, 1, 10, 10, Ceiling, "NaN", Equal);
-    test(-3, 1, 10, 10, Nearest, "NaN", Equal);
-    test(-3, 1, 10, 10, Exact, "NaN", Equal);
-    test(26, 1, 3, 30, Floor, "3.0", Equal);
-    test(26, 1, 3, 30, Ceiling, "3.0", Equal);
-    test(26, 1, 3, 30, Nearest, "3.0", Equal);
-    test(26, 1, 3, 30, Exact, "3.0", Equal);
+    test(8, 1, 9, 10, Floor, "1.0000", "0x1.000#10", Equal);
+    test(8, 1, 9, 10, Ceiling, "1.0000", "0x1.000#10", Equal);
+    test(8, 1, 9, 10, Nearest, "1.0000", "0x1.000#10", Equal);
+    test(8, 1, 9, 10, Exact, "1.0000", "0x1.000#10", Equal);
+    test(8, 1, 3, 10, Floor, "2.0000", "0x2.00#10", Equal);
+    test(8, 1, 3, 10, Ceiling, "2.0000", "0x2.00#10", Equal);
+    test(8, 1, 3, 10, Nearest, "2.0000", "0x2.00#10", Equal);
+    test(8, 1, 3, 10, Exact, "2.0000", "0x2.00#10", Equal);
+    test(2, 1, 9, 10, Floor, "0.50000", "0x0.800#10", Equal);
+    test(2, 1, 9, 10, Ceiling, "0.50000", "0x0.800#10", Equal);
+    test(2, 1, 9, 10, Nearest, "0.50000", "0x0.800#10", Equal);
+    test(2, 1, 9, 10, Exact, "0.50000", "0x0.800#10", Equal);
+    test(0, 1, 10, 10, Floor, "0.0", "0x0.0", Equal);
+    test(0, 1, 10, 10, Ceiling, "0.0", "0x0.0", Equal);
+    test(0, 1, 10, 10, Nearest, "0.0", "0x0.0", Equal);
+    test(0, 1, 10, 10, Exact, "0.0", "0x0.0", Equal);
+    test(1, 1, 3, 20, Floor, "0.63092899", "0x0.a1849#20", Less);
+    test(1, 1, 3, 20, Ceiling, "0.63092995", "0x0.a184a#20", Greater);
+    test(1, 1, 3, 20, Nearest, "0.63092995", "0x0.a184a#20", Greater);
+    test(50, 1, 3, 20, Floor, "3.5788994", "0x3.9432c#20", Less);
+    test(50, 1, 3, 20, Ceiling, "3.5789032", "0x3.94330#20", Greater);
+    test(50, 1, 3, 20, Nearest, "3.5789032", "0x3.94330#20", Greater);
+    test(7, 1, 5, 30, Floor, "1.2920296732", "0x1.4ac274e8#30", Less);
+    test(7, 1, 5, 30, Ceiling, "1.2920296751", "0x1.4ac274f0#30", Greater);
+    test(7, 1, 5, 30, Nearest, "1.2920296751", "0x1.4ac274f0#30", Greater);
+    test(1, 8, 3, 20, Floor, "0.10721064", "0x0.1b7228#20", Less);
+    test(1, 8, 3, 20, Ceiling, "0.10721076", "0x0.1b722a#20", Greater);
+    test(1, 8, 3, 20, Nearest, "0.10721076", "0x0.1b722a#20", Greater);
+    test(-1, 2, 3, 20, Floor, "-0.63092995", "-0x0.a184a#20", Less);
+    test(-1, 2, 3, 20, Ceiling, "-0.63092899", "-0x0.a1849#20", Greater);
+    test(-1, 2, 3, 20, Nearest, "-0.63092995", "-0x0.a184a#20", Less);
+    test(-1, 1, 10, 10, Floor, "-Infinity", "-Infinity", Equal);
+    test(-1, 1, 10, 10, Ceiling, "-Infinity", "-Infinity", Equal);
+    test(-1, 1, 10, 10, Nearest, "-Infinity", "-Infinity", Equal);
+    test(-1, 1, 10, 10, Exact, "-Infinity", "-Infinity", Equal);
+    test(-3, 1, 10, 10, Floor, "NaN", "NaN", Equal);
+    test(-3, 1, 10, 10, Ceiling, "NaN", "NaN", Equal);
+    test(-3, 1, 10, 10, Nearest, "NaN", "NaN", Equal);
+    test(-3, 1, 10, 10, Exact, "NaN", "NaN", Equal);
+    test(26, 1, 3, 30, Floor, "3.0000000000", "0x3.0000000#30", Equal);
+    test(26, 1, 3, 30, Ceiling, "3.0000000000", "0x3.0000000#30", Equal);
+    test(26, 1, 3, 30, Nearest, "3.0000000000", "0x3.0000000#30", Equal);
+    test(26, 1, 3, 30, Exact, "3.0000000000", "0x3.0000000#30", Equal);
 }
 
 #[test]
 fn test_log_base_1_plus_x_prec() {
     // The `_prec` methods round to nearest; cross-checked against the rug oracle.
-    let test = |n: i64, d: u64, base: u64, prec: u64, out: &str, o_out: Ordering| {
+    let test = |n: i64, d: u64, base: u64, prec: u64, out: &str, out_hex: &str, o_out: Ordering| {
         let x = Float::exact_from(malachite_q::Rational::from_signeds(n, i64::exact_from(d)));
 
         let (log, o) = x.clone().log_base_1_plus_x_prec(base, prec);
         assert!(log.is_valid());
         assert_eq!(log.to_string(), out);
+        assert_eq!(to_hex_string(&log), out_hex);
         assert_eq!(o, o_out);
 
         let (log_alt, o_alt) = x.log_base_1_plus_x_prec_ref(base, prec);
@@ -492,28 +494,29 @@ fn test_log_base_1_plus_x_prec() {
         );
         assert_eq!(rug_o, o);
     };
-    test(8, 1, 9, 10, "1.0", Equal); // log_9(9) = 1
-    test(8, 1, 3, 10, "2.0", Equal); // log_3(9) = 2
-    test(2, 1, 9, 10, "0.5", Equal); // log_9(3) = 1/2
-    test(26, 1, 3, 30, "3.0", Equal); // log_3(27) = 3
-    test(0, 1, 10, 10, "0.0", Equal);
-    test(1, 1, 3, 20, "0.63093", Greater); // log_3(2)
-    test(50, 1, 3, 20, "3.578903", Greater); // log_3(51)
-    test(7, 1, 5, 30, "1.292029675", Greater); // log_5(8)
-    test(1, 8, 3, 20, "0.1072108", Greater); // log_3(9/8)
-    test(-1, 2, 3, 20, "-0.63093", Less); // log_3(1/2)
-    test(-1, 1, 10, 10, "-Infinity", Equal);
-    test(-3, 1, 10, 10, "NaN", Equal);
+    test(8, 1, 9, 10, "1.0000", "0x1.000#10", Equal); // log_9(9) = 1
+    test(8, 1, 3, 10, "2.0000", "0x2.00#10", Equal); // log_3(9) = 2
+    test(2, 1, 9, 10, "0.50000", "0x0.800#10", Equal); // log_9(3) = 1/2
+    test(26, 1, 3, 30, "3.0000000000", "0x3.0000000#30", Equal); // log_3(27) = 3
+    test(0, 1, 10, 10, "0.0", "0x0.0", Equal);
+    test(1, 1, 3, 20, "0.63092995", "0x0.a184a#20", Greater); // log_3(2)
+    test(50, 1, 3, 20, "3.5789032", "0x3.94330#20", Greater); // log_3(51)
+    test(7, 1, 5, 30, "1.2920296751", "0x1.4ac274f0#30", Greater); // log_5(8)
+    test(1, 8, 3, 20, "0.10721076", "0x0.1b722a#20", Greater); // log_3(9/8)
+    test(-1, 2, 3, 20, "-0.63092995", "-0x0.a184a#20", Less); // log_3(1/2)
+    test(-1, 1, 10, 10, "-Infinity", "-Infinity", Equal);
+    test(-3, 1, 10, 10, "NaN", "NaN", Equal);
 }
 
 #[test]
 fn test_log_base_1_plus_x() {
     // The `LogBaseOf1PlusX` trait: rounds to the input's precision, to nearest.
-    let test = |n: i64, d: u64, base: u64, out: &str| {
+    let test = |n: i64, d: u64, base: u64, out: &str, out_hex: &str| {
         let x = Float::exact_from(malachite_q::Rational::from_signeds(n, i64::exact_from(d)));
         let log = x.clone().log_base_1_plus_x(base);
         assert!(log.is_valid());
         assert_eq!(log.to_string(), out);
+        assert_eq!(to_hex_string(&log), out_hex);
 
         let log_alt = (&x).log_base_1_plus_x(base);
         assert!(log_alt.is_valid());
@@ -531,23 +534,23 @@ fn test_log_base_1_plus_x() {
             ComparableFloatRef(&log),
         );
     };
-    test(8, 1, 9, "1.0");
-    test(8, 1, 3, "2.0");
-    test(2, 1, 9, "0.5");
-    test(26, 1, 3, "3.0");
-    test(0, 1, 10, "0.0");
-    test(50, 1, 3, "3.6");
-    test(7, 1, 5, "1.2");
-    test(1, 1, 3, "0.5");
-    test(1, 8, 3, "0.1");
-    test(-1, 2, 3, "-0.5");
-    test(-1, 1, 10, "-Infinity");
-    test(-3, 1, 10, "NaN");
+    test(8, 1, 9, "1.0", "0x1.0#1");
+    test(8, 1, 3, "2.0", "0x2.0#1");
+    test(2, 1, 9, "0.50", "0x0.8#1");
+    test(26, 1, 3, "3.00", "0x3.0#4");
+    test(0, 1, 10, "0.0", "0x0.0");
+    test(50, 1, 3, "3.62", "0x3.a#5");
+    test(7, 1, 5, "1.2", "0x1.4#3");
+    test(1, 1, 3, "0.50", "0x0.8#1");
+    test(1, 8, 3, "0.12", "0x0.2#1");
+    test(-1, 2, 3, "-0.50", "-0x0.8#1");
+    test(-1, 1, 10, "-Infinity", "-Infinity");
+    test(-3, 1, 10, "NaN", "NaN");
 }
 
 #[test]
 fn test_log_base_1_plus_x_round() {
-    let test = |n: i64, d: u64, base: u64, rm: RoundingMode, out: &str, o_out: Ordering| {
+    let test = |n: i64, d: u64, base: u64, rm: RoundingMode, out: &str, out_hex: &str, o_out: Ordering| {
         let x = Float::exact_from(malachite_q::Rational::from_signeds(n, i64::exact_from(d)));
         // log_base_1_plus_x_round uses the input's precision; `check` cross-checks against the
         // oracle.
@@ -556,68 +559,69 @@ fn test_log_base_1_plus_x_round() {
         assert_eq!(ComparableFloatRef(&log2), ComparableFloatRef(&log));
         assert_eq!(o2, o);
         assert_eq!(log.to_string(), out);
+        assert_eq!(to_hex_string(&log), out_hex);
         assert_eq!(o, o_out);
     };
-    test(8, 1, 9, Floor, "1.0", Equal);
-    test(8, 1, 9, Ceiling, "1.0", Equal);
-    test(8, 1, 9, Nearest, "1.0", Equal);
-    test(8, 1, 9, Down, "1.0", Equal);
-    test(8, 1, 9, Up, "1.0", Equal);
-    test(8, 1, 3, Floor, "2.0", Equal);
-    test(8, 1, 3, Ceiling, "2.0", Equal);
-    test(8, 1, 3, Nearest, "2.0", Equal);
-    test(8, 1, 3, Down, "2.0", Equal);
-    test(8, 1, 3, Up, "2.0", Equal);
-    test(2, 1, 9, Floor, "0.5", Equal);
-    test(2, 1, 9, Ceiling, "0.5", Equal);
-    test(2, 1, 9, Nearest, "0.5", Equal);
-    test(2, 1, 9, Down, "0.5", Equal);
-    test(2, 1, 9, Up, "0.5", Equal);
-    test(26, 1, 3, Floor, "3.0", Equal);
-    test(26, 1, 3, Ceiling, "3.0", Equal);
-    test(26, 1, 3, Nearest, "3.0", Equal);
-    test(26, 1, 3, Down, "3.0", Equal);
-    test(26, 1, 3, Up, "3.0", Equal);
-    test(0, 1, 10, Floor, "0.0", Equal);
-    test(0, 1, 10, Ceiling, "0.0", Equal);
-    test(0, 1, 10, Nearest, "0.0", Equal);
-    test(0, 1, 10, Down, "0.0", Equal);
-    test(0, 1, 10, Up, "0.0", Equal);
-    test(50, 1, 3, Floor, "3.5", Less);
-    test(50, 1, 3, Ceiling, "3.6", Greater);
-    test(50, 1, 3, Nearest, "3.6", Greater);
-    test(50, 1, 3, Down, "3.5", Less);
-    test(50, 1, 3, Up, "3.6", Greater);
-    test(7, 1, 5, Floor, "1.2", Less);
-    test(7, 1, 5, Ceiling, "1.5", Greater);
-    test(7, 1, 5, Nearest, "1.2", Less);
-    test(7, 1, 5, Down, "1.2", Less);
-    test(7, 1, 5, Up, "1.5", Greater);
-    test(1, 1, 3, Floor, "0.5", Less);
-    test(1, 1, 3, Ceiling, "1.0", Greater);
-    test(1, 1, 3, Nearest, "0.5", Less);
-    test(1, 1, 3, Down, "0.5", Less);
-    test(1, 1, 3, Up, "1.0", Greater);
-    test(1, 8, 3, Floor, "0.06", Less);
-    test(1, 8, 3, Ceiling, "0.1", Greater);
-    test(1, 8, 3, Nearest, "0.1", Greater);
-    test(1, 8, 3, Down, "0.06", Less);
-    test(1, 8, 3, Up, "0.1", Greater);
-    test(-1, 2, 3, Floor, "-1.0", Less);
-    test(-1, 2, 3, Ceiling, "-0.5", Greater);
-    test(-1, 2, 3, Nearest, "-0.5", Greater);
-    test(-1, 2, 3, Down, "-0.5", Greater);
-    test(-1, 2, 3, Up, "-1.0", Less);
-    test(-1, 1, 10, Floor, "-Infinity", Equal);
-    test(-1, 1, 10, Ceiling, "-Infinity", Equal);
-    test(-1, 1, 10, Nearest, "-Infinity", Equal);
-    test(-1, 1, 10, Down, "-Infinity", Equal);
-    test(-1, 1, 10, Up, "-Infinity", Equal);
-    test(-3, 1, 10, Floor, "NaN", Equal);
-    test(-3, 1, 10, Ceiling, "NaN", Equal);
-    test(-3, 1, 10, Nearest, "NaN", Equal);
-    test(-3, 1, 10, Down, "NaN", Equal);
-    test(-3, 1, 10, Up, "NaN", Equal);
+    test(8, 1, 9, Floor, "1.0", "0x1.0#1", Equal);
+    test(8, 1, 9, Ceiling, "1.0", "0x1.0#1", Equal);
+    test(8, 1, 9, Nearest, "1.0", "0x1.0#1", Equal);
+    test(8, 1, 9, Down, "1.0", "0x1.0#1", Equal);
+    test(8, 1, 9, Up, "1.0", "0x1.0#1", Equal);
+    test(8, 1, 3, Floor, "2.0", "0x2.0#1", Equal);
+    test(8, 1, 3, Ceiling, "2.0", "0x2.0#1", Equal);
+    test(8, 1, 3, Nearest, "2.0", "0x2.0#1", Equal);
+    test(8, 1, 3, Down, "2.0", "0x2.0#1", Equal);
+    test(8, 1, 3, Up, "2.0", "0x2.0#1", Equal);
+    test(2, 1, 9, Floor, "0.50", "0x0.8#1", Equal);
+    test(2, 1, 9, Ceiling, "0.50", "0x0.8#1", Equal);
+    test(2, 1, 9, Nearest, "0.50", "0x0.8#1", Equal);
+    test(2, 1, 9, Down, "0.50", "0x0.8#1", Equal);
+    test(2, 1, 9, Up, "0.50", "0x0.8#1", Equal);
+    test(26, 1, 3, Floor, "3.00", "0x3.0#4", Equal);
+    test(26, 1, 3, Ceiling, "3.00", "0x3.0#4", Equal);
+    test(26, 1, 3, Nearest, "3.00", "0x3.0#4", Equal);
+    test(26, 1, 3, Down, "3.00", "0x3.0#4", Equal);
+    test(26, 1, 3, Up, "3.00", "0x3.0#4", Equal);
+    test(0, 1, 10, Floor, "0.0", "0x0.0", Equal);
+    test(0, 1, 10, Ceiling, "0.0", "0x0.0", Equal);
+    test(0, 1, 10, Nearest, "0.0", "0x0.0", Equal);
+    test(0, 1, 10, Down, "0.0", "0x0.0", Equal);
+    test(0, 1, 10, Up, "0.0", "0x0.0", Equal);
+    test(50, 1, 3, Floor, "3.50", "0x3.8#5", Less);
+    test(50, 1, 3, Ceiling, "3.62", "0x3.a#5", Greater);
+    test(50, 1, 3, Nearest, "3.62", "0x3.a#5", Greater);
+    test(50, 1, 3, Down, "3.50", "0x3.8#5", Less);
+    test(50, 1, 3, Up, "3.62", "0x3.a#5", Greater);
+    test(7, 1, 5, Floor, "1.2", "0x1.4#3", Less);
+    test(7, 1, 5, Ceiling, "1.5", "0x1.8#3", Greater);
+    test(7, 1, 5, Nearest, "1.2", "0x1.4#3", Less);
+    test(7, 1, 5, Down, "1.2", "0x1.4#3", Less);
+    test(7, 1, 5, Up, "1.5", "0x1.8#3", Greater);
+    test(1, 1, 3, Floor, "0.50", "0x0.8#1", Less);
+    test(1, 1, 3, Ceiling, "1.0", "0x1.0#1", Greater);
+    test(1, 1, 3, Nearest, "0.50", "0x0.8#1", Less);
+    test(1, 1, 3, Down, "0.50", "0x0.8#1", Less);
+    test(1, 1, 3, Up, "1.0", "0x1.0#1", Greater);
+    test(1, 8, 3, Floor, "0.062", "0x0.1#1", Less);
+    test(1, 8, 3, Ceiling, "0.12", "0x0.2#1", Greater);
+    test(1, 8, 3, Nearest, "0.12", "0x0.2#1", Greater);
+    test(1, 8, 3, Down, "0.062", "0x0.1#1", Less);
+    test(1, 8, 3, Up, "0.12", "0x0.2#1", Greater);
+    test(-1, 2, 3, Floor, "-1.0", "-0x1.0#1", Less);
+    test(-1, 2, 3, Ceiling, "-0.50", "-0x0.8#1", Greater);
+    test(-1, 2, 3, Nearest, "-0.50", "-0x0.8#1", Greater);
+    test(-1, 2, 3, Down, "-0.50", "-0x0.8#1", Greater);
+    test(-1, 2, 3, Up, "-1.0", "-0x1.0#1", Less);
+    test(-1, 1, 10, Floor, "-Infinity", "-Infinity", Equal);
+    test(-1, 1, 10, Ceiling, "-Infinity", "-Infinity", Equal);
+    test(-1, 1, 10, Nearest, "-Infinity", "-Infinity", Equal);
+    test(-1, 1, 10, Down, "-Infinity", "-Infinity", Equal);
+    test(-1, 1, 10, Up, "-Infinity", "-Infinity", Equal);
+    test(-3, 1, 10, Floor, "NaN", "NaN", Equal);
+    test(-3, 1, 10, Ceiling, "NaN", "NaN", Equal);
+    test(-3, 1, 10, Nearest, "NaN", "NaN", Equal);
+    test(-3, 1, 10, Down, "NaN", "NaN", Equal);
+    test(-3, 1, 10, Up, "NaN", "NaN", Equal);
 }
 
 #[test]

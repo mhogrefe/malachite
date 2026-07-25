@@ -30,21 +30,21 @@ fn test_is_power_of_2() {
 
     test("1.0", "0x1.0#1", true);
     test("2.0", "0x2.0#1", true);
-    test("0.5", "0x0.8#1", true);
+    test("0.50", "0x0.8#1", true);
     test("0.33333333333333331", "0x0.55555555555554#53", false);
     test("1.4142135623730951", "0x1.6a09e667f3bcd#53", false);
     test("3.1415926535897931", "0x3.243f6a8885a30#53", false);
-    test("too_big", "0x4.0E+268435455#1", true);
-    test("too_small", "0x1.0E-268435456#1", true);
+    test("1.0e323228496", "0x4.0E+268435455#1", true);
+    test("2.4e-323228497", "0x1.0E-268435456#1", true);
 
     test("-1.0", "-0x1.0#1", false);
     test("-2.0", "-0x2.0#1", false);
-    test("-0.5", "-0x0.8#1", false);
+    test("-0.50", "-0x0.8#1", false);
     test("-0.33333333333333331", "-0x0.55555555555554#53", false);
     test("-1.4142135623730951", "-0x1.6a09e667f3bcd#53", false);
     test("-3.1415926535897931", "-0x3.243f6a8885a30#53", false);
-    test("-too_big", "-0x4.0E+268435455#1", false);
-    test("-too_small", "-0x1.0E-268435456#1", false);
+    test("-1.0e323228496", "-0x4.0E+268435455#1", false);
+    test("-2.4e-323228497", "-0x1.0E-268435456#1", false);
 }
 
 #[allow(clippy::needless_pass_by_value)]

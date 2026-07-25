@@ -80,41 +80,73 @@ fn test_cbrt_prec_round() {
     test("-0.0", "-0x0.0", 5, Nearest, "-0.0", "-0x0.0", Equal);
     // Perfect cubes are exact, even under Exact rounding. The cube root of a negative number is a
     // negative real (unlike the square root).
-    test("27.0", "0x1b.0#5", 10, Floor, "3.0", "0x3.00#10", Equal);
-    test("27.0", "0x1b.0#5", 10, Exact, "3.0", "0x3.00#10", Equal);
-    test("8.0", "0x8.0#1", 10, Nearest, "2.0", "0x2.00#10", Equal);
-    test("8.0", "0x8.0#1", 10, Exact, "2.0", "0x2.00#10", Equal);
-    test("-8.0", "-0x8.0#1", 10, Nearest, "-2.0", "-0x2.00#10", Equal);
-    test("-8.0", "-0x8.0#1", 10, Exact, "-2.0", "-0x2.00#10", Equal);
-    test("-27.0", "-0x1b.0#5", 10, Exact, "-3.0", "-0x3.00#10", Equal);
+    test("27.0", "0x1b.0#5", 10, Floor, "3.0000", "0x3.00#10", Equal);
+    test("27.0", "0x1b.0#5", 10, Exact, "3.0000", "0x3.00#10", Equal);
+    test("8.0", "0x8.0#1", 10, Nearest, "2.0000", "0x2.00#10", Equal);
+    test("8.0", "0x8.0#1", 10, Exact, "2.0000", "0x2.00#10", Equal);
+    test(
+        "-8.0",
+        "-0x8.0#1",
+        10,
+        Nearest,
+        "-2.0000",
+        "-0x2.00#10",
+        Equal,
+    );
+    test(
+        "-8.0",
+        "-0x8.0#1",
+        10,
+        Exact,
+        "-2.0000",
+        "-0x2.00#10",
+        Equal,
+    );
+    test(
+        "-27.0",
+        "-0x1b.0#5",
+        10,
+        Exact,
+        "-3.0000",
+        "-0x3.00#10",
+        Equal,
+    );
     // Inexact roots
-    test("2.0", "0x2.0#1", 10, Floor, "1.26", "0x1.428#10", Less);
+    test("2.0", "0x2.0#1", 10, Floor, "1.2598", "0x1.428#10", Less);
     test(
         "2.0",
         "0x2.0#1",
         10,
         Ceiling,
-        "1.262",
+        "1.2617",
         "0x1.430#10",
         Greater,
     );
-    test("2.0", "0x2.0#1", 10, Nearest, "1.26", "0x1.428#10", Less);
-    test("0.5", "0x0.8#1", 20, Floor, "0.7937", "0x0.cb2ff#20", Less);
+    test("2.0", "0x2.0#1", 10, Nearest, "1.2598", "0x1.428#10", Less);
     test(
-        "0.5",
+        "0.50",
+        "0x0.8#1",
+        20,
+        Floor,
+        "0.79370022",
+        "0x0.cb2ff#20",
+        Less,
+    );
+    test(
+        "0.50",
         "0x0.8#1",
         20,
         Ceiling,
-        "0.793701",
+        "0.79370117",
         "0x0.cb300#20",
         Greater,
     );
     test(
-        "0.5",
+        "0.50",
         "0x0.8#1",
         20,
         Nearest,
-        "0.7937",
+        "0.79370022",
         "0x0.cb2ff#20",
         Less,
     );
@@ -122,11 +154,12 @@ fn test_cbrt_prec_round() {
 
 #[test]
 fn test_cbrt() {
-    let test = |s_hex: &str, out: &str| {
+    let test = |s_hex: &str, out: &str, out_hex: &str| {
         let x = parse_hex_string(s_hex);
         let cbrt = x.clone().cbrt();
         assert!(cbrt.is_valid());
         assert_eq!(cbrt.to_string(), out);
+        assert_eq!(to_hex_string(&cbrt), out_hex);
 
         let cbrt_alt = (&x).cbrt();
         assert_eq!(ComparableFloatRef(&cbrt_alt), ComparableFloatRef(&cbrt));
@@ -135,22 +168,23 @@ fn test_cbrt() {
         let (cbrt_prec, _) = x.cbrt_prec_ref(x.significant_bits());
         assert_eq!(ComparableFloatRef(&cbrt_prec), ComparableFloatRef(&cbrt));
     };
-    test("NaN", "NaN");
-    test("Infinity", "Infinity");
-    test("-Infinity", "-Infinity");
-    test("0x0.0", "0.0");
-    test("-0x0.0", "-0.0");
-    test("0x1b.0#5", "3.0");
-    test("-0x8.0#1", "-2.0");
-    test("0x2.0#1", "1.0");
+    test("NaN", "NaN", "NaN");
+    test("Infinity", "Infinity", "Infinity");
+    test("-Infinity", "-Infinity", "-Infinity");
+    test("0x0.0", "0.0", "0x0.0");
+    test("-0x0.0", "-0.0", "-0x0.0");
+    test("0x1b.0#5", "3.00", "0x3.0#5");
+    test("-0x8.0#1", "-2.0", "-0x2.0#1");
+    test("0x2.0#1", "1.0", "0x1.0#1");
 }
 
 #[test]
 fn test_cbrt_rational_prec() {
-    let test = |x: Rational, prec: u64, out: &str, o_out: Ordering| {
+    let test = |x: Rational, prec: u64, out: &str, out_hex: &str, o_out: Ordering| {
         let (cbrt, o) = Float::cbrt_rational_prec(x.clone(), prec);
         assert!(cbrt.is_valid());
         assert_eq!(cbrt.to_string(), out);
+        assert_eq!(to_hex_string(&cbrt), out_hex);
         assert_eq!(o, o_out);
 
         let (cbrt_alt, o_alt) = Float::cbrt_rational_prec_ref(&x, prec);
@@ -162,9 +196,9 @@ fn test_cbrt_rational_prec() {
         assert_eq!(ComparableFloatRef(&root), ComparableFloatRef(&cbrt));
         assert_eq!(root_o, o_out);
     };
-    test(Rational::from(27), 10, "3.0", Equal);
-    test(Rational::from(-8), 10, "-2.0", Equal);
-    test(Rational::from(2), 10, "1.26", Less);
+    test(Rational::from(27), 10, "3.0000", "0x3.00#10", Equal);
+    test(Rational::from(-8), 10, "-2.0000", "-0x2.00#10", Equal);
+    test(Rational::from(2), 10, "1.2598", "0x1.428#10", Less);
 }
 
 #[test]

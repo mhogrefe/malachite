@@ -1150,15 +1150,15 @@ impl Float {
     /// assert_eq!(o, Less);
     ///
     /// let (quotient, o) = Float::from(PI).div_prec_round(Float::from(E), 20, Floor);
-    /// assert_eq!(quotient.to_string(), "1.155725");
+    /// assert_eq!(quotient.to_string(), "1.1557255");
     /// assert_eq!(o, Less);
     ///
     /// let (quotient, o) = Float::from(PI).div_prec_round(Float::from(E), 20, Ceiling);
-    /// assert_eq!(quotient.to_string(), "1.155727");
+    /// assert_eq!(quotient.to_string(), "1.1557274");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) = Float::from(PI).div_prec_round(Float::from(E), 20, Nearest);
-    /// assert_eq!(quotient.to_string(), "1.155727");
+    /// assert_eq!(quotient.to_string(), "1.1557274");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -1265,15 +1265,15 @@ impl Float {
     /// assert_eq!(o, Less);
     ///
     /// let (quotient, o) = Float::from(PI).div_prec_round_val_ref(&Float::from(E), 20, Floor);
-    /// assert_eq!(quotient.to_string(), "1.155725");
+    /// assert_eq!(quotient.to_string(), "1.1557255");
     /// assert_eq!(o, Less);
     ///
     /// let (quotient, o) = Float::from(PI).div_prec_round_val_ref(&Float::from(E), 20, Ceiling);
-    /// assert_eq!(quotient.to_string(), "1.155727");
+    /// assert_eq!(quotient.to_string(), "1.1557274");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) = Float::from(PI).div_prec_round_val_ref(&Float::from(E), 20, Nearest);
-    /// assert_eq!(quotient.to_string(), "1.155727");
+    /// assert_eq!(quotient.to_string(), "1.1557274");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -1385,15 +1385,15 @@ impl Float {
     /// assert_eq!(o, Less);
     ///
     /// let (quotient, o) = Float::from(PI).div_prec_round_ref_val(Float::from(E), 20, Floor);
-    /// assert_eq!(quotient.to_string(), "1.155725");
+    /// assert_eq!(quotient.to_string(), "1.1557255");
     /// assert_eq!(o, Less);
     ///
     /// let (quotient, o) = Float::from(PI).div_prec_round_ref_val(Float::from(E), 20, Ceiling);
-    /// assert_eq!(quotient.to_string(), "1.155727");
+    /// assert_eq!(quotient.to_string(), "1.1557274");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) = Float::from(PI).div_prec_round_ref_val(Float::from(E), 20, Nearest);
-    /// assert_eq!(quotient.to_string(), "1.155727");
+    /// assert_eq!(quotient.to_string(), "1.1557274");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -1619,15 +1619,15 @@ impl Float {
     /// assert_eq!(o, Less);
     ///
     /// let (quotient, o) = Float::from(PI).div_prec_round_ref_ref(&Float::from(E), 20, Floor);
-    /// assert_eq!(quotient.to_string(), "1.155725");
+    /// assert_eq!(quotient.to_string(), "1.1557255");
     /// assert_eq!(o, Less);
     ///
     /// let (quotient, o) = Float::from(PI).div_prec_round_ref_ref(&Float::from(E), 20, Ceiling);
-    /// assert_eq!(quotient.to_string(), "1.155727");
+    /// assert_eq!(quotient.to_string(), "1.1557274");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) = Float::from(PI).div_prec_round_ref_ref(&Float::from(E), 20, Nearest);
-    /// assert_eq!(quotient.to_string(), "1.155727");
+    /// assert_eq!(quotient.to_string(), "1.1557274");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -1824,7 +1824,7 @@ impl Float {
     /// assert_eq!(o, Less);
     ///
     /// let (quotient, o) = Float::from(PI).div_prec(Float::from(E), 20);
-    /// assert_eq!(quotient.to_string(), "1.155727");
+    /// assert_eq!(quotient.to_string(), "1.1557274");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -1901,7 +1901,7 @@ impl Float {
     /// assert_eq!(o, Less);
     ///
     /// let (quotient, o) = Float::from(PI).div_prec_val_ref(&Float::from(E), 20);
-    /// assert_eq!(quotient.to_string(), "1.155727");
+    /// assert_eq!(quotient.to_string(), "1.1557274");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -1978,7 +1978,7 @@ impl Float {
     /// assert_eq!(o, Less);
     ///
     /// let (quotient, o) = Float::from(PI).div_prec_ref_val(Float::from(E), 20);
-    /// assert_eq!(quotient.to_string(), "1.155727");
+    /// assert_eq!(quotient.to_string(), "1.1557274");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -2055,7 +2055,7 @@ impl Float {
     /// assert_eq!(o, Less);
     ///
     /// let (quotient, o) = Float::from(PI).div_prec_ref_ref(&Float::from(E), 20);
-    /// assert_eq!(quotient.to_string(), "1.155727");
+    /// assert_eq!(quotient.to_string(), "1.1557274");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -2153,7 +2153,7 @@ impl Float {
     /// assert_eq!(o, Less);
     ///
     /// let (quotient, o) = Float::from(PI).div_round(Float::from(E), Ceiling);
-    /// assert_eq!(quotient.to_string(), "1.155727349790922");
+    /// assert_eq!(quotient.to_string(), "1.1557273497909220");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) = Float::from(PI).div_round(Float::from(E), Nearest);
@@ -2256,7 +2256,7 @@ impl Float {
     /// assert_eq!(o, Less);
     ///
     /// let (quotient, o) = Float::from(PI).div_round_val_ref(&Float::from(E), Ceiling);
-    /// assert_eq!(quotient.to_string(), "1.155727349790922");
+    /// assert_eq!(quotient.to_string(), "1.1557273497909220");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) = Float::from(PI).div_round_val_ref(&Float::from(E), Nearest);
@@ -2359,7 +2359,7 @@ impl Float {
     /// assert_eq!(o, Less);
     ///
     /// let (quotient, o) = Float::from(PI).div_round_ref_val(Float::from(E), Ceiling);
-    /// assert_eq!(quotient.to_string(), "1.155727349790922");
+    /// assert_eq!(quotient.to_string(), "1.1557273497909220");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) = Float::from(PI).div_round_ref_val(Float::from(E), Nearest);
@@ -2462,7 +2462,7 @@ impl Float {
     /// assert_eq!(o, Less);
     ///
     /// let (quotient, o) = Float::from(PI).div_round_ref_ref(&Float::from(E), Ceiling);
-    /// assert_eq!(quotient.to_string(), "1.155727349790922");
+    /// assert_eq!(quotient.to_string(), "1.1557273497909220");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) = Float::from(PI).div_round_ref_ref(&Float::from(E), Nearest);
@@ -2546,21 +2546,21 @@ impl Float {
     ///     quotient.div_prec_round_assign(Float::from(E), 20, Floor),
     ///     Less
     /// );
-    /// assert_eq!(quotient.to_string(), "1.155725");
+    /// assert_eq!(quotient.to_string(), "1.1557255");
     ///
     /// let mut quotient = Float::from(PI);
     /// assert_eq!(
     ///     quotient.div_prec_round_assign(Float::from(E), 20, Ceiling),
     ///     Greater
     /// );
-    /// assert_eq!(quotient.to_string(), "1.155727");
+    /// assert_eq!(quotient.to_string(), "1.1557274");
     ///
     /// let mut quotient = Float::from(PI);
     /// assert_eq!(
     ///     quotient.div_prec_round_assign(Float::from(E), 20, Nearest),
     ///     Greater
     /// );
-    /// assert_eq!(quotient.to_string(), "1.155727");
+    /// assert_eq!(quotient.to_string(), "1.1557274");
     /// ```
     #[inline]
     pub fn div_prec_round_assign(&mut self, other: Self, prec: u64, rm: RoundingMode) -> Ordering {
@@ -2804,21 +2804,21 @@ impl Float {
     ///     quotient.div_prec_round_assign_ref(&Float::from(E), 20, Floor),
     ///     Less
     /// );
-    /// assert_eq!(quotient.to_string(), "1.155725");
+    /// assert_eq!(quotient.to_string(), "1.1557255");
     ///
     /// let mut quotient = Float::from(PI);
     /// assert_eq!(
     ///     quotient.div_prec_round_assign_ref(&Float::from(E), 20, Ceiling),
     ///     Greater
     /// );
-    /// assert_eq!(quotient.to_string(), "1.155727");
+    /// assert_eq!(quotient.to_string(), "1.1557274");
     ///
     /// let mut quotient = Float::from(PI);
     /// assert_eq!(
     ///     quotient.div_prec_round_assign_ref(&Float::from(E), 20, Nearest),
     ///     Greater
     /// );
-    /// assert_eq!(quotient.to_string(), "1.155727");
+    /// assert_eq!(quotient.to_string(), "1.1557274");
     /// ```
     #[inline]
     pub fn div_prec_round_assign_ref(
@@ -3041,7 +3041,7 @@ impl Float {
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.div_prec_assign(Float::from(E), 20), Greater);
-    /// assert_eq!(x.to_string(), "1.155727");
+    /// assert_eq!(x.to_string(), "1.1557274");
     /// ```
     #[inline]
     pub fn div_prec_assign(&mut self, other: Self, prec: u64) -> Ordering {
@@ -3093,7 +3093,7 @@ impl Float {
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.div_prec_assign_ref(&Float::from(E), 20), Greater);
-    /// assert_eq!(x.to_string(), "1.155727");
+    /// assert_eq!(x.to_string(), "1.1557274");
     /// ```
     #[inline]
     pub fn div_prec_assign_ref(&mut self, other: &Self, prec: u64) -> Ordering {
@@ -3152,7 +3152,7 @@ impl Float {
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.div_round_assign(Float::from(E), Ceiling), Greater);
-    /// assert_eq!(x.to_string(), "1.155727349790922");
+    /// assert_eq!(x.to_string(), "1.1557273497909220");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.div_round_assign(Float::from(E), Nearest), Less);
@@ -3216,7 +3216,7 @@ impl Float {
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.div_round_assign_ref(&Float::from(E), Ceiling), Greater);
-    /// assert_eq!(x.to_string(), "1.155727349790922");
+    /// assert_eq!(x.to_string(), "1.1557273497909220");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.div_round_assign_ref(&Float::from(E), Nearest), Less);
@@ -3307,32 +3307,32 @@ impl Float {
     ///
     /// let (quotient, o) =
     ///     Float::from(PI).div_rational_prec_round(Rational::from_unsigneds(1u8, 3), 5, Floor);
-    /// assert_eq!(quotient.to_string(), "9.0");
+    /// assert_eq!(quotient.to_string(), "9.00");
     /// assert_eq!(o, Less);
     ///
     /// let (quotient, o) =
     ///     Float::from(PI).div_rational_prec_round(Rational::from_unsigneds(1u8, 3), 5, Ceiling);
-    /// assert_eq!(quotient.to_string(), "9.5");
+    /// assert_eq!(quotient.to_string(), "9.50");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) =
     ///     Float::from(PI).div_rational_prec_round(Rational::from_unsigneds(1u8, 3), 5, Nearest);
-    /// assert_eq!(quotient.to_string(), "9.5");
+    /// assert_eq!(quotient.to_string(), "9.50");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) =
     ///     Float::from(PI).div_rational_prec_round(Rational::from_unsigneds(1u8, 3), 20, Floor);
-    /// assert_eq!(quotient.to_string(), "9.42477");
+    /// assert_eq!(quotient.to_string(), "9.4247742");
     /// assert_eq!(o, Less);
     ///
     /// let (quotient, o) =
     ///     Float::from(PI).div_rational_prec_round(Rational::from_unsigneds(1u8, 3), 20, Ceiling);
-    /// assert_eq!(quotient.to_string(), "9.42479");
+    /// assert_eq!(quotient.to_string(), "9.4247894");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) =
     ///     Float::from(PI).div_rational_prec_round(Rational::from_unsigneds(1u8, 3), 20, Nearest);
-    /// assert_eq!(quotient.to_string(), "9.42477");
+    /// assert_eq!(quotient.to_string(), "9.4247742");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -3428,7 +3428,7 @@ impl Float {
     ///     5,
     ///     Floor,
     /// );
-    /// assert_eq!(quotient.to_string(), "9.0");
+    /// assert_eq!(quotient.to_string(), "9.00");
     /// assert_eq!(o, Less);
     ///
     /// let (quotient, o) = Float::from(PI).div_rational_prec_round_val_ref(
@@ -3436,7 +3436,7 @@ impl Float {
     ///     5,
     ///     Ceiling,
     /// );
-    /// assert_eq!(quotient.to_string(), "9.5");
+    /// assert_eq!(quotient.to_string(), "9.50");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) = Float::from(PI).div_rational_prec_round_val_ref(
@@ -3444,7 +3444,7 @@ impl Float {
     ///     5,
     ///     Nearest,
     /// );
-    /// assert_eq!(quotient.to_string(), "9.5");
+    /// assert_eq!(quotient.to_string(), "9.50");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) = Float::from(PI).div_rational_prec_round_val_ref(
@@ -3452,7 +3452,7 @@ impl Float {
     ///     20,
     ///     Floor,
     /// );
-    /// assert_eq!(quotient.to_string(), "9.42477");
+    /// assert_eq!(quotient.to_string(), "9.4247742");
     /// assert_eq!(o, Less);
     ///
     /// let (quotient, o) = Float::from(PI).div_rational_prec_round_val_ref(
@@ -3460,7 +3460,7 @@ impl Float {
     ///     20,
     ///     Ceiling,
     /// );
-    /// assert_eq!(quotient.to_string(), "9.42479");
+    /// assert_eq!(quotient.to_string(), "9.4247894");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) = Float::from(PI).div_rational_prec_round_val_ref(
@@ -3468,7 +3468,7 @@ impl Float {
     ///     20,
     ///     Nearest,
     /// );
-    /// assert_eq!(quotient.to_string(), "9.42477");
+    /// assert_eq!(quotient.to_string(), "9.4247742");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -3564,7 +3564,7 @@ impl Float {
     ///     5,
     ///     Floor,
     /// );
-    /// assert_eq!(quotient.to_string(), "9.0");
+    /// assert_eq!(quotient.to_string(), "9.00");
     /// assert_eq!(o, Less);
     ///
     /// let (quotient, o) = Float::from(PI).div_rational_prec_round_ref_val(
@@ -3572,7 +3572,7 @@ impl Float {
     ///     5,
     ///     Ceiling,
     /// );
-    /// assert_eq!(quotient.to_string(), "9.5");
+    /// assert_eq!(quotient.to_string(), "9.50");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) = Float::from(PI).div_rational_prec_round_ref_val(
@@ -3580,7 +3580,7 @@ impl Float {
     ///     5,
     ///     Nearest,
     /// );
-    /// assert_eq!(quotient.to_string(), "9.5");
+    /// assert_eq!(quotient.to_string(), "9.50");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) = Float::from(PI).div_rational_prec_round_ref_val(
@@ -3588,7 +3588,7 @@ impl Float {
     ///     20,
     ///     Floor,
     /// );
-    /// assert_eq!(quotient.to_string(), "9.42477");
+    /// assert_eq!(quotient.to_string(), "9.4247742");
     /// assert_eq!(o, Less);
     ///
     /// let (quotient, o) = Float::from(PI).div_rational_prec_round_ref_val(
@@ -3596,7 +3596,7 @@ impl Float {
     ///     20,
     ///     Ceiling,
     /// );
-    /// assert_eq!(quotient.to_string(), "9.42479");
+    /// assert_eq!(quotient.to_string(), "9.4247894");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) = Float::from(PI).div_rational_prec_round_ref_val(
@@ -3604,7 +3604,7 @@ impl Float {
     ///     20,
     ///     Nearest,
     /// );
-    /// assert_eq!(quotient.to_string(), "9.42477");
+    /// assert_eq!(quotient.to_string(), "9.4247742");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -3705,7 +3705,7 @@ impl Float {
     ///     5,
     ///     Floor,
     /// );
-    /// assert_eq!(quotient.to_string(), "9.0");
+    /// assert_eq!(quotient.to_string(), "9.00");
     /// assert_eq!(o, Less);
     ///
     /// let (quotient, o) = Float::from(PI).div_rational_prec_round_ref_ref(
@@ -3713,7 +3713,7 @@ impl Float {
     ///     5,
     ///     Ceiling,
     /// );
-    /// assert_eq!(quotient.to_string(), "9.5");
+    /// assert_eq!(quotient.to_string(), "9.50");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) = Float::from(PI).div_rational_prec_round_ref_ref(
@@ -3721,7 +3721,7 @@ impl Float {
     ///     5,
     ///     Nearest,
     /// );
-    /// assert_eq!(quotient.to_string(), "9.5");
+    /// assert_eq!(quotient.to_string(), "9.50");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) = Float::from(PI).div_rational_prec_round_ref_ref(
@@ -3729,7 +3729,7 @@ impl Float {
     ///     20,
     ///     Floor,
     /// );
-    /// assert_eq!(quotient.to_string(), "9.42477");
+    /// assert_eq!(quotient.to_string(), "9.4247742");
     /// assert_eq!(o, Less);
     ///
     /// let (quotient, o) = Float::from(PI).div_rational_prec_round_ref_ref(
@@ -3737,7 +3737,7 @@ impl Float {
     ///     20,
     ///     Ceiling,
     /// );
-    /// assert_eq!(quotient.to_string(), "9.42479");
+    /// assert_eq!(quotient.to_string(), "9.4247894");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) = Float::from(PI).div_rational_prec_round_ref_ref(
@@ -3745,7 +3745,7 @@ impl Float {
     ///     20,
     ///     Nearest,
     /// );
-    /// assert_eq!(quotient.to_string(), "9.42477");
+    /// assert_eq!(quotient.to_string(), "9.4247742");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -3822,11 +3822,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (quotient, o) = Float::from(PI).div_rational_prec(Rational::exact_from(1.5), 5);
-    /// assert_eq!(quotient.to_string(), "2.1");
+    /// assert_eq!(quotient.to_string(), "2.12");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) = Float::from(PI).div_rational_prec(Rational::exact_from(1.5), 20);
-    /// assert_eq!(quotient.to_string(), "2.094395");
+    /// assert_eq!(quotient.to_string(), "2.0943947");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -3893,12 +3893,12 @@ impl Float {
     ///
     /// let (quotient, o) =
     ///     Float::from(PI).div_rational_prec_val_ref(&Rational::exact_from(1.5), 5);
-    /// assert_eq!(quotient.to_string(), "2.1");
+    /// assert_eq!(quotient.to_string(), "2.12");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) =
     ///     Float::from(PI).div_rational_prec_val_ref(&Rational::exact_from(1.5), 20);
-    /// assert_eq!(quotient.to_string(), "2.094395");
+    /// assert_eq!(quotient.to_string(), "2.0943947");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -3964,12 +3964,12 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (quotient, o) = Float::from(PI).div_rational_prec_ref_val(Rational::exact_from(1.5), 5);
-    /// assert_eq!(quotient.to_string(), "2.1");
+    /// assert_eq!(quotient.to_string(), "2.12");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) =
     ///     Float::from(PI).div_rational_prec_ref_val(Rational::exact_from(1.5), 20);
-    /// assert_eq!(quotient.to_string(), "2.094395");
+    /// assert_eq!(quotient.to_string(), "2.0943947");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -4036,12 +4036,12 @@ impl Float {
     ///
     /// let (quotient, o) =
     ///     Float::from(PI).div_rational_prec_ref_ref(&Rational::exact_from(1.5), 5);
-    /// assert_eq!(quotient.to_string(), "2.1");
+    /// assert_eq!(quotient.to_string(), "2.12");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) =
     ///     Float::from(PI).div_rational_prec_ref_ref(&Rational::exact_from(1.5), 20);
-    /// assert_eq!(quotient.to_string(), "2.094395");
+    /// assert_eq!(quotient.to_string(), "2.0943947");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -4128,17 +4128,17 @@ impl Float {
     ///
     /// let (quotient, o) =
     ///     Float::from(PI).div_rational_round(Rational::from_unsigneds(1u8, 3), Floor);
-    /// assert_eq!(quotient.to_string(), "9.42477796076938");
+    /// assert_eq!(quotient.to_string(), "9.4247779607693758");
     /// assert_eq!(o, Less);
     ///
     /// let (quotient, o) =
     ///     Float::from(PI).div_rational_round(Rational::from_unsigneds(1u8, 3), Ceiling);
-    /// assert_eq!(quotient.to_string(), "9.42477796076939");
+    /// assert_eq!(quotient.to_string(), "9.4247779607693900");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) =
     ///     Float::from(PI).div_rational_round(Rational::from_unsigneds(1u8, 3), Nearest);
-    /// assert_eq!(quotient.to_string(), "9.42477796076938");
+    /// assert_eq!(quotient.to_string(), "9.4247779607693758");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -4226,17 +4226,17 @@ impl Float {
     ///
     /// let (quotient, o) =
     ///     Float::from(PI).div_rational_round_val_ref(&Rational::from_unsigneds(1u8, 3), Floor);
-    /// assert_eq!(quotient.to_string(), "9.42477796076938");
+    /// assert_eq!(quotient.to_string(), "9.4247779607693758");
     /// assert_eq!(o, Less);
     ///
     /// let (quotient, o) =
     ///     Float::from(PI).div_rational_round_val_ref(&Rational::from_unsigneds(1u8, 3), Ceiling);
-    /// assert_eq!(quotient.to_string(), "9.42477796076939");
+    /// assert_eq!(quotient.to_string(), "9.4247779607693900");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) =
     ///     Float::from(PI).div_rational_round_val_ref(&Rational::from_unsigneds(1u8, 3), Nearest);
-    /// assert_eq!(quotient.to_string(), "9.42477796076938");
+    /// assert_eq!(quotient.to_string(), "9.4247779607693758");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -4328,17 +4328,17 @@ impl Float {
     ///
     /// let (quotient, o) =
     ///     Float::from(PI).div_rational_round_ref_val(Rational::from_unsigneds(1u8, 3), Floor);
-    /// assert_eq!(quotient.to_string(), "9.42477796076938");
+    /// assert_eq!(quotient.to_string(), "9.4247779607693758");
     /// assert_eq!(o, Less);
     ///
     /// let (quotient, o) =
     ///     Float::from(PI).div_rational_round_ref_val(Rational::from_unsigneds(1u8, 3), Ceiling);
-    /// assert_eq!(quotient.to_string(), "9.42477796076939");
+    /// assert_eq!(quotient.to_string(), "9.4247779607693900");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) =
     ///     Float::from(PI).div_rational_round_ref_val(Rational::from_unsigneds(1u8, 3), Nearest);
-    /// assert_eq!(quotient.to_string(), "9.42477796076938");
+    /// assert_eq!(quotient.to_string(), "9.4247779607693758");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -4430,17 +4430,17 @@ impl Float {
     ///
     /// let (quotient, o) =
     ///     Float::from(PI).div_rational_round_ref_ref(&Rational::from_unsigneds(1u8, 3), Floor);
-    /// assert_eq!(quotient.to_string(), "9.42477796076938");
+    /// assert_eq!(quotient.to_string(), "9.4247779607693758");
     /// assert_eq!(o, Less);
     ///
     /// let (quotient, o) =
     ///     Float::from(PI).div_rational_round_ref_ref(&Rational::from_unsigneds(1u8, 3), Ceiling);
-    /// assert_eq!(quotient.to_string(), "9.42477796076939");
+    /// assert_eq!(quotient.to_string(), "9.4247779607693900");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) =
     ///     Float::from(PI).div_rational_round_ref_ref(&Rational::from_unsigneds(1u8, 3), Nearest);
-    /// assert_eq!(quotient.to_string(), "9.42477796076938");
+    /// assert_eq!(quotient.to_string(), "9.4247779607693758");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -4504,42 +4504,42 @@ impl Float {
     ///     x.div_rational_prec_round_assign(Rational::from_unsigneds(1u8, 3), 5, Floor),
     ///     Less
     /// );
-    /// assert_eq!(x.to_string(), "9.0");
+    /// assert_eq!(x.to_string(), "9.00");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.div_rational_prec_round_assign(Rational::from_unsigneds(1u8, 3), 5, Ceiling),
     ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "9.5");
+    /// assert_eq!(x.to_string(), "9.50");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.div_rational_prec_round_assign(Rational::from_unsigneds(1u8, 3), 5, Nearest),
     ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "9.5");
+    /// assert_eq!(x.to_string(), "9.50");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.div_rational_prec_round_assign(Rational::from_unsigneds(1u8, 3), 20, Floor),
     ///     Less
     /// );
-    /// assert_eq!(x.to_string(), "9.42477");
+    /// assert_eq!(x.to_string(), "9.4247742");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.div_rational_prec_round_assign(Rational::from_unsigneds(1u8, 3), 20, Ceiling),
     ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "9.42479");
+    /// assert_eq!(x.to_string(), "9.4247894");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.div_rational_prec_round_assign(Rational::from_unsigneds(1u8, 3), 20, Nearest),
     ///     Less
     /// );
-    /// assert_eq!(x.to_string(), "9.42477");
+    /// assert_eq!(x.to_string(), "9.4247742");
     /// ```
     #[inline]
     pub fn div_rational_prec_round_assign(
@@ -4609,42 +4609,42 @@ impl Float {
     ///     x.div_rational_prec_round_assign_ref(&Rational::from_unsigneds(1u8, 3), 5, Floor),
     ///     Less
     /// );
-    /// assert_eq!(x.to_string(), "9.0");
+    /// assert_eq!(x.to_string(), "9.00");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.div_rational_prec_round_assign_ref(&Rational::from_unsigneds(1u8, 3), 5, Ceiling),
     ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "9.5");
+    /// assert_eq!(x.to_string(), "9.50");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.div_rational_prec_round_assign_ref(&Rational::from_unsigneds(1u8, 3), 5, Nearest),
     ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "9.5");
+    /// assert_eq!(x.to_string(), "9.50");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.div_rational_prec_round_assign_ref(&Rational::from_unsigneds(1u8, 3), 20, Floor),
     ///     Less
     /// );
-    /// assert_eq!(x.to_string(), "9.42477");
+    /// assert_eq!(x.to_string(), "9.4247742");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.div_rational_prec_round_assign_ref(&Rational::from_unsigneds(1u8, 3), 20, Ceiling),
     ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "9.42479");
+    /// assert_eq!(x.to_string(), "9.4247894");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.div_rational_prec_round_assign_ref(&Rational::from_unsigneds(1u8, 3), 20, Nearest),
     ///     Less
     /// );
-    /// assert_eq!(x.to_string(), "9.42477");
+    /// assert_eq!(x.to_string(), "9.4247742");
     /// ```
     #[inline]
     pub fn div_rational_prec_round_assign_ref(
@@ -4708,14 +4708,14 @@ impl Float {
     ///     x.div_rational_prec_assign(Rational::exact_from(1.5), 5),
     ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "2.1");
+    /// assert_eq!(x.to_string(), "2.12");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.div_rational_prec_assign(Rational::exact_from(1.5), 20),
     ///     Less
     /// );
-    /// assert_eq!(x.to_string(), "2.094395");
+    /// assert_eq!(x.to_string(), "2.0943947");
     /// ```
     #[inline]
     pub fn div_rational_prec_assign(&mut self, other: Rational, prec: u64) -> Ordering {
@@ -4768,14 +4768,14 @@ impl Float {
     ///     x.div_rational_prec_assign_ref(&Rational::exact_from(1.5), 5),
     ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "2.1");
+    /// assert_eq!(x.to_string(), "2.12");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.div_rational_prec_assign_ref(&Rational::exact_from(1.5), 20),
     ///     Less
     /// );
-    /// assert_eq!(x.to_string(), "2.094395");
+    /// assert_eq!(x.to_string(), "2.0943947");
     /// ```
     #[inline]
     pub fn div_rational_prec_assign_ref(&mut self, other: &Rational, prec: u64) -> Ordering {
@@ -4834,21 +4834,21 @@ impl Float {
     ///     x.div_rational_round_assign(Rational::from_unsigneds(1u8, 3), Floor),
     ///     Less
     /// );
-    /// assert_eq!(x.to_string(), "9.42477796076938");
+    /// assert_eq!(x.to_string(), "9.4247779607693758");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.div_rational_round_assign(Rational::from_unsigneds(1u8, 3), Ceiling),
     ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "9.42477796076939");
+    /// assert_eq!(x.to_string(), "9.4247779607693900");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.div_rational_round_assign(Rational::from_unsigneds(1u8, 3), Nearest),
     ///     Less
     /// );
-    /// assert_eq!(x.to_string(), "9.42477796076938");
+    /// assert_eq!(x.to_string(), "9.4247779607693758");
     /// ```
     #[inline]
     pub fn div_rational_round_assign(&mut self, other: Rational, rm: RoundingMode) -> Ordering {
@@ -4908,21 +4908,21 @@ impl Float {
     ///     x.div_rational_round_assign_ref(&Rational::from_unsigneds(1u8, 3), Floor),
     ///     Less
     /// );
-    /// assert_eq!(x.to_string(), "9.42477796076938");
+    /// assert_eq!(x.to_string(), "9.4247779607693758");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.div_rational_round_assign_ref(&Rational::from_unsigneds(1u8, 3), Ceiling),
     ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "9.42477796076939");
+    /// assert_eq!(x.to_string(), "9.4247779607693900");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.div_rational_round_assign_ref(&Rational::from_unsigneds(1u8, 3), Nearest),
     ///     Less
     /// );
-    /// assert_eq!(x.to_string(), "9.42477796076938");
+    /// assert_eq!(x.to_string(), "9.4247779607693758");
     /// ```
     #[inline]
     pub fn div_rational_round_assign_ref(
@@ -5011,32 +5011,32 @@ impl Float {
     ///
     /// let (quotient, o) =
     ///     Float::rational_div_float_prec_round(Rational::from(3), Float::from(PI), 5, Floor);
-    /// assert_eq!(quotient.to_string(), "0.94");
+    /// assert_eq!(quotient.to_string(), "0.938");
     /// assert_eq!(o, Less);
     ///
     /// let (quotient, o) =
     ///     Float::rational_div_float_prec_round(Rational::from(3), Float::from(PI), 5, Ceiling);
-    /// assert_eq!(quotient.to_string(), "0.97");
+    /// assert_eq!(quotient.to_string(), "0.969");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) =
     ///     Float::rational_div_float_prec_round(Rational::from(3), Float::from(PI), 5, Nearest);
-    /// assert_eq!(quotient.to_string(), "0.97");
+    /// assert_eq!(quotient.to_string(), "0.969");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) =
     ///     Float::rational_div_float_prec_round(Rational::from(3), Float::from(PI), 20, Floor);
-    /// assert_eq!(quotient.to_string(), "0.954929");
+    /// assert_eq!(quotient.to_string(), "0.95492935");
     /// assert_eq!(o, Less);
     ///
     /// let (quotient, o) =
     ///     Float::rational_div_float_prec_round(Rational::from(3), Float::from(PI), 20, Ceiling);
-    /// assert_eq!(quotient.to_string(), "0.95493");
+    /// assert_eq!(quotient.to_string(), "0.95493031");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) =
     ///     Float::rational_div_float_prec_round(Rational::from(3), Float::from(PI), 20, Nearest);
-    /// assert_eq!(quotient.to_string(), "0.954929");
+    /// assert_eq!(quotient.to_string(), "0.95492935");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -5135,7 +5135,7 @@ impl Float {
     ///     5,
     ///     Floor,
     /// );
-    /// assert_eq!(quotient.to_string(), "0.94");
+    /// assert_eq!(quotient.to_string(), "0.938");
     /// assert_eq!(o, Less);
     ///
     /// let (quotient, o) = Float::rational_div_float_prec_round_val_ref(
@@ -5144,7 +5144,7 @@ impl Float {
     ///     5,
     ///     Ceiling,
     /// );
-    /// assert_eq!(quotient.to_string(), "0.97");
+    /// assert_eq!(quotient.to_string(), "0.969");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) = Float::rational_div_float_prec_round_val_ref(
@@ -5153,7 +5153,7 @@ impl Float {
     ///     5,
     ///     Nearest,
     /// );
-    /// assert_eq!(quotient.to_string(), "0.97");
+    /// assert_eq!(quotient.to_string(), "0.969");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) = Float::rational_div_float_prec_round_val_ref(
@@ -5162,7 +5162,7 @@ impl Float {
     ///     20,
     ///     Floor,
     /// );
-    /// assert_eq!(quotient.to_string(), "0.954929");
+    /// assert_eq!(quotient.to_string(), "0.95492935");
     /// assert_eq!(o, Less);
     ///
     /// let (quotient, o) = Float::rational_div_float_prec_round_val_ref(
@@ -5171,7 +5171,7 @@ impl Float {
     ///     20,
     ///     Ceiling,
     /// );
-    /// assert_eq!(quotient.to_string(), "0.95493");
+    /// assert_eq!(quotient.to_string(), "0.95493031");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) = Float::rational_div_float_prec_round_val_ref(
@@ -5180,7 +5180,7 @@ impl Float {
     ///     20,
     ///     Nearest,
     /// );
-    /// assert_eq!(quotient.to_string(), "0.954929");
+    /// assert_eq!(quotient.to_string(), "0.95492935");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -5279,7 +5279,7 @@ impl Float {
     ///     5,
     ///     Floor,
     /// );
-    /// assert_eq!(quotient.to_string(), "0.94");
+    /// assert_eq!(quotient.to_string(), "0.938");
     /// assert_eq!(o, Less);
     ///
     /// let (quotient, o) = Float::rational_div_float_prec_round_ref_val(
@@ -5288,7 +5288,7 @@ impl Float {
     ///     5,
     ///     Ceiling,
     /// );
-    /// assert_eq!(quotient.to_string(), "0.97");
+    /// assert_eq!(quotient.to_string(), "0.969");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) = Float::rational_div_float_prec_round_ref_val(
@@ -5297,7 +5297,7 @@ impl Float {
     ///     5,
     ///     Nearest,
     /// );
-    /// assert_eq!(quotient.to_string(), "0.97");
+    /// assert_eq!(quotient.to_string(), "0.969");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) = Float::rational_div_float_prec_round_ref_val(
@@ -5306,7 +5306,7 @@ impl Float {
     ///     20,
     ///     Floor,
     /// );
-    /// assert_eq!(quotient.to_string(), "0.954929");
+    /// assert_eq!(quotient.to_string(), "0.95492935");
     /// assert_eq!(o, Less);
     ///
     /// let (quotient, o) = Float::rational_div_float_prec_round_ref_val(
@@ -5315,7 +5315,7 @@ impl Float {
     ///     20,
     ///     Ceiling,
     /// );
-    /// assert_eq!(quotient.to_string(), "0.95493");
+    /// assert_eq!(quotient.to_string(), "0.95493031");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) = Float::rational_div_float_prec_round_ref_val(
@@ -5324,7 +5324,7 @@ impl Float {
     ///     20,
     ///     Nearest,
     /// );
-    /// assert_eq!(quotient.to_string(), "0.954929");
+    /// assert_eq!(quotient.to_string(), "0.95492935");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -5423,7 +5423,7 @@ impl Float {
     ///     5,
     ///     Floor,
     /// );
-    /// assert_eq!(quotient.to_string(), "0.94");
+    /// assert_eq!(quotient.to_string(), "0.938");
     /// assert_eq!(o, Less);
     ///
     /// let (quotient, o) = Float::rational_div_float_prec_round_ref_ref(
@@ -5432,7 +5432,7 @@ impl Float {
     ///     5,
     ///     Ceiling,
     /// );
-    /// assert_eq!(quotient.to_string(), "0.97");
+    /// assert_eq!(quotient.to_string(), "0.969");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) = Float::rational_div_float_prec_round_ref_ref(
@@ -5441,7 +5441,7 @@ impl Float {
     ///     5,
     ///     Nearest,
     /// );
-    /// assert_eq!(quotient.to_string(), "0.97");
+    /// assert_eq!(quotient.to_string(), "0.969");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) = Float::rational_div_float_prec_round_ref_ref(
@@ -5450,7 +5450,7 @@ impl Float {
     ///     20,
     ///     Floor,
     /// );
-    /// assert_eq!(quotient.to_string(), "0.954929");
+    /// assert_eq!(quotient.to_string(), "0.95492935");
     /// assert_eq!(o, Less);
     ///
     /// let (quotient, o) = Float::rational_div_float_prec_round_ref_ref(
@@ -5459,7 +5459,7 @@ impl Float {
     ///     20,
     ///     Ceiling,
     /// );
-    /// assert_eq!(quotient.to_string(), "0.95493");
+    /// assert_eq!(quotient.to_string(), "0.95493031");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) = Float::rational_div_float_prec_round_ref_ref(
@@ -5468,7 +5468,7 @@ impl Float {
     ///     20,
     ///     Nearest,
     /// );
-    /// assert_eq!(quotient.to_string(), "0.954929");
+    /// assert_eq!(quotient.to_string(), "0.95492935");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -5540,11 +5540,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (quotient, o) = Float::rational_div_float_prec(Rational::from(3), Float::from(PI), 5);
-    /// assert_eq!(quotient.to_string(), "0.97");
+    /// assert_eq!(quotient.to_string(), "0.969");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) = Float::rational_div_float_prec(Rational::from(3), Float::from(PI), 20);
-    /// assert_eq!(quotient.to_string(), "0.954929");
+    /// assert_eq!(quotient.to_string(), "0.95492935");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -5608,12 +5608,12 @@ impl Float {
     ///
     /// let (quotient, o) =
     ///     Float::rational_div_float_prec_val_ref(Rational::from(3), &Float::from(PI), 5);
-    /// assert_eq!(quotient.to_string(), "0.97");
+    /// assert_eq!(quotient.to_string(), "0.969");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) =
     ///     Float::rational_div_float_prec_val_ref(Rational::from(3), &Float::from(PI), 20);
-    /// assert_eq!(quotient.to_string(), "0.954929");
+    /// assert_eq!(quotient.to_string(), "0.95492935");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -5677,12 +5677,12 @@ impl Float {
     ///
     /// let (quotient, o) =
     ///     Float::rational_div_float_prec_ref_val(&Rational::from(3), Float::from(PI), 5);
-    /// assert_eq!(quotient.to_string(), "0.97");
+    /// assert_eq!(quotient.to_string(), "0.969");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) =
     ///     Float::rational_div_float_prec_ref_val(&Rational::from(3), Float::from(PI), 20);
-    /// assert_eq!(quotient.to_string(), "0.954929");
+    /// assert_eq!(quotient.to_string(), "0.95492935");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -5746,12 +5746,12 @@ impl Float {
     ///
     /// let (quotient, o) =
     ///     Float::rational_div_float_prec_ref_ref(&Rational::from(3), &Float::from(PI), 5);
-    /// assert_eq!(quotient.to_string(), "0.97");
+    /// assert_eq!(quotient.to_string(), "0.969");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) =
     ///     Float::rational_div_float_prec_ref_ref(&Rational::from(3), &Float::from(PI), 20);
-    /// assert_eq!(quotient.to_string(), "0.954929");
+    /// assert_eq!(quotient.to_string(), "0.95492935");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -5836,17 +5836,17 @@ impl Float {
     ///
     /// let (quotient, o) =
     ///     Float::rational_div_float_round(Rational::from(3), Float::from(PI), Floor);
-    /// assert_eq!(quotient.to_string(), "0.9549296585513716");
+    /// assert_eq!(quotient.to_string(), "0.95492965855137157");
     /// assert_eq!(o, Less);
     ///
     /// let (quotient, o) =
     ///     Float::rational_div_float_round(Rational::from(3), Float::from(PI), Ceiling);
-    /// assert_eq!(quotient.to_string(), "0.9549296585513725");
+    /// assert_eq!(quotient.to_string(), "0.95492965855137246");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) =
     ///     Float::rational_div_float_round(Rational::from(3), Float::from(PI), Nearest);
-    /// assert_eq!(quotient.to_string(), "0.9549296585513725");
+    /// assert_eq!(quotient.to_string(), "0.95492965855137246");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -5932,17 +5932,17 @@ impl Float {
     ///
     /// let (quotient, o) =
     ///     Float::rational_div_float_round_val_ref(Rational::from(3), &Float::from(PI), Floor);
-    /// assert_eq!(quotient.to_string(), "0.9549296585513716");
+    /// assert_eq!(quotient.to_string(), "0.95492965855137157");
     /// assert_eq!(o, Less);
     ///
     /// let (quotient, o) =
     ///     Float::rational_div_float_round_val_ref(Rational::from(3), &Float::from(PI), Ceiling);
-    /// assert_eq!(quotient.to_string(), "0.9549296585513725");
+    /// assert_eq!(quotient.to_string(), "0.95492965855137246");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) =
     ///     Float::rational_div_float_round_val_ref(Rational::from(3), &Float::from(PI), Nearest);
-    /// assert_eq!(quotient.to_string(), "0.9549296585513725");
+    /// assert_eq!(quotient.to_string(), "0.95492965855137246");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -6032,17 +6032,17 @@ impl Float {
     ///
     /// let (quotient, o) =
     ///     Float::rational_div_float_round_ref_val(&Rational::from(3), Float::from(PI), Floor);
-    /// assert_eq!(quotient.to_string(), "0.9549296585513716");
+    /// assert_eq!(quotient.to_string(), "0.95492965855137157");
     /// assert_eq!(o, Less);
     ///
     /// let (quotient, o) =
     ///     Float::rational_div_float_round_ref_val(&Rational::from(3), Float::from(PI), Ceiling);
-    /// assert_eq!(quotient.to_string(), "0.9549296585513725");
+    /// assert_eq!(quotient.to_string(), "0.95492965855137246");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) =
     ///     Float::rational_div_float_round_ref_val(&Rational::from(3), Float::from(PI), Nearest);
-    /// assert_eq!(quotient.to_string(), "0.9549296585513725");
+    /// assert_eq!(quotient.to_string(), "0.95492965855137246");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -6132,17 +6132,17 @@ impl Float {
     ///
     /// let (quotient, o) =
     ///     Float::rational_div_float_round_ref_ref(&Rational::from(3), &Float::from(PI), Floor);
-    /// assert_eq!(quotient.to_string(), "0.9549296585513716");
+    /// assert_eq!(quotient.to_string(), "0.95492965855137157");
     /// assert_eq!(o, Less);
     ///
     /// let (quotient, o) =
     ///     Float::rational_div_float_round_ref_ref(&Rational::from(3), &Float::from(PI), Ceiling);
-    /// assert_eq!(quotient.to_string(), "0.9549296585513725");
+    /// assert_eq!(quotient.to_string(), "0.95492965855137246");
     /// assert_eq!(o, Greater);
     ///
     /// let (quotient, o) =
     ///     Float::rational_div_float_round_ref_ref(&Rational::from(3), &Float::from(PI), Nearest);
-    /// assert_eq!(quotient.to_string(), "0.9549296585513725");
+    /// assert_eq!(quotient.to_string(), "0.95492965855137246");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -6229,10 +6229,10 @@ impl Div<Self> for Float {
     /// assert_eq!(Float::from(-1.5) / Float::NEGATIVE_ZERO, Float::INFINITY);
     /// assert!((Float::ZERO / Float::ZERO).is_nan());
     ///
-    /// assert_eq!((Float::from(1.5) / Float::from(2.5)).to_string(), "0.6");
-    /// assert_eq!((Float::from(1.5) / Float::from(-2.5)).to_string(), "-0.6");
-    /// assert_eq!((Float::from(-1.5) / Float::from(2.5)).to_string(), "-0.6");
-    /// assert_eq!((Float::from(-1.5) / Float::from(-2.5)).to_string(), "0.6");
+    /// assert_eq!((Float::from(1.5) / Float::from(2.5)).to_string(), "0.62");
+    /// assert_eq!((Float::from(1.5) / Float::from(-2.5)).to_string(), "-0.62");
+    /// assert_eq!((Float::from(-1.5) / Float::from(2.5)).to_string(), "-0.62");
+    /// assert_eq!((Float::from(-1.5) / Float::from(-2.5)).to_string(), "0.62");
     /// ```
     #[inline]
     fn div(self, other: Self) -> Self {
@@ -6315,10 +6315,10 @@ impl Div<&Self> for Float {
     /// assert_eq!(Float::from(-1.5) / &Float::NEGATIVE_ZERO, Float::INFINITY);
     /// assert!((Float::ZERO / &Float::ZERO).is_nan());
     ///
-    /// assert_eq!((Float::from(1.5) / &Float::from(2.5)).to_string(), "0.6");
-    /// assert_eq!((Float::from(1.5) / &Float::from(-2.5)).to_string(), "-0.6");
-    /// assert_eq!((Float::from(-1.5) / &Float::from(2.5)).to_string(), "-0.6");
-    /// assert_eq!((Float::from(-1.5) / &Float::from(-2.5)).to_string(), "0.6");
+    /// assert_eq!((Float::from(1.5) / &Float::from(2.5)).to_string(), "0.62");
+    /// assert_eq!((Float::from(1.5) / &Float::from(-2.5)).to_string(), "-0.62");
+    /// assert_eq!((Float::from(-1.5) / &Float::from(2.5)).to_string(), "-0.62");
+    /// assert_eq!((Float::from(-1.5) / &Float::from(-2.5)).to_string(), "0.62");
     /// ```
     #[inline]
     fn div(self, other: &Self) -> Self {
@@ -6401,10 +6401,10 @@ impl Div<Float> for &Float {
     /// assert_eq!(&Float::from(-1.5) / Float::NEGATIVE_ZERO, Float::INFINITY);
     /// assert!((&Float::ZERO / Float::ZERO).is_nan());
     ///
-    /// assert_eq!((&Float::from(1.5) / Float::from(2.5)).to_string(), "0.6");
-    /// assert_eq!((&Float::from(1.5) / Float::from(-2.5)).to_string(), "-0.6");
-    /// assert_eq!((&Float::from(-1.5) / Float::from(2.5)).to_string(), "-0.6");
-    /// assert_eq!((&Float::from(-1.5) / Float::from(-2.5)).to_string(), "0.6");
+    /// assert_eq!((&Float::from(1.5) / Float::from(2.5)).to_string(), "0.62");
+    /// assert_eq!((&Float::from(1.5) / Float::from(-2.5)).to_string(), "-0.62");
+    /// assert_eq!((&Float::from(-1.5) / Float::from(2.5)).to_string(), "-0.62");
+    /// assert_eq!((&Float::from(-1.5) / Float::from(-2.5)).to_string(), "0.62");
     /// ```
     #[inline]
     fn div(self, other: Float) -> Float {
@@ -6487,10 +6487,19 @@ impl Div<&Float> for &Float {
     /// assert_eq!(&Float::from(-1.5) / &Float::NEGATIVE_ZERO, Float::INFINITY);
     /// assert!((&Float::ZERO / &Float::ZERO).is_nan());
     ///
-    /// assert_eq!((&Float::from(1.5) / &Float::from(2.5)).to_string(), "0.6");
-    /// assert_eq!((&Float::from(1.5) / &Float::from(-2.5)).to_string(), "-0.6");
-    /// assert_eq!((&Float::from(-1.5) / &Float::from(2.5)).to_string(), "-0.6");
-    /// assert_eq!((&Float::from(-1.5) / &Float::from(-2.5)).to_string(), "0.6");
+    /// assert_eq!((&Float::from(1.5) / &Float::from(2.5)).to_string(), "0.62");
+    /// assert_eq!(
+    ///     (&Float::from(1.5) / &Float::from(-2.5)).to_string(),
+    ///     "-0.62"
+    /// );
+    /// assert_eq!(
+    ///     (&Float::from(-1.5) / &Float::from(2.5)).to_string(),
+    ///     "-0.62"
+    /// );
+    /// assert_eq!(
+    ///     (&Float::from(-1.5) / &Float::from(-2.5)).to_string(),
+    ///     "0.62"
+    /// );
     /// ```
     #[inline]
     fn div(self, other: &Float) -> Float {
@@ -6563,19 +6572,19 @@ impl DivAssign<Self> for Float {
     ///
     /// let mut x = Float::from(1.5);
     /// x /= Float::from(2.5);
-    /// assert_eq!(x.to_string(), "0.6");
+    /// assert_eq!(x.to_string(), "0.62");
     ///
     /// let mut x = Float::from(1.5);
     /// x /= Float::from(-2.5);
-    /// assert_eq!(x.to_string(), "-0.6");
+    /// assert_eq!(x.to_string(), "-0.62");
     ///
     /// let mut x = Float::from(-1.5);
     /// x /= Float::from(2.5);
-    /// assert_eq!(x.to_string(), "-0.6");
+    /// assert_eq!(x.to_string(), "-0.62");
     ///
     /// let mut x = Float::from(-1.5);
     /// x /= Float::from(-2.5);
-    /// assert_eq!(x.to_string(), "0.6");
+    /// assert_eq!(x.to_string(), "0.62");
     /// ```
     #[inline]
     fn div_assign(&mut self, other: Self) {
@@ -6648,19 +6657,19 @@ impl DivAssign<&Self> for Float {
     ///
     /// let mut x = Float::from(1.5);
     /// x /= &Float::from(2.5);
-    /// assert_eq!(x.to_string(), "0.6");
+    /// assert_eq!(x.to_string(), "0.62");
     ///
     /// let mut x = Float::from(1.5);
     /// x /= &Float::from(-2.5);
-    /// assert_eq!(x.to_string(), "-0.6");
+    /// assert_eq!(x.to_string(), "-0.62");
     ///
     /// let mut x = Float::from(-1.5);
     /// x /= &Float::from(2.5);
-    /// assert_eq!(x.to_string(), "-0.6");
+    /// assert_eq!(x.to_string(), "-0.62");
     ///
     /// let mut x = Float::from(-1.5);
     /// x /= &Float::from(-2.5);
-    /// assert_eq!(x.to_string(), "0.6");
+    /// assert_eq!(x.to_string(), "0.62");
     /// ```
     #[inline]
     fn div_assign(&mut self, other: &Self) {
@@ -7264,19 +7273,19 @@ impl Div<Float> for Rational {
     ///
     /// assert_eq!(
     ///     (Rational::exact_from(1.5) / Float::from(2.5)).to_string(),
-    ///     "0.6"
+    ///     "0.62"
     /// );
     /// assert_eq!(
     ///     (Rational::exact_from(-1.5) / Float::from(2.5)).to_string(),
-    ///     "-0.6"
+    ///     "-0.62"
     /// );
     /// assert_eq!(
     ///     (Rational::exact_from(1.5) / Float::from(-2.5)).to_string(),
-    ///     "-0.6"
+    ///     "-0.62"
     /// );
     /// assert_eq!(
     ///     (Rational::exact_from(-1.5) / Float::from(-2.5)).to_string(),
-    ///     "0.6"
+    ///     "0.62"
     /// );
     /// ```
     #[inline]
@@ -7355,19 +7364,19 @@ impl Div<&Float> for Rational {
     ///
     /// assert_eq!(
     ///     (Rational::exact_from(1.5) / &Float::from(2.5)).to_string(),
-    ///     "0.6"
+    ///     "0.62"
     /// );
     /// assert_eq!(
     ///     (Rational::exact_from(-1.5) / &Float::from(2.5)).to_string(),
-    ///     "-0.6"
+    ///     "-0.62"
     /// );
     /// assert_eq!(
     ///     (Rational::exact_from(1.5) / &Float::from(-2.5)).to_string(),
-    ///     "-0.6"
+    ///     "-0.62"
     /// );
     /// assert_eq!(
     ///     (Rational::exact_from(-1.5) / &Float::from(-2.5)).to_string(),
-    ///     "0.6"
+    ///     "0.62"
     /// );
     /// ```
     #[inline]
@@ -7446,19 +7455,19 @@ impl Div<Float> for &Rational {
     ///
     /// assert_eq!(
     ///     (&Rational::exact_from(1.5) / Float::from(2.5)).to_string(),
-    ///     "0.6"
+    ///     "0.62"
     /// );
     /// assert_eq!(
     ///     (&Rational::exact_from(-1.5) / Float::from(2.5)).to_string(),
-    ///     "-0.6"
+    ///     "-0.62"
     /// );
     /// assert_eq!(
     ///     (&Rational::exact_from(1.5) / Float::from(-2.5)).to_string(),
-    ///     "-0.6"
+    ///     "-0.62"
     /// );
     /// assert_eq!(
     ///     (&Rational::exact_from(-1.5) / Float::from(-2.5)).to_string(),
-    ///     "0.6"
+    ///     "0.62"
     /// );
     /// ```
     #[inline]
@@ -7536,19 +7545,19 @@ impl Div<&Float> for &Rational {
     ///
     /// assert_eq!(
     ///     (&Rational::exact_from(1.5) / &Float::from(2.5)).to_string(),
-    ///     "0.6"
+    ///     "0.62"
     /// );
     /// assert_eq!(
     ///     (&Rational::exact_from(-1.5) / &Float::from(2.5)).to_string(),
-    ///     "-0.6"
+    ///     "-0.62"
     /// );
     /// assert_eq!(
     ///     (&Rational::exact_from(1.5) / &Float::from(-2.5)).to_string(),
-    ///     "-0.6"
+    ///     "-0.62"
     /// );
     /// assert_eq!(
     ///     (&Rational::exact_from(-1.5) / &Float::from(-2.5)).to_string(),
-    ///     "0.6"
+    ///     "0.62"
     /// );
     /// ```
     #[inline]

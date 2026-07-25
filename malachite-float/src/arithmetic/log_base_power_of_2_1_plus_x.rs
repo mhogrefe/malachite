@@ -200,13 +200,13 @@ impl Float {
     /// let (log, o) = Float::from_unsigned_prec(10u32, 100)
     ///     .0
     ///     .log_base_power_of_2_1_plus_x_prec_round(2, 20, Floor);
-    /// assert_eq!(log.to_string(), "1.729715");
+    /// assert_eq!(log.to_string(), "1.7297153");
     /// assert_eq!(o, Less);
     ///
     /// let (log, o) = Float::from_unsigned_prec(10u32, 100)
     ///     .0
     ///     .log_base_power_of_2_1_plus_x_prec_round(2, 20, Ceiling);
-    /// assert_eq!(log.to_string(), "1.729717");
+    /// assert_eq!(log.to_string(), "1.7297173");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -310,13 +310,13 @@ impl Float {
     /// let (log, o) = Float::from_unsigned_prec(10u32, 100)
     ///     .0
     ///     .log_base_power_of_2_1_plus_x_prec_round_ref(2, 20, Floor);
-    /// assert_eq!(log.to_string(), "1.729715");
+    /// assert_eq!(log.to_string(), "1.7297153");
     /// assert_eq!(o, Less);
     ///
     /// let (log, o) = Float::from_unsigned_prec(10u32, 100)
     ///     .0
     ///     .log_base_power_of_2_1_plus_x_prec_round_ref(2, 20, Ceiling);
-    /// assert_eq!(log.to_string(), "1.729717");
+    /// assert_eq!(log.to_string(), "1.7297173");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -407,7 +407,7 @@ impl Float {
     /// let (log, o) = Float::from_unsigned_prec(10u32, 100)
     ///     .0
     ///     .log_base_power_of_2_1_plus_x_prec(2, 20);
-    /// assert_eq!(log.to_string(), "1.729715");
+    /// assert_eq!(log.to_string(), "1.7297153");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -478,7 +478,7 @@ impl Float {
     /// let (log, o) = Float::from_unsigned_prec(10u32, 100)
     ///     .0
     ///     .log_base_power_of_2_1_plus_x_prec_ref(2, 20);
-    /// assert_eq!(log.to_string(), "1.729715");
+    /// assert_eq!(log.to_string(), "1.7297153");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -538,7 +538,7 @@ impl Float {
     /// let (log, o) = Float::from_unsigned_prec(10u32, 100)
     ///     .0
     ///     .log_base_power_of_2_1_plus_x_round(2, Floor);
-    /// assert_eq!(log.to_string(), "1.729715809318648628099681523362");
+    /// assert_eq!(log.to_string(), "1.7297158093186486280996815233624");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -604,7 +604,7 @@ impl Float {
     /// let (log, o) = Float::from_unsigned_prec(10u32, 100)
     ///     .0
     ///     .log_base_power_of_2_1_plus_x_round_ref(2, Floor);
-    /// assert_eq!(log.to_string(), "1.729715809318648628099681523362");
+    /// assert_eq!(log.to_string(), "1.7297158093186486280996815233624");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -666,7 +666,7 @@ impl Float {
     ///     x.log_base_power_of_2_1_plus_x_prec_round_assign(2, 20, Floor),
     ///     Less
     /// );
-    /// assert_eq!(x.to_string(), "1.729715");
+    /// assert_eq!(x.to_string(), "1.7297153");
     /// ```
     #[inline]
     pub fn log_base_power_of_2_1_plus_x_prec_round_assign(
@@ -726,7 +726,7 @@ impl Float {
     ///
     /// let mut x = Float::from_unsigned_prec(10u32, 100).0;
     /// assert_eq!(x.log_base_power_of_2_1_plus_x_prec_assign(2, 20), Less);
-    /// assert_eq!(x.to_string(), "1.729715");
+    /// assert_eq!(x.to_string(), "1.7297153");
     /// ```
     #[inline]
     pub fn log_base_power_of_2_1_plus_x_prec_assign(&mut self, pow: i64, prec: u64) -> Ordering {
@@ -779,7 +779,7 @@ impl Float {
     ///
     /// let mut x = Float::from_unsigned_prec(10u32, 100).0;
     /// assert_eq!(x.log_base_power_of_2_1_plus_x_round_assign(2, Floor), Less);
-    /// assert_eq!(x.to_string(), "1.729715809318648628099681523362");
+    /// assert_eq!(x.to_string(), "1.7297158093186486280996815233624");
     /// ```
     #[inline]
     pub fn log_base_power_of_2_1_plus_x_round_assign(
@@ -850,7 +850,7 @@ impl LogBasePowerOf2Of1PlusX<i64> for Float {
     ///         .0
     ///         .log_base_power_of_2_1_plus_x(2)
     ///         .to_string(),
-    ///     "1.729715809318648628099681523362"
+    ///     "1.7297158093186486280996815233624"
     /// );
     /// ```
     #[inline]
@@ -919,7 +919,7 @@ impl LogBasePowerOf2Of1PlusX<i64> for &Float {
     ///     (&Float::from_unsigned_prec(10u32, 100).0)
     ///         .log_base_power_of_2_1_plus_x(2)
     ///         .to_string(),
-    ///     "1.729715809318648628099681523362"
+    ///     "1.7297158093186486280996815233624"
     /// );
     /// ```
     #[inline]
@@ -985,7 +985,7 @@ impl LogBasePowerOf2Of1PlusXAssign<i64> for Float {
     ///
     /// let mut x = Float::from_unsigned_prec(10u32, 100).0;
     /// x.log_base_power_of_2_1_plus_x_assign(2);
-    /// assert_eq!(x.to_string(), "1.729715809318648628099681523362");
+    /// assert_eq!(x.to_string(), "1.7297158093186486280996815233624");
     /// ```
     #[inline]
     fn log_base_power_of_2_1_plus_x_assign(&mut self, pow: i64) {

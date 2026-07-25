@@ -116,19 +116,24 @@ fn test_reciprocal_sqrt() {
     test("1.0", "0x1.0#1", "1.0", "0x1.0#1");
     test("-1.0", "-0x1.0#1", "NaN", "NaN");
     test(
-        "1.0",
+        "1.0000000000000000000000000000000",
         "0x1.0000000000000000000000000#100",
-        "1.0",
+        "1.0000000000000000000000000000000",
         "0x1.0000000000000000000000000#100",
     );
-    test("-1.0", "-0x1.0000000000000000000000000#100", "NaN", "NaN");
+    test(
+        "-1.0000000000000000000000000000000",
+        "-0x1.0000000000000000000000000#100",
+        "NaN",
+        "NaN",
+    );
 
-    test("123.0", "0x7b.0#7", "0.09", "0x0.170#7");
+    test("123.0", "0x7b.0#7", "0.08984", "0x0.170#7");
     test("-123.0", "-0x7b.0#7", "NaN", "NaN");
     test(
         "3.1415926535897931",
         "0x3.243f6a8885a30#53",
-        "0.5641895835477563",
+        "0.56418958354775628",
         "0x0.906eba8214db68#53",
     );
     test("-3.1415926535897931", "-0x3.243f6a8885a30#53", "NaN", "NaN");
@@ -178,11 +183,11 @@ fn test_reciprocal_sqrt_prec() {
     test("0.0", "0x0.0", 1, "Infinity", "Infinity", Equal);
     test("-0.0", "-0x0.0", 1, "Infinity", "Infinity", Equal);
     test("1.0", "0x1.0#1", 1, "1.0", "0x1.0#1", Equal);
-    test("1.0", "0x1.0#1", 10, "1.0", "0x1.000#10", Equal);
+    test("1.0", "0x1.0#1", 10, "1.0000", "0x1.000#10", Equal);
     test("-1.0", "-0x1.0#1", 1, "NaN", "NaN", Equal);
     test("-1.0", "-0x1.0#1", 10, "NaN", "NaN", Equal);
     test(
-        "1.0",
+        "1.0000000000000000000000000000000",
         "0x1.0000000000000000000000000#100",
         1,
         "1.0",
@@ -190,25 +195,25 @@ fn test_reciprocal_sqrt_prec() {
         Equal,
     );
     test(
-        "1.0",
+        "1.0000000000000000000000000000000",
         "0x1.0000000000000000000000000#100",
         10,
-        "1.0",
+        "1.0000",
         "0x1.000#10",
         Equal,
     );
     test("-1.0", "-0x1.0#1", 1, "NaN", "NaN", Equal);
     test("-1.0", "-0x1.0#1", 10, "NaN", "NaN", Equal);
 
-    test("123.0", "0x7b.0#7", 1, "0.06", "0x0.1#1", Less);
-    test("123.0", "0x7b.0#7", 10, "0.0902", "0x0.1718#10", Greater);
+    test("123.0", "0x7b.0#7", 1, "0.062", "0x0.1#1", Less);
+    test("123.0", "0x7b.0#7", 10, "0.090210", "0x0.1718#10", Greater);
     test("-123.0", "-0x7b.0#7", 1, "NaN", "NaN", Equal);
     test("-123.0", "-0x7b.0#7", 10, "NaN", "NaN", Equal);
     test(
         "3.1415926535897931",
         "0x3.243f6a8885a30#53",
         1,
-        "0.5",
+        "0.50",
         "0x0.8#1",
         Less,
     );
@@ -216,7 +221,7 @@ fn test_reciprocal_sqrt_prec() {
         "3.1415926535897931",
         "0x3.243f6a8885a30#53",
         10,
-        "0.564",
+        "0.56445",
         "0x0.908#10",
         Greater,
     );
@@ -242,12 +247,12 @@ fn test_reciprocal_sqrt_prec() {
     // - neg != 0 second time in limbs_reciprocal_sqrt
     // - neg != 0 && ln == 0 in limbs_reciprocal_sqrt
     // - can round in limbs_reciprocal_sqrt
-    test("2.0", "0x2.0#1", 1, "0.5", "0x0.8#1", Less);
+    test("2.0", "0x2.0#1", 1, "0.50", "0x0.8#1", Less);
     // - neg == 0 && ln != 0 in limbs_reciprocal_sqrt
     // - h << 1 > Limb::WIDTH && xn != 1 in limbs_reciprocal_sqrt
     // - rn < xn << 1 in limbs_reciprocal_sqrt
     test(
-        "21729783659306408649613509.686",
+        "21729783659306408649613509.6855",
         "0x11f975eebbcb21a32ee0c5.af8#95",
         95,
         "2.14522227948652325458263602314e-13",
@@ -257,19 +262,19 @@ fn test_reciprocal_sqrt_prec() {
     // - working_prec >= limb_to_bit_count(rn) in limbs_reciprocal_sqrt
     // - neg != 0 && ln != 0 in limbs_reciprocal_sqrt
     test(
-        "513.233925441497129966680656795646506",
+        "513.2339254414971299666806567956465065",
         "0x201.3be289a8eeba947a6a3693540ab#118",
         118,
-        "0.0441410156743607347324939524894430093",
+        "0.04414101567436073473249395248944300931",
         "0x0.0b4cd35abbcd63a67e82b6f5189c42c#118",
         Less,
     );
     // - rn >= xn << 1 in limbs_reciprocal_sqrt
     test(
-        "531607.999405753398566100250398911805595276409254333486007034444758646220477451",
+        "531607.9994057533985661002503989118055952764092543334860070344447586462204774513",
         "0x81c97.ffd90e3247f501afdb3e5781d0c650b8de694094110713b5a698d3d38550#257",
         257,
-        "0.00137152663593666837873986552665405007986703190176786715506823381645265890475571",
+        "0.001371526635936668378739865526654050079867031901767867155068233816452658904755708",
         "0x0.0059e2660c04516f28e8c959120460810dbcbbd967b4a8d1f95cf325678e624d8b8#257",
         Less,
     );
@@ -288,7 +293,7 @@ fn test_reciprocal_sqrt_prec() {
         "0.000199046277632504184666664672269768242929310652018203552191617720205649",
         "0x0.000d0b7140b8f3aea60aad60c1dc3b2ee0d83e2eba33dcfb6f874df52d78#225",
         26,
-        "70.879879",
+        "70.8798790",
         "0x46.e13fc#26",
         Less,
     );
@@ -395,56 +400,56 @@ fn test_reciprocal_sqrt_round() {
     test("-1.0", "-0x1.0#1", Exact, "NaN", "NaN", Equal);
 
     test(
-        "1.0",
+        "1.0000000000000000000000000000000",
         "0x1.0000000000000000000000000#100",
         Floor,
-        "1.0",
+        "1.0000000000000000000000000000000",
         "0x1.0000000000000000000000000#100",
         Equal,
     );
     test(
-        "1.0",
+        "1.0000000000000000000000000000000",
         "0x1.0000000000000000000000000#100",
         Ceiling,
-        "1.0",
+        "1.0000000000000000000000000000000",
         "0x1.0000000000000000000000000#100",
         Equal,
     );
     test(
-        "1.0",
+        "1.0000000000000000000000000000000",
         "0x1.0000000000000000000000000#100",
         Down,
-        "1.0",
+        "1.0000000000000000000000000000000",
         "0x1.0000000000000000000000000#100",
         Equal,
     );
     test(
-        "1.0",
+        "1.0000000000000000000000000000000",
         "0x1.0000000000000000000000000#100",
         Up,
-        "1.0",
+        "1.0000000000000000000000000000000",
         "0x1.0000000000000000000000000#100",
         Equal,
     );
     test(
-        "1.0",
+        "1.0000000000000000000000000000000",
         "0x1.0000000000000000000000000#100",
         Nearest,
-        "1.0",
+        "1.0000000000000000000000000000000",
         "0x1.0000000000000000000000000#100",
         Equal,
     );
     test(
-        "1.0",
+        "1.0000000000000000000000000000000",
         "0x1.0000000000000000000000000#100",
         Exact,
-        "1.0",
+        "1.0000000000000000000000000000000",
         "0x1.0000000000000000000000000#100",
         Equal,
     );
 
     test(
-        "-1.0",
+        "-1.0000000000000000000000000000000",
         "-0x1.0000000000000000000000000#100",
         Floor,
         "NaN",
@@ -452,7 +457,7 @@ fn test_reciprocal_sqrt_round() {
         Equal,
     );
     test(
-        "-1.0",
+        "-1.0000000000000000000000000000000",
         "-0x1.0000000000000000000000000#100",
         Ceiling,
         "NaN",
@@ -460,7 +465,7 @@ fn test_reciprocal_sqrt_round() {
         Equal,
     );
     test(
-        "-1.0",
+        "-1.0000000000000000000000000000000",
         "-0x1.0000000000000000000000000#100",
         Down,
         "NaN",
@@ -468,7 +473,7 @@ fn test_reciprocal_sqrt_round() {
         Equal,
     );
     test(
-        "-1.0",
+        "-1.0000000000000000000000000000000",
         "-0x1.0000000000000000000000000#100",
         Up,
         "NaN",
@@ -476,7 +481,7 @@ fn test_reciprocal_sqrt_round() {
         Equal,
     );
     test(
-        "-1.0",
+        "-1.0000000000000000000000000000000",
         "-0x1.0000000000000000000000000#100",
         Nearest,
         "NaN",
@@ -484,7 +489,7 @@ fn test_reciprocal_sqrt_round() {
         Equal,
     );
     test(
-        "-1.0",
+        "-1.0000000000000000000000000000000",
         "-0x1.0000000000000000000000000#100",
         Exact,
         "NaN",
@@ -492,11 +497,18 @@ fn test_reciprocal_sqrt_round() {
         Equal,
     );
 
-    test("123.0", "0x7b.0#7", Floor, "0.09", "0x0.170#7", Less);
-    test("123.0", "0x7b.0#7", Ceiling, "0.091", "0x0.174#7", Greater);
-    test("123.0", "0x7b.0#7", Down, "0.09", "0x0.170#7", Less);
-    test("123.0", "0x7b.0#7", Up, "0.091", "0x0.174#7", Greater);
-    test("123.0", "0x7b.0#7", Nearest, "0.09", "0x0.170#7", Less);
+    test("123.0", "0x7b.0#7", Floor, "0.08984", "0x0.170#7", Less);
+    test(
+        "123.0",
+        "0x7b.0#7",
+        Ceiling,
+        "0.09082",
+        "0x0.174#7",
+        Greater,
+    );
+    test("123.0", "0x7b.0#7", Down, "0.08984", "0x0.170#7", Less);
+    test("123.0", "0x7b.0#7", Up, "0.09082", "0x0.174#7", Greater);
+    test("123.0", "0x7b.0#7", Nearest, "0.08984", "0x0.170#7", Less);
 
     test("-123.0", "-0x7b.0#7", Floor, "NaN", "NaN", Equal);
     test("-123.0", "-0x7b.0#7", Ceiling, "NaN", "NaN", Equal);
@@ -508,7 +520,7 @@ fn test_reciprocal_sqrt_round() {
         "3.1415926535897931",
         "0x3.243f6a8885a30#53",
         Floor,
-        "0.5641895835477563",
+        "0.56418958354775628",
         "0x0.906eba8214db68#53",
         Less,
     );
@@ -516,7 +528,7 @@ fn test_reciprocal_sqrt_round() {
         "3.1415926535897931",
         "0x3.243f6a8885a30#53",
         Ceiling,
-        "0.5641895835477564",
+        "0.56418958354775639",
         "0x0.906eba8214db70#53",
         Greater,
     );
@@ -524,7 +536,7 @@ fn test_reciprocal_sqrt_round() {
         "3.1415926535897931",
         "0x3.243f6a8885a30#53",
         Down,
-        "0.5641895835477563",
+        "0.56418958354775628",
         "0x0.906eba8214db68#53",
         Less,
     );
@@ -532,7 +544,7 @@ fn test_reciprocal_sqrt_round() {
         "3.1415926535897931",
         "0x3.243f6a8885a30#53",
         Up,
-        "0.5641895835477564",
+        "0.56418958354775639",
         "0x0.906eba8214db70#53",
         Greater,
     );
@@ -540,7 +552,7 @@ fn test_reciprocal_sqrt_round() {
         "3.1415926535897931",
         "0x3.243f6a8885a30#53",
         Nearest,
-        "0.5641895835477563",
+        "0.56418958354775628",
         "0x0.906eba8214db68#53",
         Less,
     );
@@ -680,12 +692,12 @@ fn test_reciprocal_sqrt_prec_round() {
     test("1.0", "0x1.0#1", 1, Nearest, "1.0", "0x1.0#1", Equal);
     test("1.0", "0x1.0#1", 1, Exact, "1.0", "0x1.0#1", Equal);
 
-    test("1.0", "0x1.0#1", 10, Floor, "1.0", "0x1.000#10", Equal);
-    test("1.0", "0x1.0#1", 10, Ceiling, "1.0", "0x1.000#10", Equal);
-    test("1.0", "0x1.0#1", 10, Down, "1.0", "0x1.000#10", Equal);
-    test("1.0", "0x1.0#1", 10, Up, "1.0", "0x1.000#10", Equal);
-    test("1.0", "0x1.0#1", 10, Nearest, "1.0", "0x1.000#10", Equal);
-    test("1.0", "0x1.0#1", 10, Exact, "1.0", "0x1.000#10", Equal);
+    test("1.0", "0x1.0#1", 10, Floor, "1.0000", "0x1.000#10", Equal);
+    test("1.0", "0x1.0#1", 10, Ceiling, "1.0000", "0x1.000#10", Equal);
+    test("1.0", "0x1.0#1", 10, Down, "1.0000", "0x1.000#10", Equal);
+    test("1.0", "0x1.0#1", 10, Up, "1.0000", "0x1.000#10", Equal);
+    test("1.0", "0x1.0#1", 10, Nearest, "1.0000", "0x1.000#10", Equal);
+    test("1.0", "0x1.0#1", 10, Exact, "1.0000", "0x1.000#10", Equal);
 
     test("-1.0", "-0x1.0#1", 1, Floor, "NaN", "NaN", Equal);
     test("-1.0", "-0x1.0#1", 1, Ceiling, "NaN", "NaN", Equal);
@@ -702,7 +714,7 @@ fn test_reciprocal_sqrt_prec_round() {
     test("-1.0", "-0x1.0#1", 10, Exact, "NaN", "NaN", Equal);
 
     test(
-        "1.0",
+        "1.0000000000000000000000000000000",
         "0x1.0000000000000000000000000#100",
         1,
         Floor,
@@ -711,7 +723,7 @@ fn test_reciprocal_sqrt_prec_round() {
         Equal,
     );
     test(
-        "1.0",
+        "1.0000000000000000000000000000000",
         "0x1.0000000000000000000000000#100",
         1,
         Ceiling,
@@ -720,7 +732,7 @@ fn test_reciprocal_sqrt_prec_round() {
         Equal,
     );
     test(
-        "1.0",
+        "1.0000000000000000000000000000000",
         "0x1.0000000000000000000000000#100",
         1,
         Down,
@@ -729,7 +741,7 @@ fn test_reciprocal_sqrt_prec_round() {
         Equal,
     );
     test(
-        "1.0",
+        "1.0000000000000000000000000000000",
         "0x1.0000000000000000000000000#100",
         1,
         Up,
@@ -738,7 +750,7 @@ fn test_reciprocal_sqrt_prec_round() {
         Equal,
     );
     test(
-        "1.0",
+        "1.0000000000000000000000000000000",
         "0x1.0000000000000000000000000#100",
         1,
         Nearest,
@@ -747,7 +759,7 @@ fn test_reciprocal_sqrt_prec_round() {
         Equal,
     );
     test(
-        "1.0",
+        "1.0000000000000000000000000000000",
         "0x1.0000000000000000000000000#100",
         1,
         Exact,
@@ -757,126 +769,126 @@ fn test_reciprocal_sqrt_prec_round() {
     );
 
     test(
-        "1.0",
+        "1.0000000000000000000000000000000",
         "0x1.0000000000000000000000000#100",
         10,
         Floor,
-        "1.0",
+        "1.0000",
         "0x1.000#10",
         Equal,
     );
     test(
-        "1.0",
+        "1.0000000000000000000000000000000",
         "0x1.0000000000000000000000000#100",
         10,
         Ceiling,
-        "1.0",
+        "1.0000",
         "0x1.000#10",
         Equal,
     );
     test(
-        "1.0",
+        "1.0000000000000000000000000000000",
         "0x1.0000000000000000000000000#100",
         10,
         Down,
-        "1.0",
+        "1.0000",
         "0x1.000#10",
         Equal,
     );
     test(
-        "1.0",
+        "1.0000000000000000000000000000000",
         "0x1.0000000000000000000000000#100",
         10,
         Up,
-        "1.0",
+        "1.0000",
         "0x1.000#10",
         Equal,
     );
     test(
-        "1.0",
+        "1.0000000000000000000000000000000",
         "0x1.0000000000000000000000000#100",
         10,
         Nearest,
-        "1.0",
+        "1.0000",
         "0x1.000#10",
         Equal,
     );
     test(
-        "1.0",
+        "1.0000000000000000000000000000000",
         "0x1.0000000000000000000000000#100",
         10,
         Exact,
-        "1.0",
+        "1.0000",
         "0x1.000#10",
         Equal,
     );
 
     test(
-        "-1.0",
+        "-1.0000000000000000000000000000000",
         "-0x1.0000000000000000000000000#100",
         1,
-        Floor,
-        "NaN",
-        "NaN",
-        Equal,
-    );
-    test(
-        "-1.0",
-        "-0x1.0000000000000000000000000#100",
-        1,
-        Ceiling,
-        "NaN",
-        "NaN",
-        Equal,
-    );
-    test(
-        "-1.0",
-        "-0x1.0000000000000000000000000#100",
-        1,
-        Down,
-        "NaN",
-        "NaN",
-        Equal,
-    );
-    test(
-        "-1.0",
-        "-0x1.0000000000000000000000000#100",
-        1,
-        Up,
-        "NaN",
-        "NaN",
-        Equal,
-    );
-    test(
-        "-1.0",
-        "-0x1.0000000000000000000000000#100",
-        1,
-        Nearest,
-        "NaN",
-        "NaN",
-        Equal,
-    );
-    test(
-        "-1.0",
-        "-0x1.0000000000000000000000000#100",
-        1,
-        Exact,
-        "NaN",
-        "NaN",
-        Equal,
-    );
-
-    test(
-        "-1.0",
-        "-0x1.0000000000000000000000000#100",
-        10,
         Floor,
         "NaN",
         "NaN",
         Equal,
     );
     test(
-        "-1.0",
+        "-1.0000000000000000000000000000000",
+        "-0x1.0000000000000000000000000#100",
+        1,
+        Ceiling,
+        "NaN",
+        "NaN",
+        Equal,
+    );
+    test(
+        "-1.0000000000000000000000000000000",
+        "-0x1.0000000000000000000000000#100",
+        1,
+        Down,
+        "NaN",
+        "NaN",
+        Equal,
+    );
+    test(
+        "-1.0000000000000000000000000000000",
+        "-0x1.0000000000000000000000000#100",
+        1,
+        Up,
+        "NaN",
+        "NaN",
+        Equal,
+    );
+    test(
+        "-1.0000000000000000000000000000000",
+        "-0x1.0000000000000000000000000#100",
+        1,
+        Nearest,
+        "NaN",
+        "NaN",
+        Equal,
+    );
+    test(
+        "-1.0000000000000000000000000000000",
+        "-0x1.0000000000000000000000000#100",
+        1,
+        Exact,
+        "NaN",
+        "NaN",
+        Equal,
+    );
+
+    test(
+        "-1.0000000000000000000000000000000",
+        "-0x1.0000000000000000000000000#100",
+        10,
+        Floor,
+        "NaN",
+        "NaN",
+        Equal,
+    );
+    test(
+        "-1.0000000000000000000000000000000",
         "-0x1.0000000000000000000000000#100",
         10,
         Ceiling,
@@ -885,7 +897,7 @@ fn test_reciprocal_sqrt_prec_round() {
         Equal,
     );
     test(
-        "-1.0",
+        "-1.0000000000000000000000000000000",
         "-0x1.0000000000000000000000000#100",
         10,
         Down,
@@ -894,7 +906,7 @@ fn test_reciprocal_sqrt_prec_round() {
         Equal,
     );
     test(
-        "-1.0",
+        "-1.0000000000000000000000000000000",
         "-0x1.0000000000000000000000000#100",
         10,
         Up,
@@ -903,7 +915,7 @@ fn test_reciprocal_sqrt_prec_round() {
         Equal,
     );
     test(
-        "-1.0",
+        "-1.0000000000000000000000000000000",
         "-0x1.0000000000000000000000000#100",
         10,
         Nearest,
@@ -912,7 +924,7 @@ fn test_reciprocal_sqrt_prec_round() {
         Equal,
     );
     test(
-        "-1.0",
+        "-1.0000000000000000000000000000000",
         "-0x1.0000000000000000000000000#100",
         10,
         Exact,
@@ -921,18 +933,18 @@ fn test_reciprocal_sqrt_prec_round() {
         Equal,
     );
 
-    test("123.0", "0x7b.0#7", 1, Floor, "0.06", "0x0.1#1", Less);
-    test("123.0", "0x7b.0#7", 1, Ceiling, "0.1", "0x0.2#1", Greater);
-    test("123.0", "0x7b.0#7", 1, Down, "0.06", "0x0.1#1", Less);
-    test("123.0", "0x7b.0#7", 1, Up, "0.1", "0x0.2#1", Greater);
-    test("123.0", "0x7b.0#7", 1, Nearest, "0.06", "0x0.1#1", Less);
+    test("123.0", "0x7b.0#7", 1, Floor, "0.062", "0x0.1#1", Less);
+    test("123.0", "0x7b.0#7", 1, Ceiling, "0.12", "0x0.2#1", Greater);
+    test("123.0", "0x7b.0#7", 1, Down, "0.062", "0x0.1#1", Less);
+    test("123.0", "0x7b.0#7", 1, Up, "0.12", "0x0.2#1", Greater);
+    test("123.0", "0x7b.0#7", 1, Nearest, "0.062", "0x0.1#1", Less);
 
     test(
         "123.0",
         "0x7b.0#7",
         10,
         Floor,
-        "0.0901",
+        "0.090088",
         "0x0.1710#10",
         Less,
     );
@@ -941,17 +953,25 @@ fn test_reciprocal_sqrt_prec_round() {
         "0x7b.0#7",
         10,
         Ceiling,
-        "0.0902",
+        "0.090210",
         "0x0.1718#10",
         Greater,
     );
-    test("123.0", "0x7b.0#7", 10, Down, "0.0901", "0x0.1710#10", Less);
+    test(
+        "123.0",
+        "0x7b.0#7",
+        10,
+        Down,
+        "0.090088",
+        "0x0.1710#10",
+        Less,
+    );
     test(
         "123.0",
         "0x7b.0#7",
         10,
         Up,
-        "0.0902",
+        "0.090210",
         "0x0.1718#10",
         Greater,
     );
@@ -960,7 +980,7 @@ fn test_reciprocal_sqrt_prec_round() {
         "0x7b.0#7",
         10,
         Nearest,
-        "0.0902",
+        "0.090210",
         "0x0.1718#10",
         Greater,
     );
@@ -982,7 +1002,7 @@ fn test_reciprocal_sqrt_prec_round() {
         "0x3.243f6a8885a30#53",
         1,
         Floor,
-        "0.5",
+        "0.50",
         "0x0.8#1",
         Less,
     );
@@ -1000,7 +1020,7 @@ fn test_reciprocal_sqrt_prec_round() {
         "0x3.243f6a8885a30#53",
         1,
         Down,
-        "0.5",
+        "0.50",
         "0x0.8#1",
         Less,
     );
@@ -1018,7 +1038,7 @@ fn test_reciprocal_sqrt_prec_round() {
         "0x3.243f6a8885a30#53",
         1,
         Nearest,
-        "0.5",
+        "0.50",
         "0x0.8#1",
         Less,
     );
@@ -1028,7 +1048,7 @@ fn test_reciprocal_sqrt_prec_round() {
         "0x3.243f6a8885a30#53",
         10,
         Floor,
-        "0.563",
+        "0.56348",
         "0x0.904#10",
         Less,
     );
@@ -1037,7 +1057,7 @@ fn test_reciprocal_sqrt_prec_round() {
         "0x3.243f6a8885a30#53",
         10,
         Ceiling,
-        "0.564",
+        "0.56445",
         "0x0.908#10",
         Greater,
     );
@@ -1046,7 +1066,7 @@ fn test_reciprocal_sqrt_prec_round() {
         "0x3.243f6a8885a30#53",
         10,
         Down,
-        "0.563",
+        "0.56348",
         "0x0.904#10",
         Less,
     );
@@ -1055,7 +1075,7 @@ fn test_reciprocal_sqrt_prec_round() {
         "0x3.243f6a8885a30#53",
         10,
         Up,
-        "0.564",
+        "0.56445",
         "0x0.908#10",
         Greater,
     );
@@ -1064,7 +1084,7 @@ fn test_reciprocal_sqrt_prec_round() {
         "0x3.243f6a8885a30#53",
         10,
         Nearest,
-        "0.564",
+        "0.56445",
         "0x0.908#10",
         Greater,
     );
@@ -1260,32 +1280,38 @@ fn test_reciprocal_sqrt_rational_prec() {
     test("0", 10, "Infinity", "Infinity", Equal);
     test("0", 100, "Infinity", "Infinity", Equal);
     test("1", 1, "1.0", "0x1.0#1", Equal);
-    test("1", 10, "1.0", "0x1.000#10", Equal);
-    test("1", 100, "1.0", "0x1.0000000000000000000000000#100", Equal);
+    test("1", 10, "1.0000", "0x1.000#10", Equal);
+    test(
+        "1",
+        100,
+        "1.0000000000000000000000000000000",
+        "0x1.0000000000000000000000000#100",
+        Equal,
+    );
     test("1/2", 1, "1.0", "0x1.0#1", Less);
-    test("1/2", 10, "1.414", "0x1.6a0#10", Less);
+    test("1/2", 10, "1.4141", "0x1.6a0#10", Less);
     test(
         "1/2",
         100,
-        "1.414213562373095048801688724209",
+        "1.4142135623730950488016887242092",
         "0x1.6a09e667f3bcc908b2fb1366e#100",
         Less,
     );
     test("1/3", 1, "2.0", "0x2.0#1", Greater);
-    test("1/3", 10, "1.732", "0x1.bb8#10", Greater);
+    test("1/3", 10, "1.7324", "0x1.bb8#10", Greater);
     test(
         "1/3",
         100,
-        "1.732050807568877293527446341506",
+        "1.7320508075688772935274463415062",
         "0x1.bb67ae8584caa73b25742d708#100",
         Greater,
     );
-    test("22/7", 1, "0.5", "0x0.8#1", Less);
-    test("22/7", 10, "0.564", "0x0.908#10", Greater);
+    test("22/7", 1, "0.50", "0x0.8#1", Less);
+    test("22/7", 10, "0.56445", "0x0.908#10", Greater);
     test(
         "22/7",
         100,
-        "0.5640760748177662089151473616116",
+        "0.56407607481776620891514736161160",
         "0x0.90674a25cc60febbd6cc7515c#100",
         Greater,
     );
@@ -1342,28 +1368,28 @@ fn test_reciprocal_sqrt_rational_prec() {
     test_big(
         Rational::power_of_2(1000i64),
         10,
-        "3.055e-151",
+        "3.0549e-151",
         "0x1.000E-125#10",
         Equal,
     );
     test_big(
         Rational::power_of_2(i64::from(Float::MAX_EXPONENT)),
         10,
-        "too_small",
+        "6.9023e-161614249",
         "0x1.6a0E-134217728#10",
         Less,
     );
     test_big(
         Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
         10,
-        "too_small",
+        "9.7623e-161614249",
         "0x2.00E-134217728#10",
         Equal,
     );
     test_big(
         Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1) * Rational::from_unsigneds(3u8, 2),
         1,
-        "too_small",
+        "9.8e-161614249",
         "0x2.0E-134217728#1",
         Greater,
     );
@@ -1371,7 +1397,7 @@ fn test_reciprocal_sqrt_rational_prec() {
         Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
             * Rational::from_unsigneds(300u16, 199),
         1,
-        "too_small",
+        "9.8e-161614249",
         "0x2.0E-134217728#1",
         Greater,
     );
@@ -1379,7 +1405,7 @@ fn test_reciprocal_sqrt_rational_prec() {
         Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1)
             * Rational::from_unsigneds(299u16, 200),
         1,
-        "too_small",
+        "9.8e-161614249",
         "0x2.0E-134217728#1",
         Greater,
     );
@@ -1387,28 +1413,28 @@ fn test_reciprocal_sqrt_rational_prec() {
     test_big(
         Rational::power_of_2(-1000i64),
         10,
-        "3.273e150",
+        "3.2734e150",
         "0x1.000E+125#10",
         Equal,
     );
     test_big(
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
         10,
-        "too_big",
+        "1.4485e161614248",
         "0xb.50E+134217727#10",
         Less,
     );
     test_big(
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
         10,
-        "too_big",
+        "2.0487e161614248",
         "0x1.000E+134217728#10",
         Equal,
     );
     test_big(
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2),
         10,
-        "too_big",
+        "2.8970e161614248",
         "0x1.6a0E+134217728#10",
         Less,
     );
@@ -1416,7 +1442,7 @@ fn test_reciprocal_sqrt_rational_prec() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
             * Rational::from_unsigneds(1001u16, 1000),
         10,
-        "too_big",
+        "2.8970e161614248",
         "0x1.6a0E+134217728#10",
         Greater,
     );
@@ -1424,7 +1450,7 @@ fn test_reciprocal_sqrt_rational_prec() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
             * Rational::from_unsigneds(1025u16, 1024),
         10,
-        "too_big",
+        "2.8970e161614248",
         "0x1.6a0E+134217728#10",
         Greater,
     );
@@ -1432,7 +1458,7 @@ fn test_reciprocal_sqrt_rational_prec() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
             * Rational::from_unsigneds(1024u16, 1023),
         10,
-        "too_big",
+        "2.8970e161614248",
         "0x1.6a0E+134217728#10",
         Greater,
     );
@@ -1440,7 +1466,7 @@ fn test_reciprocal_sqrt_rational_prec() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
             * Rational::from_unsigneds(1001u16, 1000),
         10,
-        "too_big",
+        "2.8970e161614248",
         "0x1.6a0E+134217728#10",
         Greater,
     );
@@ -1448,7 +1474,7 @@ fn test_reciprocal_sqrt_rational_prec() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2)
             * Rational::from_unsigneds(1025u16, 1024),
         10,
-        "too_big",
+        "2.8970e161614248",
         "0x1.6a0E+134217728#10",
         Greater,
     );
@@ -1554,18 +1580,18 @@ fn test_reciprocal_sqrt_rational_prec_round() {
     test("1", 1, Nearest, "1.0", "0x1.0#1", Equal);
     test("1", 1, Exact, "1.0", "0x1.0#1", Equal);
 
-    test("1", 10, Floor, "1.0", "0x1.000#10", Equal);
-    test("1", 10, Ceiling, "1.0", "0x1.000#10", Equal);
-    test("1", 10, Down, "1.0", "0x1.000#10", Equal);
-    test("1", 10, Up, "1.0", "0x1.000#10", Equal);
-    test("1", 10, Nearest, "1.0", "0x1.000#10", Equal);
-    test("1", 10, Exact, "1.0", "0x1.000#10", Equal);
+    test("1", 10, Floor, "1.0000", "0x1.000#10", Equal);
+    test("1", 10, Ceiling, "1.0000", "0x1.000#10", Equal);
+    test("1", 10, Down, "1.0000", "0x1.000#10", Equal);
+    test("1", 10, Up, "1.0000", "0x1.000#10", Equal);
+    test("1", 10, Nearest, "1.0000", "0x1.000#10", Equal);
+    test("1", 10, Exact, "1.0000", "0x1.000#10", Equal);
 
     test(
         "1",
         100,
         Floor,
-        "1.0",
+        "1.0000000000000000000000000000000",
         "0x1.0000000000000000000000000#100",
         Equal,
     );
@@ -1573,7 +1599,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         "1",
         100,
         Ceiling,
-        "1.0",
+        "1.0000000000000000000000000000000",
         "0x1.0000000000000000000000000#100",
         Equal,
     );
@@ -1581,7 +1607,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         "1",
         100,
         Down,
-        "1.0",
+        "1.0000000000000000000000000000000",
         "0x1.0000000000000000000000000#100",
         Equal,
     );
@@ -1589,7 +1615,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         "1",
         100,
         Up,
-        "1.0",
+        "1.0000000000000000000000000000000",
         "0x1.0000000000000000000000000#100",
         Equal,
     );
@@ -1597,7 +1623,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         "1",
         100,
         Nearest,
-        "1.0",
+        "1.0000000000000000000000000000000",
         "0x1.0000000000000000000000000#100",
         Equal,
     );
@@ -1605,7 +1631,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         "1",
         100,
         Exact,
-        "1.0",
+        "1.0000000000000000000000000000000",
         "0x1.0000000000000000000000000#100",
         Equal,
     );
@@ -1616,17 +1642,17 @@ fn test_reciprocal_sqrt_rational_prec_round() {
     test("1/2", 1, Up, "2.0", "0x2.0#1", Greater);
     test("1/2", 1, Nearest, "1.0", "0x1.0#1", Less);
 
-    test("1/2", 10, Floor, "1.414", "0x1.6a0#10", Less);
-    test("1/2", 10, Ceiling, "1.416", "0x1.6a8#10", Greater);
-    test("1/2", 10, Down, "1.414", "0x1.6a0#10", Less);
-    test("1/2", 10, Up, "1.416", "0x1.6a8#10", Greater);
-    test("1/2", 10, Nearest, "1.414", "0x1.6a0#10", Less);
+    test("1/2", 10, Floor, "1.4141", "0x1.6a0#10", Less);
+    test("1/2", 10, Ceiling, "1.4160", "0x1.6a8#10", Greater);
+    test("1/2", 10, Down, "1.4141", "0x1.6a0#10", Less);
+    test("1/2", 10, Up, "1.4160", "0x1.6a8#10", Greater);
+    test("1/2", 10, Nearest, "1.4141", "0x1.6a0#10", Less);
 
     test(
         "1/2",
         100,
         Floor,
-        "1.414213562373095048801688724209",
+        "1.4142135623730950488016887242092",
         "0x1.6a09e667f3bcc908b2fb1366e#100",
         Less,
     );
@@ -1634,7 +1660,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         "1/2",
         100,
         Ceiling,
-        "1.414213562373095048801688724211",
+        "1.4142135623730950488016887242108",
         "0x1.6a09e667f3bcc908b2fb13670#100",
         Greater,
     );
@@ -1642,7 +1668,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         "1/2",
         100,
         Down,
-        "1.414213562373095048801688724209",
+        "1.4142135623730950488016887242092",
         "0x1.6a09e667f3bcc908b2fb1366e#100",
         Less,
     );
@@ -1650,7 +1676,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         "1/2",
         100,
         Up,
-        "1.414213562373095048801688724211",
+        "1.4142135623730950488016887242108",
         "0x1.6a09e667f3bcc908b2fb13670#100",
         Greater,
     );
@@ -1658,7 +1684,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         "1/2",
         100,
         Nearest,
-        "1.414213562373095048801688724209",
+        "1.4142135623730950488016887242092",
         "0x1.6a09e667f3bcc908b2fb1366e#100",
         Less,
     );
@@ -1669,17 +1695,17 @@ fn test_reciprocal_sqrt_rational_prec_round() {
     test("1/3", 1, Up, "2.0", "0x2.0#1", Greater);
     test("1/3", 1, Nearest, "2.0", "0x2.0#1", Greater);
 
-    test("1/3", 10, Floor, "1.73", "0x1.bb0#10", Less);
-    test("1/3", 10, Ceiling, "1.732", "0x1.bb8#10", Greater);
-    test("1/3", 10, Down, "1.73", "0x1.bb0#10", Less);
-    test("1/3", 10, Up, "1.732", "0x1.bb8#10", Greater);
-    test("1/3", 10, Nearest, "1.732", "0x1.bb8#10", Greater);
+    test("1/3", 10, Floor, "1.7305", "0x1.bb0#10", Less);
+    test("1/3", 10, Ceiling, "1.7324", "0x1.bb8#10", Greater);
+    test("1/3", 10, Down, "1.7305", "0x1.bb0#10", Less);
+    test("1/3", 10, Up, "1.7324", "0x1.bb8#10", Greater);
+    test("1/3", 10, Nearest, "1.7324", "0x1.bb8#10", Greater);
 
     test(
         "1/3",
         100,
         Floor,
-        "1.732050807568877293527446341505",
+        "1.7320508075688772935274463415047",
         "0x1.bb67ae8584caa73b25742d706#100",
         Less,
     );
@@ -1687,7 +1713,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         "1/3",
         100,
         Ceiling,
-        "1.732050807568877293527446341506",
+        "1.7320508075688772935274463415062",
         "0x1.bb67ae8584caa73b25742d708#100",
         Greater,
     );
@@ -1695,7 +1721,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         "1/3",
         100,
         Down,
-        "1.732050807568877293527446341505",
+        "1.7320508075688772935274463415047",
         "0x1.bb67ae8584caa73b25742d706#100",
         Less,
     );
@@ -1703,7 +1729,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         "1/3",
         100,
         Up,
-        "1.732050807568877293527446341506",
+        "1.7320508075688772935274463415062",
         "0x1.bb67ae8584caa73b25742d708#100",
         Greater,
     );
@@ -1711,28 +1737,28 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         "1/3",
         100,
         Nearest,
-        "1.732050807568877293527446341506",
+        "1.7320508075688772935274463415062",
         "0x1.bb67ae8584caa73b25742d708#100",
         Greater,
     );
 
-    test("22/7", 1, Floor, "0.5", "0x0.8#1", Less);
+    test("22/7", 1, Floor, "0.50", "0x0.8#1", Less);
     test("22/7", 1, Ceiling, "1.0", "0x1.0#1", Greater);
-    test("22/7", 1, Down, "0.5", "0x0.8#1", Less);
+    test("22/7", 1, Down, "0.50", "0x0.8#1", Less);
     test("22/7", 1, Up, "1.0", "0x1.0#1", Greater);
-    test("22/7", 1, Nearest, "0.5", "0x0.8#1", Less);
+    test("22/7", 1, Nearest, "0.50", "0x0.8#1", Less);
 
-    test("22/7", 10, Floor, "0.563", "0x0.904#10", Less);
-    test("22/7", 10, Ceiling, "0.564", "0x0.908#10", Greater);
-    test("22/7", 10, Down, "0.563", "0x0.904#10", Less);
-    test("22/7", 10, Up, "0.564", "0x0.908#10", Greater);
-    test("22/7", 10, Nearest, "0.564", "0x0.908#10", Greater);
+    test("22/7", 10, Floor, "0.56348", "0x0.904#10", Less);
+    test("22/7", 10, Ceiling, "0.56445", "0x0.908#10", Greater);
+    test("22/7", 10, Down, "0.56348", "0x0.904#10", Less);
+    test("22/7", 10, Up, "0.56445", "0x0.908#10", Greater);
+    test("22/7", 10, Nearest, "0.56445", "0x0.908#10", Greater);
 
     test(
         "22/7",
         100,
         Floor,
-        "0.564076074817766208915147361611",
+        "0.56407607481776620891514736161081",
         "0x0.90674a25cc60febbd6cc7515b#100",
         Less,
     );
@@ -1740,7 +1766,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         "22/7",
         100,
         Ceiling,
-        "0.5640760748177662089151473616116",
+        "0.56407607481776620891514736161160",
         "0x0.90674a25cc60febbd6cc7515c#100",
         Greater,
     );
@@ -1748,7 +1774,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         "22/7",
         100,
         Down,
-        "0.564076074817766208915147361611",
+        "0.56407607481776620891514736161081",
         "0x0.90674a25cc60febbd6cc7515b#100",
         Less,
     );
@@ -1756,7 +1782,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         "22/7",
         100,
         Up,
-        "0.5640760748177662089151473616116",
+        "0.56407607481776620891514736161160",
         "0x0.90674a25cc60febbd6cc7515c#100",
         Greater,
     );
@@ -1764,7 +1790,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         "22/7",
         100,
         Nearest,
-        "0.5640760748177662089151473616116",
+        "0.56407607481776620891514736161160",
         "0x0.90674a25cc60febbd6cc7515c#100",
         Greater,
     );
@@ -1899,7 +1925,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         Rational::power_of_2(1000i64),
         10,
         Floor,
-        "3.055e-151",
+        "3.0549e-151",
         "0x1.000E-125#10",
         Equal,
     );
@@ -1907,7 +1933,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         Rational::power_of_2(1000i64),
         10,
         Ceiling,
-        "3.055e-151",
+        "3.0549e-151",
         "0x1.000E-125#10",
         Equal,
     );
@@ -1915,7 +1941,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         Rational::power_of_2(1000i64),
         10,
         Down,
-        "3.055e-151",
+        "3.0549e-151",
         "0x1.000E-125#10",
         Equal,
     );
@@ -1923,7 +1949,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         Rational::power_of_2(1000i64),
         10,
         Up,
-        "3.055e-151",
+        "3.0549e-151",
         "0x1.000E-125#10",
         Equal,
     );
@@ -1931,7 +1957,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         Rational::power_of_2(1000i64),
         10,
         Nearest,
-        "3.055e-151",
+        "3.0549e-151",
         "0x1.000E-125#10",
         Equal,
     );
@@ -1939,7 +1965,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         Rational::power_of_2(1000i64),
         10,
         Exact,
-        "3.055e-151",
+        "3.0549e-151",
         "0x1.000E-125#10",
         Equal,
     );
@@ -1948,7 +1974,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MAX_EXPONENT)),
         10,
         Floor,
-        "too_small",
+        "6.9023e-161614249",
         "0x1.6a0E-134217728#10",
         Less,
     );
@@ -1956,7 +1982,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MAX_EXPONENT)),
         10,
         Ceiling,
-        "too_small",
+        "6.9118e-161614249",
         "0x1.6a8E-134217728#10",
         Greater,
     );
@@ -1964,7 +1990,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MAX_EXPONENT)),
         10,
         Down,
-        "too_small",
+        "6.9023e-161614249",
         "0x1.6a0E-134217728#10",
         Less,
     );
@@ -1972,7 +1998,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MAX_EXPONENT)),
         10,
         Up,
-        "too_small",
+        "6.9118e-161614249",
         "0x1.6a8E-134217728#10",
         Greater,
     );
@@ -1980,7 +2006,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MAX_EXPONENT)),
         10,
         Nearest,
-        "too_small",
+        "6.9023e-161614249",
         "0x1.6a0E-134217728#10",
         Less,
     );
@@ -1989,7 +2015,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
         10,
         Floor,
-        "too_small",
+        "9.7623e-161614249",
         "0x2.00E-134217728#10",
         Equal,
     );
@@ -1997,7 +2023,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
         10,
         Ceiling,
-        "too_small",
+        "9.7623e-161614249",
         "0x2.00E-134217728#10",
         Equal,
     );
@@ -2005,7 +2031,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
         10,
         Down,
-        "too_small",
+        "9.7623e-161614249",
         "0x2.00E-134217728#10",
         Equal,
     );
@@ -2013,7 +2039,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
         10,
         Up,
-        "too_small",
+        "9.7623e-161614249",
         "0x2.00E-134217728#10",
         Equal,
     );
@@ -2021,7 +2047,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
         10,
         Nearest,
-        "too_small",
+        "9.7623e-161614249",
         "0x2.00E-134217728#10",
         Equal,
     );
@@ -2029,7 +2055,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1),
         10,
         Exact,
-        "too_small",
+        "9.7623e-161614249",
         "0x2.00E-134217728#10",
         Equal,
     );
@@ -2038,7 +2064,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1) * Rational::from_unsigneds(3u8, 2),
         1,
         Floor,
-        "too_small",
+        "4.9e-161614249",
         "0x1.0E-134217728#1",
         Less,
     );
@@ -2046,7 +2072,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1) * Rational::from_unsigneds(3u8, 2),
         1,
         Ceiling,
-        "too_small",
+        "9.8e-161614249",
         "0x2.0E-134217728#1",
         Greater,
     );
@@ -2054,7 +2080,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1) * Rational::from_unsigneds(3u8, 2),
         1,
         Down,
-        "too_small",
+        "4.9e-161614249",
         "0x1.0E-134217728#1",
         Less,
     );
@@ -2062,7 +2088,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1) * Rational::from_unsigneds(3u8, 2),
         1,
         Up,
-        "too_small",
+        "9.8e-161614249",
         "0x2.0E-134217728#1",
         Greater,
     );
@@ -2070,7 +2096,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MAX_EXPONENT) - 1) * Rational::from_unsigneds(3u8, 2),
         1,
         Nearest,
-        "too_small",
+        "9.8e-161614249",
         "0x2.0E-134217728#1",
         Greater,
     );
@@ -2080,7 +2106,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
             * Rational::from_unsigneds(300u16, 199),
         1,
         Floor,
-        "too_small",
+        "4.9e-161614249",
         "0x1.0E-134217728#1",
         Less,
     );
@@ -2089,7 +2115,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
             * Rational::from_unsigneds(300u16, 199),
         1,
         Ceiling,
-        "too_small",
+        "9.8e-161614249",
         "0x2.0E-134217728#1",
         Greater,
     );
@@ -2098,7 +2124,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
             * Rational::from_unsigneds(300u16, 199),
         1,
         Down,
-        "too_small",
+        "4.9e-161614249",
         "0x1.0E-134217728#1",
         Less,
     );
@@ -2107,7 +2133,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
             * Rational::from_unsigneds(300u16, 199),
         1,
         Up,
-        "too_small",
+        "9.8e-161614249",
         "0x2.0E-134217728#1",
         Greater,
     );
@@ -2116,7 +2142,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
             * Rational::from_unsigneds(300u16, 199),
         1,
         Nearest,
-        "too_small",
+        "9.8e-161614249",
         "0x2.0E-134217728#1",
         Greater,
     );
@@ -2126,7 +2152,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
             * Rational::from_unsigneds(299u16, 200),
         1,
         Floor,
-        "too_small",
+        "4.9e-161614249",
         "0x1.0E-134217728#1",
         Less,
     );
@@ -2135,7 +2161,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
             * Rational::from_unsigneds(299u16, 200),
         1,
         Ceiling,
-        "too_small",
+        "9.8e-161614249",
         "0x2.0E-134217728#1",
         Greater,
     );
@@ -2144,7 +2170,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
             * Rational::from_unsigneds(299u16, 200),
         1,
         Down,
-        "too_small",
+        "4.9e-161614249",
         "0x1.0E-134217728#1",
         Less,
     );
@@ -2153,7 +2179,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
             * Rational::from_unsigneds(299u16, 200),
         1,
         Up,
-        "too_small",
+        "9.8e-161614249",
         "0x2.0E-134217728#1",
         Greater,
     );
@@ -2162,7 +2188,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
             * Rational::from_unsigneds(299u16, 200),
         1,
         Nearest,
-        "too_small",
+        "9.8e-161614249",
         "0x2.0E-134217728#1",
         Greater,
     );
@@ -2171,7 +2197,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         Rational::power_of_2(-1000i64),
         10,
         Floor,
-        "3.273e150",
+        "3.2734e150",
         "0x1.000E+125#10",
         Equal,
     );
@@ -2179,7 +2205,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         Rational::power_of_2(-1000i64),
         10,
         Ceiling,
-        "3.273e150",
+        "3.2734e150",
         "0x1.000E+125#10",
         Equal,
     );
@@ -2187,7 +2213,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         Rational::power_of_2(-1000i64),
         10,
         Down,
-        "3.273e150",
+        "3.2734e150",
         "0x1.000E+125#10",
         Equal,
     );
@@ -2195,7 +2221,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         Rational::power_of_2(-1000i64),
         10,
         Up,
-        "3.273e150",
+        "3.2734e150",
         "0x1.000E+125#10",
         Equal,
     );
@@ -2203,7 +2229,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         Rational::power_of_2(-1000i64),
         10,
         Nearest,
-        "3.273e150",
+        "3.2734e150",
         "0x1.000E+125#10",
         Equal,
     );
@@ -2211,7 +2237,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         Rational::power_of_2(-1000i64),
         10,
         Exact,
-        "3.273e150",
+        "3.2734e150",
         "0x1.000E+125#10",
         Equal,
     );
@@ -2220,7 +2246,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
         10,
         Floor,
-        "too_big",
+        "1.4485e161614248",
         "0xb.50E+134217727#10",
         Less,
     );
@@ -2228,7 +2254,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
         10,
         Ceiling,
-        "too_big",
+        "1.4505e161614248",
         "0xb.54E+134217727#10",
         Greater,
     );
@@ -2236,7 +2262,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
         10,
         Down,
-        "too_big",
+        "1.4485e161614248",
         "0xb.50E+134217727#10",
         Less,
     );
@@ -2244,7 +2270,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
         10,
         Up,
-        "too_big",
+        "1.4505e161614248",
         "0xb.54E+134217727#10",
         Greater,
     );
@@ -2252,7 +2278,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT)),
         10,
         Nearest,
-        "too_big",
+        "1.4485e161614248",
         "0xb.50E+134217727#10",
         Less,
     );
@@ -2261,7 +2287,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
         10,
         Floor,
-        "too_big",
+        "2.0487e161614248",
         "0x1.000E+134217728#10",
         Equal,
     );
@@ -2269,7 +2295,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
         10,
         Ceiling,
-        "too_big",
+        "2.0487e161614248",
         "0x1.000E+134217728#10",
         Equal,
     );
@@ -2277,7 +2303,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
         10,
         Down,
-        "too_big",
+        "2.0487e161614248",
         "0x1.000E+134217728#10",
         Equal,
     );
@@ -2285,7 +2311,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
         10,
         Up,
-        "too_big",
+        "2.0487e161614248",
         "0x1.000E+134217728#10",
         Equal,
     );
@@ -2293,7 +2319,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
         10,
         Nearest,
-        "too_big",
+        "2.0487e161614248",
         "0x1.000E+134217728#10",
         Equal,
     );
@@ -2301,7 +2327,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 1),
         10,
         Exact,
-        "too_big",
+        "2.0487e161614248",
         "0x1.000E+134217728#10",
         Equal,
     );
@@ -2310,7 +2336,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2),
         10,
         Floor,
-        "too_big",
+        "2.8970e161614248",
         "0x1.6a0E+134217728#10",
         Less,
     );
@@ -2318,7 +2344,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2),
         10,
         Ceiling,
-        "too_big",
+        "2.9010e161614248",
         "0x1.6a8E+134217728#10",
         Greater,
     );
@@ -2326,7 +2352,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2),
         10,
         Down,
-        "too_big",
+        "2.8970e161614248",
         "0x1.6a0E+134217728#10",
         Less,
     );
@@ -2334,7 +2360,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2),
         10,
         Up,
-        "too_big",
+        "2.9010e161614248",
         "0x1.6a8E+134217728#10",
         Greater,
     );
@@ -2342,7 +2368,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
         Rational::power_of_2(i64::from(Float::MIN_EXPONENT) - 2),
         10,
         Nearest,
-        "too_big",
+        "2.8970e161614248",
         "0x1.6a0E+134217728#10",
         Less,
     );
@@ -2352,7 +2378,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
             * Rational::from_unsigneds(1001u16, 1000),
         10,
         Floor,
-        "too_big",
+        "2.8930e161614248",
         "0x1.698E+134217728#10",
         Less,
     );
@@ -2361,7 +2387,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
             * Rational::from_unsigneds(1001u16, 1000),
         10,
         Ceiling,
-        "too_big",
+        "2.8970e161614248",
         "0x1.6a0E+134217728#10",
         Greater,
     );
@@ -2370,7 +2396,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
             * Rational::from_unsigneds(1001u16, 1000),
         10,
         Down,
-        "too_big",
+        "2.8930e161614248",
         "0x1.698E+134217728#10",
         Less,
     );
@@ -2379,7 +2405,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
             * Rational::from_unsigneds(1001u16, 1000),
         10,
         Up,
-        "too_big",
+        "2.8970e161614248",
         "0x1.6a0E+134217728#10",
         Greater,
     );
@@ -2388,7 +2414,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
             * Rational::from_unsigneds(1001u16, 1000),
         10,
         Nearest,
-        "too_big",
+        "2.8970e161614248",
         "0x1.6a0E+134217728#10",
         Greater,
     );
@@ -2398,7 +2424,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
             * Rational::from_unsigneds(1025u16, 1024),
         10,
         Floor,
-        "too_big",
+        "2.8930e161614248",
         "0x1.698E+134217728#10",
         Less,
     );
@@ -2407,7 +2433,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
             * Rational::from_unsigneds(1025u16, 1024),
         10,
         Ceiling,
-        "too_big",
+        "2.8970e161614248",
         "0x1.6a0E+134217728#10",
         Greater,
     );
@@ -2416,7 +2442,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
             * Rational::from_unsigneds(1025u16, 1024),
         10,
         Down,
-        "too_big",
+        "2.8930e161614248",
         "0x1.698E+134217728#10",
         Less,
     );
@@ -2425,7 +2451,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
             * Rational::from_unsigneds(1025u16, 1024),
         10,
         Up,
-        "too_big",
+        "2.8970e161614248",
         "0x1.6a0E+134217728#10",
         Greater,
     );
@@ -2434,7 +2460,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
             * Rational::from_unsigneds(1025u16, 1024),
         10,
         Nearest,
-        "too_big",
+        "2.8970e161614248",
         "0x1.6a0E+134217728#10",
         Greater,
     );
@@ -2444,7 +2470,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
             * Rational::from_unsigneds(1024u16, 1023),
         10,
         Floor,
-        "too_big",
+        "2.8930e161614248",
         "0x1.698E+134217728#10",
         Less,
     );
@@ -2453,7 +2479,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
             * Rational::from_unsigneds(1024u16, 1023),
         10,
         Ceiling,
-        "too_big",
+        "2.8970e161614248",
         "0x1.6a0E+134217728#10",
         Greater,
     );
@@ -2462,7 +2488,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
             * Rational::from_unsigneds(1024u16, 1023),
         10,
         Down,
-        "too_big",
+        "2.8930e161614248",
         "0x1.698E+134217728#10",
         Less,
     );
@@ -2471,7 +2497,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
             * Rational::from_unsigneds(1024u16, 1023),
         10,
         Up,
-        "too_big",
+        "2.8970e161614248",
         "0x1.6a0E+134217728#10",
         Greater,
     );
@@ -2480,7 +2506,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
             * Rational::from_unsigneds(1024u16, 1023),
         10,
         Nearest,
-        "too_big",
+        "2.8970e161614248",
         "0x1.6a0E+134217728#10",
         Greater,
     );
@@ -2490,7 +2516,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
             * Rational::from_unsigneds(1001u16, 1000),
         10,
         Floor,
-        "too_big",
+        "2.8930e161614248",
         "0x1.698E+134217728#10",
         Less,
     );
@@ -2499,7 +2525,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
             * Rational::from_unsigneds(1001u16, 1000),
         10,
         Ceiling,
-        "too_big",
+        "2.8970e161614248",
         "0x1.6a0E+134217728#10",
         Greater,
     );
@@ -2508,7 +2534,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
             * Rational::from_unsigneds(1001u16, 1000),
         10,
         Down,
-        "too_big",
+        "2.8930e161614248",
         "0x1.698E+134217728#10",
         Less,
     );
@@ -2517,7 +2543,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
             * Rational::from_unsigneds(1001u16, 1000),
         10,
         Up,
-        "too_big",
+        "2.8970e161614248",
         "0x1.6a0E+134217728#10",
         Greater,
     );
@@ -2526,7 +2552,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
             * Rational::from_unsigneds(1001u16, 1000),
         10,
         Nearest,
-        "too_big",
+        "2.8970e161614248",
         "0x1.6a0E+134217728#10",
         Greater,
     );
@@ -2536,7 +2562,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
             * Rational::from_unsigneds(1025u16, 1024),
         10,
         Floor,
-        "too_big",
+        "2.8930e161614248",
         "0x1.698E+134217728#10",
         Less,
     );
@@ -2545,7 +2571,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
             * Rational::from_unsigneds(1025u16, 1024),
         10,
         Ceiling,
-        "too_big",
+        "2.8970e161614248",
         "0x1.6a0E+134217728#10",
         Greater,
     );
@@ -2554,7 +2580,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
             * Rational::from_unsigneds(1025u16, 1024),
         10,
         Down,
-        "too_big",
+        "2.8930e161614248",
         "0x1.698E+134217728#10",
         Less,
     );
@@ -2563,7 +2589,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
             * Rational::from_unsigneds(1025u16, 1024),
         10,
         Up,
-        "too_big",
+        "2.8970e161614248",
         "0x1.6a0E+134217728#10",
         Greater,
     );
@@ -2572,7 +2598,7 @@ fn test_reciprocal_sqrt_rational_prec_round() {
             * Rational::from_unsigneds(1025u16, 1024),
         10,
         Nearest,
-        "too_big",
+        "2.8970e161614248",
         "0x1.6a0E+134217728#10",
         Greater,
     );

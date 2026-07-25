@@ -82,11 +82,11 @@ fn test_log_base_2_1_plus_x() {
     test("-0.0", "-0x0.0", "-0.0", "-0x0.0");
     test("1.0", "0x1.0#1", "1.0", "0x1.0#1");
     test("-1.0", "-0x1.0#1", "-Infinity", "-Infinity");
-    test("-0.5", "-0x0.8#1", "-1.0", "-0x1.0#1");
-    test("-0.8", "-0x0.c#2", "-2.0", "-0x2.0#2");
+    test("-0.50", "-0x0.8#1", "-1.0", "-0x1.0#1");
+    test("-0.75", "-0x0.c#2", "-2.0", "-0x2.0#2");
     test("3.0", "0x3.0#2", "2.0", "0x2.0#2");
     test("7.0", "0x7.0#3", "3.0", "0x3.0#3");
-    test("123.0", "0x7b.0#7", "6.94", "0x6.f#7");
+    test("123.0", "0x7b.0#7", "6.938", "0x6.f#7");
     test("-123.0", "-0x7b.0#7", "NaN", "NaN");
     test(
         "3.1415926535897931",
@@ -130,12 +130,12 @@ fn test_log_base_2_1_plus_x_prec_round_special() {
     test(Float::ONE, 1, Exact, "1.0", "0x1.0#1", Equal);
     test(Float::from(3), 2, Exact, "2.0", "0x2.0#2", Equal);
     test(Float::from(7), 3, Exact, "3.0", "0x3.0#3", Equal);
-    test(Float::exact_from(31), 5, Exact, "5.0", "0x5.0#5", Equal);
+    test(Float::exact_from(31), 5, Exact, "5.00", "0x5.0#5", Equal);
     test(
         Float::exact_from(1023),
         10,
         Exact,
-        "10.0",
+        "10.000",
         "0xa.00#10",
         Equal,
     );
@@ -172,7 +172,7 @@ fn test_log_base_2_1_plus_x_prec_round_special() {
         Float::power_of_2(60i64),
         60,
         Nearest,
-        "60.0",
+        "60.000000000000000000",
         "0x3c.00000000000000#60",
         Less,
     );
@@ -180,7 +180,7 @@ fn test_log_base_2_1_plus_x_prec_round_special() {
         Float::power_of_2(100i64),
         100,
         Nearest,
-        "100.0",
+        "100.00000000000000000000000000000",
         "0x64.000000000000000000000000#100",
         Less,
     );
@@ -188,7 +188,10 @@ fn test_log_base_2_1_plus_x_prec_round_special() {
         Float::power_of_2(1000i64),
         1000,
         Nearest,
-        "1000.0",
+        "1000.000000000000000000000000000000000000000000000000000000000000000000000000000000000000\
+        000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\
+        000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\
+        00000000000000000000000000000000000",
         "0x3e8.000000000000000000000000000000000000000000000000000000000000000000000000000000000000\
         000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\
         00000000000000000000000000000000000000000000000000000000000000000000000000#1000",
@@ -207,7 +210,7 @@ fn test_log_base_2_1_plus_x_prec_round_special() {
         Float::power_of_2(-1000i64),
         10,
         Nearest,
-        "1.347e-301",
+        "1.3470e-301",
         "0x1.718E-250#10",
         Greater,
     );
@@ -218,7 +221,7 @@ fn test_log_base_2_1_plus_x_prec_round_special() {
             .0,
         10,
         Nearest,
-        "-100.0",
+        "-100.00",
         "-0x64.0#10",
         Equal,
     );
@@ -268,11 +271,11 @@ fn test_log_base_2_1_plus_x_prec() {
     test("0.0", "0x0.0", 1, "0.0", "0x0.0", Equal);
     test("-0.0", "-0x0.0", 1, "-0.0", "-0x0.0", Equal);
     test("1.0", "0x1.0#1", 1, "1.0", "0x1.0#1", Equal);
-    test("1.0", "0x1.0#1", 10, "1.0", "0x1.000#10", Equal);
+    test("1.0", "0x1.0#1", 10, "1.0000", "0x1.000#10", Equal);
     test("-1.0", "-0x1.0#1", 1, "-Infinity", "-Infinity", Equal);
     test("-1.0", "-0x1.0#1", 10, "-Infinity", "-Infinity", Equal);
     test("123.0", "0x7b.0#7", 1, "8.0", "0x8.0#1", Greater);
-    test("123.0", "0x7b.0#7", 10, "6.953", "0x6.f4#10", Less);
+    test("123.0", "0x7b.0#7", 10, "6.9531", "0x6.f4#10", Less);
     test("-123.0", "-0x7b.0#7", 1, "NaN", "NaN", Equal);
     test("-123.0", "-0x7b.0#7", 10, "NaN", "NaN", Equal);
     test(
@@ -287,7 +290,7 @@ fn test_log_base_2_1_plus_x_prec() {
         "3.1415926535897931",
         "0x3.243f6a8885a30#53",
         10,
-        "2.051",
+        "2.0508",
         "0x2.0d#10",
         Greater,
     );
@@ -311,12 +314,12 @@ fn test_log_base_2_1_plus_x_prec() {
         "2.7182818284590451",
         "0x2.b7e151628aed2#53",
         10,
-        "1.895",
+        "1.8945",
         "0x1.e50#10",
         Less,
     );
     test("2.0", "0x2.0#1", 1, "2.0", "0x2.0#1", Greater);
-    test("0.999998", "0x0.ffffe#19", 5, "1.0", "0x1.0#5", Greater);
+    test("0.9999981", "0x0.ffffe#19", 5, "1.00", "0x1.0#5", Greater);
 }
 
 #[test]
@@ -393,11 +396,11 @@ fn test_log_base_2_1_plus_x_round() {
     test("-1.0", "-0x1.0#1", Nearest, "-Infinity", "-Infinity", Equal);
     test("-1.0", "-0x1.0#1", Exact, "-Infinity", "-Infinity", Equal);
 
-    test("123.0", "0x7b.0#7", Floor, "6.94", "0x6.f#7", Less);
-    test("123.0", "0x7b.0#7", Ceiling, "7.0", "0x7.0#7", Greater);
-    test("123.0", "0x7b.0#7", Down, "6.94", "0x6.f#7", Less);
-    test("123.0", "0x7b.0#7", Up, "7.0", "0x7.0#7", Greater);
-    test("123.0", "0x7b.0#7", Nearest, "6.94", "0x6.f#7", Less);
+    test("123.0", "0x7b.0#7", Floor, "6.938", "0x6.f#7", Less);
+    test("123.0", "0x7b.0#7", Ceiling, "7.000", "0x7.0#7", Greater);
+    test("123.0", "0x7b.0#7", Down, "6.938", "0x6.f#7", Less);
+    test("123.0", "0x7b.0#7", Up, "7.000", "0x7.0#7", Greater);
+    test("123.0", "0x7b.0#7", Nearest, "6.938", "0x6.f#7", Less);
 
     test("-123.0", "-0x7b.0#7", Floor, "NaN", "NaN", Equal);
     test("-123.0", "-0x7b.0#7", Nearest, "NaN", "NaN", Equal);
@@ -542,9 +545,9 @@ fn test_log_base_2_1_plus_x_prec_round() {
     test("1.0", "0x1.0#1", 1, Up, "1.0", "0x1.0#1", Equal);
     test("1.0", "0x1.0#1", 1, Nearest, "1.0", "0x1.0#1", Equal);
     test("1.0", "0x1.0#1", 1, Exact, "1.0", "0x1.0#1", Equal);
-    test("1.0", "0x1.0#1", 10, Floor, "1.0", "0x1.000#10", Equal);
-    test("1.0", "0x1.0#1", 10, Ceiling, "1.0", "0x1.000#10", Equal);
-    test("1.0", "0x1.0#1", 10, Nearest, "1.0", "0x1.000#10", Equal);
+    test("1.0", "0x1.0#1", 10, Floor, "1.0000", "0x1.000#10", Equal);
+    test("1.0", "0x1.0#1", 10, Ceiling, "1.0000", "0x1.000#10", Equal);
+    test("1.0", "0x1.0#1", 10, Nearest, "1.0000", "0x1.000#10", Equal);
 
     test(
         "-1.0",
@@ -586,17 +589,25 @@ fn test_log_base_2_1_plus_x_prec_round() {
     test("123.0", "0x7b.0#7", 1, Floor, "4.0", "0x4.0#1", Less);
     test("123.0", "0x7b.0#7", 1, Ceiling, "8.0", "0x8.0#1", Greater);
     test("123.0", "0x7b.0#7", 1, Nearest, "8.0", "0x8.0#1", Greater);
-    test("123.0", "0x7b.0#7", 10, Floor, "6.953", "0x6.f4#10", Less);
+    test("123.0", "0x7b.0#7", 10, Floor, "6.9531", "0x6.f4#10", Less);
     test(
         "123.0",
         "0x7b.0#7",
         10,
         Ceiling,
-        "6.96",
+        "6.9609",
         "0x6.f6#10",
         Greater,
     );
-    test("123.0", "0x7b.0#7", 10, Nearest, "6.953", "0x6.f4#10", Less);
+    test(
+        "123.0",
+        "0x7b.0#7",
+        10,
+        Nearest,
+        "6.9531",
+        "0x6.f4#10",
+        Less,
+    );
 
     test("-123.0", "-0x7b.0#7", 1, Floor, "NaN", "NaN", Equal);
     test("-123.0", "-0x7b.0#7", 10, Nearest, "NaN", "NaN", Equal);
@@ -633,7 +644,7 @@ fn test_log_base_2_1_plus_x_prec_round() {
         "0x3.243f6a8885a30#53",
         10,
         Floor,
-        "2.047",
+        "2.0469",
         "0x2.0c#10",
         Less,
     );
@@ -642,7 +653,7 @@ fn test_log_base_2_1_plus_x_prec_round() {
         "0x3.243f6a8885a30#53",
         10,
         Ceiling,
-        "2.051",
+        "2.0508",
         "0x2.0d#10",
         Greater,
     );
@@ -651,7 +662,7 @@ fn test_log_base_2_1_plus_x_prec_round() {
         "0x3.243f6a8885a30#53",
         10,
         Nearest,
-        "2.051",
+        "2.0508",
         "0x2.0d#10",
         Greater,
     );
@@ -698,7 +709,7 @@ fn test_log_base_2_1_plus_x_prec_round() {
         "0x2.b7e151628aed2#53",
         10,
         Floor,
-        "1.895",
+        "1.8945",
         "0x1.e50#10",
         Less,
     );
@@ -707,7 +718,7 @@ fn test_log_base_2_1_plus_x_prec_round() {
         "0x2.b7e151628aed2#53",
         10,
         Ceiling,
-        "1.896",
+        "1.8965",
         "0x1.e58#10",
         Greater,
     );
@@ -716,7 +727,7 @@ fn test_log_base_2_1_plus_x_prec_round() {
         "0x2.b7e151628aed2#53",
         10,
         Nearest,
-        "1.895",
+        "1.8945",
         "0x1.e50#10",
         Less,
     );

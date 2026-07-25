@@ -89,11 +89,11 @@ fn test_log_base_10() {
     test("-0.0", "-0x0.0", "-Infinity", "-Infinity");
     test("1.0", "0x1.0#1", "0.0", "0x0.0");
     test("-1.0", "-0x1.0#1", "NaN", "NaN");
-    test("2.0", "0x2.0#1", "0.2", "0x0.4#1");
-    test("50.0", "0x32.0#5", "1.7", "0x1.b#5");
-    test("123.0", "0x7b.0#7", "2.09", "0x2.18#7");
-    test("7.0", "0x7.0#3", "0.9", "0x0.e#3");
-    test("0.1", "0x0.2#1", "-1.0", "-0x1.0#1");
+    test("2.0", "0x2.0#1", "0.25", "0x0.4#1");
+    test("50.0", "0x32.0#5", "1.69", "0x1.b#5");
+    test("123.0", "0x7b.0#7", "2.094", "0x2.18#7");
+    test("7.0", "0x7.0#3", "0.88", "0x0.e#3");
+    test("0.12", "0x0.2#1", "-1.0", "-0x1.0#1");
     test(
         "3.1415926535897931",
         "0x3.243f6a8885a30#53",
@@ -101,11 +101,11 @@ fn test_log_base_10() {
         "0x0.7f4536cc6e8eec#53",
     );
     test("-5.0", "-0x5.0#3", "NaN", "NaN");
-    test("3.0e301", "0x3.0E+250#2", "3.0e2", "0x1.0E+2#2");
+    test("3.2e301", "0x3.0E+250#2", "2.6e2", "0x1.0E+2#2");
     test("10.0", "0xa.0#3", "1.0", "0x1.0#3");
-    test("100.0", "0x64.0#5", "2.0", "0x2.0#5");
-    test("1.0e3", "0x3e8.0#7", "3.0", "0x3.00#7");
-    test("1.0e6", "0xf.424E+4#14", "6.0", "0x6.000#14");
+    test("100.0", "0x64.0#5", "2.00", "0x2.0#5");
+    test("1000.0", "0x3e8.0#7", "3.000", "0x3.00#7");
+    test("1.00000e6", "0xf.424E+4#14", "6.00000", "0x6.000#14");
 }
 
 #[test]
@@ -173,13 +173,13 @@ fn test_log_base_10_prec() {
     test("-1.0", "-0x1.0#1", 10, "NaN", "NaN", Equal);
     test("-1.0", "-0x1.0#1", 53, "NaN", "NaN", Equal);
     test("-1.0", "-0x1.0#1", 100, "NaN", "NaN", Equal);
-    test("2.0", "0x2.0#1", 1, "0.2", "0x0.4#1", Less);
-    test("2.0", "0x2.0#1", 10, "0.3013", "0x0.4d2#10", Greater);
+    test("2.0", "0x2.0#1", 1, "0.25", "0x0.4#1", Less);
+    test("2.0", "0x2.0#1", 10, "0.30127", "0x0.4d2#10", Greater);
     test(
         "2.0",
         "0x2.0#1",
         53,
-        "0.3010299956639812",
+        "0.30102999566398120",
         "0x0.4d104d427de7fc#53",
         Greater,
     );
@@ -187,12 +187,12 @@ fn test_log_base_10_prec() {
         "2.0",
         "0x2.0#1",
         100,
-        "0.3010299956639811952137388947246",
+        "0.30102999566398119521373889472460",
         "0x0.4d104d427de7fbcc47c4acd608#100",
         Greater,
     );
     test("50.0", "0x32.0#5", 1, "2.0", "0x2.0#1", Greater);
-    test("50.0", "0x32.0#5", 10, "1.699", "0x1.b30#10", Greater);
+    test("50.0", "0x32.0#5", 10, "1.6992", "0x1.b30#10", Greater);
     test(
         "50.0",
         "0x32.0#5",
@@ -205,12 +205,12 @@ fn test_log_base_10_prec() {
         "50.0",
         "0x32.0#5",
         100,
-        "1.698970004336018804786261105276",
+        "1.6989700043360188047862611052758",
         "0x1.b2efb2bd82180433b83b532a0#100",
         Greater,
     );
     test("123.0", "0x7b.0#7", 1, "2.0", "0x2.0#1", Less);
-    test("123.0", "0x7b.0#7", 10, "2.09", "0x2.17#10", Less);
+    test("123.0", "0x7b.0#7", 10, "2.0898", "0x2.17#10", Less);
     test(
         "123.0",
         "0x7b.0#7",
@@ -223,17 +223,17 @@ fn test_log_base_10_prec() {
         "123.0",
         "0x7b.0#7",
         100,
-        "2.089905111439397931804439753222",
+        "2.0899051114393979318044397532222",
         "0x2.17040579601d77164f7c690d4#100",
         Less,
     );
     test("7.0", "0x7.0#3", 1, "1.0", "0x1.0#1", Greater);
-    test("7.0", "0x7.0#3", 10, "0.845", "0x0.d84#10", Less);
+    test("7.0", "0x7.0#3", 10, "0.84473", "0x0.d84#10", Less);
     test(
         "7.0",
         "0x7.0#3",
         53,
-        "0.8450980400142568",
+        "0.84509804001425681",
         "0x0.d858585bc661f8#53",
         Less,
     );
@@ -241,25 +241,25 @@ fn test_log_base_10_prec() {
         "7.0",
         "0x7.0#3",
         100,
-        "0.8450980400142568307122162585923",
+        "0.84509804001425683071221625859234",
         "0x0.d858585bc661f94b692ff8a80#100",
         Less,
     );
-    test("0.1", "0x0.2#1", 1, "-1.0", "-0x1.0#1", Less);
-    test("0.1", "0x0.2#1", 10, "-0.903", "-0x0.e74#10", Less);
+    test("0.12", "0x0.2#1", 1, "-1.0", "-0x1.0#1", Less);
+    test("0.12", "0x0.2#1", 10, "-0.90332", "-0x0.e74#10", Less);
     test(
-        "0.1",
+        "0.12",
         "0x0.2#1",
         53,
-        "-0.9030899869919435",
+        "-0.90308998699194354",
         "-0x0.e730e7c779b7f0#53",
         Greater,
     );
     test(
-        "0.1",
+        "0.12",
         "0x0.2#1",
         100,
-        "-0.9030899869919435856412166841734",
+        "-0.90308998699194358564121668417342",
         "-0x0.e730e7c779b7f364d74e06821#100",
         Greater,
     );
@@ -267,7 +267,7 @@ fn test_log_base_10_prec() {
         "3.1415926535897931",
         "0x3.243f6a8885a30#53",
         1,
-        "0.5",
+        "0.50",
         "0x0.8#1",
         Greater,
     );
@@ -275,7 +275,7 @@ fn test_log_base_10_prec() {
         "3.1415926535897931",
         "0x3.243f6a8885a30#53",
         10,
-        "0.4971",
+        "0.49707",
         "0x0.7f4#10",
         Less,
     );
@@ -291,7 +291,7 @@ fn test_log_base_10_prec() {
         "3.1415926535897931",
         "0x3.243f6a8885a30#53",
         100,
-        "0.4971498726941338374217231245522",
+        "0.49714987269413383742172312455219",
         "0x0.7f4536cc6e8eeacae4696b9e08#100",
         Less,
     );
@@ -299,10 +299,10 @@ fn test_log_base_10_prec() {
     test("-5.0", "-0x5.0#3", 10, "NaN", "NaN", Equal);
     test("-5.0", "-0x5.0#3", 53, "NaN", "NaN", Equal);
     test("-5.0", "-0x5.0#3", 100, "NaN", "NaN", Equal);
-    test("3.0e301", "0x3.0E+250#2", 1, "3.0e2", "0x1.0E+2#1", Less);
-    test("3.0e301", "0x3.0E+250#2", 10, "301.5", "0x12d.8#10", Less);
+    test("3.2e301", "0x3.0E+250#2", 1, "2.6e2", "0x1.0E+2#1", Less);
+    test("3.2e301", "0x3.0E+250#2", 10, "301.50", "0x12d.8#10", Less);
     test(
-        "3.0e301",
+        "3.2e301",
         "0x3.0E+250#2",
         53,
         "301.50711691870083",
@@ -310,17 +310,24 @@ fn test_log_base_10_prec() {
         Less,
     );
     test(
-        "3.0e301",
+        "3.2e301",
         "0x3.0E+250#2",
         100,
-        "301.5071169187008576510339226277",
+        "301.50711691870085765103392262766",
         "0x12d.81d26a1511878a1b645032a#100",
         Less,
     );
-    test("10.0", "0xa.0#3", 10, "1.0", "0x1.000#10", Equal);
-    test("100.0", "0x64.0#5", 10, "2.0", "0x2.00#10", Equal);
-    test("1.0e3", "0x3e8.0#7", 10, "3.0", "0x3.00#10", Equal);
-    test("1.0e6", "0xf.424E+4#14", 10, "6.0", "0x6.00#10", Equal);
+    test("10.0", "0xa.0#3", 10, "1.0000", "0x1.000#10", Equal);
+    test("100.0", "0x64.0#5", 10, "2.0000", "0x2.00#10", Equal);
+    test("1000.0", "0x3e8.0#7", 10, "3.0000", "0x3.00#10", Equal);
+    test(
+        "1.00000e6",
+        "0xf.424E+4#14",
+        10,
+        "6.0000",
+        "0x6.00#10",
+        Equal,
+    );
 }
 
 #[test]
@@ -412,36 +419,36 @@ fn test_log_base_10_round() {
     test("-1.0", "-0x1.0#1", Down, "NaN", "NaN", Equal);
     test("-1.0", "-0x1.0#1", Up, "NaN", "NaN", Equal);
     test("-1.0", "-0x1.0#1", Nearest, "NaN", "NaN", Equal);
-    test("2.0", "0x2.0#1", Floor, "0.2", "0x0.4#1", Less);
-    test("2.0", "0x2.0#1", Ceiling, "0.5", "0x0.8#1", Greater);
-    test("2.0", "0x2.0#1", Down, "0.2", "0x0.4#1", Less);
-    test("2.0", "0x2.0#1", Up, "0.5", "0x0.8#1", Greater);
-    test("2.0", "0x2.0#1", Nearest, "0.2", "0x0.4#1", Less);
-    test("50.0", "0x32.0#5", Floor, "1.7", "0x1.b#5", Less);
+    test("2.0", "0x2.0#1", Floor, "0.25", "0x0.4#1", Less);
+    test("2.0", "0x2.0#1", Ceiling, "0.50", "0x0.8#1", Greater);
+    test("2.0", "0x2.0#1", Down, "0.25", "0x0.4#1", Less);
+    test("2.0", "0x2.0#1", Up, "0.50", "0x0.8#1", Greater);
+    test("2.0", "0x2.0#1", Nearest, "0.25", "0x0.4#1", Less);
+    test("50.0", "0x32.0#5", Floor, "1.69", "0x1.b#5", Less);
     test("50.0", "0x32.0#5", Ceiling, "1.75", "0x1.c#5", Greater);
-    test("50.0", "0x32.0#5", Down, "1.7", "0x1.b#5", Less);
+    test("50.0", "0x32.0#5", Down, "1.69", "0x1.b#5", Less);
     test("50.0", "0x32.0#5", Up, "1.75", "0x1.c#5", Greater);
-    test("50.0", "0x32.0#5", Nearest, "1.7", "0x1.b#5", Less);
-    test("123.0", "0x7b.0#7", Floor, "2.06", "0x2.10#7", Less);
-    test("123.0", "0x7b.0#7", Ceiling, "2.09", "0x2.18#7", Greater);
-    test("123.0", "0x7b.0#7", Down, "2.06", "0x2.10#7", Less);
-    test("123.0", "0x7b.0#7", Up, "2.09", "0x2.18#7", Greater);
-    test("123.0", "0x7b.0#7", Nearest, "2.09", "0x2.18#7", Greater);
-    test("7.0", "0x7.0#3", Floor, "0.8", "0x0.c#3", Less);
-    test("7.0", "0x7.0#3", Ceiling, "0.9", "0x0.e#3", Greater);
-    test("7.0", "0x7.0#3", Down, "0.8", "0x0.c#3", Less);
-    test("7.0", "0x7.0#3", Up, "0.9", "0x0.e#3", Greater);
-    test("7.0", "0x7.0#3", Nearest, "0.9", "0x0.e#3", Greater);
-    test("0.1", "0x0.2#1", Floor, "-1.0", "-0x1.0#1", Less);
-    test("0.1", "0x0.2#1", Ceiling, "-0.5", "-0x0.8#1", Greater);
-    test("0.1", "0x0.2#1", Down, "-0.5", "-0x0.8#1", Greater);
-    test("0.1", "0x0.2#1", Up, "-1.0", "-0x1.0#1", Less);
-    test("0.1", "0x0.2#1", Nearest, "-1.0", "-0x1.0#1", Less);
+    test("50.0", "0x32.0#5", Nearest, "1.69", "0x1.b#5", Less);
+    test("123.0", "0x7b.0#7", Floor, "2.062", "0x2.10#7", Less);
+    test("123.0", "0x7b.0#7", Ceiling, "2.094", "0x2.18#7", Greater);
+    test("123.0", "0x7b.0#7", Down, "2.062", "0x2.10#7", Less);
+    test("123.0", "0x7b.0#7", Up, "2.094", "0x2.18#7", Greater);
+    test("123.0", "0x7b.0#7", Nearest, "2.094", "0x2.18#7", Greater);
+    test("7.0", "0x7.0#3", Floor, "0.75", "0x0.c#3", Less);
+    test("7.0", "0x7.0#3", Ceiling, "0.88", "0x0.e#3", Greater);
+    test("7.0", "0x7.0#3", Down, "0.75", "0x0.c#3", Less);
+    test("7.0", "0x7.0#3", Up, "0.88", "0x0.e#3", Greater);
+    test("7.0", "0x7.0#3", Nearest, "0.88", "0x0.e#3", Greater);
+    test("0.12", "0x0.2#1", Floor, "-1.0", "-0x1.0#1", Less);
+    test("0.12", "0x0.2#1", Ceiling, "-0.50", "-0x0.8#1", Greater);
+    test("0.12", "0x0.2#1", Down, "-0.50", "-0x0.8#1", Greater);
+    test("0.12", "0x0.2#1", Up, "-1.0", "-0x1.0#1", Less);
+    test("0.12", "0x0.2#1", Nearest, "-1.0", "-0x1.0#1", Less);
     test(
         "3.1415926535897931",
         "0x3.243f6a8885a30#53",
         Floor,
-        "0.4971498726941338",
+        "0.49714987269413380",
         "0x0.7f4536cc6e8ee8#53",
         Less,
     );
@@ -457,7 +464,7 @@ fn test_log_base_10_round() {
         "3.1415926535897931",
         "0x3.243f6a8885a30#53",
         Down,
-        "0.4971498726941338",
+        "0.49714987269413380",
         "0x0.7f4536cc6e8ee8#53",
         Less,
     );
@@ -483,42 +490,49 @@ fn test_log_base_10_round() {
     test("-5.0", "-0x5.0#3", Up, "NaN", "NaN", Equal);
     test("-5.0", "-0x5.0#3", Nearest, "NaN", "NaN", Equal);
     test(
-        "3.0e301",
+        "3.2e301",
         "0x3.0E+250#2",
         Floor,
-        "3.0e2",
+        "2.6e2",
         "0x1.0E+2#2",
         Less,
     );
     test(
-        "3.0e301",
+        "3.2e301",
         "0x3.0E+250#2",
         Ceiling,
-        "4.0e2",
+        "3.8e2",
         "0x1.8E+2#2",
         Greater,
     );
-    test("3.0e301", "0x3.0E+250#2", Down, "3.0e2", "0x1.0E+2#2", Less);
+    test("3.2e301", "0x3.0E+250#2", Down, "2.6e2", "0x1.0E+2#2", Less);
     test(
-        "3.0e301",
+        "3.2e301",
         "0x3.0E+250#2",
         Up,
-        "4.0e2",
+        "3.8e2",
         "0x1.8E+2#2",
         Greater,
     );
     test(
-        "3.0e301",
+        "3.2e301",
         "0x3.0E+250#2",
         Nearest,
-        "3.0e2",
+        "2.6e2",
         "0x1.0E+2#2",
         Less,
     );
     test("10.0", "0xa.0#3", Exact, "1.0", "0x1.0#3", Equal);
-    test("100.0", "0x64.0#5", Exact, "2.0", "0x2.0#5", Equal);
-    test("1.0e3", "0x3e8.0#7", Exact, "3.0", "0x3.00#7", Equal);
-    test("1.0e6", "0xf.424E+4#14", Exact, "6.0", "0x6.000#14", Equal);
+    test("100.0", "0x64.0#5", Exact, "2.00", "0x2.0#5", Equal);
+    test("1000.0", "0x3e8.0#7", Exact, "3.000", "0x3.00#7", Equal);
+    test(
+        "1.00000e6",
+        "0xf.424E+4#14",
+        Exact,
+        "6.00000",
+        "0x6.000#14",
+        Equal,
+    );
 }
 
 #[test]
@@ -701,16 +715,16 @@ fn test_log_base_10_prec_round() {
     test("-1.0", "-0x1.0#1", 53, Floor, "NaN", "NaN", Equal);
     test("-1.0", "-0x1.0#1", 53, Ceiling, "NaN", "NaN", Equal);
     test("-1.0", "-0x1.0#1", 53, Nearest, "NaN", "NaN", Equal);
-    test("2.0", "0x2.0#1", 1, Floor, "0.2", "0x0.4#1", Less);
-    test("2.0", "0x2.0#1", 1, Ceiling, "0.5", "0x0.8#1", Greater);
-    test("2.0", "0x2.0#1", 1, Nearest, "0.2", "0x0.4#1", Less);
-    test("2.0", "0x2.0#1", 10, Floor, "0.3008", "0x0.4d0#10", Less);
+    test("2.0", "0x2.0#1", 1, Floor, "0.25", "0x0.4#1", Less);
+    test("2.0", "0x2.0#1", 1, Ceiling, "0.50", "0x0.8#1", Greater);
+    test("2.0", "0x2.0#1", 1, Nearest, "0.25", "0x0.4#1", Less);
+    test("2.0", "0x2.0#1", 10, Floor, "0.30078", "0x0.4d0#10", Less);
     test(
         "2.0",
         "0x2.0#1",
         10,
         Ceiling,
-        "0.3013",
+        "0.30127",
         "0x0.4d2#10",
         Greater,
     );
@@ -719,7 +733,7 @@ fn test_log_base_10_prec_round() {
         "0x2.0#1",
         10,
         Nearest,
-        "0.3013",
+        "0.30127",
         "0x0.4d2#10",
         Greater,
     );
@@ -737,7 +751,7 @@ fn test_log_base_10_prec_round() {
         "0x2.0#1",
         53,
         Ceiling,
-        "0.3010299956639812",
+        "0.30102999566398120",
         "0x0.4d104d427de7fc#53",
         Greater,
     );
@@ -746,20 +760,20 @@ fn test_log_base_10_prec_round() {
         "0x2.0#1",
         53,
         Nearest,
-        "0.3010299956639812",
+        "0.30102999566398120",
         "0x0.4d104d427de7fc#53",
         Greater,
     );
     test("50.0", "0x32.0#5", 1, Floor, "1.0", "0x1.0#1", Less);
     test("50.0", "0x32.0#5", 1, Ceiling, "2.0", "0x2.0#1", Greater);
     test("50.0", "0x32.0#5", 1, Nearest, "2.0", "0x2.0#1", Greater);
-    test("50.0", "0x32.0#5", 10, Floor, "1.697", "0x1.b28#10", Less);
+    test("50.0", "0x32.0#5", 10, Floor, "1.6973", "0x1.b28#10", Less);
     test(
         "50.0",
         "0x32.0#5",
         10,
         Ceiling,
-        "1.699",
+        "1.6992",
         "0x1.b30#10",
         Greater,
     );
@@ -768,7 +782,7 @@ fn test_log_base_10_prec_round() {
         "0x32.0#5",
         10,
         Nearest,
-        "1.699",
+        "1.6992",
         "0x1.b30#10",
         Greater,
     );
@@ -786,7 +800,7 @@ fn test_log_base_10_prec_round() {
         "0x32.0#5",
         53,
         Ceiling,
-        "1.698970004336019",
+        "1.6989700043360190",
         "0x1.b2efb2bd82181#53",
         Greater,
     );
@@ -802,17 +816,25 @@ fn test_log_base_10_prec_round() {
     test("123.0", "0x7b.0#7", 1, Floor, "2.0", "0x2.0#1", Less);
     test("123.0", "0x7b.0#7", 1, Ceiling, "4.0", "0x4.0#1", Greater);
     test("123.0", "0x7b.0#7", 1, Nearest, "2.0", "0x2.0#1", Less);
-    test("123.0", "0x7b.0#7", 10, Floor, "2.09", "0x2.17#10", Less);
+    test("123.0", "0x7b.0#7", 10, Floor, "2.0898", "0x2.17#10", Less);
     test(
         "123.0",
         "0x7b.0#7",
         10,
         Ceiling,
-        "2.094",
+        "2.0938",
         "0x2.18#10",
         Greater,
     );
-    test("123.0", "0x7b.0#7", 10, Nearest, "2.09", "0x2.17#10", Less);
+    test(
+        "123.0",
+        "0x7b.0#7",
+        10,
+        Nearest,
+        "2.0898",
+        "0x2.17#10",
+        Less,
+    );
     test(
         "123.0",
         "0x7b.0#7",
@@ -840,26 +862,26 @@ fn test_log_base_10_prec_round() {
         "0x2.17040579601d8#53",
         Greater,
     );
-    test("7.0", "0x7.0#3", 1, Floor, "0.5", "0x0.8#1", Less);
+    test("7.0", "0x7.0#3", 1, Floor, "0.50", "0x0.8#1", Less);
     test("7.0", "0x7.0#3", 1, Ceiling, "1.0", "0x1.0#1", Greater);
     test("7.0", "0x7.0#3", 1, Nearest, "1.0", "0x1.0#1", Greater);
-    test("7.0", "0x7.0#3", 10, Floor, "0.845", "0x0.d84#10", Less);
+    test("7.0", "0x7.0#3", 10, Floor, "0.84473", "0x0.d84#10", Less);
     test(
         "7.0",
         "0x7.0#3",
         10,
         Ceiling,
-        "0.846",
+        "0.84570",
         "0x0.d88#10",
         Greater,
     );
-    test("7.0", "0x7.0#3", 10, Nearest, "0.845", "0x0.d84#10", Less);
+    test("7.0", "0x7.0#3", 10, Nearest, "0.84473", "0x0.d84#10", Less);
     test(
         "7.0",
         "0x7.0#3",
         53,
         Floor,
-        "0.8450980400142568",
+        "0.84509804001425681",
         "0x0.d858585bc661f8#53",
         Less,
     );
@@ -868,7 +890,7 @@ fn test_log_base_10_prec_round() {
         "0x7.0#3",
         53,
         Ceiling,
-        "0.8450980400142569",
+        "0.84509804001425692",
         "0x0.d858585bc66200#53",
         Greater,
     );
@@ -877,48 +899,64 @@ fn test_log_base_10_prec_round() {
         "0x7.0#3",
         53,
         Nearest,
-        "0.8450980400142568",
+        "0.84509804001425681",
         "0x0.d858585bc661f8#53",
         Less,
     );
-    test("0.1", "0x0.2#1", 1, Floor, "-1.0", "-0x1.0#1", Less);
-    test("0.1", "0x0.2#1", 1, Ceiling, "-0.5", "-0x0.8#1", Greater);
-    test("0.1", "0x0.2#1", 1, Nearest, "-1.0", "-0x1.0#1", Less);
-    test("0.1", "0x0.2#1", 10, Floor, "-0.903", "-0x0.e74#10", Less);
+    test("0.12", "0x0.2#1", 1, Floor, "-1.0", "-0x1.0#1", Less);
+    test("0.12", "0x0.2#1", 1, Ceiling, "-0.50", "-0x0.8#1", Greater);
+    test("0.12", "0x0.2#1", 1, Nearest, "-1.0", "-0x1.0#1", Less);
     test(
-        "0.1",
+        "0.12",
+        "0x0.2#1",
+        10,
+        Floor,
+        "-0.90332",
+        "-0x0.e74#10",
+        Less,
+    );
+    test(
+        "0.12",
         "0x0.2#1",
         10,
         Ceiling,
-        "-0.902",
+        "-0.90234",
         "-0x0.e70#10",
         Greater,
     );
-    test("0.1", "0x0.2#1", 10, Nearest, "-0.903", "-0x0.e74#10", Less);
     test(
-        "0.1",
+        "0.12",
+        "0x0.2#1",
+        10,
+        Nearest,
+        "-0.90332",
+        "-0x0.e74#10",
+        Less,
+    );
+    test(
+        "0.12",
         "0x0.2#1",
         53,
         Floor,
-        "-0.9030899869919436",
+        "-0.90308998699194365",
         "-0x0.e730e7c779b7f8#53",
         Less,
     );
     test(
-        "0.1",
+        "0.12",
         "0x0.2#1",
         53,
         Ceiling,
-        "-0.9030899869919435",
+        "-0.90308998699194354",
         "-0x0.e730e7c779b7f0#53",
         Greater,
     );
     test(
-        "0.1",
+        "0.12",
         "0x0.2#1",
         53,
         Nearest,
-        "-0.9030899869919435",
+        "-0.90308998699194354",
         "-0x0.e730e7c779b7f0#53",
         Greater,
     );
@@ -927,7 +965,7 @@ fn test_log_base_10_prec_round() {
         "0x3.243f6a8885a30#53",
         1,
         Floor,
-        "0.2",
+        "0.25",
         "0x0.4#1",
         Less,
     );
@@ -936,7 +974,7 @@ fn test_log_base_10_prec_round() {
         "0x3.243f6a8885a30#53",
         1,
         Ceiling,
-        "0.5",
+        "0.50",
         "0x0.8#1",
         Greater,
     );
@@ -945,7 +983,7 @@ fn test_log_base_10_prec_round() {
         "0x3.243f6a8885a30#53",
         1,
         Nearest,
-        "0.5",
+        "0.50",
         "0x0.8#1",
         Greater,
     );
@@ -954,7 +992,7 @@ fn test_log_base_10_prec_round() {
         "0x3.243f6a8885a30#53",
         10,
         Floor,
-        "0.4971",
+        "0.49707",
         "0x0.7f4#10",
         Less,
     );
@@ -963,7 +1001,7 @@ fn test_log_base_10_prec_round() {
         "0x3.243f6a8885a30#53",
         10,
         Ceiling,
-        "0.4976",
+        "0.49756",
         "0x0.7f6#10",
         Greater,
     );
@@ -972,7 +1010,7 @@ fn test_log_base_10_prec_round() {
         "0x3.243f6a8885a30#53",
         10,
         Nearest,
-        "0.4971",
+        "0.49707",
         "0x0.7f4#10",
         Less,
     );
@@ -981,7 +1019,7 @@ fn test_log_base_10_prec_round() {
         "0x3.243f6a8885a30#53",
         53,
         Floor,
-        "0.4971498726941338",
+        "0.49714987269413380",
         "0x0.7f4536cc6e8ee8#53",
         Less,
     );
@@ -1013,61 +1051,61 @@ fn test_log_base_10_prec_round() {
     test("-5.0", "-0x5.0#3", 53, Ceiling, "NaN", "NaN", Equal);
     test("-5.0", "-0x5.0#3", 53, Nearest, "NaN", "NaN", Equal);
     test(
-        "3.0e301",
+        "3.2e301",
         "0x3.0E+250#2",
         1,
         Floor,
-        "3.0e2",
+        "2.6e2",
         "0x1.0E+2#1",
         Less,
     );
     test(
-        "3.0e301",
+        "3.2e301",
         "0x3.0E+250#2",
         1,
         Ceiling,
-        "5.0e2",
+        "5.1e2",
         "0x2.0E+2#1",
         Greater,
     );
     test(
-        "3.0e301",
+        "3.2e301",
         "0x3.0E+250#2",
         1,
         Nearest,
-        "3.0e2",
+        "2.6e2",
         "0x1.0E+2#1",
         Less,
     );
     test(
-        "3.0e301",
+        "3.2e301",
         "0x3.0E+250#2",
         10,
         Floor,
-        "301.5",
+        "301.50",
         "0x12d.8#10",
         Less,
     );
     test(
-        "3.0e301",
+        "3.2e301",
         "0x3.0E+250#2",
         10,
         Ceiling,
-        "302.0",
+        "302.00",
         "0x12e.0#10",
         Greater,
     );
     test(
-        "3.0e301",
+        "3.2e301",
         "0x3.0E+250#2",
         10,
         Nearest,
-        "301.5",
+        "301.50",
         "0x12d.8#10",
         Less,
     );
     test(
-        "3.0e301",
+        "3.2e301",
         "0x3.0E+250#2",
         53,
         Floor,
@@ -1076,7 +1114,7 @@ fn test_log_base_10_prec_round() {
         Less,
     );
     test(
-        "3.0e301",
+        "3.2e301",
         "0x3.0E+250#2",
         53,
         Ceiling,
@@ -1085,7 +1123,7 @@ fn test_log_base_10_prec_round() {
         Greater,
     );
     test(
-        "3.0e301",
+        "3.2e301",
         "0x3.0E+250#2",
         53,
         Nearest,
@@ -1093,51 +1131,115 @@ fn test_log_base_10_prec_round() {
         "0x12d.81d26a15118#53",
         Less,
     );
-    test("10.0", "0xa.0#3", 10, Floor, "1.0", "0x1.000#10", Equal);
-    test("10.0", "0xa.0#3", 10, Ceiling, "1.0", "0x1.000#10", Equal);
-    test("10.0", "0xa.0#3", 10, Nearest, "1.0", "0x1.000#10", Equal);
-    test("10.0", "0xa.0#3", 10, Exact, "1.0", "0x1.000#10", Equal);
-    test("100.0", "0x64.0#5", 10, Floor, "2.0", "0x2.00#10", Equal);
-    test("100.0", "0x64.0#5", 10, Ceiling, "2.0", "0x2.00#10", Equal);
-    test("100.0", "0x64.0#5", 10, Nearest, "2.0", "0x2.00#10", Equal);
-    test("100.0", "0x64.0#5", 10, Exact, "2.0", "0x2.00#10", Equal);
-    test("1.0e3", "0x3e8.0#7", 10, Floor, "3.0", "0x3.00#10", Equal);
-    test("1.0e3", "0x3e8.0#7", 10, Ceiling, "3.0", "0x3.00#10", Equal);
-    test("1.0e3", "0x3e8.0#7", 10, Nearest, "3.0", "0x3.00#10", Equal);
-    test("1.0e3", "0x3e8.0#7", 10, Exact, "3.0", "0x3.00#10", Equal);
+    test("10.0", "0xa.0#3", 10, Floor, "1.0000", "0x1.000#10", Equal);
     test(
-        "1.0e6",
+        "10.0",
+        "0xa.0#3",
+        10,
+        Ceiling,
+        "1.0000",
+        "0x1.000#10",
+        Equal,
+    );
+    test(
+        "10.0",
+        "0xa.0#3",
+        10,
+        Nearest,
+        "1.0000",
+        "0x1.000#10",
+        Equal,
+    );
+    test("10.0", "0xa.0#3", 10, Exact, "1.0000", "0x1.000#10", Equal);
+    test("100.0", "0x64.0#5", 10, Floor, "2.0000", "0x2.00#10", Equal);
+    test(
+        "100.0",
+        "0x64.0#5",
+        10,
+        Ceiling,
+        "2.0000",
+        "0x2.00#10",
+        Equal,
+    );
+    test(
+        "100.0",
+        "0x64.0#5",
+        10,
+        Nearest,
+        "2.0000",
+        "0x2.00#10",
+        Equal,
+    );
+    test("100.0", "0x64.0#5", 10, Exact, "2.0000", "0x2.00#10", Equal);
+    test(
+        "1000.0",
+        "0x3e8.0#7",
+        10,
+        Floor,
+        "3.0000",
+        "0x3.00#10",
+        Equal,
+    );
+    test(
+        "1000.0",
+        "0x3e8.0#7",
+        10,
+        Ceiling,
+        "3.0000",
+        "0x3.00#10",
+        Equal,
+    );
+    test(
+        "1000.0",
+        "0x3e8.0#7",
+        10,
+        Nearest,
+        "3.0000",
+        "0x3.00#10",
+        Equal,
+    );
+    test(
+        "1000.0",
+        "0x3e8.0#7",
+        10,
+        Exact,
+        "3.0000",
+        "0x3.00#10",
+        Equal,
+    );
+    test(
+        "1.00000e6",
         "0xf.424E+4#14",
         10,
         Floor,
-        "6.0",
+        "6.0000",
         "0x6.00#10",
         Equal,
     );
     test(
-        "1.0e6",
+        "1.00000e6",
         "0xf.424E+4#14",
         10,
         Ceiling,
-        "6.0",
+        "6.0000",
         "0x6.00#10",
         Equal,
     );
     test(
-        "1.0e6",
+        "1.00000e6",
         "0xf.424E+4#14",
         10,
         Nearest,
-        "6.0",
+        "6.0000",
         "0x6.00#10",
         Equal,
     );
     test(
-        "1.0e6",
+        "1.00000e6",
         "0xf.424E+4#14",
         10,
         Exact,
-        "6.0",
+        "6.0000",
         "0x6.00#10",
         Equal,
     );
@@ -1598,11 +1700,12 @@ fn log_base_10_rational_prec_properties() {
 
 #[test]
 fn test_log_base_10_rational_prec_round() {
-    let test = |n: i64, d: u64, prec: u64, rm: RoundingMode, out: &str, o_out: Ordering| {
+    let test = |n: i64, d: u64, prec: u64, rm: RoundingMode, out: &str, out_hex: &str, o_out: Ordering| {
         let x = Rational::from_signeds(n, i64::exact_from(d));
         let (log, o) = Float::log_base_10_rational_prec_round(x.clone(), prec, rm);
         assert!(log.is_valid());
         assert_eq!(log.to_string(), out);
+        assert_eq!(to_hex_string(&log), out_hex);
         assert_eq!(o, o_out);
         let (log_alt, o_alt) = Float::log_base_10_rational_prec_round_ref(&x, prec, rm);
         assert_eq!(ComparableFloatRef(&log_alt), ComparableFloatRef(&log));
@@ -1616,71 +1719,72 @@ fn test_log_base_10_rational_prec_round() {
             assert_eq!(ro, o);
         }
     };
-    test(3, 5, 20, Floor, "-0.221849", Less);
-    test(3, 5, 20, Ceiling, "-0.2218487", Greater);
-    test(3, 5, 20, Nearest, "-0.2218487", Greater);
-    test(2, 1, 20, Floor, "0.3010297", Less);
-    test(2, 1, 20, Ceiling, "0.3010302", Greater);
-    test(2, 1, 20, Nearest, "0.3010302", Greater);
-    test(1, 8, 20, Floor, "-0.9030905", Less);
-    test(1, 8, 20, Ceiling, "-0.9030895", Greater);
-    test(1, 8, 20, Nearest, "-0.9030895", Greater);
-    test(7, 1, 30, Floor, "0.845098039", Less);
-    test(7, 1, 30, Ceiling, "0.84509804", Greater);
-    test(7, 1, 30, Nearest, "0.84509804", Greater);
-    test(50, 1, 10, Floor, "1.697", Less);
-    test(50, 1, 10, Ceiling, "1.699", Greater);
-    test(50, 1, 10, Nearest, "1.699", Greater);
-    test(1, 100, 10, Floor, "-2.0", Equal);
-    test(1, 100, 10, Ceiling, "-2.0", Equal);
-    test(1, 100, 10, Nearest, "-2.0", Equal);
-    test(1, 100, 10, Exact, "-2.0", Equal);
-    test(22, 7, 15, Floor, "0.49731", Less);
-    test(22, 7, 15, Ceiling, "0.49733", Greater);
-    test(22, 7, 15, Nearest, "0.49733", Greater);
-    test(1000, 1, 10, Floor, "3.0", Equal);
-    test(1000, 1, 10, Ceiling, "3.0", Equal);
-    test(1000, 1, 10, Nearest, "3.0", Equal);
-    test(1000, 1, 10, Exact, "3.0", Equal);
-    test(10, 1, 10, Floor, "1.0", Equal);
-    test(10, 1, 10, Ceiling, "1.0", Equal);
-    test(10, 1, 10, Nearest, "1.0", Equal);
-    test(10, 1, 10, Exact, "1.0", Equal);
-    test(1, 10, 10, Floor, "-1.0", Equal);
-    test(1, 10, 10, Ceiling, "-1.0", Equal);
-    test(1, 10, 10, Nearest, "-1.0", Equal);
-    test(1, 10, 10, Exact, "-1.0", Equal);
+    test(3, 5, 20, Floor, "-0.22184896", "-0x0.38cb18#20", Less);
+    test(3, 5, 20, Ceiling, "-0.22184873", "-0x0.38cb14#20", Greater);
+    test(3, 5, 20, Nearest, "-0.22184873", "-0x0.38cb14#20", Greater);
+    test(2, 1, 20, Floor, "0.30102968", "0x0.4d1048#20", Less);
+    test(2, 1, 20, Ceiling, "0.30103016", "0x0.4d1050#20", Greater);
+    test(2, 1, 20, Nearest, "0.30103016", "0x0.4d1050#20", Greater);
+    test(1, 8, 20, Floor, "-0.90309048", "-0x0.e730f#20", Less);
+    test(1, 8, 20, Ceiling, "-0.90308952", "-0x0.e730e#20", Greater);
+    test(1, 8, 20, Nearest, "-0.90308952", "-0x0.e730e#20", Greater);
+    test(7, 1, 30, Floor, "0.84509803914", "0x0.d8585858#30", Less);
+    test(7, 1, 30, Ceiling, "0.84509804007", "0x0.d858585c#30", Greater);
+    test(7, 1, 30, Nearest, "0.84509804007", "0x0.d858585c#30", Greater);
+    test(50, 1, 10, Floor, "1.6973", "0x1.b28#10", Less);
+    test(50, 1, 10, Ceiling, "1.6992", "0x1.b30#10", Greater);
+    test(50, 1, 10, Nearest, "1.6992", "0x1.b30#10", Greater);
+    test(1, 100, 10, Floor, "-2.0000", "-0x2.00#10", Equal);
+    test(1, 100, 10, Ceiling, "-2.0000", "-0x2.00#10", Equal);
+    test(1, 100, 10, Nearest, "-2.0000", "-0x2.00#10", Equal);
+    test(1, 100, 10, Exact, "-2.0000", "-0x2.00#10", Equal);
+    test(22, 7, 15, Floor, "0.497314", "0x0.7f50#15", Less);
+    test(22, 7, 15, Ceiling, "0.497330", "0x0.7f51#15", Greater);
+    test(22, 7, 15, Nearest, "0.497330", "0x0.7f51#15", Greater);
+    test(1000, 1, 10, Floor, "3.0000", "0x3.00#10", Equal);
+    test(1000, 1, 10, Ceiling, "3.0000", "0x3.00#10", Equal);
+    test(1000, 1, 10, Nearest, "3.0000", "0x3.00#10", Equal);
+    test(1000, 1, 10, Exact, "3.0000", "0x3.00#10", Equal);
+    test(10, 1, 10, Floor, "1.0000", "0x1.000#10", Equal);
+    test(10, 1, 10, Ceiling, "1.0000", "0x1.000#10", Equal);
+    test(10, 1, 10, Nearest, "1.0000", "0x1.000#10", Equal);
+    test(10, 1, 10, Exact, "1.0000", "0x1.000#10", Equal);
+    test(1, 10, 10, Floor, "-1.0000", "-0x1.000#10", Equal);
+    test(1, 10, 10, Ceiling, "-1.0000", "-0x1.000#10", Equal);
+    test(1, 10, 10, Nearest, "-1.0000", "-0x1.000#10", Equal);
+    test(1, 10, 10, Exact, "-1.0000", "-0x1.000#10", Equal);
     // Special cases.
-    test(0, 1, 10, Nearest, "-Infinity", Equal);
-    test(0, 1, 10, Exact, "-Infinity", Equal);
-    test(-3, 1, 10, Nearest, "NaN", Equal);
-    test(1, 1, 10, Exact, "0.0", Equal);
+    test(0, 1, 10, Nearest, "-Infinity", "-Infinity", Equal);
+    test(0, 1, 10, Exact, "-Infinity", "-Infinity", Equal);
+    test(-3, 1, 10, Nearest, "NaN", "NaN", Equal);
+    test(1, 1, 10, Exact, "0.0", "0x0.0", Equal);
 }
 
 #[test]
 fn test_log_base_10_rational_prec() {
-    let test = |n: i64, d: u64, prec: u64, out: &str, o_out: Ordering| {
+    let test = |n: i64, d: u64, prec: u64, out: &str, out_hex: &str, o_out: Ordering| {
         let x = Rational::from_signeds(n, i64::exact_from(d));
         let (log, o) = Float::log_base_10_rational_prec(x.clone(), prec);
         assert!(log.is_valid());
         assert_eq!(log.to_string(), out);
+        assert_eq!(to_hex_string(&log), out_hex);
         assert_eq!(o, o_out);
         let (log_alt, o_alt) = Float::log_base_10_rational_prec_ref(&x, prec);
         assert_eq!(ComparableFloatRef(&log_alt), ComparableFloatRef(&log));
         assert_eq!(o_alt, o);
     };
-    test(3, 5, 20, "-0.2218487", Greater);
-    test(2, 1, 20, "0.3010302", Greater);
-    test(1, 8, 20, "-0.9030895", Greater);
-    test(7, 1, 30, "0.84509804", Greater);
-    test(50, 1, 10, "1.699", Greater);
-    test(1, 100, 10, "-2.0", Equal);
-    test(22, 7, 15, "0.49733", Greater);
-    test(1000, 1, 10, "3.0", Equal);
-    test(10, 1, 10, "1.0", Equal);
-    test(1, 10, 10, "-1.0", Equal);
-    test(0, 1, 10, "-Infinity", Equal);
-    test(1, 1, 10, "0.0", Equal);
+    test(3, 5, 20, "-0.22184873", "-0x0.38cb14#20", Greater);
+    test(2, 1, 20, "0.30103016", "0x0.4d1050#20", Greater);
+    test(1, 8, 20, "-0.90308952", "-0x0.e730e#20", Greater);
+    test(7, 1, 30, "0.84509804007", "0x0.d858585c#30", Greater);
+    test(50, 1, 10, "1.6992", "0x1.b30#10", Greater);
+    test(1, 100, 10, "-2.0000", "-0x2.00#10", Equal);
+    test(22, 7, 15, "0.497330", "0x0.7f51#15", Greater);
+    test(1000, 1, 10, "3.0000", "0x3.00#10", Equal);
+    test(10, 1, 10, "1.0000", "0x1.000#10", Equal);
+    test(1, 10, 10, "-1.0000", "-0x1.000#10", Equal);
+    test(0, 1, 10, "-Infinity", "-Infinity", Equal);
+    test(1, 1, 10, "0.0", "0x0.0", Equal);
 }
 
 #[test]

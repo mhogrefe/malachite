@@ -282,27 +282,27 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (p, o) = Float::power_of_2_of_float_prec_round(Float::from(1.5), 5, Floor);
-    /// assert_eq!(p.to_string(), "2.8");
+    /// assert_eq!(p.to_string(), "2.75");
     /// assert_eq!(o, Less);
     ///
     /// let (p, o) = Float::power_of_2_of_float_prec_round(Float::from(1.5), 5, Ceiling);
-    /// assert_eq!(p.to_string(), "2.9");
+    /// assert_eq!(p.to_string(), "2.88");
     /// assert_eq!(o, Greater);
     ///
     /// let (p, o) = Float::power_of_2_of_float_prec_round(Float::from(1.5), 5, Nearest);
-    /// assert_eq!(p.to_string(), "2.9");
+    /// assert_eq!(p.to_string(), "2.88");
     /// assert_eq!(o, Greater);
     ///
     /// let (p, o) = Float::power_of_2_of_float_prec_round(Float::from(1.5), 20, Floor);
-    /// assert_eq!(p.to_string(), "2.828426");
+    /// assert_eq!(p.to_string(), "2.8284264");
     /// assert_eq!(o, Less);
     ///
     /// let (p, o) = Float::power_of_2_of_float_prec_round(Float::from(1.5), 20, Ceiling);
-    /// assert_eq!(p.to_string(), "2.82843");
+    /// assert_eq!(p.to_string(), "2.8284302");
     /// assert_eq!(o, Greater);
     ///
     /// let (p, o) = Float::power_of_2_of_float_prec_round(Float::from(1.5), 20, Nearest);
-    /// assert_eq!(p.to_string(), "2.828426");
+    /// assert_eq!(p.to_string(), "2.8284264");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -375,27 +375,27 @@ impl Float {
     /// let x = Float::from(1.5);
     ///
     /// let (p, o) = Float::power_of_2_of_float_prec_round_ref(&x, 5, Floor);
-    /// assert_eq!(p.to_string(), "2.8");
+    /// assert_eq!(p.to_string(), "2.75");
     /// assert_eq!(o, Less);
     ///
     /// let (p, o) = Float::power_of_2_of_float_prec_round_ref(&x, 5, Ceiling);
-    /// assert_eq!(p.to_string(), "2.9");
+    /// assert_eq!(p.to_string(), "2.88");
     /// assert_eq!(o, Greater);
     ///
     /// let (p, o) = Float::power_of_2_of_float_prec_round_ref(&x, 5, Nearest);
-    /// assert_eq!(p.to_string(), "2.9");
+    /// assert_eq!(p.to_string(), "2.88");
     /// assert_eq!(o, Greater);
     ///
     /// let (p, o) = Float::power_of_2_of_float_prec_round_ref(&x, 20, Floor);
-    /// assert_eq!(p.to_string(), "2.828426");
+    /// assert_eq!(p.to_string(), "2.8284264");
     /// assert_eq!(o, Less);
     ///
     /// let (p, o) = Float::power_of_2_of_float_prec_round_ref(&x, 20, Ceiling);
-    /// assert_eq!(p.to_string(), "2.82843");
+    /// assert_eq!(p.to_string(), "2.8284302");
     /// assert_eq!(o, Greater);
     ///
     /// let (p, o) = Float::power_of_2_of_float_prec_round_ref(&x, 20, Nearest);
-    /// assert_eq!(p.to_string(), "2.828426");
+    /// assert_eq!(p.to_string(), "2.8284264");
     /// assert_eq!(o, Less);
     /// ```
     pub fn power_of_2_of_float_prec_round_ref(
@@ -470,11 +470,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (p, o) = Float::power_of_2_of_float_prec(Float::from(1.5), 5);
-    /// assert_eq!(p.to_string(), "2.9");
+    /// assert_eq!(p.to_string(), "2.88");
     /// assert_eq!(o, Greater);
     ///
     /// let (p, o) = Float::power_of_2_of_float_prec(Float::from(1.5), 20);
-    /// assert_eq!(p.to_string(), "2.828426");
+    /// assert_eq!(p.to_string(), "2.8284264");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -534,11 +534,11 @@ impl Float {
     /// let x = Float::from(1.5);
     ///
     /// let (p, o) = Float::power_of_2_of_float_prec_ref(&x, 5);
-    /// assert_eq!(p.to_string(), "2.9");
+    /// assert_eq!(p.to_string(), "2.88");
     /// assert_eq!(o, Greater);
     ///
     /// let (p, o) = Float::power_of_2_of_float_prec_ref(&x, 20);
-    /// assert_eq!(p.to_string(), "2.828426");
+    /// assert_eq!(p.to_string(), "2.8284264");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -599,21 +599,21 @@ impl Float {
     ///
     /// let (p, o) =
     ///     Float::power_of_2_of_float_round(Float::from_unsigned_prec(3u32, 100).0 >> 1u32, Floor);
-    /// assert_eq!(p.to_string(), "2.828427124746190097603377448418");
+    /// assert_eq!(p.to_string(), "2.8284271247461900976033774484184");
     /// assert_eq!(o, Less);
     ///
     /// let (p, o) = Float::power_of_2_of_float_round(
     ///     Float::from_unsigned_prec(3u32, 100).0 >> 1u32,
     ///     Ceiling,
     /// );
-    /// assert_eq!(p.to_string(), "2.828427124746190097603377448422");
+    /// assert_eq!(p.to_string(), "2.8284271247461900976033774484215");
     /// assert_eq!(o, Greater);
     ///
     /// let (p, o) = Float::power_of_2_of_float_round(
     ///     Float::from_unsigned_prec(3u32, 100).0 >> 1u32,
     ///     Nearest,
     /// );
-    /// assert_eq!(p.to_string(), "2.828427124746190097603377448418");
+    /// assert_eq!(p.to_string(), "2.8284271247461900976033774484184");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -675,15 +675,15 @@ impl Float {
     /// let x = Float::from_unsigned_prec(3u32, 100).0 >> 1u32;
     ///
     /// let (p, o) = Float::power_of_2_of_float_round_ref(&x, Floor);
-    /// assert_eq!(p.to_string(), "2.828427124746190097603377448418");
+    /// assert_eq!(p.to_string(), "2.8284271247461900976033774484184");
     /// assert_eq!(o, Less);
     ///
     /// let (p, o) = Float::power_of_2_of_float_round_ref(&x, Ceiling);
-    /// assert_eq!(p.to_string(), "2.828427124746190097603377448422");
+    /// assert_eq!(p.to_string(), "2.8284271247461900976033774484215");
     /// assert_eq!(o, Greater);
     ///
     /// let (p, o) = Float::power_of_2_of_float_round_ref(&x, Nearest);
-    /// assert_eq!(p.to_string(), "2.828427124746190097603377448418");
+    /// assert_eq!(p.to_string(), "2.8284271247461900976033774484184");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -739,30 +739,30 @@ impl Float {
     ///
     /// let mut x = Float::from(1.5);
     /// assert_eq!(x.power_of_2_of_float_prec_round_assign(5, Floor), Less);
-    /// assert_eq!(x.to_string(), "2.8");
+    /// assert_eq!(x.to_string(), "2.75");
     ///
     /// let mut x = Float::from(1.5);
     /// assert_eq!(x.power_of_2_of_float_prec_round_assign(5, Ceiling), Greater);
-    /// assert_eq!(x.to_string(), "2.9");
+    /// assert_eq!(x.to_string(), "2.88");
     ///
     /// let mut x = Float::from(1.5);
     /// assert_eq!(x.power_of_2_of_float_prec_round_assign(5, Nearest), Greater);
-    /// assert_eq!(x.to_string(), "2.9");
+    /// assert_eq!(x.to_string(), "2.88");
     ///
     /// let mut x = Float::from(1.5);
     /// assert_eq!(x.power_of_2_of_float_prec_round_assign(20, Floor), Less);
-    /// assert_eq!(x.to_string(), "2.828426");
+    /// assert_eq!(x.to_string(), "2.8284264");
     ///
     /// let mut x = Float::from(1.5);
     /// assert_eq!(
     ///     x.power_of_2_of_float_prec_round_assign(20, Ceiling),
     ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "2.82843");
+    /// assert_eq!(x.to_string(), "2.8284302");
     ///
     /// let mut x = Float::from(1.5);
     /// assert_eq!(x.power_of_2_of_float_prec_round_assign(20, Nearest), Less);
-    /// assert_eq!(x.to_string(), "2.828426");
+    /// assert_eq!(x.to_string(), "2.8284264");
     /// ```
     #[inline]
     pub fn power_of_2_of_float_prec_round_assign(
@@ -818,11 +818,11 @@ impl Float {
     ///
     /// let mut x = Float::from(1.5);
     /// assert_eq!(x.power_of_2_of_float_prec_assign(5), Greater);
-    /// assert_eq!(x.to_string(), "2.9");
+    /// assert_eq!(x.to_string(), "2.88");
     ///
     /// let mut x = Float::from(1.5);
     /// assert_eq!(x.power_of_2_of_float_prec_assign(20), Less);
-    /// assert_eq!(x.to_string(), "2.828426");
+    /// assert_eq!(x.to_string(), "2.8284264");
     /// ```
     #[inline]
     pub fn power_of_2_of_float_prec_assign(&mut self, prec: u64) -> Ordering {
@@ -874,15 +874,15 @@ impl Float {
     ///
     /// let mut x = Float::from_unsigned_prec(3u32, 100).0 >> 1u32;
     /// assert_eq!(x.power_of_2_of_float_round_assign(Floor), Less);
-    /// assert_eq!(x.to_string(), "2.828427124746190097603377448418");
+    /// assert_eq!(x.to_string(), "2.8284271247461900976033774484184");
     ///
     /// let mut x = Float::from_unsigned_prec(3u32, 100).0 >> 1u32;
     /// assert_eq!(x.power_of_2_of_float_round_assign(Ceiling), Greater);
-    /// assert_eq!(x.to_string(), "2.828427124746190097603377448422");
+    /// assert_eq!(x.to_string(), "2.8284271247461900976033774484215");
     ///
     /// let mut x = Float::from_unsigned_prec(3u32, 100).0 >> 1u32;
     /// assert_eq!(x.power_of_2_of_float_round_assign(Nearest), Less);
-    /// assert_eq!(x.to_string(), "2.828427124746190097603377448418");
+    /// assert_eq!(x.to_string(), "2.8284271247461900976033774484184");
     /// ```
     #[inline]
     pub fn power_of_2_of_float_round_assign(&mut self, rm: RoundingMode) -> Ordering {
@@ -945,7 +945,7 @@ impl Float {
     ///
     /// let (p, o) =
     ///     Float::power_of_2_rational_prec_round(Rational::from_unsigneds(3u8, 5), 5, Floor);
-    /// assert_eq!(p.to_string(), "1.5");
+    /// assert_eq!(p.to_string(), "1.50");
     /// assert_eq!(o, Less);
     ///
     /// let (p, o) =
@@ -955,12 +955,12 @@ impl Float {
     ///
     /// let (p, o) =
     ///     Float::power_of_2_rational_prec_round(Rational::from_unsigneds(3u8, 5), 20, Floor);
-    /// assert_eq!(p.to_string(), "1.515717");
+    /// assert_eq!(p.to_string(), "1.5157166");
     /// assert_eq!(o, Less);
     ///
     /// let (p, o) =
     ///     Float::power_of_2_rational_prec_round(Rational::from_unsigneds(3u8, 5), 20, Ceiling);
-    /// assert_eq!(p.to_string(), "1.515718");
+    /// assert_eq!(p.to_string(), "1.5157185");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -1026,7 +1026,7 @@ impl Float {
     ///
     /// let (p, o) =
     ///     Float::power_of_2_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 5, Floor);
-    /// assert_eq!(p.to_string(), "1.5");
+    /// assert_eq!(p.to_string(), "1.50");
     /// assert_eq!(o, Less);
     ///
     /// let (p, o) = Float::power_of_2_rational_prec_round_ref(
@@ -1039,7 +1039,7 @@ impl Float {
     ///
     /// let (p, o) =
     ///     Float::power_of_2_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 20, Floor);
-    /// assert_eq!(p.to_string(), "1.515717");
+    /// assert_eq!(p.to_string(), "1.5157166");
     /// assert_eq!(o, Less);
     ///
     /// let (p, o) = Float::power_of_2_rational_prec_round_ref(
@@ -1047,7 +1047,7 @@ impl Float {
     ///     20,
     ///     Ceiling,
     /// );
-    /// assert_eq!(p.to_string(), "1.515718");
+    /// assert_eq!(p.to_string(), "1.5157185");
     /// assert_eq!(o, Greater);
     /// ```
     pub fn power_of_2_rational_prec_round_ref(
@@ -1118,15 +1118,15 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (p, o) = Float::power_of_2_rational_prec(Rational::from_unsigneds(3u8, 5), 5);
-    /// assert_eq!(p.to_string(), "1.5");
+    /// assert_eq!(p.to_string(), "1.50");
     /// assert_eq!(o, Less);
     ///
     /// let (p, o) = Float::power_of_2_rational_prec(Rational::from_unsigneds(3u8, 5), 20);
-    /// assert_eq!(p.to_string(), "1.515717");
+    /// assert_eq!(p.to_string(), "1.5157166");
     /// assert_eq!(o, Less);
     ///
     /// let (p, o) = Float::power_of_2_rational_prec(Rational::from(0), 10);
-    /// assert_eq!(p.to_string(), "1.0");
+    /// assert_eq!(p.to_string(), "1.0000");
     /// assert_eq!(o, Equal);
     /// ```
     #[inline]
@@ -1179,15 +1179,15 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (p, o) = Float::power_of_2_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 5);
-    /// assert_eq!(p.to_string(), "1.5");
+    /// assert_eq!(p.to_string(), "1.50");
     /// assert_eq!(o, Less);
     ///
     /// let (p, o) = Float::power_of_2_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 20);
-    /// assert_eq!(p.to_string(), "1.515717");
+    /// assert_eq!(p.to_string(), "1.5157166");
     /// assert_eq!(o, Less);
     ///
     /// let (p, o) = Float::power_of_2_rational_prec_ref(&Rational::from(0), 10);
-    /// assert_eq!(p.to_string(), "1.0");
+    /// assert_eq!(p.to_string(), "1.0000");
     /// assert_eq!(o, Equal);
     /// ```
     #[inline]
@@ -1242,7 +1242,7 @@ impl PowerOf2<Self> for Float {
     /// assert_eq!(Float::power_of_2(Float::NEGATIVE_INFINITY), Float::ZERO);
     /// assert_eq!(
     ///     Float::power_of_2(Float::from_unsigned_prec(3u32, 100).0 >> 1u32).to_string(),
-    ///     "2.828427124746190097603377448418"
+    ///     "2.8284271247461900976033774484184"
     /// );
     /// ```
     #[inline]
@@ -1297,7 +1297,7 @@ impl PowerOf2<&Self> for Float {
     /// assert_eq!(Float::power_of_2(&Float::NEGATIVE_INFINITY), Float::ZERO);
     /// assert_eq!(
     ///     Float::power_of_2(&(Float::from_unsigned_prec(3u32, 100).0 >> 1u32)).to_string(),
-    ///     "2.828427124746190097603377448418"
+    ///     "2.8284271247461900976033774484184"
     /// );
     /// ```
     #[inline]
@@ -1342,7 +1342,7 @@ impl PowerOf2Assign for Float {
     ///
     /// let mut x = Float::from_unsigned_prec(3u32, 100).0 >> 1u32;
     /// x.power_of_2_assign();
-    /// assert_eq!(x.to_string(), "2.828427124746190097603377448418");
+    /// assert_eq!(x.to_string(), "2.8284271247461900976033774484184");
     /// ```
     #[inline]
     fn power_of_2_assign(&mut self) {

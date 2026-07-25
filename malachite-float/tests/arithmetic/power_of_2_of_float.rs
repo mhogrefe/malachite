@@ -86,26 +86,34 @@ fn test_power_of_2_of_float_prec_round() {
     test("0.0", "0x0.0", 1, Floor, "1.0", "0x1.0#1", Equal);
     test("-0.0", "-0x0.0", 1, Ceiling, "1.0", "0x1.0#1", Equal);
     // Integer exponents: 2^x is a power of 2, hence exact and rounding-mode-invariant.
-    test("3.0", "0x3.0#2", 10, Nearest, "8.0", "0x8.00#10", Equal);
-    test("3.0", "0x3.0#2", 10, Floor, "8.0", "0x8.00#10", Equal);
-    test("3.0", "0x3.0#2", 10, Ceiling, "8.0", "0x8.00#10", Equal);
-    test("-1.0", "-0x1.0#1", 10, Nearest, "0.5", "0x0.800#10", Equal);
-    test("10.0", "0xa.0#3", 4, Nearest, "1.0e3", "0x4.0E+2#4", Equal);
+    test("3.0", "0x3.0#2", 10, Nearest, "8.0000", "0x8.00#10", Equal);
+    test("3.0", "0x3.0#2", 10, Floor, "8.0000", "0x8.00#10", Equal);
+    test("3.0", "0x3.0#2", 10, Ceiling, "8.0000", "0x8.00#10", Equal);
+    test(
+        "-1.0",
+        "-0x1.0#1",
+        10,
+        Nearest,
+        "0.50000",
+        "0x0.800#10",
+        Equal,
+    );
+    test("10.0", "0xa.0#3", 4, Nearest, "1.02e3", "0x4.0E+2#4", Equal);
     test(
         "-5.0",
         "-0x5.0#3",
         20,
         Nearest,
-        "0.03125",
+        "0.031250000",
         "0x0.080000#20",
         Equal,
     );
     // 2^0.5 = sqrt(2); non-integer with integer part 0, so xfrac = x
-    test("0.5", "0x0.8#1", 1, Floor, "1.0", "0x1.0#1", Less);
-    test("0.5", "0x0.8#1", 1, Ceiling, "2.0", "0x2.0#1", Greater);
-    test("0.5", "0x0.8#1", 1, Nearest, "1.0", "0x1.0#1", Less);
+    test("0.50", "0x0.8#1", 1, Floor, "1.0", "0x1.0#1", Less);
+    test("0.50", "0x0.8#1", 1, Ceiling, "2.0", "0x2.0#1", Greater);
+    test("0.50", "0x0.8#1", 1, Nearest, "1.0", "0x1.0#1", Less);
     test(
-        "0.5",
+        "0.50",
         "0x0.8#1",
         53,
         Nearest,
@@ -115,50 +123,58 @@ fn test_power_of_2_of_float_prec_round() {
     );
     // 2^(-0.5) = 1/sqrt(2)
     test(
-        "-0.5",
+        "-0.50",
         "-0x0.8#1",
         53,
         Nearest,
-        "0.7071067811865476",
+        "0.70710678118654757",
         "0x0.b504f333f9de68#53",
         Greater,
     );
-    test("-0.5", "-0x0.8#1", 10, Floor, "0.707", "0x0.b50#10", Less);
     test(
-        "-0.5",
+        "-0.50",
+        "-0x0.8#1",
+        10,
+        Floor,
+        "0.70703",
+        "0x0.b50#10",
+        Less,
+    );
+    test(
+        "-0.50",
         "-0x0.8#1",
         10,
         Ceiling,
-        "0.708",
+        "0.70801",
         "0x0.b54#10",
         Greater,
     );
     // 2^0.25
     test(
-        "0.2",
+        "0.25",
         "0x0.4#1",
         53,
         Nearest,
-        "1.189207115002721",
+        "1.1892071150027210",
         "0x1.306fe0a31b715#53",
         Less,
     );
     // 2^1.5 = 2 * sqrt(2); non-integer with nonzero integer part (xint = 1), so xfrac = x - 1
-    test("1.5", "0x1.8#2", 10, Nearest, "2.828", "0x2.d4#10", Less);
-    test("1.5", "0x1.8#2", 10, Floor, "2.828", "0x2.d4#10", Less);
+    test("1.5", "0x1.8#2", 10, Nearest, "2.8281", "0x2.d4#10", Less);
+    test("1.5", "0x1.8#2", 10, Floor, "2.8281", "0x2.d4#10", Less);
     // 2^(-1.5); nonzero integer part (xint = -2)
     test(
         "-1.5",
         "-0x1.8#2",
         20,
         Nearest,
-        "0.3535533",
+        "0.35355330",
         "0x0.5a8278#20",
         Less,
     );
     // overflow: x = 2^30 = MAX_EXPONENT + 1, so 2^x exceeds the largest finite Float
     test(
-        "1.0e9",
+        "1.1e9",
         "0x4.0E+7#1",
         20,
         Nearest,
@@ -167,34 +183,34 @@ fn test_power_of_2_of_float_prec_round() {
         Greater,
     );
     test(
-        "1.0e9",
+        "1.1e9",
         "0x4.0E+7#1",
         20,
         Floor,
-        "too_big",
+        "2.0985767e323228496",
         "0x7.ffff8E+268435455#20",
         Less,
     );
     // underflow: x = -2^31 < MIN_EXPONENT - 2, so 2^x rounds to 0 or the smallest positive Float
-    test("-2.0e9", "-0x8.0E+7#1", 20, Nearest, "0.0", "0x0.0", Less);
+    test("-2.1e9", "-0x8.0E+7#1", 20, Nearest, "0.0", "0x0.0", Less);
     test(
-        "-2.0e9",
+        "-2.1e9",
         "-0x8.0E+7#1",
         20,
         Ceiling,
-        "too_small",
+        "2.3825649e-323228497",
         "0x1.00000E-268435456#20",
         Greater,
     );
     // Ziv loop iterates: x = 2^-100 makes 2^x so close to 1 that the initial working precision
     // can't round it
-    test("8.0e-31", "0x1.0E-25#1", 1, Nearest, "1.0", "0x1.0#1", Less);
+    test("7.9e-31", "0x1.0E-25#1", 1, Nearest, "1.0", "0x1.0#1", Less);
     test(
-        "8.0e-31",
+        "7.9e-31",
         "0x1.0E-25#1",
         53,
         Nearest,
-        "1.0",
+        "1.0000000000000000",
         "0x1.0000000000000#53",
         Less,
     );
@@ -202,11 +218,11 @@ fn test_power_of_2_of_float_prec_round() {
     // rounds to 1/2; the unrounded result is the underflow midpoint, rounded up to the smallest
     // positive Float
     test(
-        "-1073741824.5",
+        "-1073741824.5000",
         "-0x40000000.800#40",
         1,
         Nearest,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Greater,
     );
@@ -215,7 +231,7 @@ fn test_power_of_2_of_float_prec_round() {
     // that smallest value. (`shl_prec_round` handles this; a plain `<<` would ignore the rounding
     // mode and always produce the smallest positive value.)
     test(
-        "-1073741824.5",
+        "-1073741824.5000",
         "-0x40000000.800#40",
         1,
         Floor,
@@ -224,7 +240,7 @@ fn test_power_of_2_of_float_prec_round() {
         Less,
     );
     test(
-        "-1073741824.5",
+        "-1073741824.5000",
         "-0x40000000.800#40",
         1,
         Down,
@@ -233,25 +249,25 @@ fn test_power_of_2_of_float_prec_round() {
         Less,
     );
     test(
-        "-1073741824.5",
+        "-1073741824.5000",
         "-0x40000000.800#40",
         1,
         Ceiling,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Greater,
     );
     test(
-        "-1073741824.5",
+        "-1073741824.5000",
         "-0x40000000.800#40",
         1,
         Up,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Greater,
     );
     test(
-        "-1073741824.5",
+        "-1073741824.5000",
         "-0x40000000.800#40",
         20,
         Floor,
@@ -260,11 +276,11 @@ fn test_power_of_2_of_float_prec_round() {
         Less,
     );
     test(
-        "-1073741824.5",
+        "-1073741824.5000",
         "-0x40000000.800#40",
         20,
         Nearest,
-        "too_small",
+        "2.3825649e-323228497",
         "0x1.00000E-268435456#20",
         Greater,
     );
@@ -684,17 +700,23 @@ fn test_power_of_2_rational_prec() {
     };
     // integer x: 2^x is an exact power of 2
     test("0", 1, "1.0", "0x1.0#1", Equal);
-    test("0", 10, "1.0", "0x1.000#10", Equal);
-    test("0", 53, "1.0", "0x1.0000000000000#53", Equal);
+    test("0", 10, "1.0000", "0x1.000#10", Equal);
+    test("0", 53, "1.0000000000000000", "0x1.0000000000000#53", Equal);
     test("1", 1, "2.0", "0x2.0#1", Equal);
-    test("1", 10, "2.0", "0x2.00#10", Equal);
-    test("1", 53, "2.0", "0x2.0000000000000#53", Equal);
-    test("-1", 1, "0.5", "0x0.8#1", Equal);
-    test("-1", 10, "0.5", "0x0.800#10", Equal);
-    test("-1", 53, "0.5", "0x0.80000000000000#53", Equal);
+    test("1", 10, "2.0000", "0x2.00#10", Equal);
+    test("1", 53, "2.0000000000000000", "0x2.0000000000000#53", Equal);
+    test("-1", 1, "0.50", "0x0.8#1", Equal);
+    test("-1", 10, "0.50000", "0x0.800#10", Equal);
+    test(
+        "-1",
+        53,
+        "0.50000000000000000",
+        "0x0.80000000000000#53",
+        Equal,
+    );
     // non-integer x: 2^x is transcendental
     test("1/2", 1, "1.0", "0x1.0#1", Less);
-    test("1/2", 10, "1.414", "0x1.6a0#10", Less);
+    test("1/2", 10, "1.4141", "0x1.6a0#10", Less);
     test(
         "1/2",
         53,
@@ -702,17 +724,17 @@ fn test_power_of_2_rational_prec() {
         "0x1.6a09e667f3bcd#53",
         Greater,
     );
-    test("-1/2", 1, "0.5", "0x0.8#1", Less);
-    test("-1/2", 10, "0.707", "0x0.b50#10", Less);
+    test("-1/2", 1, "0.50", "0x0.8#1", Less);
+    test("-1/2", 10, "0.70703", "0x0.b50#10", Less);
     test(
         "-1/2",
         53,
-        "0.7071067811865476",
+        "0.70710678118654757",
         "0x0.b504f333f9de68#53",
         Greater,
     );
     test("1/3", 1, "1.0", "0x1.0#1", Less);
-    test("1/3", 10, "1.26", "0x1.428#10", Less);
+    test("1/3", 10, "1.2598", "0x1.428#10", Less);
     test(
         "1/3",
         53,
@@ -721,16 +743,16 @@ fn test_power_of_2_rational_prec() {
         Greater,
     );
     test("22/7", 1, "8.0", "0x8.0#1", Less);
-    test("22/7", 10, "8.83", "0x8.d4#10", Less);
+    test("22/7", 10, "8.8281", "0x8.d4#10", Less);
     test(
         "22/7",
         53,
-        "8.832716109390498",
+        "8.8327161093904980",
         "0x8.d52ce208af3e8#53",
         Less,
     );
-    test("-22/7", 1, "0.1", "0x0.2#1", Greater);
-    test("-22/7", 10, "0.1132", "0x0.1cf8#10", Less);
+    test("-22/7", 1, "0.12", "0x0.2#1", Greater);
+    test("-22/7", 10, "0.11316", "0x0.1cf8#10", Less);
     test(
         "-22/7",
         53,
@@ -738,8 +760,8 @@ fn test_power_of_2_rational_prec() {
         "0x0.1cfbb031a741a5#53",
         Greater,
     );
-    test("100", 1, "1.0e30", "0x1.0E+25#1", Equal);
-    test("100", 10, "1.268e30", "0x1.000E+25#10", Equal);
+    test("100", 1, "1.3e30", "0x1.0E+25#1", Equal);
+    test("100", 10, "1.2677e30", "0x1.000E+25#10", Equal);
     test(
         "100",
         53,
@@ -747,12 +769,12 @@ fn test_power_of_2_rational_prec() {
         "0x1.0000000000000E+25#53",
         Equal,
     );
-    test("-100", 1, "8.0e-31", "0x1.0E-25#1", Equal);
-    test("-100", 10, "7.89e-31", "0x1.000E-25#10", Equal);
+    test("-100", 1, "7.9e-31", "0x1.0E-25#1", Equal);
+    test("-100", 10, "7.8886e-31", "0x1.000E-25#10", Equal);
     test(
         "-100",
         53,
-        "7.888609052210118e-31",
+        "7.8886090522101181e-31",
         "0x1.0000000000000E-25#53",
         Equal,
     );
@@ -806,70 +828,70 @@ fn test_power_of_2_rational_prec_round() {
     test("0", 1, Floor, "1.0", "0x1.0#1", Equal);
     test("0", 1, Ceiling, "1.0", "0x1.0#1", Equal);
     test("0", 1, Nearest, "1.0", "0x1.0#1", Equal);
-    test("0", 10, Floor, "1.0", "0x1.000#10", Equal);
-    test("0", 10, Ceiling, "1.0", "0x1.000#10", Equal);
-    test("0", 10, Nearest, "1.0", "0x1.000#10", Equal);
+    test("0", 10, Floor, "1.0000", "0x1.000#10", Equal);
+    test("0", 10, Ceiling, "1.0000", "0x1.000#10", Equal);
+    test("0", 10, Nearest, "1.0000", "0x1.000#10", Equal);
     test("1", 1, Floor, "2.0", "0x2.0#1", Equal);
     test("1", 1, Ceiling, "2.0", "0x2.0#1", Equal);
     test("1", 1, Nearest, "2.0", "0x2.0#1", Equal);
-    test("1", 10, Floor, "2.0", "0x2.00#10", Equal);
-    test("1", 10, Ceiling, "2.0", "0x2.00#10", Equal);
-    test("1", 10, Nearest, "2.0", "0x2.00#10", Equal);
-    test("-1", 1, Floor, "0.5", "0x0.8#1", Equal);
-    test("-1", 1, Ceiling, "0.5", "0x0.8#1", Equal);
-    test("-1", 1, Nearest, "0.5", "0x0.8#1", Equal);
-    test("-1", 10, Floor, "0.5", "0x0.800#10", Equal);
-    test("-1", 10, Ceiling, "0.5", "0x0.800#10", Equal);
-    test("-1", 10, Nearest, "0.5", "0x0.800#10", Equal);
+    test("1", 10, Floor, "2.0000", "0x2.00#10", Equal);
+    test("1", 10, Ceiling, "2.0000", "0x2.00#10", Equal);
+    test("1", 10, Nearest, "2.0000", "0x2.00#10", Equal);
+    test("-1", 1, Floor, "0.50", "0x0.8#1", Equal);
+    test("-1", 1, Ceiling, "0.50", "0x0.8#1", Equal);
+    test("-1", 1, Nearest, "0.50", "0x0.8#1", Equal);
+    test("-1", 10, Floor, "0.50000", "0x0.800#10", Equal);
+    test("-1", 10, Ceiling, "0.50000", "0x0.800#10", Equal);
+    test("-1", 10, Nearest, "0.50000", "0x0.800#10", Equal);
     // non-integer x: 2^x is transcendental
     test("1/2", 1, Floor, "1.0", "0x1.0#1", Less);
     test("1/2", 1, Ceiling, "2.0", "0x2.0#1", Greater);
     test("1/2", 1, Nearest, "1.0", "0x1.0#1", Less);
-    test("1/2", 10, Floor, "1.414", "0x1.6a0#10", Less);
-    test("1/2", 10, Ceiling, "1.416", "0x1.6a8#10", Greater);
-    test("1/2", 10, Nearest, "1.414", "0x1.6a0#10", Less);
-    test("-1/2", 1, Floor, "0.5", "0x0.8#1", Less);
+    test("1/2", 10, Floor, "1.4141", "0x1.6a0#10", Less);
+    test("1/2", 10, Ceiling, "1.4160", "0x1.6a8#10", Greater);
+    test("1/2", 10, Nearest, "1.4141", "0x1.6a0#10", Less);
+    test("-1/2", 1, Floor, "0.50", "0x0.8#1", Less);
     test("-1/2", 1, Ceiling, "1.0", "0x1.0#1", Greater);
-    test("-1/2", 1, Nearest, "0.5", "0x0.8#1", Less);
-    test("-1/2", 10, Floor, "0.707", "0x0.b50#10", Less);
-    test("-1/2", 10, Ceiling, "0.708", "0x0.b54#10", Greater);
-    test("-1/2", 10, Nearest, "0.707", "0x0.b50#10", Less);
+    test("-1/2", 1, Nearest, "0.50", "0x0.8#1", Less);
+    test("-1/2", 10, Floor, "0.70703", "0x0.b50#10", Less);
+    test("-1/2", 10, Ceiling, "0.70801", "0x0.b54#10", Greater);
+    test("-1/2", 10, Nearest, "0.70703", "0x0.b50#10", Less);
     test("1/3", 1, Floor, "1.0", "0x1.0#1", Less);
     test("1/3", 1, Ceiling, "2.0", "0x2.0#1", Greater);
     test("1/3", 1, Nearest, "1.0", "0x1.0#1", Less);
-    test("1/3", 10, Floor, "1.26", "0x1.428#10", Less);
-    test("1/3", 10, Ceiling, "1.262", "0x1.430#10", Greater);
-    test("1/3", 10, Nearest, "1.26", "0x1.428#10", Less);
+    test("1/3", 10, Floor, "1.2598", "0x1.428#10", Less);
+    test("1/3", 10, Ceiling, "1.2617", "0x1.430#10", Greater);
+    test("1/3", 10, Nearest, "1.2598", "0x1.428#10", Less);
     test("22/7", 1, Floor, "8.0", "0x8.0#1", Less);
-    test("22/7", 1, Ceiling, "2.0e1", "0x1.0E+1#1", Greater);
+    test("22/7", 1, Ceiling, "16.0", "0x1.0E+1#1", Greater);
     test("22/7", 1, Nearest, "8.0", "0x8.0#1", Less);
-    test("22/7", 10, Floor, "8.83", "0x8.d4#10", Less);
-    test("22/7", 10, Ceiling, "8.84", "0x8.d8#10", Greater);
-    test("22/7", 10, Nearest, "8.83", "0x8.d4#10", Less);
-    test("-22/7", 1, Floor, "0.06", "0x0.1#1", Less);
-    test("-22/7", 1, Ceiling, "0.1", "0x0.2#1", Greater);
-    test("-22/7", 1, Nearest, "0.1", "0x0.2#1", Greater);
-    test("-22/7", 10, Floor, "0.1132", "0x0.1cf8#10", Less);
-    test("-22/7", 10, Ceiling, "0.1133", "0x0.1d00#10", Greater);
-    test("-22/7", 10, Nearest, "0.1132", "0x0.1cf8#10", Less);
-    test("100", 1, Floor, "1.0e30", "0x1.0E+25#1", Equal);
-    test("100", 1, Ceiling, "1.0e30", "0x1.0E+25#1", Equal);
-    test("100", 1, Nearest, "1.0e30", "0x1.0E+25#1", Equal);
-    test("100", 10, Floor, "1.268e30", "0x1.000E+25#10", Equal);
-    test("100", 10, Ceiling, "1.268e30", "0x1.000E+25#10", Equal);
-    test("100", 10, Nearest, "1.268e30", "0x1.000E+25#10", Equal);
-    test("-100", 1, Floor, "8.0e-31", "0x1.0E-25#1", Equal);
-    test("-100", 1, Ceiling, "8.0e-31", "0x1.0E-25#1", Equal);
-    test("-100", 1, Nearest, "8.0e-31", "0x1.0E-25#1", Equal);
-    test("-100", 10, Floor, "7.89e-31", "0x1.000E-25#10", Equal);
-    test("-100", 10, Ceiling, "7.89e-31", "0x1.000E-25#10", Equal);
-    test("-100", 10, Nearest, "7.89e-31", "0x1.000E-25#10", Equal);
+    test("22/7", 10, Floor, "8.8281", "0x8.d4#10", Less);
+    test("22/7", 10, Ceiling, "8.8438", "0x8.d8#10", Greater);
+    test("22/7", 10, Nearest, "8.8281", "0x8.d4#10", Less);
+    test("-22/7", 1, Floor, "0.062", "0x0.1#1", Less);
+    test("-22/7", 1, Ceiling, "0.12", "0x0.2#1", Greater);
+    test("-22/7", 1, Nearest, "0.12", "0x0.2#1", Greater);
+    test("-22/7", 10, Floor, "0.11316", "0x0.1cf8#10", Less);
+    test("-22/7", 10, Ceiling, "0.11328", "0x0.1d00#10", Greater);
+    test("-22/7", 10, Nearest, "0.11316", "0x0.1cf8#10", Less);
+    test("100", 1, Floor, "1.3e30", "0x1.0E+25#1", Equal);
+    test("100", 1, Ceiling, "1.3e30", "0x1.0E+25#1", Equal);
+    test("100", 1, Nearest, "1.3e30", "0x1.0E+25#1", Equal);
+    test("100", 10, Floor, "1.2677e30", "0x1.000E+25#10", Equal);
+    test("100", 10, Ceiling, "1.2677e30", "0x1.000E+25#10", Equal);
+    test("100", 10, Nearest, "1.2677e30", "0x1.000E+25#10", Equal);
+    test("-100", 1, Floor, "7.9e-31", "0x1.0E-25#1", Equal);
+    test("-100", 1, Ceiling, "7.9e-31", "0x1.0E-25#1", Equal);
+    test("-100", 1, Nearest, "7.9e-31", "0x1.0E-25#1", Equal);
+    test("-100", 10, Floor, "7.8886e-31", "0x1.000E-25#10", Equal);
+    test("-100", 10, Ceiling, "7.8886e-31", "0x1.000E-25#10", Equal);
+    test("-100", 10, Nearest, "7.8886e-31", "0x1.000E-25#10", Equal);
     // Exact succeeds for integer x (2^x is an exact power of 2)
-    test("0", 10, Exact, "1.0", "0x1.000#10", Equal);
-    test("1", 10, Exact, "2.0", "0x2.00#10", Equal);
-    test("-1", 10, Exact, "0.5", "0x0.800#10", Equal);
-    test("100", 10, Exact, "1.268e30", "0x1.000E+25#10", Equal);
-    test("-100", 10, Exact, "7.89e-31", "0x1.000E-25#10", Equal);
+    test("0", 10, Exact, "1.0000", "0x1.000#10", Equal);
+    test("1", 10, Exact, "2.0000", "0x2.00#10", Equal);
+    test("-1", 10, Exact, "0.50000", "0x0.800#10", Equal);
+    test("100", 10, Exact, "1.2677e30", "0x1.000E+25#10", Equal);
+    test("-100", 10, Exact, "7.8886e-31", "0x1.000E-25#10", Equal);
     // x near a rounding boundary: the bracket loop iterates before the bounds agree
     test("17/37", 3, Nearest, "1.5", "0x1.8#3", Greater);
 
@@ -887,7 +909,7 @@ fn test_power_of_2_rational_prec_round() {
         Rational::power_of_2(100i64),
         20,
         Floor,
-        "too_big",
+        "2.0985767e323228496",
         "0x7.ffff8E+268435455#20",
         Less,
     );
@@ -903,7 +925,7 @@ fn test_power_of_2_rational_prec_round() {
         -Rational::power_of_2(100i64),
         20,
         Ceiling,
-        "too_small",
+        "2.3825649e-323228497",
         "0x1.00000E-268435456#20",
         Greater,
     );
@@ -913,7 +935,7 @@ fn test_power_of_2_rational_prec_round() {
         Rational::power_of_2(-100i64),
         10,
         Nearest,
-        "1.0",
+        "1.0000",
         "0x1.000#10",
         Less,
     ); // 1
@@ -921,7 +943,7 @@ fn test_power_of_2_rational_prec_round() {
         Rational::power_of_2(-100i64),
         10,
         Ceiling,
-        "1.002",
+        "1.0020",
         "0x1.008#10",
         Greater,
     ); // 1 + ulp
@@ -929,7 +951,7 @@ fn test_power_of_2_rational_prec_round() {
         -Rational::power_of_2(-100i64),
         10,
         Nearest,
-        "1.0",
+        "1.0000",
         "0x1.000#10",
         Greater,
     ); // 1
@@ -937,7 +959,7 @@ fn test_power_of_2_rational_prec_round() {
         -Rational::power_of_2(-100i64),
         10,
         Floor,
-        "0.999",
+        "0.99902",
         "0x0.ffc#10",
         Less,
     ); // 1 - ulp

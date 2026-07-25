@@ -522,15 +522,15 @@ impl Float {
     /// assert_eq!(o, Greater);
     ///
     /// let (agm, o) = Float::from(24).agm_prec_round(Float::from(6), 20, Floor);
-    /// assert_eq!(agm.to_string(), "13.45816");
+    /// assert_eq!(agm.to_string(), "13.458160");
     /// assert_eq!(o, Less);
     ///
     /// let (agm, o) = Float::from(24).agm_prec_round(Float::from(6), 20, Ceiling);
-    /// assert_eq!(agm.to_string(), "13.45818");
+    /// assert_eq!(agm.to_string(), "13.458176");
     /// assert_eq!(o, Greater);
     ///
     /// let (agm, o) = Float::from(24).agm_prec_round(Float::from(6), 20, Nearest);
-    /// assert_eq!(agm.to_string(), "13.45818");
+    /// assert_eq!(agm.to_string(), "13.458176");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -613,15 +613,15 @@ impl Float {
     /// assert_eq!(o, Greater);
     ///
     /// let (agm, o) = Float::from(24).agm_prec_round_val_ref(&Float::from(6), 20, Floor);
-    /// assert_eq!(agm.to_string(), "13.45816");
+    /// assert_eq!(agm.to_string(), "13.458160");
     /// assert_eq!(o, Less);
     ///
     /// let (agm, o) = Float::from(24).agm_prec_round_val_ref(&Float::from(6), 20, Ceiling);
-    /// assert_eq!(agm.to_string(), "13.45818");
+    /// assert_eq!(agm.to_string(), "13.458176");
     /// assert_eq!(o, Greater);
     ///
     /// let (agm, o) = Float::from(24).agm_prec_round_val_ref(&Float::from(6), 20, Nearest);
-    /// assert_eq!(agm.to_string(), "13.45818");
+    /// assert_eq!(agm.to_string(), "13.458176");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -701,15 +701,15 @@ impl Float {
     /// assert_eq!(o, Greater);
     ///
     /// let (agm, o) = Float::from(24).agm_prec_round_ref_val(Float::from(6), 20, Floor);
-    /// assert_eq!(agm.to_string(), "13.45816");
+    /// assert_eq!(agm.to_string(), "13.458160");
     /// assert_eq!(o, Less);
     ///
     /// let (agm, o) = Float::from(24).agm_prec_round_ref_val(Float::from(6), 20, Ceiling);
-    /// assert_eq!(agm.to_string(), "13.45818");
+    /// assert_eq!(agm.to_string(), "13.458176");
     /// assert_eq!(o, Greater);
     ///
     /// let (agm, o) = Float::from(24).agm_prec_round_ref_val(Float::from(6), 20, Nearest);
-    /// assert_eq!(agm.to_string(), "13.45818");
+    /// assert_eq!(agm.to_string(), "13.458176");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -789,15 +789,15 @@ impl Float {
     /// assert_eq!(o, Greater);
     ///
     /// let (agm, o) = Float::from(24).agm_prec_round_ref_ref(&Float::from(6), 20, Floor);
-    /// assert_eq!(agm.to_string(), "13.45816");
+    /// assert_eq!(agm.to_string(), "13.458160");
     /// assert_eq!(o, Less);
     ///
     /// let (agm, o) = Float::from(24).agm_prec_round_ref_ref(&Float::from(6), 20, Ceiling);
-    /// assert_eq!(agm.to_string(), "13.45818");
+    /// assert_eq!(agm.to_string(), "13.458176");
     /// assert_eq!(o, Greater);
     ///
     /// let (agm, o) = Float::from(24).agm_prec_round_ref_ref(&Float::from(6), 20, Nearest);
-    /// assert_eq!(agm.to_string(), "13.45818");
+    /// assert_eq!(agm.to_string(), "13.458176");
     /// assert_eq!(o, Greater);
     /// ```
     ///
@@ -873,7 +873,7 @@ impl Float {
     /// assert_eq!(o, Greater);
     ///
     /// let (agm, o) = Float::from(24).agm_prec(Float::from(6), 20);
-    /// assert_eq!(agm.to_string(), "13.45818");
+    /// assert_eq!(agm.to_string(), "13.458176");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -933,7 +933,7 @@ impl Float {
     /// assert_eq!(o, Greater);
     ///
     /// let (agm, o) = Float::from(24).agm_prec_val_ref(&Float::from(6), 20);
-    /// assert_eq!(agm.to_string(), "13.45818");
+    /// assert_eq!(agm.to_string(), "13.458176");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -993,7 +993,7 @@ impl Float {
     /// assert_eq!(o, Greater);
     ///
     /// let (agm, o) = (&Float::from(24)).agm_prec_ref_val(Float::from(6), 20);
-    /// assert_eq!(agm.to_string(), "13.45818");
+    /// assert_eq!(agm.to_string(), "13.458176");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -1053,7 +1053,7 @@ impl Float {
     /// assert_eq!(o, Greater);
     ///
     /// let (agm, o) = (&Float::from(24)).agm_prec_ref_ref(&Float::from(6), 20);
-    /// assert_eq!(agm.to_string(), "13.45818");
+    /// assert_eq!(agm.to_string(), "13.458176");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -1120,19 +1120,19 @@ impl Float {
     /// let (agm, o) = Float::from_unsigned_prec(24u8, 100)
     ///     .0
     ///     .agm_round(Float::from(6), Floor);
-    /// assert_eq!(agm.to_string(), "13.45817148172561542076681315696");
+    /// assert_eq!(agm.to_string(), "13.458171481725615420766813156964");
     /// assert_eq!(o, Less);
     ///
     /// let (agm, o) = Float::from_unsigned_prec(24u8, 100)
     ///     .0
     ///     .agm_round(Float::from(6), Ceiling);
-    /// assert_eq!(agm.to_string(), "13.45817148172561542076681315698");
+    /// assert_eq!(agm.to_string(), "13.458171481725615420766813156976");
     /// assert_eq!(o, Greater);
     ///
     /// let (agm, o) = Float::from_unsigned_prec(24u8, 100)
     ///     .0
     ///     .agm_round(Float::from(6), Nearest);
-    /// assert_eq!(agm.to_string(), "13.45817148172561542076681315698");
+    /// assert_eq!(agm.to_string(), "13.458171481725615420766813156976");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -1200,19 +1200,19 @@ impl Float {
     /// let (agm, o) = Float::from_unsigned_prec(24u8, 100)
     ///     .0
     ///     .agm_round_val_ref(&Float::from(6), Floor);
-    /// assert_eq!(agm.to_string(), "13.45817148172561542076681315696");
+    /// assert_eq!(agm.to_string(), "13.458171481725615420766813156964");
     /// assert_eq!(o, Less);
     ///
     /// let (agm, o) = Float::from_unsigned_prec(24u8, 100)
     ///     .0
     ///     .agm_round_val_ref(&Float::from(6), Ceiling);
-    /// assert_eq!(agm.to_string(), "13.45817148172561542076681315698");
+    /// assert_eq!(agm.to_string(), "13.458171481725615420766813156976");
     /// assert_eq!(o, Greater);
     ///
     /// let (agm, o) = Float::from_unsigned_prec(24u8, 100)
     ///     .0
     ///     .agm_round_val_ref(&Float::from(6), Nearest);
-    /// assert_eq!(agm.to_string(), "13.45817148172561542076681315698");
+    /// assert_eq!(agm.to_string(), "13.458171481725615420766813156976");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -1279,17 +1279,17 @@ impl Float {
     ///
     /// let (agm, o) =
     ///     (&Float::from_unsigned_prec(24u8, 100).0).agm_round_ref_val(Float::from(6), Floor);
-    /// assert_eq!(agm.to_string(), "13.45817148172561542076681315696");
+    /// assert_eq!(agm.to_string(), "13.458171481725615420766813156964");
     /// assert_eq!(o, Less);
     ///
     /// let (agm, o) =
     ///     (&Float::from_unsigned_prec(24u8, 100).0).agm_round_ref_val(Float::from(6), Ceiling);
-    /// assert_eq!(agm.to_string(), "13.45817148172561542076681315698");
+    /// assert_eq!(agm.to_string(), "13.458171481725615420766813156976");
     /// assert_eq!(o, Greater);
     ///
     /// let (agm, o) =
     ///     (&Float::from_unsigned_prec(24u8, 100).0).agm_round_ref_val(Float::from(6), Nearest);
-    /// assert_eq!(agm.to_string(), "13.45817148172561542076681315698");
+    /// assert_eq!(agm.to_string(), "13.458171481725615420766813156976");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -1357,19 +1357,19 @@ impl Float {
     /// let (agm, o) = Float::from_unsigned_prec(24u8, 100)
     ///     .0
     ///     .agm_round_ref_ref(&Float::from(6), Floor);
-    /// assert_eq!(agm.to_string(), "13.45817148172561542076681315696");
+    /// assert_eq!(agm.to_string(), "13.458171481725615420766813156964");
     /// assert_eq!(o, Less);
     ///
     /// let (agm, o) = Float::from_unsigned_prec(24u8, 100)
     ///     .0
     ///     .agm_round_ref_ref(&Float::from(6), Ceiling);
-    /// assert_eq!(agm.to_string(), "13.45817148172561542076681315698");
+    /// assert_eq!(agm.to_string(), "13.458171481725615420766813156976");
     /// assert_eq!(o, Greater);
     ///
     /// let (agm, o) = Float::from_unsigned_prec(24u8, 100)
     ///     .0
     ///     .agm_round_ref_ref(&Float::from(6), Nearest);
-    /// assert_eq!(agm.to_string(), "13.45817148172561542076681315698");
+    /// assert_eq!(agm.to_string(), "13.458171481725615420766813156976");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -1440,21 +1440,21 @@ impl Float {
     ///
     /// let mut x = Float::from(24);
     /// assert_eq!(x.agm_prec_round_assign(Float::from(6), 20, Floor), Less);
-    /// assert_eq!(x.to_string(), "13.45816");
+    /// assert_eq!(x.to_string(), "13.458160");
     ///
     /// let mut x = Float::from(24);
     /// assert_eq!(
     ///     x.agm_prec_round_assign(Float::from(6), 20, Ceiling),
     ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "13.45818");
+    /// assert_eq!(x.to_string(), "13.458176");
     ///
     /// let mut x = Float::from(24);
     /// assert_eq!(
     ///     x.agm_prec_round_assign(Float::from(6), 20, Nearest),
     ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "13.45818");
+    /// assert_eq!(x.to_string(), "13.458176");
     /// ```
     #[inline]
     pub fn agm_prec_round_assign(&mut self, other: Self, prec: u64, rm: RoundingMode) -> Ordering {
@@ -1536,21 +1536,21 @@ impl Float {
     ///     x.agm_prec_round_assign_ref(&Float::from(6), 20, Floor),
     ///     Less
     /// );
-    /// assert_eq!(x.to_string(), "13.45816");
+    /// assert_eq!(x.to_string(), "13.458160");
     ///
     /// let mut x = Float::from(24);
     /// assert_eq!(
     ///     x.agm_prec_round_assign_ref(&Float::from(6), 20, Ceiling),
     ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "13.45818");
+    /// assert_eq!(x.to_string(), "13.458176");
     ///
     /// let mut x = Float::from(24);
     /// assert_eq!(
     ///     x.agm_prec_round_assign_ref(&Float::from(6), 20, Nearest),
     ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "13.45818");
+    /// assert_eq!(x.to_string(), "13.458176");
     /// ```
     #[inline]
     pub fn agm_prec_round_assign_ref(
@@ -1612,7 +1612,7 @@ impl Float {
     ///
     /// let mut x = Float::from(24);
     /// assert_eq!(x.agm_prec_assign(Float::from(6), 20), Greater);
-    /// assert_eq!(x.to_string(), "13.45818");
+    /// assert_eq!(x.to_string(), "13.458176");
     /// ```
     #[inline]
     pub fn agm_prec_assign(&mut self, other: Self, prec: u64) -> Ordering {
@@ -1667,7 +1667,7 @@ impl Float {
     ///
     /// let mut x = Float::from(24);
     /// assert_eq!(x.agm_prec_assign_ref(&Float::from(6), 20), Greater);
-    /// assert_eq!(x.to_string(), "13.45818");
+    /// assert_eq!(x.to_string(), "13.458176");
     /// ```
     #[inline]
     pub fn agm_prec_assign_ref(&mut self, other: &Self, prec: u64) -> Ordering {
@@ -1727,15 +1727,15 @@ impl Float {
     ///
     /// let mut x = Float::from_unsigned_prec(24u8, 100).0;
     /// assert_eq!(x.agm_round_assign(Float::from(6), Floor), Less);
-    /// assert_eq!(x.to_string(), "13.45817148172561542076681315696");
+    /// assert_eq!(x.to_string(), "13.458171481725615420766813156964");
     ///
     /// let mut x = Float::from_unsigned_prec(24u8, 100).0;
     /// assert_eq!(x.agm_round_assign(Float::from(6), Ceiling), Greater);
-    /// assert_eq!(x.to_string(), "13.45817148172561542076681315698");
+    /// assert_eq!(x.to_string(), "13.458171481725615420766813156976");
     ///
     /// let mut x = Float::from_unsigned_prec(24u8, 100).0;
     /// assert_eq!(x.agm_round_assign(Float::from(6), Nearest), Greater);
-    /// assert_eq!(x.to_string(), "13.45817148172561542076681315698");
+    /// assert_eq!(x.to_string(), "13.458171481725615420766813156976");
     /// ```
     #[inline]
     pub fn agm_round_assign(&mut self, other: Self, rm: RoundingMode) -> Ordering {
@@ -1796,15 +1796,15 @@ impl Float {
     ///
     /// let mut x = Float::from_unsigned_prec(24u8, 100).0;
     /// assert_eq!(x.agm_round_assign_ref(&Float::from(6), Floor), Less);
-    /// assert_eq!(x.to_string(), "13.45817148172561542076681315696");
+    /// assert_eq!(x.to_string(), "13.458171481725615420766813156964");
     ///
     /// let mut x = Float::from_unsigned_prec(24u8, 100).0;
     /// assert_eq!(x.agm_round_assign_ref(&Float::from(6), Ceiling), Greater);
-    /// assert_eq!(x.to_string(), "13.45817148172561542076681315698");
+    /// assert_eq!(x.to_string(), "13.458171481725615420766813156976");
     ///
     /// let mut x = Float::from_unsigned_prec(24u8, 100).0;
     /// assert_eq!(x.agm_round_assign_ref(&Float::from(6), Nearest), Greater);
-    /// assert_eq!(x.to_string(), "13.45817148172561542076681315698");
+    /// assert_eq!(x.to_string(), "13.458171481725615420766813156976");
     /// ```
     #[inline]
     pub fn agm_round_assign_ref(&mut self, other: &Self, rm: RoundingMode) -> Ordering {
@@ -1888,7 +1888,7 @@ impl Float {
     ///     20,
     ///     Floor,
     /// );
-    /// assert_eq!(agm.to_string(), "0.3985109");
+    /// assert_eq!(agm.to_string(), "0.39851093");
     /// assert_eq!(o, Less);
     ///
     /// let (agm, o) = Float::agm_rational_prec_round(
@@ -1897,7 +1897,7 @@ impl Float {
     ///     20,
     ///     Ceiling,
     /// );
-    /// assert_eq!(agm.to_string(), "0.3985114");
+    /// assert_eq!(agm.to_string(), "0.39851141");
     /// assert_eq!(o, Greater);
     ///
     /// let (agm, o) = Float::agm_rational_prec_round(
@@ -1906,7 +1906,7 @@ impl Float {
     ///     20,
     ///     Nearest,
     /// );
-    /// assert_eq!(agm.to_string(), "0.3985114");
+    /// assert_eq!(agm.to_string(), "0.39851141");
     /// assert_eq!(o, Greater);
     /// ```
     #[allow(clippy::needless_pass_by_value)]
@@ -1997,7 +1997,7 @@ impl Float {
     ///     20,
     ///     Floor,
     /// );
-    /// assert_eq!(agm.to_string(), "0.3985109");
+    /// assert_eq!(agm.to_string(), "0.39851093");
     /// assert_eq!(o, Less);
     ///
     /// let (agm, o) = Float::agm_rational_prec_round_val_ref(
@@ -2006,7 +2006,7 @@ impl Float {
     ///     20,
     ///     Ceiling,
     /// );
-    /// assert_eq!(agm.to_string(), "0.3985114");
+    /// assert_eq!(agm.to_string(), "0.39851141");
     /// assert_eq!(o, Greater);
     ///
     /// let (agm, o) = Float::agm_rational_prec_round_val_ref(
@@ -2015,7 +2015,7 @@ impl Float {
     ///     20,
     ///     Nearest,
     /// );
-    /// assert_eq!(agm.to_string(), "0.3985114");
+    /// assert_eq!(agm.to_string(), "0.39851141");
     /// assert_eq!(o, Greater);
     /// ```
     pub fn agm_rational_prec_round_val_ref(
@@ -2134,7 +2134,7 @@ impl Float {
     ///     20,
     ///     Floor,
     /// );
-    /// assert_eq!(agm.to_string(), "0.3985109");
+    /// assert_eq!(agm.to_string(), "0.39851093");
     /// assert_eq!(o, Less);
     ///
     /// let (agm, o) = Float::agm_rational_prec_round_ref_val(
@@ -2143,7 +2143,7 @@ impl Float {
     ///     20,
     ///     Ceiling,
     /// );
-    /// assert_eq!(agm.to_string(), "0.3985114");
+    /// assert_eq!(agm.to_string(), "0.39851141");
     /// assert_eq!(o, Greater);
     ///
     /// let (agm, o) = Float::agm_rational_prec_round_ref_val(
@@ -2152,7 +2152,7 @@ impl Float {
     ///     20,
     ///     Nearest,
     /// );
-    /// assert_eq!(agm.to_string(), "0.3985114");
+    /// assert_eq!(agm.to_string(), "0.39851141");
     /// assert_eq!(o, Greater);
     /// ```
     pub fn agm_rational_prec_round_ref_val(
@@ -2271,7 +2271,7 @@ impl Float {
     ///     20,
     ///     Floor,
     /// );
-    /// assert_eq!(agm.to_string(), "0.3985109");
+    /// assert_eq!(agm.to_string(), "0.39851093");
     /// assert_eq!(o, Less);
     ///
     /// let (agm, o) = Float::agm_rational_prec_round_ref_ref(
@@ -2280,7 +2280,7 @@ impl Float {
     ///     20,
     ///     Ceiling,
     /// );
-    /// assert_eq!(agm.to_string(), "0.3985114");
+    /// assert_eq!(agm.to_string(), "0.39851141");
     /// assert_eq!(o, Greater);
     ///
     /// let (agm, o) = Float::agm_rational_prec_round_ref_ref(
@@ -2289,7 +2289,7 @@ impl Float {
     ///     20,
     ///     Nearest,
     /// );
-    /// assert_eq!(agm.to_string(), "0.3985114");
+    /// assert_eq!(agm.to_string(), "0.39851141");
     /// assert_eq!(o, Greater);
     /// ```
     pub fn agm_rational_prec_round_ref_ref(
@@ -2390,7 +2390,7 @@ impl Float {
     ///     Rational::from_unsigneds(1u8, 5),
     ///     20,
     /// );
-    /// assert_eq!(agm.to_string(), "0.3985114");
+    /// assert_eq!(agm.to_string(), "0.39851141");
     /// assert_eq!(o, Greater);
     /// ```
     #[allow(clippy::needless_pass_by_value)]
@@ -2459,7 +2459,7 @@ impl Float {
     ///     &Rational::from_unsigneds(1u8, 5),
     ///     20,
     /// );
-    /// assert_eq!(agm.to_string(), "0.3985114");
+    /// assert_eq!(agm.to_string(), "0.39851141");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -2527,7 +2527,7 @@ impl Float {
     ///     Rational::from_unsigneds(1u8, 5),
     ///     20,
     /// );
-    /// assert_eq!(agm.to_string(), "0.3985114");
+    /// assert_eq!(agm.to_string(), "0.39851141");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -2595,7 +2595,7 @@ impl Float {
     ///     &Rational::from_unsigneds(1u8, 5),
     ///     20,
     /// );
-    /// assert_eq!(agm.to_string(), "0.3985114");
+    /// assert_eq!(agm.to_string(), "0.39851141");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -2655,7 +2655,7 @@ impl Agm<Self> for Float {
     ///         .0
     ///         .agm(Float::from(6))
     ///         .to_string(),
-    ///     "13.45817148172561542076681315698"
+    ///     "13.458171481725615420766813156976"
     /// );
     /// ```
     #[inline]
@@ -2718,7 +2718,7 @@ impl Agm<&Self> for Float {
     ///         .0
     ///         .agm(&Float::from(6))
     ///         .to_string(),
-    ///     "13.45817148172561542076681315698"
+    ///     "13.458171481725615420766813156976"
     /// );
     /// ```
     #[inline]
@@ -2780,7 +2780,7 @@ impl Agm<Float> for &Float {
     ///     (&Float::from_unsigned_prec(24u8, 100).0)
     ///         .agm(Float::from(6))
     ///         .to_string(),
-    ///     "13.45817148172561542076681315698"
+    ///     "13.458171481725615420766813156976"
     /// );
     /// ```
     #[inline]
@@ -2841,7 +2841,7 @@ impl Agm<&Float> for &Float {
     ///     (&Float::from_unsigned_prec(24u8, 100).0)
     ///         .agm(&Float::from(6))
     ///         .to_string(),
-    ///     "13.45817148172561542076681315698"
+    ///     "13.458171481725615420766813156976"
     /// );
     /// ```
     #[inline]
@@ -2893,7 +2893,7 @@ impl AgmAssign<Self> for Float {
     ///
     /// let mut x = Float::from_unsigned_prec(24u8, 100).0;
     /// x.agm_assign(Float::from(6));
-    /// assert_eq!(x.to_string(), "13.45817148172561542076681315698");
+    /// assert_eq!(x.to_string(), "13.458171481725615420766813156976");
     /// ```
     #[inline]
     fn agm_assign(&mut self, other: Self) {
@@ -2944,7 +2944,7 @@ impl AgmAssign<&Self> for Float {
     ///
     /// let mut x = Float::from_unsigned_prec(24u8, 100).0;
     /// x.agm_assign(&Float::from(6));
-    /// assert_eq!(x.to_string(), "13.45817148172561542076681315698");
+    /// assert_eq!(x.to_string(), "13.458171481725615420766813156976");
     /// ```
     #[inline]
     fn agm_assign(&mut self, other: &Self) {

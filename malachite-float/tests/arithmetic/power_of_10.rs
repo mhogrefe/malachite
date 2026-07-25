@@ -96,26 +96,26 @@ fn test_power_of_10_of_float_prec_round() {
         "-0x1.0#1",
         10,
         Nearest,
-        "0.09998",
+        "0.099976",
         "0x0.1998#10",
         Less,
     );
-    test("10.0", "0xa.0#3", 4, Nearest, "9.7e9", "0x2.4E+8#4", Less);
+    test("10.0", "0xa.0#3", 4, Nearest, "9.66e9", "0x2.4E+8#4", Less);
     test(
         "-5.0",
         "-0x5.0#3",
         20,
         Nearest,
-        "0.00001",
+        "0.000010000003",
         "0x0.0000a7c5b#20",
         Greater,
     );
     // 10^0.5 = sqrt(10)
-    test("0.5", "0x0.8#1", 1, Floor, "2.0", "0x2.0#1", Less);
-    test("0.5", "0x0.8#1", 1, Ceiling, "4.0", "0x4.0#1", Greater);
-    test("0.5", "0x0.8#1", 1, Nearest, "4.0", "0x4.0#1", Greater);
+    test("0.50", "0x0.8#1", 1, Floor, "2.0", "0x2.0#1", Less);
+    test("0.50", "0x0.8#1", 1, Ceiling, "4.0", "0x4.0#1", Greater);
+    test("0.50", "0x0.8#1", 1, Nearest, "4.0", "0x4.0#1", Greater);
     test(
-        "0.5",
+        "0.50",
         "0x0.8#1",
         53,
         Nearest,
@@ -125,7 +125,7 @@ fn test_power_of_10_of_float_prec_round() {
     );
     // 10^(-0.5) = 1/sqrt(10)
     test(
-        "-0.5",
+        "-0.50",
         "-0x0.8#1",
         53,
         Nearest,
@@ -133,19 +133,27 @@ fn test_power_of_10_of_float_prec_round() {
         "0x0.50f44d8921243c#53",
         Greater,
     );
-    test("-0.5", "-0x0.8#1", 10, Floor, "0.3159", "0x0.50e#10", Less);
     test(
-        "-0.5",
+        "-0.50",
+        "-0x0.8#1",
+        10,
+        Floor,
+        "0.31592",
+        "0x0.50e#10",
+        Less,
+    );
+    test(
+        "-0.50",
         "-0x0.8#1",
         10,
         Ceiling,
-        "0.3164",
+        "0.31641",
         "0x0.510#10",
         Greater,
     );
     // 10^0.25
     test(
-        "0.2",
+        "0.25",
         "0x0.4#1",
         53,
         Nearest,
@@ -159,24 +167,24 @@ fn test_power_of_10_of_float_prec_round() {
         "0x1.8#2",
         10,
         Nearest,
-        "31.62",
+        "31.625",
         "0x1f.a0#10",
         Greater,
     );
-    test("1.5", "0x1.8#2", 10, Floor, "31.59", "0x1f.98#10", Less);
+    test("1.5", "0x1.8#2", 10, Floor, "31.594", "0x1f.98#10", Less);
     // 10^(-1.5)
     test(
         "-1.5",
         "-0x1.8#2",
         20,
         Nearest,
-        "0.03162277",
+        "0.031622767",
         "0x0.08186e#20",
         Less,
     );
     // overflow: x = 2^30, so 10^x has exponent about x * log2(10) ~ 3.6e9, far above MAX_EXPONENT
     test(
-        "1.0e9",
+        "1.1e9",
         "0x4.0E+7#1",
         20,
         Nearest,
@@ -185,35 +193,35 @@ fn test_power_of_10_of_float_prec_round() {
         Greater,
     );
     test(
-        "1.0e9",
+        "1.1e9",
         "0x4.0E+7#1",
         20,
         Floor,
-        "too_big",
+        "2.0985767e323228496",
         "0x7.ffff8E+268435455#20",
         Less,
     );
     // underflow: x = -2^31, so 10^x has exponent about x * log2(10) ~ -7.1e9, far below
     // MIN_EXPONENT; it rounds to 0 or the smallest positive Float
-    test("-2.0e9", "-0x8.0E+7#1", 20, Nearest, "0.0", "0x0.0", Less);
+    test("-2.1e9", "-0x8.0E+7#1", 20, Nearest, "0.0", "0x0.0", Less);
     test(
-        "-2.0e9",
+        "-2.1e9",
         "-0x8.0E+7#1",
         20,
         Ceiling,
-        "too_small",
+        "2.3825649e-323228497",
         "0x1.00000E-268435456#20",
         Greater,
     );
     // Ziv loop iterates: x = 2^-100 makes 10^x so close to 1 that the initial working precision
     // can't round it
-    test("8.0e-31", "0x1.0E-25#1", 1, Nearest, "1.0", "0x1.0#1", Less);
+    test("7.9e-31", "0x1.0E-25#1", 1, Nearest, "1.0", "0x1.0#1", Less);
     test(
-        "8.0e-31",
+        "7.9e-31",
         "0x1.0E-25#1",
         53,
         Nearest,
-        "1.0",
+        "1.0000000000000000",
         "0x1.0000000000000#53",
         Less,
     );
@@ -221,7 +229,7 @@ fn test_power_of_10_of_float_prec_round() {
     // below MIN_EXPONENT, so the exact value lies strictly between 0 and the smallest positive
     // Float and well below its midpoint. `Nearest` therefore rounds down to +0.
     test(
-        "-1073741824.5",
+        "-1073741824.5000",
         "-0x40000000.800#40",
         1,
         Nearest,
@@ -234,7 +242,7 @@ fn test_power_of_10_of_float_prec_round() {
     // that smallest value. (`shl_prec_round` handles this; a plain `<<` would ignore the rounding
     // mode and always produce the smallest positive value.)
     test(
-        "-1073741824.5",
+        "-1073741824.5000",
         "-0x40000000.800#40",
         1,
         Floor,
@@ -243,7 +251,7 @@ fn test_power_of_10_of_float_prec_round() {
         Less,
     );
     test(
-        "-1073741824.5",
+        "-1073741824.5000",
         "-0x40000000.800#40",
         1,
         Down,
@@ -252,25 +260,25 @@ fn test_power_of_10_of_float_prec_round() {
         Less,
     );
     test(
-        "-1073741824.5",
+        "-1073741824.5000",
         "-0x40000000.800#40",
         1,
         Ceiling,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Greater,
     );
     test(
-        "-1073741824.5",
+        "-1073741824.5000",
         "-0x40000000.800#40",
         1,
         Up,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Greater,
     );
     test(
-        "-1073741824.5",
+        "-1073741824.5000",
         "-0x40000000.800#40",
         20,
         Floor,
@@ -279,7 +287,7 @@ fn test_power_of_10_of_float_prec_round() {
         Less,
     );
     test(
-        "-1073741824.5",
+        "-1073741824.5000",
         "-0x40000000.800#40",
         20,
         Nearest,
@@ -706,13 +714,13 @@ fn test_power_of_10_rational_prec() {
     // integer x: 10^n is exact when it fits in the precision (10^0 = 1), else rounded (10^1 = 10 at
     // prec 1); negative n gives a non-dyadic fraction that is never exact
     test("0", 1, "1.0", "0x1.0#1", Equal);
-    test("0", 10, "1.0", "0x1.000#10", Equal);
-    test("0", 53, "1.0", "0x1.0000000000000#53", Equal);
+    test("0", 10, "1.0000", "0x1.000#10", Equal);
+    test("0", 53, "1.0000000000000000", "0x1.0000000000000#53", Equal);
     test("1", 1, "8.0", "0x8.0#1", Less);
-    test("1", 10, "10.0", "0xa.00#10", Equal);
-    test("1", 53, "10.0", "0xa.0000000000000#53", Equal);
-    test("-1", 1, "0.1", "0x0.2#1", Greater);
-    test("-1", 10, "0.09998", "0x0.1998#10", Less);
+    test("1", 10, "10.000", "0xa.00#10", Equal);
+    test("1", 53, "10.000000000000000", "0xa.0000000000000#53", Equal);
+    test("-1", 1, "0.12", "0x0.2#1", Greater);
+    test("-1", 10, "0.099976", "0x0.1998#10", Less);
     test(
         "-1",
         53,
@@ -722,7 +730,7 @@ fn test_power_of_10_rational_prec() {
     );
     // non-integer x: 10^x is transcendental
     test("1/2", 1, "4.0", "0x4.0#1", Greater);
-    test("1/2", 10, "3.164", "0x3.2a#10", Greater);
+    test("1/2", 10, "3.1641", "0x3.2a#10", Greater);
     test(
         "1/2",
         53,
@@ -730,8 +738,8 @@ fn test_power_of_10_rational_prec() {
         "0x3.298b075b4b6a6#53",
         Greater,
     );
-    test("-1/2", 1, "0.2", "0x0.4#1", Less);
-    test("-1/2", 10, "0.3164", "0x0.510#10", Greater);
+    test("-1/2", 1, "0.25", "0x0.4#1", Less);
+    test("-1/2", 10, "0.31641", "0x0.510#10", Greater);
     test(
         "-1/2",
         53,
@@ -740,7 +748,7 @@ fn test_power_of_10_rational_prec() {
         Greater,
     );
     test("1/3", 1, "2.0", "0x2.0#1", Less);
-    test("1/3", 10, "2.156", "0x2.28#10", Greater);
+    test("1/3", 10, "2.1562", "0x2.28#10", Greater);
     test(
         "1/3",
         53,
@@ -757,21 +765,33 @@ fn test_power_of_10_rational_prec() {
         "0x56d.7ed8b81ffa8#53",
         Greater,
     );
-    test("-22/7", 1, "0.0005", "0x0.002#1", Less);
-    test("-22/7", 10, "0.00072", "0x0.002f3#10", Greater);
+    test("-22/7", 1, "0.00049", "0x0.002#1", Less);
+    test("-22/7", 10, "0.00072002", "0x0.002f3#10", Greater);
     test(
         "-22/7",
         53,
-        "0.0007196856730011521",
+        "0.00071968567300115206",
         "0x0.002f2a526dcefdf8#53",
         Greater,
     );
-    test("100", 1, "9.0e99", "0x1.0E+83#1", Less);
-    test("100", 10, "9.996e99", "0x1.248E+83#10", Less);
-    test("100", 53, "1.0e100", "0x1.249ad2594c37dE+83#53", Greater);
-    test("-100", 1, "1.0e-100", "0x1.0E-83#1", Greater);
-    test("-100", 10, "1.0e-100", "0xe.00E-84#10", Greater);
-    test("-100", 53, "1.0e-100", "0xd.ff97724702980E-84#53", Greater);
+    test("100", 1, "8.7e99", "0x1.0E+83#1", Less);
+    test("100", 10, "9.9964e99", "0x1.248E+83#10", Less);
+    test(
+        "100",
+        53,
+        "1.0000000000000000e100",
+        "0x1.249ad2594c37dE+83#53",
+        Greater,
+    );
+    test("-100", 1, "1.1e-100", "0x1.0E-83#1", Greater);
+    test("-100", 10, "1.0001e-100", "0xe.00E-84#10", Greater);
+    test(
+        "-100",
+        53,
+        "1.0000000000000000e-100",
+        "0xd.ff97724702980E-84#53",
+        Greater,
+    );
 }
 
 #[test]
@@ -823,75 +843,75 @@ fn test_power_of_10_rational_prec_round() {
     test("0", 1, Floor, "1.0", "0x1.0#1", Equal);
     test("0", 1, Ceiling, "1.0", "0x1.0#1", Equal);
     test("0", 1, Nearest, "1.0", "0x1.0#1", Equal);
-    test("0", 10, Floor, "1.0", "0x1.000#10", Equal);
-    test("0", 10, Ceiling, "1.0", "0x1.000#10", Equal);
-    test("0", 10, Nearest, "1.0", "0x1.000#10", Equal);
+    test("0", 10, Floor, "1.0000", "0x1.000#10", Equal);
+    test("0", 10, Ceiling, "1.0000", "0x1.000#10", Equal);
+    test("0", 10, Nearest, "1.0000", "0x1.000#10", Equal);
     test("1", 1, Floor, "8.0", "0x8.0#1", Less);
-    test("1", 1, Ceiling, "2.0e1", "0x1.0E+1#1", Greater);
+    test("1", 1, Ceiling, "16.0", "0x1.0E+1#1", Greater);
     test("1", 1, Nearest, "8.0", "0x8.0#1", Less);
-    test("1", 10, Floor, "10.0", "0xa.00#10", Equal);
-    test("1", 10, Ceiling, "10.0", "0xa.00#10", Equal);
-    test("1", 10, Nearest, "10.0", "0xa.00#10", Equal);
-    test("-1", 1, Floor, "0.06", "0x0.1#1", Less);
-    test("-1", 1, Ceiling, "0.1", "0x0.2#1", Greater);
-    test("-1", 1, Nearest, "0.1", "0x0.2#1", Greater);
-    test("-1", 10, Floor, "0.09998", "0x0.1998#10", Less);
-    test("-1", 10, Ceiling, "0.1001", "0x0.19a0#10", Greater);
-    test("-1", 10, Nearest, "0.09998", "0x0.1998#10", Less);
+    test("1", 10, Floor, "10.000", "0xa.00#10", Equal);
+    test("1", 10, Ceiling, "10.000", "0xa.00#10", Equal);
+    test("1", 10, Nearest, "10.000", "0xa.00#10", Equal);
+    test("-1", 1, Floor, "0.062", "0x0.1#1", Less);
+    test("-1", 1, Ceiling, "0.12", "0x0.2#1", Greater);
+    test("-1", 1, Nearest, "0.12", "0x0.2#1", Greater);
+    test("-1", 10, Floor, "0.099976", "0x0.1998#10", Less);
+    test("-1", 10, Ceiling, "0.10010", "0x0.19a0#10", Greater);
+    test("-1", 10, Nearest, "0.099976", "0x0.1998#10", Less);
     // non-integer x: 10^x is transcendental
     test("1/2", 1, Floor, "2.0", "0x2.0#1", Less);
     test("1/2", 1, Ceiling, "4.0", "0x4.0#1", Greater);
     test("1/2", 1, Nearest, "4.0", "0x4.0#1", Greater);
-    test("1/2", 10, Floor, "3.16", "0x3.29#10", Less);
-    test("1/2", 10, Ceiling, "3.164", "0x3.2a#10", Greater);
-    test("1/2", 10, Nearest, "3.164", "0x3.2a#10", Greater);
-    test("-1/2", 1, Floor, "0.2", "0x0.4#1", Less);
-    test("-1/2", 1, Ceiling, "0.5", "0x0.8#1", Greater);
-    test("-1/2", 1, Nearest, "0.2", "0x0.4#1", Less);
-    test("-1/2", 10, Floor, "0.3159", "0x0.50e#10", Less);
-    test("-1/2", 10, Ceiling, "0.3164", "0x0.510#10", Greater);
-    test("-1/2", 10, Nearest, "0.3164", "0x0.510#10", Greater);
+    test("1/2", 10, Floor, "3.1602", "0x3.29#10", Less);
+    test("1/2", 10, Ceiling, "3.1641", "0x3.2a#10", Greater);
+    test("1/2", 10, Nearest, "3.1641", "0x3.2a#10", Greater);
+    test("-1/2", 1, Floor, "0.25", "0x0.4#1", Less);
+    test("-1/2", 1, Ceiling, "0.50", "0x0.8#1", Greater);
+    test("-1/2", 1, Nearest, "0.25", "0x0.4#1", Less);
+    test("-1/2", 10, Floor, "0.31592", "0x0.50e#10", Less);
+    test("-1/2", 10, Ceiling, "0.31641", "0x0.510#10", Greater);
+    test("-1/2", 10, Nearest, "0.31641", "0x0.510#10", Greater);
     test("1/3", 1, Floor, "2.0", "0x2.0#1", Less);
     test("1/3", 1, Ceiling, "4.0", "0x4.0#1", Greater);
     test("1/3", 1, Nearest, "2.0", "0x2.0#1", Less);
-    test("1/3", 10, Floor, "2.152", "0x2.27#10", Less);
-    test("1/3", 10, Ceiling, "2.156", "0x2.28#10", Greater);
-    test("1/3", 10, Nearest, "2.156", "0x2.28#10", Greater);
+    test("1/3", 10, Floor, "2.1523", "0x2.27#10", Less);
+    test("1/3", 10, Ceiling, "2.1562", "0x2.28#10", Greater);
+    test("1/3", 10, Nearest, "2.1562", "0x2.28#10", Greater);
     test("22/7", 1, Floor, "1.0e3", "0x4.0E+2#1", Less);
     test("22/7", 1, Ceiling, "2.0e3", "0x8.0E+2#1", Greater);
     test("22/7", 1, Nearest, "1.0e3", "0x4.0E+2#1", Less);
     test("22/7", 10, Floor, "1388.0", "0x56c.0#10", Less);
     test("22/7", 10, Ceiling, "1390.0", "0x56e.0#10", Greater);
     test("22/7", 10, Nearest, "1390.0", "0x56e.0#10", Greater);
-    test("-22/7", 1, Floor, "0.0005", "0x0.002#1", Less);
-    test("-22/7", 1, Ceiling, "0.001", "0x0.004#1", Greater);
-    test("-22/7", 1, Nearest, "0.0005", "0x0.002#1", Less);
-    test("-22/7", 10, Floor, "0.000719", "0x0.002f2#10", Less);
-    test("-22/7", 10, Ceiling, "0.00072", "0x0.002f3#10", Greater);
-    test("-22/7", 10, Nearest, "0.00072", "0x0.002f3#10", Greater);
-    test("100", 1, Floor, "9.0e99", "0x1.0E+83#1", Less);
-    test("100", 1, Ceiling, "2.0e100", "0x2.0E+83#1", Greater);
-    test("100", 1, Nearest, "9.0e99", "0x1.0E+83#1", Less);
-    test("100", 10, Floor, "9.996e99", "0x1.248E+83#10", Less);
-    test("100", 10, Ceiling, "1.001e100", "0x1.250E+83#10", Greater);
-    test("100", 10, Nearest, "9.996e99", "0x1.248E+83#10", Less);
-    test("-100", 1, Floor, "6.0e-101", "0x8.0E-84#1", Less);
-    test("-100", 1, Ceiling, "1.0e-100", "0x1.0E-83#1", Greater);
-    test("-100", 1, Nearest, "1.0e-100", "0x1.0E-83#1", Greater);
-    test("-100", 10, Floor, "9.99e-101", "0xd.fcE-84#10", Less);
-    test("-100", 10, Ceiling, "1.0e-100", "0xe.00E-84#10", Greater);
-    test("-100", 10, Nearest, "1.0e-100", "0xe.00E-84#10", Greater);
+    test("-22/7", 1, Floor, "0.00049", "0x0.002#1", Less);
+    test("-22/7", 1, Ceiling, "0.00098", "0x0.004#1", Greater);
+    test("-22/7", 1, Nearest, "0.00049", "0x0.002#1", Less);
+    test("-22/7", 10, Floor, "0.00071907", "0x0.002f2#10", Less);
+    test("-22/7", 10, Ceiling, "0.00072002", "0x0.002f3#10", Greater);
+    test("-22/7", 10, Nearest, "0.00072002", "0x0.002f3#10", Greater);
+    test("100", 1, Floor, "8.7e99", "0x1.0E+83#1", Less);
+    test("100", 1, Ceiling, "1.7e100", "0x2.0E+83#1", Greater);
+    test("100", 1, Nearest, "8.7e99", "0x1.0E+83#1", Less);
+    test("100", 10, Floor, "9.9964e99", "0x1.248E+83#10", Less);
+    test("100", 10, Ceiling, "1.0014e100", "0x1.250E+83#10", Greater);
+    test("100", 10, Nearest, "9.9964e99", "0x1.248E+83#10", Less);
+    test("-100", 1, Floor, "5.7e-101", "0x8.0E-84#1", Less);
+    test("-100", 1, Ceiling, "1.1e-100", "0x1.0E-83#1", Greater);
+    test("-100", 1, Nearest, "1.1e-100", "0x1.0E-83#1", Greater);
+    test("-100", 10, Floor, "9.9900e-101", "0xd.fcE-84#10", Less);
+    test("-100", 10, Ceiling, "1.0001e-100", "0xe.00E-84#10", Greater);
+    test("-100", 10, Nearest, "1.0001e-100", "0xe.00E-84#10", Greater);
     // Exact succeeds for non-negative integer x with enough precision: 10^x = 2^x * 5^x, whose odd
     // part 5^x has about 2.33 bits per unit of x. Negative integers are never exact (10^-x is not
     // dyadic).
-    test("0", 10, Exact, "1.0", "0x1.000#10", Equal);
-    test("1", 10, Exact, "10.0", "0xa.00#10", Equal);
-    test("2", 10, Exact, "100.0", "0x64.0#10", Equal);
+    test("0", 10, Exact, "1.0000", "0x1.000#10", Equal);
+    test("1", 10, Exact, "10.000", "0xa.00#10", Equal);
+    test("2", 10, Exact, "100.00", "0x64.0#10", Equal);
     test(
         "100",
         233,
         Exact,
-        "1.0e100",
+        "1.00000000000000000000000000000000000000000000000000000000000000000000000e100",
         "0x1.249ad2594c37ceb0b2784c4ce0bf38ace408e211a7caab24308a82e8f1E+83#233",
         Equal,
     );
@@ -922,7 +942,7 @@ fn test_power_of_10_rational_prec_round() {
         Rational::power_of_2(100i64),
         20,
         Floor,
-        "too_big",
+        "2.0985767e323228496",
         "0x7.ffff8E+268435455#20",
         Less,
     );
@@ -938,7 +958,7 @@ fn test_power_of_10_rational_prec_round() {
         -Rational::power_of_2(100i64),
         20,
         Ceiling,
-        "too_small",
+        "2.3825649e-323228497",
         "0x1.00000E-268435456#20",
         Greater,
     );
@@ -948,7 +968,7 @@ fn test_power_of_10_rational_prec_round() {
         Rational::power_of_2(-100i64),
         10,
         Nearest,
-        "1.0",
+        "1.0000",
         "0x1.000#10",
         Less,
     ); // 1
@@ -956,7 +976,7 @@ fn test_power_of_10_rational_prec_round() {
         Rational::power_of_2(-100i64),
         10,
         Ceiling,
-        "1.002",
+        "1.0020",
         "0x1.008#10",
         Greater,
     ); // 1 + ulp
@@ -964,7 +984,7 @@ fn test_power_of_10_rational_prec_round() {
         -Rational::power_of_2(-100i64),
         10,
         Nearest,
-        "1.0",
+        "1.0000",
         "0x1.000#10",
         Greater,
     ); // 1
@@ -972,7 +992,7 @@ fn test_power_of_10_rational_prec_round() {
         -Rational::power_of_2(-100i64),
         10,
         Floor,
-        "0.999",
+        "0.99902",
         "0x0.ffc#10",
         Less,
     ); // 1 - ulp

@@ -564,7 +564,7 @@ impl Float {
     ///     5,
     ///     Floor,
     /// );
-    /// assert_eq!(e.to_string(), "2.9");
+    /// assert_eq!(e.to_string(), "2.88");
     /// assert_eq!(o, Less);
     ///
     /// let (e, o) = Float::power_of_10_x_minus_1_rational_prec_round(
@@ -572,7 +572,7 @@ impl Float {
     ///     5,
     ///     Ceiling,
     /// );
-    /// assert_eq!(e.to_string(), "3.0");
+    /// assert_eq!(e.to_string(), "3.00");
     /// assert_eq!(o, Greater);
     ///
     /// let (e, o) = Float::power_of_10_x_minus_1_rational_prec_round(
@@ -580,7 +580,7 @@ impl Float {
     ///     20,
     ///     Floor,
     /// );
-    /// assert_eq!(e.to_string(), "2.981071");
+    /// assert_eq!(e.to_string(), "2.9810715");
     /// assert_eq!(o, Less);
     ///
     /// let (e, o) = Float::power_of_10_x_minus_1_rational_prec_round(
@@ -588,7 +588,7 @@ impl Float {
     ///     20,
     ///     Ceiling,
     /// );
-    /// assert_eq!(e.to_string(), "2.981075");
+    /// assert_eq!(e.to_string(), "2.9810753");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -667,7 +667,7 @@ impl Float {
     ///     5,
     ///     Floor,
     /// );
-    /// assert_eq!(e.to_string(), "2.9");
+    /// assert_eq!(e.to_string(), "2.88");
     /// assert_eq!(o, Less);
     ///
     /// let (e, o) = Float::power_of_10_x_minus_1_rational_prec_round_ref(
@@ -675,7 +675,7 @@ impl Float {
     ///     5,
     ///     Ceiling,
     /// );
-    /// assert_eq!(e.to_string(), "3.0");
+    /// assert_eq!(e.to_string(), "3.00");
     /// assert_eq!(o, Greater);
     ///
     /// let (e, o) = Float::power_of_10_x_minus_1_rational_prec_round_ref(
@@ -683,7 +683,7 @@ impl Float {
     ///     20,
     ///     Floor,
     /// );
-    /// assert_eq!(e.to_string(), "2.981071");
+    /// assert_eq!(e.to_string(), "2.9810715");
     /// assert_eq!(o, Less);
     ///
     /// let (e, o) = Float::power_of_10_x_minus_1_rational_prec_round_ref(
@@ -691,7 +691,7 @@ impl Float {
     ///     20,
     ///     Ceiling,
     /// );
-    /// assert_eq!(e.to_string(), "2.981075");
+    /// assert_eq!(e.to_string(), "2.9810753");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -759,17 +759,17 @@ impl Float {
     ///
     /// let (e, o) =
     ///     Float::power_of_10_x_minus_1_rational_prec(Rational::from_unsigneds(3u8, 5), 5);
-    /// assert_eq!(e.to_string(), "3.0");
+    /// assert_eq!(e.to_string(), "3.00");
     /// assert_eq!(o, Greater);
     ///
     /// let (e, o) =
     ///     Float::power_of_10_x_minus_1_rational_prec(Rational::from_unsigneds(3u8, 5), 20);
-    /// assert_eq!(e.to_string(), "2.981071");
+    /// assert_eq!(e.to_string(), "2.9810715");
     /// assert_eq!(o, Less);
     ///
     /// let (e, o) =
     ///     Float::power_of_10_x_minus_1_rational_prec(Rational::from_signeds(-3i8, 5), 10);
-    /// assert_eq!(e.to_string(), "-0.749");
+    /// assert_eq!(e.to_string(), "-0.74902");
     /// assert_eq!(o, Less);
     ///
     /// let (e, o) = Float::power_of_10_x_minus_1_rational_prec(Rational::from(0), 10);
@@ -832,17 +832,17 @@ impl Float {
     ///
     /// let (e, o) =
     ///     Float::power_of_10_x_minus_1_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 5);
-    /// assert_eq!(e.to_string(), "3.0");
+    /// assert_eq!(e.to_string(), "3.00");
     /// assert_eq!(o, Greater);
     ///
     /// let (e, o) =
     ///     Float::power_of_10_x_minus_1_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 20);
-    /// assert_eq!(e.to_string(), "2.981071");
+    /// assert_eq!(e.to_string(), "2.9810715");
     /// assert_eq!(o, Less);
     ///
     /// let (e, o) =
     ///     Float::power_of_10_x_minus_1_rational_prec_ref(&Rational::from_signeds(-3i8, 5), 10);
-    /// assert_eq!(e.to_string(), "-0.749");
+    /// assert_eq!(e.to_string(), "-0.74902");
     /// assert_eq!(o, Less);
     ///
     /// let (e, o) = Float::power_of_10_x_minus_1_rational_prec_ref(&Rational::from(0), 10);

@@ -203,7 +203,7 @@ impl Float {
     ///     10,
     ///     Exact,
     /// );
-    /// assert_eq!(log.to_string(), "1.0"); // log_4(1 + 3) = log_4(4) = 1
+    /// assert_eq!(log.to_string(), "1.0000"); // log_4(1 + 3) = log_4(4) = 1
     /// assert_eq!(o, Equal);
     ///
     /// let (log, o) = Float::from(1).log_base_rational_base_1_plus_x_prec_round(
@@ -211,7 +211,7 @@ impl Float {
     ///     10,
     ///     Exact,
     /// );
-    /// assert_eq!(log.to_string(), "0.5"); // log_4(1 + 1) = log_4(2) = 1/2
+    /// assert_eq!(log.to_string(), "0.50000"); // log_4(1 + 1) = log_4(2) = 1/2
     /// assert_eq!(o, Equal);
     /// ```
     #[inline]
@@ -263,7 +263,7 @@ impl Float {
     ///     10,
     ///     Exact,
     /// );
-    /// assert_eq!(log.to_string(), "2.0"); // log_3(1 + 8) = log_3(9) = 2
+    /// assert_eq!(log.to_string(), "2.0000"); // log_3(1 + 8) = log_3(9) = 2
     /// assert_eq!(o, Equal);
     ///
     /// let (log, o) = (&Float::from(1)).log_base_rational_base_1_plus_x_prec_round_ref(
@@ -271,7 +271,7 @@ impl Float {
     ///     20,
     ///     Floor,
     /// );
-    /// assert_eq!(log.to_string(), "0.630929"); // log_3(2), rounded down
+    /// assert_eq!(log.to_string(), "0.63092899"); // log_3(2), rounded down
     /// assert_eq!(o, Less);
     /// ```
     pub fn log_base_rational_base_1_plus_x_prec_round_ref(
@@ -313,7 +313,7 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (log, o) = Float::from(8).log_base_rational_base_1_plus_x_prec(&Rational::from(3), 10);
-    /// assert_eq!(log.to_string(), "2.0"); // log_3(1 + 8) = log_3(9) = 2
+    /// assert_eq!(log.to_string(), "2.0000"); // log_3(1 + 8) = log_3(9) = 2
     /// assert_eq!(o, Equal);
     /// ```
     #[inline]
@@ -349,7 +349,7 @@ impl Float {
     ///
     /// let (log, o) =
     ///     (&Float::from(8)).log_base_rational_base_1_plus_x_prec_ref(&Rational::from(3), 10);
-    /// assert_eq!(log.to_string(), "2.0"); // log_3(1 + 8) = log_3(9) = 2
+    /// assert_eq!(log.to_string(), "2.0000"); // log_3(1 + 8) = log_3(9) = 2
     /// assert_eq!(o, Equal);
     /// ```
     #[inline]
@@ -467,7 +467,7 @@ impl Float {
     ///     x.log_base_rational_base_1_plus_x_prec_round_assign(&Rational::from(3), 10, Exact),
     ///     Equal
     /// );
-    /// assert_eq!(x.to_string(), "2.0"); // log_3(1 + 8) = log_3(9) = 2
+    /// assert_eq!(x.to_string(), "2.0000"); // log_3(1 + 8) = log_3(9) = 2
     /// ```
     #[inline]
     pub fn log_base_rational_base_1_plus_x_prec_round_assign(
@@ -505,7 +505,7 @@ impl Float {
     ///
     /// let mut x = Float::from(8);
     /// x.log_base_rational_base_1_plus_x_prec_assign(&Rational::from(3), 10);
-    /// assert_eq!(x.to_string(), "2.0"); // log_3(1 + 8) = log_3(9) = 2
+    /// assert_eq!(x.to_string(), "2.0000"); // log_3(1 + 8) = log_3(9) = 2
     /// ```
     #[inline]
     pub fn log_base_rational_base_1_plus_x_prec_assign(

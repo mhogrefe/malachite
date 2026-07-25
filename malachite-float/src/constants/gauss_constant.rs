@@ -62,7 +62,10 @@ impl Float {
     /// assert_eq!(o, Less);
     ///
     /// let (gauss_constant, o) = Float::gauss_constant_prec_round(100, Ceiling);
-    /// assert_eq!(gauss_constant.to_string(), "0.83462684167407318628142973279977");
+    /// assert_eq!(
+    ///     gauss_constant.to_string(),
+    ///     "0.83462684167407318628142973279977"
+    /// );
     /// assert_eq!(o, Greater);
     /// ```
     pub fn gauss_constant_prec_round(prec: u64, rm: RoundingMode) -> (Self, Ordering) {

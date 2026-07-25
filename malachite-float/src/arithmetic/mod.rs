@@ -141,22 +141,22 @@ pub(crate) mod round_near_x;
 /// assert_eq!(Float::INFINITY << 10, Float::INFINITY);
 /// assert_eq!(
 ///     (Float::from(std::f64::consts::PI) << 10u8).to_string(),
-///     "3216.990877275948"
+///     "3216.9908772759482"
 /// );
 /// assert_eq!(
 ///     (Float::from(std::f64::consts::PI) << -10i8).to_string(),
-///     "0.003067961575771282"
+///     "0.0030679615757712823"
 /// );
 ///
 /// assert_eq!(&Float::ZERO << 10, 0);
 /// assert_eq!(&Float::INFINITY << 10, Float::INFINITY);
 /// assert_eq!(
 ///     (&Float::from(std::f64::consts::PI) << 10u8).to_string(),
-///     "3216.990877275948"
+///     "3216.9908772759482"
 /// );
 /// assert_eq!(
 ///     (&Float::from(std::f64::consts::PI) << -10i8).to_string(),
-///     "0.003067961575771282"
+///     "0.0030679615757712823"
 /// );
 /// ```
 ///
@@ -175,11 +175,11 @@ pub(crate) mod round_near_x;
 ///
 /// let mut x = Float::from(std::f64::consts::PI);
 /// x <<= 10;
-/// assert_eq!(x.to_string(), "3216.990877275948");
+/// assert_eq!(x.to_string(), "3216.9908772759482");
 ///
 /// let mut x = Float::from(std::f64::consts::PI);
 /// x <<= -10;
-/// assert_eq!(x.to_string(), "0.003067961575771282");
+/// assert_eq!(x.to_string(), "0.0030679615757712823");
 /// ```
 pub mod shl;
 /// Implementations of [`ShlRound`](malachite_base::num::arithmetic::traits::ShlRound) and
@@ -199,11 +199,11 @@ pub mod shl;
 /// assert_eq!(o, Less);
 ///
 /// let (shifted, o) = Float::from(std::f64::consts::PI).shl_prec_round(-10i8, 10, Nearest);
-/// assert_eq!(shifted.to_string(), "0.003067");
+/// assert_eq!(shifted.to_string(), "0.0030670");
 /// assert_eq!(o, Less);
 ///
 /// let (shifted, o) = Float::from(std::f64::consts::PI).shl_prec_round(u32::MAX, 10, Floor);
-/// assert_eq!(shifted.to_string(), "too_big");
+/// assert_eq!(shifted.to_string(), "2.0965e323228496");
 /// assert_eq!(o, Less);
 ///
 /// let (shifted, o) = Float::from(std::f64::consts::PI).shl_prec_round(u32::MAX, 10, Ceiling);
@@ -215,11 +215,11 @@ pub mod shl;
 /// assert_eq!(o, Less);
 ///
 /// let (shifted, o) = Float::from(std::f64::consts::PI).shl_prec_round_ref(-10i8, 10, Nearest);
-/// assert_eq!(shifted.to_string(), "0.003067");
+/// assert_eq!(shifted.to_string(), "0.0030670");
 /// assert_eq!(o, Less);
 ///
 /// let (shifted, o) = Float::from(std::f64::consts::PI).shl_prec_round_ref(u32::MAX, 10, Floor);
-/// assert_eq!(shifted.to_string(), "too_big");
+/// assert_eq!(shifted.to_string(), "2.0965e323228496");
 /// assert_eq!(o, Less);
 ///
 /// let (shifted, o) = Float::from(std::f64::consts::PI).shl_prec_round_ref(u32::MAX, 10, Ceiling);
@@ -239,11 +239,11 @@ pub mod shl;
 ///
 /// let mut x = Float::from(std::f64::consts::PI);
 /// assert_eq!(x.shl_prec_round_assign(-10i8, 10, Nearest), Less);
-/// assert_eq!(x.to_string(), "0.003067");
+/// assert_eq!(x.to_string(), "0.0030670");
 ///
 /// let mut x = Float::from(std::f64::consts::PI);
 /// assert_eq!(x.shl_prec_round_assign(u32::MAX, 10, Floor), Less);
-/// assert_eq!(x.to_string(), "too_big");
+/// assert_eq!(x.to_string(), "2.0965e323228496");
 ///
 /// let mut x = Float::from(std::f64::consts::PI);
 /// assert_eq!(x.shl_prec_round_assign(u32::MAX, 10, Ceiling), Greater);
@@ -260,7 +260,7 @@ pub mod shl;
 /// assert_eq!(o, Less);
 ///
 /// let (shifted, o) = Float::from(std::f64::consts::PI).shl_prec(-10i8, 10);
-/// assert_eq!(shifted.to_string(), "0.003067");
+/// assert_eq!(shifted.to_string(), "0.0030670");
 /// assert_eq!(o, Less);
 ///
 /// let (shifted, o) = Float::from(std::f64::consts::PI).shl_prec(u32::MAX, 10);
@@ -272,7 +272,7 @@ pub mod shl;
 /// assert_eq!(o, Less);
 ///
 /// let (shifted, o) = Float::from(std::f64::consts::PI).shl_prec_ref(-10i8, 10);
-/// assert_eq!(shifted.to_string(), "0.003067");
+/// assert_eq!(shifted.to_string(), "0.0030670");
 /// assert_eq!(o, Less);
 ///
 /// let (shifted, o) = Float::from(std::f64::consts::PI).shl_prec_ref(u32::MAX, 10);
@@ -291,7 +291,7 @@ pub mod shl;
 ///
 /// let mut x = Float::from(std::f64::consts::PI);
 /// assert_eq!(x.shl_prec_assign(-10i8, 10), Less);
-/// assert_eq!(x.to_string(), "0.003067");
+/// assert_eq!(x.to_string(), "0.0030670");
 ///
 /// let mut x = Float::from(std::f64::consts::PI);
 /// assert_eq!(x.shl_prec_assign(u32::MAX, 10), Greater);
@@ -306,15 +306,15 @@ pub mod shl;
 /// use std::cmp::Ordering::*;
 ///
 /// let (shifted, o) = Float::from(std::f64::consts::PI).shl_round(10u8, Nearest);
-/// assert_eq!(shifted.to_string(), "3216.990877275948");
+/// assert_eq!(shifted.to_string(), "3216.9908772759482");
 /// assert_eq!(o, Equal);
 ///
 /// let (shifted, o) = Float::from(std::f64::consts::PI).shl_round(-10i8, Nearest);
-/// assert_eq!(shifted.to_string(), "0.003067961575771282");
+/// assert_eq!(shifted.to_string(), "0.0030679615757712823");
 /// assert_eq!(o, Equal);
 ///
 /// let (shifted, o) = Float::from(std::f64::consts::PI).shl_round(u32::MAX, Floor);
-/// assert_eq!(shifted.to_string(), "too_big");
+/// assert_eq!(shifted.to_string(), "2.0985787164673858e323228496");
 /// assert_eq!(o, Less);
 ///
 /// let (shifted, o) = Float::from(std::f64::consts::PI).shl_round(u32::MAX, Ceiling);
@@ -322,15 +322,15 @@ pub mod shl;
 /// assert_eq!(o, Greater);
 ///
 /// let (shifted, o) = (&Float::from(std::f64::consts::PI)).shl_round(10u8, Nearest);
-/// assert_eq!(shifted.to_string(), "3216.990877275948");
+/// assert_eq!(shifted.to_string(), "3216.9908772759482");
 /// assert_eq!(o, Equal);
 ///
 /// let (shifted, o) = (&Float::from(std::f64::consts::PI)).shl_round(-10i8, Nearest);
-/// assert_eq!(shifted.to_string(), "0.003067961575771282");
+/// assert_eq!(shifted.to_string(), "0.0030679615757712823");
 /// assert_eq!(o, Equal);
 ///
 /// let (shifted, o) = (&Float::from(std::f64::consts::PI)).shl_round(u32::MAX, Floor);
-/// assert_eq!(shifted.to_string(), "too_big");
+/// assert_eq!(shifted.to_string(), "2.0985787164673858e323228496");
 /// assert_eq!(o, Less);
 ///
 /// let (shifted, o) = (&Float::from(std::f64::consts::PI)).shl_round(u32::MAX, Ceiling);
@@ -347,15 +347,15 @@ pub mod shl;
 ///
 /// let mut x = Float::from(std::f64::consts::PI);
 /// assert_eq!(x.shl_round_assign(10u8, Nearest), Equal);
-/// assert_eq!(x.to_string(), "3216.990877275948");
+/// assert_eq!(x.to_string(), "3216.9908772759482");
 ///
 /// let mut x = Float::from(std::f64::consts::PI);
 /// assert_eq!(x.shl_round_assign(-10i8, Nearest), Equal);
-/// assert_eq!(x.to_string(), "0.003067961575771282");
+/// assert_eq!(x.to_string(), "0.0030679615757712823");
 ///
 /// let mut x = Float::from(std::f64::consts::PI);
 /// assert_eq!(x.shl_round_assign(u32::MAX, Floor), Less);
-/// assert_eq!(x.to_string(), "too_big");
+/// assert_eq!(x.to_string(), "2.0985787164673858e323228496");
 ///
 /// let mut x = Float::from(std::f64::consts::PI);
 /// assert_eq!(x.shl_round_assign(u32::MAX, Ceiling), Greater);
@@ -373,22 +373,22 @@ pub mod shl_round;
 /// assert_eq!(Float::INFINITY >> 10, Float::INFINITY);
 /// assert_eq!(
 ///     (Float::from(std::f64::consts::PI) >> 10u8).to_string(),
-///     "0.003067961575771282"
+///     "0.0030679615757712823"
 /// );
 /// assert_eq!(
 ///     (Float::from(std::f64::consts::PI) >> -10i8).to_string(),
-///     "3216.990877275948"
+///     "3216.9908772759482"
 /// );
 ///
 /// assert_eq!(&Float::ZERO >> 10, 0);
 /// assert_eq!(&Float::INFINITY >> 10, Float::INFINITY);
 /// assert_eq!(
 ///     (&Float::from(std::f64::consts::PI) >> 10u8).to_string(),
-///     "0.003067961575771282"
+///     "0.0030679615757712823"
 /// );
 /// assert_eq!(
 ///     (&Float::from(std::f64::consts::PI) >> -10i8).to_string(),
-///     "3216.990877275948"
+///     "3216.9908772759482"
 /// );
 /// ```
 ///
@@ -407,11 +407,11 @@ pub mod shl_round;
 ///
 /// let mut x = Float::from(std::f64::consts::PI);
 /// x >>= 10;
-/// assert_eq!(x.to_string(), "0.003067961575771282");
+/// assert_eq!(x.to_string(), "0.0030679615757712823");
 ///
 /// let mut x = Float::from(std::f64::consts::PI);
 /// x >>= -10;
-/// assert_eq!(x.to_string(), "3216.990877275948");
+/// assert_eq!(x.to_string(), "3216.9908772759482");
 /// ```
 pub mod shr;
 /// Implementations of [`ShlRound`](malachite_base::num::arithmetic::traits::ShrRound) and
@@ -427,7 +427,7 @@ pub mod shr;
 /// use std::cmp::Ordering::*;
 ///
 /// let (shifted, o) = Float::from(std::f64::consts::PI).shr_prec_round(10u8, 10, Nearest);
-/// assert_eq!(shifted.to_string(), "0.003067");
+/// assert_eq!(shifted.to_string(), "0.0030670");
 /// assert_eq!(o, Less);
 ///
 /// let (shifted, o) = Float::from(std::f64::consts::PI).shr_prec_round(-10i8, 10, Nearest);
@@ -439,11 +439,11 @@ pub mod shr;
 /// assert_eq!(o, Less);
 ///
 /// let (shifted, o) = Float::from(std::f64::consts::PI).shr_prec_round(u32::MAX, 10, Ceiling);
-/// assert_eq!(shifted.to_string(), "too_small");
+/// assert_eq!(shifted.to_string(), "2.3826e-323228497");
 /// assert_eq!(o, Greater);
 ///
 /// let (shifted, o) = Float::from(std::f64::consts::PI).shr_prec_round_ref(10u8, 10, Nearest);
-/// assert_eq!(shifted.to_string(), "0.003067");
+/// assert_eq!(shifted.to_string(), "0.0030670");
 /// assert_eq!(o, Less);
 ///
 /// let (shifted, o) = Float::from(std::f64::consts::PI).shr_prec_round_ref(-10i8, 10, Nearest);
@@ -455,7 +455,7 @@ pub mod shr;
 /// assert_eq!(o, Less);
 ///
 /// let (shifted, o) = Float::from(std::f64::consts::PI).shr_prec_round_ref(u32::MAX, 10, Ceiling);
-/// assert_eq!(shifted.to_string(), "too_small");
+/// assert_eq!(shifted.to_string(), "2.3826e-323228497");
 /// assert_eq!(o, Greater);
 /// ```
 ///
@@ -467,7 +467,7 @@ pub mod shr;
 ///
 /// let mut x = Float::from(std::f64::consts::PI);
 /// assert_eq!(x.shr_prec_round_assign(10u8, 10, Nearest), Less);
-/// assert_eq!(x.to_string(), "0.003067");
+/// assert_eq!(x.to_string(), "0.0030670");
 ///
 /// let mut x = Float::from(std::f64::consts::PI);
 /// assert_eq!(x.shr_prec_round_assign(-10i8, 10, Nearest), Less);
@@ -479,7 +479,7 @@ pub mod shr;
 ///
 /// let mut x = Float::from(std::f64::consts::PI);
 /// assert_eq!(x.shr_prec_round_assign(u32::MAX, 10, Ceiling), Greater);
-/// assert_eq!(x.to_string(), "too_small");
+/// assert_eq!(x.to_string(), "2.3826e-323228497");
 /// ```
 ///
 /// # shr_prec
@@ -488,7 +488,7 @@ pub mod shr;
 /// use std::cmp::Ordering::*;
 ///
 /// let (shifted, o) = Float::from(std::f64::consts::PI).shr_prec(10u8, 10);
-/// assert_eq!(shifted.to_string(), "0.003067");
+/// assert_eq!(shifted.to_string(), "0.0030670");
 /// assert_eq!(o, Less);
 ///
 /// let (shifted, o) = Float::from(std::f64::consts::PI).shr_prec(-10i8, 10);
@@ -500,7 +500,7 @@ pub mod shr;
 /// assert_eq!(o, Less);
 ///
 /// let (shifted, o) = Float::from(std::f64::consts::PI).shr_prec_ref(10u8, 10);
-/// assert_eq!(shifted.to_string(), "0.003067");
+/// assert_eq!(shifted.to_string(), "0.0030670");
 /// assert_eq!(o, Less);
 ///
 /// let (shifted, o) = Float::from(std::f64::consts::PI).shr_prec_ref(-10i8, 10);
@@ -519,7 +519,7 @@ pub mod shr;
 ///
 /// let mut x = Float::from(std::f64::consts::PI);
 /// assert_eq!(x.shr_prec_assign(10u8, 10), Less);
-/// assert_eq!(x.to_string(), "0.003067");
+/// assert_eq!(x.to_string(), "0.0030670");
 ///
 /// let mut x = Float::from(std::f64::consts::PI);
 /// assert_eq!(x.shr_prec_assign(-10i8, 10), Less);
@@ -538,11 +538,11 @@ pub mod shr;
 /// use std::cmp::Ordering::*;
 ///
 /// let (shifted, o) = Float::from(std::f64::consts::PI).shr_round(10u8, Nearest);
-/// assert_eq!(shifted.to_string(), "0.003067961575771282");
+/// assert_eq!(shifted.to_string(), "0.0030679615757712823");
 /// assert_eq!(o, Equal);
 ///
 /// let (shifted, o) = Float::from(std::f64::consts::PI).shr_round(-10i8, Nearest);
-/// assert_eq!(shifted.to_string(), "3216.990877275948");
+/// assert_eq!(shifted.to_string(), "3216.9908772759482");
 /// assert_eq!(o, Equal);
 ///
 /// let (shifted, o) = Float::from(std::f64::consts::PI).shr_round(u32::MAX, Floor);
@@ -550,15 +550,15 @@ pub mod shr;
 /// assert_eq!(o, Less);
 ///
 /// let (shifted, o) = Float::from(std::f64::consts::PI).shr_round(u32::MAX, Ceiling);
-/// assert_eq!(shifted.to_string(), "too_small");
+/// assert_eq!(shifted.to_string(), "2.3825649048879511e-323228497");
 /// assert_eq!(o, Greater);
 ///
 /// let (shifted, o) = (&Float::from(std::f64::consts::PI)).shr_round(10u8, Nearest);
-/// assert_eq!(shifted.to_string(), "0.003067961575771282");
+/// assert_eq!(shifted.to_string(), "0.0030679615757712823");
 /// assert_eq!(o, Equal);
 ///
 /// let (shifted, o) = (&Float::from(std::f64::consts::PI)).shr_round(-10i8, Nearest);
-/// assert_eq!(shifted.to_string(), "3216.990877275948");
+/// assert_eq!(shifted.to_string(), "3216.9908772759482");
 /// assert_eq!(o, Equal);
 ///
 /// let (shifted, o) = (&Float::from(std::f64::consts::PI)).shr_round(u32::MAX, Floor);
@@ -566,7 +566,7 @@ pub mod shr;
 /// assert_eq!(o, Less);
 ///
 /// let (shifted, o) = (&Float::from(std::f64::consts::PI)).shr_round(u32::MAX, Ceiling);
-/// assert_eq!(shifted.to_string(), "too_small");
+/// assert_eq!(shifted.to_string(), "2.3825649048879511e-323228497");
 /// assert_eq!(o, Greater);
 /// ```
 ///
@@ -579,11 +579,11 @@ pub mod shr;
 ///
 /// let mut x = Float::from(std::f64::consts::PI);
 /// assert_eq!(x.shr_round_assign(10u8, Nearest), Equal);
-/// assert_eq!(x.to_string(), "0.003067961575771282");
+/// assert_eq!(x.to_string(), "0.0030679615757712823");
 ///
 /// let mut x = Float::from(std::f64::consts::PI);
 /// assert_eq!(x.shr_round_assign(-10i8, Nearest), Equal);
-/// assert_eq!(x.to_string(), "3216.990877275948");
+/// assert_eq!(x.to_string(), "3216.9908772759482");
 ///
 /// let mut x = Float::from(std::f64::consts::PI);
 /// assert_eq!(x.shr_round_assign(u32::MAX, Floor), Less);
@@ -591,7 +591,7 @@ pub mod shr;
 ///
 /// let mut x = Float::from(std::f64::consts::PI);
 /// assert_eq!(x.shr_round_assign(u32::MAX, Ceiling), Greater);
-/// assert_eq!(x.to_string(), "too_small");
+/// assert_eq!(x.to_string(), "2.3825649048879511e-323228497");
 /// ```
 pub mod shr_round;
 /// An implementation of [`Sign`](malachite_base::num::arithmetic::traits::Sign), a trait for

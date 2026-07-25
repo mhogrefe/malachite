@@ -91,7 +91,7 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (square, o) = Float::from(PI).square_prec_round(5, Floor);
-    /// assert_eq!(square.to_string(), "9.5");
+    /// assert_eq!(square.to_string(), "9.50");
     /// assert_eq!(o, Less);
     ///
     /// let (square, o) = Float::from(PI).square_prec_round(5, Ceiling);
@@ -103,15 +103,15 @@ impl Float {
     /// assert_eq!(o, Greater);
     ///
     /// let (square, o) = Float::from(PI).square_prec_round(20, Floor);
-    /// assert_eq!(square.to_string(), "9.8696");
+    /// assert_eq!(square.to_string(), "9.8695984");
     /// assert_eq!(o, Less);
     ///
     /// let (square, o) = Float::from(PI).square_prec_round(20, Ceiling);
-    /// assert_eq!(square.to_string(), "9.86961");
+    /// assert_eq!(square.to_string(), "9.8696136");
     /// assert_eq!(o, Greater);
     ///
     /// let (square, o) = Float::from(PI).square_prec_round(20, Nearest);
-    /// assert_eq!(square.to_string(), "9.8696");
+    /// assert_eq!(square.to_string(), "9.8695984");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -190,7 +190,7 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (square, o) = Float::from(PI).square_prec_round_ref(5, Floor);
-    /// assert_eq!(square.to_string(), "9.5");
+    /// assert_eq!(square.to_string(), "9.50");
     /// assert_eq!(o, Less);
     ///
     /// let (square, o) = Float::from(PI).square_prec_round_ref(5, Ceiling);
@@ -202,15 +202,15 @@ impl Float {
     /// assert_eq!(o, Greater);
     ///
     /// let (square, o) = Float::from(PI).square_prec_round_ref(20, Floor);
-    /// assert_eq!(square.to_string(), "9.8696");
+    /// assert_eq!(square.to_string(), "9.8695984");
     /// assert_eq!(o, Less);
     ///
     /// let (square, o) = Float::from(PI).square_prec_round_ref(20, Ceiling);
-    /// assert_eq!(square.to_string(), "9.86961");
+    /// assert_eq!(square.to_string(), "9.8696136");
     /// assert_eq!(o, Greater);
     ///
     /// let (square, o) = Float::from(PI).square_prec_round_ref(20, Nearest);
-    /// assert_eq!(square.to_string(), "9.8696");
+    /// assert_eq!(square.to_string(), "9.8695984");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -333,7 +333,7 @@ impl Float {
     /// assert_eq!(o, Greater);
     ///
     /// let (square, o) = Float::from(PI).square_prec(20);
-    /// assert_eq!(square.to_string(), "9.8696");
+    /// assert_eq!(square.to_string(), "9.8695984");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -395,7 +395,7 @@ impl Float {
     /// assert_eq!(o, Greater);
     ///
     /// let (square, o) = Float::from(PI).square_prec_ref(20);
-    /// assert_eq!(square.to_string(), "9.8696");
+    /// assert_eq!(square.to_string(), "9.8695984");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -472,15 +472,15 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (square, o) = Float::from(PI).square_round(Floor);
-    /// assert_eq!(square.to_string(), "9.86960440108935");
+    /// assert_eq!(square.to_string(), "9.8696044010893473");
     /// assert_eq!(o, Less);
     ///
     /// let (square, o) = Float::from(PI).square_round(Ceiling);
-    /// assert_eq!(square.to_string(), "9.86960440108936");
+    /// assert_eq!(square.to_string(), "9.8696044010893615");
     /// assert_eq!(o, Greater);
     ///
     /// let (square, o) = Float::from(PI).square_round(Nearest);
-    /// assert_eq!(square.to_string(), "9.86960440108936");
+    /// assert_eq!(square.to_string(), "9.8696044010893615");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -558,15 +558,15 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (square, o) = Float::from(PI).square_round_ref(Floor);
-    /// assert_eq!(square.to_string(), "9.86960440108935");
+    /// assert_eq!(square.to_string(), "9.8696044010893473");
     /// assert_eq!(o, Less);
     ///
     /// let (square, o) = Float::from(PI).square_round_ref(Ceiling);
-    /// assert_eq!(square.to_string(), "9.86960440108936");
+    /// assert_eq!(square.to_string(), "9.8696044010893615");
     /// assert_eq!(o, Greater);
     ///
     /// let (square, o) = Float::from(PI).square_round_ref(Nearest);
-    /// assert_eq!(square.to_string(), "9.86960440108936");
+    /// assert_eq!(square.to_string(), "9.8696044010893615");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -622,7 +622,7 @@ impl Float {
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.square_prec_round_assign(5, Floor), Less);
-    /// assert_eq!(x.to_string(), "9.5");
+    /// assert_eq!(x.to_string(), "9.50");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.square_prec_round_assign(5, Ceiling), Greater);
@@ -634,15 +634,15 @@ impl Float {
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.square_prec_round_assign(20, Floor), Less);
-    /// assert_eq!(x.to_string(), "9.8696");
+    /// assert_eq!(x.to_string(), "9.8695984");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.square_prec_round_assign(20, Ceiling), Greater);
-    /// assert_eq!(x.to_string(), "9.86961");
+    /// assert_eq!(x.to_string(), "9.8696136");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.square_prec_round_assign(20, Nearest), Less);
-    /// assert_eq!(x.to_string(), "9.8696");
+    /// assert_eq!(x.to_string(), "9.8695984");
     /// ```
     #[inline]
     pub fn square_prec_round_assign(&mut self, prec: u64, rm: RoundingMode) -> Ordering {
@@ -777,7 +777,7 @@ impl Float {
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.square_prec_assign(20), Less);
-    /// assert_eq!(x.to_string(), "9.8696");
+    /// assert_eq!(x.to_string(), "9.8695984");
     /// ```
     #[inline]
     pub fn square_prec_assign(&mut self, prec: u64) -> Ordering {
@@ -830,15 +830,15 @@ impl Float {
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.square_round_assign(Floor), Less);
-    /// assert_eq!(x.to_string(), "9.86960440108935");
+    /// assert_eq!(x.to_string(), "9.8696044010893473");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.square_round_assign(Ceiling), Greater);
-    /// assert_eq!(x.to_string(), "9.86960440108936");
+    /// assert_eq!(x.to_string(), "9.8696044010893615");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.square_round_assign(Nearest), Greater);
-    /// assert_eq!(x.to_string(), "9.86960440108936");
+    /// assert_eq!(x.to_string(), "9.8696044010893615");
     /// ```
     #[inline]
     pub fn square_round_assign(&mut self, rm: RoundingMode) -> Ordering {

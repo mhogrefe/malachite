@@ -612,27 +612,27 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (product, o) = Float::from(PI).mul_prec_round(Float::from(E), 5, Floor);
-    /// assert_eq!(product.to_string(), "8.5");
+    /// assert_eq!(product.to_string(), "8.50");
     /// assert_eq!(o, Less);
     ///
     /// let (product, o) = Float::from(PI).mul_prec_round(Float::from(E), 5, Ceiling);
-    /// assert_eq!(product.to_string(), "9.0");
+    /// assert_eq!(product.to_string(), "9.00");
     /// assert_eq!(o, Greater);
     ///
     /// let (product, o) = Float::from(PI).mul_prec_round(Float::from(E), 5, Nearest);
-    /// assert_eq!(product.to_string(), "8.5");
+    /// assert_eq!(product.to_string(), "8.50");
     /// assert_eq!(o, Less);
     ///
     /// let (product, o) = Float::from(PI).mul_prec_round(Float::from(E), 20, Floor);
-    /// assert_eq!(product.to_string(), "8.53973");
+    /// assert_eq!(product.to_string(), "8.5397339");
     /// assert_eq!(o, Less);
     ///
     /// let (product, o) = Float::from(PI).mul_prec_round(Float::from(E), 20, Ceiling);
-    /// assert_eq!(product.to_string(), "8.53975");
+    /// assert_eq!(product.to_string(), "8.5397491");
     /// assert_eq!(o, Greater);
     ///
     /// let (product, o) = Float::from(PI).mul_prec_round(Float::from(E), 20, Nearest);
-    /// assert_eq!(product.to_string(), "8.53973");
+    /// assert_eq!(product.to_string(), "8.5397339");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -723,27 +723,27 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (product, o) = Float::from(PI).mul_prec_round_val_ref(&Float::from(E), 5, Floor);
-    /// assert_eq!(product.to_string(), "8.5");
+    /// assert_eq!(product.to_string(), "8.50");
     /// assert_eq!(o, Less);
     ///
     /// let (product, o) = Float::from(PI).mul_prec_round_val_ref(&Float::from(E), 5, Ceiling);
-    /// assert_eq!(product.to_string(), "9.0");
+    /// assert_eq!(product.to_string(), "9.00");
     /// assert_eq!(o, Greater);
     ///
     /// let (product, o) = Float::from(PI).mul_prec_round_val_ref(&Float::from(E), 5, Nearest);
-    /// assert_eq!(product.to_string(), "8.5");
+    /// assert_eq!(product.to_string(), "8.50");
     /// assert_eq!(o, Less);
     ///
     /// let (product, o) = Float::from(PI).mul_prec_round_val_ref(&Float::from(E), 20, Floor);
-    /// assert_eq!(product.to_string(), "8.53973");
+    /// assert_eq!(product.to_string(), "8.5397339");
     /// assert_eq!(o, Less);
     ///
     /// let (product, o) = Float::from(PI).mul_prec_round_val_ref(&Float::from(E), 20, Ceiling);
-    /// assert_eq!(product.to_string(), "8.53975");
+    /// assert_eq!(product.to_string(), "8.5397491");
     /// assert_eq!(o, Greater);
     ///
     /// let (product, o) = Float::from(PI).mul_prec_round_val_ref(&Float::from(E), 20, Nearest);
-    /// assert_eq!(product.to_string(), "8.53973");
+    /// assert_eq!(product.to_string(), "8.5397339");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -839,27 +839,27 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (product, o) = Float::from(PI).mul_prec_round_ref_val(Float::from(E), 5, Floor);
-    /// assert_eq!(product.to_string(), "8.5");
+    /// assert_eq!(product.to_string(), "8.50");
     /// assert_eq!(o, Less);
     ///
     /// let (product, o) = Float::from(PI).mul_prec_round_ref_val(Float::from(E), 5, Ceiling);
-    /// assert_eq!(product.to_string(), "9.0");
+    /// assert_eq!(product.to_string(), "9.00");
     /// assert_eq!(o, Greater);
     ///
     /// let (product, o) = Float::from(PI).mul_prec_round_ref_val(Float::from(E), 5, Nearest);
-    /// assert_eq!(product.to_string(), "8.5");
+    /// assert_eq!(product.to_string(), "8.50");
     /// assert_eq!(o, Less);
     ///
     /// let (product, o) = Float::from(PI).mul_prec_round_ref_val(Float::from(E), 20, Floor);
-    /// assert_eq!(product.to_string(), "8.53973");
+    /// assert_eq!(product.to_string(), "8.5397339");
     /// assert_eq!(o, Less);
     ///
     /// let (product, o) = Float::from(PI).mul_prec_round_ref_val(Float::from(E), 20, Ceiling);
-    /// assert_eq!(product.to_string(), "8.53975");
+    /// assert_eq!(product.to_string(), "8.5397491");
     /// assert_eq!(o, Greater);
     ///
     /// let (product, o) = Float::from(PI).mul_prec_round_ref_val(Float::from(E), 20, Nearest);
-    /// assert_eq!(product.to_string(), "8.53973");
+    /// assert_eq!(product.to_string(), "8.5397339");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -955,27 +955,27 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (product, o) = Float::from(PI).mul_prec_round_ref_ref(&Float::from(E), 5, Floor);
-    /// assert_eq!(product.to_string(), "8.5");
+    /// assert_eq!(product.to_string(), "8.50");
     /// assert_eq!(o, Less);
     ///
     /// let (product, o) = Float::from(PI).mul_prec_round_ref_ref(&Float::from(E), 5, Ceiling);
-    /// assert_eq!(product.to_string(), "9.0");
+    /// assert_eq!(product.to_string(), "9.00");
     /// assert_eq!(o, Greater);
     ///
     /// let (product, o) = Float::from(PI).mul_prec_round_ref_ref(&Float::from(E), 5, Nearest);
-    /// assert_eq!(product.to_string(), "8.5");
+    /// assert_eq!(product.to_string(), "8.50");
     /// assert_eq!(o, Less);
     ///
     /// let (product, o) = Float::from(PI).mul_prec_round_ref_ref(&Float::from(E), 20, Floor);
-    /// assert_eq!(product.to_string(), "8.53973");
+    /// assert_eq!(product.to_string(), "8.5397339");
     /// assert_eq!(o, Less);
     ///
     /// let (product, o) = Float::from(PI).mul_prec_round_ref_ref(&Float::from(E), 20, Ceiling);
-    /// assert_eq!(product.to_string(), "8.53975");
+    /// assert_eq!(product.to_string(), "8.5397491");
     /// assert_eq!(o, Greater);
     ///
     /// let (product, o) = Float::from(PI).mul_prec_round_ref_ref(&Float::from(E), 20, Nearest);
-    /// assert_eq!(product.to_string(), "8.53973");
+    /// assert_eq!(product.to_string(), "8.5397339");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -1151,11 +1151,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (product, o) = Float::from(PI).mul_prec(Float::from(E), 5);
-    /// assert_eq!(product.to_string(), "8.5");
+    /// assert_eq!(product.to_string(), "8.50");
     /// assert_eq!(o, Less);
     ///
     /// let (product, o) = Float::from(PI).mul_prec(Float::from(E), 20);
-    /// assert_eq!(product.to_string(), "8.53973");
+    /// assert_eq!(product.to_string(), "8.5397339");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -1220,11 +1220,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (product, o) = Float::from(PI).mul_prec_val_ref(&Float::from(E), 5);
-    /// assert_eq!(product.to_string(), "8.5");
+    /// assert_eq!(product.to_string(), "8.50");
     /// assert_eq!(o, Less);
     ///
     /// let (product, o) = Float::from(PI).mul_prec_val_ref(&Float::from(E), 20);
-    /// assert_eq!(product.to_string(), "8.53973");
+    /// assert_eq!(product.to_string(), "8.5397339");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -1289,11 +1289,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (product, o) = Float::from(PI).mul_prec_ref_val(Float::from(E), 5);
-    /// assert_eq!(product.to_string(), "8.5");
+    /// assert_eq!(product.to_string(), "8.50");
     /// assert_eq!(o, Less);
     ///
     /// let (product, o) = Float::from(PI).mul_prec_ref_val(Float::from(E), 20);
-    /// assert_eq!(product.to_string(), "8.53973");
+    /// assert_eq!(product.to_string(), "8.5397339");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -1358,11 +1358,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (product, o) = Float::from(PI).mul_prec_ref_ref(&Float::from(E), 5);
-    /// assert_eq!(product.to_string(), "8.5");
+    /// assert_eq!(product.to_string(), "8.50");
     /// assert_eq!(o, Less);
     ///
     /// let (product, o) = Float::from(PI).mul_prec_ref_ref(&Float::from(E), 20);
-    /// assert_eq!(product.to_string(), "8.53973");
+    /// assert_eq!(product.to_string(), "8.5397339");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -1448,15 +1448,15 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (product, o) = Float::from(PI).mul_round(Float::from(E), Floor);
-    /// assert_eq!(product.to_string(), "8.539734222673566");
+    /// assert_eq!(product.to_string(), "8.5397342226735660");
     /// assert_eq!(o, Less);
     ///
     /// let (product, o) = Float::from(PI).mul_round(Float::from(E), Ceiling);
-    /// assert_eq!(product.to_string(), "8.539734222673568");
+    /// assert_eq!(product.to_string(), "8.5397342226735677");
     /// assert_eq!(o, Greater);
     ///
     /// let (product, o) = Float::from(PI).mul_round(Float::from(E), Nearest);
-    /// assert_eq!(product.to_string(), "8.539734222673566");
+    /// assert_eq!(product.to_string(), "8.5397342226735660");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -1543,15 +1543,15 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (product, o) = Float::from(PI).mul_round_val_ref(&Float::from(E), Floor);
-    /// assert_eq!(product.to_string(), "8.539734222673566");
+    /// assert_eq!(product.to_string(), "8.5397342226735660");
     /// assert_eq!(o, Less);
     ///
     /// let (product, o) = Float::from(PI).mul_round_val_ref(&Float::from(E), Ceiling);
-    /// assert_eq!(product.to_string(), "8.539734222673568");
+    /// assert_eq!(product.to_string(), "8.5397342226735677");
     /// assert_eq!(o, Greater);
     ///
     /// let (product, o) = Float::from(PI).mul_round_val_ref(&Float::from(E), Nearest);
-    /// assert_eq!(product.to_string(), "8.539734222673566");
+    /// assert_eq!(product.to_string(), "8.5397342226735660");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -1638,15 +1638,15 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (product, o) = Float::from(PI).mul_round_ref_val(Float::from(E), Floor);
-    /// assert_eq!(product.to_string(), "8.539734222673566");
+    /// assert_eq!(product.to_string(), "8.5397342226735660");
     /// assert_eq!(o, Less);
     ///
     /// let (product, o) = Float::from(PI).mul_round_ref_val(Float::from(E), Ceiling);
-    /// assert_eq!(product.to_string(), "8.539734222673568");
+    /// assert_eq!(product.to_string(), "8.5397342226735677");
     /// assert_eq!(o, Greater);
     ///
     /// let (product, o) = Float::from(PI).mul_round_ref_val(Float::from(E), Nearest);
-    /// assert_eq!(product.to_string(), "8.539734222673566");
+    /// assert_eq!(product.to_string(), "8.5397342226735660");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -1733,15 +1733,15 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (product, o) = Float::from(PI).mul_round_ref_ref(&Float::from(E), Floor);
-    /// assert_eq!(product.to_string(), "8.539734222673566");
+    /// assert_eq!(product.to_string(), "8.5397342226735660");
     /// assert_eq!(o, Less);
     ///
     /// let (product, o) = Float::from(PI).mul_round_ref_ref(&Float::from(E), Ceiling);
-    /// assert_eq!(product.to_string(), "8.539734222673568");
+    /// assert_eq!(product.to_string(), "8.5397342226735677");
     /// assert_eq!(o, Greater);
     ///
     /// let (product, o) = Float::from(PI).mul_round_ref_ref(&Float::from(E), Nearest);
-    /// assert_eq!(product.to_string(), "8.539734222673566");
+    /// assert_eq!(product.to_string(), "8.5397342226735660");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -1800,42 +1800,42 @@ impl Float {
     ///     product.mul_prec_round_assign(Float::from(E), 5, Floor),
     ///     Less
     /// );
-    /// assert_eq!(product.to_string(), "8.5");
+    /// assert_eq!(product.to_string(), "8.50");
     ///
     /// let mut product = Float::from(PI);
     /// assert_eq!(
     ///     product.mul_prec_round_assign(Float::from(E), 5, Ceiling),
     ///     Greater
     /// );
-    /// assert_eq!(product.to_string(), "9.0");
+    /// assert_eq!(product.to_string(), "9.00");
     ///
     /// let mut product = Float::from(PI);
     /// assert_eq!(
     ///     product.mul_prec_round_assign(Float::from(E), 5, Nearest),
     ///     Less
     /// );
-    /// assert_eq!(product.to_string(), "8.5");
+    /// assert_eq!(product.to_string(), "8.50");
     ///
     /// let mut product = Float::from(PI);
     /// assert_eq!(
     ///     product.mul_prec_round_assign(Float::from(E), 20, Floor),
     ///     Less
     /// );
-    /// assert_eq!(product.to_string(), "8.53973");
+    /// assert_eq!(product.to_string(), "8.5397339");
     ///
     /// let mut product = Float::from(PI);
     /// assert_eq!(
     ///     product.mul_prec_round_assign(Float::from(E), 20, Ceiling),
     ///     Greater
     /// );
-    /// assert_eq!(product.to_string(), "8.53975");
+    /// assert_eq!(product.to_string(), "8.5397491");
     ///
     /// let mut product = Float::from(PI);
     /// assert_eq!(
     ///     product.mul_prec_round_assign(Float::from(E), 20, Nearest),
     ///     Less
     /// );
-    /// assert_eq!(product.to_string(), "8.53973");
+    /// assert_eq!(product.to_string(), "8.5397339");
     /// ```
     #[inline]
     pub fn mul_prec_round_assign(&mut self, other: Self, prec: u64, rm: RoundingMode) -> Ordering {
@@ -2046,42 +2046,42 @@ impl Float {
     ///     product.mul_prec_round_assign_ref(&Float::from(E), 5, Floor),
     ///     Less
     /// );
-    /// assert_eq!(product.to_string(), "8.5");
+    /// assert_eq!(product.to_string(), "8.50");
     ///
     /// let mut product = Float::from(PI);
     /// assert_eq!(
     ///     product.mul_prec_round_assign_ref(&Float::from(E), 5, Ceiling),
     ///     Greater
     /// );
-    /// assert_eq!(product.to_string(), "9.0");
+    /// assert_eq!(product.to_string(), "9.00");
     ///
     /// let mut product = Float::from(PI);
     /// assert_eq!(
     ///     product.mul_prec_round_assign_ref(&Float::from(E), 5, Nearest),
     ///     Less
     /// );
-    /// assert_eq!(product.to_string(), "8.5");
+    /// assert_eq!(product.to_string(), "8.50");
     ///
     /// let mut product = Float::from(PI);
     /// assert_eq!(
     ///     product.mul_prec_round_assign_ref(&Float::from(E), 20, Floor),
     ///     Less
     /// );
-    /// assert_eq!(product.to_string(), "8.53973");
+    /// assert_eq!(product.to_string(), "8.5397339");
     ///
     /// let mut product = Float::from(PI);
     /// assert_eq!(
     ///     product.mul_prec_round_assign_ref(&Float::from(E), 20, Ceiling),
     ///     Greater
     /// );
-    /// assert_eq!(product.to_string(), "8.53975");
+    /// assert_eq!(product.to_string(), "8.5397491");
     ///
     /// let mut product = Float::from(PI);
     /// assert_eq!(
     ///     product.mul_prec_round_assign_ref(&Float::from(E), 20, Nearest),
     ///     Less
     /// );
-    /// assert_eq!(product.to_string(), "8.53973");
+    /// assert_eq!(product.to_string(), "8.5397339");
     /// ```
     #[inline]
     pub fn mul_prec_round_assign_ref(
@@ -2287,11 +2287,11 @@ impl Float {
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.mul_prec_assign(Float::from(E), 5), Less);
-    /// assert_eq!(x.to_string(), "8.5");
+    /// assert_eq!(x.to_string(), "8.50");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.mul_prec_assign(Float::from(E), 20), Less);
-    /// assert_eq!(x.to_string(), "8.53973");
+    /// assert_eq!(x.to_string(), "8.5397339");
     /// ```
     #[inline]
     pub fn mul_prec_assign(&mut self, other: Self, prec: u64) -> Ordering {
@@ -2339,11 +2339,11 @@ impl Float {
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.mul_prec_assign_ref(&Float::from(E), 5), Less);
-    /// assert_eq!(x.to_string(), "8.5");
+    /// assert_eq!(x.to_string(), "8.50");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.mul_prec_assign_ref(&Float::from(E), 20), Less);
-    /// assert_eq!(x.to_string(), "8.53973");
+    /// assert_eq!(x.to_string(), "8.5397339");
     /// ```
     #[inline]
     pub fn mul_prec_assign_ref(&mut self, other: &Self, prec: u64) -> Ordering {
@@ -2398,15 +2398,15 @@ impl Float {
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.mul_round_assign(Float::from(E), Floor), Less);
-    /// assert_eq!(x.to_string(), "8.539734222673566");
+    /// assert_eq!(x.to_string(), "8.5397342226735660");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.mul_round_assign(Float::from(E), Ceiling), Greater);
-    /// assert_eq!(x.to_string(), "8.539734222673568");
+    /// assert_eq!(x.to_string(), "8.5397342226735677");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.mul_round_assign(Float::from(E), Nearest), Less);
-    /// assert_eq!(x.to_string(), "8.539734222673566");
+    /// assert_eq!(x.to_string(), "8.5397342226735660");
     /// ```
     #[inline]
     pub fn mul_round_assign(&mut self, other: Self, rm: RoundingMode) -> Ordering {
@@ -2462,15 +2462,15 @@ impl Float {
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.mul_round_assign_ref(&Float::from(E), Floor), Less);
-    /// assert_eq!(x.to_string(), "8.539734222673566");
+    /// assert_eq!(x.to_string(), "8.5397342226735660");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.mul_round_assign_ref(&Float::from(E), Ceiling), Greater);
-    /// assert_eq!(x.to_string(), "8.539734222673568");
+    /// assert_eq!(x.to_string(), "8.5397342226735677");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.mul_round_assign_ref(&Float::from(E), Nearest), Less);
-    /// assert_eq!(x.to_string(), "8.539734222673566");
+    /// assert_eq!(x.to_string(), "8.5397342226735660");
     /// ```
     #[inline]
     pub fn mul_round_assign_ref(&mut self, other: &Self, rm: RoundingMode) -> Ordering {
@@ -2557,7 +2557,7 @@ impl Float {
     ///
     /// let (product, o) =
     ///     Float::from(PI).mul_rational_prec_round(Rational::from_unsigneds(1u8, 3), 5, Floor);
-    /// assert_eq!(product.to_string(), "1.0");
+    /// assert_eq!(product.to_string(), "1.00");
     /// assert_eq!(o, Less);
     ///
     /// let (product, o) =
@@ -2572,17 +2572,17 @@ impl Float {
     ///
     /// let (product, o) =
     ///     Float::from(PI).mul_rational_prec_round(Rational::from_unsigneds(1u8, 3), 20, Floor);
-    /// assert_eq!(product.to_string(), "1.047197");
+    /// assert_eq!(product.to_string(), "1.0471973");
     /// assert_eq!(o, Less);
     ///
     /// let (product, o) =
     ///     Float::from(PI).mul_rational_prec_round(Rational::from_unsigneds(1u8, 3), 20, Ceiling);
-    /// assert_eq!(product.to_string(), "1.047199");
+    /// assert_eq!(product.to_string(), "1.0471992");
     /// assert_eq!(o, Greater);
     ///
     /// let (product, o) =
     ///     Float::from(PI).mul_rational_prec_round(Rational::from_unsigneds(1u8, 3), 20, Nearest);
-    /// assert_eq!(product.to_string(), "1.047197");
+    /// assert_eq!(product.to_string(), "1.0471973");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -2678,7 +2678,7 @@ impl Float {
     ///     5,
     ///     Floor,
     /// );
-    /// assert_eq!(product.to_string(), "1.0");
+    /// assert_eq!(product.to_string(), "1.00");
     /// assert_eq!(o, Less);
     ///
     /// let (product, o) = Float::from(PI).mul_rational_prec_round_val_ref(
@@ -2702,7 +2702,7 @@ impl Float {
     ///     20,
     ///     Floor,
     /// );
-    /// assert_eq!(product.to_string(), "1.047197");
+    /// assert_eq!(product.to_string(), "1.0471973");
     /// assert_eq!(o, Less);
     ///
     /// let (product, o) = Float::from(PI).mul_rational_prec_round_val_ref(
@@ -2710,7 +2710,7 @@ impl Float {
     ///     20,
     ///     Ceiling,
     /// );
-    /// assert_eq!(product.to_string(), "1.047199");
+    /// assert_eq!(product.to_string(), "1.0471992");
     /// assert_eq!(o, Greater);
     ///
     /// let (product, o) = Float::from(PI).mul_rational_prec_round_val_ref(
@@ -2718,7 +2718,7 @@ impl Float {
     ///     20,
     ///     Nearest,
     /// );
-    /// assert_eq!(product.to_string(), "1.047197");
+    /// assert_eq!(product.to_string(), "1.0471973");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -2814,7 +2814,7 @@ impl Float {
     ///     5,
     ///     Floor,
     /// );
-    /// assert_eq!(product.to_string(), "1.0");
+    /// assert_eq!(product.to_string(), "1.00");
     /// assert_eq!(o, Less);
     ///
     /// let (product, o) = Float::from(PI).mul_rational_prec_round_ref_val(
@@ -2838,7 +2838,7 @@ impl Float {
     ///     20,
     ///     Floor,
     /// );
-    /// assert_eq!(product.to_string(), "1.047197");
+    /// assert_eq!(product.to_string(), "1.0471973");
     /// assert_eq!(o, Less);
     ///
     /// let (product, o) = Float::from(PI).mul_rational_prec_round_ref_val(
@@ -2846,7 +2846,7 @@ impl Float {
     ///     20,
     ///     Ceiling,
     /// );
-    /// assert_eq!(product.to_string(), "1.047199");
+    /// assert_eq!(product.to_string(), "1.0471992");
     /// assert_eq!(o, Greater);
     ///
     /// let (product, o) = Float::from(PI).mul_rational_prec_round_ref_val(
@@ -2854,7 +2854,7 @@ impl Float {
     ///     20,
     ///     Nearest,
     /// );
-    /// assert_eq!(product.to_string(), "1.047197");
+    /// assert_eq!(product.to_string(), "1.0471973");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -2955,7 +2955,7 @@ impl Float {
     ///     5,
     ///     Floor,
     /// );
-    /// assert_eq!(product.to_string(), "1.0");
+    /// assert_eq!(product.to_string(), "1.00");
     /// assert_eq!(o, Less);
     ///
     /// let (product, o) = Float::from(PI).mul_rational_prec_round_ref_ref(
@@ -2979,7 +2979,7 @@ impl Float {
     ///     20,
     ///     Floor,
     /// );
-    /// assert_eq!(product.to_string(), "1.047197");
+    /// assert_eq!(product.to_string(), "1.0471973");
     /// assert_eq!(o, Less);
     ///
     /// let (product, o) = Float::from(PI).mul_rational_prec_round_ref_ref(
@@ -2987,7 +2987,7 @@ impl Float {
     ///     20,
     ///     Ceiling,
     /// );
-    /// assert_eq!(product.to_string(), "1.047199");
+    /// assert_eq!(product.to_string(), "1.0471992");
     /// assert_eq!(o, Greater);
     ///
     /// let (product, o) = Float::from(PI).mul_rational_prec_round_ref_ref(
@@ -2995,7 +2995,7 @@ impl Float {
     ///     20,
     ///     Nearest,
     /// );
-    /// assert_eq!(product.to_string(), "1.047197");
+    /// assert_eq!(product.to_string(), "1.0471973");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -3072,11 +3072,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (product, o) = Float::from(PI).mul_rational_prec(Rational::exact_from(1.5), 5);
-    /// assert_eq!(product.to_string(), "4.8");
+    /// assert_eq!(product.to_string(), "4.75");
     /// assert_eq!(o, Greater);
     ///
     /// let (product, o) = Float::from(PI).mul_rational_prec(Rational::exact_from(1.5), 20);
-    /// assert_eq!(product.to_string(), "4.712387");
+    /// assert_eq!(product.to_string(), "4.7123871");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -3142,12 +3142,12 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (product, o) = Float::from(PI).mul_rational_prec_val_ref(&Rational::exact_from(1.5), 5);
-    /// assert_eq!(product.to_string(), "4.8");
+    /// assert_eq!(product.to_string(), "4.75");
     /// assert_eq!(o, Greater);
     ///
     /// let (product, o) =
     ///     Float::from(PI).mul_rational_prec_val_ref(&Rational::exact_from(1.5), 20);
-    /// assert_eq!(product.to_string(), "4.712387");
+    /// assert_eq!(product.to_string(), "4.7123871");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -3213,11 +3213,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (product, o) = Float::from(PI).mul_rational_prec_ref_val(Rational::exact_from(1.5), 5);
-    /// assert_eq!(product.to_string(), "4.8");
+    /// assert_eq!(product.to_string(), "4.75");
     /// assert_eq!(o, Greater);
     ///
     /// let (product, o) = Float::from(PI).mul_rational_prec_ref_val(Rational::exact_from(1.5), 20);
-    /// assert_eq!(product.to_string(), "4.712387");
+    /// assert_eq!(product.to_string(), "4.7123871");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -3283,12 +3283,12 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (product, o) = Float::from(PI).mul_rational_prec_ref_ref(&Rational::exact_from(1.5), 5);
-    /// assert_eq!(product.to_string(), "4.8");
+    /// assert_eq!(product.to_string(), "4.75");
     /// assert_eq!(o, Greater);
     ///
     /// let (product, o) =
     ///     Float::from(PI).mul_rational_prec_ref_ref(&Rational::exact_from(1.5), 20);
-    /// assert_eq!(product.to_string(), "4.712387");
+    /// assert_eq!(product.to_string(), "4.7123871");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -3375,17 +3375,17 @@ impl Float {
     ///
     /// let (product, o) =
     ///     Float::from(PI).mul_rational_round(Rational::from_unsigneds(1u8, 3), Floor);
-    /// assert_eq!(product.to_string(), "1.047197551196597");
+    /// assert_eq!(product.to_string(), "1.0471975511965965");
     /// assert_eq!(o, Less);
     ///
     /// let (product, o) =
     ///     Float::from(PI).mul_rational_round(Rational::from_unsigneds(1u8, 3), Ceiling);
-    /// assert_eq!(product.to_string(), "1.047197551196598");
+    /// assert_eq!(product.to_string(), "1.0471975511965983");
     /// assert_eq!(o, Greater);
     ///
     /// let (product, o) =
     ///     Float::from(PI).mul_rational_round(Rational::from_unsigneds(1u8, 3), Nearest);
-    /// assert_eq!(product.to_string(), "1.047197551196598");
+    /// assert_eq!(product.to_string(), "1.0471975511965983");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -3473,17 +3473,17 @@ impl Float {
     ///
     /// let (product, o) =
     ///     Float::from(PI).mul_rational_round_val_ref(&Rational::from_unsigneds(1u8, 3), Floor);
-    /// assert_eq!(product.to_string(), "1.047197551196597");
+    /// assert_eq!(product.to_string(), "1.0471975511965965");
     /// assert_eq!(o, Less);
     ///
     /// let (product, o) =
     ///     Float::from(PI).mul_rational_round_val_ref(&Rational::from_unsigneds(1u8, 3), Ceiling);
-    /// assert_eq!(product.to_string(), "1.047197551196598");
+    /// assert_eq!(product.to_string(), "1.0471975511965983");
     /// assert_eq!(o, Greater);
     ///
     /// let (product, o) =
     ///     Float::from(PI).mul_rational_round_val_ref(&Rational::from_unsigneds(1u8, 3), Nearest);
-    /// assert_eq!(product.to_string(), "1.047197551196598");
+    /// assert_eq!(product.to_string(), "1.0471975511965983");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -3575,17 +3575,17 @@ impl Float {
     ///
     /// let (product, o) =
     ///     Float::from(PI).mul_rational_round_ref_val(Rational::from_unsigneds(1u8, 3), Floor);
-    /// assert_eq!(product.to_string(), "1.047197551196597");
+    /// assert_eq!(product.to_string(), "1.0471975511965965");
     /// assert_eq!(o, Less);
     ///
     /// let (product, o) =
     ///     Float::from(PI).mul_rational_round_ref_val(Rational::from_unsigneds(1u8, 3), Ceiling);
-    /// assert_eq!(product.to_string(), "1.047197551196598");
+    /// assert_eq!(product.to_string(), "1.0471975511965983");
     /// assert_eq!(o, Greater);
     ///
     /// let (product, o) =
     ///     Float::from(PI).mul_rational_round_ref_val(Rational::from_unsigneds(1u8, 3), Nearest);
-    /// assert_eq!(product.to_string(), "1.047197551196598");
+    /// assert_eq!(product.to_string(), "1.0471975511965983");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -3677,17 +3677,17 @@ impl Float {
     ///
     /// let (product, o) =
     ///     Float::from(PI).mul_rational_round_ref_ref(&Rational::from_unsigneds(1u8, 3), Floor);
-    /// assert_eq!(product.to_string(), "1.047197551196597");
+    /// assert_eq!(product.to_string(), "1.0471975511965965");
     /// assert_eq!(o, Less);
     ///
     /// let (product, o) =
     ///     Float::from(PI).mul_rational_round_ref_ref(&Rational::from_unsigneds(1u8, 3), Ceiling);
-    /// assert_eq!(product.to_string(), "1.047197551196598");
+    /// assert_eq!(product.to_string(), "1.0471975511965983");
     /// assert_eq!(o, Greater);
     ///
     /// let (product, o) =
     ///     Float::from(PI).mul_rational_round_ref_ref(&Rational::from_unsigneds(1u8, 3), Nearest);
-    /// assert_eq!(product.to_string(), "1.047197551196598");
+    /// assert_eq!(product.to_string(), "1.0471975511965983");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -3751,7 +3751,7 @@ impl Float {
     ///     x.mul_rational_prec_round_assign(Rational::from_unsigneds(1u8, 3), 5, Floor),
     ///     Less
     /// );
-    /// assert_eq!(x.to_string(), "1.0");
+    /// assert_eq!(x.to_string(), "1.00");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
@@ -3772,21 +3772,21 @@ impl Float {
     ///     x.mul_rational_prec_round_assign(Rational::from_unsigneds(1u8, 3), 20, Floor),
     ///     Less
     /// );
-    /// assert_eq!(x.to_string(), "1.047197");
+    /// assert_eq!(x.to_string(), "1.0471973");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.mul_rational_prec_round_assign(Rational::from_unsigneds(1u8, 3), 20, Ceiling),
     ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "1.047199");
+    /// assert_eq!(x.to_string(), "1.0471992");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.mul_rational_prec_round_assign(Rational::from_unsigneds(1u8, 3), 20, Nearest),
     ///     Less
     /// );
-    /// assert_eq!(x.to_string(), "1.047197");
+    /// assert_eq!(x.to_string(), "1.0471973");
     /// ```
     #[inline]
     pub fn mul_rational_prec_round_assign(
@@ -3856,7 +3856,7 @@ impl Float {
     ///     x.mul_rational_prec_round_assign_ref(&Rational::from_unsigneds(1u8, 3), 5, Floor),
     ///     Less
     /// );
-    /// assert_eq!(x.to_string(), "1.0");
+    /// assert_eq!(x.to_string(), "1.00");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
@@ -3877,21 +3877,21 @@ impl Float {
     ///     x.mul_rational_prec_round_assign_ref(&Rational::from_unsigneds(1u8, 3), 20, Floor),
     ///     Less
     /// );
-    /// assert_eq!(x.to_string(), "1.047197");
+    /// assert_eq!(x.to_string(), "1.0471973");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.mul_rational_prec_round_assign_ref(&Rational::from_unsigneds(1u8, 3), 20, Ceiling),
     ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "1.047199");
+    /// assert_eq!(x.to_string(), "1.0471992");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.mul_rational_prec_round_assign_ref(&Rational::from_unsigneds(1u8, 3), 20, Nearest),
     ///     Less
     /// );
-    /// assert_eq!(x.to_string(), "1.047197");
+    /// assert_eq!(x.to_string(), "1.0471973");
     /// ```
     #[inline]
     pub fn mul_rational_prec_round_assign_ref(
@@ -3955,14 +3955,14 @@ impl Float {
     ///     x.mul_rational_prec_assign(Rational::exact_from(1.5), 5),
     ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "4.8");
+    /// assert_eq!(x.to_string(), "4.75");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.mul_rational_prec_assign(Rational::exact_from(1.5), 20),
     ///     Less
     /// );
-    /// assert_eq!(x.to_string(), "4.712387");
+    /// assert_eq!(x.to_string(), "4.7123871");
     /// ```
     #[inline]
     pub fn mul_rational_prec_assign(&mut self, other: Rational, prec: u64) -> Ordering {
@@ -4015,14 +4015,14 @@ impl Float {
     ///     x.mul_rational_prec_assign_ref(&Rational::exact_from(1.5), 5),
     ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "4.8");
+    /// assert_eq!(x.to_string(), "4.75");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.mul_rational_prec_assign_ref(&Rational::exact_from(1.5), 20),
     ///     Less
     /// );
-    /// assert_eq!(x.to_string(), "4.712387");
+    /// assert_eq!(x.to_string(), "4.7123871");
     /// ```
     #[inline]
     pub fn mul_rational_prec_assign_ref(&mut self, other: &Rational, prec: u64) -> Ordering {
@@ -4081,21 +4081,21 @@ impl Float {
     ///     x.mul_rational_round_assign(Rational::from_unsigneds(1u8, 3), Floor),
     ///     Less
     /// );
-    /// assert_eq!(x.to_string(), "1.047197551196597");
+    /// assert_eq!(x.to_string(), "1.0471975511965965");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.mul_rational_round_assign(Rational::from_unsigneds(1u8, 3), Ceiling),
     ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "1.047197551196598");
+    /// assert_eq!(x.to_string(), "1.0471975511965983");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.mul_rational_round_assign(Rational::from_unsigneds(1u8, 3), Nearest),
     ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "1.047197551196598");
+    /// assert_eq!(x.to_string(), "1.0471975511965983");
     /// ```
     #[inline]
     pub fn mul_rational_round_assign(&mut self, other: Rational, rm: RoundingMode) -> Ordering {
@@ -4155,21 +4155,21 @@ impl Float {
     ///     x.mul_rational_round_assign_ref(&Rational::from_unsigneds(1u8, 3), Floor),
     ///     Less
     /// );
-    /// assert_eq!(x.to_string(), "1.047197551196597");
+    /// assert_eq!(x.to_string(), "1.0471975511965965");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.mul_rational_round_assign_ref(&Rational::from_unsigneds(1u8, 3), Ceiling),
     ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "1.047197551196598");
+    /// assert_eq!(x.to_string(), "1.0471975511965983");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.mul_rational_round_assign_ref(&Rational::from_unsigneds(1u8, 3), Nearest),
     ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "1.047197551196598");
+    /// assert_eq!(x.to_string(), "1.0471975511965983");
     /// ```
     #[inline]
     pub fn mul_rational_round_assign_ref(

@@ -236,8 +236,14 @@ impl Float {
     /// ```
     /// use malachite_float::Float;
     ///
-    /// assert_eq!(Float::min_positive_value_prec(1).to_string(), "2.4e-323228497");
-    /// assert_eq!(Float::min_positive_value_prec(10).to_string(), "2.3826e-323228497");
+    /// assert_eq!(
+    ///     Float::min_positive_value_prec(1).to_string(),
+    ///     "2.4e-323228497"
+    /// );
+    /// assert_eq!(
+    ///     Float::min_positive_value_prec(10).to_string(),
+    ///     "2.3826e-323228497"
+    /// );
     /// assert_eq!(
     ///     Float::min_positive_value_prec(100).to_string(),
     ///     "2.3825649048879510732161697817327e-323228497"
@@ -310,8 +316,14 @@ impl Float {
     /// ```
     /// use malachite_float::Float;
     ///
-    /// assert_eq!(Float::max_finite_value_with_prec(1).to_string(), "1.0e323228496");
-    /// assert_eq!(Float::max_finite_value_with_prec(10).to_string(), "2.0965e323228496");
+    /// assert_eq!(
+    ///     Float::max_finite_value_with_prec(1).to_string(),
+    ///     "1.0e323228496"
+    /// );
+    /// assert_eq!(
+    ///     Float::max_finite_value_with_prec(10).to_string(),
+    ///     "2.0965e323228496"
+    /// );
     /// assert_eq!(
     ///     Float::max_finite_value_with_prec(100).to_string(),
     ///     "2.0985787164673876924043581168822e323228496"

@@ -123,34 +123,25 @@ fn test_shr_prec_round_unsigned_helper<
     test("-0.0", "-0x0.0", 10, 1, "-0.0", "-0x0.0");
     test("-0.0", "-0x0.0", 10, 10, "-0.0", "-0x0.0");
 
-    test_r(
-        "123.0",
-        "0x7b.0#7",
-        0,
-        1,
-        Floor,
-        "6.0e1",
-        "0x4.0E+1#1",
-        Less,
-    );
+    test_r("123.0", "0x7b.0#7", 0, 1, Floor, "64.0", "0x4.0E+1#1", Less);
     test_r(
         "123.0",
         "0x7b.0#7",
         0,
         1,
         Ceiling,
-        "1.0e2",
+        "1.3e2",
         "0x8.0E+1#1",
         Greater,
     );
-    test_r("123.0", "0x7b.0#7", 0, 1, Down, "6.0e1", "0x4.0E+1#1", Less);
+    test_r("123.0", "0x7b.0#7", 0, 1, Down, "64.0", "0x4.0E+1#1", Less);
     test_r(
         "123.0",
         "0x7b.0#7",
         0,
         1,
         Up,
-        "1.0e2",
+        "1.3e2",
         "0x8.0E+1#1",
         Greater,
     );
@@ -160,7 +151,7 @@ fn test_shr_prec_round_unsigned_helper<
         0,
         1,
         Nearest,
-        "1.0e2",
+        "1.3e2",
         "0x8.0E+1#1",
         Greater,
     );
@@ -171,7 +162,7 @@ fn test_shr_prec_round_unsigned_helper<
         0,
         10,
         Floor,
-        "123.0",
+        "123.00",
         "0x7b.0#10",
         Equal,
     );
@@ -181,7 +172,7 @@ fn test_shr_prec_round_unsigned_helper<
         0,
         10,
         Ceiling,
-        "123.0",
+        "123.00",
         "0x7b.0#10",
         Equal,
     );
@@ -191,18 +182,18 @@ fn test_shr_prec_round_unsigned_helper<
         0,
         10,
         Down,
-        "123.0",
+        "123.00",
         "0x7b.0#10",
         Equal,
     );
-    test_r("123.0", "0x7b.0#7", 0, 10, Up, "123.0", "0x7b.0#10", Equal);
+    test_r("123.0", "0x7b.0#7", 0, 10, Up, "123.00", "0x7b.0#10", Equal);
     test_r(
         "123.0",
         "0x7b.0#7",
         0,
         10,
         Nearest,
-        "123.0",
+        "123.00",
         "0x7b.0#10",
         Equal,
     );
@@ -212,19 +203,19 @@ fn test_shr_prec_round_unsigned_helper<
         0,
         10,
         Exact,
-        "123.0",
+        "123.00",
         "0x7b.0#10",
         Equal,
     );
 
-    test_r("123.0", "0x7b.0#7", 10, 1, Floor, "0.06", "0x0.1#1", Less);
+    test_r("123.0", "0x7b.0#7", 10, 1, Floor, "0.062", "0x0.1#1", Less);
     test_r(
-        "123.0", "0x7b.0#7", 10, 1, Ceiling, "0.1", "0x0.2#1", Greater,
+        "123.0", "0x7b.0#7", 10, 1, Ceiling, "0.12", "0x0.2#1", Greater,
     );
-    test_r("123.0", "0x7b.0#7", 10, 1, Down, "0.06", "0x0.1#1", Less);
-    test_r("123.0", "0x7b.0#7", 10, 1, Up, "0.1", "0x0.2#1", Greater);
+    test_r("123.0", "0x7b.0#7", 10, 1, Down, "0.062", "0x0.1#1", Less);
+    test_r("123.0", "0x7b.0#7", 10, 1, Up, "0.12", "0x0.2#1", Greater);
     test_r(
-        "123.0", "0x7b.0#7", 10, 1, Nearest, "0.1", "0x0.2#1", Greater,
+        "123.0", "0x7b.0#7", 10, 1, Nearest, "0.12", "0x0.2#1", Greater,
     );
 
     test_r(
@@ -233,7 +224,7 @@ fn test_shr_prec_round_unsigned_helper<
         10,
         10,
         Floor,
-        "0.1201",
+        "0.12012",
         "0x0.1ec0#10",
         Equal,
     );
@@ -243,7 +234,7 @@ fn test_shr_prec_round_unsigned_helper<
         10,
         10,
         Ceiling,
-        "0.1201",
+        "0.12012",
         "0x0.1ec0#10",
         Equal,
     );
@@ -253,7 +244,7 @@ fn test_shr_prec_round_unsigned_helper<
         10,
         10,
         Down,
-        "0.1201",
+        "0.12012",
         "0x0.1ec0#10",
         Equal,
     );
@@ -263,7 +254,7 @@ fn test_shr_prec_round_unsigned_helper<
         10,
         10,
         Up,
-        "0.1201",
+        "0.12012",
         "0x0.1ec0#10",
         Equal,
     );
@@ -273,7 +264,7 @@ fn test_shr_prec_round_unsigned_helper<
         10,
         10,
         Nearest,
-        "0.1201",
+        "0.12012",
         "0x0.1ec0#10",
         Equal,
     );
@@ -283,7 +274,7 @@ fn test_shr_prec_round_unsigned_helper<
         10,
         10,
         Exact,
-        "0.1201",
+        "0.12012",
         "0x0.1ec0#10",
         Equal,
     );
@@ -294,7 +285,7 @@ fn test_shr_prec_round_unsigned_helper<
         0,
         1,
         Floor,
-        "-1.0e2",
+        "-1.3e2",
         "-0x8.0E+1#1",
         Less,
     );
@@ -304,7 +295,7 @@ fn test_shr_prec_round_unsigned_helper<
         0,
         1,
         Ceiling,
-        "-6.0e1",
+        "-64.0",
         "-0x4.0E+1#1",
         Greater,
     );
@@ -314,7 +305,7 @@ fn test_shr_prec_round_unsigned_helper<
         0,
         1,
         Down,
-        "-6.0e1",
+        "-64.0",
         "-0x4.0E+1#1",
         Greater,
     );
@@ -324,7 +315,7 @@ fn test_shr_prec_round_unsigned_helper<
         0,
         1,
         Up,
-        "-1.0e2",
+        "-1.3e2",
         "-0x8.0E+1#1",
         Less,
     );
@@ -334,7 +325,7 @@ fn test_shr_prec_round_unsigned_helper<
         0,
         1,
         Nearest,
-        "-1.0e2",
+        "-1.3e2",
         "-0x8.0E+1#1",
         Less,
     );
@@ -345,7 +336,7 @@ fn test_shr_prec_round_unsigned_helper<
         0,
         10,
         Floor,
-        "-123.0",
+        "-123.00",
         "-0x7b.0#10",
         Equal,
     );
@@ -355,7 +346,7 @@ fn test_shr_prec_round_unsigned_helper<
         0,
         10,
         Ceiling,
-        "-123.0",
+        "-123.00",
         "-0x7b.0#10",
         Equal,
     );
@@ -365,7 +356,7 @@ fn test_shr_prec_round_unsigned_helper<
         0,
         10,
         Down,
-        "-123.0",
+        "-123.00",
         "-0x7b.0#10",
         Equal,
     );
@@ -375,7 +366,7 @@ fn test_shr_prec_round_unsigned_helper<
         0,
         10,
         Up,
-        "-123.0",
+        "-123.00",
         "-0x7b.0#10",
         Equal,
     );
@@ -385,7 +376,7 @@ fn test_shr_prec_round_unsigned_helper<
         0,
         10,
         Nearest,
-        "-123.0",
+        "-123.00",
         "-0x7b.0#10",
         Equal,
     );
@@ -395,7 +386,7 @@ fn test_shr_prec_round_unsigned_helper<
         0,
         10,
         Exact,
-        "-123.0",
+        "-123.00",
         "-0x7b.0#10",
         Equal,
     );
@@ -406,7 +397,7 @@ fn test_shr_prec_round_unsigned_helper<
         10,
         1,
         Floor,
-        "-0.1",
+        "-0.12",
         "-0x0.2#1",
         Less,
     );
@@ -416,7 +407,7 @@ fn test_shr_prec_round_unsigned_helper<
         10,
         1,
         Ceiling,
-        "-0.06",
+        "-0.062",
         "-0x0.1#1",
         Greater,
     );
@@ -426,18 +417,18 @@ fn test_shr_prec_round_unsigned_helper<
         10,
         1,
         Down,
-        "-0.06",
+        "-0.062",
         "-0x0.1#1",
         Greater,
     );
-    test_r("-123.0", "-0x7b.0#7", 10, 1, Up, "-0.1", "-0x0.2#1", Less);
+    test_r("-123.0", "-0x7b.0#7", 10, 1, Up, "-0.12", "-0x0.2#1", Less);
     test_r(
         "-123.0",
         "-0x7b.0#7",
         10,
         1,
         Nearest,
-        "-0.1",
+        "-0.12",
         "-0x0.2#1",
         Less,
     );
@@ -448,7 +439,7 @@ fn test_shr_prec_round_unsigned_helper<
         10,
         10,
         Floor,
-        "-0.1201",
+        "-0.12012",
         "-0x0.1ec0#10",
         Equal,
     );
@@ -458,7 +449,7 @@ fn test_shr_prec_round_unsigned_helper<
         10,
         10,
         Ceiling,
-        "-0.1201",
+        "-0.12012",
         "-0x0.1ec0#10",
         Equal,
     );
@@ -468,7 +459,7 @@ fn test_shr_prec_round_unsigned_helper<
         10,
         10,
         Down,
-        "-0.1201",
+        "-0.12012",
         "-0x0.1ec0#10",
         Equal,
     );
@@ -478,7 +469,7 @@ fn test_shr_prec_round_unsigned_helper<
         10,
         10,
         Up,
-        "-0.1201",
+        "-0.12012",
         "-0x0.1ec0#10",
         Equal,
     );
@@ -488,7 +479,7 @@ fn test_shr_prec_round_unsigned_helper<
         10,
         10,
         Nearest,
-        "-0.1201",
+        "-0.12012",
         "-0x0.1ec0#10",
         Equal,
     );
@@ -498,13 +489,13 @@ fn test_shr_prec_round_unsigned_helper<
         10,
         10,
         Exact,
-        "-0.1201",
+        "-0.12012",
         "-0x0.1ec0#10",
         Equal,
     );
 
     test_r(
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         1,
         1,
@@ -514,17 +505,17 @@ fn test_shr_prec_round_unsigned_helper<
         Less,
     );
     test_r(
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         1,
         1,
         Ceiling,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Greater,
     );
     test_r(
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         1,
         1,
@@ -534,17 +525,17 @@ fn test_shr_prec_round_unsigned_helper<
         Less,
     );
     test_r(
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         1,
         1,
         Up,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Greater,
     );
     test_r(
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         1,
         1,
@@ -555,17 +546,17 @@ fn test_shr_prec_round_unsigned_helper<
     );
 
     test_r(
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         1,
         1,
         Floor,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Less,
     );
     test_r(
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         1,
         1,
@@ -575,7 +566,7 @@ fn test_shr_prec_round_unsigned_helper<
         Greater,
     );
     test_r(
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         1,
         1,
@@ -585,17 +576,17 @@ fn test_shr_prec_round_unsigned_helper<
         Greater,
     );
     test_r(
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         1,
         1,
         Up,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Less,
     );
     test_r(
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         1,
         1,
@@ -606,22 +597,22 @@ fn test_shr_prec_round_unsigned_helper<
     );
 
     test_r(
-        "too_small",
+        "1.857667082873663089629e-323228495",
         "0x4.df81e47e11c9aa6dE-268435455#67",
         7,
         66,
         Nearest,
-        "too_small",
+        "2.38256490488795107322e-323228497",
         "0x1.00000000000000000E-268435456#66",
         Greater,
     );
     test_r(
-        "-too_small",
+        "-1.857667082873663089629e-323228495",
         "-0x4.df81e47e11c9aa6dE-268435455#67",
         7,
         66,
         Nearest,
-        "-too_small",
+        "-2.38256490488795107322e-323228497",
         "-0x1.00000000000000000E-268435456#66",
         Less,
     );
@@ -727,34 +718,25 @@ fn test_shr_prec_round_signed_helper<
     test("-0.0", "-0x0.0", -10, 1, "-0.0", "-0x0.0");
     test("-0.0", "-0x0.0", -10, 10, "-0.0", "-0x0.0");
 
-    test_r(
-        "123.0",
-        "0x7b.0#7",
-        0,
-        1,
-        Floor,
-        "6.0e1",
-        "0x4.0E+1#1",
-        Less,
-    );
+    test_r("123.0", "0x7b.0#7", 0, 1, Floor, "64.0", "0x4.0E+1#1", Less);
     test_r(
         "123.0",
         "0x7b.0#7",
         0,
         1,
         Ceiling,
-        "1.0e2",
+        "1.3e2",
         "0x8.0E+1#1",
         Greater,
     );
-    test_r("123.0", "0x7b.0#7", 0, 1, Down, "6.0e1", "0x4.0E+1#1", Less);
+    test_r("123.0", "0x7b.0#7", 0, 1, Down, "64.0", "0x4.0E+1#1", Less);
     test_r(
         "123.0",
         "0x7b.0#7",
         0,
         1,
         Up,
-        "1.0e2",
+        "1.3e2",
         "0x8.0E+1#1",
         Greater,
     );
@@ -764,7 +746,7 @@ fn test_shr_prec_round_signed_helper<
         0,
         1,
         Nearest,
-        "1.0e2",
+        "1.3e2",
         "0x8.0E+1#1",
         Greater,
     );
@@ -775,7 +757,7 @@ fn test_shr_prec_round_signed_helper<
         0,
         10,
         Floor,
-        "123.0",
+        "123.00",
         "0x7b.0#10",
         Equal,
     );
@@ -785,7 +767,7 @@ fn test_shr_prec_round_signed_helper<
         0,
         10,
         Ceiling,
-        "123.0",
+        "123.00",
         "0x7b.0#10",
         Equal,
     );
@@ -795,18 +777,18 @@ fn test_shr_prec_round_signed_helper<
         0,
         10,
         Down,
-        "123.0",
+        "123.00",
         "0x7b.0#10",
         Equal,
     );
-    test_r("123.0", "0x7b.0#7", 0, 10, Up, "123.0", "0x7b.0#10", Equal);
+    test_r("123.0", "0x7b.0#7", 0, 10, Up, "123.00", "0x7b.0#10", Equal);
     test_r(
         "123.0",
         "0x7b.0#7",
         0,
         10,
         Nearest,
-        "123.0",
+        "123.00",
         "0x7b.0#10",
         Equal,
     );
@@ -816,19 +798,19 @@ fn test_shr_prec_round_signed_helper<
         0,
         10,
         Exact,
-        "123.0",
+        "123.00",
         "0x7b.0#10",
         Equal,
     );
 
-    test_r("123.0", "0x7b.0#7", 10, 1, Floor, "0.06", "0x0.1#1", Less);
+    test_r("123.0", "0x7b.0#7", 10, 1, Floor, "0.062", "0x0.1#1", Less);
     test_r(
-        "123.0", "0x7b.0#7", 10, 1, Ceiling, "0.1", "0x0.2#1", Greater,
+        "123.0", "0x7b.0#7", 10, 1, Ceiling, "0.12", "0x0.2#1", Greater,
     );
-    test_r("123.0", "0x7b.0#7", 10, 1, Down, "0.06", "0x0.1#1", Less);
-    test_r("123.0", "0x7b.0#7", 10, 1, Up, "0.1", "0x0.2#1", Greater);
+    test_r("123.0", "0x7b.0#7", 10, 1, Down, "0.062", "0x0.1#1", Less);
+    test_r("123.0", "0x7b.0#7", 10, 1, Up, "0.12", "0x0.2#1", Greater);
     test_r(
-        "123.0", "0x7b.0#7", 10, 1, Nearest, "0.1", "0x0.2#1", Greater,
+        "123.0", "0x7b.0#7", 10, 1, Nearest, "0.12", "0x0.2#1", Greater,
     );
 
     test_r(
@@ -837,7 +819,7 @@ fn test_shr_prec_round_signed_helper<
         10,
         10,
         Floor,
-        "0.1201",
+        "0.12012",
         "0x0.1ec0#10",
         Equal,
     );
@@ -847,7 +829,7 @@ fn test_shr_prec_round_signed_helper<
         10,
         10,
         Ceiling,
-        "0.1201",
+        "0.12012",
         "0x0.1ec0#10",
         Equal,
     );
@@ -857,7 +839,7 @@ fn test_shr_prec_round_signed_helper<
         10,
         10,
         Down,
-        "0.1201",
+        "0.12012",
         "0x0.1ec0#10",
         Equal,
     );
@@ -867,7 +849,7 @@ fn test_shr_prec_round_signed_helper<
         10,
         10,
         Up,
-        "0.1201",
+        "0.12012",
         "0x0.1ec0#10",
         Equal,
     );
@@ -877,7 +859,7 @@ fn test_shr_prec_round_signed_helper<
         10,
         10,
         Nearest,
-        "0.1201",
+        "0.12012",
         "0x0.1ec0#10",
         Equal,
     );
@@ -887,7 +869,7 @@ fn test_shr_prec_round_signed_helper<
         10,
         10,
         Exact,
-        "0.1201",
+        "0.12012",
         "0x0.1ec0#10",
         Equal,
     );
@@ -898,7 +880,7 @@ fn test_shr_prec_round_signed_helper<
         -10,
         1,
         Floor,
-        "7.0e4",
+        "6.6e4",
         "0x1.0E+4#1",
         Less,
     );
@@ -908,7 +890,7 @@ fn test_shr_prec_round_signed_helper<
         -10,
         1,
         Ceiling,
-        "1.0e5",
+        "1.3e5",
         "0x2.0E+4#1",
         Greater,
     );
@@ -918,7 +900,7 @@ fn test_shr_prec_round_signed_helper<
         -10,
         1,
         Down,
-        "7.0e4",
+        "6.6e4",
         "0x1.0E+4#1",
         Less,
     );
@@ -928,7 +910,7 @@ fn test_shr_prec_round_signed_helper<
         -10,
         1,
         Up,
-        "1.0e5",
+        "1.3e5",
         "0x2.0E+4#1",
         Greater,
     );
@@ -938,7 +920,7 @@ fn test_shr_prec_round_signed_helper<
         -10,
         1,
         Nearest,
-        "1.0e5",
+        "1.3e5",
         "0x2.0E+4#1",
         Greater,
     );
@@ -949,7 +931,7 @@ fn test_shr_prec_round_signed_helper<
         -10,
         10,
         Floor,
-        "1.26e5",
+        "1.2595e5",
         "0x1.ec0E+4#10",
         Equal,
     );
@@ -959,7 +941,7 @@ fn test_shr_prec_round_signed_helper<
         -10,
         10,
         Ceiling,
-        "1.26e5",
+        "1.2595e5",
         "0x1.ec0E+4#10",
         Equal,
     );
@@ -969,7 +951,7 @@ fn test_shr_prec_round_signed_helper<
         -10,
         10,
         Down,
-        "1.26e5",
+        "1.2595e5",
         "0x1.ec0E+4#10",
         Equal,
     );
@@ -979,7 +961,7 @@ fn test_shr_prec_round_signed_helper<
         -10,
         10,
         Up,
-        "1.26e5",
+        "1.2595e5",
         "0x1.ec0E+4#10",
         Equal,
     );
@@ -989,7 +971,7 @@ fn test_shr_prec_round_signed_helper<
         -10,
         10,
         Nearest,
-        "1.26e5",
+        "1.2595e5",
         "0x1.ec0E+4#10",
         Equal,
     );
@@ -999,7 +981,7 @@ fn test_shr_prec_round_signed_helper<
         -10,
         10,
         Exact,
-        "1.26e5",
+        "1.2595e5",
         "0x1.ec0E+4#10",
         Equal,
     );
@@ -1010,7 +992,7 @@ fn test_shr_prec_round_signed_helper<
         0,
         1,
         Floor,
-        "-1.0e2",
+        "-1.3e2",
         "-0x8.0E+1#1",
         Less,
     );
@@ -1020,7 +1002,7 @@ fn test_shr_prec_round_signed_helper<
         0,
         1,
         Ceiling,
-        "-6.0e1",
+        "-64.0",
         "-0x4.0E+1#1",
         Greater,
     );
@@ -1030,7 +1012,7 @@ fn test_shr_prec_round_signed_helper<
         0,
         1,
         Down,
-        "-6.0e1",
+        "-64.0",
         "-0x4.0E+1#1",
         Greater,
     );
@@ -1040,7 +1022,7 @@ fn test_shr_prec_round_signed_helper<
         0,
         1,
         Up,
-        "-1.0e2",
+        "-1.3e2",
         "-0x8.0E+1#1",
         Less,
     );
@@ -1050,7 +1032,7 @@ fn test_shr_prec_round_signed_helper<
         0,
         1,
         Nearest,
-        "-1.0e2",
+        "-1.3e2",
         "-0x8.0E+1#1",
         Less,
     );
@@ -1061,7 +1043,7 @@ fn test_shr_prec_round_signed_helper<
         0,
         10,
         Floor,
-        "-123.0",
+        "-123.00",
         "-0x7b.0#10",
         Equal,
     );
@@ -1071,7 +1053,7 @@ fn test_shr_prec_round_signed_helper<
         0,
         10,
         Ceiling,
-        "-123.0",
+        "-123.00",
         "-0x7b.0#10",
         Equal,
     );
@@ -1081,7 +1063,7 @@ fn test_shr_prec_round_signed_helper<
         0,
         10,
         Down,
-        "-123.0",
+        "-123.00",
         "-0x7b.0#10",
         Equal,
     );
@@ -1091,7 +1073,7 @@ fn test_shr_prec_round_signed_helper<
         0,
         10,
         Up,
-        "-123.0",
+        "-123.00",
         "-0x7b.0#10",
         Equal,
     );
@@ -1101,7 +1083,7 @@ fn test_shr_prec_round_signed_helper<
         0,
         10,
         Nearest,
-        "-123.0",
+        "-123.00",
         "-0x7b.0#10",
         Equal,
     );
@@ -1111,7 +1093,7 @@ fn test_shr_prec_round_signed_helper<
         0,
         10,
         Exact,
-        "-123.0",
+        "-123.00",
         "-0x7b.0#10",
         Equal,
     );
@@ -1122,7 +1104,7 @@ fn test_shr_prec_round_signed_helper<
         10,
         1,
         Floor,
-        "-0.1",
+        "-0.12",
         "-0x0.2#1",
         Less,
     );
@@ -1132,7 +1114,7 @@ fn test_shr_prec_round_signed_helper<
         10,
         1,
         Ceiling,
-        "-0.06",
+        "-0.062",
         "-0x0.1#1",
         Greater,
     );
@@ -1142,18 +1124,18 @@ fn test_shr_prec_round_signed_helper<
         10,
         1,
         Down,
-        "-0.06",
+        "-0.062",
         "-0x0.1#1",
         Greater,
     );
-    test_r("-123.0", "-0x7b.0#7", 10, 1, Up, "-0.1", "-0x0.2#1", Less);
+    test_r("-123.0", "-0x7b.0#7", 10, 1, Up, "-0.12", "-0x0.2#1", Less);
     test_r(
         "-123.0",
         "-0x7b.0#7",
         10,
         1,
         Nearest,
-        "-0.1",
+        "-0.12",
         "-0x0.2#1",
         Less,
     );
@@ -1164,7 +1146,7 @@ fn test_shr_prec_round_signed_helper<
         10,
         10,
         Floor,
-        "-0.1201",
+        "-0.12012",
         "-0x0.1ec0#10",
         Equal,
     );
@@ -1174,7 +1156,7 @@ fn test_shr_prec_round_signed_helper<
         10,
         10,
         Ceiling,
-        "-0.1201",
+        "-0.12012",
         "-0x0.1ec0#10",
         Equal,
     );
@@ -1184,7 +1166,7 @@ fn test_shr_prec_round_signed_helper<
         10,
         10,
         Down,
-        "-0.1201",
+        "-0.12012",
         "-0x0.1ec0#10",
         Equal,
     );
@@ -1194,7 +1176,7 @@ fn test_shr_prec_round_signed_helper<
         10,
         10,
         Up,
-        "-0.1201",
+        "-0.12012",
         "-0x0.1ec0#10",
         Equal,
     );
@@ -1204,7 +1186,7 @@ fn test_shr_prec_round_signed_helper<
         10,
         10,
         Nearest,
-        "-0.1201",
+        "-0.12012",
         "-0x0.1ec0#10",
         Equal,
     );
@@ -1214,7 +1196,7 @@ fn test_shr_prec_round_signed_helper<
         10,
         10,
         Exact,
-        "-0.1201",
+        "-0.12012",
         "-0x0.1ec0#10",
         Equal,
     );
@@ -1225,7 +1207,7 @@ fn test_shr_prec_round_signed_helper<
         -10,
         1,
         Floor,
-        "-1.0e5",
+        "-1.3e5",
         "-0x2.0E+4#1",
         Less,
     );
@@ -1235,7 +1217,7 @@ fn test_shr_prec_round_signed_helper<
         -10,
         1,
         Ceiling,
-        "-7.0e4",
+        "-6.6e4",
         "-0x1.0E+4#1",
         Greater,
     );
@@ -1245,7 +1227,7 @@ fn test_shr_prec_round_signed_helper<
         -10,
         1,
         Down,
-        "-7.0e4",
+        "-6.6e4",
         "-0x1.0E+4#1",
         Greater,
     );
@@ -1255,7 +1237,7 @@ fn test_shr_prec_round_signed_helper<
         -10,
         1,
         Up,
-        "-1.0e5",
+        "-1.3e5",
         "-0x2.0E+4#1",
         Less,
     );
@@ -1265,7 +1247,7 @@ fn test_shr_prec_round_signed_helper<
         -10,
         1,
         Nearest,
-        "-1.0e5",
+        "-1.3e5",
         "-0x2.0E+4#1",
         Less,
     );
@@ -1276,7 +1258,7 @@ fn test_shr_prec_round_signed_helper<
         -10,
         10,
         Floor,
-        "-1.26e5",
+        "-1.2595e5",
         "-0x1.ec0E+4#10",
         Equal,
     );
@@ -1286,7 +1268,7 @@ fn test_shr_prec_round_signed_helper<
         -10,
         10,
         Ceiling,
-        "-1.26e5",
+        "-1.2595e5",
         "-0x1.ec0E+4#10",
         Equal,
     );
@@ -1296,7 +1278,7 @@ fn test_shr_prec_round_signed_helper<
         -10,
         10,
         Down,
-        "-1.26e5",
+        "-1.2595e5",
         "-0x1.ec0E+4#10",
         Equal,
     );
@@ -1306,7 +1288,7 @@ fn test_shr_prec_round_signed_helper<
         -10,
         10,
         Up,
-        "-1.26e5",
+        "-1.2595e5",
         "-0x1.ec0E+4#10",
         Equal,
     );
@@ -1316,7 +1298,7 @@ fn test_shr_prec_round_signed_helper<
         -10,
         10,
         Nearest,
-        "-1.26e5",
+        "-1.2595e5",
         "-0x1.ec0E+4#10",
         Equal,
     );
@@ -1326,23 +1308,23 @@ fn test_shr_prec_round_signed_helper<
         -10,
         10,
         Exact,
-        "-1.26e5",
+        "-1.2595e5",
         "-0x1.ec0E+4#10",
         Equal,
     );
 
     test_r(
-        "too_big",
+        "1.0e323228496",
         "0x4.0E+268435455#1",
         -1,
         1,
         Floor,
-        "too_big",
+        "1.0e323228496",
         "0x4.0E+268435455#1",
         Less,
     );
     test_r(
-        "too_big",
+        "1.0e323228496",
         "0x4.0E+268435455#1",
         -1,
         1,
@@ -1352,17 +1334,17 @@ fn test_shr_prec_round_signed_helper<
         Greater,
     );
     test_r(
-        "too_big",
+        "1.0e323228496",
         "0x4.0E+268435455#1",
         -1,
         1,
         Down,
-        "too_big",
+        "1.0e323228496",
         "0x4.0E+268435455#1",
         Less,
     );
     test_r(
-        "too_big",
+        "1.0e323228496",
         "0x4.0E+268435455#1",
         -1,
         1,
@@ -1372,7 +1354,7 @@ fn test_shr_prec_round_signed_helper<
         Greater,
     );
     test_r(
-        "too_big",
+        "1.0e323228496",
         "0x4.0E+268435455#1",
         -1,
         1,
@@ -1383,7 +1365,7 @@ fn test_shr_prec_round_signed_helper<
     );
 
     test_r(
-        "-too_big",
+        "-1.0e323228496",
         "-0x4.0E+268435455#1",
         -1,
         1,
@@ -1393,27 +1375,27 @@ fn test_shr_prec_round_signed_helper<
         Less,
     );
     test_r(
-        "-too_big",
+        "-1.0e323228496",
         "-0x4.0E+268435455#1",
         -1,
         1,
         Ceiling,
-        "-too_big",
+        "-1.0e323228496",
         "-0x4.0E+268435455#1",
         Greater,
     );
     test_r(
-        "-too_big",
+        "-1.0e323228496",
         "-0x4.0E+268435455#1",
         -1,
         1,
         Down,
-        "-too_big",
+        "-1.0e323228496",
         "-0x4.0E+268435455#1",
         Greater,
     );
     test_r(
-        "-too_big",
+        "-1.0e323228496",
         "-0x4.0E+268435455#1",
         -1,
         1,
@@ -1423,7 +1405,7 @@ fn test_shr_prec_round_signed_helper<
         Less,
     );
     test_r(
-        "-too_big",
+        "-1.0e323228496",
         "-0x4.0E+268435455#1",
         -1,
         1,
@@ -1434,7 +1416,7 @@ fn test_shr_prec_round_signed_helper<
     );
 
     test_r(
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         1,
         1,
@@ -1444,17 +1426,17 @@ fn test_shr_prec_round_signed_helper<
         Less,
     );
     test_r(
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         1,
         1,
         Ceiling,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Greater,
     );
     test_r(
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         1,
         1,
@@ -1464,17 +1446,17 @@ fn test_shr_prec_round_signed_helper<
         Less,
     );
     test_r(
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         1,
         1,
         Up,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Greater,
     );
     test_r(
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         1,
         1,
@@ -1485,17 +1467,17 @@ fn test_shr_prec_round_signed_helper<
     );
 
     test_r(
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         1,
         1,
         Floor,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Less,
     );
     test_r(
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         1,
         1,
@@ -1505,7 +1487,7 @@ fn test_shr_prec_round_signed_helper<
         Greater,
     );
     test_r(
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         1,
         1,
@@ -1515,17 +1497,17 @@ fn test_shr_prec_round_signed_helper<
         Greater,
     );
     test_r(
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         1,
         1,
         Up,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Less,
     );
     test_r(
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         1,
         1,
@@ -1536,22 +1518,22 @@ fn test_shr_prec_round_signed_helper<
     );
 
     test_r(
-        "too_small",
+        "1.857667082873663089629e-323228495",
         "0x4.df81e47e11c9aa6dE-268435455#67",
         7,
         66,
         Nearest,
-        "too_small",
+        "2.38256490488795107322e-323228497",
         "0x1.00000000000000000E-268435456#66",
         Greater,
     );
     test_r(
-        "-too_small",
+        "-1.857667082873663089629e-323228495",
         "-0x4.df81e47e11c9aa6dE-268435455#67",
         7,
         66,
         Nearest,
-        "-too_small",
+        "-2.38256490488795107322e-323228497",
         "-0x1.00000000000000000E-268435456#66",
         Less,
     );
@@ -1671,24 +1653,24 @@ where
     test("-0.0", "-0x0.0", 10, 1, "-0.0", "-0x0.0", Equal);
     test("-0.0", "-0x0.0", 10, 10, "-0.0", "-0x0.0", Equal);
 
-    test("123.0", "0x7b.0#7", 0, 1, "1.0e2", "0x8.0E+1#1", Greater);
-    test("123.0", "0x7b.0#7", 0, 10, "123.0", "0x7b.0#10", Equal);
-    test("123.0", "0x7b.0#7", 10, 1, "0.1", "0x0.2#1", Greater);
-    test("123.0", "0x7b.0#7", 10, 10, "0.1201", "0x0.1ec0#10", Equal);
-    test("-123.0", "-0x7b.0#7", 0, 1, "-1.0e2", "-0x8.0E+1#1", Less);
-    test("-123.0", "-0x7b.0#7", 0, 10, "-123.0", "-0x7b.0#10", Equal);
-    test("-123.0", "-0x7b.0#7", 10, 1, "-0.1", "-0x0.2#1", Less);
+    test("123.0", "0x7b.0#7", 0, 1, "1.3e2", "0x8.0E+1#1", Greater);
+    test("123.0", "0x7b.0#7", 0, 10, "123.00", "0x7b.0#10", Equal);
+    test("123.0", "0x7b.0#7", 10, 1, "0.12", "0x0.2#1", Greater);
+    test("123.0", "0x7b.0#7", 10, 10, "0.12012", "0x0.1ec0#10", Equal);
+    test("-123.0", "-0x7b.0#7", 0, 1, "-1.3e2", "-0x8.0E+1#1", Less);
+    test("-123.0", "-0x7b.0#7", 0, 10, "-123.00", "-0x7b.0#10", Equal);
+    test("-123.0", "-0x7b.0#7", 10, 1, "-0.12", "-0x0.2#1", Less);
     test(
         "-123.0",
         "-0x7b.0#7",
         10,
         10,
-        "-0.1201",
+        "-0.12012",
         "-0x0.1ec0#10",
         Equal,
     );
     test(
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         1,
         1,
@@ -1697,7 +1679,7 @@ where
         Less,
     );
     test(
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         1,
         1,
@@ -1706,20 +1688,20 @@ where
         Greater,
     );
     test(
-        "too_small",
+        "1.857667082873663089629e-323228495",
         "0x4.df81e47e11c9aa6dE-268435455#67",
         7,
         66,
-        "too_small",
+        "2.38256490488795107322e-323228497",
         "0x1.00000000000000000E-268435456#66",
         Greater,
     );
     test(
-        "-too_small",
+        "-1.857667082873663089629e-323228495",
         "-0x4.df81e47e11c9aa6dE-268435455#67",
         7,
         66,
-        "-too_small",
+        "-2.38256490488795107322e-323228497",
         "-0x1.00000000000000000E-268435456#66",
         Less,
     );
@@ -1858,44 +1840,44 @@ where
     test("-0.0", "-0x0.0", -10, 1, "-0.0", "-0x0.0", Equal);
     test("-0.0", "-0x0.0", -10, 10, "-0.0", "-0x0.0", Equal);
 
-    test("123.0", "0x7b.0#7", 0, 1, "1.0e2", "0x8.0E+1#1", Greater);
-    test("123.0", "0x7b.0#7", 0, 10, "123.0", "0x7b.0#10", Equal);
-    test("123.0", "0x7b.0#7", 10, 1, "0.1", "0x0.2#1", Greater);
-    test("123.0", "0x7b.0#7", 10, 10, "0.1201", "0x0.1ec0#10", Equal);
-    test("123.0", "0x7b.0#7", -10, 1, "1.0e5", "0x2.0E+4#1", Greater);
+    test("123.0", "0x7b.0#7", 0, 1, "1.3e2", "0x8.0E+1#1", Greater);
+    test("123.0", "0x7b.0#7", 0, 10, "123.00", "0x7b.0#10", Equal);
+    test("123.0", "0x7b.0#7", 10, 1, "0.12", "0x0.2#1", Greater);
+    test("123.0", "0x7b.0#7", 10, 10, "0.12012", "0x0.1ec0#10", Equal);
+    test("123.0", "0x7b.0#7", -10, 1, "1.3e5", "0x2.0E+4#1", Greater);
     test(
         "123.0",
         "0x7b.0#7",
         -10,
         10,
-        "1.26e5",
+        "1.2595e5",
         "0x1.ec0E+4#10",
         Equal,
     );
-    test("-123.0", "-0x7b.0#7", 0, 1, "-1.0e2", "-0x8.0E+1#1", Less);
-    test("-123.0", "-0x7b.0#7", 0, 10, "-123.0", "-0x7b.0#10", Equal);
-    test("-123.0", "-0x7b.0#7", 10, 1, "-0.1", "-0x0.2#1", Less);
+    test("-123.0", "-0x7b.0#7", 0, 1, "-1.3e2", "-0x8.0E+1#1", Less);
+    test("-123.0", "-0x7b.0#7", 0, 10, "-123.00", "-0x7b.0#10", Equal);
+    test("-123.0", "-0x7b.0#7", 10, 1, "-0.12", "-0x0.2#1", Less);
     test(
         "-123.0",
         "-0x7b.0#7",
         10,
         10,
-        "-0.1201",
+        "-0.12012",
         "-0x0.1ec0#10",
         Equal,
     );
-    test("-123.0", "-0x7b.0#7", -10, 1, "-1.0e5", "-0x2.0E+4#1", Less);
+    test("-123.0", "-0x7b.0#7", -10, 1, "-1.3e5", "-0x2.0E+4#1", Less);
     test(
         "-123.0",
         "-0x7b.0#7",
         -10,
         10,
-        "-1.26e5",
+        "-1.2595e5",
         "-0x1.ec0E+4#10",
         Equal,
     );
     test(
-        "too_big",
+        "1.0e323228496",
         "0x4.0E+268435455#1",
         -1,
         1,
@@ -1904,7 +1886,7 @@ where
         Greater,
     );
     test(
-        "-too_big",
+        "-1.0e323228496",
         "-0x4.0E+268435455#1",
         -1,
         1,
@@ -1913,7 +1895,7 @@ where
         Less,
     );
     test(
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         1,
         1,
@@ -1922,7 +1904,7 @@ where
         Less,
     );
     test(
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         1,
         1,
@@ -1931,20 +1913,20 @@ where
         Greater,
     );
     test(
-        "too_small",
+        "1.857667082873663089629e-323228495",
         "0x4.df81e47e11c9aa6dE-268435455#67",
         7,
         66,
-        "too_small",
+        "2.38256490488795107322e-323228497",
         "0x1.00000000000000000E-268435456#66",
         Greater,
     );
     test(
-        "-too_small",
+        "-1.857667082873663089629e-323228495",
         "-0x4.df81e47e11c9aa6dE-268435455#67",
         7,
         66,
-        "-too_small",
+        "-2.38256490488795107322e-323228497",
         "-0x1.00000000000000000E-268435456#66",
         Less,
     );
@@ -2020,14 +2002,14 @@ fn test_shr_round_unsigned_helper<
     test("-0.0", "-0x0.0", 10, "-0.0", "-0x0.0");
 
     test("123.0", "0x7b.0#7", 0, "123.0", "0x7b.0#7");
-    test("123.0", "0x7b.0#7", 1, "61.5", "0x3d.8#7");
-    test("123.0", "0x7b.0#7", 10, "0.12", "0x0.1ec#7");
-    test("123.0", "0x7b.0#7", 100, "9.7e-29", "0x7.bE-24#7");
+    test("123.0", "0x7b.0#7", 1, "61.50", "0x3d.8#7");
+    test("123.0", "0x7b.0#7", 10, "0.1201", "0x0.1ec#7");
+    test("123.0", "0x7b.0#7", 100, "9.703e-29", "0x7.bE-24#7");
 
     test("-123.0", "-0x7b.0#7", 0, "-123.0", "-0x7b.0#7");
-    test("-123.0", "-0x7b.0#7", 1, "-61.5", "-0x3d.8#7");
-    test("-123.0", "-0x7b.0#7", 10, "-0.12", "-0x0.1ec#7");
-    test("-123.0", "-0x7b.0#7", 100, "-9.7e-29", "-0x7.bE-24#7");
+    test("-123.0", "-0x7b.0#7", 1, "-61.50", "-0x3d.8#7");
+    test("-123.0", "-0x7b.0#7", 10, "-0.1201", "-0x0.1ec#7");
+    test("-123.0", "-0x7b.0#7", 100, "-9.703e-29", "-0x7.bE-24#7");
 
     test(
         "3.1415926535897931",
@@ -2127,7 +2109,7 @@ fn test_shr_round_unsigned_helper<
         "0x1.0#1",
         Float::MAX_EXPONENT + 1,
         Floor,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Equal,
     );
@@ -2136,7 +2118,7 @@ fn test_shr_round_unsigned_helper<
         "0x1.0#1",
         Float::MAX_EXPONENT + 1,
         Ceiling,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Equal,
     );
@@ -2145,7 +2127,7 @@ fn test_shr_round_unsigned_helper<
         "0x1.0#1",
         Float::MAX_EXPONENT + 1,
         Down,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Equal,
     );
@@ -2154,7 +2136,7 @@ fn test_shr_round_unsigned_helper<
         "0x1.0#1",
         Float::MAX_EXPONENT + 1,
         Up,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Equal,
     );
@@ -2163,7 +2145,7 @@ fn test_shr_round_unsigned_helper<
         "0x1.0#1",
         Float::MAX_EXPONENT + 1,
         Nearest,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Equal,
     );
@@ -2172,7 +2154,7 @@ fn test_shr_round_unsigned_helper<
         "0x1.0#1",
         Float::MAX_EXPONENT + 1,
         Exact,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Equal,
     );
@@ -2191,7 +2173,7 @@ fn test_shr_round_unsigned_helper<
         "0x1.0#1",
         Float::MAX_EXPONENT + 2,
         Ceiling,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Greater,
     );
@@ -2209,7 +2191,7 @@ fn test_shr_round_unsigned_helper<
         "0x1.0#1",
         Float::MAX_EXPONENT + 2,
         Up,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Greater,
     );
@@ -2237,7 +2219,7 @@ fn test_shr_round_unsigned_helper<
         "0x1.8#2",
         Float::MAX_EXPONENT + 2,
         Ceiling,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#2",
         Greater,
     );
@@ -2255,7 +2237,7 @@ fn test_shr_round_unsigned_helper<
         "0x1.8#2",
         Float::MAX_EXPONENT + 2,
         Up,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#2",
         Greater,
     );
@@ -2264,7 +2246,7 @@ fn test_shr_round_unsigned_helper<
         "0x1.8#2",
         Float::MAX_EXPONENT + 2,
         Nearest,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#2",
         Greater,
     );
@@ -2274,7 +2256,7 @@ fn test_shr_round_unsigned_helper<
         "-0x1.0#1",
         Float::MAX_EXPONENT + 1,
         Floor,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Equal,
     );
@@ -2283,7 +2265,7 @@ fn test_shr_round_unsigned_helper<
         "-0x1.0#1",
         Float::MAX_EXPONENT + 1,
         Ceiling,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Equal,
     );
@@ -2292,7 +2274,7 @@ fn test_shr_round_unsigned_helper<
         "-0x1.0#1",
         Float::MAX_EXPONENT + 1,
         Down,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Equal,
     );
@@ -2301,7 +2283,7 @@ fn test_shr_round_unsigned_helper<
         "-0x1.0#1",
         Float::MAX_EXPONENT + 1,
         Up,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Equal,
     );
@@ -2310,7 +2292,7 @@ fn test_shr_round_unsigned_helper<
         "-0x1.0#1",
         Float::MAX_EXPONENT + 1,
         Nearest,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Equal,
     );
@@ -2319,7 +2301,7 @@ fn test_shr_round_unsigned_helper<
         "-0x1.0#1",
         Float::MAX_EXPONENT + 1,
         Exact,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Equal,
     );
@@ -2329,7 +2311,7 @@ fn test_shr_round_unsigned_helper<
         "-0x1.0#1",
         Float::MAX_EXPONENT + 2,
         Floor,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Less,
     );
@@ -2356,7 +2338,7 @@ fn test_shr_round_unsigned_helper<
         "-0x1.0#1",
         Float::MAX_EXPONENT + 2,
         Up,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Less,
     );
@@ -2375,7 +2357,7 @@ fn test_shr_round_unsigned_helper<
         "-0x1.8#2",
         Float::MAX_EXPONENT + 2,
         Floor,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#2",
         Less,
     );
@@ -2402,7 +2384,7 @@ fn test_shr_round_unsigned_helper<
         "-0x1.8#2",
         Float::MAX_EXPONENT + 2,
         Up,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#2",
         Less,
     );
@@ -2411,7 +2393,7 @@ fn test_shr_round_unsigned_helper<
         "-0x1.8#2",
         Float::MAX_EXPONENT + 2,
         Nearest,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#2",
         Less,
     );
@@ -2492,20 +2474,20 @@ fn test_shr_round_signed_helper<
     test("-0.0", "-0x0.0", -10, "-0.0", "-0x0.0");
 
     test("123.0", "0x7b.0#7", 0, "123.0", "0x7b.0#7");
-    test("123.0", "0x7b.0#7", 1, "61.5", "0x3d.8#7");
-    test("123.0", "0x7b.0#7", 10, "0.12", "0x0.1ec#7");
-    test("123.0", "0x7b.0#7", 100, "9.7e-29", "0x7.bE-24#7");
+    test("123.0", "0x7b.0#7", 1, "61.50", "0x3d.8#7");
+    test("123.0", "0x7b.0#7", 10, "0.1201", "0x0.1ec#7");
+    test("123.0", "0x7b.0#7", 100, "9.703e-29", "0x7.bE-24#7");
     test("123.0", "0x7b.0#7", -1, "246.0", "0xf6.0#7");
-    test("123.0", "0x7b.0#7", -10, "1.26e5", "0x1.ecE+4#7");
-    test("123.0", "0x7b.0#7", -100, "1.56e32", "0x7.bE+26#7");
+    test("123.0", "0x7b.0#7", -10, "1.260e5", "0x1.ecE+4#7");
+    test("123.0", "0x7b.0#7", -100, "1.559e32", "0x7.bE+26#7");
 
     test("-123.0", "-0x7b.0#7", 0, "-123.0", "-0x7b.0#7");
-    test("-123.0", "-0x7b.0#7", 1, "-61.5", "-0x3d.8#7");
-    test("-123.0", "-0x7b.0#7", 10, "-0.12", "-0x0.1ec#7");
-    test("-123.0", "-0x7b.0#7", 100, "-9.7e-29", "-0x7.bE-24#7");
+    test("-123.0", "-0x7b.0#7", 1, "-61.50", "-0x3d.8#7");
+    test("-123.0", "-0x7b.0#7", 10, "-0.1201", "-0x0.1ec#7");
+    test("-123.0", "-0x7b.0#7", 100, "-9.703e-29", "-0x7.bE-24#7");
     test("-123.0", "-0x7b.0#7", -1, "-246.0", "-0xf6.0#7");
-    test("-123.0", "-0x7b.0#7", -10, "-1.26e5", "-0x1.ecE+4#7");
-    test("-123.0", "-0x7b.0#7", -100, "-1.56e32", "-0x7.bE+26#7");
+    test("-123.0", "-0x7b.0#7", -10, "-1.260e5", "-0x1.ecE+4#7");
+    test("-123.0", "-0x7b.0#7", -100, "-1.559e32", "-0x7.bE+26#7");
 
     test(
         "3.1415926535897931",
@@ -2539,7 +2521,7 @@ fn test_shr_round_signed_helper<
         "3.1415926535897931",
         "0x3.243f6a8885a30#53",
         -1,
-        "6.283185307179586",
+        "6.2831853071795862",
         "0x6.487ed5110b460#53",
     );
     test(
@@ -2589,7 +2571,7 @@ fn test_shr_round_signed_helper<
         "-3.1415926535897931",
         "-0x3.243f6a8885a30#53",
         -1,
-        "-6.283185307179586",
+        "-6.2831853071795862",
         "-0x6.487ed5110b460#53",
     );
     test(
@@ -2645,7 +2627,7 @@ fn test_shr_round_signed_helper<
         "0x1.0#1",
         Float::MIN_EXPONENT + 1,
         Floor,
-        "too_big",
+        "1.0e323228496",
         "0x4.0E+268435455#1",
         Equal,
     );
@@ -2654,7 +2636,7 @@ fn test_shr_round_signed_helper<
         "0x1.0#1",
         Float::MIN_EXPONENT + 1,
         Ceiling,
-        "too_big",
+        "1.0e323228496",
         "0x4.0E+268435455#1",
         Equal,
     );
@@ -2663,7 +2645,7 @@ fn test_shr_round_signed_helper<
         "0x1.0#1",
         Float::MIN_EXPONENT + 1,
         Down,
-        "too_big",
+        "1.0e323228496",
         "0x4.0E+268435455#1",
         Equal,
     );
@@ -2672,7 +2654,7 @@ fn test_shr_round_signed_helper<
         "0x1.0#1",
         Float::MIN_EXPONENT + 1,
         Up,
-        "too_big",
+        "1.0e323228496",
         "0x4.0E+268435455#1",
         Equal,
     );
@@ -2681,7 +2663,7 @@ fn test_shr_round_signed_helper<
         "0x1.0#1",
         Float::MIN_EXPONENT + 1,
         Nearest,
-        "too_big",
+        "1.0e323228496",
         "0x4.0E+268435455#1",
         Equal,
     );
@@ -2690,7 +2672,7 @@ fn test_shr_round_signed_helper<
         "0x1.0#1",
         Float::MIN_EXPONENT + 1,
         Exact,
-        "too_big",
+        "1.0e323228496",
         "0x4.0E+268435455#1",
         Equal,
     );
@@ -2700,7 +2682,7 @@ fn test_shr_round_signed_helper<
         "0x1.0#1",
         Float::MIN_EXPONENT,
         Floor,
-        "too_big",
+        "1.0e323228496",
         "0x4.0E+268435455#1",
         Less,
     );
@@ -2718,7 +2700,7 @@ fn test_shr_round_signed_helper<
         "0x1.0#1",
         Float::MIN_EXPONENT,
         Down,
-        "too_big",
+        "1.0e323228496",
         "0x4.0E+268435455#1",
         Less,
     );
@@ -2755,7 +2737,7 @@ fn test_shr_round_signed_helper<
         "0x1.8#2",
         Float::MAX_EXPONENT + 2,
         Ceiling,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#2",
         Greater,
     );
@@ -2773,7 +2755,7 @@ fn test_shr_round_signed_helper<
         "0x1.8#2",
         Float::MAX_EXPONENT + 2,
         Up,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#2",
         Greater,
     );
@@ -2782,7 +2764,7 @@ fn test_shr_round_signed_helper<
         "0x1.8#2",
         Float::MAX_EXPONENT + 2,
         Nearest,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#2",
         Greater,
     );
@@ -2792,7 +2774,7 @@ fn test_shr_round_signed_helper<
         "-0x1.0#1",
         Float::MIN_EXPONENT + 1,
         Floor,
-        "-too_big",
+        "-1.0e323228496",
         "-0x4.0E+268435455#1",
         Equal,
     );
@@ -2801,7 +2783,7 @@ fn test_shr_round_signed_helper<
         "-0x1.0#1",
         Float::MIN_EXPONENT + 1,
         Ceiling,
-        "-too_big",
+        "-1.0e323228496",
         "-0x4.0E+268435455#1",
         Equal,
     );
@@ -2810,7 +2792,7 @@ fn test_shr_round_signed_helper<
         "-0x1.0#1",
         Float::MIN_EXPONENT + 1,
         Down,
-        "-too_big",
+        "-1.0e323228496",
         "-0x4.0E+268435455#1",
         Equal,
     );
@@ -2819,7 +2801,7 @@ fn test_shr_round_signed_helper<
         "-0x1.0#1",
         Float::MIN_EXPONENT + 1,
         Up,
-        "-too_big",
+        "-1.0e323228496",
         "-0x4.0E+268435455#1",
         Equal,
     );
@@ -2828,7 +2810,7 @@ fn test_shr_round_signed_helper<
         "-0x1.0#1",
         Float::MIN_EXPONENT + 1,
         Nearest,
-        "-too_big",
+        "-1.0e323228496",
         "-0x4.0E+268435455#1",
         Equal,
     );
@@ -2837,7 +2819,7 @@ fn test_shr_round_signed_helper<
         "-0x1.0#1",
         Float::MIN_EXPONENT + 1,
         Exact,
-        "-too_big",
+        "-1.0e323228496",
         "-0x4.0E+268435455#1",
         Equal,
     );
@@ -2856,7 +2838,7 @@ fn test_shr_round_signed_helper<
         "-0x1.0#1",
         Float::MIN_EXPONENT,
         Ceiling,
-        "-too_big",
+        "-1.0e323228496",
         "-0x4.0E+268435455#1",
         Greater,
     );
@@ -2865,7 +2847,7 @@ fn test_shr_round_signed_helper<
         "-0x1.0#1",
         Float::MIN_EXPONENT,
         Down,
-        "-too_big",
+        "-1.0e323228496",
         "-0x4.0E+268435455#1",
         Greater,
     );
@@ -2893,7 +2875,7 @@ fn test_shr_round_signed_helper<
         "0x1.0#1",
         Float::MAX_EXPONENT + 1,
         Floor,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Equal,
     );
@@ -2902,7 +2884,7 @@ fn test_shr_round_signed_helper<
         "0x1.0#1",
         Float::MAX_EXPONENT + 1,
         Ceiling,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Equal,
     );
@@ -2911,7 +2893,7 @@ fn test_shr_round_signed_helper<
         "0x1.0#1",
         Float::MAX_EXPONENT + 1,
         Down,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Equal,
     );
@@ -2920,7 +2902,7 @@ fn test_shr_round_signed_helper<
         "0x1.0#1",
         Float::MAX_EXPONENT + 1,
         Up,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Equal,
     );
@@ -2929,7 +2911,7 @@ fn test_shr_round_signed_helper<
         "0x1.0#1",
         Float::MAX_EXPONENT + 1,
         Nearest,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Equal,
     );
@@ -2938,7 +2920,7 @@ fn test_shr_round_signed_helper<
         "0x1.0#1",
         Float::MAX_EXPONENT + 1,
         Exact,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Equal,
     );
@@ -2957,7 +2939,7 @@ fn test_shr_round_signed_helper<
         "0x1.0#1",
         Float::MAX_EXPONENT + 2,
         Ceiling,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Greater,
     );
@@ -2975,7 +2957,7 @@ fn test_shr_round_signed_helper<
         "0x1.0#1",
         Float::MAX_EXPONENT + 2,
         Up,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Greater,
     );
@@ -2994,7 +2976,7 @@ fn test_shr_round_signed_helper<
         "-0x1.0#1",
         Float::MAX_EXPONENT + 1,
         Floor,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Equal,
     );
@@ -3003,7 +2985,7 @@ fn test_shr_round_signed_helper<
         "-0x1.0#1",
         Float::MAX_EXPONENT + 1,
         Ceiling,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Equal,
     );
@@ -3012,7 +2994,7 @@ fn test_shr_round_signed_helper<
         "-0x1.0#1",
         Float::MAX_EXPONENT + 1,
         Down,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Equal,
     );
@@ -3021,7 +3003,7 @@ fn test_shr_round_signed_helper<
         "-0x1.0#1",
         Float::MAX_EXPONENT + 1,
         Up,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Equal,
     );
@@ -3030,7 +3012,7 @@ fn test_shr_round_signed_helper<
         "-0x1.0#1",
         Float::MAX_EXPONENT + 1,
         Nearest,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Equal,
     );
@@ -3039,7 +3021,7 @@ fn test_shr_round_signed_helper<
         "-0x1.0#1",
         Float::MAX_EXPONENT + 1,
         Exact,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Equal,
     );
@@ -3049,7 +3031,7 @@ fn test_shr_round_signed_helper<
         "-0x1.0#1",
         Float::MAX_EXPONENT + 2,
         Floor,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Less,
     );
@@ -3076,7 +3058,7 @@ fn test_shr_round_signed_helper<
         "-0x1.0#1",
         Float::MAX_EXPONENT + 2,
         Up,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Less,
     );
@@ -3095,7 +3077,7 @@ fn test_shr_round_signed_helper<
         "-0x1.8#2",
         Float::MAX_EXPONENT + 2,
         Floor,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#2",
         Less,
     );
@@ -3122,7 +3104,7 @@ fn test_shr_round_signed_helper<
         "-0x1.8#2",
         Float::MAX_EXPONENT + 2,
         Up,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#2",
         Less,
     );
@@ -3131,7 +3113,7 @@ fn test_shr_round_signed_helper<
         "-0x1.8#2",
         Float::MAX_EXPONENT + 2,
         Nearest,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#2",
         Less,
     );

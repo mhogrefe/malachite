@@ -26,7 +26,7 @@ use malachite_float::arithmetic::log_base_power_of_2::{
 use malachite_float::test_util::arithmetic::log_base::{
     rug_log_base, rug_log_base_prec_round, rug_log_base_rational_prec_round,
 };
-use malachite_float::test_util::common::rug_round_try_from_rounding_mode;
+use malachite_float::test_util::common::{rug_round_try_from_rounding_mode, to_hex_string};
 use malachite_float::test_util::generators::{
     float_unsigned_rounding_mode_triple_gen_var_27, float_unsigned_rounding_mode_triple_gen_var_28,
     float_unsigned_unsigned_rounding_mode_quadruple_gen_var_5,
@@ -87,40 +87,159 @@ fn check(x: &Float, base: u64, prec: u64, rm: RoundingMode) -> (Float, Ordering)
 
 #[test]
 fn test_log_base_prec_round() {
-    let test = |x: Float, base: u64, prec: u64, rm: RoundingMode, out: &str, o_out: Ordering| {
+    let test = |x: Float,
+                base: u64,
+                prec: u64,
+                rm: RoundingMode,
+                out: &str,
+                out_hex: &str,
+                o_out: Ordering| {
         let (log, o) = check(&x, base, prec, rm);
         assert_eq!(log.to_string(), out);
+        assert_eq!(to_hex_string(&log), out_hex);
         assert_eq!(o, o_out);
     };
     // Exact powers: log_base(base^n) = n.
-    test(Float::from(1000), 10, 10, Exact, "3.0", Equal);
-    test(Float::from(100), 10, 10, Exact, "2.0", Equal);
-    test(Float::from(81), 3, 10, Exact, "4.0", Equal);
-    test(Float::from(243), 3, 10, Nearest, "5.0", Equal); // 3^5
-    test(Float::from(16807), 7, 10, Nearest, "5.0", Equal); // 7^5
-    test(Float::from(1), 10, 10, Exact, "0.0", Equal);
+    test(
+        Float::from(1000),
+        10,
+        10,
+        Exact,
+        "3.0000",
+        "0x3.00#10",
+        Equal,
+    );
+    test(
+        Float::from(100),
+        10,
+        10,
+        Exact,
+        "2.0000",
+        "0x2.00#10",
+        Equal,
+    );
+    test(Float::from(81), 3, 10, Exact, "4.0000", "0x4.00#10", Equal);
+    test(
+        Float::from(243),
+        3,
+        10,
+        Nearest,
+        "5.0000",
+        "0x5.00#10",
+        Equal,
+    ); // 3^5
+    test(
+        Float::from(16807),
+        7,
+        10,
+        Nearest,
+        "5.0000",
+        "0x5.00#10",
+        Equal,
+    ); // 7^5
+    test(Float::from(1), 10, 10, Exact, "0.0", "0x0.0", Equal);
     // Base a power of 2: delegates to log_base_power_of_2.
-    test(Float::from(64), 4, 10, Nearest, "3.0", Equal); // log_4(64) = 3
-    test(Float::from(8), 2, 10, Exact, "3.0", Equal);
-    test(Float::from(1000000), 8, 10, Nearest, "6.64", Less); // log_8(10^6), inexact
+    test(
+        Float::from(64),
+        4,
+        10,
+        Nearest,
+        "3.0000",
+        "0x3.00#10",
+        Equal,
+    ); // log_4(64) = 3
+    test(Float::from(8), 2, 10, Exact, "3.0000", "0x3.00#10", Equal);
+    test(
+        Float::from(1000000),
+        8,
+        10,
+        Nearest,
+        "6.6406",
+        "0x6.a4#10",
+        Less,
+    ); // log_8(10^6), inexact
     // Perfect-power base: exercises the express_as_power reduction (base 9 -> root 3) and the
     // dyadic exact case.
-    test(Float::from(3), 9, 10, Exact, "0.5", Equal); // log_9(3) = 1/2
-    test(Float::from(81), 9, 10, Exact, "2.0", Equal); // log_9(81) = 2
+    test(Float::from(3), 9, 10, Exact, "0.50000", "0x0.800#10", Equal); // log_9(3) = 1/2
+    test(Float::from(81), 9, 10, Exact, "2.0000", "0x2.00#10", Equal); // log_9(81) = 2
     // Inexact.
-    test(Float::from(50), 10, 10, Floor, "1.697", Less);
-    test(Float::from(50), 10, 10, Ceiling, "1.699", Greater);
-    test(Float::from(50), 10, 10, Nearest, "1.699", Greater);
-    test(Float::from(2), 3, 20, Nearest, "0.63093", Greater);
+    test(Float::from(50), 10, 10, Floor, "1.6973", "0x1.b28#10", Less);
+    test(
+        Float::from(50),
+        10,
+        10,
+        Ceiling,
+        "1.6992",
+        "0x1.b30#10",
+        Greater,
+    );
+    test(
+        Float::from(50),
+        10,
+        10,
+        Nearest,
+        "1.6992",
+        "0x1.b30#10",
+        Greater,
+    );
+    test(
+        Float::from(2),
+        3,
+        20,
+        Nearest,
+        "0.63092995",
+        "0x0.a184a#20",
+        Greater,
+    );
     // x in (0, 1): negative result.
-    test(Float::from(1) >> 3, 3, 20, Nearest, "-1.89279", Less); // log_3(1/8)
+    test(
+        Float::from(1) >> 3,
+        3,
+        20,
+        Nearest,
+        "-1.8927898",
+        "-0x1.e48de#20",
+        Less,
+    ); // log_3(1/8)
     // Special cases.
-    test(Float::NAN, 10, 10, Nearest, "NaN", Equal);
-    test(Float::INFINITY, 10, 10, Nearest, "Infinity", Equal);
-    test(Float::NEGATIVE_INFINITY, 10, 10, Nearest, "NaN", Equal);
-    test(Float::ZERO, 10, 10, Nearest, "-Infinity", Equal);
-    test(Float::NEGATIVE_ZERO, 10, 10, Nearest, "-Infinity", Equal);
-    test(-Float::from(5), 10, 10, Nearest, "NaN", Equal);
+    test(Float::NAN, 10, 10, Nearest, "NaN", "NaN", Equal);
+    test(
+        Float::INFINITY,
+        10,
+        10,
+        Nearest,
+        "Infinity",
+        "Infinity",
+        Equal,
+    );
+    test(
+        Float::NEGATIVE_INFINITY,
+        10,
+        10,
+        Nearest,
+        "NaN",
+        "NaN",
+        Equal,
+    );
+    test(
+        Float::ZERO,
+        10,
+        10,
+        Nearest,
+        "-Infinity",
+        "-Infinity",
+        Equal,
+    );
+    test(
+        Float::NEGATIVE_ZERO,
+        10,
+        10,
+        Nearest,
+        "-Infinity",
+        "-Infinity",
+        Equal,
+    );
+    test(-Float::from(5), 10, 10, Nearest, "NaN", "NaN", Equal);
 }
 
 #[test]
@@ -161,10 +280,11 @@ fn test_log_base_directed_consistency() {
 #[test]
 fn test_log_base() {
     // The `LogBase` trait: rounds to the input's precision, to nearest.
-    let test = |x: Float, base: u64, out: &str| {
+    let test = |x: Float, base: u64, out: &str, out_hex: &str| {
         let log = x.clone().log_base(base);
         assert!(log.is_valid());
         assert_eq!(log.to_string(), out);
+        assert_eq!(to_hex_string(&log), out_hex);
 
         let log_alt = (&x).log_base(base);
         assert!(log_alt.is_valid());
@@ -183,12 +303,12 @@ fn test_log_base() {
         );
         let _ = x.significant_bits();
     };
-    test(Float::from(1000), 10, "3.0");
-    test(Float::from(81), 3, "4.0");
-    test(Float::from(1), 10, "0.0");
-    test(Float::NAN, 10, "NaN");
-    test(Float::INFINITY, 10, "Infinity");
-    test(Float::ZERO, 10, "-Infinity");
+    test(Float::from(1000), 10, "3.000", "0x3.00#7");
+    test(Float::from(81), 3, "4.000", "0x4.0#7");
+    test(Float::from(1), 10, "0.0", "0x0.0");
+    test(Float::NAN, 10, "NaN", "NaN");
+    test(Float::INFINITY, 10, "Infinity", "Infinity");
+    test(Float::ZERO, 10, "-Infinity", "-Infinity");
 }
 
 #[test]
@@ -397,94 +517,138 @@ fn log_base_rational_prec_properties() {
 
 #[test]
 fn test_log_base_rational_prec_round() {
-    let test =
-        |n: i64, d: u64, base: u64, prec: u64, rm: RoundingMode, out: &str, o_out: Ordering| {
-            let x = Rational::from_signeds(n, i64::exact_from(d));
-            let (log, o) = Float::log_base_rational_prec_round(x.clone(), base, prec, rm);
-            assert!(log.is_valid());
-            assert_eq!(log.to_string(), out);
-            assert_eq!(o, o_out);
-            let (log_alt, o_alt) = Float::log_base_rational_prec_round_ref(&x, base, prec, rm);
-            assert_eq!(ComparableFloatRef(&log_alt), ComparableFloatRef(&log));
-            assert_eq!(o_alt, o);
-            if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm) {
-                let (rl, ro) = rug_log_base_rational_prec_round(&x, base, prec, rug_rm);
-                assert_eq!(
-                    ComparableFloatRef(&Float::from(&rl)),
-                    ComparableFloatRef(&log)
-                );
-                assert_eq!(ro, o);
-            }
-        };
-    test(3, 5, 10, 20, Floor, "-0.221849", Less);
-    test(3, 5, 10, 20, Ceiling, "-0.2218487", Greater);
-    test(3, 5, 10, 20, Nearest, "-0.2218487", Greater);
-    test(2, 1, 3, 20, Floor, "0.630929", Less);
-    test(2, 1, 3, 20, Ceiling, "0.63093", Greater);
-    test(2, 1, 3, 20, Nearest, "0.63093", Greater);
-    test(1, 8, 3, 20, Floor, "-1.89279", Less);
-    test(1, 8, 3, 20, Ceiling, "-1.892788", Greater);
-    test(1, 8, 3, 20, Nearest, "-1.89279", Less);
-    test(7, 1, 5, 30, Floor, "1.209061954", Less);
-    test(7, 1, 5, 30, Ceiling, "1.209061956", Greater);
-    test(7, 1, 5, 30, Nearest, "1.209061956", Greater);
-    test(50, 1, 10, 10, Floor, "1.697", Less);
-    test(50, 1, 10, 10, Ceiling, "1.699", Greater);
-    test(50, 1, 10, 10, Nearest, "1.699", Greater);
-    test(1, 100, 10, 10, Floor, "-2.0", Equal);
-    test(1, 100, 10, 10, Ceiling, "-2.0", Equal);
-    test(1, 100, 10, 10, Nearest, "-2.0", Equal);
-    test(1, 100, 10, 10, Exact, "-2.0", Equal);
-    test(22, 7, 3, 15, Floor, "1.0423", Less);
-    test(22, 7, 3, 15, Ceiling, "1.04236", Greater);
-    test(22, 7, 3, 15, Nearest, "1.04236", Greater);
-    test(3, 1, 9, 10, Floor, "0.5", Equal);
-    test(3, 1, 9, 10, Ceiling, "0.5", Equal);
-    test(3, 1, 9, 10, Nearest, "0.5", Equal);
-    test(3, 1, 9, 10, Exact, "0.5", Equal);
-    test(1, 9, 3, 10, Floor, "-2.0", Equal);
-    test(1, 9, 3, 10, Ceiling, "-2.0", Equal);
-    test(1, 9, 3, 10, Nearest, "-2.0", Equal);
-    test(1, 9, 3, 10, Exact, "-2.0", Equal);
-    test(1000, 1, 10, 10, Floor, "3.0", Equal);
-    test(1000, 1, 10, 10, Ceiling, "3.0", Equal);
-    test(1000, 1, 10, 10, Nearest, "3.0", Equal);
-    test(1000, 1, 10, 10, Exact, "3.0", Equal);
-    test(5, 2, 4, 20, Floor, "0.660964", Less);
-    test(5, 2, 4, 20, Ceiling, "0.660965", Greater);
-    test(5, 2, 4, 20, Nearest, "0.660964", Less);
+    let test = |n: i64,
+                d: u64,
+                base: u64,
+                prec: u64,
+                rm: RoundingMode,
+                out: &str,
+                out_hex: &str,
+                o_out: Ordering| {
+        let x = Rational::from_signeds(n, i64::exact_from(d));
+        let (log, o) = Float::log_base_rational_prec_round(x.clone(), base, prec, rm);
+        assert!(log.is_valid());
+        assert_eq!(log.to_string(), out);
+        assert_eq!(to_hex_string(&log), out_hex);
+        assert_eq!(o, o_out);
+        let (log_alt, o_alt) = Float::log_base_rational_prec_round_ref(&x, base, prec, rm);
+        assert_eq!(ComparableFloatRef(&log_alt), ComparableFloatRef(&log));
+        assert_eq!(o_alt, o);
+        if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm) {
+            let (rl, ro) = rug_log_base_rational_prec_round(&x, base, prec, rug_rm);
+            assert_eq!(
+                ComparableFloatRef(&Float::from(&rl)),
+                ComparableFloatRef(&log)
+            );
+            assert_eq!(ro, o);
+        }
+    };
+    test(3, 5, 10, 20, Floor, "-0.22184896", "-0x0.38cb18#20", Less);
+    test(
+        3,
+        5,
+        10,
+        20,
+        Ceiling,
+        "-0.22184873",
+        "-0x0.38cb14#20",
+        Greater,
+    );
+    test(
+        3,
+        5,
+        10,
+        20,
+        Nearest,
+        "-0.22184873",
+        "-0x0.38cb14#20",
+        Greater,
+    );
+    test(2, 1, 3, 20, Floor, "0.63092899", "0x0.a1849#20", Less);
+    test(2, 1, 3, 20, Ceiling, "0.63092995", "0x0.a184a#20", Greater);
+    test(2, 1, 3, 20, Nearest, "0.63092995", "0x0.a184a#20", Greater);
+    test(1, 8, 3, 20, Floor, "-1.8927898", "-0x1.e48de#20", Less);
+    test(1, 8, 3, 20, Ceiling, "-1.8927879", "-0x1.e48dc#20", Greater);
+    test(1, 8, 3, 20, Nearest, "-1.8927898", "-0x1.e48de#20", Less);
+    test(7, 1, 5, 30, Floor, "1.2090619542", "0x1.35851590#30", Less);
+    test(
+        7,
+        1,
+        5,
+        30,
+        Ceiling,
+        "1.2090619560",
+        "0x1.35851598#30",
+        Greater,
+    );
+    test(
+        7,
+        1,
+        5,
+        30,
+        Nearest,
+        "1.2090619560",
+        "0x1.35851598#30",
+        Greater,
+    );
+    test(50, 1, 10, 10, Floor, "1.6973", "0x1.b28#10", Less);
+    test(50, 1, 10, 10, Ceiling, "1.6992", "0x1.b30#10", Greater);
+    test(50, 1, 10, 10, Nearest, "1.6992", "0x1.b30#10", Greater);
+    test(1, 100, 10, 10, Floor, "-2.0000", "-0x2.00#10", Equal);
+    test(1, 100, 10, 10, Ceiling, "-2.0000", "-0x2.00#10", Equal);
+    test(1, 100, 10, 10, Nearest, "-2.0000", "-0x2.00#10", Equal);
+    test(1, 100, 10, 10, Exact, "-2.0000", "-0x2.00#10", Equal);
+    test(22, 7, 3, 15, Floor, "1.04230", "0x1.0ad4#15", Less);
+    test(22, 7, 3, 15, Ceiling, "1.04236", "0x1.0ad8#15", Greater);
+    test(22, 7, 3, 15, Nearest, "1.04236", "0x1.0ad8#15", Greater);
+    test(3, 1, 9, 10, Floor, "0.50000", "0x0.800#10", Equal);
+    test(3, 1, 9, 10, Ceiling, "0.50000", "0x0.800#10", Equal);
+    test(3, 1, 9, 10, Nearest, "0.50000", "0x0.800#10", Equal);
+    test(3, 1, 9, 10, Exact, "0.50000", "0x0.800#10", Equal);
+    test(1, 9, 3, 10, Floor, "-2.0000", "-0x2.00#10", Equal);
+    test(1, 9, 3, 10, Ceiling, "-2.0000", "-0x2.00#10", Equal);
+    test(1, 9, 3, 10, Nearest, "-2.0000", "-0x2.00#10", Equal);
+    test(1, 9, 3, 10, Exact, "-2.0000", "-0x2.00#10", Equal);
+    test(1000, 1, 10, 10, Floor, "3.0000", "0x3.00#10", Equal);
+    test(1000, 1, 10, 10, Ceiling, "3.0000", "0x3.00#10", Equal);
+    test(1000, 1, 10, 10, Nearest, "3.0000", "0x3.00#10", Equal);
+    test(1000, 1, 10, 10, Exact, "3.0000", "0x3.00#10", Equal);
+    test(5, 2, 4, 20, Floor, "0.66096401", "0x0.a934f#20", Less);
+    test(5, 2, 4, 20, Ceiling, "0.66096497", "0x0.a9350#20", Greater);
+    test(5, 2, 4, 20, Nearest, "0.66096401", "0x0.a934f#20", Less);
     // Special cases.
-    test(0, 1, 10, 10, Nearest, "-Infinity", Equal);
-    test(0, 1, 10, 10, Exact, "-Infinity", Equal);
-    test(-3, 1, 10, 10, Nearest, "NaN", Equal);
-    test(1, 1, 10, 10, Exact, "0.0", Equal);
+    test(0, 1, 10, 10, Nearest, "-Infinity", "-Infinity", Equal);
+    test(0, 1, 10, 10, Exact, "-Infinity", "-Infinity", Equal);
+    test(-3, 1, 10, 10, Nearest, "NaN", "NaN", Equal);
+    test(1, 1, 10, 10, Exact, "0.0", "0x0.0", Equal);
 }
 
 #[test]
 fn test_log_base_rational_prec() {
-    let test = |n: i64, d: u64, base: u64, prec: u64, out: &str, o_out: Ordering| {
+    let test = |n: i64, d: u64, base: u64, prec: u64, out: &str, out_hex: &str, o_out: Ordering| {
         let x = Rational::from_signeds(n, i64::exact_from(d));
         let (log, o) = Float::log_base_rational_prec(x.clone(), base, prec);
         assert!(log.is_valid());
         assert_eq!(log.to_string(), out);
+        assert_eq!(to_hex_string(&log), out_hex);
         assert_eq!(o, o_out);
         let (log_alt, o_alt) = Float::log_base_rational_prec_ref(&x, base, prec);
         assert_eq!(ComparableFloatRef(&log_alt), ComparableFloatRef(&log));
         assert_eq!(o_alt, o);
     };
-    test(3, 5, 10, 20, "-0.2218487", Greater);
-    test(2, 1, 3, 20, "0.63093", Greater);
-    test(1, 8, 3, 20, "-1.89279", Less);
-    test(7, 1, 5, 30, "1.209061956", Greater);
-    test(50, 1, 10, 10, "1.699", Greater);
-    test(1, 100, 10, 10, "-2.0", Equal);
-    test(22, 7, 3, 15, "1.04236", Greater);
-    test(3, 1, 9, 10, "0.5", Equal);
-    test(1, 9, 3, 10, "-2.0", Equal);
-    test(1000, 1, 10, 10, "3.0", Equal);
-    test(5, 2, 4, 20, "0.660964", Less);
-    test(0, 1, 10, 10, "-Infinity", Equal);
-    test(1, 1, 10, 10, "0.0", Equal);
+    test(3, 5, 10, 20, "-0.22184873", "-0x0.38cb14#20", Greater);
+    test(2, 1, 3, 20, "0.63092995", "0x0.a184a#20", Greater);
+    test(1, 8, 3, 20, "-1.8927898", "-0x1.e48de#20", Less);
+    test(7, 1, 5, 30, "1.2090619560", "0x1.35851598#30", Greater);
+    test(50, 1, 10, 10, "1.6992", "0x1.b30#10", Greater);
+    test(1, 100, 10, 10, "-2.0000", "-0x2.00#10", Equal);
+    test(22, 7, 3, 15, "1.04236", "0x1.0ad8#15", Greater);
+    test(3, 1, 9, 10, "0.50000", "0x0.800#10", Equal);
+    test(1, 9, 3, 10, "-2.0000", "-0x2.00#10", Equal);
+    test(1000, 1, 10, 10, "3.0000", "0x3.00#10", Equal);
+    test(5, 2, 4, 20, "0.66096401", "0x0.a934f#20", Less);
+    test(0, 1, 10, 10, "-Infinity", "-Infinity", Equal);
+    test(1, 1, 10, 10, "0.0", "0x0.0", Equal);
 }
 
 #[test]

@@ -392,13 +392,13 @@ impl Float {
     /// let (e, o) = Float::from_unsigned_prec(1u32, 100)
     ///     .0
     ///     .exp_x_minus_1_prec_round(20, Floor);
-    /// assert_eq!(e.to_string(), "1.718281");
+    /// assert_eq!(e.to_string(), "1.7182808");
     /// assert_eq!(o, Less);
     ///
     /// let (e, o) = Float::from_unsigned_prec(1u32, 100)
     ///     .0
     ///     .exp_x_minus_1_prec_round(20, Ceiling);
-    /// assert_eq!(e.to_string(), "1.718283");
+    /// assert_eq!(e.to_string(), "1.7182827");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -471,13 +471,13 @@ impl Float {
     /// let (e, o) = Float::from_unsigned_prec(1u32, 100)
     ///     .0
     ///     .exp_x_minus_1_prec_round_ref(20, Floor);
-    /// assert_eq!(e.to_string(), "1.718281");
+    /// assert_eq!(e.to_string(), "1.7182808");
     /// assert_eq!(o, Less);
     ///
     /// let (e, o) = Float::from_unsigned_prec(1u32, 100)
     ///     .0
     ///     .exp_x_minus_1_prec_round_ref(20, Ceiling);
-    /// assert_eq!(e.to_string(), "1.718283");
+    /// assert_eq!(e.to_string(), "1.7182827");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -548,7 +548,7 @@ impl Float {
     /// let (e, o) = Float::from_unsigned_prec(1u32, 100)
     ///     .0
     ///     .exp_x_minus_1_prec(20);
-    /// assert_eq!(e.to_string(), "1.718283");
+    /// assert_eq!(e.to_string(), "1.7182827");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -610,7 +610,7 @@ impl Float {
     /// let (e, o) = Float::from_unsigned_prec(1u32, 100)
     ///     .0
     ///     .exp_x_minus_1_prec_ref(20);
-    /// assert_eq!(e.to_string(), "1.718283");
+    /// assert_eq!(e.to_string(), "1.7182827");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -683,22 +683,22 @@ impl Float {
     ///
     /// let (e, o) =
     ///     Float::exp_x_minus_1_rational_prec_round(Rational::from_unsigneds(3u8, 5), 5, Floor);
-    /// assert_eq!(e.to_string(), "0.81");
+    /// assert_eq!(e.to_string(), "0.812");
     /// assert_eq!(o, Less);
     ///
     /// let (e, o) =
     ///     Float::exp_x_minus_1_rational_prec_round(Rational::from_unsigneds(3u8, 5), 5, Ceiling);
-    /// assert_eq!(e.to_string(), "0.84");
+    /// assert_eq!(e.to_string(), "0.844");
     /// assert_eq!(o, Greater);
     ///
     /// let (e, o) =
     ///     Float::exp_x_minus_1_rational_prec_round(Rational::from_unsigneds(3u8, 5), 20, Floor);
-    /// assert_eq!(e.to_string(), "0.822119");
+    /// assert_eq!(e.to_string(), "0.82211876");
     /// assert_eq!(o, Less);
     ///
     /// let (e, o) =
     ///     Float::exp_x_minus_1_rational_prec_round(Rational::from_unsigneds(3u8, 5), 20, Ceiling);
-    /// assert_eq!(e.to_string(), "0.82212");
+    /// assert_eq!(e.to_string(), "0.82211971");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -777,7 +777,7 @@ impl Float {
     ///     5,
     ///     Floor,
     /// );
-    /// assert_eq!(e.to_string(), "0.81");
+    /// assert_eq!(e.to_string(), "0.812");
     /// assert_eq!(o, Less);
     ///
     /// let (e, o) = Float::exp_x_minus_1_rational_prec_round_ref(
@@ -785,7 +785,7 @@ impl Float {
     ///     5,
     ///     Ceiling,
     /// );
-    /// assert_eq!(e.to_string(), "0.84");
+    /// assert_eq!(e.to_string(), "0.844");
     /// assert_eq!(o, Greater);
     ///
     /// let (e, o) = Float::exp_x_minus_1_rational_prec_round_ref(
@@ -793,7 +793,7 @@ impl Float {
     ///     20,
     ///     Floor,
     /// );
-    /// assert_eq!(e.to_string(), "0.822119");
+    /// assert_eq!(e.to_string(), "0.82211876");
     /// assert_eq!(o, Less);
     ///
     /// let (e, o) = Float::exp_x_minus_1_rational_prec_round_ref(
@@ -801,7 +801,7 @@ impl Float {
     ///     20,
     ///     Ceiling,
     /// );
-    /// assert_eq!(e.to_string(), "0.82212");
+    /// assert_eq!(e.to_string(), "0.82211971");
     /// assert_eq!(o, Greater);
     /// ```
     pub fn exp_x_minus_1_rational_prec_round_ref(
@@ -868,15 +868,15 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (e, o) = Float::exp_x_minus_1_rational_prec(Rational::from_unsigneds(3u8, 5), 5);
-    /// assert_eq!(e.to_string(), "0.81");
+    /// assert_eq!(e.to_string(), "0.812");
     /// assert_eq!(o, Less);
     ///
     /// let (e, o) = Float::exp_x_minus_1_rational_prec(Rational::from_unsigneds(3u8, 5), 20);
-    /// assert_eq!(e.to_string(), "0.822119");
+    /// assert_eq!(e.to_string(), "0.82211876");
     /// assert_eq!(o, Less);
     ///
     /// let (e, o) = Float::exp_x_minus_1_rational_prec(Rational::from_signeds(-3i8, 5), 10);
-    /// assert_eq!(e.to_string(), "-0.4512");
+    /// assert_eq!(e.to_string(), "-0.45117");
     /// assert_eq!(o, Greater);
     ///
     /// let (e, o) = Float::exp_x_minus_1_rational_prec(Rational::from(0), 10);
@@ -938,15 +938,15 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (e, o) = Float::exp_x_minus_1_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 5);
-    /// assert_eq!(e.to_string(), "0.81");
+    /// assert_eq!(e.to_string(), "0.812");
     /// assert_eq!(o, Less);
     ///
     /// let (e, o) = Float::exp_x_minus_1_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 20);
-    /// assert_eq!(e.to_string(), "0.822119");
+    /// assert_eq!(e.to_string(), "0.82211876");
     /// assert_eq!(o, Less);
     ///
     /// let (e, o) = Float::exp_x_minus_1_rational_prec_ref(&Rational::from_signeds(-3i8, 5), 10);
-    /// assert_eq!(e.to_string(), "-0.4512");
+    /// assert_eq!(e.to_string(), "-0.45117");
     /// assert_eq!(o, Greater);
     ///
     /// let (e, o) = Float::exp_x_minus_1_rational_prec_ref(&Rational::from(0), 10);
@@ -1022,13 +1022,13 @@ impl Float {
     /// let (e, o) = Float::from_unsigned_prec(1u32, 100)
     ///     .0
     ///     .exp_x_minus_1_round(Floor);
-    /// assert_eq!(e.to_string(), "1.718281828459045235360287471351");
+    /// assert_eq!(e.to_string(), "1.7182818284590452353602874713512");
     /// assert_eq!(o, Less);
     ///
     /// let (e, o) = Float::from_unsigned_prec(1u32, 100)
     ///     .0
     ///     .exp_x_minus_1_round(Ceiling);
-    /// assert_eq!(e.to_string(), "1.718281828459045235360287471353");
+    /// assert_eq!(e.to_string(), "1.7182818284590452353602874713528");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -1101,13 +1101,13 @@ impl Float {
     /// let (e, o) = Float::from_unsigned_prec(1u32, 100)
     ///     .0
     ///     .exp_x_minus_1_round_ref(Floor);
-    /// assert_eq!(e.to_string(), "1.718281828459045235360287471351");
+    /// assert_eq!(e.to_string(), "1.7182818284590452353602874713512");
     /// assert_eq!(o, Less);
     ///
     /// let (e, o) = Float::from_unsigned_prec(1u32, 100)
     ///     .0
     ///     .exp_x_minus_1_round_ref(Ceiling);
-    /// assert_eq!(e.to_string(), "1.718281828459045235360287471353");
+    /// assert_eq!(e.to_string(), "1.7182818284590452353602874713528");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -1161,11 +1161,11 @@ impl Float {
     ///
     /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
     /// assert_eq!(x.exp_x_minus_1_prec_round_assign(20, Floor), Less);
-    /// assert_eq!(x.to_string(), "1.718281");
+    /// assert_eq!(x.to_string(), "1.7182808");
     ///
     /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
     /// assert_eq!(x.exp_x_minus_1_prec_round_assign(20, Ceiling), Greater);
-    /// assert_eq!(x.to_string(), "1.718283");
+    /// assert_eq!(x.to_string(), "1.7182827");
     /// ```
     #[inline]
     pub fn exp_x_minus_1_prec_round_assign(&mut self, prec: u64, rm: RoundingMode) -> Ordering {
@@ -1216,7 +1216,7 @@ impl Float {
     ///
     /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
     /// assert_eq!(x.exp_x_minus_1_prec_assign(20), Greater);
-    /// assert_eq!(x.to_string(), "1.718283");
+    /// assert_eq!(x.to_string(), "1.7182827");
     /// ```
     #[inline]
     pub fn exp_x_minus_1_prec_assign(&mut self, prec: u64) -> Ordering {
@@ -1268,11 +1268,11 @@ impl Float {
     ///
     /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
     /// assert_eq!(x.exp_x_minus_1_round_assign(Floor), Less);
-    /// assert_eq!(x.to_string(), "1.718281828459045235360287471351");
+    /// assert_eq!(x.to_string(), "1.7182818284590452353602874713512");
     ///
     /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
     /// assert_eq!(x.exp_x_minus_1_round_assign(Ceiling), Greater);
-    /// assert_eq!(x.to_string(), "1.718281828459045235360287471353");
+    /// assert_eq!(x.to_string(), "1.7182818284590452353602874713528");
     /// ```
     #[inline]
     pub fn exp_x_minus_1_round_assign(&mut self, rm: RoundingMode) -> Ordering {

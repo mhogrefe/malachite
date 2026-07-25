@@ -744,27 +744,27 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (sum, o) = Float::from(PI).add_prec_round(Float::from(E), 5, Floor);
-    /// assert_eq!(sum.to_string(), "5.8");
+    /// assert_eq!(sum.to_string(), "5.75");
     /// assert_eq!(o, Less);
     ///
     /// let (sum, o) = Float::from(PI).add_prec_round(Float::from(E), 5, Ceiling);
-    /// assert_eq!(sum.to_string(), "6.0");
+    /// assert_eq!(sum.to_string(), "6.00");
     /// assert_eq!(o, Greater);
     ///
     /// let (sum, o) = Float::from(PI).add_prec_round(Float::from(E), 5, Nearest);
-    /// assert_eq!(sum.to_string(), "5.8");
+    /// assert_eq!(sum.to_string(), "5.75");
     /// assert_eq!(o, Less);
     ///
     /// let (sum, o) = Float::from(PI).add_prec_round(Float::from(E), 20, Floor);
-    /// assert_eq!(sum.to_string(), "5.85987");
+    /// assert_eq!(sum.to_string(), "5.8598709");
     /// assert_eq!(o, Less);
     ///
     /// let (sum, o) = Float::from(PI).add_prec_round(Float::from(E), 20, Ceiling);
-    /// assert_eq!(sum.to_string(), "5.85988");
+    /// assert_eq!(sum.to_string(), "5.8598785");
     /// assert_eq!(o, Greater);
     ///
     /// let (sum, o) = Float::from(PI).add_prec_round(Float::from(E), 20, Nearest);
-    /// assert_eq!(sum.to_string(), "5.85987");
+    /// assert_eq!(sum.to_string(), "5.8598709");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -850,27 +850,27 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (sum, o) = Float::from(PI).add_prec_round_val_ref(&Float::from(E), 5, Floor);
-    /// assert_eq!(sum.to_string(), "5.8");
+    /// assert_eq!(sum.to_string(), "5.75");
     /// assert_eq!(o, Less);
     ///
     /// let (sum, o) = Float::from(PI).add_prec_round_val_ref(&Float::from(E), 5, Ceiling);
-    /// assert_eq!(sum.to_string(), "6.0");
+    /// assert_eq!(sum.to_string(), "6.00");
     /// assert_eq!(o, Greater);
     ///
     /// let (sum, o) = Float::from(PI).add_prec_round_val_ref(&Float::from(E), 5, Nearest);
-    /// assert_eq!(sum.to_string(), "5.8");
+    /// assert_eq!(sum.to_string(), "5.75");
     /// assert_eq!(o, Less);
     ///
     /// let (sum, o) = Float::from(PI).add_prec_round_val_ref(&Float::from(E), 20, Floor);
-    /// assert_eq!(sum.to_string(), "5.85987");
+    /// assert_eq!(sum.to_string(), "5.8598709");
     /// assert_eq!(o, Less);
     ///
     /// let (sum, o) = Float::from(PI).add_prec_round_val_ref(&Float::from(E), 20, Ceiling);
-    /// assert_eq!(sum.to_string(), "5.85988");
+    /// assert_eq!(sum.to_string(), "5.8598785");
     /// assert_eq!(o, Greater);
     ///
     /// let (sum, o) = Float::from(PI).add_prec_round_val_ref(&Float::from(E), 20, Nearest);
-    /// assert_eq!(sum.to_string(), "5.85987");
+    /// assert_eq!(sum.to_string(), "5.8598709");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -961,27 +961,27 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (sum, o) = Float::from(PI).add_prec_round_val_ref(&Float::from(E), 5, Floor);
-    /// assert_eq!(sum.to_string(), "5.8");
+    /// assert_eq!(sum.to_string(), "5.75");
     /// assert_eq!(o, Less);
     ///
     /// let (sum, o) = Float::from(PI).add_prec_round_ref_val(Float::from(E), 5, Ceiling);
-    /// assert_eq!(sum.to_string(), "6.0");
+    /// assert_eq!(sum.to_string(), "6.00");
     /// assert_eq!(o, Greater);
     ///
     /// let (sum, o) = Float::from(PI).add_prec_round_ref_val(Float::from(E), 5, Nearest);
-    /// assert_eq!(sum.to_string(), "5.8");
+    /// assert_eq!(sum.to_string(), "5.75");
     /// assert_eq!(o, Less);
     ///
     /// let (sum, o) = Float::from(PI).add_prec_round_ref_val(Float::from(E), 20, Floor);
-    /// assert_eq!(sum.to_string(), "5.85987");
+    /// assert_eq!(sum.to_string(), "5.8598709");
     /// assert_eq!(o, Less);
     ///
     /// let (sum, o) = Float::from(PI).add_prec_round_ref_val(Float::from(E), 20, Ceiling);
-    /// assert_eq!(sum.to_string(), "5.85988");
+    /// assert_eq!(sum.to_string(), "5.8598785");
     /// assert_eq!(o, Greater);
     ///
     /// let (sum, o) = Float::from(PI).add_prec_round_ref_val(Float::from(E), 20, Nearest);
-    /// assert_eq!(sum.to_string(), "5.85987");
+    /// assert_eq!(sum.to_string(), "5.8598709");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -1072,27 +1072,27 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (sum, o) = Float::from(PI).add_prec_round_ref_ref(&Float::from(E), 5, Floor);
-    /// assert_eq!(sum.to_string(), "5.8");
+    /// assert_eq!(sum.to_string(), "5.75");
     /// assert_eq!(o, Less);
     ///
     /// let (sum, o) = Float::from(PI).add_prec_round_ref_ref(&Float::from(E), 5, Ceiling);
-    /// assert_eq!(sum.to_string(), "6.0");
+    /// assert_eq!(sum.to_string(), "6.00");
     /// assert_eq!(o, Greater);
     ///
     /// let (sum, o) = Float::from(PI).add_prec_round_ref_ref(&Float::from(E), 5, Nearest);
-    /// assert_eq!(sum.to_string(), "5.8");
+    /// assert_eq!(sum.to_string(), "5.75");
     /// assert_eq!(o, Less);
     ///
     /// let (sum, o) = Float::from(PI).add_prec_round_ref_ref(&Float::from(E), 20, Floor);
-    /// assert_eq!(sum.to_string(), "5.85987");
+    /// assert_eq!(sum.to_string(), "5.8598709");
     /// assert_eq!(o, Less);
     ///
     /// let (sum, o) = Float::from(PI).add_prec_round_ref_ref(&Float::from(E), 20, Ceiling);
-    /// assert_eq!(sum.to_string(), "5.85988");
+    /// assert_eq!(sum.to_string(), "5.8598785");
     /// assert_eq!(o, Greater);
     ///
     /// let (sum, o) = Float::from(PI).add_prec_round_ref_ref(&Float::from(E), 20, Nearest);
-    /// assert_eq!(sum.to_string(), "5.85987");
+    /// assert_eq!(sum.to_string(), "5.8598709");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -1157,11 +1157,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (sum, o) = Float::from(PI).add_prec(Float::from(E), 5);
-    /// assert_eq!(sum.to_string(), "5.8");
+    /// assert_eq!(sum.to_string(), "5.75");
     /// assert_eq!(o, Less);
     ///
     /// let (sum, o) = Float::from(PI).add_prec(Float::from(E), 20);
-    /// assert_eq!(sum.to_string(), "5.85987");
+    /// assert_eq!(sum.to_string(), "5.8598709");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -1222,11 +1222,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (sum, o) = Float::from(PI).add_prec_val_ref(&Float::from(E), 5);
-    /// assert_eq!(sum.to_string(), "5.8");
+    /// assert_eq!(sum.to_string(), "5.75");
     /// assert_eq!(o, Less);
     ///
     /// let (sum, o) = Float::from(PI).add_prec_val_ref(&Float::from(E), 20);
-    /// assert_eq!(sum.to_string(), "5.85987");
+    /// assert_eq!(sum.to_string(), "5.8598709");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -1287,11 +1287,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (sum, o) = (&Float::from(PI)).add_prec_ref_val(Float::from(E), 5);
-    /// assert_eq!(sum.to_string(), "5.8");
+    /// assert_eq!(sum.to_string(), "5.75");
     /// assert_eq!(o, Less);
     ///
     /// let (sum, o) = (&Float::from(PI)).add_prec_ref_val(Float::from(E), 20);
-    /// assert_eq!(sum.to_string(), "5.85987");
+    /// assert_eq!(sum.to_string(), "5.8598709");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -1352,11 +1352,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (sum, o) = (&Float::from(PI)).add_prec_ref_ref(&Float::from(E), 5);
-    /// assert_eq!(sum.to_string(), "5.8");
+    /// assert_eq!(sum.to_string(), "5.75");
     /// assert_eq!(o, Less);
     ///
     /// let (sum, o) = (&Float::from(PI)).add_prec_ref_ref(&Float::from(E), 20);
-    /// assert_eq!(sum.to_string(), "5.85987");
+    /// assert_eq!(sum.to_string(), "5.8598709");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -1441,15 +1441,15 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (sum, o) = Float::from(PI).add_round(Float::from(E), Floor);
-    /// assert_eq!(sum.to_string(), "5.859874482048838");
+    /// assert_eq!(sum.to_string(), "5.8598744820488378");
     /// assert_eq!(o, Less);
     ///
     /// let (sum, o) = Float::from(PI).add_round(Float::from(E), Ceiling);
-    /// assert_eq!(sum.to_string(), "5.859874482048839");
+    /// assert_eq!(sum.to_string(), "5.8598744820488387");
     /// assert_eq!(o, Greater);
     ///
     /// let (sum, o) = Float::from(PI).add_round(Float::from(E), Nearest);
-    /// assert_eq!(sum.to_string(), "5.859874482048838");
+    /// assert_eq!(sum.to_string(), "5.8598744820488378");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -1536,15 +1536,15 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (sum, o) = Float::from(PI).add_round_val_ref(&Float::from(E), Floor);
-    /// assert_eq!(sum.to_string(), "5.859874482048838");
+    /// assert_eq!(sum.to_string(), "5.8598744820488378");
     /// assert_eq!(o, Less);
     ///
     /// let (sum, o) = Float::from(PI).add_round_val_ref(&Float::from(E), Ceiling);
-    /// assert_eq!(sum.to_string(), "5.859874482048839");
+    /// assert_eq!(sum.to_string(), "5.8598744820488387");
     /// assert_eq!(o, Greater);
     ///
     /// let (sum, o) = Float::from(PI).add_round_val_ref(&Float::from(E), Nearest);
-    /// assert_eq!(sum.to_string(), "5.859874482048838");
+    /// assert_eq!(sum.to_string(), "5.8598744820488378");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -1631,15 +1631,15 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (sum, o) = (&Float::from(PI)).add_round_ref_val(Float::from(E), Floor);
-    /// assert_eq!(sum.to_string(), "5.859874482048838");
+    /// assert_eq!(sum.to_string(), "5.8598744820488378");
     /// assert_eq!(o, Less);
     ///
     /// let (sum, o) = (&Float::from(PI)).add_round_ref_val(Float::from(E), Ceiling);
-    /// assert_eq!(sum.to_string(), "5.859874482048839");
+    /// assert_eq!(sum.to_string(), "5.8598744820488387");
     /// assert_eq!(o, Greater);
     ///
     /// let (sum, o) = (&Float::from(PI)).add_round_ref_val(Float::from(E), Nearest);
-    /// assert_eq!(sum.to_string(), "5.859874482048838");
+    /// assert_eq!(sum.to_string(), "5.8598744820488378");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -1725,15 +1725,15 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (sum, o) = Float::from(PI).add_round_ref_ref(&Float::from(E), Floor);
-    /// assert_eq!(sum.to_string(), "5.859874482048838");
+    /// assert_eq!(sum.to_string(), "5.8598744820488378");
     /// assert_eq!(o, Less);
     ///
     /// let (sum, o) = Float::from(PI).add_round_ref_ref(&Float::from(E), Ceiling);
-    /// assert_eq!(sum.to_string(), "5.859874482048839");
+    /// assert_eq!(sum.to_string(), "5.8598744820488387");
     /// assert_eq!(o, Greater);
     ///
     /// let (sum, o) = Float::from(PI).add_round_ref_ref(&Float::from(E), Nearest);
-    /// assert_eq!(sum.to_string(), "5.859874482048838");
+    /// assert_eq!(sum.to_string(), "5.8598744820488378");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -1788,30 +1788,30 @@ impl Float {
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.add_prec_round_assign(Float::from(E), 5, Floor), Less);
-    /// assert_eq!(x.to_string(), "5.8");
+    /// assert_eq!(x.to_string(), "5.75");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.add_prec_round_assign(Float::from(E), 5, Ceiling), Greater);
-    /// assert_eq!(x.to_string(), "6.0");
+    /// assert_eq!(x.to_string(), "6.00");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.add_prec_round_assign(Float::from(E), 5, Nearest), Less);
-    /// assert_eq!(x.to_string(), "5.8");
+    /// assert_eq!(x.to_string(), "5.75");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.add_prec_round_assign(Float::from(E), 20, Floor), Less);
-    /// assert_eq!(x.to_string(), "5.85987");
+    /// assert_eq!(x.to_string(), "5.8598709");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.add_prec_round_assign(Float::from(E), 20, Ceiling),
     ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "5.85988");
+    /// assert_eq!(x.to_string(), "5.8598785");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.add_prec_round_assign(Float::from(E), 20, Nearest), Less);
-    /// assert_eq!(x.to_string(), "5.85987");
+    /// assert_eq!(x.to_string(), "5.8598709");
     /// ```
     #[inline]
     pub fn add_prec_round_assign(&mut self, other: Self, prec: u64, rm: RoundingMode) -> Ordering {
@@ -1864,42 +1864,42 @@ impl Float {
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.add_prec_round_assign_ref(&Float::from(E), 5, Floor), Less);
-    /// assert_eq!(x.to_string(), "5.8");
+    /// assert_eq!(x.to_string(), "5.75");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.add_prec_round_assign_ref(&Float::from(E), 5, Ceiling),
     ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "6.0");
+    /// assert_eq!(x.to_string(), "6.00");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.add_prec_round_assign_ref(&Float::from(E), 5, Nearest),
     ///     Less
     /// );
-    /// assert_eq!(x.to_string(), "5.8");
+    /// assert_eq!(x.to_string(), "5.75");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.add_prec_round_assign_ref(&Float::from(E), 20, Floor),
     ///     Less
     /// );
-    /// assert_eq!(x.to_string(), "5.85987");
+    /// assert_eq!(x.to_string(), "5.8598709");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.add_prec_round_assign_ref(&Float::from(E), 20, Ceiling),
     ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "5.85988");
+    /// assert_eq!(x.to_string(), "5.8598785");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.add_prec_round_assign_ref(&Float::from(E), 20, Nearest),
     ///     Less
     /// );
-    /// assert_eq!(x.to_string(), "5.85987");
+    /// assert_eq!(x.to_string(), "5.8598709");
     /// ```
     #[inline]
     pub fn add_prec_round_assign_ref(
@@ -1951,11 +1951,11 @@ impl Float {
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.add_prec_assign(Float::from(E), 5), Less);
-    /// assert_eq!(x.to_string(), "5.8");
+    /// assert_eq!(x.to_string(), "5.75");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.add_prec_assign(Float::from(E), 20), Less);
-    /// assert_eq!(x.to_string(), "5.85987");
+    /// assert_eq!(x.to_string(), "5.8598709");
     /// ```
     #[inline]
     pub fn add_prec_assign(&mut self, other: Self, prec: u64) -> Ordering {
@@ -2002,11 +2002,11 @@ impl Float {
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.add_prec_assign_ref(&Float::from(E), 5), Less);
-    /// assert_eq!(x.to_string(), "5.8");
+    /// assert_eq!(x.to_string(), "5.75");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.add_prec_assign_ref(&Float::from(E), 20), Less);
-    /// assert_eq!(x.to_string(), "5.85987");
+    /// assert_eq!(x.to_string(), "5.8598709");
     /// ```
     #[inline]
     pub fn add_prec_assign_ref(&mut self, other: &Self, prec: u64) -> Ordering {
@@ -2061,15 +2061,15 @@ impl Float {
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.add_round_assign(Float::from(E), Floor), Less);
-    /// assert_eq!(x.to_string(), "5.859874482048838");
+    /// assert_eq!(x.to_string(), "5.8598744820488378");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.add_round_assign(Float::from(E), Ceiling), Greater);
-    /// assert_eq!(x.to_string(), "5.859874482048839");
+    /// assert_eq!(x.to_string(), "5.8598744820488387");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.add_round_assign(Float::from(E), Nearest), Less);
-    /// assert_eq!(x.to_string(), "5.859874482048838");
+    /// assert_eq!(x.to_string(), "5.8598744820488378");
     /// ```
     #[inline]
     pub fn add_round_assign(&mut self, other: Self, rm: RoundingMode) -> Ordering {
@@ -2125,15 +2125,15 @@ impl Float {
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.add_round_assign_ref(&Float::from(E), Floor), Less);
-    /// assert_eq!(x.to_string(), "5.859874482048838");
+    /// assert_eq!(x.to_string(), "5.8598744820488378");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.add_round_assign_ref(&Float::from(E), Ceiling), Greater);
-    /// assert_eq!(x.to_string(), "5.859874482048839");
+    /// assert_eq!(x.to_string(), "5.8598744820488387");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.add_round_assign_ref(&Float::from(E), Nearest), Less);
-    /// assert_eq!(x.to_string(), "5.859874482048838");
+    /// assert_eq!(x.to_string(), "5.8598744820488378");
     /// ```
     #[inline]
     pub fn add_round_assign_ref(&mut self, other: &Self, rm: RoundingMode) -> Ordering {
@@ -2218,32 +2218,32 @@ impl Float {
     ///
     /// let (sum, o) =
     ///     Float::from(PI).add_rational_prec_round(Rational::from_unsigneds(1u8, 3), 5, Floor);
-    /// assert_eq!(sum.to_string(), "3.4");
+    /// assert_eq!(sum.to_string(), "3.38");
     /// assert_eq!(o, Less);
     ///
     /// let (sum, o) =
     ///     Float::from(PI).add_rational_prec_round(Rational::from_unsigneds(1u8, 3), 5, Ceiling);
-    /// assert_eq!(sum.to_string(), "3.5");
+    /// assert_eq!(sum.to_string(), "3.50");
     /// assert_eq!(o, Greater);
     ///
     /// let (sum, o) =
     ///     Float::from(PI).add_rational_prec_round(Rational::from_unsigneds(1u8, 3), 5, Nearest);
-    /// assert_eq!(sum.to_string(), "3.5");
+    /// assert_eq!(sum.to_string(), "3.50");
     /// assert_eq!(o, Greater);
     ///
     /// let (sum, o) =
     ///     Float::from(PI).add_rational_prec_round(Rational::from_unsigneds(1u8, 3), 20, Floor);
-    /// assert_eq!(sum.to_string(), "3.474922");
+    /// assert_eq!(sum.to_string(), "3.4749222");
     /// assert_eq!(o, Less);
     ///
     /// let (sum, o) =
     ///     Float::from(PI).add_rational_prec_round(Rational::from_unsigneds(1u8, 3), 20, Ceiling);
-    /// assert_eq!(sum.to_string(), "3.474926");
+    /// assert_eq!(sum.to_string(), "3.4749260");
     /// assert_eq!(o, Greater);
     ///
     /// let (sum, o) =
     ///     Float::from(PI).add_rational_prec_round(Rational::from_unsigneds(1u8, 3), 20, Nearest);
-    /// assert_eq!(sum.to_string(), "3.474926");
+    /// assert_eq!(sum.to_string(), "3.4749260");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -2337,7 +2337,7 @@ impl Float {
     ///     5,
     ///     Floor,
     /// );
-    /// assert_eq!(sum.to_string(), "3.4");
+    /// assert_eq!(sum.to_string(), "3.38");
     /// assert_eq!(o, Less);
     ///
     /// let (sum, o) = Float::from(PI).add_rational_prec_round_val_ref(
@@ -2345,7 +2345,7 @@ impl Float {
     ///     5,
     ///     Ceiling,
     /// );
-    /// assert_eq!(sum.to_string(), "3.5");
+    /// assert_eq!(sum.to_string(), "3.50");
     /// assert_eq!(o, Greater);
     ///
     /// let (sum, o) = Float::from(PI).add_rational_prec_round_val_ref(
@@ -2353,7 +2353,7 @@ impl Float {
     ///     5,
     ///     Nearest,
     /// );
-    /// assert_eq!(sum.to_string(), "3.5");
+    /// assert_eq!(sum.to_string(), "3.50");
     /// assert_eq!(o, Greater);
     ///
     /// let (sum, o) = Float::from(PI).add_rational_prec_round_val_ref(
@@ -2361,7 +2361,7 @@ impl Float {
     ///     20,
     ///     Floor,
     /// );
-    /// assert_eq!(sum.to_string(), "3.474922");
+    /// assert_eq!(sum.to_string(), "3.4749222");
     /// assert_eq!(o, Less);
     ///
     /// let (sum, o) = Float::from(PI).add_rational_prec_round_val_ref(
@@ -2369,7 +2369,7 @@ impl Float {
     ///     20,
     ///     Ceiling,
     /// );
-    /// assert_eq!(sum.to_string(), "3.474926");
+    /// assert_eq!(sum.to_string(), "3.4749260");
     /// assert_eq!(o, Greater);
     ///
     /// let (sum, o) = Float::from(PI).add_rational_prec_round_val_ref(
@@ -2377,7 +2377,7 @@ impl Float {
     ///     20,
     ///     Nearest,
     /// );
-    /// assert_eq!(sum.to_string(), "3.474926");
+    /// assert_eq!(sum.to_string(), "3.4749260");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -2471,7 +2471,7 @@ impl Float {
     ///     5,
     ///     Floor,
     /// );
-    /// assert_eq!(sum.to_string(), "3.4");
+    /// assert_eq!(sum.to_string(), "3.38");
     /// assert_eq!(o, Less);
     ///
     /// let (sum, o) = Float::from(PI).add_rational_prec_round_ref_val(
@@ -2479,7 +2479,7 @@ impl Float {
     ///     5,
     ///     Ceiling,
     /// );
-    /// assert_eq!(sum.to_string(), "3.5");
+    /// assert_eq!(sum.to_string(), "3.50");
     /// assert_eq!(o, Greater);
     ///
     /// let (sum, o) = Float::from(PI).add_rational_prec_round_ref_val(
@@ -2487,7 +2487,7 @@ impl Float {
     ///     5,
     ///     Nearest,
     /// );
-    /// assert_eq!(sum.to_string(), "3.5");
+    /// assert_eq!(sum.to_string(), "3.50");
     /// assert_eq!(o, Greater);
     ///
     /// let (sum, o) = Float::from(PI).add_rational_prec_round_ref_val(
@@ -2495,7 +2495,7 @@ impl Float {
     ///     20,
     ///     Floor,
     /// );
-    /// assert_eq!(sum.to_string(), "3.474922");
+    /// assert_eq!(sum.to_string(), "3.4749222");
     /// assert_eq!(o, Less);
     ///
     /// let (sum, o) = Float::from(PI).add_rational_prec_round_ref_val(
@@ -2503,7 +2503,7 @@ impl Float {
     ///     20,
     ///     Ceiling,
     /// );
-    /// assert_eq!(sum.to_string(), "3.474926");
+    /// assert_eq!(sum.to_string(), "3.4749260");
     /// assert_eq!(o, Greater);
     ///
     /// let (sum, o) = Float::from(PI).add_rational_prec_round_ref_val(
@@ -2511,7 +2511,7 @@ impl Float {
     ///     20,
     ///     Nearest,
     /// );
-    /// assert_eq!(sum.to_string(), "3.474926");
+    /// assert_eq!(sum.to_string(), "3.4749260");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -2686,7 +2686,7 @@ impl Float {
     ///     5,
     ///     Floor,
     /// );
-    /// assert_eq!(sum.to_string(), "3.4");
+    /// assert_eq!(sum.to_string(), "3.38");
     /// assert_eq!(o, Less);
     ///
     /// let (sum, o) = Float::from(PI).add_rational_prec_round_ref_ref(
@@ -2694,7 +2694,7 @@ impl Float {
     ///     5,
     ///     Ceiling,
     /// );
-    /// assert_eq!(sum.to_string(), "3.5");
+    /// assert_eq!(sum.to_string(), "3.50");
     /// assert_eq!(o, Greater);
     ///
     /// let (sum, o) = Float::from(PI).add_rational_prec_round_ref_ref(
@@ -2702,7 +2702,7 @@ impl Float {
     ///     5,
     ///     Nearest,
     /// );
-    /// assert_eq!(sum.to_string(), "3.5");
+    /// assert_eq!(sum.to_string(), "3.50");
     /// assert_eq!(o, Greater);
     ///
     /// let (sum, o) = Float::from(PI).add_rational_prec_round_ref_ref(
@@ -2710,7 +2710,7 @@ impl Float {
     ///     20,
     ///     Floor,
     /// );
-    /// assert_eq!(sum.to_string(), "3.474922");
+    /// assert_eq!(sum.to_string(), "3.4749222");
     /// assert_eq!(o, Less);
     ///
     /// let (sum, o) = Float::from(PI).add_rational_prec_round_ref_ref(
@@ -2718,7 +2718,7 @@ impl Float {
     ///     20,
     ///     Ceiling,
     /// );
-    /// assert_eq!(sum.to_string(), "3.474926");
+    /// assert_eq!(sum.to_string(), "3.4749260");
     /// assert_eq!(o, Greater);
     ///
     /// let (sum, o) = Float::from(PI).add_rational_prec_round_ref_ref(
@@ -2726,7 +2726,7 @@ impl Float {
     ///     20,
     ///     Nearest,
     /// );
-    /// assert_eq!(sum.to_string(), "3.474926");
+    /// assert_eq!(sum.to_string(), "3.4749260");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -2876,11 +2876,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (sum, o) = Float::from(PI).add_rational_prec(Rational::exact_from(1.5), 5);
-    /// assert_eq!(sum.to_string(), "4.8");
+    /// assert_eq!(sum.to_string(), "4.75");
     /// assert_eq!(o, Greater);
     ///
     /// let (sum, o) = Float::from(PI).add_rational_prec(Rational::exact_from(1.5), 20);
-    /// assert_eq!(sum.to_string(), "4.641594");
+    /// assert_eq!(sum.to_string(), "4.6415939");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -2943,11 +2943,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (sum, o) = Float::from(PI).add_rational_prec_val_ref(&Rational::exact_from(1.5), 5);
-    /// assert_eq!(sum.to_string(), "4.8");
+    /// assert_eq!(sum.to_string(), "4.75");
     /// assert_eq!(o, Greater);
     ///
     /// let (sum, o) = Float::from(PI).add_rational_prec_val_ref(&Rational::exact_from(1.5), 20);
-    /// assert_eq!(sum.to_string(), "4.641594");
+    /// assert_eq!(sum.to_string(), "4.6415939");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -3010,11 +3010,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (sum, o) = Float::from(PI).add_rational_prec_ref_val(Rational::exact_from(1.5), 5);
-    /// assert_eq!(sum.to_string(), "4.8");
+    /// assert_eq!(sum.to_string(), "4.75");
     /// assert_eq!(o, Greater);
     ///
     /// let (sum, o) = Float::from(PI).add_rational_prec_ref_val(Rational::exact_from(1.5), 20);
-    /// assert_eq!(sum.to_string(), "4.641594");
+    /// assert_eq!(sum.to_string(), "4.6415939");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -3077,11 +3077,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (sum, o) = Float::from(PI).add_rational_prec_ref_ref(&Rational::exact_from(1.5), 5);
-    /// assert_eq!(sum.to_string(), "4.8");
+    /// assert_eq!(sum.to_string(), "4.75");
     /// assert_eq!(o, Greater);
     ///
     /// let (sum, o) = Float::from(PI).add_rational_prec_ref_ref(&Rational::exact_from(1.5), 20);
-    /// assert_eq!(sum.to_string(), "4.641594");
+    /// assert_eq!(sum.to_string(), "4.6415939");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -3166,17 +3166,17 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (sum, o) = Float::from(PI).add_rational_round(Rational::from_unsigneds(1u8, 3), Floor);
-    /// assert_eq!(sum.to_string(), "3.474925986923125");
+    /// assert_eq!(sum.to_string(), "3.4749259869231253");
     /// assert_eq!(o, Less);
     ///
     /// let (sum, o) =
     ///     Float::from(PI).add_rational_round(Rational::from_unsigneds(1u8, 3), Ceiling);
-    /// assert_eq!(sum.to_string(), "3.474925986923129");
+    /// assert_eq!(sum.to_string(), "3.4749259869231288");
     /// assert_eq!(o, Greater);
     ///
     /// let (sum, o) =
     ///     Float::from(PI).add_rational_round(Rational::from_unsigneds(1u8, 3), Nearest);
-    /// assert_eq!(sum.to_string(), "3.474925986923125");
+    /// assert_eq!(sum.to_string(), "3.4749259869231253");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -3263,17 +3263,17 @@ impl Float {
     ///
     /// let (sum, o) =
     ///     Float::from(PI).add_rational_round_val_ref(&Rational::from_unsigneds(1u8, 3), Floor);
-    /// assert_eq!(sum.to_string(), "3.474925986923125");
+    /// assert_eq!(sum.to_string(), "3.4749259869231253");
     /// assert_eq!(o, Less);
     ///
     /// let (sum, o) =
     ///     Float::from(PI).add_rational_round_val_ref(&Rational::from_unsigneds(1u8, 3), Ceiling);
-    /// assert_eq!(sum.to_string(), "3.474925986923129");
+    /// assert_eq!(sum.to_string(), "3.4749259869231288");
     /// assert_eq!(o, Greater);
     ///
     /// let (sum, o) =
     ///     Float::from(PI).add_rational_round_val_ref(&Rational::from_unsigneds(1u8, 3), Nearest);
-    /// assert_eq!(sum.to_string(), "3.474925986923125");
+    /// assert_eq!(sum.to_string(), "3.4749259869231253");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -3364,17 +3364,17 @@ impl Float {
     ///
     /// let (sum, o) =
     ///     Float::from(PI).add_rational_round_ref_val(Rational::from_unsigneds(1u8, 3), Floor);
-    /// assert_eq!(sum.to_string(), "3.474925986923125");
+    /// assert_eq!(sum.to_string(), "3.4749259869231253");
     /// assert_eq!(o, Less);
     ///
     /// let (sum, o) =
     ///     Float::from(PI).add_rational_round_ref_val(Rational::from_unsigneds(1u8, 3), Ceiling);
-    /// assert_eq!(sum.to_string(), "3.474925986923129");
+    /// assert_eq!(sum.to_string(), "3.4749259869231288");
     /// assert_eq!(o, Greater);
     ///
     /// let (sum, o) =
     ///     Float::from(PI).add_rational_round_ref_val(Rational::from_unsigneds(1u8, 3), Nearest);
-    /// assert_eq!(sum.to_string(), "3.474925986923125");
+    /// assert_eq!(sum.to_string(), "3.4749259869231253");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -3465,17 +3465,17 @@ impl Float {
     ///
     /// let (sum, o) =
     ///     Float::from(PI).add_rational_round_ref_ref(&Rational::from_unsigneds(1u8, 3), Floor);
-    /// assert_eq!(sum.to_string(), "3.474925986923125");
+    /// assert_eq!(sum.to_string(), "3.4749259869231253");
     /// assert_eq!(o, Less);
     ///
     /// let (sum, o) =
     ///     Float::from(PI).add_rational_round_ref_ref(&Rational::from_unsigneds(1u8, 3), Ceiling);
-    /// assert_eq!(sum.to_string(), "3.474925986923129");
+    /// assert_eq!(sum.to_string(), "3.4749259869231288");
     /// assert_eq!(o, Greater);
     ///
     /// let (sum, o) =
     ///     Float::from(PI).add_rational_round_ref_ref(&Rational::from_unsigneds(1u8, 3), Nearest);
-    /// assert_eq!(sum.to_string(), "3.474925986923125");
+    /// assert_eq!(sum.to_string(), "3.4749259869231253");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -3539,42 +3539,42 @@ impl Float {
     ///     x.add_rational_prec_round_assign(Rational::from_unsigneds(1u8, 3), 5, Floor),
     ///     Less
     /// );
-    /// assert_eq!(x.to_string(), "3.4");
+    /// assert_eq!(x.to_string(), "3.38");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.add_rational_prec_round_assign(Rational::from_unsigneds(1u8, 3), 5, Ceiling),
     ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "3.5");
+    /// assert_eq!(x.to_string(), "3.50");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.add_rational_prec_round_assign(Rational::from_unsigneds(1u8, 3), 5, Nearest),
     ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "3.5");
+    /// assert_eq!(x.to_string(), "3.50");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.add_rational_prec_round_assign(Rational::from_unsigneds(1u8, 3), 20, Floor),
     ///     Less
     /// );
-    /// assert_eq!(x.to_string(), "3.474922");
+    /// assert_eq!(x.to_string(), "3.4749222");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.add_rational_prec_round_assign(Rational::from_unsigneds(1u8, 3), 20, Ceiling),
     ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "3.474926");
+    /// assert_eq!(x.to_string(), "3.4749260");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.add_rational_prec_round_assign(Rational::from_unsigneds(1u8, 3), 20, Nearest),
     ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "3.474926");
+    /// assert_eq!(x.to_string(), "3.4749260");
     /// ```
     ///
     /// This is mpfr_add_q from gmp_op.c, MPFR 4.2.0.
@@ -3737,42 +3737,42 @@ impl Float {
     ///     x.add_rational_prec_round_assign_ref(&Rational::from_unsigneds(1u8, 3), 5, Floor),
     ///     Less
     /// );
-    /// assert_eq!(x.to_string(), "3.4");
+    /// assert_eq!(x.to_string(), "3.38");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.add_rational_prec_round_assign_ref(&Rational::from_unsigneds(1u8, 3), 5, Ceiling),
     ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "3.5");
+    /// assert_eq!(x.to_string(), "3.50");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.add_rational_prec_round_assign_ref(&Rational::from_unsigneds(1u8, 3), 5, Nearest),
     ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "3.5");
+    /// assert_eq!(x.to_string(), "3.50");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.add_rational_prec_round_assign_ref(&Rational::from_unsigneds(1u8, 3), 20, Floor),
     ///     Less
     /// );
-    /// assert_eq!(x.to_string(), "3.474922");
+    /// assert_eq!(x.to_string(), "3.4749222");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.add_rational_prec_round_assign_ref(&Rational::from_unsigneds(1u8, 3), 20, Ceiling),
     ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "3.474926");
+    /// assert_eq!(x.to_string(), "3.4749260");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.add_rational_prec_round_assign_ref(&Rational::from_unsigneds(1u8, 3), 20, Nearest),
     ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "3.474926");
+    /// assert_eq!(x.to_string(), "3.4749260");
     /// ```
     #[inline]
     pub fn add_rational_prec_round_assign_ref(
@@ -3928,14 +3928,14 @@ impl Float {
     ///     x.add_rational_prec_assign(Rational::exact_from(1.5), 5),
     ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "4.8");
+    /// assert_eq!(x.to_string(), "4.75");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.add_rational_prec_assign(Rational::exact_from(1.5), 20),
     ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "4.641594");
+    /// assert_eq!(x.to_string(), "4.6415939");
     /// ```
     #[inline]
     pub fn add_rational_prec_assign(&mut self, other: Rational, prec: u64) -> Ordering {
@@ -3988,14 +3988,14 @@ impl Float {
     ///     x.add_rational_prec_assign_ref(&Rational::exact_from(1.5), 5),
     ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "4.8");
+    /// assert_eq!(x.to_string(), "4.75");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.add_rational_prec_assign_ref(&Rational::exact_from(1.5), 20),
     ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "4.641594");
+    /// assert_eq!(x.to_string(), "4.6415939");
     /// ```
     #[inline]
     pub fn add_rational_prec_assign_ref(&mut self, other: &Rational, prec: u64) -> Ordering {
@@ -4054,21 +4054,21 @@ impl Float {
     ///     x.add_rational_round_assign(Rational::from_unsigneds(1u8, 3), Floor),
     ///     Less
     /// );
-    /// assert_eq!(x.to_string(), "3.474925986923125");
+    /// assert_eq!(x.to_string(), "3.4749259869231253");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.add_rational_round_assign(Rational::from_unsigneds(1u8, 3), Ceiling),
     ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "3.474925986923129");
+    /// assert_eq!(x.to_string(), "3.4749259869231288");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.add_rational_round_assign(Rational::from_unsigneds(1u8, 3), Nearest),
     ///     Less
     /// );
-    /// assert_eq!(x.to_string(), "3.474925986923125");
+    /// assert_eq!(x.to_string(), "3.4749259869231253");
     /// ```
     #[inline]
     pub fn add_rational_round_assign(&mut self, other: Rational, rm: RoundingMode) -> Ordering {
@@ -4128,21 +4128,21 @@ impl Float {
     ///     x.add_rational_round_assign_ref(&Rational::from_unsigneds(1u8, 3), Floor),
     ///     Less
     /// );
-    /// assert_eq!(x.to_string(), "3.474925986923125");
+    /// assert_eq!(x.to_string(), "3.4749259869231253");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.add_rational_round_assign_ref(&Rational::from_unsigneds(1u8, 3), Ceiling),
     ///     Greater
     /// );
-    /// assert_eq!(x.to_string(), "3.474925986923129");
+    /// assert_eq!(x.to_string(), "3.4749259869231288");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(
     ///     x.add_rational_round_assign_ref(&Rational::from_unsigneds(1u8, 3), Nearest),
     ///     Less
     /// );
-    /// assert_eq!(x.to_string(), "3.474925986923125");
+    /// assert_eq!(x.to_string(), "3.4749259869231253");
     /// ```
     #[inline]
     pub fn add_rational_round_assign_ref(

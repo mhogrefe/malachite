@@ -53,11 +53,17 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (one_over_pi, o) = Float::one_over_pi_prec_round(100, Floor);
-    /// assert_eq!(one_over_pi.to_string(), "0.31830988618379067153776752674490");
+    /// assert_eq!(
+    ///     one_over_pi.to_string(),
+    ///     "0.31830988618379067153776752674490"
+    /// );
     /// assert_eq!(o, Less);
     ///
     /// let (one_over_pi, o) = Float::one_over_pi_prec_round(100, Ceiling);
-    /// assert_eq!(one_over_pi.to_string(), "0.31830988618379067153776752674529");
+    /// assert_eq!(
+    ///     one_over_pi.to_string(),
+    ///     "0.31830988618379067153776752674529"
+    /// );
     /// assert_eq!(o, Greater);
     /// ```
     pub fn one_over_pi_prec_round(prec: u64, rm: RoundingMode) -> (Self, Ordering) {
@@ -118,7 +124,10 @@ impl Float {
     /// assert_eq!(o, Greater);
     ///
     /// let (one_over_pi, o) = Float::one_over_pi_prec(100);
-    /// assert_eq!(one_over_pi.to_string(), "0.31830988618379067153776752674490");
+    /// assert_eq!(
+    ///     one_over_pi.to_string(),
+    ///     "0.31830988618379067153776752674490"
+    /// );
     /// assert_eq!(o, Less);
     /// ```
     #[inline]

@@ -316,27 +316,27 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (reciprocal_sqrt, o) = Float::from(PI).reciprocal_sqrt_prec_round(5, Floor);
-    /// assert_eq!(reciprocal_sqrt.to_string(), "0.56");
+    /// assert_eq!(reciprocal_sqrt.to_string(), "0.562");
     /// assert_eq!(o, Less);
     ///
     /// let (reciprocal_sqrt, o) = Float::from(PI).reciprocal_sqrt_prec_round(5, Ceiling);
-    /// assert_eq!(reciprocal_sqrt.to_string(), "0.59");
+    /// assert_eq!(reciprocal_sqrt.to_string(), "0.594");
     /// assert_eq!(o, Greater);
     ///
     /// let (reciprocal_sqrt, o) = Float::from(PI).reciprocal_sqrt_prec_round(5, Nearest);
-    /// assert_eq!(reciprocal_sqrt.to_string(), "0.56");
+    /// assert_eq!(reciprocal_sqrt.to_string(), "0.562");
     /// assert_eq!(o, Less);
     ///
     /// let (reciprocal_sqrt, o) = Float::from(PI).reciprocal_sqrt_prec_round(20, Floor);
-    /// assert_eq!(reciprocal_sqrt.to_string(), "0.564189");
+    /// assert_eq!(reciprocal_sqrt.to_string(), "0.56418896");
     /// assert_eq!(o, Less);
     ///
     /// let (reciprocal_sqrt, o) = Float::from(PI).reciprocal_sqrt_prec_round(20, Ceiling);
-    /// assert_eq!(reciprocal_sqrt.to_string(), "0.56419");
+    /// assert_eq!(reciprocal_sqrt.to_string(), "0.56418991");
     /// assert_eq!(o, Greater);
     ///
     /// let (reciprocal_sqrt, o) = Float::from(PI).reciprocal_sqrt_prec_round(20, Nearest);
-    /// assert_eq!(reciprocal_sqrt.to_string(), "0.56419");
+    /// assert_eq!(reciprocal_sqrt.to_string(), "0.56418991");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -403,27 +403,27 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (reciprocal_sqrt, o) = Float::from(PI).reciprocal_sqrt_prec_round_ref(5, Floor);
-    /// assert_eq!(reciprocal_sqrt.to_string(), "0.56");
+    /// assert_eq!(reciprocal_sqrt.to_string(), "0.562");
     /// assert_eq!(o, Less);
     ///
     /// let (reciprocal_sqrt, o) = Float::from(PI).reciprocal_sqrt_prec_round_ref(5, Ceiling);
-    /// assert_eq!(reciprocal_sqrt.to_string(), "0.59");
+    /// assert_eq!(reciprocal_sqrt.to_string(), "0.594");
     /// assert_eq!(o, Greater);
     ///
     /// let (reciprocal_sqrt, o) = Float::from(PI).reciprocal_sqrt_prec_round_ref(5, Nearest);
-    /// assert_eq!(reciprocal_sqrt.to_string(), "0.56");
+    /// assert_eq!(reciprocal_sqrt.to_string(), "0.562");
     /// assert_eq!(o, Less);
     ///
     /// let (reciprocal_sqrt, o) = Float::from(PI).reciprocal_sqrt_prec_round_ref(20, Floor);
-    /// assert_eq!(reciprocal_sqrt.to_string(), "0.564189");
+    /// assert_eq!(reciprocal_sqrt.to_string(), "0.56418896");
     /// assert_eq!(o, Less);
     ///
     /// let (reciprocal_sqrt, o) = Float::from(PI).reciprocal_sqrt_prec_round_ref(20, Ceiling);
-    /// assert_eq!(reciprocal_sqrt.to_string(), "0.56419");
+    /// assert_eq!(reciprocal_sqrt.to_string(), "0.56418991");
     /// assert_eq!(o, Greater);
     ///
     /// let (reciprocal_sqrt, o) = Float::from(PI).reciprocal_sqrt_prec_round_ref(20, Nearest);
-    /// assert_eq!(reciprocal_sqrt.to_string(), "0.56419");
+    /// assert_eq!(reciprocal_sqrt.to_string(), "0.56418991");
     /// assert_eq!(o, Greater);
     /// ```
     ///
@@ -556,11 +556,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (reciprocal_sqrt, o) = Float::from(PI).reciprocal_sqrt_prec(5);
-    /// assert_eq!(reciprocal_sqrt.to_string(), "0.56");
+    /// assert_eq!(reciprocal_sqrt.to_string(), "0.562");
     /// assert_eq!(o, Less);
     ///
     /// let (reciprocal_sqrt, o) = Float::from(PI).reciprocal_sqrt_prec(20);
-    /// assert_eq!(reciprocal_sqrt.to_string(), "0.56419");
+    /// assert_eq!(reciprocal_sqrt.to_string(), "0.56418991");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -620,11 +620,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (reciprocal_sqrt, o) = Float::from(PI).reciprocal_sqrt_prec_ref(5);
-    /// assert_eq!(reciprocal_sqrt.to_string(), "0.56");
+    /// assert_eq!(reciprocal_sqrt.to_string(), "0.562");
     /// assert_eq!(o, Less);
     ///
     /// let (reciprocal_sqrt, o) = Float::from(PI).reciprocal_sqrt_prec_ref(20);
-    /// assert_eq!(reciprocal_sqrt.to_string(), "0.56419");
+    /// assert_eq!(reciprocal_sqrt.to_string(), "0.56418991");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -690,15 +690,15 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (reciprocal_sqrt, o) = Float::from(PI).reciprocal_sqrt_round(Floor);
-    /// assert_eq!(reciprocal_sqrt.to_string(), "0.564189583547756");
+    /// assert_eq!(reciprocal_sqrt.to_string(), "0.56418958354775572");
     /// assert_eq!(o, Less);
     ///
     /// let (reciprocal_sqrt, o) = Float::from(PI).reciprocal_sqrt_round(Ceiling);
-    /// assert_eq!(reciprocal_sqrt.to_string(), "0.564189583547757");
+    /// assert_eq!(reciprocal_sqrt.to_string(), "0.56418958354775661");
     /// assert_eq!(o, Greater);
     ///
     /// let (reciprocal_sqrt, o) = Float::from(PI).reciprocal_sqrt_round(Nearest);
-    /// assert_eq!(reciprocal_sqrt.to_string(), "0.564189583547757");
+    /// assert_eq!(reciprocal_sqrt.to_string(), "0.56418958354775661");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -765,15 +765,15 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (reciprocal_sqrt, o) = Float::from(PI).reciprocal_sqrt_round_ref(Floor);
-    /// assert_eq!(reciprocal_sqrt.to_string(), "0.564189583547756");
+    /// assert_eq!(reciprocal_sqrt.to_string(), "0.56418958354775572");
     /// assert_eq!(o, Less);
     ///
     /// let (reciprocal_sqrt, o) = Float::from(PI).reciprocal_sqrt_round_ref(Ceiling);
-    /// assert_eq!(reciprocal_sqrt.to_string(), "0.564189583547757");
+    /// assert_eq!(reciprocal_sqrt.to_string(), "0.56418958354775661");
     /// assert_eq!(o, Greater);
     ///
     /// let (reciprocal_sqrt, o) = Float::from(PI).reciprocal_sqrt_round_ref(Nearest);
-    /// assert_eq!(reciprocal_sqrt.to_string(), "0.564189583547757");
+    /// assert_eq!(reciprocal_sqrt.to_string(), "0.56418958354775661");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -835,27 +835,27 @@ impl Float {
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.reciprocal_sqrt_prec_round_assign(5, Floor), Less);
-    /// assert_eq!(x.to_string(), "0.56");
+    /// assert_eq!(x.to_string(), "0.562");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.reciprocal_sqrt_prec_round_assign(5, Ceiling), Greater);
-    /// assert_eq!(x.to_string(), "0.59");
+    /// assert_eq!(x.to_string(), "0.594");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.reciprocal_sqrt_prec_round_assign(5, Nearest), Less);
-    /// assert_eq!(x.to_string(), "0.56");
+    /// assert_eq!(x.to_string(), "0.562");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.reciprocal_sqrt_prec_round_assign(20, Floor), Less);
-    /// assert_eq!(x.to_string(), "0.564189");
+    /// assert_eq!(x.to_string(), "0.56418896");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.reciprocal_sqrt_prec_round_assign(20, Ceiling), Greater);
-    /// assert_eq!(x.to_string(), "0.56419");
+    /// assert_eq!(x.to_string(), "0.56418991");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.reciprocal_sqrt_prec_round_assign(20, Nearest), Greater);
-    /// assert_eq!(x.to_string(), "0.56419");
+    /// assert_eq!(x.to_string(), "0.56418991");
     /// ```
     #[inline]
     pub fn reciprocal_sqrt_prec_round_assign(&mut self, prec: u64, rm: RoundingMode) -> Ordering {
@@ -911,11 +911,11 @@ impl Float {
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.reciprocal_sqrt_prec_assign(5), Less);
-    /// assert_eq!(x.to_string(), "0.56");
+    /// assert_eq!(x.to_string(), "0.562");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.reciprocal_sqrt_prec_assign(20), Greater);
-    /// assert_eq!(x.to_string(), "0.56419");
+    /// assert_eq!(x.to_string(), "0.56418991");
     /// ```
     #[inline]
     pub fn reciprocal_sqrt_prec_assign(&mut self, prec: u64) -> Ordering {
@@ -976,15 +976,15 @@ impl Float {
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.reciprocal_sqrt_round_assign(Floor), Less);
-    /// assert_eq!(x.to_string(), "0.564189583547756");
+    /// assert_eq!(x.to_string(), "0.56418958354775572");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.reciprocal_sqrt_round_assign(Ceiling), Greater);
-    /// assert_eq!(x.to_string(), "0.564189583547757");
+    /// assert_eq!(x.to_string(), "0.56418958354775661");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.reciprocal_sqrt_round_assign(Nearest), Greater);
-    /// assert_eq!(x.to_string(), "0.564189583547757");
+    /// assert_eq!(x.to_string(), "0.56418958354775661");
     /// ```
     #[inline]
     pub fn reciprocal_sqrt_round_assign(&mut self, rm: RoundingMode) -> Ordering {
@@ -1071,7 +1071,7 @@ impl Float {
     ///     5,
     ///     Ceiling,
     /// );
-    /// assert_eq!(sqrt.to_string(), "1.3");
+    /// assert_eq!(sqrt.to_string(), "1.31");
     /// assert_eq!(o, Greater);
     ///
     /// let (sqrt, o) = Float::reciprocal_sqrt_rational_prec_round(
@@ -1079,12 +1079,12 @@ impl Float {
     ///     5,
     ///     Nearest,
     /// );
-    /// assert_eq!(sqrt.to_string(), "1.3");
+    /// assert_eq!(sqrt.to_string(), "1.31");
     /// assert_eq!(o, Greater);
     ///
     /// let (sqrt, o) =
     ///     Float::reciprocal_sqrt_rational_prec_round(Rational::from_unsigneds(3u8, 5), 20, Floor);
-    /// assert_eq!(sqrt.to_string(), "1.290993");
+    /// assert_eq!(sqrt.to_string(), "1.2909927");
     /// assert_eq!(o, Less);
     ///
     /// let (sqrt, o) = Float::reciprocal_sqrt_rational_prec_round(
@@ -1092,7 +1092,7 @@ impl Float {
     ///     20,
     ///     Ceiling,
     /// );
-    /// assert_eq!(sqrt.to_string(), "1.290995");
+    /// assert_eq!(sqrt.to_string(), "1.2909946");
     /// assert_eq!(o, Greater);
     ///
     /// let (sqrt, o) = Float::reciprocal_sqrt_rational_prec_round(
@@ -1100,7 +1100,7 @@ impl Float {
     ///     20,
     ///     Nearest,
     /// );
-    /// assert_eq!(sqrt.to_string(), "1.290995");
+    /// assert_eq!(sqrt.to_string(), "1.2909946");
     /// assert_eq!(o, Greater);
     /// ```
     pub fn reciprocal_sqrt_rational_prec_round(
@@ -1239,7 +1239,7 @@ impl Float {
     ///     5,
     ///     Ceiling,
     /// );
-    /// assert_eq!(sqrt.to_string(), "1.3");
+    /// assert_eq!(sqrt.to_string(), "1.31");
     /// assert_eq!(o, Greater);
     ///
     /// let (sqrt, o) = Float::reciprocal_sqrt_rational_prec_round_ref(
@@ -1247,7 +1247,7 @@ impl Float {
     ///     5,
     ///     Nearest,
     /// );
-    /// assert_eq!(sqrt.to_string(), "1.3");
+    /// assert_eq!(sqrt.to_string(), "1.31");
     /// assert_eq!(o, Greater);
     ///
     /// let (sqrt, o) = Float::reciprocal_sqrt_rational_prec_round_ref(
@@ -1255,7 +1255,7 @@ impl Float {
     ///     20,
     ///     Floor,
     /// );
-    /// assert_eq!(sqrt.to_string(), "1.290993");
+    /// assert_eq!(sqrt.to_string(), "1.2909927");
     /// assert_eq!(o, Less);
     ///
     /// let (sqrt, o) = Float::reciprocal_sqrt_rational_prec_round_ref(
@@ -1263,7 +1263,7 @@ impl Float {
     ///     20,
     ///     Ceiling,
     /// );
-    /// assert_eq!(sqrt.to_string(), "1.290995");
+    /// assert_eq!(sqrt.to_string(), "1.2909946");
     /// assert_eq!(o, Greater);
     ///
     /// let (sqrt, o) = Float::reciprocal_sqrt_rational_prec_round_ref(
@@ -1271,7 +1271,7 @@ impl Float {
     ///     20,
     ///     Nearest,
     /// );
-    /// assert_eq!(sqrt.to_string(), "1.290995");
+    /// assert_eq!(sqrt.to_string(), "1.2909946");
     /// assert_eq!(o, Greater);
     /// ```
     pub fn reciprocal_sqrt_rational_prec_round_ref(
@@ -1390,11 +1390,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (sqrt, o) = Float::reciprocal_sqrt_rational_prec(Rational::from_unsigneds(3u8, 5), 5);
-    /// assert_eq!(sqrt.to_string(), "1.3");
+    /// assert_eq!(sqrt.to_string(), "1.31");
     /// assert_eq!(o, Greater);
     ///
     /// let (sqrt, o) = Float::reciprocal_sqrt_rational_prec(Rational::from_unsigneds(3u8, 5), 20);
-    /// assert_eq!(sqrt.to_string(), "1.290995");
+    /// assert_eq!(sqrt.to_string(), "1.2909946");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -1468,12 +1468,12 @@ impl Float {
     ///
     /// let (sqrt, o) =
     ///     Float::reciprocal_sqrt_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 5);
-    /// assert_eq!(sqrt.to_string(), "1.3");
+    /// assert_eq!(sqrt.to_string(), "1.31");
     /// assert_eq!(o, Greater);
     ///
     /// let (sqrt, o) =
     ///     Float::reciprocal_sqrt_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 20);
-    /// assert_eq!(sqrt.to_string(), "1.290995");
+    /// assert_eq!(sqrt.to_string(), "1.2909946");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -1535,7 +1535,7 @@ impl ReciprocalSqrt for Float {
     /// assert!(Float::NAN.reciprocal_sqrt().is_nan());
     /// assert_eq!(Float::INFINITY.reciprocal_sqrt(), Float::ZERO);
     /// assert!(Float::NEGATIVE_INFINITY.reciprocal_sqrt().is_nan());
-    /// assert_eq!(Float::from(1.5).reciprocal_sqrt().to_string(), "0.8");
+    /// assert_eq!(Float::from(1.5).reciprocal_sqrt().to_string(), "0.75");
     /// assert!(Float::from(-1.5).reciprocal_sqrt().is_nan());
     /// ```
     #[inline]
@@ -1598,7 +1598,7 @@ impl ReciprocalSqrt for &Float {
     /// assert!((&Float::NAN).reciprocal_sqrt().is_nan());
     /// assert_eq!((&Float::INFINITY).reciprocal_sqrt(), Float::ZERO);
     /// assert!((&Float::NEGATIVE_INFINITY).reciprocal_sqrt().is_nan());
-    /// assert_eq!((&Float::from(1.5)).reciprocal_sqrt().to_string(), "0.8");
+    /// assert_eq!((&Float::from(1.5)).reciprocal_sqrt().to_string(), "0.75");
     /// assert!((&Float::from(-1.5)).reciprocal_sqrt().is_nan());
     /// ```
     #[inline]
@@ -1664,7 +1664,7 @@ impl ReciprocalSqrtAssign for Float {
     ///
     /// let mut x = Float::from(1.5);
     /// x.reciprocal_sqrt_assign();
-    /// assert_eq!(x.to_string(), "0.8");
+    /// assert_eq!(x.to_string(), "0.75");
     ///
     /// let mut x = Float::from(-1.5);
     /// x.reciprocal_sqrt_assign();

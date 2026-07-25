@@ -171,7 +171,7 @@ fn test_pow() {
     test(
         "2.0",
         "0x2.0#1",
-        "0.5",
+        "0.50",
         "0x0.8#1",
         53,
         Nearest,
@@ -186,7 +186,7 @@ fn test_pow() {
         "0x64.0#5",
         53,
         Nearest,
-        "5.153775207320113e47",
+        "5.1537752073201132e47",
         "0x5.a4653ca673768E+39#53",
         Less,
     );
@@ -197,18 +197,18 @@ fn test_pow() {
         "0xa.0#3",
         53,
         Nearest,
-        "1024.0",
+        "1024.0000000000000",
         "0x400.00000000000#53",
         Equal,
     );
     test(
-        "0.5",
+        "0.50",
         "0x0.8#1",
         "2.0",
         "0x2.0#1",
         53,
         Nearest,
-        "0.25",
+        "0.25000000000000000",
         "0x0.40000000000000#53",
         Equal,
     );
@@ -226,7 +226,7 @@ fn test_pow() {
     test(
         "2.0",
         "0x2.0#1",
-        "0.5",
+        "0.50",
         "0x0.8#1",
         53,
         Floor,
@@ -252,7 +252,7 @@ fn test_pow() {
         "0x3.0#2",
         53,
         Nearest,
-        "-8.0",
+        "-8.0000000000000000",
         "-0x8.0000000000000#53",
         Equal,
     );
@@ -263,7 +263,7 @@ fn test_pow() {
         "-0x3.0#2",
         53,
         Nearest,
-        "-0.125",
+        "-0.12500000000000000",
         "-0x0.20000000000000#53",
         Equal,
     );
@@ -381,11 +381,11 @@ fn test_pow_coverage() {
     test(
         "1.5",
         "0x1.8#2",
-        "6.0e-61",
+        "6.2e-61",
         "0x1.0E-50#1",
         10,
         Nearest,
-        "1.0",
+        "1.0000",
         "0x1.000#10",
         Less,
     );
@@ -393,11 +393,11 @@ fn test_pow_coverage() {
     test(
         "1.5",
         "0x1.8#2",
-        "6.0e-61",
+        "6.2e-61",
         "0x1.0E-50#1",
         10,
         Up,
-        "1.002",
+        "1.0020",
         "0x1.008#10",
         Greater,
     );
@@ -405,11 +405,11 @@ fn test_pow_coverage() {
     test(
         "1.5",
         "0x1.8#2",
-        "-6.0e-61",
+        "-6.2e-61",
         "-0x1.0E-50#1",
         10,
         Floor,
-        "0.999",
+        "0.99902",
         "0x0.ffc#10",
         Less,
     );
@@ -417,11 +417,11 @@ fn test_pow_coverage() {
     test(
         "1.5",
         "0x1.8#2",
-        "-6.0e-61",
+        "-6.2e-61",
         "-0x1.0E-50#1",
         10,
         Nearest,
-        "1.0",
+        "1.0000",
         "0x1.000#10",
         Greater,
     );
@@ -429,12 +429,12 @@ fn test_pow_coverage() {
     test(
         "-1.0000000000000000000000000000000000000000000000000000000000000000000000000000000000005",
         "-0x1.0000000000000000000000000000000000000000000000000000000000000000000001#281",
-        "2037035976334486086268445688409378161051468393665936250636140449354381299763336706183397\
-         377.0",
+        "20370359763344860862684456884093781610514683936659362506361404493543812997633367061833973\
+        77.0",
         "0x1000000000000000000000000000000000000000000000000000000000000000000000000001.0#301",
         10,
         Nearest,
-        "-too_big",
+        "-5.8943e455390",
         "-0xa.84E+378193#10",
         Greater,
     );
@@ -454,11 +454,11 @@ fn test_pow_coverage() {
     test(
         "3.0",
         "0x3.0#2",
-        "677453079.5",
+        "677453079.50",
         "0x28611d17.8#32",
         2,
         Nearest,
-        "too_big",
+        "2.0e323227263",
         "0x8.0E+268434431#2",
         Less,
     );
@@ -470,7 +470,7 @@ fn test_pow_coverage() {
         "-0x100000.8#22",
         10,
         Nearest,
-        "too_small",
+        "7.3203e-500299",
         "0x2.f7E-415489#10",
         Less,
     );
@@ -482,13 +482,13 @@ fn test_pow_coverage() {
         "0x100000.8#22",
         10,
         Nearest,
-        "too_big",
+        "1.4331e184645",
         "0x3.d1E+153344#10",
         Greater,
     );
     // - pi_pos_zero_directed: deep positive-exponent underflow, Floor gives 0
     test(
-        "0.8",
+        "0.75",
         "0x0.c#2",
         "2587095930.0",
         "0x9a33f37a.0#31",
@@ -500,13 +500,13 @@ fn test_pow_coverage() {
     );
     // - pi_pos_zero_directed: deep positive-exponent underflow, Up gives min positive
     test(
-        "0.8",
+        "0.75",
         "0x0.c#2",
         "2587095930.0",
         "0x9a33f37a.0#31",
         10,
         Up,
-        "too_small",
+        "2.3826e-323228497",
         "0x1.000E-268435456#10",
         Greater,
     );
@@ -536,9 +536,9 @@ fn test_pow_coverage() {
     );
     // - pi_prebound_underflow: estimate far below the exponent range
     test(
-        "0.8",
+        "0.75",
         "0x0.c#2",
-        "9.0e9",
+        "8.6e9",
         "0x2.0E+8#1",
         10,
         Nearest,
@@ -813,7 +813,7 @@ fn test_powr() {
     test(
         "2.0",
         "0x2.0#1",
-        "0.5",
+        "0.50",
         "0x0.8#1",
         53,
         Nearest,
@@ -828,7 +828,7 @@ fn test_powr() {
         "0x64.0#5",
         53,
         Nearest,
-        "5.153775207320113e47",
+        "5.1537752073201132e47",
         "0x5.a4653ca673768E+39#53",
         Less,
     );
@@ -839,18 +839,18 @@ fn test_powr() {
         "0xa.0#3",
         53,
         Nearest,
-        "1024.0",
+        "1024.0000000000000",
         "0x400.00000000000#53",
         Equal,
     );
     test(
-        "0.5",
+        "0.50",
         "0x0.8#1",
         "2.0",
         "0x2.0#1",
         53,
         Nearest,
-        "0.25",
+        "0.25000000000000000",
         "0x0.40000000000000#53",
         Equal,
     );
@@ -1176,7 +1176,7 @@ fn test_pow_sliver_of_one() {
     test(
         sliver(Rational::ONE + &eps),
         y.clone(),
-        "1.0",
+        "1.00000000000000000000",
         "0x1.0000000000000000#64",
         Less,
     );
@@ -1184,7 +1184,7 @@ fn test_pow_sliver_of_one() {
     test(
         sliver(Rational::ONE - &eps),
         y.clone(),
-        "1.0",
+        "1.00000000000000000000",
         "0x1.0000000000000000#64",
         Greater,
     );
@@ -1192,7 +1192,7 @@ fn test_pow_sliver_of_one() {
     test(
         sliver(-(Rational::ONE + &eps)),
         y,
-        "1.0",
+        "1.00000000000000000000",
         "0x1.0000000000000000#64",
         Less,
     );
@@ -1202,7 +1202,7 @@ fn test_pow_sliver_of_one() {
     test(
         sliver(-(Rational::ONE + &eps)),
         y_odd,
-        "-1.0",
+        "-1.00000000000000000000",
         "-0x1.0000000000000000#64",
         Greater,
     );
@@ -1230,11 +1230,11 @@ fn test_rational_pow() {
     // - ordinary squeeze: non-dyadic base
     test(
         "3/2",
-        "0.5",
+        "0.50",
         "0x0.8#1",
         20,
         Nearest,
-        "1.224745",
+        "1.2247448",
         "0x1.3988e#20",
         Less,
     );
@@ -1245,7 +1245,7 @@ fn test_rational_pow() {
         "0x2.8#3",
         20,
         Floor,
-        "0.3628869",
+        "0.36288691",
         "0x0.5ce628#20",
         Less,
     );
@@ -1256,60 +1256,60 @@ fn test_rational_pow() {
         "0x3.0#2",
         20,
         Nearest,
-        "-3.375",
+        "-3.3750000",
         "-0x3.60000#20",
         Equal,
     );
     // - negative base, non-integer y is NaN
-    test("-3/2", "0.5", "0x0.8#1", 20, Nearest, "NaN", "NaN", Equal);
+    test("-3/2", "0.50", "0x0.8#1", 20, Nearest, "NaN", "NaN", Equal);
     // - exact dyadic result via descent: (9/4)^(1/2) = 3/2
     test(
         "9/4",
-        "0.5",
+        "0.50",
         "0x0.8#1",
         20,
         Nearest,
-        "1.5",
+        "1.5000000",
         "0x1.80000#20",
         Equal,
     );
     // - power-of-2 base delegates to power_of_2_rational
     test(
         "1/4",
-        "0.8",
+        "0.75",
         "0x0.c#2",
         20,
         Nearest,
-        "0.3535533",
+        "0.35355330",
         "0x0.5a8278#20",
         Less,
     );
     // - small integer y materializes exactly
     test(
         "3/7",
-        "4.0e1",
+        "40.0",
         "0x28.0#3",
         30,
         Nearest,
-        "1.909539244e-15",
+        "1.9095392443e-15",
         "0x8.998c820E-13#30",
         Greater,
     );
     // - dyadic in-range base delegates to Float::pow
     test(
         "5/4",
-        "0.5",
+        "0.50",
         "0x0.8#1",
         20,
         Nearest,
-        "1.118034",
+        "1.1180344",
         "0x1.1e378#20",
         Greater,
     );
     // - deep underflow, Nearest
     test(
         "2/3",
-        "1.0e12",
+        "1.1e12",
         "0x1.0E+10#1",
         32,
         Nearest,
@@ -1320,11 +1320,11 @@ fn test_rational_pow() {
     // - deep underflow, Up gives the minimum positive value
     test(
         "2/3",
-        "1.0e12",
+        "1.1e12",
         "0x1.0E+10#1",
         32,
         Up,
-        "too_small",
+        "2.3825649049e-323228497",
         "0x1.00000000E-268435456#32",
         Greater,
     );
@@ -1382,11 +1382,11 @@ fn test_rational_pow_extreme() {
     //   inexact result via the directed-log t-squeeze
     test(
         &(Rational::from(3u32) * Rational::power_of_2(e)),
-        "0.2",
+        "0.25",
         "0x0.4#1",
         20,
         Nearest,
-        "too_big",
+        "1.8837326e80807124",
         "0x1.50ea4E+67108864#20",
         Greater,
     );
@@ -1394,11 +1394,11 @@ fn test_rational_pow_extreme() {
     //   square-root descent
     test(
         &(Rational::from(81u32) * Rational::power_of_2(e)),
-        "0.2",
+        "0.25",
         "0x0.4#1",
         20,
         Nearest,
-        "too_big",
+        "4.2939805e80807124",
         "0x3.00000E+67108864#20",
         Equal,
     );
@@ -1406,11 +1406,11 @@ fn test_rational_pow_extreme() {
     //   in-range result
     test(
         &(Rational::from(5u32) * Rational::power_of_2(-e)),
-        "-0.5",
+        "-0.50",
         "-0x0.8#1",
         20,
         Nearest,
-        "too_big",
+        "9.1620505e161614247",
         "0x7.27c98E+134217727#20",
         Greater,
     );
@@ -1418,11 +1418,11 @@ fn test_rational_pow_extreme() {
     //   underflow; the sliver reroute sends it to the t-squeeze (via the directed branch on 2x)
     test(
         &(Rational::ONE - Rational::power_of_2(mi - 2)),
-        "1.0e18",
+        "1.2e18",
         "0x1.0E+15#1",
         64,
         Nearest,
-        "1.0",
+        "1.00000000000000000000",
         "0x1.0000000000000000#64",
         Greater,
     );
@@ -1431,11 +1431,11 @@ fn test_rational_pow_extreme() {
     test(
         &((Rational::ONE + Rational::from_unsigneds(1u32, 3u32).pow(500i64))
             * Rational::power_of_2(e)),
-        "0.2",
+        "0.25",
         "0x0.4#1",
         20,
         Nearest,
-        "too_big",
+        "1.4313268e80807124",
         "0x1.00000E+67108864#20",
         Less,
     );
@@ -1443,22 +1443,22 @@ fn test_rational_pow_extreme() {
     //   logarithm is well within range)
     test(
         &(Rational::ONE + Rational::power_of_2(-70000i64)),
-        "1.0e18",
+        "1.2e18",
         "0x1.0E+15#1",
         64,
         Nearest,
-        "1.0",
+        "1.00000000000000000000",
         "0x1.0000000000000000#64",
         Less,
     );
     // - (1 + 3^-500)^(2^700): a moderate non-dyadic sliver, in-range x-space squeeze
     test(
         &(Rational::ONE + Rational::from_unsigneds(1u32, 3u32).pow(500i64)),
-        "5.0e210",
+        "5.3e210",
         "0x1.0E+175#1",
         64,
         Nearest,
-        "1.0",
+        "1.00000000000000000000",
         "0x1.0000000000000000#64",
         Less,
     );
@@ -1467,11 +1467,11 @@ fn test_rational_pow_extreme() {
     test(
         &((Rational::ONE - Rational::from_unsigneds(1u32, 3u32).pow(500i64))
             * Rational::power_of_2(e)),
-        "0.2",
+        "0.25",
         "0x0.4#1",
         20,
         Nearest,
-        "too_big",
+        "1.4313268e80807124",
         "0x1.00000E+67108864#20",
         Greater,
     );
@@ -1895,7 +1895,7 @@ fn test_pow_integer() {
         5,
         20,
         Nearest,
-        "243.0",
+        "243.00000",
         "0xf3.000#20",
         Equal,
     );
@@ -1916,7 +1916,7 @@ fn test_pow_integer() {
         3,
         10,
         Nearest,
-        "-8.0",
+        "-8.0000",
         "-0x8.00#10",
         Equal,
     );
@@ -1927,11 +1927,20 @@ fn test_pow_integer() {
         4,
         10,
         Nearest,
-        "16.0",
+        "16.000",
         "0x10.00#10",
         Equal,
     );
-    test("1.5", "0x1.8#2", 2, 10, Nearest, "2.25", "0x2.40#10", Equal);
+    test(
+        "1.5",
+        "0x1.8#2",
+        2,
+        10,
+        Nearest,
+        "2.2500",
+        "0x2.40#10",
+        Equal,
+    );
     // - inexact, rounded down
     test(
         "3.0",
@@ -1939,7 +1948,7 @@ fn test_pow_integer() {
         -2,
         10,
         Floor,
-        "0.1111",
+        "0.11108",
         "0x0.1c70#10",
         Less,
     );
@@ -1950,18 +1959,18 @@ fn test_pow_integer() {
         -2,
         10,
         Ceiling,
-        "0.1112",
+        "0.11121",
         "0x0.1c78#10",
         Greater,
     );
-    test("3.0", "0x3.0#2", 5, 2, Floor, "2.0e2", "0xc.0E+1#2", Less);
+    test("3.0", "0x3.0#2", 5, 2, Floor, "1.9e2", "0xc.0E+1#2", Less);
     test(
         "3.0",
         "0x3.0#2",
         5,
         2,
         Ceiling,
-        "3.0e2",
+        "2.6e2",
         "0x1.0E+2#2",
         Greater,
     );
@@ -1972,25 +1981,36 @@ fn test_pow_integer() {
         -1,
         10,
         Nearest,
-        "-0.3335",
+        "-0.33350",
         "-0x0.556#10",
         Less,
     );
     // - zero exponent gives 1 for any base
-    test("5.0", "0x5.0#3", 0, 10, Nearest, "1.0", "0x1.000#10", Equal);
+    test(
+        "5.0",
+        "0x5.0#3",
+        0,
+        10,
+        Nearest,
+        "1.0000",
+        "0x1.000#10",
+        Equal,
+    );
     test(
         "-5.0",
         "-0x5.0#3",
         0,
         10,
         Nearest,
-        "1.0",
+        "1.0000",
         "0x1.000#10",
         Equal,
     );
     // - |base| == 1: sign follows exponent parity
-    test("-1.0", "-0x1.0#1", 7, 5, Nearest, "-1.0", "-0x1.0#5", Equal);
-    test("-1.0", "-0x1.0#1", 8, 5, Nearest, "1.0", "0x1.0#5", Equal);
+    test(
+        "-1.0", "-0x1.0#1", 7, 5, Nearest, "-1.00", "-0x1.0#5", Equal,
+    );
+    test("-1.0", "-0x1.0#1", 8, 5, Nearest, "1.00", "0x1.0#5", Equal);
     // - overflow
     test(
         "2.0",
@@ -2020,7 +2040,7 @@ fn test_pow_integer() {
         -100000000000,
         5,
         Up,
-        "too_small",
+        "2.38e-323228497",
         "0x1.0E-268435456#5",
         Greater,
     );
@@ -2095,7 +2115,7 @@ fn test_pow_integer_extreme() {
         1,
         10,
         Nearest,
-        "too_big",
+        "1.0493e323228496",
         "0x4.00E+268435455#10",
         Equal,
     );
@@ -2115,7 +2135,7 @@ fn test_pow_integer_extreme() {
         2,
         5,
         Down,
-        "too_big",
+        "2.03e323228496",
         "0x7.cE+268435455#5",
         Less,
     );
@@ -2135,7 +2155,7 @@ fn test_pow_integer_extreme() {
         2,
         5,
         Up,
-        "too_small",
+        "2.38e-323228497",
         "0x1.0E-268435456#5",
         Greater,
     );
@@ -2246,13 +2266,40 @@ fn test_pow_u() {
         assert_eq!(o, o_out);
     };
     // - n == 0 fast path: x^0 = 1
-    test("3.0", "0x3.0#2", 0, 10, Nearest, "1.0", "0x1.000#10", Equal);
+    test(
+        "3.0",
+        "0x3.0#2",
+        0,
+        10,
+        Nearest,
+        "1.0000",
+        "0x1.000#10",
+        Equal,
+    );
     // - n == 1 fast path: x^1 = x
-    test("3.0", "0x3.0#2", 1, 10, Nearest, "3.0", "0x3.00#10", Equal);
+    test(
+        "3.0",
+        "0x3.0#2",
+        1,
+        10,
+        Nearest,
+        "3.0000",
+        "0x3.00#10",
+        Equal,
+    );
     // - n == 1 fast path with rounding
     test("1.2", "0x1.4#3", 1, 2, Nearest, "1.0", "0x1.0#2", Less);
     // - n == 2 fast path: x^2 = sqr(x)
-    test("3.0", "0x3.0#2", 2, 10, Nearest, "9.0", "0x9.00#10", Equal);
+    test(
+        "3.0",
+        "0x3.0#2",
+        2,
+        10,
+        Nearest,
+        "9.0000",
+        "0x9.00#10",
+        Equal,
+    );
     test("3.0", "0x3.0#2", 2, 2, Nearest, "8.0", "0x8.0#2", Less);
     // - n >= 3 square-and-multiply
     test(
@@ -2261,18 +2308,18 @@ fn test_pow_u() {
         5,
         20,
         Nearest,
-        "243.0",
+        "243.00000",
         "0xf3.000#20",
         Equal,
     );
-    test("3.0", "0x3.0#2", 5, 2, Floor, "2.0e2", "0xc.0E+1#2", Less);
+    test("3.0", "0x3.0#2", 5, 2, Floor, "1.9e2", "0xc.0E+1#2", Less);
     test(
         "3.0",
         "0x3.0#2",
         5,
         2,
         Ceiling,
-        "3.0e2",
+        "2.6e2",
         "0x1.0E+2#2",
         Greater,
     );
@@ -2282,17 +2329,17 @@ fn test_pow_u() {
         3,
         10,
         Nearest,
-        "3.375",
+        "3.3750",
         "0x3.60#10",
         Equal,
     );
     test(
-        "1.5",
+        "1.50",
         "0x1.8#4",
         10,
         20,
         Nearest,
-        "57.66504",
+        "57.665039",
         "0x39.aa40#20",
         Equal,
     );
@@ -2303,7 +2350,7 @@ fn test_pow_u() {
         3,
         10,
         Nearest,
-        "-8.0",
+        "-8.0000",
         "-0x8.00#10",
         Equal,
     );
@@ -2314,7 +2361,7 @@ fn test_pow_u() {
         4,
         10,
         Nearest,
-        "16.0",
+        "16.000",
         "0x10.00#10",
         Equal,
     );
@@ -2324,7 +2371,7 @@ fn test_pow_u() {
         3,
         10,
         Nearest,
-        "-27.0",
+        "-27.000",
         "-0x1b.00#10",
         Equal,
     );
@@ -2357,13 +2404,13 @@ fn test_pow_u() {
         100000000000,
         5,
         Down,
-        "too_big",
+        "2.03e323228496",
         "0x7.cE+268435455#5",
         Less,
     );
     // - underflow to zero
     test(
-        "0.5",
+        "0.50",
         "0x0.8#3",
         100000000000,
         5,
@@ -2374,29 +2421,29 @@ fn test_pow_u() {
     );
     // - underflow with Up gives the smallest positive value
     test(
-        "0.5",
+        "0.50",
         "0x0.8#3",
         100000000000,
         5,
         Up,
-        "too_small",
+        "2.38e-323228497",
         "0x1.0E-268435456#5",
         Greater,
     );
     // - canround: an inexact power that the initial working precision already rounds correctly
     test(
-        "-269104312292334.303",
+        "-269104312292334.3027",
         "-0xf4bfbaf113ee.4d8#57",
         11,
         123,
         Floor,
-        "-5.3595364566060205383890667672492462806e158",
+        "-5.35953645660602053838906676724924628060e158",
         "-0x9.c253fc20bc736c88c0172ae629606cE+131#123",
         Less,
     );
     // - ziv: a hard-to-round power that needs the working precision to grow
     test(
-        "-0.0078124999999999999999999999999999",
+        "-0.00781249999999999999999999999999990",
         "-0x0.01ffffffffffffffffffffffffff8#106",
         72,
         5,
@@ -2476,7 +2523,7 @@ fn test_pow_u_extreme() {
         1,
         10,
         Nearest,
-        "too_big",
+        "1.0493e323228496",
         "0x4.00E+268435455#10",
         Equal,
     );
@@ -2496,7 +2543,7 @@ fn test_pow_u_extreme() {
         2,
         5,
         Down,
-        "too_big",
+        "2.03e323228496",
         "0x7.cE+268435455#5",
         Less,
     );
@@ -2525,7 +2572,7 @@ fn test_pow_u_extreme() {
         2,
         5,
         Up,
-        "too_small",
+        "2.38e-323228497",
         "0x1.0E-268435456#5",
         Greater,
     );
@@ -2781,9 +2828,27 @@ fn test_pow_s() {
         assert_eq!(o, o_out);
     };
     // - n == 0: x^0 = 1
-    test("3.0", "0x3.0#2", 0, 10, Nearest, "1.0", "0x1.000#10", Equal);
+    test(
+        "3.0",
+        "0x3.0#2",
+        0,
+        10,
+        Nearest,
+        "1.0000",
+        "0x1.000#10",
+        Equal,
+    );
     // - n == 1: x^1 = x
-    test("3.0", "0x3.0#2", 1, 10, Nearest, "3.0", "0x3.00#10", Equal);
+    test(
+        "3.0",
+        "0x3.0#2",
+        1,
+        10,
+        Nearest,
+        "3.0000",
+        "0x3.00#10",
+        Equal,
+    );
     // - n >= 0 delegates to pow_u (square-and-multiply)
     test(
         "3.0",
@@ -2791,18 +2856,18 @@ fn test_pow_s() {
         5,
         20,
         Nearest,
-        "243.0",
+        "243.00000",
         "0xf3.000#20",
         Equal,
     );
-    test("3.0", "0x3.0#2", 5, 2, Floor, "2.0e2", "0xc.0E+1#2", Less);
+    test("3.0", "0x3.0#2", 5, 2, Floor, "1.9e2", "0xc.0E+1#2", Less);
     test(
         "3.0",
         "0x3.0#2",
         5,
         2,
         Ceiling,
-        "3.0e2",
+        "2.6e2",
         "0x1.0E+2#2",
         Greater,
     );
@@ -2812,7 +2877,7 @@ fn test_pow_s() {
         3,
         10,
         Nearest,
-        "-8.0",
+        "-8.0000",
         "-0x8.00#10",
         Equal,
     );
@@ -2822,7 +2887,7 @@ fn test_pow_s() {
         4,
         10,
         Nearest,
-        "16.0",
+        "16.000",
         "0x10.00#10",
         Equal,
     );
@@ -2833,7 +2898,7 @@ fn test_pow_s() {
         -3,
         10,
         Nearest,
-        "0.125",
+        "0.12500",
         "0x0.200#10",
         Equal,
     );
@@ -2843,7 +2908,7 @@ fn test_pow_s() {
         -2,
         10,
         Floor,
-        "0.1111",
+        "0.11108",
         "0x0.1c70#10",
         Less,
     );
@@ -2853,7 +2918,7 @@ fn test_pow_s() {
         -2,
         10,
         Ceiling,
-        "0.1112",
+        "0.11121",
         "0x0.1c78#10",
         Greater,
     );
@@ -2864,7 +2929,7 @@ fn test_pow_s() {
         -3,
         10,
         Nearest,
-        "-0.125",
+        "-0.12500",
         "-0x0.200#10",
         Equal,
     );
@@ -2875,17 +2940,17 @@ fn test_pow_s() {
         -4,
         10,
         Nearest,
-        "0.0625",
+        "0.062500",
         "0x0.1000#10",
         Equal,
     );
     test(
-        "1.5",
+        "1.50",
         "0x1.8#4",
         -10,
         20,
         Nearest,
-        "0.01734152",
+        "0.017341524",
         "0x0.04707e8#20",
         Less,
     );
@@ -2895,7 +2960,7 @@ fn test_pow_s() {
         -1,
         10,
         Nearest,
-        "-0.3335",
+        "-0.33350",
         "-0x0.556#10",
         Less,
     );
@@ -2906,7 +2971,7 @@ fn test_pow_s() {
         -3,
         5,
         Nearest,
-        "0.016",
+        "0.0156",
         "0x0.040#5",
         Equal,
     );
@@ -2923,7 +2988,7 @@ fn test_pow_s() {
     );
     // - overflow (base < 1, large negative exponent)
     test(
-        "0.5",
+        "0.50",
         "0x0.8#3",
         -100000000000,
         5,
@@ -2934,12 +2999,12 @@ fn test_pow_s() {
     );
     // - overflow with Down gives the largest finite value
     test(
-        "0.5",
+        "0.50",
         "0x0.8#3",
         -100000000000,
         5,
         Down,
-        "too_big",
+        "2.03e323228496",
         "0x7.cE+268435455#5",
         Less,
     );
@@ -3048,7 +3113,7 @@ fn test_pow_s_extreme() {
         -2,
         5,
         Up,
-        "too_small",
+        "2.38e-323228497",
         "0x1.0E-268435456#5",
         Greater,
     );
@@ -3220,29 +3285,29 @@ fn test_unsigned_pow_unsigned() {
         assert_eq!(o, o_out);
     };
     // - n == 0: k^0 = 1 for any k
-    test(0, 0, 10, Nearest, "1.0", "0x1.000#10", Equal);
-    test(5, 0, 10, Nearest, "1.0", "0x1.000#10", Equal);
+    test(0, 0, 10, Nearest, "1.0000", "0x1.000#10", Equal);
+    test(5, 0, 10, Nearest, "1.0000", "0x1.000#10", Equal);
     // - n == 1: k^1 = k
-    test(5, 1, 10, Nearest, "5.0", "0x5.00#10", Equal);
+    test(5, 1, 10, Nearest, "5.0000", "0x5.00#10", Equal);
     // - n == 1 with rounding
     test(5, 1, 2, Nearest, "4.0", "0x4.0#2", Less);
     // - k == 0: 0^n = 0 for n >= 1
     test(0, 3, 10, Nearest, "0.0", "0x0.0", Equal);
     // - k == 1: 1^n = 1
-    test(1, 100, 10, Nearest, "1.0", "0x1.000#10", Equal);
+    test(1, 100, 10, Nearest, "1.0000", "0x1.000#10", Equal);
     // - square-and-multiply, exact
-    test(2, 10, 20, Nearest, "1024.0", "0x400.000#20", Equal);
-    test(3, 5, 20, Nearest, "243.0", "0xf3.000#20", Equal);
-    test(10, 3, 20, Nearest, "1000.0", "0x3e8.000#20", Equal);
+    test(2, 10, 20, Nearest, "1024.0000", "0x400.000#20", Equal);
+    test(3, 5, 20, Nearest, "243.00000", "0xf3.000#20", Equal);
+    test(10, 3, 20, Nearest, "1000.0000", "0x3e8.000#20", Equal);
     // - inexact, rounded both ways
-    test(3, 5, 2, Floor, "2.0e2", "0xc.0E+1#2", Less);
-    test(3, 5, 2, Ceiling, "3.0e2", "0x1.0E+2#2", Greater);
+    test(3, 5, 2, Floor, "1.9e2", "0xc.0E+1#2", Less);
+    test(3, 5, 2, Ceiling, "2.6e2", "0x1.0E+2#2", Greater);
     test(
         7,
         20,
         30,
         Nearest,
-        "7.97922663e16",
+        "7.9792266289e16",
         "0x1.1b7aa4b8E+14#30",
         Less,
     );
@@ -3252,7 +3317,7 @@ fn test_unsigned_pow_unsigned() {
         24,
         200,
         Nearest,
-        "79496847203390844133441536.0",
+        "79496847203390844133441536.000000000000000000000000000000000000",
         "0x41c21cb8e1000000000000.00000000000000000000000000000#200",
         Equal,
     );
@@ -3264,21 +3329,21 @@ fn test_unsigned_pow_unsigned() {
         1000000000,
         5,
         Down,
-        "too_big",
+        "2.03e323228496",
         "0x7.cE+268435455#5",
         Less,
     );
     test(2, 10000000000, 10, Nearest, "Infinity", "Infinity", Greater);
     // - canround: an inexact power the initial working precision already rounds correctly
-    test(3, 6, 1, Down, "5.0e2", "0x2.0E+2#1", Less);
+    test(3, 6, 1, Down, "5.1e2", "0x2.0E+2#1", Less);
 
     // - error-budget regressions: with MPFR's budget (which upstream mpfr_ui_pow_ui inherits),
     //   `float_can_round` certified wrongly rounded results at small precisions
-    test(263, 15, 1, Nearest, "1.0e36", "0x1.0E+30#1", Less);
-    test(281, 6, 2, Nearest, "4.0e14", "0x1.8E+12#2", Less);
-    test(205, 63, 4, Down, "4.1e145", "0xd.0E+120#4", Less);
-    test(205, 63, 4, Nearest, "4.4e145", "0xe.0E+120#4", Greater);
-    test(410, 63, 4, Floor, "3.7e164", "0x6.8E+136#4", Less);
+    test(263, 15, 1, Nearest, "1.3e36", "0x1.0E+30#1", Less);
+    test(281, 6, 2, Nearest, "4.2e14", "0x1.8E+12#2", Less);
+    test(205, 63, 4, Down, "4.06e145", "0xd.0E+120#4", Less);
+    test(205, 63, 4, Nearest, "4.37e145", "0xe.0E+120#4", Greater);
+    test(410, 63, 4, Floor, "3.74e164", "0x6.8E+136#4", Less);
 }
 
 // The exact Float representation of a u64, for use as an oracle base.
@@ -3363,7 +3428,7 @@ fn test_unsigned_pow() {
     // - a fractional exponent
     test(
         2,
-        "0.5",
+        "0.50",
         "0x0.8#1",
         53,
         Nearest,
@@ -3398,13 +3463,13 @@ fn test_unsigned_pow() {
         "-0x1.0#1",
         10,
         Nearest,
-        "0.5",
+        "0.50000",
         "0x0.800#10",
         Equal,
     );
     test(
         10,
-        "-0.5",
+        "-0.50",
         "-0x0.8#1",
         53,
         Nearest,
@@ -3419,25 +3484,25 @@ fn test_unsigned_pow() {
         "0x5.0#3",
         20,
         Nearest,
-        "243.0",
+        "243.00000",
         "0xf3.000#20",
         Equal,
     );
-    test(3, "5.0", "0x5.0#3", 2, Floor, "2.0e2", "0xc.0E+1#2", Less);
+    test(3, "5.0", "0x5.0#3", 2, Floor, "1.9e2", "0xc.0E+1#2", Less);
     test(
         2,
         "1.2",
         "0x1.4#3",
         10,
         Nearest,
-        "2.379",
+        "2.3789",
         "0x2.61#10",
         Greater,
     );
     // - overflow
     test(
         2,
-        "1.0e12",
+        "1.1e12",
         "0x1.0E+10#1",
         10,
         Nearest,
@@ -3448,11 +3513,11 @@ fn test_unsigned_pow() {
     // - a tiny exponent gives a result near 1
     test(
         100,
-        "9.0e-13",
+        "9.1e-13",
         "0x1.0E-10#1",
         20,
         Nearest,
-        "1.0",
+        "1.0000000",
         "0x1.00000#20",
         Less,
     );
@@ -3657,13 +3722,29 @@ fn test_unsigned_pow_rational() {
         assert_eq!(o, o_out);
     };
     // - exact perfect powers: k = j^b gives k^(a/b) = j^a exactly
-    test(8, "1/3", 20, Nearest, "2.0", "0x2.00000#20", Equal);
-    test(27, "1/3", 20, Floor, "3.0", "0x3.00000#20", Equal);
-    test(9, "1/2", 20, Nearest, "3.0", "0x3.00000#20", Equal);
-    test(16, "3/4", 20, Nearest, "8.0", "0x8.0000#20", Equal);
-    test(4, "-1/2", 20, Nearest, "0.5", "0x0.80000#20", Equal);
-    test(1000000, "1/3", 20, Nearest, "100.0", "0x64.0000#20", Equal);
-    test(64, "5/6", 30, Nearest, "32.0", "0x20.000000#30", Equal);
+    test(8, "1/3", 20, Nearest, "2.0000000", "0x2.00000#20", Equal);
+    test(27, "1/3", 20, Floor, "3.0000000", "0x3.00000#20", Equal);
+    test(9, "1/2", 20, Nearest, "3.0000000", "0x3.00000#20", Equal);
+    test(16, "3/4", 20, Nearest, "8.0000000", "0x8.0000#20", Equal);
+    test(4, "-1/2", 20, Nearest, "0.50000000", "0x0.80000#20", Equal);
+    test(
+        1000000,
+        "1/3",
+        20,
+        Nearest,
+        "100.00000",
+        "0x64.0000#20",
+        Equal,
+    );
+    test(
+        64,
+        "5/6",
+        30,
+        Nearest,
+        "32.000000000",
+        "0x20.000000#30",
+        Equal,
+    );
     // - power-of-2 base: k = 2^s gives k^q = 2^(s*q)
     test(
         2,
@@ -3674,9 +3755,9 @@ fn test_unsigned_pow_rational() {
         "0x1.6a09e667f3bcd#53",
         Greater,
     );
-    test(8, "2/3", 20, Nearest, "4.0", "0x4.00000#20", Equal);
-    test(2, "-1", 10, Nearest, "0.5", "0x0.800#10", Equal);
-    test(4, "1/3", 30, Floor, "1.587401051", "0x1.965fea50#30", Less);
+    test(8, "2/3", 20, Nearest, "4.0000000", "0x4.00000#20", Equal);
+    test(2, "-1", 10, Nearest, "0.50000", "0x0.800#10", Equal);
+    test(4, "1/3", 30, Floor, "1.5874010511", "0x1.965fea50#30", Less);
     // - irrational results
     test(
         3,
@@ -3692,7 +3773,7 @@ fn test_unsigned_pow_rational() {
         "2/3",
         53,
         Nearest,
-        "2.924017738212866",
+        "2.9240177382128660",
         "0x2.ec8c6d2e8c538#53",
         Less,
     );
@@ -3701,15 +3782,15 @@ fn test_unsigned_pow_rational() {
         "-3/5",
         30,
         Nearest,
-        "0.311129489",
+        "0.31112948898",
         "0x0.4fa62ea4#30",
         Less,
     );
     test(3, "1/2", 2, Floor, "1.5", "0x1.8#2", Less);
     test(3, "1/2", 2, Ceiling, "2.0", "0x2.0#2", Greater);
     // - integer-valued exponents
-    test(5, "3", 20, Nearest, "125.0", "0x7d.0000#20", Equal);
-    test(2, "10", 20, Nearest, "1024.0", "0x400.000#20", Equal);
+    test(5, "3", 20, Nearest, "125.00000", "0x7d.0000#20", Equal);
+    test(2, "10", 20, Nearest, "1024.0000", "0x400.000#20", Equal);
     // - overflow and underflow
     test(
         2,
@@ -3726,20 +3807,28 @@ fn test_unsigned_pow_rational() {
         "5000000000/7",
         5,
         Down,
-        "too_big",
+        "2.03e323228496",
         "0x7.cE+268435455#5",
         Less,
     );
     // - Exact rounding of an exactly-representable result
-    test(8, "1/3", 20, Exact, "2.0", "0x2.00000#20", Equal);
-    test(27, "1/3", 30, Exact, "3.0", "0x3.0000000#30", Equal);
+    test(8, "1/3", 20, Exact, "2.0000000", "0x2.00000#20", Equal);
+    test(
+        27,
+        "1/3",
+        30,
+        Exact,
+        "3.0000000000",
+        "0x3.0000000#30",
+        Equal,
+    );
     // - a denominator exceeding u64::MAX (the perfect-power check is skipped)
     test(
         3,
         "1/18446744073709551617",
         20,
         Nearest,
-        "1.0",
+        "1.0000000",
         "0x1.00000#20",
         Less,
     );
@@ -3748,7 +3837,7 @@ fn test_unsigned_pow_rational() {
         "-1/18446744073709551617",
         20,
         Nearest,
-        "1.0",
+        "1.0000000",
         "0x1.00000#20",
         Greater,
     );
@@ -3760,7 +3849,7 @@ fn test_unsigned_pow_rational() {
         "3/36028797018963968",
         53,
         Floor,
-        "1.0",
+        "1.0000000000000000",
         "0x1.0000000000000#53",
         Less,
     );
@@ -3787,7 +3876,7 @@ fn test_unsigned_pow_rational() {
         "-3/36028797018963968",
         53,
         Nearest,
-        "0.9999999999999998",
+        "0.99999999999999978",
         "0x0.fffffffffffff0#53",
         Less,
     );
@@ -3796,7 +3885,7 @@ fn test_unsigned_pow_rational() {
         "-3/73786976294838206464",
         64,
         Nearest,
-        "0.99999999999999999995",
+        "0.999999999999999999946",
         "0x0.ffffffffffffffff#64",
         Greater,
     );
@@ -3805,7 +3894,7 @@ fn test_unsigned_pow_rational() {
         "3/4503599627370496",
         50,
         Nearest,
-        "1.000000000000009",
+        "1.0000000000000089",
         "0x1.0000000000028#50",
         Less,
     );
@@ -3814,11 +3903,11 @@ fn test_unsigned_pow_rational() {
     //   so the initial working precision cannot separate the brackets and must grow
     let q = Rational::ONE + (Rational::ONE >> 300u32);
     let (p, o) = Float::unsigned_pow_rational_prec_round(6, q.clone(), 53, Floor);
-    assert_eq!(p.to_string(), "6.0");
+    assert_eq!(p.to_string(), "6.0000000000000000");
     assert_eq!(to_hex_string(&p), "0x6.0000000000000#53");
     assert_eq!(o, Less);
     let (p, o) = Float::unsigned_pow_rational_prec_round(6, q, 53, Ceiling);
-    assert_eq!(p.to_string(), "6.000000000000001");
+    assert_eq!(p.to_string(), "6.0000000000000009");
     assert_eq!(to_hex_string(&p), "0x6.0000000000004#53");
     assert_eq!(o, Greater);
 }
@@ -3850,8 +3939,8 @@ fn test_unsigned_pow_rational_special_values() {
     // - a normal base with exact integer/reciprocal exponents
     test(2, "0", "1.0", "0x1.0#1");
     test(2, "1", "2.0", "0x2.0#1");
-    test(2, "-1", "0.5", "0x0.8#1");
-    test(2, "-2", "0.2", "0x0.4#1");
+    test(2, "-1", "0.50", "0x0.8#1");
+    test(2, "-2", "0.25", "0x0.4#1");
 }
 
 #[allow(clippy::needless_pass_by_value)]
@@ -4019,7 +4108,7 @@ fn test_pow_near_one_fast_path() {
     // - rounded directly from 1: all rounding modes, both signs of d
     test(
         xp.pow_u_prec_round_ref(3, 53, Floor),
-        "1.0",
+        "1.0000000000000000",
         "0x1.0000000000000#53",
         Less,
     );
@@ -4031,32 +4120,32 @@ fn test_pow_near_one_fast_path() {
     );
     test(
         xp.pow_u_prec_round_ref(3, 53, Nearest),
-        "1.0",
+        "1.0000000000000000",
         "0x1.0000000000000#53",
         Less,
     );
     test(
         xm.pow_u_prec_round_ref(65535, 53, Floor),
-        "0.9999999999999999",
+        "0.99999999999999989",
         "0x0.fffffffffffff8#53",
         Less,
     );
     test(
         xm.pow_u_prec_round_ref(65535, 53, Nearest),
-        "1.0",
+        "1.0000000000000000",
         "0x1.0000000000000#53",
         Greater,
     );
     // - negative z (the reciprocal-power path)
     test(
         xp.pow_integer_prec_round_ref_ref(&-Integer::from(1000), 53, Floor),
-        "0.9999999999999999",
+        "0.99999999999999989",
         "0x0.fffffffffffff8#53",
         Less,
     );
     test(
         xp.pow_integer_prec_round_ref_ref(&-Integer::from(1000), 53, Nearest),
-        "1.0",
+        "1.0000000000000000",
         "0x1.0000000000000#53",
         Greater,
     );
@@ -4069,13 +4158,13 @@ fn test_pow_near_one_fast_path() {
     );
     test(
         (-xp.clone()).pow_u_prec_round_ref(3, 53, Nearest),
-        "-1.0",
+        "-1.0000000000000000",
         "-0x1.0000000000000#53",
         Greater,
     );
     test(
         (-xm.clone()).pow_integer_prec_round_ref_ref(&-Integer::from(999), 53, Nearest),
-        "-1.0",
+        "-1.0000000000000000",
         "-0x1.0000000000000#53",
         Greater,
     );
@@ -4084,13 +4173,13 @@ fn test_pow_near_one_fast_path() {
     //   leading run of 0s or 9s
     test(
         xp.pow_u_prec_round_ref(3, 150, Nearest),
-        "1.000000000000000000000000000002366582715663035",
+        "1.0000000000000000000000000000023665827156630354",
         "0x1.00000000000000000000000030000000000000#150",
         Less,
     );
     test(
         xp.pow_integer_prec_round_ref_ref(&-Integer::from(3), 150, Nearest),
-        "0.9999999999999999999999999999976334172843369646",
+        "0.99999999999999999999999999999763341728433696458",
         "0x0.ffffffffffffffffffffffffd0000000000000#150",
         Less,
     );
@@ -4136,14 +4225,23 @@ fn test_pow_rational_prec_round() {
         assert_eq!(o_assign, o);
     };
     // Irrational results, all rounding directions.
-    test("0x2.0#2", 3, 2, 20, Floor, "2.828426", "0x2.d413c#20", Less);
+    test(
+        "0x2.0#2",
+        3,
+        2,
+        20,
+        Floor,
+        "2.8284264",
+        "0x2.d413c#20",
+        Less,
+    );
     test(
         "0x2.0#2",
         3,
         2,
         20,
         Ceiling,
-        "2.82843",
+        "2.8284302",
         "0x2.d4140#20",
         Greater,
     );
@@ -4153,11 +4251,11 @@ fn test_pow_rational_prec_round() {
         2,
         20,
         Nearest,
-        "2.828426",
+        "2.8284264",
         "0x2.d413c#20",
         Less,
     );
-    test("0x3.0#2", 5, 2, 10, Nearest, "15.59", "0xf.98#10", Greater);
+    test("0x3.0#2", 5, 2, 10, Nearest, "15.594", "0xf.98#10", Greater);
     test(
         "0x2.0#2",
         1,
@@ -4175,7 +4273,7 @@ fn test_pow_rational_prec_round() {
         2,
         20,
         Floor,
-        "0.3162274",
+        "0.31622744",
         "0x0.50f448#20",
         Less,
     );
@@ -4185,7 +4283,7 @@ fn test_pow_rational_prec_round() {
         2,
         20,
         Ceiling,
-        "0.3162279",
+        "0.31622791",
         "0x0.50f450#20",
         Greater,
     );
@@ -4198,19 +4296,55 @@ fn test_pow_rational_prec_round() {
         2,
         20,
         Nearest,
-        "1.224745",
+        "1.2247448",
         "0x1.3988e#20",
         Less,
     );
     // Exactly-representable algebraic results (perfect powers): Ordering is Equal.
     // - in positive_float_pow_rational: b | d && c is a perfect b-th power (exact-algebraic branch)
-    test("0x8.0#4", 1, 3, 20, Floor, "2.0", "0x2.00000#20", Equal);
-    test("0x9.0#4", 1, 2, 20, Nearest, "3.0", "0x3.00000#20", Equal);
-    test("0x1b.0#5", 2, 3, 20, Nearest, "9.0", "0x9.0000#20", Equal);
-    test("0x4.0#3", 1, 2, 10, Nearest, "2.0", "0x2.00#10", Equal);
+    test(
+        "0x8.0#4",
+        1,
+        3,
+        20,
+        Floor,
+        "2.0000000",
+        "0x2.00000#20",
+        Equal,
+    );
+    test(
+        "0x9.0#4",
+        1,
+        2,
+        20,
+        Nearest,
+        "3.0000000",
+        "0x3.00000#20",
+        Equal,
+    );
+    test(
+        "0x1b.0#5",
+        2,
+        3,
+        20,
+        Nearest,
+        "9.0000000",
+        "0x9.0000#20",
+        Equal,
+    );
+    test("0x4.0#3", 1, 2, 10, Nearest, "2.0000", "0x2.00#10", Equal);
     // Exact rounding mode, when the result is exactly representable, succeeds.
     // - in float_rational_pow: rm == Exact (and the result is exact)
-    test("0x8.0#4", 1, 3, 20, Exact, "2.0", "0x2.00000#20", Equal);
+    test(
+        "0x8.0#4",
+        1,
+        3,
+        20,
+        Exact,
+        "2.0000000",
+        "0x2.00000#20",
+        Equal,
+    );
     // Power-of-2 base (including a fractional one): x^(a/b) = 2^(d*a/b).
     test(
         "0x0.4#1",
@@ -4218,12 +4352,21 @@ fn test_pow_rational_prec_round() {
         2,
         30,
         Nearest,
-        "0.5",
+        "0.50000000000",
         "0x0.80000000#30",
         Equal,
     );
     // Negative base with an integer exponent is defined; with a non-integer exponent it is NaN.
-    test("-0x2.0#2", 3, 1, 10, Nearest, "-8.0", "-0x8.00#10", Equal);
+    test(
+        "-0x2.0#2",
+        3,
+        1,
+        10,
+        Nearest,
+        "-8.0000",
+        "-0x8.00#10",
+        Equal,
+    );
     test("-0x8.0#4", 1, 3, 10, Nearest, "NaN", "NaN", Equal);
 }
 
@@ -4586,49 +4729,89 @@ fn test_rational_pow_rational() {
                 assert_eq!(o_alt, o);
             }
         };
-    test("3/2", "0", 10, Nearest, "1.0", "0x1.000#10", Equal);
+    test("3/2", "0", 10, Nearest, "1.0000", "0x1.000#10", Equal);
     test("0", "1/2", 10, Nearest, "0.0", "0x0.0", Equal);
     test("0", "-1/2", 10, Nearest, "Infinity", "Infinity", Equal);
     test("-4", "1/2", 10, Nearest, "NaN", "NaN", Equal);
-    test("-2", "3", 10, Nearest, "-8.0", "-0x8.00#10", Equal);
-    test("-2", "2", 10, Nearest, "4.0", "0x4.00#10", Equal);
-    test("1", "1/2", 10, Nearest, "1.0", "0x1.000#10", Equal);
-    test("4", "1/3", 20, Floor, "1.5874", "0x1.965fe#20", Less);
-    test("4", "1/3", 20, Ceiling, "1.587402", "0x1.96600#20", Greater);
-    test("1/2", "1/2", 20, Nearest, "0.707107", "0x0.b504f#20", Less);
-    test("5", "3", 10, Nearest, "125.0", "0x7d.0#10", Equal);
-    test("3/2", "4", 20, Nearest, "5.0625", "0x5.10000#20", Equal);
-    test("3/4", "1/2", 20, Floor, "0.866025", "0x0.ddb3d#20", Less);
+    test("-2", "3", 10, Nearest, "-8.0000", "-0x8.00#10", Equal);
+    test("-2", "2", 10, Nearest, "4.0000", "0x4.00#10", Equal);
+    test("1", "1/2", 10, Nearest, "1.0000", "0x1.000#10", Equal);
+    test("4", "1/3", 20, Floor, "1.5874004", "0x1.965fe#20", Less);
+    test(
+        "4",
+        "1/3",
+        20,
+        Ceiling,
+        "1.5874023",
+        "0x1.96600#20",
+        Greater,
+    );
+    test(
+        "1/2",
+        "1/2",
+        20,
+        Nearest,
+        "0.70710659",
+        "0x0.b504f#20",
+        Less,
+    );
+    test("5", "3", 10, Nearest, "125.00", "0x7d.0#10", Equal);
+    test("3/2", "4", 20, Nearest, "5.0625000", "0x5.10000#20", Equal);
+    test("3/4", "1/2", 20, Floor, "0.86602497", "0x0.ddb3d#20", Less);
     test(
         "3/4",
         "1/2",
         20,
         Ceiling,
-        "0.866026",
+        "0.86602592",
         "0x0.ddb3e#20",
         Greater,
     );
-    test("1/9", "-1/2", 20, Nearest, "3.0", "0x3.00000#20", Equal);
-    test("6/5", "1/2", 20, Floor, "1.095444", "0x1.186f0#20", Less);
+    test(
+        "1/9",
+        "-1/2",
+        20,
+        Nearest,
+        "3.0000000",
+        "0x3.00000#20",
+        Equal,
+    );
+    test("6/5", "1/2", 20, Floor, "1.0954437", "0x1.186f0#20", Less);
     test(
         "6/5",
         "1/2",
         20,
         Ceiling,
-        "1.095446",
+        "1.0954456",
         "0x1.186f2#20",
         Greater,
     );
-    test("3/5", "1/2", 20, Nearest, "0.774596", "0x0.c64bf#20", Less);
-    test("9/5", "1/2", 20, Nearest, "1.34164", "0x1.5775c#20", Less);
-    test("9/25", "1/2", 20, Floor, "0.599999", "0x0.99999#20", Less);
-    test("9/25", "1/2", 20, Ceiling, "0.6", "0x0.9999a#20", Greater);
+    test(
+        "3/5",
+        "1/2",
+        20,
+        Nearest,
+        "0.77459621",
+        "0x0.c64bf#20",
+        Less,
+    );
+    test("9/5", "1/2", 20, Nearest, "1.3416405", "0x1.5775c#20", Less);
+    test("9/25", "1/2", 20, Floor, "0.59999943", "0x0.99999#20", Less);
+    test(
+        "9/25",
+        "1/2",
+        20,
+        Ceiling,
+        "0.60000038",
+        "0x0.9999a#20",
+        Greater,
+    );
     test(
         "9/25",
         "-1/2",
         20,
         Nearest,
-        "1.666666",
+        "1.6666660",
         "0x1.aaaaa#20",
         Less,
     );
@@ -4646,17 +4829,17 @@ fn test_rational_pow_rational() {
         "1/3",
         20,
         Nearest,
-        "0.873581",
+        "0.87358093",
         "0x0.dfa30#20",
         Greater,
     );
-    test("9/4", "1/2", 10, Exact, "1.5", "0x1.800#10", Equal);
+    test("9/4", "1/2", 10, Exact, "1.5000", "0x1.800#10", Equal);
     test(
         "3/5",
         "1/1180591620717411303425",
         20,
         Nearest,
-        "1.0",
+        "1.0000000",
         "0x1.00000#20",
         Greater,
     );

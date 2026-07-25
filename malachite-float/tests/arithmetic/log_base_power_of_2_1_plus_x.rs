@@ -90,13 +90,13 @@ fn test_log_base_power_of_2_1_plus_x() {
     test("-1.0", "-0x1.0#1", 2, "-Infinity", "-Infinity");
     // 1 + x = 2^m, exact when m / pow is representable
     test("7.0", "0x7.0#3", 2, "1.5", "0x1.8#3"); // log_4(8) = 3/2, exact
-    test("-0.5", "-0x0.8#1", 2, "-0.5", "-0x0.8#1"); // log_4(0.5) = -1/2, exact
+    test("-0.50", "-0x0.8#1", 2, "-0.50", "-0x0.8#1"); // log_4(0.5) = -1/2, exact
     test("3.0", "0x3.0#2", 1, "2.0", "0x2.0#2"); // log_2(4) = 2
     // 1 + x = 2^m, inexact (m / pow not representable)
-    test("3.0", "0x3.0#2", 3, "0.8", "0x0.c#2"); // log_8(4) = 2/3, inexact
-    test("123.0", "0x7b.0#7", 1, "6.94", "0x6.f#7");
-    test("123.0", "0x7b.0#7", 2, "3.47", "0x3.78#7");
-    test("123.0", "0x7b.0#7", -1, "-6.94", "-0x6.f#7");
+    test("3.0", "0x3.0#2", 3, "0.75", "0x0.c#2"); // log_8(4) = 2/3, inexact
+    test("123.0", "0x7b.0#7", 1, "6.938", "0x6.f#7");
+    test("123.0", "0x7b.0#7", 2, "3.469", "0x3.78#7");
+    test("123.0", "0x7b.0#7", -1, "-6.938", "-0x6.f#7");
     test("-123.0", "-0x7b.0#7", 2, "NaN", "NaN");
     test(
         "3.1415926535897931",
@@ -144,7 +144,7 @@ fn test_log_base_power_of_2_1_plus_x_prec_round_special() {
         2,
         1,
         Exact,
-        "-0.5",
+        "-0.50",
         "-0x0.8#1",
         Equal,
     ); // log_4(0.5) = -1/2
@@ -154,7 +154,7 @@ fn test_log_base_power_of_2_1_plus_x_prec_round_special() {
         5,
         10,
         Exact,
-        "2.0",
+        "2.0000",
         "0x2.00#10",
         Equal,
     ); // log_32(1024) = 2
@@ -164,7 +164,7 @@ fn test_log_base_power_of_2_1_plus_x_prec_round_special() {
         3,
         10,
         Nearest,
-        "0.667",
+        "0.66699",
         "0x0.aac#10",
         Greater,
     );
@@ -175,7 +175,7 @@ fn test_log_base_power_of_2_1_plus_x_prec_round_special() {
         2,
         10,
         Nearest,
-        "500.0",
+        "500.00",
         "0x1f4.0#10",
         Less,
     );
@@ -184,7 +184,7 @@ fn test_log_base_power_of_2_1_plus_x_prec_round_special() {
         8,
         10,
         Nearest,
-        "125.0",
+        "125.00",
         "0x7d.0#10",
         Less,
     );
@@ -193,7 +193,7 @@ fn test_log_base_power_of_2_1_plus_x_prec_round_special() {
         -2,
         10,
         Nearest,
-        "-500.0",
+        "-500.00",
         "-0x1f4.0#10",
         Greater,
     );
@@ -203,7 +203,7 @@ fn test_log_base_power_of_2_1_plus_x_prec_round_special() {
         1000,
         10,
         Nearest,
-        "1.0",
+        "1.0000",
         "0x1.000#10",
         Less,
     );
@@ -213,7 +213,7 @@ fn test_log_base_power_of_2_1_plus_x_prec_round_special() {
         2,
         10,
         Nearest,
-        "6.735e-302",
+        "6.7352e-302",
         "0xb.8cE-251#10",
         Greater,
     );
@@ -268,16 +268,16 @@ fn test_log_base_power_of_2_1_plus_x_prec() {
     test("-1.0", "-0x1.0#1", 1, 10, "-Infinity", "-Infinity", Equal);
     test("-1.0", "-0x1.0#1", -2, 10, "Infinity", "Infinity", Equal);
     test("7.0", "0x7.0#3", 2, 2, "1.5", "0x1.8#2", Equal);
-    test("7.0", "0x7.0#3", 2, 10, "1.5", "0x1.800#10", Equal);
-    test("3.0", "0x3.0#2", 3, 10, "0.667", "0x0.aac#10", Greater);
-    test("123.0", "0x7b.0#7", 2, 10, "3.477", "0x3.7a#10", Less);
+    test("7.0", "0x7.0#3", 2, 10, "1.5000", "0x1.800#10", Equal);
+    test("3.0", "0x3.0#2", 3, 10, "0.66699", "0x0.aac#10", Greater);
+    test("123.0", "0x7b.0#7", 2, 10, "3.4766", "0x3.7a#10", Less);
     test("-123.0", "-0x7b.0#7", 2, 10, "NaN", "NaN", Equal);
     test(
         "3.1415926535897931",
         "0x3.243f6a8885a30#53",
         2,
         10,
-        "1.025",
+        "1.0254",
         "0x1.068#10",
         Greater,
     );
@@ -368,12 +368,14 @@ fn test_log_base_power_of_2_1_plus_x_round() {
         Equal,
     );
     test("7.0", "0x7.0#3", 2, Exact, "1.5", "0x1.8#3", Equal);
-    test("-0.5", "-0x0.8#1", 2, Exact, "-0.5", "-0x0.8#1", Equal);
-    test("123.0", "0x7b.0#7", 2, Floor, "3.47", "0x3.78#7", Less);
-    test("123.0", "0x7b.0#7", 2, Ceiling, "3.5", "0x3.80#7", Greater);
-    test("123.0", "0x7b.0#7", 2, Down, "3.47", "0x3.78#7", Less);
-    test("123.0", "0x7b.0#7", 2, Up, "3.5", "0x3.80#7", Greater);
-    test("123.0", "0x7b.0#7", 2, Nearest, "3.47", "0x3.78#7", Less);
+    test("-0.50", "-0x0.8#1", 2, Exact, "-0.50", "-0x0.8#1", Equal);
+    test("123.0", "0x7b.0#7", 2, Floor, "3.469", "0x3.78#7", Less);
+    test(
+        "123.0", "0x7b.0#7", 2, Ceiling, "3.500", "0x3.80#7", Greater,
+    );
+    test("123.0", "0x7b.0#7", 2, Down, "3.469", "0x3.78#7", Less);
+    test("123.0", "0x7b.0#7", 2, Up, "3.500", "0x3.80#7", Greater);
+    test("123.0", "0x7b.0#7", 2, Nearest, "3.469", "0x3.78#7", Less);
 }
 
 #[test]
@@ -463,9 +465,9 @@ fn test_log_base_power_of_2_1_plus_x_prec_round() {
         Equal,
     );
     test("7.0", "0x7.0#3", 2, 2, Exact, "1.5", "0x1.8#2", Equal);
-    test("-0.5", "-0x0.8#1", 2, 1, Exact, "-0.5", "-0x0.8#1", Equal);
+    test("-0.50", "-0x0.8#1", 2, 1, Exact, "-0.50", "-0x0.8#1", Equal);
     test("3.0", "0x3.0#2", 1, 2, Exact, "2.0", "0x2.0#2", Equal);
-    test("4.0", "0x4.0#1", 3, 1, Floor, "0.5", "0x0.8#1", Less);
+    test("4.0", "0x4.0#1", 3, 1, Floor, "0.50", "0x0.8#1", Less);
     test("4.0", "0x4.0#1", 3, 1, Ceiling, "1.0", "0x1.0#1", Greater);
     test(
         "3.0",
@@ -473,7 +475,7 @@ fn test_log_base_power_of_2_1_plus_x_prec_round() {
         3,
         10,
         Nearest,
-        "0.667",
+        "0.66699",
         "0x0.aac#10",
         Greater,
     );
@@ -483,7 +485,7 @@ fn test_log_base_power_of_2_1_plus_x_prec_round() {
         2,
         10,
         Floor,
-        "3.477",
+        "3.4766",
         "0x3.7a#10",
         Less,
     );
@@ -493,7 +495,7 @@ fn test_log_base_power_of_2_1_plus_x_prec_round() {
         2,
         10,
         Ceiling,
-        "3.48",
+        "3.4805",
         "0x3.7b#10",
         Greater,
     );
@@ -503,7 +505,7 @@ fn test_log_base_power_of_2_1_plus_x_prec_round() {
         -2,
         10,
         Floor,
-        "-3.48",
+        "-3.4805",
         "-0x3.7b#10",
         Less,
     );
@@ -541,7 +543,7 @@ fn test_log_base_power_of_2_1_plus_x_prec_round_underflow() {
         2,
         1,
         Up,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Greater,
     );
@@ -550,7 +552,7 @@ fn test_log_base_power_of_2_1_plus_x_prec_round_underflow() {
         2,
         1,
         Nearest,
-        "too_small",
+        "2.4e-323228497",
         "0x1.0E-268435456#1",
         Greater,
     );
@@ -563,7 +565,7 @@ fn test_log_base_power_of_2_1_plus_x_prec_round_underflow() {
         -2,
         1,
         Nearest,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Less,
     );
@@ -575,7 +577,7 @@ fn test_log_base_power_of_2_1_plus_x_prec_round_underflow() {
         2,
         1,
         Up,
-        "-too_small",
+        "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         Less,
     );

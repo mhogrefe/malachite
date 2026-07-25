@@ -281,11 +281,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (log, o) = Float::from(8).log_base_float_base_prec_round(&Float::from(4), 10, Exact);
-    /// assert_eq!(log.to_string(), "1.5"); // log_4(8) = 3/2
+    /// assert_eq!(log.to_string(), "1.5000"); // log_4(8) = 3/2
     /// assert_eq!(o, Equal);
     ///
     /// let (log, o) = Float::from(4).log_base_float_base_prec_round(&Float::from(0.5), 10, Exact);
-    /// assert_eq!(log.to_string(), "-2.0"); // log_{1/2}(4) = -2
+    /// assert_eq!(log.to_string(), "-2.0000"); // log_{1/2}(4) = -2
     /// assert_eq!(o, Equal);
     /// ```
     #[inline]
@@ -326,12 +326,12 @@ impl Float {
     ///
     /// let (log, o) =
     ///     (&Float::from(8)).log_base_float_base_prec_round_ref(&Float::from(2), 10, Exact);
-    /// assert_eq!(log.to_string(), "3.0"); // log_2(8) = 3
+    /// assert_eq!(log.to_string(), "3.0000"); // log_2(8) = 3
     /// assert_eq!(o, Equal);
     ///
     /// let (log, o) =
     ///     (&Float::from(2)).log_base_float_base_prec_round_ref(&Float::from(4), 10, Exact);
-    /// assert_eq!(log.to_string(), "0.5"); // log_4(2) = 1/2
+    /// assert_eq!(log.to_string(), "0.50000"); // log_4(2) = 1/2
     /// assert_eq!(o, Equal);
     /// ```
     #[inline]
@@ -367,7 +367,7 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (log, o) = Float::from(8).log_base_float_base_prec(&Float::from(4), 10);
-    /// assert_eq!(log.to_string(), "1.5"); // log_4(8) = 3/2
+    /// assert_eq!(log.to_string(), "1.5000"); // log_4(8) = 3/2
     /// assert_eq!(o, Equal);
     /// ```
     #[inline]
@@ -397,7 +397,7 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (log, o) = (&Float::from(8)).log_base_float_base_prec_ref(&Float::from(4), 10);
-    /// assert_eq!(log.to_string(), "1.5"); // log_4(8) = 3/2
+    /// assert_eq!(log.to_string(), "1.5000"); // log_4(8) = 3/2
     /// assert_eq!(o, Equal);
     /// ```
     #[inline]
@@ -429,7 +429,7 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (log, o) = Float::from(81).log_base_float_base_round(&Float::from(3), Exact);
-    /// assert_eq!(log.to_string(), "4.0"); // log_3(81) = 4
+    /// assert_eq!(log.to_string(), "4.000"); // log_3(81) = 4
     /// assert_eq!(o, Equal);
     /// ```
     #[inline]
@@ -462,7 +462,7 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (log, o) = (&Float::from(81)).log_base_float_base_round_ref(&Float::from(3), Exact);
-    /// assert_eq!(log.to_string(), "4.0"); // log_3(81) = 4
+    /// assert_eq!(log.to_string(), "4.000"); // log_3(81) = 4
     /// assert_eq!(o, Equal);
     /// ```
     #[inline]
@@ -498,7 +498,7 @@ impl Float {
     ///     x.log_base_float_base_prec_round_assign(&Float::from(4), 10, Exact),
     ///     Equal
     /// );
-    /// assert_eq!(x.to_string(), "1.5"); // log_4(8) = 3/2
+    /// assert_eq!(x.to_string(), "1.5000"); // log_4(8) = 3/2
     /// ```
     #[inline]
     pub fn log_base_float_base_prec_round_assign(
@@ -534,7 +534,7 @@ impl Float {
     ///
     /// let mut x = Float::from(8);
     /// x.log_base_float_base_prec_assign(&Float::from(4), 10);
-    /// assert_eq!(x.to_string(), "1.5"); // log_4(8) = 3/2
+    /// assert_eq!(x.to_string(), "1.5000"); // log_4(8) = 3/2
     /// ```
     #[inline]
     pub fn log_base_float_base_prec_assign(&mut self, base: &Self, prec: u64) -> Ordering {
@@ -565,7 +565,7 @@ impl Float {
     ///
     /// let mut x = Float::from(81);
     /// x.log_base_float_base_round_assign(&Float::from(3), Exact);
-    /// assert_eq!(x.to_string(), "4.0"); // log_3(81) = 4
+    /// assert_eq!(x.to_string(), "4.000"); // log_3(81) = 4
     /// ```
     #[inline]
     pub fn log_base_float_base_round_assign(&mut self, base: &Self, rm: RoundingMode) -> Ordering {
@@ -594,8 +594,11 @@ impl LogBase<Self> for Float {
     /// use malachite_base::num::arithmetic::traits::LogBase;
     /// use malachite_float::Float;
     ///
-    /// assert_eq!(Float::from(81).log_base(Float::from(3)).to_string(), "4.0"); // log_3(81) = 4
-    /// assert_eq!(Float::from(9).log_base(Float::from(3)).to_string(), "2.0"); // log_3(9) = 2
+    /// assert_eq!(
+    ///     Float::from(81).log_base(Float::from(3)).to_string(),
+    ///     "4.000"
+    /// ); // log_3(81) = 4
+    /// assert_eq!(Float::from(9).log_base(Float::from(3)).to_string(), "2.00"); // log_3(9) = 2
     /// ```
     #[inline]
     fn log_base(self, base: Self) -> Self {
@@ -626,11 +629,11 @@ impl LogBase<&Float> for &Float {
     ///
     /// assert_eq!(
     ///     (&Float::from(81)).log_base(&Float::from(3)).to_string(),
-    ///     "4.0"
+    ///     "4.000"
     /// ); // log_3(81)=4
     /// assert_eq!(
     ///     (&Float::from(9)).log_base(&Float::from(3)).to_string(),
-    ///     "2.0"
+    ///     "2.00"
     /// ); // log_3(9)=2
     /// ```
     #[inline]
@@ -660,7 +663,7 @@ impl LogBaseAssign<&Self> for Float {
     ///
     /// let mut x = Float::from(81);
     /// x.log_base_assign(&Float::from(3));
-    /// assert_eq!(x.to_string(), "4.0"); // log_3(81) = 4
+    /// assert_eq!(x.to_string(), "4.000"); // log_3(81) = 4
     /// ```
     #[inline]
     fn log_base_assign(&mut self, base: &Self) {

@@ -335,11 +335,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (root, o) = Float::from(2.0).root_u_prec_round(3, 20, Floor);
-    /// assert_eq!(root.to_string(), "1.25992");
+    /// assert_eq!(root.to_string(), "1.2599201");
     /// assert_eq!(o, Less);
     ///
     /// let (root, o) = Float::from(2.0).root_u_prec_round(3, 20, Ceiling);
-    /// assert_eq!(root.to_string(), "1.259922");
+    /// assert_eq!(root.to_string(), "1.2599220");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -402,11 +402,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (root, o) = Float::from(2.0).root_u_prec_round_ref(3, 20, Floor);
-    /// assert_eq!(root.to_string(), "1.25992");
+    /// assert_eq!(root.to_string(), "1.2599201");
     /// assert_eq!(o, Less);
     ///
     /// let (root, o) = Float::from(2.0).root_u_prec_round_ref(3, 20, Ceiling);
-    /// assert_eq!(root.to_string(), "1.259922");
+    /// assert_eq!(root.to_string(), "1.2599220");
     /// assert_eq!(o, Greater);
     /// ```
     pub fn root_u_prec_round_ref(&self, k: u64, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
@@ -512,7 +512,7 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (root, o) = Float::from(2.0).root_u_prec(3, 20);
-    /// assert_eq!(root.to_string(), "1.25992");
+    /// assert_eq!(root.to_string(), "1.2599201");
     /// assert_eq!(o, Less);
     ///
     /// let (root, o) = Float::from(2.0).root_u_prec(3, 53);
@@ -575,7 +575,7 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (root, o) = Float::from(2.0).root_u_prec_ref(3, 20);
-    /// assert_eq!(root.to_string(), "1.25992");
+    /// assert_eq!(root.to_string(), "1.2599201");
     /// assert_eq!(o, Less);
     ///
     /// let (root, o) = Float::from(2.0).root_u_prec_ref(3, 53);
@@ -639,7 +639,7 @@ impl Float {
     ///
     /// let x = Float::from_rational_prec(Rational::from(2u32), 20).0;
     /// let (root, o) = x.root_u_round(3, Floor);
-    /// assert_eq!(root.to_string(), "1.25992");
+    /// assert_eq!(root.to_string(), "1.2599201");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -700,7 +700,7 @@ impl Float {
     ///
     /// let x = Float::from_rational_prec(Rational::from(2u32), 20).0;
     /// let (root, o) = x.root_u_round_ref(3, Floor);
-    /// assert_eq!(root.to_string(), "1.25992");
+    /// assert_eq!(root.to_string(), "1.2599201");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -745,7 +745,7 @@ impl Float {
     ///
     /// let mut x = Float::from(2.0);
     /// assert_eq!(x.root_u_prec_round_assign(3, 20, Floor), Less);
-    /// assert_eq!(x.to_string(), "1.25992");
+    /// assert_eq!(x.to_string(), "1.2599201");
     /// ```
     #[inline]
     pub fn root_u_prec_round_assign(&mut self, k: u64, prec: u64, rm: RoundingMode) -> Ordering {
@@ -777,7 +777,7 @@ impl Float {
     ///
     /// let mut x = Float::from(2.0);
     /// assert_eq!(x.root_u_prec_assign(3, 20), Less);
-    /// assert_eq!(x.to_string(), "1.25992");
+    /// assert_eq!(x.to_string(), "1.2599201");
     /// ```
     #[inline]
     pub fn root_u_prec_assign(&mut self, k: u64, prec: u64) -> Ordering {
@@ -810,7 +810,7 @@ impl Float {
     ///
     /// let mut x = Float::from_rational_prec(Rational::from(2u32), 20).0;
     /// assert_eq!(x.root_u_round_assign(3, Nearest), Less);
-    /// assert_eq!(x.to_string(), "1.25992");
+    /// assert_eq!(x.to_string(), "1.2599201");
     /// ```
     #[inline]
     pub fn root_u_round_assign(&mut self, k: u64, rm: RoundingMode) -> Ordering {
@@ -871,11 +871,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (root, o) = Float::from(2.0).root_s_prec_round(-3, 20, Floor);
-    /// assert_eq!(root.to_string(), "0.7937");
+    /// assert_eq!(root.to_string(), "0.79370022");
     /// assert_eq!(o, Less);
     ///
     /// let (root, o) = Float::from(2.0).root_s_prec_round(-3, 20, Ceiling);
-    /// assert_eq!(root.to_string(), "0.793701");
+    /// assert_eq!(root.to_string(), "0.79370117");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -936,11 +936,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (root, o) = Float::from(2.0).root_s_prec_round_ref(-3, 20, Floor);
-    /// assert_eq!(root.to_string(), "0.7937");
+    /// assert_eq!(root.to_string(), "0.79370022");
     /// assert_eq!(o, Less);
     ///
     /// let (root, o) = Float::from(2.0).root_s_prec_round_ref(-3, 20, Ceiling);
-    /// assert_eq!(root.to_string(), "0.793701");
+    /// assert_eq!(root.to_string(), "0.79370117");
     /// assert_eq!(o, Greater);
     /// ```
     pub fn root_s_prec_round_ref(&self, k: i64, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
@@ -1086,7 +1086,7 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (root, o) = Float::from(2.0).root_s_prec(-3, 53);
-    /// assert_eq!(root.to_string(), "0.7937005259840998");
+    /// assert_eq!(root.to_string(), "0.79370052598409979");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -1143,7 +1143,7 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (root, o) = Float::from(2.0).root_s_prec_ref(-3, 53);
-    /// assert_eq!(root.to_string(), "0.7937005259840998");
+    /// assert_eq!(root.to_string(), "0.79370052598409979");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -1201,7 +1201,7 @@ impl Float {
     ///
     /// let x = Float::from_rational_prec(Rational::from(2u32), 20).0;
     /// let (root, o) = x.root_s_round(-3, Ceiling);
-    /// assert_eq!(root.to_string(), "0.793701");
+    /// assert_eq!(root.to_string(), "0.79370117");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -1260,7 +1260,7 @@ impl Float {
     ///
     /// let x = Float::from_rational_prec(Rational::from(2u32), 20).0;
     /// let (root, o) = x.root_s_round_ref(-3, Ceiling);
-    /// assert_eq!(root.to_string(), "0.793701");
+    /// assert_eq!(root.to_string(), "0.79370117");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -1294,7 +1294,7 @@ impl Float {
     ///
     /// let mut x = Float::from(2.0);
     /// assert_eq!(x.root_s_prec_round_assign(-3, 20, Floor), Less);
-    /// assert_eq!(x.to_string(), "0.7937");
+    /// assert_eq!(x.to_string(), "0.79370022");
     /// ```
     #[inline]
     pub fn root_s_prec_round_assign(&mut self, k: i64, prec: u64, rm: RoundingMode) -> Ordering {
@@ -1326,7 +1326,7 @@ impl Float {
     ///
     /// let mut x = Float::from(2.0);
     /// assert_eq!(x.root_s_prec_assign(-3, 20), Less);
-    /// assert_eq!(x.to_string(), "0.7937");
+    /// assert_eq!(x.to_string(), "0.79370022");
     /// ```
     #[inline]
     pub fn root_s_prec_assign(&mut self, k: i64, prec: u64) -> Ordering {
@@ -1359,7 +1359,7 @@ impl Float {
     ///
     /// let mut x = Float::from_rational_prec(Rational::from(2u32), 20).0;
     /// assert_eq!(x.root_s_round_assign(-3, Nearest), Less);
-    /// assert_eq!(x.to_string(), "0.7937");
+    /// assert_eq!(x.to_string(), "0.79370022");
     /// ```
     #[inline]
     pub fn root_s_round_assign(&mut self, k: i64, rm: RoundingMode) -> Ordering {
@@ -1419,12 +1419,12 @@ impl Float {
     ///
     /// let (root, o) =
     ///     Float::root_u_rational_prec_round(Rational::from_signeds(3, 5), 3, 20, Floor);
-    /// assert_eq!(root.to_string(), "0.843432");
+    /// assert_eq!(root.to_string(), "0.84343243");
     /// assert_eq!(o, Less);
     ///
     /// let (root, o) =
     ///     Float::root_u_rational_prec_round(Rational::from_signeds(3, 5), 3, 20, Ceiling);
-    /// assert_eq!(root.to_string(), "0.843433");
+    /// assert_eq!(root.to_string(), "0.84343338");
     /// assert_eq!(o, Greater);
     /// ```
     #[allow(clippy::needless_pass_by_value)]
@@ -1490,12 +1490,12 @@ impl Float {
     ///
     /// let (root, o) =
     ///     Float::root_u_rational_prec_round_ref(&Rational::from_signeds(3, 5), 3, 20, Floor);
-    /// assert_eq!(root.to_string(), "0.843432");
+    /// assert_eq!(root.to_string(), "0.84343243");
     /// assert_eq!(o, Less);
     ///
     /// let (root, o) =
     ///     Float::root_u_rational_prec_round_ref(&Rational::from_signeds(3, 5), 3, 20, Ceiling);
-    /// assert_eq!(root.to_string(), "0.843433");
+    /// assert_eq!(root.to_string(), "0.84343338");
     /// assert_eq!(o, Greater);
     /// ```
     pub fn root_u_rational_prec_round_ref(
@@ -1579,11 +1579,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (root, o) = Float::root_u_rational_prec(Rational::from_signeds(3, 5), 3, 20);
-    /// assert_eq!(root.to_string(), "0.843432");
+    /// assert_eq!(root.to_string(), "0.84343243");
     /// assert_eq!(o, Less);
     ///
     /// let (root, o) = Float::root_u_rational_prec(Rational::from_signeds(8, 27), 3, 10);
-    /// assert_eq!(root.to_string(), "0.667");
+    /// assert_eq!(root.to_string(), "0.66699");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -1640,11 +1640,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (root, o) = Float::root_u_rational_prec_ref(&Rational::from_signeds(3, 5), 3, 20);
-    /// assert_eq!(root.to_string(), "0.843432");
+    /// assert_eq!(root.to_string(), "0.84343243");
     /// assert_eq!(o, Less);
     ///
     /// let (root, o) = Float::root_u_rational_prec_ref(&Rational::from_signeds(8, 27), 3, 10);
-    /// assert_eq!(root.to_string(), "0.667");
+    /// assert_eq!(root.to_string(), "0.66699");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -1703,7 +1703,7 @@ impl Float {
     ///
     /// let (root, o) =
     ///     Float::root_s_rational_prec_round(Rational::from_signeds(3, 5), -3, 20, Nearest);
-    /// assert_eq!(root.to_string(), "1.185631");
+    /// assert_eq!(root.to_string(), "1.1856308");
     /// assert_eq!(o, Less);
     /// ```
     #[allow(clippy::needless_pass_by_value)]
@@ -1768,7 +1768,7 @@ impl Float {
     ///
     /// let (root, o) =
     ///     Float::root_s_rational_prec_round_ref(&Rational::from_signeds(3, 5), -3, 20, Nearest);
-    /// assert_eq!(root.to_string(), "1.185631");
+    /// assert_eq!(root.to_string(), "1.1856308");
     /// assert_eq!(o, Less);
     /// ```
     pub fn root_s_rational_prec_round_ref(
@@ -1840,7 +1840,7 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (root, o) = Float::root_s_rational_prec(Rational::from_signeds(27, 8), -3, 10);
-    /// assert_eq!(root.to_string(), "0.667");
+    /// assert_eq!(root.to_string(), "0.66699");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -1895,7 +1895,7 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (root, o) = Float::root_s_rational_prec_ref(&Rational::from_signeds(27, 8), -3, 10);
-    /// assert_eq!(root.to_string(), "0.667");
+    /// assert_eq!(root.to_string(), "0.66699");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -1931,7 +1931,7 @@ impl Root<u64> for Float {
     /// use malachite_base::num::arithmetic::traits::Root;
     /// use malachite_float::Float;
     ///
-    /// assert_eq!(Float::from(27.0).root(3u64).to_string(), "3.0");
+    /// assert_eq!(Float::from(27.0).root(3u64).to_string(), "3.00");
     /// ```
     #[inline]
     fn root(self, pow: u64) -> Self {
@@ -1967,7 +1967,7 @@ impl Root<u64> for &Float {
     /// use malachite_base::num::arithmetic::traits::Root;
     /// use malachite_float::Float;
     ///
-    /// assert_eq!((&Float::from(27.0)).root(3u64).to_string(), "3.0");
+    /// assert_eq!((&Float::from(27.0)).root(3u64).to_string(), "3.00");
     /// ```
     #[inline]
     fn root(self, pow: u64) -> Float {
@@ -2038,7 +2038,7 @@ impl Root<i64> for Float {
     /// use malachite_base::num::arithmetic::traits::Root;
     /// use malachite_float::Float;
     ///
-    /// assert_eq!(Float::from(8.0).root(-3i64).to_string(), "0.5");
+    /// assert_eq!(Float::from(8.0).root(-3i64).to_string(), "0.50");
     /// ```
     #[inline]
     fn root(self, pow: i64) -> Self {
@@ -2074,7 +2074,7 @@ impl Root<i64> for &Float {
     /// use malachite_base::num::arithmetic::traits::Root;
     /// use malachite_float::Float;
     ///
-    /// assert_eq!((&Float::from(8.0)).root(-3i64).to_string(), "0.5");
+    /// assert_eq!((&Float::from(8.0)).root(-3i64).to_string(), "0.50");
     /// ```
     #[inline]
     fn root(self, pow: i64) -> Float {
@@ -2109,7 +2109,7 @@ impl RootAssign<i64> for Float {
     ///
     /// let mut x = Float::from(4.0);
     /// x.root_assign(-2i64);
-    /// assert_eq!(x.to_string(), "0.5");
+    /// assert_eq!(x.to_string(), "0.50");
     /// ```
     #[inline]
     fn root_assign(&mut self, pow: i64) {

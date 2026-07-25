@@ -167,15 +167,15 @@ impl Float {
     /// assert_eq!(o, Less);
     ///
     /// let (sqrt, o) = Float::from(PI).sqrt_prec_round(20, Floor);
-    /// assert_eq!(sqrt.to_string(), "1.772453");
+    /// assert_eq!(sqrt.to_string(), "1.7724533");
     /// assert_eq!(o, Less);
     ///
     /// let (sqrt, o) = Float::from(PI).sqrt_prec_round(20, Ceiling);
-    /// assert_eq!(sqrt.to_string(), "1.772455");
+    /// assert_eq!(sqrt.to_string(), "1.7724552");
     /// assert_eq!(o, Greater);
     ///
     /// let (sqrt, o) = Float::from(PI).sqrt_prec_round(20, Nearest);
-    /// assert_eq!(sqrt.to_string(), "1.772453");
+    /// assert_eq!(sqrt.to_string(), "1.7724533");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -251,15 +251,15 @@ impl Float {
     /// assert_eq!(o, Less);
     ///
     /// let (sqrt, o) = Float::from(PI).sqrt_prec_round_ref(20, Floor);
-    /// assert_eq!(sqrt.to_string(), "1.772453");
+    /// assert_eq!(sqrt.to_string(), "1.7724533");
     /// assert_eq!(o, Less);
     ///
     /// let (sqrt, o) = Float::from(PI).sqrt_prec_round_ref(20, Ceiling);
-    /// assert_eq!(sqrt.to_string(), "1.772455");
+    /// assert_eq!(sqrt.to_string(), "1.7724552");
     /// assert_eq!(o, Greater);
     ///
     /// let (sqrt, o) = Float::from(PI).sqrt_prec_round_ref(20, Nearest);
-    /// assert_eq!(sqrt.to_string(), "1.772453");
+    /// assert_eq!(sqrt.to_string(), "1.7724533");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -347,7 +347,7 @@ impl Float {
     /// assert_eq!(o, Less);
     ///
     /// let (sqrt, o) = Float::from(PI).sqrt_prec(20);
-    /// assert_eq!(sqrt.to_string(), "1.772453");
+    /// assert_eq!(sqrt.to_string(), "1.7724533");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -408,7 +408,7 @@ impl Float {
     /// assert_eq!(o, Less);
     ///
     /// let (sqrt, o) = Float::from(PI).sqrt_prec_ref(20);
-    /// assert_eq!(sqrt.to_string(), "1.772453");
+    /// assert_eq!(sqrt.to_string(), "1.7724533");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -471,15 +471,15 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (sqrt, o) = Float::from(PI).sqrt_round(Floor);
-    /// assert_eq!(sqrt.to_string(), "1.772453850905515");
+    /// assert_eq!(sqrt.to_string(), "1.7724538509055154");
     /// assert_eq!(o, Less);
     ///
     /// let (sqrt, o) = Float::from(PI).sqrt_round(Ceiling);
-    /// assert_eq!(sqrt.to_string(), "1.772453850905517");
+    /// assert_eq!(sqrt.to_string(), "1.7724538509055172");
     /// assert_eq!(o, Greater);
     ///
     /// let (sqrt, o) = Float::from(PI).sqrt_round(Nearest);
-    /// assert_eq!(sqrt.to_string(), "1.772453850905515");
+    /// assert_eq!(sqrt.to_string(), "1.7724538509055154");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -543,15 +543,15 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (sqrt, o) = Float::from(PI).sqrt_round_ref(Floor);
-    /// assert_eq!(sqrt.to_string(), "1.772453850905515");
+    /// assert_eq!(sqrt.to_string(), "1.7724538509055154");
     /// assert_eq!(o, Less);
     ///
     /// let (sqrt, o) = Float::from(PI).sqrt_round_ref(Ceiling);
-    /// assert_eq!(sqrt.to_string(), "1.772453850905517");
+    /// assert_eq!(sqrt.to_string(), "1.7724538509055172");
     /// assert_eq!(o, Greater);
     ///
     /// let (sqrt, o) = Float::from(PI).sqrt_round_ref(Nearest);
-    /// assert_eq!(sqrt.to_string(), "1.772453850905515");
+    /// assert_eq!(sqrt.to_string(), "1.7724538509055154");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -622,15 +622,15 @@ impl Float {
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.sqrt_prec_round_assign(20, Floor), Less);
-    /// assert_eq!(x.to_string(), "1.772453");
+    /// assert_eq!(x.to_string(), "1.7724533");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.sqrt_prec_round_assign(20, Ceiling), Greater);
-    /// assert_eq!(x.to_string(), "1.772455");
+    /// assert_eq!(x.to_string(), "1.7724552");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.sqrt_prec_round_assign(20, Nearest), Less);
-    /// assert_eq!(x.to_string(), "1.772453");
+    /// assert_eq!(x.to_string(), "1.7724533");
     /// ```
     #[inline]
     pub fn sqrt_prec_round_assign(&mut self, prec: u64, rm: RoundingMode) -> Ordering {
@@ -708,7 +708,7 @@ impl Float {
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.sqrt_prec_assign(20), Less);
-    /// assert_eq!(x.to_string(), "1.772453");
+    /// assert_eq!(x.to_string(), "1.7724533");
     /// ```
     #[inline]
     pub fn sqrt_prec_assign(&mut self, prec: u64) -> Ordering {
@@ -765,15 +765,15 @@ impl Float {
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.sqrt_round_assign(Floor), Less);
-    /// assert_eq!(x.to_string(), "1.772453850905515");
+    /// assert_eq!(x.to_string(), "1.7724538509055154");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.sqrt_round_assign(Ceiling), Greater);
-    /// assert_eq!(x.to_string(), "1.772453850905517");
+    /// assert_eq!(x.to_string(), "1.7724538509055172");
     ///
     /// let mut x = Float::from(PI);
     /// assert_eq!(x.sqrt_round_assign(Nearest), Less);
-    /// assert_eq!(x.to_string(), "1.772453850905515");
+    /// assert_eq!(x.to_string(), "1.7724538509055154");
     /// ```
     #[inline]
     pub fn sqrt_round_assign(&mut self, rm: RoundingMode) -> Ordering {
@@ -850,32 +850,32 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (sqrt, o) = Float::sqrt_rational_prec_round(Rational::from_unsigneds(3u8, 5), 5, Floor);
-    /// assert_eq!(sqrt.to_string(), "0.75");
+    /// assert_eq!(sqrt.to_string(), "0.750");
     /// assert_eq!(o, Less);
     ///
     /// let (sqrt, o) =
     ///     Float::sqrt_rational_prec_round(Rational::from_unsigneds(3u8, 5), 5, Ceiling);
-    /// assert_eq!(sqrt.to_string(), "0.78");
+    /// assert_eq!(sqrt.to_string(), "0.781");
     /// assert_eq!(o, Greater);
     ///
     /// let (sqrt, o) =
     ///     Float::sqrt_rational_prec_round(Rational::from_unsigneds(3u8, 5), 5, Nearest);
-    /// assert_eq!(sqrt.to_string(), "0.78");
+    /// assert_eq!(sqrt.to_string(), "0.781");
     /// assert_eq!(o, Greater);
     ///
     /// let (sqrt, o) =
     ///     Float::sqrt_rational_prec_round(Rational::from_unsigneds(3u8, 5), 20, Floor);
-    /// assert_eq!(sqrt.to_string(), "0.774596");
+    /// assert_eq!(sqrt.to_string(), "0.77459621");
     /// assert_eq!(o, Less);
     ///
     /// let (sqrt, o) =
     ///     Float::sqrt_rational_prec_round(Rational::from_unsigneds(3u8, 5), 20, Ceiling);
-    /// assert_eq!(sqrt.to_string(), "0.774597");
+    /// assert_eq!(sqrt.to_string(), "0.77459717");
     /// assert_eq!(o, Greater);
     ///
     /// let (sqrt, o) =
     ///     Float::sqrt_rational_prec_round(Rational::from_unsigneds(3u8, 5), 20, Nearest);
-    /// assert_eq!(sqrt.to_string(), "0.774596");
+    /// assert_eq!(sqrt.to_string(), "0.77459621");
     /// assert_eq!(o, Less);
     /// ```
     pub fn sqrt_rational_prec_round(x: Rational, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
@@ -996,32 +996,32 @@ impl Float {
     ///
     /// let (sqrt, o) =
     ///     Float::sqrt_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 5, Floor);
-    /// assert_eq!(sqrt.to_string(), "0.75");
+    /// assert_eq!(sqrt.to_string(), "0.750");
     /// assert_eq!(o, Less);
     ///
     /// let (sqrt, o) =
     ///     Float::sqrt_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 5, Ceiling);
-    /// assert_eq!(sqrt.to_string(), "0.78");
+    /// assert_eq!(sqrt.to_string(), "0.781");
     /// assert_eq!(o, Greater);
     ///
     /// let (sqrt, o) =
     ///     Float::sqrt_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 5, Nearest);
-    /// assert_eq!(sqrt.to_string(), "0.78");
+    /// assert_eq!(sqrt.to_string(), "0.781");
     /// assert_eq!(o, Greater);
     ///
     /// let (sqrt, o) =
     ///     Float::sqrt_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 20, Floor);
-    /// assert_eq!(sqrt.to_string(), "0.774596");
+    /// assert_eq!(sqrt.to_string(), "0.77459621");
     /// assert_eq!(o, Less);
     ///
     /// let (sqrt, o) =
     ///     Float::sqrt_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 20, Ceiling);
-    /// assert_eq!(sqrt.to_string(), "0.774597");
+    /// assert_eq!(sqrt.to_string(), "0.77459717");
     /// assert_eq!(o, Greater);
     ///
     /// let (sqrt, o) =
     ///     Float::sqrt_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 20, Nearest);
-    /// assert_eq!(sqrt.to_string(), "0.774596");
+    /// assert_eq!(sqrt.to_string(), "0.77459621");
     /// assert_eq!(o, Less);
     /// ```
     pub fn sqrt_rational_prec_round_ref(
@@ -1137,11 +1137,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (sqrt, o) = Float::sqrt_rational_prec(Rational::from_unsigneds(3u8, 5), 5);
-    /// assert_eq!(sqrt.to_string(), "0.78");
+    /// assert_eq!(sqrt.to_string(), "0.781");
     /// assert_eq!(o, Greater);
     ///
     /// let (sqrt, o) = Float::sqrt_rational_prec(Rational::from_unsigneds(3u8, 5), 20);
-    /// assert_eq!(sqrt.to_string(), "0.774596");
+    /// assert_eq!(sqrt.to_string(), "0.77459621");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -1213,11 +1213,11 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (sqrt, o) = Float::sqrt_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 5);
-    /// assert_eq!(sqrt.to_string(), "0.78");
+    /// assert_eq!(sqrt.to_string(), "0.781");
     /// assert_eq!(o, Greater);
     ///
     /// let (sqrt, o) = Float::sqrt_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 20);
-    /// assert_eq!(sqrt.to_string(), "0.774596");
+    /// assert_eq!(sqrt.to_string(), "0.77459621");
     /// assert_eq!(o, Less);
     /// ```
     #[inline]
@@ -1276,7 +1276,7 @@ impl Float {
     /// assert_eq!(o, Greater);
     ///
     /// let (sqrt, o) = Float::sqrt_unsigned_prec_round(4, 10, Exact);
-    /// assert_eq!(sqrt.to_string(), "2.0");
+    /// assert_eq!(sqrt.to_string(), "2.0000");
     /// assert_eq!(o, Equal);
     /// ```
     ///

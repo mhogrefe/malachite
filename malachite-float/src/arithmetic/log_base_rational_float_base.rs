@@ -247,7 +247,7 @@ impl Float {
     ///     10,
     ///     Exact,
     /// );
-    /// assert_eq!(log.to_string(), "1.5"); // log_4(8) = 3/2
+    /// assert_eq!(log.to_string(), "1.5000"); // log_4(8) = 3/2
     /// assert_eq!(o, Equal);
     ///
     /// let (log, o) = Float::log_base_rational_float_base_prec_round(
@@ -256,7 +256,7 @@ impl Float {
     ///     10,
     ///     Exact,
     /// );
-    /// assert_eq!(log.to_string(), "-2.0"); // log_{1/2}(4) = -2
+    /// assert_eq!(log.to_string(), "-2.0000"); // log_{1/2}(4) = -2
     /// assert_eq!(o, Equal);
     /// ```
     #[allow(clippy::needless_pass_by_value)]
@@ -302,7 +302,7 @@ impl Float {
     ///     10,
     ///     Exact,
     /// );
-    /// assert_eq!(log.to_string(), "2.0"); // log_3(9) = 2
+    /// assert_eq!(log.to_string(), "2.0000"); // log_3(9) = 2
     /// assert_eq!(o, Equal);
     ///
     /// let (log, o) = Float::log_base_rational_float_base_prec_round_ref(
@@ -311,7 +311,7 @@ impl Float {
     ///     10,
     ///     Exact,
     /// );
-    /// assert_eq!(log.to_string(), "-1.0"); // log_3(1/3) = -1
+    /// assert_eq!(log.to_string(), "-1.0000"); // log_3(1/3) = -1
     /// assert_eq!(o, Equal);
     /// ```
     pub fn log_base_rational_float_base_prec_round_ref(
@@ -348,7 +348,7 @@ impl Float {
     ///
     /// let (log, o) =
     ///     Float::log_base_rational_float_base_prec(Rational::from(8), Float::from(4), 10);
-    /// assert_eq!(log.to_string(), "1.5"); // log_4(8) = 3/2
+    /// assert_eq!(log.to_string(), "1.5000"); // log_4(8) = 3/2
     /// assert_eq!(o, Equal);
     /// ```
     #[allow(clippy::needless_pass_by_value)]
@@ -385,7 +385,7 @@ impl Float {
     ///
     /// let (log, o) =
     ///     Float::log_base_rational_float_base_prec_ref(&Rational::from(9), &Float::from(3), 10);
-    /// assert_eq!(log.to_string(), "2.0"); // log_3(9) = 2
+    /// assert_eq!(log.to_string(), "2.0000"); // log_3(9) = 2
     /// assert_eq!(o, Equal);
     /// ```
     #[inline]
