@@ -256,6 +256,19 @@ Flags rounding one of the named [`Float`] constants that are exact at every prec
 (by value or by reference). The rounding is a no-op: the rounding mode is dead and the ordering is
 always `Equal`, so write the dedicated constructor, `(Float::one_prec(prec), Equal)`.
 
+### `redundant_shift_conversion`
+
+Flags a shift whose amount is first converted to another integer type, as in
+`x << i64::exact_from(n)`, when the shift already accepts the amount's own type (checked by
+resolving the `Shl`/`Shr`/`ShlAssign`/`ShrAssign` impl). Shifting is implemented for every
+primitive integer on the right, so the conversion buys nothing and only hides the amount.
+
+Conversions that are load-bearing are left alone: converting a *signed* amount to an *unsigned*
+type asserts that the amount is non-negative, and dropping it would silently reverse the shift,
+because Malachite shifts the other way when the amount is negative (see the signed-shift idiom).
+Among the conversions that are flagged, the conversion still panics on an out-of-range amount, so
+keep it where that panic is the point.
+
 ### `compare_with_primitive`
 
 Flags comparing a bignum with a named bignum constant (`ZERO`, `ONE`, `TWO`, `NEGATIVE_ONE`) or
@@ -288,8 +301,14 @@ the low end to `MIN`, not 0, which would differ.
 
 ### `use_divisible_by`
 
-Flags `x % b == 0` or `x % b != 0` for a primitive integer, `Natural`, or `Integer`: use
+Flags a remainder compared with zero for a primitive integer, `Natural`, or `Integer`: use
 `x.divisible_by(b)` (or `!x.divisible_by(b)`). Divisor 2 is excluded and left to `use_parity`.
+
+Both spellings of the remainder are caught, since every one of them vanishes exactly when `b`
+divides `x`: the `%` operator and `x.rem_euclid(b)`. The comparison an assertion generates is
+caught too — `assert_eq!(x % b, 0)`, `assert_ne!`, and their `debug_` forms — by recovering the
+macro's arguments from the expansion, since the comparison it expands to no longer mentions the
+remainder.
 
 ### `use_width_mask`
 

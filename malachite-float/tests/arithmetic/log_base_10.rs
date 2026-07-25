@@ -1700,25 +1700,26 @@ fn log_base_10_rational_prec_properties() {
 
 #[test]
 fn test_log_base_10_rational_prec_round() {
-    let test = |n: i64, d: u64, prec: u64, rm: RoundingMode, out: &str, out_hex: &str, o_out: Ordering| {
-        let x = Rational::from_signeds(n, i64::exact_from(d));
-        let (log, o) = Float::log_base_10_rational_prec_round(x.clone(), prec, rm);
-        assert!(log.is_valid());
-        assert_eq!(log.to_string(), out);
-        assert_eq!(to_hex_string(&log), out_hex);
-        assert_eq!(o, o_out);
-        let (log_alt, o_alt) = Float::log_base_10_rational_prec_round_ref(&x, prec, rm);
-        assert_eq!(ComparableFloatRef(&log_alt), ComparableFloatRef(&log));
-        assert_eq!(o_alt, o);
-        if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm) {
-            let (rl, ro) = rug_log_base_10_rational_prec_round(&x, prec, rug_rm);
-            assert_eq!(
-                ComparableFloatRef(&Float::from(&rl)),
-                ComparableFloatRef(&log)
-            );
-            assert_eq!(ro, o);
-        }
-    };
+    let test =
+        |n: i64, d: u64, prec: u64, rm: RoundingMode, out: &str, out_hex: &str, o_out: Ordering| {
+            let x = Rational::from_signeds(n, i64::exact_from(d));
+            let (log, o) = Float::log_base_10_rational_prec_round(x.clone(), prec, rm);
+            assert!(log.is_valid());
+            assert_eq!(log.to_string(), out);
+            assert_eq!(to_hex_string(&log), out_hex);
+            assert_eq!(o, o_out);
+            let (log_alt, o_alt) = Float::log_base_10_rational_prec_round_ref(&x, prec, rm);
+            assert_eq!(ComparableFloatRef(&log_alt), ComparableFloatRef(&log));
+            assert_eq!(o_alt, o);
+            if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm) {
+                let (rl, ro) = rug_log_base_10_rational_prec_round(&x, prec, rug_rm);
+                assert_eq!(
+                    ComparableFloatRef(&Float::from(&rl)),
+                    ComparableFloatRef(&log)
+                );
+                assert_eq!(ro, o);
+            }
+        };
     test(3, 5, 20, Floor, "-0.22184896", "-0x0.38cb18#20", Less);
     test(3, 5, 20, Ceiling, "-0.22184873", "-0x0.38cb14#20", Greater);
     test(3, 5, 20, Nearest, "-0.22184873", "-0x0.38cb14#20", Greater);
@@ -1729,8 +1730,24 @@ fn test_log_base_10_rational_prec_round() {
     test(1, 8, 20, Ceiling, "-0.90308952", "-0x0.e730e#20", Greater);
     test(1, 8, 20, Nearest, "-0.90308952", "-0x0.e730e#20", Greater);
     test(7, 1, 30, Floor, "0.84509803914", "0x0.d8585858#30", Less);
-    test(7, 1, 30, Ceiling, "0.84509804007", "0x0.d858585c#30", Greater);
-    test(7, 1, 30, Nearest, "0.84509804007", "0x0.d858585c#30", Greater);
+    test(
+        7,
+        1,
+        30,
+        Ceiling,
+        "0.84509804007",
+        "0x0.d858585c#30",
+        Greater,
+    );
+    test(
+        7,
+        1,
+        30,
+        Nearest,
+        "0.84509804007",
+        "0x0.d858585c#30",
+        Greater,
+    );
     test(50, 1, 10, Floor, "1.6973", "0x1.b28#10", Less);
     test(50, 1, 10, Ceiling, "1.6992", "0x1.b30#10", Greater);
     test(50, 1, 10, Nearest, "1.6992", "0x1.b30#10", Greater);

@@ -17,7 +17,7 @@ use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn, floa
 use core::cmp::Ordering::{self, *};
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    Abs, CeilingLogBase2, CheckedRoot, DivisibleBy, IsPowerOf2, Parity, Reciprocal, Root,
+    Abs, CeilingLogBase2, CheckedRoot, DivRound, DivisibleBy, IsPowerOf2, Parity, Reciprocal, Root,
     RootAssign, RootRem, Sign,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
@@ -45,17 +45,13 @@ fn root_u_exact(x: &Float, k: u64, prec: u64) -> (Float, Ordering) {
     let m_odd = m >> nu;
     let e =
         i128::from(x.get_exponent().unwrap()) - i128::from(m.significant_bits()) + i128::from(nu);
-    let ki = i128::from(k);
-    assert_eq!(e.rem_euclid(ki), 0, "Inexact root");
-    let root = (&m_odd).checked_root(k).expect("Inexact root");
-    let (root, o) = Float::from_natural_prec_round(root, prec, Exact);
-    debug_assert_eq!(o, Equal);
-    let root = root << i64::exact_from(e / ki);
-    if x.is_sign_negative() {
-        (-root, Equal)
-    } else {
-        (root, Equal)
-    }
+    let root = Float::from_natural_prec_round(
+        (&m_odd).checked_root(k).expect("Inexact root"),
+        prec,
+        Exact,
+    )
+    .0 << e.div_round(i128::from(k), Exact).0;
+    (if x.is_sign_negative() { -root } else { root }, Equal)
 }
 
 // The integer-root path for 2 <= k <= 100: scale the significand m so that its integer kth root has
@@ -119,12 +115,12 @@ fn root_u_integer(x: &Float, k: u64, prec: u64, rm: RoundingMode) -> (Float, Ord
         // Rounding modes are inverted for negative x, since the rounding decision below is made on
         // the magnitude.
         let rm_abs = if negative { -rm } else { rm };
-        if rm_abs == Ceiling || rm_abs == Up || (rm_abs == Nearest && root.odd()) {
+        o = if rm_abs == Ceiling || rm_abs == Up || (rm_abs == Nearest && root.odd()) {
             root += Natural::ONE;
-            o = Greater;
+            Greater
         } else {
-            o = Less;
-        }
+            Less
+        };
     }
     // Either o is not `Equal` and the conversion is exact, or o is `Equal` and the conversion
     // rounds only when rm is `Nearest` and the exact root has n = prec + 1 bits (a midpoint).
@@ -133,10 +129,9 @@ fn root_u_integer(x: &Float, k: u64, prec: u64, rm: RoundingMode) -> (Float, Ord
     if o == Equal {
         o = o2;
     }
-    debug_assert_eq!(e.rem_euclid(ki), 0);
     // The result's exponent is about EXP(x) / k, always within the exponent range for k >= 2, so
     // the shift is exact and cannot overflow or underflow.
-    let y = y << i64::exact_from(e / ki);
+    let y = y << e.div_round(ki, Exact).0;
     if negative { (-y, o.reverse()) } else { (y, o) }
 }
 

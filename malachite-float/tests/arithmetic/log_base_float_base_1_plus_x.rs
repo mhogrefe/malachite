@@ -113,8 +113,7 @@ fn test_log_base_float_base_1_plus_x_prec_round() {
     // Exact, non-integer base.
     test(7.0, 4.0, 10, Exact, "1.5000", "0x1.800#10", Equal); // log_4(8) = 3/2
     test(1.0, 4.0, 10, Exact, "0.50000", "0x0.800#10", Equal); // log_4(1 + 1) = log_4(2) = 1/2
-    // Exact, base in (0, 1): sign-flipped.
-    // log_{1/2}(1 + 3) = log_{1/2}(4) = -2
+    // Exact, base in (0, 1): sign-flipped. log_{1/2}(1 + 3) = log_{1/2}(4) = -2
     test(3.0, 0.5, 10, Exact, "-2.0000", "-0x2.00#10", Equal);
     test(-0.75, 0.5, 10, Exact, "2.0000", "0x2.00#10", Equal); // log_{1/2}(1/4) = 2
     // Exact, fractional root (base 3/2): 1 + x = (3/2)^m.

@@ -282,13 +282,14 @@ fn log_base_10_1_plus_x_underflow() {
 
 #[test]
 fn test_log_base_10_1_plus_x_prec_round() {
-    let test = |n: i64, d: u64, prec: u64, rm: RoundingMode, out: &str, out_hex: &str, o_out: Ordering| {
-        let x = Float::exact_from(malachite_q::Rational::from_signeds(n, i64::exact_from(d)));
-        let (log, o) = check(&x, prec, rm);
-        assert_eq!(log.to_string(), out);
-        assert_eq!(to_hex_string(&log), out_hex);
-        assert_eq!(o, o_out);
-    };
+    let test =
+        |n: i64, d: u64, prec: u64, rm: RoundingMode, out: &str, out_hex: &str, o_out: Ordering| {
+            let x = Float::exact_from(malachite_q::Rational::from_signeds(n, i64::exact_from(d)));
+            let (log, o) = check(&x, prec, rm);
+            assert_eq!(log.to_string(), out);
+            assert_eq!(to_hex_string(&log), out_hex);
+            assert_eq!(o, o_out);
+        };
     test(9, 1, 10, Floor, "1.0000", "0x1.000#10", Equal);
     test(9, 1, 10, Ceiling, "1.0000", "0x1.000#10", Equal);
     test(9, 1, 10, Nearest, "1.0000", "0x1.000#10", Equal);
@@ -308,8 +309,24 @@ fn test_log_base_10_1_plus_x_prec_round() {
     test(1, 1, 20, Ceiling, "0.30103016", "0x0.4d1050#20", Greater);
     test(1, 1, 20, Nearest, "0.30103016", "0x0.4d1050#20", Greater);
     test(7, 1, 30, Floor, "0.90308998618", "0x0.e730e7c4#30", Less);
-    test(7, 1, 30, Ceiling, "0.90308998711", "0x0.e730e7c8#30", Greater);
-    test(7, 1, 30, Nearest, "0.90308998711", "0x0.e730e7c8#30", Greater);
+    test(
+        7,
+        1,
+        30,
+        Ceiling,
+        "0.90308998711",
+        "0x0.e730e7c8#30",
+        Greater,
+    );
+    test(
+        7,
+        1,
+        30,
+        Nearest,
+        "0.90308998711",
+        "0x0.e730e7c8#30",
+        Greater,
+    );
     test(-1, 2, 20, Floor, "-0.30103016", "-0x0.4d1050#20", Less);
     test(-1, 2, 20, Ceiling, "-0.30102968", "-0x0.4d1048#20", Greater);
     test(-1, 2, 20, Nearest, "-0.30103016", "-0x0.4d1050#20", Less);

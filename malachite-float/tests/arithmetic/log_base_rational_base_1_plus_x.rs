@@ -113,13 +113,12 @@ fn test_log_base_rational_base_1_plus_x_prec_round() {
     test(8, 1, 9, 1, 10, Exact, "1.0000", "0x1.000#10", Equal); // log_9(1 + 8) = log_9(9) = 1
     test(3, 1, 4, 1, 10, Exact, "1.0000", "0x1.000#10", Equal); // log_4(1 + 3) = log_4(4) = 1
     test(1, 1, 4, 1, 10, Exact, "0.50000", "0x0.800#10", Equal); // log_4(1 + 1) = log_4(2) = 1/2
-    // Exact, rational base, including a non-integer x (dyadic root 3/2).
-    // log_{3/2}(1 + 1/2) = log_{3/2}(3/2) = 1
+    // Exact, rational base, including a non-integer x (dyadic root 3/2). log_{3/2}(1 + 1/2) =
+    // log_{3/2}(3/2) = 1
     test(1, 2, 3, 2, 10, Exact, "1.0000", "0x1.000#10", Equal);
     // log_{3/2}(1 + 5/4) = log_{3/2}(9/4) = 2
     test(5, 4, 3, 2, 10, Exact, "2.0000", "0x2.00#10", Equal);
-    // x in (-1, 0): negative result.
-    // log_4(1 - 1/2) = log_4(1/2) = -1/2
+    // x in (-1, 0): negative result. log_4(1 - 1/2) = log_4(1/2) = -1/2
     test(-1, 2, 4, 1, 10, Exact, "-0.50000", "-0x0.800#10", Equal);
     // log_4(1 - 3/4) = log_4(1/4) = -1
     test(-3, 4, 4, 1, 10, Exact, "-1.0000", "-0x1.000#10", Equal);

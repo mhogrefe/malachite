@@ -1,4 +1,4 @@
-error: testing divisibility with `% b == 0`
+error: testing divisibility by comparing a remainder with zero
   --> $DIR/use_divisible_by.rs:7:13
    |
 LL |     let _ = n % b == 0;
@@ -7,7 +7,7 @@ LL |     let _ = n % b == 0;
    = help: use `n.divisible_by(b)`
    = note: `#[deny(use_divisible_by)]` on by default
 
-error: testing divisibility with `% b == 0`
+error: testing divisibility by comparing a remainder with zero
   --> $DIR/use_divisible_by.rs:8:13
    |
 LL |     let _ = n % 3 != 0;
@@ -15,7 +15,7 @@ LL |     let _ = n % 3 != 0;
    |
    = help: use `!n.divisible_by(3)`
 
-error: testing divisibility with `% b == 0`
+error: testing divisibility by comparing a remainder with zero
   --> $DIR/use_divisible_by.rs:12:13
    |
 LL |     let _ = &x % &three == 0u32;
@@ -23,5 +23,29 @@ LL |     let _ = &x % &three == 0u32;
    |
    = help: use `x.divisible_by(&three)`
 
-error: aborting due to 3 previous errors
+error: testing divisibility by comparing a remainder with zero
+  --> $DIR/use_divisible_by.rs:15:13
+   |
+LL |     let _ = i.rem_euclid(5) == 0;
+   |             ^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: use `i.divisible_by(5)`
+
+error: testing divisibility by comparing a remainder with zero
+  --> $DIR/use_divisible_by.rs:17:5
+   |
+LL |     assert_eq!(n % b, 0);
+   |     ^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: use `assert!(n.divisible_by(b))`, keeping any message
+
+error: testing divisibility by comparing a remainder with zero
+  --> $DIR/use_divisible_by.rs:18:5
+   |
+LL |     assert_ne!(i.rem_euclid(5), 0, "not divisible");
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: use `assert!(!i.divisible_by(5))`, keeping any message
+
+error: aborting due to 6 previous errors
 

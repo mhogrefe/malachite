@@ -1,0 +1,27 @@
+error: converting a shift amount to a type the shift already accepts
+  --> $DIR/redundant_shift_conversion.rs:10:18
+   |
+LL |     let a = x << i64::exact_from(n);
+   |                  ^^^^^^^^^^^^^^^^^^
+   |
+   = help: shift by the amount itself: `<< n`
+   = note: `#[deny(redundant_shift_conversion)]` on by default
+
+error: converting a shift amount to a type the shift already accepts
+  --> $DIR/redundant_shift_conversion.rs:13:11
+   |
+LL |     b <<= i64::exact_from(n);
+   |           ^^^^^^^^^^^^^^^^^^
+   |
+   = help: shift by the amount itself: `<<= n`
+
+error: converting a shift amount to a type the shift already accepts
+  --> $DIR/redundant_shift_conversion.rs:15:18
+   |
+LL |     let c = x >> u64::from(m);
+   |                  ^^^^^^^^^^^^
+   |
+   = help: shift by the amount itself: `>> m`
+
+error: aborting due to 3 previous errors
+

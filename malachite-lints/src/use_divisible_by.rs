@@ -7,28 +7,33 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use clippy_utils::diagnostics::span_lint_and_help;
+use clippy_utils::macros::{find_assert_eq_args, root_macro_call_first_node};
 use clippy_utils::source::snippet;
 use rustc_hir::{BinOpKind, Expr, ExprKind};
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_middle::ty::Ty;
 use rustc_session::{declare_lint, declare_lint_pass};
+use rustc_span::sym;
 
 declare_lint! {
     /// ### What it does
     ///
-    /// Flags divisibility tests of an integer (a primitive, `Natural`, or `Integer`) spelled as
-    /// `x % b == 0` or `x % b != 0`.
+    /// Flags divisibility tests of an integer (a primitive, `Natural`, or `Integer`) spelled as a
+    /// remainder compared with zero: `x % b == 0`, `x % b != 0`, or the same with
+    /// `x.rem_euclid(b)`.
     ///
     /// ### Why is this bad?
     ///
     /// `divisible_by(b)` says what is being asked, and for the bignum types it avoids computing and
     /// allocating the full remainder. (The `b == 2` case has its own `even()`/`odd()` spelling; see
-    /// `use_parity`.)
+    /// `use_parity`.) Every remainder operation vanishes exactly when `b` divides `x`, however it
+    /// resolves the sign, so which one is used makes no difference to the test.
     ///
     /// ### Example
     ///
     /// ```rust,ignore
     /// if x % b == 0 { .. }
+    /// if x.rem_euclid(b) == 0 { .. }
     /// ```
     ///
     /// Use instead:
@@ -38,7 +43,7 @@ declare_lint! {
     /// ```
     pub USE_DIVISIBLE_BY,
     Deny,
-    "testing divisibility with `% b == 0` instead of `divisible_by(b)`"
+    "testing divisibility with a remainder and zero instead of `divisible_by(b)`"
 }
 
 declare_lint_pass!(UseDivisibleBy => [USE_DIVISIBLE_BY]);
@@ -49,28 +54,38 @@ fn has_divisible_by<'tcx>(cx: &LateContext<'tcx>, ty: Ty<'tcx>) -> bool {
     ty.is_integral() || matches!(crate::bignum_name(cx, ty), Some("Natural" | "Integer"))
 }
 
-impl<'tcx> LateLintPass<'tcx> for UseDivisibleBy {
-    fn check_expr(&mut self, cx: &LateContext<'tcx>, expr: &'tcx Expr<'tcx>) {
-        if expr.span.from_expansion() || crate::in_test_code(cx, expr.span) {
-            return;
+// The dividend and divisor of `x % b` or `x.rem_euclid(b)`. Every remainder is zero exactly when
+// `b` divides `x`, so which one is used makes no difference to a divisibility test.
+fn remainder<'tcx>(e: &'tcx Expr<'tcx>) -> Option<(&'tcx Expr<'tcx>, &'tcx Expr<'tcx>)> {
+    match e.kind {
+        ExprKind::Binary(op, x, b) if op.node == BinOpKind::Rem => Some((x, b)),
+        ExprKind::MethodCall(segment, x, [b], _) if segment.ident.name.as_str() == "rem_euclid" => {
+            Some((x, b))
         }
-        // `x % b == 0` or `x % b != 0`.
-        let ExprKind::Binary(op, lhs, rhs) = expr.kind else {
-            return;
-        };
-        if !matches!(op.node, BinOpKind::Eq | BinOpKind::Ne) {
-            return;
-        }
-        for (rem, zero) in [(lhs, rhs), (rhs, lhs)] {
+        _ => None,
+    }
+}
+
+impl UseDivisibleBy {
+    // Reports a remainder-with-zero pair, whichever way round it is written. `negated` selects
+    // `!x.divisible_by(b)`, and `assertion` names the `assert!` form to wrap it in when the pair
+    // came from an `assert_eq!`.
+    fn check_pair<'tcx>(
+        &self,
+        cx: &LateContext<'tcx>,
+        span: rustc_span::Span,
+        left: &'tcx Expr<'tcx>,
+        right: &'tcx Expr<'tcx>,
+        negated: bool,
+        assertion: Option<&str>,
+    ) -> bool {
+        for (rem, zero) in [(left, right), (right, left)] {
             if crate::literal_value(zero) != Some(0) {
                 continue;
             }
-            let ExprKind::Binary(rem_op, x, b) = rem.kind else {
+            let Some((x, b)) = remainder(rem) else {
                 continue;
             };
-            if rem_op.node != BinOpKind::Rem {
-                continue;
-            }
             // `% 2` (including `% T::TWO`) is `use_parity`'s job.
             if crate::is_int_const(cx, b, 2, "TWO") {
                 continue;
@@ -79,20 +94,64 @@ impl<'tcx> LateLintPass<'tcx> for UseDivisibleBy {
             if !has_divisible_by(cx, cx.typeck_results().expr_ty(x_inner).peel_refs()) {
                 continue;
             }
-            let bang = if op.node == BinOpKind::Eq { "" } else { "!" };
+            let bang = if negated { "!" } else { "" };
+            let test = format!(
+                "{bang}{}.divisible_by({})",
+                snippet(cx, x_inner.span, ".."),
+                snippet(cx, b.span, ".."),
+            );
+            let help = match assertion {
+                Some(name) => format!("use `{name}({test})`, keeping any message"),
+                None => format!("use `{test}`"),
+            };
             span_lint_and_help(
                 cx,
                 USE_DIVISIBLE_BY,
-                expr.span,
-                "testing divisibility with `% b == 0`",
+                span,
+                "testing divisibility by comparing a remainder with zero",
                 None,
-                format!(
-                    "use `{bang}{}.divisible_by({})`",
-                    snippet(cx, x_inner.span, ".."),
-                    snippet(cx, b.span, ".."),
-                ),
+                help,
             );
+            return true;
+        }
+        false
+    }
+}
+
+impl<'tcx> LateLintPass<'tcx> for UseDivisibleBy {
+    fn check_expr(&mut self, cx: &LateContext<'tcx>, expr: &'tcx Expr<'tcx>) {
+        if crate::in_test_code(cx, expr.span) {
             return;
         }
+        // `assert_eq!(x % b, 0)` and friends: the comparison itself is generated by the macro, so
+        // the operands have to be recovered from the expansion.
+        if let Some(macro_call) = root_macro_call_first_node(cx, expr) {
+            let negated = match cx.tcx.get_diagnostic_name(macro_call.def_id) {
+                Some(sym::assert_eq_macro | sym::debug_assert_eq_macro) => false,
+                Some(sym::assert_ne_macro | sym::debug_assert_ne_macro) => true,
+                _ => return,
+            };
+            let name = cx.tcx.item_name(macro_call.def_id);
+            let assertion = if name.as_str().starts_with("debug_") {
+                "debug_assert!"
+            } else {
+                "assert!"
+            };
+            if let Some((left, right, _)) = find_assert_eq_args(cx, expr, macro_call.expn) {
+                self.check_pair(cx, macro_call.span, left, right, negated, Some(assertion));
+            }
+            return;
+        }
+        if expr.span.from_expansion() {
+            return;
+        }
+        // `x % b == 0`, `x.rem_euclid(b) == 0`, or either with `!=`.
+        let ExprKind::Binary(op, lhs, rhs) = expr.kind else {
+            return;
+        };
+        if !matches!(op.node, BinOpKind::Eq | BinOpKind::Ne) {
+            return;
+        }
+        self.check_pair(cx, expr.span, lhs, rhs, op.node == BinOpKind::Ne, None);
     }
 }

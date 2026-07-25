@@ -204,5 +204,13 @@ general-case tests — every one of them corresponds to a real bug class found i
 - **Ternary values are part of the contract**: `Equal` means the result is exactly the
   mathematical value. A coincidentally-exact intermediate rounding must not produce `Equal` for a
   transcendental result; the property tests check this against rug.
-- Float `to_string` currently renders extreme-magnitude values as `too_big`/`too_small`; use the
-  `{:#x}` `ComparableFloat` debug format in tests and debug strings.
+- **`Float`'s `Display` renders every value**, including extreme magnitudes (it is built on
+  `get_str`, which is why `4.6e301029995` prints fine). It shows the round-trip digit count for
+  the value's precision — `1 + ceil(p log10(2))` significant digits, trailing zeros included — so
+  the same value at different precisions prints differently, and a printed string alone does not
+  pin down a `Float`.
+- **Label a `Float` with both forms in tests**: the decimal `Display` string and, alongside it, the
+  `{:#x}` `ComparableFloat` form, which is exact and carries the precision (`0x1.8#2`). By
+  convention the hex argument is named after the decimal one plus `_hex` (`out` / `out_hex`), and
+  the hex is the source of truth: `parse_hex_string` reads it, and a decimal expectation can always
+  be recomputed from it. Debug output should likewise print the hex form.

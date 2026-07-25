@@ -35,6 +35,7 @@ mod redundant_from_in_comparison;
 mod redundant_from_in_literal_comparison;
 mod redundant_nearest;
 mod redundant_prec_round_of_exact_constant;
+mod redundant_shift_conversion;
 mod runtime_literal_conversion;
 mod shift_of_one;
 mod use_assign_variant;
@@ -316,6 +317,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         redundant_from_in_literal_comparison::REDUNDANT_FROM_IN_LITERAL_COMPARISON,
         redundant_nearest::REDUNDANT_NEAREST,
         redundant_prec_round_of_exact_constant::REDUNDANT_PREC_ROUND_OF_EXACT_CONSTANT,
+        redundant_shift_conversion::REDUNDANT_SHIFT_CONVERSION,
         runtime_literal_conversion::RUNTIME_LITERAL_CONVERSION,
         shift_of_one::SHIFT_OF_ONE,
         use_assign_variant::USE_ASSIGN_VARIANT,
@@ -364,6 +366,8 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
     lint_store.register_late_pass(|_| {
         Box::new(redundant_prec_round_of_exact_constant::RedundantPrecRoundOfExactConstant)
     });
+    lint_store
+        .register_late_pass(|_| Box::new(redundant_shift_conversion::RedundantShiftConversion));
     lint_store
         .register_late_pass(|_| Box::new(runtime_literal_conversion::RuntimeLiteralConversion));
     lint_store.register_late_pass(|_| Box::new(shift_of_one::ShiftOfOne));
