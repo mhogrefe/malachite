@@ -6,13 +6,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-pub mod arithmetic;
 pub mod bench;
 pub mod common;
-pub mod comparison;
-pub mod constants;
-pub mod conversion;
-pub mod exhaustive;
 pub mod extra_variadic;
+pub mod float;
 pub mod generators;
-pub mod random;

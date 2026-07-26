@@ -1,0 +1,894 @@
+// Copyright © 2026 Mikhail Hogrefe
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
+use crate::Float;
+use crate::InnerFloat::Finite;
+use alloc::vec::IntoIter;
+use core::iter::{Chain, Once, once};
+use core::mem::swap;
+use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
+use malachite_base::num::arithmetic::traits::{NegModPowerOf2, PowerOf2};
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, NegativeZero, Zero};
+use malachite_base::num::exhaustive::{
+    ExhaustiveSignedRange, PrimitiveIntIncreasingRange, exhaustive_signed_inclusive_range,
+    primitive_int_increasing_inclusive_range,
+};
+use malachite_base::num::iterators::{BitDistributorSequence, bit_distributor_sequence};
+use malachite_base::num::logic::traits::{LowMask, NotAssign};
+use malachite_base::tuples::exhaustive::{
+    ExhaustiveDependentPairs, ExhaustiveDependentPairsYsGenerator, LexDependentPairs,
+    exhaustive_dependent_pairs, lex_dependent_pairs,
+};
+use malachite_nz::natural::Natural;
+use malachite_nz::natural::exhaustive::{
+    ExhaustiveNaturalRange, exhaustive_natural_inclusive_range,
+};
+use malachite_nz::platform::Limb;
+
+/// Generates all finite positive [`Float`]s with a specified `sci_exponent` (one less than the raw
+/// exponent) and precision.
+///
+/// This `struct` is created by [`exhaustive_positive_floats_with_sci_exponent_and_precision`]; see
+/// its documentation for more.
+#[derive(Clone, Debug)]
+pub struct ExhaustivePositiveFloatsWithSciExponentAndPrecision {
+    exponent: i32,
+    precision: u64,
+    shift: u64,
+    significands: ExhaustiveNaturalRange,
+}
+
+impl Iterator for ExhaustivePositiveFloatsWithSciExponentAndPrecision {
+    type Item = Float;
+
+    #[inline]
+    fn next(&mut self) -> Option<Float> {
+        self.significands.next().map(|s| {
+            Float(Finite {
+                sign: true,
+                exponent: self.exponent,
+                precision: self.precision,
+                significand: s << self.shift,
+            })
+        })
+    }
+}
+
+/// Generates all finite positive [`Float`]s with a specified `sci_exponent` (one less than the raw
+/// exponent) and precision.
+///
+/// Positive and negative zero are both excluded.
+///
+/// A finite positive [`Float`] may be uniquely expressed as $x = m_s2^e_s$, where $1 \leq m_s < 2$
+/// and $e_s$ is an integer; then $e_s$ is the sci-exponent.
+///
+/// The output length is $2^{p-1}$.
+///
+/// # Worst-case complexity
+/// $T(n) = O(n)$
+///
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+///
+/// # Panics
+/// Panics if the precision is zero.
+///
+/// # Examples
+/// ```
+/// use itertools::Itertools;
+/// use malachite_float::float::exhaustive::*;
+/// use malachite_float::ComparableFloat;
+///
+/// // The number after the '#' is the precision.
+/// assert_eq!(
+///     exhaustive_positive_floats_with_sci_exponent_and_precision(0, 4)
+///         .map(|f| ComparableFloat(f).to_string())
+///         .collect_vec()
+///         .as_slice(),
+///     &["1.00#4", "1.12#4", "1.25#4", "1.38#4", "1.50#4", "1.62#4", "1.75#4", "1.88#4"]
+/// );
+///
+/// assert_eq!(
+///     exhaustive_positive_floats_with_sci_exponent_and_precision(2, 5)
+///         .map(|f| ComparableFloat(f).to_string())
+///         .collect_vec()
+///         .as_slice(),
+///     &[
+///         "4.00#5", "4.25#5", "4.50#5", "4.75#5", "5.00#5", "5.25#5", "5.50#5", "5.75#5",
+///         "6.00#5", "6.25#5", "6.50#5", "6.75#5", "7.00#5", "7.25#5", "7.50#5", "7.75#5"
+///     ]
+/// );
+/// ```
+pub fn exhaustive_positive_floats_with_sci_exponent_and_precision(
+    sci_exponent: i32,
+    prec: u64,
+) -> ExhaustivePositiveFloatsWithSciExponentAndPrecision {
+    assert!(sci_exponent < Float::MAX_EXPONENT);
+    assert!(sci_exponent >= Float::MIN_EXPONENT_MINUS_1);
+    assert_ne!(prec, 0);
+    ExhaustivePositiveFloatsWithSciExponentAndPrecision {
+        exponent: sci_exponent + 1,
+        precision: prec,
+        shift: prec.neg_mod_power_of_2(Limb::LOG_WIDTH),
+        significands: exhaustive_natural_inclusive_range(
+            Natural::power_of_2(prec - 1),
+            Natural::low_mask(prec),
+        ),
+    }
+}
+
+#[derive(Clone, Debug)]
+struct FloatsWithSciExponentAndPrecisionGenerator {
+    sci_exponent: i32,
+}
+
+impl
+    ExhaustiveDependentPairsYsGenerator<
+        u64,
+        Float,
+        ExhaustivePositiveFloatsWithSciExponentAndPrecision,
+    > for FloatsWithSciExponentAndPrecisionGenerator
+{
+    #[inline]
+    fn get_ys(&self, &prec: &u64) -> ExhaustivePositiveFloatsWithSciExponentAndPrecision {
+        exhaustive_positive_floats_with_sci_exponent_and_precision(self.sci_exponent, prec)
+    }
+}
+
+#[inline]
+fn exhaustive_positive_floats_with_sci_exponent_helper(
+    sci_exponent: i32,
+) -> LexDependentPairs<
+    u64,
+    Float,
+    FloatsWithSciExponentAndPrecisionGenerator,
+    PrimitiveIntIncreasingRange<u64>,
+    ExhaustivePositiveFloatsWithSciExponentAndPrecision,
+> {
+    lex_dependent_pairs(
+        primitive_int_increasing_inclusive_range(1, u64::MAX),
+        FloatsWithSciExponentAndPrecisionGenerator { sci_exponent },
+    )
+}
+
+/// Generates all finite positive [`Float`]s with a specified `sci_exponent` (one less than the raw
+/// exponent).
+///
+/// This `struct` is created by [`exhaustive_positive_floats_with_sci_exponent`]; see its
+/// documentation for more.
+#[derive(Clone, Debug)]
+pub struct ExhaustivePositiveFloatsWithSciExponent(
+    LexDependentPairs<
+        u64,
+        Float,
+        FloatsWithSciExponentAndPrecisionGenerator,
+        PrimitiveIntIncreasingRange<u64>,
+        ExhaustivePositiveFloatsWithSciExponentAndPrecision,
+    >,
+);
+
+impl Iterator for ExhaustivePositiveFloatsWithSciExponent {
+    type Item = Float;
+
+    #[inline]
+    fn next(&mut self) -> Option<Float> {
+        self.0.next().map(|p| p.1)
+    }
+}
+
+/// Generates all finite positive [`Float`]s with a specified `sci_exponent` (one less than the raw
+/// exponent).
+///
+/// Positive and negative zero are both excluded.
+///
+/// A finite positive [`Float`] may be uniquely expressed as $x = m_s2^e_s$, where $1 \leq m_s < 2$
+/// and $e_s$ is an integer; then $e_s$ is the sci-exponent.
+///
+/// The output length is infinite.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\log i)$
+///
+/// $M(i) = O(\log i)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+///
+/// # Panics
+/// Panics if the precision is zero.
+///
+/// # Examples
+/// ```
+/// use itertools::Itertools;
+/// use malachite_float::float::exhaustive::exhaustive_positive_floats_with_sci_exponent;
+/// use malachite_float::ComparableFloat;
+///
+/// // The number after the '#' is the precision.
+/// assert_eq!(
+///     exhaustive_positive_floats_with_sci_exponent(0)
+///         .take(20)
+///         .map(|f| ComparableFloat(f).to_string())
+///         .collect_vec()
+///         .as_slice(),
+///     &[
+///         "1.0#1", "1.0#2", "1.5#2", "1.0#3", "1.2#3", "1.5#3", "1.8#3", "1.00#4", "1.12#4",
+///         "1.25#4", "1.38#4", "1.50#4", "1.62#4", "1.75#4", "1.88#4", "1.00#5", "1.06#5",
+///         "1.12#5", "1.19#5", "1.25#5"
+///     ]
+/// );
+///
+/// assert_eq!(
+///     exhaustive_positive_floats_with_sci_exponent(2)
+///         .take(20)
+///         .map(|f| ComparableFloat(f).to_string())
+///         .collect_vec()
+///         .as_slice(),
+///     &[
+///         "4.0#1", "4.0#2", "6.0#2", "4.0#3", "5.0#3", "6.0#3", "7.0#3", "4.00#4", "4.50#4",
+///         "5.00#4", "5.50#4", "6.00#4", "6.50#4", "7.00#4", "7.50#4", "4.00#5", "4.25#5",
+///         "4.50#5", "4.75#5", "5.00#5"
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_positive_floats_with_sci_exponent(
+    sci_exponent: i32,
+) -> ExhaustivePositiveFloatsWithSciExponent {
+    assert!(sci_exponent < Float::MAX_EXPONENT);
+    assert!(sci_exponent >= Float::MIN_EXPONENT_MINUS_1);
+    ExhaustivePositiveFloatsWithSciExponent(exhaustive_positive_floats_with_sci_exponent_helper(
+        sci_exponent,
+    ))
+}
+
+#[derive(Clone, Debug)]
+struct FloatsWithPrecisionAndSciExponentGenerator {
+    precision: u64,
+}
+
+impl
+    ExhaustiveDependentPairsYsGenerator<
+        i32,
+        Float,
+        ExhaustivePositiveFloatsWithSciExponentAndPrecision,
+    > for FloatsWithPrecisionAndSciExponentGenerator
+{
+    #[inline]
+    fn get_ys(&self, &exp: &i32) -> ExhaustivePositiveFloatsWithSciExponentAndPrecision {
+        exhaustive_positive_floats_with_sci_exponent_and_precision(exp, self.precision)
+    }
+}
+
+#[inline]
+fn exhaustive_floats_with_precision_helper(
+    prec: u64,
+) -> ExhaustiveDependentPairs<
+    i32,
+    Float,
+    BitDistributorSequence,
+    FloatsWithPrecisionAndSciExponentGenerator,
+    ExhaustiveSignedRange<i32>,
+    ExhaustivePositiveFloatsWithSciExponentAndPrecision,
+> {
+    exhaustive_dependent_pairs(
+        bit_distributor_sequence(
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::normal(1),
+        ),
+        exhaustive_signed_inclusive_range(Float::MIN_EXPONENT, Float::MAX_EXPONENT),
+        FloatsWithPrecisionAndSciExponentGenerator { precision: prec },
+    )
+}
+
+/// Generates all finite positive [`Float`]s with a specified precision.
+///
+/// This `struct` is created by [`exhaustive_positive_floats_with_precision`]; see its documentation
+/// for more.
+#[derive(Clone, Debug)]
+pub struct ExhaustivePositiveFloatsWithPrecision(
+    ExhaustiveDependentPairs<
+        i32,
+        Float,
+        BitDistributorSequence,
+        FloatsWithPrecisionAndSciExponentGenerator,
+        ExhaustiveSignedRange<i32>,
+        ExhaustivePositiveFloatsWithSciExponentAndPrecision,
+    >,
+);
+
+impl Iterator for ExhaustivePositiveFloatsWithPrecision {
+    type Item = Float;
+
+    #[inline]
+    fn next(&mut self) -> Option<Float> {
+        self.0.next().map(|p| p.1)
+    }
+}
+
+/// Generates all finite positive [`Float`]s with a specified `precision`.
+///
+/// Positive and negative zero are both excluded.
+///
+/// The output length is infinite.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\log i)$
+///
+/// $M(i) = O(\log i)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+///
+/// # Panics
+/// Panics if the precision is zero.
+///
+/// # Examples
+/// ```
+/// use itertools::Itertools;
+/// use malachite_float::float::exhaustive::exhaustive_positive_floats_with_precision;
+/// use malachite_float::ComparableFloat;
+///
+/// // The number after the '#' is the precision.
+/// assert_eq!(
+///     exhaustive_positive_floats_with_precision(1)
+///         .take(20)
+///         .map(|f| ComparableFloat(f).to_string())
+///         .collect_vec()
+///         .as_slice(),
+///     &[
+///         "1.0#1", "2.0#1", "0.50#1", "4.0#1", "0.25#1", "8.0#1", "0.12#1", "16.0#1", "0.062#1",
+///         "32.0#1", "0.031#1", "64.0#1", "0.016#1", "1.3e2#1", "0.0078#1", "2.6e2#1", "0.0039#1",
+///         "5.1e2#1", "0.0020#1", "1.0e3#1"
+///     ]
+/// );
+///
+/// assert_eq!(
+///     exhaustive_positive_floats_with_precision(10)
+///         .take(20)
+///         .map(|f| ComparableFloat(f).to_string())
+///         .collect_vec()
+///         .as_slice(),
+///     &[
+///         "1.0000#10",
+///         "2.0000#10",
+///         "1.0020#10",
+///         "2.0039#10",
+///         "0.50000#10",
+///         "4.0000#10",
+///         "0.50098#10",
+///         "4.0078#10",
+///         "1.0039#10",
+///         "2.0078#10",
+///         "1.0059#10",
+///         "2.0117#10",
+///         "0.50195#10",
+///         "4.0156#10",
+///         "0.50293#10",
+///         "4.0234#10",
+///         "0.25000#10",
+///         "8.0000#10",
+///         "0.25049#10",
+///         "8.0156#10"
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_positive_floats_with_precision(
+    prec: u64,
+) -> ExhaustivePositiveFloatsWithPrecision {
+    assert_ne!(prec, 0);
+    ExhaustivePositiveFloatsWithPrecision(exhaustive_floats_with_precision_helper(prec))
+}
+
+/// Generates all [`Float`]s with a specified precision. (Since they have a precision, they are
+/// finite and nonzero.)
+///
+/// This `struct` is created by [`exhaustive_floats_with_precision`]; see its documentation for
+/// more.
+#[derive(Clone, Debug)]
+pub struct ExhaustiveFloatsWithPrecision {
+    toggle: bool,
+    xs: ExhaustivePositiveFloatsWithPrecision,
+    x: Float,
+}
+
+impl Iterator for ExhaustiveFloatsWithPrecision {
+    type Item = Float;
+
+    #[inline]
+    fn next(&mut self) -> Option<Float> {
+        self.toggle.not_assign();
+        Some(if self.toggle {
+            self.x = self.xs.next().unwrap();
+            self.x.clone()
+        } else {
+            let mut out = Float::NAN;
+            swap(&mut out, &mut self.x);
+            -out
+        })
+    }
+}
+
+/// Generates all [`Float`]s with a specified precision. (Since they have a precision, they are
+/// finite and nonzero.)
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\log i)$
+///
+/// $M(i) = O(\log i)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+///
+/// # Panics
+/// Panics if the precision is zero.
+///
+/// ```
+/// use itertools::Itertools;
+/// use malachite_float::float::exhaustive::exhaustive_floats_with_precision;
+/// use malachite_float::ComparableFloat;
+///
+/// // The number after the '#' is the precision.
+/// assert_eq!(
+///     exhaustive_floats_with_precision(1)
+///         .take(20)
+///         .map(|f| ComparableFloat(f).to_string())
+///         .collect_vec()
+///         .as_slice(),
+///     &[
+///         "1.0#1", "-1.0#1", "2.0#1", "-2.0#1", "0.50#1", "-0.50#1", "4.0#1", "-4.0#1", "0.25#1",
+///         "-0.25#1", "8.0#1", "-8.0#1", "0.12#1", "-0.12#1", "16.0#1", "-16.0#1", "0.062#1",
+///         "-0.062#1", "32.0#1", "-32.0#1"
+///     ]
+/// );
+///
+/// assert_eq!(
+///     exhaustive_floats_with_precision(10)
+///         .take(20)
+///         .map(|f| ComparableFloat(f).to_string())
+///         .collect_vec()
+///         .as_slice(),
+///     &[
+///         "1.0000#10",
+///         "-1.0000#10",
+///         "2.0000#10",
+///         "-2.0000#10",
+///         "1.0020#10",
+///         "-1.0020#10",
+///         "2.0039#10",
+///         "-2.0039#10",
+///         "0.50000#10",
+///         "-0.50000#10",
+///         "4.0000#10",
+///         "-4.0000#10",
+///         "0.50098#10",
+///         "-0.50098#10",
+///         "4.0078#10",
+///         "-4.0078#10",
+///         "1.0039#10",
+///         "-1.0039#10",
+///         "2.0078#10",
+///         "-2.0078#10"
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_floats_with_precision(prec: u64) -> ExhaustiveFloatsWithPrecision {
+    ExhaustiveFloatsWithPrecision {
+        toggle: false,
+        xs: exhaustive_positive_floats_with_precision(prec),
+        x: Float::NAN,
+    }
+}
+
+#[derive(Clone, Debug)]
+pub(crate) struct ExhaustivePositiveFiniteFloatsGenerator;
+
+impl ExhaustiveDependentPairsYsGenerator<i32, Float, ExhaustivePositiveFloatsWithSciExponent>
+    for ExhaustivePositiveFiniteFloatsGenerator
+{
+    #[inline]
+    fn get_ys(&self, &sci_exponent: &i32) -> ExhaustivePositiveFloatsWithSciExponent {
+        exhaustive_positive_floats_with_sci_exponent(sci_exponent)
+    }
+}
+
+#[inline]
+fn exhaustive_positive_finite_floats_helper() -> ExhaustiveDependentPairs<
+    i32,
+    Float,
+    BitDistributorSequence,
+    ExhaustivePositiveFiniteFloatsGenerator,
+    ExhaustiveSignedRange<i32>,
+    ExhaustivePositiveFloatsWithSciExponent,
+> {
+    exhaustive_dependent_pairs(
+        bit_distributor_sequence(
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::normal(1),
+        ),
+        exhaustive_signed_inclusive_range(Float::MIN_EXPONENT, Float::MAX_EXPONENT),
+        ExhaustivePositiveFiniteFloatsGenerator,
+    )
+}
+
+/// Generates all positive finite [`Float`]s.
+///
+/// This `struct` is created by [`exhaustive_positive_finite_floats`]; see its documentation for
+/// more.
+#[derive(Clone, Debug)]
+pub struct ExhaustivePositiveFiniteFloats(
+    ExhaustiveDependentPairs<
+        i32,
+        Float,
+        BitDistributorSequence,
+        ExhaustivePositiveFiniteFloatsGenerator,
+        ExhaustiveSignedRange<i32>,
+        ExhaustivePositiveFloatsWithSciExponent,
+    >,
+);
+
+impl Iterator for ExhaustivePositiveFiniteFloats {
+    type Item = Float;
+
+    #[inline]
+    fn next(&mut self) -> Option<Float> {
+        self.0.next().map(|p| p.1)
+    }
+}
+
+/// Generates all positive finite [`Float`]s.
+///
+/// Positive and negative zero are both excluded.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\log i)$
+///
+/// $M(i) = O(\log i)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+///
+/// ```
+/// use itertools::Itertools;
+/// use malachite_float::float::exhaustive::exhaustive_positive_finite_floats;
+/// use malachite_float::ComparableFloat;
+///
+/// // The number after the '#' is the precision.
+/// assert_eq!(
+///     exhaustive_positive_finite_floats()
+///         .take(20)
+///         .map(|f| ComparableFloat(f).to_string())
+///         .collect_vec()
+///         .as_slice(),
+///     &[
+///         "1.0#1", "2.0#1", "1.0#2", "2.0#2", "0.50#1", "4.0#1", "0.50#2", "4.0#2", "1.5#2",
+///         "3.0#2", "1.0#3", "2.0#3", "0.75#2", "6.0#2", "0.50#3", "4.0#3", "0.25#1", "8.0#1",
+///         "0.25#2", "8.0#2"
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_positive_finite_floats() -> ExhaustivePositiveFiniteFloats {
+    ExhaustivePositiveFiniteFloats(exhaustive_positive_finite_floats_helper())
+}
+
+/// Generates all negative finite [`Float`]s.
+///
+/// This `struct` is created by [`exhaustive_negative_finite_floats`]; see its documentation for
+/// more.
+#[derive(Clone, Debug)]
+pub struct ExhaustiveNegativeFiniteFloats(ExhaustivePositiveFiniteFloats);
+
+impl Iterator for ExhaustiveNegativeFiniteFloats {
+    type Item = Float;
+
+    #[inline]
+    fn next(&mut self) -> Option<Float> {
+        self.0.next().map(|f| -f)
+    }
+}
+
+/// Generates all negative finite [`Float`]s.
+///
+/// Positive and negative zero are both excluded.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\log i)$
+///
+/// $M(i) = O(\log i)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+///
+/// ```
+/// use itertools::Itertools;
+/// use malachite_float::float::exhaustive::exhaustive_negative_finite_floats;
+/// use malachite_float::ComparableFloat;
+///
+/// // The number after the '#' is the precision.
+/// assert_eq!(
+///     exhaustive_negative_finite_floats()
+///         .take(20)
+///         .map(|f| ComparableFloat(f).to_string())
+///         .collect_vec()
+///         .as_slice(),
+///     &[
+///         "-1.0#1", "-2.0#1", "-1.0#2", "-2.0#2", "-0.50#1", "-4.0#1", "-0.50#2", "-4.0#2",
+///         "-1.5#2", "-3.0#2", "-1.0#3", "-2.0#3", "-0.75#2", "-6.0#2", "-0.50#3", "-4.0#3",
+///         "-0.25#1", "-8.0#1", "-0.25#2", "-8.0#2"
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_negative_finite_floats() -> ExhaustiveNegativeFiniteFloats {
+    ExhaustiveNegativeFiniteFloats(exhaustive_positive_finite_floats())
+}
+
+/// Generates all nonzero finite [`Float`]s.
+///
+/// This `struct` is created by [`exhaustive_nonzero_finite_floats`]; see its documentation for
+/// more.
+#[derive(Clone, Debug)]
+pub struct ExhaustiveNonzeroFiniteFloats {
+    toggle: bool,
+    xs: ExhaustivePositiveFiniteFloats,
+    x: Float,
+}
+
+impl Iterator for ExhaustiveNonzeroFiniteFloats {
+    type Item = Float;
+
+    #[inline]
+    fn next(&mut self) -> Option<Float> {
+        self.toggle.not_assign();
+        Some(if self.toggle {
+            self.x = self.xs.next().unwrap();
+            self.x.clone()
+        } else {
+            let mut out = Float::NAN;
+            swap(&mut out, &mut self.x);
+            -out
+        })
+    }
+}
+
+/// Generates all nonzero finite [`Float`]s.
+///
+/// Positive and negative zero are both excluded.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\log i)$
+///
+/// $M(i) = O(\log i)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+///
+/// ```
+/// use itertools::Itertools;
+/// use malachite_float::float::exhaustive::exhaustive_nonzero_finite_floats;
+/// use malachite_float::ComparableFloat;
+///
+/// // The number after the '#' is the precision.
+/// assert_eq!(
+///     exhaustive_nonzero_finite_floats()
+///         .take(20)
+///         .map(|f| ComparableFloat(f).to_string())
+///         .collect_vec()
+///         .as_slice(),
+///     &[
+///         "1.0#1", "-1.0#1", "2.0#1", "-2.0#1", "1.0#2", "-1.0#2", "2.0#2", "-2.0#2", "0.50#1",
+///         "-0.50#1", "4.0#1", "-4.0#1", "0.50#2", "-0.50#2", "4.0#2", "-4.0#2", "1.5#2",
+///         "-1.5#2", "3.0#2", "-3.0#2"
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_nonzero_finite_floats() -> ExhaustiveNonzeroFiniteFloats {
+    ExhaustiveNonzeroFiniteFloats {
+        toggle: false,
+        xs: exhaustive_positive_finite_floats(),
+        x: Float::NAN,
+    }
+}
+
+type ExhaustiveNonNegativeFiniteFloats = Chain<Once<Float>, ExhaustivePositiveFiniteFloats>;
+
+/// Generates all non-negative finite [`Float`]s.
+///
+/// Positive zero is included, but negative zero is not.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\log i)$
+///
+/// $M(i) = O(\log i)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+///
+/// ```
+/// use itertools::Itertools;
+/// use malachite_float::float::exhaustive::exhaustive_non_negative_finite_floats;
+/// use malachite_float::ComparableFloat;
+///
+/// // The number after the '#' is the precision.
+/// assert_eq!(
+///     exhaustive_non_negative_finite_floats()
+///         .take(20)
+///         .map(|f| ComparableFloat(f).to_string())
+///         .collect_vec()
+///         .as_slice(),
+///     &[
+///         "0.0", "1.0#1", "2.0#1", "1.0#2", "2.0#2", "0.50#1", "4.0#1", "0.50#2", "4.0#2",
+///         "1.5#2", "3.0#2", "1.0#3", "2.0#3", "0.75#2", "6.0#2", "0.50#3", "4.0#3", "0.25#1",
+///         "8.0#1", "0.25#2"
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_non_negative_finite_floats() -> ExhaustiveNonNegativeFiniteFloats {
+    once(Float::ZERO).chain(exhaustive_positive_finite_floats())
+}
+
+type ExhaustiveNonPositiveFiniteFloats = Chain<Once<Float>, ExhaustiveNegativeFiniteFloats>;
+
+/// Generates all non-positive finite [`Float`]s.
+///
+/// Negative zero is included, but positive zero is not.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\log i)$
+///
+/// $M(i) = O(\log i)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+///
+/// ```
+/// use itertools::Itertools;
+/// use malachite_float::float::exhaustive::exhaustive_non_positive_finite_floats;
+/// use malachite_float::ComparableFloat;
+///
+/// // The number after the '#' is the precision.
+/// assert_eq!(
+///     exhaustive_non_positive_finite_floats()
+///         .take(20)
+///         .map(|f| ComparableFloat(f).to_string())
+///         .collect_vec()
+///         .as_slice(),
+///     &[
+///         "-0.0", "-1.0#1", "-2.0#1", "-1.0#2", "-2.0#2", "-0.50#1", "-4.0#1", "-0.50#2",
+///         "-4.0#2", "-1.5#2", "-3.0#2", "-1.0#3", "-2.0#3", "-0.75#2", "-6.0#2", "-0.50#3",
+///         "-4.0#3", "-0.25#1", "-8.0#1", "-0.25#2"
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_non_positive_finite_floats() -> ExhaustiveNonPositiveFiniteFloats {
+    once(Float::NEGATIVE_ZERO).chain(exhaustive_negative_finite_floats())
+}
+
+type ExhaustiveFloats = Chain<IntoIter<Float>, ExhaustiveNonzeroFiniteFloats>;
+
+/// Generates all finite [`Float`]s.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\log i)$
+///
+/// $M(i) = O(\log i)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+///
+/// ```
+/// use itertools::Itertools;
+/// use malachite_float::float::exhaustive::exhaustive_finite_floats;
+/// use malachite_float::ComparableFloat;
+///
+/// // The number after the '#' is the precision.
+/// assert_eq!(
+///     exhaustive_finite_floats()
+///         .take(20)
+///         .map(|f| ComparableFloat(f).to_string())
+///         .collect_vec()
+///         .as_slice(),
+///     &[
+///         "0.0", "-0.0", "1.0#1", "-1.0#1", "2.0#1", "-2.0#1", "1.0#2", "-1.0#2", "2.0#2",
+///         "-2.0#2", "0.50#1", "-0.50#1", "4.0#1", "-4.0#1", "0.50#2", "-0.50#2", "4.0#2",
+///         "-4.0#2", "1.5#2", "-1.5#2"
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_finite_floats() -> ExhaustiveFloats {
+    alloc::vec![Float::ZERO, Float::NEGATIVE_ZERO]
+        .into_iter()
+        .chain(exhaustive_nonzero_finite_floats())
+}
+
+/// Generates all [`Float`]s.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\log i)$
+///
+/// $M(i) = O(\log i)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+///
+/// ```
+/// use itertools::Itertools;
+/// use malachite_float::float::exhaustive::exhaustive_floats;
+/// use malachite_float::ComparableFloat;
+///
+/// // The number after the '#' is the precision.
+/// assert_eq!(
+///     exhaustive_floats()
+///         .take(50)
+///         .map(|f| ComparableFloat(f).to_string())
+///         .collect_vec()
+///         .as_slice(),
+///     &[
+///         "NaN",
+///         "Infinity",
+///         "-Infinity",
+///         "0.0",
+///         "-0.0",
+///         "1.0#1",
+///         "-1.0#1",
+///         "2.0#1",
+///         "-2.0#1",
+///         "1.0#2",
+///         "-1.0#2",
+///         "2.0#2",
+///         "-2.0#2",
+///         "0.50#1",
+///         "-0.50#1",
+///         "4.0#1",
+///         "-4.0#1",
+///         "0.50#2",
+///         "-0.50#2",
+///         "4.0#2",
+///         "-4.0#2",
+///         "1.5#2",
+///         "-1.5#2",
+///         "3.0#2",
+///         "-3.0#2",
+///         "1.0#3",
+///         "-1.0#3",
+///         "2.0#3",
+///         "-2.0#3",
+///         "0.75#2",
+///         "-0.75#2",
+///         "6.0#2",
+///         "-6.0#2",
+///         "0.50#3",
+///         "-0.50#3",
+///         "4.0#3",
+///         "-4.0#3",
+///         "0.25#1",
+///         "-0.25#1",
+///         "8.0#1",
+///         "-8.0#1",
+///         "0.25#2",
+///         "-0.25#2",
+///         "8.0#2",
+///         "-8.0#2",
+///         "0.12#1",
+///         "-0.12#1",
+///         "16.0#1",
+///         "-16.0#1",
+///         "0.12#2"
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_floats() -> ExhaustiveFloats {
+    alloc::vec![
+        Float::NAN,
+        Float::INFINITY,
+        Float::NEGATIVE_INFINITY,
+        Float::ZERO,
+        Float::NEGATIVE_ZERO
+    ]
+    .into_iter()
+    .chain(exhaustive_nonzero_finite_floats())
+}

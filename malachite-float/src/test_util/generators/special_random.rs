@@ -8,7 +8,7 @@
 
 use crate::Float;
 use crate::InnerFloat::Finite;
-use crate::random::{
+use crate::float::random::{
     RandomPositiveFiniteFloats, striped_random_finite_floats, striped_random_floats,
     striped_random_non_negative_finite_floats, striped_random_nonzero_finite_floats,
     striped_random_positive_finite_floats, striped_random_positive_floats_with_precision,

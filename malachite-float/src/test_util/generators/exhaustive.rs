@@ -6,17 +6,17 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::arithmetic::log_base::{rational_log_base, rational_log_base_of_rational};
-use crate::arithmetic::log_base_1_plus_x::log_base_1_plus_x_rational;
-use crate::arithmetic::log_base_10::float_is_power_of_10;
-use crate::arithmetic::log_base_float_base::log_base_float_base_rational;
-use crate::arithmetic::log_base_float_base_1_plus_x::log_base_float_base_1_plus_x_rational;
-use crate::arithmetic::log_base_rational_base::rational_log_base_rational_base;
-use crate::arithmetic::log_base_rational_base_1_plus_x::rational_log_base_rational_base_1_plus_x;
-use crate::arithmetic::log_base_rational_float_base::log_base_rational_float_base_rational;
-use crate::arithmetic::log_base_rational_rational_base::rational_log_base_rational_rational_base;
-use crate::conversion::string::to_sci::to_sci_valid;
-use crate::exhaustive::{
+use crate::float::arithmetic::log_base::{rational_log_base, rational_log_base_of_rational};
+use crate::float::arithmetic::log_base_1_plus_x::log_base_1_plus_x_rational;
+use crate::float::arithmetic::log_base_10::float_is_power_of_10;
+use crate::float::arithmetic::log_base_float_base::log_base_float_base_rational;
+use crate::float::arithmetic::log_base_float_base_1_plus_x::log_base_float_base_1_plus_x_rational;
+use crate::float::arithmetic::log_base_rational_base::rational_log_base_rational_base;
+use crate::float::arithmetic::log_base_rational_base_1_plus_x::*;
+use crate::float::arithmetic::log_base_rational_float_base::log_base_rational_float_base_rational;
+use crate::float::arithmetic::log_base_rational_rational_base::*;
+use crate::float::conversion::string::to_sci::to_sci_valid;
+use crate::float::exhaustive::{
     ExhaustivePositiveFiniteFloatsGenerator, ExhaustivePositiveFloatsWithSciExponent,
     exhaustive_finite_floats, exhaustive_floats, exhaustive_non_negative_finite_floats,
     exhaustive_nonzero_finite_floats, exhaustive_positive_finite_floats,
@@ -2792,7 +2792,7 @@ pub fn log_base_power_of_2_1_plus_x_prec_round_valid(
         || !x.is_finite()
         || *x == 0u32
         || *x <= -1i32
-        || crate::arithmetic::log_base_2_1_plus_x::log_base_2_1_plus_x_exact(x)
+        || crate::float::arithmetic::log_base_2_1_plus_x::log_base_2_1_plus_x_exact(x)
             .is_some_and(|m| Float::from(m).div_prec(Float::from(pow), prec).1 == Equal)
 }
 
@@ -4424,12 +4424,14 @@ pub fn log_base_power_of_2_1_plus_x_round_valid(x: &Float, pow: i64, rm: Roundin
         || !x.is_finite()
         || *x == 0u32
         || *x <= -1i32
-        || crate::arithmetic::log_base_2_1_plus_x::log_base_2_1_plus_x_exact(x).is_some_and(|m| {
-            Float::from(m)
-                .div_prec(Float::from(pow), x.significant_bits())
-                .1
-                == Equal
-        })
+        || crate::float::arithmetic::log_base_2_1_plus_x::log_base_2_1_plus_x_exact(x).is_some_and(
+            |m| {
+                Float::from(m)
+                    .div_prec(Float::from(pow), x.significant_bits())
+                    .1
+                    == Equal
+            },
+        )
 }
 
 pub fn exhaustive_float_signed_rounding_mode_triple_gen_var_9() -> It<(Float, i64, RoundingMode)> {

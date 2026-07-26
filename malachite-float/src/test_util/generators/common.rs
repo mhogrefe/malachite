@@ -7,8 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Float;
-use crate::conversion::string::get_str::get_str;
-use crate::conversion::string::strtofr::strtofr;
+use crate::float::conversion::string::get_str::get_str;
+use crate::float::conversion::string::strtofr::strtofr;
 use crate::test_util::common::rug_round_exact_from_rounding_mode;
 use alloc::string::{String, ToString};
 use core::cmp::Ordering::Equal;
