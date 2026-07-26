@@ -18,8 +18,8 @@ use rustc_session::{declare_lint, declare_lint_pass};
 declare_lint! {
     /// ### What it does
     ///
-    /// Flags a shift whose amount is converted to another integer type first, as in
-    /// `x << i64::exact_from(n)`, when the shift is already implemented for the type of `n`.
+    /// Flags a shift whose amount is converted to another integer type first, as in `x <<
+    /// i64::exact_from(n)`, when the shift is already implemented for the type of `n`.
     ///
     /// ### Why is this bad?
     ///
@@ -54,7 +54,10 @@ declare_lint_pass!(RedundantShiftConversion => [REDUNDANT_SHIFT_CONVERSION]);
 const CONVERSIONS: [&str; 4] = ["exact_from", "wrapping_from", "saturating_from", "from"];
 
 // The operand of a `T::exact_from(..)`-style integer conversion, if `e` is one.
-fn conversion_operand<'tcx>(cx: &LateContext<'tcx>, e: &'tcx Expr<'tcx>) -> Option<&'tcx Expr<'tcx>> {
+fn conversion_operand<'tcx>(
+    cx: &LateContext<'tcx>,
+    e: &'tcx Expr<'tcx>,
+) -> Option<&'tcx Expr<'tcx>> {
     let ExprKind::Call(callee, [operand]) = e.kind else {
         return None;
     };

@@ -17,9 +17,8 @@ declare_lint! {
     /// ### What it does
     ///
     /// Flags cloning a bignum where a by-reference alternative exists: `x.clone().op(..)` when the
-    /// family has an `op_ref*` variant, `y.op(x.clone(), ..)` when it has an `op*_ref` variant,
-    /// and `x.clone() * y` (or `x *= y.clone()`, etc.) when the operator is implemented for
-    /// references.
+    /// family has an `op_ref*` variant, `y.op(x.clone(), ..)` when it has an `op*_ref` variant, and
+    /// `x.clone() * y` (or `x *= y.clone()`, etc.) when the operator is implemented for references.
     ///
     /// ### Why is this bad?
     ///
@@ -103,8 +102,7 @@ impl<'tcx> LateLintPass<'tcx> for CloneWithRefVariant {
                 let base = crate::strip_variant_suffixes(name);
                 // A cloned receiver, with a receiver-by-reference sibling available. The right
                 // sibling depends on the current variant: a plain `foo` can move to `foo_ref`
-                // (unary), `foo_ref_val`, or `foo_ref_ref`; a `foo_val_ref` moves to
-                // `foo_ref_ref`.
+                // (unary), `foo_ref_val`, or `foo_ref_ref`; a `foo_val_ref` moves to `foo_ref_ref`.
                 if let Some(x) = bignum_clone(cx, recv)
                     && let Some(adt_did) = crate::bignum_adt_did(cx, cx.typeck_results().expr_ty(x))
                 {
@@ -134,9 +132,9 @@ impl<'tcx> LateLintPass<'tcx> for CloneWithRefVariant {
                         }
                     }
                 }
-                // A cloned argument, with an argument-by-reference sibling available: a plain
-                // `foo` moves to `foo_val_ref`, a `foo_ref_val` to `foo_ref_ref`, and an
-                // `_assign`-family `foo` to `foo_ref`.
+                // A cloned argument, with an argument-by-reference sibling available: a plain `foo`
+                // moves to `foo_val_ref`, a `foo_ref_val` to `foo_ref_ref`, and an `_assign`-family
+                // `foo` to `foo_ref`.
                 for arg in args {
                     if let Some(x) = bignum_clone(cx, arg)
                         && let Some(adt_did) =
@@ -180,8 +178,8 @@ impl<'tcx> LateLintPass<'tcx> for CloneWithRefVariant {
                 let Some(trait_did) = cx.tcx.lang_items().get(item) else {
                     return;
                 };
-                // A cloned left operand (not for compound assignment, whose left side is a
-                // place): the operator must be implemented for `&T op Rhs`.
+                // A cloned left operand (not for compound assignment, whose left side is a place):
+                // the operator must be implemented for `&T op Rhs`.
                 if !assign && let Some(x) = bignum_clone(cx, lhs) {
                     let x_ref = ref_of(cx, cx.typeck_results().expr_ty(x));
                     let rhs_ty = cx.typeck_results().expr_ty(rhs);

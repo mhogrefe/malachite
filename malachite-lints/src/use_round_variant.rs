@@ -21,8 +21,8 @@ use rustc_session::{declare_lint, declare_lint_pass};
 declare_lint! {
     /// ### What it does
     ///
-    /// Flags calling a `*_prec_round` or `*_prec` method on a [`Float`] local whose binding
-    /// visibly pins its precision to the very same precision expression, like
+    /// Flags calling a `*_prec_round` or `*_prec` method on a [`Float`] local whose binding visibly
+    /// pins its precision to the very same precision expression, like
     ///
     /// ```rust,ignore
     /// let arg = x.mul_prec_round(y, working_prec, Floor).0;
@@ -42,9 +42,9 @@ declare_lint! {
     /// operand, since the `*_round` variants compute at the maximum of their `Float` operands'
     /// precisions -- is an immutable local bound by a `let` whose initializer is itself a
     /// `*_prec_round`/`*_prec` call (possibly through the precision-preserving
-    /// `floor_and_ceiling`), all precision expressions are syntactically identical and refer to
-    /// the same bindings, and no local mentioned in the precision expression is reassigned between
-    /// the bindings and the use.
+    /// `floor_and_ceiling`), all precision expressions are syntactically identical and refer to the
+    /// same bindings, and no local mentioned in the precision expression is reassigned between the
+    /// bindings and the use.
     pub USE_ROUND_VARIANT,
     Deny,
     "re-specifying a precision the receiver is already known to have; use the `*_round` variant"
@@ -52,9 +52,9 @@ declare_lint! {
 
 declare_lint_pass!(UseRoundVariant => [USE_ROUND_VARIANT]);
 
-// If `base` (a method name with `_val`/`_ref` suffixes already stripped) is a
-// precision-specifying family member, returns whether it takes a rounding mode and the family
-// stem, e.g. `mul_prec_round` -> (true, "mul") and `exp_prec` -> (false, "exp").
+// If `base` (a method name with `_val`/`_ref` suffixes already stripped) is a precision-specifying
+// family member, returns whether it takes a rounding mode and the family stem, e.g.
+// `mul_prec_round` -> (true, "mul") and `exp_prec` -> (false, "exp").
 fn prec_family(base: &str) -> Option<(bool, &str)> {
     if let Some(stem) = base.strip_suffix("_prec_round") {
         Some((true, stem))
@@ -75,8 +75,8 @@ fn prec_arg<'tcx>(has_rm: bool, args: &'tcx [Expr<'tcx>]) -> Option<&'tcx Expr<'
     }
 }
 
-// If `e` is a `*_prec_round`/`*_prec` call whose result carries the requested precision -- either
-// a method call or a `Float::...` associated-function call -- returns its precision argument.
+// If `e` is a `*_prec_round`/`*_prec` call whose result carries the requested precision -- either a
+// method call or a `Float::...` associated-function call -- returns its precision argument.
 fn prec_producing_call<'tcx>(
     cx: &LateContext<'tcx>,
     e: &'tcx Expr<'tcx>,
@@ -125,8 +125,8 @@ fn floor_and_ceiling_inner<'tcx>(
 }
 
 // The precision expression that `init` visibly pins its result to, if any. `elem` is the tuple
-// element being bound (`None` for a direct binding, where a `.0`/`.1` projection may appear in
-// the initializer instead). Ordinary `*_prec*` calls pin only their first element (the value);
+// element being bound (`None` for a direct binding, where a `.0`/`.1` projection may appear in the
+// initializer instead). Ordinary `*_prec*` calls pin only their first element (the value);
 // `floor_and_ceiling` pins both elements of its output to its input's precision.
 fn pinning_prec<'tcx>(
     cx: &LateContext<'tcx>,
@@ -320,10 +320,10 @@ fn local_pinned_at<'tcx>(
     if watched != collect_locals(init_prec) {
         return false;
     }
-    // No local mentioned in the precision expression may be reassigned between the binding and
-    // the use. Scan the statements of the shared block from just after the `let` through the
-    // statement containing the use (inclusive: if the use sits inside a loop, a mutation
-    // anywhere in that loop could precede it on a later iteration).
+    // No local mentioned in the precision expression may be reassigned between the binding and the
+    // use. Scan the statements of the shared block from just after the `let` through the statement
+    // containing the use (inclusive: if the use sits inside a loop, a mutation anywhere in that
+    // loop could precede it on a later iteration).
     if !watched.is_empty() {
         let mut block: Option<&Block<'tcx>> = None;
         for (_, node) in cx.tcx.hir_parent_iter(l_id) {
@@ -362,8 +362,8 @@ fn local_pinned_at<'tcx>(
         }
         let scan_end = use_index.unwrap_or(block.stmts.len().saturating_sub(1));
         if scan_end < let_index {
-            // The use is not downstream of the binding in this block (e.g. a different
-            // control-flow shape); be conservative.
+            // The use is not downstream of the binding in this block (e.g. a different control-flow
+            // shape); be conservative.
             return false;
         }
         for stmt in &block.stmts[let_index + 1..=scan_end] {
@@ -403,10 +403,10 @@ impl<'tcx> LateLintPass<'tcx> for UseRoundVariant {
         let Some(outer_prec) = prec_arg(has_rm, args) else {
             return;
         };
-        // The receiver must be a `Float` local pinned at the requested precision, and so must
-        // every other `Float` operand: the `*_round` variants compute at the maximum of their
-        // `Float` operands' precisions, so knowing the receiver's precision alone is not enough
-        // to drop the explicit one.
+        // The receiver must be a `Float` local pinned at the requested precision, and so must every
+        // other `Float` operand: the `*_round` variants compute at the maximum of their `Float`
+        // operands' precisions, so knowing the receiver's precision alone is not enough to drop the
+        // explicit one.
         let prec_index = if has_rm {
             args.len() - 2
         } else {

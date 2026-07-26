@@ -19,9 +19,8 @@ declare_lint! {
     /// ### What it does
     ///
     /// Flags constructing a [`Float`] from a primitive integer at exactly its own significant-bit
-    /// precision and then discarding the ordering, like
-    /// `Float::from_unsigned_prec(x, x.significant_bits()).0` or
-    /// `Float::from_unsigned_prec(x, x.significant_bits().max(1)).0`.
+    /// precision and then discarding the ordering, like `Float::from_unsigned_prec(x,
+    /// x.significant_bits()).0` or `Float::from_unsigned_prec(x, x.significant_bits().max(1)).0`.
     ///
     /// ### Why is this bad?
     ///

@@ -15,11 +15,11 @@ use rustc_session::{declare_lint, declare_lint_pass};
 declare_lint! {
     /// ### What it does
     ///
-    /// Flags constructing one of the named bignum constants (`ZERO`, `ONE`, `TWO`,
-    /// `NEGATIVE_ONE`, `ONE_HALF`) the long way: `from` (or `const_from_unsigned`/
-    /// `const_from_signed`) of a literal 0, 1, 2, or -1; `Rational::from_unsigneds(1, 2)` or
-    /// `from_signeds(1, 2)`; or, for `Float`, the dedicated constructors `one_prec`, `two_prec`,
-    /// `negative_one_prec`, and `one_half_prec` with a literal precision of 1.
+    /// Flags constructing one of the named bignum constants (`ZERO`, `ONE`, `TWO`, `NEGATIVE_ONE`,
+    /// `ONE_HALF`) the long way: `from` (or `const_from_unsigned`/ `const_from_signed`) of a
+    /// literal 0, 1, 2, or -1; `Rational::from_unsigneds(1, 2)` or `from_signeds(1, 2)`; or, for
+    /// `Float`, the dedicated constructors `one_prec`, `two_prec`, `negative_one_prec`, and
+    /// `one_half_prec` with a literal precision of 1.
     ///
     /// ### Why is this bad?
     ///
@@ -50,8 +50,8 @@ impl<'tcx> LateLintPass<'tcx> for UseNamedConstant {
         if expr.span.from_expansion() {
             return;
         }
-        // Tests, demos, and test utilities construct constants the long way on purpose, to
-        // exercise the constructors themselves.
+        // Tests, demos, and test utilities construct constants the long way on purpose, to exercise
+        // the constructors themselves.
         if crate::in_test_code(cx, expr.span) {
             return;
         }
@@ -70,8 +70,8 @@ impl<'tcx> LateLintPass<'tcx> for UseNamedConstant {
             return;
         };
         let konst = match (t_name, fn_name, args) {
-            // A `Float`'s named constants have precision 1, so only the dedicated constructors
-            // with a literal precision of 1 construct exactly them.
+            // A `Float`'s named constants have precision 1, so only the dedicated constructors with
+            // a literal precision of 1 construct exactly them.
             ("Float", "one_prec", [p]) if crate::literal_value(p) == Some(1) => "ONE",
             ("Float", "two_prec", [p]) if crate::literal_value(p) == Some(1) => "TWO",
             ("Float", "negative_one_prec", [p]) if crate::literal_value(p) == Some(1) => {

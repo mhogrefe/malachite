@@ -15,22 +15,23 @@ use rustc_session::{declare_lint, declare_lint_pass};
 declare_lint! {
     /// ### What it does
     ///
-    /// Flags an immutable `let` whose initializer is a *derived* compile-time constant — arithmetic,
-    /// a unary operation, or a cast built from at least one named constant, such as
+    /// Flags an immutable `let` whose initializer is a *derived* compile-time constant —
+    /// arithmetic, a unary operation, or a cast built from at least one named constant, such as
     /// `let rnd_bit = Limb::WIDTH - 5;`. Suggests declaring it as a `const` instead.
     ///
     /// ### Why is this bad?
     ///
     /// A value that is fixed at compile time reads more clearly as a named `const`: the `const`
     /// announces that it does not depend on any runtime state, is computed once, and can be
-    /// referred to by an unambiguous `SCREAMING_SNAKE_CASE` name. It also lets the reader (and other
-    /// lints — see `shift_of_one`, which treats a constant shift amount specially) recognize the
-    /// operand as a constant without having to trace the `let` back to its initializer.
+    /// referred to by an unambiguous `SCREAMING_SNAKE_CASE` name. It also lets the reader (and
+    /// other lints — see `shift_of_one`, which treats a constant shift amount specially)
+    /// recognize the operand as a constant without having to trace the `let` back to its
+    /// initializer.
     ///
-    /// Only *derived* constants are flagged: a bare literal (`let n = 5;`) is already as clear as it
-    /// gets, and a bare path to an existing constant would just be a rename. Initializers that do
-    /// not evaluate at compile time are left alone — which also excludes anything that depends on a
-    /// generic parameter, where a `const` item could not name it in the first place.
+    /// Only *derived* constants are flagged: a bare literal (`let n = 5;`) is already as clear as
+    /// it gets, and a bare path to an existing constant would just be a rename. Initializers that
+    /// do not evaluate at compile time are left alone — which also excludes anything that depends
+    /// on a generic parameter, where a `const` item could not name it in the first place.
     ///
     /// ### Example
     ///
@@ -62,8 +63,8 @@ impl<'tcx> LateLintPass<'tcx> for UseConstBinding {
         let Some(init) = local.init else {
             return;
         };
-        // A *computed* initializer: arithmetic, a unary op, or a cast. A bare literal or a bare path
-        // to an existing constant is not worth turning into a `const`.
+        // A *computed* initializer: arithmetic, a unary op, or a cast. A bare literal or a bare
+        // path to an existing constant is not worth turning into a `const`.
         if !matches!(
             init.kind,
             ExprKind::Binary(..) | ExprKind::Unary(..) | ExprKind::Cast(..)

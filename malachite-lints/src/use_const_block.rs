@@ -21,26 +21,26 @@ declare_lint! {
     ///
     /// Flags a *derived* compile-time constant that appears as a subexpression of a larger runtime
     /// expression — arithmetic, a unary operation, a comparison, or a cast built from named
-    /// constants, such as `RND_BIT + 1` in `msl >> (RND_BIT + 1)` or `Limb::ONE << RND_BIT` in
-    /// `msl & (Limb::ONE << RND_BIT)`. Suggests folding it to its value or wrapping it in a
-    /// `const { .. }` block.
+    /// constants, such as `RND_BIT + 1` in `msl >> (RND_BIT + 1)` or `Limb::ONE << RND_BIT` in `msl
+    /// & (Limb::ONE << RND_BIT)`. Suggests folding it to its value or wrapping it in a `const { ..
+    /// }` block.
     ///
     /// ### Why is this bad?
     ///
     /// A constant island buried in a runtime expression reads as if it were computed each time. A
     /// `const { .. }` block (or the folded literal) makes the compile-time evaluation explicit and
-    /// guaranteed, and — like `use_const_binding` for a whole binding — lets the reader see at a
-    /// glance which part of the expression does not depend on runtime state.
+    /// guaranteed, and — like `use_const_binding` for a whole binding — lets the reader see at
+    /// a glance which part of the expression does not depend on runtime state.
     ///
     /// Only the *maximal* constant subexpression is flagged (the largest one whose enclosing
     /// expression is not itself a constructible constant), and only when it is *derived* — built
     /// from at least one named constant, not a bare literal computation the compiler folds anyway.
     /// A subexpression is left alone if it does not evaluate at compile time, or if it mentions a
-    /// local — including a `bool` expression that short-circuiting makes constant-*valued* while it
-    /// still names a runtime operand (`SOME_CONST && n < THRESHOLD`), which could not be lifted into
-    /// a `const { .. }` block. Anything already inside a `const { .. }` block or a const context is
-    /// likewise skipped, and a fully-constant `let` initializer is `use_const_binding`'s job, not
-    /// this lint's.
+    /// local — including a `bool` expression that short-circuiting makes constant-*valued* while
+    /// it still names a runtime operand (`SOME_CONST && n < THRESHOLD`), which could not be lifted
+    /// into a `const { .. }` block. Anything already inside a `const { .. }` block or a const
+    /// context is likewise skipped, and a fully-constant `let` initializer is `use_const_binding`'s
+    /// job, not this lint's.
     ///
     /// ### Example
     ///
@@ -99,7 +99,8 @@ impl<'tcx> LateLintPass<'tcx> for UseConstBlock {
         // actually be lifted into a `const { .. }`), but its enclosing expression is not such a
         // constant — so this is the maximal constant island. (When the parent is also a
         // constructible constant, the parent is flagged instead; when there is no enclosing
-        // expression — a fully-constant `let` initializer, say — that is `use_const_binding`'s.)
+        // expression — a fully-constant `let` initializer, say — that is
+        // `use_const_binding`'s.)
         let cx_eval = ConstEvalCtxt::new(cx);
         if cx_eval.eval(expr).is_none() || references_local(cx, expr) {
             return;

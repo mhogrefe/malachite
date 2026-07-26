@@ -17,8 +17,8 @@ declare_lint! {
     /// ### What it does
     ///
     /// Flags a `let` that destructures a tuple only to keep one field and discard the rest with
-    /// `_`, like `let (x, _) = f();` or `let (_, o) = f();`, suggesting direct field access
-    /// (`let x = f().0;`).
+    /// `_`, like `let (x, _) = f();` or `let (_, o) = f();`, suggesting direct field access (`let x
+    /// = f().0;`).
     ///
     /// ### Why is this bad?
     ///
@@ -68,9 +68,9 @@ impl<'tcx> LateLintPass<'tcx> for LetTupleUnderscoreToField {
         if dot_dot.as_opt_usize().is_some() {
             return;
         }
-        // Exactly one element is a plain by-value binding; every other is a top-level wildcard.
-        // Two or more bindings means both fields are genuinely used; a `ref`/`mut ref` binding or
-        // a subpattern is not a simple rename, so bail in those cases.
+        // Exactly one element is a plain by-value binding; every other is a top-level wildcard. Two
+        // or more bindings means both fields are genuinely used; a `ref`/`mut ref` binding or a
+        // subpattern is not a simple rename, so bail in those cases.
         let mut binding = None;
         for (i, pat) in pats.iter().enumerate() {
             match pat.kind {
@@ -90,8 +90,8 @@ impl<'tcx> LateLintPass<'tcx> for LetTupleUnderscoreToField {
         let Some(init_snip) = snippet_opt(cx, init.span) else {
             return;
         };
-        // Field access binds tighter than most expression forms, so anything that is not already
-        // a postfix expression must be parenthesized to keep the suggestion valid.
+        // Field access binds tighter than most expression forms, so anything that is not already a
+        // postfix expression must be parenthesized to keep the suggestion valid.
         let needs_parens = !matches!(
             init.kind,
             ExprKind::MethodCall(..)

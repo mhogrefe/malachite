@@ -88,9 +88,8 @@ fn power_of_2_call<'tcx>(
 }
 
 // If `ty` is one of the Malachite bignum types, returns its unqualified name. The def path is
-// compared via `get_def_path`, which includes the crate name even for local types --
-// `def_path_str` would not, leaving the lints blind inside the very crates that define the
-// types.
+// compared via `get_def_path`, which includes the crate name even for local types -- `def_path_str`
+// would not, leaving the lints blind inside the very crates that define the types.
 fn bignum_name<'tcx>(
     cx: &rustc_lint::LateContext<'tcx>,
     ty: rustc_middle::ty::Ty<'tcx>,
@@ -107,8 +106,8 @@ fn bignum_name<'tcx>(
         .map(|&(_, name)| name)
 }
 
-// Strips any trailing `_val`/`_ref` variant suffixes, so that all by-value/by-reference variants
-// of a function family normalize to the same name.
+// Strips any trailing `_val`/`_ref` variant suffixes, so that all by-value/by-reference variants of
+// a function family normalize to the same name.
 fn strip_variant_suffixes(mut name: &str) -> &str {
     loop {
         if let Some(stripped) = name
@@ -165,8 +164,8 @@ fn peel_clone_and_borrows<'tcx>(e: &'tcx rustc_hir::Expr<'tcx>) -> &'tcx rustc_h
     }
 }
 
-// Converts a snake_case function-family name to the CamelCase trait-name stem, e.g.
-// `exp_x_minus_1` to `ExpXMinus1`.
+// Converts a snake_case function-family name to the CamelCase trait-name stem, e.g. `exp_x_minus_1`
+// to `ExpXMinus1`.
 fn camel_case(name: &str) -> String {
     name.split('_')
         .map(|part| {
@@ -247,8 +246,8 @@ fn is_int_const(
 }
 
 // Whether the expression is inside a const context: the body of a `const` item, a `const` block, a
-// `static` initializer, or a `const fn` (whose body is evaluated at compile time whenever its caller
-// is).
+// `static` initializer, or a `const fn` (whose body is evaluated at compile time whenever its
+// caller is).
 fn in_const_context(cx: &rustc_lint::LateContext<'_>, e: &rustc_hir::Expr<'_>) -> bool {
     use rustc_hir::{BodyOwnerKind, Constness};
     let owner = cx.tcx.hir_enclosing_body_owner(e.hir_id);

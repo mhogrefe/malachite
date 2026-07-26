@@ -18,8 +18,8 @@ use rustc_session::{declare_lint, declare_lint_pass};
 declare_lint! {
     /// ### What it does
     ///
-    /// Flags the pattern of binding a `(value, Ordering)` result and then asserting the ordering
-    /// is `Equal`:
+    /// Flags the pattern of binding a `(value, Ordering)` result and then asserting the ordering is
+    /// `Equal`:
     ///
     /// ```rust,ignore
     /// let (x, o) = a.from_natural_prec(p);
@@ -34,8 +34,8 @@ declare_lint! {
     /// The `_round(.., Exact)` variant *is* the assertion: `Exact` panics if the result is not
     /// exactly representable, so the separate `assert_eq!` is redundant and the ordering binding
     /// only exists to be checked. Passing `Exact` also tends to be faster: the default `Nearest`
-    /// generally does more work than the directed modes (it must decide the tie), so a call that
-    /// is known to be exact should not pay for round-to-nearest.
+    /// generally does more work than the directed modes (it must decide the tie), so a call that is
+    /// known to be exact should not pay for round-to-nearest.
     ///
     /// ### Example
     ///

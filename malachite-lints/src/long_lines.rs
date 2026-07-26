@@ -17,23 +17,22 @@ use serde::Deserialize;
 declare_lint! {
     /// ### What it does
     ///
-    /// Flags source lines longer than `max_line_length` characters (default 100), ignoring
-    /// trailing whitespace.
+    /// Flags source lines longer than `max_line_length` characters (default 100), ignoring trailing
+    /// whitespace.
     ///
     /// ### Why is this bad?
     ///
     /// `rustfmt` keeps code within the limit, but cannot split long string literals or Markdown
     /// constructs in doc comments; this catches those.
     ///
-    /// Each long line is attributed to the innermost item containing it (doc comments belong to
-    /// the item they document), so a line that genuinely cannot be shortened (a long Markdown
-    /// table row or link) is exempted by annotating that item with
-    /// `#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]`. `expect` rather than
-    /// `allow` keeps the exemptions from going stale: if the item no longer contains a long line,
-    /// the unfulfilled expectation is itself reported. Crate-level `//!` doc lines have no
-    /// containing item (an `#![expect]` at crate level would exempt the entire crate), so those
-    /// few are listed in `dylint.toml` under `long_lines_exceptions` instead, with the same
-    /// staleness guarantee.
+    /// Each long line is attributed to the innermost item containing it (doc comments belong to the
+    /// item they document), so a line that genuinely cannot be shortened (a long Markdown table row
+    /// or link) is exempted by annotating that item with `#[cfg_attr(dylint_lib =
+    /// "malachite_lints", expect(long_lines))]`. `expect` rather than `allow` keeps the exemptions
+    /// from going stale: if the item no longer contains a long line, the unfulfilled expectation is
+    /// itself reported. Crate-level `//!` doc lines have no containing item (an `#![expect]` at
+    /// crate level would exempt the entire crate), so those few are listed in `dylint.toml` under
+    /// `long_lines_exceptions` instead, with the same staleness guarantee.
     pub LONG_LINES,
     Deny,
     "source line exceeds the maximum length"
@@ -63,9 +62,9 @@ impl Default for Config {
     }
 }
 
-// Whether the exception path (repo-relative, e.g. `malachite-base/src/lib.rs`) refers to
-// `path_str` (as rustc knows it, which may be absolute or relative to some other directory):
-// require a whole-component suffix match.
+// Whether the exception path (repo-relative, e.g. `malachite-base/src/lib.rs`) refers to `path_str`
+// (as rustc knows it, which may be absolute or relative to some other directory): require a
+// whole-component suffix match.
 fn path_matches(path_str: &str, exception_file: &str) -> bool {
     path_str == exception_file || path_str.ends_with(&format!("/{exception_file}"))
 }
@@ -78,8 +77,8 @@ fn line_span(file: &SourceFile, line_index: usize, line: &str) -> Span {
     Span::new(range.start, end, SyntaxContext::root(), None)
 }
 
-// The innermost HIR owner whose extent contains `sp`, or the crate root if none does. Owner
-// extents nest, so the smallest containing extent is the innermost.
+// The innermost HIR owner whose extent contains `sp`, or the crate root if none does. Owner extents
+// nest, so the smallest containing extent is the innermost.
 fn innermost_owner(owners: &[(BytePos, BytePos, HirId)], sp: Span) -> HirId {
     owners
         .iter()
@@ -92,16 +91,16 @@ impl<'tcx> LateLintPass<'tcx> for LongLines {
     fn check_crate(&mut self, cx: &LateContext<'tcx>) {
         let config: Config = dylint_linting::config_or_default(env!("CARGO_PKG_NAME"));
         // Collect every HIR owner's extent: its span joined with its attributes' spans, which
-        // include doc comments. Each long line is then attributed to the innermost owner
-        // containing it, which is where an `allow` or `expect` attribute takes effect.
+        // include doc comments. Each long line is then attributed to the innermost owner containing
+        // it, which is where an `allow` or `expect` attribute takes effect.
         let mut owners: Vec<(BytePos, BytePos, HirId)> = Vec::new();
         for owner_id in cx.tcx.hir_crate_items(()).owners() {
             let hir_id = HirId::make_owner(owner_id.def_id);
             let mut span = cx.tcx.hir_span(hir_id);
             for attr in cx.tcx.hir_attrs(hir_id) {
-                // Some synthetic parsed attributes have no span (`Attribute::span` panics on
-                // them); only real source attributes -- unparsed ones and doc comments -- extend
-                // the extent.
+                // Some synthetic parsed attributes have no span (`Attribute::span` panics on them);
+                // only real source attributes -- unparsed ones and doc comments -- extend the
+                // extent.
                 match attr {
                     Attribute::Unparsed(u) => span = span.to(u.span),
                     Attribute::Parsed(AttributeKind::DocComment {

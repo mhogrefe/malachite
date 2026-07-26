@@ -16,23 +16,23 @@ use rustc_session::{declare_lint, declare_lint_pass};
 declare_lint! {
     /// ### What it does
     ///
-    /// Flags a numeric conversion of a `const { .. }` block — either an `as` cast
-    /// (`const { (A - B) << 1 } as f64`) or a `from`/`exact_from`/`wrapping_from` call
-    /// (`u64::exact_from(const { Self::MAX_EXPONENT - 1 })`). The whole expression is a compile-time
-    /// constant, so the conversion should be an `as` cast *inside* the block:
-    /// `const { ((A - B) << 1) as f64 }` / `const { (Self::MAX_EXPONENT - 1) as u64 }`.
+    /// Flags a numeric conversion of a `const { .. }` block — either an `as` cast (`const { (A -
+    /// B) << 1 } as f64`) or a `from`/`exact_from`/`wrapping_from` call (`u64::exact_from(const {
+    /// Self::MAX_EXPONENT - 1 })`). The whole expression is a compile-time constant, so the
+    /// conversion should be an `as` cast *inside* the block: `const { ((A - B) << 1) as f64 }` /
+    /// `const { (Self::MAX_EXPONENT - 1) as u64 }`.
     ///
     /// ### Why is this bad?
     ///
     /// The value is already known at compile time (that is what the `const { .. }` block says), but
     /// the conversion is still a runtime call or cast. Folding it into the block as an `as` cast
-    /// evaluates the whole thing once, at compile time. For a value representable in the target type
-    /// — which a working conversion guarantees — the cast produces the same result.
+    /// evaluates the whole thing once, at compile time. For a value representable in the target
+    /// type — which a working conversion guarantees — the cast produces the same result.
     ///
-    /// This complements `use_const_block`, which wraps the constant argument in the first place. Once
-    /// the argument is a `const { .. }` block, the conversion belongs inside it; `use_const_block`
-    /// leaves it out because `ConstEvalCtxt` does not fold `as` casts, so the block stops at the
-    /// integer operand.
+    /// This complements `use_const_block`, which wraps the constant argument in the first place.
+    /// Once the argument is a `const { .. }` block, the conversion belongs inside it;
+    /// `use_const_block` leaves it out because `ConstEvalCtxt` does not fold `as` casts, so the
+    /// block stops at the integer operand.
     ///
     /// ### Example
     ///

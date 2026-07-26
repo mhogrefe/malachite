@@ -21,11 +21,11 @@ declare_lint! {
     /// ### Why is this bad?
     ///
     /// Materializing a power of 2 just to compare against it is wasteful (for large powers it
-    /// allocates a huge number); comparing the value's exponent with the power is direct and
-    /// cheap. `Natural` has `floor_log_base_2`, `ceiling_log_base_2`, and `checked_log_base_2`;
-    /// an `Integer` can use them through `unsigned_abs_ref()`; `Rational` additionally has the
-    /// `_abs` variants; and for a `Float`, `get_exponent()` gives 1 more than the floor of the
-    /// log (|x| lies in [2^(e-1), 2^e)).
+    /// allocates a huge number); comparing the value's exponent with the power is direct and cheap.
+    /// `Natural` has `floor_log_base_2`, `ceiling_log_base_2`, and `checked_log_base_2`; an
+    /// `Integer` can use them through `unsigned_abs_ref()`; `Rational` additionally has the `_abs`
+    /// variants; and for a `Float`, `get_exponent()` gives 1 more than the floor of the log (|x|
+    /// lies in [2^(e-1), 2^e)).
     ///
     /// ### Example
     ///

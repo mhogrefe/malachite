@@ -23,8 +23,8 @@ declare_lint! {
     /// The `*_prec*` shorthands are exactly the `*_prec_round*` functions with `Nearest`; house
     /// style is to use the shorthand.
     ///
-    /// The lint exempts the shorthand's own defining delegation and everything inside trait
-    /// impls, which delegate via the explicit form by convention.
+    /// The lint exempts the shorthand's own defining delegation and everything inside trait impls,
+    /// which delegate via the explicit form by convention.
     ///
     /// ### Example
     ///
@@ -66,8 +66,8 @@ impl<'tcx> LateLintPass<'tcx> for RedundantNearest {
             return;
         }
         // Match both method calls (`x.foo_prec_round(..)`) and associated-function calls
-        // (`Float::foo_rational_prec_round(..)`), extracting the function name, the self type
-        // whose inherent impls define the shorthand, and the last argument.
+        // (`Float::foo_rational_prec_round(..)`), extracting the function name, the self type whose
+        // inherent impls define the shorthand, and the last argument.
         let (fn_name, self_ty_did, last_arg) = match expr.kind {
             ExprKind::MethodCall(seg, receiver, args, _) => {
                 if !seg.ident.name.as_str().contains("_prec_round") {
@@ -115,12 +115,12 @@ impl<'tcx> LateLintPass<'tcx> for RedundantNearest {
         if !crate::has_inherent_fn(cx, self_ty_did, &shorthand) {
             return;
         }
-        // Exemptions. A shorthand's own definition delegates to a `_round` variant -- possibly of
-        // a different by-value/by-reference variant, as in `exp_rational_prec` calling
+        // Exemptions. A shorthand's own definition delegates to a `_round` variant -- possibly of a
+        // different by-value/by-reference variant, as in `exp_rational_prec` calling
         // `Self::exp_rational_prec_round_ref(&x, prec, Nearest)` -- so the name comparison ignores
         // `_val`/`_ref` suffixes. Trait impls (operators, `*Assign`, `LogBase`, etc.) delegate via
-        // the explicit form by convention. Tests, demos, and test utilities exercise both
-        // spellings on purpose.
+        // the explicit form by convention. Tests, demos, and test utilities exercise both spellings
+        // on purpose.
         let owner_did = cx.tcx.hir_get_parent_item(expr.hir_id).to_def_id();
         if matches!(cx.tcx.def_kind(owner_did), DefKind::Fn | DefKind::AssocFn) {
             if crate::strip_variant_suffixes(cx.tcx.item_name(owner_did).as_str())

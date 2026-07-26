@@ -19,8 +19,8 @@ use rustc_span::def_id::LocalDefId;
 declare_lint! {
     /// ### What it does
     ///
-    /// Flags a public function whose entire body is a single call that forwards to another
-    /// function or method (a trivial delegator), but which is not marked `#[inline]`.
+    /// Flags a public function whose entire body is a single call that forwards to another function
+    /// or method (a trivial delegator), but which is not marked `#[inline]`.
     ///
     /// ### Why is this bad?
     ///

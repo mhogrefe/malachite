@@ -15,9 +15,9 @@ use rustc_session::{declare_lint, declare_lint_pass};
 declare_lint! {
     /// ### What it does
     ///
-    /// Flags parity tests of an integer (a primitive, `Natural`, or `Integer`) spelled as
-    /// `x % 2 == 0` (or `!= 0`, or compared with 1), as `x & 1 == 0` (or the other comparisons), or
-    /// as `divisible_by(2)`.
+    /// Flags parity tests of an integer (a primitive, `Natural`, or `Integer`) spelled as `x % 2 ==
+    /// 0` (or `!= 0`, or compared with 1), as `x & 1 == 0` (or the other comparisons), or as
+    /// `divisible_by(2)`.
     ///
     /// ### Why is this bad?
     ///

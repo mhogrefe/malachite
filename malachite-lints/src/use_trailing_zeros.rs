@@ -16,8 +16,8 @@ use rustc_session::{declare_lint, declare_lint_pass};
 declare_lint! {
     /// ### What it does
     ///
-    /// Flags a loop that strips the trailing zero bits off an integer one at a time, such as
-    /// `while x.even() { x >>= 1; k -= 1; }`.
+    /// Flags a loop that strips the trailing zero bits off an integer one at a time, such as `while
+    /// x.even() { x >>= 1; k -= 1; }`.
     ///
     /// ### Why is this bad?
     ///
@@ -110,8 +110,8 @@ impl<'tcx> LateLintPass<'tcx> for UseTrailingZeros {
         if effects.is_empty() || effects.len() > 2 {
             return;
         }
-        // The body must be exactly one `x >>= 1` (on the tested integer), plus at most one
-        // `counter += 1` / `counter -= 1` on a *different* place.
+        // The body must be exactly one `x >>= 1` (on the tested integer), plus at most one `counter
+        // += 1` / `counter -= 1` on a *different* place.
         let mut shifts = 0;
         for e in effects {
             let ExprKind::AssignOp(op, lhs, rhs) = e.kind else {

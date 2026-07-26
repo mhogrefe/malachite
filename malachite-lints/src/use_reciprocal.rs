@@ -20,8 +20,8 @@ declare_lint! {
     /// ### Why is this bad?
     ///
     /// Taking the reciprocal has a dedicated implementation: use `reciprocal()`,
-    /// `reciprocal_assign()`, or (for `Float`) the `reciprocal_prec*` family when a specific
-    /// output precision is wanted.
+    /// `reciprocal_assign()`, or (for `Float`) the `reciprocal_prec*` family when a specific output
+    /// precision is wanted.
     ///
     /// ### Example
     ///

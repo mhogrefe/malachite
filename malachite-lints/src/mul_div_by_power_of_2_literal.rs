@@ -14,8 +14,8 @@ use rustc_session::{declare_lint, declare_lint_pass};
 declare_lint! {
     /// ### What it does
     ///
-    /// Flags multiplying or dividing a primitive integer by a power-of-two literal (`x * 8`,
-    /// `x / 16`, and the `*=`/`/=` forms), where a shift says the same thing.
+    /// Flags multiplying or dividing a primitive integer by a power-of-two literal (`x * 8`, `x /
+    /// 16`, and the `*=`/`/=` forms), where a shift says the same thing.
     ///
     /// This is the primitive-integer companion of `mul_div_by_power_of_2`, which covers the bignum
     /// `x * T::power_of_2(k)` spelling.

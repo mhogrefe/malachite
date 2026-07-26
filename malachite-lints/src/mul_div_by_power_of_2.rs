@@ -19,12 +19,12 @@ declare_lint! {
     ///
     /// ### Why is this bad?
     ///
-    /// Shifting is more direct and cheaper: `x << k` instead of `x * T::power_of_2(k)`, and
-    /// `x >> k` instead of `x / T::power_of_2(k)`. Note that malachite's signed shifts accept
-    /// negative counts, which reverse the direction, so a signed `power_of_2` argument needs no
-    /// special treatment. One case needs care: `Integer` division truncates while `>>` takes the
-    /// floor, so dividing an `Integer` converts to `shr_round` with `Down` (or `>>` if the floor
-    /// is really what's wanted).
+    /// Shifting is more direct and cheaper: `x << k` instead of `x * T::power_of_2(k)`, and `x >>
+    /// k` instead of `x / T::power_of_2(k)`. Note that malachite's signed shifts accept negative
+    /// counts, which reverse the direction, so a signed `power_of_2` argument needs no special
+    /// treatment. One case needs care: `Integer` division truncates while `>>` takes the floor, so
+    /// dividing an `Integer` converts to `shr_round` with `Down` (or `>>` if the floor is really
+    /// what's wanted).
     ///
     /// ### Example
     ///
@@ -49,8 +49,8 @@ impl<'tcx> LateLintPass<'tcx> for MulDivByPowerOf2 {
         if expr.span.from_expansion() {
             return;
         }
-        // Tests, demos, and test utilities multiply by `power_of_2` on purpose, to cross-check
-        // the shift operators themselves.
+        // Tests, demos, and test utilities multiply by `power_of_2` on purpose, to cross-check the
+        // shift operators themselves.
         if crate::in_test_code(cx, expr.span) {
             return;
         }

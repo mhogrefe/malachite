@@ -136,8 +136,8 @@ impl<'tcx> LateLintPass<'tcx> for RuntimeLiteralConversion {
             && let [a] = args
             && let Some(v) = crate::literal_value(a)
         {
-            // 0, 1, 2, and -1 are the named constants' territory; literals outside the 32-bit
-            // limb range have no portable `const_from*`.
+            // 0, 1, 2, and -1 are the named constants' territory; literals outside the 32-bit limb
+            // range have no portable `const_from*`.
             if matches!(v, 0 | 1 | 2 | -1) || v > i128::from(u32::MAX) || v < i128::from(i32::MIN) {
                 return;
             }

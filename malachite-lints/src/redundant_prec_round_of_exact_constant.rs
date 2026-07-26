@@ -17,9 +17,8 @@ declare_lint! {
     /// ### What it does
     ///
     /// Flags rounding one of the exactly-representable named [`Float`] constants (`ONE`, `TWO`,
-    /// `NEGATIVE_ONE`, `ONE_HALF`) to a precision, like
-    /// `Float::from_float_prec_round(Float::ONE, prec, rm)` or
-    /// `Float::from_float_prec(Float::ONE, prec)`.
+    /// `NEGATIVE_ONE`, `ONE_HALF`) to a precision, like `Float::from_float_prec_round(Float::ONE,
+    /// prec, rm)` or `Float::from_float_prec(Float::ONE, prec)`.
     ///
     /// ### Why is this bad?
     ///

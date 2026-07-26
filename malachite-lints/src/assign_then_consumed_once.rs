@@ -31,13 +31,13 @@ declare_lint! {
     /// ### Why is this bad?
     ///
     /// This is GMP/FLINT's assembly-like bind-mutate-move shape. In Malachite the value can be
-    /// threaded straight through a by-value variant of the operation, keeping it an expression
-    /// that chains: `f(a.ln_prec(p).0.mul_prec_val_ref(&y, p).0)`. The `mut` binding and the
-    /// separate statement disappear.
+    /// threaded straight through a by-value variant of the operation, keeping it an expression that
+    /// chains: `f(a.ln_prec(p).0.mul_prec_val_ref(&y, p).0)`. The `mut` binding and the separate
+    /// statement disappear.
     ///
     /// This is the near-inverse of `use_assign_variant`, which prefers the in-place form when a
-    /// *persisted* variable is reassigned its own result; the two do not overlap, because here
-    /// the binding is fresh and consumed once rather than reassigned.
+    /// *persisted* variable is reassigned its own result; the two do not overlap, because here the
+    /// binding is fresh and consumed once rather than reassigned.
     ///
     /// ### Example
     ///
@@ -87,8 +87,8 @@ impl<'tcx> LateLintPass<'tcx> for AssignThenConsumedOnce {
             if crate::bignum_adt_did(cx, cx.typeck_results().expr_ty(init)).is_none() {
                 continue;
             }
-            // s2: `NAME.<something>_assign<..>(..);` — an in-place method whose receiver is exactly
-            // NAME (no projection), evaluated for effect.
+            // s2: `NAME.<something>_assign<..>(..);` — an in-place method whose receiver is
+            // exactly NAME (no projection), evaluated for effect.
             let (StmtKind::Semi(e) | StmtKind::Expr(e)) = s2.kind else {
                 continue;
             };
@@ -122,9 +122,9 @@ impl<'tcx> LateLintPass<'tcx> for AssignThenConsumedOnce {
     }
 }
 
-// Whether `name_hir` is referenced exactly once in the block's statements after index `after`
-// (plus the trailing block expression), and that single reference is a by-value move: not the
-// operand of `&mut`, and not the receiver of another `*_assign*` method.
+// Whether `name_hir` is referenced exactly once in the block's statements after index `after` (plus
+// the trailing block expression), and that single reference is a by-value move: not the operand of
+// `&mut`, and not the receiver of another `*_assign*` method.
 fn consumed_once_by_move<'tcx>(
     cx: &LateContext<'tcx>,
     block: &'tcx Block<'tcx>,

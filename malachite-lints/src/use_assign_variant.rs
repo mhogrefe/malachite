@@ -16,9 +16,9 @@ declare_lint! {
     /// ### What it does
     ///
     /// Flags rebinding a bignum to the result of a method on itself when an in-place `*_assign*`
-    /// companion exists — whether by reassignment, like `x = x.add_prec(y, p).0` or
-    /// `x = (&x).abs()`, or by a shadowing `let`, like `let x = x.exp_prec(p).0` or
-    /// `let (x, o) = x.div_prec(y, p)`.
+    /// companion exists — whether by reassignment, like `x = x.add_prec(y, p).0` or `x =
+    /// (&x).abs()`, or by a shadowing `let`, like `let x = x.exp_prec(p).0` or `let (x, o) =
+    /// x.div_prec(y, p)`.
     ///
     /// ### Why is this bad?
     ///
@@ -59,8 +59,8 @@ impl<'tcx> LateLintPass<'tcx> for UseAssignVariant {
         let ExprKind::Assign(lhs, rhs, _) = expr.kind else {
             return;
         };
-        // The reassigned result is either the method call itself or the `.0` of its returned
-        // tuple (the house `(value, Ordering)` shape).
+        // The reassigned result is either the method call itself or the `.0` of its returned tuple
+        // (the house `(value, Ordering)` shape).
         let call = match rhs.kind {
             ExprKind::Field(base, ident) if ident.as_str() == "0" => base,
             _ => rhs,
@@ -83,8 +83,8 @@ impl<'tcx> LateLintPass<'tcx> for UseAssignVariant {
         let Some(suggestion) = crate::assign_variant(cx, adt_did, base) else {
             return;
         };
-        // The assign variant's own defining delegation (`fn foo_assign(&mut self, ..) {
-        // *self = (&*self).foo(..); }`) is exempt.
+        // The assign variant's own defining delegation (`fn foo_assign(&mut self, ..) { *self =
+        // (&*self).foo(..); }`) is exempt.
         let owner_did = cx.tcx.hir_get_parent_item(expr.hir_id).to_def_id();
         if matches!(
             cx.tcx.def_kind(owner_did),
@@ -123,8 +123,8 @@ impl<'tcx> LateLintPass<'tcx> for UseAssignVariant {
             }
             _ => return,
         };
-        // The bound result is the method call itself, or (for a non-tuple binding) the `.0` of
-        // its returned tuple.
+        // The bound result is the method call itself, or (for a non-tuple binding) the `.0` of its
+        // returned tuple.
         let call = match init.kind {
             ExprKind::Field(base, ident) if !tuple && ident.as_str() == "0" => base,
             _ => init,
@@ -136,8 +136,8 @@ impl<'tcx> LateLintPass<'tcx> for UseAssignVariant {
         if name.contains("_assign") || name == "clone" {
             return;
         }
-        // The receiver, behind any `&` or `.clone()`, must be a bare path with the same name as
-        // the new binding: a shadowing rebind.
+        // The receiver, behind any `&` or `.clone()`, must be a bare path with the same name as the
+        // new binding: a shadowing rebind.
         let recv_peeled = crate::peel_clone_and_borrows(recv);
         let ExprKind::Path(QPath::Resolved(None, path)) = recv_peeled.kind else {
             return;
@@ -148,8 +148,8 @@ impl<'tcx> LateLintPass<'tcx> for UseAssignVariant {
         if segment.ident.name != bound.name {
             return;
         }
-        // A reference-typed receiver (e.g. a `&Rational` parameter shadowed by an owned result)
-        // has no in-place option; the rebind is a legitimate conversion to an owned value.
+        // A reference-typed receiver (e.g. a `&Rational` parameter shadowed by an owned result) has
+        // no in-place option; the rebind is a legitimate conversion to an owned value.
         let recv_ty = cx.typeck_results().expr_ty(recv_peeled);
         if recv_ty.is_ref() {
             return;

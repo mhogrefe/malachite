@@ -28,8 +28,7 @@ declare_lint! {
     /// types, so materializing a bignum comparand is unnecessary: `*x == 1u32` and
     /// `x.partial_cmp(&1u32).unwrap()` mean the same thing. (Comparing with an unsigned literal is
     /// preferred when the value is nonnegative.) The operator-with-`from` form is covered by
-    /// `redundant_from_in_comparison`; this lint covers named constants and the comparison
-    /// methods.
+    /// `redundant_from_in_comparison`; this lint covers named constants and the comparison methods.
     ///
     /// ### Example
     ///

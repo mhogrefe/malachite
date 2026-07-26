@@ -26,9 +26,9 @@ declare_lint! {
     ///
     /// ### Why is this bad?
     ///
-    /// The raw shift obscures the intent (a mask, a bit test, or a power of two) and re-derives what
-    /// `LowMask`, `BitAccess`, and `PowerOf2` already provide. The named helpers read at the level
-    /// of the operation rather than its bit-twiddling implementation.
+    /// The raw shift obscures the intent (a mask, a bit test, or a power of two) and re-derives
+    /// what `LowMask`, `BitAccess`, and `PowerOf2` already provide. The named helpers read at the
+    /// level of the operation rather than its bit-twiddling implementation.
     ///
     /// A *constant* shift amount is left alone: `1 << 70` folds at compile time, but
     /// `power_of_2(70)` is an ordinary runtime call, so the rewrite would only pessimize it. Const
@@ -59,8 +59,8 @@ declare_lint_pass!(ShiftOfOne => [SHIFT_OF_ONE]);
 
 // Whether `e` is a compile-time-constant shift amount: an integer literal, a `const`/
 // associated-const/const-parameter path, or arithmetic over such. Immutable locals are followed to
-// their initializers (via `expr_or_init`), so a `let r = A::LOG_WIDTH - B::LOG_WIDTH;` counts too. A
-// plain syntactic check is used rather than `ConstEvalCtxt` because the latter cannot evaluate a
+// their initializers (via `expr_or_init`), so a `let r = A::LOG_WIDTH - B::LOG_WIDTH;` counts too.
+// A plain syntactic check is used rather than `ConstEvalCtxt` because the latter cannot evaluate a
 // generic associated const like `B::LOG_WIDTH`, which nonetheless folds at each instantiation.
 fn is_const_amount(cx: &LateContext<'_>, e: &Expr<'_>) -> bool {
     let e = expr_or_init(cx, e);

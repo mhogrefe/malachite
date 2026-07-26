@@ -20,16 +20,16 @@ declare_lint! {
     /// ### What it does
     ///
     /// Flags a *derived* compile-time constant that is written out more than once with the same
-    /// value — whether as a `const { .. }` block (`const { Limb::WIDTH - 1 }`) or as a `const` item
-    /// (`const TWICE_WIDTH: u64 = Limb::WIDTH << 1;`) — across the crate. Such repeats should be
-    /// consolidated into a single named constant.
+    /// value — whether as a `const { .. }` block (`const { Limb::WIDTH - 1 }`) or as a `const`
+    /// item (`const TWICE_WIDTH: u64 = Limb::WIDTH << 1;`) — across the crate. Such repeats
+    /// should be consolidated into a single named constant.
     ///
     /// ### Why is this bad?
     ///
     /// Repeating the same constant computation in many places is error-prone (they can drift apart)
     /// and obscures that they are meant to be the same value. A single named constant — a
-    /// `pub(crate)` associated constant on the relevant type, or a standalone `const` — states the
-    /// value once and lets every site refer to it.
+    /// `pub(crate)` associated constant on the relevant type, or a standalone `const` — states
+    /// the value once and lets every site refer to it.
     ///
     /// Instances are grouped by their source text *and* by the `DefId`s of the constants they
     /// reference, so two `const { UPPER_LIMIT - 1 }` blocks whose `UPPER_LIMIT` is a different
@@ -44,8 +44,8 @@ declare_lint! {
     /// const WIDTH_MINUS_1: u64 = Limb::WIDTH - 1;
     /// ```
     ///
-    /// Use instead: a single `pub(crate) const WIDTH_MINUS_1: u64 = Limb::WIDTH - 1;` referenced from
-    /// both places.
+    /// Use instead: a single `pub(crate) const WIDTH_MINUS_1: u64 = Limb::WIDTH - 1;` referenced
+    /// from both places.
     pub DUPLICATE_CONST,
     Deny,
     "the same derived constant written out more than once instead of a single named constant"
@@ -72,8 +72,8 @@ fn peel_block<'tcx>(e: &'tcx Expr<'tcx>) -> &'tcx Expr<'tcx> {
 }
 
 // Collects the `DefId`s of the `const`/associated-const paths referenced by `e` (resolved paths
-// only — a type-relative path like `Limb::WIDTH` is unambiguous by text, whereas a bare path like a
-// scope-local `UPPER_LIMIT` needs its `DefId` to tell instances apart).
+// only — a type-relative path like `Limb::WIDTH` is unambiguous by text, whereas a bare path like
+// a scope-local `UPPER_LIMIT` needs its `DefId` to tell instances apart).
 fn collect_const_defids(e: &Expr<'_>, out: &mut Vec<DefId>) {
     match e.kind {
         ExprKind::Path(QPath::Resolved(_, path)) => {
@@ -139,7 +139,10 @@ impl<'tcx> LateLintPass<'tcx> for DuplicateConst {
                         cx,
                         DUPLICATE_CONST,
                         span,
-                        format!("`{text}` is written out {} times with the same value", spans.len()),
+                        format!(
+                            "`{text}` is written out {} times with the same value",
+                            spans.len()
+                        ),
                         None,
                         "consolidate it into one named constant (a `pub(crate)` associated constant, \
                          or a standalone `const`)",
