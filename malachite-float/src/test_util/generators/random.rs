@@ -106,7 +106,7 @@ use malachite_nz::natural::random::{
 };
 use malachite_nz::platform::Limb;
 use malachite_q::Rational;
-use malachite_q::random::{random_non_negative_rationals, random_rationals};
+use malachite_q::rational::random::{random_non_negative_rationals, random_rationals};
 use std::cmp::Ordering;
 use std::collections::HashMap;
 

@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Rational;
-use crate::random::{
+use crate::rational::random::{
     RandomRationalsFromDoubleAndSign, random_negative_rationals, random_non_negative_rationals,
     random_nonzero_rationals, random_positive_rationals, random_rationals,
 };

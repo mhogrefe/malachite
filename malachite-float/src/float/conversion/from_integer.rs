@@ -15,7 +15,7 @@ use malachite_base::num::arithmetic::traits::{FloorLogBase2, UnsignedAbs};
 use malachite_base::num::conversion::traits::{ConvertibleFrom, SaturatingFrom};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::integer::Integer;
-use malachite_q::conversion::primitive_float_from_rational::FloatConversionError;
+use malachite_q::rational::conversion::primitive_float_from_rational::FloatConversionError;
 
 pub(crate) fn from_integer_zero_exponent(n: Integer) -> Float {
     let sign = n >= 0;

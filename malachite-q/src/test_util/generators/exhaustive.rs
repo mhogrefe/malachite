@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Rational;
-use crate::exhaustive::{
+use crate::rational::exhaustive::{
     exhaustive_negative_rationals, exhaustive_non_negative_rationals, exhaustive_nonzero_rationals,
     exhaustive_positive_rationals, exhaustive_rationals,
 };

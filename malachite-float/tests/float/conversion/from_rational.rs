@@ -23,7 +23,7 @@ use malachite_float::test_util::generators::rational_unsigned_rounding_mode_trip
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float, emulate_rational_to_float_fn};
 use malachite_nz::test_util::generators::integer_gen;
 use malachite_q::Rational;
-use malachite_q::conversion::primitive_float_from_rational::FloatConversionError;
+use malachite_q::rational::conversion::primitive_float_from_rational::FloatConversionError;
 use malachite_q::test_util::generators::{rational_gen, rational_unsigned_pair_gen_var_3};
 use std::cmp::Ordering::*;
 use std::panic::catch_unwind;

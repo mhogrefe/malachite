@@ -20,7 +20,7 @@ use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::{Natural, bit_to_limb_count_ceiling};
 use malachite_nz::platform::Limb;
-use malachite_q::conversion::primitive_float_from_rational::FloatConversionError;
+use malachite_q::rational::conversion::primitive_float_from_rational::FloatConversionError;
 
 fn from_natural_prec_round_helper(
     x: &Natural,

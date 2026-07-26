@@ -30,7 +30,7 @@ use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::Limb;
 use malachite_q::Rational;
-use malachite_q::conversion::primitive_float_from_rational::FloatConversionError;
+use malachite_q::rational::conversion::primitive_float_from_rational::FloatConversionError;
 
 pub_test! {from_rational_prec_round_direct(
     x: Rational,
@@ -698,7 +698,7 @@ impl TryFrom<Rational> for Float {
     /// ```
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_float::Float;
-    /// use malachite_q::conversion::primitive_float_from_rational::FloatConversionError;
+    /// use malachite_q::rational::conversion::primitive_float_from_rational::FloatConversionError;
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(Float::try_from(Rational::ZERO).unwrap(), 0);
@@ -770,7 +770,7 @@ impl TryFrom<&Rational> for Float {
     /// ```
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_float::Float;
-    /// use malachite_q::conversion::primitive_float_from_rational::FloatConversionError;
+    /// use malachite_q::rational::conversion::primitive_float_from_rational::FloatConversionError;
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(Float::try_from(&Rational::ZERO).unwrap(), 0);

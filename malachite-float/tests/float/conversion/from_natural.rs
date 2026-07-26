@@ -18,7 +18,7 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::{natural_gen, natural_unsigned_pair_gen_var_7};
 use malachite_q::Rational;
-use malachite_q::conversion::primitive_float_from_rational::FloatConversionError;
+use malachite_q::rational::conversion::primitive_float_from_rational::FloatConversionError;
 use std::cmp::Ordering::*;
 use std::panic::catch_unwind;
 use std::str::FromStr;

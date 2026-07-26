@@ -78,7 +78,7 @@ use malachite_nz::natural::Natural;
 use malachite_nz::natural::exhaustive::exhaustive_naturals;
 use malachite_nz::platform::Limb;
 use malachite_q::Rational;
-use malachite_q::exhaustive::{exhaustive_non_negative_rationals, exhaustive_rationals};
+use malachite_q::rational::exhaustive::{exhaustive_non_negative_rationals, exhaustive_rationals};
 use std::cmp::{Ordering, max};
 use std::iter::Chain;
 use std::mem::swap;
