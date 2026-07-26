@@ -36,18 +36,17 @@ const fn is_space(c: u8) -> bool {
 //
 // This is `digit_value_in_base` from `strtofr.c`, MPFR 4.3.0.
 const fn digit_value_in_base(c: u8, base: u8) -> Option<u8> {
-    let digit = if c.is_ascii_digit() {
-        c - b'0'
-    } else if c.is_ascii_lowercase() {
-        if base >= 37 {
-            c - b'a' + 36
-        } else {
-            c - b'a' + 10
+    let digit = match c {
+        b'0'..=b'9' => c - b'0',
+        b'a'..=b'z' => {
+            if base >= 37 {
+                c - b'a' + 36
+            } else {
+                c - b'a' + 10
+            }
         }
-    } else if c.is_ascii_uppercase() {
-        c - b'A' + 10
-    } else {
-        return None;
+        b'A'..=b'Z' => c - b'A' + 10,
+        _ => return None,
     };
     if digit < base { Some(digit) } else { None }
 }
@@ -56,8 +55,9 @@ const fn digit_value_in_base(c: u8, base: u8) -> Option<u8> {
 //
 // This is `fast_casecmp` from `strtofr.c`, MPFR 4.3.0, returning whether the comparison succeeded.
 fn starts_with_ignore_case(s: &[u8], prefix: &[u8]) -> bool {
-    s.len() >= prefix.len()
-        && s[..prefix.len()]
+    let prefix_len = prefix.len();
+    s.len() >= prefix_len
+        && s[..prefix_len]
             .iter()
             .zip(prefix)
             .all(|(&c, &p)| c.to_ascii_lowercase() == p)
@@ -149,20 +149,15 @@ fn parse_string(s: &[u8], mut base: u8) -> (ParsedString, usize) {
         return (ParsedString::NaN, i);
     }
     // a case-insensitive infinity
-    let inf = if starts_with_ignore_case(&s[i..], b"@inf@") {
-        i += 5;
-        true
-    } else if base <= 16 && starts_with_ignore_case(&s[i..], b"infinity") {
-        i += 8;
-        true
-    } else if base <= 16 && starts_with_ignore_case(&s[i..], b"inf") {
-        i += 3;
-        true
-    } else {
-        false
-    };
-    if inf {
-        return (ParsedString::Infinity(sign), i);
+    let s_tail = &s[i..];
+    if starts_with_ignore_case(s_tail, b"@inf@") {
+        return (ParsedString::Infinity(sign), i + 5);
+    } else if base <= 16 {
+        if starts_with_ignore_case(s_tail, b"infinity") {
+            return (ParsedString::Infinity(sign), i + 8);
+        } else if starts_with_ignore_case(s_tail, b"inf") {
+            return (ParsedString::Infinity(sign), i + 3);
+        }
     }
     // For a base of 0 or 16 the string may carry a "0x" prefix, and for 0 or 2 a "0b" one.
     let mut prefix_index = None;
@@ -268,11 +263,87 @@ fn parse_string(s: &[u8], mut base: u8) -> (ParsedString, usize) {
 
 /// Converts a string to a [`Float`], reading as much of it as forms a valid number.
 ///
-/// Returns the value, the [`Ordering`] of the value against the exact value of the string, and the
-/// number of bytes consumed, which is zero if the string does not begin with a valid number.
+/// The value is the exact value of the digits read, rounded once to `prec` bits with `rm`. Returns
+/// that value, the [`Ordering`] of it against the string's exact value, and the number of bytes
+/// consumed, which is zero if the string does not begin with a valid number (in which case the
+/// value is zero and the [`Ordering`] is `Equal`).
+///
+/// This is MPFR's grammar rather than Malachite's, so it differs from
+/// [`from_sci_string_prec_round`](Float::from_sci_string_prec_round) in what it accepts; see
+/// [`from_string`](mod@crate::conversion::string::from_string) for the Malachite side. Leading
+/// whitespace is skipped, then an optional sign, then:
+/// - `nan` or `inf` or `infinity`, case-insensitively, when `base` is 16 or less, or `@nan@` or
+///   `@inf@` in any base. A `nan` may be followed by a parenthesized run of alphanumerics and
+///   underscores, as in `nan(_char_sequence)`.
+/// - Otherwise digits, with an optional point among them. Digits above 9 are the letters, with the
+///   case ignored when `base` is 36 or less; above that, `a`–`z` continue the sequence after
+///   `A`–`Z`, giving values 36 to 61.
+///
+/// A `base` of 0 means the base is taken from a `0x` or `0b` prefix, defaulting to 10. Those
+/// prefixes are also accepted when `base` is 16 or 2 respectively.
+///
+/// An exponent may follow the digits: `e` or `E` when `base` is 10 or less, `p` or `P` when `base`
+/// is 2 or 16, and `@` in any base. An `e` or `@` exponent is a power of `base`, while a `p`
+/// exponent is a power of 2. The exponent itself is always read in base 10, and saturates rather
+/// than wrapping.
+///
+/// # Worst-case complexity
+/// $T(n) = O(n (\log n)^2 \log\log n)$
+///
+/// $M(n) = O(n \log n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `max(s.len(), prec)`.
 ///
 /// # Panics
-/// Panics if `base` is 1 or greater than 62, or if `prec` is zero.
+/// Panics if `base` is 1 or greater than 62, if `prec` is zero, or if `rm` is `Exact` but the
+/// string's value is not exactly representable with `prec` bits.
+///
+/// # Examples
+/// ```
+/// use core::cmp::Ordering::*;
+/// use malachite_base::rounding_modes::RoundingMode::*;
+/// use malachite_float::conversion::string::strtofr::strtofr;
+/// use malachite_float::Float;
+///
+/// let s = |s, base, prec, rm| {
+///     let (x, o, len) = strtofr(s, base, prec, rm);
+///     (x.to_string(), o, len)
+/// };
+///
+/// assert_eq!(s("1.5", 10, 10, Nearest), ("1.5000".to_string(), Equal, 3));
+/// assert_eq!(
+///     s("ff", 16, 53, Nearest),
+///     ("255.00000000000000".to_string(), Equal, 2)
+/// );
+///
+/// // 0.1 is not representable in binary, so it is rounded and the `Ordering` gives the direction.
+/// assert_eq!(s("0.1", 10, 4, Floor), ("0.0938".to_string(), Less, 3));
+/// assert_eq!(s("0.1", 10, 4, Ceiling), ("0.102".to_string(), Greater, 3));
+///
+/// // A base of 0 takes the base from the prefix.
+/// assert_eq!(
+///     s("0b1.1", 0, 53, Nearest),
+///     ("1.5000000000000000".to_string(), Equal, 5)
+/// );
+///
+/// // `e` is a power of the base and `p` a power of two; `@` works in any base.
+/// assert_eq!(
+///     s("1e5", 10, 53, Nearest),
+///     ("100000.00000000000".to_string(), Equal, 3)
+/// );
+/// assert_eq!(
+///     s("1@5", 16, 53, Nearest),
+///     ("1048576.0000000000".to_string(), Equal, 3)
+/// );
+///
+/// // The special values, and a string that is not a number at all.
+/// assert_eq!(s("nan", 10, 53, Nearest), ("NaN".to_string(), Equal, 3));
+/// assert_eq!(
+///     s("-inf", 10, 53, Nearest),
+///     ("-Infinity".to_string(), Equal, 4)
+/// );
+/// assert_eq!(s("abc", 10, 53, Nearest), ("0.0".to_string(), Equal, 0));
+/// ```
 ///
 /// This is `mpfr_strtofr` from `strtofr.c`, MPFR 4.3.0.
 pub fn strtofr(s: &str, base: u8, prec: u64, rm: RoundingMode) -> (Float, Ordering, usize) {
@@ -313,11 +384,46 @@ pub fn strtofr(s: &str, base: u8, prec: u64, rm: RoundingMode) -> (Float, Orderi
 
 /// Converts a string to a [`Float`], requiring that the whole string be a valid number.
 ///
-/// Returns the value and the [`Ordering`] of the value against the exact value of the string, or
-/// `None` if the string is empty or is not entirely consumed by [`strtofr`].
+/// This is [`strtofr`] with the trailing text disallowed: it returns the value and the [`Ordering`]
+/// of that value against the string's exact value, or `None` if the string is empty or is not
+/// entirely consumed. See [`strtofr`] for the grammar, which is MPFR's rather than Malachite's.
+///
+/// Note that trailing whitespace is trailing text, and so is rejected, even though leading
+/// whitespace is skipped.
+///
+/// # Worst-case complexity
+/// $T(n) = O(n (\log n)^2 \log\log n)$
+///
+/// $M(n) = O(n \log n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `max(s.len(), prec)`.
 ///
 /// # Panics
-/// Panics if `base` is 1 or greater than 62, or if `prec` is zero.
+/// Panics if `base` is 1 or greater than 62, if `prec` is zero, or if `rm` is `Exact` but the
+/// string's value is not exactly representable with `prec` bits.
+///
+/// # Examples
+/// ```
+/// use core::cmp::Ordering::*;
+/// use malachite_base::rounding_modes::RoundingMode::*;
+/// use malachite_float::conversion::string::strtofr::set_str;
+///
+/// let s = |s, base, prec, rm| set_str(s, base, prec, rm).map(|(x, o)| (x.to_string(), o));
+///
+/// assert_eq!(
+///     s("1.5", 10, 10, Nearest),
+///     Some(("1.5000".to_string(), Equal))
+/// );
+/// assert_eq!(
+///     s("0.1", 10, 4, Nearest),
+///     Some(("0.102".to_string(), Greater))
+/// );
+///
+/// // Trailing text that `strtofr` would simply stop at is rejected here.
+/// assert_eq!(s("1.5abc", 10, 10, Nearest), None);
+/// assert_eq!(s("1.5 ", 10, 10, Nearest), None);
+/// assert_eq!(s("", 10, 10, Nearest), None);
+/// ```
 ///
 /// This is `mpfr_set_str` from `set_str.c`, MPFR 4.3.0. MPFR's version reports only success or
 /// failure, discarding the ternary value; this one returns it.

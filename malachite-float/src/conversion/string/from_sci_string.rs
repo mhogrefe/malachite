@@ -5,7 +5,7 @@
 // Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
-
+//
 // Malachite's own scientific-string parsing, driven by `FromSciStringOptions`: the counterpart of
 // `to_sci.rs`, and the reverse-direction sibling of `strtofr.rs`.
 //
@@ -110,7 +110,48 @@ fn implied_prec(significant: usize, base: u8) -> u64 {
 }
 
 impl Float {
-    /// Converts a string, possibly in scientific notation, to a [`Float`].
+    /// Converts a string, possibly in scientific notation, to a [`Float`], with a given precision
+    /// and rounding mode.
+    ///
+    /// The string is read in base 10; use
+    /// [`from_sci_string_with_options_prec`](Float::from_sci_string_with_options_prec) for another
+    /// base. The result is the string's exact value rounded once to `prec` bits with `rm`, together
+    /// with the [`Ordering`] of the result against that exact value. `None` means the string is not
+    /// a number.
+    ///
+    /// See [`from_sci_string_with_options_prec`](Float::from_sci_string_with_options_prec) for the
+    /// grammar and for the treatment of the special values and of zero.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(s.len(), prec)`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the string's value is not exactly
+    /// representable with `prec` bits.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    ///
+    /// let s = |s, prec, rm| {
+    ///     Float::from_sci_string_prec_round(s, prec, rm).map(|(x, o)| (x.to_string(), o))
+    /// };
+    ///
+    /// assert_eq!(s("1.5", 10, Nearest), Some(("1.5000".to_string(), Equal)));
+    ///
+    /// // 0.1 is not representable in binary, so it is rounded and the `Ordering` gives the
+    /// // direction.
+    /// assert_eq!(s("0.1", 4, Floor), Some(("0.0938".to_string(), Less)));
+    /// assert_eq!(s("0.1", 4, Ceiling), Some(("0.102".to_string(), Greater)));
+    ///
+    /// assert_eq!(s("abc", 10, Nearest), None);
+    /// ```
     pub fn from_sci_string_prec_round(
         s: &str,
         prec: u64,
@@ -121,14 +162,123 @@ impl Float {
         Self::from_sci_string_with_options_prec(s, options, prec)
     }
 
-    /// Converts a string, possibly in scientific notation, to a [`Float`], rounding to nearest.
+    /// Converts a string, possibly in scientific notation, to a [`Float`], with a given precision,
+    /// rounding to nearest.
+    ///
+    /// This is [`from_sci_string_prec_round`](Float::from_sci_string_prec_round) with `Nearest`.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(s.len(), prec)`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_float::Float;
+    ///
+    /// let s = |s, prec| Float::from_sci_string_prec(s, prec).map(|(x, o)| (x.to_string(), o));
+    ///
+    /// assert_eq!(s("1.5", 10), Some(("1.5000".to_string(), Equal)));
+    /// assert_eq!(s("0.1", 4), Some(("0.102".to_string(), Greater)));
+    /// assert_eq!(
+    ///     s("1e10", 53),
+    ///     Some(("10000000000.000000".to_string(), Equal))
+    /// );
+    /// assert_eq!(s("abc", 10), None);
+    /// ```
     #[inline]
     pub fn from_sci_string_prec(s: &str, prec: u64) -> Option<(Self, Ordering)> {
         Self::from_sci_string_with_options_prec(s, FromSciStringOptions::default(), prec)
     }
 
-    /// Converts a string, possibly in scientific notation, to a [`Float`], using the given options
-    /// for the base and the rounding mode.
+    /// Converts a string, possibly in scientific notation, to a [`Float`], with a given precision,
+    /// using the given options for the base and the rounding mode.
+    ///
+    /// The result is the string's exact value rounded once to `prec` bits, together with the
+    /// [`Ordering`] of the result against that exact value. `None` means the string is not a
+    /// number; it never means the value is out of range, since a value too large in magnitude gives
+    /// an infinity (or, under a mode that rounds toward zero, the largest finite value) and one too
+    /// small gives a zero.
+    ///
+    /// Use [`FromSciStringOptions`] to specify the base, from 2 to 36 inclusive, and the rounding
+    /// mode. This is the grammar the rest of Malachite uses, so a [`Float`] reads a string the same
+    /// way a [`Rational`](malachite_q::Rational) does, with three additions: the strings `NaN`,
+    /// `Infinity`, and `-Infinity`, which are what [`Float`]'s [`Display`](std::fmt::Display)
+    /// writes and are read in every base; a signed zero, so that `-0.0` is negative zero rather
+    /// than zero; and the precision and rounding mode. Note that from base 24 up `NaN` is also a
+    /// valid digit string, and from base 35 up so is `Infinity`; the special value wins.
+    ///
+    /// If the base is greater than 10, the higher digits are represented by the letters `'a'`
+    /// through `'z'` or `'A'` through `'Z'`; the case doesn't matter and doesn't need to be
+    /// consistent.
+    ///
+    /// Exponents are allowed, and are indicated using the character `'e'` or `'E'`. If the base is
+    /// 15 or greater, an ambiguity arises where it may not be clear whether `'e'` is a digit or an
+    /// exponent indicator. To resolve this ambiguity, always use a `'+'` or `'-'` sign after the
+    /// exponent indicator when the base is 15 or greater. The exponent itself is always parsed
+    /// using base 10.
+    ///
+    /// Points are allowed.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(s.len(), prec)`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if the rounding mode is `Exact` but the string's value is not
+    /// exactly representable with `prec` bits.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_base::num::conversion::string::options::FromSciStringOptions;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    ///
+    /// let s = |s, options, prec| {
+    ///     Float::from_sci_string_with_options_prec(s, options, prec)
+    ///         .map(|(x, o)| (x.to_string(), o))
+    /// };
+    ///
+    /// let mut options = FromSciStringOptions::default();
+    /// options.set_base(16);
+    /// assert_eq!(
+    ///     s("ff", options, 53),
+    ///     Some(("255.00000000000000".to_string(), Equal))
+    /// );
+    /// // From base 15 up, an exponent needs an explicit sign, since `e` is also a digit.
+    /// assert_eq!(
+    ///     s("1e5", options, 20),
+    ///     Some(("485.00000".to_string(), Equal))
+    /// );
+    /// assert_eq!(
+    ///     s("1e+5", options, 20),
+    ///     Some(("1048576.0".to_string(), Equal))
+    /// );
+    ///
+    /// // The rounding mode comes from the options.
+    /// options.set_base(10);
+    /// options.set_rounding_mode(Floor);
+    /// assert_eq!(s("0.1", options, 4), Some(("0.0938".to_string(), Less)));
+    /// options.set_rounding_mode(Ceiling);
+    /// assert_eq!(s("0.1", options, 4), Some(("0.102".to_string(), Greater)));
+    ///
+    /// // Zero keeps its sign, and an exponent too large to represent gives an infinity.
+    /// assert_eq!(s("-0.0", options, 53), Some(("-0.0".to_string(), Equal)));
+    /// assert_eq!(
+    ///     s("1e1000000000000000000", options, 53),
+    ///     Some(("Infinity".to_string(), Greater))
+    /// );
+    /// ```
     pub fn from_sci_string_with_options_prec(
         s: &str,
         options: FromSciStringOptions,
@@ -211,6 +361,70 @@ float_from_string_base(base: u8, s: &str) -> Option<Float> {
 impl FromSciString for Float {
     /// Converts a string, possibly in scientific notation, to a [`Float`], inferring a precision
     /// from the number of digits.
+    ///
+    /// The grammar, the base, and the treatment of the special values and of zero are as in
+    /// [`from_sci_string_with_options_prec`](Float::from_sci_string_with_options_prec), which this
+    /// differs from only in where the precision comes from. The rounding mode option is ignored;
+    /// the value is rounded to nearest.
+    ///
+    /// A string does not say how precise it is, so the precision has to be guessed, and the guess
+    /// is that its $n$ significant digits are all meaningful: $\lceil n \log_2 b \rceil$ bits. If
+    /// the value is exactly representable in fewer bits than that, it is stored in the fewest that
+    /// represent it, which makes a literal agree with [`Float::from`]: `"1.5"` gives precision 2
+    /// and `"255"` gives 8, matching `Float::from(1.5)` and `Float::from(255)`.
+    ///
+    /// This is worth dwelling on, because for short strings the guess is coarse in a way that may
+    /// surprise, much as
+    /// [`from_sci_string_simplest`](malachite_q::Rational::from_sci_string_simplest) does for
+    /// [`Rational`](malachite_q::Rational). One decimal digit buys only four bits, so `"0.1"` gives
+    /// a precision-4 [`Float`] whose value is $13/128$, or 0.1015625 — not the nearest `f64` to
+    /// 0.1, and not close to it. Reading `"0.1000000000000000055511151231257827"` gives that
+    /// instead, and asking for a precision outright with
+    /// [`from_sci_string_prec`](Float::from_sci_string_prec) avoids the question altogether. Note
+    /// also that a string with a huge exponent is not thereby precise: `"1e100000000"` still has
+    /// one significant digit, so it gives four bits rather than its exact 332 million.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `s.len()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::conversion::string::options::FromSciStringOptions;
+    /// use malachite_base::num::conversion::traits::FromSciString;
+    /// use malachite_float::Float;
+    ///
+    /// // An exactly representable value is stored in the fewest bits that represent it, so these
+    /// // agree with `Float::from`.
+    /// assert_eq!(Float::from_sci_string("1.5").unwrap(), Float::from(1.5));
+    /// assert_eq!(Float::from_sci_string("255").unwrap(), Float::from(255));
+    ///
+    /// // A value that is not exactly representable keeps the precision its digits imply, which
+    /// // for short strings is coarse: one decimal digit buys only four bits.
+    /// assert_eq!(Float::from_sci_string("0.1").unwrap().to_string(), "0.102");
+    /// assert_eq!(
+    ///     Float::from_sci_string("3.14159").unwrap().to_string(),
+    ///     "3.1415901"
+    /// );
+    ///
+    /// // A huge exponent does not make the digits more precise.
+    /// assert_eq!(
+    ///     Float::from_sci_string("1e100000000").unwrap().to_string(),
+    ///     "9.80e99999999"
+    /// );
+    ///
+    /// let mut options = FromSciStringOptions::default();
+    /// options.set_base(16);
+    /// assert_eq!(
+    ///     Float::from_sci_string_with_options("ff", options).unwrap(),
+    ///     Float::from(255)
+    /// );
+    ///
+    /// assert!(Float::from_sci_string("abc").is_none());
+    /// ```
     fn from_sci_string_with_options(s: &str, options: FromSciStringOptions) -> Option<Self> {
         let base = options.get_base();
         Some(match parse(s, options)? {
