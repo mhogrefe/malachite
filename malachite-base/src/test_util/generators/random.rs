@@ -11,6 +11,8 @@ use crate::chars::constants::NUMBER_OF_CHARS;
 use crate::chars::random::{
     random_ascii_chars, random_char_inclusive_range, random_char_range, random_chars,
 };
+use crate::foer_sequences::FoerSequence;
+use crate::foer_sequences::random::random_foer_sequences;
 use crate::iterators::with_special_value;
 use crate::num::arithmetic::traits::CoprimeWith;
 use crate::num::arithmetic::traits::{
@@ -54,8 +56,6 @@ use crate::num::random::{
     special_random_primitive_floats,
 };
 use crate::random::{EXAMPLE_SEED, Seed};
-use crate::rational_sequences::RationalSequence;
-use crate::rational_sequences::random::random_rational_sequences;
 use crate::rounding_modes::RoundingMode::{self, *};
 use crate::rounding_modes::random::{RandomRoundingModes, random_rounding_modes};
 use crate::slices::slice_test_zero;
@@ -4580,12 +4580,12 @@ pub fn random_unsigned_bool_vec_pair_gen_var_1<T: PrimitiveUnsigned>(
     })
 }
 
-// -- RationalSequence<PrimitiveInt> --
+// -- FoerSequence<PrimitiveInt> --
 
-pub fn random_primitive_int_rational_sequence_gen<T: PrimitiveInt>(
+pub fn random_primitive_int_foer_sequence_gen<T: PrimitiveInt>(
     config: &GenConfig,
-) -> It<RationalSequence<T>> {
-    Box::new(random_rational_sequences(
+) -> It<FoerSequence<T>> {
+    Box::new(random_foer_sequences(
         EXAMPLE_SEED,
         &random_primitive_ints,
         config.get_or("mean_length_n", 4),
@@ -4593,18 +4593,18 @@ pub fn random_primitive_int_rational_sequence_gen<T: PrimitiveInt>(
     ))
 }
 
-// -- (RationalSequence<PrimitiveInt>, PrimitiveUnsigned) --
+// -- (FoerSequence<PrimitiveInt>, PrimitiveUnsigned) --
 
-pub fn random_primitive_int_rational_sequence_unsigned_pair_gen_var_1<
+pub fn random_primitive_int_foer_sequence_unsigned_pair_gen_var_1<
     T: PrimitiveInt,
     U: PrimitiveUnsigned,
 >(
     config: &GenConfig,
-) -> It<(RationalSequence<T>, U)> {
+) -> It<(FoerSequence<T>, U)> {
     Box::new(random_pairs(
         EXAMPLE_SEED,
         &|seed| {
-            random_rational_sequences(
+            random_foer_sequences(
                 seed,
                 &random_primitive_ints,
                 config.get_or("mean_length_n", 4),
@@ -4621,14 +4621,14 @@ pub fn random_primitive_int_rational_sequence_unsigned_pair_gen_var_1<
     ))
 }
 
-pub fn random_primitive_int_rational_sequence_unsigned_pair_gen_var_2<T: PrimitiveInt>(
+pub fn random_primitive_int_foer_sequence_unsigned_pair_gen_var_2<T: PrimitiveInt>(
     config: &GenConfig,
-) -> It<(RationalSequence<T>, usize)> {
+) -> It<(FoerSequence<T>, usize)> {
     Box::new(
         random_pairs(
             EXAMPLE_SEED,
             &|seed| {
-                random_rational_sequences(
+                random_foer_sequences(
                     seed,
                     &random_primitive_ints,
                     config.get_or("mean_length_n", 4),
@@ -4653,12 +4653,12 @@ pub fn random_primitive_int_rational_sequence_unsigned_pair_gen_var_2<T: Primiti
     )
 }
 
-// -- (RationalSequence<PrimitiveInt>, RationalSequence<PrimitiveInt>) --
+// -- (FoerSequence<PrimitiveInt>, FoerSequence<PrimitiveInt>) --
 
-pub fn random_primitive_int_rational_sequence_pair_gen<T: PrimitiveInt>(
+pub fn random_primitive_int_foer_sequence_pair_gen<T: PrimitiveInt>(
     config: &GenConfig,
-) -> It<(RationalSequence<T>, RationalSequence<T>)> {
-    Box::new(random_pairs_from_single(random_rational_sequences(
+) -> It<(FoerSequence<T>, FoerSequence<T>)> {
+    Box::new(random_pairs_from_single(random_foer_sequences(
         EXAMPLE_SEED,
         &random_primitive_ints,
         config.get_or("mean_length_n", 4),
@@ -4666,16 +4666,12 @@ pub fn random_primitive_int_rational_sequence_pair_gen<T: PrimitiveInt>(
     )))
 }
 
-// -- RationalSequence<PrimitiveInt> * 3 --
+// -- FoerSequence<PrimitiveInt> * 3 --
 
-pub fn random_primitive_int_rational_sequence_triple_gen<T: PrimitiveInt>(
+pub fn random_primitive_int_foer_sequence_triple_gen<T: PrimitiveInt>(
     config: &GenConfig,
-) -> It<(
-    RationalSequence<T>,
-    RationalSequence<T>,
-    RationalSequence<T>,
-)> {
-    Box::new(random_triples_from_single(random_rational_sequences(
+) -> It<(FoerSequence<T>, FoerSequence<T>, FoerSequence<T>)> {
+    Box::new(random_triples_from_single(random_foer_sequences(
         EXAMPLE_SEED,
         &random_primitive_ints,
         config.get_or("mean_length_n", 4),
@@ -8148,12 +8144,12 @@ pub fn random_large_type_gen_var_9<T: PrimitiveInt>(
 
 pub fn random_large_type_gen_var_22<T: PrimitiveInt>(
     config: &GenConfig,
-) -> It<(RationalSequence<T>, usize, T, T)> {
+) -> It<(FoerSequence<T>, usize, T, T)> {
     Box::new(
         random_quadruples_xyzz(
             EXAMPLE_SEED,
             &|seed| {
-                random_rational_sequences(
+                random_foer_sequences(
                     seed,
                     &random_primitive_ints,
                     config.get_or("mean_length_n", 4),

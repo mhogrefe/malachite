@@ -171,6 +171,10 @@ pub mod nevers;
 /// Functions for working with primitive integers and floats.
 #[macro_use]
 pub mod num;
+/// [`FoerSequence`](foer_sequences::FoerSequence), a type representing a sequence that is finite or
+/// eventually repeating (which is what "foer" abbreviates), just like the digits of a rational
+/// number.
+pub mod foer_sequences;
 /// Functions for working with [`Ordering`](std::cmp::Ordering)s.
 pub mod options;
 /// Functions for working with [`Option`]s.
@@ -178,9 +182,6 @@ pub mod orderings;
 #[cfg(feature = "random")]
 /// Functions for generating random values.
 pub mod random;
-/// [`RationalSequence`](rational_sequences::RationalSequence), a type representing a sequence that
-/// is finite or eventually repeating, just like the digits of a rational number.
-pub mod rational_sequences;
 /// [`RoundingMode`](rounding_modes::RoundingMode), an enum used to specify rounding behavior.
 pub mod rounding_modes;
 /// Functions for working with [`HashSet`](std::collections::HashSet)s and

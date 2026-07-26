@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::foer_sequences::FoerSequence;
 use crate::iterators::bit_distributor::BitDistributorOutputType;
 use crate::num::arithmetic::traits::UnsignedAbs;
 use crate::num::basic::floats::PrimitiveFloat;
@@ -20,7 +21,6 @@ use crate::num::conversion::traits::{
 use crate::num::factorization::traits::IsPrime;
 use crate::num::float::NiceFloat;
 use crate::num::logic::traits::{BitBlockAccess, LeadingZeros};
-use crate::rational_sequences::RationalSequence;
 use crate::rounding_modes::RoundingMode;
 use crate::slices::slice_trailing_zeros;
 use crate::test_util::generators::common::Generator;
@@ -2985,63 +2985,60 @@ pub fn unsigned_bool_vec_pair_gen_var_1<T: PrimitiveUnsigned>() -> Generator<(T,
     )
 }
 
-// -- RationalSequence<PrimitiveUnsigned> --
+// -- FoerSequence<PrimitiveUnsigned> --
 
-pub fn unsigned_rational_sequence_gen<T: PrimitiveUnsigned>() -> Generator<RationalSequence<T>> {
+pub fn unsigned_foer_sequence_gen<T: PrimitiveUnsigned>() -> Generator<FoerSequence<T>> {
     Generator::new(
-        &exhaustive_unsigned_rational_sequence_gen,
-        &random_primitive_int_rational_sequence_gen,
-        &special_random_unsigned_rational_sequence_gen,
+        &exhaustive_unsigned_foer_sequence_gen,
+        &random_primitive_int_foer_sequence_gen,
+        &special_random_unsigned_foer_sequence_gen,
     )
 }
 
-// -- (RationalSequence<PrimitiveUnsigned>, PrimitiveUnsigned) --
+// -- (FoerSequence<PrimitiveUnsigned>, PrimitiveUnsigned) --
 
-// All `(RationalSequence<T>, U)` pairs where `T` and `U` are unsigned and the `U` is small.
-pub fn unsigned_rational_sequence_unsigned_pair_gen_var_1<
+// All `(FoerSequence<T>, U)` pairs where `T` and `U` are unsigned and the `U` is small.
+pub fn unsigned_foer_sequence_unsigned_pair_gen_var_1<
     T: PrimitiveUnsigned,
     U: PrimitiveUnsigned,
->() -> Generator<(RationalSequence<T>, U)> {
+>() -> Generator<(FoerSequence<T>, U)> {
     Generator::new(
-        &exhaustive_unsigned_rational_sequence_unsigned_pair_gen_var_1,
-        &random_primitive_int_rational_sequence_unsigned_pair_gen_var_1,
-        &special_random_unsigned_rational_sequence_unsigned_pair_gen_var_1,
+        &exhaustive_unsigned_foer_sequence_unsigned_pair_gen_var_1,
+        &random_primitive_int_foer_sequence_unsigned_pair_gen_var_1,
+        &special_random_unsigned_foer_sequence_unsigned_pair_gen_var_1,
     )
 }
 
-// All `(RationalSequence<T>, usize)` pairs where `T` is unsigned and the `usize` is less than the
-// length of the `RationalSequence`.
-pub fn unsigned_rational_sequence_unsigned_pair_gen_var_2<T: PrimitiveUnsigned>()
--> Generator<(RationalSequence<T>, usize)> {
+// All `(FoerSequence<T>, usize)` pairs where `T` is unsigned and the `usize` is less than the
+// length of the `FoerSequence`.
+pub fn unsigned_foer_sequence_unsigned_pair_gen_var_2<T: PrimitiveUnsigned>()
+-> Generator<(FoerSequence<T>, usize)> {
     Generator::new(
-        &exhaustive_unsigned_rational_sequence_unsigned_pair_gen_var_2,
-        &random_primitive_int_rational_sequence_unsigned_pair_gen_var_2,
-        &special_random_unsigned_rational_sequence_unsigned_pair_gen_var_2,
+        &exhaustive_unsigned_foer_sequence_unsigned_pair_gen_var_2,
+        &random_primitive_int_foer_sequence_unsigned_pair_gen_var_2,
+        &special_random_unsigned_foer_sequence_unsigned_pair_gen_var_2,
     )
 }
 
-// -- (RationalSequence<PrimitiveUnsigned>, RationalSequence<PrimitiveUnsigned>) --
+// -- (FoerSequence<PrimitiveUnsigned>, FoerSequence<PrimitiveUnsigned>) --
 
-pub fn unsigned_rational_sequence_pair_gen<T: PrimitiveUnsigned>()
--> Generator<(RationalSequence<T>, RationalSequence<T>)> {
+pub fn unsigned_foer_sequence_pair_gen<T: PrimitiveUnsigned>()
+-> Generator<(FoerSequence<T>, FoerSequence<T>)> {
     Generator::new(
-        &exhaustive_unsigned_rational_sequence_pair_gen,
-        &random_primitive_int_rational_sequence_pair_gen,
-        &special_random_unsigned_rational_sequence_pair_gen,
+        &exhaustive_unsigned_foer_sequence_pair_gen,
+        &random_primitive_int_foer_sequence_pair_gen,
+        &special_random_unsigned_foer_sequence_pair_gen,
     )
 }
 
-// -- RationalSequence<PrimitiveUnsigned> * 3 --
+// -- FoerSequence<PrimitiveUnsigned> * 3 --
 
-pub fn unsigned_rational_sequence_triple_gen<T: PrimitiveUnsigned>() -> Generator<(
-    RationalSequence<T>,
-    RationalSequence<T>,
-    RationalSequence<T>,
-)> {
+pub fn unsigned_foer_sequence_triple_gen<T: PrimitiveUnsigned>()
+-> Generator<(FoerSequence<T>, FoerSequence<T>, FoerSequence<T>)> {
     Generator::new(
-        &exhaustive_unsigned_rational_sequence_triple_gen,
-        &random_primitive_int_rational_sequence_triple_gen,
-        &special_random_unsigned_rational_sequence_triple_gen,
+        &exhaustive_unsigned_foer_sequence_triple_gen,
+        &random_primitive_int_foer_sequence_triple_gen,
+        &special_random_unsigned_foer_sequence_triple_gen,
     )
 }
 
@@ -4640,10 +4637,10 @@ pub fn large_type_gen_var_9<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, Vec<T>
 
 // vars 10 through 21 are in malachite-nz.
 
-type T2<T> = Generator<(RationalSequence<T>, usize, T, T)>;
+type T2<T> = Generator<(FoerSequence<T>, usize, T, T)>;
 
-// All `(RationalSequence<T>, usize, T, T)` quadruples where `T` is unsigned and the `usize` is less
-// than the length of the `RationalSequence`.
+// All `(FoerSequence<T>, usize, T, T)` quadruples where `T` is unsigned and the `usize` is less
+// than the length of the `FoerSequence`.
 pub fn large_type_gen_var_22<T: PrimitiveUnsigned>() -> T2<T> {
     Generator::new(
         &exhaustive_large_type_gen_var_22,

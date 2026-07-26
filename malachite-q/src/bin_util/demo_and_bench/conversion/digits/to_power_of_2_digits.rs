@@ -7,8 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use itertools::Itertools;
+use malachite_base::foer_sequences::FoerSequence;
 use malachite_base::iterators::prefix_to_string;
-use malachite_base::rational_sequences::RationalSequence;
 use malachite_base::strings::ToDebugString;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
@@ -33,7 +33,7 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_rational_power_of_2_digits);
 }
 
-fn to_string_helper(p: (Vec<Natural>, RationalSequence<Natural>)) -> String {
+fn to_string_helper(p: (Vec<Natural>, FoerSequence<Natural>)) -> String {
     let (before, after) = p;
     let mut s = "(".to_string();
     s.push_str(&before.to_debug_string());

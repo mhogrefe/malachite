@@ -9,6 +9,8 @@
 use crate::bools::exhaustive::{ExhaustiveBools, exhaustive_bools};
 use crate::chars::constants::NUMBER_OF_CHARS;
 use crate::chars::exhaustive::{exhaustive_ascii_chars, exhaustive_chars};
+use crate::foer_sequences::FoerSequence;
+use crate::foer_sequences::exhaustive::exhaustive_foer_sequences;
 use crate::iterators::bit_distributor::BitDistributorOutputType;
 use crate::iterators::iter_windows;
 use crate::max;
@@ -40,8 +42,6 @@ use crate::num::exhaustive::{
 use crate::num::float::NiceFloat;
 use crate::num::iterators::{bit_distributor_sequence, ruler_sequence};
 use crate::num::logic::traits::{BitBlockAccess, LeadingZeros};
-use crate::rational_sequences::RationalSequence;
-use crate::rational_sequences::exhaustive::exhaustive_rational_sequences;
 use crate::rounding_modes::RoundingMode::{self, *};
 use crate::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use crate::slices::slice_test_zero;
@@ -3416,30 +3416,29 @@ pub fn exhaustive_unsigned_bool_vec_pair_gen_var_1<T: PrimitiveUnsigned>() -> It
     ))
 }
 
-// -- RationalSequence<PrimitiveUnsigned> --
+// -- FoerSequence<PrimitiveUnsigned> --
 
-pub fn exhaustive_unsigned_rational_sequence_gen<T: PrimitiveUnsigned>() -> It<RationalSequence<T>>
-{
-    Box::new(exhaustive_rational_sequences(exhaustive_unsigneds()))
+pub fn exhaustive_unsigned_foer_sequence_gen<T: PrimitiveUnsigned>() -> It<FoerSequence<T>> {
+    Box::new(exhaustive_foer_sequences(exhaustive_unsigneds()))
 }
 
-// -- (RationalSequence<PrimitiveUnsigned>, PrimitiveUnsigned) --
+// -- (FoerSequence<PrimitiveUnsigned>, PrimitiveUnsigned) --
 
-pub fn exhaustive_unsigned_rational_sequence_unsigned_pair_gen_var_1<
+pub fn exhaustive_unsigned_foer_sequence_unsigned_pair_gen_var_1<
     T: PrimitiveUnsigned,
     U: PrimitiveUnsigned,
->() -> It<(RationalSequence<T>, U)> {
+>() -> It<(FoerSequence<T>, U)> {
     Box::new(exhaustive_pairs_big_tiny(
-        exhaustive_rational_sequences(exhaustive_unsigneds()),
+        exhaustive_foer_sequences(exhaustive_unsigneds()),
         exhaustive_unsigneds(),
     ))
 }
 
-pub fn exhaustive_unsigned_rational_sequence_unsigned_pair_gen_var_2<T: PrimitiveUnsigned>()
--> It<(RationalSequence<T>, usize)> {
+pub fn exhaustive_unsigned_foer_sequence_unsigned_pair_gen_var_2<T: PrimitiveUnsigned>()
+-> It<(FoerSequence<T>, usize)> {
     Box::new(
         exhaustive_pairs_big_tiny(
-            exhaustive_rational_sequences(exhaustive_unsigneds()),
+            exhaustive_foer_sequences(exhaustive_unsigneds()),
             exhaustive_unsigneds(),
         )
         .filter(|&(ref xs, i)| {
@@ -3452,25 +3451,22 @@ pub fn exhaustive_unsigned_rational_sequence_unsigned_pair_gen_var_2<T: Primitiv
     )
 }
 
-// -- (RationalSequence<PrimitiveUnsigned>, RationalSequence<PrimitiveUnsigned>) --
+// -- (FoerSequence<PrimitiveUnsigned>, FoerSequence<PrimitiveUnsigned>) --
 
-pub fn exhaustive_unsigned_rational_sequence_pair_gen<T: PrimitiveUnsigned>()
--> It<(RationalSequence<T>, RationalSequence<T>)> {
-    Box::new(exhaustive_pairs_from_single(exhaustive_rational_sequences(
+pub fn exhaustive_unsigned_foer_sequence_pair_gen<T: PrimitiveUnsigned>()
+-> It<(FoerSequence<T>, FoerSequence<T>)> {
+    Box::new(exhaustive_pairs_from_single(exhaustive_foer_sequences(
         exhaustive_unsigneds(),
     )))
 }
 
-// -- RationalSequence<PrimitiveUnsigned> * 3 --
+// -- FoerSequence<PrimitiveUnsigned> * 3 --
 
-pub fn exhaustive_unsigned_rational_sequence_triple_gen<T: PrimitiveUnsigned>() -> It<(
-    RationalSequence<T>,
-    RationalSequence<T>,
-    RationalSequence<T>,
-)> {
-    Box::new(exhaustive_triples_from_single(
-        exhaustive_rational_sequences(exhaustive_unsigneds()),
-    ))
+pub fn exhaustive_unsigned_foer_sequence_triple_gen<T: PrimitiveUnsigned>()
+-> It<(FoerSequence<T>, FoerSequence<T>, FoerSequence<T>)> {
+    Box::new(exhaustive_triples_from_single(exhaustive_foer_sequences(
+        exhaustive_unsigneds(),
+    )))
 }
 
 // -- RoundingMode --
@@ -6083,11 +6079,13 @@ pub fn exhaustive_large_type_gen_var_9<T: PrimitiveUnsigned>() -> It<(Vec<T>, Ve
 
 // vars 10 through 21 are in malachite-nz.
 
-pub fn exhaustive_large_type_gen_var_22<T: PrimitiveUnsigned>()
--> It<(RationalSequence<T>, usize, T, T)> {
+pub fn exhaustive_large_type_gen_var_22<T>() -> It<(FoerSequence<T>, usize, T, T)>
+where
+    T: PrimitiveUnsigned,
+{
     Box::new(
         exhaustive_quadruples_xyzz(
-            exhaustive_rational_sequences(exhaustive_unsigneds()),
+            exhaustive_foer_sequences(exhaustive_unsigneds()),
             exhaustive_unsigneds(),
             exhaustive_unsigneds(),
         )

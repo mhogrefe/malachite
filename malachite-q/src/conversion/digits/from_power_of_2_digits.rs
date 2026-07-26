@@ -8,9 +8,9 @@
 
 use crate::Rational;
 use alloc::vec::Vec;
+use malachite_base::foer_sequences::FoerSequence;
 use malachite_base::num::conversion::traits::{ExactFrom, PowerOf2Digits};
 use malachite_base::num::logic::traits::LowMask;
-use malachite_base::rational_sequences::RationalSequence;
 use malachite_nz::natural::Natural;
 
 impl Rational {
@@ -36,12 +36,12 @@ impl Rational {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::rational_sequences::RationalSequence;
+    /// use malachite_base::foer_sequences::FoerSequence;
     /// use malachite_base::vecs::vec_from_str;
     /// use malachite_q::Rational;
     ///
     /// let before_point = vec_from_str("[1, 1]").unwrap();
-    /// let after_point = RationalSequence::from_vecs(
+    /// let after_point = FoerSequence::from_vecs(
     ///     vec_from_str("[0]").unwrap(),
     ///     vec_from_str("[0, 0, 1]").unwrap(),
     /// );
@@ -52,7 +52,7 @@ impl Rational {
     ///
     /// // 21.34565656..._32
     /// let before_point = vec_from_str("[1, 2]").unwrap();
-    /// let after_point = RationalSequence::from_vecs(
+    /// let after_point = FoerSequence::from_vecs(
     ///     vec_from_str("[3, 4]").unwrap(),
     ///     vec_from_str("[5, 6]").unwrap(),
     /// );
@@ -64,7 +64,7 @@ impl Rational {
     pub fn from_power_of_2_digits(
         log_base: u64,
         before_point: Vec<Natural>,
-        after_point: RationalSequence<Natural>,
+        after_point: FoerSequence<Natural>,
     ) -> Self {
         let (non_repeating, repeating) = after_point.into_vecs();
         let r_len = u64::exact_from(repeating.len());
@@ -106,12 +106,12 @@ impl Rational {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::rational_sequences::RationalSequence;
+    /// use malachite_base::foer_sequences::FoerSequence;
     /// use malachite_base::vecs::vec_from_str;
     /// use malachite_q::Rational;
     ///
     /// let before_point = vec_from_str("[1, 1]").unwrap();
-    /// let after_point = RationalSequence::from_vecs(
+    /// let after_point = FoerSequence::from_vecs(
     ///     vec_from_str("[0]").unwrap(),
     ///     vec_from_str("[0, 0, 1]").unwrap(),
     /// );
@@ -122,7 +122,7 @@ impl Rational {
     ///
     /// // 21.34565656..._32
     /// let before_point = vec_from_str("[1, 2]").unwrap();
-    /// let after_point = RationalSequence::from_vecs(
+    /// let after_point = FoerSequence::from_vecs(
     ///     vec_from_str("[3, 4]").unwrap(),
     ///     vec_from_str("[5, 6]").unwrap(),
     /// );
@@ -134,7 +134,7 @@ impl Rational {
     pub fn from_power_of_2_digits_ref(
         log_base: u64,
         before_point: &[Natural],
-        after_point: &RationalSequence<Natural>,
+        after_point: &FoerSequence<Natural>,
     ) -> Self {
         let (non_repeating, repeating) = after_point.to_vecs();
         let r_len = u64::exact_from(repeating.len());

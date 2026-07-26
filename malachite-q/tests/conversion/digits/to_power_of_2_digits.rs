@@ -6,11 +6,11 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::foer_sequences::FoerSequence;
 use malachite_base::num::arithmetic::traits::{Abs, Floor, IsPowerOf2, UnsignedAbs};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{IsInteger, PowerOf2Digits};
 use malachite_base::num::logic::traits::LowMask;
-use malachite_base::rational_sequences::RationalSequence;
 use malachite_base::strings::ToDebugString;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::natural_unsigned_pair_gen_var_7;
@@ -124,7 +124,7 @@ fn to_power_of_2_digits_properties() {
             Rational::from(&n).into_power_of_2_digits(log_base),
             (
                 n.to_power_of_2_digits_asc(log_base),
-                RationalSequence::from_vec(Vec::new())
+                FoerSequence::from_vec(Vec::new())
             )
         );
     });

@@ -6,10 +6,10 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::foer_sequences::FoerSequence;
 use malachite_base::num::arithmetic::traits::{Abs, Floor, UnsignedAbs};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{Digits, IsInteger};
-use malachite_base::rational_sequences::RationalSequence;
 use malachite_base::strings::ToDebugString;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::natural_pair_gen_var_2;
@@ -148,10 +148,7 @@ fn to_digits_properties() {
     natural_pair_gen_var_2().test_properties(|(n, base)| {
         assert_eq!(
             Rational::from(&n).into_digits(&base),
-            (
-                n.to_digits_asc(&base),
-                RationalSequence::from_vec(Vec::new())
-            )
+            (n.to_digits_asc(&base), FoerSequence::from_vec(Vec::new()))
         );
     });
 }

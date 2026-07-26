@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::chars::crement::char_to_contiguous_range;
+use crate::foer_sequences::FoerSequence;
 use crate::max;
 use crate::num::arithmetic::traits::UnsignedAbs;
 use crate::num::basic::floats::PrimitiveFloat;
@@ -15,7 +16,6 @@ use crate::num::basic::signeds::PrimitiveSigned;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::{ExactFrom, WrappingFrom};
 use crate::num::logic::traits::SignificantBits;
-use crate::rational_sequences::RationalSequence;
 use std::cmp::{max, min};
 
 pub struct Bucketer<'a, T> {
@@ -995,37 +995,35 @@ where
     }
 }
 
-pub fn rational_sequence_len_bucketer<'a, T: Eq>(
-    xs_name: &str,
-) -> Bucketer<'a, RationalSequence<T>> {
+pub fn foer_sequence_len_bucketer<'a, T: Eq>(xs_name: &str) -> Bucketer<'a, FoerSequence<T>> {
     Bucketer {
-        bucketing_function: &RationalSequence::component_len,
+        bucketing_function: &FoerSequence::component_len,
         bucketing_label: format!("{xs_name}.component_len()"),
     }
 }
 
-pub fn pair_rational_sequence_max_len_bucketer<'a, T: Eq, U: Eq>(
+pub fn pair_foer_sequence_max_len_bucketer<'a, T: Eq, U: Eq>(
     xs_name: &str,
     ys_name: &str,
-) -> Bucketer<'a, (RationalSequence<T>, RationalSequence<U>)> {
+) -> Bucketer<'a, (FoerSequence<T>, FoerSequence<U>)> {
     Bucketer {
         bucketing_function: &|(xs, ys)| max(xs.component_len(), ys.component_len()),
         bucketing_label: format!("max({xs_name}.component_len(), {ys_name}.component_len())"),
     }
 }
 
-pub fn pair_1_rational_sequence_len_bucketer<'a, T: Eq, U>(
+pub fn pair_1_foer_sequence_len_bucketer<'a, T: Eq, U>(
     xs_name: &str,
-) -> Bucketer<'a, (RationalSequence<T>, U)> {
+) -> Bucketer<'a, (FoerSequence<T>, U)> {
     Bucketer {
         bucketing_function: &|(xs, _)| xs.component_len(),
         bucketing_label: format!("{xs_name}.component_len()"),
     }
 }
 
-pub fn quadruple_1_rational_sequence_len_bucketer<'a, T: Eq, U, V, W>(
+pub fn quadruple_1_foer_sequence_len_bucketer<'a, T: Eq, U, V, W>(
     xs_name: &str,
-) -> Bucketer<'a, (RationalSequence<T>, U, V, W)> {
+) -> Bucketer<'a, (FoerSequence<T>, U, V, W)> {
     Bucketer {
         bucketing_function: &|(xs, _, _, _)| xs.component_len(),
         bucketing_label: format!("{xs_name}.component_len()"),

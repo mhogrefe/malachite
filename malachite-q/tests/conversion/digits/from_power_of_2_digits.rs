@@ -6,10 +6,10 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::foer_sequences::FoerSequence;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::PowerOf2Digits;
 use malachite_base::num::logic::traits::LowMask;
-use malachite_base::rational_sequences::RationalSequence;
 use malachite_base::vecs::vec_from_str;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::{
@@ -26,7 +26,7 @@ fn test_from_power_of_2_digits() {
         let x = Rational::from_power_of_2_digits_ref(
             log_base,
             &before,
-            &RationalSequence::from_slices(&after_nr, &after_r),
+            &FoerSequence::from_slices(&after_nr, &after_r),
         );
         assert!(x.is_valid());
         assert_eq!(x.to_string(), out);
@@ -34,7 +34,7 @@ fn test_from_power_of_2_digits() {
             Rational::from_power_of_2_digits(
                 log_base,
                 before,
-                RationalSequence::from_vecs(after_nr, after_r)
+                FoerSequence::from_vecs(after_nr, after_r)
             ),
             x
         );
@@ -75,13 +75,13 @@ fn test_from_power_of_2_digits() {
 #[test]
 #[should_panic]
 fn from_power_of_2_digits_fail() {
-    Rational::from_power_of_2_digits(0, Vec::new(), RationalSequence::from_vec(Vec::new()));
+    Rational::from_power_of_2_digits(0, Vec::new(), FoerSequence::from_vec(Vec::new()));
 }
 
 #[test]
 #[should_panic]
 fn from_power_of_2_digits_ref_fail() {
-    Rational::from_power_of_2_digits_ref(0, &[], &RationalSequence::from_vec(Vec::new()));
+    Rational::from_power_of_2_digits_ref(0, &[], &FoerSequence::from_vec(Vec::new()));
 }
 
 #[test]
@@ -114,7 +114,7 @@ fn from_power_of_2_digits_properties() {
             Rational::from_power_of_2_digits(
                 log_base,
                 digits.to_vec(),
-                RationalSequence::from_vec(Vec::new())
+                FoerSequence::from_vec(Vec::new())
             )
         );
     });

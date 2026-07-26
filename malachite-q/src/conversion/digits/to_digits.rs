@@ -10,14 +10,14 @@ use crate::Rational;
 use crate::conversion::digits::to_power_of_2_digits::to_power_of_2_digits_helper;
 use alloc::collections::BTreeMap;
 use alloc::vec::Vec;
+use malachite_base::foer_sequences::FoerSequence;
 use malachite_base::num::arithmetic::traits::{
     Abs, AbsAssign, CheckedLogBase2, Floor, UnsignedAbs,
 };
 use malachite_base::num::conversion::traits::Digits;
-use malachite_base::rational_sequences::RationalSequence;
 use malachite_nz::natural::Natural;
 
-fn to_digits_helper(x: Rational, base: &Natural) -> (Vec<Natural>, RationalSequence<Natural>) {
+fn to_digits_helper(x: Rational, base: &Natural) -> (Vec<Natural>, FoerSequence<Natural>) {
     if let Some(log_base) = base.checked_log_base_2() {
         return to_power_of_2_digits_helper(x, log_base);
     }
@@ -29,11 +29,11 @@ fn to_digits_helper(x: Rational, base: &Natural) -> (Vec<Natural>, RationalSeque
     let base = Rational::from(base);
     for i in 0.. {
         if remainder == 0u32 {
-            return (before_point, RationalSequence::from_vec(digits));
+            return (before_point, FoerSequence::from_vec(digits));
         }
         if let Some(previous_i) = state_map.insert(remainder.clone(), i) {
             let repeating = digits.drain(previous_i..).collect();
-            return (before_point, RationalSequence::from_vecs(digits, repeating));
+            return (before_point, FoerSequence::from_vecs(digits, repeating));
         }
         remainder *= &base;
         let floor = (&remainder).floor().unsigned_abs();
@@ -47,7 +47,7 @@ impl Rational {
     /// Returns the base-$b$ digits of a [`Rational`], taking the [`Rational`] by value.
     ///
     /// The output has two components. The first is a [`Vec`] of the digits of the integer portion
-    /// of the [`Rational`], least- to most-significant. The second is a [`RationalSequence`] of the
+    /// of the [`Rational`], least- to most-significant. The second is a [`FoerSequence`] of the
     /// digits of the fractional portion.
     ///
     /// The output is in its simplest form: the integer-portion digits do not end with a zero, and
@@ -85,7 +85,7 @@ impl Rational {
     /// assert_eq!(after_point.to_string(), "[[1, 4, 2, 8, 5, 7]]");
     /// ```
     #[inline]
-    pub fn into_digits(mut self, base: &Natural) -> (Vec<Natural>, RationalSequence<Natural>) {
+    pub fn into_digits(mut self, base: &Natural) -> (Vec<Natural>, FoerSequence<Natural>) {
         self.abs_assign();
         to_digits_helper(self, base)
     }
@@ -93,7 +93,7 @@ impl Rational {
     /// Returns the base-$b$ digits of a [`Rational`], taking the [`Rational`] by reference.
     ///
     /// The output has two components. The first is a [`Vec`] of the digits of the integer portion
-    /// of the [`Rational`], least- to most-significant. The second is a [`RationalSequence`] of the
+    /// of the [`Rational`], least- to most-significant. The second is a [`FoerSequence`] of the
     /// digits of the fractional portion.
     ///
     /// The output is in its simplest form: the integer-portion digits do not end with a zero, and
@@ -131,7 +131,7 @@ impl Rational {
     /// assert_eq!(after_point.to_string(), "[[1, 4, 2, 8, 5, 7]]");
     /// ```
     #[inline]
-    pub fn to_digits(&self, base: &Natural) -> (Vec<Natural>, RationalSequence<Natural>) {
+    pub fn to_digits(&self, base: &Natural) -> (Vec<Natural>, FoerSequence<Natural>) {
         to_digits_helper(self.abs(), base)
     }
 }

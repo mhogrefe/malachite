@@ -11,10 +11,10 @@ use crate::natural::Natural;
 use crate::natural::logic::significant_bits::limbs_significant_bits;
 use crate::platform::Limb;
 use crate::test_util::natural::arithmetic::gcd::OwnedHalfGcdMatrix;
+use malachite_base::foer_sequences::FoerSequence;
 use malachite_base::max;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rational_sequences::RationalSequence;
 use malachite_base::test_util::bench::bucketers::Bucketer;
 use std::cmp::{max, min};
 
@@ -685,7 +685,7 @@ pub fn limbs_mod_limb_small_unnormalized_bucketer<'a>() -> Bucketer<'a, (Vec<Lim
 }
 
 pub fn rational_from_power_of_2_digits_bucketer<'a>()
--> Bucketer<'a, (u64, Vec<Natural>, RationalSequence<Natural>)> {
+-> Bucketer<'a, (u64, Vec<Natural>, FoerSequence<Natural>)> {
     Bucketer {
         bucketing_function: &|(log_base, xs, ys)| {
             usize::exact_from(*log_base) * max(xs.len(), ys.component_len())
@@ -696,7 +696,7 @@ pub fn rational_from_power_of_2_digits_bucketer<'a>()
 }
 
 pub fn rational_from_digits_bucketer<'a>()
--> Bucketer<'a, (Natural, Vec<Natural>, RationalSequence<Natural>)> {
+-> Bucketer<'a, (Natural, Vec<Natural>, FoerSequence<Natural>)> {
     Bucketer {
         bucketing_function: &|(base, xs, ys)| {
             usize::exact_from(base.significant_bits()) * max(xs.len(), ys.component_len())

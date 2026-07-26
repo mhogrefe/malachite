@@ -72,6 +72,7 @@ use crate::test_util::generators::exhaustive::{
 use crate::test_util::generators::{T8, factors_of_limb_max};
 use crate::test_util::natural::arithmetic::gcd::{OwnedHalfGcdMatrix, half_gcd_matrix_create};
 use malachite_base::bools::random::{RandomBools, random_bools};
+use malachite_base::foer_sequences::FoerSequence;
 use malachite_base::iterators::with_special_value;
 use malachite_base::num::arithmetic::traits::{
     ArithmeticCheckedShl, CeilingLogBase2, CoprimeWith, DivRound, DivisibleBy, DivisibleByPowerOf2,
@@ -109,7 +110,6 @@ use malachite_base::num::random::{
 };
 use malachite_base::options::random::{RandomOptions, random_options};
 use malachite_base::random::{EXAMPLE_SEED, Seed};
-use malachite_base::rational_sequences::RationalSequence;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::random::random_rounding_modes;
 use malachite_base::test_util::generators::common::{
@@ -7874,9 +7874,9 @@ struct RationalFromPowerOf2DigitsGenerator {
 }
 
 impl Iterator for RationalFromPowerOf2DigitsGenerator {
-    type Item = (u64, Vec<Natural>, RationalSequence<Natural>);
+    type Item = (u64, Vec<Natural>, FoerSequence<Natural>);
 
-    fn next(&mut self) -> Option<(u64, Vec<Natural>, RationalSequence<Natural>)> {
+    fn next(&mut self) -> Option<(u64, Vec<Natural>, FoerSequence<Natural>)> {
         let log_base = self.log_bases.next().unwrap();
         let mean_stripe_n = self.mean_stripe_n;
         let mean_stripe_d = self.mean_stripe_d;
@@ -7896,14 +7896,14 @@ impl Iterator for RationalFromPowerOf2DigitsGenerator {
         Some((
             log_base,
             before_point,
-            RationalSequence::from_vecs(non_repeating, repeating),
+            FoerSequence::from_vecs(non_repeating, repeating),
         ))
     }
 }
 
 pub fn special_random_large_type_gen_var_23(
     config: &GenConfig,
-) -> It<(u64, Vec<Natural>, RationalSequence<Natural>)> {
+) -> It<(u64, Vec<Natural>, FoerSequence<Natural>)> {
     Box::new(RationalFromPowerOf2DigitsGenerator {
         mean_stripe_n: config.get_or("mean_stripe_n", 32),
         mean_stripe_d: config.get_or("mean_stripe_d", 1),
@@ -7930,9 +7930,9 @@ struct RationalFromDigitsGenerator {
 }
 
 impl Iterator for RationalFromDigitsGenerator {
-    type Item = (Natural, Vec<Natural>, RationalSequence<Natural>);
+    type Item = (Natural, Vec<Natural>, FoerSequence<Natural>);
 
-    fn next(&mut self) -> Option<(Natural, Vec<Natural>, RationalSequence<Natural>)> {
+    fn next(&mut self) -> Option<(Natural, Vec<Natural>, FoerSequence<Natural>)> {
         let base = self.bases.next().unwrap();
         let mean_stripe_n = self.mean_stripe_n;
         let mean_stripe_d = self.mean_stripe_d;
@@ -7952,14 +7952,14 @@ impl Iterator for RationalFromDigitsGenerator {
         Some((
             base,
             before_point,
-            RationalSequence::from_vecs(non_repeating, repeating),
+            FoerSequence::from_vecs(non_repeating, repeating),
         ))
     }
 }
 
 pub fn special_random_large_type_gen_var_24(
     config: &GenConfig,
-) -> It<(Natural, Vec<Natural>, RationalSequence<Natural>)> {
+) -> It<(Natural, Vec<Natural>, FoerSequence<Natural>)> {
     Box::new(RationalFromDigitsGenerator {
         mean_stripe_n: config.get_or("mean_stripe_n", 32),
         mean_stripe_d: config.get_or("mean_stripe_d", 1),

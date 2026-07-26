@@ -6,9 +6,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::foer_sequences::FoerSequence;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::Digits;
-use malachite_base::rational_sequences::RationalSequence;
 use malachite_base::vecs::vec_from_str;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::{
@@ -27,16 +27,12 @@ fn test_from_digits() {
         let x = Rational::from_digits_ref(
             &base,
             &before,
-            &RationalSequence::from_slices(&after_nr, &after_r),
+            &FoerSequence::from_slices(&after_nr, &after_r),
         );
         assert!(x.is_valid());
         assert_eq!(x.to_string(), out);
         assert_eq!(
-            Rational::from_digits(
-                &base,
-                before,
-                RationalSequence::from_vecs(after_nr, after_r)
-            ),
+            Rational::from_digits(&base, before, FoerSequence::from_vecs(after_nr, after_r)),
             x
         );
     };
@@ -96,7 +92,7 @@ fn from_digits_fail_1() {
     Rational::from_digits(
         &Natural::ONE,
         Vec::new(),
-        RationalSequence::from_vec(Vec::new()),
+        FoerSequence::from_vec(Vec::new()),
     );
 }
 
@@ -106,20 +102,20 @@ fn from_digits_fail_2() {
     Rational::from_digits(
         &Natural::ZERO,
         Vec::new(),
-        RationalSequence::from_vec(Vec::new()),
+        FoerSequence::from_vec(Vec::new()),
     );
 }
 
 #[test]
 #[should_panic]
 fn from_digits_ref_fail_1() {
-    Rational::from_digits_ref(&Natural::ONE, &[], &RationalSequence::from_vec(Vec::new()));
+    Rational::from_digits_ref(&Natural::ONE, &[], &FoerSequence::from_vec(Vec::new()));
 }
 
 #[test]
 #[should_panic]
 fn from_digits_ref_fail_2() {
-    Rational::from_digits_ref(&Natural::ZERO, &[], &RationalSequence::from_vec(Vec::new()));
+    Rational::from_digits_ref(&Natural::ZERO, &[], &FoerSequence::from_vec(Vec::new()));
 }
 
 #[test]
@@ -145,11 +141,7 @@ fn from_digits_properties() {
     natural_vec_natural_pair_gen_var_2().test_properties(|(digits, base)| {
         assert_eq!(
             Natural::from_digits_asc(&base, digits.iter().cloned()).unwrap(),
-            Rational::from_digits(
-                &base,
-                digits.to_vec(),
-                RationalSequence::from_vec(Vec::new())
-            )
+            Rational::from_digits(&base, digits.to_vec(), FoerSequence::from_vec(Vec::new()))
         );
     });
 }

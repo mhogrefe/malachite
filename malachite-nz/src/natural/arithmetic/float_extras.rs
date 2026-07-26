@@ -1435,9 +1435,9 @@ pub fn limbs_set_str(
         exp += 1;
     }
     // If the approximation was exact then no double rounding can occur, so `dir` is the correct
-    // direction. The exponent may be out of range; the caller checks it.
-    // `add_exp` reports a downward overflow only when its second argument is negative, and
-    // `ysize_bits` is always positive, so the only failure possible here is an upward one.
+    // direction. The exponent may be out of range; the caller checks it. `add_exp` reports a
+    // downward overflow only when its second argument is negative, and `ysize_bits` is always
+    // positive, so the only failure possible here is an upward one.
     match add_exp(exp, i64::exact_from(ysize_bits)) {
         Ok(exp) => SetStrResult::Finite(out, exp, dir),
         Err(_) => SetStrResult::Overflow,

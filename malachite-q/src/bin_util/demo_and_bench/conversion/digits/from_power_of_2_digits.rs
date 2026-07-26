@@ -67,7 +67,7 @@ fn benchmark_rational_from_power_of_2_digits_evaluation_strategy(
     file_name: &str,
 ) {
     run_benchmark(
-        "Rational::from_power_of_2_digits(u64, &[Natural], &RationalSequence<Natural>)",
+        "Rational::from_power_of_2_digits(u64, &[Natural], &FoerSequence<Natural>)",
         BenchmarkType::EvaluationStrategy,
         large_type_gen_var_23().get(gm, config),
         gm.name(),
@@ -76,7 +76,7 @@ fn benchmark_rational_from_power_of_2_digits_evaluation_strategy(
         &rational_from_power_of_2_digits_bucketer(),
         &mut [
             (
-                "Rational::from_power_of_2_digits(u64, Vec<Natural>, RationalSequence<Natural>)",
+                "Rational::from_power_of_2_digits(u64, Vec<Natural>, FoerSequence<Natural>)",
                 &mut |(log_base, before_point, after_point)| {
                     no_out!(Rational::from_power_of_2_digits(
                         log_base,
@@ -86,7 +86,7 @@ fn benchmark_rational_from_power_of_2_digits_evaluation_strategy(
                 },
             ),
             (
-                "Rational::from_power_of_2_digits_ref(u64, &[Natural], &RationalSequence<Natural>)",
+                "Rational::from_power_of_2_digits_ref(u64, &[Natural], &FoerSequence<Natural>)",
                 &mut |(log_base, before_point, after_point)| {
                     no_out!(Rational::from_power_of_2_digits_ref(
                         log_base,

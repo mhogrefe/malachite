@@ -81,6 +81,8 @@ use crate::test_util::generators::{factors_of_limb_max, limbs_odd_factorial_vali
 use crate::test_util::natural::arithmetic::gcd::{OwnedHalfGcdMatrix, half_gcd_matrix_create};
 use itertools::Itertools;
 use malachite_base::bools::exhaustive::{ExhaustiveBools, exhaustive_bools};
+use malachite_base::foer_sequences::FoerSequence;
+use malachite_base::foer_sequences::exhaustive::exhaustive_foer_sequences;
 use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 use malachite_base::iterators::iter_windows;
 use malachite_base::num::arithmetic::traits::{
@@ -108,8 +110,6 @@ use malachite_base::num::iterators::{bit_distributor_sequence, ruler_sequence};
 use malachite_base::num::logic::traits::{
     BitAccess, BitConvertible, LeadingZeros, SignificantBits,
 };
-use malachite_base::rational_sequences::RationalSequence;
-use malachite_base::rational_sequences::exhaustive::exhaustive_rational_sequences;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::slices::slice_trailing_zeros;
@@ -4539,18 +4539,18 @@ struct RationalFromPowerOf2DigitsGenerator;
 impl
     ExhaustiveDependentPairsYsGenerator<
         u64,
-        (Vec<Natural>, RationalSequence<Natural>),
-        It<(Vec<Natural>, RationalSequence<Natural>)>,
+        (Vec<Natural>, FoerSequence<Natural>),
+        It<(Vec<Natural>, FoerSequence<Natural>)>,
     > for RationalFromPowerOf2DigitsGenerator
 {
     #[inline]
-    fn get_ys(&self, log_base: &u64) -> It<(Vec<Natural>, RationalSequence<Natural>)> {
+    fn get_ys(&self, log_base: &u64) -> It<(Vec<Natural>, FoerSequence<Natural>)> {
         Box::new(exhaustive_pairs(
             exhaustive_vecs(exhaustive_natural_range(
                 Natural::ZERO,
                 Natural::power_of_2(*log_base),
             )),
-            exhaustive_rational_sequences(exhaustive_natural_range(
+            exhaustive_foer_sequences(exhaustive_natural_range(
                 Natural::ZERO,
                 Natural::power_of_2(*log_base),
             )),
@@ -4558,7 +4558,7 @@ impl
     }
 }
 
-pub fn exhaustive_large_type_gen_var_23() -> It<(u64, Vec<Natural>, RationalSequence<Natural>)> {
+pub fn exhaustive_large_type_gen_var_23() -> It<(u64, Vec<Natural>, FoerSequence<Natural>)> {
     reshape_1_2_to_3(Box::new(exhaustive_dependent_pairs(
         ruler_sequence(),
         exhaustive_positive_primitive_ints(),
@@ -4566,7 +4566,7 @@ pub fn exhaustive_large_type_gen_var_23() -> It<(u64, Vec<Natural>, RationalSequ
     )))
 }
 
-pub fn exhaustive_large_type_gen_var_24() -> It<(Vec<Natural>, RationalSequence<Natural>)> {
+pub fn exhaustive_large_type_gen_var_24() -> It<(Vec<Natural>, FoerSequence<Natural>)> {
     RationalFromPowerOf2DigitsGenerator.get_ys(&1)
 }
 
@@ -4575,21 +4575,20 @@ struct RationalFromDigitsGenerator;
 impl
     ExhaustiveDependentPairsYsGenerator<
         Natural,
-        (Vec<Natural>, RationalSequence<Natural>),
-        It<(Vec<Natural>, RationalSequence<Natural>)>,
+        (Vec<Natural>, FoerSequence<Natural>),
+        It<(Vec<Natural>, FoerSequence<Natural>)>,
     > for RationalFromDigitsGenerator
 {
     #[inline]
-    fn get_ys(&self, base: &Natural) -> It<(Vec<Natural>, RationalSequence<Natural>)> {
+    fn get_ys(&self, base: &Natural) -> It<(Vec<Natural>, FoerSequence<Natural>)> {
         Box::new(exhaustive_pairs(
             exhaustive_vecs(exhaustive_natural_range(Natural::ZERO, base.clone())),
-            exhaustive_rational_sequences(exhaustive_natural_range(Natural::ZERO, base.clone())),
+            exhaustive_foer_sequences(exhaustive_natural_range(Natural::ZERO, base.clone())),
         ))
     }
 }
 
-pub fn exhaustive_large_type_gen_var_25() -> It<(Natural, Vec<Natural>, RationalSequence<Natural>)>
-{
+pub fn exhaustive_large_type_gen_var_25() -> It<(Natural, Vec<Natural>, FoerSequence<Natural>)> {
     reshape_1_2_to_3(Box::new(exhaustive_dependent_pairs(
         ruler_sequence(),
         exhaustive_natural_range_to_infinity(Natural::TWO),
@@ -4597,7 +4596,7 @@ pub fn exhaustive_large_type_gen_var_25() -> It<(Natural, Vec<Natural>, Rational
     )))
 }
 
-pub fn exhaustive_large_type_gen_var_26() -> It<(Vec<Natural>, RationalSequence<Natural>)> {
+pub fn exhaustive_large_type_gen_var_26() -> It<(Vec<Natural>, FoerSequence<Natural>)> {
     RationalFromDigitsGenerator.get_ys(&Natural::from(10u32))
 }
 

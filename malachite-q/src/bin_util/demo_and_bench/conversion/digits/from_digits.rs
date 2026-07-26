@@ -63,7 +63,7 @@ fn benchmark_rational_from_digits_evaluation_strategy(
     file_name: &str,
 ) {
     run_benchmark(
-        "Rational::from_digits(Natural, &[Natural], &RationalSequence<Natural>)",
+        "Rational::from_digits(Natural, &[Natural], &FoerSequence<Natural>)",
         BenchmarkType::EvaluationStrategy,
         large_type_gen_var_25().get(gm, config),
         gm.name(),
@@ -72,13 +72,13 @@ fn benchmark_rational_from_digits_evaluation_strategy(
         &rational_from_digits_bucketer(),
         &mut [
             (
-                "Rational::from_digits(base, Vec<Natural>, RationalSequence<Natural>)",
+                "Rational::from_digits(base, Vec<Natural>, FoerSequence<Natural>)",
                 &mut |(base, before_point, after_point)| {
                     no_out!(Rational::from_digits(&base, before_point, after_point));
                 },
             ),
             (
-                "Rational::from_digits_ref(base, &[Natural], &RationalSequence<Natural>)",
+                "Rational::from_digits_ref(base, &[Natural], &FoerSequence<Natural>)",
                 &mut |(base, before_point, after_point)| {
                     no_out!(Rational::from_digits_ref(
                         &base,

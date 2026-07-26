@@ -12,6 +12,8 @@ use crate::chars::random::{
     graphic_weighted_random_ascii_chars, graphic_weighted_random_char_inclusive_range,
     graphic_weighted_random_char_range, graphic_weighted_random_chars,
 };
+use crate::foer_sequences::FoerSequence;
+use crate::foer_sequences::random::random_foer_sequences;
 use crate::iterators::{NonzeroValues, with_special_value};
 use crate::num::arithmetic::traits::{
     ArithmeticCheckedShl, DivRound, Parity, PowerOf2, ShrRound, UnsignedAbs,
@@ -59,8 +61,6 @@ use crate::num::random::{
     random_unsigneds_less_than,
 };
 use crate::random::{EXAMPLE_SEED, Seed};
-use crate::rational_sequences::RationalSequence;
-use crate::rational_sequences::random::random_rational_sequences;
 use crate::rounding_modes::RoundingMode::{self, *};
 use crate::rounding_modes::random::{RandomRoundingModes, random_rounding_modes};
 use crate::slices::slice_test_zero;
@@ -5835,12 +5835,12 @@ pub fn special_random_unsigned_bool_vec_pair_gen_var_1<T: PrimitiveUnsigned>(
     })
 }
 
-// -- RationalSequence<PrimitiveUnsigned> --
+// -- FoerSequence<PrimitiveUnsigned> --
 
-pub fn special_random_unsigned_rational_sequence_gen<T: PrimitiveUnsigned>(
+pub fn special_random_unsigned_foer_sequence_gen<T: PrimitiveUnsigned>(
     config: &GenConfig,
-) -> It<RationalSequence<T>> {
-    Box::new(random_rational_sequences(
+) -> It<FoerSequence<T>> {
+    Box::new(random_foer_sequences(
         EXAMPLE_SEED,
         &|seed| {
             striped_random_unsigneds(
@@ -5854,18 +5854,18 @@ pub fn special_random_unsigned_rational_sequence_gen<T: PrimitiveUnsigned>(
     ))
 }
 
-// -- (RationalSequence<PrimitiveUnsigned>, PrimitiveUnsigned) --
+// -- (FoerSequence<PrimitiveUnsigned>, PrimitiveUnsigned) --
 
-pub fn special_random_unsigned_rational_sequence_unsigned_pair_gen_var_1<
+pub fn special_random_unsigned_foer_sequence_unsigned_pair_gen_var_1<
     T: PrimitiveUnsigned,
     U: PrimitiveUnsigned,
 >(
     config: &GenConfig,
-) -> It<(RationalSequence<T>, U)> {
+) -> It<(FoerSequence<T>, U)> {
     Box::new(random_pairs(
         EXAMPLE_SEED,
         &|seed| {
-            random_rational_sequences(
+            random_foer_sequences(
                 seed,
                 &|seed_2| {
                     striped_random_unsigneds(
@@ -5888,14 +5888,14 @@ pub fn special_random_unsigned_rational_sequence_unsigned_pair_gen_var_1<
     ))
 }
 
-pub fn special_random_unsigned_rational_sequence_unsigned_pair_gen_var_2<T: PrimitiveUnsigned>(
+pub fn special_random_unsigned_foer_sequence_unsigned_pair_gen_var_2<T: PrimitiveUnsigned>(
     config: &GenConfig,
-) -> It<(RationalSequence<T>, usize)> {
+) -> It<(FoerSequence<T>, usize)> {
     Box::new(
         random_pairs(
             EXAMPLE_SEED,
             &|seed| {
-                random_rational_sequences(
+                random_foer_sequences(
                     seed,
                     &|seed_2| {
                         striped_random_unsigneds(
@@ -5926,12 +5926,12 @@ pub fn special_random_unsigned_rational_sequence_unsigned_pair_gen_var_2<T: Prim
     )
 }
 
-// -- (RationalSequence<PrimitiveUnsigned>, RationalSequence<PrimitiveUnsigned>) --
+// -- (FoerSequence<PrimitiveUnsigned>, FoerSequence<PrimitiveUnsigned>) --
 
-pub fn special_random_unsigned_rational_sequence_pair_gen<T: PrimitiveUnsigned>(
+pub fn special_random_unsigned_foer_sequence_pair_gen<T: PrimitiveUnsigned>(
     config: &GenConfig,
-) -> It<(RationalSequence<T>, RationalSequence<T>)> {
-    Box::new(random_pairs_from_single(random_rational_sequences(
+) -> It<(FoerSequence<T>, FoerSequence<T>)> {
+    Box::new(random_pairs_from_single(random_foer_sequences(
         EXAMPLE_SEED,
         &|seed| {
             striped_random_unsigneds(
@@ -5945,16 +5945,12 @@ pub fn special_random_unsigned_rational_sequence_pair_gen<T: PrimitiveUnsigned>(
     )))
 }
 
-// -- RationalSequence<PrimitiveUnsigned> * 3 --
+// -- FoerSequence<PrimitiveUnsigned> * 3 --
 
-pub fn special_random_unsigned_rational_sequence_triple_gen<T: PrimitiveUnsigned>(
+pub fn special_random_unsigned_foer_sequence_triple_gen<T: PrimitiveUnsigned>(
     config: &GenConfig,
-) -> It<(
-    RationalSequence<T>,
-    RationalSequence<T>,
-    RationalSequence<T>,
-)> {
-    Box::new(random_triples_from_single(random_rational_sequences(
+) -> It<(FoerSequence<T>, FoerSequence<T>, FoerSequence<T>)> {
+    Box::new(random_triples_from_single(random_foer_sequences(
         EXAMPLE_SEED,
         &|seed| {
             striped_random_unsigneds(
@@ -9597,12 +9593,12 @@ pub fn special_random_large_type_gen_var_9<T: PrimitiveUnsigned>(
 
 pub fn special_random_large_type_gen_var_22<T: PrimitiveUnsigned>(
     config: &GenConfig,
-) -> It<(RationalSequence<T>, usize, T, T)> {
+) -> It<(FoerSequence<T>, usize, T, T)> {
     Box::new(
         random_quadruples_xyzz(
             EXAMPLE_SEED,
             &|seed| {
-                random_rational_sequences(
+                random_foer_sequences(
                     seed,
                     &|seed_2| {
                         striped_random_unsigneds(

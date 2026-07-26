@@ -9,15 +9,15 @@
 use crate::Rational;
 use alloc::collections::BTreeMap;
 use alloc::vec::Vec;
+use malachite_base::foer_sequences::FoerSequence;
 use malachite_base::num::arithmetic::traits::{Abs, AbsAssign, Floor, UnsignedAbs};
 use malachite_base::num::conversion::traits::PowerOf2Digits;
-use malachite_base::rational_sequences::RationalSequence;
 use malachite_nz::natural::Natural;
 
 pub(crate) fn to_power_of_2_digits_helper(
     x: Rational,
     log_base: u64,
-) -> (Vec<Natural>, RationalSequence<Natural>) {
+) -> (Vec<Natural>, FoerSequence<Natural>) {
     let floor = (&x).floor();
     let mut remainder = x - Rational::from(&floor);
     let before_point = floor.unsigned_abs().to_power_of_2_digits_asc(log_base);
@@ -25,11 +25,11 @@ pub(crate) fn to_power_of_2_digits_helper(
     let mut digits = Vec::new();
     for i in 0.. {
         if remainder == 0u32 {
-            return (before_point, RationalSequence::from_vec(digits));
+            return (before_point, FoerSequence::from_vec(digits));
         }
         if let Some(previous_i) = state_map.insert(remainder.clone(), i) {
             let repeating = digits.drain(previous_i..).collect();
-            return (before_point, RationalSequence::from_vecs(digits, repeating));
+            return (before_point, FoerSequence::from_vecs(digits, repeating));
         }
         remainder <<= log_base;
         let floor = (&remainder).floor().unsigned_abs();
@@ -43,7 +43,7 @@ impl Rational {
     /// Returns the base-$2^k$ digits of a [`Rational`], taking the [`Rational`] by value.
     ///
     /// The output has two components. The first is a [`Vec`] of the digits of the integer portion
-    /// of the [`Rational`], least- to most-significant. The second is a [`RationalSequence`] of the
+    /// of the [`Rational`], least- to most-significant. The second is a [`FoerSequence`] of the
     /// digits of the fractional portion.
     ///
     /// The output is in its simplest form: the integer-portion digits do not end with a zero, and
@@ -87,7 +87,7 @@ impl Rational {
     pub fn into_power_of_2_digits(
         mut self,
         log_base: u64,
-    ) -> (Vec<Natural>, RationalSequence<Natural>) {
+    ) -> (Vec<Natural>, FoerSequence<Natural>) {
         self.abs_assign();
         to_power_of_2_digits_helper(self, log_base)
     }
@@ -95,7 +95,7 @@ impl Rational {
     /// Returns the base-$2^k$ digits of a [`Rational`], taking the [`Rational`] by reference.
     ///
     /// The output has two components. The first is a [`Vec`] of the digits of the integer portion
-    /// of the [`Rational`], least- to most-significant. The second is a [`RationalSequence`] of the
+    /// of the [`Rational`], least- to most-significant. The second is a [`FoerSequence`] of the
     /// digits of the fractional portion.
     ///
     /// The output is in its simplest form: the integer-portion digits do not end with a zero, and
@@ -136,7 +136,7 @@ impl Rational {
     /// assert_eq!(after_point.to_string(), "[[146, 292, 585]]");
     /// ```
     #[inline]
-    pub fn to_power_of_2_digits(&self, log_base: u64) -> (Vec<Natural>, RationalSequence<Natural>) {
+    pub fn to_power_of_2_digits(&self, log_base: u64) -> (Vec<Natural>, FoerSequence<Natural>) {
         to_power_of_2_digits_helper(self.abs(), log_base)
     }
 }

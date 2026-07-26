@@ -564,7 +564,7 @@ pub mod random {
     pub mod get_rng;
     pub mod next;
 }
-pub mod rational_sequences {
+pub mod foer_sequences {
     pub mod access {
         pub mod get;
         pub mod mutate;

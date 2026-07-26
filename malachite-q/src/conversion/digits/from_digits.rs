@@ -8,10 +8,10 @@
 
 use crate::Rational;
 use alloc::vec::Vec;
+use malachite_base::foer_sequences::FoerSequence;
 use malachite_base::num::arithmetic::traits::{CheckedLogBase2, Pow};
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::{Digits, ExactFrom};
-use malachite_base::rational_sequences::RationalSequence;
 use malachite_nz::natural::Natural;
 
 impl Rational {
@@ -37,14 +37,14 @@ impl Rational {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::rational_sequences::RationalSequence;
+    /// use malachite_base::foer_sequences::FoerSequence;
     /// use malachite_base::vecs::vec_from_str;
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
     ///
     /// let before_point = vec_from_str("[3]").unwrap();
     /// let after_point =
-    ///     RationalSequence::from_vecs(Vec::new(), vec_from_str("[1, 4, 2, 8, 5, 7]").unwrap());
+    ///     FoerSequence::from_vecs(Vec::new(), vec_from_str("[1, 4, 2, 8, 5, 7]").unwrap());
     /// assert_eq!(
     ///     Rational::from_digits(&Natural::from(10u32), before_point, after_point).to_string(),
     ///     "22/7"
@@ -52,7 +52,7 @@ impl Rational {
     ///
     /// // 21.34565656...
     /// let before_point = vec_from_str("[1, 2]").unwrap();
-    /// let after_point = RationalSequence::from_vecs(
+    /// let after_point = FoerSequence::from_vecs(
     ///     vec_from_str("[3, 4]").unwrap(),
     ///     vec_from_str("[5, 6]").unwrap(),
     /// );
@@ -64,7 +64,7 @@ impl Rational {
     pub fn from_digits(
         base: &Natural,
         before_point: Vec<Natural>,
-        after_point: RationalSequence<Natural>,
+        after_point: FoerSequence<Natural>,
     ) -> Self {
         if let Some(log_base) = base.checked_log_base_2() {
             return Self::from_power_of_2_digits(log_base, before_point, after_point);
@@ -106,14 +106,14 @@ impl Rational {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::rational_sequences::RationalSequence;
+    /// use malachite_base::foer_sequences::FoerSequence;
     /// use malachite_base::vecs::vec_from_str;
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
     ///
     /// let before_point = vec_from_str("[3]").unwrap();
     /// let after_point =
-    ///     RationalSequence::from_vecs(Vec::new(), vec_from_str("[1, 4, 2, 8, 5, 7]").unwrap());
+    ///     FoerSequence::from_vecs(Vec::new(), vec_from_str("[1, 4, 2, 8, 5, 7]").unwrap());
     /// assert_eq!(
     ///     Rational::from_digits_ref(&Natural::from(10u32), &before_point, &after_point)
     ///         .to_string(),
@@ -122,7 +122,7 @@ impl Rational {
     ///
     /// // 21.34565656...
     /// let before_point = vec_from_str("[1, 2]").unwrap();
-    /// let after_point = RationalSequence::from_vecs(
+    /// let after_point = FoerSequence::from_vecs(
     ///     vec_from_str("[3, 4]").unwrap(),
     ///     vec_from_str("[5, 6]").unwrap(),
     /// );
@@ -135,7 +135,7 @@ impl Rational {
     pub fn from_digits_ref(
         base: &Natural,
         before_point: &[Natural],
-        after_point: &RationalSequence<Natural>,
+        after_point: &FoerSequence<Natural>,
     ) -> Self {
         if let Some(log_base) = base.checked_log_base_2() {
             return Self::from_power_of_2_digits_ref(log_base, before_point, after_point);

@@ -23,6 +23,7 @@ use crate::test_util::generators::exhaustive::*;
 use crate::test_util::generators::random::*;
 use crate::test_util::generators::special_random::*;
 use crate::test_util::natural::arithmetic::gcd::OwnedHalfGcdMatrix;
+use malachite_base::foer_sequences::FoerSequence;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
@@ -30,7 +31,6 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::from::UnsignedFromFloatError;
 use malachite_base::num::conversion::string::options::ToSciOptions;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, SaturatingFrom};
-use malachite_base::rational_sequences::RationalSequence;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::test_util::generators::common::Generator;
 use malachite_base::vecs::exhaustive::lex_ordered_unique_vecs;
@@ -3718,9 +3718,9 @@ pub fn large_type_gen_var_21() -> Generator<(Limb, Limb, Limb, Limb, Limb, Limb,
 
 // var 22 is in malachite-base.
 
-/// All `(u64, Vec<Natural>, RationalSequence<Natural>)` that are valid inputs to
+/// All `(u64, Vec<Natural>, FoerSequence<Natural>)` that are valid inputs to
 /// `Rational::from_power_of_2_digits`.
-pub fn large_type_gen_var_23() -> Generator<(u64, Vec<Natural>, RationalSequence<Natural>)> {
+pub fn large_type_gen_var_23() -> Generator<(u64, Vec<Natural>, FoerSequence<Natural>)> {
     Generator::new(
         &exhaustive_large_type_gen_var_23,
         &random_large_type_gen_var_23,
@@ -3728,18 +3728,18 @@ pub fn large_type_gen_var_23() -> Generator<(u64, Vec<Natural>, RationalSequence
     )
 }
 
-/// All `(Vec<Natural>, RationalSequence<Natural>)` that are valid inputs to
+/// All `(Vec<Natural>, FoerSequence<Natural>)` that are valid inputs to
 /// `Rational::from_power_of_2_digits` with `log_base` == 1.
-pub fn large_type_gen_var_24() -> Generator<(Vec<Natural>, RationalSequence<Natural>)> {
+pub fn large_type_gen_var_24() -> Generator<(Vec<Natural>, FoerSequence<Natural>)> {
     Generator::new_no_special(
         &exhaustive_large_type_gen_var_24,
         &random_large_type_gen_var_24,
     )
 }
 
-/// All `(u64, Vec<Natural>, RationalSequence<Natural>)` that are valid inputs to
+/// All `(u64, Vec<Natural>, FoerSequence<Natural>)` that are valid inputs to
 /// `Rational::from_digits`.
-pub fn large_type_gen_var_25() -> Generator<(Natural, Vec<Natural>, RationalSequence<Natural>)> {
+pub fn large_type_gen_var_25() -> Generator<(Natural, Vec<Natural>, FoerSequence<Natural>)> {
     Generator::new(
         &exhaustive_large_type_gen_var_25,
         &random_large_type_gen_var_25,
@@ -3747,9 +3747,9 @@ pub fn large_type_gen_var_25() -> Generator<(Natural, Vec<Natural>, RationalSequ
     )
 }
 
-/// All `(Vec<Natural>, RationalSequence<Natural>)` that are valid inputs to `Rational::from_digits`
+/// All `(Vec<Natural>, FoerSequence<Natural>)` that are valid inputs to `Rational::from_digits`
 /// with `base` == 10.
-pub fn large_type_gen_var_26() -> Generator<(Vec<Natural>, RationalSequence<Natural>)> {
+pub fn large_type_gen_var_26() -> Generator<(Vec<Natural>, FoerSequence<Natural>)> {
     Generator::new_no_special(
         &exhaustive_large_type_gen_var_26,
         &random_large_type_gen_var_26,
