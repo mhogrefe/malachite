@@ -13,25 +13,25 @@ The import path of the `Rational` type is shortened to `malachite::Rational`.
 
 # malachite-q
 This crate defines
-[`Rational`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html)s. The name of
+[`Rational`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html)s. The name of
 this crate refers to the mathematical symbol for rational numbers, ℚ.
 - There are many functions defined on
-  [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html)s. These include
+  [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html)s. These include
   - All the ones you'd expect, like addition, subtraction, multiplication, and division;
   - Functions related to conversion between
-    [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html)s and other
+    [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html)s and other
     kinds of numbers, including primitive floats;
   - Functions for Diophantine approximation;
   - Functions for expressing
-    [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html)s in
+    [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html)s in
     scientific notation.
 - The numerators and denominators of
-  [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html)s are stored as
+  [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html)s are stored as
   [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html)s, so
-  [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html)s with small
+  [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html)s with small
   numerators and denominators can be stored entirely on the stack.
 - Most arithmetic involving
-  [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html)s requires
+  [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html)s requires
   (automatically) reducing the numerator and denominator. This is done very efficiently by using
   the high performance GCD and exact division algorithms implemented by
   [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html)s.
@@ -40,7 +40,7 @@ this crate refers to the mathematical symbol for rational numbers, ℚ.
 This crate comes with a `bin` target that can be used for running demos and benchmarks.
 - Almost all of the public functions in this crate have an associated demo. Running a demo
   shows you a function's behavior on a large number of inputs. For example, to demo
-  [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html) addition, you
+  [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html) addition, you
   can use the following command:
   ```text
   cargo run --features bin_build --release -- -l 10000 -m exhaustive -d demo_rational_add

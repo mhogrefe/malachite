@@ -20,10 +20,8 @@ use malachite_nz::platform::Limb;
 
 /// A floating-point number.
 ///
-/// `Float`s are currently experimental. They are missing many important functions. However, the
-/// functions that are currently implemented are thoroughly tested and documented, with the
-/// exception of string conversion functions. The current string conversions are incomplete and will
-/// be changed in the future to match MPFR's behavior.
+/// `Float`s are not yet feature-complete, but the functions that are implemented are thoroughly
+/// tested and documented.
 ///
 /// `Float`s are similar to the primitive floats defined by the IEEE 754 standard. They include NaN,
 /// $\infty$ and $-\infty$, and positive and negative zero. There is only one NaN; there is no

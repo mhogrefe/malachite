@@ -8,10 +8,8 @@
 
 //! This crate defines [`Float`]s, which are arbitrary-precision floating-point numbers.
 //!
-//! [`Float`]s are currently experimental. They are missing many important functions. However, the
-//! functions that are currently implemented are thoroughly tested and documented, with the
-//! exception of string conversion functions. The current string conversions are incomplete and
-//! will be changed in the future to match MPFR's behavior.
+//! [`Float`]s are not yet feature-complete, but the functions that are implemented are thoroughly
+//! tested and documented.
 //!
 //! # Demos and benchmarks
 //! This crate comes with a `bin` target that can be used for running demos and benchmarks.

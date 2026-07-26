@@ -16,7 +16,7 @@ long_lines_exceptions = [
     { file = "malachite-nz/src/natural/conversion/digits/power_of_2_digit_iterable.rs", line = 530 },
     { file = "malachite-nz/src/natural/conversion/mantissa_and_exponent.rs", line = 509 },
     { file = "malachite-base/src/lib.rs", line = 65 },
-    { file = "malachite-float/src/lib.rs", line = 24 },
+    { file = "malachite-float/src/lib.rs", line = 22 },
     { file = "malachite-nz/src/lib.rs", line = 36 },
     { file = "malachite-nz/src/lib.rs", line = 103 },
     { file = "malachite-q/src/lib.rs", line = 54 },

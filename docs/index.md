@@ -106,22 +106,42 @@ The `malachite` crate re-exports three sub-crates.
   If you need to explicitly include this crate as a dependency of the `malachite` crate, use the
   `naturals_and_integers` or `malachite-nz` feature.
 - **malachite-q** ([crates.io](https://crates.io/crates/malachite-q)) defines
-  [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html)s. The
+  [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html)s. The
   functions defined on this type include
   - All the ones you'd expect, like addition, subtraction, multiplication, and division;
   - Functions related to conversion between
-    [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html)s and other
+    [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html)s and other
     kinds of numbers, including primitive floats;
   - Functions for Diophantine approximation;
   - Functions for expressing
-    [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html)s in
+    [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html)s in
     scientific notation.
 
   If you need to explicitly include this crate as a dependency of the `malachite` crate, use the
   `rationals` or `malachite-q` feature.
 
-- **malachite-float** Arbitrary-precision floating-point numbers. These are in development, and
-  most features are missing.
+- **malachite-float** ([crates.io](https://crates.io/crates/malachite-float)) defines
+  [`Float`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html)s,
+  arbitrary-precision floating-point numbers whose semantics follow
+  [MPFR](https://www.mpfr.org/)'s: the precision is chosen per value, every operation is correctly
+  rounded to a requested precision and rounding mode, and every rounding operation reports whether
+  its result is below, equal to, or above the exact value. The functions defined on this type
+  include
+  - All the ones you'd expect, like addition, subtraction, multiplication, and division;
+  - Square roots, cube roots, and kth roots, along with their reciprocals;
+  - Exponentials, logarithms, and powers, in an arbitrary base as well as base 2, base 10, and
+    base e;
+  - Around three dozen mathematical constants, computed to any requested precision;
+  - Functions related to conversion between
+    [`Float`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html)s and
+    other kinds of numbers, and to and from strings in any base from 2 to 36 (or up to 62 through
+    the lower-level MPFR-style entry points).
+
+  These are not yet feature-complete, but the functions that are implemented are thoroughly tested
+  and documented.
+
+  If you need to explicitly include this crate as a dependency of the `malachite` crate, use the
+  `floats` or `malachite-float` feature.
 
 Malachite is under active development, with many more types and features planned for the future.
 Nonetheless, it is extensively tested and documented, and ready for use today. Just be aware that
