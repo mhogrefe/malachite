@@ -28,6 +28,7 @@ use crate::{
 };
 use core::cmp::Ordering::{self, *};
 use core::cmp::max;
+use core::mem::swap;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     Abs, CeilingLogBase2, CheckedLogBase2, CheckedRoot, CheckedSqrt, DivisibleBy, IsPowerOf2,
@@ -49,7 +50,6 @@ use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::float_extras::float_can_round;
 use malachite_nz::platform::{Limb, SignedLimb};
 use malachite_q::Rational;
-use std::mem::swap;
 
 // This is MPFR_POW_EXP_THRESHOLD from `pow.c`, MPFR 4.3.0.
 const POW_EXP_THRESHOLD: i64 = 256;

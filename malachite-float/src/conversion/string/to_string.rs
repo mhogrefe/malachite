@@ -73,8 +73,8 @@ fn fmt_power_of_2_base(
 impl Display for Float {
     /// Converts a [`Float`] to a [`String`].
     ///
-    /// The output has enough digits to round-trip: a [`Float`] of precision $p$ is written with $1
-    /// + \lceil p \log_{10} 2 \rceil$ significant digits, correctly rounded to nearest. That count
+    /// The output has enough digits to round-trip: a [`Float`] of precision $p$ is written with
+    /// $1+\lceil p \log_{10} 2 \rceil$ significant digits, correctly rounded to nearest. That count
     /// depends only on the precision, so it is the same for every value of a given precision, and
     /// trailing zeros are kept to reach it; a value of precision 1 prints as `"1.0"` where the same
     /// value at precision 100 prints as `"1.0000000000000000000000000000000"`. A printed string
@@ -402,7 +402,10 @@ impl LowerHex for ComparableFloat {
     ///
     /// assert_eq!(format!("{:x}", ComparableFloat(Float::ONE)), "1.0#1");
     /// assert_eq!(format!("{:#x}", ComparableFloat(Float::ONE)), "0x1.0#1");
-    /// assert_eq!(format!("{:#x}", ComparableFloat(Float::from(1.5))), "0x1.8#2");
+    /// assert_eq!(
+    ///     format!("{:#x}", ComparableFloat(Float::from(1.5))),
+    ///     "0x1.8#2"
+    /// );
     /// assert_eq!(
     ///     format!("{:#x}", ComparableFloat(Float::from(-1.5))),
     ///     "-0x1.8#2"
@@ -411,6 +414,102 @@ impl LowerHex for ComparableFloat {
     #[inline]
     fn fmt(&self, f: &mut Formatter) -> Result {
         LowerHex::fmt(&ComparableFloatRef(&self.0), f)
+    }
+}
+
+impl Binary for ComparableFloat {
+    /// Converts a [`ComparableFloat`] to a binary [`String`].
+    ///
+    /// This is the same implementation as for [`ComparableFloatRef`]: the wrapped [`Float`]'s
+    /// [`Binary`] output, followed by `#` and the precision. Using the `#` format flag prepends
+    /// `"0b"` to the value, after any sign.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.0.complexity()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_float::{ComparableFloat, Float};
+    ///
+    /// assert_eq!(format!("{:b}", ComparableFloat(Float::ONE)), "1.0#1");
+    /// assert_eq!(format!("{:#b}", ComparableFloat(Float::ONE)), "0b1.0#1");
+    /// assert_eq!(
+    ///     format!("{:#b}", ComparableFloat(Float::from(-1.5))),
+    ///     "-0b1.1#2"
+    /// );
+    /// ```
+    #[inline]
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        Binary::fmt(&ComparableFloatRef(&self.0), f)
+    }
+}
+
+impl Octal for ComparableFloat {
+    /// Converts a [`ComparableFloat`] to an octal [`String`].
+    ///
+    /// This is the same implementation as for [`ComparableFloatRef`]: the wrapped [`Float`]'s
+    /// [`Octal`] output, followed by `#` and the precision. Using the `#` format flag prepends
+    /// `"0o"` to the value, after any sign.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.0.complexity()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_float::{ComparableFloat, Float};
+    ///
+    /// assert_eq!(format!("{:o}", ComparableFloat(Float::ONE)), "1.0#1");
+    /// assert_eq!(format!("{:#o}", ComparableFloat(Float::ONE)), "0o1.0#1");
+    /// assert_eq!(
+    ///     format!("{:#o}", ComparableFloat(Float::from(-1.5))),
+    ///     "-0o1.4#2"
+    /// );
+    /// ```
+    #[inline]
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        Octal::fmt(&ComparableFloatRef(&self.0), f)
+    }
+}
+
+impl UpperHex for ComparableFloat {
+    /// Converts a [`ComparableFloat`] to a hexadecimal [`String`].
+    ///
+    /// This is the same implementation as for [`ComparableFloatRef`]: the wrapped [`Float`]'s
+    /// [`UpperHex`] output, followed by `#` and the precision. Using the `#` format flag prepends
+    /// `"0x"` to the value, after any sign.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.0.complexity()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_float::{ComparableFloat, Float};
+    ///
+    /// assert_eq!(format!("{:X}", ComparableFloat(Float::ONE)), "1.0#1");
+    /// assert_eq!(format!("{:#X}", ComparableFloat(Float::ONE)), "0x1.0#1");
+    /// assert_eq!(
+    ///     format!("{:#X}", ComparableFloat(Float::from(255))),
+    ///     "0xFF.0#8"
+    /// );
+    /// ```
+    #[inline]
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        UpperHex::fmt(&ComparableFloatRef(&self.0), f)
     }
 }
 
@@ -501,6 +600,154 @@ impl LowerHex for ComparableFloatRef<'_> {
             write!(f, "{precision}")
         } else {
             LowerHex::fmt(&self.0, f)
+        }
+    }
+}
+
+impl Binary for ComparableFloatRef<'_> {
+    /// Converts a [`ComparableFloatRef`] to a binary [`String`].
+    ///
+    /// The output is the wrapped [`Float`]'s [`Binary`] output, followed by `#` and the precision.
+    /// Using the `#` format flag prepends `"0b"` to the value, after any sign.
+    ///
+    /// Like the hexadecimal form, this identifies a [`Float`] exactly: the digits are exact because
+    /// the base is a power of two, and the suffix supplies the precision, which the digits alone
+    /// may not determine.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.0.complexity()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{NaN, One};
+    /// use malachite_float::{ComparableFloatRef, Float};
+    ///
+    /// assert_eq!(format!("{:b}", ComparableFloatRef(&Float::ONE)), "1.0#1");
+    /// assert_eq!(format!("{:#b}", ComparableFloatRef(&Float::ONE)), "0b1.0#1");
+    /// assert_eq!(
+    ///     format!("{:#b}", ComparableFloatRef(&Float::from(1.5))),
+    ///     "0b1.1#2"
+    /// );
+    /// assert_eq!(
+    ///     format!("{:#b}", ComparableFloatRef(&Float::from(255))),
+    ///     "0b11111111.0#8"
+    /// );
+    /// assert_eq!(format!("{:#b}", ComparableFloatRef(&Float::NAN)), "NaN");
+    /// ```
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        if let x @ Float(Finite { precision, .. }) = &self.0 {
+            if f.alternate() {
+                write!(f, "{x:#b}")?;
+            } else {
+                write!(f, "{x:b}")?;
+            }
+            f.write_char('#')?;
+            write!(f, "{precision}")
+        } else {
+            Binary::fmt(&self.0, f)
+        }
+    }
+}
+
+impl Octal for ComparableFloatRef<'_> {
+    /// Converts a [`ComparableFloatRef`] to an octal [`String`].
+    ///
+    /// The output is the wrapped [`Float`]'s [`Octal`] output, followed by `#` and the precision.
+    /// Using the `#` format flag prepends `"0o"` to the value, after any sign.
+    ///
+    /// Like the hexadecimal form, this identifies a [`Float`] exactly: the digits are exact because
+    /// the base is a power of two, and the suffix supplies the precision, which the digits alone
+    /// may not determine.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.0.complexity()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{NaN, One};
+    /// use malachite_float::{ComparableFloatRef, Float};
+    ///
+    /// assert_eq!(format!("{:o}", ComparableFloatRef(&Float::ONE)), "1.0#1");
+    /// assert_eq!(format!("{:#o}", ComparableFloatRef(&Float::ONE)), "0o1.0#1");
+    /// assert_eq!(
+    ///     format!("{:#o}", ComparableFloatRef(&Float::from(1.5))),
+    ///     "0o1.4#2"
+    /// );
+    /// assert_eq!(
+    ///     format!("{:#o}", ComparableFloatRef(&Float::from(255))),
+    ///     "0o377.0#8"
+    /// );
+    /// assert_eq!(format!("{:#o}", ComparableFloatRef(&Float::NAN)), "NaN");
+    /// ```
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        if let x @ Float(Finite { precision, .. }) = &self.0 {
+            if f.alternate() {
+                write!(f, "{x:#o}")?;
+            } else {
+                write!(f, "{x:o}")?;
+            }
+            f.write_char('#')?;
+            write!(f, "{precision}")
+        } else {
+            Octal::fmt(&self.0, f)
+        }
+    }
+}
+
+impl UpperHex for ComparableFloatRef<'_> {
+    /// Converts a [`ComparableFloatRef`] to a hexadecimal [`String`].
+    ///
+    /// The output is the wrapped [`Float`]'s [`UpperHex`] output, followed by `#` and the
+    /// precision. Using the `#` format flag prepends `"0x"` to the value, after any sign.
+    ///
+    /// Like the hexadecimal form, this identifies a [`Float`] exactly: the digits are exact because
+    /// the base is a power of two, and the suffix supplies the precision, which the digits alone
+    /// may not determine.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.0.complexity()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{NaN, One};
+    /// use malachite_float::{ComparableFloatRef, Float};
+    ///
+    /// assert_eq!(format!("{:X}", ComparableFloatRef(&Float::ONE)), "1.0#1");
+    /// assert_eq!(format!("{:#X}", ComparableFloatRef(&Float::ONE)), "0x1.0#1");
+    /// assert_eq!(
+    ///     format!("{:#X}", ComparableFloatRef(&Float::from(255))),
+    ///     "0xFF.0#8"
+    /// );
+    /// // As for `Float`, the prefix stays lowercase, matching the primitive integers.
+    /// assert_eq!(
+    ///     format!("{:#X}", ComparableFloatRef(&Float::from(-1.5))),
+    ///     "-0x1.8#2"
+    /// );
+    /// assert_eq!(format!("{:#X}", ComparableFloatRef(&Float::NAN)), "NaN");
+    /// ```
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        if let x @ Float(Finite { precision, .. }) = &self.0 {
+            if f.alternate() {
+                write!(f, "{x:#X}")?;
+            } else {
+                write!(f, "{x:X}")?;
+            }
+            f.write_char('#')?;
+            write!(f, "{precision}")
+        } else {
+            UpperHex::fmt(&self.0, f)
         }
     }
 }

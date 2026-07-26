@@ -12,7 +12,9 @@ use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_float::Float;
 use malachite_float::conversion::string::to_sci::{to_sci_string, to_sci_valid};
 use malachite_float::test_util::common::parse_hex_string;
-use malachite_float::test_util::generators::float_to_sci_options_pair_gen_var_1;
+use malachite_float::test_util::generators::{
+    float_to_sci_options_pair_gen_var_1, float_to_sci_options_pair_gen_var_2,
+};
 use malachite_q::Rational;
 use std::panic::catch_unwind;
 
@@ -524,10 +526,10 @@ fn test_to_sci_valid() {
 
 #[test]
 fn to_sci_string_properties() {
-    float_to_sci_options_pair_gen_var_1().test_properties(|(x, options)| {
-        let s = to_sci_string(&x, options);
+    fn check(x: &Float, options: ToSciOptions) {
+        let s = to_sci_string(x, options);
         assert!(s.is_ascii());
-        assert!(to_sci_valid(&x, options));
+        assert!(to_sci_valid(x, options));
         if x.is_nan() {
             assert_eq!(s, "NaN");
         } else {
@@ -547,7 +549,7 @@ fn to_sci_string_properties() {
             && exponent.unsigned_abs() <= 10_000
             && options.get_base() <= 14
         {
-            let q = Rational::exact_from(&x);
+            let q = Rational::exact_from(x);
             assert!(q.fmt_sci_valid(options));
             assert_eq!(
                 s,
@@ -555,5 +557,10 @@ fn to_sci_string_properties() {
                 "{x} {options:?}"
             );
         }
-    });
+    }
+    float_to_sci_options_pair_gen_var_1().test_properties(|(x, options)| check(&x, options));
+    // The same over extreme `Float`s. The generator's validity filter keeps only the
+    // digit-count-bounded sizing for them, and the `Rational` cross-check in `check` skips them, so
+    // what this adds is the structural checks over the widest exponents.
+    float_to_sci_options_pair_gen_var_2().test_properties(|(x, options)| check(&x, options));
 }

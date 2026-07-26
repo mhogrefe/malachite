@@ -89,6 +89,96 @@ major improvement warrants re-porting.
   MPFR via rug. This is the strongest correctness signal in the whole process; don't skip it.
 - **Coverage comments** (`// - !(...) first time`) mark which unit-test case exercises which
   branch. Keep adding them for new coverage cases.
+- **`Exact` panics; it does not return `None`.** Every `Float` function taking a `RoundingMode`
+  asserts when `Exact` is requested but the result is not exactly representable
+  (`from_rational_prec_round`, `get_str`, `to_sci_string`, the whole `pow` family). Keep this even
+  in functions that already return `Option` for some other reason, or "not exactly representable"
+  and "malformed input" collapse into the same answer. Note the inconsistency: malachite-base's
+  `FromSciString` for primitive integers returns `None` in this case instead — changing it to
+  panic is a possible future cleanup.
+- **An options struct owns its rounding mode.** `ToSciOptions` and `FromSciStringOptions` each
+  carry one, so a function taking options must not also take an `rm` parameter; there is no
+  `..._with_options_prec_round`. (`Rational` documents that it ignores the `FromSciStringOptions`
+  rounding mode, because nothing it produces needs rounding. `Float` does not have that luxury and
+  must honor it.)
+
+## String conversion
+
+Both directions have the same three-layer shape: one MPFR-ported numeric engine, with two
+front-ends over it — one reproducing MPFR's grammar, one reproducing Malachite's — because the two
+grammars genuinely conflict while the arithmetic underneath does not.
+
+    Float -> String                            String -> Float
+    get_str.rs      (mpfr_get_str)             set_str.rs       (parsed_string_to_mpfr)
+     |- format_float.rs   (printf grammar)      |- strtofr.rs         (parse_string + entry points)
+     \- to_sci.rs         (ToSciOptions)        \- from_sci_string.rs (FromSciStringOptions)
+         \- to_string.rs  (Display, {:x}, ...)      \- from_string.rs  (FromStr, FromStringBase)
+
+- **The grammars conflict, but over digits never silently.** Malachite's `preprocess_sci_string`
+  treats `e`/`E` as an exponent marker in every base, requiring an explicit `+`/`-` after it when
+  the base is 15 or greater (to disambiguate from the digit `e`). MPFR accepts `e`/`E` only when
+  the base is 10 or less, uses `@` for every base, adds `p`/`P` binary exponents in bases 2 and 16,
+  and accepts `0x`/`0b` prefixes and the names `nan`/`inf`/`infinity`. Checked over every base from
+  2 to 36, there is **no** digit string that both grammars accept and read as different values:
+  every such divergence is one side accepting and the other rejecting. That is what makes two
+  front-ends safe. The most visible case is Malachite's own hex output, `0x1.0E+25#1` — MPFR cannot
+  parse it at all, since `E` is a hex digit there.
+- **The one silent disagreement is over the names of the special values.** MPFR reads
+  `nan`/`inf`/`infinity` case-insensitively only up to base 16 — the last base in which `i`, worth
+  18, is not a digit — precisely so that a name can never also be a digit string; above that only
+  the delimited `@nan@` and `@inf@` are read. Malachite reads `NaN` and `Infinity` in every base,
+  because that is what `Display` writes and a `Float` has to be readable from its own output. So
+  from base 24 up (`n` is 23) `NaN` is a special to Malachite and a digit string to MPFR, and
+  likewise from base 35 up (`y` is 34) for `Infinity`; `-Infinity` in base 35 is the counterexample
+  that found this. Those two, in those bases, are the whole of the overlap — the lowercase and
+  `@`-delimited spellings are always rejected by Malachite, so they cannot disagree. The
+  cross-check in `from_sci_string_properties` excludes exactly this class, and nothing more.
+- **The semantics are shared, so a naive reference implementation exists.** MPFR's Ziv loop
+  computes exactly "the exact value of the string, rounded once to the target precision". Verified
+  against rug over 24000 cases (bases 2/3/8/10/16/36 × precisions 1/2/10/53/100 × all five rounding
+  modes) plus the overflow and underflow boundaries: zero mismatches in value, sign of zero, *and*
+  ternary. So `Float::from_rational_prec_round(Rational::from_sci_string(s), prec, rm)` is a
+  correct oracle for property tests — but not a correct implementation. It is O(exponent): parsing
+  `1e100000000` that way takes 297 ms and builds a 40 MB integer, against 10 µs for MPFR, which is
+  O(log exponent) because `mpfr_mpn_exp` truncates b^e to the working precision. Beware of timing
+  this with sparse values — a big all-zero allocation is nearly free until it is touched (1 GB
+  allocates in 9 µs, faults in over 268 ms), so use a dense case like `10^e`, which is ~35% ones.
+- **The engine's parts are already ported.** `parsed_string_to_mpfr` needs `mpn_set_str`
+  (`limbs_from_digits_small_base`), `mpfr_mpn_exp` (`limbs_float_exp`), `mpfr_round_p`
+  (`round_helper_2`), and `mpfr_round_raw` (`round_helper_raw`) — all in
+  `malachite-nz/src/natural/arithmetic/float_extras.rs`. Watch the two live FIXMEs in `strtofr.c`:
+  bits dropped by `mpn_rshift` are not counted in the error analysis, and `MPFR_SADD_OVERFLOW` is
+  called with bounds the macro does not support. Probe both deliberately in step 4.
+- **Precision comes from the string, and cannot be inferred from the digit count alone.**
+  `0xff.0#8` is three hex digits (12 bits) at precision 8, and `0x1.0#1` is precision 1, so the
+  `#p` suffix that `ComparableFloat` emits is load-bearing; it is what makes the round trip exact,
+  in every base. Where a bare string has no `#p`, infer `ceil(n log2(b))` bits from the n
+  significant digits — that is `ceil_mul(n, b, 0)`, the same `MPFR_L2B` table `get_str_ndigits`
+  uses in the other direction — and then shrink to the minimal precision if the value happens to
+  be exactly representable in fewer bits. The shrink step makes bare literals agree with
+  `Float::from`: `"1.5"` gives precision 2 and `"255"` gives 8, matching `Float::from(1.5)` and
+  `Float::from(255)`. The cap is what keeps `"1e100000000"` at 4 bits instead of its exact 232
+  million. This rule never under-estimates (verified for precisions 1 to 2000 in six bases;
+  overshoot is 0 bits in base 2, at most 7 in base 10), but it is coarse for short inputs —
+  `"0.1"` yields 4 bits, i.e. 0.1015625. Document that surprise explicitly, the way
+  `Rational::from_sci_string_simplest` documents its own.
+- **API shape.** Parsing rounds, so it follows the usual pair: `_prec_round` takes the mode and
+  `_prec` assumes `Nearest`, both returning the ternary — `from_sci_string_prec_round(s, prec, rm)`,
+  `from_sci_string_prec(s, prec)`, and `from_sci_string_with_options_prec(s, options, prec)`, each
+  `-> Option<(Float, Ordering)>`, with `None` meaning unparseable only. The MPFR-side entry points
+  stay 1-to-1 with C — `strtofr(s, base, prec, rm) -> (Float, Ordering, usize)` reporting the bytes
+  consumed, and `set_str(s, base, prec, rm) -> Option<(Float, Ordering)>` requiring the whole
+  string — with no `Nearest` shorthand, since `mpfr_strtofr` always takes an explicit `mpfr_rnd_t`.
+  `FromStr` and `FromStringBase` are `Nearest`-only, their signatures carrying neither a mode nor a
+  ternary; add an inherent `from_string_base_round(base, s, rm)` if the ternary is wanted there
+  (no `_prec`, since that form takes its precision from the string).
+- **Oracles, in two tiers.** `rug::Float::parse_radix(s, base).complete_round(prec, rm)` is the
+  simple one and covers the bulk. It is not raw MPFR, though: rug's own validator rejects the
+  `0x`/`0b` prefixes, `p`/`P` exponents, and `nan`/`inf` in bases 11-16, and panics outside bases
+  2-36, all of which `mpfr_strtofr` accepts; conversely it accepts interior whitespace and `_`
+  separators, which `mpfr_strtofr` does not (it skips leading whitespace only). For those corners
+  use an `unsafe extern "C" { fn mpfr_strtofr(...) }` declaration in `tests/`, the same trick
+  `tests/conversion/string/format_float.rs` uses for `mpfr_snprintf`.
 
 ## Tooling
 

@@ -19,6 +19,7 @@ use crate::{
     float_infinity, float_nan, float_negative_infinity, float_zero, floor_and_ceiling,
     significand_bits,
 };
+use alloc::vec;
 use core::cmp::Ordering::{self, *};
 use core::mem::{swap, take};
 use malachite_base::num::arithmetic::traits::{

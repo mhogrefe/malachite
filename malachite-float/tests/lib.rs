@@ -196,7 +196,10 @@ pub mod conversion {
     pub mod rational_from_float;
     pub mod string {
         pub mod format_float;
+        pub mod from_sci_string;
+        pub mod from_string;
         pub mod get_str;
+        pub mod strtofr;
         pub mod to_sci;
         pub mod to_string;
     }

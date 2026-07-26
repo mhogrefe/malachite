@@ -8,10 +8,13 @@
 
 use crate::Float;
 use crate::conversion::string::get_str::get_str;
+use crate::conversion::string::strtofr::strtofr;
 use crate::test_util::common::rug_round_exact_from_rounding_mode;
+use alloc::string::{String, ToString};
 use core::cmp::Ordering::Equal;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::conversion::string::options::FromSciStringOptions;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode::{self, Down, Exact};
 use malachite_base::test_util::generators::common::It;
@@ -27,6 +30,224 @@ pub fn valid_float_get_str_quadruple(x: &Float, b0: i64, m: usize, rnd: Rounding
     rnd != Exact || matches!(get_str(x, b0, m, Down), Some((_, _, Equal)))
 }
 
+// Whether `(s, base, prec, rnd)` is a valid input to `strtofr`: every rounding mode is valid except
+// `Exact`, which `strtofr` accepts only when the string's value is exactly representable with
+// `prec` bits. Exactness is mode-independent, so we detect it by probing with `Down` (any
+// non-`Exact` mode returns `Equal` exactly when the value is representable). An unparseable string
+// yields an exact zero, so `Exact` is valid for it too. The base is assumed already valid.
+pub fn valid_strtofr_quadruple(s: &str, base: u8, prec: u64, rnd: RoundingMode) -> bool {
+    rnd != Exact || strtofr(s, base, prec, Down).1 == Equal
+}
+
+// The digit characters, indexed by value. Bases up to 36 are parsed case-insensitively; above that,
+// the uppercase letters are 10 to 35 and the lowercase ones 36 to 61.
+const DIGIT_CHARS_36: &[u8; 36] = b"0123456789abcdefghijklmnopqrstuvwxyz";
+const DIGIT_CHARS_62: &[u8; 62] = b"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+// Whether `(s, options, prec)` is a valid input to `Float::from_sci_string_with_options_prec`:
+// every rounding mode is valid except `Exact`, which is accepted only when the string's value is
+// exactly representable with `prec` bits. Exactness is mode-independent, so we detect it by probing
+// with `Down`. A string that does not parse at all is fine under every mode.
+pub fn valid_float_from_sci_string_triple(
+    s: &str,
+    options: FromSciStringOptions,
+    prec: u64,
+) -> bool {
+    if options.get_rounding_mode() != Exact {
+        return true;
+    }
+    let mut probe = options;
+    probe.set_rounding_mode(Down);
+    Float::from_sci_string_with_options_prec(s, probe, prec).is_none_or(|(_, o)| o == Equal)
+}
+
+// The number of distinct `combo` values for `sci_string_from_parts`. As for
+// `strtofr_string_from_parts`, the fields are ordered so that the fastest-varying ones are the most
+// distinctive.
+pub const SCI_STRING_COMBO_COUNT: u32 = 3 * 3 * 3 * 5;
+
+// Assembles a string that `Float::from_sci_string_with_options` reads completely, so that
+// generators can build valid input by construction rather than by filtering.
+//
+// `combo` selects, from successive fields: whether the value is a number, a NaN, or an infinity; an
+// exponent marker; a sign; and where the point goes. Malachite's grammar differs from MPFR's, so
+// there are no base prefixes and no `@` or `p` markers, and a base of 15 or more requires an
+// explicit sign after the marker, to tell it from the digit `e`. The special values are spelled as
+// `Float`'s `Display` writes them, which admits no sign on a NaN and only `-` on an infinity.
+pub fn sci_string_from_parts(base: u8, combo: u32, digits: &[u8], exp: i64) -> String {
+    // 0 is a number, the main case, and so the one an exhaustive enumeration should reach first; 1
+    // is a NaN and 2 an infinity.
+    let kind = combo % 3;
+    let marker = (combo / 3) % 3;
+    let sign = usize::exact_from((combo / 9) % 3);
+    let point = usize::exact_from((combo / 27) % 5);
+    if kind == 1 {
+        return String::from("NaN");
+    }
+    if kind == 2 {
+        return String::from(if sign == 1 { "-Infinity" } else { "Infinity" });
+    }
+    let mut s = String::new();
+    s.push_str(["", "-", "+"][sign]);
+    let default_digits = [0];
+    let digits = if digits.is_empty() {
+        &default_digits[..]
+    } else {
+        digits
+    };
+    let chars: &[u8] = if base <= 36 {
+        DIGIT_CHARS_36
+    } else {
+        DIGIT_CHARS_62
+    };
+    let point = point % (digits.len() + 1);
+    for (i, &d) in digits.iter().enumerate() {
+        if i == point {
+            s.push('.');
+        }
+        s.push(char::from(chars[usize::from(d % base)]));
+    }
+    if point == digits.len() {
+        // a trailing point, as in "5."
+        s.push('.');
+    }
+    if marker != 0 {
+        // `preprocess_sci_string` folds the digits after the point into the exponent by subtracting
+        // their count, so an exponent within that count of `i64::MIN` makes the subtraction
+        // overflow and the whole string unparseable.
+        let exp = exp.max(i64::MIN + i64::exact_from(digits.len()));
+        s.push(if marker == 1 { 'e' } else { 'E' });
+        // Above base 14 the marker is only recognized when a sign follows it.
+        if exp >= 0 && base >= 15 {
+            s.push('+');
+        }
+        s.push_str(&exp.to_string());
+    }
+    s
+}
+
+// The characters that can appear in `strtofr` input: digits, the letters used by the special
+// spellings and the base prefixes, signs, points, exponent markers, the NaN-suffix brackets, and
+// whitespace. Strings drawn from this alphabet exercise the parser's rejection paths without being
+// so unlike real input that they are all rejected in the first character.
+pub const STRTOFR_STRING_CHARS: &str = "+-.0123456789abfinxzABFINXZ@epP()_ \t";
+
+// The number of distinct `combo` values for `strtofr_string_from_parts`. The fields are ordered so
+// that the fastest-varying ones are the most syntactically distinctive, and index 0 of each is the
+// least usual choice: exhaustive generators only reach small values, so a low `combo` must still
+// vary the shape of the string rather than only its decoration.
+pub const STRTOFR_COMBO_COUNT: u32 = 8 * 5 * 4 * 6 * 3 * 4;
+
+// Assembles a valid `strtofr` input string from its parts, so that generators can build valid
+// numbers by construction rather than by filtering. `strtofr` always consumes the whole output, so
+// `set_str` accepts it too.
+//
+// `combo` (which should be less than `STRTOFR_COMBO_COUNT`) selects, from successive fields:
+// whether the value is a NaN, an infinity, or a number; an exponent marker; a base prefix or
+// special spelling; where the point goes; a sign; and leading whitespace. Choices the base does not
+// permit fall back to ones it does, so every `(base, combo)` pair yields valid output. `digits`
+// supplies the mantissa digits, reduced into range (an empty slice becomes a single zero), and
+// `exp` the exponent, used only when the chosen marker is not "none".
+//
+// When `rug_compatible` is set the output is further restricted to what rug's own parser accepts,
+// which is stricter than MPFR's: no `0x` or `0b` prefix, no `p` binary exponent, and the bare `nan`
+// and `inf` spellings only in bases up to 10 rather than up to 16.
+pub fn strtofr_string_from_parts(
+    base: u8,
+    combo: u32,
+    digits: &[u8],
+    exp: i64,
+    rug_compatible: bool,
+) -> String {
+    // 0 is a NaN and 1 an infinity; 2 through 7 are numbers.
+    let kind = combo % 8;
+    let marker = (combo / 8) % 6;
+    let variant = usize::exact_from((combo / 48) % 4);
+    let point = usize::exact_from((combo / 192) % 5);
+    let sign = ["", "-", "+"][usize::exact_from((combo / 960) % 3)];
+    let whitespace = ["", " ", "\t", " \n\t"][usize::exact_from((combo / 2880) % 4)];
+    let mut s = String::new();
+    s.push_str(whitespace);
+    s.push_str(sign);
+    // The bare spellings are accepted in bases up to 16 by MPFR but only up to 10 by rug; the `@`
+    // forms work in every base.
+    let bare_specials_ok = base <= if rug_compatible { 10 } else { 16 };
+    if kind == 0 {
+        s.push_str(if bare_specials_ok {
+            ["nan", "NaN", "@nan@", "nan(_a1)"][variant]
+        } else {
+            ["@nan@", "@NAN@", "@Nan@", "@nan@(_a1)"][variant]
+        });
+        return s;
+    }
+    if kind == 1 {
+        s.push_str(if bare_specials_ok {
+            ["inf", "INF", "infinity", "@inf@"][variant]
+        } else {
+            ["@inf@", "@INF@", "@Inf@", "@inf@"][variant]
+        });
+        return s;
+    }
+    // A `0x` prefix is recognized in bases 0 and 16, and `0b` in bases 0 and 2; it also fixes the
+    // base the digits must satisfy.
+    let prefix = if rug_compatible {
+        ""
+    } else {
+        match variant {
+            1 if base == 0 || base == 16 => "0x",
+            2 if base == 0 || base == 2 => "0b",
+            3 if base == 0 || base == 16 => "0X",
+            _ => "",
+        }
+    };
+    let effective_base = match prefix {
+        "0x" | "0X" => 16,
+        "0b" => 2,
+        // a base of 0 with no prefix means decimal
+        _ if base == 0 => 10,
+        _ => base,
+    };
+    s.push_str(prefix);
+    let default_digits = [0];
+    let digits = if digits.is_empty() {
+        &default_digits[..]
+    } else {
+        digits
+    };
+    let chars: &[u8] = if effective_base <= 36 {
+        DIGIT_CHARS_36
+    } else {
+        DIGIT_CHARS_62
+    };
+    let point = point % (digits.len() + 1);
+    for (i, &d) in digits.iter().enumerate() {
+        if i == point {
+            s.push('.');
+        }
+        s.push(char::from(chars[usize::from(d % effective_base)]));
+    }
+    if point == digits.len() {
+        // a trailing point, as in "5."
+        s.push('.');
+    }
+    // `@` marks an exponent in every base; `e` and `E` only when the base is at most 10, since
+    // above that they are digits, and `p` and `P`, which mark a binary exponent, only in bases 2
+    // and 16. A marker the base does not permit becomes `@`.
+    let marker = match marker {
+        0 => None,
+        2 if !rug_compatible && (effective_base == 2 || effective_base == 16) => Some('p'),
+        3 if effective_base <= 10 => Some('e'),
+        4 if !rug_compatible && (effective_base == 2 || effective_base == 16) => Some('P'),
+        5 if effective_base <= 10 => Some('E'),
+        _ => Some('@'),
+    };
+    if let Some(marker) = marker {
+        s.push(marker);
+        s.push_str(&exp.to_string());
+    }
+    s
+}
+
 // The nine Float conversion specifiers, in `format_string_from_parts`'s `combo` order.
 const FLOAT_FORMAT_CONV_CHARS: &[u8; 9] = b"aAbeEfFgG";
 // The six flag characters, selected by the low six bits of `combo`.
@@ -36,6 +257,15 @@ const FLOAT_FORMAT_RND_CHARS: &[u8; 5] = b"DUYZN";
 // The number of distinct `combo` values: 2^6 flag subsets times 9 conversions times 6 rounding
 // choices (a rounding character or none).
 pub const FLOAT_FORMAT_COMBO_COUNT: u16 = 64 * 9 * 6;
+
+// Whether a `%R` format string's output stays short however large the value's exponent is. The `b`,
+// `f`, and `F` conversions write out every digit before the point, which for an extreme exponent
+// would be hundreds of millions of them; every other conversion positions the point with an
+// exponent instead, and `g` and `G` fall back to `e` style exactly when the exponent is large. The
+// conversion character is the last character of the string.
+pub fn format_string_output_is_bounded(fmt: &str) -> bool {
+    !fmt.ends_with(['b', 'f', 'F'])
+}
 
 // Assembles a valid single-conversion `%R` printf format string from its parts (see
 // `format_float_str`), so that generators can build valid format strings by construction rather
@@ -151,6 +381,28 @@ pub fn float_t_u_triple_rm<T: Clone + 'static, U: Clone + 'static>(
         (
             (rug::Float::exact_from(&x), p.clone(), q.clone()),
             (x, p, q),
+        )
+    }))
+}
+
+// Pairs each `strtofr` input with the same input in the form rug's `parse_radix` and
+// `complete_round` take, so that a library comparison does not pay for the conversion inside the
+// timed closure.
+pub fn string_u_u_rounding_mode_quadruple_rm(
+    xs: It<(String, u8, u64, RoundingMode)>,
+) -> It<(
+    (String, i32, u32, rug::float::Round),
+    (String, u8, u64, RoundingMode),
+)> {
+    Box::new(xs.map(|(s, base, prec, rm)| {
+        (
+            (
+                s.clone(),
+                i32::from(base),
+                u32::exact_from(prec),
+                rug_round_exact_from_rounding_mode(rm),
+            ),
+            (s, base, prec, rm),
         )
     }))
 }

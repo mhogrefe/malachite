@@ -16,6 +16,8 @@ use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::conversion::string::get_str_data::MPFR_L2B;
 use crate::floor_and_ceiling;
+use alloc::vec;
+use alloc::vec::Vec;
 use core::cmp::Ordering::{self, Equal};
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{CeilingLogBase2, CheckedLogBase2, NegAssign, Sign};
@@ -30,7 +32,7 @@ use malachite_nz::natural::arithmetic::float_extras::{limbs_get_str, limbs_get_s
 // log(beta)`. Both approximations are entries of `MPFR_L2B`.
 //
 // This is `mpfr_ceil_mul` from `get_str.c`, MPFR 4.2.2.
-pub(crate) fn ceil_mul(e: i64, beta: u64, i: usize) -> i64 {
+pub_crate_test! {ceil_mul(e: i64, beta: u64, i: usize) -> i64 {
     const WIDTH_MINUS_1: u64 = i64::WIDTH - 1;
     // p = mantissa * 2 ^ (exp - 128): the l2b approximation as an exact `Float`.
     let (mantissa, exp) = MPFR_L2B[usize::exact_from(beta) - 2][i];
@@ -44,7 +46,7 @@ pub(crate) fn ceil_mul(e: i64, beta: u64, i: usize) -> i64 {
         .0;
     // ceil(t).
     i64::rounding_from(&t, Ceiling).0
-}
+}}
 
 pub_crate_test! {
 // Returns at least `1 + ceil(bit_len * log(2) / log(base))` digits, where `bit_len` is the number

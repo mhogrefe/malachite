@@ -21,6 +21,7 @@ use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::conversion::string::format_float::strip_trailing_zeros;
 use crate::conversion::string::get_str::get_str;
 use alloc::string::String;
+use alloc::vec;
 use alloc::vec::Vec;
 use core::cmp::Ordering::*;
 use core::fmt::Write;

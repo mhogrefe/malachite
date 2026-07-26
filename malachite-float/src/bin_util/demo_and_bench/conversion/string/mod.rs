@@ -10,12 +10,18 @@ use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
     format_float::register(runner);
+    from_sci_string::register(runner);
+    from_string::register(runner);
     get_str::register(runner);
+    strtofr::register(runner);
     to_sci::register(runner);
     to_string::register(runner);
 }
 
 mod format_float;
+mod from_sci_string;
+mod from_string;
 mod get_str;
+mod strtofr;
 mod to_sci;
 mod to_string;

@@ -26,11 +26,17 @@ use crate::test_util::extra_variadic::{
     exhaustive_triples_from_single, exhaustive_triples_xxy, exhaustive_triples_xxy_custom_output,
 };
 use crate::test_util::generators::common::{
-    FLOAT_FORMAT_COMBO_COUNT, format_string_from_parts, valid_float_get_str_quadruple,
+    FLOAT_FORMAT_COMBO_COUNT, format_string_from_parts, format_string_output_is_bounded,
+    valid_float_get_str_quadruple,
+};
+use crate::test_util::generators::common::{
+    SCI_STRING_COMBO_COUNT, STRTOFR_STRING_CHARS, sci_string_from_parts, strtofr_string_from_parts,
+    valid_float_from_sci_string_triple, valid_strtofr_quadruple,
 };
 use crate::{Float, significand_bits};
 use alloc::vec::IntoIter;
 use core::cmp::Ordering::*;
+use core::iter::once;
 use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 use malachite_base::num::arithmetic::traits::{
     CheckedLogBase, CheckedLogBase2, IsPowerOf2, Reciprocal, Square,
@@ -40,6 +46,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, NegativeZero, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::string::options::FromSciStringOptions;
 use malachite_base::num::conversion::string::options::exhaustive::exhaustive_to_sci_options;
 use malachite_base::num::conversion::string::options::{SciSizeOptions, ToSciOptions};
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, SaturatingFrom};
@@ -53,7 +60,9 @@ use malachite_base::options::exhaustive::exhaustive_options;
 use malachite_base::orderings::exhaustive::exhaustive_orderings;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
+use malachite_base::strings::exhaustive::exhaustive_strings_using_chars;
 use malachite_base::test_util::generators::common::{It, reshape_2_1_to_3, reshape_3_1_to_4};
+use malachite_base::test_util::generators::exhaustive as base_gen;
 use malachite_base::test_util::generators::exhaustive_pairs_big_tiny;
 use malachite_base::tuples::exhaustive::{
     ExhaustiveDependentPairs, ExhaustiveDependentPairsYsGenerator, exhaustive_dependent_pairs,
@@ -62,6 +71,7 @@ use malachite_base::tuples::exhaustive::{
     exhaustive_pairs, exhaustive_pairs_from_single, exhaustive_triples,
     exhaustive_triples_custom_output, exhaustive_triples_xyy, lex_pairs,
 };
+use malachite_base::vecs::exhaustive::exhaustive_vecs_min_length;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer::exhaustive::exhaustive_integers;
 use malachite_nz::natural::Natural;
@@ -1634,6 +1644,21 @@ pub fn exhaustive_float_string_pair_gen_var_1() -> It<(Float, String)> {
             exhaustive_options(primitive_int_increasing_inclusive_range(0u64, 20)),
         )
         .map(|(combo, width, prec)| format_string_from_parts(combo, width, prec)),
+    ))
+}
+
+// The same as var 1, but over extreme `Float`s, and restricted to the format strings whose output
+// stays short for them (see `format_string_output_is_bounded`).
+pub fn exhaustive_float_string_pair_gen_var_2() -> It<(Float, String)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_extreme_floats(),
+        exhaustive_triples(
+            primitive_int_increasing_inclusive_range(0, FLOAT_FORMAT_COMBO_COUNT - 1),
+            exhaustive_options(primitive_int_increasing_inclusive_range(0u64, 30)),
+            exhaustive_options(primitive_int_increasing_inclusive_range(0u64, 20)),
+        )
+        .map(|(combo, width, prec)| format_string_from_parts(combo, width, prec))
+        .filter(|fmt: &String| format_string_output_is_bounded(fmt)),
     ))
 }
 
@@ -4559,6 +4584,17 @@ pub fn exhaustive_float_to_sci_options_pair_gen_var_1() -> It<(Float, ToSciOptio
     )
 }
 
+// The same as var 1, but over extreme `Float`s. `float_to_sci_options_valid` rejects an extreme
+// exponent paired with `Scale` or `Complete` sizing, since writing every digit of such a value
+// would take hundreds of millions of them, so what survives is the digit-count-bounded `Precision`
+// sizing.
+pub fn exhaustive_float_to_sci_options_pair_gen_var_2() -> It<(Float, ToSciOptions)> {
+    Box::new(
+        exhaustive_pairs(exhaustive_extreme_floats(), exhaustive_to_sci_options())
+            .filter(|(x, options)| float_to_sci_options_valid(x, *options)),
+    )
+}
+
 // -- (Integer, PrimitiveUnsigned, RoundingMode) --
 
 // vars 1 through 2 are in malachite-nz.
@@ -5195,6 +5231,24 @@ pub fn exhaustive_float_signed_unsigned_rounding_mode_quadruple_gen_var_9()
     )
 }
 
+// The same as var 9, but over extreme `Float`s: `get_str` has to scale by a power of the base as
+// large as the exponent, which is where that scaling works hardest.
+pub fn exhaustive_float_signed_unsigned_rounding_mode_quadruple_gen_var_15()
+-> It<(Float, i64, usize, RoundingMode)> {
+    Box::new(
+        reshape_3_1_to_4(Box::new(lex_pairs(
+            exhaustive_triples(
+                exhaustive_extreme_floats(),
+                primitive_int_increasing_inclusive_range::<i64>(-36, 62)
+                    .filter(|&b| (2..=62).contains(&b) || (-36..=-2).contains(&b)),
+                primitive_int_increasing_inclusive_range::<usize>(0, 20),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, b0, m, rnd)| valid_float_get_str_quadruple(x, *b0, *m, *rnd)),
+    )
+}
+
 // All `(Float, base, m, RoundingMode)` inputs for `get_str` that rug's `to_sign_string_exp_round`
 // also accepts: base restricted to 2..=36 (rug supports neither negative bases nor bases above 36)
 // and rounding mode not `Exact` (rug has no exact rounding mode).
@@ -5203,6 +5257,20 @@ pub fn exhaustive_float_signed_unsigned_rounding_mode_quadruple_gen_var_10()
     reshape_3_1_to_4(Box::new(lex_pairs(
         exhaustive_triples(
             exhaustive_floats(),
+            primitive_int_increasing_inclusive_range::<i64>(2, 36),
+            primitive_int_increasing_inclusive_range::<usize>(0, 20),
+        ),
+        exhaustive_rounding_modes().filter(|&rm| rm != Exact),
+    )))
+}
+
+// The same as var 10, but over extreme `Float`s, so that the rug cross-check applies to them too.
+// rug's exponent range is `Float`'s, so it is a faithful oracle there.
+pub fn exhaustive_float_signed_unsigned_rounding_mode_quadruple_gen_var_16()
+-> It<(Float, i64, usize, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(lex_pairs(
+        exhaustive_triples(
+            exhaustive_extreme_floats(),
             primitive_int_increasing_inclusive_range::<i64>(2, 36),
             primitive_int_increasing_inclusive_range::<usize>(0, 20),
         ),
@@ -5393,4 +5461,186 @@ pub fn exhaustive_rational_signed_unsigned_rounding_mode_quadruple_gen_var_2()
         )
         .filter(|&((ref n, k, prec), rm)| root_s_rational_prec_round_valid(n, k, prec, rm)),
     ))
+}
+
+// -- (String, PrimitiveUnsigned, PrimitiveUnsigned, RoundingMode) --
+
+// All valid `(String, base, prec, RoundingMode)` inputs for `strtofr`: base 0 or in 2..=62, a
+// string the whole of which parses, a positive precision, and (since `strtofr` panics on `Exact`
+// for values it cannot represent exactly) `Exact` only paired with exactly-representable values.
+//
+// The string parts are a flat tuple rather than nested pairs so that each gets an equal share of
+// the bit distributor's output; nesting them starves the combo, which is what chooses the syntactic
+// shape.
+fn exhaustive_strtofr_quadruples(rug_compatible: bool) -> It<(String, u8, u64, RoundingMode)> {
+    // A property test runs 10000 values, far too few to cross every base with every syntactic
+    // shape, every digit string, and every exponent. So the base and the shape are enumerated
+    // exhaustively over the values that behave differently, and put in the lex cycle so that a
+    // single run covers all of them; the digits, exponent, and precision then vary underneath. The
+    // random modes supply the breadth these curated lists leave out.
+    //
+    // The bases are the ones on either side of every boundary the parser tests: prefix detection
+    // (0), the `p` marker (2 and 16), the `e` marker (10 and 11), the bare special spellings (16
+    // and 17), and the switch to case-sensitive digits (36 and 62).
+    const BASES: [u8; 7] = [0, 2, 10, 11, 16, 36, 62];
+    const RUG_BASES: [u8; 5] = [2, 10, 11, 16, 36];
+    let bases: &[u8] = if rug_compatible { &RUG_BASES } else { &BASES };
+    // Every combination of kind (NaN, infinity, a number), exponent marker, prefix or spelling
+    // variant, and sign. The point position and the leading whitespace are left at their first
+    // choice, being the two fields that cannot change which branch the parser takes.
+    let combos = (0..3u32).flat_map(|kind| {
+        (0..6).flat_map(move |marker| {
+            (0..4).flat_map(move |variant| {
+                (0..3).map(move |sign| kind + 8 * marker + 48 * variant + 960 * sign)
+            })
+        })
+    });
+    let base_combo_rms: Vec<(u8, u32, RoundingMode)> = bases
+        .iter()
+        .flat_map(|&base| {
+            combos
+                .clone()
+                .flat_map(move |combo| exhaustive_rounding_modes().map(move |rm| (base, combo, rm)))
+        })
+        .collect();
+    Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(
+                exhaustive_pairs(
+                    exhaustive_vecs_min_length(
+                        1,
+                        primitive_int_increasing_inclusive_range::<u8>(0, 61),
+                    ),
+                    exhaustive_signeds::<i64>(),
+                ),
+                exhaustive_positive_primitive_ints::<u64>(),
+            ),
+            base_combo_rms.into_iter(),
+        )
+        .map(move |(((digits, exp), prec), (base, combo, rm))| {
+            (
+                strtofr_string_from_parts(base, combo, &digits, exp, rug_compatible),
+                base,
+                prec,
+                rm,
+            )
+        }),
+    )
+}
+
+pub fn exhaustive_string_unsigned_unsigned_rounding_mode_quadruple_gen_var_1()
+-> It<(String, u8, u64, RoundingMode)> {
+    Box::new(
+        exhaustive_strtofr_quadruples(false)
+            .filter(|(s, base, prec, rm)| valid_strtofr_quadruple(s, *base, *prec, *rm)),
+    )
+}
+
+// All `(String, base, prec, RoundingMode)` inputs for `strtofr` that rug's `parse_radix` also
+// accepts: base in 2..=36 (rug supports no others), no syntax rug rejects, and rounding mode not
+// `Exact` (rug has no exact rounding mode).
+pub fn exhaustive_string_unsigned_unsigned_rounding_mode_quadruple_gen_var_2()
+-> It<(String, u8, u64, RoundingMode)> {
+    Box::new(exhaustive_strtofr_quadruples(true).filter(|(_, _, _, rm)| *rm != Exact))
+}
+
+// All `(String, base, prec, RoundingMode)` where the string is an arbitrary sequence of the
+// characters that appear in `strtofr` input, so that most of them are invalid. The base and
+// rounding-mode restrictions are those of
+// `exhaustive_string_unsigned_unsigned_rounding_mode_quadruple_gen_var_1`.
+pub fn exhaustive_string_unsigned_unsigned_rounding_mode_quadruple_gen_var_3()
+-> It<(String, u8, u64, RoundingMode)> {
+    Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(
+                exhaustive_pairs(
+                    exhaustive_strings_using_chars(STRTOFR_STRING_CHARS.chars()),
+                    once(0).chain(primitive_int_increasing_inclusive_range(2, 62)),
+                ),
+                exhaustive_positive_primitive_ints::<u64>(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .map(|(((s, base), prec), rm)| (s, base, prec, rm))
+        .filter(|(s, base, prec, rm)| valid_strtofr_quadruple(s, *base, *prec, *rm)),
+    )
+}
+
+// -- (String, FromSciStringOptions, PrimitiveUnsigned) --
+
+// All valid `(String, FromSciStringOptions, prec)` inputs for
+// `Float::from_sci_string_with_options_prec`: a string the whole of which parses, a positive
+// precision, and (since `Exact` panics on a value it cannot represent) `Exact` only paired with
+// exactly-representable values.
+//
+// As for `strtofr`, the base and the syntactic shape are enumerated over the values that behave
+// differently and put in the lex cycle, so that a single property run covers all of them; the
+// digits, exponent, and precision vary underneath.
+pub fn exhaustive_string_from_sci_string_options_unsigned_triple_gen_var_1()
+-> It<(String, FromSciStringOptions, u64)> {
+    // A property test runs 10000 values, far too few to cross every base and rounding mode with
+    // every syntactic shape, digit string, exponent, and precision. Under a bit distributor the
+    // digits never leave their first value and every number comes out zero, so the dimensions are
+    // curated and enumerated in lex order instead, which spends the budget predictably: the
+    // innermost components are covered in full and the outermost get what is left. The random modes
+    // supply the breadth these lists leave out.
+    //
+    // The bases sit on either side of the one boundary this grammar has: above base 14 the exponent
+    // marker needs an explicit sign, to tell it from the digit `e`. That pair comes first because
+    // the budget runs out partway through the list; the rest are here for their digit alphabets.
+    const BASES: [u8; 5] = [14, 15, 2, 10, 36];
+    // Every combination of kind (a NaN, an infinity, or a number), exponent marker, and sign, with
+    // the point in the first two of its positions.
+    let combos: Vec<u32> = (0..SCI_STRING_COMBO_COUNT)
+        .filter(|combo| (combo / 27) % 5 < 2)
+        .collect();
+    // Digit strings that exercise the value: a single zero and a single one, a run, a string whose
+    // leading and trailing digits are zero, and the largest digits of the base.
+    let digit_sets: Vec<Vec<u8>> =
+        vec![vec![0], vec![1], vec![1, 0], vec![0, 1, 0], vec![1, 2, 3, 4], vec![35, 35, 35]];
+    let exps: [i64; 9] = [0, 1, -1, 5, -5, 1000, -1000, i64::MAX, i64::MIN];
+    // Digits innermost, then the shape, then the base, then the exponent.
+    let mut shapes: Vec<(i64, u8, u32, Vec<u8>)> = Vec::new();
+    for exp in exps {
+        for base in BASES {
+            for &combo in &combos {
+                for digits in &digit_sets {
+                    shapes.push((exp, base, combo, digits.clone()));
+                }
+            }
+        }
+    }
+    // The lex cycle repeats for every shape, so it holds only the two small dimensions.
+    let rm_precs: Vec<(RoundingMode, u64)> = exhaustive_rounding_modes()
+        .flat_map(|rm| [1u64, 10, 53].into_iter().map(move |prec| (rm, prec)))
+        .collect();
+    Box::new(
+        lex_pairs(shapes.into_iter(), rm_precs.into_iter())
+            .map(|((exp, base, combo, digits), (rm, prec))| {
+                let mut options = FromSciStringOptions::default();
+                options.set_base(base);
+                options.set_rounding_mode(rm);
+                (
+                    sci_string_from_parts(base, combo, &digits, exp),
+                    options,
+                    prec,
+                )
+            })
+            .filter(|(s, options, prec)| valid_float_from_sci_string_triple(s, *options, *prec)),
+    )
+}
+
+// All `(String, FromSciStringOptions, prec)` where the string is an arbitrary sequence of the
+// characters that appear in scientific notation, so that most of them are invalid; for exercising
+// the parser's rejection paths.
+pub fn exhaustive_string_from_sci_string_options_unsigned_triple_gen_var_2()
+-> It<(String, FromSciStringOptions, u64)> {
+    Box::new(
+        exhaustive_pairs_big_tiny(
+            base_gen::exhaustive_string_from_sci_string_options_pair_gen_var_1(),
+            exhaustive_positive_primitive_ints::<u64>(),
+        )
+        .map(|((s, options), prec)| (s, options, prec))
+        .filter(|(s, options, prec)| valid_float_from_sci_string_triple(s, *options, *prec)),
+    )
 }

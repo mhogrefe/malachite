@@ -18,7 +18,9 @@ use malachite_float::conversion::string::format_float::{
     PrintfArg, float_conversion_spec, format, format_float, format_float_str,
 };
 use malachite_float::test_util::common::parse_hex_string;
-use malachite_float::test_util::generators::float_string_pair_gen_var_1;
+use malachite_float::test_util::generators::{
+    float_string_pair_gen_var_1, float_string_pair_gen_var_2,
+};
 use malachite_nz::natural::Natural;
 use malachite_q::Rational;
 use std::panic::catch_unwind;
@@ -93,7 +95,10 @@ fn split_point(s: &str) -> (&str, &str) {
 // formatting analogue of `get_str`'s `verify_get_str`.
 //
 // Padding, sign, grouping, and the alternate-form flag do not change the denoted value, so they are
-// stripped before parsing.
+// stripped before parsing. The largest exponent for which the denoted value is rebuilt as a
+// `Rational`.
+const MAX_RATIONAL_EXPONENT: u64 = 10_000;
+
 fn verify_regular_output(x: &Float, out: &str, conv: u8, rm: RoundingMode) {
     let base = conversion_base(conv);
     // strip field-width padding (spaces), a leading sign or space slot, and grouping separators,
@@ -144,7 +149,13 @@ fn verify_regular_output(x: &Float, out: &str, conv: u8, rm: RoundingMode) {
         )
     };
 
-    // v = +-all * ulp_base ^ e is the denoted value; ulp is the weight of the last digit.
+    // v = +-all * ulp_base ^ e is the denoted value; ulp is the weight of the last digit. Both are
+    // `Rational`s, which is only affordable for a moderate exponent: `ulp_base ^ e` and the exact
+    // value of a `Float` with an extreme exponent are integers of around a billion bits. What
+    // covers those is the MPFR cross-check above, which is the primary oracle anyway.
+    if e.unsigned_abs() > MAX_RATIONAL_EXPONENT {
+        return;
+    }
     let ulp = Rational::from(ulp_base).pow(e);
     let mut v = Rational::from(digits_to_natural(&all, base)) * &ulp;
     if neg {
@@ -784,14 +795,19 @@ fn format_float_properties() {
     // format_float_str(x, fmt) is format_float applied to the spec parsed from fmt, so this
     // property exercises the same partition_number / sprnt_fp core as format_float itself, over the
     // full space of conversions, flags, widths, precisions, and rounding characters.
-    float_string_pair_gen_var_1().test_properties(|(x, fmt)| {
-        let out = format_float_str(&x, &fmt).unwrap();
+    fn check(x: &Float, fmt: &str) {
+        let out = format_float_str(x, fmt).unwrap();
         // valid format strings with bounded width/precision always succeed and produce ASCII
         assert!(out.is_ascii());
         // every non-NaN negative value (including negative zero and negative infinity) is signed
         if !x.is_nan() && x.is_sign_negative() {
             assert!(out.trim().starts_with('-'), "{fmt:?} -> {out:?}");
         }
-        verify_format(&x, &fmt);
-    });
+        verify_format(x, fmt);
+    }
+    float_string_pair_gen_var_1().test_properties(|(x, fmt)| check(&x, &fmt));
+    // The same over extreme `Float`s, restricted to the conversions that position the point with an
+    // exponent: `b`, `f`, and `F` would write out every digit before it, hundreds of millions of
+    // them for such a value.
+    float_string_pair_gen_var_2().test_properties(|(x, fmt)| check(&x, &fmt));
 }

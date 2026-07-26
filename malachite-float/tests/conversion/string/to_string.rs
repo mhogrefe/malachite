@@ -13,7 +13,10 @@ use malachite_float::ComparableFloatRef;
 use malachite_float::Float;
 use malachite_float::conversion::string::get_str::get_str_ndigits;
 use malachite_float::test_util::common::parse_hex_string;
-use malachite_float::test_util::generators::float_gen;
+use malachite_float::test_util::generators::{
+    float_gen, float_gen_var_6, float_gen_var_7, float_gen_var_8, float_gen_var_9,
+    float_gen_var_10, float_gen_var_12,
+};
 use malachite_nz::natural::Natural;
 
 // The number of significant digits in a formatted mantissa: the digits of `s` up to any exponent
@@ -77,7 +80,7 @@ fn test_to_string_high_precision() {
 
 #[test]
 fn to_string_properties() {
-    float_gen().test_properties(|x| {
+    fn check(x: &Float) {
         let s = x.to_string();
         assert_eq!(x.to_debug_string(), s);
         assert!(s.is_ascii());
@@ -105,7 +108,17 @@ fn to_string_properties() {
                 }
             }
         }
-    });
+    }
+    float_gen().test_properties(|x| check(&x));
+    // The digit count is a function of the precision, so the precisions on either side of a limb
+    // boundary, and on it, are worth pinning down.
+    float_gen_var_6().test_properties(|x| check(&x));
+    float_gen_var_7().test_properties(|x| check(&x));
+    float_gen_var_8().test_properties(|x| check(&x));
+    float_gen_var_9().test_properties(|x| check(&x));
+    float_gen_var_10().test_properties(|x| check(&x));
+    // Extreme exponents, where the exponent part of the rendering is largest.
+    float_gen_var_12().test_properties(|x| check(&x));
 }
 
 #[test]
@@ -136,7 +149,7 @@ pub fn test_to_binary_string() {
 
 #[test]
 fn to_binary_string_properties() {
-    float_gen().test_properties(|x| {
+    fn check(x: &Float) {
         let s = format!("{x:b}");
         assert!(s.is_ascii());
         // the alternate form only inserts the prefix, after any sign, for non-special values
@@ -162,7 +175,17 @@ fn to_binary_string_properties() {
                 "{s:?}"
             );
         }
-    });
+    }
+    float_gen().test_properties(|x| check(&x));
+    // The digit count is a function of the precision, so the precisions on either side of a limb
+    // boundary, and on it, are worth pinning down.
+    float_gen_var_6().test_properties(|x| check(&x));
+    float_gen_var_7().test_properties(|x| check(&x));
+    float_gen_var_8().test_properties(|x| check(&x));
+    float_gen_var_9().test_properties(|x| check(&x));
+    float_gen_var_10().test_properties(|x| check(&x));
+    // Extreme exponents, where the exponent part of the rendering is largest.
+    float_gen_var_12().test_properties(|x| check(&x));
 }
 
 #[test]
@@ -189,7 +212,7 @@ pub fn test_to_octal_string() {
 
 #[test]
 fn to_octal_string_properties() {
-    float_gen().test_properties(|x| {
+    fn check(x: &Float) {
         let s = format!("{x:o}");
         assert!(s.is_ascii());
         let prefixed = if x.is_nan() || x.is_infinite() {
@@ -204,7 +227,17 @@ fn to_octal_string_properties() {
             // digits 8 and 9 can still appear in the decimal exponent
             assert!(string_is_subset(&s, "-.01234567E+89"));
         }
-    });
+    }
+    float_gen().test_properties(|x| check(&x));
+    // The digit count is a function of the precision, so the precisions on either side of a limb
+    // boundary, and on it, are worth pinning down.
+    float_gen_var_6().test_properties(|x| check(&x));
+    float_gen_var_7().test_properties(|x| check(&x));
+    float_gen_var_8().test_properties(|x| check(&x));
+    float_gen_var_9().test_properties(|x| check(&x));
+    float_gen_var_10().test_properties(|x| check(&x));
+    // Extreme exponents, where the exponent part of the rendering is largest.
+    float_gen_var_12().test_properties(|x| check(&x));
 }
 
 #[test]
@@ -253,7 +286,7 @@ pub fn test_to_upper_hex_string() {
 
 #[test]
 fn to_hex_string_properties() {
-    float_gen().test_properties(|x| {
+    fn check(x: &Float) {
         let lower = format!("{x:x}");
         let upper = format!("{x:X}");
         assert!(lower.is_ascii());
@@ -273,8 +306,18 @@ fn to_hex_string_properties() {
         }
         // The ComparableFloat hex form round-trips exactly, preserving value, sign, and precision.
         // (parse_hex_string itself asserts that re-rendering the parsed value gives its input.)
-        let s = format!("{:#x}", ComparableFloatRef(&x));
+        let s = format!("{:#x}", ComparableFloatRef(x));
         let y = parse_hex_string(&s);
-        assert_eq!(ComparableFloatRef(&y), ComparableFloatRef(&x));
-    });
+        assert_eq!(ComparableFloatRef(&y), ComparableFloatRef(x));
+    }
+    float_gen().test_properties(|x| check(&x));
+    // The digit count is a function of the precision, so the precisions on either side of a limb
+    // boundary, and on it, are worth pinning down.
+    float_gen_var_6().test_properties(|x| check(&x));
+    float_gen_var_7().test_properties(|x| check(&x));
+    float_gen_var_8().test_properties(|x| check(&x));
+    float_gen_var_9().test_properties(|x| check(&x));
+    float_gen_var_10().test_properties(|x| check(&x));
+    // Extreme exponents, where the exponent part of the rendering is largest.
+    float_gen_var_12().test_properties(|x| check(&x));
 }

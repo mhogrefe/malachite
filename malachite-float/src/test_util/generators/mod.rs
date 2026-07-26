@@ -15,6 +15,7 @@ use crate::test_util::generators::common::{
     float_rational_pair_rm, float_rational_rounding_mode_triple_rm, float_rm,
     float_rounding_mode_pair_rm, float_t_rounding_mode_triple_rm,
     float_t_u_rounding_mode_quadruple_rm, float_t_u_triple_rm,
+    string_u_u_rounding_mode_quadruple_rm,
 };
 use crate::test_util::generators::exhaustive::*;
 use crate::test_util::generators::random::*;
@@ -22,7 +23,7 @@ use crate::test_util::generators::special_random::*;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::string::options::ToSciOptions;
+use malachite_base::num::conversion::string::options::{FromSciStringOptions, ToSciOptions};
 use malachite_base::num::conversion::traits::ConvertibleFrom;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::test_util::generators::common::Generator;
@@ -1180,6 +1181,16 @@ pub fn float_string_pair_gen_var_1() -> Generator<(Float, String)> {
         &exhaustive_float_string_pair_gen_var_1,
         &random_float_string_pair_gen_var_1,
         &special_random_float_string_pair_gen_var_1,
+    )
+}
+
+// The same as var 1, but over extreme `Float`s, and restricted to the format strings whose output
+// stays short for them (see `format_string_output_is_bounded`).
+pub fn float_string_pair_gen_var_2() -> Generator<(Float, String)> {
+    Generator::new(
+        &exhaustive_float_string_pair_gen_var_2,
+        &random_float_string_pair_gen_var_2,
+        &special_random_float_string_pair_gen_var_2,
     )
 }
 
@@ -4004,6 +4015,17 @@ pub fn float_to_sci_options_pair_gen_var_1() -> Generator<(Float, ToSciOptions)>
     )
 }
 
+// The same as var 1, but over extreme `Float`s. `float_to_sci_options_valid` rejects an extreme
+// exponent paired with `Scale` or `Complete` sizing, since writing every digit of such a value
+// would take hundreds of millions of them, so what survives is `Precision` sizing.
+pub fn float_to_sci_options_pair_gen_var_2() -> Generator<(Float, ToSciOptions)> {
+    Generator::new(
+        &exhaustive_float_to_sci_options_pair_gen_var_2,
+        &random_float_to_sci_options_pair_gen_var_2,
+        &special_random_float_to_sci_options_pair_gen_var_2,
+    )
+}
+
 // -- (Integer, PrimitiveUnsigned, RoundingMode) --
 
 // vars 1 and 2 are in malachite-nz.
@@ -4373,6 +4395,17 @@ pub fn float_signed_unsigned_rounding_mode_quadruple_gen_var_9()
     )
 }
 
+// The same as var 9, but over extreme `Float`s: `get_str` has to scale by a power of the base as
+// large as the exponent, which is where that scaling works hardest.
+pub fn float_signed_unsigned_rounding_mode_quadruple_gen_var_15()
+-> Generator<(Float, i64, usize, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_signed_unsigned_rounding_mode_quadruple_gen_var_15,
+        &random_float_signed_unsigned_rounding_mode_quadruple_gen_var_15,
+        &special_random_float_signed_unsigned_rounding_mode_quadruple_gen_var_15,
+    )
+}
+
 // All `(Float, base, m, RoundingMode)` inputs for `get_str` that rug's `to_sign_string_exp_round`
 // also accepts: base in 2..=36 (rug supports neither negative bases nor bases above 36) and
 // rounding mode not `Exact`.
@@ -4382,6 +4415,17 @@ pub fn float_signed_unsigned_rounding_mode_quadruple_gen_var_10()
         &exhaustive_float_signed_unsigned_rounding_mode_quadruple_gen_var_10,
         &random_float_signed_unsigned_rounding_mode_quadruple_gen_var_10,
         &special_random_float_signed_unsigned_rounding_mode_quadruple_gen_var_10,
+    )
+}
+
+// The same as var 10, but over extreme `Float`s, so that the rug cross-check applies to them too.
+// rug's exponent range is `Float`'s, so it is a faithful oracle there.
+pub fn float_signed_unsigned_rounding_mode_quadruple_gen_var_16()
+-> Generator<(Float, i64, usize, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_signed_unsigned_rounding_mode_quadruple_gen_var_16,
+        &random_float_signed_unsigned_rounding_mode_quadruple_gen_var_16,
+        &special_random_float_signed_unsigned_rounding_mode_quadruple_gen_var_16,
     )
 }
 
@@ -4562,5 +4606,97 @@ pub fn rational_signed_unsigned_rounding_mode_quadruple_gen_var_2()
         &exhaustive_rational_signed_unsigned_rounding_mode_quadruple_gen_var_2,
         &random_rational_signed_unsigned_rounding_mode_quadruple_gen_var_2,
         &special_random_rational_signed_unsigned_rounding_mode_quadruple_gen_var_2,
+    )
+}
+
+// -- (String, PrimitiveUnsigned, PrimitiveUnsigned, RoundingMode) --
+
+// All valid `(String, base, prec, RoundingMode)` inputs for `strtofr`: base 0 (detect it from the
+// prefix) or in 2..=62, a string the whole of which parses, a positive precision, and (since
+// `strtofr` panics on `Exact` for values it cannot represent exactly) `Exact` only paired with
+// exactly-representable values.
+pub fn string_unsigned_unsigned_rounding_mode_quadruple_gen_var_1()
+-> Generator<(String, u8, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_string_unsigned_unsigned_rounding_mode_quadruple_gen_var_1,
+        &random_string_unsigned_unsigned_rounding_mode_quadruple_gen_var_1,
+        &special_random_string_unsigned_unsigned_rounding_mode_quadruple_gen_var_1,
+    )
+}
+
+// All `(String, base, prec, RoundingMode)` inputs for `strtofr` that rug's `parse_radix` also
+// accepts: base in 2..=36 (rug supports no others), none of the syntax rug rejects (the `0x` and
+// `0b` prefixes, `p` binary exponents, and the bare `nan` and `inf` spellings above base 10), and
+// rounding mode not `Exact` (rug has no exact rounding mode).
+pub fn string_unsigned_unsigned_rounding_mode_quadruple_gen_var_2()
+-> Generator<(String, u8, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_string_unsigned_unsigned_rounding_mode_quadruple_gen_var_2,
+        &random_string_unsigned_unsigned_rounding_mode_quadruple_gen_var_2,
+        &special_random_string_unsigned_unsigned_rounding_mode_quadruple_gen_var_2,
+    )
+}
+
+// All `(String, base, prec, RoundingMode)` where the string is an arbitrary sequence of the
+// characters that appear in `strtofr` input, so that most of them are invalid; for exercising the
+// parser's rejection paths. The base, precision, and rounding-mode restrictions are those of
+// `string_unsigned_unsigned_rounding_mode_quadruple_gen_var_1`.
+pub fn string_unsigned_unsigned_rounding_mode_quadruple_gen_var_3()
+-> Generator<(String, u8, u64, RoundingMode)> {
+    Generator::new_no_special(
+        &exhaustive_string_unsigned_unsigned_rounding_mode_quadruple_gen_var_3,
+        &random_string_unsigned_unsigned_rounding_mode_quadruple_gen_var_3,
+    )
+}
+
+// All `(String, base, prec, RoundingMode)` inputs for `strtofr` that rug also accepts, paired with
+// the same input in the form rug's `parse_radix` and `complete_round` take.
+pub fn string_unsigned_unsigned_rounding_mode_quadruple_gen_var_2_rm() -> Generator<(
+    (String, i32, u32, rug::float::Round),
+    (String, u8, u64, RoundingMode),
+)> {
+    Generator::new(
+        &|| {
+            string_u_u_rounding_mode_quadruple_rm(
+                exhaustive_string_unsigned_unsigned_rounding_mode_quadruple_gen_var_2(),
+            )
+        },
+        &|config| {
+            string_u_u_rounding_mode_quadruple_rm(
+                random_string_unsigned_unsigned_rounding_mode_quadruple_gen_var_2(config),
+            )
+        },
+        &|config| {
+            string_u_u_rounding_mode_quadruple_rm(
+                special_random_string_unsigned_unsigned_rounding_mode_quadruple_gen_var_2(config),
+            )
+        },
+    )
+}
+
+// -- (String, FromSciStringOptions, PrimitiveUnsigned) --
+
+// All valid `(String, FromSciStringOptions, prec)` inputs for
+// `Float::from_sci_string_with_options_prec`: a string the whole of which parses, a positive
+// precision, and (since `Exact` panics on a value it cannot represent exactly) `Exact` only paired
+// with exactly-representable values.
+pub fn string_from_sci_string_options_unsigned_triple_gen_var_1()
+-> Generator<(String, FromSciStringOptions, u64)> {
+    Generator::new(
+        &exhaustive_string_from_sci_string_options_unsigned_triple_gen_var_1,
+        &random_string_from_sci_string_options_unsigned_triple_gen_var_1,
+        &special_random_string_from_sci_string_options_unsigned_triple_gen_var_1,
+    )
+}
+
+// All `(String, FromSciStringOptions, prec)` where the string is an arbitrary sequence of the
+// characters that appear in scientific notation, so that most of them are invalid; for exercising
+// the parser's rejection paths. The precision and rounding-mode restrictions are those of
+// `string_from_sci_string_options_unsigned_triple_gen_var_1`.
+pub fn string_from_sci_string_options_unsigned_triple_gen_var_2()
+-> Generator<(String, FromSciStringOptions, u64)> {
+    Generator::new_no_special(
+        &exhaustive_string_from_sci_string_options_unsigned_triple_gen_var_2,
+        &random_string_from_sci_string_options_unsigned_triple_gen_var_2,
     )
 }

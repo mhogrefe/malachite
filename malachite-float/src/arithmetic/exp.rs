@@ -23,6 +23,7 @@
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::WIDTH_MINUS_1;
 use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn, floor_and_ceiling};
+use alloc::vec;
 use core::cmp::Ordering::{self, Equal, Greater, Less};
 use core::cmp::max;
 use core::mem::swap;

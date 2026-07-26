@@ -54,6 +54,10 @@
 use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::conversion::string::get_str::{ceil_mul, get_str, get_str_ndigits};
+use alloc::format;
+use alloc::string::String;
+use alloc::vec;
+use alloc::vec::Vec;
 use core::cmp::Ordering::{Equal, Greater, Less};
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::basic::integers::PrimitiveInt;

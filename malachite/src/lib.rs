@@ -53,9 +53,9 @@
 #![cfg_attr(not(any(feature = "random", feature = "std")), no_std)]
 #![forbid(unsafe_code)]
 
-/// This module contains various functions that support the other crates. This includes many
-/// numeric traits and their implementation for primitive numeric types, as well as many functions
-/// for exhaustively and randomly generating values of many types.
+/// This module contains various functions that support the other crates. This includes many numeric
+/// traits and their implementation for primitive numeric types, as well as many functions for
+/// exhaustively and randomly generating values of many types.
 pub mod base {
     pub use malachite_base::*;
 }
@@ -81,9 +81,10 @@ pub mod rational {
 #[cfg(feature = "rationals")]
 pub use malachite_q::Rational;
 
-/// Various types and constants dependent on whether Malachite is built using 32-bit limbs or
-/// 64-bit limbs. `Limb` is the type such that `Vec`s of limbs are used to represent the bits of a
+/// Various types and constants dependent on whether Malachite is built using 32-bit limbs or 64-bit
+/// limbs. `Limb` is the type such that `Vec`s of limbs are used to represent the bits of a
 /// [`Natural`].
+#[cfg(feature = "naturals_and_integers")]
 pub mod platform {
     #[cfg(feature = "32_bit_limbs")]
     pub use malachite_nz::platform_32::*;

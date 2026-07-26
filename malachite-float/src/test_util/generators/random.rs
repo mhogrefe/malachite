@@ -18,7 +18,12 @@ use crate::test_util::extra_variadic::{
     random_triples_xxy, random_triples_xyy,
 };
 use crate::test_util::generators::common::{
-    FLOAT_FORMAT_COMBO_COUNT, format_string_from_parts, valid_float_get_str_quadruple,
+    FLOAT_FORMAT_COMBO_COUNT, format_string_from_parts, format_string_output_is_bounded,
+    valid_float_get_str_quadruple,
+};
+use crate::test_util::generators::common::{
+    SCI_STRING_COMBO_COUNT, STRTOFR_COMBO_COUNT, STRTOFR_STRING_CHARS, sci_string_from_parts,
+    strtofr_string_from_parts, valid_float_from_sci_string_triple, valid_strtofr_quadruple,
 };
 use crate::test_util::generators::exhaustive::{
     add_prec_round_valid, add_rational_prec_round_valid, add_rational_round_valid, add_round_valid,
@@ -66,6 +71,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::string::options::FromSciStringOptions;
 use malachite_base::num::conversion::string::options::ToSciOptions;
 use malachite_base::num::conversion::string::options::random::random_to_sci_options;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, SaturatingFrom};
@@ -76,6 +82,7 @@ use malachite_base::num::random::geometric::{
     geometric_random_signeds, geometric_random_unsigned_inclusive_range,
     geometric_random_unsigneds,
 };
+use malachite_base::num::random::striped::striped_random_signeds;
 use malachite_base::num::random::{
     RandomUnsignedInclusiveRange, random_primitive_ints, random_unsigned_inclusive_range,
     special_random_primitive_floats,
@@ -85,8 +92,12 @@ use malachite_base::orderings::random::random_orderings;
 use malachite_base::random::{EXAMPLE_SEED, Seed};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::random::random_rounding_modes;
+use malachite_base::strings::random::random_strings_using_chars;
 use malachite_base::test_util::generators::common::{GenConfig, It, reshape_2_1_to_3};
+use malachite_base::test_util::generators::random as base_gen;
 use malachite_base::tuples::random::{random_pairs, random_pairs_from_single};
+use malachite_base::vecs::random::random_vecs_min_length;
+use malachite_base::vecs::random_values_from_vec;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer::random::random_integers;
 use malachite_nz::natural::Natural;
@@ -2512,6 +2523,28 @@ pub fn random_float_string_pair_gen_var_1(config: &GenConfig) -> It<(Float, Stri
             )
         },
         &|seed| random_format_strings(seed, config),
+    ))
+}
+
+// The same as var 1, but over extreme `Float`s, and restricted to the format strings whose output
+// stays short for them (see `format_string_output_is_bounded`).
+pub fn random_float_string_pair_gen_var_2(config: &GenConfig) -> It<(Float, String)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_extreme_floats(
+                seed,
+                config.get_or("mean_exponent_n", 64),
+                config.get_or("mean_exponent_d", 1),
+                config.get_or("mean_precision_n", 64),
+                config.get_or("mean_precision_d", 1),
+                config.get_or("mean_zero_p_n", 1),
+                config.get_or("mean_zero_p_d", 64),
+            )
+        },
+        &|seed| {
+            random_format_strings(seed, config).filter(|fmt| format_string_output_is_bounded(fmt))
+        },
     ))
 }
 
@@ -7833,6 +7866,37 @@ pub fn random_float_to_sci_options_pair_gen_var_1(config: &GenConfig) -> It<(Flo
     )
 }
 
+// The same as var 1, but over extreme `Float`s. `float_to_sci_options_valid` rejects an extreme
+// exponent paired with `Scale` or `Complete` sizing, since writing every digit of such a value
+// would take hundreds of millions of them, so what survives is the digit-count-bounded `Precision`
+// sizing.
+pub fn random_float_to_sci_options_pair_gen_var_2(config: &GenConfig) -> It<(Float, ToSciOptions)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_extreme_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                random_to_sci_options(
+                    seed,
+                    config.get_or("small_mean_n", 4),
+                    config.get_or("small_mean_d", 1),
+                )
+            },
+        )
+        .filter(|(x, options)| float_to_sci_options_valid(x, *options)),
+    )
+}
+
 // -- (Integer, PrimitiveUnsigned, RoundingMode) --
 
 // vars 1 through 2 are in malachite-nz.
@@ -8739,6 +8803,45 @@ pub fn random_float_signed_unsigned_rounding_mode_quadruple_gen_var_9(
     )
 }
 
+// The same as var 9, but over extreme `Float`s: `get_str` has to scale by a power of the base as
+// large as the exponent, which is where that scaling works hardest.
+pub fn random_float_signed_unsigned_rounding_mode_quadruple_gen_var_15(
+    config: &GenConfig,
+) -> It<(Float, i64, usize, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_extreme_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &random_primitive_ints::<u64>,
+            &random_rounding_modes,
+        )
+        .map(|(x, v, rm): (Float, u64, RoundingMode)| {
+            {
+                // base in -36..=-2 or 2..=62; digit count in 0..=20 (0 chooses the round-trip
+                // minimum)
+                let raw = v % 96;
+                let base = if raw < 61 {
+                    i64::exact_from(2 + raw)
+                } else {
+                    -i64::exact_from(raw - 59)
+                };
+                (x, base, usize::exact_from((v >> 8) % 21), rm)
+            }
+        })
+        .filter(|(x, b0, m, rnd)| valid_float_get_str_quadruple(x, *b0, *m, *rnd)),
+    )
+}
+
 // All `(Float, base, m, RoundingMode)` inputs for `get_str` that rug's `to_sign_string_exp_round`
 // also accepts: base restricted to 2..=36 (rug supports neither negative bases nor bases above 36)
 // and rounding mode not `Exact` (rug has no exact rounding mode).
@@ -8750,6 +8853,37 @@ pub fn random_float_signed_unsigned_rounding_mode_quadruple_gen_var_10(
             EXAMPLE_SEED,
             &|seed| {
                 random_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &random_primitive_ints::<u64>,
+            &random_rounding_modes,
+        )
+        .map(|(x, v, rm): (Float, u64, RoundingMode)| {
+            // base in 2..=36; digit count in 0..=20 (0 chooses the round-trip minimum)
+            let base = i64::exact_from(2 + (v % 35));
+            (x, base, usize::exact_from((v >> 8) % 21), rm)
+        })
+        .filter(|(_, _, _, rm): &(Float, i64, usize, RoundingMode)| *rm != Exact),
+    )
+}
+
+// The same as var 10, but over extreme `Float`s, so that the rug cross-check applies to them too.
+// rug's exponent range is `Float`'s, so it is a faithful oracle there.
+pub fn random_float_signed_unsigned_rounding_mode_quadruple_gen_var_16(
+    config: &GenConfig,
+) -> It<(Float, i64, usize, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_extreme_floats(
                     seed,
                     config.get_or("mean_exponent_n", 64),
                     config.get_or("mean_exponent_d", 1),
@@ -9086,5 +9220,215 @@ pub fn random_rational_signed_unsigned_rounding_mode_quadruple_gen_var_2(
             &random_rounding_modes,
         )
         .filter(|&(ref n, k, prec, rm)| root_s_rational_prec_round_valid(n, k, prec, rm)),
+    )
+}
+
+// -- (String, PrimitiveUnsigned, PrimitiveUnsigned, RoundingMode) --
+
+// Unpacks a base and a `strtofr_string_from_parts` combo from a single random value. The base is 0
+// or in 2..=62, or in 2..=36 when `rug_compatible` is set.
+pub(crate) fn unpack_strtofr_parts(v: u64, rug_compatible: bool) -> (u8, u32) {
+    let base = if rug_compatible {
+        u8::exact_from(2 + v % 35)
+    } else {
+        // 62 choices: 0, then 2 through 62
+        let raw = v % 62;
+        if raw == 0 { 0 } else { u8::exact_from(raw + 1) }
+    };
+    (
+        base,
+        u32::exact_from((v >> 8) % u64::from(STRTOFR_COMBO_COUNT)),
+    )
+}
+
+fn random_strtofr_quadruples(
+    config: &GenConfig,
+    rug_compatible: bool,
+) -> It<(String, u8, u64, RoundingMode)> {
+    let mean_digits_n = config.get_or("mean_digits_n", 8);
+    let mean_digits_d = config.get_or("mean_digits_d", 1);
+    let mean_prec_n = config.get_or("mean_small_n", 64);
+    let mean_prec_d = config.get_or("mean_small_d", 1);
+    Box::new(
+        random_quadruples(
+            EXAMPLE_SEED,
+            &random_primitive_ints::<u64>,
+            &move |seed| {
+                random_vecs_min_length(
+                    seed,
+                    1,
+                    &|seed_2| random_unsigned_inclusive_range(seed_2, 0, 61),
+                    mean_digits_n,
+                    mean_digits_d,
+                )
+            },
+            &random_primitive_ints::<i64>,
+            &move |seed| {
+                random_pairs(
+                    seed,
+                    &|seed_2| geometric_random_positive_unsigneds(seed_2, mean_prec_n, mean_prec_d),
+                    &random_rounding_modes,
+                )
+            },
+        )
+        .map(
+            move |(v, digits, exp, (prec, rm)): (u64, Vec<u8>, i64, (u64, RoundingMode))| {
+                let (base, combo) = unpack_strtofr_parts(v, rug_compatible);
+                (
+                    strtofr_string_from_parts(base, combo, &digits, exp, rug_compatible),
+                    base,
+                    prec,
+                    rm,
+                )
+            },
+        ),
+    )
+}
+
+pub fn random_string_unsigned_unsigned_rounding_mode_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(String, u8, u64, RoundingMode)> {
+    Box::new(
+        random_strtofr_quadruples(config, false)
+            .filter(|(s, base, prec, rm)| valid_strtofr_quadruple(s, *base, *prec, *rm)),
+    )
+}
+
+pub fn random_string_unsigned_unsigned_rounding_mode_quadruple_gen_var_2(
+    config: &GenConfig,
+) -> It<(String, u8, u64, RoundingMode)> {
+    Box::new(random_strtofr_quadruples(config, true).filter(|(_, _, _, rm)| *rm != Exact))
+}
+
+pub fn random_string_unsigned_unsigned_rounding_mode_quadruple_gen_var_3(
+    config: &GenConfig,
+) -> It<(String, u8, u64, RoundingMode)> {
+    let mean_length_n = config.get_or("mean_length_n", 16);
+    let mean_length_d = config.get_or("mean_length_d", 1);
+    let mean_prec_n = config.get_or("mean_small_n", 64);
+    let mean_prec_d = config.get_or("mean_small_d", 1);
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &move |seed| {
+                random_strings_using_chars(
+                    seed,
+                    &|seed_2| {
+                        random_values_from_vec(seed_2, STRTOFR_STRING_CHARS.chars().collect())
+                    },
+                    mean_length_n,
+                    mean_length_d,
+                )
+            },
+            &random_primitive_ints::<u64>,
+            &move |seed| {
+                random_pairs(
+                    seed,
+                    &|seed_2| geometric_random_positive_unsigneds(seed_2, mean_prec_n, mean_prec_d),
+                    &random_rounding_modes,
+                )
+            },
+        )
+        .map(|(s, v, (prec, rm)): (String, u64, (u64, RoundingMode))| {
+            let raw = v % 62;
+            let base = if raw == 0 { 0 } else { u8::exact_from(raw + 1) };
+            (s, base, prec, rm)
+        })
+        .filter(|(s, base, prec, rm)| valid_strtofr_quadruple(s, *base, *prec, *rm)),
+    )
+}
+
+// -- (String, FromSciStringOptions, PrimitiveUnsigned) --
+
+pub(crate) fn random_sci_string_triples(
+    config: &GenConfig,
+    striped: bool,
+) -> It<(String, FromSciStringOptions, u64)> {
+    let mean_digits_n = config.get_or("mean_digits_n", if striped { 32 } else { 8 });
+    let mean_digits_d = config.get_or("mean_digits_d", 1);
+    let mean_stripe_n = config.get_or("mean_stripe_n", 32);
+    let mean_stripe_d = config.get_or("mean_stripe_d", 1);
+    let mean_prec_n = config.get_or("mean_small_n", 64);
+    let mean_prec_d = config.get_or("mean_small_d", 1);
+    Box::new(
+        random_quadruples(
+            EXAMPLE_SEED,
+            &random_primitive_ints::<u64>,
+            &move |seed| {
+                random_vecs_min_length(
+                    seed,
+                    1,
+                    &|seed_2| random_unsigned_inclusive_range(seed_2, 0, 35),
+                    mean_digits_n,
+                    mean_digits_d,
+                )
+            },
+            &move |seed| {
+                if striped {
+                    Box::new(striped_random_signeds::<i64>(
+                        seed,
+                        mean_stripe_n,
+                        mean_stripe_d,
+                    )) as It<i64>
+                } else {
+                    Box::new(random_primitive_ints::<i64>(seed)) as It<i64>
+                }
+            },
+            &move |seed| {
+                random_pairs(
+                    seed,
+                    &|seed_2| geometric_random_positive_unsigneds(seed_2, mean_prec_n, mean_prec_d),
+                    &random_rounding_modes,
+                )
+            },
+        )
+        .map(
+            move |(v, mut digits, exp, (prec, rm)): (u64, Vec<u8>, i64, (u64, RoundingMode))| {
+                let base = u8::exact_from(2 + v % 35);
+                let combo = u32::exact_from((v >> 8) % u64::from(SCI_STRING_COMBO_COUNT));
+                if striped {
+                    // A run of one digit puts inputs near a rounding boundary; see
+                    // `special_random_strtofr_quadruples`.
+                    let len = digits.len();
+                    let split = usize::exact_from((v >> 16) % u64::exact_from(len + 1));
+                    let run = u8::exact_from((v >> 24) % 36);
+                    digits[split..].fill(run);
+                }
+                let mut options = FromSciStringOptions::default();
+                options.set_base(base);
+                options.set_rounding_mode(rm);
+                (
+                    sci_string_from_parts(base, combo, &digits, exp),
+                    options,
+                    prec,
+                )
+            },
+        ),
+    )
+}
+
+pub fn random_string_from_sci_string_options_unsigned_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(String, FromSciStringOptions, u64)> {
+    Box::new(
+        random_sci_string_triples(config, false)
+            .filter(|(s, options, prec)| valid_float_from_sci_string_triple(s, *options, *prec)),
+    )
+}
+
+pub fn random_string_from_sci_string_options_unsigned_triple_gen_var_2(
+    config: &GenConfig,
+) -> It<(String, FromSciStringOptions, u64)> {
+    let mean_prec_n = config.get_or("mean_small_n", 64);
+    let mean_prec_d = config.get_or("mean_small_d", 1);
+    Box::new(
+        base_gen::random_string_from_sci_string_options_pair_gen_var_1(config)
+            .zip(geometric_random_positive_unsigneds(
+                EXAMPLE_SEED.fork("prec"),
+                mean_prec_n,
+                mean_prec_d,
+            ))
+            .map(|((s, options), prec)| (s, options, prec))
+            .filter(|(s, options, prec)| valid_float_from_sci_string_triple(s, *options, *prec)),
     )
 }

@@ -1705,7 +1705,7 @@ const SET_STR_PRECOMPUTE_THRESHOLD: usize = 7100;
 //
 // This is equivalent to `mpn_set_str` from `mpn/generic/set_str.c`, GMP 6.2.1, where `base` is not
 // a power of 2.
-pub_test! {limbs_from_digits_small_base<T: PrimitiveUnsigned>(
+pub_crate_test! {limbs_from_digits_small_base<T: PrimitiveUnsigned>(
     out: &mut [Limb],
     xs: &[T],
     base: u64,
