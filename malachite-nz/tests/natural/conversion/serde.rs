@@ -50,12 +50,19 @@ fn serde_properties() {
     });
 
     string_gen().test_properties(|s| {
-        let _n: Result<Natural, _> = serde_json::from_str(&s);
+        // Whatever an arbitrary string deserializes to, if anything, is a valid `Natural`:
+        // deserializing goes through the same parser as `from_string_base`, which cannot produce an
+        // unnormalized one.
+        if let Ok(x) = serde_json::from_str::<Natural>(&s) {
+            assert!(x.is_valid());
+        }
     });
 
     string_gen_var_8().test_properties(|s| {
         let n: Natural = serde_json::from_str(&s).unwrap();
         let i: Integer = serde_json::from_str(&s).unwrap();
+        assert!(n.is_valid());
+        assert!(i.is_valid());
         assert_eq!(n, i);
     });
 }

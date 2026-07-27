@@ -8,6 +8,7 @@
 
 #[cfg(feature = "test_build")]
 use crate::InnerFloat::Finite;
+use alloc::string::String;
 use core::cmp::Ordering::{self, *};
 use core::ops::Deref;
 #[cfg(feature = "test_build")]
@@ -70,7 +71,19 @@ use malachite_nz::platform::Limb;
 /// `Float`s whose precision is 64 bits or less can be represented without any memory allocation.
 /// (Unless Malachite is compiled with `32_bit_limbs`, in which case the limit is 32).
 #[derive(Clone)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature = "serde", serde(try_from = "SerdeFloat", into = "SerdeFloat"))]
 pub struct Float(pub(crate) InnerFloat);
+
+// A `Float` is serialized as the string `ComparableFloat`'s `Display` writes in base 16, for
+// example `0x1.8#2`. Going through a string rather than the fields is what `Natural` and `Integer`
+// do too, and here it also keeps the encoding independent of `Limb`'s width: the stored significand
+// is padded out to a whole number of limbs, so its digits would differ between 32- and 64-bit
+// builds, while the digits of the value itself do not. Reading it back parses, so a deserialized
+// `Float` cannot violate the invariants that `is_valid` checks.
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(transparent))]
+pub(crate) struct SerdeFloat(String);
 
 // We want to limit the visibility of the `NaN`, `Zero`, `Infinity`, and `Finite` constructors to
 // within this crate. To do this, we wrap the `InnerFloat` enum in a struct that gets compiled away.
@@ -191,7 +204,12 @@ impl Float {
 /// `ComparableFloat` owns its float. This is useful in many cases, for example if you want to use
 /// [`Float`]s as keys in a hash map. In other situations, it is better to use
 /// [`ComparableFloatRef`], which only has a reference to its float.
+// Serialized as its inner `Float`, that is as the same hexadecimal string, since the wrapper adds
+// no data of its own. That the string carries a precision is what makes the round trip preserve
+// everything `ComparableFloat` compares by.
 #[derive(Clone)]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature = "serde", serde(transparent))]
 pub struct ComparableFloat(pub Float);
 
 /// `ComparableFloatRef` is a wrapper around a [`Float`], taking the [`Float`] be reference.

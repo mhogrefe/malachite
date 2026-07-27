@@ -1,3 +1,6 @@
+// `z`'s initial value is never read; it only gives the assignment below a different receiver.
+#![allow(unused_assignments)]
+
 use core::ops::Neg;
 use malachite_base::num::arithmetic::traits::Abs;
 use malachite_base::num::basic::traits::{One, Two};

@@ -148,6 +148,69 @@ where
         }
     }
     fg.echo_to_file(&options.file_name);
+    // `Figure` keeps its data in a `tempfile::TempDir` and writes the script with references to it,
+    // so the `.gp` stops working the moment this process exits and its temp directory is removed.
+    // Fold the data back into the script while it is still there, which is what the gnuplot crate
+    // used to do and what makes an archived `.gp` replottable months later.
+    inline_gp_data(&options.file_name);
+}
+
+// Rewrites `file_name`, a gnuplot script whose `plot` command reads its series from separate binary
+// files, into an equivalent self-contained one: each `"<path>" binary` reference becomes `"-"
+// binary`, and the files' bytes are appended after the command, in the order the references appear.
+// That is gnuplot's inline-data form, so the script plots with no sidecar files.
+//
+// Leaves the script alone if anything is missing or unexpected; a benchmark that has already run
+// should not fail over its output formatting.
+fn inline_gp_data(file_name: &str) {
+    let Ok(script) = std::fs::read(file_name) else {
+        return;
+    };
+    // The plot command is the last line, and the only one that names data files.
+    let Some(plot_start) = script
+        .windows(5)
+        .rposition(|w| w == b"plot ")
+        .filter(|&i| i == 0 || script[i - 1] == b'\n')
+    else {
+        return;
+    };
+    let Ok(plot) = std::str::from_utf8(&script[plot_start..]) else {
+        return;
+    };
+    let mut rewritten = String::with_capacity(plot.len());
+    let mut data = Vec::new();
+    let mut rest = plot;
+    // Each data reference is a quoted path immediately followed by ` binary`. Other quoted strings
+    // on the line (colors, series names) are left alone.
+    while let Some(quote) = rest.find('"') {
+        let after = &rest[quote + 1..];
+        let Some(close) = after.find('"') else {
+            break;
+        };
+        let (path, tail) = (&after[..close], &after[close + 1..]);
+        if tail.starts_with(" binary")
+            && let Ok(bytes) = std::fs::read(path)
+        {
+            rewritten.push_str(&rest[..quote]);
+            rewritten.push_str("\"-\"");
+            data.push(bytes);
+        } else {
+            // Not a data reference; copy it through, up to where `tail` resumes.
+            rewritten.push_str(&rest[..rest.len() - tail.len()]);
+        }
+        rest = tail;
+    }
+    if data.is_empty() {
+        return;
+    }
+    rewritten.push_str(rest);
+    let mut out = script[..plot_start].to_vec();
+    out.extend_from_slice(rewritten.trim_end().as_bytes());
+    out.push(b'\n');
+    for series in data {
+        out.extend_from_slice(&series);
+    }
+    std::fs::write(file_name, out).ok();
 }
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]

@@ -4711,9 +4711,9 @@ fn multi_add<const N: usize>(z: &mut [u64], a: &[u64]) {
 #[inline(always)]
 fn multi_add_alt<const N: usize>(z: &mut [Limb], a: &[u64]) {
     let mut carry = false;
-    for k in 0..N {
-        let (hi, lo) = a[k].split_in_half();
-        let w = k << 1;
+    let mut w = 0;
+    for ak in &a[..N] {
+        let (hi, lo) = ak.split_in_half();
         let (s, carry_1) = z[w].overflowing_add(lo);
         let (s, carry_2) = s.overflowing_add(Limb::from(carry));
         z[w] = s;
@@ -4728,6 +4728,7 @@ fn multi_add_alt<const N: usize>(z: &mut [Limb], a: &[u64]) {
             z[w + 1] = s;
             carry = carry_1 | carry_2;
         }
+        w += 2;
     }
 }
 

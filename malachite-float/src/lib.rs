@@ -92,6 +92,10 @@ extern crate alloc;
 #[macro_use]
 extern crate malachite_base;
 
+#[cfg(feature = "serde")]
+#[macro_use]
+extern crate serde;
+
 #[cfg(feature = "test_build")]
 extern crate itertools;
 

@@ -38,7 +38,7 @@ fn benchmark_foer_sequence_iter(gm: GenMode, config: &GenConfig, limit: usize, f
         file_name,
         &foer_sequence_len_bucketer("xs"),
         &mut [("FoerSequence.iter().take(20).collect_vec()", &mut |xs| {
-            no_out!(xs.iter().take(20).collect_vec())
+            no_out!(xs.iter().take(20).collect_vec());
         })],
     );
 }

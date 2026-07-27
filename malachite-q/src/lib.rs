@@ -15,11 +15,12 @@
 //!     primitive floats;
 //!   - Functions for Diophantine approximation;
 //!   - Functions for expressing [`Rational`]s in scientific notation.
-//! - The numerators and denominators of [`Rational`]s are stored as [`Natural`]s, so [`Rational`]s
-//!   with small numerators and denominators can be stored entirely on the stack.
+//! - The numerators and denominators of [`Rational`]s are stored as
+//!   [`Natural`](malachite_nz::natural::Natural)s, so [`Rational`]s with small numerators and
+//!   denominators can be stored entirely on the stack.
 //! - Most arithmetic involving [`Rational`]s requires (automatically) reducing the numerator and
 //!   denominator. This is done very efficiently by using the high performance GCD and exact
-//!   division algorithms implemented by [`Natural`]s.
+//!   division algorithms implemented by [`Natural`](malachite_nz::natural::Natural)s.
 //!
 //! # Demos and benchmarks
 //! This crate comes with a `bin` target that can be used for running demos and benchmarks.

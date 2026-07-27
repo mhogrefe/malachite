@@ -843,7 +843,11 @@ fn tune_small_kernel_probe() {
         let mut ys = vec![0; n];
         lcg_fill(&mut xs, 5);
         lcg_fill(&mut ys, 6);
-        let z = 0x9E3779B97F4A7C15 as Limb;
+        // The golden-ratio constant for the limb width, 2^`Limb::WIDTH` / phi: the top half of the
+        // 64-bit one is the 32-bit one, so taking the leading `Limb::WIDTH` bits gives the right
+        // value either way. Truncating instead would clear the top bit on 32-bit limbs, making the
+        // multiplier narrower than a limb and the benchmark unrepresentative.
+        let z = (0x9E3779B97F4A7C15u64 >> (u64::WIDTH - Limb::WIDTH)) as Limb;
         let iters = 1 + ((1u64 << 22) / n as u64);
         let t = best_of(
             &mut || {

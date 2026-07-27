@@ -49,10 +49,10 @@ where
 /// # Examples
 /// ```
 /// use itertools::Itertools;
-/// use malachite_base::num::random::random_primitive_ints;
-/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::foer_sequences::random::random_foer_sequences;
 /// use malachite_base::foer_sequences::FoerSequence;
+/// use malachite_base::num::random::random_primitive_ints;
+/// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
 ///     random_foer_sequences(EXAMPLE_SEED, &random_primitive_ints::<u8>, 4, 1)

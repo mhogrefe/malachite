@@ -310,7 +310,7 @@ impl Float {
     /// If you know you'll be using `Nearest`, consider using [`Float::root_u_prec`] instead. If you
     /// know that your target precision is the precision of the input, consider using
     /// [`Float::root_u_round`] instead. If both of these things are true, consider using the
-    /// [`Root`](malachite_base::num::arithmetic::traits::Root) implementation instead.
+    /// [`Root`] implementation instead.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
@@ -377,7 +377,7 @@ impl Float {
     /// If you know you'll be using `Nearest`, consider using [`Float::root_u_prec`] instead. If you
     /// know that your target precision is the precision of the input, consider using
     /// [`Float::root_u_round`] instead. If both of these things are true, consider using the
-    /// [`Root`](malachite_base::num::arithmetic::traits::Root) implementation instead.
+    /// [`Root`] implementation instead.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
@@ -846,7 +846,7 @@ impl Float {
     /// If you know you'll be using `Nearest`, consider using [`Float::root_s_prec`] instead. If you
     /// know that your target precision is the precision of the input, consider using
     /// [`Float::root_s_round`] instead. If both of these things are true, consider using the
-    /// [`Root`](malachite_base::num::arithmetic::traits::Root) implementation instead.
+    /// [`Root`] implementation instead.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
@@ -911,7 +911,7 @@ impl Float {
     /// If you know you'll be using `Nearest`, consider using [`Float::root_s_prec`] instead. If you
     /// know that your target precision is the precision of the input, consider using
     /// [`Float::root_s_round`] instead. If both of these things are true, consider using the
-    /// [`Root`](malachite_base::num::arithmetic::traits::Root) implementation instead.
+    /// [`Root`] implementation instead.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$

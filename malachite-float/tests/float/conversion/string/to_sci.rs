@@ -22,17 +22,22 @@ use std::panic::catch_unwind;
 // point, so `.0` is inserted before the exponent, or appended, when it lacks one. Only valid for
 // bases up to 14, where the first 'e' or 'E' in the string is unambiguously the exponent indicator.
 fn insert_point(s: &str) -> String {
-    if let Some(i) = s.find(['e', 'E']) {
-        if s[..i].contains('.') {
-            s.to_string()
-        } else {
-            format!("{}.0{}", &s[..i], &s[i..])
-        }
-    } else if s.contains('.') {
-        s.to_string()
-    } else {
-        format!("{s}.0")
-    }
+    s.find(['e', 'E']).map_or_else(
+        || {
+            if s.contains('.') {
+                s.to_string()
+            } else {
+                format!("{s}.0")
+            }
+        },
+        |i| {
+            if s[..i].contains('.') {
+                s.to_string()
+            } else {
+                format!("{}.0{}", &s[..i], &s[i..])
+            }
+        },
+    )
 }
 
 #[test]

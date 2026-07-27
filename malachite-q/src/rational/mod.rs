@@ -20,8 +20,24 @@ use malachite_nz::natural::Natural;
 /// the limit is 32).
 #[derive(Clone, Hash, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(
+    feature = "serde",
+    serde(try_from = "SerdeRational", into = "SerdeRational")
+)]
 pub struct Rational {
     // whether the `Rational` is non-negative
+    pub(crate) sign: bool,
+    pub(crate) numerator: Natural,
+    pub(crate) denominator: Natural,
+}
+
+// `Rational` is serialized through this struct rather than deriving directly, so that deserializing
+// checks the invariants that `is_valid` describes. Deriving on `Rational` itself would accept a
+// zero denominator, a fraction that is not in lowest terms, or a negative zero, none of which any
+// other part of the crate is prepared for. The field names are the ones `Rational` used before, so
+// the encoding is unchanged.
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+pub(crate) struct SerdeRational {
     #[cfg_attr(feature = "serde", serde(rename = "s"))]
     pub(crate) sign: bool,
     #[cfg_attr(feature = "serde", serde(rename = "n"))]

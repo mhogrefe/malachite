@@ -64,6 +64,34 @@ fn test_serde() {
 }
 
 #[test]
+fn test_serde_invalid() {
+    // Deserializing goes through a validating conversion, so an encoding that no `Rational` could
+    // have produced is rejected rather than yielding one that violates `is_valid`.
+    let test = |s: &str, message| {
+        assert_eq!(
+            serde_json::from_str::<Rational>(s).unwrap_err().to_string(),
+            message
+        );
+    };
+    test(
+        "{\"s\":true,\"n\":\"0x1\",\"d\":\"0x0\"}",
+        "Denominator is zero",
+    );
+    test(
+        "{\"s\":false,\"n\":\"0x0\",\"d\":\"0x1\"}",
+        "Zero is negative",
+    );
+    test(
+        "{\"s\":true,\"n\":\"0x2\",\"d\":\"0x4\"}",
+        "Numerator and denominator are not relatively prime",
+    );
+    test(
+        "{\"s\":true,\"n\":\"0x6\",\"d\":\"0x9\"}",
+        "Numerator and denominator are not relatively prime",
+    );
+}
+
+#[test]
 fn serde_properties() {
     rational_gen().test_properties(|x| {
         let s = serde_json::to_string(&x).unwrap();
@@ -71,8 +99,16 @@ fn serde_properties() {
         assert!(string_is_subset(&s, "\",-/0123456789:abcdeflnrstux{}"));
     });
 
+    rational_gen().test_properties(|x| {
+        let s = serde_json::to_string(&x).unwrap();
+        assert!(serde_json::from_str::<Rational>(&s).unwrap().is_valid());
+    });
+
     string_gen().test_properties(|s| {
-        let _n: Result<Rational, _> = serde_json::from_str(&s);
+        // Whatever an arbitrary string deserializes to, if anything, is a valid `Rational`.
+        if let Ok(x) = serde_json::from_str::<Rational>(&s) {
+            assert!(x.is_valid());
+        }
     });
 
     string_gen_var_11().test_properties(|s| {

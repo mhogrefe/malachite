@@ -27,14 +27,14 @@ impl Float {
     /// negative input does not produce a `NaN`.
     ///
     /// $$
-    /// f(x,p,m) = \sqrt[3]{x}+\varepsilon.
+    /// f(x,p,m) = \sqrt\[3\]{x}+\varepsilon.
     /// $$
-    /// - If $\sqrt[3]{x}$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to
+    /// - If $\sqrt\[3\]{x}$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to
     ///   be 0.
-    /// - If $\sqrt[3]{x}$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
-    ///   2^{\lfloor\log_2 |\sqrt[3]{x}|\rfloor-p+1}$.
-    /// - If $\sqrt[3]{x}$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
-    ///   2^{\lfloor\log_2 |\sqrt[3]{x}|\rfloor-p}$.
+    /// - If $\sqrt\[3\]{x}$ is finite and nonzero, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |\sqrt\[3\]{x}|\rfloor-p+1}$.
+    /// - If $\sqrt\[3\]{x}$ is finite and nonzero, and $m$ is `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |\sqrt\[3\]{x}|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -50,8 +50,8 @@ impl Float {
     ///
     /// If you know you'll be using `Nearest`, consider using [`Float::cbrt_prec`] instead. If you
     /// know that your target precision is the precision of the input, consider using
-    /// [`Float::cbrt_round`] instead. If both of these things are true, consider using the
-    /// [`Cbrt`](malachite_base::num::arithmetic::traits::Cbrt) implementation instead.
+    /// [`Float::cbrt_round`] instead. If both of these things are true, consider using the [`Cbrt`]
+    /// implementation instead.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
@@ -99,7 +99,7 @@ impl Float {
     /// If you know you'll be using `Nearest`, consider using [`Float::cbrt_prec_ref`] instead. If
     /// you know that your target precision is the precision of the input, consider using
     /// [`Float::cbrt_round_ref`] instead. If both of these things are true, consider using the
-    /// [`Cbrt`](malachite_base::num::arithmetic::traits::Cbrt) implementation instead.
+    /// [`Cbrt`] implementation instead.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
@@ -543,12 +543,12 @@ impl Cbrt for Float {
     /// negative input does not produce a `NaN`.
     ///
     /// $$
-    /// f(x) = \sqrt[3]{x}+\varepsilon.
+    /// f(x) = \sqrt\[3\]{x}+\varepsilon.
     /// $$
-    /// - If $\sqrt[3]{x}$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to
+    /// - If $\sqrt\[3\]{x}$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to
     ///   be 0.
-    /// - If $\sqrt[3]{x}$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2
-    ///   |\sqrt[3]{x}|\rfloor-p}$, where $p$ is the precision of the input.
+    /// - If $\sqrt\[3\]{x}$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2
+    ///   |\sqrt\[3\]{x}|\rfloor-p}$, where $p$ is the precision of the input.
     ///
     /// Special cases:
     /// - $f(\text{NaN})=\text{NaN}$
@@ -603,12 +603,12 @@ impl Cbrt for &Float {
     /// negative input does not produce a `NaN`.
     ///
     /// $$
-    /// f(x) = \sqrt[3]{x}+\varepsilon.
+    /// f(x) = \sqrt\[3\]{x}+\varepsilon.
     /// $$
-    /// - If $\sqrt[3]{x}$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to
+    /// - If $\sqrt\[3\]{x}$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to
     ///   be 0.
-    /// - If $\sqrt[3]{x}$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2
-    ///   |\sqrt[3]{x}|\rfloor-p}$, where $p$ is the precision of the input.
+    /// - If $\sqrt\[3\]{x}$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2
+    ///   |\sqrt\[3\]{x}|\rfloor-p}$, where $p$ is the precision of the input.
     ///
     /// Special cases:
     /// - $f(\text{NaN})=\text{NaN}$
@@ -662,12 +662,12 @@ impl CbrtAssign for Float {
     /// negative input does not produce a `NaN`.
     ///
     /// $$
-    /// x\gets = \sqrt[3]{x}+\varepsilon.
+    /// x\gets = \sqrt\[3\]{x}+\varepsilon.
     /// $$
-    /// - If $\sqrt[3]{x}$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to
+    /// - If $\sqrt\[3\]{x}$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to
     ///   be 0.
-    /// - If $\sqrt[3]{x}$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2
-    ///   |\sqrt[3]{x}|\rfloor-p}$, where $p$ is the precision of the input.
+    /// - If $\sqrt\[3\]{x}$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2
+    ///   |\sqrt\[3\]{x}|\rfloor-p}$, where $p$ is the precision of the input.
     ///
     /// See the [`Float::cbrt`] documentation for information on special cases, overflow, and
     /// underflow.
@@ -707,7 +707,7 @@ impl CbrtAssign for Float {
 /// appropriate precision.
 ///
 /// $$
-/// f(x) = \sqrt[3]{x}.
+/// f(x) = \sqrt\[3\]{x}.
 /// $$
 ///
 /// # Worst-case complexity
@@ -743,7 +743,7 @@ where
 /// rounded to even.
 ///
 /// $$
-/// f(x) = \sqrt[3]{x}.
+/// f(x) = \sqrt\[3\]{x}.
 /// $$
 ///
 /// # Worst-case complexity

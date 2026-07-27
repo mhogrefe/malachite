@@ -44,7 +44,7 @@ fn striped_random_positive_floats_with_precision_helper(
         expected_median,
         expected_median_hex,
         expected_moment_stats,
-    )
+    );
 }
 
 fn striped_random_positive_floats_with_precision_helper_no_common_values(
@@ -73,7 +73,7 @@ fn striped_random_positive_floats_with_precision_helper_no_common_values(
         expected_median,
         expected_median_hex,
         expected_moment_stats,
-    )
+    );
 }
 
 #[test]

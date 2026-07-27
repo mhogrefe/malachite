@@ -195,6 +195,8 @@ pub mod float {
         pub mod primitive_float_from_float;
         pub mod primitive_int_from_float;
         pub mod rational_from_float;
+        #[cfg(feature = "serde")]
+        pub mod serde;
         pub mod string {
             pub mod format_float;
             pub mod from_sci_string;

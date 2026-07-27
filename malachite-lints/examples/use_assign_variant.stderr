@@ -1,5 +1,5 @@
 error: use `add_prec_assign` (in place) instead of assigning the result of `add_prec_val_ref`
-  --> $DIR/use_assign_variant.rs:11:5
+  --> $DIR/use_assign_variant.rs:14:5
    |
 LL |     x = x.add_prec_val_ref(&y, p).0;
    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -7,31 +7,31 @@ LL |     x = x.add_prec_val_ref(&y, p).0;
    = note: `#[deny(use_assign_variant)]` on by default
 
 error: use `abs_assign` (in place) instead of assigning the result of `abs`
-  --> $DIR/use_assign_variant.rs:13:5
+  --> $DIR/use_assign_variant.rs:16:5
    |
 LL |     x = x.abs();
    |     ^^^^^^^^^^^
 
 error: use `neg_assign` (in place) instead of assigning the result of `neg`
-  --> $DIR/use_assign_variant.rs:15:5
+  --> $DIR/use_assign_variant.rs:18:5
    |
 LL |     x = x.clone().neg();
    |     ^^^^^^^^^^^^^^^^^^^
 
 error: use `exp_prec_assign` (in place) instead of shadowing `t` with the result of `exp_prec`
-  --> $DIR/use_assign_variant.rs:22:5
+  --> $DIR/use_assign_variant.rs:25:5
    |
 LL |     let t = t.exp_prec(p).0;
    |     ^^^^^^^^^^^^^^^^^^^^^^^^
 
 error: use `div_prec_assign` (in place) instead of shadowing `t` with the result of `div_prec_val_ref`
-  --> $DIR/use_assign_variant.rs:23:5
+  --> $DIR/use_assign_variant.rs:26:5
    |
 LL |     let t = t.div_prec_val_ref(&y, p).0;
    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 error: use `add_prec_assign` (in place) instead of shadowing `t` with the result of `add_prec_val_ref`
-  --> $DIR/use_assign_variant.rs:25:5
+  --> $DIR/use_assign_variant.rs:28:5
    |
 LL |     let (t, o) = t.add_prec_val_ref(&y, p);
    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

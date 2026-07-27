@@ -491,6 +491,9 @@ pub mod primitive_float_from_rational;
 /// ```
 pub mod primitive_int_from_rational;
 /// Implementations of traits for converting [`Rational`](crate::Rational)s to and from [`String`]s.
+/// Implementations of traits for serialization and deserialization using
+/// [serde](https://serde.rs/).
+pub mod serde;
 pub mod string;
 /// Functions for extracting or referencing the numerator and/or denominator of a
 /// [`Rational`](crate::Rational).

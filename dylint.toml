@@ -19,5 +19,5 @@ long_lines_exceptions = [
     { file = "malachite-float/src/lib.rs", line = 22 },
     { file = "malachite-nz/src/lib.rs", line = 36 },
     { file = "malachite-nz/src/lib.rs", line = 103 },
-    { file = "malachite-q/src/lib.rs", line = 54 },
+    { file = "malachite-q/src/lib.rs", line = 55 },
 ]

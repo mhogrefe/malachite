@@ -1,3 +1,6 @@
+// `exp_prec` and `Exp` exist for the lint to see, not to be called.
+#![allow(dead_code)]
+
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 
 struct MyFloat;

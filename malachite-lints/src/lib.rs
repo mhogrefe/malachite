@@ -59,8 +59,8 @@ dylint_linting::dylint_library!();
 const BIGNUM_TYPES: [(&[&str], &str); 4] = [
     (&["malachite_nz", "natural", "Natural"], "Natural"),
     (&["malachite_nz", "integer", "Integer"], "Integer"),
-    (&["malachite_q", "Rational"], "Rational"),
-    (&["malachite_float", "Float"], "Float"),
+    (&["malachite_q", "rational", "Rational"], "Rational"),
+    (&["malachite_float", "float", "Float"], "Float"),
 ];
 
 // If `e` (possibly behind `&`) is a call to `T::power_of_2` where `T` is a Malachite bignum type,

@@ -1,3 +1,6 @@
+// `twenty` exists to show a `const_from*` call inside a `const fn`; it is never called.
+#![allow(dead_code)]
+
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_q::Rational;

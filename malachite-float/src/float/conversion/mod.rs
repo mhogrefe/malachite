@@ -719,7 +719,8 @@ pub mod primitive_int_from_float;
 /// [`ConvertibleFrom`](malachite_base::num::conversion::traits::ConvertibleFrom), and
 /// [`RoundingFrom`](malachite_base::num::conversion::traits::RoundingFrom).
 pub mod rational_from_float;
+/// Implementations of traits for serialization and deserialization using
+/// [serde](https://serde.rs/).
+pub mod serde;
 /// Implementations of traits for converting [`Float`](crate::Float)s to and from [`String`]s.
-///
-/// Warning: these implementations are unstable and will definitely be changed in the future.
 pub mod string;

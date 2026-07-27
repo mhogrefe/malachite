@@ -63,10 +63,16 @@ fn serde_properties() {
     });
 
     string_gen().test_properties(|s| {
-        let _n: Result<Integer, _> = serde_json::from_str(&s);
+        // Whatever an arbitrary string deserializes to, if anything, is a valid `Integer`. In
+        // particular `-0x0` is normalized to a nonnegative zero rather than kept as a negative one,
+        // which `is_valid` does not allow.
+        if let Ok(x) = serde_json::from_str::<Integer>(&s) {
+            assert!(x.is_valid());
+        }
     });
 
     string_gen_var_9().test_properties(|s| {
-        let _n: Integer = serde_json::from_str(&s).unwrap();
+        let n: Integer = serde_json::from_str(&s).unwrap();
+        assert!(n.is_valid());
     });
 }
