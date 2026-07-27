@@ -50,6 +50,9 @@ specify different rounding behavior via the options parameter.
 Malachite is designed to work with very large numbers efficiently. See [here](/performance) for a
 performance comparison against other libraries.
 
+If you are coming from GMP, [this page](/gmp-mapping) maps GMP's functions onto their Malachite
+counterparts, and marks the ones Malachite does not have yet.
+
 Malachite uses `no_std`, unless the `random`, `test_build`, or `bin_build` features are enabled.
 
 To use Malachite, add the following to your project's `Cargo.toml` file:

@@ -203,6 +203,10 @@ fn legendre_symbol_fail() {
     assert_panic!(Integer::ONE.legendre_symbol(&Integer::NEGATIVE_ONE));
     assert_panic!((&Integer::ONE).legendre_symbol(Integer::NEGATIVE_ONE));
     assert_panic!((&Integer::ONE).legendre_symbol(&Integer::NEGATIVE_ONE));
+    assert_panic!(Integer::ONE.legendre_symbol(Integer::ZERO));
+    assert_panic!(Integer::ONE.legendre_symbol(&Integer::ZERO));
+    assert_panic!((&Integer::ONE).legendre_symbol(Integer::ZERO));
+    assert_panic!((&Integer::ONE).legendre_symbol(&Integer::ZERO));
 }
 
 #[test]
@@ -270,6 +274,10 @@ fn jacobi_symbol_fail() {
     assert_panic!(Integer::ONE.jacobi_symbol(&Integer::NEGATIVE_ONE));
     assert_panic!((&Integer::ONE).jacobi_symbol(Integer::NEGATIVE_ONE));
     assert_panic!((&Integer::ONE).jacobi_symbol(&Integer::NEGATIVE_ONE));
+    assert_panic!(Integer::ONE.jacobi_symbol(Integer::ZERO));
+    assert_panic!(Integer::ONE.jacobi_symbol(&Integer::ZERO));
+    assert_panic!((&Integer::ONE).jacobi_symbol(Integer::ZERO));
+    assert_panic!((&Integer::ONE).jacobi_symbol(&Integer::ZERO));
 }
 
 // Odd n is already tested in test_jacobi_symbol, so here we just test even n

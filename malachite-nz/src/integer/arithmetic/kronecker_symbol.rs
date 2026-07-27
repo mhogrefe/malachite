@@ -221,7 +221,7 @@ impl LegendreSymbol<Self> for Integer {
     /// other.significant_bits())`.
     ///
     /// # Panics
-    /// Panics if `self` is negative or if `other` is even.
+    /// Panics if `other` is negative or even.
     ///
     /// # Examples
     /// ```
@@ -262,7 +262,7 @@ impl LegendreSymbol<&Self> for Integer {
     /// other.significant_bits())`.
     ///
     /// # Panics
-    /// Panics if `self` is negative or if `other` is even.
+    /// Panics if `other` is negative or even.
     ///
     /// # Examples
     /// ```
@@ -303,7 +303,7 @@ impl LegendreSymbol<Integer> for &Integer {
     /// other.significant_bits())`.
     ///
     /// # Panics
-    /// Panics if `self` is negative or if `other` is even.
+    /// Panics if `other` is negative or even.
     ///
     /// # Examples
     /// ```
@@ -343,7 +343,7 @@ impl LegendreSymbol<&Integer> for &Integer {
     /// other.significant_bits())`.
     ///
     /// # Panics
-    /// Panics if `self` is negative or if `other` is even.
+    /// Panics if `other` is negative or even.
     ///
     /// # Examples
     /// ```
@@ -380,7 +380,7 @@ impl JacobiSymbol<Self> for Integer {
     /// other.significant_bits())`.
     ///
     /// # Panics
-    /// Panics if `self` is negative or if `other` is even.
+    /// Panics if `other` is negative or even.
     ///
     /// # Examples
     /// ```
@@ -420,7 +420,7 @@ impl JacobiSymbol<&Self> for Integer {
     /// other.significant_bits())`.
     ///
     /// # Panics
-    /// Panics if `self` is negative or if `other` is even.
+    /// Panics if `other` is negative or even.
     ///
     /// # Examples
     /// ```
@@ -460,7 +460,7 @@ impl JacobiSymbol<Integer> for &Integer {
     /// other.significant_bits())`.
     ///
     /// # Panics
-    /// Panics if `self` is negative or if `other` is even.
+    /// Panics if `other` is negative or even.
     ///
     /// # Examples
     /// ```
@@ -499,7 +499,7 @@ impl JacobiSymbol<&Integer> for &Integer {
     /// other.significant_bits())`.
     ///
     /// # Panics
-    /// Panics if `self` is negative or if `other` is even.
+    /// Panics if `other` is negative or even.
     ///
     /// # Examples
     /// ```

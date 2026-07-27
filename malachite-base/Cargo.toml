@@ -49,6 +49,10 @@ malachite-base = { workspace = true, features = ["test_build"] }
 maplit = "1.0.2"
 
 [package.metadata.docs.rs]
+# The `random` module is behind the `random` feature, so without this docs.rs would omit it
+# entirely, and the other crates' published docs (which are built with `random`) would link into
+# a module that isn't there.
+features = ["random"]
 rustdoc-args = [ "--html-in-header", "katex-header.html" ]
 
 # Accept the `dylint_lib` cfg that `cargo dylint` sets, used by
