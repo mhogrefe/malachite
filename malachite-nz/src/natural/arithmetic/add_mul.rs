@@ -286,12 +286,16 @@ pub_test! {limbs_vec_add_mul_limb_in_place_either(
 pub_test! {limbs_add_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let mut out_len = ys.len() + zs.len();
-    let mut out = vec![0; out_len];
-    let mut mul_scratch = vec![0; limbs_mul_to_out_scratch_len(ys.len(), zs.len())];
-    if limbs_mul_to_out(&mut out, ys, zs, &mut mul_scratch) == 0 {
+    // The product must end up owned, so it is the parent's prefix, with the multiplication scratch
+    // as the tail; the parent is truncated to the product once the multiplication is done.
+    let mut out = vec![0; out_len + limbs_mul_to_out_scratch_len(ys.len(), zs.len())];
+    let (out_slice, mul_scratch) = out.split_at_mut(out_len);
+    if limbs_mul_to_out(out_slice, ys, zs, mul_scratch) == 0 {
         out_len -= 1;
-        out.pop();
     }
+    out.truncate(out_len);
+    // Give back the scratch capacity, so the returned value does not carry it around.
+    out.shrink_to_fit();
     assert_ne!(*out.last().unwrap(), 0);
     if xs_len >= out_len {
         limbs_add_greater(xs, &out)
@@ -324,12 +328,16 @@ pub_test! {limbs_add_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Vec<Limb> {
 pub_test! {limbs_add_mul_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], zs: &[Limb]) {
     let xs_len = xs.len();
     let mut out_len = ys.len() + zs.len();
-    let mut out = vec![0; out_len];
-    let mut mul_scratch = vec![0; limbs_mul_to_out_scratch_len(ys.len(), zs.len())];
-    if limbs_mul_to_out(&mut out, ys, zs, &mut mul_scratch) == 0 {
+    // The product must end up owned, so it is the parent's prefix, with the multiplication scratch
+    // as the tail; the parent is truncated to the product once the multiplication is done.
+    let mut out = vec![0; out_len + limbs_mul_to_out_scratch_len(ys.len(), zs.len())];
+    let (out_slice, mul_scratch) = out.split_at_mut(out_len);
+    if limbs_mul_to_out(out_slice, ys, zs, mul_scratch) == 0 {
         out_len -= 1;
-        out.pop();
     }
+    out.truncate(out_len);
+    // Give back the scratch capacity, so the returned value does not carry it around.
+    out.shrink_to_fit();
     assert_ne!(*out.last().unwrap(), 0);
     if xs_len < out_len {
         swap(xs, &mut out);

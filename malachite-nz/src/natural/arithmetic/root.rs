@@ -575,7 +575,11 @@ pub_test! {limbs_floor_root(xs: &[Limb], exp: u64) -> (Vec<Limb>, bool) {
 // $M(n) = O(n \log n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
-pub_test! {limbs_root_rem(xs: &[Limb], exp: u64) -> (Vec<Limb>, Vec<Limb>) {
+pub_test! {
+// The two buffers stay separate allocations: both are returned as owned `Vec`s, and merging them
+// would force one to be copied out of the parent.
+#[cfg_attr(dylint_lib = "malachite_lints", allow(adjacent_vec_allocations))]
+limbs_root_rem(xs: &[Limb], exp: u64) -> (Vec<Limb>, Vec<Limb>) {
     let mut root_out = vec![
         0;
         xs.len()
@@ -584,6 +588,9 @@ pub_test! {limbs_root_rem(xs: &[Limb], exp: u64) -> (Vec<Limb>, Vec<Limb>) {
     let mut rem_out = vec![0; xs.len()];
     let rem_len = limbs_root_rem_to_out(&mut root_out, &mut rem_out, xs, exp);
     rem_out.truncate(rem_len);
+    // The remainder may be much shorter than its buffer; give back the excess capacity, since the
+    // remainder is returned.
+    rem_out.shrink_to_fit();
     (root_out, rem_out)
 }}
 

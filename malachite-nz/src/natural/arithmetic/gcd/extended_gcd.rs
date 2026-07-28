@@ -734,6 +734,9 @@ pub fn limbs_extended_gcd(
     }
 }
 
+// The gcd and cofactor buffers stay separate allocations: both end up as owned `Natural`s, and
+// merging them would force one to be copied out of the parent.
+#[cfg_attr(dylint_lib = "malachite_lints", allow(adjacent_vec_allocations))]
 fn extended_gcd_helper(a: Natural, b: Natural) -> (Natural, Integer, Integer) {
     let mut xs = a.to_limbs_asc();
     let mut ys = b.to_limbs_asc();
@@ -749,6 +752,9 @@ fn extended_gcd_helper(a: Natural, b: Natural) -> (Natural, Integer, Integer) {
     let mut ss = vec![0; ys.len() + 1];
     let (g_len, ss_sign) = limbs_extended_gcd(&mut gs, &mut ss, &mut xs, &mut ys);
     gs.truncate(g_len);
+    // The GCD is typically much shorter than the operands its buffer was sized for; give back the
+    // excess capacity, since the GCD is returned.
+    gs.shrink_to_fit();
     let gcd = Natural::from_owned_limbs_asc(gs);
     let mut s = Integer::from_sign_and_abs(ss_sign, Natural::from_owned_limbs_asc(ss));
     let mut t = (Integer::from(&gcd) - a * &s).div_exact(b);

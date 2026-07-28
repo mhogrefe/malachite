@@ -24,7 +24,10 @@ use crate::natural::arithmetic::add::{
     limbs_add_to_out_aliased, limbs_slice_add_greater_in_place_left,
     limbs_slice_add_same_length_in_place_left,
 };
-use crate::natural::arithmetic::shl::{limbs_shl_to_out, limbs_slice_shl_in_place};
+use crate::natural::arithmetic::shl::{
+    limbs_add_shl_same_length_in_place_left, limbs_shl_add_same_length_in_place_left,
+    limbs_shl_add_same_length_to_out, limbs_shl_to_out, limbs_slice_shl_in_place,
+};
 use crate::natural::arithmetic::sub::limbs_sub_same_length_to_out;
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
 use crate::platform::Limb;
@@ -100,18 +103,12 @@ pub(crate) fn limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2(
     let (scratch_last, scratch_init) = scratch.split_last_mut().unwrap();
     assert_eq!(scratch_init.len(), n);
     // scratch <- (poly_0 + 4 * poly_2) +/- (2 * poly_1 + 8 * poly_3)
-    v_2[n] = limbs_shl_to_out(scratch_init, poly_2, 2);
-    if limbs_add_same_length_to_out(v_2, scratch_init, poly_0) {
-        v_2[n] += 1;
-    }
+    v_2[n] = limbs_shl_add_same_length_to_out(v_2, poly_2, poly_0, 2);
     if n_high < n {
         scratch_init[n_high] = limbs_shl_to_out(scratch_init, poly_3, 2);
         *scratch_last = Limb::from(limbs_add_to_out_aliased(scratch_init, n_high + 1, poly_1));
     } else {
-        *scratch_last = limbs_shl_to_out(scratch_init, poly_3, 2);
-        if limbs_slice_add_same_length_in_place_left(scratch_init, poly_1) {
-            *scratch_last += 1;
-        }
+        *scratch_last = limbs_shl_add_same_length_to_out(scratch_init, poly_3, poly_1, 2);
     }
     limbs_slice_shl_in_place(scratch, 1);
     let v_neg_2_neg = limbs_cmp_same_length(v_2, scratch) == Less;
@@ -211,11 +208,7 @@ pub(crate) fn limbs_mul_toom_evaluate_poly_in_1_and_neg_1(
 // This is equivalent to `DO_addlsh2` from `mpn/generic/toom_eval_pm2.c`, GMP 6.2.1, with `d ==
 // out`, `a == xs`, and `b == ys`.
 fn shl_2_and_add_with_carry_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb], carry: &mut Limb) {
-    *carry <<= 2;
-    *carry += limbs_shl_to_out(out, xs, 2);
-    if limbs_slice_add_same_length_in_place_left(&mut out[..ys.len()], ys) {
-        *carry += 1;
-    }
+    *carry = (*carry << 2) + limbs_shl_add_same_length_to_out(out, xs, ys, 2);
 }
 
 // Given a `Natural` whose highest limb is `carry` and remaining limbs are `xs`, multiplies the
@@ -233,11 +226,7 @@ fn shl_2_and_add_with_carry_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb], c
 // This is equivalent to `DO_addlsh2` from `mpn/generic/toom_eval_pm2.c`, GMP 6.2.1, with `d == b ==
 // ys` and `a == xs`.
 fn shl_2_and_add_with_carry_in_place_left(xs: &mut [Limb], ys: &[Limb], carry: &mut Limb) {
-    *carry <<= 2;
-    *carry += limbs_slice_shl_in_place(xs, 2);
-    if limbs_slice_add_same_length_in_place_left(xs, ys) {
-        *carry += 1;
-    }
+    *carry = (*carry << 2) + limbs_shl_add_same_length_in_place_left(xs, ys, 2);
 }
 
 // Evaluates a polynomial of degree 3 < `degree` < `Limb::WIDTH`, in the points +2 and -2, where
@@ -375,21 +364,20 @@ pub(crate) fn limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(
     let (v_2_pow_last, v_2_pow_init) = v_2_pow.split_last_mut().unwrap();
     // The degree `degree` is also the number of full-size coefficients, so that the last
     // coefficient, of size `n_high`, starts at `poly + degree * n`.
-    *v_2_pow_last = limbs_shl_to_out(scratch_init, coefficients[2], shift << 1);
-    if limbs_add_same_length_to_out(v_2_pow_init, coefficients[0], scratch_init) {
-        v_2_pow_last.wrapping_add_assign(1);
-    }
+    *v_2_pow_last = limbs_shl_add_same_length_to_out(
+        v_2_pow_init,
+        coefficients[2],
+        coefficients[0],
+        shift << 1,
+    );
     let mut i = 4;
     let mut local_shift = shift << 2;
     while i < degree {
-        v_2_pow_last.wrapping_add_assign(limbs_shl_to_out(
-            scratch_init,
+        v_2_pow_last.wrapping_add_assign(limbs_add_shl_same_length_in_place_left(
+            v_2_pow_init,
             coefficients[i],
             local_shift,
         ));
-        if limbs_slice_add_same_length_in_place_left(v_2_pow_init, scratch_init) {
-            v_2_pow_last.wrapping_add_assign(1);
-        }
         i += 2;
         local_shift += shift << 1;
     }
@@ -398,10 +386,11 @@ pub(crate) fn limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(
     let mut i = 3;
     let mut local_shift = shift * 3;
     while i < degree {
-        *scratch_last += limbs_shl_to_out(v_neg_2_pow, coefficients[i], local_shift);
-        if limbs_slice_add_same_length_in_place_left(scratch_init, &v_neg_2_pow[..n]) {
-            scratch_last.wrapping_add_assign(1);
-        }
+        scratch_last.wrapping_add_assign(limbs_add_shl_same_length_in_place_left(
+            scratch_init,
+            coefficients[i],
+            local_shift,
+        ));
         i += 2;
         local_shift += shift << 1;
     }
@@ -419,33 +408,6 @@ pub(crate) fn limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(
     }
     limbs_slice_add_same_length_in_place_left(v_2_pow, scratch);
     v_neg_2_pow_neg
-}
-
-// Given a `Natural` whose limbs are `ys`, multiplies the `Natural` by `2 ^ shift` and adds the
-// `Natural` whose limbs are the lowest `ys.len()` limbs of `xs`, writing the lowest `ys.len()`
-// limbs of the result to those limbs, and returning the highest limb as a carry.
-//
-// # Worst-case complexity
-// $T(n) = O(n)$
-//
-// $M(n) = O(1)$
-//
-// where $T$ is time, $M$ is additional memory, and $n$ is `ys.len()`.
-//
-// This is equivalent to `DO_mpn_addlsh_n` from `mpn/generic/toom_eval_pm2rexp.c`, GMP 6.2.1.
-pub(crate) fn limbs_shl_and_add_same_length_in_place_left(
-    xs: &mut [Limb],
-    ys: &[Limb],
-    shift: u64,
-    scratch: &mut [Limb],
-) -> Limb {
-    let n = ys.len();
-    let scratch = &mut scratch[..n];
-    let mut carry = limbs_shl_to_out(scratch, ys, shift);
-    if limbs_slice_add_same_length_in_place_left(&mut xs[..n], scratch) {
-        carry.wrapping_add_assign(1);
-    }
-    carry
 }
 
 // Evaluates a polynomial of degree `degree` > 2, in the points 2 ^ -`shift` and -2 ^ -`shift`,
@@ -488,31 +450,28 @@ pub(crate) fn limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
             scratch,
             coefficients[degree],
         ));
-        let carry = limbs_shl_and_add_same_length_in_place_left(
-            v_2_pow_neg,
+        let carry = limbs_add_shl_same_length_in_place_left(
+            &mut v_2_pow_neg[..n],
             coefficients[degree - 1],
             shift,
-            v_neg_2_pow_neg,
         );
         v_2_pow_neg[n].wrapping_add_assign(carry);
     }
     let mut i = 2;
     let mut local_shift = shift * (degree_u64 - 2);
     while i < degree - 1 {
-        let carry = limbs_shl_and_add_same_length_in_place_left(
-            v_2_pow_neg,
+        let carry = limbs_add_shl_same_length_in_place_left(
+            &mut v_2_pow_neg[..n],
             coefficients[i],
             local_shift,
-            v_neg_2_pow_neg,
         );
         v_2_pow_neg[n].wrapping_add_assign(carry);
         i += 1;
         local_shift -= shift;
-        let carry = limbs_shl_and_add_same_length_in_place_left(
-            scratch,
+        let carry = limbs_add_shl_same_length_in_place_left(
+            &mut scratch[..n],
             coefficients[i],
             local_shift,
-            v_neg_2_pow_neg,
         );
         scratch[n].wrapping_add_assign(carry);
         i += 1;

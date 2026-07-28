@@ -180,6 +180,9 @@ pub_test! {limbs_binomial_coefficient_limb_limb_bdiv(n: Limb, k: Limb) -> Vec<Li
     }
     let mut ns = big_scratch;
     ns.truncate(n_len);
+    // The quotient is shorter than the numerator product its buffer held; give back the excess
+    // capacity, since the result is returned.
+    ns.shrink_to_fit();
     ns
 }}
 

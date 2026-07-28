@@ -1382,18 +1382,22 @@ pub fn limbs_set_str(
             // ysize. Both operands are normalized.
             assert!(y0[(ysize << 1) - 1].get_highest_bit());
             assert!(z[ysize - 1].get_highest_bit());
-            let mut quotient = vec![0; ysize + 1];
-            let mut remainder = vec![0; ysize];
+            // The quotient must end up owned (it becomes `product`), so it is the parent's prefix,
+            // with the remainder scratch as the tail; the parent is truncated once the remainder
+            // has been tested.
+            let mut quotient = vec![0; (ysize << 1) + 1];
+            let (qs, remainder) = quotient.split_at_mut(ysize + 1);
             if ysize == 1 {
-                remainder[0] = limbs_div_limb_to_out_mod(&mut quotient, &y0[..2], z[0]);
+                remainder[0] = limbs_div_limb_to_out_mod(qs, &y0[..2], z[0]);
             } else {
-                limbs_div_mod_to_out(&mut quotient, &mut remainder, &y0[..ysize << 1], &z);
+                limbs_div_mod_to_out(qs, remainder, &y0[..ysize << 1], &z);
             }
-            assert!(quotient[ysize] <= 1);
+            assert!(qs[ysize] <= 1);
             // see the note above on the compensating errors
             err += 1;
             // if the remainder is zero the result is still exact, if it was before
-            exact = exact && slice_test_zero(&remainder);
+            exact = exact && slice_test_zero(remainder);
+            quotient.truncate(ysize + 1);
             if quotient[ysize] == 1 {
                 exact = exact && quotient[0].even();
                 limbs_slice_shr_in_place(&mut quotient, 1);

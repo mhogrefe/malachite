@@ -646,12 +646,19 @@ pub_test! {limbs_floor_sqrt(xs: &[Limb]) -> Vec<Limb> {
 // TODO
 pub_test! {limbs_ceiling_sqrt(xs: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
-    let mut out_sqrt = vec![0; xs_len.shr_round(1, Ceiling).0];
-    let mut out_rem = vec![0; xs_len];
-    let rem_len = limbs_sqrt_rem_to_out(&mut out_sqrt, &mut out_rem, xs);
-    if !slice_test_zero(&out_rem[..rem_len]) {
+    let sqrt_len = xs_len.shr_round(1, Ceiling).0;
+    // The square root must end up owned, so it is the parent's prefix, with the remainder scratch
+    // as the tail; the parent is truncated once the remainder has been tested.
+    let mut out_sqrt = vec![0; sqrt_len + xs_len];
+    let (sqrt, out_rem) = out_sqrt.split_at_mut(sqrt_len);
+    let rem_len = limbs_sqrt_rem_to_out(sqrt, out_rem, xs);
+    let inexact = !slice_test_zero(&out_rem[..rem_len]);
+    out_sqrt.truncate(sqrt_len);
+    if inexact {
         limbs_vec_add_limb_in_place(&mut out_sqrt, 1);
     }
+    // Give back the scratch capacity, so the returned value does not carry it around.
+    out_sqrt.shrink_to_fit();
     out_sqrt
 }}
 
@@ -700,12 +707,19 @@ pub_crate_test! {limbs_checked_sqrt(xs: &[Limb]) -> Option<Vec<Limb>> {
 // $M(n) = O(n \log n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
-pub_test! {limbs_sqrt_rem(xs: &[Limb]) -> (Vec<Limb>, Vec<Limb>) {
+pub_test! {
+// The two buffers stay separate allocations: both are returned as owned `Vec`s, and merging them
+// would force one to be copied out of the parent.
+#[cfg_attr(dylint_lib = "malachite_lints", allow(adjacent_vec_allocations))]
+limbs_sqrt_rem(xs: &[Limb]) -> (Vec<Limb>, Vec<Limb>) {
     let xs_len = xs.len();
     let mut out_sqrt = vec![0; xs_len.shr_round(1, Ceiling).0];
     let mut out_rem = vec![0; xs_len];
     let rem_len = limbs_sqrt_rem_to_out(&mut out_sqrt, &mut out_rem, xs);
     out_rem.truncate(rem_len);
+    // The remainder is at most about half as long as its buffer; give back the excess capacity,
+    // since the remainder is returned.
+    out_rem.shrink_to_fit();
     (out_sqrt, out_rem)
 }}
 

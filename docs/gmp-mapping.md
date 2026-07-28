@@ -47,6 +47,38 @@ There are three exceptions, where mixed-type operations do exist:
   every rational is a float, so a mixed operation cannot be written as a conversion followed by an
   ordinary one, and the mixed forms exist in their own right.
 
+### Allocation {#allocation}
+
+GMP makes allocation explicit at each call site: `mpz_add(rop, a, b)` writes into storage that
+`rop` already owns, growing it only when it is too small. Malachite's operations return their
+results, so memory behavior is controlled by how the operands are passed instead. Every operation
+comes in by-reference and by-value forms: `(&x).floor_sqrt()` and `&x + &y` must leave their
+operands intact, so they allocate room for the result, while `x.floor_sqrt()` and `x + y` consume
+their operands and can reuse their storage. The `Assign` forms, `x.floor_sqrt_assign()` and
+`x += y`, are the mutating spelling of the by-value forms; each such pair is essentially
+equivalent, with one delegating to the other. The distinction that matters is by-reference versus
+by-value-or-assign, and only the second group has the *potential* to avoid allocation.
+
+Potential, not guarantee, and the difference is worth understanding. Whether the storage of a
+consumed operand is actually reused depends on the operation. For addition it is: adding a
+1000-bit and a 500-bit
+[`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html) by value
+reuses the larger operand's buffer for the sum, and even when only the smaller operand is owned,
+its buffer is grown rather than abandoned. The
+[malachite-nz README](https://docs.rs/malachite-nz/latest/malachite_nz/) works through this
+example in detail, including why the chain `&x + &y + &z` allocates once rather than once per
+`+`: the intermediate sum is a temporary that the second `+` consumes by value. But most
+nontrivial operations pass through multiplication, and multiplication of large operands uses
+$$O(n \log n)$$ scratch space, so a large multiplication allocates no matter how it is invoked.
+For such operations, only special cases behave differently by form, such as multiplying by a
+[`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html) that
+fits in one limb, which the by-value form performs in place.
+
+The practical rule: pass an operand by value, or use the `Assign` form, whenever you are done
+with it. It can only reduce allocation, and for operations that need no scratch space, like
+addition, subtraction, and shifts, it usually eliminates it. Just do not expect it to make large
+multiplications allocation-free.
+
 Everything on this page is reachable through the umbrella crate
 [`malachite`](https://docs.rs/malachite/latest/malachite/), which re-exports `Natural`, `Integer`, and
 `Rational` at its top level and `Float` behind its `floats` feature. The individual crates also
@@ -467,7 +499,7 @@ they only need to look at the low bits.
 | ✓ | `void mpz_ui_pow_ui (mpz_t rop, unsigned long int base, unsigned long int exp)` | [`Pow`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Pow.html) |
 
 **`mpz_pow_ui`, `mpz_ui_pow_ui`.** `x.pow(n)`, with `n` a `u64`. Malachite agrees with GMP that
-0<sup>0</sup> is 1. The second function exists in GMP because its base is an `unsigned long` rather
+$$0^0$$ is 1. The second function exists in GMP because its base is an `unsigned long` rather
 than an `mpz_t`; in Malachite it is the same
 [`Pow`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Pow.html) after a conversion, as described under [Conventions](#conventions).
 There is also [`PowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.PowerOf2.html) for the common case of $$2^n$$, which is
@@ -518,8 +550,9 @@ roots of negative numbers, GMP's `mpz_root` is Malachite's
 [`FloorRoot`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.FloorRoot.html) is the one you want.
 
 Both directions are available: alongside `floor_root` and `ceiling_root` there are
-[`FloorSqrt`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.FloorSqrt.html) and [`CeilingSqrt`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CeilingSqrt.html), and each
-has an `Assign` variant that avoids the extra allocation.
+[`FloorSqrt`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.FloorSqrt.html) and [`CeilingSqrt`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CeilingSqrt.html), each in
+by-reference, by-value, and `Assign` forms; [Allocation](#allocation) explains what the choice of
+form means for memory.
 
 **`mpz_root`.** GMP packs two results into one call: it writes the root and returns a flag saying
 whether the root was exact. Malachite splits them. If the flag is what you care about, use
@@ -657,12 +690,12 @@ returning [`None`](https://doc.rust-lang.org/nightly/std/option/enum.Option.html
 | ✗ | `void mpz_nextprime (mpz_t rop, const mpz_t op)` | |
 | ✗ | `int mpz_prevprime (mpz_t rop, const mpz_t op)` | |
 | ✗ | `mp_bitcnt_t mpz_remove (mpz_t rop, const mpz_t op, const mpz_t f)` | |
-| ✗ | `void mpz_fib_ui (mpz_t fn, unsigned long int n)` | |
-| ✗ | `void mpz_fib2_ui (mpz_t fn, mpz_t fnsub1, unsigned long int n)` | |
-| ✗ | `void mpz_lucnum_ui (mpz_t ln, unsigned long int n)` | |
-| ✗ | `void mpz_lucnum2_ui (mpz_t ln, mpz_t lnsub1, unsigned long int n)` | |
+| ✓ | `void mpz_fib_ui (mpz_t fn, unsigned long int n)` | [`Fibonacci`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Fibonacci.html) |
+| ✓ | `void mpz_fib2_ui (mpz_t fn, mpz_t fnsub1, unsigned long int n)` | [`fibonacci_pair`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Fibonacci.html#tymethod.fibonacci_pair) |
+| ✓ | `void mpz_lucnum_ui (mpz_t ln, unsigned long int n)` | [`LucasNumber`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.LucasNumber.html) |
+| ≈ | `void mpz_lucnum2_ui (mpz_t ln, mpz_t lnsub1, unsigned long int n)` | [`lucas_number_pair`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.LucasNumber.html#tymethod.lucas_number_pair) |
 
-This is where the gaps are, and they fall into three groups.
+This is where the gaps are, and they fall into two groups.
 
 **Primality.** Malachite has [`IsPrime`](https://docs.rs/malachite-base/latest/malachite_base/num/factorization/traits/trait.IsPrime.html) and
 [`Factor`](https://docs.rs/malachite-base/latest/malachite_base/num/factorization/traits/trait.Factor.html) for the primitive integer types, but not yet for
@@ -684,11 +717,18 @@ prime", is also likely to be split across separate functions that each answer ye
 **`mpz_remove`.** Removing every occurrence of a factor and reporting how many were removed has no
 public counterpart. The machinery is present internally and will be exposed in a future version.
 
-**Fibonacci and Lucas numbers.** Not implemented yet; they are planned for the next release. GMP's
-two-output forms, `mpz_fib2_ui` and `mpz_lucnum2_ui`, exist because computing F[n] produces
-F[n−1] along the way, so the pair is nearly free; expect the Malachite versions to return tuples
-rather than write through out-parameters, as [`ExtendedGcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ExtendedGcd.html) and
-[`RootRem`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.RootRem.html) do.
+**Fibonacci and Lucas numbers.** GMP's two-output forms, `mpz_fib2_ui` and `mpz_lucnum2_ui`,
+exist because computing F[n] produces F[n−1] along the way, so the pair is nearly free. The
+Malachite versions, `fibonacci_pair` and `lucas_number_pair`, return the pair as a tuple rather
+than writing through out-parameters, as [`ExtendedGcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ExtendedGcd.html) and
+[`RootRem`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.RootRem.html) do. The one behavioral difference is at zero: `mpz_lucnum2_ui(ln, lnsub1, 0)`
+sets its second output to L[−1] = −1, which is not a
+[`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html), so `Natural::lucas_number_pair(0)` panics instead. (`fibonacci_pair(0)` is fine,
+since F[−1] = 1.) Both traits are also implemented for the primitive unsigned integer types,
+with table lookups, and the
+[`CheckedFibonacci`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CheckedFibonacci.html) and
+[`CheckedLucasNumber`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CheckedLucasNumber.html) variants return
+[`None`](https://doc.rust-lang.org/nightly/std/option/enum.Option.html) when the result does not fit.
 
 ## [Comparison Functions](https://gmplib.org/manual/Integer-Comparisons) {#comparison-functions}
 
@@ -1024,7 +1064,7 @@ to the caller.
 Malachite does not expose the equivalent. Handing out a
 mutable limb array would mean publishing the normalization invariant as part of the public API,
 which freezes the internal representation. Malachite's representation is also not the one the
-signatures assume: a [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html) smaller than 2<sup>64</sup> is stored inline, with no
+signatures assume: a [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html) smaller than $$2^{64}$$ is stored inline, with no
 allocated limb array to point at, so `mpz_limbs_write` would have nothing to return in the common
 case.
 Reading works because a view can be synthesized; writing would not. Along the same lines,

@@ -426,6 +426,26 @@ values are flagged. Because grouping is textual, the same value written two diff
 (`i64::WIDTH - 1` versus `Limb::WIDTH - 1`) is left alone — which is correct, since those two
 differ on 32-bit platforms.
 
+### `adjacent_vec_allocations`
+
+Flags two or more consecutive `let` statements that each allocate a `Vec` of the same element type
+with the `vec![x; n]` repeat form. Back-to-back buffer allocations can be a single allocation
+divided with `split_at_mut`. The right shape for the fix varies:
+
+- If all the buffers are scratch space, one `Vec` and `split_at_mut` suffice; the parent is
+  dropped at the end of the function.
+- If one buffer must end up owned — passed to `Natural::from_owned_limbs_asc`, say — make it the
+  parent's prefix, `truncate` the parent to the result once the other pieces are no longer in use,
+  and, if the value outlives the function, `shrink_to_fit` so it does not retain the scratch
+  capacity.
+- Buffers that an algorithm ping-pongs with `swap` can still share an allocation if they are only
+  ever used as slices: swapping the slice *bindings* exchanges the references.
+
+Occasionally separate allocations are genuinely right: if two of the buffers each end up owned, or
+a swapped buffer must be surrendered to `from_owned_limbs_asc` without a copy, or a buffer needs
+`Vec` operations like `remove`, merging would cost more than the saved allocation. Such sites
+carry an `allow` with a comment saying why.
+
 ## Tests
 
 `cargo test` in this directory runs UI tests: `ui/main.rs` exercises `long_lines` (the basic

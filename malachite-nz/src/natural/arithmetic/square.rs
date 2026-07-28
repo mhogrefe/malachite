@@ -1075,9 +1075,13 @@ limbs_square_to_out(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
 }}
 
 pub_crate_test! {limbs_square(xs: &[Limb]) -> Vec<Limb> {
-    let mut out = vec![0; xs.len() << 1];
-    let mut square_scratch = vec![0; limbs_square_to_out_scratch_len(xs.len())];
-    limbs_square_to_out(&mut out, xs, &mut square_scratch);
+    let out_len = xs.len() << 1;
+    let mut out = vec![0; out_len + limbs_square_to_out_scratch_len(xs.len())];
+    let (out_slice, square_scratch) = out.split_at_mut(out_len);
+    limbs_square_to_out(out_slice, xs, square_scratch);
+    out.truncate(out_len);
+    // Give back the scratch capacity, so the returned value does not carry it around.
+    out.shrink_to_fit();
     out
 }}
 

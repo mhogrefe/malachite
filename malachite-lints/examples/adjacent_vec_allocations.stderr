@@ -1,0 +1,13 @@
+error: 3 `Vec`s of the same type are allocated back to back
+  --> $DIR/adjacent_vec_allocations.rs:3:5
+   |
+LL | /     let mut a = vec![0u64; n << 1];
+LL | |     let mut b = vec![0u64; n];
+LL | |     let mut c = vec![0u64; n];
+   | |______________________________^
+   |
+   = help: allocate one `Vec` of the combined length and divide it with `split_at_mut`; if one buffer must end up owned, make it the parent's prefix, `truncate` the parent at the end, and `shrink_to_fit` if the value outlives the function
+   = note: `#[deny(adjacent_vec_allocations)]` on by default
+
+error: aborting due to 1 previous error
+

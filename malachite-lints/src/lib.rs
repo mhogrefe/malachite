@@ -17,6 +17,7 @@ extern crate rustc_middle;
 extern crate rustc_session;
 extern crate rustc_span;
 
+mod adjacent_vec_allocations;
 mod assert_ordering_equal_prefer_exact;
 mod assign_then_consumed_once;
 mod clone_with_ref_variant;
@@ -309,6 +310,7 @@ fn in_test_code(cx: &rustc_lint::LateContext<'_>, span: rustc_span::Span) -> boo
 pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint::LintStore) {
     dylint_linting::init_config(sess);
     lint_store.register_lints(&[
+        adjacent_vec_allocations::ADJACENT_VEC_ALLOCATIONS,
         assert_ordering_equal_prefer_exact::ASSERT_ORDERING_EQUAL_PREFER_EXACT,
         assign_then_consumed_once::ASSIGN_THEN_CONSUMED_ONCE,
         clone_with_ref_variant::CLONE_WITH_REF_VARIANT,
@@ -349,6 +351,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
     lint_store.register_late_pass(|_| {
         Box::new(assert_ordering_equal_prefer_exact::AssertOrderingEqualPreferExact)
     });
+    lint_store.register_late_pass(|_| Box::new(adjacent_vec_allocations::AdjacentVecAllocations));
     lint_store.register_late_pass(|_| Box::new(assign_then_consumed_once::AssignThenConsumedOnce));
     lint_store.register_late_pass(|_| Box::new(compare_with_power_of_2::CompareWithPowerOf2));
     lint_store.register_late_pass(|_| Box::new(compare_with_primitive::CompareWithPrimitive));

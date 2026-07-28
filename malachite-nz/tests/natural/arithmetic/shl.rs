@@ -21,8 +21,10 @@ use malachite_base::test_util::generators::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::shl::{
-    limbs_shl, limbs_shl_to_out, limbs_shl_with_complement_to_out, limbs_slice_shl_in_place,
-    limbs_vec_shl_in_place,
+    limbs_add_shl_same_length_in_place_left, limbs_shl, limbs_shl_add_same_length_in_place_left,
+    limbs_shl_add_same_length_to_out, limbs_shl_sub_same_length_in_place_left,
+    limbs_shl_sub_same_length_in_place_right, limbs_shl_to_out, limbs_shl_with_complement_to_out,
+    limbs_slice_shl_in_place, limbs_sub_shl_same_length_in_place_left, limbs_vec_shl_in_place,
 };
 use malachite_nz::natural::logic::not::limbs_not_in_place;
 use malachite_nz::platform::Limb;
@@ -476,6 +478,242 @@ fn limbs_shl_with_complement_to_out_properties() {
             xs.resize(actual_xs.len(), 0);
             assert_eq!(xs, actual_xs);
             assert_eq!(&out[len..], &old_out[len..]);
+        });
+}
+
+const HIGH_BIT: Limb = 1 << (Limb::WIDTH - 1);
+
+#[test]
+fn test_limbs_shl_add_same_length_in_place_left() {
+    let test = |xs: &[Limb], ys: &[Limb], bits: u64, out: &[Limb], carry: Limb| {
+        let mut xs = xs.to_vec();
+        assert_eq!(
+            limbs_shl_add_same_length_in_place_left(&mut xs, ys, bits),
+            carry
+        );
+        assert_eq!(xs, out);
+    };
+    test(&[], &[], 1, &[], 0);
+    test(&[100], &[23], 3, &[823], 0);
+    test(&[Limb::MAX], &[Limb::MAX], 1, &[Limb::MAX - 2], 2);
+    test(
+        &[Limb::MAX, 1],
+        &[0, 0],
+        Limb::WIDTH - 1,
+        &[HIGH_BIT, Limb::MAX],
+        0,
+    );
+}
+
+#[test]
+fn test_limbs_add_shl_same_length_in_place_left() {
+    let test = |xs: &[Limb], ys: &[Limb], bits: u64, out: &[Limb], carry: Limb| {
+        let mut xs = xs.to_vec();
+        assert_eq!(
+            limbs_add_shl_same_length_in_place_left(&mut xs, ys, bits),
+            carry
+        );
+        assert_eq!(xs, out);
+    };
+    test(&[], &[], 1, &[], 0);
+    test(&[1, 2], &[3, 4], 2, &[13, 18], 0);
+    test(&[Limb::MAX], &[1], 1, &[1], 1);
+    test(
+        &[0, 0],
+        &[Limb::MAX, Limb::MAX],
+        1,
+        &[Limb::MAX - 1, Limb::MAX],
+        1,
+    );
+}
+
+#[test]
+fn test_limbs_shl_add_same_length_to_out() {
+    let test = |xs: &[Limb], ys: &[Limb], bits: u64, out_val: &[Limb], carry: Limb| {
+        let mut out = vec![0; xs.len() + 2];
+        assert_eq!(
+            limbs_shl_add_same_length_to_out(&mut out, xs, ys, bits),
+            carry
+        );
+        assert_eq!(&out[..xs.len()], out_val);
+        assert_eq!(&out[xs.len()..], &[0, 0]);
+    };
+    test(&[], &[], 1, &[], 0);
+    test(&[100], &[23], 3, &[823], 0);
+    test(&[Limb::MAX], &[Limb::MAX], 1, &[Limb::MAX - 2], 2);
+    test(
+        &[Limb::MAX, 1],
+        &[0, 0],
+        Limb::WIDTH - 1,
+        &[HIGH_BIT, Limb::MAX],
+        0,
+    );
+}
+
+#[test]
+fn test_limbs_shl_sub_same_length_in_place_left() {
+    let test = |xs: &[Limb], ys: &[Limb], bits: u64, out: &[Limb], carry: Limb| {
+        let mut xs = xs.to_vec();
+        assert_eq!(
+            limbs_shl_sub_same_length_in_place_left(&mut xs, ys, bits),
+            carry
+        );
+        assert_eq!(xs, out);
+    };
+    test(&[], &[], 1, &[], 0);
+    test(&[5], &[7], 1, &[3], 0);
+    test(&[1], &[2], 1, &[0], 0);
+    test(&[0, 1], &[1, 0], 1, &[Limb::MAX, 1], 0);
+}
+
+#[test]
+fn test_limbs_shl_sub_same_length_in_place_right() {
+    let test = |xs: &[Limb], ys: &[Limb], bits: u64, out: &[Limb], carry: Limb| {
+        let mut ys = ys.to_vec();
+        assert_eq!(
+            limbs_shl_sub_same_length_in_place_right(xs, &mut ys, bits),
+            carry
+        );
+        assert_eq!(ys, out);
+    };
+    test(&[], &[], 1, &[], 0);
+    test(&[7], &[5], 1, &[9], 0);
+    test(&[1, 1], &[0, 0], Limb::WIDTH - 1, &[HIGH_BIT, HIGH_BIT], 0);
+}
+
+#[test]
+fn test_limbs_sub_shl_same_length_in_place_left() {
+    let test = |xs: &[Limb], ys: &[Limb], bits: u64, out: &[Limb], carry: Limb| {
+        let mut xs = xs.to_vec();
+        assert_eq!(
+            limbs_sub_shl_same_length_in_place_left(&mut xs, ys, bits),
+            carry
+        );
+        assert_eq!(xs, out);
+    };
+    test(&[], &[], 1, &[], 0);
+    test(&[10], &[2], 2, &[2], 0);
+    test(&[0], &[Limb::MAX], 1, &[2], 2);
+}
+
+#[test]
+fn limbs_shl_add_same_length_in_place_left_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_22::<Limb, Limb>()
+        .test_properties_with_config(&config, |(out, xs, bits)| {
+            let len = xs.len();
+            let mut a = out[..len].to_vec();
+            let n_a = Natural::from_limbs_asc(&a);
+            let n_x = Natural::from_limbs_asc(&xs);
+            let carry = limbs_shl_add_same_length_in_place_left(&mut a, &xs, bits);
+            a.push(carry);
+            assert_eq!(Natural::from_owned_limbs_asc(a), (n_a << bits) + n_x);
+        });
+}
+
+#[test]
+fn limbs_add_shl_same_length_in_place_left_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_22::<Limb, Limb>()
+        .test_properties_with_config(&config, |(out, xs, bits)| {
+            let len = xs.len();
+            let mut a = out[..len].to_vec();
+            let n_a = Natural::from_limbs_asc(&a);
+            let n_x = Natural::from_limbs_asc(&xs);
+            let carry = limbs_add_shl_same_length_in_place_left(&mut a, &xs, bits);
+            a.push(carry);
+            assert_eq!(Natural::from_owned_limbs_asc(a), n_a + (n_x << bits));
+        });
+}
+
+#[test]
+fn limbs_shl_add_same_length_to_out_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_22::<Limb, Limb>()
+        .test_properties_with_config(&config, |(mut out, xs, bits)| {
+            let len = xs.len();
+            let ys = out[..len].to_vec();
+            let old_out = out.clone();
+            let n_x = Natural::from_limbs_asc(&xs);
+            let n_y = Natural::from_limbs_asc(&ys);
+            let carry = limbs_shl_add_same_length_to_out(&mut out, &xs, &ys, bits);
+            let mut result = out[..len].to_vec();
+            result.push(carry);
+            assert_eq!(Natural::from_owned_limbs_asc(result), (n_x << bits) + n_y);
+            assert_eq!(&out[len..], &old_out[len..]);
+        });
+}
+
+#[test]
+fn limbs_shl_sub_same_length_in_place_left_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_22::<Limb, Limb>()
+        .test_properties_with_config(&config, |(out, xs, bits)| {
+            let len = xs.len();
+            // The shifted operand must be the larger one, so that the difference is nonnegative.
+            let mut a = out[..len].to_vec();
+            let mut b = xs;
+            if Natural::from_limbs_asc(&a) < Natural::from_limbs_asc(&b) {
+                std::mem::swap(&mut a, &mut b);
+            }
+            let n_a = Natural::from_limbs_asc(&a);
+            let n_b = Natural::from_limbs_asc(&b);
+            let carry = limbs_shl_sub_same_length_in_place_left(&mut a, &b, bits);
+            a.push(carry);
+            assert_eq!(Natural::from_owned_limbs_asc(a), (n_a << bits) - n_b);
+        });
+}
+
+#[test]
+fn limbs_shl_sub_same_length_in_place_right_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_22::<Limb, Limb>()
+        .test_properties_with_config(&config, |(out, xs, bits)| {
+            let len = xs.len();
+            // The shifted operand must be the larger one, so that the difference is nonnegative.
+            let mut a = out[..len].to_vec();
+            let mut b = xs;
+            if Natural::from_limbs_asc(&a) < Natural::from_limbs_asc(&b) {
+                std::mem::swap(&mut a, &mut b);
+            }
+            let n_a = Natural::from_limbs_asc(&a);
+            let n_b = Natural::from_limbs_asc(&b);
+            let carry = limbs_shl_sub_same_length_in_place_right(&a, &mut b, bits);
+            b.push(carry);
+            assert_eq!(Natural::from_owned_limbs_asc(b), (n_a << bits) - n_b);
+        });
+}
+
+#[test]
+fn limbs_sub_shl_same_length_in_place_left_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_22::<Limb, Limb>()
+        .test_properties_with_config(&config, |(out, xs, bits)| {
+            let len = xs.len();
+            let mut a = out[..len].to_vec();
+            let n_a = Natural::from_limbs_asc(&a);
+            let n_x = Natural::from_limbs_asc(&xs);
+            let deficit = limbs_sub_shl_same_length_in_place_left(&mut a, &xs, bits);
+            // a - deficit * 2 ^ (Limb::WIDTH * len) == n_a - (n_x << bits), so a + (n_x << bits) ==
+            // n_a + deficit * 2 ^ (Limb::WIDTH * len).
+            let mut deficit_limbs = vec![0; len];
+            deficit_limbs.push(deficit);
+            assert_eq!(
+                Natural::from_owned_limbs_asc(a) + (n_x << bits),
+                n_a + Natural::from_owned_limbs_asc(deficit_limbs)
+            );
         });
 }
 

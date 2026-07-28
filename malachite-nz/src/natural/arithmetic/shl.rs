@@ -212,6 +212,251 @@ pub_crate_test! {limbs_shl_with_complement_to_out(
     xs[n - 1] >> cobits
 }}
 
+// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
+// `Natural`s x and y, writes the limbs of 2 ^ `bits` * x + y to the first slice and returns the
+// highest limb of the result. `bits` must be between 1 and `Limb::WIDTH` - 1, inclusive.
+//
+// The shift is in windows form (each shifted limb is assembled from the two adjacent original
+// limbs), so the addition's carry is the only loop-carried dependency, and the scratch space and
+// second memory pass of a separate shift are saved.
+//
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// # Panics
+// Panics if `xs` and `ys` have different lengths, if `bits` is 0, or if `bits` is greater than or
+// equal to `Limb::WIDTH`.
+//
+// This is equivalent to `mpn_addlsh_n` from GMP 6.3.0, where `rp == vp`. GMP provides this function
+// as native assembly or macro fallbacks rather than as generic C code.
+pub_crate_test! {limbs_shl_add_same_length_in_place_left(
+    xs: &mut [Limb],
+    ys: &[Limb],
+    bits: u64
+) -> Limb {
+    assert_ne!(bits, 0);
+    assert!(bits < Limb::WIDTH);
+    assert_eq!(xs.len(), ys.len());
+    let cobits = Limb::WIDTH - bits;
+    let mut prev = 0;
+    let mut carry = false;
+    for (x, &y) in xs.iter_mut().zip(ys.iter()) {
+        let shifted = (*x << bits) | (prev >> cobits);
+        prev = *x;
+        let (sum, carry_1) = shifted.overflowing_add(y);
+        let (sum, carry_2) = sum.overflowing_add(Limb::from(carry));
+        *x = sum;
+        carry = carry_1 | carry_2;
+    }
+    (prev >> cobits) + Limb::from(carry)
+}}
+
+// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
+// `Natural`s x and y, writes the limbs of x + 2 ^ `bits` * y to the first slice and returns the
+// highest limb of the result. `bits` must be between 1 and `Limb::WIDTH` - 1, inclusive.
+//
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// # Panics
+// Panics if `xs` and `ys` have different lengths, if `bits` is 0, or if `bits` is greater than or
+// equal to `Limb::WIDTH`.
+//
+// This is equivalent to `mpn_addlsh_n` from GMP 6.3.0, where `rp == up`, and to `DO_mpn_addlsh_n`
+// from `mpn/generic/toom_eval_pm2rexp.c`, GMP 6.2.1, but in a single pass with no scratch space.
+pub_crate_test! {limbs_add_shl_same_length_in_place_left(
+    xs: &mut [Limb],
+    ys: &[Limb],
+    bits: u64
+) -> Limb {
+    assert_ne!(bits, 0);
+    assert!(bits < Limb::WIDTH);
+    assert_eq!(xs.len(), ys.len());
+    let cobits = Limb::WIDTH - bits;
+    let mut prev = 0;
+    let mut carry = false;
+    for (x, &y) in xs.iter_mut().zip(ys.iter()) {
+        let shifted = (y << bits) | (prev >> cobits);
+        prev = y;
+        let (sum, carry_1) = x.overflowing_add(shifted);
+        let (sum, carry_2) = sum.overflowing_add(Limb::from(carry));
+        *x = sum;
+        carry = carry_1 | carry_2;
+    }
+    (prev >> cobits) + Limb::from(carry)
+}}
+
+// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
+// `Natural`s x and y, writes the lowest `xs.len()` limbs of 2 ^ `bits` * x + y to `out` and returns
+// the highest limb of the result. `bits` must be between 1 and `Limb::WIDTH` - 1, inclusive.
+//
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// # Panics
+// Panics if `out` is shorter than `xs`, if `xs` and `ys` have different lengths, if `bits` is 0, or
+// if `bits` is greater than or equal to `Limb::WIDTH`.
+//
+// This is equivalent to `mpn_addlsh_n` from GMP 6.3.0. GMP provides this function as native
+// assembly or macro fallbacks rather than as generic C code.
+pub_crate_test! {limbs_shl_add_same_length_to_out(
+    out: &mut [Limb],
+    xs: &[Limb],
+    ys: &[Limb],
+    bits: u64
+) -> Limb {
+    assert_ne!(bits, 0);
+    assert!(bits < Limb::WIDTH);
+    assert_eq!(xs.len(), ys.len());
+    assert!(out.len() >= xs.len());
+    let cobits = Limb::WIDTH - bits;
+    let mut prev = 0;
+    let mut carry = false;
+    for ((o, &x), &y) in out.iter_mut().zip(xs.iter()).zip(ys.iter()) {
+        let shifted = (x << bits) | (prev >> cobits);
+        prev = x;
+        let (sum, carry_1) = shifted.overflowing_add(y);
+        let (sum, carry_2) = sum.overflowing_add(Limb::from(carry));
+        *o = sum;
+        carry = carry_1 | carry_2;
+    }
+    (prev >> cobits) + Limb::from(carry)
+}}
+
+// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
+// `Natural`s x and y, writes the lowest `xs.len()` limbs of x - 2 ^ `bits` * y to the first slice
+// and returns the highest limb of 2 ^ `bits` * y plus the subtraction's borrow; the caller must
+// subtract the returned limb from the part of x above `xs`. `bits` must be between 1 and
+// `Limb::WIDTH` - 1, inclusive.
+//
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// # Panics
+// Panics if `xs` and `ys` have different lengths, if `bits` is 0, or if `bits` is greater than or
+// equal to `Limb::WIDTH`.
+//
+// This is equivalent to `mpn_sublsh_n` from GMP 6.3.0, where `rp == up`, and to `DO_mpn_sublsh_n`
+// from `mpn/generic/toom_interpolate_8pts.c`, GMP 6.2.1, but in a single pass with no scratch
+// space.
+pub_crate_test! {limbs_sub_shl_same_length_in_place_left(
+    xs: &mut [Limb],
+    ys: &[Limb],
+    bits: u64
+) -> Limb {
+    assert_ne!(bits, 0);
+    assert!(bits < Limb::WIDTH);
+    assert_eq!(xs.len(), ys.len());
+    let cobits = Limb::WIDTH - bits;
+    let mut prev = 0;
+    let mut borrow = false;
+    for (x, &y) in xs.iter_mut().zip(ys.iter()) {
+        let shifted = (y << bits) | (prev >> cobits);
+        prev = y;
+        let (diff, borrow_1) = x.overflowing_sub(shifted);
+        let (diff, borrow_2) = diff.overflowing_sub(Limb::from(borrow));
+        *x = diff;
+        borrow = borrow_1 | borrow_2;
+    }
+    (prev >> cobits) + Limb::from(borrow)
+}}
+
+// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
+// `Natural`s x and y, writes the limbs of 2 ^ `bits` * x - y to the first slice and returns the
+// highest limb of the result. `bits` must be between 1 and `Limb::WIDTH` - 1, inclusive, and 2 ^
+// `bits` * x must be at least y.
+//
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// # Panics
+// Panics if `xs` and `ys` have different lengths, if `bits` is 0, or if `bits` is greater than or
+// equal to `Limb::WIDTH`.
+//
+// This is equivalent to `mpn_rsblsh_n` from GMP 6.3.0, where `rp == vp`. GMP provides this function
+// as native assembly or macro fallbacks rather than as generic C code.
+pub_crate_test! {limbs_shl_sub_same_length_in_place_left(
+    xs: &mut [Limb],
+    ys: &[Limb],
+    bits: u64
+) -> Limb {
+    assert_ne!(bits, 0);
+    assert!(bits < Limb::WIDTH);
+    assert_eq!(xs.len(), ys.len());
+    let cobits = Limb::WIDTH - bits;
+    let mut prev = 0;
+    let mut borrow = false;
+    for (x, &y) in xs.iter_mut().zip(ys.iter()) {
+        let shifted = (*x << bits) | (prev >> cobits);
+        prev = *x;
+        let (diff, borrow_1) = shifted.overflowing_sub(y);
+        let (diff, borrow_2) = diff.overflowing_sub(Limb::from(borrow));
+        *x = diff;
+        borrow = borrow_1 | borrow_2;
+    }
+    (prev >> cobits) - Limb::from(borrow)
+}}
+
+// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
+// `Natural`s x and y, writes the limbs of 2 ^ `bits` * x - y to the second slice and returns the
+// highest limb of the result. `bits` must be between 1 and `Limb::WIDTH` - 1, inclusive, and 2 ^
+// `bits` * x must be at least y.
+//
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+//
+// # Panics
+// Panics if `xs` and `ys` have different lengths, if `bits` is 0, or if `bits` is greater than or
+// equal to `Limb::WIDTH`.
+//
+// This is equivalent to `mpn_rsblsh_n` from GMP 6.3.0, where `rp == up`. GMP provides this function
+// as native assembly or macro fallbacks rather than as generic C code.
+pub_crate_test! {limbs_shl_sub_same_length_in_place_right(
+    xs: &[Limb],
+    ys: &mut [Limb],
+    bits: u64
+) -> Limb {
+    assert_ne!(bits, 0);
+    assert!(bits < Limb::WIDTH);
+    assert_eq!(xs.len(), ys.len());
+    let cobits = Limb::WIDTH - bits;
+    let mut prev = 0;
+    let mut borrow = false;
+    for (y, &x) in ys.iter_mut().zip(xs.iter()) {
+        let shifted = (x << bits) | (prev >> cobits);
+        prev = x;
+        let (diff, borrow_1) = shifted.overflowing_sub(*y);
+        let (diff, borrow_2) = diff.overflowing_sub(Limb::from(borrow));
+        *y = diff;
+        borrow = borrow_1 | borrow_2;
+    }
+    (prev >> cobits) - Limb::from(borrow)
+}}
+
 fn shl_ref_unsigned<T: PrimitiveUnsigned>(x: &Natural, bits: T) -> Natural
 where
     u64: ExactFrom<T>,

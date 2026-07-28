@@ -2283,7 +2283,6 @@ pub_test! {limbs_mul_greater_to_out_toom_54_scratch_len(
     6 * n
         + 2
         + max!(
-            3 * n + 1,
             limbs_mul_same_length_to_out_scratch_len(n),
             limbs_mul_same_length_to_out_scratch_len(m),
             limbs_mul_to_out_scratch_len(s, t)
@@ -2354,8 +2353,6 @@ pub fn limbs_mul_greater_to_out_toom_54(
     let sum = s + t;
     assert!(sum >= n);
     assert!(sum > 4);
-    // Also allocate 3 * `n` + 1 limbs for `scratch_hi`. `limbs_mul_toom_interpolate_8_points` may
-    // need all of them, when `shl_and_sub_same_length` uses a scratch.
     let (scratch, mul_scratch) = scratch.split_at_mut(6 * n + 2);
     let (r7, r3) = scratch.split_at_mut(3 * n + 1);
     let (out_lo, out_hi) = out.split_at_mut(3 * n);
@@ -2404,7 +2401,7 @@ pub fn limbs_mul_greater_to_out_toom_54(
     // - Infinity
     // - size: s, t
     limbs_mul_to_out(&mut out[7 * n..], a4, b3, mul_scratch);
-    limbs_mul_toom_interpolate_8_points(out, n, sum, r3, r7, mul_scratch);
+    limbs_mul_toom_interpolate_8_points(out, n, sum, r3, r7);
 }
 
 // This function can be used to determine whether the sizes of the input slices to
@@ -2778,8 +2775,8 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_63_scratch_len(
     assert!(m < xs_len);
     let s = xs_len - 5 * n;
     let t = ys_len - (n << 1);
-    9 * n
-        + 3
+    7 * n
+        + 2
         + max!(
             limbs_mul_same_length_to_out_scratch_len(n),
             limbs_mul_same_length_to_out_scratch_len(m),
@@ -2848,11 +2845,10 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_63(
     assert!(s <= n);
     assert!(s + t >= n);
     assert!(s + t > 4);
-    // - Also allocate 3 * n + 1 limbs for `scratch2`. `limbs_mul_toom_interpolate_8_points` may
-    //   need all of them, when `shl_and_sub_same_length` uses a scratch.
+    // - Also allocate n limbs for `scratch2`, a temporary used during evaluation
     // - Evaluation and recursive calls
     // - 4, -4
-    let (scratch, mul_scratch) = scratch.split_at_mut(9 * n + 3);
+    let (scratch, mul_scratch) = scratch.split_at_mut(7 * n + 2);
     split_into_chunks_mut!(scratch, 3 * n + 1, [r7, r3], scratch2);
     let (r8, remainder) = out.split_at_mut(3 * n);
     split_into_chunks_mut!(remainder, m, [v0, v1, v2, v3], _unused);
@@ -2946,7 +2942,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_63(
     let r1 = &mut out[7 * n..];
     // size: s, t
     limbs_mul_to_out(r1, xs_5, ys_2, mul_scratch);
-    limbs_mul_toom_interpolate_8_points(out, n, s + t, r3, r7, scratch2);
+    limbs_mul_toom_interpolate_8_points(out, n, s + t, r3, r7);
 }}
 
 // - The limit is a rational number between (12 / 11) ^ (log(4) / log(2 * 4 - 1)) and

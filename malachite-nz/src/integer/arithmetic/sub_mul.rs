@@ -328,11 +328,13 @@ fn limbs_overflowing_sub_mul_greater_in_place_left(
 ) -> bool {
     let xs_len = xs.len();
     let product_len = ys.len() + zs.len();
-    let mut product = vec![0; product_len];
-    let mut mul_scratch = vec![0; limbs_mul_greater_to_out_scratch_len(ys.len(), zs.len())];
-    if limbs_mul_greater_to_out(&mut product, ys, zs, &mut mul_scratch) == 0 {
-        product.pop();
-    }
+    // The product must end up owned, so it is the parent's prefix, with the multiplication scratch
+    // as the tail; the parent is truncated to the product once the multiplication is done.
+    let mut product =
+        vec![0; product_len + limbs_mul_greater_to_out_scratch_len(ys.len(), zs.len())];
+    let (product_slice, mul_scratch) = product.split_at_mut(product_len);
+    let high_zero = limbs_mul_greater_to_out(product_slice, ys, zs, mul_scratch) == 0;
+    product.truncate(product_len - usize::from(high_zero));
     assert_ne!(*product.last().unwrap(), 0);
     if limbs_cmp(xs, &product) == Less {
         if xs_len < product_len {

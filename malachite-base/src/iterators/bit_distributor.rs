@@ -179,6 +179,9 @@ impl BitDistributor {
         self.bit_map.as_ref()
     }
 
+    // The two bookkeeping `Vec`s stay separate allocations: both shrink via `remove` as output
+    // types reach their bit limits, and slices of a shared allocation cannot do that.
+    #[cfg_attr(dylint_lib = "malachite_lints", allow(adjacent_vec_allocations))]
     fn update_bit_map(&mut self) {
         let (mut normal_output_type_indices, mut tiny_output_type_indices): (
             Vec<usize>,

@@ -1863,7 +1863,11 @@ pub(crate) fn limbs_div_mod_balanced(
 //
 // This is equivalent to `mpn_tdiv_qr` from `mpn/generic/tdiv_qr.c`, GMP 6.2.1, where `dn > 1` and
 // `qp` and `rp` are returned.
-pub_test! {limbs_div_mod(ns: &[Limb], ds: &[Limb]) -> (Vec<Limb>, Vec<Limb>) {
+pub_test! {
+// The two buffers stay separate allocations: both are returned as owned `Vec`s, and merging them
+// would force one to be copied out of the parent.
+#[cfg_attr(dylint_lib = "malachite_lints", allow(adjacent_vec_allocations))]
+limbs_div_mod(ns: &[Limb], ds: &[Limb]) -> (Vec<Limb>, Vec<Limb>) {
     let d_len = ds.len();
     let mut qs = vec![0; ns.len() - d_len + 1];
     let mut rs = vec![0; d_len];

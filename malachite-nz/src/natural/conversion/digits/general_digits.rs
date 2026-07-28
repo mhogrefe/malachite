@@ -781,9 +781,10 @@ fn compute_power_inverses<'a>(
         if limbs_add_limb_to_out(&mut top, &ds_shifted[d_len - is_len_plus_1..], 1) {
             // The top of the divisor is all ones; the inverse is zero.
         } else {
-            let mut is_buf = vec![0; is_len_plus_1];
-            let mut inv_scratch = vec![0; limbs_invert_approx_scratch_len(is_len_plus_1)];
-            limbs_invert_approx(&mut is_buf, &top, &mut inv_scratch);
+            let mut is_buf_and_scratch =
+                vec![0; is_len_plus_1 + limbs_invert_approx_scratch_len(is_len_plus_1)];
+            let (is_buf, inv_scratch) = is_buf_and_scratch.split_at_mut(is_len_plus_1);
+            limbs_invert_approx(is_buf, &top, inv_scratch);
             is.copy_from_slice(&is_buf[1..]);
         }
         out.push(Some(PowerInverse {
@@ -1038,9 +1039,10 @@ pub_crate_test! {limbs_to_digits_small_base<T: PrimitiveUnsigned>(
         // Precompute Barrett inverses for the rows whose divisions run at Barrett sizes; each such
         // row's inverse is computed once and reused by every division through the row.
         let (inverse_arena_len, preinv_scratch_len) = power_inverses_scratch_lens(&powers);
-        let mut inverse_arena = vec![0; inverse_arena_len];
-        let mut preinv_scratch = vec![0; preinv_scratch_len];
-        let inverses = compute_power_inverses(&powers, &mut inverse_arena);
+        let mut inverse_arena_and_scratch = vec![0; inverse_arena_len + preinv_scratch_len];
+        let (inverse_arena, preinv_scratch) =
+            inverse_arena_and_scratch.split_at_mut(inverse_arena_len);
+        let inverses = compute_power_inverses(&powers, inverse_arena);
         // Using our precomputed powers, convert our number.
         let mut scratch =
             vec![0; limbs_to_digits_small_base_divide_and_conquer_scratch_len(xs_len)];
@@ -1051,7 +1053,7 @@ pub_crate_test! {limbs_to_digits_small_base<T: PrimitiveUnsigned>(
             base,
             &powers,
             &inverses,
-            &mut preinv_scratch,
+            preinv_scratch,
             power_len,
             &mut scratch,
         )
@@ -1895,6 +1897,9 @@ where
             let mut out = vec![0; usize::exact_from(limbs_per_digit_in_base(xs.len(), u64_base))];
             let len = limbs_from_digits_small_base(&mut out, &xs, u64_base)?;
             out.truncate(len);
+            // The buffer is sized from the digit count, which leading zero digits can inflate
+            // arbitrarily; give back the excess capacity, since the value is returned.
+            out.shrink_to_fit();
             Some(Natural::from_owned_limbs_asc(out))
         } else {
             let t_base = T::wrapping_from(base);
@@ -1946,6 +1951,9 @@ where
             let mut out = vec![0; usize::exact_from(limbs_per_digit_in_base(xs.len(), u64_base))];
             let len = limbs_from_digits_small_base(&mut out, &xs, u64_base)?;
             out.truncate(len);
+            // The buffer is sized from the digit count, which leading zero digits can inflate
+            // arbitrarily; give back the excess capacity, since the value is returned.
+            out.shrink_to_fit();
             Some(Natural::from_owned_limbs_asc(out))
         } else {
             let t_base = T::wrapping_from(base);
@@ -1988,6 +1996,9 @@ where
             let mut out = vec![0; usize::exact_from(limbs_per_digit_in_base(xs.len(), u64_base))];
             let len = limbs_from_digits_small_base(&mut out, &xs, u64_base)?;
             out.truncate(len);
+            // The buffer is sized from the digit count, which leading zero digits can inflate
+            // arbitrarily; give back the excess capacity, since the value is returned.
+            out.shrink_to_fit();
             Some(Natural::from_owned_limbs_asc(out))
         } else {
             let t_base = T::wrapping_from(base);
@@ -2038,6 +2049,9 @@ where
             let mut out = vec![0; usize::exact_from(limbs_per_digit_in_base(xs.len(), u64_base))];
             let len = limbs_from_digits_small_base(&mut out, &xs, u64_base)?;
             out.truncate(len);
+            // The buffer is sized from the digit count, which leading zero digits can inflate
+            // arbitrarily; give back the excess capacity, since the value is returned.
+            out.shrink_to_fit();
             Some(Natural::from_owned_limbs_asc(out))
         } else {
             let t_base = T::wrapping_from(base);

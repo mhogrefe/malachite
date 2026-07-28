@@ -364,11 +364,14 @@ fn limb_pow_to_out_alt<'a>(
 // where $T$ is time, $M$ is additional memory, and $n$ is `exp`.
 #[cfg(feature = "test_build")]
 fn limb_pow_alt(x: Limb, exp: u64) -> Vec<Limb> {
-    let mut out = vec![0; limb_pow_alt_estimated_out_len(x, exp)];
-    let mut scratch = vec![0; limb_pow_alt_estimated_scratch_len(x, exp)];
-    let out_len = limb_pow_to_out_alt(&mut out, x, exp, &mut scratch);
-    assert!(out_len <= out.len());
+    let estimated_out_len = limb_pow_alt_estimated_out_len(x, exp);
+    let mut out = vec![0; estimated_out_len + limb_pow_alt_estimated_scratch_len(x, exp)];
+    let (out_slice, scratch) = out.split_at_mut(estimated_out_len);
+    let out_len = limb_pow_to_out_alt(out_slice, x, exp, scratch);
+    assert!(out_len <= estimated_out_len);
     out.truncate(out_len);
+    // Give back the scratch capacity, so the returned value does not carry it around.
+    out.shrink_to_fit();
     out
 }
 
@@ -466,11 +469,14 @@ fn limbs_pow_to_out_alt<'a>(
 // where $T$ is time, $M$ is additional memory, $n$ is `xs.len()`, and $m$ is `exp`.
 #[cfg(feature = "test_build")]
 fn limbs_pow_alt(xs: &[Limb], exp: u64) -> Vec<Limb> {
-    let mut out = vec![0; limbs_pow_alt_estimated_out_len(xs, exp)];
-    let mut scratch = vec![0; limbs_pow_alt_estimated_scratch_len(xs, exp)];
-    let out_len = limbs_pow_to_out_alt(&mut out, xs, exp, &mut scratch);
-    assert!(out_len <= out.len());
+    let estimated_out_len = limbs_pow_alt_estimated_out_len(xs, exp);
+    let mut out = vec![0; estimated_out_len + limbs_pow_alt_estimated_scratch_len(xs, exp)];
+    let (out_slice, scratch) = out.split_at_mut(estimated_out_len);
+    let out_len = limbs_pow_to_out_alt(out_slice, xs, exp, scratch);
+    assert!(out_len <= estimated_out_len);
     out.truncate(out_len);
+    // Give back the scratch capacity, so the returned value does not carry it around.
+    out.shrink_to_fit();
     out
 }
 

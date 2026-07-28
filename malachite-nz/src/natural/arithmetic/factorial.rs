@@ -436,6 +436,9 @@ limbs_odd_factorial(n: usize, double: bool) -> Vec<Limb> {
             // not monotonic in the operand size - it is 0 in both the basecase and FFT regimes - so
             // it is sliced to the exact length each time.
             let mut square_scratch: Vec<Limb> = Vec::new();
+            // The square buffer is likewise reused across iterations, growing when needed. Only
+            // square[..size] is written and read, so stale limbs beyond that are harmless.
+            let mut square: Vec<Limb> = Vec::new();
             for i in (0..s).rev() {
                 let ns = limbs_2_multiswing_odd(
                     &mut swing_and_sieve,
@@ -443,14 +446,17 @@ limbs_odd_factorial(n: usize, double: bool) -> Vec<Limb> {
                     Limb::exact_from(n >> i),
                     &mut factors,
                 );
-                let mut square;
                 if double && i == 0 {
                     size = out_len;
-                    square = vec![0; size];
+                    if square.len() < size {
+                        square.resize(size, 0);
+                    }
                     square[..out_len].copy_from_slice(&out[..out_len]);
                 } else {
                     size = out_len << 1;
-                    square = vec![0; size];
+                    if square.len() < size {
+                        square.resize(size, 0);
+                    }
                     let scratch_len = limbs_square_to_out_scratch_len(out_len);
                     if square_scratch.len() < scratch_len {
                         square_scratch.resize(scratch_len, 0);

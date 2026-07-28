@@ -622,9 +622,10 @@ fn limbs_gcd_sub_mul(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> usize {
     assert!(out_len >= xs_len);
     let sum_len = xs_len + ys_len;
     assert!(sum_len <= out_len + 1);
-    let mut scratch = vec![0; sum_len];
-    let mut mul_scratch = vec![0; limbs_mul_greater_to_out_scratch_len(xs_len, ys_len)];
-    limbs_mul_greater_to_out(&mut scratch, xs, ys, &mut mul_scratch);
+    let mut scratch_and_mul_scratch =
+        vec![0; sum_len + limbs_mul_greater_to_out_scratch_len(xs_len, ys_len)];
+    let (scratch, mul_scratch) = scratch_and_mul_scratch.split_at_mut(sum_len);
+    limbs_mul_greater_to_out(scratch, xs, ys, mul_scratch);
     assert!(sum_len <= out_len || scratch[out_len] == 0);
     let mut scratch_len = sum_len;
     if scratch_len > out_len {

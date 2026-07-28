@@ -51,6 +51,8 @@ fn mod_power_of_2_inverse_helper(xs: &[Limb], pow: u64) -> Option<Natural> {
     let (out, scratch) = big_scratch.split_at_mut(len);
     limbs_mod_power_of_2_inverse(out, xs, pow, scratch);
     big_scratch.truncate(len);
+    // Give back the scratch capacity, so the returned value does not carry it around.
+    big_scratch.shrink_to_fit();
     Some(Natural::from_owned_limbs_asc(big_scratch))
 }
 

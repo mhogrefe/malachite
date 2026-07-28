@@ -40,10 +40,11 @@ pub fn limbs_remove(
     assert!(vp[0].odd(), "V must be odd for 2-adic division");
     assert!(vn > 1 || vp[0] > 1, "V must be > 1 to avoid infinite loop");
 
-    // Temporary work buffers
-    let mut qp = vec![0; un + 1];
-    let mut qp2 = vec![0; un + 1];
-    let mut tp = vec![0; (un + 1 + vn) >> 1];
+    // Temporary work buffers, sharing one allocation: the algorithm only ever uses them as slices,
+    // so the ping-pong `swap`s exchange the slice references.
+    let mut work = vec![0; ((un + 1) << 1) + ((un + 1 + vn) >> 1)];
+    let (mut qp, rest) = work.split_at_mut(un + 1);
+    let (mut qp2, tp) = rest.split_at_mut(un + 1);
 
     // Copy input into quotient buffer
     qp[..un].copy_from_slice(up);

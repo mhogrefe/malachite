@@ -11,7 +11,8 @@ Here are some benchmarks comparing the Malachite to two other libraries:
 - [`rug`](https://crates.io/crates/rug), a library that calls GMP, a widely used, highly-optimized
 bignum library written in C.
 
-The `num` version that is compared against is 0.4.3, and the `rug` version is 1.30.0.
+The `num` version that is compared against is 0.4.3, and the `rug` version is 1.30.0. The
+Malachite version is 0.10.0.
 
 The general trend is that Malachite is faster than `num` due to better algorithms, and slower than
 `rug`, though the gap is steadily decreasing. My guess is that the better performance of `rug` is

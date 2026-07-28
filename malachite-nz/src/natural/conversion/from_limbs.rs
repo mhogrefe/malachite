@@ -117,6 +117,11 @@ impl Natural {
     /// This function takes ownership of the limbs. If it's necessary to borrow the limbs instead,
     /// use [`from_limbs_asc`](Self::from_limbs_asc).
     ///
+    /// The [`Vec`]'s buffer is used as is, including any excess capacity, and no copy is made. If
+    /// the [`Vec`] carries significant excess capacity — because it shared an allocation with
+    /// scratch space, for example — call [`shrink_to_fit`](Vec::shrink_to_fit) first, or the
+    /// resulting [`Natural`] will retain that capacity for as long as it lives.
+    ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
     ///
@@ -161,6 +166,10 @@ impl Natural {
     ///
     /// This function takes ownership of the limbs. If it's necessary to borrow the limbs instead,
     /// use [`from_limbs_desc`](Self::from_limbs_desc).
+    ///
+    /// The [`Vec`]'s buffer is used as is, including any excess capacity. If the [`Vec`] carries
+    /// significant excess capacity, call [`shrink_to_fit`](Vec::shrink_to_fit) first, or the
+    /// resulting [`Natural`] will retain that capacity for as long as it lives.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$

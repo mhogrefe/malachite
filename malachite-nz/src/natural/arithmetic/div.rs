@@ -703,12 +703,14 @@ pub_test! {limbs_div_barrett(
         if *scratch_2_head > 6 {
             qs.copy_from_slice(scratch_2_tail);
         } else {
-            let mut rs = vec![0; n_len];
-            let mut mul_scratch =
-                vec![0; limbs_mul_greater_to_out_scratch_len(ds.len(), scratch_2_tail.len())];
-            limbs_mul_greater_to_out(&mut rs, ds, scratch_2_tail, &mut mul_scratch);
+            let mut rs_and_mul_scratch = vec![
+                0;
+                n_len + limbs_mul_greater_to_out_scratch_len(ds.len(), scratch_2_tail.len())
+            ];
+            let (rs, mul_scratch) = rs_and_mul_scratch.split_at_mut(n_len);
+            limbs_mul_greater_to_out(rs, ds, scratch_2_tail, mul_scratch);
             if highest_q && limbs_slice_add_same_length_in_place_left(&mut rs[q_len..], ds)
-                || limbs_cmp_same_length(&rs, ns) == Greater
+                || limbs_cmp_same_length(rs, ns) == Greater
             {
                 // At most is wrong by one, no cycle.
                 if limbs_sub_limb_to_out(qs, scratch_2_tail, 1) {
@@ -1738,10 +1740,12 @@ pub_test! {limbs_div_to_out_balanced(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) 
     let (scratch_2_head, scratch_2_tail) = scratch_2.split_first().unwrap();
     qs[..q_len].copy_from_slice(scratch_2_tail);
     if *scratch_2_head <= 4 {
-        let mut rs = vec![0; n_len + 1];
-        let mut mul_scratch =
-            vec![0; limbs_mul_greater_to_out_scratch_len(ds.len(), scratch_2_tail.len())];
-        limbs_mul_greater_to_out(&mut rs, ds, scratch_2_tail, &mut mul_scratch);
+        let mut rs_and_mul_scratch = vec![
+            0;
+            n_len + 1 + limbs_mul_greater_to_out_scratch_len(ds.len(), scratch_2_tail.len())
+        ];
+        let (rs, mul_scratch) = rs_and_mul_scratch.split_at_mut(n_len + 1);
+        limbs_mul_greater_to_out(rs, ds, scratch_2_tail, mul_scratch);
         let r_len = if rs[n_len] == 0 { n_len } else { n_len + 1 };
         if r_len > n_len || limbs_cmp_same_length(ns, &rs[..n_len]) == Less {
             assert!(!limbs_sub_limb_in_place(qs, 1));

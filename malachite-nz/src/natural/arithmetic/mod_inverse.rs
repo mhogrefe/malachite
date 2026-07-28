@@ -13,6 +13,9 @@ use crate::natural::arithmetic::sub::limbs_sub_same_length_in_place_right;
 use malachite_base::num::arithmetic::traits::ModInverse;
 use malachite_base::num::basic::traits::One;
 
+// The two buffers stay separate allocations: both end up as owned `Natural`s, and merging them
+// would force one to be copied out of the parent.
+#[cfg_attr(dylint_lib = "malachite_lints", allow(adjacent_vec_allocations))]
 fn mod_inverse_helper(x: Natural, m: Natural) -> Option<Natural> {
     let mut xs = x.into_limbs_asc();
     let mut ys = m.to_limbs_asc();

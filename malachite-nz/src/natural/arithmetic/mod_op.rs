@@ -850,9 +850,10 @@ fn limbs_mod_unbalanced(rs: &mut [Limb], ns: &[Limb], ds: &[Limb], adjusted_n_le
         }
     } else {
         let scratch_len = limbs_div_mod_barrett_scratch_len(n_len, d_len);
-        let mut qs = vec![0; n_len - d_len];
-        let mut scratch = vec![0; scratch_len];
-        limbs_mod_barrett(&mut qs, rs, ns_shifted, ds_shifted, &mut scratch);
+        // The quotient is discarded, so both buffers are scratch and can share one allocation.
+        let mut qs_and_scratch = vec![0; n_len - d_len + scratch_len];
+        let (qs, scratch) = qs_and_scratch.split_at_mut(n_len - d_len);
+        limbs_mod_barrett(qs, rs, ns_shifted, ds_shifted, scratch);
         if bits != 0 {
             limbs_slice_shr_in_place(rs, bits);
         }
