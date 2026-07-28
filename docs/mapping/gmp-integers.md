@@ -1,17 +1,21 @@
 ---
 layout: default
-title: "Malachite for GMP Users"
-permalink: /gmp-mapping/
+title: "Malachite for GMP Users: Integers"
+permalink: /mapping/gmp-integers/
+redirect_from: /gmp-mapping/
 theme: jekyll-theme-slate
 ---
 
-# Malachite for GMP Users
+# Malachite for GMP Users: Integers
 
 This page maps the functions of [GMP](https://gmplib.org/manual/) onto their Malachite
 counterparts, section by section, following the organization of the GMP manual. It is meant to be
 read in two directions: if you are porting C code, look up the `mpz_` function you are using and
 find what to write instead; if you are wondering what Malachite is still missing, look for the
-rows marked ✗, which are the ones it is committed to filling in.
+rows marked ✗, which are the ones it is committed to filling in. This page covers the integer
+functions; a companion page, [Malachite for GMP Users: Rationals](/mapping/gmp-rationals/), maps
+the rational number functions, and the [mapping index](/mapping/) lists the pages for other
+libraries as they are written.
 
 ## Conventions {#conventions}
 
@@ -59,9 +63,8 @@ their operands and can reuse their storage. The `Assign` forms, `x.floor_sqrt_as
 equivalent, with one delegating to the other. The distinction that matters is by-reference versus
 by-value-or-assign, and only the second group has the *potential* to avoid allocation.
 
-Potential, not guarantee, and the difference is worth understanding. Whether the storage of a
-consumed operand is actually reused depends on the operation. For addition it is: adding a
-1000-bit and a 500-bit
+Potential, not guarantee: whether the storage of a consumed operand is reused depends on the
+operation. For addition it is: adding a 1000-bit and a 500-bit
 [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html) by value
 reuses the larger operand's buffer for the sum, and even when only the smaller operand is owned,
 its buffer is grown rather than abandoned. The
@@ -76,8 +79,8 @@ fits in one limb, which the by-value form performs in place.
 
 The practical rule: pass an operand by value, or use the `Assign` form, whenever you are done
 with it. It can only reduce allocation, and for operations that need no scratch space, like
-addition, subtraction, and shifts, it usually eliminates it. Just do not expect it to make large
-multiplications allocation-free.
+addition, subtraction, and shifts, it usually eliminates it. What it cannot do is make a large
+multiplication allocation-free.
 
 Everything on this page is reachable through the umbrella crate
 [`malachite`](https://docs.rs/malachite/latest/malachite/), which re-exports `Natural`, `Integer`, and

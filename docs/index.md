@@ -8,6 +8,11 @@ achieves high performance in part by using algorithms derived from [GMP](https:/
 
 The documentation for Malachite is [here](https://docs.rs/malachite/latest/malachite/), and its crate is [here](https://crates.io/crates/malachite).
 
+**Coming from GMP?** The [mapping pages](/mapping/) list every GMP function next to its Malachite
+counterpart, section by section, and mark the ones Malachite does not have yet:
+[integers](/mapping/gmp-integers/) and [rationals](/mapping/gmp-rationals/) are covered today,
+with FLINT and MPFR pages to follow.
+
 ```rust
 use malachite::num::arithmetic::traits::Factorial;
 use malachite::Natural;
@@ -49,9 +54,6 @@ specify different rounding behavior via the options parameter.
 
 Malachite is designed to work with very large numbers efficiently. See [here](/performance) for a
 performance comparison against other libraries.
-
-If you are coming from GMP, [this page](/gmp-mapping) maps GMP's functions onto their Malachite
-counterparts, and marks the ones Malachite does not have yet.
 
 Malachite uses `no_std`, unless the `random`, `test_build`, or `bin_build` features are enabled.
 
