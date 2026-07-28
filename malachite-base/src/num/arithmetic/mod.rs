@@ -950,6 +950,99 @@ pub mod extended_gcd;
 /// assert_eq!(u32::checked_subfactorial(100), None);
 /// ```
 pub mod factorial;
+/// Traits for computing Fibonacci and Lucas numbers, either alone or paired with their
+/// predecessors. Each function has a trait whose implementations panic if the result cannot be
+/// represented, and a checked trait whose implementations return `None` in that case. The traits
+/// are [`Fibonacci`](traits::Fibonacci), [`LucasNumber`](traits::LucasNumber),
+/// [`CheckedFibonacci`](traits::CheckedFibonacci), and
+/// [`CheckedLucasNumber`](traits::CheckedLucasNumber).
+///
+/// # fibonacci
+/// ```
+/// use malachite_base::num::arithmetic::traits::Fibonacci;
+///
+/// assert_eq!(u8::fibonacci(0), 0);
+/// assert_eq!(u8::fibonacci(1), 1);
+/// assert_eq!(u8::fibonacci(2), 1);
+/// assert_eq!(u8::fibonacci(3), 2);
+/// assert_eq!(u8::fibonacci(10), 55);
+/// assert_eq!(u32::fibonacci(30), 832040);
+/// ```
+///
+/// # fibonacci_pair
+/// ```
+/// use malachite_base::num::arithmetic::traits::Fibonacci;
+///
+/// assert_eq!(u8::fibonacci_pair(0), (0, 1));
+/// assert_eq!(u8::fibonacci_pair(1), (1, 0));
+/// assert_eq!(u8::fibonacci_pair(2), (1, 1));
+/// assert_eq!(u8::fibonacci_pair(10), (55, 34));
+/// assert_eq!(u32::fibonacci_pair(30), (832040, 514229));
+/// ```
+///
+/// # checked_fibonacci
+/// ```
+/// use malachite_base::num::arithmetic::traits::CheckedFibonacci;
+///
+/// assert_eq!(u8::checked_fibonacci(0), Some(0));
+/// assert_eq!(u8::checked_fibonacci(10), Some(55));
+/// assert_eq!(u8::checked_fibonacci(13), Some(233));
+/// assert_eq!(u8::checked_fibonacci(14), None);
+/// assert_eq!(u32::checked_fibonacci(100), None);
+/// ```
+///
+/// # checked_fibonacci_pair
+/// ```
+/// use malachite_base::num::arithmetic::traits::CheckedFibonacci;
+///
+/// assert_eq!(u8::checked_fibonacci_pair(0), Some((0, 1)));
+/// assert_eq!(u8::checked_fibonacci_pair(10), Some((55, 34)));
+/// assert_eq!(u8::checked_fibonacci_pair(13), Some((233, 144)));
+/// assert_eq!(u8::checked_fibonacci_pair(14), None);
+/// ```
+///
+/// # lucas_number
+/// ```
+/// use malachite_base::num::arithmetic::traits::LucasNumber;
+///
+/// assert_eq!(u8::lucas_number(0), 2);
+/// assert_eq!(u8::lucas_number(1), 1);
+/// assert_eq!(u8::lucas_number(2), 3);
+/// assert_eq!(u8::lucas_number(10), 123);
+/// assert_eq!(u32::lucas_number(30), 1860498);
+/// ```
+///
+/// # lucas_number_pair
+/// ```
+/// use malachite_base::num::arithmetic::traits::LucasNumber;
+///
+/// assert_eq!(u8::lucas_number_pair(1), (1, 2));
+/// assert_eq!(u8::lucas_number_pair(2), (3, 1));
+/// assert_eq!(u8::lucas_number_pair(10), (123, 76));
+/// assert_eq!(u32::lucas_number_pair(30), (1860498, 1149851));
+/// ```
+///
+/// # checked_lucas_number
+/// ```
+/// use malachite_base::num::arithmetic::traits::CheckedLucasNumber;
+///
+/// assert_eq!(u8::checked_lucas_number(0), Some(2));
+/// assert_eq!(u8::checked_lucas_number(10), Some(123));
+/// assert_eq!(u8::checked_lucas_number(11), Some(199));
+/// assert_eq!(u8::checked_lucas_number(12), None);
+/// assert_eq!(u32::checked_lucas_number(100), None);
+/// ```
+///
+/// # checked_lucas_number_pair
+/// ```
+/// use malachite_base::num::arithmetic::traits::CheckedLucasNumber;
+///
+/// assert_eq!(u8::checked_lucas_number_pair(0), None);
+/// assert_eq!(u8::checked_lucas_number_pair(1), Some((1, 2)));
+/// assert_eq!(u8::checked_lucas_number_pair(10), Some((123, 76)));
+/// assert_eq!(u8::checked_lucas_number_pair(12), None);
+/// ```
+pub mod fibonacci;
 /// [`Floor`](traits::Floor) and [`FloorAssign`](traits::FloorAssign), traits for computing the
 /// floor of a number.
 ///

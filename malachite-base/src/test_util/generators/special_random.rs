@@ -3054,6 +3054,39 @@ pub fn special_random_unsigned_gen_var_26<T: PrimitiveFloat>(config: &GenConfig)
     ))
 }
 
+pub fn special_random_unsigned_gen_var_27<T: PrimitiveUnsigned>(config: &GenConfig) -> It<u64> {
+    let limit = smallest_invalid_value(T::checked_fibonacci);
+    Box::new(striped_random_unsigned_range(
+        EXAMPLE_SEED,
+        0,
+        limit,
+        config.get_or("mean_stripe_n", 4),
+        config.get_or("mean_stripe_d", 1),
+    ))
+}
+
+pub fn special_random_unsigned_gen_var_28<T: PrimitiveUnsigned>(config: &GenConfig) -> It<u64> {
+    let limit = smallest_invalid_value(T::checked_lucas_number);
+    Box::new(striped_random_unsigned_range(
+        EXAMPLE_SEED,
+        0,
+        limit,
+        config.get_or("mean_stripe_n", 4),
+        config.get_or("mean_stripe_d", 1),
+    ))
+}
+
+pub fn special_random_unsigned_gen_var_29<T: PrimitiveUnsigned>(config: &GenConfig) -> It<u64> {
+    let limit = smallest_invalid_value(T::checked_lucas_number);
+    Box::new(striped_random_unsigned_range(
+        EXAMPLE_SEED,
+        1,
+        limit,
+        config.get_or("mean_stripe_n", 4),
+        config.get_or("mean_stripe_d", 1),
+    ))
+}
+
 // -- (PrimitiveUnsigned, PrimitiveSigned) --
 
 pub fn special_random_unsigned_signed_pair_gen<T: PrimitiveUnsigned, U: PrimitiveSigned>(

@@ -8,7 +8,6 @@
 
 use clippy_utils::diagnostics::span_lint_and_help;
 use clippy_utils::source::snippet;
-use rustc_hir::def::{DefKind, Res};
 use rustc_hir::{BinOpKind, Expr, ExprKind, Node};
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_session::{declare_lint, declare_lint_pass};
@@ -42,15 +41,6 @@ declare_lint! {
 
 declare_lint_pass!(UseWidthMask => [USE_WIDTH_MASK]);
 
-// Whether `e` is a path to an associated constant named `WIDTH`.
-fn is_width(cx: &LateContext<'_>, e: &Expr<'_>) -> bool {
-    let ExprKind::Path(qpath) = &e.kind else {
-        return false;
-    };
-    matches!(cx.qpath_res(qpath, e.hir_id), Res::Def(DefKind::AssocConst { .. }, did)
-        if cx.tcx.item_name(did).as_str() == "WIDTH")
-}
-
 impl<'tcx> LateLintPass<'tcx> for UseWidthMask {
     fn check_expr(&mut self, cx: &LateContext<'tcx>, expr: &'tcx Expr<'tcx>) {
         if expr.span.from_expansion() || crate::in_test_code(cx, expr.span) {
@@ -59,7 +49,7 @@ impl<'tcx> LateLintPass<'tcx> for UseWidthMask {
         let ExprKind::Binary(op, x, divisor) = expr.kind else {
             return;
         };
-        if op.node != BinOpKind::Rem || !is_width(cx, divisor) {
+        if op.node != BinOpKind::Rem || !crate::is_width_const(cx, divisor) {
             return;
         }
         // The dividend is unsigned (`WIDTH` is a `u64`), so `%` and `&` agree.

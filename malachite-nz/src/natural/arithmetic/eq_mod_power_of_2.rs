@@ -67,7 +67,10 @@ fn limbs_eq_mod_power_of_2_greater(xs: &[Limb], ys: &[Limb], pow: u64) -> bool {
     } else if i >= ys_len {
         let (xs_lo, xs_hi) = xs.split_at(ys_len);
         xs_lo == ys
-            && limbs_divisible_by_power_of_2(xs_hi, pow - Limb::WIDTH * u64::wrapping_from(ys_len))
+            && limbs_divisible_by_power_of_2(
+                xs_hi,
+                pow - (u64::wrapping_from(ys_len) << Limb::LOG_WIDTH),
+            )
     } else {
         let (xs_last, xs_init) = xs[..=i].split_last().unwrap();
         let (ys_last, ys_init) = ys[..=i].split_last().unwrap();

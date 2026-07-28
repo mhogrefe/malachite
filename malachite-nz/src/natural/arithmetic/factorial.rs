@@ -27,11 +27,11 @@ use crate::platform::{
 use alloc::vec::Vec;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    DoubleFactorial, Factorial, Gcd, Multifactorial, Parity, Pow, PowerOf2, Square, Subfactorial,
-    XMulYToZZ,
+    AddMulAssign, DoubleFactorial, Factorial, Gcd, Multifactorial, Parity, Pow, PowerOf2, Square,
+    Subfactorial, XMulYToZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::One;
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, WrappingFrom};
 #[cfg(feature = "32_bit_limbs")]
 use malachite_base::num::factorization::prime_sieve::limbs_prime_sieve_u32;
@@ -56,6 +56,74 @@ pub_test! {subfactorial_naive(n: u64) -> Natural {
     }
     f
 }}
+
+// The number of pairs a leaf of the binary-splitting recursion handles iteratively.
+const SUBFACTORIAL_SPLIT_LEAF_PAIRS: u64 = 32;
+
+// Below this, the naive iterative algorithm is faster than binary splitting. The crossover is
+// shallow - the two algorithms are within a factor of 2 of each other from about n = 512 to n =
+// 2048 - so this does not need to be precise. Measured with 64-bit limbs on Apple Silicon; both
+// paths are correct at any n, so an untuned width only costs a constant factor near the crossover.
+const SUBFACTORIAL_SPLIT_THRESHOLD: u64 = 1024;
+
+// The subfactorial satisfies !n = n * !(n - 1) + (-1) ^ n. Fusing two consecutive steps, for even
+// k,
+//
+// !(k + 1) = k * (k + 1) * !(k - 1) + k,
+//
+// so the affine map x -> k(k + 1)x + k sends !(k - 1) to !(k + 1), and both of its coefficients are
+// positive, which keeps all intermediate values `Natural`s. Applying x -> ax + b and then x -> cx +
+// d is the same as applying x -> (ca)x + (cb + d), so the maps for consecutive pairs may be
+// combined by binary splitting: a few multiplications of large, similarly-sized numbers replace the
+// naive algorithm's many multiplications of a large number by a small one.
+//
+// `subfactorial_split` returns the coefficients (a, b) of the combined map for the pairs (lo, lo +
+// 1), (lo + 2, lo + 3), ..., (hi, hi + 1), where lo and hi are even and lo <= hi.
+fn subfactorial_split(lo: u64, hi: u64) -> (Natural, Natural) {
+    let pairs = ((hi - lo) >> 1) + 1;
+    if pairs <= SUBFACTORIAL_SPLIT_LEAF_PAIRS {
+        let mut a = Natural::ONE;
+        let mut b = Natural::ZERO;
+        for i in 0..pairs {
+            let k = lo + (i << 1);
+            let m = Natural::from(u128::from(k) * u128::from(k + 1));
+            a *= &m;
+            b *= m;
+            b += Natural::from(k);
+        }
+        (a, b)
+    } else {
+        // The left range gets the extra pair when the count is odd, since its values are smaller.
+        let mid = lo + ((pairs - (pairs >> 1)) << 1);
+        let (a_lo, b_lo) = subfactorial_split(lo, mid - 2);
+        let (a_hi, mut b_hi) = subfactorial_split(mid, hi);
+        let a = &a_hi * a_lo;
+        b_hi.add_mul_assign(a_hi, b_lo);
+        (a, b_hi)
+    }
+}
+
+// Since !1 = 0, applying the combined map of the pairs (2, 3), (4, 5), ..., (n - 1, n) to it gives
+// !n = a * 0 + b = b, so the a-coefficient of the leftmost part of the range is never needed. This
+// function computes b alone, skipping the a-products along the left spine of the recursion.
+fn subfactorial_split_only_b(lo: u64, hi: u64) -> Natural {
+    let pairs = ((hi - lo) >> 1) + 1;
+    if pairs <= SUBFACTORIAL_SPLIT_LEAF_PAIRS {
+        let mut b = Natural::ZERO;
+        for i in 0..pairs {
+            let k = lo + (i << 1);
+            b *= Natural::from(u128::from(k) * u128::from(k + 1));
+            b += Natural::from(k);
+        }
+        b
+    } else {
+        let mid = lo + ((pairs - (pairs >> 1)) << 1);
+        let b_lo = subfactorial_split_only_b(lo, mid - 2);
+        let (a_hi, mut b_hi) = subfactorial_split(mid, hi);
+        b_hi.add_mul_assign(a_hi, b_lo);
+        b_hi
+    }
+}
 
 // Returns an approximation of the square root of x.
 //
@@ -364,6 +432,10 @@ limbs_odd_factorial(n: usize, double: bool) -> Vec<Limb> {
             size = usize::exact_from((count + 1) / log_n_max(Limb::exact_from(n)) + 1);
             let mut factors = vec![0; size];
             let mut out_len = out.len();
+            // The squaring scratch is reused across iterations, growing when needed. Its length is
+            // not monotonic in the operand size - it is 0 in both the basecase and FFT regimes - so
+            // it is sliced to the exact length each time.
+            let mut square_scratch: Vec<Limb> = Vec::new();
             for i in (0..s).rev() {
                 let ns = limbs_2_multiswing_odd(
                     &mut swing_and_sieve,
@@ -379,8 +451,15 @@ limbs_odd_factorial(n: usize, double: bool) -> Vec<Limb> {
                 } else {
                     size = out_len << 1;
                     square = vec![0; size];
-                    let mut square_scratch = vec![0; limbs_square_to_out_scratch_len(out_len)];
-                    limbs_square_to_out(&mut square, &out[..out_len], &mut square_scratch);
+                    let scratch_len = limbs_square_to_out_scratch_len(out_len);
+                    if square_scratch.len() < scratch_len {
+                        square_scratch.resize(scratch_len, 0);
+                    }
+                    limbs_square_to_out(
+                        &mut square,
+                        &out[..out_len],
+                        &mut square_scratch[..scratch_len],
+                    );
                     if square[size - 1] == 0 {
                         size -= 1;
                     }
@@ -705,10 +784,15 @@ impl Subfactorial for Natural {
     ///
     /// $!n = O(n!) = O(\sqrt{n}(n/e)^n)$.
     ///
-    /// # Worst-case complexity
-    /// $T(n) = O(n^2)$
+    /// The subfactorial is computed by binary splitting on the recurrence $!n = n \cdot !(n - 1) +
+    /// (-1)^n$.
     ///
-    /// $M(n) = O(n)$
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^3 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `n`.
     ///
     /// # Examples
     /// ```
@@ -727,8 +811,18 @@ impl Subfactorial for Natural {
     ///     1396429850988990237345920155783984828001486412574060553756854137069878601"
     /// );
     /// ```
-    #[inline]
     fn subfactorial(n: u64) -> Self {
-        subfactorial_naive(n)
+        if n < SUBFACTORIAL_SPLIT_THRESHOLD {
+            subfactorial_naive(n)
+        } else if n.odd() {
+            // The pairs (2, 3), (4, 5), ..., (n - 1, n) send !1 = 0 to !n.
+            subfactorial_split_only_b(2, n - 1)
+        } else {
+            // !n = n * !(n - 1) + 1, since n is even
+            let mut f = subfactorial_split_only_b(2, n - 2);
+            f *= Self::from(n);
+            f += Self::ONE;
+            f
+        }
     }
 }

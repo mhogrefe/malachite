@@ -80,6 +80,10 @@ pub mod eq_mod_power_of_2;
 /// [`Multifactorial`](malachite_base::num::arithmetic::traits::Multifactorial), and
 /// [`Subfactorial`](malachite_base::num::arithmetic::traits::Subfactorial).
 pub mod factorial;
+/// [`Fibonacci`](malachite_base::num::arithmetic::traits::Fibonacci) and
+/// [`LucasNumber`](malachite_base::num::arithmetic::traits::LucasNumber), traits for computing
+/// Fibonacci and Lucas numbers.
+pub mod fibonacci;
 #[cfg(feature = "float_helpers")]
 pub mod float_add;
 #[cfg(feature = "float_helpers")]

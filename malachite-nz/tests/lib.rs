@@ -240,6 +240,7 @@ pub mod natural {
         pub mod eq_mod_power_of_2;
         pub mod extended_gcd;
         pub mod factorial;
+        pub mod fibonacci;
         #[cfg(feature = "float_helpers")]
         pub mod float_extras;
         pub mod gcd;

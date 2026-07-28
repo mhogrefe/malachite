@@ -470,7 +470,7 @@ they only need to look at the low bits.
 0<sup>0</sup> is 1. The second function exists in GMP because its base is an `unsigned long` rather
 than an `mpz_t`; in Malachite it is the same
 [`Pow`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Pow.html) after a conversion, as described under [Conventions](#conventions).
-There is also [`PowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.PowerOf2.html) for the common case of 2<sup>n</sup>, which is
+There is also [`PowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.PowerOf2.html) for the common case of $$2^n$$, which is
 much cheaper than the general power.
 
 **`mpz_powm`, `mpz_powm_ui`.** [`ModPow`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPow.html) computes the same thing, with

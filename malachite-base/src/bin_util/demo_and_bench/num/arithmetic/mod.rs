@@ -30,6 +30,7 @@ pub(crate) fn register(runner: &mut Runner) {
     eq_mod_power_of_2::register(runner);
     extended_gcd::register(runner);
     factorial::register(runner);
+    fibonacci::register(runner);
     floor::register(runner);
     gcd::register(runner);
     is_power_of_2::register(runner);
@@ -136,6 +137,7 @@ mod eq_mod;
 mod eq_mod_power_of_2;
 mod extended_gcd;
 mod factorial;
+mod fibonacci;
 mod floor;
 mod gcd;
 mod is_power_of_2;

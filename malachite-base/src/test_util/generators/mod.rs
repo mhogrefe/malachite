@@ -1799,6 +1799,33 @@ pub fn unsigned_gen_var_31<T: PrimitiveUnsigned>() -> Generator<T> {
     )
 }
 
+// All `u64`s whose Fibonacci number is representable as a `T`.
+pub fn unsigned_gen_var_32<T: PrimitiveUnsigned>() -> Generator<u64> {
+    Generator::new(
+        &exhaustive_unsigned_gen_var_30::<T>,
+        &random_unsigned_gen_var_32::<T>,
+        &special_random_unsigned_gen_var_27::<T>,
+    )
+}
+
+// All `u64`s whose Lucas number is representable as a `T`.
+pub fn unsigned_gen_var_33<T: PrimitiveUnsigned>() -> Generator<u64> {
+    Generator::new(
+        &exhaustive_unsigned_gen_var_31::<T>,
+        &random_unsigned_gen_var_33::<T>,
+        &special_random_unsigned_gen_var_28::<T>,
+    )
+}
+
+// All nonzero `u64`s whose Lucas number is representable as a `T`.
+pub fn unsigned_gen_var_34<T: PrimitiveUnsigned>() -> Generator<u64> {
+    Generator::new(
+        &exhaustive_unsigned_gen_var_32::<T>,
+        &random_unsigned_gen_var_34::<T>,
+        &special_random_unsigned_gen_var_29::<T>,
+    )
+}
+
 // -- (PrimitiveUnsigned, PrimitiveSigned) --
 
 pub fn unsigned_signed_pair_gen<T: PrimitiveUnsigned, U: PrimitiveSigned>() -> Generator<(T, U)> {

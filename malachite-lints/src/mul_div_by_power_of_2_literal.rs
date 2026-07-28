@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use clippy_utils::diagnostics::span_lint;
+use clippy_utils::source::snippet;
 use rustc_hir::{BinOpKind, Expr, ExprKind};
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_session::{declare_lint, declare_lint_pass};
@@ -15,7 +16,9 @@ declare_lint! {
     /// ### What it does
     ///
     /// Flags multiplying or dividing a primitive integer by a power-of-two literal (`x * 8`, `x /
-    /// 16`, and the `*=`/`/=` forms), where a shift says the same thing.
+    /// 16`, and the `*=`/`/=` forms), where a shift says the same thing. Also flags multiplying or
+    /// dividing by a type's bit width, `x * T::WIDTH` or `x / T::WIDTH`, where the shift amount is
+    /// `T::LOG_WIDTH`.
     ///
     /// This is the primitive-integer companion of `mul_div_by_power_of_2`, which covers the bignum
     /// `x * T::power_of_2(k)` spelling.
@@ -37,6 +40,7 @@ declare_lint! {
     /// ```rust,ignore
     /// let y = x * 8;
     /// let z = x / 16;
+    /// let w = x / Limb::WIDTH;
     /// ```
     ///
     /// Use instead:
@@ -44,19 +48,31 @@ declare_lint! {
     /// ```rust,ignore
     /// let y = x << 3;
     /// let z = x >> 4;
+    /// let w = x >> Limb::LOG_WIDTH;
     /// ```
     pub MUL_DIV_BY_POWER_OF_2_LITERAL,
     Deny,
-    "multiplying or dividing a primitive integer by a power-of-two literal instead of shifting"
+    "multiplying or dividing a primitive integer by a power-of-two literal or by `T::WIDTH` instead of shifting"
 }
 
 declare_lint_pass!(MulDivByPowerOf2Literal => [MUL_DIV_BY_POWER_OF_2_LITERAL]);
 
-// If `e` is a power-of-two integer literal that is at least 2, returns its base-2 exponent (the
-// shift amount). 1 is excluded: shifting by 0 is no clearer than the identity it already is.
-fn power_of_2_literal(e: &Expr<'_>) -> Option<u32> {
-    let v = crate::literal_value(e)?;
-    (v >= 2 && v & (v - 1) == 0).then(|| v.trailing_zeros())
+// A recognized power-of-two operand: a literal, or a path to a `WIDTH` associated constant.
+enum PowerOf2 {
+    // the literal's value and its base-2 exponent (the shift amount)
+    Literal(i128, u32),
+    Width,
+}
+
+// If `e` is a power-of-two integer literal that is at least 2, or a `T::WIDTH` constant (whose
+// value is always a power of two, with `T::LOG_WIDTH` as the shift amount), classifies it. A
+// literal 1 is excluded: shifting by 0 is no clearer than the identity it already is.
+fn power_of_2_operand(cx: &LateContext<'_>, e: &Expr<'_>) -> Option<PowerOf2> {
+    if let Some(v) = crate::literal_value(e) {
+        (v >= 2 && v & (v - 1) == 0).then(|| PowerOf2::Literal(v, v.trailing_zeros()))
+    } else {
+        crate::is_width_const(cx, e).then_some(PowerOf2::Width)
+    }
 }
 
 impl<'tcx> LateLintPass<'tcx> for MulDivByPowerOf2Literal {
@@ -84,16 +100,23 @@ impl<'tcx> LateLintPass<'tcx> for MulDivByPowerOf2Literal {
                 _ => return,
             };
         for (power, value) in candidates.into_iter().flatten() {
-            let Some(k) = power_of_2_literal(power) else {
+            let Some(p) = power_of_2_operand(cx, power) else {
                 continue;
             };
             // Only primitive integers; bignums go through `mul_div_by_power_of_2`. And a literal
-            // times/over a literal is a compile-time constant, not a runtime shift.
+            // times/over a literal or a `WIDTH` is a compile-time constant, not a runtime shift.
             let value_ty = cx.typeck_results().expr_ty(value);
             if !value_ty.is_integral() || crate::literal_value(value).is_some() {
                 continue;
             }
-            let v = crate::literal_value(power).unwrap();
+            // The shift amount as it should appear in the advice, and the operand as written.
+            let (k, described) = match p {
+                PowerOf2::Literal(v, k) => (k.to_string(), format!("`{v}`")),
+                PowerOf2::Width => {
+                    let w = snippet(cx, power.span, "..");
+                    (w.replace("WIDTH", "LOG_WIDTH"), format!("`{w}`"))
+                }
+            };
             let advice = match (mul, assign, value_ty.is_signed()) {
                 (true, false, _) => format!("use `<< {k}`"),
                 (true, true, _) => format!("use `<<= {k}`"),
@@ -113,7 +136,7 @@ impl<'tcx> LateLintPass<'tcx> for MulDivByPowerOf2Literal {
                 cx,
                 MUL_DIV_BY_POWER_OF_2_LITERAL,
                 expr.span,
-                format!("{advice} instead of {verb} by `{v}`"),
+                format!("{advice} instead of {verb} by {described}"),
             );
             return;
         }

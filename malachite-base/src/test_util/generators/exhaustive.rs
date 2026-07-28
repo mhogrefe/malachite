@@ -1947,6 +1947,21 @@ pub fn exhaustive_unsigned_gen_var_29<T: PrimitiveFloat>() -> It<u64> {
     ))
 }
 
+pub fn exhaustive_unsigned_gen_var_30<T: PrimitiveUnsigned>() -> It<u64> {
+    let limit = smallest_invalid_value(T::checked_fibonacci);
+    Box::new(primitive_int_increasing_range(0, limit))
+}
+
+pub fn exhaustive_unsigned_gen_var_31<T: PrimitiveUnsigned>() -> It<u64> {
+    let limit = smallest_invalid_value(T::checked_lucas_number);
+    Box::new(primitive_int_increasing_range(0, limit))
+}
+
+pub fn exhaustive_unsigned_gen_var_32<T: PrimitiveUnsigned>() -> It<u64> {
+    let limit = smallest_invalid_value(T::checked_lucas_number);
+    Box::new(primitive_int_increasing_range(1, limit))
+}
+
 // -- (PrimitiveUnsigned, PrimitiveInt) --
 
 pub fn exhaustive_unsigned_primitive_int_gen_var_1<T: PrimitiveUnsigned, U: PrimitiveInt>()

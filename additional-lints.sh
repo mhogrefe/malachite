@@ -3,6 +3,11 @@
 # lints are deny-by-default, so any hit fails the run. Lint configuration, including the
 # long-lines exception list, lives in dylint.toml.
 set -e
+# `set -e` already makes any lint hit fail the run, but when the output is piped or logged the
+# caller sees the pipe's exit code, not this script's. Print an unambiguous textual verdict so a
+# masked exit code cannot be mistaken for success. (An ERR trap would not fire for a failing
+# subshell under bash 3.2, so check the status in an EXIT trap instead.)
+trap 'code=$?; if [ "$code" -ne 0 ]; then echo "LINT SWEEP FAILED (exit $code)" >&2; fi' EXIT
 cd "$(dirname "$0")"
 # Files that no chain of `mod` declarations reaches are invisible to the compiler, and therefore
 # to every rustc-based lint; catch them with a filesystem-level scan first.
@@ -33,3 +38,4 @@ done
 # The criterion-bench bench targets require features that `build.sh` never enables, so, like
 # `build.sh`, only check the default target.
 (cd malachite-criterion-bench && echo "Linting malachite-criterion-bench" && cargo dylint --all)
+echo "All lints passed"

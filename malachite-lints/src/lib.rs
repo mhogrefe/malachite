@@ -205,6 +205,17 @@ fn assign_variant(
     None
 }
 
+// Whether `e` is a path to an associated constant named `WIDTH`.
+fn is_width_const(cx: &rustc_lint::LateContext<'_>, e: &rustc_hir::Expr<'_>) -> bool {
+    use rustc_hir::ExprKind;
+    use rustc_hir::def::{DefKind, Res};
+    let ExprKind::Path(qpath) = &e.kind else {
+        return false;
+    };
+    matches!(cx.qpath_res(qpath, e.hir_id), Res::Def(DefKind::AssocConst { .. }, did)
+        if cx.tcx.item_name(did).as_str() == "WIDTH")
+}
+
 // The value of an integer literal, negated literal included.
 fn literal_value(e: &rustc_hir::Expr<'_>) -> Option<i128> {
     use rustc_ast::LitKind;

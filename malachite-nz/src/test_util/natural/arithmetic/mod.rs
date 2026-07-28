@@ -16,6 +16,7 @@ pub mod divisible_by;
 pub mod eq_mod;
 pub mod extended_gcd;
 pub mod factorial;
+pub mod fibonacci;
 pub mod gcd;
 pub mod kronecker_symbol;
 pub mod log_base;

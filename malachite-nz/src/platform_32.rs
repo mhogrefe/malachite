@@ -416,6 +416,27 @@ pub(crate) const BASES: [(usize, Limb, Limb, Limb, Limb); 257] = [
     (4, 0x1fffffff, 0xffffffff, 0x8, 0x0),                // 256
 ];
 
+// This section is created by fibonacci_data.rs.
+
+// This is equivalent to `__gmp_fib_table` in `mpn/fib_table.c`, GMP 6.3.0. `FIB_TABLE[i]` is F(i -
+// 1), so the table begins with F(-1) = 1 and F(0) = 0.
+pub(crate) const FIB_TABLE: [Limb; 49] = [
+    1, 0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181, 6765,
+    10946, 17711, 28657, 46368, 75025, 121393, 196418, 317811, 514229, 832040, 1346269, 2178309,
+    3524578, 5702887, 9227465, 14930352, 24157817, 39088169, 63245986, 102334155, 165580141,
+    267914296, 433494437, 701408733, 1134903170, 1836311903, 2971215073,
+];
+
+// The largest n whose F(n) fits in one limb.
+//
+// This is equivalent to `FIB_TABLE_LIMIT` in `fib_table.h`, GMP 6.3.0.
+pub(crate) const FIB_TABLE_LIMIT: u64 = 47;
+
+// The largest n whose L(n) = F(n) + 2 * F(n - 1) fits in one limb.
+//
+// This is equivalent to `FIB_TABLE_LUCNUM_LIMIT` in `fib_table.h`, GMP 6.3.0.
+pub(crate) const FIB_TABLE_LUCNUM_LIMIT: u64 = 46;
+
 // This section is created by factorial_data.rs.
 
 // This is equivalent to `__gmp_oddfac_table` in `mpn/comb_tables.c`, GMP 6.2.1, which is the

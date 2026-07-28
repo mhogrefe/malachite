@@ -2160,6 +2160,13 @@ fn test_subfactorial() {
         "34332795984163804765195977526776142032365783805375784983543400282685180793327632432791396\
         429850988990237345920155783984828001486412574060553756854137069878601",
     );
+    // Sweeps across the binary-splitting threshold at 1024, covering both parities on both sides of
+    // it, plus a pair of larger values well into the binary-splitting range.
+    for n in (0..=64).chain(990..=1060) {
+        assert_eq!(Natural::subfactorial(n), subfactorial_naive(n));
+    }
+    assert_eq!(Natural::subfactorial(3000), subfactorial_naive(3000));
+    assert_eq!(Natural::subfactorial(3001), subfactorial_naive(3001));
 }
 
 #[test]

@@ -8,3 +8,4 @@
 
 pub mod digits_data;
 pub mod factorial_data;
+pub mod fibonacci_data;

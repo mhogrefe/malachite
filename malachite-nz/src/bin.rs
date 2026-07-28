@@ -77,6 +77,8 @@ use crate::bin_util::generate::digits_data::generate_string_data;
 #[cfg(feature = "bin_build")]
 use crate::bin_util::generate::factorial_data::generate_factorial_data;
 #[cfg(feature = "bin_build")]
+use crate::bin_util::generate::fibonacci_data::generate_fibonacci_data;
+#[cfg(feature = "bin_build")]
 use malachite_base::test_util::runner::Runner;
 #[cfg(feature = "bin_build")]
 use malachite_base::test_util::runner::cmd::read_command_line_arguments;
@@ -112,6 +114,7 @@ fn main() {
         match codegen_key.as_str() {
             "digits_data" => generate_string_data(),
             "factorial_data" => generate_factorial_data(),
+            "fibonacci_data" => generate_fibonacci_data(),
             key => {
                 if let Some(tune_key) = key.strip_prefix("tune_") {
                     crate::bin_util::tune::tune(tune_key);

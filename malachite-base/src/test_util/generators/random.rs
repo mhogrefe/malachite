@@ -3153,6 +3153,21 @@ pub fn random_unsigned_gen_var_31<T: PrimitiveUnsigned>(config: &GenConfig) -> I
     ))
 }
 
+pub fn random_unsigned_gen_var_32<T: PrimitiveUnsigned>(_config: &GenConfig) -> It<u64> {
+    let limit = smallest_invalid_value(T::checked_fibonacci);
+    Box::new(random_unsigned_range(EXAMPLE_SEED, 0, limit))
+}
+
+pub fn random_unsigned_gen_var_33<T: PrimitiveUnsigned>(_config: &GenConfig) -> It<u64> {
+    let limit = smallest_invalid_value(T::checked_lucas_number);
+    Box::new(random_unsigned_range(EXAMPLE_SEED, 0, limit))
+}
+
+pub fn random_unsigned_gen_var_34<T: PrimitiveUnsigned>(_config: &GenConfig) -> It<u64> {
+    let limit = smallest_invalid_value(T::checked_lucas_number);
+    Box::new(random_unsigned_range(EXAMPLE_SEED, 1, limit))
+}
+
 pub fn random_unsigned_gen_var_26<T: PrimitiveUnsigned>(_config: &GenConfig) -> It<u64> {
     let limit = smallest_invalid_value(T::checked_primorial);
     Box::new(random_unsigned_range(EXAMPLE_SEED, 0, limit))

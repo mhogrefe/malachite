@@ -18,7 +18,7 @@ use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::{unsigned_gen_var_5, unsigned_pair_gen_var_18};
 use malachite_base::test_util::runner::Runner;
 use malachite_nz::natural::Natural;
-use malachite_nz::natural::arithmetic::factorial::limbs_odd_factorial;
+use malachite_nz::natural::arithmetic::factorial::{limbs_odd_factorial, subfactorial_naive};
 use malachite_nz::test_util::generators::unsigned_bool_pair_gen_var_1;
 use malachite_nz::test_util::natural::arithmetic::factorial::{
     double_factorial_naive, factorial_naive, multifactorial_naive,
@@ -39,7 +39,7 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_double_factorial_library_comparison);
     register_bench!(runner, benchmark_multifactorial_algorithms);
     register_bench!(runner, benchmark_multifactorial_library_comparison);
-    register_bench!(runner, benchmark_subfactorial);
+    register_bench!(runner, benchmark_subfactorial_algorithms);
 }
 
 fn demo_limbs_odd_factorial(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -233,15 +233,23 @@ fn benchmark_multifactorial_library_comparison(
     );
 }
 
-fn benchmark_subfactorial(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
+fn benchmark_subfactorial_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
     run_benchmark(
         "Natural.subfactorial(u64)",
-        BenchmarkType::Single,
+        BenchmarkType::Algorithms,
         unsigned_gen_var_5().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &unsigned_direct_bucketer(),
-        &mut [("Malachite", &mut |n| no_out!(Natural::subfactorial(n)))],
+        &mut [
+            ("default", &mut |n| no_out!(Natural::subfactorial(n))),
+            ("naive", &mut |n| no_out!(subfactorial_naive(n))),
+        ],
     );
 }

@@ -420,6 +420,22 @@ pub trait CheckedSubfactorial: Sized {
     fn checked_subfactorial(n: u64) -> Option<Self>;
 }
 
+/// Computes the $n$th Fibonacci number, either alone or paired with its predecessor:
+/// `fibonacci_pair(n)` returns $(F(n), F(n-1))$.
+pub trait Fibonacci: Sized {
+    fn fibonacci(n: u64) -> Self;
+
+    fn fibonacci_pair(n: u64) -> (Self, Self);
+}
+
+/// Computes the $n$th Fibonacci number, either alone or paired with its predecessor, returning
+/// `None` if the result is too large to be represented.
+pub trait CheckedFibonacci: Sized {
+    fn checked_fibonacci(n: u64) -> Option<Self>;
+
+    fn checked_fibonacci_pair(n: u64) -> Option<(Self, Self)>;
+}
+
 /// Takes the floor of a number.
 pub trait Floor {
     type Output;
@@ -717,6 +733,22 @@ pub trait LogBase<B = Self> {
 /// Replaces a number with its base-$b$ logarithm, rounding the (generally irrational) result.
 pub trait LogBaseAssign<B = Self> {
     fn log_base_assign(&mut self, base: B);
+}
+
+/// Computes the $n$th Lucas number, either alone or paired with its predecessor:
+/// `lucas_number_pair(n)` returns $(L(n), L(n-1))$.
+pub trait LucasNumber: Sized {
+    fn lucas_number(n: u64) -> Self;
+
+    fn lucas_number_pair(n: u64) -> (Self, Self);
+}
+
+/// Computes the $n$th Lucas number, either alone or paired with its predecessor, returning `None`
+/// if the result is too large to be represented.
+pub trait CheckedLucasNumber: Sized {
+    fn checked_lucas_number(n: u64) -> Option<Self>;
+
+    fn checked_lucas_number_pair(n: u64) -> Option<(Self, Self)>;
 }
 
 /// Adds two numbers modulo a third number $m$. The inputs must be already reduced modulo $m$.
