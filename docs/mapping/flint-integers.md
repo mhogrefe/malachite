@@ -319,7 +319,8 @@ rounding direction, the ternary result that FLINT's `void` wrapper discards. For
 then convert the word-sized result back down. The `nmod_t` argument is more than a modulus: it
 carries a precomputed inverse so that repeated reductions avoid division. Malachite has no
 public precomputed-modulus context; that machinery reappears throughout FLINT's `fmpz_mod`
-chapter, and the trade will be taken up properly when that chapter is mapped.
+chapter, and the trade is taken up properly on
+[its page](/mapping/flint-integers-mod-n/#conventions).
 
 **`fmpz_get_str`, `fmpz_set_str`.** The same pair of gaps as GMP's string functions, with the
 same shape: `to_string_base` and `from_string_base` cover bases 2 through 36, FLINT reaches 62,
@@ -557,7 +558,8 @@ accumulate in one step without a temporary, exactly as FLINT's do; the three-ope
 spelling `&a * &b + &c * &d` computes the right value but allocates both products and the sum
 separately, where FLINT's fused versions manage their scratch space once; like `fmpz_cmp2abs`
 above, these earn their keep in inner loops, rational arithmetic being the motivating case,
-since a sum of fractions has an `ad + bc` numerator.
+since a sum of fractions has an `ad + bc` numerator, the shape behind
+[`fmpq_addmul`](/mapping/flint-rationals/#arithmetic) on the rationals page.
 
 ### Division with rounding
 
@@ -680,7 +682,8 @@ is —, since whenever such a type exists, releasing it is what
 [`Drop`](https://doc.rust-lang.org/nightly/std/ops/trait.Drop.html) does. This is the second
 appearance of FLINT's precomputed-modulus pattern, after `fmpz_get_nmod`
 [under Conversion](#conversion), and the right shape for a public version is a question for the
-`fmpz_mod` chapter, which is built around exactly such contexts and will be mapped next.
+`fmpz_mod` chapter, which is built around exactly such contexts; see
+[its page](/mapping/flint-integers-mod-n/#conventions).
 
 ### Powers and logarithms
 
@@ -865,7 +868,9 @@ remainders fall below a bound: a building block, used by FLINT's binary quadrati
 for algorithms such as Cornacchia's that need only the middle of the remainder sequence.
 Malachite has half-GCD machinery internally but no public partial GCD, so this is a gap; it
 belongs to the same family of algorithm-component exports as the Lucas chains under
-[Primality testing](#primality-testing) below.
+[Primality testing](#primality-testing) below. It is also the engine of
+[rational reconstruction](/mapping/flint-rationals/#modular-reduction-and-rational-reconstruction),
+a gap on the rationals page; the two are one work item.
 
 ## [Modular arithmetic](https://flintlib.org/doc/fmpz.html#modular-arithmetic) {#modular-arithmetic}
 
@@ -992,8 +997,9 @@ Malachite does not have it yet. The facility is residue recombination: `fmpz_CRT
 case, with `fmpz_comb_t` structures that precompute a tree of products so that reducing one
 integer modulo many primes, or reassembling it from many residues, costs less than doing each
 modulus separately. It is the largest instance of the precomputed-context pattern this page has
-met as `nmod_t` and `fmpz_preinvn_t`, and the design of such contexts belongs to the `fmpz_mod`
-chapter, to be mapped next. Until the facility exists, every row here would read ✗ for the same
+met as `nmod_t` and `fmpz_preinvn_t`, and the design of such contexts belongs to
+[the `fmpz_mod` page](/mapping/flint-integers-mod-n/#conventions). Until the facility exists,
+every row here would read ✗ for the same
 reason, which is no more informative than this paragraph; the two-congruence case composes
 today from mapped pieces, through
 [`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModInverse.html)

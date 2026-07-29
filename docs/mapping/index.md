@@ -31,9 +31,14 @@ MPFR, so the float mapping belongs with MPFR.
 - [Integers](/mapping/flint-integers/): the `fmpz_t` type, mapped onto
   [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html) and
   [`Integer`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html).
+- [Integers mod n](/mapping/flint-integers-mod-n/): the `fmpz_mod.h` module, mapped onto the
+  `Mod*` traits over
+  [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html)
+  residues.
+- [Rationals](/mapping/flint-rationals/): the `fmpq_t` type, mapped onto
+  [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html).
 
-FLINT is much larger than GMP, and its pages will arrive module by module; `fmpz_mod`, modular
-arithmetic with precomputed contexts, is next.
+FLINT is much larger than GMP, and its pages will arrive module by module.
 
 ## Planned
 
