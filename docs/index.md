@@ -8,13 +8,13 @@ achieves high performance in part by using algorithms derived from [GMP](https:/
 
 The documentation for Malachite is [here](https://docs.rs/malachite/latest/malachite/), and its crate is [here](https://crates.io/crates/malachite).
 
-**Coming from GMP or FLINT?** The [mapping pages](/mapping/) list each library's functions next
+**Coming from another arithmetic library?** The [mapping pages](/mapping/) list each library's functions next
 to their Malachite counterparts, section by section, and mark the ones Malachite does not have
 yet: GMP's [integers](/mapping/gmp-integers/) and [rationals](/mapping/gmp-rationals/),
 FLINT's [integers](/mapping/flint-integers/),
 [integers mod n](/mapping/flint-integers-mod-n/), and [rationals](/mapping/flint-rationals/),
-and MPFR's [floats](/mapping/mpfr-floats/) are covered today, with more FLINT modules to
-follow.
+MPFR's [floats](/mapping/mpfr-floats/), and num's [integers](/mapping/num-integers/) are
+covered today, with more FLINT and num pages to follow.
 
 ```rust
 use malachite::num::arithmetic::traits::Factorial;
