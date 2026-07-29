@@ -24,7 +24,8 @@ the rows marked ✗, which are the ones it is committed to filling in.
 GMP's floating-point type, `mpf_t`, will not get a page of its own. GMP's manual steers new
 projects toward [MPFR](https://www.mpfr.org/), and Malachite's
 [`Float`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html) follows
-MPFR, so the float mapping belongs with MPFR.
+MPFR, so the float mapping belongs with
+[the MPFR page](/mapping/mpfr-floats/#compatibility-with-mpf).
 
 ## [FLINT](https://flintlib.org/)
 
@@ -40,7 +41,7 @@ MPFR, so the float mapping belongs with MPFR.
 
 FLINT is much larger than GMP, and its pages will arrive module by module.
 
-## Planned
+## [MPFR](https://www.mpfr.org/)
 
-An MPFR page will cover
-[`Float`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html).
+- [Floats](/mapping/mpfr-floats/): the `mpfr_t` type, mapped onto
+  [`Float`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html).

@@ -10,10 +10,11 @@ The documentation for Malachite is [here](https://docs.rs/malachite/latest/malac
 
 **Coming from GMP or FLINT?** The [mapping pages](/mapping/) list each library's functions next
 to their Malachite counterparts, section by section, and mark the ones Malachite does not have
-yet: GMP's [integers](/mapping/gmp-integers/) and [rationals](/mapping/gmp-rationals/) and
+yet: GMP's [integers](/mapping/gmp-integers/) and [rationals](/mapping/gmp-rationals/),
 FLINT's [integers](/mapping/flint-integers/),
-[integers mod n](/mapping/flint-integers-mod-n/), and [rationals](/mapping/flint-rationals/)
-are covered today, with more FLINT modules and MPFR to follow.
+[integers mod n](/mapping/flint-integers-mod-n/), and [rationals](/mapping/flint-rationals/),
+and MPFR's [floats](/mapping/mpfr-floats/) are covered today, with more FLINT modules to
+follow.
 
 ```rust
 use malachite::num::arithmetic::traits::Factorial;

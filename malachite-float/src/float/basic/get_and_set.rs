@@ -263,6 +263,10 @@ impl Float {
     /// Returns an [`Ordering`], indicating whether the final value is less than, greater than, or
     /// equal to the original value.
     ///
+    /// Unlike the similarly-named MPFR function `mpfr_set_prec`, which discards the value of its
+    /// argument, this function preserves the value, rounding it if necessary; it corresponds to
+    /// MPFR's `mpfr_prec_round`.
+    ///
     /// If the [`Float`] originally had the maximum exponent, it is possible for this function to
     /// overflow. This is even possible if `rm` is `Nearest`, even though infinity is never nearer
     /// to the exact result than any finite [`Float`] is. This is to match the behavior of MPFR.
@@ -360,6 +364,10 @@ impl Float {
     /// is. This is to match the behavior of MPFR.
     ///
     /// This function never underflows.
+    ///
+    /// Unlike the similarly-named MPFR function `mpfr_set_prec`, which discards the value of its
+    /// argument, this function preserves the value, rounding it if necessary; it corresponds to
+    /// MPFR's `mpfr_prec_round`.
     ///
     /// To use a different rounding mode, try [`Float::set_prec_round`].
     ///
