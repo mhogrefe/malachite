@@ -26,7 +26,16 @@ projects toward [MPFR](https://www.mpfr.org/), and Malachite's
 [`Float`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html) follows
 MPFR, so the float mapping belongs with MPFR.
 
+## [FLINT](https://flintlib.org/)
+
+- [Integers](/mapping/flint-integers/): the `fmpz_t` type, mapped onto
+  [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html) and
+  [`Integer`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html).
+
+FLINT is much larger than GMP, and its pages will arrive module by module; `fmpz_mod`, modular
+arithmetic with precomputed contexts, is next.
+
 ## Planned
 
-A [FLINT](https://flintlib.org/) page is next, and an MPFR page will cover
+An MPFR page will cover
 [`Float`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html).
