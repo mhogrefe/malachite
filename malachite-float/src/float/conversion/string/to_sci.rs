@@ -7,8 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 // `get_str`-based scientific-string conversion, driven by `ToSciOptions`: the engine behind
-// `Float`'s `Display` and power-of-2-base formatting traits (to_string.rs), and eventually behind a
-// `ToSci` implementation.
+// `Float`'s `Display` and power-of-2-base formatting traits (to_string.rs) and its `ToSci`
+// implementation.
 //
 // The semantics mirror `Rational::fmt_sci` (malachite-q's to_sci.rs) — the same size options,
 // negative-exponent threshold, trailing-zero handling, and digit rounding — with one addition,
@@ -24,11 +24,13 @@ use alloc::string::String;
 use alloc::vec;
 use alloc::vec::Vec;
 use core::cmp::Ordering::*;
-use core::fmt::Write;
-use malachite_base::num::arithmetic::traits::{Abs, DivRound, Pow};
+use core::fmt::{Formatter, Write};
+use malachite_base::num::arithmetic::traits::{Abs, DivRound, DivisibleBy, Pow};
 use malachite_base::num::conversion::string::options::{SciSizeOptions, ToSciOptions};
-use malachite_base::num::conversion::traits::{ExactFrom, IntegerMantissaAndExponent};
+use malachite_base::num::conversion::traits::{ExactFrom, IntegerMantissaAndExponent, ToSci};
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::*;
+use malachite_nz::natural::Natural;
 use malachite_q::Rational;
 
 // The number of base-`base` digits after the point in the exact expansion of the finite nonzero
@@ -95,9 +97,9 @@ fn zero_to_string(neg: bool, options: ToSciOptions) -> String {
 
 pub_crate_test! {
 // Determines whether `x` can be converted to a string using `to_sci_string` and a particular set of
-// options; this is the future `ToSci::fmt_sci_valid`. Mirrors `Rational::fmt_sci_valid`: with the
-// `Complete` size option the expansion must terminate, and with the `Exact` rounding mode the value
-// must be representable in the digits the size options allow.
+// options; this is the engine of `ToSci::fmt_sci_valid`. Mirrors `Rational::fmt_sci_valid`: with
+// the `Complete` size option the expansion must terminate, and with the `Exact` rounding mode the
+// value must be representable in the digits the size options allow.
 to_sci_valid(x: &Float, options: ToSciOptions) -> bool {
     if !matches!(x, Float(Finite { .. })) {
         // NaN, infinities, and zeros have fixed representations
@@ -118,7 +120,32 @@ to_sci_valid(x: &Float, options: ToSciOptions) -> bool {
     match options.get_size_options() {
         SciSizeOptions::Scale(scale) => min_scale <= i64::exact_from(scale),
         SciSizeOptions::Precision(precision) => {
-            min_scale <= i64::exact_from(precision - 1) - floor_log_base(x, base)
+            let s = i64::exact_from(precision - 1) - floor_log_base(x, base);
+            if s >= 0 {
+                min_scale <= s
+            } else {
+                // The last digit sits at position -s > 0, so the value must be divisible by
+                // base^(-s): 2^(-s * v) must divide via the binary exponent, and the base's odd
+                // part to the -s must divide the odd mantissa. (`min_scale` cannot see this: it
+                // measures digits after the point, and gives no credit for trailing zeros before
+                // it.)
+                let t = s.unsigned_abs();
+                let v = i64::from(base.trailing_zeros());
+                if x.integer_exponent() < i64::exact_from(t) * v {
+                    return false;
+                }
+                let odd_base = base >> v;
+                if odd_base == 1 {
+                    return true;
+                }
+                let mantissa = x.integer_mantissa();
+                // odd_base >= 3, so odd_base^t > 2^t > mantissa: not divisible. This also keeps the
+                // power below from being enormous.
+                if t >= mantissa.significant_bits() {
+                    return false;
+                }
+                mantissa.divisible_by(Natural::from(u64::exact_from(odd_base)).pow(t))
+            }
         }
         SciSizeOptions::Complete => unreachable!(),
     }
@@ -126,11 +153,11 @@ to_sci_valid(x: &Float, options: ToSciOptions) -> bool {
 
 pub_crate_test! {
 // Converts a `Float` to a string using a specified base, possibly using scientific notation; this
-// is the engine behind `Display` and the power-of-2-base formatting traits (and eventually
-// `ToSci`). See `ToSciOptions` for details on the available options. The `Float` `Display`
-// conventions apply on top of them: NaN and the infinities are rendered as `NaN`, `Infinity`, and
-// `-Infinity`, and the output for any finite value (including zeros) always contains a point, `.0`
-// being appended if necessary.
+// is the engine behind `Display`, the power-of-2-base formatting traits, and `ToSci`. See
+// `ToSciOptions` for details on the available options. The `Float` `Display` conventions apply on
+// top of them: NaN and the infinities are rendered as `NaN`, `Infinity`, and `-Infinity`, and the
+// output for any finite value (including zeros) always contains a point, `.0` being appended if
+// necessary.
 //
 // The digits are computed by `get_str`, which rounds the value directly, so this function never
 // materializes the `Float` as a `Rational` (except in one corner case: deciding a `Nearest` tie
@@ -283,3 +310,148 @@ to_sci_string(x: &Float, options: ToSciOptions) -> String {
     }
     out
 }}
+
+impl ToSci for Float {
+    /// Determines whether a [`Float`] can be converted to a string using
+    /// [`to_sci`](malachite_base::num::conversion::traits::ToSci::to_sci) and a particular set of
+    /// options.
+    ///
+    /// NaN, the infinities, and zeros have fixed representations and are always convertible. A
+    /// finite nonzero [`Float`] is convertible unless the options request more digits than the
+    /// value has: if the size option is `Complete`, the value's expansion in the chosen base must
+    /// terminate (any [`Float`] is a dyadic rational, so this holds whenever the value is an
+    /// integer or the base is even), and if the rounding mode is `Exact`, the value must be exactly
+    /// representable in the digits the size options allow.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::NaN;
+    /// use malachite_base::num::conversion::string::options::ToSciOptions;
+    /// use malachite_base::num::conversion::traits::ToSci;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    ///
+    /// let mut options = ToSciOptions::default();
+    /// assert!(Float::NAN.fmt_sci_valid(options));
+    /// // 1.5 has 2 significant bits
+    /// assert!(Float::from(1.5).fmt_sci_valid(options));
+    /// options.set_rounding_mode(Exact);
+    /// options.set_precision(1);
+    /// assert!(!Float::from(1.5).fmt_sci_valid(options));
+    /// options.set_precision(2);
+    /// assert!(Float::from(1.5).fmt_sci_valid(options));
+    ///
+    /// let mut options = ToSciOptions::default();
+    /// options.set_size_complete();
+    /// // 0.5 is non-terminating in base 3...
+    /// options.set_base(3);
+    /// assert!(!Float::from(0.5).fmt_sci_valid(options));
+    /// // ...but is terminating in base 32
+    /// options.set_base(32);
+    /// assert!(Float::from(0.5).fmt_sci_valid(options));
+    /// ```
+    #[inline]
+    fn fmt_sci_valid(&self, options: ToSciOptions) -> bool {
+        to_sci_valid(self, options)
+    }
+
+    /// Converts a [`Float`] to a string using a specified base, possibly formatting the number
+    /// using scientific notation.
+    ///
+    /// See [`ToSciOptions`] for details on the available options. The [`Float`] `Display`
+    /// conventions apply on top of them: NaN and the infinities are rendered as `NaN`, `Infinity`,
+    /// and `-Infinity`, and the output for any finite value (including zeros) always contains a
+    /// point, `.0` being appended if necessary. Note that the digits are those of the value's
+    /// actual expansion, rounded to the requested size; unlike `Display`, which shows the shortest
+    /// string that rounds back to the value, no round-trip shortening occurs.
+    ///
+    /// The digits are computed by rounding the value directly, so the [`Float`] is never
+    /// materialized as a [`Rational`].
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(), s)`,
+    /// where `s` depends on the size type specified in `options`.
+    /// - If `options` has `scale` specified, then `s` is `options.scale`.
+    /// - If `options` has `precision` specified, then `s` is `options.precision`.
+    /// - If `options` has `size_complete` specified, then `s` is
+    ///   `self.get_exponent().unwrap().unsigned_abs()`. This reflects the fact that setting
+    ///   `size_complete` might result in a very long string when the value's magnitude is very
+    ///   large or very small.
+    ///
+    /// # Panics
+    /// Panics if `options.rounding_mode` is `Exact`, but the size options are such that the input
+    /// must be rounded, or if the size option is `Complete` but `self` has a non-terminating
+    /// expansion in the chosen base (a fractional value in an odd base).
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::PowerOf2;
+    /// use malachite_base::num::basic::traits::NaN;
+    /// use malachite_base::num::conversion::string::options::ToSciOptions;
+    /// use malachite_base::num::conversion::traits::ToSci;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    ///
+    /// assert_eq!(Float::NAN.to_sci().to_string(), "NaN");
+    /// // a finite value always shows a point
+    /// assert_eq!(Float::from(255.0).to_sci().to_string(), "255.0");
+    ///
+    /// let x = Float::from(1234.5);
+    /// let mut options = ToSciOptions::default();
+    /// assert_eq!(x.to_sci_with_options(options).to_string(), "1234.5");
+    /// options.set_precision(4);
+    /// assert_eq!(x.to_sci_with_options(options).to_string(), "1234.0");
+    /// options.set_precision(2);
+    /// assert_eq!(x.to_sci_with_options(options).to_string(), "1.2e3");
+    ///
+    /// let x = Float::from(1.5);
+    /// let mut options = ToSciOptions::default();
+    /// options.set_scale(0);
+    /// assert_eq!(x.to_sci_with_options(options).to_string(), "2.0");
+    /// options.set_rounding_mode(Down);
+    /// assert_eq!(x.to_sci_with_options(options).to_string(), "1.0");
+    ///
+    /// let mut options = ToSciOptions::default();
+    /// options.set_base(20);
+    /// assert_eq!(x.to_sci_with_options(options).to_string(), "1.a");
+    /// options.set_uppercase();
+    /// assert_eq!(x.to_sci_with_options(options).to_string(), "1.A");
+    ///
+    /// // in bases 15 and up, a positive exponent always gets an explicit sign, to distinguish
+    /// // the exponent indicator from the digit 'e'
+    /// let mut options = ToSciOptions::default();
+    /// options.set_base(16);
+    /// options.set_precision(2);
+    /// assert_eq!(
+    ///     Float::from(1000000.0).to_sci_with_options(options).to_string(),
+    ///     "f.4e+4"
+    /// );
+    ///
+    /// // 2^-17, a 1-bit value, printed with its actual digits
+    /// let x = Float::power_of_2(-17i64);
+    /// let mut options = ToSciOptions::default();
+    /// assert_eq!(x.to_sci_with_options(options).to_string(), "7.62939453125e-6");
+    /// options.set_e_uppercase();
+    /// assert_eq!(x.to_sci_with_options(options).to_string(), "7.62939453125E-6");
+    /// options.set_neg_exp_threshold(-10);
+    /// assert_eq!(
+    ///     x.to_sci_with_options(options).to_string(),
+    ///     "0.00000762939453125"
+    /// );
+    /// ```
+    #[inline]
+    fn fmt_sci(&self, f: &mut Formatter, options: ToSciOptions) -> core::fmt::Result {
+        f.write_str(&to_sci_string(self, options))
+    }
+}

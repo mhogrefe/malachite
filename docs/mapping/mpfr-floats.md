@@ -362,7 +362,7 @@ panic where the caller asked for something the value cannot do. The notes call o
 | ≈ | `int mpfr_get_z (mpz_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`RoundingFrom`](https://docs.rs/malachite-float/latest/malachite_float/float/conversion/integer_from_float/index.html), [`TryFrom`](https://docs.rs/malachite-float/latest/malachite_float/float/conversion/integer_from_float/index.html) |
 | ✓ | `void mpfr_get_q (mpq_t rop, mpfr_t op)` | [`TryFrom`](https://docs.rs/malachite-float/latest/malachite_float/float/conversion/rational_from_float/index.html) |
 | — | `int mpfr_get_f (mpf_t rop, mpfr_t op, mpfr_rnd_t rnd)` | |
-| ✗ | `size_t mpfr_get_str_ndigits (int b, mpfr_prec_t p)` | |
+| ✓ | `size_t mpfr_get_str_ndigits (int b, mpfr_prec_t p)` | [`get_str_digit_count`](https://docs.rs/malachite-float/latest/malachite_float/float/conversion/string/get_str/fn.get_str_digit_count.html) |
 | ✓ | `char * mpfr_get_str (char *str, mpfr_exp_t *expptr, int base, size_t n, mpfr_t op, mpfr_rnd_t rnd)` | [`get_str`](https://docs.rs/malachite-float/latest/malachite_float/float/conversion/string/get_str/fn.get_str.html) |
 | — | `void mpfr_free_str (char *str)` | |
 | ≈ | `int mpfr_fits_ulong_p (mpfr_t op, mpfr_rnd_t rnd)` | [`ConvertibleFrom`](https://docs.rs/malachite-float/latest/malachite_float/float/conversion/primitive_int_from_float/index.html) |
@@ -429,8 +429,9 @@ even in odd bases; and `n = 0` requesting the round-trip digit count. It returns
 `Option<(Vec<u8>, i64, Ordering)>`, `None` standing in for the null-pointer return on an
 invalid base, and the ternary value coming along where MPFR only sets the inexact flag.
 `mpfr_get_str_ndigits`, the round-trip digit count
-$$m = 1 + \lceil p \log 2 / \log b \rceil$$ itself, is implemented inside Malachite's `get_str`
-but not yet exposed on its own, so its row is a gap. `mpfr_free_str` is the usual absence of
+$$m = 1 + \lceil p \log 2 / \log b \rceil$$ itself, is
+[`get_str_digit_count`](https://docs.rs/malachite-float/latest/malachite_float/float/conversion/string/get_str/fn.get_str_digit_count.html),
+with the abbreviation spelled out. `mpfr_free_str` is the usual absence of
 manual deallocation.
 
 **The `fits` family.** The eight C types collapse into the generic

@@ -7,20 +7,20 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::cmp::Ordering::{self, Equal, Greater, Less};
-use malachite_base::num::arithmetic::traits::{Abs, Pow};
+use malachite_base::num::arithmetic::traits::{Abs, CheckedLogBase2, DivRound, Pow, PowerOf2};
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::conversion::traits::{ExactFrom, IntegerMantissaAndExponent};
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
-use malachite_float::Float;
-use malachite_float::float::conversion::string::get_str::get_str;
+use malachite_float::float::conversion::string::get_str::{get_str, get_str_digit_count};
 use malachite_float::test_util::common::{parse_hex_string, rug_round_try_from_rounding_mode};
 use malachite_float::test_util::generators::{
     float_signed_unsigned_rounding_mode_quadruple_gen_var_9,
     float_signed_unsigned_rounding_mode_quadruple_gen_var_10,
     float_signed_unsigned_rounding_mode_quadruple_gen_var_15,
-    float_signed_unsigned_rounding_mode_quadruple_gen_var_16,
+    float_signed_unsigned_rounding_mode_quadruple_gen_var_16, unsigned_pair_gen_var_51,
 };
+use malachite_float::{ComparableFloatRef, Float};
 use malachite_nz::natural::Natural;
 use malachite_q::Rational;
 use std::panic::catch_unwind;
@@ -723,6 +723,85 @@ fn test_get_str_exact_panics() {
     // m == 0 picks the round-trip digit count, which is generally too few for an exact base-10
     // representation, so even round-trip mode panics under `Exact`.
     assert_panic!(get_str(&parse_hex_string("0x1.921fb6#24"), 10, 0, Exact));
+}
+
+#[test]
+fn test_get_str_digit_count() {
+    fn test(base: u64, prec: u64, out: usize) {
+        assert_eq!(get_str_digit_count(base, prec), out);
+    }
+    // 17 significant decimal digits distinguish every double-precision (53-bit) value, and 9
+    // suffice for single precision (24 bits)
+    test(10, 53, 17);
+    test(10, 24, 9);
+    test(10, 1, 2);
+    // power-of-2 bases: 1 + ceil((prec - 1) / k)
+    test(2, 1, 1);
+    test(2, 10, 10);
+    test(2, 53, 53);
+    test(16, 1, 1);
+    test(16, 53, 14);
+    test(32, 100, 21);
+    // an odd base, and the largest base
+    test(3, 2, 3);
+    test(62, 100, 18);
+}
+
+#[test]
+fn get_str_digit_count_fail() {
+    assert_panic!(get_str_digit_count(0, 10));
+    assert_panic!(get_str_digit_count(1, 10));
+    assert_panic!(get_str_digit_count(63, 10));
+    assert_panic!(get_str_digit_count(10, 0));
+}
+
+#[test]
+fn get_str_digit_count_properties() {
+    unsigned_pair_gen_var_51().test_properties(|(base, prec)| {
+        let m = u64::exact_from(get_str_digit_count(base, prec));
+        if let Some(k) = base.checked_log_base_2() {
+            // for a power-of-2 base, the count is 1 + ceil((prec - 1) / k)
+            assert_eq!(m, 1 + (prec - 1).div_round(k, Ceiling).0);
+        } else if prec <= 1_000_000 {
+            // Otherwise, m - 1 = ceil(prec * log(2) / log(base)), the smallest e with base ^ e >= 2
+            // ^ prec; m >= 2, since the ceiling is positive.
+            let b = Natural::from(base);
+            let p2 = Natural::power_of_2(prec);
+            assert!((&b).pow(m - 1) >= p2);
+            assert!((&b).pow(m - 2) < p2);
+        }
+    });
+    // The defining round-trip property: printing any Float to get_str_digit_count(base, prec)
+    // digits with rounding to nearest, then rounding the digits' value back to prec bits, again to
+    // nearest, recovers the Float exactly. The check reconstructs the digits' value as an exact
+    // Rational, so it is gated to moderate exponents.
+    float_signed_unsigned_rounding_mode_quadruple_gen_var_9().test_properties(|(x, b0, _, _)| {
+        let Some(prec) = x.get_prec() else {
+            return;
+        };
+        if x.get_exponent().unwrap().unsigned_abs() > 10_000 {
+            return;
+        }
+        let b = b0.unsigned_abs();
+        let m = get_str_digit_count(b, prec);
+        let (digits, exp, _) = get_str(&x, i64::exact_from(b), m, Nearest).unwrap();
+        let neg = digits[0] == b'-';
+        let digit_bytes = &digits[usize::from(neg)..];
+        let mut d = Natural::ZERO;
+        for &c in digit_bytes {
+            d = d * Natural::from(b) + Natural::from(digit_value(c, b > 36));
+        }
+        let mut v = Rational::from(d) * Rational::from(b).pow(exp - i64::exact_from(m));
+        if neg {
+            v = -v;
+        }
+        let x_back = Float::from_rational_prec_round(v, prec, Nearest).0;
+        assert_eq!(
+            ComparableFloatRef(&x_back),
+            ComparableFloatRef(&x),
+            "{x} base {b} m {m}"
+        );
+    });
 }
 
 #[test]

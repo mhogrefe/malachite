@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::Finite;
-use crate::float::conversion::string::get_str::get_str_ndigits;
+use crate::float::conversion::string::get_str::get_str_digit_count;
 use crate::float::conversion::string::to_sci::to_sci_string;
 use crate::{ComparableFloat, ComparableFloatRef, Float};
 use core::fmt::{Binary, Debug, Display, Formatter, LowerHex, Octal, Result, UpperHex, Write};
@@ -127,7 +127,7 @@ impl Display for Float {
     fn fmt(&self, f: &mut Formatter) -> Result {
         let mut options = ToSciOptions::default();
         if let Self(Finite { precision, .. }) = self {
-            options.set_precision(u64::exact_from(get_str_ndigits(10, *precision)));
+            options.set_precision(u64::exact_from(get_str_digit_count(10, *precision)));
             options.set_include_trailing_zeros(true);
         }
         f.write_str(&to_sci_string(self, options))

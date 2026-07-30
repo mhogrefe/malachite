@@ -8488,6 +8488,34 @@ pub fn special_random_float_rounding_mode_pair_gen_var_41(
 
 // -- (Float, ToSciOptions) --
 
+pub fn special_random_float_to_sci_options_pair_gen(
+    config: &GenConfig,
+) -> It<(Float, ToSciOptions)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_floats(
+                seed,
+                config.get_or("mean_exponent_n", 64),
+                config.get_or("mean_exponent_d", 1),
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_precision_n", 64),
+                config.get_or("mean_precision_d", 1),
+                config.get_or("mean_zero_p_n", 1),
+                config.get_or("mean_zero_p_d", 64),
+            )
+        },
+        &|seed| {
+            random_to_sci_options(
+                seed,
+                config.get_or("small_mean_n", 4),
+                config.get_or("small_mean_d", 1),
+            )
+        },
+    ))
+}
+
 pub fn special_random_float_to_sci_options_pair_gen_var_1(
     config: &GenConfig,
 ) -> It<(Float, ToSciOptions)> {
@@ -8802,6 +8830,22 @@ pub fn special_random_signed_unsigned_rounding_mode_triple_gen_var_5(
                     .contains(&i32::saturating_from(pow).saturating_add(1))
         }),
     )
+}
+
+// -- (PrimitiveUnsigned, PrimitiveUnsigned) --
+
+pub fn special_random_unsigned_pair_gen_var_51(config: &GenConfig) -> It<(u64, u64)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| random_unsigned_inclusive_range(seed, 2, 62),
+        &|seed| {
+            geometric_random_positive_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
 }
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, RoundingMode) --

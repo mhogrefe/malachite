@@ -11,7 +11,7 @@ use malachite_base::num::basic::traits::One;
 use malachite_base::strings::{ToDebugString, string_is_subset};
 use malachite_float::ComparableFloatRef;
 use malachite_float::Float;
-use malachite_float::float::conversion::string::get_str::get_str_ndigits;
+use malachite_float::float::conversion::string::get_str::get_str_digit_count;
 use malachite_float::test_util::common::parse_hex_string;
 use malachite_float::test_util::generators::{
     float_gen, float_gen_var_6, float_gen_var_7, float_gen_var_8, float_gen_var_9,
@@ -75,7 +75,7 @@ fn test_to_string_high_precision() {
     let s = x.to_string();
     // 2^99999 + 1 has 30103 decimal digits, and is shown with one more significant digit
     assert!(s.starts_with("499501046507192253972016382165016795490214"));
-    assert_eq!(significant_digit_count(&s), get_str_ndigits(10, P));
+    assert_eq!(significant_digit_count(&s), get_str_digit_count(10, P));
 }
 
 #[test]
@@ -100,7 +100,7 @@ fn to_string_properties() {
                 // for the genuinely four-digit prec-8 value 255).
                 if let Some(precision) = x.get_prec() {
                     let count = significant_digit_count(&s);
-                    let expected = get_str_ndigits(10, precision);
+                    let expected = get_str_digit_count(10, precision);
                     assert!(
                         count == expected || s.ends_with(".0") && count == expected + 1,
                         "{s:?}"

@@ -53,7 +53,7 @@
 
 use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use crate::float::conversion::string::get_str::{ceil_mul, get_str, get_str_ndigits};
+use crate::float::conversion::string::get_str::{ceil_mul, get_str, get_str_digit_count};
 use alloc::format;
 use alloc::string::String;
 use alloc::vec;
@@ -899,7 +899,7 @@ fn partition_number(p: &Float, mut spec: PrintfSpec) -> Option<(NumberParts, i64
                 spec.prec = match spec.spec {
                     // Malachite zeros are precision-less (unlike MPFR, which sizes this from the
                     // zero's stored precision), so use precision 1.
-                    b'e' | b'E' => i64::exact_from(get_str_ndigits(10, 1)) - 1,
+                    b'e' | b'E' => i64::exact_from(get_str_digit_count(10, 1)) - 1,
                     b'f' | b'F' | b'g' | b'G' => DEFAULT_DECIMAL_PREC,
                     _ => spec.prec,
                 };

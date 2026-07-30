@@ -48,40 +48,67 @@ pub_crate_test! {ceil_mul(e: i64, beta: u64, i: usize) -> i64 {
     i64::rounding_from(&t, Ceiling).0
 }}
 
-pub_crate_test! {
-// Returns at least `1 + ceil(bit_len * log(2) / log(base))` digits, where `bit_len` is the number
-// of bits of the mantissa, ensuring that converting the output back gives the same `Float`.
-//
-// `base` must be between 2 and 62, inclusive.
-//
-// This is `mpfr_get_str_ndigits` from `get_str.c`, MPFR 4.2.2.
-get_str_ndigits(base: u64, bit_len: u64) -> usize {
+/// Returns the number of significant digits that suffice to losslessly represent any [`Float`] of
+/// precision `prec` in base `base`: printing such a [`Float`] to this many digits with rounding to
+/// nearest (for example with [`get_str`]), then reading the digits back at precision `prec`, again
+/// rounding to nearest, recovers the original value exactly.
+///
+/// The count is $1 + \lceil p \log 2 / \log b \rceil$, except that for a power-of-2 base $b = 2^k$
+/// it is $1 + \lceil (p - 1) / k \rceil$.
+///
+/// This function depends only on the precision, not on any particular [`Float`] value. It is the
+/// digit count [`get_str`] uses when its `digit_len` argument is 0, and the number of significant
+/// digits `Display` shows for a [`Float`] of precision `prec`.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Panics
+/// Panics if `base` is less than 2 or greater than 62, or if `prec` is 0.
+///
+/// # Examples
+/// ```
+/// use malachite_float::float::conversion::string::get_str::get_str_digit_count;
+///
+/// // 17 significant decimal digits distinguish every double-precision (53-bit) value...
+/// assert_eq!(get_str_digit_count(10, 53), 17);
+/// // ...and 9 suffice for single precision (24 bits)
+/// assert_eq!(get_str_digit_count(10, 24), 9);
+/// // in base 16, 14 digits: 1 + ceil(52 / 4)
+/// assert_eq!(get_str_digit_count(16, 53), 14);
+/// // in base 2 the digits are just the bits
+/// assert_eq!(get_str_digit_count(2, 53), 53);
+/// ```
+///
+/// This is `mpfr_get_str_ndigits` from `get_str.c`, MPFR 4.2.2.
+pub fn get_str_digit_count(base: u64, prec: u64) -> usize {
     assert!((2..=62).contains(&base));
+    assert_ne!(prec, 0);
     // Deal first with power-of-two bases, since even for those, `ceil_mul` might return a value too
-    // large by 1. For `base = 2 ^ k`, this is `1 + ceil((bit_len - 1) / k) = 2 + floor((bit_len -
-    // 2) / k)`.
+    // large by 1. For `base = 2 ^ k`, this is `1 + ceil((prec - 1) / k) = 2 + floor((prec - 2) /
+    // k)`.
     if let Some(k) = base.checked_log_base_2() {
-        return usize::exact_from(1 + (bit_len + k - 2) / k);
+        return usize::exact_from(1 + (prec + k - 2) / k);
     }
-    // `ceil_mul` is guaranteed to give `1 + ceil(bit_len * log(2) / log(base))` for `bit_len` below
-    // this bound (for `bit_len = 186564318007` and `base = 7` or `49` it returns one more).
-    let ret = if bit_len < 186_564_318_007 {
-        u64::exact_from(ceil_mul(i64::exact_from(bit_len), base, 1))
+    // `ceil_mul` is guaranteed to give `1 + ceil(prec * log(2) / log(base))` for `prec` below this
+    // bound (for `prec = 186564318007` and `base = 7` or `49` it returns one more).
+    let ret = if prec < 186_564_318_007 {
+        u64::exact_from(ceil_mul(i64::exact_from(prec), base, 1))
     } else {
-        // `bit_len` is large and `base` is not a power of two, so `bit_len * log(2) / log(base)`
-        // cannot be an integer and Ziv's loop terminates. `w` is the working precision; `ceil_mul`
-        // used a 77-bit upper approximation to `log(2) / log(base)`. Reaching here needs a mantissa
-        // of at least ~1.86e11 bits, far beyond any `Float` the test suite builds.
-        fail_on_untested_path("get_str_ndigits, Ziv loop for huge bit_len");
+        // `prec` is large and `base` is not a power of two, so `prec * log(2) / log(base)` cannot
+        // be an integer and Ziv's loop terminates. `w` is the working precision; `ceil_mul` used a
+        // 77-bit upper approximation to `log(2) / log(base)`. Reaching here needs a mantissa of at
+        // least ~1.86e11 bits, far beyond any `Float` the test suite builds.
+        fail_on_untested_path("get_str_digit_count, Ziv loop for huge prec");
         let mut w = 77;
         loop {
             w <<= 1;
             // lower (rounding down) and upper (rounding up) approximations to `log2(base)`
             let (log_lo, log_hi) =
                 floor_and_ceiling(Float::from_unsigned_prec(base, w).0.log_base_2_round(Floor));
-            // lower (`bit_len / log_hi`, rounding down) and upper (`bit_len / log_lo`, rounding up)
-            // bounds on `bit_len * log(2) / log(base)`, each rounded up to an integer
-            let pf = Float::from_unsigned_prec(bit_len, w).0;
+            // lower (`prec / log_hi`, rounding down) and upper (`prec / log_lo`, rounding up)
+            // bounds on `prec * log(2) / log(base)`, each rounded up to an integer
+            let pf = Float::from_unsigned_prec(prec, w).0;
             let lo = u64::rounding_from(&pf.div_round_ref_val(log_hi, Floor).0, Ceiling).0;
             let hi = u64::rounding_from(&pf.div_round(log_lo, Ceiling).0, Ceiling).0;
             if lo == hi {
@@ -90,7 +117,7 @@ get_str_ndigits(base: u64, bit_len: u64) -> usize {
         }
     };
     usize::exact_from(1 + ret)
-}}
+}
 
 /// Converts a [`Float`] to base-`base` mantissa digits and an exponent, rounding to `digit_len`
 /// digits with the rounding mode `rm`.
@@ -195,7 +222,7 @@ pub fn get_str(
         }
         Zero { sign } => {
             // Malachite's zero carries no precision, so the digit_len == 0 default
-            // (get_str_ndigits) does not apply; use a single digit.
+            // (get_str_digit_count) does not apply; use a single digit.
             (
                 !*sign,
                 vec![b'0'; if digit_len == 0 { 1 } else { digit_len }],
@@ -210,7 +237,7 @@ pub fn get_str(
             significand,
         } => {
             let m = if digit_len == 0 {
-                get_str_ndigits(b, *precision)
+                get_str_digit_count(b, *precision)
             } else {
                 digit_len
             };

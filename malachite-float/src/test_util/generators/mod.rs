@@ -4005,6 +4005,14 @@ pub fn float_rounding_mode_pair_gen_var_40_rm()
 
 // -- (Float, ToSciOptions) --
 
+pub fn float_to_sci_options_pair_gen() -> Generator<(Float, ToSciOptions)> {
+    Generator::new(
+        &exhaustive_float_to_sci_options_pair_gen,
+        &random_float_to_sci_options_pair_gen,
+        &special_random_float_to_sci_options_pair_gen,
+    )
+}
+
 // All `(Float, ToSciOptions)` pairs where the `Float` can be formatted using the options and the
 // resulting string has a manageable length.
 pub fn float_to_sci_options_pair_gen_var_1() -> Generator<(Float, ToSciOptions)> {
@@ -4149,6 +4157,20 @@ pub fn signed_unsigned_rounding_mode_triple_gen_var_6() -> Generator<(i64, u64, 
         &exhaustive_signed_unsigned_rounding_mode_triple_gen_var_5,
         &random_signed_unsigned_rounding_mode_triple_gen_var_4,
         &special_random_signed_unsigned_rounding_mode_triple_gen_var_5,
+    )
+}
+
+// -- (PrimitiveUnsigned, PrimitiveUnsigned) --
+
+// vars 1 through 50 are in malachite-base and malachite-nz.
+
+// All `(base, prec)` pairs with `base` in `[2, 62]` and `prec` positive: the inputs of
+// `get_str_digit_count`.
+pub fn unsigned_pair_gen_var_51() -> Generator<(u64, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_pair_gen_var_51,
+        &random_unsigned_pair_gen_var_51,
+        &special_random_unsigned_pair_gen_var_51,
     )
 }
 

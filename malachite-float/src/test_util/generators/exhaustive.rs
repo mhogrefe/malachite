@@ -4579,6 +4579,13 @@ pub(crate) fn float_to_sci_options_valid(x: &Float, options: ToSciOptions) -> bo
     }
 }
 
+pub fn exhaustive_float_to_sci_options_pair_gen() -> It<(Float, ToSciOptions)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_floats(),
+        exhaustive_to_sci_options(),
+    ))
+}
+
 pub fn exhaustive_float_to_sci_options_pair_gen_var_1() -> It<(Float, ToSciOptions)> {
     Box::new(
         exhaustive_pairs(exhaustive_floats(), exhaustive_to_sci_options())
@@ -4735,6 +4742,17 @@ pub fn exhaustive_signed_unsigned_rounding_mode_triple_gen_var_5() -> It<(i64, u
                 || (Float::MIN_EXPONENT..=Float::MAX_EXPONENT)
                     .contains(&i32::saturating_from(pow).saturating_add(1))
         }),
+    ))
+}
+
+// -- (PrimitiveUnsigned, PrimitiveUnsigned) --
+
+// All `(base, prec)` pairs with `base` in `[2, 62]` and `prec` positive: the inputs of
+// `get_str_digit_count`.
+pub fn exhaustive_unsigned_pair_gen_var_51() -> It<(u64, u64)> {
+    Box::new(exhaustive_pairs(
+        primitive_int_increasing_inclusive_range::<u64>(2, 62),
+        exhaustive_positive_primitive_ints::<u64>(),
     ))
 }
 

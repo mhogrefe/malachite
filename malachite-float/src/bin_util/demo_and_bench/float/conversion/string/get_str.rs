@@ -8,22 +8,48 @@
 
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode;
-use malachite_base::test_util::bench::bucketers::Bucketer;
+use malachite_base::test_util::bench::bucketers::{Bucketer, pair_2_bucketer};
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
 use malachite_float::ComparableFloatRef;
 use malachite_float::Float;
-use malachite_float::float::conversion::string::get_str::get_str;
+use malachite_float::float::conversion::string::get_str::{get_str, get_str_digit_count};
 use malachite_float::test_util::generators::{
     float_signed_unsigned_rounding_mode_quadruple_gen_var_9,
-    float_signed_unsigned_rounding_mode_quadruple_gen_var_10_rm,
+    float_signed_unsigned_rounding_mode_quadruple_gen_var_10_rm, unsigned_pair_gen_var_51,
 };
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_get_str);
+    register_demo!(runner, demo_get_str_digit_count);
     register_bench!(runner, benchmark_get_str);
     register_bench!(runner, benchmark_get_str_library_comparison);
+    register_bench!(runner, benchmark_get_str_digit_count);
+}
+
+fn demo_get_str_digit_count(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (base, prec) in unsigned_pair_gen_var_51().get(gm, config).take(limit) {
+        println!(
+            "get_str_digit_count({base}, {prec}) = {}",
+            get_str_digit_count(base, prec)
+        );
+    }
+}
+
+fn benchmark_get_str_digit_count(gm: GenMode, config: &GenConfig, limit: usize, file_name: &str) {
+    run_benchmark(
+        "get_str_digit_count(u64, u64)",
+        BenchmarkType::Single,
+        unsigned_pair_gen_var_51().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_2_bucketer("prec"),
+        &mut [("Malachite", &mut |(base, prec)| {
+            no_out!(get_str_digit_count(base, prec));
+        })],
+    );
 }
 
 fn demo_get_str(gm: GenMode, config: &GenConfig, limit: usize) {

@@ -13,7 +13,8 @@ use malachite_float::Float;
 use malachite_float::float::conversion::string::to_sci::{to_sci_string, to_sci_valid};
 use malachite_float::test_util::common::parse_hex_string;
 use malachite_float::test_util::generators::{
-    float_to_sci_options_pair_gen_var_1, float_to_sci_options_pair_gen_var_2,
+    float_gen, float_to_sci_options_pair_gen, float_to_sci_options_pair_gen_var_1,
+    float_to_sci_options_pair_gen_var_2,
 };
 use malachite_q::Rational;
 use std::panic::catch_unwind;
@@ -49,6 +50,8 @@ fn test_to_sci_string() {
         let mut options = ToSciOptions::default();
         configure(&mut options);
         assert_eq!(to_sci_string(&x, options), out, "{s} {options:?}");
+        // the `ToSci` implementation goes through the same engine
+        assert_eq!(x.to_sci_with_options(options).to_string(), out);
     }
     let default = &|_: &mut ToSciOptions| {};
 
@@ -376,6 +379,17 @@ fn test_to_sci_string() {
         },
         "0.5",
     );
+    // trailing zeros before the point count toward an Exact precision: 233472 is exactly 0x39000
+    test(
+        "2.33e5",
+        "0x3.9E+4#6",
+        &|o| {
+            o.set_base(16);
+            o.set_precision(2);
+            o.set_rounding_mode(Exact);
+        },
+        "3.9e+4",
+    );
 }
 
 #[test]
@@ -401,6 +415,13 @@ fn test_to_sci_string_panics() {
         options.set_size_complete();
         to_sci_string(&Float::from(0.5), options)
     });
+    // the `ToSci` implementation panics under the same conditions
+    assert_panic!({
+        let mut options = ToSciOptions::default();
+        options.set_precision(1);
+        options.set_rounding_mode(Exact);
+        Float::from(1.5).to_sci_with_options(options).to_string()
+    });
 }
 
 #[test]
@@ -411,6 +432,8 @@ fn test_to_sci_valid() {
         let mut options = ToSciOptions::default();
         configure(&mut options);
         assert_eq!(to_sci_valid(&x, options), out, "{s} {options:?}");
+        // the `ToSci` implementation goes through the same engine
+        assert_eq!(x.fmt_sci_valid(options), out);
     }
     let default = &|_: &mut ToSciOptions| {};
 
@@ -517,6 +540,50 @@ fn test_to_sci_valid() {
         },
         false,
     );
+    // Exact with a precision gives credit for trailing zeros before the point: 233472 is 0x39000,
+    // two significant hex digits
+    test(
+        "2.33e5",
+        "0x3.9E+4#6",
+        &|o| {
+            o.set_base(16);
+            o.set_precision(2);
+            o.set_rounding_mode(Exact);
+        },
+        true,
+    );
+    test(
+        "2.33e5",
+        "0x3.9E+4#6",
+        &|o| {
+            o.set_base(16);
+            o.set_precision(1);
+            o.set_rounding_mode(Exact);
+        },
+        false,
+    );
+    // ...including trailing zeros in an odd base: 21 is "10" in base 21, one significant digit, but
+    // 22 is "11"
+    test(
+        "21.0",
+        "0x15.0#5",
+        &|o| {
+            o.set_base(21);
+            o.set_precision(1);
+            o.set_rounding_mode(Exact);
+        },
+        true,
+    );
+    test(
+        "22.0",
+        "0x16.0#4",
+        &|o| {
+            o.set_base(21);
+            o.set_precision(1);
+            o.set_rounding_mode(Exact);
+        },
+        false,
+    );
     test(
         "1.5",
         "0x1.8#2",
@@ -535,6 +602,9 @@ fn to_sci_string_properties() {
         let s = to_sci_string(x, options);
         assert!(s.is_ascii());
         assert!(to_sci_valid(x, options));
+        // the `ToSci` implementation goes through the same engine
+        assert_eq!(x.to_sci_with_options(options).to_string(), s);
+        assert!(x.fmt_sci_valid(options));
         if x.is_nan() {
             assert_eq!(s, "NaN");
         } else {
@@ -568,4 +638,38 @@ fn to_sci_string_properties() {
     // digit-count-bounded sizing for them, and the `Rational` cross-check in `check` skips them, so
     // what this adds is the structural checks over the widest exponents.
     float_to_sci_options_pair_gen_var_2().test_properties(|(x, options)| check(&x, options));
+}
+
+#[test]
+fn to_sci_properties() {
+    float_gen().test_properties(|x| {
+        // the default options can format any Float
+        assert!(x.fmt_sci_valid(ToSciOptions::default()));
+        assert_eq!(
+            x.to_sci().to_string(),
+            to_sci_string(&x, ToSciOptions::default())
+        );
+    });
+}
+
+#[test]
+fn fmt_sci_valid_properties() {
+    fn check(x: &Float, options: ToSciOptions) {
+        let valid = x.fmt_sci_valid(options);
+        assert_eq!(to_sci_valid(x, options), valid);
+        // Cross-check against Rational::fmt_sci_valid, whose semantics these mirror. The comparison
+        // is gated to moderate exponents (`Rational::exact_from` of a Float with an extreme
+        // exponent is enormous).
+        if let Some(exponent) = x.get_exponent()
+            && exponent.unsigned_abs() <= 10_000
+        {
+            assert_eq!(
+                Rational::exact_from(x).fmt_sci_valid(options),
+                valid,
+                "{x} {options:?}"
+            );
+        }
+    }
+    // this generator, unlike the ones above, includes invalid pairs
+    float_to_sci_options_pair_gen().test_properties(|(x, options)| check(&x, options));
 }
