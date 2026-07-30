@@ -13,8 +13,9 @@ to their Malachite counterparts, section by section, and mark the ones Malachite
 yet: GMP's [integers](/mapping/gmp-integers/) and [rationals](/mapping/gmp-rationals/),
 FLINT's [integers](/mapping/flint-integers/),
 [integers mod n](/mapping/flint-integers-mod-n/), and [rationals](/mapping/flint-rationals/),
-MPFR's [floats](/mapping/mpfr-floats/), and num's [integers](/mapping/num-integers/) are
-covered today, with more FLINT and num pages to follow.
+MPFR's [floats](/mapping/mpfr-floats/), and num's [integers](/mapping/num-integers/),
+[rationals](/mapping/num-rationals/), and [traits](/mapping/num-traits/) are covered today,
+with more FLINT pages to follow.
 
 ```rust
 use malachite::num::arithmetic::traits::Factorial;

@@ -51,6 +51,10 @@ FLINT is much larger than GMP, and its pages will arrive module by module.
 - [Integers](/mapping/num-integers/): num-bigint's `BigUint` and `BigInt`, mapped onto
   [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html) and
   [`Integer`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html).
+- [Rationals](/mapping/num-rationals/): num-rational's `Ratio<T>` and `BigRational`, mapped
+  onto [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html).
+- [Traits](/mapping/num-traits/): the num-traits and num-integer trait crates, with num-iter's
+  ranges, mapped onto [malachite-base](https://docs.rs/malachite-base/latest/malachite_base/)'s
+  generic vocabulary.
 
-Pages for num-rational and for the num-traits and num-integer trait crates are next.
 num-complex has no page: Malachite has no complex type for it to map onto.

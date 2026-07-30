@@ -121,7 +121,7 @@ Each item falls into one of four categories:
 | ≈ | `FromPrimitive for BigInt` | [`TryFrom`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/conversion/from_primitive_float/index.html), [`RoundingFrom`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/conversion/from_primitive_float/index.html) |
 
 **The word-digit constructors.** `BigUint::new`, `from_slice`, and `assign_from_slice` build
-from "base 2<sup>32</sup> digits... ordered least significant digit first", and num keeps that
+from "base $$2^{32}$$ digits... ordered least significant digit first", and num keeps that
 `u32` interface on every platform, whatever its internal digit size. Malachite offers the same
 construction two ways: `Natural::from_power_of_2_digits_asc(32, digits.iter().copied())`
 matches num's interface digit for digit, and
@@ -332,7 +332,8 @@ panic into `None` and Malachite spells the same guard directly,
 `(y != 0u32).then(|| x / y)`. The rest, `checked_add`, `checked_mul`, and `checked_sub` on
 `BigInt`, cannot fail and always return `Some`; num implements them so that generic code
 written against the checked traits accepts bignums, a role that belongs to
-the traits page, and Malachite leaves them off the types. In the other direction,
+[the traits page](/mapping/num-traits/#operator-refinements), and Malachite leaves them off
+the types. In the other direction,
 [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html) has
 a saturating story:
 [`SaturatingSub`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.SaturatingSub.html)
@@ -597,7 +598,8 @@ a dedicated coprimality test that can stop earlier than a full GCD, and the numb
 symbols, [`LegendreSymbol`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.LegendreSymbol.html),
 `JacobiSymbol`, and `KroneckerSymbol`, on both types. In the other direction, num-integer
 defines an `Average` trait, but num-bigint does not implement it for the bignum types, so it
-reappears with the generic machinery on the traits page; Malachite has no averaging functions
+reappears with the generic machinery on
+[the traits page](/mapping/num-traits/#num-integer); Malachite has no averaging functions
 either, and a
 `(&a + &b) >> 1` computes the floor average exactly, bignums having no overflow to dodge.
 
@@ -686,5 +688,6 @@ not migrate between the libraries directly; it crosses through any of the explic
 [Conversion](#conversion), bytes, digits, or strings, re-serialized on the other side.
 
 That closes the type-level mapping. What remains of the num-bigint experience is its generic
-face, the num-traits and num-integer traits themselves, which the traits page, next in this
-family, takes up for code written against `T: Num` rather than a concrete bignum.
+face, the num-traits and num-integer traits themselves, which
+[the traits page](/mapping/num-traits/) takes up for code written against `T: Num` rather
+than a concrete bignum.
