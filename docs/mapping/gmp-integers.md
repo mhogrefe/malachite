@@ -435,8 +435,8 @@ remainder together is worth a single call: [`DivMod`](https://docs.rs/malachite-
 
 | | GMP | Malachite |
 | :---: | --- | --- |
-| ✓ | `void mpz_mod (mpz_t r, const mpz_t n, const mpz_t d)` | [`DivEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivEuclidean.html) |
-| ✓ | `unsigned long int mpz_mod_ui (mpz_t r, const mpz_t n, unsigned long int d)` | [`DivEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivEuclidean.html) |
+| ✓ | `void mpz_mod (mpz_t r, const mpz_t n, const mpz_t d)` | [`ModEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModEuclidean.html) |
+| ✓ | `unsigned long int mpz_mod_ui (mpz_t r, const mpz_t n, unsigned long int d)` | [`ModEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModEuclidean.html) |
 | ✓ | `void mpz_divexact (mpz_t q, const mpz_t n, const mpz_t d)` | [`DivExact`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivExact.html) |
 | ✓ | `void mpz_divexact_ui (mpz_t q, const mpz_t n, unsigned long d)` | [`DivExact`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivExact.html) |
 | ✓ | `int mpz_divisible_p (const mpz_t n, const mpz_t d)` | [`DivisibleBy`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivisibleBy.html) |
@@ -463,11 +463,11 @@ rounded. `Exact` panics if the division is inexact, which is a checked alternati
 
 **`mpz_mod`.** GMP's `mpz_mod` ignores the divisor's sign and always returns a non-negative
 remainder, which is neither `fdiv` nor `tdiv` when the divisor is negative. Malachite spells that
-[`DivEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivEuclidean.html), whose remainder is non-negative by construction;
+[`ModEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModEuclidean.html), whose remainder is non-negative by construction;
 for an [`Integer`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html) it
 is a [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html), so the type says so. Take care not to reach for
 [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Mod.html) instead: that one gives the remainder the sign of the divisor, so with
-−7 and −3, `mpz_mod` and `div_euclidean` give 2 while `mod_op` gives −1.
+−7 and −3, `mpz_mod` and `mod_euclidean` give 2 while `mod_op` gives −1.
 
 **`mpz_divexact`.** [`DivExact`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivExact.html) has the same contract: much faster than
 ordinary division, and correct only when the division is exact. If it is not, the result is

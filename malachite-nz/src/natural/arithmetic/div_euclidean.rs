@@ -7,23 +7,19 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::Natural;
-use malachite_base::num::arithmetic::traits::{
-    DivAssignEuclidean, DivAssignMod, DivEuclidean, DivMod,
-};
+use malachite_base::num::arithmetic::traits::{DivEuclidean, DivEuclideanAssign};
 
 impl DivEuclidean<Self> for Natural {
-    type DivOutput = Self;
-    type ModOutput = Self;
+    type Output = Self;
 
-    /// Divides a [`Natural`] by another [`Natural`], taking both by value and returning the
-    /// quotient and remainder. The remainder is nonnegative.
+    /// Divides a [`Natural`] by another [`Natural`], taking both by value and returning just the
+    /// quotient.
     ///
-    /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq r < y$. For [`Natural`]s,
-    /// Euclidean division coincides with [`div_mod`](DivMod::div_mod).
+    /// If the remainder were computed, the quotient and remainder would satisfy $x = qy + r$ and $0
+    /// \leq r < y$. For [`Natural`]s, the Euclidean quotient coincides with division.
     ///
     /// $$
-    /// f(x, y) = \left ( \left \lfloor \frac{x}{y} \right \rfloor, \space
-    /// x - y\left \lfloor \frac{x}{y} \right \rfloor \right ).
+    /// f(x, y) = \left \lfloor \frac{x}{y} \right \rfloor.
     /// $$
     ///
     /// # Worst-case complexity
@@ -39,36 +35,28 @@ impl DivEuclidean<Self> for Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::DivEuclidean;
-    /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
     ///
     /// // 2 * 10 + 3 = 23
-    /// assert_eq!(
-    ///     Natural::from(23u32)
-    ///         .div_euclidean(Natural::from(10u32))
-    ///         .to_debug_string(),
-    ///     "(2, 3)"
-    /// );
+    /// assert_eq!(Natural::from(23u32).div_euclidean(Natural::from(10u32)), 2);
     /// ```
     #[inline]
-    fn div_euclidean(self, other: Self) -> (Self, Self) {
-        self.div_mod(other)
+    fn div_euclidean(self, other: Self) -> Self {
+        self / other
     }
 }
 
 impl DivEuclidean<&Self> for Natural {
-    type DivOutput = Self;
-    type ModOutput = Self;
+    type Output = Self;
 
     /// Divides a [`Natural`] by another [`Natural`], taking the first by value and the second by
-    /// reference and returning the quotient and remainder. The remainder is nonnegative.
+    /// reference and returning just the quotient.
     ///
-    /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq r < y$. For [`Natural`]s,
-    /// Euclidean division coincides with [`div_mod`](DivMod::div_mod).
+    /// If the remainder were computed, the quotient and remainder would satisfy $x = qy + r$ and $0
+    /// \leq r < y$. For [`Natural`]s, the Euclidean quotient coincides with division.
     ///
     /// $$
-    /// f(x, y) = \left ( \left \lfloor \frac{x}{y} \right \rfloor, \space
-    /// x - y\left \lfloor \frac{x}{y} \right \rfloor \right ).
+    /// f(x, y) = \left \lfloor \frac{x}{y} \right \rfloor.
     /// $$
     ///
     /// # Worst-case complexity
@@ -84,36 +72,28 @@ impl DivEuclidean<&Self> for Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::DivEuclidean;
-    /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
     ///
-    /// // 3 * 123 + 87 = 456
-    /// assert_eq!(
-    ///     Natural::from(456u32)
-    ///         .div_euclidean(&Natural::from(123u32))
-    ///         .to_debug_string(),
-    ///     "(3, 87)"
-    /// );
+    /// // 2 * 10 + 3 = 23
+    /// assert_eq!(Natural::from(23u32).div_euclidean(&Natural::from(10u32)), 2);
     /// ```
     #[inline]
-    fn div_euclidean(self, other: &Self) -> (Self, Self) {
-        self.div_mod(other)
+    fn div_euclidean(self, other: &Self) -> Self {
+        self / other
     }
 }
 
 impl DivEuclidean<Natural> for &Natural {
-    type DivOutput = Natural;
-    type ModOutput = Natural;
+    type Output = Natural;
 
     /// Divides a [`Natural`] by another [`Natural`], taking the first by reference and the second
-    /// by value and returning the quotient and remainder. The remainder is nonnegative.
+    /// by value and returning just the quotient.
     ///
-    /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq r < y$. For [`Natural`]s,
-    /// Euclidean division coincides with [`div_mod`](DivMod::div_mod).
+    /// If the remainder were computed, the quotient and remainder would satisfy $x = qy + r$ and $0
+    /// \leq r < y$. For [`Natural`]s, the Euclidean quotient coincides with division.
     ///
     /// $$
-    /// f(x, y) = \left ( \left \lfloor \frac{x}{y} \right \rfloor, \space
-    /// x - y\left \lfloor \frac{x}{y} \right \rfloor \right ).
+    /// f(x, y) = \left \lfloor \frac{x}{y} \right \rfloor.
     /// $$
     ///
     /// # Worst-case complexity
@@ -129,36 +109,28 @@ impl DivEuclidean<Natural> for &Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::DivEuclidean;
-    /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
     ///
-    /// // 0 * 456 + 123 = 123
-    /// assert_eq!(
-    ///     (&Natural::from(123u32))
-    ///         .div_euclidean(Natural::from(456u32))
-    ///         .to_debug_string(),
-    ///     "(0, 123)"
-    /// );
+    /// // 2 * 10 + 3 = 23
+    /// assert_eq!((&Natural::from(23u32)).div_euclidean(Natural::from(10u32)), 2);
     /// ```
     #[inline]
-    fn div_euclidean(self, other: Natural) -> (Natural, Natural) {
-        self.div_mod(other)
+    fn div_euclidean(self, other: Natural) -> Natural {
+        self / other
     }
 }
 
 impl DivEuclidean<&Natural> for &Natural {
-    type DivOutput = Natural;
-    type ModOutput = Natural;
+    type Output = Natural;
 
-    /// Divides a [`Natural`] by another [`Natural`], taking both by reference and returning the
-    /// quotient and remainder. The remainder is nonnegative.
+    /// Divides a [`Natural`] by another [`Natural`], taking both by reference and returning just
+    /// the quotient.
     ///
-    /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq r < y$. For [`Natural`]s,
-    /// Euclidean division coincides with [`div_mod`](DivMod::div_mod).
+    /// If the remainder were computed, the quotient and remainder would satisfy $x = qy + r$ and $0
+    /// \leq r < y$. For [`Natural`]s, the Euclidean quotient coincides with division.
     ///
     /// $$
-    /// f(x, y) = \left ( \left \lfloor \frac{x}{y} \right \rfloor, \space
-    /// x - y\left \lfloor \frac{x}{y} \right \rfloor \right ).
+    /// f(x, y) = \left \lfloor \frac{x}{y} \right \rfloor.
     /// $$
     ///
     /// # Worst-case complexity
@@ -174,35 +146,24 @@ impl DivEuclidean<&Natural> for &Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::DivEuclidean;
-    /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::natural::Natural;
     ///
     /// // 2 * 10 + 3 = 23
-    /// assert_eq!(
-    ///     (&Natural::from(23u32))
-    ///         .div_euclidean(&Natural::from(10u32))
-    ///         .to_debug_string(),
-    ///     "(2, 3)"
-    /// );
+    /// assert_eq!((&Natural::from(23u32)).div_euclidean(&Natural::from(10u32)), 2);
     /// ```
     #[inline]
-    fn div_euclidean(self, other: &Natural) -> (Natural, Natural) {
-        self.div_mod(other)
+    fn div_euclidean(self, other: &Natural) -> Natural {
+        self / other
     }
 }
 
-impl DivAssignEuclidean<Self> for Natural {
-    type ModOutput = Self;
-
+impl DivEuclideanAssign<Self> for Natural {
     /// Divides a [`Natural`] by another [`Natural`] in place, taking the [`Natural`] on the
-    /// right-hand side by value and returning the remainder. The remainder is nonnegative.
+    /// right-hand side by value and keeping just the quotient.
     ///
-    /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq r < y$. For [`Natural`]s,
-    /// Euclidean division coincides with [`div_mod`](DivMod::div_mod).
+    /// If the remainder were computed, the quotient and remainder would satisfy $x = qy + r$ and $0
+    /// \leq r < y$. For [`Natural`]s, the Euclidean quotient coincides with division.
     ///
-    /// $$
-    /// f(x, y) = x - y\left \lfloor \frac{x}{y} \right \rfloor,
-    /// $$
     /// $$
     /// x \gets \left \lfloor \frac{x}{y} \right \rfloor.
     /// $$
@@ -219,32 +180,27 @@ impl DivAssignEuclidean<Self> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::DivAssignEuclidean;
+    /// use malachite_base::num::arithmetic::traits::DivEuclideanAssign;
     /// use malachite_nz::natural::Natural;
     ///
     /// // 2 * 10 + 3 = 23
     /// let mut x = Natural::from(23u32);
-    /// assert_eq!(x.div_assign_euclidean(Natural::from(10u32)), 3);
+    /// x.div_euclidean_assign(Natural::from(10u32));
     /// assert_eq!(x, 2);
     /// ```
     #[inline]
-    fn div_assign_euclidean(&mut self, other: Self) -> Self {
-        self.div_assign_mod(other)
+    fn div_euclidean_assign(&mut self, other: Self) {
+        *self /= other;
     }
 }
 
-impl DivAssignEuclidean<&Self> for Natural {
-    type ModOutput = Self;
-
+impl DivEuclideanAssign<&Self> for Natural {
     /// Divides a [`Natural`] by another [`Natural`] in place, taking the [`Natural`] on the
-    /// right-hand side by reference and returning the remainder. The remainder is nonnegative.
+    /// right-hand side by reference and keeping just the quotient.
     ///
-    /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq r < y$. For [`Natural`]s,
-    /// Euclidean division coincides with [`div_mod`](DivMod::div_mod).
+    /// If the remainder were computed, the quotient and remainder would satisfy $x = qy + r$ and $0
+    /// \leq r < y$. For [`Natural`]s, the Euclidean quotient coincides with division.
     ///
-    /// $$
-    /// f(x, y) = x - y\left \lfloor \frac{x}{y} \right \rfloor,
-    /// $$
     /// $$
     /// x \gets \left \lfloor \frac{x}{y} \right \rfloor.
     /// $$
@@ -261,16 +217,16 @@ impl DivAssignEuclidean<&Self> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::DivAssignEuclidean;
+    /// use malachite_base::num::arithmetic::traits::DivEuclideanAssign;
     /// use malachite_nz::natural::Natural;
     ///
-    /// // 3 * 123 + 87 = 456
-    /// let mut x = Natural::from(456u32);
-    /// assert_eq!(x.div_assign_euclidean(&Natural::from(123u32)), 87);
-    /// assert_eq!(x, 3);
+    /// // 2 * 10 + 3 = 23
+    /// let mut x = Natural::from(23u32);
+    /// x.div_euclidean_assign(&Natural::from(10u32));
+    /// assert_eq!(x, 2);
     /// ```
     #[inline]
-    fn div_assign_euclidean(&mut self, other: &Self) -> Self {
-        self.div_assign_mod(other)
+    fn div_euclidean_assign(&mut self, other: &Self) {
+        *self /= other;
     }
 }

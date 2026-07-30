@@ -17,56 +17,57 @@ use std::panic::catch_unwind;
 
 #[test]
 fn test_div_euclidean_unsigned() {
-    fn test<T: PrimitiveUnsigned>(n: T, d: T, q: T, r: T) {
-        assert_eq!(n.div_euclidean(d), (q, r));
+    fn test<T: PrimitiveUnsigned>(n: T, d: T, q: T) {
+        assert_eq!(n.div_euclidean(d), q);
 
         let mut mut_n = n;
-        assert_eq!(mut_n.div_assign_euclidean(d), r);
+        mut_n.div_euclidean_assign(d);
         assert_eq!(mut_n, q);
 
-        // For unsigned integers, Euclidean division coincides with `div_mod`.
-        assert_eq!(n.div_mod(d), (q, r));
+        // For unsigned integers, the Euclidean quotient coincides with division.
+        assert_eq!(n / d, q);
     }
-    test::<u8>(0, 1, 0, 0);
-    test::<u16>(0, 123, 0, 0);
-    test::<u32>(1, 1, 1, 0);
-    test::<u64>(123, 1, 123, 0);
-    test::<usize>(123, 123, 1, 0);
-    test::<u128>(123, 456, 0, 123);
-    test::<u16>(456, 123, 3, 87);
+    test::<u8>(0, 1, 0);
+    test::<u16>(0, 123, 0);
+    test::<u32>(1, 1, 1);
+    test::<u64>(123, 1, 123);
+    test::<usize>(123, 123, 1);
+    test::<u128>(123, 456, 0);
+    test::<u16>(456, 123, 3);
 }
 
 #[test]
 fn test_div_euclidean_signed() {
-    fn test<T: PrimitiveSigned>(n: T, d: T, q: T, r: T) {
-        assert_eq!(n.div_euclidean(d), (q, r));
+    fn test<T: PrimitiveSigned>(n: T, d: T, q: T) {
+        assert_eq!(n.div_euclidean(d), q);
 
         let mut mut_n = n;
-        assert_eq!(mut_n.div_assign_euclidean(d), r);
+        mut_n.div_euclidean_assign(d);
         assert_eq!(mut_n, q);
     }
-    test::<i8>(0, 1, 0, 0);
-    test::<i16>(0, 123, 0, 0);
-    test::<i32>(1, 1, 1, 0);
-    test::<i64>(123, 1, 123, 0);
-    test::<i128>(123, 123, 1, 0);
-    test::<isize>(123, 456, 0, 123);
-    // The remainder is always nonnegative, regardless of the signs of the operands.
-    test::<i16>(23, 10, 2, 3);
-    test::<i16>(23, -10, -2, 3);
-    test::<i16>(-23, 10, -3, 7);
-    test::<i16>(-23, -10, 3, 7);
-    test::<i32>(-50, -23, 3, 19);
-    test::<i64>(50, -23, -2, 4);
-    // Division by -1 negates without producing a remainder.
-    test::<i32>(123, -1, -123, 0);
+    test::<i8>(0, 1, 0);
+    test::<i16>(0, 123, 0);
+    test::<i32>(1, 1, 1);
+    test::<i64>(123, 1, 123);
+    test::<i128>(123, 123, 1);
+    test::<isize>(123, 456, 0);
+    // The quotient is rounded so that the remainder would be nonnegative, regardless of the signs
+    // of the operands.
+    test::<i16>(23, 10, 2);
+    test::<i16>(23, -10, -2);
+    test::<i16>(-23, 10, -3);
+    test::<i16>(-23, -10, 3);
+    test::<i32>(-50, -23, 3);
+    test::<i64>(50, -23, -2);
+    // Division by -1 negates.
+    test::<i32>(123, -1, -123);
 }
 
 fn div_euclidean_fail_helper<T: PrimitiveInt>() {
     assert_panic!(T::ONE.div_euclidean(T::ZERO));
     assert_panic!({
         let mut x = T::ONE;
-        x.div_assign_euclidean(T::ZERO)
+        x.div_euclidean_assign(T::ZERO)
     });
 }
 
@@ -74,7 +75,7 @@ fn div_euclidean_signed_fail_helper<T: PrimitiveSigned>() {
     assert_panic!(T::MIN.div_euclidean(T::NEGATIVE_ONE));
     assert_panic!({
         let mut x = T::MIN;
-        x.div_assign_euclidean(T::NEGATIVE_ONE)
+        x.div_euclidean_assign(T::NEGATIVE_ONE)
     });
 }
 
@@ -86,78 +87,60 @@ pub fn div_euclidean_fail() {
 
 fn div_euclidean_properties_helper_unsigned<T: PrimitiveUnsigned>() {
     unsigned_pair_gen_var_12::<T, T>().test_properties(|(x, y)| {
-        let mut mut_x = x;
-        let r = mut_x.div_assign_euclidean(y);
-        let q = mut_x;
-        assert_eq!(x.div_euclidean(y), (q, r));
+        let q = x.div_euclidean(y);
 
-        // For unsigned integers, Euclidean division coincides with `div_mod`.
-        assert_eq!(x.div_mod(y), (q, r));
-        assert!(r < y);
-        assert_eq!(q * y + r, x);
+        let mut mut_x = x;
+        mut_x.div_euclidean_assign(y);
+        assert_eq!(mut_x, q);
+
+        // The quotient is the one Euclidean division produces.
+        assert_eq!(x.div_mod_euclidean(y).0, q);
+        // For unsigned integers, the Euclidean quotient coincides with division.
+        assert_eq!(x / y, q);
     });
 
     unsigned_gen::<T>().test_properties(|x| {
-        assert_eq!(x.div_euclidean(T::ONE), (x, T::ZERO));
+        assert_eq!(x.div_euclidean(T::ONE), x);
         assert_panic!(x.div_euclidean(T::ZERO));
         assert_panic!({
             let mut y = x;
-            y.div_assign_euclidean(T::ZERO)
+            y.div_euclidean_assign(T::ZERO)
         });
     });
 
     unsigned_gen_var_1::<T>().test_properties(|x| {
-        assert_eq!(x.div_euclidean(x), (T::ONE, T::ZERO));
-        assert_eq!(T::ZERO.div_euclidean(x), (T::ZERO, T::ZERO));
-        if x > T::ONE {
-            assert_eq!(T::ONE.div_euclidean(x), (T::ZERO, T::ONE));
-        }
+        assert_eq!(x.div_euclidean(x), T::ONE);
+        assert_eq!(T::ZERO.div_euclidean(x), T::ZERO);
     });
 }
 
 fn div_euclidean_properties_helper_signed<T: PrimitiveSigned>() {
     signed_pair_gen_var_4::<T>().test_properties(|(x, y)| {
-        let mut mut_x = x;
-        let r = mut_x.div_assign_euclidean(y);
-        let q = mut_x;
-        assert_eq!(x.div_euclidean(y), (q, r));
+        let q = x.div_euclidean(y);
 
-        // The remainder is nonnegative and smaller in magnitude than the divisor.
-        assert!(r >= T::ZERO);
-        assert!(r.lt_abs(&y));
-        // The defining relation x = q * y + r holds (modulo overflow of the q * y product).
-        if let Some(product) = q.checked_mul(y) {
-            assert_eq!(product + r, x);
-        } else if q > T::ZERO {
-            assert_eq!((q - T::ONE) * y + r + y, x);
-        } else {
-            assert_eq!((q + T::ONE) * y + r - y, x);
-        }
-        // For a positive divisor, Euclidean division coincides with `div_mod`.
-        if y > T::ZERO {
-            assert_eq!(x.div_mod(y), (q, r));
-        }
+        let mut mut_x = x;
+        mut_x.div_euclidean_assign(y);
+        assert_eq!(mut_x, q);
+
+        // The quotient is the one Euclidean division produces.
+        assert_eq!(x.div_mod_euclidean(y).0, q);
     });
 
     signed_gen::<T>().test_properties(|x| {
-        assert_eq!(x.div_euclidean(T::ONE), (x, T::ZERO));
+        assert_eq!(x.div_euclidean(T::ONE), x);
         if x != T::MIN {
-            assert_eq!(x.div_euclidean(T::NEGATIVE_ONE), (-x, T::ZERO));
+            assert_eq!(x.div_euclidean(T::NEGATIVE_ONE), -x);
         }
         assert_panic!(x.div_euclidean(T::ZERO));
         assert_panic!({
             let mut y = x;
-            y.div_assign_euclidean(T::ZERO)
+            y.div_euclidean_assign(T::ZERO)
         });
     });
 
     signed_gen_var_6::<T>().test_properties(|x| {
-        assert_eq!(x.div_euclidean(T::ONE), (x, T::ZERO));
-        assert_eq!(x.div_euclidean(x), (T::ONE, T::ZERO));
-        assert_eq!(T::ZERO.div_euclidean(x), (T::ZERO, T::ZERO));
-        if x > T::ONE {
-            assert_eq!(T::ONE.div_euclidean(x), (T::ZERO, T::ONE));
-        }
+        assert_eq!(x.div_euclidean(x), T::ONE);
+        assert_eq!(T::ZERO.div_euclidean(x), T::ZERO);
     });
 }
 

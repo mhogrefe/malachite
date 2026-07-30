@@ -642,8 +642,8 @@ before converting the word-sized result down.
 | ✓ | `int fmpz_divisible (const fmpz_t f, const fmpz_t g)` | [`DivisibleBy`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivisibleBy.html) |
 | ✓ | `int fmpz_divisible_si (const fmpz_t f, slong g)` | [`DivisibleBy`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivisibleBy.html) |
 | ✓ | `int fmpz_divides (fmpz_t q, const fmpz_t f, const fmpz_t g)` | [`DivMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivMod.html) |
-| ✓ | `void fmpz_mod (fmpz_t f, const fmpz_t g, const fmpz_t h)` | [`DivEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivEuclidean.html) |
-| ✓ | `ulong fmpz_mod_ui (fmpz_t f, const fmpz_t g, ulong h)` | [`DivEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivEuclidean.html) |
+| ✓ | `void fmpz_mod (fmpz_t f, const fmpz_t g, const fmpz_t h)` | [`ModEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModEuclidean.html) |
+| ✓ | `ulong fmpz_mod_ui (fmpz_t f, const fmpz_t g, ulong h)` | [`ModEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModEuclidean.html) |
 | ✗ | `void fmpz_smod (fmpz_t f, const fmpz_t g, const fmpz_t h)` | |
 | ✗ | `void fmpz_preinvn_init (fmpz_preinvn_t inv, const fmpz_t f)` | |
 | — | `void fmpz_preinvn_clear (fmpz_preinvn_t inv)` | |
@@ -664,9 +664,9 @@ by zero panics, so test the divisor first when zero can reach this code.
 
 **`fmpz_mod`, `fmpz_mod_ui`.** FLINT's `fmpz_mod` produces a nonnegative remainder whatever the
 sign of `h`, and that is exactly
-[`DivEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivEuclidean.html)'s
-convention: `div_euclidean` returns the quotient and an always-nonnegative remainder, and
-`div_assign_euclidean` leaves the quotient in place and returns the remainder. For a positive
+[`ModEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModEuclidean.html)'s
+convention: `mod_euclidean` returns the always-nonnegative remainder, as a `Natural`, and
+`mod_euclidean_assign` leaves it in place. For a positive
 divisor, which is all `fmpz_mod_ui` allows, plain
 [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Mod.html)
 agrees and is the more common spelling.

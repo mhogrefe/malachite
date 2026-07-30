@@ -16,11 +16,6 @@ use crate::natural::arithmetic::mul::{limbs_mul_to_out, limbs_mul_to_out_scratch
 use crate::natural::arithmetic::sub::{limbs_sub_greater_in_place_left, limbs_sub_limb_in_place};
 use crate::natural::comparison::cmp::limbs_cmp;
 use crate::platform::{DoubleLimb, Limb};
-
-// Above this shorter-operand length, a full product followed by a subtraction beats single-limb
-// submul rows: the multiplication's basecase processes two rows per pass, and there is no two-row
-// submul kernel to match it.
-const SUB_MUL_BASECASE_THRESHOLD: usize = 10;
 use alloc::vec::Vec;
 use core::cmp::Ordering::*;
 use core::fmt::Display;
@@ -28,6 +23,11 @@ use malachite_base::num::arithmetic::traits::{
     CheckedSubMul, SubMul, SubMulAssign, WrappingAddAssign,
 };
 use malachite_base::num::conversion::traits::SplitInHalf;
+
+// Above this shorter-operand length, a full product followed by a subtraction beats single-limb
+// submul rows: the multiplication's basecase processes two rows per pass, and there is no two-row
+// submul kernel to match it.
+const SUB_MUL_BASECASE_THRESHOLD: usize = 10;
 
 // Given the limbs of two `Natural`s x and y, and a limb z, returns the limbs of x - y * z. If y * z
 // > x, `None` is returned.
@@ -268,8 +268,8 @@ pub_crate_test! {limbs_sub_mul_in_place_left(xs: &mut [Limb], ys: &[Limb], zs: &
     if short.len() < SUB_MUL_BASECASE_THRESHOLD {
         limbs_sub_mul_basecase_in_place_left(xs, long, short)
     } else {
-        // The product is a temporary that is dropped whole, scratch tail and all, so nothing has
-        // to be shrunk.
+        // The product is a temporary that is dropped whole, scratch tail and all, so nothing has to
+        // be shrunk.
         let mut product_len = long.len() + short.len();
         let mut product =
             vec![0; product_len + limbs_mul_to_out_scratch_len(long.len(), short.len())];
@@ -288,8 +288,8 @@ pub_crate_test! {limbs_sub_mul_in_place_left(xs: &mut [Limb], ys: &[Limb], zs: &
 }}
 
 // Subtracts y * z directly out of `xs`, one submul row per limb of the shorter input, with no
-// product temporary. Returns whether a borrow occurred; if it did, the function returned as soon
-// as the borrow was detected, and the contents of `xs` should be ignored. `ys` must be at least as
+// product temporary. Returns whether a borrow occurred; if it did, the function returned as soon as
+// the borrow was detected, and the contents of `xs` should be ignored. `ys` must be at least as
 // long as `zs`, `zs` must be nonempty, and `xs` must be at least `ys.len() + zs.len() - 1` limbs
 // long; no slice may have trailing zeros.
 //

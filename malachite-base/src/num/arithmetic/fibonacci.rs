@@ -693,9 +693,8 @@ macro_rules! impl_fibonaccis_a {
 
             /// Computes the $n$th Lucas number, paired with its predecessor: $(L(n), L(n-1))$.
             ///
-            /// If either component is too large to be represented, the function returns `None`.
-            /// The function also returns `None` when $n = 0$, since $L(-1) = -1$ cannot be
-            /// represented.
+            /// If either component is too large to be represented, the function returns `None`. The
+            /// function also returns `None` when $n = 0$, since $L(-1) = -1$ cannot be represented.
             ///
             /// $$
             /// f(n) = \\begin{cases}

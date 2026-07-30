@@ -366,10 +366,9 @@ fn limbs_add_mul_basecase_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], zs: &[L
 }
 
 // Adds x + y * (z[0] + z[1] * B) into `xs`, where B is 2^W: the two's-limb analogue of an addmul
-// row that accumulates into all of `xs`, including its top two limbs, rather than overwriting
-// them. `xs` must be exactly two limbs longer than `ys`. Returns whether a carry escaped the
-// window; the escape is at most one, since the window's value and the addend are each less than
-// B^(len + 2).
+// row that accumulates into all of `xs`, including its top two limbs, rather than overwriting them.
+// `xs` must be exactly two limbs longer than `ys`. Returns whether a carry escaped the window; the
+// escape is at most one, since the window's value and the addend are each less than B^(len + 2).
 fn limbs_slice_add_mul_two_limbs_in_place_left(
     xs: &mut [Limb],
     ys: &[Limb],
@@ -427,8 +426,8 @@ limbs_add_mul_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], zs: &[Limb]) {
         // have to reallocate to make room.
         limbs_add_mul_basecase_in_place_left(xs, long, short);
     } else if xs.len() >= out_len {
-        // The product is a temporary that is dropped whole, scratch tail and all; nothing is
-        // shrunk or swapped, so xs keeps its capacity across repeated calls.
+        // The product is a temporary that is dropped whole, scratch tail and all; nothing is shrunk
+        // or swapped, so xs keeps its capacity across repeated calls.
         let mut product_len = out_len;
         let mut product =
             vec![0; product_len + limbs_mul_to_out_scratch_len(long.len(), short.len())];

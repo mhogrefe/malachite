@@ -6,26 +6,24 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::num::arithmetic::traits::{DivAssignEuclidean, DivEuclidean};
+use crate::num::arithmetic::traits::{DivEuclidean, DivEuclideanAssign};
 
 macro_rules! impl_div_euclidean {
     ($t:ident) => {
         impl DivEuclidean<$t> for $t {
-            type DivOutput = $t;
-            type ModOutput = $t;
+            type Output = $t;
 
-            /// Divides a number by another number, returning the quotient and remainder. The
-            /// quotient is rounded so that the remainder is nonnegative.
+            /// Divides a number by another number, returning just the quotient. The quotient is
+            /// rounded so that the remainder would be nonnegative.
             ///
-            /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq r < |y|$.
+            /// If the remainder were computed, the quotient and remainder would satisfy $x = qy +
+            /// r$ and $0 \leq r < |y|$.
             ///
             /// $$
-            /// f(x, y) = \left ( \operatorname{sgn}(y) \left \lfloor \frac{x}{|y|} \right \rfloor,
-            /// \space x-y \operatorname{sgn}(y) \left \lfloor \frac{x}{|y|} \right \rfloor \right).
+            /// f(x, y) = \operatorname{sgn}(y) \left \lfloor \frac{x}{|y|} \right \rfloor.
             /// $$
             ///
-            /// For unsigned integers, `div_euclidean` is equivalent to
-            /// [`div_mod`](super::traits::DivMod::div_mod).
+            /// For unsigned integers, `div_euclidean` is equivalent to division.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -37,28 +35,23 @@ macro_rules! impl_div_euclidean {
             /// # Examples
             /// See [here](super::div_euclidean#div_euclidean).
             #[inline]
-            fn div_euclidean(self, other: $t) -> ($t, $t) {
-                (self.div_euclid(other), self.rem_euclid(other))
+            fn div_euclidean(self, other: $t) -> $t {
+                self.div_euclid(other)
             }
         }
 
-        impl DivAssignEuclidean<$t> for $t {
-            type ModOutput = $t;
-
-            /// Divides a number by another number in place, returning the remainder. The quotient
-            /// is rounded so that the remainder is nonnegative.
+        impl DivEuclideanAssign<$t> for $t {
+            /// Divides a number by another number in place, keeping just the quotient. The quotient
+            /// is rounded so that the remainder would be nonnegative.
             ///
-            /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq r < |y|$.
+            /// If the remainder were computed, the quotient and remainder would satisfy $x = qy +
+            /// r$ and $0 \leq r < |y|$.
             ///
-            /// $$
-            /// f(x, y) = x - y \operatorname{sgn}(y) \left \lfloor \frac{x}{|y|} \right \rfloor,
-            /// $$
             /// $$
             /// x \gets \operatorname{sgn}(y) \left \lfloor \frac{x}{|y|} \right \rfloor.
             /// $$
             ///
-            /// For unsigned integers, `div_assign_euclidean` is equivalent to
-            /// [`div_assign_mod`](super::traits::DivAssignMod::div_assign_mod).
+            /// For unsigned integers, `div_euclidean_assign` is equivalent to `/=`.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -68,13 +61,10 @@ macro_rules! impl_div_euclidean {
             /// signed).
             ///
             /// # Examples
-            /// See [here](super::div_euclidean#div_assign_euclidean).
+            /// See [here](super::div_euclidean#div_euclidean_assign).
             #[inline]
-            fn div_assign_euclidean(&mut self, other: $t) -> $t {
-                let q = self.div_euclid(other);
-                let r = self.rem_euclid(other);
-                *self = q;
-                r
+            fn div_euclidean_assign(&mut self, other: $t) {
+                *self = self.div_euclid(other);
             }
         }
     };

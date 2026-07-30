@@ -15,18 +15,18 @@ use malachite_base::test_util::generators::{signed_pair_gen_var_4, unsigned_pair
 use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
-    register_unsigned_demos!(runner, demo_div_euclidean_unsigned);
-    register_signed_demos!(runner, demo_div_euclidean_signed);
-    register_unsigned_demos!(runner, demo_div_euclidean_assign_unsigned);
-    register_signed_demos!(runner, demo_div_euclidean_assign_signed);
+    register_unsigned_demos!(runner, demo_div_mod_euclidean_unsigned);
+    register_signed_demos!(runner, demo_div_mod_euclidean_signed);
+    register_unsigned_demos!(runner, demo_div_assign_mod_euclidean_unsigned);
+    register_signed_demos!(runner, demo_div_assign_mod_euclidean_signed);
 
-    register_unsigned_benches!(runner, benchmark_div_euclidean_unsigned);
-    register_signed_benches!(runner, benchmark_div_euclidean_signed);
-    register_unsigned_benches!(runner, benchmark_div_euclidean_assign_unsigned);
-    register_signed_benches!(runner, benchmark_div_euclidean_assign_signed);
+    register_unsigned_benches!(runner, benchmark_div_mod_euclidean_unsigned);
+    register_signed_benches!(runner, benchmark_div_mod_euclidean_signed);
+    register_unsigned_benches!(runner, benchmark_div_assign_mod_euclidean_unsigned);
+    register_signed_benches!(runner, benchmark_div_assign_mod_euclidean_signed);
 }
 
-fn demo_div_euclidean_unsigned<T: PrimitiveUnsigned>(
+fn demo_div_mod_euclidean_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -35,17 +35,31 @@ fn demo_div_euclidean_unsigned<T: PrimitiveUnsigned>(
         .get(gm, config)
         .take(limit)
     {
-        println!("{}.div_euclidean({}) = {}", x, y, x.div_euclidean(y));
+        println!(
+            "{}.div_mod_euclidean({}) = {:?}",
+            x,
+            y,
+            x.div_mod_euclidean(y)
+        );
     }
 }
 
-fn demo_div_euclidean_signed<T: PrimitiveSigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+fn demo_div_mod_euclidean_signed<T: PrimitiveSigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
     for (x, y) in signed_pair_gen_var_4::<T>().get(gm, config).take(limit) {
-        println!("({}).div_euclidean({}) = {}", x, y, x.div_euclidean(y));
+        println!(
+            "({}).div_mod_euclidean({}) = {:?}",
+            x,
+            y,
+            x.div_mod_euclidean(y)
+        );
     }
 }
 
-fn demo_div_euclidean_assign_unsigned<T: PrimitiveUnsigned>(
+fn demo_div_assign_mod_euclidean_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
@@ -55,67 +69,67 @@ fn demo_div_euclidean_assign_unsigned<T: PrimitiveUnsigned>(
         .take(limit)
     {
         let mut mut_x = x;
-        mut_x.div_euclidean_assign(y);
-        println!("x := {x}; x.div_euclidean_assign({y}); x = {mut_x}");
+        let r = mut_x.div_assign_mod_euclidean(y);
+        println!("x := {x}; x.div_assign_mod_euclidean({y}) = {r}; x = {mut_x}");
     }
 }
 
-fn demo_div_euclidean_assign_signed<T: PrimitiveSigned>(
+fn demo_div_assign_mod_euclidean_signed<T: PrimitiveSigned>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
 ) {
     for (x, y) in signed_pair_gen_var_4::<T>().get(gm, config).take(limit) {
         let mut mut_x = x;
-        mut_x.div_euclidean_assign(y);
-        println!("x := {x}; x.div_euclidean_assign({y}); x = {mut_x}");
+        let r = mut_x.div_assign_mod_euclidean(y);
+        println!("x := {x}; x.div_assign_mod_euclidean({y}) = {r}; x = {mut_x}");
     }
 }
 
-fn benchmark_div_euclidean_unsigned<T: PrimitiveUnsigned>(
+fn benchmark_div_mod_euclidean_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
-        &format!("{}.div_euclidean({})", T::NAME, T::NAME),
+        &format!("{}.div_mod_euclidean({})", T::NAME, T::NAME),
         BenchmarkType::Single,
         unsigned_pair_gen_var_12::<T, T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &pair_max_bit_bucketer("x", "y"),
-        &mut [("Malachite", &mut |(x, y)| no_out!(x.div_euclidean(y)))],
+        &mut [("Malachite", &mut |(x, y)| no_out!(x.div_mod_euclidean(y)))],
     );
 }
 
-fn benchmark_div_euclidean_signed<T: PrimitiveSigned>(
+fn benchmark_div_mod_euclidean_signed<T: PrimitiveSigned>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
-        &format!("{}.div_euclidean({})", T::NAME, T::NAME),
+        &format!("{}.div_mod_euclidean({})", T::NAME, T::NAME),
         BenchmarkType::Single,
         signed_pair_gen_var_4::<T>().get(gm, config),
         gm.name(),
         limit,
         file_name,
         &pair_max_bit_bucketer("x", "y"),
-        &mut [("Malachite", &mut |(x, y)| no_out!(x.div_euclidean(y)))],
+        &mut [("Malachite", &mut |(x, y)| no_out!(x.div_mod_euclidean(y)))],
     );
 }
 
-fn benchmark_div_euclidean_assign_unsigned<T: PrimitiveUnsigned>(
+fn benchmark_div_assign_mod_euclidean_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
-        &format!("{}.div_euclidean_assign({})", T::NAME, T::NAME),
+        &format!("{}.div_assign_mod_euclidean({})", T::NAME, T::NAME),
         BenchmarkType::Single,
         unsigned_pair_gen_var_12::<T, T>().get(gm, config),
         gm.name(),
@@ -123,19 +137,19 @@ fn benchmark_div_euclidean_assign_unsigned<T: PrimitiveUnsigned>(
         file_name,
         &pair_max_bit_bucketer("x", "y"),
         &mut [("Malachite", &mut |(mut x, y)| {
-            no_out!(x.div_euclidean_assign(y));
+            no_out!(x.div_assign_mod_euclidean(y));
         })],
     );
 }
 
-fn benchmark_div_euclidean_assign_signed<T: PrimitiveSigned>(
+fn benchmark_div_assign_mod_euclidean_signed<T: PrimitiveSigned>(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
-        &format!("{}.div_euclidean_assign({})", T::NAME, T::NAME),
+        &format!("{}.div_assign_mod_euclidean({})", T::NAME, T::NAME),
         BenchmarkType::Single,
         signed_pair_gen_var_4::<T>().get(gm, config),
         gm.name(),
@@ -143,7 +157,7 @@ fn benchmark_div_euclidean_assign_signed<T: PrimitiveSigned>(
         file_name,
         &pair_max_bit_bucketer("x", "y"),
         &mut [("Malachite", &mut |(mut x, y)| {
-            no_out!(x.div_euclidean_assign(y));
+            no_out!(x.div_assign_mod_euclidean(y));
         })],
     );
 }

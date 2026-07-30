@@ -373,7 +373,8 @@ first, the additions after.
 | ≈ | `Integer::next_multiple_of (&self, other: &Self) -> Self` | [`RoundToMultiple`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.RoundToMultiple.html) |
 | ≈ | `Integer::prev_multiple_of (&self, other: &Self) -> Self` | [`RoundToMultiple`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.RoundToMultiple.html) |
 | ✓ | `Euclid::div_euclid (&self, v: &Self) -> Self` | [`DivEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivEuclidean.html) |
-| ✗ | `Euclid::rem_euclid (&self, v: &Self) -> Self` | [`Mod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Mod.html) |
+| ✓ | `Euclid::rem_euclid (&self, v: &Self) -> Self` | [`ModEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModEuclidean.html) |
+| ✓ | `Euclid::div_rem_euclid (&self, v: &Self) -> (Self, Self)` | [`DivModEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivModEuclidean.html) |
 | ≈ | `CheckedEuclid::checked_div_euclid`, `checked_rem_euclid` | [`DivEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivEuclidean.html) |
 
 **The floor, ceiling, and truncating divisions.** `div_floor` is `x.div_round(&y, Floor)`,
@@ -404,10 +405,15 @@ so `next_multiple_of` is `round_to_multiple` with `Ceiling` for a positive divis
 **Euclidean division.** The quotient-remainder convention with the remainder always in
 $$[0, |d|)$$: `div_euclid` maps directly to
 [`DivEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivEuclidean.html)'s
-`div_euclidean`, with its assign form. The remainder half is a gap: a `ModEuclidean`
-companion to `DivEuclidean` is planned, and until it lands the operation is one step away,
-since a floor remainder by a positive divisor is already Euclidean:
-`x.mod_op(Integer::from(y.unsigned_abs()))`. On the
+`div_euclidean`, with its assign form. `rem_euclid` is the
+[`ModEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModEuclidean.html)
+companion: `x.mod_euclidean(&y)`, whose result is nonnegative and therefore comes back as a
+[`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html), with
+[`ModEuclideanAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModEuclideanAssign.html)
+as its in-place form. The provided `div_rem_euclid`, which computes both at once, is the
+simultaneous pair
+[`DivModEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivModEuclidean.html).
+On the
 unsigned types, Euclidean, floor, and truncating division are all the same thing, which is how
 num implements `Euclid for BigUint`. The `CheckedEuclid` pair adds the zero-divisor guard,
 answered as `checked_div` was in

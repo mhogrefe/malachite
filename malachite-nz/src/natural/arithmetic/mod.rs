@@ -33,9 +33,8 @@ pub mod coprime_with;
 /// Division of [`Natural`](super::Natural)s.
 pub mod div;
 /// Implementations of [`DivEuclidean`](malachite_base::num::arithmetic::traits::DivEuclidean) and
-/// [`DivAssignEuclidean`](malachite_base::num::arithmetic::traits::DivAssignEuclidean), traits for
-/// simultaneously finding the quotient and remainder of two numbers, where the remainder is
-/// nonnegative.
+/// [`DivEuclideanAssign`](malachite_base::num::arithmetic::traits::DivEuclideanAssign), traits for
+/// finding the quotient of two numbers, rounded so that the remainder would be nonnegative.
 pub mod div_euclidean;
 /// Implementations of [`DivExact`](malachite_base::num::arithmetic::traits::DivExact) and
 /// [`DivExactAssign`](malachite_base::num::arithmetic::traits::DivExactAssign), traits for dividing
@@ -57,6 +56,11 @@ pub mod div_exact;
 /// modifies the usual relation $x = qy + r$ to $x = qy - r$.
 #[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
 pub mod div_mod;
+/// Implementations of [`DivModEuclidean`](malachite_base::num::arithmetic::traits::DivModEuclidean)
+/// and [`DivAssignModEuclidean`](malachite_base::num::arithmetic::traits::DivAssignModEuclidean),
+/// traits for simultaneously finding the quotient and remainder of two numbers, where the remainder
+/// is nonnegative.
+pub mod div_mod_euclidean;
 /// Implementations of [`DivRound`](malachite_base::num::arithmetic::traits::DivRound) and
 /// [`DivExactAssign`](malachite_base::num::arithmetic::traits::DivRoundAssign), traits for dividing
 /// two numbers according to a specified
@@ -142,6 +146,10 @@ pub mod log_base_power_of_2;
 /// [`ModAddAssign`](malachite_base::num::arithmetic::traits::ModAddAssign), traits for adding two
 /// numbers modulo another number.
 pub mod mod_add;
+/// Implementations of [`ModEuclidean`](malachite_base::num::arithmetic::traits::ModEuclidean) and
+/// [`ModEuclideanAssign`](malachite_base::num::arithmetic::traits::ModEuclideanAssign), traits for
+/// finding the remainder of two numbers, where the remainder is nonnegative.
+pub mod mod_euclidean;
 /// Implementations of [`ModInverse`](malachite_base::num::arithmetic::traits::ModInverse), a trait
 /// for finding the multiplicative inverse of a number modulo another number.
 pub mod mod_inverse;

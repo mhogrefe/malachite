@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::{DivEuclidean, DivEuclideanAssign};
+use malachite_base::num::arithmetic::traits::{ModEuclidean, ModEuclideanAssign};
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
@@ -14,46 +14,46 @@ use malachite_nz::test_util::bench::bucketers::pair_1_integer_bit_bucketer;
 use malachite_nz::test_util::generators::integer_pair_gen_var_1;
 
 pub(crate) fn register(runner: &mut Runner) {
-    register_demo!(runner, demo_integer_div_euclidean);
-    register_demo!(runner, demo_integer_div_euclidean_assign);
+    register_demo!(runner, demo_integer_mod_euclidean);
+    register_demo!(runner, demo_integer_mod_euclidean_assign);
 
-    register_bench!(runner, benchmark_integer_div_euclidean_evaluation_strategy);
+    register_bench!(runner, benchmark_integer_mod_euclidean_evaluation_strategy);
     register_bench!(
         runner,
-        benchmark_integer_div_euclidean_assign_evaluation_strategy
+        benchmark_integer_mod_euclidean_assign_evaluation_strategy
     );
 }
 
-fn demo_integer_div_euclidean(gm: GenMode, config: &GenConfig, limit: usize) {
+fn demo_integer_mod_euclidean(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y) in integer_pair_gen_var_1().get(gm, config).take(limit) {
         let x_old = x.clone();
         let y_old = y.clone();
         println!(
-            "({}).div_euclidean({}) = {}",
+            "({}).mod_euclidean({}) = {}",
             x_old,
             y_old,
-            x.div_euclidean(y)
+            x.mod_euclidean(y)
         );
     }
 }
 
-fn demo_integer_div_euclidean_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+fn demo_integer_mod_euclidean_assign(gm: GenMode, config: &GenConfig, limit: usize) {
     for (x, y) in integer_pair_gen_var_1().get(gm, config).take(limit) {
         let x_old = x.clone();
         let mut x = x;
-        x.div_euclidean_assign(&y);
-        println!("x := {x_old}; x.div_euclidean_assign(&{y}); x = {x}");
+        x.mod_euclidean_assign(&y);
+        println!("x := {x_old}; x.mod_euclidean_assign(&{y}); x = {x}");
     }
 }
 
-fn benchmark_integer_div_euclidean_evaluation_strategy(
+fn benchmark_integer_mod_euclidean_evaluation_strategy(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
-        "Integer.div_euclidean(Integer)",
+        "Integer.mod_euclidean(Integer)",
         BenchmarkType::EvaluationStrategy,
         integer_pair_gen_var_1().get(gm, config),
         gm.name(),
@@ -61,30 +61,30 @@ fn benchmark_integer_div_euclidean_evaluation_strategy(
         file_name,
         &pair_1_integer_bit_bucketer("x"),
         &mut [
-            ("Integer.div_euclidean(Integer)", &mut |(x, y)| {
-                no_out!(x.div_euclidean(y));
+            ("Integer.mod_euclidean(Integer)", &mut |(x, y)| {
+                no_out!(x.mod_euclidean(y));
             }),
-            ("Integer.div_euclidean(&Integer)", &mut |(x, y)| {
-                no_out!(x.div_euclidean(&y));
+            ("Integer.mod_euclidean(&Integer)", &mut |(x, y)| {
+                no_out!(x.mod_euclidean(&y));
             }),
-            ("(&Integer).div_euclidean(Integer)", &mut |(x, y)| {
-                no_out!((&x).div_euclidean(y));
+            ("(&Integer).mod_euclidean(Integer)", &mut |(x, y)| {
+                no_out!((&x).mod_euclidean(y));
             }),
-            ("(&Integer).div_euclidean(&Integer)", &mut |(x, y)| {
-                no_out!((&x).div_euclidean(&y));
+            ("(&Integer).mod_euclidean(&Integer)", &mut |(x, y)| {
+                no_out!((&x).mod_euclidean(&y));
             }),
         ],
     );
 }
 
-fn benchmark_integer_div_euclidean_assign_evaluation_strategy(
+fn benchmark_integer_mod_euclidean_assign_evaluation_strategy(
     gm: GenMode,
     config: &GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
-        "Integer.div_euclidean_assign(Integer)",
+        "Integer.mod_euclidean_assign(Integer)",
         BenchmarkType::EvaluationStrategy,
         integer_pair_gen_var_1().get(gm, config),
         gm.name(),
@@ -93,15 +93,15 @@ fn benchmark_integer_div_euclidean_assign_evaluation_strategy(
         &pair_1_integer_bit_bucketer("x"),
         &mut [
             (
-                "Integer.div_euclidean_assign(Integer)",
+                "Integer.mod_euclidean_assign(Integer)",
                 &mut |(mut x, y)| {
-                    no_out!(x.div_euclidean_assign(y));
+                    no_out!(x.mod_euclidean_assign(y));
                 },
             ),
             (
-                "Integer.div_euclidean_assign(&Integer)",
+                "Integer.mod_euclidean_assign(&Integer)",
                 &mut |(mut x, y)| {
-                    no_out!(x.div_euclidean_assign(&y));
+                    no_out!(x.mod_euclidean_assign(&y));
                 },
             ),
         ],

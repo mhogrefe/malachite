@@ -12,11 +12,12 @@ use crate::num::arithmetic::traits::{
     AbsDiff, AddMul, AddMulAssign, ArithmeticCheckedShl, ArithmeticCheckedShr, BinomialCoefficient,
     CeilingRoot, CeilingRootAssign, CeilingSqrt, CeilingSqrtAssign, CheckedAdd, CheckedAddMul,
     CheckedBinomialCoefficient, CheckedDiv, CheckedMul, CheckedNeg, CheckedPow, CheckedRoot,
-    CheckedSqrt, CheckedSquare, CheckedSub, CheckedSubMul, DivAssignEuclidean, DivAssignMod,
-    DivAssignRem, DivEuclidean, DivExact, DivExactAssign, DivMod, DivRem, DivRound, DivRoundAssign,
-    DivisibleBy, DivisibleByPowerOf2, EqMod, EqModPowerOf2, ExtendedGcd, FloorRoot,
-    FloorRootAssign, FloorSqrt, FloorSqrtAssign, JacobiSymbol, KroneckerSymbol, LegendreSymbol,
-    Mod, ModAssign, ModPowerOf2, ModPowerOf2Assign, OverflowingAdd, OverflowingAddAssign,
+    CheckedSqrt, CheckedSquare, CheckedSub, CheckedSubMul, DivAssignMod, DivAssignModEuclidean,
+    DivAssignRem, DivEuclidean, DivEuclideanAssign, DivExact, DivExactAssign, DivMod,
+    DivModEuclidean, DivRem, DivRound, DivRoundAssign, DivisibleBy, DivisibleByPowerOf2, EqMod,
+    EqModPowerOf2, ExtendedGcd, FloorRoot, FloorRootAssign, FloorSqrt, FloorSqrtAssign,
+    JacobiSymbol, KroneckerSymbol, LegendreSymbol, Mod, ModAssign, ModEuclidean,
+    ModEuclideanAssign, ModPowerOf2, ModPowerOf2Assign, OverflowingAdd, OverflowingAddAssign,
     OverflowingAddMul, OverflowingAddMulAssign, OverflowingDiv, OverflowingDivAssign,
     OverflowingMul, OverflowingMulAssign, OverflowingNeg, OverflowingNegAssign, OverflowingPow,
     OverflowingPowAssign, OverflowingSquare, OverflowingSquareAssign, OverflowingSub,
@@ -151,10 +152,12 @@ pub trait PrimitiveInt:
     + Display
     + Div<Self, Output = Self>
     + DivAssign<Self>
-    + DivAssignEuclidean<Self, ModOutput = Self>
+    + DivAssignModEuclidean<Self, ModOutput = Self>
     + DivAssignMod<Self, ModOutput = Self>
     + DivAssignRem<Self, RemOutput = Self>
-    + DivEuclidean<Self, DivOutput = Self, ModOutput = Self>
+    + DivEuclidean<Self, Output = Self>
+    + DivEuclideanAssign<Self>
+    + DivModEuclidean<Self, DivOutput = Self, ModOutput = Self>
     + DivExact<Self, Output = Self>
     + DivExactAssign<Self>
     + DivMod<Self, DivOutput = Self, ModOutput = Self>
@@ -215,6 +218,8 @@ pub trait PrimitiveInt:
     + Min
     + Mod<Self, Output = Self>
     + ModAssign<Self>
+    + ModEuclidean<Self, Output = Self>
+    + ModEuclideanAssign<Self>
     + ModPowerOf2
     + ModPowerOf2Assign
     + Mul<Self, Output = Self>
@@ -630,10 +635,12 @@ pub trait PrimitiveInt:
     + Display
     + Div<Self, Output = Self>
     + DivAssign<Self>
-    + DivAssignEuclidean<Self, ModOutput = Self>
+    + DivAssignModEuclidean<Self, ModOutput = Self>
     + DivAssignMod<Self, ModOutput = Self>
     + DivAssignRem<Self, RemOutput = Self>
-    + DivEuclidean<Self, DivOutput = Self, ModOutput = Self>
+    + DivEuclidean<Self, Output = Self>
+    + DivEuclideanAssign<Self>
+    + DivModEuclidean<Self, DivOutput = Self, ModOutput = Self>
     + DivExact<Self, Output = Self>
     + DivExactAssign<Self>
     + DivMod<Self, DivOutput = Self, ModOutput = Self>
@@ -693,6 +700,8 @@ pub trait PrimitiveInt:
     + Min
     + Mod<Self, Output = Self>
     + ModAssign<Self>
+    + ModEuclidean<Self, Output = Self>
+    + ModEuclideanAssign<Self>
     + ModPowerOf2
     + ModPowerOf2Assign
     + Mul<Self, Output = Self>

@@ -215,15 +215,35 @@ pub trait DivMod<RHS = Self> {
     fn div_mod(self, other: RHS) -> (Self::DivOutput, Self::ModOutput);
 }
 
+/// Divides two numbers, returning just the quotient. The quotient is rounded towards the quotient
+/// that makes the remainder nonnegative.
+///
+/// If the remainder were computed, the quotient and remainder would satisfy $x = qy + r$ and $0
+/// \leq r < |y|$.
+pub trait DivEuclidean<RHS = Self> {
+    type Output;
+
+    fn div_euclidean(self, other: RHS) -> Self::Output;
+}
+
+/// Divides a number by another number in place, keeping just the quotient. The quotient is rounded
+/// towards the quotient that makes the remainder nonnegative.
+///
+/// If the remainder were computed, the quotient and remainder would satisfy $x = qy + r$ and $0
+/// \leq r < |y|$.
+pub trait DivEuclideanAssign<RHS = Self> {
+    fn div_euclidean_assign(&mut self, other: RHS);
+}
+
 /// Divides two numbers, returning the quotient and remainder. The quotient is rounded towards the
 /// quotient that makes the remainder nonnegative, and the remainder is always nonnegative.
 ///
 /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq r < |y|$.
-pub trait DivEuclidean<RHS = Self> {
+pub trait DivModEuclidean<RHS = Self> {
     type DivOutput;
     type ModOutput;
 
-    fn div_euclidean(self, other: RHS) -> (Self::DivOutput, Self::ModOutput);
+    fn div_mod_euclidean(self, other: RHS) -> (Self::DivOutput, Self::ModOutput);
 }
 
 /// Divides a number by another number in place, returning the remainder. The quotient is rounded
@@ -241,10 +261,10 @@ pub trait DivAssignMod<RHS = Self> {
 /// nonnegative.
 ///
 /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq r < |y|$.
-pub trait DivAssignEuclidean<RHS = Self> {
+pub trait DivAssignModEuclidean<RHS = Self> {
     type ModOutput;
 
-    fn div_assign_euclidean(&mut self, other: RHS) -> Self::ModOutput;
+    fn div_assign_mod_euclidean(&mut self, other: RHS) -> Self::ModOutput;
 }
 
 /// Divides two numbers, returning the quotient and remainder. The quotient is rounded towards zero,
@@ -848,6 +868,26 @@ pub trait Mod<RHS = Self> {
 /// |r| < |y|$.
 pub trait ModAssign<RHS = Self> {
     fn mod_assign(&mut self, other: RHS);
+}
+
+/// Divides a number by another number, returning just the remainder. The remainder is always
+/// nonnegative.
+///
+/// If the quotient were computed, the quotient and remainder would satisfy $x = qy + r$ and $0 \leq
+/// r < |y|$.
+pub trait ModEuclidean<RHS = Self> {
+    type Output;
+
+    fn mod_euclidean(self, other: RHS) -> Self::Output;
+}
+
+/// Divides a number by another number, replacing the first number by the remainder. The remainder
+/// is always nonnegative.
+///
+/// If the quotient were computed, the quotient and remainder would satisfy $x = qy + r$ and $0 \leq
+/// r < |y|$.
+pub trait ModEuclideanAssign<RHS = Self> {
+    fn mod_euclidean_assign(&mut self, other: RHS);
 }
 
 /// Divides the negative of a number by another number, returning the remainder.

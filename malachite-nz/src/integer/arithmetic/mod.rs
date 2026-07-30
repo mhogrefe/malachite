@@ -26,9 +26,8 @@ pub mod binomial_coefficient;
 /// Division of [`Integer`](super::Integer)s.
 pub mod div;
 /// Implementations of [`DivEuclidean`](malachite_base::num::arithmetic::traits::DivEuclidean) and
-/// [`DivAssignEuclidean`](malachite_base::num::arithmetic::traits::DivAssignEuclidean), traits for
-/// simultaneously finding the quotient and remainder of two numbers, where the remainder is
-/// nonnegative.
+/// [`DivEuclideanAssign`](malachite_base::num::arithmetic::traits::DivEuclideanAssign), traits for
+/// finding the quotient of two numbers, rounded so that the remainder would be nonnegative.
 pub mod div_euclidean;
 /// Implementations of [`DivExact`](malachite_base::num::arithmetic::traits::DivExact) and
 /// [`DivExactAssign`](malachite_base::num::arithmetic::traits::DivExactAssign), traits for dividing
@@ -46,6 +45,11 @@ pub mod div_exact;
 /// | towards $\infty$  | [`CeilingDivMod`](malachite_base::num::arithmetic::traits::CeilingDivMod) | [`CeilingDivAssignMod`](malachite_base::num::arithmetic::traits::CeilingDivAssignMod) |
 #[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
 pub mod div_mod;
+/// Implementations of [`DivModEuclidean`](malachite_base::num::arithmetic::traits::DivModEuclidean)
+/// and [`DivAssignModEuclidean`](malachite_base::num::arithmetic::traits::DivAssignModEuclidean),
+/// traits for simultaneously finding the quotient and remainder of two numbers, where the remainder
+/// is nonnegative.
+pub mod div_mod_euclidean;
 /// Implementations of [`DivRound`](malachite_base::num::arithmetic::traits::DivRound) and
 /// [`DivExactAssign`](malachite_base::num::arithmetic::traits::DivRoundAssign), traits for dividing
 /// two numbers according to a specified
@@ -72,6 +76,10 @@ pub mod extended_gcd;
 /// [`KroneckerSymbol`](malachite_base::num::arithmetic::traits::KroneckerSymbol), traits for
 /// computing the Legendre, Jacobi, and Kronecker symbols of two numbers.
 pub mod kronecker_symbol;
+/// Implementations of [`ModEuclidean`](malachite_base::num::arithmetic::traits::ModEuclidean) and
+/// [`ModEuclideanAssign`](malachite_base::num::arithmetic::traits::ModEuclideanAssign), traits for
+/// finding the remainder of two numbers, where the remainder is nonnegative.
+pub mod mod_euclidean;
 /// Implementations of traits for finding the remainder of two numbers, subject to various rounding
 /// rules.
 ///

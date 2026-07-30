@@ -248,7 +248,7 @@ come closest to being one: most rows are the same trait name in two crates.
 | — | `Saturating` (legacy two-method umbrella) | |
 | ✓ | `WrappingAdd`, `WrappingSub`, `WrappingMul`, `WrappingNeg` | [`WrappingAdd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.WrappingAdd.html) and kin |
 | ≈ | `WrappingShl`, `WrappingShr` | [`Shl`](https://doc.rust-lang.org/nightly/std/ops/trait.Shl.html), [`Shr`](https://doc.rust-lang.org/nightly/std/ops/trait.Shr.html) |
-| ≈ | `Euclid`, `CheckedEuclid` | [`DivEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivEuclidean.html) |
+| ≈ | `Euclid`, `CheckedEuclid` | [`DivEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivEuclidean.html), [`ModEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModEuclidean.html) |
 | ✓ | `Inv` | [`Reciprocal`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Reciprocal.html) |
 | ✓ | `MulAdd` | [`AddMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.AddMul.html) |
 | ≈ | `MulAddAssign` | [`AddMulAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.AddMulAssign.html) |
@@ -275,12 +275,14 @@ The count-based behaviors are one-liners when ported exactly,
 wants the value-based question, and should choose deliberately.
 
 **`Euclid` and `Inv`.** `div_euclid` is
-[`DivEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivEuclidean.html),
+[`DivEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivEuclidean.html)
+and `rem_euclid` is
+[`ModEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModEuclidean.html),
 on the primitives as on
-[`Integer`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html);
-the remainder half belongs to the `ModEuclidean` companion
-[planned on the integers page](/mapping/num-integers/#the-division-family), with the
-mod-by-absolute-value spelling in the meantime, and `CheckedEuclid` adds the zero-divisor
+[`Integer`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html), and the
+provided `div_rem_euclid` pair is
+[`DivModEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivModEuclidean.html);
+`CheckedEuclid` adds the zero-divisor
 guard. `Inv` is
 [`Reciprocal`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Reciprocal.html),
 on the primitive floats here and on

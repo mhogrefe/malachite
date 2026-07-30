@@ -76,6 +76,7 @@ pub mod integer {
         pub mod div_euclidean;
         pub mod div_exact;
         pub mod div_mod;
+        pub mod div_mod_euclidean;
         pub mod div_round;
         pub mod divisible_by;
         pub mod divisible_by_power_of_2;
@@ -83,6 +84,7 @@ pub mod integer {
         pub mod eq_mod_power_of_2;
         pub mod extended_gcd;
         pub mod kronecker_symbol;
+        pub mod mod_euclidean;
         pub mod mod_op;
         pub mod mod_power_of_2;
         pub mod mul;
@@ -233,6 +235,7 @@ pub mod natural {
         pub mod div_euclidean;
         pub mod div_exact;
         pub mod div_mod;
+        pub mod div_mod_euclidean;
         pub mod div_round;
         pub mod divisible_by;
         pub mod divisible_by_power_of_2;
@@ -251,6 +254,7 @@ pub mod natural {
         pub mod log_base_2;
         pub mod log_base_power_of_2;
         pub mod mod_add;
+        pub mod mod_euclidean;
         pub mod mod_inverse;
         pub mod mod_is_reduced;
         pub mod mod_mul;
