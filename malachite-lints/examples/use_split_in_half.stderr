@@ -1,0 +1,15 @@
+error: use `split_in_half()` instead of taking `upper_half()` and `lower_half()` separately
+  --> $DIR/use_split_in_half.rs:7:14
+   |
+LL |     let lo = t.lower_half();
+   |              ^^^^^^^^^^^^^^
+   |
+note: the other half of the same value is taken here
+  --> $DIR/use_split_in_half.rs:6:14
+   |
+LL |     let hi = t.upper_half();
+   |              ^^^^^^^^^^^^^^
+   = note: `#[deny(use_split_in_half)]` on by default
+
+error: aborting due to 1 previous error
+

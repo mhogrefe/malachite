@@ -977,8 +977,7 @@ pub fn limbs_mod_limb_normalized<
         let sum;
         (sum, big_carry) =
             DT::join_halves(sum_low, n).overflowing_add(DT::from(sum_high) * DT::from(power_of_2));
-        sum_high = sum.upper_half();
-        sum_low = sum.lower_half();
+        (sum_high, sum_low) = sum.split_in_half();
     }
     if big_carry {
         sum_high.wrapping_sub_assign(d);
@@ -1037,8 +1036,7 @@ pub_test! {limbs_mod_limb_normalized_shl<
         let sum;
         (sum, big_carry) =
             DT::join_halves(sum_low, n).overflowing_add(DT::from(sum_high) * DT::from(power_of_2));
-        sum_high = sum.upper_half();
-        sum_low = sum.lower_half();
+        (sum_high, sum_low) = sum.split_in_half();
     }
     if big_carry {
         sum_high.wrapping_sub_assign(d);

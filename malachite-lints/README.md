@@ -176,6 +176,16 @@ operand order, but not when the literal is out of the source type's range (then 
 load-bearing) or when the other operand is not a literal. Distinct from
 `redundant_from_in_comparison`, which is about comparing a *bignum* with `Bignum::from(primitive)`.
 
+### `use_split_in_half`
+
+Flags calling both `upper_half()` and `lower_half()` on the same value within one function body:
+`split_in_half()` produces both halves in one call, so the pair collapses into a single
+destructuring, `let (hi, lo) = t.split_in_half()`. To keep the lint sound, it only considers
+receivers that are immutable locals of non-mutable-reference type, whose value therefore cannot
+change between the two calls, and it verifies that the methods resolve to malachite-base's
+`SplitInHalf` trait. Calls inside macro expansions are ignored, which also spares macros that take
+one half or the other per invocation.
+
 ### `use_square`
 
 Flags multiplying a bignum by itself (`&x * &x`) and raising one to the power of 2 (`x.pow(2)`,

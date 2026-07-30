@@ -74,7 +74,8 @@ major improvement warrants re-porting.
   rather than comparing with `power_of_2`; use the named constants and convert other literals at
   compile time; use the in-place `*_assign*` variants and the by-reference variants rather than
   cloning; use `square()`, `even()`/`odd()`, and `reciprocal()` over their spelled-out
-  equivalents; and keep lines within 100 columns.
+  equivalents; use `split_in_half()` rather than taking `upper_half()` and `lower_half()`
+  separately; and keep lines within 100 columns.
 - **Visibility macros**: `pub_test!`/`pub_crate_test!` make internals `pub` under `test_build` so
   tests, demos, and tuning code can call them. For tuner- or test-only entry points that don't fit
   the macros, add explicit `#[cfg(feature = "test_build")] pub fn ..._for_tuning` wrappers.

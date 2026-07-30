@@ -12,10 +12,15 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::Natural;
-use crate::natural::arithmetic::mul::limbs_mul;
+use crate::natural::arithmetic::mul::{limbs_mul_to_out, limbs_mul_to_out_scratch_len};
 use crate::natural::arithmetic::sub::{limbs_sub_greater_in_place_left, limbs_sub_limb_in_place};
 use crate::natural::comparison::cmp::limbs_cmp;
 use crate::platform::{DoubleLimb, Limb};
+
+// Above this shorter-operand length, a full product followed by a subtraction beats single-limb
+// submul rows: the multiplication's basecase processes two rows per pass, and there is no two-row
+// submul kernel to match it.
+const SUB_MUL_BASECASE_THRESHOLD: usize = 10;
 use alloc::vec::Vec;
 use core::cmp::Ordering::*;
 use core::fmt::Display;
@@ -258,17 +263,56 @@ pub_crate_test! {limbs_sub_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Option<
 pub_crate_test! {limbs_sub_mul_in_place_left(xs: &mut [Limb], ys: &[Limb], zs: &[Limb]) -> bool {
     assert!(ys.len() > 1);
     assert!(zs.len() > 1);
-    let mut scratch = limbs_mul(ys, zs);
-    assert!(xs.len() >= scratch.len() - 1);
-    if *scratch.last().unwrap() == 0 {
-        scratch.pop();
+    let (long, short) = if ys.len() >= zs.len() { (ys, zs) } else { (zs, ys) };
+    assert!(xs.len() >= long.len() + short.len() - 1);
+    if short.len() < SUB_MUL_BASECASE_THRESHOLD {
+        limbs_sub_mul_basecase_in_place_left(xs, long, short)
+    } else {
+        // The product is a temporary that is dropped whole, scratch tail and all, so nothing has
+        // to be shrunk.
+        let mut product_len = long.len() + short.len();
+        let mut product =
+            vec![0; product_len + limbs_mul_to_out_scratch_len(long.len(), short.len())];
+        let (product_slice, mul_scratch) = product.split_at_mut(product_len);
+        if limbs_mul_to_out(product_slice, long, short, mul_scratch) == 0 {
+            product_len -= 1;
+        }
+        let product = &product[..product_len];
+        assert_ne!(*product.last().unwrap(), 0);
+        let borrow = limbs_cmp(xs, product) == Less;
+        if !borrow {
+            assert!(!limbs_sub_greater_in_place_left(xs, product));
+        }
+        borrow
     }
-    let borrow = limbs_cmp(xs, &scratch) == Less;
-    if !borrow {
-        assert!(!limbs_sub_greater_in_place_left(xs, &scratch));
-    }
-    borrow
 }}
+
+// Subtracts y * z directly out of `xs`, one submul row per limb of the shorter input, with no
+// product temporary. Returns whether a borrow occurred; if it did, the function returned as soon
+// as the borrow was detected, and the contents of `xs` should be ignored. `ys` must be at least as
+// long as `zs`, `zs` must be nonempty, and `xs` must be at least `ys.len() + zs.len() - 1` limbs
+// long; no slice may have trailing zeros.
+//
+// # Worst-case complexity
+// $T(n, m) = O(nm)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, $n$ is `ys.len()`, and $m$ is `zs.len()`.
+fn limbs_sub_mul_basecase_in_place_left(xs: &mut [Limb], ys: &[Limb], zs: &[Limb]) -> bool {
+    let ys_len = ys.len();
+    for (i, &z) in zs.iter().enumerate() {
+        if z == 0 {
+            continue;
+        }
+        let end = i + ys_len;
+        let borrow = limbs_sub_mul_limb_same_length_in_place_left(&mut xs[i..end], ys, z);
+        if borrow != 0 && (end == xs.len() || limbs_sub_limb_in_place(&mut xs[end..], borrow)) {
+            return true;
+        }
+    }
+    false
+}
 
 fn sub_mul_panic<S: Display, T: Display, U: Display>(a: S, b: T, c: U) -> ! {
     panic!("Cannot perform sub_mul. a: {a}, b: {b}, c: {c}");

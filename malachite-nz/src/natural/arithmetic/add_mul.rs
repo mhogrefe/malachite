@@ -20,9 +20,9 @@ use crate::natural::arithmetic::add::{
 };
 use crate::natural::arithmetic::mul::limb::{limbs_mul_limb_to_out, limbs_slice_mul_limb_in_place};
 use crate::natural::arithmetic::mul::{limbs_mul_to_out, limbs_mul_to_out_scratch_len};
-use crate::platform::{DoubleLimb, Limb};
+use crate::platform::{DoubleLimb, Limb, MUL_TOOM22_THRESHOLD};
 use alloc::vec::Vec;
-use core::mem::swap;
+use core::cmp::max;
 use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign, XMulYToZZ};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
@@ -105,10 +105,10 @@ pub(crate) fn limbs_slice_add_mul_two_limbs_matching_length_in_place_left(
     for (x, &y) in xs[..len].iter_mut().zip(ys.iter()) {
         let y = DoubleLimb::from(y);
         let t = DoubleLimb::from(*x) + DoubleLimb::from(carry_lo) + y * z_0;
-        *x = t.lower_half();
-        let t_2 = DoubleLimb::from(t.upper_half()) + DoubleLimb::from(carry_hi) + y * z_1;
-        carry_lo = t_2.lower_half();
-        carry_hi = t_2.upper_half();
+        let (t_hi, t_lo) = t.split_in_half();
+        *x = t_lo;
+        let t_2 = DoubleLimb::from(t_hi) + DoubleLimb::from(carry_hi) + y * z_1;
+        (carry_hi, carry_lo) = t_2.split_in_half();
     }
     xs[len] = carry_lo;
     carry_hi
@@ -283,29 +283,119 @@ pub_test! {limbs_vec_add_mul_limb_in_place_either(
 //
 // This is equivalent to `mpz_aorsmul` from `mpz/aorsmul.c`, GMP 6.2.1, where `w`, `x`, and `y` are
 // positive, `sub` is positive, and `w` is returned instead of overwriting the first input.
-pub_test! {limbs_add_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Vec<Limb> {
-    let xs_len = xs.len();
-    let mut out_len = ys.len() + zs.len();
-    // The product must end up owned, so it is the parent's prefix, with the multiplication scratch
-    // as the tail; the parent is truncated to the product once the multiplication is done.
-    let mut out = vec![0; out_len + limbs_mul_to_out_scratch_len(ys.len(), zs.len())];
-    let (out_slice, mul_scratch) = out.split_at_mut(out_len);
-    if limbs_mul_to_out(out_slice, ys, zs, mul_scratch) == 0 {
-        out_len -= 1;
-    }
-    out.truncate(out_len);
-    // Give back the scratch capacity, so the returned value does not carry it around.
-    out.shrink_to_fit();
-    assert_ne!(*out.last().unwrap(), 0);
-    if xs_len >= out_len {
-        limbs_add_greater(xs, &out)
-    } else {
-        if limbs_slice_add_greater_in_place_left(&mut out, xs) {
-            out.push(1);
-        }
+pub_test! {
+// The multiplication scratch stays a separate allocation: the product buffer becomes the returned
+// value, and a merged parent would either retain the scratch capacity or pay a shrinking copy.
+#[cfg_attr(dylint_lib = "malachite_lints", allow(adjacent_vec_allocations))]
+limbs_add_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Vec<Limb> {
+    let (long, short) = if ys.len() >= zs.len() { (ys, zs) } else { (zs, ys) };
+    if short.len() < MUL_TOOM22_THRESHOLD {
+        // The one extra slot means neither the resize inside the basecase nor a final carry push
+        // can reallocate.
+        let mut out = Vec::with_capacity(max(xs.len(), long.len() + short.len()) + 1);
+        out.extend_from_slice(xs);
+        limbs_add_mul_basecase_in_place_left(&mut out, long, short);
         out
+    } else {
+        let xs_len = xs.len();
+        let mut out_len = long.len() + short.len();
+        // The scratch is a separate allocation so that the product, which may become the returned
+        // value, carries no scratch-sized slack; unlike a shared allocation, nothing has to be
+        // shrunk (and therefore copied) afterward.
+        let mut out = vec![0; out_len];
+        let mut mul_scratch = vec![0; limbs_mul_to_out_scratch_len(long.len(), short.len())];
+        if limbs_mul_to_out(&mut out, long, short, &mut mul_scratch) == 0 {
+            out_len -= 1;
+            out.pop();
+        }
+        drop(mul_scratch);
+        assert_ne!(*out.last().unwrap(), 0);
+        if xs_len >= out_len {
+            limbs_add_greater(xs, &out)
+        } else {
+            if limbs_slice_add_greater_in_place_left(&mut out, xs) {
+                out.push(1);
+            }
+            out
+        }
     }
 }}
+
+// Accumulates y * z directly into `xs`, one addmul row per limb of the shorter input, with no
+// product temporary. `ys` must be at least as long as `zs`, and `zs` must be nonempty; no slice may
+// have trailing zeros. The result has no trailing zeros.
+//
+// # Worst-case complexity
+// $T(n, m) = O(nm)$
+//
+// $M(n) = O(n)$
+//
+// where $T$ is time, $M$ is additional memory, $n$ is `ys.len()`, and $m$ is `zs.len()`.
+fn limbs_add_mul_basecase_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], zs: &[Limb]) {
+    let ys_len = ys.len();
+    let zs_len = zs.len();
+    let out_len = ys_len + zs_len;
+    if xs.len() < out_len {
+        xs.resize(out_len, 0);
+    }
+    let mut i = 0;
+    while i + 1 < zs_len {
+        let z_pair = [zs[i], zs[i + 1]];
+        if z_pair != [0, 0] {
+            let end = i + ys_len + 2;
+            if limbs_slice_add_mul_two_limbs_in_place_left(&mut xs[i..end], ys, z_pair)
+                && limbs_slice_add_limb_in_place(&mut xs[end..], 1)
+            {
+                xs.push(1);
+            }
+        }
+        i += 2;
+    }
+    if i < zs_len && zs[i] != 0 {
+        let end = i + ys_len;
+        let carry = limbs_slice_add_mul_limb_same_length_in_place_left(&mut xs[i..end], ys, zs[i]);
+        if carry != 0 && limbs_slice_add_limb_in_place(&mut xs[end..], carry) {
+            xs.push(1);
+        }
+    }
+    // Only the top limb can be zero: the result is at least y * z, which has at least out_len - 1
+    // significant limbs.
+    if *xs.last().unwrap() == 0 {
+        xs.pop();
+    }
+}
+
+// Adds x + y * (z[0] + z[1] * B) into `xs`, where B is 2^W: the two's-limb analogue of an addmul
+// row that accumulates into all of `xs`, including its top two limbs, rather than overwriting
+// them. `xs` must be exactly two limbs longer than `ys`. Returns whether a carry escaped the
+// window; the escape is at most one, since the window's value and the addend are each less than
+// B^(len + 2).
+fn limbs_slice_add_mul_two_limbs_in_place_left(
+    xs: &mut [Limb],
+    ys: &[Limb],
+    zs: [Limb; 2],
+) -> bool {
+    let len = ys.len();
+    assert_eq!(xs.len(), len + 2);
+    let mut carry_lo: Limb = 0;
+    let mut carry_hi: Limb = 0;
+    let z_0 = DoubleLimb::from(zs[0]);
+    let z_1 = DoubleLimb::from(zs[1]);
+    for (x, &y) in xs[..len].iter_mut().zip(ys.iter()) {
+        let y = DoubleLimb::from(y);
+        let t = DoubleLimb::from(*x) + DoubleLimb::from(carry_lo) + y * z_0;
+        let (t_hi, t_lo) = t.split_in_half();
+        *x = t_lo;
+        let t_2 = DoubleLimb::from(t_hi) + DoubleLimb::from(carry_hi) + y * z_1;
+        (carry_hi, carry_lo) = t_2.split_in_half();
+    }
+    let (sum, carry_1) = xs[len].overflowing_add(carry_lo);
+    xs[len] = sum;
+    let (carry_hi, carry_2) = carry_hi.overflowing_add(Limb::from(carry_1));
+    let (sum, carry_3) = xs[len + 1].overflowing_add(carry_hi);
+    xs[len + 1] = sum;
+    carry_2 || carry_3
+}
 
 // Given the limbs `xs`, `ys` and `zs` of three `Natural`s x, y, and z, computes x + y * z. The
 // limbs of the result are written to `xs`. `xs` should be nonempty and `ys` and `zs` should have
@@ -325,25 +415,46 @@ pub_test! {limbs_add_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Vec<Limb> {
 //
 // This is equivalent to `mpz_aorsmul` from `mpz/aorsmul.c`, GMP 6.2.1, where `w`, `x`, and `y` are
 // positive and `sub` is positive.
-pub_test! {limbs_add_mul_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], zs: &[Limb]) {
-    let xs_len = xs.len();
-    let mut out_len = ys.len() + zs.len();
-    // The product must end up owned, so it is the parent's prefix, with the multiplication scratch
-    // as the tail; the parent is truncated to the product once the multiplication is done.
-    let mut out = vec![0; out_len + limbs_mul_to_out_scratch_len(ys.len(), zs.len())];
-    let (out_slice, mul_scratch) = out.split_at_mut(out_len);
-    if limbs_mul_to_out(out_slice, ys, zs, mul_scratch) == 0 {
-        out_len -= 1;
-    }
-    out.truncate(out_len);
-    // Give back the scratch capacity, so the returned value does not carry it around.
-    out.shrink_to_fit();
-    assert_ne!(*out.last().unwrap(), 0);
-    if xs_len < out_len {
-        swap(xs, &mut out);
-    }
-    if limbs_slice_add_greater_in_place_left(xs, &out) {
-        xs.push(1);
+pub_test! {
+// The multiplication scratch stays a separate allocation: the product buffer becomes the new xs,
+// and a merged parent would either retain the scratch capacity or pay a shrinking copy.
+#[cfg_attr(dylint_lib = "malachite_lints", allow(adjacent_vec_allocations))]
+limbs_add_mul_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], zs: &[Limb]) {
+    let (long, short) = if ys.len() >= zs.len() { (ys, zs) } else { (zs, ys) };
+    let out_len = long.len() + short.len();
+    if short.len() < MUL_TOOM22_THRESHOLD && (xs.len() >= out_len || xs.capacity() > out_len) {
+        // Accumulating rows directly into xs beats a product temporary, but only when xs does not
+        // have to reallocate to make room.
+        limbs_add_mul_basecase_in_place_left(xs, long, short);
+    } else if xs.len() >= out_len {
+        // The product is a temporary that is dropped whole, scratch tail and all; nothing is
+        // shrunk or swapped, so xs keeps its capacity across repeated calls.
+        let mut product_len = out_len;
+        let mut product =
+            vec![0; product_len + limbs_mul_to_out_scratch_len(long.len(), short.len())];
+        let (product_slice, mul_scratch) = product.split_at_mut(product_len);
+        if limbs_mul_to_out(product_slice, long, short, mul_scratch) == 0 {
+            product_len -= 1;
+        }
+        let product = &product[..product_len];
+        assert_ne!(*product.last().unwrap(), 0);
+        if limbs_slice_add_greater_in_place_left(xs, product) {
+            xs.push(1);
+        }
+    } else {
+        // xs is shorter than the product, so the product's buffer becomes the result; the scratch
+        // is a separate allocation so that the result carries no scratch-sized slack.
+        let mut out = vec![0; out_len];
+        let mut mul_scratch = vec![0; limbs_mul_to_out_scratch_len(long.len(), short.len())];
+        if limbs_mul_to_out(&mut out, long, short, &mut mul_scratch) == 0 {
+            out.pop();
+        }
+        drop(mul_scratch);
+        assert_ne!(*out.last().unwrap(), 0);
+        if limbs_slice_add_greater_in_place_left(&mut out, xs) {
+            out.push(1);
+        }
+        *xs = out;
     }
 }}
 

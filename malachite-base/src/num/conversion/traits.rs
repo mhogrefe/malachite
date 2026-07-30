@@ -305,6 +305,9 @@ pub trait SplitInHalf: HasHalf {
     /// respectively, and $M_U$ and $M_L$ are the memory complexities of the
     /// [`upper_half`](Self::upper_half) and [`lower_half`](Self::lower_half) functions,
     /// respectively.
+    // This default implementation is the one place where taking the two halves separately is the
+    // point, rather than a missed `split_in_half` call.
+    #[cfg_attr(dylint_lib = "malachite_lints", allow(use_split_in_half))]
     #[inline]
     fn split_in_half(&self) -> (Self::Half, Self::Half) {
         (self.upper_half(), self.lower_half())

@@ -37,8 +37,9 @@ pub_test! {limbs_mul_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
     let mut out = Vec::with_capacity(xs.len());
     for &x in xs {
         let product = DoubleLimb::from(x) * y + DoubleLimb::from(carry);
-        out.push(product.lower_half());
-        carry = product.upper_half();
+        let product_lo;
+        (carry, product_lo) = product.split_in_half();
+        out.push(product_lo);
     }
     if carry != 0 {
         out.push(carry);
@@ -125,8 +126,7 @@ pub_crate_test! {limbs_slice_mul_limb_with_carry_in_place(
     let y = DoubleLimb::from(y);
     for x in &mut *xs {
         let product = DoubleLimb::from(*x) * y + DoubleLimb::from(carry);
-        *x = product.lower_half();
-        carry = product.upper_half();
+        (carry, *x) = product.split_in_half();
     }
     carry
 }}
