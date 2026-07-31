@@ -536,10 +536,10 @@ a library built for it.
 | | GMP | Malachite |
 | :---: | --- | --- |
 | ≈ | `int mpz_root (mpz_t rop, const mpz_t op, unsigned long int n)` | [`FloorRoot`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.FloorRoot.html), [`CeilingRoot`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CeilingRoot.html), [`CheckedRoot`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CheckedRoot.html) |
-| ✗ | `void mpz_rootrem (mpz_t root, mpz_t rem, const mpz_t u, unsigned long int n)` | [`RootRem`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.RootRem.html) |
+| ≈ | `void mpz_rootrem (mpz_t root, mpz_t rem, const mpz_t u, unsigned long int n)` | [`RootRem`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.RootRem.html) |
 | ✓ | `void mpz_sqrt (mpz_t rop, const mpz_t op)` | [`FloorSqrt`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.FloorSqrt.html) |
 | ✓ | `void mpz_sqrtrem (mpz_t rop1, mpz_t rop2, const mpz_t op)` | [`SqrtRem`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.SqrtRem.html) |
-| ✗ | `int mpz_perfect_power_p (const mpz_t op)` | [`IsPower`](https://docs.rs/malachite-base/latest/malachite_base/num/factorization/traits/trait.IsPower.html) |
+| ✓ | `int mpz_perfect_power_p (const mpz_t op)` | [`IsPower`](https://docs.rs/malachite-base/latest/malachite_base/num/factorization/traits/trait.IsPower.html) |
 | ✓ | `int mpz_perfect_square_p (const mpz_t op)` | [`IsSquare`](https://docs.rs/malachite-base/latest/malachite_base/num/factorization/traits/trait.IsSquare.html) |
 
 **Truncation versus flooring.** GMP sets
@@ -573,22 +573,32 @@ documentation of each method.
 **`mpz_rootrem`, `mpz_sqrtrem`.** [`RootRem`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.RootRem.html) and
 [`SqrtRem`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.SqrtRem.html) return the root and the remainder as a pair, so GMP's warning
 that `mpz_sqrtrem`'s two outputs must not be the same variable has nothing to correspond to. Both
-are defined on [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html) only. For `mpz_sqrtrem` that matches GMP's domain,
-since a negative operand has no square root. `mpz_rootrem` does accept a negative `u` together
-with an odd `n`, again truncating, and a future version of Malachite will extend
-[`RootRem`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.RootRem.html) to [`Integer`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html) to cover it.
+[`SqrtRem`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.SqrtRem.html) is defined on [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html) only, which matches
+GMP's domain, since a negative operand has no square root.
+[`RootRem`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.RootRem.html) is defined on both, so a negative `u` with an odd `n` is
+covered; the ≈ is the rounding, the same one `mpz_root` carries above. GMP truncates toward
+zero, so its remainder takes the sign of `u`; Malachite rounds the root toward negative
+infinity, so its remainder is always non-negative, and on a negative operand with an inexact
+root GMP's root is Malachite's plus one. `root_rem` of −999 with $$n = 3$$ is $$(-10, 1)$$
+where GMP gives $$(-9, -270)$$. Both describe the same number, since
+$$-10^3 + 1 = -9^3 - 270 = -999$$; pick the convention your code expects, and
+[`CeilingRoot`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CeilingRoot.html) is GMP's root on its own.
 
 **`mpz_perfect_square_p`, `mpz_perfect_power_p`.** [`IsSquare`](https://docs.rs/malachite-base/latest/malachite_base/num/factorization/traits/trait.IsSquare.html) and
 [`IsPower`](https://docs.rs/malachite-base/latest/malachite_base/num/factorization/traits/trait.IsPower.html) agree with GMP's conventions, including that 0 and 1 count as
-both perfect squares and perfect powers. Both are [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html)-only. For squares that costs
-nothing, because no negative number is a square. For powers it does: GMP accepts a negative
-operand, where an odd perfect power such as −8 counts. A future version of Malachite will
-implement [`IsPower`](https://docs.rs/malachite-base/latest/malachite_base/num/factorization/traits/trait.IsPower.html) for [`Integer`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html) so that this case is covered too.
+both perfect squares and perfect powers.
+[`IsSquare`](https://docs.rs/malachite-base/latest/malachite_base/num/factorization/traits/trait.IsSquare.html) is [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html)-only, which costs nothing, because no
+negative number is a square.
+[`IsPower`](https://docs.rs/malachite-base/latest/malachite_base/num/factorization/traits/trait.IsPower.html) is defined on [`Integer`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html) as well, so GMP's negative operands are
+covered: a negative value can only be an odd perfect power, so −8 counts, being $$(-2)^3$$, and
+so does −1, while −16 does not, since the only exponents above 1 that divide out of $$2^4$$ are
+even.
 
 [`ExpressAsPower`](https://docs.rs/malachite-base/latest/malachite_base/num/factorization/traits/trait.ExpressAsPower.html) goes a step further
 than the predicate: where `mpz_perfect_power_p` reports only that some $$a^b$$ exists,
 `express_as_power` on 64 returns `Some((2, 6))`, and on a number that is not a perfect power
-it returns [`None`](https://doc.rust-lang.org/nightly/std/option/enum.Option.html).
+it returns [`None`](https://doc.rust-lang.org/nightly/std/option/enum.Option.html). It too is
+defined on both types, and the exponent it returns for a negative value is always odd.
 
 ## [Number Theoretic Functions](https://gmplib.org/manual/Number-Theoretic-Functions) {#number-theoretic-functions}
 

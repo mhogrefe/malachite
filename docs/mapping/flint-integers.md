@@ -748,7 +748,7 @@ the approximation is the same bit pattern on every platform.
 | ✓ | `void fmpz_sqrtrem (fmpz_t f, fmpz_t r, const fmpz_t g)` | [`SqrtRem`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.SqrtRem.html) |
 | ✓ | `int fmpz_is_square (const fmpz_t f)` | [`IsSquare`](https://docs.rs/malachite-base/latest/malachite_base/num/factorization/traits/trait.IsSquare.html) |
 | ≈ | `int fmpz_root (fmpz_t r, const fmpz_t f, slong n)` | [`FloorRoot`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.FloorRoot.html), [`CeilingRoot`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CeilingRoot.html), [`CheckedRoot`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CheckedRoot.html) |
-| ✗ | `int fmpz_is_perfect_power (fmpz_t root, const fmpz_t f)` | [`ExpressAsPower`](https://docs.rs/malachite-base/latest/malachite_base/num/factorization/traits/trait.ExpressAsPower.html) |
+| ✓ | `int fmpz_is_perfect_power (fmpz_t root, const fmpz_t f)` | [`ExpressAsPower`](https://docs.rs/malachite-base/latest/malachite_base/num/factorization/traits/trait.ExpressAsPower.html) |
 
 **`fmpz_sqrt`, `fmpz_sqrtrem`, `fmpz_is_square`.** `g.floor_sqrt()`, `g.sqrt_rem()`, and
 `f.is_square()`, with FLINT's exception on a negative operand becoming a panic. FLINT's warning
@@ -780,11 +780,12 @@ composite `p` usually, but not always, reports failure.
 has exactly this function's shape, and more precisely than GMP's predicate does:
 `express_as_power` on 64 returns `Some((2, 6))`, the root and the exponent, where
 `fmpz_is_perfect_power` sets the root and returns the exponent. The conventions agree too: 0 and
-1 count as perfect powers, and neither library promises the smallest root. The row is ✗ for the
-same reason as `mpz_perfect_power_p` on the GMP page: the trait is `Natural`-only today, while
-FLINT permits negative operands, where an odd power such as $$-8$$ counts; the
-[`Integer`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html)
-implementation is planned.
+1 count as perfect powers, and neither library promises the smallest root. FLINT's negative
+operands are covered as well, since the trait is implemented for
+[`Integer`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html): a
+negative value can only be an odd power, so $$-8$$ counts as $$(-2)^3$$ and the exponent
+returned for a negative value is always odd. The bare predicate, without the root, is
+[`IsPower`](https://docs.rs/malachite-base/latest/malachite_base/num/factorization/traits/trait.IsPower.html).
 
 ### Combinatorial functions and fused operations
 

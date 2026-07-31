@@ -10,8 +10,10 @@ use crate::integer::Integer;
 use crate::natural::Natural;
 use core::ops::Neg;
 use malachite_base::num::arithmetic::traits::{
-    CeilingRoot, CeilingRootAssign, CheckedRoot, FloorRoot, FloorRootAssign, Parity, UnsignedAbs,
+    CeilingRoot, CeilingRootAssign, CheckedRoot, FloorRoot, FloorRootAssign, Parity, Pow,
+    RootAssignRem, RootRem, UnsignedAbs,
 };
+use malachite_base::num::basic::traits::{One, Zero};
 
 impl FloorRoot<u64> for Integer {
     type Output = Self;
@@ -418,5 +420,184 @@ impl CheckedRoot<u64> for &Integer {
         } else {
             panic!("Cannot take even root of {self}")
         }
+    }
+}
+
+// The floor root of a negative value is the negated ceiling root of its absolute value, so the
+// remainder is what the absolute value falls short of that ceiling root's power.
+fn root_rem_neg(abs: Natural, exp: u64) -> (Integer, Integer) {
+    let (floor, rem) = (&abs).root_rem(exp);
+    if rem == 0u32 {
+        (-Integer::from(floor), Integer::ZERO)
+    } else {
+        let ceiling = floor + Natural::ONE;
+        let rem = (&ceiling).pow(exp) - abs;
+        (-Integer::from(ceiling), Integer::from(rem))
+    }
+}
+
+impl RootRem<u64> for Integer {
+    type RootOutput = Self;
+    type RemOutput = Self;
+
+    /// Returns the floor of the $n$th root of an [`Integer`], and the remainder (the difference
+    /// between the [`Integer`] and the $n$th power of the floor).
+    ///
+    /// $f(x, n) = (\lfloor\sqrt\[n\]{x}\rfloor, x - \lfloor\sqrt\[n\]{x}\rfloor^n)$.
+    ///
+    /// The remainder is always non-negative, because the root is rounded toward negative infinity.
+    /// GMP's `mpz_rootrem` truncates toward zero instead, so on a negative operand its root is this
+    /// one plus 1, unless the root is exact, and its remainder is negative; see [`CeilingRoot`] for
+    /// that convention.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `exp` is zero, or if `self` is negative and `exp` is even.
+    ///
+    /// The [`Integer`] is taken by value.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::RootRem;
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// assert_eq!(
+    ///     Integer::from(999).root_rem(3),
+    ///     (Integer::from(9), Integer::from(270))
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(1000).root_rem(3),
+    ///     (Integer::from(10), Integer::ZERO)
+    /// );
+    /// // the root is rounded down, so the remainder stays non-negative
+    /// assert_eq!(
+    ///     Integer::from(-999).root_rem(3),
+    ///     (Integer::from(-10), Integer::from(1))
+    /// );
+    /// assert_eq!(
+    ///     Integer::from(-1000).root_rem(3),
+    ///     (Integer::from(-10), Integer::ZERO)
+    /// );
+    /// ```
+    fn root_rem(self, exp: u64) -> (Self, Self) {
+        if self >= 0 {
+            let (root, rem) = self.unsigned_abs().root_rem(exp);
+            (Self::from(root), Self::from(rem))
+        } else if exp.odd() {
+            root_rem_neg(self.unsigned_abs(), exp)
+        } else {
+            panic!("Cannot take even root of a negative Integer")
+        }
+    }
+}
+
+impl RootRem<u64> for &Integer {
+    type RootOutput = Integer;
+    type RemOutput = Integer;
+
+    /// Returns the floor of the $n$th root of an [`Integer`], and the remainder (the difference
+    /// between the [`Integer`] and the $n$th power of the floor).
+    ///
+    /// $f(x, n) = (\lfloor\sqrt\[n\]{x}\rfloor, x - \lfloor\sqrt\[n\]{x}\rfloor^n)$.
+    ///
+    /// The remainder is always non-negative, because the root is rounded toward negative infinity.
+    /// GMP's `mpz_rootrem` truncates toward zero instead, so on a negative operand its root is this
+    /// one plus 1, unless the root is exact, and its remainder is negative; see [`CeilingRoot`] for
+    /// that convention.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `exp` is zero, or if `self` is negative and `exp` is even.
+    ///
+    /// The [`Integer`] is taken by reference.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::RootRem;
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// assert_eq!(
+    ///     (&Integer::from(999)).root_rem(3),
+    ///     (Integer::from(9), Integer::from(270))
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(1000)).root_rem(3),
+    ///     (Integer::from(10), Integer::ZERO)
+    /// );
+    /// // the root is rounded down, so the remainder stays non-negative
+    /// assert_eq!(
+    ///     (&Integer::from(-999)).root_rem(3),
+    ///     (Integer::from(-10), Integer::from(1))
+    /// );
+    /// assert_eq!(
+    ///     (&Integer::from(-1000)).root_rem(3),
+    ///     (Integer::from(-10), Integer::ZERO)
+    /// );
+    /// ```
+    fn root_rem(self, exp: u64) -> (Integer, Integer) {
+        if *self >= 0 {
+            let (root, rem) = self.unsigned_abs_ref().root_rem(exp);
+            (Integer::from(root), Integer::from(rem))
+        } else if exp.odd() {
+            root_rem_neg(self.unsigned_abs(), exp)
+        } else {
+            panic!("Cannot take even root of a negative Integer")
+        }
+    }
+}
+
+impl RootAssignRem<u64> for Integer {
+    type RemOutput = Self;
+
+    /// Replaces an [`Integer`] with the floor of its $n$th root, and returns the remainder (the
+    /// difference between the original [`Integer`] and the $n$th power of the floor).
+    ///
+    /// $f(x, n) = x - \lfloor\sqrt\[n\]{x}\rfloor^n$,
+    ///
+    /// $x \gets \lfloor\sqrt\[n\]{x}\rfloor$.
+    ///
+    /// The remainder is always non-negative; see [`RootRem`] for how that compares with GMP.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `exp` is zero, or if `self` is negative and `exp` is even.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::RootAssignRem;
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// let mut x = Integer::from(999);
+    /// assert_eq!(x.root_assign_rem(3), 270);
+    /// assert_eq!(x, 9);
+    ///
+    /// let mut x = Integer::from(-999);
+    /// assert_eq!(x.root_assign_rem(3), 1);
+    /// assert_eq!(x, -10);
+    /// ```
+    fn root_assign_rem(&mut self, exp: u64) -> Self {
+        let (root, rem) = core::mem::take(self).root_rem(exp);
+        *self = root;
+        rem
     }
 }

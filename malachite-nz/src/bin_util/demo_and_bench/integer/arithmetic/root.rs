@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{
-    CeilingRoot, CeilingRootAssign, CheckedRoot, FloorRoot, FloorRootAssign,
+    CeilingRoot, CeilingRootAssign, CheckedRoot, FloorRoot, FloorRootAssign, RootAssignRem, RootRem,
 };
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
@@ -40,7 +40,11 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_integer_ceiling_root_assign);
     register_demo!(runner, demo_integer_checked_root);
     register_demo!(runner, demo_integer_checked_root_ref);
+    register_demo!(runner, demo_integer_root_rem);
+    register_demo!(runner, demo_integer_root_rem_ref);
+    register_demo!(runner, demo_integer_root_assign_rem);
 
+    register_bench!(runner, benchmark_integer_root_rem_evaluation_strategy);
     register_bench!(runner, benchmark_integer_floor_cbrt_evaluation_strategy);
     register_bench!(runner, benchmark_integer_floor_cbrt_library_comparison);
     register_bench!(runner, benchmark_integer_floor_cbrt_assign);
@@ -478,6 +482,61 @@ fn benchmark_integer_checked_root_evaluation_strategy(
             }),
             ("(&Integer).checked_root(u64)", &mut |(x, exp)| {
                 no_out!((&x).checked_root(exp));
+            }),
+        ],
+    );
+}
+
+fn demo_integer_root_rem(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, exp) in integer_unsigned_pair_gen_var_3()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        println!("({}).root_rem({}) = {:?}", x_old, exp, x.root_rem(exp));
+    }
+}
+
+fn demo_integer_root_rem_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, exp) in integer_unsigned_pair_gen_var_3()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!("(&{}).root_rem({}) = {:?}", x, exp, (&x).root_rem(exp));
+    }
+}
+
+fn demo_integer_root_assign_rem(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, exp) in integer_unsigned_pair_gen_var_3()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let rem = x.root_assign_rem(exp);
+        println!("x := {x_old}; x.root_assign_rem({exp}) = {rem}; x = {x}");
+    }
+}
+
+fn benchmark_integer_root_rem_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Integer.root_rem(u64)",
+        BenchmarkType::EvaluationStrategy,
+        integer_unsigned_pair_gen_var_3().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_1_integer_bit_bucketer("x"),
+        &mut [
+            ("Integer.root_rem(u64)", &mut |(x, exp)| {
+                no_out!(x.root_rem(exp));
+            }),
+            ("(&Integer).root_rem(u64)", &mut |(x, exp)| {
+                no_out!((&x).root_rem(exp));
             }),
         ],
     );

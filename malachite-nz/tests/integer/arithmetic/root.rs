@@ -6,12 +6,14 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::assert_panic;
 use malachite_base::num::arithmetic::traits::{
     CeilingRoot, CeilingRootAssign, CeilingSqrt, CheckedRoot, CheckedSqrt, FloorRoot,
-    FloorRootAssign, FloorSqrt, Parity, Pow,
+    FloorRootAssign, FloorSqrt, Parity, Pow, RootAssignRem, RootRem,
 };
 use malachite_base::num::basic::traits::{NegativeOne, One};
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::strings::ToDebugString;
 use malachite_base::test_util::generators::{signed_gen, signed_unsigned_pair_gen_var_18};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
@@ -547,5 +549,83 @@ fn checked_root_properties() {
             i.checked_root(exp).map(Integer::from),
             Integer::from(i).checked_root(exp)
         );
+    });
+}
+
+#[test]
+fn test_root_rem() {
+    let test = |s, exp, root, rem| {
+        let n = Integer::from_str(s).unwrap();
+        assert_eq!(
+            n.clone().root_rem(exp).to_debug_string(),
+            format!("({root}, {rem})")
+        );
+        assert_eq!(
+            (&n).root_rem(exp).to_debug_string(),
+            format!("({root}, {rem})")
+        );
+        let mut mut_n = n;
+        let r = mut_n.root_assign_rem(exp);
+        assert_eq!(mut_n.to_string(), root);
+        assert_eq!(r.to_string(), rem);
+    };
+    test("0", 1, "0", "0");
+    test("0", 3, "0", "0");
+    test("1", 3, "1", "0");
+    test("999", 3, "9", "270");
+    test("1000", 3, "10", "0");
+    test("1001", 3, "10", "1");
+    test("100", 1, "100", "0");
+    // - negative operands: the root is rounded toward negative infinity, so the remainder is
+    //   non-negative, unlike GMP's truncating convention
+    test("-1", 3, "-1", "0");
+    test("-999", 3, "-10", "1");
+    test("-1000", 3, "-10", "0");
+    test("-1001", 3, "-11", "330");
+    test("-100", 1, "-100", "0");
+}
+
+#[test]
+fn root_rem_fail() {
+    assert_panic!(Integer::from(10).root_rem(0));
+    assert_panic!((&Integer::from(10)).root_rem(0));
+    assert_panic!(Integer::from(-10).root_rem(2));
+    assert_panic!((&Integer::from(-10)).root_rem(2));
+    assert_panic!(Integer::from(-10).root_assign_rem(2));
+}
+
+#[test]
+fn root_rem_properties() {
+    integer_unsigned_pair_gen_var_3().test_properties(|(n, exp)| {
+        let (root, rem) = (&n).root_rem(exp);
+        assert!(root.is_valid());
+        assert!(rem.is_valid());
+        assert_eq!(n.clone().root_rem(exp), (root.clone(), rem.clone()));
+        let mut mut_n = n.clone();
+        assert_eq!(mut_n.root_assign_rem(exp), rem);
+        assert_eq!(mut_n, root);
+
+        // the defining identity, and the root is the floor root
+        assert_eq!((&root).pow(exp) + &rem, n);
+        assert_eq!(root, (&n).floor_root(exp));
+        assert!(rem >= 0);
+        // the remainder is smaller than the gap to the next power up
+        assert!(rem < (&root + Integer::ONE).pow(exp) - (&root).pow(exp));
+        assert_eq!(rem == 0, (&n).checked_root(exp).is_some());
+
+        // GMP truncates toward zero, so its root and remainder differ on a negative operand whose
+        // root is inexact
+        let rug_n = rug::Integer::from(&n);
+        let (rug_root, rug_rem) = rug_n.root_rem(rug::Integer::new(), u32::exact_from(exp));
+        if n >= 0 || rem == 0 {
+            assert_eq!(Integer::from(&rug_root), root);
+            assert_eq!(Integer::from(&rug_rem), rem);
+        } else {
+            assert_eq!(Integer::from(&rug_root), &root + Integer::ONE);
+            assert_eq!(
+                Integer::from(&rug_rem),
+                &n - Integer::from(&rug_root).pow(exp)
+            );
+        }
     });
 }
