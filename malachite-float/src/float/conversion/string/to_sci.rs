@@ -434,16 +434,24 @@ impl ToSci for Float {
     /// options.set_base(16);
     /// options.set_precision(2);
     /// assert_eq!(
-    ///     Float::from(1000000.0).to_sci_with_options(options).to_string(),
+    ///     Float::from(1000000.0)
+    ///         .to_sci_with_options(options)
+    ///         .to_string(),
     ///     "f.4e+4"
     /// );
     ///
     /// // 2^-17, a 1-bit value, printed with its actual digits
     /// let x = Float::power_of_2(-17i64);
     /// let mut options = ToSciOptions::default();
-    /// assert_eq!(x.to_sci_with_options(options).to_string(), "7.62939453125e-6");
+    /// assert_eq!(
+    ///     x.to_sci_with_options(options).to_string(),
+    ///     "7.62939453125e-6"
+    /// );
     /// options.set_e_uppercase();
-    /// assert_eq!(x.to_sci_with_options(options).to_string(), "7.62939453125E-6");
+    /// assert_eq!(
+    ///     x.to_sci_with_options(options).to_string(),
+    ///     "7.62939453125E-6"
+    /// );
     /// options.set_neg_exp_threshold(-10);
     /// assert_eq!(
     ///     x.to_sci_with_options(options).to_string(),

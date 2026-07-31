@@ -415,6 +415,16 @@ pub fn float_float_unsigned_rounding_mode_quadruple_gen_var_1()
     )
 }
 
+// All `(Float, Float, u64, RoundingMode)` that are valid inputs to `Float::average_prec_round`.
+pub fn float_float_unsigned_rounding_mode_quadruple_gen_var_15()
+-> Generator<(Float, Float, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_float_unsigned_rounding_mode_quadruple_gen_var_15,
+        &random_float_float_unsigned_rounding_mode_quadruple_gen_var_15,
+        &special_random_float_float_unsigned_rounding_mode_quadruple_gen_var_15,
+    )
+}
+
 pub fn float_float_unsigned_rounding_mode_quadruple_gen_var_1_rm() -> Generator<(
     (rug::Float, rug::Float, u64, rug::float::Round),
     (Float, Float, u64, RoundingMode),

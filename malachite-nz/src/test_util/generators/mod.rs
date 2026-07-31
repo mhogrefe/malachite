@@ -548,6 +548,17 @@ pub fn integer_integer_rounding_mode_triple_gen_var_2()
     )
 }
 
+// All `(Integer, Integer, RoundingMode)` triples that are a valid input to
+// `Integer::average_round`.
+pub fn integer_integer_rounding_mode_triple_gen_var_3()
+-> Generator<(Integer, Integer, RoundingMode)> {
+    Generator::new(
+        &exhaustive_integer_integer_rounding_mode_triple_gen_var_3,
+        &random_integer_integer_rounding_mode_triple_gen_var_3,
+        &special_random_integer_integer_rounding_mode_triple_gen_var_3,
+    )
+}
+
 // -- (Integer, Natural) --
 
 pub fn integer_natural_pair_gen() -> Generator<(Integer, Natural)> {
@@ -1797,6 +1808,17 @@ pub fn natural_natural_rounding_mode_triple_gen_var_2()
         &exhaustive_natural_natural_rounding_mode_triple_gen_var_2,
         &random_natural_natural_rounding_mode_triple_gen_var_2,
         &special_random_natural_natural_rounding_mode_triple_gen_var_2,
+    )
+}
+
+// All `(Natural, Natural, RoundingMode)` triples that are a valid input to
+// `Natural::average_round`.
+pub fn natural_natural_rounding_mode_triple_gen_var_3()
+-> Generator<(Natural, Natural, RoundingMode)> {
+    Generator::new(
+        &exhaustive_natural_natural_rounding_mode_triple_gen_var_3,
+        &random_natural_natural_rounding_mode_triple_gen_var_3,
+        &special_random_natural_natural_rounding_mode_triple_gen_var_3,
     )
 }
 

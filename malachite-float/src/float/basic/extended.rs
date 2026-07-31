@@ -118,7 +118,7 @@ impl ExtendedFloat {
         )
     }
 
-    fn add_prec_ref_ref(&self, other: &Self, prec: u64) -> (Self, Ordering) {
+    pub(crate) fn add_prec_ref_ref(&self, other: &Self, prec: u64) -> (Self, Ordering) {
         assert!(self.is_valid());
         assert!(other.is_valid());
         assert!(self.x.is_normal());

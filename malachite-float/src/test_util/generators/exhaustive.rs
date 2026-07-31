@@ -696,6 +696,12 @@ pub fn exhaustive_float_float_unsigned_triple_gen_var_2<T: PrimitiveUnsigned>()
 
 // -- (Float, Float, PrimitiveUnsigned, RoundingMode) --
 
+pub(crate) fn average_prec_round_valid(x: &Float, y: &Float, prec: u64, rm: RoundingMode) -> bool {
+    // Rounding toward negative infinity reports whether the average is exactly representable, and
+    // unlike a rational recomputation it stays cheap for extreme exponents.
+    rm != Exact || x.clone().average_prec_round(y.clone(), prec, Floor).1 == Equal
+}
+
 pub(crate) fn add_prec_round_valid(
     x: &Float,
     y: &Float,
@@ -733,6 +739,23 @@ pub fn exhaustive_float_float_unsigned_rounding_mode_quadruple_gen_var_1()
             exhaustive_rounding_modes(),
         )))
         .filter(|(x, y, prec, rm)| add_prec_round_valid(x, y, *prec, *rm, false)),
+    )
+}
+
+pub fn exhaustive_float_float_unsigned_rounding_mode_quadruple_gen_var_15()
+-> It<(Float, Float, u64, RoundingMode)> {
+    Box::new(
+        reshape_3_1_to_4(Box::new(lex_pairs(
+            exhaustive_triples_xxy_custom_output(
+                exhaustive_floats(),
+                exhaustive_positive_primitive_ints::<u64>(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, prec, rm)| average_prec_round_valid(x, y, *prec, *rm)),
     )
 }
 

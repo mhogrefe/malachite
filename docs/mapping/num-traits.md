@@ -406,8 +406,11 @@ average, and the plain
 rounds to nearest, breaking ties toward the even neighbor, a mode num does not offer; both come
 with in-place `Assign` forms. Malachite's `Average` also covers `f32` and `f64`, where the
 result is the correctly rounded mean, computed without intermediate overflow, something outside
-num-integer's `Integer`-bounded trait. Neither library extends the operation to the bignums,
-where there is no overflow to dodge and `(&a + &b) >> 1` computes the floor average directly.
+num-integer's `Integer`-bounded trait. The traits extend to
+[`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html) and
+[`Integer`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html) as
+well, where they exist for convenience rather than overflow safety; num-bigint implements the
+trait for neither of its bignum types.
 
 **The combinatorial functions.** `binomial(n, k)` is
 [`BinomialCoefficient`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.BinomialCoefficient.html)'s

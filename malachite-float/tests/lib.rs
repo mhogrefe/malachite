@@ -66,6 +66,7 @@ pub mod float {
         pub mod abs;
         pub mod add;
         pub mod agm;
+        pub mod average;
         pub mod cbrt;
         pub mod div;
         pub mod exp;

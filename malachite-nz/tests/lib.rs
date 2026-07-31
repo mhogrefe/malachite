@@ -71,6 +71,7 @@ pub mod integer {
         pub mod abs_diff;
         pub mod add;
         pub mod add_mul;
+        pub mod average;
         pub mod binomial_coefficient;
         pub mod div;
         pub mod div_euclidean;
@@ -228,6 +229,7 @@ pub mod natural {
         pub mod abs_diff;
         pub mod add;
         pub mod add_mul;
+        pub mod average;
         pub mod binomial_coefficient;
         pub mod checked_sub;
         pub mod checked_sub_mul;

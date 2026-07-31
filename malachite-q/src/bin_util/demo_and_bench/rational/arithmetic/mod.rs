@@ -13,6 +13,7 @@ pub(crate) fn register(runner: &mut Runner) {
     abs_diff::register(runner);
     add::register(runner);
     approximate::register(runner);
+    average::register(runner);
     ceiling::register(runner);
     denominators_in_closed_interval::register(runner);
     div::register(runner);
@@ -45,6 +46,7 @@ mod abs;
 mod abs_diff;
 mod add;
 mod approximate;
+mod average;
 mod ceiling;
 mod denominators_in_closed_interval;
 mod div;

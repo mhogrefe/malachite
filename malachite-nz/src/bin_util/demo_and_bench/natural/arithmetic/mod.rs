@@ -12,6 +12,7 @@ pub(crate) fn register(runner: &mut Runner) {
     abs_diff::register(runner);
     add::register(runner);
     add_mul::register(runner);
+    average::register(runner);
     binomial_coefficient::register(runner);
     checked_sub::register(runner);
     checked_sub_mul::register(runner);
@@ -87,6 +88,7 @@ pub(crate) fn register(runner: &mut Runner) {
 mod abs_diff;
 mod add;
 mod add_mul;
+mod average;
 mod binomial_coefficient;
 mod checked_sub;
 mod checked_sub_mul;

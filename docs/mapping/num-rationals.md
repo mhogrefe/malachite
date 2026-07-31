@@ -241,6 +241,10 @@ powers of two exactly, in either direction and by signed or unsigned amounts, an
 [`Square`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Square.html)
 with `SquareAssign` is the dedicated squaring; num-rational spells these `r * &two_pow` and
 `&r * &r`.
+[`Average`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Average.html),
+with `AverageAssign`, is the midpoint of two values, exact on rationals and so free of the
+rounding modes its integer counterpart carries; num-integer's `Average` trait is bounded by
+`Integer` and does not reach `Ratio`, where the spelling is `(a + b) / two`.
 
 ## Rounding and conversion {#rounding-and-conversion}
 

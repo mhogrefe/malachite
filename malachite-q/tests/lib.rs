@@ -71,6 +71,7 @@ pub mod rational {
         pub mod abs_diff;
         pub mod add;
         pub mod approximate;
+        pub mod average;
         pub mod ceiling;
         pub mod denominators_in_closed_interval;
         pub mod div;

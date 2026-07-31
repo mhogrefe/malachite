@@ -18,6 +18,10 @@ pub mod add;
 /// [`ApproximateAssign`](traits::ApproximateAssign), traits for approximating a
 /// [`Rational`](super::Rational) by a [`Rational`](super::Rational) with a bounded denominator.
 pub mod approximate;
+/// [`Average`](malachite_base::num::arithmetic::traits::Average) and
+/// [`AverageAssign`](malachite_base::num::arithmetic::traits::AverageAssign), traits for computing
+/// the average (arithmetic mean) of two numbers.
+pub mod average;
 /// Implementations of [`Ceiling`](malachite_base::num::arithmetic::traits::Ceiling) and
 /// [`CeilingAssign`](malachite_base::num::arithmetic::traits::CeilingAssign), traits for taking the
 /// ceiling of a number.

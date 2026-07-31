@@ -16,6 +16,12 @@ pub mod add;
 /// [`AddMulAssign`](malachite_base::num::arithmetic::traits::AddMulAssign), traits for adding a
 /// number and the product of two other numbers.
 pub mod add_mul;
+/// [`Average`](malachite_base::num::arithmetic::traits::Average),
+/// [`AverageAssign`](malachite_base::num::arithmetic::traits::AverageAssign),
+/// [`AverageRound`](malachite_base::num::arithmetic::traits::AverageRound), and
+/// [`AverageRoundAssign`](malachite_base::num::arithmetic::traits::AverageRoundAssign), traits for
+/// computing the average (arithmetic mean) of two numbers.
+pub mod average;
 /// Implementations of
 /// [`BinomialCoefficient`](malachite_base::num::arithmetic::traits::BinomialCoefficient), a trait
 /// for computing the binomial coefficient of two numbers.

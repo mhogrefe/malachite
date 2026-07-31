@@ -6,9 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::num::arithmetic::traits::{
-    Abs, Average, AverageAssign, AverageRound, AverageRoundAssign,
-};
+use crate::num::arithmetic::traits::{Average, AverageAssign, AverageRound, AverageRoundAssign};
 use crate::num::basic::floats::PrimitiveFloat;
 use crate::num::basic::integers::PrimitiveInt;
 use crate::rounding_modes::RoundingMode::{self, *};

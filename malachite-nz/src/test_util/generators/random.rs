@@ -760,6 +760,25 @@ pub fn random_integer_integer_rounding_mode_triple_gen_var_2(
     )
 }
 
+pub fn random_integer_integer_rounding_mode_triple_gen_var_3(
+    config: &GenConfig,
+) -> It<(Integer, Integer, RoundingMode)> {
+    Box::new(
+        random_triples_xxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_integers(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(x, y, rm)| *rm != Exact || x.even() == y.even()),
+    )
+}
+
 // -- (Integer, Natural) --
 
 pub fn random_integer_natural_pair_gen(config: &GenConfig) -> It<(Integer, Natural)> {
@@ -2704,6 +2723,25 @@ pub fn random_natural_natural_rounding_mode_triple_gen_var_2(
             &random_rounding_modes,
         )
         .filter_map(|(x, y, rm)| round_to_multiple_natural_filter_map(x, y, rm)),
+    )
+}
+
+pub fn random_natural_natural_rounding_mode_triple_gen_var_3(
+    config: &GenConfig,
+) -> It<(Natural, Natural, RoundingMode)> {
+    Box::new(
+        random_triples_xxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_naturals(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(x, y, rm)| *rm != Exact || x.even() == y.even()),
     )
 }
 

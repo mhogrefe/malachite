@@ -607,8 +607,9 @@ defines an `Average` trait, but num-bigint does not implement it for the bignum 
 appears with the generic machinery on
 [the traits page](/mapping/num-traits/#num-integer), where Malachite's own
 [`Average`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Average.html)
-and `AverageRound` traits now cover the primitives; on the bignums, which have no overflow to
-dodge, `(&a + &b) >> 1` computes the floor average exactly.
+and `AverageRound` traits cover the primitives and, going beyond num, the bignums too, with
+every rounding mode; the underlying computation is the `(&a + &b) >> 1` that bignums, having no
+overflow to dodge, afford directly.
 
 ## Random generation {#random-generation}
 

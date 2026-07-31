@@ -456,6 +456,18 @@ pub fn exhaustive_integer_integer_rounding_mode_triple_gen_var_2()
     )
 }
 
+pub fn exhaustive_integer_integer_rounding_mode_triple_gen_var_3()
+-> It<(Integer, Integer, RoundingMode)> {
+    Box::new(
+        exhaustive_triples(
+            exhaustive_integers(),
+            exhaustive_integers(),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|(x, y, rm)| *rm != Exact || x.even() == y.even()),
+    )
+}
+
 // -- (Integer, Natural) --
 
 pub fn exhaustive_integer_natural_pair_gen() -> It<(Integer, Natural)> {
@@ -1478,6 +1490,18 @@ pub fn exhaustive_natural_natural_rounding_mode_triple_gen_var_2()
             exhaustive_rounding_modes(),
         )
         .filter_map(|(x, y, rm)| round_to_multiple_natural_filter_map(x, y, rm)),
+    )
+}
+
+pub fn exhaustive_natural_natural_rounding_mode_triple_gen_var_3()
+-> It<(Natural, Natural, RoundingMode)> {
+    Box::new(
+        exhaustive_triples(
+            exhaustive_naturals(),
+            exhaustive_naturals(),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|(x, y, rm)| *rm != Exact || x.even() == y.even()),
     )
 }
 

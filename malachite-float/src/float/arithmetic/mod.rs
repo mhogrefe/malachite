@@ -14,6 +14,131 @@ pub mod add;
 /// Taking the AGM (arithmetic-geometric mean) of two [`Float`](super::Float)s, and of
 /// [`Float`](super::Float)s with [`Rational`](malachite_q::Rational)s.
 pub mod agm;
+/// [`Average`](malachite_base::num::arithmetic::traits::Average) and
+/// [`AverageAssign`](malachite_base::num::arithmetic::traits::AverageAssign), traits for computing
+/// the average (arithmetic mean) of two numbers, and the associated precision- and
+/// rounding-mode-aware functions.
+///
+/// # average
+/// ```
+/// use malachite_base::num::arithmetic::traits::Average;
+/// use malachite_float::Float;
+///
+/// assert_eq!(Float::from(1.5).average(Float::from(2.5)), 2.0);
+/// assert_eq!((&Float::from(1.5)).average(&Float::from(2.5)), 2.0);
+/// // the output precision is the maximum of the inputs', so the average of two one-bit
+/// // `Float`s is itself rounded to one bit, here to the even neighbor
+/// assert_eq!(Float::from(1.0).average(Float::from(2.0)), 2.0);
+/// // the sum would overflow, but the average is in range
+/// let max = Float::max_finite_value_with_prec(10);
+/// assert_eq!((&max).average(&max), max);
+/// ```
+///
+/// # average_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::AverageAssign;
+/// use malachite_float::Float;
+///
+/// let mut x = Float::from(1.5);
+/// x.average_assign(Float::from(2.5));
+/// assert_eq!(x, 2.0);
+/// ```
+///
+/// # average_prec_round
+/// ```
+/// use malachite_base::rounding_modes::RoundingMode::*;
+/// use malachite_float::Float;
+/// use std::cmp::Ordering::*;
+///
+/// // the exact average of 1 and 2 is 1.5, which needs 2 bits
+/// let (avg, o) = Float::from(1.0).average_prec_round(Float::from(2.0), 2, Exact);
+/// assert_eq!(avg, 1.5);
+/// assert_eq!(o, Equal);
+///
+/// // at one bit it must be rounded
+/// let (avg, o) = Float::from(1.0).average_prec_round(Float::from(2.0), 1, Floor);
+/// assert_eq!(avg, 1.0);
+/// assert_eq!(o, Less);
+/// let (avg, o) = Float::from(1.0).average_prec_round(Float::from(2.0), 1, Ceiling);
+/// assert_eq!(avg, 2.0);
+/// assert_eq!(o, Greater);
+/// ```
+///
+/// # average_prec
+/// ```
+/// use malachite_float::Float;
+/// use std::cmp::Ordering::*;
+///
+/// let (avg, o) = Float::from(1.0).average_prec(Float::from(2.0), 10);
+/// assert_eq!(avg, 1.5);
+/// assert_eq!(o, Equal);
+/// ```
+///
+/// # average_round
+/// ```
+/// use malachite_base::rounding_modes::RoundingMode::*;
+/// use malachite_float::Float;
+/// use std::cmp::Ordering::*;
+///
+/// // the output precision is the maximum of the inputs' precisions
+/// let (avg, o) = Float::from(1.5).average_round(Float::from(2.5), Nearest);
+/// assert_eq!(avg, 2.0);
+/// assert_eq!(o, Equal);
+/// ```
+///
+/// # average_prec_round_assign
+/// ```
+/// use malachite_base::rounding_modes::RoundingMode::*;
+/// use malachite_float::Float;
+/// use std::cmp::Ordering::*;
+///
+/// let mut x = Float::from(1.0);
+/// assert_eq!(
+///     x.average_prec_round_assign(Float::from(2.0), 1, Floor),
+///     Less
+/// );
+/// assert_eq!(x, 1.0);
+///
+/// let mut x = Float::from(1.0);
+/// assert_eq!(
+///     x.average_prec_round_assign_ref(&Float::from(2.0), 2, Exact),
+///     Equal
+/// );
+/// assert_eq!(x, 1.5);
+/// ```
+///
+/// # average_prec_assign
+/// ```
+/// use malachite_float::Float;
+/// use std::cmp::Ordering::*;
+///
+/// let mut x = Float::from(1.0);
+/// assert_eq!(x.average_prec_assign(Float::from(2.0), 10), Equal);
+/// assert_eq!(x, 1.5);
+///
+/// let mut x = Float::from(1.0);
+/// assert_eq!(x.average_prec_assign_ref(&Float::from(2.0), 10), Equal);
+/// assert_eq!(x, 1.5);
+/// ```
+///
+/// # average_round_assign
+/// ```
+/// use malachite_base::rounding_modes::RoundingMode::*;
+/// use malachite_float::Float;
+/// use std::cmp::Ordering::*;
+///
+/// let mut x = Float::from(1.5);
+/// assert_eq!(x.average_round_assign(Float::from(2.5), Nearest), Equal);
+/// assert_eq!(x, 2.0);
+///
+/// let mut x = Float::from(1.5);
+/// assert_eq!(
+///     x.average_round_assign_ref(&Float::from(2.5), Nearest),
+///     Equal
+/// );
+/// assert_eq!(x, 2.0);
+/// ```
+pub mod average;
 /// Cube root of [`Float`](super::Float)s and of [`Rational`](malachite_q::Rational)s.
 pub mod cbrt;
 /// Division of [`Float`](super::Float)s, of [`Float`](super::Float)s by
