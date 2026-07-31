@@ -8,7 +8,7 @@
 
 use malachite_base::num::arithmetic::traits::Abs;
 use malachite_base::num::basic::traits::{Infinity, NegativeInfinity};
-use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
+use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs, PartialOrdAbsDouble};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::float::NiceFloat;
 use malachite_base::test_util::generators::primitive_float_pair_gen;
@@ -246,5 +246,71 @@ fn comparable_float_cmp_abs_properties() {
             ComparableFloat(Float::from(x)).cmp_abs(&ComparableFloat(Float::from(y))),
             NiceFloat(x.abs()).cmp(&NiceFloat(y.abs()))
         );
+    });
+}
+
+#[test]
+fn test_partial_cmp_abs_double() {
+    let test = |s, t, out: Option<Ordering>| {
+        let x = parse_hex_string(s);
+        let y = parse_hex_string(t);
+        assert_eq!(x.partial_cmp_abs_double(&y), out);
+    };
+    test("NaN", "NaN", None);
+    test("NaN", "0x1.0#1", None);
+    test("0x1.0#1", "NaN", None);
+    // - doubling leaves infinities and zeros alone
+    test("Infinity", "Infinity", Some(Equal));
+    test("0x0.0", "0x0.0", Some(Equal));
+    test("-0x0.0", "0x0.0", Some(Equal));
+    test("Infinity", "0x1.0#1", Some(Greater));
+    test("0x1.0#1", "Infinity", Some(Less));
+    test("0x1.0#1", "0x0.0", Some(Greater));
+    test("0x0.0", "0x1.0#1", Some(Less));
+    // - ordinary values
+    test("0x1.0#1", "0x0.8#1", Some(Equal));
+    test("0x0.8#1", "0x1.0#1", Some(Less));
+    test("0x4.0#1", "0x1.0#1", Some(Greater));
+    // - only magnitudes matter
+    test("-0x1.0#1", "0x0.8#1", Some(Equal));
+    test("0x1.0#1", "-0x0.8#1", Some(Equal));
+    // - precision does not affect the value comparison
+    test("0x1.000#10", "0x0.800#10", Some(Equal));
+}
+
+#[test]
+fn test_partial_cmp_abs_double_overflow() {
+    // Doubling the largest finite value overflows to an infinity, so forming it first would make an
+    // infinite `self` compare equal rather than greater.
+    let max = Float::max_finite_value_with_prec(10);
+    assert_eq!(Float::INFINITY.partial_cmp_abs_double(&max), Some(Greater));
+    assert_eq!((&max << 1u32), Float::INFINITY);
+    assert_eq!(
+        Float::INFINITY.partial_cmp_abs(&(&max << 1u32)),
+        Some(Equal)
+    );
+    // a finite value is still less than the unrepresentable doubled one
+    assert_eq!(max.partial_cmp_abs_double(&max), Some(Less));
+}
+
+#[test]
+fn partial_cmp_abs_double_properties() {
+    float_pair_gen().test_properties(|(x, y)| {
+        let c = x.partial_cmp_abs_double(&y);
+        // sign changes are invisible
+        assert_eq!((-&x).partial_cmp_abs_double(&y), c);
+        assert_eq!(x.partial_cmp_abs_double(&-&y), c);
+        if x.is_nan() || y.is_nan() {
+            assert_eq!(c, None);
+            return;
+        }
+        // the doubling form agrees except where it overflows, which is the point of this
+        let doubled = &y << 1u32;
+        if !(doubled.is_infinite() && y.is_finite()) {
+            assert_eq!(c, x.partial_cmp_abs(&doubled));
+        } else {
+            // the true doubled value is past the range, so it exceeds every finite value
+            assert_eq!(c, Some(if x.is_infinite() { Greater } else { Less }));
+        }
     });
 }

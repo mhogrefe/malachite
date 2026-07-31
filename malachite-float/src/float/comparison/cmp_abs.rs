@@ -9,7 +9,7 @@
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::{ComparableFloat, ComparableFloatRef, Float};
 use core::cmp::Ordering::{self, *};
-use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
+use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs, PartialOrdAbsDouble};
 
 impl PartialOrdAbs for Float {
     /// Compares the absolute values of two [`Float`]s.
@@ -222,5 +222,88 @@ impl PartialOrdAbs for ComparableFloat {
     #[inline]
     fn partial_cmp_abs(&self, other: &Self) -> Option<Ordering> {
         Some(self.as_ref().cmp_abs(&other.as_ref()))
+    }
+}
+
+impl PartialOrdAbsDouble for Float {
+    /// Compares the absolute value of a [`Float`] with twice the absolute value of another
+    /// [`Float`].
+    ///
+    /// The doubled value is never formed, so the comparison is right even when doubling would
+    /// overflow: doubling a [`Float`] raises its exponent, and an exponent past the maximum becomes
+    /// an infinity, which would compare equal to an infinite `self` rather than less than it. Here
+    /// the exponents are compared directly instead.
+    ///
+    /// This implementation follows the IEEE 754 standard. `NaN` is not comparable to anything, not
+    /// even itself. [`Float`]s with different precisions are equal if they represent the same
+    /// numeric value.
+    ///
+    /// $$
+    /// f(x, y) = \operatorname{cmp}(|x|, 2|y|).
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{Infinity, NaN, One, OneHalf, Zero};
+    /// use malachite_base::num::comparison::traits::PartialOrdAbsDouble;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// assert_eq!(Float::NAN.partial_cmp_abs_double(&Float::ONE), None);
+    /// assert_eq!(
+    ///     Float::ONE.partial_cmp_abs_double(&Float::ONE_HALF),
+    ///     Some(Equal)
+    /// );
+    /// assert_eq!(
+    ///     Float::ONE_HALF.partial_cmp_abs_double(&Float::ONE),
+    ///     Some(Less)
+    /// );
+    /// // doubling the largest finite value would overflow to an infinity, but an infinity is
+    /// // still the larger
+    /// assert_eq!(
+    ///     Float::INFINITY.partial_cmp_abs_double(&Float::max_finite_value_with_prec(10)),
+    ///     Some(Greater)
+    /// );
+    /// assert_eq!(
+    ///     Float::ZERO.partial_cmp_abs_double(&Float::ZERO),
+    ///     Some(Equal)
+    /// );
+    /// ```
+    fn partial_cmp_abs_double(&self, other: &Self) -> Option<Ordering> {
+        match (self, other) {
+            (float_nan!(), _) | (_, float_nan!()) => None,
+            // doubling leaves an infinity and a zero alone
+            (float_either_infinity!(), float_either_infinity!())
+            | (float_either_zero!(), float_either_zero!()) => Some(Equal),
+            (float_either_infinity!(), _) | (_, float_either_zero!()) => Some(Greater),
+            (_, float_either_infinity!()) | (float_either_zero!(), _) => Some(Less),
+            (
+                Self(Finite {
+                    exponent: e_x,
+                    significand: x,
+                    ..
+                }),
+                Self(Finite {
+                    exponent: e_y,
+                    significand: y,
+                    ..
+                }),
+            ) => {
+                // Doubling raises the exponent by one; the exponent range leaves room for that even
+                // at the maximum, since it is far from `i32`'s.
+                Some(
+                    e_x.cmp(&(e_y + 1))
+                        .then_with(|| x.cmp_normalized_no_shift(y)),
+                )
+            }
+        }
     }
 }

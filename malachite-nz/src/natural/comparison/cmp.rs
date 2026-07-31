@@ -12,10 +12,12 @@
 
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
+use crate::natural::WIDTH_MINUS_1;
 use crate::platform::Limb;
 use core::cmp::Ordering::{self, *};
 use core::mem::swap;
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::comparison::traits::{OrdDouble, PartialOrdDouble};
 use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_base::slices::{slice_leading_zeros, slice_test_zero};
 
@@ -69,7 +71,46 @@ pub_crate_test! {limbs_cmp(xs: &[Limb], ys: &[Limb]) -> Ordering {
 // where $T$ is time, $M$ is additional memory, and $n$ is `min(xs.len(), ys.len())`.
 //
 // # Panics
-// Panics if either `xs` or `ys` is empty, or if the last element of `xs` or `ys` is zero.
+// Panics if either `xs` or `ys` is empty, or if the last element of `xs` or `ys` is zero. Compares
+// `xs` with `ys` shifted left by one bit, without performing the shift. Both slices must be
+// normalized, with no trailing zero limbs.
+//
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+pub_test! {limbs_cmp_double(xs: &[Limb], ys: &[Limb]) -> Ordering {
+    let ys_len = ys.len();
+    // whether doubling carries into a limb of its own
+    let high = ys[ys_len - 1] >> WIDTH_MINUS_1;
+    let double_len = ys_len + usize::from(high != 0);
+    let len_cmp = xs.len().cmp(&double_len);
+    if len_cmp != Equal {
+        return len_cmp;
+    }
+    let mut i = xs.len();
+    if high != 0 {
+        // the extra limb of the doubled value is exactly 1
+        i -= 1;
+        let c = xs[i].cmp(&1);
+        if c != Equal {
+            return c;
+        }
+    }
+    while i > 0 {
+        i -= 1;
+        // the bit shifted out of the limb below moves into this one
+        let y = (ys[i] << 1) | if i == 0 { 0 } else { ys[i - 1] >> WIDTH_MINUS_1 };
+        let c = xs[i].cmp(&y);
+        if c != Equal {
+            return c;
+        }
+    }
+    Equal
+}}
+
 pub_test! {limbs_cmp_normalized(xs: &[Limb], ys: &[Limb]) -> Ordering {
     let mut xs = &xs[slice_leading_zeros(xs)..];
     let mut ys = &ys[slice_leading_zeros(ys)..];
@@ -184,6 +225,49 @@ impl Ord for Natural {
             (&Self(Small(_)), &Self(Large(_))) => Less,
             (&Self(Large(_)), &Self(Small(_))) => Greater,
             (&Self(Large(ref xs)), &Self(Large(ref ys))) => limbs_cmp(xs, ys),
+        }
+    }
+}
+
+impl OrdDouble for Natural {
+    /// Compares a [`Natural`] with twice another [`Natural`].
+    ///
+    /// The doubling is not actually performed, so no memory is allocated. This is the shape of a
+    /// round-to-nearest decision, where a remainder is weighed against half a divisor.
+    ///
+    /// $$
+    /// f(x, y) = \operatorname{cmp}(x, 2y).
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::comparison::traits::{OrdDouble, PartialOrdDouble};
+    /// use malachite_nz::natural::Natural;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// assert_eq!(Natural::from(4u32).cmp_double(&Natural::from(2u32)), Equal);
+    /// assert_eq!(Natural::from(3u32).cmp_double(&Natural::from(2u32)), Less);
+    /// assert_eq!(
+    ///     Natural::from(5u32).cmp_double(&Natural::from(2u32)),
+    ///     Greater
+    /// );
+    /// assert_eq!(Natural::ZERO.cmp_double(&Natural::ZERO), Equal);
+    /// ```
+    fn cmp_double(&self, other: &Self) -> Ordering {
+        match (self, other) {
+            (&Self(Small(x)), &Self(Small(y))) => x.cmp_double(&y),
+            // a single limb cannot reach twice a multi-limb value
+            (&Self(Small(_)), &Self(Large(_))) => Less,
+            (&Self(Large(ref xs)), &Self(Small(y))) => limbs_cmp_double(xs, &[y]),
+            (&Self(Large(ref xs)), &Self(Large(ref ys))) => limbs_cmp_double(xs, ys),
         }
     }
 }
@@ -326,5 +410,15 @@ impl Natural {
                 }
             }
         }
+    }
+}
+
+impl PartialOrdDouble for Natural {
+    /// Compares a [`Natural`] with twice another [`Natural`].
+    ///
+    /// See the documentation for the [`OrdDouble`] implementation.
+    #[inline]
+    fn partial_cmp_double(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp_double(other))
     }
 }

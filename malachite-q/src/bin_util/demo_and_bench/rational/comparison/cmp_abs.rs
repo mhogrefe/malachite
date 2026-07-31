@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::Abs;
-use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
+use malachite_base::num::comparison::traits::{OrdAbs, OrdAbsDouble, PartialOrdAbs};
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
@@ -18,6 +18,8 @@ use malachite_q::test_util::generators::{rational_pair_gen, rational_pair_gen_rm
 use std::cmp::Ordering::*;
 
 pub(crate) fn register(runner: &mut Runner) {
+    register_demo!(runner, demo_rational_cmp_abs_double);
+    register_bench!(runner, benchmark_rational_cmp_abs_double_algorithms);
     register_demo!(runner, demo_rational_cmp_abs);
     register_demo!(runner, demo_rational_lt_abs);
     register_demo!(runner, demo_rational_gt_abs);
@@ -175,5 +177,42 @@ fn benchmark_rational_ge_abs(gm: GenMode, config: &GenConfig, limit: usize, file
         file_name,
         &pair_rational_max_bit_bucketer("x", "y"),
         &mut [("Malachite", &mut |(x, y)| no_out!(x.ge_abs(&y)))],
+    );
+}
+
+fn demo_rational_cmp_abs_double(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in rational_pair_gen().get(gm, config).take(limit) {
+        println!(
+            "({}).cmp_abs_double(&{}) = {:?}",
+            x,
+            y,
+            x.cmp_abs_double(&y)
+        );
+    }
+}
+
+fn benchmark_rational_cmp_abs_double_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Rational.cmp_abs_double(&Rational)",
+        BenchmarkType::Algorithms,
+        rational_pair_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_rational_max_bit_bucketer("x", "y"),
+        &mut [
+            ("no doubling", &mut |(x, y)| no_out!(x.cmp_abs_double(&y))),
+            ("doubling first", &mut |(x, y)| {
+                no_out!(x.cmp_abs(&(&y << 1u32)));
+            }),
+            ("ordinary cmp_abs, for scale", &mut |(x, y)| {
+                no_out!(x.cmp_abs(&y));
+            }),
+        ],
     );
 }

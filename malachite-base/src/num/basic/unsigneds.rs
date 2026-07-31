@@ -28,6 +28,7 @@ use crate::num::arithmetic::traits::{
 };
 use crate::num::basic::integers::PrimitiveInt;
 use crate::num::basic::signeds::PrimitiveSigned;
+use crate::num::comparison::traits::OrdDouble;
 use crate::num::conversion::traits::{
     Digits, FromOtherTypeSlice, IntegerMantissaAndExponent, PowerOf2DigitIterable, PowerOf2Digits,
     SciMantissaAndExponent, VecFromOtherType, VecFromOtherTypeSlice,
@@ -163,6 +164,7 @@ pub trait PrimitiveUnsigned:
     + NegModPowerOf2Assign
     + NextPowerOf2<Output = Self>
     + NextPowerOf2Assign
+    + OrdDouble<Self>
     + PowerOf2Digits<u8>
     + PowerOf2Digits<u16>
     + PowerOf2Digits<u32>

@@ -306,6 +306,7 @@ pub mod num {
     }
     pub mod comparison {
         pub mod cmp_abs;
+        pub mod cmp_double;
         pub mod eq_abs;
     }
     pub mod conversion {

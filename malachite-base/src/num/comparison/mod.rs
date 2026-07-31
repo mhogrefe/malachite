@@ -27,6 +27,33 @@
 /// assert_eq!(123i32.cmp_abs(&-123), Equal);
 /// ```
 pub mod cmp_abs;
+/// [`OrdDouble`](traits::OrdDouble) and [`OrdAbsDouble`](traits::OrdAbsDouble), traits for
+/// comparing a number with twice another number without computing the doubled value.
+///
+/// # cmp_double
+/// ```
+/// use malachite_base::num::comparison::traits::OrdDouble;
+/// use std::cmp::Ordering::*;
+///
+/// assert_eq!(4u32.cmp_double(&2), Equal);
+/// assert_eq!(3u32.cmp_double(&2), Less);
+/// assert_eq!(5u32.cmp_double(&2), Greater);
+/// // the doubling would overflow, but the comparison still works
+/// assert_eq!(u32::MAX.cmp_double(&(1 << 31)), Less);
+/// ```
+///
+/// # cmp_abs_double
+/// ```
+/// use malachite_base::num::comparison::traits::OrdAbsDouble;
+/// use std::cmp::Ordering::*;
+///
+/// assert_eq!((-4i32).cmp_abs_double(&2), Equal);
+/// assert_eq!(3i32.cmp_abs_double(&-2), Less);
+/// assert_eq!((-5i32).cmp_abs_double(&2), Greater);
+/// // the most negative value, whose magnitude is not representable
+/// assert_eq!(i32::MIN.cmp_abs_double(&(i32::MIN >> 1)), Equal);
+/// ```
+pub mod cmp_double;
 /// [`EqAbs`](`traits::EqAbs`), a trait for comparing the absolute values of numbers by equality.
 ///
 /// # eq_abs

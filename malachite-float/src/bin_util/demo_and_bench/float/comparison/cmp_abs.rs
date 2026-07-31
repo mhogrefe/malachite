@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::Abs;
-use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
+use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs, PartialOrdAbsDouble};
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
@@ -21,6 +21,8 @@ use malachite_float::{ComparableFloat, ComparableFloatRef};
 use std::cmp::Ordering::*;
 
 pub(crate) fn register(runner: &mut Runner) {
+    register_demo!(runner, demo_float_partial_cmp_abs_double);
+    register_bench!(runner, benchmark_float_partial_cmp_abs_double_algorithms);
     register_demo!(runner, demo_float_partial_cmp_abs);
     register_demo!(runner, demo_float_partial_cmp_abs_debug);
     register_demo!(runner, demo_float_partial_cmp_abs_extreme);
@@ -265,6 +267,42 @@ fn benchmark_comparable_float_ref_cmp_abs_algorithms(
             }),
             ("using abs", &mut |(x, y)| {
                 no_out!(ComparableFloatRef(&x.abs()).partial_cmp(&ComparableFloatRef(&y.abs())));
+            }),
+        ],
+    );
+}
+
+fn demo_float_partial_cmp_abs_double(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in float_pair_gen().get(gm, config).take(limit) {
+        println!(
+            "({}).partial_cmp_abs_double(&{}) = {:?}",
+            x,
+            y,
+            x.partial_cmp_abs_double(&y)
+        );
+    }
+}
+
+fn benchmark_float_partial_cmp_abs_double_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float.partial_cmp_abs_double(&Float)",
+        BenchmarkType::Algorithms,
+        float_pair_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_float_max_complexity_bucketer("x", "y"),
+        &mut [
+            ("no doubling", &mut |(x, y)| {
+                no_out!(x.partial_cmp_abs_double(&y));
+            }),
+            ("doubling first", &mut |(x, y)| {
+                no_out!(x.partial_cmp_abs(&(&y << 1u32)));
             }),
         ],
     );

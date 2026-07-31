@@ -76,6 +76,44 @@ pub trait PartialOrdAbs<Rhs: ?Sized = Self> {
     }
 }
 
+/// Compares a number with twice another number, without computing the doubled value.
+///
+/// If the two values are not comparable, `None` is returned.
+pub trait PartialOrdDouble<Rhs: ?Sized = Self> {
+    /// Compares a number with twice another number, taking both by reference.
+    fn partial_cmp_double(&self, other: &Rhs) -> Option<Ordering>;
+}
+
+/// Compares the absolute value of a number with twice the absolute value of another number, without
+/// computing the doubled value.
+///
+/// If the two values are not comparable, `None` is returned.
+pub trait PartialOrdAbsDouble<Rhs: ?Sized = Self> {
+    /// Compares the absolute value of a number with twice the absolute value of another number,
+    /// taking both by reference.
+    fn partial_cmp_abs_double(&self, other: &Rhs) -> Option<Ordering>;
+}
+
+/// Compares a number with twice another number, without computing the doubled value.
+///
+/// This is the shape of a round-to-nearest decision, where a remainder is weighed against half a
+/// divisor, so it is worth doing without the allocation or the overflow that doubling would cost.
+pub trait OrdDouble<Rhs: ?Sized = Self>: PartialOrdDouble<Rhs> {
+    /// Compares a number with twice another number, taking both by reference.
+    fn cmp_double(&self, other: &Rhs) -> Ordering;
+}
+
+/// Compares the absolute value of a number with twice the absolute value of another number, without
+/// computing the doubled value.
+///
+/// This is the shape of a round-to-nearest decision, where a remainder is weighed against half a
+/// divisor, so it is worth doing without the allocation or the overflow that doubling would cost.
+pub trait OrdAbsDouble<Rhs: ?Sized = Self>: PartialOrdAbsDouble<Rhs> {
+    /// Compares the absolute value of a number with twice the absolute value of another number,
+    /// taking both by reference.
+    fn cmp_abs_double(&self, other: &Rhs) -> Ordering;
+}
+
 /// Compares the absolute values of two numbers.
 pub trait OrdAbs: Eq + PartialOrdAbs<Self> {
     fn cmp_abs(&self, other: &Self) -> Ordering;

@@ -7,13 +7,14 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::Abs;
-use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
+use malachite_base::num::comparison::traits::{OrdAbs, OrdAbsDouble, PartialOrdAbs};
 use malachite_base::test_util::common::test_custom_cmp_helper;
 use malachite_nz::test_util::generators::integer_pair_gen;
 use malachite_q::Rational;
 use malachite_q::test_util::generators::{rational_gen, rational_pair_gen, rational_triple_gen};
 use rug;
 use std::cmp::Ordering::*;
+use std::str::FromStr;
 
 #[test]
 fn test_ord_abs() {
@@ -65,5 +66,47 @@ fn cmp_abs_properties() {
             Rational::from(&x).cmp_abs(&Rational::from(&y)),
             x.cmp_abs(&y)
         );
+    });
+}
+
+#[test]
+fn test_cmp_abs_double() {
+    let test = |s, t, out| {
+        let x = Rational::from_str(s).unwrap();
+        let y = Rational::from_str(t).unwrap();
+        assert_eq!(x.cmp_abs_double(&y), out);
+        // the form it exists to avoid: doubling a Rational must renormalize its denominator
+        assert_eq!(x.cmp_abs(&(&y << 1u32)), out);
+    };
+    test("0", "0", Equal);
+    test("0", "1/2", Less);
+    test("1/2", "0", Greater);
+    test("1", "1/2", Equal);
+    test("-1", "-1/2", Equal);
+    test("1", "-1/2", Equal);
+    test("2/3", "1/2", Less);
+    test("3/2", "1/2", Greater);
+    // - an even denominator, where doubling would halve it
+    test("1", "1/4", Greater);
+    test("1/2", "1/4", Equal);
+    // - both sides above and below 1
+    test("5", "1/2", Greater);
+    test("1/5", "3", Less);
+    test("100000000000000000000/3", "50000000000000000000/3", Equal);
+}
+
+#[test]
+fn cmp_abs_double_properties() {
+    rational_pair_gen().test_properties(|(x, y)| {
+        let c = x.cmp_abs_double(&y);
+        // the allocating form it replaces
+        assert_eq!(c, x.cmp_abs(&(&y << 1u32)));
+        // sign changes are invisible
+        assert_eq!((-&x).cmp_abs_double(&y), c);
+        assert_eq!(x.cmp_abs_double(&-&y), c);
+        // a doubled value is at least as big in absolute value
+        if c == Greater {
+            assert_eq!(x.cmp_abs(&y), Greater);
+        }
     });
 }

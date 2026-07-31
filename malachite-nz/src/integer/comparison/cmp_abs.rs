@@ -8,7 +8,9 @@
 
 use crate::integer::Integer;
 use core::cmp::Ordering;
-use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
+use malachite_base::num::comparison::traits::{
+    OrdAbs, OrdAbsDouble, OrdDouble, PartialOrdAbs, PartialOrdAbsDouble,
+};
 
 impl PartialOrdAbs for Integer {
     /// Compares the absolute values of two [`Integer`]s.
@@ -44,5 +46,51 @@ impl OrdAbs for Integer {
     #[inline]
     fn cmp_abs(&self, other: &Self) -> Ordering {
         self.abs.cmp(&other.abs)
+    }
+}
+
+impl OrdAbsDouble for Integer {
+    /// Compares the absolute value of an [`Integer`] with twice the absolute value of another
+    /// [`Integer`].
+    ///
+    /// The doubling is not actually performed, so no memory is allocated. This is the shape of a
+    /// round-to-nearest decision, where a remainder is weighed against half a divisor.
+    ///
+    /// $$
+    /// f(x, y) = \operatorname{cmp}(|x|, 2|y|).
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::comparison::traits::OrdAbsDouble;
+    /// use malachite_nz::integer::Integer;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// assert_eq!(Integer::from(4).cmp_abs_double(&Integer::from(2)), Equal);
+    /// assert_eq!(Integer::from(-4).cmp_abs_double(&Integer::from(-2)), Equal);
+    /// assert_eq!(Integer::from(3).cmp_abs_double(&Integer::from(-2)), Less);
+    /// assert_eq!(Integer::from(-5).cmp_abs_double(&Integer::from(2)), Greater);
+    /// ```
+    #[inline]
+    fn cmp_abs_double(&self, other: &Self) -> Ordering {
+        self.unsigned_abs_ref().cmp_double(other.unsigned_abs_ref())
+    }
+}
+
+impl PartialOrdAbsDouble for Integer {
+    /// Compares the absolute value of an [`Integer`] with twice the absolute value of another
+    /// [`Integer`].
+    ///
+    /// See the documentation for the [`OrdAbsDouble`] implementation.
+    #[inline]
+    fn partial_cmp_abs_double(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp_abs_double(other))
     }
 }

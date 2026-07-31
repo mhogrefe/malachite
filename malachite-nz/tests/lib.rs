@@ -315,6 +315,7 @@ pub mod natural {
     }
     pub mod comparison {
         pub mod cmp;
+        pub mod cmp_double;
         pub mod eq;
         pub mod eq_abs_primitive_float;
         pub mod eq_abs_primitive_int;

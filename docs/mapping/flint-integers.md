@@ -473,7 +473,7 @@ unchanged.
 | ✓ | `int fmpz_cmp_ui (const fmpz_t f, ulong g)` | [`PartialOrd`](https://doc.rust-lang.org/nightly/std/cmp/trait.PartialOrd.html) |
 | ✓ | `int fmpz_cmp_si (const fmpz_t f, slong g)` | [`PartialOrd`](https://doc.rust-lang.org/nightly/std/cmp/trait.PartialOrd.html) |
 | ✓ | `int fmpz_cmpabs (const fmpz_t f, const fmpz_t g)` | [`OrdAbs`](https://docs.rs/malachite-base/latest/malachite_base/num/comparison/traits/trait.OrdAbs.html) |
-| ✗ | `int fmpz_cmp2abs (const fmpz_t f, const fmpz_t g)` | [`OrdAbs`](https://docs.rs/malachite-base/latest/malachite_base/num/comparison/traits/trait.OrdAbs.html), [`Shl`](https://doc.rust-lang.org/nightly/std/ops/trait.Shl.html) |
+| ✓ | `int fmpz_cmp2abs (const fmpz_t f, const fmpz_t g)` | [`OrdAbsDouble`](https://docs.rs/malachite-base/latest/malachite_base/num/comparison/traits/trait.OrdAbsDouble.html) |
 | ✓ | `int fmpz_equal (const fmpz_t f, const fmpz_t g)` | [`PartialEq`](https://doc.rust-lang.org/nightly/std/cmp/trait.PartialEq.html) |
 | ✓ | `int fmpz_equal_ui (const fmpz_t f, ulong g)` | [`PartialEq`](https://doc.rust-lang.org/nightly/std/cmp/trait.PartialEq.html) |
 | ✓ | `int fmpz_equal_si (const fmpz_t f, slong g)` | [`PartialEq`](https://doc.rust-lang.org/nightly/std/cmp/trait.PartialEq.html) |
@@ -483,12 +483,24 @@ unchanged.
 | ✓ | `int fmpz_is_even (const fmpz_t f)` | [`Parity`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Parity.html) |
 | ✓ | `int fmpz_is_odd (const fmpz_t f)` | [`Parity`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Parity.html) |
 
-**`fmpz_cmp2abs`.** The section's one gap. It compares `|f|` against `|2g|` without materializing
-the doubled value, which is the point of it: the comparison of something against twice something
-else is the shape of a round-to-nearest decision, where a remainder is weighed against half a
-divisor, and it belongs in an inner loop with no allocation in sight. The workaround,
-`f.cmp_abs(&(g << 1u32))`, gets the right answer but builds the temporary the FLINT function
-exists to avoid, so the row is marked ✗ rather than ✓; an allocation-free version is planned.
+**`fmpz_cmp2abs`.** [`OrdAbsDouble`](https://docs.rs/malachite-base/latest/malachite_base/num/comparison/traits/trait.OrdAbsDouble.html)'s
+`cmp_abs_double` compares `|f|` against `|2g|` without materializing the doubled value, which is the point of it:
+the comparison of something against twice something else is the shape of a round-to-nearest
+decision, where a remainder is weighed against half a divisor, and it belongs in an inner loop
+with no allocation in sight. `f.cmp_abs(&(g << 1u32))` gets the same answer but builds the
+temporary the FLINT function exists to avoid. On
+[`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html), where
+there are no signs to take absolute values of, the same comparison is
+[`OrdDouble`](https://docs.rs/malachite-base/latest/malachite_base/num/comparison/traits/trait.OrdDouble.html)'s
+`cmp_double`. The two traits split by sign exactly as
+[`Ord`](https://doc.rust-lang.org/nightly/std/cmp/trait.Ord.html) and
+[`OrdAbs`](https://docs.rs/malachite-base/latest/malachite_base/num/comparison/traits/trait.OrdAbs.html)
+do, and both are implemented for the primitive integers too, where the doubling would overflow
+rather than allocate.
+Both sit beside
+[`cmp_normalized`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html#method.cmp_normalized),
+which compares two values as if each were scaled into $$[1, 2)$$, likewise without scaling
+anything.
 
 **The predicates.** `fmpz_is_zero` and `fmpz_is_one` are `f == 0` and `f == 1`: mixed equality
 with a small constant compares against the inline representation and allocates nothing, so the
