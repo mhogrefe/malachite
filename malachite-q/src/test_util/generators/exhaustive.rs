@@ -32,12 +32,14 @@ use malachite_base::num::exhaustive::{
     exhaustive_nonzero_signeds, exhaustive_positive_primitive_ints, exhaustive_primitive_floats,
     exhaustive_signeds, exhaustive_unsigneds, primitive_int_increasing_inclusive_range,
 };
+use malachite_base::options::exhaustive::exhaustive_options;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::common::{It, reshape_2_1_to_3};
 use malachite_base::test_util::generators::{
     exhaustive_pairs_big_small, exhaustive_pairs_big_tiny,
 };
+use malachite_base::tuples::exhaustive::exhaustive_triples;
 use malachite_base::tuples::exhaustive::{
     exhaustive_ordered_unique_pairs, exhaustive_pairs, exhaustive_pairs_from_single,
     exhaustive_triples_custom_output, exhaustive_triples_xyy, exhaustive_triples_xyy_custom_output,
@@ -49,6 +51,9 @@ use malachite_nz::integer::exhaustive::exhaustive_integers;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::exhaustive::{
     exhaustive_natural_range_to_infinity, exhaustive_naturals, exhaustive_positive_naturals,
+};
+use malachite_nz::test_util::generators::common::{
+    GMP_FORMAT_COMBO_COUNT, gmp_format_string_from_parts,
 };
 use num::BigRational;
 use std::ops::Shr;
@@ -677,6 +682,24 @@ where
             }
         }),
     )
+}
+
+// -- (Rational, String) --
+
+// All `(Rational, String)` where the `String` is a valid single-conversion `%Q` printf format
+// string: the `%Z` strings of the malachite-nz generators, with the type character replaced.
+pub fn exhaustive_rational_string_pair_gen_var_1() -> It<(Rational, String)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_rationals(),
+        exhaustive_triples(
+            primitive_int_increasing_inclusive_range(0, GMP_FORMAT_COMBO_COUNT - 1),
+            exhaustive_options(primitive_int_increasing_inclusive_range(0u64, 30)),
+            exhaustive_options(primitive_int_increasing_inclusive_range(0u64, 20)),
+        )
+        .map(|(combo, width, prec)| {
+            gmp_format_string_from_parts(combo, width, prec).replace('Z', "Q")
+        }),
+    ))
 }
 
 // -- (Rational, ToSciOptions) --

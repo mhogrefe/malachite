@@ -77,6 +77,7 @@ use crate::test_util::extra_variadic::{
     exhaustive_sextuples_from_single, exhaustive_triples_from_single, exhaustive_triples_xxy,
     exhaustive_triples_xxy_custom_output, exhaustive_triples_xyx,
 };
+use crate::test_util::generators::common::{GMP_FORMAT_COMBO_COUNT, gmp_format_string_from_parts};
 use crate::test_util::generators::{factors_of_limb_max, limbs_odd_factorial_valid};
 use crate::test_util::natural::arithmetic::gcd::{OwnedHalfGcdMatrix, half_gcd_matrix_create};
 use itertools::Itertools;
@@ -110,6 +111,7 @@ use malachite_base::num::iterators::{bit_distributor_sequence, ruler_sequence};
 use malachite_base::num::logic::traits::{
     BitAccess, BitConvertible, LeadingZeros, SignificantBits,
 };
+use malachite_base::options::exhaustive::exhaustive_options;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::slices::slice_trailing_zeros;
@@ -817,6 +819,24 @@ pub fn exhaustive_integer_rounding_mode_pair_gen_var_2() -> It<(Integer, Roundin
     Box::new(lex_pairs(
         exhaustive_nonzero_integers(),
         exhaustive_rounding_modes(),
+    ))
+}
+
+// -- (Integer, String) --
+
+// All `(Integer, String)` where the `String` is a valid single-conversion `%Z` printf format
+// string. The format strings are assembled from their parts (see `gmp_format_string_from_parts`),
+// so every output is valid by construction; the field width and precision are capped so the strings
+// and their outputs stay small.
+pub fn exhaustive_integer_string_pair_gen_var_1() -> It<(Integer, String)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_integers(),
+        exhaustive_triples(
+            primitive_int_increasing_inclusive_range(0, GMP_FORMAT_COMBO_COUNT - 1),
+            exhaustive_options(primitive_int_increasing_inclusive_range(0u64, 30)),
+            exhaustive_options(primitive_int_increasing_inclusive_range(0u64, 20)),
+        )
+        .map(|(combo, width, prec)| gmp_format_string_from_parts(combo, width, prec)),
     ))
 }
 
@@ -1972,6 +1992,24 @@ pub fn exhaustive_natural_rounding_mode_pair_gen_var_2() -> It<(Natural, Roundin
     Box::new(lex_pairs(
         exhaustive_positive_naturals(),
         exhaustive_rounding_modes(),
+    ))
+}
+
+// -- (Natural, String) --
+
+// All `(Natural, String)` where the `String` is a valid single-conversion `%Z` printf format
+// string. The format strings are assembled from their parts (see `gmp_format_string_from_parts`),
+// so every output is valid by construction; the field width and precision are capped so the strings
+// and their outputs stay small.
+pub fn exhaustive_natural_string_pair_gen_var_1() -> It<(Natural, String)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_naturals(),
+        exhaustive_triples(
+            primitive_int_increasing_inclusive_range(0, GMP_FORMAT_COMBO_COUNT - 1),
+            exhaustive_options(primitive_int_increasing_inclusive_range(0u64, 30)),
+            exhaustive_options(primitive_int_increasing_inclusive_range(0u64, 20)),
+        )
+        .map(|(combo, width, prec)| gmp_format_string_from_parts(combo, width, prec)),
     ))
 }
 

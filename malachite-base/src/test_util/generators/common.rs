@@ -223,3 +223,51 @@ pub fn reshape_3_1_to_4<A: 'static, B: 'static, C: 'static, D: 'static>(
 ) -> Box<dyn Iterator<Item = (A, B, C, D)>> {
     Box::new(it.map(|((a, b, c), d)| (a, b, c, d)))
 }
+
+// The building blocks of a GMP/MPFR-style `printf` conversion specification, for generators that
+// enumerate the whole grammar accepted by `parse_gmp_conversion_spec`.
+pub const GMP_SPEC_FLAG_CHARS: [u8; 6] = *b"-+ #0'";
+// The C length modifiers come first, then GMP's and MPFR's type characters, then the
+// `R`-with-rounding-character forms, so that generators can select the C-only prefixes with a
+// subrange.
+pub const GMP_SPEC_TYPE_STRS: [&str; 22] = [
+    "", "h", "hh", "l", "ll", "j", "q", "t", "z", "L", "M", "N", "P", "F", "Z", "Q", "R", "RN",
+    "RD", "RU", "RY", "RZ",
+];
+pub const GMP_SPEC_C_TYPE_COUNT: usize = 10;
+// The integer conversions come first, so that generators can select them with a subrange.
+pub const GMP_SPEC_CONV_CHARS: [u8; 20] = *b"diuoxXcspnmeEfFgGaAb";
+pub const GMP_SPEC_INTEGER_CONV_COUNT: usize = 6;
+
+// Assembles a conversion specification from its parts: a subset of the flag characters, an optional
+// field width, an optional precision (`Some(-1)` produces a `.` with no digits), a type string, and
+// a conversion character. Every output parses under `parse_gmp_conversion_spec`.
+pub fn gmp_spec_string_from_parts(
+    flags: u8,
+    type_index: usize,
+    conv_index: usize,
+    width: Option<u64>,
+    prec: Option<i64>,
+) -> String {
+    let mut s = vec![b'%'];
+    for (i, &c) in GMP_SPEC_FLAG_CHARS.iter().enumerate() {
+        if flags & (1 << i) != 0 {
+            s.push(c);
+        }
+    }
+    if let Some(w) = width {
+        s.extend_from_slice(w.to_string().as_bytes());
+    }
+    match prec {
+        None => {}
+        Some(-1) => s.push(b'.'),
+        Some(p) => {
+            s.push(b'.');
+            s.extend_from_slice(p.to_string().as_bytes());
+        }
+    }
+    s.extend_from_slice(GMP_SPEC_TYPE_STRS[type_index].as_bytes());
+    s.push(GMP_SPEC_CONV_CHARS[conv_index]);
+    // `s` is ASCII by construction
+    String::from_utf8(s).unwrap()
+}

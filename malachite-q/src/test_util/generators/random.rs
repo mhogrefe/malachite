@@ -52,6 +52,7 @@ use malachite_nz::natural::Natural;
 use malachite_nz::natural::random::{
     random_natural_range_to_infinity, random_naturals, random_positive_naturals,
 };
+use malachite_nz::test_util::generators::random::random_gmp_format_strings;
 use num::BigRational;
 use std::cmp::Ordering::*;
 use std::ops::Shr;
@@ -1583,6 +1584,24 @@ where
             _ => true,
         }),
     )
+}
+
+// -- (Rational, String) --
+
+// All `(Rational, String)` where the `String` is a valid single-conversion `%Q` printf format
+// string.
+pub fn random_rational_string_pair_gen_var_1(config: &GenConfig) -> It<(Rational, String)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_rationals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| random_gmp_format_strings(seed, config).map(|s| s.replace('Z', "Q")),
+    ))
 }
 
 // -- (Rational, ToSciOptions) --

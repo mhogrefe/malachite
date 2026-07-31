@@ -42,6 +42,7 @@ use crate::num::exhaustive::{
 use crate::num::float::NiceFloat;
 use crate::num::iterators::{bit_distributor_sequence, ruler_sequence};
 use crate::num::logic::traits::{BitBlockAccess, LeadingZeros};
+use crate::options::exhaustive::exhaustive_options;
 use crate::rounding_modes::RoundingMode::{self, *};
 use crate::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use crate::slices::slice_test_zero;
@@ -56,6 +57,10 @@ use crate::test_util::extra_variadic::{
     exhaustive_sextuples_from_single, exhaustive_triples_from_single, exhaustive_triples_xxy,
     exhaustive_triples_xxy_custom_output, exhaustive_triples_xyx,
     exhaustive_triples_xyx_custom_output, lex_triples_from_single, lex_triples_xyy, lex_union3s,
+};
+use crate::test_util::generators::common::{
+    GMP_SPEC_C_TYPE_COUNT, GMP_SPEC_CONV_CHARS, GMP_SPEC_INTEGER_CONV_COUNT, GMP_SPEC_TYPE_STRS,
+    gmp_spec_string_from_parts,
 };
 use crate::test_util::generators::common::{
     It, permute_1_3_2, permute_2_1, permute_3_1_4_2, reshape_1_2_to_3, reshape_2_1_1_to_4,
@@ -3641,6 +3646,67 @@ pub fn exhaustive_string_gen_var_15() -> It<String> {
         exhaustive_strings_using_chars(DECIMAL_SCI_STRING_CHARS.chars())
             .filter(|s| !large_exponent(s)),
     )
+}
+
+// All GMP/MPFR-style conversion specification strings, exhaustively covering every flag subset,
+// type character (including the `R`-with-rounding-character forms), conversion character, and a
+// range of field widths and precisions (including the bare `.`). Every output parses under
+// `parse_gmp_conversion_spec`.
+pub fn exhaustive_string_gen_var_16() -> It<String> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_triples(
+                primitive_int_increasing_inclusive_range(0u8, 63),
+                primitive_int_increasing_inclusive_range(0usize, GMP_SPEC_TYPE_STRS.len() - 1),
+                primitive_int_increasing_inclusive_range(0usize, GMP_SPEC_CONV_CHARS.len() - 1),
+            ),
+            exhaustive_pairs(
+                exhaustive_options(primitive_int_increasing_inclusive_range(0u64, 12)),
+                exhaustive_options(primitive_int_increasing_inclusive_range(-1i64, 12)),
+            ),
+        )
+        .map(|((flags, t, c), (width, prec))| gmp_spec_string_from_parts(flags, t, c, width, prec)),
+    )
+}
+
+// All `(T, String)` where the `String` is a plain C integer conversion specification, covering
+// every flag subset, C length modifier, integer conversion character, and a range of field widths
+// and precisions.
+pub fn exhaustive_unsigned_string_pair_gen_var_4<T: PrimitiveUnsigned>() -> It<(T, String)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_unsigneds::<T>(),
+        exhaustive_pairs(
+            exhaustive_triples(
+                primitive_int_increasing_inclusive_range(0u8, 63),
+                primitive_int_increasing_inclusive_range(0usize, GMP_SPEC_C_TYPE_COUNT - 1),
+                primitive_int_increasing_inclusive_range(0usize, GMP_SPEC_INTEGER_CONV_COUNT - 1),
+            ),
+            exhaustive_pairs(
+                exhaustive_options(primitive_int_increasing_inclusive_range(0u64, 12)),
+                exhaustive_options(primitive_int_increasing_inclusive_range(-1i64, 12)),
+            ),
+        )
+        .map(|((flags, t, c), (width, prec))| gmp_spec_string_from_parts(flags, t, c, width, prec)),
+    ))
+}
+
+// The same as `exhaustive_unsigned_string_pair_gen_var_4`, but over signed values.
+pub fn exhaustive_signed_string_pair_gen_var_1<T: PrimitiveSigned>() -> It<(T, String)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_signeds::<T>(),
+        exhaustive_pairs(
+            exhaustive_triples(
+                primitive_int_increasing_inclusive_range(0u8, 63),
+                primitive_int_increasing_inclusive_range(0usize, GMP_SPEC_C_TYPE_COUNT - 1),
+                primitive_int_increasing_inclusive_range(0usize, GMP_SPEC_INTEGER_CONV_COUNT - 1),
+            ),
+            exhaustive_pairs(
+                exhaustive_options(primitive_int_increasing_inclusive_range(0u64, 12)),
+                exhaustive_options(primitive_int_increasing_inclusive_range(-1i64, 12)),
+            ),
+        )
+        .map(|((flags, t, c), (width, prec))| gmp_spec_string_from_parts(flags, t, c, width, prec)),
+    ))
 }
 
 // -- (String, FromSciStringOptions) --

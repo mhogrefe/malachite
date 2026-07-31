@@ -2951,6 +2951,17 @@ pub fn unsigned_rounding_mode_pair_gen_var_5<T: PrimitiveUnsigned>() -> Generato
     )
 }
 
+// -- (PrimitiveSigned, String) --
+
+// All `(T, String)` where the `String` is a plain C integer conversion specification; see
+// `unsigned_string_pair_gen_var_4`.
+pub fn signed_string_pair_gen_var_1<T: PrimitiveSigned>() -> Generator<(T, String)> {
+    Generator::new_no_special(
+        &exhaustive_signed_string_pair_gen_var_1,
+        &random_signed_string_pair_gen_var_1,
+    )
+}
+
 // -- (PrimitiveUnsigned, String) --
 
 // All `(u8, String)` that, when passed to `Natural::from_string_base`, return a `Some`.
@@ -2976,6 +2987,15 @@ pub fn unsigned_string_pair_gen_var_3() -> Generator<(u8, String)> {
     Generator::new_no_special(
         &exhaustive_unsigned_string_pair_gen_var_3,
         &random_unsigned_string_pair_gen_var_3,
+    )
+}
+
+// All `(T, String)` where the `String` is a plain C integer conversion specification, covering
+// every flag subset, C length modifier, integer conversion, and a range of widths and precisions.
+pub fn unsigned_string_pair_gen_var_4<T: PrimitiveUnsigned>() -> Generator<(T, String)> {
+    Generator::new_no_special(
+        &exhaustive_unsigned_string_pair_gen_var_4,
+        &random_unsigned_string_pair_gen_var_4,
     )
 }
 
@@ -3212,6 +3232,12 @@ pub fn string_gen_var_14() -> Generator<String> {
 // 'E' followed by an optional plus or minus sign and more than three digits.
 pub fn string_gen_var_15() -> Generator<String> {
     Generator::new_no_special(&exhaustive_string_gen_var_15, &random_string_gen_var_15)
+}
+
+// All GMP/MPFR-style `printf` conversion specification strings, exhaustively covering every flag
+// subset, type character, conversion character, and a range of field widths and precisions.
+pub fn string_gen_var_16() -> Generator<String> {
+    Generator::new_no_special(&exhaustive_string_gen_var_16, &random_string_gen_var_16)
 }
 
 // -- (String, FromSciStringOptions) --

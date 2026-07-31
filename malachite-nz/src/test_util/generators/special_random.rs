@@ -69,6 +69,7 @@ use crate::test_util::generators::exhaustive::{
     map_helper_1, map_helper_2, map_helper_3, round_to_multiple_integer_filter_map,
     round_to_multiple_natural_filter_map,
 };
+use crate::test_util::generators::random::random_gmp_format_strings;
 use crate::test_util::generators::{T8, factors_of_limb_max};
 use crate::test_util::natural::arithmetic::gcd::{OwnedHalfGcdMatrix, half_gcd_matrix_create};
 use malachite_base::bools::random::{RandomBools, random_bools};
@@ -1759,6 +1760,26 @@ pub fn special_random_integer_rounding_mode_pair_gen_var_2(
             )
         },
         &random_rounding_modes,
+    ))
+}
+
+// -- (Integer, String) --
+
+// All `(Integer, String)` where the `String` is a valid single-conversion `%Z` printf format
+// string.
+pub fn special_random_integer_string_pair_gen_var_1(config: &GenConfig) -> It<(Integer, String)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_integers(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| random_gmp_format_strings(seed, config),
     ))
 }
 
@@ -4333,6 +4354,26 @@ pub fn special_random_natural_rounding_mode_pair_gen_var_2(
             )
         },
         &random_rounding_modes,
+    ))
+}
+
+// -- (Natural, String) --
+
+// All `(Natural, String)` where the `String` is a valid single-conversion `%Z` printf format
+// string.
+pub fn special_random_natural_string_pair_gen_var_1(config: &GenConfig) -> It<(Natural, String)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_naturals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| random_gmp_format_strings(seed, config),
     ))
 }
 

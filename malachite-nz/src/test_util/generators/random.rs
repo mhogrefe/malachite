@@ -67,6 +67,7 @@ use crate::test_util::extra_variadic::{
     random_sextuples_from_single, random_triples, random_triples_from_single, random_triples_xxy,
     random_triples_xyx, random_triples_xyy,
 };
+use crate::test_util::generators::common::{GMP_FORMAT_COMBO_COUNT, gmp_format_string_from_parts};
 use crate::test_util::generators::exhaustive::{
     filter_helper_1, filter_helper_2, filter_helper_3, filter_helper_4, filter_helper_5,
     filter_helper_6, filter_map_helper_1, filter_map_helper_2, filter_map_helper_3,
@@ -1498,6 +1499,54 @@ pub fn random_integer_rounding_mode_pair_gen_var_2(
             )
         },
         &random_rounding_modes,
+    ))
+}
+
+// -- (Integer, String) --
+
+// Produces random GMP-style `%Z` format strings, valid by construction. The `combo` selector is
+// uniform; the field width and precision are each absent with probability `format_string_none_p_n /
+// format_string_none_p_d` and otherwise geometric with a small mean, so the strings and their
+// outputs stay small.
+pub fn random_gmp_format_strings(seed: Seed, config: &GenConfig) -> It<String> {
+    let none_p_n = config.get_or("format_string_none_p_n", 1);
+    let none_p_d = config.get_or("format_string_none_p_d", 3);
+    let mean_width_n = config.get_or("mean_format_width_n", 8);
+    let mean_width_d = config.get_or("mean_format_width_d", 1);
+    let mean_prec_n = config.get_or("mean_format_prec_n", 8);
+    let mean_prec_d = config.get_or("mean_format_prec_d", 1);
+    Box::new(
+        random_triples(
+            seed,
+            &|seed| random_unsigned_inclusive_range(seed, 0, GMP_FORMAT_COMBO_COUNT - 1),
+            &move |seed| {
+                random_options(seed, none_p_n, none_p_d, &move |seed| {
+                    geometric_random_unsigneds::<u64>(seed, mean_width_n, mean_width_d)
+                })
+            },
+            &move |seed| {
+                random_options(seed, none_p_n, none_p_d, &move |seed| {
+                    geometric_random_unsigneds::<u64>(seed, mean_prec_n, mean_prec_d)
+                })
+            },
+        )
+        .map(|(combo, width, prec)| gmp_format_string_from_parts(combo, width, prec)),
+    )
+}
+
+// All `(Integer, String)` where the `String` is a valid single-conversion `%Z` printf format
+// string.
+pub fn random_integer_string_pair_gen_var_1(config: &GenConfig) -> It<(Integer, String)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_integers(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| random_gmp_format_strings(seed, config),
     ))
 }
 
@@ -3645,6 +3694,24 @@ pub fn random_natural_rounding_mode_pair_gen_var_2(
             )
         },
         &random_rounding_modes,
+    ))
+}
+
+// -- (Natural, String) --
+
+// All `(Natural, String)` where the `String` is a valid single-conversion `%Z` printf format
+// string.
+pub fn random_natural_string_pair_gen_var_1(config: &GenConfig) -> It<(Natural, String)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_naturals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| random_gmp_format_strings(seed, config),
     ))
 }
 

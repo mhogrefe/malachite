@@ -6,6 +6,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+/// [`format_natural_str`](format_natural::format_natural_str), a function for formatting a
+/// [`Natural`](crate::natural::Natural) according to a GMP-style `printf` format string.
+pub mod format_natural;
 /// Implementations of [`FromSciString`](malachite_base::num::conversion::traits::FromSciString).
 /// This is a trait for converting strings, possibly using scientific notation, to numbers.
 pub mod from_sci_string;

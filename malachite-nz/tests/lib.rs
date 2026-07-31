@@ -145,6 +145,7 @@ pub mod integer {
         #[cfg(feature = "serde")]
         pub mod serde;
         pub mod string {
+            pub mod format_integer;
             pub mod from_sci_string;
             pub mod from_string;
             pub mod to_sci;
@@ -341,6 +342,7 @@ pub mod natural {
         #[cfg(feature = "serde")]
         pub mod serde;
         pub mod string {
+            pub mod format_natural;
             pub mod from_sci_string;
             pub mod from_string;
             pub mod to_sci;

@@ -307,3 +307,38 @@ pub fn get_str_aux_inputs(
     };
     (r, neg_f, e, i64::exact_from(b0), m, rnd)
 }
+
+// The flag characters a GMP-style integer format string may carry, and the conversion characters of
+// the `Z` type. Kept in sync with `format_gmp_integer_str`.
+pub const GMP_FORMAT_FLAG_CHARS: [u8; 6] = *b"-+ #0'";
+pub const GMP_FORMAT_CONV_CHARS: [u8; 6] = *b"diuoxX";
+// flag subsets times conversion characters
+pub const GMP_FORMAT_COMBO_COUNT: u16 = 64 * 6;
+
+// Assembles a GMP-style `%Z` format string from its parts (see `format_natural_str`), so that
+// generators can build valid format strings by construction rather than by filtering. `combo`
+// (which should be less than `GMP_FORMAT_COMBO_COUNT`) selects, via its low six bits, a subset of
+// the flag characters, and via the rest a conversion character; `width` and `prec` are the optional
+// field width and precision. Every output parses as a valid `%Z` integer conversion, so none of the
+// `format_natural_str` failure paths can be reached.
+pub fn gmp_format_string_from_parts(combo: u16, width: Option<u64>, prec: Option<u64>) -> String {
+    let flags = combo & 0x3f;
+    let conv = usize::from(combo >> 6); // in 0..6
+    let mut s = vec![b'%'];
+    for (i, &c) in GMP_FORMAT_FLAG_CHARS.iter().enumerate() {
+        if flags & (1 << i) != 0 {
+            s.push(c);
+        }
+    }
+    if let Some(w) = width {
+        s.extend_from_slice(w.to_string().as_bytes());
+    }
+    if let Some(p) = prec {
+        s.push(b'.');
+        s.extend_from_slice(p.to_string().as_bytes());
+    }
+    s.push(b'Z');
+    s.push(GMP_FORMAT_CONV_CHARS[conv]);
+    // `s` is ASCII by construction
+    String::from_utf8(s).unwrap()
+}

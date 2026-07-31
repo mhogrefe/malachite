@@ -160,6 +160,7 @@ pub mod rational {
         pub mod sci_mantissa_and_exponent;
         pub mod serde;
         pub mod string {
+            pub mod format_rational;
             pub mod from_sci_string;
             pub mod from_string;
             pub mod to_sci;

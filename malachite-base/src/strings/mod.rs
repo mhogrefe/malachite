@@ -250,6 +250,11 @@ pub const fn strings_from_char_vecs<I: Iterator<Item = Vec<char>>>(
 
 /// Iterators that generate [`String`]s without repetition.
 pub mod exhaustive;
+/// The [`GmpConversionSpec`](gmp_format::GmpConversionSpec) struct, the
+/// [`GmpFormatArg`](gmp_format::GmpFormatArg) trait, and the [`gmp_format`](gmp_format::gmp_format)
+/// function, for formatting values according to GMP-style `printf` format strings; the
+/// [`gmp_format!`](crate::gmp_format) macro wraps them.
+pub mod gmp_format;
 #[cfg(feature = "random")]
 /// Iterators that generate [`String`]s randomly.
 pub mod random;

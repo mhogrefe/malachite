@@ -1075,6 +1075,69 @@ Reading works because a view can be synthesized; writing would not. Along the sa
 `_mpz_realloc` is handled by the growth strategy of the underlying
 [`Vec`](https://doc.rust-lang.org/nightly/std/vec/struct.Vec.html).
 
+## [Formatted Output](https://gmplib.org/manual/Formatted-Output) {#formatted-output}
+
+GMP extends `printf` with the `Z` type: a conversion specification
+`% [flags] [width] [.precision] Z [conv]` formats an `mpz_t` argument, with `conv` drawn from C's
+integer conversions. Malachite splits the job along the same seam as
+[the MPFR floats page](/mapping/mpfr-floats/#formatted-output-functions). The `Z`-conversion
+engine is ported:
+[`format_natural_str`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/conversion/string/format_natural/fn.format_natural_str.html)`(&x, "%#Zx")`
+and
+[`format_integer_str`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/conversion/string/format_integer/fn.format_integer_str.html)
+each take one number and one conversion specification and return the formatted piece. Everything
+around it is either Rust's own
+[`format!`](https://doc.rust-lang.org/nightly/std/macro.format.html) and `write!`, or, when a
+whole template should be interpreted as `gmp_printf` would, the
+[`gmp_format!`](https://docs.rs/malachite-base/latest/malachite_base/macro.gmp_format.html)
+macro: `gmp_format!("%s: %Zd of %d", name, n, k)` walks the template, each conversion consuming
+the next argument, mixing the GMP types with the plain C integer, character, and string
+conversions and `*` widths. Either way the choice of sink is Rust's, which also retires the
+buffer-management distinctions that give this section most of its rows.
+
+| | GMP | Malachite |
+| :---: | --- | --- |
+| ≈ | `int gmp_printf (const char *fmt, ...)` | [`format_natural_str`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/conversion/string/format_natural/fn.format_natural_str.html), [`print!`](https://doc.rust-lang.org/nightly/std/macro.print.html) |
+| — | `int gmp_vprintf (const char *fmt, va_list ap)` | |
+| ≈ | `int gmp_fprintf (FILE *fp, const char *fmt, ...)` | [`format_natural_str`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/conversion/string/format_natural/fn.format_natural_str.html), [`write!`](https://doc.rust-lang.org/nightly/std/macro.write.html) |
+| — | `int gmp_vfprintf (FILE *fp, const char *fmt, va_list ap)` | |
+| ≈ | `int gmp_sprintf (char *buf, const char *fmt, ...)` | [`format_natural_str`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/conversion/string/format_natural/fn.format_natural_str.html), [`format!`](https://doc.rust-lang.org/nightly/std/macro.format.html) |
+| — | `int gmp_vsprintf (char *buf, const char *fmt, va_list ap)` | |
+| ≈ | `int gmp_snprintf (char *buf, size_t size, const char *fmt, ...)` | [`format_natural_str`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/conversion/string/format_natural/fn.format_natural_str.html), [`format!`](https://doc.rust-lang.org/nightly/std/macro.format.html) |
+| — | `int gmp_vsnprintf (char *buf, size_t size, const char *fmt, va_list ap)` | |
+| ≈ | `int gmp_asprintf (char **pp, const char *fmt, ...)` | [`format_natural_str`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/conversion/string/format_natural/fn.format_natural_str.html), [`format!`](https://doc.rust-lang.org/nightly/std/macro.format.html) |
+| — | `int gmp_vasprintf (char **pp, const char *fmt, va_list ap)` | |
+| — | `int gmp_obstack_printf (struct obstack *ob, const char *fmt, ...)` | |
+| — | `int gmp_obstack_vprintf (struct obstack *ob, const char *fmt, va_list ap)` | |
+
+**The family.** Twelve functions, one engine. The six direct functions differ only in where the
+characters go, `stdout`, a stream, a caller's buffer with or without a size limit, an allocated
+string, or an obstack; in Rust the destination is `write!`'s first argument or `format!`'s
+returned [`String`](https://doc.rust-lang.org/nightly/std/string/struct.String.html), and the
+truncating and allocating variants collapse. The `va_list` five and the obstack pair are C's
+variadic and allocation plumbing. A row is ≈ rather than ✓ because
+[`gmp_format!`](https://docs.rs/malachite-base/latest/malachite_base/macro.gmp_format.html)
+stops short of the full C library underneath `gmp_printf`: the C float conversions on primitive
+floats, `%n`, `%p`, `%m`, and GMP's `mpf_t` and limb types are not interpreted, and a type
+mismatch between a conversion and its argument is a
+[`None`](https://doc.rust-lang.org/nightly/std/option/enum.Option.html) where C's is undefined
+behavior.
+
+**The conversion specification.** The engines accept GMP's grammar for a single `Z` conversion,
+verified against `gmp_snprintf` itself: the `printf` flags (`-`, `+`, space, `#`, and `0`, with
+`'` accepted but, as in GMP, having no effect on GMP types), the field width, the precision as a
+minimum digit count, and the conversions `d`/`i`/`u` (all decimal), `o`, and `x`/`X`. GMP's
+quirks come along exactly: flags may follow the width, a later sign flag overwrites an earlier
+one, the `0` fill is not suppressed by an explicit precision or by left justification, and a zero
+value under an explicit precision of 0 prints no digits, un-suppressing the `#` prefix. The `*`
+width and precision, which in C fetch their values from the argument list, have no argument list
+to fetch from in a single-value call, and a failed conversion returns
+[`None`](https://doc.rust-lang.org/nightly/std/option/enum.Option.html) where GMP returns
+$$-1$$. The same template grammar's `Q` and `F` conversions belong to
+[the rationals page](/mapping/gmp-rationals/) and to floats, which
+[the MPFR page](/mapping/mpfr-floats/#formatted-output-functions) covers.
+
+
 Malachite is developed by Mikhail Hogrefe. Thanks to 43615, b4D8, Romain Billot, Maxim Biryukov, coolreader18, Dasaav-dsv, Duncan Freeman, florian1345, konstin, Rowan Hart, YunWon Jeong, Park Joon-Kyu, Antonio Mamić, OliverNChalk, Kevin Phoenix, probablykasper, shekohex, skycloudd, John Vandenberg, Brandon Weeks, and Will Youmans for additional contributions.
 
 Copyright © 2026 Mikhail Hogrefe

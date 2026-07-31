@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::gmp_format;
 use malachite_base::num::arithmetic::traits::{Abs, Pow, PowerOf2};
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
@@ -15,7 +16,7 @@ use malachite_base::rounding_modes::RoundingMode::{
 use malachite_float::Float;
 use malachite_float::float::conversion::string::format_float::PrintfArg::{Float as F, Int, Str};
 use malachite_float::float::conversion::string::format_float::{
-    PrintfArg, float_conversion_spec, format, format_float, format_float_str,
+    PrintfArg, float_conversion_spec, format_float_str, format_mpfr_float, format_mpfr_str,
 };
 use malachite_float::test_util::common::parse_hex_string;
 use malachite_float::test_util::generators::{
@@ -264,22 +265,22 @@ fn verify_format(x: &Float, fmt: &str) {
 
 // Convenience: format one Float with default flags.
 fn fmt_float(p: &Float, conv: u8, prec: i64, rm: RoundingMode) -> String {
-    format_float(p, &float_conversion_spec(conv, prec, 0, rm)).unwrap()
+    format_mpfr_float(p, &float_conversion_spec(conv, prec, 0, rm)).unwrap()
 }
 
 // Convenience: run the format-string frontend and collect the result as a `String`.
 fn fmt(f: &[u8], args: &[PrintfArg]) -> String {
-    String::from_utf8(format(f, args).unwrap()).unwrap()
+    String::from_utf8(format_mpfr_str(f, args).unwrap()).unwrap()
 }
 
 #[test]
-fn test_format_float() {
-    // format_float, exercised directly through a spec built by float_conversion_spec.
+fn test_format_mpfr_float() {
+    // format_mpfr_float, exercised directly through a spec built by float_conversion_spec.
     fn test(s: &str, s_hex: &str, conv: u8, prec: i64, width: i64, rm: RoundingMode, out: &str) {
         let x = parse_hex_string(s_hex);
         assert_eq!(x.to_string(), s);
         let spec = float_conversion_spec(conv, prec, width, rm);
-        assert_eq!(format_float(&x, &spec).unwrap(), out);
+        assert_eq!(format_mpfr_float(&x, &spec).unwrap(), out);
         if !x.is_nan() && !x.is_infinite() {
             verify_regular_output(&x, out, conv, rm);
         }
@@ -381,8 +382,8 @@ fn test_format_float_single_digit_rounding() {
 fn test_format_float_exact_panics() {
     // Exact panics whenever the output does not represent the value exactly. 1.5625 = 0x1.9 needs
     // five significant bits, so it is not representable in a single base-16 digit (unlike 1.5 =
-    // 0xcp-3, which is; the succeeding Exact cases live in `test_format_float`).
-    assert_panic!(format_float(
+    // 0xcp-3, which is; the succeeding Exact cases live in `test_format_mpfr_float`).
+    assert_panic!(format_mpfr_float(
         &parse_hex_string("0x1.9#5"),
         &float_conversion_spec(b'a', 0, 0, Exact)
     ));
@@ -403,10 +404,10 @@ fn test_format_float_none() {
     // worse: `mpfr_snprintf("%.9223372036854775807Rf", ...)` aborts the whole process on the failed
     // allocation, whereas these paths return None or unwind.)
     let x = parse_hex_string("0x1.8#2");
-    assert!(format_float(&x, &float_conversion_spec(b'f', i64::MAX, 0, Nearest)).is_none());
+    assert!(format_mpfr_float(&x, &float_conversion_spec(b'f', i64::MAX, 0, Nearest)).is_none());
     let small = Float::from(0.001);
     assert!(
-        format_float(
+        format_mpfr_float(
             &small,
             &float_conversion_spec(b'g', i64::MAX - 1, 0, Nearest)
         )
@@ -733,15 +734,15 @@ fn test_format_coverage() {
     // covers: fmt_break (format string ends before a conversion character)
     assert_eq!(fmt(b"%5", &[]), "");
     // covers: fmt_float_bad (a `%R` float conversion given a non-Float argument)
-    assert!(format(b"%Rf", &[Int(5)]).is_none());
+    assert!(format_mpfr_str(b"%Rf", &[Int(5)]).is_none());
     // covers: fmt_str_bad (a `%s` conversion given a non-Str argument)
-    assert!(format(b"%s", &[Int(5)]).is_none());
+    assert!(format_mpfr_str(b"%s", &[Int(5)]).is_none());
     // covers: siv_invalid fmt_invalid (an unknown conversion character is dropped)
     assert_eq!(fmt(b"%y", &[]), "");
     // covers: siv_n (`%n` is rejected, then dropped)
     assert_eq!(fmt(b"%n", &[]), "");
     // covers: siv_p fmt_unsupported (`%p` is valid but has no PrintfArg counterpart)
-    assert!(format(b"%p", &[]).is_none());
+    assert!(format_mpfr_str(b"%p", &[]).is_none());
     // covers: pf_alt (the `#` flag)
     assert_eq!(fmt(b"%#Ra", &[F(&x)]), "0x1.8p+0");
     // covers: fmt_prec_neg (a `*` precision of a negative value means "unset")
@@ -768,33 +769,33 @@ fn test_format_coverage() {
     // invalid (dropped); the GMP integer types make it valid-but-unsupported (fails)
     assert_eq!(fmt(b"%Ld", &[]), ""); // covers: pat_l_double
     assert_eq!(fmt(b"%Fd", &[]), ""); // covers: pat_mpf
-    assert!(format(b"%Qd", &[]).is_none()); // covers: pat_mpq
-    assert!(format(b"%Md", &[]).is_none()); // covers: pat_mplimb
-    assert!(format(b"%Nd", &[]).is_none()); // covers: pat_mplimbarray
-    assert!(format(b"%Zd", &[]).is_none()); // covers: pat_mpz
-    assert!(format(b"%Pd", &[]).is_none()); // covers: pat_mpfrprec
+    assert!(format_mpfr_str(b"%Qd", &[]).is_none()); // covers: pat_mpq
+    assert!(format_mpfr_str(b"%Md", &[]).is_none()); // covers: pat_mplimb
+    assert!(format_mpfr_str(b"%Nd", &[]).is_none()); // covers: pat_mplimbarray
+    assert!(format_mpfr_str(b"%Zd", &[]).is_none()); // covers: pat_mpz
+    assert!(format_mpfr_str(b"%Pd", &[]).is_none()); // covers: pat_mpfrprec
 }
 
 #[test]
 fn test_format_none() {
     let x = Float::from(1.5);
     // width/precision literals overflowing an i64 fail like MPFR's EOVERFLOW
-    assert!(format(b"%.99999999999999999999Rf", &[F(&x)]).is_none());
-    assert!(format(b"%99999999999999999999Rf", &[F(&x)]).is_none());
+    assert!(format_mpfr_str(b"%.99999999999999999999Rf", &[F(&x)]).is_none());
+    assert!(format_mpfr_str(b"%99999999999999999999Rf", &[F(&x)]).is_none());
     // valid-in-MPFR conversions with no PrintfArg counterpart fail instead of silently
     // desynchronizing the argument stream
-    assert!(format(b"%u %Rf", &[Int(5), F(&x)]).is_none());
-    assert!(format(b"%e %Rf", &[F(&x), F(&x)]).is_none());
+    assert!(format_mpfr_str(b"%u %Rf", &[Int(5), F(&x)]).is_none());
+    assert!(format_mpfr_str(b"%e %Rf", &[F(&x), F(&x)]).is_none());
     // missing and wrongly-typed arguments fail
-    assert!(format(b"%d %d", &[Int(1)]).is_none());
-    assert!(format(b"%d", &[Str("x")]).is_none());
+    assert!(format_mpfr_str(b"%d %d", &[Int(1)]).is_none());
+    assert!(format_mpfr_str(b"%d", &[Str("x")]).is_none());
 }
 
 #[test]
 fn format_float_properties() {
     // format_float_str(x, fmt) is format_float applied to the spec parsed from fmt, so this
-    // property exercises the same partition_number / sprnt_fp core as format_float itself, over the
-    // full space of conversions, flags, widths, precisions, and rounding characters.
+    // property exercises the same partition_number / sprnt_fp core as format_mpfr_float itself,
+    // over the full space of conversions, flags, widths, precisions, and rounding characters.
     fn check(x: &Float, fmt: &str) {
         let out = format_float_str(x, fmt).unwrap();
         // valid format strings with bounded width/precision always succeed and produce ASCII
@@ -810,4 +811,82 @@ fn format_float_properties() {
     // exponent: `b`, `f`, and `F` would write out every digit before it, hundreds of millions of
     // them for such a value.
     float_string_pair_gen_var_2().test_properties(|(x, fmt)| check(&x, &fmt));
+}
+
+// A two-argument analogue of `mpfr_format`: an `%R` conversion and an mpz `%Z` conversion, matching
+// `mpfr_snprintf`, which accepts GMP's types alongside its own.
+fn mpfr_format_r_z(x: &Float, y: &rug::Integer, fmt: &str) -> Option<String> {
+    unsafe extern "C" {
+        fn mpfr_snprintf(
+            buf: *mut core::ffi::c_char,
+            n: usize,
+            template: *const core::ffi::c_char,
+            ...
+        ) -> core::ffi::c_int;
+    }
+    let rf = rug::Float::exact_from(x);
+    let template = std::ffi::CString::new(fmt).ok()?;
+    let mut buf = vec![0u8; 1 << 12];
+    let n = unsafe {
+        mpfr_snprintf(
+            buf.as_mut_ptr().cast(),
+            buf.len(),
+            template.as_ptr(),
+            rf.as_raw(),
+            y.as_raw(),
+        )
+    };
+    if n < 0 || n as usize >= buf.len() {
+        return None;
+    }
+    Some(String::from_utf8_lossy(&buf[..n as usize]).into_owned())
+}
+
+#[test]
+fn test_gmp_format_multi() {
+    let x = Float::from(1.5);
+    let n = Natural::from(255u32);
+    let rn = rug::Integer::from(&n);
+
+    let fmt = "%.3Rf of %#Zx";
+    let s = gmp_format!(fmt, x.clone(), n.clone()).unwrap();
+    assert_eq!(s, "1.500 of 0xff");
+    assert_eq!(mpfr_format_r_z(&x, &rn, fmt).unwrap(), s);
+
+    // rounding characters reach the Float, and widths pad the field
+    let fmt = "%10.2RZe|%08Zd";
+    let s = gmp_format!(fmt, x.clone(), n.clone()).unwrap();
+    assert_eq!(s, "  1.50e+00|00000255");
+    assert_eq!(mpfr_format_r_z(&x, &rn, fmt).unwrap(), s);
+
+    // a Float refuses integer conversions, and bignums refuse %R
+    assert!(gmp_format!("%d", x.clone()).is_none());
+    assert!(gmp_format!("%Zd", x.clone()).is_none());
+    assert!(gmp_format!("%Rf", n.clone()).is_none());
+    // (C float conversions on primitive floats are unsupported: f64 does not implement GmpFormatArg
+    // at all, so the misuse is a compile error rather than a None.)
+}
+
+#[test]
+fn gmp_format_multi_properties() {
+    float_string_pair_gen_var_1().test_properties(|(x, fmt)| {
+        // The single-value entry and the multi-argument walker agree on %R templates.
+        let s = format_float_str(&x, &fmt).unwrap();
+        assert_eq!(gmp_format!(&*fmt, x.clone()).unwrap(), s);
+        // Appending a %Z conversion consumes a second argument, matching mpfr_snprintf. The `'`
+        // flag is excluded from the comparison for the same reason as in `verify_format_float`:
+        // MPFR takes the separator from the locale, empty in the C locale, while ours always groups
+        // with a comma.
+        let n = Natural::from(255u32);
+        let fmt2 = format!("{fmt} %#Zx");
+        let sw = gmp_format!(&*fmt2, x.clone(), n.clone()).unwrap();
+        let conv = *fmt.as_bytes().last().unwrap();
+        if !fmt.contains('\'') && !(matches!(conv, b'a' | b'A' | b'b') && precision_is_zero(&fmt)) {
+            assert_eq!(
+                mpfr_format_r_z(&x, &rug::Integer::from(&n), &fmt2).unwrap(),
+                sw,
+                "{x} {fmt2}"
+            );
+        }
+    });
 }

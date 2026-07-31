@@ -689,6 +689,7 @@ pub mod strings {
         pub mod shortlex_strings;
         pub mod shortlex_strings_using_chars;
     }
+    pub mod gmp_format;
     pub mod random {
         pub mod random_fixed_length_strings;
         pub mod random_fixed_length_strings_using_chars;

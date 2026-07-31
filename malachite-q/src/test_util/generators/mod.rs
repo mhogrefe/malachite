@@ -927,6 +927,18 @@ where
 
 // var 6 is in malachite-float.
 
+// -- (Rational, String) --
+
+// All `(Rational, String)` where the `String` is a valid single-conversion `%Q` printf format
+// string, for `format_rational_str`.
+pub fn rational_string_pair_gen_var_1() -> Generator<(Rational, String)> {
+    Generator::new(
+        &exhaustive_rational_string_pair_gen_var_1,
+        &random_rational_string_pair_gen_var_1,
+        &special_random_rational_string_pair_gen_var_1,
+    )
+}
+
 // -- (Rational, ToSciOptions) --
 
 pub fn rational_to_sci_options_pair_gen() -> Generator<(Rational, ToSciOptions)> {

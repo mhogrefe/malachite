@@ -982,6 +982,18 @@ pub fn integer_rounding_mode_pair_gen_var_2() -> Generator<(Integer, RoundingMod
     )
 }
 
+// -- (Integer, String) --
+
+// All `(Integer, String)` where the `String` is a valid single-conversion `%Z` printf format
+// string, for `format_integer_str`.
+pub fn integer_string_pair_gen_var_1() -> Generator<(Integer, String)> {
+    Generator::new(
+        &exhaustive_integer_string_pair_gen_var_1,
+        &random_integer_string_pair_gen_var_1,
+        &special_random_integer_string_pair_gen_var_1,
+    )
+}
+
 // -- (Integer, ToSciOptions) --
 
 pub fn integer_to_sci_options_pair_gen() -> Generator<(Integer, ToSciOptions)> {
@@ -2346,6 +2358,18 @@ pub fn natural_rounding_mode_pair_gen_var_2() -> Generator<(Natural, RoundingMod
         &exhaustive_natural_rounding_mode_pair_gen_var_2,
         &random_natural_rounding_mode_pair_gen_var_2,
         &special_random_natural_rounding_mode_pair_gen_var_2,
+    )
+}
+
+// -- (Natural, String) --
+
+// All `(Natural, String)` where the `String` is a valid single-conversion `%Z` printf format
+// string, for `format_natural_str`.
+pub fn natural_string_pair_gen_var_1() -> Generator<(Natural, String)> {
+    Generator::new(
+        &exhaustive_natural_string_pair_gen_var_1,
+        &random_natural_string_pair_gen_var_1,
+        &special_random_natural_string_pair_gen_var_1,
     )
 }
 

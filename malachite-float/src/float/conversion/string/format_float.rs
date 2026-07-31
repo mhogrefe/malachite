@@ -19,7 +19,7 @@
 //
 // `format_float_str` (below) is the public MPFR-compatible entry point, for callers who want strict
 // `mpfr_printf`-style formatting of a single `Float`. Everything else is internal: `format` /
-// `PrintfArg` are the multi-conversion engine it delegates to, and `format_float` /
+// `PrintfArg` are the multi-conversion engine it delegates to, and `format_mpfr_float` /
 // `float_conversion_spec` / `PrintfSpec` are the spec-based core; all are exposed only under
 // `test_build`, for tests/conversion/string/format_float.rs.
 //
@@ -30,7 +30,7 @@
 //   spec/flag/arg-type parsing, buffer ops (on a plain `Vec<u8>`), `NumberParts`/`DecimalInfo`,
 //   `mpfr_get_str_wrapper`, `floor_log10` (on `Float::unsigned_pow`), `number_parts_init`,
 //   `regular_eg` (scientific), `regular_fg` (fixed), `next_base_power_p` + `regular_ab`
-//   (hex/binary), `partition_number` (dispatcher), `sprnt_fp` (emitter), `format_float` (a
+//   (hex/binary), `partition_number` (dispatcher), `sprnt_fp` (emitter), `format_mpfr_float` (a
 //   per-conversion entry point), `format` (a format-string frontend over a `&[PrintfArg]` slice),
 //   and `format_float_str` (the public single-value entry point).
 // - REMAINING: the multi-argument `format` frontend is not yet public (its `PrintfArg` model would
@@ -69,6 +69,7 @@ use malachite_base::num::logic::traits::{BitAccess, LowMask, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode::{
     self, Ceiling, Down, Exact, Floor, Nearest, Up,
 };
+use malachite_base::strings::gmp_format::{GmpConversionSpec, GmpFormatArg};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 
@@ -1074,7 +1075,7 @@ fn sprnt_fp(buf: &mut Vec<u8>, p: &Float, spec: &PrintfSpec) -> Option<()> {
 // Builds a [`PrintfSpec`] for a single `%R<conv>` conversion with the given precision (negative
 // means unset), field width, and rounding mode. The flag fields start out cleared, so callers (e.g.
 // a future `Display` wiring, which needs `alt`/`showsign`/`left`/`pad`) may set them on the result
-// before calling [`format_float`].
+// before calling [`format_mpfr_float`].
 pub_const_crate_test! {float_conversion_spec(
     conv: u8,
     prec: i64,
@@ -1092,7 +1093,7 @@ pub_const_crate_test! {float_conversion_spec(
 // Formats the [`Float`] `p` for a single `%R<conv>` conversion described by `spec`, returning the
 // formatted string, or `None` on an internal size overflow (where MPFR returns -1). This is the
 // core of the `%R` path; [`format`] is the multi-conversion format-string frontend on top of it.
-pub_crate_test! {format_float(p: &Float, spec: &PrintfSpec) -> Option<String> {
+pub_crate_test! {format_mpfr_float(p: &Float, spec: &PrintfSpec) -> Option<String> {
     let mut buf = Vec::new();
     sprnt_fp(&mut buf, p, spec)?;
     Some(String::from_utf8(buf).unwrap())
@@ -1261,7 +1262,7 @@ fn format_str(s: &str, spec: &PrintfSpec) -> Vec<u8> {
 // This is the `%R` path of `mpfr_vasnprintf_aux`'s main loop from `vasprintf.c`, MPFR 4.2.2, recast
 // onto a Rust argument slice instead of a `va_list` (and without the `gmp_vsnprintf` delegation,
 // which has no Malachite analog).
-pub_crate_test! {format(fmt: &[u8], args: &[PrintfArg]) -> Option<Vec<u8>> {
+pub_crate_test! {format_mpfr_str(fmt: &[u8], args: &[PrintfArg]) -> Option<Vec<u8>> {
     let mut out = Vec::new();
     let mut fmt = fmt;
     let mut args = args.iter();
@@ -1450,10 +1451,70 @@ pub_crate_test! {format(fmt: &[u8], args: &[PrintfArg]) -> Option<Vec<u8>> {
 /// ```
 ///
 /// A single-value entry point over the port of the `%R` path of `mpfr_vasnprintf_aux` (vasprintf.c,
-/// MPFR 4.2.2): `format_float_str(x, fmt)` is `format(fmt, &[PrintfArg::Float(x)])`. The output is
-/// valid UTF-8 because every literal run of `fmt` (`%` is ASCII, so it never splits a multi-byte
-/// character) and every conversion's output is.
+/// MPFR 4.2.2): `format_float_str(x, fmt)` is `format_mpfr_str(fmt, &[PrintfArg::Float(x)])`. The
+/// output is valid UTF-8 because every literal run of `fmt` (`%` is ASCII, so it never splits a
+/// multi-byte character) and every conversion's output is.
 #[inline]
 pub fn format_float_str(x: &Float, fmt: &str) -> Option<String> {
-    format(fmt.as_bytes(), &[PrintfArg::Float(x)]).map(|v| String::from_utf8(v).unwrap())
+    format_mpfr_str(fmt.as_bytes(), &[PrintfArg::Float(x)]).map(|v| String::from_utf8(v).unwrap())
+}
+
+impl GmpFormatArg for Float {
+    /// Formats a [`Float`] according to a single parsed conversion specification, which must be an
+    /// MPFR-style `%R` conversion (`a`, `A`, `b`, `e`, `E`, `f`, `F`, `g`, or `G`, optionally
+    /// preceded by a rounding character); see
+    /// [`gmp_format`](malachite_base::strings::gmp_format::gmp_format) and [`format_float_str`].
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(), p, w)`, with
+    /// `p` and `w` the precision and field width of the specification.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::gmp_format;
+    /// use malachite_float::Float;
+    ///
+    /// assert_eq!(
+    ///     gmp_format!("%.3Rf and %.2RUe", Float::from(1.5), Float::from(1.5)),
+    ///     Some("1.500 and 1.50e+00".to_string())
+    /// );
+    /// ```
+    fn gmp_format(&self, spec: &GmpConversionSpec) -> Option<String> {
+        if spec.type_chr != b'R'
+            || !matches!(
+                spec.conv,
+                b'a' | b'A' | b'b' | b'e' | b'E' | b'f' | b'F' | b'g' | b'G'
+            )
+        {
+            return None;
+        }
+        let mpfr_spec = PrintfSpec {
+            alt: spec.alt,
+            space: spec.space,
+            left: spec.left,
+            showsign: spec.plus,
+            group: spec.group,
+            width: spec.width,
+            // MPFR reads a `.` with no digits as a precision of 0, and no `.` as -1
+            prec: match spec.prec {
+                None => -1,
+                Some(p) => p.max(0),
+            },
+            arg_type: ArgType::Mpfr,
+            rnd_mode: match spec.rnd_chr {
+                b'D' => Floor,
+                b'U' => Ceiling,
+                b'Y' => Up,
+                b'Z' => Down,
+                _ => Nearest,
+            },
+            spec: spec.conv,
+            pad: spec.fill,
+        };
+        format_mpfr_float(self, &mpfr_spec)
+    }
 }

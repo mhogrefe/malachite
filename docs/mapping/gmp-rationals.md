@@ -344,3 +344,23 @@ Deserialization validates canonical form, rejecting a zero denominator, a negati
 fraction not in lowest terms. So the invariant this page opened with holds across serialization
 as well: code downstream of a `Deserialize` never sees a non-canonical
 [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html).
+
+## [Formatted Output](https://gmplib.org/manual/Formatted-Output) {#formatted-output}
+
+The `gmp_printf` family's `Q` type formats an `mpq_t` with the integer conversions:
+`% [flags] [width] [.precision] Q [conv]` writes the numerator's digits and, unless the
+denominator is 1, a slash and the denominator's digits, as with `mpq_get_str`. The `Q`-conversion
+engine is ported:
+[`format_rational_str`](https://docs.rs/malachite-q/latest/malachite_q/rational/conversion/string/format_rational/fn.format_rational_str.html)`(&x, "%#Qx")`
+takes one [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html)
+and one conversion specification and returns the formatted piece, verified against `gmp_snprintf`
+itself; the surrounding template is Rust's own
+[`format!`](https://doc.rust-lang.org/nightly/std/macro.format.html) and `write!`, or the
+[`gmp_format!`](https://docs.rs/malachite-base/latest/malachite_base/macro.gmp_format.html)
+macro, which interprets a whole mixed-type template as `gmp_printf` would, and the family's
+twelve functions and their rows are on
+[the integers page](/mapping/gmp-integers/#formatted-output). The details GMP's conventions imply
+carry over: the field width and precision treat the whole fraction as a unit, with the precision's
+leading zeros attached to the numerator (GMP documents the precision's influence on a rational as
+undefined, and the port reproduces what its code does), and the `#` flag prefixes the numerator
+and the denominator separately, as in `0xff/0x10`.

@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::gmp_format;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
@@ -15,6 +16,7 @@ use malachite_float::test_util::bench::bucketers::pair_1_float_complexity_bucket
 use malachite_float::test_util::generators::float_string_pair_gen_var_1;
 
 pub(crate) fn register(runner: &mut Runner) {
+    register_demo!(runner, demo_gmp_format_float);
     register_demo!(runner, demo_format_float_str);
     register_demo!(runner, demo_format_float_str_debug);
     register_bench!(runner, benchmark_format_float_str);
@@ -52,4 +54,15 @@ fn benchmark_format_float_str(gm: GenMode, config: &GenConfig, limit: usize, fil
             no_out!(format_float_str(&x, &s));
         })],
     );
+}
+
+// The `%R` templates from the generator sweep every flag subset, rounding character, conversion,
+// width, and precision through the multi-argument walker.
+fn demo_gmp_format_float(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, fmt) in float_string_pair_gen_var_1().get(gm, config).take(limit) {
+        println!(
+            "gmp_format!({fmt:?}, {x}) = {:?}",
+            gmp_format!(&*fmt, x.clone())
+        );
+    }
 }

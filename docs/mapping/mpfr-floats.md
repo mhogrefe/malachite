@@ -993,9 +993,13 @@ drawn from C99's float conversions plus `b` for binary. Malachite splits the job
 natural seam. The `R`-conversion engine is ported:
 [`format_float_str`](https://docs.rs/malachite-float/latest/malachite_float/float/conversion/string/format_float/fn.format_float_str.html)`(&x, "%.10RYf")`
 takes one `Float` and one conversion specification and returns the formatted piece. Everything
-around it, the literal text, the other arguments, and the choice of sink, is Rust's own
-[`format!`](https://doc.rust-lang.org/nightly/std/macro.format.html) and `write!`, which also
-retire the buffer-management distinctions that give this section most of its rows.
+around it is either Rust's own
+[`format!`](https://doc.rust-lang.org/nightly/std/macro.format.html) and `write!`, or the
+[`gmp_format!`](https://docs.rs/malachite-base/latest/malachite_base/macro.gmp_format.html)
+macro, which interprets a whole template as `mpfr_printf` would, mixing `R` conversions with the
+`Z` and `Q` types and the plain C integer, character, and string conversions. Either way the
+choice of sink is Rust's, which also retires the buffer-management distinctions that give this
+section most of its rows.
 
 | | MPFR | Malachite |
 | :---: | --- | --- |
@@ -1016,8 +1020,10 @@ allocated string; in Rust the destination is `write!`'s first argument or `forma
 returned [`String`](https://doc.rust-lang.org/nightly/std/string/struct.String.html), and the
 truncating and allocating variants collapse. The `va_list` five are C's variadic plumbing, and
 the Requirements subsection's concerns, variadic support and header order, come with them. A
-row is ≈ rather than ✓ because the template string as a whole is not interpreted: each `R`
-conversion is formatted by `format_float_str` and spliced where `{}` puts it.
+row is ≈ rather than ✓ because
+[`gmp_format!`](https://docs.rs/malachite-base/latest/malachite_base/macro.gmp_format.html)
+stops short of the full C library underneath `mpfr_printf`: the C float conversions on primitive
+floats, `%n`, `%p`, `%m`, and the `mpf_t`, limb, and `mpfr_prec_t` types are not interpreted.
 
 **The conversion specification.** `format_float_str` accepts MPFR's grammar for a single
 conversion: the `printf` flags, width, and precision; the rounding characters, `U` for

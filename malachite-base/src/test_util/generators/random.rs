@@ -55,6 +55,7 @@ use crate::num::random::{
     special_random_primitive_float_inclusive_range, special_random_primitive_float_range,
     special_random_primitive_floats,
 };
+use crate::options::random::random_options;
 use crate::random::{EXAMPLE_SEED, Seed};
 use crate::rounding_modes::RoundingMode::{self, *};
 use crate::rounding_modes::random::{RandomRoundingModes, random_rounding_modes};
@@ -67,6 +68,10 @@ use crate::test_util::extra_variadic::{
     random_quadruples_xyxy, random_quadruples_xyyx, random_quadruples_xyyz, random_quadruples_xyzz,
     random_sextuples_from_single, random_triples, random_triples_from_single, random_triples_xxy,
     random_triples_xyx, random_triples_xyy, random_union3s,
+};
+use crate::test_util::generators::common::{
+    GMP_SPEC_C_TYPE_COUNT, GMP_SPEC_CONV_CHARS, GMP_SPEC_INTEGER_CONV_COUNT, GMP_SPEC_TYPE_STRS,
+    gmp_spec_string_from_parts,
 };
 use crate::test_util::generators::common::{
     GenConfig, It, reshape_1_2_to_3, reshape_2_1_to_3, reshape_2_2_to_4, reshape_3_1_to_4,
@@ -4934,6 +4939,94 @@ pub fn random_string_gen_var_15(config: &GenConfig) -> It<String> {
         )
         .filter(|s| !large_exponent(s)),
     )
+}
+
+// Produces random GMP/MPFR-style conversion specification strings; `type_count` and `conv_count`
+// bound the type and conversion selections (see `GMP_SPEC_TYPE_STRS` and `GMP_SPEC_CONV_CHARS`).
+pub fn random_gmp_spec_strings(
+    seed: Seed,
+    config: &GenConfig,
+    type_count: usize,
+    conv_count: usize,
+) -> It<String> {
+    let none_p_n = config.get_or("format_string_none_p_n", 1);
+    let none_p_d = config.get_or("format_string_none_p_d", 3);
+    Box::new(
+        random_pairs(
+            seed,
+            &|seed| {
+                random_triples(
+                    seed,
+                    &|seed_2| random_unsigned_inclusive_range(seed_2, 0u8, 63),
+                    &move |seed_2| random_unsigned_inclusive_range(seed_2, 0usize, type_count - 1),
+                    &move |seed_2| random_unsigned_inclusive_range(seed_2, 0usize, conv_count - 1),
+                )
+            },
+            &move |seed| {
+                random_pairs(
+                    seed,
+                    &move |seed_2| {
+                        random_options(seed_2, none_p_n, none_p_d, &|seed_3| {
+                            random_unsigned_inclusive_range(seed_3, 0u64, 12)
+                        })
+                    },
+                    &move |seed_2| {
+                        random_options(seed_2, none_p_n, none_p_d, &|seed_3| {
+                            random_signed_inclusive_range(seed_3, -1i64, 12)
+                        })
+                    },
+                )
+            },
+        )
+        .map(|((flags, t, c), (width, prec))| gmp_spec_string_from_parts(flags, t, c, width, prec)),
+    )
+}
+
+// All GMP/MPFR-style conversion specification strings; see `exhaustive_string_gen_var_16`.
+pub fn random_string_gen_var_16(config: &GenConfig) -> It<String> {
+    random_gmp_spec_strings(
+        EXAMPLE_SEED,
+        config,
+        GMP_SPEC_TYPE_STRS.len(),
+        GMP_SPEC_CONV_CHARS.len(),
+    )
+}
+
+// All `(T, String)` where the `String` is a plain C integer conversion specification; see
+// `exhaustive_unsigned_string_pair_gen_var_4`.
+pub fn random_unsigned_string_pair_gen_var_4<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(T, String)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &random_primitive_ints::<T>,
+        &|seed| {
+            random_gmp_spec_strings(
+                seed,
+                config,
+                GMP_SPEC_C_TYPE_COUNT,
+                GMP_SPEC_INTEGER_CONV_COUNT,
+            )
+        },
+    ))
+}
+
+// The same as `random_unsigned_string_pair_gen_var_4`, but over signed values.
+pub fn random_signed_string_pair_gen_var_1<T: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(T, String)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &random_primitive_ints::<T>,
+        &|seed| {
+            random_gmp_spec_strings(
+                seed,
+                config,
+                GMP_SPEC_C_TYPE_COUNT,
+                GMP_SPEC_INTEGER_CONV_COUNT,
+            )
+        },
+    ))
 }
 
 // -- (String, FromSciStringOptions) --
