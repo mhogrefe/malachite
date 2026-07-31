@@ -310,10 +310,10 @@ direction.
 | :---: | --- | --- |
 | ✓ | `Display` | [`Display`](https://doc.rust-lang.org/nightly/std/fmt/trait.Display.html) |
 | ≈ | `Debug` | [`Debug`](https://doc.rust-lang.org/nightly/std/fmt/trait.Debug.html) |
-| ✗ | `Binary`, `Octal`, `LowerHex`, `UpperHex` | |
+| ✓ | `Binary`, `Octal`, `LowerHex`, `UpperHex` | [`Binary`](https://doc.rust-lang.org/nightly/std/fmt/trait.Binary.html), [`Octal`](https://doc.rust-lang.org/nightly/std/fmt/trait.Octal.html), [`LowerHex`](https://doc.rust-lang.org/nightly/std/fmt/trait.LowerHex.html), [`UpperHex`](https://doc.rust-lang.org/nightly/std/fmt/trait.UpperHex.html) |
 | ≈ | `LowerExp`, `UpperExp` | [`ToSci`](https://docs.rs/malachite-base/latest/malachite_base/num/conversion/traits/trait.ToSci.html) |
 | ✓ | `FromStr` (error: `ParseRatioError`) | [`FromStr`](https://doc.rust-lang.org/nightly/std/str/trait.FromStr.html) |
-| ✗ | `Num::from_str_radix (s: &str, radix: u32) -> Result` | [`FromStr`](https://doc.rust-lang.org/nightly/std/str/trait.FromStr.html) |
+| ✓ | `Num::from_str_radix (s: &str, radix: u32) -> Result` | [`FromStringBase`](https://docs.rs/malachite-base/latest/malachite_base/num/conversion/traits/trait.FromStringBase.html) |
 | ≈ | `Serialize`, `Deserialize` | [`Serialize`](https://docs.rs/serde/latest/serde/trait.Serialize.html), [`Deserialize`](https://docs.rs/serde/latest/serde/trait.Deserialize.html) |
 
 **`Display` and `Debug`.** The display convention converges exactly, and it is the same
@@ -322,14 +322,21 @@ convergence [the FLINT page found](/mapping/flint-rationals/#input-and-output) i
 prints as a bare integer. `Debug` differs: num derives it, printing the struct form with
 field names, while Malachite's `Debug` prints what `Display` prints.
 
-**Radix strings.** num formats a `Ratio` in binary, octal, and hexadecimal componentwise,
-prefixes and all, and parses any radix from 2 to 36 through `Num::from_str_radix`. Both
-directions belong to the base-$$n$$ rational string gap
-[already promised on the GMP rationals page](/mapping/gmp-rationals/#conversion-functions):
-[`Rational`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html)
-parses and prints base 10 today, through `FromStr` and `Display`, and until the general-base
-functions land, radix output composes from the integer formatting of
-`numerator_ref()` and `denominator_ref()`.
+**Radix strings.** num parses any radix from 2 to 36 through `Num::from_str_radix`, and
+[`Rational`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html)'s
+`from_string_base` covers it, reaching 62 with
+[the GMP digit alphabet](/mapping/gmp-rationals/#conversion-functions). The grammars differ at
+the edges: num requires the `numer/denom` shape, rejecting a bare integer, and hands each
+component to the component type's parser, so `"1/-2"` is accepted and canonicalized;
+Malachite's slash is optional and its sign belongs only at the front of the string. Both
+reduce, and both refuse a zero denominator. In the other direction, `to_string_base` produces
+the value in any base as `numer/denom`, and the `Binary`, `Octal`, `LowerHex`, and `UpperHex`
+rows converge the way `Display` does: both libraries print the components in the radix,
+separated by `'/'`, dropping the `/1` of an integral value, and both expand the `#` flag to a
+prefix on each component, `0xff/0x7`. Only the padded forms differ, and in the same way as
+`Display`: num sizes width and fill against the whole composite string through
+[`pad_integral`](https://doc.rust-lang.org/nightly/std/fmt/struct.Formatter.html#method.pad_integral),
+while Malachite hands the formatter flags to each component.
 
 **Scientific notation.** num's `LowerExp` and `UpperExp` render each component in exponential
 notation, `numer`'s over `denom`'s. Malachite's

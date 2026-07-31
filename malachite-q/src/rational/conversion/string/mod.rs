@@ -19,7 +19,8 @@ pub mod from_string;
 /// Implementations of [`ToSci`](malachite_base::num::conversion::traits::ToSci), a trait for
 /// converting a number to string, possibly using scientific notation.
 pub mod to_sci;
-/// Implementations of [`Display`](std::fmt::Display), [`Debug`], and
-/// [`ToStringBase`](malachite_base::num::conversion::traits::ToStringBase), traits for converting a
-/// number to a string in base 10 or in other bases.
+/// Implementations of [`Display`](std::fmt::Display), [`Debug`], [`Binary`](std::fmt::Binary),
+/// [`Octal`](std::fmt::Octal), [`LowerHex`](std::fmt::LowerHex), [`UpperHex`](std::fmt::UpperHex),
+/// and [`ToStringBase`](malachite_base::num::conversion::traits::ToStringBase), traits for
+/// converting a number to a string in base 10 or in other bases.
 pub mod to_string;

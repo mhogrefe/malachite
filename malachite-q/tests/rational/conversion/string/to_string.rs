@@ -8,8 +8,10 @@
 
 use malachite_base::assert_panic;
 use malachite_base::num::conversion::traits::{FromStringBase, ToStringBase};
-use malachite_base::strings::ToDebugString;
 use malachite_base::strings::string_is_subset;
+use malachite_base::strings::{
+    ToBinaryString, ToDebugString, ToLowerHexString, ToOctalString, ToUpperHexString,
+};
 use malachite_nz::test_util::generators::integer_gen;
 use malachite_q::Rational;
 use malachite_q::test_util::generators::{rational_gen, rational_unsigned_pair_gen_var_10};
@@ -151,5 +153,72 @@ fn to_string_base_properties() {
 
     rational_gen().test_properties(|x| {
         assert_eq!(x.to_string_base(10), x.to_string());
+    });
+}
+
+#[test]
+pub fn test_radix_strings() {
+    fn test(n: &str, out_b: &str, out_o: &str, out_x: &str, out_upper_x: &str, out_alt_x: &str) {
+        let x = Rational::from_str(n).unwrap();
+        assert_eq!(x.to_binary_string(), out_b);
+        assert_eq!(x.to_octal_string(), out_o);
+        assert_eq!(x.to_lower_hex_string(), out_x);
+        assert_eq!(x.to_upper_hex_string(), out_upper_x);
+        assert_eq!(format!("{x:#x}"), out_alt_x);
+    }
+    test("0", "0", "0", "0", "0", "0x0");
+    test("123", "1111011", "173", "7b", "7B", "0x7b");
+    test("-123", "-1111011", "-173", "-7b", "-7B", "-0x7b");
+    test("255/7", "11111111/111", "377/7", "ff/7", "FF/7", "0xff/0x7");
+    test(
+        "-255/7",
+        "-11111111/111",
+        "-377/7",
+        "-ff/7",
+        "-FF/7",
+        "-0xff/0x7",
+    );
+    assert_eq!(
+        format!("{:#b}", Rational::from_signeds(22, 7)),
+        "0b10110/0b111"
+    );
+    assert_eq!(format!("{:#o}", Rational::from_signeds(22, 7)), "0o26/0o7");
+    assert_eq!(
+        format!("{:#X}", Rational::from_signeds(-255, 7)),
+        "-0xFF/0x7"
+    );
+}
+
+#[test]
+fn radix_strings_properties() {
+    rational_gen().test_properties(|x| {
+        let b = x.to_binary_string();
+        let o = x.to_octal_string();
+        let lx = x.to_lower_hex_string();
+        let ux = x.to_upper_hex_string();
+        assert_eq!(b, x.to_string_base(2));
+        assert_eq!(o, x.to_string_base(8));
+        assert_eq!(lx, x.to_string_base(16));
+        assert_eq!(ux, x.to_string_base_upper(16));
+        let num_x = BigRational::from(&x);
+        assert_eq!(num_x.to_binary_string(), b);
+        assert_eq!(num_x.to_octal_string(), o);
+        assert_eq!(num_x.to_lower_hex_string(), lx);
+        assert_eq!(num_x.to_upper_hex_string(), ux);
+        // num also writes the `#` prefixes componentwise; rug writes a single prefix at the front,
+        // so it only participates in the plain comparisons
+        assert_eq!(format!("{num_x:#b}"), format!("{x:#b}"));
+        assert_eq!(format!("{num_x:#o}"), format!("{x:#o}"));
+        assert_eq!(format!("{num_x:#x}"), format!("{x:#x}"));
+        assert_eq!(format!("{num_x:#X}"), format!("{x:#X}"));
+        let rug_x = rug::Rational::from(&x);
+        assert_eq!(rug_x.to_binary_string(), b);
+        assert_eq!(rug_x.to_octal_string(), o);
+        assert_eq!(rug_x.to_lower_hex_string(), lx);
+        assert_eq!(rug_x.to_upper_hex_string(), ux);
+        assert!(string_is_subset(&b, "-/01"));
+        assert!(string_is_subset(&o, "-/01234567"));
+        assert!(string_is_subset(&lx, "-/0123456789abcdef"));
+        assert!(string_is_subset(&ux, "-/0123456789ABCDEF"));
     });
 }

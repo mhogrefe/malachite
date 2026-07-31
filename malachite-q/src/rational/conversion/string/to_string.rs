@@ -8,7 +8,7 @@
 
 use crate::Rational;
 use alloc::string::String;
-use core::fmt::{Debug, Display, Formatter, Result, Write};
+use core::fmt::{Binary, Debug, Display, Formatter, LowerHex, Octal, Result, UpperHex, Write};
 use malachite_base::num::conversion::traits::ToStringBase;
 
 impl ToStringBase for Rational {
@@ -110,6 +110,205 @@ impl ToStringBase for Rational {
             s.push_str(&self.denominator.to_string_base_upper(base));
         }
         s
+    }
+}
+
+impl Binary for Rational {
+    /// Converts a [`Rational`] to a binary [`String`].
+    ///
+    /// The numerator and denominator are each written in binary, separated by a `'/'`, unless the
+    /// denominator is 1, in which case only the numerator is written. Using the `#` format flag
+    /// prepends `"0b"` to each of them.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::strings::ToBinaryString;
+    /// use malachite_q::Rational;
+    ///
+    /// assert_eq!(Rational::ZERO.to_binary_string(), "0");
+    /// assert_eq!(Rational::from(123).to_binary_string(), "1111011");
+    /// assert_eq!(
+    ///     Rational::from_signeds(22, 7).to_binary_string(),
+    ///     "10110/111"
+    /// );
+    /// assert_eq!(
+    ///     Rational::from_signeds(-22, 7).to_binary_string(),
+    ///     "-10110/111"
+    /// );
+    ///
+    /// assert_eq!(format!("{:#b}", Rational::ZERO), "0b0");
+    /// assert_eq!(
+    ///     format!("{:#b}", Rational::from_signeds(22, 7)),
+    ///     "0b10110/0b111"
+    /// );
+    /// assert_eq!(
+    ///     format!("{:#b}", Rational::from_signeds(-22, 7)),
+    ///     "-0b10110/0b111"
+    /// );
+    /// ```
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        if !self.sign {
+            f.write_char('-')?;
+        }
+        let result = Binary::fmt(&self.numerator, f);
+        if self.denominator == 1 {
+            result
+        } else {
+            f.write_char('/')?;
+            Binary::fmt(&self.denominator, f)
+        }
+    }
+}
+
+impl Octal for Rational {
+    /// Converts a [`Rational`] to an octal [`String`].
+    ///
+    /// The numerator and denominator are each written in octal, separated by a `'/'`, unless the
+    /// denominator is 1, in which case only the numerator is written. Using the `#` format flag
+    /// prepends `"0o"` to each of them.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::strings::ToOctalString;
+    /// use malachite_q::Rational;
+    ///
+    /// assert_eq!(Rational::ZERO.to_octal_string(), "0");
+    /// assert_eq!(Rational::from(123).to_octal_string(), "173");
+    /// assert_eq!(Rational::from_signeds(22, 7).to_octal_string(), "26/7");
+    /// assert_eq!(Rational::from_signeds(-22, 7).to_octal_string(), "-26/7");
+    ///
+    /// assert_eq!(format!("{:#o}", Rational::ZERO), "0o0");
+    /// assert_eq!(format!("{:#o}", Rational::from_signeds(22, 7)), "0o26/0o7");
+    /// assert_eq!(
+    ///     format!("{:#o}", Rational::from_signeds(-22, 7)),
+    ///     "-0o26/0o7"
+    /// );
+    /// ```
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        if !self.sign {
+            f.write_char('-')?;
+        }
+        let result = Octal::fmt(&self.numerator, f);
+        if self.denominator == 1 {
+            result
+        } else {
+            f.write_char('/')?;
+            Octal::fmt(&self.denominator, f)
+        }
+    }
+}
+
+impl LowerHex for Rational {
+    /// Converts a [`Rational`] to a hexadecimal [`String`] using lowercase characters.
+    ///
+    /// The numerator and denominator are each written in hexadecimal, separated by a `'/'`, unless
+    /// the denominator is 1, in which case only the numerator is written. Using the `#` format flag
+    /// prepends `"0x"` to each of them.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::strings::ToLowerHexString;
+    /// use malachite_q::Rational;
+    ///
+    /// assert_eq!(Rational::ZERO.to_lower_hex_string(), "0");
+    /// assert_eq!(Rational::from(123).to_lower_hex_string(), "7b");
+    /// assert_eq!(Rational::from_signeds(255, 7).to_lower_hex_string(), "ff/7");
+    /// assert_eq!(
+    ///     Rational::from_signeds(-255, 7).to_lower_hex_string(),
+    ///     "-ff/7"
+    /// );
+    ///
+    /// assert_eq!(format!("{:#x}", Rational::ZERO), "0x0");
+    /// assert_eq!(format!("{:#x}", Rational::from_signeds(255, 7)), "0xff/0x7");
+    /// assert_eq!(
+    ///     format!("{:#x}", Rational::from_signeds(-255, 7)),
+    ///     "-0xff/0x7"
+    /// );
+    /// ```
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        if !self.sign {
+            f.write_char('-')?;
+        }
+        let result = LowerHex::fmt(&self.numerator, f);
+        if self.denominator == 1 {
+            result
+        } else {
+            f.write_char('/')?;
+            LowerHex::fmt(&self.denominator, f)
+        }
+    }
+}
+
+impl UpperHex for Rational {
+    /// Converts a [`Rational`] to a hexadecimal [`String`] using uppercase characters.
+    ///
+    /// The numerator and denominator are each written in hexadecimal, separated by a `'/'`, unless
+    /// the denominator is 1, in which case only the numerator is written. Using the `#` format flag
+    /// prepends `"0x"` to each of them.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::strings::ToUpperHexString;
+    /// use malachite_q::Rational;
+    ///
+    /// assert_eq!(Rational::ZERO.to_upper_hex_string(), "0");
+    /// assert_eq!(Rational::from(123).to_upper_hex_string(), "7B");
+    /// assert_eq!(Rational::from_signeds(255, 7).to_upper_hex_string(), "FF/7");
+    /// assert_eq!(
+    ///     Rational::from_signeds(-255, 7).to_upper_hex_string(),
+    ///     "-FF/7"
+    /// );
+    ///
+    /// assert_eq!(format!("{:#X}", Rational::ZERO), "0x0");
+    /// assert_eq!(format!("{:#X}", Rational::from_signeds(255, 7)), "0xFF/0x7");
+    /// assert_eq!(
+    ///     format!("{:#X}", Rational::from_signeds(-255, 7)),
+    ///     "-0xFF/0x7"
+    /// );
+    /// ```
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        if !self.sign {
+            f.write_char('-')?;
+        }
+        let result = UpperHex::fmt(&self.numerator, f);
+        if self.denominator == 1 {
+            result
+        } else {
+            f.write_char('/')?;
+            UpperHex::fmt(&self.denominator, f)
+        }
     }
 }
 

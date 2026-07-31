@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::conversion::traits::ToStringBase;
-use malachite_base::strings::ToDebugString;
+use malachite_base::strings::{ToDebugString, ToLowerHexString};
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
@@ -23,8 +23,20 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_rational_to_debug_string);
     register_demo!(runner, demo_rational_to_string_base);
     register_demo!(runner, demo_rational_to_string_base_upper);
+    register_demo!(runner, demo_rational_to_binary_string);
+    register_demo!(runner, demo_rational_to_binary_string_with_0b);
+    register_demo!(runner, demo_rational_to_octal_string);
+    register_demo!(runner, demo_rational_to_octal_string_with_0o);
+    register_demo!(runner, demo_rational_to_lower_hex_string);
+    register_demo!(runner, demo_rational_to_lower_hex_string_with_0x);
+    register_demo!(runner, demo_rational_to_upper_hex_string);
+    register_demo!(runner, demo_rational_to_upper_hex_string_with_0x);
 
     register_bench!(runner, benchmark_rational_to_string_base);
+    register_bench!(
+        runner,
+        benchmark_rational_to_lower_hex_string_library_comparison
+    );
     register_bench!(runner, benchmark_rational_to_string_library_comparison);
     register_bench!(
         runner,
@@ -126,5 +138,77 @@ fn benchmark_rational_to_string_base(
         &mut [("Malachite", &mut |(x, base)| {
             no_out!(x.to_string_base(base))
         })],
+    );
+}
+
+fn demo_rational_to_binary_string(gm: GenMode, config: &GenConfig, limit: usize) {
+    for q in rational_gen().get(gm, config).take(limit) {
+        println!("{q:b}");
+    }
+}
+
+fn demo_rational_to_binary_string_with_0b(gm: GenMode, config: &GenConfig, limit: usize) {
+    for q in rational_gen().get(gm, config).take(limit) {
+        println!("{q:#b}");
+    }
+}
+
+fn demo_rational_to_octal_string(gm: GenMode, config: &GenConfig, limit: usize) {
+    for q in rational_gen().get(gm, config).take(limit) {
+        println!("{q:o}");
+    }
+}
+
+fn demo_rational_to_octal_string_with_0o(gm: GenMode, config: &GenConfig, limit: usize) {
+    for q in rational_gen().get(gm, config).take(limit) {
+        println!("{q:#o}");
+    }
+}
+
+fn demo_rational_to_lower_hex_string(gm: GenMode, config: &GenConfig, limit: usize) {
+    for q in rational_gen().get(gm, config).take(limit) {
+        println!("{q:x}");
+    }
+}
+
+fn demo_rational_to_lower_hex_string_with_0x(gm: GenMode, config: &GenConfig, limit: usize) {
+    for q in rational_gen().get(gm, config).take(limit) {
+        println!("{q:#x}");
+    }
+}
+
+fn demo_rational_to_upper_hex_string(gm: GenMode, config: &GenConfig, limit: usize) {
+    for q in rational_gen().get(gm, config).take(limit) {
+        println!("{q:X}");
+    }
+}
+
+fn demo_rational_to_upper_hex_string_with_0x(gm: GenMode, config: &GenConfig, limit: usize) {
+    for q in rational_gen().get(gm, config).take(limit) {
+        println!("{q:#X}");
+    }
+}
+
+fn benchmark_rational_to_lower_hex_string_library_comparison(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Rational.to_lower_hex_string()",
+        BenchmarkType::LibraryComparison,
+        rational_gen_nrm().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &triple_3_rational_bit_bucketer("x"),
+        &mut [
+            ("Malachite", &mut |(_, _, x)| {
+                no_out!(x.to_lower_hex_string())
+            }),
+            ("num", &mut |(x, _, _)| no_out!(x.to_lower_hex_string())),
+            ("rug", &mut |(_, x, _)| no_out!(x.to_lower_hex_string())),
+        ],
     );
 }
