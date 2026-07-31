@@ -3989,6 +3989,26 @@ pub fn special_random_float_unsigned_pair_gen_var_7<T: PrimitiveUnsigned>(
     ))
 }
 
+pub fn special_random_float_unsigned_pair_gen_var_8(config: &GenConfig) -> It<(Float, u8)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_floats(
+                seed,
+                config.get_or("mean_exponent_n", 64),
+                config.get_or("mean_exponent_d", 1),
+                config.get_or("mean_precision_n", 64),
+                config.get_or("mean_precision_d", 1),
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_zero_p_n", 1),
+                config.get_or("mean_zero_p_d", 64),
+            )
+        },
+        &|seed| random_unsigned_inclusive_range(seed, 2, 36),
+    ))
+}
+
 // -- (Float, PrimitiveUnsigned, PrimitiveUnsigned) --
 
 pub fn special_random_float_unsigned_unsigned_triple_gen<T: PrimitiveUnsigned>(

@@ -6,18 +6,23 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::assert_panic;
 use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::traits::One;
+use malachite_base::num::conversion::traits::{FromStringBase, ToStringBase};
 use malachite_base::strings::{ToDebugString, string_is_subset};
 use malachite_float::ComparableFloatRef;
 use malachite_float::Float;
 use malachite_float::float::conversion::string::get_str::get_str_digit_count;
 use malachite_float::test_util::common::parse_hex_string;
+use malachite_float::test_util::generators::float_unsigned_pair_gen_var_8;
 use malachite_float::test_util::generators::{
     float_gen, float_gen_var_6, float_gen_var_7, float_gen_var_8, float_gen_var_9,
     float_gen_var_10, float_gen_var_12,
 };
 use malachite_nz::natural::Natural;
+use std::panic::catch_unwind;
+use std::str::FromStr;
 
 // The number of significant digits in a formatted mantissa: the digits of `s` up to any exponent
 // part, ignoring the sign, the point, and leading zeros (which only position the point).
@@ -320,4 +325,71 @@ fn to_hex_string_properties() {
     float_gen_var_10().test_properties(|x| check(&x));
     // Extreme exponents, where the exponent part of the rendering is largest.
     float_gen_var_12().test_properties(|x| check(&x));
+}
+
+#[test]
+fn test_to_string_base() {
+    let test = |s: &str, base: u8, out: &str| {
+        let x = Float::from_str(s).unwrap();
+        assert_eq!(x.to_string_base(base), out);
+    };
+    test("1.5#10", 10, "1.5000");
+    test("255.0#8", 10, "255.0");
+    test("255.0#8", 16, "ff.0");
+    test("255.0#8", 2, "11111111.0");
+    test("255.0#8", 3, "100110.0");
+    test("1.5#2", 16, "1.8");
+    test("NaN", 36, "NaN");
+    test("-Infinity", 36, "-Infinity");
+    test("0.0", 36, "0.0");
+    test("-0.0", 36, "-0.0");
+}
+
+#[test]
+fn to_string_base_fail() {
+    assert_panic!(Float::from(1.5).to_string_base(1));
+    assert_panic!(Float::from(1.5).to_string_base(37));
+    assert_panic!(Float::from(1.5).to_string_base_upper(1));
+    assert_panic!(Float::from(1.5).to_string_base_upper(37));
+}
+
+#[test]
+fn to_string_base_properties() {
+    float_unsigned_pair_gen_var_8().test_properties(|(x, base)| {
+        let s = x.to_string_base(base);
+        let upper = x.to_string_base_upper(base);
+        // the special values keep their spelling in every base and case
+        if x.is_finite() {
+            assert_eq!(upper, s.to_uppercase());
+        } else {
+            assert_eq!(upper, s);
+        }
+        // `from_string_base` inverts this, but the digits alone do not determine a `Float`: the
+        // precision has to come along, which is what the `#` suffix is for. The specials and the
+        // zeros carry no precision and reject the suffix.
+        if let Some(prec) = x.get_prec() {
+            for written in [&s, &upper] {
+                let back = Float::from_string_base(base, &format!("{written}#{prec}")).unwrap();
+                assert_eq!(
+                    ComparableFloatRef(&back),
+                    ComparableFloatRef(&x),
+                    "{written}"
+                );
+            }
+        } else if x.is_nan() {
+            assert!(Float::from_string_base(base, &s).unwrap().is_nan());
+        } else {
+            let back = Float::from_string_base(base, &s).unwrap();
+            assert_eq!(ComparableFloatRef(&back), ComparableFloatRef(&x));
+        }
+    });
+
+    float_gen().test_properties(|x| {
+        // each base agrees with the corresponding formatting impl
+        assert_eq!(x.to_string_base(10), x.to_string());
+        assert_eq!(x.to_string_base(2), format!("{x:b}"));
+        assert_eq!(x.to_string_base(8), format!("{x:o}"));
+        assert_eq!(x.to_string_base(16), format!("{x:x}"));
+        assert_eq!(x.to_string_base_upper(16), format!("{x:X}"));
+    });
 }

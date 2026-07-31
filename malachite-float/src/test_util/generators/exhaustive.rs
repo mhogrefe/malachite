@@ -2145,6 +2145,13 @@ pub fn exhaustive_float_unsigned_pair_gen_var_7<T: PrimitiveUnsigned>() -> It<(F
     ))
 }
 
+pub fn exhaustive_float_unsigned_pair_gen_var_8() -> It<(Float, u8)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_floats(),
+        primitive_int_increasing_inclusive_range(2, 36),
+    ))
+}
+
 // -- (Float, PrimitiveUnsigned, PrimitiveUnsigned) --
 
 pub fn exhaustive_float_unsigned_unsigned_triple_gen<T: PrimitiveUnsigned>() -> It<(Float, T, T)> {

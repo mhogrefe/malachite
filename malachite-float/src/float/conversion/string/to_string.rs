@@ -10,10 +10,11 @@ use crate::InnerFloat::Finite;
 use crate::float::conversion::string::get_str::get_str_digit_count;
 use crate::float::conversion::string::to_sci::to_sci_string;
 use crate::{ComparableFloat, ComparableFloatRef, Float};
+use alloc::string::String;
 use core::fmt::{Binary, Debug, Display, Formatter, LowerHex, Octal, Result, UpperHex, Write};
 use malachite_base::num::arithmetic::traits::{DivRound, Mod, PowerOf2};
 use malachite_base::num::conversion::string::options::ToSciOptions;
-use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, ToStringBase};
 use malachite_base::rounding_modes::RoundingMode::Ceiling;
 
 // The number of base-2^`digit_bits` digits that exactly cover a `Float` with binary exponent
@@ -67,6 +68,139 @@ fn fmt_power_of_2_base(
         f.write_str(body)
     } else {
         f.write_str(&s)
+    }
+}
+
+// The options that `to_string_base` and `to_string_base_upper` share, chosen so that each base
+// agrees with the corresponding formatting impl: a power-of-2 base writes the exact digits, as
+// `Binary`, `Octal`, and the hexadecimal impls do, and any other base writes the round-trip digit
+// count, as `Display` does in base 10.
+fn to_string_base_options(x: &Float, base: u8, uppercase: bool) -> ToSciOptions {
+    let mut options = ToSciOptions::default();
+    options.set_base(base);
+    if uppercase {
+        options.set_uppercase();
+        // so that the whole string, exponent marker included, is the uppercase of the lowercase
+        // form; from base 15 up the mandatory sign on the exponent keeps `E` the digit distinct
+        // from `E` the marker
+        options.set_e_uppercase();
+    }
+    if base.is_power_of_two() {
+        options.set_e_uppercase();
+        if let Float(Finite {
+            exponent,
+            precision,
+            ..
+        }) = x
+        {
+            options.set_precision(power_of_2_digit_count(
+                *exponent,
+                *precision,
+                u64::from(base.trailing_zeros()),
+            ));
+            options.set_include_trailing_zeros(true);
+        }
+    } else if let Float(Finite { precision, .. }) = x {
+        options.set_precision(u64::exact_from(get_str_digit_count(
+            u64::from(base),
+            *precision,
+        )));
+        options.set_include_trailing_zeros(true);
+    }
+    options
+}
+
+impl ToStringBase for Float {
+    /// Converts a [`Float`] to a [`String`] using a specified base.
+    ///
+    /// Digits from 0 to 9 become [`char`]s from `'0'` to `'9'`, and digits from 10 to 35 become the
+    /// lowercase [`char`]s `'a'` to `'z'`.
+    ///
+    /// The output agrees with the formatting impls: base 10 writes what
+    /// [`Display`](std::fmt::Display) writes, and bases 2, 8, and 16 write what `{:b}`, `{:o}`, and
+    /// `{:x}` write, without the prefix that the `#` flag would add. The number of digits follows
+    /// from that. In a power-of-2 base the value is exactly representable, so exactly enough digits
+    /// are written to reproduce it; in any other base the count is the one that round-trips a
+    /// [`Float`] of this precision, with trailing zeros kept to reach it. The count therefore
+    /// depends only on the precision, so a printed string does not by itself determine a [`Float`];
+    /// see [`ComparableFloat`], whose output also records the precision.
+    ///
+    /// Values whose exponent is far from zero use scientific notation. From base 15 upward the
+    /// exponent always carries an explicit sign, since `'e'` is a digit in those bases and the sign
+    /// is what distinguishes the exponent from the digits.
+    ///
+    /// The special values are `NaN`, `Infinity`, and `-Infinity` in every base, and the zeros are
+    /// `0.0` and `-0.0`.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.complexity()`.
+    ///
+    /// # Panics
+    /// Panics if `base` is less than 2 or greater than 36. Unlike
+    /// [`Natural`](malachite_nz::natural::Natural) and [`Integer`](malachite_nz::integer::Integer),
+    /// whose strings reach base 62, a [`Float`] is limited to base 36 in both directions: see
+    /// [`FromStringBase`](malachite_base::num::conversion::traits::FromStringBase), which this
+    /// inverts.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::conversion::traits::ToStringBase;
+    /// use malachite_float::Float;
+    ///
+    /// assert_eq!(Float::from(255).to_string_base(10), "255.0");
+    /// assert_eq!(Float::from(255).to_string_base(16), "ff.0");
+    /// assert_eq!(Float::from(255).to_string_base(2), "11111111.0");
+    /// assert_eq!(Float::from(1.5).to_string_base(10), "1.5");
+    /// assert_eq!(Float::from(1.5).to_string_base(16), "1.8");
+    ///
+    /// // base 10 agrees with `Display`, and base 16 with `{:x}`
+    /// let x = Float::from(core::f64::consts::PI);
+    /// assert_eq!(x.to_string_base(10), x.to_string());
+    /// assert_eq!(x.to_string_base(16), format!("{x:x}"));
+    /// ```
+    fn to_string_base(&self, base: u8) -> String {
+        assert!((2..=36).contains(&base), "base out of range");
+        to_sci_string(self, to_string_base_options(self, base, false))
+    }
+
+    /// Converts a [`Float`] to a [`String`] using a specified base, with digits being uppercase.
+    ///
+    /// Digits from 0 to 9 become [`char`]s from `'0'` to `'9'`, and digits from 10 to 35 become the
+    /// uppercase [`char`]s `'A'` to `'Z'`.
+    ///
+    /// This is [`to_string_base`](ToStringBase::to_string_base) with the whole string uppercased,
+    /// the exponent marker included; in base 16 it writes what `{:X}` writes, without the prefix
+    /// that the `#` flag would add. The special values `NaN`, `Infinity`, and `-Infinity` keep
+    /// their spelling, as they do in every base.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.complexity()`.
+    ///
+    /// # Panics
+    /// Panics if `base` is less than 2 or greater than 36.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::conversion::traits::ToStringBase;
+    /// use malachite_float::Float;
+    ///
+    /// assert_eq!(Float::from(255).to_string_base_upper(16), "FF.0");
+    /// assert_eq!(Float::from(1.5).to_string_base_upper(16), "1.8");
+    ///
+    /// let x = Float::from(core::f64::consts::PI);
+    /// assert_eq!(x.to_string_base_upper(16), format!("{x:X}"));
+    /// ```
+    fn to_string_base_upper(&self, base: u8) -> String {
+        assert!((2..=36).contains(&base), "base out of range");
+        to_sci_string(self, to_string_base_options(self, base, true))
     }
 }
 

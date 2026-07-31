@@ -1984,6 +1984,16 @@ pub fn float_unsigned_pair_gen_var_7<T: PrimitiveUnsigned>() -> Generator<(Float
     )
 }
 
+// All `(Float, u8)`s where the `u8` is between 2 and 36, inclusive: a valid base for
+// `Float::to_string_base`.
+pub fn float_unsigned_pair_gen_var_8() -> Generator<(Float, u8)> {
+    Generator::new(
+        &exhaustive_float_unsigned_pair_gen_var_8,
+        &random_float_unsigned_pair_gen_var_8,
+        &special_random_float_unsigned_pair_gen_var_8,
+    )
+}
+
 // -- (Float, PrimitiveUnsigned, PrimitiveUnsigned) --
 
 pub fn float_unsigned_unsigned_triple_gen<T: PrimitiveUnsigned>() -> Generator<(Float, T, T)> {
