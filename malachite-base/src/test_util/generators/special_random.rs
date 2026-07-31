@@ -1675,6 +1675,25 @@ pub fn special_random_signed_signed_rounding_mode_triple_gen_var_4<
     )
 }
 
+pub fn special_random_signed_signed_rounding_mode_triple_gen_var_5<T: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(T, T, RoundingMode)> {
+    Box::new(
+        random_triples_xxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_signeds(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(x, y, rm): &(T, T, RoundingMode)| rm != Exact || (x ^ y).even()),
+    )
+}
+
 // -- (PrimitiveSigned, PrimitiveUnsigned) --
 
 pub fn special_random_signed_unsigned_pair_gen<T: PrimitiveSigned, U: PrimitiveUnsigned>(
@@ -5647,6 +5666,25 @@ pub fn special_random_unsigned_unsigned_rounding_mode_triple_gen_var_7<
         },
         &random_rounding_modes,
     ))
+}
+
+pub fn special_random_unsigned_unsigned_rounding_mode_triple_gen_var_8<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(T, T, RoundingMode)> {
+    Box::new(
+        random_triples_xxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigneds(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(x, y, rm): &(T, T, RoundingMode)| rm != Exact || (x ^ y).even()),
+    )
 }
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, Vec<bool>) --

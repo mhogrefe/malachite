@@ -1060,6 +1060,16 @@ pub fn signed_signed_rounding_mode_triple_gen_var_4<T: PrimitiveSigned, U: Primi
     )
 }
 
+// All `(T, T, RoundingMode)` that are valid inputs to `T::average_round`.
+pub fn signed_signed_rounding_mode_triple_gen_var_5<T: PrimitiveSigned>()
+-> Generator<(T, T, RoundingMode)> {
+    Generator::new(
+        &exhaustive_signed_signed_rounding_mode_triple_gen_var_5,
+        &random_signed_signed_rounding_mode_triple_gen_var_5,
+        &special_random_signed_signed_rounding_mode_triple_gen_var_5,
+    )
+}
+
 // -- (PrimitiveSigned, PrimitiveUnsigned) --
 
 pub fn signed_unsigned_pair_gen<T: PrimitiveSigned, U: PrimitiveUnsigned>() -> Generator<(T, U)> {
@@ -2873,6 +2883,16 @@ pub fn unsigned_unsigned_rounding_mode_triple_gen_var_7<
         &exhaustive_unsigned_unsigned_rounding_mode_triple_gen_var_8,
         &random_primitive_int_unsigned_rounding_mode_triple_gen_var_4,
         &special_random_unsigned_unsigned_rounding_mode_triple_gen_var_7,
+    )
+}
+
+// All `(T, T, RoundingMode)` that are valid inputs to `T::average_round`.
+pub fn unsigned_unsigned_rounding_mode_triple_gen_var_9<T: PrimitiveUnsigned>()
+-> Generator<(T, T, RoundingMode)> {
+    Generator::new(
+        &exhaustive_unsigned_unsigned_rounding_mode_triple_gen_var_9,
+        &random_unsigned_unsigned_rounding_mode_triple_gen_var_8,
+        &special_random_unsigned_unsigned_rounding_mode_triple_gen_var_8,
     )
 }
 

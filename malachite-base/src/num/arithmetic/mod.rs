@@ -31,7 +31,7 @@
 /// x.abs_assign();
 /// assert_eq!(NiceFloat(x), NiceFloat(0.0));
 ///
-/// let mut x = f64::NEGATIVE_INFINITY;
+/// let mut x = f64::NEG_INFINITY;
 /// x.abs_assign();
 /// assert_eq!(NiceFloat(x), NiceFloat(f64::INFINITY));
 ///
@@ -158,6 +158,82 @@ pub mod arithmetic_checked_shl;
 /// assert_eq!(0i8.arithmetic_checked_shr(-100), Some(0i8));
 /// ```
 pub mod arithmetic_checked_shr;
+/// [`Average`](traits::Average), [`AverageAssign`](traits::AverageAssign),
+/// [`AverageRound`](traits::AverageRound), and [`AverageRoundAssign`](traits::AverageRoundAssign),
+/// traits for computing the average (arithmetic mean) of two numbers without overflow.
+///
+/// # average
+/// ```
+/// use malachite_base::num::arithmetic::traits::Average;
+///
+/// assert_eq!(4u8.average(6), 5);
+/// // 4.5 rounds to the even neighbor, 4
+/// assert_eq!(4u8.average(5), 4);
+/// // 5.5 rounds to the even neighbor, 6
+/// assert_eq!(5u8.average(6), 6);
+/// assert_eq!((-5i8).average(-6), -6);
+/// assert_eq!(u8::MAX.average(u8::MAX - 2), 254);
+///
+/// // for floats, the average is correctly rounded and cannot overflow
+/// assert_eq!(1.0f64.average(2.0), 1.5);
+/// assert_eq!(f64::MAX.average(f64::MAX), f64::MAX);
+/// assert_eq!(f64::MAX.average(0.0), f64::MAX / 2.0);
+/// assert_eq!(f32::INFINITY.average(1.0), f32::INFINITY);
+/// assert!(f32::INFINITY.average(f32::NEG_INFINITY).is_nan());
+/// ```
+///
+/// # average_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::AverageAssign;
+///
+/// let mut x = 4u8;
+/// x.average_assign(6);
+/// assert_eq!(x, 5);
+///
+/// let mut x = -5i8;
+/// x.average_assign(-6);
+/// assert_eq!(x, -6);
+///
+/// let mut x = 1.0f64;
+/// x.average_assign(2.0);
+/// assert_eq!(x, 1.5);
+/// ```
+///
+/// # average_round
+/// ```
+/// use malachite_base::num::arithmetic::traits::AverageRound;
+/// use malachite_base::rounding_modes::RoundingMode::*;
+/// use std::cmp::Ordering::*;
+///
+/// assert_eq!(4u8.average_round(7, Floor), (5, Less));
+/// assert_eq!(4u8.average_round(7, Ceiling), (6, Greater));
+/// assert_eq!(4u8.average_round(7, Down), (5, Less));
+/// assert_eq!(4u8.average_round(6, Exact), (5, Equal));
+///
+/// // the exact average is -5.5
+/// assert_eq!((-4i8).average_round(-7, Down), (-5, Greater));
+/// assert_eq!((-4i8).average_round(-7, Up), (-6, Less));
+///
+/// // the exact average is -0.5
+/// assert_eq!(i8::MIN.average_round(i8::MAX, Floor), (-1, Less));
+/// assert_eq!(i8::MIN.average_round(i8::MAX, Nearest), (0, Greater));
+/// ```
+///
+/// # average_round_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::AverageRoundAssign;
+/// use malachite_base::rounding_modes::RoundingMode::*;
+/// use std::cmp::Ordering::*;
+///
+/// let mut x = 4u8;
+/// assert_eq!(x.average_round_assign(7, Floor), Less);
+/// assert_eq!(x, 5);
+///
+/// let mut x = -4i8;
+/// assert_eq!(x.average_round_assign(-7, Up), Less);
+/// assert_eq!(x, -6);
+/// ```
+pub mod average;
 /// Traits for computing the binomial coefficient of two numbers. There is a trait whose
 /// implementations panic if the result cannot be represented, and a checked trait whose
 /// implementations return `None` in that case: [`BinomialCoefficient`](traits::BinomialCoefficient)
@@ -3642,7 +3718,7 @@ pub mod shr_round;
 ///
 /// assert_eq!((-0.0).sign(), Less);
 /// assert_eq!((-1.0).sign(), Less);
-/// assert_eq!(f64::NEGATIVE_INFINITY.sign(), Less);
+/// assert_eq!(f64::NEG_INFINITY.sign(), Less);
 ///
 /// assert_eq!(f64::NAN.sign(), Equal);
 /// ```

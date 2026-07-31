@@ -9,11 +9,11 @@
 use crate::comparison::traits::{Max, Min};
 use crate::named::Named;
 use crate::num::arithmetic::traits::{
-    Abs, AbsAssign, AddMul, AddMulAssign, Ceiling, CeilingAssign, CeilingLogBase2,
-    CeilingLogBasePowerOf2, CheckedLogBase2, CheckedLogBasePowerOf2, Floor, FloorAssign,
-    FloorLogBase2, FloorLogBasePowerOf2, IsPowerOf2, NegAssign, NextPowerOf2, NextPowerOf2Assign,
-    Pow, PowAssign, PowerOf2, Reciprocal, ReciprocalAssign, Sign, Sqrt, SqrtAssign, Square,
-    SquareAssign, SubMul, SubMulAssign,
+    Abs, AbsAssign, AddMul, AddMulAssign, Average, AverageAssign, Ceiling, CeilingAssign,
+    CeilingLogBase2, CeilingLogBasePowerOf2, CheckedLogBase2, CheckedLogBasePowerOf2, Floor,
+    FloorAssign, FloorLogBase2, FloorLogBasePowerOf2, IsPowerOf2, NegAssign, NextPowerOf2,
+    NextPowerOf2Assign, Pow, PowAssign, PowerOf2, Reciprocal, ReciprocalAssign, Sign, Sqrt,
+    SqrtAssign, Square, SquareAssign, SubMul, SubMulAssign,
 };
 use crate::num::basic::traits::{
     GaussConstant, GelfondSchneiderConstant, GelfondsConstant, Infinity, LemniscateConstant, Ln2,
@@ -106,6 +106,8 @@ pub trait PrimitiveFloat:
     + AddAssign<Self>
     + AddMul<Output = Self>
     + AddMulAssign<Self, Self>
+    + Average<Self, Output = Self>
+    + AverageAssign<Self>
     + Ceiling<Output = Self>
     + CeilingAssign
     + CeilingLogBase2<Output = i64>

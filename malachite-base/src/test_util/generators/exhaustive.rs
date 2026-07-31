@@ -1335,6 +1335,17 @@ pub fn exhaustive_signed_signed_rounding_mode_triple_gen_var_4<
     ))
 }
 
+pub fn exhaustive_signed_signed_rounding_mode_triple_gen_var_5<T: PrimitiveSigned>()
+-> It<(T, T, RoundingMode)> {
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs_from_single(exhaustive_signeds::<T>()),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((x, y), rm)| rm != Exact || (x ^ y).even()),
+    ))
+}
+
 // -- (PrimitiveSigned, PrimitiveUnsigned) --
 
 pub fn exhaustive_signed_unsigned_pair_gen<T: PrimitiveSigned, U: PrimitiveUnsigned>() -> It<(T, U)>
@@ -3245,6 +3256,17 @@ pub fn exhaustive_unsigned_unsigned_rounding_mode_triple_gen_var_8<
         ),
         exhaustive_rounding_modes(),
     )))
+}
+
+pub fn exhaustive_unsigned_unsigned_rounding_mode_triple_gen_var_9<T: PrimitiveUnsigned>()
+-> It<(T, T, RoundingMode)> {
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs_from_single(exhaustive_unsigneds::<T>()),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((x, y), rm)| rm != Exact || (x ^ y).even()),
+    ))
 }
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, Vec<bool>) --

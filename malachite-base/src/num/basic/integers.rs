@@ -9,8 +9,9 @@
 use crate::comparison::traits::{Max, Min};
 use crate::named::Named;
 use crate::num::arithmetic::traits::{
-    AbsDiff, AddMul, AddMulAssign, ArithmeticCheckedShl, ArithmeticCheckedShr, BinomialCoefficient,
-    CeilingRoot, CeilingRootAssign, CeilingSqrt, CeilingSqrtAssign, CheckedAdd, CheckedAddMul,
+    AbsDiff, AddMul, AddMulAssign, ArithmeticCheckedShl, ArithmeticCheckedShr, Average,
+    AverageAssign, AverageRound, AverageRoundAssign, BinomialCoefficient, CeilingRoot,
+    CeilingRootAssign, CeilingSqrt, CeilingSqrtAssign, CheckedAdd, CheckedAddMul,
     CheckedBinomialCoefficient, CheckedDiv, CheckedMul, CheckedNeg, CheckedPow, CheckedRoot,
     CheckedSqrt, CheckedSquare, CheckedSub, CheckedSubMul, DivAssignMod, DivAssignModEuclidean,
     DivAssignRem, DivEuclidean, DivEuclideanAssign, DivExact, DivExactAssign, DivMod,
@@ -100,6 +101,10 @@ pub trait PrimitiveInt:
     + ArithmeticCheckedShr<i64, Output = Self>
     + ArithmeticCheckedShr<i8, Output = Self>
     + ArithmeticCheckedShr<isize, Output = Self>
+    + Average<Self, Output = Self>
+    + AverageAssign<Self>
+    + AverageRound<Self, Output = Self>
+    + AverageRoundAssign<Self>
     + Binary
     + BinomialCoefficient<Self>
     + BitAccess
@@ -583,6 +588,10 @@ pub trait PrimitiveInt:
     + ArithmeticCheckedShr<i64, Output = Self>
     + ArithmeticCheckedShr<i8, Output = Self>
     + ArithmeticCheckedShr<isize, Output = Self>
+    + Average<Self, Output = Self>
+    + AverageAssign<Self>
+    + AverageRound<Self, Output = Self>
+    + AverageRoundAssign<Self>
     + Binary
     + BinomialCoefficient<Self>
     + BitAccess

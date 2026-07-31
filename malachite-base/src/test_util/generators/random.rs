@@ -2496,6 +2496,15 @@ pub fn random_signed_signed_rounding_mode_triple_gen_var_2<
     )
 }
 
+pub fn random_signed_signed_rounding_mode_triple_gen_var_5<T: PrimitiveSigned>(
+    _config: &GenConfig,
+) -> It<(T, T, RoundingMode)> {
+    Box::new(
+        random_triples_xxy(EXAMPLE_SEED, &random_primitive_ints, &random_rounding_modes)
+            .filter(|&(x, y, rm): &(T, T, RoundingMode)| rm != Exact || (x ^ y).even()),
+    )
+}
+
 // -- (PrimitiveSigned, PrimitiveUnsigned) --
 
 pub fn random_signed_unsigned_pair_gen_var_1<T: PrimitiveSigned>(
@@ -4415,6 +4424,15 @@ pub fn random_unsigned_unsigned_rounding_mode_triple_gen_var_2<T: PrimitiveUnsig
             &random_rounding_modes,
         )
         .filter_map(|(x, y, rm)| round_to_multiple_unsigned_filter_map(x, y, rm)),
+    )
+}
+
+pub fn random_unsigned_unsigned_rounding_mode_triple_gen_var_8<T: PrimitiveUnsigned>(
+    _config: &GenConfig,
+) -> It<(T, T, RoundingMode)> {
+    Box::new(
+        random_triples_xxy(EXAMPLE_SEED, &random_primitive_ints, &random_rounding_modes)
+            .filter(|&(x, y, rm): &(T, T, RoundingMode)| rm != Exact || (x ^ y).even()),
     )
 }
 

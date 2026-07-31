@@ -379,7 +379,7 @@ methods.
 | :---: | --- | --- |
 | ≈ | `num_integer::Integer` (as a bound) | [`DivMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivMod.html), [`Gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Gcd.html), [`Parity`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Parity.html), and kin |
 | ≈ | `Roots` (as a bound) | [`FloorSqrt`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.FloorSqrt.html), [`FloorRoot`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.FloorRoot.html) |
-| ✗ | `Average` (`average_floor`, `average_ceil`; free functions) | |
+| ✓ | `Average` (`average_floor`, `average_ceil`; free functions) | [`AverageRound`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.AverageRound.html), [`Average`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Average.html) |
 | — | `ExtendedGcd` (the struct) | |
 | — | free functions `div_rem` through `gcd_lcm`, `sqrt`, `cbrt`, `nth_root` | |
 | ✓ | `binomial (n, k)` | [`BinomialCoefficient`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.BinomialCoefficient.html) |
@@ -396,12 +396,18 @@ the Bézout triple that Malachite returns as a tuple, with the
 [normalization advice](/mapping/num-integers/#gcd-and-parity) of the integers page attached;
 the free functions are call syntax over the trait methods.
 
-**`Average`.** The committed gap of this page: averaging functions,
-$$\lfloor (a+b)/2 \rfloor$$ and its ceiling, overflow-proof, are planned for Malachite. Until
-they land, the bignums have no overflow to dodge, `(&a + &b) >> 1` for the floor and
-`(&a + &b + Natural::ONE) >> 1` for the ceiling, and the primitives use the classic
-carry-free spellings, `(a & b) + ((a ^ b) >> 1)` for the floor and
-`(a | b) - ((a ^ b) >> 1)` for the ceiling.
+**`Average`.** `average_floor` is `x.average_round(y, Floor).0` and `average_ceil` is
+`x.average_round(y, Ceiling).0`: overflow-proof averaging on every primitive integer type,
+computed through the classic carry-free spelling. Malachite's
+[`AverageRound`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.AverageRound.html)
+takes any rounding mode and also reports whether the result is below, at, or above the exact
+average, and the plain
+[`Average`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Average.html)
+rounds to nearest, breaking ties toward the even neighbor, a mode num does not offer; both come
+with in-place `Assign` forms. Malachite's `Average` also covers `f32` and `f64`, where the
+result is the correctly rounded mean, computed without intermediate overflow, something outside
+num-integer's `Integer`-bounded trait. Neither library extends the operation to the bignums,
+where there is no overflow to dodge and `(&a + &b) >> 1` computes the floor average directly.
 
 **The combinatorial functions.** `binomial(n, k)` is
 [`BinomialCoefficient`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.BinomialCoefficient.html)'s

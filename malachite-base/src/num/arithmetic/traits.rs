@@ -83,6 +83,48 @@ pub trait ArithmeticCheckedShr<RHS> {
     fn arithmetic_checked_shr(self, other: RHS) -> Option<Self::Output>;
 }
 
+/// Computes the average (arithmetic mean) of two numbers, rounding to the nearest integer. Two-way
+/// ties are broken by rounding to the even integer.
+///
+/// The average is computed without overflow: the result is always exact or within a half of the
+/// exact value, so it always fits in the same type as the inputs.
+pub trait Average<RHS = Self> {
+    type Output;
+
+    fn average(self, other: RHS) -> Self::Output;
+}
+
+/// Computes the average (arithmetic mean) of two numbers, rounding to the nearest integer and
+/// replacing the first number with it. Two-way ties are broken by rounding to the even integer.
+///
+/// The average is computed without overflow: the result is always exact or within a half of the
+/// exact value, so it always fits in the same type as the inputs.
+pub trait AverageAssign<RHS = Self> {
+    fn average_assign(&mut self, other: RHS);
+}
+
+/// Computes the average (arithmetic mean) of two numbers and rounds according to a specified
+/// rounding mode. An [`Ordering`] is also returned, indicating whether the returned value is less
+/// than, equal to, or greater than the exact value.
+///
+/// The average is computed without overflow: the result is always exact or within a half of the
+/// exact value, so it always fits in the same type as the inputs.
+pub trait AverageRound<RHS = Self> {
+    type Output;
+
+    fn average_round(self, other: RHS, rm: RoundingMode) -> (Self::Output, Ordering);
+}
+
+/// Computes the average (arithmetic mean) of two numbers, rounding according to a specified
+/// rounding mode and replacing the first number with it. An [`Ordering`] is returned, indicating
+/// whether the assigned value is less than, equal to, or greater than the exact value.
+///
+/// The average is computed without overflow: the result is always exact or within a half of the
+/// exact value, so it always fits in the same type as the inputs.
+pub trait AverageRoundAssign<RHS = Self> {
+    fn average_round_assign(&mut self, other: RHS, rm: RoundingMode) -> Ordering;
+}
+
 pub trait BinomialCoefficient<T = Self> {
     fn binomial_coefficient(n: T, k: T) -> Self;
 }
