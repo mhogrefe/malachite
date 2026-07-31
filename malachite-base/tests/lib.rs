@@ -194,6 +194,7 @@ pub mod num {
         pub mod arithmetic_checked_shl;
         pub mod arithmetic_checked_shr;
         pub mod average;
+        pub mod balanced_mod;
         pub mod binomial_coefficient;
         pub mod ceiling;
         pub mod checked_abs;
@@ -404,6 +405,7 @@ pub mod num {
         pub mod prime_sieve;
         pub mod primes;
         pub mod primitive_root_prime;
+        pub mod remove_power;
     }
     pub mod float {
         pub mod basic {

@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::num::arithmetic::traits::{
-    AbsDiff, AbsDiffAssign, CeilingDivAssignNegMod, CeilingDivNegMod, CeilingLogBase,
+    AbsDiff, AbsDiffAssign, BalancedMod, CeilingDivAssignNegMod, CeilingDivNegMod, CeilingLogBase,
     CeilingLogBase2, CeilingLogBasePowerOf2, CheckedDoubleFactorial, CheckedFactorial,
     CheckedFibonacci, CheckedLcm, CheckedLogBase, CheckedLogBase2, CheckedLogBasePowerOf2,
     CheckedLucasNumber, CheckedMultifactorial, CheckedNextPowerOf2, CheckedPrimorial,
@@ -22,10 +22,12 @@ use crate::num::arithmetic::traits::{
     ModPowerOf2SquareAssign, ModPowerOf2Sub, ModPowerOf2SubAssign, ModSquare, ModSquareAssign,
     ModSquarePrecomputed, ModSquarePrecomputedAssign, ModSub, ModSubAssign, Multifactorial, NegMod,
     NegModAssign, NegModPowerOf2, NegModPowerOf2Assign, NextPowerOf2, NextPowerOf2Assign,
-    Primorial, RootAssignRem, RootRem, SqrtAssignRem, SqrtRem, Subfactorial, XMulYToZZ,
-    XXAddYYToZZ, XXDivModYToQR, XXSubYYToZZ, XXXAddYYYToZZZ, XXXSubYYYToZZZ, XXXXAddYYYYToZZZZ,
+    Primorial, RootAssignRem, RootRem, SqrtAssignRem, SqrtRem, Subfactorial, UnsignedAbs,
+    XMulYToZZ, XXAddYYToZZ, XXDivModYToQR, XXSubYYToZZ, XXXAddYYYToZZZ, XXXSubYYYToZZZ,
+    XXXXAddYYYYToZZZZ,
 };
 use crate::num::basic::integers::PrimitiveInt;
+use crate::num::basic::signeds::PrimitiveSigned;
 use crate::num::conversion::traits::{
     Digits, FromOtherTypeSlice, IntegerMantissaAndExponent, PowerOf2DigitIterable, PowerOf2Digits,
     SciMantissaAndExponent, VecFromOtherType, VecFromOtherTypeSlice,
@@ -38,6 +40,7 @@ use crate::num::logic::traits::{BitBlockAccess, HammingDistance};
 pub trait PrimitiveUnsigned:
     AbsDiff<Self, Output = Self>
     + AbsDiffAssign<Self>
+    + BalancedMod<Self, Output: PrimitiveSigned + UnsignedAbs<Output = Self>>
     + BitBlockAccess<Bits = Self>
     + CeilingLogBase<Output = u64>
     + CeilingLogBase2<Output = u64>

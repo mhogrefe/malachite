@@ -701,7 +701,7 @@ returning [`None`](https://doc.rust-lang.org/nightly/std/option/enum.Option.html
 | ✗ | `int mpz_probab_prime_p (const mpz_t n, int reps)` | |
 | ✗ | `void mpz_nextprime (mpz_t rop, const mpz_t op)` | |
 | ✗ | `int mpz_prevprime (mpz_t rop, const mpz_t op)` | |
-| ✗ | `mp_bitcnt_t mpz_remove (mpz_t rop, const mpz_t op, const mpz_t f)` | |
+| ✓ | `mp_bitcnt_t mpz_remove (mpz_t rop, const mpz_t op, const mpz_t f)` | [`RemovePower`](https://docs.rs/malachite-base/latest/malachite_base/num/factorization/traits/trait.RemovePower.html) |
 | ✓ | `void mpz_fib_ui (mpz_t fn, unsigned long int n)` | [`Fibonacci`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Fibonacci.html) |
 | ✓ | `void mpz_fib2_ui (mpz_t fn, mpz_t fnsub1, unsigned long int n)` | [`fibonacci_pair`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Fibonacci.html#tymethod.fibonacci_pair) |
 | ✓ | `void mpz_lucnum_ui (mpz_t ln, unsigned long int n)` | [`LucasNumber`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.LucasNumber.html) |
@@ -726,8 +726,16 @@ all, as in its Baillie-PSW and Lucas tests. So there may end up being no direct 
 `reps` count. GMP's three-way return, which distinguishes "definitely prime" from "probably
 prime", is also likely to be split across separate functions that each answer yes or no.
 
-**`mpz_remove`.** Removing every occurrence of a factor and reporting how many were removed has no
-public counterpart. The machinery is present internally and will be exposed in a future version.
+**`mpz_remove`.** [`RemovePower`](https://docs.rs/malachite-base/latest/malachite_base/num/factorization/traits/trait.RemovePower.html)
+divides out the largest power of a factor and returns that power alongside the reduced number,
+as a tuple rather than through an out-parameter and a return value. The factor need not be
+prime, and nothing here needs primality testing. The conventions match GMP's: zero is left
+alone with a count of 0, and on
+[`Integer`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html) the
+quotient is the exact division by the signed power, so a negative factor raised to an odd power
+flips the sign — `(-8).remove_power(-2)` is `(1, 3)`. Where GMP raises a division-by-zero for a
+factor of 0 and silently returns for a factor of ±1, Malachite panics on all three, since no
+largest power exists.
 
 **Fibonacci and Lucas numbers.** GMP's two-output forms, `mpz_fib2_ui` and `mpz_lucnum2_ui`,
 exist because computing F[n] produces F[n−1] along the way, so the pair is nearly free. The

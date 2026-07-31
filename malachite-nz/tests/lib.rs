@@ -72,6 +72,7 @@ pub mod integer {
         pub mod add;
         pub mod add_mul;
         pub mod average;
+        pub mod balanced_mod;
         pub mod binomial_coefficient;
         pub mod div;
         pub mod div_euclidean;
@@ -171,6 +172,7 @@ pub mod integer {
     }
     pub mod factorization {
         pub mod is_power;
+        pub mod remove_power;
     }
     pub mod logic {
         pub mod and;

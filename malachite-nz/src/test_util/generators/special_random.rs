@@ -473,6 +473,19 @@ pub fn special_random_integer_pair_gen_var_7(config: &GenConfig) -> It<(Integer,
     ))
 }
 
+pub fn special_random_integer_pair_gen_var_9(config: &GenConfig) -> It<(Integer, Integer)> {
+    Box::new(
+        random_pairs_from_single(striped_random_integers(
+            EXAMPLE_SEED,
+            config.get_or("mean_stripe_n", 32),
+            config.get_or("mean_stripe_d", 1),
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        ))
+        .filter(|(_, y): &(Integer, Integer)| *y > 1u32 || *y < -1i32),
+    )
+}
+
 // -- (Integer, Integer, Integer) --
 
 pub fn special_random_integer_triple_gen(config: &GenConfig) -> It<(Integer, Integer, Integer)> {
@@ -2453,6 +2466,19 @@ pub fn special_random_natural_pair_gen_var_15(config: &GenConfig) -> It<(Natural
             .map(Natural::from)
         },
     ))
+}
+
+pub fn special_random_natural_pair_gen_var_16(config: &GenConfig) -> It<(Natural, Natural)> {
+    Box::new(
+        random_pairs_from_single(striped_random_naturals(
+            EXAMPLE_SEED,
+            config.get_or("mean_stripe_n", 32),
+            config.get_or("mean_stripe_d", 1),
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        ))
+        .filter(|(_, y): &(Natural, Natural)| *y > 1u32),
+    )
 }
 
 // -- (Natural, Natural, bool) --

@@ -245,7 +245,7 @@ types are a boundary that Malachite does not have.
 | ✓ | `void fmpz_get_signed_uiui (ulong * hi, ulong * lo, const fmpz_t in)` | [`WrappingFrom`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/conversion/primitive_int_from_integer/index.html) |
 | — | `void fmpz_set_mpz (fmpz_t f, const mpz_t x)` | |
 | ✓ | `int fmpz_set_str (fmpz_t f, const char * str, int b)` | [`FromStringBase`](https://docs.rs/malachite-base/latest/malachite_base/num/conversion/traits/trait.FromStringBase.html), [`FromStr`](https://doc.rust-lang.org/nightly/std/str/trait.FromStr.html) |
-| ✗ | `void fmpz_set_ui_smod (fmpz_t f, ulong x, ulong m)` | |
+| ✓ | `void fmpz_set_ui_smod (fmpz_t f, ulong x, ulong m)` | [`BalancedMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.BalancedMod.html) |
 | — | `void flint_mpz_init_set_readonly (mpz_t z, const fmpz_t f)` | |
 | — | `void flint_mpz_clear_readonly (mpz_t z)` | |
 | — | `void fmpz_init_set_readonly (fmpz_t f, const mpz_t z)` | |
@@ -337,10 +337,16 @@ whitespace, accepts a single leading `+` that FLINT and GMP reject, and, like FL
 special check, rejects a doubled minus sign.
 
 **`fmpz_set_ui_smod`.** A balanced remainder: the representative of `x` modulo `m` in
-`(-m/2, m/2]`. Malachite has floor, ceiling, and truncating remainders, but no balanced one, and
-this is a genuine gap rather than a spelling difference; it recurs at full size as `fmpz_smod`
-in the next section. Until it is filled, the composition is a comparison and a subtraction:
-reduce, then subtract `m` if the result exceeds `m/2`.
+`(-m/2, m/2]`, which is
+[`BalancedMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.BalancedMod.html).
+FLINT states a precondition, that `x` already satisfies `0 <= x < m`, and does not check it;
+`balanced_mod` reduces first, so any
+[`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html) is
+accepted and the result is the same wherever FLINT's precondition holds. Because the
+representative may be negative, the output is an
+[`Integer`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html) even
+though the inputs are not. The full-size version is `fmpz_smod` in the next section, the same
+trait.
 
 ## [Input and output](https://flintlib.org/doc/fmpz.html#input-and-output) {#input-and-output}
 
@@ -650,7 +656,7 @@ before converting the word-sized result down.
 | ✓ | `int fmpz_divides (fmpz_t q, const fmpz_t f, const fmpz_t g)` | [`DivMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivMod.html) |
 | ✓ | `void fmpz_mod (fmpz_t f, const fmpz_t g, const fmpz_t h)` | [`ModEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModEuclidean.html) |
 | ✓ | `ulong fmpz_mod_ui (fmpz_t f, const fmpz_t g, ulong h)` | [`ModEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModEuclidean.html) |
-| ✗ | `void fmpz_smod (fmpz_t f, const fmpz_t g, const fmpz_t h)` | |
+| ✓ | `void fmpz_smod (fmpz_t f, const fmpz_t g, const fmpz_t h)` | [`BalancedMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.BalancedMod.html) |
 | ✗ | `void fmpz_preinvn_init (fmpz_preinvn_t inv, const fmpz_t f)` | |
 | — | `void fmpz_preinvn_clear (fmpz_preinvn_t inv)` | |
 | ✗ | `void fmpz_fdiv_qr_preinvn (fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h, const fmpz_preinvn_t hinv)` | |
@@ -678,8 +684,10 @@ divisor, which is all `fmpz_mod_ui` allows, plain
 agrees and is the more common spelling.
 
 **`fmpz_smod`.** The balanced remainder again, in `(-|h|/2, |h|/2]`, the full-size version of
-the `fmpz_set_ui_smod` gap [under Conversion](#conversion); the same workaround and the same
-plan apply.
+`fmpz_set_ui_smod` [under Conversion](#conversion) and the same trait,
+[`BalancedMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.BalancedMod.html),
+with an `Assign` form as well. The conventions agree: only the magnitude of `h` matters, and a
+remainder of exactly `|h|/2` is the positive one, since the range is closed at the top.
 
 **The `preinvn` trio.** A precomputed Newton inverse of a divisor, built once and reused so
 that many divisions by the same `h` skip the setup work. Malachite has preinverted division in
@@ -883,18 +891,18 @@ a gap on the rationals page; the two are one work item.
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✗ | `slong fmpz_remove (fmpz_t rop, const fmpz_t op, const fmpz_t f)` | |
+| ✓ | `slong fmpz_remove (fmpz_t rop, const fmpz_t op, const fmpz_t f)` | [`RemovePower`](https://docs.rs/malachite-base/latest/malachite_base/num/factorization/traits/trait.RemovePower.html) |
 | ≈ | `int fmpz_invmod (fmpz_t f, const fmpz_t g, const fmpz_t h)` | [`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModInverse.html) |
 | ✓ | `void fmpz_negmod (fmpz_t f, const fmpz_t g, const fmpz_t h)` | [`ModNeg`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModNeg.html), [`NegMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.NegMod.html) |
 | ≈ | `int fmpz_jacobi (const fmpz_t a, const fmpz_t n)` | [`JacobiSymbol`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.JacobiSymbol.html), [`KroneckerSymbol`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.KroneckerSymbol.html) |
 | ✓ | `int fmpz_kronecker (const fmpz_t a, const fmpz_t n)` | [`KroneckerSymbol`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.KroneckerSymbol.html) |
 | ✗ | `void fmpz_divides_mod_list (fmpz_t xstart, fmpz_t xstride, fmpz_t xlength, const fmpz_t a, const fmpz_t b, const fmpz_t n)` | |
 
-**`fmpz_remove`.** The same gap as `mpz_remove`,
-[noted on the GMP page](/mapping/gmp-integers/#number-theoretic-functions): removing every
-occurrence of a factor and counting them has no public counterpart yet, though the machinery is
-present internally and will be exposed. FLINT's version returns the count, defines the zero
-input as removing nothing, and aborts if `f <= 1`.
+**`fmpz_remove`.** [`RemovePower`](https://docs.rs/malachite-base/latest/malachite_base/num/factorization/traits/trait.RemovePower.html),
+described [on the GMP page](/mapping/gmp-integers/#number-theoretic-functions), which returns the
+reduced number and the count as a tuple instead of writing one and returning the other. The
+conventions line up with FLINT's on both edges it names: a zero input removes nothing, and a
+factor of 1 or below is rejected, where FLINT aborts and Malachite panics.
 
 **`fmpz_invmod`.** [`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModInverse.html)
 returns [`Option`](https://doc.rust-lang.org/nightly/std/option/enum.Option.html), so FLINT's

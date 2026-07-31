@@ -25,6 +25,10 @@ pub mod add_mul;
 /// [`AverageRoundAssign`](malachite_base::num::arithmetic::traits::AverageRoundAssign), traits for
 /// computing the average (arithmetic mean) of two numbers.
 pub mod average;
+/// [`BalancedMod`](malachite_base::num::arithmetic::traits::BalancedMod) and
+/// [`BalancedModAssign`](malachite_base::num::arithmetic::traits::BalancedModAssign), traits for
+/// finding the representative of a number modulo another number that is closest to zero.
+pub mod balanced_mod;
 /// Implementations of
 /// [`BinomialCoefficient`](malachite_base::num::arithmetic::traits::BinomialCoefficient), a trait
 /// for computing the binomial coefficient of two numbers.

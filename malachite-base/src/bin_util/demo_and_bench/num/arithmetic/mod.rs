@@ -15,6 +15,7 @@ pub(crate) fn register(runner: &mut Runner) {
     arithmetic_checked_shl::register(runner);
     arithmetic_checked_shr::register(runner);
     average::register(runner);
+    balanced_mod::register(runner);
     binomial_coefficient::register(runner);
     ceiling::register(runner);
     checked_add_mul::register(runner);
@@ -125,6 +126,7 @@ mod add_mul;
 mod arithmetic_checked_shl;
 mod arithmetic_checked_shr;
 mod average;
+mod balanced_mod;
 mod binomial_coefficient;
 mod ceiling;
 mod checked_add_mul;

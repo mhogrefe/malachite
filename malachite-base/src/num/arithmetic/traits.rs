@@ -912,6 +912,26 @@ pub trait ModAssign<RHS = Self> {
     fn mod_assign(&mut self, other: RHS);
 }
 
+/// Divides a number by another number, returning the balanced remainder: the representative of the
+/// first number modulo the second that is closest to zero.
+///
+/// The remainder $r$ satisfies $-|y|/2 < r \leq |y|/2$, so a remainder of exactly $|y|/2$ is
+/// positive. It is congruent to $x$ modulo $y$, and those two properties determine it uniquely.
+pub trait BalancedMod<RHS = Self> {
+    type Output;
+
+    fn balanced_mod(self, other: RHS) -> Self::Output;
+}
+
+/// Divides a number by another number, replacing the first number by the balanced remainder: the
+/// representative of the first number modulo the second that is closest to zero.
+///
+/// The remainder $r$ satisfies $-|y|/2 < r \leq |y|/2$, so a remainder of exactly $|y|/2$ is
+/// positive.
+pub trait BalancedModAssign<RHS = Self> {
+    fn balanced_mod_assign(&mut self, other: RHS);
+}
+
 /// Divides a number by another number, returning just the remainder. The remainder is always
 /// nonnegative.
 ///

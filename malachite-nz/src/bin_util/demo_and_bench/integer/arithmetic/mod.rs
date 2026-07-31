@@ -14,6 +14,7 @@ pub(crate) fn register(runner: &mut Runner) {
     add::register(runner);
     add_mul::register(runner);
     average::register(runner);
+    balanced_mod::register(runner);
     binomial_coefficient::register(runner);
     div::register(runner);
     div_euclidean::register(runner);
@@ -54,6 +55,7 @@ mod abs_diff;
 mod add;
 mod add_mul;
 mod average;
+mod balanced_mod;
 mod binomial_coefficient;
 mod div;
 mod div_euclidean;

@@ -10,7 +10,7 @@ use malachite_base::num::arithmetic::traits::{
     Average, AverageAssign, AverageRound, AverageRoundAssign, DivRound, Parity,
 };
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::rounding_modes::RoundingMode::{self, *};
+use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::{
     natural_natural_rounding_mode_triple_gen_var_3, natural_pair_gen,

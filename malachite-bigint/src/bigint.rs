@@ -30,10 +30,11 @@ use malachite_base::{
     rounding_modes::RoundingMode,
 };
 use malachite_nz::integer::Integer;
-use num_integer::Roots;
+use malachite_nz::platform::SignedLimb;
+use num_integer::{Integer as NumInteger, Roots};
 use num_traits::{
-    CheckedAdd, CheckedDiv, CheckedMul, CheckedSub, FromPrimitive, Num, One, Pow, Signed,
-    ToPrimitive, Zero,
+    CheckedAdd, CheckedDiv, CheckedEuclid, CheckedMul, CheckedSub, Euclid, FromPrimitive, Num, One,
+    Pow, Signed, ToPrimitive, Zero,
 };
 use paste::paste;
 
@@ -909,5 +910,146 @@ mod test {
     fn test_display_bigint() {
         let n = BigInt::from_str("1234567890").unwrap();
         assert_eq!(format!("{n}"), "1234567890");
+    }
+}
+
+impl BigInt {
+    /// Creates a constant [`BigInt`] from a primitive [`i32`] value.
+    ///
+    /// Non-`const` callers should use [`From<i32>`] instead.
+    #[inline]
+    pub const fn new_const(n: i32) -> Self {
+        Self(Integer::const_from_signed(n as SignedLimb))
+    }
+
+    /// Converts this owned [`BigInt`] into a [`BigUint`], if it is not negative.
+    #[inline]
+    pub fn into_biguint(self) -> Option<BigUint> {
+        if self.is_negative() {
+            None
+        } else {
+            Some(BigUint(self.0.unsigned_abs()))
+        }
+    }
+
+    /// Returns the modular multiplicative inverse of `self` modulo `modulus`, or `None` if no
+    /// inverse exists.
+    ///
+    /// # Panics
+    /// Panics if `modulus` is zero.
+    pub fn modinv(&self, modulus: &Self) -> Option<Self> {
+        let result = self.magnitude().modinv(modulus.magnitude())?;
+        // The sign of the result follows the modulus, as `mod_floor` does.
+        let (sign, magnitude) = match (self.is_negative(), modulus.is_negative()) {
+            (false, false) => (Sign::Plus, result),
+            (true, false) => (Sign::Plus, modulus.magnitude() - result),
+            (false, true) => (Sign::Minus, modulus.magnitude() - result),
+            (true, true) => (Sign::Minus, result),
+        };
+        Some(Self::from_biguint(sign, magnitude))
+    }
+}
+
+impl num_traits::ConstZero for BigInt {
+    const ZERO: Self = Self::new_const(0);
+}
+
+impl num_traits::ConstOne for BigInt {
+    const ONE: Self = Self::new_const(1);
+}
+
+impl From<bool> for BigInt {
+    #[inline]
+    fn from(x: bool) -> Self {
+        if x { Self::one() } else { Self::zero() }
+    }
+}
+
+impl Euclid for BigInt {
+    #[inline]
+    fn div_euclid(&self, v: &Self) -> Self {
+        let (q, r) = self.div_rem(v);
+        if r.is_negative() {
+            if v.is_positive() { q - 1 } else { q + 1 }
+        } else {
+            q
+        }
+    }
+
+    #[inline]
+    fn rem_euclid(&self, v: &Self) -> Self {
+        let r = self % v;
+        if r.is_negative() {
+            if v.is_positive() { r + v } else { r - v }
+        } else {
+            r
+        }
+    }
+
+    fn div_rem_euclid(&self, v: &Self) -> (Self, Self) {
+        let (q, r) = self.div_rem(v);
+        if r.is_negative() {
+            if v.is_positive() {
+                (q - 1, r + v)
+            } else {
+                (q + 1, r - v)
+            }
+        } else {
+            (q, r)
+        }
+    }
+}
+
+impl CheckedEuclid for BigInt {
+    #[inline]
+    fn checked_div_euclid(&self, v: &Self) -> Option<Self> {
+        if v.is_zero() {
+            return None;
+        }
+        Some(self.div_euclid(v))
+    }
+
+    #[inline]
+    fn checked_rem_euclid(&self, v: &Self) -> Option<Self> {
+        if v.is_zero() {
+            return None;
+        }
+        Some(self.rem_euclid(v))
+    }
+
+    #[inline]
+    fn checked_div_rem_euclid(&self, v: &Self) -> Option<(Self, Self)> {
+        if v.is_zero() {
+            return None;
+        }
+        Some(self.div_rem_euclid(v))
+    }
+}
+
+impl num_traits::FromBytes for BigInt {
+    type Bytes = [u8];
+
+    #[inline]
+    fn from_be_bytes(bytes: &Self::Bytes) -> Self {
+        Self::from_signed_bytes_be(bytes)
+    }
+
+    #[inline]
+    fn from_le_bytes(bytes: &Self::Bytes) -> Self {
+        Self::from_signed_bytes_le(bytes)
+    }
+}
+
+impl num_traits::ToBytes for BigInt {
+    type Bytes = Vec<u8>;
+
+    #[inline]
+    fn to_be_bytes(&self) -> Self::Bytes {
+        self.to_signed_bytes_be()
+    }
+
+    #[inline]
+    fn to_le_bytes(&self) -> Self::Bytes {
+        self.to_signed_bytes_le()
     }
 }

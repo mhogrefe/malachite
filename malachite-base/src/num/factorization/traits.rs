@@ -27,6 +27,20 @@ pub trait ExpressAsPower: Sized {
     fn express_as_power(&self) -> Option<(Self, u64)>;
 }
 
+/// A trait for removing the largest power of a factor from a number, returning the reduced number
+/// and how many times the factor was removed.
+pub trait RemovePower<RHS = Self> {
+    type Output;
+
+    fn remove_power(self, other: RHS) -> (Self::Output, u64);
+}
+
+/// A trait for replacing a number with itself divided by the largest power of a factor, returning
+/// how many times the factor was removed.
+pub trait RemovePowerAssign<RHS = Self> {
+    fn remove_power_assign(&mut self, other: RHS) -> u64;
+}
+
 /// A trait for finding the prime factorization of a number.
 pub trait Factor {
     type FACTORS;

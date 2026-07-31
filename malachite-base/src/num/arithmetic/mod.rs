@@ -234,6 +234,33 @@ pub mod arithmetic_checked_shr;
 /// assert_eq!(x, -6);
 /// ```
 pub mod average;
+/// [`BalancedMod`](traits::BalancedMod) and [`BalancedModAssign`](traits::BalancedModAssign),
+/// traits for finding the representative of a number modulo another number that is closest to zero.
+///
+/// # balanced_mod
+/// ```
+/// use malachite_base::num::arithmetic::traits::BalancedMod;
+///
+/// assert_eq!(23u32.balanced_mod(10), 3);
+/// // 7 is more than half of 10, so the closest representative is negative
+/// assert_eq!(27u32.balanced_mod(10), -3);
+/// // exactly half the modulus is the top of the range, so it stays positive
+/// assert_eq!(25u32.balanced_mod(10), 5);
+///
+/// assert_eq!((-23i32).balanced_mod(10), -3);
+/// // only the magnitude of the modulus matters
+/// assert_eq!(27i32.balanced_mod(-10), -3);
+/// ```
+///
+/// # balanced_mod_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::BalancedModAssign;
+///
+/// let mut x = 27i32;
+/// x.balanced_mod_assign(10);
+/// assert_eq!(x, -3);
+/// ```
+pub mod balanced_mod;
 /// Traits for computing the binomial coefficient of two numbers. There is a trait whose
 /// implementations panic if the result cannot be represented, and a checked trait whose
 /// implementations return `None` in that case: [`BinomialCoefficient`](traits::BinomialCoefficient)

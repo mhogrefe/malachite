@@ -11,6 +11,7 @@ use malachite_base::test_util::runner::Runner;
 pub(crate) fn register(runner: &mut Runner) {
     factor::register(runner);
     is_power::register(runner);
+    remove_power::register(runner);
     is_prime::register(runner);
     is_square::register(runner);
     primes::register(runner);
@@ -25,3 +26,4 @@ mod is_square;
 mod prime_sieve;
 mod primes;
 mod primitive_root_prime;
+mod remove_power;

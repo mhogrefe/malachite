@@ -2259,6 +2259,13 @@ pub fn random_signed_pair_gen_var_11<T: PrimitiveSigned>(config: &GenConfig) -> 
     )
 }
 
+pub fn random_signed_pair_gen_var_12<T: PrimitiveSigned>(_config: &GenConfig) -> It<(T, T)> {
+    Box::new(
+        random_pairs_from_single(random_primitive_ints(EXAMPLE_SEED))
+            .filter(|&(_, y): &(T, T)| y > T::ONE || y < T::NEGATIVE_ONE),
+    )
+}
+
 // -- (PrimitiveSigned, PrimitiveSigned, PrimitiveSigned) --
 
 fn halve_bits<T: PrimitiveSigned>(x: T) -> T {
@@ -3976,6 +3983,13 @@ pub fn random_unsigned_pair_gen_var_38<T: PrimitiveUnsigned>(_config: &GenConfig
         T::TWO,
         T::MAX,
     )))
+}
+
+pub fn random_unsigned_pair_gen_var_39<T: PrimitiveUnsigned>(_config: &GenConfig) -> It<(T, T)> {
+    Box::new(
+        random_pairs_from_single(random_primitive_ints(EXAMPLE_SEED))
+            .filter(|&(_, y): &(T, T)| y > T::ONE),
+    )
 }
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveInt, PrimitiveUnsigned) --

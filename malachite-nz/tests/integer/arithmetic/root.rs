@@ -569,6 +569,7 @@ fn test_root_rem() {
         assert_eq!(mut_n.to_string(), root);
         assert_eq!(r.to_string(), rem);
     };
+    // - self >= 0
     test("0", 1, "0", "0");
     test("0", 3, "0", "0");
     test("1", 3, "1", "0");
@@ -576,9 +577,11 @@ fn test_root_rem() {
     test("1000", 3, "10", "0");
     test("1001", 3, "10", "1");
     test("100", 1, "100", "0");
-    // - negative operands: the root is rounded toward negative infinity, so the remainder is
+    // - self < 0 and exp.odd(): the root is rounded toward negative infinity, so the remainder is
     //   non-negative, unlike GMP's truncating convention
+    // - rem == 0u32: the root is exact, so the ceiling is not needed
     test("-1", 3, "-1", "0");
+    // - rem != 0: the floor root is the negated ceiling root of the absolute value
     test("-999", 3, "-10", "1");
     test("-1000", 3, "-10", "0");
     test("-1001", 3, "-11", "330");

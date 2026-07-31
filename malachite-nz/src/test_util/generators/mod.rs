@@ -321,6 +321,16 @@ pub fn integer_pair_gen_var_7() -> Generator<(Integer, Integer)> {
     )
 }
 
+// All `(Integer, Integer)` where the second `Integer` has absolute value greater than 1: a valid
+// factor for `Integer::remove_power`.
+pub fn integer_pair_gen_var_9() -> Generator<(Integer, Integer)> {
+    Generator::new(
+        &exhaustive_integer_pair_gen_var_9,
+        &random_integer_pair_gen_var_9,
+        &special_random_integer_pair_gen_var_9,
+    )
+}
+
 pub fn integer_pair_gen_var_7_rm() -> Generator<((rug::Integer, u32), (Integer, Integer))> {
     Generator::new(
         &|| {
@@ -1436,6 +1446,16 @@ pub fn natural_pair_gen_var_15() -> Generator<(Natural, Natural)> {
         &exhaustive_natural_pair_gen_var_15,
         &random_natural_pair_gen_var_15,
         &special_random_natural_pair_gen_var_15,
+    )
+}
+
+// All `(Natural, Natural)` where the second `Natural` is greater than 1: a valid factor for
+// `Natural::remove_power`.
+pub fn natural_pair_gen_var_16() -> Generator<(Natural, Natural)> {
+    Generator::new(
+        &exhaustive_natural_pair_gen_var_16,
+        &random_natural_pair_gen_var_16,
+        &special_random_natural_pair_gen_var_16,
     )
 }
 

@@ -976,6 +976,13 @@ pub fn exhaustive_signed_pair_gen_var_13<T: PrimitiveSigned>() -> It<(T, T)> {
     )
 }
 
+pub fn exhaustive_signed_pair_gen_var_14<T: PrimitiveSigned>() -> It<(T, T)> {
+    Box::new(
+        exhaustive_pairs_from_single(exhaustive_signeds::<T>())
+            .filter(|&(_, y): &(T, T)| y > T::ONE || y < T::NEGATIVE_ONE),
+    )
+}
+
 // -- (PrimitiveSigned, PrimitiveSigned, PrimitiveSigned) --
 
 pub fn exhaustive_signed_triple_gen<T: PrimitiveSigned>() -> It<(T, T, T)> {
@@ -2525,6 +2532,13 @@ pub fn exhaustive_unsigned_pair_gen_var_31<T: PrimitiveUnsigned>() -> It<(T, T)>
         exhaustive_pairs_from_single(exhaustive_unsigneds())
             .filter(|&(n, k)| T::checked_binomial_coefficient(n, k).is_some()),
     )
+}
+
+pub fn exhaustive_unsigned_pair_gen_var_32<T: PrimitiveUnsigned>() -> It<(T, T)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_unsigneds(),
+        primitive_int_increasing_inclusive_range(T::TWO, T::MAX),
+    ))
 }
 
 // vars 32 through 36 are in malachite-nz.

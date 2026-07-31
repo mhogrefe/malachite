@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::{Parity, Pow, UnsignedAbs};
+use malachite_base::num::arithmetic::traits::{Parity, Pow};
 use malachite_base::num::factorization::traits::{ExpressAsPower, IsPower};
 use malachite_nz::integer::Integer;
 use malachite_nz::test_util::generators::{integer_gen, integer_unsigned_pair_gen_var_3};
@@ -17,6 +17,7 @@ fn test_is_power() {
     let test = |s, out| {
         assert_eq!(Integer::from_str(s).unwrap().is_power(), out);
     };
+    // - *self >= 0: delegated to the `Natural` implementation
     test("0", true);
     test("1", true);
     test("4", true);
@@ -24,14 +25,15 @@ fn test_is_power() {
     test("8", true);
     test("64", true);
     test("1000000000000", true);
-    // - a negative value can only be an odd perfect power
+    // - abs == 1u32: -1 is (-1)^3, but its bit length admits no exponent to search
     test("-1", true);
+    // - a negative value can only be an odd perfect power, so the search finds nothing here
     test("-4", false);
     test("-6", false);
     test("-8", true);
     // - -16 is 2^4 in absolute value, and 4 has no odd divisor above 1
     test("-16", false);
-    // - -64 is (-4)^3
+    // - the odd-prime search succeeds: -64 is (-4)^3
     test("-64", true);
     // -10^12 is (-10000)^3, since 10^12 = (10^4)^3
     test("-1000000000000", true);

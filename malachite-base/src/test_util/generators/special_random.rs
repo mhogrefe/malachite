@@ -1187,6 +1187,17 @@ pub fn special_random_signed_pair_gen_var_10<
     )
 }
 
+pub fn special_random_signed_pair_gen_var_11<T: PrimitiveSigned>(config: &GenConfig) -> It<(T, T)> {
+    Box::new(
+        random_pairs_from_single(striped_random_signeds(
+            EXAMPLE_SEED,
+            config.get_or("mean_stripe_n", T::WIDTH >> 1),
+            config.get_or("mean_stripe_d", 1),
+        ))
+        .filter(|&(_, y): &(T, T)| y > T::ONE || y < T::NEGATIVE_ONE),
+    )
+}
+
 // -- (PrimitiveSigned, PrimitiveSigned, PrimitiveSigned) --
 
 pub fn special_random_signed_triple_gen<T: PrimitiveSigned>(config: &GenConfig) -> It<(T, T, T)> {
@@ -4360,6 +4371,19 @@ pub fn special_random_unsigned_pair_gen_var_41<T: PrimitiveUnsigned>(
             config.get_or("mean_stripe_d", 1),
         ),
     ))
+}
+
+pub fn special_random_unsigned_pair_gen_var_42<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(T, T)> {
+    Box::new(
+        random_pairs_from_single(striped_random_unsigneds(
+            EXAMPLE_SEED,
+            config.get_or("mean_stripe_n", T::WIDTH >> 1),
+            config.get_or("mean_stripe_d", 1),
+        ))
+        .filter(|&(_, y): &(T, T)| y > T::ONE),
+    )
 }
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, bool) --

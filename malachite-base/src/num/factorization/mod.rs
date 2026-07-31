@@ -139,5 +139,38 @@ pub mod primes;
 /// assert_eq!(4294967291u32.primitive_root_prime(), 2);
 /// ```
 pub mod primitive_root_prime;
+/// [`RemovePower`](traits::RemovePower) and [`RemovePowerAssign`](traits::RemovePowerAssign),
+/// traits for dividing out the largest power of a factor.
+///
+/// # remove_power
+/// ```
+/// use malachite_base::num::factorization::traits::RemovePower;
+///
+/// assert_eq!(12u32.remove_power(2), (3, 2));
+/// // the factor need not be prime
+/// assert_eq!(1000u32.remove_power(10), (1, 3));
+/// // a factor that does not divide at all is removed zero times
+/// assert_eq!(7u32.remove_power(3), (7, 0));
+/// // zero is left alone
+/// assert_eq!(0u32.remove_power(3), (0, 0));
+///
+/// // for signed types the quotient is the exact division by the signed power
+/// assert_eq!((-12i32).remove_power(2), (-3, 2));
+/// assert_eq!((-8i32).remove_power(-2), (1, 3));
+/// ```
+///
+/// # remove_power_assign
+/// ```
+/// use malachite_base::num::factorization::traits::RemovePowerAssign;
+///
+/// let mut x = 12u32;
+/// assert_eq!(x.remove_power_assign(2), 2);
+/// assert_eq!(x, 3);
+///
+/// let mut x = -8i32;
+/// assert_eq!(x.remove_power_assign(-2), 3);
+/// assert_eq!(x, 1);
+/// ```
+pub mod remove_power;
 /// Various traits for generating primes, primality testing, and factorization.
 pub mod traits;

@@ -10,7 +10,7 @@ use crate::comparison::traits::{Max, Min};
 use crate::named::Named;
 use crate::num::arithmetic::traits::{
     AbsDiff, AddMul, AddMulAssign, ArithmeticCheckedShl, ArithmeticCheckedShr, Average,
-    AverageAssign, AverageRound, AverageRoundAssign, BinomialCoefficient, CeilingRoot,
+    AverageAssign, AverageRound, AverageRoundAssign, BalancedMod, BinomialCoefficient, CeilingRoot,
     CeilingRootAssign, CeilingSqrt, CeilingSqrtAssign, CheckedAdd, CheckedAddMul,
     CheckedBinomialCoefficient, CheckedDiv, CheckedMul, CheckedNeg, CheckedPow, CheckedRoot,
     CheckedSqrt, CheckedSquare, CheckedSub, CheckedSubMul, DivAssignMod, DivAssignModEuclidean,
@@ -40,7 +40,9 @@ use crate::num::conversion::traits::{
     OverflowingFrom, OverflowingInto, RoundingFrom, RoundingInto, SaturatingFrom, SaturatingInto,
     ToSci, ToStringBase, WrappingFrom, WrappingInto,
 };
-use crate::num::factorization::traits::{ExpressAsPower, IsPower, IsSquare};
+use crate::num::factorization::traits::{
+    ExpressAsPower, IsPower, IsSquare, RemovePower, RemovePowerAssign,
+};
 use crate::num::float::NiceFloat;
 use crate::num::logic::traits::{
     BitAccess, BitBlockAccess, BitConvertible, BitIterable, BitScan, CountOnes, CountZeros,
@@ -105,6 +107,7 @@ pub trait PrimitiveInt:
     + AverageAssign<Self>
     + AverageRound<Self, Output = Self>
     + AverageRoundAssign<Self>
+    + BalancedMod<Self>
     + Binary
     + BinomialCoefficient<Self>
     + BitAccess
@@ -289,6 +292,8 @@ pub trait PrimitiveInt:
     + RemAssign<Self>
     + RemPowerOf2<Output = Self>
     + RemPowerOf2Assign
+    + RemovePower<Self, Output = Self>
+    + RemovePowerAssign<Self>
     + RotateLeft<Output = Self>
     + RotateLeftAssign
     + RotateRight<Output = Self>
@@ -592,6 +597,7 @@ pub trait PrimitiveInt:
     + AverageAssign<Self>
     + AverageRound<Self, Output = Self>
     + AverageRoundAssign<Self>
+    + BalancedMod<Self>
     + Binary
     + BinomialCoefficient<Self>
     + BitAccess
@@ -775,6 +781,8 @@ pub trait PrimitiveInt:
     + RemAssign<Self>
     + RemPowerOf2<Output = Self>
     + RemPowerOf2Assign
+    + RemovePower<Self, Output = Self>
+    + RemovePowerAssign<Self>
     + RotateLeft<Output = Self>
     + RotateLeftAssign
     + RotateRight<Output = Self>

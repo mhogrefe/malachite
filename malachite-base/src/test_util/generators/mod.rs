@@ -860,6 +860,16 @@ pub fn signed_pair_gen_var_12<T: PrimitiveSigned>() -> Generator<(T, T)> {
     )
 }
 
+// All `(T, T)` where `T` is signed and the second `T` has absolute value greater than 1: a valid
+// factor for `T::remove_power`.
+pub fn signed_pair_gen_var_52<T: PrimitiveSigned>() -> Generator<(T, T)> {
+    Generator::new(
+        &exhaustive_signed_pair_gen_var_14,
+        &random_signed_pair_gen_var_12,
+        &special_random_signed_pair_gen_var_11,
+    )
+}
+
 // -- (PrimitiveSigned, PrimitiveSigned, PrimitiveSigned) --
 
 pub fn signed_triple_gen<T: PrimitiveSigned>() -> Generator<(T, T, T)> {
@@ -2381,6 +2391,16 @@ pub fn unsigned_pair_gen_var_50<T: PrimitiveUnsigned>() -> Generator<(T, T)> {
         &exhaustive_primitive_int_unsigned_pair_gen_var_3,
         &random_unsigned_pair_gen_var_38,
         &special_random_unsigned_pair_gen_var_41,
+    )
+}
+
+// All `(T, T)` where `T` is unsigned and the second `T` is greater than 1: a valid factor for
+// `T::remove_power`.
+pub fn unsigned_pair_gen_var_52<T: PrimitiveUnsigned>() -> Generator<(T, T)> {
+    Generator::new(
+        &exhaustive_unsigned_pair_gen_var_32,
+        &random_unsigned_pair_gen_var_39,
+        &special_random_unsigned_pair_gen_var_42,
     )
 }
 
