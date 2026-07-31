@@ -66,7 +66,7 @@ impl FromStringBase for Integer {
     /// where $T$ is time, $M$ is additional memory, and $n$ is `s.len()`.
     ///
     /// # Panics
-    /// Panics if `base` is less than 2 or greater than 36.
+    /// Panics if `base` is less than 2 or greater than 62.
     ///
     /// # Examples
     /// ```
@@ -86,6 +86,10 @@ impl FromStringBase for Integer {
     /// );
     /// assert_eq!(Integer::from_string_base(10, "-123456").unwrap(), -123456);
     /// assert_eq!(Integer::from_string_base(10, "-00123456").unwrap(), -123456);
+    ///
+    /// // above base 36, the uppercase and lowercase letters are distinct digits
+    /// assert_eq!(Integer::from_string_base(62, "-G8").unwrap(), -1000);
+    /// assert_eq!(Integer::from_string_base(62, "-g8").unwrap(), -2612);
     /// assert_eq!(Integer::from_string_base(16, "-0").unwrap(), 0);
     /// assert_eq!(
     ///     Integer::from_string_base(16, "-deadbeef").unwrap(),

@@ -12,7 +12,7 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::string::to_string::{
     BaseFmtWrapper, digit_to_display_byte_lower, digit_to_display_byte_upper,
 };
-use malachite_base::num::conversion::traits::WrappingFrom;
+use malachite_base::num::conversion::traits::{ToStringBase, WrappingFrom};
 use malachite_base::test_util::bench::bucketers::{pair_1_bit_bucketer, triple_1_bit_bucketer};
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
@@ -27,6 +27,7 @@ use malachite_base::test_util::runner::Runner;
 use std::fmt::Display;
 
 pub(crate) fn register(runner: &mut Runner) {
+    register_demo!(runner, demo_to_string_base_all_bases);
     register_demo!(runner, demo_digit_to_display_byte_lower);
     register_demo!(runner, demo_digit_to_display_byte_upper);
     register_demo!(runner, demo_digit_to_display_byte_lower_targeted);
@@ -579,4 +580,19 @@ fn benchmark_base_fmt_wrapper_fmt_upper_with_width_signed<T: PrimitiveSigned>(
             ));
         })],
     );
+}
+
+// Sweeps every base from 2 through 62, including the case-sensitive large-base alphabet.
+fn demo_to_string_base_all_bases(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (i, x) in unsigned_gen::<u64>()
+        .get(gm, config)
+        .take(limit)
+        .enumerate()
+    {
+        let base = u8::try_from(i % 61).unwrap() + 2;
+        println!(
+            "({x}).to_string_base({base}) = {:?}",
+            x.to_string_base(base)
+        );
+    }
 }

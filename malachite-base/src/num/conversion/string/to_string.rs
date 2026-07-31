@@ -29,7 +29,7 @@ impl<T> BaseFmtWrapper<T> {
     /// Constant time and additional memory.
     ///
     /// # Panics
-    /// Panics if `base` is less than 2 or greater than 36.
+    /// Panics if `base` is less than 2 or greater than 62.
     ///
     /// # Examples
     /// ```
@@ -40,7 +40,7 @@ impl<T> BaseFmtWrapper<T> {
     /// assert_eq!(format!("{:#}", x), "GJDGXS");
     /// ```
     pub fn new(x: T, base: u8) -> Self {
-        assert!((2..=36).contains(&base), "base out of range");
+        assert!((2..=62).contains(&base), "base out of range");
         Self { x, base }
     }
 
@@ -117,12 +117,48 @@ pub const fn digit_to_display_byte_upper(b: u8) -> Option<u8> {
     }
 }
 
+/// Converts a digit to a byte corresponding to a numeric or alphabetic [`char`] in the large-base
+/// alphabet used for bases from 37 through 62, in which the uppercase and lowercase letters are
+/// distinct digits: `b'0'` through `b'9'` represent 0 through 9, `b'A'` through `b'Z'` represent 10
+/// through 35, and `b'a'` through `b'z'` represent 36 through 61, as in GMP.
+///
+/// Digits from 62 on are not associated with any byte, so [`None`] is returned.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::conversion::string::to_string::digit_to_display_byte_large;
+///
+/// assert_eq!(digit_to_display_byte_large(0), Some(b'0'));
+/// assert_eq!(digit_to_display_byte_large(10), Some(b'A'));
+/// assert_eq!(digit_to_display_byte_large(35), Some(b'Z'));
+/// assert_eq!(digit_to_display_byte_large(36), Some(b'a'));
+/// assert_eq!(digit_to_display_byte_large(61), Some(b'z'));
+/// assert_eq!(digit_to_display_byte_large(62), None);
+/// ```
+pub const fn digit_to_display_byte_large(b: u8) -> Option<u8> {
+    match b {
+        0..=9 => Some(b + b'0'),
+        10..=35 => Some(b + b'A' - 10),
+        36..=61 => Some(b + b'a' - 36),
+        _ => None,
+    }
+}
+
 fn fmt_unsigned<T: Copy + Digits<u8> + Eq + Zero>(
     w: &BaseFmtWrapper<T>,
     f: &mut Formatter,
 ) -> Result {
     let mut digits = w.x.to_digits_desc(&u8::wrapping_from(w.base));
-    if f.alternate() {
+    // Above base 36 the uppercase and lowercase letters are distinct digits, so there is only one
+    // alphabet and the `#` flag has no effect.
+    if w.base > 36 {
+        for digit in &mut digits {
+            *digit = digit_to_display_byte_large(*digit).unwrap();
+        }
+    } else if f.alternate() {
         for digit in &mut digits {
             *digit = digit_to_display_byte_upper(*digit).unwrap();
         }
@@ -138,26 +174,38 @@ fn fmt_unsigned<T: Copy + Digits<u8> + Eq + Zero>(
 }
 
 fn to_string_base_unsigned<T: Copy + Digits<u8> + Eq + Zero>(x: &T, base: u8) -> String {
-    assert!((2..=36).contains(&base), "base out of range");
+    assert!((2..=62).contains(&base), "base out of range");
     if *x == T::ZERO {
         "0".to_string()
     } else {
         let mut digits = x.to_digits_desc(&base);
+        let map = if base > 36 {
+            // above base 36 there is only one alphabet, with both cases as distinct digits
+            digit_to_display_byte_large
+        } else {
+            digit_to_display_byte_lower
+        };
         for digit in &mut digits {
-            *digit = digit_to_display_byte_lower(*digit).unwrap();
+            *digit = map(*digit).unwrap();
         }
         String::from_utf8(digits).unwrap()
     }
 }
 
 fn to_string_base_upper_unsigned<T: Copy + Digits<u8> + Eq + Zero>(x: &T, base: u8) -> String {
-    assert!((2..=36).contains(&base), "base out of range");
+    assert!((2..=62).contains(&base), "base out of range");
     if *x == T::ZERO {
         "0".to_string()
     } else {
         let mut digits = x.to_digits_desc(&base);
+        let map = if base > 36 {
+            // above base 36 there is only one alphabet, with both cases as distinct digits
+            digit_to_display_byte_large
+        } else {
+            digit_to_display_byte_upper
+        };
         for digit in &mut digits {
-            *digit = digit_to_display_byte_upper(*digit).unwrap();
+            *digit = map(*digit).unwrap();
         }
         String::from_utf8(digits).unwrap()
     }
@@ -170,6 +218,10 @@ macro_rules! impl_to_string_base_unsigned {
             ///
             /// If the base is greater than 10, lowercase alphabetic letters are used by default.
             /// Using the `#` flag switches to uppercase letters. Padding with zeros works as usual.
+            /// If the base is greater than 36, the uppercase and lowercase letters are distinct
+            /// digits (see
+            /// [`digit_to_display_byte_large`](super::to_string::digit_to_display_byte_large)), and
+            /// the `#` flag has no effect.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$
@@ -179,7 +231,7 @@ macro_rules! impl_to_string_base_unsigned {
             /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
             ///
             /// # Panics
-            /// Panics if `base` is less than 2 or greater than 36.
+            /// Panics if `base` is less than 2 or greater than 62.
             ///
             /// # Examples
             /// See [here](super::to_string).
@@ -194,6 +246,10 @@ macro_rules! impl_to_string_base_unsigned {
             ///
             /// If the base is greater than 10, lowercase alphabetic letters are used by default.
             /// Using the `#` flag switches to uppercase letters. Padding with zeros works as usual.
+            /// If the base is greater than 36, the uppercase and lowercase letters are distinct
+            /// digits (see
+            /// [`digit_to_display_byte_large`](super::to_string::digit_to_display_byte_large)), and
+            /// the `#` flag has no effect.
             ///
             /// This is the same as the [`Display::fmt`] implementation.
             ///
@@ -205,7 +261,7 @@ macro_rules! impl_to_string_base_unsigned {
             /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
             ///
             /// # Panics
-            /// Panics if `base` is less than 2 or greater than 36.
+            /// Panics if `base` is less than 2 or greater than 62.
             ///
             /// # Examples
             /// See [here](super::to_string).
@@ -218,8 +274,11 @@ macro_rules! impl_to_string_base_unsigned {
         impl ToStringBase for $t {
             /// Converts an unsigned number to a string using a specified base.
             ///
-            /// Digits from 0 to 9 become `char`s from '0' to '9'. Digits from 10 to 35 become the
-            /// lowercase [`char`]s 'a' to 'z'.
+            /// For bases up to 36, digits from 0 to 9 become [`char`]s from '0' to '9' and digits
+            /// from 10 to 35 become the lowercase [`char`]s 'a' to 'z'. For bases from 37 through
+            /// 62 the uppercase and lowercase letters are distinct digits, 'A' through 'Z'
+            /// representing 10 through 35 and 'a' through 'z' representing 36 through 61, as in
+            /// GMP.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$
@@ -229,7 +288,7 @@ macro_rules! impl_to_string_base_unsigned {
             /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
             ///
             /// # Panics
-            /// Panics if `base` is less than 2 or greater than 36.
+            /// Panics if `base` is less than 2 or greater than 62.
             ///
             /// # Examples
             /// See [here](super::to_string#to_string_base).
@@ -240,8 +299,11 @@ macro_rules! impl_to_string_base_unsigned {
 
             /// Converts an unsigned number to a string using a specified base.
             ///
-            /// Digits from 0 to 9 become `char`s from '0' to '9'. Digits from 10 to 35 become the
-            /// uppercase [`char`]s 'A' to 'Z'.
+            /// For bases up to 36, digits from 0 to 9 become [`char`]s from '0' to '9' and digits
+            /// from 10 to 35 become the uppercase [`char`]s 'A' to 'Z'. For bases from 37 through
+            /// 62 the uppercase and lowercase letters are distinct digits and there is only one
+            /// alphabet, so the result is the same as
+            /// [`to_string_base`](super::traits::ToStringBase::to_string_base)'s.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$
@@ -251,7 +313,7 @@ macro_rules! impl_to_string_base_unsigned {
             /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
             ///
             /// # Panics
-            /// Panics if `base` is less than 2 or greater than 36.
+            /// Panics if `base` is less than 2 or greater than 62.
             ///
             /// # Examples
             /// See [here](super::to_string#to_string_base_upper).
@@ -298,13 +360,19 @@ fn to_string_base_signed<U: Digits<u8>, S: Copy + Eq + Ord + UnsignedAbs<Output 
     x: &S,
     base: u8,
 ) -> String {
-    assert!((2..=36).contains(&base), "base out of range");
+    assert!((2..=62).contains(&base), "base out of range");
     if *x == S::ZERO {
         "0".to_string()
     } else {
         let mut digits = x.unsigned_abs().to_digits_desc(&u8::wrapping_from(base));
+        let map = if base > 36 {
+            // above base 36 there is only one alphabet, with both cases as distinct digits
+            digit_to_display_byte_large
+        } else {
+            digit_to_display_byte_lower
+        };
         for digit in &mut digits {
-            *digit = digit_to_display_byte_lower(*digit).unwrap();
+            *digit = map(*digit).unwrap();
         }
         if *x < S::ZERO {
             vec_pad_left(&mut digits, 1, b'-');
@@ -320,13 +388,19 @@ fn to_string_base_upper_signed<
     x: &S,
     base: u8,
 ) -> String {
-    assert!((2..=36).contains(&base), "base out of range");
+    assert!((2..=62).contains(&base), "base out of range");
     if *x == S::ZERO {
         "0".to_string()
     } else {
         let mut digits = x.unsigned_abs().to_digits_desc(&base);
+        let map = if base > 36 {
+            // above base 36 there is only one alphabet, with both cases as distinct digits
+            digit_to_display_byte_large
+        } else {
+            digit_to_display_byte_upper
+        };
         for digit in &mut digits {
-            *digit = digit_to_display_byte_upper(*digit).unwrap();
+            *digit = map(*digit).unwrap();
         }
         if *x < S::ZERO {
             vec_pad_left(&mut digits, 1, b'-');
@@ -342,6 +416,10 @@ macro_rules! impl_to_string_base_signed {
             ///
             /// If the base is greater than 10, lowercase alphabetic letters are used by default.
             /// Using the `#` flag switches to uppercase letters. Padding with zeros works as usual.
+            /// If the base is greater than 36, the uppercase and lowercase letters are distinct
+            /// digits (see
+            /// [`digit_to_display_byte_large`](super::to_string::digit_to_display_byte_large)), and
+            /// the `#` flag has no effect.
             ///
             /// Unlike with the default implementations of [`Binary`](std::fmt::Binary),
             /// [`Octal`](std::fmt::Octal), [`LowerHex`](std::fmt::LowerHex), and
@@ -356,7 +434,7 @@ macro_rules! impl_to_string_base_signed {
             /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
             ///
             /// # Panics
-            /// Panics if `base` is less than 2 or greater than 36.
+            /// Panics if `base` is less than 2 or greater than 62.
             ///
             /// # Examples
             /// See [here](super::to_string).
@@ -371,6 +449,10 @@ macro_rules! impl_to_string_base_signed {
             ///
             /// If the base is greater than 10, lowercase alphabetic letters are used by default.
             /// Using the `#` flag switches to uppercase letters. Padding with zeros works as usual.
+            /// If the base is greater than 36, the uppercase and lowercase letters are distinct
+            /// digits (see
+            /// [`digit_to_display_byte_large`](super::to_string::digit_to_display_byte_large)), and
+            /// the `#` flag has no effect.
             ///
             /// Unlike with the default implementations of [`Binary`](std::fmt::Binary),
             /// [`Octal`](std::fmt::Octal), [`LowerHex`](std::fmt::LowerHex), and
@@ -387,7 +469,7 @@ macro_rules! impl_to_string_base_signed {
             /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
             ///
             /// # Panics
-            /// Panics if `base` is less than 2 or greater than 36.
+            /// Panics if `base` is less than 2 or greater than 62.
             ///
             /// # Examples
             /// See [here](super::to_string).
@@ -400,8 +482,11 @@ macro_rules! impl_to_string_base_signed {
         impl ToStringBase for $s {
             /// Converts a signed number to a string using a specified base.
             ///
-            /// Digits from 0 to 9 become `char`s from '0' to '9'. Digits from 10 to 35 become the
-            /// lowercase [`char`]s 'a' to 'z'.
+            /// For bases up to 36, digits from 0 to 9 become [`char`]s from '0' to '9' and digits
+            /// from 10 to 35 become the lowercase [`char`]s 'a' to 'z'. For bases from 37 through
+            /// 62 the uppercase and lowercase letters are distinct digits, 'A' through 'Z'
+            /// representing 10 through 35 and 'a' through 'z' representing 36 through 61, as in
+            /// GMP.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$
@@ -411,7 +496,7 @@ macro_rules! impl_to_string_base_signed {
             /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
             ///
             /// # Panics
-            /// Panics if `base` is less than 2 or greater than 36.
+            /// Panics if `base` is less than 2 or greater than 62.
             ///
             /// # Examples
             /// See [here](super::to_string#to_string_base).
@@ -422,8 +507,11 @@ macro_rules! impl_to_string_base_signed {
 
             /// Converts a signed number to a string using a specified base.
             ///
-            /// Digits from 0 to 9 become `char`s from '0' to '9'. Digits from 10 to 35 become the
-            /// uppercase [`char`]s 'A' to 'Z'.
+            /// For bases up to 36, digits from 0 to 9 become [`char`]s from '0' to '9' and digits
+            /// from 10 to 35 become the uppercase [`char`]s 'A' to 'Z'. For bases from 37 through
+            /// 62 the uppercase and lowercase letters are distinct digits and there is only one
+            /// alphabet, so the result is the same as
+            /// [`to_string_base`](super::traits::ToStringBase::to_string_base)'s.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$
@@ -433,7 +521,7 @@ macro_rules! impl_to_string_base_signed {
             /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
             ///
             /// # Panics
-            /// Panics if `base` is less than 2 or greater than 36.
+            /// Panics if `base` is less than 2 or greater than 62.
             ///
             /// # Examples
             /// See [here](super::to_string#to_string_base_upper).

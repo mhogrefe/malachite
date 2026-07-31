@@ -26,6 +26,7 @@ use malachite_nz::test_util::generators::{
 use malachite_nz::test_util::natural::conversion::string::to_string::to_string_base_naive;
 
 pub(crate) fn register(runner: &mut Runner) {
+    register_demo!(runner, demo_natural_to_string_base_all_bases);
     register_demo!(runner, demo_natural_to_string);
     register_demo!(runner, demo_natural_to_string_with_width);
     register_demo!(runner, demo_natural_to_binary_string);
@@ -818,4 +819,15 @@ fn benchmark_natural_base_fmt_wrapper_fmt_upper_with_width(
             ));
         })],
     );
+}
+
+// Sweeps every base from 2 through 62, including the case-sensitive large-base alphabet.
+fn demo_natural_to_string_base_all_bases(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (i, x) in natural_gen().get(gm, config).take(limit).enumerate() {
+        let base = u8::try_from(i % 61).unwrap() + 2;
+        println!(
+            "({x}).to_string_base({base}) = {:?}",
+            x.to_string_base(base)
+        );
+    }
 }

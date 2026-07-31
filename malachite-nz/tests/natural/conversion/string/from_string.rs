@@ -232,3 +232,51 @@ fn from_string_base_properties() {
         );
     });
 }
+
+#[test]
+fn test_from_string_base_large() {
+    fn test(base: u8, s: &str, out: Option<u64>) {
+        assert_eq!(
+            Natural::from_string_base(base, s),
+            out.map(Natural::from),
+            "{base} {s}"
+        );
+    }
+    test(62, "0", Some(0));
+    test(62, "A", Some(10));
+    test(62, "Z", Some(35));
+    test(62, "a", Some(36));
+    test(62, "z", Some(61));
+    test(62, "10", Some(62));
+    test(62, "G8", Some(1000));
+    test(62, "+G8", Some(1000));
+    test(62, "00G8", Some(1000));
+    test(37, "R1", Some(1000));
+    // above base 36 the two cases are distinct digits...
+    test(62, "g8", Some(2612));
+    // ...and a digit's value must still be smaller than the base
+    test(37, "a", Some(36));
+    test(37, "b", None);
+    test(38, "b", Some(37));
+    test(62, "-G8", None);
+    test(62, "", None);
+    test(62, "!", None);
+}
+
+#[test]
+fn from_string_base_large_properties() {
+    use crate::natural::conversion::string::to_string::gmp_to_string_base;
+    use malachite_nz::test_util::generators::natural_gen;
+    natural_gen().test_properties(|x| {
+        let rx = rug::Integer::from(&x);
+        for base in 37..=62u8 {
+            // reading back GMP's own digits gives the value back
+            let s = gmp_to_string_base(&rx, i32::from(base));
+            assert_eq!(
+                Natural::from_string_base(base, &s).unwrap(),
+                x,
+                "{x} {base}"
+            );
+        }
+    });
+}

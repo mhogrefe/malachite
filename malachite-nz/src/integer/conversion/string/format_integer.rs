@@ -50,8 +50,8 @@ use malachite_base::strings::gmp_format::{GmpConversionSpec, GmpFormatArg};
 ///
 /// # Examples
 /// ```
-/// use malachite_nz::integer::Integer;
 /// use malachite_nz::integer::conversion::string::format_integer::format_integer_str;
+/// use malachite_nz::integer::Integer;
 ///
 /// let x = Integer::from(-255);
 /// assert_eq!(format_integer_str(&x, "%Zd"), Some("-255".to_string()));
@@ -59,13 +59,19 @@ use malachite_base::strings::gmp_format::{GmpConversionSpec, GmpFormatArg};
 /// assert_eq!(format_integer_str(&x, "%#ZX"), Some("-0XFF".to_string()));
 /// assert_eq!(format_integer_str(&x, "%#Zo"), Some("-0377".to_string()));
 /// assert_eq!(format_integer_str(&x, "%8Zd"), Some("    -255".to_string()));
-/// assert_eq!(format_integer_str(&x, "%08Zd"), Some("-0000255".to_string()));
+/// assert_eq!(
+///     format_integer_str(&x, "%08Zd"),
+///     Some("-0000255".to_string())
+/// );
 /// assert_eq!(format_integer_str(&x, "%.6Zd"), Some("-000255".to_string()));
 ///
 /// let x = Integer::from(255);
 /// assert_eq!(format_integer_str(&x, "%+Zd"), Some("+255".to_string()));
 /// assert_eq!(format_integer_str(&x, "% Zd"), Some(" 255".to_string()));
-/// assert_eq!(format_integer_str(&x, "x = %Zd!"), Some("x = 255!".to_string()));
+/// assert_eq!(
+///     format_integer_str(&x, "x = %Zd!"),
+///     Some("x = 255!".to_string())
+/// );
 ///
 /// // invalid or unsupported format strings
 /// assert_eq!(format_integer_str(&x, "%d"), None);

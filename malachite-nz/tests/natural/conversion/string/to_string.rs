@@ -738,13 +738,13 @@ pub fn test_to_string_base() {
 fn to_string_base_fail() {
     assert_panic!(Natural::from(10u32).to_string_base(0));
     assert_panic!(Natural::from(10u32).to_string_base(1));
-    assert_panic!(Natural::from(10u32).to_string_base(37));
+    assert_panic!(Natural::from(10u32).to_string_base(63));
     assert_panic!(Natural::from(10u32).to_string_base(100));
     assert_panic!(format!("{}", BaseFmtWrapper::new(&Natural::from(10u32), 0)));
     assert_panic!(format!("{}", BaseFmtWrapper::new(&Natural::from(10u32), 1)));
     assert_panic!(format!(
         "{}",
-        BaseFmtWrapper::new(&Natural::from(10u32), 37)
+        BaseFmtWrapper::new(&Natural::from(10u32), 63)
     ));
     assert_panic!(format!(
         "{}",
@@ -914,7 +914,7 @@ pub fn test_to_string_base_upper() {
 fn to_string_base_upper_fail() {
     assert_panic!(Natural::from(10u32).to_string_base_upper(0));
     assert_panic!(Natural::from(10u32).to_string_base_upper(1));
-    assert_panic!(Natural::from(10u32).to_string_base_upper(37));
+    assert_panic!(Natural::from(10u32).to_string_base_upper(63));
     assert_panic!(Natural::from(10u32).to_string_base_upper(100));
     assert_panic!(format!(
         "{:#}",
@@ -926,7 +926,7 @@ fn to_string_base_upper_fail() {
     ));
     assert_panic!(format!(
         "{:#}",
-        BaseFmtWrapper::new(&Natural::from(10u32), 37)
+        BaseFmtWrapper::new(&Natural::from(10u32), 63)
     ));
     assert_panic!(format!(
         "{:#}",
@@ -1016,5 +1016,73 @@ fn to_string_base_upper_properties() {
                 width = width
             ),
         );
+    });
+}
+
+// Converts `x` to a string in `base` using GMP's own `mpz_get_str` (linked in via rug), writing
+// into a caller-supplied buffer so that no GMP-allocated memory needs freeing. A negative base
+// selects uppercase digits, as in GMP.
+pub fn gmp_to_string_base(x: &rug::Integer, base: i32) -> String {
+    unsafe extern "C" {
+        fn __gmpz_get_str(
+            buf: *mut core::ffi::c_char,
+            base: core::ffi::c_int,
+            op: *const core::ffi::c_void,
+        ) -> *mut core::ffi::c_char;
+    }
+    let mut buf = vec![0u8; usize::try_from(x.significant_bits()).unwrap() + 3];
+    unsafe {
+        __gmpz_get_str(
+            buf.as_mut_ptr().cast(),
+            base,
+            x.as_raw() as *const core::ffi::c_void,
+        );
+    }
+    let end = buf.iter().position(|&b| b == 0).unwrap();
+    String::from_utf8_lossy(&buf[..end]).into_owned()
+}
+
+#[test]
+fn test_to_string_base_large() {
+    fn test(x: u64, base: u8, out: &str) {
+        let n = Natural::from(x);
+        assert_eq!(n.to_string_base(base), out);
+        // above base 36 there is only one alphabet, so the uppercase variant is the same
+        assert_eq!(n.to_string_base_upper(base), out);
+        assert_eq!(
+            gmp_to_string_base(&rug::Integer::from(x), i32::from(base)),
+            out
+        );
+    }
+    test(0, 62, "0");
+    test(10, 62, "A");
+    test(35, 62, "Z");
+    test(36, 62, "a");
+    test(61, 62, "z");
+    test(62, 62, "10");
+    test(1000, 62, "G8");
+    test(1000, 37, "R1");
+    test(1000, 61, "GO");
+}
+
+#[test]
+fn to_string_base_large_properties() {
+    natural_gen().test_properties(|x| {
+        let rx = rug::Integer::from(&x);
+        for base in 2..=62u8 {
+            let s = x.to_string_base(base);
+            // the primary oracle: GMP's own mpz_get_str
+            assert_eq!(gmp_to_string_base(&rx, i32::from(base)), s, "{x} {base}");
+            // round trip
+            assert_eq!(Natural::from_string_base(base, &s).unwrap(), x);
+            let su = x.to_string_base_upper(base);
+            if base > 36 {
+                // above base 36 there is only one alphabet
+                assert_eq!(su, s);
+            } else {
+                // GMP's negative bases select uppercase digits
+                assert_eq!(gmp_to_string_base(&rx, -i32::from(base)), su);
+            }
+        }
     });
 }

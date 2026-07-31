@@ -13,7 +13,9 @@ use crate::platform::{Limb, MAX_DIGITS_PER_LIMB};
 use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{ModPowerOf2, ShrRound};
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::conversion::string::from_string::digit_from_display_byte;
+use malachite_base::num::conversion::string::from_string::{
+    digit_from_display_byte, digit_from_display_byte_large,
+};
 use malachite_base::num::conversion::traits::{Digits, ExactFrom, FromStringBase, WrappingFrom};
 use malachite_base::rounding_modes::RoundingMode::*;
 
@@ -174,6 +176,9 @@ impl FromStringBase for Natural {
     /// string must be nonempty and only contain the [`char`]s `'0'` through `'9'`, `'a'` through
     /// `'z'`, and `'A'` through `'Z'`, with an optional single leading `'+'`; and only characters
     /// that represent digits smaller than the base are allowed. Leading zeros are always allowed.
+    /// For bases up to 36 the uppercase and lowercase letters are interchangeable; for bases from
+    /// 37 through 62 they are distinct digits, `'A'` through `'Z'` representing 10 through 35 and
+    /// `'a'` through `'z'` representing 36 through 61, as in GMP.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$
@@ -183,7 +188,7 @@ impl FromStringBase for Natural {
     /// where $T$ is time, $M$ is additional memory, and $n$ is `s.len()`.
     ///
     /// # Panics
-    /// Panics if `base` is less than 2 or greater than 36.
+    /// Panics if `base` is less than 2 or greater than 62.
     ///
     /// # Examples
     /// ```
@@ -206,10 +211,23 @@ impl FromStringBase for Natural {
     /// assert!(Natural::from_string_base(10, "a").is_none());
     /// assert!(Natural::from_string_base(10, "-5").is_none());
     /// assert!(Natural::from_string_base(2, "2").is_none());
+    ///
+    /// // above base 36, the uppercase and lowercase letters are distinct digits
+    /// assert_eq!(Natural::from_string_base(62, "G8").unwrap(), 1000);
+    /// assert_eq!(Natural::from_string_base(62, "g8").unwrap(), 2612);
     /// ```
     #[inline]
     fn from_string_base(base: u8, mut s: &str) -> Option<Self> {
-        assert!((2..=36).contains(&base), "base out of range");
+        assert!((2..=62).contains(&base), "base out of range");
+        // A single leading `+` is allowed whatever the base. It is stripped here, before the
+        // dispatch, so that every branch sees the bare digits; a second sign after it is an error
+        // (the branches that delegate to `from_str_radix` would otherwise accept one of their own).
+        if let Some(rest) = s.strip_prefix('+') {
+            if rest.starts_with(['+', '-']) {
+                return None;
+            }
+            s = rest;
+        }
         if s.is_empty() {
             None
         } else {
@@ -232,15 +250,21 @@ impl FromStringBase for Natural {
                     }
                 }
                 _ => {
+                    // above base 36, the uppercase and lowercase letters are distinct digits
+                    let map = if base <= 36 {
+                        digit_from_display_byte
+                    } else {
+                        digit_from_display_byte_large
+                    };
                     for b in s.bytes() {
-                        let digit = digit_from_display_byte(b)?;
+                        let digit = map(b)?;
                         if digit >= base {
                             return None;
                         }
                     }
                     Self::from_digits_desc(
                         &u8::wrapping_from(base),
-                        s.bytes().map(|b| digit_from_display_byte(b).unwrap()),
+                        s.bytes().map(|b| map(b).unwrap()),
                     )
                 }
             }

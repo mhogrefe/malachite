@@ -885,11 +885,11 @@ pub fn test_to_string_base() {
 fn to_string_base_fail() {
     assert_panic!(Integer::from(10).to_string_base(0));
     assert_panic!(Integer::from(10).to_string_base(1));
-    assert_panic!(Integer::from(10).to_string_base(37));
+    assert_panic!(Integer::from(10).to_string_base(63));
     assert_panic!(Integer::from(10).to_string_base(100));
     assert_panic!(format!("{}", BaseFmtWrapper::new(&Integer::from(10), 0)));
     assert_panic!(format!("{}", BaseFmtWrapper::new(&Integer::from(10), 1)));
-    assert_panic!(format!("{}", BaseFmtWrapper::new(&Integer::from(10), 37)));
+    assert_panic!(format!("{}", BaseFmtWrapper::new(&Integer::from(10), 63)));
     assert_panic!(format!("{}", BaseFmtWrapper::new(&Integer::from(10), 100)));
 }
 
@@ -1098,11 +1098,11 @@ pub fn test_to_string_base_upper() {
 fn to_string_base_upper_fail() {
     assert_panic!(Integer::from(10).to_string_base_upper(0));
     assert_panic!(Integer::from(10).to_string_base_upper(1));
-    assert_panic!(Integer::from(10).to_string_base_upper(37));
+    assert_panic!(Integer::from(10).to_string_base_upper(63));
     assert_panic!(Integer::from(10).to_string_base_upper(100));
     assert_panic!(format!("{:#}", BaseFmtWrapper::new(&Integer::from(10), 0)));
     assert_panic!(format!("{:#}", BaseFmtWrapper::new(&Integer::from(10), 1)));
-    assert_panic!(format!("{:#}", BaseFmtWrapper::new(&Integer::from(10), 37)));
+    assert_panic!(format!("{:#}", BaseFmtWrapper::new(&Integer::from(10), 63)));
     assert_panic!(format!(
         "{:#}",
         BaseFmtWrapper::new(&Integer::from(10), 100)

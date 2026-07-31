@@ -271,8 +271,8 @@ impl GmpFormatArg for Natural {
 ///
 /// # Examples
 /// ```
-/// use malachite_nz::natural::Natural;
 /// use malachite_nz::natural::conversion::string::format_natural::format_natural_str;
+/// use malachite_nz::natural::Natural;
 ///
 /// let x = Natural::from(255u32);
 /// assert_eq!(format_natural_str(&x, "%Zd"), Some("255".to_string()));
@@ -280,15 +280,30 @@ impl GmpFormatArg for Natural {
 /// assert_eq!(format_natural_str(&x, "%#ZX"), Some("0XFF".to_string()));
 /// assert_eq!(format_natural_str(&x, "%#Zo"), Some("0377".to_string()));
 /// assert_eq!(format_natural_str(&x, "%8Zd"), Some("     255".to_string()));
-/// assert_eq!(format_natural_str(&x, "%-8Zd|"), Some("255     |".to_string()));
-/// assert_eq!(format_natural_str(&x, "%08Zd"), Some("00000255".to_string()));
+/// assert_eq!(
+///     format_natural_str(&x, "%-8Zd|"),
+///     Some("255     |".to_string())
+/// );
+/// assert_eq!(
+///     format_natural_str(&x, "%08Zd"),
+///     Some("00000255".to_string())
+/// );
 /// assert_eq!(format_natural_str(&x, "%.6Zd"), Some("000255".to_string()));
 /// assert_eq!(format_natural_str(&x, "%+Zd"), Some("+255".to_string()));
-/// assert_eq!(format_natural_str(&x, "x = %Zd!"), Some("x = 255!".to_string()));
-/// assert_eq!(format_natural_str(&x, "100%% of %Zd"), Some("100% of 255".to_string()));
+/// assert_eq!(
+///     format_natural_str(&x, "x = %Zd!"),
+///     Some("x = 255!".to_string())
+/// );
+/// assert_eq!(
+///     format_natural_str(&x, "100%% of %Zd"),
+///     Some("100% of 255".to_string())
+/// );
 ///
 /// // a zero value with an explicit precision of 0 produces no digits
-/// assert_eq!(format_natural_str(&Natural::from(0u32), "%.0Zd"), Some("".to_string()));
+/// assert_eq!(
+///     format_natural_str(&Natural::from(0u32), "%.0Zd"),
+///     Some("".to_string())
+/// );
 ///
 /// // invalid or unsupported format strings
 /// assert_eq!(format_natural_str(&x, "%d"), None);

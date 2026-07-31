@@ -164,7 +164,7 @@ than rounds. Passing `Down` reproduces GMP exactly.
 | ≈ | `void mpz_set_d (mpz_t rop, double op)` | [`RoundingFrom`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/conversion/from_primitive_float/index.html), [`TryFrom`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/conversion/from_primitive_float/index.html) |
 | ≈ | `void mpz_set_q (mpz_t rop, const mpq_t op)` | [`RoundingFrom`](https://docs.rs/malachite-q/latest/malachite_q/rational/conversion/integer_from_rational/index.html), [`TryFrom`](https://docs.rs/malachite-q/latest/malachite_q/rational/conversion/integer_from_rational/index.html) |
 | ≈ | `void mpz_set_f (mpz_t rop, const mpf_t op)` | [`RoundingFrom`](https://docs.rs/malachite-float/latest/malachite_float/float/conversion/integer_from_float/index.html), [`TryFrom`](https://docs.rs/malachite-float/latest/malachite_float/float/conversion/integer_from_float/index.html) |
-| ✗ | `int mpz_set_str (mpz_t rop, const char *str, int base)` | [`FromStringBase`](https://docs.rs/malachite-base/latest/malachite_base/num/conversion/traits/trait.FromStringBase.html), [`FromStr`](https://doc.rust-lang.org/nightly/std/str/trait.FromStr.html) |
+| ✓ | `int mpz_set_str (mpz_t rop, const char *str, int base)` | [`FromStringBase`](https://docs.rs/malachite-base/latest/malachite_base/num/conversion/traits/trait.FromStringBase.html), [`FromStr`](https://doc.rust-lang.org/nightly/std/str/trait.FromStr.html) |
 | — | `void mpz_swap (mpz_t rop1, mpz_t rop2)` | |
 
 **`mpz_set`.** `x = y.clone()`, or `x.clone_from(&y)` if `x` already holds a value whose allocation
@@ -203,12 +203,11 @@ return an [`Option`](https://doc.rust-lang.org/nightly/std/option/enum.Option.ht
 shorthand [`FromStr`](https://doc.rust-lang.org/nightly/std/str/trait.FromStr.html), letting you
 write `"1234".parse::<Integer>()`.
 
-Malachite currently accepts bases 2 through 36, where GMP goes up to 62 by giving upper- and
-lower-case letters different values; it will accept the same range in a future version. It already
-does so for [`Float`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html),
-whose string conversions follow MPFR and reach base 62, so the limit is an inconsistency within
-Malachite as much as a difference from GMP. Malachite also has no equivalent of GMP's base 0, which
-infers the base from a `0x`, `0b`, or `0` prefix.
+The full base range is supported: 2 through 62, with GMP's convention that bases up to 36 read
+the upper- and lower-case letters interchangeably while bases above 36 give them distinct values,
+`A` through `Z` meaning 10 through 35 and `a` through `z` meaning 36 through 61. Malachite also
+accepts an optional leading `+`, which GMP does not. It has no equivalent of GMP's base 0, which
+infers the base from a `0x`, `0b`, or `0` prefix; strip the prefix and pass the base explicitly.
 
 **`mpz_swap`.** [`std::mem::swap`](https://doc.rust-lang.org/nightly/std/mem/fn.swap.html) swaps
 any two values of the same type, and for a `Natural` or an `Integer` it is the same pointer
@@ -228,7 +227,7 @@ analogue, rather than these.
 | ✓ | `void mpz_init_set_ui (mpz_t rop, unsigned long int op)` | [`From`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/conversion/from_primitive_int/index.html) |
 | ✓ | `void mpz_init_set_si (mpz_t rop, signed long int op)` | [`From`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/conversion/from_primitive_int/index.html), [`TryFrom`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/conversion/from_primitive_int/index.html) |
 | ≈ | `void mpz_init_set_d (mpz_t rop, double op)` | [`RoundingFrom`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/conversion/from_primitive_float/index.html), [`TryFrom`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/conversion/from_primitive_float/index.html) |
-| ✗ | `int mpz_init_set_str (mpz_t rop, const char *str, int base)` | [`FromStringBase`](https://docs.rs/malachite-base/latest/malachite_base/num/conversion/traits/trait.FromStringBase.html), [`FromStr`](https://doc.rust-lang.org/nightly/std/str/trait.FromStr.html) |
+| ✓ | `int mpz_init_set_str (mpz_t rop, const char *str, int base)` | [`FromStringBase`](https://docs.rs/malachite-base/latest/malachite_base/num/conversion/traits/trait.FromStringBase.html), [`FromStr`](https://doc.rust-lang.org/nightly/std/str/trait.FromStr.html) |
 
 Each row behaves as its `mpz_set_*` counterpart in
 [Assigning Integers](#assigning-integers) does, including the explicit rounding that `mpz_init_set_d`
@@ -265,7 +264,7 @@ is the `mpz_fits_*_p` predicate.
 | ≈ | `signed long int mpz_get_si (const mpz_t op)` | [`TryFrom`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/conversion/primitive_int_from_integer/index.html), [`WrappingFrom`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/conversion/primitive_int_from_integer/index.html), [`SaturatingFrom`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/conversion/primitive_int_from_integer/index.html) |
 | ≈ | `double mpz_get_d (const mpz_t op)` | [`RoundingFrom`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/conversion/primitive_float_from_natural/index.html), [`TryFrom`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/conversion/primitive_float_from_natural/index.html) |
 | ≈ | `double mpz_get_d_2exp (signed long int *exp, const mpz_t op)` | [`SciMantissaAndExponent`](https://docs.rs/malachite-base/latest/malachite_base/num/conversion/traits/trait.SciMantissaAndExponent.html) |
-| ✗ | `char * mpz_get_str (char *str, int base, const mpz_t op)` | [`ToStringBase`](https://docs.rs/malachite-base/latest/malachite_base/num/conversion/traits/trait.ToStringBase.html), [`Display`](https://doc.rust-lang.org/nightly/std/fmt/trait.Display.html) |
+| ✓ | `char * mpz_get_str (char *str, int base, const mpz_t op)` | [`ToStringBase`](https://docs.rs/malachite-base/latest/malachite_base/num/conversion/traits/trait.ToStringBase.html), [`Display`](https://doc.rust-lang.org/nightly/std/fmt/trait.Display.html) |
 
 **`mpz_get_ui`.** For a
 [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html),
@@ -303,12 +302,12 @@ and the `{:b}`, `{:o}`, and `{:x}` formats covering the common bases. Malachite 
 [`String`](https://doc.rust-lang.org/nightly/std/string/struct.String.html), so there is no buffer
 to size with `mpz_sizeinbase` and no allocation to free.
 
-As with [`mpz_set_str`](#assigning-integers), the base range is narrower than GMP's for now:
-Malachite accepts 2 through 36 and will accept 2 through 62 in a future version, matching
-[`Float`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html), whose
-string conversions follow MPFR and already reach base 62. GMP additionally accepts negative bases
-from −2 to −36, which select upper-case digits; Malachite spells that as a separate method rather
-than as a sign on the base.
+As with [`mpz_set_str`](#assigning-integers), the full base range is supported: 2 through 62,
+with GMP's alphabet, in which the bases above 36 give the upper- and lower-case letters distinct
+values, `A` through `Z` meaning 10 through 35 and `a` through `z` meaning 36 through 61. GMP
+additionally accepts negative bases from −2 to −36, which select upper-case digits; Malachite
+spells that as a separate method, `to_string_base_upper`, rather than as a sign on the base, and
+above base 36, where there is only one alphabet, the two methods agree.
 
 ## [Arithmetic Functions](https://gmplib.org/manual/Integer-Arithmetic) {#arithmetic-functions}
 
@@ -846,8 +845,8 @@ and [`CountZeros`](https://docs.rs/malachite-base/latest/malachite_base/num/logi
 
 | | GMP | Malachite |
 | :---: | --- | --- |
-| ✗ | `size_t mpz_out_str (FILE *stream, int base, const mpz_t op)` | [`ToStringBase`](https://docs.rs/malachite-base/latest/malachite_base/num/conversion/traits/trait.ToStringBase.html), [`Display`](https://doc.rust-lang.org/nightly/std/fmt/trait.Display.html) |
-| ✗ | `size_t mpz_inp_str (mpz_t rop, FILE *stream, int base)` | [`FromStringBase`](https://docs.rs/malachite-base/latest/malachite_base/num/conversion/traits/trait.FromStringBase.html), [`FromStr`](https://doc.rust-lang.org/nightly/std/str/trait.FromStr.html) |
+| ✓ | `size_t mpz_out_str (FILE *stream, int base, const mpz_t op)` | [`ToStringBase`](https://docs.rs/malachite-base/latest/malachite_base/num/conversion/traits/trait.ToStringBase.html), [`Display`](https://doc.rust-lang.org/nightly/std/fmt/trait.Display.html) |
+| ✓ | `size_t mpz_inp_str (mpz_t rop, FILE *stream, int base)` | [`FromStringBase`](https://docs.rs/malachite-base/latest/malachite_base/num/conversion/traits/trait.FromStringBase.html), [`FromStr`](https://doc.rust-lang.org/nightly/std/str/trait.FromStr.html) |
 | ≈ | `size_t mpz_out_raw (FILE *stream, const mpz_t op)` | [`Serialize`](https://docs.rs/serde/latest/serde/trait.Serialize.html) |
 | ≈ | `size_t mpz_inp_raw (mpz_t rop, FILE *stream)` | [`Deserialize`](https://docs.rs/serde/latest/serde/trait.Deserialize.html) |
 
@@ -857,9 +856,9 @@ one means pulling a token out of your reader and handing it to
 [`FromStr`](https://doc.rust-lang.org/nightly/std/str/trait.FromStr.html). Nothing in Malachite needs to know about streams, and
 you are not restricted to `stdio` the way `mpz_out_str` is.
 
-What keeps the first two rows at ✗ is the base, not the stream. `mpz_out_str` and `mpz_inp_str`
-are `mpz_get_str` and `mpz_set_str` with a stream attached, so they inherit the same gap:
-Malachite accepts bases 2 through 36 today and will accept 2 through 62 in a future version. See
+`mpz_out_str` and `mpz_inp_str` are `mpz_get_str` and `mpz_set_str` with a stream attached, so
+their rows follow those functions': the full base range of 2 through 62 is supported, and the
+stream half is `write!` and your reader. See
 [Conversion Functions](#conversion-functions) for the details, including GMP's negative bases and
 its base-0 prefix detection.
 

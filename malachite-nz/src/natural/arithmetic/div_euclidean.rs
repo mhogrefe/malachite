@@ -112,7 +112,10 @@ impl DivEuclidean<Natural> for &Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// // 2 * 10 + 3 = 23
-    /// assert_eq!((&Natural::from(23u32)).div_euclidean(Natural::from(10u32)), 2);
+    /// assert_eq!(
+    ///     (&Natural::from(23u32)).div_euclidean(Natural::from(10u32)),
+    ///     2
+    /// );
     /// ```
     #[inline]
     fn div_euclidean(self, other: Natural) -> Natural {
@@ -149,7 +152,10 @@ impl DivEuclidean<&Natural> for &Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// // 2 * 10 + 3 = 23
-    /// assert_eq!((&Natural::from(23u32)).div_euclidean(&Natural::from(10u32)), 2);
+    /// assert_eq!(
+    ///     (&Natural::from(23u32)).div_euclidean(&Natural::from(10u32)),
+    ///     2
+    /// );
     /// ```
     #[inline]
     fn div_euclidean(self, other: &Natural) -> Natural {

@@ -12,7 +12,8 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::string::to_string::{
-    BaseFmtWrapper, digit_to_display_byte_lower, digit_to_display_byte_upper,
+    BaseFmtWrapper, digit_to_display_byte_large, digit_to_display_byte_lower,
+    digit_to_display_byte_upper,
 };
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::strings::{
@@ -301,7 +302,7 @@ pub fn test_to_string_base() {
 fn to_string_base_fail_helper<T: PrimitiveInt>() {
     assert_panic!(T::exact_from(100).to_string_base(0));
     assert_panic!(T::exact_from(100).to_string_base(1));
-    assert_panic!(T::exact_from(100).to_string_base(37));
+    assert_panic!(T::exact_from(100).to_string_base(63));
     assert_panic!(T::exact_from(100).to_string_base(100));
 }
 
@@ -620,7 +621,7 @@ pub fn test_to_string_base_upper() {
 fn to_string_base_upper_fail_helper<T: PrimitiveInt>() {
     assert_panic!(T::exact_from(100).to_string_base_upper(0));
     assert_panic!(T::exact_from(100).to_string_base_upper(1));
-    assert_panic!(T::exact_from(100).to_string_base_upper(37));
+    assert_panic!(T::exact_from(100).to_string_base_upper(63));
     assert_panic!(T::exact_from(100).to_string_base_upper(100));
 }
 
@@ -789,4 +790,68 @@ where
 fn to_string_base_upper_properties() {
     apply_fn_to_unsigneds!(to_string_base_upper_helper_unsigned);
     apply_fn_to_signeds!(to_string_base_upper_helper_signed);
+}
+
+#[test]
+fn test_digit_to_display_byte_large() {
+    // spot checks beyond the doctest: the three alphabet segments and their boundaries
+    assert_eq!(digit_to_display_byte_large(9), Some(b'9'));
+    assert_eq!(digit_to_display_byte_large(11), Some(b'B'));
+    assert_eq!(digit_to_display_byte_large(37), Some(b'b'));
+    assert_eq!(digit_to_display_byte_large(u8::MAX), None);
+}
+
+#[test]
+fn test_to_string_base_large() {
+    fn test_u<T: PrimitiveUnsigned>(x: T, base: u8, out: &str) {
+        assert_eq!(x.to_string_base(base), out);
+        // above base 36 there is only one alphabet, so the uppercase variant is the same
+        assert_eq!(x.to_string_base_upper(base), out);
+    }
+    test_u(0u8, 62, "0");
+    test_u(10u16, 62, "A");
+    test_u(36u32, 62, "a");
+    test_u(61u64, 62, "z");
+    test_u(62u128, 62, "10");
+    test_u(1000usize, 62, "G8");
+    test_u(1000u32, 37, "R1");
+    test_u(1000u32, 61, "GO");
+
+    fn test_s<T: PrimitiveSigned>(x: T, base: u8, out: &str) {
+        assert_eq!(x.to_string_base(base), out);
+        assert_eq!(x.to_string_base_upper(base), out);
+    }
+    test_s(1000i32, 62, "G8");
+    test_s(-1000i32, 62, "-G8");
+    test_s(-61i8, 62, "-z");
+}
+
+#[test]
+fn to_string_base_large_properties() {
+    fn props_u<T: PrimitiveUnsigned>() {
+        unsigned_gen::<T>().test_properties(|x| {
+            for base in 2..=62u8 {
+                let s = x.to_string_base(base);
+                // round trip
+                assert_eq!(T::from_string_base(base, &s), Some(x));
+                let su = x.to_string_base_upper(base);
+                if base > 36 {
+                    // above base 36 there is only one alphabet
+                    assert_eq!(su, s);
+                } else {
+                    assert_eq!(su, s.to_ascii_uppercase());
+                }
+            }
+        });
+    }
+    apply_fn_to_unsigneds!(props_u);
+    fn props_s<T: PrimitiveSigned>() {
+        signed_gen::<T>().test_properties(|x| {
+            for base in 2..=62u8 {
+                let s = x.to_string_base(base);
+                assert_eq!(T::from_string_base(base, &s), Some(x));
+            }
+        });
+    }
+    apply_fn_to_signeds!(props_s);
 }

@@ -12,7 +12,7 @@ use alloc::string::String;
 use alloc::string::ToString;
 use core::fmt::{Binary, Debug, Display, Formatter, LowerHex, Octal, Result, UpperHex, Write};
 use malachite_base::num::conversion::string::to_string::{
-    digit_to_display_byte_lower, digit_to_display_byte_upper,
+    digit_to_display_byte_large, digit_to_display_byte_lower, digit_to_display_byte_upper,
 };
 use malachite_base::num::conversion::traits::{Digits, ToStringBase};
 use malachite_base::vecs::vec_pad_left;
@@ -21,7 +21,8 @@ impl Display for BaseFmtWrapper<&Integer> {
     /// Writes a wrapped [`Integer`] to a string using a specified base.
     ///
     /// If the base is greater than 10, lowercase alphabetic letters are used by default. Using the
-    /// `#` flag switches to uppercase letters. Padding with zeros works as usual.
+    /// `#` flag switches to uppercase letters (it has no effect above base 36, where the two cases
+    /// are distinct digits). Padding with zeros works as usual.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$
@@ -31,7 +32,7 @@ impl Display for BaseFmtWrapper<&Integer> {
     /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
-    /// Panics if `base` is less than 2 or greater than 36.
+    /// Panics if `base` is less than 2 or greater than 62.
     ///
     /// # Examples
     /// ```
@@ -77,7 +78,8 @@ impl Debug for BaseFmtWrapper<&Integer> {
     /// Writes a wrapped [`Integer`] to a string using a specified base.
     ///
     /// If the base is greater than 10, lowercase alphabetic letters are used by default. Using the
-    /// `#` flag switches to uppercase letters. Padding with zeros works as usual.
+    /// `#` flag switches to uppercase letters (it has no effect above base 36, where the two cases
+    /// are distinct digits). Padding with zeros works as usual.
     ///
     /// This is the same as the [`Display::fmt`] implementation.
     ///
@@ -89,7 +91,7 @@ impl Debug for BaseFmtWrapper<&Integer> {
     /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
-    /// Panics if `base` is less than 2 or greater than 36.
+    /// Panics if `base` is less than 2 or greater than 62.
     ///
     /// # Examples
     /// ```
@@ -112,8 +114,10 @@ impl Debug for BaseFmtWrapper<&Integer> {
 impl ToStringBase for Integer {
     /// Converts an [`Integer`] to a [`String`] using a specified base.
     ///
-    /// Digits from 0 to 9 become [`char`]s from `'0'` to `'9'`. Digits from 10 to 35 become the
-    /// lowercase [`char`]s `'a'` to `'z'`.
+    /// For bases up to 36, digits from 0 to 9 become [`char`]s from `'0'` to `'9'` and digits from
+    /// 10 to 35 become the lowercase [`char`]s `'a'` to `'z'`. For bases from 37 through 62 the
+    /// uppercase and lowercase letters are distinct digits, `'A'` through `'Z'` representing 10
+    /// through 35 and `'a'` through `'z'` representing 36 through 61, as in GMP.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$
@@ -123,7 +127,7 @@ impl ToStringBase for Integer {
     /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
-    /// Panics if `base` is less than 2 or greater than 36.
+    /// Panics if `base` is less than 2 or greater than 62.
     ///
     /// # Examples
     /// ```
@@ -137,15 +141,23 @@ impl ToStringBase for Integer {
     /// assert_eq!(Integer::from(-1000).to_string_base(2), "-1111101000");
     /// assert_eq!(Integer::from(-1000).to_string_base(10), "-1000");
     /// assert_eq!(Integer::from(-1000).to_string_base(36), "-rs");
+    /// // above base 36, the uppercase and lowercase letters are distinct digits
+    /// assert_eq!(Integer::from(-1000).to_string_base(62), "-G8");
     /// ```
     fn to_string_base(&self, base: u8) -> String {
-        assert!((2..=36).contains(&base), "base out of range");
+        assert!((2..=62).contains(&base), "base out of range");
         if *self == 0 {
             "0".to_string()
         } else {
             let mut digits = self.unsigned_abs_ref().to_digits_desc(&base);
+            let map = if base > 36 {
+                // above base 36 there is only one alphabet, with both cases as distinct digits
+                digit_to_display_byte_large
+            } else {
+                digit_to_display_byte_lower
+            };
             for digit in &mut digits {
-                *digit = digit_to_display_byte_lower(*digit).unwrap();
+                *digit = map(*digit).unwrap();
             }
             if *self < 0 {
                 vec_pad_left(&mut digits, 1, b'-');
@@ -156,8 +168,11 @@ impl ToStringBase for Integer {
 
     /// Converts an [`Integer`] to a [`String`] using a specified base.
     ///
-    /// Digits from 0 to 9 become [`char`]s from `'0'` to `'9'`. Digits from 10 to 35 become the
-    /// uppercase [`char`]s `'A'` to `'Z'`.
+    /// For bases up to 36, digits from 0 to 9 become [`char`]s from `'0'` to `'9'` and digits from
+    /// 10 to 35 become the uppercase [`char`]s `'A'` to `'Z'`. For bases from 37 through 62 the
+    /// uppercase and lowercase letters are distinct digits and there is only one alphabet, so the
+    /// result is the same as
+    /// [`to_string_base`](malachite_base::num::conversion::traits::ToStringBase::to_string_base)'s.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$
@@ -167,7 +182,7 @@ impl ToStringBase for Integer {
     /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
     /// # Panics
-    /// Panics if `base` is less than 2 or greater than 36.
+    /// Panics if `base` is less than 2 or greater than 62.
     ///
     /// # Examples
     /// ```
@@ -181,15 +196,22 @@ impl ToStringBase for Integer {
     /// assert_eq!(Integer::from(-1000).to_string_base_upper(2), "-1111101000");
     /// assert_eq!(Integer::from(-1000).to_string_base_upper(10), "-1000");
     /// assert_eq!(Integer::from(-1000).to_string_base_upper(36), "-RS");
+    /// assert_eq!(Integer::from(-1000).to_string_base_upper(62), "-G8");
     /// ```
     fn to_string_base_upper(&self, base: u8) -> String {
-        assert!((2..=36).contains(&base), "base out of range");
+        assert!((2..=62).contains(&base), "base out of range");
         if *self == 0 {
             "0".to_string()
         } else {
             let mut digits = self.unsigned_abs_ref().to_digits_desc(&base);
+            let map = if base > 36 {
+                // above base 36 there is only one alphabet, with both cases as distinct digits
+                digit_to_display_byte_large
+            } else {
+                digit_to_display_byte_upper
+            };
             for digit in &mut digits {
-                *digit = digit_to_display_byte_upper(*digit).unwrap();
+                *digit = map(*digit).unwrap();
             }
             if *self < 0 {
                 vec_pad_left(&mut digits, 1, b'-');

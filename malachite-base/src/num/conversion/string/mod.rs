@@ -176,6 +176,7 @@ pub mod to_sci;
 /// assert_eq!((-1000i16).to_string_base(2), "-1111101000");
 /// assert_eq!((-1000i16).to_string_base(10), "-1000");
 /// assert_eq!((-1000i16).to_string_base(36), "-rs");
+/// assert_eq!((-1000i16).to_string_base(62), "-G8");
 /// ```
 ///
 /// # to_string_base_upper

@@ -242,3 +242,54 @@ fn from_string_base_properties() {
         );
     });
 }
+
+#[test]
+fn test_from_string_base_large_integer() {
+    fn test(base: u8, s: &str, out: Option<i64>) {
+        assert_eq!(
+            Integer::from_string_base(base, s),
+            out.map(Integer::from),
+            "{base} {s}"
+        );
+    }
+    test(62, "G8", Some(1000));
+    test(62, "-G8", Some(-1000));
+    test(62, "+G8", Some(1000));
+    test(62, "-z", Some(-61));
+    test(62, "g8", Some(2612));
+    test(37, "b", None);
+    test(62, "", None);
+    test(62, "-", None);
+}
+
+#[test]
+fn from_string_base_large_integer_properties() {
+    use malachite_base::num::conversion::traits::ToStringBase;
+    use malachite_nz::test_util::generators::integer_gen;
+    // `mpz_set_str` is the parsing oracle.
+    fn gmp_from_string_base(base: i32, s: &str) -> Option<rug::Integer> {
+        unsafe extern "C" {
+            fn __gmpz_set_str(
+                rop: *mut core::ffi::c_void,
+                s: *const core::ffi::c_char,
+                base: core::ffi::c_int,
+            ) -> core::ffi::c_int;
+        }
+        let mut x = rug::Integer::new();
+        let cs = std::ffi::CString::new(s).ok()?;
+        (unsafe { __gmpz_set_str(x.as_raw_mut() as *mut core::ffi::c_void, cs.as_ptr(), base) }
+            == 0)
+            .then_some(x)
+    }
+    integer_gen().test_properties(|x| {
+        for base in 37..=62u8 {
+            let s = x.to_string_base(base);
+            // GMP parses our digits to the same value
+            assert_eq!(
+                Integer::from(&gmp_from_string_base(i32::from(base), &s).unwrap()),
+                x,
+                "{x} {base}"
+            );
+        }
+    });
+}

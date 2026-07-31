@@ -115,7 +115,10 @@ impl ModEuclidean<Natural> for &Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// // 2 * 10 + 3 = 23
-    /// assert_eq!((&Natural::from(23u32)).mod_euclidean(Natural::from(10u32)), 3);
+    /// assert_eq!(
+    ///     (&Natural::from(23u32)).mod_euclidean(Natural::from(10u32)),
+    ///     3
+    /// );
     /// ```
     #[inline]
     fn mod_euclidean(self, other: Natural) -> Natural {
@@ -153,7 +156,10 @@ impl ModEuclidean<&Natural> for &Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// // 2 * 10 + 3 = 23
-    /// assert_eq!((&Natural::from(23u32)).mod_euclidean(&Natural::from(10u32)), 3);
+    /// assert_eq!(
+    ///     (&Natural::from(23u32)).mod_euclidean(&Natural::from(10u32)),
+    ///     3
+    /// );
     /// ```
     #[inline]
     fn mod_euclidean(self, other: &Natural) -> Natural {
