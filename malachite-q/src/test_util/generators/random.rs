@@ -980,6 +980,20 @@ pub fn random_rational_unsigned_pair_gen_var_9<T: PrimitiveUnsigned>(
     ))
 }
 
+pub fn random_rational_unsigned_pair_gen_var_10(config: &GenConfig) -> It<(Rational, u8)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_rationals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| random_unsigned_inclusive_range(seed, 2, 62),
+    ))
+}
+
 // -- (Rational, PrimitiveUnsigned, PrimitiveUnsigned) --
 
 pub fn random_rational_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>(

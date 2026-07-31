@@ -541,6 +541,15 @@ pub fn rational_unsigned_pair_gen_var_9<T: PrimitiveUnsigned>() -> Generator<(Ra
     )
 }
 
+// All `(Rational, u8)`s where the `u8` is between 2 and 62, inclusive.
+pub fn rational_unsigned_pair_gen_var_10() -> Generator<(Rational, u8)> {
+    Generator::new(
+        &exhaustive_rational_unsigned_pair_gen_var_8,
+        &random_rational_unsigned_pair_gen_var_10,
+        &special_random_rational_unsigned_pair_gen_var_8,
+    )
+}
+
 // -- (Rational, PrimitiveUnsigned, PrimitiveUnsigned) --
 
 pub fn rational_unsigned_unsigned_triple_gen<T: PrimitiveUnsigned>() -> Generator<(Rational, T, T)>

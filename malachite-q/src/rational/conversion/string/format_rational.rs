@@ -55,17 +55,26 @@ use malachite_nz::natural::conversion::string::format_natural::{
 ///
 /// # Examples
 /// ```
-/// use malachite_q::Rational;
 /// use malachite_q::rational::conversion::string::format_rational::format_rational_str;
+/// use malachite_q::Rational;
 ///
 /// let x = Rational::from_signeds(255, 16);
 /// assert_eq!(format_rational_str(&x, "%Qd"), Some("255/16".to_string()));
-/// assert_eq!(format_rational_str(&x, "%#Qx"), Some("0xff/0x10".to_string()));
-/// assert_eq!(format_rational_str(&x, "%10Qd"), Some("    255/16".to_string()));
+/// assert_eq!(
+///     format_rational_str(&x, "%#Qx"),
+///     Some("0xff/0x10".to_string())
+/// );
+/// assert_eq!(
+///     format_rational_str(&x, "%10Qd"),
+///     Some("    255/16".to_string())
+/// );
 /// assert_eq!(format_rational_str(&-x, "%Qd"), Some("-255/16".to_string()));
 ///
 /// // a denominator of 1 is omitted, as with `mpq_get_str`
-/// assert_eq!(format_rational_str(&Rational::from(255), "%Qd"), Some("255".to_string()));
+/// assert_eq!(
+///     format_rational_str(&Rational::from(255), "%Qd"),
+///     Some("255".to_string())
+/// );
 ///
 /// // invalid or unsupported format strings
 /// let x = Rational::from_signeds(255, 16);

@@ -1013,6 +1013,30 @@ pub fn special_random_rational_unsigned_pair_gen_var_7<T: PrimitiveUnsigned>(
     ))
 }
 
+pub fn special_random_rational_unsigned_pair_gen_var_8(config: &GenConfig) -> It<(Rational, u8)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_rationals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_unsigned_inclusive_range(
+                seed,
+                2,
+                62,
+                config.get_or("mean_stripe_n", 4),
+                config.get_or("mean_stripe_d", 1),
+            )
+        },
+    ))
+}
+
 // -- (Rational, PrimitiveUnsigned, PrimitiveUnsigned) --
 
 pub fn special_random_rational_unsigned_unsigned_triple_gen<T: PrimitiveUnsigned>(

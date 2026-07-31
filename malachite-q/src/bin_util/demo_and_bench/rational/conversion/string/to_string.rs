@@ -6,17 +6,25 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::num::conversion::traits::ToStringBase;
 use malachite_base::strings::ToDebugString;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
-use malachite_q::test_util::bench::bucketers::triple_3_rational_bit_bucketer;
-use malachite_q::test_util::generators::{rational_gen, rational_gen_nrm};
+use malachite_q::test_util::bench::bucketers::{
+    pair_1_rational_bit_bucketer, triple_3_rational_bit_bucketer,
+};
+use malachite_q::test_util::generators::{
+    rational_gen, rational_gen_nrm, rational_unsigned_pair_gen_var_10,
+};
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_rational_to_string);
     register_demo!(runner, demo_rational_to_debug_string);
+    register_demo!(runner, demo_rational_to_string_base);
+    register_demo!(runner, demo_rational_to_string_base_upper);
 
+    register_bench!(runner, benchmark_rational_to_string_base);
     register_bench!(runner, benchmark_rational_to_string_library_comparison);
     register_bench!(
         runner,
@@ -77,5 +85,46 @@ fn benchmark_rational_to_debug_string_library_comparison(
             ("num", &mut |(x, _, _)| no_out!(x.to_debug_string())),
             ("rug", &mut |(_, x, _)| no_out!(x.to_debug_string())),
         ],
+    );
+}
+
+fn demo_rational_to_string_base(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, base) in rational_unsigned_pair_gen_var_10()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!("({x}).to_string_base({base}) = {}", x.to_string_base(base));
+    }
+}
+
+fn demo_rational_to_string_base_upper(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, base) in rational_unsigned_pair_gen_var_10()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "({x}).to_string_base_upper({base}) = {}",
+            x.to_string_base_upper(base)
+        );
+    }
+}
+
+fn benchmark_rational_to_string_base(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Rational.to_string_base(u8)",
+        BenchmarkType::Single,
+        rational_unsigned_pair_gen_var_10().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_1_rational_bit_bucketer("x"),
+        &mut [("Malachite", &mut |(x, base)| {
+            no_out!(x.to_string_base(base))
+        })],
     );
 }

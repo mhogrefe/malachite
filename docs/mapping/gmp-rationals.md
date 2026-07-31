@@ -50,7 +50,7 @@ Each function falls into one of four categories:
 | ✓ | `void mpq_set_z (mpq_t rop, const mpz_t op)` | [`From`](https://docs.rs/malachite-q/latest/malachite_q/rational/conversion/from_integer/index.html) |
 | ✓ | `void mpq_set_ui (mpq_t rop, unsigned long int op1, unsigned long int op2)` | [`from_unsigneds`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.from_unsigneds) |
 | ✓ | `void mpq_set_si (mpq_t rop, signed long int op1, unsigned long int op2)` | [`from_signeds`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.from_signeds) |
-| ✗ | `int mpq_set_str (mpq_t rop, const char *str, int base)` | [`FromStr`](https://doc.rust-lang.org/nightly/std/str/trait.FromStr.html) |
+| ✓ | `int mpq_set_str (mpq_t rop, const char *str, int base)` | [`FromStringBase`](https://docs.rs/malachite-base/latest/malachite_base/num/conversion/traits/trait.FromStringBase.html), [`FromStr`](https://doc.rust-lang.org/nightly/std/str/trait.FromStr.html) |
 | — | `void mpq_swap (mpq_t rop1, mpq_t rop2)` | |
 
 **`mpq_canonicalize`.** Nothing to call: as described above, a
@@ -92,14 +92,18 @@ each with a `_ref` variant that borrows instead of consuming.
 **`mpq_set_str`.** Base 10 works through
 [`FromStr`](https://doc.rust-lang.org/nightly/std/str/trait.FromStr.html):
 `"22/7".parse::<Rational>()`, accepting an integer like `"41"` or a fraction like `"41/152"`,
-just as GMP does. The numerator and denominator need not be in lowest terms; the parse reduces
-them. A zero denominator is an `Err` at parse time, where GMP accepts the string and the zero
-surfaces as a division error later. The sign may only appear at the front of the string. The
-other bases are the gap: GMP accepts 2 through 62, and `Rational` does not yet have the
-`from_string_base` that
-[`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html) and
-[`Integer`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html) provide
-for bases 2 through 36.
+just as GMP does. For the other bases,
+[`from_string_base`](https://docs.rs/malachite-base/latest/malachite_base/num/conversion/traits/trait.FromStringBase.html)
+takes the same 2 through 62 that GMP does, with GMP's digit alphabet: up to base 36 the letters
+are read without regard to case, and above 36 `A` through `Z` are the digit values 10 through 35
+while `a` through `z` are 36 through 61. In either form the numerator and denominator need not
+be in lowest terms; the parse reduces them, where GMP leaves the fraction unreduced until
+`mpq_canonicalize`. A zero denominator is an `Err` or `None` at parse time, where GMP accepts
+the string and the zero surfaces as a division error later. The sign may only appear at the
+front of the string, and Malachite also accepts a single leading `+`, which GMP does not. GMP
+additionally ignores whitespace in the string and offers a base-0 mode that infers the base from
+a `0x`, `0b`, or `0` prefix; Malachite does neither, so strip any prefix and whitespace before
+parsing.
 
 **`mpq_swap`.** [`std::mem::swap`](https://doc.rust-lang.org/nightly/std/mem/fn.swap.html) swaps
 any two values of the same type, exchanging the representations without copying any limbs.
@@ -116,7 +120,7 @@ exact in one direction and rounded in the other, never lossy in both.
 | ≈ | `double mpq_get_d (const mpq_t op)` | [`RoundingFrom`](https://docs.rs/malachite-q/latest/malachite_q/rational/conversion/primitive_float_from_rational/index.html), [`TryFrom`](https://docs.rs/malachite-q/latest/malachite_q/rational/conversion/primitive_float_from_rational/index.html) |
 | ✓ | `void mpq_set_d (mpq_t rop, double op)` | [`TryFrom`](https://docs.rs/malachite-q/latest/malachite_q/rational/conversion/from_primitive_float/index.html) |
 | ✓ | `void mpq_set_f (mpq_t rop, const mpf_t op)` | [`TryFrom`](https://docs.rs/malachite-float/latest/malachite_float/float/conversion/rational_from_float/index.html) |
-| ✗ | `char * mpq_get_str (char *str, int base, const mpq_t op)` | [`Display`](https://doc.rust-lang.org/nightly/std/fmt/trait.Display.html) |
+| ✓ | `char * mpq_get_str (char *str, int base, const mpq_t op)` | [`ToStringBase`](https://docs.rs/malachite-base/latest/malachite_base/num/conversion/traits/trait.ToStringBase.html), [`Display`](https://doc.rust-lang.org/nightly/std/fmt/trait.Display.html) |
 
 **`mpq_get_d`.** GMP truncates toward zero, so `f64::rounding_from(&q, Down)` reproduces it, and
 also returns an [`Ordering`](https://doc.rust-lang.org/nightly/std/cmp/enum.Ordering.html) saying
@@ -150,9 +154,13 @@ MPFR rather than GMP's `mpf_t`, so this row is the analogue rather than the equi
 format: `"num/den"`, or just `"num"` when the denominator is 1, so `q.to_string()` and
 `format!("{q}")` are direct replacements, returning a
 [`String`](https://doc.rust-lang.org/nightly/std/string/struct.String.html) with no buffer to
-size and no allocation to free. Other bases are missing, as with `mpq_set_str` above: `Rational`
-has no `to_string_base` yet. The base only affects how the two integers are printed: `22/7` in
-base 16 is `"16/7"`. For a representation where the base matters mathematically,
+size and no allocation to free. For the other bases,
+[`to_string_base`](https://docs.rs/malachite-base/latest/malachite_base/num/conversion/traits/trait.ToStringBase.html)
+covers GMP's whole positive range, 2 through 62, producing lowercase digits up to base 36 and
+the case-sensitive 62-character alphabet above that. GMP's negative bases, -2 through -36, mean
+uppercase digits, which is `to_string_base_upper`. The base only affects how the two integers
+are printed: `22/7` in base 16 is `"16/7"`. For a representation where the base matters
+mathematically,
 [`digits`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.digits)
 and
 [`to_digits`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.to_digits)
@@ -321,18 +329,20 @@ positive in both libraries; `mpq_get_num` differs by the sign, as above.
 
 | | GMP | Malachite |
 | :---: | --- | --- |
-| ✗ | `size_t mpq_out_str (FILE *stream, int base, const mpq_t op)` | [`Display`](https://doc.rust-lang.org/nightly/std/fmt/trait.Display.html) |
-| ✗ | `size_t mpq_inp_str (mpq_t rop, FILE *stream, int base)` | [`FromStr`](https://doc.rust-lang.org/nightly/std/str/trait.FromStr.html) |
+| ✓ | `size_t mpq_out_str (FILE *stream, int base, const mpq_t op)` | [`ToStringBase`](https://docs.rs/malachite-base/latest/malachite_base/num/conversion/traits/trait.ToStringBase.html), [`Display`](https://doc.rust-lang.org/nightly/std/fmt/trait.Display.html) |
+| ✓ | `size_t mpq_inp_str (mpq_t rop, FILE *stream, int base)` | [`FromStringBase`](https://docs.rs/malachite-base/latest/malachite_base/num/conversion/traits/trait.FromStringBase.html), [`FromStr`](https://doc.rust-lang.org/nightly/std/str/trait.FromStr.html) |
 
 As on [the integer page](/mapping/gmp-integers/#input-and-output-functions), there is no `FILE *` half to
 port: writing is `write!(stream, "{q}")` for any
 [`Write`](https://doc.rust-lang.org/nightly/std/io/trait.Write.html), reading means pulling a
 token out of your reader and handing it to
-[`FromStr`](https://doc.rust-lang.org/nightly/std/str/trait.FromStr.html), and nothing in
-Malachite needs to know about streams. What keeps the rows at ✗ is the base: these are
-`mpq_get_str` and `mpq_set_str` with a stream attached, and they inherit the gap described under
-[Conversion Functions](#conversion-functions), along with the absence of `mpq_inp_str`'s base-0
-prefix detection.
+[`FromStr`](https://doc.rust-lang.org/nightly/std/str/trait.FromStr.html) or
+[`from_string_base`](https://docs.rs/malachite-base/latest/malachite_base/num/conversion/traits/trait.FromStringBase.html),
+and nothing in Malachite needs to know about streams. These are `mpq_get_str` and `mpq_set_str`
+with a stream attached, so their rows follow those functions': the full base range of 2 through
+62 is supported, and the stream half is `write!` and your reader. See
+[Conversion Functions](#conversion-functions) for the details, including GMP's negative bases
+and the absence of `mpq_inp_str`'s base-0 prefix detection.
 
 GMP's rational chapter has no raw-format I/O, but the serde support described on the integer page
 covers `Rational` too: with the `enable_serde` feature it implements

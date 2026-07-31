@@ -12,10 +12,14 @@ pub mod format_rational;
 /// Implementations of [`FromSciString`](malachite_base::num::conversion::traits::FromSciString).
 /// This is a trait for converting strings, possibly using scientific notation, to numbers.
 pub mod from_sci_string;
-/// An implementation of [`FromStr`](std::str::FromStr).
+/// Implementations of [`FromStr`](std::str::FromStr) and
+/// [`FromStringBase`](malachite_base::num::conversion::traits::FromStringBase), traits for parsing
+/// strings in base 10 or in other bases.
 pub mod from_string;
 /// Implementations of [`ToSci`](malachite_base::num::conversion::traits::ToSci), a trait for
 /// converting a number to string, possibly using scientific notation.
 pub mod to_sci;
-/// Implementations of [`Display`](std::fmt::Display) and [`Debug`].
+/// Implementations of [`Display`](std::fmt::Display), [`Debug`], and
+/// [`ToStringBase`](malachite_base::num::conversion::traits::ToStringBase), traits for converting a
+/// number to a string in base 10 or in other bases.
 pub mod to_string;
