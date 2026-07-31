@@ -205,11 +205,11 @@ is `fmpq_height_bits`.
 | ✓ | `void fmpq_set_si (fmpq_t res, slong p, ulong q)` | [`from_signeds`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.from_signeds), [`from_sign_and_unsigneds`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.from_sign_and_unsigneds) |
 | ✓ | `void fmpq_set_ui (fmpq_t res, ulong p, ulong q)` | [`from_unsigneds`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.from_unsigneds) |
 | — | `void fmpq_set_mpq (fmpq_t dest, const mpq_t src)` | |
-| ✗ | `int fmpq_set_str (fmpq_t dest, const char * s, int base)` | [`FromStr`](https://doc.rust-lang.org/nightly/std/str/trait.FromStr.html) |
+| ✓ | `int fmpq_set_str (fmpq_t dest, const char * s, int base)` | [`FromStringBase`](https://docs.rs/malachite-base/latest/malachite_base/num/conversion/traits/trait.FromStringBase.html), [`FromStr`](https://doc.rust-lang.org/nightly/std/str/trait.FromStr.html) |
 | ≈ | `double fmpq_get_d (const fmpq_t f)` | [`RoundingFrom`](https://docs.rs/malachite-q/latest/malachite_q/rational/conversion/primitive_float_from_rational/index.html), [`TryFrom`](https://docs.rs/malachite-q/latest/malachite_q/rational/conversion/primitive_float_from_rational/index.html) |
 | — | `void fmpq_get_mpq (mpq_t dest, const fmpq_t src)` | |
 | ✓ | `int fmpq_get_mpfr (mpfr_t dest, const fmpq_t src, mpfr_rnd_t rnd)` | [`from_rational_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.from_rational_prec_round) |
-| ✗ | `char * fmpq_get_str (char * str, int b, const fmpq_t x)` | [`Display`](https://doc.rust-lang.org/nightly/std/fmt/trait.Display.html) |
+| ✓ | `char * fmpq_get_str (char * str, int b, const fmpq_t x)` | [`ToStringBase`](https://docs.rs/malachite-base/latest/malachite_base/num/conversion/traits/trait.ToStringBase.html), [`Display`](https://doc.rust-lang.org/nightly/std/fmt/trait.Display.html) |
 | — | `void flint_mpq_init_set_readonly (mpq_t z, const fmpq_t f)` | |
 | — | `void flint_mpq_clear_readonly (mpq_t z)` | |
 | — | `void fmpq_init_set_readonly (fmpq_t f, const mpq_t z)` | |
@@ -240,17 +240,20 @@ conventions", which is the
 return, and this time nothing is discarded, unlike
 [`fmpz_get_mpfr`](/mapping/flint-integers/#conversion), whose `void` wrapper dropped it.
 
-**`fmpq_set_str`, `fmpq_get_str`.** The string pair carries the same base gap as every page so
-far, with one asymmetry gone: FLINT's rational strings themselves stop at base 36, so when
-[`Rational`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html) grows
-the `from_string_base` and `to_string_base` promised on
-[the GMP rationals page](/mapping/gmp-rationals/#conversion-functions), the two ranges will
-coincide exactly; there is no base-62 remainder here. Base 10 works today through
+**`fmpq_set_str`, `fmpq_get_str`.** Base 10 is
 [`FromStr`](https://doc.rust-lang.org/nightly/std/str/trait.FromStr.html) and
-[`Display`](https://doc.rust-lang.org/nightly/std/fmt/trait.Display.html). Two small
-conventions differ in the usual directions: `fmpq_set_str` zeroes `dest` and returns `-1` on a
-bad string where parsing returns an `Err` and no value at all, and `fmpq_get_str` accepts
-`NULL` and allocates, halfway to returning a
+[`Display`](https://doc.rust-lang.org/nightly/std/fmt/trait.Display.html), and
+[`Rational`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html)'s
+`from_string_base` and `to_string_base` now cover the other bases, as described on
+[the GMP rationals page](/mapping/gmp-rationals/#conversion-functions). The ranges line up
+however FLINT's are read: the manual documents `fmpq_get_str` for bases 2 through 36, but both
+halves are thin wrappers, over `fmpz_get_str` per component and over `mpq_set_str`, and that
+machinery runs to 62; Malachite's 2 through 62 spans it either way. One behavioral difference
+matters: `fmpq_set_str` stores the parsed numerator and denominator as given, leaving
+`"2/4"` unreduced until `fmpq_canonicalise`, where `from_string_base` reduces on the way in and
+returns `None` for a zero denominator that FLINT would accept and let surface later. The small
+conventions differ in the usual directions: a bad string is a `-1` return there and no value at
+all here, and `fmpq_get_str` accepts `NULL` and allocates, halfway to returning a
 [`String`](https://doc.rust-lang.org/nightly/std/string/struct.String.html).
 
 **The GMP boundary.** `fmpq_set_mpq`, `fmpq_get_mpq`, and the four `readonly` functions are the

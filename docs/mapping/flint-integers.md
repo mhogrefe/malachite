@@ -227,7 +227,7 @@ types are a boundary that Malachite does not have.
 | ≈ | `double fmpz_get_d_2exp (slong * exp, const fmpz_t f)` | [`SciMantissaAndExponent`](https://docs.rs/malachite-base/latest/malachite_base/num/conversion/traits/trait.SciMantissaAndExponent.html) |
 | — | `void fmpz_get_mpz (mpz_t x, const fmpz_t f)` | |
 | ✓ | `int fmpz_get_mpn (nn_ptr * n, fmpz_t n_in)` | [`to_limbs_asc`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html#method.to_limbs_asc) |
-| ✗ | `char * fmpz_get_str (char * str, int b, const fmpz_t f)` | [`ToStringBase`](https://docs.rs/malachite-base/latest/malachite_base/num/conversion/traits/trait.ToStringBase.html), [`Display`](https://doc.rust-lang.org/nightly/std/fmt/trait.Display.html) |
+| ✓ | `char * fmpz_get_str (char * str, int b, const fmpz_t f)` | [`ToStringBase`](https://docs.rs/malachite-base/latest/malachite_base/num/conversion/traits/trait.ToStringBase.html), [`Display`](https://doc.rust-lang.org/nightly/std/fmt/trait.Display.html) |
 | ✓ | `void fmpz_set_si (fmpz_t f, slong val)` | [`From`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/conversion/from_primitive_int/index.html), [`TryFrom`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/conversion/from_primitive_int/index.html) |
 | ✓ | `void fmpz_set_ui (fmpz_t f, ulong val)` | [`From`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/conversion/from_primitive_int/index.html) |
 | ≈ | `void fmpz_set_d (fmpz_t f, double c)` | [`RoundingFrom`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/conversion/from_primitive_float/index.html), [`TryFrom`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/conversion/from_primitive_float/index.html) |
@@ -244,7 +244,7 @@ types are a boundary that Malachite does not have.
 | ✓ | `void fmpz_set_mpn_large (fmpz_t z, nn_srcptr src, slong n, int negative)` | [`from_limbs_asc`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html#method.from_limbs_asc), [`from_sign_and_abs`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html#method.from_sign_and_abs) |
 | ✓ | `void fmpz_get_signed_uiui (ulong * hi, ulong * lo, const fmpz_t in)` | [`WrappingFrom`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/conversion/primitive_int_from_integer/index.html) |
 | — | `void fmpz_set_mpz (fmpz_t f, const mpz_t x)` | |
-| ✗ | `int fmpz_set_str (fmpz_t f, const char * str, int b)` | [`FromStringBase`](https://docs.rs/malachite-base/latest/malachite_base/num/conversion/traits/trait.FromStringBase.html), [`FromStr`](https://doc.rust-lang.org/nightly/std/str/trait.FromStr.html) |
+| ✓ | `int fmpz_set_str (fmpz_t f, const char * str, int b)` | [`FromStringBase`](https://docs.rs/malachite-base/latest/malachite_base/num/conversion/traits/trait.FromStringBase.html), [`FromStr`](https://doc.rust-lang.org/nightly/std/str/trait.FromStr.html) |
 | ✗ | `void fmpz_set_ui_smod (fmpz_t f, ulong x, ulong m)` | |
 | — | `void flint_mpz_init_set_readonly (mpz_t z, const fmpz_t f)` | |
 | — | `void flint_mpz_clear_readonly (mpz_t z)` | |
@@ -322,14 +322,19 @@ public precomputed-modulus context; that machinery reappears throughout FLINT's 
 chapter, and the trade is taken up properly on
 [its page](/mapping/flint-integers-mod-n/#conventions).
 
-**`fmpz_get_str`, `fmpz_set_str`.** The same pair of gaps as GMP's string functions, with the
-same shape: `to_string_base` and `from_string_base` cover bases 2 through 36, FLINT reaches 62,
-and the [notes on the GMP page](/mapping/gmp-integers/#assigning-integers) about the missing
-range, [`Option`](https://doc.rust-lang.org/nightly/std/option/enum.Option.html) in place of a
-`-1` return, and [`String`](https://doc.rust-lang.org/nightly/std/string/struct.String.html) in
-place of a caller-sized buffer all apply. One difference from GMP does not carry over: FLINT's
-`fmpz_get_str` accepts `NULL` and allocates, so its buffer-management hazard is already halfway
-to Rust's.
+**`fmpz_get_str`, `fmpz_set_str`.** The same pair as GMP's string functions, and the same
+match: `to_string_base` and `from_string_base` cover the full base range of 2 through 62 with
+the digit alphabet FLINT delegates to GMP for, described in
+[the notes on the GMP page](/mapping/gmp-integers/#assigning-integers) along with
+[`Option`](https://doc.rust-lang.org/nightly/std/option/enum.Option.html) in place of a `-1`
+return and [`String`](https://doc.rust-lang.org/nightly/std/string/struct.String.html) in place
+of a caller-sized buffer. Two differences from GMP do not carry over: FLINT's `fmpz_get_str`
+accepts `NULL` and allocates, so its buffer-management hazard is already halfway to Rust's, and
+FLINT has no negative-base uppercase mode, so `to_string_base` alone is the whole of
+`fmpz_get_str` and `to_string_base_upper` is extra. On the parsing side FLINT skips surrounding
+whitespace itself and inherits GMP's tolerance of interior whitespace; Malachite accepts no
+whitespace, accepts a single leading `+` that FLINT and GMP reject, and, like FLINT's own
+special check, rejects a doubled minus sign.
 
 **`fmpz_set_ui_smod`.** A balanced remainder: the representative of `x` modulo `m` in
 `(-m/2, m/2]`. Malachite has floor, ceiling, and truncating remainders, but no balanced one, and
@@ -353,9 +358,10 @@ about streams, and none of it is restricted to `stdio`.
 | ≈ | `size_t fmpz_out_raw (FILE * fout, const fmpz_t x)` | [`Serialize`](https://docs.rs/serde/latest/serde/trait.Serialize.html) |
 
 **`fmpz_read`, `fmpz_fread`.** Pull a token out of your reader and hand it to
-`parse::<Integer>()`. These two are decimal-only, so the base gap that keeps `fmpz_set_str` at ✗
-does not arise here. Failure is an `Err` rather than a non-positive return, and Malachite's
-parser is the more permissive of the two: FLINT rejects leading zeros, while `"00123"` parses.
+`parse::<Integer>()`; these two are decimal-only, with `from_string_base` covering the other
+bases as under `fmpz_set_str`. Failure is an `Err` rather than a non-positive return, and
+Malachite's parser is the more permissive of the two: FLINT rejects leading zeros, while
+`"00123"` parses.
 
 **`fmpz_print`, `fmpz_fprint`.** `print!("{x}")`, or `write!(f, "{x}")` for any
 [`Write`](https://doc.rust-lang.org/nightly/std/io/trait.Write.html). The sign-then-digits
