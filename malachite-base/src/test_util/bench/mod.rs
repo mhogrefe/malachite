@@ -250,7 +250,27 @@ pub fn run_benchmark<'a, I: Iterator>(
         BenchmarkType::Algorithms => format!("{title} algorithms"),
     };
     println!("benchmarking {generation_mode_name} {title}");
-    let colors = ["green", "blue", "red", "black", "orange", "yellow", "gray", "purple"];
+    // gnuplot colour names, ordered so that adjacent series stay distinguishable. Benchmarks that
+    // enumerate every by-value/by-reference spelling of a four-operand operation need more than the
+    // original eight.
+    let colors = [
+        "green",
+        "blue",
+        "red",
+        "black",
+        "orange",
+        "yellow",
+        "gray",
+        "purple",
+        "cyan",
+        "magenta",
+        "brown",
+        "dark-green",
+        "navy",
+        "olive",
+        "salmon",
+        "turquoise",
+    ];
     assert!(series.len() <= colors.len(), "not enough available colors");
     let mut series_options = Vec::new();
     for (&mut (label, ref mut function), color) in series.iter_mut().zip(colors.iter()) {

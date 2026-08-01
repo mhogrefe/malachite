@@ -90,6 +90,8 @@ pub mod integer {
         pub mod mod_op;
         pub mod mod_power_of_2;
         pub mod mul;
+        pub mod mul_add_mul;
+        pub mod mul_sub_mul;
         pub mod neg;
         pub mod parity;
         pub mod pow;
@@ -270,6 +272,7 @@ pub mod natural {
         pub mod mod_op;
         pub mod mod_pow;
         // end
+        pub mod checked_mul_sub_mul;
         pub mod mod_power_of_2;
         pub mod mod_power_of_2_add;
         pub mod mod_power_of_2_inverse;
@@ -286,6 +289,8 @@ pub mod natural {
         pub mod mod_square;
         pub mod mod_sub;
         pub mod mul;
+        pub mod mul_add_mul;
+        pub mod mul_sub_mul;
         pub mod neg;
         pub mod next_power_of_2;
         pub mod parity;
@@ -295,6 +300,7 @@ pub mod natural {
         pub mod root;
         pub mod round_to_multiple;
         pub mod round_to_multiple_of_power_of_2;
+        pub mod saturating_mul_sub_mul;
         pub mod saturating_sub;
         pub mod saturating_sub_mul;
         pub mod shl;

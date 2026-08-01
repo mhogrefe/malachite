@@ -355,11 +355,12 @@ assign and by-value forms as
 [`Integer`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html) size,
 with a by-value `Integer` donating its storage to the numerator.
 
-**`fmpq_addmul`, `fmpq_submul`.** The fused accumulate, `res += op1 * op2`, is a gap, and a
-familiar one: it is the rational operation whose numerator arithmetic is the `ad + bc` shape
-that `fmpz_fmma` [exists to fuse](/mapping/flint-integers/#basic-arithmetic), so the two gaps
-are close kin and are likely to be filled together. The spelling `res += &op1 * &op2` computes
-the right value with a separately allocated product in the middle.
+**`fmpq_addmul`, `fmpq_submul`.** The fused accumulate, `res += op1 * op2`, is a gap. Its
+numerator arithmetic is the `ad + bc` shape that `fmpz_fmma`
+[exists to fuse](/mapping/flint-integers/#basic-arithmetic), and that piece is now available as
+`mul_add_mul` on the integers, so filling this gap is a matter of lifting it to the rationals
+rather than of writing the kernel. The spelling `res += &op1 * &op2` computes the right value
+with a separately allocated product in the middle.
 
 **`fmpq_inv`, `fmpq_pow_si`, `fmpq_pow_fmpz`.** `src.reciprocal()`, a numerator-denominator
 swap [as on the GMP rationals page](/mapping/gmp-rationals/#arithmetic-functions); and

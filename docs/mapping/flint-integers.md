@@ -549,8 +549,8 @@ function's row.
 | ≈ | `void fmpz_submul (fmpz_t f, const fmpz_t g, const fmpz_t h)` | [`SubMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.SubMul.html), [`SubMulAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.SubMulAssign.html) |
 | ≈ | `void fmpz_submul_ui (fmpz_t f, const fmpz_t g, ulong h)` | [`SubMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.SubMul.html), [`SubMulAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.SubMulAssign.html) |
 | ≈ | `void fmpz_submul_si (fmpz_t f, const fmpz_t g, slong h)` | [`SubMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.SubMul.html), [`SubMulAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.SubMulAssign.html) |
-| ✗ | `void fmpz_fmma (fmpz_t f, const fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_t d)` | |
-| ✗ | `void fmpz_fmms (fmpz_t f, const fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_t d)` | |
+| ✓ | `void fmpz_fmma (fmpz_t f, const fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_t d)` | [`MulAddMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.MulAddMul.html), [`MulAddMulAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.MulAddMulAssign.html) |
+| ≈ | `void fmpz_fmms (fmpz_t f, const fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_t d)` | [`MulSubMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.MulSubMul.html), [`MulSubMulAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.MulSubMulAssign.html) |
 
 **The operators.** `-g`, `g.abs()`, `g + h`, `g - h`, `g * h`, and `g << e`, with
 [`UnsignedAbs`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.UnsignedAbs.html)
@@ -578,12 +578,19 @@ counterpart; the shift count is an ordinary integer, of
 accumulate in one step without a temporary, exactly as FLINT's do; the three-operand
 `f.add_mul(&g, &h)` forms return the result instead.
 
-**`fmpz_fmma`, `fmpz_fmms`.** The fused double products, `ab + cd` and `ab - cd`, are gaps. The
-spelling `&a * &b + &c * &d` computes the right value but allocates both products and the sum
-separately, where FLINT's fused versions manage their scratch space once; like `fmpz_cmp2abs`
-above, these earn their keep in inner loops, rational arithmetic being the motivating case,
-since a sum of fractions has an `ad + bc` numerator, the shape behind
-[`fmpq_addmul`](/mapping/flint-rationals/#arithmetic) on the rationals page.
+**`fmpz_fmma`, `fmpz_fmms`.** The fused double products, `ab + cd` and `ab - cd`, are
+`a.mul_add_mul(b, c, d)` and `a.mul_sub_mul(b, c, d)`, which form the second product straight
+onto the first rather than building it separately. They earn their keep in inner loops, rational
+arithmetic being the motivating case, since a sum of fractions has an `ad + bc` numerator, the
+shape behind [`fmpq_addmul`](/mapping/flint-rationals/#arithmetic) on the rationals page. The
+`fmms` row is ≈ for the same reason as `submul` above: on `Natural` a difference that would go
+negative panics, so that type also has
+[`CheckedMulSubMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CheckedMulSubMul.html) and
+[`SaturatingMulSubMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.SaturatingMulSubMul.html),
+which return `None` and 0 respectively. All four traits are also implemented for the primitive
+integers, where the checked, wrapping, saturating, and overflowing variants each form both
+products at double width, so an intermediate that does not fit cannot by itself make a
+representable result unrepresentable.
 
 ### Division with rounding
 
@@ -836,8 +843,8 @@ $$x^{(k)} = \binom{x+k-1}{k} \, k!$$ spells it through `BinomialCoefficient` and
 which handles a bignum `x` as well, since the binomial coefficient takes `Natural` arguments.
 
 **`fmpz_mul_tdiv_q_2exp`, `fmpz_mul_si_tdiv_q_2exp`.** `(&g * &h).shr_round(exp, Down).0`.
-Unlike the fused `fmma` pair above, these are not marked as gaps: FLINT's implementation
-multiplies in full and then shifts, so the composition is the same work in the same order. The
+These are not gaps: FLINT's implementation multiplies in full and then shifts, so the
+composition is the same work in the same order. The
 one detail to keep is the rounding mode: `tdiv` truncates toward zero, and a plain `>>` floors,
 so a negative product needs `shr_round` with `Down` rather than the operator.
 

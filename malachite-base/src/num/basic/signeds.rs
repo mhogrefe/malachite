@@ -26,9 +26,8 @@ use core::ops::Neg;
 /// off there are none. Every type meeting the bounds implements it automatically, so it never needs
 /// to be implemented by hand.
 ///
-/// See
-/// [`PrimitiveIntRandomBounds`](crate::num::basic::integers::PrimitiveIntRandomBounds) for why this
-/// indirection exists.
+/// See [`PrimitiveIntRandomBounds`](crate::num::basic::integers::PrimitiveIntRandomBounds) for why
+/// this indirection exists.
 #[cfg(feature = "random")]
 pub trait PrimitiveSignedRandomBounds: HasRandomSignedRange + RandomSignedChunkable {}
 

@@ -364,6 +364,14 @@ pub fn integer_triple_gen() -> Generator<(Integer, Integer, Integer)> {
     )
 }
 
+pub fn integer_quadruple_gen() -> Generator<(Integer, Integer, Integer, Integer)> {
+    Generator::new(
+        &exhaustive_integer_quadruple_gen,
+        &random_integer_quadruple_gen,
+        &special_random_integer_quadruple_gen,
+    )
+}
+
 // All triples of natural (non-negative) `Integer`s.
 pub fn integer_triple_gen_var_1() -> Generator<(Integer, Integer, Integer)> {
     Generator::new(
@@ -1503,6 +1511,14 @@ pub fn natural_triple_gen() -> Generator<(Natural, Natural, Natural)> {
     )
 }
 
+pub fn natural_quadruple_gen() -> Generator<(Natural, Natural, Natural, Natural)> {
+    Generator::new(
+        &exhaustive_natural_quadruple_gen,
+        &random_natural_quadruple_gen,
+        &special_random_natural_quadruple_gen,
+    )
+}
+
 #[allow(clippy::type_complexity)]
 pub fn natural_triple_gen_rm() -> Generator<(
     (rug::Integer, rug::Integer, rug::Integer),
@@ -1636,6 +1652,16 @@ pub fn natural_quadruple_gen_var_3() -> Generator<(Natural, Natural, Natural, Na
         &exhaustive_natural_quadruple_gen_var_3,
         &random_natural_quadruple_gen_var_3,
         &special_random_natural_quadruple_gen_var_3,
+    )
+}
+
+// All `(Natural, Natural, Natural, Natural)` quadruples where $xy \geq zw$: the inputs of
+// `mul_sub_mul` that do not panic.
+pub fn natural_quadruple_gen_var_4() -> Generator<(Natural, Natural, Natural, Natural)> {
+    Generator::new(
+        &exhaustive_natural_quadruple_gen_var_4,
+        &random_natural_quadruple_gen_var_4,
+        &special_random_natural_quadruple_gen_var_4,
     )
 }
 

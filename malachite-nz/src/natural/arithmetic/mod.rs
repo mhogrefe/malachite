@@ -29,6 +29,7 @@ pub mod balanced_mod;
 /// [`BinomialCoefficient`](malachite_base::num::arithmetic::traits::BinomialCoefficient), a trait
 /// for computing the binomial coefficient of two numbers.
 pub mod binomial_coefficient;
+pub mod checked_mul_sub_mul;
 /// Implementations of [`CheckedSub`](malachite_base::num::arithmetic::traits::CheckedSub), a trait
 /// for subtracting two numbers and checking whether the result is representable.
 pub mod checked_sub;
@@ -563,6 +564,8 @@ pub mod mod_square;
 pub mod mod_sub;
 /// Multiplication of [`Natural`](super::Natural)s.
 pub mod mul;
+pub mod mul_add_mul;
+pub mod mul_sub_mul;
 /// Negation of a [`Natural`](super::Natural), returning an [`Integer`](crate::integer::Integer).
 pub mod neg;
 /// Implementations of [`NextPowerOf2`](malachite_base::num::arithmetic::traits::NextPowerOf2) and
@@ -603,6 +606,7 @@ pub mod round_to_multiple;
 /// traits for rounding a number to a multiple of a power of 2.
 #[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
 pub mod round_to_multiple_of_power_of_2;
+pub mod saturating_mul_sub_mul;
 /// Implementations of [`SaturatingSub`](malachite_base::num::arithmetic::traits::SaturatingSub) and
 /// [`SaturatingSubAssign`](malachite_base::num::arithmetic::traits::SaturatingSubAssign), traits
 /// for subtracting two numbers and saturating at numeric bounds instead of overflowing.

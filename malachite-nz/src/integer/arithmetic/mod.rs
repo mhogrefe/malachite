@@ -117,6 +117,8 @@ pub mod mod_op;
 pub mod mod_power_of_2;
 /// Multiplication of [`Integer`](super::Integer)s.
 pub mod mul;
+pub mod mul_add_mul;
+pub mod mul_sub_mul;
 /// Negation of an [`Integer`](super::Integer).
 pub mod neg;
 /// Implementations of [`Parity`](malachite_base::num::arithmetic::traits::Parity), a trait for

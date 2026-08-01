@@ -284,6 +284,10 @@ pub fn exhaustive_integer_triple_gen() -> It<(Integer, Integer, Integer)> {
     Box::new(exhaustive_triples_from_single(exhaustive_integers()))
 }
 
+pub fn exhaustive_integer_quadruple_gen() -> It<(Integer, Integer, Integer, Integer)> {
+    Box::new(exhaustive_quadruples_from_single(exhaustive_integers()))
+}
+
 pub fn exhaustive_integer_triple_gen_var_1() -> It<(Integer, Integer, Integer)> {
     Box::new(exhaustive_triples_from_single(exhaustive_natural_integers()))
 }
@@ -1196,6 +1200,10 @@ pub fn exhaustive_natural_triple_gen() -> It<(Natural, Natural, Natural)> {
     Box::new(exhaustive_triples_from_single(exhaustive_naturals()))
 }
 
+pub fn exhaustive_natural_quadruple_gen() -> It<(Natural, Natural, Natural, Natural)> {
+    Box::new(exhaustive_quadruples_from_single(exhaustive_naturals()))
+}
+
 pub fn exhaustive_natural_triple_gen_var_1() -> It<(Natural, Natural, Natural)> {
     Box::new(
         exhaustive_triples_from_single(exhaustive_naturals()).map(|(x, y, m)| (x * &m + &y, y, m)),
@@ -1289,6 +1297,10 @@ pub fn exhaustive_natural_quadruple_gen_var_3() -> It<(Natural, Natural, Natural
             (x, y, z, w)
         }),
     )
+}
+
+pub fn exhaustive_natural_quadruple_gen_var_4() -> It<(Natural, Natural, Natural, Natural)> {
+    Box::new(exhaustive_natural_quadruple_gen().filter(|(x, y, z, w)| x * y >= z * w))
 }
 
 // -- (Natural, Natural, Natural, PrimitiveUnsigned) --

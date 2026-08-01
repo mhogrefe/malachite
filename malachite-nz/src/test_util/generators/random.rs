@@ -437,6 +437,16 @@ pub fn random_integer_triple_gen(config: &GenConfig) -> It<(Integer, Integer, In
     )))
 }
 
+pub fn random_integer_quadruple_gen(
+    config: &GenConfig,
+) -> It<(Integer, Integer, Integer, Integer)> {
+    Box::new(random_quadruples_from_single(random_integers(
+        EXAMPLE_SEED,
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    )))
+}
+
 pub fn random_integer_triple_gen_var_1(config: &GenConfig) -> It<(Integer, Integer, Integer)> {
     Box::new(random_triples_from_single(random_natural_integers(
         EXAMPLE_SEED,
@@ -2178,6 +2188,16 @@ pub fn random_natural_triple_gen(config: &GenConfig) -> It<(Natural, Natural, Na
     )))
 }
 
+pub fn random_natural_quadruple_gen(
+    config: &GenConfig,
+) -> It<(Natural, Natural, Natural, Natural)> {
+    Box::new(random_quadruples_from_single(random_naturals(
+        EXAMPLE_SEED,
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    )))
+}
+
 pub fn random_natural_triple_gen_var_1(config: &GenConfig) -> It<(Natural, Natural, Natural)> {
     Box::new(
         random_triples_from_single(random_naturals(
@@ -2350,6 +2370,12 @@ pub fn random_natural_quadruple_gen_var_3(
             (x, y, z, w)
         }),
     )
+}
+
+pub fn random_natural_quadruple_gen_var_4(
+    config: &GenConfig,
+) -> It<(Natural, Natural, Natural, Natural)> {
+    Box::new(random_natural_quadruple_gen(config).filter(|(x, y, z, w)| x * y >= z * w))
 }
 
 // -- (Natural, Natural, Natural, PrimitiveUnsigned) --

@@ -32,6 +32,8 @@ pub(crate) fn register(runner: &mut Runner) {
     mod_op::register(runner);
     mod_power_of_2::register(runner);
     mul::register(runner);
+    mul_add_mul::register(runner);
+    mul_sub_mul::register(runner);
     neg::register(runner);
     parity::register(runner);
     pow::register(runner);
@@ -73,6 +75,8 @@ mod mod_euclidean;
 mod mod_op;
 mod mod_power_of_2;
 mod mul;
+mod mul_add_mul;
+mod mul_sub_mul;
 mod neg;
 mod parity;
 mod pow;

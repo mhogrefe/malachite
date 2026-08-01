@@ -573,11 +573,12 @@ precision near the target throughout, which is far cheaper when `prec` is small 
 large; the row is a gap until the dedicated version exists.
 
 **The fused operations.** `mpfr_fma`, `mpfr_fms`, `mpfr_fmma`, and `mpfr_fmms`, the singly
-rounded $$op1 \cdot op2 \pm op3$$ and $$op1 \cdot op2 \pm op3 \cdot op4$$, are gaps, the same
-fused family promised on
-[the FLINT integers page](/mapping/flint-integers/#basic-arithmetic) for exact integers. The
-separately rounded spelling `&a * &b + &c` computes a different, twice-rounded value, which is
-exactly what fusing exists to avoid; these rows are gaps rather than compositions.
+rounded $$op1 \cdot op2 \pm op3$$ and $$op1 \cdot op2 \pm op3 \cdot op4$$, are gaps. The exact
+counterparts of the double-product pair exist on
+[the FLINT integers page](/mapping/flint-integers/#basic-arithmetic), but they do not carry
+over: for exact integers fusing is about the temporary, while here it is about the rounding.
+The separately rounded spelling `&a * &b + &c` computes a different, twice-rounded value, which
+is exactly what fusing exists to avoid; these rows are gaps rather than compositions.
 
 **`mpfr_hypot`.** The Euclidean norm $$\sqrt{x^2 + y^2}$$, with the C99 special-value rule that
 an infinite operand gives $$+\infty$$ "even if the other number is NaN", is a gap.
