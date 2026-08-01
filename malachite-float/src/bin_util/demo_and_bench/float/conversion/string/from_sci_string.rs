@@ -12,12 +12,11 @@ use malachite_base::test_util::bench::bucketers::Bucketer;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
-use malachite_float::ComparableFloatRef;
-use malachite_float::Float;
 use malachite_float::test_util::generators::{
     string_from_sci_string_options_unsigned_triple_gen_var_1,
     string_from_sci_string_options_unsigned_triple_gen_var_2,
 };
+use malachite_float::{ComparableFloatRef, Float};
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_from_sci_string);

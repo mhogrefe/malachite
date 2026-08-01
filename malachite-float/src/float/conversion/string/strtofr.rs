@@ -16,6 +16,7 @@ use crate::Float;
 use crate::float::conversion::string::set_str::{overflow, set_str_helper};
 use alloc::vec::Vec;
 use core::cmp::Ordering::{self, *};
+use malachite_base::num::arithmetic::traits::SaturatingSubAssign;
 use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, NegativeZero, Zero};
 use malachite_base::rounding_modes::RoundingMode;
 
@@ -243,7 +244,7 @@ fn parse_string(s: &[u8], mut base: u8) -> (ParsedString, usize) {
     let mut leading = 0;
     while leading < digits.len() && digits[leading] == 0 {
         leading += 1;
-        exp_base = exp_base.saturating_sub(1);
+        exp_base.saturating_sub_assign(1);
     }
     digits.drain(..leading);
     while digits.last() == Some(&0) {

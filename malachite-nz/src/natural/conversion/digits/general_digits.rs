@@ -24,9 +24,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::arithmetic::add::limbs_add_limb_to_out;
 use crate::natural::arithmetic::add::{
-    limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
+    limbs_add_limb_to_out, limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
 };
 use crate::natural::arithmetic::div_exact::limbs_div_exact_limb_in_place;
 use crate::natural::arithmetic::div_mod::{

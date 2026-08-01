@@ -18,12 +18,10 @@ use crate::test_util::extra_variadic::{
     random_triples_xxy, random_triples_xyy,
 };
 use crate::test_util::generators::common::{
-    FLOAT_FORMAT_COMBO_COUNT, format_string_from_parts, format_string_output_is_bounded,
-    valid_float_get_str_quadruple,
-};
-use crate::test_util::generators::common::{
-    SCI_STRING_COMBO_COUNT, STRTOFR_COMBO_COUNT, STRTOFR_STRING_CHARS, sci_string_from_parts,
-    strtofr_string_from_parts, valid_float_from_sci_string_triple, valid_strtofr_quadruple,
+    FLOAT_FORMAT_COMBO_COUNT, SCI_STRING_COMBO_COUNT, STRTOFR_COMBO_COUNT, STRTOFR_STRING_CHARS,
+    format_string_from_parts, format_string_output_is_bounded, sci_string_from_parts,
+    strtofr_string_from_parts, valid_float_from_sci_string_triple, valid_float_get_str_quadruple,
+    valid_strtofr_quadruple,
 };
 use crate::test_util::generators::exhaustive::{
     add_prec_round_valid, add_rational_prec_round_valid, add_rational_round_valid, add_round_valid,
@@ -71,9 +69,8 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::string::options::FromSciStringOptions;
-use malachite_base::num::conversion::string::options::ToSciOptions;
 use malachite_base::num::conversion::string::options::random::random_to_sci_options;
+use malachite_base::num::conversion::string::options::{FromSciStringOptions, ToSciOptions};
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, SaturatingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::num::random::geometric::{
@@ -8255,6 +8252,26 @@ pub fn random_unsigned_pair_gen_var_51(config: &GenConfig) -> It<(u64, u64)> {
             )
         },
     ))
+}
+
+pub fn random_unsigned_unsigned_rounding_mode_triple_gen_var_10(
+    config: &GenConfig,
+) -> It<(u64, u64, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| random_unsigned_inclusive_range(seed, 2, 62),
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(_, _, rm)| *rm != Exact),
+    )
 }
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, RoundingMode) --

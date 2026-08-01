@@ -7,8 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use itertools::Itertools;
-use malachite_base::num::basic::traits::One;
-use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::strings::ToDebugString;
 use malachite_nz::natural::Natural;
 use malachite_q::Rational;

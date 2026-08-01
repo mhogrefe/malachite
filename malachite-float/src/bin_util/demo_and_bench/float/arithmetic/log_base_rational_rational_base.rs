@@ -12,10 +12,9 @@ use malachite_base::num::float::NiceFloat;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
-use malachite_float::ComparableFloat;
-use malachite_float::Float;
 use malachite_float::float::arithmetic::log_base_rational_rational_base::*;
 use malachite_float::test_util::generators::*;
+use malachite_float::{ComparableFloat, Float};
 use malachite_q::test_util::bench::bucketers::*;
 
 pub(crate) fn register(runner: &mut Runner) {

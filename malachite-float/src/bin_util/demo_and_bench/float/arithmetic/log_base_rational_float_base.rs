@@ -12,11 +12,10 @@ use malachite_base::num::float::NiceFloat;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
-use malachite_float::ComparableFloat;
-use malachite_float::Float;
 use malachite_float::float::arithmetic::log_base_rational_float_base::*;
 use malachite_float::test_util::bench::bucketers::*;
 use malachite_float::test_util::generators::*;
+use malachite_float::{ComparableFloat, Float};
 use malachite_q::test_util::bench::bucketers::pair_1_rational_bit_bucketer;
 use malachite_q::test_util::generators::rational_primitive_float_pair_gen;
 

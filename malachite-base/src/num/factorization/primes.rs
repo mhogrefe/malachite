@@ -20,9 +20,8 @@
 
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::{ExactFrom, WrappingFrom};
-use crate::num::factorization::prime_sieve::n_to_bit;
 use crate::num::factorization::prime_sieve::{
-    id_to_n, limbs_prime_sieve_size, limbs_prime_sieve_u64,
+    id_to_n, limbs_prime_sieve_size, limbs_prime_sieve_u64, n_to_bit,
 };
 use crate::num::factorization::traits::Primes;
 use crate::num::logic::traits::TrailingZeros;

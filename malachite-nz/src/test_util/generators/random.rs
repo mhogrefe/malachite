@@ -13,8 +13,9 @@ use crate::integer::random::{
     random_nonzero_integers,
 };
 use crate::natural::Natural;
-use crate::natural::arithmetic::binomial_coefficient::BIN_GOETGHELUCK_THRESHOLD;
-use crate::natural::arithmetic::binomial_coefficient::BIN_UIUI_RECURSIVE_SMALLDC;
+use crate::natural::arithmetic::binomial_coefficient::{
+    BIN_GOETGHELUCK_THRESHOLD, BIN_UIUI_RECURSIVE_SMALLDC,
+};
 use crate::natural::arithmetic::div_exact::{
     limbs_modular_invert_limb, limbs_modular_invert_scratch_len,
 };

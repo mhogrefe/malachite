@@ -6,8 +6,6 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::apply_fn_to_primitive_floats;
-use malachite_base::assert_panic;
 use malachite_base::num::arithmetic::traits::{CheckedRoot, IsPowerOf2, Pow, PowAssign, PowerOf2};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{
@@ -21,6 +19,7 @@ use malachite_base::test_util::generators::{
     primitive_float_pair_gen, primitive_float_unsigned_pair_gen_var_1,
     primitive_float_unsigned_pair_gen_var_4,
 };
+use malachite_base::{apply_fn_to_primitive_floats, assert_panic};
 use malachite_float::float::arithmetic::pow::{
     primitive_float_pow, primitive_float_pow_integer, primitive_float_pow_rational,
     primitive_float_pow_u, primitive_float_rational_pow, primitive_float_unsigned_pow,

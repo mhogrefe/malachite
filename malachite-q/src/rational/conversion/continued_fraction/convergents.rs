@@ -8,8 +8,7 @@
 
 use crate::Rational;
 use crate::rational::conversion::continued_fraction::to_continued_fraction::*;
-use crate::rational::conversion::traits::ContinuedFraction;
-use crate::rational::conversion::traits::Convergents;
+use crate::rational::conversion::traits::{ContinuedFraction, Convergents};
 use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{AddMulAssign, UnsignedAbs};
 use malachite_base::num::basic::traits::{One, Zero};

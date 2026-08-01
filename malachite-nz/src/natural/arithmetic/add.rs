@@ -151,8 +151,8 @@ pub(crate) fn add_with_carry_limb<T: PrimitiveUnsigned>(x: T, y: T, carry: T) ->
 // aarch64 (see perf/README.md).
 #[inline]
 pub(crate) fn add_with_carry<T: PrimitiveUnsigned>(x: T, y: T, carry: bool) -> (T, bool) {
-    let (sum, carry_1) = x.overflowing_add(y);
-    let (sum, carry_2) = sum.overflowing_add(if carry { T::ONE } else { T::ZERO });
+    let (mut sum, carry_1) = x.overflowing_add(y);
+    let carry_2 = sum.overflowing_add_assign(if carry { T::ONE } else { T::ZERO });
     (sum, carry_1 | carry_2)
 }
 

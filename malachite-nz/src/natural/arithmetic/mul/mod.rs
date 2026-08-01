@@ -24,18 +24,18 @@ use crate::natural::arithmetic::add_mul::{
 };
 use crate::natural::arithmetic::mul::fft::mpn_mul_default_mpn_ctx;
 use crate::natural::arithmetic::mul::limb::limbs_mul_limb_to_out;
-use crate::natural::arithmetic::mul::toom::MUL_TOOM33_THRESHOLD_LIMIT;
 use crate::natural::arithmetic::mul::toom::{
-    limbs_mul_greater_to_out_toom_6h, limbs_mul_greater_to_out_toom_6h_scratch_len,
-    limbs_mul_greater_to_out_toom_8h, limbs_mul_greater_to_out_toom_8h_scratch_len,
-    limbs_mul_greater_to_out_toom_22, limbs_mul_greater_to_out_toom_22_scratch_len,
-    limbs_mul_greater_to_out_toom_32, limbs_mul_greater_to_out_toom_32_scratch_len,
-    limbs_mul_greater_to_out_toom_33, limbs_mul_greater_to_out_toom_33_scratch_len,
-    limbs_mul_greater_to_out_toom_42, limbs_mul_greater_to_out_toom_42_scratch_len,
-    limbs_mul_greater_to_out_toom_43, limbs_mul_greater_to_out_toom_43_scratch_len,
-    limbs_mul_greater_to_out_toom_44, limbs_mul_greater_to_out_toom_44_scratch_len,
-    limbs_mul_greater_to_out_toom_53, limbs_mul_greater_to_out_toom_53_scratch_len,
-    limbs_mul_greater_to_out_toom_63, limbs_mul_greater_to_out_toom_63_scratch_len,
+    MUL_TOOM33_THRESHOLD_LIMIT, limbs_mul_greater_to_out_toom_6h,
+    limbs_mul_greater_to_out_toom_6h_scratch_len, limbs_mul_greater_to_out_toom_8h,
+    limbs_mul_greater_to_out_toom_8h_scratch_len, limbs_mul_greater_to_out_toom_22,
+    limbs_mul_greater_to_out_toom_22_scratch_len, limbs_mul_greater_to_out_toom_32,
+    limbs_mul_greater_to_out_toom_32_scratch_len, limbs_mul_greater_to_out_toom_33,
+    limbs_mul_greater_to_out_toom_33_scratch_len, limbs_mul_greater_to_out_toom_42,
+    limbs_mul_greater_to_out_toom_42_scratch_len, limbs_mul_greater_to_out_toom_43,
+    limbs_mul_greater_to_out_toom_43_scratch_len, limbs_mul_greater_to_out_toom_44,
+    limbs_mul_greater_to_out_toom_44_scratch_len, limbs_mul_greater_to_out_toom_53,
+    limbs_mul_greater_to_out_toom_53_scratch_len, limbs_mul_greater_to_out_toom_63,
+    limbs_mul_greater_to_out_toom_63_scratch_len,
 };
 use crate::platform::{
     DoubleLimb, Limb, MUL_FFT_THRESHOLD, MUL_TOOM6H_THRESHOLD, MUL_TOOM8H_THRESHOLD,
@@ -47,8 +47,7 @@ use alloc::vec::Vec;
 use core::cmp::max;
 use core::iter::Product;
 use core::ops::{Mul, MulAssign};
-use malachite_base::num::basic::traits::One;
-use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::traits::{One, Zero};
 
 const MUL_TOOM33_THRESHOLD_LIMIT_MINUS_1: usize = MUL_TOOM33_THRESHOLD_LIMIT - 1;
 

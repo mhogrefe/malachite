@@ -16,10 +16,11 @@ use crate::num::arithmetic::traits::{
     SqrtAssign, Square, SquareAssign, SubMul, SubMulAssign,
 };
 use crate::num::basic::traits::{
-    GaussConstant, GelfondSchneiderConstant, GelfondsConstant, Infinity, LemniscateConstant, Ln2,
-    Ln10, Log2E, Log10E, Log102, Log210, NaN, NegativeInfinity, NegativeOne, NegativeZero, One,
-    OneHalf, OneOverPi, OneOverSqrtPi, OneOverSqrtTau, Phi, Pi, PiOver2, PiOver3, PiOver4, PiOver6,
-    PiOver8, PrimeConstant, ProuhetThueMorseConstant, RamanujansConstant, Sqrt2, Sqrt2Over2, Sqrt3,
+    ChampernowneConstant, CopelandErdosConstant, GaussConstant, GelfondSchneiderConstant,
+    GelfondsConstant, Infinity, LemniscateConstant, LiouvillesConstant, Ln2, Ln10, Log2E, Log10E,
+    Log102, Log210, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, OneHalf, OneOverPi,
+    OneOverSqrtPi, OneOverSqrtTau, Phi, Pi, PiOver2, PiOver3, PiOver4, PiOver6, PiOver8,
+    PrimeConstant, ProuhetThueMorseConstant, RamanujansConstant, Sqrt2, Sqrt2Over2, Sqrt3,
     Sqrt3Over3, Sqrt5, Sqrt5Over5, SqrtPi, Tau, Two, TwoOverPi, TwoOverSqrtPi, Zero,
 };
 use crate::num::comparison::traits::{EqAbs, PartialOrdAbs};
@@ -149,6 +150,9 @@ pub trait PrimitiveFloat:
     + IsInteger
     + IsPowerOf2
     + LemniscateConstant
+    + LiouvillesConstant
+    + ChampernowneConstant
+    + CopelandErdosConstant
     + Log2E
     + Log10E
     + Log210
@@ -643,7 +647,10 @@ macro_rules! impl_basic_traits_primitive_float {
         $gelfonds_constant: expr,
         $gelfond_schneider_constant: expr,
         $lemniscate_constant: expr,
-        $ramanujans_constant: expr
+        $ramanujans_constant: expr,
+        $liouvilles_constant: expr,
+        $champernowne_constant: expr,
+        $copeland_erdos_constant: expr
     ) => {
         impl PrimitiveFloat for $t {
             const WIDTH: u64 = $width;
@@ -926,6 +933,21 @@ macro_rules! impl_basic_traits_primitive_float {
         impl RamanujansConstant for $t {
             const RAMANUJANS_CONSTANT: $t = $ramanujans_constant;
         }
+
+        /// $\sum_{n=1}^{\infty} 10^{-n!}$.
+        impl LiouvillesConstant for $t {
+            const LIOUVILLES_CONSTANT: $t = $liouvilles_constant;
+        }
+
+        /// $0.123456789101112\ldots$
+        impl ChampernowneConstant for $t {
+            const CHAMPERNOWNE_CONSTANT: $t = $champernowne_constant;
+        }
+
+        /// $0.235711131719\ldots$
+        impl CopelandErdosConstant for $t {
+            const COPELAND_ERDOS_CONSTANT: $t = $copeland_erdos_constant;
+        }
     };
 }
 impl_basic_traits_primitive_float!(
@@ -948,7 +970,10 @@ impl_basic_traits_primitive_float!(
     23.140692,
     2.6651442,
     2.6220574,
-    2.6253742e17
+    2.6253742e17,
+    0.110001,
+    0.12345679,
+    0.23571113
 );
 impl_basic_traits_primitive_float!(
     f64,
@@ -970,5 +995,8 @@ impl_basic_traits_primitive_float!(
     23.14069263277927,
     2.665144142690225,
     2.6220575542921196,
-    2.6253741264076874e17
+    2.6253741264076874e17,
+    0.110001,
+    0.12345678910111213,
+    0.23571113171923294
 );

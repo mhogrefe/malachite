@@ -12,13 +12,12 @@ use malachite_base::test_util::bench::bucketers::{Bucketer, pair_2_bucketer};
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
-use malachite_float::ComparableFloatRef;
-use malachite_float::Float;
 use malachite_float::float::conversion::string::get_str::{get_str, get_str_digit_count};
 use malachite_float::test_util::generators::{
     float_signed_unsigned_rounding_mode_quadruple_gen_var_9,
     float_signed_unsigned_rounding_mode_quadruple_gen_var_10_rm, unsigned_pair_gen_var_51,
 };
+use malachite_float::{ComparableFloatRef, Float};
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_get_str);

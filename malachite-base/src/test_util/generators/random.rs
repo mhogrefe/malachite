@@ -14,9 +14,8 @@ use crate::chars::random::{
 use crate::foer_sequences::FoerSequence;
 use crate::foer_sequences::random::random_foer_sequences;
 use crate::iterators::with_special_value;
-use crate::num::arithmetic::traits::CoprimeWith;
 use crate::num::arithmetic::traits::{
-    ArithmeticCheckedShl, DivRound, Parity, PowerOf2, ShrRound, UnsignedAbs,
+    ArithmeticCheckedShl, CoprimeWith, DivRound, Parity, PowerOf2, ShrRound, UnsignedAbs,
 };
 use crate::num::basic::floats::PrimitiveFloat;
 use crate::num::basic::integers::PrimitiveInt;
@@ -71,10 +70,8 @@ use crate::test_util::extra_variadic::{
 };
 use crate::test_util::generators::common::{
     GMP_SPEC_C_TYPE_COUNT, GMP_SPEC_CONV_CHARS, GMP_SPEC_INTEGER_CONV_COUNT, GMP_SPEC_TYPE_STRS,
-    gmp_spec_string_from_parts,
-};
-use crate::test_util::generators::common::{
-    GenConfig, It, reshape_1_2_to_3, reshape_2_1_to_3, reshape_2_2_to_4, reshape_3_1_to_4,
+    GenConfig, It, gmp_spec_string_from_parts, reshape_1_2_to_3, reshape_2_1_to_3,
+    reshape_2_2_to_4, reshape_3_1_to_4,
 };
 use crate::test_util::generators::exhaustive::{
     float_rounding_mode_filter_var_1, valid_digit_chars,
@@ -96,8 +93,7 @@ use crate::vecs::random::{
     random_vecs_min_length,
 };
 use crate::vecs::random_values_from_vec;
-use itertools::Itertools;
-use itertools::repeat_n;
+use itertools::{Itertools, repeat_n};
 use std::cmp::{Ordering::*, max, min};
 use std::collections::HashMap;
 use std::marker::PhantomData;

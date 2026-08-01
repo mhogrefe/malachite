@@ -6,8 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use alloc::string::String;
-use alloc::string::ToString;
+use alloc::string::{String, ToString};
 use core::fmt::{self, Display, Formatter};
 use core::str::FromStr;
 

@@ -7,8 +7,10 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use crate::{Float, float_either_zero};
-use crate::{float_either_infinity, float_finite, float_nan, float_negative_zero, float_zero};
+use crate::{
+    Float, float_either_infinity, float_either_zero, float_finite, float_nan, float_negative_zero,
+    float_zero,
+};
 use core::num::FpCategory;
 
 impl Float {

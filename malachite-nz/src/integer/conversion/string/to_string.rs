@@ -8,8 +8,7 @@
 
 use crate::integer::Integer;
 use crate::natural::conversion::string::to_string::BaseFmtWrapper;
-use alloc::string::String;
-use alloc::string::ToString;
+use alloc::string::{String, ToString};
 use core::fmt::{Binary, Debug, Display, Formatter, LowerHex, Octal, Result, UpperHex, Write};
 use malachite_base::num::conversion::string::to_string::{
     digit_to_display_byte_large, digit_to_display_byte_lower, digit_to_display_byte_upper,

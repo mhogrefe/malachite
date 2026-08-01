@@ -14,8 +14,7 @@ use malachite_base::num::arithmetic::traits::{DivisibleByPowerOf2, NegModPowerOf
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
-use malachite_nz::natural::LIMB_HIGH_BIT;
-use malachite_nz::natural::{Natural, bit_to_limb_count_ceiling};
+use malachite_nz::natural::{LIMB_HIGH_BIT, Natural, bit_to_limb_count_ceiling};
 use malachite_nz::platform::Limb;
 
 impl Float {
@@ -30,8 +29,10 @@ impl Float {
     /// This function reads `prec + z` bits, or `prec + z + 1` bits if `rm` is `Nearest`, where `z`
     /// is the number of leading false bits in `bits`.
     ///
-    /// This function always produces a value in the interval $[1/2,1]$. In particular, it never
-    /// overflows or underflows.
+    /// If the first bit is set, this function produces a value in the interval $[1/2,1)$; each
+    /// leading false bit halves that interval, so $z$ of them place the value in
+    /// $[2^{-z-1},2^{-z})$. The exponent is not range-checked, so a bit sequence beginning with
+    /// enough false bits to reach `Float::MIN_EXPONENT` would underflow.
     ///
     /// $$
     /// f((x_k),p,m) = C+\varepsilon,
@@ -177,8 +178,10 @@ impl Float {
     /// This function reads `prec + z + 1` bits, where `z` is the number of leading false bits in
     /// `bits`.
     ///
-    /// This function always produces a value in the interval $[1/2,1]$. In particular, it never
-    /// overflows or underflows.
+    /// If the first bit is set, this function produces a value in the interval $[1/2,1)$; each
+    /// leading false bit halves that interval, so $z$ of them place the value in
+    /// $[2^{-z-1},2^{-z})$. The exponent is not range-checked, so a bit sequence beginning with
+    /// enough false bits to reach `Float::MIN_EXPONENT` would underflow.
     ///
     /// $$
     /// f((x_k),p,m) = C+\varepsilon,

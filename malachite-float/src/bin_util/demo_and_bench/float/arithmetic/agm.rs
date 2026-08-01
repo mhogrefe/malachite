@@ -18,8 +18,9 @@ use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::primitive_float_pair_gen;
 use malachite_base::test_util::runner::Runner;
 use malachite_float::float::arithmetic::agm::{primitive_float_agm, primitive_float_agm_rational};
-use malachite_float::float::basic::extended::ExtendedFloat;
-use malachite_float::float::basic::extended::agm_prec_round_normal_ref_ref_extended;
+use malachite_float::float::basic::extended::{
+    ExtendedFloat, agm_prec_round_normal_ref_ref_extended,
+};
 use malachite_float::test_util::bench::bucketers::{
     pair_2_pair_float_max_complexity_bucketer,
     pair_2_quadruple_1_2_3_float_float_primitive_int_max_complexity_bucketer,

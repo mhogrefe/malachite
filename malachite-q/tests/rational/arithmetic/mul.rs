@@ -10,14 +10,12 @@ use malachite_base::num::arithmetic::traits::{Reciprocal, Square};
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::vecs::vec_from_str;
 use malachite_nz::integer::Integer;
-use malachite_nz::test_util::generators::integer_pair_gen;
-use malachite_nz::test_util::generators::integer_vec_gen;
+use malachite_nz::test_util::generators::{integer_pair_gen, integer_vec_gen};
 use malachite_q::Rational;
 use malachite_q::test_util::generators::{
     rational_gen, rational_pair_gen, rational_triple_gen, rational_vec_gen,
 };
-use malachite_q::test_util::rational::arithmetic::mul::mul_naive;
-use malachite_q::test_util::rational::arithmetic::mul::rational_product_naive;
+use malachite_q::test_util::rational::arithmetic::mul::{mul_naive, rational_product_naive};
 use num::BigRational;
 use std::iter::{Product, once};
 use std::str::FromStr;

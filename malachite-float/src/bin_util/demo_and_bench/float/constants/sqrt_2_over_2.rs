@@ -14,10 +14,9 @@ use malachite_base::test_util::generators::{
     unsigned_gen_var_11, unsigned_rounding_mode_pair_gen_var_4,
 };
 use malachite_base::test_util::runner::Runner;
-use malachite_float::ComparableFloat;
-use malachite_float::Float;
 use malachite_float::test_util::common::rug_round_exact_from_rounding_mode;
 use malachite_float::test_util::float::constants::sqrt_2_over_2::rug_sqrt_2_over_2_prec_round;
+use malachite_float::{ComparableFloat, Float};
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_sqrt_2_over_2_prec_round);

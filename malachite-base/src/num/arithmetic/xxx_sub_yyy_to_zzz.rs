@@ -33,8 +33,8 @@ pub_test! {xxx_sub_yyy_to_zzz<T: PrimitiveUnsigned>(
     y_0: T,
 ) -> (T, T, T) {
     let (z_0, borrow) = x_0.overflowing_sub(y_0);
-    let (z_1, borrow_a) = x_1.overflowing_sub(y_1);
-    let (z_1, borrow_b) = z_1.overflowing_sub(if borrow { T::ONE } else { T::ZERO });
+    let (mut z_1, borrow_a) = x_1.overflowing_sub(y_1);
+    let borrow_b = z_1.overflowing_sub_assign(if borrow { T::ONE } else { T::ZERO });
     let borrow = borrow_a | borrow_b;
     let z_2 = x_2.wrapping_sub(y_2).wrapping_sub(if borrow { T::ONE } else { T::ZERO });
     (z_2, z_1, z_0)

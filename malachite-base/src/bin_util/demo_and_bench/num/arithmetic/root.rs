@@ -8,13 +8,11 @@
 
 use malachite_base::named::Named;
 use malachite_base::num::arithmetic::root::{
-    cbrt_chebyshev_approx_u32, cbrt_chebyshev_approx_u64, fast_ceiling_root_u32,
-    fast_ceiling_root_u64, fast_checked_root_u32, fast_checked_root_u64, fast_floor_cbrt_u32,
-    fast_floor_cbrt_u64, fast_floor_root_u32, fast_floor_root_u64, fast_root_rem_u32,
-    fast_root_rem_u64, floor_root_approx_and_refine,
-};
-use malachite_base::num::arithmetic::root::{
-    ceiling_root_binary, checked_root_binary, floor_root_binary, root_rem_binary,
+    cbrt_chebyshev_approx_u32, cbrt_chebyshev_approx_u64, ceiling_root_binary, checked_root_binary,
+    fast_ceiling_root_u32, fast_ceiling_root_u64, fast_checked_root_u32, fast_checked_root_u64,
+    fast_floor_cbrt_u32, fast_floor_cbrt_u64, fast_floor_root_u32, fast_floor_root_u64,
+    fast_root_rem_u32, fast_root_rem_u64, floor_root_approx_and_refine, floor_root_binary,
+    root_rem_binary,
 };
 use malachite_base::num::arithmetic::traits::{CeilingRoot, CheckedRoot, FloorRoot, RootRem};
 use malachite_base::num::basic::signeds::PrimitiveSigned;

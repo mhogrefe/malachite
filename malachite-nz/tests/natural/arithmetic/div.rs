@@ -21,12 +21,9 @@ use malachite_nz::natural::arithmetic::div::{
     limbs_div, limbs_div_barrett, limbs_div_barrett_approx, limbs_div_barrett_approx_scratch_len,
     limbs_div_barrett_scratch_len, limbs_div_divide_and_conquer,
     limbs_div_divide_and_conquer_approx, limbs_div_divisor_of_limb_max_with_carry_in_place,
-    limbs_div_divisor_of_limb_max_with_carry_to_out, limbs_div_schoolbook,
-    limbs_div_schoolbook_approx, limbs_div_to_out, limbs_div_to_out_ref_ref,
-    limbs_div_to_out_ref_val, limbs_div_to_out_val_ref,
-};
-use malachite_nz::natural::arithmetic::div::{
-    limbs_div_limb, limbs_div_limb_in_place, limbs_div_limb_to_out,
+    limbs_div_divisor_of_limb_max_with_carry_to_out, limbs_div_limb, limbs_div_limb_in_place,
+    limbs_div_limb_to_out, limbs_div_schoolbook, limbs_div_schoolbook_approx, limbs_div_to_out,
+    limbs_div_to_out_ref_ref, limbs_div_to_out_ref_val, limbs_div_to_out_val_ref,
 };
 use malachite_nz::natural::arithmetic::div_mod::limbs_two_limb_inverse_helper;
 use malachite_nz::platform::{DoubleLimb, Limb};
@@ -39,8 +36,7 @@ use malachite_nz::test_util::generators::{
 use malachite_nz::test_util::natural::arithmetic::div::{
     limbs_div_limb_in_place_alt, limbs_div_limb_to_out_alt,
 };
-use num::BigUint;
-use num::CheckedDiv as NumCheckedDiv;
+use num::{BigUint, CheckedDiv as NumCheckedDiv};
 use rug;
 use std::str::FromStr;
 

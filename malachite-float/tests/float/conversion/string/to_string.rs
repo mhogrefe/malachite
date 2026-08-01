@@ -11,15 +11,13 @@ use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::{FromStringBase, ToStringBase};
 use malachite_base::strings::{ToDebugString, string_is_subset};
-use malachite_float::ComparableFloatRef;
-use malachite_float::Float;
 use malachite_float::float::conversion::string::get_str::get_str_digit_count;
 use malachite_float::test_util::common::parse_hex_string;
-use malachite_float::test_util::generators::float_unsigned_pair_gen_var_8;
 use malachite_float::test_util::generators::{
     float_gen, float_gen_var_6, float_gen_var_7, float_gen_var_8, float_gen_var_9,
-    float_gen_var_10, float_gen_var_12,
+    float_gen_var_10, float_gen_var_12, float_unsigned_pair_gen_var_8,
 };
+use malachite_float::{ComparableFloatRef, Float};
 use malachite_nz::natural::Natural;
 use std::panic::catch_unwind;
 use std::str::FromStr;

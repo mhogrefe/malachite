@@ -205,6 +205,18 @@ pub trait TwoOverSqrtPi {
     const TWO_OVER_SQRT_PI: Self;
 }
 
+/// Provides the Champernowne constant in base 10, $0.123456789101112\ldots$, formed by
+/// concatenating the decimal representations of the positive integers.
+pub trait ChampernowneConstant {
+    const CHAMPERNOWNE_CONSTANT: Self;
+}
+
+/// Provides the Copeland–Erdős constant in base 10, $0.235711131719\ldots$, formed by
+/// concatenating the decimal representations of the primes.
+pub trait CopelandErdosConstant {
+    const COPELAND_ERDOS_CONSTANT: Self;
+}
+
 /// Provides Gauss's constant, $G=1/\mathrm{AGM}(1,\sqrt{2})$.
 ///
 /// Having three consecutive esses in an identifier is awkward, so let's pretend that we sometimes
@@ -226,6 +238,12 @@ pub trait GelfondSchneiderConstant {
 /// Provides the lemniscate constant $\varpi=\pi G$, where $G$ is Gauss's constant.
 pub trait LemniscateConstant {
     const LEMNISCATE_CONSTANT: Self;
+}
+
+/// Provides Liouville's constant in base 10, $\sum_{n=1}^{\infty} 10^{-n!}$, whose decimal
+/// expansion has a 1 at every position that is a factorial and a 0 everywhere else.
+pub trait LiouvillesConstant {
+    const LIOUVILLES_CONSTANT: Self;
 }
 
 /// Provides Ramanujan's constant, $e^{\pi\sqrt{163}}$.

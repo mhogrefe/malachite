@@ -22,8 +22,6 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::LIMB_MAX_MINUS_1;
-use crate::natural::Natural;
 use crate::natural::arithmetic::add::{
     limbs_add_limb_to_out, limbs_add_same_length_to_out,
     limbs_add_same_length_with_carry_in_in_place_left, limbs_add_same_length_with_carry_in_to_out,
@@ -52,6 +50,7 @@ use crate::natural::arithmetic::sub::{
 use crate::natural::arithmetic::sub_mul::limbs_sub_mul_limb_same_length_in_place_left;
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
 use crate::natural::logic::not::limbs_not_to_out;
+use crate::natural::{LIMB_MAX_MINUS_1, Natural};
 use crate::platform::{
     DC_DIV_QR_THRESHOLD, DC_DIVAPPR_Q_THRESHOLD, DoubleLimb, INV_MULMOD_BNM1_THRESHOLD,
     INV_NEWTON_THRESHOLD, Limb, MAYBE_DCP1_DIVAPPR, MU_DIV_QR_SKEW_THRESHOLD, MU_DIV_QR_THRESHOLD,

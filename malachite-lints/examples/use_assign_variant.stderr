@@ -36,5 +36,35 @@ error: use `add_prec_assign` (in place) instead of shadowing `t` with the result
 LL |     let (t, o) = t.add_prec_val_ref(&y, p);
    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-error: aborting due to 6 previous errors
+error: use `saturating_mul_assign` (in place) instead of assigning the result of `saturating_mul`
+  --> $DIR/use_assign_variant.rs:44:5
+   |
+LL |     n = n.saturating_mul(k);
+   |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `wrapping_add_assign` (in place) instead of assigning the result of `wrapping_add`
+  --> $DIR/use_assign_variant.rs:45:5
+   |
+LL |     n = n.wrapping_add(k);
+   |     ^^^^^^^^^^^^^^^^^^^^^
+
+error: use `overflowing_sub_assign` (in place) instead of assigning the result of `overflowing_sub`
+  --> $DIR/use_assign_variant.rs:48:5
+   |
+LL |     n = n.overflowing_sub(k).0;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `wrapping_mul_assign` (in place) instead of shadowing `m` with the result of `wrapping_mul`
+  --> $DIR/use_assign_variant.rs:51:5
+   |
+LL |     let m = m.wrapping_mul(k);
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `overflowing_add_assign` (in place) instead of shadowing `m` with the result of `overflowing_add`
+  --> $DIR/use_assign_variant.rs:52:5
+   |
+LL |     let (m, overflow) = m.overflowing_add(k);
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: aborting due to 11 previous errors
 

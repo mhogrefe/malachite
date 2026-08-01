@@ -27,10 +27,10 @@ use malachite_float::test_util::bench::bucketers::{
     triple_float_rational_primitive_int_max_complexity_bucketer,
 };
 use malachite_float::test_util::float::arithmetic::add::add_prec_round_naive;
-use malachite_float::test_util::float::arithmetic::sub::sub_rational_prec_round_naive;
 use malachite_float::test_util::float::arithmetic::sub::{
     rug_sub, rug_sub_prec, rug_sub_prec_round, rug_sub_rational, rug_sub_rational_prec,
     rug_sub_rational_prec_round, rug_sub_rational_round, rug_sub_round,
+    sub_rational_prec_round_naive,
 };
 use malachite_float::test_util::generators::{
     float_float_rounding_mode_triple_gen_var_1_rm, float_float_rounding_mode_triple_gen_var_2,

@@ -7,8 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::InnerNatural::Small;
-use crate::natural::Natural;
-use crate::natural::{WIDTH_MINUS_1, WIDTH_MINUS_2, WIDTH_MINUS_3};
+use crate::natural::{Natural, WIDTH_MINUS_1, WIDTH_MINUS_2, WIDTH_MINUS_3};
 use crate::platform::{Limb, MAX_DIGITS_PER_LIMB};
 use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{ModPowerOf2, ShrRound};

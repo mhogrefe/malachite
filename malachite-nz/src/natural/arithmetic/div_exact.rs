@@ -21,8 +21,6 @@
 
 use crate::integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
 use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::LIMB_MAX_DIV_3;
-use crate::natural::Natural;
 use crate::natural::arithmetic::add::{
     limbs_slice_add_greater_in_place_left, limbs_slice_add_limb_in_place,
     limbs_slice_add_same_length_in_place_left,
@@ -51,6 +49,7 @@ use crate::natural::arithmetic::sub::{
 };
 use crate::natural::arithmetic::sub_mul::limbs_sub_mul_limb_same_length_in_place_left;
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
+use crate::natural::{LIMB_MAX_DIV_3, Natural};
 use crate::platform::{
     BINV_NEWTON_THRESHOLD, DC_BDIV_Q_THRESHOLD, DC_BDIV_QR_THRESHOLD, DoubleLimb, Limb,
     MU_BDIV_Q_THRESHOLD, MU_BDIV_QR_THRESHOLD,
@@ -1605,8 +1604,7 @@ pub(crate) fn limbs_modular_div_mod(
         tp[..nn].copy_from_slice(np);
 
         // Compute modular inverse: di = -D[0]^(-1) mod B
-        let mut di = limbs_modular_invert_limb(dp[0]);
-        di = di.wrapping_neg(); // Negate the inverse
+        let di = limbs_modular_invert_limb(dp[0]).wrapping_neg();
 
         // Perform simple binary division with precomputed inverse
         rh = limbs_modular_div_mod_schoolbook(qp, &mut tp[..nn], dp, di);
@@ -1620,8 +1618,7 @@ pub(crate) fn limbs_modular_div_mod(
         tp[..nn].copy_from_slice(np);
 
         // Compute modular inverse
-        let mut di = limbs_modular_invert_limb(dp[0]);
-        di = di.wrapping_neg();
+        let di = limbs_modular_invert_limb(dp[0]).wrapping_neg();
 
         // Perform divide-and-conquer binary division
         rh = limbs_modular_div_mod_divide_and_conquer(qp, &mut tp[..nn], dp, di);

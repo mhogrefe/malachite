@@ -13,8 +13,7 @@ use malachite_base::test_util::generators::unsigned_pair_gen_var_34;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::{natural_gen, natural_pair_gen, natural_triple_gen};
-use num::BigUint;
-use num::Integer as rug_integer;
+use num::{BigUint, Integer as rug_integer};
 use std::str::FromStr;
 
 #[test]

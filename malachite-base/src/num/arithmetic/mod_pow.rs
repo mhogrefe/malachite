@@ -16,8 +16,7 @@ use crate::num::arithmetic::traits::{
 };
 use crate::num::basic::integers::USIZE_IS_U32;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
-use crate::num::conversion::traits::WrappingFrom;
-use crate::num::conversion::traits::{HasHalf, JoinHalves, SplitInHalf};
+use crate::num::conversion::traits::{HasHalf, JoinHalves, SplitInHalf, WrappingFrom};
 use crate::num::logic::traits::{BitIterable, LeadingZeros};
 
 pub_test! {simple_binary_mod_pow<T: PrimitiveUnsigned>(x: T, exp: u64, m: T) -> T {

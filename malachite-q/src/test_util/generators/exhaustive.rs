@@ -39,11 +39,10 @@ use malachite_base::test_util::generators::common::{It, reshape_2_1_to_3};
 use malachite_base::test_util::generators::{
     exhaustive_pairs_big_small, exhaustive_pairs_big_tiny,
 };
-use malachite_base::tuples::exhaustive::exhaustive_triples;
 use malachite_base::tuples::exhaustive::{
     exhaustive_ordered_unique_pairs, exhaustive_pairs, exhaustive_pairs_from_single,
-    exhaustive_triples_custom_output, exhaustive_triples_xyy, exhaustive_triples_xyy_custom_output,
-    lex_pairs,
+    exhaustive_triples, exhaustive_triples_custom_output, exhaustive_triples_xyy,
+    exhaustive_triples_xyy_custom_output, lex_pairs,
 };
 use malachite_base::vecs::exhaustive::exhaustive_vecs;
 use malachite_nz::integer::Integer;

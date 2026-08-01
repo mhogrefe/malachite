@@ -21,6 +21,7 @@ mod adjacent_vec_allocations;
 mod assert_ordering_equal_prefer_exact;
 mod assign_then_consumed_once;
 mod clone_with_ref_variant;
+mod collapse_adjacent_imports;
 mod compare_with_power_of_2;
 mod compare_with_primitive;
 mod duplicate_const;
@@ -207,6 +208,58 @@ fn assign_variant(
     None
 }
 
+// The `*Assign` companion of the function family `base` for a type that is not a Malachite bignum:
+// a `{CamelCase(base)}Assign` trait in `malachite_base` that `ty` actually implements. Unlike
+// `assign_variant`, which knows its receiver is a bignum and so can settle for the trait existing,
+// this must check the impl: `PowAssign` exists, but that says nothing about some unrelated type
+// with a `pow` method.
+fn assign_trait_impl<'tcx>(
+    cx: &rustc_lint::LateContext<'tcx>,
+    ty: rustc_middle::ty::Ty<'tcx>,
+    base: &str,
+) -> Option<String> {
+    use clippy_utils::paths::{PathNS, lookup_path_str};
+    use clippy_utils::ty::implements_trait_with_env_from_iter;
+    let trait_name = format!("{}Assign", camel_case(base));
+    for module in ["arithmetic", "logic"] {
+        let path = format!("malachite_base::num::{module}::traits::{trait_name}");
+        for did in lookup_path_str(cx.tcx, PathNS::Type, &path) {
+            if cx.tcx.def_kind(did) != rustc_hir::def::DefKind::Trait {
+                continue;
+            }
+            // These traits are generic in the right-hand side (`SaturatingMulAssign<RHS = Self>`);
+            // any RHS counts, so every parameter past `Self` is left to inference.
+            let rhs_count = cx.tcx.generics_of(did).own_params.len() - 1;
+            if implements_trait_with_env_from_iter(
+                cx.tcx,
+                cx.typing_env(),
+                ty,
+                did,
+                None,
+                std::iter::repeat_n(None::<rustc_middle::ty::GenericArg<'tcx>>, rhs_count),
+            ) {
+                return Some(format!("{base}_assign"));
+            }
+        }
+    }
+    None
+}
+
+// The in-place `*_assign*` companion to suggest for a call to the `base` family on a receiver of
+// type `ty`, if one exists. Bignums get the inherent-or-trait lookup; everything else (primitive
+// integers and floats, and any other type implementing a `malachite_base` assign trait) must
+// implement the trait.
+fn assign_variant_for_ty<'tcx>(
+    cx: &rustc_lint::LateContext<'tcx>,
+    ty: rustc_middle::ty::Ty<'tcx>,
+    base: &str,
+) -> Option<String> {
+    match bignum_adt_did(cx, ty) {
+        Some(adt_did) => assign_variant(cx, adt_did, base),
+        None => assign_trait_impl(cx, ty, base),
+    }
+}
+
 // Whether `e` is a path to an associated constant named `WIDTH`.
 fn is_width_const(cx: &rustc_lint::LateContext<'_>, e: &rustc_hir::Expr<'_>) -> bool {
     use rustc_hir::ExprKind;
@@ -315,6 +368,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         assert_ordering_equal_prefer_exact::ASSERT_ORDERING_EQUAL_PREFER_EXACT,
         assign_then_consumed_once::ASSIGN_THEN_CONSUMED_ONCE,
         clone_with_ref_variant::CLONE_WITH_REF_VARIANT,
+        collapse_adjacent_imports::COLLAPSE_ADJACENT_IMPORTS,
         compare_with_power_of_2::COMPARE_WITH_POWER_OF_2,
         compare_with_primitive::COMPARE_WITH_PRIMITIVE,
         duplicate_const::DUPLICATE_CONST,
@@ -387,6 +441,8 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         .register_late_pass(|_| Box::new(runtime_literal_conversion::RuntimeLiteralConversion));
     lint_store.register_late_pass(|_| Box::new(shift_of_one::ShiftOfOne));
     lint_store.register_late_pass(|_| Box::new(clone_with_ref_variant::CloneWithRefVariant));
+    lint_store
+        .register_early_pass(|| Box::new(collapse_adjacent_imports::CollapseAdjacentImports));
     lint_store.register_late_pass(|_| Box::new(use_assign_variant::UseAssignVariant));
     lint_store.register_late_pass(|_| Box::new(use_checked_log_base_2::UseCheckedLogBase2));
     lint_store.register_late_pass(|_| Box::new(use_const_binding::UseConstBinding));

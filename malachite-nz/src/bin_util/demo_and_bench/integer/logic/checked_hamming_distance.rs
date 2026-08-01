@@ -23,9 +23,9 @@ use malachite_nz::test_util::bench::bucketers::{
     pair_2_pair_integer_max_bit_bucketer, pair_integer_max_bit_bucketer,
 };
 use malachite_nz::test_util::generators::{integer_pair_gen, integer_pair_gen_rm};
-use malachite_nz::test_util::integer::logic::checked_hamming_distance::rug_checked_hamming_distance;
 use malachite_nz::test_util::integer::logic::checked_hamming_distance::{
     integer_checked_hamming_distance_alt_1, integer_checked_hamming_distance_alt_2,
+    rug_checked_hamming_distance,
 };
 
 pub(crate) fn register(runner: &mut Runner) {

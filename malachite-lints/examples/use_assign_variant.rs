@@ -36,4 +36,24 @@ fn main() {
     let v = v.abs();
     let _ = v;
     let _ = t;
+
+    // Primitive receivers: the `*_assign` companion comes from a `malachite_base` trait.
+    let mut n = 10u64;
+    let k = 3u64;
+    // Saturating, wrapping, and checked-style families: flagged.
+    n = n.saturating_mul(k);
+    n = n.wrapping_add(k);
+    // An `overflowing_*` method's `(value, bool)` has the same shape as `(value, Ordering)`:
+    // flagged, and the discarded flag becomes the assign variant's return value.
+    n = n.overflowing_sub(k).0;
+    // Shadowing `let` rebinds work the same way: flagged.
+    let m = 7u64;
+    let m = m.wrapping_mul(k);
+    let (m, overflow) = m.overflowing_add(k);
+    let _ = overflow;
+    // A different receiver: fine.
+    n = k.saturating_mul(m);
+    // No `*Assign` trait for this family, so there is nothing to suggest: fine.
+    n = n.count_ones().into();
+    let _ = n;
 }

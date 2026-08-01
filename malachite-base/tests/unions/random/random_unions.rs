@@ -6,8 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::extra_variadic::Union3;
-use crate::extra_variadic::random_union3s;
+use crate::extra_variadic::{Union3, random_union3s};
 use core::hash::Hash;
 use itertools::Itertools;
 use malachite_base::bools::random::random_bools;

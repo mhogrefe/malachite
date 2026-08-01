@@ -28,8 +28,9 @@ use malachite_base::fail_on_untested_path;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_base::num::arithmetic::traits::ShrRound;
 use malachite_base::num::arithmetic::traits::{
-    CeilingLogBase2, DivRound, ModInverse, ModPow, Parity, PowerOf2, RoundToMultiple,
-    RoundToMultipleOfPowerOf2, WrappingAddAssign, XMulYToZZ, XXAddYYToZZ,
+    CeilingLogBase2, DivRound, ModInverse, ModPow, OverflowingAddAssign, OverflowingSubAssign,
+    Parity, PowerOf2, RoundToMultiple, RoundToMultipleOfPowerOf2, WrappingAddAssign, XMulYToZZ,
+    XXAddYYToZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::One;
@@ -4692,8 +4693,8 @@ macro_rules! big_add_mul {
 fn multi_add<const N: usize>(z: &mut [u64], a: &[u64]) {
     let mut carry = false;
     for i in 0..N - 1 {
-        let (s, carry_1) = z[i].overflowing_add(a[i]);
-        let (s, carry_2) = s.overflowing_add(u64::from(carry));
+        let (mut s, carry_1) = z[i].overflowing_add(a[i]);
+        let carry_2 = s.overflowing_add_assign(u64::from(carry));
         z[i] = s;
         carry = carry_1 | carry_2;
     }
@@ -4739,8 +4740,8 @@ fn multi_add_alt<const N: usize>(z: &mut [Limb], a: &[u64]) {
 fn multi_sub<const N: usize>(z: &mut [u64], a: &[u64]) {
     let mut borrow = false;
     for i in 0..N - 1 {
-        let (d, borrow_1) = z[i].overflowing_sub(a[i]);
-        let (d, borrow_2) = d.overflowing_sub(u64::from(borrow));
+        let (mut d, borrow_1) = z[i].overflowing_sub(a[i]);
+        let borrow_2 = d.overflowing_sub_assign(u64::from(borrow));
         z[i] = d;
         borrow = borrow_1 | borrow_2;
     }

@@ -6,9 +6,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::DivMod;
 use malachite_base::num::arithmetic::traits::{
-    CeilingDivNegMod, Mod, ModAssign, NegMod, NegModAssign,
+    CeilingDivNegMod, DivMod, Mod, ModAssign, NegMod, NegModAssign,
 };
 use malachite_base::test_util::bench::bucketers::{
     pair_1_vec_len_bucketer, pair_1_vec_len_sub_1_bucketer, quadruple_2_3_diff_vec_len_bucketer,
@@ -17,12 +16,11 @@ use malachite_base::test_util::bench::bucketers::{
 };
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
-use malachite_base::test_util::generators::unsigned_vec_unsigned_pair_gen_var_24;
 use malachite_base::test_util::generators::{
     unsigned_vec_pair_gen_var_11, unsigned_vec_pair_gen_var_18, unsigned_vec_triple_gen_var_57,
-    unsigned_vec_unsigned_pair_gen_var_22, unsigned_vec_unsigned_pair_gen_var_25,
-    unsigned_vec_unsigned_pair_gen_var_26, unsigned_vec_unsigned_pair_gen_var_27,
-    unsigned_vec_unsigned_pair_gen_var_28,
+    unsigned_vec_unsigned_pair_gen_var_22, unsigned_vec_unsigned_pair_gen_var_24,
+    unsigned_vec_unsigned_pair_gen_var_25, unsigned_vec_unsigned_pair_gen_var_26,
+    unsigned_vec_unsigned_pair_gen_var_27, unsigned_vec_unsigned_pair_gen_var_28,
 };
 use malachite_base::test_util::runner::Runner;
 use malachite_nz::natural::arithmetic::div_mod::{

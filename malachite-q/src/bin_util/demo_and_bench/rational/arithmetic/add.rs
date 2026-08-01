@@ -19,8 +19,7 @@ use malachite_q::test_util::generators::{
     rational_pair_gen, rational_pair_gen_nrm, rational_pair_gen_rm, rational_vec_gen,
     rational_vec_gen_nrm,
 };
-use malachite_q::test_util::rational::arithmetic::add::add_naive;
-use malachite_q::test_util::rational::arithmetic::add::rational_sum_naive;
+use malachite_q::test_util::rational::arithmetic::add::{add_naive, rational_sum_naive};
 use num::BigRational;
 use std::iter::Sum;
 

@@ -23,7 +23,9 @@ use crate::natural::arithmetic::mul::{limbs_mul_to_out, limbs_mul_to_out_scratch
 use crate::platform::{DoubleLimb, Limb, MUL_TOOM22_THRESHOLD};
 use alloc::vec::Vec;
 use core::cmp::max;
-use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign, XMulYToZZ};
+use malachite_base::num::arithmetic::traits::{
+    AddMul, AddMulAssign, OverflowingAddAssign, XMulYToZZ,
+};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{SplitInHalf, WrappingFrom};
@@ -390,7 +392,7 @@ fn limbs_slice_add_mul_two_limbs_in_place_left(
     }
     let (sum, carry_1) = xs[len].overflowing_add(carry_lo);
     xs[len] = sum;
-    let (carry_hi, carry_2) = carry_hi.overflowing_add(Limb::from(carry_1));
+    let carry_2 = carry_hi.overflowing_add_assign(Limb::from(carry_1));
     let (sum, carry_3) = xs[len + 1].overflowing_add(carry_hi);
     xs[len + 1] = sum;
     carry_2 || carry_3

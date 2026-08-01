@@ -21,8 +21,10 @@
 // The Paterson-Stockmeyer series (exp2_aux2) and the high-precision exp_3 are not yet ported.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use crate::WIDTH_MINUS_1;
-use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn, floor_and_ceiling};
+use crate::{
+    Float, WIDTH_MINUS_1, emulate_float_to_float_fn, emulate_rational_to_float_fn,
+    floor_and_ceiling,
+};
 use alloc::vec;
 use core::cmp::Ordering::{self, Equal, Greater, Less};
 use core::cmp::max;

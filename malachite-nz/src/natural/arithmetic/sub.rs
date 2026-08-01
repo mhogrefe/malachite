@@ -17,7 +17,7 @@ use crate::platform::Limb;
 use alloc::vec::Vec;
 use core::fmt::Display;
 use core::ops::{Sub, SubAssign};
-use malachite_base::num::arithmetic::traits::CheckedSub;
+use malachite_base::num::arithmetic::traits::{CheckedSub, OverflowingSubAssign};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, subtracts the
@@ -113,8 +113,8 @@ pub_crate_test! {limbs_sub_limb_in_place<T: PrimitiveUnsigned>(xs: &mut [T], mut
 // analogous `add_with_carry` in add.rs and perf/README.md).
 #[inline]
 pub(crate) fn sub_with_borrow(x: Limb, y: Limb, borrow: bool) -> (Limb, bool) {
-    let (diff, borrow_1) = x.overflowing_sub(y);
-    let (diff, borrow_2) = diff.overflowing_sub(Limb::from(borrow));
+    let (mut diff, borrow_1) = x.overflowing_sub(y);
+    let borrow_2 = diff.overflowing_sub_assign(Limb::from(borrow));
     (diff, borrow_1 | borrow_2)
 }
 

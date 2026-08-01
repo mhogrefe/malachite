@@ -19,8 +19,7 @@ use malachite_base::num::arithmetic::traits::{
     CheckedLogBasePowerOf2, DivExactAssign, FloorLogBase, FloorLogBasePowerOf2, Pow,
 };
 use malachite_base::num::basic::traits::One;
-use malachite_base::num::conversion::traits::RoundingFrom;
-use malachite_base::num::conversion::traits::SciMantissaAndExponent;
+use malachite_base::num::conversion::traits::{RoundingFrom, SciMantissaAndExponent};
 use malachite_base::rounding_modes::RoundingMode::*;
 
 impl Natural {

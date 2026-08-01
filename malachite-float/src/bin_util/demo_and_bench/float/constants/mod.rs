@@ -10,11 +10,14 @@ use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
     cbrt_2::register(runner);
+    champernowne_constant::register(runner);
+    copeland_erdos_constant::register(runner);
     e::register(runner);
     gauss_constant::register(runner);
     gelfond_schneider_constant::register(runner);
     gelfonds_constant::register(runner);
     lemniscate_constant::register(runner);
+    liouvilles_constant::register(runner);
     ln_10::register(runner);
     ln_2::register(runner);
     log_10_2::register(runner);
@@ -47,11 +50,14 @@ pub(crate) fn register(runner: &mut Runner) {
 }
 
 mod cbrt_2;
+mod champernowne_constant;
+mod copeland_erdos_constant;
 mod e;
 mod gauss_constant;
 mod gelfond_schneider_constant;
 mod gelfonds_constant;
 mod lemniscate_constant;
+mod liouvilles_constant;
 mod ln_10;
 mod ln_2;
 mod log_10_2;

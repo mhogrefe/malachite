@@ -23,8 +23,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::factorization::traits::{RemovePower, RemovePowerAssign};
-use malachite_base::num::logic::traits::LowMask;
-use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::num::logic::traits::{LowMask, SignificantBits};
 use malachite_base::slices::slice_test_zero;
 
 // Remove the largest power of V from U that doesn't exceed the given cap

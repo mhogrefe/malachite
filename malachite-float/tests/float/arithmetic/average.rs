@@ -7,17 +7,15 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::cmp::max;
-use malachite_base::num::arithmetic::traits::PowerOf2;
-use malachite_base::num::arithmetic::traits::{Average, AverageAssign};
+use malachite_base::num::arithmetic::traits::{Average, AverageAssign, PowerOf2};
 use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeZero, One, Two, Zero,
 };
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
-use malachite_float::ComparableFloatRef;
-use malachite_float::Float;
 use malachite_float::test_util::generators::float_float_unsigned_rounding_mode_quadruple_gen_var_15;
+use malachite_float::{ComparableFloatRef, Float};
 use malachite_q::Rational;
 use std::cmp::Ordering::{self, *};
 

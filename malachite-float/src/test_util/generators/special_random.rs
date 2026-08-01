@@ -17,10 +17,9 @@ use crate::test_util::extra_variadic::{
     random_quadruples, random_quadruples_xxyz, random_triples, random_triples_from_single,
     random_triples_xxy, random_triples_xyy,
 };
-use crate::test_util::generators::common::format_string_output_is_bounded;
-use crate::test_util::generators::common::valid_float_get_str_quadruple;
 use crate::test_util::generators::common::{
-    strtofr_string_from_parts, valid_float_from_sci_string_triple, valid_strtofr_quadruple,
+    format_string_output_is_bounded, strtofr_string_from_parts, valid_float_from_sci_string_triple,
+    valid_float_get_str_quadruple, valid_strtofr_quadruple,
 };
 use crate::test_util::generators::exhaustive::{
     add_prec_round_valid, add_rational_prec_round_valid, add_rational_round_valid, add_round_valid,
@@ -62,9 +61,9 @@ use crate::test_util::generators::random::{
     RandomExtremeFiniteFloats, RandomExtremeNonNegativeFiniteFloats,
     RandomExtremeNonzeroFiniteFloats, RandomExtremePositiveFiniteFloats,
     RandomMixedExtremeFiniteFloats, RandomMixedExtremeNonNegativeFiniteFloats,
-    RandomMixedExtremePositiveFiniteFloats, random_format_strings,
+    RandomMixedExtremePositiveFiniteFloats, random_format_strings, random_sci_string_triples,
+    unpack_strtofr_parts,
 };
-use crate::test_util::generators::random::{random_sci_string_triples, unpack_strtofr_parts};
 use malachite_base::bools::random::{random_bools, weighted_random_bools};
 use malachite_base::iterators::{WithSpecialValues, with_special_values};
 use malachite_base::num::arithmetic::traits::IsPowerOf2;
@@ -73,9 +72,8 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::string::options::FromSciStringOptions;
-use malachite_base::num::conversion::string::options::ToSciOptions;
 use malachite_base::num::conversion::string::options::random::random_to_sci_options;
+use malachite_base::num::conversion::string::options::{FromSciStringOptions, ToSciOptions};
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, SaturatingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::num::random::geometric::{
@@ -8898,6 +8896,26 @@ pub fn special_random_unsigned_pair_gen_var_51(config: &GenConfig) -> It<(u64, u
             )
         },
     ))
+}
+
+pub fn special_random_unsigned_unsigned_rounding_mode_triple_gen_var_10(
+    config: &GenConfig,
+) -> It<(u64, u64, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| random_unsigned_inclusive_range(seed, 2, 62),
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(_, _, rm)| *rm != Exact),
+    )
 }
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, RoundingMode) --

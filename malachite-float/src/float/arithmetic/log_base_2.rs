@@ -16,10 +16,9 @@ use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::float::arithmetic::ln::{SliverOfOne, ln_1_plus_rational_brackets, sliver_of_one};
 use crate::float::arithmetic::round_near_x::float_round_near_x;
 use crate::float::basic::extended::ExtendedFloat;
-use crate::{ComparableFloatRef, floor_and_ceiling};
 use crate::{
-    Float, emulate_float_to_float_fn, emulate_rational_to_float_fn, float_either_zero,
-    float_infinity, float_nan, float_negative_infinity,
+    ComparableFloatRef, Float, emulate_float_to_float_fn, emulate_rational_to_float_fn,
+    float_either_zero, float_infinity, float_nan, float_negative_infinity, floor_and_ceiling,
 };
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{

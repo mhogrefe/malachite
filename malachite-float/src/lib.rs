@@ -145,6 +145,39 @@ where
     }
 }
 
+#[doc(hidden)]
+pub fn emulate_constant_to_float_fn<T: PrimitiveFloat, F: Fn(u64) -> (Float, Ordering)>(f: F) -> T
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    let (mut result, o) = f(T::MANTISSA_WIDTH + 1);
+    if !result.is_normal() {
+        return T::exact_from(&result);
+    }
+    let e = i64::from(<&Float as SciMantissaAndExponent<Float, i32, _>>::sci_exponent(&result));
+    if e < T::MIN_NORMAL_EXPONENT {
+        if e < T::MIN_EXPONENT {
+            let rm =
+                if e == T::MIN_EXPONENT - 1 && result.significand_ref().unwrap().is_power_of_2() {
+                    let down = if result > T::ZERO { Less } else { Greater };
+                    if o == down { Up } else { Down }
+                } else {
+                    Nearest
+                };
+            return T::rounding_from(&result, rm).0;
+        }
+        result = f(T::max_precision_for_sci_exponent(e)).0;
+    }
+    if result > T::MAX_FINITE {
+        T::INFINITY
+    } else if result < -T::MAX_FINITE {
+        T::NEGATIVE_INFINITY
+    } else {
+        T::exact_from(&result)
+    }
+}
+
 #[allow(clippy::type_repetition_in_bounds)]
 #[doc(hidden)]
 pub fn emulate_float_float_to_float_fn<

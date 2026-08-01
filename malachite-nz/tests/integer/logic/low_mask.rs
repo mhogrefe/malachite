@@ -9,8 +9,7 @@
 use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::num::logic::traits::BitScan;
-use malachite_base::num::logic::traits::LowMask;
+use malachite_base::num::logic::traits::{BitScan, LowMask};
 use malachite_base::test_util::generators::{unsigned_gen_var_5, unsigned_gen_var_15};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;

@@ -12,8 +12,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::Float;
-use crate::floor_and_ceiling;
+use crate::{Float, floor_and_ceiling};
 use core::cmp::Ordering;
 use core::cmp::Ordering::*;
 use malachite_base::num::basic::integers::PrimitiveInt;

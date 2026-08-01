@@ -19,8 +19,7 @@ use crate::num::arithmetic::traits::XXDivModYToQR;
 use crate::num::basic::integers::USIZE_IS_U32;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::half::{wide_join_halves, wide_split_in_half};
-use crate::num::conversion::traits::WrappingFrom;
-use crate::num::conversion::traits::{HasHalf, JoinHalves, SplitInHalf};
+use crate::num::conversion::traits::{HasHalf, JoinHalves, SplitInHalf, WrappingFrom};
 use crate::num::logic::traits::LeadingZeros;
 
 fn implicit_xx_div_mod_y_to_qr<

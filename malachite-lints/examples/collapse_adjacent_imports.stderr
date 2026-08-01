@@ -1,0 +1,49 @@
+error: these 2 `use` items differ only in their final component
+  --> $DIR/collapse_adjacent_imports.rs:5:1
+   |
+LL | / use malachite_float::ComparableFloat;
+LL | | use malachite_float::Float;
+   | |___________________________^
+   |
+   = help: merge them into `use malachite_float::{ComparableFloat, Float};`
+   = note: `#[deny(collapse_adjacent_imports)]` on by default
+
+error: these 3 `use` items differ only in their final component
+  --> $DIR/collapse_adjacent_imports.rs:8:1
+   |
+LL | / use malachite_base::num::basic::traits::One;
+LL | | use malachite_base::num::basic::traits::Two;
+LL | | use malachite_base::num::basic::traits::Zero as Nought;
+   | |_______________________________________________________^
+   |
+   = help: merge them into `use malachite_base::num::basic::traits::{One, Two, Zero as Nought};`
+
+error: these 2 `use` items differ only in their final component
+  --> $DIR/collapse_adjacent_imports.rs:12:1
+   |
+LL | / use malachite_base::num::arithmetic::traits::Abs;
+LL | | use malachite_base::num::arithmetic::traits::{Pow, Sign};
+   | |_________________________________________________________^
+   |
+   = help: merge them into `use malachite_base::num::arithmetic::traits::{Abs, Pow, Sign};`
+
+error: these 2 `use` items differ only in their final component
+  --> $DIR/collapse_adjacent_imports.rs:30:5
+   |
+LL | /     pub use malachite_base::num::logic::traits::BitAccess;
+LL | |     pub use malachite_base::num::logic::traits::SignificantBits;
+   | |________________________________________________________________^
+   |
+   = help: merge them into `pub use malachite_base::num::logic::traits::{BitAccess, SignificantBits};`
+
+error: these 2 `use` items differ only in their final component
+  --> $DIR/collapse_adjacent_imports.rs:36:5
+   |
+LL | /     use malachite_base::num::float::FmtRyuString;
+LL | |     use malachite_base::num::float::NiceFloat;
+   | |______________________________________________^
+   |
+   = help: merge them into `use malachite_base::num::float::{FmtRyuString, NiceFloat};`
+
+error: aborting due to 5 previous errors
+

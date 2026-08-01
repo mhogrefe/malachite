@@ -60,6 +60,7 @@ use alloc::vec;
 use alloc::vec::Vec;
 use core::cmp::Ordering::{Equal, Greater, Less};
 use malachite_base::fail_on_untested_path;
+use malachite_base::num::arithmetic::traits::SaturatingNegAssign;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, OneHalf};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
@@ -1290,7 +1291,7 @@ pub_crate_test! {format_mpfr_str(fmt: &[u8], args: &[PrintfArg]) -> Option<Vec<u
         if spec.width < 0 {
             // a negative width (from `*`) means left justification
             spec.left = true;
-            spec.width = spec.width.saturating_neg();
+            spec.width.saturating_neg_assign();
         }
 
         // precision

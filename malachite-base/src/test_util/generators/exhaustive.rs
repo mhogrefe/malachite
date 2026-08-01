@@ -14,9 +14,9 @@ use crate::foer_sequences::exhaustive::exhaustive_foer_sequences;
 use crate::iterators::bit_distributor::BitDistributorOutputType;
 use crate::iterators::iter_windows;
 use crate::max;
-use crate::num::arithmetic::traits::CoprimeWith;
 use crate::num::arithmetic::traits::{
-    ArithmeticCheckedShl, CheckedNeg, DivRound, Parity, PowerOf2, ShrRound, UnsignedAbs,
+    ArithmeticCheckedShl, CheckedNeg, CoprimeWith, DivRound, Parity, PowerOf2, ShrRound,
+    UnsignedAbs,
 };
 use crate::num::basic::floats::PrimitiveFloat;
 use crate::num::basic::integers::PrimitiveInt;
@@ -60,11 +60,8 @@ use crate::test_util::extra_variadic::{
 };
 use crate::test_util::generators::common::{
     GMP_SPEC_C_TYPE_COUNT, GMP_SPEC_CONV_CHARS, GMP_SPEC_INTEGER_CONV_COUNT, GMP_SPEC_TYPE_STRS,
-    gmp_spec_string_from_parts,
-};
-use crate::test_util::generators::common::{
-    It, permute_1_3_2, permute_2_1, permute_3_1_4_2, reshape_1_2_to_3, reshape_2_1_1_to_4,
-    reshape_2_1_to_3, reshape_2_2_to_4, reshape_3_1_to_4,
+    It, gmp_spec_string_from_parts, permute_1_3_2, permute_2_1, permute_3_1_4_2, reshape_1_2_to_3,
+    reshape_2_1_1_to_4, reshape_2_1_to_3, reshape_2_2_to_4, reshape_3_1_to_4,
 };
 use crate::test_util::generators::{
     digits_valid, exhaustive_pairs_big_small, exhaustive_pairs_big_tiny, large_exponent,

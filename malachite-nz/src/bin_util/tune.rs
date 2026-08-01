@@ -41,11 +41,11 @@ use malachite_nz::natural::arithmetic::div_exact::{
     limbs_modular_div_mod_schoolbook, limbs_modular_div_schoolbook, limbs_modular_invert,
     limbs_modular_invert_limb, limbs_modular_invert_scratch_len,
 };
-use malachite_nz::natural::arithmetic::div_mod::limbs_div_mod_to_out;
 use malachite_nz::natural::arithmetic::div_mod::{
     limbs_div_mod_barrett, limbs_div_mod_barrett_scratch_len, limbs_div_mod_divide_and_conquer,
-    limbs_div_mod_schoolbook, limbs_invert_approx, limbs_invert_approx_scratch_len,
-    limbs_invert_basecase_approx, limbs_invert_newton_approx, limbs_two_limb_inverse_helper,
+    limbs_div_mod_schoolbook, limbs_div_mod_to_out, limbs_invert_approx,
+    limbs_invert_approx_scratch_len, limbs_invert_basecase_approx, limbs_invert_newton_approx,
+    limbs_two_limb_inverse_helper,
 };
 use malachite_nz::natural::arithmetic::mod_power_of_2_square::{
     limbs_square_low_basecase, limbs_square_low_divide_and_conquer, limbs_square_low_scratch_len,

@@ -17,8 +17,7 @@ use malachite_float::float::conversion::from_rational::{
     from_rational_prec_round_direct, from_rational_prec_round_ref_direct,
     from_rational_prec_round_ref_using_div, from_rational_prec_round_using_div,
 };
-use malachite_float::test_util::common::rug_round_try_from_rounding_mode;
-use malachite_float::test_util::common::to_hex_string;
+use malachite_float::test_util::common::{rug_round_try_from_rounding_mode, to_hex_string};
 use malachite_float::test_util::generators::rational_unsigned_rounding_mode_triple_gen_var_1;
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float, emulate_rational_to_float_fn};
 use malachite_nz::test_util::generators::integer_gen;

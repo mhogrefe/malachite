@@ -43,8 +43,7 @@ use crate::natural::{HALF_WIDTH, WIDTH_MINUS_1};
 use crate::platform::{DC_DIVAPPR_Q_THRESHOLD, Limb, MU_DIVAPPR_Q_THRESHOLD, SignedLimb};
 use alloc::vec::Vec;
 use core::cmp::Ordering::*;
-use malachite_base::num::arithmetic::sqrt::sqrt_rem_2_newton;
-use malachite_base::num::arithmetic::sqrt::sqrt_rem_newton;
+use malachite_base::num::arithmetic::sqrt::{sqrt_rem_2_newton, sqrt_rem_newton};
 use malachite_base::num::arithmetic::traits::{
     CeilingSqrt, CeilingSqrtAssign, CheckedSqrt, FloorSqrt, FloorSqrtAssign, ModPowerOf2, Parity,
     ShrRound, SqrtAssignRem, SqrtRem, Square, WrappingSquare, WrappingSubAssign,

@@ -7,8 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::rounding_modes::RoundingMode::{self, *};
-use alloc::string::String;
-use alloc::string::ToString;
+use alloc::string::{String, ToString};
 use core::str::FromStr;
 
 impl FromStr for RoundingMode {

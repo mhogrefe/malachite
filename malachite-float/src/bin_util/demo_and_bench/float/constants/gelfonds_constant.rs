@@ -13,8 +13,7 @@ use malachite_base::test_util::generators::{
     unsigned_gen_var_11, unsigned_rounding_mode_pair_gen_var_4,
 };
 use malachite_base::test_util::runner::Runner;
-use malachite_float::ComparableFloat;
-use malachite_float::Float;
+use malachite_float::{ComparableFloat, Float};
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_gelfonds_constant_prec_round);

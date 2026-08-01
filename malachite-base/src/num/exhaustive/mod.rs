@@ -21,8 +21,7 @@ use crate::tuples::exhaustive::{
     ExhaustiveDependentPairs, ExhaustiveDependentPairsYsGenerator, LexDependentPairs,
     exhaustive_dependent_pairs, lex_dependent_pairs,
 };
-use alloc::vec::IntoIter;
-use alloc::vec::Vec;
+use alloc::vec::{IntoIter, Vec};
 use core::iter::{Chain, Once, Rev, once};
 use core::marker::PhantomData;
 use itertools::{Interleave, Itertools};

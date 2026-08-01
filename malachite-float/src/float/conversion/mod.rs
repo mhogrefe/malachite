@@ -8,6 +8,9 @@
 
 /// Functions for creating a [`Float`](crate::Float) from an infinite iterator of bits.
 pub mod from_bits;
+/// Functions for constructing a [`Float`](crate::Float) from a sequence of digits in an arbitrary
+/// base.
+pub mod from_digits;
 /// Implementations of the [`From`] trait for converting an
 /// [`Integer`](malachite_nz::integer::Integer) to a [`Float`](crate::Float).
 pub mod from_integer;

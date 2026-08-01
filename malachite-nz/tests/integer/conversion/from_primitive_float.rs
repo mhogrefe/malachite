@@ -8,8 +8,7 @@
 
 use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::basic::floats::PrimitiveFloat;
-use malachite_base::num::basic::traits::NegativeInfinity;
-use malachite_base::num::basic::traits::One;
+use malachite_base::num::basic::traits::{NegativeInfinity, One};
 use malachite_base::num::conversion::from::SignedFromFloatError;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;

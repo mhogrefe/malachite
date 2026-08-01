@@ -75,7 +75,7 @@ impl<'tcx> LateLintPass<'tcx> for AdjacentVecAllocations {
     fn check_block(&mut self, cx: &LateContext<'tcx>, block: &'tcx Block<'tcx>) {
         // Each run entry is (span of the `let`, init expr, repeated element).
         let mut run: Vec<(Span, &Expr<'_>, &Expr<'_>)> = Vec::new();
-        let mut flush = |run: &mut Vec<(Span, &Expr<'_>, &Expr<'_>)>| {
+        let flush = |run: &mut Vec<(Span, &Expr<'_>, &Expr<'_>)>| {
             // in_test_code is comparatively expensive, so it runs after the structural checks.
             if run.len() >= 2 && !crate::in_test_code(cx, run[0].0) {
                 span_lint_and_help(

@@ -37,8 +37,7 @@ use malachite_nz::test_util::natural::arithmetic::gcd::{
     OwnedHalfGcdMatrix, gcd_binary_nz, gcd_euclidean_nz, half_gcd_matrix_1_to_naturals,
     half_gcd_matrix_to_naturals, limbs_gcd_div_alt, limbs_gcd_div_naive,
 };
-use num::BigUint;
-use num::Integer as rug_integer;
+use num::{BigUint, Integer as rug_integer};
 use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]

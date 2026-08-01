@@ -4194,6 +4194,16 @@ pub fn unsigned_pair_gen_var_51() -> Generator<(u64, u64)> {
     )
 }
 
+// All `(base, prec, RoundingMode)` triples with `base` in `[2, 62]`, `prec` positive, and the
+// rounding mode not `Exact`: the inputs of the digit-sequence constants.
+pub fn unsigned_unsigned_rounding_mode_triple_gen_var_10() -> Generator<(u64, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_unsigned_unsigned_rounding_mode_triple_gen_var_10,
+        &random_unsigned_unsigned_rounding_mode_triple_gen_var_10,
+        &special_random_unsigned_unsigned_rounding_mode_triple_gen_var_10,
+    )
+}
+
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, RoundingMode) --
 
 // vars 1 through 4 are in malachite-base.

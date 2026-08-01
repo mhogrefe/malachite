@@ -16,8 +16,9 @@ use malachite_nz::integer::logic::bit_access::{
     limbs_slice_clear_bit_neg, limbs_vec_clear_bit_neg,
 };
 use malachite_nz::test_util::bench::bucketers::pair_integer_bit_u64_max_bucketer;
-use malachite_nz::test_util::generators::integer_unsigned_pair_gen_var_2;
-use malachite_nz::test_util::generators::unsigned_vec_unsigned_pair_gen_var_21;
+use malachite_nz::test_util::generators::{
+    integer_unsigned_pair_gen_var_2, unsigned_vec_unsigned_pair_gen_var_21,
+};
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_limbs_slice_clear_bit_neg);

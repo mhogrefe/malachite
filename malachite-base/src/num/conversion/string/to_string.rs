@@ -10,8 +10,7 @@ use crate::num::arithmetic::traits::UnsignedAbs;
 use crate::num::basic::traits::Zero;
 use crate::num::conversion::traits::{Digits, ToStringBase, WrappingFrom};
 use crate::vecs::vec_pad_left;
-use alloc::string::String;
-use alloc::string::ToString;
+use alloc::string::{String, ToString};
 use core::fmt::{Debug, Display, Formatter, Result, Write};
 
 /// A `struct` that allows for formatting a numeric type and rendering its digits in a specified

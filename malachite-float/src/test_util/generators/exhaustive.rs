@@ -26,12 +26,10 @@ use crate::test_util::extra_variadic::{
     exhaustive_triples_from_single, exhaustive_triples_xxy, exhaustive_triples_xxy_custom_output,
 };
 use crate::test_util::generators::common::{
-    FLOAT_FORMAT_COMBO_COUNT, format_string_from_parts, format_string_output_is_bounded,
-    valid_float_get_str_quadruple,
-};
-use crate::test_util::generators::common::{
-    SCI_STRING_COMBO_COUNT, STRTOFR_STRING_CHARS, sci_string_from_parts, strtofr_string_from_parts,
-    valid_float_from_sci_string_triple, valid_strtofr_quadruple,
+    FLOAT_FORMAT_COMBO_COUNT, SCI_STRING_COMBO_COUNT, STRTOFR_STRING_CHARS,
+    format_string_from_parts, format_string_output_is_bounded, sci_string_from_parts,
+    strtofr_string_from_parts, valid_float_from_sci_string_triple, valid_float_get_str_quadruple,
+    valid_strtofr_quadruple,
 };
 use crate::{Float, significand_bits};
 use alloc::vec::IntoIter;
@@ -62,12 +60,9 @@ use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::strings::exhaustive::exhaustive_strings_using_chars;
 use malachite_base::test_util::generators::common::{It, reshape_2_1_to_3, reshape_3_1_to_4};
-use malachite_base::test_util::generators::exhaustive as base_gen;
-use malachite_base::test_util::generators::exhaustive_pairs_big_tiny;
+use malachite_base::test_util::generators::{exhaustive as base_gen, exhaustive_pairs_big_tiny};
 use malachite_base::tuples::exhaustive::{
     ExhaustiveDependentPairs, ExhaustiveDependentPairsYsGenerator, exhaustive_dependent_pairs,
-};
-use malachite_base::tuples::exhaustive::{
     exhaustive_pairs, exhaustive_pairs_from_single, exhaustive_triples,
     exhaustive_triples_custom_output, exhaustive_triples_xyy, lex_pairs,
 };
@@ -4784,6 +4779,20 @@ pub fn exhaustive_unsigned_pair_gen_var_51() -> It<(u64, u64)> {
         primitive_int_increasing_inclusive_range::<u64>(2, 62),
         exhaustive_positive_primitive_ints::<u64>(),
     ))
+}
+
+// The name and the return type are both fixed by convention, and rustfmt cannot break the signature
+// anywhere that brings it under the limit.
+#[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
+pub fn exhaustive_unsigned_unsigned_rounding_mode_triple_gen_var_10() -> It<(u64, u64, RoundingMode)>
+{
+    reshape_2_1_to_3(Box::new(lex_pairs(
+        exhaustive_pairs(
+            primitive_int_increasing_inclusive_range::<u64>(2, 62),
+            exhaustive_positive_primitive_ints::<u64>(),
+        ),
+        exhaustive_rounding_modes().filter(|rm| *rm != Exact),
+    )))
 }
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, RoundingMode) --

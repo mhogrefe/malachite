@@ -15,9 +15,6 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use crate::TWICE_WIDTH;
-use crate::emulate_float_float_to_float_fn;
-use crate::emulate_float_to_float_fn;
 use crate::float::arithmetic::exp::{
     exp_overflow, exp_rational_near_one, exp_underflow, one_neighbor,
 };
@@ -25,8 +22,8 @@ use crate::float::arithmetic::ln::ln_1_plus_rational_brackets;
 use crate::float::arithmetic::log_base_2::log_2_rational_brackets;
 use crate::float::arithmetic::round_near_x::float_round_near_x;
 use crate::{
-    Float, float_either_infinity, float_either_zero, float_nan, float_negative_zero,
-    floor_and_ceiling,
+    Float, TWICE_WIDTH, emulate_float_float_to_float_fn, emulate_float_to_float_fn,
+    float_either_infinity, float_either_zero, float_nan, float_negative_zero, floor_and_ceiling,
 };
 use core::cmp::Ordering::{self, *};
 use core::cmp::max;
@@ -42,8 +39,7 @@ use malachite_base::num::basic::traits::{
     Infinity as InfinityTrait, NaN as NaNTrait, NegativeInfinity, NegativeZero, One,
     Zero as ZeroTrait,
 };
-use malachite_base::num::comparison::traits::OrdAbs;
-use malachite_base::num::comparison::traits::PartialOrdAbs;
+use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
 use malachite_base::num::conversion::traits::{ExactFrom, IsInteger, RoundingFrom, SaturatingFrom};
 use malachite_base::num::logic::traits::{BitAccess, BitIterable, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode::{self, *};

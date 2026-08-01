@@ -15,7 +15,9 @@ use crate::natural::{Natural, bit_to_limb_count_floor};
 use crate::platform::Limb;
 use alloc::vec::Vec;
 use core::ops::{Shl, ShlAssign, Shr, ShrAssign};
-use malachite_base::num::arithmetic::traits::{ArithmeticCheckedShl, UnsignedAbs};
+use malachite_base::num::arithmetic::traits::{
+    ArithmeticCheckedShl, OverflowingAddAssign, OverflowingSubAssign, UnsignedAbs,
+};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::Zero;
@@ -247,8 +249,8 @@ pub_crate_test! {limbs_shl_add_same_length_in_place_left(
     for (x, &y) in xs.iter_mut().zip(ys.iter()) {
         let shifted = (*x << bits) | (prev >> cobits);
         prev = *x;
-        let (sum, carry_1) = shifted.overflowing_add(y);
-        let (sum, carry_2) = sum.overflowing_add(Limb::from(carry));
+        let (mut sum, carry_1) = shifted.overflowing_add(y);
+        let carry_2 = sum.overflowing_add_assign(Limb::from(carry));
         *x = sum;
         carry = carry_1 | carry_2;
     }
@@ -286,8 +288,8 @@ pub_crate_test! {limbs_add_shl_same_length_in_place_left(
     for (x, &y) in xs.iter_mut().zip(ys.iter()) {
         let shifted = (y << bits) | (prev >> cobits);
         prev = y;
-        let (sum, carry_1) = x.overflowing_add(shifted);
-        let (sum, carry_2) = sum.overflowing_add(Limb::from(carry));
+        let (mut sum, carry_1) = x.overflowing_add(shifted);
+        let carry_2 = sum.overflowing_add_assign(Limb::from(carry));
         *x = sum;
         carry = carry_1 | carry_2;
     }
@@ -327,8 +329,8 @@ pub_crate_test! {limbs_shl_add_same_length_to_out(
     for ((o, &x), &y) in out.iter_mut().zip(xs.iter()).zip(ys.iter()) {
         let shifted = (x << bits) | (prev >> cobits);
         prev = x;
-        let (sum, carry_1) = shifted.overflowing_add(y);
-        let (sum, carry_2) = sum.overflowing_add(Limb::from(carry));
+        let (mut sum, carry_1) = shifted.overflowing_add(y);
+        let carry_2 = sum.overflowing_add_assign(Limb::from(carry));
         *o = sum;
         carry = carry_1 | carry_2;
     }
@@ -369,8 +371,8 @@ pub_crate_test! {limbs_sub_shl_same_length_in_place_left(
     for (x, &y) in xs.iter_mut().zip(ys.iter()) {
         let shifted = (y << bits) | (prev >> cobits);
         prev = y;
-        let (diff, borrow_1) = x.overflowing_sub(shifted);
-        let (diff, borrow_2) = diff.overflowing_sub(Limb::from(borrow));
+        let (mut diff, borrow_1) = x.overflowing_sub(shifted);
+        let borrow_2 = diff.overflowing_sub_assign(Limb::from(borrow));
         *x = diff;
         borrow = borrow_1 | borrow_2;
     }
@@ -409,8 +411,8 @@ pub_crate_test! {limbs_shl_sub_same_length_in_place_left(
     for (x, &y) in xs.iter_mut().zip(ys.iter()) {
         let shifted = (*x << bits) | (prev >> cobits);
         prev = *x;
-        let (diff, borrow_1) = shifted.overflowing_sub(y);
-        let (diff, borrow_2) = diff.overflowing_sub(Limb::from(borrow));
+        let (mut diff, borrow_1) = shifted.overflowing_sub(y);
+        let borrow_2 = diff.overflowing_sub_assign(Limb::from(borrow));
         *x = diff;
         borrow = borrow_1 | borrow_2;
     }
@@ -449,8 +451,8 @@ pub_crate_test! {limbs_shl_sub_same_length_in_place_right(
     for (y, &x) in ys.iter_mut().zip(xs.iter()) {
         let shifted = (x << bits) | (prev >> cobits);
         prev = x;
-        let (diff, borrow_1) = shifted.overflowing_sub(*y);
-        let (diff, borrow_2) = diff.overflowing_sub(Limb::from(borrow));
+        let (mut diff, borrow_1) = shifted.overflowing_sub(*y);
+        let borrow_2 = diff.overflowing_sub_assign(Limb::from(borrow));
         *y = diff;
         borrow = borrow_1 | borrow_2;
     }

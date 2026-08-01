@@ -15,16 +15,25 @@ use rustc_session::{declare_lint, declare_lint_pass};
 declare_lint! {
     /// ### What it does
     ///
-    /// Flags rebinding a bignum to the result of a method on itself when an in-place `*_assign*`
-    /// companion exists — whether by reassignment, like `x = x.add_prec(y, p).0` or `x =
-    /// (&x).abs()`, or by a shadowing `let`, like `let x = x.exp_prec(p).0` or `let (x, o) =
-    /// x.div_prec(y, p)`.
+    /// Flags rebinding a value to the result of a method on itself when an in-place `*_assign*`
+    /// companion exists — whether by reassignment, like `x = x.add_prec(y, p).0`, `x =
+    /// (&x).abs()`, or `n = n.saturating_mul(k)`, or by a shadowing `let`, like `let x =
+    /// x.exp_prec(p).0` or `let (x, o) = x.div_prec(y, p)`.
+    ///
+    /// This covers both the bignum types, whose companion may be an inherent
+    /// `{base}_assign`/`{base}_assign_ref`, and any type implementing a `malachite_base`
+    /// `{Base}Assign` trait — primitive integers and floats included, so the
+    /// `saturating_*`/`wrapping_*`/`overflowing_*` families are in scope. The `(value, bool)` an
+    /// `overflowing_*` method returns has the same shape as the house `(value, Ordering)`, so `n =
+    /// n.overflowing_mul(k).0` is flagged just like `x = x.add_prec(y, p).0`.
     ///
     /// ### Why is this bad?
     ///
     /// The `*_assign*` variants work in place, avoiding a needless move (and, if the receiver was
-    /// cloned, a needless copy of a potentially huge value). Operator forms (`x = &x * &y`) are
-    /// covered by clippy's `assign_op_pattern`; this lint covers the house method families.
+    /// cloned, a needless copy of a potentially huge value). For a primitive the copy is free, but
+    /// naming the receiver once instead of twice is shorter, and it removes the chance of the two
+    /// names drifting apart. Operator forms (`x = &x * &y`) are covered by clippy's
+    /// `assign_op_pattern`; this lint covers the house method families.
     ///
     /// ### Example
     ///
@@ -32,6 +41,8 @@ declare_lint! {
     /// t = t.sub_prec(Float::ONE, p).0;
     /// let t = t.exp_prec(p).0;
     /// let (t, o) = t.div_prec(k, p);
+    /// n = n.saturating_mul(k);
+    /// n = n.overflowing_add(k).0;
     /// ```
     ///
     /// Use instead:
@@ -40,6 +51,8 @@ declare_lint! {
     /// t.sub_prec_assign(Float::ONE, p);
     /// t.exp_prec_assign(p);
     /// let o = t.div_prec_assign(k, p);
+    /// n.saturating_mul_assign(k);
+    /// n.overflowing_add_assign(k);
     /// ```
     pub USE_ASSIGN_VARIANT,
     Deny,
@@ -76,11 +89,9 @@ impl<'tcx> LateLintPass<'tcx> for UseAssignVariant {
         if !eq_expr_value(cx, lhs, crate::peel_clone_and_borrows(recv)) {
             return;
         }
-        let Some(adt_did) = crate::bignum_adt_did(cx, cx.typeck_results().expr_ty(lhs)) else {
-            return;
-        };
         let base = crate::strip_variant_suffixes(name);
-        let Some(suggestion) = crate::assign_variant(cx, adt_did, base) else {
+        let ty = cx.typeck_results().expr_ty(lhs);
+        let Some(suggestion) = crate::assign_variant_for_ty(cx, ty, base) else {
             return;
         };
         // The assign variant's own defining delegation (`fn foo_assign(&mut self, ..) { *self =
@@ -154,11 +165,8 @@ impl<'tcx> LateLintPass<'tcx> for UseAssignVariant {
         if recv_ty.is_ref() {
             return;
         }
-        let Some(adt_did) = crate::bignum_adt_did(cx, recv_ty) else {
-            return;
-        };
         let base = crate::strip_variant_suffixes(name);
-        let Some(suggestion) = crate::assign_variant(cx, adt_did, base) else {
+        let Some(suggestion) = crate::assign_variant_for_ty(cx, recv_ty, base) else {
             return;
         };
         // The assign variant's own defining delegation is exempt, as in `check_expr`.

@@ -12,10 +12,9 @@ use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::unsigned_gen_var_11;
 use malachite_base::test_util::runner::Runner;
-use malachite_float::ComparableFloat;
-use malachite_float::Float;
 use malachite_float::test_util::bench::bucketers::float_complexity_bucketer;
 use malachite_float::test_util::generators::float_gen;
+use malachite_float::{ComparableFloat, Float};
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_min_positive_value_prec);

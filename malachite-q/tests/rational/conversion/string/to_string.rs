@@ -8,9 +8,9 @@
 
 use malachite_base::assert_panic;
 use malachite_base::num::conversion::traits::{FromStringBase, ToStringBase};
-use malachite_base::strings::string_is_subset;
 use malachite_base::strings::{
     ToBinaryString, ToDebugString, ToLowerHexString, ToOctalString, ToUpperHexString,
+    string_is_subset,
 };
 use malachite_nz::test_util::generators::integer_gen;
 use malachite_q::Rational;

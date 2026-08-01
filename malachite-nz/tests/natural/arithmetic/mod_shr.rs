@@ -6,8 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::{Mod, ModShl};
-use malachite_base::num::arithmetic::traits::{ModIsReduced, ModShr, ModShrAssign};
+use malachite_base::num::arithmetic::traits::{Mod, ModIsReduced, ModShl, ModShr, ModShrAssign};
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;

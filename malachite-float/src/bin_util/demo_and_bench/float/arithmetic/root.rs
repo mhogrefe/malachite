@@ -18,8 +18,6 @@ use malachite_base::test_util::generators::{
     primitive_float_signed_pair_gen, primitive_float_unsigned_pair_gen_var_1,
 };
 use malachite_base::test_util::runner::Runner;
-use malachite_float::ComparableFloat;
-use malachite_float::Float;
 use malachite_float::float::arithmetic::root::{
     primitive_float_root_s, primitive_float_root_s_rational, primitive_float_root_u,
     primitive_float_root_u_rational,
@@ -38,6 +36,7 @@ use malachite_float::test_util::generators::{
     rational_signed_unsigned_rounding_mode_quadruple_gen_var_2,
     rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_3,
 };
+use malachite_float::{ComparableFloat, Float};
 use malachite_q::test_util::generators::{rational_signed_pair_gen, rational_unsigned_pair_gen};
 
 pub(crate) fn register(runner: &mut Runner) {

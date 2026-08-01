@@ -39,7 +39,8 @@ use core::cmp::{Ordering::*, max, min};
 use core::mem::swap;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    DivMod, Gcd, Parity, XMulYToZZ, XXDivModYToQR, XXSubYYToZZ,
+    DivMod, Gcd, OverflowingAddAssign, OverflowingSubAssign, Parity, XMulYToZZ, XXDivModYToQR,
+    XXSubYYToZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{ExactFrom, JoinHalves, SplitInHalf, WrappingFrom};
@@ -694,8 +695,8 @@ pub_crate_test! {limbs_half_gcd_matrix_1_mul_vector(
         let q = m_10 * yw + DoubleLimb::from(p_lo);
         let (q_hi, q_lo) = q.split_in_half();
         *o = q_lo;
-        let (c, overflow_1) = p_hi.overflowing_add(q_hi);
-        let (c, overflow_2) = c.overflowing_add(carry_x_1);
+        let (mut c, overflow_1) = p_hi.overflowing_add(q_hi);
+        let overflow_2 = c.overflowing_add_assign(carry_x_1);
         carry_x_0 = c;
         carry_x_1 = Limb::from(overflow_1) | Limb::from(overflow_2);
         let r = m_01 * xw + DoubleLimb::from(carry_y_0);
@@ -703,8 +704,8 @@ pub_crate_test! {limbs_half_gcd_matrix_1_mul_vector(
         let t = m_11 * yw + DoubleLimb::from(r_lo);
         let (t_hi, t_lo) = t.split_in_half();
         *y = t_lo;
-        let (c, overflow_1) = r_hi.overflowing_add(t_hi);
-        let (c, overflow_2) = c.overflowing_add(carry_y_1);
+        let (mut c, overflow_1) = r_hi.overflowing_add(t_hi);
+        let overflow_2 = c.overflowing_add_assign(carry_y_1);
         carry_y_0 = c;
         carry_y_1 = Limb::from(overflow_1) | Limb::from(overflow_2);
     }
@@ -763,8 +764,8 @@ pub(crate) fn limbs_half_gcd_matrix_1_mul_inverse_vector(
         let (p_lo, q_lo);
         (carry_p, p_lo) = p.split_in_half();
         (carry_q, q_lo) = q.split_in_half();
-        let (d, borrow_1) = p_lo.overflowing_sub(q_lo);
-        let (d, borrow_2) = d.overflowing_sub(borrow_out);
+        let (mut d, borrow_1) = p_lo.overflowing_sub(q_lo);
+        let borrow_2 = d.overflowing_sub_assign(borrow_out);
         borrow_out = Limb::from(borrow_1) + Limb::from(borrow_2);
         *o = d;
         // ys[i] = (m00 * y)[i] - (m10 * x)[i]
@@ -773,8 +774,8 @@ pub(crate) fn limbs_half_gcd_matrix_1_mul_inverse_vector(
         let (r_lo, s_lo);
         (carry_r, r_lo) = r.split_in_half();
         (carry_s, s_lo) = s.split_in_half();
-        let (d, borrow_1) = r_lo.overflowing_sub(s_lo);
-        let (d, borrow_2) = d.overflowing_sub(borrow_y);
+        let (mut d, borrow_1) = r_lo.overflowing_sub(s_lo);
+        let borrow_2 = d.overflowing_sub_assign(borrow_y);
         borrow_y = Limb::from(borrow_1) + Limb::from(borrow_2);
         *y = d;
     }

@@ -147,11 +147,14 @@ pub mod float {
     }
     pub mod constants {
         pub mod cbrt_2;
+        pub mod champernowne_constant;
+        pub mod copeland_erdos_constant;
         pub mod e;
         pub mod gauss_constant;
         pub mod gelfond_schneider_constant;
         pub mod gelfonds_constant;
         pub mod lemniscate_constant;
+        pub mod liouvilles_constant;
         pub mod ln_10;
         pub mod ln_2;
         pub mod log_10_2;

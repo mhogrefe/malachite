@@ -7,10 +7,10 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Rational;
-use crate::rational::random::RandomRationalsFromDoubleAndSign;
 use crate::rational::random::{
-    striped_random_negative_rationals, striped_random_non_negative_rationals,
-    striped_random_nonzero_rationals, striped_random_positive_rationals, striped_random_rationals,
+    RandomRationalsFromDoubleAndSign, striped_random_negative_rationals,
+    striped_random_non_negative_rationals, striped_random_nonzero_rationals,
+    striped_random_positive_rationals, striped_random_rationals,
 };
 use crate::test_util::extra_variadic::{
     random_ordered_unique_triples, random_quadruples_xxyz, random_triples,

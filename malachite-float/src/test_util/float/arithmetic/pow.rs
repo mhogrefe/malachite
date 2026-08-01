@@ -11,8 +11,7 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_q::Rational;
 use rug::float::{Round, Special};
-use rug::ops::AssignRound;
-use rug::ops::Pow;
+use rug::ops::{AssignRound, Pow};
 use std::cmp::Ordering::{self, *};
 use std::cmp::max;
 

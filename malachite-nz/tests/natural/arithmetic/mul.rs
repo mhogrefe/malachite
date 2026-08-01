@@ -62,10 +62,9 @@ use malachite_nz::platform::{DoubleLimb, Limb};
 use malachite_nz::test_util::generators::{
     natural_gen, natural_pair_gen, natural_triple_gen, natural_vec_gen,
 };
-use malachite_nz::test_util::natural::arithmetic::mul::natural_product_naive;
-use malachite_nz::test_util::natural::arithmetic::mul::{initialize_context, mul_slow_fft};
 use malachite_nz::test_util::natural::arithmetic::mul::{
-    limbs_mul_greater_to_out_basecase_mem_opt, limbs_product_naive,
+    initialize_context, limbs_mul_greater_to_out_basecase_mem_opt, limbs_product_naive,
+    mul_slow_fft, natural_product_naive,
 };
 use num::BigUint;
 use rug;

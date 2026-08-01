@@ -13,8 +13,6 @@ use malachite_base::num::comparison::traits::EqAbs;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
-use malachite_float::ComparableFloatRef;
-use malachite_float::Float;
 use malachite_float::test_util::bench::bucketers::{
     pair_float_signed_max_complexity_bucketer, pair_float_unsigned_max_complexity_bucketer,
 };
@@ -22,6 +20,7 @@ use malachite_float::test_util::generators::{
     float_signed_pair_gen, float_signed_pair_gen_var_4, float_unsigned_pair_gen,
     float_unsigned_pair_gen_var_5,
 };
+use malachite_float::{ComparableFloatRef, Float};
 
 pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_demos!(runner, demo_float_eq_abs_unsigned);

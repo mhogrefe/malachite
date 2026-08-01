@@ -15,8 +15,7 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::SignedLimb;
 use malachite_nz::test_util::generators::{integer_gen, integer_pair_gen};
-use num::BigInt;
-use num::Integer as NumInteger;
+use num::{BigInt, Integer as NumInteger};
 use std::cmp::min;
 use std::str::FromStr;
 
