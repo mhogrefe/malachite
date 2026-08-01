@@ -150,7 +150,7 @@ fn fill_bitpattern_u64(bit_array: &mut [u64], mut offset: u64) -> u64 {
     } else {
         // correctly handle offset == 0...
         let mut m21 = offset % 110;
-        let (m11, m12) = if m21 != 0 {
+        let m1 = if m21 != 0 {
             if m21 < u64::WIDTH {
                 let mut m11 = (SIEVE_MASK1_U64 >> m21) | (SIEVE_MASKT_U64 << (u64::WIDTH - m21));
                 if m21 <= C110MU64W {
@@ -171,7 +171,7 @@ fn fill_bitpattern_u64(bit_array: &mut [u64], mut offset: u64) -> u64 {
         } else {
             (SIEVE_MASK1_U64, SIEVE_MASKT_U64)
         };
-        ((m11, m12), {
+        (m1, {
             offset %= 182;
             if offset != 0 {
                 if offset <= u64::WIDTH {

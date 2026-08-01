@@ -22,8 +22,8 @@ pub fn test_cmp() {
     test_cmp_helper::<NiceFloat<f64>>(&TEST_STRINGS);
 }
 
-// The antisymmetry assertion below is the property under test; swapping its operands would
-// restate the line above it rather than assert anything.
+// The antisymmetry assertion below is the property under test; swapping its operands would restate
+// the line above it rather than assert anything.
 #[cfg_attr(dylint_lib = "malachite_lints", expect(redundant_cmp_reverse))]
 fn cmp_properties_helper<T: PrimitiveFloat>() {
     primitive_float_pair_gen::<T>().test_properties(|(x, y)| {

@@ -517,7 +517,7 @@ pub fn negative_truncated_geometric_dist_assertions<
         abs_max.unsigned_abs(),
         abs_unadjusted_mean,
     );
-    let (x, y) = y.map_or((S::wrapping_from(x.wrapping_neg()), None), |y| {
+    let pop_median = y.map_or((S::wrapping_from(x.wrapping_neg()), None), |y| {
         (
             S::wrapping_from(y.wrapping_neg()),
             Some(S::wrapping_from(x.wrapping_neg())),
@@ -527,7 +527,7 @@ pub fn negative_truncated_geometric_dist_assertions<
         (
             actual_values.as_slice(),
             actual_common_values.as_slice(),
-            (x, y),
+            pop_median,
             actual_sample_median,
             pop_sample_moment_stats,
             actual_sample_moment_stats

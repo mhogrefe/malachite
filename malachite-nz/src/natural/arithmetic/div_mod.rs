@@ -462,7 +462,7 @@ pub_crate_test! {limbs_two_limb_inverse_helper(hi: Limb, lo: Limb) -> Limb {
     hi_product.wrapping_add_assign(lo_product_hi);
     if hi_product < lo_product_hi {
         d_inv.wrapping_sub_assign(1);
-        if hi_product > hi || hi_product == hi && lo_product_lo >= lo {
+        if (hi_product, lo_product_lo) >= (hi, lo) {
             d_inv.wrapping_sub_assign(1);
         }
     }
@@ -779,7 +779,7 @@ pub_test! {limbs_div_mod_divide_and_conquer(
             let mut n_1 = ns[a];
             let mut n_0 = ns[b];
             let d_0 = ds[b];
-            assert!(n_2 < d_1 || n_2 == d_1 && n_1 <= d_0);
+            assert!((n_2, n_1) <= (d_1, d_0));
             let mut q;
             if n_2 == d_1 && n_1 == d_0 {
                 q = Limb::MAX;

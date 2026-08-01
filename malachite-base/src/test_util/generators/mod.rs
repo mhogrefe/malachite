@@ -952,6 +952,26 @@ pub fn signed_triple_gen_var_7<
     )
 }
 
+// -- (PrimitiveFloat, PrimitiveFloat, PrimitiveFloat, PrimitiveFloat) --
+
+pub fn primitive_float_quadruple_gen<T: PrimitiveFloat>() -> Generator<(T, T, T, T)> {
+    Generator::new(
+        &exhaustive_primitive_float_quadruple_gen,
+        &random_primitive_float_quadruple_gen,
+        &special_random_primitive_float_quadruple_gen,
+    )
+}
+
+// -- (PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned) --
+
+pub fn unsigned_quadruple_gen<T: PrimitiveUnsigned>() -> Generator<(T, T, T, T)> {
+    Generator::new(
+        &exhaustive_unsigned_quadruple_gen,
+        &random_primitive_int_quadruple_gen_var_4,
+        &special_random_unsigned_quadruple_gen,
+    )
+}
+
 // -- (PrimitiveSigned, PrimitiveSigned, PrimitiveSigned, PrimitiveSigned) --
 
 pub fn signed_quadruple_gen<T: PrimitiveSigned>() -> Generator<(T, T, T, T)> {

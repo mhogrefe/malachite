@@ -12,6 +12,5 @@ fn f(x: i32, y: u8, z: i64) -> (bool, bool, bool, bool, bool) {
 }
 
 fn main() {
-    let (a, b, c, d, e) = f(5, 3, 40);
-    let _ = (a, b, c, d, e);
+    let _ = f(5, 3, 40);
 }

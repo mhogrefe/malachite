@@ -1210,6 +1210,22 @@ pub fn random_primitive_int_quadruple_gen_var_3<T: PrimitiveInt, U: PrimitiveInt
     )
 }
 
+pub fn random_primitive_float_quadruple_gen<T: PrimitiveFloat>(
+    config: &GenConfig,
+) -> It<(T, T, T, T)> {
+    Box::new(random_quadruples_from_single(
+        special_random_primitive_floats(
+            EXAMPLE_SEED,
+            config.get_or("exponent_mean_n", 8),
+            config.get_or("exponent_mean_d", 1),
+            config.get_or("precision_mean_n", 8),
+            config.get_or("precision_mean_d", 1),
+            config.get_or("special_p_mean_n", 1),
+            config.get_or("special_p_mean_d", 64),
+        ),
+    ))
+}
+
 pub fn random_primitive_int_quadruple_gen_var_4<T: PrimitiveInt>(
     _config: &GenConfig,
 ) -> It<(T, T, T, T)> {
@@ -1225,7 +1241,7 @@ pub fn random_primitive_int_quadruple_gen_var_5<T: PrimitiveInt>(
         random_quadruples_from_single(random_primitive_ints(EXAMPLE_SEED)).filter(
             |&(n1, n0, d1, d0)| {
                 // conditions: D >= 2^W, N >= D, and N / D < 2^W
-                d1 != T::ZERO && (n1 > d1 || n1 == d1 && n0 >= d0)
+                d1 != T::ZERO && (n1, n0) >= (d1, d0)
             },
         ),
     )

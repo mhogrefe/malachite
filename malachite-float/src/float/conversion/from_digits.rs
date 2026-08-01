@@ -10,20 +10,32 @@ use crate::Float;
 use alloc::vec::Vec;
 use core::cmp::Ordering::{self, *};
 use core::cmp::max;
-use malachite_base::num::arithmetic::traits::{FloorLogBase2, Pow, PowerOf2};
+use malachite_base::num::arithmetic::traits::{CheckedLogBase2, FloorLogBase2, Pow, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::One;
-use malachite_base::num::conversion::traits::Digits;
+use malachite_base::num::conversion::traits::{Digits, ExactFrom};
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::Natural;
+use malachite_q::Rational;
 
 // Rounds the exact quotient of two `Natural`s, the second nonzero, to a `Float` of the given
-// precision. The conversions are exact, so the returned `Ordering` describes the quotient itself.
-fn quotient_prec_round(n: &Natural, d: &Natural, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
-    let nf = Float::from_natural_prec(n.clone(), max(1, n.significant_bits())).0;
-    let df = Float::from_natural_prec(d.clone(), max(1, d.significant_bits())).0;
-    nf.div_prec_round(df, prec, rm)
+// precision. The conversions are exact, so the division sees the exact quotient and the returned
+// `Ordering` describes the quotient itself.
+fn quotient_prec_round(n: Natural, d: Natural, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    // A `Natural` needs an exponent of `significant_bits` to be a `Float`, so past `MAX_EXPONENT`
+    // it has no `Float` of its own even when the quotient is perfectly ordinary -- which is the
+    // usual case here, since the quotient is a digit expansion less than 1 while the numerator and
+    // denominator both grow with the precision. Building the `Rational` first never forms either
+    // endpoint as a `Float`. It costs a gcd, so it is worth avoiding until it is needed.
+    //
+    // Both arguments are taken by value: at these sizes the conversions would otherwise copy them,
+    // and one caller-side clone is cheaper than two internal ones.
+    if max(n.significant_bits(), d.significant_bits()) > u64::exact_from(Float::MAX_EXPONENT) {
+        Float::from_rational_prec_round(Rational::from_naturals(n, d), prec, rm)
+    } else {
+        Float::exact_from(n).div_prec_round(Float::exact_from(d), prec, rm)
+    }
 }
 
 impl Float {
@@ -188,13 +200,8 @@ impl Float {
         assert!(base >= 2, "base out of range");
         assert_ne!(prec, 0);
         assert_ne!(rm, Exact);
-        if base.is_power_of_two() {
-            return Self::non_dyadic_from_power_of_2_digits_prec_round(
-                digits,
-                base.floor_log_base_2(),
-                prec,
-                rm,
-            );
+        if let Some(log_base) = base.checked_log_base_2() {
+            return Self::non_dyadic_from_power_of_2_digits_prec_round(digits, log_base, prec, rm);
         }
         // Each digit carries at least `floor(log2(base))` bits, so this many digits is enough to
         // cover the precision, with a few to spare for the rounding decision.
@@ -212,9 +219,10 @@ impl Float {
             }
             let n = Natural::from_digits_desc(&base, buf.iter().copied()).unwrap();
             let power = (&base_n).pow(target);
-            // C lies strictly between n / power and (n + 1) / power.
-            let (lo, o_lo) = quotient_prec_round(&n, &power, prec, rm);
-            let (hi, o_hi) = quotient_prec_round(&(&n + Natural::ONE), &power, prec, rm);
+            // C lies strictly between n / power and (n + 1) / power. The second call consumes both
+            // values, so only the first has to clone.
+            let (lo, o_lo) = quotient_prec_round(n.clone(), power.clone(), prec, rm);
+            let (hi, o_hi) = quotient_prec_round(n + Natural::ONE, power, prec, rm);
             if lo == hi {
                 // Rounding is monotonic, so `lo` is the rounding of everything in the bracket, and
                 // hence of C. It only remains to place it relative to C, which the orderings of the

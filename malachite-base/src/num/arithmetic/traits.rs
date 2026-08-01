@@ -55,6 +55,30 @@ pub trait AddMulAssign<Y = Self, Z = Self> {
     fn add_mul_assign(&mut self, y: Y, z: Z);
 }
 
+/// Adds the products of two pairs of numbers.
+pub trait MulAddMul<Y = Self, Z = Self, W = Self> {
+    type Output;
+
+    fn mul_add_mul(self, y: Y, z: Z, w: W) -> Self::Output;
+}
+
+/// Adds the products of two pairs of numbers, in place.
+pub trait MulAddMulAssign<Y = Self, Z = Self, W = Self> {
+    fn mul_add_mul_assign(&mut self, y: Y, z: Z, w: W);
+}
+
+/// Subtracts the product of one pair of numbers from the product of another.
+pub trait MulSubMul<Y = Self, Z = Self, W = Self> {
+    type Output;
+
+    fn mul_sub_mul(self, y: Y, z: Z, w: W) -> Self::Output;
+}
+
+/// Subtracts the product of one pair of numbers from the product of another, in place.
+pub trait MulSubMulAssign<Y = Self, Z = Self, W = Self> {
+    fn mul_sub_mul_assign(&mut self, y: Y, z: Z, w: W);
+}
+
 /// Calculates the AGM (arithmetic-geometric mean) of two numbers.
 pub trait Agm<RHS = Self> {
     type Output;
@@ -165,6 +189,21 @@ pub trait CheckedAddMul<Y = Self, Z = Self> {
     type Output;
 
     fn checked_add_mul(self, y: Y, z: Z) -> Option<Self::Output>;
+}
+
+/// Adds the products of two pairs of numbers, returning `None` if the result is not representable.
+pub trait CheckedMulAddMul<Y = Self, Z = Self, W = Self> {
+    type Output;
+
+    fn checked_mul_add_mul(self, y: Y, z: Z, w: W) -> Option<Self::Output>;
+}
+
+/// Subtracts the product of one pair of numbers from the product of another, returning `None` if
+/// the result is not representable.
+pub trait CheckedMulSubMul<Y = Self, Z = Self, W = Self> {
+    type Output;
+
+    fn checked_mul_sub_mul(self, y: Y, z: Z, w: W) -> Option<Self::Output>;
 }
 
 /// Divides two numbers, returning `None` if the result is not representable.
@@ -1374,6 +1413,42 @@ pub trait OverflowingAddMulAssign<Y = Self, Z = Self> {
     fn overflowing_add_mul_assign(&mut self, y: Y, z: Z) -> bool;
 }
 
+/// Adds the products of two pairs of numbers.
+///
+/// Returns a tuple of the result along with a boolean indicating whether an arithmetic overflow
+/// occurred. If an overflow occurred, then the wrapped result is returned.
+pub trait OverflowingMulAddMul<Y = Self, Z = Self, W = Self> {
+    type Output;
+
+    fn overflowing_mul_add_mul(self, y: Y, z: Z, w: W) -> (Self::Output, bool);
+}
+
+/// Adds the products of two pairs of numbers, in place.
+///
+/// Returns a boolean indicating whether an arithmetic overflow occurred. If an overflow occurred,
+/// then the wrapped result is assigned.
+pub trait OverflowingMulAddMulAssign<Y = Self, Z = Self, W = Self> {
+    fn overflowing_mul_add_mul_assign(&mut self, y: Y, z: Z, w: W) -> bool;
+}
+
+/// Subtracts the product of one pair of numbers from the product of another.
+///
+/// Returns a tuple of the result along with a boolean indicating whether an arithmetic overflow
+/// occurred. If an overflow occurred, then the wrapped result is returned.
+pub trait OverflowingMulSubMul<Y = Self, Z = Self, W = Self> {
+    type Output;
+
+    fn overflowing_mul_sub_mul(self, y: Y, z: Z, w: W) -> (Self::Output, bool);
+}
+
+/// Subtracts the product of one pair of numbers from the product of another, in place.
+///
+/// Returns a boolean indicating whether an arithmetic overflow occurred. If an overflow occurred,
+/// then the wrapped result is assigned.
+pub trait OverflowingMulSubMulAssign<Y = Self, Z = Self, W = Self> {
+    fn overflowing_mul_sub_mul_assign(&mut self, y: Y, z: Z, w: W) -> bool;
+}
+
 /// Divides two numbers.
 ///
 /// Returns a tuple of the sum along with a boolean indicating whether an arithmetic overflow
@@ -1747,6 +1822,34 @@ pub trait SaturatingAddMulAssign<Y = Self, Z = Self> {
     fn saturating_add_mul_assign(&mut self, y: Y, z: Z);
 }
 
+/// Adds the products of two pairs of numbers, saturating at the numeric bounds instead of
+/// overflowing.
+pub trait SaturatingMulAddMul<Y = Self, Z = Self, W = Self> {
+    type Output;
+
+    fn saturating_mul_add_mul(self, y: Y, z: Z, w: W) -> Self::Output;
+}
+
+/// Adds the products of two pairs of numbers, in place, saturating at the numeric bounds instead of
+/// overflowing.
+pub trait SaturatingMulAddMulAssign<Y = Self, Z = Self, W = Self> {
+    fn saturating_mul_add_mul_assign(&mut self, y: Y, z: Z, w: W);
+}
+
+/// Subtracts the product of one pair of numbers from the product of another, saturating at the
+/// numeric bounds instead of overflowing.
+pub trait SaturatingMulSubMul<Y = Self, Z = Self, W = Self> {
+    type Output;
+
+    fn saturating_mul_sub_mul(self, y: Y, z: Z, w: W) -> Self::Output;
+}
+
+/// Subtracts the product of one pair of numbers from the product of another, in place, saturating
+/// at the numeric bounds instead of overflowing.
+pub trait SaturatingMulSubMulAssign<Y = Self, Z = Self, W = Self> {
+    fn saturating_mul_sub_mul_assign(&mut self, y: Y, z: Z, w: W);
+}
+
 /// Multiplies two numbers, saturating at the numeric bounds instead of overflowing.
 pub trait SaturatingMul<RHS = Self> {
     type Output;
@@ -1986,6 +2089,33 @@ pub trait WrappingAddMul<Y = Self, Z = Self> {
 /// the type.
 pub trait WrappingAddMulAssign<Y = Self, Z = Self> {
     fn wrapping_add_mul_assign(&mut self, y: Y, z: Z);
+}
+
+/// Adds the products of two pairs of numbers, wrapping around at the boundary of the type.
+pub trait WrappingMulAddMul<Y = Self, Z = Self, W = Self> {
+    type Output;
+
+    fn wrapping_mul_add_mul(self, y: Y, z: Z, w: W) -> Self::Output;
+}
+
+/// Adds the products of two pairs of numbers, in place, wrapping around at the boundary of the
+/// type.
+pub trait WrappingMulAddMulAssign<Y = Self, Z = Self, W = Self> {
+    fn wrapping_mul_add_mul_assign(&mut self, y: Y, z: Z, w: W);
+}
+
+/// Subtracts the product of one pair of numbers from the product of another, wrapping around at the
+/// boundary of the type.
+pub trait WrappingMulSubMul<Y = Self, Z = Self, W = Self> {
+    type Output;
+
+    fn wrapping_mul_sub_mul(self, y: Y, z: Z, w: W) -> Self::Output;
+}
+
+/// Subtracts the product of one pair of numbers from the product of another, in place, wrapping
+/// around at the boundary of the type.
+pub trait WrappingMulSubMulAssign<Y = Self, Z = Self, W = Self> {
+    fn wrapping_mul_sub_mul_assign(&mut self, y: Y, z: Z, w: W);
 }
 
 /// Divides a number by another number, wrapping around at the boundary of the type.

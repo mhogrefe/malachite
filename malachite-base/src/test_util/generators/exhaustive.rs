@@ -1107,6 +1107,20 @@ pub fn exhaustive_signed_triple_gen_var_7<T: PrimitiveSigned>() -> It<(T, T, T)>
     ))
 }
 
+// -- (PrimitiveFloat, PrimitiveFloat, PrimitiveFloat, PrimitiveFloat) --
+
+pub fn exhaustive_primitive_float_quadruple_gen<T: PrimitiveFloat>() -> It<(T, T, T, T)> {
+    Box::new(exhaustive_quadruples_from_single(
+        exhaustive_primitive_floats(),
+    ))
+}
+
+// -- (PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned) --
+
+pub fn exhaustive_unsigned_quadruple_gen<T: PrimitiveUnsigned>() -> It<(T, T, T, T)> {
+    Box::new(exhaustive_quadruples_from_single(exhaustive_unsigneds()))
+}
+
 // -- (PrimitiveSigned, PrimitiveSigned, PrimitiveSigned, PrimitiveSigned) --
 
 pub fn exhaustive_signed_quadruple_gen<T: PrimitiveSigned>() -> It<(T, T, T, T)> {
@@ -3117,7 +3131,7 @@ pub fn exhaustive_unsigned_quadruple_gen_var_11<T: PrimitiveUnsigned>() -> It<(T
     Box::new(
         exhaustive_quadruples_from_single(exhaustive_unsigneds()).filter(|&(n1, n0, d1, d0)| {
             // conditions: D >= 2^W, N >= D, and N / D < 2^W
-            d1 != T::ZERO && (n1 > d1 || n1 == d1 && n0 >= d0)
+            d1 != T::ZERO && (n1, n0) >= (d1, d0)
         }),
     )
 }

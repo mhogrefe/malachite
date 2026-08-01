@@ -1,0 +1,35 @@
+error: this rebuilds the tuple that `(n_2, n_1)` took apart
+  --> $DIR/redundant_tuple_rebuild.rs:8:46
+   |
+LL |         .filter(|&&((n_2, n_1), (d_1, d_0))| (n_2, n_1) < (d_1, d_0))
+   |                                              ^^^^^^^^^^
+   |
+   = help: bind the tuple to one name instead of naming its elements and putting them back together
+   = note: `#[deny(redundant_tuple_rebuild)]` on by default
+
+error: this rebuilds the tuple that `(d_1, d_0)` took apart
+  --> $DIR/redundant_tuple_rebuild.rs:8:59
+   |
+LL |         .filter(|&&((n_2, n_1), (d_1, d_0))| (n_2, n_1) < (d_1, d_0))
+   |                                                           ^^^^^^^^^^
+   |
+   = help: bind the tuple to one name instead of naming its elements and putting them back together
+
+error: this rebuilds the tuple that `(a, b)` took apart
+  --> $DIR/redundant_tuple_rebuild.rs:12:13
+   |
+LL |     let _ = (a, b);
+   |             ^^^^^^
+   |
+   = help: bind the tuple to one name instead of naming its elements and putting them back together
+
+error: this rebuilds the tuple that `(p, q, r)` took apart
+  --> $DIR/redundant_tuple_rebuild.rs:15:13
+   |
+LL |     let _ = (p, q, r);
+   |             ^^^^^^^^^
+   |
+   = help: bind the tuple to one name instead of naming its elements and putting them back together
+
+error: aborting due to 4 previous errors
+

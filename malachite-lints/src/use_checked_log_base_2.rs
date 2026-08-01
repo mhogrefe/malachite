@@ -20,7 +20,8 @@ declare_lint! {
     /// ### What it does
     ///
     /// Flags an `if x.is_power_of_2()` whose body computes `x.floor_log_base_2()` (or
-    /// `x.floor_log_base_2_abs()`) on the same value.
+    /// `x.floor_log_base_2_abs()`) on the same value. The standard library's `is_power_of_two`
+    /// counts as the same guard.
     ///
     /// ### Why is this bad?
     ///
@@ -62,15 +63,24 @@ fn has_checked_log_base_2<'tcx>(cx: &LateContext<'tcx>, ty: Ty<'tcx>) -> bool {
 struct IsPow2Receivers<'a, 'tcx> {
     cx: &'a LateContext<'tcx>,
     receivers: Vec<&'tcx Expr<'tcx>>,
+    /// The spelling of the guard that was actually written, for the diagnostic.
+    guard: Option<&'static str>,
 }
 
 impl<'tcx> Visitor<'tcx> for IsPow2Receivers<'_, 'tcx> {
     fn visit_expr(&mut self, e: &'tcx Expr<'tcx>) {
+        // `is_power_of_two` is the standard library's spelling of the same test, available on
+        // primitives; both guard the same thing, so both belong here.
         if let ExprKind::MethodCall(seg, recv, [], _) = e.kind
-            && seg.ident.name.as_str() == "is_power_of_2"
+            && matches!(seg.ident.name.as_str(), "is_power_of_2" | "is_power_of_two")
             && has_checked_log_base_2(self.cx, self.cx.typeck_results().expr_ty(recv).peel_refs())
         {
             self.receivers.push(recv);
+            self.guard.get_or_insert(if seg.ident.name.as_str() == "is_power_of_2" {
+                "is_power_of_2"
+            } else {
+                "is_power_of_two"
+            });
         }
         walk_expr(self, e);
     }
@@ -113,6 +123,7 @@ impl<'tcx> LateLintPass<'tcx> for UseCheckedLogBase2 {
         let mut receivers = IsPow2Receivers {
             cx,
             receivers: Vec::new(),
+            guard: None,
         };
         receivers.visit_expr(cond);
         if receivers.receivers.is_empty() {
@@ -129,7 +140,10 @@ impl<'tcx> LateLintPass<'tcx> for UseCheckedLogBase2 {
                 cx,
                 USE_CHECKED_LOG_BASE_2,
                 span,
-                "computing `floor_log_base_2` under an `is_power_of_2` guard",
+                format!(
+                    "computing `floor_log_base_2` under an `{}` guard",
+                    receivers.guard.unwrap_or("is_power_of_2")
+                ),
                 None,
                 format!(
                     "use `if let Some(e) = {}.checked_log_base_2()`, which tests and returns the \

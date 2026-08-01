@@ -68,15 +68,14 @@ where
                 } else {
                     (significand << (eb - sb), Equal)
                 };
-                let (n, o) = if let Ok(n) = T::try_from(&n) {
+                if let Ok(n) = T::try_from(&n) {
                     (n, o)
                 } else {
                     match rm {
                         Floor | Down | Nearest => (T::MAX, Less),
                         _ => panic!("Cannot convert large Float to {} using {}", T::NAME, rm),
                     }
-                };
-                (n, o)
+                }
             }
         }
     }
@@ -134,15 +133,14 @@ where
                 } else {
                     (significand << (eb - sb), Equal)
                 };
-                let (n, o) = if let Ok(n) = T::try_from(&n) {
+                if let Ok(n) = T::try_from(&n) {
                     (n, o)
                 } else {
                     match rm {
                         Floor | Down | Nearest => (T::MAX, Less),
                         _ => panic!("Cannot convert large Float to {} using {}", T::NAME, rm),
                     }
-                };
-                (n, o)
+                }
             }
         }
     }
@@ -423,7 +421,7 @@ where
                     } else {
                         (significand << (eb - sb), Equal)
                     };
-                    let (n, o) = if let Ok(n) = T::try_from(&n) {
+                    if let Ok(n) = T::try_from(&n) {
                         (n, o)
                     } else {
                         match rm {
@@ -432,8 +430,7 @@ where
                                 panic!("Cannot convert large Float to {} using {}", T::NAME, rm)
                             }
                         }
-                    };
-                    (n, o)
+                    }
                 }
             } else if exponent < 0 {
                 match rm {
@@ -460,7 +457,7 @@ where
                 } else {
                     (significand << (eb - sb), Equal)
                 };
-                let (n, o) = if let Ok(n) = T::try_from(&-n) {
+                if let Ok(n) = T::try_from(&-n) {
                     (n, o.reverse())
                 } else {
                     match rm {
@@ -471,8 +468,7 @@ where
                             rm
                         ),
                     }
-                };
-                (n, o)
+                }
             }
         }
     }
@@ -525,7 +521,7 @@ where
                     } else {
                         (significand << (eb - sb), Equal)
                     };
-                    let (n, o) = if let Ok(n) = T::try_from(&n) {
+                    if let Ok(n) = T::try_from(&n) {
                         (n, o)
                     } else {
                         match rm {
@@ -534,8 +530,7 @@ where
                                 panic!("Cannot convert large Float to {} using {}", T::NAME, rm)
                             }
                         }
-                    };
-                    (n, o)
+                    }
                 }
             } else if exponent < 0 {
                 match rm {
@@ -562,7 +557,7 @@ where
                 } else {
                     (significand << (eb - sb), Equal)
                 };
-                let (n, o) = if let Ok(n) = T::try_from(&-n) {
+                if let Ok(n) = T::try_from(&-n) {
                     (n, o.reverse())
                 } else {
                     match rm {
@@ -573,8 +568,7 @@ where
                             rm
                         ),
                     }
-                };
-                (n, o)
+                }
             }
         }
     }

@@ -92,6 +92,25 @@ pub fn triple_max_primitive_float_bucketer<'a, T: PrimitiveFloat>(
     }
 }
 
+pub fn quadruple_max_primitive_float_bucketer<'a, T: PrimitiveFloat>(
+    x_name: &str,
+    y_name: &str,
+    z_name: &str,
+    w_name: &str,
+) -> Bucketer<'a, (T, T, T, T)> {
+    Bucketer {
+        bucketing_function: &|&(f, g, h, i)| {
+            max!(float_size(f), float_size(g), float_size(h), float_size(i))
+        },
+        bucketing_label: format!(
+            "max(precision({x_name}) + |exponent({x_name})|, \
+            precision({y_name}) + |exponent({y_name})|, \
+            precision({z_name}) + |exponent({z_name})|, \
+            precision({w_name}) + |exponent({w_name})|)",
+        ),
+    }
+}
+
 pub fn pair_primitive_float_bit_u64_max_bucketer<'a, T: PrimitiveFloat>(
     x_name: &'a str,
     y_name: &'a str,

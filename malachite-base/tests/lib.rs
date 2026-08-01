@@ -247,6 +247,8 @@ pub mod num {
         pub mod mod_shr;
         pub mod mod_square;
         pub mod mod_sub;
+        pub mod mul_add_mul;
+        pub mod mul_sub_mul;
         pub mod neg;
         pub mod next_power_of_2;
         pub mod overflowing_abs;

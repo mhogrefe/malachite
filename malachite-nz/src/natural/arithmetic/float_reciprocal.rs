@@ -357,7 +357,7 @@ fn reciprocal_float_significand_same_prec_gt_w_lt_2w(
                 q_1.wrapping_add_assign(1);
             }
             // Subtract x_1 : x_0 to s_2 : s_1 : s_0
-            if s_1 < x_1 || s_1 == x_1 && s_0 < x_0 {
+            if (s_1, s_0) < (x_1, x_0) {
                 s_2.wrapping_sub_assign(1);
             }
             (s_1, s_0) = Limb::xx_sub_yy_to_zz(s_1, s_0, x_1, x_0);

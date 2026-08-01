@@ -145,8 +145,8 @@ fn test_comparable_float_cmp() {
 }
 
 #[test]
-// The antisymmetry assertion below is the property under test; swapping its operands would
-// restate the line above it rather than assert anything.
+// The antisymmetry assertion below is the property under test; swapping its operands would restate
+// the line above it rather than assert anything.
 #[cfg_attr(dylint_lib = "malachite_lints", expect(redundant_cmp_reverse))]
 fn comparable_float_cmp_properties() {
     float_pair_gen().test_properties(|(x, y)| {

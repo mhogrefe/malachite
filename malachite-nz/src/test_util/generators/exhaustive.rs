@@ -2233,7 +2233,7 @@ pub fn exhaustive_unsigned_sextuple_gen_var_2() -> It<(Limb, Limb, Limb, Limb, L
                 exhaustive_unsigned_pair_gen_var_20(),
                 exhaustive_unsigned_pair_gen_var_24(),
             )
-            .filter(|&((n_2, n_1), (d_1, d_0))| n_2 < d_1 || n_2 == d_1 && n_1 < d_0),
+            .filter(|&(n, d)| n < d),
             exhaustive_unsigneds(),
         )
         .map(|(((n_2, n_1), (d_1, d_0)), n_0)| {

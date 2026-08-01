@@ -177,7 +177,7 @@ fn measure_mul_pair(n: usize, a: &Algo, b: &Algo) -> Option<(f64, f64)> {
         (b.run)(&mut out_b, xs, ys, &mut scratch_b);
     }
     let (mut i, mut j) = (0usize, 0usize);
-    let (ta, tb) = interleaved_min_pair(
+    let times = interleaved_min_pair(
         &mut || {
             let (xs, ys) = &inputs[i & (INPUT_SETS - 1)];
             i += 1;
@@ -189,7 +189,7 @@ fn measure_mul_pair(n: usize, a: &Algo, b: &Algo) -> Option<(f64, f64)> {
             (b.run)(black_box(&mut out_b), xs, ys, &mut scratch_b);
         },
     );
-    Some((ta, tb))
+    Some(times)
 }
 
 // GMP's analyze_dat: given (size, d) where d > 0 means the lower algorithm was faster at that size,
@@ -583,7 +583,7 @@ fn measure_div_pair(n: usize, min_d: usize, a: DivAlgoFn, b: DivAlgoFn) -> Optio
         b(&mut qs_b, &mut ns_b, ds, *d_inv);
     }
     let (mut i, mut j) = (0usize, 0usize);
-    let (ta, tb) = interleaved_min_pair(
+    let times = interleaved_min_pair(
         &mut || {
             let (ns, ds, d_inv) = &inputs[i & (INPUT_SETS - 1)];
             i += 1;
@@ -597,7 +597,7 @@ fn measure_div_pair(n: usize, min_d: usize, a: DivAlgoFn, b: DivAlgoFn) -> Optio
             b(black_box(&mut qs_b), &mut ns_b, ds, *d_inv);
         },
     );
-    Some((ta, tb))
+    Some(times)
 }
 
 // Newton inversion vs the basecase approximate inversion, at divisor length n (normalized).

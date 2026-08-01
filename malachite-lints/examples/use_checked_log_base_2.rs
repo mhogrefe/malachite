@@ -11,6 +11,10 @@ fn f(x: Rational, y: Rational, n: u64) -> i64 {
     if n.is_power_of_2() {
         return n.floor_log_base_2() as i64;
     }
+    // The standard library's spelling of the guard is the same guard: flagged.
+    if n.is_power_of_two() {
+        return n.floor_log_base_2() as i64;
+    }
     // The floor-log is taken of a different value than the guard: fine.
     if x.is_power_of_2() {
         return y.floor_log_base_2_abs();

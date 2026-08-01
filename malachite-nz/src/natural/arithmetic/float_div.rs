@@ -576,11 +576,11 @@ fn div_float_significands_same_prec_gt_w_lt_2w(
     let shift = TWICE_WIDTH - prec;
     let shift_bit = Limb::power_of_2(shift);
     let mask = shift_bit - 1;
-    let increment_exp = x_1 > y_1 || (x_1 == y_1 && x_0 >= y_0);
+    let increment_exp = (x_1, x_0) >= (y_1, y_0);
     if increment_exp {
         (x_1, x_0) = Limb::xx_sub_yy_to_zz(x_1, x_0, y_1, y_0);
     }
-    assert!(x_1 < y_1 || (x_1 == y_1 && x_0 < y_0));
+    assert!((x_1, x_0) < (y_1, y_0));
     let (mut q_1, mut q_0) = div_float_2_approx(x_1, x_0, y_1, y_0);
     // We know q1 * B + q0 is smaller or equal to the exact quotient, with difference at most 21.
     let mut sticky_bit = if (q_0.wrapping_add(21)) & (mask >> 1) > 21 {
@@ -621,7 +621,7 @@ fn div_float_significands_same_prec_gt_w_lt_2w(
                 q_1.wrapping_add_assign(1);
             }
             // Subtract y_1 : y_0 to s_2 : s_1 : s_0
-            if (s_1 < y_1) || (s_1 == y_1 && s_0 < y_0) {
+            if (s_1, s_0) < (y_1, y_0) {
                 s_2.wrapping_sub_assign(1);
             }
             (s_1, s_0) = Limb::xx_sub_yy_to_zz(s_1, s_0, y_1, y_0);

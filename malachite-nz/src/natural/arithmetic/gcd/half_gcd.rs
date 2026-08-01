@@ -987,7 +987,7 @@ pub_crate_test! {limbs_gcd_div(
         d0 <<= c;
         (q, n1) = Limb::xx_div_mod_y_to_qr(n2, n1, d1);
         let (mut t1, mut t0) = Limb::x_mul_y_to_zz(q, d0);
-        if t1 > n1 || t1 == n1 && t0 > n0 {
+        if (t1, t0) > (n1, n0) {
             assert_ne!(q, 0);
             q -= 1;
             (t1, t0) = Limb::xx_sub_yy_to_zz(t1, t0, d1, d0);
@@ -1024,7 +1024,7 @@ pub(crate) fn limbs_half_gcd_2(
     }
     let mut m01;
     let mut m10;
-    if x_high > y_high || x_high == y_high && a_low > b_low {
+    if (x_high, a_low) > (y_high, b_low) {
         (x_high, a_low) = Limb::xx_sub_yy_to_zz(x_high, a_low, y_high, b_low);
         if x_high < 2 {
             return false;

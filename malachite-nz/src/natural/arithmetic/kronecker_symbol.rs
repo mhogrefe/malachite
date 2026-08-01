@@ -103,7 +103,7 @@ fn limbs_half_gcd_2_jacobi(
     let mut u01;
     let mut u10;
     let mut u11 = 1;
-    (u01, u10, bits) = if x_1 > y_1 || x_1 == y_1 && x_0 > y_0 {
+    (u01, u10, bits) = if (x_1, x_0) > (y_1, y_0) {
         (x_1, x_0) = Limb::xx_sub_yy_to_zz(x_1, x_0, y_1, y_0);
         if x_1 < 2 {
             return (bits, false);

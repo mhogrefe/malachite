@@ -12,7 +12,6 @@ use clippy_utils::path_to_local_with_projections;
 use rustc_hir::def::{DefKind, Res};
 use rustc_hir::{Block, Expr, ExprKind, HirId, PatKind, StmtKind};
 use rustc_lint::{LateContext, LateLintPass};
-use rustc_middle::ty::Ty;
 use rustc_session::{declare_lint, declare_lint_pass};
 
 declare_lint! {

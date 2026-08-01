@@ -4059,7 +4059,7 @@ pub fn random_unsigned_sextuple_gen_var_1(
                         )
                     },
                 )
-                .filter(|&((n_2, n_1), (d_1, d_0))| n_2 < d_1 || n_2 == d_1 && n_1 < d_0)
+                .filter(|&(n, d)| n < d)
             },
             &random_primitive_ints,
         )

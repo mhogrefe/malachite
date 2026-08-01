@@ -203,9 +203,9 @@ pub fn sqrt_float_significand_in_place(
     rm: RoundingMode,
 ) -> (i32, Ordering) {
     if out_prec == x_prec
-        && let Some((exp, o)) = sqrt_float_significand_in_place_same_prec(x, x_exp, out_prec, rm)
+        && let Some(exp_and_o) = sqrt_float_significand_in_place_same_prec(x, x_exp, out_prec, rm)
     {
-        return (exp, o);
+        return exp_and_o;
     }
     let (sqrt, exp, o) = match &*x {
         Natural(Small(x)) => sqrt_float_significand_ref_helper(&[*x], x_exp, x_prec, out_prec, rm),
@@ -725,14 +725,14 @@ fn sqrt_float_significand_same_prec_gt_w_lt_2w(
             t0.wrapping_add_assign(l + 1);
             t1.wrapping_add_assign(h + Limb::from(t0 < l));
             // necessarily r1 has its most significant bit set
-            t2.wrapping_add_assign(1 + Limb::from(t1 < h || (t1 == h && t0 < l)));
+            t2.wrapping_add_assign(1 + Limb::from((t1, t0) < (h, l)));
         }
         // now tp[2] >= 0
         //
         // now we want {tp, 4} <= 2 * {rp, 2}, which implies tp[2] <= 1
-        while t2 > 1 || (t2 == 1 && t1 > h) || (t2 == 1 && t1 == h && t0 > l) {
+        while (t2, t1, t0) > (1, h, l) {
             // subtract (1:h:l)+1 from {tp,3}
-            t2 -= 1 + Limb::from(t1 < h || (t1 == h && t0 <= l));
+            t2 -= 1 + Limb::from((t1, t0) <= (h, l));
             t1.wrapping_sub_assign(h + Limb::from(t0 <= l));
             t0.wrapping_sub_assign(l + 1);
             // add 2 to  h:l

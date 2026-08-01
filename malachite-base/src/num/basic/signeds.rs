@@ -20,49 +20,30 @@ use crate::num::logic::traits::CheckedHammingDistance;
 use crate::num::random::{HasRandomSignedRange, RandomSignedChunkable};
 use core::ops::Neg;
 
-// When the `random` feature is enabled, the HasRandomSignedRange and RandomSignedChunkable bounds
-// are included.
+/// The bounds that [`PrimitiveSigned`] has only when the `random` feature is enabled.
+///
+/// With the feature on these are [`HasRandomSignedRange`] and [`RandomSignedChunkable`]; with it
+/// off there are none. Every type meeting the bounds implements it automatically, so it never needs
+/// to be implemented by hand.
+///
+/// See
+/// [`PrimitiveIntRandomBounds`](crate::num::basic::integers::PrimitiveIntRandomBounds) for why this
+/// indirection exists.
+#[cfg(feature = "random")]
+pub trait PrimitiveSignedRandomBounds: HasRandomSignedRange + RandomSignedChunkable {}
 
 #[cfg(feature = "random")]
-/// Defines functions on primitive signed integer types: ixx and isize.
-pub trait PrimitiveSigned:
-    Abs<Output = Self>
-    + AbsAssign
-    + BalancedMod<Self, Output = Self>
-    + BalancedModAssign<Self>
-    + CeilingDivAssignMod<Self, ModOutput = Self>
-    + CeilingDivMod<Self, DivOutput = Self, ModOutput = Self>
-    + CeilingMod<Self, Output = Self>
-    + CeilingModAssign<Self>
-    + CeilingModPowerOf2<Output = Self>
-    + CeilingModPowerOf2Assign
-    + CheckedAbs<Output = Self>
-    + CheckedHammingDistance
-    + EqAbs<Self>
-    + ExtendedGcd<Self, Cofactor = Self>
-    + From<i8>
-    + HasRandomSignedRange
-    + Neg<Output = Self>
-    + NegAssign
-    + NegativeOne
-    + OrdAbs
-    + OrdAbsDouble<Self>
-    + OverflowingAbs<Output = Self>
-    + OverflowingAbsAssign
-    + PartialOrdAbs<Self>
-    + PrimitiveInt
-    + RandomSignedChunkable
-    + SaturatingAbs<Output = Self>
-    + SaturatingAbsAssign
-    + SaturatingNeg<Output = Self>
-    + SaturatingNegAssign
-    + UnsignedAbs
-    + WrappingAbs<Output = Self>
-    + WrappingAbsAssign
-{
-}
+impl<T: HasRandomSignedRange + RandomSignedChunkable> PrimitiveSignedRandomBounds for T {}
+
+/// The bounds that [`PrimitiveSigned`] has only when the `random` feature is enabled.
+///
+/// With the feature off, as here, there are none.
+#[cfg(not(feature = "random"))]
+pub trait PrimitiveSignedRandomBounds {}
 
 #[cfg(not(feature = "random"))]
+impl<T> PrimitiveSignedRandomBounds for T {}
+
 /// Defines functions on primitive signed integer types: ixx and isize.
 pub trait PrimitiveSigned:
     Abs<Output = Self>
@@ -89,6 +70,7 @@ pub trait PrimitiveSigned:
     + OverflowingAbsAssign
     + PartialOrdAbs<Self>
     + PrimitiveInt
+    + PrimitiveSignedRandomBounds
     + SaturatingAbs<Output = Self>
     + SaturatingAbsAssign
     + SaturatingNeg<Output = Self>

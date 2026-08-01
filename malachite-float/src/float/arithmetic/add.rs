@@ -210,7 +210,7 @@ impl Float {
                     y_sign.not_assign();
                 }
                 let (o, swapped) = if *x_sign == y_sign {
-                    let (o, swapped) = add_float_significands_in_place(
+                    let o_and_swapped = add_float_significands_in_place(
                         x,
                         x_exp,
                         *x_prec,
@@ -241,7 +241,7 @@ impl Float {
                             }
                         };
                     }
-                    (o, swapped)
+                    o_and_swapped
                 } else {
                     let (o, swapped, neg) = sub_float_significands_in_place(
                         x,

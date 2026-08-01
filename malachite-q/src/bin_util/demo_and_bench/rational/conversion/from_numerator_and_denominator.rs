@@ -300,8 +300,8 @@ fn benchmark_from_integers_library_comparison(
                 no_out!(Rational::from_integers(n, d));
             }),
             ("num", &mut |((n, d), _, _)| no_out!(BigRational::new(n, d))),
-            ("rug", &mut |(_, (n, d), _)| {
-                no_out!(rug::Rational::from((n, d)));
+            ("rug", &mut |(_, n_and_d, _)| {
+                no_out!(rug::Rational::from(n_and_d));
             }),
         ],
     );

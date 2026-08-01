@@ -343,6 +343,34 @@ pub mod checked_div;
 /// [`CheckedMul`](traits::CheckedMul), a trait for multiplying two numbers and checking whether the
 /// result is representable.
 pub mod checked_mul;
+/// [`CheckedMulAddMul`](traits::CheckedMulAddMul), a trait for adding the products of two pairs of
+/// numbers.
+///
+/// # checked_mul_add_mul
+/// ```
+/// use malachite_base::num::arithmetic::traits::CheckedMulAddMul;
+///
+/// assert_eq!(2u8.checked_mul_add_mul(3, 4, 5), Some(26));
+/// assert_eq!(200u8.checked_mul_add_mul(200, 100, 100), None);
+/// assert_eq!(10i8.checked_mul_add_mul(-2, 3, 5), Some(-5));
+/// // Neither product fits in an i8, but their sum does.
+/// assert_eq!(100i8.checked_mul_add_mul(100, -99, 100), Some(100));
+/// ```
+pub mod checked_mul_add_mul;
+/// [`CheckedMulSubMul`](traits::CheckedMulSubMul), a trait for subtracting the product of one pair
+/// of numbers from the product of another.
+///
+/// # checked_mul_sub_mul
+/// ```
+/// use malachite_base::num::arithmetic::traits::CheckedMulSubMul;
+///
+/// assert_eq!(10u8.checked_mul_sub_mul(3, 4, 5), Some(10));
+/// assert_eq!(1u8.checked_mul_sub_mul(1, 2, 2), None);
+/// assert_eq!(2i8.checked_mul_sub_mul(3, 4, 5), Some(-14));
+/// // Neither product fits in an i8, but their difference does.
+/// assert_eq!(100i8.checked_mul_sub_mul(100, 99, 100), Some(100));
+/// ```
+pub mod checked_mul_sub_mul;
 /// [`CheckedNeg`](traits::CheckedNeg), a trait for negating a number and checking whether the
 /// result is representable.
 pub mod checked_neg;
@@ -2436,6 +2464,54 @@ pub mod mod_square;
 /// assert_eq!(n, 8);
 /// ```
 pub mod mod_sub;
+/// [`MulAddMul`](traits::MulAddMul) and [`MulAddMulAssign`](traits::MulAddMulAssign), traits for
+/// adding the products of two pairs of numbers.
+///
+/// # mul_add_mul
+/// ```
+/// use malachite_base::num::arithmetic::traits::MulAddMul;
+///
+/// assert_eq!(2u8.mul_add_mul(3, 4, 5), 26);
+/// assert_eq!(10i8.mul_add_mul(-2, 3, 5), -5);
+/// ```
+///
+/// # mul_add_mul_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::MulAddMulAssign;
+///
+/// let mut x = 2u8;
+/// x.mul_add_mul_assign(3, 4, 5);
+/// assert_eq!(x, 26);
+///
+/// let mut x = 10i8;
+/// x.mul_add_mul_assign(-2, 3, 5);
+/// assert_eq!(x, -5);
+/// ```
+pub mod mul_add_mul;
+/// [`MulSubMul`](traits::MulSubMul) and [`MulSubMulAssign`](traits::MulSubMulAssign), traits for
+/// subtracting the product of one pair of numbers from the product of another.
+///
+/// # mul_sub_mul
+/// ```
+/// use malachite_base::num::arithmetic::traits::MulSubMul;
+///
+/// assert_eq!(10u8.mul_sub_mul(3, 4, 5), 10);
+/// assert_eq!(2i8.mul_sub_mul(3, 4, 5), -14);
+/// ```
+///
+/// # mul_sub_mul_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::MulSubMulAssign;
+///
+/// let mut x = 10u8;
+/// x.mul_sub_mul_assign(3, 4, 5);
+/// assert_eq!(x, 10);
+///
+/// let mut x = 2i8;
+/// x.mul_sub_mul_assign(3, 4, 5);
+/// assert_eq!(x, -14);
+/// ```
+pub mod mul_sub_mul;
 /// [`NegAssign`](traits::NegAssign), a trait for negating a number in place.
 ///
 /// # neg_assign
@@ -2611,6 +2687,50 @@ pub mod overflowing_div;
 /// assert_eq!(x, 24);
 /// ```
 pub mod overflowing_mul;
+/// [`OverflowingMulAddMul`](traits::OverflowingMulAddMul) and
+/// [`OverflowingMulAddMulAssign`](traits::OverflowingMulAddMulAssign), traits for adding the
+/// products of two pairs of numbers.
+///
+/// # overflowing_mul_add_mul
+/// ```
+/// use malachite_base::num::arithmetic::traits::OverflowingMulAddMul;
+///
+/// assert_eq!(2u8.overflowing_mul_add_mul(3, 4, 5), (26, false));
+/// assert_eq!(200u8.overflowing_mul_add_mul(200, 100, 100), (80, true));
+/// assert_eq!(10i8.overflowing_mul_add_mul(-2, 3, 5), (-5, false));
+/// ```
+///
+/// # overflowing_mul_add_mul_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::OverflowingMulAddMulAssign;
+///
+/// let mut x = 200u8;
+/// assert_eq!(x.overflowing_mul_add_mul_assign(200, 100, 100), true);
+/// assert_eq!(x, 80);
+/// ```
+pub mod overflowing_mul_add_mul;
+/// [`OverflowingMulSubMul`](traits::OverflowingMulSubMul) and
+/// [`OverflowingMulSubMulAssign`](traits::OverflowingMulSubMulAssign), traits for subtracting the
+/// product of one pair of numbers from the product of another.
+///
+/// # overflowing_mul_sub_mul
+/// ```
+/// use malachite_base::num::arithmetic::traits::OverflowingMulSubMul;
+///
+/// assert_eq!(10u8.overflowing_mul_sub_mul(3, 4, 5), (10, false));
+/// assert_eq!(1u8.overflowing_mul_sub_mul(1, 2, 2), (253, true));
+/// assert_eq!(2i8.overflowing_mul_sub_mul(3, 4, 5), (-14, false));
+/// ```
+///
+/// # overflowing_mul_sub_mul_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::OverflowingMulSubMulAssign;
+///
+/// let mut x = 1u8;
+/// assert_eq!(x.overflowing_mul_sub_mul_assign(1, 2, 2), true);
+/// assert_eq!(x, 253);
+/// ```
+pub mod overflowing_mul_sub_mul;
 /// [`OverflowingNeg`](traits::OverflowingNeg) and
 /// [`OverflowingNegAssign`](traits::OverflowingNegAssign), traits for negating a number and
 /// returning a boolean indicating whether an overflow occurred.
@@ -3390,6 +3510,54 @@ pub mod saturating_add_mul;
 /// assert_eq!(x, 255);
 /// ```
 pub mod saturating_mul;
+/// [`SaturatingMulAddMul`](traits::SaturatingMulAddMul) and
+/// [`SaturatingMulAddMulAssign`](traits::SaturatingMulAddMulAssign), traits for adding the products
+/// of two pairs of numbers.
+///
+/// # saturating_mul_add_mul
+/// ```
+/// use malachite_base::num::arithmetic::traits::SaturatingMulAddMul;
+///
+/// assert_eq!(2u8.saturating_mul_add_mul(3, 4, 5), 26);
+/// assert_eq!(200u8.saturating_mul_add_mul(200, 100, 100), 255);
+/// assert_eq!(10i8.saturating_mul_add_mul(-2, 3, 5), -5);
+/// assert_eq!(100i8.saturating_mul_add_mul(100, 100, 100), 127);
+/// assert_eq!((-100i8).saturating_mul_add_mul(100, -100, 100), -128);
+/// ```
+///
+/// # saturating_mul_add_mul_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::SaturatingMulAddMulAssign;
+///
+/// let mut x = 200u8;
+/// x.saturating_mul_add_mul_assign(200, 100, 100);
+/// assert_eq!(x, 255);
+/// ```
+pub mod saturating_mul_add_mul;
+/// [`SaturatingMulSubMul`](traits::SaturatingMulSubMul) and
+/// [`SaturatingMulSubMulAssign`](traits::SaturatingMulSubMulAssign), traits for subtracting the
+/// product of one pair of numbers from the product of another.
+///
+/// # saturating_mul_sub_mul
+/// ```
+/// use malachite_base::num::arithmetic::traits::SaturatingMulSubMul;
+///
+/// assert_eq!(10u8.saturating_mul_sub_mul(3, 4, 5), 10);
+/// // The exact result is negative, so it saturates to zero.
+/// assert_eq!(1u8.saturating_mul_sub_mul(1, 2, 2), 0);
+/// assert_eq!(2i8.saturating_mul_sub_mul(3, 4, 5), -14);
+/// assert_eq!(100i8.saturating_mul_sub_mul(100, -100, 100), 127);
+/// ```
+///
+/// # saturating_mul_sub_mul_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::SaturatingMulSubMulAssign;
+///
+/// let mut x = 1u8;
+/// x.saturating_mul_sub_mul_assign(1, 2, 2);
+/// assert_eq!(x, 0);
+/// ```
+pub mod saturating_mul_sub_mul;
 /// [`SaturatingNeg`](traits::SaturatingNeg) and
 /// [`SaturatingNegAssign`](traits::SaturatingNegAssign), traits for negating a number and
 /// saturating at numeric bounds instead of overflowing.
@@ -4047,6 +4215,50 @@ pub mod wrapping_div;
 /// assert_eq!(x, 24);
 /// ```
 pub mod wrapping_mul;
+/// [`WrappingMulAddMul`](traits::WrappingMulAddMul) and
+/// [`WrappingMulAddMulAssign`](traits::WrappingMulAddMulAssign), traits for adding the products of
+/// two pairs of numbers.
+///
+/// # wrapping_mul_add_mul
+/// ```
+/// use malachite_base::num::arithmetic::traits::WrappingMulAddMul;
+///
+/// assert_eq!(2u8.wrapping_mul_add_mul(3, 4, 5), 26);
+/// assert_eq!(200u8.wrapping_mul_add_mul(200, 100, 100), 80);
+/// assert_eq!(10i8.wrapping_mul_add_mul(-2, 3, 5), -5);
+/// ```
+///
+/// # wrapping_mul_add_mul_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::WrappingMulAddMulAssign;
+///
+/// let mut x = 200u8;
+/// x.wrapping_mul_add_mul_assign(200, 100, 100);
+/// assert_eq!(x, 80);
+/// ```
+pub mod wrapping_mul_add_mul;
+/// [`WrappingMulSubMul`](traits::WrappingMulSubMul) and
+/// [`WrappingMulSubMulAssign`](traits::WrappingMulSubMulAssign), traits for subtracting the product
+/// of one pair of numbers from the product of another.
+///
+/// # wrapping_mul_sub_mul
+/// ```
+/// use malachite_base::num::arithmetic::traits::WrappingMulSubMul;
+///
+/// assert_eq!(10u8.wrapping_mul_sub_mul(3, 4, 5), 10);
+/// assert_eq!(1u8.wrapping_mul_sub_mul(1, 2, 2), 253);
+/// assert_eq!(2i8.wrapping_mul_sub_mul(3, 4, 5), -14);
+/// ```
+///
+/// # wrapping_mul_sub_mul_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::WrappingMulSubMulAssign;
+///
+/// let mut x = 1u8;
+/// x.wrapping_mul_sub_mul_assign(1, 2, 2);
+/// assert_eq!(x, 253);
+/// ```
+pub mod wrapping_mul_sub_mul;
 /// [`WrappingNeg`](traits::WrappingNeg) and [`WrappingNegAssign`](traits::WrappingNegAssign) for
 /// negating a number and wrapping at the boundary of the type.
 ///

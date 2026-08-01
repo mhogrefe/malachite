@@ -1368,6 +1368,24 @@ pub fn special_random_signed_triple_gen_var_7<
 
 // -- (PrimitiveSigned, PrimitiveSigned, PrimitiveSigned, PrimitiveSigned) --
 
+pub fn special_random_primitive_float_quadruple_gen<T: PrimitiveFloat>(
+    _config: &GenConfig,
+) -> It<(T, T, T, T)> {
+    Box::new(random_quadruples_from_single(random_primitive_floats(
+        EXAMPLE_SEED,
+    )))
+}
+
+pub fn special_random_unsigned_quadruple_gen<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(T, T, T, T)> {
+    Box::new(random_quadruples_from_single(striped_random_unsigneds(
+        EXAMPLE_SEED,
+        config.get_or("mean_stripe_n", T::WIDTH >> 1),
+        config.get_or("mean_stripe_d", 1),
+    )))
+}
+
 pub fn special_random_signed_quadruple_gen<T: PrimitiveSigned>(
     config: &GenConfig,
 ) -> It<(T, T, T, T)> {
@@ -5456,7 +5474,7 @@ pub fn special_random_unsigned_quadruple_gen_var_11<T: PrimitiveUnsigned>(
         ))
         .filter(|&(n1, n0, d1, d0)| {
             // conditions: D >= 2^W, N >= D, and N / D < 2^W
-            d1 != T::ZERO && (n1 > d1 || n1 == d1 && n0 >= d0)
+            d1 != T::ZERO && (n1, n0) >= (d1, d0)
         }),
     )
 }

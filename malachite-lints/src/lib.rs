@@ -29,6 +29,7 @@ mod let_tuple_underscore_to_field;
 mod long_lines;
 mod manual_float_from_primitive;
 mod manual_from_sign_and_abs;
+mod manual_lexicographic_cmp;
 mod manual_rational_significant_bits;
 mod missing_inline_on_delegator;
 mod mul_div_by_power_of_2;
@@ -39,6 +40,7 @@ mod redundant_from_in_literal_comparison;
 mod redundant_nearest;
 mod redundant_prec_round_of_exact_constant;
 mod redundant_shift_conversion;
+mod redundant_tuple_rebuild;
 mod runtime_literal_conversion;
 mod shift_of_one;
 mod use_assign_variant;
@@ -400,6 +402,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         long_lines::LONG_LINES,
         manual_float_from_primitive::MANUAL_FLOAT_FROM_PRIMITIVE,
         manual_from_sign_and_abs::MANUAL_FROM_SIGN_AND_ABS,
+        manual_lexicographic_cmp::MANUAL_LEXICOGRAPHIC_CMP,
         manual_rational_significant_bits::MANUAL_RATIONAL_SIGNIFICANT_BITS,
         missing_inline_on_delegator::MISSING_INLINE_ON_DELEGATOR,
         mul_div_by_power_of_2::MUL_DIV_BY_POWER_OF_2,
@@ -410,6 +413,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         redundant_nearest::REDUNDANT_NEAREST,
         redundant_prec_round_of_exact_constant::REDUNDANT_PREC_ROUND_OF_EXACT_CONSTANT,
         redundant_shift_conversion::REDUNDANT_SHIFT_CONVERSION,
+        redundant_tuple_rebuild::REDUNDANT_TUPLE_REBUILD,
         runtime_literal_conversion::RUNTIME_LITERAL_CONVERSION,
         shift_of_one::SHIFT_OF_ONE,
         use_assign_variant::USE_ASSIGN_VARIANT,
@@ -444,6 +448,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
     lint_store
         .register_late_pass(|_| Box::new(manual_float_from_primitive::ManualFloatFromPrimitive));
     lint_store.register_late_pass(|_| Box::new(manual_from_sign_and_abs::ManualFromSignAndAbs));
+    lint_store.register_late_pass(|_| Box::new(manual_lexicographic_cmp::ManualLexicographicCmp));
     lint_store.register_late_pass(|_| {
         Box::new(manual_rational_significant_bits::ManualRationalSignificantBits)
     });
@@ -464,6 +469,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
     });
     lint_store
         .register_late_pass(|_| Box::new(redundant_shift_conversion::RedundantShiftConversion));
+    lint_store.register_late_pass(|_| Box::new(redundant_tuple_rebuild::RedundantTupleRebuild));
     lint_store
         .register_late_pass(|_| Box::new(runtime_literal_conversion::RuntimeLiteralConversion));
     lint_store.register_late_pass(|_| Box::new(shift_of_one::ShiftOfOne));

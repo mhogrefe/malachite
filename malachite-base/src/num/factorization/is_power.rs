@@ -745,9 +745,7 @@ fn is_power_i32(n: i32) -> bool {
     // For negative numbers, we need to check if there's an odd exponent representation
     //
     // continue until we have largest possible exponent
-    let (mut base, mut exp) = if let Some((base, exp)) = get_perfect_power_u32(n.unsigned_abs()) {
-        (base, exp)
-    } else {
+    let Some((mut base, mut exp)) = get_perfect_power_u32(n.unsigned_abs()) else {
         return false;
     };
     while base > 3 {
@@ -774,9 +772,7 @@ fn is_power_i64(n: i64) -> bool {
     // For negative numbers, we need to check if there's an odd exponent representation
     //
     // continue until we have largest possible exponent
-    let (mut base, mut exp) = if let Some((base, exp)) = get_perfect_power_u64(n.unsigned_abs()) {
-        (base, exp)
-    } else {
+    let Some((mut base, mut exp)) = get_perfect_power_u64(n.unsigned_abs()) else {
         return false;
     };
     while base > 3 {
@@ -803,9 +799,7 @@ fn is_power_i128(n: i128) -> bool {
     // For negative numbers, we need to check if there's an odd exponent representation
     //
     // continue until we have largest possible exponent
-    let (mut base, mut exp) = if let Some((base, exp)) = get_perfect_power_u128(n.unsigned_abs()) {
-        (base, exp)
-    } else {
+    let Some((mut base, mut exp)) = get_perfect_power_u128(n.unsigned_abs()) else {
         return false;
     };
     while base > 3 {

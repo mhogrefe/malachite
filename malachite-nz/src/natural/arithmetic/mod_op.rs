@@ -416,7 +416,7 @@ pub_test! {limbs_mod_divide_and_conquer(
             let mut n_1 = ns[a];
             let mut n_0 = ns[b];
             let d_0 = ds[b];
-            assert!(n_2 < d_1 || n_2 == d_1 && n_1 <= d_0);
+            assert!((n_2, n_1) <= (d_1, d_0));
             let mut q;
             if n_2 == d_1 && n_1 == d_0 {
                 q = Limb::MAX;

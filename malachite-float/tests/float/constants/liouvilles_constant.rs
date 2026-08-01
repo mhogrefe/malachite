@@ -43,6 +43,23 @@ fn test_liouvilles_constant_base_prec_helper(
     assert_eq!(o, o_alt);
 }
 
+// Regression test: in base 3 each digit is worth only one whole bit, so at this precision the
+// bracket's numerator and denominator both exceed `MAX_EXPONENT` bits and have no `Float` of their
+// own, even though their quotient is an ordinary number below 1. Converting them individually used
+// to panic; the quotient now goes through a `Rational` instead. Check that the result is finite and
+// that its leading 100 bits match a directly computed low-precision value. (~130 MB intermediates
+// and about a minute and a half, so release-only.)
+#[test]
+fn test_liouvilles_constant_base_prec_high() {
+    let (high, _) = Float::liouvilles_constant_base_prec(3, 678_000_000);
+    assert!(high.is_valid());
+    assert!(high.is_normal());
+    assert_eq!(high.get_prec(), Some(678_000_000));
+    let (high_rounded, _) = Float::from_float_prec_round(high, 100, Nearest);
+    let (low, _) = Float::liouvilles_constant_base_prec(3, 100);
+    assert_eq!(ComparableFloatRef(&high_rounded), ComparableFloatRef(&low));
+}
+
 #[test]
 fn test_liouvilles_constant_base_prec() {
     test_liouvilles_constant_base_prec_helper(

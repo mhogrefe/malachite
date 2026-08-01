@@ -44,7 +44,8 @@ pub_crate_test! {limbs_pow_low(xs: &mut [Limb], es: &[Limb], scratch: &mut [Limb
     let es_len = es.len();
     assert_ne!(es_len, 0);
     assert_ne!(es[es_len - 1], 0);
-    assert!(es_len > 1 || es_len == 1 && es[0] > 1);
+    // The exponent, read as (limb count, low limb), must exceed 1.
+    assert!((es_len, es[0]) > (1, 1));
     let mut bit_index = limbs_significant_bits(es);
     let window_size = get_window_size(bit_index);
     assert!(window_size < bit_index);
