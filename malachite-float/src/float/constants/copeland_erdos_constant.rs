@@ -56,10 +56,16 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (_, o) = Float::copeland_erdos_constant_base_prec_round(10, 100, Floor);
+    /// // In base 16 the digits are the primes in hexadecimal: 2, 3, 5, 7, b, d, 11, 13, 17,
+    /// // ..., which the hexadecimal representation spells out.
+    /// let (x, o) = Float::copeland_erdos_constant_base_prec_round(16, 100, Floor);
+    /// assert_eq!(x.to_string(), "0.13805753390178350683643564212329");
+    /// assert_eq!(format!("{x:#x}"), "0x0.2357bd1113171d1f25292b2f34");
     /// assert_eq!(o, Less);
     ///
-    /// let (_, o) = Float::copeland_erdos_constant_base_prec_round(10, 100, Ceiling);
+    /// let (x, o) = Float::copeland_erdos_constant_base_prec_round(16, 100, Ceiling);
+    /// assert_eq!(x.to_string(), "0.13805753390178350683643564212348");
+    /// assert_eq!(format!("{x:#x}"), "0x0.2357bd1113171d1f25292b2f38");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -92,9 +98,18 @@ impl Float {
     /// # Examples
     /// ```
     /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
     ///
-    /// let (ce, _) = Float::copeland_erdos_constant_base_prec(10, 100);
-    /// assert_eq!(ce.to_string(), "0.23571113171923293137414347535966");
+    /// // In base 16 the digits are the primes in hexadecimal: 2, 3, 5, 7, b, d, 11, 13, ...
+    /// let (x, o) = Float::copeland_erdos_constant_base_prec(16, 100);
+    /// assert_eq!(x.to_string(), "0.13805753390178350683643564212329");
+    /// assert_eq!(format!("{x:#x}"), "0x0.2357bd1113171d1f25292b2f34");
+    /// assert_eq!(o, Less);
+    ///
+    /// // Base 3 concatenates 2, 12, 21, 111, 122, 200, ...
+    /// let (x, o) = Float::copeland_erdos_constant_base_prec(3, 50);
+    /// assert_eq!(x.to_string(), "0.80174949296954523");
+    /// assert_eq!(o, Greater);
     /// ```
     #[inline]
     pub fn copeland_erdos_constant_base_prec(base: u64, prec: u64) -> (Self, Ordering) {

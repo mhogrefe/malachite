@@ -996,7 +996,7 @@ fn pow_general(
                     .0
                     .mul_prec_round_val_ref(y, wprec, Floor)
                     .0
-                    .exp_prec_round(wprec, Floor)
+                    .exp_round(Floor)
                     .0;
                 if t2.is_infinite() {
                     // The entry check bounds |x^y| < 2^MAX_EXPONENT, so the lower-bound

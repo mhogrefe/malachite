@@ -55,10 +55,16 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (_, o) = Float::champernowne_constant_base_prec_round(10, 100, Floor);
+    /// // In base 16 the digits are the hexadecimal integers 1, 2, ..., 9, a, ..., f, 10, 11,
+    /// // ..., which the hexadecimal representation spells out.
+    /// let (x, o) = Float::champernowne_constant_base_prec_round(16, 100, Floor);
+    /// assert_eq!(x.to_string(), "0.071111111111111110236506352380963");
+    /// assert_eq!(format!("{x:#x}"), "0x0.123456789abcdef10111213140");
     /// assert_eq!(o, Less);
     ///
-    /// let (_, o) = Float::champernowne_constant_base_prec_round(10, 100, Ceiling);
+    /// let (x, o) = Float::champernowne_constant_base_prec_round(16, 100, Ceiling);
+    /// assert_eq!(x.to_string(), "0.071111111111111110236506352381062");
+    /// assert_eq!(format!("{x:#x}"), "0x0.123456789abcdef10111213142");
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -90,9 +96,18 @@ impl Float {
     /// # Examples
     /// ```
     /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
     ///
-    /// let (c, _) = Float::champernowne_constant_base_prec(10, 100);
-    /// assert_eq!(c.to_string(), "0.12345678910111213141516171819207");
+    /// // In base 16 the digits are the hexadecimal integers 1, 2, ..., f, 10, 11, ...
+    /// let (x, o) = Float::champernowne_constant_base_prec(16, 100);
+    /// assert_eq!(x.to_string(), "0.071111111111111110236506352381062");
+    /// assert_eq!(format!("{x:#x}"), "0x0.123456789abcdef10111213142");
+    /// assert_eq!(o, Greater);
+    ///
+    /// // Base 3 concatenates 1, 2, 10, 11, 12, 20, 21, 22, 100, ...
+    /// let (x, o) = Float::champernowne_constant_base_prec(3, 50);
+    /// assert_eq!(x.to_string(), "0.59895816753843434");
+    /// assert_eq!(o, Greater);
     /// ```
     #[inline]
     pub fn champernowne_constant_base_prec(base: u64, prec: u64) -> (Self, Ordering) {

@@ -73,10 +73,22 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (_, o) = Float::liouvilles_constant_base_prec_round(10, 100, Floor);
+    /// // In base 2 the constant has a 1 at every factorial position -- 1, 2, 6, 24, ... -- and a
+    /// // 0 everywhere else, which the binary representation shows directly.
+    /// let (x, o) = Float::liouvilles_constant_base_prec_round(2, 64, Floor);
+    /// assert_eq!(x.to_string(), "0.765625059604644775391");
+    /// assert_eq!(
+    ///     format!("{x:#b}"),
+    ///     "0b0.1100010000000000000000010000000000000000000000000000000000000000"
+    /// );
     /// assert_eq!(o, Less);
     ///
-    /// let (_, o) = Float::liouvilles_constant_base_prec_round(10, 100, Ceiling);
+    /// let (x, o) = Float::liouvilles_constant_base_prec_round(2, 64, Ceiling);
+    /// assert_eq!(x.to_string(), "0.765625059604644775445");
+    /// assert_eq!(
+    ///     format!("{x:#b}"),
+    ///     "0b0.1100010000000000000000010000000000000000000000000000000000000001"
+    /// );
     /// assert_eq!(o, Greater);
     /// ```
     #[inline]
@@ -108,9 +120,22 @@ impl Float {
     /// # Examples
     /// ```
     /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
     ///
-    /// let (l, _) = Float::liouvilles_constant_base_prec(10, 100);
-    /// assert_eq!(l.to_string(), "0.11000100000000000000000099999997");
+    /// // In base 2 the 1s sit at the factorial positions 1, 2, 6, 24, ...
+    /// let (x, o) = Float::liouvilles_constant_base_prec(2, 64);
+    /// assert_eq!(x.to_string(), "0.765625059604644775391");
+    /// assert_eq!(
+    ///     format!("{x:#b}"),
+    ///     "0b0.1100010000000000000000010000000000000000000000000000000000000000"
+    /// );
+    /// assert_eq!(o, Less);
+    ///
+    /// // A base that is not a power of 2 takes the general path, where the digits cannot simply
+    /// // be read off.
+    /// let (x, o) = Float::liouvilles_constant_base_prec(3, 50);
+    /// assert_eq!(x.to_string(), "0.44581618656046818");
+    /// assert_eq!(o, Greater);
     /// ```
     #[inline]
     pub fn liouvilles_constant_base_prec(base: u64, prec: u64) -> (Self, Ordering) {

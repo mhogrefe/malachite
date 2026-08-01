@@ -212,8 +212,8 @@ fn limbs_cmp_normalized_properties() {
 }
 
 #[test]
-// The antisymmetry assertion below is the property under test; swapping its operands would
-// restate the line above it rather than assert anything.
+// The antisymmetry assertion below is the property under test; swapping its operands would restate
+// the line above it rather than assert anything.
 #[cfg_attr(dylint_lib = "malachite_lints", expect(redundant_cmp_reverse))]
 fn cmp_properties() {
     natural_pair_gen().test_properties(|(x, y)| {
