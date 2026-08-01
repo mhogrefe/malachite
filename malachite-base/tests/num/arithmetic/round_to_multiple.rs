@@ -1395,10 +1395,7 @@ fn round_to_multiple_properties_helper_signed<
 
     signed_rounding_mode_pair_gen::<S>().test_properties(|(n, rm)| {
         if rm == Down || rm == Nearest || rm == if n >= S::ZERO { Floor } else { Ceiling } {
-            assert_eq!(
-                n.round_to_multiple(S::ZERO, rm),
-                (S::ZERO, n.cmp(&S::ZERO).reverse())
-            );
+            assert_eq!(n.round_to_multiple(S::ZERO, rm), (S::ZERO, S::ZERO.cmp(&n)));
         }
         assert_eq!(S::ZERO.round_to_multiple(n, rm), (S::ZERO, Equal));
         assert_eq!(n.round_to_multiple(S::ONE, rm), (n, Equal));

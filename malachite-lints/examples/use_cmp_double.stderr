@@ -1,0 +1,155 @@
+error: use `cmp_double` instead of comparing with a value doubled by `<< 1`
+  --> $DIR/use_cmp_double.rs:26:13
+   |
+LL |     let _ = X.cmp(&(&Y << 1));
+   |             ^^^^^^^^^^^^^^^^^
+   |
+   = help: `a.cmp_double(&b)` compares `a` with twice `b` without ever forming twice `b`, which for a bignum is a whole wasted allocation
+   = note: `#[deny(use_cmp_double)]` on by default
+
+error: use `partial_cmp_double` instead of comparing with a value doubled by `<< 1`
+  --> $DIR/use_cmp_double.rs:27:13
+   |
+LL |     let _ = X.partial_cmp(&(&Y << 1));
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: `a.partial_cmp_double(&b)` compares `a` with twice `b` without ever forming twice `b`, which for a bignum is a whole wasted allocation
+
+error: use `cmp_abs_double` instead of comparing with a value doubled by `<< 1`
+  --> $DIR/use_cmp_double.rs:28:13
+   |
+LL |     let _ = A.cmp_abs(&(&B << 1));
+   |             ^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: `a.cmp_abs_double(&b)` compares `a` with twice `b` without ever forming twice `b`, which for a bignum is a whole wasted allocation
+
+error: use `partial_cmp_abs_double` instead of comparing with a value doubled by `<< 1`
+  --> $DIR/use_cmp_double.rs:29:13
+   |
+LL |     let _ = A.partial_cmp_abs(&(&B << 1));
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: `a.partial_cmp_abs_double(&b)` compares `a` with twice `b` without ever forming twice `b`, which for a bignum is a whole wasted allocation
+
+error: use `cmp_double` instead of comparing with a value doubled by `<< 1`
+  --> $DIR/use_cmp_double.rs:31:13
+   |
+LL |     let _ = X < &Y << 1;
+   |             ^^^^^^^^^^^
+   |
+   = help: `a.cmp_double(&b)` compares `a` with twice `b` without ever forming twice `b`, which for a bignum is a whole wasted allocation
+
+error: use `cmp_double` instead of comparing with a value doubled by `<< 1`
+  --> $DIR/use_cmp_double.rs:32:13
+   |
+LL |     let _ = X >= &Y << 1;
+   |             ^^^^^^^^^^^^
+   |
+   = help: `a.cmp_double(&b)` compares `a` with twice `b` without ever forming twice `b`, which for a bignum is a whole wasted allocation
+
+error: use `cmp_double` instead of comparing with a value doubled by `<< 1`
+  --> $DIR/use_cmp_double.rs:33:13
+   |
+LL |     let _ = X == &Y << 1;
+   |             ^^^^^^^^^^^^
+   |
+   = help: `a.cmp_double(&b)` compares `a` with twice `b` without ever forming twice `b`, which for a bignum is a whole wasted allocation
+
+error: use `cmp_double` instead of comparing with a value doubled by `<< 1`
+  --> $DIR/use_cmp_double.rs:35:13
+   |
+LL |     let _ = X.lt(&(&Y << 1));
+   |             ^^^^^^^^^^^^^^^^
+   |
+   = help: `a.cmp_double(&b)` compares `a` with twice `b` without ever forming twice `b`, which for a bignum is a whole wasted allocation
+
+error: use `cmp_double` instead of comparing with a value doubled by `<< 1`
+  --> $DIR/use_cmp_double.rs:36:13
+   |
+LL |     let _ = X.ge(&(&Y << 1));
+   |             ^^^^^^^^^^^^^^^^
+   |
+   = help: `a.cmp_double(&b)` compares `a` with twice `b` without ever forming twice `b`, which for a bignum is a whole wasted allocation
+
+error: use `cmp_abs_double` instead of comparing with a value doubled by `<< 1`
+  --> $DIR/use_cmp_double.rs:38:13
+   |
+LL |     let _ = A.lt_abs(&(&B << 1));
+   |             ^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: `a.cmp_abs_double(&b)` compares `a` with twice `b` without ever forming twice `b`, which for a bignum is a whole wasted allocation
+
+error: use `cmp_abs_double` instead of comparing with a value doubled by `<< 1`
+  --> $DIR/use_cmp_double.rs:39:13
+   |
+LL |     let _ = A.ge_abs(&(&B << 1));
+   |             ^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: `a.cmp_abs_double(&b)` compares `a` with twice `b` without ever forming twice `b`, which for a bignum is a whole wasted allocation
+
+error: use `cmp_double` instead of comparing with a value doubled by `<< 1`
+  --> $DIR/use_cmp_double.rs:41:13
+   |
+LL |     let _ = X.cmp(&(&Y << u64::ONE));
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: `a.cmp_double(&b)` compares `a` with twice `b` without ever forming twice `b`, which for a bignum is a whole wasted allocation
+
+error: use `cmp_double` instead of comparing against a value halved by `>> 1`
+  --> $DIR/use_cmp_double.rs:43:13
+   |
+LL |     let _ = X <= &Y >> 1;
+   |             ^^^^^^^^^^^^
+   |
+   = help: `a <= b >> 1` is exactly `2a <= b`, so `b.cmp_double(&a) != Less` answers this                      without building `b >> 1`
+
+error: use `cmp_double` instead of comparing against a value halved by `>> 1`
+  --> $DIR/use_cmp_double.rs:44:13
+   |
+LL |     let _ = X > &Y >> 1;
+   |             ^^^^^^^^^^^
+   |
+   = help: `a <= b >> 1` is exactly `2a <= b`, so `b.cmp_double(&a) == Less` answers this                      without building `b >> 1`
+
+error: use `cmp_double` instead of comparing against a value halved by `>> 1`
+  --> $DIR/use_cmp_double.rs:45:13
+   |
+LL |     let _ = X.le(&(&Y >> 1));
+   |             ^^^^^^^^^^^^^^^^
+   |
+   = help: `a <= b >> 1` is exactly `2a <= b`, so `b.cmp_double(&a) != Less` answers this                      without building `b >> 1`
+
+error: use `cmp_double` instead of comparing against a value halved by `>> 1`
+  --> $DIR/use_cmp_double.rs:46:13
+   |
+LL |     let _ = &Y >> 1 >= X;
+   |             ^^^^^^^^^^^^
+   |
+   = help: `a <= b >> 1` is exactly `2a <= b`, so `b.cmp_double(&a) != Less` answers this                      without building `b >> 1`
+
+error: use `cmp_double` instead of comparing against a value halved by `>> 1`
+  --> $DIR/use_cmp_double.rs:47:13
+   |
+LL |     let _ = &Y >> 1 < X;
+   |             ^^^^^^^^^^^
+   |
+   = help: `a <= b >> 1` is exactly `2a <= b`, so `b.cmp_double(&a) == Less` answers this                      without building `b >> 1`
+
+error: use `cmp_double` instead of comparing a value doubled by `<< 1`
+  --> $DIR/use_cmp_double.rs:49:13
+   |
+LL |     let _ = (&X << 1u64).cmp(&Y);
+   |             ^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: the doubled value is on the left, so the operands swap: `b.cmp_double(&a)` answers the same question, reversed
+
+error: use `cmp_double` instead of comparing a value doubled by `<< 1`
+  --> $DIR/use_cmp_double.rs:50:13
+   |
+LL |     let _ = &X << 1 < Y;
+   |             ^^^^^^^^^^^
+   |
+   = help: the doubled value is on the left, so the operands swap: `b.cmp_double(&a)` answers the same question, reversed
+
+error: aborting due to 19 previous errors
+

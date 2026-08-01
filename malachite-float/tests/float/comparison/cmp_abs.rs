@@ -183,6 +183,9 @@ fn test_comparable_float_cmp_abs() {
     }
 }
 
+// The antisymmetry assertion below is the property under test; swapping its operands would
+// restate the line above it rather than assert anything.
+#[cfg_attr(dylint_lib = "malachite_lints", expect(redundant_cmp_reverse))]
 fn comparable_float_cmp_abs_properties_helper(x: Float, y: Float) {
     let cx = ComparableFloatRef(&x);
     let cy = ComparableFloatRef(&y);

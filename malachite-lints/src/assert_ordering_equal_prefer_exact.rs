@@ -56,19 +56,6 @@ declare_lint! {
 
 declare_lint_pass!(AssertOrderingEqualPreferExact => [ASSERT_ORDERING_EQUAL_PREFER_EXACT]);
 
-// Whether `ty` is `core::cmp::Ordering`.
-fn is_ordering_ty(cx: &LateContext<'_>, ty: Ty<'_>) -> bool {
-    if let rustc_middle::ty::Adt(adt, _) = ty.kind() {
-        let path = cx.get_def_path(adt.did());
-        path.len() == 3
-            && path[0].as_str() == "core"
-            && path[1].as_str() == "cmp"
-            && path[2].as_str() == "Ordering"
-    } else {
-        false
-    }
-}
-
 // Whether `e` is `Ordering::Equal` (a path to the `Equal` variant of `core::cmp::Ordering`).
 fn is_ordering_equal(cx: &LateContext<'_>, e: &Expr<'_>) -> bool {
     let ExprKind::Path(qpath) = &e.kind else {
@@ -78,7 +65,7 @@ fn is_ordering_equal(cx: &LateContext<'_>, e: &Expr<'_>) -> bool {
     let Res::Def(DefKind::Ctor(..) | DefKind::Variant, did) = res else {
         return false;
     };
-    cx.tcx.item_name(did).as_str() == "Equal" && is_ordering_ty(cx, cx.typeck_results().expr_ty(e))
+    cx.tcx.item_name(did).as_str() == "Equal" && crate::is_ordering_ty(cx, cx.typeck_results().expr_ty(e))
 }
 
 // If `init` is a call to an inherent associated function of a Malachite bignum type, returns the
@@ -153,7 +140,7 @@ impl<'tcx> LateLintPass<'tcx> for AssertOrderingEqualPreferExact {
             let PatKind::Binding(_, o_hir, _, None) = pats[1].kind else {
                 continue;
             };
-            if !is_ordering_ty(cx, cx.typeck_results().node_type(o_hir)) {
+            if !crate::is_ordering_ty(cx, cx.typeck_results().node_type(o_hir)) {
                 continue;
             }
             // The initializer is an inherent bignum function with a `_round` sibling, and is not

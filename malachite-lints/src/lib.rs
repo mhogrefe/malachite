@@ -33,6 +33,7 @@ mod manual_rational_significant_bits;
 mod missing_inline_on_delegator;
 mod mul_div_by_power_of_2;
 mod mul_div_by_power_of_2_literal;
+mod redundant_cmp_reverse;
 mod redundant_from_in_comparison;
 mod redundant_from_in_literal_comparison;
 mod redundant_nearest;
@@ -42,6 +43,7 @@ mod runtime_literal_conversion;
 mod shift_of_one;
 mod use_assign_variant;
 mod use_checked_log_base_2;
+mod use_cmp_double;
 mod use_const_binding;
 mod use_const_block;
 mod use_const_cast;
@@ -218,31 +220,40 @@ fn assign_trait_impl<'tcx>(
     ty: rustc_middle::ty::Ty<'tcx>,
     base: &str,
 ) -> Option<String> {
-    use clippy_utils::paths::{PathNS, lookup_path_str};
-    use clippy_utils::ty::implements_trait_with_env_from_iter;
     let trait_name = format!("{}Assign", camel_case(base));
     for module in ["arithmetic", "logic"] {
         let path = format!("malachite_base::num::{module}::traits::{trait_name}");
-        for did in lookup_path_str(cx.tcx, PathNS::Type, &path) {
-            if cx.tcx.def_kind(did) != rustc_hir::def::DefKind::Trait {
-                continue;
-            }
-            // These traits are generic in the right-hand side (`SaturatingMulAssign<RHS = Self>`);
-            // any RHS counts, so every parameter past `Self` is left to inference.
+        if implements_trait_by_path(cx, ty, &path) {
+            return Some(format!("{base}_assign"));
+        }
+    }
+    None
+}
+
+// Whether `ty` implements the trait named by the full path `path`. The traits this is used with are
+// generic in their right-hand side (`SaturatingMulAssign<RHS = Self>`, `OrdDouble<Rhs = Self>`); any
+// right-hand side counts, so every parameter past `Self` is left to inference.
+fn implements_trait_by_path<'tcx>(
+    cx: &rustc_lint::LateContext<'tcx>,
+    ty: rustc_middle::ty::Ty<'tcx>,
+    path: &str,
+) -> bool {
+    use clippy_utils::paths::{PathNS, lookup_path_str};
+    use clippy_utils::ty::implements_trait_with_env_from_iter;
+    lookup_path_str(cx.tcx, PathNS::Type, path)
+        .into_iter()
+        .filter(|did| cx.tcx.def_kind(*did) == rustc_hir::def::DefKind::Trait)
+        .any(|did| {
             let rhs_count = cx.tcx.generics_of(did).own_params.len() - 1;
-            if implements_trait_with_env_from_iter(
+            implements_trait_with_env_from_iter(
                 cx.tcx,
                 cx.typing_env(),
                 ty,
                 did,
                 None,
                 std::iter::repeat_n(None::<rustc_middle::ty::GenericArg<'tcx>>, rhs_count),
-            ) {
-                return Some(format!("{base}_assign"));
-            }
-        }
-    }
-    None
+            )
+        })
 }
 
 // The in-place `*_assign*` companion to suggest for a call to the `base` family on a receiver of
@@ -257,6 +268,19 @@ fn assign_variant_for_ty<'tcx>(
     match bignum_adt_did(cx, ty) {
         Some(adt_did) => assign_variant(cx, adt_did, base),
         None => assign_trait_impl(cx, ty, base),
+    }
+}
+
+// Whether `ty` is `core::cmp::Ordering`.
+fn is_ordering_ty(cx: &rustc_lint::LateContext<'_>, ty: rustc_middle::ty::Ty<'_>) -> bool {
+    if let rustc_middle::ty::Adt(adt, _) = ty.kind() {
+        let path = cx.get_def_path(adt.did());
+        path.len() == 3
+            && path[0].as_str() == "core"
+            && path[1].as_str() == "cmp"
+            && path[2].as_str() == "Ordering"
+    } else {
+        false
     }
 }
 
@@ -380,6 +404,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         missing_inline_on_delegator::MISSING_INLINE_ON_DELEGATOR,
         mul_div_by_power_of_2::MUL_DIV_BY_POWER_OF_2,
         mul_div_by_power_of_2_literal::MUL_DIV_BY_POWER_OF_2_LITERAL,
+        redundant_cmp_reverse::REDUNDANT_CMP_REVERSE,
         redundant_from_in_comparison::REDUNDANT_FROM_IN_COMPARISON,
         redundant_from_in_literal_comparison::REDUNDANT_FROM_IN_LITERAL_COMPARISON,
         redundant_nearest::REDUNDANT_NEAREST,
@@ -389,6 +414,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         shift_of_one::SHIFT_OF_ONE,
         use_assign_variant::USE_ASSIGN_VARIANT,
         use_checked_log_base_2::USE_CHECKED_LOG_BASE_2,
+        use_cmp_double::USE_CMP_DOUBLE,
         use_const_binding::USE_CONST_BINDING,
         use_const_block::USE_CONST_BLOCK,
         use_const_cast::USE_CONST_CAST,
@@ -426,6 +452,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
     lint_store.register_late_pass(|_| Box::new(mul_div_by_power_of_2::MulDivByPowerOf2));
     lint_store
         .register_late_pass(|_| Box::new(mul_div_by_power_of_2_literal::MulDivByPowerOf2Literal));
+    lint_store.register_late_pass(|_| Box::new(redundant_cmp_reverse::RedundantCmpReverse));
     lint_store
         .register_late_pass(|_| Box::new(redundant_from_in_comparison::RedundantFromInComparison));
     lint_store.register_late_pass(|_| {
@@ -445,6 +472,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         .register_early_pass(|| Box::new(collapse_adjacent_imports::CollapseAdjacentImports));
     lint_store.register_late_pass(|_| Box::new(use_assign_variant::UseAssignVariant));
     lint_store.register_late_pass(|_| Box::new(use_checked_log_base_2::UseCheckedLogBase2));
+    lint_store.register_late_pass(|_| Box::new(use_cmp_double::UseCmpDouble));
     lint_store.register_late_pass(|_| Box::new(use_const_binding::UseConstBinding));
     lint_store.register_late_pass(|_| Box::new(use_const_block::UseConstBlock));
     lint_store.register_late_pass(|_| Box::new(use_const_cast::UseConstCast));

@@ -1,0 +1,35 @@
+error: swap the operands instead of reversing the result of `cmp`
+  --> $DIR/redundant_cmp_reverse.rs:13:13
+   |
+LL |     let _ = X.cmp(&Y).reverse();
+   |             ^^^^^^^^^^^^^^^^^^^
+   |
+   = help: `a.cmp(&b).reverse()` is `b.cmp(&a)`
+   = note: `#[deny(redundant_cmp_reverse)]` on by default
+
+error: swap the operands instead of reversing the result of `cmp_abs`
+  --> $DIR/redundant_cmp_reverse.rs:14:13
+   |
+LL |     let _ = A.cmp_abs(&B).reverse();
+   |             ^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: `a.cmp_abs(&b).reverse()` is `b.cmp_abs(&a)`
+
+error: swap the operands instead of reversing the result of `total_cmp`
+  --> $DIR/redundant_cmp_reverse.rs:15:13
+   |
+LL |     let _ = 1.0f64.total_cmp(&2.0).reverse();
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: `a.total_cmp(&b).reverse()` is `b.total_cmp(&a)`
+
+error: swap the operands instead of reversing the result of `cmp`
+  --> $DIR/redundant_cmp_reverse.rs:17:11
+   |
+LL |     match X.cmp(&Y).reverse() {
+   |           ^^^^^^^^^^^^^^^^^^^
+   |
+   = help: `a.cmp(&b).reverse()` is `b.cmp(&a)`
+
+error: aborting due to 4 previous errors
+

@@ -10,6 +10,7 @@ use crate::natural::Natural;
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{RoundToMultiple, RoundToMultipleAssign};
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::comparison::traits::OrdDouble;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 
 impl RoundToMultiple<Self> for Natural {
@@ -354,7 +355,7 @@ impl RoundToMultiple<Natural> for &Natural {
                         Down | Floor => (floor, Less),
                         Up | Ceiling => (floor + y, Greater),
                         Nearest => {
-                            match (r << 1u64).cmp(&y) {
+                            match y.cmp_double(&r).reverse() {
                                 Less => (floor, Less),
                                 Greater => (floor + y, Greater),
                                 Equal => {
@@ -502,7 +503,7 @@ impl RoundToMultiple<&Natural> for &Natural {
                         Down | Floor => (floor, Less),
                         Up | Ceiling => (floor + y, Greater),
                         Nearest => {
-                            match (r << 1u64).cmp(y) {
+                            match y.cmp_double(&r).reverse() {
                                 Less => (floor, Less),
                                 Greater => (floor + y, Greater),
                                 Equal => {
@@ -633,7 +634,7 @@ impl RoundToMultipleAssign<Self> for Natural {
                             Greater
                         }
                         Nearest => {
-                            match (r << 1u64).cmp(&y) {
+                            match y.cmp_double(&r).reverse() {
                                 Less => Less,
                                 Greater => {
                                     *x += y;
@@ -771,7 +772,7 @@ impl RoundToMultipleAssign<&Self> for Natural {
                             Greater
                         }
                         Nearest => {
-                            match (r << 1u64).cmp(y) {
+                            match y.cmp_double(&r).reverse() {
                                 Less => Less,
                                 Greater => {
                                     *x += y;

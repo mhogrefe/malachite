@@ -8,14 +8,18 @@
 
 use crate::integer::Integer;
 use crate::natural::Natural;
+use core::cmp::Ordering::Less;
 use malachite_base::num::arithmetic::traits::{BalancedMod, Mod};
+use malachite_base::num::comparison::traits::OrdDouble;
 
 // The balanced remainder is the ordinary one when it is at most half the modulus, and that
 // remainder less the modulus otherwise. A remainder of exactly half the modulus stays positive,
 // which is what puts the endpoint at the top of the range rather than the bottom.
 fn balanced_mod_helper(x: &Natural, m: &Natural) -> Integer {
     let r = x.mod_op(m);
-    if r <= m >> 1u32 {
+    // `r <= m >> 1` is exactly `2r <= m`: for an integer `r`, `r <= floor(x)` iff `r <= x`.
+    // Phrasing it as the latter lets `cmp_double` answer it without building either value.
+    if m.cmp_double(&r) != Less {
         Integer::from(r)
     } else {
         Integer::from(r) - Integer::from(m)

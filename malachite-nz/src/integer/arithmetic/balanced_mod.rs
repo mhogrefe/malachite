@@ -8,7 +8,9 @@
 
 use crate::integer::Integer;
 use crate::natural::Natural;
+use core::cmp::Ordering::Less;
 use malachite_base::num::arithmetic::traits::{BalancedMod, BalancedModAssign, ModEuclidean};
+use malachite_base::num::comparison::traits::OrdDouble;
 
 // The Euclidean remainder already lies in [0, |m|), so the balanced one is that remainder when it
 // is at most half the modulus, and that remainder less the modulus otherwise. A remainder of
@@ -16,7 +18,9 @@ use malachite_base::num::arithmetic::traits::{BalancedMod, BalancedModAssign, Mo
 fn balanced_mod_helper(x: &Integer, m: &Integer) -> Integer {
     let r: Natural = x.mod_euclidean(m);
     let abs_m = m.unsigned_abs_ref();
-    if r <= abs_m >> 1u32 {
+    // `r <= abs_m >> 1` is exactly `2r <= abs_m`: for an integer `r`, `r <= floor(x)` iff `r <= x`.
+    // Phrasing it as the latter lets `cmp_double` answer it without building either value.
+    if abs_m.cmp_double(&r) != Less {
         Integer::from(r)
     } else {
         Integer::from(r) - Integer::from(abs_m)
