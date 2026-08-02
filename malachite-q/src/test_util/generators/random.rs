@@ -12,8 +12,8 @@ use crate::rational::random::{
     random_nonzero_rationals, random_positive_rationals, random_rationals,
 };
 use crate::test_util::extra_variadic::{
-    random_ordered_unique_triples, random_quadruples_xxyz, random_triples,
-    random_triples_from_single, random_triples_xxy, random_triples_xyy,
+    random_ordered_unique_triples, random_quadruples_from_single, random_quadruples_xxyz,
+    random_triples, random_triples_from_single, random_triples_xxy, random_triples_xyy,
 };
 use crate::test_util::generators::round_to_multiple_rational_filter;
 use malachite_base::bools::random::random_bools;
@@ -1392,6 +1392,18 @@ pub fn random_rational_rational_unsigned_triple_gen_var_2<T: PrimitiveUnsigned>(
 
 pub fn random_rational_triple_gen(config: &GenConfig) -> It<(Rational, Rational, Rational)> {
     Box::new(random_triples_from_single(random_rationals(
+        EXAMPLE_SEED,
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    )))
+}
+
+// -- (Rational, Rational, Rational, Rational) --
+
+pub fn random_rational_quadruple_gen(
+    config: &GenConfig,
+) -> It<(Rational, Rational, Rational, Rational)> {
+    Box::new(random_quadruples_from_single(random_rationals(
         EXAMPLE_SEED,
         config.get_or("mean_bits_n", 64),
         config.get_or("mean_bits_d", 1),

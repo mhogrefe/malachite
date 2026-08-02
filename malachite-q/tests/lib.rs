@@ -84,6 +84,8 @@ pub mod rational {
         pub mod log_base_power_of_2;
         pub mod mod_op;
         pub mod mul;
+        pub mod mul_add_mul;
+        pub mod mul_sub_mul;
         pub mod neg;
         pub mod next_power_of_2;
         pub mod pow;

@@ -12,8 +12,9 @@ use crate::rational::exhaustive::{
     exhaustive_positive_rationals, exhaustive_rationals,
 };
 use crate::test_util::extra_variadic::{
-    exhaustive_ordered_unique_triples, exhaustive_quadruples_xxyz, exhaustive_triples_from_single,
-    exhaustive_triples_xxy, exhaustive_triples_xxy_custom_output,
+    exhaustive_ordered_unique_triples, exhaustive_quadruples_from_single,
+    exhaustive_quadruples_xxyz, exhaustive_triples_from_single, exhaustive_triples_xxy,
+    exhaustive_triples_xxy_custom_output,
 };
 use itertools::Itertools;
 use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
@@ -592,6 +593,12 @@ pub fn exhaustive_rational_rational_unsigned_triple_gen_var_1<T: PrimitiveUnsign
 
 pub fn exhaustive_rational_triple_gen() -> It<(Rational, Rational, Rational)> {
     Box::new(exhaustive_triples_from_single(exhaustive_rationals()))
+}
+
+// -- (Rational, Rational, Rational, Rational) --
+
+pub fn exhaustive_rational_quadruple_gen() -> It<(Rational, Rational, Rational, Rational)> {
+    Box::new(exhaustive_quadruples_from_single(exhaustive_rationals()))
 }
 
 pub fn exhaustive_rational_triple_gen_var_1() -> It<(Rational, Rational, Rational)> {

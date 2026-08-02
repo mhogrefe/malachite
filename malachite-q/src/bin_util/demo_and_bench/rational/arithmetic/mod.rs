@@ -26,6 +26,8 @@ pub(crate) fn register(runner: &mut Runner) {
     log_base_power_of_2::register(runner);
     mod_op::register(runner);
     mul::register(runner);
+    mul_add_mul::register(runner);
+    mul_sub_mul::register(runner);
     neg::register(runner);
     next_power_of_2::register(runner);
     pow::register(runner);
@@ -61,6 +63,8 @@ mod log_base_2;
 mod log_base_power_of_2;
 mod mod_op;
 mod mul;
+mod mul_add_mul;
+mod mul_sub_mul;
 mod neg;
 mod next_power_of_2;
 mod pow;

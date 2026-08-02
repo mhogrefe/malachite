@@ -13,8 +13,8 @@ use crate::rational::random::{
     striped_random_positive_rationals, striped_random_rationals,
 };
 use crate::test_util::extra_variadic::{
-    random_ordered_unique_triples, random_quadruples_xxyz, random_triples,
-    random_triples_from_single, random_triples_xxy, random_triples_xyy,
+    random_ordered_unique_triples, random_quadruples_from_single, random_quadruples_xxyz,
+    random_triples, random_triples_from_single, random_triples_xxy, random_triples_xyy,
 };
 use crate::test_util::generators::round_to_multiple_rational_filter;
 use malachite_base::bools::random::random_bools;
@@ -1481,6 +1481,20 @@ pub fn special_random_rational_triple_gen(
     config: &GenConfig,
 ) -> It<(Rational, Rational, Rational)> {
     Box::new(random_triples_from_single(striped_random_rationals(
+        EXAMPLE_SEED,
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    )))
+}
+
+// -- (Rational, Rational, Rational, Rational) --
+
+pub fn special_random_rational_quadruple_gen(
+    config: &GenConfig,
+) -> It<(Rational, Rational, Rational, Rational)> {
+    Box::new(random_quadruples_from_single(striped_random_rationals(
         EXAMPLE_SEED,
         config.get_or("mean_stripe_n", 32),
         config.get_or("mean_stripe_d", 1),

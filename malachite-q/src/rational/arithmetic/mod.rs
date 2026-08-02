@@ -80,6 +80,14 @@ pub mod log_base_power_of_2;
 pub mod mod_op;
 /// Multiplication of [`Rational`](super::Rational)s.
 pub mod mul;
+/// Implementations of [`MulAddMul`](malachite_base::num::arithmetic::traits::MulAddMul) and
+/// [`MulAddMulAssign`](malachite_base::num::arithmetic::traits::MulAddMulAssign), traits for adding
+/// the products of two pairs of numbers.
+pub mod mul_add_mul;
+/// Implementations of [`MulSubMul`](malachite_base::num::arithmetic::traits::MulSubMul) and
+/// [`MulSubMulAssign`](malachite_base::num::arithmetic::traits::MulSubMulAssign), traits for
+/// subtracting the product of one pair of numbers from the product of another.
+pub mod mul_sub_mul;
 /// Negation of [`Rational`](super::Rational)s.
 pub mod neg;
 /// Implementations of [`NextPowerOf2`](malachite_base::num::arithmetic::traits::NextPowerOf2) and

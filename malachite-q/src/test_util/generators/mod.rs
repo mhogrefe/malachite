@@ -827,6 +827,16 @@ pub fn rational_triple_gen() -> Generator<(Rational, Rational, Rational)> {
     )
 }
 
+// -- (Rational, Rational, Rational, Rational) --
+
+pub fn rational_quadruple_gen() -> Generator<(Rational, Rational, Rational, Rational)> {
+    Generator::new(
+        &exhaustive_rational_quadruple_gen,
+        &random_rational_quadruple_gen,
+        &special_random_rational_quadruple_gen,
+    )
+}
+
 // All triples of `Rational` where the last `Rational` is nonzero.
 pub fn rational_triple_gen_var_1() -> Generator<(Rational, Rational, Rational)> {
     Generator::new(
