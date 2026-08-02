@@ -23,7 +23,8 @@
 use crate::num::arithmetic::mod_pow::mul_mod_helper;
 use crate::num::arithmetic::traits::{
     Gcd, JacobiSymbol, ModAdd, ModInverse, ModMulPrecomputed, ModMulPrecomputedAssign, ModSub,
-    Parity, PowerOf2, WrappingAddAssign, WrappingNegAssign, XMulYToZZ, XXAddYYToZZ,
+    Parity, PowerOf2, WrappingAddAssign, WrappingMulSubMul, WrappingNegAssign, XMulYToZZ,
+    XXAddYYToZZ,
 };
 use crate::num::basic::integers::{PrimitiveInt, USIZE_IS_U32};
 use crate::num::comparison::traits::PartialOrdAbs;
@@ -203,7 +204,7 @@ fn mod_pow_preinverted_u64(mut a: u64, mut exp: u64, mut n: u64, inverse: u64) -
 // This is n_mulmod_precomp when FLINT64 is true, from ulong_extras/mulmod_precomp.c, FLINT 3.1.2.
 fn mod_mul_preinverted_float(a: u64, b: u64, n: u64, inverse: f64) -> u64 {
     let q = ((a as f64) * (b as f64) * inverse) as u64;
-    let mut r = (a.wrapping_mul(b)).wrapping_sub(q.wrapping_mul(n));
+    let mut r = a.wrapping_mul_sub_mul(b, q, n);
     if r.get_highest_bit() {
         r.wrapping_add_assign(n);
         if r.get_highest_bit() {

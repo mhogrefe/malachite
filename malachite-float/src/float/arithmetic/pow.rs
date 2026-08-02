@@ -30,8 +30,8 @@ use core::cmp::max;
 use core::mem::swap;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    Abs, CeilingLogBase2, CheckedLogBase2, CheckedRoot, CheckedSqrt, DivisibleBy, IsPowerOf2,
-    NegAssign, Parity, Pow, PowAssign, Square, UnsignedAbs,
+    Abs, AddMul, CeilingLogBase2, CheckedLogBase2, CheckedRoot, CheckedSqrt, DivisibleBy,
+    IsPowerOf2, NegAssign, Parity, Pow, PowAssign, Square, UnsignedAbs,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -355,7 +355,7 @@ fn pow_integer(x: &Float, z: &Integer, prec: u64, rm: RoundingMode) -> (Float, O
         let ex = i64::from(x.get_exponent().unwrap());
         let sign_negative = x.is_sign_negative() && z_odd;
         // new exponent = z * (ex - 1) + 1
-        let new_exp = z * Integer::from(ex - 1) + Integer::ONE;
+        let new_exp = Integer::ONE.add_mul(z, Integer::from(ex - 1));
         let base = if sign_negative {
             -Float::one_prec(prec)
         } else {

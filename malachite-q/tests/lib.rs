@@ -70,6 +70,7 @@ pub mod rational {
         pub mod abs;
         pub mod abs_diff;
         pub mod add;
+        pub mod add_mul;
         pub mod approximate;
         pub mod average;
         pub mod ceiling;
@@ -98,6 +99,7 @@ pub mod rational {
         pub mod sqrt;
         pub mod square;
         pub mod sub;
+        pub mod sub_mul;
     }
     pub mod basic {
         pub mod constants;

@@ -10,7 +10,7 @@ use crate::Rational;
 use core::mem::swap;
 use core::ops::{Rem, RemAssign};
 use malachite_base::num::arithmetic::traits::{
-    CeilingMod, CeilingModAssign, DivRound, Mod, ModAssign, UnsignedAbs,
+    CeilingMod, CeilingModAssign, DivRound, Mod, ModAssign, SubMul, UnsignedAbs,
 };
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::rounding_modes::RoundingMode::*;
@@ -88,7 +88,7 @@ impl Mod<Self> for Rational {
         let n1d2 = Integer::from_sign_and_abs(x_sign, n1 * &d2);
         let n2d1 = Integer::from_sign_and_abs(y_sign, n2 * &d1);
         let q = (&n1d2).div_round(&n2d1, Floor).0;
-        let n = n1d2 - n2d1 * q;
+        let n = n1d2.sub_mul(n2d1, q);
         Self::from_sign_and_naturals(n >= 0, n.unsigned_abs(), d1 * d2)
     }
 }
@@ -165,7 +165,7 @@ impl Mod<&Self> for Rational {
         let n1d2 = Integer::from_sign_and_abs(x_sign, n1 * d2);
         let n2d1 = Integer::from_sign_and_abs(*other >= 0u32, n2 * &d1);
         let q = (&n1d2).div_round(&n2d1, Floor).0;
-        let n = n1d2 - n2d1 * q;
+        let n = n1d2.sub_mul(n2d1, q);
         Self::from_sign_and_naturals(n >= 0, n.unsigned_abs(), d1 * d2)
     }
 }
@@ -241,7 +241,7 @@ impl Mod<Rational> for &Rational {
         let n1d2 = Integer::from_sign_and_abs(*self >= 0u32, n1 * &d2);
         let n2d1 = Integer::from_sign_and_abs(y_sign, n2 * d1);
         let q = (&n1d2).div_round(&n2d1, Floor).0;
-        let n = n1d2 - n2d1 * q;
+        let n = n1d2.sub_mul(n2d1, q);
         Rational::from_sign_and_naturals(n >= 0, n.unsigned_abs(), d1 * d2)
     }
 }
@@ -315,7 +315,7 @@ impl Mod<&Rational> for &Rational {
         let n1d2 = Integer::from_sign_and_abs(*self >= 0u32, n1 * d2);
         let n2d1 = Integer::from_sign_and_abs(*other >= 0u32, n2 * d1);
         let q = (&n1d2).div_round(&n2d1, Floor).0;
-        let n = n1d2 - n2d1 * q;
+        let n = n1d2.sub_mul(n2d1, q);
         Rational::from_sign_and_naturals(n >= 0, n.unsigned_abs(), d1 * d2)
     }
 }
@@ -882,7 +882,7 @@ impl CeilingMod<Self> for Rational {
         let n1d2 = Integer::from_sign_and_abs(x_sign, n1 * &d2);
         let n2d1 = Integer::from_sign_and_abs(y_sign, n2 * &d1);
         let q = (&n1d2).div_round(&n2d1, Ceiling).0;
-        let n = n1d2 - n2d1 * q;
+        let n = n1d2.sub_mul(n2d1, q);
         Self::from_sign_and_naturals(n >= 0, n.unsigned_abs(), d1 * d2)
     }
 }
@@ -957,7 +957,7 @@ impl CeilingMod<&Self> for Rational {
         let n1d2 = Integer::from_sign_and_abs(x_sign, n1 * d2);
         let n2d1 = Integer::from_sign_and_abs(*other > 0u32, n2 * &d1);
         let q = (&n1d2).div_round(&n2d1, Ceiling).0;
-        let n = n1d2 - n2d1 * q;
+        let n = n1d2.sub_mul(n2d1, q);
         Self::from_sign_and_naturals(n >= 0, n.unsigned_abs(), d1 * d2)
     }
 }
@@ -1031,7 +1031,7 @@ impl CeilingMod<Rational> for &Rational {
         let n1d2 = Integer::from_sign_and_abs(*self >= 0u32, n1 * &d2);
         let n2d1 = Integer::from_sign_and_abs(y_sign, n2 * d1);
         let q = (&n1d2).div_round(&n2d1, Ceiling).0;
-        let n = n1d2 - n2d1 * q;
+        let n = n1d2.sub_mul(n2d1, q);
         Rational::from_sign_and_naturals(n >= 0, n.unsigned_abs(), d1 * d2)
     }
 }
@@ -1103,7 +1103,7 @@ impl CeilingMod<&Rational> for &Rational {
         let n1d2 = Integer::from_sign_and_abs(*self >= 0u32, n1 * d2);
         let n2d1 = Integer::from_sign_and_abs(*other >= 0u32, n2 * d1);
         let q = (&n1d2).div_round(&n2d1, Ceiling).0;
-        let n = n1d2 - n2d1 * q;
+        let n = n1d2.sub_mul(n2d1, q);
         Rational::from_sign_and_naturals(n >= 0, n.unsigned_abs(), d1 * d2)
     }
 }

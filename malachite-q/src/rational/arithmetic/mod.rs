@@ -14,6 +14,10 @@ pub mod abs;
 pub mod abs_diff;
 /// Addition of [`Rational`](super::Rational)s.
 pub mod add;
+/// Implementations of [`AddMul`](malachite_base::num::arithmetic::traits::AddMul) and
+/// [`AddMulAssign`](malachite_base::num::arithmetic::traits::AddMulAssign), traits for adding a
+/// number and the product of two other numbers.
+pub mod add_mul;
 /// Implementations of [`Approximate`](traits::Approximate) and
 /// [`ApproximateAssign`](traits::ApproximateAssign), traits for approximating a
 /// [`Rational`](super::Rational) by a [`Rational`](super::Rational) with a bounded denominator.
@@ -278,5 +282,9 @@ pub mod sqrt;
 pub mod square;
 /// Subtraction of [`Rational`](super::Rational)s.
 pub mod sub;
+/// Implementations of [`SubMul`](malachite_base::num::arithmetic::traits::SubMul) and
+/// [`SubMulAssign`](malachite_base::num::arithmetic::traits::SubMulAssign), traits for subtracting
+/// the product of two numbers from a number.
+pub mod sub_mul;
 /// Various traits for performing arithmetic operations on numbers.
 pub mod traits;

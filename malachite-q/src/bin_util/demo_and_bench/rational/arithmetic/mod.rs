@@ -12,6 +12,7 @@ pub(crate) fn register(runner: &mut Runner) {
     abs::register(runner);
     abs_diff::register(runner);
     add::register(runner);
+    add_mul::register(runner);
     approximate::register(runner);
     average::register(runner);
     ceiling::register(runner);
@@ -40,11 +41,13 @@ pub(crate) fn register(runner: &mut Runner) {
     sqrt::register(runner);
     square::register(runner);
     sub::register(runner);
+    sub_mul::register(runner);
 }
 
 mod abs;
 mod abs_diff;
 mod add;
+mod add_mul;
 mod approximate;
 mod average;
 mod ceiling;
@@ -73,3 +76,4 @@ mod simplest_rational_in_interval;
 mod sqrt;
 mod square;
 mod sub;
+mod sub_mul;

@@ -285,8 +285,8 @@ impl SimplestRationalInInterval for Rational {
                     let next_denominator = (&previous_denominator).add_mul(&denominator, &y_n);
                     let (n, d) = if cf_y.is_done() && next_y_n == 2u32 {
                         (
-                            next_numerator * THREE + (numerator << 1),
-                            next_denominator * THREE + (denominator << 1),
+                            (numerator << 1u32).add_mul(next_numerator, THREE),
+                            (denominator << 1u32).add_mul(next_denominator, THREE),
                         )
                     } else {
                         (
@@ -316,7 +316,7 @@ impl SimplestRationalInInterval for Rational {
                     if x_1 > 1u32 {
                         if x_1 == 2u32 && cf_x.is_done() {
                             // [f; 1, 1] and [f; 1], so [f; 1, 2] is a candidate.
-                            (floor * THREE + Natural::TWO, THREE)
+                            (Natural::TWO.add_mul(floor, THREE), THREE)
                         } else {
                             // If x_1 > 1, we have [f; 2] as a candidate.
                             ((floor << 1) | Natural::ONE, Natural::TWO)
@@ -327,7 +327,7 @@ impl SimplestRationalInInterval for Rational {
                         // [f; 1, x_2] and [f; 1], so [f; 1, x_2 + 1] is a candidate. [f; 1, x_2 -
                         // 1, 1] and [f; 1], but [f; 1, x_2] is not in the interval
                         let k = &x_2 + Natural::ONE;
-                        (&floor * &k + floor + k, x_2 + Natural::TWO)
+                        (&floor * (&k + Natural::ONE) + k, x_2 + Natural::TWO)
                     }
                 };
                 Self {

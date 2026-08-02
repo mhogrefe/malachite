@@ -42,7 +42,7 @@ use core::cmp::{Ordering::*, max};
 use core::mem::swap;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    DivExact, ExtendedGcd, NegAssign, OverflowingAddAssign,
+    DivExact, ExtendedGcd, NegAssign, OverflowingAddAssign, SubMul,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
@@ -757,7 +757,7 @@ fn extended_gcd_helper(a: Natural, b: Natural) -> (Natural, Integer, Integer) {
     gs.shrink_to_fit();
     let gcd = Natural::from_owned_limbs_asc(gs);
     let mut s = Integer::from_sign_and_abs(ss_sign, Natural::from_owned_limbs_asc(ss));
-    let mut t = (Integer::from(&gcd) - a * &s).div_exact(b);
+    let mut t = Integer::from(&gcd).sub_mul(a, &s).div_exact(b);
     if swapped {
         swap(&mut s, &mut t);
     }

@@ -61,7 +61,8 @@ use core::cmp::Ordering::*;
 use core::mem::swap;
 use core::ops::{Rem, RemAssign};
 use malachite_base::num::arithmetic::traits::{
-    Mod, ModAssign, ModPowerOf2, NegMod, NegModAssign, Parity, WrappingAddAssign, WrappingSubAssign,
+    Mod, ModAssign, ModPowerOf2, NegMod, NegModAssign, Parity, WrappingAddAssign,
+    WrappingSubAssign, WrappingSubMul,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
@@ -180,7 +181,7 @@ private_test_fn! {limbs_mod_three_limb_by_two_limb(
         .split_in_half();
     let d = DoubleLimb::join_halves(d_1, d_0);
     // Compute the two most significant limbs of n - q * d
-    let r = DoubleLimb::join_halves(n_1.wrapping_sub(d_1.wrapping_mul(q)), n_0)
+    let r = DoubleLimb::join_halves(n_1.wrapping_sub_mul(d_1, q), n_0)
         .wrapping_sub(d)
         .wrapping_sub(DoubleLimb::from(d_0) * DoubleLimb::from(q));
     // Conditionally adjust the remainder

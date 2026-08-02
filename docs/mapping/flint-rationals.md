@@ -335,8 +335,8 @@ trait.
 | ✓ | `void fmpq_sub_fmpz (fmpq_t res, const fmpq_t op1, const fmpz_t c)` | [`Sub`](https://doc.rust-lang.org/nightly/std/ops/trait.Sub.html) |
 | ✓ | `void fmpq_mul_si (fmpq_t res, const fmpq_t op1, slong c)` | [`Mul`](https://doc.rust-lang.org/nightly/std/ops/trait.Mul.html) |
 | ✓ | `void fmpq_mul_ui (fmpq_t res, const fmpq_t op1, ulong c)` | [`Mul`](https://doc.rust-lang.org/nightly/std/ops/trait.Mul.html) |
-| ✗ | `void fmpq_addmul (fmpq_t res, const fmpq_t op1, const fmpq_t op2)` | |
-| ✗ | `void fmpq_submul (fmpq_t res, const fmpq_t op1, const fmpq_t op2)` | |
+| ✓ | `void fmpq_addmul (fmpq_t res, const fmpq_t op1, const fmpq_t op2)` | [`AddMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.AddMul.html), [`AddMulAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.AddMulAssign.html) |
+| ✓ | `void fmpq_submul (fmpq_t res, const fmpq_t op1, const fmpq_t op2)` | [`SubMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.SubMul.html), [`SubMulAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.SubMulAssign.html) |
 | ✓ | `void fmpq_inv (fmpq_t dest, const fmpq_t src)` | [`Reciprocal`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Reciprocal.html), [`ReciprocalAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ReciprocalAssign.html) |
 | ✓ | `void fmpq_pow_si (fmpq_t res, const fmpq_t op, slong e)` | [`Pow`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Pow.html), [`PowAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.PowAssign.html) |
 | ✓ | `int fmpq_pow_fmpz (fmpq_t a, const fmpq_t b, const fmpz_t e)` | [`Pow`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Pow.html), [`TryFrom`](https://doc.rust-lang.org/nightly/std/convert/trait.TryFrom.html) |
@@ -355,12 +355,15 @@ assign and by-value forms as
 [`Integer`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html) size,
 with a by-value `Integer` donating its storage to the numerator.
 
-**`fmpq_addmul`, `fmpq_submul`.** The fused accumulate, `res += op1 * op2`, is a gap. Its
-numerator arithmetic is the `ad + bc` shape that `fmpz_fmma`
-[exists to fuse](/mapping/flint-integers/#basic-arithmetic), and that piece is now available as
-`mul_add_mul` on the integers, so filling this gap is a matter of lifting it to the rationals
-rather than of writing the kernel. The spelling `res += &op1 * &op2` computes the right value
-with a separately allocated product in the middle.
+**`fmpq_addmul`, `fmpq_submul`.** The accumulate, `res += op1 * op2`. Neither library fuses it:
+`_fmpq_addmul` calls `_fmpq_mul` and then `_fmpq_add`, and Malachite's `add_mul` does the same,
+so the operations exist for uniformity and to name the intent rather than to take a shorter path.
+That is not an oversight in either place. Both steps put their result in lowest terms, and the
+intermediate product is the smaller thing to reduce, so deferring to a single reduction at the
+end would trade two cheap gcds for one expensive one. The `ad + bc` shape in the numerator is the
+one that `fmpz_fmma` [exists to fuse](/mapping/flint-integers/#basic-arithmetic), and that piece
+is available on the integers as `mul_add_mul`; using it here would mean giving up the early
+reduction, which is why it is not simply a matter of lifting.
 
 **`fmpq_inv`, `fmpq_pow_si`, `fmpq_pow_fmpz`.** `src.reciprocal()`, a numerator-denominator
 swap [as on the GMP rationals page](/mapping/gmp-rationals/#arithmetic-functions); and

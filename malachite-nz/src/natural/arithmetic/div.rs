@@ -62,7 +62,8 @@ use malachite_base::fail_on_untested_path;
 #[cfg(feature = "test_build")]
 use malachite_base::num::arithmetic::traits::DivRem;
 use malachite_base::num::arithmetic::traits::{
-    CheckedDiv, WrappingAddAssign, WrappingMulAssign, WrappingSubAssign, XMulYToZZ, XXAddYYToZZ,
+    CheckedDiv, WrappingAddAssign, WrappingMulAssign, WrappingSubAssign, WrappingSubMul, XMulYToZZ,
+    XXAddYYToZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
@@ -147,7 +148,7 @@ private_test_fn! {div_by_preinversion(n_high: Limb, n_low: Limb, d: Limb, d_inv:
     let (mut q_high, q_low) = (DoubleLimb::from(n_high) * DoubleLimb::from(d_inv))
         .wrapping_add(DoubleLimb::join_halves(n_high.wrapping_add(1), n_low))
         .split_in_half();
-    let mut r = n_low.wrapping_sub(q_high.wrapping_mul(d));
+    let mut r = n_low.wrapping_sub_mul(q_high, d);
     if r > q_low {
         q_high.wrapping_sub_assign(1);
         r.wrapping_add_assign(d);

@@ -60,7 +60,7 @@ use core::cmp::{Ordering::*, min};
 use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, DivAssignMod, DivAssignRem, DivMod, DivRem,
-    WrappingAddAssign, WrappingSub, WrappingSubAssign, XMulYToZZ, XXDivModYToQR,
+    WrappingAddAssign, WrappingSub, WrappingSubAssign, WrappingSubMul, XMulYToZZ, XXDivModYToQR,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
@@ -110,7 +110,7 @@ crate_test_fn! {div_mod_by_preinversion(
     let (mut q_high, q_low) = (DoubleLimb::from(n_high) * DoubleLimb::from(d_inv))
         .wrapping_add(DoubleLimb::join_halves(n_high.wrapping_add(1), n_low))
         .split_in_half();
-    let mut r = n_low.wrapping_sub(q_high.wrapping_mul(d));
+    let mut r = n_low.wrapping_sub_mul(q_high, d);
     if r > q_low {
         let (r_plus_d, overflow) = r.overflowing_add(d);
         if overflow {
@@ -490,7 +490,7 @@ crate_test_fn! {limbs_div_mod_three_limb_by_two_limb(
         .split_in_half();
     let d = DoubleLimb::join_halves(d_1, d_0);
     // Compute the two most significant limbs of n - q * d
-    let mut r = DoubleLimb::join_halves(n_1.wrapping_sub(d_1.wrapping_mul(q)), n_0)
+    let mut r = DoubleLimb::join_halves(n_1.wrapping_sub_mul(d_1, q), n_0)
         .wrapping_sub(d)
         .wrapping_sub(DoubleLimb::from(d_0) * DoubleLimb::from(q));
     q.wrapping_add_assign(1);

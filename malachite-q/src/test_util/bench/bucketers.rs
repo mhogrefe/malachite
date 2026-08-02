@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Rational;
+use malachite_base::max;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
@@ -86,6 +87,26 @@ pub fn pair_rational_max_bit_bucketer<'a>(
             usize::exact_from(max(x.significant_bits(), y.significant_bits()))
         },
         bucketing_label: format!("max({x_name}.significant_bits(), {y_name}.significant_bits())"),
+    }
+}
+
+pub fn triple_rational_max_bit_bucketer<'a>(
+    x_name: &'a str,
+    y_name: &'a str,
+    z_name: &'a str,
+) -> Bucketer<'a, (Rational, Rational, Rational)> {
+    Bucketer {
+        bucketing_function: &|(x, y, z)| {
+            usize::exact_from(max!(
+                x.significant_bits(),
+                y.significant_bits(),
+                z.significant_bits()
+            ))
+        },
+        bucketing_label: format!(
+            "max({x_name}.significant_bits(), {y_name}.significant_bits(), \
+            {z_name}.significant_bits())"
+        ),
     }
 }
 

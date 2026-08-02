@@ -51,8 +51,8 @@ use core::cmp::Ordering::*;
 use itertools::Itertools;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    CheckedLogBase2, CheckedMul, DivAssignMod, DivMod, DivisibleByPowerOf2, ModPowerOf2Assign,
-    Parity, PowerOf2, ShrRound, ShrRoundAssign, SquareAssign, XMulYToZZ,
+    AddMul, CheckedLogBase2, CheckedMul, DivAssignMod, DivMod, DivisibleByPowerOf2,
+    ModPowerOf2Assign, Parity, PowerOf2, ShrRound, ShrRoundAssign, SquareAssign, XMulYToZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
@@ -1835,7 +1835,7 @@ where
                 from_digits_desc_divide_and_conquer_limb(xs_hi, base, powers, power_index - 1)?;
             let out_lo =
                 from_digits_desc_divide_and_conquer_limb(xs_lo, base, powers, power_index - 1)?;
-            Some(out_hi * &powers[power_index] + out_lo)
+            Some(out_lo.add_mul(out_hi, &powers[power_index]))
         }
     }
 }
@@ -1867,7 +1867,7 @@ private_test_fn! {from_digits_desc_divide_and_conquer(
             let (xs_hi, xs_lo) = xs.split_at(xs_len - p);
             let out_hi = from_digits_desc_divide_and_conquer(xs_hi, base, powers, power_index - 1)?;
             let out_lo = from_digits_desc_divide_and_conquer(xs_lo, base, powers, power_index - 1)?;
-            Some(out_hi * &powers[power_index] + out_lo)
+            Some(out_lo.add_mul(out_hi, &powers[power_index]))
         }
     }
 }}

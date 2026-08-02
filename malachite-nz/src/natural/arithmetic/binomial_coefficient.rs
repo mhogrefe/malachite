@@ -34,7 +34,7 @@ use crate::platform::{
 use alloc::vec::Vec;
 use core::cmp::{Ordering::*, max, min};
 use malachite_base::num::arithmetic::traits::{
-    AddMulAssign, BinomialCoefficient, DivAssignMod, DivExact, Parity, PowerOf2, Square,
+    AddMulAssign, BinomialCoefficient, DivAssignMod, DivExact, Parity, PowerOf2, Square, SubMul,
     WrappingAddAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -526,7 +526,7 @@ fn binomial_coefficient_hmul_nbnpk(n: &Natural, mut k: Limb) -> Natural {
     assert_ne!(*n, 0u32);
     k -= 1;
     (((n + Natural::from(k)).square() + n) >> 1u32)
-        - Natural::from(k + (k & 1)) * Natural::from(k >> 1)
+        .sub_mul(Natural::from(k + (k & 1)), Natural::from(k >> 1))
 }
 
 // This is equivalent to `rek_raising_fac4` from `mpz/bin_ui.c`, GMP 6.2.1.

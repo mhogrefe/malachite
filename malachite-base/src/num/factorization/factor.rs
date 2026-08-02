@@ -16,8 +16,8 @@ use crate::num::arithmetic::mod_pow::mul_mod_helper;
 use crate::num::arithmetic::sqrt::{sqrt_rem_2_newton, sqrt_rem_newton};
 use crate::num::arithmetic::traits::{
     DivMod, FloorRoot, FloorSqrt, Gcd, ModMulPrecomputed, ModSub, ModSubAssign, Parity, PowerOf2,
-    SqrtRem, Square, WrappingAddAssign, WrappingMulAssign, WrappingSquare, WrappingSubAssign,
-    XMulYToZZ, XXDivModYToQR, XXSubYYToZZ,
+    SqrtRem, Square, WrappingAddAssign, WrappingAddMul, WrappingMulAssign, WrappingSquare,
+    WrappingSubAssign, WrappingSubMul, XMulYToZZ, XXDivModYToQR, XXSubYYToZZ,
 };
 use crate::num::basic::integers::{PrimitiveInt, USIZE_IS_U32};
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
@@ -149,7 +149,7 @@ fn div_rem_precomputed_float_u64(a: u64, n: u64, npre: f64) -> (u64, u64) {
         (a, 0)
     } else {
         let q = ((a as f64) * npre) as u64;
-        (q, a.wrapping_sub(q.wrapping_mul(n)))
+        (q, a.wrapping_sub_mul(q, n))
     };
     let ri = i64::wrapping_from(r);
     let ni = i64::wrapping_from(n);
@@ -162,7 +162,7 @@ fn div_rem_precomputed_float_u64(a: u64, n: u64, npre: f64) -> (u64, u64) {
     } else {
         return (q, r);
     }
-    let r = a.wrapping_sub(q.wrapping_mul(n));
+    let r = a.wrapping_sub_mul(q, n);
     let ri = i64::wrapping_from(r);
     if ri >= ni {
         (q + 1, r.wrapping_sub(n))
@@ -641,7 +641,7 @@ fn ll_factor_squfof_u64(n_hi: u64, n_lo: u64, max_iters: usize) -> u64 {
                 }
             }
         }
-        let t = qlast.wrapping_add(iq.wrapping_mul(p.wrapping_sub(pnext)));
+        let t = qlast.wrapping_add_mul(iq, p.wrapping_sub(pnext));
         qlast = q;
         q = t;
         p = pnext;
@@ -696,7 +696,7 @@ fn ll_factor_squfof_u64(n_hi: u64, n_lo: u64, max_iters: usize) -> u64 {
             finished_loop = false;
             break;
         }
-        let t = qlast.wrapping_add(iq.wrapping_mul(p.wrapping_sub(pnext)));
+        let t = qlast.wrapping_add_mul(iq, p.wrapping_sub(pnext));
         qlast = q;
         q = t;
         p = pnext;
