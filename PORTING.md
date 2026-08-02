@@ -76,7 +76,7 @@ major improvement warrants re-porting.
   cloning; use `square()`, `even()`/`odd()`, and `reciprocal()` over their spelled-out
   equivalents; use `split_in_half()` rather than taking `upper_half()` and `lower_half()`
   separately; and keep lines within 100 columns.
-- **Visibility macros**: `pub_test!`/`pub_crate_test!` make internals `pub` under `test_build` so
+- **Visibility macros**: `private_test_fn!`/`crate_test_fn!` make internals `pub` under `test_build` so
   tests, demos, and tuning code can call them. For tuner- or test-only entry points that don't fit
   the macros, add explicit `#[cfg(feature = "test_build")] pub fn ..._for_tuning` wrappers.
 - **Generators** live in `test_util/generators/` in exhaustive/random/special_random triples with

@@ -17,7 +17,6 @@ impl MulSubMul<Self, Self, Self> for Integer {
     ///
     /// $f(x, y, z, w) = xy - zw$.
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -54,7 +53,6 @@ impl MulSubMul<Self, Self, &Self> for Integer {
     ///
     /// $f(x, y, z, w) = xy - zw$.
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -91,7 +89,6 @@ impl MulSubMul<Self, &Self, Self> for Integer {
     ///
     /// $f(x, y, z, w) = xy - zw$.
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -128,7 +125,6 @@ impl MulSubMul<Self, &Self, &Self> for Integer {
     ///
     /// $f(x, y, z, w) = xy - zw$.
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -165,7 +161,6 @@ impl MulSubMul<&Self, Self, Self> for Integer {
     ///
     /// $f(x, y, z, w) = xy - zw$.
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -202,7 +197,6 @@ impl MulSubMul<&Self, Self, &Self> for Integer {
     ///
     /// $f(x, y, z, w) = xy - zw$.
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -239,7 +233,6 @@ impl MulSubMul<&Self, &Self, Self> for Integer {
     ///
     /// $f(x, y, z, w) = xy - zw$.
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -276,7 +269,6 @@ impl MulSubMul<&Self, &Self, &Self> for Integer {
     ///
     /// $f(x, y, z, w) = xy - zw$.
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -313,7 +305,6 @@ impl MulSubMul<&Integer, &Integer, &Integer> for &Integer {
     ///
     /// $f(x, y, z, w) = xy - zw$.
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -348,7 +339,6 @@ impl MulSubMulAssign<Self, Self, Self> for Integer {
     ///
     /// $x \gets xy - zw$.
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -379,7 +369,6 @@ impl MulSubMulAssign<Self, Self, &Self> for Integer {
     ///
     /// $x \gets xy - zw$.
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -410,7 +399,6 @@ impl MulSubMulAssign<Self, &Self, Self> for Integer {
     ///
     /// $x \gets xy - zw$.
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -441,7 +429,6 @@ impl MulSubMulAssign<Self, &Self, &Self> for Integer {
     ///
     /// $x \gets xy - zw$.
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -472,7 +459,6 @@ impl MulSubMulAssign<&Self, Self, Self> for Integer {
     ///
     /// $x \gets xy - zw$.
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -503,7 +489,6 @@ impl MulSubMulAssign<&Self, Self, &Self> for Integer {
     ///
     /// $x \gets xy - zw$.
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -534,7 +519,6 @@ impl MulSubMulAssign<&Self, &Self, Self> for Integer {
     ///
     /// $x \gets xy - zw$.
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -565,7 +549,6 @@ impl MulSubMulAssign<&Self, &Self, &Self> for Integer {
     ///
     /// $x \gets xy - zw$.
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///

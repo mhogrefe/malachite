@@ -187,7 +187,7 @@ fn benchmark_average_round_unsigned<T: PrimitiveUnsigned>(
         file_name,
         &triple_1_2_max_bit_bucketer("x", "y"),
         &mut [("Malachite", &mut |(x, y, rm)| {
-            no_out!(x.average_round(y, rm))
+            no_out!(x.average_round(y, rm));
         })],
     );
 }
@@ -207,7 +207,7 @@ fn benchmark_average_round_signed<T: PrimitiveSigned>(
         file_name,
         &triple_1_2_max_bit_bucketer("x", "y"),
         &mut [("Malachite", &mut |(x, y, rm)| {
-            no_out!(x.average_round(y, rm))
+            no_out!(x.average_round(y, rm));
         })],
     );
 }

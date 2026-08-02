@@ -743,17 +743,19 @@ fn test_sci_mantissa_and_exponent_round() {
 #[test]
 fn test_from_sci_mantissa_and_exponent() {
     let test = |mantissa: f32, exponent: i64, out: Option<&str>| {
+        let u = out.map(|s| Rational::from_str(s).unwrap());
+
         assert_eq!(
             <&Rational as SciMantissaAndExponent<_, _, _>>::from_sci_mantissa_and_exponent(
                 mantissa, exponent
             ),
-            out.map(|s| Rational::from_str(s).unwrap())
+            u
         );
         assert_eq!(
             <Rational as SciMantissaAndExponent<_, _, _>>::from_sci_mantissa_and_exponent(
                 mantissa, exponent
             ),
-            out.map(|s| Rational::from_str(s).unwrap())
+            u
         );
     };
     test(1.5, 1, Some("3"));

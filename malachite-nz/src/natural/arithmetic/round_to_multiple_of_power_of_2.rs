@@ -33,7 +33,7 @@ use malachite_base::slices::{slice_set_zero, slice_test_zero};
 // $M(n) = O(n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
-pub_test! {
+private_test_fn! {
     limbs_round_to_multiple_of_power_of_2_down(xs: &[Limb], pow: u64) -> (Vec<Limb>, Ordering) {
     let clear_count = bit_to_limb_count_floor(pow);
     let xs_len = xs.len();
@@ -64,7 +64,7 @@ pub_test! {
 // $M(n) = O(n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), pow / Limb::WIDTH)`.
-pub_test! {
+private_test_fn! {
     limbs_round_to_multiple_of_power_of_2_up(xs: &[Limb], pow: u64) -> (Vec<Limb>, Ordering) {
     let clear_count = bit_to_limb_count_floor(pow);
     let xs_len = xs.len();
@@ -141,7 +141,7 @@ fn limbs_round_to_multiple_of_power_of_2_half_integer_to_even(
 // $M(n) = O(n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), pow / Limb::WIDTH)`.
-pub_test! {
+private_test_fn! {
     limbs_round_to_multiple_of_power_of_2_nearest(xs: &[Limb], pow: u64) -> (Vec<Limb>, Ordering) {
     if pow == 0 {
         (xs.to_vec(), Equal)
@@ -165,7 +165,7 @@ pub_test! {
 // $M(n) = O(n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), pow / Limb::WIDTH)`.
-pub_test! {limbs_round_to_multiple_of_power_of_2(
+private_test_fn! {limbs_round_to_multiple_of_power_of_2(
     xs: &[Limb],
     pow: u64,
     rm: RoundingMode,
@@ -197,7 +197,7 @@ pub_test! {limbs_round_to_multiple_of_power_of_2(
 // $M(n) = O(1)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
-pub_test! {
+private_test_fn! {
     limbs_round_to_multiple_of_power_of_2_down_in_place(xs: &mut Vec<Limb>, pow: u64) -> Ordering {
     let clear_count = bit_to_limb_count_floor(pow);
     let xs_len = xs.len();
@@ -230,7 +230,7 @@ pub_test! {
 // $M(n) = O(n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), pow / Limb::WIDTH)`.
-pub_test! {
+private_test_fn! {
     limbs_round_to_multiple_of_power_of_2_up_in_place(xs: &mut Vec<Limb>, pow: u64) -> Ordering {
     let clear_count = bit_to_limb_count_floor(pow);
     let xs_len = xs.len();
@@ -311,7 +311,7 @@ fn limbs_round_to_multiple_of_power_of_2_half_integer_to_even_in_place(
 // $M(n) = O(n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), pow / Limb::WIDTH)`.
-pub_test! {limbs_round_to_multiple_of_power_of_2_nearest_in_place(
+private_test_fn! {limbs_round_to_multiple_of_power_of_2_nearest_in_place(
     xs: &mut Vec<Limb>,
     pow: u64
 ) -> Ordering {
@@ -338,7 +338,7 @@ pub_test! {limbs_round_to_multiple_of_power_of_2_nearest_in_place(
 // $M(n) = O(n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), pow / Limb::WIDTH)`.
-pub_test! {limbs_round_to_multiple_of_power_of_2_in_place(
+private_test_fn! {limbs_round_to_multiple_of_power_of_2_in_place(
     xs: &mut Vec<Limb>,
     pow: u64,
     rm: RoundingMode,

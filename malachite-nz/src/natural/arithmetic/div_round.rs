@@ -31,7 +31,7 @@ use malachite_base::rounding_modes::RoundingMode::{self, *};
 //
 // # Worst-case complexity
 // Constant time and additional memory.
-pub_test! {limbs_limb_div_round_limbs(n: Limb, ds: &[Limb], rm: RoundingMode)
+private_test_fn! {limbs_limb_div_round_limbs(n: Limb, ds: &[Limb], rm: RoundingMode)
         -> Option<(Limb, Ordering)> {
     if n == 0 {
         Some((0, Equal))

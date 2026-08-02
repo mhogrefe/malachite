@@ -32,7 +32,7 @@ use malachite_base::num::logic::traits::SignificantBits;
 // $M(n) = O(n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
-pub_test! {limbs_mod_power_of_2_add_limb(xs: &[Limb], y: Limb, pow: u64) -> Vec<Limb> {
+private_test_fn! {limbs_mod_power_of_2_add_limb(xs: &[Limb], y: Limb, pow: u64) -> Vec<Limb> {
     if xs.len() < bit_to_limb_count_ceiling(pow) {
         limbs_add_limb(xs, y)
     } else {
@@ -54,7 +54,7 @@ pub_test! {limbs_mod_power_of_2_add_limb(xs: &[Limb], y: Limb, pow: u64) -> Vec<
 // $M(n) = O(1)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
-pub_test! {limbs_slice_mod_power_of_2_add_limb_in_place(
+private_test_fn! {limbs_slice_mod_power_of_2_add_limb_in_place(
     xs: &mut [Limb],
     y: Limb,
     pow: u64
@@ -82,7 +82,7 @@ pub_test! {limbs_slice_mod_power_of_2_add_limb_in_place(
 //
 // # Panics
 // Panics if `xs` is empty.
-pub_crate_test! {limbs_vec_mod_power_of_2_add_limb_in_place(xs: &mut Vec<Limb>, y: Limb, pow: u64) {
+crate_test_fn! {limbs_vec_mod_power_of_2_add_limb_in_place(xs: &mut Vec<Limb>, y: Limb, pow: u64) {
     assert!(!xs.is_empty());
     if limbs_slice_mod_power_of_2_add_limb_in_place(xs, y, pow) {
         xs.push(1);
@@ -102,7 +102,11 @@ pub_crate_test! {limbs_vec_mod_power_of_2_add_limb_in_place(xs: &mut Vec<Limb>, 
 //
 // # Panics
 // Panics if `xs` is shorter than `ys`.
-pub_test! {limbs_mod_power_of_2_add_greater(xs: &[Limb], ys: &[Limb], pow: u64) -> Vec<Limb> {
+private_test_fn! {limbs_mod_power_of_2_add_greater(
+    xs: &[Limb],
+    ys: &[Limb],
+    pow: u64,
+) -> Vec<Limb> {
     let mut out = xs.to_vec();
     if limbs_slice_mod_power_of_2_add_greater_in_place_left(&mut out, ys, pow) {
         out.push(1);
@@ -120,7 +124,7 @@ pub_test! {limbs_mod_power_of_2_add_greater(xs: &[Limb], ys: &[Limb], pow: u64) 
 // $M(n) = O(n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
-pub_test! {limbs_mod_power_of_2_add(xs: &[Limb], ys: &[Limb], pow: u64) -> Vec<Limb> {
+private_test_fn! {limbs_mod_power_of_2_add(xs: &[Limb], ys: &[Limb], pow: u64) -> Vec<Limb> {
     if xs.len() >= ys.len() {
         limbs_mod_power_of_2_add_greater(xs, ys, pow)
     } else {
@@ -143,7 +147,7 @@ pub_test! {limbs_mod_power_of_2_add(xs: &[Limb], ys: &[Limb], pow: u64) -> Vec<L
 //
 // # Panics
 // Panics if `xs` is shorter than `ys`.
-pub_test! {limbs_slice_mod_power_of_2_add_greater_in_place_left(
+private_test_fn! {limbs_slice_mod_power_of_2_add_greater_in_place_left(
     xs: &mut [Limb],
     ys: &[Limb],
     pow: u64,
@@ -169,7 +173,11 @@ pub_test! {limbs_slice_mod_power_of_2_add_greater_in_place_left(
 //
 // where $T$ is time, $M$ is additional memory, $n$ is `max(xs.len(), ys.len())`, and $m$ is `max(1,
 // ys.len() - xs.len())`.
-pub_test! {limbs_vec_mod_power_of_2_add_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], pow: u64) {
+private_test_fn! {limbs_vec_mod_power_of_2_add_in_place_left(
+    xs: &mut Vec<Limb>,
+    ys: &[Limb],
+    pow: u64,
+) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let max_len =bit_to_limb_count_ceiling(pow);
@@ -204,7 +212,7 @@ pub_test! {limbs_vec_mod_power_of_2_add_in_place_left(xs: &mut Vec<Limb>, ys: &[
 // $M(n) = O(1)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
-pub_test! {limbs_mod_power_of_2_add_in_place_either(
+private_test_fn! {limbs_mod_power_of_2_add_in_place_either(
     xs: &mut Vec<Limb>,
     ys: &mut Vec<Limb>,
     pow: u64,

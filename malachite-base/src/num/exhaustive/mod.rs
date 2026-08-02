@@ -1684,7 +1684,9 @@ pub fn exhaustive_primitive_floats<T: PrimitiveFloat>()
         .chain(exhaustive_nonzero_finite_primitive_floats())
 }
 
-pub_test! {exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range<T: PrimitiveFloat>(
+private_test_fn! {exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range<
+    T: PrimitiveFloat,
+>(
     a: T,
     b: T,
     sci_exponent: i64,

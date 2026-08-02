@@ -55,7 +55,7 @@ fn log_base_power_of_2_1_plus_x_prec_round_normal(
     assert_ne!(rm, Exact, "Inexact log_base_power_of_2_1_plus_x");
     let pow_f = Float::from(pow);
     let e_pow = i64::from(pow_f.get_exponent().unwrap());
-    let min_exp = i64::from(Float::MIN_EXPONENT);
+    let min_exp = Float::MIN_EXPONENT_I64;
     // If x = 2^k for a k large enough that 1 + x is astronomically close to 2^k, then log_2(1 + x)
     // is k plus a positive infinitesimal (delta < 2^(2 - expx)), so log_{2^pow}(1 + x) is k / pow
     // nudged infinitesimally away from k / pow (toward +infinity when pow > 0, toward -infinity

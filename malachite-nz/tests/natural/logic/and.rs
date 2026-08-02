@@ -202,54 +202,43 @@ fn test_limbs_and_in_place_either() {
 
 #[test]
 fn test_and() {
-    let test = |u, v, out| {
-        let mut n = Natural::from_str(u).unwrap();
-        n &= Natural::from_str(v).unwrap();
+    let test = |s, t, out| {
+        let u = Natural::from_str(s).unwrap();
+        let v = Natural::from_str(t).unwrap();
+
+        let mut n = u.clone();
+        n &= v.clone();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let mut n = Natural::from_str(u).unwrap();
-        n &= &Natural::from_str(v).unwrap();
+        let mut n = u.clone();
+        n &= &v;
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = Natural::from_str(u).unwrap() & Natural::from_str(v).unwrap();
+        let n = u.clone() & v.clone();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = &Natural::from_str(u).unwrap() & Natural::from_str(v).unwrap();
+        let n = &u & v.clone();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = Natural::from_str(u).unwrap() & &Natural::from_str(v).unwrap();
+        let n = u.clone() & &v;
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = &Natural::from_str(u).unwrap() & &Natural::from_str(v).unwrap();
+        let n = &u & &v;
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        assert_eq!(
-            natural_and_alt_1(
-                &Natural::from_str(u).unwrap(),
-                &Natural::from_str(v).unwrap(),
-            )
-            .to_string(),
-            out
-        );
-        assert_eq!(
-            natural_and_alt_2(
-                &Natural::from_str(u).unwrap(),
-                &Natural::from_str(v).unwrap(),
-            )
-            .to_string(),
-            out
-        );
+        assert_eq!(natural_and_alt_1(&u, &v).to_string(), out);
+        assert_eq!(natural_and_alt_2(&u, &v).to_string(), out);
 
-        let n = BigUint::from_str(u).unwrap() & BigUint::from_str(v).unwrap();
+        let n = BigUint::from_str(s).unwrap() & BigUint::from_str(t).unwrap();
         assert_eq!(n.to_string(), out);
 
-        let n = rug::Integer::from_str(u).unwrap() & rug::Integer::from_str(v).unwrap();
+        let n = rug::Integer::from_str(s).unwrap() & rug::Integer::from_str(t).unwrap();
         assert_eq!(n.to_string(), out);
     };
     test("0", "0", "0");

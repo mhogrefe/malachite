@@ -42,7 +42,7 @@ use malachite_base::num::logic::traits::{BitAccess, CountOnes, NotAssign, Signif
 
 const ODD_DOUBLEFACTORIAL_TABLE_LIMIT_PLUS_1: usize = ODD_DOUBLEFACTORIAL_TABLE_LIMIT + 1;
 
-pub_test! {subfactorial_naive(n: u64) -> Natural {
+private_test_fn! {subfactorial_naive(n: u64) -> Natural {
     let mut f = Natural::ONE;
     let mut b = true;
     for i in 1..=n {
@@ -332,7 +332,7 @@ pub(crate) fn log_n_max(n: Limb) -> u64 {
 //
 // This is equivalent to `mpz_oddfac_1` from `mpz/oddfac_1.c`, GMP 6.2.1.
 
-pub_crate_test! {
+crate_test_fn! {
 #[allow(clippy::redundant_comparisons)]
 limbs_odd_factorial(n: usize, double: bool) -> Vec<Limb> {
     assert!(Limb::convertible_from(n));
@@ -535,12 +535,14 @@ impl Factorial for Natural {
     /// ```
     ///
     /// This is equivalent to `mpz_fac_ui` from `mpz/fac_ui.c`, GMP 6.2.1.
-    #[allow(clippy::useless_conversion)]
+    // `FAC_ODD_THRESHOLD` is a `Limb`, so the cast below widens on 32-bit and is a no-op on 64-bit;
+    // dropping it would break the 32-bit build.
+    #[allow(clippy::useless_conversion, clippy::unnecessary_cast)]
     fn factorial(n: u64) -> Self {
         assert!(Limb::convertible_from(n));
         if n < SMALL_FACTORIAL_LIMIT {
             Self::from(Limb::factorial(n))
-        } else if n < u64::from(FAC_ODD_THRESHOLD) {
+        } else if n < const { FAC_ODD_THRESHOLD as u64 } {
             let mut factors =
                 vec![0; usize::wrapping_from(n - SMALL_FACTORIAL_LIMIT) / FACTORS_PER_LIMB + 2];
             factors[0] = Limb::factorial(const { SMALL_FACTORIAL_LIMIT - 1 });
@@ -616,6 +618,9 @@ impl DoubleFactorial for Natural {
     /// ```
     ///
     /// This is equivalent to `mpz_2fac_ui` from `mpz/2fac_ui.c`, GMP 6.2.1.
+    // `FAC_2DSC_THRESHOLD` is a `Limb`, so the cast below widens on 32-bit and is a no-op on
+    // 64-bit; dropping it would break the 32-bit build.
+    #[allow(clippy::unnecessary_cast)]
     fn double_factorial(n: u64) -> Self {
         assert!(Limb::convertible_from(n));
         if n.even() {
@@ -627,9 +632,9 @@ impl DoubleFactorial for Natural {
                 n - CountOnes::count_ones(n)
             };
             Self::from_owned_limbs_asc(limbs_odd_factorial(half_n, false)) << count
-        } else if n <= u64::wrapping_from(ODD_DOUBLEFACTORIAL_TABLE_LIMIT) {
+        } else if n <= const { ODD_DOUBLEFACTORIAL_TABLE_LIMIT as u64 } {
             Self::from(ONE_LIMB_ODD_DOUBLEFACTORIAL_TABLE[usize::wrapping_from(n >> 1)])
-        } else if n < u64::wrapping_from(FAC_2DSC_THRESHOLD) {
+        } else if n < const { FAC_2DSC_THRESHOLD as u64 } {
             let mut factors = vec![0; usize::exact_from(n) / const { FACTORS_PER_LIMB << 1 } + 1];
             factors[0] = ODD_DOUBLEFACTORIAL_TABLE_MAX;
             let mut j = 1;

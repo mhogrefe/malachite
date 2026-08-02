@@ -77,18 +77,17 @@ fn test_partial_cmp_u64() {
 
 #[test]
 fn test_partial_cmp_i32() {
-    let test = |u, v: i32, out| {
-        assert_eq!(Integer::from_str(u).unwrap().partial_cmp(&v), out);
+    let test = |s, v: i32, out| {
+        let u = Integer::from_str(s).unwrap();
+
+        assert_eq!(u.partial_cmp(&v), out);
         assert_eq!(
-            num_partial_cmp_primitive(&BigInt::from_str(u).unwrap(), v),
+            num_partial_cmp_primitive(&BigInt::from_str(s).unwrap(), v),
             out
         );
-        assert_eq!(rug::Integer::from_str(u).unwrap().partial_cmp(&v), out);
+        assert_eq!(rug::Integer::from_str(s).unwrap().partial_cmp(&v), out);
 
-        assert_eq!(
-            v.partial_cmp(&Integer::from_str(u).unwrap()),
-            out.map(Ordering::reverse)
-        );
+        assert_eq!(v.partial_cmp(&u), out.map(Ordering::reverse));
     };
     test("0", 0, Some(Equal));
     test("0", 5, Some(Less));
@@ -113,18 +112,17 @@ fn test_partial_cmp_i32() {
 
 #[test]
 fn test_partial_cmp_i64() {
-    let test = |u, v: i64, out| {
-        assert_eq!(Integer::from_str(u).unwrap().partial_cmp(&v), out);
+    let test = |s, v: i64, out| {
+        let u = Integer::from_str(s).unwrap();
+
+        assert_eq!(u.partial_cmp(&v), out);
         assert_eq!(
-            num_partial_cmp_primitive(&BigInt::from_str(u).unwrap(), v),
+            num_partial_cmp_primitive(&BigInt::from_str(s).unwrap(), v),
             out
         );
-        assert_eq!(rug::Integer::from_str(u).unwrap().partial_cmp(&v), out);
+        assert_eq!(rug::Integer::from_str(s).unwrap().partial_cmp(&v), out);
 
-        assert_eq!(
-            v.partial_cmp(&Integer::from_str(u).unwrap()),
-            out.map(Ordering::reverse)
-        );
+        assert_eq!(v.partial_cmp(&u), out.map(Ordering::reverse));
     };
     test("0", 0, Some(Equal));
     test("0", 5, Some(Less));

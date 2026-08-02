@@ -19,10 +19,10 @@ fn balanced_mod_helper(x: &Natural, m: &Natural) -> Integer {
     let r = x.mod_op(m);
     // `r <= m >> 1` is exactly `2r <= m`: for an integer `r`, `r <= floor(x)` iff `r <= x`.
     // Phrasing it as the latter lets `cmp_double` answer it without building either value.
-    if m.cmp_double(&r) != Less {
-        Integer::from(r)
-    } else {
+    if m.cmp_double(&r) == Less {
         Integer::from(r) - Integer::from(m)
+    } else {
+        Integer::from(r)
     }
 }
 

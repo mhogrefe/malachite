@@ -20,15 +20,15 @@ fn balanced_mod_helper(x: &Integer, m: &Integer) -> Integer {
     let abs_m = m.unsigned_abs_ref();
     // `r <= abs_m >> 1` is exactly `2r <= abs_m`: for an integer `r`, `r <= floor(x)` iff `r <= x`.
     // Phrasing it as the latter lets `cmp_double` answer it without building either value.
-    if abs_m.cmp_double(&r) != Less {
-        Integer::from(r)
-    } else {
+    if abs_m.cmp_double(&r) == Less {
         Integer::from(r) - Integer::from(abs_m)
+    } else {
+        Integer::from(r)
     }
 }
 
 impl BalancedMod<Self> for Integer {
-    type Output = Integer;
+    type Output = Self;
 
     /// Divides an [`Integer`] by another [`Integer`], returning the balanced remainder: the
     /// representative of `self` modulo `other` that is closest to zero, taking both [`Integer`]s by
@@ -60,13 +60,13 @@ impl BalancedMod<Self> for Integer {
     /// assert_eq!(Integer::from(27).balanced_mod(Integer::from(-10)), -3);
     /// ```
     #[inline]
-    fn balanced_mod(self, other: Self) -> Integer {
+    fn balanced_mod(self, other: Self) -> Self {
         balanced_mod_helper(&self, &other)
     }
 }
 
 impl BalancedMod<&Self> for Integer {
-    type Output = Integer;
+    type Output = Self;
 
     /// Divides an [`Integer`] by another [`Integer`], returning the balanced remainder: the
     /// representative of `self` modulo `other` that is closest to zero, taking the first
@@ -98,7 +98,7 @@ impl BalancedMod<&Self> for Integer {
     /// assert_eq!(Integer::from(27).balanced_mod(&Integer::from(-10)), -3);
     /// ```
     #[inline]
-    fn balanced_mod(self, other: &Self) -> Integer {
+    fn balanced_mod(self, other: &Self) -> Self {
         balanced_mod_helper(&self, other)
     }
 }

@@ -52,7 +52,7 @@ fn extend_with_ones(xs: &mut Vec<Limb>, pow: u64) {
 //
 // # Panics
 // Panics if `pow` is zero.
-pub_test! {limbs_mod_power_of_2_limb_sub_limbs(x: Limb, ys: &[Limb], pow: u64) -> Vec<Limb> {
+private_test_fn! {limbs_mod_power_of_2_limb_sub_limbs(x: Limb, ys: &[Limb], pow: u64) -> Vec<Limb> {
     let mut diff = limbs_neg_mod_power_of_2(ys, pow);
     limbs_vec_mod_power_of_2_add_limb_in_place(&mut diff, x, pow);
     diff
@@ -71,7 +71,11 @@ pub_test! {limbs_mod_power_of_2_limb_sub_limbs(x: Limb, ys: &[Limb], pow: u64) -
 //
 // # Panics
 // Panics if `pow` is zero.
-pub_test! {limbs_mod_power_of_2_limb_sub_limbs_in_place(x: Limb, ys: &mut Vec<Limb>, pow: u64) {
+private_test_fn! {limbs_mod_power_of_2_limb_sub_limbs_in_place(
+    x: Limb,
+    ys: &mut Vec<Limb>,
+    pow: u64,
+) {
     limbs_neg_mod_power_of_2_in_place(ys, pow);
     limbs_vec_mod_power_of_2_add_limb_in_place(ys, x, pow);
 }}
@@ -86,7 +90,7 @@ pub_test! {limbs_mod_power_of_2_limb_sub_limbs_in_place(x: Limb, ys: &mut Vec<Li
 // $M(n) = O(n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
-pub_test! {limbs_mod_power_of_2_sub(xs: &[Limb], ys: &[Limb], pow: u64) -> Vec<Limb> {
+private_test_fn! {limbs_mod_power_of_2_sub(xs: &[Limb], ys: &[Limb], pow: u64) -> Vec<Limb> {
     let ys_len = ys.len();
     let mut out_limbs = xs.to_vec();
     if ys_len > xs.len() {
@@ -109,7 +113,11 @@ pub_test! {limbs_mod_power_of_2_sub(xs: &[Limb], ys: &[Limb], pow: u64) -> Vec<L
 // $M(n) = O(n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
-pub_test! {limbs_mod_power_of_2_sub_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], pow: u64) {
+private_test_fn! {limbs_mod_power_of_2_sub_in_place_left(
+    xs: &mut Vec<Limb>,
+    ys: &[Limb],
+    pow: u64,
+) {
     let ys_len = ys.len();
     if ys_len > xs.len() {
         xs.resize(ys_len, 0);
@@ -132,7 +140,11 @@ pub_test! {limbs_mod_power_of_2_sub_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb
 // $M(n) = O(n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
-pub_test! {limbs_mod_power_of_2_sub_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>, pow: u64) {
+private_test_fn! {limbs_mod_power_of_2_sub_in_place_right(
+    xs: &[Limb],
+    ys: &mut Vec<Limb>,
+    pow: u64,
+) {
     let xs_len = xs.len();
     if xs_len >= ys.len() {
         if limbs_vec_sub_in_place_right(xs, ys) {
@@ -165,7 +177,7 @@ pub_test! {limbs_mod_power_of_2_sub_in_place_right(xs: &[Limb], ys: &mut Vec<Lim
 // $M(n) = O(n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
-pub_test! {limbs_mod_power_of_2_sub_in_place_either(
+private_test_fn! {limbs_mod_power_of_2_sub_in_place_either(
     xs: &mut Vec<Limb>,
     ys: &mut Vec<Limb>,
     pow: u64,

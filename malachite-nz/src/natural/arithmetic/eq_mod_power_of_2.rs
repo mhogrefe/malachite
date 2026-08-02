@@ -32,7 +32,7 @@ use malachite_base::num::conversion::traits::WrappingFrom;
 // $M(n) = O(1)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
-pub_test! {limbs_eq_limb_mod_power_of_2(xs: &[Limb], y: Limb, pow: u64) -> bool {
+private_test_fn! {limbs_eq_limb_mod_power_of_2(xs: &[Limb], y: Limb, pow: u64) -> bool {
     let i = bit_to_limb_count_floor(pow);
     if i >= xs.len() {
         false

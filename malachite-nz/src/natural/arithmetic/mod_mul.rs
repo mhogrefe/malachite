@@ -29,7 +29,7 @@ use malachite_base::num::logic::traits::LeadingZeros;
 // Constant time and additional memory.
 //
 // This is equivalent to part of `fmpz_mod_ctx_init` from `fmpz_mod/ctx_init.c`, FLINT 2.7.1.
-pub_test! {limbs_precompute_mod_mul_two_limbs(m_1: Limb, m_0: Limb) -> (Limb, Limb, Limb) {
+private_test_fn! {limbs_precompute_mod_mul_two_limbs(m_1: Limb, m_0: Limb) -> (Limb, Limb, Limb) {
     let xs = &mut [0; 5];
     let out = &mut [0; 3];
     let bits = LeadingZeros::leading_zeros(m_1);
@@ -69,7 +69,7 @@ pub_test! {limbs_precompute_mod_mul_two_limbs(m_1: Limb, m_0: Limb) -> (Limb, Li
 // Constant time and additional memory.
 //
 // This is equivalent to `_fmpz_mod_mul2` from `fmpz_mod/mul.c`, FLINT 2.7.1.
-pub_test! {limbs_mod_mul_two_limbs(
+private_test_fn! {limbs_mod_mul_two_limbs(
     x_1: Limb,
     x_0: Limb,
     y_1: Limb,

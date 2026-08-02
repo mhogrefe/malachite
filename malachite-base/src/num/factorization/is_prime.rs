@@ -549,7 +549,7 @@ fn is_probable_prime_u32(n: u32) -> bool {
 // This is n_is_probabprime when FLINT64 is true, from ulong_extras/is_probabprime.c, FLINT 3.1.2,
 // assuming n is odd and greater than 2.
 fn is_probable_prime_u64(n: u64) -> bool {
-    if n < u64::from(FLINT_ODDPRIME_SMALL_CUTOFF) {
+    if n < const { FLINT_ODDPRIME_SMALL_CUTOFF as u64 } {
         return is_odd_prime_small_u64(n);
     } else if n >= 1050535501 {
         // Avoid the unnecessary inverse

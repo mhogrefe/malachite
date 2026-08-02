@@ -2547,7 +2547,7 @@ impl Float {
                     );
                 }
                 let (min_exponent, max_exponent) = float_rational_sum_exponent_range(x, &y);
-                if min_exponent >= i64::from(Self::MAX_EXPONENT) {
+                if min_exponent >= Self::MAX_EXPONENT_I64 {
                     assert!(rm != Exact, "Inexact Float addition");
                     return match (float_rational_sum_sign(x, &y), rm) {
                         (true, Ceiling | Up | Nearest) => (float_infinity!(), Greater),
@@ -2556,7 +2556,7 @@ impl Float {
                         (false, _) => (-Self::max_finite_value_with_prec(prec), Greater),
                     };
                 }
-                if max_exponent > i64::from(Self::MAX_EXPONENT) - 2
+                if max_exponent > Self::MAX_EXPONENT_MINUS_2_I64
                     || min_exponent < Self::MIN_EXPONENT_MINUS_2_I64
                 {
                     // If we can't rule out overflow or underflow, use slow-but-correct naive
@@ -2762,7 +2762,7 @@ impl Float {
                     );
                 }
                 let (min_exponent, max_exponent) = float_rational_sum_exponent_range(x, y);
-                if min_exponent >= i64::from(Self::MAX_EXPONENT) {
+                if min_exponent >= Self::MAX_EXPONENT_I64 {
                     assert!(rm != Exact, "Inexact Float addition");
                     return match (float_rational_sum_sign(x, y), rm) {
                         (true, Ceiling | Up | Nearest) => (float_infinity!(), Greater),
@@ -2771,7 +2771,7 @@ impl Float {
                         (false, _) => (-Self::max_finite_value_with_prec(prec), Greater),
                     };
                 }
-                if max_exponent > i64::from(Self::MAX_EXPONENT) - 2
+                if max_exponent > Self::MAX_EXPONENT_MINUS_2_I64
                     || min_exponent < Self::MIN_EXPONENT_MINUS_2_I64
                 {
                     // If we can't rule out overflow or underflow, use slow-but-correct naive
@@ -3613,7 +3613,7 @@ impl Float {
                     return Equal;
                 }
                 let (min_exponent, max_exponent) = float_rational_sum_exponent_range(x, &y);
-                if min_exponent >= i64::from(Self::MAX_EXPONENT) {
+                if min_exponent >= Self::MAX_EXPONENT_I64 {
                     assert!(rm != Exact, "Inexact Float addition");
                     return match (float_rational_sum_sign(x, &y), rm) {
                         (true, Ceiling | Up | Nearest) => {
@@ -3634,7 +3634,7 @@ impl Float {
                         }
                     };
                 }
-                if max_exponent > i64::from(Self::MAX_EXPONENT) - 2
+                if max_exponent > Self::MAX_EXPONENT_MINUS_2_I64
                     || min_exponent < Self::MIN_EXPONENT_MINUS_2_I64
                 {
                     // If we can't rule out overflow or underflow, use slow-but-correct naive
@@ -3809,7 +3809,7 @@ impl Float {
                     return Equal;
                 }
                 let (min_exponent, max_exponent) = float_rational_sum_exponent_range(x, y);
-                if min_exponent >= i64::from(Self::MAX_EXPONENT) {
+                if min_exponent >= Self::MAX_EXPONENT_I64 {
                     assert!(rm != Exact, "Inexact Float addition");
                     return match (float_rational_sum_sign(x, y), rm) {
                         (true, Ceiling | Up | Nearest) => {
@@ -3830,7 +3830,7 @@ impl Float {
                         }
                     };
                 }
-                if max_exponent > i64::from(Self::MAX_EXPONENT) - 2
+                if max_exponent > Self::MAX_EXPONENT_MINUS_2_I64
                     || min_exponent < Self::MIN_EXPONENT_MINUS_2_I64
                 {
                     // If we can't rule out overflow or underflow, use slow-but-correct naive

@@ -110,15 +110,13 @@ pub(crate) enum SliverOfOne {
 
 pub(crate) fn sliver_of_one(x: &Float) -> SliverOfOne {
     let e = i64::from(x.get_exponent().unwrap());
-    if (e == 0 || e == 1)
-        && x.get_prec().unwrap() >= u64::exact_from(-i64::from(Float::MIN_EXPONENT) - 8)
-    {
+    if (e == 0 || e == 1) && x.get_prec().unwrap() >= Float::NEAR_ONE_MAX_PREC {
         let (mut d, o) = x.sub_prec_round_ref_val(Float::ONE, x.get_prec().unwrap() + 1, Floor);
         if o != Equal {
             // `x - 1` fell below the smallest positive `Float`, so `ln(x) ~ x - 1` underflows.
             return SliverOfOne::Underflow;
         }
-        if i64::from(d.get_exponent().unwrap()) <= i64::from(Float::MIN_EXPONENT) + 4 {
+        if i64::from(d.get_exponent().unwrap()) <= Float::MIN_EXPONENT_PLUS_4_I64 {
             // Shed the trailing zeros inherited from the subtraction's requested precision: d's
             // true significant span is small, and the inflated precision would defeat the
             // `1_plus_x` functions' round-near-x shortcut (a significand padded with ~2^30 trailing
@@ -1360,7 +1358,7 @@ impl Float {
         // x within a sliver of 1: ln(x) ~ x - 1 may fall below the smallest positive Float, which
         // the helpers below could never resolve.
         let eps = x - Rational::ONE;
-        if eps.floor_log_base_2_abs() <= i64::from(Self::MIN_EXPONENT) + 4 {
+        if eps.floor_log_base_2_abs() <= Self::MIN_EXPONENT_PLUS_4_I64 {
             return ln_rational_near_one(&eps, prec, rm);
         }
         let x_exp = i32::saturating_from(x.floor_log_base_2_abs()).saturating_add(1);

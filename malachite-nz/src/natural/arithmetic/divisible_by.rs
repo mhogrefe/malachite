@@ -44,7 +44,7 @@ use malachite_base::slices::{slice_leading_zeros, slice_test_zero};
 //
 // This is equivalent to `mpz_divisible_ui_p` from `mpz/divis_ui.c`, GMP 6.2.1, where `a` is
 // non-negative and the `ABOVE_THRESHOLD` branch is excluded.
-pub_crate_test! {limbs_divisible_by_limb(ns: &[Limb], d: Limb) -> bool {
+crate_test_fn! {limbs_divisible_by_limb(ns: &[Limb], d: Limb) -> bool {
     assert!(ns.len() > 1);
     if d.even() {
         let twos = TrailingZeros::trailing_zeros(d);
@@ -81,7 +81,7 @@ fn limbs_mod_limb_helper(ns: &[Limb], d_low: Limb) -> Limb {
 //
 // This is equivalent to `mpn_divisible_p` from `mpn/generic/divis.c`, GMP 6.2.1, where `an >= dn`
 // and neither are zero.
-pub_crate_test! {
+crate_test_fn! {
 #[allow(clippy::absurd_extreme_comparisons)]
 limbs_divisible_by(ns: &mut [Limb], ds: &mut [Limb]) -> bool {
     let n_len = ns.len();
@@ -177,7 +177,7 @@ limbs_divisible_by(ns: &mut [Limb], ds: &mut [Limb]) -> bool {
 //
 // This is equivalent to `mpn_divisible_p` from `mpn/generic/divis.c`, GMP 6.2.1, where `an >= dn`
 // and neither are zero.
-pub_crate_test! {
+crate_test_fn! {
 #[allow(clippy::absurd_extreme_comparisons)]
 limbs_divisible_by_val_ref(ns: &mut [Limb], ds: &[Limb]) -> bool {
     let n_len = ns.len();
@@ -276,7 +276,7 @@ limbs_divisible_by_val_ref(ns: &mut [Limb], ds: &[Limb]) -> bool {
 //
 // This is equivalent to `mpn_divisible_p` from `mpn/generic/divis.c`, GMP 6.2.1, where `an >= dn`
 // and neither are zero.
-pub_test! {
+private_test_fn! {
 #[allow(clippy::absurd_extreme_comparisons)]
 limbs_divisible_by_ref_val(ns: &[Limb], ds: &mut [Limb]) -> bool {
     let n_len = ns.len();
@@ -371,7 +371,7 @@ limbs_divisible_by_ref_val(ns: &[Limb], ds: &mut [Limb]) -> bool {
 //
 // This is equivalent to `mpn_divisible_p` from `mpn/generic/divis.c`, GMP 6.2.1, where `an >= dn`
 // and neither are zero.
-pub_test! {
+private_test_fn! {
 #[allow(clippy::absurd_extreme_comparisons)]
 limbs_divisible_by_ref_ref(ns: &[Limb], ds: &[Limb]) -> bool {
     let n_len = ns.len();

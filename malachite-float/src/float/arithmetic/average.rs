@@ -130,7 +130,7 @@ impl Float {
     /// # Examples
     /// See [here](super::average#average_prec_round).
     #[inline]
-    pub fn average_prec_round(self, other: Self, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    pub fn average_prec_round(self, other: Self, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
         average_prec_round_helper(self, other, prec, rm)
     }
 
@@ -177,7 +177,7 @@ impl Float {
         other: &Self,
         prec: u64,
         rm: RoundingMode,
-    ) -> (Float, Ordering) {
+    ) -> (Self, Ordering) {
         average_prec_round_helper(self, other.clone(), prec, rm)
     }
 
@@ -224,7 +224,7 @@ impl Float {
         other: Self,
         prec: u64,
         rm: RoundingMode,
-    ) -> (Float, Ordering) {
+    ) -> (Self, Ordering) {
         average_prec_round_helper(self.clone(), other, prec, rm)
     }
 
@@ -271,7 +271,7 @@ impl Float {
         other: &Self,
         prec: u64,
         rm: RoundingMode,
-    ) -> (Float, Ordering) {
+    ) -> (Self, Ordering) {
         average_prec_round_helper(self.clone(), other.clone(), prec, rm)
     }
 
@@ -312,7 +312,7 @@ impl Float {
     /// # Examples
     /// See [here](super::average#average_prec).
     #[inline]
-    pub fn average_prec(self, other: Self, prec: u64) -> (Float, Ordering) {
+    pub fn average_prec(self, other: Self, prec: u64) -> (Self, Ordering) {
         average_prec_round_helper(self, other, prec, Nearest)
     }
 
@@ -353,7 +353,7 @@ impl Float {
     /// # Examples
     /// See [here](super::average#average_prec).
     #[inline]
-    pub fn average_prec_val_ref(self, other: &Self, prec: u64) -> (Float, Ordering) {
+    pub fn average_prec_val_ref(self, other: &Self, prec: u64) -> (Self, Ordering) {
         average_prec_round_helper(self, other.clone(), prec, Nearest)
     }
 
@@ -394,7 +394,7 @@ impl Float {
     /// # Examples
     /// See [here](super::average#average_prec).
     #[inline]
-    pub fn average_prec_ref_val(&self, other: Self, prec: u64) -> (Float, Ordering) {
+    pub fn average_prec_ref_val(&self, other: Self, prec: u64) -> (Self, Ordering) {
         average_prec_round_helper(self.clone(), other, prec, Nearest)
     }
 
@@ -435,7 +435,7 @@ impl Float {
     /// # Examples
     /// See [here](super::average#average_prec).
     #[inline]
-    pub fn average_prec_ref_ref(&self, other: &Self, prec: u64) -> (Float, Ordering) {
+    pub fn average_prec_ref_ref(&self, other: &Self, prec: u64) -> (Self, Ordering) {
         average_prec_round_helper(self.clone(), other.clone(), prec, Nearest)
     }
 
@@ -479,7 +479,7 @@ impl Float {
     /// # Examples
     /// See [here](super::average#average_round).
     #[inline]
-    pub fn average_round(self, other: Self, rm: RoundingMode) -> (Float, Ordering) {
+    pub fn average_round(self, other: Self, rm: RoundingMode) -> (Self, Ordering) {
         let prec = max(self.significant_bits(), other.significant_bits());
         average_prec_round_helper(self, other, prec, rm)
     }
@@ -524,7 +524,7 @@ impl Float {
     /// # Examples
     /// See [here](super::average#average_round).
     #[inline]
-    pub fn average_round_val_ref(self, other: &Self, rm: RoundingMode) -> (Float, Ordering) {
+    pub fn average_round_val_ref(self, other: &Self, rm: RoundingMode) -> (Self, Ordering) {
         let prec = max(self.significant_bits(), other.significant_bits());
         average_prec_round_helper(self, other.clone(), prec, rm)
     }
@@ -569,7 +569,7 @@ impl Float {
     /// # Examples
     /// See [here](super::average#average_round).
     #[inline]
-    pub fn average_round_ref_val(&self, other: Self, rm: RoundingMode) -> (Float, Ordering) {
+    pub fn average_round_ref_val(&self, other: Self, rm: RoundingMode) -> (Self, Ordering) {
         let prec = max(self.significant_bits(), other.significant_bits());
         average_prec_round_helper(self.clone(), other, prec, rm)
     }
@@ -614,7 +614,7 @@ impl Float {
     /// # Examples
     /// See [here](super::average#average_round).
     #[inline]
-    pub fn average_round_ref_ref(&self, other: &Self, rm: RoundingMode) -> (Float, Ordering) {
+    pub fn average_round_ref_ref(&self, other: &Self, rm: RoundingMode) -> (Self, Ordering) {
         let prec = max(self.significant_bits(), other.significant_bits());
         average_prec_round_helper(self.clone(), other.clone(), prec, rm)
     }
@@ -840,7 +840,7 @@ impl Float {
 }
 
 impl Average<Self> for Float {
-    type Output = Float;
+    type Output = Self;
 
     /// Computes the average (arithmetic mean) of two [`Float`]s, taking both [`Float`]s by value.
     ///
@@ -875,14 +875,14 @@ impl Average<Self> for Float {
     /// # Examples
     /// See [here](super::average#average).
     #[inline]
-    fn average(self, other: Self) -> Float {
+    fn average(self, other: Self) -> Self {
         let prec = max(self.significant_bits(), other.significant_bits());
         average_prec_round_helper(self, other, prec, Nearest).0
     }
 }
 
 impl Average<&Self> for Float {
-    type Output = Float;
+    type Output = Self;
 
     /// Computes the average (arithmetic mean) of two [`Float`]s, taking the first [`Float`] by
     /// value and the second by reference.
@@ -918,7 +918,7 @@ impl Average<&Self> for Float {
     /// # Examples
     /// See [here](super::average#average).
     #[inline]
-    fn average(self, other: &Self) -> Float {
+    fn average(self, other: &Self) -> Self {
         let prec = max(self.significant_bits(), other.significant_bits());
         average_prec_round_helper(self, other.clone(), prec, Nearest).0
     }

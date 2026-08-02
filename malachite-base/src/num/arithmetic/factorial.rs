@@ -14,7 +14,7 @@ use crate::num::basic::integers::USIZE_IS_U32;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::WrappingFrom;
 
-pub_test! {checked_multifactorial_naive<T: PrimitiveUnsigned>(n: u64, m: u64) -> Option<T> {
+private_test_fn! {checked_multifactorial_naive<T: PrimitiveUnsigned>(n: u64, m: u64) -> Option<T> {
     assert_ne!(m, 0);
     let mut f = T::ONE;
     let mut n = T::try_from(n).ok()?;

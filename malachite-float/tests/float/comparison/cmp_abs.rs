@@ -309,11 +309,11 @@ fn partial_cmp_abs_double_properties() {
         }
         // the doubling form agrees except where it overflows, which is the point of this
         let doubled = &y << 1u32;
-        if !(doubled.is_infinite() && y.is_finite()) {
-            assert_eq!(c, x.partial_cmp_abs(&doubled));
-        } else {
+        if doubled.is_infinite() && y.is_finite() {
             // the true doubled value is past the range, so it exceeds every finite value
             assert_eq!(c, Some(if x.is_infinite() { Greater } else { Less }));
+        } else {
+            assert_eq!(c, x.partial_cmp_abs(&doubled));
         }
     });
 }

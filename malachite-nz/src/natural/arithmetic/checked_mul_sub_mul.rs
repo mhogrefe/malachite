@@ -22,7 +22,6 @@ impl CheckedMulSubMul<Self, Self, Self> for Natural {
     /// \end{cases}
     /// $$
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -73,7 +72,6 @@ impl CheckedMulSubMul<Self, Self, &Self> for Natural {
     /// \end{cases}
     /// $$
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -124,7 +122,6 @@ impl CheckedMulSubMul<Self, &Self, Self> for Natural {
     /// \end{cases}
     /// $$
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -175,7 +172,6 @@ impl CheckedMulSubMul<Self, &Self, &Self> for Natural {
     /// \end{cases}
     /// $$
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -226,7 +222,6 @@ impl CheckedMulSubMul<&Self, Self, Self> for Natural {
     /// \end{cases}
     /// $$
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -277,7 +272,6 @@ impl CheckedMulSubMul<&Self, Self, &Self> for Natural {
     /// \end{cases}
     /// $$
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -328,7 +322,6 @@ impl CheckedMulSubMul<&Self, &Self, Self> for Natural {
     /// \end{cases}
     /// $$
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -379,7 +372,6 @@ impl CheckedMulSubMul<&Self, &Self, &Self> for Natural {
     /// \end{cases}
     /// $$
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -429,7 +421,6 @@ impl CheckedMulSubMul<&Natural, &Natural, &Natural> for &Natural {
     /// \end{cases}
     /// $$
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///

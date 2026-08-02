@@ -17,7 +17,7 @@ use crate::num::conversion::traits::WrappingFrom;
 use crate::rounding_modes::RoundingMode::*;
 
 // This is a variation of `n_xgcd` from `ulong_extras/xgcd.c`, FLINT 2.7.1.
-pub_test! {mod_inverse_binary<
+private_test_fn! {mod_inverse_binary<
     U: WrappingFrom<S> + PrimitiveUnsigned,
     S: PrimitiveSigned + WrappingFrom<U>,
 >(

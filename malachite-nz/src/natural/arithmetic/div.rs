@@ -84,7 +84,7 @@ use malachite_base::slices::{slice_move_left, slice_set_zero};
 // Panics if `out` is shorter than `ns`.
 //
 // This is equivalent to `mpn_bdiv_dbm1c` from `mpn/generic/bdiv_dbm1c.c`, GMP 6.2.1.
-pub_crate_test! {limbs_div_divisor_of_limb_max_with_carry_to_out<
+crate_test_fn! {limbs_div_divisor_of_limb_max_with_carry_to_out<
     DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + SplitInHalf,
     T: PrimitiveUnsigned,
 >(
@@ -119,7 +119,7 @@ pub_crate_test! {limbs_div_divisor_of_limb_max_with_carry_to_out<
 //
 // This is equivalent to `mpn_bdiv_dbm1c` from `mpn/generic/bdiv_dbm1c.c`, GMP 6.2.1, where `qp ==
 // ap`.
-pub_crate_test! {limbs_div_divisor_of_limb_max_with_carry_in_place(
+crate_test_fn! {limbs_div_divisor_of_limb_max_with_carry_in_place(
     ns: &mut [Limb],
     d: Limb,
     mut carry: Limb,
@@ -143,7 +143,7 @@ pub_crate_test! {limbs_div_divisor_of_limb_max_with_carry_in_place(
 //
 // This is equivalent to `udiv_qrnnd_preinv` from `gmp-impl.h`, GMP 6.2.1, but not computing the
 // remainder.
-pub_test! {div_by_preinversion(n_high: Limb, n_low: Limb, d: Limb, d_inv: Limb) -> Limb {
+private_test_fn! {div_by_preinversion(n_high: Limb, n_low: Limb, d: Limb, d_inv: Limb) -> Limb {
     let (mut q_high, q_low) = (DoubleLimb::from(n_high) * DoubleLimb::from(d_inv))
         .wrapping_add(DoubleLimb::join_halves(n_high.wrapping_add(1), n_low))
         .split_in_half();
@@ -174,7 +174,7 @@ pub_test! {div_by_preinversion(n_high: Limb, n_low: Limb, d: Limb, d_inv: Limb) 
 //
 // This is equivalent to `mpn_div_qr_1` from `mpn/generic/div_qr_1.c`, GMP 6.2.1, where the quotient
 // is returned, but not computing the remainder.
-pub_test! {limbs_div_limb(ns: &[Limb], d: Limb) -> Vec<Limb> {
+private_test_fn! {limbs_div_limb(ns: &[Limb], d: Limb) -> Vec<Limb> {
     let mut qs = vec![0; ns.len()];
     limbs_div_limb_to_out(&mut qs, ns, d);
     qs
@@ -197,7 +197,7 @@ pub_test! {limbs_div_limb(ns: &[Limb], d: Limb) -> Vec<Limb> {
 //
 // This is equivalent to `mpn_divrem_1` from `mpn/generic/divrem_1.c`, GMP 6.2.1, where `qxn == 0`
 // and `un > 1`, but not computing the remainder.
-pub_crate_test! {limbs_div_limb_to_out(out: &mut [Limb], ns: &[Limb], d: Limb) {
+crate_test_fn! {limbs_div_limb_to_out(out: &mut [Limb], ns: &[Limb], d: Limb) {
     assert_ne!(d, 0);
     let len = ns.len();
     assert!(len > 1);
@@ -261,7 +261,7 @@ pub_crate_test! {limbs_div_limb_to_out(out: &mut [Limb], ns: &[Limb], d: Limb) {
 //
 // This is equivalent to `mpn_divrem_1` from `mpn/generic/divrem_1.c`, GMP 6.2.1, where `qp == up`,
 // `qxn == 0`, and `un > 1`, but not computing the remainder.
-pub_test! {limbs_div_limb_in_place(ns: &mut [Limb], d: Limb) {
+private_test_fn! {limbs_div_limb_in_place(ns: &mut [Limb], d: Limb) {
     assert_ne!(d, 0);
     let len = ns.len();
     assert!(len > 1);
@@ -327,7 +327,7 @@ pub_test! {limbs_div_limb_in_place(ns: &mut [Limb], d: Limb) {
 // `ns.len()` - `ds.len()`, or the last limb of `ds` does not have its highest bit set.
 //
 // This is equivalent to `mpn_sbpi1_div_q` from `mpn/generic/sbpi1_div_q.c`, GMP 6.2.1.
-pub_test! {limbs_div_schoolbook(
+private_test_fn! {limbs_div_schoolbook(
     qs: &mut [Limb],
     ns: &mut [Limb],
     ds: &[Limb],
@@ -567,7 +567,7 @@ pub_test! {limbs_div_schoolbook(
 // bit set.
 //
 // This is equivalent to `mpn_dcpi1_div_q` from `mpn/generic/dcpi1_div_q.c`, GMP 6.2.1.
-pub_test! {limbs_div_divide_and_conquer(
+private_test_fn! {limbs_div_divide_and_conquer(
     qs: &mut [Limb],
     ns: &[Limb],
     ds: &[Limb],
@@ -624,7 +624,7 @@ pub_test! {limbs_div_divide_and_conquer(
 // where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
 // This is equivalent to `mpn_mu_div_q` from `mpn/generic/mu_div_q.c`, GMP 6.2.1.
-pub_test! {limbs_div_barrett(
+private_test_fn! {limbs_div_barrett(
     qs: &mut [Limb],
     ns: &[Limb],
     ds: &[Limb],
@@ -732,7 +732,7 @@ pub_test! {limbs_div_barrett(
 //
 // This is equivalent to `mpn_mu_div_q_itch` from `mpn/generic/mu_div_q.c`, GMP 6.2.1, where `mua_k
 // == 0`.
-pub_test! {limbs_div_barrett_scratch_len(n_len: usize, d_len: usize) -> usize {
+private_test_fn! {limbs_div_barrett_scratch_len(n_len: usize, d_len: usize) -> usize {
     let q_len = n_len - d_len;
     if q_len >= d_len {
         limbs_div_barrett_approx_scratch_len(n_len + 1, d_len)
@@ -763,7 +763,7 @@ pub_test! {limbs_div_barrett_scratch_len(n_len: usize, d_len: usize) -> usize {
 // `ns.len()` - `ds.len()`, or the last limb of `ds` does not have its highest bit set.
 //
 // This is equivalent to `mpn_sbpi1_divappr_q` from `mpn/generic/sbpi1_divappr_q.c`, GMP 6.2.1.
-pub_crate_test! {limbs_div_schoolbook_approx(
+crate_test_fn! {limbs_div_schoolbook_approx(
     qs: &mut [Limb],
     ns: &mut [Limb],
     mut ds: &[Limb],
@@ -973,7 +973,7 @@ fn limbs_div_divide_and_conquer_approx_helper(
 // bit set.
 //
 // This is equivalent to `mpn_dcpi1_divappr_q` from `mpn/generic/dcpi1_divappr_q.c`, GMP 6.2.1.
-pub_crate_test! {limbs_div_divide_and_conquer_approx(
+crate_test_fn! {limbs_div_divide_and_conquer_approx(
     qs: &mut [Limb],
     ns: &mut [Limb],
     ds: &[Limb],
@@ -1148,7 +1148,7 @@ pub_crate_test! {limbs_div_divide_and_conquer_approx(
 // where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
 // This is equivalent to `mpn_mu_divappr_q` from `mpn/generic/mu_divappr_q.c`, GMP 6.2.1.
-pub_crate_test! {limbs_div_barrett_approx(
+crate_test_fn! {limbs_div_barrett_approx(
     qs: &mut [Limb],
     ns: &[Limb],
     ds: &[Limb],
@@ -1381,7 +1381,7 @@ fn limbs_div_barrett_approx_is_len(q_len: usize, d_len: usize) -> usize {
 //
 // This is equivalent to `mpn_mu_divappr_q_itch` from `mpn/generic/mu_divappr_q.c`, GMP 6.2.1, where
 // `mua_k == 0`.
-pub_crate_test! {limbs_div_barrett_approx_scratch_len(n_len: usize, mut d_len: usize) -> usize {
+crate_test_fn! {limbs_div_barrett_approx_scratch_len(n_len: usize, mut d_len: usize) -> usize {
     let qn = n_len - d_len;
     if qn + 1 < d_len {
         d_len = qn + 1;
@@ -1412,7 +1412,7 @@ fn limbs_div_dc_condition(n_len: usize, d_len: usize) -> bool {
         || fma!(
             const { ((MU_DIV_Q_THRESHOLD - MUPI_DIV_Q_THRESHOLD) << 1) as f64 },
             d_64,
-            MUPI_DIV_Q_THRESHOLD as f64 * n_64
+            const { MUPI_DIV_Q_THRESHOLD as f64 } * n_64
         ) > d_64 * n_64
 }
 
@@ -1424,7 +1424,7 @@ fn limbs_div_dc_condition(n_len: usize, d_len: usize) -> bool {
 // $M(n) = O(n \log n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
-pub_crate_test! {limbs_div_to_out_unbalanced(qs: &mut [Limb], ns: &mut [Limb], ds: &mut [Limb]) {
+crate_test_fn! {limbs_div_to_out_unbalanced(qs: &mut [Limb], ns: &mut [Limb], ds: &mut [Limb]) {
     // ```
     // |________________________|
     //                  |_______|
@@ -1474,7 +1474,7 @@ pub_crate_test! {limbs_div_to_out_unbalanced(qs: &mut [Limb], ns: &mut [Limb], d
     }
 }}
 
-pub_test! {limbs_div_q_dc_helper(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb]) -> bool {
+private_test_fn! {limbs_div_q_dc_helper(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb]) -> bool {
     let n_len = ns.len();
     let d_len = ds.len();
     let highest_d = ds[d_len - 1];
@@ -1671,7 +1671,7 @@ fn limbs_div_to_out_unbalanced_ref_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]
 // $M(n) = O(n \log n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
-pub_test! {limbs_div_to_out_balanced(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
+private_test_fn! {limbs_div_to_out_balanced(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
     // ```
     // |________________________|
     //        |_________________|
@@ -1773,7 +1773,7 @@ pub_test! {limbs_div_to_out_balanced(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) 
 //
 // This is equivalent to `mpn_div_q` from `mpn/generic/div_q.c`, GMP 6.2.1, where `scratch` is
 // allocated internally and `qp` is returned.
-pub_test! {limbs_div(ns: &[Limb], ds: &[Limb]) -> Vec<Limb> {
+private_test_fn! {limbs_div(ns: &[Limb], ds: &[Limb]) -> Vec<Limb> {
     let mut qs = vec![0; ns.len() - ds.len() + 1];
     limbs_div_to_out_ref_ref(&mut qs, ns, ds);
     qs
@@ -1798,7 +1798,7 @@ pub_test! {limbs_div(ns: &[Limb], ds: &[Limb]) -> Vec<Limb> {
 //
 // This is equivalent to `mpn_div_q` from `mpn/generic/div_q.c`, GMP 6.2.1, where `scratch` is
 // allocated internally and `np` and `dp` are consumed, saving some memory allocations.
-pub_crate_test! {limbs_div_to_out(qs: &mut [Limb], ns: &mut [Limb], ds: &mut [Limb]) {
+crate_test_fn! {limbs_div_to_out(qs: &mut [Limb], ns: &mut [Limb], ds: &mut [Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
     assert!(n_len >= d_len);
@@ -1832,7 +1832,7 @@ pub_crate_test! {limbs_div_to_out(qs: &mut [Limb], ns: &mut [Limb], ds: &mut [Li
 //
 // This is equivalent to `mpn_div_q` from `mpn/generic/div_q.c`, GMP 6.2.1, where `scratch` is
 // allocated internally and `np` is consumed, saving some memory allocations.
-pub_test! {limbs_div_to_out_val_ref(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb]) {
+private_test_fn! {limbs_div_to_out_val_ref(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
     assert!(n_len >= d_len);
@@ -1866,7 +1866,7 @@ pub_test! {limbs_div_to_out_val_ref(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb
 //
 // This is equivalent to `mpn_div_q` from `mpn/generic/div_q.c`, GMP 6.2.1, where `scratch` is
 // allocated internally and `dp` is consumed, saving some memory allocations.
-pub_test! {limbs_div_to_out_ref_val(qs: &mut [Limb], ns: &[Limb], ds: &mut [Limb]) {
+private_test_fn! {limbs_div_to_out_ref_val(qs: &mut [Limb], ns: &[Limb], ds: &mut [Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
     assert!(n_len >= d_len);
@@ -1900,7 +1900,7 @@ pub_test! {limbs_div_to_out_ref_val(qs: &mut [Limb], ns: &[Limb], ds: &mut [Limb
 //
 // This is equivalent to `mpn_div_q` from `mpn/generic/div_q.c`, GMP 6.2.1, where `scratch` is
 // allocated internally.
-pub_test! {limbs_div_to_out_ref_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
+private_test_fn! {limbs_div_to_out_ref_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
     assert!(n_len >= d_len);

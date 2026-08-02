@@ -204,7 +204,7 @@ const REDC_1_TO_REDC_N_THRESHOLD: usize = 100;
 
 // # Worst-case complexity
 // Constant time and additional memory.
-pub_test! {limbs_mod_pow_odd_scratch_len(n: usize) -> usize {
+private_test_fn! {limbs_mod_pow_odd_scratch_len(n: usize) -> usize {
     max(limbs_modular_invert_scratch_len(n), n << 1)
 }}
 
@@ -336,7 +336,7 @@ fn select_fns(
 // `ms` is even, or if $E$ less than 2.
 //
 // This is equivalent to `mpn_powm` from `mpn/generic/powm.c`, GMP 6.2.1.
-pub_test! {limbs_mod_pow_odd(
+private_test_fn! {limbs_mod_pow_odd(
     out: &mut [Limb],
     xs: &[Limb],
     es: &[Limb],
@@ -449,7 +449,7 @@ pub_test! {limbs_mod_pow_odd(
 //
 // This is equivalent to `mpz_powm` from `mpn/generic/powm.c`, GMP 6.2.1, where `b`, `e`, and `m`
 // are non-negative. Investigate changes from 6.1.2?
-pub_test! {limbs_mod_pow(out: &mut [Limb], xs: &[Limb], es: &[Limb], ms: &[Limb]) {
+private_test_fn! {limbs_mod_pow(out: &mut [Limb], xs: &[Limb], es: &[Limb], ms: &[Limb]) {
     let ms_len = ms.len();
     let es_len = es.len();
     let xs_len = xs.len();

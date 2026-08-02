@@ -136,7 +136,7 @@ fn benchmark_rational_to_string_base(
         file_name,
         &pair_1_rational_bit_bucketer("x"),
         &mut [("Malachite", &mut |(x, base)| {
-            no_out!(x.to_string_base(base))
+            no_out!(x.to_string_base(base));
         })],
     );
 }
@@ -205,7 +205,7 @@ fn benchmark_rational_to_lower_hex_string_library_comparison(
         &triple_3_rational_bit_bucketer("x"),
         &mut [
             ("Malachite", &mut |(_, _, x)| {
-                no_out!(x.to_lower_hex_string())
+                no_out!(x.to_lower_hex_string());
             }),
             ("num", &mut |(x, _, _)| no_out!(x.to_lower_hex_string())),
             ("rug", &mut |(_, x, _)| no_out!(x.to_lower_hex_string())),

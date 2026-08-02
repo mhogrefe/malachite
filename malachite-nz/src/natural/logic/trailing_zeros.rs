@@ -26,7 +26,7 @@ use malachite_base::slices::slice_leading_zeros;
 //
 // # Panics
 // Panics if `xs` only contains zeros.
-pub_crate_test! {limbs_trailing_zeros(xs: &[Limb]) -> u64 {
+crate_test_fn! {limbs_trailing_zeros(xs: &[Limb]) -> u64 {
     let zeros = slice_leading_zeros(xs);
     let remaining_zeros = TrailingZeros::trailing_zeros(xs[zeros]);
     limb_to_bit_count(zeros)+ remaining_zeros

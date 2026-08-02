@@ -32,7 +32,7 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // This is equivalent to `mpn_sub_1` from `gmp.h`, GMP 6.2.1, where the result is returned.
-pub_crate_test! {limbs_sub_limb(xs: &[Limb], mut y: Limb) -> (Vec<Limb>, bool) {
+crate_test_fn! {limbs_sub_limb(xs: &[Limb], mut y: Limb) -> (Vec<Limb>, bool) {
     let len = xs.len();
     let mut out = Vec::with_capacity(len);
     for i in 0..len {
@@ -65,7 +65,7 @@ pub_crate_test! {limbs_sub_limb(xs: &[Limb], mut y: Limb) -> (Vec<Limb>, bool) {
 // Panics if `out` is shorter than `xs`.
 //
 // This is equivalent to `mpn_sub_1` from `gmp.h`, GMP 6.2.1.
-pub_crate_test! {limbs_sub_limb_to_out(out: &mut [Limb], xs: &[Limb], mut y: Limb) -> bool {
+crate_test_fn! {limbs_sub_limb_to_out(out: &mut [Limb], xs: &[Limb], mut y: Limb) -> bool {
     let len = xs.len();
     assert!(out.len() >= len);
     for i in 0..len {
@@ -96,7 +96,7 @@ pub_crate_test! {limbs_sub_limb_to_out(out: &mut [Limb], xs: &[Limb], mut y: Lim
 //
 // This is equivalent to `mpn_add_1` from `gmp.h`, GMP 6.2.1, where the result is written to the
 // input slice.
-pub_crate_test! {limbs_sub_limb_in_place<T: PrimitiveUnsigned>(xs: &mut [T], mut y: T) -> bool {
+crate_test_fn! {limbs_sub_limb_in_place<T: PrimitiveUnsigned>(xs: &mut [T], mut y: T) -> bool {
     for x in &mut *xs {
         if x.overflowing_sub_assign(y) {
             y = T::ONE;
@@ -134,7 +134,7 @@ pub(crate) fn sub_with_borrow(x: Limb, y: Limb, borrow: bool) -> (Limb, bool) {
 // Panics if `xs` is shorter than `ys`.
 //
 // This is equivalent to `mpn_sub` from `gmp.h`, GMP 6.2.1, where the output is returned.
-pub_crate_test! {limbs_sub(xs: &[Limb], ys: &[Limb]) -> (Vec<Limb>, bool) {
+crate_test_fn! {limbs_sub(xs: &[Limb], ys: &[Limb]) -> (Vec<Limb>, bool) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
@@ -168,7 +168,7 @@ pub_crate_test! {limbs_sub(xs: &[Limb], ys: &[Limb]) -> (Vec<Limb>, bool) {
 // Panics if `out` is shorter than `xs` or if `xs` and `ys` have different lengths.
 //
 // This is equivalent to `mpn_sub_n` from `gmp.h`, GMP 6.2.1.
-pub_crate_test! {limbs_sub_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
+crate_test_fn! {limbs_sub_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     limbs_sub_same_length_with_borrow_in_to_out(out, xs, ys, false)
 }}
 
@@ -189,7 +189,7 @@ pub_crate_test! {limbs_sub_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys:
 // Panics if `out` is shorter than `xs` or if `xs` is shorter than `ys`.
 //
 // This is equivalent to `mpn_sub` from `gmp.h`, GMP 6.2.1.
-pub_crate_test! {limbs_sub_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
+crate_test_fn! {limbs_sub_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(out.len() >= xs_len);
@@ -222,7 +222,7 @@ pub_crate_test! {limbs_sub_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[L
 //
 // This is equivalent to `mpn_sub_n` from `gmp.h`, GMP 6.2.1, where the output is written to the
 // first input.
-pub_crate_test! {limbs_sub_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
+crate_test_fn! {limbs_sub_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
     limbs_sub_same_length_with_borrow_in_in_place_left(xs, ys, false)
 }}
 
@@ -243,7 +243,7 @@ pub_crate_test! {limbs_sub_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb
 //
 // This is equivalent to `mpn_sub` from `gmp.h`, GMP 6.2.1, where the output is written to the first
 // input.
-pub_crate_test! {limbs_sub_greater_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
+crate_test_fn! {limbs_sub_greater_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let (xs_lo, xs_hi) = xs.split_at_mut(ys_len);
@@ -274,7 +274,7 @@ pub_crate_test! {limbs_sub_greater_in_place_left(xs: &mut [Limb], ys: &[Limb]) -
 //
 // This is equivalent to `mpn_sub_n` from `gmp.h`, GMP 6.2.1, where the output is written to the
 // second input.
-pub_crate_test! {limbs_sub_same_length_in_place_right(xs: &[Limb], ys: &mut [Limb]) -> bool {
+crate_test_fn! {limbs_sub_same_length_in_place_right(xs: &[Limb], ys: &mut [Limb]) -> bool {
     limbs_sub_same_length_with_borrow_in_in_place_right(xs, ys, false)
 }}
 
@@ -296,7 +296,7 @@ pub_crate_test! {limbs_sub_same_length_in_place_right(xs: &[Limb], ys: &mut [Lim
 // This is equivalent to `mpn_sub_n` from `gmp.h`, GMP 6.2.1, where the output is written to the
 // second input (which has `len` limbs) and the second input has enough space past `len` to
 // accomodate the output.
-pub_crate_test! {limbs_slice_sub_in_place_right(xs: &[Limb], ys: &mut [Limb], len: usize) -> bool {
+crate_test_fn! {limbs_slice_sub_in_place_right(xs: &[Limb], ys: &mut [Limb], len: usize) -> bool {
     let xs_len = xs.len();
     assert_eq!(xs_len, ys.len());
     let (xs_lo, xs_hi) = xs.split_at(len);
@@ -328,7 +328,7 @@ pub_crate_test! {limbs_slice_sub_in_place_right(xs: &[Limb], ys: &mut [Limb], le
 //
 // # Panics
 // Panics if `xs` is shorter than `ys`.
-pub_crate_test! {limbs_vec_sub_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>) -> bool {
+crate_test_fn! {limbs_vec_sub_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
@@ -364,7 +364,7 @@ pub_crate_test! {limbs_vec_sub_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>) -
 //
 // This is equivalent to `mpn_sub_n` from `gmp.h`, GMP 6.2.1, where the output is written to the
 // first input, and the two inputs are possibly-overlapping subslices of a single slice.
-pub_crate_test! {limbs_sub_same_length_in_place_with_overlap(
+crate_test_fn! {limbs_sub_same_length_in_place_with_overlap(
     xs: &mut [Limb],
     right_start: usize
 ) -> bool {
@@ -403,7 +403,7 @@ pub_crate_test! {limbs_sub_same_length_in_place_with_overlap(
 // This is equivalent to `mpn_sub_n` from `gmp.h`, GMP 6.2.1, where the output is a prefix of a
 // slice and the left operand of the subtraction is a suffix of the same slice, and the prefix and
 // suffix may overlap.
-pub_crate_test! {limbs_sub_same_length_to_out_with_overlap(xs: &mut [Limb], ys: &[Limb]) -> bool {
+crate_test_fn! {limbs_sub_same_length_to_out_with_overlap(xs: &mut [Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
@@ -440,7 +440,7 @@ pub_crate_test! {limbs_sub_same_length_to_out_with_overlap(xs: &mut [Limb], ys: 
 //
 // This is equivalent to `mpn_sub_nc` from `gmp-impl.h`, GMP 6.2.1, where `rp`, `up`, and `vp` are
 // disjoint.
-pub_crate_test! {limbs_sub_same_length_with_borrow_in_to_out(
+crate_test_fn! {limbs_sub_same_length_with_borrow_in_to_out(
     out: &mut [Limb],
     xs: &[Limb],
     ys: &[Limb],
@@ -486,7 +486,7 @@ pub_crate_test! {limbs_sub_same_length_with_borrow_in_to_out(
 // Panics if `xs` and `ys` have different lengths.
 //
 // This is equivalent to `mpn_sub_nc` from `gmp-impl.h`, GMP 6.2.1, where `rp` is the same as `up`.
-pub_crate_test! {limbs_sub_same_length_with_borrow_in_in_place_left(
+crate_test_fn! {limbs_sub_same_length_with_borrow_in_in_place_left(
     xs: &mut [Limb],
     ys: &[Limb],
     borrow_in: bool,
@@ -527,7 +527,7 @@ pub_crate_test! {limbs_sub_same_length_with_borrow_in_in_place_left(
 // Panics if `xs` and `ys` have different lengths.
 //
 // This is equivalent to `mpn_sub_nc` from `gmp-impl.h`, GMP 6.2.1, where `rp` is the same as `vp`.
-pub_crate_test! {limbs_sub_same_length_with_borrow_in_in_place_right(
+crate_test_fn! {limbs_sub_same_length_with_borrow_in_in_place_right(
     xs: &[Limb],
     ys: &mut [Limb],
     borrow_in: bool,

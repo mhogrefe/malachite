@@ -53,10 +53,10 @@ where
     // exact.
     let q = T::wrapping_from(abs);
     (
-        if (x < T::ZERO) != (y < T::ZERO && k.odd()) {
-            q.wrapping_neg()
-        } else {
+        if (x < T::ZERO) == (y < T::ZERO && k.odd()) {
             q
+        } else {
+            q.wrapping_neg()
         },
         k,
     )

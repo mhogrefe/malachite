@@ -10,12 +10,12 @@ use crate::integer::Integer;
 use crate::integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
 use crate::natural::Natural;
 use crate::natural::arithmetic::shr::limbs_slice_shr_in_place;
-use crate::platform::{Limb, SignedLimb};
+use crate::platform::{LIMB_WIDTH_USIZE, Limb, SignedLimb};
 use alloc::vec::Vec;
 use itertools::Itertools;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::logic::traits::{BitConvertible, LowMask, NotAssign};
 
 // Given the bits of a non-negative `Integer`, in ascending order, checks whether the most
@@ -24,7 +24,7 @@ use malachite_base::num::logic::traits::{BitConvertible, LowMask, NotAssign};
 //
 // # Worst-case complexity
 // Constant time and additional memory.
-pub_test! {bits_to_twos_complement_bits_non_negative(bits: &mut Vec<bool>) {
+private_test_fn! {bits_to_twos_complement_bits_non_negative(bits: &mut Vec<bool>) {
     if !bits.is_empty() && *bits.last().unwrap() {
         // Sign-extend with an extra false bit to indicate a positive Integer
         bits.push(false);
@@ -41,7 +41,7 @@ pub_test! {bits_to_twos_complement_bits_non_negative(bits: &mut Vec<bool>) {
 // $M(n) = O(1)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `bits.len()`.
-pub_test! {bits_slice_to_twos_complement_bits_negative(bits: &mut [bool]) -> bool {
+private_test_fn! {bits_slice_to_twos_complement_bits_negative(bits: &mut [bool]) -> bool {
     let mut true_seen = false;
     for bit in &mut *bits {
         if true_seen {
@@ -67,7 +67,7 @@ pub_test! {bits_slice_to_twos_complement_bits_negative(bits: &mut [bool]) -> boo
 //
 // # Panics
 // Panics if `bits` contains only `false`s.
-pub_test! {bits_vec_to_twos_complement_bits_negative(bits: &mut Vec<bool>) {
+private_test_fn! {bits_vec_to_twos_complement_bits_negative(bits: &mut Vec<bool>) {
     assert!(!bits_slice_to_twos_complement_bits_negative(bits));
     if bits.last() == Some(&false) {
         // Sign-extend with an extra true bit to indicate a negative Integer
@@ -225,7 +225,7 @@ impl BitConvertible for Integer {
         let mut limbs = Vec::new();
         let mut last_width = 0;
         let mut last_bit = false;
-        for chunk in &xs.chunks(usize::exact_from(Limb::WIDTH)) {
+        for chunk in &xs.chunks(LIMB_WIDTH_USIZE) {
             let mut limb = 0;
             let mut i = 0;
             let mut mask = 1;
@@ -295,7 +295,7 @@ impl BitConvertible for Integer {
         let mut last_width = 0;
         let mut first_bit = false;
         let mut first = true;
-        for chunk in &xs.chunks(usize::exact_from(Limb::WIDTH)) {
+        for chunk in &xs.chunks(LIMB_WIDTH_USIZE) {
             let mut limb = 0;
             let mut i = 0;
             for bit in chunk {

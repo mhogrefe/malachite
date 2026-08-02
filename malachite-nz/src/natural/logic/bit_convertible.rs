@@ -8,13 +8,13 @@
 
 use crate::natural::Natural;
 use crate::natural::arithmetic::shr::limbs_slice_shr_in_place;
-use crate::platform::Limb;
+use crate::platform::{LIMB_WIDTH_USIZE, Limb};
 use alloc::vec::Vec;
 use itertools::Itertools;
 use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, BitConvertible};
 
 impl BitConvertible for Natural {
@@ -129,7 +129,7 @@ impl BitConvertible for Natural {
     #[inline]
     fn from_bits_asc<I: Iterator<Item = bool>>(xs: I) -> Self {
         Self::from_owned_limbs_asc(
-            xs.chunks(usize::wrapping_from(Limb::WIDTH))
+            xs.chunks(LIMB_WIDTH_USIZE)
                 .into_iter()
                 .map(Limb::from_bits_asc)
                 .collect(),
@@ -171,7 +171,7 @@ impl BitConvertible for Natural {
     fn from_bits_desc<I: Iterator<Item = bool>>(xs: I) -> Self {
         let mut out = Vec::new();
         let mut last_width = 0;
-        for chunk in &xs.chunks(usize::exact_from(Limb::WIDTH)) {
+        for chunk in &xs.chunks(LIMB_WIDTH_USIZE) {
             let mut x = 0;
             let mut i = 0;
             for bit in chunk {

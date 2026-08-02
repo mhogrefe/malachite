@@ -123,7 +123,7 @@ fn div_rational_prec_round_assign_naive_ref(
     }
 }
 
-pub_test! {div_rational_prec_round_naive(
+private_test_fn! {div_rational_prec_round_naive(
     mut x: Float,
     y: Rational,
     prec: u64,
@@ -133,7 +133,7 @@ pub_test! {div_rational_prec_round_naive(
     (x, o)
 }}
 
-pub_test! {div_rational_prec_round_naive_val_ref(
+private_test_fn! {div_rational_prec_round_naive_val_ref(
     mut x: Float,
     y: &Rational,
     prec: u64,
@@ -143,7 +143,7 @@ pub_test! {div_rational_prec_round_naive_val_ref(
     (x, o)
 }}
 
-pub_test! {div_rational_prec_round_naive_ref_val(
+private_test_fn! {div_rational_prec_round_naive_ref_val(
     x: &Float,
     y: Rational,
     prec: u64,
@@ -183,7 +183,7 @@ pub_test! {div_rational_prec_round_naive_ref_val(
     }
 }}
 
-pub_test! {div_rational_prec_round_naive_ref_ref(
+private_test_fn! {div_rational_prec_round_naive_ref_ref(
     x: &Float,
     y: &Rational,
     prec: u64,
@@ -371,7 +371,7 @@ fn div_rational_prec_round_assign_direct_ref(
     }
 }
 
-pub_test! {div_rational_prec_round_direct(
+private_test_fn! {div_rational_prec_round_direct(
     mut x: Float,
     y: Rational,
     prec: u64,
@@ -381,7 +381,7 @@ pub_test! {div_rational_prec_round_direct(
     (x, o)
 }}
 
-pub_test! {div_rational_prec_round_direct_val_ref(
+private_test_fn! {div_rational_prec_round_direct_val_ref(
     mut x: Float,
     y: &Rational,
     prec: u64,
@@ -391,7 +391,7 @@ pub_test! {div_rational_prec_round_direct_val_ref(
     (x, o)
 }}
 
-pub_test! {div_rational_prec_round_direct_ref_val(
+private_test_fn! {div_rational_prec_round_direct_ref_val(
     x: &Float,
     y: Rational,
     prec: u64,
@@ -469,7 +469,7 @@ pub_test! {div_rational_prec_round_direct_ref_val(
     }
 }}
 
-pub_test! {div_rational_prec_round_direct_ref_ref(
+private_test_fn! {div_rational_prec_round_direct_ref_ref(
     x: &Float,
     y: &Rational,
     prec: u64,
@@ -547,7 +547,7 @@ pub_test! {div_rational_prec_round_direct_ref_ref(
     }
 }}
 
-pub_test! {rational_div_float_prec_round_naive(
+private_test_fn! {rational_div_float_prec_round_naive(
     x: Rational,
     y: Float,
     prec: u64,
@@ -584,7 +584,7 @@ pub_test! {rational_div_float_prec_round_naive(
     }
 }}
 
-pub_test! {rational_div_float_prec_round_naive_val_ref(
+private_test_fn! {rational_div_float_prec_round_naive_val_ref(
     x: Rational,
     y: &Float,
     prec: u64,
@@ -620,7 +620,7 @@ pub_test! {rational_div_float_prec_round_naive_val_ref(
     }
 }}
 
-pub_test! {rational_div_float_prec_round_naive_ref_val(
+private_test_fn! {rational_div_float_prec_round_naive_ref_val(
     x: &Rational,
     y: Float,
     prec: u64,
@@ -657,7 +657,7 @@ pub_test! {rational_div_float_prec_round_naive_ref_val(
     }
 }}
 
-pub_test! {rational_div_float_prec_round_naive_ref_ref(
+private_test_fn! {rational_div_float_prec_round_naive_ref_ref(
     x: &Rational,
     y: &Float,
     prec: u64,
@@ -693,7 +693,7 @@ pub_test! {rational_div_float_prec_round_naive_ref_ref(
     }
 }}
 
-pub_test! {rational_div_float_prec_round_direct(
+private_test_fn! {rational_div_float_prec_round_direct(
     x: Rational,
     y: Float,
     prec: u64,
@@ -783,7 +783,7 @@ pub_test! {rational_div_float_prec_round_direct(
     }
 }}
 
-pub_test! {rational_div_float_prec_round_direct_val_ref(
+private_test_fn! {rational_div_float_prec_round_direct_val_ref(
     x: Rational,
     y: &Float,
     prec: u64,
@@ -873,7 +873,7 @@ pub_test! {rational_div_float_prec_round_direct_val_ref(
     }
 }}
 
-pub_test! {rational_div_float_prec_round_direct_ref_val(
+private_test_fn! {rational_div_float_prec_round_direct_ref_val(
     x: &Rational,
     y: Float,
     prec: u64,
@@ -963,7 +963,7 @@ pub_test! {rational_div_float_prec_round_direct_ref_val(
     }
 }}
 
-pub_test! {rational_div_float_prec_round_direct_ref_ref(
+private_test_fn! {rational_div_float_prec_round_direct_ref_ref(
     x: &Rational,
     y: &Float,
     prec: u64,

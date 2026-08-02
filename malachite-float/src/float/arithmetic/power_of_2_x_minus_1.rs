@@ -106,7 +106,7 @@ fn power_of_2_x_minus_1_prec_round_normal(
     // output precision, which may be enormous) is enough to resolve which side of min_positive the
     // result lies on.
     let ex = i64::from(x.get_exponent().unwrap());
-    if ex <= i64::from(Float::MIN_EXPONENT) {
+    if ex <= Float::MIN_EXPONENT_I64 {
         // Scale x to exponent 1 before converting to a `Rational`: x itself sits in the smallest
         // binade, so an exact `Rational` for it would carry a ~2^30-bit power-of-2 denominator
         // (~128 MB). With x' = x * 2^(1 - EXP(x)), a small number, the test |x ln(2)| <
@@ -117,7 +117,7 @@ fn power_of_2_x_minus_1_prec_round_normal(
         // irrational, so the widening always terminates.)
         let x_scaled = x >> (ex - 1);
         let xs_r = Rational::exact_from(&x_scaled);
-        let bound = i64::from(Float::MIN_EXPONENT) - ex;
+        let bound = Float::MIN_EXPONENT_I64 - ex;
         let mut p = x.significant_bits() + Limb::WIDTH;
         let below = loop {
             let (ln_2_lo, ln_2_hi) = floor_and_ceiling(Float::ln_2_prec_round(p, Floor));
@@ -357,7 +357,7 @@ fn power_of_2_x_minus_1_rational_helper(
             } else {
                 exp_overflow(prec, rm)
             }
-        } else if n >= i64::from(Float::MIN_EXPONENT) - 1 {
+        } else if n >= Float::MIN_EXPONENT_MINUS_1_I64 {
             // 2^n is representable, so round the exact difference 2^n - 1 directly.
             Float::power_of_2(i64::exact_from(&n)).sub_prec_round(Float::ONE, prec, rm)
         } else {

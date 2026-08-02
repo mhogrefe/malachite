@@ -147,7 +147,7 @@ fn demo_integer_mul_sub_mul_ref_ref_ref_ref(gm: GenMode, config: &GenConfig, lim
             y.clone(),
             z.clone(),
             w.clone(),
-            &x.mul_sub_mul(&y.clone(), &z.clone(), &w.clone())
+            x.mul_sub_mul(&y.clone(), &z.clone(), &w.clone())
         );
     }
 }
@@ -287,7 +287,7 @@ fn benchmark_integer_mul_sub_mul_algorithms(
         &quadruple_integer_max_bit_bucketer("x", "y", "z", "w"),
         &mut [
             ("default", &mut |(x, y, z, w)| {
-                no_out!(x.mul_sub_mul(y, z, w))
+                no_out!(x.mul_sub_mul(y, z, w));
             }),
             ("naive", &mut |(x, y, z, w)| {
                 let _ = x * y - z * w;

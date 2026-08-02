@@ -16,10 +16,12 @@ use std::str::FromStr;
 
 #[test]
 fn test_eq_abs_f32() {
-    let test = |u, v: f32, out| {
-        assert_eq!(Natural::from_str(u).unwrap().eq_abs(&v), out);
-        assert_eq!(!Natural::from_str(u).unwrap().ne_abs(&v), out);
-        assert_eq!(v.eq_abs(&Natural::from_str(u).unwrap()), out);
+    let test = |s, v: f32, out| {
+        let u = Natural::from_str(s).unwrap();
+
+        assert_eq!(u.eq_abs(&v), out);
+        assert_eq!(!u.ne_abs(&v), out);
+        assert_eq!(v.eq_abs(&u), out);
     };
     test("0", 0.0, true);
     test("0", -0.0, true);
@@ -40,10 +42,12 @@ fn test_eq_abs_f32() {
 
 #[test]
 fn test_eq_abs_f64() {
-    let test = |u, v: f64, out| {
-        assert_eq!(Natural::from_str(u).unwrap().eq_abs(&v), out);
-        assert_eq!(!Natural::from_str(u).unwrap().ne_abs(&v), out);
-        assert_eq!(v.eq_abs(&Natural::from_str(u).unwrap()), out);
+    let test = |s, v: f64, out| {
+        let u = Natural::from_str(s).unwrap();
+
+        assert_eq!(u.eq_abs(&v), out);
+        assert_eq!(!u.ne_abs(&v), out);
+        assert_eq!(v.eq_abs(&u), out);
     };
     test("0", 0.0, true);
     test("0", -0.0, true);

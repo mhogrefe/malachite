@@ -13,13 +13,12 @@ use crate::natural::Natural;
 use crate::natural::arithmetic::div_exact::limbs_modular_div_mod_wrap;
 use crate::natural::arithmetic::square::{limbs_square_to_out, limbs_square_to_out_scratch_len};
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
-use crate::platform::Limb;
+use crate::platform::{LIMB_WIDTH_USIZE, Limb};
 use alloc::vec::Vec;
 use core::cmp::Ordering::Equal;
 use core::cmp::min;
 use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{Parity, Pow, PowerOf2};
-use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::factorization::traits::{RemovePower, RemovePowerAssign};
@@ -55,8 +54,8 @@ pub fn limbs_remove(
     let mut qn = un;
 
     // Store the powers of V
-    let mut pwpsn = Vec::with_capacity(Limb::WIDTH as usize);
-    let mut pwpsp_offsets = Vec::with_capacity(Limb::WIDTH as usize);
+    let mut pwpsn = Vec::with_capacity(LIMB_WIDTH_USIZE);
+    let mut pwpsp_offsets = Vec::with_capacity(LIMB_WIDTH_USIZE);
 
     // All generated powers of V are stored here
     let mut powers_storage = Vec::new();
@@ -115,7 +114,7 @@ pub fn limbs_remove(
         }
         // allocate powers_storage on first use
         if npowers == 1 {
-            powers_storage = vec![0; qn + Limb::WIDTH as usize];
+            powers_storage = vec![0; qn + LIMB_WIDTH_USIZE];
         }
         // compute square of current power into powers_storage
         let np_offset = if npowers == 1 {
@@ -245,7 +244,7 @@ fn remove_power_helper(x: &Natural, y: &Natural) -> (Natural, u64) {
 }
 
 impl RemovePower<Self> for Natural {
-    type Output = Natural;
+    type Output = Self;
 
     /// Removes the largest power of a factor from a [`Natural`], returning the reduced [`Natural`]
     /// together with the exponent of that power.
@@ -285,13 +284,13 @@ impl RemovePower<Self> for Natural {
     /// assert_eq!(k, 0);
     /// ```
     #[inline]
-    fn remove_power(self, other: Self) -> (Natural, u64) {
+    fn remove_power(self, other: Self) -> (Self, u64) {
         remove_power_helper(&self, &other)
     }
 }
 
 impl RemovePower<&Self> for Natural {
-    type Output = Natural;
+    type Output = Self;
 
     /// Removes the largest power of a factor from a [`Natural`], returning the reduced [`Natural`]
     /// together with the exponent of that power.
@@ -331,7 +330,7 @@ impl RemovePower<&Self> for Natural {
     /// assert_eq!(k, 0);
     /// ```
     #[inline]
-    fn remove_power(self, other: &Self) -> (Natural, u64) {
+    fn remove_power(self, other: &Self) -> (Self, u64) {
         remove_power_helper(&self, other)
     }
 }

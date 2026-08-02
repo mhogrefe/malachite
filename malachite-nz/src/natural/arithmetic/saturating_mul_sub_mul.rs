@@ -24,7 +24,6 @@ impl SaturatingMulSubMul<Self, Self, Self> for Natural {
     /// \end{cases}
     /// $$
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -74,7 +73,6 @@ impl SaturatingMulSubMul<Self, Self, &Self> for Natural {
     /// \end{cases}
     /// $$
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -124,7 +122,6 @@ impl SaturatingMulSubMul<Self, &Self, Self> for Natural {
     /// \end{cases}
     /// $$
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -174,7 +171,6 @@ impl SaturatingMulSubMul<Self, &Self, &Self> for Natural {
     /// \end{cases}
     /// $$
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -224,7 +220,6 @@ impl SaturatingMulSubMul<&Self, Self, Self> for Natural {
     /// \end{cases}
     /// $$
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -274,7 +269,6 @@ impl SaturatingMulSubMul<&Self, Self, &Self> for Natural {
     /// \end{cases}
     /// $$
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -324,7 +318,6 @@ impl SaturatingMulSubMul<&Self, &Self, Self> for Natural {
     /// \end{cases}
     /// $$
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -374,7 +367,6 @@ impl SaturatingMulSubMul<&Self, &Self, &Self> for Natural {
     /// \end{cases}
     /// $$
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -424,7 +416,6 @@ impl SaturatingMulSubMul<&Natural, &Natural, &Natural> for &Natural {
     /// \end{cases}
     /// $$
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -472,7 +463,6 @@ impl SaturatingMulSubMulAssign<Self, Self, Self> for Natural {
     /// \end{cases}
     /// $$
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -512,7 +502,6 @@ impl SaturatingMulSubMulAssign<Self, Self, &Self> for Natural {
     /// \end{cases}
     /// $$
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -552,7 +541,6 @@ impl SaturatingMulSubMulAssign<Self, &Self, Self> for Natural {
     /// \end{cases}
     /// $$
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -592,7 +580,6 @@ impl SaturatingMulSubMulAssign<Self, &Self, &Self> for Natural {
     /// \end{cases}
     /// $$
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -632,7 +619,6 @@ impl SaturatingMulSubMulAssign<&Self, Self, Self> for Natural {
     /// \end{cases}
     /// $$
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -672,7 +658,6 @@ impl SaturatingMulSubMulAssign<&Self, Self, &Self> for Natural {
     /// \end{cases}
     /// $$
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -712,7 +697,6 @@ impl SaturatingMulSubMulAssign<&Self, &Self, Self> for Natural {
     /// \end{cases}
     /// $$
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -752,7 +736,6 @@ impl SaturatingMulSubMulAssign<&Self, &Self, &Self> for Natural {
     /// \end{cases}
     /// $$
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///

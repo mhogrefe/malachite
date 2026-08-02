@@ -173,7 +173,7 @@ pub(crate) const MPN_CTX_NCRTS: usize = 8;
 pub(crate) const VEC_SZ: usize = 4;
 pub(crate) const MAX_NPROFILES: usize = 20;
 
-pub_test_struct! {
+crate_test_struct! {
     #[derive(Debug, Eq, PartialEq)]
     SerializedContext {
     pub(crate) ffts: [SerializedFFTContext; MPN_CTX_NCRTS],
@@ -196,7 +196,7 @@ pub_test_struct! {
 }}
 
 impl SerializedContext {
-    pub_test! {deserialize(self) -> Context {
+    private_test_fn! {deserialize(self) -> Context {
         let [f0, f1, f2, f3, f4, f5, f6, f7] = self.ffts;
         let [c0, c1, c2, c3, c4, c5, c6, c7] = self.crts;
         Context {
@@ -248,7 +248,7 @@ impl SerializedContext {
 }
 
 // This is mpn_ctx_struct from fft_small.h, FLINT 3.3.0-dev.
-pub_test_struct! {
+crate_test_struct! {
     #[derive(Debug, Default, Clone, PartialEq)]
 Context {
     pub(crate) ffts: [FFTContext; MPN_CTX_NCRTS],

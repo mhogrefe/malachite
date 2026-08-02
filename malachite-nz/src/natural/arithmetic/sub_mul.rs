@@ -44,7 +44,7 @@ const SUB_MUL_BASECASE_THRESHOLD: usize = 10;
 //
 // This is equivalent to `mpz_aorsmul_1` from `mpz/aorsmul_i.c`, GMP 6.2.1, where `w` and `x` are
 // positive, `sub` is negative, and `w` is returned instead of overwriting the first input.
-pub_crate_test! {limbs_sub_mul_limb_greater(
+crate_test_fn! {limbs_sub_mul_limb_greater(
     xs: &[Limb],
     ys: &[Limb],
     z: Limb
@@ -76,7 +76,7 @@ pub_crate_test! {limbs_sub_mul_limb_greater(
 // Panics if `xs` and `ys` have different lengths.
 //
 // This is equivalent to `mpn_submul_1` from `mpn/generic/submul_1.c`, GMP 6.2.1.
-pub_crate_test! {limbs_sub_mul_limb_same_length_in_place_left(
+crate_test_fn! {limbs_sub_mul_limb_same_length_in_place_left(
     xs: &mut [Limb],
     ys: &[Limb],
     z: Limb
@@ -116,7 +116,7 @@ pub_crate_test! {limbs_sub_mul_limb_same_length_in_place_left(
 //
 // This is equivalent to `mpn_submul_1` from `mpn/generic/submul_1.c`, GMP 6.2.1, but where the
 // first input may be longer than the second.
-pub_crate_test! {limbs_sub_mul_limb_greater_in_place_left(
+crate_test_fn! {limbs_sub_mul_limb_greater_in_place_left(
     xs: &mut [Limb],
     ys: &[Limb],
     limb: Limb
@@ -147,7 +147,7 @@ pub_crate_test! {limbs_sub_mul_limb_greater_in_place_left(
 // This is equivalent to `mpz_aorsmul_1` from `mpz/aorsmul_i.c`, GMP 6.2.1, where `w` and `x` are
 // positive and have the same lengths, sub is negative, and the lowest limbs of the result are
 // written to the second input rather than the first.
-pub_crate_test! {limbs_sub_mul_limb_same_length_in_place_right(
+crate_test_fn! {limbs_sub_mul_limb_same_length_in_place_right(
     xs: &[Limb],
     ys: &mut [Limb],
     z: Limb,
@@ -188,7 +188,7 @@ pub_crate_test! {limbs_sub_mul_limb_same_length_in_place_right(
 //
 // This is equivalent to `mpz_aorsmul_1` from `mpz/aorsmul_i.c`, GMP 6.2.1, where `w` and `x` are
 // positive, `sub` is negative, and the result is written to the second input rather than the first.
-pub_test! {limbs_sub_mul_limb_greater_in_place_right(
+private_test_fn! {limbs_sub_mul_limb_greater_in_place_right(
     xs: &[Limb],
     ys: &mut Vec<Limb>,
     z: Limb
@@ -229,7 +229,7 @@ pub_test! {limbs_sub_mul_limb_greater_in_place_right(
 // This is equivalent to `mpz_aorsmul` from `mpz/aorsmul.c`, GMP 6.2.1, where `w`, `x`, and `y` are
 // positive, `sub` is negative, negative results are converted to `None`, and `w` is returned
 // instead of overwriting the first input.
-pub_crate_test! {limbs_sub_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Option<Vec<Limb>> {
+crate_test_fn! {limbs_sub_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Option<Vec<Limb>> {
     let mut xs = xs.to_vec();
     if limbs_sub_mul_in_place_left(&mut xs, ys, zs) {
         None
@@ -260,7 +260,7 @@ pub_crate_test! {limbs_sub_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Option<
 //
 // This is equivalent to `mpz_aorsmul` from `mpz/aorsmul.c`, GMP 6.2.1, where `w`, `x`, and `y` are
 // positive, `sub` is negative and negative results are discarded.
-pub_crate_test! {limbs_sub_mul_in_place_left(xs: &mut [Limb], ys: &[Limb], zs: &[Limb]) -> bool {
+crate_test_fn! {limbs_sub_mul_in_place_left(xs: &mut [Limb], ys: &[Limb], zs: &[Limb]) -> bool {
     assert!(ys.len() > 1);
     assert!(zs.len() > 1);
     let (long, short) = if ys.len() >= zs.len() { (ys, zs) } else { (zs, ys) };

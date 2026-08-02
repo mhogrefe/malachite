@@ -37,9 +37,9 @@ fn test_mul_add_mul() {
 // The wide helper must agree with exact arithmetic done another way, so the checked, saturating,
 // wrapping, and overflowing variants are all cross-checked against each other and against the value
 // computed in a type twice as wide.
-fn mul_add_mul_properties_helper_int<T: PrimitiveInt, W: PrimitiveInt>(x: T, y: T, z: T, w: T)
+fn mul_add_mul_properties_helper_int<T: PrimitiveInt, W>(x: T, y: T, z: T, w: T)
 where
-    W: From<T> + TryInto<T>,
+    W: PrimitiveInt + From<T> + TryInto<T>,
 {
     let wrapped = x.mul_add_mul(y, z, w);
     assert_eq!(x.wrapping_mul_add_mul(y, z, w), wrapped);
@@ -86,18 +86,18 @@ where
     assert_eq!(x.mul_sub_mul(y, z.wrapping_neg(), w), wrapped);
 }
 
-fn mul_add_mul_properties_helper_unsigned<T: PrimitiveUnsigned, W: PrimitiveInt>()
+fn mul_add_mul_properties_helper_unsigned<T: PrimitiveUnsigned, W>()
 where
-    W: From<T> + TryInto<T>,
+    W: PrimitiveInt + From<T> + TryInto<T>,
 {
     unsigned_quadruple_gen::<T>().test_properties(|(x, y, z, w)| {
         mul_add_mul_properties_helper_int::<T, W>(x, y, z, w);
     });
 }
 
-fn mul_add_mul_properties_helper_signed<T: PrimitiveSigned, W: PrimitiveInt>()
+fn mul_add_mul_properties_helper_signed<T: PrimitiveSigned, W>()
 where
-    W: From<T> + TryInto<T>,
+    W: PrimitiveInt + From<T> + TryInto<T>,
 {
     signed_quadruple_gen::<T>().test_properties(|(x, y, z, w)| {
         mul_add_mul_properties_helper_int::<T, W>(x, y, z, w);

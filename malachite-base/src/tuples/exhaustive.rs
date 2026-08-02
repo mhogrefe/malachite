@@ -42,7 +42,7 @@ pub fn exhaustive_units() -> Once<()> {
 }
 
 // hack for macro
-pub_test! {
+private_test_fn! {
 #[inline]
 clone_helper<T: Clone>(x: &T, _i: usize) -> T {
     x.clone()

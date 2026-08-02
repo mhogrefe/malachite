@@ -207,8 +207,8 @@ fn average_prec_round_properties() {
             // every ownership variant agrees
             for (a, ao) in [
                 x.clone().average_prec_round_val_ref(&y, prec, rm),
-                (&x).average_prec_round_ref_val(y.clone(), prec, rm),
-                (&x).average_prec_round_ref_ref(&y, prec, rm),
+                x.average_prec_round_ref_val(y.clone(), prec, rm),
+                x.average_prec_round_ref_ref(&y, prec, rm),
             ] {
                 assert_eq!(ComparableFloatRef(&a), ComparableFloatRef(&avg));
                 assert_eq!(ao, o);

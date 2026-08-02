@@ -19,20 +19,22 @@ use std::str::FromStr;
 
 #[test]
 fn test_partial_cmp_primitive_float() {
-    let test = |u, v: f32, out: Option<Ordering>| {
-        let out_rev = out.map(Ordering::reverse);
-        assert_eq!(Natural::from_str(u).unwrap().partial_cmp(&v), out);
-        assert_eq!(rug::Integer::from_str(u).unwrap().partial_cmp(&v), out);
+    let test = |s, v: f32, out: Option<Ordering>| {
+        let u = Natural::from_str(s).unwrap();
 
-        assert_eq!(v.partial_cmp(&Natural::from_str(u).unwrap()), out_rev);
-        assert_eq!(v.partial_cmp(&rug::Integer::from_str(u).unwrap()), out_rev);
+        let out_rev = out.map(Ordering::reverse);
+        assert_eq!(u.partial_cmp(&v), out);
+        assert_eq!(rug::Integer::from_str(s).unwrap().partial_cmp(&v), out);
+
+        assert_eq!(v.partial_cmp(&u), out_rev);
+        assert_eq!(v.partial_cmp(&rug::Integer::from_str(s).unwrap()), out_rev);
 
         let v = f64::from(v);
-        assert_eq!(Natural::from_str(u).unwrap().partial_cmp(&v), out);
-        assert_eq!(rug::Integer::from_str(u).unwrap().partial_cmp(&v), out);
+        assert_eq!(u.partial_cmp(&v), out);
+        assert_eq!(rug::Integer::from_str(s).unwrap().partial_cmp(&v), out);
 
-        assert_eq!(v.partial_cmp(&Natural::from_str(u).unwrap()), out_rev);
-        assert_eq!(v.partial_cmp(&rug::Integer::from_str(u).unwrap()), out_rev);
+        assert_eq!(v.partial_cmp(&u), out_rev);
+        assert_eq!(v.partial_cmp(&rug::Integer::from_str(s).unwrap()), out_rev);
     };
     test("5", f32::NAN, None);
     test("5", f32::INFINITY, Some(Less));

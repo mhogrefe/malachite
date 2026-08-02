@@ -73,6 +73,8 @@ fn mod_euclidean_assign_fail() {
     x.mod_euclidean_assign(Integer::ZERO);
 }
 
+// It would be a little confusing to only pass y by value
+#[allow(clippy::needless_pass_by_value)]
 fn mod_euclidean_properties_helper(x: Integer, y: Integer) {
     let r = (&x).mod_euclidean(&y);
     assert!(r.is_valid());

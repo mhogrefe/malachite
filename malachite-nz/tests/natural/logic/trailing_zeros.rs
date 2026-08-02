@@ -44,12 +44,11 @@ fn limbs_trailing_zeros_fail_2() {
 
 #[test]
 fn test_trailing_zeros() {
-    let test = |n, out| {
-        assert_eq!(Natural::from_str(n).unwrap().trailing_zeros(), out);
-        assert_eq!(
-            natural_trailing_zeros_alt(&Natural::from_str(n).unwrap()),
-            out
-        );
+    let test = |s, out| {
+        let u = Natural::from_str(s).unwrap();
+
+        assert_eq!(u.trailing_zeros(), out);
+        assert_eq!(natural_trailing_zeros_alt(&u), out);
     };
     test("0", None);
     test("123", Some(0));

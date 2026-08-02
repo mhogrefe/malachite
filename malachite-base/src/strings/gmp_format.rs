@@ -57,7 +57,7 @@ fn read_digits(c: u8, mut fmt: &[u8]) -> Option<(i64, &[u8])> {
         n = n.checked_mul(10)?.checked_add(i64::from(d - b'0'))?;
         fmt = tail;
     }
-    if n > i64::from(i32::MAX) {
+    if n > const { i32::MAX as i64 } {
         return None;
     }
     Some((n, fmt))
@@ -156,7 +156,7 @@ pub fn parse_gmp_conversion_spec<'a>(
             }
             b'*' => {
                 let n = star()?;
-                if n.unsigned_abs() > u64::from(u32::wrapping_from(i32::MAX)) {
+                if n.unsigned_abs() > const { i32::MAX as u64 } {
                     return None;
                 }
                 if in_width {
@@ -267,7 +267,7 @@ fn justify(body: &[u8], spec: &GmpConversionSpec) -> Option<String> {
 // Whether `spec` is an integer conversion with no type character or with a C length modifier, which
 // is accepted but has no effect: the value is formatted as passed, and is never truncated the way
 // C's `%hd` would truncate an `int` argument.
-fn is_c_integer_spec(spec: &GmpConversionSpec) -> bool {
+const fn is_c_integer_spec(spec: &GmpConversionSpec) -> bool {
     matches!(spec.conv, b'd' | b'i' | b'u' | b'o' | b'x' | b'X')
         && matches!(
             spec.type_chr,

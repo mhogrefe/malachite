@@ -95,6 +95,8 @@ extern crate malachite_base;
 #[cfg(feature = "serde")]
 #[macro_use]
 extern crate serde;
+#[macro_use]
+mod macros;
 
 #[cfg(feature = "test_build")]
 extern crate itertools;
@@ -145,6 +147,7 @@ where
     }
 }
 
+#[allow(clippy::type_repetition_in_bounds)]
 #[doc(hidden)]
 pub fn emulate_constant_to_float_fn<T: PrimitiveFloat, F: Fn(u64) -> (Float, Ordering)>(f: F) -> T
 where

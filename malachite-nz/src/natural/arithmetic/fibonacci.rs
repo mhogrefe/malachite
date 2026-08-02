@@ -65,7 +65,7 @@ pub(crate) const fn limbs_fibonacci_pair_alloc_len(n: u64) -> usize {
 // squares, just by setting a bit. In F(2k + 1) with k even, the +2 is added after the subtraction.
 //
 // This is equivalent to `mpn_fib2_ui` from `mpn/generic/fib2_ui.c`, GMP 6.3.0.
-pub_crate_test! {limbs_fibonacci_pair(fs: &mut [Limb], f1s: &mut [Limb], n: u64) -> usize {
+crate_test_fn! {limbs_fibonacci_pair(fs: &mut [Limb], f1s: &mut [Limb], n: u64) -> usize {
     // Take a starting pair from the table.
     let mut mask = 1u64;
     let mut nfirst = n;
@@ -192,9 +192,9 @@ impl Fibonacci for Natural {
     /// ```
     ///
     /// This is equivalent to `mpz_fib_ui` from `mpz/fib_ui.c`, GMP 6.3.0.
-    fn fibonacci(n: u64) -> Natural {
+    fn fibonacci(n: u64) -> Self {
         if n <= FIB_TABLE_LIMIT {
-            return Natural::from(FIB_TABLE[usize::wrapping_from(n) + 1]);
+            return Self::from(FIB_TABLE[usize::wrapping_from(n) + 1]);
         }
         let n2 = n >> 1;
         let xalloc = limbs_fibonacci_pair_alloc_len(n2) + 1;
@@ -271,7 +271,7 @@ impl Fibonacci for Natural {
         out.truncate(size);
         // Give back the scratch capacity, so the returned value does not carry it around.
         out.shrink_to_fit();
-        Natural::from_owned_limbs_asc(out)
+        Self::from_owned_limbs_asc(out)
     }
 
     /// Computes the $n$th Fibonacci number, paired with its predecessor.
@@ -308,10 +308,10 @@ impl Fibonacci for Natural {
     ///
     /// This is equivalent to `mpz_fib2_ui` from `mpz/fib2_ui.c`, GMP 6.3.0.
     #[cfg_attr(dylint_lib = "malachite_lints", allow(adjacent_vec_allocations))]
-    fn fibonacci_pair(n: u64) -> (Natural, Natural) {
+    fn fibonacci_pair(n: u64) -> (Self, Self) {
         if n <= FIB_TABLE_LIMIT {
             let i = usize::wrapping_from(n);
-            return (Natural::from(FIB_TABLE[i + 1]), Natural::from(FIB_TABLE[i]));
+            return (Self::from(FIB_TABLE[i + 1]), Self::from(FIB_TABLE[i]));
         }
         let alloc = limbs_fibonacci_pair_alloc_len(n);
         // The two buffers stay separate allocations: both end up owned, and merging them would
@@ -323,8 +323,8 @@ impl Fibonacci for Natural {
         fs.truncate(size);
         f1s.truncate(size);
         (
-            Natural::from_owned_limbs_asc(fs),
-            Natural::from_owned_limbs_asc(f1s),
+            Self::from_owned_limbs_asc(fs),
+            Self::from_owned_limbs_asc(f1s),
         )
     }
 }
@@ -370,9 +370,9 @@ impl LucasNumber for Natural {
     ///
     /// This is equivalent to `mpz_lucnum_ui` from `mpz/lucnum_ui.c`, GMP 6.3.0.
     #[cfg_attr(dylint_lib = "malachite_lints", allow(adjacent_vec_allocations))]
-    fn lucas_number(mut n: u64) -> Natural {
+    fn lucas_number(mut n: u64) -> Self {
         if n <= FIB_TABLE_LUCNUM_LIMIT {
-            return Natural::from(one_limb_lucas_number(n));
+            return Self::from(one_limb_lucas_number(n));
         }
         // +1 since L(n) = F(n) + 2 * F(n - 1) might be 1 limb bigger than F(n), and +1 again since
         // the square or multiply below might need an extra limb over the true size.
@@ -401,7 +401,7 @@ impl LucasNumber for Natural {
                 assert_ne!(ys[ysize - 1], 0);
                 // xs = 2 * F(k) + F(k - 1)
                 let c = limbs_shl_add_same_length_in_place_left(&mut xs[..xsize], &ys[..xsize], 1);
-                assert!(lalloc >= xsize + 1);
+                assert!(lalloc > xsize);
                 xs[xsize] = c;
                 xsize += usize::from(c != 0);
                 assert_ne!(xs[xsize - 1], 0);
@@ -413,7 +413,7 @@ impl LucasNumber for Natural {
                 // ls = 5 * ls. GMP computes this as ls += 4 * ls, with a comment asking whether a
                 // mul-by-5 would be faster; here the mul is used, since it is a single pass.
                 let c = limbs_slice_mul_limb_in_place(&mut ls[..lsize], 5);
-                assert!(lalloc >= lsize + 1);
+                assert!(lalloc > lsize);
                 ls[lsize] = c;
                 lsize += usize::from(c != 0);
                 // ls -= 4 * (-1) ^ k
@@ -467,7 +467,7 @@ impl LucasNumber for Natural {
             assert_ne!(ls[lsize - 1], 0);
         }
         ls.truncate(lsize);
-        Natural::from_owned_limbs_asc(ls)
+        Self::from_owned_limbs_asc(ls)
     }
 
     /// Computes the $n$th Lucas number, paired with its predecessor.
@@ -509,14 +509,14 @@ impl LucasNumber for Natural {
     /// This is equivalent to `mpz_lucnum2_ui` from `mpz/lucnum2_ui.c`, GMP 6.3.0, except that GMP
     /// returns $L(-1) = -1$ for `n == 0`, which is not a [`Natural`], so this function panics
     /// instead.
-    fn lucas_number_pair(n: u64) -> (Natural, Natural) {
+    fn lucas_number_pair(n: u64) -> (Self, Self) {
         assert_ne!(n, 0, "L(-1) = -1 cannot be represented as a Natural");
         if n <= FIB_TABLE_LUCNUM_LIMIT {
             let i = usize::wrapping_from(n);
             let f = FIB_TABLE[i + 1];
             let f1 = FIB_TABLE[i];
             // L(n) = F(n) + 2 * F(n - 1) and L(n - 1) = 2 * F(n) - F(n - 1)
-            return (Natural::from(f + (f1 << 1)), Natural::from((f << 1) - f1));
+            return (Self::from(f + (f1 << 1)), Self::from((f << 1) - f1));
         }
         let alloc = limbs_fibonacci_pair_alloc_len(n);
         // L(n)'s buffer must end up owned, so it is the parent's prefix, with the F(n - 1) scratch
@@ -538,8 +538,8 @@ impl LucasNumber for Natural {
         // Give back the scratch capacity, so the returned value does not carry it around.
         out.shrink_to_fit();
         (
-            Natural::from_owned_limbs_asc(out),
-            Natural::from_owned_limbs_asc(l1s),
+            Self::from_owned_limbs_asc(out),
+            Self::from_owned_limbs_asc(l1s),
         )
     }
 }

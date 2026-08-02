@@ -14,7 +14,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::rounding_modes::RoundingMode::{self, Nearest};
 
 impl Average<Self> for Natural {
-    type Output = Natural;
+    type Output = Self;
 
     /// Computes the average (arithmetic mean) of two [`Natural`]s, taking both by value and
     /// rounding to the nearest integer. Two-way ties are broken by rounding to the even integer.
@@ -49,13 +49,13 @@ impl Average<Self> for Natural {
     /// assert_eq!(Natural::from(5u32).average(Natural::from(6u32)), 6);
     /// ```
     #[inline]
-    fn average(self, other: Self) -> Natural {
+    fn average(self, other: Self) -> Self {
         (self + other).shr_round(1u64, Nearest).0
     }
 }
 
 impl Average<&Self> for Natural {
-    type Output = Natural;
+    type Output = Self;
 
     /// Computes the average (arithmetic mean) of two [`Natural`]s, taking the first by value and
     /// the second by reference and rounding to the nearest integer. Two-way ties are broken by
@@ -91,7 +91,7 @@ impl Average<&Self> for Natural {
     /// assert_eq!(Natural::from(5u32).average(&Natural::from(6u32)), 6);
     /// ```
     #[inline]
-    fn average(self, other: &Self) -> Natural {
+    fn average(self, other: &Self) -> Self {
         (self + other).shr_round(1u64, Nearest).0
     }
 }
@@ -238,7 +238,7 @@ impl AverageAssign<&Self> for Natural {
 }
 
 impl AverageRound<Self> for Natural {
-    type Output = Natural;
+    type Output = Self;
 
     /// Computes the average (arithmetic mean) of two [`Natural`]s, taking both by value and
     /// rounding according to a specified rounding mode. An [`Ordering`] is also returned,
@@ -286,13 +286,13 @@ impl AverageRound<Self> for Natural {
     /// );
     /// ```
     #[inline]
-    fn average_round(self, other: Self, rm: RoundingMode) -> (Natural, Ordering) {
+    fn average_round(self, other: Self, rm: RoundingMode) -> (Self, Ordering) {
         (self + other).shr_round(1u64, rm)
     }
 }
 
 impl AverageRound<&Self> for Natural {
-    type Output = Natural;
+    type Output = Self;
 
     /// Computes the average (arithmetic mean) of two [`Natural`]s, taking the first by value and
     /// the second by reference and rounding according to a specified rounding mode. An [`Ordering`]
@@ -340,7 +340,7 @@ impl AverageRound<&Self> for Natural {
     /// );
     /// ```
     #[inline]
-    fn average_round(self, other: &Self, rm: RoundingMode) -> (Natural, Ordering) {
+    fn average_round(self, other: &Self, rm: RoundingMode) -> (Self, Ordering) {
         (self + other).shr_round(1u64, rm)
     }
 }

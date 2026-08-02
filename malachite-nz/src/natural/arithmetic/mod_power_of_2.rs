@@ -37,7 +37,7 @@ use malachite_base::slices::slice_set_zero;
 //
 // This is equivalent to `mpz_tdiv_r_2exp` from `mpz/tdiv_r_2exp.c`, GMP 6.2.1, where in is
 // non-negative and the result is returned.
-pub_test! {limbs_mod_power_of_2(xs: &[Limb], pow: u64) -> Vec<Limb> {
+private_test_fn! {limbs_mod_power_of_2(xs: &[Limb], pow: u64) -> Vec<Limb> {
     if pow == 0 {
         return Vec::new();
     }
@@ -64,7 +64,7 @@ pub_test! {limbs_mod_power_of_2(xs: &[Limb], pow: u64) -> Vec<Limb> {
 // This is equivalent to `mpz_tdiv_r_2exp` from `mpz/tdiv_r_2exp.c`, GMP 6.2.1, where `in` is
 // non-negative, `res == in`, and instead of possibly being truncated, the high limbs of `res` are
 // possibly filled with zeros.
-pub_crate_test! {limbs_slice_mod_power_of_2_in_place(xs: &mut [Limb], pow: u64) {
+crate_test_fn! {limbs_slice_mod_power_of_2_in_place(xs: &mut [Limb], pow: u64) {
     if pow == 0 {
         slice_set_zero(xs);
         return;
@@ -89,7 +89,7 @@ pub_crate_test! {limbs_slice_mod_power_of_2_in_place(xs: &mut [Limb], pow: u64) 
 //
 // This is equivalent to `mpz_tdiv_r_2exp` from `mpz/tdiv_r_2exp.c`, GMP 6.2.1, where `in` is
 // non-negative and `res == in`.
-pub_crate_test! {limbs_vec_mod_power_of_2_in_place(xs: &mut Vec<Limb>, pow: u64) {
+crate_test_fn! {limbs_vec_mod_power_of_2_in_place(xs: &mut Vec<Limb>, pow: u64) {
     if pow == 0 {
         xs.clear();
         return;
@@ -118,7 +118,7 @@ pub_crate_test! {limbs_vec_mod_power_of_2_in_place(xs: &mut Vec<Limb>, pow: u64)
 //
 // This is equivalent to `mpz_tdiv_r_2exp` from `mpz/tdiv_r_2exp.c`, GMP 6.2.1, where `in` is
 // negative and the result is returned. `xs` is the limbs of `-in`.
-pub_crate_test! {limbs_neg_mod_power_of_2(xs: &[Limb], pow: u64) -> Vec<Limb> {
+crate_test_fn! {limbs_neg_mod_power_of_2(xs: &[Limb], pow: u64) -> Vec<Limb> {
     let mut result = xs.to_vec();
     limbs_neg_mod_power_of_2_in_place(&mut result, pow);
     result
@@ -137,7 +137,7 @@ pub_crate_test! {limbs_neg_mod_power_of_2(xs: &[Limb], pow: u64) -> Vec<Limb> {
 //
 // This is equivalent to `mpz_tdiv_r_2exp` from `mpz/tdiv_r_2exp.c`, GMP 6.2.1, where `in` is
 // negative and `res == in`. `xs` is the limbs of `-in`.
-pub_crate_test! {limbs_neg_mod_power_of_2_in_place(xs: &mut Vec<Limb>, pow: u64) {
+crate_test_fn! {limbs_neg_mod_power_of_2_in_place(xs: &mut Vec<Limb>, pow: u64) {
     let new_size = bit_to_limb_count_ceiling(pow);
     xs.resize(new_size, 0);
     limbs_twos_complement_in_place(xs);

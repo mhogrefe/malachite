@@ -62,7 +62,7 @@ fn exp_x_minus_1_prec_round_normal(x: &Float, prec: u64, rm: RoundingMode) -> (F
     // `power_of_2_x_minus_1`'s smallest-binade guard; positive x needs none, since expm1(x) > x.)
     // The rational near-zero helper computes the result exactly, underflow rounding included; it is
     // only reached when the shortcut above failed, i.e. at prec >= -MIN_EXPONENT.
-    if x.is_sign_negative() && ex == i64::from(Float::MIN_EXPONENT) {
+    if x.is_sign_negative() && ex == Float::MIN_EXPONENT_I64 {
         return exp_x_minus_1_rational_near_zero(&Rational::exact_from(x), prec, rm);
     }
     // The result is never exactly representable for finite nonzero x.
@@ -88,7 +88,7 @@ fn exp_x_minus_1_prec_round_normal(x: &Float, prec: u64, rm: RoundingMode) -> (F
         let (clamped, err, s_est) = if exp_t > 31 {
             (
                 true,
-                u64::exact_from(Float::MAX_EXPONENT),
+                Float::MAX_EXPONENT_U64,
                 if exp_t > 64 {
                     u64::MAX
                 } else {
@@ -100,7 +100,7 @@ fn exp_x_minus_1_prec_round_normal(x: &Float, prec: u64, rm: RoundingMode) -> (F
             const MAX_EXP: Integer = Integer::const_from_signed(Float::MAX_EXPONENT as SignedLimb);
             let clamped = neg_ceil >= MAX_EXP;
             let err = if clamped {
-                u64::exact_from(Float::MAX_EXPONENT)
+                Float::MAX_EXPONENT_U64
             } else {
                 u64::exact_from(&neg_ceil)
             };
@@ -290,7 +290,7 @@ fn exp_x_minus_1_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (
         }
         // exp(x) is far below ulp(-1) at any precision, so expm1(x) rounds to -1 or its toward-zero
         // neighbor.
-        let err = u64::exact_from(Float::MAX_EXPONENT);
+        let err = Float::MAX_EXPONENT_U64;
         if let Some(result) = float_round_near_x(&Float::NEGATIVE_ONE, err, false, prec, rm) {
             return result;
         }

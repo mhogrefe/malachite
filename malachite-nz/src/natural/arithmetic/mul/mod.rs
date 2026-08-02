@@ -44,7 +44,6 @@ use crate::platform::{
     MUL_TOOM44_THRESHOLD,
 };
 use alloc::vec::Vec;
-use core::cmp::max;
 use core::iter::Product;
 use core::ops::{Mul, MulAssign};
 use malachite_base::num::basic::traits::{One, Zero};
@@ -66,7 +65,7 @@ const MUL_TOOM33_THRESHOLD_LIMIT_MINUS_1: usize = MUL_TOOM33_THRESHOLD_LIMIT - 1
 // Panics if `xs` is shorter than `ys` or `ys` is empty.
 //
 // This is equivalent to `mpn_mul` from `mpn/generic/mul.c`, GMP 6.2.1, where `prodp` is returned.
-pub_test! {limbs_mul_greater(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
+private_test_fn! {limbs_mul_greater(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let out_len = xs_len + ys_len;
@@ -95,7 +94,7 @@ pub_test! {limbs_mul_greater(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 //
 // This is equivalent to `mpn_mul` from mpn/generic/mul.c, GMP 6.2.1, where `un` may be less than
 // `vn` and `prodp` is returned.
-pub_crate_test! {limbs_mul(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
+crate_test_fn! {limbs_mul(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     if xs.len() >= ys.len() {
         limbs_mul_greater(xs, ys)
     } else {
@@ -103,14 +102,17 @@ pub_crate_test! {limbs_mul(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     }
 }}
 
-pub_crate_test! { limbs_mul_same_length_to_out_scratch_len(len: usize) -> usize {
+crate_test_const_fn! { limbs_mul_same_length_to_out_scratch_len(len: usize) -> usize {
     if len < MUL_TOOM22_THRESHOLD {
         0
     } else if len < MUL_TOOM33_THRESHOLD {
-        limbs_mul_greater_to_out_toom_22_scratch_len(
+        // The arguments are constants, so this whole recursion is worth folding away rather than
+        // walking on every multiplication of this size.
+        const TOOM_22: usize = limbs_mul_greater_to_out_toom_22_scratch_len(
             MUL_TOOM33_THRESHOLD_LIMIT_MINUS_1,
             MUL_TOOM33_THRESHOLD_LIMIT_MINUS_1,
-        )
+        );
+        TOOM_22
     } else if len < MUL_TOOM44_THRESHOLD {
         limbs_mul_greater_to_out_toom_33_scratch_len(len, len)
     } else if len < MUL_TOOM6H_THRESHOLD {
@@ -141,7 +143,7 @@ pub_crate_test! { limbs_mul_same_length_to_out_scratch_len(len: usize) -> usize 
 // Panics if `out` is too short, `xs` and `ys` have different lengths, or either slice is empty.
 //
 // This is equivalent to `mpn_mul_n` from `mpn/generic/mul_n.c`, GMP 6.2.1.
-pub_crate_test! {limbs_mul_same_length_to_out(
+crate_test_fn! {limbs_mul_same_length_to_out(
     out: &mut [Limb],
     xs: &[Limb],
     ys: &[Limb],
@@ -180,13 +182,14 @@ pub_crate_test! {limbs_mul_same_length_to_out(
 }}
 
 // This is equivalent to `TOOM44_OK` from `mpn/generic/mul.c`, GMP 6.2.1.
-pub_const_crate_test! {toom44_ok(xs_len: usize, ys_len: usize) -> bool {
+crate_test_const_fn! {toom44_ok(xs_len: usize, ys_len: usize) -> bool {
     12 + 3 * xs_len < ys_len << 2
 }}
 
-pub_crate_test! { limbs_mul_greater_to_out_scratch_len(xs_len: usize, ys_len: usize) -> usize {
+crate_test_const_fn! { limbs_mul_greater_to_out_scratch_len(xs_len: usize, ys_len: usize) -> usize {
     assert!(xs_len >= ys_len);
-    assert_ne!(ys_len, 0);
+    // `assert_ne!` is not usable in a `const fn`.
+    assert!(ys_len != 0);
     if xs_len == ys_len {
         limbs_mul_same_length_to_out_scratch_len(xs_len)
     } else if ys_len < MUL_TOOM22_THRESHOLD {
@@ -210,7 +213,7 @@ pub_crate_test! { limbs_mul_greater_to_out_scratch_len(xs_len: usize, ys_len: us
             } else {
                 limbs_mul_greater_to_out_toom_42_scratch_len(xs_len, ys_len)
             };
-            max(first_mul_scratch_len, second_mul_scratch_len) + four_ys_len
+            max!(first_mul_scratch_len, second_mul_scratch_len) + four_ys_len
         } else if xs_len << 2 < 5 * ys_len {
             limbs_mul_greater_to_out_toom_22_scratch_len(xs_len, ys_len)
         } else if xs_len << 2 < 7 * ys_len {
@@ -234,7 +237,7 @@ pub_crate_test! { limbs_mul_greater_to_out_scratch_len(xs_len: usize, ys_len: us
                     xs_len -= two_ys_len;
                 }
                 let second_mul_scratch_len = limbs_mul_to_out_scratch_len(xs_len, ys_len);
-                max(first_mul_scratch_len, second_mul_scratch_len) + four_ys_len
+                max!(first_mul_scratch_len, second_mul_scratch_len) + four_ys_len
             } else if 6 * xs_len < 7 * ys_len {
                 limbs_mul_greater_to_out_toom_33_scratch_len(xs_len, ys_len)
             } else if xs_len << 1 < 3 * ys_len {
@@ -272,7 +275,7 @@ pub_crate_test! { limbs_mul_greater_to_out_scratch_len(xs_len: usize, ys_len: us
     }
 }}
 
-pub_const_crate_test_const! {FFT_MUL_THRESHOLD: usize = 1000;}
+crate_test_const! {FFT_MUL_THRESHOLD: usize = 1000;}
 
 // Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 // the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
@@ -291,7 +294,7 @@ pub_const_crate_test_const! {FFT_MUL_THRESHOLD: usize = 1000;}
 // Panics if `out` is too short, `xs` is shorter than `ys`, or `ys` is empty.
 //
 // This is _flint_mpn_mul from mpn_extras/mul.c, FLINT 3.3.0-dev.
-pub_crate_test! {limbs_mul_greater_to_out(
+crate_test_fn! {limbs_mul_greater_to_out(
     out: &mut [Limb],
     xs: &[Limb],
     ys: &[Limb],
@@ -313,7 +316,7 @@ pub_crate_test! {limbs_mul_greater_to_out(
     out[xs_len + ys_len - 1]
 }}
 
-pub_crate_test! {limbs_mul_greater_to_out_old(
+crate_test_fn! {limbs_mul_greater_to_out_old(
     out: &mut [Limb],
     xs: &[Limb],
     ys: &[Limb],
@@ -445,7 +448,7 @@ pub_crate_test! {limbs_mul_greater_to_out_old(
     out[xs_len + ys_len - 1]
 }}
 
-pub_crate_test! {limbs_mul_to_out_scratch_len(xs_len: usize, ys_len: usize) -> usize {
+crate_test_const_fn! {limbs_mul_to_out_scratch_len(xs_len: usize, ys_len: usize) -> usize {
     if xs_len >= ys_len {
         limbs_mul_greater_to_out_scratch_len(xs_len, ys_len)
     } else {
@@ -470,7 +473,7 @@ pub_crate_test! {limbs_mul_to_out_scratch_len(xs_len: usize, ys_len: usize) -> u
 //
 // This is equivalent to `mpn_mul` from `mpn/generic/mul.c`, GMP 6.2.1, where `un` may be less than
 // `vn`.
-pub_crate_test! {limbs_mul_to_out(
+crate_test_fn! {limbs_mul_to_out(
     out: &mut [Limb],
     xs: &[Limb],
     ys: &[Limb],
@@ -505,7 +508,7 @@ pub_crate_test! {limbs_mul_to_out(
 // Panics if `out` is too short, `xs` is shorter than `ys`, or `ys` is empty.
 //
 // This is equivalent to `mpn_mul_basecase` from `mpn/generic/mul_basecase.c`, GMP 6.2.1.
-pub_crate_test! {limbs_mul_greater_to_out_basecase(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
+crate_test_fn! {limbs_mul_greater_to_out_basecase(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert_ne!(ys_len, 0);

@@ -251,7 +251,7 @@ pub(crate) fn extended_log_base_2_of_rational(r: &Rational, prec: u64) -> Extend
     // Switch to the linear approximation a couple of exponents before that boundary; the ordinary
     // path is then guaranteed not to underflow, and the linear path is valid well beyond it.
     let y = r - Rational::ONE;
-    if y.floor_log_base_2_abs() <= i64::from(Float::MIN_EXPONENT) + 1 {
+    if y.floor_log_base_2_abs() <= Float::MIN_EXPONENT_PLUS_1_I64 {
         let y_ext = ExtendedFloat::from_rational_prec_round(y, prec, Nearest).0;
         let ln_2 = ExtendedFloat::from(Float::ln_2_prec(prec).0);
         y_ext.div_prec_val_ref(&ln_2, prec).0

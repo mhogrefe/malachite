@@ -31,7 +31,7 @@ use malachite_base::num::conversion::traits::{HasHalf, SplitInHalf};
 //
 // This is equivalent to `mpn_mul_1` from `mpn/generic/mul_1.c`, GMP 6.2.1, where the result is
 // returned.
-pub_test! {limbs_mul_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
+private_test_fn! {limbs_mul_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
     let mut carry = 0;
     let y = DoubleLimb::from(y);
     let mut out = Vec::with_capacity(xs.len());
@@ -62,7 +62,7 @@ pub_test! {limbs_mul_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
 // Panics if `out` is shorter than `xs`.
 //
 // This is equivalent to `mul_1c` from `gmp-impl.h`, GMP 6.2.1.
-pub_crate_test! {limbs_mul_limb_with_carry_to_out<
+crate_test_fn! {limbs_mul_limb_with_carry_to_out<
     DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + SplitInHalf,
     T: PrimitiveUnsigned,
 >(
@@ -94,7 +94,7 @@ pub_crate_test! {limbs_mul_limb_with_carry_to_out<
 // Panics if `out` is shorter than `xs`.
 //
 // This is equivalent to `mpn_mul_1` from `mpn/generic/mul_1.c`, GMP 6.2.1.
-pub_crate_test! {limbs_mul_limb_to_out<
+crate_test_fn! {limbs_mul_limb_to_out<
     DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + SplitInHalf,
     T: PrimitiveUnsigned,
 >(
@@ -118,7 +118,7 @@ pub_crate_test! {limbs_mul_limb_to_out<
 //
 // This is equivalent to `mul_1c` from `gmp-impl.h`, GMP 6.2.1, where the output is the same as the
 // input.
-pub_crate_test! {limbs_slice_mul_limb_with_carry_in_place(
+crate_test_fn! {limbs_slice_mul_limb_with_carry_in_place(
     xs: &mut [Limb],
     y: Limb,
     mut carry: Limb
@@ -142,7 +142,7 @@ pub_crate_test! {limbs_slice_mul_limb_with_carry_in_place(
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // This is equivalent to `mpn_mul_1` from `mpn/generic/mul_1.c`, GMP 6.2.1, where `rp == up`.
-pub_crate_test! {limbs_slice_mul_limb_in_place(xs: &mut [Limb], y: Limb) -> Limb {
+crate_test_fn! {limbs_slice_mul_limb_in_place(xs: &mut [Limb], y: Limb) -> Limb {
     limbs_slice_mul_limb_with_carry_in_place(xs, y, 0)
 }}
 
@@ -158,7 +158,7 @@ pub_crate_test! {limbs_slice_mul_limb_in_place(xs: &mut [Limb], y: Limb) -> Limb
 //
 // This is equivalent to `mpn_mul_1` from `mpn/generic/mul_1.c`, GMP 6.2.1, where the `rp == up` and
 // instead of returning the carry, it is appended to `rp`.
-pub_test! {limbs_vec_mul_limb_in_place(xs: &mut Vec<Limb>, y: Limb) {
+private_test_fn! {limbs_vec_mul_limb_in_place(xs: &mut Vec<Limb>, y: Limb) {
     let carry = limbs_slice_mul_limb_in_place(xs, y);
     if carry != 0 {
         xs.push(carry);

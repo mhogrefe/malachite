@@ -29,7 +29,7 @@ use core::ops::{BitXor, BitXorAssign};
 //
 // # Panics
 // Panics if `xs` is empty.
-pub_test! {limbs_xor_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
+private_test_fn! {limbs_xor_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
     let mut result = xs.to_vec();
     limbs_xor_limb_in_place(&mut result, y);
     result
@@ -48,7 +48,7 @@ pub_test! {limbs_xor_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
 //
 // # Panics
 // Panics if `out` is shorter than `xs` or if `xs` is empty.
-pub_test! {limbs_xor_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) {
+private_test_fn! {limbs_xor_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) {
     out[..xs.len()].copy_from_slice(xs);
     limbs_xor_limb_in_place(out, y);
 }}
@@ -61,7 +61,7 @@ pub_test! {limbs_xor_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) {
 //
 // # Panics
 // Panics if `xs` is empty.
-pub_test! {limbs_xor_limb_in_place(xs: &mut [Limb], y: Limb) {
+private_test_fn! {limbs_xor_limb_in_place(xs: &mut [Limb], y: Limb) {
     xs[0] ^= y;
 }}
 
@@ -80,7 +80,7 @@ pub_test! {limbs_xor_limb_in_place(xs: &mut [Limb], y: Limb) {
 //
 // # Panics
 // Panics if `xs` and `ys` have different lengths.
-pub_test! {limbs_xor_same_length(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
+private_test_fn! {limbs_xor_same_length(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     assert_eq!(xs.len(), ys.len());
     xs.iter().zip(ys.iter()).map(|(x, y)| x ^ y).collect()
 }}
@@ -98,7 +98,7 @@ pub_test! {limbs_xor_same_length(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 //
 // This is equivalent to `mpz_xor` from `mpz/xor.c`, GMP 6.2.1, where `res` is returned and both
 // inputs are non-negative.
-pub_test! {limbs_xor(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
+private_test_fn! {limbs_xor(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let mut result;
@@ -127,7 +127,7 @@ pub_test! {limbs_xor(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 // Panics if `xs` and `ys` have different lengths or if `out` is too short.
 //
 // This is equivalent to `mpn_xor_n` from `gmp-impl.h`, GMP 6.2.1.
-pub_test! {limbs_xor_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
+private_test_fn! {limbs_xor_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let len = xs.len();
     assert_eq!(len, ys.len());
     assert!(out.len() >= len);
@@ -151,7 +151,7 @@ pub_test! {limbs_xor_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Lim
 // Panics if `out` is too short.
 //
 // This is equivalent to `mpz_xor` from `mpz/xor.c`, GMP 6.2.1, where both inputs are non-negative.
-pub_test! {limbs_xor_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
+private_test_fn! {limbs_xor_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     if xs_len >= ys_len {
@@ -179,7 +179,7 @@ pub_test! {limbs_xor_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 // Panics if `xs` and `ys` have different lengths.
 //
 // This is equivalent to `mpn_xor_n` from `gmp-impl.h`, GMP 6.2.1, where `rp == up`.
-pub_test! {limbs_xor_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
+private_test_fn! {limbs_xor_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
     assert_eq!(xs.len(), ys.len());
     for (x, y) in xs.iter_mut().zip(ys.iter()) {
         *x ^= y;

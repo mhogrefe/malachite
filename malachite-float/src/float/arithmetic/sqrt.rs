@@ -32,7 +32,7 @@ use malachite_nz::natural::arithmetic::float_sqrt::{
 use malachite_nz::platform::Limb;
 use malachite_q::Rational;
 
-pub_crate_test! {
+crate_test_fn! {
 generic_sqrt_rational_ref(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
     let mut working_prec = prec + 10;
     let mut increment = Limb::WIDTH;

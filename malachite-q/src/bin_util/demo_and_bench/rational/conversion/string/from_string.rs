@@ -110,7 +110,7 @@ fn benchmark_rational_from_string_base(
         file_name,
         &pair_1_rational_bit_bucketer("x"),
         &mut [("Malachite", &mut |(x, base)| {
-            no_out!(Rational::from_string_base(base, &x.to_string_base(base)))
+            no_out!(Rational::from_string_base(base, &x.to_string_base(base)));
         })],
     );
 }

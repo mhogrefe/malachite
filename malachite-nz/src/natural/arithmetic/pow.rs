@@ -51,7 +51,7 @@ use malachite_base::slices::slice_leading_zeros;
 // $M(n, m) = O(nm \log (nm))$
 //
 // where $T$ is time, $M$ is additional memory, $n$ is `xs.len()`, and $m$ is `exp`.
-pub_crate_test! {limbs_pow(xs: &[Limb], exp: u64) -> Vec<Limb> {
+crate_test_fn! {limbs_pow(xs: &[Limb], exp: u64) -> Vec<Limb> {
     let mut out = Vec::new();
     let out_len = limbs_pow_to_out(&mut out, xs, exp);
     out.truncate(out_len);

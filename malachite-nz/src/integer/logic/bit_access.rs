@@ -37,7 +37,7 @@ use malachite_base::slices::{slice_leading_zeros, slice_test_zero};
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // This is equivalent to `mpz_tstbit` from `mpz/tstbit.c`, GMP 6.2.1, where `d` is negative.
-pub_test! {limbs_get_bit_neg(xs: &[Limb], index: u64) -> bool {
+private_test_fn! {limbs_get_bit_neg(xs: &[Limb], index: u64) -> bool {
     let x_i = bit_to_limb_count_floor(index);
     if x_i >= xs.len() {
         // We're indexing into the infinite suffix of 1s
@@ -69,7 +69,7 @@ pub_test! {limbs_get_bit_neg(xs: &[Limb], index: u64) -> bool {
 // If the slice contains only zeros a panic may occur.
 //
 // This is equivalent to `mpz_setbit` from `mpz/setbit.c`, GMP 6.2.1, where `d` is negative.
-pub_test! {limbs_set_bit_neg(xs: &mut [Limb], index: u64) {
+private_test_fn! {limbs_set_bit_neg(xs: &mut [Limb], index: u64) {
     let x_i = bit_to_limb_count_floor(index);
     if x_i >= xs.len() {
         return;
@@ -159,7 +159,7 @@ pub fn limbs_slice_clear_bit_neg(xs: &mut [Limb], index: u64) {
 // If the slice contains only zeros a panic may occur.
 //
 // This is equivalent to `mpz_clrbit` from `mpz/clrbit.c`, GMP 6.2.1, where `d` is negative.
-pub_test! {limbs_vec_clear_bit_neg(xs: &mut Vec<Limb>, index: u64) {
+private_test_fn! {limbs_vec_clear_bit_neg(xs: &mut Vec<Limb>, index: u64) {
     let x_i = bit_to_limb_count_floor(index);
     let reduced_index = index & Limb::WIDTH_MASK;
     if x_i < xs.len() {

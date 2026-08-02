@@ -145,11 +145,20 @@ impl Float {
     // Exponent bounds derived from `MIN_EXPONENT`/`MAX_EXPONENT`, written out once and shared by
     // the exponent-range checks throughout the crate.
     pub(crate) const MIN_EXPONENT_MINUS_1: i32 = Self::MIN_EXPONENT - 1;
+    pub(crate) const MIN_EXPONENT_MINUS_1_I64: i64 = Self::MIN_EXPONENT_MINUS_1 as i64;
     pub(crate) const MIN_EXPONENT_PLUS_2: i32 = Self::MIN_EXPONENT + 2;
     pub(crate) const MIN_EXPONENT_I64: i64 = Self::MIN_EXPONENT as i64;
     pub(crate) const MIN_EXPONENT_MINUS_2_I64: i64 = (Self::MIN_EXPONENT - 2) as i64;
     pub(crate) const MAX_EXPONENT_I64: i64 = Self::MAX_EXPONENT as i64;
     pub(crate) const MAX_EXPONENT_U64: u64 = Self::MAX_EXPONENT as u64;
+    pub(crate) const MIN_EXPONENT_PLUS_1_I64: i64 = Self::MIN_EXPONENT_I64 + 1;
+    pub(crate) const MIN_EXPONENT_PLUS_2_I64: i64 = Self::MIN_EXPONENT_I64 + 2;
+    pub(crate) const MIN_EXPONENT_PLUS_4_I64: i64 = Self::MIN_EXPONENT_I64 + 4;
+    pub(crate) const MIN_EXPONENT_PLUS_8_I64: i64 = Self::MIN_EXPONENT_I64 + 8;
+    pub(crate) const MAX_EXPONENT_MINUS_2_I64: i64 = Self::MAX_EXPONENT_I64 - 2;
+    // The largest precision for which the near-one fast paths are safe: any more and the
+    // intermediate exponent could fall below `MIN_EXPONENT`.
+    pub(crate) const NEAR_ONE_MAX_PREC: u64 = (-Self::MIN_EXPONENT_I64 - 8) as u64;
 
     #[cfg(feature = "test_build")]
     pub fn is_valid(&self) -> bool {

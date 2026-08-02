@@ -39,7 +39,7 @@ use malachite_base::vecs::vec_delete_left;
 //
 // # Panics
 // Panics if `start > end`.
-pub_test! {limbs_neg_limb_get_bits(x: Limb, start: u64, end: u64) -> Vec<Limb> {
+private_test_fn! {limbs_neg_limb_get_bits(x: Limb, start: u64, end: u64) -> Vec<Limb> {
     assert!(start <= end);
     let trailing_zeros = TrailingZeros::trailing_zeros(x);
     if trailing_zeros >= end {
@@ -81,7 +81,7 @@ pub_test! {limbs_neg_limb_get_bits(x: Limb, start: u64, end: u64) -> Vec<Limb> {
 //
 // # Panics
 // Panics if `start > end`.
-pub_test! {limbs_slice_neg_get_bits(xs: &[Limb], start: u64, end: u64) -> Vec<Limb> {
+private_test_fn! {limbs_slice_neg_get_bits(xs: &[Limb], start: u64, end: u64) -> Vec<Limb> {
     assert!(start <= end);
     let trailing_zeros = limbs_trailing_zeros(xs);
     if trailing_zeros >= end {
@@ -132,7 +132,7 @@ pub_test! {limbs_slice_neg_get_bits(xs: &[Limb], start: u64, end: u64) -> Vec<Li
 //
 // # Panics
 // Panics if `start > end`.
-pub_test! {limbs_vec_neg_get_bits(mut xs: Vec<Limb>, start: u64, end: u64) -> Vec<Limb> {
+private_test_fn! {limbs_vec_neg_get_bits(mut xs: Vec<Limb>, start: u64, end: u64) -> Vec<Limb> {
     assert!(start <= end);
     let trailing_zeros = limbs_trailing_zeros(&xs);
     if trailing_zeros >= end {
@@ -181,7 +181,7 @@ pub_test! {limbs_vec_neg_get_bits(mut xs: Vec<Limb>, start: u64, end: u64) -> Ve
 //
 // # Panics
 // Panics if `start >= end` or `xs` only contains zeros.
-pub_test! {limbs_neg_assign_bits(xs: &mut Vec<Limb>, start: u64, end: u64, bits: &[Limb]) {
+private_test_fn! {limbs_neg_assign_bits(xs: &mut Vec<Limb>, start: u64, end: u64, bits: &[Limb]) {
     assert!(start < end);
     assert!(!limbs_sub_limb_in_place(xs, 1));
     limbs_assign_bits_helper(xs, start, end, bits, true);

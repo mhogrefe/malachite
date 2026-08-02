@@ -34,7 +34,7 @@ use malachite_base::slices::{slice_leading_zeros, slice_test_zero};
 //
 // # Panics
 // Panics if `xs` and `ys` have different lengths.
-pub_crate_test! {limbs_cmp_same_length(xs: &[Limb], ys: &[Limb]) -> Ordering {
+crate_test_fn! {limbs_cmp_same_length(xs: &[Limb], ys: &[Limb]) -> Ordering {
     assert_eq!(xs.len(), ys.len());
     xs.iter().rev().cmp(ys.iter().rev())
 }}
@@ -51,7 +51,7 @@ pub_crate_test! {limbs_cmp_same_length(xs: &[Limb], ys: &[Limb]) -> Ordering {
 //
 // # Panics
 // Panics if the last element of `xs` or `ys` is zero.
-pub_crate_test! {limbs_cmp(xs: &[Limb], ys: &[Limb]) -> Ordering {
+crate_test_fn! {limbs_cmp(xs: &[Limb], ys: &[Limb]) -> Ordering {
     assert_ne!(xs.last(), Some(&0));
     assert_ne!(ys.last(), Some(&0));
     xs.len()
@@ -80,7 +80,7 @@ pub_crate_test! {limbs_cmp(xs: &[Limb], ys: &[Limb]) -> Ordering {
 // $M(n) = O(1)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
-pub_test! {limbs_cmp_double(xs: &[Limb], ys: &[Limb]) -> Ordering {
+private_test_fn! {limbs_cmp_double(xs: &[Limb], ys: &[Limb]) -> Ordering {
     let ys_len = ys.len();
     // whether doubling carries into a limb of its own
     let high = ys[ys_len - 1] >> WIDTH_MINUS_1;
@@ -110,7 +110,7 @@ pub_test! {limbs_cmp_double(xs: &[Limb], ys: &[Limb]) -> Ordering {
     Equal
 }}
 
-pub_test! {limbs_cmp_normalized(xs: &[Limb], ys: &[Limb]) -> Ordering {
+private_test_fn! {limbs_cmp_normalized(xs: &[Limb], ys: &[Limb]) -> Ordering {
     let mut xs = &xs[slice_leading_zeros(xs)..];
     let mut ys = &ys[slice_leading_zeros(ys)..];
     let mut xs_leading = LeadingZeros::leading_zeros(*xs.last().unwrap());

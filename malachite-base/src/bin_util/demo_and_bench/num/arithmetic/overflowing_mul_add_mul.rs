@@ -106,7 +106,7 @@ fn benchmark_overflowing_mul_add_mul_unsigned<T: PrimitiveUnsigned>(
         file_name,
         &quadruple_max_bit_bucketer("x", "y", "z", "w"),
         &mut [("Malachite", &mut |(x, y, z, w)| {
-            no_out!(x.overflowing_mul_add_mul(y, z, w))
+            no_out!(x.overflowing_mul_add_mul(y, z, w));
         })],
     );
 }
@@ -132,7 +132,7 @@ fn benchmark_overflowing_mul_add_mul_signed<T: PrimitiveSigned>(
         file_name,
         &quadruple_max_bit_bucketer("x", "y", "z", "w"),
         &mut [("Malachite", &mut |(x, y, z, w)| {
-            no_out!(x.overflowing_mul_add_mul(y, z, w))
+            no_out!(x.overflowing_mul_add_mul(y, z, w));
         })],
     );
 }

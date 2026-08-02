@@ -69,7 +69,7 @@ pub fn char_is_graphic(c: char) -> bool {
 }
 
 impl CharType {
-    pub_crate_test! {contains(self, c: char) -> bool {
+    crate_test_fn! {contains(self, c: char) -> bool {
         match self {
             Self::AsciiLower => c.is_ascii_lowercase(),
             Self::AsciiUpper => c.is_ascii_uppercase(),

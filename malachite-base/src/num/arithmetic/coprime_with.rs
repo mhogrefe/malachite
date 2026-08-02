@@ -9,7 +9,7 @@
 use crate::num::arithmetic::traits::CoprimeWith;
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
 
-pub_test! {coprime_with_check_2<T: PrimitiveUnsigned>(x: T, y: T) -> bool {
+private_test_fn! {coprime_with_check_2<T: PrimitiveUnsigned>(x: T, y: T) -> bool {
     (x.odd() || y.odd()) && x.gcd(y) == T::ONE
 }}
 

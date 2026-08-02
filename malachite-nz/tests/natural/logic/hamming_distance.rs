@@ -80,31 +80,17 @@ fn test_limbs_hamming_distance() {
 
 #[test]
 fn test_hamming_distance() {
-    let test = |x, y, out| {
-        assert_eq!(
-            Natural::from_str(x)
-                .unwrap()
-                .hamming_distance(&Natural::from_str(y).unwrap()),
-            out
-        );
-        assert_eq!(
-            natural_hamming_distance_alt_1(
-                &Natural::from_str(x).unwrap(),
-                &Natural::from_str(y).unwrap(),
-            ),
-            out
-        );
-        assert_eq!(
-            natural_hamming_distance_alt_2(
-                &Natural::from_str(x).unwrap(),
-                &Natural::from_str(y).unwrap(),
-            ),
-            out
-        );
+    let test = |s, t, out| {
+        let u = Natural::from_str(s).unwrap();
+        let v = Natural::from_str(t).unwrap();
+
+        assert_eq!(Natural::from_str(s).unwrap().hamming_distance(&v), out);
+        assert_eq!(natural_hamming_distance_alt_1(&u, &v), out);
+        assert_eq!(natural_hamming_distance_alt_2(&u, &v), out);
         assert_eq!(
             rug_hamming_distance(
-                &rug::Integer::from_str(x).unwrap(),
-                &rug::Integer::from_str(y).unwrap(),
+                &rug::Integer::from_str(s).unwrap(),
+                &rug::Integer::from_str(t).unwrap(),
             ),
             out
         );

@@ -3731,8 +3731,7 @@ fn sub_float_significands_general<'a>(
     let cancel2 = if cancel >= exp_diff {
         // Note that cancel is signed and will be converted to mpfr_uexp_t (type of diff_exp) in the
         // expression below, so that this will work even if cancel is very large and diff_exp = 0.
-        (i128::from(cancel) - i128::from(exp_diff) + i128::wrapping_from(IWIDTH_M1))
-            >> Limb::LOG_WIDTH
+        (i128::from(cancel) - i128::from(exp_diff) + const { IWIDTH_M1 as i128 }) >> Limb::LOG_WIDTH
     } else {
         -((i128::from(exp_diff) - i128::from(cancel)) >> Limb::LOG_WIDTH)
     };

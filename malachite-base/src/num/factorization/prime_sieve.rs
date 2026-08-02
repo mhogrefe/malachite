@@ -411,7 +411,7 @@ pub fn limbs_prime_sieve_size<T: PrimitiveUnsigned>(n: u64) -> usize {
 
 const BLOCK_SIZE: usize = 2048;
 
-pub_test! {limbs_count_ones<T: PrimitiveUnsigned>(xs: &[T]) -> u64 {
+private_test_fn! {limbs_count_ones<T: PrimitiveUnsigned>(xs: &[T]) -> u64 {
     xs.iter().map(|&x| CountOnes::count_ones(x)).sum()
 }}
 

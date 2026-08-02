@@ -35,7 +35,7 @@ use malachite_base::vecs::vec_delete_left;
 //
 // # Panics
 // Panics if `start > end`.
-pub_crate_test! {limbs_slice_get_bits(xs: &[Limb], start: u64, end: u64) -> Vec<Limb> {
+crate_test_fn! {limbs_slice_get_bits(xs: &[Limb], start: u64, end: u64) -> Vec<Limb> {
     assert!(start <= end);
     let small_start = bit_to_limb_count_floor(start);
     let len = xs.len();
@@ -72,7 +72,7 @@ pub_crate_test! {limbs_slice_get_bits(xs: &[Limb], start: u64, end: u64) -> Vec<
 //
 // # Panics
 // Panics if `start > end`.
-pub_test! {limbs_vec_get_bits(mut xs: Vec<Limb>, start: u64, end: u64) -> Vec<Limb> {
+private_test_fn! {limbs_vec_get_bits(mut xs: Vec<Limb>, start: u64, end: u64) -> Vec<Limb> {
     assert!(start <= end);
     let small_start = bit_to_limb_count_floor(start);
     if small_start >= xs.len() {
@@ -167,7 +167,7 @@ pub(crate) fn limbs_assign_bits_helper(
 //
 // # Panics
 // Panics if `start >= end`.
-pub_test! {limbs_assign_bits(xs: &mut Vec<Limb>, start: u64, end: u64, bits: &[Limb]) {
+private_test_fn! {limbs_assign_bits(xs: &mut Vec<Limb>, start: u64, end: u64, bits: &[Limb]) {
     assert!(start < end);
     limbs_assign_bits_helper(xs, start, end, bits, false);
 }}

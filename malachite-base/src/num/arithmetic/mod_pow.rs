@@ -19,7 +19,7 @@ use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::{HasHalf, JoinHalves, SplitInHalf, WrappingFrom};
 use crate::num::logic::traits::{BitIterable, LeadingZeros};
 
-pub_test! {simple_binary_mod_pow<T: PrimitiveUnsigned>(x: T, exp: u64, m: T) -> T {
+private_test_fn! {simple_binary_mod_pow<T: PrimitiveUnsigned>(x: T, exp: u64, m: T) -> T {
     assert!(x < m, "x must be reduced mod m, but {x} >= {m}");
     if m == T::ONE {
         return T::ZERO;

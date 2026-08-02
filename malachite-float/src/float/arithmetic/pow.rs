@@ -257,7 +257,7 @@ fn pow_pos_natural(
             && inexmul
             && res.is_finite()
             && !res.is_zero()
-            && i64::from(res.get_exponent().unwrap()) == i64::from(Float::MIN_EXPONENT)
+            && i64::from(res.get_exponent().unwrap()) == Float::MIN_EXPONENT_I64
             && raw_power_of_2(&res)
         {
             res = if res.is_sign_negative() {
@@ -420,7 +420,7 @@ fn pow_integer(x: &Float, z: &Integer, prec: u64, rm: RoundingMode) -> (Float, O
         // underflow into an exact zero, which the loops detect directly.) The check mirrors the
         // role of MPFR's overflow flag.
         if est >= const { Float::MAX_EXPONENT as f64 - 66.0 }
-            && pow_exponent_at_least(x, z, i64::from(Float::MAX_EXPONENT))
+            && pow_exponent_at_least(x, z, Float::MAX_EXPONENT_I64)
         {
             return pow_overflow(prec, rm, negative);
         }
@@ -913,7 +913,7 @@ fn pow_general(
     // harmless: the resolver is correct for any small product, and for the borderline
     // (bottom-binade but representable) products the x involved is deep within a near-sliver of 1,
     // where the loop's `ln` would need catastrophic working precision anyway.
-    if ey.saturating_add(ln_exp) <= i64::from(Float::MIN_EXPONENT) + 2 {
+    if ey.saturating_add(ln_exp) <= Float::MIN_EXPONENT_PLUS_2_I64 {
         let (mut result, mut o) = pow_general_tiny_product(&abs_x, y, prec, rm);
         if neg_result {
             result.neg_assign();
@@ -979,7 +979,7 @@ fn pow_general(
             && !t.is_zero()
             && k.is_none()
             && t.get_exponent()
-                .is_some_and(|e| i64::from(e) == i64::from(Float::MIN_EXPONENT));
+                .is_some_and(|e| i64::from(e) == Float::MIN_EXPONENT_I64);
         if t.is_zero() || t.is_infinite() || t_bottom_binade {
             // After a 2^k rescue the computation stays comfortably in range, so a singular result
             // cannot recur (MPFR_ASSERTN(!k_non_zero) in mpfr_pow_general).
@@ -1048,7 +1048,7 @@ fn pow_general(
             && lk < 0
             && result
                 .get_exponent()
-                .is_some_and(|e| i64::from(e) == i64::from(Float::MIN_EXPONENT) - 1 - lk)
+                .is_some_and(|e| i64::from(e) == Float::MIN_EXPONENT_MINUS_1_I64 - lk)
             && raw_power_of_2(&result)
         {
             shift_rm = Ceiling;
@@ -1117,12 +1117,10 @@ fn pow_exponent_at_least(x: &Float, z: &Integer, bound: i64) -> bool {
 // tests.
 fn float_sliver_of_one(x: &Float) -> Option<Rational> {
     let ex = i64::from(x.get_exponent().unwrap());
-    if (ex == 0 || ex == 1)
-        && x.get_prec().unwrap() >= u64::exact_from(-i64::from(Float::MIN_EXPONENT) - 8)
-    {
+    if (ex == 0 || ex == 1) && x.get_prec().unwrap() >= Float::NEAR_ONE_MAX_PREC {
         let xr = Rational::exact_from(x);
         let d = (&xr).abs() - Rational::ONE;
-        if d != 0u32 && d.floor_log_base_2_abs() < i64::from(Float::MIN_EXPONENT) + 8 {
+        if d != 0u32 && d.floor_log_base_2_abs() < Float::MIN_EXPONENT_PLUS_8_I64 {
             return Some(xr);
         }
     }
@@ -1360,7 +1358,7 @@ impl Float {
                 if y.is_sign_negative() && tmp == ebound {
                     ebound += 1;
                 }
-                let lim = i64::from(Self::MIN_EXPONENT) - if rm == Nearest { 2 } else { 1 };
+                let lim = Self::MIN_EXPONENT_I64 - if rm == Nearest { 2 } else { 1 };
                 if ebound <= lim {
                     return pow_underflow(
                         prec,
@@ -6347,7 +6345,7 @@ fn unsigned_pow_rational_near_one(
     let ql = q.floor_log_base_2_abs();
     let kbb = i64::exact_from(k.significant_bits().significant_bits());
     let t_exp_ub = ql + 1 + kbb;
-    if t_exp_ub >= 0 || t_exp_ub > -i64::exact_from(prec) + i64::exact_from(Limb::WIDTH) {
+    if t_exp_ub >= 0 || t_exp_ub > -i64::exact_from(prec) + const { Limb::WIDTH as i64 } {
         return None;
     }
     // `k > 1`, so `k ^ q > 1` exactly when `q > 0`. Because `q * ln(k)` is tiny, `ln(k)` needs only
@@ -6702,8 +6700,7 @@ fn rational_rational_pow(
         return Float::from_rational_prec_round(x.pow(z), prec, rm);
     }
     let fl = x.floor_log_base_2_abs();
-    let in_range =
-        fl > i64::from(Float::MIN_EXPONENT) + 2 && fl < i64::from(Float::MAX_EXPONENT) - 2;
+    let in_range = fl > Float::MIN_EXPONENT_PLUS_2_I64 && fl < Float::MAX_EXPONENT_MINUS_2_I64;
     // A base within a few binades of 1 is a sliver whose logarithm is at or below the smallest
     // positive Float; it must go through the exact-Rational t-space squeeze (which brackets log2
     // over Rationals) rather than any Float-based route, which would underflow the logarithm. `x`
@@ -6713,7 +6710,7 @@ fn rational_rational_pow(
     } else {
         None
     };
-    let sliver_of_one = sliver_fld.is_some_and(|fld| fld < i64::from(Float::MIN_EXPONENT) + 8);
+    let sliver_of_one = sliver_fld.is_some_and(|fld| fld < Float::MIN_EXPONENT_PLUS_8_I64);
     // A dyadic in-range non-sliver base is exactly convertible to a Float; `Float::pow_rational`
     // does the rest, exactness and boundary behavior included.
     if in_range && !sliver_of_one && x.denominator_ref().is_power_of_2() {
@@ -7211,8 +7208,7 @@ impl Float {
             }
         }
         let fl = x.floor_log_base_2_abs();
-        let in_range =
-            fl > i64::from(Self::MIN_EXPONENT) + 2 && fl < i64::from(Self::MAX_EXPONENT) - 2;
+        let in_range = fl > Self::MIN_EXPONENT_PLUS_2_I64 && fl < Self::MAX_EXPONENT_MINUS_2_I64;
         // A base within a few binades of 1 (from either side) has a logarithm at or below the
         // smallest positive Float, where any Float-based power -- the dyadic shortcut or the
         // x-space squeeze below, both of which call `Float::pow` -- would underflow internally
@@ -7230,7 +7226,7 @@ impl Float {
         } else {
             None
         };
-        let sliver_of_one = sliver_fld.is_some_and(|fld| fld < i64::from(Self::MIN_EXPONENT) + 8);
+        let sliver_of_one = sliver_fld.is_some_and(|fld| fld < Self::MIN_EXPONENT_PLUS_8_I64);
         // A dyadic in-range non-sliver x is exactly convertible; Float::pow does the rest,
         // exactness and boundary behavior included.
         if in_range && !sliver_of_one && x.denominator_ref().is_power_of_2() {

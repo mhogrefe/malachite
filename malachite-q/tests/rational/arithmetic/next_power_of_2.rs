@@ -17,17 +17,19 @@ use std::str::FromStr;
 
 #[test]
 fn test_next_power_of_2() {
-    let test = |u, out| {
-        let mut n = Rational::from_str(u).unwrap();
+    let test = |s, out| {
+        let u = Rational::from_str(s).unwrap();
+
+        let mut n = u.clone();
         n.next_power_of_2_assign();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = Rational::from_str(u).unwrap().next_power_of_2();
+        let n = u.clone().next_power_of_2();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = (&Rational::from_str(u).unwrap()).next_power_of_2();
+        let n = (&u).next_power_of_2();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
     };

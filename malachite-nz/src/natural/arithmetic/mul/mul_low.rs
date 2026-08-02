@@ -38,7 +38,7 @@ use malachite_base::num::arithmetic::traits::WrappingAddAssign;
 //
 // This is equivalent to `mpn_mullo_basecase` from `mpn/generic/mullo_basecase.c`, GMP 6.2.1,
 // `MULLO_VARIANT == 2`.
-pub_crate_test! {limbs_mul_low_same_length_basecase(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
+crate_test_fn! {limbs_mul_low_same_length_basecase(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let n = xs.len();
     assert_ne!(n, 0);
     assert_eq!(ys.len(), n);
@@ -112,7 +112,7 @@ const fn get_n_lo(n: usize) -> usize {
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // This is equivalent to `mpn_dc_mullo_n` from `mpn/generic/mullo_n.c`, GMP 6.2.1, where `rp == tp`.
-pub_test! {
+private_test_fn! {
 #[allow(clippy::absurd_extreme_comparisons)]
 limbs_mul_low_same_length_divide_and_conquer_shared_scratch(
     out: &mut [Limb],
@@ -228,7 +228,7 @@ limbs_mul_low_same_length_divide_and_conquer_shared_scratch(
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // This is equivalent to `mpn_dc_mullo_n` from `mpn/generic/mullo_n.c`, GMP 6.2.1, where `rp != tp`.
-pub_test! {
+private_test_fn! {
 #[allow(clippy::absurd_extreme_comparisons)]
 limbs_mul_low_same_length_divide_and_conquer(
     out: &mut [Limb],
@@ -276,14 +276,16 @@ limbs_mul_low_same_length_divide_and_conquer(
 // Constant time and additional memory.
 //
 // This is equivalent to `mpn_mullo_n_itch` from `mpn/generic/mullo_n.c`, GMP 6.2.1.
-pub_const_test! {limbs_mul_low_same_length_divide_and_conquer_scratch_len(n: usize) -> usize {
+private_test_const_fn! {limbs_mul_low_same_length_divide_and_conquer_scratch_len(
+    n: usize,
+) -> usize {
     n << 1
 }}
 
 // TODO tune
 const MULLO_BASECASE_THRESHOLD_LIMIT: usize = MULLO_BASECASE_THRESHOLD;
 
-pub_test! {limbs_mul_low_same_length_large(
+private_test_fn! {limbs_mul_low_same_length_large(
     out: &mut [Limb],
     xs: &[Limb],
     ys: &[Limb],
@@ -307,7 +309,7 @@ pub_test! {limbs_mul_low_same_length_large(
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // This is equivalent to `mpn_mullo_n` from `mpn/generic/mullo_n.c`, GMP 6.2.1.
-pub_crate_test! {
+crate_test_fn! {
 #[allow(clippy::absurd_extreme_comparisons)]
 limbs_mul_low_same_length(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let n = xs.len();
@@ -340,7 +342,7 @@ limbs_mul_low_same_length(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 //
 // This is equivalent to `mpn_mullo_basecase` from `mpn/generic/mullo_basecase.c`, GMP 6.2.1,
 // `MULLO_VARIANT == 1`.
-pub_crate_test! {limbs_mul_low_same_length_basecase_alt(
+crate_test_fn! {limbs_mul_low_same_length_basecase_alt(
     out: &mut [Limb],
     xs: &[Limb],
     ys: &[Limb]

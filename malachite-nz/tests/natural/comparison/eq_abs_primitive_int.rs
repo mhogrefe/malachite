@@ -19,10 +19,12 @@ use std::str::FromStr;
 
 #[test]
 fn test_eq_abs_u32() {
-    let test = |u, v: u32, out| {
-        assert_eq!(Natural::from_str(u).unwrap().eq_abs(&v), out);
-        assert_eq!(!Natural::from_str(u).unwrap().ne_abs(&v), out);
-        assert_eq!(v.eq_abs(&Natural::from_str(u).unwrap()), out);
+    let test = |s, v: u32, out| {
+        let u = Natural::from_str(s).unwrap();
+
+        assert_eq!(u.eq_abs(&v), out);
+        assert_eq!(!u.ne_abs(&v), out);
+        assert_eq!(v.eq_abs(&u), out);
     };
     test("0", 0, true);
     test("0", 5, false);
@@ -33,10 +35,12 @@ fn test_eq_abs_u32() {
 
 #[test]
 fn test_eq_abs_u64() {
-    let test = |u, v: u64, out| {
-        assert_eq!(Natural::from_str(u).unwrap().eq_abs(&v), out);
-        assert_eq!(!Natural::from_str(u).unwrap().ne_abs(&v), out);
-        assert_eq!(v.eq_abs(&Natural::from_str(u).unwrap()), out);
+    let test = |s, v: u64, out| {
+        let u = Natural::from_str(s).unwrap();
+
+        assert_eq!(u.eq_abs(&v), out);
+        assert_eq!(!u.ne_abs(&v), out);
+        assert_eq!(v.eq_abs(&u), out);
     };
     test("0", 0, true);
     test("0", 5, false);
@@ -49,10 +53,12 @@ fn test_eq_abs_u64() {
 
 #[test]
 fn test_eq_abs_i32() {
-    let test = |u, v: i32, out| {
-        assert_eq!(Natural::from_str(u).unwrap().eq_abs(&v), out);
-        assert_eq!(!Natural::from_str(u).unwrap().ne_abs(&v), out);
-        assert_eq!(v.eq_abs(&Natural::from_str(u).unwrap()), out);
+    let test = |s, v: i32, out| {
+        let u = Natural::from_str(s).unwrap();
+
+        assert_eq!(u.eq_abs(&v), out);
+        assert_eq!(!u.ne_abs(&v), out);
+        assert_eq!(v.eq_abs(&u), out);
     };
     test("0", 0, true);
     test("0", 5, false);
@@ -64,10 +70,12 @@ fn test_eq_abs_i32() {
 
 #[test]
 fn test_eq_abs_i64() {
-    let test = |u, v: i64, out| {
-        assert_eq!(Natural::from_str(u).unwrap().eq_abs(&v), out);
-        assert_eq!(!Natural::from_str(u).unwrap().ne_abs(&v), out);
-        assert_eq!(v.eq_abs(&Natural::from_str(u).unwrap()), out);
+    let test = |s, v: i64, out| {
+        let u = Natural::from_str(s).unwrap();
+
+        assert_eq!(u.eq_abs(&v), out);
+        assert_eq!(!u.ne_abs(&v), out);
+        assert_eq!(v.eq_abs(&u), out);
     };
     test("0", 0, true);
     test("0", 5, false);

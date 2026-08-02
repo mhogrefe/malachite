@@ -47,6 +47,10 @@ use malachite_base::num::factorization::prime_sieve::limbs_prime_sieve_u64;
 use malachite_base::num::factorization::prime_sieve::{id_to_n, limbs_prime_sieve_size, n_to_bit};
 use malachite_base::num::logic::traits::{CountOnes, LeadingZeros, SignificantBits};
 
+// The table limits as `Limb`s, for comparing against limb-sized arguments.
+const ODD_FACTORIAL_TABLE_LIMIT_LIMB: Limb = ODD_FACTORIAL_TABLE_LIMIT as Limb;
+const ODD_FACTORIAL_EXTTABLE_LIMIT_LIMB: Limb = ODD_FACTORIAL_EXTTABLE_LIMIT as Limb;
+
 const NOT_BIN_UIUI_RECURSIVE_SMALLDC: bool = !BIN_UIUI_RECURSIVE_SMALLDC;
 
 // This is similar to `mulfunc` from `mpz/bin_uiui.c`, GMP 6.2.1.
@@ -95,8 +99,8 @@ const SOME_THRESHOLD: usize = 20;
 
 // This is equivalent to `mpz_bdiv_bin_uiui` from `mpz/bin_uiui.c`, GMP 6.2.1, where a `Vec` of
 // limbs is returned.
-pub_test! {limbs_binomial_coefficient_limb_limb_bdiv(n: Limb, k: Limb) -> Vec<Limb> {
-    assert!(k > Limb::wrapping_from(ODD_FACTORIAL_TABLE_LIMIT));
+private_test_fn! {limbs_binomial_coefficient_limb_limb_bdiv(n: Limb, k: Limb) -> Vec<Limb> {
+    assert!(k > ODD_FACTORIAL_TABLE_LIMIT_LIMB);
     let max_n = 1 + usize::exact_from(n >> Limb::LOG_WIDTH);
     let alloc = min(
         const { SOME_THRESHOLD - 1 } + max((3 * max_n) >> 1, SOME_THRESHOLD),
@@ -193,7 +197,7 @@ const TCNT_TAB: [u8; 8] = [0, 1, 1, 2, 2, 4, 4, 6];
 
 // This is equivalent to `mpz_smallk_bin_uiui` from `mpz/bin_uiui.c`, GMP 6.2.1, where a `Vec` of
 // limbs is returned.
-pub_test! {limbs_binomial_coefficient_limb_limb_small_k(n: Limb, k: Limb) -> Vec<Limb> {
+private_test_fn! {limbs_binomial_coefficient_limb_limb_small_k(n: Limb, k: Limb) -> Vec<Limb> {
     let n_max = Limb::wrapping_from(log_n_max(n));
     let mut n_max = min(n_max, M);
     let mut i = n - k + 1;
@@ -244,8 +248,8 @@ pub_test! {limbs_binomial_coefficient_limb_limb_small_k(n: Limb, k: Limb) -> Vec
 //
 // This is equivalent to `bc_bin_uiui` from `mpz/bin_uiui.c`, GMP 6.2.1, where a single limb is
 // returned.
-pub_test! {limbs_binomial_coefficient_limb_limb_basecase(n: Limb, k: Limb) -> Limb {
-    assert!(n <= ODD_FACTORIAL_EXTTABLE_LIMIT as Limb);
+private_test_fn! {limbs_binomial_coefficient_limb_limb_basecase(n: Limb, k: Limb) -> Limb {
+    assert!(n <= ODD_FACTORIAL_EXTTABLE_LIMIT_LIMB);
     assert!(n >= k + 2);
     assert!(k >= 2);
     let n = usize::wrapping_from(n);
@@ -268,13 +272,13 @@ pub(crate) const BIN_UIUI_RECURSIVE_SMALLDC: bool = Limb::WIDTH > u32::WIDTH;
 //
 // This is equivalent to `mpz_smallkdc_bin_uiui` from `mpz/bin_uiui.c`, GMP 6.2.1, where a `Vec` of
 // limbs is returned.
-pub_test! {limbs_binomial_coefficient_limb_limb_small_k_divide_and_conquer(
+private_test_fn! {limbs_binomial_coefficient_limb_limb_small_k_divide_and_conquer(
     mut n: Limb,
     mut k: Limb,
 ) -> Vec<Limb> {
     let half_k = k >> 1;
     let mut out = if NOT_BIN_UIUI_RECURSIVE_SMALLDC
-        || half_k <= ODD_FACTORIAL_TABLE_LIMIT as Limb
+        || half_k <= ODD_FACTORIAL_TABLE_LIMIT_LIMB
     {
         limbs_binomial_coefficient_limb_limb_small_k(n, half_k)
     } else {
@@ -283,7 +287,7 @@ pub_test! {limbs_binomial_coefficient_limb_limb_small_k_divide_and_conquer(
     k -= half_k;
     n -= half_k;
     let mut out_len = out.len();
-    if n <= ODD_FACTORIAL_EXTTABLE_LIMIT as Limb {
+    if n <= ODD_FACTORIAL_EXTTABLE_LIMIT_LIMB {
         out.push(0);
         let carry = limbs_slice_mul_limb_in_place(
             &mut out[..out_len],
@@ -294,7 +298,7 @@ pub_test! {limbs_binomial_coefficient_limb_limb_small_k_divide_and_conquer(
             out_len += 1;
         }
     } else {
-        let t = if NOT_BIN_UIUI_RECURSIVE_SMALLDC || k <= ODD_FACTORIAL_TABLE_LIMIT as Limb {
+        let t = if NOT_BIN_UIUI_RECURSIVE_SMALLDC || k <= ODD_FACTORIAL_TABLE_LIMIT_LIMB {
             limbs_binomial_coefficient_limb_limb_small_k(n, k)
         } else {
             limbs_binomial_coefficient_limb_limb_small_k_divide_and_conquer(n, k)
@@ -343,7 +347,7 @@ pub(crate) const BIN_GOETGHELUCK_THRESHOLD: Limb = 512;
 //
 // This is equivalent to `mpz_goetgheluck_bin_uiui` from `mpz/bin_uiui.c`, GMP 6.2.1, where a `Vec`
 // of limbs is returned.
-pub_test! {
+private_test_fn! {
 #[allow(clippy::useless_conversion)]
 limbs_binomial_coefficient_limb_limb_goetgheluck(n: Limb, k: Limb) -> Vec<Limb> {
     assert!(BIN_GOETGHELUCK_THRESHOLD >= 13);
@@ -476,7 +480,7 @@ const BIN_UIUI_ENABLE_SMALLDC: bool = true;
 
 // This is equivalent to `mpz_bin_uiui` from `mpz/bin_uiui.c`, GMP 6.2.1, where a `Natural` is
 // returned.
-pub_test! {binomial_coefficient_limb_limb(n: Limb, mut k: Limb) -> Natural {
+private_test_fn! {binomial_coefficient_limb_limb(n: Limb, mut k: Limb) -> Natural {
     if n < k {
         Natural::ZERO
     } else {
@@ -486,10 +490,10 @@ pub_test! {binomial_coefficient_limb_limb(n: Limb, mut k: Limb) -> Natural {
             Natural::ONE
         } else if k == 1 {
             Natural::from(n)
-        } else if n <= ODD_FACTORIAL_EXTTABLE_LIMIT as Limb {
+        } else if n <= ODD_FACTORIAL_EXTTABLE_LIMIT_LIMB {
             // k >= 2, n >= 4
             Natural::from(limbs_binomial_coefficient_limb_limb_basecase(n, k))
-        } else if k <= ODD_FACTORIAL_TABLE_LIMIT as Limb {
+        } else if k <= ODD_FACTORIAL_TABLE_LIMIT_LIMB {
             Natural::from_owned_limbs_asc(limbs_binomial_coefficient_limb_limb_small_k(n, k))
         } else if BIN_UIUI_ENABLE_SMALLDC
             && k <= (if BIN_UIUI_RECURSIVE_SMALLDC {

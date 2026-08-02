@@ -24,7 +24,7 @@ use crate::num::conversion::traits::WrappingFrom;
 // next word) lets LLVM fuse the whole sequence into branchless adds/adcs (or subs/sbcs) on aarch64
 // and adc/sbb chains on x86_64; the previous per-word branches did not fuse, and this kernel is hot
 // in the fft_small CRT reconstruction.
-pub_test! {xxx_sub_yyy_to_zzz<T: PrimitiveUnsigned>(
+private_test_fn! {xxx_sub_yyy_to_zzz<T: PrimitiveUnsigned>(
     x_2: T,
     x_1: T,
     x_0: T,

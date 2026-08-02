@@ -60,13 +60,8 @@ fn test_limbs_remove() {
     test(&[27], &[3], 7, &[1], 3);
     // - a quotient that loses its leading limb
     // - qp[qn] == 0 in the first loop
-    test(
-        &[18446744073709551613, 2],
-        &[3],
-        0,
-        &[18446744073709551615],
-        1,
-    );
+    // 3 * (2 ^ Limb::WIDTH - 1), whose quotient by 3 is one limb narrower
+    test(&[Limb::MAX - 2, 2], &[3], 0, &[Limb::MAX], 1);
     // - a squared power whose product needs an extra limb
     // - powers_storage[np_offset + nn] != 0
     test(&pow_limbs(255, 15), &[255], 64, &[1], 15);
@@ -82,19 +77,12 @@ fn test_remove_power_natural() {
     let test = |s, t, q, k| {
         let x = Natural::from_str(s).unwrap();
         let y = Natural::from_str(t).unwrap();
-        assert_eq!(
-            x.clone().remove_power(y.clone()),
-            (Natural::from_str(q).unwrap(), k)
-        );
-        assert_eq!(
-            x.clone().remove_power(&y),
-            (Natural::from_str(q).unwrap(), k)
-        );
-        assert_eq!(
-            (&x).remove_power(y.clone()),
-            (Natural::from_str(q).unwrap(), k)
-        );
-        assert_eq!((&x).remove_power(&y), (Natural::from_str(q).unwrap(), k));
+        let z = Natural::from_str(q).unwrap();
+
+        assert_eq!(x.clone().remove_power(y.clone()), (z.clone(), k));
+        assert_eq!(x.clone().remove_power(&y), (z.clone(), k));
+        assert_eq!((&x).remove_power(y.clone()), (z.clone(), k));
+        assert_eq!((&x).remove_power(&y), (z, k));
 
         let mut mut_x = x.clone();
         assert_eq!(mut_x.remove_power_assign(y.clone()), k);
@@ -154,11 +142,10 @@ fn test_remove_power_integer() {
     let test = |s, t, q, k| {
         let x = Integer::from_str(s).unwrap();
         let y = Integer::from_str(t).unwrap();
-        assert_eq!(
-            x.clone().remove_power(y.clone()),
-            (Integer::from_str(q).unwrap(), k)
-        );
-        assert_eq!((&x).remove_power(&y), (Integer::from_str(q).unwrap(), k));
+        let z = Integer::from_str(q).unwrap();
+
+        assert_eq!(x.clone().remove_power(y.clone()), (z.clone(), k));
+        assert_eq!((&x).remove_power(&y), (z, k));
         let mut mut_x = x;
         assert_eq!(mut_x.remove_power_assign(&y), k);
         assert_eq!(mut_x.to_string(), q);

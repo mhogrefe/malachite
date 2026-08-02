@@ -65,7 +65,11 @@ fn limbs_square_low_diagonal(out: &mut [Limb], xs: &[Limb]) {
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // This is equivalent to `MPN_SQRLO_DIAG_ADDLSH1` from `mpn/generic/sqrlo_basecase.c`, GMP 6.2.1.
-pub_test! {limbs_square_diagonal_shl_add(out: &mut [Limb], scratch: &mut [Limb], xs: &[Limb]) {
+private_test_fn! {limbs_square_diagonal_shl_add(
+    out: &mut [Limb],
+    scratch: &mut [Limb],
+    xs: &[Limb],
+) {
     let n = xs.len();
     assert_eq!(scratch.len(), n - 1);
     assert_eq!(out.len(), n);
@@ -96,7 +100,7 @@ const SQRLO_BASECASE_ALLOC: usize = if SQRLO_DC_THRESHOLD_LIMIT < 2 {
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // This is equivalent to `mpn_sqrlo_basecase` from `mpn/generic/sqrlo_basecase.c`, GMP 6.2.1.
-pub_test! {limbs_square_low_basecase(out: &mut [Limb], xs: &[Limb]) {
+private_test_fn! {limbs_square_low_basecase(out: &mut [Limb], xs: &[Limb]) {
     let n = xs.len();
     let out = &mut out[..n];
     assert_ne!(n, 0);
@@ -160,7 +164,7 @@ const MAYBE_RANGE_TOOM22_MOD_SQUARE: bool = TUNE_PROGRAM_BUILD
 //
 // This is equivalent to `mpn_sqrlo_itch` from `mpn/generic/sqrlo.c`, GMP 6.2.1. Investigate changes
 // from 6.1.2?
-pub_const_test! {limbs_square_low_scratch_len(len: usize) -> usize {
+private_test_const_fn! {limbs_square_low_scratch_len(len: usize) -> usize {
     len << 1
 }}
 
@@ -175,7 +179,7 @@ pub_const_test! {limbs_square_low_scratch_len(len: usize) -> usize {
 //
 // This is equivalent to `mpn_dc_sqrlo` from `mpn/generic/sqrlo.c`, GMP 6.2.1. Investigate changes
 // from 6.1.2?
-pub_test! {
+private_test_fn! {
 #[allow(clippy::absurd_extreme_comparisons)]
 limbs_square_low_divide_and_conquer(
     out: &mut [Limb],
@@ -249,7 +253,7 @@ const SQR_BASECASE_ALLOC: usize = if SQRLO_BASECASE_THRESHOLD_LIMIT == 0 {
 //
 // This is equivalent to `mpn_sqrlo` from `mpn/generic/sqrlo.c`, GMP 6.2.1. Investigate changes from
 // 6.1.2?
-pub_crate_test! {limbs_square_low(out: &mut [Limb], xs: &[Limb]) {
+crate_test_fn! {limbs_square_low(out: &mut [Limb], xs: &[Limb]) {
     assert!(SQRLO_BASECASE_THRESHOLD_LIMIT >= SQRLO_BASECASE_THRESHOLD);
     let len = xs.len();
     assert_ne!(len, 0);
@@ -288,7 +292,7 @@ pub_crate_test! {limbs_square_low(out: &mut [Limb], xs: &[Limb]) {
 //
 // # Panics
 // Panics if the input is empty. May panic if the input has trailing zeros.
-pub_crate_test! {limbs_mod_power_of_2_square(xs: &mut Vec<Limb>, pow: u64) -> Vec<Limb> {
+crate_test_fn! {limbs_mod_power_of_2_square(xs: &mut Vec<Limb>, pow: u64) -> Vec<Limb> {
     let len = xs.len();
     assert_ne!(len, 0);
     let max_len = bit_to_limb_count_ceiling(pow);
@@ -324,7 +328,7 @@ pub_crate_test! {limbs_mod_power_of_2_square(xs: &mut Vec<Limb>, pow: u64) -> Ve
 //
 // # Panics
 // Panics if the input is empty. May panic if the input has trailing zeros.
-pub_crate_test! {limbs_mod_power_of_2_square_ref(xs: &[Limb], pow: u64) -> Vec<Limb> {
+crate_test_fn! {limbs_mod_power_of_2_square_ref(xs: &[Limb], pow: u64) -> Vec<Limb> {
     let len = xs.len();
     assert_ne!(len, 0);
     let max_len = bit_to_limb_count_ceiling(pow);

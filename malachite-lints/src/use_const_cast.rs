@@ -8,6 +8,7 @@
 
 use clippy_utils::diagnostics::span_lint_and_help;
 use clippy_utils::source::snippet;
+use clippy_utils::consts::ConstEvalCtxt;
 use rustc_hir::def::{DefKind, Res};
 use rustc_hir::{Expr, ExprKind};
 use rustc_lint::{LateContext, LateLintPass};
@@ -16,11 +17,14 @@ use rustc_session::{declare_lint, declare_lint_pass};
 declare_lint! {
     /// ### What it does
     ///
-    /// Flags a numeric conversion of a `const { .. }` block — either an `as` cast (`const { (A -
-    /// B) << 1 } as f64`) or a `from`/`exact_from`/`wrapping_from` call (`u64::exact_from(const {
-    /// Self::MAX_EXPONENT - 1 })`). The whole expression is a compile-time constant, so the
-    /// conversion should be an `as` cast *inside* the block: `const { ((A - B) << 1) as f64 }` /
-    /// `const { (Self::MAX_EXPONENT - 1) as u64 }`.
+    /// Flags a numeric conversion of a compile-time constant — either an `as` cast (`const { (A
+    /// - B) << 1 } as f64`) or a `from`/`exact_from`/`wrapping_from` call
+    /// (`u64::exact_from(Self::MAX_EXPONENT)`). The whole expression is a compile-time constant,
+    /// so the conversion should be an `as` cast inside a `const { .. }` block: `const { ((A - B)
+    /// << 1) as f64 }` / `const { Self::MAX_EXPONENT as u64 }`.
+    ///
+    /// The operand may be an existing `const { .. }` block, a named constant, or any constant
+    /// expression built from them.
     ///
     /// ### Why is this bad?
     ///
@@ -39,6 +43,7 @@ declare_lint! {
     /// ```rust,ignore
     /// let x = u64::exact_from(const { Self::MAX_EXPONENT - 1 });
     /// let y = const { (A - B) << 1 } as f64;
+    /// let z = u64::exact_from(Self::MAX_EXPONENT);
     /// ```
     ///
     /// Use instead:
@@ -46,6 +51,7 @@ declare_lint! {
     /// ```rust,ignore
     /// let x = const { (Self::MAX_EXPONENT - 1) as u64 };
     /// let y = const { ((A - B) << 1) as f64 };
+    /// let z = const { Self::MAX_EXPONENT as u64 };
     /// ```
     pub USE_CONST_CAST,
     Deny,
@@ -58,7 +64,7 @@ const CONVERSIONS: [&str; 3] = ["from", "exact_from", "wrapping_from"];
 
 // If `expr` converts a single operand to a numeric type — an `as` cast, or a
 // `from`/`exact_from`/`wrapping_from` call — returns the operand and the target type's name.
-fn conversion<'tcx>(
+pub(crate) fn conversion<'tcx>(
     cx: &LateContext<'tcx>,
     expr: &'tcx Expr<'tcx>,
 ) -> Option<(&'tcx Expr<'tcx>, String)> {
@@ -102,16 +108,32 @@ impl<'tcx> LateLintPass<'tcx> for UseConstCast {
         let Some((operand, target)) = conversion(cx, expr) else {
             return;
         };
-        // The operand is a `const { .. }` block (as `use_const_block` produces for a constant
-        // island), whose inner value we can lift the cast onto.
-        let ExprKind::ConstBlock(const_block) = operand.kind else {
-            return;
-        };
-        // The const block's body is a `{ X }` block; take its tail expression `X`.
-        let body = cx.tcx.hir_body(const_block.body).value;
-        let inner = match body.kind {
-            ExprKind::Block(block, _) if block.stmts.is_empty() => block.expr.unwrap_or(body),
-            _ => body,
+        // The operand is either a `const { .. }` block (as `use_const_block` produces for a
+        // constant island) or a constant in its own right, such as a bare named constant, which
+        // `use_const_block` leaves alone because it only flags *derived* constants. Either way the
+        // cast can be lifted to compile time.
+        let inner = match operand.kind {
+            ExprKind::ConstBlock(const_block) => {
+                // The const block's body is a `{ X }` block; take its tail expression `X`.
+                let body = cx.tcx.hir_body(const_block.body).value;
+                match body.kind {
+                    ExprKind::Block(block, _) if block.stmts.is_empty() => {
+                        block.expr.unwrap_or(body)
+                    }
+                    _ => body,
+                }
+            }
+            _ => {
+                // A constant that mentions no local and is not already in a const context, so
+                // wrapping it in `const { .. }` is possible in the first place.
+                if !crate::references_named_const(cx, operand)
+                    || crate::in_const_context(cx, operand)
+                    || ConstEvalCtxt::new(cx).eval(operand).is_none()
+                {
+                    return;
+                }
+                operand
+            }
         };
         span_lint_and_help(
             cx,
@@ -120,8 +142,14 @@ impl<'tcx> LateLintPass<'tcx> for UseConstCast {
             "this converts a compile-time constant at runtime",
             None,
             format!(
-                "do the conversion at compile time: `const {{ ({}) as {target} }}`",
-                snippet(cx, inner.span, "..")
+                "do the conversion at compile time: `const {{ {} as {target} }}`",
+                // A path or literal needs no parentheses; anything compound does, since `as` binds
+                // tighter than the arithmetic inside.
+                if matches!(inner.kind, ExprKind::Path(_) | ExprKind::Lit(_)) {
+                    snippet(cx, inner.span, "..").to_string()
+                } else {
+                    format!("({})", snippet(cx, inner.span, ".."))
+                }
             ),
         );
     }

@@ -205,7 +205,7 @@ fn from_reciprocal_rational_prec_round_ref_using_div(
     if sign { (f, o) } else { (-f, o.reverse()) }
 }
 
-pub_crate_test! {
+crate_test_fn! {
 #[inline]
 from_reciprocal_rational_prec_round_ref(
     x: &Rational,
@@ -219,7 +219,7 @@ from_reciprocal_rational_prec_round_ref(
     }
 }}
 
-pub_crate_test! {
+crate_test_fn! {
 generic_reciprocal_sqrt_rational_ref(
     x: &Rational,
     prec: u64,

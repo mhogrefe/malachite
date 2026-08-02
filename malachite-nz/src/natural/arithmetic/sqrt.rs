@@ -54,7 +54,7 @@ use malachite_base::num::logic::traits::{BitAccess, LeadingZeros, LowMask};
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::slices::slice_test_zero;
 
-pub_const_test! {limbs_sqrt_rem_helper_scratch_len(n: usize) -> usize {
+private_test_const_fn! {limbs_sqrt_rem_helper_scratch_len(n: usize) -> usize {
     (n >> 1) + 1
 }}
 
@@ -75,7 +75,7 @@ pub_const_test! {limbs_sqrt_rem_helper_scratch_len(n: usize) -> usize {
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // This is equivalent to `mpn_dc_sqrtrem` from `mpn/generic/sqrtrem.c`, GMP 6.2.1.
-pub_test! {limbs_sqrt_rem_helper(
+private_test_fn! {limbs_sqrt_rem_helper(
     out: &mut [Limb],
     xs: &mut [Limb],
     approx: Limb,
@@ -196,7 +196,7 @@ fn limbs_sqrt_div_approx_helper(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scrat
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // This is equivalent to `mpn_dc_sqrt` from `mpn/generic/sqrtrem.c`, GMP 6.2.1.
-pub_test! { limbs_sqrt_helper(out: &mut [Limb], xs: &[Limb], shift: u64, odd: bool) -> bool {
+private_test_fn! { limbs_sqrt_helper(out: &mut [Limb], xs: &[Limb], shift: u64, odd: bool) -> bool {
     let n = out.len();
     let odd = usize::from(odd);
     assert_eq!(xs.len(), (n << 1) - odd);
@@ -330,7 +330,7 @@ pub_test! { limbs_sqrt_helper(out: &mut [Limb], xs: &[Limb], shift: u64, odd: bo
 //
 // This is equivalent to `mpn_sqrtrem` from `mpn/generic/sqrtrem.c`, GMP 6.2.1, where `rp` is
 // `NULL`.
-pub_test! {limbs_sqrt_to_out(out: &mut [Limb], xs: &[Limb]) {
+private_test_fn! {limbs_sqrt_to_out(out: &mut [Limb], xs: &[Limb]) {
     let xs_len = xs.len();
     let high = xs[xs_len - 1];
     assert_ne!(high, 0);
@@ -407,7 +407,7 @@ pub_test! {limbs_sqrt_to_out(out: &mut [Limb], xs: &[Limb]) {
 //
 // This is equivalent to `mpn_sqrtrem` from `mpn/generic/sqrtrem.c`, GMP 6.2.1, where `rp` is not
 // `NULL`.
-pub_test! {limbs_sqrt_rem_to_out(
+private_test_fn! {limbs_sqrt_rem_to_out(
     out_sqrt: &mut [Limb],
     out_rem: &mut [Limb],
     xs: &[Limb]
@@ -628,7 +628,7 @@ pub(crate) fn limbs_sqrt_to_out_return_inexact(out_sqrt: &mut [Limb], xs: &[Limb
 // $M(n) = O(n \log n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
-pub_test! {limbs_floor_sqrt(xs: &[Limb]) -> Vec<Limb> {
+private_test_fn! {limbs_floor_sqrt(xs: &[Limb]) -> Vec<Limb> {
     let mut out = vec![0; xs.len().shr_round(1, Ceiling).0];
     limbs_sqrt_to_out(&mut out, xs);
     out
@@ -643,7 +643,7 @@ pub_test! {limbs_floor_sqrt(xs: &[Limb]) -> Vec<Limb> {
 //
 // # Worst-case complexity
 // TODO
-pub_test! {limbs_ceiling_sqrt(xs: &[Limb]) -> Vec<Limb> {
+private_test_fn! {limbs_ceiling_sqrt(xs: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let sqrt_len = xs_len.shr_round(1, Ceiling).0;
     // The square root must end up owned, so it is the parent's prefix, with the remainder scratch
@@ -681,7 +681,7 @@ pub_test! {limbs_ceiling_sqrt(xs: &[Limb]) -> Vec<Limb> {
 // $M(n) = O(n \log n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
-pub_crate_test! {limbs_checked_sqrt(xs: &[Limb]) -> Option<Vec<Limb>> {
+crate_test_fn! {limbs_checked_sqrt(xs: &[Limb]) -> Option<Vec<Limb>> {
     let xs_len = xs.len();
     let mut out_sqrt = vec![0; xs_len.shr_round(1, Ceiling).0];
     if limbs_sqrt_to_out_return_inexact(&mut out_sqrt, xs) {
@@ -706,7 +706,7 @@ pub_crate_test! {limbs_checked_sqrt(xs: &[Limb]) -> Option<Vec<Limb>> {
 // $M(n) = O(n \log n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
-pub_test! {
+private_test_fn! {
 // The two buffers stay separate allocations: both are returned as owned `Vec`s, and merging them
 // would force one to be copied out of the parent.
 #[cfg_attr(dylint_lib = "malachite_lints", allow(adjacent_vec_allocations))]

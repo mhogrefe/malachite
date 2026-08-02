@@ -26,7 +26,7 @@ use crate::num::conversion::traits::SplitInHalf;
 use crate::num::logic::traits::NotAssign;
 use core::mem::swap;
 
-pub_test! {jacobi_symbol_unsigned_simple<T: PrimitiveUnsigned>(mut a: T, mut n: T) -> i8 {
+private_test_fn! {jacobi_symbol_unsigned_simple<T: PrimitiveUnsigned>(mut a: T, mut n: T) -> i8 {
     assert_ne!(n, T::ZERO);
     assert!(n.odd());
     a %= n;
@@ -56,7 +56,7 @@ pub_test! {jacobi_symbol_unsigned_simple<T: PrimitiveUnsigned>(mut a: T, mut n: 
 //
 // This is equivalent to `mpn_jacobi_2` from `mpn/jacobi_2.c`, GMP 6.2.1, where `JACOBI_2_METHOD ==
 // 2` and `bit` is 0.
-pub_test! {jacobi_symbol_unsigned_double_fast_2<T: PrimitiveUnsigned>(
+private_test_fn! {jacobi_symbol_unsigned_double_fast_2<T: PrimitiveUnsigned>(
     mut x_1: T,
     mut x_0: T,
     mut y_1: T,

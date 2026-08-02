@@ -67,7 +67,7 @@ use crate::platform::{
     Limb, MUL_FFT_THRESHOLD, MUL_TOOM6H_THRESHOLD, MUL_TOOM8H_THRESHOLD, MUL_TOOM22_THRESHOLD,
     MUL_TOOM33_THRESHOLD, MUL_TOOM44_THRESHOLD,
 };
-use core::cmp::{Ordering::*, max};
+use core::cmp::Ordering::*;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     ArithmeticCheckedShl, DivRound, EqModPowerOf2, ShrRound, WrappingAddAssign, WrappingSubAssign,
@@ -170,7 +170,7 @@ pub const TOOM22_MAYBE_MUL_TOOM22: bool =
 const TOOM22_MAYBE_MUL_TOOM22: bool =
     TUNE_PROGRAM_BUILD || WANT_FAT_BINARY || MUL_TOOM33_THRESHOLD >= MUL_TOOM22_THRESHOLD << 1;
 
-fn limbs_mul_same_length_to_out_toom_22_recursive_scratch_len(xs_len: usize) -> usize {
+const fn limbs_mul_same_length_to_out_toom_22_recursive_scratch_len(xs_len: usize) -> usize {
     if NOT_TOOM22_MAYBE_MUL_TOOM22 || xs_len < MUL_TOOM22_THRESHOLD {
         0
     } else {
@@ -202,7 +202,10 @@ fn limbs_mul_same_length_to_out_toom_22_recursive(
     }
 }
 
-fn limbs_mul_greater_to_out_toom_22_recursive_scratch_len(xs_len: usize, ys_len: usize) -> usize {
+const fn limbs_mul_greater_to_out_toom_22_recursive_scratch_len(
+    xs_len: usize,
+    ys_len: usize,
+) -> usize {
     if NOT_TOOM22_MAYBE_MUL_TOOM22 || ys_len < MUL_TOOM22_THRESHOLD {
         0
     } else if xs_len << 2 < 5 * ys_len {
@@ -254,7 +257,7 @@ fn limbs_mul_greater_to_out_toom_22_recursive(
 //
 // # Worst-case complexity
 // Constant time and additional memory.
-pub_const_test! {limbs_mul_greater_to_out_toom_22_input_sizes_valid(
+private_test_const_fn! {limbs_mul_greater_to_out_toom_22_input_sizes_valid(
     xs_len: usize,
     ys_len: usize,
 ) -> bool {
@@ -268,7 +271,7 @@ pub_const_test! {limbs_mul_greater_to_out_toom_22_input_sizes_valid(
 // Constant time and additional memory.
 //
 // This is equivalent to `mpn_toom22_mul_itch` from `gmp-impl.h`, GMP 6.2.1.
-pub_crate_test! {limbs_mul_greater_to_out_toom_22_scratch_len(
+crate_test_const_fn! {limbs_mul_greater_to_out_toom_22_scratch_len(
     xs_len: usize,
     ys_len: usize
 ) -> usize {
@@ -330,7 +333,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_22_scratch_len(
 // May panic if the input slice conditions are not met.
 //
 // This is equivalent to `mpn_toom22_mul` from `mpn/generic/toom22_mul.c`, GMP 6.2.1.
-pub_crate_test! {limbs_mul_greater_to_out_toom_22(
+crate_test_fn! {limbs_mul_greater_to_out_toom_22(
     out: &mut [Limb],
     xs: &[Limb],
     ys: &[Limb],
@@ -447,7 +450,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_22(
 // Constant time and additional memory.
 //
 // This is equivalent to `mpn_toom32_mul_itch` from `gmp-impl.h`, GMP 6.2.1.
-pub_crate_test! {limbs_mul_greater_to_out_toom_32_scratch_len(
+crate_test_const_fn! {limbs_mul_greater_to_out_toom_32_scratch_len(
     xs_len: usize,
     ys_len: usize
 ) -> usize {
@@ -459,9 +462,9 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_32_scratch_len(
     let s = xs_len - (n << 1);
     let t = ys_len - n;
     (n << 1) + 1
-        + max(
+        + max!(
             limbs_mul_same_length_to_out_scratch_len(n),
-            limbs_mul_to_out_scratch_len(s, t),
+            limbs_mul_to_out_scratch_len(s, t)
         )
 }}
 
@@ -470,7 +473,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_32_scratch_len(
 //
 // # Worst-case complexity
 // Constant time and additional memory.
-pub_const_test! {limbs_mul_greater_to_out_toom_32_input_sizes_valid(
+private_test_const_fn! {limbs_mul_greater_to_out_toom_32_input_sizes_valid(
     xs_len: usize,
     ys_len: usize,
 ) -> bool {
@@ -521,7 +524,7 @@ pub_const_test! {limbs_mul_greater_to_out_toom_32_input_sizes_valid(
 // May panic if the input slice conditions are not met.
 //
 // This is equivalent to `mpn_toom32_mul` from `mpn/generic/toom32_mul.c`, GMP 6.2.1.
-pub_crate_test! {limbs_mul_greater_to_out_toom_32(
+crate_test_fn! {limbs_mul_greater_to_out_toom_32(
     out: &mut [Limb],
     xs: &[Limb],
     ys: &[Limb],
@@ -749,7 +752,7 @@ pub const TOOM33_MAYBE_MUL_TOOM33: bool =
 const TOOM33_MAYBE_MUL_TOOM33: bool =
     TUNE_PROGRAM_BUILD || WANT_FAT_BINARY || MUL_TOOM44_THRESHOLD >= 3 * MUL_TOOM33_THRESHOLD;
 
-fn limbs_mul_same_length_to_out_toom_33_recursive_scratch_len(xs_len: usize) -> usize {
+const fn limbs_mul_same_length_to_out_toom_33_recursive_scratch_len(xs_len: usize) -> usize {
     if TOOM33_MAYBE_MUL_BASECASE && xs_len < MUL_TOOM22_THRESHOLD {
         0
     } else if NOT_TOOM33_MAYBE_MUL_TOOM33 || xs_len < MUL_TOOM33_THRESHOLD {
@@ -769,7 +772,7 @@ fn limbs_mul_same_length_to_out_toom_33_recursive_scratch_len(xs_len: usize) -> 
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // This is equivalent to `TOOM33_MUL_N_REC` from `mpn/generic/toom33_mul.c`, GMP 6.2.1.
-pub_test! {limbs_mul_same_length_to_out_toom_33_recursive(
+private_test_fn! {limbs_mul_same_length_to_out_toom_33_recursive(
     out: &mut [Limb],
     xs: &[Limb],
     ys: &[Limb],
@@ -794,7 +797,7 @@ const SMALLER_RECURSION_TOOM_33_AND_53: bool = true;
 //
 // # Worst-case complexity
 // Constant time and additional memory.
-pub_test! {limbs_mul_greater_to_out_toom_33_input_sizes_valid(
+private_test_fn! {limbs_mul_greater_to_out_toom_33_input_sizes_valid(
     xs_len: usize,
     ys_len: usize
 ) -> bool {
@@ -811,11 +814,11 @@ pub_test! {limbs_mul_greater_to_out_toom_33_input_sizes_valid(
 // Constant time and additional memory.
 //
 // This is equivalent to `mpn_toom33_mul_itch` from `gmp-impl.h`, GMP 6.2.1.
-pub_crate_test! {limbs_mul_greater_to_out_toom_33_scratch_len(
+crate_test_const_fn! {limbs_mul_greater_to_out_toom_33_scratch_len(
     xs_len: usize,
     ys_len: usize
 ) -> usize {
-    let n = xs_len.div_round(3, Ceiling).0;
+    let n = xs_len.div_ceil(3);
     let m = n + 1;
     assert!(m < xs_len);
     let s = xs_len - (n << 1);
@@ -877,7 +880,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_33_scratch_len(
 // May panic if the input slice conditions are not met.
 //
 // This is equivalent to `mpn_toom33_mul` from `mpn/generic/toom33_mul.c`, GMP 6.2.1.
-pub_crate_test! {limbs_mul_greater_to_out_toom_33(
+crate_test_fn! {limbs_mul_greater_to_out_toom_33(
     out: &mut [Limb],
     xs: &[Limb],
     ys: &[Limb],
@@ -1057,7 +1060,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_33(
 //
 // # Worst-case complexity
 // Constant time and additional memory.
-pub_test! {
+private_test_fn! {
     limbs_mul_greater_to_out_toom_42_input_sizes_valid(xs_len: usize, ys_len: usize) -> bool {
     !(xs_len == 9 && ys_len == 4)
         && xs_len + 3 < ys_len << 2
@@ -1072,14 +1075,14 @@ pub_test! {
 //
 // # Worst-case complexity
 // Constant time and additional memory.
-pub_crate_test! {limbs_mul_greater_to_out_toom_42_scratch_len(
+crate_test_const_fn! {limbs_mul_greater_to_out_toom_42_scratch_len(
     xs_len: usize,
     ys_len: usize
 ) -> usize {
     let n = if xs_len >= ys_len << 1 {
-        xs_len.shr_round(2, Ceiling).0
+        xs_len.div_ceil(4)
     } else {
-        ys_len.shr_round(1, Ceiling).0
+        ys_len.div_ceil(2)
     };
     let s = xs_len - 3 * n;
     let t = ys_len - n;
@@ -1138,7 +1141,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_42_scratch_len(
 // May panic if the input slice conditions are not met.
 //
 // This is equivalent to `mpn_toom42_mul` from `mpn/generic/toom42_mul.c`, GMP 6.2.1.
-pub_crate_test! {limbs_mul_greater_to_out_toom_42(
+crate_test_fn! {limbs_mul_greater_to_out_toom_42(
     out: &mut [Limb],
     xs: &[Limb],
     ys: &[Limb],
@@ -1263,7 +1266,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_42(
 //
 // # Worst-case complexity
 // Constant time and additional memory.
-pub_test! {
+private_test_fn! {
     limbs_mul_greater_to_out_toom_43_input_sizes_valid(xs_len: usize, ys_len: usize) -> bool {
     !(xs_len == 16 && ys_len == 13)
         && xs_len.div_round(3, Ceiling).0
@@ -1282,7 +1285,7 @@ pub_test! {
 // Constant time and additional memory.
 //
 // This is equivalent to `mpn_toom43_mul_itch` from `gmp-impl.h`, GMP 6.2.1.
-pub_crate_test! {limbs_mul_greater_to_out_toom_43_scratch_len(
+crate_test_const_fn! {limbs_mul_greater_to_out_toom_43_scratch_len(
     xs_len: usize,
     ys_len: usize
 ) -> usize {
@@ -1348,7 +1351,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_43_scratch_len(
 // May panic if the input slice conditions are not met.
 //
 // This is equivalent to `mpn_toom43_mul` from `mpn/generic/toom43_mul.c`, GMP 6.2.1.
-pub_crate_test! {limbs_mul_greater_to_out_toom_43(
+crate_test_fn! {limbs_mul_greater_to_out_toom_43(
     out: &mut [Limb],
     xs: &[Limb],
     ys: &[Limb],
@@ -1467,7 +1470,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_43(
 //
 // # Worst-case complexity
 // Constant time and additional memory.
-pub_test! {limbs_mul_greater_to_out_toom_44_input_sizes_valid(
+private_test_fn! {limbs_mul_greater_to_out_toom_44_input_sizes_valid(
     xs_len: usize,
     ys_len: usize
 ) -> bool {
@@ -1481,11 +1484,11 @@ pub_test! {limbs_mul_greater_to_out_toom_44_input_sizes_valid(
 // Constant time and additional memory.
 //
 // This is equivalent to `mpn_toom44_mul_itch` from `gmp-impl.h`, GMP 6.2.1.
-pub_crate_test! {limbs_mul_greater_to_out_toom_44_scratch_len(
+crate_test_const_fn! {limbs_mul_greater_to_out_toom_44_scratch_len(
     xs_len: usize,
     ys_len: usize
 ) -> usize {
-    let n = xs_len.shr_round(2, Ceiling).0;
+    let n = xs_len.div_ceil(4);
     let s = xs_len - 3 * n;
     let t = ys_len - 3 * n;
     assert!(n + 1 < xs_len);
@@ -1494,7 +1497,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_44_scratch_len(
     } else {
         limbs_mul_same_length_to_out_scratch_len(s)
     };
-    max(
+    max!(
         9 * n
             + 6
             + max!(
@@ -1502,7 +1505,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_44_scratch_len(
                 limbs_mul_same_length_to_out_scratch_len(n + 1),
                 alt_mul_scratch_len
             ),
-        (n << 3) + 6usize + max(n << 1, s + t),
+        (n << 3) + 6usize + max!(n << 1, s + t)
     )
 }}
 
@@ -1573,7 +1576,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_44_scratch_len(
 // May panic if the input slice conditions are not met.
 //
 // This is equivalent to `mpn_toom44_mul` from `mpn/generic/toom44_mul.c`, GMP 6.2.1.
-pub_crate_test! {limbs_mul_greater_to_out_toom_44(
+crate_test_fn! {limbs_mul_greater_to_out_toom_44(
     out: &mut [Limb],
     xs: &[Limb],
     ys: &[Limb],
@@ -1702,7 +1705,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_44(
 //
 // # Worst-case complexity
 // Constant time and additional memory.
-pub_test! {
+private_test_fn! {
     limbs_mul_greater_to_out_toom_52_input_sizes_valid(xs_len: usize, ys_len: usize) -> bool {
     xs_len + 4 < 5 * ys_len
         && xs_len.shr_round(2, Ceiling).0
@@ -1717,7 +1720,7 @@ pub_test! {
 // Constant time and additional memory.
 //
 // This is equivalent to `mpn_toom52_mul_itch` from `gmp-impl.h`, GMP 6.2.1.
-pub_test! {limbs_mul_greater_to_out_toom_52_scratch_len(
+private_test_const_fn! {limbs_mul_greater_to_out_toom_52_scratch_len(
     xs_len: usize,
     ys_len: usize
 ) -> usize {
@@ -1789,7 +1792,7 @@ pub_test! {limbs_mul_greater_to_out_toom_52_scratch_len(
 // May panic if the input slice conditions are not met.
 //
 // This is equivalent to `mpn_toom52_mul` from `mpn/generic/toom52_mul.c`, GMP 6.2.1.
-pub_test! {limbs_mul_greater_to_out_toom_52(
+private_test_fn! {limbs_mul_greater_to_out_toom_52(
     out: &mut [Limb],
     xs: &[Limb],
     ys: &[Limb],
@@ -1923,7 +1926,7 @@ pub_test! {limbs_mul_greater_to_out_toom_52(
 //
 // # Worst-case complexity
 // Constant time and additional memory.
-pub_test! {
+private_test_fn! {
     limbs_mul_greater_to_out_toom_53_input_sizes_valid(xs_len: usize, ys_len: usize) -> bool {
     !(xs_len == 16 && ys_len == 9)
         && xs_len.shr_round(2, Ceiling).0
@@ -1939,7 +1942,7 @@ pub_test! {
 // Constant time and additional memory.
 //
 // This is equivalent to `mpn_toom53_mul_itch` from `gmp-impl.h`, GMP 6.2.1.
-pub_crate_test! {limbs_mul_greater_to_out_toom_53_scratch_len(
+crate_test_const_fn! {limbs_mul_greater_to_out_toom_53_scratch_len(
     xs_len: usize,
     ys_len: usize
 ) -> usize {
@@ -2008,7 +2011,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_53_scratch_len(
 // May panic if the input slice conditions are not met.
 //
 // This is equivalent to `mpn_toom53_mul` from `mpn/generic/toom53_mul.c`, GMP 6.2.1.
-pub_crate_test! {limbs_mul_greater_to_out_toom_53(
+crate_test_fn! {limbs_mul_greater_to_out_toom_53(
     out: &mut [Limb],
     xs: &[Limb],
     ys: &[Limb],
@@ -2238,7 +2241,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_53(
 //
 // # Worst-case complexity
 // Constant time and additional memory.
-pub_const_test! {limbs_mul_greater_to_out_toom_54_input_sizes_valid(
+private_test_const_fn! {limbs_mul_greater_to_out_toom_54_input_sizes_valid(
     xs_len: usize,
     ys_len: usize,
 ) -> bool {
@@ -2266,7 +2269,7 @@ pub_const_test! {limbs_mul_greater_to_out_toom_54_input_sizes_valid(
 // Constant time and additional memory.
 //
 // This is equivalent to `mpn_toom54_mul_itch` from `gmp-impl.h`, GMP 6.2.1.
-pub_test! {limbs_mul_greater_to_out_toom_54_scratch_len(
+private_test_const_fn! {limbs_mul_greater_to_out_toom_54_scratch_len(
     xs_len: usize,
     ys_len: usize
 ) -> usize {
@@ -2409,7 +2412,7 @@ pub fn limbs_mul_greater_to_out_toom_54(
 //
 // # Worst-case complexity
 // Constant time and additional memory.
-pub_const_test! {limbs_mul_greater_to_out_toom_62_input_sizes_valid(
+private_test_const_fn! {limbs_mul_greater_to_out_toom_62_input_sizes_valid(
     xs_len: usize,
     ys_len: usize,
 ) -> bool {
@@ -2430,7 +2433,7 @@ pub_const_test! {limbs_mul_greater_to_out_toom_62_input_sizes_valid(
 // Constant time and additional memory.
 //
 // This is equivalent to `mpn_toom62_mul_itch` from `gmp-impl.h`, GMP 6.2.1.
-pub_test! {limbs_mul_greater_to_out_toom_62_scratch_len(
+private_test_const_fn! {limbs_mul_greater_to_out_toom_62_scratch_len(
     xs_len: usize,
     ys_len: usize
 ) -> usize {
@@ -2495,7 +2498,7 @@ pub_test! {limbs_mul_greater_to_out_toom_62_scratch_len(
 // May panic if the input slice conditions are not met.
 //
 // This is equivalent to `mpn_toom62_mul` from `mpn/generic/toom62_mul.c`, GMP 6.2.1.
-pub_test! {limbs_mul_greater_to_out_toom_62(
+private_test_fn! {limbs_mul_greater_to_out_toom_62(
     out: &mut [Limb],
     xs: &[Limb],
     ys: &[Limb],
@@ -2734,7 +2737,7 @@ fn limbs_abs_sub_add_same_length(out_diff: &mut [Limb], xs: &mut [Limb], ys: &[L
 //
 // # Worst-case complexity
 // Constant time and additional memory.
-pub_const_test! {limbs_mul_greater_to_out_toom_63_input_sizes_valid(
+private_test_const_fn! {limbs_mul_greater_to_out_toom_63_input_sizes_valid(
     xs_len: usize,
     ys_len: usize,
 ) -> bool {
@@ -2762,7 +2765,7 @@ pub_const_test! {limbs_mul_greater_to_out_toom_63_input_sizes_valid(
 // Constant time and additional memory.
 //
 // This is equivalent to `mpn_toom63_mul_itch` from `gmp-impl.h`, GMP 6.2.1.
-pub_crate_test! {limbs_mul_greater_to_out_toom_63_scratch_len(
+crate_test_const_fn! {limbs_mul_greater_to_out_toom_63_scratch_len(
     xs_len: usize,
     ys_len: usize
 ) -> usize {
@@ -2819,7 +2822,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_63_scratch_len(
 // May panic if the input slice conditions are not met.
 //
 // This is equivalent to `mpn_toom63_mul` from `mpn/generic/toom63_mul.c`, GMP 6.2.1.
-pub_crate_test! {limbs_mul_greater_to_out_toom_63(
+crate_test_fn! {limbs_mul_greater_to_out_toom_63(
     out: &mut [Limb],
     xs: &[Limb],
     ys: &[Limb],
@@ -2955,7 +2958,7 @@ const TOOM_6H_LIMIT_DENOMINATOR: usize = 17;
 //
 // # Worst-case complexity
 // Constant time and additional memory.
-pub_test! {limbs_mul_greater_to_out_toom_6h_input_sizes_valid(
+private_test_fn! {limbs_mul_greater_to_out_toom_6h_input_sizes_valid(
     xs_len: usize,
     ys_len: usize
 ) -> bool {
@@ -3034,7 +3037,7 @@ const TOOM_6H_MAYBE_MUL_TOOM33: bool =
 const TOOM_6H_MAYBE_MUL_TOOM6H: bool =
     TUNE_PROGRAM_BUILD || MUL_FFT_THRESHOLD >= 6 * MUL_TOOM6H_THRESHOLD;
 
-fn limbs_mul_same_length_to_out_toom_6h_recursive_scratch_len(n: usize) -> usize {
+const fn limbs_mul_same_length_to_out_toom_6h_recursive_scratch_len(n: usize) -> usize {
     if TOOM_6H_MAYBE_MUL_BASECASE && n < MUL_TOOM22_THRESHOLD {
         0
     } else if TOOM_6H_MAYBE_MUL_TOOM22 && n < MUL_TOOM33_THRESHOLD {
@@ -3085,7 +3088,7 @@ fn limbs_mul_same_length_to_out_toom_6h_recursive(
 // Constant time and additional memory.
 //
 // This is equivalent to `mpn_toom6h_mul_itch` from `gmp-impl.h`, GMP 6.2.1.
-pub_crate_test! {limbs_mul_greater_to_out_toom_6h_scratch_len(
+crate_test_const_fn! {limbs_mul_greater_to_out_toom_6h_scratch_len(
     xs_len: usize,
     ys_len: usize
 ) -> usize {
@@ -3128,7 +3131,11 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_6h_scratch_len(
         let mut pn = p * n;
         let mut qn = q * n;
         // With LIMIT = 16 / 15, the following recovery is needed only if `ys_len` <= 73.
-        if !p.eq_mod_power_of_2(q, 1) {
+        //
+        // The condition is that `p` and `q` differ in parity, spelled bitwise because neither
+        // `eq_mod_power_of_2` nor `odd` is callable in a `const fn`.
+        #[cfg_attr(dylint_lib = "malachite_lints", allow(use_parity))]
+        if (p ^ q) & 1 != 0 {
             // Recover from badly-chosen splitting
             if xs_len <= pn {
                 pn -= n;
@@ -3150,7 +3157,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_6h_scratch_len(
         limbs_mul_same_length_to_out_toom_6h_recursive_scratch_len(m)
     );
     if half {
-        mul_scratch_len = max(mul_scratch_len, limbs_mul_to_out_scratch_len(s, t));
+        mul_scratch_len = max!(mul_scratch_len, limbs_mul_to_out_scratch_len(s, t));
     }
     10 * n + 4 + mul_scratch_len
 }}
@@ -3182,7 +3189,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_6h_scratch_len(
 // May panic if the input slice conditions are not met.
 //
 // This is equivalent to `mpn_toom6h_mul` from `mpn/generic/toom6h_mul.c`, GMP 6.2.1.
-pub_crate_test! {limbs_mul_greater_to_out_toom_6h(
+crate_test_fn! {limbs_mul_greater_to_out_toom_6h(
     out: &mut [Limb],
     xs: &[Limb],
     ys: &[Limb],
@@ -3369,7 +3376,7 @@ const TOOM_8H_LIMIT_DENOMINATOR: usize = 20;
 //
 // This function can be used to determine whether the sizes of the input slices to
 // `limbs_mul_greater_to_out_toom_8h` are valid.
-pub_test! {limbs_mul_greater_to_out_toom_8h_input_sizes_valid(
+private_test_fn! {limbs_mul_greater_to_out_toom_8h_input_sizes_valid(
     xs_len: usize,
     ys_len: usize
 ) -> bool {
@@ -3485,7 +3492,7 @@ const TOOM_8H_MAYBE_MUL_TOOM44: bool =
 const TOOM_8H_MAYBE_MUL_TOOM8H: bool =
     TUNE_PROGRAM_BUILD || MUL_FFT_THRESHOLD >= MUL_TOOM8H_THRESHOLD << 3;
 
-fn limbs_mul_same_length_to_out_toom_8h_recursive_scratch_len(n: usize) -> usize {
+const fn limbs_mul_same_length_to_out_toom_8h_recursive_scratch_len(n: usize) -> usize {
     if TOOM_8H_MAYBE_MUL_BASECASE && n < MUL_TOOM22_THRESHOLD {
         0
     } else if TOOM_8H_MAYBE_MUL_TOOM22 && n < MUL_TOOM33_THRESHOLD {
@@ -3543,7 +3550,7 @@ fn limbs_mul_same_length_to_out_toom_8h_recursive(
 // Constant time and additional memory.
 //
 // This is equivalent to `mpn_toom8h_mul_itch` from `gmp-impl.h`, GMP 6.2.1.
-pub_crate_test! {limbs_mul_greater_to_out_toom_8h_scratch_len(
+crate_test_const_fn! {limbs_mul_greater_to_out_toom_8h_scratch_len(
     xs_len: usize,
     ys_len: usize
 ) -> usize {
@@ -3604,7 +3611,10 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_8h_scratch_len(
         q -= 1;
         let mut pn = p * n;
         let mut qn = q * n;
-        if !p.eq_mod_power_of_2(q, 1) {
+        // The condition is that `p` and `q` differ in parity, spelled bitwise because neither
+        // `eq_mod_power_of_2` nor `odd` is callable in a `const fn`.
+        #[cfg_attr(dylint_lib = "malachite_lints", allow(use_parity))]
+        if (p ^ q) & 1 != 0 {
             // Recover from badly chosen splitting
             if xs_len <= pn {
                 pn -= n;
@@ -3626,7 +3636,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_8h_scratch_len(
         limbs_mul_same_length_to_out_toom_8h_recursive_scratch_len(m)
     );
     if half {
-        mul_scratch_len = max(mul_scratch_len, limbs_mul_to_out_scratch_len(s, t));
+        mul_scratch_len = max!(mul_scratch_len, limbs_mul_to_out_scratch_len(s, t));
     }
     13 * n + 5 + mul_scratch_len
 }}
@@ -3659,7 +3669,7 @@ pub_crate_test! {limbs_mul_greater_to_out_toom_8h_scratch_len(
 // May panic if the input slice conditions are not met.
 //
 // This is equivalent to `mpn_toom8h_mul` from `mpn/generic/toom8h_mul.c`, GMP 6.2.1.
-pub_crate_test! {limbs_mul_greater_to_out_toom_8h(
+crate_test_fn! {limbs_mul_greater_to_out_toom_8h(
     out: &mut [Limb],
     xs: &[Limb],
     ys: &[Limb],

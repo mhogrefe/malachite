@@ -38,6 +38,8 @@ MPFR, so the float mapping belongs with
   residues.
 - [Rationals](/mapping/flint-rationals/): the `fmpq_t` type, mapped onto
   [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html).
+- [Arithmetic functions](/mapping/flint-arithmetic-functions/): the `arith.h` module, which
+  computes number-theoretic and combinatorial sequences.
 
 FLINT is much larger than GMP, and its pages will arrive module by module.
 

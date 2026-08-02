@@ -39,7 +39,7 @@ pub(crate) fn floor_and_ceiling(
     (floor, ceiling)
 }
 
-pub_crate_test_struct! {
+crate_test_struct! {
 #[derive(Clone)]
 ExtendedFloat {
     pub(crate) x: Float,
@@ -96,7 +96,7 @@ impl ExtendedFloat {
             );
         }
         let exp = value.floor_log_base_2_abs() + 1;
-        if exp >= i64::from(Float::MIN_EXPONENT) && exp <= i64::from(Float::MAX_EXPONENT) {
+        if (Float::MIN_EXPONENT_I64..=Float::MAX_EXPONENT_I64).contains(&exp) {
             let (x, o) = Float::from_rational_prec_round_ref(value, prec, rm);
             let exp = x.get_exponent().unwrap();
             return (
@@ -229,7 +229,7 @@ impl ExtendedFloat {
         }
     }
 
-    pub_crate_test! {from_extended_float_prec_round_ref(
+    crate_test_fn! {from_extended_float_prec_round_ref(
         x: &Self,
         prec: u64,
         rm: RoundingMode,
@@ -587,7 +587,7 @@ pub(crate) fn agm_prec_round_normal_extended(
     v.shr_prec_round(scaleit, prec, rm)
 }
 
-pub_crate_test! {agm_prec_round_normal_ref_ref_extended<'a>(
+crate_test_fn! {agm_prec_round_normal_ref_ref_extended<'a>(
     mut a: &'a ExtendedFloat,
     mut b: &'a ExtendedFloat,
     prec: u64,

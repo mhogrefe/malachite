@@ -26,7 +26,7 @@ fn floor_log_base_naive<T: PrimitiveUnsigned>(x: T, base: T) -> u64 {
     result - 1
 }
 
-pub_test! {ceiling_log_base_naive<T: PrimitiveUnsigned>(x: T, base: T) -> u64 {
+private_test_fn! {ceiling_log_base_naive<T: PrimitiveUnsigned>(x: T, base: T) -> u64 {
     assert_ne!(x, T::ZERO);
     assert!(base > T::ONE);
     let mut result = 0;
@@ -42,7 +42,7 @@ pub_test! {ceiling_log_base_naive<T: PrimitiveUnsigned>(x: T, base: T) -> u64 {
     result
 }}
 
-pub_test! {checked_log_base_naive<T: PrimitiveUnsigned>(x: T, base: T) -> Option<u64> {
+private_test_fn! {checked_log_base_naive<T: PrimitiveUnsigned>(x: T, base: T) -> Option<u64> {
     assert_ne!(x, T::ZERO);
     assert!(base > T::ONE);
     let mut result = 0;

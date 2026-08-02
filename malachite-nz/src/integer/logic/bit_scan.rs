@@ -35,7 +35,10 @@ use malachite_base::slices::slice_leading_zeros;
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // This is equivalent to `mpz_scan0` from `mpz/scan0.c`, GMP 6.2.1.
-pub_test! {limbs_index_of_next_false_bit_neg(xs: &[Limb], mut starting_index: u64) -> Option<u64> {
+private_test_fn! {limbs_index_of_next_false_bit_neg(
+    xs: &[Limb],
+    mut starting_index: u64,
+) -> Option<u64> {
     let n = xs.len();
     let i = slice_leading_zeros(xs);
     assert!(i < n);
@@ -80,7 +83,7 @@ pub_test! {limbs_index_of_next_false_bit_neg(xs: &[Limb], mut starting_index: u6
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // This is equivalent to `mpz_scan1` from `mpz/scan1.c`, GMP 6.2.1.
-pub_test! {limbs_index_of_next_true_bit_neg(xs: &[Limb], mut starting_index: u64) -> u64 {
+private_test_fn! {limbs_index_of_next_true_bit_neg(xs: &[Limb], mut starting_index: u64) -> u64 {
     let n = xs.len();
     let i = slice_leading_zeros(xs);
     assert!(i < n);

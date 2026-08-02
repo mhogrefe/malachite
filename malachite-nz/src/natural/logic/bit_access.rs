@@ -26,7 +26,7 @@ use malachite_base::num::logic::traits::BitAccess;
 //
 // This is equivalent to `mpz_tstbit` from `mpz/tstbit.c`, GMP 6.2.1, where the input is
 // non-negative.
-pub_crate_test! {limbs_get_bit(xs: &[Limb], index: u64) -> bool {
+crate_test_fn! {limbs_get_bit(xs: &[Limb], index: u64) -> bool {
     xs.get(bit_to_limb_count_floor(index))
         .is_some_and(|x| x.get_bit(index & Limb::WIDTH_MASK))
 }}
@@ -47,7 +47,7 @@ fn limbs_set_bit_helper(xs: &mut [Limb], index: u64, limb_index: usize) {
 //
 // This is equivalent to `mpz_setbit` from `mpz/setbit.c`, GMP 6.2.1, where `d` is non-negative and
 // `bit_idx` small enough that no additional memory needs to be given to `d`.
-pub_crate_test! {limbs_slice_set_bit(xs: &mut [Limb], index: u64) {
+crate_test_fn! {limbs_slice_set_bit(xs: &mut [Limb], index: u64) {
     limbs_set_bit_helper(xs, index, bit_to_limb_count_floor(index));
 }}
 
@@ -63,7 +63,7 @@ pub_crate_test! {limbs_slice_set_bit(xs: &mut [Limb], index: u64) {
 // where $T$ is time, $M$ is additional memory, and $n$ is `index`.
 //
 // This is equivalent to `mpz_setbit` from `mpz/setbit.c`, GMP 6.2.1, where `d` is non-negative.
-pub_test! {limbs_vec_set_bit(xs: &mut Vec<Limb>, index: u64) {
+private_test_fn! {limbs_vec_set_bit(xs: &mut Vec<Limb>, index: u64) {
     let small_index = bit_to_limb_count_floor(index);
     if small_index >= xs.len() {
         xs.resize(small_index + 1, 0);
@@ -79,7 +79,7 @@ pub_test! {limbs_vec_set_bit(xs: &mut Vec<Limb>, index: u64) {
 // Constant time and additional memory.
 //
 // This is equivalent to `mpz_clrbit` from `mpz/clrbit.c`, GMP 6.2.1, where `d` is non-negative.
-pub_crate_test! {limbs_clear_bit(xs: &mut [Limb], index: u64) {
+crate_test_fn! {limbs_clear_bit(xs: &mut [Limb], index: u64) {
     let small_index = bit_to_limb_count_floor(index);
     if small_index < xs.len() {
         xs[small_index].clear_bit(index & Limb::WIDTH_MASK);

@@ -37,7 +37,11 @@ use malachite_base::num::logic::traits::SignificantBits;
 //
 // # Panics
 // Panics if either input is empty. May panic if either input has trailing zeros.
-pub_test! {limbs_mod_power_of_2_mul(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>, pow: u64) -> Vec<Limb> {
+private_test_fn! {limbs_mod_power_of_2_mul(
+    xs: &mut Vec<Limb>,
+    ys: &mut Vec<Limb>,
+    pow: u64,
+) -> Vec<Limb> {
     if core::ptr::eq(xs.as_slice(), ys.as_slice()) {
         return limbs_mod_power_of_2_square(xs, pow);
     }
@@ -82,7 +86,7 @@ pub_test! {limbs_mod_power_of_2_mul(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>, pow:
 //
 // # Panics
 // Panics if either input is empty. May panic if either input has trailing zeros.
-pub_test! {limbs_mod_power_of_2_mul_val_ref(
+private_test_fn! {limbs_mod_power_of_2_mul_val_ref(
     xs: &mut Vec<Limb>,
     ys: &[Limb],
     pow: u64
@@ -135,7 +139,11 @@ pub_test! {limbs_mod_power_of_2_mul_val_ref(
 //
 // # Panics
 // Panics if either input is empty. May panic if either input has trailing zeros.
-pub_test! {limbs_mod_power_of_2_mul_ref_ref(xs: &[Limb], ys: &[Limb], pow: u64) -> Vec<Limb> {
+private_test_fn! {limbs_mod_power_of_2_mul_ref_ref(
+    xs: &[Limb],
+    ys: &[Limb],
+    pow: u64,
+) -> Vec<Limb> {
     if core::ptr::eq(xs, ys) {
         return limbs_mod_power_of_2_square_ref(xs, pow);
     }

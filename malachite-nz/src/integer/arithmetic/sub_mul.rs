@@ -49,7 +49,7 @@ use malachite_base::slices::slice_test_zero;
 // This is equivalent to `mpz_aorsmul_1` from `mpz/aorsmul_i.c`, GMP 6.2.1, where `w` and `x` are
 // positive, `sub` is negative, and `w` is returned instead of overwriting the first input. `w_sign`
 // is also returned.
-pub_crate_test! {limbs_overflowing_sub_mul_limb(
+crate_test_fn! {limbs_overflowing_sub_mul_limb(
     xs: &[Limb],
     ys: &[Limb],
     z: Limb
@@ -80,7 +80,7 @@ pub_crate_test! {limbs_overflowing_sub_mul_limb(
 //
 // This is equivalent to `mpz_aorsmul_1` from `mpz/aorsmul_i.c`, GMP 6.2.1, where `w` and `x` are
 // positive, `sub` is negative, and `w_sign` is returned.
-pub_crate_test! {limbs_overflowing_sub_mul_limb_in_place_left(
+crate_test_fn! {limbs_overflowing_sub_mul_limb_in_place_left(
     xs: &mut Vec<Limb>,
     ys: &[Limb],
     z: Limb,
@@ -165,7 +165,7 @@ fn limbs_overflowing_sub_mul_limb_greater_in_place_left(
 // This is equivalent to `mpz_aorsmul_1` from `mpz/aorsmul_i.c`, GMP 6.2.1, where `w` and `x` are
 // positive, `sub` is negative, the limbs of the result are written to the second input rather than
 // the first, and `w_sign` is returned.
-pub_test! {limbs_overflowing_sub_mul_limb_in_place_right(
+private_test_fn! {limbs_overflowing_sub_mul_limb_in_place_right(
     xs: &[Limb],
     ys: &mut Vec<Limb>,
     z: Limb,
@@ -245,7 +245,7 @@ fn limbs_overflowing_sub_mul_limb_smaller_in_place_right(
 //
 // This is equivalent to `mpz_aorsmul_1` from `mpz/aorsmul_i.c`, GMP 6.2.1, where `w` and `x` are
 // positive, `sub` is negative, the result is written to the longer input, and `w_sign` is returned.
-pub_crate_test! {limbs_overflowing_sub_mul_limb_in_place_either(
+crate_test_fn! {limbs_overflowing_sub_mul_limb_in_place_either(
     xs: &mut Vec<Limb>,
     ys: &mut Vec<Limb>,
     z: Limb,
@@ -281,7 +281,7 @@ pub_crate_test! {limbs_overflowing_sub_mul_limb_in_place_either(
 // This is equivalent to `mpz_aorsmul` from `mpz/aorsmul.c`, GMP 6.2.1, where `w`, `x`, and `y` are
 // positive, `sub` is negative, and `w` is returned instead of overwriting the first input. `w_sign`
 // is also returned.
-pub_crate_test! {limbs_overflowing_sub_mul(
+crate_test_fn! {limbs_overflowing_sub_mul(
     xs: &[Limb],
     ys: &[Limb],
     zs: &[Limb]
@@ -308,7 +308,7 @@ pub_crate_test! {limbs_overflowing_sub_mul(
 //
 // This is equivalent to `mpz_aorsmul` from `mpz/aorsmul.c`, GMP 6.2.1, where `w`, `x`, and `y` are
 // positive, `sub` is negative, and `w_sign` is returned.
-pub_crate_test! {limbs_overflowing_sub_mul_in_place_left(
+crate_test_fn! {limbs_overflowing_sub_mul_in_place_left(
     xs: &mut Vec<Limb>,
     ys: &[Limb],
     zs: &[Limb],

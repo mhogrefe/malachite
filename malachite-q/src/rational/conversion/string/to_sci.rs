@@ -151,7 +151,7 @@ impl Rational {
     }
 }
 
-pub_test! {floor_log_base_of_abs(x: &Rational, base: &Rational) -> i64 {
+private_test_fn! {floor_log_base_of_abs(x: &Rational, base: &Rational) -> i64 {
     if let Some(log_base) = base.checked_log_base_2() {
         match log_base.sign() {
             Equal => panic!("Cannot take base-1 logarithm"),

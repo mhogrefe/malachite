@@ -33,7 +33,7 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // This is equivalent to `mpn_add_1` from `gmp.h`, GMP 6.2.1, where the result is returned.
-pub_crate_test! {limbs_add_limb(xs: &[Limb], mut y: Limb) -> Vec<Limb> {
+crate_test_fn! {limbs_add_limb(xs: &[Limb], mut y: Limb) -> Vec<Limb> {
     let len = xs.len();
     let mut out = Vec::with_capacity(len);
     for i in 0..len {
@@ -68,7 +68,7 @@ pub_crate_test! {limbs_add_limb(xs: &[Limb], mut y: Limb) -> Vec<Limb> {
 // Panics if `out` is shorter than `xs`.
 //
 // This is equivalent to `mpn_add_1` from `gmp.h`, GMP 6.2.1.
-pub_crate_test! {limbs_add_limb_to_out(out: &mut [Limb], xs: &[Limb], mut y: Limb) -> bool {
+crate_test_fn! {limbs_add_limb_to_out(out: &mut [Limb], xs: &[Limb], mut y: Limb) -> bool {
     let len = xs.len();
     assert!(out.len() >= len);
     for i in 0..len {
@@ -99,7 +99,7 @@ pub_crate_test! {limbs_add_limb_to_out(out: &mut [Limb], xs: &[Limb], mut y: Lim
 //
 // This is equivalent to `mpn_add_1` from `gmp.h`, GMP 6.2.1, where the result is written to the
 // input slice.
-pub_crate_test! {limbs_slice_add_limb_in_place<T: PrimitiveUnsigned>(
+crate_test_fn! {limbs_slice_add_limb_in_place<T: PrimitiveUnsigned>(
     xs: &mut [T],
     mut y: T
 ) -> bool {
@@ -128,7 +128,7 @@ pub_crate_test! {limbs_slice_add_limb_in_place<T: PrimitiveUnsigned>(
 //
 // This is equivalent to `mpz_add_ui` from `mpz/aors_ui.h`, GMP 6.2.1, where the input is
 // non-negative.
-pub_crate_test! {limbs_vec_add_limb_in_place(xs: &mut Vec<Limb>, y: Limb) {
+crate_test_fn! {limbs_vec_add_limb_in_place(xs: &mut Vec<Limb>, y: Limb) {
     assert!(!xs.is_empty());
     if limbs_slice_add_limb_in_place(xs, y) {
         xs.push(1);
@@ -172,7 +172,7 @@ pub(crate) fn add_with_carry<T: PrimitiveUnsigned>(x: T, y: T, carry: bool) -> (
 //
 // This is equivalent to `mpn_add` from `gmp.h`, GMP 6.2.1, where the first input is at least as
 // long as the second, and the output is returned.
-pub_crate_test! {limbs_add_greater(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
+crate_test_fn! {limbs_add_greater(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     if core::ptr::eq(xs, ys) {
         return limbs_shl(xs, 1);
     }
@@ -206,7 +206,7 @@ pub_crate_test! {limbs_add_greater(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 // where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // This is equivalent to `mpn_add` from `gmp.h`, GMP 6.2.1, where the output is returned.
-pub_crate_test! {limbs_add(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
+crate_test_fn! {limbs_add(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     if xs.len() >= ys.len() {
         limbs_add_greater(xs, ys)
     } else {
@@ -230,7 +230,7 @@ pub_crate_test! {limbs_add(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 // Panics if `xs` and `ys` have different lengths or if `out` is too short.
 //
 // This is equivalent to `mpn_add_n` from `gmp.h`, GMP 6.2.1.
-pub_crate_test! {limbs_add_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
+crate_test_fn! {limbs_add_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     let len = xs.len();
     assert_eq!(len, ys.len());
     assert!(out.len() >= len);
@@ -272,7 +272,7 @@ pub_crate_test! {limbs_add_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys:
 //
 // This is equivalent to `mpn_add` from `gmp.h`, GMP 6.2.1, where the first input is at least as
 // long as the second.
-pub_crate_test! {limbs_add_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
+crate_test_fn! {limbs_add_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
@@ -304,7 +304,7 @@ pub_crate_test! {limbs_add_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[L
 // Panics if `out` is too short.
 //
 // This is equivalent to `mpn_add` from `gmp.h`, GMP 6.2.1.
-pub_crate_test! {limbs_add_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
+crate_test_fn! {limbs_add_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     if xs.len() >= ys.len() {
         limbs_add_greater_to_out(out, xs, ys)
     } else {
@@ -332,7 +332,7 @@ pub_crate_test! {limbs_add_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) ->
 //
 // This is equivalent to `mpn_add` from `gmp.h`, GMP 6.2.1, where the second argument is at least as
 // long as the first and the output pointer is the same as the first input pointer.
-pub_crate_test! {limbs_add_to_out_aliased(xs: &mut [Limb], xs_len: usize, ys: &[Limb]) -> bool {
+crate_test_fn! {limbs_add_to_out_aliased(xs: &mut [Limb], xs_len: usize, ys: &[Limb]) -> bool {
     let ys_len = ys.len();
     assert!(xs.len() >= ys_len);
     assert!(xs_len <= ys_len);
@@ -344,7 +344,7 @@ pub_crate_test! {limbs_add_to_out_aliased(xs: &mut [Limb], xs_len: usize, ys: &[
 // For example, `limbs_add_to_out_aliased_2(&mut xs[..15], 5, &ys[..10])` would be equivalent to
 // `limbs_add_to_out(&mut xs[..10], &xs[5..15], &ys[..10])` although the latter expression is not
 // allowed because `xs` cannot be borrowed in that way.
-pub_crate_test! {
+crate_test_fn! {
     limbs_add_to_out_aliased_2(xs: &mut [Limb], xs_offset: usize, ys: &[Limb]) -> bool {
     let len = ys.len();
     assert_eq!(xs.len(), len + xs_offset);
@@ -379,7 +379,7 @@ pub_crate_test! {
 //
 // This is equivalent to `mpn_add_n` from `gmp.h`, GMP 6.2.1, where the output is written to the
 // first input.
-pub_crate_test! {limbs_slice_add_same_length_in_place_left<T: PrimitiveUnsigned>(
+crate_test_fn! {limbs_slice_add_same_length_in_place_left<T: PrimitiveUnsigned>(
     xs: &mut [T],
     ys: &[T],
 ) -> bool {
@@ -421,7 +421,7 @@ pub_crate_test! {limbs_slice_add_same_length_in_place_left<T: PrimitiveUnsigned>
 //
 // This is equivalent to `mpn_add` from `gmp.h`, GMP 6.2.1, where the first input is at least as
 // long as the second, and the output is written to the first input.
-pub_crate_test! {limbs_slice_add_greater_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
+crate_test_fn! {limbs_slice_add_greater_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let (xs_lo, xs_hi) = xs.split_at_mut(ys_len);
@@ -448,7 +448,7 @@ pub_crate_test! {limbs_slice_add_greater_in_place_left(xs: &mut [Limb], ys: &[Li
 //
 // This is equivalent to `mpz_add` from `mpz/aors.h`, GMP 6.2.1, where both inputs are non-negative
 // and the output is written to the first input.
-pub_crate_test! {limbs_vec_add_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
+crate_test_fn! {limbs_vec_add_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     if core::ptr::eq(xs.as_slice(), ys) {
         limbs_vec_shl_in_place(xs, 1);
         return;
@@ -486,7 +486,10 @@ pub_crate_test! {limbs_vec_add_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
 //
 // This is equivalent to `mpn_add` from `gmp.h`, GMP 6.2.1, where the output is written to the
 // longer input.
-pub_test! {limbs_slice_add_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> (bool, bool) {
+private_test_fn! {limbs_slice_add_in_place_either(
+    xs: &mut [Limb],
+    ys: &mut [Limb],
+) -> (bool, bool) {
     if xs.len() >= ys.len() {
         (false, limbs_slice_add_greater_in_place_left(xs, ys))
     } else {
@@ -508,7 +511,7 @@ pub_test! {limbs_slice_add_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> 
 //
 // This is equivalent to `mpz_add` from `mpz/aors.h`, GMP 6.2.1, where both inputs are non-negative
 // and the output is written to the longer input.
-pub_test! {limbs_vec_add_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>) -> bool {
+private_test_fn! {limbs_vec_add_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>) -> bool {
     if xs.len() >= ys.len() {
         if limbs_slice_add_greater_in_place_left(xs, ys) {
             xs.push(1);
@@ -539,7 +542,7 @@ pub_test! {limbs_vec_add_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>)
 //
 // This is equivalent to `mpn_add_nc` from `gmp-impl.h`, GMP 6.2.1, where `rp` and `up` are
 // disjoint.
-pub_crate_test! {limbs_add_same_length_with_carry_in_to_out(
+crate_test_fn! {limbs_add_same_length_with_carry_in_to_out(
     out: &mut [Limb],
     xs: &[Limb],
     ys: &[Limb],
@@ -567,7 +570,7 @@ pub_crate_test! {limbs_add_same_length_with_carry_in_to_out(
 // Panics if `xs` and `ys` have different lengths.
 //
 // This is equivalent to `mpn_add_nc` from `gmp-impl.h`, GMP 6.2.1, where `rp` is the same as `up`.
-pub_crate_test! {limbs_add_same_length_with_carry_in_in_place_left(
+crate_test_fn! {limbs_add_same_length_with_carry_in_in_place_left(
     xs: &mut [Limb],
     ys: &[Limb],
     carry_in: bool,

@@ -454,7 +454,11 @@ const MAX_POWER_128: [u128; 128] = [
     170141183460469231731687303715884105728,
 ];
 
-pub_test! {floor_root_approx_and_refine<T: PrimitiveUnsigned, F: Fn(T) -> f64, G: Fn(f64) -> T>(
+private_test_fn! {floor_root_approx_and_refine<
+    T: PrimitiveUnsigned,
+    F: Fn(T) -> f64,
+    G: Fn(f64) -> T,
+>(
     f: F,
     g: G,
     x: T,
@@ -570,7 +574,7 @@ const COEFF: [[f32; 3]; 16] = [
 //
 // This is equivalent to `n_cbrt_chebyshev_approx` from
 // `ulong_extras/cbrt_chebyshev_approximation.c`, FLINT 2.7.1, where `FLINT64` is `false`.
-pub_test! {cbrt_chebyshev_approx_u32(n: u32) -> u32 {
+private_test_fn! {cbrt_chebyshev_approx_u32(n: u32) -> u32 {
     // UPPER_LIMIT is the max cube root possible for one word
     const UPPER_LIMIT: u32 = 1625; // 1625 < (2^32)^(1/3)
     const BIAS_HEX: u32 = 0x3f000000;
@@ -612,7 +616,7 @@ pub_test! {cbrt_chebyshev_approx_u32(n: u32) -> u32 {
 //
 // This is equivalent to `n_cbrt_chebyshev_approx` from
 // `ulong_extras/cbrt_chebyshev_approximation.c`, FLINT 2.7.1, where `FLINT64` is `true`.
-pub_test! {cbrt_chebyshev_approx_u64(n: u64) -> u64 {
+private_test_fn! {cbrt_chebyshev_approx_u64(n: u64) -> u64 {
     // UPPER_LIMIT is the max cube root possible for one word
     const UPPER_LIMIT: u64 = 2642245; // 2642245 < (2^64)^(1/3)
     const BIAS_HEX: u64 = 0x3fe0000000000000;
@@ -1006,7 +1010,7 @@ const INV_TABLE: [f64; 65] = [
 
 // This is equivalent to `n_root` from `ulong_extras/root.c`, FLINT 2.7.1, where `FLINT64` is
 // `false` and `root` is nonzero.
-pub_test! {fast_floor_root_u32(n: u32, exp: u64) -> u32 {
+private_test_fn! {fast_floor_root_u32(n: u32, exp: u64) -> u32 {
     assert_ne!(exp, 0);
     if n < 2 || exp == 1 {
         return n;
@@ -1049,7 +1053,7 @@ pub_test! {fast_floor_root_u32(n: u32, exp: u64) -> u32 {
 
 // This is equivalent to `n_root` from `ulong_extras/root.c`, FLINT 2.7.1, where `FLINT64` is `true`
 // and `root` is nonzero.
-pub_test! {fast_floor_root_u64(n: u64, exp: u64) -> u64 {
+private_test_fn! {fast_floor_root_u64(n: u64, exp: u64) -> u64 {
     assert_ne!(exp, 0);
     if n < 2 || exp == 1 {
         return n;
@@ -1090,7 +1094,7 @@ pub_test! {fast_floor_root_u64(n: u64, exp: u64) -> u64 {
     root
 }}
 
-pub_test! {fast_ceiling_root_u32(n: u32, exp: u64) -> u32 {
+private_test_fn! {fast_ceiling_root_u32(n: u32, exp: u64) -> u32 {
     assert_ne!(exp, 0);
     if n < 2 || exp == 1 {
         return n;
@@ -1139,7 +1143,7 @@ pub_test! {fast_ceiling_root_u32(n: u32, exp: u64) -> u32 {
     }
 }}
 
-pub_test! {fast_ceiling_root_u64(n: u64, exp: u64) -> u64 {
+private_test_fn! {fast_ceiling_root_u64(n: u64, exp: u64) -> u64 {
     assert_ne!(exp, 0);
     if n < 2 || exp == 1 {
         return n;
@@ -1188,7 +1192,7 @@ pub_test! {fast_ceiling_root_u64(n: u64, exp: u64) -> u64 {
     }
 }}
 
-pub_test! {fast_checked_root_u32(n: u32, exp: u64) -> Option<u32> {
+private_test_fn! {fast_checked_root_u32(n: u32, exp: u64) -> Option<u32> {
     assert_ne!(exp, 0);
     if n < 2 || exp == 1 {
         return Some(n);
@@ -1237,7 +1241,7 @@ pub_test! {fast_checked_root_u32(n: u32, exp: u64) -> Option<u32> {
     }
 }}
 
-pub_test! {fast_checked_root_u64(n: u64, exp: u64) -> Option<u64> {
+private_test_fn! {fast_checked_root_u64(n: u64, exp: u64) -> Option<u64> {
     assert_ne!(exp, 0);
     if n < 2 || exp == 1 {
         return Some(n);
@@ -1286,7 +1290,7 @@ pub_test! {fast_checked_root_u64(n: u64, exp: u64) -> Option<u64> {
     }
 }}
 
-pub_test! {fast_root_rem_u32(n: u32, exp: u64) -> (u32, u32) {
+private_test_fn! {fast_root_rem_u32(n: u32, exp: u64) -> (u32, u32) {
     assert_ne!(exp, 0);
     if n < 2 || exp == 1 {
         return (n, 0);
@@ -1332,7 +1336,7 @@ pub_test! {fast_root_rem_u32(n: u32, exp: u64) -> (u32, u32) {
     (root, n - pow)
 }}
 
-pub_test! {fast_root_rem_u64(n: u64, exp: u64) -> (u64, u64) {
+private_test_fn! {fast_root_rem_u64(n: u64, exp: u64) -> (u64, u64) {
     assert_ne!(exp, 0);
     if n < 2 || exp == 1 {
         return (n, 0);

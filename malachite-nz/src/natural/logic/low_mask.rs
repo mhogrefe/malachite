@@ -22,7 +22,7 @@ use malachite_base::num::logic::traits::LowMask;
 // $M(n) = O(n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `bits`.
-pub_crate_test! {limbs_low_mask(bits: u64) -> Vec<Limb> {
+crate_test_fn! {limbs_low_mask(bits: u64) -> Vec<Limb> {
     let len = bit_to_limb_count_ceiling(bits);
     let remaining_bits = bits & Limb::WIDTH_MASK;
     let mut xs = vec![Limb::MAX; len];

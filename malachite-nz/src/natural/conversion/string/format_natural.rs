@@ -103,7 +103,7 @@ fn append_integer(
     let core = i128::from(zeros)
         + i128::try_from(sign_len + showbase.len() + den_showbase.len() + s.len()).ok()?;
     let justlen = max(0, i128::from(spec.width) - core);
-    if core + justlen > i128::from(i64::MAX) {
+    if core + justlen > const { i64::MAX as i128 } {
         // The parser caps the width and precision at `i32::MAX`, so the total cannot come close to
         // overflowing an `i64`; this backstop protects a future caller that constructs a spec some
         // other way.

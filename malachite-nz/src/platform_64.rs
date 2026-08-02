@@ -17,6 +17,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::num::basic::integers::PrimitiveInt;
+
 /// The type whose [`Vec`](alloc::vec::Vec)s store the limbs (large digits) of a
 /// [`Natural`](crate::natural::Natural). [`u64`] by default, or [`u32`] with the `32_bit_limbs`
 /// feature.
@@ -27,6 +29,12 @@ pub type SignedLimb = i64;
 pub type SignedHalfLimb = i32;
 pub type SignedDoubleLimb = i128;
 pub type FloatWithLimbWidth = f64;
+
+// `Limb::WIDTH` in the types it is most often compared against. Each is its own named constant
+// rather than a `const { .. }` block at every use, since the same derived value repeated across the
+// crate is what `duplicate_const` exists to catch.
+pub(crate) const LIMB_WIDTH_USIZE: usize = Limb::WIDTH as usize;
+pub(crate) const LIMB_WIDTH_LIMB: Limb = Limb::WIDTH as Limb;
 
 pub(crate) const MAX_DIGITS_PER_LIMB: usize = 20;
 

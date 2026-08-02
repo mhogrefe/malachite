@@ -37,7 +37,7 @@ use malachite_base::vecs::vec_pad_left;
 //
 // This is equivalent to `mpn_lshift` from `mpn/generic/lshift.c`, GMP 6.2.1, where the result is
 // returned.
-pub_crate_test! {limbs_shl(xs: &[Limb], bits: u64) -> Vec<Limb> {
+crate_test_fn! {limbs_shl(xs: &[Limb], bits: u64) -> Vec<Limb> {
     let small_bits = bits & Limb::WIDTH_MASK;
     let limb_offset = bit_to_limb_count_floor(bits);
     let xs_len = xs.len();
@@ -86,7 +86,7 @@ pub_crate_test! {limbs_shl(xs: &[Limb], bits: u64) -> Vec<Limb> {
 // `Limb::WIDTH`.
 //
 // This is equivalent to `mpn_lshift` from `mpn/generic/lshift.c`, GMP 6.2.1.
-pub_crate_test! {limbs_shl_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> Limb {
+crate_test_fn! {limbs_shl_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> Limb {
     assert_ne!(bits, 0);
     assert!(bits < Limb::WIDTH);
     let len = xs.len();
@@ -117,7 +117,7 @@ pub_crate_test! {limbs_shl_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> L
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // This is equivalent to `mpn_lshift` from `mpn/generic/lshift.c`, GMP 6.2.1, where `rp == up`.
-pub_crate_test! {limbs_slice_shl_in_place(xs: &mut [Limb], bits: u64) -> Limb {
+crate_test_fn! {limbs_slice_shl_in_place(xs: &mut [Limb], bits: u64) -> Limb {
     assert_ne!(bits, 0);
     assert!(bits < Limb::WIDTH);
     let len = xs.len();
@@ -148,7 +148,7 @@ pub_crate_test! {limbs_slice_shl_in_place(xs: &mut [Limb], bits: u64) -> Limb {
 //
 // This is equivalent to `mpn_lshift` from `mpn/generic/lshift.c`, GMP 6.2.1, where `rp == up` and
 // the carry is appended to `rp`.
-pub_crate_test! {limbs_vec_shl_in_place(xs: &mut Vec<Limb>, bits: u64) {
+crate_test_fn! {limbs_vec_shl_in_place(xs: &mut Vec<Limb>, bits: u64) {
     let small_bits = bits & Limb::WIDTH_MASK;
     let limb_offset = bit_to_limb_count_floor(bits);
     if small_bits == 0 {
@@ -196,7 +196,7 @@ pub_crate_test! {limbs_vec_shl_in_place(xs: &mut Vec<Limb>, bits: u64) {
 // equal to `Limb::WIDTH`.
 //
 // This is equivalent to `mpn_lshiftc` from `mpn/generic/lshift.c`, GMP 6.2.1.
-pub_crate_test! {limbs_shl_with_complement_to_out(
+crate_test_fn! {limbs_shl_with_complement_to_out(
     out: &mut [Limb],
     xs: &[Limb],
     bits: u64
@@ -235,7 +235,7 @@ pub_crate_test! {limbs_shl_with_complement_to_out(
 //
 // This is equivalent to `mpn_addlsh_n` from GMP 6.3.0, where `rp == vp`. GMP provides this function
 // as native assembly or macro fallbacks rather than as generic C code.
-pub_crate_test! {limbs_shl_add_same_length_in_place_left(
+crate_test_fn! {limbs_shl_add_same_length_in_place_left(
     xs: &mut [Limb],
     ys: &[Limb],
     bits: u64
@@ -274,7 +274,7 @@ pub_crate_test! {limbs_shl_add_same_length_in_place_left(
 //
 // This is equivalent to `mpn_addlsh_n` from GMP 6.3.0, where `rp == up`, and to `DO_mpn_addlsh_n`
 // from `mpn/generic/toom_eval_pm2rexp.c`, GMP 6.2.1, but in a single pass with no scratch space.
-pub_crate_test! {limbs_add_shl_same_length_in_place_left(
+crate_test_fn! {limbs_add_shl_same_length_in_place_left(
     xs: &mut [Limb],
     ys: &[Limb],
     bits: u64
@@ -313,7 +313,7 @@ pub_crate_test! {limbs_add_shl_same_length_in_place_left(
 //
 // This is equivalent to `mpn_addlsh_n` from GMP 6.3.0. GMP provides this function as native
 // assembly or macro fallbacks rather than as generic C code.
-pub_crate_test! {limbs_shl_add_same_length_to_out(
+crate_test_fn! {limbs_shl_add_same_length_to_out(
     out: &mut [Limb],
     xs: &[Limb],
     ys: &[Limb],
@@ -357,7 +357,7 @@ pub_crate_test! {limbs_shl_add_same_length_to_out(
 // This is equivalent to `mpn_sublsh_n` from GMP 6.3.0, where `rp == up`, and to `DO_mpn_sublsh_n`
 // from `mpn/generic/toom_interpolate_8pts.c`, GMP 6.2.1, but in a single pass with no scratch
 // space.
-pub_crate_test! {limbs_sub_shl_same_length_in_place_left(
+crate_test_fn! {limbs_sub_shl_same_length_in_place_left(
     xs: &mut [Limb],
     ys: &[Limb],
     bits: u64
@@ -397,7 +397,7 @@ pub_crate_test! {limbs_sub_shl_same_length_in_place_left(
 //
 // This is equivalent to `mpn_rsblsh_n` from GMP 6.3.0, where `rp == vp`. GMP provides this function
 // as native assembly or macro fallbacks rather than as generic C code.
-pub_crate_test! {limbs_shl_sub_same_length_in_place_left(
+crate_test_fn! {limbs_shl_sub_same_length_in_place_left(
     xs: &mut [Limb],
     ys: &[Limb],
     bits: u64
@@ -437,7 +437,7 @@ pub_crate_test! {limbs_shl_sub_same_length_in_place_left(
 //
 // This is equivalent to `mpn_rsblsh_n` from GMP 6.3.0, where `rp == up`. GMP provides this function
 // as native assembly or macro fallbacks rather than as generic C code.
-pub_crate_test! {limbs_shl_sub_same_length_in_place_right(
+crate_test_fn! {limbs_shl_sub_same_length_in_place_right(
     xs: &[Limb],
     ys: &mut [Limb],
     bits: u64

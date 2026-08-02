@@ -61,11 +61,13 @@ fn limbs_not_to_out_fail() {
 #[test]
 fn test_not() {
     let test = |s, out| {
-        let not = !Natural::from_str(s).unwrap();
+        let u = Natural::from_str(s).unwrap();
+
+        let not = !u.clone();
         assert!(not.is_valid());
         assert_eq!(not.to_string(), out);
 
-        let not = !(&Natural::from_str(s).unwrap());
+        let not = !(&u);
         assert!(not.is_valid());
         assert_eq!(not.to_string(), out);
 

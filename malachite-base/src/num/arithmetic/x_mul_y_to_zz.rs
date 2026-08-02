@@ -24,7 +24,7 @@ fn implicit_x_mul_y_to_zz<T, DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned
     (DT::from(x) * DT::from(y)).split_in_half()
 }
 
-pub_test! {explicit_x_mul_y_to_zz<T: PrimitiveUnsigned>(x: T, y: T) -> (T, T) {
+private_test_fn! {explicit_x_mul_y_to_zz<T: PrimitiveUnsigned>(x: T, y: T) -> (T, T) {
     let (x_1, x_0) = wide_split_in_half(x);
     let (y_1, y_0) = wide_split_in_half(y);
     let x_0_y_0 = x_0 * y_0;

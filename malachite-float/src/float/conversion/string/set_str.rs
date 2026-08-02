@@ -50,7 +50,7 @@ fn underflow(sign: bool, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
     }
 }
 
-pub_crate_test! {
+crate_test_fn! {
 // Converts a parsed digit string to a `Float` of precision `prec`, correctly rounded with `rm`.
 //
 // `digits` holds digit values (not characters), most significant first, with leading and trailing
@@ -87,16 +87,16 @@ set_str_helper(
             let o = if sign { dir.sign() } else { dir.sign().reverse() };
             let significand = Natural::from_owned_limbs_asc(significand);
             // mpfr_check_range
-            if exp > i64::from(Float::MAX_EXPONENT) {
+            if exp > Float::MAX_EXPONENT_I64 {
                 return overflow(sign, prec, rm);
             }
-            if exp < i64::from(Float::MIN_EXPONENT) {
+            if exp < Float::MIN_EXPONENT_I64 {
                 // Under `Nearest` the result rounds away from zero, to the least positive value,
                 // only when it is at least half of it: the exponent must be exactly one below the
                 // minimum, and at exactly half (a power of two) the discarded part must have been
                 // nonzero.
                 let rm = if rm == Nearest
-                    && !(exp == i64::from(Float::MIN_EXPONENT_MINUS_1)
+                    && !(exp == Float::MIN_EXPONENT_MINUS_1_I64
                         && (o == away_from_0.reverse() || !significand.is_power_of_2()))
                 {
                     Down

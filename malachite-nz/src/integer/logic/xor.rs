@@ -41,7 +41,7 @@ use malachite_base::slices::{slice_leading_zeros, slice_set_zero, slice_test_zer
 // $M(n) = O(n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
-pub_test! {limbs_neg_xor_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
+private_test_fn! {limbs_neg_xor_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
     if y == 0 {
         return xs.to_vec();
     }
@@ -75,7 +75,7 @@ pub_test! {limbs_neg_xor_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
 // $M(n) = O(1)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
-pub_test! {limbs_neg_xor_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) -> bool {
+private_test_fn! {limbs_neg_xor_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) -> bool {
     let len = xs.len();
     assert!(out.len() >= len);
     if y == 0 {
@@ -111,7 +111,7 @@ pub_test! {limbs_neg_xor_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) -> 
 // $M(n) = O(1)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
-pub_test! {limbs_slice_neg_xor_limb_in_place(xs: &mut [Limb], y: Limb) -> bool {
+private_test_fn! {limbs_slice_neg_xor_limb_in_place(xs: &mut [Limb], y: Limb) -> bool {
     if y == 0 {
         return false;
     }
@@ -142,7 +142,7 @@ pub_test! {limbs_slice_neg_xor_limb_in_place(xs: &mut [Limb], y: Limb) -> bool {
 // $M(n) = O(1)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
-pub_test! {limbs_vec_neg_xor_limb_in_place(xs: &mut Vec<Limb>, y: Limb) {
+private_test_fn! {limbs_vec_neg_xor_limb_in_place(xs: &mut Vec<Limb>, y: Limb) {
     if limbs_slice_neg_xor_limb_in_place(xs, y) {
         xs.push(1);
     }
@@ -161,7 +161,7 @@ pub_test! {limbs_vec_neg_xor_limb_in_place(xs: &mut Vec<Limb>, y: Limb) {
 //
 // # Panics
 // Panics if `xs` is empty.
-pub_test! {limbs_pos_xor_limb_neg(xs: &[Limb], y: Limb) -> Vec<Limb> {
+private_test_fn! {limbs_pos_xor_limb_neg(xs: &[Limb], y: Limb) -> Vec<Limb> {
     let (head, tail) = xs.split_first().unwrap();
     let lo = head ^ y;
     let mut out;
@@ -190,7 +190,7 @@ pub_test! {limbs_pos_xor_limb_neg(xs: &[Limb], y: Limb) -> Vec<Limb> {
 //
 // # Panics
 // Panics if `xs` is empty or if `out` is shorter than `xs`.
-pub_test! {limbs_pos_xor_limb_neg_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) -> bool {
+private_test_fn! {limbs_pos_xor_limb_neg_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) -> bool {
     let (head, tail) = xs.split_first().unwrap();
     let (out_head, out_tail) = out[..xs.len()].split_first_mut().unwrap();
     let lo = head ^ y;
@@ -218,7 +218,7 @@ pub_test! {limbs_pos_xor_limb_neg_to_out(out: &mut [Limb], xs: &[Limb], y: Limb)
 //
 // # Panics
 // Panics if `xs` is empty.
-pub_test! {limbs_slice_pos_xor_limb_neg_in_place(xs: &mut [Limb], y: Limb) -> bool {
+private_test_fn! {limbs_slice_pos_xor_limb_neg_in_place(xs: &mut [Limb], y: Limb) -> bool {
     let (head, tail) = xs.split_at_mut(1);
     let head = &mut head[0];
     *head ^= y;
@@ -243,7 +243,7 @@ pub_test! {limbs_slice_pos_xor_limb_neg_in_place(xs: &mut [Limb], y: Limb) -> bo
 //
 // # Panics
 // Panics if `xs` is empty.
-pub_test! {limbs_vec_pos_xor_limb_neg_in_place(xs: &mut Vec<Limb>, y: Limb) {
+private_test_fn! {limbs_vec_pos_xor_limb_neg_in_place(xs: &mut Vec<Limb>, y: Limb) {
     if limbs_slice_pos_xor_limb_neg_in_place(xs, y) {
         xs.push(1);
     }
@@ -263,7 +263,7 @@ pub_test! {limbs_vec_pos_xor_limb_neg_in_place(xs: &mut Vec<Limb>, y: Limb) {
 //
 // # Panics
 // Panics if `xs` is empty or only contains zeros.
-pub_test! {limbs_neg_xor_limb_neg(xs: &[Limb], y: Limb) -> Vec<Limb> {
+private_test_fn! {limbs_neg_xor_limb_neg(xs: &[Limb], y: Limb) -> Vec<Limb> {
     let mut out;
     if xs[0] == 0 {
         let carry;
@@ -292,7 +292,7 @@ pub_test! {limbs_neg_xor_limb_neg(xs: &[Limb], y: Limb) -> Vec<Limb> {
 //
 // # Panics
 // Panics if `xs` is empty or only contains zeros, or if `out` is shorter than `xs`.
-pub_test! {limbs_neg_xor_limb_neg_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) {
+private_test_fn! {limbs_neg_xor_limb_neg_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) {
     let (head, tail) = xs.split_first().unwrap();
     let (out_head, out_tail) = out[..xs.len()].split_first_mut().unwrap();
     if *head == 0 {
@@ -318,7 +318,7 @@ pub_test! {limbs_neg_xor_limb_neg_to_out(out: &mut [Limb], xs: &[Limb], y: Limb)
 //
 // # Panics
 // Panics if `xs` is empty or only contains zeros.
-pub_test! {limbs_neg_xor_limb_neg_in_place(xs: &mut [Limb], y: Limb) {
+private_test_fn! {limbs_neg_xor_limb_neg_in_place(xs: &mut [Limb], y: Limb) {
     let (head, tail) = xs.split_first_mut().unwrap();
     if *head == 0 {
         assert!(!limbs_sub_limb_in_place(tail, 1));
@@ -356,7 +356,7 @@ const fn limbs_xor_pos_neg_helper(x: Limb, boundary_seen: &mut bool) -> Limb {
 //
 // This is equivalent to `mpz_xor` from `mpz/xor.c`, GMP 6.2.1, where `res` is returned, the first
 // input is positive, and the second is negative.
-pub_test! {limbs_xor_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
+private_test_fn! {limbs_xor_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let x_i = slice_leading_zeros(xs);
@@ -445,7 +445,7 @@ pub_test! {limbs_xor_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 //
 // This is equivalent to `mpz_xor` from `mpz/xor.c`, GMP 6.2.1, where the first input is positive
 // and the second is negative.
-pub_test! {limbs_xor_pos_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
+private_test_fn! {limbs_xor_pos_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(out.len() >= xs_len);
@@ -578,7 +578,7 @@ fn limbs_xor_pos_neg_in_place_left_helper(
 //
 // This is equivalent to `mpz_xor` from `mpz/xor.c`, GMP 6.2.1, where `res == op1` and the first
 // input is positive and the second is negative.
-pub_test! {limbs_xor_pos_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
+private_test_fn! {limbs_xor_pos_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let x_i = slice_leading_zeros(xs);
@@ -676,7 +676,7 @@ fn limbs_xor_pos_neg_in_place_right_helper(
 //
 // This is equivalent to `mpz_xor` from `mpz/xor.c`, GMP 6.2.1, where `res == op2` and the first
 // input is positive and the second is negative.
-pub_test! {limbs_xor_pos_neg_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>) {
+private_test_fn! {limbs_xor_pos_neg_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let x_i = slice_leading_zeros(xs);
@@ -734,7 +734,10 @@ pub_test! {limbs_xor_pos_neg_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>) {
 //
 // This is equivalent to `mpz_xor` from `mpz/xor.c`, GMP 6.2.1, where the first input is positive,
 // the second is negative, and the result is written to the longer input slice.
-pub_test! {limbs_xor_pos_neg_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>) -> bool {
+private_test_fn! {limbs_xor_pos_neg_in_place_either(
+    xs: &mut Vec<Limb>,
+    ys: &mut Vec<Limb>,
+) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let x_i = slice_leading_zeros(xs);
@@ -796,7 +799,7 @@ pub_test! {limbs_xor_pos_neg_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Li
 //
 // This is equivalent to `mpz_xor` from `mpz/xor.c`, GMP 6.2.1, where `res` is returned and both
 // inputs are negative.
-pub_test! {limbs_xor_neg_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
+private_test_fn! {limbs_xor_neg_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let x_i = slice_leading_zeros(xs);
@@ -853,7 +856,7 @@ pub_test! {limbs_xor_neg_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 // `xs` and `ys`.
 //
 // This is equivalent to `mpz_xor` from `mpz/xor.c`, GMP 6.2.1, where both inputs are negative.
-pub_test! {limbs_xor_neg_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
+private_test_fn! {limbs_xor_neg_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(out.len() >= xs_len);
@@ -935,7 +938,7 @@ fn limbs_xor_neg_neg_in_place_helper(xs: &mut [Limb], ys: &[Limb], x_i: usize, y
 //
 // This is equivalent to `mpz_xor` from `mpz/xor.c`, GMP 6.2.1, where `res == op1` and both inputs
 // are negative.
-pub_test! {limbs_xor_neg_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
+private_test_fn! {limbs_xor_neg_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let x_i = slice_leading_zeros(xs);
@@ -971,7 +974,7 @@ pub_test! {limbs_xor_neg_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
 //
 // This is equivalent to `mpz_xor` from `mpz/xor.c`, GMP 6.2.1, where both inputs are negative and
 // the result is written to the longer input slice.
-pub_test! {limbs_xor_neg_neg_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> bool {
+private_test_fn! {limbs_xor_neg_neg_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let x_i = slice_leading_zeros(xs);

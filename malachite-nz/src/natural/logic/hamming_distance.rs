@@ -30,7 +30,7 @@ use malachite_base::num::logic::traits::HammingDistance;
 //
 // # Panics
 // Panics if `xs` is empty.
-pub_test! {limbs_hamming_distance_limb(xs: &[Limb], y: Limb) -> u64 {
+private_test_fn! {limbs_hamming_distance_limb(xs: &[Limb], y: Limb) -> u64 {
     xs[0].hamming_distance(y) + limbs_count_ones(&xs[1..])
 }}
 
@@ -49,7 +49,7 @@ pub_test! {limbs_hamming_distance_limb(xs: &[Limb], y: Limb) -> u64 {
 //
 // This is equivalent to `mpz_hamdist` from `mpz/hamdist.c`, GMP 6.2.1, where both arguments are
 // non-negative and have the same length.
-pub_crate_test! {limbs_hamming_distance_same_length(xs: &[Limb], ys: &[Limb]) -> u64 {
+crate_test_fn! {limbs_hamming_distance_same_length(xs: &[Limb], ys: &[Limb]) -> u64 {
     assert_eq!(xs.len(), ys.len());
     xs.iter()
         .zip(ys.iter())
@@ -69,7 +69,7 @@ pub_crate_test! {limbs_hamming_distance_same_length(xs: &[Limb], ys: &[Limb]) ->
 //
 // This is equivalent to `mpz_hamdist` from `mpz/hamdist.c`, GMP 6.2.1, where both arguments are
 // non-negative.
-pub_test! {limbs_hamming_distance(xs: &[Limb], ys: &[Limb]) -> u64 {
+private_test_fn! {limbs_hamming_distance(xs: &[Limb], ys: &[Limb]) -> u64 {
     let xs_len = xs.len();
     let ys_len = ys.len();
     match xs_len.cmp(&ys_len) {

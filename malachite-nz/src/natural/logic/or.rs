@@ -48,7 +48,7 @@ pub fn limbs_or_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
 //
 // # Panics
 // Panics if `out` is shorter than `xs` or if `xs` is empty.
-pub_test! {limbs_or_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) {
+private_test_fn! {limbs_or_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) {
     out[..xs.len()].copy_from_slice(xs);
     limbs_or_limb_in_place(out, y);
 }}
@@ -61,7 +61,7 @@ pub_test! {limbs_or_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) {
 //
 // # Panics
 // Panics if `xs` is empty.
-pub_test! {limbs_or_limb_in_place(xs: &mut [Limb], y: Limb) {
+private_test_fn! {limbs_or_limb_in_place(xs: &mut [Limb], y: Limb) {
     xs[0] |= y;
 }}
 
@@ -80,7 +80,7 @@ pub_test! {limbs_or_limb_in_place(xs: &mut [Limb], y: Limb) {
 // Panics if `xs` and `ys` have different lengths.
 //
 // This is equivalent to `mpn_ior_n` from `gmp-impl.h`, GMP 6.2.1, where `rp` is returned.
-pub_test! {limbs_or_same_length(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
+private_test_fn! {limbs_or_same_length(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     assert_eq!(xs.len(), ys.len());
     xs.iter().zip(ys.iter()).map(|(x, y)| x | y).collect()
 }}
@@ -98,7 +98,7 @@ pub_test! {limbs_or_same_length(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 //
 // This is equivalent to `mpz_ior` from `mpz/ior.c`, GMP 6.2.1, where `res` is returned and both
 // inputs are non-negative.
-pub_test! {limbs_or(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
+private_test_fn! {limbs_or(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let mut result;
@@ -127,7 +127,7 @@ pub_test! {limbs_or(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 // Panics if `xs` and `ys` have different lengths or if `out` is too short.
 //
 // This is equivalent to `mpn_ior_n` from `gmp-impl.h`, GMP 6.2.1.
-pub_test! {limbs_or_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
+private_test_fn! {limbs_or_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let len = xs.len();
     assert_eq!(len, ys.len());
     assert!(out.len() >= len);
@@ -151,7 +151,7 @@ pub_test! {limbs_or_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb
 // Panics if `out` is too short.
 //
 // This is equivalent to `mpz_ior` from `mpz/ior.c`, GMP 6.2.1, where both inputs are non-negative.
-pub_test! {limbs_or_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
+private_test_fn! {limbs_or_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     if xs_len >= ys_len {
@@ -179,7 +179,7 @@ pub_test! {limbs_or_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 // Panics if `xs` and `ys` have different lengths.
 //
 // This is equivalent to `mpn_ior_n` from `gmp-impl.h`, GMP 6.2.1, where `rp == up`.
-pub_test! {limbs_or_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
+private_test_fn! {limbs_or_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
     assert_eq!(xs.len(), ys.len());
     for (x, &y) in xs.iter_mut().zip(ys.iter()) {
         *x |= y;
@@ -199,7 +199,7 @@ pub_test! {limbs_or_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
 //
 // This is equivalent to `mpz_ior` from `mpz/ior.c`, GMP 6.2.1, where `res == op1` and both inputs
 // are non-negative.
-pub_test! {limbs_or_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
+private_test_fn! {limbs_or_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     if xs_len >= ys_len {
@@ -224,7 +224,7 @@ pub_test! {limbs_or_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
 //
 // This is equivalent to `mpz_ior` from `mpz/ior.c`, GMP 6.2.1, where both inputs are non-negative
 // and the result is written to the longer input slice.
-pub_test! {limbs_or_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> bool {
+private_test_fn! {limbs_or_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let right = xs_len < ys_len;

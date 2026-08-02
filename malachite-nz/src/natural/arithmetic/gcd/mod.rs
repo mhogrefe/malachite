@@ -49,7 +49,7 @@ fn limbs_mod_or_modexact(ns: &[Limb], d: Limb) -> Limb {
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // This is equivalent to `mpn_gcd_1` from `mpn/generic/gcd_1.c`, GMP 6.2.1.
-pub_test! {limbs_gcd_limb(xs: &[Limb], mut y: Limb) -> Limb {
+private_test_fn! {limbs_gcd_limb(xs: &[Limb], mut y: Limb) -> Limb {
     assert!(xs.len() > 1);
     assert_ne!(y, 0);
     let mut x = xs[0];

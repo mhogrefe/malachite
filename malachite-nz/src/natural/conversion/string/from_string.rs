@@ -8,7 +8,7 @@
 
 use crate::natural::InnerNatural::Small;
 use crate::natural::{Natural, WIDTH_MINUS_1, WIDTH_MINUS_2, WIDTH_MINUS_3};
-use crate::platform::{Limb, MAX_DIGITS_PER_LIMB};
+use crate::platform::{LIMB_WIDTH_USIZE, Limb, MAX_DIGITS_PER_LIMB};
 use core::str::FromStr;
 use malachite_base::num::arithmetic::traits::{ModPowerOf2, ShrRound};
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -57,11 +57,11 @@ impl FromStr for Natural {
 
 fn from_binary_str(s: &str) -> Option<Natural> {
     let len = s.len();
-    if len <= usize::wrapping_from(Limb::WIDTH) {
+    if len <= LIMB_WIDTH_USIZE {
         Limb::from_str_radix(s, 2).ok().map(Natural::from)
     } else {
         let mut xs = vec![0; len.shr_round(Limb::LOG_WIDTH, Ceiling).0];
-        let mut remaining = u64::wrapping_from(len & usize::wrapping_from(Limb::WIDTH_MASK));
+        let mut remaining = u64::wrapping_from(len & const { Limb::WIDTH_MASK as usize });
         let mut i = xs.len();
         let mut x = xs.last_mut().unwrap();
         if remaining != 0 {

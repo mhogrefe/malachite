@@ -27,7 +27,7 @@ use malachite_base::num::logic::traits::NotAssign;
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // This is equivalent to `mpn_com` from `mpn/generic/com.c`, GMP 6.2.1, where `rp` is returned.
-pub_test! {limbs_not(xs: &[Limb]) -> Vec<Limb> {
+private_test_fn! {limbs_not(xs: &[Limb]) -> Vec<Limb> {
     xs.iter().map(|x| !x).collect()
 }}
 
@@ -45,7 +45,7 @@ pub_test! {limbs_not(xs: &[Limb]) -> Vec<Limb> {
 //
 // # Panics
 // Panics if `out` is shorter than `xs`.
-pub_crate_test! {limbs_not_to_out(out: &mut [Limb], xs: &[Limb]) {
+crate_test_fn! {limbs_not_to_out(out: &mut [Limb], xs: &[Limb]) {
     assert!(out.len() >= xs.len());
     for (x, y) in out.iter_mut().zip(xs.iter()) {
         *x = !y;
@@ -62,7 +62,7 @@ pub_crate_test! {limbs_not_to_out(out: &mut [Limb], xs: &[Limb]) {
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // This is equivalent to `mpn_com` from `mpn/generic/com.c`, GMP 6.2.1, where `rp == up`.
-pub_crate_test! {limbs_not_in_place(xs: &mut [Limb]) {
+crate_test_fn! {limbs_not_in_place(xs: &mut [Limb]) {
     for x in &mut *xs {
         x.not_assign();
     }

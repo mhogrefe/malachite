@@ -10,7 +10,7 @@ use crate::Rational;
 use malachite_base::num::arithmetic::traits::{Average, AverageAssign};
 
 impl Average<Self> for Rational {
-    type Output = Rational;
+    type Output = Self;
 
     /// Computes the average (arithmetic mean) of two [`Rational`]s, taking both by value.
     ///
@@ -51,13 +51,13 @@ impl Average<Self> for Rational {
     /// );
     /// ```
     #[inline]
-    fn average(self, other: Self) -> Rational {
+    fn average(self, other: Self) -> Self {
         (self + other) >> 1u64
     }
 }
 
 impl Average<&Self> for Rational {
-    type Output = Rational;
+    type Output = Self;
 
     /// Computes the average (arithmetic mean) of two [`Rational`]s, taking the first by value and
     /// the second by reference.
@@ -99,7 +99,7 @@ impl Average<&Self> for Rational {
     /// );
     /// ```
     #[inline]
-    fn average(self, other: &Self) -> Rational {
+    fn average(self, other: &Self) -> Self {
         (self + other) >> 1u64
     }
 }

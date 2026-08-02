@@ -10,7 +10,7 @@ use crate::natural::arithmetic::mul::fft::{
     MPNToFFTFunc, ModData, ProfileEntry, SerializedCRTData, SerializedContext, SerializedFFTContext,
 };
 
-pub_const_crate_test_const! {CONTEXT: SerializedContext = SerializedContext {
+crate_test_const! {CONTEXT: SerializedContext = SerializedContext {
     ffts: [
         SerializedFFTContext {
             p: 4832221662680186888,

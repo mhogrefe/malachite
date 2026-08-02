@@ -63,7 +63,7 @@ pub(crate) fn limbs_mul_mod_base_pow_n_minus_1_next_size_helper(
 // The result is $O(n)$.
 //
 // This is equivalent to `mpn_mulmod_bnm1_next_size` from `mpn/generic/mulmod_bnm1.c`, GMP 6.2.1.
-pub_crate_test! {limbs_mul_mod_base_pow_n_minus_1_next_size(n: usize) -> usize {
+crate_test_fn! {limbs_mul_mod_base_pow_n_minus_1_next_size(n: usize) -> usize {
     limbs_mul_mod_base_pow_n_minus_1_next_size_helper(
         n,
         MULMOD_BNM1_THRESHOLD,
@@ -198,7 +198,7 @@ fn limbs_mul_mod_base_pow_n_plus_1_basecase(out: &mut [Limb], xs: &[Limb], ys: &
 // `scratch` are too short.
 //
 // This is equivalent to `mpn_mulmod_bnm1` from `mpn/generic/mulmod_bnm1.c`, GMP 6.2.1.
-pub_crate_test! {limbs_mul_mod_base_pow_n_minus_1(
+crate_test_fn! {limbs_mul_mod_base_pow_n_minus_1(
     out: &mut [Limb],
     n: usize,
     xs: &[Limb],

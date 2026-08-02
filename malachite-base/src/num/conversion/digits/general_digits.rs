@@ -13,7 +13,7 @@ use crate::num::conversion::traits::{
 use alloc::vec::Vec;
 use itertools::Itertools;
 
-pub_test! {unsigned_to_digits_asc_naive<
+private_test_fn! {unsigned_to_digits_asc_naive<
     T: ExactFrom<U> + PrimitiveUnsigned,
     U: PrimitiveUnsigned + WrappingFrom<T>,
 >(

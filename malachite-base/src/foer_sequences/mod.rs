@@ -31,7 +31,7 @@ fn foer_sequence_reduce<T: Eq>(non_repeating: &mut Vec<T>, repeating: &mut Vec<T
     }
 }
 
-pub_test! {foer_sequence_is_reduced<T: Eq>(non_repeating: &[T], repeating: &[T]) -> bool {
+private_test_fn! {foer_sequence_is_reduced<T: Eq>(non_repeating: &[T], repeating: &[T]) -> bool {
     if repeating.is_empty() {
         return true;
     }

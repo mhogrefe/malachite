@@ -66,7 +66,7 @@ fn mod_euclidean_fail_helper<T: PrimitiveInt>() {
     assert_panic!(T::ONE.mod_euclidean(T::ZERO));
     assert_panic!({
         let mut x = T::ONE;
-        x.mod_euclidean_assign(T::ZERO)
+        x.mod_euclidean_assign(T::ZERO);
     });
 }
 
@@ -74,7 +74,7 @@ fn mod_euclidean_signed_fail_helper<T: PrimitiveSigned>() {
     assert_panic!(T::MIN.mod_euclidean(T::NEGATIVE_ONE));
     assert_panic!({
         let mut x = T::MIN;
-        x.mod_euclidean_assign(T::NEGATIVE_ONE)
+        x.mod_euclidean_assign(T::NEGATIVE_ONE);
     });
 }
 
@@ -104,7 +104,7 @@ fn mod_euclidean_properties_helper_unsigned<T: PrimitiveUnsigned>() {
         assert_panic!(x.mod_euclidean(T::ZERO));
         assert_panic!({
             let mut y = x;
-            y.mod_euclidean_assign(T::ZERO)
+            y.mod_euclidean_assign(T::ZERO);
         });
     });
 
@@ -144,7 +144,7 @@ fn mod_euclidean_properties_helper_signed<T: PrimitiveSigned>() {
         assert_panic!(x.mod_euclidean(T::ZERO));
         assert_panic!({
             let mut y = x;
-            y.mod_euclidean_assign(T::ZERO)
+            y.mod_euclidean_assign(T::ZERO);
         });
     });
 

@@ -108,7 +108,7 @@ pub(crate) struct HalfGcdMatrix<'a> {
 impl HalfGcdMatrix<'_> {
     // # Worst-case complexity
     // Constant time and additional memory.
-    pub_crate_test! {get(&self, row: u8, column: u8) -> &[Limb] {
+    crate_test_fn! {get(&self, row: u8, column: u8) -> &[Limb] {
         match (row, column) {
             (0, 0) => &self.data[..self.s],
             (0, 1) => &self.data[self.s..self.two_s],
@@ -120,7 +120,7 @@ impl HalfGcdMatrix<'_> {
 
     // # Worst-case complexity
     // Constant time and additional memory.
-    pub_test! {get_mut(&mut self, row: u8, column: u8) -> &mut [Limb] {
+    private_test_fn! {get_mut(&mut self, row: u8, column: u8) -> &mut [Limb] {
         match (row, column) {
             (0, 0) => &mut self.data[..self.s],
             (0, 1) => &mut self.data[self.s..self.two_s],
@@ -173,7 +173,7 @@ impl HalfGcdMatrix<'_> {
 
     // # Worst-case complexity
     // Constant time and additional memory.
-    pub_const_test! {min_init_scratch(n: usize) -> usize {
+    private_test_const_fn! {min_init_scratch(n: usize) -> usize {
         (((n + 1) >> 1) + 1) << 2
     }}
 
@@ -189,7 +189,7 @@ impl HalfGcdMatrix<'_> {
     //
     // This is equivalent to `mpn_hgcd_matrix_init` from `mpn/generic/hgcd_matrix.c`, GMP 6.2.1,
     // where the matrix is returned.
-    pub_crate_test! {init(n: usize, p: &mut [Limb]) -> HalfGcdMatrix<'_> {
+    crate_test_fn! {init(n: usize, p: &mut [Limb]) -> HalfGcdMatrix<'_> {
         let s = n.div_ceil(2) + 1;
         let two_s = s << 1;
         let three_s = two_s + s;
@@ -208,7 +208,7 @@ impl HalfGcdMatrix<'_> {
 
     // # Worst-case complexity
     // Constant time and additional memory.
-    pub_const_test! {update_q_scratch_len(&self, qs_len: usize) -> usize {
+    private_test_const_fn! {update_q_scratch_len(&self, qs_len: usize) -> usize {
         self.n + qs_len
     }}
 
@@ -233,7 +233,7 @@ impl HalfGcdMatrix<'_> {
 // where $T$ is time, $M$ is additional memory, and $n$ is `max(a.n, b.n)`.
 //
 // This is equivalent to `mpn_hgcd_matrix_mul` from `mpn/generic/hgcd_matrix.c`, GMP 6.2.1.
-pub_crate_test! {limbs_half_gcd_matrix_mul_matrix(
+crate_test_fn! {limbs_half_gcd_matrix_mul_matrix(
     a: &mut HalfGcdMatrix,
     b: &HalfGcdMatrix,
     scratch: &mut [Limb]
@@ -286,7 +286,7 @@ pub_crate_test! {limbs_half_gcd_matrix_mul_matrix(
 // where $T$ is time, $M$ is additional memory, and $n$ is `a.n`.
 //
 // This is equivalent to `mpn_hgcd_matrix_mul_1` from `mpn/generic/hgcd_matrix.c`, GMP 6.2.1.
-pub_crate_test! {limbs_half_gcd_matrix_mul_matrix_1(
+crate_test_fn! {limbs_half_gcd_matrix_mul_matrix_1(
     a: &mut HalfGcdMatrix,
     b: &HalfGcdMatrix1,
     scratch: &mut [Limb],
@@ -314,7 +314,7 @@ pub_crate_test! {limbs_half_gcd_matrix_mul_matrix_1(
 // where $T$ is time, $M$ is additional memory, and $n$ is `m.n`.
 //
 // This is equivalent to `mpn_hgcd_matrix_update_q` from `mpn/generic/hgcd_matrix.c`, GMP 6.2.1.
-pub_crate_test! {limbs_half_gcd_matrix_update_q(
+crate_test_fn! {limbs_half_gcd_matrix_update_q(
     m: &mut HalfGcdMatrix,
     qs: &[Limb],
     column: u8,
@@ -665,7 +665,7 @@ pub(crate) struct HalfGcdMatrix1 {
 // where $T$ is time, $M$ is additional memory, and $n$ is `m.n`.
 //
 // This is equivalent to `mpn_hgcd_mul_matrix1_vector` from `mpn/generic/hgcd2.c`, GMP 6.2.1.
-pub_crate_test! {limbs_half_gcd_matrix_1_mul_vector(
+crate_test_fn! {limbs_half_gcd_matrix_1_mul_vector(
     m: &HalfGcdMatrix1,
     out: &mut [Limb],
     xs: &[Limb],
@@ -968,7 +968,7 @@ pub(crate) const fn extract_number(count: u64, x1: Limb, x0: Limb) -> Limb {
 //
 // This is equivalent to `div2` from `mpn/generic/hgcd2.c`, GMP 6.2.1, where `HGCD2_DIV2_METHOD ==
 // 1`.
-pub_crate_test! {limbs_gcd_div(
+crate_test_fn! {limbs_gcd_div(
     mut n1: Limb,
     mut n0: Limb,
     mut d1: Limb,
@@ -1276,7 +1276,7 @@ const HGCD_REDUCE_THRESHOLD: usize = 1679;
 // Constant time and additional memory.
 //
 // This is equivalent to `mpn_hgcd_reduce_itch` from `mpn/generic/hgcd_reduce.c`, GMP 6.2.1.
-pub_test! {limbs_half_gcd_reduce_scratch_len(n: usize, p: usize) -> usize {
+private_test_fn! {limbs_half_gcd_reduce_scratch_len(n: usize, p: usize) -> usize {
     assert!(n >= p);
     let diff = n - p;
     if n < HGCD_REDUCE_THRESHOLD {
@@ -1558,7 +1558,7 @@ pub(crate) const GCD_DC_THRESHOLD: usize = 330;
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // This is equivalent to `mpn_gcd` from `mpn/generic/gcd.c`, GMP 6.2.1.
-pub_crate_test! {limbs_gcd_reduced(out: &mut [Limb], xs: &mut [Limb], ys: &mut [Limb]) -> usize {
+crate_test_fn! {limbs_gcd_reduced(out: &mut [Limb], xs: &mut [Limb], ys: &mut [Limb]) -> usize {
     let mut xs = &mut *xs;
     let mut ys = &mut *ys;
     let xs_len = xs.len();

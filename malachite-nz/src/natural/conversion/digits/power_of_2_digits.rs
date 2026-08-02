@@ -23,7 +23,7 @@ use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::slices::slice_trailing_zeros;
 
 impl Natural {
-    pub_test! {to_power_of_2_digits_asc_naive<
+    private_test_fn! {to_power_of_2_digits_asc_naive<
         T: for<'a> TryFrom<&'a Natural> + PrimitiveUnsigned,
     >(
         &self,
@@ -48,7 +48,7 @@ impl Natural {
         digits
     }}
 
-    pub_test! {from_power_of_2_digits_asc_naive<T: PrimitiveUnsigned, I: Iterator<Item = T>>(
+    private_test_fn! {from_power_of_2_digits_asc_naive<T: PrimitiveUnsigned, I: Iterator<Item = T>>(
         log_base: u64,
         digits: I,
     ) -> Option<Natural>
@@ -682,7 +682,7 @@ impl PowerOf2Digits<Self> for Natural {
 }
 
 impl Natural {
-    pub_test! {to_power_of_2_digits_asc_natural_naive(&self, log_base: u64) -> Vec<Natural> {
+    private_test_fn! {to_power_of_2_digits_asc_natural_naive(&self, log_base: u64) -> Vec<Natural> {
         assert_ne!(log_base, 0);
         let digit_len = self
             .significant_bits()
@@ -697,7 +697,7 @@ impl Natural {
         digits
     }}
 
-    pub_test! {from_power_of_2_digits_asc_natural_naive<I: Iterator<Item = Natural>>(
+    private_test_fn! {from_power_of_2_digits_asc_natural_naive<I: Iterator<Item = Natural>>(
         log_base: u64,
         digits: I,
     ) -> Option<Natural> {

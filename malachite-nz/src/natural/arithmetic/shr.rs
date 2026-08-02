@@ -35,7 +35,7 @@ use malachite_base::vecs::vec_delete_left;
 //
 // This is equivalent to `mpn_rshift` from `mpn/generic/rshift.c`, GMP 6.2.1, where the result is
 // returned.
-pub_crate_test! {limbs_shr(xs: &[Limb], bits: u64) -> Vec<Limb> {
+crate_test_fn! {limbs_shr(xs: &[Limb], bits: u64) -> Vec<Limb> {
     let delete_count = bit_to_limb_count_floor(bits);
     if delete_count >= xs.len() {
         Vec::new()
@@ -77,7 +77,7 @@ pub_crate_test! {limbs_shr(xs: &[Limb], bits: u64) -> Vec<Limb> {
 // equal to `Limb::WIDTH`.
 //
 // This is equivalent to `mpn_rshift` from `mpn/generic/rshift.c`, GMP 6.2.1.
-pub_crate_test! {limbs_shr_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> Limb {
+crate_test_fn! {limbs_shr_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> Limb {
     let len = xs.len();
     assert_ne!(len, 0);
     assert_ne!(bits, 0);
@@ -111,7 +111,7 @@ pub_crate_test! {limbs_shr_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> L
 // Panics if `xs` is empty, `bits` is 0, or `bits` is greater than or equal to `Limb::WIDTH`.
 //
 // This is equivalent to `mpn_rshift` from `mpn/generic/rshift.c`, GMP 6.2.1, where `rp == up`.
-pub_crate_test! {limbs_slice_shr_in_place<T: PrimitiveUnsigned>(xs: &mut [T], bits: u64) -> T {
+crate_test_fn! {limbs_slice_shr_in_place<T: PrimitiveUnsigned>(xs: &mut [T], bits: u64) -> T {
     assert_ne!(bits, 0);
     assert!(bits < T::WIDTH);
     let len = xs.len();
@@ -139,7 +139,7 @@ pub_crate_test! {limbs_slice_shr_in_place<T: PrimitiveUnsigned>(xs: &mut [T], bi
 //
 // This is equivalent to `mpn_rshift` from `mpn/generic/rshift.c`, GMP 6.2.1, where `rp == up` and
 // if `cnt` is sufficiently large, limbs are removed from `rp`.
-pub_crate_test! {limbs_vec_shr_in_place(xs: &mut Vec<Limb>, bits: u64) {
+crate_test_fn! {limbs_vec_shr_in_place(xs: &mut Vec<Limb>, bits: u64) {
     let delete_count = bit_to_limb_count_floor(bits);
     if delete_count >= xs.len() {
         xs.clear();

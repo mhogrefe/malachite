@@ -51,16 +51,15 @@ fn test_limbs_index_of_next_true_bit() {
 
 #[test]
 fn test_index_of_next_true_bit() {
-    let test = |n, u, out| {
-        assert_eq!(Natural::from_str(n).unwrap().index_of_next_true_bit(u), out);
+    let test = |s, v, out| {
+        let u = Natural::from_str(s).unwrap();
+
+        assert_eq!(u.index_of_next_true_bit(v), out);
+        assert_eq!(natural_index_of_next_true_bit_alt(&u, v), out);
         assert_eq!(
-            natural_index_of_next_true_bit_alt(&Natural::from_str(n).unwrap(), u),
-            out
-        );
-        assert_eq!(
-            rug::Integer::from_str(n)
+            rug::Integer::from_str(s)
                 .unwrap()
-                .find_one(u32::exact_from(u))
+                .find_one(u32::exact_from(v))
                 .map(u64::from),
             out
         );

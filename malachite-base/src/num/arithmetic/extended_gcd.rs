@@ -36,7 +36,7 @@ fn extended_gcd_signed<
 
 // This is equivalent to `n_xgcd` from `ulong_extras/xgcd.c`, FLINT 2.7.1, with an adjustment to
 // find the minimal cofactors.
-pub_test! {extended_gcd_unsigned_binary<
+private_test_fn! {extended_gcd_unsigned_binary<
     U: WrappingFrom<S> + PrimitiveUnsigned,
     S: PrimitiveSigned + WrappingFrom<U>,
 >(

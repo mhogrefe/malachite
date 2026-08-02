@@ -109,7 +109,7 @@ pub(crate) enum ArgType {
 // with size = 0, is not ported: the count-only mode it selected was dropped.) The struct is `pub`
 // under `test_build` so the tests can name it (they build values via `float_conversion_spec` and
 // never touch the fields, which stay `pub(crate)`).
-pub_crate_test_struct! {
+crate_test_struct! {
 #[derive(Clone, Copy)]
 PrintfSpec {
     pub(crate) alt: bool,      // `#` flag
@@ -1009,7 +1009,7 @@ fn partition_number(p: &Float, mut spec: PrintfSpec) -> Option<(NumberParts, i64
         np.pad_size = spec.width - i64::exact_from(total);
         total = i128::from(spec.width);
     }
-    if total > i128::from(i64::MAX) {
+    if total > const { i64::MAX as i128 } {
         fail_on_untested_path("partition_number, total width overflows i64");
         return None;
     }
@@ -1077,7 +1077,7 @@ fn sprnt_fp(buf: &mut Vec<u8>, p: &Float, spec: &PrintfSpec) -> Option<()> {
 // means unset), field width, and rounding mode. The flag fields start out cleared, so callers (e.g.
 // a future `Display` wiring, which needs `alt`/`showsign`/`left`/`pad`) may set them on the result
 // before calling [`format_mpfr_float`].
-pub_const_crate_test! {float_conversion_spec(
+crate_test_const_fn! {float_conversion_spec(
     conv: u8,
     prec: i64,
     width: i64,
@@ -1094,7 +1094,7 @@ pub_const_crate_test! {float_conversion_spec(
 // Formats the [`Float`] `p` for a single `%R<conv>` conversion described by `spec`, returning the
 // formatted string, or `None` on an internal size overflow (where MPFR returns -1). This is the
 // core of the `%R` path; [`format`] is the multi-conversion format-string frontend on top of it.
-pub_crate_test! {format_mpfr_float(p: &Float, spec: &PrintfSpec) -> Option<String> {
+crate_test_fn! {format_mpfr_float(p: &Float, spec: &PrintfSpec) -> Option<String> {
     let mut buf = Vec::new();
     sprnt_fp(&mut buf, p, spec)?;
     Some(String::from_utf8(buf).unwrap())
@@ -1104,7 +1104,7 @@ pub_crate_test! {format_mpfr_float(p: &Float, spec: &PrintfSpec) -> Option<Strin
 // width/precision fields and the `%d`/`%i` conversions consume an `Int`; `%s` consumes a `Str`.
 // This replaces the C `va_list`. The enum is `pub` under `test_build` so the tests can drive
 // [`format`] directly.
-pub_crate_test_enum! {
+crate_test_enum! {
 PrintfArg<'a> {
     Float(&'a Float),
     // `format` consumes `Int` and `Str` arguments, but until the multi-conversion frontend becomes
@@ -1263,7 +1263,7 @@ fn format_str(s: &str, spec: &PrintfSpec) -> Vec<u8> {
 // This is the `%R` path of `mpfr_vasnprintf_aux`'s main loop from `vasprintf.c`, MPFR 4.2.2, recast
 // onto a Rust argument slice instead of a `va_list` (and without the `gmp_vsnprintf` delegation,
 // which has no Malachite analog).
-pub_crate_test! {format_mpfr_str(fmt: &[u8], args: &[PrintfArg]) -> Option<Vec<u8>> {
+crate_test_fn! {format_mpfr_str(fmt: &[u8], args: &[PrintfArg]) -> Option<Vec<u8>> {
     let mut out = Vec::new();
     let mut fmt = fmt;
     let mut args = args.iter();

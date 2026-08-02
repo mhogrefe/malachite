@@ -23,7 +23,7 @@ use malachite_base::num::logic::traits::{CountOnes, CountZeros};
 // $M(n) = O(1)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
-pub_crate_test! {limbs_count_zeros_neg(xs: &[Limb]) -> u64 {
+crate_test_fn! {limbs_count_zeros_neg(xs: &[Limb]) -> u64 {
     let mut sum = 0;
     let mut nonzero_seen = false;
     for &x in xs {

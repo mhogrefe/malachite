@@ -30,7 +30,7 @@ use malachite_base::num::logic::traits::SignificantBits;
 //
 // This is equivalent to `mpz_sizeinbase` from `mpz/sizeinbase.c`, GMP 6.2.1, where `x` is
 // non-negative and `base` is 2.
-pub_crate_test! {limbs_significant_bits<T: PrimitiveUnsigned>(xs: &[T]) -> u64 {
+crate_test_fn! {limbs_significant_bits<T: PrimitiveUnsigned>(xs: &[T]) -> u64 {
     ((u64::wrapping_from(xs.len()) - 1) << T::LOG_WIDTH) + xs.last().unwrap().significant_bits()
 }}
 

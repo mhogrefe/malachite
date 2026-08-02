@@ -111,6 +111,13 @@ impl<'tcx> LateLintPass<'tcx> for UseConstBlock {
         if cx_eval.eval(parent).is_some() && !references_local(cx, parent) {
             return;
         }
+        // If the island is the whole operand of a numeric conversion, `use_const_cast` reports it
+        // with a suggestion that folds the cast in too, which subsumes this one.
+        if let Some((operand, _)) = crate::use_const_cast::conversion(cx, parent)
+            && operand.hir_id == expr.hir_id
+        {
+            return;
+        }
         span_lint_and_help(
             cx,
             USE_CONST_BLOCK,

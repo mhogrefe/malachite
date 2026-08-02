@@ -129,7 +129,7 @@ fn benchmark_float_average_evaluation_strategy(
         &mut [
             ("Float.average(Float)", &mut |(x, y)| no_out!(x.average(y))),
             ("Float.average(&Float)", &mut |(x, y)| {
-                no_out!(x.average(&y))
+                no_out!(x.average(&y));
             }),
             ("(&Float).average(Float)", &mut |(x, y)| {
                 no_out!((&x).average(y));
@@ -166,11 +166,11 @@ fn benchmark_float_average_prec_round_evaluation_strategy(
             ),
             (
                 "(&Float).average_prec_round_ref_val(Float, u64, RoundingMode)",
-                &mut |(x, y, prec, rm)| no_out!((&x).average_prec_round_ref_val(y, prec, rm)),
+                &mut |(x, y, prec, rm)| no_out!(x.average_prec_round_ref_val(y, prec, rm)),
             ),
             (
                 "(&Float).average_prec_round_ref_ref(&Float, u64, RoundingMode)",
-                &mut |(x, y, prec, rm)| no_out!((&x).average_prec_round_ref_ref(&y, prec, rm)),
+                &mut |(x, y, prec, rm)| no_out!(x.average_prec_round_ref_ref(&y, prec, rm)),
             ),
         ],
     );

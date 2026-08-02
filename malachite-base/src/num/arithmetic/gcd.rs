@@ -46,7 +46,7 @@ pub fn gcd_binary<T: PrimitiveUnsigned>(x: T, y: T) -> T {
     }
 }
 
-pub_test! {gcd_fast_a<T: PrimitiveUnsigned>(mut x: T, mut y: T) -> T {
+private_test_fn! {gcd_fast_a<T: PrimitiveUnsigned>(mut x: T, mut y: T) -> T {
     if x == T::ZERO {
         return y;
     }

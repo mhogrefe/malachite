@@ -20,7 +20,7 @@ fn remove_power_helper(x: &Integer, y: &Integer) -> (Integer, u64) {
 }
 
 impl RemovePower<Self> for Integer {
-    type Output = Integer;
+    type Output = Self;
 
     /// Removes the largest power of a factor from an [`Integer`], returning the reduced [`Integer`]
     /// together with the exponent of that power, and taking both [`Integer`]s by value.
@@ -43,13 +43,13 @@ impl RemovePower<Self> for Integer {
     /// # Examples
     /// See [here](super::remove_power#remove_power).
     #[inline]
-    fn remove_power(self, other: Self) -> (Integer, u64) {
+    fn remove_power(self, other: Self) -> (Self, u64) {
         remove_power_helper(&self, &other)
     }
 }
 
 impl RemovePower<&Self> for Integer {
-    type Output = Integer;
+    type Output = Self;
 
     /// Removes the largest power of a factor from an [`Integer`], returning the reduced [`Integer`]
     /// together with the exponent of that power, and taking the first [`Integer`] by value and the
@@ -73,7 +73,7 @@ impl RemovePower<&Self> for Integer {
     /// # Examples
     /// See [here](super::remove_power#remove_power).
     #[inline]
-    fn remove_power(self, other: &Self) -> (Integer, u64) {
+    fn remove_power(self, other: &Self) -> (Self, u64) {
         remove_power_helper(&self, other)
     }
 }

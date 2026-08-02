@@ -82,7 +82,7 @@ fn log_base_1_plus_x_prec_round_normal(
     // The result is irrational, so it is never exactly representable.
     assert_ne!(rm, Exact, "Inexact log_base_1_plus_x");
     let base_float = Float::from(base);
-    let min_exp = i64::from(Float::MIN_EXPONENT);
+    let min_exp = Float::MIN_EXPONENT_I64;
     let mut working_prec = prec + 4 + prec.ceiling_log_base_2();
     let mut increment = Limb::WIDTH;
     loop {

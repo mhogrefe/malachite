@@ -19,19 +19,21 @@ use std::str::FromStr;
 
 #[test]
 fn test_partial_eq() {
-    let test = |u, v: f32, out| {
-        assert_eq!(Integer::from_str(u).unwrap() == v, out);
-        assert_eq!(rug::Integer::from_str(u).unwrap() == v, out);
+    let test = |s, v: f32, out| {
+        let u = Integer::from_str(s).unwrap();
 
-        assert_eq!(v == Integer::from_str(u).unwrap(), out);
-        assert_eq!(v == rug::Integer::from_str(u).unwrap(), out);
+        assert_eq!(u.clone() == v, out);
+        assert_eq!(rug::Integer::from_str(s).unwrap() == v, out);
+
+        assert_eq!(v == u.clone(), out);
+        assert_eq!(v == rug::Integer::from_str(s).unwrap(), out);
 
         let v = f64::from(v);
-        assert_eq!(Integer::from_str(u).unwrap() == v, out);
-        assert_eq!(rug::Integer::from_str(u).unwrap() == v, out);
+        assert_eq!(u.clone() == v, out);
+        assert_eq!(rug::Integer::from_str(s).unwrap() == v, out);
 
-        assert_eq!(v == Integer::from_str(u).unwrap(), out);
-        assert_eq!(v == rug::Integer::from_str(u).unwrap(), out);
+        assert_eq!(v == u.clone(), out);
+        assert_eq!(v == rug::Integer::from_str(s).unwrap(), out);
     };
     test("5", f32::NAN, false);
     test("5", f32::INFINITY, false);

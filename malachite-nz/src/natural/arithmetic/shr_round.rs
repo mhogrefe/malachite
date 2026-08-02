@@ -45,7 +45,7 @@ use malachite_base::vecs::vec_delete_left;
 //
 // This is equivalent to `cfdiv_q_2exp` from `mpz/cfdiv_q_2exp.c`, GMP 6.2.1, where `u` is
 // non-negative, `dir == 1`, and the result is returned.
-pub_test! {limbs_shr_round_up(xs: &[Limb], bits: u64) -> (Vec<Limb>, Ordering) {
+private_test_fn! {limbs_shr_round_up(xs: &[Limb], bits: u64) -> (Vec<Limb>, Ordering) {
     let delete_count = bit_to_limb_count_floor(bits);
     if delete_count >= xs.len() {
         (vec![1], Greater)
@@ -110,7 +110,7 @@ fn limbs_shr_round_half_integer_to_even(xs: &[Limb], bits: u64) -> (Vec<Limb>, O
 //
 // where $T$ is time, $M$ is additional memory, $n$ is `xs.len()`, and $m$ is `max(1, xs.len() -
 // bits / Limb::WIDTH)`.
-pub_test! {limbs_shr_round_nearest(xs: &[Limb], bits: u64) -> (Vec<Limb>, Ordering) {
+private_test_fn! {limbs_shr_round_nearest(xs: &[Limb], bits: u64) -> (Vec<Limb>, Ordering) {
     if bits == 0 {
         (xs.to_vec(), Equal)
     } else {
@@ -139,7 +139,7 @@ pub_test! {limbs_shr_round_nearest(xs: &[Limb], bits: u64) -> (Vec<Limb>, Orderi
 //
 // where $T$ is time, $M$ is additional memory, $n$ is `xs.len()`, and $m$ is `max(1, xs.len() -
 // bits / Limb::WIDTH)`.
-pub_test! {limbs_shr_exact(xs: &[Limb], bits: u64) -> Option<Vec<Limb>> {
+private_test_fn! {limbs_shr_exact(xs: &[Limb], bits: u64) -> Option<Vec<Limb>> {
     if limbs_divisible_by_power_of_2(xs, bits) {
         Some(limbs_shr(xs, bits))
     } else {
@@ -158,7 +158,7 @@ pub_test! {limbs_shr_exact(xs: &[Limb], bits: u64) -> Option<Vec<Limb>> {
 //
 // where $T$ is time, $M$ is additional memory, $n$ is `xs.len()`, and $m$ is `max(1, xs.len() -
 // bits / Limb::WIDTH)`.
-pub_test! {
+private_test_fn! {
     limbs_shr_round(xs: &[Limb], bits: u64, rm: RoundingMode) -> Option<(Vec<Limb>, Ordering)> {
     match rm {
         Down | Floor => Some((
@@ -188,7 +188,7 @@ pub_test! {
 //
 // This is equivalent to `cfdiv_q_2exp` from `mpz/cfdiv_q_2exp.c`, GMP 6.2.1, where `u` is
 // non-negative, `dir == 1`, and `w == u`.
-pub_test! {limbs_vec_shr_round_up_in_place(xs: &mut Vec<Limb>, bits: u64) -> Ordering {
+private_test_fn! {limbs_vec_shr_round_up_in_place(xs: &mut Vec<Limb>, bits: u64) -> Ordering {
     let delete_count = bit_to_limb_count_floor(bits);
     if delete_count >= xs.len() {
         xs.truncate(1);
@@ -253,7 +253,7 @@ fn limbs_vec_shr_round_half_integer_to_even_in_place(xs: &mut Vec<Limb>, bits: u
 // $M(n) = O(1)$
 //
 // where $T$ is time, $M$ is additional memory and $n$ is `xs.len()`.
-pub_test! {limbs_vec_shr_round_nearest_in_place(xs: &mut Vec<Limb>, bits: u64) -> Ordering {
+private_test_fn! {limbs_vec_shr_round_nearest_in_place(xs: &mut Vec<Limb>, bits: u64) -> Ordering {
     if bits == 0 {
         Equal
     } else {
@@ -284,7 +284,7 @@ pub_test! {limbs_vec_shr_round_nearest_in_place(xs: &mut Vec<Limb>, bits: u64) -
 // $M(n) = O(1)$
 //
 // where $T$ is time, $M$ is additional memory and $n$ is `xs.len()`.
-pub_test! {limbs_vec_shr_exact_in_place(xs: &mut Vec<Limb>, bits: u64) -> bool {
+private_test_fn! {limbs_vec_shr_exact_in_place(xs: &mut Vec<Limb>, bits: u64) -> bool {
     if limbs_divisible_by_power_of_2(xs, bits) {
         limbs_vec_shr_in_place(xs, bits);
         true
@@ -305,7 +305,7 @@ pub_test! {limbs_vec_shr_exact_in_place(xs: &mut Vec<Limb>, bits: u64) -> bool {
 // $M(n) = O(1)$
 //
 // where $T$ is time, $M$ is additional memory and $n$ is `xs.len()`.
-pub_test! {limbs_vec_shr_round_in_place(
+private_test_fn! {limbs_vec_shr_round_in_place(
     xs: &mut Vec<Limb>,
     bits: u64,
     rm: RoundingMode,

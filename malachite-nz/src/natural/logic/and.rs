@@ -28,7 +28,7 @@ use malachite_base::slices::slice_set_zero;
 //
 // # Panics
 // Panics if `xs` is empty.
-pub_const_test! {limbs_and_limb(xs: &[Limb], y: Limb) -> Limb {
+private_test_const_fn! {limbs_and_limb(xs: &[Limb], y: Limb) -> Limb {
     xs[0] & y
 }}
 
@@ -45,7 +45,7 @@ pub_const_test! {limbs_and_limb(xs: &[Limb], y: Limb) -> Limb {
 //
 // This is equivalent to `mpz_and` from `mpz/and.c`, GMP 6.2.1, where `res` is returned and both
 // inputs are non-negative.
-pub_test! {limbs_and(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
+private_test_fn! {limbs_and(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     xs.iter().zip(ys.iter()).map(|(x, y)| x & y).collect()
 }}
 
@@ -64,7 +64,7 @@ pub_test! {limbs_and(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 // Panics if `xs` and `ys` have different lengths or if `out` is too short.
 //
 // This is equivalent to `mpn_and_n` from `gmp-impl.h`, GMP 6.2.1.
-pub_test! {limbs_and_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
+private_test_fn! {limbs_and_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let len = xs.len();
     assert_eq!(len, ys.len());
     assert!(out.len() >= len);
@@ -88,7 +88,7 @@ pub_test! {limbs_and_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Lim
 // Panics if `out` is too short.
 //
 // This is equivalent to `mpz_and` from `mpz/and.c`, GMP 6.2.1, where both inputs are non-negative.
-pub_test! {limbs_and_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
+private_test_fn! {limbs_and_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     if xs_len >= ys_len {
@@ -116,7 +116,7 @@ pub_test! {limbs_and_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 // Panics if `xs` and `ys` have different lengths.
 //
 // This is equivalent to `mpn_and_n` from `gmp-impl.h`, GMP 6.2.1, where `rp == up`.
-pub_test! {limbs_slice_and_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
+private_test_fn! {limbs_slice_and_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
     assert_eq!(xs.len(), ys.len());
     for (x, &y) in xs.iter_mut().zip(ys.iter()) {
         *x &= y;
@@ -139,7 +139,7 @@ pub_test! {limbs_slice_and_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb
 //
 // This is equivalent to `mpz_and` from `mpz/and.c`, GMP 6.2.1, where `res == op1` and both inputs
 // are non-negative.
-pub_test! {limbs_slice_and_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> Option<usize> {
+private_test_fn! {limbs_slice_and_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> Option<usize> {
     let xs_len = xs.len();
     let ys_len = ys.len();
     match xs_len.cmp(&ys.len()) {
@@ -173,7 +173,7 @@ pub_test! {limbs_slice_and_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> Option
 // This is equivalent to `mpz_and` from `mpz/and.c`, GMP 6.2.1, where `res == op1` and both inputs
 // are non-negative and have the same length, and `res` is truncated afterwards to remove the
 // `max(0, xs.len() - ys.len())` trailing zero limbs.
-pub_test! {limbs_vec_and_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
+private_test_fn! {limbs_vec_and_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     if let Some(truncate_size) = limbs_slice_and_in_place_left(xs, ys) {
         xs.truncate(truncate_size);
     }
@@ -193,7 +193,7 @@ pub_test! {limbs_vec_and_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
 //
 // This is equivalent to `mpz_and` from `mpz/and.c`, GMP 6.2.1, where both inputs are non-negative
 // and the result is written to the shorter input slice.
-pub_test! {limbs_and_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> bool {
+private_test_fn! {limbs_and_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
     match xs_len.cmp(&ys_len) {

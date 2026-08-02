@@ -27,7 +27,7 @@ use malachite_base::slices::slice_leading_zeros;
 // $M(n) = O(n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
-pub_crate_test! {limbs_twos_complement(xs: &[Limb]) -> Vec<Limb> {
+crate_test_fn! {limbs_twos_complement(xs: &[Limb]) -> Vec<Limb> {
     let i = slice_leading_zeros(xs);
     let mut result = vec![0; i];
     if i != xs.len() {
@@ -45,7 +45,7 @@ pub_crate_test! {limbs_twos_complement(xs: &[Limb]) -> Vec<Limb> {
 //
 // # Worst-case complexity
 // Constant time and additional memory.
-pub_test! {limbs_maybe_sign_extend_non_negative_in_place(xs: &mut Vec<Limb>) {
+private_test_fn! {limbs_maybe_sign_extend_non_negative_in_place(xs: &mut Vec<Limb>) {
     if let Some(last) = xs.last() && last.get_highest_bit() {
             // Sign-extend with an extra 0 limb to indicate a positive Integer
             xs.push(0);
@@ -62,7 +62,7 @@ pub_test! {limbs_maybe_sign_extend_non_negative_in_place(xs: &mut Vec<Limb>) {
 // $M(n) = O(1)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
-pub_crate_test! {limbs_twos_complement_in_place(xs: &mut [Limb]) -> bool {
+crate_test_fn! {limbs_twos_complement_in_place(xs: &mut [Limb]) -> bool {
     limbs_not_in_place(xs);
     limbs_slice_add_limb_in_place(xs, 1)
 }}
@@ -81,7 +81,9 @@ pub_crate_test! {limbs_twos_complement_in_place(xs: &mut [Limb]) -> bool {
 //
 // # Panics
 // Panics if `xs` contains only zeros.
-pub_test! {limbs_twos_complement_and_maybe_sign_extend_negative_in_place(xs: &mut Vec<Limb>) {
+private_test_fn! {limbs_twos_complement_and_maybe_sign_extend_negative_in_place(
+    xs: &mut Vec<Limb>,
+) {
     assert!(!limbs_twos_complement_in_place(xs));
     if let Some(last) = xs.last() && !last.get_highest_bit() {
             // Sign-extend with an extra !0 limb to indicate a negative Integer

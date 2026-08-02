@@ -32,7 +32,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 // $M(n) = O(1)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
-pub_test! {limbs_eq_mod_power_of_2_neg_limb(xs: &[Limb], y: Limb, pow: u64) -> bool {
+private_test_fn! {limbs_eq_mod_power_of_2_neg_limb(xs: &[Limb], y: Limb, pow: u64) -> bool {
     if y == 0 {
         return limbs_divisible_by_power_of_2(xs, pow);
     }
@@ -123,7 +123,7 @@ fn limbs_eq_mod_power_of_2_neg_pos_greater(xs: &[Limb], ys: &[Limb], pow: u64) -
 //
 // This is equivalent to `mpz_congruent_2exp_p` from `mpz/cong_2exp.c`, GMP 6.2.1, where `a` is
 // negative and `c` is positive.
-pub_test! {limbs_eq_mod_power_of_2_neg_pos(xs: &[Limb], ys: &[Limb], pow: u64) -> bool {
+private_test_fn! {limbs_eq_mod_power_of_2_neg_pos(xs: &[Limb], ys: &[Limb], pow: u64) -> bool {
     if xs.len() >= ys.len() {
         limbs_eq_mod_power_of_2_neg_pos_greater(xs, ys, pow)
     } else {

@@ -32,7 +32,7 @@ use malachite_nz::platform::Limb;
 use malachite_q::Rational;
 use malachite_q::rational::conversion::primitive_float_from_rational::FloatConversionError;
 
-pub_test! {from_rational_prec_round_direct(
+private_test_fn! {from_rational_prec_round_direct(
     x: Rational,
     prec: u64,
     rm: RoundingMode,
@@ -117,7 +117,7 @@ pub_test! {from_rational_prec_round_direct(
     }
 }}
 
-pub_test! {from_rational_prec_round_using_div(
+private_test_fn! {from_rational_prec_round_using_div(
     x: Rational,
     prec: u64,
     mut rm: RoundingMode,
@@ -188,7 +188,7 @@ pub_test! {from_rational_prec_round_using_div(
     }
 }}
 
-pub_test! {from_rational_prec_round_ref_direct(
+private_test_fn! {from_rational_prec_round_ref_direct(
     x: &Rational,
     prec: u64,
     rm: RoundingMode,
@@ -282,7 +282,7 @@ pub_test! {from_rational_prec_round_ref_direct(
     }
 }}
 
-pub_test! {from_rational_prec_round_ref_using_div(
+private_test_fn! {from_rational_prec_round_ref_using_div(
     x: &Rational,
     prec: u64,
     mut rm: RoundingMode,

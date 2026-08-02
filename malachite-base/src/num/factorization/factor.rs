@@ -328,7 +328,7 @@ const FLINT_ONE_LINE_MULTIPLIER: u32 = 480;
 // This is n_factor_one_line when FLINT64 is true, from ulong_extras/factor_one_line.c, FLINT 3.1.2.
 fn factor_one_line_u64(mut n: u64, iters: usize) -> u64 {
     let orig_n = n;
-    n.wrapping_mul_assign(u64::from(FLINT_ONE_LINE_MULTIPLIER));
+    n.wrapping_mul_assign(const { FLINT_ONE_LINE_MULTIPLIER as u64 });
     let mut iin = 0;
     let mut inn = n;
     for _ in 0..iters {

@@ -74,6 +74,8 @@ fn div_euclidean_assign_fail() {
     x.div_euclidean_assign(Integer::ZERO);
 }
 
+// It would be a little confusing to only pass y by value
+#[allow(clippy::needless_pass_by_value)]
 fn div_euclidean_properties_helper(x: Integer, y: Integer) {
     let q = (&x).div_euclidean(&y);
     assert!(q.is_valid());

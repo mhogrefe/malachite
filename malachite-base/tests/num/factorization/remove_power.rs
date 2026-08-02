@@ -96,10 +96,10 @@ fn remove_power_properties_helper_unsigned<T: PrimitiveUnsigned>() {
 
         // the defining identity, and nothing is left to remove
         assert_eq!(q * y.pow(k), x);
-        if x != T::ZERO {
-            assert!(!q.divisible_by(y));
-        } else {
+        if x == T::ZERO {
             assert_eq!(k, 0);
+        } else {
+            assert!(!q.divisible_by(y));
         }
         assert!(q <= x);
     });

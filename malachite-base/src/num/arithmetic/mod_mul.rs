@@ -28,7 +28,7 @@ use crate::num::basic::unsigneds::PrimitiveUnsigned;
 use crate::num::conversion::traits::{ExactFrom, HasHalf, JoinHalves, SplitInHalf, WrappingFrom};
 use crate::num::logic::traits::LeadingZeros;
 
-pub_test! {naive_mod_mul<T: PrimitiveUnsigned>(x: T, y: T, m: T) -> T {
+private_test_fn! {naive_mod_mul<T: PrimitiveUnsigned>(x: T, y: T, m: T) -> T {
     assert!(x < m, "x must be reduced mod m, but {x} >= {m}");
     assert!(y < m, "y must be reduced mod m, but {y} >= {m}");
     let (product_1, product_0) = T::x_mul_y_to_zz(x, y);
@@ -107,7 +107,7 @@ pub fn test_invert_u32_table() {
 // Constant time and additional memory.
 //
 // This is equivalent to `invert_limb` from `longlong.h`, FLINT 2.7.1, when `GMP_LIMB_BITS == 32`.
-pub_crate_test! {limbs_invert_limb_u32(x: u32) -> u32 {
+crate_test_fn! {limbs_invert_limb_u32(x: u32) -> u32 {
     assert!(x.get_highest_bit());
     let a = INVERT_U32_TABLE[usize::exact_from(x << 1 >> 23)];
     let b = (a << 4)
@@ -175,7 +175,7 @@ pub fn test_invert_u64_table() {
 // Constant time and additional memory.
 //
 // This is equivalent to `invert_limb` from `longlong.h`, FLINT 2.7.1, when `GMP_LIMB_BITS == 64`.
-pub_crate_test! {limbs_invert_limb_u64(x: u64) -> u64 {
+crate_test_fn! {limbs_invert_limb_u64(x: u64) -> u64 {
     assert!(x.get_highest_bit());
     let a = (x >> 24) + 1;
     let b = INVERT_U64_TABLE[usize::exact_from(x << 1 >> 56)];
@@ -196,7 +196,7 @@ pub_crate_test! {limbs_invert_limb_u64(x: u64) -> u64 {
 }}
 
 // This is equivalent to `n_ll_mod_preinv` from `ulong_extras/ll_mod_preinv.c`, FLINT 2.7.1.
-pub_test! {mod_preinverted_double<
+private_test_fn! {mod_preinverted_double<
     T: PrimitiveUnsigned,
     DT: From<T> + HasHalf<Half = T> + JoinHalves + PrimitiveUnsigned + SplitInHalf,
 >(
@@ -262,7 +262,7 @@ pub_test! {mod_preinverted_double<
 }}
 
 // This is equivalent to `n_mulmod2_preinv` from `ulong_extras.h`, FLINT 2.7.1.
-pub_test! {fast_mod_mul<
+private_test_fn! {fast_mod_mul<
     T: PrimitiveUnsigned,
     DT: From<T> + HasHalf<Half = T> + JoinHalves + PrimitiveUnsigned + SplitInHalf,
 >(

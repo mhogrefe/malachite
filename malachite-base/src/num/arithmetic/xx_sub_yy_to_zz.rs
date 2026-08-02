@@ -27,7 +27,7 @@ fn implicit_xx_sub_yy_to_zz<DT: JoinHalves + PrimitiveUnsigned + SplitInHalf>(
         .split_in_half()
 }
 
-pub_test! {
+private_test_fn! {
 explicit_xx_sub_yy_to_zz<T: PrimitiveUnsigned>(x_1: T, x_0: T, y_1: T, y_0: T) -> (T, T) {
     let (z_0, borrow) = x_0.overflowing_sub(y_0);
     let mut z_1 = x_1.wrapping_sub(y_1);

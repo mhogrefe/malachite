@@ -95,7 +95,7 @@ fn zero_to_string(neg: bool, options: ToSciOptions) -> String {
     out
 }
 
-pub_crate_test! {
+crate_test_fn! {
 // Determines whether `x` can be converted to a string using `to_sci_string` and a particular set of
 // options; this is the engine of `ToSci::fmt_sci_valid`. Mirrors `Rational::fmt_sci_valid`: with
 // the `Complete` size option the expansion must terminate, and with the `Exact` rounding mode the
@@ -151,7 +151,7 @@ to_sci_valid(x: &Float, options: ToSciOptions) -> bool {
     }
 }}
 
-pub_crate_test! {
+crate_test_fn! {
 // Converts a `Float` to a string using a specified base, possibly using scientific notation; this
 // is the engine behind `Display`, the power-of-2-base formatting traits, and `ToSci`. See
 // `ToSciOptions` for details on the available options. The `Float` `Display` conventions apply on

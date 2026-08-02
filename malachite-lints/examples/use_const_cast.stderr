@@ -31,5 +31,29 @@ LL |     let d = const { u64::WIDTH - 4 } as f64;
    |
    = help: do the conversion at compile time: `const { (u64::WIDTH - 4) as f64 }`
 
-error: aborting due to 4 previous errors
+error: this converts a compile-time constant at runtime
+  --> $DIR/use_const_cast.rs:15:13
+   |
+LL |     let e = i128::from(u64::WIDTH);
+   |             ^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: do the conversion at compile time: `const { u64::WIDTH as i128 }`
+
+error: this converts a compile-time constant at runtime
+  --> $DIR/use_const_cast.rs:17:13
+   |
+LL |     let f = u32::exact_from(u64::WIDTH - 5);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: do the conversion at compile time: `const { (u64::WIDTH - 5) as u32 }`
+
+error: this converts a compile-time constant at runtime
+  --> $DIR/use_const_cast.rs:19:13
+   |
+LL |     let g = u64::WIDTH as f64;
+   |             ^^^^^^^^^^^^^^^^^
+   |
+   = help: do the conversion at compile time: `const { u64::WIDTH as f64 }`
+
+error: aborting due to 7 previous errors
 

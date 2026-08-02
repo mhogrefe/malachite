@@ -128,6 +128,8 @@ extern crate malachite_nz;
 #[cfg(feature = "serde")]
 #[macro_use]
 extern crate serde;
+#[macro_use]
+mod macros;
 
 #[cfg(feature = "test_build")]
 extern crate itertools;

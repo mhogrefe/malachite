@@ -645,7 +645,7 @@ pub(crate) fn limbs_mul_toom_interpolate_7_points(
 //
 // This is equivalent to `DO_mpn_sublsh_n` from `mpn/generic/toom_interpolate_8pts.c`, GMP 6.2.1.
 // `xs` may be longer than `ys`; only the lowest `ys.len()` limbs are affected.
-pub_test! {limbs_shl_and_sub_same_length(
+private_test_fn! {limbs_shl_and_sub_same_length(
     xs: &mut [Limb],
     ys: &[Limb],
     shift: u64,
@@ -956,7 +956,7 @@ fn limbs_aors_mul_or_aors_and_sh_aors_helper(
 //
 // This is equivalent to `mpn_toom_interpolate_12pts` from `mpn/generic/toom_interpolate_12pts.c`,
 // GMP 6.2.1.
-pub_crate_test! {limbs_mul_toom_interpolate_12_points<'a>(
+crate_test_fn! {limbs_mul_toom_interpolate_12_points<'a>(
     out: &mut [Limb],
     mut r1: &'a mut [Limb],
     r3: &mut [Limb],
@@ -1168,7 +1168,7 @@ const CORRECTED_WIDTH: u64 = 42;
 //
 // This is equivalent to `mpn_toom_interpolate_16pts` from `mpn/generic/toom_interpolate_16pts.c`,
 // GMP 6.2.1.
-pub_crate_test! {limbs_mul_toom_interpolate_16_points<'a>(
+crate_test_fn! {limbs_mul_toom_interpolate_16_points<'a>(
     out: &mut [Limb],
     r1: &mut [Limb],
     mut r3: &'a mut [Limb],

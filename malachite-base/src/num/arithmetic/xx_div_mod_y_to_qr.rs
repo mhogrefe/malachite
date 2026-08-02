@@ -68,7 +68,11 @@ fn explicit_xx_div_mod_y_to_qr_normalized<T: PrimitiveUnsigned>(x_1: T, x_0: T, 
 }
 
 // This is udiv_qrnnd from longlong.h, FLINT 2.7.1, where (q, r) is returned.
-pub_test! {explicit_xx_div_mod_y_to_qr<T: PrimitiveUnsigned>(x_1: T, x_0: T, y: T) -> (T, T) {
+private_test_fn! {explicit_xx_div_mod_y_to_qr<T: PrimitiveUnsigned>(
+    x_1: T,
+    x_0: T,
+    y: T,
+) -> (T, T) {
     assert!(x_1 < y);
     let shift = LeadingZeros::leading_zeros(y);
     if shift == 0 {

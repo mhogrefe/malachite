@@ -6,18 +6,22 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::comparison::traits::{OrdAbs, OrdAbsDouble, OrdDouble};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::comparison::cmp::limbs_cmp_double;
+use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::{integer_pair_gen, natural_pair_gen};
 use std::cmp::Ordering::{self, *};
 use std::str::FromStr;
 
+const HIGH_BIT: Limb = 1 << (Limb::WIDTH - 1);
+
 #[test]
 fn test_limbs_cmp_double() {
-    let test = |xs: &[u64], ys: &[u64], out: Ordering| {
+    let test = |xs: &[Limb], ys: &[Limb], out: Ordering| {
         assert_eq!(limbs_cmp_double(xs, ys), out);
     };
     // - the doubled value fits in the same number of limbs
@@ -25,12 +29,12 @@ fn test_limbs_cmp_double() {
     test(&[3], &[2], Less);
     test(&[5], &[2], Greater);
     // - doubling carries into a limb of its own
-    test(&[0, 1], &[1 << 63], Equal);
-    test(&[1, 1], &[1 << 63], Greater);
-    test(&[u64::MAX], &[1 << 63], Less);
+    test(&[0, 1], &[HIGH_BIT], Equal);
+    test(&[1, 1], &[HIGH_BIT], Greater);
+    test(&[Limb::MAX], &[HIGH_BIT], Less);
     // - the carried bit moves between limbs
-    test(&[0, 3], &[1 << 63, 1], Equal);
-    test(&[1, 3], &[1 << 63, 1], Greater);
+    test(&[0, 3], &[HIGH_BIT, 1], Equal);
+    test(&[1, 3], &[HIGH_BIT, 1], Greater);
     // - lengths settle it without comparing limbs
     test(&[1, 1], &[1], Greater);
     test(&[1], &[1, 1], Less);
@@ -95,7 +99,7 @@ fn cmp_double_properties() {
     integer_pair_gen().test_properties(|(x, y)| {
         let c = x.cmp_abs_double(&y);
         assert_eq!(c, x.unsigned_abs_ref().cmp_double(y.unsigned_abs_ref()));
-        assert_eq!(c, (&x).cmp_abs(&(&y << 1u32)));
+        assert_eq!(c, x.cmp_abs(&(&y << 1u32)));
         // sign changes are invisible
         assert_eq!((-&x).cmp_abs_double(&y), c);
         assert_eq!(x.cmp_abs_double(&-&y), c);

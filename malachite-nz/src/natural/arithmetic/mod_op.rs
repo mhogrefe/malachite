@@ -29,11 +29,12 @@ use crate::natural::arithmetic::add::{
 };
 use crate::natural::arithmetic::div_mod::{
     MU_DIV_QR_DC_SLOPE, MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD, MUPI_DIV_QR_THRESHOLD,
-    TWICE_MU_DIV_QR_THRESHOLD, limbs_div_barrett_large_product, limbs_div_mod_balanced,
-    limbs_div_mod_barrett_helper, limbs_div_mod_barrett_is_len, limbs_div_mod_barrett_scratch_len,
-    limbs_div_mod_by_two_limb_normalized, limbs_div_mod_divide_and_conquer_helper,
-    limbs_div_mod_schoolbook, limbs_div_mod_three_limb_by_two_limb, limbs_invert_approx,
-    limbs_invert_limb, limbs_two_limb_inverse_helper,
+    MUPI_DIV_QR_THRESHOLD_F64, TWICE_MU_DIV_QR_THRESHOLD, limbs_div_barrett_large_product,
+    limbs_div_mod_balanced, limbs_div_mod_barrett_helper, limbs_div_mod_barrett_is_len,
+    limbs_div_mod_barrett_scratch_len, limbs_div_mod_by_two_limb_normalized,
+    limbs_div_mod_divide_and_conquer_helper, limbs_div_mod_schoolbook,
+    limbs_div_mod_three_limb_by_two_limb, limbs_invert_approx, limbs_invert_limb,
+    limbs_two_limb_inverse_helper,
 };
 use crate::natural::arithmetic::mul::mul_mod::limbs_mul_mod_base_pow_n_minus_1_next_size;
 use crate::natural::arithmetic::mul::{
@@ -74,7 +75,7 @@ use malachite_base::slices::{slice_move_left, slice_set_zero};
 //
 // This is equivalent to `udiv_qrnnd_preinv` from `gmp-impl.h`, GMP 6.2.1, but not computing the
 // quotient.
-pub_test! {mod_by_preinversion<
+private_test_fn! {mod_by_preinversion<
     DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + SplitInHalf + JoinHalves<Half=T>,
     T: PrimitiveUnsigned,
 >(
@@ -166,7 +167,7 @@ pub(crate) fn limbs_mod_limb<
 // Constant time and additional memory.
 //
 // This is equivalent to `udiv_qr_3by2` from `gmp-impl.h`, GMP 6.2.1, returning only the remainder.
-pub_test! {limbs_mod_three_limb_by_two_limb(
+private_test_fn! {limbs_mod_three_limb_by_two_limb(
     n_2: Limb,
     n_1: Limb,
     n_0: Limb,
@@ -210,7 +211,7 @@ pub_test! {limbs_mod_three_limb_by_two_limb(
 //
 // This is equivalent to `mpn_divrem_2` from `mpn/generic/divrem_2.c`, GMP 6.2.1, returning the two
 // limbs of the remainder.
-pub_test! {limbs_mod_by_two_limb_normalized(ns: &[Limb], ds: &[Limb]) -> (Limb, Limb) {
+private_test_fn! {limbs_mod_by_two_limb_normalized(ns: &[Limb], ds: &[Limb]) -> (Limb, Limb) {
     assert_eq!(ds.len(), 2);
     let n_len = ns.len();
     assert!(n_len >= 2);
@@ -249,7 +250,7 @@ pub_test! {limbs_mod_by_two_limb_normalized(ns: &[Limb], ds: &[Limb]) -> (Limb, 
 //
 // This is equivalent to `mpn_sbpi1_div_qr` from `mpn/generic/sbpi1_div_qr.c`, GMP 6.2.1, where only
 // the remainder is calculated.
-pub_test! {limbs_mod_schoolbook(ns: &mut [Limb], ds: &[Limb], d_inv: Limb) {
+private_test_fn! {limbs_mod_schoolbook(ns: &mut [Limb], ds: &[Limb], d_inv: Limb) {
     let d_len = ds.len();
     assert!(d_len > 2);
     let n_len = ns.len();
@@ -376,7 +377,7 @@ fn limbs_mod_divide_and_conquer_helper(
 //
 // This is equivalent to `mpn_dcpi1_div_qr` from `mpn/generic/dcpi1_div_qr.c`, GMP 6.2.1, where only
 // the remainder is calculated.
-pub_test! {limbs_mod_divide_and_conquer(
+private_test_fn! {limbs_mod_divide_and_conquer(
     qs: &mut [Limb],
     ns: &mut [Limb],
     ds: &[Limb],
@@ -634,7 +635,7 @@ fn limbs_mod_barrett_preinverted(
 //
 // This is equivalent to `mpn_mu_div_qr2` from `mpn/generic/mu_div_qr.c`, GMP 6.2.1, where only the
 // remainder is calculated.
-pub_test! {limbs_mod_barrett_helper(
+private_test_fn! {limbs_mod_barrett_helper(
     qs: &mut [Limb],
     rs: &mut [Limb],
     ns: &[Limb],
@@ -732,7 +733,7 @@ fn limbs_mod_barrett_large_helper(
 // less than `ns.len()` - `ds.len()`, or the last limb of `ds` does not have its highest bit set.
 //
 // This is equivalent to `mpn_mu_div_qr` from `mpn/generic/mu_div_qr.c`, GMP 6.2.1.
-pub_test! {limbs_mod_barrett(
+private_test_fn! {limbs_mod_barrett(
     qs: &mut [Limb],
     rs: &mut [Limb],
     ns: &[Limb],
@@ -790,11 +791,7 @@ fn limbs_mod_dc_condition(n_len: usize, d_len: usize) -> bool {
     let d_64 = d_len as f64;
     d_len < MUPI_DIV_QR_THRESHOLD
         || n_len < TWICE_MU_DIV_QR_THRESHOLD
-        || fma!(
-            MU_DIV_QR_DC_SLOPE,
-            d_64,
-            MUPI_DIV_QR_THRESHOLD as f64 * n_64
-        ) > d_64 * n_64
+        || fma!(MU_DIV_QR_DC_SLOPE, d_64, MUPI_DIV_QR_THRESHOLD_F64 * n_64) > d_64 * n_64
 }
 
 // This function is optimized for the case when the numerator has at least twice the length of the
@@ -879,7 +876,7 @@ fn limbs_mod_unbalanced(rs: &mut [Limb], ns: &[Limb], ds: &[Limb], adjusted_n_le
 //
 // This is equivalent to `mpn_tdiv_qr` from `mpn/generic/tdiv_qr.c`, GMP 6.2.1, where `qp` is not
 // calculated and `rp` is returned.
-pub_test! {limbs_mod(ns: &[Limb], ds: &[Limb]) -> Vec<Limb> {
+private_test_fn! {limbs_mod(ns: &[Limb], ds: &[Limb]) -> Vec<Limb> {
     let mut rs = vec![0; ds.len()];
     limbs_mod_to_out(&mut rs, ns, ds);
     rs
@@ -904,7 +901,7 @@ pub_test! {limbs_mod(ns: &[Limb], ds: &[Limb]) -> Vec<Limb> {
 //
 // This is equivalent to `mpn_tdiv_qr` from `mpn/generic/tdiv_qr.c`, GMP 6.2.1, where `qp` is not
 // calculated.
-pub_crate_test! {limbs_mod_to_out(rs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
+crate_test_fn! {limbs_mod_to_out(rs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
     assert!(n_len >= d_len);
@@ -1000,7 +997,7 @@ pub fn limbs_mod_limb_normalized<
 // This is equivalent to `mpn_div_qr_1n_pi1` from `mpn/generic/div_qr_1n_pi1.c`, GMP 6.2.1, with
 // `DIV_QR_1N_METHOD == 2`, but not computing the quotient, and where the input is left-shifted by
 // `bits`.
-pub_test! {limbs_mod_limb_normalized_shl<
+private_test_fn! {limbs_mod_limb_normalized_shl<
     DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + SplitInHalf + JoinHalves<Half = T>,
     T: PrimitiveUnsigned,
 >(
@@ -1057,7 +1054,7 @@ pub_test! {limbs_mod_limb_normalized_shl<
 // This is equivalent to `mpn_div_qr_1` from `mpn/generic/div_qr_1.c`, GMP 6.2.1, where the quotient
 // is not computed and the remainder is returned. Experiments show that this is always slower than
 // `limbs_mod_limb`.
-pub_test! {limbs_mod_limb_alt_1<
+private_test_fn! {limbs_mod_limb_alt_1<
     DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + SplitInHalf + JoinHalves<Half = T>,
     T: PrimitiveUnsigned,
 >(ns: &[T], d: T) -> T {
@@ -1123,7 +1120,7 @@ fn mod_by_preinversion_special<
 // $M(n) = O(1)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
-pub_test! {limbs_mod_limb_small_small<
+private_test_fn! {limbs_mod_limb_small_small<
     DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + JoinHalves + SplitInHalf,
     T: PrimitiveUnsigned,
 >(ns: &[T], d: T, mut r: T) -> T {
@@ -1140,7 +1137,7 @@ pub_test! {limbs_mod_limb_small_small<
 // $M(n) = O(1)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
-pub_test! {limbs_mod_limb_small_normalized_large<
+private_test_fn! {limbs_mod_limb_small_normalized_large<
     DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + JoinHalves<Half = T> + SplitInHalf,
     T: PrimitiveUnsigned,
 >(
@@ -1163,7 +1160,7 @@ pub_test! {limbs_mod_limb_small_normalized_large<
 // where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
 // This is equivalent to `mpn_mod_1_norm` from `mpn/generic/mod_1.c`, GMP 6.2.1.
-pub_test! {
+private_test_fn! {
 #[allow(clippy::absurd_extreme_comparisons)]
 limbs_mod_limb_small_normalized<
     DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + JoinHalves<Half = T> + SplitInHalf,
@@ -1199,7 +1196,7 @@ limbs_mod_limb_small_normalized<
 // $M(n) = O(1)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
-pub_test! {limbs_mod_limb_small_unnormalized_large<
+private_test_fn! {limbs_mod_limb_small_unnormalized_large<
     DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + JoinHalves + SplitInHalf,
     T: PrimitiveUnsigned,
 >(
@@ -1231,7 +1228,7 @@ pub_test! {limbs_mod_limb_small_unnormalized_large<
 //
 // This is equivalent to `mpn_mod_1_unnorm` from `mpn/generic/mod_1.c`, GMP 6.2.1, where
 // `UDIV_NEEDS_NORMALIZATION` is `false`.
-pub_test! {
+private_test_fn! {
 #[allow(clippy::absurd_extreme_comparisons)]
 limbs_mod_limb_small_unnormalized<
 DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + JoinHalves + SplitInHalf,
@@ -1266,7 +1263,7 @@ T: PrimitiveUnsigned,
 // $M(n) = O(1)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
-pub_test! {limbs_mod_limb_any_leading_zeros<
+private_test_fn! {limbs_mod_limb_any_leading_zeros<
     DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + JoinHalves + SplitInHalf,
     T: PrimitiveUnsigned,
 >(
@@ -1289,7 +1286,7 @@ pub_test! {limbs_mod_limb_any_leading_zeros<
 //
 // This is equivalent to `mpn_mod_1_1p_cps_1` combined with `mpn_mod_1_1p_1` from
 // `mpn/generic/mod_1.c`, GMP 6.2.1.
-pub_test! {limbs_mod_limb_any_leading_zeros_1<
+private_test_fn! {limbs_mod_limb_any_leading_zeros_1<
     DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + JoinHalves + SplitInHalf,
     T: PrimitiveUnsigned,
 >(
@@ -1336,7 +1333,7 @@ pub_test! {limbs_mod_limb_any_leading_zeros_1<
 //
 // This is equivalent to `mpn_mod_1_1p_cps_2` combined with `mpn_mod_1_1p_2` from
 // `mpn/generic/mod_1.c`, GMP 6.2.1.
-pub_test! {limbs_mod_limb_any_leading_zeros_2<
+private_test_fn! {limbs_mod_limb_any_leading_zeros_2<
     DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + JoinHalves + SplitInHalf,
     T: PrimitiveUnsigned,
 >(
@@ -1400,7 +1397,7 @@ pub_test! {limbs_mod_limb_any_leading_zeros_2<
 //
 // This is equivalent to `mpn_mod_1s_2p_cps` combined with `mpn_mod_1s_2p` from
 // `mpn/generic/mod_1_2.c`, GMP 6.2.1.
-pub_test! {limbs_mod_limb_at_least_1_leading_zero<
+private_test_fn! {limbs_mod_limb_at_least_1_leading_zero<
     DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + JoinHalves + SplitInHalf,
     T: PrimitiveUnsigned,
 >(
@@ -1465,7 +1462,7 @@ pub_test! {limbs_mod_limb_at_least_1_leading_zero<
 //
 // This is equivalent to `mpn_mod_1s_4p_cps` combined with `mpn_mod_1s_4p` from
 // `mpn/generic/mod_1_4.c`, GMP 6.2.1.
-pub_test! {limbs_mod_limb_at_least_2_leading_zeros<
+private_test_fn! {limbs_mod_limb_at_least_2_leading_zeros<
     DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + JoinHalves + SplitInHalf,
     T: PrimitiveUnsigned,
 >(
@@ -1549,7 +1546,7 @@ pub_test! {limbs_mod_limb_at_least_2_leading_zeros<
 // where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
 // This is equivalent to `mpn_mod_1` from `mpn/generic/mod_1.c`, GMP 6.2.1, where `n > 1`.
-pub_crate_test! {
+crate_test_fn! {
 #[allow(clippy::absurd_extreme_comparisons)]
 limbs_mod_limb_alt_2<
     DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + JoinHalves + SplitInHalf,

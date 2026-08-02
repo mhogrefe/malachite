@@ -35,7 +35,7 @@ use malachite_base::slices::slice_leading_zeros;
 //
 // This is equivalent to `mpz_jacobi` from `mpz/jacobi.c`, GMP 6.2.1, where the absolute values of
 // both `a` and `b` fit in a limb.
-pub_crate_test! {limbs_kronecker_symbol_single(
+crate_test_fn! {limbs_kronecker_symbol_single(
     x_sign: bool,
     x: Limb,
     y_sign: bool,
@@ -72,7 +72,7 @@ pub_crate_test! {limbs_kronecker_symbol_single(
 // where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // This is equivalent to `mpz_jacobi` from `mpz/jacobi.c`, GMP 6.2.1.
-pub_crate_test! {
+crate_test_fn! {
     limbs_kronecker_symbol(x_sign: bool, xs: &[Limb], y_sign: bool, ys: &[Limb]) -> i8 {
     let mut xs_len = xs.len();
     let mut ys_len = ys.len();

@@ -20,7 +20,7 @@ use malachite_base::num::logic::traits::CountOnes;
 // $M(n) = O(1)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
-pub_crate_test! {limbs_count_ones(xs: &[Limb]) -> u64 {
+crate_test_fn! {limbs_count_ones(xs: &[Limb]) -> u64 {
     xs.iter().map(|&x| CountOnes::count_ones(x)).sum()
 }}
 

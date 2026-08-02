@@ -26,7 +26,7 @@ use malachite_base::slices::slice_test_zero;
 //
 // # Panics
 // Panics if `xs` is empty.
-pub_crate_test! {limbs_is_power_of_2(xs: &[Limb]) -> bool {
+crate_test_fn! {limbs_is_power_of_2(xs: &[Limb]) -> bool {
     let (xs_last, xs_init) = xs.split_last().unwrap();
     slice_test_zero(xs_init) && xs_last.is_power_of_2()
 }}

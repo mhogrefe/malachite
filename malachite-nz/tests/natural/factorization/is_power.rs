@@ -15,13 +15,12 @@ use std::str::FromStr;
 
 #[test]
 fn test_is_power() {
-    let test = |n, out| {
-        assert_eq!(Natural::from_str(n).unwrap().is_power(), out);
-        assert_eq!(
-            Natural::from_str(n).unwrap().express_as_power().is_some(),
-            out
-        );
-        assert_eq!(rug::Integer::from_str(n).unwrap().is_perfect_power(), out);
+    let test = |s, out| {
+        let u = Natural::from_str(s).unwrap();
+
+        assert_eq!(u.is_power(), out);
+        assert_eq!(u.express_as_power().is_some(), out);
+        assert_eq!(rug::Integer::from_str(s).unwrap().is_perfect_power(), out);
     };
     test("0", true);
     test("1", true);

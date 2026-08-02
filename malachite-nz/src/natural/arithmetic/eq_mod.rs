@@ -42,7 +42,7 @@ use malachite_base::slices::slice_trailing_zeros;
 // This is equivalent to `mpn_modexact_1c_odd`, from `mpn/generic/mode1o.c`, GMP 6.2.1, where `size
 // == 1`. Pass `carry = 0` to get `mpn_modexact_1_odd` from `gmp-impl.c`, GMP 6.2.1, where `size ==
 // 1`.
-pub_const_test! {limbs_limb_mod_exact_odd_limb(n: Limb, d: Limb, carry: Limb) -> Limb {
+private_test_const_fn! {limbs_limb_mod_exact_odd_limb(n: Limb, d: Limb, carry: Limb) -> Limb {
     if n > carry {
         let result = (n - carry) % d;
         if result == 0 {
@@ -82,7 +82,7 @@ pub_const_test! {limbs_limb_mod_exact_odd_limb(n: Limb, d: Limb, carry: Limb) ->
 //
 // This is equivalent to `mpn_modexact_1c_odd` from mpn/generic/mode1o.c, GMP 6.2.1. Pass `carry =
 // 0` to get `mpn_modexact_1_odd` from `gmp-impl.c`, GMP 6.2.1.
-pub_crate_test! {limbs_mod_exact_odd_limb(ns: &[Limb], d: Limb, mut carry: Limb) -> Limb {
+crate_test_fn! {limbs_mod_exact_odd_limb(ns: &[Limb], d: Limb, mut carry: Limb) -> Limb {
     let len = ns.len();
     if len == 1 {
         return limbs_limb_mod_exact_odd_limb(ns[0], d, carry);
@@ -132,7 +132,7 @@ pub_crate_test! {limbs_mod_exact_odd_limb(ns: &[Limb], d: Limb, mut carry: Limb)
 //
 // This is equivalent to `mpz_congruent_ui_p` from `mpz/cong_ui.c`, GMP 6.2.1, where `a` is positive
 // and the `ABOVE_THRESHOLD` branch is excluded.
-pub_crate_test! {limbs_eq_limb_mod_limb(xs: &[Limb], y: Limb, m: Limb) -> bool {
+crate_test_fn! {limbs_eq_limb_mod_limb(xs: &[Limb], y: Limb, m: Limb) -> bool {
     assert_ne!(m, 0);
     assert!(xs.len() > 1);
     let r = if m.even() {
@@ -201,7 +201,7 @@ fn limbs_eq_limb_mod_helper(xs: &[Limb], y: Limb, ms: &[Limb]) -> Option<bool> {
 //
 // This is equivalent to `mpz_congruent_p` from `mpz/cong.c`, GMP 6.2.1, where `a`, `c`, and `d` are
 // positive, `a` and `d` are longer than one limb, and `c` is one limb long.
-pub_test! {limbs_eq_limb_mod_ref_ref(xs: &[Limb], y: Limb, ms: &[Limb]) -> bool {
+private_test_fn! {limbs_eq_limb_mod_ref_ref(xs: &[Limb], y: Limb, ms: &[Limb]) -> bool {
     if let Some(equal) = limbs_eq_limb_mod_helper(xs, y, ms) {
         return equal;
     }
@@ -232,7 +232,7 @@ pub_test! {limbs_eq_limb_mod_ref_ref(xs: &[Limb], y: Limb, ms: &[Limb]) -> bool 
 //
 // This is equivalent to `mpz_congruent_p` from `mpz/cong.c`, GMP 6.2.1, where `a`, `c`, and `d` are
 // positive, `a` and `d` are longer than one limb, and `c` is one limb long.
-pub_test! {limbs_eq_limb_mod_ref_val(xs: &[Limb], y: Limb, ms: &mut [Limb]) -> bool {
+private_test_fn! {limbs_eq_limb_mod_ref_val(xs: &[Limb], y: Limb, ms: &mut [Limb]) -> bool {
     if let Some(equal) = limbs_eq_limb_mod_helper(xs, y, ms) {
         return equal;
     }
@@ -263,7 +263,7 @@ pub_test! {limbs_eq_limb_mod_ref_val(xs: &[Limb], y: Limb, ms: &mut [Limb]) -> b
 //
 // This is equivalent to `mpz_congruent_p` from `mpz/cong.c`, GMP 6.2.1, where `a`, `c`, and `d` are
 // positive, `a` and `d` are longer than one limb, and `c` is one limb long.
-pub_test! {limbs_eq_limb_mod_val_ref(xs: &mut [Limb], y: Limb, ms: &[Limb]) -> bool {
+private_test_fn! {limbs_eq_limb_mod_val_ref(xs: &mut [Limb], y: Limb, ms: &[Limb]) -> bool {
     if let Some(equal) = limbs_eq_limb_mod_helper(xs, y, ms) {
         return equal;
     }
@@ -292,7 +292,7 @@ pub_test! {limbs_eq_limb_mod_val_ref(xs: &mut [Limb], y: Limb, ms: &[Limb]) -> b
 //
 // This is equivalent to `mpz_congruent_p` from `mpz/cong.c`, GMP 6.2.1, where `a`, `c`, and `d` are
 // positive, `a` and `d` are longer than one limb, and `c` is one limb long.
-pub_test! {limbs_eq_limb_mod(xs: &mut [Limb], y: Limb, ms: &mut [Limb]) -> bool {
+private_test_fn! {limbs_eq_limb_mod(xs: &mut [Limb], y: Limb, ms: &mut [Limb]) -> bool {
     if let Some(equal) = limbs_eq_limb_mod_helper(xs, y, ms) {
         return equal;
     }
@@ -340,7 +340,7 @@ fn limbs_eq_mod_limb_helper(xs: &[Limb], ys: &[Limb], m: Limb) -> Option<bool> {
 //
 // This is equivalent to `mpz_congruent_p` from `mpz/cong.c`, GMP 6.2.1, where `a`, `c`, and `d` are
 // positive, `a` and `c` are longer than one limb, and `m` is one limb long.
-pub_test! {limbs_eq_mod_limb_ref_ref(xs: &[Limb], ys: &[Limb], m: Limb) -> bool {
+private_test_fn! {limbs_eq_mod_limb_ref_ref(xs: &[Limb], ys: &[Limb], m: Limb) -> bool {
     if xs.len() >= ys.len() {
         limbs_eq_mod_limb_ref_ref_greater(xs, ys, m)
     } else {
@@ -388,7 +388,7 @@ fn limbs_eq_mod_limb_ref_ref_greater(xs: &[Limb], ys: &[Limb], m: Limb) -> bool 
 //
 // This is equivalent to `mpz_congruent_p` from `mpz/cong.c`, GMP 6.2.1, where `a`, `c`, and `d` are
 // positive, `a` and `c` are longer than one limb, and `m` is one limb long.
-pub_test! {limbs_eq_mod_limb_ref_val(xs: &[Limb], ys: &mut [Limb], m: Limb) -> bool {
+private_test_fn! {limbs_eq_mod_limb_ref_val(xs: &[Limb], ys: &mut [Limb], m: Limb) -> bool {
     if xs.len() >= ys.len() {
         limbs_eq_mod_limb_ref_val_greater(xs, ys, m)
     } else {
@@ -439,7 +439,7 @@ fn limbs_eq_mod_limb_ref_val_greater(xs: &[Limb], ys: &mut [Limb], m: Limb) -> b
 //
 // This is equivalent to `mpz_congruent_p` from `mpz/cong.c`, GMP 6.2.1, where `a`, `c`, and `d` are
 // positive, `a` and `c` are longer than one limb, and `m` is one limb long.
-pub_test! {limbs_eq_mod_limb_val_ref(xs: &mut [Limb], ys: &[Limb], m: Limb) -> bool {
+private_test_fn! {limbs_eq_mod_limb_val_ref(xs: &mut [Limb], ys: &[Limb], m: Limb) -> bool {
     if xs.len() >= ys.len() {
         limbs_eq_mod_limb_val_ref_greater(xs, ys, m)
     } else {
@@ -510,7 +510,7 @@ fn limbs_eq_mod_helper(xs: &[Limb], ys: &[Limb], m: &[Limb]) -> Option<bool> {
 //
 // This is equivalent to `mpz_congruent_p` from `mpz/cong.c`, GMP 6.2.1, where `a`, `c`, and `d` are
 // positive and each is longer than one limb.
-pub_test! {limbs_eq_mod_ref_ref_ref(xs: &[Limb], ys: &[Limb], ms: &[Limb]) -> bool {
+private_test_fn! {limbs_eq_mod_ref_ref_ref(xs: &[Limb], ys: &[Limb], ms: &[Limb]) -> bool {
     if xs.len() >= ys.len() {
         limbs_eq_mod_greater_ref_ref_ref(xs, ys, ms)
     } else {
@@ -554,7 +554,7 @@ fn limbs_eq_mod_greater_ref_ref_ref(xs: &[Limb], ys: &[Limb], ms: &[Limb]) -> bo
 //
 // This is equivalent to `mpz_congruent_p` from `mpz/cong.c`, GMP 6.2.1, where `a`, `c`, and `d` are
 // positive and each is longer than one limb.
-pub_test! {limbs_eq_mod_ref_ref_val(xs: &[Limb], ys: &[Limb], ms: &mut [Limb]) -> bool {
+private_test_fn! {limbs_eq_mod_ref_ref_val(xs: &[Limb], ys: &[Limb], ms: &mut [Limb]) -> bool {
     if xs.len() >= ys.len() {
         limbs_eq_mod_greater_ref_ref_val(xs, ys, ms)
     } else {
@@ -598,7 +598,7 @@ fn limbs_eq_mod_greater_ref_ref_val(xs: &[Limb], ys: &[Limb], ms: &mut [Limb]) -
 //
 // This is equivalent to `mpz_congruent_p` from `mpz/cong.c`, GMP 6.2.1, where `a`, `c`, and `d` are
 // positive and each is longer than one limb.
-pub_test! {limbs_eq_mod_ref_val_ref(xs: &[Limb], ys: &mut [Limb], ms: &[Limb]) -> bool {
+private_test_fn! {limbs_eq_mod_ref_val_ref(xs: &[Limb], ys: &mut [Limb], ms: &[Limb]) -> bool {
     if xs.len() >= ys.len() {
         limbs_eq_mod_greater_ref_val_ref(xs, ys, ms)
     } else {
@@ -660,7 +660,7 @@ fn limbs_eq_mod_greater_val_ref_ref(xs: &mut [Limb], ys: &[Limb], ms: &[Limb]) -
 //
 // This is equivalent to `mpz_congruent_p` from `mpz/cong.c`, GMP 6.2.1, where `a`, `c`, and `d` are
 // positive and each is longer than one limb.
-pub_test! {limbs_eq_mod_ref_val_val(xs: &[Limb], ys: &mut [Limb], ms: &mut [Limb]) -> bool {
+private_test_fn! {limbs_eq_mod_ref_val_val(xs: &[Limb], ys: &mut [Limb], ms: &mut [Limb]) -> bool {
     if xs.len() >= ys.len() {
         limbs_eq_mod_greater_ref_val_val(xs, ys, ms)
     } else {

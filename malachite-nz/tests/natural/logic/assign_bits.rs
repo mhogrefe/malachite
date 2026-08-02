@@ -108,13 +108,17 @@ fn limbs_assign_bits_fail_2() {
 
 #[test]
 fn test_assign_bits() {
-    let test = |u, start, end, v, out| {
-        let mut n = Natural::from_str(u).unwrap();
-        n.assign_bits(start, end, &Natural::from_str(v).unwrap());
-        assert_eq!(n, Natural::from_str(out).unwrap());
-        let mut n = Natural::from_str(u).unwrap();
-        assign_bits_naive(&mut n, start, end, &Natural::from_str(v).unwrap());
-        assert_eq!(n, Natural::from_str(out).unwrap());
+    let test = |r, start, end, s, t| {
+        let u = Natural::from_str(r).unwrap();
+        let v = Natural::from_str(s).unwrap();
+        let w = Natural::from_str(t).unwrap();
+
+        let mut n = u.clone();
+        n.assign_bits(start, end, &v);
+        assert_eq!(n, w.clone());
+        let mut n = u.clone();
+        assign_bits_naive(&mut n, start, end, &v);
+        assert_eq!(n, w.clone());
     };
     test("123", 10, 10, "456", "123");
     test("123", 5, 7, "456", "27");

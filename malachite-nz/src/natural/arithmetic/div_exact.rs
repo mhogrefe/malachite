@@ -109,7 +109,7 @@ pub fn test_invert_limb_table() {
 // Panics if `x` is even.
 //
 // This is equivalent to `binvert_limb` from `gmp-impl.h`, GMP 6.2.1.
-pub_crate_test! {limbs_modular_invert_limb<T: PrimitiveUnsigned>(x: T) -> T
+crate_test_fn! {limbs_modular_invert_limb<T: PrimitiveUnsigned>(x: T) -> T
 where
     usize: ExactFrom<T>,
 {
@@ -142,7 +142,7 @@ where
 //
 // This is equivalent to `mpn_divexact_1` from `mpn/generic/dive_1.c`, GMP 6.2.1, where the result
 // is returned.
-pub_test! {limbs_div_exact_limb_no_special_3(ns: &[Limb], d: Limb) -> Vec<Limb> {
+private_test_fn! {limbs_div_exact_limb_no_special_3(ns: &[Limb], d: Limb) -> Vec<Limb> {
     let mut q = vec![0; ns.len()];
     limbs_div_exact_limb_to_out::<DoubleLimb, Limb>(&mut q, ns, d);
     q
@@ -159,7 +159,7 @@ pub_test! {limbs_div_exact_limb_no_special_3(ns: &[Limb], d: Limb) -> Vec<Limb> 
 // Panics if `out` is shorter than `ns`, `ns` is empty, or if `d` is zero.
 //
 // This is equivalent to `mpn_divexact_1` from `mpn/generic/dive_1.c`, GMP 6.2.1.
-pub_test! {limbs_div_exact_limb_to_out_no_special_3<
+private_test_fn! {limbs_div_exact_limb_to_out_no_special_3<
     DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + SplitInHalf,
     T: PrimitiveUnsigned,
 >(
@@ -227,7 +227,7 @@ pub_test! {limbs_div_exact_limb_to_out_no_special_3<
 //
 // This is equivalent to `mpn_divexact_1` from `mpn/generic/dive_1.c`, GMP 6.2.1, where `dst ==
 // src`.
-pub_test! {limbs_div_exact_limb_in_place_no_special_3(ns: &mut [Limb], d: Limb) {
+private_test_fn! {limbs_div_exact_limb_in_place_no_special_3(ns: &mut [Limb], d: Limb) {
     assert_ne!(d, 0);
     let len = ns.len();
     assert_ne!(len, 0);
@@ -290,7 +290,7 @@ pub_test! {limbs_div_exact_limb_in_place_no_special_3(ns: &mut [Limb], d: Limb) 
 //
 // This is equivalent to `mpn_divexact_by3c` from `mpn/generic/diveby3.c`, GMP 6.2.1, with
 // `DIVEXACT_BY3_METHOD == 0` and no carry-in, where the result is returned.
-pub_test! {limbs_div_exact_3(ns: &[Limb]) -> Vec<Limb> {
+private_test_fn! {limbs_div_exact_3(ns: &[Limb]) -> Vec<Limb> {
     let mut q = vec![0; ns.len()];
     limbs_div_exact_3_to_out::<DoubleLimb, Limb>(&mut q, ns);
     q
@@ -313,7 +313,7 @@ pub_test! {limbs_div_exact_3(ns: &[Limb]) -> Vec<Limb> {
 //
 // This is equivalent to `mpn_divexact_by3c` from `mpn/generic/diveby3.c`, GMP 6.2.1, with
 // `DIVEXACT_BY3_METHOD == 0`, no carry-in, and no return value.
-pub_test! {limbs_div_exact_3_to_out<
+private_test_fn! {limbs_div_exact_3_to_out<
     DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + SplitInHalf,
     T: PrimitiveUnsigned,
 >(
@@ -350,10 +350,10 @@ pub_test! {limbs_div_exact_3_to_out<
 //
 // This is equivalent to `mpn_divexact_by3c` from `mpn/generic/diveby3.c`, GMP 6.2.1, with
 // `DIVEXACT_BY3_METHOD == 0`, no carry-in, and no return value, where `rp == up`.
-pub_crate_test! {limbs_div_exact_3_in_place(ns: &mut [Limb]) {
+crate_test_fn! {limbs_div_exact_3_in_place(ns: &mut [Limb]) {
     let (ns_last, ns_init) = ns.split_last_mut().unwrap();
     let q = limbs_div_divisor_of_limb_max_with_carry_in_place(ns_init, LIMB_MAX_DIV_3, 0);
-    let lower = (DoubleLimb::from(*ns_last) * DoubleLimb::from(LIMB_MAX_DIV_3)).lower_half();
+    let lower = (DoubleLimb::from(*ns_last) * const { LIMB_MAX_DIV_3 as DoubleLimb }).lower_half();
     *ns_last = q.wrapping_sub(lower);
 }}
 
@@ -374,7 +374,7 @@ pub_crate_test! {limbs_div_exact_3_in_place(ns: &mut [Limb]) {
 // Panics if `out` is shorter than `ns`, `ns` is empty, or if `d` is zero.
 //
 // This is equivalent to `mpn_divexact_1` from `mpn/generic/dive_1.c`, GMP 6.2.1.
-pub_crate_test! {limbs_div_exact_limb_to_out<
+crate_test_fn! {limbs_div_exact_limb_to_out<
     DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + SplitInHalf,
     T: PrimitiveUnsigned,
 >(
@@ -408,7 +408,7 @@ pub_crate_test! {limbs_div_exact_limb_to_out<
 //
 // This is equivalent to `mpn_divexact_1` from `mpn/generic/dive_1.c`, GMP 6.2.1, where the result
 // is returned.
-pub_test! {limbs_div_exact_limb(ns: &[Limb], d: Limb) -> Vec<Limb> {
+private_test_fn! {limbs_div_exact_limb(ns: &[Limb], d: Limb) -> Vec<Limb> {
     if d == 3 {
         limbs_div_exact_3(ns)
     } else {
@@ -433,7 +433,7 @@ pub_test! {limbs_div_exact_limb(ns: &[Limb], d: Limb) -> Vec<Limb> {
 //
 // This is equivalent to `mpn_divexact_1` from `mpn/generic/dive_1.c`, GMP 6.2.1, where `dest ==
 // src`.
-pub_crate_test! {limbs_div_exact_limb_in_place(ns: &mut [Limb], d: Limb) {
+crate_test_fn! {limbs_div_exact_limb_in_place(ns: &mut [Limb], d: Limb) {
     if d == 3 {
         limbs_div_exact_3_in_place(ns);
     } else {
@@ -447,7 +447,7 @@ pub_crate_test! {limbs_div_exact_limb_in_place(ns: &mut [Limb], d: Limb) {
 // The result is $O(n)$.
 //
 // This is equivalent to `mpn_binvert_itch` from `mpn/generic/binvert.c`, GMP 6.2.1.
-pub_crate_test! {limbs_modular_invert_scratch_len(n: usize) -> usize {
+crate_test_fn! {limbs_modular_invert_scratch_len(n: usize) -> usize {
     let itch_local = limbs_mul_mod_base_pow_n_minus_1_next_size(n);
     let itch_out = limbs_mul_mod_base_pow_n_minus_1_scratch_len(
         itch_local,
@@ -463,7 +463,7 @@ pub_crate_test! {limbs_modular_invert_scratch_len(n: usize) -> usize {
 // $M(n) = O(n \log n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `ds.len()`.
-pub_test! {limbs_modular_invert_small(
+private_test_fn! {limbs_modular_invert_small(
     size: usize,
     is: &mut [Limb],
     scratch: &mut [Limb],
@@ -493,7 +493,7 @@ pub_test! {limbs_modular_invert_small(
 // Panics if `is` is shorter than `ds`, if `ds` is empty, or if `scratch` is too short.
 //
 // This is equivalent to `mpn_binvert` from `mpn/generic/binvert.c`, GMP 6.2.1.
-pub_crate_test! {limbs_modular_invert(is: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) {
+crate_test_fn! {limbs_modular_invert(is: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) {
     let d_len = ds.len();
     // Compute the computation precisions from highest to lowest, leaving the basecase size in
     // `size`.
@@ -550,7 +550,7 @@ pub_crate_test! {limbs_modular_invert(is: &mut [Limb], ds: &[Limb], scratch: &mu
 //
 // This is equivalent to `mpn_sbpi1_bdiv_qr` from `mpn/generic/sbpi1_bdiv_qr.c`, GMP 6.2.1.
 // Investigate changes from 6.1.2?
-pub_crate_test! {limbs_modular_div_mod_schoolbook(
+crate_test_fn! {limbs_modular_div_mod_schoolbook(
     qs: &mut [Limb],
     ns: &mut [Limb],
     ds: &[Limb],
@@ -695,7 +695,7 @@ fn limbs_modular_div_mod_divide_and_conquer_helper(
 // where $T$ is time, $M$ is additional memory, $n$ is `ns.len()`, and $d$ is `ds.len()`.
 //
 // This is equivalent to `mpn_dcpi1_bdiv_qr` from `mpn/generic/dcpi1_bdiv_qr.c`, GMP 6.2.1.
-pub_crate_test! {limbs_modular_div_mod_divide_and_conquer(
+crate_test_fn! {limbs_modular_div_mod_divide_and_conquer(
     qs: &mut [Limb],
     ns: &mut [Limb],
     ds: &[Limb],
@@ -781,7 +781,9 @@ pub_crate_test! {limbs_modular_div_mod_divide_and_conquer(
 // Constant time and additional memory.
 //
 // This is equivalent to `mpn_dcpi1_bdiv_qr_n_itch` from `mpn/generic/dcpi1_bdiv_qr.c`, GMP 6.2.1.
-pub_const_test! {limbs_modular_div_mod_divide_and_conquer_helper_scratch_len(n: usize) -> usize {
+private_test_const_fn! {limbs_modular_div_mod_divide_and_conquer_helper_scratch_len(
+    n: usize,
+) -> usize {
     n
 }}
 
@@ -789,7 +791,7 @@ pub_const_test! {limbs_modular_div_mod_divide_and_conquer_helper_scratch_len(n: 
 // Constant time and additional memory.
 //
 // This is equivalent to `mpn_mu_bdiv_qr_itch` from `mpn/generic/mu_bdiv_qr.c`, GMP 6.2.1.
-pub_crate_test! {limbs_modular_div_mod_barrett_scratch_len(n_len: usize, d_len: usize) -> usize {
+crate_test_fn! {limbs_modular_div_mod_barrett_scratch_len(n_len: usize, d_len: usize) -> usize {
     assert!(DC_BDIV_Q_THRESHOLD < MU_BDIV_Q_THRESHOLD);
     let q_len = n_len - d_len;
     let i_len = if q_len > d_len {
@@ -1043,7 +1045,7 @@ fn limbs_modular_div_mod_barrett_balanced(
 // limb of `ds` is even.
 //
 // This is equivalent to `mpn_mu_bdiv_qr` from `mpn/generic/mu_bdiv_qr.c`, GMP 6.2.1.
-pub_crate_test! {limbs_modular_div_mod_barrett(
+crate_test_fn! {limbs_modular_div_mod_barrett(
     qs: &mut [Limb],
     rs: &mut [Limb],
     ns: &[Limb],
@@ -1073,7 +1075,7 @@ pub_crate_test! {limbs_modular_div_mod_barrett(
 // where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
 // This is equivalent to `mpn_sbpi1_bdiv_q` from `mpn/generic/sbpi1_bdiv_q.c`, GMP 6.2.1.
-pub_crate_test! {limbs_modular_div_schoolbook(
+crate_test_fn! {limbs_modular_div_schoolbook(
     mut qs: &mut [Limb],
     mut ns: &mut [Limb],
     ds: &[Limb],
@@ -1174,7 +1176,7 @@ pub fn limbs_modular_div_schoolbook_in_place(mut ns: &mut [Limb], ds: &[Limb], d
 // Constant time and additional memory.
 //
 // This is equivalent to `mpn_dcpi1_bdiv_q_n_itch` from `mpn/generic/dcpi1_bdiv_q.c`, GMP 6.2.1.
-pub_const_test! {limbs_modular_div_divide_and_conquer_helper_scratch_len(n: usize) -> usize {
+private_test_const_fn! {limbs_modular_div_divide_and_conquer_helper_scratch_len(n: usize) -> usize {
     n
 }}
 
@@ -1235,7 +1237,7 @@ fn limbs_modular_div_divide_and_conquer_helper(
 //
 // This is equivalent to `mpn_dcpi1_bdiv_q` from `mpn/generic/dcpi1_bdiv_q.c`, GMP 6.2.1.
 // Investigate changes from 6.1.2?
-pub_test! {limbs_modular_div_divide_and_conquer(
+private_test_fn! {limbs_modular_div_divide_and_conquer(
     qs: &mut [Limb],
     ns: &mut [Limb],
     ds: &[Limb],
@@ -1315,7 +1317,7 @@ pub_test! {limbs_modular_div_divide_and_conquer(
 // Constant time and additional memory.
 //
 // This is equivalent to `mpn_mu_bdiv_q_itch` from `mpn/generic/mu_bdiv_q.c`, GMP 6.2.1.
-pub_test! {limbs_modular_div_barrett_scratch_len(n_len: usize, d_len: usize) -> usize {
+private_test_fn! {limbs_modular_div_barrett_scratch_len(n_len: usize, d_len: usize) -> usize {
     assert!(DC_BDIV_Q_THRESHOLD < MU_BDIV_Q_THRESHOLD);
     let i_len;
     let mul_len = if n_len > d_len {
@@ -1528,7 +1530,7 @@ fn limbs_modular_div_barrett_same_length(
 // where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
 // This is equivalent to `mpn_mu_bdiv_q` from `mpn/generic/mu_bdiv_q.c`, GMP 6.2.1.
-pub_test! {limbs_modular_div_barrett(
+private_test_fn! {limbs_modular_div_barrett(
     qs: &mut [Limb],
     ns: &[Limb],
     ds: &[Limb],
@@ -1550,7 +1552,7 @@ pub_test! {limbs_modular_div_barrett(
 //
 // This is equivalent to `mpn_bdiv_q_itch` from `mpn/generic/bdiv_q.c`, GMP 6.2.1, where nothing is
 // allocated for inputs that are too small for Barrett division. Investigate changes from 6.1.2?
-pub_test! {limbs_modular_div_scratch_len(n_len: usize, d_len: usize) -> usize {
+private_test_fn! {limbs_modular_div_scratch_len(n_len: usize, d_len: usize) -> usize {
     if d_len < MU_BDIV_Q_THRESHOLD {
         0
     } else {
@@ -1569,7 +1571,12 @@ pub_test! {limbs_modular_div_scratch_len(n_len: usize, d_len: usize) -> usize {
 //
 // This is equivalent to `mpn_bdiv_q` from `mpn/generic/bdiv_q.c`, GMP 6.2.1. Investigate changes
 // from 6.1.2?
-pub_test! {limbs_modular_div(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) {
+private_test_fn! {limbs_modular_div(
+    qs: &mut [Limb],
+    ns: &mut [Limb],
+    ds: &[Limb],
+    scratch: &mut [Limb],
+) {
     let d_len = ds.len();
     if d_len < DC_BDIV_Q_THRESHOLD {
         let d_inv = limbs_modular_invert_limb(ds[0]).wrapping_neg();
@@ -1659,7 +1666,7 @@ pub(crate) fn limbs_modular_div_mod_wrap(
 // Constant time and additional memory.
 //
 // This is equivalent to `mpn_bdiv_q_itch` from `mpn/generic/bdiv_q.c`, GMP 6.2.1.
-pub_test! {limbs_modular_div_ref_scratch_len(n_len: usize, d_len: usize) -> usize {
+private_test_fn! {limbs_modular_div_ref_scratch_len(n_len: usize, d_len: usize) -> usize {
     if d_len < MU_BDIV_Q_THRESHOLD {
         n_len
     } else {
@@ -1677,7 +1684,12 @@ pub_test! {limbs_modular_div_ref_scratch_len(n_len: usize, d_len: usize) -> usiz
 // where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
 // This is equivalent to `mpn_bdiv_q` from `mpn/generic/bdiv_q.c`, GMP 6.2.1.
-pub_test! {limbs_modular_div_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch: &mut [Limb]) {
+private_test_fn! {limbs_modular_div_ref(
+    qs: &mut [Limb],
+    ns: &[Limb],
+    ds: &[Limb],
+    scratch: &mut [Limb],
+) {
     let n_len = ns.len();
     let d_len = ds.len();
     if d_len < DC_BDIV_Q_THRESHOLD {
@@ -1718,7 +1730,7 @@ pub_test! {limbs_modular_div_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scra
 //
 // This is equivalent to `mpn_divexact` from `mpn/generic/divexact.c`, GMP 6.2.1, where `scratch` is
 // allocated internally and `qp` is returned.
-pub_test! {limbs_div_exact(ns: &[Limb], ds: &[Limb]) -> Vec<Limb> {
+private_test_fn! {limbs_div_exact(ns: &[Limb], ds: &[Limb]) -> Vec<Limb> {
     let mut qs = vec![0; ns.len() - ds.len() + 1];
     limbs_div_exact_to_out_ref_ref(&mut qs, ns, ds);
     qs
@@ -1747,7 +1759,7 @@ pub_test! {limbs_div_exact(ns: &[Limb], ds: &[Limb]) -> Vec<Limb> {
 //
 // This is equivalent to `mpn_divexact` from `mpn/generic/divexact.c`, GMP 6.2.1, except that `np`
 // and `dp` are consumed.
-pub_crate_test! {limbs_div_exact_to_out(qs: &mut [Limb], ns: &mut [Limb], ds: &mut [Limb]) {
+crate_test_fn! {limbs_div_exact_to_out(qs: &mut [Limb], ns: &mut [Limb], ds: &mut [Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
     assert_ne!(d_len, 0);
@@ -1801,7 +1813,7 @@ pub_crate_test! {limbs_div_exact_to_out(qs: &mut [Limb], ns: &mut [Limb], ds: &m
 //
 // This is equivalent to `mpn_divexact` from `mpn/generic/divexact.c`, GMP 6.2.1, except that `np`
 // is consumed.
-pub_test! {limbs_div_exact_to_out_val_ref(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb]) {
+private_test_fn! {limbs_div_exact_to_out_val_ref(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
     assert_ne!(d_len, 0);
@@ -1858,7 +1870,7 @@ pub_test! {limbs_div_exact_to_out_val_ref(qs: &mut [Limb], ns: &mut [Limb], ds: 
 //
 // This is equivalent to `mpn_divexact` from `mpn/generic/divexact.c`, GMP 6.2.1, except that `dp`
 // is consumed.
-pub_test! {limbs_div_exact_to_out_ref_val(qs: &mut [Limb], ns: &[Limb], ds: &mut [Limb]) {
+private_test_fn! {limbs_div_exact_to_out_ref_val(qs: &mut [Limb], ns: &[Limb], ds: &mut [Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
     assert_ne!(d_len, 0);
@@ -1915,7 +1927,7 @@ pub_test! {limbs_div_exact_to_out_ref_val(qs: &mut [Limb], ns: &[Limb], ds: &mut
 // limb of `ds` is zero.
 //
 // This is equivalent to `mpn_divexact` from `mpn/generic/divexact.c`, GMP 6.2.1.
-pub_test! {limbs_div_exact_to_out_ref_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
+private_test_fn! {limbs_div_exact_to_out_ref_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
     assert_ne!(d_len, 0);

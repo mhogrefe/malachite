@@ -502,7 +502,7 @@ pub(crate) fn exp_3(x: &Float, precy: u64, rm: RoundingMode) -> (Float, Ordering
                     if rm == Nearest
                         && inexact == Less
                         && matches!(y.0, Zero { .. })
-                        && ey == i64::from(Float::MIN_EXPONENT) + 1
+                        && ey == Float::MIN_EXPONENT_PLUS_1_I64
                     {
                         // Double rounding: RNDN rounded the scaled result down to 2^emin, but the
                         // exact result is > 2^(emin - 2), so round up instead.

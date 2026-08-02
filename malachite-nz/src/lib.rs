@@ -210,6 +210,9 @@ pub mod platform_32;
 #[cfg(not(feature = "32_bit_limbs"))]
 pub mod platform_64;
 
+#[macro_use]
+mod macros;
+
 #[cfg(feature = "doc-images")]
 extern crate embed_doc_image;
 

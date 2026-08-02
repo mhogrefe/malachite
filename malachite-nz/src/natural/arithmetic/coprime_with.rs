@@ -16,7 +16,7 @@ const THREE: Natural = Natural::const_from(3);
 #[cfg(feature = "test_build")]
 const FIFTEEN: Natural = Natural::const_from(15);
 
-pub_test! {coprime_with_check_2(x: Natural, y: Natural) -> bool {
+private_test_fn! {coprime_with_check_2(x: Natural, y: Natural) -> bool {
     (x.odd() || y.odd()) && x.gcd(y) == 1u32
 }}
 
@@ -48,15 +48,15 @@ pub fn coprime_with_check_2_3_5(x: Natural, y: Natural) -> bool {
     }
 }
 
-pub_test! {coprime_with_check_2_val_ref(x: Natural, y: &Natural) -> bool {
+private_test_fn! {coprime_with_check_2_val_ref(x: Natural, y: &Natural) -> bool {
     (x.odd() || y.odd()) && x.gcd(y) == 1u32
 }}
 
-pub_test! {coprime_with_check_2_ref_val(x: &Natural, y: Natural) -> bool {
+private_test_fn! {coprime_with_check_2_ref_val(x: &Natural, y: Natural) -> bool {
     (x.odd() || y.odd()) && x.gcd(y) == 1u32
 }}
 
-pub_test! {coprime_with_check_2_ref_ref(x: &Natural, y: &Natural) -> bool {
+private_test_fn! {coprime_with_check_2_ref_ref(x: &Natural, y: &Natural) -> bool {
     (x.odd() || y.odd()) && x.gcd(y) == 1u32
 }}
 

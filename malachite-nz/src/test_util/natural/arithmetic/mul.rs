@@ -411,7 +411,7 @@ impl FFTContext {
 }
 
 impl Context {
-    pub_crate_test! {serialize(self) -> SerializedContext {
+    crate_test_fn! {serialize(self) -> SerializedContext {
         let mut crts_data_0 = [0; 3];
         let mut crts_data_1 = [0; 8];
         let mut crts_data_2 = [0; 15];

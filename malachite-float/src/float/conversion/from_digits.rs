@@ -31,7 +31,7 @@ fn quotient_prec_round(n: Natural, d: Natural, prec: u64, rm: RoundingMode) -> (
     //
     // Both arguments are taken by value: at these sizes the conversions would otherwise copy them,
     // and one caller-side clone is cheaper than two internal ones.
-    if max(n.significant_bits(), d.significant_bits()) > u64::exact_from(Float::MAX_EXPONENT) {
+    if max(n.significant_bits(), d.significant_bits()) > Float::MAX_EXPONENT_U64 {
         Float::from_rational_prec_round(Rational::from_naturals(n, d), prec, rm)
     } else {
         Float::exact_from(n).div_prec_round(Float::exact_from(d), prec, rm)

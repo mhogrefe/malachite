@@ -503,6 +503,8 @@ so there is nothing to bound.
 evaluates it by table lookup at word size and divide-and-conquer beyond, which is the
 binary-splitting shape Malachite already uses elsewhere; until the function exists, a fold of
 `Rational::from_unsigneds(1, i)` computes the value without the divide-and-conquer speed.
+[`arith_harmonic_number`](/mapping/flint-arithmetic-functions/#harmonic-numbers) wraps this
+function, so the two rows are one piece of work.
 
 ## [Dedekind sums](https://flintlib.org/doc/fmpq.html#dedekind-sums) {#dedekind-sums}
 

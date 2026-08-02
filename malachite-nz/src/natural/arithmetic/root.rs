@@ -265,7 +265,7 @@ fn limbs_root_to_out_internal(
     // Similarly for S = 4, then S' can be 6 at most. So the worst case is S' / S = 3 / 2, thus S' ^
     // exp <= (3 / 2) ^ exp * S ^ exp. Since S ^ exp fits in xs_len limbs, the number of extra limbs
     // needed is bounded by ceil(exp * log_2(3 / 2) / B), where B is `Limb::WIDTH`.
-    let extra = (((0.585 * (exp as f64)) / (Limb::WIDTH as f64)) as usize) + 2;
+    let extra = (((0.585 * (exp as f64)) / const { Limb::WIDTH as f64 }) as usize) + 2;
     let mut big_scratch = vec![0; 3 * xs_len + (extra << 1) + 1];
     let (scratch, remainder) = big_scratch.split_at_mut(xs_len + 1);
     // - qs will contain quotient and remainder of R / (exp * S ^ (exp - 1)).
@@ -499,7 +499,7 @@ fn limbs_root_to_out_internal(
 //
 // This is equivalent to `mpn_rootrem` from `mpn/generic/rootrem.c`, GMP 6.2.1, where `k != 2` and
 // `remp` is not `NULL`.
-pub_test! {limbs_root_rem_to_out(
+private_test_fn! {limbs_root_rem_to_out(
     out_root: &mut [Limb],
     out_rem: &mut [Limb],
     xs: &[Limb],
@@ -524,7 +524,7 @@ pub_test! {limbs_root_rem_to_out(
 //
 // This is equivalent to `mpn_rootrem` from `mpn/generic/rootrem.c`, GMP 6.2.1, where `remp` is
 // `NULL`.
-pub_test! {limbs_floor_root_to_out(out_root: &mut [Limb], xs: &[Limb], exp: u64) -> bool {
+private_test_fn! {limbs_floor_root_to_out(out_root: &mut [Limb], xs: &[Limb], exp: u64) -> bool {
     let xs_len = xs.len();
     assert_ne!(xs_len, 0);
     assert_ne!(xs[xs_len - 1], 0);
@@ -559,7 +559,7 @@ pub_test! {limbs_floor_root_to_out(out_root: &mut [Limb], xs: &[Limb], exp: u64)
 // $M(n) = O(n \log n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
-pub_test! {limbs_floor_root(xs: &[Limb], exp: u64) -> (Vec<Limb>, bool) {
+private_test_fn! {limbs_floor_root(xs: &[Limb], exp: u64) -> (Vec<Limb>, bool) {
     let mut out = vec![
         0;
         xs.len()
@@ -575,7 +575,7 @@ pub_test! {limbs_floor_root(xs: &[Limb], exp: u64) -> (Vec<Limb>, bool) {
 // $M(n) = O(n \log n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
-pub_test! {
+private_test_fn! {
 // The two buffers stay separate allocations: both are returned as owned `Vec`s, and merging them
 // would force one to be copied out of the parent.
 #[cfg_attr(dylint_lib = "malachite_lints", allow(adjacent_vec_allocations))]

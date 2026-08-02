@@ -150,7 +150,7 @@ fn demo_natural_checked_mul_sub_mul_ref_ref_ref_ref(gm: GenMode, config: &GenCon
             y.clone(),
             z.clone(),
             w.clone(),
-            &x.checked_mul_sub_mul(&y.clone(), &z.clone(), &w.clone())
+            x.checked_mul_sub_mul(&y.clone(), &z.clone(), &w.clone())
         );
     }
 }
@@ -226,10 +226,10 @@ fn benchmark_natural_checked_mul_sub_mul_algorithms(
         &quadruple_natural_max_bit_bucketer("x", "y", "z", "w"),
         &mut [
             ("default", &mut |(x, y, z, w)| {
-                no_out!(x.checked_mul_sub_mul(y, z, w))
+                no_out!(x.checked_mul_sub_mul(y, z, w));
             }),
             ("naive", &mut |(x, y, z, w)| {
-                no_out!((x * y).checked_sub(z * w))
+                no_out!((x * y).checked_sub(z * w));
             }),
         ],
     );

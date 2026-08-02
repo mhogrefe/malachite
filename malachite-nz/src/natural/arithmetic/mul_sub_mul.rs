@@ -20,7 +20,6 @@ impl MulSubMul<Self, Self, Self> for Natural {
     /// # Panics
     /// Panics if $zw > xy$.
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -60,7 +59,6 @@ impl MulSubMul<Self, Self, &Self> for Natural {
     /// # Panics
     /// Panics if $zw > xy$.
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -100,7 +98,6 @@ impl MulSubMul<Self, &Self, Self> for Natural {
     /// # Panics
     /// Panics if $zw > xy$.
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -140,7 +137,6 @@ impl MulSubMul<Self, &Self, &Self> for Natural {
     /// # Panics
     /// Panics if $zw > xy$.
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -180,7 +176,6 @@ impl MulSubMul<&Self, Self, Self> for Natural {
     /// # Panics
     /// Panics if $zw > xy$.
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -220,7 +215,6 @@ impl MulSubMul<&Self, Self, &Self> for Natural {
     /// # Panics
     /// Panics if $zw > xy$.
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -260,7 +254,6 @@ impl MulSubMul<&Self, &Self, Self> for Natural {
     /// # Panics
     /// Panics if $zw > xy$.
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -300,7 +293,6 @@ impl MulSubMul<&Self, &Self, &Self> for Natural {
     /// # Panics
     /// Panics if $zw > xy$.
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -340,7 +332,6 @@ impl MulSubMul<&Natural, &Natural, &Natural> for &Natural {
     /// # Panics
     /// Panics if $zw > xy$.
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -378,7 +369,6 @@ impl MulSubMulAssign<Self, Self, Self> for Natural {
     /// # Panics
     /// Panics if $zw > xy$.
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -412,7 +402,6 @@ impl MulSubMulAssign<Self, Self, &Self> for Natural {
     /// # Panics
     /// Panics if $zw > xy$.
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -446,7 +435,6 @@ impl MulSubMulAssign<Self, &Self, Self> for Natural {
     /// # Panics
     /// Panics if $zw > xy$.
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -480,7 +468,6 @@ impl MulSubMulAssign<Self, &Self, &Self> for Natural {
     /// # Panics
     /// Panics if $zw > xy$.
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -514,7 +501,6 @@ impl MulSubMulAssign<&Self, Self, Self> for Natural {
     /// # Panics
     /// Panics if $zw > xy$.
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -548,7 +534,6 @@ impl MulSubMulAssign<&Self, Self, &Self> for Natural {
     /// # Panics
     /// Panics if $zw > xy$.
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -582,7 +567,6 @@ impl MulSubMulAssign<&Self, &Self, Self> for Natural {
     /// # Panics
     /// Panics if $zw > xy$.
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
@@ -616,7 +600,6 @@ impl MulSubMulAssign<&Self, &Self, &Self> for Natural {
     /// # Panics
     /// Panics if $zw > xy$.
     ///
-
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///

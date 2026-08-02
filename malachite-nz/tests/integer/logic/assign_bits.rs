@@ -116,13 +116,14 @@ fn test_assign_bits() {
     let test = |s, start, end, t, out| {
         let u = Integer::from_str(s).unwrap();
         let v = Natural::from_str(t).unwrap();
+        let w = Integer::from_str(out).unwrap();
 
         let mut n = u.clone();
         n.assign_bits(start, end, &v);
-        assert_eq!(n, Integer::from_str(out).unwrap());
+        assert_eq!(n, w);
         let mut n = u;
         assign_bits_naive(&mut n, start, end, &v);
-        assert_eq!(n, Integer::from_str(out).unwrap());
+        assert_eq!(n, w);
     };
     test("123", 10, 10, "456", "123");
     test("123", 5, 7, "456", "27");

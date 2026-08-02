@@ -26,7 +26,7 @@ use malachite_base::slices::slice_test_zero;
 //
 // # Panics
 // Panics if `xs` is empty.
-pub_test! {limbs_floor_log_base_2(xs: &[Limb]) -> u64 {
+private_test_fn! {limbs_floor_log_base_2(xs: &[Limb]) -> u64 {
     limbs_significant_bits(xs) - 1
 }}
 
@@ -46,7 +46,7 @@ pub_test! {limbs_floor_log_base_2(xs: &[Limb]) -> u64 {
 //
 // # Panics
 // Panics if `xs` is empty.
-pub_test! {limbs_ceiling_log_base_2(xs: &[Limb]) -> u64 {
+private_test_fn! {limbs_ceiling_log_base_2(xs: &[Limb]) -> u64 {
     let floor_log_base_2 = limbs_floor_log_base_2(xs);
     if limbs_is_power_of_2(xs) {
         floor_log_base_2
@@ -77,7 +77,7 @@ pub_test! {limbs_ceiling_log_base_2(xs: &[Limb]) -> u64 {
 //
 // # Panics
 // Panics if `xs` is empty.
-pub_test! {limbs_checked_log_base_2(xs: &[Limb]) -> Option<u64> {
+private_test_fn! {limbs_checked_log_base_2(xs: &[Limb]) -> Option<u64> {
     let (xs_last, xs_init) = xs.split_last().unwrap();
     if slice_test_zero(xs_init) {
         xs_last

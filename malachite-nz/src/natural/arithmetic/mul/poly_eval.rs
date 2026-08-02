@@ -30,12 +30,12 @@ use crate::natural::arithmetic::shl::{
 };
 use crate::natural::arithmetic::sub::limbs_sub_same_length_to_out;
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
-use crate::platform::Limb;
+use crate::platform::{LIMB_WIDTH_USIZE, Limb};
 use core::cmp::Ordering::*;
 use itertools::Itertools;
 use malachite_base::num::arithmetic::traits::{Parity, WrappingAddAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::NotAssign;
 
 // Evaluate a degree-3 polynomial in +1 and -1, where each coefficient has width `n` limbs, except
@@ -250,7 +250,7 @@ pub(crate) fn limbs_mul_toom_evaluate_poly_in_2_and_neg_2(
     scratch: &mut [Limb],
 ) -> bool {
     assert!(degree >= 3);
-    assert!(degree < usize::wrapping_from(Limb::WIDTH));
+    assert!(degree < LIMB_WIDTH_USIZE);
     assert_eq!(v_2.len(), n + 1);
     assert_eq!(scratch.len(), n + 1);
     // The degree `degree` is also the number of full-size coefficients, so that the last

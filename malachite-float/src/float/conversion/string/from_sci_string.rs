@@ -314,7 +314,7 @@ const fn base_prefix(base: u8) -> &'static str {
     }
 }
 
-pub_crate_test! {
+crate_test_fn! {
 // Reads what `ComparableFloat` writes in the given base: an optional sign, an optional base prefix,
 // the digits, and an optional `#` and precision. Without the suffix the precision is inferred from
 // the digits.

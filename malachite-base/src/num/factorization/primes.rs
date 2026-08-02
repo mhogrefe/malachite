@@ -29,6 +29,8 @@ use alloc::vec::Vec;
 use core::marker::PhantomData;
 
 const NUM_SMALL_PRIMES: usize = 172;
+// The same count as a `u64`, for comparing against the `u64` index of a prime iterator.
+const NUM_SMALL_PRIMES_U64: u64 = NUM_SMALL_PRIMES as u64;
 
 // The sieve bit index of the first prime past the small-prime table (1031 is the next prime after
 // 1021, the largest prime below 2^10).
@@ -142,7 +144,7 @@ impl<T: PrimitiveUnsigned> PrimesLessThanIterator<T> {
                 Ok(i) => i + 1,
                 Err(i) => i,
             });
-            if self.i == NUM_SMALL_PRIMES as u64 {
+            if self.i == NUM_SMALL_PRIMES_U64 {
                 if self.sieve.is_empty() {
                     false
                 } else {
@@ -194,7 +196,7 @@ impl<T: PrimitiveUnsigned> Iterator for PrimesLessThanIterator<T> {
                 return None;
             }
             self.i += 1;
-            if self.i == NUM_SMALL_PRIMES as u64 {
+            if self.i == NUM_SMALL_PRIMES_U64 {
                 self.small = false;
                 self.i = NEXT_INDEX;
             }

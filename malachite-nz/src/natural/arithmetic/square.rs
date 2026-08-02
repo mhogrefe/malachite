@@ -57,8 +57,8 @@ use crate::natural::arithmetic::sub::{
 };
 use crate::natural::comparison::cmp::limbs_cmp_same_length;
 use crate::platform::{
-    DoubleLimb, Limb, SQR_BASECASE_THRESHOLD, SQR_TOOM3_THRESHOLD, SQR_TOOM4_THRESHOLD,
-    SQR_TOOM6_THRESHOLD, SQR_TOOM8_THRESHOLD,
+    DoubleLimb, LIMB_WIDTH_USIZE, Limb, SQR_BASECASE_THRESHOLD, SQR_TOOM3_THRESHOLD,
+    SQR_TOOM4_THRESHOLD, SQR_TOOM6_THRESHOLD, SQR_TOOM8_THRESHOLD,
 };
 
 // Re-exported so that the tuner can read the compiled-in cap (`limbs_square_to_out_basecase`'s
@@ -70,15 +70,14 @@ pub const SQR_TOOM2_THRESHOLD: usize = crate::platform::SQR_TOOM2_THRESHOLD;
 #[cfg(not(feature = "test_build"))]
 const SQR_TOOM2_THRESHOLD: usize = crate::platform::SQR_TOOM2_THRESHOLD;
 use alloc::vec::Vec;
-use core::cmp::{Ordering::*, max};
+use core::cmp::Ordering::*;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     ArithmeticCheckedShl, DivRound, ShrRound, Square, SquareAssign, WrappingAddAssign,
     WrappingSubAssign, XMulYToZZ,
 };
-use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
-use malachite_base::num::conversion::traits::{SplitInHalf, WrappingFrom};
+use malachite_base::num::conversion::traits::SplitInHalf;
 use malachite_base::rounding_modes::RoundingMode::*;
 
 const TWICE_SQR_TOOM6_THRESHOLD: usize = SQR_TOOM6_THRESHOLD << 1;
@@ -120,7 +119,11 @@ pub(crate) fn limbs_square_diagonal(out: &mut [Limb], xs: &[Limb]) {
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // This is equivalent to `MPN_SQR_DIAG_ADDLSH1` from `mpn/generic/sqr_basecase.c`, GMP 6.2.1.
-pub_test! {limbs_square_diagonal_add_shl_1(out: &mut [Limb], scratch: &mut [Limb], xs: &[Limb]) {
+private_test_fn! {limbs_square_diagonal_add_shl_1(
+    out: &mut [Limb],
+    scratch: &mut [Limb],
+    xs: &[Limb],
+) {
     limbs_square_diagonal(out, xs);
     let (out_last, out_init) = out.split_last_mut().unwrap();
     *out_last += limbs_slice_shl_in_place(scratch, 1);
@@ -146,7 +149,7 @@ pub_test! {limbs_square_diagonal_add_shl_1(out: &mut [Limb], scratch: &mut [Limb
 // `xs` is empty.
 //
 // This is equivalent to `mpn_sqr_basecase` from `mpn/generic/sqr_basecase.c`, GMP 6.2.1.
-pub_crate_test! {limbs_square_to_out_basecase(out: &mut [Limb], xs: &[Limb]) {
+crate_test_fn! {limbs_square_to_out_basecase(out: &mut [Limb], xs: &[Limb]) {
     let n = xs.len();
     let (xs_head, xs_tail) = xs.split_first().unwrap();
     (out[1], out[0]) = DoubleLimb::from(*xs_head).square().split_in_half();
@@ -171,8 +174,8 @@ pub_crate_test! {limbs_square_to_out_basecase(out: &mut [Limb], xs: &[Limb]) {
 // Constant time and additional memory.
 //
 // This is equivalent to `mpn_toom2_sqr_itch` from `gmp-impl.h`, GMP 6.2.1.
-pub_const_test! {limbs_square_to_out_toom_2_scratch_len(xs_len: usize) -> usize {
-    (xs_len + Limb::WIDTH as usize) << 1
+private_test_const_fn! {limbs_square_to_out_toom_2_scratch_len(xs_len: usize) -> usize {
+    (xs_len + LIMB_WIDTH_USIZE) << 1
 }}
 
 // TODO tune
@@ -229,7 +232,7 @@ fn limbs_square_to_out_toom_2_recursive(out: &mut [Limb], xs: &[Limb], scratch: 
 // May panic if the input slice conditions are not met.
 //
 // This is equivalent to `mpn_toom2_sqr` from `mpn/generic/toom2_sqr.c`, GMP 6.2.1.
-pub_test! {limbs_square_to_out_toom_2(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
+private_test_fn! {limbs_square_to_out_toom_2(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
     let xs_len = xs.len();
     assert!(xs_len > 1);
     let out = &mut out[..xs_len << 1];
@@ -290,7 +293,7 @@ pub_test! {limbs_square_to_out_toom_2(out: &mut [Limb], xs: &[Limb], scratch: &m
 //
 // # Worst-case complexity
 // Constant time and additional memory.
-pub_const_test! {limbs_square_to_out_toom_3_input_size_valid(xs_len: usize) -> bool {
+private_test_const_fn! {limbs_square_to_out_toom_3_input_size_valid(xs_len: usize) -> bool {
     xs_len == 3 || xs_len > 4
 }}
 
@@ -298,8 +301,8 @@ pub_const_test! {limbs_square_to_out_toom_3_input_size_valid(xs_len: usize) -> b
 // Constant time and additional memory.
 //
 // This is equivalent to `mpn_toom3_sqr_itch` from `gmp-impl.h`, GMP 6.2.1.
-pub_const_test! {limbs_square_to_out_toom_3_scratch_len(xs_len: usize) -> usize {
-    3 * xs_len + Limb::WIDTH as usize
+private_test_const_fn! {limbs_square_to_out_toom_3_scratch_len(xs_len: usize) -> usize {
+    3 * xs_len + LIMB_WIDTH_USIZE
 }}
 
 // TODO tune
@@ -379,7 +382,7 @@ fn limbs_square_to_out_toom_3_recursive(out: &mut [Limb], xs: &[Limb], scratch: 
 // May panic if the input slice conditions are not met.
 //
 // This is equivalent to `mpn_toom3_sqr` from `mpn/generic/toom3_sqr.c`, GMP 6.2.1.
-pub_test! {limbs_square_to_out_toom_3(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
+private_test_fn! {limbs_square_to_out_toom_3(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
     let xs_len = xs.len();
     let n = xs_len.div_round(3, Ceiling).0;
     let m = n + 1;
@@ -476,7 +479,7 @@ pub_test! {limbs_square_to_out_toom_3(out: &mut [Limb], xs: &[Limb], scratch: &m
 //
 // # Worst-case complexity
 // Constant time and additional memory.
-pub_const_test! {limbs_square_to_out_toom_4_input_size_valid(xs_len: usize) -> bool {
+private_test_const_fn! {limbs_square_to_out_toom_4_input_size_valid(xs_len: usize) -> bool {
     xs_len == 4 || xs_len == 7 || xs_len == 8 || xs_len > 9
 }}
 
@@ -484,8 +487,8 @@ pub_const_test! {limbs_square_to_out_toom_4_input_size_valid(xs_len: usize) -> b
 // Constant time and additional memory.
 //
 // This is equivalent to `mpn_toom4_sqr_itch` from `gmp-impl.h`, GMP 6.2.1.
-pub_const_test! {limbs_square_to_out_toom_4_scratch_len(xs_len: usize) -> usize {
-    3 * xs_len + Limb::WIDTH as usize
+private_test_const_fn! {limbs_square_to_out_toom_4_scratch_len(xs_len: usize) -> usize {
+    3 * xs_len + LIMB_WIDTH_USIZE
 }}
 
 // TODO tune
@@ -559,7 +562,7 @@ fn limbs_square_to_out_toom_4_recursive(out: &mut [Limb], xs: &[Limb], scratch: 
 // May panic if the input slice conditions are not met.
 //
 // This is equivalent to `mpn_toom4_sqr` from `mpn/generic/toom4_sqr.c`, GMP 6.2.1.
-pub_test! {limbs_square_to_out_toom_4(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
+private_test_fn! {limbs_square_to_out_toom_4(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
     let xs_len = xs.len();
     let n = (xs_len + 3) >> 2;
     let s = xs_len - 3 * n;
@@ -618,7 +621,7 @@ pub_test! {limbs_square_to_out_toom_4(out: &mut [Limb], xs: &[Limb], scratch: &m
 //
 // # Worst-case complexity
 // Constant time and additional memory.
-pub_const_test! {limbs_square_to_out_toom_6_input_size_valid(xs_len: usize) -> bool {
+private_test_const_fn! {limbs_square_to_out_toom_6_input_size_valid(xs_len: usize) -> bool {
     xs_len == 18 || xs_len > 21 && xs_len != 25 && xs_len != 26 && xs_len != 31
 }}
 
@@ -626,13 +629,15 @@ pub_const_test! {limbs_square_to_out_toom_6_input_size_valid(xs_len: usize) -> b
 // Constant time and additional memory.
 //
 // This is equivalent to `mpn_toom6_sqr_itch` from `gmp-impl.h`, GMP 6.2.1.
-pub_crate_test! {limbs_square_to_out_toom_6_scratch_len(n: usize) -> usize {
-    (n << 1)
-        + max(
-            TWICE_SQR_TOOM6_THRESHOLD + usize::wrapping_from(Limb::WIDTH) * 6,
-            limbs_square_to_out_toom_4_scratch_len(SQR_TOOM6_THRESHOLD),
-        )
-        - TWICE_SQR_TOOM6_THRESHOLD
+crate_test_const_fn! {limbs_square_to_out_toom_6_scratch_len(n: usize) -> usize {
+    // Everything but `n << 1` is a compile-time constant. `max` is not const-stable, so the
+    // comparison is spelled out; that is what lets this be a `const fn` like its siblings.
+    const ITCH: usize = {
+        const FLOOR: usize = TWICE_SQR_TOOM6_THRESHOLD + LIMB_WIDTH_USIZE * 6;
+        const TOOM4: usize = limbs_square_to_out_toom_4_scratch_len(SQR_TOOM6_THRESHOLD);
+        (if FLOOR > TOOM4 { FLOOR } else { TOOM4 }) - TWICE_SQR_TOOM6_THRESHOLD
+    };
+    (n << 1) + ITCH
 }}
 
 // TODO tune
@@ -724,7 +729,7 @@ fn limbs_square_to_out_toom_6_recursive(out: &mut [Limb], xs: &[Limb], scratch: 
 // May panic if the input slice conditions are not met.
 //
 // This is equivalent to `mpn_toom6_sqr` from `mpn/generic/toom6_sqr.c`, GMP 6.2.1.
-pub_test! {limbs_square_to_out_toom_6(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
+private_test_fn! {limbs_square_to_out_toom_6(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
     let xs_len = xs.len();
     assert!(xs_len >= 18);
     let n = 1 + (xs_len - 1) / 6;
@@ -793,7 +798,7 @@ pub_test! {limbs_square_to_out_toom_6(out: &mut [Limb], xs: &[Limb], scratch: &m
 //
 // # Worst-case complexity
 // Constant time and additional memory.
-pub_const_test! {limbs_square_to_out_toom_8_input_size_valid(xs_len: usize) -> bool {
+private_test_const_fn! {limbs_square_to_out_toom_8_input_size_valid(xs_len: usize) -> bool {
     xs_len == 40 || xs_len > 43 && xs_len != 49 && xs_len != 50 && xs_len != 57
 }}
 
@@ -801,13 +806,14 @@ pub_const_test! {limbs_square_to_out_toom_8_input_size_valid(xs_len: usize) -> b
 // Constant time and additional memory.
 //
 // This is equivalent to `mpn_toom8_sqr_itch` from `gmp-impl.h`, GMP 6.2.1.
-pub_crate_test! {limbs_square_to_out_toom_8_scratch_len(n: usize) -> usize {
-    ((n * 15) >> 3)
-        + max(
-            SQR_TOOM8_THRESHOLD_TIMES_15_OVER_8 + usize::wrapping_from(Limb::WIDTH) * 6,
-            limbs_square_to_out_toom_6_scratch_len(SQR_TOOM8_THRESHOLD),
-        )
-        - SQR_TOOM8_THRESHOLD_TIMES_15_OVER_8
+crate_test_const_fn! {limbs_square_to_out_toom_8_scratch_len(n: usize) -> usize {
+    // As in `limbs_square_to_out_toom_6_scratch_len`, `max` is written out so this can be const.
+    const ITCH: usize = {
+        const FLOOR: usize = SQR_TOOM8_THRESHOLD_TIMES_15_OVER_8 + LIMB_WIDTH_USIZE * 6;
+        const TOOM6: usize = limbs_square_to_out_toom_6_scratch_len(SQR_TOOM8_THRESHOLD);
+        (if FLOOR > TOOM6 { FLOOR } else { TOOM6 }) - SQR_TOOM8_THRESHOLD_TIMES_15_OVER_8
+    };
+    ((n * 15) >> 3) + ITCH
 }}
 
 // TODO tune
@@ -928,7 +934,7 @@ fn limbs_square_to_out_toom_8_recursive(out: &mut [Limb], xs: &[Limb], scratch: 
 // May panic if the input slice conditions are not met.
 //
 // This is equivalent to `mpn_toom8_sqr` from `mpn/generic/toom8_sqr.c`, GMP 6.2.1.
-pub_test! {limbs_square_to_out_toom_8(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
+private_test_fn! {limbs_square_to_out_toom_8(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
     let xs_len = xs.len();
     assert!(xs_len >= 40);
     let n: usize = xs_len.shr_round(3, Ceiling).0;
@@ -1020,7 +1026,7 @@ pub_test! {limbs_square_to_out_toom_8(out: &mut [Limb], xs: &[Limb], scratch: &m
     limbs_mul_toom_interpolate_16_points(out, r1, r3, r5, r7, n, s << 1, false, &mut wse[..p]);
 }}
 
-pub_crate_test! {
+crate_test_const_fn! {
 #[allow(clippy::absurd_extreme_comparisons)]
 limbs_square_to_out_scratch_len(n: usize) -> usize {
     if n < SQR_BASECASE_THRESHOLD || n < SQR_TOOM2_THRESHOLD {
@@ -1048,7 +1054,7 @@ limbs_square_to_out_scratch_len(n: usize) -> usize {
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // This is equivalent to `mpn_sqr` from `mpn/generic/sqr.c`, GMP 6.2.1.
-pub_crate_test! {
+crate_test_fn! {
 #[allow(clippy::absurd_extreme_comparisons)]
 limbs_square_to_out(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
     let n = xs.len();
@@ -1074,7 +1080,7 @@ limbs_square_to_out(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
     }
 }}
 
-pub_crate_test! {limbs_square(xs: &[Limb]) -> Vec<Limb> {
+crate_test_fn! {limbs_square(xs: &[Limb]) -> Vec<Limb> {
     let out_len = xs.len() << 1;
     let mut out = vec![0; out_len + limbs_square_to_out_scratch_len(xs.len())];
     let (out_slice, square_scratch) = out.split_at_mut(out_len);

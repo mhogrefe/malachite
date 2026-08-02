@@ -29,7 +29,7 @@ use malachite_base::slices::{slice_set_zero, slice_test_zero};
 //
 // # Panics
 // Panics if `xs` is empty.
-pub_test! {limbs_next_power_of_2(xs: &[Limb]) -> Vec<Limb> {
+private_test_fn! {limbs_next_power_of_2(xs: &[Limb]) -> Vec<Limb> {
     let (xs_last, xs_init) = xs.split_last().unwrap();
     let mut out;
     if let Some(x) = xs_last.checked_next_power_of_two() {
@@ -67,7 +67,7 @@ pub_test! {limbs_next_power_of_2(xs: &[Limb]) -> Vec<Limb> {
 //
 // # Panics
 // Panics if `xs` is empty.
-pub_test! {limbs_slice_next_power_of_2_in_place(xs: &mut [Limb]) -> bool {
+private_test_fn! {limbs_slice_next_power_of_2_in_place(xs: &mut [Limb]) -> bool {
     let (xs_last, xs_init) = xs.split_last_mut().unwrap();
     if let Some(x) = xs_last.checked_next_power_of_two() {
         if x == *xs_last && !slice_test_zero(xs_init) {
@@ -106,7 +106,7 @@ pub_test! {limbs_slice_next_power_of_2_in_place(xs: &mut [Limb]) -> bool {
 //
 // # Panics
 // Panics if `xs` is empty.
-pub_test! {limbs_vec_next_power_of_2_in_place(xs: &mut Vec<Limb>) {
+private_test_fn! {limbs_vec_next_power_of_2_in_place(xs: &mut Vec<Limb>) {
     if limbs_slice_next_power_of_2_in_place(xs) {
         xs.push(1);
     }

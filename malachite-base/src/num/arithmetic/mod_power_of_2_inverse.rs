@@ -11,7 +11,7 @@ use crate::num::basic::unsigneds::PrimitiveUnsigned;
 
 // Uses Newton's method, as described by Colin Plumb in
 // https://groups.google.com/g/sci.crypt/c/UI-UMbUnYGk/m/hX2-wQVyE3oJ.
-pub_test! {mod_power_of_2_inverse_fast<T: PrimitiveUnsigned>(x: T, pow: u64) -> Option<T> {
+private_test_fn! {mod_power_of_2_inverse_fast<T: PrimitiveUnsigned>(x: T, pow: u64) -> Option<T> {
     assert_ne!(x, T::ZERO);
     assert!(pow <= T::WIDTH);
     assert!(x.significant_bits() <= pow, "x must be reduced mod 2^pow, but {x} >= 2^{pow}");

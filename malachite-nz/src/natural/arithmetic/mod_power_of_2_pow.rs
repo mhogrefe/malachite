@@ -37,7 +37,7 @@ use malachite_base::num::logic::traits::{SignificantBits, TrailingZeros};
 //
 // This is equivalent to `mpn_powlo` from `mpn/generic/powlo.c`, GMP 6.2.1, where `rp == bp`.
 // Investigate changes from 6.1.2?
-pub_crate_test! {limbs_pow_low(xs: &mut [Limb], es: &[Limb], scratch: &mut [Limb]) {
+crate_test_fn! {limbs_pow_low(xs: &mut [Limb], es: &[Limb], scratch: &mut [Limb]) {
     let xs_len = xs.len();
     assert_ne!(xs_len, 0);
     let scratch = &mut scratch[..xs_len];
@@ -114,7 +114,7 @@ pub_crate_test! {limbs_pow_low(xs: &mut [Limb], es: &[Limb], scratch: &mut [Limb
 //
 // # Panics
 // Panics if the exponent has trailing zeros or is 1.
-pub_test! {limbs_mod_power_of_2_pow(xs: &mut Vec<Limb>, es: &[Limb], pow: u64) {
+private_test_fn! {limbs_mod_power_of_2_pow(xs: &mut Vec<Limb>, es: &[Limb], pow: u64) {
     let out_len = bit_to_limb_count_ceiling(pow);
     xs.resize(out_len, 0);
     let mut scratch = vec![0; out_len];

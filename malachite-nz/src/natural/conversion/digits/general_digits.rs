@@ -76,7 +76,7 @@ const GET_STR_PRECOMPUTE_THRESHOLD: usize = crate::platform::GET_STR_PRECOMPUTE_
 
 // # Worst-case complexity
 // Constant time and additional memory.
-pub_const_test! {get_chars_per_limb(base: u64) -> usize {
+private_test_const_fn! {get_chars_per_limb(base: u64) -> usize {
     BASES[base as usize].0
 }}
 
@@ -138,7 +138,7 @@ fn limbs_digit_count_helper(bit_count: u64, base: u64) -> u64 {
 //
 // This is equivalent to `MPN_SIZEINBASE` from `gmp-impl.h`, GMP 6.2.1, where result is returned and
 // base is not a power of 2.
-pub_crate_test! {limbs_digit_count(xs: &[Limb], base: u64) -> u64 {
+crate_test_fn! {limbs_digit_count(xs: &[Limb], base: u64) -> u64 {
     assert!(base > 2);
     assert!(base < u64::wrapping_from(BASES.len()));
     assert!(!base.is_power_of_two());
@@ -189,7 +189,7 @@ const RP_LEN: usize = if TUNE_PROGRAM_BUILD {
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // This is equivalent to `mpn_bc_get_str` from `mpn/generic/get_str.c`, GMP 6.2.1.
-pub_crate_test! {limbs_to_digits_small_base_basecase<T: PrimitiveUnsigned>(
+crate_test_fn! {limbs_to_digits_small_base_basecase<T: PrimitiveUnsigned>(
     out: &mut [T],
     len: usize,
     xs: &[Limb],
@@ -345,7 +345,7 @@ pub(crate) enum PowerTableAlgorithm {
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs_len`.
 //
 // This is equivalent to `powtab_decide` from `mpn/compute_powtab.c`, GMP 6.2.1.
-pub_test! {limbs_choose_power_table_algorithm(
+private_test_fn! {limbs_choose_power_table_algorithm(
     exptab: &mut [usize],
     xs_len: usize,
     base: u64,
@@ -418,7 +418,7 @@ const fn limbs_to_digits_small_base_divide_and_conquer_scratch_len(xs_len: usize
 // where $T$ is time, $M$ is additional memory, and $n$ is `power_len`.
 //
 // This is equivalent to `mpn_compute_powtab_mul` from `mpn/compute_powtab.c`, GMP 6.2.1.
-pub_test! {limbs_compute_power_table_using_mul<'a>(
+private_test_fn! {limbs_compute_power_table_using_mul<'a>(
     power_table_memory: &'a mut [Limb],
     base: u64,
     exponents: &[usize],
@@ -597,7 +597,7 @@ pub_test! {limbs_compute_power_table_using_mul<'a>(
 // where $T$ is time, $M$ is additional memory, and $n$ is `power_len`.
 //
 // This is equivalent to `mpn_compute_powtab_div` from `mpn/compute_powtab.c`, GMP 6.2.1.
-pub_test! {limbs_compute_power_table_using_div<'a>(
+private_test_fn! {limbs_compute_power_table_using_div<'a>(
     power_table_memory: &'a mut [Limb],
     base: u64,
     exponents: &[usize],
@@ -672,7 +672,7 @@ pub_test! {limbs_compute_power_table_using_div<'a>(
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs_len`.
 //
 // This is equivalent to `mpn_compute_powtab` from `mpn/compute_powtab.c`, GMP 6.2.1.
-pub_test! {limbs_compute_power_table(
+private_test_fn! {limbs_compute_power_table(
     power_table_memory: &mut [Limb],
     xs_len: usize,
     base: u64,
@@ -999,7 +999,7 @@ pub const fn limbs_to_digits_small_base_divide_and_conquer_scratch_len_for_tunin
 // $M(n) = O(n \log n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
-pub_crate_test! {limbs_to_digits_small_base_no_alg_specified<T: PrimitiveUnsigned>(
+crate_test_fn! {limbs_to_digits_small_base_no_alg_specified<T: PrimitiveUnsigned>(
     out: &mut [T],
     base: u64,
     xs: &mut [Limb],
@@ -1016,7 +1016,7 @@ pub_crate_test! {limbs_to_digits_small_base_no_alg_specified<T: PrimitiveUnsigne
 //
 // This is equivalent to `mpn_get_str` from `mpn/generic/get_str.c`, GMP 6.2.1, where `un != 0` and
 // base is not a power of 2.
-pub_crate_test! {limbs_to_digits_small_base<T: PrimitiveUnsigned>(
+crate_test_fn! {limbs_to_digits_small_base<T: PrimitiveUnsigned>(
     out: &mut [T],
     base: u64,
     xs: &mut [Limb],
@@ -1067,7 +1067,7 @@ pub_crate_test! {limbs_to_digits_small_base<T: PrimitiveUnsigned>(
 // $M(n) = O(1)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `digits.len()`.
-pub_test! {limbs_to_digits_basecase<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>(
+private_test_fn! {limbs_to_digits_basecase<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>(
     digits: &mut Vec<T>,
     xs: &mut [Limb],
     base: Limb,
@@ -1098,7 +1098,9 @@ pub_test! {limbs_to_digits_basecase<T: ConvertibleFrom<Limb> + PrimitiveUnsigned
 // $M(n) = O(1)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `digits.len()`.
-pub_test! {to_digits_asc_naive_primitive<T: for<'a> ExactFrom<&'a Natural> + PrimitiveUnsigned>(
+private_test_fn! {to_digits_asc_naive_primitive<
+    T: for<'a> ExactFrom<&'a Natural> + PrimitiveUnsigned,
+>(
     digits: &mut Vec<T>,
     x: &Natural,
     base: T,
@@ -1120,7 +1122,7 @@ pub_test! {to_digits_asc_naive_primitive<T: for<'a> ExactFrom<&'a Natural> + Pri
 //
 // where $T$ is time, $M$ is additional memory, $n$ is `x.significant_bits()`, and $m$ is
 // `base.significant_bits()`.
-pub_test! {to_digits_asc_naive(digits: &mut Vec<Natural>, x: &Natural, base: &Natural) {
+private_test_fn! {to_digits_asc_naive(digits: &mut Vec<Natural>, x: &Natural, base: &Natural) {
     assert!(*base > 1);
     let mut remainder = x.clone();
     while remainder != 0 {
@@ -1233,7 +1235,7 @@ fn to_digits_asc_divide_and_conquer(
 // $M(n) = O(n \log n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `x.significant_bits()`.
-pub_test! {to_digits_asc_limb<
+private_test_fn! {to_digits_asc_limb<
     T: ConvertibleFrom<Limb> + for<'a> ExactFrom<&'a Natural> + PrimitiveUnsigned,
 >(
     x: &Natural,
@@ -1293,7 +1295,7 @@ where
 // $M(n) = O(n \log n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `x.significant_bits()`.
-pub_test! {to_digits_desc_limb<
+private_test_fn! {to_digits_desc_limb<
     T: ConvertibleFrom<Limb> + for<'a> ExactFrom<&'a Natural> + PrimitiveUnsigned,
 >(
     x: &Natural,
@@ -1355,7 +1357,7 @@ where
 // $M(n) = O(n \log n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `x.significant_bits()`.
-pub_test! {to_digits_asc_large(x: &Natural, base: &Natural) -> Vec<Natural> {
+private_test_fn! {to_digits_asc_large(x: &Natural, base: &Natural) -> Vec<Natural> {
     if *x == 0 {
         Vec::new()
     } else if x < base {
@@ -1389,7 +1391,7 @@ pub_test! {to_digits_asc_large(x: &Natural, base: &Natural) -> Vec<Natural> {
 // $M(n) = O(n \log n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `x.significant_bits()`.
-pub_test! {to_digits_desc_large(x: &Natural, base: &Natural) -> Vec<Natural> {
+private_test_fn! {to_digits_desc_large(x: &Natural, base: &Natural) -> Vec<Natural> {
     if *x == 0 {
         Vec::new()
     } else if x < base {
@@ -1422,7 +1424,7 @@ pub_test! {to_digits_desc_large(x: &Natural, base: &Natural) -> Vec<Natural> {
 // $M(n) = O(n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
-pub_test! {from_digits_desc_naive_primitive<T: PrimitiveUnsigned>(
+private_test_fn! {from_digits_desc_naive_primitive<T: PrimitiveUnsigned>(
     xs: &[T],
     base: T
 ) -> Option<Natural>
@@ -1449,7 +1451,7 @@ where
 //
 // where $T$ is time, $M$ is additional memory, $n$ is `base.significant_bits()`, and $m$ is
 // `xs.len()`.
-pub_test! {from_digits_desc_naive(xs: &[Natural], base: &Natural) -> Option<Natural> {
+private_test_fn! {from_digits_desc_naive(xs: &[Natural], base: &Natural) -> Option<Natural> {
     assert!(*base > 1);
     let mut n = Natural::ZERO;
     for x in xs {
@@ -1469,7 +1471,7 @@ pub_test! {from_digits_desc_naive(xs: &[Natural], base: &Natural) -> Option<Natu
 //
 // This is equivalent to `LIMBS_PER_DIGIT_IN_BASE` from `gmp-impl.h`, where `res` is returned and
 // `base` is not a power of 2.
-pub_test! {limbs_per_digit_in_base(digit_count: usize, base: u64) -> u64 {
+private_test_fn! {limbs_per_digit_in_base(digit_count: usize, base: u64) -> u64 {
     (u64::exact_from(Limb::x_mul_y_to_zz(get_log_2_of_base(base), Limb::exact_from(digit_count)).0)
         >> const { Limb::LOG_WIDTH - 3 })
         + 2
@@ -1486,7 +1488,7 @@ pub_test! {limbs_per_digit_in_base(digit_count: usize, base: u64) -> u64 {
 //
 // This is equivalent to `mpn_bc_set_str` from `mpn/generic/set_str.c`, GMP 6.2.1, where `base` is
 // not a power of 2.
-pub_test! {limbs_from_digits_small_base_basecase<T: PrimitiveUnsigned>(
+private_test_fn! {limbs_from_digits_small_base_basecase<T: PrimitiveUnsigned>(
     out: &mut [Limb],
     xs: &[T],
     base: u64,
@@ -1611,7 +1613,7 @@ const SET_STR_DC_THRESHOLD: usize = 7100;
 //
 // This is equivalent to `mpn_dc_set_str` from `mpn/generic/set_str.c`, GMP 6.2.1, where `base` is
 // not a power of 2.
-pub_test! {limbs_from_digits_small_base_divide_and_conquer<T: PrimitiveUnsigned>(
+private_test_fn! {limbs_from_digits_small_base_divide_and_conquer<T: PrimitiveUnsigned>(
     out: &mut [Limb],
     xs: &[T],
     base: u64,
@@ -1706,7 +1708,7 @@ const SET_STR_PRECOMPUTE_THRESHOLD: usize = 7100;
 //
 // This is equivalent to `mpn_set_str` from `mpn/generic/set_str.c`, GMP 6.2.1, where `base` is not
 // a power of 2.
-pub_crate_test! {limbs_from_digits_small_base<T: PrimitiveUnsigned>(
+crate_test_fn! {limbs_from_digits_small_base<T: PrimitiveUnsigned>(
     out: &mut [Limb],
     xs: &[T],
     base: u64,
@@ -1742,7 +1744,10 @@ where
 // $M(n) = O(1)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
-pub_test! {from_digits_desc_basecase<T: PrimitiveUnsigned>(xs: &[T], base: Limb) -> Option<Natural>
+private_test_fn! {from_digits_desc_basecase<T: PrimitiveUnsigned>(
+    xs: &[T],
+    base: Limb,
+) -> Option<Natural>
 where
     Limb: WrappingFrom<T>,
 {
@@ -1842,7 +1847,7 @@ where
 //
 // where $T$ is time, $M$ is additional memory, $n$ is `xs.len()`, and $m$ is
 // `base.significant_bits()`.
-pub_test! {from_digits_desc_divide_and_conquer(
+private_test_fn! {from_digits_desc_divide_and_conquer(
     xs: &[Natural],
     base: &Natural,
     powers: &[Natural],
@@ -1873,7 +1878,7 @@ pub_test! {from_digits_desc_divide_and_conquer(
 // $M(n) = O(n \log n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
-pub_test! {from_digits_asc_limb<I: Iterator<Item = T>, T: TryFrom<Limb> + PrimitiveUnsigned>(
+private_test_fn! {from_digits_asc_limb<I: Iterator<Item = T>, T: TryFrom<Limb> + PrimitiveUnsigned>(
     xs: I,
     base: Limb,
 ) -> Option<Natural>
@@ -1973,7 +1978,7 @@ where
 // $M(n) = O(n \log n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.count()`.
-pub_test! {from_digits_desc_limb<I: Iterator<Item = T>, T: PrimitiveUnsigned>(
+private_test_fn! {from_digits_desc_limb<I: Iterator<Item = T>, T: PrimitiveUnsigned>(
     xs: I,
     base: Limb,
 ) -> Option<Natural>
@@ -2074,7 +2079,7 @@ where
 // `base.significant_bits()`.
 //
 // optimized for large base
-pub_test! {from_digits_asc_large<I: Iterator<Item = Natural>>(
+private_test_fn! {from_digits_asc_large<I: Iterator<Item = Natural>>(
     xs: I,
     base: &Natural,
 ) -> Option<Natural> {
@@ -2097,7 +2102,7 @@ pub_test! {from_digits_asc_large<I: Iterator<Item = Natural>>(
 // `base.significant_bits()`.
 //
 // optimized for large base
-pub_test! {from_digits_desc_large<I: Iterator<Item = Natural>>(
+private_test_fn! {from_digits_desc_large<I: Iterator<Item = Natural>>(
     xs: I,
     base: &Natural,
 ) -> Option<Natural> {

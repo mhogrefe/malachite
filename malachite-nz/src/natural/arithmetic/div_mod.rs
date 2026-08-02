@@ -78,7 +78,7 @@ use malachite_base::slices::{slice_move_left, slice_set_zero};
 // Panics if `d` is zero.
 //
 // This is equivalent to `mpn_invert_limb`, or `invert_limb`, from `gmp-impl.h`, GMP 6.2.1.
-pub_crate_test! {limbs_invert_limb<
+crate_test_fn! {limbs_invert_limb<
     DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + JoinHalves<Half = T> + SplitInHalf,
     T: PrimitiveUnsigned,
 >(
@@ -101,7 +101,7 @@ const fn div_mod_by_preinversion_second_fixup(q_high: Limb, r: Limb, d: Limb) ->
 // Constant time and additional memory.
 //
 // This is equivalent to `udiv_qrnnd_preinv` from `gmp-impl.h`, GMP 6.2.1.
-pub_crate_test! {div_mod_by_preinversion(
+crate_test_fn! {div_mod_by_preinversion(
     n_high: Limb,
     n_low: Limb,
     d: Limb,
@@ -140,7 +140,7 @@ pub_crate_test! {div_mod_by_preinversion(
 // This is equivalent to `mpn_divrem_1` from `mpn/generic/divrem_1.c`, GMP 6.2.1, where `qxn == 0`,
 // `un > 1`, and both results are returned. Experiments show that `DIVREM_1_NORM_THRESHOLD` and
 // `DIVREM_1_UNNORM_THRESHOLD` are unnecessary (they would always be 0).
-pub_test! {limbs_div_limb_mod(ns: &[Limb], d: Limb) -> (Vec<Limb>, Limb) {
+private_test_fn! {limbs_div_limb_mod(ns: &[Limb], d: Limb) -> (Vec<Limb>, Limb) {
     let mut qs = vec![0; ns.len()];
     let r = limbs_div_limb_to_out_mod(&mut qs, ns, d);
     (qs, r)
@@ -164,7 +164,7 @@ pub_test! {limbs_div_limb_mod(ns: &[Limb], d: Limb) -> (Vec<Limb>, Limb) {
 // This is equivalent to `mpn_divrem_1` from `mpn/generic/divrem_1.c`, GMP 6.2.1, where `qxn == 0`
 // and `un > 1`. Experiments show that `DIVREM_1_NORM_THRESHOLD` and `DIVREM_1_UNNORM_THRESHOLD` are
 // unnecessary (they would always be 0).
-pub_crate_test! {limbs_div_limb_to_out_mod(out: &mut [Limb], ns: &[Limb], d: Limb) -> Limb {
+crate_test_fn! {limbs_div_limb_to_out_mod(out: &mut [Limb], ns: &[Limb], d: Limb) -> Limb {
     assert_ne!(d, 0);
     let len = ns.len();
     assert!(len > 1);
@@ -232,7 +232,7 @@ pub_crate_test! {limbs_div_limb_to_out_mod(out: &mut [Limb], ns: &[Limb], d: Lim
 // This is equivalent to `mpn_divrem_1` from `mpn/generic/divrem_1.c`, GMP 6.2.1, where `qp == up`,
 // `qxn == 0`, and `un > 1`. Experiments show that `DIVREM_1_NORM_THRESHOLD` and
 // `DIVREM_1_UNNORM_THRESHOLD` are unnecessary (they would always be 0).
-pub_crate_test! {limbs_div_limb_in_place_mod(ns: &mut [Limb], d: Limb) -> Limb {
+crate_test_fn! {limbs_div_limb_in_place_mod(ns: &mut [Limb], d: Limb) -> Limb {
     assert_ne!(d, 0);
     let len = ns.len();
     assert!(len > 1);
@@ -300,7 +300,7 @@ pub_crate_test! {limbs_div_limb_in_place_mod(ns: &mut [Limb], d: Limb) -> Limb {
 //
 // This is equivalent to `mpn_preinv_divrem_1` from `mpn/generic/pre_divrem_1.c`, GMP 6.2.1, where
 // `qp != ap`.
-pub_test! {limbs_div_mod_extra(
+private_test_fn! {limbs_div_mod_extra(
     out: &mut [Limb],
     fraction_len: usize,
     mut ns: &[Limb],
@@ -380,7 +380,7 @@ pub_test! {limbs_div_mod_extra(
 //
 // This is equivalent to `mpn_preinv_divrem_1` from `mpn/generic/pre_divrem_1.c`, GMP 6.2.1, where
 // `qp == ap`.
-pub_crate_test! {limbs_div_mod_extra_in_place(
+crate_test_fn! {limbs_div_mod_extra_in_place(
     ns: &mut [Limb],
     fraction_len: usize,
     d: Limb,
@@ -446,7 +446,7 @@ pub_crate_test! {limbs_div_mod_extra_in_place(
 //
 // This is equivalent to `invert_pi1` from `gmp-impl.h`, GMP 6.2.1, where the result is returned
 // instead of being written to `dinv`.
-pub_crate_test! {limbs_two_limb_inverse_helper(hi: Limb, lo: Limb) -> Limb {
+crate_test_fn! {limbs_two_limb_inverse_helper(hi: Limb, lo: Limb) -> Limb {
     let mut d_inv = limbs_invert_limb::<DoubleLimb, Limb>(hi);
     let mut hi_product = hi.wrapping_mul(d_inv);
     hi_product.wrapping_add_assign(lo);
@@ -477,7 +477,7 @@ pub_crate_test! {limbs_two_limb_inverse_helper(hi: Limb, lo: Limb) -> Limb {
 // Constant time and additional memory.
 //
 // This is equivalent to `udiv_qr_3by2` from `gmp-impl.h`, GMP 6.2.1.
-pub_crate_test! {limbs_div_mod_three_limb_by_two_limb(
+crate_test_fn! {limbs_div_mod_three_limb_by_two_limb(
     n_2: Limb,
     n_1: Limb,
     n_0: Limb,
@@ -525,7 +525,7 @@ pub_crate_test! {limbs_div_mod_three_limb_by_two_limb(
 // `ns.len() - 2`, or `ds[1]` does not have its highest bit set.
 //
 // This is equivalent to `mpn_divrem_2` from `mpn/generic/divrem_2.c`, GMP 6.2.1.
-pub_crate_test! {limbs_div_mod_by_two_limb_normalized(
+crate_test_fn! {limbs_div_mod_by_two_limb_normalized(
     qs: &mut [Limb],
     ns: &mut [Limb],
     ds: &[Limb]
@@ -575,7 +575,7 @@ pub_crate_test! {limbs_div_mod_by_two_limb_normalized(
 // `ns.len()` - `ds.len()`, or the last limb of `ds` does not have its highest bit set.
 //
 // This is equivalent to `mpn_sbpi1_div_qr` from `mpn/generic/sbpi1_div_qr.c`, GMP 6.2.1.
-pub_crate_test! {limbs_div_mod_schoolbook(
+crate_test_fn! {limbs_div_mod_schoolbook(
     qs: &mut [Limb],
     ns: &mut [Limb],
     ds: &[Limb],
@@ -709,7 +709,7 @@ pub(crate) fn limbs_div_mod_divide_and_conquer_helper(
 // $M(n) = O(n \log n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `ds.len()`.
-pub_test! {limbs_div_dc_helper(
+private_test_fn! {limbs_div_dc_helper(
     qs: &mut [Limb],
     ns: &mut [Limb],
     ds: &[Limb],
@@ -737,7 +737,7 @@ pub_test! {limbs_div_dc_helper(
 // less than `ns.len()` - `ds.len()`, or the last limb of `ds` does not have its highest bit set.
 //
 // This is equivalent to `mpn_dcpi1_div_qr` from `mpn/generic/dcpi1_div_qr.c`, GMP 6.2.1.
-pub_test! {limbs_div_mod_divide_and_conquer(
+private_test_fn! {limbs_div_mod_divide_and_conquer(
     qs: &mut [Limb],
     ns: &mut [Limb],
     ds: &[Limb],
@@ -889,7 +889,12 @@ pub_test! {limbs_div_mod_divide_and_conquer(
     highest_q
 }}
 
-pub_test! {limbs_div_approx_helper(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], d_inv: Limb) {
+private_test_fn! {limbs_div_approx_helper(
+    qs: &mut [Limb],
+    ns: &mut [Limb],
+    ds: &[Limb],
+    d_inv: Limb,
+) {
     if ds.len() < DC_DIVAPPR_Q_THRESHOLD {
         limbs_div_schoolbook_approx(qs, ns, ds, d_inv);
     } else {
@@ -914,7 +919,7 @@ pub_test! {limbs_div_approx_helper(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb]
 //
 // This is equivalent to `mpn_bc_invertappr` from `mpn/generic/invertappr.c`, GMP 6.2.1, where the
 // return value is `true` iff the return value of `mpn_bc_invertappr` would be 0.
-pub_test! {limbs_invert_basecase_approx(
+private_test_fn! {limbs_invert_basecase_approx(
     is: &mut [Limb],
     ds: &[Limb],
     scratch: &mut [Limb]
@@ -981,7 +986,11 @@ pub_test! {limbs_invert_basecase_approx(
 //
 // This is equivalent to `mpn_ni_invertappr` from `mpn/generic/invertappr.c`, GMP 6.2.1, where the
 // return value is `true` iff the return value of `mpn_ni_invertappr` would be 0.
-pub_test! {limbs_invert_newton_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) -> bool {
+private_test_fn! {limbs_invert_newton_approx(
+    is: &mut [Limb],
+    ds: &[Limb],
+    scratch: &mut [Limb],
+) -> bool {
     let d_len = ds.len();
     assert!(d_len > 4);
     assert!(ds[d_len - 1].get_highest_bit());
@@ -1154,7 +1163,7 @@ pub_test! {limbs_invert_newton_approx(is: &mut [Limb], ds: &[Limb], scratch: &mu
 //
 // This is equivalent to `mpn_invertappr` from `mpn/generic/invertappr.c`, GMP 6.2.1, where the
 // return value is `true` iff the return value of `mpn_invertappr` would be 0.
-pub_crate_test! {limbs_invert_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) -> bool {
+crate_test_fn! {limbs_invert_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) -> bool {
     if ds.len() < INV_NEWTON_THRESHOLD {
         limbs_invert_basecase_approx(is, ds, scratch)
     } else {
@@ -1180,7 +1189,7 @@ pub(crate) const MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD: usize = INV_MULMOD_BNM1_
 // - scratch_len ==  limbs_mul_mod_base_pow_n_minus_1_next_size(ds.len() + 1)
 // - scratch.len() == limbs_div_mod_barrett_scratch_len(n_len, d_len) - i_len
 // - rs_hi.len() == i_len
-pub_crate_test! {limbs_div_barrett_large_product(
+crate_test_fn! {limbs_div_barrett_large_product(
     scratch: &mut [Limb],
     ds: &[Limb],
     qs: &[Limb],
@@ -1320,7 +1329,7 @@ pub(crate) fn limbs_div_mod_barrett_preinverted(
 //
 // This is equivalent to `mpn_mu_div_qr_choose_in` from `mpn/generic/mu_div_qr.c`, GMP 6.2.1, where
 // `k == 0`.
-pub_const_crate_test! {limbs_div_mod_barrett_is_len(q_len: usize, d_len: usize) -> usize {
+crate_test_const_fn! {limbs_div_mod_barrett_is_len(q_len: usize, d_len: usize) -> usize {
     let q_len_minus_1 = q_len - 1;
     if q_len > d_len {
         // Compute an inverse size that is a nice partition of the quotient.
@@ -1341,7 +1350,7 @@ pub_const_crate_test! {limbs_div_mod_barrett_is_len(q_len: usize, d_len: usize) 
 // where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
 // This is equivalent to `mpn_mu_div_qr2` from `mpn/generic/mu_div_qr.c`, GMP 6.2.1.
-pub_crate_test! {limbs_div_mod_barrett_helper(
+crate_test_fn! {limbs_div_mod_barrett_helper(
     qs: &mut [Limb],
     rs: &mut [Limb],
     ns: &[Limb],
@@ -1418,7 +1427,7 @@ const fn limbs_invert_approx_scratch_len_helper(is_len: usize) -> usize {
 //
 // This is equivalent to `mpn_mu_div_qr_itch` from `mpn/generic/mu_div_qr.c`, GMP 6.2.1, where
 // `mua_k == 0`.
-pub_crate_test! {limbs_div_mod_barrett_scratch_len(n_len: usize, d_len: usize) -> usize {
+crate_test_fn! {limbs_div_mod_barrett_scratch_len(n_len: usize, d_len: usize) -> usize {
     let is_len = limbs_div_mod_barrett_is_len(n_len - d_len, d_len);
     let preinverse_len = limbs_div_mod_barrett_preinverse_scratch_len(d_len, is_len);
     // 3 * is_len + 4
@@ -1433,7 +1442,7 @@ pub_crate_test! {limbs_div_mod_barrett_scratch_len(n_len: usize, d_len: usize) -
 // $M(n) = O(n \log n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `ds.len()`.
-pub_test! {limbs_div_mod_barrett_large_helper(
+private_test_fn! {limbs_div_mod_barrett_large_helper(
     qs: &mut [Limb],
     rs: &mut [Limb],
     ns: &[Limb],
@@ -1495,7 +1504,7 @@ pub_test! {limbs_div_mod_barrett_large_helper(
 // its highest bit set.
 //
 // This is equivalent to `mpn_mu_div_qr` from `mpn/generic/mu_div_qr.c`, GMP 6.2.1.
-pub_test! {limbs_div_mod_barrett(
+private_test_fn! {limbs_div_mod_barrett(
     qs: &mut [Limb],
     rs: &mut [Limb],
     ns: &[Limb],
@@ -1576,6 +1585,9 @@ fn limbs_div_mod_by_two_limb(qs: &mut [Limb], rs: &mut [Limb], ns: &[Limb], ds: 
 
 // TODO tune
 pub(crate) const MUPI_DIV_QR_THRESHOLD: usize = 74;
+// The same threshold as an `f64`, for the slope comparisons; named once because two modules need
+// it.
+pub(crate) const MUPI_DIV_QR_THRESHOLD_F64: f64 = MUPI_DIV_QR_THRESHOLD as f64;
 
 // Derived thresholds for the divide-and-conquer condition, shared by division and remainder.
 pub(crate) const TWICE_MU_DIV_QR_THRESHOLD: usize = MU_DIV_QR_THRESHOLD << 1;
@@ -1589,11 +1601,7 @@ fn limbs_div_mod_dc_condition(n_len: usize, d_len: usize) -> bool {
     let d_64 = d_len as f64;
     d_len < MUPI_DIV_QR_THRESHOLD
         || n_len < TWICE_MU_DIV_QR_THRESHOLD
-        || fma!(
-            MU_DIV_QR_DC_SLOPE,
-            d_64,
-            MUPI_DIV_QR_THRESHOLD as f64 * n_64
-        ) > d_64 * n_64
+        || fma!(MU_DIV_QR_DC_SLOPE, d_64, MUPI_DIV_QR_THRESHOLD_F64 * n_64) > d_64 * n_64
 }
 
 // This function is optimized for the case when the numerator has at least twice the length of the
@@ -1862,7 +1870,7 @@ pub(crate) fn limbs_div_mod_balanced(
 //
 // This is equivalent to `mpn_tdiv_qr` from `mpn/generic/tdiv_qr.c`, GMP 6.2.1, where `dn > 1` and
 // `qp` and `rp` are returned.
-pub_test! {
+private_test_fn! {
 // The two buffers stay separate allocations: both are returned as owned `Vec`s, and merging them
 // would force one to be copied out of the parent.
 #[cfg_attr(dylint_lib = "malachite_lints", allow(adjacent_vec_allocations))]
@@ -1894,7 +1902,7 @@ limbs_div_mod(ns: &[Limb], ds: &[Limb]) -> (Vec<Limb>, Vec<Limb>) {
 // the most-significant limb of `ds` is zero.
 //
 // This is equivalent to `mpn_tdiv_qr` from `mpn/generic/tdiv_qr.c`, GMP 6.2.1, where `dn > 1`.
-pub_crate_test! {limbs_div_mod_to_out(qs: &mut [Limb], rs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
+crate_test_fn! {limbs_div_mod_to_out(qs: &mut [Limb], rs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
     assert!(d_len > 1);
@@ -1923,7 +1931,7 @@ pub_crate_test! {limbs_div_mod_to_out(qs: &mut [Limb], rs: &mut [Limb], ns: &[Li
 // $M(n) = O(n \log n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
-pub_crate_test! {limbs_div_mod_qs_to_out_rs_to_ns(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb]) {
+crate_test_fn! {limbs_div_mod_qs_to_out_rs_to_ns(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
     assert!(d_len > 1);
@@ -1974,7 +1982,7 @@ impl Natural {
         }
     }
 
-    pub_test! {div_assign_mod_limb(&mut self, other: Limb) -> Limb {
+    private_test_fn! {div_assign_mod_limb(&mut self, other: Limb) -> Limb {
         match (&mut *self, other) {
             (_, 0) => panic!("division by zero"),
             (_, 1) => 0,

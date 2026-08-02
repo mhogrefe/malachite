@@ -37,7 +37,7 @@ use malachite_base::slices::{slice_leading_zeros, slice_set_zero};
 //
 // # Panics
 // Panics if `xs` is empty.
-pub_test! {limbs_pos_and_limb_neg(xs: &[Limb], y: Limb) -> Vec<Limb> {
+private_test_fn! {limbs_pos_and_limb_neg(xs: &[Limb], y: Limb) -> Vec<Limb> {
     let mut out = xs.to_vec();
     out[0] &= y;
     out
@@ -57,7 +57,7 @@ pub_test! {limbs_pos_and_limb_neg(xs: &[Limb], y: Limb) -> Vec<Limb> {
 //
 // # Panics
 // Panics if `xs` is empty or if `out` is shorter than `xs`.
-pub_test! {limbs_pos_and_limb_neg_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) {
+private_test_fn! {limbs_pos_and_limb_neg_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) {
     let len = xs.len();
     assert!(out.len() >= len);
     let (xs_head, xs_tail) = xs.split_first().unwrap();
@@ -75,7 +75,7 @@ pub_test! {limbs_pos_and_limb_neg_to_out(out: &mut [Limb], xs: &[Limb], y: Limb)
 //
 // # Panics
 // Panics if `xs` is empty.
-pub_test! {limbs_pos_and_limb_neg_in_place(xs: &mut [Limb], ys: Limb) {
+private_test_fn! {limbs_pos_and_limb_neg_in_place(xs: &mut [Limb], ys: Limb) {
     xs[0] &= ys;
 }}
 
@@ -93,7 +93,7 @@ pub_test! {limbs_pos_and_limb_neg_in_place(xs: &mut [Limb], ys: Limb) {
 //
 // # Panics
 // Panics if `xs` is empty.
-pub_test! {limbs_neg_and_limb_neg(xs: &[Limb], y: Limb) -> Vec<Limb> {
+private_test_fn! {limbs_neg_and_limb_neg(xs: &[Limb], y: Limb) -> Vec<Limb> {
     let mut out = xs.to_vec();
     limbs_vec_neg_and_limb_neg_in_place(&mut out, y);
     out
@@ -114,7 +114,7 @@ pub_test! {limbs_neg_and_limb_neg(xs: &[Limb], y: Limb) -> Vec<Limb> {
 //
 // # Panics
 // Panics if `xs` is empty or if `out` is shorter than `xs`.
-pub_test! {limbs_neg_and_limb_neg_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) -> bool {
+private_test_fn! {limbs_neg_and_limb_neg_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) -> bool {
     let out = &mut out[..xs.len()];
     if xs[0] == 0 {
         out.copy_from_slice(xs);
@@ -148,7 +148,7 @@ pub_test! {limbs_neg_and_limb_neg_to_out(out: &mut [Limb], xs: &[Limb], y: Limb)
 //
 // # Panics
 // Panics if `xs` is empty.
-pub_test! {limbs_slice_neg_and_limb_neg_in_place(xs: &mut [Limb], y: Limb) -> bool {
+private_test_fn! {limbs_slice_neg_and_limb_neg_in_place(xs: &mut [Limb], y: Limb) -> bool {
     let (xs_head, xs_tail) = xs.split_first_mut().unwrap();
     if *xs_head == 0 {
         false
@@ -177,7 +177,7 @@ pub_test! {limbs_slice_neg_and_limb_neg_in_place(xs: &mut [Limb], y: Limb) -> bo
 //
 // # Panics
 // Panics if `xs` is empty.
-pub_test! {limbs_vec_neg_and_limb_neg_in_place(xs: &mut Vec<Limb>, y: Limb) {
+private_test_fn! {limbs_vec_neg_and_limb_neg_in_place(xs: &mut Vec<Limb>, y: Limb) {
     if limbs_slice_neg_and_limb_neg_in_place(xs, y) {
         xs.push(1);
     }
@@ -199,7 +199,7 @@ pub_test! {limbs_vec_neg_and_limb_neg_in_place(xs: &mut Vec<Limb>, y: Limb) {
 //
 // This is equivalent to `mpz_and` from `mpz/and.c`, GMP 6.2.1, where `res` is returned, the first
 // input is positive, and the second is negative.
-pub_test! {limbs_and_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
+private_test_fn! {limbs_and_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let x_i = slice_leading_zeros(xs);
@@ -251,7 +251,7 @@ pub_test! {limbs_and_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 //
 // This is equivalent to `mpz_and` from `mpz/and.c`, GMP 6.2.1, where the first input is positive
 // and the second is negative.
-pub_test! {limbs_and_pos_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
+private_test_fn! {limbs_and_pos_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(out.len() >= xs_len);
@@ -301,7 +301,7 @@ pub_test! {limbs_and_pos_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
 //
 // This is equivalent to `mpz_and` from `mpz/and.c`, GMP 6.2.1, where `res == op1`, the first input
 // is positive, and the second is negative.
-pub_test! {limbs_and_pos_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
+private_test_fn! {limbs_and_pos_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let x_i = slice_leading_zeros(xs);
@@ -345,7 +345,7 @@ pub_test! {limbs_and_pos_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
 // This is equivalent to `mpz_and` from `mpz/and.c`, GMP 6.2.1, where `res == op2`, the first input
 // is positive, the second is negative, and the length of `op2` is not changed; instead, a carry is
 // returned.
-pub_test! {limbs_slice_and_pos_neg_in_place_right(xs: &[Limb], ys: &mut [Limb]) {
+private_test_fn! {limbs_slice_and_pos_neg_in_place_right(xs: &[Limb], ys: &mut [Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let x_i = slice_leading_zeros(xs);
@@ -388,7 +388,7 @@ pub_test! {limbs_slice_and_pos_neg_in_place_right(xs: &[Limb], ys: &mut [Limb]) 
 //
 // This is equivalent to `mpz_and` from `mpz/and.c`, GMP 6.2.1, where `res == op2`, the first input
 // is positive, and the second is negative.
-pub_test! {limbs_vec_and_pos_neg_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>) {
+private_test_fn! {limbs_vec_and_pos_neg_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>) {
     limbs_slice_and_pos_neg_in_place_right(xs, ys);
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -432,7 +432,7 @@ const fn limbs_and_neg_neg_helper(input: Limb, boundary_limb_seen: &mut bool) ->
 //
 // This is equivalent to `mpz_and` from `mpz/and.c`, GMP 6.2.1, where `res` is returned and both
 // inputs are negative.
-pub_test! {limbs_and_neg_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
+private_test_fn! {limbs_and_neg_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let x_i = slice_leading_zeros(xs);
@@ -504,7 +504,7 @@ pub_test! {limbs_and_neg_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 // `xs` and `ys`.
 //
 // This is equivalent to `mpz_and` from `mpz/and.c`, GMP 6.2.1, where both inputs are negative.
-pub_test! {limbs_and_neg_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
+private_test_fn! {limbs_and_neg_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let x_i = slice_leading_zeros(xs);
@@ -584,7 +584,7 @@ pub_test! {limbs_and_neg_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
 //
 // This is equivalent to `mpz_and` from `mpz/and.c`, GMP 6.2.1, where `res == op1`, both inputs are
 // negative, and the length of `op1` is not changed; instead, a carry is returned.
-pub_test! {limbs_slice_and_neg_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
+private_test_fn! {limbs_slice_and_neg_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
@@ -645,7 +645,7 @@ pub_test! {limbs_slice_and_neg_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) -
 //
 // This is equivalent to `mpz_and` from `mpz/and.c`, GMP 6.2.1, where `res == op1` and both inputs
 // are negative.
-pub_test! {limbs_vec_and_neg_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
+private_test_fn! {limbs_vec_and_neg_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let y_i = slice_leading_zeros(ys);
@@ -694,7 +694,7 @@ pub_test! {limbs_vec_and_neg_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) 
 // This is equivalent to `mpz_and` from `mpz/and.c`, GMP 6.2.1, where both inputs are negative, the
 // result is written to the longer input slice, and the length of `op1` is not changed; instead, a
 // carry is returned.
-pub_test! {limbs_slice_and_neg_neg_in_place_either(
+private_test_fn! {limbs_slice_and_neg_neg_in_place_either(
     xs: &mut [Limb],
     ys: &mut [Limb]
 ) -> (bool, bool) {
@@ -723,7 +723,10 @@ pub_test! {limbs_slice_and_neg_neg_in_place_either(
 //
 // This is equivalent to `mpz_and` from `mpz/and.c`, GMP 6.2.1, where both inputs are negative and
 // the result is written to the longer input slice.
-pub_test! {limbs_vec_and_neg_neg_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>) -> bool {
+private_test_fn! {limbs_vec_and_neg_neg_in_place_either(
+    xs: &mut Vec<Limb>,
+    ys: &mut Vec<Limb>,
+) -> bool {
     if xs.len() >= ys.len() {
         limbs_vec_and_neg_neg_in_place_left(xs, ys);
         false

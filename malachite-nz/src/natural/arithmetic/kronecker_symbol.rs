@@ -502,7 +502,7 @@ fn limbs_jacobi_finish(bits: u8) -> i8 {
 }
 
 // This is equivalent to `mpn_jacobi_init` from `gmp-impl.h`, GMP 6.2.1.
-pub_crate_test! {limbs_jacobi_symbol_init(a: Limb, b: Limb, s: u8) -> u8 {
+crate_test_fn! {limbs_jacobi_symbol_init(a: Limb, b: Limb, s: u8) -> u8 {
     assert!(b.odd());
     assert!(s <= 1);
     u8::wrapping_from((a.mod_power_of_2(2) << 2) + (b & 2)) + s
@@ -553,7 +553,7 @@ const JACOBI_DC_THRESHOLD: usize = GCD_DC_THRESHOLD;
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // This is equivalent to `mpn_jacobi_n` from `mpn/jacobi.c`, GMP 6.2.1.
-pub_crate_test! {
+crate_test_fn! {
     limbs_jacobi_symbol_same_length(xs: &mut [Limb], ys: &mut [Limb], mut bits: u8) -> i8 {
     let mut n = xs.len();
     assert_eq!(ys.len(), n);

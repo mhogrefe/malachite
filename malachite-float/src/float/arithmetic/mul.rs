@@ -115,7 +115,7 @@ fn mul_rational_prec_round_assign_naive_ref(
     }
 }
 
-pub_test! {mul_rational_prec_round_naive(
+private_test_fn! {mul_rational_prec_round_naive(
     mut x: Float,
     y: Rational,
     prec: u64,
@@ -125,7 +125,7 @@ pub_test! {mul_rational_prec_round_naive(
     (x, o)
 }}
 
-pub_test! {mul_rational_prec_round_naive_val_ref(
+private_test_fn! {mul_rational_prec_round_naive_val_ref(
     mut x: Float,
     y: &Rational,
     prec: u64,
@@ -135,7 +135,7 @@ pub_test! {mul_rational_prec_round_naive_val_ref(
     (x, o)
 }}
 
-pub_test! {mul_rational_prec_round_naive_ref_val(
+private_test_fn! {mul_rational_prec_round_naive_ref_val(
     x: &Float,
     y: Rational,
     prec: u64,
@@ -171,7 +171,7 @@ pub_test! {mul_rational_prec_round_naive_ref_val(
     }
 }}
 
-pub_test! {mul_rational_prec_round_naive_ref_ref(
+private_test_fn! {mul_rational_prec_round_naive_ref_ref(
     x: &Float,
     y: &Rational,
     prec: u64,
@@ -355,7 +355,7 @@ fn mul_rational_prec_round_assign_direct_ref(
     }
 }
 
-pub_test! {mul_rational_prec_round_direct(
+private_test_fn! {mul_rational_prec_round_direct(
     mut x: Float,
     y: Rational,
     prec: u64,
@@ -365,7 +365,7 @@ pub_test! {mul_rational_prec_round_direct(
     (x, o)
 }}
 
-pub_test! {mul_rational_prec_round_direct_val_ref(
+private_test_fn! {mul_rational_prec_round_direct_val_ref(
     mut x: Float,
     y: &Rational,
     prec: u64,
@@ -375,7 +375,7 @@ pub_test! {mul_rational_prec_round_direct_val_ref(
     (x, o)
 }}
 
-pub_test! {mul_rational_prec_round_direct_ref_val(
+private_test_fn! {mul_rational_prec_round_direct_ref_val(
     x: &Float,
     y: Rational,
     prec: u64,
@@ -453,7 +453,7 @@ pub_test! {mul_rational_prec_round_direct_ref_val(
     }
 }}
 
-pub_test! {mul_rational_prec_round_direct_ref_ref(
+private_test_fn! {mul_rational_prec_round_direct_ref_ref(
     x: &Float,
     y: &Rational,
     prec: u64,

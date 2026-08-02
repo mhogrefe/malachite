@@ -66,7 +66,7 @@ fn step_toward_zero(y: Float, prec: u64) -> Float {
 //
 // This is equivalent to `mpfr_round_near_x` from `round_near_x.c`, MPFR 4.3.0, where the result is
 // returned along with the ternary value, and a `None` return corresponds to a 0 return in C.
-pub_crate_test! {float_round_near_x(
+crate_test_fn! {float_round_near_x(
     v: &Float,
     err: u64,
     dir: bool,

@@ -151,7 +151,7 @@ pub(crate) fn floor_inverse_checked_binary<T: PrimitiveUnsigned, F: Fn(T) -> Opt
     }
 }
 
-pub_test! {floor_sqrt_binary<T: PrimitiveUnsigned>(x: T) -> T {
+private_test_fn! {floor_sqrt_binary<T: PrimitiveUnsigned>(x: T) -> T {
     if x < T::TWO {
         x
     } else {
@@ -160,7 +160,7 @@ pub_test! {floor_sqrt_binary<T: PrimitiveUnsigned>(x: T) -> T {
     }
 }}
 
-pub_test! {ceiling_sqrt_binary<T: PrimitiveUnsigned>(x: T) -> T {
+private_test_fn! {ceiling_sqrt_binary<T: PrimitiveUnsigned>(x: T) -> T {
     let floor_sqrt = floor_sqrt_binary(x);
     if floor_sqrt.square() == x {
         floor_sqrt
@@ -169,7 +169,7 @@ pub_test! {ceiling_sqrt_binary<T: PrimitiveUnsigned>(x: T) -> T {
     }
 }}
 
-pub_test! {checked_sqrt_binary<T: PrimitiveUnsigned>(x: T) -> Option<T> {
+private_test_fn! {checked_sqrt_binary<T: PrimitiveUnsigned>(x: T) -> Option<T> {
     let floor_sqrt = floor_sqrt_binary(x);
     if floor_sqrt.square() == x {
         Some(floor_sqrt)
@@ -178,7 +178,7 @@ pub_test! {checked_sqrt_binary<T: PrimitiveUnsigned>(x: T) -> Option<T> {
     }
 }}
 
-pub_test! {sqrt_rem_binary<T: PrimitiveUnsigned>(x: T) -> (T, T) {
+private_test_fn! {sqrt_rem_binary<T: PrimitiveUnsigned>(x: T) -> (T, T) {
     let floor_sqrt = floor_sqrt_binary(x);
     (floor_sqrt, x - floor_sqrt.square())
 }}

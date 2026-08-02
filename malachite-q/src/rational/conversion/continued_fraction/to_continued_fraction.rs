@@ -23,7 +23,7 @@ pub struct RationalContinuedFraction {
 }
 
 impl RationalContinuedFraction {
-    pub_crate_test! {is_done(&self) -> bool {
+    crate_test_fn! {is_done(&self) -> bool {
         self.denominator == 0u32 || self.numerator == 0u32
     }}
 }

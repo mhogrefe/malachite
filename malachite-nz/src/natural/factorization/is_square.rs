@@ -11,14 +11,14 @@
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
 use crate::natural::arithmetic::sqrt::limbs_checked_sqrt;
-use crate::platform::Limb;
+use crate::platform::{LIMB_WIDTH_LIMB, Limb};
 use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::factorization::traits::IsSquare;
 
-const MOD34_BITS: Limb = ((Limb::WIDTH as Limb) >> 2) * 3;
+const MOD34_BITS: Limb = (LIMB_WIDTH_LIMB >> 2) * 3;
 const MOD34_MASK: Limb = (1 << MOD34_BITS) - 1;
 
 // This is PERFSQR_MOD_BITS from mpn/perfsqr.h, GMP 6.3.0. Either 49 on 64 bit limb or 25 on 32 bit
@@ -27,7 +27,7 @@ const SQR_MOD_BITS: Limb = MOD34_BITS + 1;
 const SQR_MOD_MASK: Limb = (1 << SQR_MOD_BITS) - 1;
 
 // From mpn/generic/mod_34lsub1.c
-const B1: Limb = (Limb::WIDTH as Limb) >> 2;
+const B1: Limb = LIMB_WIDTH_LIMB >> 2;
 const B2: Limb = B1 << 1;
 const B3: Limb = B1 * 3;
 
@@ -114,7 +114,7 @@ const fn perfsqr_mod_idx(r: Limb, d: Limb, inv: Limb) -> Limb {
 // Single limb. Check precomputed bitmasks to see if remainder is a quadratic residue
 fn perfsqr_mod_1(r: Limb, d: Limb, inv: Limb, mask: Limb) -> bool {
     //   CNST_LIMB(0x202021202020213),
-    assert!(d <= Limb::WIDTH as Limb);
+    assert!(d <= LIMB_WIDTH_LIMB);
     let idx = perfsqr_mod_idx(r, d, inv);
     if (mask >> idx).even() {
         // non-square
@@ -125,10 +125,10 @@ fn perfsqr_mod_1(r: Limb, d: Limb, inv: Limb, mask: Limb) -> bool {
 
 // Double limb. Check precomputed bitmasks to see if remainder is a quadratic residue
 fn perfsqr_mod_2(r: Limb, d: Limb, inv: Limb, mhi: Limb, mlo: Limb) -> bool {
-    assert!(d <= (Limb::WIDTH as Limb) << 1);
+    assert!(d <= const { LIMB_WIDTH_LIMB << 1 });
     let mut idx = perfsqr_mod_idx(r, d, inv);
-    let m = if idx < Limb::WIDTH as Limb { mlo } else { mhi };
-    idx %= Limb::WIDTH as Limb;
+    let m = if idx < LIMB_WIDTH_LIMB { mlo } else { mhi };
+    idx %= LIMB_WIDTH_LIMB;
     if (m >> idx).even() {
         // non-square
         return false;

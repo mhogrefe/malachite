@@ -28,7 +28,7 @@ use malachite_base::slices::slice_leading_zeros;
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // This is equivalent to `mpn_scan0` from `mpn/generic/scan0.c`, GMP 6.2.1.
-pub_crate_test! {limbs_index_of_next_false_bit(xs: &[Limb], start: u64) -> u64 {
+crate_test_fn! {limbs_index_of_next_false_bit(xs: &[Limb], start: u64) -> u64 {
     let starting_index = bit_to_limb_count_floor(start);
     if starting_index >= xs.len() {
         return start;
@@ -66,7 +66,7 @@ pub_crate_test! {limbs_index_of_next_false_bit(xs: &[Limb], start: u64) -> u64 {
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // This is equivalent to `mpn_scan1` from `mpn/generic/scan1.c`, GMP 6.2.1.
-pub_crate_test! {limbs_index_of_next_true_bit(xs: &[Limb], start: u64) -> Option<u64> {
+crate_test_fn! {limbs_index_of_next_true_bit(xs: &[Limb], start: u64) -> Option<u64> {
     let starting_index = bit_to_limb_count_floor(start);
     if starting_index >= xs.len() {
         None

@@ -19,14 +19,16 @@ use std::str::FromStr;
 
 #[test]
 fn test_partial_cmp_abs_primitive_float() {
-    let test = |u, v: f32, out: Option<Ordering>| {
+    let test = |s, v: f32, out: Option<Ordering>| {
+        let u = Natural::from_str(s).unwrap();
+
         let out_rev = out.map(Ordering::reverse);
-        assert_eq!(Natural::from_str(u).unwrap().partial_cmp_abs(&v), out);
-        assert_eq!(v.partial_cmp_abs(&Natural::from_str(u).unwrap()), out_rev);
+        assert_eq!(u.partial_cmp_abs(&v), out);
+        assert_eq!(v.partial_cmp_abs(&u), out_rev);
 
         let v = f64::from(v);
-        assert_eq!(Natural::from_str(u).unwrap().partial_cmp_abs(&v), out);
-        assert_eq!(v.partial_cmp_abs(&Natural::from_str(u).unwrap()), out_rev);
+        assert_eq!(u.partial_cmp_abs(&v), out);
+        assert_eq!(v.partial_cmp_abs(&u), out_rev);
     };
     test("5", f32::NAN, None);
     test("5", f32::INFINITY, Some(Less));

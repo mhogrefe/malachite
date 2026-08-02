@@ -27,7 +27,7 @@ use malachite_base::num::arithmetic::traits::{
 //
 // # Panics
 // Panics if `xs` is empty or `pow` is 0.
-pub_test! {limbs_floor_log_base_power_of_2(xs: &[Limb], pow: u64) -> u64 {
+private_test_fn! {limbs_floor_log_base_power_of_2(xs: &[Limb], pow: u64) -> u64 {
     assert_ne!(pow, 0);
     (limbs_significant_bits(xs) - 1) / pow
 }}
@@ -48,7 +48,7 @@ pub_test! {limbs_floor_log_base_power_of_2(xs: &[Limb], pow: u64) -> u64 {
 //
 // # Panics
 // Panics if `xs` is empty or `pow` is 0.
-pub_test! {limbs_ceiling_log_base_power_of_2(xs: &[Limb], pow: u64) -> u64 {
+private_test_fn! {limbs_ceiling_log_base_power_of_2(xs: &[Limb], pow: u64) -> u64 {
     assert_ne!(pow, 0);
     let significant_bits_m_1 = limbs_significant_bits(xs) - 1;
     let (floor_log, rem) = significant_bits_m_1.div_mod(pow);
@@ -81,7 +81,7 @@ pub_test! {limbs_ceiling_log_base_power_of_2(xs: &[Limb], pow: u64) -> u64 {
 //
 // # Panics
 // Panics if `xs` is empty or `pow` is 0.
-pub_test! {limbs_checked_log_base_power_of_2(xs: &[Limb], pow: u64) -> Option<u64> {
+private_test_fn! {limbs_checked_log_base_power_of_2(xs: &[Limb], pow: u64) -> Option<u64> {
     assert_ne!(pow, 0);
     let significant_bits_m_1 = limbs_significant_bits(xs) - 1;
     let (floor_log, rem) = significant_bits_m_1.div_mod(pow);

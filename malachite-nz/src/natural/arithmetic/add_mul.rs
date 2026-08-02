@@ -43,7 +43,7 @@ use malachite_base::num::conversion::traits::{SplitInHalf, WrappingFrom};
 //
 // This is equivalent to `mpz_aorsmul_1` from `mpz/aorsmul_i.c`, GMP 6.2.1, where `w` and `x` are
 // positive, `sub` is positive, and `w` is returned instead of overwriting the first input.
-pub_test! {limbs_add_mul_limb(xs: &[Limb], ys: &[Limb], limb: Limb) -> Vec<Limb> {
+private_test_fn! {limbs_add_mul_limb(xs: &[Limb], ys: &[Limb], limb: Limb) -> Vec<Limb> {
     let mut out;
     if xs.len() >= ys.len() {
         out = xs.to_vec();
@@ -70,7 +70,7 @@ pub_test! {limbs_add_mul_limb(xs: &[Limb], ys: &[Limb], limb: Limb) -> Vec<Limb>
 // Panics if `xs` and `ys` have different lengths.
 //
 // This is equivalent to `mpn_addmul_1` from `mpn/generic/addmul_1.c`, GMP 6.2.1.
-pub_crate_test! {limbs_slice_add_mul_limb_same_length_in_place_left(
+crate_test_fn! {limbs_slice_add_mul_limb_same_length_in_place_left(
     xs: &mut [Limb],
     ys: &[Limb],
     z: Limb,
@@ -133,7 +133,7 @@ pub(crate) fn limbs_slice_add_mul_two_limbs_matching_length_in_place_left(
 // This is equivalent to `mpz_aorsmul_1` from `mpz/aorsmul_i.c`, GMP 6.2.1, where `w` and `x` are
 // positive and have the same lengths, `sub` is positive, the lowest limbs of the result are written
 // to the second input rather than the first, and the highest limb is returned.
-pub_test! {limbs_slice_add_mul_limb_same_length_in_place_right(
+private_test_fn! {limbs_slice_add_mul_limb_same_length_in_place_right(
     xs: &[Limb],
     ys: &mut [Limb],
     z: Limb,
@@ -164,7 +164,7 @@ pub_test! {limbs_slice_add_mul_limb_same_length_in_place_right(
 //
 // This is equivalent to `mpz_aorsmul_1` from `mpz/aorsmul_i.c`, GMP 6.2.1, where `w` and `x` are
 // positive and sub is positive.
-pub_test! {limbs_vec_add_mul_limb_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], z: Limb) {
+private_test_fn! {limbs_vec_add_mul_limb_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], z: Limb) {
     let xs_len = xs.len();
     if xs_len >= ys.len() {
         limbs_vec_add_mul_limb_greater_in_place_left(xs, ys, z);
@@ -210,7 +210,7 @@ fn limbs_vec_add_mul_limb_greater_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb],
 //
 // This is equivalent to `mpz_aorsmul_1` from `mpz/aorsmul_i.c`, GMP 6.2.1, where `w` and `x` are
 // positive, `sub` is positive, and the result is written to the second input rather than the first.
-pub_test! {limbs_vec_add_mul_limb_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>, z: Limb) {
+private_test_fn! {limbs_vec_add_mul_limb_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>, z: Limb) {
     let ys_len = ys.len();
     if xs.len() >= ys_len {
         let carry = limbs_slice_add_mul_limb_same_length_in_place_right(&xs[..ys_len], ys, z);
@@ -254,7 +254,7 @@ fn limbs_vec_add_mul_limb_smaller_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>
 //
 // This is equivalent to `mpz_aorsmul_1` from `mpz/aorsmul_i.c`, GMP 6.2.1, where `w` and `x` are
 // positive, `sub` is positive, and the result is written to the longer input.
-pub_test! {limbs_vec_add_mul_limb_in_place_either(
+private_test_fn! {limbs_vec_add_mul_limb_in_place_either(
     xs: &mut Vec<Limb>,
     ys: &mut Vec<Limb>,
     z: Limb,
@@ -285,11 +285,13 @@ pub_test! {limbs_vec_add_mul_limb_in_place_either(
 //
 // This is equivalent to `mpz_aorsmul` from `mpz/aorsmul.c`, GMP 6.2.1, where `w`, `x`, and `y` are
 // positive, `sub` is positive, and `w` is returned instead of overwriting the first input.
-pub_test! {
+private_test_fn! {
 // The multiplication scratch stays a separate allocation: the product buffer becomes the returned
 // value, and a merged parent would either retain the scratch capacity or pay a shrinking copy.
 #[cfg_attr(dylint_lib = "malachite_lints", allow(adjacent_vec_allocations))]
 limbs_add_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Vec<Limb> {
+    assert!(!ys.is_empty());
+    assert!(!zs.is_empty());
     let (long, short) = if ys.len() >= zs.len() { (ys, zs) } else { (zs, ys) };
     if short.len() < MUL_TOOM22_THRESHOLD {
         // The one extra slot means neither the resize inside the basecase nor a final carry push
@@ -416,11 +418,13 @@ fn limbs_slice_add_mul_two_limbs_in_place_left(
 //
 // This is equivalent to `mpz_aorsmul` from `mpz/aorsmul.c`, GMP 6.2.1, where `w`, `x`, and `y` are
 // positive and `sub` is positive.
-pub_test! {
+private_test_fn! {
 // The multiplication scratch stays a separate allocation: the product buffer becomes the new xs,
 // and a merged parent would either retain the scratch capacity or pay a shrinking copy.
 #[cfg_attr(dylint_lib = "malachite_lints", allow(adjacent_vec_allocations))]
 limbs_add_mul_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], zs: &[Limb]) {
+    assert!(!ys.is_empty());
+    assert!(!zs.is_empty());
     let (long, short) = if ys.len() >= zs.len() { (ys, zs) } else { (zs, ys) };
     let out_len = long.len() + short.len();
     if short.len() < MUL_TOOM22_THRESHOLD && (xs.len() >= out_len || xs.capacity() > out_len) {

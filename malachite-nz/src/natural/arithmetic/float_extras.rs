@@ -674,7 +674,7 @@ const NUM_TO_TEXT_62: &[u8] = b"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijkl
 // - `MPFR_ROUND_FAILED` otherwise (too large error).
 //
 // This is `mpfr_get_str_aux` from `get_str.c`, MPFR 4.2.2.
-pub_test! {limbs_get_str_aux(
+private_test_fn! {limbs_get_str_aux(
     out: &mut [u8],
     xs: &mut [Limb],
     neg_f: u64,

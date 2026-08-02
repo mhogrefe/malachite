@@ -32,7 +32,7 @@ use malachite_nz::natural::arithmetic::float_extras::{limbs_get_str, limbs_get_s
 // log(beta)`. Both approximations are entries of `MPFR_L2B`.
 //
 // This is `mpfr_ceil_mul` from `get_str.c`, MPFR 4.2.2.
-pub_crate_test! {ceil_mul(e: i64, beta: u64, i: usize) -> i64 {
+crate_test_fn! {ceil_mul(e: i64, beta: u64, i: usize) -> i64 {
     const WIDTH_MINUS_1: u64 = i64::WIDTH - 1;
     // p = mantissa * 2 ^ (exp - 128): the l2b approximation as an exact `Float`.
     let (mantissa, exp) = MPFR_L2B[usize::exact_from(beta) - 2][i];
