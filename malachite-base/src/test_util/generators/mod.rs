@@ -4779,3 +4779,40 @@ pub mod common;
 pub mod exhaustive;
 pub mod random;
 pub mod special_random;
+
+// -- (PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned, RoundingMode) --
+
+// All `(T, T, U, RoundingMode)` that are valid inputs to `T::mul_shr_round`: the result fits, and
+// when the `RoundingMode` is `Exact` the shift is exact.
+pub fn unsigned_unsigned_unsigned_rounding_mode_quadruple_gen_var_1<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>() -> Generator<(T, T, U, RoundingMode)>
+where
+    u64: SaturatingFrom<U>,
+{
+    Generator::new(
+        &exhaustive_unsigned_unsigned_unsigned_rounding_mode_quadruple_gen_var_1,
+        &random_unsigned_unsigned_unsigned_rounding_mode_quadruple_gen_var_1,
+        &special_random_unsigned_unsigned_unsigned_rounding_mode_quadruple_gen_var_1,
+    )
+}
+
+// -- (PrimitiveSigned, PrimitiveSigned, PrimitiveUnsigned, RoundingMode) --
+
+// All `(T, T, B, RoundingMode)` that are valid inputs to `T::mul_shr_round`: the result fits, and
+// when the `RoundingMode` is `Exact` the shift is exact.
+pub fn signed_signed_unsigned_rounding_mode_quadruple_gen_var_1<
+    T: PrimitiveSigned + UnsignedAbs<Output = U>,
+    U: PrimitiveUnsigned,
+    B: PrimitiveUnsigned,
+>() -> Generator<(T, T, B, RoundingMode)>
+where
+    u64: SaturatingFrom<B>,
+{
+    Generator::new(
+        &exhaustive_signed_signed_unsigned_rounding_mode_quadruple_gen_var_1,
+        &random_signed_signed_unsigned_rounding_mode_quadruple_gen_var_1,
+        &special_random_signed_signed_unsigned_rounding_mode_quadruple_gen_var_1,
+    )
+}

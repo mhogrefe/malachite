@@ -67,6 +67,28 @@ pub trait MulAddMulAssign<Y = Self, Z = Self, W = Self> {
     fn mul_add_mul_assign(&mut self, y: Y, z: Z, w: W);
 }
 
+/// Multiplies two numbers and right-shifts the product (divides it by a power of 2), rounding
+/// the result according to a specified rounding mode. An [`Ordering`] is also returned,
+/// indicating whether the returned value is less than, equal to, or greater than the exact value.
+///
+/// The product is computed exactly, as if at unlimited width; only the final shifted result must
+/// be representable.
+pub trait MulShrRound<RHS = Self, B = u64> {
+    type Output;
+
+    fn mul_shr_round(self, other: RHS, bits: B, rm: RoundingMode) -> (Self::Output, Ordering);
+}
+
+/// Multiplies two numbers and right-shifts the product (divides it by a power of 2) in place,
+/// rounding the result according to a specified rounding mode. An [`Ordering`] is returned,
+/// indicating whether the assigned value is less than, equal to, or greater than the exact value.
+///
+/// The product is computed exactly, as if at unlimited width; only the final shifted result must
+/// be representable.
+pub trait MulShrRoundAssign<RHS = Self, B = u64> {
+    fn mul_shr_round_assign(&mut self, other: RHS, bits: B, rm: RoundingMode) -> Ordering;
+}
+
 /// Subtracts the product of one pair of numbers from the product of another.
 pub trait MulSubMul<Y = Self, Z = Self, W = Self> {
     type Output;

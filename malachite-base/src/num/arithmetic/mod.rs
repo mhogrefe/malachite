@@ -2488,6 +2488,69 @@ pub mod mod_sub;
 /// assert_eq!(x, -5);
 /// ```
 pub mod mul_add_mul;
+/// Implementations of [`MulShrRound`](traits::MulShrRound) and
+/// [`MulShrRoundAssign`](traits::MulShrRoundAssign), traits for multiplying two numbers and
+/// right-shifting the product (dividing it by a power of 2) with a specified rounding mode. The
+/// product is computed at twice the width of the type, so the operation is exact even when the
+/// product itself would overflow.
+///
+/// # mul_shr_round
+/// ```
+/// use malachite_base::num::arithmetic::traits::MulShrRound;
+/// use malachite_base::rounding_modes::RoundingMode::*;
+/// use std::cmp::Ordering::*;
+///
+/// assert_eq!(100u8.mul_shr_round(200, 8u32, Down), (78, Less));
+/// assert_eq!(100u8.mul_shr_round(200, 8u32, Up), (79, Greater));
+/// assert_eq!(100u8.mul_shr_round(200, 8u32, Nearest), (78, Less));
+/// assert_eq!(96u8.mul_shr_round(8, 8u32, Exact), (3, Equal));
+///
+/// // a tie, broken toward the even neighbor
+/// assert_eq!(5u8.mul_shr_round(102, 2u32, Nearest), (128, Greater));
+///
+/// // the whole point: the product of two u64s does not fit a u64, but its high half does
+/// assert_eq!(
+///     u64::MAX.mul_shr_round(u64::MAX, 64u32, Down),
+///     (0xfffffffffffffffe, Less)
+/// );
+///
+/// // u128 works the same way, despite there being no wider type to multiply into
+/// assert_eq!(
+///     10u128.pow(30).mul_shr_round(10u128.pow(30), 128u32, Down),
+///     (2938735877055718769921, Less)
+/// );
+///
+/// // Floor and Down differ for negative products
+/// assert_eq!((-100i16).mul_shr_round(200, 8u32, Floor), (-79, Less));
+/// assert_eq!((-100i16).mul_shr_round(200, 8u32, Down), (-78, Greater));
+/// assert_eq!(
+///     (-1000000000007i64).mul_shr_round(1000000000009, 64u32, Floor),
+///     (-54211, Less)
+/// );
+///
+/// // negative bits shift left; the shift is exact
+/// assert_eq!(3u8.mul_shr_round(5, -2i8, Floor), (60, Equal));
+/// ```
+///
+/// # mul_shr_round_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::MulShrRoundAssign;
+/// use malachite_base::rounding_modes::RoundingMode::*;
+/// use std::cmp::Ordering::*;
+///
+/// let mut x = 100u8;
+/// assert_eq!(x.mul_shr_round_assign(200, 8u32, Down), Less);
+/// assert_eq!(x, 78);
+///
+/// let mut x = u64::MAX;
+/// assert_eq!(x.mul_shr_round_assign(u64::MAX, 64u32, Down), Less);
+/// assert_eq!(x, 0xfffffffffffffffe);
+///
+/// let mut x = -100i16;
+/// assert_eq!(x.mul_shr_round_assign(200, 8u32, Floor), Less);
+/// assert_eq!(x, -79);
+/// ```
+pub mod mul_shr_round;
 /// [`MulSubMul`](traits::MulSubMul) and [`MulSubMulAssign`](traits::MulSubMulAssign), traits for
 /// subtracting the product of one pair of numbers from the product of another.
 ///

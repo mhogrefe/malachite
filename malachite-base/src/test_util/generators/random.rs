@@ -74,7 +74,8 @@ use crate::test_util::generators::common::{
     reshape_2_2_to_4, reshape_3_1_to_4,
 };
 use crate::test_util::generators::exhaustive::{
-    float_rounding_mode_filter_var_1, valid_digit_chars,
+    float_rounding_mode_filter_var_1, mul_shr_round_rounded_mag, mul_shr_round_valid_signed,
+    valid_digit_chars,
 };
 use crate::test_util::generators::{
     digits_valid, large_exponent, round_to_multiple_of_power_of_2_filter_map,
@@ -8345,4 +8346,67 @@ pub fn random_large_type_gen_var_27<T: PrimitiveInt>(
             .filter(|xs| xs.last() != Some(&T::ZERO))
         },
     ))
+}
+
+// -- (PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned, RoundingMode) --
+
+pub fn random_unsigned_unsigned_unsigned_rounding_mode_quadruple_gen_var_1<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(T, T, U, RoundingMode)>
+where
+    u64: SaturatingFrom<U>,
+{
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| random_pairs_from_single(random_primitive_ints::<T>(seed)),
+            &|seed| {
+                geometric_random_unsigneds::<U>(
+                    seed,
+                    config.get_or("mean_shift_n", T::WIDTH),
+                    config.get_or("mean_shift_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .map(|((x, y), bits, rm)| (x, y, bits, rm))
+        .filter(|&(x, y, bits, rm)| {
+            mul_shr_round_rounded_mag(x, y, u64::saturating_from(bits), rm).is_some()
+        }),
+    )
+}
+
+// -- (PrimitiveSigned, PrimitiveSigned, PrimitiveUnsigned, RoundingMode) --
+
+pub fn random_signed_signed_unsigned_rounding_mode_quadruple_gen_var_1<
+    T: PrimitiveSigned + UnsignedAbs<Output = U>,
+    U: PrimitiveUnsigned,
+    B: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(T, T, B, RoundingMode)>
+where
+    u64: SaturatingFrom<B>,
+{
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| random_pairs_from_single(random_primitive_ints::<T>(seed)),
+            &|seed| {
+                geometric_random_unsigneds::<B>(
+                    seed,
+                    config.get_or("mean_shift_n", T::WIDTH),
+                    config.get_or("mean_shift_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .map(|((x, y), bits, rm)| (x, y, bits, rm))
+        .filter(|&(x, y, bits, rm)| {
+            mul_shr_round_valid_signed(x, y, u64::saturating_from(bits), rm)
+        }),
+    )
 }

@@ -49,6 +49,26 @@ use malachite_nz::integer::Integer;
 /// the shared factors `p` and `q` carrying the chosen fraction of the bits and the private parts
 /// padding every denominator back to the same width, then take all three numerators to be 1 so
 /// the multiplication's cross-gcds stay trivial and only the cancellation under study is timed.
+///
+/// The negative result is stronger than this one variant. Any schedule, fused or not, must
+/// decide coprimality for the three independent pairs $(c, f)$, $(e, d)$, and $(b, d_1 f_1)$,
+/// because the canonical denominator depends on all three; no known coprimality test beats
+/// running the gcd, and a gcd that returns 1 costs as much as one that does not, so three
+/// gcd-runs is the generic floor. The composition also places them optimally. Deferring any of
+/// them leaves a known common factor inside a larger pair -- complete deferral means one
+/// $\gcd(N, D)$ on operands three times as wide, which a superlinear gcd makes dearer than the
+/// three it replaces -- and any deferral forfeits the guarantee that the sum's residual divides
+/// $\gcd(b, d_1 f_1)$, the guarantee that lets the composition skip a fourth gcd entirely
+/// whenever that one is 1. Advancing them instead is precisely this variant, and the table above
+/// is what it costs. What a genuinely fused implementation would save is one canonicalization
+/// and at most an allocation.
+///
+/// The conclusion flips only with arity. Accumulating $\sum_i y_i z_i$ through $k$ canonical
+/// `add_mul`s costs $\Theta(k^2)$ base-size multiplications as the accumulator's denominator
+/// grows, while accumulating unreduced over a product tree and reducing once costs
+/// $O(k \log k)$ of them plus a single large gcd -- the binary-splitting shape the rational
+/// series code already uses internally. A future n-ary sum-of-products is therefore the one
+/// fused rational operation with a real algorithmic edge; the ternary one has none.
 pub fn add_mul_split(x: &Rational, y: &Rational, z: &Rational) -> Rational {
     if x.numerator == 0 || y.numerator == 0 || z.numerator == 0 {
         if y.numerator == 0 || z.numerator == 0 {

@@ -3215,6 +3215,89 @@ pub(crate) fn round_to_multiple_unsigned_filter_map<T: PrimitiveUnsigned>(
     }
 }
 
+// The rounded magnitude of `mul_shr_round(x, y, bits, rm)` over unsigned `T`, or `None` if the
+// result does not fit or `rm` is `Exact` and the shift is inexact. Used to pre-validate generator
+// output; mirrors the logic of the implementation.
+pub(crate) fn mul_shr_round_rounded_mag<T: PrimitiveUnsigned>(
+    x: T,
+    y: T,
+    bits: u64,
+    rm: RoundingMode,
+) -> Option<T> {
+    if x == T::ZERO || y == T::ZERO {
+        return Some(T::ZERO);
+    }
+    let w = T::WIDTH;
+    let (hi, lo) = T::x_mul_y_to_zz(x, y);
+    let k = if bits == 0 {
+        return if hi == T::ZERO { Some(lo) } else { None };
+    } else if bits < w {
+        if hi >> bits != T::ZERO {
+            return None;
+        }
+        hi << (w - bits) | lo >> bits
+    } else if bits < w << 1 {
+        hi >> (bits - w)
+    } else {
+        T::ZERO
+    };
+    let i = bits - 1;
+    let top = if i < w {
+        lo.get_bit(i)
+    } else if i < w << 1 {
+        hi.get_bit(i - w)
+    } else {
+        false
+    };
+    let rest = if i == 0 {
+        false
+    } else if i < w {
+        lo << (w - i) != T::ZERO
+    } else if i == w {
+        lo != T::ZERO
+    } else if i < w << 1 {
+        lo != T::ZERO || hi << ((w << 1) - i) != T::ZERO
+    } else {
+        lo != T::ZERO || hi != T::ZERO
+    };
+    let round_up = match rm {
+        _ if !top && !rest => false,
+        Down | Floor => false,
+        Up | Ceiling => true,
+        Exact => return None,
+        Nearest => top && (rest || k.odd()),
+    };
+    if round_up {
+        k.checked_add(T::ONE)
+    } else {
+        Some(k)
+    }
+}
+
+// Whether `mul_shr_round(x, y, bits, rm)` over signed `T` neither panics nor requires an inexact
+// `Exact` shift.
+pub(crate) fn mul_shr_round_valid_signed<
+    U: PrimitiveUnsigned,
+    T: PrimitiveSigned + UnsignedAbs<Output = U>,
+>(
+    x: T,
+    y: T,
+    bits: u64,
+    rm: RoundingMode,
+) -> bool {
+    if x == T::ZERO || y == T::ZERO {
+        return true;
+    }
+    let negative = (x < T::ZERO) != (y < T::ZERO);
+    let mrm = if negative { -rm } else { rm };
+    if let Some(mag) = mul_shr_round_rounded_mag(x.unsigned_abs(), y.unsigned_abs(), bits, mrm) {
+        let lim = U::power_of_2(U::WIDTH - 1);
+        mag < lim || (negative && mag == lim)
+    } else {
+        false
+    }
+}
+
 pub(crate) fn round_to_multiple_of_power_of_2_filter_map<T: PrimitiveInt>(
     n: T,
     u: u64,
@@ -6237,4 +6320,60 @@ pub fn exhaustive_large_type_gen_var_27<T: PrimitiveUnsigned>() -> It<(bool, Vec
         ),
         exhaustive_bools(),
     ))))
+}
+
+// -- (PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned, RoundingMode) --
+
+// All `(T, T, U, RoundingMode)` where `T::mul_shr_round(T, U, RoundingMode)` neither panics nor
+// requires an inexact `Exact` shift.
+pub fn exhaustive_unsigned_unsigned_unsigned_rounding_mode_quadruple_gen_var_1<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>() -> It<(T, T, U, RoundingMode)>
+where
+    u64: SaturatingFrom<U>,
+{
+    Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_small(
+                exhaustive_pairs_from_single(exhaustive_unsigneds::<T>()),
+                exhaustive_unsigneds::<U>(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter_map(|(((x, y), bits), rm)| {
+            mul_shr_round_rounded_mag(x, y, u64::saturating_from(bits), rm)
+                .map(|_| (x, y, bits, rm))
+        }),
+    )
+}
+
+// -- (PrimitiveSigned, PrimitiveSigned, PrimitiveUnsigned, RoundingMode) --
+
+// All `(T, T, U, RoundingMode)` where `T::mul_shr_round(T, U, RoundingMode)` neither panics nor
+// requires an inexact `Exact` shift.
+pub fn exhaustive_signed_signed_unsigned_rounding_mode_quadruple_gen_var_1<
+    T: PrimitiveSigned + UnsignedAbs<Output = U>,
+    U: PrimitiveUnsigned,
+    B: PrimitiveUnsigned,
+>() -> It<(T, T, B, RoundingMode)>
+where
+    u64: SaturatingFrom<B>,
+{
+    Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_small(
+                exhaustive_pairs_from_single(exhaustive_signeds::<T>()),
+                exhaustive_unsigneds::<B>(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter_map(|(((x, y), bits), rm)| {
+            if mul_shr_round_valid_signed(x, y, u64::saturating_from(bits), rm) {
+                Some((x, y, bits, rm))
+            } else {
+                None
+            }
+        }),
+    )
 }

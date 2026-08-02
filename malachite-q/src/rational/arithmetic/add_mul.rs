@@ -18,6 +18,10 @@ use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign};
 // reduce, so there is nothing to be saved by deferring that to a single reduction at the end.
 //
 // This is equivalent to `_fmpq_addmul` from `fmpq/addmul.c`, FLINT 3.6.0.
+//
+// A split-cancellation variant, its measurements, and the full argument that no fused schedule
+// improves on this composition are recorded on `add_mul_split` in the crate's
+// `test_util::rational::arithmetic::add_mul`.
 
 impl AddMul<Self, Self> for Rational {
     type Output = Self;

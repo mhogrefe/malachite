@@ -75,6 +75,9 @@ use crate::test_util::extra_variadic::{
 use crate::test_util::generators::common::{
     GenConfig, It, reshape_1_2_to_3, reshape_2_1_to_3, reshape_2_2_to_4, reshape_3_1_to_4,
 };
+use crate::test_util::generators::exhaustive::{
+    mul_shr_round_rounded_mag, mul_shr_round_valid_signed,
+};
 use crate::test_util::generators::{
     digits_valid, float_rounding_mode_filter_var_1, get_two_highest, large_exponent,
     reduce_to_fit_add_mul_signed, reduce_to_fit_add_mul_unsigned, reduce_to_fit_sub_mul_signed,
@@ -9767,4 +9770,79 @@ pub fn special_random_large_type_gen_var_25<T: PrimitiveUnsigned>(
             .filter(|xs| xs.last() != Some(&T::ZERO))
         },
     ))
+}
+
+// -- (PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned, RoundingMode) --
+
+pub fn special_random_unsigned_unsigned_unsigned_rounding_mode_quadruple_gen_var_1<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(T, T, U, RoundingMode)>
+where
+    u64: SaturatingFrom<U>,
+{
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_pairs_from_single(striped_random_unsigneds::<T>(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                ))
+            },
+            &|seed| {
+                geometric_random_unsigneds::<U>(
+                    seed,
+                    config.get_or("mean_shift_n", T::WIDTH),
+                    config.get_or("mean_shift_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .map(|((x, y), bits, rm)| (x, y, bits, rm))
+        .filter(|&(x, y, bits, rm)| {
+            mul_shr_round_rounded_mag(x, y, u64::saturating_from(bits), rm).is_some()
+        }),
+    )
+}
+
+// -- (PrimitiveSigned, PrimitiveSigned, PrimitiveUnsigned, RoundingMode) --
+
+pub fn special_random_signed_signed_unsigned_rounding_mode_quadruple_gen_var_1<
+    T: PrimitiveSigned + UnsignedAbs<Output = U>,
+    U: PrimitiveUnsigned,
+    B: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(T, T, B, RoundingMode)>
+where
+    u64: SaturatingFrom<B>,
+{
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_pairs_from_single(striped_random_signeds::<T>(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                ))
+            },
+            &|seed| {
+                geometric_random_unsigneds::<B>(
+                    seed,
+                    config.get_or("mean_shift_n", T::WIDTH),
+                    config.get_or("mean_shift_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .map(|((x, y), bits, rm)| (x, y, bits, rm))
+        .filter(|&(x, y, bits, rm)| {
+            mul_shr_round_valid_signed(x, y, u64::saturating_from(bits), rm)
+        }),
+    )
 }
