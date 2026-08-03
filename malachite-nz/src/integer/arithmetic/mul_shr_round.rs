@@ -276,7 +276,10 @@ impl MulShrRoundAssign<&Integer, u64> for Integer {
     /// use std::cmp::Ordering::*;
     ///
     /// let mut x = Integer::from(-100);
-    /// assert_eq!(x.mul_shr_round_assign(&Integer::from(200), 8, Ceiling), Greater);
+    /// assert_eq!(
+    ///     x.mul_shr_round_assign(&Integer::from(200), 8, Ceiling),
+    ///     Greater
+    /// );
     /// assert_eq!(x, -78);
     /// ```
     #[inline]

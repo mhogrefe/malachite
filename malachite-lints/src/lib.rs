@@ -53,6 +53,7 @@ mod use_div_mod_precomputed;
 mod use_divisible_by;
 mod use_exact_from;
 mod use_fused_mul;
+mod use_mod_power_of_2;
 mod use_mul_shr_round;
 mod use_named_constant;
 mod use_parity;
@@ -160,6 +161,14 @@ fn bignum_adt_did<'tcx>(
 }
 
 // Peels `&` and `.clone()` layers off an expression, for comparing against the underlying place.
+// The name of the last segment of a `QPath`, if any.
+fn qpath_last_segment_name<'a>(qpath: &'a rustc_hir::QPath<'a>) -> Option<&'a str> {
+    match qpath {
+        rustc_hir::QPath::Resolved(_, path) => path.segments.last().map(|s| s.ident.name.as_str()),
+        rustc_hir::QPath::TypeRelative(_, seg) => Some(seg.ident.name.as_str()),
+    }
+}
+
 fn peel_clone_and_borrows<'tcx>(e: &'tcx rustc_hir::Expr<'tcx>) -> &'tcx rustc_hir::Expr<'tcx> {
     use rustc_hir::ExprKind;
     let mut e = e;
@@ -429,6 +438,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         use_divisible_by::USE_DIVISIBLE_BY,
         use_exact_from::USE_EXACT_FROM,
         use_fused_mul::USE_FUSED_MUL,
+        use_mod_power_of_2::USE_MOD_POWER_OF_2,
         use_mul_shr_round::USE_MUL_SHR_ROUND,
         use_named_constant::USE_NAMED_CONSTANT,
         use_parity::USE_PARITY,
@@ -491,6 +501,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
     lint_store.register_late_pass(|_| Box::new(use_exact_from::UseExactFrom));
     lint_store.register_late_pass(|_| Box::new(use_fused_mul::UseFusedMul));
     lint_store.register_late_pass(|_| Box::new(use_div_mod_precomputed::UseDivModPrecomputed));
+    lint_store.register_late_pass(|_| Box::new(use_mod_power_of_2::UseModPowerOf2));
     lint_store.register_late_pass(|_| Box::new(use_mul_shr_round::UseMulShrRound));
     lint_store.register_late_pass(|_| Box::new(use_named_constant::UseNamedConstant));
     lint_store.register_late_pass(|_| Box::new(use_parity::UseParity));

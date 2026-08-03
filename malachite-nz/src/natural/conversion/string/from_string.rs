@@ -116,7 +116,7 @@ fn from_oct_str(s: &str) -> Option<Natural> {
                     *x |= digit >> 2;
                     i -= 1;
                     x = &mut xs[i];
-                    *x = digit & 3;
+                    *x = digit.mod_power_of_2(2);
                     remaining = WIDTH_MINUS_2;
                 }
                 2 => {

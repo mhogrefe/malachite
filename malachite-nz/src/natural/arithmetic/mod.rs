@@ -534,6 +534,9 @@ pub mod mod_shl;
 /// assert_eq!(x, 7436663564915145u64);
 /// ```
 pub mod mod_shr;
+/// Implementations of [`ModSqrt`](malachite_base::num::arithmetic::traits::ModSqrt), a trait for
+/// computing a square root of a number modulo another number.
+pub mod mod_sqrt;
 /// Implementations of traits for squaring a number modulo another number.
 ///
 /// The traits are [`ModSquare`](malachite_base::num::arithmetic::traits::ModSquare),

@@ -26,7 +26,7 @@ impl MulAddMul<Self, Self, Self> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{MulAddMul};
+    /// use malachite_base::num::arithmetic::traits::MulAddMul;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
@@ -62,7 +62,7 @@ impl MulAddMul<Self, Self, &Self> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{MulAddMul};
+    /// use malachite_base::num::arithmetic::traits::MulAddMul;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
@@ -98,7 +98,7 @@ impl MulAddMul<Self, &Self, Self> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{MulAddMul};
+    /// use malachite_base::num::arithmetic::traits::MulAddMul;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
@@ -134,7 +134,7 @@ impl MulAddMul<Self, &Self, &Self> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{MulAddMul};
+    /// use malachite_base::num::arithmetic::traits::MulAddMul;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
@@ -170,7 +170,7 @@ impl MulAddMul<&Self, Self, Self> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{MulAddMul};
+    /// use malachite_base::num::arithmetic::traits::MulAddMul;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
@@ -206,7 +206,7 @@ impl MulAddMul<&Self, Self, &Self> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{MulAddMul};
+    /// use malachite_base::num::arithmetic::traits::MulAddMul;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
@@ -242,7 +242,7 @@ impl MulAddMul<&Self, &Self, Self> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{MulAddMul};
+    /// use malachite_base::num::arithmetic::traits::MulAddMul;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
@@ -278,7 +278,7 @@ impl MulAddMul<&Self, &Self, &Self> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{MulAddMul};
+    /// use malachite_base::num::arithmetic::traits::MulAddMul;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
@@ -313,7 +313,7 @@ impl MulAddMul<&Natural, &Natural, &Natural> for &Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{MulAddMul};
+    /// use malachite_base::num::arithmetic::traits::MulAddMul;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
@@ -346,11 +346,15 @@ impl MulAddMulAssign<Self, Self, Self> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{MulAddMulAssign};
+    /// use malachite_base::num::arithmetic::traits::MulAddMulAssign;
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::from(10u32);
-    /// x.mul_add_mul_assign(Natural::from(3u32), Natural::from(4u32), Natural::from(5u32));
+    /// x.mul_add_mul_assign(
+    ///     Natural::from(3u32),
+    ///     Natural::from(4u32),
+    ///     Natural::from(5u32),
+    /// );
     /// assert_eq!(x, 50);
     /// ```
     #[inline]
@@ -376,11 +380,15 @@ impl MulAddMulAssign<Self, Self, &Self> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{MulAddMulAssign};
+    /// use malachite_base::num::arithmetic::traits::MulAddMulAssign;
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::from(10u32);
-    /// x.mul_add_mul_assign(Natural::from(3u32), Natural::from(4u32), &Natural::from(5u32));
+    /// x.mul_add_mul_assign(
+    ///     Natural::from(3u32),
+    ///     Natural::from(4u32),
+    ///     &Natural::from(5u32),
+    /// );
     /// assert_eq!(x, 50);
     /// ```
     #[inline]
@@ -406,11 +414,15 @@ impl MulAddMulAssign<Self, &Self, Self> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{MulAddMulAssign};
+    /// use malachite_base::num::arithmetic::traits::MulAddMulAssign;
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::from(10u32);
-    /// x.mul_add_mul_assign(Natural::from(3u32), &Natural::from(4u32), Natural::from(5u32));
+    /// x.mul_add_mul_assign(
+    ///     Natural::from(3u32),
+    ///     &Natural::from(4u32),
+    ///     Natural::from(5u32),
+    /// );
     /// assert_eq!(x, 50);
     /// ```
     #[inline]
@@ -436,11 +448,15 @@ impl MulAddMulAssign<Self, &Self, &Self> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{MulAddMulAssign};
+    /// use malachite_base::num::arithmetic::traits::MulAddMulAssign;
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::from(10u32);
-    /// x.mul_add_mul_assign(Natural::from(3u32), &Natural::from(4u32), &Natural::from(5u32));
+    /// x.mul_add_mul_assign(
+    ///     Natural::from(3u32),
+    ///     &Natural::from(4u32),
+    ///     &Natural::from(5u32),
+    /// );
     /// assert_eq!(x, 50);
     /// ```
     #[inline]
@@ -466,11 +482,15 @@ impl MulAddMulAssign<&Self, Self, Self> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{MulAddMulAssign};
+    /// use malachite_base::num::arithmetic::traits::MulAddMulAssign;
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::from(10u32);
-    /// x.mul_add_mul_assign(&Natural::from(3u32), Natural::from(4u32), Natural::from(5u32));
+    /// x.mul_add_mul_assign(
+    ///     &Natural::from(3u32),
+    ///     Natural::from(4u32),
+    ///     Natural::from(5u32),
+    /// );
     /// assert_eq!(x, 50);
     /// ```
     #[inline]
@@ -496,11 +516,15 @@ impl MulAddMulAssign<&Self, Self, &Self> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{MulAddMulAssign};
+    /// use malachite_base::num::arithmetic::traits::MulAddMulAssign;
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::from(10u32);
-    /// x.mul_add_mul_assign(&Natural::from(3u32), Natural::from(4u32), &Natural::from(5u32));
+    /// x.mul_add_mul_assign(
+    ///     &Natural::from(3u32),
+    ///     Natural::from(4u32),
+    ///     &Natural::from(5u32),
+    /// );
     /// assert_eq!(x, 50);
     /// ```
     #[inline]
@@ -526,11 +550,15 @@ impl MulAddMulAssign<&Self, &Self, Self> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{MulAddMulAssign};
+    /// use malachite_base::num::arithmetic::traits::MulAddMulAssign;
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::from(10u32);
-    /// x.mul_add_mul_assign(&Natural::from(3u32), &Natural::from(4u32), Natural::from(5u32));
+    /// x.mul_add_mul_assign(
+    ///     &Natural::from(3u32),
+    ///     &Natural::from(4u32),
+    ///     Natural::from(5u32),
+    /// );
     /// assert_eq!(x, 50);
     /// ```
     #[inline]
@@ -556,11 +584,15 @@ impl MulAddMulAssign<&Self, &Self, &Self> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{MulAddMulAssign};
+    /// use malachite_base::num::arithmetic::traits::MulAddMulAssign;
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::from(10u32);
-    /// x.mul_add_mul_assign(&Natural::from(3u32), &Natural::from(4u32), &Natural::from(5u32));
+    /// x.mul_add_mul_assign(
+    ///     &Natural::from(3u32),
+    ///     &Natural::from(4u32),
+    ///     &Natural::from(5u32),
+    /// );
     /// assert_eq!(x, 50);
     /// ```
     #[inline]

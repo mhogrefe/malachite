@@ -355,8 +355,9 @@ cd .. &&
 echo "Step 167. Running additional-lints" &&
 bash additional-lints.sh &&
 echo "Step 168. Testing against FLINT" &&
-cd ../malachite-cpp-test/malachite-test-cpp &&
+cd cpp-test &&
 cargo run --release &&
+cd .. &&
 echo "Step 169. Checking links" &&
-cd ../../check-malachite-links &&
+cd ../check-malachite-links &&
 cargo run --release

@@ -525,12 +525,16 @@ macro_rules! integer_div_mod_precomputed_doc {
         /// let data = Integer::precompute_div_mod_data(&d);
         /// // 2 * 10 + 3 = 23
         /// assert_eq!(
-        ///     Integer::from(23).div_mod_precomputed(&d, &data).to_debug_string(),
+        ///     Integer::from(23)
+        ///         .div_mod_precomputed(&d, &data)
+        ///         .to_debug_string(),
         ///     "(2, 3)"
         /// );
         /// // -3 * 10 + 7 = -23
         /// assert_eq!(
-        ///     Integer::from(-23).div_mod_precomputed(&d, &data).to_debug_string(),
+        ///     Integer::from(-23)
+        ///         .div_mod_precomputed(&d, &data)
+        ///         .to_debug_string(),
         ///     "(-3, 7)"
         /// );
         ///
@@ -538,12 +542,16 @@ macro_rules! integer_div_mod_precomputed_doc {
         /// let data = Integer::precompute_div_mod_data(&d);
         /// // -3 * -10 + -7 = 23
         /// assert_eq!(
-        ///     Integer::from(23).div_mod_precomputed(&d, &data).to_debug_string(),
+        ///     Integer::from(23)
+        ///         .div_mod_precomputed(&d, &data)
+        ///         .to_debug_string(),
         ///     "(-3, -7)"
         /// );
         /// // 2 * -10 + -3 = -23
         /// assert_eq!(
-        ///     Integer::from(-23).div_mod_precomputed(&d, &data).to_debug_string(),
+        ///     Integer::from(-23)
+        ///         .div_mod_precomputed(&d, &data)
+        ///         .to_debug_string(),
         ///     "(2, -3)"
         /// );
         /// ```
@@ -655,9 +663,7 @@ impl DivAssignModPrecomputed<Self> for Integer {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{
-    ///     DivAssignModPrecomputed, DivModPrecomputed,
-    /// };
+    /// use malachite_base::num::arithmetic::traits::{DivAssignModPrecomputed, DivModPrecomputed};
     /// use malachite_nz::integer::Integer;
     ///
     /// let d = Integer::from(10);
@@ -699,9 +705,7 @@ impl DivAssignModPrecomputed<&Self> for Integer {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{
-    ///     DivAssignModPrecomputed, DivModPrecomputed,
-    /// };
+    /// use malachite_base::num::arithmetic::traits::{DivAssignModPrecomputed, DivModPrecomputed};
     /// use malachite_nz::integer::Integer;
     ///
     /// let d = Integer::from(10);

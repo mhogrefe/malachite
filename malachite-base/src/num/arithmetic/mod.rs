@@ -2483,6 +2483,19 @@ pub mod mod_shr;
 /// x.mod_square_precomputed_assign(497, &data);
 /// assert_eq!(x, 43);
 /// ```
+/// [`ModSqrt`](traits::ModSqrt), a trait for computing a square root of a number modulo another
+/// number.
+///
+/// # mod_sqrt
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModSqrt;
+///
+/// assert_eq!(4u32.mod_sqrt(5), Some(2));
+/// assert_eq!(2u32.mod_sqrt(3), None);
+/// assert_eq!(12909u64.mod_sqrt(65537), Some(50618));
+/// assert_eq!(3u16.mod_sqrt(611), Some(183));
+/// ```
+pub mod mod_sqrt;
 pub mod mod_square;
 /// [`ModSub`](traits::ModSub) and [`ModSubAssign`](traits::ModSubAssign), traits for subtracting
 /// two numbers modulo another number.

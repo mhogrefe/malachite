@@ -402,7 +402,10 @@ impl MulShrRoundAssign<&Natural, u64> for Natural {
     /// use std::cmp::Ordering::*;
     ///
     /// let mut x = Natural::from(100u32);
-    /// assert_eq!(x.mul_shr_round_assign(&Natural::from(200u32), 8, Up), Greater);
+    /// assert_eq!(
+    ///     x.mul_shr_round_assign(&Natural::from(200u32), 8, Up),
+    ///     Greater
+    /// );
     /// assert_eq!(x, 79);
     /// ```
     #[inline]

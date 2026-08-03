@@ -77,7 +77,7 @@ fn widened_from<'tcx>(cx: &LateContext<'tcx>, e: &'tcx Expr<'tcx>) -> Option<Ty<
     match crate::peel_clone_and_borrows(e).kind {
         ExprKind::Call(callee, [arg]) => {
             if let ExprKind::Path(qpath) = &callee.kind
-                && let Some(seg) = qpath_last_segment_name(qpath)
+                && let Some(seg) = crate::qpath_last_segment_name(qpath)
                 && seg == "from"
             {
                 Some(cx.typeck_results().expr_ty(arg))
@@ -87,13 +87,6 @@ fn widened_from<'tcx>(cx: &LateContext<'tcx>, e: &'tcx Expr<'tcx>) -> Option<Ty<
         }
         ExprKind::Cast(inner, _) => Some(cx.typeck_results().expr_ty(inner)),
         _ => None,
-    }
-}
-
-fn qpath_last_segment_name<'a>(qpath: &'a rustc_hir::QPath<'a>) -> Option<&'a str> {
-    match qpath {
-        rustc_hir::QPath::Resolved(_, path) => path.segments.last().map(|s| s.ident.name.as_str()),
-        rustc_hir::QPath::TypeRelative(_, seg) => Some(seg.ident.name.as_str()),
     }
 }
 

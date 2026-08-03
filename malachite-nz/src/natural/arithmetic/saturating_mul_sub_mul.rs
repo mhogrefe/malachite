@@ -34,7 +34,7 @@ impl SaturatingMulSubMul<Self, Self, Self> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{SaturatingMulSubMul};
+    /// use malachite_base::num::arithmetic::traits::SaturatingMulSubMul;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
@@ -83,7 +83,7 @@ impl SaturatingMulSubMul<Self, Self, &Self> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{SaturatingMulSubMul};
+    /// use malachite_base::num::arithmetic::traits::SaturatingMulSubMul;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
@@ -132,7 +132,7 @@ impl SaturatingMulSubMul<Self, &Self, Self> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{SaturatingMulSubMul};
+    /// use malachite_base::num::arithmetic::traits::SaturatingMulSubMul;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
@@ -181,7 +181,7 @@ impl SaturatingMulSubMul<Self, &Self, &Self> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{SaturatingMulSubMul};
+    /// use malachite_base::num::arithmetic::traits::SaturatingMulSubMul;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
@@ -230,7 +230,7 @@ impl SaturatingMulSubMul<&Self, Self, Self> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{SaturatingMulSubMul};
+    /// use malachite_base::num::arithmetic::traits::SaturatingMulSubMul;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
@@ -279,7 +279,7 @@ impl SaturatingMulSubMul<&Self, Self, &Self> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{SaturatingMulSubMul};
+    /// use malachite_base::num::arithmetic::traits::SaturatingMulSubMul;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
@@ -328,7 +328,7 @@ impl SaturatingMulSubMul<&Self, &Self, Self> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{SaturatingMulSubMul};
+    /// use malachite_base::num::arithmetic::traits::SaturatingMulSubMul;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
@@ -377,7 +377,7 @@ impl SaturatingMulSubMul<&Self, &Self, &Self> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{SaturatingMulSubMul};
+    /// use malachite_base::num::arithmetic::traits::SaturatingMulSubMul;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
@@ -426,7 +426,7 @@ impl SaturatingMulSubMul<&Natural, &Natural, &Natural> for &Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{SaturatingMulSubMul};
+    /// use malachite_base::num::arithmetic::traits::SaturatingMulSubMul;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
@@ -473,7 +473,7 @@ impl SaturatingMulSubMulAssign<Self, Self, Self> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{SaturatingMulSubMulAssign};
+    /// use malachite_base::num::arithmetic::traits::SaturatingMulSubMulAssign;
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::from(1u32);
@@ -512,7 +512,7 @@ impl SaturatingMulSubMulAssign<Self, Self, &Self> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{SaturatingMulSubMulAssign};
+    /// use malachite_base::num::arithmetic::traits::SaturatingMulSubMulAssign;
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::from(1u32);
@@ -551,7 +551,7 @@ impl SaturatingMulSubMulAssign<Self, &Self, Self> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{SaturatingMulSubMulAssign};
+    /// use malachite_base::num::arithmetic::traits::SaturatingMulSubMulAssign;
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::from(1u32);
@@ -590,7 +590,7 @@ impl SaturatingMulSubMulAssign<Self, &Self, &Self> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{SaturatingMulSubMulAssign};
+    /// use malachite_base::num::arithmetic::traits::SaturatingMulSubMulAssign;
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::from(1u32);
@@ -629,7 +629,7 @@ impl SaturatingMulSubMulAssign<&Self, Self, Self> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{SaturatingMulSubMulAssign};
+    /// use malachite_base::num::arithmetic::traits::SaturatingMulSubMulAssign;
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::from(1u32);
@@ -668,7 +668,7 @@ impl SaturatingMulSubMulAssign<&Self, Self, &Self> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{SaturatingMulSubMulAssign};
+    /// use malachite_base::num::arithmetic::traits::SaturatingMulSubMulAssign;
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::from(1u32);
@@ -707,7 +707,7 @@ impl SaturatingMulSubMulAssign<&Self, &Self, Self> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{SaturatingMulSubMulAssign};
+    /// use malachite_base::num::arithmetic::traits::SaturatingMulSubMulAssign;
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::from(1u32);
@@ -746,7 +746,7 @@ impl SaturatingMulSubMulAssign<&Self, &Self, &Self> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{SaturatingMulSubMulAssign};
+    /// use malachite_base::num::arithmetic::traits::SaturatingMulSubMulAssign;
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::from(1u32);

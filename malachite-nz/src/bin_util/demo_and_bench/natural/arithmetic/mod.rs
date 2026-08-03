@@ -61,6 +61,7 @@ pub(crate) fn register(runner: &mut Runner) {
     mod_power_of_2_sub::register(runner);
     mod_shl::register(runner);
     mod_shr::register(runner);
+    mod_sqrt::register(runner);
     mod_square::register(runner);
     mod_sub::register(runner);
     mul::register(runner);
@@ -142,6 +143,7 @@ mod mod_power_of_2_square;
 mod mod_power_of_2_sub;
 mod mod_shl;
 mod mod_shr;
+mod mod_sqrt;
 mod mod_square;
 mod mod_sub;
 mod mul;

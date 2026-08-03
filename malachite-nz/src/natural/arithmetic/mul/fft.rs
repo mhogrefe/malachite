@@ -28,9 +28,9 @@ use malachite_base::fail_on_untested_path;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_base::num::arithmetic::traits::ShrRound;
 use malachite_base::num::arithmetic::traits::{
-    CeilingLogBase2, DivRound, ModInverse, ModPow, OverflowingAddAssign, OverflowingSubAssign,
-    Parity, PowerOf2, RoundToMultiple, RoundToMultipleOfPowerOf2, WrappingAddAssign, XMulYToZZ,
-    XXAddYYToZZ,
+    CeilingLogBase2, DivRound, DivisibleByPowerOf2, ModInverse, ModPow, OverflowingAddAssign,
+    OverflowingSubAssign, Parity, PowerOf2, RoundToMultiple, RoundToMultipleOfPowerOf2,
+    WrappingAddAssign, XMulYToZZ, XXAddYYToZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::One;
@@ -972,6 +972,8 @@ fn slow_mpn_to_fft_easy(
         let mut m = 0;
         for ir in 0..BLK_SZ_DIV_8 {
             let mut k = iq * const { BLK_SZ >> 5 } * bits + (m >> 5);
+            // the `>> 5`/`& 31` pair is the kernel's word-index/bit-offset split
+            #[cfg_attr(dylint_lib = "malachite_lints", allow(use_mod_power_of_2))]
             let mut j = m & 31;
             let mut ak = f64x8::from([
                 f64::from(get!(a, k) >> j),
@@ -1060,6 +1062,8 @@ fn slow_mpn_to_fft(
         for (i, z) in zs[big_i..].iter_mut().enumerate().take(BLK_SZ) {
             let n = (big_i + i) * bits;
             let mut k = n >> 5;
+            // the `>> 5`/`& 31` pair is the kernel's word-index/bit-offset split
+            #[cfg_attr(dylint_lib = "malachite_lints", allow(use_mod_power_of_2))]
             let mut j = n & 31;
             let mut x = f64::from(get_or_default!(a, k) >> j);
             k += 1;
@@ -5067,9 +5071,9 @@ fn mpn_ctx_mpn_mul(r: &mut Context, z: &mut [Limb], a: &[Limb], b: &[Limb], test
         // ditto
         let mut b_stop_easy = min(btrunc, (bn_64 - 33) / bits);
         let b_stop_hard = min(btrunc, bn_64.div_ceil(bits));
-        let rounding: usize = if bits & 7 == 0 {
+        let rounding: usize = if bits.divisible_by_power_of_2(3) {
             4
-        } else if bits & 3 == 0 {
+        } else if bits.divisible_by_power_of_2(2) {
             8
         } else {
             16

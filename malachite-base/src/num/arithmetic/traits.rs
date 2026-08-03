@@ -1349,6 +1349,18 @@ pub trait ModShrAssign<RHS, M = Self> {
     fn mod_shr_assign(&mut self, other: RHS, m: M);
 }
 
+/// Computes a square root of a number modulo another number $m$, returning `None` if no root is
+/// found. The input must be already reduced modulo $m$.
+///
+/// The modulus should be an odd prime: for such moduli a root is found whenever one exists. The
+/// behavior for other moduli is deterministic and never hangs, but a root may be missed, and a
+/// returned value may fail to be a root.
+pub trait ModSqrt<M = Self> {
+    type Output;
+
+    fn mod_sqrt(self, m: M) -> Option<Self::Output>;
+}
+
 /// Squares a number modulo another number $m$. The input must be already reduced modulo $m$.
 pub trait ModSquare<M = Self> {
     type Output;

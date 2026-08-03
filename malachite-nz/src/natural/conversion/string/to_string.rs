@@ -22,7 +22,7 @@ use core::fmt::Write;
 use core::fmt::{Binary, Debug, Display, Formatter, LowerHex, Octal, Result, UpperHex};
 #[cfg(feature = "test_build")]
 use itertools::Itertools;
-use malachite_base::num::arithmetic::traits::{DivRound, Parity, ShrRound};
+use malachite_base::num::arithmetic::traits::{DivRound, ModPowerOf2, Parity, ShrRound};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::string::to_string::{
     BaseFmtWrapper as BaseBaseFmtWrapper, digit_to_display_byte_large, digit_to_display_byte_lower,
@@ -655,15 +655,19 @@ impl Octal for Natural {
                 let mut limb = *limbs.next().unwrap();
                 for digit in digits.iter_mut().rev() {
                     if remaining_bits >= 3 {
-                        *digit = digit_to_display_byte_lower(u8::wrapping_from(limb & 7)).unwrap();
+                        *digit =
+                            digit_to_display_byte_lower(u8::wrapping_from(limb.mod_power_of_2(3)))
+                                .unwrap();
                         remaining_bits -= 3;
                         limb >>= 3;
                     } else {
                         match remaining_bits {
                             0 => {
                                 limb = *limbs.next().unwrap();
-                                *digit = digit_to_display_byte_lower(u8::wrapping_from(limb & 7))
-                                    .unwrap();
+                                *digit = digit_to_display_byte_lower(u8::wrapping_from(
+                                    limb.mod_power_of_2(3),
+                                ))
+                                .unwrap();
                                 remaining_bits = WIDTH_MINUS_3;
                                 limb >>= 3;
                             }
@@ -671,7 +675,7 @@ impl Octal for Natural {
                                 let previous_limb = limb;
                                 limb = *limbs.next().unwrap_or(&0);
                                 *digit = digit_to_display_byte_lower(u8::wrapping_from(
-                                    ((limb & 3) << 1) | previous_limb,
+                                    (limb.mod_power_of_2(2) << 1) | previous_limb,
                                 ))
                                 .unwrap();
                                 remaining_bits = WIDTH_MINUS_2;
@@ -806,7 +810,8 @@ impl LowerHex for Natural {
                         remaining_digits = QUARTER_WIDTH;
                         limb = *limbs.next().unwrap();
                     }
-                    *digit = digit_to_display_byte_lower(u8::wrapping_from(limb & 15)).unwrap();
+                    *digit = digit_to_display_byte_lower(u8::wrapping_from(limb.mod_power_of_2(4)))
+                        .unwrap();
                     limb >>= 4;
                     remaining_digits -= 1;
                 }
@@ -867,7 +872,8 @@ impl UpperHex for Natural {
                         remaining_digits = QUARTER_WIDTH;
                         limb = *limbs.next().unwrap();
                     }
-                    *digit = digit_to_display_byte_upper(u8::wrapping_from(limb & 15)).unwrap();
+                    *digit = digit_to_display_byte_upper(u8::wrapping_from(limb.mod_power_of_2(4)))
+                        .unwrap();
                     limb >>= 4;
                     remaining_digits -= 1;
                 }

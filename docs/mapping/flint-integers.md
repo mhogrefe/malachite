@@ -779,7 +779,7 @@ the approximation is the same bit pattern on every platform.
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✗ | `int fmpz_sqrtmod (fmpz_t b, const fmpz_t a, const fmpz_t p)` | |
+| ✓ | `int fmpz_sqrtmod (fmpz_t b, const fmpz_t a, const fmpz_t p)` | [`ModSqrt`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModSqrt.html) |
 | ✓ | `void fmpz_sqrt (fmpz_t f, const fmpz_t g)` | [`FloorSqrt`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.FloorSqrt.html) |
 | ✓ | `void fmpz_sqrtrem (fmpz_t f, fmpz_t r, const fmpz_t g)` | [`SqrtRem`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.SqrtRem.html) |
 | ✓ | `int fmpz_is_square (const fmpz_t f)` | [`IsSquare`](https://docs.rs/malachite-base/latest/malachite_base/num/factorization/traits/trait.IsSquare.html) |
@@ -805,11 +805,19 @@ which returns the root only when it is exact, or
 [`RootRem`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.RootRem.html)
 when you want the flag and the truncated root at once.
 
-**`fmpz_sqrtmod`.** A square root modulo a prime is a gap, and it will stay one until the
-modular-arithmetic story it belongs to is built out; it joins the `nmod` context above in the
-`fmpz_mod`-shaped queue. FLINT's caveats are
-worth reading before porting code that uses it: primality of `p` is assumed, not checked, and a
-composite `p` usually, but not always, reports failure.
+**`fmpz_sqrtmod`.** `a.mod_sqrt(&p)`, returning an `Option` where FLINT sets an output and
+returns a flag. The trait is
+[`ModSqrt`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModSqrt.html), implemented for
+[`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html) and the
+unsigned primitives, with the primitive version corresponding to `n_sqrtmod`. FLINT's caveats
+carry over and are worth reading before use: primality of `p` is assumed, not checked, and a
+composite `p` usually, but not always, reports failure — the same inputs produce the same
+results, missed roots, spurious "roots", iteration cap and all, which differential testing
+against FLINT confirms line for line. The two exceptions, where Malachite computes the
+mathematically expected value instead: for even moduli between 50 and 600, FLINT's answer
+passes through a Jacobi-symbol routine whose behavior for even moduli is undefined; and for
+`p` of `2^64 - 1` or `2^64 - 3`, `n_sqrtmod`'s exponent computations wrap, while Malachite (and
+FLINT's own large-`p` path) computes them exactly. Both windows involve only composite moduli.
 
 **`fmpz_is_perfect_power`.** Malachite's
 [`ExpressAsPower`](https://docs.rs/malachite-base/latest/malachite_base/num/factorization/traits/trait.ExpressAsPower.html)

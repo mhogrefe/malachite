@@ -2770,12 +2770,16 @@ macro_rules! natural_div_mod_precomputed_doc {
         /// let data = Natural::precompute_div_mod_data(&d);
         /// // 2 * 10 + 3 = 23
         /// assert_eq!(
-        ///     Natural::from(23u32).div_mod_precomputed(&d, &data).to_debug_string(),
+        ///     Natural::from(23u32)
+        ///         .div_mod_precomputed(&d, &data)
+        ///         .to_debug_string(),
         ///     "(2, 3)"
         /// );
         /// // 12 * 10 + 5 = 125
         /// assert_eq!(
-        ///     Natural::from(125u32).div_mod_precomputed(&d, &data).to_debug_string(),
+        ///     Natural::from(125u32)
+        ///         .div_mod_precomputed(&d, &data)
+        ///         .to_debug_string(),
         ///     "(12, 5)"
         /// );
         ///
@@ -2896,9 +2900,7 @@ impl DivAssignModPrecomputed<Self> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{
-    ///     DivAssignModPrecomputed, DivModPrecomputed,
-    /// };
+    /// use malachite_base::num::arithmetic::traits::{DivAssignModPrecomputed, DivModPrecomputed};
     /// use malachite_nz::natural::Natural;
     ///
     /// let d = Natural::from(10u32);
@@ -2938,9 +2940,7 @@ impl<'a> DivAssignModPrecomputed<&'a Self> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{
-    ///     DivAssignModPrecomputed, DivModPrecomputed,
-    /// };
+    /// use malachite_base::num::arithmetic::traits::{DivAssignModPrecomputed, DivModPrecomputed};
     /// use malachite_nz::natural::Natural;
     ///
     /// let d = Natural::from(10u32);

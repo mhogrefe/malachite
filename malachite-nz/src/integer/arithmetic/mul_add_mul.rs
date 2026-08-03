@@ -26,15 +26,11 @@ impl MulAddMul<Self, Self, Self> for Integer {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{MulAddMul};
+    /// use malachite_base::num::arithmetic::traits::MulAddMul;
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(
-    ///     Integer::from(-10).mul_add_mul(
-    ///         Integer::from(3),
-    ///         Integer::from(4),
-    ///         Integer::from(5)
-    ///     ),
+    ///     Integer::from(-10).mul_add_mul(Integer::from(3), Integer::from(4), Integer::from(5)),
     ///     -10
     /// );
     /// ```
@@ -62,15 +58,11 @@ impl MulAddMul<Self, Self, &Self> for Integer {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{MulAddMul};
+    /// use malachite_base::num::arithmetic::traits::MulAddMul;
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(
-    ///     Integer::from(-10).mul_add_mul(
-    ///         Integer::from(3),
-    ///         Integer::from(4),
-    ///         &Integer::from(5)
-    ///     ),
+    ///     Integer::from(-10).mul_add_mul(Integer::from(3), Integer::from(4), &Integer::from(5)),
     ///     -10
     /// );
     /// ```
@@ -98,15 +90,11 @@ impl MulAddMul<Self, &Self, Self> for Integer {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{MulAddMul};
+    /// use malachite_base::num::arithmetic::traits::MulAddMul;
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(
-    ///     Integer::from(-10).mul_add_mul(
-    ///         Integer::from(3),
-    ///         &Integer::from(4),
-    ///         Integer::from(5)
-    ///     ),
+    ///     Integer::from(-10).mul_add_mul(Integer::from(3), &Integer::from(4), Integer::from(5)),
     ///     -10
     /// );
     /// ```
@@ -134,15 +122,11 @@ impl MulAddMul<Self, &Self, &Self> for Integer {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{MulAddMul};
+    /// use malachite_base::num::arithmetic::traits::MulAddMul;
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(
-    ///     Integer::from(-10).mul_add_mul(
-    ///         Integer::from(3),
-    ///         &Integer::from(4),
-    ///         &Integer::from(5)
-    ///     ),
+    ///     Integer::from(-10).mul_add_mul(Integer::from(3), &Integer::from(4), &Integer::from(5)),
     ///     -10
     /// );
     /// ```
@@ -170,15 +154,11 @@ impl MulAddMul<&Self, Self, Self> for Integer {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{MulAddMul};
+    /// use malachite_base::num::arithmetic::traits::MulAddMul;
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(
-    ///     Integer::from(-10).mul_add_mul(
-    ///         &Integer::from(3),
-    ///         Integer::from(4),
-    ///         Integer::from(5)
-    ///     ),
+    ///     Integer::from(-10).mul_add_mul(&Integer::from(3), Integer::from(4), Integer::from(5)),
     ///     -10
     /// );
     /// ```
@@ -206,15 +186,11 @@ impl MulAddMul<&Self, Self, &Self> for Integer {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{MulAddMul};
+    /// use malachite_base::num::arithmetic::traits::MulAddMul;
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(
-    ///     Integer::from(-10).mul_add_mul(
-    ///         &Integer::from(3),
-    ///         Integer::from(4),
-    ///         &Integer::from(5)
-    ///     ),
+    ///     Integer::from(-10).mul_add_mul(&Integer::from(3), Integer::from(4), &Integer::from(5)),
     ///     -10
     /// );
     /// ```
@@ -242,15 +218,11 @@ impl MulAddMul<&Self, &Self, Self> for Integer {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{MulAddMul};
+    /// use malachite_base::num::arithmetic::traits::MulAddMul;
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(
-    ///     Integer::from(-10).mul_add_mul(
-    ///         &Integer::from(3),
-    ///         &Integer::from(4),
-    ///         Integer::from(5)
-    ///     ),
+    ///     Integer::from(-10).mul_add_mul(&Integer::from(3), &Integer::from(4), Integer::from(5)),
     ///     -10
     /// );
     /// ```
@@ -278,15 +250,11 @@ impl MulAddMul<&Self, &Self, &Self> for Integer {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{MulAddMul};
+    /// use malachite_base::num::arithmetic::traits::MulAddMul;
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(
-    ///     Integer::from(-10).mul_add_mul(
-    ///         &Integer::from(3),
-    ///         &Integer::from(4),
-    ///         &Integer::from(5)
-    ///     ),
+    ///     Integer::from(-10).mul_add_mul(&Integer::from(3), &Integer::from(4), &Integer::from(5)),
     ///     -10
     /// );
     /// ```
@@ -313,7 +281,7 @@ impl MulAddMul<&Integer, &Integer, &Integer> for &Integer {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{MulAddMul};
+    /// use malachite_base::num::arithmetic::traits::MulAddMul;
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(
@@ -346,7 +314,7 @@ impl MulAddMulAssign<Self, Self, Self> for Integer {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{MulAddMulAssign};
+    /// use malachite_base::num::arithmetic::traits::MulAddMulAssign;
     /// use malachite_nz::integer::Integer;
     ///
     /// let mut x = Integer::from(-10);
@@ -376,7 +344,7 @@ impl MulAddMulAssign<Self, Self, &Self> for Integer {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{MulAddMulAssign};
+    /// use malachite_base::num::arithmetic::traits::MulAddMulAssign;
     /// use malachite_nz::integer::Integer;
     ///
     /// let mut x = Integer::from(-10);
@@ -406,7 +374,7 @@ impl MulAddMulAssign<Self, &Self, Self> for Integer {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{MulAddMulAssign};
+    /// use malachite_base::num::arithmetic::traits::MulAddMulAssign;
     /// use malachite_nz::integer::Integer;
     ///
     /// let mut x = Integer::from(-10);
@@ -436,7 +404,7 @@ impl MulAddMulAssign<Self, &Self, &Self> for Integer {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{MulAddMulAssign};
+    /// use malachite_base::num::arithmetic::traits::MulAddMulAssign;
     /// use malachite_nz::integer::Integer;
     ///
     /// let mut x = Integer::from(-10);
@@ -466,7 +434,7 @@ impl MulAddMulAssign<&Self, Self, Self> for Integer {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{MulAddMulAssign};
+    /// use malachite_base::num::arithmetic::traits::MulAddMulAssign;
     /// use malachite_nz::integer::Integer;
     ///
     /// let mut x = Integer::from(-10);
@@ -496,7 +464,7 @@ impl MulAddMulAssign<&Self, Self, &Self> for Integer {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{MulAddMulAssign};
+    /// use malachite_base::num::arithmetic::traits::MulAddMulAssign;
     /// use malachite_nz::integer::Integer;
     ///
     /// let mut x = Integer::from(-10);
@@ -526,7 +494,7 @@ impl MulAddMulAssign<&Self, &Self, Self> for Integer {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{MulAddMulAssign};
+    /// use malachite_base::num::arithmetic::traits::MulAddMulAssign;
     /// use malachite_nz::integer::Integer;
     ///
     /// let mut x = Integer::from(-10);
@@ -556,7 +524,7 @@ impl MulAddMulAssign<&Self, &Self, &Self> for Integer {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::arithmetic::traits::{MulAddMulAssign};
+    /// use malachite_base::num::arithmetic::traits::MulAddMulAssign;
     /// use malachite_nz::integer::Integer;
     ///
     /// let mut x = Integer::from(-10);
