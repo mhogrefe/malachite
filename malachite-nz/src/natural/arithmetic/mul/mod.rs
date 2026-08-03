@@ -891,6 +891,9 @@ pub mod fft;
 /// Code for multiplying a many-limbed [`Natural`] by a single [limb](crate#limbs).
 pub mod limb;
 /// Code for computing only the lowest [limbs](crate#limbs) of the product of two [`Natural`]s.
+/// Code for computing an approximation of the high half of a product, used in `Float`
+/// multiplication and in `mul_shr_round`.
+pub mod mul_high;
 pub mod mul_low;
 /// Code for multiplying two [`Natural`]s modulo one less than a large power of 2; used by the
 /// Schönhage-Strassen algorithm.

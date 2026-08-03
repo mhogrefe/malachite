@@ -27,8 +27,8 @@ use crate::natural::arithmetic::div_mod::{
     limbs_two_limb_inverse_helper,
 };
 use crate::natural::arithmetic::float_extras::round_helper_2;
-use crate::natural::arithmetic::float_mul::{
-    limbs_float_mul_high_same_length, limbs_float_mul_high_same_length_scratch_len,
+use crate::natural::arithmetic::mul::mul_high::{
+    limbs_mul_high_same_length, limbs_mul_high_same_length_scratch_len,
 };
 use crate::natural::arithmetic::mul::{limbs_mul_to_out, limbs_mul_to_out_scratch_len};
 use crate::natural::arithmetic::shl::limbs_slice_shl_in_place;
@@ -358,6 +358,9 @@ fn div_float_significands_same_prec_lt_w(
         x -= y;
     }
     // First try with an approximate quotient.
+    // The widening spelling is deliberate: only the floor is needed, in a per-limb kernel, and
+    // `mul_shr_round` would also compute the rounding bookkeeping that this call site discards.
+    #[cfg_attr(dylint_lib = "malachite_lints", expect(use_mul_shr_round))]
     let mut round_bit = Limb::wrapping_from(
         (DoubleLimb::from(x) * DoubleLimb::from(limbs_invert_limb::<DoubleLimb, Limb>(y)))
             >> Limb::WIDTH,
@@ -436,7 +439,10 @@ fn div_float_significands_same_prec_w(
     if increment_exp {
         x -= y;
     }
-    // First compute an approximate quotient.
+    // First compute an approximate quotient. The widening spelling is deliberate: only the floor
+    // is needed, in a per-limb kernel, and `mul_shr_round` would also compute the rounding
+    // bookkeeping that this call site discards.
+    #[cfg_attr(dylint_lib = "malachite_lints", expect(use_mul_shr_round))]
     let mut q = x.wrapping_add(Limb::wrapping_from(
         (DoubleLimb::from(x) * DoubleLimb::from(limbs_invert_limb::<DoubleLimb, Limb>(y)))
             >> Limb::WIDTH,
@@ -518,6 +524,9 @@ fn div_float_2_approx(x_1: Limb, x_0: Limb, y_1: Limb, y_0: Limb) -> (Limb, Limb
         limbs_invert_limb::<DoubleLimb, Limb>(y_1 + 1)
     };
     // Now inv <= B ^ 2 / (y_1 + 1) - B.
+    // The widening spelling is deliberate: only the floor is needed, in a per-limb kernel, and
+    // `mul_shr_round` would also compute the rounding bookkeeping that this call site discards.
+    #[cfg_attr(dylint_lib = "malachite_lints", expect(use_mul_shr_round))]
     let mut q_1 =
         Limb::wrapping_from((DoubleLimb::from(x_1) * DoubleLimb::from(inv)) >> Limb::WIDTH);
     q_1.wrapping_add_assign(x_1);
@@ -550,6 +559,9 @@ fn div_float_2_approx(x_1: Limb, x_0: Limb, y_1: Limb, y_0: Limb) -> (Limb, Limb
     // = r_1 * B * r_1 * inv + r_0 + (r0 * inv / B).
     q_1.wrapping_add_assign(r_1);
     // Add floor(r_0 * inv / B) to q_0.
+    // The widening spelling is deliberate: only the floor is needed, in a per-limb kernel, and
+    // `mul_shr_round` would also compute the rounding bookkeeping that this call site discards.
+    #[cfg_attr(dylint_lib = "malachite_lints", expect(use_mul_shr_round))]
     if r_0.overflowing_add_assign(Limb::wrapping_from(
         (DoubleLimb::from(r_0) * DoubleLimb::from(inv)) >> Limb::WIDTH,
     )) {
@@ -1074,7 +1086,7 @@ pub(crate) fn limbs_float_div_high_scratch_len(ds_len: usize) -> usize {
         0
     } else {
         let l = ds_len - k;
-        (l << 1) + limbs_float_mul_high_same_length_scratch_len(l)
+        (l << 1) + limbs_mul_high_same_length_scratch_len(l)
     }
 }
 
@@ -1127,7 +1139,7 @@ pub(crate) fn limbs_float_div_high(
     // now we have to subtract high(Q1) * D0 where Q1 = q_high * B ^ k + {qs + l, k} and D0 = {ds,
     // l}
     let (scratch_lo, scratch_hi) = scratch.split_at_mut(two_l);
-    limbs_float_mul_high_same_length(scratch_lo, &qs[k..], ds_lo, scratch_hi);
+    limbs_mul_high_same_length(scratch_lo, &qs[k..], ds_lo, scratch_hi);
     // We are only interested in the upper l limbs from {scratch, 2 * l}
     let ns_mid = &mut ns[len..two_len_m_k];
     let mut carry = Limb::from(limbs_sub_same_length_in_place_left(

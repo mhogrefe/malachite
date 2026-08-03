@@ -3864,3 +3864,40 @@ pub mod common;
 pub mod exhaustive;
 pub mod random;
 pub mod special_random;
+
+// -- (Natural, Natural, PrimitiveUnsigned, RoundingMode) --
+
+// All `(Natural, Natural, u64, RoundingMode)` that are valid inputs to
+// `Natural::mul_shr_round`.
+pub fn natural_natural_unsigned_rounding_mode_quadruple_gen_var_1()
+-> Generator<(Natural, Natural, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_natural_natural_unsigned_rounding_mode_quadruple_gen_var_1,
+        &random_natural_natural_unsigned_rounding_mode_quadruple_gen_var_1,
+        &special_random_natural_natural_unsigned_rounding_mode_quadruple_gen_var_1,
+    )
+}
+
+// Valid inputs to `Natural::mul_shr_round` where `bits` is close to the width of the product, so
+// that the short-product path is taken densely.
+pub fn natural_natural_unsigned_rounding_mode_quadruple_gen_var_2()
+-> Generator<(Natural, Natural, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_natural_natural_unsigned_rounding_mode_quadruple_gen_var_2,
+        &random_natural_natural_unsigned_rounding_mode_quadruple_gen_var_2,
+        &special_random_natural_natural_unsigned_rounding_mode_quadruple_gen_var_2,
+    )
+}
+
+// -- (Integer, Integer, PrimitiveUnsigned, RoundingMode) --
+
+// All `(Integer, Integer, u64, RoundingMode)` that are valid inputs to
+// `Integer::mul_shr_round`.
+pub fn integer_integer_unsigned_rounding_mode_quadruple_gen_var_1()
+-> Generator<(Integer, Integer, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_integer_integer_unsigned_rounding_mode_quadruple_gen_var_1,
+        &random_integer_integer_unsigned_rounding_mode_quadruple_gen_var_1,
+        &special_random_integer_integer_unsigned_rounding_mode_quadruple_gen_var_1,
+    )
+}

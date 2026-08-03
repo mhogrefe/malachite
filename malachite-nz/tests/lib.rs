@@ -91,6 +91,7 @@ pub mod integer {
         pub mod mod_power_of_2;
         pub mod mul;
         pub mod mul_add_mul;
+        pub mod mul_shr_round;
         pub mod mul_sub_mul;
         pub mod neg;
         pub mod parity;
@@ -290,6 +291,7 @@ pub mod natural {
         pub mod mod_sub;
         pub mod mul;
         pub mod mul_add_mul;
+        pub mod mul_shr_round;
         pub mod mul_sub_mul;
         pub mod neg;
         pub mod next_power_of_2;

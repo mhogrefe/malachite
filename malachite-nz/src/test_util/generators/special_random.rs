@@ -66,8 +66,8 @@ use crate::test_util::generators::exhaustive::{
     filter_helper_1, filter_helper_2, filter_helper_3, filter_helper_4, filter_helper_5,
     filter_helper_6, filter_map_helper_1, filter_map_helper_2, filter_map_helper_3,
     gcd_input_filter, large_type_filter_map_1, limbs_eq_mod_map, limbs_significant_bits_helper,
-    map_helper_1, map_helper_2, map_helper_3, round_to_multiple_integer_filter_map,
-    round_to_multiple_natural_filter_map,
+    map_helper_1, map_helper_2, map_helper_3, mul_shr_round_valid,
+    round_to_multiple_integer_filter_map, round_to_multiple_natural_filter_map,
 };
 use crate::test_util::generators::random::random_gmp_format_strings;
 use crate::test_util::generators::{T8, factors_of_limb_max};
@@ -8179,5 +8179,105 @@ pub fn special_random_large_type_gen_var_28(
             &random_rounding_modes,
         )
         .map(crate::test_util::generators::common::get_str_aux_inputs),
+    )
+}
+
+// -- (Natural, Natural, PrimitiveUnsigned, RoundingMode) --
+
+pub fn special_random_natural_natural_unsigned_rounding_mode_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(Natural, Natural, u64, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_pairs_from_single(striped_random_naturals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                ))
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_shift_n", 128),
+                    config.get_or("mean_shift_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .map(|((x, y), bits, rm)| (x, y, bits, rm))
+        .filter(|(x, y, bits, rm)| mul_shr_round_valid(x, y, *bits, *rm)),
+    )
+}
+
+// The short-product-dense variant: `bits` is close to the width of the product. Striped operands
+// exercise the determinacy check, since long runs of ones just below the cut are exactly what
+// makes the window indecisive.
+pub fn special_random_natural_natural_unsigned_rounding_mode_quadruple_gen_var_2(
+    config: &GenConfig,
+) -> It<(Natural, Natural, u64, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_pairs_from_single(striped_random_naturals(
+                    seed,
+                    config.get_or("mean_stripe_n", 128),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 1024),
+                    config.get_or("mean_bits_d", 1),
+                ))
+            },
+            &|seed| {
+                geometric_random_unsigneds::<u64>(
+                    seed,
+                    config.get_or("mean_offset_n", 256),
+                    config.get_or("mean_offset_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .map(|((x, y), offset, rm)| {
+            let total = x.significant_bits() + y.significant_bits();
+            let bits = total.saturating_sub(offset);
+            (x, y, bits, rm)
+        })
+        .filter(|(x, y, bits, rm)| mul_shr_round_valid(x, y, *bits, *rm)),
+    )
+}
+
+// -- (Integer, Integer, PrimitiveUnsigned, RoundingMode) --
+
+pub fn special_random_integer_integer_unsigned_rounding_mode_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(Integer, Integer, u64, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_pairs_from_single(striped_random_integers(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                ))
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_shift_n", 128),
+                    config.get_or("mean_shift_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .map(|((x, y), bits, rm)| (x, y, bits, rm))
+        .filter(|(x, y, bits, rm)| {
+            mul_shr_round_valid(x.unsigned_abs_ref(), y.unsigned_abs_ref(), *bits, *rm)
+        }),
     )
 }

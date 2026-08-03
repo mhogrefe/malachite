@@ -1,0 +1,60 @@
+error: use `mul_shr_round()` instead of shifting the product: it never computes the part of the product that the shift discards
+  --> $DIR/use_mul_shr_round.rs:13:13
+   |
+LL |     let _ = (&X * &Y).shr_round(100u64, Floor);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[deny(use_mul_shr_round)]` on by default
+
+error: use `mul_shr_round()` instead of shifting the product: it never computes the part of the product that the shift discards
+  --> $DIR/use_mul_shr_round.rs:14:13
+   |
+LL |     let _ = (X.clone() * Y.clone()).shr_round(3u64, Nearest);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: borrow instead of cloning: this operator is implemented for references
+  --> $DIR/use_mul_shr_round.rs:14:13
+   |
+LL |     let _ = (X.clone() * Y.clone()).shr_round(3u64, Nearest);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[deny(clone_with_ref_variant)]` on by default
+
+error: use `mul_shr_round()` instead of shifting the product: it never computes the part of the product that the shift discards
+  --> $DIR/use_mul_shr_round.rs:15:13
+   |
+LL |     let _ = (&A * &B).shr_round(10u64, Ceiling);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `mul_shr_round()` instead of shifting the product: it never computes the part of the product that the shift discards
+  --> $DIR/use_mul_shr_round.rs:17:13
+   |
+LL |     let _ = (&X * &Y) >> 50u32;
+   |             ^^^^^^^^^^^^^^^^^^
+
+error: use `mul_shr_round()` instead of shifting the product: it never computes the part of the product that the shift discards
+  --> $DIR/use_mul_shr_round.rs:18:13
+   |
+LL |     let _ = (&A * &B) >> 5u64;
+   |             ^^^^^^^^^^^^^^^^^
+
+error: use `mul_shr_round()` on the narrower type instead of widening, multiplying, and shifting
+  --> $DIR/use_mul_shr_round.rs:22:13
+   |
+LL |     let _ = (u128::from(a) * u128::from(b)) >> 64;
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `mul_shr_round()` on the narrower type instead of widening, multiplying, and shifting
+  --> $DIR/use_mul_shr_round.rs:23:13
+   |
+LL |     let _ = ((a as u128) * (b as u128)) >> 64;
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `mul_shr_round()` on the narrower type instead of widening, multiplying, and shifting
+  --> $DIR/use_mul_shr_round.rs:24:13
+   |
+LL |     let _ = (u128::from(a) * u128::from(b)).shr_round(64u64, Nearest);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: aborting due to 9 previous errors
+

@@ -18,9 +18,9 @@ use crate::natural::arithmetic::add::{
 };
 use crate::natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
 use crate::natural::arithmetic::float_extras::round_helper_raw;
-use crate::natural::arithmetic::float_mul::{
-    limbs_float_mul_high_same_length, limbs_float_mul_high_same_length_scratch_len,
-    mul_float_significands_ref_ref_helper,
+use crate::natural::arithmetic::float_mul::mul_float_significands_ref_ref_helper;
+use crate::natural::arithmetic::mul::mul_high::{
+    limbs_mul_high_same_length, limbs_mul_high_same_length_scratch_len,
 };
 use crate::natural::arithmetic::shl::limbs_slice_shl_in_place;
 use crate::natural::arithmetic::square::{limbs_square_to_out, limbs_square_to_out_scratch_len};
@@ -460,7 +460,7 @@ pub(crate) fn limbs_float_square_high_scratch_len(n: usize) -> usize {
             let k = usize::wrapping_from(k);
             max(
                 limbs_square_to_out_scratch_len(k),
-                limbs_float_mul_high_same_length_scratch_len(n - k),
+                limbs_mul_high_same_length_scratch_len(n - k),
             )
         }
     }
@@ -512,7 +512,7 @@ pub(crate) fn limbs_float_square_high(out: &mut [Limb], xs: &[Limb], scratch: &m
             let l = n - k;
             limbs_square_to_out(&mut out[l << 1..], &xs[l..], scratch);
             let (xs_lo, xs_hi) = xs.split_at(k);
-            limbs_float_mul_high_same_length(out, &xs_lo[..l], xs_hi, scratch);
+            limbs_mul_high_same_length(out, &xs_lo[..l], xs_hi, scratch);
             let (out_lo, out_hi) = out.split_at_mut(n - 1);
             let out_lo = &mut out_lo[l - 1..l << 1];
             let mut carry = limbs_slice_shl_in_place(out_lo, 1);

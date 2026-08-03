@@ -52,6 +52,7 @@ mod use_const_cast;
 mod use_divisible_by;
 mod use_exact_from;
 mod use_fused_mul;
+mod use_mul_shr_round;
 mod use_named_constant;
 mod use_parity;
 mod use_reciprocal;
@@ -426,6 +427,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         use_divisible_by::USE_DIVISIBLE_BY,
         use_exact_from::USE_EXACT_FROM,
         use_fused_mul::USE_FUSED_MUL,
+        use_mul_shr_round::USE_MUL_SHR_ROUND,
         use_named_constant::USE_NAMED_CONSTANT,
         use_parity::USE_PARITY,
         use_reciprocal::USE_RECIPROCAL,
@@ -487,6 +489,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
     lint_store.register_late_pass(|_| Box::new(use_divisible_by::UseDivisibleBy));
     lint_store.register_late_pass(|_| Box::new(use_exact_from::UseExactFrom));
     lint_store.register_late_pass(|_| Box::new(use_fused_mul::UseFusedMul));
+    lint_store.register_late_pass(|_| Box::new(use_mul_shr_round::UseMulShrRound));
     lint_store.register_late_pass(|_| Box::new(use_named_constant::UseNamedConstant));
     lint_store.register_late_pass(|_| Box::new(use_parity::UseParity));
     lint_store.register_late_pass(|_| Box::new(use_reciprocal::UseReciprocal));

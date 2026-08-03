@@ -4710,3 +4710,71 @@ pub fn exhaustive_large_type_gen_var_28() -> It<(Vec<Limb>, u64, i64, i64, usize
         .map(crate::test_util::generators::common::get_str_aux_inputs),
     )
 }
+
+// -- (Natural, Natural, PrimitiveUnsigned, RoundingMode) --
+
+// All `(Natural, Natural, u64, RoundingMode)` that are valid inputs to
+// `Natural::mul_shr_round`: when the `RoundingMode` is `Exact`, the shift is exact, decided by
+// the trailing-zeros identity.
+pub fn exhaustive_natural_natural_unsigned_rounding_mode_quadruple_gen_var_1()
+-> It<(Natural, Natural, u64, RoundingMode)> {
+    Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_small(
+                exhaustive_pairs_from_single(exhaustive_naturals()),
+                exhaustive_unsigneds(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&(((ref x, ref y), bits), rm)| mul_shr_round_valid(x, y, bits, rm))
+        .map(|(((x, y), bits), rm)| (x, y, bits, rm)),
+    )
+}
+
+pub(crate) fn mul_shr_round_valid(x: &Natural, y: &Natural, bits: u64, rm: RoundingMode) -> bool {
+    rm != RoundingMode::Exact
+        || *x == 0u32
+        || *y == 0u32
+        || x.trailing_zeros().unwrap() + y.trailing_zeros().unwrap() >= bits
+}
+
+// -- (Integer, Integer, PrimitiveUnsigned, RoundingMode) --
+
+// All `(Integer, Integer, u64, RoundingMode)` that are valid inputs to
+// `Integer::mul_shr_round`.
+pub fn exhaustive_integer_integer_unsigned_rounding_mode_quadruple_gen_var_1()
+-> It<(Integer, Integer, u64, RoundingMode)> {
+    Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_small(
+                exhaustive_pairs_from_single(exhaustive_integers()),
+                exhaustive_unsigneds(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&(((ref x, ref y), bits), rm)| {
+            mul_shr_round_valid(x.unsigned_abs_ref(), y.unsigned_abs_ref(), bits, rm)
+        })
+        .map(|(((x, y), bits), rm)| (x, y, bits, rm)),
+    )
+}
+
+// The short-product-dense variant: `bits` is derived from the operands' sizes so that most of
+// the product is discarded.
+pub fn exhaustive_natural_natural_unsigned_rounding_mode_quadruple_gen_var_2()
+-> It<(Natural, Natural, u64, RoundingMode)> {
+    Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_small(
+                exhaustive_pairs_from_single(exhaustive_naturals()),
+                exhaustive_unsigneds::<u64>(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .map(|(((x, y), offset), rm)| {
+            let bits = (x.significant_bits() + y.significant_bits()).saturating_sub(offset);
+            (x, y, bits, rm)
+        })
+        .filter(|(x, y, bits, rm)| mul_shr_round_valid(x, y, *bits, *rm)),
+    )
+}

@@ -13,28 +13,24 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::arithmetic::add::{
-    limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
-};
-use crate::natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
 use crate::natural::arithmetic::float_extras::{limbs_float_can_round, round_helper_raw};
 use crate::natural::arithmetic::float_square::{
     limbs_float_square_high, limbs_float_square_high_scratch_len,
 };
-use crate::natural::arithmetic::mul::{
-    limbs_mul_greater_to_out_basecase, limbs_mul_same_length_to_out,
-    limbs_mul_same_length_to_out_scratch_len, limbs_mul_to_out, limbs_mul_to_out_scratch_len,
+use crate::natural::arithmetic::mul::mul_high::{
+    limbs_mul_high_same_length, limbs_mul_high_same_length_scratch_len,
 };
+use crate::natural::arithmetic::mul::{limbs_mul_to_out, limbs_mul_to_out_scratch_len};
 use crate::natural::arithmetic::shl::limbs_slice_shl_in_place;
 use crate::natural::{
     LIMB_HIGH_BIT, LIMB_MASK, NOT_LIMB_HIGH_BIT, Natural, THRICE_WIDTH, TWICE_WIDTH, WIDTH_MINUS_1,
     bit_to_limb_count_ceiling, limb_to_bit_count,
 };
-use crate::platform::{DoubleLimb, Limb, MUL_FFT_THRESHOLD};
+use crate::platform::{DoubleLimb, Limb};
 use alloc::vec::Vec;
 use core::cmp::{
     Ordering::{self, *},
-    max, min,
+    min,
 };
 use malachite_base::num::arithmetic::traits::{
     CeilingLogBase2, OverflowingAddAssign, Parity, PowerOf2, Sign, WrappingAddAssign, XMulYToZZ,
@@ -611,113 +607,6 @@ fn mul_float_significands_same_prec_gt_2w_lt_3w(
     }
 }
 
-pub(crate) const MPFR_MULHIGH_TAB: [i8; 17] =
-    [-1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-
-// This is mpfr_mulhigh_n_basecase from mulders.c, MPFR 4.2.0.
-fn limbs_float_mul_high_same_length_basecase(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
-    let len = xs.len();
-    assert_eq!(ys.len(), len);
-    // We neglect xs[0..len - 2] * ys[0], which is less than B ^ len
-    let out = &mut out[len - 1..];
-    (out[1], out[0]) = Limb::x_mul_y_to_zz(*xs.last().unwrap(), ys[0]);
-    for (i, y) in ys.iter().enumerate() {
-        let i = i + 1;
-        // Here, we neglect xs[0..len - i - 2] * ys[i], which is less than B ^ len too
-        let (out_lo, out_hi) = out.split_at_mut(i);
-        out_hi[0] = limbs_slice_add_mul_limb_same_length_in_place_left(out_lo, &xs[len - i..], *y);
-        // In total, we neglect less than n * B ^ len, i.e., n ulps of out[len].
-    }
-}
-
-pub(crate) fn limbs_float_mul_high_same_length_scratch_len(len: usize) -> usize {
-    if len > MUL_FFT_THRESHOLD {
-        limbs_mul_same_length_to_out_scratch_len(len)
-    } else {
-        let k = MPFR_MULHIGH_TAB.get(len).map_or_else(
-            || 3 * (len >> 2),
-            |&m| if m == -1 { 0 } else { usize::wrapping_from(m) },
-        );
-        if k == 0 {
-            0
-        } else {
-            // The recursive case in `limbs_float_mul_high_same_length` reuses `scratch` for a full
-            // multiply of length `k` and two recursive mul-highs of length `l = len - k`, so the
-            // requirement is the max of those, not `scratch_len(len)`. Because Toom/FFT scratch
-            // requirements are not monotonic in the operand length, `scratch_len(len)` can be
-            // smaller than `scratch_len(k)` and under-size the buffer (mirrors the already- correct
-            // `limbs_float_square_high_scratch_len`).
-            let l = len - k;
-            max(
-                limbs_mul_same_length_to_out_scratch_len(k),
-                limbs_float_mul_high_same_length_scratch_len(l),
-            )
-        }
-    }
-}
-
-// Put in out[n..2 * len - 1] an approximation of the n high limbs of xs * ys. The error is less
-// than len ulps of out[len] (and the approximation is always less or equal to the truncated full
-// product).
-//
-// Implements Algorithm ShortMul from:
-//
-// [1] Short Division of Long Integers, David Harvey and Paul Zimmermann, Proceedings of the 20th
-// Symposium on Computer Arithmetic (ARITH-20), July 25-27, 2011, pages 7-14.
-//
-// This is mpfr_mulhigh_n from mulders.c, MPFR 4.2.0.
-pub(crate) fn limbs_float_mul_high_same_length(
-    out: &mut [Limb],
-    xs: &[Limb],
-    ys: &[Limb],
-    scratch: &mut [Limb],
-) {
-    let len = xs.len();
-    assert_eq!(ys.len(), len);
-    const LENGTH_VALID: bool = MPFR_MULHIGH_TAB.len() >= 8;
-    assert!(LENGTH_VALID); // so that 3 * (len / 4) > len / 2
-    let k = MPFR_MULHIGH_TAB.get(len).map_or_else(
-        || Some(3 * (len >> 2)),
-        |&m| {
-            if m == -1 {
-                None
-            } else {
-                Some(usize::wrapping_from(m))
-            }
-        },
-    );
-    assert!(k.is_none() || k == Some(0) || (k.unwrap() >= (len + 4) >> 1 && k.unwrap() < len));
-    if let Some(k) = k {
-        if k == 0 {
-            // basecase error < len ulps
-            limbs_float_mul_high_same_length_basecase(out, xs, ys);
-        } else if len > MUL_FFT_THRESHOLD {
-            // result is exact, no error
-            limbs_mul_same_length_to_out(out, xs, ys, scratch);
-        } else {
-            let l = len - k;
-            let out = &mut out[..len << 1];
-            let (out_lo, out_hi) = out.split_at_mut(l << 1);
-            let (ys_lo, ys_hi) = ys.split_at(l);
-            limbs_mul_same_length_to_out(out_hi, &xs[l..], ys_hi, scratch);
-            limbs_float_mul_high_same_length(out_lo, &xs[k..], ys_lo, scratch);
-            let out_hi = &mut out_hi[k - l - 1..k];
-            let mut carry = Limb::from(limbs_slice_add_same_length_in_place_left(
-                out_hi,
-                &out_lo[l - 1..],
-            ));
-            limbs_float_mul_high_same_length(out_lo, &xs[..l], &ys[k..], scratch);
-            if limbs_slice_add_same_length_in_place_left(out_hi, &out_lo[l - 1..]) {
-                carry += 1;
-            }
-            limbs_slice_add_limb_in_place(&mut out[len + l..], carry);
-        }
-    } else {
-        // result is exact, no error
-        limbs_mul_greater_to_out_basecase(out, xs, ys);
-    }
-}
-
 const MPFR_MUL_THRESHOLD: usize = 20;
 
 // x.limb_count() >= y.limb_count()
@@ -887,7 +776,7 @@ fn mul_float_significands_general(
                 if square {
                     limbs_float_square_high_scratch_len(len)
                 } else {
-                    limbs_float_mul_high_same_length_scratch_len(len)
+                    limbs_mul_high_same_length_scratch_len(len)
                 } + tmp_alloc
             ];
             let scratch: &mut [Limb];
@@ -895,7 +784,7 @@ fn mul_float_significands_general(
             if square {
                 limbs_float_square_high(&mut tmp[to + k - (len << 1)..], xs, scratch);
             } else {
-                limbs_float_mul_high_same_length(&mut tmp[to + k - (len << 1)..], xs, ys, scratch);
+                limbs_mul_high_same_length(&mut tmp[to + k - (len << 1)..], xs, ys, scratch);
             }
             // now tmp[k - len]..tmp[k - 1] contains an approximation of the `len` upper limbs of
             // the product, with tmp[k - 1] >= 2 ^ (Limb::WIDTH - 2)
@@ -999,8 +888,8 @@ mod float_mul_high_tests {
                 0x9abc_def0 ^ u64::wrapping_from(len).rotate_left(17),
             );
             let mut out = vec![0; len << 1];
-            let mut scratch = vec![0; limbs_float_mul_high_same_length_scratch_len(len)];
-            limbs_float_mul_high_same_length(&mut out, &xs, &ys, &mut scratch);
+            let mut scratch = vec![0; limbs_mul_high_same_length_scratch_len(len)];
+            limbs_mul_high_same_length(&mut out, &xs, &ys, &mut scratch);
 
             let mut full = vec![0; len << 1];
             let mut full_scratch = vec![0; limbs_mul_same_length_to_out_scratch_len(len)];

@@ -565,6 +565,11 @@ pub mod mod_sub;
 /// Multiplication of [`Natural`](super::Natural)s.
 pub mod mul;
 pub mod mul_add_mul;
+/// Implementations of [`MulShrRound`](malachite_base::num::arithmetic::traits::MulShrRound) and
+/// [`MulShrRoundAssign`](malachite_base::num::arithmetic::traits::MulShrRoundAssign), traits for
+/// multiplying two numbers and right-shifting the product with a specified rounding mode. When
+/// most of the product is discarded, a short product avoids computing the rest.
+pub mod mul_shr_round;
 pub mod mul_sub_mul;
 /// Negation of a [`Natural`](super::Natural), returning an [`Integer`](crate::integer::Integer).
 pub mod neg;

@@ -281,6 +281,30 @@ pub fn triple_natural_max_bit_bucketer<'a>(
         ),
     }
 }
+pub fn quadruple_1_2_integer_sum_bit_bucketer<'a, T, U>(
+    x_name: &str,
+    y_name: &str,
+) -> Bucketer<'a, (Integer, Integer, T, U)> {
+    Bucketer {
+        bucketing_function: &|(x, y, _, _)| {
+            usize::exact_from(x.significant_bits() + y.significant_bits())
+        },
+        bucketing_label: format!("{x_name}.significant_bits() + {y_name}.significant_bits()"),
+    }
+}
+
+pub fn quadruple_1_2_natural_sum_bit_bucketer<'a, T, U>(
+    x_name: &str,
+    y_name: &str,
+) -> Bucketer<'a, (Natural, Natural, T, U)> {
+    Bucketer {
+        bucketing_function: &|(x, y, _, _)| {
+            usize::exact_from(x.significant_bits() + y.significant_bits())
+        },
+        bucketing_label: format!("{x_name}.significant_bits() + {y_name}.significant_bits()"),
+    }
+}
+
 pub fn quadruple_natural_max_bit_bucketer<'a>(
     x_name: &'a str,
     y_name: &'a str,
