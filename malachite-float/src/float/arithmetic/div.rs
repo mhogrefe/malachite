@@ -28,7 +28,7 @@ use malachite_base::num::basic::traits::{
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{NotAssign, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
-use malachite_nz::natural::arithmetic::float_div::{
+use malachite_nz::natural::arithmetic::float::div::{
     div_float_significands_in_place, div_float_significands_in_place_ref,
     div_float_significands_ref_ref, div_float_significands_ref_val,
 };

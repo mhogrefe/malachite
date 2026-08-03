@@ -25,8 +25,8 @@ use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
-use malachite_nz::natural::arithmetic::float_extras::float_can_round;
-use malachite_nz::natural::arithmetic::float_sqrt::{
+use malachite_nz::natural::arithmetic::float::round::float_can_round;
+use malachite_nz::natural::arithmetic::float::sqrt::{
     sqrt_float_significand_in_place, sqrt_float_significand_ref,
 };
 use malachite_nz::platform::Limb;

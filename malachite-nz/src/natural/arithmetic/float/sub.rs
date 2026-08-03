@@ -14,7 +14,7 @@
 
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::arithmetic::add::limbs_slice_add_limb_in_place;
-use crate::natural::arithmetic::float_extras::{MPFR_EVEN_INEX, round_helper_even};
+use crate::natural::arithmetic::float::round::{MPFR_EVEN_INEX, round_helper_even};
 use crate::natural::arithmetic::is_power_of_2::limbs_is_power_of_2;
 use crate::natural::arithmetic::shl::limbs_slice_shl_in_place;
 use crate::natural::arithmetic::shr::limbs_shr_to_out;

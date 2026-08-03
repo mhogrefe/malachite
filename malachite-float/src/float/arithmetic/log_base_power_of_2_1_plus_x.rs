@@ -19,7 +19,7 @@ use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
-use malachite_nz::natural::arithmetic::float_extras::float_can_round;
+use malachite_nz::natural::arithmetic::float::round::float_can_round;
 use malachite_nz::platform::Limb;
 
 // The computation of log_base_power_of_2_1_plus_x(x, pow) is done by log_{2^pow}(1 + x) = log_2(1 +

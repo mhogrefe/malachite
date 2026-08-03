@@ -11,7 +11,7 @@ use core::cmp::Ordering;
 use malachite_base::num::arithmetic::traits::Reciprocal;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
-use malachite_nz::natural::arithmetic::float_extras::float_can_round;
+use malachite_nz::natural::arithmetic::float::round::float_can_round;
 use malachite_nz::platform::Limb;
 
 impl Float {

@@ -147,7 +147,7 @@ grammars genuinely conflict while the arithmetic underneath does not.
 - **The engine's parts are already ported.** `parsed_string_to_mpfr` needs `mpn_set_str`
   (`limbs_from_digits_small_base`), `mpfr_mpn_exp` (`limbs_float_exp`), `mpfr_round_p`
   (`round_helper_2`), and `mpfr_round_raw` (`round_helper_raw`) — all in
-  `malachite-nz/src/natural/arithmetic/float_extras.rs`. Watch the two live FIXMEs in `strtofr.c`:
+  `malachite-nz/src/natural/arithmetic/float/` (`exp.rs` and `round.rs`). Watch the two live FIXMEs in `strtofr.c`:
   bits dropped by `mpn_rshift` are not counted in the error analysis, and `MPFR_SADD_OVERFLOW` is
   called with bounds the macro does not support. Probe both deliberately in step 4.
 - **Precision comes from the string, and cannot be inferred from the digit count alone.**

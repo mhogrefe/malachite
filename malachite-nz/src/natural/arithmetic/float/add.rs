@@ -17,7 +17,7 @@ use crate::natural::arithmetic::add::{
     limbs_add_limb_to_out, limbs_add_same_length_to_out, limbs_add_to_out_aliased_2,
     limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
 };
-use crate::natural::arithmetic::float_add::RoundBit::*;
+use crate::natural::arithmetic::float::add::RoundBit::*;
 use crate::natural::arithmetic::is_power_of_2::limbs_is_power_of_2;
 use crate::natural::arithmetic::shr::{limbs_shr_to_out, limbs_slice_shr_in_place};
 use crate::natural::{

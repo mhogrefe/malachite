@@ -99,23 +99,7 @@ pub mod factorial;
 /// Fibonacci and Lucas numbers.
 pub mod fibonacci;
 #[cfg(feature = "float_helpers")]
-pub mod float_add;
-#[cfg(feature = "float_helpers")]
-pub mod float_div;
-#[cfg(feature = "float_helpers")]
-pub mod float_extras;
-#[cfg(feature = "float_helpers")]
-pub mod float_mul;
-#[cfg(feature = "float_helpers")]
-pub mod float_reciprocal;
-#[cfg(feature = "float_helpers")]
-pub mod float_reciprocal_sqrt;
-#[cfg(feature = "float_helpers")]
-pub mod float_sqrt;
-#[cfg(feature = "float_helpers")]
-pub mod float_square;
-#[cfg(feature = "float_helpers")]
-pub mod float_sub;
+pub mod float;
 /// Implementations of [`Gcd`](malachite_base::num::arithmetic::traits::Gcd) and
 /// [`GcdAssign`](malachite_base::num::arithmetic::traits::GcdAssign), traits for computing the GCD
 /// (greatest common divisor) of two numbers.

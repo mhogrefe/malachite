@@ -17,7 +17,7 @@ use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
-use malachite_nz::natural::arithmetic::float_extras::float_can_round;
+use malachite_nz::natural::arithmetic::float::round::float_can_round;
 
 // Steps `y` to the next `prec`-precision value away from zero, like `mpfr_nexttoinf` (note that
 // `Float::increment` is not suitable: it does not preserve precision when crossing a power of 2).

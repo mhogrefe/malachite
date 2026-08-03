@@ -16,7 +16,7 @@ use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
-use malachite_nz::natural::arithmetic::float_reciprocal::reciprocal_float_significand_ref;
+use malachite_nz::natural::arithmetic::float::reciprocal::reciprocal_float_significand_ref;
 
 impl Float {
     /// Takes the reciprocal of a [`Float`], rounding the result to the specified precision and with

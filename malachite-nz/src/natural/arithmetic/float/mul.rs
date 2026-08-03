@@ -13,8 +13,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::InnerNatural::{Large, Small};
-use crate::natural::arithmetic::float_extras::{limbs_float_can_round, round_helper_raw};
-use crate::natural::arithmetic::float_square::{
+use crate::natural::arithmetic::float::round::{limbs_float_can_round, round_helper_raw};
+use crate::natural::arithmetic::float::square::{
     limbs_float_square_high, limbs_float_square_high_scratch_len,
 };
 use crate::natural::arithmetic::mul::mul_high::{
@@ -854,9 +854,12 @@ fn mul_float_significands_general(
 }
 
 #[cfg(test)]
-mod float_mul_high_tests {
+mod mul_high_tests {
     use super::*;
     use crate::natural::Natural;
+    use crate::natural::arithmetic::mul::{
+        limbs_mul_same_length_to_out, limbs_mul_same_length_to_out_scratch_len,
+    };
 
     // Deterministically fill `xs` with a normalized significand (most significant bit set).
     fn fill(xs: &mut [Limb], mut seed: u64) {

@@ -27,7 +27,7 @@ use malachite_base::num::basic::traits::{NegativeZero, Zero as ZeroTrait};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{NotAssign, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
-use malachite_nz::natural::arithmetic::float_mul::{
+use malachite_nz::natural::arithmetic::float::mul::{
     mul_float_significands_in_place, mul_float_significands_in_place_ref,
     mul_float_significands_ref_ref,
 };

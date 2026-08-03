@@ -21,7 +21,7 @@ use crate::natural::arithmetic::add::{
     limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
 };
 use crate::natural::arithmetic::div_mod::{div_mod_by_preinversion, limbs_invert_limb};
-use crate::natural::arithmetic::float_div::{
+use crate::natural::arithmetic::float::div::{
     Cleanup, MPFR_DIV_THRESHOLD, limbs_div_helper, limbs_float_div_high,
     limbs_float_div_high_scratch_len,
 };

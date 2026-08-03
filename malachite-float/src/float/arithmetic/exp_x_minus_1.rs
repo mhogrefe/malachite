@@ -32,7 +32,7 @@ use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom, Saturatin
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::integer::Integer;
-use malachite_nz::natural::arithmetic::float_extras::float_can_round;
+use malachite_nz::natural::arithmetic::float::round::float_can_round;
 use malachite_nz::platform::{Limb, SignedLimb};
 use malachite_q::Rational;
 

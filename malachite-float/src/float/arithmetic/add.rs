@@ -27,12 +27,12 @@ use malachite_base::num::comparison::traits::{EqAbs, PartialOrdAbs};
 use malachite_base::num::conversion::traits::{ExactFrom, SaturatingFrom};
 use malachite_base::num::logic::traits::{NotAssign, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
-use malachite_nz::natural::arithmetic::float_add::{
+use malachite_nz::natural::arithmetic::float::add::{
     add_float_significands_in_place, add_float_significands_in_place_ref,
     add_float_significands_ref_ref,
 };
-use malachite_nz::natural::arithmetic::float_extras::float_can_round;
-use malachite_nz::natural::arithmetic::float_sub::{
+use malachite_nz::natural::arithmetic::float::round::float_can_round;
+use malachite_nz::natural::arithmetic::float::sub::{
     sub_float_significands_in_place, sub_float_significands_in_place_ref,
     sub_float_significands_ref_ref,
 };

@@ -32,7 +32,7 @@ pub(crate) fn register(runner: &mut Runner) {
     factorial::register(runner);
     fibonacci::register(runner);
     #[cfg(feature = "float_helpers")]
-    float_extras::register(runner);
+    float::register(runner);
     gcd::register(runner);
     is_power_of_2::register(runner);
     kronecker_symbol::register(runner);
@@ -113,7 +113,7 @@ mod extended_gcd;
 mod factorial;
 mod fibonacci;
 #[cfg(feature = "float_helpers")]
-mod float_extras;
+mod float;
 mod gcd;
 mod is_power_of_2;
 mod kronecker_symbol;

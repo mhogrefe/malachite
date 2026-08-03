@@ -46,7 +46,7 @@ use malachite_base::rounding_modes::RoundingMode::{
 };
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use malachite_nz::natural::arithmetic::float_extras::float_can_round;
+use malachite_nz::natural::arithmetic::float::round::float_can_round;
 use malachite_nz::platform::{Limb, SignedLimb};
 use malachite_q::Rational;
 

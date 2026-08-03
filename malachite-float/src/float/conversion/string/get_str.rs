@@ -25,7 +25,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::rounding_modes::RoundingMode::{self, Ceiling, Exact, Floor};
 use malachite_nz::natural::Natural;
-use malachite_nz::natural::arithmetic::float_extras::{limbs_get_str, limbs_get_str_power_of_2};
+use malachite_nz::natural::arithmetic::float::get_str::{limbs_get_str, limbs_get_str_power_of_2};
 
 // Returns `ceil(e * log2(beta) ^ ((-1) ^ i))`, or that plus 1. For `i == 0` it uses a 23-bit upper
 // approximation to `log(beta) / log(2)`; for `i == 1` a 77-bit upper approximation to `log(2) /

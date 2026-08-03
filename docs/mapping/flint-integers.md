@@ -826,8 +826,8 @@ multiply-shifts.
 | ✓ | `void fmpz_bin_uiui (fmpz_t f, ulong n, ulong k)` | [`BinomialCoefficient`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.BinomialCoefficient.html) |
 | ✗ | `void fmpz_rfac_ui (fmpz_t r, const fmpz_t x, ulong k)` | |
 | ✗ | `void fmpz_rfac_uiui (fmpz_t r, ulong x, ulong k)` | |
-| ✓ | `void fmpz_mul_tdiv_q_2exp (fmpz_t f, const fmpz_t g, const fmpz_t h, ulong exp)` | [`Mul`](https://doc.rust-lang.org/nightly/std/ops/trait.Mul.html), [`ShrRound`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ShrRound.html) |
-| ✓ | `void fmpz_mul_si_tdiv_q_2exp (fmpz_t f, const fmpz_t g, slong x, ulong exp)` | [`Mul`](https://doc.rust-lang.org/nightly/std/ops/trait.Mul.html), [`ShrRound`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ShrRound.html) |
+| ✓ | `void fmpz_mul_tdiv_q_2exp (fmpz_t f, const fmpz_t g, const fmpz_t h, ulong exp)` | [`MulShrRound`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.MulShrRound.html), [`MulShrRoundAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.MulShrRoundAssign.html) |
+| ✓ | `void fmpz_mul_si_tdiv_q_2exp (fmpz_t f, const fmpz_t g, slong x, ulong exp)` | [`MulShrRound`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.MulShrRound.html), [`MulShrRoundAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.MulShrRoundAssign.html) |
 
 **`fmpz_fac_ui`, `fmpz_fib_ui`, `fmpz_bin_uiui`.** `Natural::factorial(n)`,
 `Natural::fibonacci(n)`, and `Natural::binomial_coefficient(n, k)`. The wider families are
@@ -842,11 +842,16 @@ Malachite counterpart yet, at either operand size. In the meantime the identity
 $$x^{(k)} = \binom{x+k-1}{k} \, k!$$ spells it through `BinomialCoefficient` and `Factorial`,
 which handles a bignum `x` as well, since the binomial coefficient takes `Natural` arguments.
 
-**`fmpz_mul_tdiv_q_2exp`, `fmpz_mul_si_tdiv_q_2exp`.** `(&g * &h).shr_round(exp, Down).0`.
-These are not gaps: FLINT's implementation multiplies in full and then shifts, so the
-composition is the same work in the same order. The
-one detail to keep is the rounding mode: `tdiv` truncates toward zero, and a plain `>>` floors,
-so a negative product needs `shr_round` with `Down` rather than the operator.
+**`fmpz_mul_tdiv_q_2exp`, `fmpz_mul_si_tdiv_q_2exp`.** `(&g).mul_shr_round(&h, exp, Down).0`.
+`tdiv` truncates toward zero, which is Malachite's `Down`; the operation accepts any
+`RoundingMode`, and its second return value reports how the result compares with the exact
+quotient. The two implementations differ in shape: FLINT multiplies in full and then shifts,
+while `mul_shr_round` is fused — when the shift discards most of the product, only the
+surviving high part is computed, via a short product. Note that the rounding mode matters when
+composing by hand: a plain `>>` floors, so a negative product truncated toward zero needs
+`Down` explicitly. The `si` variant maps to the same trait with the multiplier spelled
+`Integer::from(x)`; a word-sized factor leaves nothing below the cut worth skipping, so that
+case does the same work as multiplying and shifting.
 
 ## [Greatest common divisor](https://flintlib.org/doc/fmpz.html#greatest-common-divisor) {#greatest-common-divisor}
 

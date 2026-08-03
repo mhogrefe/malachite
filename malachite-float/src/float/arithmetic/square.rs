@@ -16,7 +16,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
-use malachite_nz::natural::arithmetic::float_square::{
+use malachite_nz::natural::arithmetic::float::square::{
     square_float_significand_in_place, square_float_significand_ref,
 };
 

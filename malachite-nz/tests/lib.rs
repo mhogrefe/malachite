@@ -256,7 +256,10 @@ pub mod natural {
         pub mod factorial;
         pub mod fibonacci;
         #[cfg(feature = "float_helpers")]
-        pub mod float_extras;
+        pub mod float {
+            pub mod exp;
+            pub mod get_str;
+        }
         pub mod gcd;
         pub mod is_power_of_2;
         pub mod kronecker_symbol;

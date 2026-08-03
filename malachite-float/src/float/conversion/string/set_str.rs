@@ -20,7 +20,7 @@ use malachite_base::num::basic::traits::{Infinity, NegativeInfinity, NegativeZer
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::Natural;
-use malachite_nz::natural::arithmetic::float_extras::{SetStrResult, limbs_set_str};
+use malachite_nz::natural::arithmetic::float::set_str::{SetStrResult, limbs_set_str};
 
 // The value is larger in magnitude than any finite `Float` of precision `prec`.
 //

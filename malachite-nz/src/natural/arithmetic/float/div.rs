@@ -26,7 +26,7 @@ use crate::natural::arithmetic::div_mod::{
     limbs_div_mod_by_two_limb_normalized, limbs_div_mod_qs_to_out_rs_to_ns, limbs_invert_limb,
     limbs_two_limb_inverse_helper,
 };
-use crate::natural::arithmetic::float_extras::round_helper_2;
+use crate::natural::arithmetic::float::round::round_helper_2;
 use crate::natural::arithmetic::mul::mul_high::{
     limbs_mul_high_same_length, limbs_mul_high_same_length_scratch_len,
 };
