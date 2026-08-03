@@ -41,10 +41,10 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::LIMB_HIGH_BIT;
+use malachite_nz::natural::arithmetic::float::reciprocal_sqrt::limbs_reciprocal_sqrt;
 use malachite_nz::natural::arithmetic::float::round::{
     float_can_round, limbs_float_can_round, limbs_significand_slice_add_limb_in_place,
 };
-use malachite_nz::natural::arithmetic::float::reciprocal_sqrt::limbs_reciprocal_sqrt;
 use malachite_nz::natural::{Natural, bit_to_limb_count_ceiling, limb_to_bit_count};
 use malachite_nz::platform::Limb;
 use malachite_q::Rational;

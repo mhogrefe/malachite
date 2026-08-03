@@ -88,8 +88,8 @@ fn test_mul_shr_round_large() {
             test(&x, &y, bits, rm);
         }
     }
-    // The adversarial band: (2^k - 1)^2 = 2^(2k) - 2^(k + 1) + 1 has a long run of ones ending
-    // just below bit k + 1, so cuts inside that run force the fallback.
+    // The adversarial band: (2^k - 1)^2 = 2^(2k) - 2^(k + 1) + 1 has a long run of ones ending just
+    // below bit k + 1, so cuts inside that run force the fallback.
     let m = (Natural::ONE << 2000u32) - Natural::ONE;
     for bits in [1500, 1999, 2000, 2001, 2500, 3998, 3999, 4000] {
         for rm in [Down, Up, Nearest] {

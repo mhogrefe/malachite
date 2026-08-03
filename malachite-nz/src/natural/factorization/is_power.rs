@@ -55,6 +55,9 @@ fn get_perfect_power_natural(n: &Natural) -> Option<(Natural, u64)> {
             }
             let mut pow_p = 2u64;
             loop {
+                // This loop runs `multiplicity + 1` times, usually once or twice, and the divisor
+                // is a single limb, so precomputing division data would cost more than it saves.
+                #[cfg_attr(dylint_lib = "malachite_lints", allow(use_div_mod_precomputed))]
                 let (new_q, r) = (&q).div_mod(&prime);
                 if r == 0 {
                     q = new_q;
@@ -127,6 +130,9 @@ fn get_perfect_power_natural_bool(n: &Natural) -> bool {
             }
             let mut pow_p = 2u64;
             loop {
+                // This loop runs `multiplicity + 1` times, usually once or twice, and the divisor
+                // is a single limb, so precomputing division data would cost more than it saves.
+                #[cfg_attr(dylint_lib = "malachite_lints", allow(use_div_mod_precomputed))]
                 let (new_q, r) = (&q).div_mod(&prime);
                 if r == 0 {
                     q = new_q;

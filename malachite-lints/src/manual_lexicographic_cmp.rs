@@ -69,7 +69,9 @@ fn is_place(e: &Expr<'_>) -> bool {
         ExprKind::Path(_) | ExprKind::Lit(_) => true,
         ExprKind::Field(base, _) => is_place(base),
         ExprKind::Index(base, index, _) => is_place(base) && is_place(index),
-        ExprKind::Unary(UnOp::Deref | UnOp::Neg, inner) | ExprKind::Cast(inner, _) => is_place(inner),
+        ExprKind::Unary(UnOp::Deref | UnOp::Neg, inner) | ExprKind::Cast(inner, _) => {
+            is_place(inner)
+        }
         _ => false,
     }
 }
@@ -129,7 +131,10 @@ fn flat_chain<'tcx>(cx: &LateContext<'tcx>, e: &'tcx Expr<'tcx>) -> Option<Chain
     }
     let last = *ops.last()?;
     // Every element but the last is compared strictly, and all in the same direction.
-    if ops[..ops.len() - 1].iter().any(|&op| Some(op) != strict(last)) {
+    if ops[..ops.len() - 1]
+        .iter()
+        .any(|&op| Some(op) != strict(last))
+    {
         return None;
     }
     Some((last, a, b))
@@ -235,7 +240,10 @@ impl<'tcx> LateLintPass<'tcx> for ManualLexicographicCmp {
             cx,
             MANUAL_LEXICOGRAPHIC_CMP,
             expr.span,
-            format!("compare tuples instead of spelling out a lexicographic comparison of {} elements", a.len()),
+            format!(
+                "compare tuples instead of spelling out a lexicographic comparison of {} elements",
+                a.len()
+            ),
             None,
             format!("`{a_tuple} {op} {b_tuple}` is the same comparison"),
         );

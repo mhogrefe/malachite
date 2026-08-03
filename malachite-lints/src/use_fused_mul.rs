@@ -72,7 +72,6 @@ fn operator_form_is_worthwhile<'tcx>(cx: &LateContext<'tcx>, ty: Ty<'tcx>) -> bo
     crate::bignum_name(cx, ty).is_some()
 }
 
-
 // Whether any impl of the trait named by `path` has `ty` as its self type, ignoring references and
 // generic arguments.
 //
@@ -100,8 +99,6 @@ fn has_trait_impl<'tcx>(cx: &LateContext<'tcx>, ty: Ty<'tcx>, path: &str) -> boo
             })
         })
 }
-
-
 
 // How the addend of `x * y + a` relates to the product.
 enum Alias {
@@ -206,7 +203,8 @@ impl<'tcx> LateLintPass<'tcx> for UseFusedMul {
                 if as_mul(lhs).is_some() && as_mul(rhs).is_some() {
                     let fused = format!("mul_{name}_mul");
                     if !inside_own_definition(cx, expr, &fused)
-                        && has_trait_impl(cx, ty, &format!("{TRAIT_ROOT}::{}", camel(&fused))) {
+                        && has_trait_impl(cx, ty, &format!("{TRAIT_ROOT}::{}", camel(&fused)))
+                    {
                         span_lint(
                             cx,
                             USE_FUSED_MUL,
@@ -244,7 +242,11 @@ impl<'tcx> LateLintPass<'tcx> for UseFusedMul {
                                 format!(
                                     "the addend is also a factor: multiply by {} operand \
                                      instead, as in `x * (y {} 1)`",
-                                    if add { "an incremented" } else { "a decremented" },
+                                    if add {
+                                        "an incremented"
+                                    } else {
+                                        "a decremented"
+                                    },
                                     if add { "+" } else { "-" },
                                 ),
                             );
@@ -255,7 +257,7 @@ impl<'tcx> LateLintPass<'tcx> for UseFusedMul {
                 }
                 let fused = format!("{name}_mul");
                 if !inside_own_definition(cx, expr, &fused)
-                        && has_trait_impl(cx, ty, &format!("{TRAIT_ROOT}::{}", camel(&fused)))
+                    && has_trait_impl(cx, ty, &format!("{TRAIT_ROOT}::{}", camel(&fused)))
                 {
                     span_lint(
                         cx,
@@ -280,7 +282,8 @@ impl<'tcx> LateLintPass<'tcx> for UseFusedMul {
                 }
                 let fused = format!("{name}_mul_assign");
                 if !inside_own_definition(cx, expr, &fused)
-                        && has_trait_impl(cx, ty, &format!("{TRAIT_ROOT}::{}", camel(&fused))) {
+                    && has_trait_impl(cx, ty, &format!("{TRAIT_ROOT}::{}", camel(&fused)))
+                {
                     span_lint(
                         cx,
                         USE_FUSED_MUL,
@@ -299,28 +302,35 @@ impl<'tcx> LateLintPass<'tcx> for UseFusedMul {
                     _ => return,
                 };
                 let ty = operand_ty(cx, recv);
-                if !matches!(ty.kind(), rustc_middle::ty::Int(_) | rustc_middle::ty::Uint(_)) {
+                if !matches!(
+                    ty.kind(),
+                    rustc_middle::ty::Int(_) | rustc_middle::ty::Uint(_)
+                ) {
                     return;
                 }
                 // `x.wrapping_mul(y).wrapping_add(z.wrapping_mul(w))` is a `mul_add_mul`.
-                let verb = if name == "add" { "adding" } else { "subtracting" };
-                let (fused, advice) = if as_wrapping_mul(recv).is_some()
-                    && as_wrapping_mul(arg).is_some()
-                {
-                    (
-                        format!("wrapping_mul_{name}_mul"),
-                        format!("{verb} the products separately"),
-                    )
-                } else if as_wrapping_mul(arg).is_some() {
-                    (
-                        format!("wrapping_{name}_mul"),
-                        "forming the product separately".to_string(),
-                    )
+                let verb = if name == "add" {
+                    "adding"
                 } else {
-                    return;
+                    "subtracting"
                 };
+                let (fused, advice) =
+                    if as_wrapping_mul(recv).is_some() && as_wrapping_mul(arg).is_some() {
+                        (
+                            format!("wrapping_mul_{name}_mul"),
+                            format!("{verb} the products separately"),
+                        )
+                    } else if as_wrapping_mul(arg).is_some() {
+                        (
+                            format!("wrapping_{name}_mul"),
+                            "forming the product separately".to_string(),
+                        )
+                    } else {
+                        return;
+                    };
                 if !inside_own_definition(cx, expr, &fused)
-                        && has_trait_impl(cx, ty, &format!("{TRAIT_ROOT}::{}", camel(&fused))) {
+                    && has_trait_impl(cx, ty, &format!("{TRAIT_ROOT}::{}", camel(&fused)))
+                {
                     span_lint(
                         cx,
                         USE_FUSED_MUL,

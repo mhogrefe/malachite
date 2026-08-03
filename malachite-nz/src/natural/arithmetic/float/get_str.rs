@@ -12,26 +12,23 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::natural::arithmetic::div_mod::{limbs_div_limb_to_out_mod, limbs_div_mod_to_out};
 use crate::natural::arithmetic::float::exp::limbs_float_exp;
 use crate::natural::arithmetic::float::round::{
     MPFR_ROUND_FAILED, NEG_MPFR_ROUND_FAILED, round_helper_2, round_helper_raw,
     round_helper_raw_aliased,
 };
-use crate::natural::arithmetic::div_mod::{limbs_div_limb_to_out_mod, limbs_div_mod_to_out};
 use crate::natural::arithmetic::mul::limbs_mul;
 use crate::natural::arithmetic::shl::limbs_shl_to_out;
 use crate::natural::arithmetic::shr::{limbs_shr_to_out, limbs_slice_shr_in_place};
 use crate::natural::conversion::digits::general_digits::limbs_to_digits_small_base;
 use crate::natural::{
-    LIMB_HIGH_BIT, Natural, bit_to_limb_count_ceiling, bit_to_limb_count_floor,
-    limb_to_bit_count,
+    LIMB_HIGH_BIT, Natural, bit_to_limb_count_ceiling, bit_to_limb_count_floor, limb_to_bit_count,
 };
 use crate::platform::Limb;
 use alloc::vec::Vec;
 use core::cmp::Ordering::*;
-use malachite_base::num::arithmetic::traits::{
-    DivMod, Parity,
-};
+use malachite_base::num::arithmetic::traits::{DivMod, Parity};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{ExactFrom, PowerOf2Digits};
 use malachite_base::num::logic::traits::SignificantBits;

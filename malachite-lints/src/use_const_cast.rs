@@ -6,9 +6,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use clippy_utils::consts::ConstEvalCtxt;
 use clippy_utils::diagnostics::span_lint_and_help;
 use clippy_utils::source::snippet;
-use clippy_utils::consts::ConstEvalCtxt;
 use rustc_hir::def::{DefKind, Res};
 use rustc_hir::{Expr, ExprKind};
 use rustc_lint::{LateContext, LateLintPass};

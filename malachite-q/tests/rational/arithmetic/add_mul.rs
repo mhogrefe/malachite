@@ -92,8 +92,8 @@ fn add_mul_properties() {
 
         // the defining identity, and the unfused spelling the lint steers away from
         assert_eq!(&x + &y * &z, sum);
-        // the rejected split-cancellation variant agrees; see its documentation for why it is
-        // not the implementation
+        // the rejected split-cancellation variant agrees; see its documentation for why it is not
+        // the implementation
         let split = add_mul_split(&x, &y, &z);
         assert!(split.is_valid());
         assert_eq!(split, sum);

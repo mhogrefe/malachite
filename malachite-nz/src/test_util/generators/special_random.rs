@@ -8214,8 +8214,8 @@ pub fn special_random_natural_natural_unsigned_rounding_mode_quadruple_gen_var_1
 }
 
 // The short-product-dense variant: `bits` is close to the width of the product. Striped operands
-// exercise the determinacy check, since long runs of ones just below the cut are exactly what
-// makes the window indecisive.
+// exercise the determinacy check, since long runs of ones just below the cut are exactly what makes
+// the window indecisive.
 pub fn special_random_natural_natural_unsigned_rounding_mode_quadruple_gen_var_2(
     config: &GenConfig,
 ) -> It<(Natural, Natural, u64, RoundingMode)> {

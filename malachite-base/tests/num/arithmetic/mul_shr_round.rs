@@ -226,8 +226,8 @@ where
                 assert_eq!(o_nearest, if nearest == down { Less } else { Greater });
             }
 
-            // A multiplier of 1 turns the operation into shr_round. `Exact` must be skipped:
-            // the generator validated exactness for x * y, not for x alone.
+            // A multiplier of 1 turns the operation into shr_round. `Exact` must be skipped: the
+            // generator validated exactness for x * y, not for x alone.
             if rm != Exact {
                 assert_eq!(x.mul_shr_round(T::ONE, bits, rm), x.shr_round(bits, rm));
             }
@@ -266,8 +266,8 @@ where
                 assert_eq!(o == Equal, exact);
             }
 
-            // the rounding direction respects the mode; Down and Up are relative to zero, so
-            // their direction depends on the product's sign
+            // the rounding direction respects the mode; Down and Up are relative to zero, so their
+            // direction depends on the product's sign
             let negative = (x < T::ZERO) != (y < T::ZERO) && x != T::ZERO && y != T::ZERO;
             match rm {
                 Floor => assert_ne!(o, Greater),

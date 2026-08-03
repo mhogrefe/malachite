@@ -59,8 +59,9 @@ use alloc::vec::Vec;
 use core::cmp::{Ordering::*, min};
 use core::mem::swap;
 use malachite_base::num::arithmetic::traits::{
-    CeilingDivAssignNegMod, CeilingDivNegMod, DivAssignMod, DivAssignRem, DivMod, DivRem,
-    WrappingAddAssign, WrappingSub, WrappingSubAssign, WrappingSubMul, XMulYToZZ, XXDivModYToQR,
+    CeilingDivAssignNegMod, CeilingDivNegMod, DivAssignMod, DivAssignModPrecomputed, DivAssignRem,
+    DivMod, DivModPrecomputed, DivRem, WrappingAddAssign, WrappingSub, WrappingSubAssign,
+    WrappingSubMul, XMulYToZZ, XXDivModYToQR,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
@@ -530,6 +531,29 @@ crate_test_fn! {limbs_div_mod_by_two_limb_normalized(
     ns: &mut [Limb],
     ds: &[Limb]
 ) -> bool {
+    limbs_div_mod_by_two_limb_normalized_preinverted(
+        qs,
+        ns,
+        ds,
+        limbs_two_limb_inverse_helper(ds[1], ds[0]),
+    )
+}}
+
+// Like `limbs_div_mod_by_two_limb_normalized`, but takes the two-limb inverse of the divisor, which
+// must be the result of `limbs_two_limb_inverse_helper` applied to `ds[1]` and `ds[0]`.
+//
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
+fn limbs_div_mod_by_two_limb_normalized_preinverted(
+    qs: &mut [Limb],
+    ns: &mut [Limb],
+    ds: &[Limb],
+    d_inv: Limb,
+) -> bool {
     assert_eq!(ds.len(), 2);
     let n_len = ns.len();
     assert!(n_len >= 2);
@@ -544,7 +568,6 @@ crate_test_fn! {limbs_div_mod_by_two_limb_normalized(
         r.wrapping_sub_assign(d);
     }
     let (mut r_1, mut r_0) = r.split_in_half();
-    let d_inv = limbs_two_limb_inverse_helper(d_1, d_0);
     for (&n, q) in ns[..n_limit].iter().zip(qs[..n_limit].iter_mut()).rev() {
         let r;
         (*q, r) = limbs_div_mod_three_limb_by_two_limb(r_1, r_0, n, d_1, d_0, d_inv);
@@ -553,7 +576,7 @@ crate_test_fn! {limbs_div_mod_by_two_limb_normalized(
     ns[1] = r_1;
     ns[0] = r_0;
     highest_q
-}}
+}
 
 // Schoolbook division using the Möller-Granlund 3/2 division algorithm.
 //
@@ -1966,6 +1989,290 @@ crate_test_fn! {limbs_div_mod_qs_to_out_rs_to_ns(qs: &mut [Limb], ns: &mut [Limb
     }
 }}
 
+// Precomputed data speeding up divisions by a fixed `Natural` divisor. See
+// [`DivModPrecomputed`](malachite_base::num::arithmetic::traits::DivModPrecomputed). The divisor is
+// stored in normalized (shifted) form, along with the inverses that the division engines would
+// otherwise recompute on every call.
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+#[doc(hidden)]
+pub enum DivModData {
+    OneLimb {
+        // `limbs_invert_limb` applied to the normalized divisor
+        d_inv: Limb,
+        shift: u64,
+    },
+    TwoLimbs {
+        // the normalized divisor
+        ds: [Limb; 2],
+        // `limbs_two_limb_inverse_helper` applied to the normalized divisor
+        d_inv: Limb,
+        shift: u64,
+    },
+    ManyLimbs {
+        // the normalized divisor
+        ds: Vec<Limb>,
+        // `limbs_two_limb_inverse_helper` applied to the two highest normalized limbs
+        d_inv: Limb,
+        shift: u64,
+        // The full-length approximate inverse used by the Barrett engine, computed exactly as
+        // `limbs_div_mod_barrett_helper` computes it in its `d_len == i_len` branch. Only present
+        // when the divisor is large enough for the Barrett engine to be selectable.
+        inverse: Option<Vec<Limb>>,
+    },
+}
+
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `d.significant_bits()`.
+//
+// `is` and `scratch` stay separate allocations: `is` is returned as the stored inverse while
+// `scratch` is temporary, and merging them would either copy the inverse out or store it in an
+// oversized buffer for the context's lifetime.
+#[cfg_attr(dylint_lib = "malachite_lints", allow(adjacent_vec_allocations))]
+fn precompute_div_mod_data_helper(d: &Natural) -> DivModData {
+    match *d {
+        Natural::ZERO => panic!("division by zero"),
+        Natural(Small(d)) => {
+            let shift = LeadingZeros::leading_zeros(d);
+            DivModData::OneLimb {
+                d_inv: limbs_invert_limb::<DoubleLimb, Limb>(d << shift),
+                shift,
+            }
+        }
+        Natural(Large(ref ds)) => {
+            let d_len = ds.len();
+            let shift = LeadingZeros::leading_zeros(*ds.last().unwrap());
+            if d_len == 2 {
+                let ds_shifted = if shift == 0 {
+                    [ds[0], ds[1]]
+                } else {
+                    [ds[0] << shift, (ds[1] << shift) | (ds[0] >> (Limb::WIDTH - shift))]
+                };
+                DivModData::TwoLimbs {
+                    d_inv: limbs_two_limb_inverse_helper(ds_shifted[1], ds_shifted[0]),
+                    ds: ds_shifted,
+                    shift,
+                }
+            } else {
+                let ds_shifted = if shift == 0 {
+                    ds.clone()
+                } else {
+                    let mut ds_shifted = vec![0; d_len];
+                    limbs_shl_to_out(&mut ds_shifted, ds, shift);
+                    ds_shifted
+                };
+                let d_inv =
+                    limbs_two_limb_inverse_helper(ds_shifted[d_len - 1], ds_shifted[d_len - 2]);
+                // The Barrett branch of `limbs_div_mod_precomputed` is only reachable when `d_len
+                // >= DC_DIV_QR_THRESHOLD` and `limbs_div_mod_dc_condition` can return false, which
+                // requires `d_len >= MUPI_DIV_QR_THRESHOLD`; below that, the inverse would never be
+                // used.
+                let inverse = if d_len >= DC_DIV_QR_THRESHOLD && d_len >= MUPI_DIV_QR_THRESHOLD {
+                    let i_len_plus_1 = d_len + 1;
+                    let mut is = vec![0; i_len_plus_1];
+                    let mut scratch =
+                        vec![0; i_len_plus_1 + limbs_invert_approx_scratch_len(i_len_plus_1)];
+                    let (scratch_lo, scratch_hi) = scratch.split_at_mut(i_len_plus_1);
+                    let (scratch_first, scratch_lo_tail) = scratch_lo.split_first_mut().unwrap();
+                    scratch_lo_tail.copy_from_slice(&ds_shifted);
+                    *scratch_first = 1;
+                    limbs_invert_approx(&mut is, scratch_lo, scratch_hi);
+                    slice_move_left(&mut is, 1);
+                    is.truncate(d_len);
+                    Some(is)
+                } else {
+                    None
+                };
+                DivModData::ManyLimbs {
+                    ds: ds_shifted,
+                    d_inv,
+                    shift,
+                    inverse,
+                }
+            }
+        }
+    }
+}
+
+// Divides `ns` by the at-least-3-limb divisor described by `ds_shifted`, `d_inv`, `inverse`, and
+// `shift`, writing the `ns.len() - ds_shifted.len() + 1` limbs of the quotient to `qs` and the
+// `ds_shifted.len()` limbs of the remainder to `rs`. The dividend must be at least as large as the
+// divisor. The dispatch mirrors `limbs_div_mod_to_out`'s unbalanced flow, with the normalization,
+// the two-limb inverse, and the Barrett inverse taken from the precomputed data instead of being
+// recomputed.
+//
+// The Barrett engine is called with the high `i_len` limbs of the stored full-length inverse.
+// Supplying a longer-than-needed inverse and truncating its high limbs is exactly what
+// `limbs_div_mod_barrett_preinverted` itself does for its final short block (following
+// `mpn_preinv_mu_div_qr`), so this stays within the engine's tolerance for approximate inverses:
+// truncation only lowers the inverse, and the engine's correction loops absorb bounded
+// underestimates.
+//
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
+fn limbs_div_mod_precomputed(
+    qs: &mut [Limb],
+    rs: &mut [Limb],
+    ns: &[Limb],
+    ds_shifted: &[Limb],
+    d_inv: Limb,
+    inverse: Option<&Vec<Limb>>,
+    shift: u64,
+) {
+    let mut n_len = ns.len();
+    let d_len = ds_shifted.len();
+    assert!(d_len > 2);
+    assert!(n_len >= d_len);
+    qs[n_len - d_len] = 0; // zero high quotient limb
+    let mut ns_shifted_vec = vec![0; n_len + 1];
+    let ns_shifted = &mut ns_shifted_vec;
+    if shift == 0 {
+        ns_shifted[..n_len].copy_from_slice(ns);
+    } else {
+        let (ns_shifted_last, ns_shifted_init) = ns_shifted.split_last_mut().unwrap();
+        *ns_shifted_last = limbs_shl_to_out(ns_shifted_init, ns, shift);
+    }
+    // Conservative test for the quotient size, as in `limbs_div_mod_to_out`. The unshifted top
+    // divisor limb is recovered by undoing the normalization shift.
+    if ns[n_len - 1] >= (ds_shifted[d_len - 1] >> shift) {
+        n_len += 1;
+    }
+    let q_len = n_len - d_len;
+    let ns_shifted = &mut ns_shifted[..n_len];
+    if d_len < DC_DIV_QR_THRESHOLD || n_len < d_len + 3 {
+        limbs_div_mod_schoolbook(qs, ns_shifted, ds_shifted, d_inv);
+    } else if inverse.is_none() || limbs_div_mod_dc_condition(n_len, d_len) {
+        limbs_div_mod_divide_and_conquer(qs, ns_shifted, ds_shifted, d_inv);
+    } else {
+        let inverse = inverse.unwrap();
+        let i_len = limbs_div_mod_barrett_is_len(q_len, d_len);
+        let mut scratch = vec![0; limbs_div_mod_barrett_preinverse_scratch_len(d_len, i_len)];
+        // The conservative quotient-size test above guarantees that the top `d_len` limbs of the
+        // shifted dividend are less than the shifted divisor.
+        assert!(!limbs_div_mod_barrett_preinverted(
+            qs,
+            rs,
+            ns_shifted,
+            ds_shifted,
+            &inverse[d_len - i_len..],
+            &mut scratch,
+        ));
+        if shift != 0 {
+            limbs_slice_shr_in_place(rs, shift);
+        }
+        return;
+    }
+    let ns_shifted = &ns_shifted[..d_len];
+    if shift == 0 {
+        rs.copy_from_slice(ns_shifted);
+    } else {
+        limbs_shr_to_out(rs, ns_shifted, shift);
+    }
+}
+
+impl Natural {
+    // # Worst-case complexity
+    // $T(n) = O(n \log n \log\log n)$
+    //
+    // $M(n) = O(n \log n)$
+    //
+    // where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    //
+    // The quotient and remainder buffers stay separate allocations: both become owned `Natural`s,
+    // and merging them would force one to be copied out of the parent.
+    #[cfg_attr(dylint_lib = "malachite_lints", allow(adjacent_vec_allocations))]
+    fn div_mod_precomputed_ref_ref(&self, other: &Self, data: &DivModData) -> (Self, Self) {
+        if self < other {
+            return (Self::ZERO, self.clone());
+        }
+        match (self, other, data) {
+            (_, &Self(Small(d)), &DivModData::OneLimb { d_inv, shift }) => match self {
+                Self(Small(x)) => {
+                    // A single hardware division beats the preinverted path when the dividend is
+                    // one limb; FLINT's `fmpz_fdiv_qr_preinvn` likewise ignores the context when
+                    // both operands are small.
+                    let (q, r) = x.div_rem(d);
+                    (Self(Small(q)), Self(Small(r)))
+                }
+                Self(Large(xs)) => {
+                    let mut out = vec![0; xs.len()];
+                    let r = limbs_div_mod_extra(&mut out, 0, xs, d, d_inv, shift);
+                    (Self::from_owned_limbs_asc(out), Self(Small(r)))
+                }
+            },
+            (Self(Large(ns)), _, DivModData::TwoLimbs { ds, d_inv, shift }) => {
+                // This mirrors `limbs_div_mod_by_two_limb`, with the normalized divisor and its
+                // inverse taken from the precomputed data.
+                let n_len = ns.len();
+                let mut qs = vec![0; n_len - 1];
+                let shift = *shift;
+                let mut ns_shifted = vec![0; n_len + 1];
+                let carry = if shift == 0 {
+                    ns_shifted[..n_len].copy_from_slice(ns);
+                    0
+                } else {
+                    limbs_shl_to_out(&mut ns_shifted, ns, shift)
+                };
+                if carry == 0 {
+                    // always store n_len - 1 quotient limbs
+                    qs[n_len - 2] = Limb::from(limbs_div_mod_by_two_limb_normalized_preinverted(
+                        &mut qs,
+                        &mut ns_shifted[..n_len],
+                        ds,
+                        *d_inv,
+                    ));
+                } else {
+                    ns_shifted[n_len] = carry;
+                    limbs_div_mod_by_two_limb_normalized_preinverted(
+                        &mut qs,
+                        &mut ns_shifted,
+                        ds,
+                        *d_inv,
+                    );
+                }
+                let r = DoubleLimb::join_halves(ns_shifted[1], ns_shifted[0]) >> shift;
+                (Self::from_owned_limbs_asc(qs), Self::from(r))
+            }
+            (
+                Self(Large(ns)),
+                _,
+                DivModData::ManyLimbs {
+                    ds,
+                    d_inv,
+                    shift,
+                    inverse,
+                },
+            ) => {
+                let mut qs = vec![0; ns.len() - ds.len() + 1];
+                let mut rs = vec![0; ds.len()];
+                limbs_div_mod_precomputed(
+                    &mut qs,
+                    &mut rs,
+                    ns,
+                    ds,
+                    *d_inv,
+                    inverse.as_ref(),
+                    *shift,
+                );
+                (
+                    Self::from_owned_limbs_asc(qs),
+                    Self::from_owned_limbs_asc(rs),
+                )
+            }
+            // Inconsistent divisor and precomputed data. Since `self >= other`, a `Small` dividend
+            // implies a `Small` divisor, so the first arm covers all consistent `Small` cases.
+            _ => panic!("precomputed data does not match the divisor"),
+        }
+    }
+}
+
 impl Natural {
     fn div_mod_limb_ref(&self, other: Limb) -> (Self, Limb) {
         match (self, other) {
@@ -2404,6 +2711,250 @@ impl<'a> DivAssignMod<&'a Self> for Natural {
                 }
             }
         }
+    }
+}
+
+macro_rules! natural_precompute_div_mod_data_doc {
+    ($f:item) => {
+        /// Precomputes data for division by a [`Natural`]. See `div_mod_precomputed` and
+        /// [`div_assign_mod_precomputed`](
+        /// malachite_base::num::arithmetic::traits::DivAssignModPrecomputed).
+        ///
+        /// # Worst-case complexity
+        /// $T(n) = O(n \log n \log\log n)$
+        ///
+        /// $M(n) = O(n \log n)$
+        ///
+        /// where $T$ is time, $M$ is additional memory, and $n$ is `other.significant_bits()`.
+        ///
+        /// # Panics
+        /// Panics if `other` is zero.
+        $f
+    };
+}
+
+macro_rules! natural_div_mod_precomputed_doc {
+    ($f:item) => {
+        /// Divides a [`Natural`] by another [`Natural`], returning the quotient and remainder.
+        ///
+        /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq r < y$.
+        ///
+        /// Some precomputed data is provided; this speeds up computations involving several
+        /// divisions by the same divisor. The precomputed data should be obtained using
+        /// [`precompute_div_mod_data`](DivModPrecomputed::precompute_div_mod_data), applied to the
+        /// same divisor.
+        ///
+        /// $$
+        /// f(x, y) = \left ( \left \lfloor \frac{x}{y} \right \rfloor, \space
+        /// x - y\left \lfloor \frac{x}{y} \right \rfloor \right ).
+        /// $$
+        ///
+        /// # Worst-case complexity
+        /// $T(n) = O(n \log n \log\log n)$
+        ///
+        /// $M(n) = O(n \log n)$
+        ///
+        /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+        ///
+        /// # Panics
+        /// May panic if `data` was not computed from `other`.
+        ///
+        /// # Examples
+        /// ```
+        /// use core::str::FromStr;
+        /// use malachite_base::num::arithmetic::traits::DivModPrecomputed;
+        /// use malachite_base::strings::ToDebugString;
+        /// use malachite_nz::natural::Natural;
+        ///
+        /// let d = Natural::from(10u32);
+        /// let data = Natural::precompute_div_mod_data(&d);
+        /// // 2 * 10 + 3 = 23
+        /// assert_eq!(
+        ///     Natural::from(23u32).div_mod_precomputed(&d, &data).to_debug_string(),
+        ///     "(2, 3)"
+        /// );
+        /// // 12 * 10 + 5 = 125
+        /// assert_eq!(
+        ///     Natural::from(125u32).div_mod_precomputed(&d, &data).to_debug_string(),
+        ///     "(12, 5)"
+        /// );
+        ///
+        /// let d = Natural::from_str("1234567890987").unwrap();
+        /// let data = Natural::precompute_div_mod_data(&d);
+        /// // 810000006723 * 1234567890987 + 530068894399 = 1000000000000000000000000
+        /// assert_eq!(
+        ///     Natural::from_str("1000000000000000000000000")
+        ///         .unwrap()
+        ///         .div_mod_precomputed(&d, &data)
+        ///         .to_debug_string(),
+        ///     "(810000006723, 530068894399)"
+        /// );
+        /// ```
+        $f
+    };
+}
+
+impl DivModPrecomputed<Self> for Natural {
+    type DivOutput = Self;
+    type ModOutput = Self;
+    type Data = DivModData;
+
+    natural_precompute_div_mod_data_doc! {
+        #[inline]
+        fn precompute_div_mod_data(other: &Self) -> DivModData {
+            precompute_div_mod_data_helper(other)
+        }
+    }
+
+    natural_div_mod_precomputed_doc! {
+        #[inline]
+        fn div_mod_precomputed(self, other: Self, data: &DivModData) -> (Self, Self) {
+            self.div_mod_precomputed_ref_ref(&other, data)
+        }
+    }
+}
+
+impl<'a> DivModPrecomputed<&'a Self> for Natural {
+    type DivOutput = Self;
+    type ModOutput = Self;
+    type Data = DivModData;
+
+    natural_precompute_div_mod_data_doc! {
+        #[inline]
+        fn precompute_div_mod_data(other: &&'a Self) -> DivModData {
+            precompute_div_mod_data_helper(other)
+        }
+    }
+
+    natural_div_mod_precomputed_doc! {
+        #[inline]
+        fn div_mod_precomputed(self, other: &'a Self, data: &DivModData) -> (Self, Self) {
+            self.div_mod_precomputed_ref_ref(other, data)
+        }
+    }
+}
+
+impl DivModPrecomputed<Natural> for &Natural {
+    type DivOutput = Natural;
+    type ModOutput = Natural;
+    type Data = DivModData;
+
+    natural_precompute_div_mod_data_doc! {
+        #[inline]
+        fn precompute_div_mod_data(other: &Natural) -> DivModData {
+            precompute_div_mod_data_helper(other)
+        }
+    }
+
+    natural_div_mod_precomputed_doc! {
+        #[inline]
+        fn div_mod_precomputed(self, other: Natural, data: &DivModData) -> (Natural, Natural) {
+            self.div_mod_precomputed_ref_ref(&other, data)
+        }
+    }
+}
+
+impl DivModPrecomputed<&Natural> for &Natural {
+    type DivOutput = Natural;
+    type ModOutput = Natural;
+    type Data = DivModData;
+
+    natural_precompute_div_mod_data_doc! {
+        #[inline]
+        fn precompute_div_mod_data(other: &&Natural) -> DivModData {
+            precompute_div_mod_data_helper(other)
+        }
+    }
+
+    natural_div_mod_precomputed_doc! {
+        #[inline]
+        fn div_mod_precomputed(self, other: &Natural, data: &DivModData) -> (Natural, Natural) {
+            self.div_mod_precomputed_ref_ref(other, data)
+        }
+    }
+}
+
+impl DivAssignModPrecomputed<Self> for Natural {
+    /// Divides a [`Natural`] by another [`Natural`] in place, returning the remainder.
+    ///
+    /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq r < y$.
+    ///
+    /// Some precomputed data is provided; this speeds up computations involving several divisions
+    /// by the same divisor. The precomputed data should be obtained using
+    /// [`precompute_div_mod_data`](DivModPrecomputed::precompute_div_mod_data), applied to the same
+    /// divisor.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Panics
+    /// May panic if `data` was not computed from `other`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::{
+    ///     DivAssignModPrecomputed, DivModPrecomputed,
+    /// };
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let d = Natural::from(10u32);
+    /// let data = Natural::precompute_div_mod_data(&d);
+    /// // 2 * 10 + 3 = 23
+    /// let mut x = Natural::from(23u32);
+    /// assert_eq!(x.div_assign_mod_precomputed(d, &data), 3);
+    /// assert_eq!(x, 2);
+    /// ```
+    #[inline]
+    fn div_assign_mod_precomputed(&mut self, other: Self, data: &DivModData) -> Self {
+        let (q, r) = self.div_mod_precomputed_ref_ref(&other, data);
+        *self = q;
+        r
+    }
+}
+
+impl<'a> DivAssignModPrecomputed<&'a Self> for Natural {
+    /// Divides a [`Natural`] by another [`Natural`] in place, returning the remainder.
+    ///
+    /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq r < y$.
+    ///
+    /// Some precomputed data is provided; this speeds up computations involving several divisions
+    /// by the same divisor. The precomputed data should be obtained using
+    /// [`precompute_div_mod_data`](DivModPrecomputed::precompute_div_mod_data), applied to the same
+    /// divisor.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Panics
+    /// May panic if `data` was not computed from `other`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::{
+    ///     DivAssignModPrecomputed, DivModPrecomputed,
+    /// };
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let d = Natural::from(10u32);
+    /// let data = Natural::precompute_div_mod_data(&d);
+    /// // 2 * 10 + 3 = 23
+    /// let mut x = Natural::from(23u32);
+    /// assert_eq!(x.div_assign_mod_precomputed(&d, &data), 3);
+    /// assert_eq!(x, 2);
+    /// ```
+    #[inline]
+    fn div_assign_mod_precomputed(&mut self, other: &'a Self, data: &DivModData) -> Self {
+        let (q, r) = self.div_mod_precomputed_ref_ref(other, data);
+        *self = q;
+        r
     }
 }
 

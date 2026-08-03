@@ -49,6 +49,7 @@ mod use_cmp_double;
 mod use_const_binding;
 mod use_const_block;
 mod use_const_cast;
+mod use_div_mod_precomputed;
 mod use_divisible_by;
 mod use_exact_from;
 mod use_fused_mul;
@@ -424,6 +425,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         use_const_binding::USE_CONST_BINDING,
         use_const_block::USE_CONST_BLOCK,
         use_const_cast::USE_CONST_CAST,
+        use_div_mod_precomputed::USE_DIV_MOD_PRECOMPUTED,
         use_divisible_by::USE_DIVISIBLE_BY,
         use_exact_from::USE_EXACT_FROM,
         use_fused_mul::USE_FUSED_MUL,
@@ -478,8 +480,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         .register_late_pass(|_| Box::new(runtime_literal_conversion::RuntimeLiteralConversion));
     lint_store.register_late_pass(|_| Box::new(shift_of_one::ShiftOfOne));
     lint_store.register_late_pass(|_| Box::new(clone_with_ref_variant::CloneWithRefVariant));
-    lint_store
-        .register_early_pass(|| Box::new(collapse_adjacent_imports::CollapseAdjacentImports));
+    lint_store.register_early_pass(|| Box::new(collapse_adjacent_imports::CollapseAdjacentImports));
     lint_store.register_late_pass(|_| Box::new(use_assign_variant::UseAssignVariant));
     lint_store.register_late_pass(|_| Box::new(use_checked_log_base_2::UseCheckedLogBase2));
     lint_store.register_late_pass(|_| Box::new(use_cmp_double::UseCmpDouble));
@@ -489,6 +490,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
     lint_store.register_late_pass(|_| Box::new(use_divisible_by::UseDivisibleBy));
     lint_store.register_late_pass(|_| Box::new(use_exact_from::UseExactFrom));
     lint_store.register_late_pass(|_| Box::new(use_fused_mul::UseFusedMul));
+    lint_store.register_late_pass(|_| Box::new(use_div_mod_precomputed::UseDivModPrecomputed));
     lint_store.register_late_pass(|_| Box::new(use_mul_shr_round::UseMulShrRound));
     lint_store.register_late_pass(|_| Box::new(use_named_constant::UseNamedConstant));
     lint_store.register_late_pass(|_| Box::new(use_parity::UseParity));

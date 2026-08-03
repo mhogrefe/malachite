@@ -14,8 +14,7 @@
 // Mulders' short product: an approximation of the high half of a product, computed in roughly half
 // the work of the full product at basecase sizes. Ported from MPFR's mulders.c as part of the
 // `Float` multiplication port, and moved here, outside the `float_helpers` gate, because
-// `mul_shr_round` uses it too. The complementary low-half kernel is in
-// [`mul_low`](super::mul_low).
+// `mul_shr_round` uses it too. The complementary low-half kernel is in [`mul_low`](super::mul_low).
 
 use crate::natural::arithmetic::add::{
     limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
@@ -41,11 +40,11 @@ fn limbs_mul_high_same_length_basecase(out: &mut [Limb], xs: &[Limb], ys: &[Limb
     let out = &mut out[len - 1..];
     (out[1], out[0]) = Limb::x_mul_y_to_zz(*xs.last().unwrap(), ys[0]);
     // The loop starts at ys[1]: the initial statement is ys[0]'s entire surviving row, and
-    // repeating it would push the approximation above the true product, breaking the promise
-    // that it never exceeds the truncated full product. (An earlier version of this port did
-    // repeat it, adding the low limb of xs[len - 1] * ys[0] a second time. The `Float` callers
-    // absorbed that overshoot inside their symmetric rounding budget, but one-sided consumers
-    // like `mul_shr_round` cannot.)
+    // repeating it would push the approximation above the true product, breaking the promise that
+    // it never exceeds the truncated full product. (An earlier version of this port did repeat it,
+    // adding the low limb of xs[len - 1] * ys[0] a second time. The `Float` callers absorbed that
+    // overshoot inside their symmetric rounding budget, but one-sided consumers like
+    // `mul_shr_round` cannot.)
     for (i, y) in ys.iter().enumerate().skip(1) {
         // Here, we neglect xs[0..len - i - 2] * ys[i], which is less than B ^ len too
         let (out_lo, out_hi) = out.split_at_mut(i + 1);

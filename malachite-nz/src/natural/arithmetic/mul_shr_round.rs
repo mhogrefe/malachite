@@ -31,10 +31,10 @@ use malachite_base::rounding_modes::RoundingMode::{self, *};
 // below the half-ulp position, against an error of at most 64 bits' worth.
 const MUL_SHR_ROUND_GUARD: u64 = 66;
 
-// Below this many limbs of product, the short-product window's constant costs -- its allocation
-// and the `Natural` arithmetic of the determinacy check -- outweigh what it saves, and the full
-// product is faster. Measured crossover on this machine: mid-size inputs were 10-20% slower
-// through the window at 15-27 limbs and 50% faster by 41.
+// Below this many limbs of product, the short-product window's constant costs -- its allocation and
+// the `Natural` arithmetic of the determinacy check -- outweigh what it saves, and the full product
+// is faster. Measured crossover on this machine: mid-size inputs were 10-20% slower through the
+// window at 15-27 limbs and 50% faster by 41.
 const MUL_SHR_ROUND_SHORT_THRESHOLD: usize = 30;
 
 // The top `l` limbs of a `Natural` known to have more than `l` limbs.
@@ -50,21 +50,21 @@ fn top_limbs(x: &Natural, l: usize) -> &[Limb] {
 //
 // The point of fusing is to avoid the full product when most of it is discarded. Three regimes:
 //
-// - If the shift is exact -- decidable up front from the factors' trailing zeros, since
-//   $\nu_2(xy) = \nu_2(x) + \nu_2(y)$ -- nothing is really discarded, and the result is the full
-//   product of the operands with their trailing zeros removed. No short product can help here,
-//   because every bit of both operands ends up in the result.
+// - If the shift is exact -- decidable up front from the factors' trailing zeros, since $\nu_2(xy)
+//   = \nu_2(x) + \nu_2(y)$ -- nothing is really discarded, and the result is the full product of
+//   the operands with their trailing zeros removed. No short product can help here, because every
+//   bit of both operands ends up in the result.
 //
-// - If the discarded part is small, the full product plus a shift is within a constant of
-//   optimal, and that is what happens.
+// - If the discarded part is small, the full product plus a shift is within a constant of optimal,
+//   and that is what happens.
 //
-// - Otherwise both operands are truncated to their top `l` limbs, sized so that the kept bits
-//   plus a guard band fit in the top half of a `2l`-limb window, and Mulders' short product
-//   approximates that window from below with error less than `l + 2` ulps. If the guard band is
-//   not within the error of carrying -- checked exactly -- the kept bits and the half-ulp bit
-//   are exact, and the sticky bits below come from the trailing-zeros identity, so every rounding
-//   mode resolves. The window fails to decide only when the product's bits just below the cut
-//   are nearly all ones, in which case the exact product is computed after all, Ziv-style.
+// - Otherwise both operands are truncated to their top `l` limbs, sized so that the kept bits plus
+//   a guard band fit in the top half of a `2l`-limb window, and Mulders' short product approximates
+//   that window from below with error less than `l + 2` ulps. If the guard band is not within the
+//   error of carrying -- checked exactly -- the kept bits and the half-ulp bit are exact, and the
+//   sticky bits below come from the trailing-zeros identity, so every rounding mode resolves. The
+//   window fails to decide only when the product's bits just below the cut are nearly all ones, in
+//   which case the exact product is computed after all, Ziv-style.
 crate_test_fn! {mul_shr_round_ref_ref(
     x: &Natural,
     y: &Natural,
@@ -102,10 +102,10 @@ crate_test_fn! {mul_shr_round_ref_ref(
                     // The product is below 2^(bits - 1), so the value is below one half.
                     (Natural::ZERO, Less)
                 } else {
-                    // The product's top bit may or may not reach 2^(bits - 1); this corner is
-                    // rare enough that the exact product settles it. The product is at least
-                    // 2^(bits - 1) iff it has at least `bits` significant bits, and equals it --
-                    // a half, rounding to the even neighbor, 0 -- iff it is that power of 2.
+                    // The product's top bit may or may not reach 2^(bits - 1); this corner is rare
+                    // enough that the exact product settles it. The product is at least 2^(bits -
+                    // 1) iff it has at least `bits` significant bits, and equals it -- a half,
+                    // rounding to the even neighbor, 0 -- iff it is that power of 2.
                     let p = x * y;
                     if p.significant_bits() < bits || p.checked_log_base_2() == Some(bits - 1) {
                         (Natural::ZERO, Less)
@@ -121,14 +121,14 @@ crate_test_fn! {mul_shr_round_ref_ref(
     let d = total_limb_bits - bits;
     let l = usize::exact_from((d + MUL_SHR_ROUND_GUARD).div_ceil(Limb::WIDTH));
     if n + m < MUL_SHR_ROUND_SHORT_THRESHOLD || l >= min(n, m) {
-        // Truncation would discard nothing (or the shorter operand is smaller than the window),
-        // so the sub-cut triangle is small and the full product is the right tool.
+        // Truncation would discard nothing (or the shorter operand is smaller than the window), so
+        // the sub-cut triangle is small and the full product is the right tool.
         return (x * y).shr_round(bits, rm);
     }
     // The short-product attempt. The window is the product of the operands' top `l` limbs: `2l`
     // limbs whose top half approximates the top of the full product from below, with error less
-    // than `l + 2` ulps of the bottom valid limb (`l` from Mulders' neglected triangle, 2 from
-    // the operands' discarded low limbs).
+    // than `l + 2` ulps of the bottom valid limb (`l` from Mulders' neglected triangle, 2 from the
+    // operands' discarded low limbs).
     let xs = top_limbs(x, l);
     let ys = top_limbs(y, l);
     let two_l = l << 1;
@@ -138,8 +138,8 @@ crate_test_fn! {mul_shr_round_ref_ref(
     let s_top = Natural::from_limbs_asc(&out[l..]);
     // The cut, in the coordinates of the window's top half.
     let c = (u64::exact_from(l) << Limb::LOG_WIDTH) - d;
-    // The kept bits and the half-ulp bit are exact iff adding the error bound cannot carry past
-    // the half-ulp position.
+    // The kept bits and the half-ulp bit are exact iff adding the error bound cannot carry past the
+    // half-ulp position.
     let band = (&s_top).mod_power_of_2(c - 1);
     // `v < 2^k` is `v.significant_bits() <= k`, with no power materialized.
     if (band + Natural::from(u64::exact_from(l) + 4)).significant_bits() < c {
@@ -162,8 +162,8 @@ crate_test_fn! {mul_shr_round_ref_ref(
             Exact => unreachable!(),
         }
     } else {
-        // The bits just below the cut are nearly all ones, and the window cannot tell whether
-        // they carry. Fall back to the exact product.
+        // The bits just below the cut are nearly all ones, and the window cannot tell whether they
+        // carry. Fall back to the exact product.
         (x * y).shr_round(bits, rm)
     }
 }}
@@ -173,15 +173,15 @@ impl MulShrRound<Natural, u64> for Natural {
 
     /// Multiplies two [`Natural`]s and right-shifts the product (divides it by a power of 2),
     /// rounding according to a specified rounding mode, taking both [`Natural`]s by value. An
-    /// [`Ordering`] is also returned, indicating whether the returned value is less than, equal
-    /// to, or greater than the exact value.
+    /// [`Ordering`] is also returned, indicating whether the returned value is less than, equal to,
+    /// or greater than the exact value.
     ///
-    /// When most of the product is discarded, the product's low portion is never computed: a
-    /// short product determines the surviving bits at roughly half the cost of a full
-    /// multiplication. The result is always exactly the rounding of $xy/2^k$.
+    /// When most of the product is discarded, the product's low portion is never computed: a short
+    /// product determines the surviving bits at roughly half the cost of a full multiplication. The
+    /// result is always exactly the rounding of $xy/2^k$.
     ///
-    /// $f(x, y, k, \mathrm{Down}) = f(x, y, k, \mathrm{Floor}) = \lfloor xy/2^k \rfloor$, and
-    /// $f(x, y, k, \mathrm{Up}) = f(x, y, k, \mathrm{Ceiling}) = \lceil xy/2^k \rceil$;
+    /// $f(x, y, k, \mathrm{Down}) = f(x, y, k, \mathrm{Floor}) = \lfloor xy/2^k \rfloor$, and $f(x,
+    /// y, k, \mathrm{Up}) = f(x, y, k, \mathrm{Ceiling}) = \lceil xy/2^k \rceil$;
     /// $\mathrm{Nearest}$ rounds to the closer integer, breaking ties toward the even one.
     ///
     /// # Worst-case complexity
@@ -300,8 +300,8 @@ impl MulShrRound<&Natural, u64> for &Natural {
 
     /// Multiplies two [`Natural`]s and right-shifts the product (divides it by a power of 2),
     /// rounding according to a specified rounding mode, taking both [`Natural`]s by reference. An
-    /// [`Ordering`] is also returned, indicating whether the returned value is less than, equal
-    /// to, or greater than the exact value.
+    /// [`Ordering`] is also returned, indicating whether the returned value is less than, equal to,
+    /// or greater than the exact value.
     ///
     /// See the by-value documentation for details.
     ///
@@ -340,8 +340,8 @@ impl MulShrRound<&Natural, u64> for &Natural {
 impl MulShrRoundAssign<Natural, u64> for Natural {
     /// Multiplies two [`Natural`]s and right-shifts the product (divides it by a power of 2) in
     /// place, rounding according to a specified rounding mode, taking the [`Natural`] on the
-    /// right-hand side by value. An [`Ordering`] is returned, indicating whether the assigned
-    /// value is less than, equal to, or greater than the exact value.
+    /// right-hand side by value. An [`Ordering`] is returned, indicating whether the assigned value
+    /// is less than, equal to, or greater than the exact value.
     ///
     /// See the [`MulShrRound`] documentation for details.
     ///

@@ -7,10 +7,13 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer::Integer;
+use crate::natural::Natural;
+use crate::natural::arithmetic::div_mod::DivModData;
 use malachite_base::num::arithmetic::traits::{
     CeilingDivAssignMod, CeilingDivAssignNegMod, CeilingDivMod, CeilingDivNegMod, DivAssignMod,
-    DivAssignRem, DivMod, DivRem,
+    DivAssignModPrecomputed, DivAssignRem, DivMod, DivModPrecomputed, DivRem,
 };
+use malachite_base::num::basic::traits::One;
 
 impl DivMod<Self> for Integer {
     type DivOutput = Self;
@@ -435,6 +438,284 @@ impl DivAssignMod<&Self> for Integer {
             r
         };
         Self::from_sign_and_abs(other.sign, r)
+    }
+}
+
+// # Worst-case complexity
+// $T(n) = O(n \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `x.significant_bits()`.
+fn div_mod_precomputed_integers(
+    x: &Integer,
+    other: &Integer,
+    data: &DivModData,
+) -> (Integer, Integer) {
+    let q_sign = x.sign == other.sign;
+    let (mut q, mut r) = (&x.abs).div_mod_precomputed(&other.abs, data);
+    if !q_sign && r != 0 {
+        // The floor of the negative quotient is one less than the negated floor of the positive
+        // quotient, and the remainder is adjusted to have the divisor's sign.
+        q += Natural::ONE;
+        r = &other.abs - r;
+    }
+    (
+        Integer::from_sign_and_abs(q_sign, q),
+        Integer::from_sign_and_abs(other.sign, r),
+    )
+}
+
+macro_rules! integer_precompute_div_mod_data_doc {
+    ($f:item) => {
+        /// Precomputes data for division by an [`Integer`]. See `div_mod_precomputed` and
+        /// [`div_assign_mod_precomputed`](
+        /// malachite_base::num::arithmetic::traits::DivAssignModPrecomputed).
+        ///
+        /// The data depends only on the absolute value of the divisor.
+        ///
+        /// # Worst-case complexity
+        /// $T(n) = O(n \log n \log\log n)$
+        ///
+        /// $M(n) = O(n \log n)$
+        ///
+        /// where $T$ is time, $M$ is additional memory, and $n$ is `other.significant_bits()`.
+        ///
+        /// # Panics
+        /// Panics if `other` is zero.
+        $f
+    };
+}
+
+macro_rules! integer_div_mod_precomputed_doc {
+    ($f:item) => {
+        /// Divides an [`Integer`] by another [`Integer`], returning the quotient and remainder. The
+        /// quotient is rounded towards negative infinity, and the remainder has the same sign as
+        /// the second [`Integer`].
+        ///
+        /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq |r| < |y|$.
+        ///
+        /// Some precomputed data is provided; this speeds up computations involving several
+        /// divisions by the same divisor. The precomputed data should be obtained using
+        /// [`precompute_div_mod_data`](DivModPrecomputed::precompute_div_mod_data), applied to the
+        /// same divisor or to its negative.
+        ///
+        /// $$
+        /// f(x, y) = \left ( \left \lfloor \frac{x}{y} \right \rfloor, \space
+        /// x - y\left \lfloor \frac{x}{y} \right \rfloor \right ).
+        /// $$
+        ///
+        /// # Worst-case complexity
+        /// $T(n) = O(n \log n \log\log n)$
+        ///
+        /// $M(n) = O(n \log n)$
+        ///
+        /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+        ///
+        /// # Panics
+        /// May panic if `data` was not computed from `other` or its negative.
+        ///
+        /// # Examples
+        /// ```
+        /// use malachite_base::num::arithmetic::traits::DivModPrecomputed;
+        /// use malachite_base::strings::ToDebugString;
+        /// use malachite_nz::integer::Integer;
+        ///
+        /// let d = Integer::from(10);
+        /// let data = Integer::precompute_div_mod_data(&d);
+        /// // 2 * 10 + 3 = 23
+        /// assert_eq!(
+        ///     Integer::from(23).div_mod_precomputed(&d, &data).to_debug_string(),
+        ///     "(2, 3)"
+        /// );
+        /// // -3 * 10 + 7 = -23
+        /// assert_eq!(
+        ///     Integer::from(-23).div_mod_precomputed(&d, &data).to_debug_string(),
+        ///     "(-3, 7)"
+        /// );
+        ///
+        /// let d = Integer::from(-10);
+        /// let data = Integer::precompute_div_mod_data(&d);
+        /// // -3 * -10 + -7 = 23
+        /// assert_eq!(
+        ///     Integer::from(23).div_mod_precomputed(&d, &data).to_debug_string(),
+        ///     "(-3, -7)"
+        /// );
+        /// // 2 * -10 + -3 = -23
+        /// assert_eq!(
+        ///     Integer::from(-23).div_mod_precomputed(&d, &data).to_debug_string(),
+        ///     "(2, -3)"
+        /// );
+        /// ```
+        $f
+    };
+}
+
+impl DivModPrecomputed<Self> for Integer {
+    type DivOutput = Self;
+    type ModOutput = Self;
+    type Data = DivModData;
+
+    integer_precompute_div_mod_data_doc! {
+        #[inline]
+        fn precompute_div_mod_data(other: &Self) -> DivModData {
+            Natural::precompute_div_mod_data(&other.abs)
+        }
+    }
+
+    integer_div_mod_precomputed_doc! {
+        #[inline]
+        fn div_mod_precomputed(self, other: Self, data: &DivModData) -> (Self, Self) {
+            div_mod_precomputed_integers(&self, &other, data)
+        }
+    }
+}
+
+impl DivModPrecomputed<&Self> for Integer {
+    type DivOutput = Self;
+    type ModOutput = Self;
+    type Data = DivModData;
+
+    integer_precompute_div_mod_data_doc! {
+        #[inline]
+        fn precompute_div_mod_data(other: &&Self) -> DivModData {
+            Natural::precompute_div_mod_data(&other.abs)
+        }
+    }
+
+    integer_div_mod_precomputed_doc! {
+        #[inline]
+        fn div_mod_precomputed(self, other: &Self, data: &DivModData) -> (Self, Self) {
+            div_mod_precomputed_integers(&self, other, data)
+        }
+    }
+}
+
+impl DivModPrecomputed<Integer> for &Integer {
+    type DivOutput = Integer;
+    type ModOutput = Integer;
+    type Data = DivModData;
+
+    integer_precompute_div_mod_data_doc! {
+        #[inline]
+        fn precompute_div_mod_data(other: &Integer) -> DivModData {
+            Natural::precompute_div_mod_data(&other.abs)
+        }
+    }
+
+    integer_div_mod_precomputed_doc! {
+        #[inline]
+        fn div_mod_precomputed(self, other: Integer, data: &DivModData) -> (Integer, Integer) {
+            div_mod_precomputed_integers(self, &other, data)
+        }
+    }
+}
+
+impl DivModPrecomputed<&Integer> for &Integer {
+    type DivOutput = Integer;
+    type ModOutput = Integer;
+    type Data = DivModData;
+
+    integer_precompute_div_mod_data_doc! {
+        #[inline]
+        fn precompute_div_mod_data(other: &&Integer) -> DivModData {
+            Natural::precompute_div_mod_data(&other.abs)
+        }
+    }
+
+    integer_div_mod_precomputed_doc! {
+        #[inline]
+        fn div_mod_precomputed(self, other: &Integer, data: &DivModData) -> (Integer, Integer) {
+            div_mod_precomputed_integers(self, other, data)
+        }
+    }
+}
+
+impl DivAssignModPrecomputed<Self> for Integer {
+    /// Divides an [`Integer`] by another [`Integer`] in place, returning the remainder. The
+    /// quotient is rounded towards negative infinity, and the remainder has the same sign as the
+    /// second [`Integer`].
+    ///
+    /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq |r| < |y|$.
+    ///
+    /// Some precomputed data is provided; this speeds up computations involving several divisions
+    /// by the same divisor. The precomputed data should be obtained using
+    /// [`precompute_div_mod_data`](DivModPrecomputed::precompute_div_mod_data), applied to the same
+    /// divisor or to its negative.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Panics
+    /// May panic if `data` was not computed from `other` or its negative.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::{
+    ///     DivAssignModPrecomputed, DivModPrecomputed,
+    /// };
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// let d = Integer::from(10);
+    /// let data = Integer::precompute_div_mod_data(&d);
+    /// // -3 * 10 + 7 = -23
+    /// let mut x = Integer::from(-23);
+    /// assert_eq!(x.div_assign_mod_precomputed(d, &data), 7);
+    /// assert_eq!(x, -3);
+    /// ```
+    #[inline]
+    fn div_assign_mod_precomputed(&mut self, other: Self, data: &DivModData) -> Self {
+        let (q, r) = div_mod_precomputed_integers(self, &other, data);
+        *self = q;
+        r
+    }
+}
+
+impl DivAssignModPrecomputed<&Self> for Integer {
+    /// Divides an [`Integer`] by another [`Integer`] in place, returning the remainder. The
+    /// quotient is rounded towards negative infinity, and the remainder has the same sign as the
+    /// second [`Integer`].
+    ///
+    /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq |r| < |y|$.
+    ///
+    /// Some precomputed data is provided; this speeds up computations involving several divisions
+    /// by the same divisor. The precomputed data should be obtained using
+    /// [`precompute_div_mod_data`](DivModPrecomputed::precompute_div_mod_data), applied to the same
+    /// divisor or to its negative.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Panics
+    /// May panic if `data` was not computed from `other` or its negative.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::{
+    ///     DivAssignModPrecomputed, DivModPrecomputed,
+    /// };
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// let d = Integer::from(10);
+    /// let data = Integer::precompute_div_mod_data(&d);
+    /// // -3 * 10 + 7 = -23
+    /// let mut x = Integer::from(-23);
+    /// assert_eq!(x.div_assign_mod_precomputed(&d, &data), 7);
+    /// assert_eq!(x, -3);
+    /// ```
+    #[inline]
+    fn div_assign_mod_precomputed(&mut self, other: &Self, data: &DivModData) -> Self {
+        let (q, r) = div_mod_precomputed_integers(self, other, data);
+        *self = q;
+        r
     }
 }
 

@@ -29,7 +29,7 @@ use crate::natural::arithmetic::add::{
 };
 use crate::natural::arithmetic::div_exact::limbs_div_exact_limb_in_place;
 use crate::natural::arithmetic::div_mod::{
-    limbs_div_limb_in_place_mod, limbs_div_mod_barrett_is_len,
+    DivModData, limbs_div_limb_in_place_mod, limbs_div_mod_barrett_is_len,
     limbs_div_mod_barrett_preinverse_scratch_len, limbs_div_mod_barrett_preinverted,
     limbs_div_mod_extra_in_place, limbs_div_mod_qs_to_out_rs_to_ns, limbs_invert_approx,
     limbs_invert_approx_scratch_len,
@@ -51,8 +51,9 @@ use core::cmp::Ordering::*;
 use itertools::Itertools;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    AddMul, CheckedLogBase2, CheckedMul, DivAssignMod, DivMod, DivisibleByPowerOf2,
-    ModPowerOf2Assign, Parity, PowerOf2, ShrRound, ShrRoundAssign, SquareAssign, XMulYToZZ,
+    AddMul, CheckedLogBase2, CheckedMul, DivAssignMod, DivAssignModPrecomputed, DivModPrecomputed,
+    DivisibleByPowerOf2, ModPowerOf2Assign, Parity, PowerOf2, ShrRound, ShrRoundAssign,
+    SquareAssign, XMulYToZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
@@ -1110,8 +1111,11 @@ private_test_fn! {to_digits_asc_naive_primitive<
     assert!(base > T::ONE);
     let mut remainder = x.clone();
     let nat_base = Natural::from(base);
+    let data = Natural::precompute_div_mod_data(&nat_base);
     while remainder != 0 {
-        digits.push(T::exact_from(&remainder.div_assign_mod(&nat_base)));
+        digits.push(T::exact_from(
+            &remainder.div_assign_mod_precomputed(&nat_base, &data),
+        ));
     }
 }}
 
@@ -1125,8 +1129,9 @@ private_test_fn! {to_digits_asc_naive_primitive<
 private_test_fn! {to_digits_asc_naive(digits: &mut Vec<Natural>, x: &Natural, base: &Natural) {
     assert!(*base > 1);
     let mut remainder = x.clone();
+    let data = Natural::precompute_div_mod_data(base);
     while remainder != 0 {
-        digits.push(remainder.div_assign_mod(base));
+        digits.push(remainder.div_assign_mod_precomputed(base, &data));
     }
 }}
 
@@ -1138,8 +1143,11 @@ const TO_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD: u64 = 50;
 //
 // $M(n) = O(n \log n)$
 //
-// where $T$ is time, $M$ is additional memory, and $n$ is `bits`.
-fn compute_powers_for_to_digits(base: &Natural, bits: u64) -> Vec<Natural> {
+// where $T$ is time, $M$ is additional memory, and $n$ is `bits`. Each power is paired with its
+// precomputed division data: the divide-and-conquer recursion divides by the same power at every
+// node of a recursion level, so the normalization and inverses are computed once per power instead
+// of once per division.
+fn compute_powers_for_to_digits(base: &Natural, bits: u64) -> Vec<(Natural, DivModData)> {
     if bits / base.significant_bits() < TO_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD {
         return Vec::new();
     }
@@ -1147,13 +1155,14 @@ fn compute_powers_for_to_digits(base: &Natural, bits: u64) -> Vec<Natural> {
     let mut powers = Vec::new();
     let mut power = base.clone();
     loop {
-        powers.push(power.clone());
+        powers.push((power.clone(), Natural::precompute_div_mod_data(&power)));
         power.square_assign();
         if power.significant_bits() >= limit {
             break;
         }
     }
-    powers.push(power);
+    let data = Natural::precompute_div_mod_data(&power);
+    powers.push((power, data));
     powers
 }
 
@@ -1169,7 +1178,7 @@ fn to_digits_asc_divide_and_conquer_limb<
     digits: &mut Vec<T>,
     mut x: Natural,
     base: Limb,
-    powers: &[Natural],
+    powers: &[(Natural, DivModData)],
     power_index: usize,
 ) where
     Limb: Digits<T>,
@@ -1188,7 +1197,8 @@ fn to_digits_asc_divide_and_conquer_limb<
             to_digits_asc_naive_primitive(digits, &x, T::exact_from(base));
         }
     } else {
-        let (q, r) = x.div_mod(&powers[power_index]);
+        let (power, data) = &powers[power_index];
+        let (q, r) = x.div_mod_precomputed(power, data);
         let start_len = digits.len();
         to_digits_asc_divide_and_conquer_limb(digits, r, base, powers, power_index - 1);
         if q != 0 {
@@ -1210,14 +1220,15 @@ fn to_digits_asc_divide_and_conquer(
     digits: &mut Vec<Natural>,
     x: &Natural,
     base: &Natural,
-    powers: &[Natural],
+    powers: &[(Natural, DivModData)],
     power_index: usize,
 ) {
     let bits = x.significant_bits();
     if bits / base.significant_bits() < TO_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD {
         to_digits_asc_naive(digits, x, base);
     } else {
-        let (q, r) = x.div_mod(&powers[power_index]);
+        let (power, data) = &powers[power_index];
+        let (q, r) = x.div_mod_precomputed(power, data);
         let start_len = digits.len();
         to_digits_asc_divide_and_conquer(digits, &r, base, powers, power_index - 1);
         if q != 0 {

@@ -45,8 +45,8 @@ fn wide_low_bits_nonzero<T: PrimitiveUnsigned>(hi: T, lo: T, i: u64) -> bool {
 // The shifted product, rounded according to `rm`. The product is exact, held in a double word, so
 // only the rounded result has to fit; when `bits >= T::WIDTH` it always does. This is where the
 // `u128` implementation earns its keep: with no wider type to widen into, the kept part, the
-// half-ulp bit, and the sticky bits are read straight out of the double word, and no 256-bit
-// value is ever materialized or shifted.
+// half-ulp bit, and the sticky bits are read straight out of the double word, and no 256-bit value
+// is ever materialized or shifted.
 fn mul_shr_round_unsigned<T: PrimitiveUnsigned>(
     x: T,
     y: T,
@@ -118,8 +118,8 @@ fn mul_shr_round_signed<
         return (T::ZERO, Equal);
     }
     let negative = (x < T::ZERO) != (y < T::ZERO);
-    // Rounding a negative value with `rm` is rounding its magnitude with `-rm`, and the
-    // magnitude's `Ordering` flips on the way back.
+    // Rounding a negative value with `rm` is rounding its magnitude with `-rm`, and the magnitude's
+    // `Ordering` flips on the way back.
     let (mag, o) = mul_shr_round_unsigned(
         x.unsigned_abs(),
         y.unsigned_abs(),
@@ -142,8 +142,8 @@ fn mul_shr_round_signed<
     }
 }
 
-// The product left-shifted by `bits`, for the negative-`bits` case of the signed-`bits` impls.
-// The shift is always exact, so there is no rounding; the result must fit.
+// The product left-shifted by `bits`, for the negative-`bits` case of the signed-`bits` impls. The
+// shift is always exact, so there is no rounding; the result must fit.
 fn mul_shl_exact_unsigned<T: PrimitiveUnsigned>(x: T, y: T, bits: u64) -> T {
     if x == T::ZERO || y == T::ZERO {
         return T::ZERO;
@@ -195,19 +195,18 @@ macro_rules! impl_mul_shr_round_unsigned_unsigned {
 
                     /// Multiplies two numbers and right-shifts the product (divides it by a power
                     /// of 2), rounding according to a specified rounding mode. An [`Ordering`] is
-                    /// also returned, indicating whether the returned value is less than, equal
-                    /// to, or greater than the exact value.
+                    /// also returned, indicating whether the returned value is less than, equal to,
+                    /// or greater than the exact value.
                     ///
                     /// The product is computed at twice the width of the type, so it cannot
                     /// overflow; only the shifted result must fit, and if `bits` is at least
                     /// `Self::WIDTH` it always does.
                     ///
-                    /// Let $q = \frac{xy}{2^k}$. Then $f(x, y, k, \mathrm{Down}) =
-                    /// f(x, y, k, \mathrm{Floor}) = \lfloor q \rfloor$ and
-                    /// $f(x, y, k, \mathrm{Up}) = f(x, y, k, \mathrm{Ceiling}) =
-                    /// \lceil q \rceil$; $\mathrm{Nearest}$ rounds to the integer closest to $q$,
-                    /// breaking ties toward the even integer; and
-                    /// $f(x, y, k, \mathrm{Exact}) = q$, but panics if $q \notin \Z$.
+                    /// Let $q = \frac{xy}{2^k}$. Then $f(x, y, k, \mathrm{Down}) = f(x, y, k,
+                    /// \mathrm{Floor}) = \lfloor q \rfloor$ and $f(x, y, k, \mathrm{Up}) = f(x, y,
+                    /// k, \mathrm{Ceiling}) = \lceil q \rceil$; $\mathrm{Nearest}$ rounds to the
+                    /// integer closest to $q$, breaking ties toward the even integer; and $f(x, y,
+                    /// k, \mathrm{Exact}) = q$, but panics if $q \notin \Z$.
                     ///
                     /// # Worst-case complexity
                     /// Constant time and additional memory.
@@ -275,21 +274,21 @@ macro_rules! impl_mul_shr_round_signed_unsigned {
 
                     /// Multiplies two numbers and right-shifts the product (divides it by a power
                     /// of 2), rounding according to a specified rounding mode. An [`Ordering`] is
-                    /// also returned, indicating whether the returned value is less than, equal
-                    /// to, or greater than the exact value.
+                    /// also returned, indicating whether the returned value is less than, equal to,
+                    /// or greater than the exact value.
                     ///
                     /// The product is computed exactly, in sign-magnitude form at twice the width
-                    /// of the type, so it cannot overflow; only the shifted result must fit, and
-                    /// if `bits` is at least `Self::WIDTH` it always does. `Floor` rounds toward
+                    /// of the type, so it cannot overflow; only the shifted result must fit, and if
+                    /// `bits` is at least `Self::WIDTH` it always does. `Floor` rounds toward
                     /// negative infinity and `Down` rounds toward zero, so they differ when the
                     /// product is negative.
                     ///
-                    /// Let $q = \frac{xy}{2^k}$. Then $f(x, y, k, \mathrm{Floor}) =
-                    /// \lfloor q \rfloor$, $f(x, y, k, \mathrm{Ceiling}) = \lceil q \rceil$, and
+                    /// Let $q = \frac{xy}{2^k}$. Then $f(x, y, k, \mathrm{Floor}) = \lfloor q
+                    /// \rfloor$, $f(x, y, k, \mathrm{Ceiling}) = \lceil q \rceil$, and
                     /// $\mathrm{Down}$ and $\mathrm{Up}$ round toward and away from zero,
                     /// respectively; $\mathrm{Nearest}$ rounds to the integer closest to $q$,
-                    /// breaking ties toward the even integer; and
-                    /// $f(x, y, k, \mathrm{Exact}) = q$, but panics if $q \notin \Z$.
+                    /// breaking ties toward the even integer; and $f(x, y, k, \mathrm{Exact}) = q$,
+                    /// but panics if $q \notin \Z$.
                     ///
                     /// # Worst-case complexity
                     /// Constant time and additional memory.
@@ -357,14 +356,14 @@ macro_rules! impl_mul_shr_round_unsigned_signed {
 
                     /// Multiplies two numbers and right-shifts the product (divides it by a power
                     /// of 2), rounding according to a specified rounding mode. An [`Ordering`] is
-                    /// also returned, indicating whether the returned value is less than, equal
-                    /// to, or greater than the exact value.
+                    /// also returned, indicating whether the returned value is less than, equal to,
+                    /// or greater than the exact value.
                     ///
                     /// If `bits` is negative, the product is left-shifted by `-bits` instead. That
                     /// shift is always exact, so the returned [`Ordering`] is `Equal`; but unlike
                     /// [`ShrRound`](crate::num::arithmetic::traits::ShrRound), whose left shifts
-                    /// discard overflowing bits, this operation panics if the result does not
-                    /// fit, since its purpose is to return the exact rounded value.
+                    /// discard overflowing bits, this operation panics if the result does not fit,
+                    /// since its purpose is to return the exact rounded value.
                     ///
                     /// # Worst-case complexity
                     /// Constant time and additional memory.
@@ -444,14 +443,14 @@ macro_rules! impl_mul_shr_round_signed_signed {
 
                     /// Multiplies two numbers and right-shifts the product (divides it by a power
                     /// of 2), rounding according to a specified rounding mode. An [`Ordering`] is
-                    /// also returned, indicating whether the returned value is less than, equal
-                    /// to, or greater than the exact value.
+                    /// also returned, indicating whether the returned value is less than, equal to,
+                    /// or greater than the exact value.
                     ///
                     /// If `bits` is negative, the product is left-shifted by `-bits` instead. That
                     /// shift is always exact, so the returned [`Ordering`] is `Equal`; but unlike
                     /// [`ShrRound`](crate::num::arithmetic::traits::ShrRound), whose left shifts
-                    /// discard overflowing bits, this operation panics if the result does not
-                    /// fit, since its purpose is to return the exact rounded value.
+                    /// discard overflowing bits, this operation panics if the result does not fit,
+                    /// since its purpose is to return the exact rounded value.
                     ///
                     /// # Worst-case complexity
                     /// Constant time and additional memory.

@@ -17,8 +17,8 @@ use crate::natural::arithmetic::add::{
     limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
 };
 use crate::natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
-use crate::natural::arithmetic::float::round::round_helper_raw;
 use crate::natural::arithmetic::float::mul::mul_float_significands_ref_ref_helper;
+use crate::natural::arithmetic::float::round::round_helper_raw;
 use crate::natural::arithmetic::mul::mul_high::{
     limbs_mul_high_same_length, limbs_mul_high_same_length_scratch_len,
 };

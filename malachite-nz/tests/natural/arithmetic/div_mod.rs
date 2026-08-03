@@ -6,13 +6,14 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::assert_panic;
 use malachite_base::num::arithmetic::traits::{
-    CeilingDivAssignNegMod, CeilingDivNegMod, DivAssignMod, DivAssignRem, DivMod, DivRem, DivRound,
-    NegMod, PowerOf2,
+    CeilingDivAssignNegMod, CeilingDivNegMod, DivAssignMod, DivAssignModPrecomputed, DivAssignRem,
+    DivMod, DivModPrecomputed, DivRem, DivRound, NegMod, PowerOf2,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Two, Zero};
-use malachite_base::num::conversion::traits::{ExactFrom, JoinHalves};
+use malachite_base::num::conversion::traits::{ExactFrom, JoinHalves, WrappingFrom};
 #[cfg(feature = "32_bit_limbs")]
 use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_base::num::logic::traits::LowMask;
@@ -47,6 +48,7 @@ use malachite_nz::test_util::natural::arithmetic::div_mod::{
 };
 use num::{BigUint, Integer};
 use rug;
+use std::panic::catch_unwind;
 use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
@@ -23940,6 +23942,115 @@ fn limbs_div_mod_to_out_properties() {
 
 // It would be a little confusing to only pass y by value
 #[allow(clippy::needless_pass_by_value)]
+// Builds a dense `len`-limb `Natural` deterministically from `seed`, with a nonzero top limb.
+fn dense_natural(len: usize, mut seed: u64) -> Natural {
+    let mut limbs = Vec::with_capacity(len);
+    for _ in 0..len {
+        seed = seed
+            .wrapping_mul(6364136223846793005)
+            .wrapping_add(1442695040888963407);
+        limbs.push(Limb::wrapping_from(seed >> 7));
+    }
+    *limbs.last_mut().unwrap() |= 1;
+    Natural::from_owned_limbs_asc(limbs)
+}
+
+#[test]
+fn test_div_mod_precomputed() {
+    // Checks `div_mod_precomputed` against plain `div_mod` on inputs chosen to exercise every
+    // branch of the precomputed dispatch. The limb counts in the comments refer to 64-bit limbs;
+    // the size thresholds differ on 32-bit, but every case remains valid there, and the large cases
+    // still reach the Barrett engine.
+    fn test(x: &Natural, y: &Natural, data: &<Natural as DivModPrecomputed>::Data) {
+        let expected = x.div_mod(y);
+        assert_eq!(x.div_mod_precomputed(y, data), expected, "{x} / {y}");
+        let (q, r) = expected;
+        assert!(r < *y);
+        assert_eq!(q * y + r, *x);
+    }
+    let w = usize::exact_from(Limb::WIDTH);
+    // Divisor shapes: dense, dense with the top bit set (shift == 0), all ones (maximal inverse), a
+    // power of 2, and a power of 2 plus 1 (minimal dense inverse stress).
+    let divisor_shapes: Vec<Box<dyn Fn(usize) -> Natural>> = vec![
+        Box::new(|d_len| dense_natural(d_len, 0x1234_5678)),
+        Box::new(|d_len| {
+            dense_natural(d_len, 0x9abc_def0) | (Natural::ONE << (u64::exact_from(d_len * w) - 1))
+        }),
+        Box::new(|d_len| Natural::low_mask(u64::exact_from(d_len * w))),
+        Box::new(|d_len| Natural::power_of_2(u64::exact_from(d_len * w) - 1)),
+        Box::new(|d_len| Natural::power_of_2(u64::exact_from(d_len * w) - 1) + Natural::ONE),
+    ];
+    for (d_len, n_len) in [
+        // - one-limb divisor
+        (1, 1),
+        (1, 5),
+        // - two-limb divisor
+        (2, 2),
+        (2, 7),
+        // - `d_len < DC_DIV_QR_THRESHOLD`: schoolbook
+        (3, 8),
+        (50, 120),
+        // - `n_len < d_len + 3`: schoolbook even above the divide-and-conquer threshold
+        (100, 101),
+        // - `limbs_div_mod_dc_condition`: divide-and-conquer, with the Barrett inverse stored but
+        //   unused
+        (100, 150),
+        // - Barrett with `i_len == d_len`: the full stored inverse
+        (1000, 3000),
+        // - Barrett with `q_len <= d_len`: `i_len` is about `d_len / 2`, using the high half of the
+        //   stored inverse
+        (1000, 2000),
+        // - Barrett with a final short block: the engine truncates the sliced inverse again
+        (1000, 3005),
+        // - Barrett, very unbalanced: `i_len == d_len`, many blocks
+        (150, 3000),
+    ] {
+        for shape in &divisor_shapes {
+            let d = shape(d_len);
+            let data = Natural::precompute_div_mod_data(&d);
+            let x = dense_natural(n_len, 0x2468_ace0 ^ u64::exact_from(n_len));
+            test(&x, &d, &data);
+            // the same data serves multiple dividends
+            test(&(&x + Natural::ONE), &d, &data);
+            test(&dense_natural(n_len, 0x1357_9bdf), &d, &data);
+            // exact multiples, and offsets by one from them
+            let q = dense_natural(n_len - d_len + 1, 0xfeed_f00d);
+            let product = &q * &d;
+            test(&product, &d, &data);
+            test(&(&product + Natural::ONE), &d, &data);
+            if product != 0 {
+                test(&(product - Natural::ONE), &d, &data);
+            }
+            // dividends at and around the divisor itself
+            test(&d, &d, &data);
+            test(&(&d + Natural::ONE), &d, &data);
+            if d > 1 {
+                test(&(&d - Natural::ONE), &d, &data);
+            }
+            test(&Natural::ZERO, &d, &data);
+        }
+    }
+}
+
+#[test]
+fn test_div_mod_precomputed_two_limb_carry() {
+    // - a shifted two-limb divisor whose dividend, shifted by the same amount, carries out of its
+    //   top limb
+    let d = Natural::from_limbs_asc(&[123, 456]);
+    let data = Natural::precompute_div_mod_data(&d);
+    let x = Natural::low_mask(Limb::WIDTH * 7);
+    let expected = (&x).div_mod(&d);
+    assert_eq!((&x).div_mod_precomputed(&d, &data), expected);
+    let (q, r) = expected;
+    assert!(r < d);
+    assert_eq!(q * d + r, x);
+}
+
+#[test]
+fn precompute_div_mod_data_fail() {
+    assert_panic!(Natural::precompute_div_mod_data(&Natural::ZERO));
+}
+
 fn div_mod_and_div_rem_properties_helper(x: Natural, y: Natural) {
     let mut mut_x = x.clone();
     let r = mut_x.div_assign_mod(&y);
@@ -24020,6 +24131,50 @@ fn div_mod_and_div_rem_properties_helper(x: Natural, y: Natural) {
     let (q_alt, r_alt) = (&x / &y, &x % &y);
     assert_eq!(q_alt, q);
     assert_eq!(r_alt, r);
+
+    let data = Natural::precompute_div_mod_data(&y);
+
+    let (q_alt, r_alt) = (&x).div_mod_precomputed(&y, &data);
+    assert!(q_alt.is_valid());
+    assert_eq!(q_alt, q);
+    assert!(r_alt.is_valid());
+    assert_eq!(r_alt, r);
+
+    let (q_alt, r_alt) = (&x).div_mod_precomputed(y.clone(), &data);
+    assert!(q_alt.is_valid());
+    assert_eq!(q_alt, q);
+    assert!(r_alt.is_valid());
+    assert_eq!(r_alt, r);
+
+    let (q_alt, r_alt) = x.clone().div_mod_precomputed(&y, &data);
+    assert!(q_alt.is_valid());
+    assert_eq!(q_alt, q);
+    assert!(r_alt.is_valid());
+    assert_eq!(r_alt, r);
+
+    let (q_alt, r_alt) = x.clone().div_mod_precomputed(y.clone(), &data);
+    assert!(q_alt.is_valid());
+    assert_eq!(q_alt, q);
+    assert!(r_alt.is_valid());
+    assert_eq!(r_alt, r);
+
+    let mut q_alt = x.clone();
+    let r_alt = q_alt.div_assign_mod_precomputed(&y, &data);
+    assert_eq!(q_alt, q);
+    assert_eq!(r_alt, r);
+
+    let mut q_alt = x.clone();
+    let r_alt = q_alt.div_assign_mod_precomputed(y.clone(), &data);
+    assert_eq!(q_alt, q);
+    assert_eq!(r_alt, r);
+
+    // the same data works for other dividends
+    assert_eq!((&q).div_mod_precomputed(&y, &data), (&q).div_mod(&y));
+    let x_plus_1 = &x + Natural::ONE;
+    assert_eq!(
+        (&x_plus_1).div_mod_precomputed(&y, &data),
+        x_plus_1.div_mod(&y)
+    );
 
     let (num_q, num_r) = BigUint::from(&x).div_mod_floor(&BigUint::from(&y));
     assert_eq!(Natural::from(&num_q), q);

@@ -676,9 +676,9 @@ before converting the word-sized result down.
 | ✓ | `void fmpz_mod (fmpz_t f, const fmpz_t g, const fmpz_t h)` | [`ModEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModEuclidean.html) |
 | ✓ | `ulong fmpz_mod_ui (fmpz_t f, const fmpz_t g, ulong h)` | [`ModEuclidean`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModEuclidean.html) |
 | ✓ | `void fmpz_smod (fmpz_t f, const fmpz_t g, const fmpz_t h)` | [`BalancedMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.BalancedMod.html) |
-| ✗ | `void fmpz_preinvn_init (fmpz_preinvn_t inv, const fmpz_t f)` | |
+| ✓ | `void fmpz_preinvn_init (fmpz_preinvn_t inv, const fmpz_t f)` | [`DivModPrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivModPrecomputed.html) |
 | — | `void fmpz_preinvn_clear (fmpz_preinvn_t inv)` | |
-| ✗ | `void fmpz_fdiv_qr_preinvn (fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h, const fmpz_preinvn_t hinv)` | |
+| ✓ | `void fmpz_fdiv_qr_preinvn (fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h, const fmpz_preinvn_t hinv)` | [`DivModPrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivModPrecomputed.html), [`DivAssignModPrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivAssignModPrecomputed.html) |
 
 **The `divexact` family.** `g.div_exact(&h)`, with the same contract as FLINT's: exactness is
 the caller's promise, not checked, and the result is undefined if the promise is broken. The
@@ -709,14 +709,23 @@ with an `Assign` form as well. The conventions agree: only the magnitude of `h` 
 remainder of exactly `|h|/2` is the positive one, since the range is closed at the top.
 
 **The `preinvn` trio.** A precomputed Newton inverse of a divisor, built once and reused so
-that many divisions by the same `h` skip the setup work. Malachite has preinverted division in
-its internals but no public context type, so the operation is a gap; `fmpz_preinvn_clear` alone
-is —, since whenever such a type exists, releasing it is what
-[`Drop`](https://doc.rust-lang.org/nightly/std/ops/trait.Drop.html) does. This is the second
-appearance of FLINT's precomputed-modulus pattern, after `fmpz_get_nmod`
-[under Conversion](#conversion), and the right shape for a public version is a question for the
-`fmpz_mod` chapter, which is built around exactly such contexts; see
-[its page](/mapping/flint-integers-mod-n/#conventions).
+that many divisions by the same `h` skip the setup work. In Malachite this is the
+[`DivModPrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivModPrecomputed.html)
+trait: `Integer::precompute_div_mod_data(&h)` plays the role of `fmpz_preinvn_init`, building a
+normalized copy of the divisor along with the inverses
+that the division engines would otherwise recompute on every call — for large divisors, the
+full-length approximate inverse that Barrett division uses — and
+`g.div_mod_precomputed(&h, &data)` is `fmpz_fdiv_qr_preinvn`, since `fdiv` is floor division,
+which is what `div_mod` performs. The data depends only on `|h|`, as in FLINT. The trait is also
+implemented for
+[`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html) and for
+the primitive integers, and
+[`DivAssignModPrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.DivAssignModPrecomputed.html)
+is the in-place form. `fmpz_preinvn_clear` alone stays —: the precomputed data is an ordinary
+value, and releasing it is what [`Drop`](https://doc.rust-lang.org/nightly/std/ops/trait.Drop.html) does.
+The precomputed-modulus pattern first appeared at `fmpz_get_nmod`
+[under Conversion](#conversion), whose `nmod` context remains a question for the `fmpz_mod`
+chapter; see [its page](/mapping/flint-integers-mod-n/#conventions).
 
 ### Powers and logarithms
 
@@ -797,8 +806,8 @@ which returns the root only when it is exact, or
 when you want the flag and the truncated root at once.
 
 **`fmpz_sqrtmod`.** A square root modulo a prime is a gap, and it will stay one until the
-modular-arithmetic story it belongs to is built out; it is the third entry in the
-`fmpz_mod`-shaped queue, after the `nmod` and `preinvn` contexts above. FLINT's caveats are
+modular-arithmetic story it belongs to is built out; it joins the `nmod` context above in the
+`fmpz_mod`-shaped queue. FLINT's caveats are
 worth reading before porting code that uses it: primality of `p` is assumed, not checked, and a
 composite `p` usually, but not always, reports failure.
 

@@ -7,8 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{
-    CeilingDivAssignNegMod, CeilingDivNegMod, DivAssignMod, DivAssignRem, DivMod, DivRem, DivRound,
-    NegMod,
+    CeilingDivAssignNegMod, CeilingDivNegMod, DivAssignMod, DivAssignRem, DivMod,
+    DivModPrecomputed, DivRem, DivRound, NegMod,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::logic::traits::BitAccess;
@@ -27,6 +27,7 @@ use malachite_base::test_util::generators::{
     unsigned_vec_unsigned_vec_unsigned_triple_gen_var_13,
 };
 use malachite_base::test_util::runner::Runner;
+use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::div_mod::{
     limbs_div_barrett_large_product, limbs_div_limb_in_place_mod, limbs_div_limb_mod,
     limbs_div_limb_to_out_mod, limbs_div_mod, limbs_div_mod_barrett, limbs_div_mod_barrett_helper,
@@ -121,6 +122,7 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_div_assign_mod_evaluation_strategy);
     register_bench!(runner, benchmark_natural_div_mod_library_comparison);
     register_bench!(runner, benchmark_natural_div_mod_algorithms);
+    register_bench!(runner, benchmark_natural_div_mod_precomputed_algorithms);
     register_bench!(runner, benchmark_natural_div_mod_evaluation_strategy);
     register_bench!(runner, benchmark_natural_div_assign_rem_evaluation_strategy);
     register_bench!(runner, benchmark_natural_div_rem_library_comparison);
@@ -1076,6 +1078,36 @@ fn benchmark_natural_div_mod_algorithms(
         &mut [
             ("standard", &mut |(x, y)| no_out!(x.div_mod(y))),
             ("using / and %", &mut |(x, y)| no_out!((&x / &y, x % y))),
+        ],
+    );
+}
+
+fn benchmark_natural_div_mod_precomputed_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Natural.div_mod_precomputed(Natural, &DivModData)",
+        BenchmarkType::Algorithms,
+        natural_pair_gen_var_5().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_1_natural_bit_bucketer("x"),
+        &mut [
+            ("default", &mut |(x, y)| {
+                for _ in 0..10 {
+                    no_out!((&x).div_mod(&y));
+                }
+            }),
+            ("precomputed", &mut |(x, y)| {
+                let data = Natural::precompute_div_mod_data(&y);
+                for _ in 0..10 {
+                    no_out!((&x).div_mod_precomputed(&y, &data));
+                }
+            }),
         ],
     );
 }

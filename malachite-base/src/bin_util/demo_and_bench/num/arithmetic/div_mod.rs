@@ -31,6 +31,8 @@ pub(crate) fn register(runner: &mut Runner) {
 
     register_unsigned_benches!(runner, benchmark_div_mod_unsigned_algorithms);
     register_signed_benches!(runner, benchmark_div_mod_signed_algorithms);
+    register_unsigned_benches!(runner, benchmark_div_mod_precomputed_unsigned_algorithms);
+    register_signed_benches!(runner, benchmark_div_mod_precomputed_signed_algorithms);
     register_unsigned_benches!(runner, benchmark_div_assign_mod_unsigned);
     register_signed_benches!(runner, benchmark_div_assign_mod_signed);
     register_unsigned_benches!(runner, benchmark_div_rem_unsigned_algorithms);
@@ -168,6 +170,66 @@ fn demo_ceiling_div_assign_mod<T: PrimitiveSigned>(gm: GenMode, config: &GenConf
 }
 
 #[allow(clippy::no_effect)]
+fn benchmark_div_mod_precomputed_unsigned_algorithms<T: PrimitiveUnsigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        &format!("{}.div_mod_precomputed({}, &Data)", T::NAME, T::NAME),
+        BenchmarkType::Algorithms,
+        unsigned_pair_gen_var_12::<T, T>().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_max_bit_bucketer("x", "y"),
+        &mut [
+            ("default", &mut |(x, y)| {
+                for _ in 0..10 {
+                    no_out!(x.div_mod(y));
+                }
+            }),
+            ("precomputed", &mut |(x, y)| {
+                let data = T::precompute_div_mod_data(&y);
+                for _ in 0..10 {
+                    no_out!(x.div_mod_precomputed(y, &data));
+                }
+            }),
+        ],
+    );
+}
+
+fn benchmark_div_mod_precomputed_signed_algorithms<T: PrimitiveSigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        &format!("{}.div_mod_precomputed({}, &Data)", T::NAME, T::NAME),
+        BenchmarkType::Algorithms,
+        signed_pair_gen_var_4::<T>().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_max_bit_bucketer("x", "y"),
+        &mut [
+            ("default", &mut |(x, y)| {
+                for _ in 0..10 {
+                    no_out!(x.div_mod(y));
+                }
+            }),
+            ("precomputed", &mut |(x, y)| {
+                let data = T::precompute_div_mod_data(&y);
+                for _ in 0..10 {
+                    no_out!(x.div_mod_precomputed(y, &data));
+                }
+            }),
+        ],
+    );
+}
+
 fn benchmark_div_mod_unsigned_algorithms<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: &GenConfig,

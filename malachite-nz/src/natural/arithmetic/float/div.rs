@@ -357,9 +357,9 @@ fn div_float_significands_same_prec_lt_w(
     if increment_exp {
         x -= y;
     }
-    // First try with an approximate quotient.
-    // The widening spelling is deliberate: only the floor is needed, in a per-limb kernel, and
-    // `mul_shr_round` would also compute the rounding bookkeeping that this call site discards.
+    // First try with an approximate quotient. The widening spelling is deliberate: only the floor
+    // is needed, in a per-limb kernel, and `mul_shr_round` would also compute the rounding
+    // bookkeeping that this call site discards.
     #[cfg_attr(dylint_lib = "malachite_lints", expect(use_mul_shr_round))]
     let mut round_bit = Limb::wrapping_from(
         (DoubleLimb::from(x) * DoubleLimb::from(limbs_invert_limb::<DoubleLimb, Limb>(y)))
@@ -439,9 +439,9 @@ fn div_float_significands_same_prec_w(
     if increment_exp {
         x -= y;
     }
-    // First compute an approximate quotient. The widening spelling is deliberate: only the floor
-    // is needed, in a per-limb kernel, and `mul_shr_round` would also compute the rounding
-    // bookkeeping that this call site discards.
+    // First compute an approximate quotient. The widening spelling is deliberate: only the floor is
+    // needed, in a per-limb kernel, and `mul_shr_round` would also compute the rounding bookkeeping
+    // that this call site discards.
     #[cfg_attr(dylint_lib = "malachite_lints", expect(use_mul_shr_round))]
     let mut q = x.wrapping_add(Limb::wrapping_from(
         (DoubleLimb::from(x) * DoubleLimb::from(limbs_invert_limb::<DoubleLimb, Limb>(y)))
@@ -523,9 +523,9 @@ fn div_float_2_approx(x_1: Limb, x_0: Limb, y_1: Limb, y_0: Limb) -> (Limb, Limb
     } else {
         limbs_invert_limb::<DoubleLimb, Limb>(y_1 + 1)
     };
-    // Now inv <= B ^ 2 / (y_1 + 1) - B.
-    // The widening spelling is deliberate: only the floor is needed, in a per-limb kernel, and
-    // `mul_shr_round` would also compute the rounding bookkeeping that this call site discards.
+    // Now inv <= B ^ 2 / (y_1 + 1) - B. The widening spelling is deliberate: only the floor is
+    // needed, in a per-limb kernel, and `mul_shr_round` would also compute the rounding bookkeeping
+    // that this call site discards.
     #[cfg_attr(dylint_lib = "malachite_lints", expect(use_mul_shr_round))]
     let mut q_1 =
         Limb::wrapping_from((DoubleLimb::from(x_1) * DoubleLimb::from(inv)) >> Limb::WIDTH);
@@ -558,9 +558,9 @@ fn div_float_2_approx(x_1: Limb, x_0: Limb, y_1: Limb, y_0: Limb) -> (Limb, Limb
     // inv) / B approximates B / y_1, this is in turn approximated by (r * B + r_0) * (B + inv) / B
     // = r_1 * B * r_1 * inv + r_0 + (r0 * inv / B).
     q_1.wrapping_add_assign(r_1);
-    // Add floor(r_0 * inv / B) to q_0.
-    // The widening spelling is deliberate: only the floor is needed, in a per-limb kernel, and
-    // `mul_shr_round` would also compute the rounding bookkeeping that this call site discards.
+    // Add floor(r_0 * inv / B) to q_0. The widening spelling is deliberate: only the floor is
+    // needed, in a per-limb kernel, and `mul_shr_round` would also compute the rounding bookkeeping
+    // that this call site discards.
     #[cfg_attr(dylint_lib = "malachite_lints", expect(use_mul_shr_round))]
     if r_0.overflowing_add_assign(Limb::wrapping_from(
         (DoubleLimb::from(r_0) * DoubleLimb::from(inv)) >> Limb::WIDTH,

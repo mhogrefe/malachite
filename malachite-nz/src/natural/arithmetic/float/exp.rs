@@ -19,9 +19,7 @@ use crate::natural::limb_to_bit_count;
 use crate::platform::{DoubleLimb, Limb};
 use alloc::vec::Vec;
 use malachite_base::fail_on_untested_path;
-use malachite_base::num::arithmetic::traits::{
-    NegAssign, Parity,
-};
+use malachite_base::num::arithmetic::traits::{NegAssign, Parity};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
@@ -145,4 +143,3 @@ pub fn limbs_float_exp(xs: &mut [Limb], base: u64, e: i64) -> (i64, i32) {
         },
     )
 }
-

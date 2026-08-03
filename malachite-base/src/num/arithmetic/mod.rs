@@ -699,6 +699,50 @@ pub mod div_exact;
 /// assert_eq!(x.ceiling_div_assign_mod(-10), 7);
 /// assert_eq!(x, 3);
 /// ```
+///
+/// # div_mod_precomputed
+/// ```
+/// use malachite_base::num::arithmetic::traits::DivModPrecomputed;
+///
+/// let data = u32::precompute_div_mod_data(&10);
+/// assert_eq!(23u32.div_mod_precomputed(10, &data), (2, 3));
+/// assert_eq!(125u32.div_mod_precomputed(10, &data), (12, 5));
+///
+/// let data = u64::precompute_div_mod_data(&123);
+/// assert_eq!(456u64.div_mod_precomputed(123, &data), (3, 87));
+///
+/// let data = u8::precompute_div_mod_data(&10);
+/// assert_eq!(23u8.div_mod_precomputed(10, &data), (2, 3));
+///
+/// let data = u16::precompute_div_mod_data(&10);
+/// assert_eq!(23u16.div_mod_precomputed(10, &data), (2, 3));
+///
+/// let data = u128::precompute_div_mod_data(&10);
+/// assert_eq!(23u128.div_mod_precomputed(10, &data), (2, 3));
+///
+/// let data = i32::precompute_div_mod_data(&10);
+/// assert_eq!(23i32.div_mod_precomputed(10, &data), (2, 3));
+/// assert_eq!((-23i32).div_mod_precomputed(10, &data), (-3, 7));
+///
+/// let data = i64::precompute_div_mod_data(&-10);
+/// assert_eq!(23i64.div_mod_precomputed(-10, &data), (-3, -7));
+/// assert_eq!((-23i64).div_mod_precomputed(-10, &data), (2, -3));
+/// ```
+///
+/// # div_assign_mod_precomputed
+/// ```
+/// use malachite_base::num::arithmetic::traits::{DivAssignModPrecomputed, DivModPrecomputed};
+///
+/// let data = u32::precompute_div_mod_data(&10);
+/// let mut x = 23u32;
+/// assert_eq!(x.div_assign_mod_precomputed(10, &data), 3);
+/// assert_eq!(x, 2);
+///
+/// let data = i64::precompute_div_mod_data(&10);
+/// let mut x = -23i64;
+/// assert_eq!(x.div_assign_mod_precomputed(10, &data), 7);
+/// assert_eq!(x, -3);
+/// ```
 #[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
 pub mod div_mod;
 /// [`DivModEuclidean`](traits::DivModEuclidean) and

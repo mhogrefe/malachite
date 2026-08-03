@@ -76,11 +76,12 @@ impl<'tcx> Visitor<'tcx> for IsPow2Receivers<'_, 'tcx> {
             && has_checked_log_base_2(self.cx, self.cx.typeck_results().expr_ty(recv).peel_refs())
         {
             self.receivers.push(recv);
-            self.guard.get_or_insert(if seg.ident.name.as_str() == "is_power_of_2" {
-                "is_power_of_2"
-            } else {
-                "is_power_of_two"
-            });
+            self.guard
+                .get_or_insert(if seg.ident.name.as_str() == "is_power_of_2" {
+                    "is_power_of_2"
+                } else {
+                    "is_power_of_two"
+                });
         }
         walk_expr(self, e);
     }

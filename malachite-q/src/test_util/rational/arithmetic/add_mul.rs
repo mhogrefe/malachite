@@ -19,18 +19,18 @@ use malachite_nz::integer::Integer;
 ///
 /// $$\gcd(b, d_1 f_1) = \gcd(b, d_1) \cdot \gcd(b / \gcd(b, d_1), f_1),$$
 ///
-/// which holds for every prime valuation. Two things are traded. It pays one extra gcd, on
-/// operands no larger than the single one it replaces. In exchange it cancels *before* the
-/// product is formed, so the denominator of the sum is built as $(d_1/g_a)(f_1/g_b)$ from pieces
-/// that are already reduced, and the double-width $d_1 f_1$ is never materialized nor divided by
-/// the gcd afterwards.
+/// which holds for every prime valuation. Two things are traded. It pays one extra gcd, on operands
+/// no larger than the single one it replaces. In exchange it cancels *before* the product is
+/// formed, so the denominator of the sum is built as $(d_1/g_a)(f_1/g_b)$ from pieces that are
+/// already reduced, and the double-width $d_1 f_1$ is never materialized nor divided by the gcd
+/// afterwards.
 ///
-/// **It is slower, and this function exists to record that.** The appeal of the split is that a
-/// gcd costs more than linear time, so two gcds on $n$-bit operands should beat one against a
-/// $2n$-bit product. That reasoning does not survive contact with
+/// **It is slower, and this function exists to record that.** The appeal of the split is that a gcd
+/// costs more than linear time, so two gcds on $n$-bit operands should beat one against a $2n$-bit
+/// product. That reasoning does not survive contact with
 /// [`limbs_gcd_reduced`](malachite_nz::natural::arithmetic::gcd), which begins by reducing the
-/// larger operand modulo the smaller: the single gcd therefore costs one division plus a
-/// *balanced* gcd, and the split trades that cheap division for a second full gcd.
+/// larger operand modulo the smaller: the single gcd therefore costs one division plus a *balanced*
+/// gcd, and the split trades that cheap division for a second full gcd.
 ///
 /// Measured against the composition, as `split / composed`, on denominators of equal width with
 /// only the shared fraction varying:
@@ -42,33 +42,32 @@ use malachite_nz::integer::Integer;
 /// | 4096 | 1.42      | 1.35 | 1.37 | 1.31 | 1.33 |
 ///
 /// Sharing does move things the predicted way -- the gap narrows as the overlap grows -- but it
-/// never closes. The `Algorithms` benchmark, whose triples are drawn from `rational_triple_gen`
-/// and so are essentially always coprime, independently puts the split at 1.149.
+/// never closes. The `Algorithms` benchmark, whose triples are drawn from `rational_triple_gen` and
+/// so are essentially always coprime, independently puts the split at 1.149.
 ///
-/// To reproduce the shared-factor half: build `b = p * q * b0`, `d = p * d0`, `f = q * f0` with
-/// the shared factors `p` and `q` carrying the chosen fraction of the bits and the private parts
-/// padding every denominator back to the same width, then take all three numerators to be 1 so
-/// the multiplication's cross-gcds stay trivial and only the cancellation under study is timed.
+/// To reproduce the shared-factor half: build `b = p * q * b0`, `d = p * d0`, `f = q * f0` with the
+/// shared factors `p` and `q` carrying the chosen fraction of the bits and the private parts
+/// padding every denominator back to the same width, then take all three numerators to be 1 so the
+/// multiplication's cross-gcds stay trivial and only the cancellation under study is timed.
 ///
-/// The negative result is stronger than this one variant. Any schedule, fused or not, must
-/// decide coprimality for the three independent pairs $(c, f)$, $(e, d)$, and $(b, d_1 f_1)$,
-/// because the canonical denominator depends on all three; no known coprimality test beats
-/// running the gcd, and a gcd that returns 1 costs as much as one that does not, so three
-/// gcd-runs is the generic floor. The composition also places them optimally. Deferring any of
-/// them leaves a known common factor inside a larger pair -- complete deferral means one
-/// $\gcd(N, D)$ on operands three times as wide, which a superlinear gcd makes dearer than the
-/// three it replaces -- and any deferral forfeits the guarantee that the sum's residual divides
-/// $\gcd(b, d_1 f_1)$, the guarantee that lets the composition skip a fourth gcd entirely
-/// whenever that one is 1. Advancing them instead is precisely this variant, and the table above
-/// is what it costs. What a genuinely fused implementation would save is one canonicalization
-/// and at most an allocation.
+/// The negative result is stronger than this one variant. Any schedule, fused or not, must decide
+/// coprimality for the three independent pairs $(c, f)$, $(e, d)$, and $(b, d_1 f_1)$, because the
+/// canonical denominator depends on all three; no known coprimality test beats running the gcd, and
+/// a gcd that returns 1 costs as much as one that does not, so three gcd-runs is the generic floor.
+/// The composition also places them optimally. Deferring any of them leaves a known common factor
+/// inside a larger pair -- complete deferral means one $\gcd(N, D)$ on operands three times as
+/// wide, which a superlinear gcd makes dearer than the three it replaces -- and any deferral
+/// forfeits the guarantee that the sum's residual divides $\gcd(b, d_1 f_1)$, the guarantee that
+/// lets the composition skip a fourth gcd entirely whenever that one is 1. Advancing them instead
+/// is precisely this variant, and the table above is what it costs. What a genuinely fused
+/// implementation would save is one canonicalization and at most an allocation.
 ///
 /// The conclusion flips only with arity. Accumulating $\sum_i y_i z_i$ through $k$ canonical
-/// `add_mul`s costs $\Theta(k^2)$ base-size multiplications as the accumulator's denominator
-/// grows, while accumulating unreduced over a product tree and reducing once costs
-/// $O(k \log k)$ of them plus a single large gcd -- the binary-splitting shape the rational
-/// series code already uses internally. A future n-ary sum-of-products is therefore the one
-/// fused rational operation with a real algorithmic edge; the ternary one has none.
+/// `add_mul`s costs $\Theta(k^2)$ base-size multiplications as the accumulator's denominator grows,
+/// while accumulating unreduced over a product tree and reducing once costs $O(k \log k)$ of them
+/// plus a single large gcd -- the binary-splitting shape the rational series code already uses
+/// internally. A future n-ary sum-of-products is therefore the one fused rational operation with a
+/// real algorithmic edge; the ternary one has none.
 pub fn add_mul_split(x: &Rational, y: &Rational, z: &Rational) -> Rational {
     if x.numerator == 0 || y.numerator == 0 || z.numerator == 0 {
         if y.numerator == 0 || z.numerator == 0 {

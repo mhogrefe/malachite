@@ -7,13 +7,14 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{
-    CeilingDivAssignMod, CeilingDivMod, CeilingMod, DivAssignMod, DivAssignRem, DivMod, DivRem,
-    DivRound, Mod,
+    CeilingDivAssignMod, CeilingDivMod, CeilingMod, DivAssignMod, DivAssignRem, DivMod,
+    DivModPrecomputed, DivRem, DivRound, Mod,
 };
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
+use malachite_nz::integer::Integer;
 use malachite_nz::test_util::bench::bucketers::{
     pair_1_integer_bit_bucketer, pair_2_pair_1_integer_bit_bucketer,
     triple_3_pair_1_integer_bit_bucketer,
@@ -45,6 +46,7 @@ pub(crate) fn register(runner: &mut Runner) {
 
     register_bench!(runner, benchmark_integer_div_mod_library_comparison);
     register_bench!(runner, benchmark_integer_div_mod_algorithms);
+    register_bench!(runner, benchmark_integer_div_mod_precomputed_algorithms);
     register_bench!(runner, benchmark_integer_div_mod_evaluation_strategy);
     register_bench!(runner, benchmark_integer_div_assign_mod_evaluation_strategy);
     register_bench!(runner, benchmark_integer_div_rem_library_comparison);
@@ -259,6 +261,36 @@ fn benchmark_integer_div_mod_algorithms(
             ("standard", &mut |(x, y)| no_out!(x.div_mod(y))),
             ("using div_round and mod_op", &mut |(x, y)| {
                 no_out!(((&x).div_round(&y, Floor), x.mod_op(y)));
+            }),
+        ],
+    );
+}
+
+fn benchmark_integer_div_mod_precomputed_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Integer.div_mod_precomputed(Integer, &DivModData)",
+        BenchmarkType::Algorithms,
+        integer_pair_gen_var_1().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_1_integer_bit_bucketer("x"),
+        &mut [
+            ("default", &mut |(x, y)| {
+                for _ in 0..10 {
+                    no_out!((&x).div_mod(&y));
+                }
+            }),
+            ("precomputed", &mut |(x, y)| {
+                let data = Integer::precompute_div_mod_data(&y);
+                for _ in 0..10 {
+                    no_out!((&x).div_mod_precomputed(&y, &data));
+                }
             }),
         ],
     );

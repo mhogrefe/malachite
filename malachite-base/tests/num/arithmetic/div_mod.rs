@@ -30,6 +30,13 @@ fn test_div_mod_and_div_rem_unsigned() {
         let mut mut_n = n;
         assert_eq!(mut_n.div_assign_rem(d), r);
         assert_eq!(mut_n, q);
+
+        let data = T::precompute_div_mod_data(&d);
+        assert_eq!(n.div_mod_precomputed(d, &data), (q, r));
+
+        let mut mut_n = n;
+        assert_eq!(mut_n.div_assign_mod_precomputed(d, &data), r);
+        assert_eq!(mut_n, q);
     }
     test::<u8>(0, 1, 0, 0);
     test::<u16>(0, 123, 0, 0);
@@ -102,11 +109,20 @@ fn div_mod_and_div_rem_properties_helper_unsigned<T: PrimitiveUnsigned>() {
         assert_eq!((x / y, x % y), (q, r));
         assert!(r < y);
         assert_eq!(q * y + r, x);
+
+        let data = T::precompute_div_mod_data(&y);
+        assert_eq!(x.div_mod_precomputed(y, &data), (q, r));
+        let mut mut_x = x;
+        assert_eq!(mut_x.div_assign_mod_precomputed(y, &data), r);
+        assert_eq!(mut_x, q);
+        // the same data works for other dividends
+        assert_eq!(q.div_mod_precomputed(y, &data), q.div_mod(y));
     });
 
     unsigned_gen::<T>().test_properties(|x| {
         assert_eq!(x.div_mod(T::ONE), (x, T::ZERO));
         assert_panic!(x.div_mod(T::ZERO));
+        assert_panic!(T::precompute_div_mod_data(&T::ZERO));
         assert_panic!({
             let mut y = x;
             y.div_assign_mod(T::ZERO)
@@ -129,6 +145,13 @@ fn test_div_mod_signed() {
 
         let mut mut_n = n;
         assert_eq!(mut_n.div_assign_mod(d), r);
+        assert_eq!(mut_n, q);
+
+        let data = T::precompute_div_mod_data(&d);
+        assert_eq!(n.div_mod_precomputed(d, &data), (q, r));
+
+        let mut mut_n = n;
+        assert_eq!(mut_n.div_assign_mod_precomputed(d, &data), r);
         assert_eq!(mut_n, q);
     }
     test::<i8>(0, 1, 0, 0);
@@ -380,6 +403,11 @@ fn div_mod_fail_helper<T: PrimitiveInt>() {
 fn div_mod_signed_fail_helper<T: PrimitiveSigned>() {
     assert_panic!(T::MIN.div_mod(T::NEGATIVE_ONE));
     assert_panic!({
+        let data = T::precompute_div_mod_data(&T::NEGATIVE_ONE);
+        T::MIN.div_mod_precomputed(T::NEGATIVE_ONE, &data)
+    });
+    assert_panic!(T::precompute_div_mod_data(&T::ZERO));
+    assert_panic!({
         let mut n = T::MIN;
         n.div_assign_mod(T::NEGATIVE_ONE);
     });
@@ -405,6 +433,16 @@ fn div_mod_properties_helper_signed<T: PrimitiveSigned>() {
 
         assert!(r.lt_abs(&y));
         assert!(r == T::ZERO || (r > T::ZERO) == (y > T::ZERO));
+
+        let data = T::precompute_div_mod_data(&y);
+        assert_eq!(x.div_mod_precomputed(y, &data), (q, r));
+        let mut mut_x = x;
+        assert_eq!(mut_x.div_assign_mod_precomputed(y, &data), r);
+        assert_eq!(mut_x, q);
+        // the data depends only on |y|
+        if y != T::MIN && (x != T::MIN || y != T::ONE) {
+            assert_eq!(x.div_mod_precomputed(-y, &data), x.div_mod(-y));
+        }
         if let Some(product) = q.checked_mul(y) {
             assert_eq!(product + r, x);
         } else if q > T::ZERO {

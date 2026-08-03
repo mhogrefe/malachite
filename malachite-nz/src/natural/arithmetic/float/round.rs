@@ -15,20 +15,15 @@
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::arithmetic::add::{limbs_add_limb_to_out, limbs_slice_add_limb_in_place};
 use crate::natural::{
-    LIMB_HIGH_BIT, LIMB_MAX_HALF, Natural, bit_to_limb_count_floor,
-    limb_to_bit_count,
+    LIMB_HIGH_BIT, LIMB_MAX_HALF, Natural, bit_to_limb_count_floor, limb_to_bit_count,
 };
 use crate::platform::Limb;
 use core::cmp::min;
-use malachite_base::num::arithmetic::traits::{
-    NegModPowerOf2, PowerOf2,
-    WrappingSubAssign,
-};
+use malachite_base::num::arithmetic::traits::{NegModPowerOf2, PowerOf2, WrappingSubAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::logic::traits::LowMask;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::slices::slice_test_zero;
-
 
 // This is MPFR_CAN_ROUND from mpfr-impl.h, MPFR 4.2.0.
 pub fn float_can_round(x: &Natural, err0: u64, prec: u64, rm: RoundingMode) -> bool {

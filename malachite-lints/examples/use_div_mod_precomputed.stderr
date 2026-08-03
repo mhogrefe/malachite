@@ -1,0 +1,34 @@
+error: this division's divisor is loop-invariant; call `precompute_div_mod_data()` outside the loop and use `div_mod_precomputed()` here
+  --> $DIR/use_div_mod_precomputed.rs:21:17
+   |
+LL |         let _ = x.div_mod(&d);
+   |                 ^^^^^^^^^^^^^
+   |
+   = note: `#[deny(use_div_mod_precomputed)]` on by default
+
+error: this division's divisor is loop-invariant; call `precompute_div_mod_data()` outside the loop and use `div_mod_precomputed()` here
+  --> $DIR/use_div_mod_precomputed.rs:25:17
+   |
+LL |         let _ = &xs[i] % &d;
+   |                 ^^^^^^^^^^^
+
+error: this division's divisor is loop-invariant; call `precompute_div_mod_data()` outside the loop and use `div_mod_precomputed()` here
+  --> $DIR/use_div_mod_precomputed.rs:26:17
+   |
+LL |         let _ = &xs[i] / &d;
+   |                 ^^^^^^^^^^^
+
+error: this division's divisor is loop-invariant; call `precompute_div_mod_data()` outside the loop and use `div_mod_precomputed()` here
+  --> $DIR/use_div_mod_precomputed.rs:30:17
+   |
+LL |         let _ = y.div_rem(&e);
+   |                 ^^^^^^^^^^^^^
+
+error: this division's divisor is loop-invariant; call `precompute_div_mod_data()` outside the loop and use `div_mod_precomputed()` here
+  --> $DIR/use_div_mod_precomputed.rs:34:17
+   |
+LL |         let _ = x.div_assign_mod(&d);
+   |                 ^^^^^^^^^^^^^^^^^^^^
+
+error: aborting due to 5 previous errors
+

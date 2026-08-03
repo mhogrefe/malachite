@@ -7,8 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{
-    CeilingDivAssignMod, CeilingDivMod, CeilingDivNegMod, CeilingMod, DivAssignMod, DivAssignRem,
-    DivMod, DivRem, DivRound, Mod,
+    CeilingDivAssignMod, CeilingDivMod, CeilingDivNegMod, CeilingMod, DivAssignMod,
+    DivAssignModPrecomputed, DivAssignRem, DivMod, DivModPrecomputed, DivRem, DivRound, Mod,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
@@ -1504,6 +1504,52 @@ fn div_mod_properties_helper(x: Integer, y: Integer) {
     assert_eq!(q_alt, q);
     assert!(r_alt.is_valid());
     assert_eq!(r_alt, r);
+
+    let data = Integer::precompute_div_mod_data(&y);
+    // the data depends only on the absolute value of the divisor
+    assert_eq!(Integer::precompute_div_mod_data(&-&y), data);
+
+    let (q_alt, r_alt) = (&x).div_mod_precomputed(&y, &data);
+    assert!(q_alt.is_valid());
+    assert_eq!(q_alt, q);
+    assert!(r_alt.is_valid());
+    assert_eq!(r_alt, r);
+
+    let (q_alt, r_alt) = (&x).div_mod_precomputed(y.clone(), &data);
+    assert!(q_alt.is_valid());
+    assert_eq!(q_alt, q);
+    assert!(r_alt.is_valid());
+    assert_eq!(r_alt, r);
+
+    let (q_alt, r_alt) = x.clone().div_mod_precomputed(&y, &data);
+    assert!(q_alt.is_valid());
+    assert_eq!(q_alt, q);
+    assert!(r_alt.is_valid());
+    assert_eq!(r_alt, r);
+
+    let (q_alt, r_alt) = x.clone().div_mod_precomputed(y.clone(), &data);
+    assert!(q_alt.is_valid());
+    assert_eq!(q_alt, q);
+    assert!(r_alt.is_valid());
+    assert_eq!(r_alt, r);
+
+    let mut q_alt = x.clone();
+    let r_alt = q_alt.div_assign_mod_precomputed(&y, &data);
+    assert_eq!(q_alt, q);
+    assert_eq!(r_alt, r);
+
+    let mut q_alt = x.clone();
+    let r_alt = q_alt.div_assign_mod_precomputed(y.clone(), &data);
+    assert_eq!(q_alt, q);
+    assert_eq!(r_alt, r);
+
+    // the same data works for other dividends and for the negated divisor
+    assert_eq!((&x).div_mod_precomputed(-&y, &data), (&x).div_mod(-&y));
+    let x_plus_1 = &x + Integer::ONE;
+    assert_eq!(
+        (&x_plus_1).div_mod_precomputed(&y, &data),
+        x_plus_1.div_mod(&y)
+    );
 
     let (q_alt, r_alt) = ((&x).div_round(&y, Floor).0, (&x).mod_op(&y));
     assert_eq!(q_alt, q);

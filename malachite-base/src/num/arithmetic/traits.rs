@@ -67,12 +67,12 @@ pub trait MulAddMulAssign<Y = Self, Z = Self, W = Self> {
     fn mul_add_mul_assign(&mut self, y: Y, z: Z, w: W);
 }
 
-/// Multiplies two numbers and right-shifts the product (divides it by a power of 2), rounding
-/// the result according to a specified rounding mode. An [`Ordering`] is also returned,
-/// indicating whether the returned value is less than, equal to, or greater than the exact value.
+/// Multiplies two numbers and right-shifts the product (divides it by a power of 2), rounding the
+/// result according to a specified rounding mode. An [`Ordering`] is also returned, indicating
+/// whether the returned value is less than, equal to, or greater than the exact value.
 ///
-/// The product is computed exactly, as if at unlimited width; only the final shifted result must
-/// be representable.
+/// The product is computed exactly, as if at unlimited width; only the final shifted result must be
+/// representable.
 pub trait MulShrRound<RHS = Self, B = u64> {
     type Output;
 
@@ -83,8 +83,8 @@ pub trait MulShrRound<RHS = Self, B = u64> {
 /// rounding the result according to a specified rounding mode. An [`Ordering`] is returned,
 /// indicating whether the assigned value is less than, equal to, or greater than the exact value.
 ///
-/// The product is computed exactly, as if at unlimited width; only the final shifted result must
-/// be representable.
+/// The product is computed exactly, as if at unlimited width; only the final shifted result must be
+/// representable.
 pub trait MulShrRoundAssign<RHS = Self, B = u64> {
     fn mul_shr_round_assign(&mut self, other: RHS, bits: B, rm: RoundingMode) -> Ordering;
 }
@@ -316,6 +316,43 @@ pub trait DivMod<RHS = Self> {
     type ModOutput;
 
     fn div_mod(self, other: RHS) -> (Self::DivOutput, Self::ModOutput);
+}
+
+/// Divides two numbers, returning the quotient and remainder. The quotient is rounded towards
+/// negative infinity, and the remainder has the same sign as the divisor (second input).
+///
+/// The quotient and remainder satisfy $x = qy + r$ and $0 \leq |r| < |y|$.
+///
+/// If multiple divisions by the same divisor are necessary, it can be quicker to precompute some
+/// piece of data based on the divisor and reuse it in the division calls. This trait provides a
+/// function for precomputing the data and a function for using it during division.
+pub trait DivModPrecomputed<RHS = Self> {
+    type DivOutput;
+    type ModOutput;
+    type Data;
+
+    /// Precomputes some data to use for division.
+    fn precompute_div_mod_data(other: &RHS) -> Self::Data;
+
+    fn div_mod_precomputed(
+        self,
+        other: RHS,
+        data: &Self::Data,
+    ) -> (Self::DivOutput, Self::ModOutput);
+}
+
+/// Divides a number by another number in place, returning the remainder. The quotient is rounded
+/// towards negative infinity, and the remainder has the same sign as the divisor (second input).
+///
+/// The quotient and remainder satisfy $x = qy + r$ and $0 \leq |r| < |y|$.
+///
+/// If multiple divisions by the same divisor are necessary, it can be quicker to precompute some
+/// piece of data based on the divisor and reuse it in the division calls. This trait provides a
+/// function for using precomputed data during division. For precomputing the data, use the
+/// [`precompute_div_mod_data`](DivModPrecomputed::precompute_div_mod_data) function in
+/// [`DivModPrecomputed`].
+pub trait DivAssignModPrecomputed<RHS = Self>: DivModPrecomputed<RHS> {
+    fn div_assign_mod_precomputed(&mut self, other: RHS, data: &Self::Data) -> Self::ModOutput;
 }
 
 /// Divides two numbers, returning just the quotient. The quotient is rounded towards the quotient

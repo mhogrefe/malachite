@@ -12,23 +12,18 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::natural::arithmetic::div_mod::{limbs_div_limb_to_out_mod, limbs_div_mod_to_out};
 use crate::natural::arithmetic::float::exp::limbs_float_exp;
 use crate::natural::arithmetic::float::round::{round_helper_2, round_helper_raw};
-use crate::natural::arithmetic::div_mod::{limbs_div_limb_to_out_mod, limbs_div_mod_to_out};
 use crate::natural::arithmetic::mul::limbs_mul;
 use crate::natural::arithmetic::shl::limbs_slice_shl_in_place;
 use crate::natural::arithmetic::shr::limbs_slice_shr_in_place;
 use crate::natural::conversion::digits::general_digits::limbs_from_digits_small_base;
-use crate::natural::{
-    bit_to_limb_count_ceiling,
-    limb_to_bit_count,
-};
+use crate::natural::{bit_to_limb_count_ceiling, limb_to_bit_count};
 use crate::platform::Limb;
 use alloc::vec::Vec;
 use core::cmp::max;
-use malachite_base::num::arithmetic::traits::{
-    CeilingLogBase2, CheckedLogBase2, DivMod, Parity,
-};
+use malachite_base::num::arithmetic::traits::{CeilingLogBase2, CheckedLogBase2, DivMod, Parity};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode::{self, *};

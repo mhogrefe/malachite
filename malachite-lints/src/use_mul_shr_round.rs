@@ -133,7 +133,9 @@ impl<'tcx> LateLintPass<'tcx> for UseMulShrRound {
         }
         let product = match expr.kind {
             // `(x * y).shr_round(bits, rm)`
-            ExprKind::MethodCall(seg, recv, [_, _], _) if seg.ident.name.as_str() == "shr_round" => {
+            ExprKind::MethodCall(seg, recv, [_, _], _)
+                if seg.ident.name.as_str() == "shr_round" =>
+            {
                 recv
             }
             // `(x * y) >> bits`

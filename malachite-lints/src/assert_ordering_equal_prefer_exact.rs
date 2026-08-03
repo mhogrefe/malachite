@@ -64,7 +64,8 @@ fn is_ordering_equal(cx: &LateContext<'_>, e: &Expr<'_>) -> bool {
     let Res::Def(DefKind::Ctor(..) | DefKind::Variant, did) = res else {
         return false;
     };
-    cx.tcx.item_name(did).as_str() == "Equal" && crate::is_ordering_ty(cx, cx.typeck_results().expr_ty(e))
+    cx.tcx.item_name(did).as_str() == "Equal"
+        && crate::is_ordering_ty(cx, cx.typeck_results().expr_ty(e))
 }
 
 // If `init` is a call to an inherent associated function of a Malachite bignum type, returns the

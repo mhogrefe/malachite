@@ -53,13 +53,13 @@ impl MulShrRound<Integer, u64> for Integer {
 
     /// Multiplies two [`Integer`]s and right-shifts the product (divides it by a power of 2),
     /// rounding according to a specified rounding mode, taking both [`Integer`]s by value. An
-    /// [`Ordering`] is also returned, indicating whether the returned value is less than, equal
-    /// to, or greater than the exact value.
+    /// [`Ordering`] is also returned, indicating whether the returned value is less than, equal to,
+    /// or greater than the exact value.
     ///
-    /// When most of the product is discarded, the product's low portion is never computed: a
-    /// short product determines the surviving bits at roughly half the cost of a full
-    /// multiplication. `Floor` rounds toward negative infinity and `Down` toward zero, so they
-    /// differ when the product is negative.
+    /// When most of the product is discarded, the product's low portion is never computed: a short
+    /// product determines the surviving bits at roughly half the cost of a full multiplication.
+    /// `Floor` rounds toward negative infinity and `Down` toward zero, so they differ when the
+    /// product is negative.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
@@ -177,8 +177,8 @@ impl MulShrRound<&Integer, u64> for &Integer {
 
     /// Multiplies two [`Integer`]s and right-shifts the product (divides it by a power of 2),
     /// rounding according to a specified rounding mode, taking both [`Integer`]s by reference. An
-    /// [`Ordering`] is also returned, indicating whether the returned value is less than, equal
-    /// to, or greater than the exact value.
+    /// [`Ordering`] is also returned, indicating whether the returned value is less than, equal to,
+    /// or greater than the exact value.
     ///
     /// See the by-value documentation for details.
     ///
@@ -214,8 +214,8 @@ impl MulShrRound<&Integer, u64> for &Integer {
 impl MulShrRoundAssign<Integer, u64> for Integer {
     /// Multiplies two [`Integer`]s and right-shifts the product (divides it by a power of 2) in
     /// place, rounding according to a specified rounding mode, taking the [`Integer`] on the
-    /// right-hand side by value. An [`Ordering`] is returned, indicating whether the assigned
-    /// value is less than, equal to, or greater than the exact value.
+    /// right-hand side by value. An [`Ordering`] is returned, indicating whether the assigned value
+    /// is less than, equal to, or greater than the exact value.
     ///
     /// See the [`MulShrRound`] documentation for details.
     ///
