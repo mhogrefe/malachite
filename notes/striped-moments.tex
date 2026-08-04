@@ -1,0 +1,315 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1.1in]{geometry}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{booktabs}
+\usepackage{microtype}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Kurt}{\operatorname{Kurt}}
+\newcommand{\hM}{\widehat{M}}
+
+\title{Sums of powers of integers with a fixed number of binary transitions,\\
+and the moments of striped random generators}
+\author{}
+\date{August 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+For $0 \le k \le n-1$, let $T_{n,k}$ be the set of integers in $[0, 2^n)$ whose $n$-bit binary
+representations have exactly $k$ transitions (adjacent unequal bits), and let
+$S_{n,k,p} = \sum_{m \in T_{n,k}} m^p$. We show that the generating polynomial of the $p$-th
+central power sums over $k$ satisfies a \emph{triangular} linear recursion in $n$, and therefore
+admits an explicit eigen-expansion: a closed form as a finite combination of $n$-th powers of the
+eigenvalues $2^j(1 + (-1)^j t)$ with explicit rational coefficients in the transition-marking
+variable $t$. Extracting the coefficient of $t^k$ yields exact formulas for $S_{n,k,p}$ with
+$O(k+p)$ terms, and the recursion itself evaluates all $k$ simultaneously in $O(n p^2)$
+big-integer operations. We give fully explicit results for $p \le 4$, correct a previously
+conjectured special case, and derive the exact variance and kurtosis---both for the uniform
+distribution on $T_{n,k}$ and for the ``striped'' random generators that motivated the question,
+in which each bit repeats the previous one with a fixed probability. In the striped model the
+formulas collapse to short rational expressions; for mean run length $m$, writing
+$\beta = 1 - 2/m$, the kurtosis converges as $n \to \infty$ to
+$\frac{3(2-\beta)(6+\beta)(8+7\beta)}{5(8-\beta)(2+\beta)^2}$.
+All formulas have been verified in exact arithmetic against exhaustive enumeration.
+\end{abstract}
+
+\section{Setup and notation}
+
+Fix $n \ge 1$. Every $m \in [0, 2^n)$ has bits $b_{n-1} \cdots b_0$, and its number of
+transitions is $\tau(m) = \#\{\, j \in [1, n-1] : b_j \ne b_{j-1} \,\}$. Let
+$T_{n,k} = \{\, m : \tau(m) = k \,\}$ and
+\[
+S_{n,k,p} \;=\; \sum_{m \in T_{n,k}} m^p .
+\]
+Counting is classical: a string with $k$ transitions is determined by its transition set (a
+$k$-subset of the $n-1$ boundaries) and its bottom bit, so $|T_{n,k}| = 2\binom{n-1}{k}$.
+
+It is convenient to center. Write each bit as a sign $\epsilon_i = 2b_i - 1 \in \{\pm 1\}$ and set
+\[
+c(m) \;=\; 2m - (2^n - 1) \;=\; \sum_{i=0}^{n-1} \epsilon_i 2^i .
+\]
+Factor out the bottom sign: $\epsilon_i = \epsilon_0 \prod_{j \le i} s_j$, where
+$s_j = \epsilon_j \epsilon_{j-1} \in \{\pm 1\}$ equals $-1$ exactly at transitions. The map
+$m \leftrightarrow (\epsilon_0, s_1, \dots, s_{n-1})$ is a bijection, $\tau(m) = \#\{j : s_j = -1\}$
+does not depend on $\epsilon_0$, and
+\begin{equation}\label{eq:Y}
+c(m) \;=\; \epsilon_0\, Y, \qquad
+Y \;=\; Y(s) \;=\; \sum_{i=0}^{n-1} 2^i \prod_{j=1}^{i} s_j .
+\end{equation}
+Summing over $\epsilon_0 = \pm 1$ shows that all odd central power sums vanish (this is the
+complement symmetry $m \mapsto 2^n - 1 - m$ of $T_{n,k}$), and that everything is encoded in the
+polynomials
+\[
+\hM_p(n) \;=\; \hM_p(n)(t) \;:=\; \sum_{s \in \{\pm 1\}^{n-1}} t^{\#\{j\,:\,s_j = -1\}}\, Y(s)^p ,
+\]
+via
+\begin{equation}\label{eq:bridge}
+\sum_{m \in T_{n,k}} c(m)^p \;=\;
+\begin{cases}
+2\,[t^k]\, \hM_p(n), & p \text{ even},\\[2pt]
+0, & p \text{ odd},
+\end{cases}
+\qquad
+S_{n,k,p} \;=\; \frac{1}{2^p} \sum_{\substack{j = 0 \\ j \text{ even}}}^{p}
+\binom{p}{j} (2^n - 1)^{p-j} \cdot 2\,[t^k]\,\hM_j(n) .
+\end{equation}
+The second identity is the binomial expansion of $m^p = \bigl((c + 2^n - 1)/2\bigr)^p$, with the
+odd-$j$ terms dropped.
+
+\section{The triangular recursion and its eigen-expansion}
+
+\begin{theorem}\label{thm:main}
+The polynomials $\hM_p$ satisfy, for $n \ge 2$,
+\begin{equation}\label{eq:rec}
+\hM_p(n) \;=\; \sum_{j=0}^{p} \binom{p}{j}\, 2^j \bigl(1 + (-1)^j t\bigr)\, \hM_j(n-1),
+\qquad \hM_p(1) = 1 .
+\end{equation}
+Consequently, since the coefficient matrix is lower triangular with distinct eigenvalues
+$\lambda_j = \lambda_j(t) = 2^j\bigl(1 + (-1)^j t\bigr)$,
+\begin{equation}\label{eq:eigen}
+\hM_p(n) \;=\; \sum_{j=0}^{p} c_{p,j}(t)\, \lambda_j(t)^{\,n-1},
+\end{equation}
+where the rational functions $c_{p,j}$ are determined by
+\[
+c_{p,j} \;=\; \frac{\displaystyle\sum_{i=j}^{p-1} \binom{p}{i} 2^i \bigl(1 + (-1)^i t\bigr)\, c_{i,j}}
+{\lambda_j - \lambda_p} \quad (j < p),
+\qquad
+c_{p,p} \;=\; 1 - \sum_{j < p} c_{p,j} .
+\]
+\end{theorem}
+
+\begin{proof}
+Splitting off the boundary variable $s_1$ in \eqref{eq:Y} gives the self-similarity
+$Y = 1 + 2 s_1 \widetilde{Y}$, where $\widetilde{Y}$ is the same functional of
+$(s_2, \dots, s_{n-1})$. Raise to the $p$-th power, expand, and sum first over
+$s_1 \in \{\pm 1\}$ using $\sum_{s = \pm 1} t^{[s = -1]} s^j = 1 + (-1)^j t$, then over the
+remaining variables; this is \eqref{eq:rec}. The expansion \eqref{eq:eigen} is the standard
+solution of a triangular linear recursion with distinct eigenvalues; matching the coefficient of
+$\lambda_j^{\,n-1}$ on both sides of \eqref{eq:rec} gives the formula for $c_{p,j}$ with $j < p$,
+and the initial condition $\hM_p(1) = 1$ fixes $c_{p,p}$.
+\end{proof}
+
+Theorem \ref{thm:main} answers the algorithmic question at once: iterating \eqref{eq:rec}
+computes $\hM_0, \dots, \hM_p$ as polynomials in $t$, hence $S_{n,k,p}$ \emph{for every $k$
+simultaneously}, in $O(n p^2)$ arithmetic operations on big integers---versus $\Theta(2^n)$ for
+enumeration. The expansion \eqref{eq:eigen} is moreover a closed form, uniform in $n$; the tables
+for $p \le 4$ are as follows (each was generated by exact rational-function arithmetic and
+verified against exhaustive enumeration; note the $t \mapsto -t$ symmetry between $c_{p,j}$ and
+$c_{p,p-j}$ up to powers of $2$).
+\begingroup
+\allowdisplaybreaks
+\begin{align}
+\hM_0(n) &= (1+t)^{n-1},\\[4pt]
+\hM_1(n) &= \frac{(1+t)^n - 2^n (1-t)^n}{3t - 1},\\[4pt]
+\hM_2(n) &= \frac{(3-t)\,(1+t)^{n-1}}{3(1 - 3t)}
+\;+\; \frac{2^{\,n+1}(1-t)^{n+1}}{(3t-1)(3t+1)}
+\;+\; \frac{4^{\,n}(3+t)\,(1+t)^{n-1}}{3(1 + 3t)},\label{eq:M2}\\[4pt]
+\hM_3(n) &= \frac{(t-7)(t+1)\,(1+t)^{n-1}}{(3t-1)(9t-7)}
++ \frac{(t+3)\,2^n(1-t)^{n}}{(3t-1)(3t+1)}
++ \frac{(t+3)\,4^{n}(1+t)^{n}}{(3t-1)(3t+1)}
++ \frac{(t-7)\,8^{n}(1-t)^{n}}{(3t-1)(9t-7)},\label{eq:M3}\\[4pt]
+\hM_4(n) &= \frac{(15-t)(7-5t)\,(1+t)^{n-1}}{15(1-3t)(7-9t)}
+\;+\; \frac{8(7+t)\;2^{\,n-1}(1-t)^{n+1}}{(3t-1)(3t+1)(9t+7)}
+\;+\; \frac{8(t^2 - 9)\;4^{\,n-1}(1+t)^{n-1}}{3(9t^2-1)}\notag\\
+&\qquad + \frac{32(t-7)\;8^{\,n-1}(1-t)^{n+1}}{(9t^2-1)(9t-7)}
+\;+\; \frac{16(15+t)(7+5t)\;16^{\,n-1}(1+t)^{n-1}}{15(1+3t)(7+9t)}.\label{eq:M4}
+\end{align}
+\endgroup
+Each summand has poles, but the sum is a polynomial in $t$ of degree $n - 1$; the singularities
+cancel identically, which is a useful internal check.
+
+\begin{remark}[Krawtchouk form]
+There is an equivalent ``static'' formulation that avoids the recursion. Expanding
+$Y^p = \sum_{i_1, \dots, i_p} 2^{i_1 + \cdots + i_p} \prod_j s_j^{e_j}$ with
+$e_j = \#\{ \ell : i_\ell \ge j \}$ and summing over $s$ shows, for even $p$,
+\[
+\sum_{m \in T_{n,k}} c(m)^p
+\;=\; 2 \sum_{i_1, \dots, i_p = 0}^{n-1} 2^{\,i_1 + \cdots + i_p}\; K_k\bigl(O(i);\, n-1\bigr),
+\]
+where, if $i_{(1)} \le \cdots \le i_{(p)}$ is the sorted tuple,
+$O(i) = (i_{(2)} - i_{(1)}) + (i_{(4)} - i_{(3)}) + \cdots + (i_{(p)} - i_{(p-1)})$ is the
+alternating gap sum, and $K_k(d;N) = \sum_j (-1)^j \binom{d}{j}\binom{N - d}{k - j}$ is the binary
+Krawtchouk polynomial, i.e.\ $[t^k](1+t)^{N-d}(1-t)^d$. The eigen-expansion results from
+evaluating this $p$-fold sum by nested geometric series.
+\end{remark}
+
+\section{Extracting a fixed number of transitions}
+
+All denominators in \eqref{eq:M2}--\eqref{eq:M4} are products of polynomials \emph{linear} in
+$t$, so coefficient extraction is mechanical.
+
+\begin{lemma}[extraction]\label{lem:extract}
+For any $A, B \ge 0$ and constant $a$,
+\[
+[t^k]\, \frac{(1+t)^A (1-t)^B}{1 - a t}
+\;=\; \sum_{i=0}^{k} a^{\,k-i} \sum_{j} (-1)^j \binom{B}{j} \binom{A}{i - j}.
+\]
+Terms with several linear factors in the denominator are first split by partial fractions in $t$.
+Applied to \eqref{eq:eigen}, this produces, for each fixed even $p$, an explicit formula for
+$\sum_{T_{n,k}} c^p$ with $O(k + p)$ terms; the relevant values of $a$ are $\pm 3$ for $p = 2$
+and $\pm 3, \pm \tfrac{9}{7}$ for $p = 4$.
+\end{lemma}
+
+For $p = 2$ the assembled result is compact. Writing
+$\Sigma_{n,k,2} = \sum_{m \in T_{n,k}} (2m - 2^n + 1)^2$:
+\begin{equation}\label{eq:sigma2}
+\begin{aligned}
+\Sigma_{n,k,2} = 2 \sum_{i=0}^{k} \biggl\{
+\frac{3^{k-i}}{3}\!\left[ 3\binom{n-1}{i} - \binom{n-1}{i-1} \right]
+&+ \frac{(-3)^{k-i}\, 4^n}{3}\!\left[ 3\binom{n-1}{i} + \binom{n-1}{i-1} \right]\\[2pt]
+&- 2^n (-1)^i \bigl( 3^{k-i} + (-3)^{k-i} \bigr) \binom{n+1}{i}
+\biggr\},
+\end{aligned}
+\end{equation}
+and then
+\begin{equation}\label{eq:S2}
+S_{n,k,2} \;=\; \frac{\Sigma_{n,k,2}}{4} + \frac{(2^n - 1)^2}{2} \binom{n-1}{k}.
+\end{equation}
+
+\begin{corollary}[low $k$]\label{cor:smallk}
+Specializing \eqref{eq:sigma2}--\eqref{eq:S2},
+\[
+S_{n,1,2} \;=\; 4^n \Bigl( n - \tfrac{7}{3} \Bigr) + 2^{\,n+1} + n + \tfrac{1}{3},
+\qquad
+S_{n,2,2} \;=\; 4^n \Bigl( \tfrac{n^2}{2} - \tfrac{17n}{6} + \tfrac{19}{3} \Bigr)
+- 2^n \bigl( n^2 - n + 10 \bigr) + \tfrac{n^2}{2} - \tfrac{n}{6} + \tfrac{11}{3}.
+\]
+\end{corollary}
+
+\begin{remark}
+The value of $S_{n,1,2}$ corrects the formula conjectured in the original question, which omits
+the ``$+\,n$'' term; the two expressions already disagree at $n = 2$, where
+$T_{2,1} = \{1, 2\}$ gives $S_{2,1,2} = 5$.
+\end{remark}
+
+\begin{corollary}[moments of the uniform distribution on $T_{n,k}$]\label{cor:unif}
+Let $X$ be uniform on $T_{n,k}$. Then $\E X = (2^n-1)/2$, all odd central moments vanish, and
+\[
+\Var(X) = \frac{[t^k]\,\hM_2(n)}{4 \binom{n-1}{k}},
+\qquad
+\Kurt(X) = \frac{\mu_4}{\mu_2^2}
+= \frac{\binom{n-1}{k}\; [t^k]\,\hM_4(n)}{\bigl( [t^k]\,\hM_2(n) \bigr)^{2}} .
+\]
+For every \emph{fixed} $k$, $\Kurt(X) \to 1$ as $n \to \infty$: with few transitions the value
+is dominated by the top run and the distribution becomes two-lobed. (For $k = 0$ and $k = n-1$
+the kurtosis is exactly $1$.) Sample values at $n = 64$: $1.0297$ at $k = 1$, $1.2302$ at
+$k = 8$, $1.7869$ at $k = 31$.
+\end{corollary}
+
+\begin{remark}[on ``closed form'']
+For each fixed $p$, \eqref{eq:eigen} with Lemma \ref{lem:extract} is an exact formula with
+$O(k+p)$ terms, uniform in $n$ and $k$. A single hypergeometric-free expression in all three
+parameters simultaneously seems out of reach: the $k$-slices irreducibly involve the partial sums
+$\sum_{i \le k} 3^i \binom{n}{i}$ (and $\tfrac{9}{7}$-weighted analogues at $p = 4$), which do
+not telescope.
+\end{remark}
+
+\section{Striped generators: independent transitions}
+
+The generators that motivated the question do not fix $k$. A \emph{striped} generator with mean
+run length $m \ge 2$ draws $b_0$ uniformly and then repeats the previous bit with probability
+$1 - \theta$, where $\theta = 1/m$; that is, the $s_j$ of Section 1 are i.i.d.\ with
+$\Pr[s_j = -1] = \theta$. Set
+\[
+\beta \;=\; \E[s_j] \;=\; 1 - 2\theta \;=\; 1 - \frac{2}{m} .
+\]
+The analysis of Theorem \ref{thm:main} goes through verbatim with the marker $t$ replaced by
+expectation: the recursion for $\E[Y^p]$ has the triangular matrix
+$\binom{p}{j} 2^j e_j$ with $e_j = 1$ for even $j$ and $e_j = \beta$ for odd $j$, hence
+eigenvalues $1, 2\beta, 4, 8\beta, 16, \dots$ For the centered value $c = 2X - (2^n - 1)$ all odd
+moments vanish, and the even ones are short rational expressions:
+\begin{align}
+\E[c^2] &= \frac{1 + 2\beta}{3(2\beta - 1)}
+\;+\; \frac{4\beta^2\,(2\beta)^{n-1}}{(2\beta - 1)(\beta - 2)}
+\;+\; \frac{4(2 + \beta)\,4^{\,n-1}}{3(2 - \beta)},
+\label{eq:E2}\\[6pt]
+\E[c^4] &= \frac{(6\beta + 1)(8\beta + 7)}{15 (2\beta - 1)(8\beta - 1)}
+\;-\; \frac{8 \beta^2 (3\beta + 4)\,(2\beta)^{n-1}}{(2\beta - 1)(2 - \beta)(8 - \beta)}
+\;-\; \frac{8 (2\beta + 1)(\beta + 2)\,4^{\,n-1}}{3 (2\beta - 1)(\beta - 2)}\notag\\
+&\qquad + \frac{32 \beta^2 (4\beta + 3)\,(8\beta)^{n-1}}{(\beta - 2)(8\beta - 1)(2\beta - 1)}
+\;+\; \frac{16 (7\beta + 8)(\beta + 6)\,16^{\,n-1}}{15 (8 - \beta)(2 - \beta)},
+\label{eq:E4}
+\end{align}
+with $\Var(X) = \tfrac14 \E[c^2]$ and $\Kurt(X) = \E[c^4] / \E[c^2]^2$.
+
+\begin{remark}[removable singularities]
+The parameter values $\beta = \tfrac12$ (mean run length $m = 4$) and $\beta = \tfrac18$ are
+removable singularities of \eqref{eq:E2}--\eqref{eq:E4}, caused by eigenvalue collisions
+($2\beta = 1$, resp.\ $8\beta = 1$); evaluate by taking limits, or by running the recursion
+directly. For example, at $m = 4$,
+\[
+\E[c^2] \;=\; \frac{5 \cdot 4^n - 6n - 5}{9}.
+\]
+\end{remark}
+
+\begin{corollary}[limits]\label{cor:limits}
+As $n \to \infty$,
+\[
+\Var\!\left( \frac{X}{2^n} \right) \;\longrightarrow\; \frac{2 + \beta}{12 (2 - \beta)},
+\qquad
+\Kurt(X) \;\longrightarrow\;
+\frac{3 (2 - \beta)(6 + \beta)(8 + 7\beta)}{5 (8 - \beta)(2 + \beta)^2}.
+\]
+At $\beta = 0$ (unstriped, uniform bits) these are $\tfrac{1}{12}$ and $\tfrac{9}{5}$, the
+variance and kurtosis of the uniform distribution; as $\beta \to 1$ they tend to $\tfrac14$ and
+$1$, those of a symmetric two-point distribution.
+\end{corollary}
+
+\begin{center}
+\begin{tabular}{ccccc}
+\toprule
+$m$ & $\beta$ & $\lim \Var(X/2^n)$ & $\lim \Kurt(X)$ & \\
+\midrule
+$2$ & $0$ & $1/12 \approx 0.0833$ & $9/5 = 1.8$ & (uniform)\\
+$3$ & $1/3$ & $7/60 \approx 0.1167$ & $1767/1127 \approx 1.5679$ &\\
+$4$ & $1/2$ & $5/36 \approx 0.1389$ & $897/625 = 1.4352$ &\\
+$8$ & $3/4$ & $11/60 \approx 0.1833$ & $\approx 1.2234$ &\\
+$16$ & $7/8$ & $23/108 \approx 0.2130$ & $\approx 1.1130$ &\\
+$32$ & $15/16$ & $47/204 \approx 0.2304$ & $\approx 1.0568$ &\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section{Verification}
+
+All results were checked in exact rational arithmetic:
+the eigen-expansions \eqref{eq:M2}--\eqref{eq:M4} against exhaustive enumeration of all
+$2^{\,n-1}$ transition strings for $p \le 4$ and $n \le 12$;
+the bridge \eqref{eq:bridge} against the raw integer sums $\sum_{m} m^p$ over $[0, 2^n)$ for
+$n \le 10$ and all $k$;
+the closed forms against an independent iteration of \eqref{eq:rec} at $n = 40$;
+the explicit formulas \eqref{eq:sigma2}--\eqref{eq:S2} and Corollaries
+\ref{cor:smallk}--\ref{cor:unif} against brute force on the stated ranges;
+and \eqref{eq:E2}--\eqref{eq:E4} against probability-weighted enumeration at
+$\beta \in \{ \tfrac13, \tfrac35, \tfrac{15}{16}, -\tfrac13 \}$.
+
+\end{document}
