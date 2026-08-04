@@ -98,6 +98,9 @@ pub type PrimitiveIntUpDown<T> =
 /// # Complexity per iteration
 /// Constant time and additional memory.
 ///
+/// # Worst-case complexity per iteration
+/// Constant time and additional memory.
+///
 /// # Examples
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
@@ -123,6 +126,9 @@ pub fn exhaustive_unsigneds<T: PrimitiveUnsigned>() -> PrimitiveIntIncreasingRan
 /// The output length is $L$.
 ///
 /// # Complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Worst-case complexity per iteration
 /// Constant time and additional memory.
 ///
 /// # Examples
@@ -155,6 +161,9 @@ pub type ExhaustiveSigneds<T> = Chain<Once<T>, PrimitiveIntUpDown<T>>;
 /// # Complexity per iteration
 /// Constant time and additional memory.
 ///
+/// # Worst-case complexity per iteration
+/// Constant time and additional memory.
+///
 /// # Examples
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
@@ -179,6 +188,9 @@ pub fn exhaustive_signeds<T: PrimitiveSigned>() -> ExhaustiveSigneds<T> {
 /// # Complexity per iteration
 /// Constant time and additional memory.
 ///
+/// # Worst-case complexity per iteration
+/// Constant time and additional memory.
+///
 /// # Examples
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
@@ -201,6 +213,9 @@ pub fn exhaustive_natural_signeds<T: PrimitiveSigned>() -> PrimitiveIntIncreasin
 /// The output length is $2^{W-1}$.
 ///
 /// # Complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Worst-case complexity per iteration
 /// Constant time and additional memory.
 ///
 /// # Examples
@@ -231,6 +246,9 @@ pub fn exhaustive_negative_signeds<T: PrimitiveSigned>() -> Rev<PrimitiveIntIncr
 /// # Complexity per iteration
 /// Constant time and additional memory.
 ///
+/// # Worst-case complexity per iteration
+/// Constant time and additional memory.
+///
 /// # Examples
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
@@ -257,6 +275,9 @@ pub fn exhaustive_nonzero_signeds<T: PrimitiveSigned>() -> PrimitiveIntUpDown<T>
 /// The output length is $b - a$.
 ///
 /// # Complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Worst-case complexity per iteration
 /// Constant time and additional memory.
 ///
 /// # Panics
@@ -294,6 +315,9 @@ pub fn primitive_int_increasing_range<T: PrimitiveInt>(
 /// The output length is $b - a + 1$.
 ///
 /// # Complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Worst-case complexity per iteration
 /// Constant time and additional memory.
 ///
 /// # Panics
@@ -334,6 +358,9 @@ pub fn primitive_int_increasing_inclusive_range<T: PrimitiveInt>(
 /// The output length is $b - a$.
 ///
 /// # Complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Worst-case complexity per iteration
 /// Constant time and additional memory.
 ///
 /// # Panics
@@ -377,6 +404,9 @@ pub fn exhaustive_signed_range<T: PrimitiveSigned>(a: T, b: T) -> ExhaustiveSign
 /// The output length is $b - a + 1$.
 ///
 /// # Complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Worst-case complexity per iteration
 /// Constant time and additional memory.
 ///
 /// # Panics
@@ -462,6 +492,9 @@ impl<T: PrimitiveFloat> DoubleEndedIterator for PrimitiveFloatIncreasingRange<T>
 /// # Complexity per iteration
 /// Constant time and additional memory.
 ///
+/// # Worst-case complexity per iteration
+/// Constant time and additional memory.
+///
 /// # Panics
 /// Panics if `NiceFloat(a) > NiceFloat(b)`.
 ///
@@ -529,6 +562,9 @@ pub fn primitive_float_increasing_range<T: PrimitiveFloat>(
 /// The output length is $\varphi(b) - \varphi(a) + 1$.
 ///
 /// # Complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Worst-case complexity per iteration
 /// Constant time and additional memory.
 ///
 /// # Panics
@@ -602,6 +638,9 @@ pub fn primitive_float_increasing_inclusive_range<T: PrimitiveFloat>(
 /// # Complexity per iteration
 /// Constant time and additional memory.
 ///
+/// # Worst-case complexity per iteration
+/// Constant time and additional memory.
+///
 /// # Examples
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
@@ -654,6 +693,9 @@ pub fn positive_finite_primitive_floats_increasing<T: PrimitiveFloat>()
 /// - For [`f64`], this is $2^{63}-2^{52}-1$, or 9218868437227405311.
 ///
 /// # Complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Worst-case complexity per iteration
 /// Constant time and additional memory.
 ///
 /// # Examples
@@ -713,6 +755,9 @@ pub fn negative_finite_primitive_floats_increasing<T: PrimitiveFloat>()
 /// # Complexity per iteration
 /// Constant time and additional memory.
 ///
+/// # Worst-case complexity per iteration
+/// Constant time and additional memory.
+///
 /// # Examples
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
@@ -766,6 +811,9 @@ pub fn nonzero_finite_primitive_floats_increasing<T: PrimitiveFloat>()
 /// - For [`f64`], this is $2^{64}-2^{53}$, or 18437736874454810624.
 ///
 /// # Complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Worst-case complexity per iteration
 /// Constant time and additional memory.
 ///
 /// # Examples
@@ -822,6 +870,9 @@ pub fn finite_primitive_floats_increasing<T: PrimitiveFloat>() -> PrimitiveFloat
 /// # Complexity per iteration
 /// Constant time and additional memory.
 ///
+/// # Worst-case complexity per iteration
+/// Constant time and additional memory.
+///
 /// # Examples
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
@@ -874,6 +925,9 @@ pub fn positive_primitive_floats_increasing<T: PrimitiveFloat>() -> PrimitiveFlo
 /// - For [`f64`], this is $2^{63}-2^{52}$, or 9218868437227405312.
 ///
 /// # Complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Worst-case complexity per iteration
 /// Constant time and additional memory.
 ///
 /// # Examples
@@ -932,6 +986,9 @@ pub fn negative_primitive_floats_increasing<T: PrimitiveFloat>() -> PrimitiveFlo
 /// # Complexity per iteration
 /// Constant time and additional memory.
 ///
+/// # Worst-case complexity per iteration
+/// Constant time and additional memory.
+///
 /// # Examples
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
@@ -984,6 +1041,9 @@ pub fn nonzero_primitive_floats_increasing<T: PrimitiveFloat>()
 /// - For [`f64`], this is $2^{64}-2^{53}+2$, or 18437736874454810626.
 ///
 /// # Complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Worst-case complexity per iteration
 /// Constant time and additional memory.
 ///
 /// # Examples
@@ -1064,6 +1124,15 @@ impl<T: PrimitiveFloat> Iterator for ConstantPrecisionPrimitiveFloats<T> {
 /// If $p$ is 1, the output length is 1; otherwise, it is $2^{p-2}$.
 ///
 /// # Complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Worst-case complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Worst-case complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Worst-case complexity per iteration
 /// Constant time and additional memory.
 ///
 /// # Panics
@@ -1344,6 +1413,9 @@ impl<T: PrimitiveFloat> Iterator for ExhaustivePositiveFinitePrimitiveFloats<T> 
 /// # Complexity per iteration
 /// Constant time and additional memory.
 ///
+/// # Worst-case complexity per iteration
+/// Constant time and additional memory.
+///
 /// # Examples
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
@@ -1397,6 +1469,9 @@ impl<T: PrimitiveFloat> Iterator for ExhaustiveNegativeFinitePrimitiveFloats<T> 
 /// - For [`f64`], this is $2^{63}-2^{52}-1$, or 9218868437227405311.
 ///
 /// # Complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Worst-case complexity per iteration
 /// Constant time and additional memory.
 ///
 /// # Examples
@@ -1463,6 +1538,9 @@ impl<T: PrimitiveFloat> Iterator for ExhaustiveNonzeroFinitePrimitiveFloats<T> {
 /// # Complexity per iteration
 /// Constant time and additional memory.
 ///
+/// # Worst-case complexity per iteration
+/// Constant time and additional memory.
+///
 /// # Examples
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
@@ -1507,6 +1585,9 @@ pub type ExhaustiveFinitePrimitiveFloats<T> =
 /// # Complexity per iteration
 /// Constant time and additional memory.
 ///
+/// # Worst-case complexity per iteration
+/// Constant time and additional memory.
+///
 /// # Examples
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
@@ -1544,6 +1625,9 @@ pub fn exhaustive_finite_primitive_floats<T: PrimitiveFloat>()
 /// - For [`f64`], this is $2^{63}-2^{52}$, or 9218868437227405312.
 ///
 /// # Complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Worst-case complexity per iteration
 /// Constant time and additional memory.
 ///
 /// # Examples
@@ -1584,6 +1668,9 @@ pub fn exhaustive_positive_primitive_floats<T: PrimitiveFloat>()
 /// # Complexity per iteration
 /// Constant time and additional memory.
 ///
+/// # Worst-case complexity per iteration
+/// Constant time and additional memory.
+///
 /// # Examples
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
@@ -1620,6 +1707,9 @@ pub fn exhaustive_negative_primitive_floats<T: PrimitiveFloat>()
 /// - For [`f64`], this is $2^{64}-2^{53}$, or 18437736874454810624.
 ///
 /// # Complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Worst-case complexity per iteration
 /// Constant time and additional memory.
 ///
 /// # Examples
@@ -2042,6 +2132,9 @@ impl<T: PrimitiveFloat> Iterator for ExhaustivePrimitiveFloatInclusiveRange<T> {
 /// # Complexity per iteration
 /// Constant time and additional memory.
 ///
+/// # Worst-case complexity per iteration
+/// Constant time and additional memory.
+///
 /// # Panics
 /// Panics if `NiceFloat(a) > NiceFloat(b)`.
 ///
@@ -2098,6 +2191,9 @@ pub fn exhaustive_primitive_float_range<T: PrimitiveFloat>(
 /// The output length is $\varphi(b) - \varphi(a) + 1$.
 ///
 /// # Complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Worst-case complexity per iteration
 /// Constant time and additional memory.
 ///
 /// # Panics

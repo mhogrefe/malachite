@@ -24,6 +24,7 @@ CRATES = ["malachite-base", "malachite-nz", "malachite-q", "malachite-float"]
 HEADERS = {
     "# Worst-case complexity",
     "# Worst-case complexity (amortized)",
+    "# Worst-case complexity per iteration",
     "# Expected complexity",
     "# Expected complexity per iteration",
 }

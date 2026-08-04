@@ -461,15 +461,16 @@ pub fn random_slice_permutations<T>(seed: Seed, xs: &[T]) -> RandomSlicePermutat
     }
 }
 
-/// Given a slice with nonzero length $\ell$, returns the smallest $n$ such that the slice consists
+/// Given a nonempty slice of length $n$, returns the smallest $\ell$ such that the slice consists
 /// of $n/\ell$ copies of a length-$\ell$ subslice.
 ///
 /// Typically $\ell = n$.
 ///
 /// # Worst-case complexity
-/// $T(n) = O(n^{1+\varepsilon})$ for all $\varepsilon > 0$
+/// $T(n) = O(n^{1+\varepsilon})$ for all $\varepsilon > 0$: each of the $d(n) = n^{o(1)}$ divisors
+/// of $n$ costs one $O(n)$ comparison.
 ///
-/// $M(n) = O(n)$
+/// $M(n) = O(1)$
 ///
 /// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 ///

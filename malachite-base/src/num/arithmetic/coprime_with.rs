@@ -34,8 +34,8 @@ pub fn coprime_with_check_2_3_5<T: PrimitiveUnsigned>(x: T, y: T) -> bool {
         let c10 = T::from(10u8);
         let x15 = x % c15;
         let y15 = y % c15;
-        // Whether x and y are both divisible by 3, or both divisible by 5, read off their
-        // residues mod 15.
+        // Whether x and y are both divisible by 3, or both divisible by 5, read off their residues
+        // mod 15.
         if ((x15 == T::ZERO || x15 == c3 || x15 == c6 || x15 == c9 || x15 == c12)
             && (y15 == T::ZERO || y15 == c3 || y15 == c6 || y15 == c9 || y15 == c12))
             || ((x15 == T::ZERO || x15 == c5 || x15 == c10)

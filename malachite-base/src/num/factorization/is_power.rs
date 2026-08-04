@@ -803,7 +803,13 @@ impl ExpressAsPower for u64 {
     /// example, $64=2^6=4^3=8^2$, but this function returns `(2,6)` rather than `(4,3)` or `(8,2)`.
     ///
     /// # Worst-case complexity
-    /// Constant time and additional memory.
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`: trial
+    /// division strips small prime factors, each division removing at least one bit, and a bounded
+    /// number of root extractions follow, each at worst $O(n)$.
     ///
     /// # Examples
     /// See [here](super::is_power#express_as_power).
@@ -826,7 +832,13 @@ impl ExpressAsPower for u128 {
     /// example, $64=2^6=4^3=8^2$, but this function returns `(2,6)` rather than `(4,3)` or `(8,2)`.
     ///
     /// # Worst-case complexity
-    /// Constant time and additional memory.
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`: trial
+    /// division strips small prime factors, each division removing at least one bit, and a bounded
+    /// number of root extractions follow, each at worst $O(n)$.
     ///
     /// # Examples
     /// See [here](super::is_power#express_as_power).
@@ -849,7 +861,13 @@ impl ExpressAsPower for usize {
     /// example, $64=2^6=4^3=8^2$, but this function returns `(2,6)` rather than `(4,3)` or `(8,2)`.
     ///
     /// # Worst-case complexity
-    /// Constant time and additional memory.
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`: trial
+    /// division strips small prime factors, each division removing at least one bit, and a bounded
+    /// number of root extractions follow, each at worst $O(n)$.
     ///
     /// # Examples
     /// See [here](super::is_power#express_as_power).
@@ -881,7 +899,13 @@ impl IsPower for u64 {
     /// $f(x) = (\exists b \in \Z, e \in \N : e > 1 \ \text{and} \ b^e = x)$.
     ///
     /// # Worst-case complexity
-    /// Constant time and additional memory.
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`: trial
+    /// division strips small prime factors, each division removing at least one bit, and a bounded
+    /// number of root extractions follow, each at worst $O(n)$.
     ///
     /// # Examples
     /// See [here](super::is_power#is_power).
@@ -899,7 +923,13 @@ impl IsPower for u128 {
     /// $f(x) = (\exists b \in \Z, e \in \N : e > 1 \ \text{and} \ b^e = x)$.
     ///
     /// # Worst-case complexity
-    /// Constant time and additional memory.
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`: trial
+    /// division strips small prime factors, each division removing at least one bit, and a bounded
+    /// number of root extractions follow, each at worst $O(n)$.
     ///
     /// # Examples
     /// See [here](super::is_power#is_power).
@@ -917,7 +947,13 @@ impl IsPower for usize {
     /// $f(x) = (\exists b \in \Z, e \in \N : e > 1 \ \text{and} \ b^e = x)$.
     ///
     /// # Worst-case complexity
-    /// Constant time and additional memory.
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`: trial
+    /// division strips small prime factors, each division removing at least one bit, and a bounded
+    /// number of root extractions follow, each at worst $O(n)$.
     ///
     /// # Examples
     /// See [here](super::is_power#is_power).
@@ -941,7 +977,13 @@ macro_rules! impl_unsigned_32 {
             /// than `(4,3)` or `(8,2)`.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`:
+            /// trial division strips small prime factors, each division removing at least one bit,
+            /// and a bounded number of root extractions follow, each at worst $O(n)$.
             ///
             /// # Examples
             /// See [here](super::is_power#express_as_power).
@@ -966,7 +1008,13 @@ macro_rules! impl_unsigned_32 {
             /// $f(x) = (\exists b \in \Z, e \in \N : e > 1 \ \text{and} \ b^e = x)$.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`:
+            /// trial division strips small prime factors, each division removing at least one bit,
+            /// and a bounded number of root extractions follow, each at worst $O(n)$.
             ///
             /// # Examples
             /// See [here](super::is_power#is_power).
@@ -989,7 +1037,13 @@ impl ExpressAsPower for i64 {
     /// example, $64=2^6=4^3=8^2$, but this function returns `(2,6)` rather than `(4,3)` or `(8,2)`.
     ///
     /// # Worst-case complexity
-    /// Constant time and additional memory.
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`: trial
+    /// division strips small prime factors, each division removing at least one bit, and a bounded
+    /// number of root extractions follow, each at worst $O(n)$.
     ///
     /// # Examples
     /// See [here](super::is_power#express_as_power).
@@ -1012,7 +1066,13 @@ impl ExpressAsPower for i128 {
     /// example, $64=2^6=4^3=8^2$, but this function returns `(2,6)` rather than `(4,3)` or `(8,2)`.
     ///
     /// # Worst-case complexity
-    /// Constant time and additional memory.
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`: trial
+    /// division strips small prime factors, each division removing at least one bit, and a bounded
+    /// number of root extractions follow, each at worst $O(n)$.
     ///
     /// # Examples
     /// See [here](super::is_power#express_as_power).
@@ -1035,7 +1095,13 @@ impl ExpressAsPower for isize {
     /// example, $64=2^6=4^3=8^2$, but this function returns `(2,6)` rather than `(4,3)` or `(8,2)`.
     ///
     /// # Worst-case complexity
-    /// Constant time and additional memory.
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`: trial
+    /// division strips small prime factors, each division removing at least one bit, and a bounded
+    /// number of root extractions follow, each at worst $O(n)$.
     ///
     /// # Examples
     /// See [here](super::is_power#express_as_power).
@@ -1067,7 +1133,13 @@ impl IsPower for i64 {
     /// $f(x) = (\exists b \in \Z, e \in \N : e > 1 \ \text{and} \ b^e = x)$.
     ///
     /// # Worst-case complexity
-    /// Constant time and additional memory.
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`: trial
+    /// division strips small prime factors, each division removing at least one bit, and a bounded
+    /// number of root extractions follow, each at worst $O(n)$.
     ///
     /// # Examples
     /// See [here](super::is_power#is_power).
@@ -1085,7 +1157,13 @@ impl IsPower for i128 {
     /// $f(x) = (\exists b \in \Z, e \in \N : e > 1 \ \text{and} \ b^e = x)$.
     ///
     /// # Worst-case complexity
-    /// Constant time and additional memory.
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`: trial
+    /// division strips small prime factors, each division removing at least one bit, and a bounded
+    /// number of root extractions follow, each at worst $O(n)$.
     ///
     /// # Examples
     /// See [here](super::is_power#is_power).
@@ -1103,7 +1181,13 @@ impl IsPower for isize {
     /// $f(x) = (\exists b \in \Z, e \in \N : e > 1 \ \text{and} \ b^e = x)$.
     ///
     /// # Worst-case complexity
-    /// Constant time and additional memory.
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`: trial
+    /// division strips small prime factors, each division removing at least one bit, and a bounded
+    /// number of root extractions follow, each at worst $O(n)$.
     ///
     /// # Examples
     /// See [here](super::is_power#is_power).
@@ -1127,7 +1211,13 @@ macro_rules! impl_signed_32 {
             /// than `(4,3)` or `(8,2)`.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`:
+            /// trial division strips small prime factors, each division removing at least one bit,
+            /// and a bounded number of root extractions follow, each at worst $O(n)$.
             ///
             /// # Examples
             /// See [here](super::is_power#express_as_power).
@@ -1152,7 +1242,13 @@ macro_rules! impl_signed_32 {
             /// $f(x) = (\exists b \in \Z, e \in \N : e > 1 \ \text{and} \ b^e = x)$.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`:
+            /// trial division strips small prime factors, each division removing at least one bit,
+            /// and a bounded number of root extractions follow, each at worst $O(n)$.
             ///
             /// # Examples
             /// See [here](super::is_power#is_power).

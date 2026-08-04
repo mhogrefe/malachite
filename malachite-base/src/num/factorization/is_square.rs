@@ -176,7 +176,13 @@ impl IsSquare for u128 {
     /// $f(x) = (\exists b \in \Z : b^2 = x)$.
     ///
     /// # Worst-case complexity
-    /// Constant time and additional memory.
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`: the
+    /// quadratic-residue prefilters are constant-time and reject most nonsquares, but surviving
+    /// candidates pay one $O(n)$ 128-bit square root.
     ///
     /// # Examples
     /// See [here](super::is_square#is_square).

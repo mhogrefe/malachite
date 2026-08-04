@@ -37,6 +37,14 @@ impl<I: Iterator> Iterator for RandomSomes<I> {
 ///
 /// The output length is infinite.
 ///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(T^\prime(i))$
+///
+/// $M(i) = O(M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`.
+///
 /// # Examples
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
@@ -98,6 +106,15 @@ impl<I: Iterator> Iterator for RandomOptions<I> {
 /// `xs` must be infinite.
 ///
 /// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// $T(i) = O(T^\prime(i))$
+///
+/// $M(i) = O(M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`: each iteration adds only the weighted coin
+/// flip that decides between `None` and a wrapped value.
 ///
 /// # Panics
 /// Panics if `none_p_denominator` is 0 or `none_p_numerator > none_p_denominator`.

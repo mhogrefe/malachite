@@ -125,14 +125,6 @@ formula.
 - [ ] `div_assign_mod` (line 363) — cx, panics
 - [ ] `div_assign_mod` (line 429) — cx, panics
 - [ ] `div_mod_precomputed_integers` (line 450) — cx
-- [ ] `precompute_div_mod_data` (line 569)
-- [ ] `div_mod_precomputed` (line 576)
-- [ ] `precompute_div_mod_data` (line 589)
-- [ ] `div_mod_precomputed` (line 596)
-- [ ] `precompute_div_mod_data` (line 609)
-- [ ] `div_mod_precomputed` (line 616)
-- [ ] `precompute_div_mod_data` (line 629)
-- [ ] `div_mod_precomputed` (line 636)
 - [ ] `div_assign_mod_precomputed` (line 677) — cx, panics
 - [ ] `div_assign_mod_precomputed` (line 719) — cx, panics
 - [ ] `div_rem` (line 792) — cx, panics
@@ -183,7 +175,6 @@ formula.
 - [ ] `limbs_eq_neg_limb_mod_limb` (line 48) — cx, panics
 - [ ] `quick_neg_mod` (line 55)
 - [ ] `limbs_pos_limb_eq_neg_limb_mod` (line 75) — cx
-- [ ] `limbs_pos_eq_neg_limb_mod_helper` (line 87)
 - [ ] `limbs_pos_eq_neg_limb_mod_ref` (line 138) — cx, panics
 - [ ] `limbs_pos_eq_neg_limb_mod` (line 166) — cx, panics
 - [ ] `limbs_pos_eq_neg_mod_limb` (line 194) — cx, panics
@@ -634,11 +625,6 @@ formula.
 - [ ] `handle_zero` (line 429)
 - [ ] `check_overflow` (line 449)
 
-## malachite-nz/src/integer/conversion/serde.rs
-
-- [ ] `from` (line 17)
-- [ ] `try_from` (line 26)
-
 ## malachite-nz/src/integer/conversion/string/format_integer.rs
 
 - [ ] `format_integer_str` (line 85) — cx
@@ -785,7 +771,6 @@ formula.
 
 ## malachite-nz/src/integer/logic/bit_iterable.rs
 
-- [ ] `size_hint` (line 50)
 - [ ] `index` (line 206)
 - [ ] `negative_bits` (line 224) — cx
 - [ ] `bits` (line 283) — cx
@@ -842,7 +827,6 @@ formula.
 - [ ] `limbs_slice_or_neg_neg_in_place_left` (line 587) — cx, panics
 - [ ] `limbs_vec_or_neg_neg_in_place_left` (line 633) — cx, panics
 - [ ] `limbs_or_neg_neg_in_place_either` (line 679) — cx, panics
-- [ ] `or_neg_limb_neg` (line 736)
 - [ ] `bitor` (line 892) — cx
 - [ ] `bitor` (line 929) — cx
 - [ ] `bitor` (line 966) — cx
@@ -904,7 +888,6 @@ formula.
 - [ ] `striped_random_negative_integers` (line 525) — cx, panics
 - [ ] `striped_random_nonzero_integers` (line 589) — cx, panics
 - [ ] `striped_random_integers` (line 649) — cx, panics
-- [ ] `next` (line 681)
 - [ ] `uniform_random_integer_range` (line 725) — cx, panics
 - [ ] `uniform_random_integer_inclusive_range` (line 781) — cx, panics
 - [ ] `get_uniform_random_integer_from_range` (line 826) — cx
@@ -955,8 +938,6 @@ formula.
 - [x] `limbs_vec_add_in_place_either` (line 513) — cx
 - [x] `limbs_add_same_length_with_carry_in_to_out` (line 544) — cx, panics
 - [x] `limbs_add_same_length_with_carry_in_in_place_left` (line 572) — cx, panics
-- [x] `add_limb` (line 586)
-- [x] `add_assign_at_limb` (line 621)
 - [x] `add` (line 667) — cx
 - [x] `add` (line 705) — cx
 - [x] `add` (line 743) — cx
@@ -1063,8 +1044,6 @@ formula.
 
 ## malachite-nz/src/natural/arithmetic/coprime_with.rs
 
-- [ ] `coprime_with_check_2_3` (line 24)
-- [ ] `coprime_with_check_2_3_5` (line 31)
 - [ ] `coprime_with` (line 92) — cx
 - [ ] `coprime_with` (line 127) — cx
 - [ ] `coprime_with` (line 165) — cx
@@ -1102,8 +1081,6 @@ formula.
 - [ ] `limbs_div_to_out_ref_ref` (line 1904) — cx, panics
 - [ ] `limbs_div_in_place_naive` (line 1924) — cx
 - [ ] `limbs_hensel_div_limb_in_place` (line 1937)
-- [ ] `div_limb_naive` (line 1992)
-- [ ] `div_assign_limb_naive` (line 2010)
 - [ ] `div` (line 2062) — cx, panics
 - [ ] `div` (line 2101) — cx, panics
 - [ ] `div` (line 2139) — cx, panics
@@ -1224,14 +1201,6 @@ formula.
 - [ ] `div_mod` (line 2543) — cx, panics
 - [ ] `div_assign_mod` (line 2615) — cx, panics
 - [ ] `div_assign_mod` (line 2692) — cx, panics
-- [ ] `precompute_div_mod_data` (line 2813)
-- [ ] `div_mod_precomputed` (line 2820)
-- [ ] `precompute_div_mod_data` (line 2833)
-- [ ] `div_mod_precomputed` (line 2840)
-- [ ] `precompute_div_mod_data` (line 2853)
-- [ ] `div_mod_precomputed` (line 2860)
-- [ ] `precompute_div_mod_data` (line 2873)
-- [ ] `div_mod_precomputed` (line 2880)
 - [ ] `div_assign_mod_precomputed` (line 2919) — cx, panics
 - [ ] `div_assign_mod_precomputed` (line 2959) — cx, panics
 - [ ] `div_rem` (line 3018) — cx, panics
@@ -1292,7 +1261,6 @@ formula.
 - [ ] `limbs_limb_mod_exact_odd_limb` (line 45) — cx
 - [ ] `limbs_mod_exact_odd_limb` (line 85) — cx
 - [ ] `limbs_eq_limb_mod_limb` (line 135) — cx, panics
-- [ ] `limbs_eq_limb_mod_helper` (line 151)
 - [ ] `limbs_eq_limb_mod_ref_ref` (line 204) — cx, panics
 - [ ] `limbs_eq_limb_mod_ref_val` (line 235) — cx, panics
 - [ ] `limbs_eq_limb_mod_val_ref` (line 266) — cx, panics
@@ -1367,8 +1335,6 @@ formula.
 - [ ] `add_significands_rsh_to_out` (line 1449)
 - [ ] `add_significands_rsh_mut_ref` (line 1554)
 - [ ] `add_significands_rsh_ref_mut` (line 1640)
-- [ ] `flip_assign` (line 2240)
-- [ ] `from` (line 2251)
 
 ## malachite-nz/src/natural/arithmetic/float/div.rs
 
@@ -1390,7 +1356,6 @@ formula.
 - [ ] `limbs_float_div_high` (line 1105) — scratch
 - [ ] `cmp_helper` (line 1171)
 - [ ] `sub_helper` (line 1239)
-- [ ] `div_float_significands_general` (line 1264)
 - [ ] `div_float_significands_general_to_out` (line 1288)
 
 ## malachite-nz/src/natural/arithmetic/float/exp.rs
@@ -1426,7 +1391,6 @@ formula.
 - [ ] `reciprocal_float_significand_same_prec_gt_w_lt_2w` (line 313)
 - [ ] `reciprocal_float_significand_short` (line 397)
 - [ ] `reciprocal_float_significand_short_to_out` (line 433)
-- [ ] `reciprocal_float_significand_general` (line 515)
 - [ ] `reciprocal_float_significand_general_to_out` (line 529)
 
 ## malachite-nz/src/natural/arithmetic/float/reciprocal_sqrt.rs
@@ -1444,7 +1408,6 @@ formula.
 - [ ] `round_helper` (line 249)
 - [ ] `round_helper_aliased` (line 354)
 - [ ] `round_helper_2` (line 452)
-- [ ] `limbs_significand_slice_add_limb_in_place` (line 504)
 
 ## malachite-nz/src/natural/arithmetic/float/set_str.rs
 
@@ -1458,10 +1421,6 @@ formula.
 - [ ] `sqrt_float_significand_in_place` (line 198)
 - [ ] `sqrt_float_significand_in_place` (line 220)
 - [ ] `sqrt_float_significand_ref` (line 236)
-- [ ] `sqrt_float_significand_ref_helper` (line 250)
-- [ ] `sqrt_float_significand_in_place_same_prec` (line 266)
-- [ ] `sqrt_float_significand_ref_helper` (line 297)
-- [ ] `sqrt_float_significand_same_prec_ref` (line 308)
 - [ ] `half_limb_inverse_sqrt_approx` (line 336)
 - [ ] `limb_sqrt_approx` (line 355)
 - [ ] `sqrt_float_significand_same_prec_lt_w` (line 387)
@@ -1686,40 +1645,40 @@ formula.
 
 ## malachite-nz/src/natural/arithmetic/mod_mul.rs
 
-- [ ] `limbs_precompute_mod_mul_two_limbs` (line 32) — cx
-- [ ] `limbs_mod_mul_two_limbs` (line 72) — cx
-- [ ] `precompute_mod_mul_data` (line 243) — cx
-- [ ] `mod_mul_precomputed` (line 298) — cx, panics
-- [ ] `precompute_mod_mul_data` (line 316) — cx
-- [ ] `mod_mul_precomputed` (line 372) — cx, panics
-- [ ] `precompute_mod_mul_data` (line 390) — cx
-- [ ] `mod_mul_precomputed` (line 446) — cx, panics
-- [ ] `precompute_mod_mul_data` (line 464) — cx
-- [ ] `mod_mul_precomputed` (line 520) — cx, panics
-- [ ] `precompute_mod_mul_data` (line 538) — cx
-- [ ] `mod_mul_precomputed` (line 594) — cx, panics
-- [ ] `precompute_mod_mul_data` (line 628) — cx
-- [ ] `mod_mul_precomputed` (line 685) — cx, panics
-- [ ] `precompute_mod_mul_data` (line 702) — cx
-- [ ] `mod_mul_precomputed` (line 758) — cx, panics
-- [ ] `precompute_mod_mul_data` (line 795) — cx
-- [ ] `mod_mul_precomputed` (line 850) — cx, panics
-- [ ] `mod_mul_precomputed_assign` (line 912) — cx, panics
-- [ ] `mod_mul_precomputed_assign` (line 975) — cx, panics
-- [ ] `mod_mul_precomputed_assign` (line 1041) — cx, panics
-- [ ] `mod_mul_precomputed_assign` (line 1106) — cx, panics
-- [ ] `mod_mul` (line 1164) — cx, panics
-- [ ] `mod_mul` (line 1207) — cx, panics
-- [ ] `mod_mul` (line 1249) — cx, panics
-- [ ] `mod_mul` (line 1292) — cx, panics
-- [ ] `mod_mul` (line 1334) — cx, panics
-- [ ] `mod_mul` (line 1377) — cx, panics
-- [ ] `mod_mul` (line 1419) — cx, panics
-- [ ] `mod_mul` (line 1461) — cx, panics
-- [ ] `mod_mul_assign` (line 1499) — cx, panics
-- [ ] `mod_mul_assign` (line 1539) — cx, panics
-- [ ] `mod_mul_assign` (line 1576) — cx, panics
-- [ ] `mod_mul_assign` (line 1615) — cx, panics
+- [ ] `limbs_precompute_mod_mul_two_limbs` (line 36) — cx
+- [ ] `limbs_mod_mul_two_limbs` (line 76) — cx
+- [ ] `precompute_mod_mul_data` (line 251) — cx
+- [ ] `mod_mul_precomputed` (line 306) — cx, panics
+- [ ] `precompute_mod_mul_data` (line 328) — cx
+- [ ] `mod_mul_precomputed` (line 384) — cx, panics
+- [ ] `precompute_mod_mul_data` (line 406) — cx
+- [ ] `mod_mul_precomputed` (line 462) — cx, panics
+- [ ] `precompute_mod_mul_data` (line 484) — cx
+- [ ] `mod_mul_precomputed` (line 540) — cx, panics
+- [ ] `precompute_mod_mul_data` (line 562) — cx
+- [ ] `mod_mul_precomputed` (line 618) — cx, panics
+- [ ] `precompute_mod_mul_data` (line 659) — cx
+- [ ] `mod_mul_precomputed` (line 716) — cx, panics
+- [ ] `precompute_mod_mul_data` (line 737) — cx
+- [ ] `mod_mul_precomputed` (line 793) — cx, panics
+- [ ] `precompute_mod_mul_data` (line 837) — cx
+- [ ] `mod_mul_precomputed` (line 892) — cx, panics
+- [ ] `mod_mul_precomputed_assign` (line 957) — cx, panics
+- [ ] `mod_mul_precomputed_assign` (line 1024) — cx, panics
+- [ ] `mod_mul_precomputed_assign` (line 1094) — cx, panics
+- [ ] `mod_mul_precomputed_assign` (line 1163) — cx, panics
+- [ ] `mod_mul` (line 1225) — cx, panics
+- [ ] `mod_mul` (line 1268) — cx, panics
+- [ ] `mod_mul` (line 1310) — cx, panics
+- [ ] `mod_mul` (line 1353) — cx, panics
+- [ ] `mod_mul` (line 1395) — cx, panics
+- [ ] `mod_mul` (line 1438) — cx, panics
+- [ ] `mod_mul` (line 1480) — cx, panics
+- [ ] `mod_mul` (line 1522) — cx, panics
+- [ ] `mod_mul_assign` (line 1560) — cx, panics
+- [ ] `mod_mul_assign` (line 1600) — cx, panics
+- [ ] `mod_mul_assign` (line 1637) — cx, panics
+- [ ] `mod_mul_assign` (line 1676) — cx, panics
 
 ## malachite-nz/src/natural/arithmetic/mod_neg.rs
 
@@ -1734,9 +1693,6 @@ formula.
 
 - [ ] `mod_by_preinversion` (line 79) — cx
 - [ ] `limbs_mod_limb` (line 118) — cx, panics
-- [ ] `limbs_mod_limb` (line 130)
-- [ ] `limbs_mod_limb` (line 142)
-- [ ] `limbs_mod_limb` (line 153)
 - [ ] `limbs_mod_three_limb_by_two_limb` (line 171) — cx
 - [ ] `limbs_mod_by_two_limb_normalized` (line 215) — cx, panics
 - [ ] `limbs_mod_schoolbook` (line 254) — cx, panics
@@ -1767,7 +1723,6 @@ formula.
 - [ ] `limbs_mod_limb_at_least_1_leading_zero` (line 1401) — cx
 - [ ] `limbs_mod_limb_at_least_2_leading_zeros` (line 1466) — cx
 - [ ] `limbs_mod_limb_alt_2` (line 1550) — cx
-- [ ] `mod_limb_naive` (line 1581)
 - [ ] `mod_op` (line 1651) — cx, panics
 - [ ] `mod_op` (line 1697) — cx, panics
 - [ ] `mod_op` (line 1742) — cx, panics
@@ -1815,24 +1770,24 @@ formula.
 - [ ] `mod_pow_assign` (line 1094) — cx, panics
 - [ ] `mod_pow_assign` (line 1145) — cx, panics
 - [ ] `mod_pow_precomputed_helper` (line 1180) — cx
-- [ ] `precompute_mod_pow_data` (line 1246) — cx
-- [ ] `mod_pow_precomputed` (line 1296) — cx, panics
-- [ ] `precompute_mod_pow_data` (line 1313) — cx
-- [ ] `mod_pow_precomputed` (line 1364) — cx, panics
-- [ ] `precompute_mod_pow_data` (line 1381) — cx
-- [ ] `mod_pow_precomputed` (line 1432) — cx, panics
-- [ ] `precompute_mod_pow_data` (line 1449) — cx
-- [ ] `mod_pow_precomputed` (line 1500) — cx, panics
-- [ ] `precompute_mod_pow_data` (line 1517) — cx
-- [ ] `mod_pow_precomputed` (line 1568) — cx, panics
-- [ ] `precompute_mod_pow_data` (line 1585) — cx
-- [ ] `mod_pow_precomputed` (line 1636) — cx, panics
-- [ ] `precompute_mod_pow_data` (line 1653) — cx
-- [ ] `mod_pow_precomputed` (line 1704) — cx, panics
-- [ ] `precompute_mod_pow_data` (line 1721) — cx
-- [ ] `mod_pow_precomputed` (line 1771) — cx, panics
-- [ ] `mod_pow_precomputed_assign` (line 1816) — cx, panics
-- [ ] `mod_pow_precomputed_assign` (line 1861) — cx, panics
+- [ ] `precompute_mod_pow_data` (line 1250) — cx
+- [ ] `mod_pow_precomputed` (line 1300) — cx, panics
+- [ ] `precompute_mod_pow_data` (line 1321) — cx
+- [ ] `mod_pow_precomputed` (line 1372) — cx, panics
+- [ ] `precompute_mod_pow_data` (line 1393) — cx
+- [ ] `mod_pow_precomputed` (line 1444) — cx, panics
+- [ ] `precompute_mod_pow_data` (line 1465) — cx
+- [ ] `mod_pow_precomputed` (line 1516) — cx, panics
+- [ ] `precompute_mod_pow_data` (line 1537) — cx
+- [ ] `mod_pow_precomputed` (line 1588) — cx, panics
+- [ ] `precompute_mod_pow_data` (line 1609) — cx
+- [ ] `mod_pow_precomputed` (line 1660) — cx, panics
+- [ ] `precompute_mod_pow_data` (line 1681) — cx
+- [ ] `mod_pow_precomputed` (line 1732) — cx, panics
+- [ ] `precompute_mod_pow_data` (line 1753) — cx
+- [ ] `mod_pow_precomputed` (line 1803) — cx, panics
+- [ ] `mod_pow_precomputed_assign` (line 1848) — cx, panics
+- [ ] `mod_pow_precomputed_assign` (line 1893) — cx, panics
 
 ## malachite-nz/src/natural/arithmetic/mod_power_of_2.rs
 
@@ -1871,7 +1826,6 @@ formula.
 ## malachite-nz/src/natural/arithmetic/mod_power_of_2_inverse.rs
 
 - [ ] `limbs_mod_power_of_2_inverse` (line 25) — scratch
-- [ ] `mod_power_of_2_inverse_helper` (line 48)
 - [ ] `mod_power_of_2_inverse` (line 90) — cx, panics
 - [ ] `mod_power_of_2_inverse` (line 148) — cx, panics
 
@@ -1982,10 +1936,6 @@ formula.
 ## malachite-nz/src/natural/arithmetic/mod_sqrt.rs
 
 - [ ] `mod_sqrt_ref_ref` (line 40)
-- [ ] `mod_sqrt` (line 172)
-- [ ] `mod_sqrt` (line 183)
-- [ ] `mod_sqrt` (line 194)
-- [ ] `mod_sqrt` (line 205)
 
 ## malachite-nz/src/natural/arithmetic/mod_square.rs
 
@@ -2021,7 +1971,6 @@ formula.
 
 - [ ] `co_prime_red` (line 143)
 - [ ] `co_prime` (line 152)
-- [ ] `prod_primes_ref` (line 158)
 - [ ] `crt_data_find_bn_bound` (line 566)
 - [ ] `crt_data_find_bits` (line 596)
 - [ ] `mpn_ctx_best_profile` (line 885)
@@ -2093,11 +2042,9 @@ formula.
 - [ ] `multi_add` (line 4697)
 - [ ] `multi_add_alt` (line 4717)
 - [ ] `multi_sub` (line 4744)
-- [ ] `limbs_slice_add_same_length_in_place_left_alt` (line 4812)
 - [ ] `mpn_ctx_mpn_mul` (line 5020)
 - [ ] `mpn_mul_default_mpn_ctx` (line 5177)
 - [ ] `mpn_mul_fft_for_tuning` (line 5186)
-- [ ] `mpn_square_fft_for_tuning` (line 5191)
 
 ## malachite-nz/src/natural/arithmetic/mul/limb.rs
 
@@ -2565,7 +2512,6 @@ formula.
 - [x] `limbs_sub_same_length_with_borrow_in_to_out` (line 442) — cx, panics
 - [x] `limbs_sub_same_length_with_borrow_in_in_place_left` (line 488) — cx, panics
 - [x] `limbs_sub_same_length_with_borrow_in_in_place_right` (line 529) — cx, panics
-- [x] `sub_assign_at_limb` (line 571)
 - [x] `sub` (line 618) — cx, panics
 - [x] `sub` (line 658) — cx, panics
 - [x] `sub` (line 698) — cx, panics
@@ -2602,7 +2548,6 @@ formula.
 - [ ] `cmp` (line 218) — cx
 - [ ] `cmp_double` (line 263) — cx
 - [ ] `cmp_normalized` (line 329) — cx, panics
-- [ ] `cmp_normalized_no_shift` (line 352)
 - [ ] `partial_cmp_double` (line 420)
 
 ## malachite-nz/src/natural/comparison/eq_abs_primitive_float.rs
@@ -2685,9 +2630,6 @@ formula.
 - [ ] `divide_by_power_preinverted` (line 802) — scratch
 - [ ] `limbs_to_digits_small_base_divide_and_conquer` (line 853) — cx, scratch
 - [ ] `limbs_to_digits_small_base_divide_and_conquer_for_tuning` (line 956) — scratch
-- [ ] `limbs_digits_power_table_scratch_len_for_tuning` (line 979)
-- [ ] `digits_in_base_per_limb_for_tuning` (line 985)
-- [ ] `limbs_to_digits_small_base_divide_and_conquer_scratch_len_for_tuning` (line 991)
 - [ ] `limbs_to_digits_small_base_no_alg_specified` (line 1003) — cx
 - [ ] `limbs_to_digits_small_base` (line 1020) — cx
 - [ ] `limbs_to_digits_basecase` (line 1071) — cx
@@ -2732,20 +2674,10 @@ formula.
 
 ## malachite-nz/src/natural/conversion/digits/power_of_2_digit_iterable.rs
 
-- [ ] `size_hint` (line 69)
-- [ ] `size_hint` (line 139)
-- [ ] `next` (line 186)
-- [ ] `size_hint` (line 191)
-- [ ] `next_back` (line 198)
-- [ ] `size_hint` (line 252)
 - [ ] `next` (line 326) — cx
 - [ ] `next_back` (line 353) — cx
 - [ ] `get_digit` (line 403) — cx
 - [ ] `power_of_2_digits` (line 539) — cx
-- [ ] `next` (line 565)
-- [ ] `size_hint` (line 570)
-- [ ] `next_back` (line 577)
-- [ ] `size_hint` (line 630)
 - [ ] `next` (line 689) — cx
 - [ ] `next_back` (line 740) — cx
 - [ ] `get_digit` (line 791) — cx
@@ -2872,11 +2804,6 @@ formula.
 - [ ] `check_overflow` (line 435)
 - [ ] `negative_natural` (line 468)
 
-## malachite-nz/src/natural/conversion/serde.rs
-
-- [ ] `from` (line 16)
-- [ ] `try_from` (line 25)
-
 ## malachite-nz/src/natural/conversion/string/format_natural.rs
 
 - [ ] `append_integer` (line 34)
@@ -2910,8 +2837,6 @@ formula.
 - [ ] `fmt` (line 310) — cx
 - [ ] `fmt` (line 357) — cx
 - [ ] `fmt` (line 464) — cx
-- [ ] `oz_fmt` (line 515)
-- [ ] `oz_fmt` (line 520)
 - [ ] `fmt` (line 647) — cx
 - [ ] `fmt` (line 799) — cx
 - [ ] `fmt` (line 861) — cx
@@ -2919,7 +2844,6 @@ formula.
 ## malachite-nz/src/natural/conversion/to_limbs.rs
 
 - [ ] `next` (line 66) — cx
-- [ ] `size_hint` (line 83)
 - [ ] `next_back` (line 114) — cx
 - [ ] `index` (line 164) — cx
 - [ ] `most_significant` (line 179)
@@ -2960,8 +2884,6 @@ formula.
 
 ## malachite-nz/src/natural/factorization/primes.rs
 
-- [ ] `next` (line 25)
-- [ ] `next` (line 40)
 - [ ] `primes_less_than` (line 91) — cx
 - [ ] `primes_less_than_or_equal_to` (line 137) — cx
 - [ ] `primes` (line 169) — cx
@@ -3070,7 +2992,6 @@ formula.
 - [ ] `limbs_or_same_length_in_place_left` (line 182) — cx, panics
 - [ ] `limbs_or_in_place_left` (line 202) — cx
 - [ ] `limbs_or_in_place_either` (line 227) — cx
-- [ ] `or_limb` (line 241)
 - [ ] `bitor` (line 291) — cx
 - [ ] `bitor` (line 327) — cx
 - [ ] `bitor` (line 363) — cx
@@ -3100,7 +3021,6 @@ formula.
 - [ ] `limbs_xor_same_length_in_place_left` (line 182) — cx, panics
 - [ ] `limbs_xor_in_place_left` (line 203) — cx
 - [ ] `limbs_xor_in_place_either` (line 229) — cx
-- [ ] `xor_limb` (line 243)
 - [ ] `bitxor` (line 293) — cx
 - [ ] `bitxor` (line 329) — cx
 - [ ] `bitxor` (line 365) — cx
@@ -3114,9 +3034,6 @@ formula.
 - [ ] `promote_in_place` (line 67)
 - [ ] `is_valid` (line 94)
 - [ ] `default` (line 129)
-- [ ] `limb_to_bit_count` (line 139)
-- [ ] `bit_to_limb_count_floor` (line 147)
-- [ ] `bit_to_limb_count_ceiling` (line 153)
 
 ## malachite-nz/src/natural/random/mod.rs
 
@@ -3130,13 +3047,11 @@ formula.
 - [ ] `striped_random_positive_naturals` (line 447) — cx, panics
 - [ ] `random_naturals_less_than` (line 526) — cx, panics
 - [ ] `get_random_natural_less_than` (line 571) — cx
-- [ ] `next` (line 596)
 - [ ] `uniform_random_natural_range` (line 639) — cx, panics
 - [ ] `uniform_random_natural_inclusive_range` (line 694) — cx, panics
 - [ ] `random_natural_range_to_infinity` (line 779) — cx, panics
 - [ ] `random_natural_range` (line 904) — cx, panics
 - [ ] `random_natural_inclusive_range` (line 998) — cx, panics
-- [ ] `ranges_intersect` (line 1037)
 - [ ] `striped_random_natural_range` (line 1147) — cx, panics
 - [ ] `striped_random_natural_inclusive_range` (line 1210) — cx, panics
 - [ ] `get_striped_random_natural_from_range` (line 1266) — cx, panics
@@ -3144,4 +3059,4 @@ formula.
 - [ ] `striped_random_natural_range_to_infinity` (line 1449) — cx, panics
 
 ---
-2400 items; 1936 with complexity claims; 108 scratch-takers; 61 scratch-length formulas.
+2321 items; 1936 with complexity claims; 108 scratch-takers; 61 scratch-length formulas.

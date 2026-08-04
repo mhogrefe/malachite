@@ -76,7 +76,7 @@ impl Iterator for ExhaustivePositiveRationals {
 ///
 /// $M(i) = O(\log i \log\log i)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ is the iteration number.
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
 ///
 /// # Examples
 /// ```
@@ -109,7 +109,7 @@ pub const fn exhaustive_positive_rationals() -> ExhaustivePositiveRationals {
 ///
 /// $M(i) = O(\log i \log\log i)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ is the iteration number.
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
 ///
 /// # Examples
 /// ```
@@ -160,7 +160,7 @@ impl Iterator for ExhaustiveNegativeRationals {
 ///
 /// $M(i) = O(\log i \log\log i)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ is the iteration number.
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
 ///
 /// # Examples
 /// ```
@@ -221,7 +221,7 @@ impl Iterator for ExhaustiveNonzeroRationals {
 ///
 /// $M(i) = O(\log i \log\log i)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ is the iteration number.
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
 ///
 /// # Examples
 /// ```
@@ -253,7 +253,7 @@ pub const fn exhaustive_nonzero_rationals() -> ExhaustiveNonzeroRationals {
 /// # Worst-case complexity per iteration
 /// $T(n) = O(\log n \log\log n \log\log\log n)$
 ///
-/// $M(i) = O(\log n \log\log n)$
+/// $M(n) = O(\log n \log\log n)$
 ///
 /// where $T$ is time, $M$ is additional memory, and $n$ is the iteration number.
 ///

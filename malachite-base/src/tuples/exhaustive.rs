@@ -1558,6 +1558,16 @@ impl<
 /// trying to find another $(x, y)$ to output. To get around this, try
 /// [`lex_dependent_pairs_stop_after_empty_ys`].
 ///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(T^\prime(i) + T^{\prime\prime}(i))$
+///
+/// $M(i) = O(M^\prime(i) + M^{\prime\prime}(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $T^{\prime\prime}$ and
+/// $M^{\prime\prime}$ are the time and memory functions of the iterators produced by
+/// `ys_generator`.
+///
 /// # Examples
 /// ```
 /// use itertools::Itertools;
@@ -1661,6 +1671,16 @@ pub const fn lex_dependent_pairs<
 /// If the output iterator encounters an $x$ value whose corresponding `ys` iterator is empty, the
 /// output iterator stops iterating altogether. This prevents the iterator from getting stuck if all
 /// `ys` iterators after a certain point are empty.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(T^\prime(i) + T^{\prime\prime}(i))$
+///
+/// $M(i) = O(M^\prime(i) + M^{\prime\prime}(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $T^{\prime\prime}$ and
+/// $M^{\prime\prime}$ are the time and memory functions of the iterators produced by
+/// `ys_generator`.
 ///
 /// # Examples
 /// ```
@@ -1821,6 +1841,16 @@ impl<
 /// If, after a certain point, all the generated `ys` are empty, the output iterator will hang
 /// trying to find another $(x, y)$ to output. To get around this, try
 /// [`exhaustive_dependent_pairs_stop_after_empty_ys`].
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(T^\prime(i) + T^{\prime\prime}(i))$
+///
+/// $M(i) = O(M^\prime(i) + M^{\prime\prime}(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $T^{\prime\prime}$ and
+/// $M^{\prime\prime}$ are the time and memory functions of the iterators produced by
+/// `ys_generator`.
 ///
 /// # Examples
 /// ```
@@ -1993,6 +2023,16 @@ pub const fn exhaustive_dependent_pairs<
 /// If the output iterator encounters an $x$ value whose corresponding `ys` iterator is empty, the
 /// output iterator stops iterating altogether. This prevents the iterator from getting stuck if all
 /// `ys` iterators after a certain point are empty.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(T^\prime(i) + T^{\prime\prime}(i))$
+///
+/// $M(i) = O(M^\prime(i) + M^{\prime\prime}(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $T^{\prime\prime}$ and
+/// $M^{\prime\prime}$ are the time and memory functions of the iterators produced by
+/// `ys_generator`.
 ///
 /// # Examples
 /// ```
@@ -2628,6 +2668,15 @@ where
 /// If the input iterator length is $n$, the output length is $\tfrac{1}{2}{n!}$.
 ///
 /// If `xs` is empty, the output is also empty.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(T^\prime(i))$
+///
+/// $M(i) = O(M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`: the elements seen so far are cached, and
+/// each output pair reuses cached elements.
 ///
 /// # Examples
 /// ```

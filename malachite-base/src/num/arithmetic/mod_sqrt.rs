@@ -60,10 +60,10 @@ fn mod_pow_full_width<T: PrimitiveUnsigned>(
 // $M(n) = O(1)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`: the fast cases
-// are a single $O(n)$ modular powering, and the general Tonelli-Shanks loop runs at most $n$
-// times with an inner adjustment chain of at most $n$ squarings, all on words. The bound assumes
-// that the quadratic-nonresidue search does not dominate; under the extended Riemann hypothesis
-// the search inspects $O((\log m)^2)$ candidates.
+// are a single $O(n)$ modular powering, and the general Tonelli-Shanks loop runs at most $n$ times
+// with an inner adjustment chain of at most $n$ squarings, all on words. The bound assumes that the
+// quadratic-nonresidue search does not dominate; under the extended Riemann hypothesis the search
+// inspects $O((\log m)^2)$ candidates.
 private_test_fn! {mod_sqrt_unsigned<
     T: CheckedSqrt<Output = T> + JacobiSymbol<T> + PrimitiveUnsigned,
 >(
@@ -185,9 +185,9 @@ macro_rules! impl_mod_sqrt {
             ///
             /// $M(n) = O(1)$
             ///
-            /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
-            /// The bound assumes that the quadratic-nonresidue search does not dominate; under
-            /// the extended Riemann hypothesis the search inspects $O((\log m)^2)$ candidates.
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`. The
+            /// bound assumes that the quadratic-nonresidue search does not dominate; under the
+            /// extended Riemann hypothesis the search inspects $O((\log m)^2)$ candidates.
             ///
             /// # Panics
             /// Panics if `self` is greater than or equal to `m`.
@@ -234,9 +234,9 @@ macro_rules! impl_mod_sqrt_promoted {
             ///
             /// $M(n) = O(1)$
             ///
-            /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
-            /// The bound assumes that the quadratic-nonresidue search does not dominate; under
-            /// the extended Riemann hypothesis the search inspects $O((\log m)^2)$ candidates.
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`. The
+            /// bound assumes that the quadratic-nonresidue search does not dominate; under the
+            /// extended Riemann hypothesis the search inspects $O((\log m)^2)$ candidates.
             ///
             /// # Panics
             /// Panics if `self` is greater than or equal to `m`.

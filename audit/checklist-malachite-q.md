@@ -370,10 +370,8 @@ formula.
 
 ## malachite-q/src/rational/comparison/partial_cmp_abs_primitive_int.rs
 
-- [ ] `partial_cmp_abs_unsigned` (line 19)
 - [ ] `partial_cmp_abs` (line 80) — cx
 - [ ] `partial_cmp_abs` (line 97) — cx
-- [ ] `partial_cmp_abs_signed` (line 106)
 - [ ] `partial_cmp_abs` (line 174) — cx
 - [ ] `partial_cmp_abs` (line 191) — cx
 
@@ -394,10 +392,8 @@ formula.
 
 ## malachite-q/src/rational/comparison/partial_cmp_primitive_int.rs
 
-- [ ] `partial_cmp_unsigned` (line 18)
 - [ ] `partial_cmp` (line 79) — cx
 - [ ] `partial_cmp` (line 97) — cx
-- [ ] `partial_cmp_signed` (line 106)
 - [ ] `partial_cmp` (line 174) — cx
 - [ ] `partial_cmp` (line 192) — cx
 
@@ -559,8 +555,6 @@ formula.
 
 ## malachite-q/src/rational/conversion/primitive_int_from_rational.rs
 
-- [ ] `rounding_from_unsigned` (line 41)
-- [ ] `try_from_signed` (line 74)
 - [ ] `try_from` (line 182) — cx
 - [ ] `convertible_from` (line 196) — cx
 - [ ] `rounding_from` (line 227) — cx, panics
@@ -570,7 +564,6 @@ formula.
 
 ## malachite-q/src/rational/conversion/serde.rs
 
-- [ ] `from` (line 15)
 - [ ] `try_from` (line 29)
 
 ## malachite-q/src/rational/conversion/string/format_rational.rs
@@ -622,7 +615,6 @@ formula.
 
 - [ ] `exhaustive_positive_rationals` (line 92) — cx
 - [ ] `exhaustive_non_negative_rationals` (line 126) — cx
-- [ ] `next` (line 142)
 - [ ] `exhaustive_negative_rationals` (line 176) — cx
 - [ ] `exhaustive_nonzero_rationals` (line 237) — cx
 - [ ] `exhaustive_rationals` (line 272) — cx
@@ -630,21 +622,9 @@ formula.
 - [ ] `exhaustive_rationals_with_denominator_range_to_negative_infinity` (line 410) — cx, panics
 - [ ] `exhaustive_rationals_with_denominator_range` (line 482) — cx, panics
 - [ ] `exhaustive_rationals_with_denominator_inclusive_range` (line 561) — cx, panics
-- [ ] `get_ys` (line 590)
-- [ ] `exhaustive_rational_range_to_infinity_helper` (line 596)
-- [ ] `next` (line 633)
 - [ ] `exhaustive_rational_range_to_infinity` (line 666) — cx
-- [ ] `get_ys` (line 685)
-- [ ] `exhaustive_rational_range_to_negative_infinity_helper` (line 694)
-- [ ] `next` (line 731)
 - [ ] `exhaustive_rational_range_to_negative_infinity` (line 766) — cx
-- [ ] `get_ys` (line 788)
-- [ ] `exhaustive_rational_range_helper` (line 794)
-- [ ] `next` (line 835)
 - [ ] `exhaustive_rational_range` (line 881) — cx, panics
-- [ ] `get_ys` (line 903)
-- [ ] `exhaustive_rational_inclusive_range_helper` (line 913)
-- [ ] `next` (line 955)
 - [ ] `exhaustive_rational_inclusive_range` (line 1008) — cx, panics
 
 ## malachite-q/src/rational/mod.rs
@@ -657,7 +637,6 @@ formula.
 
 - [ ] `random_positive_rationals` (line 99) — cx, panics
 - [ ] `random_non_negative_rationals` (line 160) — cx, panics
-- [ ] `next` (line 192)
 - [ ] `random_negative_rationals` (line 236) — cx, panics
 - [ ] `random_nonzero_rationals` (line 297) — cx, panics
 - [ ] `random_rationals` (line 364) — cx, panics
@@ -678,4 +657,4 @@ formula.
 - [ ] `striped_random_rational_range_to_negative_infinity` (line 1671) — cx, panics
 
 ---
-408 items; 372 with complexity claims; 0 scratch-takers; 0 scratch-length formulas.
+387 items; 372 with complexity claims; 0 scratch-takers; 0 scratch-length formulas.

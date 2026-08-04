@@ -51,8 +51,8 @@ where
 ///
 /// $M(i) = O((\log i) M^\prime(i))$
 ///
-/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
-/// memory functions of the input iterator.
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of the input iterator.
 ///
 /// # Examples
 /// ```

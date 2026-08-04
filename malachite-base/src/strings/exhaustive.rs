@@ -28,6 +28,22 @@ use crate::vecs::exhaustive::{
 ///
 /// If `cs` is empty, the output is also empty, unless `len` is 0.
 ///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell)$
+///
+/// $M(i) = O(\ell)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $\ell$ is `len`:
+/// each output is a fresh string of length `len`.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell)$
+///
+/// $M(i) = O(\ell)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $\ell$ is `len`:
+/// each output is a fresh string of length `len`.
+///
 /// # Examples
 /// ```
 /// use itertools::Itertools;
@@ -95,6 +111,22 @@ pub fn lex_fixed_length_strings(
 ///
 /// If `cs` is empty, the output is also empty, unless `len` is 0.
 ///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell)$
+///
+/// $M(i) = O(\ell)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $\ell$ is `len`:
+/// each output is a fresh string of length `len`.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell)$
+///
+/// $M(i) = O(\ell)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $\ell$ is `len`:
+/// each output is a fresh string of length `len`.
+///
 /// # Examples
 /// ```
 /// use itertools::Itertools;
@@ -160,6 +192,22 @@ pub fn exhaustive_fixed_length_strings(
 /// $M(i) = O(\log i)$
 ///
 /// where $T$ is time and $M$ is additional memory.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell)$
+///
+/// $M(i) = O(\ell)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $\ell$ is the
+/// length of the $i$th output string.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell)$
+///
+/// $M(i) = O(\ell)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $\ell$ is the
+/// length of the $i$th output string.
 ///
 /// # Examples
 /// ```
@@ -235,6 +283,22 @@ pub fn shortlex_strings()
 /// $M(i) = O(\log i)$
 ///
 /// where $T$ is time and $M$ is additional memory.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell)$
+///
+/// $M(i) = O(\ell)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $\ell$ is the
+/// length of the $i$th output string.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell)$
+///
+/// $M(i) = O(\ell)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $\ell$ is the
+/// length of the $i$th output string.
 ///
 /// # Examples
 /// ```

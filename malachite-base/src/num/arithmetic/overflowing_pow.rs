@@ -105,8 +105,7 @@ macro_rules! impl_overflowing_pow_primitive_int {
             /// $M(n) = O(1)$
             ///
             /// where $T$ is time, $M$ is additional memory, and $n$ is `exp.significant_bits()`.
-            /// The square-and-multiply ladder performs one or two multiplications per exponent
-            /// bit.
+            /// The square-and-multiply ladder performs one or two multiplications per exponent bit.
             ///
             /// # Examples
             /// See [here](super::overflowing_pow#overflowing_pow_assign).

@@ -58,13 +58,15 @@ def scan_file(path):
                 name = mm.group(1)
         if not name:
             continue
-        # preceding contiguous comment/attribute block
+        # preceding contiguous comment/attribute block; only actual comment lines count as
+        # documentation (a bare `#[inline]` does not make an undocumented fn an audit item)
         j = i - 1
         doc = []
         while j >= 0:
             s = lines[j].strip()
             if s.startswith("///") or s.startswith("//") or s.startswith("#[") or s.startswith("#!["):
-                doc.append(s)
+                if s.startswith("///") or s.startswith("//"):
+                    doc.append(s)
                 j -= 1
             else:
                 break

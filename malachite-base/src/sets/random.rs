@@ -66,6 +66,31 @@ where
 ///
 /// `xs` must be infinite.
 ///
+/// # Expected complexity per iteration
+/// $T(i) = O(\ell T^\prime(i))$
+///
+/// $M(i) = O(\ell M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is `len`.
+///
+/// If `xs` can repeat values, extra draws are needed to reach the required number of distinct
+/// elements, and an iteration fails to terminate if fewer distinct values are reachable than the
+/// requested length.
+///
+/// # Expected complexity per iteration
+/// $T(i) = O(m T^\prime(i))$
+///
+/// $M(i) = O(m M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of the iterators produced by `xs_gen`, and $m$ is
+/// `mean_length_numerator / mean_length_denominator`.
+///
+/// If `xs` can repeat values, extra draws are needed to reach the required number of distinct
+/// elements, and an iteration fails to terminate if fewer distinct values are reachable than the
+/// requested length.
+///
 /// # Examples
 /// ```
 /// use itertools::Itertools;
@@ -140,6 +165,20 @@ impl<T: Eq + Hash, I: Iterator<Item = u64>, J: Iterator<Item = T>> Iterator
 /// $$
 ///
 /// `lengths` and `xs` must be infinite.
+///
+/// # Expected complexity per iteration
+/// $T(i) = O(T^{\prime\prime}(i) + \ell T^\prime(i))$
+///
+/// $M(i) = O(M^{\prime\prime}(i) + \ell M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of the iterators produced by `xs_gen`,
+/// $T^{\prime\prime}$ and $M^{\prime\prime}$ are the time and memory functions of `lengths`, and
+/// $\ell$ is the $i$th generated length.
+///
+/// If `xs` can repeat values, extra draws are needed to reach the required number of distinct
+/// elements, and an iteration fails to terminate if fewer distinct values are reachable than the
+/// requested length.
 ///
 /// # Examples
 /// ```
@@ -292,6 +331,19 @@ where
 ///
 /// `xs_gen` must be infinite.
 ///
+/// # Expected complexity per iteration
+/// $T(i) = O(m T^\prime(i))$
+///
+/// $M(i) = O(m M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of the iterators produced by `xs_gen`, and $m$ is
+/// `mean_length_numerator / mean_length_denominator`.
+///
+/// If `xs` can repeat values, extra draws are needed to reach the required number of distinct
+/// elements, and an iteration fails to terminate if fewer distinct values are reachable than the
+/// requested length.
+///
 /// # Panics
 /// Panics if `mean_length_numerator` or `mean_length_denominator` are zero, if their ratio is less
 /// than or equal to `min_length`, or if they are too large and manipulating them leads to
@@ -374,6 +426,19 @@ where
 ///
 /// `xs_gen` must be infinite.
 ///
+/// # Expected complexity per iteration
+/// $T(i) = O(b T^\prime(i))$
+///
+/// $M(i) = O(b M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of the iterators produced by `xs_gen`, and $b$ is
+/// `b`.
+///
+/// If `xs` can repeat values, extra draws are needed to reach the required number of distinct
+/// elements, and an iteration fails to terminate if fewer distinct values are reachable than the
+/// requested length.
+///
 /// # Panics
 /// Panics if $a \geq b$.
 ///
@@ -442,6 +507,19 @@ where
 /// $$
 ///
 /// `xs_gen` must be infinite.
+///
+/// # Expected complexity per iteration
+/// $T(i) = O(b T^\prime(i))$
+///
+/// $M(i) = O(b M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of the iterators produced by `xs_gen`, and $b$ is
+/// `b`.
+///
+/// If `xs` can repeat values, extra draws are needed to reach the required number of distinct
+/// elements, and an iteration fails to terminate if fewer distinct values are reachable than the
+/// requested length.
 ///
 /// # Panics
 /// Panics if $a \geq b$.
@@ -542,6 +620,31 @@ where
 ///
 /// `xs` must be infinite.
 ///
+/// # Expected complexity per iteration
+/// $T(i) = O(\ell \log \ell \cdot T^\prime(i))$
+///
+/// $M(i) = O(\ell M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is `len`.
+///
+/// If `xs` can repeat values, extra draws are needed to reach the required number of distinct
+/// elements, and an iteration fails to terminate if fewer distinct values are reachable than the
+/// requested length.
+///
+/// # Expected complexity per iteration
+/// $T(i) = O(m \log m \cdot T^\prime(i))$
+///
+/// $M(i) = O(m M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of the iterators produced by `xs_gen`, and $m$ is
+/// `mean_length_numerator / mean_length_denominator`.
+///
+/// If `xs` can repeat values, extra draws are needed to reach the required number of distinct
+/// elements, and an iteration fails to terminate if fewer distinct values are reachable than the
+/// requested length.
+///
 /// # Examples
 /// ```
 /// use itertools::Itertools;
@@ -617,6 +720,20 @@ impl<T: Ord, I: Iterator<Item = u64>, J: Iterator<Item = T>> Iterator for Random
 /// $$
 ///
 /// `lengths` and `xs` must be infinite.
+///
+/// # Expected complexity per iteration
+/// $T(i) = O(T^{\prime\prime}(i) + \ell \log \ell \cdot T^\prime(i))$
+///
+/// $M(i) = O(M^{\prime\prime}(i) + \ell M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of the iterators produced by `xs_gen`,
+/// $T^{\prime\prime}$ and $M^{\prime\prime}$ are the time and memory functions of `lengths`, and
+/// $\ell$ is the $i$th generated length.
+///
+/// If `xs` can repeat values, extra draws are needed to reach the required number of distinct
+/// elements, and an iteration fails to terminate if fewer distinct values are reachable than the
+/// requested length.
 ///
 /// # Examples
 /// ```
@@ -769,6 +886,19 @@ where
 ///
 /// `xs_gen` must be infinite.
 ///
+/// # Expected complexity per iteration
+/// $T(i) = O(m \log m \cdot T^\prime(i))$
+///
+/// $M(i) = O(m M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of the iterators produced by `xs_gen`, and $m$ is
+/// `mean_length_numerator / mean_length_denominator`.
+///
+/// If `xs` can repeat values, extra draws are needed to reach the required number of distinct
+/// elements, and an iteration fails to terminate if fewer distinct values are reachable than the
+/// requested length.
+///
 /// # Panics
 /// Panics if `mean_length_numerator` or `mean_length_denominator` are zero, if their ratio is less
 /// than or equal to `min_length`, or if they are too large and manipulating them leads to
@@ -851,6 +981,19 @@ where
 ///
 /// `xs_gen` must be infinite.
 ///
+/// # Expected complexity per iteration
+/// $T(i) = O(b \log b \cdot T^\prime(i))$
+///
+/// $M(i) = O(b M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of the iterators produced by `xs_gen`, and $b$ is
+/// `b`.
+///
+/// If `xs` can repeat values, extra draws are needed to reach the required number of distinct
+/// elements, and an iteration fails to terminate if fewer distinct values are reachable than the
+/// requested length.
+///
 /// # Panics
 /// Panics if $a \geq b$.
 ///
@@ -919,6 +1062,19 @@ where
 /// $$
 ///
 /// `xs_gen` must be infinite.
+///
+/// # Expected complexity per iteration
+/// $T(i) = O(b \log b \cdot T^\prime(i))$
+///
+/// $M(i) = O(b M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of the iterators produced by `xs_gen`, and $b$ is
+/// `b`.
+///
+/// If `xs` can repeat values, extra draws are needed to reach the required number of distinct
+/// elements, and an iteration fails to terminate if fewer distinct values are reachable than the
+/// requested length.
 ///
 /// # Panics
 /// Panics if $a \geq b$.

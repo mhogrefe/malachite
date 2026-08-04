@@ -174,7 +174,7 @@ between two algorithms, where the tested sizes never landed.
 | chunk | status |
 |-------|--------|
 | 0 pilot + conventions | DONE 2026-08-03 (conventions in crate docs; well-formedness checker in additional-lints.sh; canary harness in test_util/scratch.rs; add/sub + mul-dispatcher audits complete, 62 items checked) |
-| 1 base | in progress 2026-08-03: arithmetic + factorization leaf algorithms done (109 items checked); remaining: sqrt/primes/prime_sieve full passes, conversions (digits/strings/slices), logic, random/exhaustive iterator families, foer_sequences, and the mass constant-time macro families |
+| 1 base | DONE 2026-08-04: 1241/1241 (item counts shrank when the inventory stopped counting attribute-only "docs"); missing generator complexity sections written per the scope decision (110 new blocks) |
 | 2 nz kernels | not started |
 | 3 nz wrappers | not started |
 | 4 q | not started |
@@ -278,3 +278,58 @@ between two algorithms, where the tested sizes never landed.
   - Known triage limitation: the loop-scan can't see through delegators (a constant claim on
     a thin wrapper whose callee loops), so delegator claims are checked against their
     audited callees per family instead.
+- 2026-08-04, chunk 1 second pass (conversions/logic/slices/strings/foer_sequences/iterators
+  + a mechanical **delegator check**: constant-claimed bodies calling known non-constant
+  functions — 59 flags, most false positives, all triaged). Fixed same day:
+  - **128-bit width class**: macro-uniform "constant time" claims covered u128/i128 impls
+    that delegate to the $O(n)$ binary-search square root: the signed sqrt macro, the sqrt
+    assign macros, the u128 root impls, all three root macros (16 blocks), and u128
+    `is_square` (whose residue prefilters are constant but survivors pay a 128-bit sqrt).
+    All now claim $O(n)$ with a constant-below-128-bits note.
+  - `gmp_format` for primitives and `char` claimed constant but pads to the requested field
+    width/precision: now $O(n + w + p)$.
+  - `FoerSequence::cmp` claimed $O(n)$ in `self` alone, but after the equality pretest two
+    distinct reduced sequences can first differ as late as the max prefix plus
+    $\mathrm{lcm}$ of the period lengths: now $T(n, m) = O(nm)$ with the argument.
+    `FoerSequence::mutate` claimed $O(index)$ but re-reduces, paying the minimal-period scan
+    on the whole repeating part: now $O(n + m^{1+\varepsilon})$.
+  - `string_is_subset` claimed $T(n) = O(n)$ but builds a hash set of the second string:
+    now $T(n, m) = O(n + m)$, $M = O(m)$. `min_repeating_len` claimed $M(n) = O(n)$ but
+    allocates nothing: now $O(1)$; its description also had the roles of $\ell$ and $n$
+    reversed.
+  - Verified clean: digits/string conversions, slice conversions, bit_convertible,
+    comparison/logic traits, bit_distributor (fixed 64-bit counter ⇒ the flagged constant
+    claims are legitimate), iterator_cache, primes/prime_sieve (sieve claims standard),
+    float `pow` (libm, constant), fork-callers with fixed keys.
+- 2026-08-04, chunk 1 third pass (algorithm stragglers + generator families + constant mass):
+  - **Private-helper delegator class** (closed with a third mechanical net — same-file loopy
+    helper scan): `is_power` (16 blocks) claimed constant but its helpers trial-divide
+    (each division removes a bit) and take up to ~31 roots → $O(n)$ with argument;
+    `remove_power` (2 blocks) claimed constant but loops dividing out the factor → $O(n)$.
+    fibonacci/factorial/primorial constants are legitimate (table lookups).
+  - The same-file scan's other 5 flags are bounded and legitimate (fixed-size factor arrays,
+    width-ratio conversion loops, Ryu's digit cap, ChaCha block refills).
+  - Two more header variants found and added to the checker: `# Worst-case complexity per
+    iteration` (58 blocks, previously unscanned). That scan flushed: 5 blocks in
+    malachite-q's rational/exhaustive with $T(i)$ formulas but `$n$ is the iteration
+    number` where-lines (wrong-variable class), one mixed $T(n)$/$M(i)$ block, and a
+    foer_sequences block whose $i$ was never defined.
+  - Generator-content spot checks: geometric's $n$ = numerator + denominator is a valid
+    upper bound on the mean-proportional expected work; striped's mean-length and
+    length-range claims verified.
+  - Constant-time mass (~750 items) checked off on the strength of three mechanical nets
+    (own-loop scan, same-file loopy-helper scan, known-non-constant callee scan — every flag
+    triaged) plus per-family samples read across the three passes.
+- 2026-08-04, scope decision RESOLVED (user chose: write the missing blocks): 110 new
+  complexity sections added to the block-less generator modules — num/exhaustive (32,
+  all constant per iteration), sets/exhaustive (28, $\ell$-parameterized, hash = expected /
+  b-tree = worst-case with the $\log$), vecs/random (18) and sets/random (12)
+  (mean/range/length-iterator-parameterized Expected claims, with the distinct-values
+  termination caveat on the unique/set variants), strings/exhaustive (8), tuples/exhaustive
+  dependent-pairs family (5, callee-relative $T^\prime$/$T^{\prime\prime}$ form), options
+  (4), foer_sequences/random (1). Also fixed the inventory to stop counting attribute-only
+  "docs" as documented items (5,654 → 5,387 real items repo-wide).
+  NOTE for later chunks: vecs/exhaustive and a few similar files were checked off earlier
+  despite lacking complexity sections on most items; now that the convention is
+  "generators carry per-iteration blocks", a follow-up sweep should backfill those too
+  (mechanical detector: documented pub fn returning an iterator with no complexity header).

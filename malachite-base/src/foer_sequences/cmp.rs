@@ -25,11 +25,14 @@ impl<T: Eq + Ord> Ord for FoerSequence<T> {
     /// The comparison is made lexicographically with respect to the element type's ordering.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n)$
+    /// $T(n, m) = O(nm)$
     ///
-    /// $M(n) = O(1)$
+    /// $M(n, m) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.component_len()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `self.component_len()`, and $m$ is
+    /// `other.component_len()`: after an $O(n + m)$ equality pretest, two distinct reduced
+    /// sequences first differ within the longer non-repeating prefix plus the least common multiple
+    /// of the two repeating-part lengths, which is $O(nm)$.
     ///
     /// # Examples
     /// ```

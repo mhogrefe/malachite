@@ -42,6 +42,17 @@ where
 ///
 /// The output length is infinite.
 ///
+/// # Expected complexity per iteration
+/// $T(i) = O(m^{1+\varepsilon} T^\prime(i))$ for all $\varepsilon > 0$
+///
+/// $M(i) = O(m M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $m$ is
+/// `mean_length_numerator / mean_length_denominator`, and $T^\prime$ and $M^\prime$ are the time
+/// and memory functions of the iterators produced by `xs_gen`: the non-repeating and repeating
+/// parts have geometrically-distributed lengths with mean $m$, and reducing the sequence finds the
+/// repeating part's minimal period.
+///
 /// # Panics
 /// Panics if `mean_length_numerator` or `mean_length_denominator` are zero, or, if after being
 /// reduced to lowest terms, their sum is greater than or equal to $2^{64}$.

@@ -1083,7 +1083,13 @@ macro_rules! impl_sqrt_signed {
             /// $f(x) = \lfloor\sqrt{x}\rfloor$.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`:
+            /// constant for widths up to 64 bits, where a floating-point approximation is refined
+            /// with $O(1)$ adjustments; 128-bit square roots fall back to an $O(n)$ binary search.
             ///
             /// # Panics
             /// Panics if `self` is negative.
@@ -1108,7 +1114,13 @@ macro_rules! impl_sqrt_signed {
             /// $f(x) = \lceil\sqrt{x}\rceil$.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`:
+            /// constant for widths up to 64 bits, where a floating-point approximation is refined
+            /// with $O(1)$ adjustments; 128-bit square roots fall back to an $O(n)$ binary search.
             ///
             /// # Panics
             /// Panics if `self` is negative.
@@ -1139,7 +1151,13 @@ macro_rules! impl_sqrt_signed {
             /// $$
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`:
+            /// constant for widths up to 64 bits, where a floating-point approximation is refined
+            /// with $O(1)$ adjustments; 128-bit square roots fall back to an $O(n)$ binary search.
             ///
             /// # Panics
             /// Panics if `self` is negative.
@@ -1172,7 +1190,13 @@ macro_rules! impl_sqrt_assign_rem_unsigned {
             /// $x \gets \lfloor\sqrt{x}\rfloor$.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`:
+            /// constant for widths up to 64 bits, where a floating-point approximation is refined
+            /// with $O(1)$ adjustments; 128-bit square roots fall back to an $O(n)$ binary search.
             ///
             /// # Examples
             /// See [here](super::sqrt#sqrt_assign_rem).
@@ -1195,7 +1219,13 @@ macro_rules! impl_sqrt_assign {
             /// $x \gets \lfloor\sqrt{x}\rfloor$.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`:
+            /// constant for widths up to 64 bits, where a floating-point approximation is refined
+            /// with $O(1)$ adjustments; 128-bit square roots fall back to an $O(n)$ binary search.
             ///
             /// # Panics
             /// Panics if `self` is negative.
@@ -1214,7 +1244,13 @@ macro_rules! impl_sqrt_assign {
             /// $x \gets \lceil\sqrt{x}\rceil$.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`:
+            /// constant for widths up to 64 bits, where a floating-point approximation is refined
+            /// with $O(1)$ adjustments; 128-bit square roots fall back to an $O(n)$ binary search.
             ///
             /// # Panics
             /// Panics if `self` is negative.

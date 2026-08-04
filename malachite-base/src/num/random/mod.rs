@@ -2654,8 +2654,8 @@ impl VariableRangeGenerator {
     /// $M(n) = O(1)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `limit.significant_bits()`. Each
-    /// rejection-sampling trial rejects with probability less than $1/2$, so the expected number
-    /// of trials is $O(1)$, but the worst case is unbounded.
+    /// rejection-sampling trial rejects with probability less than $1/2$, so the expected number of
+    /// trials is $O(1)$, but the worst case is unbounded.
     ///
     /// # Panics
     /// Panics if `limit` is 0.

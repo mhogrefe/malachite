@@ -78,7 +78,12 @@ macro_rules! impl_remove_power {
             /// negative factor raised to an odd power flips its sign.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`:
+            /// each division by `other`, which is at least 2, removes at least one bit.
             ///
             /// # Panics
             /// Panics if `other` is 0 or 1, or, for signed types, -1: no largest power exists in
@@ -99,7 +104,12 @@ macro_rules! impl_remove_power {
             /// The factor need not be prime. Zero is left alone, with an exponent of 0.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`:
+            /// each division by `other`, which is at least 2, removes at least one bit.
             ///
             /// # Panics
             /// Panics if `other` is 0 or 1, or, for signed types, -1.

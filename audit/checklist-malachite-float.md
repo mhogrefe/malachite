@@ -1054,7 +1054,6 @@ formula.
 - [ ] `shl_prec` (line 323) — cx
 - [ ] `shl_prec_ref` (line 356) — cx
 - [ ] `shl_prec_assign` (line 389) — cx
-- [ ] `shl_round_assign_primitive_int` (line 460)
 - [ ] `shl_round` (line 525) — cx, panics
 - [ ] `shl_round` (line 586) — cx, panics
 - [ ] `shl_round_assign` (line 644) — cx, panics
@@ -1212,8 +1211,6 @@ formula.
 ## malachite-float/src/float/basic/extended.rs
 
 - [ ] `floor_and_ceiling` (line 32)
-- [ ] `try_from` (line 369)
-- [ ] `try_from` (line 378)
 
 ## malachite-float/src/float/basic/get_and_set.rs
 
@@ -1697,19 +1694,11 @@ formula.
 
 ## malachite-float/src/float/conversion/primitive_int_from_float.rs
 
-- [ ] `unsigned_rounding_from_float` (line 23)
-- [ ] `unsigned_rounding_from_float_ref` (line 85)
-- [ ] `unsigned_try_from_float` (line 150)
-- [ ] `unsigned_try_from_float_ref` (line 188)
 - [ ] `rounding_from` (line 276) — cx, panics
 - [ ] `rounding_from` (line 310) — cx, panics
 - [ ] `try_from` (line 330) — cx
 - [ ] `try_from` (line 350) — cx
 - [ ] `convertible_from` (line 369) — cx
-- [ ] `signed_rounding_from_float` (line 378)
-- [ ] `signed_rounding_from_float_ref` (line 478)
-- [ ] `signed_try_from_float` (line 578)
-- [ ] `signed_try_from_float_ref` (line 620)
 - [ ] `rounding_from` (line 717) — cx, panics
 - [ ] `rounding_from` (line 752) — cx, panics
 - [ ] `try_from` (line 770) — cx
@@ -1721,11 +1710,6 @@ formula.
 - [ ] `try_from` (line 55) — cx
 - [ ] `try_from` (line 109) — cx
 - [ ] `convertible_from` (line 152) — cx
-
-## malachite-float/src/float/conversion/serde.rs
-
-- [ ] `from` (line 17)
-- [ ] `try_from` (line 29)
 
 ## malachite-float/src/float/conversion/string/format_float.rs
 
@@ -1837,25 +1821,12 @@ formula.
 
 ## malachite-float/src/float/exhaustive/mod.rs
 
-- [ ] `next` (line 51)
 - [ ] `exhaustive_positive_floats_with_sci_exponent_and_precision` (line 109) — cx, panics
-- [ ] `get_ys` (line 140)
-- [ ] `exhaustive_positive_floats_with_sci_exponent_helper` (line 146)
-- [ ] `next` (line 181)
 - [ ] `exhaustive_positive_floats_with_sci_exponent` (line 240) — cx, panics
-- [ ] `get_ys` (line 263)
-- [ ] `exhaustive_floats_with_precision_helper` (line 269)
-- [ ] `next` (line 309)
 - [ ] `exhaustive_positive_floats_with_precision` (line 381) — cx, panics
-- [ ] `next` (line 404)
 - [ ] `exhaustive_floats_with_precision` (line 480) — cx, panics
-- [ ] `get_ys` (line 495)
-- [ ] `exhaustive_positive_finite_floats_helper` (line 501)
-- [ ] `next` (line 539)
 - [ ] `exhaustive_positive_finite_floats` (line 575) — cx
-- [ ] `next` (line 590)
 - [ ] `exhaustive_negative_finite_floats` (line 626) — cx
-- [ ] `next` (line 645)
 - [ ] `exhaustive_nonzero_finite_floats` (line 689) — cx
 - [ ] `exhaustive_non_negative_finite_floats` (line 730) — cx
 - [ ] `exhaustive_non_positive_finite_floats` (line 767) — cx
@@ -1864,9 +1835,7 @@ formula.
 
 ## malachite-float/src/float/mod.rs
 
-- [ ] `significand_bits` (line 108)
 - [ ] `floor_and_ceiling` (line 118)
-- [ ] `is_valid` (line 164)
 - [ ] `deref` (line 248)
 - [ ] `deref` (line 266)
 
@@ -1874,15 +1843,10 @@ formula.
 
 - [ ] `random_positive_finite_floats` (line 122) — cx
 - [ ] `random_positive_floats_with_precision` (line 211) — cx, panics
-- [ ] `next` (line 244)
 - [ ] `random_negative_finite_floats` (line 315) — cx
-- [ ] `next` (line 345)
 - [ ] `random_non_negative_finite_floats` (line 421) — cx
-- [ ] `next` (line 456)
 - [ ] `random_non_positive_finite_floats` (line 532) — cx
-- [ ] `next` (line 566)
 - [ ] `random_nonzero_finite_floats` (line 638) — cx
-- [ ] `next` (line 670)
 - [ ] `random_finite_floats` (line 743) — cx
 - [ ] `random_floats` (line 861) — cx
 - [ ] `striped_random_positive_finite_floats` (line 955) — cx, panics
@@ -1896,13 +1860,8 @@ formula.
 
 ## malachite-float/src/lib.rs
 
-- [ ] `emulate_float_to_float_fn` (line 119)
-- [ ] `emulate_constant_to_float_fn` (line 157)
-- [ ] `emulate_float_float_to_float_fn` (line 191)
-- [ ] `emulate_rational_to_float_fn` (line 234)
-- [ ] `emulate_rational_rational_to_float_fn` (line 271)
 - [ ] `test_overflow` (line 346) — cx
 - [ ] `test_underflow` (line 387) — cx
 
 ---
-1476 items; 1183 with complexity claims; 0 scratch-takers; 0 scratch-length formulas.
+1438 items; 1183 with complexity claims; 0 scratch-takers; 0 scratch-length formulas.

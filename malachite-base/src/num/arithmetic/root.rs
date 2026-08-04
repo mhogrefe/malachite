@@ -2049,7 +2049,14 @@ impl FloorRoot<u64> for u128 {
     /// $f(x, n) = \lfloor\sqrt\[n\]{x}\rfloor$.
     ///
     /// # Worst-case complexity
-    /// Constant time and additional memory.
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`: constant
+    /// for widths up to 64 bits and for exponents greater than 2, where a floating-point
+    /// approximation is refined with $O(1)$ adjustments; 128-bit square roots (`exp == 2`) fall
+    /// back to an $O(n)$ binary search.
     ///
     /// # Panics
     /// Panics if `exp` is zero.
@@ -2076,7 +2083,14 @@ impl CeilingRoot<u64> for u128 {
     /// $f(x, n) = \lceil\sqrt\[n\]{x}\rceil$.
     ///
     /// # Worst-case complexity
-    /// Constant time and additional memory.
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`: constant
+    /// for widths up to 64 bits and for exponents greater than 2, where a floating-point
+    /// approximation is refined with $O(1)$ adjustments; 128-bit square roots (`exp == 2`) fall
+    /// back to an $O(n)$ binary search.
     ///
     /// # Panics
     /// Panics if `exp` is zero.
@@ -2114,7 +2128,14 @@ impl CheckedRoot<u64> for u128 {
     /// $$
     ///
     /// # Worst-case complexity
-    /// Constant time and additional memory.
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`: constant
+    /// for widths up to 64 bits and for exponents greater than 2, where a floating-point
+    /// approximation is refined with $O(1)$ adjustments; 128-bit square roots (`exp == 2`) fall
+    /// back to an $O(n)$ binary search.
     ///
     /// # Panics
     /// Panics if `exp` is zero.
@@ -2148,7 +2169,14 @@ impl RootRem<u64> for u128 {
     /// $f(x, n) = (\lfloor\sqrt\[n\]{x}\rfloor, x - \lfloor\sqrt\[n\]{x}\rfloor^n)$.
     ///
     /// # Worst-case complexity
-    /// Constant time and additional memory.
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`: constant
+    /// for widths up to 64 bits and for exponents greater than 2, where a floating-point
+    /// approximation is refined with $O(1)$ adjustments; 128-bit square roots (`exp == 2`) fall
+    /// back to an $O(n)$ binary search.
     ///
     /// # Panics
     /// Panics if `exp` is zero.
@@ -2181,7 +2209,14 @@ macro_rules! impl_root_assign_rem {
             /// $x \gets \lfloor\sqrt\[n\]{x}\rfloor$.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`:
+            /// constant for widths up to 64 bits and for exponents greater than 2, where a
+            /// floating-point approximation is refined with $O(1)$ adjustments; 128-bit square
+            /// roots (`exp == 2`) fall back to an $O(n)$ binary search.
             ///
             /// # Panics
             /// Panics if `exp` is zero.
@@ -2209,7 +2244,14 @@ macro_rules! impl_root_signed {
             /// $f(x, n) = \lfloor\sqrt\[n\]{x}\rfloor$.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`:
+            /// constant for widths up to 64 bits and for exponents greater than 2, where a
+            /// floating-point approximation is refined with $O(1)$ adjustments; 128-bit square
+            /// roots (`exp == 2`) fall back to an $O(n)$ binary search.
             ///
             /// # Panics
             /// Panics if `exp` is zero, or if `self` is negative and `exp` is even.
@@ -2236,7 +2278,14 @@ macro_rules! impl_root_signed {
             /// $f(x, n) = \lceil\sqrt\[n\]{x}\rceil$.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`:
+            /// constant for widths up to 64 bits and for exponents greater than 2, where a
+            /// floating-point approximation is refined with $O(1)$ adjustments; 128-bit square
+            /// roots (`exp == 2`) fall back to an $O(n)$ binary search.
             ///
             /// # Panics
             /// Panics if `exp` is zero, or if `self` is negative and `exp` is even.
@@ -2269,7 +2318,14 @@ macro_rules! impl_root_signed {
             /// $$
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`:
+            /// constant for widths up to 64 bits and for exponents greater than 2, where a
+            /// floating-point approximation is refined with $O(1)$ adjustments; 128-bit square
+            /// roots (`exp == 2`) fall back to an $O(n)$ binary search.
             ///
             /// # Panics
             /// Panics if `exp` is zero, or if `self` is negative and `exp` is even.
@@ -2301,7 +2357,14 @@ macro_rules! impl_root_primitive_int {
             /// $x \gets \lfloor\sqrt\[n\]{x}\rfloor$.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`:
+            /// constant for widths up to 64 bits and for exponents greater than 2, where a
+            /// floating-point approximation is refined with $O(1)$ adjustments; 128-bit square
+            /// roots (`exp == 2`) fall back to an $O(n)$ binary search.
             ///
             /// # Panics
             /// Panics if `exp` is zero, or if `self` is negative and `exp` is even.
@@ -2320,7 +2383,14 @@ macro_rules! impl_root_primitive_int {
             /// $x \gets \lceil\sqrt\[n\]{x}\rceil$.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`:
+            /// constant for widths up to 64 bits and for exponents greater than 2, where a
+            /// floating-point approximation is refined with $O(1)$ adjustments; 128-bit square
+            /// roots (`exp == 2`) fall back to an $O(n)$ binary search.
             ///
             /// # Panics
             /// Panics if `exp` is zero, or if `self` is negative and `exp` is even.

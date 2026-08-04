@@ -369,7 +369,14 @@ macro_rules! impl_gmp_format_arg_unsigned {
             /// value's lowest byte, as C does).
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n, w, p) = O(n + w + p)$
+            ///
+            /// $M(n, w, p) = O(n + w + p)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, $w$
+            /// is the field width stored in `spec`, and $p$ is the precision stored in `spec`:
+            /// rendering the digits is linear in the value's bits, and padding to the field width
+            /// or precision is linear in those settings.
             ///
             /// # Examples
             /// See [here](super::gmp_format#gmp_format).
@@ -408,7 +415,14 @@ macro_rules! impl_gmp_format_arg_signed {
             /// as C does).
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n, w, p) = O(n + w + p)$
+            ///
+            /// $M(n, w, p) = O(n + w + p)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, $w$
+            /// is the field width stored in `spec`, and $p$ is the precision stored in `spec`:
+            /// rendering the digits is linear in the value's bits, and padding to the field width
+            /// or precision is linear in those settings.
             ///
             /// # Examples
             /// See [here](super::gmp_format#gmp_format).
@@ -443,7 +457,12 @@ impl GmpFormatArg for char {
     /// `%c` conversion with no type character.
     ///
     /// # Worst-case complexity
-    /// Constant time and additional memory.
+    /// $T(w) = O(w)$
+    ///
+    /// $M(w) = O(w)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $w$ is the field width stored in `spec`:
+    /// the character itself is constant-size, but the output is padded to the field width.
     ///
     /// # Examples
     /// See [here](super::gmp_format#gmp_format).

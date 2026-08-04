@@ -72,11 +72,14 @@ impl<T: Clone + Eq> FoerSequence<T> {
     /// If the index is greater than or equal to the length of the sequence, this function panics.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n)$
+    /// $T(n, m) = O(n + m^{1+\varepsilon})$ for all $\varepsilon > 0$
     ///
-    /// $M(n) = O(n)$
+    /// $M(n, m) = O(n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `index`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `index`, and $m$ is
+    /// `self.component_len()`: indices within the repeating part expand the non-repeating prefix up
+    /// to the index, and the sequence is then re-reduced, which scans the components and finds the
+    /// repeating part's minimal period.
     ///
     /// # Panics
     /// Panics if `index` is greater than or equal to the length of this sequence.

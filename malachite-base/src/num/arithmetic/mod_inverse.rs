@@ -165,8 +165,8 @@ macro_rules! impl_mod_inverse {
             ///
             /// where $T$ is time, $M$ is additional memory, and $n$ is
             /// `max(self.significant_bits(), m.significant_bits())`: the extended Euclidean
-            /// algorithm on words performs $O(n)$ iterations of constant-cost word operations,
-            /// with no allocation.
+            /// algorithm on words performs $O(n)$ iterations of constant-cost word operations, with
+            /// no allocation.
             ///
             /// # Panics
             /// Panics if `self` is greater than or equal to `m`.

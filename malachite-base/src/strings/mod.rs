@@ -70,11 +70,13 @@ pub fn string_unique(s: &str) -> String {
 /// Does not take multiplicities into account.
 ///
 /// # Worst-case complexity
-/// $T(n) = O(n)$
+/// $T(n, m) = O(n + m)$
 ///
-/// $M(n) = O(n + m)$
+/// $M(n, m) = O(m)$
 ///
-/// where $T$ is time, $M$ is additional memory, $n$ is `s.len()`, and $m$ is `t.len()`.
+/// where $T$ is time, $M$ is additional memory, $n$ is `s.len()`, and $m$ is `t.len()`: the second
+/// string's characters are collected into a hash set, and the first string's characters are checked
+/// against it.
 ///
 /// # Examples
 /// ```
