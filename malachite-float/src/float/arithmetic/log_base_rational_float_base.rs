@@ -122,12 +122,9 @@ fn log_base_rational_float_base_helper(
     prec: u64,
     rm: RoundingMode,
 ) -> (Float, Ordering) {
-    // ln(base) is NaN for a NaN or negative base (negative finite or -infinity).
-    if base.is_nan() || *base < 0u32 {
-        return (float_nan!(), Equal);
-    }
-    // ln(x) is NaN for a negative x.
-    if *x < 0u32 {
+    // ln(base) is NaN for a NaN or negative base (negative finite or -infinity), and ln(x) is
+    // NaN for a negative x.
+    if base.is_nan() || *base < 0u32 || *x < 0u32 {
         return (float_nan!(), Equal);
     }
     if base.is_infinite() {

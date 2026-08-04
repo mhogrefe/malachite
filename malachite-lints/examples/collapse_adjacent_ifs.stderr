@@ -1,0 +1,41 @@
+error: these ifs have identical diverging bodies; join the conditions with `||` in a single `if`
+  --> $DIR/collapse_adjacent_ifs.rs:3:5
+   |
+LL | /     if x == 0 {
+LL | |         return None;
+LL | |     }
+LL | |     if y == 0 {
+...  |
+LL | |         return None;
+LL | |     }
+   | |_____^
+   |
+   = note: `#[deny(collapse_adjacent_ifs)]` on by default
+
+error: these ifs have identical diverging bodies; join the conditions with `||` in a single `if`
+  --> $DIR/collapse_adjacent_ifs.rs:19:9
+   |
+LL | /         if x == 3 {
+LL | |             continue;
+LL | |         }
+LL | |         if x == 5 {
+LL | |             continue;
+LL | |         }
+   | |_________^
+
+error: use `>>= 1` instead of dividing by `2`
+  --> $DIR/collapse_adjacent_ifs.rs:45:9
+   |
+LL |         *x /= 2;
+   |         ^^^^^^^
+   |
+   = note: `#[deny(mul_div_by_power_of_2_literal)]` on by default
+
+error: use `>>= 1` instead of dividing by `2`
+  --> $DIR/collapse_adjacent_ifs.rs:48:9
+   |
+LL |         *x /= 2;
+   |         ^^^^^^^
+
+error: aborting due to 4 previous errors
+

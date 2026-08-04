@@ -16,10 +16,10 @@ LL |         return n.floor_log_base_2() as i64;
    = help: use `if let Some(e) = n.checked_log_base_2()`, which tests and returns the exact log at once
 
 error: computing `floor_log_base_2` under an `is_power_of_two` guard
-  --> $DIR/use_checked_log_base_2.rs:16:16
+  --> $DIR/use_checked_log_base_2.rs:17:17
    |
-LL |         return n.floor_log_base_2() as i64;
-   |                ^^^^^^^^^^^^^^^^^^^^
+LL |         return (n.floor_log_base_2() + 1) as i64;
+   |                 ^^^^^^^^^^^^^^^^^^^^
    |
    = help: use `if let Some(e) = n.checked_log_base_2()`, which tests and returns the exact log at once
 

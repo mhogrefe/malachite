@@ -154,10 +154,7 @@ pub fn limbs_remove(
 
     for i in (0..npowers).rev() {
         let pn = pwpsn[i];
-        if qn < pn {
-            continue;
-        }
-        if pwr + usize::power_of_2(u64::exact_from(i)) > cap {
+        if qn < pn || pwr + usize::power_of_2(u64::exact_from(i)) > cap {
             continue;
         }
 

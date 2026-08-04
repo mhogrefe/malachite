@@ -124,13 +124,13 @@ fn benchmark_rational_add_mul_evaluation_strategy(
         &triple_rational_max_bit_bucketer("x", "y", "z"),
         &mut [
             ("Rational.add_mul(Rational, Rational)", &mut |(x, y, z)| {
-                no_out!(x.add_mul(y, z))
+                no_out!(x.add_mul(y, z));
             }),
             ("Rational.add_mul(Rational, &Rational)", &mut |(x, y, z)| {
-                no_out!(x.add_mul(y, &z))
+                no_out!(x.add_mul(y, &z));
             }),
             ("Rational.add_mul(&Rational, Rational)", &mut |(x, y, z)| {
-                no_out!(x.add_mul(&y, z))
+                no_out!(x.add_mul(&y, z));
             }),
             (
                 "Rational.add_mul(&Rational, &Rational)",
@@ -161,7 +161,7 @@ fn benchmark_rational_add_mul_algorithms(
         &triple_rational_max_bit_bucketer("x", "y", "z"),
         &mut [
             ("Rational.add_mul(Rational, Rational)", &mut |(x, y, z)| {
-                no_out!(x.add_mul(y, z))
+                no_out!(x.add_mul(y, z));
             }),
             ("Rational + Rational * Rational", &mut |(x, y, z)| {
                 no_out!(x + y * z);

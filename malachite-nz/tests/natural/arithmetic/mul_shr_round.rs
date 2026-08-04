@@ -126,6 +126,7 @@ fn mul_shr_round_properties() {
     );
 }
 
+#[allow(clippy::needless_pass_by_value)]
 fn mul_shr_round_properties_helper(x: Natural, y: Natural, bits: u64, rm: RoundingMode) {
     let (r, o) = (&x).mul_shr_round(&y, bits, rm);
     assert!(r.is_valid());

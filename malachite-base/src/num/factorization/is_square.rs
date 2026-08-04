@@ -180,6 +180,9 @@ impl IsSquare for u128 {
     ///
     /// # Examples
     /// See [here](super::is_square#is_square).
+    // The body stays separate staged tests, each with its own explanation; merging the first two
+    // into one `if` would obscure the staging.
+    #[cfg_attr(dylint_lib = "malachite_lints", allow(collapse_adjacent_ifs))]
     #[inline]
     fn is_square(&self) -> bool {
         let idx = self % 0x100; // mod 256

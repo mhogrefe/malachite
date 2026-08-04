@@ -77,16 +77,13 @@ fn mod_sqrt_properties_helper<T: ModSqrt<T, Output = T> + PrimitiveUnsigned>() {
         }
         // For odd moduli the sub-600 search is exhaustive.
         if m.odd() && m < T::saturating_from(600u16) {
-            match result {
-                Some(r) => {
-                    assert_eq!(r.mod_mul(r, m), x);
-                }
-                None => {
-                    let mut t = T::ZERO;
-                    while t < m {
-                        assert_ne!(t.mod_mul(t, m), x);
-                        t += T::ONE;
-                    }
+            if let Some(r) = result {
+                assert_eq!(r.mod_mul(r, m), x);
+            } else {
+                let mut t = T::ZERO;
+                while t < m {
+                    assert_ne!(t.mod_mul(t, m), x);
+                    t += T::ONE;
                 }
             }
         }

@@ -21,6 +21,7 @@ mod adjacent_vec_allocations;
 mod assert_ordering_equal_prefer_exact;
 mod assign_then_consumed_once;
 mod clone_with_ref_variant;
+mod collapse_adjacent_ifs;
 mod collapse_adjacent_imports;
 mod compare_with_power_of_2;
 mod compare_with_primitive;
@@ -406,6 +407,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         assert_ordering_equal_prefer_exact::ASSERT_ORDERING_EQUAL_PREFER_EXACT,
         assign_then_consumed_once::ASSIGN_THEN_CONSUMED_ONCE,
         clone_with_ref_variant::CLONE_WITH_REF_VARIANT,
+        collapse_adjacent_ifs::COLLAPSE_ADJACENT_IFS,
         collapse_adjacent_imports::COLLAPSE_ADJACENT_IMPORTS,
         compare_with_power_of_2::COMPARE_WITH_POWER_OF_2,
         compare_with_primitive::COMPARE_WITH_PRIMITIVE,
@@ -454,6 +456,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         Box::new(assert_ordering_equal_prefer_exact::AssertOrderingEqualPreferExact)
     });
     lint_store.register_late_pass(|_| Box::new(adjacent_vec_allocations::AdjacentVecAllocations));
+    lint_store.register_late_pass(|_| Box::new(collapse_adjacent_ifs::CollapseAdjacentIfs));
     lint_store.register_late_pass(|_| Box::new(assign_then_consumed_once::AssignThenConsumedOnce));
     lint_store.register_late_pass(|_| Box::new(compare_with_power_of_2::CompareWithPowerOf2));
     lint_store.register_late_pass(|_| Box::new(compare_with_primitive::CompareWithPrimitive));

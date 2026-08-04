@@ -24051,6 +24051,7 @@ fn precompute_div_mod_data_fail() {
     assert_panic!(Natural::precompute_div_mod_data(&Natural::ZERO));
 }
 
+#[allow(clippy::needless_pass_by_value)]
 fn div_mod_and_div_rem_properties_helper(x: Natural, y: Natural) {
     let mut mut_x = x.clone();
     let r = mut_x.div_assign_mod(&y);

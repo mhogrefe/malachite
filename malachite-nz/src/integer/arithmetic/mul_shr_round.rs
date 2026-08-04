@@ -48,8 +48,8 @@ fn mul_shr_round_integers(
     }
 }
 
-impl MulShrRound<Integer, u64> for Integer {
-    type Output = Integer;
+impl MulShrRound<Self, u64> for Integer {
+    type Output = Self;
 
     /// Multiplies two [`Integer`]s and right-shifts the product (divides it by a power of 2),
     /// rounding according to a specified rounding mode, taking both [`Integer`]s by value. An
@@ -89,13 +89,13 @@ impl MulShrRound<Integer, u64> for Integer {
     /// );
     /// ```
     #[inline]
-    fn mul_shr_round(self, y: Integer, bits: u64, rm: RoundingMode) -> (Integer, Ordering) {
+    fn mul_shr_round(self, y: Self, bits: u64, rm: RoundingMode) -> (Self, Ordering) {
         mul_shr_round_integers(&self, &y, bits, rm)
     }
 }
 
-impl MulShrRound<&Integer, u64> for Integer {
-    type Output = Integer;
+impl MulShrRound<&Self, u64> for Integer {
+    type Output = Self;
 
     /// Multiplies two [`Integer`]s and right-shifts the product (divides it by a power of 2),
     /// rounding according to a specified rounding mode, taking the first [`Integer`] by value and
@@ -128,7 +128,7 @@ impl MulShrRound<&Integer, u64> for Integer {
     /// );
     /// ```
     #[inline]
-    fn mul_shr_round(self, y: &Integer, bits: u64, rm: RoundingMode) -> (Integer, Ordering) {
+    fn mul_shr_round(self, y: &Self, bits: u64, rm: RoundingMode) -> (Self, Ordering) {
         mul_shr_round_integers(&self, y, bits, rm)
     }
 }
@@ -211,7 +211,7 @@ impl MulShrRound<&Integer, u64> for &Integer {
     }
 }
 
-impl MulShrRoundAssign<Integer, u64> for Integer {
+impl MulShrRoundAssign<Self, u64> for Integer {
     /// Multiplies two [`Integer`]s and right-shifts the product (divides it by a power of 2) in
     /// place, rounding according to a specified rounding mode, taking the [`Integer`] on the
     /// right-hand side by value. An [`Ordering`] is returned, indicating whether the assigned value
@@ -242,14 +242,14 @@ impl MulShrRoundAssign<Integer, u64> for Integer {
     /// assert_eq!(x, -79);
     /// ```
     #[inline]
-    fn mul_shr_round_assign(&mut self, y: Integer, bits: u64, rm: RoundingMode) -> Ordering {
+    fn mul_shr_round_assign(&mut self, y: Self, bits: u64, rm: RoundingMode) -> Ordering {
         let o;
         (*self, o) = mul_shr_round_integers(self, &y, bits, rm);
         o
     }
 }
 
-impl MulShrRoundAssign<&Integer, u64> for Integer {
+impl MulShrRoundAssign<&Self, u64> for Integer {
     /// Multiplies two [`Integer`]s and right-shifts the product (divides it by a power of 2) in
     /// place, rounding according to a specified rounding mode, taking the [`Integer`] on the
     /// right-hand side by reference. An [`Ordering`] is returned, indicating whether the assigned
@@ -283,7 +283,7 @@ impl MulShrRoundAssign<&Integer, u64> for Integer {
     /// assert_eq!(x, -78);
     /// ```
     #[inline]
-    fn mul_shr_round_assign(&mut self, y: &Integer, bits: u64, rm: RoundingMode) -> Ordering {
+    fn mul_shr_round_assign(&mut self, y: &Self, bits: u64, rm: RoundingMode) -> Ordering {
         let o;
         (*self, o) = mul_shr_round_integers(self, y, bits, rm);
         o

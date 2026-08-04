@@ -34,13 +34,12 @@ pub fn coprime_with_check_2_3_5(x: Natural, y: Natural) -> bool {
     } else {
         let x15 = &x % FIFTEEN;
         let y15 = &y % FIFTEEN;
-        if (x15 == 0u32 || x15 == 3u32 || x15 == 6u32 || x15 == 9u32 || x15 == 12u32)
-            && (y15 == 0u32 || y15 == 3u32 || y15 == 6u32 || y15 == 9u32 || y15 == 12u32)
-        {
-            return false;
-        }
-        if (x15 == 0u32 || x15 == 5u32 || x15 == 10u32)
-            && (y15 == 0u32 || y15 == 5u32 || y15 == 10u32)
+        // Whether x and y are both divisible by 3, or both divisible by 5, read off their
+        // residues mod 15.
+        if ((x15 == 0u32 || x15 == 3u32 || x15 == 6u32 || x15 == 9u32 || x15 == 12u32)
+            && (y15 == 0u32 || y15 == 3u32 || y15 == 6u32 || y15 == 9u32 || y15 == 12u32))
+            || ((x15 == 0u32 || x15 == 5u32 || x15 == 10u32)
+                && (y15 == 0u32 || y15 == 5u32 || y15 == 10u32))
         {
             return false;
         }

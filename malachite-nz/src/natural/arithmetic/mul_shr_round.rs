@@ -168,8 +168,8 @@ crate_test_fn! {mul_shr_round_ref_ref(
     }
 }}
 
-impl MulShrRound<Natural, u64> for Natural {
-    type Output = Natural;
+impl MulShrRound<Self, u64> for Natural {
+    type Output = Self;
 
     /// Multiplies two [`Natural`]s and right-shifts the product (divides it by a power of 2),
     /// rounding according to a specified rounding mode, taking both [`Natural`]s by value. An
@@ -212,13 +212,13 @@ impl MulShrRound<Natural, u64> for Natural {
     /// );
     /// ```
     #[inline]
-    fn mul_shr_round(self, y: Natural, bits: u64, rm: RoundingMode) -> (Natural, Ordering) {
+    fn mul_shr_round(self, y: Self, bits: u64, rm: RoundingMode) -> (Self, Ordering) {
         mul_shr_round_ref_ref(&self, &y, bits, rm)
     }
 }
 
-impl MulShrRound<&Natural, u64> for Natural {
-    type Output = Natural;
+impl MulShrRound<&Self, u64> for Natural {
+    type Output = Self;
 
     /// Multiplies two [`Natural`]s and right-shifts the product (divides it by a power of 2),
     /// rounding according to a specified rounding mode, taking the first [`Natural`] by value and
@@ -251,7 +251,7 @@ impl MulShrRound<&Natural, u64> for Natural {
     /// );
     /// ```
     #[inline]
-    fn mul_shr_round(self, y: &Natural, bits: u64, rm: RoundingMode) -> (Natural, Ordering) {
+    fn mul_shr_round(self, y: &Self, bits: u64, rm: RoundingMode) -> (Self, Ordering) {
         mul_shr_round_ref_ref(&self, y, bits, rm)
     }
 }
@@ -337,7 +337,7 @@ impl MulShrRound<&Natural, u64> for &Natural {
     }
 }
 
-impl MulShrRoundAssign<Natural, u64> for Natural {
+impl MulShrRoundAssign<Self, u64> for Natural {
     /// Multiplies two [`Natural`]s and right-shifts the product (divides it by a power of 2) in
     /// place, rounding according to a specified rounding mode, taking the [`Natural`] on the
     /// right-hand side by value. An [`Ordering`] is returned, indicating whether the assigned value
@@ -368,14 +368,14 @@ impl MulShrRoundAssign<Natural, u64> for Natural {
     /// assert_eq!(x, 78);
     /// ```
     #[inline]
-    fn mul_shr_round_assign(&mut self, y: Natural, bits: u64, rm: RoundingMode) -> Ordering {
+    fn mul_shr_round_assign(&mut self, y: Self, bits: u64, rm: RoundingMode) -> Ordering {
         let o;
         (*self, o) = mul_shr_round_ref_ref(self, &y, bits, rm);
         o
     }
 }
 
-impl MulShrRoundAssign<&Natural, u64> for Natural {
+impl MulShrRoundAssign<&Self, u64> for Natural {
     /// Multiplies two [`Natural`]s and right-shifts the product (divides it by a power of 2) in
     /// place, rounding according to a specified rounding mode, taking the [`Natural`] on the
     /// right-hand side by reference. An [`Ordering`] is returned, indicating whether the assigned
@@ -409,7 +409,7 @@ impl MulShrRoundAssign<&Natural, u64> for Natural {
     /// assert_eq!(x, 79);
     /// ```
     #[inline]
-    fn mul_shr_round_assign(&mut self, y: &Natural, bits: u64, rm: RoundingMode) -> Ordering {
+    fn mul_shr_round_assign(&mut self, y: &Self, bits: u64, rm: RoundingMode) -> Ordering {
         let o;
         (*self, o) = mul_shr_round_ref_ref(self, y, bits, rm);
         o

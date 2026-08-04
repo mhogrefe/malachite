@@ -246,7 +246,10 @@ fn benchmark_div_mod_unsigned_algorithms<T: PrimitiveUnsigned>(
         &pair_max_bit_bucketer("x", "y"),
         &mut [
             ("using div_mod", &mut |(x, y)| no_out!(x.div_mod(y))),
-            ("using / and %", &mut |(x, y)| no_out!((x / y, x % y))),
+            ("using / and %", &mut |(x, y)| {
+                let _ = x / y;
+                let _ = x % y;
+            }),
         ],
     );
 }
@@ -328,7 +331,10 @@ fn benchmark_div_rem_unsigned_algorithms<T: PrimitiveUnsigned>(
         &pair_max_bit_bucketer("x", "y"),
         &mut [
             ("using div_rem", &mut |(x, y)| no_out!(x.div_rem(y))),
-            ("using / and %", &mut |(x, y)| no_out!((x / y, x % y))),
+            ("using / and %", &mut |(x, y)| {
+                let _ = x / y;
+                let _ = x % y;
+            }),
         ],
     );
 }
@@ -350,7 +356,10 @@ fn benchmark_div_rem_signed_algorithms<T: PrimitiveSigned>(
         &pair_max_bit_bucketer("x", "y"),
         &mut [
             ("using div_rem", &mut |(x, y)| no_out!(x.div_rem(y))),
-            ("using / and %", &mut |(x, y)| no_out!((x / y, x % y))),
+            ("using / and %", &mut |(x, y)| {
+                let _ = x / y;
+                let _ = x % y;
+            }),
         ],
     );
 }

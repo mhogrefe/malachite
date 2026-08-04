@@ -107,16 +107,13 @@ fn mod_sqrt_properties() {
         // For odd moduli the sub-600 search is exhaustive: roots come in pairs t and m - t, so
         // scanning half the range decides existence.
         if m.odd() && m < 600 {
-            match &result {
-                Some(r) => {
-                    assert_eq!(r.mod_mul(r, &m), x);
-                }
-                None => {
-                    let mut t = Natural::ZERO;
-                    while t < m {
-                        assert_ne!((&t).mod_mul(&t, &m), x);
-                        t += Natural::ONE;
-                    }
+            if let Some(r) = &result {
+                assert_eq!(r.mod_mul(r, &m), x);
+            } else {
+                let mut t = Natural::ZERO;
+                while t < m {
+                    assert_ne!((&t).mod_mul(&t, &m), x);
+                    t += Natural::ONE;
                 }
             }
         }

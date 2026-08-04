@@ -51,13 +51,9 @@ fn mod_sqrt_ref_ref(x: &Natural, m: &Natural) -> Option<Natural> {
     if *x <= 1u32 {
         return Some(x.clone());
     }
-    if m.even() {
-        return None;
-    }
-    if m.checked_sqrt().is_some() {
-        return None;
-    }
-    if x.jacobi_symbol(m) == -1 {
+    // The evenness test must come first, since the Jacobi symbol requires an odd modulus; the
+    // perfect-square test keeps the quadratic-nonresidue search below terminating.
+    if m.even() || m.checked_sqrt().is_some() || x.jacobi_symbol(m) == -1 {
         return None;
     }
     let data = ModMulPrecomputed::<Natural>::precompute_mod_mul_data(m);

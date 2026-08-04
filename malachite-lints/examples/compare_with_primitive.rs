@@ -10,17 +10,22 @@ fn main() {
     let x = X;
     let n = N;
     let k = 10u32;
-    // Operator comparison with a named constant: flagged.
+    // Operator comparison with a named constant: flagged. (The bodies are kept distinct so that
+    // `collapse_adjacent_ifs` does not also fire.)
     if x == Rational::ONE {
+        println!("one");
         return;
     }
     if x > Rational::TWO {
+        println!("big");
         return;
     }
     if x < Rational::NEGATIVE_ONE {
+        println!("small");
         return;
     }
     if n == Natural::ZERO {
+        println!("zero");
         return;
     }
     // Comparison methods with a named constant: flagged.

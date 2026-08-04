@@ -123,13 +123,13 @@ fn benchmark_rational_sub_mul_evaluation_strategy(
         &triple_rational_max_bit_bucketer("x", "y", "z"),
         &mut [
             ("Rational.sub_mul(Rational, Rational)", &mut |(x, y, z)| {
-                no_out!(x.sub_mul(y, z))
+                no_out!(x.sub_mul(y, z));
             }),
             ("Rational.sub_mul(Rational, &Rational)", &mut |(x, y, z)| {
-                no_out!(x.sub_mul(y, &z))
+                no_out!(x.sub_mul(y, &z));
             }),
             ("Rational.sub_mul(&Rational, Rational)", &mut |(x, y, z)| {
-                no_out!(x.sub_mul(&y, z))
+                no_out!(x.sub_mul(&y, z));
             }),
             (
                 "Rational.sub_mul(&Rational, &Rational)",
@@ -160,7 +160,7 @@ fn benchmark_rational_sub_mul_algorithms(
         &triple_rational_max_bit_bucketer("x", "y", "z"),
         &mut [
             ("Rational.sub_mul(Rational, Rational)", &mut |(x, y, z)| {
-                no_out!(x.sub_mul(y, z))
+                no_out!(x.sub_mul(y, z));
             }),
             ("Rational - Rational * Rational", &mut |(x, y, z)| {
                 no_out!(x - y * z);

@@ -266,7 +266,7 @@ fn benchmark_mul_shr_round_unsigned_unsigned<
         file_name,
         &quadruple_3_bucketer("bits"),
         &mut [("Malachite", &mut |(x, y, bits, rm)| {
-            no_out!(x.mul_shr_round(y, bits, rm))
+            no_out!(x.mul_shr_round(y, bits, rm));
         })],
     );
 }
@@ -298,7 +298,7 @@ fn benchmark_mul_shr_round_signed_unsigned<
         file_name,
         &quadruple_3_bucketer("bits"),
         &mut [("Malachite", &mut |(x, y, bits, rm)| {
-            no_out!(x.mul_shr_round(y, bits, rm))
+            no_out!(x.mul_shr_round(y, bits, rm));
         })],
     );
 }

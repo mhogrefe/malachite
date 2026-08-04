@@ -164,16 +164,11 @@ fn get_perfect_power_u32_bool(n: u32) -> bool {
     t &= MOD44[(n % 44) as usize];
     t &= MOD61[(n % 61) as usize];
     t &= MOD63[(n % 63) as usize];
-    // Check for perfect square
-    if t.odd() && n.is_square() {
-        return true;
-    }
-    // Check for perfect cube
-    if t & 2 != 0 && n.root_rem(3).1 == 0 {
-        return true;
-    }
-    // Check for perfect fifth power
-    if t & 4 != 0 && n.root_rem(5).1 == 0 {
+    // Check for perfect squares, cubes, and fifth powers
+    if (t.odd() && n.is_square())
+        || (t & 2 != 0 && n.root_rem(3).1 == 0)
+        || (t & 4 != 0 && n.root_rem(5).1 == 0)
+    {
         return true;
     }
     // Check for powers 7, 11, 13
@@ -181,16 +176,11 @@ fn get_perfect_power_u32_bool(n: u32) -> bool {
     t |= MOD67[(n % 67) as usize];
     t |= MOD79[(n % 79) as usize];
     t &= MOD72[(n % 72) as usize];
-    // Check for perfect 7th power
-    if t.odd() && n.root_rem(7).1 == 0 {
-        return true;
-    }
-    // Check for perfect 11th power
-    if t & 2 != 0 && n.root_rem(11).1 == 0 {
-        return true;
-    }
-    // Check for perfect 13th power
-    if t & 13 != 0 && n.root_rem(13).1 == 0 {
+    // Check for perfect 7th, 11th, and 13th powers
+    if (t.odd() && n.root_rem(7).1 == 0)
+        || (t & 2 != 0 && n.root_rem(11).1 == 0)
+        || (t & 13 != 0 && n.root_rem(13).1 == 0)
+    {
         return true;
     }
     // Handle powers of 2
@@ -356,16 +346,11 @@ fn get_perfect_power_u64_bool(n: u64) -> bool {
     t &= MOD44[(n % 44) as usize];
     t &= MOD61[(n % 61) as usize];
     t &= MOD63[(n % 63) as usize];
-    // Check for perfect square
-    if t.odd() && n.is_square() {
-        return true;
-    }
-    // Check for perfect cube
-    if t & 2 != 0 && n.root_rem(3).1 == 0 {
-        return true;
-    }
-    // Check for perfect fifth power
-    if t & 4 != 0 && n.root_rem(5).1 == 0 {
+    // Check for perfect squares, cubes, and fifth powers
+    if (t.odd() && n.is_square())
+        || (t & 2 != 0 && n.root_rem(3).1 == 0)
+        || (t & 4 != 0 && n.root_rem(5).1 == 0)
+    {
         return true;
     }
     // Check for powers 7, 11, 13
@@ -373,16 +358,11 @@ fn get_perfect_power_u64_bool(n: u64) -> bool {
     t |= MOD67[(n % 67) as usize];
     t |= MOD79[(n % 79) as usize];
     t &= MOD72[(n % 72) as usize];
-    // Check for perfect 7th power
-    if t.odd() && n.root_rem(7).1 == 0 {
-        return true;
-    }
-    // Check for perfect 11th power
-    if t & 2 != 0 && n.root_rem(11).1 == 0 {
-        return true;
-    }
-    // Check for perfect 13th power
-    if t & 13 != 0 && n.root_rem(13).1 == 0 {
+    // Check for perfect 7th, 11th, and 13th powers
+    if (t.odd() && n.root_rem(7).1 == 0)
+        || (t & 2 != 0 && n.root_rem(11).1 == 0)
+        || (t & 13 != 0 && n.root_rem(13).1 == 0)
+    {
         return true;
     }
     // Handle powers of 2

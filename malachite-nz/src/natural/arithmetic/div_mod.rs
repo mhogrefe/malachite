@@ -2068,9 +2068,14 @@ fn precompute_div_mod_data_helper(d: &Natural) -> DivModData {
                     limbs_two_limb_inverse_helper(ds_shifted[d_len - 1], ds_shifted[d_len - 2]);
                 // The Barrett branch of `limbs_div_mod_precomputed` is only reachable when `d_len
                 // >= DC_DIV_QR_THRESHOLD` and `limbs_div_mod_dc_condition` can return false, which
-                // requires `d_len >= MUPI_DIV_QR_THRESHOLD`; below that, the inverse would never be
-                // used.
-                let inverse = if d_len >= DC_DIV_QR_THRESHOLD && d_len >= MUPI_DIV_QR_THRESHOLD {
+                // requires `d_len >= MUPI_DIV_QR_THRESHOLD`; below the larger of the two
+                // thresholds (their order is platform-dependent), the inverse would never be used.
+                const INVERSE_THRESHOLD: usize = if DC_DIV_QR_THRESHOLD > MUPI_DIV_QR_THRESHOLD {
+                    DC_DIV_QR_THRESHOLD
+                } else {
+                    MUPI_DIV_QR_THRESHOLD
+                };
+                let inverse = if d_len >= INVERSE_THRESHOLD {
                     let i_len_plus_1 = d_len + 1;
                     let mut is = vec![0; i_len_plus_1];
                     let mut scratch =

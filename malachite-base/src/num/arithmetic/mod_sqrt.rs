@@ -81,13 +81,9 @@ private_test_fn! {mod_sqrt_unsigned<
         }
         return None;
     }
-    if m.even() {
-        return None;
-    }
-    if m.checked_sqrt().is_some() {
-        return None;
-    }
-    if x.jacobi_symbol(m) == -1 {
+    // The evenness test must come first, since the Jacobi symbol requires an odd modulus; the
+    // perfect-square test keeps the quadratic-nonresidue search below terminating.
+    if m.even() || m.checked_sqrt().is_some() || x.jacobi_symbol(m) == -1 {
         return None;
     }
     let data = T::precompute_mod_mul_data(&m);

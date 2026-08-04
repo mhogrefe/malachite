@@ -69,10 +69,8 @@ use malachite_nz::integer::Integer;
 /// internally. A future n-ary sum-of-products is therefore the one fused rational operation with a
 /// real algorithmic edge; the ternary one has none.
 pub fn add_mul_split(x: &Rational, y: &Rational, z: &Rational) -> Rational {
-    if x.numerator == 0 || y.numerator == 0 || z.numerator == 0 {
-        if y.numerator == 0 || z.numerator == 0 {
-            return x.clone();
-        }
+    if y.numerator == 0 || z.numerator == 0 {
+        return x.clone();
     }
     // The cross-cancellation of the product, exactly as `Mul` does it.
     let g_1 = (&y.numerator).gcd(&z.denominator);
