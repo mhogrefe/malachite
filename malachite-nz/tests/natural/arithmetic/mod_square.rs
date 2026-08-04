@@ -7,7 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{
-    ModIsReduced, ModMul, ModNeg, ModSquare, ModSquareAssign, Square,
+    ModIsReduced, ModMul, ModNeg, ModPowPrecomputed, ModSquare, ModSquareAssign,
+    ModSquarePrecomputed, ModSquarePrecomputedAssign, Square,
 };
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::test_util::generators::unsigned_pair_gen_var_16;
@@ -117,6 +118,30 @@ fn mod_square_properties() {
         mut_x.mod_square_assign(m.clone());
         assert!(mut_x.is_valid());
         assert_eq!(mut_x, square);
+
+        let data = ModPowPrecomputed::<Natural>::precompute_mod_pow_data(&m);
+        let square_pre_val_val = x.clone().mod_square_precomputed(m.clone(), &data);
+        let square_pre_ref_val = (&x).mod_square_precomputed(m.clone(), &data);
+        let square_pre_val_ref = x.clone().mod_square_precomputed(&m, &data);
+        let square_pre_ref_ref = (&x).mod_square_precomputed(&m, &data);
+        assert!(square_pre_val_val.is_valid());
+        assert!(square_pre_ref_val.is_valid());
+        assert!(square_pre_val_ref.is_valid());
+        assert!(square_pre_ref_ref.is_valid());
+        assert_eq!(square_pre_val_val, square);
+        assert_eq!(square_pre_ref_val, square);
+        assert_eq!(square_pre_val_ref, square);
+        assert_eq!(square_pre_ref_ref, square);
+
+        let mut mut_x = x.clone();
+        mut_x.mod_square_precomputed_assign(m.clone(), &data);
+        assert!(mut_x.is_valid());
+        assert_eq!(mut_x, square);
+        let mut mut_x = x.clone();
+        mut_x.mod_square_precomputed_assign(&m, &data);
+        assert!(mut_x.is_valid());
+        assert_eq!(mut_x, square);
+
         let mut mut_x = x.clone();
         mut_x.mod_square_assign(&m);
         assert!(mut_x.is_valid());

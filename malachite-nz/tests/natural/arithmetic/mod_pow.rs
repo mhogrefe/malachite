@@ -7,7 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{
-    ModIsReduced, ModMul, ModNeg, ModPow, ModPowAssign, Parity,
+    ModIsReduced, ModMul, ModNeg, ModPow, ModPowAssign, ModPowPrecomputed, ModPowPrecomputedAssign,
+    Parity,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Two, Zero};
@@ -538,6 +539,41 @@ fn mod_pow_properties() {
 
         let mut mut_x = x.clone();
         mut_x.mod_pow_assign(exp.clone(), m.clone());
+        assert!(mut_x.is_valid());
+        assert_eq!(mut_x, power);
+
+        let data = ModPowPrecomputed::<Natural>::precompute_mod_pow_data(&m);
+        let power_pre_val_val_val = x.clone().mod_pow_precomputed(exp.clone(), m.clone(), &data);
+        let power_pre_val_ref_val = x.clone().mod_pow_precomputed(&exp, m.clone(), &data);
+        let power_pre_ref_val_val = (&x).mod_pow_precomputed(exp.clone(), m.clone(), &data);
+        let power_pre_ref_ref_val = (&x).mod_pow_precomputed(&exp, m.clone(), &data);
+        let power_pre_val_val_ref = x.clone().mod_pow_precomputed(exp.clone(), &m, &data);
+        let power_pre_val_ref_ref = x.clone().mod_pow_precomputed(&exp, &m, &data);
+        let power_pre_ref_val_ref = (&x).mod_pow_precomputed(exp.clone(), &m, &data);
+        let power_pre_ref_ref_ref = (&x).mod_pow_precomputed(&exp, &m, &data);
+        assert!(power_pre_val_val_val.is_valid());
+        assert!(power_pre_val_ref_val.is_valid());
+        assert!(power_pre_ref_val_val.is_valid());
+        assert!(power_pre_ref_ref_val.is_valid());
+        assert!(power_pre_val_val_ref.is_valid());
+        assert!(power_pre_val_ref_ref.is_valid());
+        assert!(power_pre_ref_val_ref.is_valid());
+        assert!(power_pre_ref_ref_ref.is_valid());
+        assert_eq!(power_pre_val_val_val, power);
+        assert_eq!(power_pre_val_ref_val, power);
+        assert_eq!(power_pre_ref_val_val, power);
+        assert_eq!(power_pre_ref_ref_val, power);
+        assert_eq!(power_pre_val_val_ref, power);
+        assert_eq!(power_pre_val_ref_ref, power);
+        assert_eq!(power_pre_ref_val_ref, power);
+        assert_eq!(power_pre_ref_ref_ref, power);
+
+        let mut mut_x = x.clone();
+        mut_x.mod_pow_precomputed_assign(exp.clone(), m.clone(), &data);
+        assert!(mut_x.is_valid());
+        assert_eq!(mut_x, power);
+        let mut mut_x = x.clone();
+        mut_x.mod_pow_precomputed_assign(exp.clone(), &m, &data);
         assert!(mut_x.is_valid());
         assert_eq!(mut_x, power);
         let mut mut_x = x.clone();

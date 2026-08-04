@@ -16,7 +16,7 @@ use crate::natural::InnerNatural::Small;
 use crate::natural::Natural;
 use malachite_base::num::arithmetic::traits::{
     CheckedSqrt, JacobiSymbol, ModMulPrecomputed, ModMulPrecomputedAssign, ModPow, ModPowerOf2,
-    ModSqrt, Parity,
+    ModSqrt, ModSquarePrecomputed, ModSquarePrecomputedAssign, Parity,
 };
 use malachite_base::num::basic::traits::{One, Two, Zero};
 
@@ -62,7 +62,7 @@ fn mod_sqrt_ref_ref(x: &Natural, m: &Natural) -> Option<Natural> {
     }
     if m.mod_power_of_2(3) == 5 {
         let root: Natural = x.mod_pow((m + THREE) >> 3, m);
-        let square = (&root).mod_mul_precomputed(&root, m, &data);
+        let square = (&root).mod_square_precomputed(m, &data);
         if square == *x {
             return Some(root);
         }
@@ -93,7 +93,7 @@ fn mod_sqrt_ref_ref(x: &Natural, m: &Natural) -> Option<Natural> {
         let mut b_pow = b.clone();
         let mut new_r = 0;
         loop {
-            b_pow.mod_mul_precomputed_assign(b_pow.clone(), m, &data);
+            b_pow.mod_square_precomputed_assign(m, &data);
             new_r += 1;
             if new_r >= r || b_pow == 1 {
                 break;
@@ -101,10 +101,10 @@ fn mod_sqrt_ref_ref(x: &Natural, m: &Natural) -> Option<Natural> {
         }
         let mut g_pow = g;
         for _ in 1..r - new_r {
-            g_pow.mod_mul_precomputed_assign(g_pow.clone(), m, &data);
+            g_pow.mod_square_precomputed_assign(m, &data);
         }
         root.mod_mul_precomputed_assign(&g_pow, m, &data);
-        g = (&g_pow).mod_mul_precomputed(&g_pow, m, &data);
+        g = (&g_pow).mod_square_precomputed(m, &data);
         b.mod_mul_precomputed_assign(&g, m, &data);
         r = new_r;
         if iter == 0 {

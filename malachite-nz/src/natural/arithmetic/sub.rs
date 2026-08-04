@@ -118,10 +118,10 @@ pub(crate) fn sub_with_borrow(x: Limb, y: Limb, borrow: bool) -> (Limb, bool) {
     (diff, borrow_1 | borrow_2)
 }
 
-// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s,
-// subtracts the second from the first. Returns a pair consisting of the limbs of the result, and
-// whether there was a borrow left over; that is, whether the second `Natural` was greater than the
-// first `Natural`. The first slice must be at least as long as the second.
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, subtracts
+// the second from the first. Returns a pair consisting of the limbs of the result, and whether
+// there was a borrow left over; that is, whether the second `Natural` was greater than the first
+// `Natural`. The first slice must be at least as long as the second.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -172,11 +172,11 @@ crate_test_fn! {limbs_sub_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: 
     limbs_sub_same_length_with_borrow_in_to_out(out, xs, ys, false)
 }}
 
-// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s,
-// subtracts the second from the first, writing the `xs.len()` limbs of the result to an output
-// slice. Returns whether there was a borrow left over; that is, whether the second `Natural` was
-// greater than the first `Natural`. The output slice must be at least as long as the first input
-// slice and the first input slice must be at least as long as the second.
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, subtracts
+// the second from the first, writing the `xs.len()` limbs of the result to an output slice. Returns
+// whether there was a borrow left over; that is, whether the second `Natural` was greater than the
+// first `Natural`. The output slice must be at least as long as the first input slice and the first
+// input slice must be at least as long as the second.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$

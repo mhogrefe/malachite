@@ -6,7 +6,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::{ModMul, ModMulAssign, ModMulPrecomputed};
+use malachite_base::num::arithmetic::traits::{
+    ModMul, ModMulAssign, ModMulPrecomputed, ModMulPrecomputedAssign,
+};
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::unsigned_pair_gen_var_36;
@@ -39,6 +41,18 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_natural_mod_mul_ref_val_ref);
     register_demo!(runner, demo_natural_mod_mul_ref_ref_val);
     register_demo!(runner, demo_natural_mod_mul_ref_ref_ref);
+    register_demo!(runner, demo_natural_mod_mul_precomputed_assign);
+    register_demo!(runner, demo_natural_mod_mul_precomputed_assign_val_ref);
+    register_demo!(runner, demo_natural_mod_mul_precomputed_assign_ref_val);
+    register_demo!(runner, demo_natural_mod_mul_precomputed_assign_ref_ref);
+    register_demo!(runner, demo_natural_mod_mul_precomputed);
+    register_demo!(runner, demo_natural_mod_mul_precomputed_val_val_ref);
+    register_demo!(runner, demo_natural_mod_mul_precomputed_val_ref_val);
+    register_demo!(runner, demo_natural_mod_mul_precomputed_val_ref_ref);
+    register_demo!(runner, demo_natural_mod_mul_precomputed_ref_val_val);
+    register_demo!(runner, demo_natural_mod_mul_precomputed_ref_val_ref);
+    register_demo!(runner, demo_natural_mod_mul_precomputed_ref_ref_val);
+    register_demo!(runner, demo_natural_mod_mul_precomputed_ref_ref_ref);
 
     register_bench!(
         runner,
@@ -339,6 +353,174 @@ fn benchmark_natural_mod_mul_evaluation_strategy(
             ),
         ],
     );
+}
+
+fn demo_natural_mod_mul_precomputed_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y, m) in natural_triple_gen_var_3().get(gm, config).take(limit) {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        let m_old = m.clone();
+        let data = ModMulPrecomputed::<Natural>::precompute_mod_mul_data(&m);
+        x.mod_mul_precomputed_assign(y, m, &data);
+        println!(
+            "x := {}; x.mod_mul_precomputed_assign({}, {}, &data); x = {}",
+            x_old, y_old, m_old, x
+        );
+    }
+}
+
+fn demo_natural_mod_mul_precomputed_assign_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y, m) in natural_triple_gen_var_3().get(gm, config).take(limit) {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        let data = ModMulPrecomputed::<Natural>::precompute_mod_mul_data(&m);
+        x.mod_mul_precomputed_assign(y, &m, &data);
+        println!(
+            "x := {}; x.mod_mul_precomputed_assign({}, &{}, &data); x = {}",
+            x_old, y_old, m, x
+        );
+    }
+}
+
+fn demo_natural_mod_mul_precomputed_assign_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y, m) in natural_triple_gen_var_3().get(gm, config).take(limit) {
+        let x_old = x.clone();
+        let m_old = m.clone();
+        let data = ModMulPrecomputed::<Natural>::precompute_mod_mul_data(&m);
+        x.mod_mul_precomputed_assign(&y, m, &data);
+        println!(
+            "x := {}; x.mod_mul_precomputed_assign(&{}, {}, &data); x = {}",
+            x_old, y, m_old, x
+        );
+    }
+}
+
+fn demo_natural_mod_mul_precomputed_assign_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, y, m) in natural_triple_gen_var_3().get(gm, config).take(limit) {
+        let x_old = x.clone();
+        let data = ModMulPrecomputed::<Natural>::precompute_mod_mul_data(&m);
+        x.mod_mul_precomputed_assign(&y, &m, &data);
+        println!(
+            "x := {}; x.mod_mul_precomputed_assign(&{}, &{}, &data); x = {}",
+            x_old, y, m, x
+        );
+    }
+}
+
+fn demo_natural_mod_mul_precomputed(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, m) in natural_triple_gen_var_3().get(gm, config).take(limit) {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        let m_old = m.clone();
+        let data = ModMulPrecomputed::<Natural>::precompute_mod_mul_data(&m);
+        println!(
+            "{}.mod_mul_precomputed({}, {}, &data) = {}",
+            x_old,
+            y_old,
+            m_old,
+            x.mod_mul_precomputed(y, m, &data)
+        );
+    }
+}
+
+fn demo_natural_mod_mul_precomputed_val_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, m) in natural_triple_gen_var_3().get(gm, config).take(limit) {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        let data = ModMulPrecomputed::<Natural>::precompute_mod_mul_data(&m);
+        println!(
+            "{}.mod_mul_precomputed({}, &{}, &data) = {}",
+            x_old,
+            y_old,
+            m,
+            x.mod_mul_precomputed(y, &m, &data)
+        );
+    }
+}
+
+fn demo_natural_mod_mul_precomputed_val_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, m) in natural_triple_gen_var_3().get(gm, config).take(limit) {
+        let x_old = x.clone();
+        let m_old = m.clone();
+        let data = ModMulPrecomputed::<Natural>::precompute_mod_mul_data(&m);
+        println!(
+            "{}.mod_mul_precomputed(&{}, {}, &data) = {}",
+            x_old,
+            y,
+            m_old,
+            x.mod_mul_precomputed(&y, m, &data)
+        );
+    }
+}
+
+fn demo_natural_mod_mul_precomputed_val_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, m) in natural_triple_gen_var_3().get(gm, config).take(limit) {
+        let x_old = x.clone();
+        let data = ModMulPrecomputed::<Natural>::precompute_mod_mul_data(&m);
+        println!(
+            "{}.mod_mul_precomputed(&{}, &{}, &data) = {}",
+            x_old,
+            y,
+            m,
+            x.mod_mul_precomputed(&y, &m, &data)
+        );
+    }
+}
+
+fn demo_natural_mod_mul_precomputed_ref_val_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, m) in natural_triple_gen_var_3().get(gm, config).take(limit) {
+        let y_old = y.clone();
+        let m_old = m.clone();
+        let data = ModMulPrecomputed::<Natural>::precompute_mod_mul_data(&m);
+        println!(
+            "(&{}).mod_mul_precomputed({}, {}, &data) = {}",
+            x,
+            y_old,
+            m_old,
+            (&x).mod_mul_precomputed(y, m, &data)
+        );
+    }
+}
+
+fn demo_natural_mod_mul_precomputed_ref_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, m) in natural_triple_gen_var_3().get(gm, config).take(limit) {
+        let y_old = y.clone();
+        let data = ModMulPrecomputed::<Natural>::precompute_mod_mul_data(&m);
+        println!(
+            "(&{}).mod_mul_precomputed({}, &{}, &data) = {}",
+            x,
+            y_old,
+            m,
+            (&x).mod_mul_precomputed(y, &m, &data)
+        );
+    }
+}
+
+fn demo_natural_mod_mul_precomputed_ref_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, m) in natural_triple_gen_var_3().get(gm, config).take(limit) {
+        let m_old = m.clone();
+        let data = ModMulPrecomputed::<Natural>::precompute_mod_mul_data(&m);
+        println!(
+            "(&{}).mod_mul_precomputed(&{}, {}, &data) = {}",
+            x,
+            y,
+            m_old,
+            (&x).mod_mul_precomputed(&y, m, &data)
+        );
+    }
+}
+
+fn demo_natural_mod_mul_precomputed_ref_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, m) in natural_triple_gen_var_3().get(gm, config).take(limit) {
+        let data = ModMulPrecomputed::<Natural>::precompute_mod_mul_data(&m);
+        println!(
+            "(&{}).mod_mul_precomputed(&{}, &{}, &data) = {}",
+            x,
+            y,
+            m,
+            (&x).mod_mul_precomputed(&y, &m, &data)
+        );
+    }
 }
 
 fn benchmark_natural_mod_mul_precomputed_algorithms(

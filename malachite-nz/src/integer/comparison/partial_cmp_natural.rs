@@ -18,8 +18,8 @@ impl PartialOrd<Natural> for Integer {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `min(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `min(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -50,8 +50,8 @@ impl PartialOrd<Integer> for Natural {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is
-    /// `min(self.significant_bits(), other.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `min(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Examples
     /// ```

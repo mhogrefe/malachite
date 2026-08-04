@@ -12956,9 +12956,9 @@ fn product_properties() {
     });
 }
 
-// Scratch-sizing canaries for the mul dispatchers (see DOC-AUDIT.md): run every input shape with
-// a scratch of exactly the advertised length, densely sampling every dispatch-threshold boundary.
-// An under-sized scratch formula panics inside a kernel (the failure mode of the 2026-08-02
+// Scratch-sizing canaries for the mul dispatchers (see DOC-AUDIT.md): run every input shape with a
+// scratch of exactly the advertised length, densely sampling every dispatch-threshold boundary. An
+// under-sized scratch formula panics inside a kernel (the failure mode of the 2026-08-02
 // `limbs_mul_high_same_length_scratch_len` bug); the high-water measurement bounds what the
 // function actually touched, and the product is checked against `Natural` multiplication to catch
 // any scratch-related corruption.
@@ -12983,9 +12983,9 @@ fn test_limbs_mul_same_length_to_out_scratch_sizing() {
 #[test]
 fn test_limbs_mul_greater_to_out_scratch_sizing() {
     let thresholds = mul_dispatch_thresholds();
-    // The unbalanced dispatch's bands are all below `MUL_FFT_THRESHOLD` mean length; above that
-    // the FFT path allocates internally and the advertised scratch length is 0. Sweep the ratio
-    // space over the sub-FFT bands, then spot-check the FFT band.
+    // The unbalanced dispatch's bands are all below `MUL_FFT_THRESHOLD` mean length; above that the
+    // FFT path allocates internally and the advertised scratch length is 0. Sweep the ratio space
+    // over the sub-FFT bands, then spot-check the FFT band.
     for ys_len in threshold_straddling_lengths(&thresholds, 1, 330, 2) {
         for ratio_halves in 3..=9 {
             let xs_len = ys_len * ratio_halves / 2 + (ratio_halves & 1);

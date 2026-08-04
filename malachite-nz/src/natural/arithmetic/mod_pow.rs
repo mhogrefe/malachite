@@ -23,6 +23,7 @@ use crate::natural::arithmetic::div_exact::{
     limbs_modular_invert, limbs_modular_invert_limb, limbs_modular_invert_scratch_len,
 };
 use crate::natural::arithmetic::div_mod::limbs_div_limb_to_out_mod;
+use crate::natural::arithmetic::mod_mul::{ModMulData, precompute_mod_mul_data_helper};
 use crate::natural::arithmetic::mod_op::limbs_mod_to_out;
 use crate::natural::arithmetic::mod_power_of_2_pow::limbs_pow_low;
 use crate::natural::arithmetic::mul::mul_low::limbs_mul_low_same_length;
@@ -51,12 +52,14 @@ use alloc::vec::Vec;
 use core::cmp::{Ordering::*, max, min};
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    ModPow, ModPowAssign, ModPowerOf2, ModPowerOf2Assign, Parity, PowerOf2, WrappingNegAssign,
+    ModMulPrecomputedAssign, ModPow, ModPowAssign, ModPowPrecomputed, ModPowPrecomputedAssign,
+    ModPowerOf2, ModPowerOf2Assign, ModSquarePrecomputedAssign, Parity, PowerOf2,
+    WrappingNegAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, WrappingFrom};
-use malachite_base::num::logic::traits::TrailingZeros;
+use malachite_base::num::logic::traits::{BitIterable, LeadingZeros, TrailingZeros};
 use malachite_base::slices::{slice_leading_zeros, slice_set_zero};
 
 #[allow(clippy::absurd_extreme_comparisons)]
@@ -1155,5 +1158,739 @@ impl<'a, 'b> ModPowAssign<&'a Self, &'b Self> for Natural {
                 *self = Self::from_owned_limbs_asc(out);
             }
         }
+    }
+}
+
+// Raises `x` to the power of `exp` modulo `m`, using precomputed modular-multiplication data.
+//
+// The data only carries a nontrivial precomputation for moduli of up to two limbs, so for larger
+// moduli this delegates to the ordinary `mod_pow`, which is optimal there. For one-limb moduli the
+// stored inverse is the same one `Limb::mod_pow_precomputed` expects, so exponents that fit in a
+// `u64` reuse the whole `Limb` powering ladder; larger exponents (only reachable with a one- or
+// two-limb modulus) fall back to a simple square-and-multiply ladder over the precomputed
+// multiplication.
+//
+// # Worst-case complexity
+// $T(n, m) = O(mn \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$ is
+// `exp.significant_bits()`.
+fn mod_pow_precomputed_helper(
+    x: &Natural,
+    exp: &Natural,
+    m: &Natural,
+    data: &ModMulData,
+) -> Natural {
+    assert!(x < m, "self must be reduced mod m, but {x} >= {m}");
+    if *m == 1u32 {
+        return Natural::ZERO;
+    }
+    if *exp == 0u32 {
+        return Natural::ONE;
+    }
+    if *x <= 1u32 || *exp == 1u32 {
+        return x.clone();
+    }
+    match (x, m, data) {
+        (_, _, ModMulData::MoreThanTwoLimbs(_)) => x.mod_pow(exp, m),
+        (&Natural(Small(x)), &Natural(Small(m)), ModMulData::OneLimb(inverse))
+            if u64::convertible_from(exp) =>
+        {
+            Natural::from(x.mod_pow_precomputed(
+                u64::exact_from(exp),
+                m,
+                &(*inverse, LeadingZeros::leading_zeros(m)),
+            ))
+        }
+        (&Natural(Small(x)), &Natural(Small(m)), ModMulData::OneLimb(inverse)) => {
+            let mut result = x;
+            let mut bits = exp.bits().rev();
+            bits.next();
+            for bit in bits {
+                result.mod_mul_precomputed_assign(result, m, inverse);
+                if bit {
+                    result.mod_mul_precomputed_assign(x, m, inverse);
+                }
+            }
+            Natural::from(result)
+        }
+        _ => {
+            let mut result = x.clone();
+            let mut bits = exp.bits().rev();
+            bits.next();
+            for bit in bits {
+                result.mod_square_precomputed_assign(m, data);
+                if bit {
+                    result.mod_mul_precomputed_assign(x, m, data);
+                }
+            }
+            result
+        }
+    }
+}
+
+impl ModPowPrecomputed<Self, Self> for Natural {
+    type Output = Natural;
+    type Data = ModMulData;
+
+    /// Precomputes data for modular exponentiation. See `mod_pow_precomputed` and
+    /// [`mod_pow_precomputed_assign`](ModPowPrecomputedAssign).
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// This is equivalent to part of `fmpz_mod_ctx_init` from `fmpz_mod/ctx_init.c`, FLINT 3.6.0.
+    #[inline]
+    fn precompute_mod_pow_data(m: &Self) -> ModMulData {
+        precompute_mod_mul_data_helper(m)
+    }
+
+    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. The base must be
+    /// already reduced modulo $m$. All three [`Natural`]s are taken by value.
+    ///
+    /// Some precomputed data is provided; this speeds up computations involving several modular
+    /// exponentiations with the same modulus. The precomputed data should be obtained using
+    /// [`precompute_mod_pow_data`](ModPowPrecomputed::precompute_mod_pow_data).
+    ///
+    /// $f(x, n, m) = y$, where $x, y < m$ and $x^n \equiv y \mod m$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(mn \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$ is
+    /// `exp.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to `m`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::ModPowPrecomputed;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let data = ModPowPrecomputed::<Natural>::precompute_mod_pow_data(&Natural::from(497u32));
+    /// assert_eq!(
+    ///     Natural::from(4u32).mod_pow_precomputed(
+    ///         Natural::from(13u32),
+    ///         Natural::from(497u32),
+    ///         &data
+    ///     ),
+    ///     445
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(5u32).mod_pow_precomputed(
+    ///         Natural::from(200u32),
+    ///         Natural::from(497u32),
+    ///         &data
+    ///     ),
+    ///     214
+    /// );
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_mod_pow_fmpz` from `fmpz_mod/pow.c`, FLINT 3.6.0.
+    #[inline]
+    fn mod_pow_precomputed(self, exp: Self, m: Self, data: &ModMulData) -> Natural {
+        mod_pow_precomputed_helper(&self, &exp, &m, data)
+    }
+}
+
+impl<'a> ModPowPrecomputed<Self, &'a Self> for Natural {
+    type Output = Natural;
+    type Data = ModMulData;
+
+    /// Precomputes data for modular exponentiation. See `mod_pow_precomputed` and
+    /// [`mod_pow_precomputed_assign`](ModPowPrecomputedAssign).
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// This is equivalent to part of `fmpz_mod_ctx_init` from `fmpz_mod/ctx_init.c`, FLINT 3.6.0.
+    #[inline]
+    fn precompute_mod_pow_data(m: &&'a Self) -> ModMulData {
+        precompute_mod_mul_data_helper(m)
+    }
+
+    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. The base must be
+    /// already reduced modulo $m$. The first two [`Natural`]s are taken by value and the third by
+    /// reference.
+    ///
+    /// Some precomputed data is provided; this speeds up computations involving several modular
+    /// exponentiations with the same modulus. The precomputed data should be obtained using
+    /// [`precompute_mod_pow_data`](ModPowPrecomputed::precompute_mod_pow_data).
+    ///
+    /// $f(x, n, m) = y$, where $x, y < m$ and $x^n \equiv y \mod m$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(mn \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$ is
+    /// `exp.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to `m`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::ModPowPrecomputed;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let data = ModPowPrecomputed::<Natural>::precompute_mod_pow_data(&Natural::from(497u32));
+    /// assert_eq!(
+    ///     Natural::from(4u32).mod_pow_precomputed(
+    ///         Natural::from(13u32),
+    ///         &Natural::from(497u32),
+    ///         &data
+    ///     ),
+    ///     445
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(5u32).mod_pow_precomputed(
+    ///         Natural::from(200u32),
+    ///         &Natural::from(497u32),
+    ///         &data
+    ///     ),
+    ///     214
+    /// );
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_mod_pow_fmpz` from `fmpz_mod/pow.c`, FLINT 3.6.0.
+    #[inline]
+    fn mod_pow_precomputed(self, exp: Self, m: &'a Self, data: &ModMulData) -> Natural {
+        mod_pow_precomputed_helper(&self, &exp, m, data)
+    }
+}
+
+impl<'a> ModPowPrecomputed<&'a Self, Self> for Natural {
+    type Output = Natural;
+    type Data = ModMulData;
+
+    /// Precomputes data for modular exponentiation. See `mod_pow_precomputed` and
+    /// [`mod_pow_precomputed_assign`](ModPowPrecomputedAssign).
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// This is equivalent to part of `fmpz_mod_ctx_init` from `fmpz_mod/ctx_init.c`, FLINT 3.6.0.
+    #[inline]
+    fn precompute_mod_pow_data(m: &Self) -> ModMulData {
+        precompute_mod_mul_data_helper(m)
+    }
+
+    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. The base must be
+    /// already reduced modulo $m$. The first and third [`Natural`]s are taken by value and the
+    /// second by reference.
+    ///
+    /// Some precomputed data is provided; this speeds up computations involving several modular
+    /// exponentiations with the same modulus. The precomputed data should be obtained using
+    /// [`precompute_mod_pow_data`](ModPowPrecomputed::precompute_mod_pow_data).
+    ///
+    /// $f(x, n, m) = y$, where $x, y < m$ and $x^n \equiv y \mod m$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(mn \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$ is
+    /// `exp.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to `m`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::ModPowPrecomputed;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let data = ModPowPrecomputed::<Natural>::precompute_mod_pow_data(&Natural::from(497u32));
+    /// assert_eq!(
+    ///     Natural::from(4u32).mod_pow_precomputed(
+    ///         &Natural::from(13u32),
+    ///         Natural::from(497u32),
+    ///         &data
+    ///     ),
+    ///     445
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(5u32).mod_pow_precomputed(
+    ///         &Natural::from(200u32),
+    ///         Natural::from(497u32),
+    ///         &data
+    ///     ),
+    ///     214
+    /// );
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_mod_pow_fmpz` from `fmpz_mod/pow.c`, FLINT 3.6.0.
+    #[inline]
+    fn mod_pow_precomputed(self, exp: &'a Self, m: Self, data: &ModMulData) -> Natural {
+        mod_pow_precomputed_helper(&self, exp, &m, data)
+    }
+}
+
+impl<'a, 'b> ModPowPrecomputed<&'a Self, &'b Self> for Natural {
+    type Output = Natural;
+    type Data = ModMulData;
+
+    /// Precomputes data for modular exponentiation. See `mod_pow_precomputed` and
+    /// [`mod_pow_precomputed_assign`](ModPowPrecomputedAssign).
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// This is equivalent to part of `fmpz_mod_ctx_init` from `fmpz_mod/ctx_init.c`, FLINT 3.6.0.
+    #[inline]
+    fn precompute_mod_pow_data(m: &&'b Self) -> ModMulData {
+        precompute_mod_mul_data_helper(m)
+    }
+
+    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. The base must be
+    /// already reduced modulo $m$. The first [`Natural`] is taken by value and the second and third
+    /// by reference.
+    ///
+    /// Some precomputed data is provided; this speeds up computations involving several modular
+    /// exponentiations with the same modulus. The precomputed data should be obtained using
+    /// [`precompute_mod_pow_data`](ModPowPrecomputed::precompute_mod_pow_data).
+    ///
+    /// $f(x, n, m) = y$, where $x, y < m$ and $x^n \equiv y \mod m$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(mn \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$ is
+    /// `exp.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to `m`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::ModPowPrecomputed;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let data = ModPowPrecomputed::<Natural>::precompute_mod_pow_data(&Natural::from(497u32));
+    /// assert_eq!(
+    ///     Natural::from(4u32).mod_pow_precomputed(
+    ///         &Natural::from(13u32),
+    ///         &Natural::from(497u32),
+    ///         &data
+    ///     ),
+    ///     445
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(5u32).mod_pow_precomputed(
+    ///         &Natural::from(200u32),
+    ///         &Natural::from(497u32),
+    ///         &data
+    ///     ),
+    ///     214
+    /// );
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_mod_pow_fmpz` from `fmpz_mod/pow.c`, FLINT 3.6.0.
+    #[inline]
+    fn mod_pow_precomputed(self, exp: &'a Self, m: &'b Self, data: &ModMulData) -> Natural {
+        mod_pow_precomputed_helper(&self, exp, m, data)
+    }
+}
+
+impl ModPowPrecomputed<Natural, Natural> for &Natural {
+    type Output = Natural;
+    type Data = ModMulData;
+
+    /// Precomputes data for modular exponentiation. See `mod_pow_precomputed` and
+    /// [`mod_pow_precomputed_assign`](ModPowPrecomputedAssign).
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// This is equivalent to part of `fmpz_mod_ctx_init` from `fmpz_mod/ctx_init.c`, FLINT 3.6.0.
+    #[inline]
+    fn precompute_mod_pow_data(m: &Natural) -> ModMulData {
+        precompute_mod_mul_data_helper(m)
+    }
+
+    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. The base must be
+    /// already reduced modulo $m$. The first [`Natural`] is taken by reference and the second and
+    /// third by value.
+    ///
+    /// Some precomputed data is provided; this speeds up computations involving several modular
+    /// exponentiations with the same modulus. The precomputed data should be obtained using
+    /// [`precompute_mod_pow_data`](ModPowPrecomputed::precompute_mod_pow_data).
+    ///
+    /// $f(x, n, m) = y$, where $x, y < m$ and $x^n \equiv y \mod m$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(mn \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$ is
+    /// `exp.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to `m`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::ModPowPrecomputed;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let data = ModPowPrecomputed::<Natural>::precompute_mod_pow_data(&Natural::from(497u32));
+    /// assert_eq!(
+    ///     (&Natural::from(4u32)).mod_pow_precomputed(
+    ///         Natural::from(13u32),
+    ///         Natural::from(497u32),
+    ///         &data
+    ///     ),
+    ///     445
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(5u32)).mod_pow_precomputed(
+    ///         Natural::from(200u32),
+    ///         Natural::from(497u32),
+    ///         &data
+    ///     ),
+    ///     214
+    /// );
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_mod_pow_fmpz` from `fmpz_mod/pow.c`, FLINT 3.6.0.
+    #[inline]
+    fn mod_pow_precomputed(self, exp: Natural, m: Natural, data: &ModMulData) -> Natural {
+        mod_pow_precomputed_helper(self, &exp, &m, data)
+    }
+}
+
+impl ModPowPrecomputed<Natural, &Natural> for &Natural {
+    type Output = Natural;
+    type Data = ModMulData;
+
+    /// Precomputes data for modular exponentiation. See `mod_pow_precomputed` and
+    /// [`mod_pow_precomputed_assign`](ModPowPrecomputedAssign).
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// This is equivalent to part of `fmpz_mod_ctx_init` from `fmpz_mod/ctx_init.c`, FLINT 3.6.0.
+    #[inline]
+    fn precompute_mod_pow_data(m: &&Natural) -> ModMulData {
+        precompute_mod_mul_data_helper(m)
+    }
+
+    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. The base must be
+    /// already reduced modulo $m$. The first and third [`Natural`]s are taken by reference and the
+    /// second by value.
+    ///
+    /// Some precomputed data is provided; this speeds up computations involving several modular
+    /// exponentiations with the same modulus. The precomputed data should be obtained using
+    /// [`precompute_mod_pow_data`](ModPowPrecomputed::precompute_mod_pow_data).
+    ///
+    /// $f(x, n, m) = y$, where $x, y < m$ and $x^n \equiv y \mod m$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(mn \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$ is
+    /// `exp.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to `m`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::ModPowPrecomputed;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let data = ModPowPrecomputed::<Natural>::precompute_mod_pow_data(&Natural::from(497u32));
+    /// assert_eq!(
+    ///     (&Natural::from(4u32)).mod_pow_precomputed(
+    ///         Natural::from(13u32),
+    ///         &Natural::from(497u32),
+    ///         &data
+    ///     ),
+    ///     445
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(5u32)).mod_pow_precomputed(
+    ///         Natural::from(200u32),
+    ///         &Natural::from(497u32),
+    ///         &data
+    ///     ),
+    ///     214
+    /// );
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_mod_pow_fmpz` from `fmpz_mod/pow.c`, FLINT 3.6.0.
+    #[inline]
+    fn mod_pow_precomputed(self, exp: Natural, m: &Natural, data: &ModMulData) -> Natural {
+        mod_pow_precomputed_helper(self, &exp, m, data)
+    }
+}
+
+impl ModPowPrecomputed<&Natural, Natural> for &Natural {
+    type Output = Natural;
+    type Data = ModMulData;
+
+    /// Precomputes data for modular exponentiation. See `mod_pow_precomputed` and
+    /// [`mod_pow_precomputed_assign`](ModPowPrecomputedAssign).
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// This is equivalent to part of `fmpz_mod_ctx_init` from `fmpz_mod/ctx_init.c`, FLINT 3.6.0.
+    #[inline]
+    fn precompute_mod_pow_data(m: &Natural) -> ModMulData {
+        precompute_mod_mul_data_helper(m)
+    }
+
+    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. The base must be
+    /// already reduced modulo $m$. The first two [`Natural`]s are taken by reference and the third
+    /// by value.
+    ///
+    /// Some precomputed data is provided; this speeds up computations involving several modular
+    /// exponentiations with the same modulus. The precomputed data should be obtained using
+    /// [`precompute_mod_pow_data`](ModPowPrecomputed::precompute_mod_pow_data).
+    ///
+    /// $f(x, n, m) = y$, where $x, y < m$ and $x^n \equiv y \mod m$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(mn \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$ is
+    /// `exp.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to `m`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::ModPowPrecomputed;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let data = ModPowPrecomputed::<Natural>::precompute_mod_pow_data(&Natural::from(497u32));
+    /// assert_eq!(
+    ///     (&Natural::from(4u32)).mod_pow_precomputed(
+    ///         &Natural::from(13u32),
+    ///         Natural::from(497u32),
+    ///         &data
+    ///     ),
+    ///     445
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(5u32)).mod_pow_precomputed(
+    ///         &Natural::from(200u32),
+    ///         Natural::from(497u32),
+    ///         &data
+    ///     ),
+    ///     214
+    /// );
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_mod_pow_fmpz` from `fmpz_mod/pow.c`, FLINT 3.6.0.
+    #[inline]
+    fn mod_pow_precomputed(self, exp: &Natural, m: Natural, data: &ModMulData) -> Natural {
+        mod_pow_precomputed_helper(self, exp, &m, data)
+    }
+}
+
+impl ModPowPrecomputed<&Natural, &Natural> for &Natural {
+    type Output = Natural;
+    type Data = ModMulData;
+
+    /// Precomputes data for modular exponentiation. See `mod_pow_precomputed` and
+    /// [`mod_pow_precomputed_assign`](ModPowPrecomputedAssign).
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// This is equivalent to part of `fmpz_mod_ctx_init` from `fmpz_mod/ctx_init.c`, FLINT 3.6.0.
+    #[inline]
+    fn precompute_mod_pow_data(m: &&Natural) -> ModMulData {
+        precompute_mod_mul_data_helper(m)
+    }
+
+    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$. The base must be
+    /// already reduced modulo $m$. All three [`Natural`]s are taken by reference.
+    ///
+    /// Some precomputed data is provided; this speeds up computations involving several modular
+    /// exponentiations with the same modulus. The precomputed data should be obtained using
+    /// [`precompute_mod_pow_data`](ModPowPrecomputed::precompute_mod_pow_data).
+    ///
+    /// $f(x, n, m) = y$, where $x, y < m$ and $x^n \equiv y \mod m$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(mn \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$ is
+    /// `exp.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to `m`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::ModPowPrecomputed;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let data = ModPowPrecomputed::<Natural>::precompute_mod_pow_data(&Natural::from(497u32));
+    /// assert_eq!(
+    ///     (&Natural::from(4u32)).mod_pow_precomputed(
+    ///         &Natural::from(13u32),
+    ///         &Natural::from(497u32),
+    ///         &data
+    ///     ),
+    ///     445
+    /// );
+    /// assert_eq!(
+    ///     (&Natural::from(5u32)).mod_pow_precomputed(
+    ///         &Natural::from(200u32),
+    ///         &Natural::from(497u32),
+    ///         &data
+    ///     ),
+    ///     214
+    /// );
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_mod_pow_fmpz` from `fmpz_mod/pow.c`, FLINT 3.6.0.
+    #[inline]
+    fn mod_pow_precomputed(self, exp: &Natural, m: &Natural, data: &ModMulData) -> Natural {
+        mod_pow_precomputed_helper(self, exp, m, data)
+    }
+}
+
+impl ModPowPrecomputedAssign<Self, Self> for Natural {
+    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$, in place. The
+    /// base must be already reduced modulo $m$. Both [`Natural`]s on the right-hand side are taken
+    /// by value.
+    ///
+    /// Some precomputed data is provided; this speeds up computations involving several modular
+    /// exponentiations with the same modulus. The precomputed data should be obtained using
+    /// [`precompute_mod_pow_data`](ModPowPrecomputed::precompute_mod_pow_data).
+    ///
+    /// $x \gets y$, where $x, y < m$ and $x^n \equiv y \mod m$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(mn \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$ is
+    /// `exp.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to `m`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::{ModPowPrecomputed, ModPowPrecomputedAssign};
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let data = ModPowPrecomputed::<Natural>::precompute_mod_pow_data(&Natural::from(497u32));
+    /// let mut x = Natural::from(4u32);
+    /// x.mod_pow_precomputed_assign(Natural::from(13u32), Natural::from(497u32), &data);
+    /// assert_eq!(x, 445);
+    ///
+    /// let mut x = Natural::from(5u32);
+    /// x.mod_pow_precomputed_assign(Natural::from(200u32), Natural::from(497u32), &data);
+    /// assert_eq!(x, 214);
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_mod_pow_fmpz` from `fmpz_mod/pow.c`, FLINT 3.6.0, where `a ==
+    /// b`.
+    #[inline]
+    fn mod_pow_precomputed_assign(&mut self, exp: Self, m: Self, data: &ModMulData) {
+        *self = mod_pow_precomputed_helper(&*self, &exp, &m, data);
+    }
+}
+
+impl<'a> ModPowPrecomputedAssign<Self, &'a Self> for Natural {
+    /// Raises a [`Natural`] to a [`Natural`] power modulo a third [`Natural`] $m$, in place. The
+    /// base must be already reduced modulo $m$. The first [`Natural`] on the right-hand side is
+    /// taken by value and the second by reference.
+    ///
+    /// Some precomputed data is provided; this speeds up computations involving several modular
+    /// exponentiations with the same modulus. The precomputed data should be obtained using
+    /// [`precompute_mod_pow_data`](ModPowPrecomputed::precompute_mod_pow_data).
+    ///
+    /// $x \gets y$, where $x, y < m$ and $x^n \equiv y \mod m$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(mn \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `m.significant_bits()`, and $m$ is
+    /// `exp.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to `m`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::{ModPowPrecomputed, ModPowPrecomputedAssign};
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let data = ModPowPrecomputed::<Natural>::precompute_mod_pow_data(&Natural::from(497u32));
+    /// let mut x = Natural::from(4u32);
+    /// x.mod_pow_precomputed_assign(Natural::from(13u32), &Natural::from(497u32), &data);
+    /// assert_eq!(x, 445);
+    ///
+    /// let mut x = Natural::from(5u32);
+    /// x.mod_pow_precomputed_assign(Natural::from(200u32), &Natural::from(497u32), &data);
+    /// assert_eq!(x, 214);
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_mod_pow_fmpz` from `fmpz_mod/pow.c`, FLINT 3.6.0, where `a ==
+    /// b`.
+    #[inline]
+    fn mod_pow_precomputed_assign(&mut self, exp: Self, m: &'a Self, data: &ModMulData) {
+        *self = mod_pow_precomputed_helper(&*self, &exp, m, data);
     }
 }

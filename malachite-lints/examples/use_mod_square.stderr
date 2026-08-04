@@ -1,0 +1,40 @@
+error: both multiplicand operands of this modular multiplication are the same; use `mod_square()`
+  --> $DIR/use_mod_square.rs:16:13
+   |
+LL |     let _ = (&x).mod_mul(&x, &m);
+   |             ^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[deny(use_mod_square)]` on by default
+
+error: both multiplicand operands of this modular multiplication are the same; use `mod_square()`
+  --> $DIR/use_mod_square.rs:17:13
+   |
+LL |     let _ = x.clone().mod_mul(x.clone(), m.clone());
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: both multiplicand operands of this modular multiplication are the same; use `mod_square_assign()`
+  --> $DIR/use_mod_square.rs:19:5
+   |
+LL |     w.mod_mul_assign(w.clone(), &m);
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: both multiplicand operands of this modular multiplication are the same; use `mod_square()`
+  --> $DIR/use_mod_square.rs:20:13
+   |
+LL |     let _ = 100u32.mod_mul(100u32, 497u32);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: both multiplicand operands of this modular multiplication are the same; use `mod_square_precomputed()`
+  --> $DIR/use_mod_square.rs:24:13
+   |
+LL |     let _ = (&x).mod_mul_precomputed(&x, &m, &data);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: both multiplicand operands of this modular multiplication are the same; use `mod_square_precomputed_assign()`
+  --> $DIR/use_mod_square.rs:26:5
+   |
+LL |     w.mod_mul_precomputed_assign(w.clone(), &m, &data);
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: aborting due to 6 previous errors
+

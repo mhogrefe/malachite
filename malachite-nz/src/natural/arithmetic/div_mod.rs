@@ -2032,7 +2032,7 @@ pub enum DivModData {
 // `scratch` is temporary, and merging them would either copy the inverse out or store it in an
 // oversized buffer for the context's lifetime.
 #[cfg_attr(dylint_lib = "malachite_lints", allow(adjacent_vec_allocations))]
-fn precompute_div_mod_data_helper(d: &Natural) -> DivModData {
+pub(crate) fn precompute_div_mod_data_helper(d: &Natural) -> DivModData {
     match *d {
         Natural::ZERO => panic!("division by zero"),
         Natural(Small(d)) => {
@@ -2068,8 +2068,8 @@ fn precompute_div_mod_data_helper(d: &Natural) -> DivModData {
                     limbs_two_limb_inverse_helper(ds_shifted[d_len - 1], ds_shifted[d_len - 2]);
                 // The Barrett branch of `limbs_div_mod_precomputed` is only reachable when `d_len
                 // >= DC_DIV_QR_THRESHOLD` and `limbs_div_mod_dc_condition` can return false, which
-                // requires `d_len >= MUPI_DIV_QR_THRESHOLD`; below the larger of the two
-                // thresholds (their order is platform-dependent), the inverse would never be used.
+                // requires `d_len >= MUPI_DIV_QR_THRESHOLD`; below the larger of the two thresholds
+                // (their order is platform-dependent), the inverse would never be used.
                 const INVERSE_THRESHOLD: usize = if DC_DIV_QR_THRESHOLD > MUPI_DIV_QR_THRESHOLD {
                     DC_DIV_QR_THRESHOLD
                 } else {

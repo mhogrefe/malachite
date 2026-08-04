@@ -37,6 +37,7 @@ pub(crate) fn register(runner: &mut Runner) {
     );
     register_unsigned_demos!(runner, demo_mod_mul);
     register_unsigned_demos!(runner, demo_mod_mul_assign);
+    register_unsigned_demos!(runner, demo_mod_mul_precomputed);
 
     register_bench!(runner, benchmark_limbs_invert_limb_u32_algorithms);
     register_bench!(runner, benchmark_limbs_invert_limb_u64_algorithms);
@@ -98,6 +99,22 @@ fn demo_mod_preinverted_double<
             m,
             inv,
             mod_preinverted_double::<T, DT>(x_1, x_0, m, inv)
+        );
+    }
+}
+
+fn demo_mod_mul_precomputed<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, m) in unsigned_triple_gen_var_12::<T>()
+        .get(gm, config)
+        .take(limit)
+    {
+        let data = T::precompute_mod_mul_data(&m);
+        println!(
+            "{}.mod_mul_precomputed({}, {}, &data) = {}",
+            x,
+            y,
+            m,
+            x.mod_mul_precomputed(y, m, &data)
         );
     }
 }

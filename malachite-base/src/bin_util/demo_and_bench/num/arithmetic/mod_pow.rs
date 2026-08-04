@@ -20,10 +20,27 @@ use malachite_base::test_util::runner::Runner;
 pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_demos!(runner, demo_mod_pow);
     register_unsigned_demos!(runner, demo_mod_pow_assign);
+    register_unsigned_demos!(runner, demo_mod_pow_precomputed);
     register_unsigned_benches!(runner, benchmark_mod_pow_algorithms);
     register_unsigned_benches!(runner, benchmark_mod_pow_naive_algorithms);
     register_unsigned_benches!(runner, benchmark_mod_pow_assign);
     register_unsigned_benches!(runner, benchmark_mod_pow_precomputed_algorithms);
+}
+
+fn demo_mod_pow_precomputed<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, exp, m) in unsigned_triple_gen_var_15::<T, u64>()
+        .get(gm, config)
+        .take(limit)
+    {
+        let data = T::precompute_mod_pow_data(&m);
+        println!(
+            "{}.mod_pow_precomputed({}, {}, &data) = {}",
+            x,
+            exp,
+            m,
+            x.mod_pow_precomputed(exp, m, &data)
+        );
+    }
 }
 
 fn demo_mod_pow<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {

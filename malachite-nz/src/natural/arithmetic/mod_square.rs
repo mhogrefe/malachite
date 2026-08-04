@@ -7,7 +7,11 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::Natural;
-use malachite_base::num::arithmetic::traits::{ModPow, ModPowAssign, ModSquare, ModSquareAssign};
+use crate::natural::arithmetic::mod_mul::ModMulData;
+use malachite_base::num::arithmetic::traits::{
+    ModMulPrecomputed, ModPow, ModPowAssign, ModSquare, ModSquareAssign, ModSquarePrecomputed,
+    ModSquarePrecomputedAssign,
+};
 use malachite_base::num::basic::traits::Two;
 
 impl ModSquare<Self> for Natural {
@@ -211,5 +215,277 @@ impl ModSquareAssign<&Self> for Natural {
     #[inline]
     fn mod_square_assign(&mut self, m: &Self) {
         self.mod_pow_assign(&Self::TWO, m);
+    }
+}
+
+impl ModSquarePrecomputed<Natural, Self> for Natural {
+    /// Squares a [`Natural`] modulo another [`Natural`] $m$. The input must be already reduced
+    /// modulo $m$. Both [`Natural`]s are taken by value.
+    ///
+    /// Some precomputed data is provided; this speeds up computations involving several modular
+    /// squarings with the same modulus. The precomputed data should be obtained using
+    /// [`precompute_mod_pow_data`](malachite_base::num::arithmetic::traits::ModPowPrecomputed).
+    ///
+    /// $f(x, m) = y$, where $x, y < m$ and $x^2 \equiv y \mod m$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to `m`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::{ModPowPrecomputed, ModSquarePrecomputed};
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let data = ModPowPrecomputed::<Natural>::precompute_mod_pow_data(&Natural::from(497u32));
+    /// assert_eq!(
+    ///     Natural::from(100u32).mod_square_precomputed(Natural::from(497u32), &data),
+    ///     60
+    /// );
+    ///
+    /// let data = ModPowPrecomputed::<Natural>::precompute_mod_pow_data(&Natural::from(10u32));
+    /// assert_eq!(
+    ///     Natural::from(2u32).mod_square_precomputed(Natural::from(10u32), &data),
+    ///     4
+    /// );
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_mod_mul` from `fmpz_mod/mul.c`, FLINT 3.6.0, where `b == c`.
+    #[inline]
+    fn mod_square_precomputed(self, m: Self, data: &ModMulData) -> Natural {
+        (&self).mod_mul_precomputed(&self, &m, data)
+    }
+}
+
+impl<'a> ModSquarePrecomputed<Natural, &'a Self> for Natural {
+    /// Squares a [`Natural`] modulo another [`Natural`] $m$. The input must be already reduced
+    /// modulo $m$. The first [`Natural`] is taken by value and the second by reference.
+    ///
+    /// Some precomputed data is provided; this speeds up computations involving several modular
+    /// squarings with the same modulus. The precomputed data should be obtained using
+    /// [`precompute_mod_pow_data`](malachite_base::num::arithmetic::traits::ModPowPrecomputed).
+    ///
+    /// $f(x, m) = y$, where $x, y < m$ and $x^2 \equiv y \mod m$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to `m`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::{ModPowPrecomputed, ModSquarePrecomputed};
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let data = ModPowPrecomputed::<Natural>::precompute_mod_pow_data(&Natural::from(497u32));
+    /// assert_eq!(
+    ///     Natural::from(100u32).mod_square_precomputed(&Natural::from(497u32), &data),
+    ///     60
+    /// );
+    ///
+    /// let data = ModPowPrecomputed::<Natural>::precompute_mod_pow_data(&Natural::from(10u32));
+    /// assert_eq!(
+    ///     Natural::from(2u32).mod_square_precomputed(&Natural::from(10u32), &data),
+    ///     4
+    /// );
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_mod_mul` from `fmpz_mod/mul.c`, FLINT 3.6.0, where `b == c`.
+    #[inline]
+    fn mod_square_precomputed(self, m: &'a Self, data: &ModMulData) -> Natural {
+        (&self).mod_mul_precomputed(&self, m, data)
+    }
+}
+
+impl ModSquarePrecomputed<Natural, Natural> for &Natural {
+    /// Squares a [`Natural`] modulo another [`Natural`] $m$. The input must be already reduced
+    /// modulo $m$. The first [`Natural`] is taken by reference and the second by value.
+    ///
+    /// Some precomputed data is provided; this speeds up computations involving several modular
+    /// squarings with the same modulus. The precomputed data should be obtained using
+    /// [`precompute_mod_pow_data`](malachite_base::num::arithmetic::traits::ModPowPrecomputed).
+    ///
+    /// $f(x, m) = y$, where $x, y < m$ and $x^2 \equiv y \mod m$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to `m`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::{ModPowPrecomputed, ModSquarePrecomputed};
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let data = ModPowPrecomputed::<Natural>::precompute_mod_pow_data(&Natural::from(497u32));
+    /// assert_eq!(
+    ///     (&Natural::from(100u32)).mod_square_precomputed(Natural::from(497u32), &data),
+    ///     60
+    /// );
+    ///
+    /// let data = ModPowPrecomputed::<Natural>::precompute_mod_pow_data(&Natural::from(10u32));
+    /// assert_eq!(
+    ///     (&Natural::from(2u32)).mod_square_precomputed(Natural::from(10u32), &data),
+    ///     4
+    /// );
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_mod_mul` from `fmpz_mod/mul.c`, FLINT 3.6.0, where `b == c`.
+    #[inline]
+    fn mod_square_precomputed(self, m: Natural, data: &ModMulData) -> Natural {
+        self.mod_mul_precomputed(self, &m, data)
+    }
+}
+
+impl ModSquarePrecomputed<Natural, &Natural> for &Natural {
+    /// Squares a [`Natural`] modulo another [`Natural`] $m$. The input must be already reduced
+    /// modulo $m$. Both [`Natural`]s are taken by reference.
+    ///
+    /// Some precomputed data is provided; this speeds up computations involving several modular
+    /// squarings with the same modulus. The precomputed data should be obtained using
+    /// [`precompute_mod_pow_data`](malachite_base::num::arithmetic::traits::ModPowPrecomputed).
+    ///
+    /// $f(x, m) = y$, where $x, y < m$ and $x^2 \equiv y \mod m$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to `m`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::{ModPowPrecomputed, ModSquarePrecomputed};
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let data = ModPowPrecomputed::<Natural>::precompute_mod_pow_data(&Natural::from(497u32));
+    /// assert_eq!(
+    ///     (&Natural::from(100u32)).mod_square_precomputed(&Natural::from(497u32), &data),
+    ///     60
+    /// );
+    ///
+    /// let data = ModPowPrecomputed::<Natural>::precompute_mod_pow_data(&Natural::from(10u32));
+    /// assert_eq!(
+    ///     (&Natural::from(2u32)).mod_square_precomputed(&Natural::from(10u32), &data),
+    ///     4
+    /// );
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_mod_mul` from `fmpz_mod/mul.c`, FLINT 3.6.0, where `b == c`.
+    #[inline]
+    fn mod_square_precomputed(self, m: &Natural, data: &ModMulData) -> Natural {
+        self.mod_mul_precomputed(self, m, data)
+    }
+}
+
+impl ModSquarePrecomputedAssign<Natural, Self> for Natural {
+    /// Squares a [`Natural`] modulo another [`Natural`] $m$, in place. The input must be already
+    /// reduced modulo $m$. The [`Natural`] on the right-hand side is taken by value.
+    ///
+    /// Some precomputed data is provided; this speeds up computations involving several modular
+    /// squarings with the same modulus. The precomputed data should be obtained using
+    /// [`precompute_mod_pow_data`](malachite_base::num::arithmetic::traits::ModPowPrecomputed).
+    ///
+    /// $x \\gets y$, where $x, y < m$ and $x^2 \equiv y \mod m$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to `m`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::{
+    ///     ModPowPrecomputed, ModSquarePrecomputedAssign,
+    /// };
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let data = ModPowPrecomputed::<Natural>::precompute_mod_pow_data(&Natural::from(497u32));
+    /// let mut x = Natural::from(100u32);
+    /// x.mod_square_precomputed_assign(Natural::from(497u32), &data);
+    /// assert_eq!(x, 60);
+    ///
+    /// let data = ModPowPrecomputed::<Natural>::precompute_mod_pow_data(&Natural::from(10u32));
+    /// let mut x = Natural::from(2u32);
+    /// x.mod_square_precomputed_assign(Natural::from(10u32), &data);
+    /// assert_eq!(x, 4);
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_mod_mul` from `fmpz_mod/mul.c`, FLINT 3.6.0, where `a == b ==
+    /// c`.
+    #[inline]
+    fn mod_square_precomputed_assign(&mut self, m: Self, data: &ModMulData) {
+        *self = (&*self).mod_mul_precomputed(&*self, &m, data);
+    }
+}
+
+impl<'a> ModSquarePrecomputedAssign<Natural, &'a Self> for Natural {
+    /// Squares a [`Natural`] modulo another [`Natural`] $m$, in place. The input must be already
+    /// reduced modulo $m$. The [`Natural`] on the right-hand side is taken by reference.
+    ///
+    /// Some precomputed data is provided; this speeds up computations involving several modular
+    /// squarings with the same modulus. The precomputed data should be obtained using
+    /// [`precompute_mod_pow_data`](malachite_base::num::arithmetic::traits::ModPowPrecomputed).
+    ///
+    /// $x \\gets y$, where $x, y < m$ and $x^2 \equiv y \mod m$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than or equal to `m`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::{
+    ///     ModPowPrecomputed, ModSquarePrecomputedAssign,
+    /// };
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let data = ModPowPrecomputed::<Natural>::precompute_mod_pow_data(&Natural::from(497u32));
+    /// let mut x = Natural::from(100u32);
+    /// x.mod_square_precomputed_assign(&Natural::from(497u32), &data);
+    /// assert_eq!(x, 60);
+    ///
+    /// let data = ModPowPrecomputed::<Natural>::precompute_mod_pow_data(&Natural::from(10u32));
+    /// let mut x = Natural::from(2u32);
+    /// x.mod_square_precomputed_assign(&Natural::from(10u32), &data);
+    /// assert_eq!(x, 4);
+    /// ```
+    ///
+    /// This is equivalent to `fmpz_mod_mul` from `fmpz_mod/mul.c`, FLINT 3.6.0, where `a == b ==
+    /// c`.
+    #[inline]
+    fn mod_square_precomputed_assign(&mut self, m: &'a Self, data: &ModMulData) {
+        *self = (&*self).mod_mul_precomputed(&*self, m, data);
     }
 }

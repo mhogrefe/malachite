@@ -16,9 +16,26 @@ use malachite_base::test_util::runner::Runner;
 pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_demos!(runner, demo_mod_square);
     register_unsigned_demos!(runner, demo_mod_square_assign);
+    register_unsigned_demos!(runner, demo_mod_square_precomputed);
     register_unsigned_benches!(runner, benchmark_mod_square);
     register_unsigned_benches!(runner, benchmark_mod_square_assign);
     register_unsigned_benches!(runner, benchmark_mod_square_precomputed_algorithms);
+}
+
+fn demo_mod_square_precomputed<T: PrimitiveUnsigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, m) in unsigned_pair_gen_var_16::<T>().get(gm, config).take(limit) {
+        let data = T::precompute_mod_pow_data(&m);
+        println!(
+            "{}.mod_square_precomputed({}, &data) = {}",
+            x,
+            m,
+            x.mod_square_precomputed(m, &data)
+        );
+    }
 }
 
 fn demo_mod_square<T: PrimitiveUnsigned>(gm: GenMode, config: &GenConfig, limit: usize) {

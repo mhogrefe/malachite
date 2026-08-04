@@ -272,7 +272,7 @@ formula.
 
 - [x] `coprime_with_check_2_3` (line 17)
 - [x] `coprime_with_check_2_3_5` (line 24)
-- [x] `coprime_with` (line 73) — cx
+- [x] `coprime_with` (line 75) — cx
 
 ## malachite-base/src/num/arithmetic/div_euclidean.rs
 
@@ -345,8 +345,8 @@ formula.
 ## malachite-base/src/num/arithmetic/extended_gcd.rs
 
 - [x] `extended_gcd_unsigned_binary` (line 39)
-- [x] `extended_gcd` (line 212) — cx
-- [x] `extended_gcd` (line 247) — cx
+- [x] `extended_gcd` (line 216) — cx
+- [x] `extended_gcd` (line 255) — cx
 
 ## malachite-base/src/num/arithmetic/factorial.rs
 
@@ -387,8 +387,8 @@ formula.
 - [x] `gcd_euclidean` (line 18)
 - [x] `gcd_binary` (line 27)
 - [x] `gcd_fast_b` (line 75)
-- [x] `gcd` (line 149) — cx
-- [x] `gcd_assign` (line 175) — cx
+- [x] `gcd` (line 152) — cx
+- [x] `gcd_assign` (line 181) — cx
 
 ## malachite-base/src/num/arithmetic/is_power_of_2.rs
 
@@ -398,26 +398,26 @@ formula.
 ## malachite-base/src/num/arithmetic/kronecker_symbol.rs
 
 - [x] `jacobi_symbol_unsigned_double_fast_2` (line 59)
-- [x] `legendre_symbol` (line 326) — cx, panics
-- [x] `legendre_symbol` (line 355) — cx, panics
-- [x] `jacobi_symbol` (line 381) — cx, panics
-- [x] `kronecker_symbol` (line 404) — cx
-- [x] `kronecker_symbol` (line 427) — cx
-- [x] `jacobi_symbol` (line 458)
-- [x] `jacobi_symbol` (line 488) — cx
+- [x] `legendre_symbol` (line 328) — cx, panics
+- [x] `legendre_symbol` (line 359) — cx, panics
+- [x] `jacobi_symbol` (line 387) — cx, panics
+- [x] `kronecker_symbol` (line 412) — cx
+- [x] `kronecker_symbol` (line 437) — cx
+- [x] `jacobi_symbol` (line 470)
+- [x] `jacobi_symbol` (line 500) — cx
 
 ## malachite-base/src/num/arithmetic/lcm.rs
 
 - [x] `lcm` (line 13)
 - [x] `lcm` (line 50) — cx, panics
-- [x] `lcm_assign` (line 76) — cx, panics
-- [x] `checked_lcm` (line 107) — cx
+- [x] `lcm_assign` (line 78) — cx, panics
+- [x] `checked_lcm` (line 111) — cx
 
 ## malachite-base/src/num/arithmetic/log_base.rs
 
-- [x] `floor_log_base` (line 108) — cx, panics
-- [x] `ceiling_log_base` (line 135) — cx, panics
-- [x] `checked_log_base` (line 167) — cx, panics
+- [x] `floor_log_base` (line 109) — cx, panics
+- [x] `ceiling_log_base` (line 137) — cx, panics
+- [x] `checked_log_base` (line 170) — cx, panics
 
 ## malachite-base/src/num/arithmetic/log_base_2.rs
 
@@ -451,7 +451,7 @@ formula.
 ## malachite-base/src/num/arithmetic/mod_inverse.rs
 
 - [x] `mod_inverse_binary` (line 20)
-- [x] `mod_inverse` (line 175) — cx, panics
+- [x] `mod_inverse` (line 177) — cx, panics
 
 ## malachite-base/src/num/arithmetic/mod_is_reduced.rs
 
@@ -498,16 +498,16 @@ formula.
 - [x] `mul_mod_helper` (line 41)
 - [x] `fast_mod_pow` (line 67)
 - [x] `precompute_mod_pow_data` (line 113) — cx
-- [x] `mod_pow_precomputed` (line 138) — cx, panics
-- [x] `precompute_mod_pow_data` (line 161) — cx
-- [x] `mod_pow_precomputed` (line 185) — cx, panics
-- [x] `precompute_mod_pow_data` (line 205) — cx
-- [x] `mod_pow_precomputed` (line 227) — cx, panics
-- [x] `precompute_mod_pow_data` (line 243) — cx
-- [x] `mod_pow_precomputed` (line 272) — cx, panics
-- [x] `mod_pow_precomputed_assign` (line 311) — cx
-- [x] `mod_pow` (line 337) — cx, panics
-- [x] `mod_pow_assign` (line 361) — cx, panics
+- [x] `mod_pow_precomputed` (line 140) — cx, panics
+- [x] `precompute_mod_pow_data` (line 163) — cx
+- [x] `mod_pow_precomputed` (line 189) — cx, panics
+- [x] `precompute_mod_pow_data` (line 209) — cx
+- [x] `mod_pow_precomputed` (line 233) — cx, panics
+- [x] `precompute_mod_pow_data` (line 249) — cx
+- [x] `mod_pow_precomputed` (line 280) — cx, panics
+- [x] `mod_pow_precomputed_assign` (line 321) — cx
+- [x] `mod_pow` (line 349) — cx, panics
+- [x] `mod_pow_assign` (line 375) — cx, panics
 
 ## malachite-base/src/num/arithmetic/mod_power_of_2.rs
 
@@ -533,7 +533,7 @@ formula.
 ## malachite-base/src/num/arithmetic/mod_power_of_2_inverse.rs
 
 - [x] `mod_power_of_2_inverse_fast` (line 14)
-- [x] `mod_power_of_2_inverse` (line 68) — cx, panics
+- [x] `mod_power_of_2_inverse` (line 70) — cx, panics
 
 ## malachite-base/src/num/arithmetic/mod_power_of_2_is_reduced.rs
 
@@ -552,8 +552,8 @@ formula.
 
 ## malachite-base/src/num/arithmetic/mod_power_of_2_pow.rs
 
-- [ ] `mod_power_of_2_pow` (line 56) — cx, panics
-- [ ] `mod_power_of_2_pow_assign` (line 81) — cx, panics
+- [ ] `mod_power_of_2_pow` (line 58) — cx, panics
+- [ ] `mod_power_of_2_pow_assign` (line 85) — cx, panics
 
 ## malachite-base/src/num/arithmetic/mod_power_of_2_shl.rs
 
@@ -592,17 +592,17 @@ formula.
 ## malachite-base/src/num/arithmetic/mod_sqrt.rs
 
 - [x] `mod_pow_full_width` (line 23)
-- [x] `mod_sqrt_unsigned` (line 56)
-- [x] `mod_sqrt` (line 184) — cx, panics
-- [x] `mod_sqrt` (line 227) — cx, panics
-- [x] `mod_sqrt` (line 268) — cx, panics
+- [x] `mod_sqrt_unsigned` (line 67) — cx
+- [x] `mod_sqrt` (line 201) — cx, panics
+- [x] `mod_sqrt` (line 250) — cx, panics
+- [x] `mod_sqrt` (line 297) — cx, panics
 
 ## malachite-base/src/num/arithmetic/mod_square.rs
 
-- [ ] `mod_square` (line 33) — cx, panics
-- [ ] `mod_square_assign` (line 53) — cx, panics
-- [ ] `mod_square_precomputed` (line 75) — cx, panics
-- [ ] `mod_square_precomputed_assign` (line 97) — cx, panics
+- [ ] `mod_square` (line 36) — cx, panics
+- [ ] `mod_square_assign` (line 56) — cx, panics
+- [ ] `mod_square_precomputed` (line 78) — cx, panics
+- [ ] `mod_square_precomputed_assign` (line 100) — cx, panics
 
 ## malachite-base/src/num/arithmetic/mod_sub.rs
 
@@ -694,7 +694,7 @@ formula.
 
 - [ ] `overflowing_pow` (line 70)
 - [ ] `overflowing_pow` (line 86)
-- [ ] `overflowing_pow_assign` (line 112) — cx
+- [ ] `overflowing_pow_assign` (line 114) — cx
 
 ## malachite-base/src/num/arithmetic/overflowing_square.rs
 
@@ -722,11 +722,11 @@ formula.
 
 - [ ] `pow` (line 20)
 - [ ] `pow` (line 42)
-- [ ] `pow_assign` (line 73) — cx
-- [ ] `pow` (line 89)
-- [ ] `pow_assign` (line 103) — cx
-- [ ] `pow` (line 114)
-- [ ] `pow_assign` (line 128) — cx
+- [ ] `pow_assign` (line 75) — cx
+- [ ] `pow` (line 91)
+- [ ] `pow_assign` (line 105) — cx
+- [ ] `pow` (line 116)
+- [ ] `pow_assign` (line 130) — cx
 
 ## malachite-base/src/num/arithmetic/power_of_2.rs
 
@@ -1429,10 +1429,10 @@ formula.
 - [x] `ll_factor_squfof_u64` (line 605)
 - [x] `factor_squfof_u64` (line 714)
 - [x] `factor` (line 765) — cx, panics
-- [x] `factor` (line 907) — cx, panics
-- [x] `factor` (line 949) — cx, panics
-- [x] `factor` (line 1033) — cx, panics
-- [x] `factor` (line 1120) — cx, panics
+- [x] `factor` (line 910) — cx, panics
+- [x] `factor` (line 955) — cx, panics
+- [x] `factor` (line 1042) — cx, panics
+- [x] `factor` (line 1132) — cx, panics
 
 ## malachite-base/src/num/factorization/is_power.rs
 
@@ -1484,10 +1484,10 @@ formula.
 - [x] `is_probable_prime_u32` (line 532)
 - [x] `is_probable_prime_u64` (line 552)
 - [x] `is_prime` (line 589) — cx
-- [x] `is_prime` (line 626) — cx
-- [x] `is_prime` (line 683) — cx
-- [x] `is_prime` (line 766) — cx
-- [x] `is_prime` (line 850) — cx
+- [x] `is_prime` (line 628) — cx
+- [x] `is_prime` (line 687) — cx
+- [x] `is_prime` (line 772) — cx
+- [x] `is_prime` (line 858) — cx
 
 ## malachite-base/src/num/factorization/is_square.rs
 
@@ -1528,7 +1528,7 @@ formula.
 ## malachite-base/src/num/factorization/primitive_root_prime.rs
 
 - [x] `primitive_root_prime` (line 24)
-- [x] `primitive_root_prime` (line 85) — cx, panics
+- [x] `primitive_root_prime` (line 88) — cx, panics
 
 ## malachite-base/src/num/factorization/remove_power.rs
 
@@ -1733,10 +1733,10 @@ formula.
 - [ ] `special_random_primitive_float_inclusive_range` (line 2430) — cx, panics
 - [ ] `new` (line 2540) — cx
 - [ ] `next_bool` (line 2574) — cx
-- [ ] `next_bit_chunk` (line 2606) — cx, panics
-- [ ] `next_less_than` (line 2665) — cx, panics
-- [ ] `next_in_range` (line 2710) — cx, panics
-- [ ] `next_in_inclusive_range` (line 2743) — cx, panics
+- [ ] `next_bit_chunk` (line 2610) — cx, panics
+- [ ] `next_less_than` (line 2675) — cx, panics
+- [ ] `next_in_range` (line 2725) — cx, panics
+- [ ] `next_in_inclusive_range` (line 2764) — cx, panics
 
 ## malachite-base/src/num/random/striped.rs
 
@@ -1808,7 +1808,7 @@ formula.
 - [ ] `from_bytes` (line 38) — cx
 - [ ] `get_rng` (line 54) — cx
 - [ ] `next` (line 78) — cx
-- [ ] `fork` (line 112) — cx
+- [ ] `fork` (line 116) — cx
 
 ## malachite-base/src/rounding_modes/exhaustive.rs
 
@@ -2079,4 +2079,4 @@ formula.
 - [ ] `random_unique_vecs_length_inclusive_range` (line 1682) — panics
 
 ---
-1395 items; 780 with complexity claims; 0 scratch-takers; 0 scratch-length formulas.
+1395 items; 781 with complexity claims; 0 scratch-takers; 0 scratch-length formulas.

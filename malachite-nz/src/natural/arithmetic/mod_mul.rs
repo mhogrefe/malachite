@@ -12,11 +12,15 @@
 
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::Natural;
-use crate::natural::arithmetic::div_mod::limbs_div_mod_by_two_limb_normalized;
+use crate::natural::arithmetic::div_mod::{
+    DivModData, limbs_div_mod_by_two_limb_normalized, precompute_div_mod_data_helper,
+};
 use crate::platform::{DoubleLimb, Limb};
+use core::mem::take;
 use malachite_base::num::arithmetic::traits::{
-    ModMul, ModMulAssign, ModMulPrecomputed, ModMulPrecomputedAssign, ModPowerOf2Mul,
-    ModPowerOf2MulAssign, PowerOf2, XMulYToZZ, XXXAddYYYToZZZ, XXXSubYYYToZZZ, XXXXAddYYYYToZZZZ,
+    DivModPrecomputed, ModMul, ModMulAssign, ModMulPrecomputed, ModMulPrecomputedAssign,
+    ModPowerOf2Mul, ModPowerOf2MulAssign, PowerOf2, XMulYToZZ, XXXAddYYYToZZZ, XXXSubYYYToZZZ,
+    XXXXAddYYYYToZZZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
@@ -140,16 +144,16 @@ private_test_fn! {limbs_mod_mul_two_limbs(
     }
 }}
 
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
 #[doc(hidden)]
 pub enum ModMulData {
     OneLimb(Limb),
     MinTwoLimbs,
     TwoLimbs(Limb, Limb, Limb),
-    MoreThanTwoLimbs,
+    MoreThanTwoLimbs(DivModData),
 }
 
-fn precompute_mod_mul_data_helper(m: &Natural) -> ModMulData {
+pub(crate) fn precompute_mod_mul_data_helper(m: &Natural) -> ModMulData {
     match *m {
         Natural::ZERO => panic!("division by zero"),
         Natural(Small(ref x)) => ModMulData::OneLimb(Limb::precompute_mod_mul_data(x)),
@@ -159,7 +163,7 @@ fn precompute_mod_mul_data_helper(m: &Natural) -> ModMulData {
                 let (inv_2, inv_1, inv_0) = limbs_precompute_mod_mul_two_limbs(m_1, m_0);
                 ModMulData::TwoLimbs(inv_2, inv_1, inv_0)
             }
-            _ => ModMulData::MoreThanTwoLimbs,
+            _ => ModMulData::MoreThanTwoLimbs(precompute_div_mod_data_helper(m)),
         },
     }
 }
@@ -236,7 +240,11 @@ impl ModMulPrecomputed<Self, Self> for Natural {
     /// [`mod_mul_precomputed_assign`](ModMulPrecomputedAssign).
     ///
     /// # Worst-case complexity
-    /// Constant time and additional memory.
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
     ///
     /// This is equivalent to part of `fmpz_mod_ctx_init` from `fmpz_mod/ctx_init.c`, FLINT 2.7.1.
     #[inline]
@@ -309,7 +317,11 @@ impl<'a> ModMulPrecomputed<Self, &'a Self> for Natural {
     /// [`mod_mul_precomputed_assign`](ModMulPrecomputedAssign).
     ///
     /// # Worst-case complexity
-    /// Constant time and additional memory.
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
     ///
     /// This is equivalent to part of `fmpz_mod_ctx_init` from `fmpz_mod/ctx_init.c`, FLINT 2.7.1.
     #[inline]
@@ -383,7 +395,11 @@ impl<'a> ModMulPrecomputed<&'a Self, Self> for Natural {
     /// [`mod_mul_precomputed_assign`](ModMulPrecomputedAssign).
     ///
     /// # Worst-case complexity
-    /// Constant time and additional memory.
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
     ///
     /// This is equivalent to part of `fmpz_mod_ctx_init` from `fmpz_mod/ctx_init.c`, FLINT 2.7.1.
     #[inline]
@@ -457,7 +473,11 @@ impl<'a, 'b> ModMulPrecomputed<&'a Self, &'b Self> for Natural {
     /// [`mod_mul_precomputed_assign`](ModMulPrecomputedAssign).
     ///
     /// # Worst-case complexity
-    /// Constant time and additional memory.
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
     ///
     /// This is equivalent to part of `fmpz_mod_ctx_init` from `fmpz_mod/ctx_init.c`, FLINT 2.7.1.
     #[inline]
@@ -531,7 +551,11 @@ impl ModMulPrecomputed<Natural, Natural> for &Natural {
     /// [`mod_mul_precomputed_assign`](ModMulPrecomputedAssign).
     ///
     /// # Worst-case complexity
-    /// Constant time and additional memory.
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
     ///
     /// This is equivalent to part of `fmpz_mod_ctx_init` from `fmpz_mod/ctx_init.c`, FLINT 2.7.1.
     #[inline]
@@ -608,6 +632,9 @@ impl ModMulPrecomputed<Natural, Natural> for &Natural {
             (x, y, m, &ModMulData::TwoLimbs(inv_2, inv_1, inv_0)) => {
                 x.mod_mul_precomputed_two_limbs(&y, &m, inv_2, inv_1, inv_0)
             }
+            (x, y, m, ModMulData::MoreThanTwoLimbs(div_data)) => {
+                (x * y).div_mod_precomputed(m, div_data).1
+            }
             (x, y, m, _) => x * y % m,
         }
     }
@@ -621,7 +648,11 @@ impl ModMulPrecomputed<Natural, &Natural> for &Natural {
     /// [`mod_mul_precomputed_assign`](ModMulPrecomputedAssign).
     ///
     /// # Worst-case complexity
-    /// Constant time and additional memory.
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
     ///
     /// This is equivalent to part of `fmpz_mod_ctx_init` from `fmpz_mod/ctx_init.c`, FLINT 2.7.1.
     #[inline]
@@ -695,7 +726,11 @@ impl ModMulPrecomputed<&Natural, Natural> for &Natural {
     /// [`mod_mul_precomputed_assign`](ModMulPrecomputedAssign).
     ///
     /// # Worst-case complexity
-    /// Constant time and additional memory.
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
     ///
     /// This is equivalent to part of `fmpz_mod_ctx_init` from `fmpz_mod/ctx_init.c`, FLINT 2.7.1.
     #[inline]
@@ -775,6 +810,9 @@ impl ModMulPrecomputed<&Natural, Natural> for &Natural {
             (x, y, m, &ModMulData::TwoLimbs(inv_2, inv_1, inv_0)) => {
                 x.mod_mul_precomputed_two_limbs(y, &m, inv_2, inv_1, inv_0)
             }
+            (x, y, m, ModMulData::MoreThanTwoLimbs(div_data)) => {
+                (x * y).div_mod_precomputed(m, div_data).1
+            }
             (x, y, m, _) => x * y % m,
         }
     }
@@ -788,7 +826,11 @@ impl ModMulPrecomputed<&Natural, &Natural> for &Natural {
     /// [`mod_mul_precomputed_assign`](ModMulPrecomputedAssign).
     ///
     /// # Worst-case complexity
-    /// Constant time and additional memory.
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
     ///
     /// This is equivalent to part of `fmpz_mod_ctx_init` from `fmpz_mod/ctx_init.c`, FLINT 2.7.1.
     #[inline]
@@ -864,6 +906,9 @@ impl ModMulPrecomputed<&Natural, &Natural> for &Natural {
             (x, y, m, &ModMulData::TwoLimbs(inv_2, inv_1, inv_0)) => {
                 x.mod_mul_precomputed_two_limbs(y, m, inv_2, inv_1, inv_0)
             }
+            (x, y, m, ModMulData::MoreThanTwoLimbs(div_data)) => {
+                (x * y).div_mod_precomputed(m, div_data).1
+            }
             (x, y, m, _) => x * y % m,
         }
     }
@@ -922,6 +967,10 @@ impl ModMulPrecomputedAssign<Self, Self> for Natural {
             (x, y, _, &ModMulData::MinTwoLimbs) => x.mod_power_of_2_mul_assign(y, Limb::WIDTH),
             (x, y, m, &ModMulData::TwoLimbs(inv_2, inv_1, inv_0)) => {
                 x.mod_mul_precomputed_two_limbs_assign(&y, &m, inv_2, inv_1, inv_0);
+            }
+            (x, y, m, ModMulData::MoreThanTwoLimbs(div_data)) => {
+                *x *= y;
+                *x = take(x).div_mod_precomputed(m, div_data).1;
             }
             (x, y, m, _) => {
                 *x *= y;
@@ -989,6 +1038,10 @@ impl<'a> ModMulPrecomputedAssign<Self, &'a Self> for Natural {
             (x, y, m, &ModMulData::TwoLimbs(inv_2, inv_1, inv_0)) => {
                 x.mod_mul_precomputed_two_limbs_assign(&y, m, inv_2, inv_1, inv_0);
             }
+            (x, y, m, ModMulData::MoreThanTwoLimbs(div_data)) => {
+                *x *= y;
+                *x = take(x).div_mod_precomputed(m, div_data).1;
+            }
             (x, y, m, _) => {
                 *x *= y;
                 *x %= m;
@@ -1055,6 +1108,10 @@ impl<'a> ModMulPrecomputedAssign<&'a Self, Self> for Natural {
             (x, y, m, &ModMulData::TwoLimbs(inv_2, inv_1, inv_0)) => {
                 x.mod_mul_precomputed_two_limbs_assign(y, &m, inv_2, inv_1, inv_0);
             }
+            (x, y, m, ModMulData::MoreThanTwoLimbs(div_data)) => {
+                *x *= y;
+                *x = take(x).div_mod_precomputed(m, div_data).1;
+            }
             (x, y, m, _) => {
                 *x *= y;
                 *x %= m;
@@ -1116,6 +1173,10 @@ impl<'a, 'b> ModMulPrecomputedAssign<&'a Self, &'b Self> for Natural {
             (x, y, _, &ModMulData::MinTwoLimbs) => x.mod_power_of_2_mul_assign(y, Limb::WIDTH),
             (x, y, m, &ModMulData::TwoLimbs(inv_2, inv_1, inv_0)) => {
                 x.mod_mul_precomputed_two_limbs_assign(y, m, inv_2, inv_1, inv_0);
+            }
+            (x, y, m, ModMulData::MoreThanTwoLimbs(div_data)) => {
+                *x *= y;
+                *x = take(x).div_mod_precomputed(m, div_data).1;
             }
             (x, y, m, _) => {
                 *x *= y;

@@ -20,8 +20,7 @@ macro_rules! impl_float {
             ///
             /// $M(n) = O(1)$
             ///
-            /// where $T$ is time, $M$ is additional memory, and $n$ is
-            /// `self.significant_bits()`.
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
             ///
             /// # Examples
             /// See [here](super::partial_cmp_primitive_float#partial_cmp).
@@ -44,8 +43,7 @@ macro_rules! impl_float {
             ///
             /// $M(n) = O(1)$
             ///
-            /// where $T$ is time, $M$ is additional memory, and $n$ is
-            /// `other.significant_bits()`.
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `other.significant_bits()`.
             ///
             /// # Examples
             /// See [here](super::partial_cmp_primitive_float#partial_cmp).

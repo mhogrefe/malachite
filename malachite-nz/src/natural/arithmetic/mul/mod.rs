@@ -103,11 +103,11 @@ crate_test_fn! {limbs_mul(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 }}
 
 // Scratch derivation: each band returns the requirement of the kernel that
-// `limbs_mul_same_length_to_out` dispatches to under the same conditions, so the two functions
-// must be kept in lockstep. The Toom-22 band returns a range maximum (an over-estimate, exact at
-// the top of the band) so that the whole recursion folds to a constant; every higher band is the
-// kernel's exact formula for this length. The basecase and FFT bands use no caller scratch (the
-// FFT allocates internally).
+// `limbs_mul_same_length_to_out` dispatches to under the same conditions, so the two functions must
+// be kept in lockstep. The Toom-22 band returns a range maximum (an over-estimate, exact at the top
+// of the band) so that the whole recursion folds to a constant; every higher band is the kernel's
+// exact formula for this length. The basecase and FFT bands use no caller scratch (the FFT
+// allocates internally).
 crate_test_const_fn! { limbs_mul_same_length_to_out_scratch_len(len: usize) -> usize {
     if len < MUL_TOOM22_THRESHOLD {
         0
@@ -136,8 +136,8 @@ crate_test_const_fn! { limbs_mul_same_length_to_out_scratch_len(len: usize) -> u
 // `Natural`s, writes the `2 * xs.len()` least-significant limbs of the product of the `Natural`s to
 // an output slice. The output must be at least as long as `2 * xs.len()`, `xs` must be as long as
 // `ys`, and neither slice can be empty. `scratch` must have length at least
-// `limbs_mul_same_length_to_out_scratch_len(xs.len())`. Returns the result limb at index
-// `2 * xs.len() - 1` (which may be zero).
+// `limbs_mul_same_length_to_out_scratch_len(xs.len())`. Returns the result limb at index `2 *
+// xs.len() - 1` (which may be zero).
 //
 // # Worst-case complexity
 // $T(n) = O(n \log n \log\log n)$
@@ -195,9 +195,9 @@ crate_test_const_fn! {toom44_ok(xs_len: usize, ys_len: usize) -> bool {
 }}
 
 // Scratch derivation: the branch structure below mirrors `limbs_mul_greater_to_out_old` exactly;
-// each branch returns the requirement of the kernel selected under the same conditions, so the
-// two functions must be kept in lockstep. In the unbalanced chunking branches (`xs` split into
-// `2 * ys.len()`-limb blocks), the first summand is the largest per-block kernel requirement —
+// each branch returns the requirement of the kernel selected under the same conditions, so the two
+// functions must be kept in lockstep. In the unbalanced chunking branches (`xs` split into `2 *
+// ys.len()`-limb blocks), the first summand is the largest per-block kernel requirement —
 // including the final, differently-shaped block, whose length is recomputed here with the same
 // reduction loop — and the `4 * ys.len()` term pays for the block-product buffer that the chunks
 // are accumulated through. The basecase and FFT branches use no caller scratch (the FFT allocates
@@ -529,8 +529,8 @@ crate_test_fn! {limbs_mul_to_out(
 // $M(n, m) = O(1)$
 //
 // where $T$ is time, $M$ is additional memory, $n$ is `xs.len()`, and $m$ is `ys.len()`: one
-// `limbs_mul_limb` or `limbs_add_mul_limb` pass of length $n$ (plus $O(1)$) per limb of `ys`,
-// with no allocation.
+// `limbs_mul_limb` or `limbs_add_mul_limb` pass of length $n$ (plus $O(1)$) per limb of `ys`, with
+// no allocation.
 //
 // # Panics
 // Panics if `out` is too short, `xs` is shorter than `ys`, or `ys` is empty.

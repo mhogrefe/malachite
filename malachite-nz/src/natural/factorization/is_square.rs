@@ -172,8 +172,8 @@ const SQR_MOD256: [u64; 4] =
 const SQR_MOD256: [u32; 8] =
     [0x2030213, 0x2020212, 0x2020213, 0x2020212, 0x2030212, 0x2020212, 0x2020212, 0x2020212];
 
-// The body stays separate staged tests, each with its own explanation; merging the first two
-// into one `if` would obscure the staging.
+// The body stays separate staged tests, each with its own explanation; merging the first two into
+// one `if` would obscure the staging.
 #[cfg_attr(dylint_lib = "malachite_lints", allow(collapse_adjacent_ifs))]
 fn limbs_is_square(limbs: &[Limb]) -> bool {
     assert!(!limbs.is_empty());

@@ -221,8 +221,8 @@ impl ModPowPrecomputed<u64, Self> for u128 {
     /// $M(n) = O(1)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `exp.significant_bits()`.
-            /// The square-and-multiply ladder performs one or two modular multiplications per
-            /// exponent bit.
+    /// The square-and-multiply ladder performs one or two modular multiplications per
+    /// exponent bit.
     ///
     /// # Panics
     /// Panics if `self` is greater than or equal to `m`.
@@ -269,8 +269,8 @@ impl ModPowPrecomputed<u64, Self> for usize {
     /// $M(n) = O(1)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `exp.significant_bits()`.
-            /// The square-and-multiply ladder performs one or two modular multiplications per
-            /// exponent bit.
+    /// The square-and-multiply ladder performs one or two modular multiplications per
+    /// exponent bit.
     ///
     /// # Panics
     /// Panics if `self` is greater than or equal to `m`.
