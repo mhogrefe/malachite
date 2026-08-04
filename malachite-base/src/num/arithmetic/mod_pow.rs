@@ -129,6 +129,8 @@ macro_rules! impl_mod_pow_precomputed_fast {
             /// $M(n) = O(1)$
             ///
             /// where $T$ is time, $M$ is additional memory, and $n$ is `exp.significant_bits()`.
+            /// The square-and-multiply ladder performs one or two modular multiplications per
+            /// exponent bit.
             ///
             /// # Panics
             /// Panics if `self` is greater than or equal to `m`.
@@ -176,6 +178,8 @@ macro_rules! impl_mod_pow_precomputed_promoted {
             /// $M(n) = O(1)$
             ///
             /// where $T$ is time, $M$ is additional memory, and $n$ is `exp.significant_bits()`.
+            /// The square-and-multiply ladder performs one or two modular multiplications per
+            /// exponent bit.
             ///
             /// # Panics
             /// Panics if `self` is greater than or equal to `m`.
@@ -217,6 +221,8 @@ impl ModPowPrecomputed<u64, Self> for u128 {
     /// $M(n) = O(1)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `exp.significant_bits()`.
+            /// The square-and-multiply ladder performs one or two modular multiplications per
+            /// exponent bit.
     ///
     /// # Panics
     /// Panics if `self` is greater than or equal to `m`.
@@ -263,6 +269,8 @@ impl ModPowPrecomputed<u64, Self> for usize {
     /// $M(n) = O(1)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `exp.significant_bits()`.
+            /// The square-and-multiply ladder performs one or two modular multiplications per
+            /// exponent bit.
     ///
     /// # Panics
     /// Panics if `self` is greater than or equal to `m`.
@@ -304,6 +312,8 @@ macro_rules! impl_mod_pow {
             /// $M(n) = O(1)$
             ///
             /// where $T$ is time, $M$ is additional memory, and $n$ is `exp.significant_bits()`.
+            /// The square-and-multiply ladder performs one or two modular multiplications per
+            /// exponent bit.
             ///
             /// # Examples
             /// See [here](super::mod_pow#mod_pow_precomputed_assign).
@@ -327,6 +337,8 @@ macro_rules! impl_mod_pow {
             /// $M(n) = O(1)$
             ///
             /// where $T$ is time, $M$ is additional memory, and $n$ is `exp.significant_bits()`.
+            /// The square-and-multiply ladder performs one or two modular multiplications per
+            /// exponent bit.
             ///
             /// # Panics
             /// Panics if `self` is greater than or equal to `m`.
@@ -351,6 +363,8 @@ macro_rules! impl_mod_pow {
             /// $M(n) = O(1)$
             ///
             /// where $T$ is time, $M$ is additional memory, and $n$ is `exp.significant_bits()`.
+            /// The square-and-multiply ladder performs one or two modular multiplications per
+            /// exponent bit.
             ///
             /// # Panics
             /// Panics if `self` is greater than or equal to `m`.

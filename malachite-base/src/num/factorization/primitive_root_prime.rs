@@ -74,7 +74,10 @@ macro_rules! impl_primitive_root_prime {
             ///
             /// $M(n) = O(1)$
             ///
-            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`:
+            /// the cost is dominated by factoring $p - 1$ (SQUFOF, heuristically
+            /// $O(\sqrt\[4\]{p})$); each candidate root is then tested with one modular powering
+            /// per prime factor.
             ///
             /// # Panics
             /// Panics if `self` is 0, and possibly panics if `self` is not prime.

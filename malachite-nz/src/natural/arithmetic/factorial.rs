@@ -594,6 +594,8 @@ impl DoubleFactorial for Natural {
     ///
     /// $M(n) = O(n \log n)$
     ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `n`.
+    ///
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::DoubleFactorial;
@@ -679,6 +681,8 @@ impl Multifactorial for Natural {
     /// $T(n, m) = O(n (\log n)^2 \log\log n)$
     ///
     /// $M(n, m) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `n`, and $m$ is `m`.
     ///
     /// # Examples
     /// ```

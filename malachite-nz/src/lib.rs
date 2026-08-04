@@ -69,6 +69,11 @@
 //! By default, the type of a [`Limb`](crate::platform::Limb) is [`u64`], but you can set it to
 //! [`u32`] using the `32_bit_limbs` feature.
 //!
+//! # Complexity conventions
+//! Functions in this crate are documented with worst-case time and additional-memory bounds,
+//! following the conventions described in the `malachite-base`
+//! [docs](https://docs.rs/malachite-base/latest/malachite_base/#complexity-conventions).
+//!
 //! # Demos and benchmarks
 //! This crate comes with a `bin` target that can be used for running demos and benchmarks.
 //! - Almost all of the public functions in this crate have an associated demo. Running a demo

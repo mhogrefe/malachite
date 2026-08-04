@@ -97,7 +97,8 @@ macro_rules! impl_log_base_unsigned {
             /// $M(n) = O(1)$
             ///
             /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits() /
-            /// base.significant_bits()`.
+            /// base.significant_bits()`: the loop multiplies by the base once per unit of the
+            /// logarithm, which is $O(n)$; the power-of-2 fast path is $O(1)$.
             ///
             /// # Panics
             /// Panics if `self` is 0 or `base` is less than 2.
@@ -124,7 +125,8 @@ macro_rules! impl_log_base_unsigned {
             /// $M(n) = O(1)$
             ///
             /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits() /
-            /// base.significant_bits()`.
+            /// base.significant_bits()`: the loop multiplies by the base once per unit of the
+            /// logarithm, which is $O(n)$; the power-of-2 fast path is $O(1)$.
             ///
             /// # Panics
             /// Panics if `self` is 0 or `base` is less than 2.
@@ -156,7 +158,8 @@ macro_rules! impl_log_base_unsigned {
             /// $M(n) = O(1)$
             ///
             /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits() /
-            /// base.significant_bits()`.
+            /// base.significant_bits()`: the loop multiplies by the base once per unit of the
+            /// logarithm, which is $O(n)$; the power-of-2 fast path is $O(1)$.
             ///
             /// # Panics
             /// Panics if `self` is 0 or `base` is less than 2.

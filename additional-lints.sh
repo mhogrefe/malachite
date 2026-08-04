@@ -13,6 +13,10 @@ cd "$(dirname "$0")"
 # to every rustc-based lint; catch them with a filesystem-level scan first.
 echo "Checking for unincluded files"
 python3 unincluded-files.py
+# Complexity doc blocks must be well-formed: constant/delegation form, or $T$ + $M$ formulas with
+# a `where` line defining exactly the variables used. See DOC-AUDIT.md.
+echo "Checking complexity doc blocks"
+python3 complexity-doc-check.py
 # A stale `#[expect(long_lines)]` exemption surfaces as an unfulfilled-expectation warning; make
 # it fail the run like any other lint hit.
 export DYLINT_RUSTFLAGS="-D unfulfilled_lint_expectations"

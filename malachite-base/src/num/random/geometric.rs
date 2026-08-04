@@ -431,7 +431,7 @@ impl<T: PrimitiveSigned> Iterator for GeometricRandomSignedRange<T> {
 ///
 /// $M(n) = O(1)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ = `um_numerator + um_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `um_numerator + um_denominator`.
 ///
 /// # Panics
 /// Panics if `um_numerator` or `um_denominator` are zero, or, if after being reduced to lowest
@@ -513,7 +513,7 @@ pub fn geometric_random_unsigneds<T: PrimitiveUnsigned>(
 ///
 /// $M(n) = O(1)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ = `um_numerator + um_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `um_numerator + um_denominator`.
 ///
 /// # Panics
 /// Panics if `um_denominator` is zero or if `um_numerator <= um_denominator`.
@@ -607,7 +607,7 @@ pub fn geometric_random_positive_unsigneds<T: PrimitiveUnsigned>(
 ///
 /// $M(n) = O(1)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ = `abs_um_numerator + abs_um_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `abs_um_numerator + abs_um_denominator`.
 ///
 /// # Panics
 /// Panics if `abs_um_numerator` or `abs_um_denominator` are zero, or, if after being reduced to
@@ -689,7 +689,7 @@ pub fn geometric_random_signeds<T: PrimitiveSigned>(
 ///
 /// $M(n) = O(1)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ = `um_numerator + um_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `um_numerator + um_denominator`.
 ///
 /// # Panics
 /// Panics if `um_numerator` or `um_denominator` are zero, or, if after being reduced to lowest
@@ -778,7 +778,7 @@ pub fn geometric_random_natural_signeds<T: PrimitiveSigned>(
 ///
 /// $M(n) = O(1)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ = `um_numerator + um_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `um_numerator + um_denominator`.
 ///
 /// # Panics
 /// Panics if `um_denominator` is zero or if `um_numerator <= um_denominator`.
@@ -869,7 +869,7 @@ pub fn geometric_random_positive_signeds<T: PrimitiveSigned>(
 ///
 /// $M(n) = O(1)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ = `abs_um_numerator + abs_um_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `abs_um_numerator + abs_um_denominator`.
 ///
 /// # Panics
 /// Panics if `abs_um_denominator` is zero or if `abs_um_numerator <= abs_um_denominator`.
@@ -969,7 +969,7 @@ pub fn geometric_random_negative_signeds<T: PrimitiveSigned>(
 ///
 /// $M(n) = O(1)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ = `abs_um_numerator + abs_um_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `abs_um_numerator + abs_um_denominator`.
 ///
 /// # Panics
 /// Panics if `abs_um_denominator` is zero or if `abs_um_numerator <= abs_um_denominator`.
@@ -1059,7 +1059,7 @@ pub fn geometric_random_nonzero_signeds<T: PrimitiveSigned>(
 ///
 /// $M(n) = O(1)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ = `um_numerator + um_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `um_numerator + um_denominator`.
 ///
 /// # Panics
 /// Panics if $a \geq b$, if `um_numerator` or `um_denominator` are zero, if their ratio is less
@@ -1144,7 +1144,7 @@ pub fn geometric_random_unsigned_range<T: PrimitiveUnsigned>(
 ///
 /// $M(n) = O(1)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ = `um_numerator + um_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `um_numerator + um_denominator`.
 ///
 /// # Panics
 /// Panics if $a > b$, if `um_numerator` or `um_denominator` are zero, if their ratio is less than
@@ -1240,7 +1240,7 @@ pub fn geometric_random_unsigned_inclusive_range<T: PrimitiveUnsigned>(
 ///
 /// $M(n) = O(1)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ = `um_numerator + um_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `um_numerator + um_denominator`.
 ///
 /// # Panics
 /// Panics if $a \geq b$, if `um_numerator` or `um_denominator` are zero, if their ratio is less
@@ -1361,7 +1361,7 @@ pub fn geometric_random_signed_range<T: PrimitiveSigned>(
 ///
 /// $M(n) = O(1)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ = `um_numerator + um_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `um_numerator + um_denominator`.
 ///
 /// # Panics
 /// Panics if $a > b$, if `um_numerator` or `um_denominator` are zero, if their ratio is less than
@@ -1442,7 +1442,7 @@ pub fn geometric_random_signed_inclusive_range<T: PrimitiveSigned>(
 ///
 /// $M(n) = O(1)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ = `um_numerator + um_denominator`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `um_numerator + um_denominator`.
 ///
 /// # Panics
 /// Panics if $a > b$, if `um_numerator` or `um_denominator` are zero, if their ratio is less than

@@ -143,6 +143,8 @@ crate_test_fn! {limbs_slice_shl_in_place(xs: &mut [Limb], bits: u64) -> Limb {
 //
 // $M(n, m) = O(n + m)$
 //
+// where $T$ is time, $M$ is additional memory, $n$ is `xs.len()`, and $m$ is `bits / Limb::WIDTH`.
+//
 // # Panics
 // Panics if `xs` is empty.
 //

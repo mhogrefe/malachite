@@ -94,7 +94,7 @@ crate_test_fn! {limbs_sub_limb_to_out(out: &mut [Limb], xs: &[Limb], mut y: Limb
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
-// This is equivalent to `mpn_add_1` from `gmp.h`, GMP 6.2.1, where the result is written to the
+// This is equivalent to `mpn_sub_1` from `gmp.h`, GMP 6.2.1, where the result is written to the
 // input slice.
 crate_test_fn! {limbs_sub_limb_in_place<T: PrimitiveUnsigned>(xs: &mut [T], mut y: T) -> bool {
     for x in &mut *xs {
@@ -118,7 +118,7 @@ pub(crate) fn sub_with_borrow(x: Limb, y: Limb, borrow: bool) -> (Limb, bool) {
     (diff, borrow_1 | borrow_2)
 }
 
-// Interpreting a two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s,
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s,
 // subtracts the second from the first. Returns a pair consisting of the limbs of the result, and
 // whether there was a borrow left over; that is, whether the second `Natural` was greater than the
 // first `Natural`. The first slice must be at least as long as the second.
@@ -151,7 +151,7 @@ crate_test_fn! {limbs_sub(xs: &[Limb], ys: &[Limb]) -> (Vec<Limb>, bool) {
     (out, borrow)
 }}
 
-// Interpreting a two equal-length slices of `Limb`s as the limbs (in ascending order) of two
+// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
 // `Natural`s, subtracts the second from the first, writing the `xs.len()` limbs of the result to an
 // output slice. Returns whether there was a borrow left over; that is, whether the second `Natural`
 // was greater than the first `Natural`. The output slice must be at least as long as either input
@@ -172,7 +172,7 @@ crate_test_fn! {limbs_sub_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: 
     limbs_sub_same_length_with_borrow_in_to_out(out, xs, ys, false)
 }}
 
-// Interpreting a two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s,
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s,
 // subtracts the second from the first, writing the `xs.len()` limbs of the result to an output
 // slice. Returns whether there was a borrow left over; that is, whether the second `Natural` was
 // greater than the first `Natural`. The output slice must be at least as long as the first input
@@ -312,7 +312,7 @@ crate_test_fn! {limbs_slice_sub_in_place_right(xs: &[Limb], ys: &mut [Limb], len
     }
 }}
 
-// Interpreting a of `Limb`s and a `Vec` of `Limb`s as the limbs (in ascending order) of two
+// Interpreting a slice of `Limb`s and a `Vec` of `Limb`s as the limbs (in ascending order) of two
 // `Natural`s, subtracts the second from the first, writing the `xs.len()` limbs of the result to
 // the `Vec`, possibly extending the `Vec`'s length. Returns whether there was a borrow left over;
 // that is, whether the second `Natural` was greater than the first `Natural`. The first slice must
@@ -321,10 +321,9 @@ crate_test_fn! {limbs_slice_sub_in_place_right(xs: &[Limb], ys: &mut [Limb], len
 // # Worst-case complexity
 // $T(n) = O(n)$
 //
-// $M(m) = O(m)$
+// $M(n) = O(n)$ (only if the `Vec` needs to reallocate)
 //
-// where $T$ is time, $M$ is additional memory, $n$ is `xs.len()`, and $m$ is `xs.len()` -
-// `ys.len()`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` is shorter than `ys`.
@@ -398,7 +397,7 @@ crate_test_fn! {limbs_sub_same_length_in_place_with_overlap(
 // where $T$ is time, $M$ is additional memory, and $n$ is `ys.len()`.
 //
 // # Panics
-// Panics if `xs.len()` is shorter than `ys.len()`.
+// Panics if `xs` is shorter than `ys`.
 //
 // This is equivalent to `mpn_sub_n` from `gmp.h`, GMP 6.2.1, where the output is a prefix of a
 // slice and the left operand of the subtraction is a suffix of the same slice, and the prefix and
@@ -423,7 +422,7 @@ crate_test_fn! {limbs_sub_same_length_to_out_with_overlap(xs: &mut [Limb], ys: &
     }
 }}
 
-// Interpreting a two equal-length slices of `Limb`s as the limbs (in ascending order) of two
+// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
 // `Natural`s, subtracts the second from the first, and then subtracts a borrow (`false` is 0,
 // `true` is 1), writing the `xs.len()` limbs of the result to an output slice. Returns whether
 // there was a borrow left over. The output slice must be at least as long as either input slice.
@@ -599,6 +598,9 @@ impl Sub<Self> for Natural {
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
+    /// # Panics
+    /// Panics if `other` is greater than `self`.
+    ///
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Pow;
@@ -635,6 +637,9 @@ impl Sub<&Self> for Natural {
     /// $M(n) = O(1)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `other` is greater than `self`.
     ///
     /// # Examples
     /// ```
@@ -673,6 +678,9 @@ impl Sub<Natural> for &Natural {
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     ///
+    /// # Panics
+    /// Panics if `other` is greater than `self`.
+    ///
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Pow;
@@ -708,6 +716,9 @@ impl Sub<&Natural> for &Natural {
     /// $M(n) = O(n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `other` is greater than `self`.
     ///
     /// # Examples
     /// ```

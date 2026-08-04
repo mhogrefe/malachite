@@ -431,6 +431,8 @@ private_test_fn! {limbs_count_ones<T: PrimitiveUnsigned>(xs: &[T]) -> u64 {
 // $T(n) = O(n\log\log n)$
 //
 // $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `n`.
 fn limbs_prime_sieve_generic<T: PrimitiveUnsigned, F: Fn(&mut [T], u64) -> u64>(
     bit_array: &mut [T],
     n: u64,

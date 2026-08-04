@@ -23,7 +23,7 @@ impl FromStr for RoundingMode {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ = `src.len()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `src.len()`.
     ///
     /// The worst case occurs when the input string is invalid and must be copied into an `Err`.
     ///

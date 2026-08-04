@@ -613,7 +613,9 @@ impl IsPrime for u16 {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`: trial
+    /// division by a bounded set of small primes, then a bounded number of Miller-Rabin rounds,
+    /// each a modular powering costing one or two modular multiplications per exponent bit.
     ///
     /// # Examples
     /// ```
@@ -670,7 +672,9 @@ impl IsPrime for u32 {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`: trial
+    /// division by a bounded set of small primes, then a bounded number of Miller-Rabin rounds,
+    /// each a modular powering costing one or two modular multiplications per exponent bit.
     ///
     /// # Examples
     /// ```
@@ -753,7 +757,9 @@ impl IsPrime for u64 {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`: trial
+    /// division by a bounded set of small primes, then a bounded number of Miller-Rabin rounds,
+    /// each a modular powering costing one or two modular multiplications per exponent bit.
     ///
     /// # Examples
     /// ```
@@ -836,7 +842,9 @@ impl IsPrime for usize {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`: trial
+    /// division by a bounded set of small primes, then a bounded number of Miller-Rabin rounds,
+    /// each a modular powering costing one or two modular multiplications per exponent bit.
     ///
     /// # Examples
     /// ```

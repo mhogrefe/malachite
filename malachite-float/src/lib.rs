@@ -11,6 +11,11 @@
 //! [`Float`]s are not yet feature-complete, but the functions that are implemented are thoroughly
 //! tested and documented.
 //!
+//! # Complexity conventions
+//! Functions in this crate are documented with worst-case time and additional-memory bounds,
+//! following the conventions described in the `malachite-base`
+//! [docs](https://docs.rs/malachite-base/latest/malachite_base/#complexity-conventions).
+//!
 //! # Demos and benchmarks
 //! This crate comes with a `bin` target that can be used for running demos and benchmarks.
 //! - Almost all of the public functions in this crate have an associated demo. Running a demo

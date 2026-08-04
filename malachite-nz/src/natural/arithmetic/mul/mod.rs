@@ -102,6 +102,12 @@ crate_test_fn! {limbs_mul(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     }
 }}
 
+// Scratch derivation: each band returns the requirement of the kernel that
+// `limbs_mul_same_length_to_out` dispatches to under the same conditions, so the two functions
+// must be kept in lockstep. The Toom-22 band returns a range maximum (an over-estimate, exact at
+// the top of the band) so that the whole recursion folds to a constant; every higher band is the
+// kernel's exact formula for this length. The basecase and FFT bands use no caller scratch (the
+// FFT allocates internally).
 crate_test_const_fn! { limbs_mul_same_length_to_out_scratch_len(len: usize) -> usize {
     if len < MUL_TOOM22_THRESHOLD {
         0
@@ -129,8 +135,9 @@ crate_test_const_fn! { limbs_mul_same_length_to_out_scratch_len(len: usize) -> u
 // Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
 // `Natural`s, writes the `2 * xs.len()` least-significant limbs of the product of the `Natural`s to
 // an output slice. The output must be at least as long as `2 * xs.len()`, `xs` must be as long as
-// `ys`, and neither slice can be empty. Returns the result limb at index `2 * xs.len() - 1` (which
-// may be zero).
+// `ys`, and neither slice can be empty. `scratch` must have length at least
+// `limbs_mul_same_length_to_out_scratch_len(xs.len())`. Returns the result limb at index
+// `2 * xs.len() - 1` (which may be zero).
 //
 // # Worst-case complexity
 // $T(n) = O(n \log n \log\log n)$
@@ -140,7 +147,8 @@ crate_test_const_fn! { limbs_mul_same_length_to_out_scratch_len(len: usize) -> u
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
-// Panics if `out` is too short, `xs` and `ys` have different lengths, or either slice is empty.
+// Panics if `out` is too short, `xs` and `ys` have different lengths, either slice is empty, or
+// `scratch` is too short.
 //
 // This is equivalent to `mpn_mul_n` from `mpn/generic/mul_n.c`, GMP 6.2.1.
 crate_test_fn! {limbs_mul_same_length_to_out(
@@ -186,6 +194,14 @@ crate_test_const_fn! {toom44_ok(xs_len: usize, ys_len: usize) -> bool {
     12 + 3 * xs_len < ys_len << 2
 }}
 
+// Scratch derivation: the branch structure below mirrors `limbs_mul_greater_to_out_old` exactly;
+// each branch returns the requirement of the kernel selected under the same conditions, so the
+// two functions must be kept in lockstep. In the unbalanced chunking branches (`xs` split into
+// `2 * ys.len()`-limb blocks), the first summand is the largest per-block kernel requirement —
+// including the final, differently-shaped block, whose length is recomputed here with the same
+// reduction loop — and the `4 * ys.len()` term pays for the block-product buffer that the chunks
+// are accumulated through. The basecase and FFT branches use no caller scratch (the FFT allocates
+// internally).
 crate_test_const_fn! { limbs_mul_greater_to_out_scratch_len(xs_len: usize, ys_len: usize) -> usize {
     assert!(xs_len >= ys_len);
     // `assert_ne!` is not usable in a `const fn`.
@@ -279,9 +295,11 @@ crate_test_const! {FFT_MUL_THRESHOLD: usize = 1000;}
 
 // Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 // the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
-// slice. The output must be at least as long as `xs.len() + ys.len()`, `xs` must be as least as
-// long as `ys`, and `ys` cannot be empty. Returns the result limb at index `xs.len() + ys.len() -
-// 1` (which may be zero).
+// slice. The output must be at least as long as `xs.len() + ys.len()`, `xs` must be at least as
+// long as `ys`, and `ys` cannot be empty. `scratch` must have length at least
+// `limbs_mul_greater_to_out_scratch_len(xs.len(), ys.len())` (the FFT path allocates internally,
+// and the formula returns 0 there). Returns the result limb at index `xs.len() + ys.len() - 1`
+// (which may be zero).
 //
 // # Worst-case complexity
 // $T(n) = O(n \log n \log\log n)$
@@ -291,7 +309,8 @@ crate_test_const! {FFT_MUL_THRESHOLD: usize = 1000;}
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
-// Panics if `out` is too short, `xs` is shorter than `ys`, or `ys` is empty.
+// Panics if `out` is too short, `xs` is shorter than `ys`, `ys` is empty, or `scratch` is too
+// short.
 //
 // This is _flint_mpn_mul from mpn_extras/mul.c, FLINT 3.3.0-dev.
 crate_test_fn! {limbs_mul_greater_to_out(
@@ -308,8 +327,16 @@ crate_test_fn! {limbs_mul_greater_to_out(
     if xs_len == ys_len {
         limbs_mul_same_length_to_out(out, xs, ys, scratch);
     } else if ys_len < FFT_MUL_THRESHOLD {
-        let mut scratch = vec![0; limbs_mul_greater_to_out_scratch_len(xs_len, ys_len)];
-        limbs_mul_greater_to_out_old(out, xs, ys, &mut scratch);
+        // A too-short `scratch` otherwise panics with an opaque error deep inside a Toom routine;
+        // fail clearly here instead. (`limbs_mul_greater_to_out_scratch_len` is exact for the
+        // unequal-length bands.)
+        assert!(
+            scratch.len() >= limbs_mul_greater_to_out_scratch_len(xs_len, ys_len),
+            "limbs_mul_greater_to_out: scratch too short (have {}, need {})",
+            scratch.len(),
+            limbs_mul_greater_to_out_scratch_len(xs_len, ys_len),
+        );
+        limbs_mul_greater_to_out_old(out, xs, ys, scratch);
     } else {
         mpn_mul_default_mpn_ctx(out, xs, ys, false);
     }
@@ -488,21 +515,22 @@ crate_test_fn! {limbs_mul_to_out(
 
 // Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 // the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
-// slice. The output must be at least as long as `xs.len() + ys.len()`, `xs` must be as least as
-// long as `ys`, and `ys` cannot be empty. Returns the result limb at index `xs.len() + ys.len() -
-// 1` (which may be zero).
+// slice. The output must be at least as long as `xs.len() + ys.len()`, `xs` must be at least as
+// long as `ys`, and `ys` cannot be empty.
 //
-// This uses the basecase, quadratic, schoolbook algorithm, and it is most critical code for
+// This uses the basecase, quadratic, schoolbook algorithm, and it is the most critical code for
 // multiplication. All multiplies rely on this, both small and huge. Small ones arrive here
 // immediately, and huge ones arrive here as this is the base case for Karatsuba's recursive
 // algorithm.
 //
 // # Worst-case complexity
-// $T(n) = O(n^2)$
+// $T(n, m) = O(nm)$
 //
-// $M(n) = O(1)$
+// $M(n, m) = O(1)$
 //
-// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
+// where $T$ is time, $M$ is additional memory, $n$ is `xs.len()`, and $m$ is `ys.len()`: one
+// `limbs_mul_limb` or `limbs_add_mul_limb` pass of length $n$ (plus $O(1)$) per limb of `ys`,
+// with no allocation.
 //
 // # Panics
 // Panics if `out` is too short, `xs` is shorter than `ys`, or `ys` is empty.

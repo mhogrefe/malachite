@@ -85,7 +85,11 @@ impl Seed {
     /// probability, generate different seeds.
     ///
     /// # Worst-case complexity
-    /// Constant time and additional memory.
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `key.len()`.
     ///
     /// # Examples
     /// ```

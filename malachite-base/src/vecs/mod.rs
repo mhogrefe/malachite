@@ -26,12 +26,12 @@ use rand_chacha::ChaCha20Rng;
 /// Using this function is more efficient than inserting the values one by one.
 ///
 /// # Worst-case complexity
-/// $T(n) = O(n + m)$
+/// $T(n, m) = O(n + m)$
 ///
-/// $M(n) = O(n + m)$
+/// $M(n, m) = O(n + m)$
 ///
-/// where $T$ is time, $M$ is additional memory, $n$ = `xs.len()` before the function is called, and
-/// $m$ = `pad_size`.
+/// where $T$ is time, $M$ is additional memory, $n$ is `xs.len()` before the function is called,
+/// and $m$ is `pad_size`.
 ///
 /// # Examples
 /// ```
@@ -54,12 +54,12 @@ pub fn vec_pad_left<T: Clone>(xs: &mut Vec<T>, pad_size: usize, pad_value: T) {
 /// Using this function is more efficient than deleting the values one by one.
 ///
 /// # Worst-case complexity
-/// $T(n) = O(\operatorname{max}(1, n - m))$
+/// $T(n, m) = O(\max(1, n - m))$
 ///
-/// $M(n) = O(1)$
+/// $M(n, m) = O(1)$
 ///
-/// where $T$ is time, $M$ is additional memory, $n$ = `xs.len()` before the function is called, and
-/// $m$ = `delete_size`.
+/// where $T$ is time, $M$ is additional memory, $n$ is `xs.len()` before the function is called,
+/// and $m$ is `delete_size`.
 ///
 /// # Panics
 /// Panics if `delete_size` is greater than `xs.len()`.

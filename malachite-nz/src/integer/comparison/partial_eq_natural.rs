@@ -17,7 +17,8 @@ impl PartialEq<Natural> for Integer {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where n = `min(self.significant_bits(), other.significant_bits())`
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `min(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -40,7 +41,8 @@ impl PartialEq<Integer> for Natural {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where n = `min(self.significant_bits(), other.significant_bits())`
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `min(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```

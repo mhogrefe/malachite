@@ -28,7 +28,7 @@ impl Sub<Self> for Integer {
     ///
     /// $M(n) = O(n)$ (only if the underlying [`Vec`] needs to reallocate)
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `min(self.significant_bits(),
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
     ///
     /// # Examples
@@ -217,6 +217,9 @@ impl SubAssign<Self> for Integer {
     /// $T(n) = O(n)$
     ///
     /// $M(n) = O(n)$ (only if the underlying [`Vec`] needs to reallocate)
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```

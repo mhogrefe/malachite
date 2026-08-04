@@ -2556,13 +2556,9 @@ where
 /// bits. See the unit tests for many examples.
 ///
 /// # Worst-case complexity
-/// $$
-/// T(k) = O(k)
-/// $$
+/// $T(k) = O(k)$
 ///
-/// $$
-/// M(k) = O(k)
-/// $$
+/// $M(k) = O(k)$
 ///
 /// where $T$ is time, $M$ is additional memory, and $k$ is the length of `pattern`. The memory
 /// usage is only linear when the pattern vector needs to be reallocated, which happens rarely.

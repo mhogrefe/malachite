@@ -52,11 +52,13 @@ macro_rules! impl_mod_power_of_2_inverse {
             /// $f(x, k) = y$, where $x, y < 2^k$, $x$ is odd, and $xy \equiv 1 \mod 2^k$.
             ///
             /// # Worst-case complexity
-            /// $T(n) = O(n)$
+            /// $T(n) = O(\log n)$
             ///
             /// $M(n) = O(1)$
             ///
-            /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`.
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `pow`: Hensel lifting
+            /// doubles the solved precision each iteration, so there are $O(\log n)$ iterations
+            /// of constant-cost word operations.
             ///
             /// # Panics
             /// Panics if `pow` is greater than `Self::WIDTH`, if `self` is zero, or if `self` is

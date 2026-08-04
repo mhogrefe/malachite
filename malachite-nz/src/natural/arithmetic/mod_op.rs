@@ -531,7 +531,7 @@ private_test_fn! {limbs_mod_divide_and_conquer(
 //
 // $M(n) = O(d(\log d)^2)$
 //
-// where $T$ is time, $M$ is additional memory, n$ is `ns.len()`, and $d$ is `ds.len()`.
+// where $T$ is time, $M$ is additional memory, $n$ is `ns.len()`, and $d$ is `ds.len()`.
 //
 // This is equivalent to `mpn_preinv_mu_div_qr` from `mpn/generic/mu_div_qr.c`, GMP 6.2.1, where
 // only the remainder is calculated.
@@ -632,7 +632,7 @@ fn limbs_mod_barrett_preinverted(
 //
 // $M(n) = O(n \log n)$
 //
-// where $T$ is time, $M$ is additional memory, and n$ is `ns.len()`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
 // This is equivalent to `mpn_mu_div_qr2` from `mpn/generic/mu_div_qr.c`, GMP 6.2.1, where only the
 // remainder is calculated.
@@ -680,7 +680,7 @@ private_test_fn! {limbs_mod_barrett_helper(
 //
 // $M(n) = O(n \log n)$
 //
-// where $T$ is time, $M$ is additional memory, and n$ is `ns.len()`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 fn limbs_mod_barrett_large_helper(
     qs: &mut [Limb],
     rs: &mut [Limb],
@@ -727,7 +727,7 @@ fn limbs_mod_barrett_large_helper(
 //
 // $M(n) = O(n \log n)$
 //
-// where $T$ is time, $M$ is additional memory, and n$ is `ns.len()`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
 // # Panics
 // Panics if `ds` has length smaller than 2, `ns.len()` is less than `ds.len()`, `qs` has length
@@ -761,7 +761,7 @@ private_test_fn! {limbs_mod_barrett(
 //
 // $M(n) = O(n)$
 //
-// where $T$ is time, $M$ is additional memory, and n$ is `ns.len()`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 fn limbs_mod_by_two_limb(ns: &[Limb], ds: &[Limb]) -> (Limb, Limb) {
     let n_len = ns.len();
     let ds_1 = ds[1];
@@ -806,7 +806,7 @@ fn limbs_mod_dc_condition(n_len: usize, d_len: usize) -> bool {
 //
 // $M(n) = O(n \log n)$
 //
-// where $T$ is time, $M$ is additional memory, and n$ is `ns.len()`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 fn limbs_mod_unbalanced(rs: &mut [Limb], ns: &[Limb], ds: &[Limb], adjusted_n_len: usize) {
     let mut n_len = ns.len();
     let d_len = ds.len();
@@ -869,7 +869,7 @@ fn limbs_mod_unbalanced(rs: &mut [Limb], ns: &[Limb], ds: &[Limb], adjusted_n_le
 //
 // $M(n) = O(n \log n)$
 //
-// where $T$ is time, $M$ is additional memory, and n$ is `ns.len()`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
 // # Panics
 // Panics if `ns` is shorter than `ds`, `ds` has length less than 2, or the most-significant limb of
@@ -894,7 +894,7 @@ private_test_fn! {limbs_mod(ns: &[Limb], ds: &[Limb]) -> Vec<Limb> {
 //
 // $M(n) = O(n \log n)$
 //
-// where $T$ is time, $M$ is additional memory, and n$ is `ns.len()`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 //
 // # Panics
 // Panics if `rs` is too short, `ns` is shorter than `ds`, `ds` has length less than 2, or the

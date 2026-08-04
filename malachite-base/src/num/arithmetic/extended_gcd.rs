@@ -199,12 +199,16 @@ macro_rules! impl_extended_gcd {
             ///   and $y \leq \lfloor a/g \rfloor$.
             ///
             /// # Worst-case complexity
-            /// $T(n) = O(n^2)$
+            /// $T(n) = O(n)$
             ///
-            /// $M(n) = O(n)$
+            /// $M(n) = O(1)$
             ///
             /// where $T$ is time, $M$ is additional memory, and $n$ is
-            /// `max(self.significant_bits(), other.significant_bits())`.
+            /// `max(self.significant_bits(), other.significant_bits())`: this is the extended
+            /// Euclidean algorithm on words, whose $O(n)$ iterations (the remainder at least
+            /// halves every two division steps, and the subtract-only fast path is taken only
+            /// when the quotient is below 4) each cost $O(1)$ word operations, with no
+            /// allocation.
             ///
             /// # Examples
             /// See [here](super::extended_gcd#extended_gcd).
@@ -234,12 +238,16 @@ macro_rules! impl_extended_gcd {
             ///   and $y \leq \lfloor a/g \rfloor$.
             ///
             /// # Worst-case complexity
-            /// $T(n) = O(n^2)$
+            /// $T(n) = O(n)$
             ///
-            /// $M(n) = O(n)$
+            /// $M(n) = O(1)$
             ///
             /// where $T$ is time, $M$ is additional memory, and $n$ is
-            /// `max(self.significant_bits(), other.significant_bits())`.
+            /// `max(self.significant_bits(), other.significant_bits())`: this is the extended
+            /// Euclidean algorithm on words, whose $O(n)$ iterations (the remainder at least
+            /// halves every two division steps, and the subtract-only fast path is taken only
+            /// when the quotient is below 4) each cost $O(1)$ word operations, with no
+            /// allocation.
             ///
             /// # Examples
             /// See [here](super::extended_gcd#extended_gcd).

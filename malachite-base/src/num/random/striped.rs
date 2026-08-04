@@ -309,7 +309,7 @@ impl<T: PrimitiveSigned> Iterator for StripedRandomNegativeSigneds<T> {
 ///
 /// $M(n) = O(n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and `n` is the width of the type.
+/// where $T$ is time, $M$ is additional memory, and $n$ is the width of the type.
 ///
 /// # Panics
 /// Panics if `m_denominator` is zero or if m_numerator <= m_denominator.
@@ -352,7 +352,7 @@ pub fn striped_random_unsigneds<T: PrimitiveUnsigned>(
 ///
 /// $M(n) = O(n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and `n` is the width of the type.
+/// where $T$ is time, $M$ is additional memory, and $n$ is the width of the type.
 ///
 /// # Panics
 /// Panics if `m_denominator` is zero or if m_numerator <= m_denominator.
@@ -397,7 +397,7 @@ pub fn striped_random_positive_unsigneds<T: PrimitiveUnsigned>(
 ///
 /// $M(n) = O(n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and `n` is the width of the type.
+/// where $T$ is time, $M$ is additional memory, and $n$ is the width of the type.
 ///
 /// # Panics
 /// Panics if `m_denominator` is zero or if m_numerator <= m_denominator.
@@ -444,7 +444,7 @@ pub fn striped_random_signeds<T: PrimitiveSigned>(
 ///
 /// $M(n) = O(n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and `n` is the width of the type.
+/// where $T$ is time, $M$ is additional memory, and $n$ is the width of the type.
 ///
 /// # Panics
 /// Panics if `m_denominator` is zero or if m_numerator <= m_denominator.
@@ -489,7 +489,7 @@ pub fn striped_random_natural_signeds<T: PrimitiveSigned>(
 ///
 /// $M(n) = O(n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and `n` is the width of the type.
+/// where $T$ is time, $M$ is additional memory, and $n$ is the width of the type.
 ///
 /// # Panics
 /// Panics if `m_denominator` is zero or if m_numerator <= m_denominator.
@@ -536,7 +536,7 @@ pub fn striped_random_positive_signeds<T: PrimitiveSigned>(
 ///
 /// $M(n) = O(n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and `n` is the width of the type.
+/// where $T$ is time, $M$ is additional memory, and $n$ is the width of the type.
 ///
 /// # Panics
 /// Panics if `m_denominator` is zero or if m_numerator <= m_denominator.
@@ -582,7 +582,7 @@ pub fn striped_random_negative_signeds<T: PrimitiveSigned>(
 ///
 /// $M(n) = O(n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and `n` is the width of the type.
+/// where $T$ is time, $M$ is additional memory, and $n$ is the width of the type.
 ///
 /// # Panics
 /// Panics if `m_denominator` is zero or if m_numerator <= m_denominator.
@@ -627,7 +627,7 @@ pub fn striped_random_nonzero_signeds<T: PrimitiveSigned>(
 ///
 /// $M(n) = O(n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and `n` is `chunk_size`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `chunk_size`.
 ///
 /// # Panics
 /// Panics if `m_denominator` is zero, if m_numerator <= m_denominator, or if `chunk_size` is
@@ -674,7 +674,7 @@ pub fn striped_random_unsigned_bit_chunks<T: PrimitiveUnsigned>(
 ///
 /// $M(n) = O(n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and `n` is `len`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `len`.
 ///
 /// # Examples
 /// ```
@@ -958,11 +958,11 @@ pub fn striped_random_bool_vecs_min_length(
 /// $$
 ///
 /// # Expected complexity per iteration
-/// $T(n) = O(b)$
+/// $T(b) = O(b)$
 ///
-/// $M(n) = O(b)$
+/// $M(b) = O(b)$
 ///
-/// where $T$ is time and $M$ is additional memory.
+/// where $T$ is time, $M$ is additional memory, and $b$ is `b`.
 ///
 /// # Panics
 /// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <=
@@ -1021,11 +1021,11 @@ pub fn striped_random_bool_vecs_length_range(
 /// $$
 ///
 /// # Expected complexity per iteration
-/// $T(n) = O(b)$
+/// $T(b) = O(b)$
 ///
-/// $M(n) = O(b)$
+/// $M(b) = O(b)$
 ///
-/// where $T$ is time and $M$ is additional memory.
+/// where $T$ is time, $M$ is additional memory, and $b$ is `b`.
 ///
 /// # Panics
 /// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <=
@@ -1398,11 +1398,11 @@ pub fn striped_random_unsigned_vecs_min_length<T: PrimitiveUnsigned>(
 /// $$
 ///
 /// # Expected complexity per iteration
-/// $T(n) = O(b)$
+/// $T(b) = O(b)$
 ///
-/// $M(n) = O(b)$
+/// $M(b) = O(b)$
 ///
-/// where $T$ is time and $M$ is additional memory.
+/// where $T$ is time, $M$ is additional memory, and $b$ is `b`.
 ///
 /// # Panics
 /// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <=
@@ -1460,11 +1460,11 @@ pub fn striped_random_unsigned_vecs_length_range<T: PrimitiveUnsigned>(
 /// $$
 ///
 /// # Expected complexity per iteration
-/// $T(n) = O(b)$
+/// $T(b) = O(b)$
 ///
-/// $M(n) = O(b)$
+/// $M(b) = O(b)$
 ///
-/// where $T$ is time and $M$ is additional memory.
+/// where $T$ is time, $M$ is additional memory, and $b$ is `b`.
 ///
 /// # Panics
 /// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <=

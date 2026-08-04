@@ -155,9 +155,9 @@ pub fn random_strings_using_chars<I: Iterator<Item = char>>(
 /// $$
 ///
 /// # Expected complexity per iteration
-/// $T(n) = O(m)$
+/// $T(m) = O(m)$
 ///
-/// $M(n) = O(m)$
+/// $M(m) = O(m)$
 ///
 /// where $T$ is time, $M$ is additional memory, and $m$ is `mean_length_numerator /
 /// mean_length_denominator`.

@@ -64,7 +64,10 @@ use malachite_nz::test_util::generators::{
 };
 use malachite_nz::test_util::natural::arithmetic::mul::{
     initialize_context, limbs_mul_greater_to_out_basecase_mem_opt, limbs_product_naive,
-    mul_slow_fft, natural_product_naive,
+    mul_dispatch_thresholds, mul_slow_fft, natural_product_naive,
+};
+use malachite_nz::test_util::scratch::{
+    canary_limbs, scratch_high_water, threshold_straddling_lengths,
 };
 use num::BigUint;
 use rug;
@@ -12951,4 +12954,63 @@ fn product_properties() {
         assert_eq!(Natural::product([&x, &y].into_iter()), product);
         assert_eq!(Natural::product([x, y].into_iter()), product);
     });
+}
+
+// Scratch-sizing canaries for the mul dispatchers (see DOC-AUDIT.md): run every input shape with
+// a scratch of exactly the advertised length, densely sampling every dispatch-threshold boundary.
+// An under-sized scratch formula panics inside a kernel (the failure mode of the 2026-08-02
+// `limbs_mul_high_same_length_scratch_len` bug); the high-water measurement bounds what the
+// function actually touched, and the product is checked against `Natural` multiplication to catch
+// any scratch-related corruption.
+#[test]
+fn test_limbs_mul_same_length_to_out_scratch_sizing() {
+    let thresholds = mul_dispatch_thresholds();
+    let max = thresholds.iter().copied().max().unwrap() + 20;
+    for len in threshold_straddling_lengths(&thresholds, 1, max, 2) {
+        let xs = canary_limbs("mul canary xs", len);
+        let ys = canary_limbs("mul canary ys", len);
+        let expected = Natural::from_limbs_asc(&xs) * Natural::from_limbs_asc(&ys);
+        let mut out = vec![0; len << 1];
+        let scratch_len = limbs_mul_same_length_to_out_scratch_len(len);
+        let high_water = scratch_high_water(scratch_len, |scratch| {
+            limbs_mul_same_length_to_out(&mut out, &xs, &ys, scratch);
+        });
+        assert!(high_water <= scratch_len);
+        assert_eq!(Natural::from_owned_limbs_asc(out), expected);
+    }
+}
+
+#[test]
+fn test_limbs_mul_greater_to_out_scratch_sizing() {
+    let thresholds = mul_dispatch_thresholds();
+    // The unbalanced dispatch's bands are all below `MUL_FFT_THRESHOLD` mean length; above that
+    // the FFT path allocates internally and the advertised scratch length is 0. Sweep the ratio
+    // space over the sub-FFT bands, then spot-check the FFT band.
+    for ys_len in threshold_straddling_lengths(&thresholds, 1, 330, 2) {
+        for ratio_halves in 3..=9 {
+            let xs_len = ys_len * ratio_halves / 2 + (ratio_halves & 1);
+            let xs = canary_limbs("mul canary xs", xs_len);
+            let ys = canary_limbs("mul canary ys", ys_len);
+            let expected = Natural::from_limbs_asc(&xs) * Natural::from_limbs_asc(&ys);
+            let mut out = vec![0; xs_len + ys_len];
+            let scratch_len = limbs_mul_greater_to_out_scratch_len(xs_len, ys_len);
+            let high_water = scratch_high_water(scratch_len, |scratch| {
+                limbs_mul_greater_to_out(&mut out, &xs, &ys, scratch);
+            });
+            assert!(high_water <= scratch_len);
+            assert_eq!(Natural::from_owned_limbs_asc(out), expected);
+        }
+    }
+    for (xs_len, ys_len) in [(460, 445), (900, 899), (900, 30), (1200, 600), (2000, 1999)] {
+        let xs = canary_limbs("mul canary xs", xs_len);
+        let ys = canary_limbs("mul canary ys", ys_len);
+        let expected = Natural::from_limbs_asc(&xs) * Natural::from_limbs_asc(&ys);
+        let mut out = vec![0; xs_len + ys_len];
+        let scratch_len = limbs_mul_greater_to_out_scratch_len(xs_len, ys_len);
+        let high_water = scratch_high_water(scratch_len, |scratch| {
+            limbs_mul_greater_to_out(&mut out, &xs, &ys, scratch);
+        });
+        assert!(high_water <= scratch_len);
+        assert_eq!(Natural::from_owned_limbs_asc(out), expected);
+    }
 }

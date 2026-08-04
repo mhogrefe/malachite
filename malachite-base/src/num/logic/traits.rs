@@ -81,7 +81,7 @@ pub trait BitBlockAccess: Sized {
     /// For the default implementation, same as [`get_bits`](Self::get_bits).
     ///
     /// # Panics
-    /// For the default implementation, ee panics for [`get_bits`](Self::get_bits).
+    /// For the default implementation, see panics for [`get_bits`](Self::get_bits).
     ///
     /// # Examples
     /// ```

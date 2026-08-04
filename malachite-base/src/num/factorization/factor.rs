@@ -886,9 +886,12 @@ impl Factor for u16 {
     /// # Worst-case complexity
     /// $T(n) = O(2^{n/4})$
     ///
-    /// $M(n) = O(2^n)$
+    /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`: after
+    /// bounded trial division and perfect-power detection, the cost is dominated by SQUFOF, whose
+    /// (heuristic) running time is $O(\sqrt\[4\]{x})$ for input $x$; all working state is in
+    /// fixed-size arrays, so no memory is allocated.
     ///
     /// # Panics
     /// Panics if `self` is 0.
@@ -923,9 +926,12 @@ impl Factor for u32 {
     /// # Worst-case complexity
     /// $T(n) = O(2^{n/4})$
     ///
-    /// $M(n) = O(2^n)$
+    /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`: after
+    /// bounded trial division and perfect-power detection, the cost is dominated by SQUFOF, whose
+    /// (heuristic) running time is $O(\sqrt\[4\]{x})$ for input $x$; all working state is in
+    /// fixed-size arrays, so no memory is allocated.
     ///
     /// # Panics
     /// Panics if `self` is 0.
@@ -1007,9 +1013,12 @@ impl Factor for u64 {
     /// # Worst-case complexity
     /// $T(n) = O(2^{n/4})$
     ///
-    /// $M(n) = O(2^n)$
+    /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`: after
+    /// bounded trial division and perfect-power detection, the cost is dominated by SQUFOF, whose
+    /// (heuristic) running time is $O(\sqrt\[4\]{x})$ for input $x$; all working state is in
+    /// fixed-size arrays, so no memory is allocated.
     ///
     /// # Panics
     /// Panics if `self` is 0.
@@ -1096,9 +1105,12 @@ impl Factor for usize {
     /// # Worst-case complexity
     /// $T(n) = O(2^{n/4})$
     ///
-    /// $M(n) = O(2^n)$
+    /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`: after
+    /// bounded trial division and perfect-power detection, the cost is dominated by SQUFOF, whose
+    /// (heuristic) running time is $O(\sqrt\[4\]{x})$ for input $x$; all working state is in
+    /// fixed-size arrays, so no memory is allocated.
     ///
     /// # Panics
     /// Panics if `self` is 0.

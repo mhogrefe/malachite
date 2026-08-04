@@ -136,12 +136,15 @@ macro_rules! impl_gcd {
             /// $$
             ///
             /// # Worst-case complexity
-            /// $T(n) = O(n^2)$
+            /// $T(n) = O(n)$
             ///
-            /// $M(n) = O(n)$
+            /// $M(n) = O(1)$
             ///
             /// where $T$ is time, $M$ is additional memory, and $n$ is
-            /// `max(self.significant_bits(), other.significant_bits())`.
+            /// `max(self.significant_bits(), other.significant_bits())`: this is binary GCD, and
+            /// each subtract-and-shift iteration removes at least one bit from one of the
+            /// operands, so there are $O(n)$ iterations of constant-cost word operations, with no
+            /// allocation.
             ///
             /// # Examples
             /// See [here](super::gcd#gcd).
@@ -162,12 +165,15 @@ macro_rules! impl_gcd {
             /// $$
             ///
             /// # Worst-case complexity
-            /// $T(n) = O(n^2)$
+            /// $T(n) = O(n)$
             ///
-            /// $M(n) = O(n)$
+            /// $M(n) = O(1)$
             ///
             /// where $T$ is time, $M$ is additional memory, and $n$ is
-            /// `max(self.significant_bits(), other.significant_bits())`.
+            /// `max(self.significant_bits(), other.significant_bits())`: this is binary GCD, and
+            /// each subtract-and-shift iteration removes at least one bit from one of the
+            /// operands, so there are $O(n)$ iterations of constant-cost word operations, with no
+            /// allocation.
             ///
             /// # Examples
             /// See [here](super::gcd#gcd_assign).

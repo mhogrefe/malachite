@@ -45,7 +45,7 @@ use malachite_base::rounding_modes::RoundingMode::*;
 ///
 /// $M(n) = O(n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and `n` is `bits`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `bits`.
 ///
 /// # Examples
 /// ```
@@ -96,7 +96,7 @@ pub fn get_random_natural_with_up_to_bits(xs: &mut RandomPrimitiveInts<u64>, bit
 ///
 /// $M(n) = O(n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and `n` is `bits`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `bits`.
 ///
 /// # Examples
 /// ```
@@ -141,7 +141,7 @@ pub fn get_random_natural_with_bits(xs: &mut RandomPrimitiveInts<u64>, bits: u64
 ///
 /// $M(n) = O(n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and `n` is `bits`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `bits`.
 ///
 /// # Examples
 /// ```
@@ -173,7 +173,7 @@ pub fn get_striped_random_natural_with_up_to_bits(xs: &mut StripedBitSource, bit
 ///
 /// $M(n) = O(n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and `n` is `bits`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `bits`.
 ///
 /// # Examples
 /// ```
@@ -549,7 +549,7 @@ pub fn random_naturals_less_than(seed: Seed, limit: Natural) -> RandomNaturalsLe
 ///
 /// $M(n) = O(n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and `n` is `limit.significant_bits()`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `limit.significant_bits()`.
 ///
 /// # Examples
 /// ```

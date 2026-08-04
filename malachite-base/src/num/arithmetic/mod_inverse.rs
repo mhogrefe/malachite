@@ -159,12 +159,14 @@ macro_rules! impl_mod_inverse {
             /// $f(x, m) = y$, where $x, y < m$, $\gcd(x, y) = 1$, and $xy \equiv 1 \mod m$.
             ///
             /// # Worst-case complexity
-            /// $T(n) = O(n^2)$
+            /// $T(n) = O(n)$
             ///
-            /// $M(n) = O(n)$
+            /// $M(n) = O(1)$
             ///
             /// where $T$ is time, $M$ is additional memory, and $n$ is
-            /// `max(self.significant_bits(), m.significant_bits())`.
+            /// `max(self.significant_bits(), m.significant_bits())`: the extended Euclidean
+            /// algorithm on words performs $O(n)$ iterations of constant-cost word operations,
+            /// with no allocation.
             ///
             /// # Panics
             /// Panics if `self` is greater than or equal to `m`.

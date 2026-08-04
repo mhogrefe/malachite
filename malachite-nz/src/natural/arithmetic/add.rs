@@ -325,7 +325,7 @@ crate_test_fn! {limbs_add_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> 
 //
 // $M(n) = O(1)$
 //
-// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `ys.len()`.
 //
 // # Panics
 // Panics if `xs` is shorter than `ys` or `xs_len` is greater than `ys.len()`.
@@ -441,10 +441,9 @@ crate_test_fn! {limbs_slice_add_greater_in_place_left(xs: &mut [Limb], ys: &[Lim
 // # Worst-case complexity
 // $T(n) = O(n)$
 //
-// $M(m) = O(m)$
+// $M(n) = O(n)$ (only if the `Vec` needs to reallocate)
 //
-// where $T$ is time, $M$ is additional memory, $n$ is `max(xs.len(), ys.len())`, and $m$ is `max(1,
-// ys.len() - xs.len())`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // This is equivalent to `mpz_add` from `mpz/aors.h`, GMP 6.2.1, where both inputs are non-negative
 // and the output is written to the first input.
@@ -482,7 +481,7 @@ crate_test_fn! {limbs_vec_add_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
 //
 // $M(n) = O(1)$
 //
-// where $T$ is time, $M$ is additional memory, and $n$ is `min(xs.len(), ys.len())`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // This is equivalent to `mpn_add` from `gmp.h`, GMP 6.2.1, where the output is written to the
 // longer input.
@@ -507,7 +506,7 @@ private_test_fn! {limbs_slice_add_in_place_either(
 //
 // $M(n) = O(n)$ (only if the `Vec` reallocates)
 //
-// where $T$ is time, $M$ is additional memory, and $n$ is `min(xs.len(), ys.len())`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // This is equivalent to `mpz_add` from `mpz/aors.h`, GMP 6.2.1, where both inputs are non-negative
 // and the output is written to the longer input.
@@ -648,7 +647,7 @@ impl Add<Self> for Natural {
     ///
     /// $M(n) = O(n)$ (only if the underlying [`Vec`] needs to reallocate)
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `min(self.significant_bits(),
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
     ///
     /// # Examples
@@ -800,7 +799,7 @@ impl AddAssign<Self> for Natural {
     ///
     /// $M(n) = O(n)$ (only if the underlying [`Vec`] needs to reallocate)
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `min(self.significant_bits(),
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
     ///
     /// # Examples

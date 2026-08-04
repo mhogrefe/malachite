@@ -310,12 +310,14 @@ macro_rules! impl_symbols {
             /// $$
             ///
             /// # Worst-case complexity
-            /// $T(n) = O(n^2)$
+            /// $T(n) = O(n)$
             ///
-            /// $M(n) = O(n)$
+            /// $M(n) = O(1)$
             ///
             /// where $T$ is time, $M$ is additional memory, and $n$ is
-            /// `max(self.significant_bits(), other.significant_bits())`.
+            /// `max(self.significant_bits(), other.significant_bits())`: binary-Jacobi reduction
+            /// on words, where each mod-and-swap or subtract-and-shift step removes at least one
+            /// bit, giving $O(n)$ iterations of constant-cost word operations with no allocation.
             ///
             /// # Panics
             /// Panics if `n` is even.
@@ -339,12 +341,14 @@ macro_rules! impl_symbols {
             /// $$
             ///
             /// # Worst-case complexity
-            /// $T(n) = O(n^2)$
+            /// $T(n) = O(n)$
             ///
-            /// $M(n) = O(n)$
+            /// $M(n) = O(1)$
             ///
             /// where $T$ is time, $M$ is additional memory, and $n$ is
-            /// `max(self.significant_bits(), other.significant_bits())`.
+            /// `max(self.significant_bits(), other.significant_bits())`: binary-Jacobi reduction
+            /// on words, where each mod-and-swap or subtract-and-shift step removes at least one
+            /// bit, giving $O(n)$ iterations of constant-cost word operations with no allocation.
             ///
             /// # Panics
             /// Panics if `n` is even or negative.
@@ -365,12 +369,14 @@ macro_rules! impl_symbols {
             /// $$
             ///
             /// # Worst-case complexity
-            /// $T(n) = O(n^2)$
+            /// $T(n) = O(n)$
             ///
-            /// $M(n) = O(n)$
+            /// $M(n) = O(1)$
             ///
             /// where $T$ is time, $M$ is additional memory, and $n$ is
-            /// `max(self.significant_bits(), other.significant_bits())`.
+            /// `max(self.significant_bits(), other.significant_bits())`: binary-Jacobi reduction
+            /// on words, where each mod-and-swap or subtract-and-shift step removes at least one
+            /// bit, giving $O(n)$ iterations of constant-cost word operations with no allocation.
             ///
             /// # Panics
             /// Panics if `n` is even.
@@ -391,12 +397,14 @@ macro_rules! impl_symbols {
             /// $$
             ///
             /// # Worst-case complexity
-            /// $T(n) = O(n^2)$
+            /// $T(n) = O(n)$
             ///
-            /// $M(n) = O(n)$
+            /// $M(n) = O(1)$
             ///
             /// where $T$ is time, $M$ is additional memory, and $n$ is
-            /// `max(self.significant_bits(), other.significant_bits())`.
+            /// `max(self.significant_bits(), other.significant_bits())`: binary-Jacobi reduction
+            /// on words, where each mod-and-swap or subtract-and-shift step removes at least one
+            /// bit, giving $O(n)$ iterations of constant-cost word operations with no allocation.
             ///
             /// # Examples
             /// See [here](super::kronecker_symbol#kronecker_symbol).
@@ -414,12 +422,14 @@ macro_rules! impl_symbols {
             /// $$
             ///
             /// # Worst-case complexity
-            /// $T(n) = O(n^2)$
+            /// $T(n) = O(n)$
             ///
-            /// $M(n) = O(n)$
+            /// $M(n) = O(1)$
             ///
             /// where $T$ is time, $M$ is additional memory, and $n$ is
-            /// `max(self.significant_bits(), other.significant_bits())`.
+            /// `max(self.significant_bits(), other.significant_bits())`: binary-Jacobi reduction
+            /// on words, where each mod-and-swap or subtract-and-shift step removes at least one
+            /// bit, giving $O(n)$ iterations of constant-cost word operations with no allocation.
             ///
             /// # Examples
             /// See [here](super::kronecker_symbol#kronecker_symbol).
@@ -441,12 +451,14 @@ macro_rules! impl_jacobi_symbol_unsigned {
         /// $$
         ///
         /// # Worst-case complexity
-        /// $T(n) = O(n^2)$
+        /// $T(n) = O(n)$
         ///
-        /// $M(n) = O(n)$
+        /// $M(n) = O(1)$
         ///
         /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
-        /// other.significant_bits())`.
+        /// other.significant_bits())`: binary-Jacobi reduction on words, where each mod-and-swap
+        /// or subtract-and-shift step removes at least one bit, giving $O(n)$ iterations of
+        /// constant-cost word operations with no allocation.
         ///
         /// # Panics
         /// Panics if `n` is even or negative.

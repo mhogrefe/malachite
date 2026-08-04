@@ -12,3 +12,4 @@ pub mod extra_variadic;
 pub mod generators;
 pub mod integer;
 pub mod natural;
+pub mod scratch;

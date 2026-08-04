@@ -36,6 +36,25 @@
 //!   of [`Eq`], [`Ord`], and [`Display`](std::fmt::Display) for floating-point values which are in
 //!   some ways nicer than the defaults.
 //!
+//! # Complexity conventions
+//! Most functions in Malachite come with a "Worst-case complexity" section stating time and
+//! additional-memory bounds, like $T(n) = O(n \log n \log\log n)$ and $M(n) = O(n)$, along with a
+//! line defining each variable. The model is a word RAM: time counts operations on machine words
+//! (an operation on any primitive type up to `u128` compiles to a bounded number of native
+//! instructions, so it counts as one step), and additional memory counts words allocated beyond
+//! the inputs and the output.
+//!
+//! Since primitive-integer inputs are bounded, every function on them technically runs in
+//! constant time. The complexity sections are written to be more informative than that:
+//! - "Constant time and additional memory" means the operation count is bounded independently of
+//!   the type's width and of the inputs' values.
+//! - Otherwise, the bound is written in terms of variables, describing how the work would scale
+//!   if the same algorithm were instantiated at an arbitrarily large width. For example,
+//!   [`mod_pow`](num::arithmetic::traits::ModPow::mod_pow) for primitive types is documented as
+//!   $T(n) = O(n)$, where $n$ is `exp.significant_bits()`: the work scales with the exponent's
+//!   bit length. Every such variable is bounded by the type's width, so these bounds may be read
+//!   as constants; the variable form tells you what the constant depends on.
+//!
 //! # Demos and benchmarks
 //! This crate comes with a `bin` target that can be used for running demos and benchmarks.
 //! - Almost all of the public functions in this crate have an associated demo. Running a demo

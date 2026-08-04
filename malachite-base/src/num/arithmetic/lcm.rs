@@ -60,12 +60,14 @@ macro_rules! impl_lcm {
             /// $$
             ///
             /// # Worst-case complexity
-            /// $T(n) = O(n^2)$
+            /// $T(n) = O(n)$
             ///
-            /// $M(n) = O(n)$
+            /// $M(n) = O(1)$
             ///
             /// where $T$ is time, $M$ is additional memory, and $n$ is
-            /// `max(self.significant_bits(), other.significant_bits())`.
+            /// `max(self.significant_bits(), other.significant_bits())`: the cost is dominated by
+            /// the binary GCD, which performs $O(n)$ constant-cost word operations, with no
+            /// allocation.
             ///
             /// # Panics
             /// Panics if the result is too large to be represented.
@@ -94,12 +96,14 @@ macro_rules! impl_lcm {
             /// where $W$ is `Self::WIDTH`.
             ///
             /// # Worst-case complexity
-            /// $T(n) = O(n^2)$
+            /// $T(n) = O(n)$
             ///
-            /// $M(n) = O(n)$
+            /// $M(n) = O(1)$
             ///
             /// where $T$ is time, $M$ is additional memory, and $n$ is
-            /// `max(self.significant_bits(), other.significant_bits())`.
+            /// `max(self.significant_bits(), other.significant_bits())`: the cost is dominated by
+            /// the binary GCD, which performs $O(n)$ constant-cost word operations, with no
+            /// allocation.
             ///
             /// # Examples
             /// See [here](super::lcm#checked_lcm).

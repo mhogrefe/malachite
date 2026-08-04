@@ -110,7 +110,7 @@ impl Iterator for WeightedRandomBools {
 ///
 /// $M(n) = O(1)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ = `p_denominator.significant_bits()`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `p_denominator.significant_bits()`.
 ///
 /// # Examples
 /// ```
@@ -152,7 +152,7 @@ pub fn weighted_random_bools(
 ///
 /// $M(n) = O(1)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ = `p_denominator.significant_bits()`.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `p_denominator.significant_bits()`.
 ///
 /// # Examples
 /// ```

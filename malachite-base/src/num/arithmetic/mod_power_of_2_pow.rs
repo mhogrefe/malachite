@@ -45,6 +45,8 @@ macro_rules! impl_mod_power_of_2_pow {
             /// $M(n) = O(1)$
             ///
             /// where $T$ is time, $M$ is additional memory, and $n$ is `exp.significant_bits()`.
+            /// The square-and-multiply ladder performs one or two modular multiplications per
+            /// exponent bit.
             ///
             /// # Panics
             /// Panics if `pow` is greater than `Self::WIDTH` or if `self` is greater than or equal
@@ -70,6 +72,8 @@ macro_rules! impl_mod_power_of_2_pow {
             /// $M(n) = O(1)$
             ///
             /// where $T$ is time, $M$ is additional memory, and $n$ is `exp.significant_bits()`.
+            /// The square-and-multiply ladder performs one or two modular multiplications per
+            /// exponent bit.
             ///
             /// # Panics
             /// Panics if `pow` is greater than `Self::WIDTH` or if `self` is greater than or equal

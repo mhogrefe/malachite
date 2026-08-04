@@ -53,6 +53,17 @@ fn mod_pow_full_width<T: PrimitiveUnsigned>(
 //   both behaviors are anyway outside the odd-prime domain.)
 //
 // See `mod_sqrt_ref_ref` in `malachite-nz` for the structure; this is the same algorithm.
+//
+// # Worst-case complexity
+// $T(n) = O(n^2)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`: the fast cases
+// are a single $O(n)$ modular powering, and the general Tonelli-Shanks loop runs at most $n$
+// times with an inner adjustment chain of at most $n$ squarings, all on words. The bound assumes
+// that the quadratic-nonresidue search does not dominate; under the extended Riemann hypothesis
+// the search inspects $O((\log m)^2)$ candidates.
 private_test_fn! {mod_sqrt_unsigned<
     T: CheckedSqrt<Output = T> + JacobiSymbol<T> + PrimitiveUnsigned,
 >(
@@ -170,7 +181,13 @@ macro_rules! impl_mod_sqrt {
             /// $f(x, m) = y$, where $x, y < m$ and $y^2 \equiv x \mod m$, if such a $y$ is found.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n^2)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+            /// The bound assumes that the quadratic-nonresidue search does not dominate; under
+            /// the extended Riemann hypothesis the search inspects $O((\log m)^2)$ candidates.
             ///
             /// # Panics
             /// Panics if `self` is greater than or equal to `m`.
@@ -213,7 +230,13 @@ macro_rules! impl_mod_sqrt_promoted {
             /// $f(x, m) = y$, where $x, y < m$ and $y^2 \equiv x \mod m$, if such a $y$ is found.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n^2)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`.
+            /// The bound assumes that the quadratic-nonresidue search does not dominate; under
+            /// the extended Riemann hypothesis the search inspects $O((\log m)^2)$ candidates.
             ///
             /// # Panics
             /// Panics if `self` is greater than or equal to `m`.
@@ -254,7 +277,13 @@ impl ModSqrt<Self> for usize {
     /// $f(x, m) = y$, where $x, y < m$ and $y^2 \equiv x \mod m$, if such a $y$ is found.
     ///
     /// # Worst-case complexity
-    /// Constant time and additional memory.
+    /// $T(n) = O(n^2)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `m.significant_bits()`. The bound
+    /// assumes that the quadratic-nonresidue search does not dominate; under the extended Riemann
+    /// hypothesis the search inspects $O((\log m)^2)$ candidates.
     ///
     /// # Panics
     /// Panics if `self` is greater than or equal to `m`.

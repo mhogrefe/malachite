@@ -111,7 +111,7 @@ impl Primorial for Natural {
     /// it computes the primorial of the $n$th prime.
     ///
     /// $$
-    /// f(n) = n\\# =prod_{pleq natop p\\text {prime}} p.
+    /// f(n) = n\\# = \prod_{p \leq n \atop p \\text{ prime}} p.
     /// $$
     ///
     /// $n\\# = O(e^{(1+o(1))n})$.
@@ -120,6 +120,8 @@ impl Primorial for Natural {
     /// $T(n) = O(n \log n \log\log n)$
     ///
     /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `n`.
     ///
     /// # Examples
     /// ```
@@ -169,6 +171,8 @@ impl Primorial for Natural {
     /// $T(n) = O(n (\log n)^2 \log\log n)$
     ///
     /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `n`.
     ///
     /// # Examples
     /// ```

@@ -697,3 +697,22 @@ pub fn mul_slow_fft(x: &Natural, y: &Natural) -> Natural {
         }
     }
 }
+
+// The multiplication-dispatch thresholds, for building scratch-canary size sweeps (see
+// `test_util::scratch`). The threshold constants are `pub(crate)`, so integration tests get the
+// list through this function.
+pub fn mul_dispatch_thresholds() -> Vec<usize> {
+    vec![
+        MUL_TOOM22_THRESHOLD,
+        MUL_TOOM33_THRESHOLD,
+        MUL_TOOM44_THRESHOLD,
+        MUL_TOOM6H_THRESHOLD,
+        MUL_TOOM8H_THRESHOLD,
+        MUL_TOOM32_TO_TOOM43_THRESHOLD,
+        MUL_TOOM32_TO_TOOM53_THRESHOLD,
+        MUL_TOOM42_TO_TOOM53_THRESHOLD,
+        MUL_TOOM42_TO_TOOM63_THRESHOLD,
+        MUL_FFT_THRESHOLD,
+        FFT_MUL_THRESHOLD,
+    ]
+}

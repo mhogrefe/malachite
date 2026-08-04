@@ -2586,7 +2586,11 @@ impl VariableRangeGenerator {
     /// where $c$ is `chunk_size`.
     ///
     /// # Worst-case complexity
-    /// Constant time and additional memory.
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `chunk_size`.
     ///
     /// # Panics
     /// Panics if `chunk_size` is zero or greater than the width of the type.
@@ -2644,8 +2648,14 @@ impl VariableRangeGenerator {
     /// $$
     /// where $\ell$ is `limit`.
     ///
-    /// # Worst-case complexity
-    /// Constant time and additional memory.
+    /// # Expected complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `limit.significant_bits()`. Each
+    /// rejection-sampling trial rejects with probability less than $1/2$, so the expected number
+    /// of trials is $O(1)$, but the worst case is unbounded.
     ///
     /// # Panics
     /// Panics if `limit` is 0.
@@ -2689,8 +2699,13 @@ impl VariableRangeGenerator {
     /// \\end{cases}
     /// $$
     ///
-    /// # Worst-case complexity
-    /// Constant time and additional memory.
+    /// # Expected complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `(b - a).significant_bits()`; the
+    /// worst case is unbounded, as with [`next_less_than`](Self::next_less_than).
     ///
     /// # Panics
     /// Panics if $a \geq b$.
@@ -2722,8 +2737,14 @@ impl VariableRangeGenerator {
     /// \\end{cases}
     /// $$
     ///
-    /// # Worst-case complexity
-    /// Constant time and additional memory.
+    /// # Expected complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the number of significant bits of
+    /// the range's width; the worst case is unbounded, as with
+    /// [`next_less_than`](Self::next_less_than).
     ///
     /// # Panics
     /// Panics if $a > b$.

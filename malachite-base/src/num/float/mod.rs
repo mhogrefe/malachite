@@ -404,7 +404,7 @@ impl<T: PrimitiveFloat> FromStr for NiceFloat<T> {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ = `src.len()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `src.len()`.
     ///
     /// # Examples
     /// ```

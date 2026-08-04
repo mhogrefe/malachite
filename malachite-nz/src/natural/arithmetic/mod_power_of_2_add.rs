@@ -288,7 +288,7 @@ impl ModPowerOf2Add<Self> for Natural {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `min(self.significant_bits(),
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
     ///
     /// # Panics
@@ -454,7 +454,7 @@ impl ModPowerOf2AddAssign<Self> for Natural {
     ///
     /// $M(n) = O(1)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `min(self.significant_bits(),
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
     ///
     /// # Panics
