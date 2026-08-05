@@ -937,7 +937,7 @@ a gap on the rationals page; the two are one work item.
 | ✓ | `void fmpz_negmod (fmpz_t f, const fmpz_t g, const fmpz_t h)` | [`ModNeg`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModNeg.html), [`NegMod`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.NegMod.html) |
 | ≈ | `int fmpz_jacobi (const fmpz_t a, const fmpz_t n)` | [`JacobiSymbol`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.JacobiSymbol.html), [`KroneckerSymbol`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.KroneckerSymbol.html) |
 | ✓ | `int fmpz_kronecker (const fmpz_t a, const fmpz_t n)` | [`KroneckerSymbol`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.KroneckerSymbol.html) |
-| ✗ | `void fmpz_divides_mod_list (fmpz_t xstart, fmpz_t xstride, fmpz_t xlength, const fmpz_t a, const fmpz_t b, const fmpz_t n)` | |
+| ✓ | `void fmpz_divides_mod_list (fmpz_t xstart, fmpz_t xstride, fmpz_t xlength, const fmpz_t a, const fmpz_t b, const fmpz_t n)` | [`ModDivList`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModDivList.html) |
 
 **`fmpz_remove`.** [`RemovePower`](https://docs.rs/malachite-base/latest/malachite_base/num/factorization/traits/trait.RemovePower.html),
 described [on the GMP page](/mapping/gmp-integers/#number-theoretic-functions), which returns the
@@ -974,11 +974,15 @@ and sign of `n` are not checked", so where FLINT would return an undefined answe
 panics or, through the Kronecker symbol, returns the defined extension.
 
 **`fmpz_divides_mod_list`.** The solution set of the linear congruence $$ax \equiv b \pmod n$$,
-returned as an arithmetic progression: start, stride, and count. No Malachite function solves a
-linear congruence yet, so this is a gap, and a planned one to fill. The classical recipe
-composes from mapped pieces in the meantime: with `(d, s, _) = a.extended_gcd(&n)`, there are
-solutions exactly when `d` divides `b`, and then the progression is
-`x = s * (b / d) mod (n / d)`, stride `n / d`, count `d`.
+returned as an arithmetic progression. `b.mod_div_list(&a, &m)` computes the same three numbers,
+as `Some((start, stride, length))` in place of FLINT's three output arguments and
+all-zeros-on-failure convention; note the mirrored argument roles, with the dividend as the
+receiver, matching `mod_div` [on the mod-n page](/mapping/flint-integers-mod-n/#arithmetic).
+The result is canonical, with `start` the smallest solution, `stride` equal to
+`n / gcd(a, n)`, and `length` equal to `gcd(a, n)`, so unlike the single-quotient functions no
+normalization question arises, and FLINT and Malachite agree exactly. FLINT reduces `a` modulo
+`n` itself, while `mod_div_list` requires both inputs already reduced, the standard contract of
+the `Mod*` family. The unsigned primitive types implement `ModDivList` as well.
 
 ## [Bit packing and unpacking](https://flintlib.org/doc/fmpz.html#bit-packing-and-unpacking) {#bit-packing-and-unpacking}
 

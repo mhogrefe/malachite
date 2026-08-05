@@ -160,6 +160,18 @@ fn main() {
         "demo_mod_div_u64",
         "fmpz_mod_divides",
     );
+    check_demo_against_flint(
+        &oracle,
+        "../malachite-nz",
+        "demo_natural_mod_div_list",
+        "fmpz_divides_mod_list",
+    );
+    check_demo_against_flint(
+        &oracle,
+        "../malachite-base",
+        "demo_mod_div_list_u64",
+        "fmpz_divides_mod_list",
+    );
 
     println!("testing primitive_root_prime unit tests");
     {

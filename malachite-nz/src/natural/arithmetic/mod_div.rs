@@ -19,15 +19,18 @@ use crate::natural::arithmetic::sub::limbs_sub_same_length_in_place_right;
 use malachite_base::num::arithmetic::traits::{DivMod, ModDiv, ModMul};
 use malachite_base::num::basic::traits::Zero;
 
-// Computes `(gcd(x, m), s)`, where `s < m` and `sx ≡ gcd(x, m) mod m`. `x` must be nonzero and
-// reduced mod `m`, and `m` must have more than one significant limb.
+// Computes `(gcd(x, m), s)`, where `s < m` and `sx ≡ gcd(x, m) mod m`. `x` must be reduced mod
+// `m`, and `m` must have more than one significant limb.
 //
-// This is fmpz_gcdinv from fmpz/gcdinv.c, FLINT 3.6.0, where f is nonzero and h is large.
+// This is fmpz_gcdinv from fmpz/gcdinv.c, FLINT 3.6.0, where h is large.
 //
 // The two buffers stay separate allocations: both end up as owned `Natural`s, and merging them
 // would force one to be copied out of the parent.
 #[cfg_attr(dylint_lib = "malachite_lints", allow(adjacent_vec_allocations))]
 pub(crate) fn gcdinv_helper(x: Natural, m: Natural) -> (Natural, Natural) {
+    if x == 0u32 {
+        return (m, Natural::ZERO);
+    }
     let mut xs = x.into_limbs_asc();
     let mut ys = m.to_limbs_asc();
     let len = ys.len();

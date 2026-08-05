@@ -935,6 +935,19 @@ pub trait ModDiv<RHS = Self, M = Self> {
     fn mod_div(self, other: RHS, m: M) -> Option<Self::Output>;
 }
 
+/// Finds all quotients of a number and another number modulo a third number $m$, returning `None`
+/// if no quotient exists. The inputs must be already reduced modulo $m$.
+///
+/// The quotients form an arithmetic progression: `Some((start, stride, length))` means that the
+/// quotients are exactly the numbers $\text{start} + \text{stride} \cdot i$ for
+/// $0 \leq i < \text{length}$, where `start` is the smallest quotient.
+pub trait ModDivList<RHS = Self, M = Self> {
+    type Output;
+
+    #[allow(clippy::type_complexity)]
+    fn mod_div_list(self, other: RHS, m: M) -> Option<(Self::Output, Self::Output, Self::Output)>;
+}
+
 /// Finds the multiplicative inverse of a number modulo another number $m$. The input must be
 /// already reduced modulo $m$.
 pub trait ModInverse<M = Self> {

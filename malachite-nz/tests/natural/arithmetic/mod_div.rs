@@ -70,6 +70,41 @@ fn test_mod_div() {
     test("6", "4", "10", "Some(4)");
     test("5", "5", "10", "Some(1)");
     test("2", "5", "10", "None");
+    // Note that moduli below 2^64 are single-limb on 64-bit builds, so the multi-limb exemplars
+    // must exceed that, not merely look long.
+    // - zero divisor and zero dividend with a multi-limb modulus
+    test("0", "0", "98765432123456789012345678990", "Some(0)");
+    // - zero divisor and nonzero dividend with a multi-limb modulus
+    test("1", "0", "98765432123456789012345678990", "None");
+    // - zero dividend with a multi-limb modulus
+    test(
+        "0",
+        "12345678987654321012345678901",
+        "98765432123456789012345678990",
+        "Some(0)",
+    );
+    // - no quotient with a single-limb modulus
+    test(
+        "12345678987654322",
+        "12345678987654324",
+        "98765432123456790",
+        "None",
+    );
+    // - no quotient with a multi-limb modulus
+    test(
+        "24681357024681357024681357023",
+        "36925814703692581470369258146",
+        "98765432123456789012345678990",
+        "None",
+    );
+    // - negative cofactor from limbs_extended_gcd in gcdinv_helper (the limbs_sub lift branch);
+    //   gcd = 1, so the witness is unique and independently checkable
+    test(
+        "123",
+        "12345678987654321012345678901",
+        "98765432123456789012345678990",
+        "Some(34989702408577318988141271143)",
+    );
     test(
         "1",
         "12345678987654321",

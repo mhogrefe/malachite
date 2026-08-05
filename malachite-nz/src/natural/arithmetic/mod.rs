@@ -143,6 +143,9 @@ pub mod mod_add;
 /// Implementations of [`ModDiv`](malachite_base::num::arithmetic::traits::ModDiv), a trait for
 /// dividing two numbers modulo another number.
 pub mod mod_div;
+/// Implementations of [`ModDivList`](malachite_base::num::arithmetic::traits::ModDivList), a
+/// trait for finding all quotients of two numbers modulo another number.
+pub mod mod_div_list;
 /// Implementations of [`ModEuclidean`](malachite_base::num::arithmetic::traits::ModEuclidean) and
 /// [`ModEuclideanAssign`](malachite_base::num::arithmetic::traits::ModEuclideanAssign), traits for
 /// finding the remainder of two numbers, where the remainder is nonnegative.

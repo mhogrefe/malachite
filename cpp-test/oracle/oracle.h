@@ -52,5 +52,6 @@ int run_sqrtmod_stress(const char * arg);
 
 /* mod_divides.c */
 int run_fmpz_mod_divides(const char * arg);
+int run_fmpz_divides_mod_list(const char * arg);
 
 #endif

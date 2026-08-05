@@ -58,6 +58,28 @@ fn mod_div_helper<
     );
     test(U::ONE, U::MAX - U::ONE, U::MAX, Some(U::MAX - U::ONE));
     test(U::MAX - U::ONE, U::ONE, U::MAX, Some(U::MAX - U::ONE));
+
+    // Each of the following inputs pins a branch of the shared extended-GCD kernel `gcdinv`,
+    // found by exhaustively simulating the u8 instance; the patterns are top-bit-relative, so
+    // they hit the same branches at every width.
+    let high = U::power_of_2(U::WIDTH - 1);
+    let quarter = U::power_of_2(U::WIDTH - 2);
+    // - gcdinv: both inputs have their highest bit set
+    test(U::ONE, high, high + U::ONE, Some(high));
+    // - gcdinv: second loop, quotient 1
+    test(U::ONE, quarter, quarter + U::ONE, Some(quarter));
+    // - gcdinv: second loop, quotient 2
+    test(U::ONE, quarter, quarter << 1, None);
+    // - gcdinv: second loop, quotient 3
+    test(U::ONE, quarter, quarter * U::exact_from(3), None);
+    // - gcdinv: main loop, quotient 1; negative final cofactor, lifted
+    test(U::ONE, U::TWO, U::exact_from(3), Some(U::TWO));
+    // - gcdinv: main loop, quotient 2; nonnegative final cofactor
+    test(U::ONE, U::ONE, U::TWO, Some(U::ONE));
+    // - gcdinv: main loop, quotient 3
+    test(U::ONE, U::ONE, U::exact_from(3), Some(U::ONE));
+    // - gcdinv: main loop, quotient of 4 or more
+    test(U::ONE, U::ONE, U::exact_from(4), Some(U::ONE));
 }
 
 #[test]

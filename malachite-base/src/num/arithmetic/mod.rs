@@ -1546,6 +1546,20 @@ pub mod mod_add;
 /// assert_eq!(123u64.mod_div(456, 789), Some(265));
 /// ```
 pub mod mod_div;
+/// [`ModDivList`](traits::ModDivList), a trait for finding all quotients of two numbers modulo
+/// another number.
+///
+/// # mod_div_list
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModDivList;
+///
+/// // The quotients of 6 and 4 mod 10 are 4 and 9: 4 + 5 * i for 0 <= i < 2.
+/// assert_eq!(6u8.mod_div_list(4, 10), Some((4, 5, 2)));
+/// assert_eq!(1u16.mod_div_list(3, 10), Some((7, 10, 1)));
+/// assert_eq!(2u32.mod_div_list(5, 10), None);
+/// assert_eq!(0u64.mod_div_list(0, 10), Some((0, 1, 10)));
+/// ```
+pub mod mod_div_list;
 /// [`ModEuclidean`](traits::ModEuclidean) and [`ModEuclideanAssign`](traits::ModEuclideanAssign),
 /// traits for finding the remainder of two numbers, where the remainder is always nonnegative.
 ///

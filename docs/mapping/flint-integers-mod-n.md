@@ -158,7 +158,7 @@ for modular shifts.
 | ✓ | `void fmpz_mod_neg (fmpz_t a, const fmpz_t b, const fmpz_mod_ctx_t ctx)` | [`ModNeg`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModNeg.html), [`ModNegAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModNegAssign.html) |
 | ✓ | `void fmpz_mod_mul (fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx)` | [`ModMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModMul.html), [`ModMulPrecomputed`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModMulPrecomputed.html) |
 | ✓ | `void fmpz_mod_inv (fmpz_t a, const fmpz_t b, const fmpz_mod_ctx_t ctx)` | [`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModInverse.html) |
-| ✗ | `int fmpz_mod_divides (fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx)` | [`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModInverse.html), [`ModMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModMul.html) |
+| ✓ | `int fmpz_mod_divides (fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx)` | [`ModDiv`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModDiv.html) |
 | ✓ | `void fmpz_mod_pow_ui (fmpz_t a, const fmpz_t b, ulong e, const fmpz_mod_ctx_t ctx)` | [`ModPow`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPow.html), [`ModPowAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowAssign.html) |
 | ✓ | `int fmpz_mod_pow_fmpz (fmpz_t a, const fmpz_t b, const fmpz_t e, const fmpz_mod_ctx_t ctx)` | [`ModPow`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPow.html), [`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModInverse.html) |
 
@@ -191,12 +191,16 @@ returns [`Option`](https://doc.rust-lang.org/nightly/std/option/enum.Option.html
 and the computation are one call.
 
 **`fmpz_mod_divides`.** General modular division: solve $$a c \equiv b \pmod n$$ for `a`,
-succeeding in some cases even when `c` is not invertible. This is the one-solution sibling of
-`fmpz_divides_mod_list`, a gap
-[on the fmpz page](/mapping/flint-integers/#modular-arithmetic), and the two will be filled
-together. When `c` is invertible, the composition is
-`c.mod_inverse(&m).map(|i| i.mod_mul(&b, &m))`; when it is not, the `extended_gcd` recipe from
-the fmpz page finds a solution whenever `gcd(c, n)` divides `b`.
+succeeding whenever `gcd(c, n)` divides `b`, even when `c` is not invertible.
+`b.mod_div(&c, &m)` is the same computation, with FLINT's flag-plus-output protocol becoming an
+[`Option`](https://doc.rust-lang.org/nightly/std/option/enum.Option.html), as with
+`fmpz_mod_inv` above. When `c` is not invertible the solution is not unique; both functions
+then return the same particular solution, a bit-for-bit agreement that Malachite's
+differential tests pin down, so ported code sees identical values, not merely valid ones. The
+full solution set is the business of `fmpz_divides_mod_list`
+[on the fmpz page](/mapping/flint-integers/#modular-arithmetic), whose `mod_div_list` names
+the whole arithmetic progression at once. The unsigned primitive types implement `ModDiv` as
+well.
 
 **`fmpz_mod_pow_ui`, `fmpz_mod_pow_fmpz`.** `b.mod_pow(&e, &m)`, where the exponent is a
 [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html) of any

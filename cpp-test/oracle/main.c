@@ -30,6 +30,7 @@ static const oracle_mode modes[] = {
     {"n_sqrtmod", run_n_sqrtmod},
     {"sqrtmod_stress", run_sqrtmod_stress},
     {"fmpz_mod_divides", run_fmpz_mod_divides},
+    {"fmpz_divides_mod_list", run_fmpz_divides_mod_list},
 };
 
 int
