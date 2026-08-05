@@ -235,7 +235,12 @@ impl RawMantissaAndExponent<Natural, i32> for Float {
     /// raw exponent must be in the range $[-(2^{30}-1), 2^{30}-1]$.
     ///
     /// # Worst-case complexity
-    /// Constant time and additional memory.
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `raw_mantissa.significant_bits()`:
+    /// computing the precision scans the trailing zeros of the raw mantissa.
     ///
     /// # Panics
     /// Panics if `raw_mantissa` is zero, if its number of significant bits is not divisible by the
@@ -411,7 +416,12 @@ impl RawMantissaAndExponent<Natural, i32, Float> for &Float {
     /// raw exponent must be in the range $[-(2^{30}-1), 2^{30}-1]$.
     ///
     /// # Worst-case complexity
-    /// Constant time and additional memory.
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `raw_mantissa.significant_bits()`:
+    /// computing the precision scans the trailing zeros of the raw mantissa.
     ///
     /// # Panics
     /// Panics if `raw_mantissa` is zero, if its number of significant bits is not divisible by the

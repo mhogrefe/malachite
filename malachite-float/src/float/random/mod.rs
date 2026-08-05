@@ -74,7 +74,7 @@ impl<I: Iterator<Item = Natural>> Iterator for RandomPositiveFiniteFloats<I> {
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $T(n, m) = O(n + m)$
+/// $T(n, m) = O(n / m + 1)$
 ///
 /// $M(n, m) = O(n / m)$
 ///
@@ -163,7 +163,7 @@ pub fn random_positive_finite_floats(
 /// # Expected complexity per iteration
 /// $T(n) = O(n)$
 ///
-/// $M(n,) = O(n)$
+/// $M(n) = O(n)$
 ///
 /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
 ///
@@ -266,7 +266,7 @@ impl<I: Iterator<Item = Natural>> Iterator for RandomNegativeFiniteFloats<I> {
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $T(n, m) = O(n + m)$
+/// $T(n, m) = O(n / m + 1)$
 ///
 /// $M(n, m) = O(n / m)$
 ///
@@ -372,7 +372,7 @@ impl<I: Iterator<Item = Natural>> Iterator for RandomNonNegativeFiniteFloats<I> 
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $T(n, m) = O(n + m)$
+/// $T(n, m) = O(n / m + 1)$
 ///
 /// $M(n, m) = O(n / m)$
 ///
@@ -483,7 +483,7 @@ impl<I: Iterator<Item = Natural>> Iterator for RandomNonPositiveFiniteFloats<I> 
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $T(n, m) = O(n + m)$
+/// $T(n, m) = O(n / m + 1)$
 ///
 /// $M(n, m) = O(n / m)$
 ///
@@ -589,7 +589,7 @@ impl<I: Iterator<Item = Natural>> Iterator for RandomNonzeroFiniteFloats<I> {
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $T(n, m) = O(n + m)$
+/// $T(n, m) = O(n / m + 1)$
 ///
 /// $M(n, m) = O(n / m)$
 ///
@@ -694,7 +694,7 @@ impl<I: Iterator<Item = Natural>> Iterator for RandomFiniteFloats<I> {
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $T(n, m) = O(n + m)$
+/// $T(n, m) = O(n / m + 1)$
 ///
 /// $M(n, m) = O(n / m)$
 ///
@@ -782,7 +782,7 @@ pub fn random_finite_floats(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $T(n, m) = O(n + m)$
+/// $T(n, m) = O(n / m + 1)$
 ///
 /// $M(n, m) = O(n / m)$
 ///
@@ -902,7 +902,7 @@ pub fn random_floats(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $T(n, m) = O(n + m)$
+/// $T(n, m) = O(n / m + 1)$
 ///
 /// $M(n, m) = O(n / m)$
 ///
@@ -1083,7 +1083,7 @@ pub fn striped_random_positive_floats_with_precision(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $T(n, m) = O(n + m)$
+/// $T(n, m) = O(n / m + 1)$
 ///
 /// $M(n, m) = O(n / m)$
 ///
@@ -1170,7 +1170,7 @@ pub fn striped_random_negative_finite_floats(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $T(n, m) = O(n + m)$
+/// $T(n, m) = O(n / m + 1)$
 ///
 /// $M(n, m) = O(n / m)$
 ///
@@ -1263,7 +1263,7 @@ pub fn striped_random_non_negative_finite_floats(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $T(n, m) = O(n + m)$
+/// $T(n, m) = O(n / m + 1)$
 ///
 /// $M(n, m) = O(n / m)$
 ///
@@ -1355,7 +1355,7 @@ pub fn striped_random_non_positive_finite_floats(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $T(n, m) = O(n + m)$
+/// $T(n, m) = O(n / m + 1)$
 ///
 /// $M(n, m) = O(n / m)$
 ///
@@ -1446,7 +1446,7 @@ pub fn striped_random_nonzero_finite_floats(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $T(n, m) = O(n + m)$
+/// $T(n, m) = O(n / m + 1)$
 ///
 /// $M(n, m) = O(n / m)$
 ///
@@ -1539,7 +1539,7 @@ pub fn striped_random_finite_floats(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $T(n, m) = O(n + m)$
+/// $T(n, m) = O(n / m + 1)$
 ///
 /// $M(n, m) = O(n / m)$
 ///

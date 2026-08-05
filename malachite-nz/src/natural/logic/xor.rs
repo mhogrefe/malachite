@@ -471,10 +471,10 @@ impl<'a> BitXorAssign<&'a Self> for Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::ZERO;
-    /// x |= Natural::from(0x0000000fu32);
-    /// x |= Natural::from(0x00000f00u32);
-    /// x |= Natural::from(0x000f_0000u32);
-    /// x |= Natural::from(0x0f000000u32);
+    /// x ^= &Natural::from(0x0000000fu32);
+    /// x ^= &Natural::from(0x00000f00u32);
+    /// x ^= &Natural::from(0x000f_0000u32);
+    /// x ^= &Natural::from(0x0f000000u32);
     /// assert_eq!(x, 0x0f0f_0f0f);
     /// ```
     fn bitxor_assign(&mut self, other: &'a Self) {

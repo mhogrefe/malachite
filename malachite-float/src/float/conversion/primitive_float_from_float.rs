@@ -323,7 +323,12 @@ macro_rules! impl_primitive_float_from {
             ///   zero is returned, depending on the [`Float`]'s sign.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `f.significant_bits()`:
+            /// rounding must examine the bits that are discarded.
             ///
             /// # Panics
             /// Panics if the [`Float`] is not exactly equal to any float of the target type, and
@@ -375,7 +380,12 @@ macro_rules! impl_primitive_float_from {
             ///   zero is returned, depending on the [`Float`]'s sign.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `f.significant_bits()`:
+            /// rounding must examine the bits that are discarded.
             ///
             /// # Panics
             /// Panics if the [`Float`] is not exactly equal to any float of the target type, and
@@ -396,7 +406,12 @@ macro_rules! impl_primitive_float_from {
             /// [`Float`] is not equal to a primitive float of the given type, an error is returned.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `f.significant_bits()`:
+            /// rounding must examine the bits that are discarded.
             ///
             /// # Examples
             /// See [here](super::primitive_float_from_float#try_from).
@@ -413,7 +428,12 @@ macro_rules! impl_primitive_float_from {
             /// [`Float`] is not equal to a primitive float of the given type, an error is returned.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `f.significant_bits()`:
+            /// rounding must examine the bits that are discarded.
             ///
             /// # Examples
             /// See [here](super::primitive_float_from_float#try_from).
@@ -428,7 +448,12 @@ macro_rules! impl_primitive_float_from {
             /// [`Float`] by reference.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `f.significant_bits()`:
+            /// rounding must examine the bits that are discarded.
             ///
             /// # Examples
             /// See [here](super::primitive_float_from_float#convertible_from).

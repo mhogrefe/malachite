@@ -14,11 +14,7 @@ macro_rules! impl_unsigned {
             /// Determines whether a [`Rational`] is equal to an unsigned primitive integer.
             ///
             /// # Worst-case complexity
-            /// $T(n) = O(n)$
-            ///
-            /// $M(n) = O(1)$
-            ///
-            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// See [here](super::partial_eq_primitive_int#partial_eq).
@@ -32,11 +28,7 @@ macro_rules! impl_unsigned {
             /// Determines whether an unsigned primitive integer is equal to a [`Rational`].
             ///
             /// # Worst-case complexity
-            /// $T(n) = O(n)$
-            ///
-            /// $M(n) = O(1)$
-            ///
-            /// where $T$ is time, $M$ is additional memory, and $n$ is `other.significant_bits()`.
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// See [here](super::partial_eq_primitive_int#partial_eq).
@@ -55,11 +47,7 @@ macro_rules! impl_signed {
             /// Determines whether a [`Rational`] is equal to a signed primitive integer.
             ///
             /// # Worst-case complexity
-            /// $T(n) = O(n)$
-            ///
-            /// $M(n) = O(1)$
-            ///
-            /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// See [here](super::partial_eq_primitive_int#partial_eq).
@@ -74,11 +62,7 @@ macro_rules! impl_signed {
             /// Determines whether a signed primitive integer is equal to a [`Rational`].
             ///
             /// # Worst-case complexity
-            /// $T(n) = O(n)$
-            ///
-            /// $M(n) = O(1)$
-            ///
-            /// where $T$ is time, $M$ is additional memory, and $n$ is `other.significant_bits()`.
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// See [here](super::partial_eq_primitive_int#partial_eq).

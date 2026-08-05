@@ -82,7 +82,7 @@ macro_rules! impl_shr_unsigned {
             ///
             /// $M(n) = O(1)$
             ///
-            /// where $T$ is time, $M$ is additional memory and $n$ is `max(1,
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `max(1,
             /// self.significant_bits() - bits)`.
             ///
             /// # Examples
@@ -109,7 +109,7 @@ macro_rules! impl_shr_unsigned {
             ///
             /// $M(n) = O(1)$
             ///
-            /// where $T$ is time, $M$ is additional memory and $n$ is `max(1,
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `max(1,
             /// self.significant_bits() - bits)`.
             ///
             /// # Examples
@@ -133,7 +133,7 @@ macro_rules! impl_shr_unsigned {
             ///
             /// $M(n) = O(1)$
             ///
-            /// where $T$ is time, $M$ is additional memory and $n$ is `max(1,
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `max(1,
             /// self.significant_bits() - bits)`.
             ///
             /// # Examples
@@ -189,7 +189,7 @@ macro_rules! impl_shr_signed {
             ///
             /// $M(n) = O(1)$
             ///
-            /// where $T$ is time, $M$ is additional memory and $n$ is `max(1,
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `max(1,
             /// self.significant_bits() - bits)`.
             ///
             /// # Examples
@@ -216,7 +216,7 @@ macro_rules! impl_shr_signed {
             ///
             /// $M(n) = O(1)$
             ///
-            /// where $T$ is time, $M$ is additional memory and $n$ is `max(1,
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `max(1,
             /// self.significant_bits() - bits)`.
             ///
             /// # Examples
@@ -240,7 +240,7 @@ macro_rules! impl_shr_signed {
             ///
             /// $M(n) = O(1)$
             ///
-            /// where $T$ is time, $M$ is additional memory and $n$ is `max(1,
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `max(1,
             /// self.significant_bits() - bits)`.
             ///
             /// # Examples

@@ -446,7 +446,10 @@ crate_test_fn! {limbs_div_exact_limb_in_place(ns: &mut [Limb], d: Limb) {
 //
 // The result is $O(n)$.
 //
-// This is equivalent to `mpn_binvert_itch` from `mpn/generic/binvert.c`, GMP 6.2.1.
+// This is equivalent to `mpn_binvert_itch` from `mpn/generic/binvert.c`, GMP 6.2.1. Scratch
+// derivation: ports the corresponding GMP itch function; the summands mirror the buffers the
+// consumer carves from `scratch`. See the note above `limbs_div_mod_barrett_scratch_len` in
+// div_mod.rs; verified by the scratch-sizing canaries.
 crate_test_fn! {limbs_modular_invert_scratch_len(n: usize) -> usize {
     let itch_local = limbs_mul_mod_base_pow_n_minus_1_next_size(n);
     let itch_out = limbs_mul_mod_base_pow_n_minus_1_scratch_len(
@@ -781,6 +784,9 @@ crate_test_fn! {limbs_modular_div_mod_divide_and_conquer(
 // Constant time and additional memory.
 //
 // This is equivalent to `mpn_dcpi1_bdiv_qr_n_itch` from `mpn/generic/dcpi1_bdiv_qr.c`, GMP 6.2.1.
+// Scratch derivation: ports the corresponding GMP itch function; the summands mirror the buffers
+// the consumer carves from `scratch`. See the note above `limbs_div_mod_barrett_scratch_len` in
+// div_mod.rs; verified by the scratch-sizing canaries.
 private_test_const_fn! {limbs_modular_div_mod_divide_and_conquer_helper_scratch_len(
     n: usize,
 ) -> usize {
@@ -790,7 +796,10 @@ private_test_const_fn! {limbs_modular_div_mod_divide_and_conquer_helper_scratch_
 // # Worst-case complexity
 // Constant time and additional memory.
 //
-// This is equivalent to `mpn_mu_bdiv_qr_itch` from `mpn/generic/mu_bdiv_qr.c`, GMP 6.2.1.
+// This is equivalent to `mpn_mu_bdiv_qr_itch` from `mpn/generic/mu_bdiv_qr.c`, GMP 6.2.1. Scratch
+// derivation: ports the corresponding GMP itch function; the summands mirror the buffers the
+// consumer carves from `scratch`. See the note above `limbs_div_mod_barrett_scratch_len` in
+// div_mod.rs; verified by the scratch-sizing canaries.
 crate_test_fn! {limbs_modular_div_mod_barrett_scratch_len(n_len: usize, d_len: usize) -> usize {
     assert!(DC_BDIV_Q_THRESHOLD < MU_BDIV_Q_THRESHOLD);
     let q_len = n_len - d_len;
@@ -1176,6 +1185,9 @@ pub fn limbs_modular_div_schoolbook_in_place(mut ns: &mut [Limb], ds: &[Limb], d
 // Constant time and additional memory.
 //
 // This is equivalent to `mpn_dcpi1_bdiv_q_n_itch` from `mpn/generic/dcpi1_bdiv_q.c`, GMP 6.2.1.
+// Scratch derivation: ports the corresponding GMP itch function; the summands mirror the buffers
+// the consumer carves from `scratch`. See the note above `limbs_div_mod_barrett_scratch_len` in
+// div_mod.rs; verified by the scratch-sizing canaries.
 private_test_const_fn! {limbs_modular_div_divide_and_conquer_helper_scratch_len(n: usize) -> usize {
     n
 }}
@@ -1316,7 +1328,10 @@ private_test_fn! {limbs_modular_div_divide_and_conquer(
 // # Worst-case complexity
 // Constant time and additional memory.
 //
-// This is equivalent to `mpn_mu_bdiv_q_itch` from `mpn/generic/mu_bdiv_q.c`, GMP 6.2.1.
+// This is equivalent to `mpn_mu_bdiv_q_itch` from `mpn/generic/mu_bdiv_q.c`, GMP 6.2.1. Scratch
+// derivation: ports the corresponding GMP itch function; the summands mirror the buffers the
+// consumer carves from `scratch`. See the note above `limbs_div_mod_barrett_scratch_len` in
+// div_mod.rs; verified by the scratch-sizing canaries.
 private_test_fn! {limbs_modular_div_barrett_scratch_len(n_len: usize, d_len: usize) -> usize {
     assert!(DC_BDIV_Q_THRESHOLD < MU_BDIV_Q_THRESHOLD);
     let i_len;
@@ -1552,6 +1567,9 @@ private_test_fn! {limbs_modular_div_barrett(
 //
 // This is equivalent to `mpn_bdiv_q_itch` from `mpn/generic/bdiv_q.c`, GMP 6.2.1, where nothing is
 // allocated for inputs that are too small for Barrett division. Investigate changes from 6.1.2?
+// Scratch derivation: ports the corresponding GMP itch function; the summands mirror the buffers
+// the consumer carves from `scratch`. See the note above `limbs_div_mod_barrett_scratch_len` in
+// div_mod.rs; verified by the scratch-sizing canaries.
 private_test_fn! {limbs_modular_div_scratch_len(n_len: usize, d_len: usize) -> usize {
     if d_len < MU_BDIV_Q_THRESHOLD {
         0
@@ -1639,7 +1657,10 @@ pub(crate) fn limbs_modular_div_mod(
     rh
 }
 
-// This is equivalent to `mpn_bdiv_qr_itch` from `mpn/generic/bdiv_qr.c`, GMP 6.3.0.
+// This is equivalent to `mpn_bdiv_qr_itch` from `mpn/generic/bdiv_qr.c`, GMP 6.3.0. Scratch
+// derivation: ports the corresponding GMP itch function; the summands mirror the buffers the
+// consumer carves from `scratch`. See the note above `limbs_div_mod_barrett_scratch_len` in
+// div_mod.rs; verified by the scratch-sizing canaries.
 pub(crate) fn limbs_modular_div_mod_scratch_len(nn: usize, dn: usize) -> usize {
     if dn < MU_BDIV_QR_THRESHOLD {
         return nn;
@@ -1665,7 +1686,10 @@ pub(crate) fn limbs_modular_div_mod_wrap(
 // # Worst-case complexity
 // Constant time and additional memory.
 //
-// This is equivalent to `mpn_bdiv_q_itch` from `mpn/generic/bdiv_q.c`, GMP 6.2.1.
+// This is equivalent to `mpn_bdiv_q_itch` from `mpn/generic/bdiv_q.c`, GMP 6.2.1. Scratch
+// derivation: ports the corresponding GMP itch function; the summands mirror the buffers the
+// consumer carves from `scratch`. See the note above `limbs_div_mod_barrett_scratch_len` in
+// div_mod.rs; verified by the scratch-sizing canaries.
 private_test_fn! {limbs_modular_div_ref_scratch_len(n_len: usize, d_len: usize) -> usize {
     if d_len < MU_BDIV_Q_THRESHOLD {
         n_len

@@ -6,7 +6,8 @@
 # Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 # 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-# Checks that every "Worst-case complexity" block is well-formed (see DOC-AUDIT.md): it is either
+# Checks that every "Worst-case complexity" block is well-formed (see DOC-CONVENTIONS.md): it is
+# either
 # the constant form ("Constant time and additional memory.") or contains a $T$ formula, an $M$
 # formula, and a "where" line; every variable used in the formulas is defined in the "where" line,
 # and every variable the "where" line defines is used. This catches missing definitions, orphaned
@@ -30,14 +31,10 @@ HEADERS = {
 }
 
 # Blocks that are known to contain a placeholder TODO instead of real bounds, awaiting analysis in
-# the documentation audit (see DOC-AUDIT.md). Maps each file to how many such blocks it has. A
+# the documentation audit (see DOC-CONVENTIONS.md). Maps each file to how many such blocks it has. A
 # file with more placeholders than listed fails the run; so does one with fewer, so this list
 # cannot go stale — remove entries as the audit fills the bounds in.
-KNOWN_PLACEHOLDERS = {
-    "malachite-nz/src/natural/arithmetic/binomial_coefficient.rs": 2,
-    "malachite-nz/src/natural/arithmetic/sqrt.rs": 1,
-    "malachite-nz/src/integer/arithmetic/binomial_coefficient.rs": 2,
-}
+KNOWN_PLACEHOLDERS = {}
 
 CONSTANT_RE = re.compile(r"Constant time and additional memory\.")
 # a delegation-form block ("Same as the ... complexity of `foo`") has no formulas of its own
@@ -165,6 +162,21 @@ def main():
                     lines = f.readlines()
                 for i, line in enumerate(lines):
                     text = comment_text(line)
+                    # a "where" line with no complexity header above it means the header (and
+                    # usually the formulas) were lost in an edit; such blocks are invisible to
+                    # the header-anchored checks below
+                    if text is not None and text.startswith("where $T$ is time"):
+                        headed = False
+                        for j in range(i - 1, max(-1, i - 15), -1):
+                            back = comment_text(lines[j])
+                            if back is None:
+                                break
+                            if back in HEADERS:
+                                headed = True
+                                break
+                        if not headed:
+                            print(f"{path}:{i + 1}: `where` line with no complexity header above")
+                            problem_count += 1
                     if text in HEADERS:
                         block_count += 1
                         for problem in check_block(path, i, lines):

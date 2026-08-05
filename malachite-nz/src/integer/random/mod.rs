@@ -73,7 +73,7 @@ impl<I: Iterator<Item = i64>> Iterator for RandomIntegers<I> {
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $T(n, m) = O(n + m)$
+/// $T(n, m) = O(n / m + 1)$
 ///
 /// $M(n, m) = O(n / m)$
 ///
@@ -130,7 +130,7 @@ pub fn random_natural_integers(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $T(n, m) = O(n + m)$
+/// $T(n, m) = O(n / m + 1)$
 ///
 /// $M(n, m) = O(n / m)$
 ///
@@ -187,7 +187,7 @@ pub fn random_positive_integers(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $T(n, m) = O(n + m)$
+/// $T(n, m) = O(n / m + 1)$
 ///
 /// $M(n, m) = O(n / m)$
 ///
@@ -245,7 +245,7 @@ pub fn random_negative_integers(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $T(n, m) = O(n + m)$
+/// $T(n, m) = O(n / m + 1)$
 ///
 /// $M(n, m) = O(n / m)$
 ///
@@ -303,7 +303,7 @@ pub fn random_nonzero_integers(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $T(n, m) = O(n + m)$
+/// $T(n, m) = O(n / m + 1)$
 ///
 /// $M(n, m) = O(n / m)$
 ///
@@ -374,7 +374,7 @@ impl<I: Iterator<Item = i64>> Iterator for StripedRandomIntegers<I> {
 /// See [`StripedBitSource`] for information about generating striped random numbers.
 ///
 /// # Expected complexity per iteration
-/// $T(n, m) = O(n + m)$
+/// $T(n, m) = O(n / m + 1)$
 ///
 /// $M(n, m) = O(n / m)$
 ///
@@ -434,7 +434,7 @@ pub fn striped_random_natural_integers(
 /// See [`StripedBitSource`] for information about generating striped random numbers.
 ///
 /// # Expected complexity per iteration
-/// $T(n, m) = O(n + m)$
+/// $T(n, m) = O(n / m + 1)$
 ///
 /// $M(n, m) = O(n / m)$
 ///
@@ -495,7 +495,7 @@ pub fn striped_random_positive_integers(
 /// See [`StripedBitSource`] for information about generating striped random numbers.
 ///
 /// # Expected complexity per iteration
-/// $T(n, m) = O(n + m)$
+/// $T(n, m) = O(n / m + 1)$
 ///
 /// $M(n, m) = O(n / m)$
 ///
@@ -559,7 +559,7 @@ pub fn striped_random_negative_integers(
 /// See [`StripedBitSource`] for information about generating striped random numbers.
 ///
 /// # Expected complexity per iteration
-/// $T(n, m) = O(n + m)$
+/// $T(n, m) = O(n / m + 1)$
 ///
 /// $M(n, m) = O(n / m)$
 ///
@@ -622,7 +622,7 @@ pub fn striped_random_nonzero_integers(
 /// See [`StripedBitSource`] for information about generating striped random numbers.
 ///
 /// # Expected complexity per iteration
-/// $T(n, m) = O(n + m)$
+/// $T(n, m) = O(n / m + 1)$
 ///
 /// $M(n, m) = O(n / m)$
 ///
@@ -804,8 +804,8 @@ pub fn uniform_random_integer_inclusive_range(
 ///
 /// $M(m) = O(m)$
 ///
-/// where $T$ is time, $M$ is additional memory, $n$ is `mean_bits_numerator +
-/// mean_bits_denominator`, and $m$ is `max(a.significant_bits(), b.significant_bits())`.
+/// where $T$ is time, $M$ is additional memory, $n$ is `mean_bits_numerator / mean_bits_denominator
+/// + 1`, and $m$ is `max(a.significant_bits(), b.significant_bits())`.
 ///
 /// # Examples
 /// ```
@@ -852,8 +852,8 @@ pub fn get_uniform_random_integer_from_range(
 ///
 /// $M(m) = O(m)$
 ///
-/// where $T$ is time, $M$ is additional memory, $n$ is `mean_bits_numerator +
-/// mean_bits_denominator`, and $m$ is `max(a.significant_bits(), b.significant_bits())`.
+/// where $T$ is time, $M$ is additional memory, $n$ is `mean_bits_numerator / mean_bits_denominator
+/// + 1`, and $m$ is `max(a.significant_bits(), b.significant_bits())`.
 ///
 /// # Examples
 /// ```
@@ -1037,7 +1037,7 @@ impl Iterator for RandomIntegerRangeToInfinity {
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $T(n, m) = O(n + m)$
+/// $T(n, m) = O(n / m + 1)$
 ///
 /// $M(n, m) = O(n / m)$
 ///
@@ -1091,7 +1091,7 @@ pub fn random_integer_range_to_infinity(
 /// to `mean_bits_numerator / mean_bits_denominator`.
 ///
 /// # Expected complexity
-/// $T(n, m) = O(n + m)$
+/// $T(n, m) = O(n / m + 1)$
 ///
 /// $M(n, m) = O(n / m)$
 ///
@@ -1155,7 +1155,7 @@ pub fn get_random_integer_from_range_to_infinity(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $T(n, m) = O(n + m)$
+/// $T(n, m) = O(n / m + 1)$
 ///
 /// $M(n, m) = O(n / m)$
 ///
@@ -1209,7 +1209,7 @@ pub fn random_integer_range_to_negative_infinity(
 /// to `mean_bits_numerator / mean_bits_denominator`.
 ///
 /// # Expected complexity
-/// $T(n, m) = O(n + m)$
+/// $T(n, m) = O(n / m + 1)$
 ///
 /// $M(n, m) = O(n / m)$
 ///
@@ -1337,8 +1337,8 @@ impl Iterator for RandomIntegerRange {
 ///
 /// $M(m) = O(m)$
 ///
-/// where $T$ is time, $M$ is additional memory, $n$ is `mean_bits_numerator +
-/// mean_bits_denominator`, and $m$ is `max(a.significant_bits(), b.significant_bits())`.
+/// where $T$ is time, $M$ is additional memory, $n$ is `mean_bits_numerator / mean_bits_denominator
+/// + 1`, and $m$ is `max(a.significant_bits(), b.significant_bits())`.
 ///
 /// # Panics
 /// Panics if $a \geq b$, if `mean_bits_numerator` or `mean_bits_denominator` are zero, if their
@@ -1408,8 +1408,8 @@ pub fn random_integer_range(
 ///
 /// $M(m) = O(m)$
 ///
-/// where $T$ is time, $M$ is additional memory, $n$ is `mean_bits_numerator +
-/// mean_bits_denominator`, and $m$ is `max(a.significant_bits(), b.significant_bits())`.
+/// where $T$ is time, $M$ is additional memory, $n$ is `mean_bits_numerator / mean_bits_denominator
+/// + 1`, and $m$ is `max(a.significant_bits(), b.significant_bits())`.
 ///
 /// # Panics
 /// Panics if $a > b$, if `mean_bits_numerator` or `mean_bits_denominator` are zero, if their ratio
@@ -1858,7 +1858,7 @@ impl Iterator for StripedRandomIntegerRangeToInfinity {
 /// See [`StripedBitSource`] for information about generating striped random numbers.
 ///
 /// # Expected complexity per iteration
-/// $T(n, m) = O(n + m)$
+/// $T(n, m) = O(n / m + 1)$
 ///
 /// $M(n, m) = O(n / m)$
 ///
@@ -1942,7 +1942,7 @@ pub fn striped_random_integer_range_to_infinity(
 /// See [`StripedBitSource`] for information about generating striped random numbers.
 ///
 /// # Expected complexity
-/// $T(n, m) = O(n + m)$
+/// $T(n, m) = O(n / m + 1)$
 ///
 /// $M(n, m) = O(n / m)$
 ///
@@ -2019,7 +2019,7 @@ pub fn get_striped_random_integer_from_range_to_infinity(
 /// See [`StripedBitSource`] for information about generating striped random numbers.
 ///
 /// # Expected complexity
-/// $T(n, m) = O(n + m)$
+/// $T(n, m) = O(n / m + 1)$
 ///
 /// $M(n, m) = O(n / m)$
 ///
@@ -2098,7 +2098,7 @@ pub fn get_striped_random_integer_from_range_to_negative_infinity(
 /// See [`StripedBitSource`] for information about generating striped random numbers.
 ///
 /// # Expected complexity per iteration
-/// $T(n, m) = O(n + m)$
+/// $T(n, m) = O(n / m + 1)$
 ///
 /// $M(n, m) = O(n / m)$
 ///

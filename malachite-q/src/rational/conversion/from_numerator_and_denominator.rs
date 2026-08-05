@@ -137,12 +137,13 @@ impl Rational {
     /// slower than [`Rational::from_unsigneds`].
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^2)$
+    /// $T(n) = O(n)$
     ///
-    /// $M(n) = O(n)$
+    /// $M(n) = O(1)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(numerator.significant_bits(),
-    /// denominator.significant_bits())`.
+    /// denominator.significant_bits())`: the word-sized GCD performs $O(n)$ constant-cost word
+    /// operations, with no allocation.
     ///
     /// # Examples
     /// ```
@@ -173,12 +174,13 @@ impl Rational {
     /// slower than [`Rational::from_signeds`].
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^2)$
+    /// $T(n) = O(n)$
     ///
-    /// $M(n) = O(n)$
+    /// $M(n) = O(1)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(numerator.significant_bits(),
-    /// denominator.significant_bits())`.
+    /// denominator.significant_bits())`: the word-sized GCD performs $O(n)$ constant-cost word
+    /// operations, with no allocation.
     ///
     /// # Examples
     /// ```
@@ -303,12 +305,13 @@ impl Rational {
     /// The input integers may have common factors; this function reduces them.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^2)$
+    /// $T(n) = O(n)$
     ///
-    /// $M(n) = O(n)$
+    /// $M(n) = O(1)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(numerator.significant_bits(),
-    /// denominator.significant_bits())`.
+    /// denominator.significant_bits())`: the word-sized GCD performs $O(n)$ constant-cost word
+    /// operations, with no allocation.
     ///
     /// # Panics
     /// Panics if `denominator` is zero.
@@ -434,12 +437,13 @@ impl Rational {
     /// The input integers may have common factors; this function reduces them.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^2)$
+    /// $T(n) = O(n)$
     ///
-    /// $M(n) = O(n)$
+    /// $M(n) = O(1)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(numerator.significant_bits(),
-    /// denominator.significant_bits())`.
+    /// denominator.significant_bits())`: the word-sized GCD performs $O(n)$ constant-cost word
+    /// operations, with no allocation.
     ///
     /// # Panics
     /// Panics if `denominator` is zero.
@@ -571,12 +575,13 @@ impl Rational {
     /// The input integers may have common factors; this function reduces them.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^2)$
+    /// $T(n) = O(n)$
     ///
-    /// $M(n) = O(n)$
+    /// $M(n) = O(1)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(numerator.significant_bits(),
-    /// denominator.significant_bits())`.
+    /// denominator.significant_bits())`: the word-sized GCD performs $O(n)$ constant-cost word
+    /// operations, with no allocation.
     ///
     /// # Panics
     /// Panics if `denominator` is zero.

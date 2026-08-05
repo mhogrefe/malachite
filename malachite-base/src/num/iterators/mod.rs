@@ -308,6 +308,14 @@ impl<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned + Wrappin
 /// # Complexity per iteration
 /// Constant time and additional memory.
 ///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(T^\prime(i))$
+///
+/// $M(i) = O(M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`.
+///
 /// # Examples
 /// ```
 /// use itertools::Itertools;

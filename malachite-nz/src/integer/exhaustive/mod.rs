@@ -171,11 +171,13 @@ pub type IntegerUpDown =
 /// the same absolute value, the positive one comes first.
 ///
 /// # Worst-case complexity per iteration
-/// $T(i) = O(i)$
+/// $T(i) = O(\ell)$
 ///
-/// $M(i) = O(1)$, amortized.
+/// $M(i) = O(\ell)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $\ell$ is the
+/// number of significant bits of the $i$th output: each iteration clones the current value, and the
+/// increment's carry chain is amortized constant.
 ///
 /// # Examples
 /// ```
@@ -197,11 +199,13 @@ pub fn exhaustive_integers() -> Chain<Once<Integer>, IntegerUpDown> {
 /// The output length is infinite.
 ///
 /// # Worst-case complexity per iteration
-/// $T(i) = O(i)$
+/// $T(i) = O(\ell)$
 ///
-/// $M(i) = O(1)$, amortized.
+/// $M(i) = O(\ell)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $\ell$ is the
+/// number of significant bits of the $i$th output: each iteration clones the current value, and the
+/// increment's carry chain is amortized constant.
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_nz::integer::exhaustive::exhaustive_natural_integers;
@@ -221,11 +225,13 @@ pub const fn exhaustive_natural_integers() -> IntegerIncreasingRangeToInfinity {
 /// The output length is infinite.
 ///
 /// # Worst-case complexity per iteration
-/// $T(i) = O(i)$
+/// $T(i) = O(\ell)$
 ///
-/// $M(i) = O(1)$, amortized.
+/// $M(i) = O(\ell)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $\ell$ is the
+/// number of significant bits of the $i$th output: each iteration clones the current value, and the
+/// increment's carry chain is amortized constant.
 ///
 /// # Examples
 /// ```
@@ -247,11 +253,13 @@ pub const fn exhaustive_positive_integers() -> IntegerIncreasingRangeToInfinity 
 /// The output length is infinite.
 ///
 /// # Worst-case complexity per iteration
-/// $T(i) = O(i)$
+/// $T(i) = O(\ell)$
 ///
-/// $M(i) = O(1)$, amortized.
+/// $M(i) = O(\ell)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $\ell$ is the
+/// number of significant bits of the $i$th output: each iteration clones the current value, and the
+/// increment's carry chain is amortized constant.
 ///
 /// # Examples
 /// ```
@@ -274,11 +282,13 @@ pub const fn exhaustive_negative_integers() -> IntegerDecreasingRangeToNegativeI
 /// The output length is infinite.
 ///
 /// # Worst-case complexity per iteration
-/// $T(i) = O(i)$
+/// $T(i) = O(\ell)$
 ///
-/// $M(i) = O(1)$, amortized.
+/// $M(i) = O(\ell)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $\ell$ is the
+/// number of significant bits of the $i$th output: each iteration clones the current value, and the
+/// increment's carry chain is amortized constant.
 ///
 /// # Examples
 /// ```
@@ -306,15 +316,13 @@ pub fn exhaustive_nonzero_integers() -> IntegerUpDown {
 /// The output length is $b - a$.
 ///
 /// # Worst-case complexity per iteration
-/// $T(i) = O(i)$
+/// $T(i) = O(\ell)$
 ///
-/// $M(i) = O(i)$
+/// $M(i) = O(\ell)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
-///
-/// Although the time and space complexities are worst-case linear, the worst case is very rare. If
-/// we exclude the cases where the the previously-generated value is positive and its
-/// least-significant limb is `Limb::MAX`, the worst case space and time complexities are constant.
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $\ell$ is the
+/// number of significant bits of the $i$th output: each iteration clones the current value, and the
+/// increment's carry chain is amortized constant.
 ///
 /// # Panics
 /// Panics if $a > b$.
@@ -351,15 +359,13 @@ pub fn integer_increasing_range(a: Integer, b: Integer) -> IntegerIncreasingRang
 /// The output length is $b - a + 1$.
 ///
 /// # Worst-case complexity per iteration
-/// $T(i) = O(i)$
+/// $T(i) = O(\ell)$
 ///
-/// $M(i) = O(i)$
+/// $M(i) = O(\ell)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
-///
-/// Although the time and space complexities are worst-case linear, the worst case is very rare. If
-/// we exclude the cases where the the previously-generated value is positive and its
-/// least-significant limb is `Limb::MAX`, the worst case space and time complexities are constant.
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $\ell$ is the
+/// number of significant bits of the $i$th output: each iteration clones the current value, and the
+/// increment's carry chain is amortized constant.
 ///
 /// # Panics
 /// Panics if $a > b$.
@@ -394,15 +400,13 @@ pub fn integer_increasing_inclusive_range(a: Integer, b: Integer) -> IntegerIncr
 /// The output length is infinite.
 ///
 /// # Worst-case complexity per iteration
-/// $T(i) = O(i)$
+/// $T(i) = O(\ell)$
 ///
-/// $M(i) = O(i)$
+/// $M(i) = O(\ell)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
-///
-/// Although the time and space complexities are worst-case linear, the worst case is very rare. If
-/// we exclude the cases where the the previously-generated value is positive and its
-/// least-significant limb is `Limb::MAX`, the worst case space and time complexities are constant.
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $\ell$ is the
+/// number of significant bits of the $i$th output: each iteration clones the current value, and the
+/// increment's carry chain is amortized constant.
 ///
 /// # Examples
 /// ```
@@ -427,16 +431,13 @@ pub const fn integer_increasing_range_to_infinity(a: Integer) -> IntegerIncreasi
 /// The output length is infinite.
 ///
 /// # Worst-case complexity per iteration
-/// $T(i) = O(i)$
+/// $T(i) = O(\ell)$
 ///
-/// $M(i) = O(i)$
+/// $M(i) = O(\ell)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
-///
-/// Although the time and space complexities are worst-case linear, the worst case is very rare. If
-/// we exclude the cases where the the previously-generated value is negative and the
-/// least-significant limb of its absolute value is `Limb::MAX`, the worst case space and time
-/// complexities are constant.
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $\ell$ is the
+/// number of significant bits of the $i$th output: each iteration clones the current value, and the
+/// increment's carry chain is amortized constant.
 ///
 /// # Examples
 /// ```
@@ -471,16 +472,13 @@ pub const fn integer_decreasing_range_to_negative_infinity(
 /// The output length is $b - a$.
 ///
 /// # Worst-case complexity per iteration
-/// $T(i) = O(i)$
+/// $T(i) = O(\ell)$
 ///
-/// $M(i) = O(i)$
+/// $M(i) = O(\ell)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
-///
-/// Although the time and space complexities are worst-case linear, the worst case is very rare. If
-/// we exclude the cases where the the least-significant limb of the absolute value of the
-/// previously-generated value is `Limb::MAX`, the worst case space and time complexities are
-/// constant.
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $\ell$ is the
+/// number of significant bits of the $i$th output: each iteration clones the current value, and the
+/// increment's carry chain is amortized constant.
 ///
 /// # Panics
 /// Panics if $a > b$.
@@ -527,16 +525,13 @@ pub fn exhaustive_integer_range(a: Integer, b: Integer) -> ExhaustiveIntegerRang
 /// The output length is $b - a + 1$.
 ///
 /// # Worst-case complexity per iteration
-/// $T(i) = O(i)$
+/// $T(i) = O(\ell)$
 ///
-/// $M(i) = O(i)$
+/// $M(i) = O(\ell)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
-///
-/// Although the time and space complexities are worst-case linear, the worst case is very rare. If
-/// we exclude the cases where the the least-significant limb of the absolute value of the
-/// previously-generated value is `Limb::MAX`, the worst case space and time complexities are
-/// constant.
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $\ell$ is the
+/// number of significant bits of the $i$th output: each iteration clones the current value, and the
+/// increment's carry chain is amortized constant.
 ///
 /// # Panics
 /// Panics if $a > b$.
@@ -582,15 +577,13 @@ pub fn exhaustive_integer_inclusive_range(a: Integer, b: Integer) -> ExhaustiveI
 /// The output length is infinite.
 ///
 /// # Worst-case complexity per iteration
-/// $T(i) = O(i)$
+/// $T(i) = O(\ell)$
 ///
-/// $M(i) = O(i)$
+/// $M(i) = O(\ell)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
-///
-/// Although the time and space complexities are worst-case linear, the worst case is very rare. If
-/// we exclude the cases where the the previously-generated value is positive and its
-/// least-significant limb is `Limb::MAX`, the worst case space and time complexities are constant.
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $\ell$ is the
+/// number of significant bits of the $i$th output: each iteration clones the current value, and the
+/// increment's carry chain is amortized constant.
 ///
 /// # Examples
 /// ```
@@ -628,15 +621,13 @@ pub fn exhaustive_integer_range_to_infinity(a: Integer) -> ExhaustiveIntegerRang
 /// The output length is infinite.
 ///
 /// # Worst-case complexity per iteration
-/// $T(i) = O(i)$
+/// $T(i) = O(\ell)$
 ///
-/// $M(i) = O(i)$
+/// $M(i) = O(\ell)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
-///
-/// Although the time and space complexities are worst-case linear, the worst case is very rare. If
-/// we exclude the cases where the the previously-generated value is positive and its
-/// least-significant limb is `Limb::MAX`, the worst case space and time complexities are constant.
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $\ell$ is the
+/// number of significant bits of the $i$th output: each iteration clones the current value, and the
+/// increment's carry chain is amortized constant.
 ///
 /// # Examples
 /// ```

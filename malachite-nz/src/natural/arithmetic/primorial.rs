@@ -117,11 +117,13 @@ impl Primorial for Natural {
     /// $n\\# = O(e^{(1+o(1))n})$.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n)$
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `n`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `n`: the result has $\Theta(n)$
+    /// bits, and the product tree costs a $\log$ factor beyond a single multiplication at that
+    /// size.
     ///
     /// # Examples
     /// ```
@@ -168,11 +170,13 @@ impl Primorial for Natural {
     /// Michels](https://math.stackexchange.com/a/1594930).
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n) = O(n (\log n)^3 \log\log n)$
     ///
-    /// $M(n) = O(n \log n)$
+    /// $M(n) = O(n (\log n)^2)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `n`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `n`: the result has $\Theta(n \log
+    /// n)$ bits, and the product tree costs a $\log$ factor beyond a single multiplication at that
+    /// size.
     ///
     /// # Examples
     /// ```

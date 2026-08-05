@@ -36,22 +36,32 @@ use malachite_nz::natural::arithmetic::mul::mul_low::{
 use malachite_nz::natural::arithmetic::mul::mul_mod::limbs_mul_mod_base_pow_n_minus_1;
 use malachite_nz::natural::arithmetic::mul::product_of_limbs::limbs_product;
 use malachite_nz::natural::arithmetic::mul::toom::{
-    limbs_mul_greater_to_out_toom_6h, limbs_mul_greater_to_out_toom_6h_scratch_len,
-    limbs_mul_greater_to_out_toom_8h, limbs_mul_greater_to_out_toom_8h_scratch_len,
-    limbs_mul_greater_to_out_toom_43, limbs_mul_greater_to_out_toom_43_scratch_len,
-    limbs_mul_greater_to_out_toom_44, limbs_mul_greater_to_out_toom_44_scratch_len,
-    limbs_mul_greater_to_out_toom_52, limbs_mul_greater_to_out_toom_52_scratch_len,
-    limbs_mul_greater_to_out_toom_53, limbs_mul_greater_to_out_toom_53_scratch_len,
-    limbs_mul_greater_to_out_toom_63, limbs_mul_greater_to_out_toom_63_scratch_len,
-};
-#[cfg(feature = "32_bit_limbs")]
-use malachite_nz::natural::arithmetic::mul::toom::{
-    limbs_mul_greater_to_out_toom_22, limbs_mul_greater_to_out_toom_22_scratch_len,
-    limbs_mul_greater_to_out_toom_32, limbs_mul_greater_to_out_toom_32_scratch_len,
-    limbs_mul_greater_to_out_toom_33, limbs_mul_greater_to_out_toom_33_scratch_len,
-    limbs_mul_greater_to_out_toom_42, limbs_mul_greater_to_out_toom_42_scratch_len,
-    limbs_mul_greater_to_out_toom_54, limbs_mul_greater_to_out_toom_54_scratch_len,
-    limbs_mul_greater_to_out_toom_62, limbs_mul_greater_to_out_toom_62_scratch_len,
+    limbs_mul_greater_to_out_toom_6h, limbs_mul_greater_to_out_toom_6h_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_6h_scratch_len, limbs_mul_greater_to_out_toom_8h,
+    limbs_mul_greater_to_out_toom_8h_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_8h_scratch_len, limbs_mul_greater_to_out_toom_22,
+    limbs_mul_greater_to_out_toom_22_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_22_scratch_len, limbs_mul_greater_to_out_toom_32,
+    limbs_mul_greater_to_out_toom_32_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_32_scratch_len, limbs_mul_greater_to_out_toom_33,
+    limbs_mul_greater_to_out_toom_33_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_33_scratch_len, limbs_mul_greater_to_out_toom_42,
+    limbs_mul_greater_to_out_toom_42_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_42_scratch_len, limbs_mul_greater_to_out_toom_43,
+    limbs_mul_greater_to_out_toom_43_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_43_scratch_len, limbs_mul_greater_to_out_toom_44,
+    limbs_mul_greater_to_out_toom_44_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_44_scratch_len, limbs_mul_greater_to_out_toom_52,
+    limbs_mul_greater_to_out_toom_52_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_52_scratch_len, limbs_mul_greater_to_out_toom_53,
+    limbs_mul_greater_to_out_toom_53_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_53_scratch_len, limbs_mul_greater_to_out_toom_54,
+    limbs_mul_greater_to_out_toom_54_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_54_scratch_len, limbs_mul_greater_to_out_toom_62,
+    limbs_mul_greater_to_out_toom_62_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_62_scratch_len, limbs_mul_greater_to_out_toom_63,
+    limbs_mul_greater_to_out_toom_63_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_63_scratch_len,
 };
 use malachite_nz::natural::arithmetic::mul::{
     limbs_mul, limbs_mul_greater, limbs_mul_greater_to_out, limbs_mul_greater_to_out_basecase,
@@ -12956,12 +12966,12 @@ fn product_properties() {
     });
 }
 
-// Scratch-sizing canaries for the mul dispatchers (see DOC-AUDIT.md): run every input shape with a
-// scratch of exactly the advertised length, densely sampling every dispatch-threshold boundary. An
-// under-sized scratch formula panics inside a kernel (the failure mode of the 2026-08-02
-// `limbs_mul_high_same_length_scratch_len` bug); the high-water measurement bounds what the
-// function actually touched, and the product is checked against `Natural` multiplication to catch
-// any scratch-related corruption.
+// Scratch-sizing canaries for the mul dispatchers (see DOC-CONVENTIONS.md): run every input shape
+// with a scratch of exactly the advertised length, densely sampling every dispatch-threshold
+// boundary. An under-sized scratch formula panics inside a kernel (the failure mode of the
+// 2026-08-02 `limbs_mul_high_same_length_scratch_len` bug); the high-water measurement bounds what
+// the function actually touched, and the product is checked against `Natural` multiplication to
+// catch any scratch-related corruption.
 #[test]
 fn test_limbs_mul_same_length_to_out_scratch_sizing() {
     let thresholds = mul_dispatch_thresholds();
@@ -13013,4 +13023,130 @@ fn test_limbs_mul_greater_to_out_scratch_sizing() {
         assert!(high_water <= scratch_len);
         assert_eq!(Natural::from_owned_limbs_asc(out), expected);
     }
+}
+
+// Scratch-sizing canaries for the individual Toom kernels (see DOC-CONVENTIONS.md): every valid
+// input shape up to the size cap runs with a scratch of exactly the advertised length. An
+// under-sized formula panics inside the kernel; the high-water mark confirms the touched region
+// stays within the advertised length, and the product is checked against `Natural` multiplication.
+#[test]
+fn test_limbs_mul_toom_scratch_sizing() {
+    fn check(
+        name: &str,
+        valid: &dyn Fn(usize, usize) -> bool,
+        scratch_len: &dyn Fn(usize, usize) -> usize,
+        mul: &dyn Fn(&mut [Limb], &[Limb], &[Limb], &mut [Limb]),
+        max_len: usize,
+    ) {
+        let mut count = 0;
+        for xs_len in 2..=max_len {
+            for ys_len in 2..=xs_len {
+                if !valid(xs_len, ys_len) {
+                    continue;
+                }
+                count += 1;
+                let xs = canary_limbs("toom canary xs", xs_len);
+                let ys = canary_limbs("toom canary ys", ys_len);
+                let expected = Natural::from_limbs_asc(&xs) * Natural::from_limbs_asc(&ys);
+                let mut out = vec![0; xs_len + ys_len];
+                let sl = scratch_len(xs_len, ys_len);
+                let high_water = scratch_high_water(sl, |scratch| mul(&mut out, &xs, &ys, scratch));
+                assert!(high_water <= sl);
+                let product = Natural::from_owned_limbs_asc(out);
+                assert_eq!(product, expected, "{name} {xs_len} {ys_len}");
+            }
+        }
+        assert_ne!(count, 0, "no valid shapes swept for {name}");
+    }
+    check(
+        "toom_22",
+        &limbs_mul_greater_to_out_toom_22_input_sizes_valid,
+        &limbs_mul_greater_to_out_toom_22_scratch_len,
+        &|o, x, y, s| limbs_mul_greater_to_out_toom_22(o, x, y, s),
+        120,
+    );
+    check(
+        "toom_32",
+        &limbs_mul_greater_to_out_toom_32_input_sizes_valid,
+        &limbs_mul_greater_to_out_toom_32_scratch_len,
+        &|o, x, y, s| limbs_mul_greater_to_out_toom_32(o, x, y, s),
+        120,
+    );
+    check(
+        "toom_33",
+        &limbs_mul_greater_to_out_toom_33_input_sizes_valid,
+        &limbs_mul_greater_to_out_toom_33_scratch_len,
+        &|o, x, y, s| limbs_mul_greater_to_out_toom_33(o, x, y, s),
+        120,
+    );
+    check(
+        "toom_42",
+        &limbs_mul_greater_to_out_toom_42_input_sizes_valid,
+        &limbs_mul_greater_to_out_toom_42_scratch_len,
+        &|o, x, y, s| limbs_mul_greater_to_out_toom_42(o, x, y, s),
+        120,
+    );
+    check(
+        "toom_43",
+        &limbs_mul_greater_to_out_toom_43_input_sizes_valid,
+        &limbs_mul_greater_to_out_toom_43_scratch_len,
+        &|o, x, y, s| limbs_mul_greater_to_out_toom_43(o, x, y, s),
+        120,
+    );
+    check(
+        "toom_44",
+        &limbs_mul_greater_to_out_toom_44_input_sizes_valid,
+        &limbs_mul_greater_to_out_toom_44_scratch_len,
+        &|o, x, y, s| limbs_mul_greater_to_out_toom_44(o, x, y, s),
+        120,
+    );
+    check(
+        "toom_52",
+        &limbs_mul_greater_to_out_toom_52_input_sizes_valid,
+        &limbs_mul_greater_to_out_toom_52_scratch_len,
+        &|o, x, y, s| limbs_mul_greater_to_out_toom_52(o, x, y, s),
+        120,
+    );
+    check(
+        "toom_53",
+        &limbs_mul_greater_to_out_toom_53_input_sizes_valid,
+        &limbs_mul_greater_to_out_toom_53_scratch_len,
+        &|o, x, y, s| limbs_mul_greater_to_out_toom_53(o, x, y, s),
+        120,
+    );
+    check(
+        "toom_54",
+        &limbs_mul_greater_to_out_toom_54_input_sizes_valid,
+        &limbs_mul_greater_to_out_toom_54_scratch_len,
+        &|o, x, y, s| limbs_mul_greater_to_out_toom_54(o, x, y, s),
+        120,
+    );
+    check(
+        "toom_62",
+        &limbs_mul_greater_to_out_toom_62_input_sizes_valid,
+        &limbs_mul_greater_to_out_toom_62_scratch_len,
+        &|o, x, y, s| limbs_mul_greater_to_out_toom_62(o, x, y, s),
+        120,
+    );
+    check(
+        "toom_63",
+        &limbs_mul_greater_to_out_toom_63_input_sizes_valid,
+        &limbs_mul_greater_to_out_toom_63_scratch_len,
+        &|o, x, y, s| limbs_mul_greater_to_out_toom_63(o, x, y, s),
+        120,
+    );
+    check(
+        "toom_6h",
+        &limbs_mul_greater_to_out_toom_6h_input_sizes_valid,
+        &limbs_mul_greater_to_out_toom_6h_scratch_len,
+        &|o, x, y, s| limbs_mul_greater_to_out_toom_6h(o, x, y, s),
+        200,
+    );
+    check(
+        "toom_8h",
+        &limbs_mul_greater_to_out_toom_8h_input_sizes_valid,
+        &limbs_mul_greater_to_out_toom_8h_scratch_len,
+        &|o, x, y, s| limbs_mul_greater_to_out_toom_8h(o, x, y, s),
+        200,
+    );
 }

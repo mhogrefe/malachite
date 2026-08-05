@@ -25,6 +25,7 @@ use crate::natural::logic::not::limbs_not_in_place;
 use crate::platform::Limb;
 use alloc::vec::Vec;
 use core::cmp::{Ordering::*, max};
+use core::mem::take;
 use core::ops::{BitXor, BitXorAssign};
 use itertools::repeat_n;
 use malachite_base::num::arithmetic::traits::WrappingNegAssign;
@@ -65,9 +66,9 @@ private_test_fn! {limbs_neg_xor_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
 }}
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of the negative of an
-// `Integer`, writes the limbs of the bitwise and of the `Integer`, writes the limbs of the bitwise
-// xor of the `Integer` and a `Limb` to an output slice. The output slice must be at least as long
-// as the input slice. `xs` cannot be empty or only contain zeros. Returns whether a carry occurs.
+// `Integer`, writes the limbs of the bitwise xor of the `Integer` and a `Limb` to an output slice.
+// The output slice must be at least as long as the input slice. `xs` cannot be empty or only
+// contain zeros. Returns whether a carry occurs.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -304,7 +305,7 @@ private_test_fn! {limbs_neg_xor_limb_neg_to_out(out: &mut [Limb], xs: &[Limb], y
     }
 }}
 
-// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of the negative of an
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of the negative of an
 // `Integer`, takes the bitwise xor of the `Integer` and a negative number whose lowest limb is
 // given by `y` and whose other limbs are full of `true` bits, in place. `xs` may not be empty or
 // only contain zeros.
@@ -669,7 +670,7 @@ fn limbs_xor_pos_neg_in_place_right_helper(
 // $M(m) = O(m)$
 //
 // where $T$ is time, $M$ is additional memory, $n$ is `max(xs.len(), ys.len())`, and $m$ is `max(1,
-// ys.len() - xs.len())`.
+// xs.len() - ys.len())`.
 //
 // # Panics
 // Panics if `xs` or `ys` are empty or contain only zeros.
@@ -1106,7 +1107,7 @@ impl Natural {
     }
 
     fn xor_assign_neg_pos(&mut self, mut other: Self) {
-        other.xor_assign_pos_neg_ref(&*self);
+        other.xor_assign_pos_neg(take(self));
         *self = other;
     }
 
@@ -1284,6 +1285,11 @@ impl BitXor<&Integer> for &Integer {
     /// $$
     /// f(x, y) = x \oplus y.
     /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.

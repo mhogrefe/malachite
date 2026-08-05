@@ -45,6 +45,8 @@ use malachite_nz::test_util::generators::{
 use malachite_nz::test_util::natural::arithmetic::div_exact::{
     limbs_div_exact_3_in_place_alt, limbs_div_exact_3_to_out_alt,
 };
+use malachite_nz::test_util::natural::arithmetic::div_mod::div_dispatch_thresholds;
+use malachite_nz::test_util::scratch::*;
 use std::str::FromStr;
 
 #[test]
@@ -4900,4 +4902,89 @@ fn div_exact_properties() {
     unsigned_pair_gen_var_11::<Limb>().test_properties(|(x, y)| {
         assert_eq!(Natural::from(x).div_exact(Natural::from(y)), x.div_exact(y));
     });
+}
+
+// Scratch-sizing canaries for the 2-adic (exact/modular) division machinery (see
+// DOC-CONVENTIONS.md). The divisor must be odd; quotients are verified via Q * D = N mod B^k.
+#[test]
+fn test_limbs_modular_invert_scratch_sizing() {
+    let thresholds = div_dispatch_thresholds();
+    for d_len in threshold_straddling_lengths(&thresholds, 1, 850, 1) {
+        let mut ds = canary_limbs("modular invert ds", d_len);
+        ds[0] |= 1;
+        let mut is = vec![0; d_len];
+        let scratch_len = limbs_modular_invert_scratch_len(d_len);
+        let high_water = scratch_high_water(scratch_len, |scratch| {
+            limbs_modular_invert(&mut is, &ds, scratch);
+        });
+        assert!(high_water <= scratch_len);
+        let w = u64::exact_from(d_len) * Limb::WIDTH;
+        let product =
+            (Natural::from_limbs_asc(&ds) * Natural::from_owned_limbs_asc(is)).mod_power_of_2(w);
+        assert_eq!(product, 1, "{d_len}");
+    }
+}
+
+#[test]
+fn test_limbs_modular_div_scratch_sizing() {
+    let thresholds = div_dispatch_thresholds();
+    for d_len in threshold_straddling_lengths(&thresholds, 1, 700, 1) {
+        for n_len in [d_len, d_len + 1, d_len + 2, d_len << 1, 3 * d_len] {
+            if n_len < d_len {
+                continue;
+            }
+            let ns = canary_limbs("modular div ns", n_len);
+            let mut ds = canary_limbs("modular div ds", d_len);
+            ds[0] |= 1;
+            let w = u64::exact_from(n_len) * Limb::WIDTH;
+            let n = Natural::from_limbs_asc(&ns);
+            let d = Natural::from_limbs_asc(&ds);
+
+            let mut qs = vec![0; n_len];
+            let scratch_len = limbs_modular_div_scratch_len(n_len, d_len);
+            let mut ns_mut = ns.clone();
+            let high_water = scratch_high_water(scratch_len, |scratch| {
+                limbs_modular_div(&mut qs, &mut ns_mut, &ds, scratch);
+            });
+            assert!(high_water <= scratch_len);
+            let q = Natural::from_owned_limbs_asc(qs);
+            assert_eq!(
+                (q * &d).mod_power_of_2(w),
+                (&n).mod_power_of_2(w),
+                "{n_len} {d_len}"
+            );
+
+            if d_len >= 2 && n_len > d_len {
+                let mut qs = vec![0; n_len];
+                let scratch_len = limbs_modular_div_barrett_scratch_len(n_len, d_len);
+                let high_water = scratch_high_water(scratch_len, |scratch| {
+                    limbs_modular_div_barrett(&mut qs, &ns, &ds, scratch);
+                });
+                assert!(high_water <= scratch_len);
+                let q = Natural::from_owned_limbs_asc(qs);
+                assert_eq!(
+                    (q * &d).mod_power_of_2(w),
+                    (&n).mod_power_of_2(w),
+                    "b {n_len} {d_len}"
+                );
+            }
+
+            if d_len >= 2 && n_len >= d_len + 2 {
+                let mut qs = vec![0; n_len - d_len];
+                let mut rs = vec![0; d_len];
+                let scratch_len = limbs_modular_div_mod_barrett_scratch_len(n_len, d_len);
+                let high_water = scratch_high_water(scratch_len, |scratch| {
+                    limbs_modular_div_mod_barrett(&mut qs, &mut rs, &ns, &ds, scratch);
+                });
+                assert!(high_water <= scratch_len);
+                let qw = u64::exact_from(n_len - d_len) * Limb::WIDTH;
+                let q = Natural::from_owned_limbs_asc(qs);
+                assert_eq!(
+                    (q * &d).mod_power_of_2(qw),
+                    (&n).mod_power_of_2(qw),
+                    "qr {n_len} {d_len}"
+                );
+            }
+        }
+    }
 }

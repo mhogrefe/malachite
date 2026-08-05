@@ -1752,6 +1752,9 @@ pub fn exhaustive_nonzero_primitive_floats<T: PrimitiveFloat>()
 /// # Complexity per iteration
 /// Constant time and additional memory.
 ///
+/// # Worst-case complexity per iteration
+/// Constant time and additional memory.
+///
 /// # Examples
 /// ```
 /// use malachite_base::iterators::prefix_to_string;

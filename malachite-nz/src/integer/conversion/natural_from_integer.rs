@@ -17,7 +17,7 @@ pub struct NaturalFromIntegerError;
 impl TryFrom<Integer> for Natural {
     type Error = NaturalFromIntegerError;
 
-    /// Converts an [`Integer`] to a [`Natural`], taking the [`Natural`] by value. If the
+    /// Converts an [`Integer`] to a [`Natural`], taking the [`Integer`] by value. If the
     /// [`Integer`] is negative, an error is returned.
     ///
     /// # Worst-case complexity
@@ -58,7 +58,7 @@ impl TryFrom<Integer> for Natural {
 impl<'a> TryFrom<&'a Integer> for Natural {
     type Error = NaturalFromIntegerError;
 
-    /// Converts an [`Integer`] to a [`Natural`], taking the [`Natural`] by reference. If the
+    /// Converts an [`Integer`] to a [`Natural`], taking the [`Integer`] by reference. If the
     /// [`Integer`] is negative, an error is returned.
     ///
     /// # Worst-case complexity
@@ -104,7 +104,7 @@ impl<'a> TryFrom<&'a Integer> for Natural {
 }
 
 impl SaturatingFrom<Integer> for Natural {
-    /// Converts an [`Integer`] to a [`Natural`], taking the [`Natural`] by value. If the
+    /// Converts an [`Integer`] to a [`Natural`], taking the [`Integer`] by value. If the
     /// [`Integer`] is negative, 0 is returned.
     ///
     /// # Worst-case complexity
@@ -134,11 +134,15 @@ impl SaturatingFrom<Integer> for Natural {
 }
 
 impl<'a> SaturatingFrom<&'a Integer> for Natural {
-    /// Converts an [`Integer`] to a [`Natural`], taking the [`Natural`] by reference. If the
+    /// Converts an [`Integer`] to a [`Natural`], taking the [`Integer`] by reference. If the
     /// [`Integer`] is negative, 0 is returned.
     ///
     /// # Worst-case complexity
-    /// Constant time and additional memory.
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `value.significant_bits()`.
     ///
     /// # Examples
     /// ```

@@ -54,6 +54,9 @@ use malachite_base::num::logic::traits::{BitAccess, LeadingZeros, LowMask};
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::slices::slice_test_zero;
 
+// Scratch derivation: `limbs_sqrt_rem_helper` uses the scratch for the approximate quotient of its
+// recursive division step, whose length is half the input length plus one guard limb (mirroring
+// `mpn_dc_sqrtrem`'s usage, GMP 6.2.1).
 private_test_const_fn! {limbs_sqrt_rem_helper_scratch_len(n: usize) -> usize {
     (n >> 1) + 1
 }}
@@ -642,7 +645,12 @@ private_test_fn! {limbs_floor_sqrt(xs: &[Limb]) -> Vec<Limb> {
 // All limbs are in ascending order (least-significant first).
 //
 // # Worst-case complexity
-// TODO
+// $T(n) = O(n \log n \log\log n)$
+//
+// $M(n) = O(n \log n)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`: one square root with
+// remainder, a linear zero-test of the remainder, and at most one increment.
 private_test_fn! {limbs_ceiling_sqrt(xs: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let sqrt_len = xs_len.shr_round(1, Ceiling).0;

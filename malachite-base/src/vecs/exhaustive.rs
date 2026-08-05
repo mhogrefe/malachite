@@ -448,6 +448,14 @@ where
 ///
 /// If `xs` is empty, the output is also empty, unless `len` is 0.
 ///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is `len`.
+///
 /// # Examples
 /// ```
 /// use itertools::Itertools;
@@ -922,6 +930,15 @@ where
 ///
 /// If `xs` is empty, the output is also empty, unless `len` is 0.
 ///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is the number of elements in
+/// the $i$th output.
+///
 /// # Examples
 /// ```
 /// use itertools::Itertools;
@@ -995,6 +1012,14 @@ where
 /// If `len` is 0, the output consists of one empty [`Vec`].
 ///
 /// If `xs` is empty, the output is also empty, unless `len` is 0.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is `len`.
 ///
 /// # Examples
 /// ```
@@ -1164,6 +1189,15 @@ pub const fn shortlex_vecs_from_length_iterator<
 ///
 /// The lengths of the output [`Vec`]s grow logarithmically.
 ///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is the number of elements in
+/// the $i$th output.
+///
 /// # Examples
 /// ```
 /// use itertools::Itertools;
@@ -1221,6 +1255,15 @@ where
 /// `min_length` is greater than 0, the output is empty; otherwise, the output is infinite.
 ///
 /// The lengths of the output [`Vec`]s grow logarithmically.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is the number of elements in
+/// the $i$th output.
 ///
 /// # Examples
 /// ```
@@ -1289,6 +1332,15 @@ where
 ///
 /// The lengths of the output [`Vec`]s grow logarithmically.
 ///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is the number of elements in
+/// the $i$th output.
+///
 /// # Examples
 /// ```
 /// use itertools::Itertools;
@@ -1346,6 +1398,15 @@ where
 /// where $k$ is `xs.count()`.
 ///
 /// The lengths of the output [`Vec`]s grow logarithmically.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is the number of elements in
+/// the $i$th output.
 ///
 /// # Examples
 /// ```
@@ -1526,6 +1587,15 @@ pub const fn exhaustive_vecs_from_length_iterator<
 ///
 /// The lengths of the output [`Vec`]s grow logarithmically.
 ///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is the number of elements in
+/// the $i$th output.
+///
 /// # Examples
 /// ```
 /// use itertools::Itertools;
@@ -1577,6 +1647,15 @@ where
 /// `min_length` is greater than 0, the output is empty; otherwise, the output is infinite.
 ///
 /// The lengths of the output [`Vec`]s grow logarithmically.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is the number of elements in
+/// the $i$th output.
 ///
 /// # Examples
 /// ```
@@ -1639,6 +1718,15 @@ where
 ///   where $k$ is `xs.count()`.
 ///
 /// The lengths of the output [`Vec`]s grow logarithmically.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is the number of elements in
+/// the $i$th output.
 ///
 /// # Examples
 /// ```
@@ -1705,6 +1793,15 @@ where
 ///
 /// # Panics
 /// Panics if $a > b$.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is the number of elements in
+/// the $i$th output.
 ///
 /// # Examples
 /// ```
@@ -1878,6 +1975,14 @@ where
 ///
 /// If `xs` is empty, the output is also empty, unless $k$ is 0.
 ///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is `k`.
+///
 /// # Examples
 /// ```
 /// use itertools::Itertools;
@@ -1998,6 +2103,15 @@ where
 ///
 /// If `xs` is empty, the output consists of a single empty [`Vec`].
 ///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is the number of elements in
+/// the $i$th output.
+///
 /// # Examples
 /// ```
 /// use itertools::Itertools;
@@ -2055,6 +2169,15 @@ where
 /// \sum_{i=\ell}^n \binom{n}{i}.
 /// $$
 ///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is the number of elements in
+/// the $i$th output.
+///
 /// # Examples
 /// ```
 /// use itertools::Itertools;
@@ -2111,6 +2234,15 @@ where
 /// $$
 /// \sum_{i=a}^{b - 1} \binom{n}{i}.
 /// $$
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is the number of elements in
+/// the $i$th output.
 ///
 /// # Examples
 /// ```
@@ -2174,6 +2306,15 @@ where
 /// $$
 /// \sum_{i=a}^b \binom{n}{i}.
 /// $$
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is the number of elements in
+/// the $i$th output.
 ///
 /// # Examples
 /// ```
@@ -2340,6 +2481,15 @@ where
 ///
 /// If `xs` is empty, the output consists of a single empty [`Vec`].
 ///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is the number of elements in
+/// the $i$th output.
+///
 /// # Examples
 /// ```
 /// use itertools::Itertools;
@@ -2396,6 +2546,15 @@ where
 /// \sum_{i=\ell}^n \binom{n}{i}.
 /// $$
 ///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is the number of elements in
+/// the $i$th output.
+///
 /// # Examples
 /// ```
 /// use itertools::Itertools;
@@ -2451,6 +2610,15 @@ where
 /// $$
 /// \sum_{i=a}^{b - 1} \binom{n}{i}.
 /// $$
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is the number of elements in
+/// the $i$th output.
 ///
 /// # Examples
 /// ```
@@ -2513,6 +2681,15 @@ where
 /// $$
 /// \sum_{i=a}^b \binom{n}{i}.
 /// $$
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is the number of elements in
+/// the $i$th output.
 ///
 /// # Examples
 /// ```
@@ -2793,6 +2970,14 @@ where
 ///
 /// If `xs` is empty, the output is also empty, unless $k$ is 0.
 ///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is `k`.
+///
 /// # Examples
 /// ```
 /// use itertools::Itertools;
@@ -2845,6 +3030,15 @@ where
 /// If the input iterator length is $n$, the output length is $2^n$.
 ///
 /// If `xs` is empty, the output consists of a single empty [`Vec`].
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is the number of elements in
+/// the $i$th output.
 ///
 /// # Examples
 /// ```
@@ -2900,6 +3094,15 @@ where
 /// \sum_{i=\ell}^n \binom{n}{i}.
 /// $$
 ///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is the number of elements in
+/// the $i$th output.
+///
 /// # Examples
 /// ```
 /// use itertools::Itertools;
@@ -2953,6 +3156,15 @@ where
 /// $$
 /// \sum_{i=a}^{b - 1} \binom{n}{i}.
 /// $$
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is the number of elements in
+/// the $i$th output.
 ///
 /// # Examples
 /// ```
@@ -3013,6 +3225,15 @@ where
 /// $$
 /// \sum_{i=a}^b \binom{n}{i}.
 /// $$
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is the number of elements in
+/// the $i$th output.
 ///
 /// # Examples
 /// ```
@@ -3183,6 +3404,14 @@ where
 ///
 /// If `xs` is empty, the output is also empty, unless $k$ is 0.
 ///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is `k`.
+///
 /// # Examples
 /// ```
 /// use itertools::Itertools;
@@ -3317,6 +3546,15 @@ where
 ///
 /// If `xs` is empty, the output consists of a single empty [`Vec`].
 ///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is the number of elements in
+/// the $i$th output.
+///
 /// # Examples
 /// ```
 /// use itertools::Itertools;
@@ -3374,6 +3612,15 @@ where
 /// $$
 /// \sum_ {k=\ell}^n \frac{n!}{k!}.
 /// $$
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is the number of elements in
+/// the $i$th output.
 ///
 /// # Examples
 /// ```
@@ -3441,6 +3688,15 @@ where
 /// $$
 /// \sum_{i=a}^{b - 1} \frac{n!}{k!}.
 /// $$
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is the number of elements in
+/// the $i$th output.
 ///
 /// # Examples
 /// ```
@@ -3515,6 +3771,15 @@ where
 /// $$
 /// \sum_{i=a}^b \frac{n!}{k!}.
 /// $$
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is the number of elements in
+/// the $i$th output.
 ///
 /// # Examples
 /// ```
@@ -3690,6 +3955,15 @@ where
 ///
 /// If `xs` is empty, the output consists of a single empty [`Vec`].
 ///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is the number of elements in
+/// the $i$th output.
+///
 /// # Examples
 /// ```
 /// use itertools::Itertools;
@@ -3746,6 +4020,15 @@ where
 /// $$
 /// \sum_{i=\ell}^n \frac{n!}{k!}.
 /// $$
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is the number of elements in
+/// the $i$th output.
 ///
 /// # Examples
 /// ```
@@ -3807,6 +4090,15 @@ where
 /// $$
 /// \sum_{i=a}^{b - 1} \frac{n!}{k!}.
 /// $$
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is the number of elements in
+/// the $i$th output.
 ///
 /// # Examples
 /// ```
@@ -3876,6 +4168,15 @@ where
 /// $$
 /// \sum_{i=\ell}^n \frac{n!}{k!}.
 /// $$
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is the number of elements in
+/// the $i$th output.
 ///
 /// # Examples
 /// ```
@@ -4063,6 +4364,14 @@ where
 ///
 /// If `xs` is empty, the output is also empty, unless $k$ is 0.
 ///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is `k`.
+///
 /// # Examples
 /// ```
 /// use itertools::Itertools;
@@ -4168,6 +4477,15 @@ where
 ///
 /// If `xs` is empty, the output consists of a single empty [`Vec`].
 ///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is the number of elements in
+/// the $i$th output.
+///
 /// # Examples
 /// ```
 /// use itertools::Itertools;
@@ -4225,6 +4543,15 @@ where
 /// $$
 /// \sum_ {k=\ell}^n \frac{n!}{k!}.
 /// $$
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is the number of elements in
+/// the $i$th output.
 ///
 /// # Examples
 /// ```
@@ -4293,6 +4620,15 @@ where
 /// \sum_{i=a}^{b - 1} \frac{n!}{k!}.
 /// $$
 ///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is the number of elements in
+/// the $i$th output.
+///
 /// # Examples
 /// ```
 /// use itertools::Itertools;
@@ -4360,6 +4696,15 @@ where
 /// $$
 /// \sum_{i=a}^b \frac{n!}{k!}.
 /// $$
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is the number of elements in
+/// the $i$th output.
 ///
 /// # Examples
 /// ```

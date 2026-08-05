@@ -70,15 +70,13 @@ impl Iterator for ExhaustiveNaturalRangeToInfinity {
 /// The output length is infinite.
 ///
 /// # Worst-case complexity per iteration
-/// $T(i) = O(i)$
+/// $T(i) = O(\ell)$
 ///
-/// $M(i) = O(i)$
+/// $M(i) = O(\ell)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
-///
-/// Although the time and space complexities are worst-case linear, the worst case is very rare. If
-/// we exclude the cases where the least-significant limb of the previously-generated value is
-/// `Limb::MAX`, the worst case space and time complexities are constant.
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $\ell$ is the
+/// number of significant bits of the $i$th output: each iteration clones the current value, and the
+/// increment's carry chain is amortized constant.
 ///
 /// # Examples
 /// ```
@@ -102,15 +100,13 @@ pub const fn exhaustive_naturals() -> ExhaustiveNaturalRangeToInfinity {
 /// The output length is infinite.
 ///
 /// # Worst-case complexity per iteration
-/// $T(i) = O(i)$
+/// $T(i) = O(\ell)$
 ///
-/// $M(i) = O(i)$
+/// $M(i) = O(\ell)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
-///
-/// Although the time and space complexities are worst-case linear, the worst case is very rare. If
-/// we exclude the cases where the least-significant limb of the previously-generated value is
-/// `Limb::MAX`, the worst case space and time complexities are constant.
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $\ell$ is the
+/// number of significant bits of the $i$th output: each iteration clones the current value, and the
+/// increment's carry chain is amortized constant.
 ///
 /// # Examples
 /// ```
@@ -137,15 +133,13 @@ pub const fn exhaustive_positive_naturals() -> ExhaustiveNaturalRangeToInfinity 
 /// The output length is $b - a$.
 ///
 /// # Worst-case complexity per iteration
-/// $T(i) = O(i)$
+/// $T(i) = O(\ell)$
 ///
-/// $M(i) = O(i)$
+/// $M(i) = O(\ell)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
-///
-/// Although the time and space complexities are worst-case linear, the worst case is very rare. If
-/// we exclude the cases where the least-significant limb of the previously-generated value is
-/// `Limb::MAX`, the worst case space and time complexities are constant.
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $\ell$ is the
+/// number of significant bits of the $i$th output: each iteration clones the current value, and the
+/// increment's carry chain is amortized constant.
 ///
 /// # Panics
 /// Panics if $a > b$.
@@ -181,15 +175,13 @@ pub fn exhaustive_natural_range(a: Natural, b: Natural) -> ExhaustiveNaturalRang
 /// The output length is $b - a + 1$.
 ///
 /// # Worst-case complexity per iteration
-/// $T(i) = O(i)$
+/// $T(i) = O(\ell)$
 ///
-/// $M(i) = O(i)$
+/// $M(i) = O(\ell)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
-///
-/// Although the time and space complexities are worst-case linear, the worst case is very rare. If
-/// we exclude the cases where the least-significant limb of the previously-generated value is
-/// `Limb::MAX`, the worst case space and time complexities are constant.
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $\ell$ is the
+/// number of significant bits of the $i$th output: each iteration clones the current value, and the
+/// increment's carry chain is amortized constant.
 ///
 /// # Panics
 /// Panics if $a>b$.
@@ -224,15 +216,13 @@ pub fn exhaustive_natural_inclusive_range(a: Natural, b: Natural) -> ExhaustiveN
 /// The output length is infinite.
 ///
 /// # Worst-case complexity per iteration
-/// $T(i) = O(i)$
+/// $T(i) = O(\ell)$
 ///
-/// $M(i) = O(i)$
+/// $M(i) = O(\ell)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
-///
-/// Although the time and space complexities are worst-case linear, the worst case is very rare. If
-/// we exclude the cases where the least-significant limb of the previously-generated value is
-/// `Limb::MAX`, the worst case space and time complexities are constant.
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $\ell$ is the
+/// number of significant bits of the $i$th output: each iteration clones the current value, and the
+/// increment's carry chain is amortized constant.
 ///
 /// # Examples
 /// ```

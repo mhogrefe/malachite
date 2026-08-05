@@ -231,6 +231,15 @@ impl<I: Iterator<Item = Vec<char>>> Iterator for StringsFromCharVecs<I> {
 ///
 /// The output length is `css.count()`.
 ///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `css`, and $\ell$ is the length of the $i$th
+/// output string.
+///
 /// # Examples
 /// ```
 /// use itertools::Itertools;

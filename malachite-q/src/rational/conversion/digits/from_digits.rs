@@ -25,7 +25,7 @@ impl Rational {
     /// handled correctly.
     ///
     /// # Worst-case complexity
-    /// $T(n, m) = O(nm \log (nm)^2 \log\log (nm))$
+    /// $T(n, m) = O(nm (\log (nm))^2 \log\log (nm))$
     ///
     /// $M(n, m) = O(nm \log (nm))$
     ///
@@ -94,7 +94,7 @@ impl Rational {
     /// handled correctly.
     ///
     /// # Worst-case complexity
-    /// $T(n, m) = O(nm \log (nm)^2 \log\log (nm))$
+    /// $T(n, m) = O(nm (\log (nm))^2 \log\log (nm))$
     ///
     /// $M(n, m) = O(nm \log (nm))$
     ///

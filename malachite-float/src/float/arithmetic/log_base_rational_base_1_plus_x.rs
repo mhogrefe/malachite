@@ -181,11 +181,12 @@ impl Float {
     /// and underflow (for an $x$ near 0).
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m \log m \log\log m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m \log m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), base.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `prec` is zero, if `base` is less than or equal to 1, or if `rm` is `Exact` but
@@ -241,11 +242,12 @@ impl Float {
     /// description of the rounding behavior.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m \log m \log\log m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m \log m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), base.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `prec` is zero, if `base` is less than or equal to 1, or if `rm` is `Exact` but
@@ -297,11 +299,12 @@ impl Float {
     /// See [`Float::log_base_rational_base_1_plus_x_prec_round`] for details and special cases.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m \log m \log\log m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m \log m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), base.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `prec` is zero or if `base` is less than or equal to 1.
@@ -332,11 +335,12 @@ impl Float {
     /// See [`Float::log_base_rational_base_1_plus_x_prec_round`] for details and special cases.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m \log m \log\log m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m \log m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), base.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `prec` is zero or if `base` is less than or equal to 1.
@@ -368,11 +372,12 @@ impl Float {
     /// See [`Float::log_base_rational_base_1_plus_x_prec_round`] for details and special cases.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m \log m \log\log m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m \log m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is the precision of the input.
+    /// where $T$ is time, $M$ is additional memory, $n$ is the precision of the input, and $m$ is
+    /// `base.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `base` is less than or equal to 1, or if `rm` is `Exact` but the result cannot be
@@ -407,11 +412,12 @@ impl Float {
     /// See [`Float::log_base_rational_base_1_plus_x_prec_round`] for details and special cases.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m \log m \log\log m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m \log m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is the precision of the input.
+    /// where $T$ is time, $M$ is additional memory, $n$ is the precision of the input, and $m$ is
+    /// `base.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `base` is less than or equal to 1, or if `rm` is `Exact` but the result cannot be
@@ -445,11 +451,12 @@ impl Float {
     /// See [`Float::log_base_rational_base_1_plus_x_prec_round`] for details and special cases.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m \log m \log\log m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m \log m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), base.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `prec` is zero, if `base` is less than or equal to 1, or if `rm` is `Exact` but
@@ -489,11 +496,12 @@ impl Float {
     /// See [`Float::log_base_rational_base_1_plus_x_prec_round`] for details and special cases.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m \log m \log\log m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m \log m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), base.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `prec` is zero or if `base` is less than or equal to 1.
@@ -523,11 +531,12 @@ impl Float {
     /// See [`Float::log_base_rational_base_1_plus_x_prec_round`] for details and special cases.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m \log m \log\log m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m \log m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is the precision of the input.
+    /// where $T$ is time, $M$ is additional memory, $n$ is the precision of the input, and $m$ is
+    /// `base.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `base` is less than or equal to 1, or if `rm` is `Exact` but the result cannot be
@@ -563,11 +572,12 @@ impl LogBaseOf1PlusX<Rational> for Float {
     /// See [`Float::log_base_rational_base_1_plus_x_prec_round`] for special cases.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m \log m \log\log m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m \log m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is the precision of the input.
+    /// where $T$ is time, $M$ is additional memory, $n$ is the precision of the input, and $m$ is
+    /// `base.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `base` is less than or equal to 1.
@@ -604,11 +614,12 @@ impl LogBaseOf1PlusX<&Rational> for &Float {
     /// See [`Float::log_base_rational_base_1_plus_x_prec_round`] for special cases.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m \log m \log\log m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m \log m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is the precision of the input.
+    /// where $T$ is time, $M$ is additional memory, $n$ is the precision of the input, and $m$ is
+    /// `base.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `base` is less than or equal to 1.
@@ -642,11 +653,12 @@ impl LogBaseOf1PlusXAssign<&Rational> for Float {
     /// See [`Float::log_base_rational_base_1_plus_x_prec_round`] for special cases.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m \log m \log\log m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m \log m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is the precision of the input.
+    /// where $T$ is time, $M$ is additional memory, $n$ is the precision of the input, and $m$ is
+    /// `base.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `base` is less than or equal to 1.
@@ -696,7 +708,11 @@ impl LogBaseOf1PlusXAssign<&Rational> for Float {
 /// underflow (for an $x$ near 0).
 ///
 /// # Worst-case complexity
-/// Constant time and additional memory.
+/// $T(m) = O(m \log m \log\log m)$
+///
+/// $M(m) = O(m \log m)$
+///
+/// where $T$ is time, $M$ is additional memory, and $m$ is `base.significant_bits()`.
 ///
 /// # Panics
 /// Panics if `base` is less than or equal to 1.

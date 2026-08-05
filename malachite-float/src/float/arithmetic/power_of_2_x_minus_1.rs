@@ -669,7 +669,11 @@ where
 /// - $f(0)=0$
 ///
 /// # Worst-case complexity
-/// Constant time and additional memory.
+/// $T(m) = O(m (\log m)^2 \log\log m)$
+///
+/// $M(m) = O(m \log m)$
+///
+/// where $T$ is time, $M$ is additional memory, and $m$ is `x.significant_bits()`.
 ///
 /// # Examples
 /// ```

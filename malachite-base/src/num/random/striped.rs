@@ -718,6 +718,15 @@ impl<I: Iterator<Item = u64>> Iterator for StripedRandomBoolVecs<I> {
 /// The mean run length (before the bit sequences are truncated) is $m$ = `mean_stripe_numerator /
 /// mean_stripe_denominator`.
 ///
+/// # Expected complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `lengths`, and $\ell$ is the number of elements
+/// in the $i$th output.
+///
 /// # Panics
 /// Panics if `mean_stripe_denominator` is zero or if `mean_stripe_numerator <=
 /// mean_stripe_denominator`.
@@ -1138,6 +1147,15 @@ impl<T: PrimitiveUnsigned, I: Iterator<Item = u64>> Iterator for StripedRandomUn
 ///
 /// The mean run length (before the bit sequences are truncated) is $m$ = `mean_stripe_numerator /
 /// mean_stripe_denominator`.
+///
+/// # Expected complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `lengths`, and $\ell$ is the number of elements
+/// in the $i$th output.
 ///
 /// # Panics
 /// Panics if `mean_stripe_denominator` is zero or if `mean_stripe_numerator <=

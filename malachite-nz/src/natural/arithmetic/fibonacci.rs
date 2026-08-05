@@ -175,9 +175,10 @@ impl Fibonacci for Natural {
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// $M(n) = O(n)$
+    /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `n`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `n`: the result has $\Theta(n)$
+    /// bits, and the doubling steps use full multiplications at that size.
     ///
     /// # Examples
     /// ```
@@ -287,9 +288,10 @@ impl Fibonacci for Natural {
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// $M(n) = O(n)$
+    /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `n`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `n`: the result has $\Theta(n)$
+    /// bits, and the doubling steps use full multiplications at that size.
     ///
     /// # Examples
     /// ```
@@ -349,9 +351,10 @@ impl LucasNumber for Natural {
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// $M(n) = O(n)$
+    /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `n`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `n`: the result has $\Theta(n)$
+    /// bits, and the doubling steps use full multiplications at that size.
     ///
     /// # Examples
     /// ```
@@ -481,9 +484,10 @@ impl LucasNumber for Natural {
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// $M(n) = O(n)$
+    /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `n`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `n`: the result has $\Theta(n)$
+    /// bits, and the doubling steps use full multiplications at that size.
     ///
     /// # Panics
     /// Panics if `n` is 0, since $L(-1) = -1$ cannot be represented as a [`Natural`].

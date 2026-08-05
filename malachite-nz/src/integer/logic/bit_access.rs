@@ -63,7 +63,9 @@ private_test_fn! {limbs_get_bit_neg(xs: &[Limb], index: u64) -> bool {
 //
 // $M(n) = O(1)$
 //
-// where $T$ is time, $M$ is additional memory, and $n$ is `index`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`: setting a two's complement
+// bit subtracts a power of 2 from the stored magnitude, whose borrow can run through the entire
+// slice, as can the leading-zeros scan.
 //
 // # Panics
 // If the slice contains only zeros a panic may occur.
@@ -126,7 +128,8 @@ fn limbs_clear_bit_neg_helper(xs: &mut [Limb], x_i: usize, reduced_index: u64) -
 //
 // $M(n) = O(1)$
 //
-// where $T$ is time, $M$ is additional memory, and $n$ is `index`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`: clearing a two's complement
+// bit adds a power of 2 to the stored magnitude, whose carry can run through the entire slice.
 //
 // # Panics
 // Panics if evaluation would require new `true` bits outside of the slice. If the slice contains
@@ -153,7 +156,9 @@ pub fn limbs_slice_clear_bit_neg(xs: &mut [Limb], index: u64) {
 //
 // $M(n) = O(n)$
 //
-// where $T$ is time, $M$ is additional memory, and $n$ is `index`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), index / Limb::WIDTH)`:
+// high indices grow the `Vec`, and clearing a two's complement bit adds a power of 2 to the stored
+// magnitude, whose carry can run through the entire slice.
 //
 // # Panics
 // If the slice contains only zeros a panic may occur.
@@ -336,7 +341,8 @@ impl BitAccess for Integer {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `index`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// index)`: setting a bit of a negative number can borrow through all of its limbs.
     ///
     /// # Examples
     /// ```
@@ -387,7 +393,8 @@ impl BitAccess for Integer {
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `index`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// index)`: clearing a bit of a negative number can carry through all of its limbs.
     ///
     /// # Examples
     /// ```

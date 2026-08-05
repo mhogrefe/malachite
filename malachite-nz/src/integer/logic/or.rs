@@ -92,8 +92,8 @@ private_test_fn! {limbs_neg_or_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Lim
 }}
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of the negative of an
-// `Integer`, writes the limbs of the bitwise or of the `Integer`, writes the limbs of the bitwise
-// or of the `Integer` and a `Limb` to the input slice. `xs` cannot be empty or only contain zeros.
+// `Integer`, writes the limbs of the bitwise or of the `Integer` and a `Limb` to the input slice.
+// `xs` cannot be empty or only contain zeros.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$
@@ -373,7 +373,8 @@ private_test_fn! {limbs_vec_or_pos_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[L
         xs.push(ys[y_i] - 1);
         xs.extend_from_slice(&ys[y_i + 1..]);
     } else if x_i >= ys_len {
-        *xs = ys.to_vec();
+        xs.truncate(ys_len);
+        xs.copy_from_slice(ys);
     } else {
         let max_i = max(x_i, y_i);
         match x_i.cmp(&y_i) {
@@ -570,7 +571,7 @@ private_test_fn! {limbs_or_neg_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[L
 // Interpreting two slices of `Limb`s as the limbs (in ascending order) of the negatives of two
 // `Integer`s, writes the limbs of the bitwise or of the `Integer`s to the first (left) slice. `xs`
 // and `ys` may not be empty or only contain zeros. If the result has fewer significant limbs than
-// the left slice, the remaining limbs in the left slice are set to `Limb::MAX`.
+// the left slice, the remaining limbs in the left slice are set to zero.
 //
 // # Worst-case complexity
 // $T(n) = O(n)$

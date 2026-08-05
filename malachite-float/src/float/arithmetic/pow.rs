@@ -1187,11 +1187,12 @@ impl Float {
     /// consider using [`Pow::pow`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
@@ -1456,11 +1457,12 @@ impl Float {
     /// [`Pow::pow`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
@@ -1558,11 +1560,12 @@ impl Float {
     /// consider using [`Pow::pow`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
@@ -1666,11 +1669,12 @@ impl Float {
     /// consider using [`Pow::pow`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
@@ -1765,11 +1769,12 @@ impl Float {
     /// the precisions of the two inputs, consider using [`Pow::pow`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -1837,11 +1842,12 @@ impl Float {
     /// maximum of the precisions of the two inputs, consider using [`Pow::pow`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -1920,7 +1926,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
@@ -2010,7 +2016,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
@@ -2101,7 +2107,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
@@ -2193,7 +2199,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
@@ -2273,11 +2279,12 @@ impl Float {
     /// maximum of the precisions of the two inputs, consider using [`Pow::pow`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -2346,11 +2353,12 @@ impl Float {
     /// maximum of the precisions of the two inputs, consider using [`Pow::pow`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -2399,11 +2407,12 @@ impl Float {
     /// consider using [`PowAssign::pow_assign`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
@@ -2479,11 +2488,12 @@ impl Float {
     /// true, consider using [`PowAssign::pow_assign`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
@@ -2576,11 +2586,12 @@ impl Float {
     /// instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -2628,11 +2639,12 @@ impl Float {
     /// instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -2682,7 +2694,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
@@ -2744,7 +2756,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
@@ -2804,7 +2816,7 @@ impl Pow<Self> for Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
@@ -2850,7 +2862,7 @@ impl Pow<&Self> for Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
@@ -2896,7 +2908,7 @@ impl Pow<Float> for &Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
@@ -2945,7 +2957,7 @@ impl Pow<&Float> for &Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
@@ -2992,7 +3004,7 @@ impl PowAssign<Self> for Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
@@ -3037,7 +3049,7 @@ impl PowAssign<&Self> for Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
@@ -3088,7 +3100,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
@@ -3145,7 +3157,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
@@ -3202,7 +3214,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
@@ -3283,7 +3295,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
@@ -3344,7 +3356,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
@@ -3394,7 +3406,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
@@ -3444,7 +3456,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
@@ -3494,7 +3506,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
@@ -3545,7 +3557,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
@@ -3602,7 +3614,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
@@ -3659,7 +3671,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
@@ -3716,7 +3728,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
@@ -3754,7 +3766,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
@@ -3794,7 +3806,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
@@ -3833,7 +3845,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
@@ -3863,7 +3875,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
@@ -3892,7 +3904,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
@@ -3927,7 +3939,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
@@ -3981,7 +3993,7 @@ impl Pow<Integer> for Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
@@ -4029,7 +4041,7 @@ impl Pow<&Integer> for Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
@@ -4077,7 +4089,7 @@ impl Pow<Integer> for &Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
@@ -4128,7 +4140,7 @@ impl Pow<&Integer> for &Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
@@ -4166,7 +4178,7 @@ impl PowAssign<Integer> for Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
@@ -4199,7 +4211,7 @@ impl PowAssign<&Integer> for Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
     /// other.significant_bits())`.
@@ -4264,11 +4276,12 @@ impl Float {
     ///   rounding directions reflected.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n)$
+    /// $T(n, m) = O(mn \log n \log\log n)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(prec, self.significant_bits())`,
+    /// and $m$ is the number of significant bits of the exponent `n`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
@@ -4314,11 +4327,12 @@ impl Float {
     /// overflow, and underflow.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n)$
+    /// $T(n, m) = O(mn \log n \log\log n)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(prec, self.significant_bits())`,
+    /// and $m$ is the number of significant bits of the exponent `n`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
@@ -4367,11 +4381,12 @@ impl Float {
     /// [`Float::pow_u_prec_round`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n)$
+    /// $T(n, m) = O(mn \log n \log\log n)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(prec, self.significant_bits())`,
+    /// and $m$ is the number of significant bits of the exponent `n`.
     ///
     /// # Examples
     /// ```
@@ -4415,11 +4430,12 @@ impl Float {
     /// [`Float::pow_u_prec_round_ref`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n)$
+    /// $T(n, m) = O(mn \log n \log\log n)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(prec, self.significant_bits())`,
+    /// and $m$ is the number of significant bits of the exponent `n`.
     ///
     /// # Examples
     /// ```
@@ -4555,11 +4571,12 @@ impl Float {
     /// overflow, and underflow.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n)$
+    /// $T(n, m) = O(mn \log n \log\log n)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(prec, self.significant_bits())`,
+    /// and $m$ is the number of significant bits of the exponent `n`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
@@ -4591,11 +4608,12 @@ impl Float {
     /// overflow, and underflow.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n)$
+    /// $T(n, m) = O(mn \log n \log\log n)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(prec, self.significant_bits())`,
+    /// and $m$ is the number of significant bits of the exponent `n`.
     ///
     /// # Examples
     /// ```
@@ -4813,11 +4831,12 @@ impl Float {
     ///   rounding directions reflected.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n)$
+    /// $T(n, m) = O(mn \log n \log\log n)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(prec, self.significant_bits())`,
+    /// and $m$ is the number of significant bits of the exponent `n`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
@@ -4863,11 +4882,12 @@ impl Float {
     /// overflow, and underflow.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n)$
+    /// $T(n, m) = O(mn \log n \log\log n)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(prec, self.significant_bits())`,
+    /// and $m$ is the number of significant bits of the exponent `n`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
@@ -4916,11 +4936,12 @@ impl Float {
     /// [`Float::pow_s_prec_round`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n)$
+    /// $T(n, m) = O(mn \log n \log\log n)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(prec, self.significant_bits())`,
+    /// and $m$ is the number of significant bits of the exponent `n`.
     ///
     /// # Examples
     /// ```
@@ -4964,11 +4985,12 @@ impl Float {
     /// [`Float::pow_s_prec_round_ref`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n)$
+    /// $T(n, m) = O(mn \log n \log\log n)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(prec, self.significant_bits())`,
+    /// and $m$ is the number of significant bits of the exponent `n`.
     ///
     /// # Examples
     /// ```
@@ -5104,11 +5126,12 @@ impl Float {
     /// overflow, and underflow.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n)$
+    /// $T(n, m) = O(mn \log n \log\log n)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(prec, self.significant_bits())`,
+    /// and $m$ is the number of significant bits of the exponent `n`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
@@ -5140,11 +5163,12 @@ impl Float {
     /// overflow, and underflow.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n)$
+    /// $T(n, m) = O(mn \log n \log\log n)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `max(prec, self.significant_bits())`,
+    /// and $m$ is the number of significant bits of the exponent `n`.
     ///
     /// # Examples
     /// ```
@@ -5259,11 +5283,12 @@ impl Float {
     ///   is returned instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n)$
+    /// $T(n, m) = O(mn \log n \log\log n)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is the number of
+    /// significant bits of the exponent.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
@@ -5314,11 +5339,12 @@ impl Float {
     /// [`Float::unsigned_pow_unsigned_prec_round`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n)$
+    /// $T(n, m) = O(mn \log n \log\log n)$
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is the number of
+    /// significant bits of the exponent.
     ///
     /// # Examples
     /// ```
@@ -5378,7 +5404,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, y.significant_bits())`.
     ///
@@ -5436,7 +5462,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, y.significant_bits())`.
     ///
@@ -5493,7 +5519,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, y.significant_bits())`.
     ///
@@ -5540,7 +5566,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, y.significant_bits())`.
     ///
@@ -5598,7 +5624,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, y.significant_bits())`.
     ///
@@ -5656,7 +5682,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, y.significant_bits())`.
     ///
@@ -5723,7 +5749,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, y.significant_bits())`.
     ///
@@ -5771,7 +5797,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, y.significant_bits())`.
     ///
@@ -5942,7 +5968,11 @@ where
 /// If the result overflows, $\pm\infty$ is returned, and if it underflows, $\pm0.0$ is returned.
 ///
 /// # Worst-case complexity
-/// Constant time and additional memory.
+/// $T(m) = O(m \log m \log\log m)$
+///
+/// $M(m) = O(m \log m)$
+///
+/// where $T$ is time, $M$ is additional memory, and $m$ is `x.significant_bits()`.
 ///
 /// # Examples
 /// ```
@@ -6010,7 +6040,11 @@ where
 /// If the result overflows, $\pm\infty$ is returned, and if it underflows, $\pm0.0$ is returned.
 ///
 /// # Worst-case complexity
-/// Constant time and additional memory.
+/// $T(m) = O(m \log m \log\log m)$
+///
+/// $M(m) = O(m \log m)$
+///
+/// where $T$ is time, $M$ is additional memory, and $m$ is `y.significant_bits()`.
 ///
 /// # Examples
 /// ```
@@ -6079,7 +6113,11 @@ where
 /// If the result overflows, $\pm\infty$ is returned, and if it underflows, $\pm0.0$ is returned.
 ///
 /// # Worst-case complexity
-/// Constant time and additional memory.
+/// $T(m) = O(m)$
+///
+/// $M(m) = O(m)$
+///
+/// where $T$ is time, $M$ is additional memory, and $m$ is `y.significant_bits()`.
 ///
 /// # Examples
 /// ```
@@ -6796,7 +6834,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, x.significant_bits(),
     /// y.significant_bits())`.
@@ -6862,7 +6900,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, x.significant_bits(),
     /// y.significant_bits())`.
@@ -6912,7 +6950,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, x.significant_bits(),
     /// y.significant_bits())`.
@@ -6960,7 +6998,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, x.significant_bits(),
     /// y.significant_bits())`.
@@ -7052,7 +7090,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, x.significant_bits(),
     /// y.significant_bits())`.
@@ -7324,7 +7362,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, x.significant_bits(),
     /// y.significant_bits())`.
@@ -7461,7 +7499,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, x.significant_bits(),
     /// y.significant_bits())`.
@@ -7598,7 +7636,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, x.significant_bits(),
     /// y.significant_bits())`.
@@ -7726,7 +7764,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, x.significant_bits(),
     /// y.significant_bits())`.
@@ -7800,7 +7838,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, x.significant_bits(),
     /// y.significant_bits())`.
@@ -7880,7 +7918,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, x.significant_bits(),
     /// y.significant_bits())`.
@@ -7959,7 +7997,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, x.significant_bits(),
     /// y.significant_bits())`.
@@ -8048,7 +8086,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, self.significant_bits(),
     /// other.significant_bits())`.
@@ -8208,7 +8246,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, self.significant_bits(),
     /// other.significant_bits())`.
@@ -8342,7 +8380,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, self.significant_bits(),
     /// other.significant_bits())`.
@@ -8441,7 +8479,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, self.significant_bits(),
     /// other.significant_bits())`.
@@ -8470,7 +8508,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, self.significant_bits(),
     /// other.significant_bits())`.
@@ -8498,7 +8536,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, self.significant_bits(),
     /// other.significant_bits())`.
@@ -8519,7 +8557,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, self.significant_bits(),
     /// other.significant_bits())`.
@@ -8540,7 +8578,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, self.significant_bits(),
     /// other.significant_bits())`.
@@ -8562,7 +8600,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(prec, self.significant_bits(),
     /// other.significant_bits())`.
@@ -8715,11 +8753,12 @@ impl Float {
     ///   instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
@@ -8837,11 +8876,12 @@ impl Float {
     ///   instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
@@ -8946,11 +8986,12 @@ impl Float {
     ///   instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -9071,9 +9112,10 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the output
@@ -9150,11 +9192,12 @@ impl Float {
     /// and underflow.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
@@ -9173,11 +9216,12 @@ impl Float {
     /// and underflow.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
@@ -9200,11 +9244,12 @@ impl Float {
     /// and underflow.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -9221,11 +9266,12 @@ impl Float {
     /// and underflow.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^{3/2} \log n \log\log n)$
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -9243,9 +9289,10 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the output
@@ -9265,9 +9312,10 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n^{3/2} \log n \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(),
+    /// other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the output

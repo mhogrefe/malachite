@@ -32,7 +32,7 @@ use malachite_base::num::arithmetic::traits::WrappingAddAssign;
 // # Worst-case complexity
 // $T(n) = O(n^2)$
 //
-// $M(n) = O(n)$
+// $M(n) = O(1)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
@@ -105,11 +105,14 @@ const fn get_n_lo(n: usize) -> usize {
 // See `limbs_mul_low_same_length_divide_and_conquer` documentation for more details.
 //
 // # Worst-case complexity
-// $T(n) = O(n^{\log_8 15}) \approx O(n^{1.302})$
+// $T(n) = O(n \log n \log\log n)$
 //
-// $M(n) = O(1)$
+// $M(n) = O(n \log n)$
 //
-// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`: each level does one full
+// multiplication of the low $\approx 0.7n$ limbs through the main dispatcher while the low-product
+// side shrinks geometrically, so the total is a constant multiple of a full multiplication; the
+// multiplication scratch is allocated internally.
 //
 // This is equivalent to `mpn_dc_mullo_n` from `mpn/generic/mullo_n.c`, GMP 6.2.1, where `rp == tp`.
 private_test_fn! {
@@ -221,11 +224,14 @@ limbs_mul_low_same_length_divide_and_conquer_shared_scratch(
 //   ratio. We get k * (a + 1 / 6) = 0.929..., but k(a - 1/6) = 0.865....
 //
 // # Worst-case complexity
-// $T(n) = O(n^{\log_8 15}) \approx O(n^{1.302})$
+// $T(n) = O(n \log n \log\log n)$
 //
-// $M(n) = O(1)$
+// $M(n) = O(n \log n)$
 //
-// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`: each level does one full
+// multiplication of the low $\approx 0.7n$ limbs through the main dispatcher while the low-product
+// side shrinks geometrically, so the total is a constant multiple of a full multiplication; the
+// multiplication scratch is allocated internally.
 //
 // This is equivalent to `mpn_dc_mullo_n` from `mpn/generic/mullo_n.c`, GMP 6.2.1, where `rp != tp`.
 private_test_fn! {
@@ -302,7 +308,7 @@ private_test_fn! {limbs_mul_low_same_length_large(
 // Multiply two n-limb numbers and return the lowest n limbs of their products.
 //
 // # Worst-case complexity
-// $T(n) = O(n \log n \log\log n)$, assuming $k = O(\log n)$
+// $T(n) = O(n \log n \log\log n)$
 //
 // $M(n) = O(n \log n)$
 //
@@ -336,7 +342,7 @@ limbs_mul_low_same_length(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 // # Worst-case complexity
 // $T(n) = O(n^2)$
 //
-// $M(n) = O(n)$
+// $M(n) = O(1)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //

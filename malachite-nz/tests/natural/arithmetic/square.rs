@@ -16,11 +16,13 @@ use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::unsigned_gen_var_21;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::square::{
-    limbs_square_to_out_basecase, limbs_square_to_out_toom_2,
-    limbs_square_to_out_toom_2_scratch_len, limbs_square_to_out_toom_3,
-    limbs_square_to_out_toom_3_scratch_len, limbs_square_to_out_toom_4,
+    limbs_square_to_out, limbs_square_to_out_basecase, limbs_square_to_out_scratch_len,
+    limbs_square_to_out_toom_2, limbs_square_to_out_toom_2_scratch_len, limbs_square_to_out_toom_3,
+    limbs_square_to_out_toom_3_input_size_valid, limbs_square_to_out_toom_3_scratch_len,
+    limbs_square_to_out_toom_4, limbs_square_to_out_toom_4_input_size_valid,
     limbs_square_to_out_toom_4_scratch_len, limbs_square_to_out_toom_6,
-    limbs_square_to_out_toom_6_scratch_len, limbs_square_to_out_toom_8,
+    limbs_square_to_out_toom_6_input_size_valid, limbs_square_to_out_toom_6_scratch_len,
+    limbs_square_to_out_toom_8, limbs_square_to_out_toom_8_input_size_valid,
     limbs_square_to_out_toom_8_scratch_len,
 };
 use malachite_nz::platform::Limb;
@@ -31,7 +33,10 @@ use malachite_nz::test_util::generators::{
     unsigned_vec_pair_gen_var_24, unsigned_vec_pair_gen_var_25, unsigned_vec_pair_gen_var_27,
     unsigned_vec_pair_gen_var_28,
 };
-use malachite_nz::test_util::natural::arithmetic::square::limbs_square_to_out_basecase_unrestricted;
+use malachite_nz::test_util::natural::arithmetic::square::{
+    limbs_square_to_out_basecase_unrestricted, square_dispatch_thresholds,
+};
+use malachite_nz::test_util::scratch::*;
 use std::str::FromStr;
 
 fn limbs_square_basecase_helper_1(
@@ -13399,4 +13404,85 @@ fn sign_properties() {
     unsigned_gen_var_21::<Limb>().test_properties(|x| {
         assert_eq!(x.square(), Natural::from(x).square());
     });
+}
+
+// Scratch-sizing canaries for the squaring dispatcher and the individual Toom squaring kernels (see
+// DOC-CONVENTIONS.md): every valid length up to the cap runs with a scratch of exactly the
+// advertised length, and every square is checked against `Natural` multiplication.
+#[test]
+fn test_limbs_square_scratch_sizing() {
+    let thresholds = square_dispatch_thresholds();
+    for len in threshold_straddling_lengths(&thresholds, 1, 1100, 2) {
+        let xs = canary_limbs("square canary xs", len);
+        let expected = Natural::from_limbs_asc(&xs) * Natural::from_limbs_asc(&xs);
+        let mut out = vec![0; len << 1];
+        let scratch_len = limbs_square_to_out_scratch_len(len);
+        let high_water = scratch_high_water(scratch_len, |scratch| {
+            limbs_square_to_out(&mut out, &xs, scratch);
+        });
+        assert!(high_water <= scratch_len);
+        assert_eq!(
+            Natural::from_owned_limbs_asc(out),
+            expected,
+            "dispatch {len}"
+        );
+    }
+    fn check(
+        name: &str,
+        valid: &dyn Fn(usize) -> bool,
+        scratch_len: &dyn Fn(usize) -> usize,
+        square: &dyn Fn(&mut [Limb], &[Limb], &mut [Limb]),
+        max_len: usize,
+    ) {
+        let mut count = 0;
+        for len in 2..=max_len {
+            if !valid(len) {
+                continue;
+            }
+            count += 1;
+            let xs = canary_limbs("square canary xs", len);
+            let expected = Natural::from_limbs_asc(&xs) * Natural::from_limbs_asc(&xs);
+            let mut out = vec![0; len << 1];
+            let sl = scratch_len(len);
+            let high_water = scratch_high_water(sl, |scratch| square(&mut out, &xs, scratch));
+            assert!(high_water <= sl);
+            assert_eq!(Natural::from_owned_limbs_asc(out), expected, "{name} {len}");
+        }
+        assert_ne!(count, 0, "no valid lengths swept for {name}");
+    }
+    check(
+        "toom_2",
+        &|len| len > 1,
+        &limbs_square_to_out_toom_2_scratch_len,
+        &|o, x, s| limbs_square_to_out_toom_2(o, x, s),
+        150,
+    );
+    check(
+        "toom_3",
+        &limbs_square_to_out_toom_3_input_size_valid,
+        &limbs_square_to_out_toom_3_scratch_len,
+        &|o, x, s| limbs_square_to_out_toom_3(o, x, s),
+        150,
+    );
+    check(
+        "toom_4",
+        &limbs_square_to_out_toom_4_input_size_valid,
+        &limbs_square_to_out_toom_4_scratch_len,
+        &|o, x, s| limbs_square_to_out_toom_4(o, x, s),
+        200,
+    );
+    check(
+        "toom_6",
+        &limbs_square_to_out_toom_6_input_size_valid,
+        &limbs_square_to_out_toom_6_scratch_len,
+        &|o, x, s| limbs_square_to_out_toom_6(o, x, s),
+        250,
+    );
+    check(
+        "toom_8",
+        &limbs_square_to_out_toom_8_input_size_valid,
+        &limbs_square_to_out_toom_8_scratch_len,
+        &|o, x, s| limbs_square_to_out_toom_8(o, x, s),
+        300,
+    );
 }

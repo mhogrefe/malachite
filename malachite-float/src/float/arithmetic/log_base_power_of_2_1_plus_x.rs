@@ -181,11 +181,12 @@ impl Float {
     /// [`Float::log_base_power_of_2_1_plus_x`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `prec` is zero, if `pow` is zero (the base $2^0=1$ has no logarithm), or if `rm`
@@ -291,11 +292,12 @@ impl Float {
     /// consider using `(&Float).log_base_power_of_2_1_plus_x()` instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `prec` is zero, if `pow` is zero (the base $2^0=1$ has no logarithm), or if `rm`
@@ -390,11 +392,12 @@ impl Float {
     /// [`Float::log_base_power_of_2_1_plus_x`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `prec` is zero or if `pow` is zero (the base $2^0=1$ has no logarithm).
@@ -461,11 +464,12 @@ impl Float {
     /// `(&Float).log_base_power_of_2_1_plus_x()` instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `prec` is zero or if `pow` is zero (the base $2^0=1$ has no logarithm).
@@ -521,7 +525,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `self.get_prec()`.
     ///
@@ -587,7 +591,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `self.get_prec()`.
     ///
@@ -645,11 +649,12 @@ impl Float {
     /// true, consider using [`Float::log_base_power_of_2_1_plus_x_assign`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `prec` is zero, if `pow` is zero (the base $2^0=1$ has no logarithm), or if `rm`
@@ -710,11 +715,12 @@ impl Float {
     /// [`Float::log_base_power_of_2_1_plus_x_assign`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `prec` is zero or if `pow` is zero (the base $2^0=1$ has no logarithm).
@@ -763,7 +769,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `self.get_prec()`.
     ///
@@ -824,7 +830,7 @@ impl LogBasePowerOf2Of1PlusX<i64> for Float {
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `self.get_prec()`.
     ///
@@ -894,7 +900,7 @@ impl LogBasePowerOf2Of1PlusX<i64> for &Float {
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `self.get_prec()`.
     ///
@@ -962,7 +968,7 @@ impl LogBasePowerOf2Of1PlusXAssign<i64> for Float {
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `self.get_prec()`.
     ///

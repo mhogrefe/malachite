@@ -6,7 +6,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-// Helpers for verifying the scratch-length contracts of `limbs_*` functions (see DOC-AUDIT.md).
+// Helpers for verifying the scratch-length contracts of `limbs_*` functions (see
+// DOC-CONVENTIONS.md).
 //
 // In safe Rust an under-sized scratch slice makes the function panic on a slice operation, so the
 // primary check is simply running the function with a scratch of exactly the advertised length,

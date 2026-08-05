@@ -479,6 +479,16 @@ where
 /// second. The probability of an invalid pair is zero.
 ///
 /// `xs` must be infinite.
+///
+/// # Expected complexity per iteration
+/// $T(i) = O(T^\prime(i))$
+///
+/// $M(i) = O(M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`: each pair requires an expected constant
+/// number of draws, though duplicate draws force retries, and the iterator hangs if `xs` cannot
+/// produce two distinct values.
 #[inline]
 pub const fn random_ordered_unique_pairs<I: Iterator>(xs: I) -> RandomOrderedUniquePairs<I>
 where
@@ -665,6 +675,16 @@ where
 /// hang.
 ///
 /// `xs` must be infinite.
+///
+/// # Expected complexity per iteration
+/// $T(i) = O(T^\prime(i))$
+///
+/// $M(i) = O(M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`: each pair requires an expected constant
+/// number of draws, though duplicate draws force retries, and the iterator hangs if `xs` cannot
+/// produce two distinct values.
 #[inline]
 pub const fn random_unique_pairs<I: Iterator>(xs: I) -> RandomUniquePairs<I>
 where

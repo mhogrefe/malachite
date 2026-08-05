@@ -30,7 +30,12 @@ impl Float {
     /// [`Float`] is NaN, infinite, or zero, then `None` is returned.
     ///
     /// # Worst-case complexity
-    /// Constant time and additional memory.
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`: the
+    /// significand is cloned.
     ///
     /// # Examples
     /// ```
@@ -233,7 +238,12 @@ impl Float {
     /// `None` is returned.
     ///
     /// # Worst-case complexity
-    /// Constant time and additional memory.
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`: the
+    /// trailing-zeros scan runs through the low zero limbs of the significand.
     ///
     /// # Examples
     /// ```
@@ -274,11 +284,13 @@ impl Float {
     /// This function never underflows.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n)$
+    /// $T(n, m) = O(n + m)$
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `self.significant_bits()`: when the precision shrinks, rounding must examine the bits that
+    /// are discarded.
     ///
     /// # Panics
     /// Panics if `prec` is zero or if `rm` is [`Exact`] but setting the desired precision requires
@@ -372,11 +384,13 @@ impl Float {
     /// To use a different rounding mode, try [`Float::set_prec_round`].
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n)$
+    /// $T(n, m) = O(n + m)$
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `self.significant_bits()`: when the precision shrinks, rounding must examine the bits that
+    /// are discarded.
     ///
     /// # Examples
     /// ```
@@ -416,11 +430,13 @@ impl Float {
     /// This function never underflows.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n)$
+    /// $T(n, m) = O(n + m)$
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`: when the precision shrinks, rounding must examine the bits that are
+    /// discarded.
     ///
     /// # Panics
     /// Panics if `prec` is zero or if `rm` is [`Exact`] but setting the desired precision requires
@@ -471,11 +487,13 @@ impl Float {
     /// This function never underflows.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n)$
+    /// $T(n, m) = O(n + m)$
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`: when the precision shrinks, rounding must examine the bits that are
+    /// discarded.
     ///
     /// # Panics
     /// Panics if `prec` is zero or if `rm` is [`Exact`] but setting the desired precision requires
@@ -564,11 +582,13 @@ impl Float {
     /// To use a different rounding mode, try [`Float::from_float_prec_round`].
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n)$
+    /// $T(n, m) = O(n + m)$
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`: when the precision shrinks, rounding must examine the bits that are
+    /// discarded.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -614,11 +634,13 @@ impl Float {
     /// To use a different rounding mode, try [`Float::from_float_prec_round_ref`].
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n)$
+    /// $T(n, m) = O(n + m)$
     ///
     /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`: when the precision shrinks, rounding must examine the bits that are
+    /// discarded.
     ///
     /// # Panics
     /// Panics if `prec` is zero.

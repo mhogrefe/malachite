@@ -302,9 +302,11 @@ private_test_fn! {limbs_mod_schoolbook(ns: &mut [Limb], ds: &[Limb], d_inv: Limb
 // # Worst-case complexity
 // $T(n) = O(n (\log n)^2 \log\log n)$
 //
-// $M(n) = O(n(\log n)^2)$
+// $M(n) = O(n \log n)$
 //
-// where $T$ is time, $M$ is additional memory, and $n$ is `ds.len()`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `ds.len()`: each level of the
+// divide-and-conquer recursion frees its multiplication scratch before recursing, so the peak is a
+// single level's multiplication memory.
 //
 // This is equivalent to `mpn_dcpi1_div_qr_n` from `mpn/generic/dcpi1_div_qr.c`, GMP 6.2.1, where
 // only the remainder is calculated.
@@ -368,9 +370,11 @@ fn limbs_mod_divide_and_conquer_helper(
 // # Worst-case complexity
 // $T(n) = O(n (\log n)^2 \log\log n)$
 //
-// $M(n) = O(n(\log n)^2)$
+// $M(n) = O(n \log n)$
 //
-// where $T$ is time, $M$ is additional memory, and $n$ is `ds.len()`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `ds.len()`: each level of the
+// divide-and-conquer recursion frees its multiplication scratch before recursing, so the peak is a
+// single level's multiplication memory.
 //
 // # Panics
 // Panics if `ds` has length smaller than 6, `ns.len()` is less than `ds.len()` + 3, `qs` has length
@@ -529,7 +533,7 @@ private_test_fn! {limbs_mod_divide_and_conquer(
 // # Worst-case complexity
 // $T(n, d) = O(n \log d \log\log d)$
 //
-// $M(n) = O(d(\log d)^2)$
+// $M(d) = O(d \log d)$
 //
 // where $T$ is time, $M$ is additional memory, $n$ is `ns.len()`, and $d$ is `ds.len()`.
 //

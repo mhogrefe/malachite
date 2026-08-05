@@ -25,7 +25,13 @@ impl BinomialCoefficient for Integer {
     /// $$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n, k) = O(nk (\log (nk))^2 \log\log (nk))$
+    ///
+    /// $M(n, k) = O(nk \log (nk))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `n.significant_bits()` (after the
+    /// negative-$n$ identity is applied), and $k$ is the reduced second argument: the cost is that
+    /// of the [`Natural`](crate::natural::Natural) binomial coefficient this delegates to.
     ///
     /// # Panics
     /// Panics if $k$ is negative.
@@ -109,7 +115,13 @@ impl<'a> BinomialCoefficient<&'a Self> for Integer {
     /// $$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n, k) = O(nk (\log (nk))^2 \log\log (nk))$
+    ///
+    /// $M(n, k) = O(nk \log (nk))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `n.significant_bits()` (after the
+    /// negative-$n$ identity is applied), and $k$ is the reduced second argument: the cost is that
+    /// of the [`Natural`](crate::natural::Natural) binomial coefficient this delegates to.
     ///
     /// # Panics
     /// Panics if $k$ is negative.

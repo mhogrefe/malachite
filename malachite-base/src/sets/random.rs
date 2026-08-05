@@ -255,6 +255,15 @@ pub fn random_hash_sets_from_length_iterator<
 ///
 /// `xs_gen` must be infinite.
 ///
+/// # Expected complexity per iteration
+/// $T(i) = O(m T^\prime(i))$
+///
+/// $M(i) = O(m M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $m$ is `mean_length_numerator /
+/// mean_length_denominator`.
+///
 /// # Panics
 /// Panics if `mean_length_numerator` or `mean_length_denominator` are zero, or, if after being
 /// reduced to lowest terms, their sum is greater than or equal to $2^{64}$.
@@ -809,6 +818,15 @@ pub fn random_b_tree_sets_from_length_iterator<
 /// where $P_g(n)$ is the probability function described in [`geometric_random_unsigneds`].
 ///
 /// `xs_gen` must be infinite.
+///
+/// # Expected complexity per iteration
+/// $T(i) = O(m \log m T^\prime(i))$
+///
+/// $M(i) = O(m M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $m$ is `mean_length_numerator /
+/// mean_length_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_length_numerator` or `mean_length_denominator` are zero, or, if after being

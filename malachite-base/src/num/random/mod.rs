@@ -399,6 +399,9 @@ where
 /// # Complexity per iteration
 /// Constant time and additional memory.
 ///
+/// # Worst-case complexity per iteration
+/// Constant time and additional memory.
+///
 /// # Examples
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
@@ -499,6 +502,9 @@ pub fn random_positive_signeds<T: PrimitiveSigned>(
 /// # Complexity per iteration
 /// Constant time and additional memory.
 ///
+/// # Worst-case complexity per iteration
+/// Constant time and additional memory.
+///
 /// # Examples
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
@@ -535,6 +541,9 @@ pub fn random_negative_signeds<T: PrimitiveSigned>(
 /// # Complexity per iteration
 /// Constant time and additional memory.
 ///
+/// # Worst-case complexity per iteration
+/// Constant time and additional memory.
+///
 /// # Examples
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
@@ -564,6 +573,9 @@ pub fn random_natural_signeds<T: PrimitiveSigned>(seed: Seed) -> RandomSignedBit
 /// The output length is infinite.
 ///
 /// # Complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Worst-case complexity per iteration
 /// Constant time and additional memory.
 ///
 /// # Examples
@@ -817,6 +829,9 @@ pub fn random_signed_inclusive_range<T: PrimitiveSigned>(
 /// # Complexity per iteration
 /// Constant time and additional memory.
 ///
+/// # Worst-case complexity per iteration
+/// Constant time and additional memory.
+///
 /// # Panics
 /// Panics if `chunk_size` is zero or greater than the width of the type.
 ///
@@ -859,6 +874,9 @@ pub fn random_unsigned_bit_chunks<T: PrimitiveUnsigned>(
 /// # Complexity per iteration
 /// Constant time and additional memory.
 ///
+/// # Worst-case complexity per iteration
+/// Constant time and additional memory.
+///
 /// # Panics
 /// Panics if `chunk_size` is zero or greater than the width of the type.
 ///
@@ -896,6 +914,9 @@ pub fn random_signed_bit_chunks<T: PrimitiveSigned>(
 /// The output length is infinite.
 ///
 /// # Complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Worst-case complexity per iteration
 /// Constant time and additional memory.
 ///
 /// # Examples

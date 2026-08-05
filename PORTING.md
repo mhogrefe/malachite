@@ -57,6 +57,9 @@ major improvement warrants re-porting.
 8. **Document**: prose, LaTeX definition ($f(x,p,m) = \ldots + \varepsilon$ with epsilon bounds),
    special cases, overflow/underflow behavior, worst-case complexity, panic conditions, and
    doctests with *verified* values (run `cargo test -p <crate> --doc <name>`; never guess).
+   Follow **DOC-CONVENTIONS.md** (repo root) for the complexity-block format, the rules for
+   naming every cost driver (input sizes *and* precision), the house cost cheat-sheet, and the
+   pitfalls checklist; `complexity-doc-check.py` enforces the mechanical parts.
 
 ## House conventions
 
@@ -218,6 +221,7 @@ grammars genuinely conflict while the arithmetic underneath does not.
 Run through this for every new or changed function in the `Float` transcendental/log/exp families
 (and use judgment elsewhere). These items encode the failure modes that most reliably slip past
 general-case tests — every one of them corresponds to a real bug class found in the 2026 audits.
+(The documentation-side counterpart is the pitfalls checklist in DOC-CONVENTIONS.md.)
 
 - **Handle exact results before Ziv loops.** Enumerate the inputs whose results are exactly
   representable (integer arguments, powers of the base, commensurable base/argument pairs) and

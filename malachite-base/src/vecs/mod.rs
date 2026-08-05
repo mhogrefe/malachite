@@ -251,6 +251,14 @@ impl<T: Clone> Iterator for ExhaustiveVecPermutations<T> {
 ///
 /// The output length is $n!$, where $n$ is `xs.len()`.
 ///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell)$
+///
+/// $M(i) = O(\ell)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $\ell$ is
+/// `xs.len()`.
+///
 /// # Examples
 /// ```
 /// use itertools::Itertools;
@@ -308,6 +316,14 @@ impl<T: Clone> Iterator for RandomVecPermutations<T> {
 /// The output length is infinite.
 ///
 /// $P(p) = 1/n!$, where $n$ is `xs.len()`.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell)$
+///
+/// $M(i) = O(\ell)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $\ell$ is
+/// `xs.len()`.
 ///
 /// # Examples
 /// ```

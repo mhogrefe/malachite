@@ -20,6 +20,9 @@ use core::ops::RangeInclusive;
 /// # Complexity per iteration
 /// Constant time and additional memory.
 ///
+/// # Worst-case complexity per iteration
+/// Constant time and additional memory.
+///
 /// # Examples
 /// ```
 /// use malachite_base::chars::exhaustive::ascii_chars_increasing;
@@ -42,6 +45,9 @@ pub const fn ascii_chars_increasing() -> RangeInclusive<char> {
 /// The output length is 1,112,064.
 ///
 /// # Complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Worst-case complexity per iteration
 /// Constant time and additional memory.
 ///
 /// # Examples

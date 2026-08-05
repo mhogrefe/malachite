@@ -190,7 +190,7 @@ private_test_fn! {limbs_vec_neg_and_limb_neg_in_place(xs: &mut Vec<Limb>, y: Lim
 // # Worst-case complexity
 // $T(n) = O(n)$
 //
-// $M(n) = O(1)$
+// $M(n) = O(n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
@@ -379,7 +379,7 @@ private_test_fn! {limbs_slice_and_pos_neg_in_place_right(xs: &[Limb], ys: &mut [
 // # Worst-case complexity
 // $T(n) = O(n)$
 //
-// $M(n) = O(1)$
+// $M(n) = O(n)$
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
@@ -930,7 +930,7 @@ impl BitAnd<&Self> for Integer {
 impl BitAnd<Integer> for &Integer {
     type Output = Integer;
 
-    /// Takes the bitwise and of two [`Integer`]s, taking the first by reference and the seocnd by
+    /// Takes the bitwise and of two [`Integer`]s, taking the first by reference and the second by
     /// value.
     ///
     /// $$

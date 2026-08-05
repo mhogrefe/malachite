@@ -100,7 +100,7 @@ private_test_fn! {
 //
 // $M(n) = O(n)$
 //
-// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), pow / Limb::WIDTH)`.s
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), pow / Limb::WIDTH)`.
 fn limbs_round_to_multiple_of_power_of_2_half_integer_to_even(
     xs: &[Limb],
     pow: u64,

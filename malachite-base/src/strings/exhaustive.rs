@@ -36,14 +36,6 @@ use crate::vecs::exhaustive::{
 /// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $\ell$ is `len`:
 /// each output is a fresh string of length `len`.
 ///
-/// # Worst-case complexity per iteration
-/// $T(i) = O(\ell)$
-///
-/// $M(i) = O(\ell)$
-///
-/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $\ell$ is `len`:
-/// each output is a fresh string of length `len`.
-///
 /// # Examples
 /// ```
 /// use itertools::Itertools;
@@ -74,10 +66,10 @@ pub fn lex_fixed_length_strings_using_chars<I: Iterator<Item = char>>(
 ///
 /// If `len` is 0, the output consists of one empty [`String`].
 ///
-/// # Complexity per iteration
-/// $T(i, n) = O(n)$
+/// # Worst-case complexity per iteration
+/// $T(n) = O(n)$
 ///
-/// $M(i, n) = O(n)$
+/// $M(n) = O(n)$
 ///
 /// where $T$ is time, $M$ is additional memory, and $n$ is `len`.
 ///
@@ -119,14 +111,6 @@ pub fn lex_fixed_length_strings(
 /// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $\ell$ is `len`:
 /// each output is a fresh string of length `len`.
 ///
-/// # Worst-case complexity per iteration
-/// $T(i) = O(\ell)$
-///
-/// $M(i) = O(\ell)$
-///
-/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $\ell$ is `len`:
-/// each output is a fresh string of length `len`.
-///
 /// # Examples
 /// ```
 /// use itertools::Itertools;
@@ -152,6 +136,13 @@ pub fn exhaustive_fixed_length_strings_using_chars<I: Iterator<Item = char>>(
 /// The output length is $1112064^n$, where $n$ is `len`.
 ///
 /// If `len` is 0, the output consists of one empty [`String`].
+///
+/// # Worst-case complexity per iteration
+/// $T(n) = O(n)$
+///
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `len`.
 ///
 /// # Examples
 /// ```
@@ -185,21 +176,6 @@ pub fn exhaustive_fixed_length_strings(
 /// If `cs` is empty, the output length is 1; otherwise, the output is infinite.
 ///
 /// The lengths of the output [`String`]s grow logarithmically.
-///
-/// # Complexity per iteration
-/// $T(i) = O(\log i)$
-///
-/// $M(i) = O(\log i)$
-///
-/// where $T$ is time and $M$ is additional memory.
-///
-/// # Worst-case complexity per iteration
-/// $T(i) = O(\ell)$
-///
-/// $M(i) = O(\ell)$
-///
-/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $\ell$ is the
-/// length of the $i$th output string.
 ///
 /// # Worst-case complexity per iteration
 /// $T(i) = O(\ell)$
@@ -244,12 +220,12 @@ pub fn shortlex_strings_using_chars<I: Clone + Iterator<Item = char>>(
 ///
 /// The lengths of the output [`String`]s grow logarithmically.
 ///
-/// # Complexity per iteration
+/// # Worst-case complexity per iteration
 /// $T(i) = O(\log i)$
 ///
 /// $M(i) = O(\log i)$
 ///
-/// where $T$ is time and $M$ is additional memory.
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
 ///
 /// # Examples
 /// ```
@@ -276,21 +252,6 @@ pub fn shortlex_strings()
 /// If `cs` is empty, the output length is 1; otherwise, the output is infinite.
 ///
 /// The lengths of the output [`String`]s grow logarithmically.
-///
-/// # Complexity per iteration
-/// $T(i) = O(\log i)$
-///
-/// $M(i) = O(\log i)$
-///
-/// where $T$ is time and $M$ is additional memory.
-///
-/// # Worst-case complexity per iteration
-/// $T(i) = O(\ell)$
-///
-/// $M(i) = O(\ell)$
-///
-/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $\ell$ is the
-/// length of the $i$th output string.
 ///
 /// # Worst-case complexity per iteration
 /// $T(i) = O(\ell)$
@@ -327,12 +288,12 @@ pub fn exhaustive_strings_using_chars<I: Clone + Iterator<Item = char>>(
 ///
 /// The lengths of the output [`String`]s grow logarithmically.
 ///
-/// # Complexity per iteration
+/// # Worst-case complexity per iteration
 /// $T(i) = O(\log i)$
 ///
 /// $M(i) = O(\log i)$
 ///
-/// where $T$ is time and $M$ is additional memory.
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
 ///
 /// # Examples
 /// ```

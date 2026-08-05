@@ -727,11 +727,12 @@ impl Float {
     /// instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n)$
+    /// $T(n, m) = O(n + m)$
     ///
-    /// $M(n) = O(n)$
+    /// $M(n, m) = O(n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but `prec` is too small for an exact addition.
@@ -833,11 +834,12 @@ impl Float {
     /// consider using `+` instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n)$
+    /// $T(n, m) = O(n + m)$
     ///
-    /// $M(n) = O(n)$
+    /// $M(n, m) = O(n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but `prec` is too small for an exact addition.
@@ -944,11 +946,12 @@ impl Float {
     /// consider using `+` instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n)$
+    /// $T(n, m) = O(n + m)$
     ///
-    /// $M(n) = O(n)$
+    /// $M(n, m) = O(n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but `prec` is too small for an exact addition.
@@ -1055,11 +1058,12 @@ impl Float {
     /// consider using `+` instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n)$
+    /// $T(n, m) = O(n + m)$
     ///
-    /// $M(n) = O(n)$
+    /// $M(n, m) = O(n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but `prec` is too small for an exact addition.
@@ -1144,11 +1148,12 @@ impl Float {
     /// the precisions of the two inputs, consider using `+` instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n)$
+    /// $T(n, m) = O(n + m)$
     ///
-    /// $M(n) = O(n)$
+    /// $M(n, m) = O(n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -1209,11 +1214,12 @@ impl Float {
     /// maximum of the precisions of the two inputs, consider using `+` instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n)$
+    /// $T(n, m) = O(n + m)$
     ///
-    /// $M(n) = O(n)$
+    /// $M(n, m) = O(n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -1274,11 +1280,12 @@ impl Float {
     /// maximum of the precisions of the two inputs, consider using `+` instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n)$
+    /// $T(n, m) = O(n + m)$
     ///
-    /// $M(n) = O(n)$
+    /// $M(n, m) = O(n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -1339,11 +1346,12 @@ impl Float {
     /// maximum of the precisions of the two inputs, consider using `+` instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n)$
+    /// $T(n, m) = O(n + m)$
     ///
-    /// $M(n) = O(n)$
+    /// $M(n, m) = O(n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -1770,11 +1778,12 @@ impl Float {
     /// consider using `+=` instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n)$
+    /// $T(n, m) = O(n + m)$
     ///
-    /// $M(n) = O(n)$
+    /// $M(n, m) = O(n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but `prec` is too small for an exact addition.
@@ -1846,11 +1855,12 @@ impl Float {
     /// true, consider using `+=` instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n)$
+    /// $T(n, m) = O(n + m)$
     ///
-    /// $M(n) = O(n)$
+    /// $M(n, m) = O(n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but `prec` is too small for an exact addition.
@@ -1937,11 +1947,12 @@ impl Float {
     /// maximum of the precisions of the two inputs, consider using `+=` instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n)$
+    /// $T(n, m) = O(n + m)$
     ///
-    /// $M(n) = O(n)$
+    /// $M(n, m) = O(n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -1988,11 +1999,12 @@ impl Float {
     /// maximum of the precisions of the two inputs, consider using `+=` instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n)$
+    /// $T(n, m) = O(n + m)$
     ///
-    /// $M(n) = O(n)$
+    /// $M(n, m) = O(n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```

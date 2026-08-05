@@ -43,11 +43,14 @@ impl FromSciString for Rational {
     /// for an explanation of this behavior). This function _does_ return $1/10$.
     ///
     /// # Worst-case complexity
-    /// $T(n, m) = O(m^n n \log m (\log n + \log\log m))$
+    /// $T(n, m) = O(B (\log B)^2 \log\log B)$
     ///
-    /// $M(n, m) = O(m^n n \log m)$
+    /// $M(n, m) = O(B \log B)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `s.len()`, and $m$ is `options.base`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `s.len()`, $m$ is `options.base`, and
+    /// $B$ is $10^n \log m$, a bound on the bit length of the result: the exponent is parsed in
+    /// base 10, so a string of length $n$ can denote a number of up to about $10^n \log_2 m$ bits,
+    /// and building it costs one power and one multiplication at that size.
     ///
     /// # Examples
     /// ```
@@ -147,11 +150,15 @@ impl Rational {
     ///   [`simplest_rational_in_closed_interval`](Rational::simplest_rational_in_closed_interval).
     ///
     /// # Worst-case complexity
-    /// $T(n, m) = O(m^n n \log m (\log n + \log\log m))$
+    /// $T(n, m) = O(B^2 \log B \log\log B)$
     ///
-    /// $M(n, m) = O(m^n n \log m)$
+    /// $M(n, m) = O(B \log B)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `s.len()`, and $m$ is `options.base`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `s.len()`, $m$ is `options.base`, and
+    /// $B$ is $10^n \log m$, a bound on the bit length of the parsed value: the exponent is parsed
+    /// in base 10, so a string of length $n$ can denote a number of up to about $10^n \log_2 m$
+    /// bits, and finding the simplest [`Rational`] in the implied interval runs a
+    /// continued-fraction expansion that is quadratic in that bit length.
     ///
     /// # Examples
     /// ```
@@ -235,11 +242,15 @@ impl Rational {
     ///   [`simplest_rational_in_closed_interval`](Rational::simplest_rational_in_closed_interval).
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(10^n n \log n)$
+    /// $T(n) = O(B^2 \log B \log\log B)$
     ///
-    /// $M(n) = O(10^n n)$
+    /// $M(n) = O(B \log B)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `s.len()`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `s.len()`, and $B$ is $10^n$, a bound on
+    /// the bit length of the parsed value: the exponent is parsed in base 10, so a string of length
+    /// $n$ can denote a number of up to about $10^n$ bits, and finding the simplest [`Rational`] in
+    /// the implied interval runs a continued-fraction expansion that is quadratic in that bit
+    /// length.
     ///
     /// # Examples
     /// ```

@@ -31,8 +31,8 @@ use malachite_nz::natural::arithmetic::div_mod::{
     limbs_div_mod_divide_and_conquer, limbs_div_mod_extra, limbs_div_mod_extra_in_place,
     limbs_div_mod_qs_to_out_rs_to_ns, limbs_div_mod_schoolbook,
     limbs_div_mod_three_limb_by_two_limb, limbs_div_mod_to_out, limbs_invert_approx,
-    limbs_invert_basecase_approx, limbs_invert_limb, limbs_invert_newton_approx,
-    limbs_two_limb_inverse_helper,
+    limbs_invert_approx_scratch_len, limbs_invert_basecase_approx, limbs_invert_limb,
+    limbs_invert_newton_approx, limbs_two_limb_inverse_helper,
 };
 use malachite_nz::natural::{Natural, limb_to_bit_count};
 use malachite_nz::platform::{DoubleLimb, Limb};
@@ -43,9 +43,10 @@ use malachite_nz::test_util::generators::{
     unsigned_vec_quadruple_gen_var_5,
 };
 use malachite_nz::test_util::natural::arithmetic::div_mod::{
-    limbs_div_limb_in_place_mod_alt, limbs_div_limb_in_place_mod_naive,
+    div_dispatch_thresholds, limbs_div_limb_in_place_mod_alt, limbs_div_limb_in_place_mod_naive,
     limbs_div_limb_to_out_mod_alt, limbs_div_limb_to_out_mod_naive, rug_ceiling_div_neg_mod,
 };
+use malachite_nz::test_util::scratch::*;
 use num::{BigUint, Integer};
 use rug;
 use std::panic::catch_unwind;
@@ -24325,4 +24326,69 @@ fn ceiling_div_neg_mod_properties() {
             (Natural::from(q), Natural::from(r))
         );
     });
+}
+
+// Scratch-sizing canaries for the Barrett division machinery (see DOC-CONVENTIONS.md):
+// threshold-dense size sweeps with a scratch of exactly the advertised length, sentinel-filled, and
+// results cross-checked against `Natural` arithmetic.
+#[test]
+fn test_limbs_div_mod_barrett_scratch_sizing() {
+    let thresholds = div_dispatch_thresholds();
+    let high_bit = Limb::power_of_2(Limb::WIDTH - 1);
+    for d_len in threshold_straddling_lengths(&thresholds, 2, 850, 1) {
+        for n_len in [d_len + 1, d_len + 2, d_len + (d_len >> 1), d_len << 1, 3 * d_len] {
+            if n_len < 3 || n_len <= d_len {
+                continue;
+            }
+            let ns = canary_limbs("div_mod barrett ns", n_len);
+            let mut ds = canary_limbs("div_mod barrett ds", d_len);
+            *ds.last_mut().unwrap() |= high_bit;
+            let mut qs = vec![0; n_len - d_len];
+            let mut rs = vec![0; d_len];
+            let scratch_len = limbs_div_mod_barrett_scratch_len(n_len, d_len);
+            let mut q_high = false;
+            let high_water = scratch_high_water(scratch_len, |scratch| {
+                q_high = limbs_div_mod_barrett(&mut qs, &mut rs, &ns, &ds, scratch);
+            });
+            assert!(high_water <= scratch_len);
+            let n = Natural::from_limbs_asc(&ns);
+            let d = Natural::from_limbs_asc(&ds);
+            let (expected_q, expected_r) = (&n).div_mod(&d);
+            let mut q = Natural::from_owned_limbs_asc(qs);
+            if q_high {
+                q += Natural::power_of_2(u64::exact_from(n_len - d_len) * Limb::WIDTH);
+            }
+            assert_eq!(q, expected_q, "q {n_len} {d_len}");
+            assert_eq!(
+                Natural::from_owned_limbs_asc(rs),
+                expected_r,
+                "r {n_len} {d_len}"
+            );
+        }
+    }
+}
+
+// Sizing canary for the Newton inverse: `is` receives an approximation of floor((B^(2d) - 1) / D) -
+// B^d, whose error is at most a few ulps; the sizing and the approximation quality are both
+// checked.
+#[test]
+fn test_limbs_invert_approx_scratch_sizing() {
+    let thresholds = div_dispatch_thresholds();
+    let high_bit = Limb::power_of_2(Limb::WIDTH - 1);
+    for d_len in threshold_straddling_lengths(&thresholds, 1, 850, 1) {
+        let mut ds = canary_limbs("invert approx ds", d_len);
+        *ds.last_mut().unwrap() |= high_bit;
+        let mut is = vec![0; d_len];
+        let scratch_len = limbs_invert_approx_scratch_len(d_len);
+        let high_water = scratch_high_water(scratch_len, |scratch| {
+            limbs_invert_approx(&mut is, &ds, scratch);
+        });
+        assert!(high_water <= scratch_len);
+        let d = Natural::from_limbs_asc(&ds);
+        let w = u64::exact_from(d_len) * Limb::WIDTH;
+        let exact = (Natural::power_of_2(w << 1) - Natural::ONE) / &d - Natural::power_of_2(w);
+        let approx = Natural::from_owned_limbs_asc(is);
+        assert!(approx <= exact, "{d_len}");
+        assert!(&exact - &approx <= Natural::from(2u32), "{d_len}");
+    }
 }

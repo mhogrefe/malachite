@@ -252,3 +252,23 @@ pub fn limbs_div_limb_in_place_mod_alt(ns: &mut [Limb], d: Limb) -> Limb {
         limbs_div_limb_normalized_in_place_mod(&mut ns[..len_minus_1], r, d, d_inv) >> bits
     }
 }
+
+// The division-dispatch thresholds, for building scratch-canary size sweeps (see
+// `test_util::scratch`). The threshold constants are `pub(crate)`, so integration tests get the
+// list through this function.
+pub fn div_dispatch_thresholds() -> Vec<usize> {
+    vec![
+        crate::platform::DC_DIV_QR_THRESHOLD,
+        crate::platform::DC_DIVAPPR_Q_THRESHOLD,
+        crate::platform::INV_NEWTON_THRESHOLD,
+        crate::platform::INV_MULMOD_BNM1_THRESHOLD,
+        crate::platform::MU_DIV_QR_THRESHOLD,
+        crate::platform::MU_DIV_QR_SKEW_THRESHOLD,
+        crate::platform::MU_DIVAPPR_Q_THRESHOLD,
+        crate::platform::BINV_NEWTON_THRESHOLD,
+        crate::platform::DC_BDIV_QR_THRESHOLD,
+        crate::platform::MU_BDIV_QR_THRESHOLD,
+        crate::platform::DC_BDIV_Q_THRESHOLD,
+        crate::platform::MU_BDIV_Q_THRESHOLD,
+    ]
+}

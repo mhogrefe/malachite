@@ -179,11 +179,14 @@ impl FromSciString for Natural {
     /// mode in options is `Exact`, but rounding is necessary.
     ///
     /// # Worst-case complexity
-    /// $T(n, m) = O(m^n n \log m (\log n + \log\log m))$
+    /// $T(n, m) = O(B (\log B)^2 \log\log B)$
     ///
-    /// $M(n, m) = O(m^n n \log m)$
+    /// $M(n, m) = O(B \log B)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `s.len()`, and $m$ is `options.base`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `s.len()`, $m$ is `options.base`, and
+    /// $B$ is $10^n \log m$, a bound on the bit length of the result: the exponent is parsed in
+    /// base 10, so a string of length $n$ can denote a number of up to about $10^n \log_2 m$ bits,
+    /// and building it costs one power and one multiplication at that size.
     ///
     /// # Examples
     /// ```

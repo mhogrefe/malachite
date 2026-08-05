@@ -368,6 +368,15 @@ where
 ///
 /// If `xs` is empty, the output consists of a single empty [`HashSet`].
 ///
+/// # Expected complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is the number of elements in
+/// the $i$th output.
+///
 /// # Examples
 /// ```
 /// use itertools::Itertools;
@@ -684,6 +693,15 @@ where
 /// If the input iterator length is $n$, the output length is $2^n$.
 ///
 /// If `xs` is empty, the output consists of a single empty [`HashSet`].
+///
+/// # Expected complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is the number of elements in
+/// the $i$th output.
 ///
 /// # Examples
 /// ```
@@ -1260,6 +1278,15 @@ where
 ///
 /// If `xs` is empty, the output consists of a single empty [`BTreeSet`].
 ///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell \log \ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is the number of elements in
+/// the $i$th output.
+///
 /// # Examples
 /// ```
 /// use itertools::Itertools;
@@ -1578,6 +1605,15 @@ where
 /// If the input iterator length is $n$, the output length is $2^n$.
 ///
 /// If `xs` is empty, the output consists of a single empty [`BTreeSet`].
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell \log \ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is the number of elements in
+/// the $i$th output.
 ///
 /// # Examples
 /// ```

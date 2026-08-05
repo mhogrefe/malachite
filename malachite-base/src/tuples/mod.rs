@@ -29,6 +29,14 @@ impl<I: Iterator> Iterator for Singletons<I> {
 ///
 /// The output length is `xs.count()`.
 ///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(T^\prime(i))$
+///
+/// $M(i) = O(M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`.
+///
 /// # Examples
 /// ```
 /// use itertools::Itertools;

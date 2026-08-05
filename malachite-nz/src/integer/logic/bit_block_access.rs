@@ -35,7 +35,7 @@ use malachite_base::vecs::vec_delete_left;
 //
 // $M(n) = O(n)$
 //
-// where $T$ is time, $M$ is additional memory and $n$ is `end`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `end`.
 //
 // # Panics
 // Panics if `start > end`.
@@ -77,7 +77,7 @@ private_test_fn! {limbs_neg_limb_get_bits(x: Limb, start: u64, end: u64) -> Vec<
 //
 // $M(n) = O(n)$
 //
-// where $T$ is time, $M$ is additional memory and $n$ is `max(xs.len(), end * Limb::WIDTH)`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), end / Limb::WIDTH)`.
 //
 // # Panics
 // Panics if `start > end`.
@@ -128,7 +128,7 @@ private_test_fn! {limbs_slice_neg_get_bits(xs: &[Limb], start: u64, end: u64) ->
 //
 // $M(n) = O(n)$
 //
-// where $T$ is time, $M$ is additional memory and $n$ is `max(xs.len(), end * Limb::WIDTH)`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), end / Limb::WIDTH)`.
 //
 // # Panics
 // Panics if `start > end`.
@@ -176,8 +176,9 @@ private_test_fn! {limbs_vec_neg_get_bits(mut xs: Vec<Limb>, start: u64, end: u64
 //
 // $M(m) = O(m)$
 //
-// where $T$ is time, $M$ is additional memory, $n$ is `max(n / 2 ^ Limb::WIDTH, m)`, and $m$ is
-// `end`.
+// where $T$ is time, $M$ is additional memory, $n$ is `max(xs.len(), end / Limb::WIDTH)`, and $m$
+// is `end`: the pre- and post-adjustment of the stored magnitude can carry through the entire
+// slice, however small `end` is.
 //
 // # Panics
 // Panics if `start >= end` or `xs` only contains zeros.
@@ -396,10 +397,10 @@ impl BitBlockAccess for Integer {
     /// # Worst-case complexity
     /// $T(n) = O(n)$
     ///
-    /// $M(m) = O(m)$
+    /// $M(n) = O(n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `max(self.significant_bits(), end)`, and
-    /// $m$ is `self.significant_bits()`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.significant_bits(), end)`:
+    /// assigning bits beyond the current width grows the number to `end` bits.
     ///
     /// # Panics
     /// Panics if `start > end`.

@@ -19,8 +19,25 @@
 //! # Demos and benchmarks
 //! This crate comes with a `bin` target that can be used for running demos and benchmarks.
 //! - Almost all of the public functions in this crate have an associated demo. Running a demo
-//!   shows you a function's behavior on a large number of inputs. TODO
-//! - You can use a similar command to run benchmarks. TODO
+//!   shows you a function's behavior on a large number of inputs. For example, to demo [`Float`]
+//!   addition, you can use the following command:
+//!   ```text
+//!   cargo run --features bin_build --release -- -l 10000 -m exhaustive -d demo_float_add
+//!   ```
+//!   This command uses the `exhaustive` mode, which generates every possible input, generally
+//!   starting with the simplest input and progressing to more complex ones. Another mode is
+//!   `random`. The `-l` flag specifies how many inputs should be generated.
+//! - You can use a similar command to run benchmarks. The following command benchmarks various
+//!   [`Float`] addition implementations:
+//!   ```text
+//!   cargo run --features bin_build --release -- -l 1000000 -m random -b \
+//!       benchmark_float_add_algorithms -o add-bench.gp
+//!   ```
+//!   This creates a file called add-bench.gp. You can use gnuplot to create an SVG from it like
+//!   so:
+//!   ```text
+//!   gnuplot -e "set terminal svg; l \"add-bench.gp\"" > add-bench.svg
+//!   ```
 //!
 //! The list of available demos and benchmarks is not documented anywhere; you must find them by
 //! browsing through

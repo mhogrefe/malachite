@@ -31,7 +31,7 @@ use malachite_base::vecs::vec_delete_left;
 //
 // $M(n) = O(n)$
 //
-// where $T$ is time, $M$ is additional memory and $n$ is `max(1, xs.len() - bits / Limb::WIDTH)`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(1, xs.len() - bits / Limb::WIDTH)`.
 //
 // This is equivalent to `mpn_rshift` from `mpn/generic/rshift.c`, GMP 6.2.1, where the result is
 // returned.
@@ -70,7 +70,7 @@ crate_test_fn! {limbs_shr(xs: &[Limb], bits: u64) -> Vec<Limb> {
 //
 // $M(n) = O(1)$
 //
-// where $T$ is time, $M$ is additional memory and $n$ is `xs.len()`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` is empty, `out` is shorter than `xs`, `bits` is 0, or `bits` is greater than or
@@ -105,7 +105,7 @@ crate_test_fn! {limbs_shr_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> Li
 //
 // $M(n) = O(1)$
 //
-// where $T$ is time, $M$ is additional memory and $n$ is `xs.len()`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // # Panics
 // Panics if `xs` is empty, `bits` is 0, or `bits` is greater than or equal to `Limb::WIDTH`.
@@ -135,7 +135,7 @@ crate_test_fn! {limbs_slice_shr_in_place<T: PrimitiveUnsigned>(xs: &mut [T], bit
 //
 // $M(n) = O(1)$
 //
-// where $T$ is time, $M$ is additional memory and $n$ is `max(1, xs.len() - bits / Limb::WIDTH)`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(1, xs.len() - bits / Limb::WIDTH)`.
 //
 // This is equivalent to `mpn_rshift` from `mpn/generic/rshift.c`, GMP 6.2.1, where `rp == up` and
 // if `cnt` is sufficiently large, limbs are removed from `rp`.
@@ -219,7 +219,7 @@ macro_rules! impl_natural_shr_unsigned {
             ///
             /// $M(n) = O(1)$
             ///
-            /// where $T$ is time, $M$ is additional memory and $n$ is `max(1,
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `max(1,
             /// self.significant_bits() - bits)`.
             ///
             /// # Examples
@@ -246,7 +246,7 @@ macro_rules! impl_natural_shr_unsigned {
             ///
             /// $M(n) = O(n)$
             ///
-            /// where $T$ is time, $M$ is additional memory and $n$ is `max(1,
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `max(1,
             /// self.significant_bits() - bits)`.
             ///
             /// # Examples
@@ -270,7 +270,7 @@ macro_rules! impl_natural_shr_unsigned {
             ///
             /// $M(n) = O(1)$
             ///
-            /// where $T$ is time, $M$ is additional memory and $n$ is `max(1,
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `max(1,
             /// self.significant_bits() - bits)`.
             ///
             /// # Examples
@@ -326,7 +326,7 @@ macro_rules! impl_natural_shr_signed {
             ///
             /// $M(n) = O(1)$
             ///
-            /// where $T$ is time, $M$ is additional memory and $n$ is `max(1,
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `max(1,
             /// self.significant_bits() - bits)`.
             ///
             /// # Examples
@@ -353,7 +353,7 @@ macro_rules! impl_natural_shr_signed {
             ///
             /// $M(n) = O(n)$
             ///
-            /// where $T$ is time, $M$ is additional memory and $n$ is `max(1,
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `max(1,
             /// self.significant_bits() - bits)`.
             ///
             /// # Examples
@@ -377,7 +377,7 @@ macro_rules! impl_natural_shr_signed {
             ///
             /// $M(n) = O(1)$
             ///
-            /// where $T$ is time, $M$ is additional memory and $n$ is `max(1,
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `max(1,
             /// self.significant_bits() - bits)`.
             ///
             /// # Examples

@@ -251,11 +251,11 @@ pub const fn exhaustive_nonzero_rationals() -> ExhaustiveNonzeroRationals {
 /// $n$th element are $O(n^\frac{\log \phi}{\log 2})$.
 ///
 /// # Worst-case complexity per iteration
-/// $T(n) = O(\log n \log\log n \log\log\log n)$
+/// $T(i) = O(\log i \log\log i \log\log\log i)$
 ///
-/// $M(n) = O(\log n \log\log n)$
+/// $M(i) = O(\log i \log\log i)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ is the iteration number.
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
 ///
 /// # Examples
 /// ```

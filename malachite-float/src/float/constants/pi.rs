@@ -40,9 +40,11 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`: the iteration holds a
+    /// bounded number of working-precision values at a time (freeing each round's temporaries), so
+    /// the peak is the internal memory of a single full-precision multiplication.
     ///
     /// # Panics
     /// Panics if `prec` is zero or if `rm` is `Exact`.
@@ -131,9 +133,11 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`: the iteration holds a
+    /// bounded number of working-precision values at a time (freeing each round's temporaries), so
+    /// the peak is the internal memory of a single full-precision multiplication.
     ///
     /// # Panics
     /// Panics if `prec` is zero.

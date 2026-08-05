@@ -301,11 +301,12 @@ impl Float {
     /// [`Float::log_base_2`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
@@ -408,11 +409,12 @@ impl Float {
     /// using `(&Float).log_base_2()` instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
@@ -514,11 +516,12 @@ impl Float {
     /// precision of the input, consider using [`Float::log_base_2`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -580,11 +583,12 @@ impl Float {
     /// precision of the input, consider using `(&Float).log_base_2()` instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -653,7 +657,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `self.get_prec()`.
     ///
@@ -735,7 +739,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `self.get_prec()`.
     ///
@@ -806,11 +810,12 @@ impl Float {
     /// using [`Float::log_base_2_assign`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
@@ -885,11 +890,12 @@ impl Float {
     /// the precision of the input, consider using [`Float::log_base_2_assign`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -945,7 +951,7 @@ impl Float {
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `self.get_prec()`.
     ///
@@ -1018,11 +1024,12 @@ impl Float {
     /// instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
@@ -1115,11 +1122,12 @@ impl Float {
     /// [`Float::log_base_2_rational_prec_ref`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
@@ -1234,11 +1242,12 @@ impl Float {
     /// [`Float::log_base_2_rational_prec_round`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -1300,11 +1309,12 @@ impl Float {
     /// [`Float::log_base_2_rational_prec_round_ref`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -1369,7 +1379,7 @@ impl LogBase2 for Float {
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `self.get_prec()`.
     ///
@@ -1438,7 +1448,7 @@ impl LogBase2 for &Float {
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `self.get_prec()`.
     ///
@@ -1495,7 +1505,7 @@ impl LogBase2Assign for Float {
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `self.get_prec()`.
     ///
@@ -1617,7 +1627,11 @@ where
 /// Neither overflow nor underflow is possible.
 ///
 /// # Worst-case complexity
-/// Constant time and additional memory.
+/// $T(m) = O(m)$
+///
+/// $M(m) = O(m)$
+///
+/// where $T$ is time, $M$ is additional memory, and $m$ is `x.significant_bits()`.
 ///
 /// # Examples
 /// ```

@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::{CheckedDiv, DivMod};
+use malachite_base::num::arithmetic::traits::{CheckedDiv, DivMod, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
@@ -36,6 +36,8 @@ use malachite_nz::test_util::generators::{
 use malachite_nz::test_util::natural::arithmetic::div::{
     limbs_div_limb_in_place_alt, limbs_div_limb_to_out_alt,
 };
+use malachite_nz::test_util::natural::arithmetic::div_mod::div_dispatch_thresholds;
+use malachite_nz::test_util::scratch::*;
 use num::{BigUint, CheckedDiv as NumCheckedDiv};
 use rug;
 use std::str::FromStr;
@@ -35069,4 +35071,70 @@ fn checked_div_properties() {
         assert_eq!(Natural::ONE.checked_div(x), Some(Natural::from(*x == 1u32)));
         assert_eq!(x.checked_div(x), Some(Natural::ONE));
     });
+}
+
+// Scratch-sizing canaries for the Barrett quotient machinery (see DOC-CONVENTIONS.md).
+#[test]
+fn test_limbs_div_barrett_scratch_sizing() {
+    let thresholds = div_dispatch_thresholds();
+    let high_bit = Limb::power_of_2(Limb::WIDTH - 1);
+    for d_len in threshold_straddling_lengths(&thresholds, 3, 850, 1) {
+        for n_len in [d_len + 1, d_len + 2, d_len + (d_len >> 1), d_len << 1, 3 * d_len] {
+            if n_len <= d_len {
+                continue;
+            }
+            let ns = canary_limbs("div barrett ns", n_len);
+            let mut ds = canary_limbs("div barrett ds", d_len);
+            *ds.last_mut().unwrap() |= high_bit;
+            let mut qs = vec![0; n_len - d_len];
+            let scratch_len = limbs_div_barrett_scratch_len(n_len, d_len);
+            let mut q_high = false;
+            let high_water = scratch_high_water(scratch_len, |scratch| {
+                q_high = limbs_div_barrett(&mut qs, &ns, &ds, scratch);
+            });
+            assert!(high_water <= scratch_len);
+            let n = Natural::from_limbs_asc(&ns);
+            let d = Natural::from_limbs_asc(&ds);
+            let expected_q = n / d;
+            let mut q = Natural::from_owned_limbs_asc(qs);
+            if q_high {
+                q += Natural::power_of_2(u64::exact_from(n_len - d_len) * Limb::WIDTH);
+            }
+            assert_eq!(q, expected_q, "{n_len} {d_len}");
+        }
+    }
+}
+
+// The approximate quotient may exceed the true quotient by a few ulps; sizing and approximation
+// quality are both checked.
+#[test]
+fn test_limbs_div_barrett_approx_scratch_sizing() {
+    let thresholds = div_dispatch_thresholds();
+    let high_bit = Limb::power_of_2(Limb::WIDTH - 1);
+    for d_len in threshold_straddling_lengths(&thresholds, 3, 850, 1) {
+        for n_len in [d_len + 1, d_len + 2, d_len + (d_len >> 1), d_len << 1, 3 * d_len] {
+            if n_len <= d_len {
+                continue;
+            }
+            let ns = canary_limbs("div approx ns", n_len);
+            let mut ds = canary_limbs("div approx ds", d_len);
+            *ds.last_mut().unwrap() |= high_bit;
+            let mut qs = vec![0; n_len - d_len];
+            let scratch_len = limbs_div_barrett_approx_scratch_len(n_len, d_len);
+            let mut q_high = false;
+            let high_water = scratch_high_water(scratch_len, |scratch| {
+                q_high = limbs_div_barrett_approx(&mut qs, &ns, &ds, scratch);
+            });
+            assert!(high_water <= scratch_len);
+            let n = Natural::from_limbs_asc(&ns);
+            let d = Natural::from_limbs_asc(&ds);
+            let expected_q = n / d;
+            let mut q = Natural::from_owned_limbs_asc(qs);
+            if q_high {
+                q += Natural::power_of_2(u64::exact_from(n_len - d_len) * Limb::WIDTH);
+            }
+            assert!(q >= expected_q, "{n_len} {d_len}");
+            assert!(q - expected_q <= 4, "{n_len} {d_len}");
+        }
+    }
 }

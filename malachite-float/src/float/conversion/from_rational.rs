@@ -379,11 +379,11 @@ impl Float {
     ///   $-2^{-2^{30}-1}$.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n)$
+    /// $T(n) = O(n \log n \log\log n)$
     ///
-    /// $M(n) = O(n)$
+    /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(n.significant_bits(), prec)`.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(x.significant_bits(), prec)`.
     ///
     /// # Panics
     /// Panics if `prec` is zero, or if `rm` is exact and the `Rational` cannot be exactly

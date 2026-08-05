@@ -247,7 +247,7 @@ impl MulAssign<&Self> for Rational {
     /// $$
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^3 \log\log n)$
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
     ///
     /// $M(n) = O(n \log n)$
     ///

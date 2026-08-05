@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{
-    CoprimeWith, DivExact, DivisibleBy, Gcd, GcdAssign, Lcm, ModPowerOf2,
+    CoprimeWith, DivExact, DivisibleBy, Gcd, GcdAssign, Lcm, ModPowerOf2, PowerOf2,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
@@ -34,9 +34,11 @@ use malachite_nz::test_util::generators::{
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::test_util::natural::arithmetic::gcd::half_gcd_matrix_create;
 use malachite_nz::test_util::natural::arithmetic::gcd::{
-    OwnedHalfGcdMatrix, gcd_binary_nz, gcd_euclidean_nz, half_gcd_matrix_1_to_naturals,
-    half_gcd_matrix_to_naturals, limbs_gcd_div_alt, limbs_gcd_div_naive,
+    OwnedHalfGcdMatrix, gcd_binary_nz, gcd_dispatch_thresholds, gcd_euclidean_nz,
+    half_gcd_matrix_1_to_naturals, half_gcd_matrix_to_naturals, limbs_gcd_div_alt,
+    limbs_gcd_div_naive,
 };
+use malachite_nz::test_util::scratch::*;
 use num::{BigUint, Integer as rug_integer};
 use std::str::FromStr;
 
@@ -13133,4 +13135,37 @@ fn gcd_properties() {
     unsigned_pair_gen_var_27::<Limb>().test_properties(|(x, y)| {
         assert_eq!(Natural::from(x).gcd(Natural::from(y)), x.gcd(y));
     });
+}
+
+// Canary for the half-GCD machinery (see DOC-CONVENTIONS.md): `limbs_gcd_reduced` drives the whole
+// hgcd stack (matrix construction, Lehmer steps, divide-and-conquer, and above the reduce threshold
+// the FFT-based reduction), with all internal scratch buffers sized by the `*_scratch_len`
+// formulas. Sweeping sizes densely across every GCD threshold verifies those formulas (under-sizing
+// panics), and each result is checked against `Natural` gcd.
+#[test]
+fn test_limbs_gcd_reduced_scratch_sizing() {
+    let thresholds = gcd_dispatch_thresholds();
+    let high_bit = Limb::power_of_2(Limb::WIDTH - 1);
+    for ys_len in threshold_straddling_lengths(&thresholds, 2, 1750, 1) {
+        for xs_len in [ys_len, ys_len + 1, ys_len + (ys_len >> 1)] {
+            let mut xs = canary_limbs("gcd canary xs", xs_len);
+            let mut ys = canary_limbs("gcd canary ys", ys_len);
+            // X >= Y, and not both even
+            ys[0] |= 1;
+            *xs.last_mut().unwrap() |= high_bit;
+            if xs_len == ys_len {
+                let t = *ys.last_mut().unwrap() & !high_bit;
+                *ys.last_mut().unwrap() = if t == 0 { 1 } else { t };
+            }
+            let expected = Natural::from_limbs_asc(&xs).gcd(Natural::from_limbs_asc(&ys));
+            let mut out = vec![0; xs_len];
+            let out_len = limbs_gcd_reduced(&mut out, &mut xs, &mut ys);
+            out.truncate(out_len);
+            assert_eq!(
+                Natural::from_owned_limbs_asc(out),
+                expected,
+                "{xs_len} {ys_len}"
+            );
+        }
+    }
 }

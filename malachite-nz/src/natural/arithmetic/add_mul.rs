@@ -250,7 +250,7 @@ fn limbs_vec_add_mul_limb_smaller_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>
 //
 // $M(n) = O(1)$
 //
-// where $T$ is time, $M$ is additional memory and $n$ is `max(xs.len(), ys.len())`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `max(xs.len(), ys.len())`.
 //
 // This is equivalent to `mpz_aorsmul_1` from `mpz/aorsmul_i.c`, GMP 6.2.1, where `w` and `x` are
 // positive, `sub` is positive, and the result is written to the longer input.

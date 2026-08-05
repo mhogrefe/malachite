@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{
-    CeilingDivNegMod, DivMod, Mod, ModAssign, ModIsReduced, NegMod, NegModAssign,
+    CeilingDivNegMod, DivMod, Mod, ModAssign, ModIsReduced, NegMod, NegModAssign, PowerOf2,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
@@ -37,7 +37,9 @@ use malachite_nz::test_util::generators::{
     natural_pair_gen_var_6, natural_triple_gen_var_4, unsigned_sextuple_gen_var_2,
     unsigned_vec_quadruple_gen_var_5, unsigned_vec_unsigned_vec_unsigned_triple_gen_var_17,
 };
+use malachite_nz::test_util::natural::arithmetic::div_mod::div_dispatch_thresholds;
 use malachite_nz::test_util::natural::arithmetic::mod_op::{limbs_mod_limb_alt_3, rug_neg_mod};
+use malachite_nz::test_util::scratch::*;
 use num::{BigUint, Integer};
 use rug;
 use rug::ops::RemRounding;
@@ -13094,4 +13096,32 @@ fn neg_mod_properties() {
     unsigned_pair_gen_var_12::<Limb, Limb>().test_properties(|(x, y)| {
         assert_eq!(Natural::from(x).neg_mod(Natural::from(y)), x.neg_mod(y));
     });
+}
+
+// Scratch-sizing canary for the Barrett remainder (see DOC-CONVENTIONS.md). `limbs_mod_barrett`
+// sizes its scratch with `limbs_div_mod_barrett_scratch_len`.
+#[test]
+fn test_limbs_mod_barrett_scratch_sizing() {
+    let thresholds = div_dispatch_thresholds();
+    let high_bit = Limb::power_of_2(Limb::WIDTH - 1);
+    for d_len in threshold_straddling_lengths(&thresholds, 2, 850, 1) {
+        for n_len in [d_len + 1, d_len + 2, d_len + (d_len >> 1), d_len << 1, 3 * d_len] {
+            if n_len < 3 || n_len <= d_len {
+                continue;
+            }
+            let ns = canary_limbs("mod barrett ns", n_len);
+            let mut ds = canary_limbs("mod barrett ds", d_len);
+            *ds.last_mut().unwrap() |= high_bit;
+            let mut qs = vec![0; n_len - d_len];
+            let mut rs = vec![0; d_len];
+            let scratch_len = limbs_div_mod_barrett_scratch_len(n_len, d_len);
+            let high_water = scratch_high_water(scratch_len, |scratch| {
+                limbs_mod_barrett(&mut qs, &mut rs, &ns, &ds, scratch);
+            });
+            assert!(high_water <= scratch_len);
+            let n = Natural::from_limbs_asc(&ns);
+            let d = Natural::from_limbs_asc(&ds);
+            assert_eq!(Natural::from_owned_limbs_asc(rs), n % d, "{n_len} {d_len}");
+        }
+    }
 }

@@ -235,7 +235,7 @@ impl<I: Iterator<Item = u64>> Iterator for RandomNaturals<I> {
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $T(n, m) = O(n + m)$
+/// $T(n, m) = O(n / m + 1)$
 ///
 /// $M(n, m) = O(n / m)$
 ///
@@ -292,7 +292,7 @@ pub fn random_naturals(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $T(n, m) = O(n + m)$
+/// $T(n, m) = O(n / m + 1)$
 ///
 /// $M(n, m) = O(n / m)$
 ///
@@ -360,7 +360,7 @@ impl<I: Iterator<Item = u64>> Iterator for StripedRandomNaturals<I> {
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $T(n, m) = O(n + m)$
+/// $T(n, m) = O(n / m + 1)$
 ///
 /// $M(n, m) = O(n / m)$
 ///
@@ -417,7 +417,7 @@ pub fn striped_random_naturals(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $T(n, m) = O(n + m)$
+/// $T(n, m) = O(n / m + 1)$
 ///
 /// $M(n, m) = O(n / m)$
 ///
@@ -749,7 +749,7 @@ impl Iterator for RandomNaturalRangeToInfinity {
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-/// $T(n, m) = O(n + m)$
+/// $T(n, m) = O(n / m + 1)$
 ///
 /// $M(n, m) = O(n / m)$
 ///
@@ -871,8 +871,8 @@ impl Iterator for RandomNaturalRange {
 ///
 /// $M(m) = O(m)$
 ///
-/// where $T$ is time, $M$ is additional memory, $n$ is `mean_bits_numerator +
-/// mean_bits_denominator`, and $m$ is `b.significant_bits()`.
+/// where $T$ is time, $M$ is additional memory, $n$ is `mean_bits_numerator / mean_bits_denominator
+/// + 1`, and $m$ is `b.significant_bits()`.
 ///
 /// # Panics
 /// Panics if $a \geq b$, if `mean_bits_numerator` or `mean_bits_denominator` are zero, if their
@@ -966,8 +966,8 @@ pub fn random_natural_range(
 ///
 /// $M(m) = O(m)$
 ///
-/// where $T$ is time, $M$ is additional memory, $n$ is `mean_bits_numerator +
-/// mean_bits_denominator`, and $m$ is `b.significant_bits()`.
+/// where $T$ is time, $M$ is additional memory, $n$ is `mean_bits_numerator / mean_bits_denominator
+/// + 1`, and $m$ is `b.significant_bits()`.
 ///
 /// # Panics
 /// Panics if $a > b$, if `mean_bits_numerator` or `mean_bits_denominator` are zero, if their ratio
@@ -1411,7 +1411,7 @@ impl Iterator for StripedRandomNaturalRangeToInfinity {
 /// See [`StripedBitSource`] for information about generating striped random numbers.
 ///
 /// # Expected complexity per iteration
-/// $T(n, m) = O(n + m)$
+/// $T(n, m) = O(n / m + 1)$
 ///
 /// $M(n, m) = O(n / m)$
 ///

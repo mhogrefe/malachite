@@ -31,3 +31,18 @@ pub fn limbs_square_to_out_basecase_unrestricted(out: &mut [Limb], xs: &[Limb]) 
         limbs_square_diagonal_add_shl_1(&mut out[..two_n], &mut scratch, xs);
     }
 }
+
+// The squaring-dispatch thresholds, for building scratch-canary size sweeps (see
+// `test_util::scratch`). The threshold constants are `pub(crate)`, so integration tests get the
+// list through this function.
+pub fn square_dispatch_thresholds() -> Vec<usize> {
+    vec![
+        crate::platform::SQR_BASECASE_THRESHOLD,
+        crate::platform::SQR_TOOM2_THRESHOLD,
+        crate::platform::SQR_TOOM3_THRESHOLD,
+        crate::platform::SQR_TOOM4_THRESHOLD,
+        crate::platform::SQR_TOOM6_THRESHOLD,
+        crate::platform::SQR_TOOM8_THRESHOLD,
+        crate::natural::arithmetic::square::SQR_FFT_THRESHOLD,
+    ]
+}

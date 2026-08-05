@@ -23,6 +23,14 @@ use crate::vecs::random::{
 ///
 /// `cs` must be infinite.
 ///
+/// # Expected complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `cs`, and $\ell$ is `len`.
+///
 /// # Examples
 /// ```
 /// use itertools::Itertools;
@@ -108,6 +116,15 @@ pub fn random_fixed_length_strings(
 /// $$
 ///
 /// The iterators produced by `cs_gen` must be infinite.
+///
+/// # Expected complexity per iteration
+/// $T(i) = O(m + T^\prime(i))$
+///
+/// $M(i) = O(m + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `cs`, and $m$ is `mean_length_numerator /
+/// mean_length_denominator`.
 ///
 /// # Panics
 /// Panics if `mean_length_numerator` or `mean_length_denominator` are zero, or, if after being

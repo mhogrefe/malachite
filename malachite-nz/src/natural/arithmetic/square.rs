@@ -173,7 +173,14 @@ crate_test_fn! {limbs_square_to_out_basecase(out: &mut [Limb], xs: &[Limb]) {
 // # Worst-case complexity
 // Constant time and additional memory.
 //
-// This is equivalent to `mpn_toom2_sqr_itch` from `gmp-impl.h`, GMP 6.2.1.
+// This is equivalent to `mpn_toom2_sqr_itch` from `gmp-impl.h`, GMP 6.2.1. Scratch derivation: the
+// split lengths mirror the ones `limbs_square_to_out_toom_2` computes for the same input length, so
+// the two functions must be kept in lockstep; the additive term is the evaluation/interpolation
+// workspace the kernel slices off the front of `scratch`, and the recursive `*_scratch_len` calls
+// cover the point squarings, which re-enter the squaring dispatcher. Upper bound;
+// `test_limbs_square_scratch_sizing` verifies it (and every other squaring scratch formula, and the
+// dispatcher's) with exactly-sized sentinel-filled scratch over every valid length. The same
+// structure applies to every `*_scratch_len` below.
 private_test_const_fn! {limbs_square_to_out_toom_2_scratch_len(xs_len: usize) -> usize {
     (xs_len + LIMB_WIDTH_USIZE) << 1
 }}
@@ -300,7 +307,9 @@ private_test_const_fn! {limbs_square_to_out_toom_3_input_size_valid(xs_len: usiz
 // # Worst-case complexity
 // Constant time and additional memory.
 //
-// This is equivalent to `mpn_toom3_sqr_itch` from `gmp-impl.h`, GMP 6.2.1.
+// This is equivalent to `mpn_toom3_sqr_itch` from `gmp-impl.h`, GMP 6.2.1. Scratch derivation: see
+// the note above `limbs_square_to_out_toom_2_scratch_len`; the split lengths mirror
+// `limbs_square_to_out_toom_3`'s.
 private_test_const_fn! {limbs_square_to_out_toom_3_scratch_len(xs_len: usize) -> usize {
     3 * xs_len + LIMB_WIDTH_USIZE
 }}
@@ -486,7 +495,9 @@ private_test_const_fn! {limbs_square_to_out_toom_4_input_size_valid(xs_len: usiz
 // # Worst-case complexity
 // Constant time and additional memory.
 //
-// This is equivalent to `mpn_toom4_sqr_itch` from `gmp-impl.h`, GMP 6.2.1.
+// This is equivalent to `mpn_toom4_sqr_itch` from `gmp-impl.h`, GMP 6.2.1. Scratch derivation: see
+// the note above `limbs_square_to_out_toom_2_scratch_len`; the split lengths mirror
+// `limbs_square_to_out_toom_4`'s.
 private_test_const_fn! {limbs_square_to_out_toom_4_scratch_len(xs_len: usize) -> usize {
     3 * xs_len + LIMB_WIDTH_USIZE
 }}
@@ -628,7 +639,9 @@ private_test_const_fn! {limbs_square_to_out_toom_6_input_size_valid(xs_len: usiz
 // # Worst-case complexity
 // Constant time and additional memory.
 //
-// This is equivalent to `mpn_toom6_sqr_itch` from `gmp-impl.h`, GMP 6.2.1.
+// This is equivalent to `mpn_toom6_sqr_itch` from `gmp-impl.h`, GMP 6.2.1. Scratch derivation: see
+// the note above `limbs_square_to_out_toom_2_scratch_len`; the split lengths mirror
+// `limbs_square_to_out_toom_6`'s.
 crate_test_const_fn! {limbs_square_to_out_toom_6_scratch_len(n: usize) -> usize {
     // Everything but `n << 1` is a compile-time constant. `max` is not const-stable, so the
     // comparison is spelled out; that is what lets this be a `const fn` like its siblings.
@@ -805,7 +818,9 @@ private_test_const_fn! {limbs_square_to_out_toom_8_input_size_valid(xs_len: usiz
 // # Worst-case complexity
 // Constant time and additional memory.
 //
-// This is equivalent to `mpn_toom8_sqr_itch` from `gmp-impl.h`, GMP 6.2.1.
+// This is equivalent to `mpn_toom8_sqr_itch` from `gmp-impl.h`, GMP 6.2.1. Scratch derivation: see
+// the note above `limbs_square_to_out_toom_2_scratch_len`; the split lengths mirror
+// `limbs_square_to_out_toom_8`'s.
 crate_test_const_fn! {limbs_square_to_out_toom_8_scratch_len(n: usize) -> usize {
     // As in `limbs_square_to_out_toom_6_scratch_len`, `max` is written out so this can be const.
     const ITCH: usize = {
@@ -880,7 +895,7 @@ const TOOM8_MAYBE_SQR_ABOVE_TOOM6: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM8_MAX >= SQR_TOOM8_THRESHOLD;
 
 // # Worst-case complexity
-// $T(n) = O(n^{\log_6 11}) \approx O(n^{1.302})$
+// $T(n) = O(n^{\log_8 15}) \approx O(n^{1.302})$
 //
 // $M(n) = O(1)$
 //
@@ -924,7 +939,7 @@ fn limbs_square_to_out_toom_8_recursive(out: &mut [Limb], xs: &[Limb], scratch: 
 // The smallest allowable `xs` length is 40.
 //
 // # Worst-case complexity
-// $T(n) = O(n^{\log_6 11}) \approx O(n^{1.302})$
+// $T(n) = O(n^{\log_8 15}) \approx O(n^{1.302})$
 //
 // $M(n) = O(1)$
 //
@@ -1026,6 +1041,10 @@ private_test_fn! {limbs_square_to_out_toom_8(out: &mut [Limb], xs: &[Limb], scra
     limbs_mul_toom_interpolate_16_points(out, r1, r3, r5, r7, n, s << 1, false, &mut wse[..p]);
 }}
 
+// Scratch derivation: each band returns the requirement of the kernel that `limbs_square_to_out`
+// dispatches to under the same conditions, so the two functions must be kept in lockstep; the
+// basecase and FFT bands use no caller scratch. See the note above
+// `limbs_square_to_out_toom_2_scratch_len`.
 crate_test_const_fn! {
 #[allow(clippy::absurd_extreme_comparisons)]
 limbs_square_to_out_scratch_len(n: usize) -> usize {

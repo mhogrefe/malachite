@@ -1231,7 +1231,10 @@ fn limbs_half_gcd_step(
 // # Worst-case complexity
 // Constant time and additional memory.
 //
-// This is equivalent to `MPN_GCD_SUBDIV_STEP_ITCH` from `gmp-impl.h`, GMP 6.2.1.
+// This is equivalent to `MPN_GCD_SUBDIV_STEP_ITCH` from `gmp-impl.h`, GMP 6.2.1. Scratch
+// derivation: the subdivide step's division needs one `n`-limb quotient buffer
+// (`mpn_gcd_subdiv_step_itch`, GMP 6.2.1). Verified, with the rest of the hgcd stack's internal
+// scratch sizing, by `test_limbs_gcd_reduced_scratch_sizing`.
 pub(crate) const fn limbs_gcd_subdivide_step_scratch_len(n: usize) -> usize {
     n
 }
@@ -1247,7 +1250,10 @@ const fn limbs_gcd_choose_p(n: usize) -> usize {
 // # Worst-case complexity
 // Constant time and additional memory.
 //
-// This is equivalent to `MPN_HGCD_MATRIX_INIT_ITCH` from `gmp-impl.h`, GMP 6.2.1.
+// This is equivalent to `MPN_HGCD_MATRIX_INIT_ITCH` from `gmp-impl.h`, GMP 6.2.1. Scratch
+// derivation: four matrix elements of `ceil((n + 1) / 2) + 1` limbs each
+// (`MPN_HGCD_MATRIX_INIT_ITCH`, GMP 6.2.1); the elements of a half-GCD matrix for size-`n` inputs
+// stay within half the input size plus a guard limb.
 pub(crate) const fn limbs_half_gcd_matrix_init_scratch_len(n: usize) -> usize {
     (((n + 1) >> 1) + 1) << 2
 }
@@ -1258,7 +1264,11 @@ pub(crate) const HGCD_THRESHOLD: usize = 140;
 // # Worst-case complexity
 // Constant time and additional memory.
 //
-// This is equivalent to `mpn_hgcd_itch` from `mpn/generic/hgcd.c`, GMP 6.2.1.
+// This is equivalent to `mpn_hgcd_itch` from `mpn/generic/hgcd.c`, GMP 6.2.1. Scratch derivation:
+// ports `mpn_hgcd_itch`, GMP 6.2.1 — below the threshold, the quadratic algorithm needs `n`
+// limbs; above it, the bound covers the divide-and-conquer recursion, with the linear term paying
+// for each level's matrices and temporaries (sizes shrinking geometrically) and the per-level
+// constant times the recursion depth added on top.
 pub(crate) fn limbs_half_gcd_scratch_len(n: usize) -> usize {
     if n < HGCD_THRESHOLD {
         n
@@ -1270,7 +1280,7 @@ pub(crate) fn limbs_half_gcd_scratch_len(n: usize) -> usize {
 }
 
 // TODO tune
-const HGCD_REDUCE_THRESHOLD: usize = 1679;
+pub(crate) const HGCD_REDUCE_THRESHOLD: usize = 1679;
 
 // # Worst-case complexity
 // Constant time and additional memory.
@@ -1295,7 +1305,7 @@ private_test_fn! {limbs_half_gcd_reduce_scratch_len(n: usize, p: usize) -> usize
 }}
 
 // TODO tune
-const HGCD_APPR_THRESHOLD: usize = 104;
+pub(crate) const HGCD_APPR_THRESHOLD: usize = 104;
 
 /// Destroys inputs.
 ///

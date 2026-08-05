@@ -198,3 +198,15 @@ pub fn limbs_gcd_div_naive(n1: Limb, n0: Limb, d1: Limb, d0: Limb) -> (Limb, Lim
     let (r1, r0) = r.split_in_half();
     (q0, r1, r0)
 }
+
+// The GCD-dispatch thresholds, for building scratch-canary size sweeps (see `test_util::scratch`).
+// The threshold constants are `pub(crate)`, so integration tests get the list through this
+// function.
+pub fn gcd_dispatch_thresholds() -> Vec<usize> {
+    vec![
+        crate::natural::arithmetic::gcd::half_gcd::HGCD_APPR_THRESHOLD,
+        crate::natural::arithmetic::gcd::half_gcd::HGCD_THRESHOLD,
+        crate::natural::arithmetic::gcd::half_gcd::GCD_DC_THRESHOLD,
+        crate::natural::arithmetic::gcd::half_gcd::HGCD_REDUCE_THRESHOLD,
+    ]
+}

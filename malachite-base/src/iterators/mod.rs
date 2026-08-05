@@ -71,6 +71,15 @@ where
 ///
 /// The output length is the number of nonzero values produced by `xs`.
 ///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(z T^\prime(i))$
+///
+/// $M(i) = O(M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $z$ is the number of consecutive zeros
+/// that must be skipped to reach the next nonzero value.
+///
 /// # Examples
 /// ```
 /// use itertools::Itertools;
@@ -458,6 +467,14 @@ where
 /// iteration. The values are cloned each time a new window is generated.
 ///
 /// The output length is $n - k + 1$, where $n$ is `xs.count()` and $k$ is `window_size`.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is `window_size`.
 ///
 /// # Panics
 /// Panics if `window_size` is 0.

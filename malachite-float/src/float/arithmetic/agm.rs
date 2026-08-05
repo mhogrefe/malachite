@@ -493,11 +493,12 @@ impl Float {
     /// [`Float::agm`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m)$
     ///
-    /// $M(n) = O(n \log n)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but the two [`Float`] arguments are positive and distinct (and the
@@ -584,11 +585,12 @@ impl Float {
     /// consider using [`Float::agm`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m)$
     ///
-    /// $M(n) = O(n \log n)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but the two [`Float`] arguments are positive and distinct (and the
@@ -672,11 +674,12 @@ impl Float {
     /// consider using [`Float::agm`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m)$
     ///
-    /// $M(n) = O(n \log n)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but the two [`Float`] arguments are positive and distinct (and the
@@ -760,11 +763,12 @@ impl Float {
     /// consider using [`Float::agm`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m)$
     ///
-    /// $M(n) = O(n \log n)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but the two [`Float`] arguments are positive and distinct (and the
@@ -857,11 +861,12 @@ impl Float {
     /// the precisions of the two inputs, consider using [`Float::agm`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m)$
     ///
-    /// $M(n) = O(n \log n)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -917,11 +922,12 @@ impl Float {
     /// maximum of the precisions of the two inputs, consider using [`Float::agm`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m)$
     ///
-    /// $M(n) = O(n \log n)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -977,11 +983,12 @@ impl Float {
     /// maximum of the precisions of the two inputs, consider using [`Float::agm`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m)$
     ///
-    /// $M(n) = O(n \log n)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -1037,11 +1044,12 @@ impl Float {
     /// maximum of the precisions of the two inputs, consider using [`Float::agm`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m)$
     ///
-    /// $M(n) = O(n \log n)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -1410,11 +1418,12 @@ impl Float {
     /// consider using [`Float::agm_assign`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m)$
     ///
-    /// $M(n) = O(n \log n)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but the two [`Float`] arguments are positive and distinct (and the
@@ -1497,11 +1506,12 @@ impl Float {
     /// true, consider using [`Float::agm_assign`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m)$
     ///
-    /// $M(n) = O(n \log n)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but the two [`Float`] arguments are positive and distinct (and the
@@ -1595,11 +1605,12 @@ impl Float {
     /// maximum of the precisions of the two inputs, consider using [`Float::agm_assign`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m)$
     ///
-    /// $M(n) = O(n \log n)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -1650,11 +1661,12 @@ impl Float {
     /// maximum of the precisions of the two inputs, consider using [`Float::agm_assign`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m)$
     ///
-    /// $M(n) = O(n \log n)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Examples
     /// ```
@@ -1865,11 +1877,12 @@ impl Float {
     /// If you know you'll be using `Nearest`, consider using [`Float::agm_rational_prec`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m)$
     ///
-    /// $M(n) = O(n \log n)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(x.significant_bits(), y.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but the two [`Rational`] arguments are positive and distinct (and
@@ -1974,11 +1987,12 @@ impl Float {
     /// instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m)$
     ///
-    /// $M(n) = O(n \log n)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(x.significant_bits(), y.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but the two [`Rational`] arguments are positive and distinct (and
@@ -2111,11 +2125,12 @@ impl Float {
     /// instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m)$
     ///
-    /// $M(n) = O(n \log n)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(x.significant_bits(), y.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but the two [`Rational`] arguments are positive and distinct (and
@@ -2248,11 +2263,12 @@ impl Float {
     /// instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m)$
     ///
-    /// $M(n) = O(n \log n)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(x.significant_bits(), y.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but the two [`Rational`] arguments are positive and distinct (and
@@ -2369,11 +2385,12 @@ impl Float {
     /// [`Float::agm_rational_prec_round`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m)$
     ///
-    /// $M(n) = O(n \log n)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(x.significant_bits(), y.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but the two [`Rational`] arguments are positive and distinct (and
@@ -2438,11 +2455,12 @@ impl Float {
     /// [`Float::agm_rational_prec_round_val_ref`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m)$
     ///
-    /// $M(n) = O(n \log n)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(x.significant_bits(), y.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but the two [`Rational`] arguments are positive and distinct (and
@@ -2506,11 +2524,12 @@ impl Float {
     /// [`Float::agm_rational_prec_round_ref_val`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m)$
     ///
-    /// $M(n) = O(n \log n)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(x.significant_bits(), y.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but the two [`Rational`] arguments are positive and distinct (and
@@ -2574,11 +2593,12 @@ impl Float {
     /// [`Float::agm_rational_prec_round_ref_ref`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m)$
     ///
-    /// $M(n) = O(n \log n)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(x.significant_bits(), y.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but the two [`Rational`] arguments are positive and distinct (and
@@ -3015,7 +3035,12 @@ where
 /// - $f(x,y)=\text{NaN}$ if $x<0$ or $y<0$
 ///
 /// # Worst-case complexity
-/// Constant time and additional memory.
+/// $T(m) = O(m)$
+///
+/// $M(m) = O(m)$
+///
+/// where $T$ is time, $M$ is additional memory, and $m$ is `max(x.significant_bits(),
+/// y.significant_bits())`.
 ///
 /// # Examples
 /// ```

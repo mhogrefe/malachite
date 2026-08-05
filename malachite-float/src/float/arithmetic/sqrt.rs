@@ -139,11 +139,12 @@ impl Float {
     /// [`Float::sqrt`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n)$
+    /// $T(n, m) = O(n \log n \log\log n + m)$
     ///
-    /// $M(n) = O(n \log n)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
@@ -223,11 +224,12 @@ impl Float {
     /// `(&Float).sqrt()`instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n)$
+    /// $T(n, m) = O(n \log n \log\log n + m)$
     ///
-    /// $M(n) = O(n \log n)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
@@ -332,11 +334,12 @@ impl Float {
     /// of the input, consider using [`Float::sqrt`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n)$
+    /// $T(n, m) = O(n \log n \log\log n + m)$
     ///
-    /// $M(n) = O(n \log n)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -393,11 +396,12 @@ impl Float {
     /// precision of the input, consider using `(&Float).sqrt()` instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n)$
+    /// $T(n, m) = O(n \log n \log\log n + m)$
     ///
-    /// $M(n) = O(n \log n)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -593,11 +597,12 @@ impl Float {
     /// [`Float::sqrt_assign`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n)$
+    /// $T(n, m) = O(n \log n \log\log n + m)$
     ///
-    /// $M(n) = O(n \log n)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `self.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
@@ -692,11 +697,12 @@ impl Float {
     /// precision of the input, consider using [`Float::sqrt`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n)$
+    /// $T(n, m) = O(n \log n \log\log n + m)$
     ///
-    /// $M(n) = O(n \log n)$
+    /// $M(n, m) = O(n \log n + m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `self.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -834,11 +840,12 @@ impl Float {
     /// If you know you'll be using `Nearest`, consider using [`Float::sqrt_rational_prec`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n)$
+    /// $T(n, m) = O(n \log n \log\log n + m \log m \log\log m)$
     ///
-    /// $M(n) = O(n \log n)$
+    /// $M(n, m) = O(n \log n + m \log m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
@@ -979,11 +986,12 @@ impl Float {
     /// instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n)$
+    /// $T(n, m) = O(n \log n \log\log n + m \log m \log\log m)$
     ///
-    /// $M(n) = O(n \log n)$
+    /// $M(n, m) = O(n \log n + m \log m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the given
@@ -1126,11 +1134,12 @@ impl Float {
     /// [`Float::sqrt_rational_prec_round`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n)$
+    /// $T(n, m) = O(n \log n \log\log n + m \log m \log\log m)$
     ///
-    /// $M(n) = O(n \log n)$
+    /// $M(n, m) = O(n \log n + m \log m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -1202,11 +1211,12 @@ impl Float {
     /// [`Float::sqrt_rational_prec_round_ref`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n \log n \log\log n)$
+    /// $T(n, m) = O(n \log n \log\log n + m \log m \log\log m)$
     ///
-    /// $M(n) = O(n \log n)$
+    /// $M(n, m) = O(n \log n + m \log m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`.
     ///
     /// # Examples
     /// ```
@@ -1551,7 +1561,11 @@ impl SqrtAssign for Float {
 /// - If the absolute value of the result is too small to represent, 0.0 is returned instead.
 ///
 /// # Worst-case complexity
-/// Constant time and additional memory.
+/// $T(m) = O(m \log m \log\log m)$
+///
+/// $M(m) = O(m \log m)$
+///
+/// where $T$ is time, $M$ is additional memory, and $m$ is `x.significant_bits()`.
 ///
 /// # Examples
 /// ```

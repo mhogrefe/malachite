@@ -619,11 +619,21 @@ impl BinomialCoefficient for Natural {
     /// Computes the binomial coefficient of two [`Natural`]s, taking both by value.
     ///
     /// $$
-    /// f(n, k) =binom{n}{k} =frac{n!}{k!(n-k)!}.
+    /// f(n, k) = \binom{n}{k} = \frac{n!}{k!(n-k)!}.
     /// $$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n, k) = O(nk (\log (nk))^2 \log\log (nk))$
+    ///
+    /// $M(n, k) = O(nk \log (nk))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `n.significant_bits()`, and $k$ is
+    /// `min(k, n - k)`: the result has $O(nk)$ bits and is assembled by a raising-factorial product
+    /// tree followed by an exact division, both within a polylogarithmic factor of the result size.
+    ///
+    /// # Panics
+    /// Panics if `min(k, n - k)` does not fit in a limb; the result would have far too many bits to
+    /// represent anyway.
     ///
     /// # Examples
     /// ```
@@ -677,11 +687,21 @@ impl<'a> BinomialCoefficient<&'a Self> for Natural {
     /// Computes the binomial coefficient of two [`Natural`]s, taking both by reference.
     ///
     /// $$
-    /// f(n, k) =binom{n}{k} =frac{n!}{k!(n-k)!}.
+    /// f(n, k) = \binom{n}{k} = \frac{n!}{k!(n-k)!}.
     /// $$
     ///
     /// # Worst-case complexity
-    /// TODO
+    /// $T(n, k) = O(nk (\log (nk))^2 \log\log (nk))$
+    ///
+    /// $M(n, k) = O(nk \log (nk))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `n.significant_bits()`, and $k$ is
+    /// `min(k, n - k)`: the result has $O(nk)$ bits and is assembled by a raising-factorial product
+    /// tree followed by an exact division, both within a polylogarithmic factor of the result size.
+    ///
+    /// # Panics
+    /// Panics if `min(k, n - k)` does not fit in a limb; the result would have far too many bits to
+    /// represent anyway.
     ///
     /// # Examples
     /// ```

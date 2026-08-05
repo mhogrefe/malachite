@@ -185,7 +185,9 @@ const fn limbs_mul_same_length_to_out_toom_22_recursive_scratch_len(xs_len: usiz
 //
 // $M(n) = O(n \log n)$
 //
-// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`: the evaluation and
+// interpolation passes are linear, and the point multiplications re-enter the main multiplication
+// dispatcher, so the whole recursion costs no more than the dispatcher's bound.
 //
 // This is equivalent to `TOOM22_MUL_N_REC` from `mpn/generic/toom22_mul.c`, GMP 6.2.1.
 fn limbs_mul_same_length_to_out_toom_22_recursive(
@@ -230,7 +232,9 @@ const fn limbs_mul_greater_to_out_toom_22_recursive_scratch_len(
 //
 // $M(n) = O(n \log n)$
 //
-// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`: the evaluation and
+// interpolation passes are linear, and the point multiplications re-enter the main multiplication
+// dispatcher, so the whole recursion costs no more than the dispatcher's bound.
 //
 // This is equivalent to `TOOM22_MUL_REC` from `mpn/generic/toom22_mul.c`, GMP 6.2.1.
 fn limbs_mul_greater_to_out_toom_22_recursive(
@@ -270,7 +274,17 @@ private_test_const_fn! {limbs_mul_greater_to_out_toom_22_input_sizes_valid(
 // # Worst-case complexity
 // Constant time and additional memory.
 //
-// This is equivalent to `mpn_toom22_mul_itch` from `gmp-impl.h`, GMP 6.2.1.
+// This is equivalent to `mpn_toom22_mul_itch` from `gmp-impl.h`, GMP 6.2.1. Scratch derivation: the
+// split lengths computed here (`n`, `s`, `t`) mirror the ones `limbs_mul_greater_to_out_toom_22`
+// computes for the same input lengths, so the two functions must be kept in lockstep. The additive
+// term is the evaluation/interpolation workspace that the kernel slices off the front of `scratch`,
+// and the `max` of the recursive `*_scratch_len` calls covers the point multiplications, which
+// re-enter the main multiplication dispatcher. The result is an upper bound;
+// `test_limbs_mul_toom_scratch_sizing` verifies it (and every other Toom scratch formula) with
+// exactly-sized sentinel-filled scratch over every valid input shape. The dispatcher scratch-length
+// functions called here contain shape-reduction loops, but within the Toom kernels' valid shapes
+// those loops run $O(1)$ iterations, so the constant-time claims on this family of functions stand.
+// The same structure applies to every `*_scratch_len` below.
 crate_test_const_fn! {limbs_mul_greater_to_out_toom_22_scratch_len(
     xs_len: usize,
     ys_len: usize
@@ -324,7 +338,9 @@ crate_test_const_fn! {limbs_mul_greater_to_out_toom_22_scratch_len(
 //
 // $M(n) = O(n \log n)$
 //
-// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`: the evaluation and
+// interpolation passes are linear, and the point multiplications re-enter the main multiplication
+// dispatcher, so the whole recursion costs no more than the dispatcher's bound.
 //
 // The time would be O(n^{\log_2 3}) \approx O(n^{1.585}), but
 // `limbs_mul_same_length_to_out_toom_22_recursive` calls `limbs_mul_greater_to_out`.
@@ -449,7 +465,9 @@ crate_test_fn! {limbs_mul_greater_to_out_toom_22(
 // # Worst-case complexity
 // Constant time and additional memory.
 //
-// This is equivalent to `mpn_toom32_mul_itch` from `gmp-impl.h`, GMP 6.2.1.
+// This is equivalent to `mpn_toom32_mul_itch` from `gmp-impl.h`, GMP 6.2.1. Scratch derivation: see
+// the note above `limbs_mul_greater_to_out_toom_22_scratch_len`; the split lengths mirror
+// `limbs_mul_greater_to_out_toom_32`'s.
 crate_test_const_fn! {limbs_mul_greater_to_out_toom_32_scratch_len(
     xs_len: usize,
     ys_len: usize
@@ -515,7 +533,9 @@ private_test_const_fn! {limbs_mul_greater_to_out_toom_32_input_sizes_valid(
 //
 // $M(n) = O(n \log n)$
 //
-// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`: the evaluation and
+// interpolation passes are linear, and the point multiplications re-enter the main multiplication
+// dispatcher, so the whole recursion costs no more than the dispatcher's bound.
 //
 // The time would be O(n^{\log_3 4}) \approx O(n^{1.262}), but `limbs_mul_same_length_to_out` is
 // called.
@@ -769,7 +789,9 @@ const fn limbs_mul_same_length_to_out_toom_33_recursive_scratch_len(xs_len: usiz
 //
 // $M(n) = O(n \log n)$
 //
-// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`: the evaluation and
+// interpolation passes are linear, and the point multiplications re-enter the main multiplication
+// dispatcher, so the whole recursion costs no more than the dispatcher's bound.
 //
 // This is equivalent to `TOOM33_MUL_N_REC` from `mpn/generic/toom33_mul.c`, GMP 6.2.1.
 private_test_fn! {limbs_mul_same_length_to_out_toom_33_recursive(
@@ -813,7 +835,9 @@ private_test_fn! {limbs_mul_greater_to_out_toom_33_input_sizes_valid(
 // # Worst-case complexity
 // Constant time and additional memory.
 //
-// This is equivalent to `mpn_toom33_mul_itch` from `gmp-impl.h`, GMP 6.2.1.
+// This is equivalent to `mpn_toom33_mul_itch` from `gmp-impl.h`, GMP 6.2.1. Scratch derivation: see
+// the note above `limbs_mul_greater_to_out_toom_22_scratch_len`; the split lengths mirror
+// `limbs_mul_greater_to_out_toom_33`'s.
 crate_test_const_fn! {limbs_mul_greater_to_out_toom_33_scratch_len(
     xs_len: usize,
     ys_len: usize
@@ -871,7 +895,9 @@ crate_test_const_fn! {limbs_mul_greater_to_out_toom_33_scratch_len(
 //
 // $M(n) = O(n \log n)$
 //
-// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`: the evaluation and
+// interpolation passes are linear, and the point multiplications re-enter the main multiplication
+// dispatcher, so the whole recursion costs no more than the dispatcher's bound.
 //
 // The time would be O(n^{\log_3 5}) \approx O(n^{1.465}), but
 // `limbs_mul_same_length_to_out_toom_33_recursive` ultimately calls `limbs_mul_greater_to_out`.
@@ -1074,7 +1100,9 @@ private_test_fn! {
 // This is equivalent to `mpn_toom42_mul_itch` from `gmp-impl.h`, GMP 6.2.1.
 //
 // # Worst-case complexity
-// Constant time and additional memory.
+// Constant time and additional memory. Scratch derivation: see the note above
+// `limbs_mul_greater_to_out_toom_22_scratch_len`; the split lengths mirror
+// `limbs_mul_greater_to_out_toom_42`'s.
 crate_test_const_fn! {limbs_mul_greater_to_out_toom_42_scratch_len(
     xs_len: usize,
     ys_len: usize
@@ -1132,7 +1160,9 @@ crate_test_const_fn! {limbs_mul_greater_to_out_toom_42_scratch_len(
 //
 // $M(n) = O(n \log n)$
 //
-// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`: the evaluation and
+// interpolation passes are linear, and the point multiplications re-enter the main multiplication
+// dispatcher, so the whole recursion costs no more than the dispatcher's bound.
 //
 // The time would be O(n^{\log_4 5}) \approx O(n^{1.161}), but `limbs_mul_same_length_to_out` is
 // called.
@@ -1284,7 +1314,9 @@ private_test_fn! {
 // # Worst-case complexity
 // Constant time and additional memory.
 //
-// This is equivalent to `mpn_toom43_mul_itch` from `gmp-impl.h`, GMP 6.2.1.
+// This is equivalent to `mpn_toom43_mul_itch` from `gmp-impl.h`, GMP 6.2.1. Scratch derivation: see
+// the note above `limbs_mul_greater_to_out_toom_22_scratch_len`; the split lengths mirror
+// `limbs_mul_greater_to_out_toom_43`'s.
 crate_test_const_fn! {limbs_mul_greater_to_out_toom_43_scratch_len(
     xs_len: usize,
     ys_len: usize
@@ -1342,7 +1374,9 @@ crate_test_const_fn! {limbs_mul_greater_to_out_toom_43_scratch_len(
 //
 // $M(n) = O(n \log n)$
 //
-// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`: the evaluation and
+// interpolation passes are linear, and the point multiplications re-enter the main multiplication
+// dispatcher, so the whole recursion costs no more than the dispatcher's bound.
 //
 // The time would be O(n^{\log_4 6}) \approx O(n^{1.292}), but this function calls
 // `limbs_mul_same_length_to_out`.
@@ -1483,7 +1517,9 @@ private_test_fn! {limbs_mul_greater_to_out_toom_44_input_sizes_valid(
 // # Worst-case complexity
 // Constant time and additional memory.
 //
-// This is equivalent to `mpn_toom44_mul_itch` from `gmp-impl.h`, GMP 6.2.1.
+// This is equivalent to `mpn_toom44_mul_itch` from `gmp-impl.h`, GMP 6.2.1. Scratch derivation: see
+// the note above `limbs_mul_greater_to_out_toom_22_scratch_len`; the split lengths mirror
+// `limbs_mul_greater_to_out_toom_44`'s.
 crate_test_const_fn! {limbs_mul_greater_to_out_toom_44_scratch_len(
     xs_len: usize,
     ys_len: usize
@@ -1567,7 +1603,9 @@ crate_test_const_fn! {limbs_mul_greater_to_out_toom_44_scratch_len(
 //
 // $M(n) = O(n \log n)$
 //
-// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`: the evaluation and
+// interpolation passes are linear, and the point multiplications re-enter the main multiplication
+// dispatcher, so the whole recursion costs no more than the dispatcher's bound.
 //
 // The time would be O(n^{\log_4 7}) \approx O(n^{1.404}), but
 // `limbs_mul_same_length_to_out_toom_44_recursive` calls `limbs_mul_same_length_to_out`.
@@ -1719,7 +1757,9 @@ private_test_fn! {
 // # Worst-case complexity
 // Constant time and additional memory.
 //
-// This is equivalent to `mpn_toom52_mul_itch` from `gmp-impl.h`, GMP 6.2.1.
+// This is equivalent to `mpn_toom52_mul_itch` from `gmp-impl.h`, GMP 6.2.1. Scratch derivation: see
+// the note above `limbs_mul_greater_to_out_toom_22_scratch_len`; the split lengths mirror
+// `limbs_mul_greater_to_out_toom_52`'s.
 private_test_const_fn! {limbs_mul_greater_to_out_toom_52_scratch_len(
     xs_len: usize,
     ys_len: usize
@@ -1783,7 +1823,9 @@ private_test_const_fn! {limbs_mul_greater_to_out_toom_52_scratch_len(
 //
 // $M(n) = O(n \log n)$
 //
-// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`: the evaluation and
+// interpolation passes are linear, and the point multiplications re-enter the main multiplication
+// dispatcher, so the whole recursion costs no more than the dispatcher's bound.
 //
 // The time would be O(n^{\log_5 6}) \approx O(n^{1.113}), but this function calls
 // `limbs_mul_same_length_to_out`.
@@ -1941,7 +1983,9 @@ private_test_fn! {
 // # Worst-case complexity
 // Constant time and additional memory.
 //
-// This is equivalent to `mpn_toom53_mul_itch` from `gmp-impl.h`, GMP 6.2.1.
+// This is equivalent to `mpn_toom53_mul_itch` from `gmp-impl.h`, GMP 6.2.1. Scratch derivation: see
+// the note above `limbs_mul_greater_to_out_toom_22_scratch_len`; the split lengths mirror
+// `limbs_mul_greater_to_out_toom_53`'s.
 crate_test_const_fn! {limbs_mul_greater_to_out_toom_53_scratch_len(
     xs_len: usize,
     ys_len: usize
@@ -2002,7 +2046,9 @@ crate_test_const_fn! {limbs_mul_greater_to_out_toom_53_scratch_len(
 //
 // $M(n) = O(n \log n)$
 //
-// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`: the evaluation and
+// interpolation passes are linear, and the point multiplications re-enter the main multiplication
+// dispatcher, so the whole recursion costs no more than the dispatcher's bound.
 //
 // The time would be O(n^{\log_5 7}) \approx O(n^{1.209}), but this function calls
 // `limbs_mul_same_length_to_out`.
@@ -2268,7 +2314,9 @@ private_test_const_fn! {limbs_mul_greater_to_out_toom_54_input_sizes_valid(
 // # Worst-case complexity
 // Constant time and additional memory.
 //
-// This is equivalent to `mpn_toom54_mul_itch` from `gmp-impl.h`, GMP 6.2.1.
+// This is equivalent to `mpn_toom54_mul_itch` from `gmp-impl.h`, GMP 6.2.1. Scratch derivation: see
+// the note above `limbs_mul_greater_to_out_toom_22_scratch_len`; the split lengths mirror
+// `limbs_mul_greater_to_out_toom_54`'s.
 private_test_const_fn! {limbs_mul_greater_to_out_toom_54_scratch_len(
     xs_len: usize,
     ys_len: usize
@@ -2318,7 +2366,9 @@ private_test_const_fn! {limbs_mul_greater_to_out_toom_54_scratch_len(
 //
 // $M(n) = O(n \log n)$
 //
-// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`: the evaluation and
+// interpolation passes are linear, and the point multiplications re-enter the main multiplication
+// dispatcher, so the whole recursion costs no more than the dispatcher's bound.
 //
 // The time would be O(n^{\log_5 8}) \approx O(n^{1.292}), but `limbs_mul_same_length_to_out` is
 // called.
@@ -2432,7 +2482,9 @@ private_test_const_fn! {limbs_mul_greater_to_out_toom_62_input_sizes_valid(
 // # Worst-case complexity
 // Constant time and additional memory.
 //
-// This is equivalent to `mpn_toom62_mul_itch` from `gmp-impl.h`, GMP 6.2.1.
+// This is equivalent to `mpn_toom62_mul_itch` from `gmp-impl.h`, GMP 6.2.1. Scratch derivation: see
+// the note above `limbs_mul_greater_to_out_toom_22_scratch_len`; the split lengths mirror
+// `limbs_mul_greater_to_out_toom_62`'s.
 private_test_const_fn! {limbs_mul_greater_to_out_toom_62_scratch_len(
     xs_len: usize,
     ys_len: usize
@@ -2489,7 +2541,9 @@ private_test_const_fn! {limbs_mul_greater_to_out_toom_62_scratch_len(
 //
 // $M(n) = O(n \log n)$
 //
-// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`: the evaluation and
+// interpolation passes are linear, and the point multiplications re-enter the main multiplication
+// dispatcher, so the whole recursion costs no more than the dispatcher's bound.
 //
 // The time would be O(n^{\log_6 7}) \approx O(n^{1.086}), but this function calls
 // `limbs_mul_same_length_to_out`.
@@ -2764,7 +2818,9 @@ private_test_const_fn! {limbs_mul_greater_to_out_toom_63_input_sizes_valid(
 // # Worst-case complexity
 // Constant time and additional memory.
 //
-// This is equivalent to `mpn_toom63_mul_itch` from `gmp-impl.h`, GMP 6.2.1.
+// This is equivalent to `mpn_toom63_mul_itch` from `gmp-impl.h`, GMP 6.2.1. Scratch derivation: see
+// the note above `limbs_mul_greater_to_out_toom_22_scratch_len`; the split lengths mirror
+// `limbs_mul_greater_to_out_toom_63`'s.
 crate_test_const_fn! {limbs_mul_greater_to_out_toom_63_scratch_len(
     xs_len: usize,
     ys_len: usize
@@ -2813,7 +2869,9 @@ crate_test_const_fn! {limbs_mul_greater_to_out_toom_63_scratch_len(
 //
 // $M(n) = O(n \log n)$
 //
-// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`: the evaluation and
+// interpolation passes are linear, and the point multiplications re-enter the main multiplication
+// dispatcher, so the whole recursion costs no more than the dispatcher's bound.
 //
 // The time would be O(n^{\log_6 8}) \approx O(n^{1.161}), but
 // `limbs_mul_same_length_to_out_toom_63_recursive` calls `limbs_mul_same_length_to_out`.
@@ -3056,7 +3114,9 @@ const fn limbs_mul_same_length_to_out_toom_6h_recursive_scratch_len(n: usize) ->
 //
 // $M(n) = O(n \log n)$
 //
-// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`: the evaluation and
+// interpolation passes are linear, and the point multiplications re-enter the main multiplication
+// dispatcher, so the whole recursion costs no more than the dispatcher's bound.
 //
 // This is equivalent to `TOOM6H_MUL_N_REC` from `mpn/generic/toom6h_mul.c`, GMP 6.2.1, when `f` is
 // false.
@@ -3087,7 +3147,9 @@ fn limbs_mul_same_length_to_out_toom_6h_recursive(
 // # Worst-case complexity
 // Constant time and additional memory.
 //
-// This is equivalent to `mpn_toom6h_mul_itch` from `gmp-impl.h`, GMP 6.2.1.
+// This is equivalent to `mpn_toom6h_mul_itch` from `gmp-impl.h`, GMP 6.2.1. Scratch derivation: see
+// the note above `limbs_mul_greater_to_out_toom_22_scratch_len`; the split lengths mirror
+// `limbs_mul_greater_to_out_toom_6h`'s.
 crate_test_const_fn! {limbs_mul_greater_to_out_toom_6h_scratch_len(
     xs_len: usize,
     ys_len: usize
@@ -3180,7 +3242,9 @@ crate_test_const_fn! {limbs_mul_greater_to_out_toom_6h_scratch_len(
 //
 // $M(n) = O(n \log n)$
 //
-// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`: the evaluation and
+// interpolation passes are linear, and the point multiplications re-enter the main multiplication
+// dispatcher, so the whole recursion costs no more than the dispatcher's bound.
 //
 // The time would be O(n^{\log_5 11}) \approx O(n^{1.490}) (assuming worst-possible splitting), but
 // `limbs_mul_same_length_to_out_toom_6h_recursive` ultimately calls `limbs_mul_greater_to_out`.
@@ -3513,7 +3577,9 @@ const fn limbs_mul_same_length_to_out_toom_8h_recursive_scratch_len(n: usize) ->
 //
 // $M(n) = O(n \log n)$
 //
-// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`: the evaluation and
+// interpolation passes are linear, and the point multiplications re-enter the main multiplication
+// dispatcher, so the whole recursion costs no more than the dispatcher's bound.
 //
 // The time would be O(n^{\log_7 15}) \approx O(n^{1.392}), but
 // `limbs_mul_same_length_to_out_toom_22` ultimately calls `limbs_mul_greater_to_out`.
@@ -3549,7 +3615,9 @@ fn limbs_mul_same_length_to_out_toom_8h_recursive(
 // # Worst-case complexity
 // Constant time and additional memory.
 //
-// This is equivalent to `mpn_toom8h_mul_itch` from `gmp-impl.h`, GMP 6.2.1.
+// This is equivalent to `mpn_toom8h_mul_itch` from `gmp-impl.h`, GMP 6.2.1. Scratch derivation: see
+// the note above `limbs_mul_greater_to_out_toom_22_scratch_len`; the split lengths mirror
+// `limbs_mul_greater_to_out_toom_8h`'s.
 crate_test_const_fn! {limbs_mul_greater_to_out_toom_8h_scratch_len(
     xs_len: usize,
     ys_len: usize
@@ -3660,7 +3728,9 @@ crate_test_const_fn! {limbs_mul_greater_to_out_toom_8h_scratch_len(
 //
 // $M(n) = O(n \log n)$
 //
-// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`: the evaluation and
+// interpolation passes are linear, and the point multiplications re-enter the main multiplication
+// dispatcher, so the whole recursion costs no more than the dispatcher's bound.
 //
 // The time would be O(n^{\log_7 15}) \approx O(n^{1.392}), but
 // `limbs_mul_same_length_to_out_toom_8h_recursive` ultimately calls `limbs_mul_greater_to_out`.

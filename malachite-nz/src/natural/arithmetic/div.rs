@@ -732,7 +732,11 @@ private_test_fn! {limbs_div_barrett(
 // The result is $O(n)$, where $n$ is `n_len`.
 //
 // This is equivalent to `mpn_mu_div_q_itch` from `mpn/generic/mu_div_q.c`, GMP 6.2.1, where `mua_k
-// == 0`.
+// == 0`. Scratch derivation: delegates to the approximate-division formula at the shapes
+// `limbs_div_barrett` actually passes down -- the padded full division when the quotient is at
+// least as long as the divisor, and a `2(q+1) / (q+1)`-limb truncated division otherwise. See the
+// note above `limbs_div_mod_barrett_scratch_len` in div_mod.rs; verified by the scratch-sizing
+// canaries.
 private_test_fn! {limbs_div_barrett_scratch_len(n_len: usize, d_len: usize) -> usize {
     let q_len = n_len - d_len;
     if q_len >= d_len {
@@ -1211,9 +1215,10 @@ fn limbs_div_barrett_approx_helper(
     limbs_div_barrett_approx_preinverted(qs, ns, ns_ghost_limb, ds, is, scratch_hi)
 }
 
+// # Worst-case complexity
 // $T(n, d) = O(n \log d \log\log d)$
 //
-// $M(n) = O(d \log d)$
+// $M(d) = O(d \log d)$
 //
 // where $T$ is time, $M$ is additional memory, $n$ is `ns.len()`, and $d$ is `ds.len()`.
 //
@@ -1381,7 +1386,9 @@ fn limbs_div_barrett_approx_is_len(q_len: usize, d_len: usize) -> usize {
 // The result is $O(n)$, where $n$ is `n_len`.
 //
 // This is equivalent to `mpn_mu_divappr_q_itch` from `mpn/generic/mu_divappr_q.c`, GMP 6.2.1, where
-// `mua_k == 0`.
+// `mua_k == 0`. Scratch derivation: ports the corresponding GMP itch function; the summands mirror
+// the buffers the consumer carves from `scratch`. See the note above
+// `limbs_div_mod_barrett_scratch_len` in div_mod.rs; verified by the scratch-sizing canaries.
 crate_test_fn! {limbs_div_barrett_approx_scratch_len(n_len: usize, mut d_len: usize) -> usize {
     let qn = n_len - d_len;
     if qn + 1 < d_len {
@@ -1919,7 +1926,11 @@ private_test_fn! {limbs_div_to_out_ref_ref(qs: &mut [Limb], ns: &[Limb], ds: &[L
 // Divides using the naive (schoolbook) algorithm.
 //
 // # Worst-case complexity
-// Constant time and additional memory.
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `ns.len()`.
 #[cfg(feature = "test_build")]
 fn limbs_div_in_place_naive(ns: &mut [Limb], d: Limb) {
     let limb = DoubleLimb::from(d);

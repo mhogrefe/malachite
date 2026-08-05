@@ -262,7 +262,12 @@ macro_rules! impl_unsigned_from {
             /// If the [`Float`] is NaN, the function will panic regardless of the rounding mode.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `f.significant_bits()`:
+            /// rounding must examine the bits that are discarded.
             ///
             /// # Panics
             /// Panics if the [`Float`] is not an integer and `rm` is `Exact`, or if the [`Float`]
@@ -296,7 +301,12 @@ macro_rules! impl_unsigned_from {
             /// If the [`Float`] is NaN, the function will panic regardless of the rounding mode.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `f.significant_bits()`:
+            /// rounding must examine the bits that are discarded.
             ///
             /// # Panics
             /// Panics if the [`Float`] is not an integer and `rm` is `Exact`, or if the [`Float`]
@@ -322,7 +332,12 @@ macro_rules! impl_unsigned_from {
             /// Both positive and negative zero convert to a primitive unsigned integer zero.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `f.significant_bits()`:
+            /// rounding must examine the bits that are discarded.
             ///
             /// # Examples
             /// See [here](super::primitive_int_from_float#try_from).
@@ -342,7 +357,12 @@ macro_rules! impl_unsigned_from {
             /// Both positive and negative zero convert to a primitive unsigned integer zero.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `f.significant_bits()`:
+            /// rounding must examine the bits that are discarded.
             ///
             /// # Examples
             /// See [here](super::primitive_int_from_float#try_from).
@@ -361,7 +381,12 @@ macro_rules! impl_unsigned_from {
             /// zero, which is not negative.)
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `f.significant_bits()`:
+            /// rounding must examine the bits that are discarded.
             ///
             /// # Examples
             /// See [here](super::primitive_int_from_float#convertible_from).
@@ -702,7 +727,12 @@ macro_rules! impl_signed_from {
             /// If the [`Float`] is NaN, the function will panic regardless of the rounding mode.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `f.significant_bits()`:
+            /// rounding must examine the bits that are discarded.
             ///
             /// # Panics
             /// Panics if the [`Float`] is not an integer and `rm` is `Exact`, or if the [`Float`]
@@ -737,7 +767,12 @@ macro_rules! impl_signed_from {
             /// If the [`Float`] is NaN, the function will panic regardless of the rounding mode.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `f.significant_bits()`:
+            /// rounding must examine the bits that are discarded.
             ///
             /// # Panics
             /// Panics if the [`Float`] is not an integer and `rm` is `Exact`, or if the [`Float`]
@@ -762,7 +797,12 @@ macro_rules! impl_signed_from {
             /// error is returned.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `f.significant_bits()`:
+            /// rounding must examine the bits that are discarded.
             ///
             /// # Examples
             /// See [here](super::primitive_int_from_float#try_from).
@@ -780,7 +820,12 @@ macro_rules! impl_signed_from {
             /// type, an error is returned.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `f.significant_bits()`:
+            /// rounding must examine the bits that are discarded.
             ///
             /// # Examples
             /// See [here](super::primitive_int_from_float#try_from).
@@ -795,7 +840,12 @@ macro_rules! impl_signed_from {
             /// taking the [`Float`] by reference.
             ///
             /// # Worst-case complexity
-            /// Constant time and additional memory.
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `f.significant_bits()`:
+            /// rounding must examine the bits that are discarded.
             ///
             /// # Examples
             /// See [here](super::primitive_int_from_float#convertible_from).

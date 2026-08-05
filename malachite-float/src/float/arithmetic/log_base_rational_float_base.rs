@@ -122,8 +122,8 @@ fn log_base_rational_float_base_helper(
     prec: u64,
     rm: RoundingMode,
 ) -> (Float, Ordering) {
-    // ln(base) is NaN for a NaN or negative base (negative finite or -infinity), and ln(x) is
-    // NaN for a negative x.
+    // ln(base) is NaN for a NaN or negative base (negative finite or -infinity), and ln(x) is NaN
+    // for a negative x.
     if base.is_nan() || *base < 0u32 || *x < 0u32 {
         return (float_nan!(), Equal);
     }
@@ -221,11 +221,12 @@ impl Float {
     /// This function can both overflow (for a base near 1) and underflow (for an $x$ near 1).
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m \log m \log\log m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m \log m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(x.significant_bits(), base.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
@@ -276,11 +277,12 @@ impl Float {
     /// description of the rounding behavior.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m \log m \log\log m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m \log m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(x.significant_bits(), base.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
@@ -328,11 +330,12 @@ impl Float {
     /// See [`Float::log_base_rational_float_base_prec_round`] for details and special cases.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m \log m \log\log m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m \log m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(x.significant_bits(), base.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -365,11 +368,12 @@ impl Float {
     /// See [`Float::log_base_rational_float_base_prec_round`] for details and special cases.
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    /// $T(n, m) = O(n (\log n)^2 \log\log n + m \log m \log\log m)$
     ///
-    /// $M(n) = O(n (\log n)^2)$
+    /// $M(n, m) = O(n \log n + m \log m)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(x.significant_bits(), base.significant_bits())`.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -426,7 +430,11 @@ impl Float {
 /// This function can both overflow (for a base near 1) and underflow (for an $x$ near 1).
 ///
 /// # Worst-case complexity
-/// Constant time and additional memory.
+/// $T(m) = O(m \log m \log\log m)$
+///
+/// $M(m) = O(m \log m)$
+///
+/// where $T$ is time, $M$ is additional memory, and $m$ is `x.significant_bits()`.
 ///
 /// # Examples
 /// ```

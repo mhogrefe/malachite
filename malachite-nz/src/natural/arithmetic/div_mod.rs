@@ -1416,7 +1416,10 @@ crate_test_fn! {limbs_div_mod_barrett_helper(
 // Result is O(`d_len`)
 //
 // This is equivalent to `mpn_preinv_mu_div_qr_itch` from `mpn/generic/mu_div_qr.c`, GMP 6.2.1, but
-// `nn` is omitted from the arguments as it is unused.
+// `nn` is omitted from the arguments as it is unused. Scratch derivation: ports the corresponding
+// GMP itch function; the summands mirror the buffers the consumer carves from `scratch`. See the
+// note above `limbs_div_mod_barrett_scratch_len` in div_mod.rs; verified by the scratch-sizing
+// canaries.
 pub(crate) fn limbs_div_mod_barrett_preinverse_scratch_len(d_len: usize, is_len: usize) -> usize {
     let itch_local = limbs_mul_mod_base_pow_n_minus_1_next_size(d_len + 1);
     let itch_out = limbs_mul_mod_base_pow_n_minus_1_scratch_len(itch_local, d_len, is_len);
@@ -1439,6 +1442,9 @@ pub(crate) const fn limbs_invert_approx_scratch_len(is_len: usize) -> usize {
     limbs_invert_approx_scratch_len_helper(is_len)
 }
 
+// Scratch derivation: ports the corresponding GMP itch function; the summands mirror the buffers
+// the consumer carves from `scratch`. See the note above `limbs_div_mod_barrett_scratch_len` in
+// div_mod.rs; verified by the scratch-sizing canaries.
 const fn limbs_invert_approx_scratch_len_helper(is_len: usize) -> usize {
     is_len << 1
 }
@@ -1449,7 +1455,13 @@ const fn limbs_invert_approx_scratch_len_helper(is_len: usize) -> usize {
 // Result is O(`n_len`)
 //
 // This is equivalent to `mpn_mu_div_qr_itch` from `mpn/generic/mu_div_qr.c`, GMP 6.2.1, where
-// `mua_k == 0`.
+// `mua_k == 0`. Scratch derivation: `is_len` limbs store the Newton inverse of the divisor's high
+// part, and the preinverse workspace after them is what `limbs_div_mod_barrett_preinverted` carves
+// up; the `assert!` checks that the same space also covers computing the inverse in the first place
+// (`limbs_invert_approx`'s own requirement). Like the other division scratch formulas below and in
+// div.rs, div_exact.rs, and mod_op.rs, this ports the corresponding GMP itch function (see the
+// provenance lines) and is verified by the `test_limbs_*_scratch_sizing` canaries, which run the
+// consumers with exactly-sized sentinel-filled scratch across threshold-dense size sweeps.
 crate_test_fn! {limbs_div_mod_barrett_scratch_len(n_len: usize, d_len: usize) -> usize {
     let is_len = limbs_div_mod_barrett_is_len(n_len - d_len, d_len);
     let preinverse_len = limbs_div_mod_barrett_preinverse_scratch_len(d_len, is_len);
