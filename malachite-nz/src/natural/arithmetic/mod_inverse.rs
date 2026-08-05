@@ -8,31 +8,15 @@
 
 use crate::natural::InnerNatural::Small;
 use crate::natural::Natural;
-use crate::natural::arithmetic::gcd::extended_gcd::limbs_extended_gcd;
-use crate::natural::arithmetic::sub::limbs_sub_same_length_in_place_right;
+use crate::natural::arithmetic::mod_div::gcdinv_helper;
 use malachite_base::num::arithmetic::traits::ModInverse;
 use malachite_base::num::basic::traits::One;
 
-// The two buffers stay separate allocations: both end up as owned `Natural`s, and merging them
-// would force one to be copied out of the parent.
-#[cfg_attr(dylint_lib = "malachite_lints", allow(adjacent_vec_allocations))]
+// The modular inverse is unique, so filtering the cofactor from `gcdinv_helper` on the GCD being 1
+// produces the same value as any other algorithm.
 fn mod_inverse_helper(x: Natural, m: Natural) -> Option<Natural> {
-    let mut xs = x.into_limbs_asc();
-    let mut ys = m.to_limbs_asc();
-    let len = ys.len();
-    xs.resize(len, 0);
-    let mut gs = vec![0; len];
-    let mut ss = vec![0; len + 1];
-    let (g_len, ss_sign) = limbs_extended_gcd(&mut gs, &mut ss, &mut xs, &mut ys);
-    gs.truncate(g_len);
-    if Natural::from_owned_limbs_asc(gs) != 1u32 {
-        return None;
-    }
-    if !ss_sign {
-        assert_eq!(ss.pop(), Some(0));
-        limbs_sub_same_length_in_place_right(&m.into_limbs_asc(), &mut ss);
-    }
-    Some(Natural::from_owned_limbs_asc(ss))
+    let (g, s) = gcdinv_helper(x, m);
+    if g == 1u32 { Some(s) } else { None }
 }
 
 impl ModInverse for Natural {

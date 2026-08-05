@@ -140,6 +140,9 @@ pub mod log_base_power_of_2;
 /// [`ModAddAssign`](malachite_base::num::arithmetic::traits::ModAddAssign), traits for adding two
 /// numbers modulo another number.
 pub mod mod_add;
+/// Implementations of [`ModDiv`](malachite_base::num::arithmetic::traits::ModDiv), a trait for
+/// dividing two numbers modulo another number.
+pub mod mod_div;
 /// Implementations of [`ModEuclidean`](malachite_base::num::arithmetic::traits::ModEuclidean) and
 /// [`ModEuclideanAssign`](malachite_base::num::arithmetic::traits::ModEuclideanAssign), traits for
 /// finding the remainder of two numbers, where the remainder is nonnegative.

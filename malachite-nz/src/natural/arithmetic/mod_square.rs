@@ -218,7 +218,7 @@ impl ModSquareAssign<&Self> for Natural {
     }
 }
 
-impl ModSquarePrecomputed<Natural, Self> for Natural {
+impl ModSquarePrecomputed<Self, Self> for Natural {
     /// Squares a [`Natural`] modulo another [`Natural`] $m$. The input must be already reduced
     /// modulo $m$. Both [`Natural`]s are taken by value.
     ///
@@ -258,12 +258,12 @@ impl ModSquarePrecomputed<Natural, Self> for Natural {
     ///
     /// This is equivalent to `fmpz_mod_mul` from `fmpz_mod/mul.c`, FLINT 3.6.0, where `b == c`.
     #[inline]
-    fn mod_square_precomputed(self, m: Self, data: &ModMulData) -> Natural {
+    fn mod_square_precomputed(self, m: Self, data: &ModMulData) -> Self {
         (&self).mod_mul_precomputed(&self, &m, data)
     }
 }
 
-impl<'a> ModSquarePrecomputed<Natural, &'a Self> for Natural {
+impl<'a> ModSquarePrecomputed<Self, &'a Self> for Natural {
     /// Squares a [`Natural`] modulo another [`Natural`] $m$. The input must be already reduced
     /// modulo $m$. The first [`Natural`] is taken by value and the second by reference.
     ///
@@ -303,7 +303,7 @@ impl<'a> ModSquarePrecomputed<Natural, &'a Self> for Natural {
     ///
     /// This is equivalent to `fmpz_mod_mul` from `fmpz_mod/mul.c`, FLINT 3.6.0, where `b == c`.
     #[inline]
-    fn mod_square_precomputed(self, m: &'a Self, data: &ModMulData) -> Natural {
+    fn mod_square_precomputed(self, m: &'a Self, data: &ModMulData) -> Self {
         (&self).mod_mul_precomputed(&self, m, data)
     }
 }
@@ -398,7 +398,7 @@ impl ModSquarePrecomputed<Natural, &Natural> for &Natural {
     }
 }
 
-impl ModSquarePrecomputedAssign<Natural, Self> for Natural {
+impl ModSquarePrecomputedAssign<Self, Self> for Natural {
     /// Squares a [`Natural`] modulo another [`Natural`] $m$, in place. The input must be already
     /// reduced modulo $m$. The [`Natural`] on the right-hand side is taken by value.
     ///
@@ -444,7 +444,7 @@ impl ModSquarePrecomputedAssign<Natural, Self> for Natural {
     }
 }
 
-impl<'a> ModSquarePrecomputedAssign<Natural, &'a Self> for Natural {
+impl<'a> ModSquarePrecomputedAssign<Self, &'a Self> for Natural {
     /// Squares a [`Natural`] modulo another [`Natural`] $m$, in place. The input must be already
     /// reduced modulo $m$. The [`Natural`] on the right-hand side is taken by reference.
     ///

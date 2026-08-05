@@ -1232,7 +1232,7 @@ fn mod_pow_precomputed_helper(
 }
 
 impl ModPowPrecomputed<Self, Self> for Natural {
-    type Output = Natural;
+    type Output = Self;
     type Data = ModMulData;
 
     /// Precomputes data for modular exponentiation. See `mod_pow_precomputed` and
@@ -1297,13 +1297,13 @@ impl ModPowPrecomputed<Self, Self> for Natural {
     ///
     /// This is equivalent to `fmpz_mod_pow_fmpz` from `fmpz_mod/pow.c`, FLINT 3.6.0.
     #[inline]
-    fn mod_pow_precomputed(self, exp: Self, m: Self, data: &ModMulData) -> Natural {
+    fn mod_pow_precomputed(self, exp: Self, m: Self, data: &ModMulData) -> Self {
         mod_pow_precomputed_helper(&self, &exp, &m, data)
     }
 }
 
 impl<'a> ModPowPrecomputed<Self, &'a Self> for Natural {
-    type Output = Natural;
+    type Output = Self;
     type Data = ModMulData;
 
     /// Precomputes data for modular exponentiation. See `mod_pow_precomputed` and
@@ -1369,13 +1369,13 @@ impl<'a> ModPowPrecomputed<Self, &'a Self> for Natural {
     ///
     /// This is equivalent to `fmpz_mod_pow_fmpz` from `fmpz_mod/pow.c`, FLINT 3.6.0.
     #[inline]
-    fn mod_pow_precomputed(self, exp: Self, m: &'a Self, data: &ModMulData) -> Natural {
+    fn mod_pow_precomputed(self, exp: Self, m: &'a Self, data: &ModMulData) -> Self {
         mod_pow_precomputed_helper(&self, &exp, m, data)
     }
 }
 
 impl<'a> ModPowPrecomputed<&'a Self, Self> for Natural {
-    type Output = Natural;
+    type Output = Self;
     type Data = ModMulData;
 
     /// Precomputes data for modular exponentiation. See `mod_pow_precomputed` and
@@ -1441,13 +1441,13 @@ impl<'a> ModPowPrecomputed<&'a Self, Self> for Natural {
     ///
     /// This is equivalent to `fmpz_mod_pow_fmpz` from `fmpz_mod/pow.c`, FLINT 3.6.0.
     #[inline]
-    fn mod_pow_precomputed(self, exp: &'a Self, m: Self, data: &ModMulData) -> Natural {
+    fn mod_pow_precomputed(self, exp: &'a Self, m: Self, data: &ModMulData) -> Self {
         mod_pow_precomputed_helper(&self, exp, &m, data)
     }
 }
 
 impl<'a, 'b> ModPowPrecomputed<&'a Self, &'b Self> for Natural {
-    type Output = Natural;
+    type Output = Self;
     type Data = ModMulData;
 
     /// Precomputes data for modular exponentiation. See `mod_pow_precomputed` and
@@ -1513,7 +1513,7 @@ impl<'a, 'b> ModPowPrecomputed<&'a Self, &'b Self> for Natural {
     ///
     /// This is equivalent to `fmpz_mod_pow_fmpz` from `fmpz_mod/pow.c`, FLINT 3.6.0.
     #[inline]
-    fn mod_pow_precomputed(self, exp: &'a Self, m: &'b Self, data: &ModMulData) -> Natural {
+    fn mod_pow_precomputed(self, exp: &'a Self, m: &'b Self, data: &ModMulData) -> Self {
         mod_pow_precomputed_helper(&self, exp, m, data)
     }
 }

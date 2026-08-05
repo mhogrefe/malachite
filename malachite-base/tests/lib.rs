@@ -225,6 +225,7 @@ pub mod num {
         pub mod log_base_2;
         pub mod log_base_power_of_2;
         pub mod mod_add;
+        pub mod mod_div;
         pub mod mod_euclidean;
         pub mod mod_inverse;
         pub mod mod_is_reduced;

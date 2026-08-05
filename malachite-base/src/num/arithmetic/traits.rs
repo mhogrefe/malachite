@@ -924,6 +924,17 @@ pub trait ModAddAssign<RHS = Self, M = Self> {
     fn mod_add_assign(&mut self, other: RHS, m: M);
 }
 
+/// Divides a number by another number modulo a third number $m$, returning `None` if no quotient
+/// exists. The inputs must be already reduced modulo $m$.
+///
+/// If the divisor is not invertible modulo $m$, a quotient may exist without being unique; in that
+/// case one of the quotients is returned.
+pub trait ModDiv<RHS = Self, M = Self> {
+    type Output;
+
+    fn mod_div(self, other: RHS, m: M) -> Option<Self::Output>;
+}
+
 /// Finds the multiplicative inverse of a number modulo another number $m$. The input must be
 /// already reduced modulo $m$.
 pub trait ModInverse<M = Self> {

@@ -1534,6 +1534,18 @@ pub mod log_base_power_of_2;
 /// assert_eq!(n, 2);
 /// ```
 pub mod mod_add;
+/// [`ModDiv`](traits::ModDiv), a trait for dividing two numbers modulo another number.
+///
+/// # mod_div
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModDiv;
+///
+/// assert_eq!(6u8.mod_div(4, 10), Some(4));
+/// assert_eq!(1u32.mod_div(3, 10), Some(7));
+/// assert_eq!(2u16.mod_div(5, 10), None);
+/// assert_eq!(123u64.mod_div(456, 789), Some(265));
+/// ```
+pub mod mod_div;
 /// [`ModEuclidean`](traits::ModEuclidean) and [`ModEuclideanAssign`](traits::ModEuclideanAssign),
 /// traits for finding the remainder of two numbers, where the remainder is always nonnegative.
 ///

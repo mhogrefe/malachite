@@ -7,8 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 // Differential testing of Malachite against FLINT, without FFI: each Malachite demo's output is
-// captured to a text file, and a small C oracle (`flint-oracle.c`) recomputes every line with
-// FLINT and fails on the first disagreement. The FLINT source is not part of this repository; a
+// captured to a text file, and a small C oracle (the sources in `oracle/`) recomputes every
+// line with FLINT and fails on the first disagreement. The FLINT source is not part of this repository; a
 // built FLINT source tree is located through the `MALACHITE_FLINT_DIR` environment variable,
 // defaulting to `../../flint-3.6.0`. See README.md.
 
@@ -32,20 +32,36 @@ fn flint_dir() -> PathBuf {
     })
 }
 
-// Compiles `flint-oracle.c` against the FLINT tree if the binary is missing or stale, returning
+// Compiles the oracle sources in `oracle/` against the FLINT tree if the binary is missing or
+// stale (judged against the newest source or header), returning
 // the binary's path.
 fn build_oracle() -> PathBuf {
     let flint = flint_dir();
     let binary = Path::new("target").join("flint-oracle");
-    let stale = match (fs::metadata(&binary), fs::metadata("flint-oracle.c")) {
-        (Ok(bin), Ok(src)) => src.modified().unwrap() >= bin.modified().unwrap(),
+    let mut sources = Vec::new();
+    let mut newest = None;
+    for entry in fs::read_dir("oracle").unwrap() {
+        let path = entry.unwrap().path();
+        match path.extension().and_then(|e| e.to_str()) {
+            Some("c") => sources.push(path.clone()),
+            Some("h") => {}
+            _ => continue,
+        }
+        let modified = fs::metadata(&path).unwrap().modified().unwrap();
+        newest = Some(newest.map_or(modified, |n: std::time::SystemTime| n.max(modified)));
+    }
+    sources.sort();
+    let stale = match (fs::metadata(&binary), newest) {
+        (Ok(bin), Some(newest)) => newest >= bin.modified().unwrap(),
         _ => true,
     };
     if stale {
         fs::create_dir_all("target").unwrap();
         let status = Command::new("cc")
             .arg("-O2")
-            .arg("flint-oracle.c")
+            .arg("-Wall")
+            .arg("-Wextra")
+            .args(&sources)
             .arg("-o")
             .arg(&binary)
             .arg(format!(
@@ -131,6 +147,18 @@ fn main() {
         "../malachite-base",
         "demo_mod_sqrt_u64",
         "n_sqrtmod",
+    );
+    check_demo_against_flint(
+        &oracle,
+        "../malachite-nz",
+        "demo_natural_mod_div",
+        "fmpz_mod_divides",
+    );
+    check_demo_against_flint(
+        &oracle,
+        "../malachite-base",
+        "demo_mod_div_u64",
+        "fmpz_mod_divides",
     );
 
     println!("testing primitive_root_prime unit tests");

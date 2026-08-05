@@ -24389,6 +24389,6 @@ fn test_limbs_invert_approx_scratch_sizing() {
         let exact = (Natural::power_of_2(w << 1) - Natural::ONE) / &d - Natural::power_of_2(w);
         let approx = Natural::from_owned_limbs_asc(is);
         assert!(approx <= exact, "{d_len}");
-        assert!(&exact - &approx <= Natural::from(2u32), "{d_len}");
+        assert!(&exact - &approx <= 2u32, "{d_len}");
     }
 }

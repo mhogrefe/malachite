@@ -45,6 +45,7 @@ pub(crate) fn register(runner: &mut Runner) {
     mod_inverse::register(runner);
     mod_is_reduced::register(runner);
     mod_add::register(runner);
+    mod_div::register(runner);
     mod_euclidean::register(runner);
     mod_mul::register(runner);
     mod_neg::register(runner);
@@ -168,6 +169,7 @@ mod log_base;
 mod log_base_2;
 mod log_base_power_of_2;
 mod mod_add;
+mod mod_div;
 mod mod_euclidean;
 mod mod_inverse;
 mod mod_is_reduced;

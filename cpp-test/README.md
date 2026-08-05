@@ -2,7 +2,8 @@
 
 This harness checks Malachite functions against FLINT by comparing text, not by linking: a
 Malachite demo prints one `input = output` line per case, and a small C oracle
-(`flint-oracle.c`) re-reads the file, recomputes every line with FLINT, and exits nonzero on the
+(the sources in `oracle/`) re-reads the file, recomputes every line with FLINT, and exits
+nonzero on the
 first disagreement. There is no FFI, no `unsafe`, and no C build coupling in the Malachite
 crates themselves.
 
@@ -34,7 +35,8 @@ Use it when no good Rust oracle exists — in particular for FLINT-specific func
 cargo run --release
 ```
 
-from this directory. The driver compiles `flint-oracle.c` on demand (into `target/`), then runs
+from this directory. The driver compiles the oracle sources in `oracle/` on demand (into
+`target/`), then runs
 each registered Malachite demo in all three generator modes (`exhaustive`, `random`,
 `special_random`) at 10000 lines each, diffing every run against FLINT. Any disagreement fails
 the run with the offending line reported. The demo output lands in `test-out.txt`, which is
@@ -49,14 +51,16 @@ shared state: don't run the driver and a manual demo regeneration concurrently.
 | `n_primitive_root_prime` | `n_primitive_root_prime` | `demo_*_primitive_root_prime` (malachite-base) |
 | `sqrtmod_stress` | `fmpz_sqrtmod` | none — a memory-stress diagnostic, run manually |
 
-The `sqrtmod` modes skip documented divergence windows, noted in comments in `flint-oracle.c`;
+The `sqrtmod` modes skip documented divergence windows, noted in comments in
+`oracle/sqrtmod.c`;
 all involve only composite moduli, where Malachite computes the mathematically expected value
 and FLINT's behavior rests on undefined or wrapping operations.
 
 ## Adding an oracle
 
 1. Write a Malachite demo that prints one line per case in a stable `input = output` format.
-2. Add a mode to `flint-oracle.c` that parses that format (the input file arrives as `argv[2]`),
+2. Add a mode file under `oracle/` that parses that format (one `run_*` entry point; declare it
+   in `oracle/oracle.h` and add a row to the table in `oracle/main.c`),
    recomputes with FLINT, and returns 1 with a diagnostic on the first mismatch.
 3. Register the demo in `src/main.rs` with `check_demo_against_flint`.
 4. Prove the harness can fail: corrupt one line of `test-out.txt` by hand and check that the

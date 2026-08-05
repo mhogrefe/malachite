@@ -103,11 +103,11 @@ macro_rules! impl_mod_square {
         }
     };
 }
-fn pair_mul_data<A, B>(data: &(A, B)) -> &A {
+const fn pair_mul_data<A, B>(data: &(A, B)) -> &A {
     &data.0
 }
 
-fn unit_mul_data(data: &()) -> &() {
+const fn unit_mul_data(data: &()) -> &() {
     data
 }
 
