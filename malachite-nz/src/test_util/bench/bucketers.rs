@@ -327,6 +327,43 @@ pub fn quadruple_natural_max_bit_bucketer<'a>(
     }
 }
 
+pub fn quadruple_integer_natural_natural_natural_max_bit_bucketer<'a>(
+    x_name: &'a str,
+    y_name: &'a str,
+    z_name: &'a str,
+    w_name: &'a str,
+) -> Bucketer<'a, (Integer, Natural, Natural, Natural)> {
+    Bucketer {
+        bucketing_function: &|(x, y, z, w)| {
+            usize::exact_from(max!(
+                x.significant_bits(),
+                y.significant_bits(),
+                z.significant_bits(),
+                w.significant_bits()
+            ))
+        },
+        bucketing_label: format!(
+            "max({x_name}.significant_bits(), {y_name}.significant_bits(), \
+            {z_name}.significant_bits(), {w_name}.significant_bits())"
+        ),
+    }
+}
+
+pub fn pair_1_natural_vec_total_bit_bucketer<'a>(
+    name: &'a str,
+) -> Bucketer<'a, (Vec<Natural>, Vec<Natural>)> {
+    Bucketer {
+        bucketing_function: &|(ms, _)| {
+            usize::exact_from(
+                ms.iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+            )
+        },
+        bucketing_label: format!("{name}.map(|m| m.significant_bits()).sum()"),
+    }
+}
+
 pub fn integer_bit_bucketer(var_name: &str) -> Bucketer<'_, Integer> {
     Bucketer {
         bucketing_function: &|x| usize::exact_from(x.significant_bits()),

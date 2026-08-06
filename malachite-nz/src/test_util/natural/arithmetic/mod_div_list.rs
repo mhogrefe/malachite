@@ -12,8 +12,8 @@ use malachite_base::num::arithmetic::traits::{DivExact, Gcd, Mod};
 
 // A simple reference implementation of `ModDivList`, deriving the progression from any single
 // quotient: the solutions of `qc ≡ b mod m` are spaced `m / gcd(c, m)` apart, and the smallest is
-// any quotient reduced modulo the spacing. The result is canonical, so this agrees exactly with
-// the implementation in `mod_div_list.rs`.
+// any quotient reduced modulo the spacing. The result is canonical, so this agrees exactly with the
+// implementation in `mod_div_list.rs`.
 pub fn mod_div_list_simple(
     b: Natural,
     c: Natural,

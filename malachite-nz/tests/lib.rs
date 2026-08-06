@@ -74,6 +74,7 @@ pub mod integer {
         pub mod average;
         pub mod balanced_mod;
         pub mod binomial_coefficient;
+        pub mod crt;
         pub mod div;
         pub mod div_euclidean;
         pub mod div_exact;
@@ -242,6 +243,8 @@ pub mod natural {
         pub mod checked_sub;
         pub mod checked_sub_mul;
         pub mod coprime_with;
+        pub mod crt;
+        pub mod crt_comb;
         pub mod div;
         pub mod div_euclidean;
         pub mod div_exact;
@@ -299,6 +302,7 @@ pub mod natural {
         pub mod mul_add_mul;
         pub mod mul_shr_round;
         pub mod mul_sub_mul;
+        pub mod multi_crt;
         pub mod neg;
         pub mod next_power_of_2;
         pub mod parity;

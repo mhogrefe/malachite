@@ -497,6 +497,28 @@ pub fn exhaustive_integer_natural_natural_triple_gen() -> It<(Integer, Natural, 
     ))
 }
 
+// -- (Integer, Natural, Natural, Natural) --
+
+pub fn exhaustive_integer_natural_natural_natural_quadruple_gen_var_1()
+-> It<(Integer, Natural, Natural, Natural)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_quadruples_from_single(exhaustive_naturals()),
+            exhaustive_bools(),
+        )
+        .map(|((a, e1, b, e2), neg)| {
+            let m1 = &a + e1 + Natural::ONE;
+            let m2 = &b + e2 + Natural::ONE;
+            let r1 = if neg {
+                Integer::from(a) - Integer::from(&m1)
+            } else {
+                Integer::from(a)
+            };
+            (r1, m1, b, m2)
+        }),
+    )
+}
+
 // -- (Integer, PrimitiveFloat) --
 
 pub fn exhaustive_integer_primitive_float_pair_gen<T: PrimitiveFloat>() -> It<(Integer, T)> {
@@ -1301,6 +1323,16 @@ pub fn exhaustive_natural_quadruple_gen_var_3() -> It<(Natural, Natural, Natural
 
 pub fn exhaustive_natural_quadruple_gen_var_4() -> It<(Natural, Natural, Natural, Natural)> {
     Box::new(exhaustive_natural_quadruple_gen().filter(|(x, y, z, w)| x * y >= z * w))
+}
+
+pub fn exhaustive_natural_quadruple_gen_var_5() -> It<(Natural, Natural, Natural, Natural)> {
+    Box::new(
+        exhaustive_quadruples_from_single(exhaustive_naturals()).map(|(a, e1, b, e2)| {
+            let m1 = &a + e1 + Natural::ONE;
+            let m2 = &b + e2 + Natural::ONE;
+            (a, m1, b, m2)
+        }),
+    )
 }
 
 // -- (Natural, Natural, Natural, PrimitiveUnsigned) --
@@ -2358,6 +2390,30 @@ pub fn exhaustive_natural_vec_natural_pair_gen_var_4() -> It<(Vec<Natural>, Natu
     ))
 }
 
+// -- (Vec<Natural>, Vec<Natural>) --
+
+pub fn exhaustive_natural_vec_pair_gen_var_1() -> It<(Vec<Natural>, Vec<Natural>)> {
+    Box::new(
+        exhaustive_vecs_min_length(1, exhaustive_pairs_from_single(exhaustive_naturals()))
+            .filter_map(|ps: Vec<(Natural, Natural)>| {
+                let mut moduli = Vec::new();
+                let mut values = Vec::new();
+                for (a, b) in ps {
+                    let m = a + Natural::TWO;
+                    if moduli.iter().all(|prev| (&m).coprime_with(prev)) {
+                        values.push(b % &m);
+                        moduli.push(m);
+                    }
+                }
+                if moduli.is_empty() {
+                    None
+                } else {
+                    Some((moduli, values))
+                }
+            }),
+    )
+}
+
 // -- (Vec<Natural>, PrimitiveInt) --
 
 pub fn exhaustive_natural_vec_primitive_int_pair_gen_var_1<T: PrimitiveInt>()
@@ -2416,6 +2472,31 @@ pub fn exhaustive_unsigned_vec_gen_var_5() -> It<Vec<Limb>> {
 }
 
 // var 6 is in malachite-base
+
+// -- (Vec<PrimitiveUnsigned>, Natural) --
+
+pub fn exhaustive_unsigned_vec_natural_pair_gen_var_1() -> It<(Vec<Limb>, Natural)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_vecs_min_length(1, exhaustive_unsigneds::<Limb>()),
+            exhaustive_naturals(),
+        )
+        .filter_map(|(ms, x): (Vec<Limb>, Natural)| {
+            let mut moduli = Vec::new();
+            for a in ms {
+                let m = a.max(2);
+                if moduli.iter().all(|&prev| m.coprime_with(prev)) {
+                    moduli.push(m);
+                }
+            }
+            if moduli.is_empty() {
+                None
+            } else {
+                Some((moduli, x))
+            }
+        }),
+    )
+}
 
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned)
 

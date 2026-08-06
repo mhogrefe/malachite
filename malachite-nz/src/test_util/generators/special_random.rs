@@ -127,7 +127,7 @@ use malachite_base::tuples::random::{
 };
 use malachite_base::unions::Union2;
 use malachite_base::unions::random::random_union2s;
-use malachite_base::vecs::random::random_vecs;
+use malachite_base::vecs::random::{random_vecs, random_vecs_min_length};
 use malachite_base::vecs::{RandomValuesFromVec, random_values_from_vec};
 use num::{BigInt, BigUint};
 use std::cmp::{Ordering::*, max};
@@ -986,6 +986,38 @@ pub fn special_random_integer_natural_natural_triple_gen(
             )
         },
     ))
+}
+
+// -- (Integer, Natural, Natural, Natural) --
+
+pub fn special_random_integer_natural_natural_natural_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(Integer, Natural, Natural, Natural)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_quadruples_from_single(striped_random_naturals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                ))
+            },
+            &random_bools,
+        )
+        .map(|((a, e1, b, e2), neg)| {
+            let m1 = &a + e1 + Natural::ONE;
+            let m2 = &b + e2 + Natural::ONE;
+            let r1 = if neg {
+                Integer::from(a) - Integer::from(&m1)
+            } else {
+                Integer::from(a)
+            };
+            (r1, m1, b, m2)
+        }),
+    )
 }
 
 // -- (Integer, PrimitiveFloat) --
@@ -2770,6 +2802,25 @@ pub fn special_random_natural_quadruple_gen_var_4(
     config: &GenConfig,
 ) -> It<(Natural, Natural, Natural, Natural)> {
     Box::new(special_random_natural_quadruple_gen(config).filter(|(x, y, z, w)| x * y >= z * w))
+}
+
+pub fn special_random_natural_quadruple_gen_var_5(
+    config: &GenConfig,
+) -> It<(Natural, Natural, Natural, Natural)> {
+    Box::new(
+        random_quadruples_from_single(striped_random_naturals(
+            EXAMPLE_SEED,
+            config.get_or("mean_stripe_n", 32),
+            config.get_or("mean_stripe_d", 1),
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        ))
+        .map(|(a, e1, b, e2)| {
+            let m1 = &a + e1 + Natural::ONE;
+            let m2 = &b + e2 + Natural::ONE;
+            (a, m1, b, m2)
+        }),
+    )
 }
 
 // -- (Natural, Natural, Natural, PrimitiveUnsigned) --
@@ -4923,6 +4974,46 @@ pub fn striped_random_natural_vec_natural_pair_gen_var_4(
     })
 }
 
+// -- (Vec<Natural>, Vec<Natural>) --
+
+pub fn special_random_natural_vec_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(Vec<Natural>, Vec<Natural>)> {
+    Box::new(
+        random_vecs_min_length(
+            EXAMPLE_SEED,
+            1,
+            &|seed| {
+                random_pairs_from_single(striped_random_naturals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                ))
+            },
+            config.get_or("mean_length_n", 4),
+            config.get_or("mean_length_d", 1),
+        )
+        .filter_map(|ps: Vec<(Natural, Natural)>| {
+            let mut moduli = Vec::new();
+            let mut values = Vec::new();
+            for (a, b) in ps {
+                let m = a + Natural::TWO;
+                if moduli.iter().all(|prev| (&m).coprime_with(prev)) {
+                    values.push(b % &m);
+                    moduli.push(m);
+                }
+            }
+            if moduli.is_empty() {
+                None
+            } else {
+                Some((moduli, values))
+            }
+        }),
+    )
+}
+
 // -- (Vec<Natural>, PrimitiveUnsigned) --
 
 struct PowerOf2DigitsGenerator {
@@ -5023,6 +5114,56 @@ pub fn special_random_unsigned_vec_gen_var_5(config: &GenConfig) -> It<Vec<Limb>
 }
 
 // var 6 is in malachite-base.
+
+// -- (Vec<PrimitiveUnsigned>, Natural) --
+
+pub fn special_random_unsigned_vec_natural_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Natural)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_vecs_min_length(
+                    seed,
+                    1,
+                    &|seed_2| {
+                        striped_random_unsigneds::<Limb>(
+                            seed_2,
+                            config.get_or("mean_stripe_n", 32),
+                            config.get_or("mean_stripe_d", 1),
+                        )
+                    },
+                    config.get_or("mean_length_n", 6),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_naturals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 256),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+        )
+        .filter_map(|(ms, x): (Vec<Limb>, Natural)| {
+            let mut moduli = Vec::new();
+            for a in ms {
+                let m = a.max(2);
+                if moduli.iter().all(|&prev| m.coprime_with(prev)) {
+                    moduli.push(m);
+                }
+            }
+            if moduli.is_empty() {
+                None
+            } else {
+                Some((moduli, x))
+            }
+        }),
+    )
+}
 
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
 

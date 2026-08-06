@@ -75,12 +75,10 @@ fn mod_div_list_fail() {
     apply_fn_to_unsigneds!(mod_div_list_fail_helper);
 }
 
-fn mod_div_list_properties_helper<U, S>()
-where
-    U: ModDiv<U, U, Output = U> + ModDivList<U, U, Output = U> + PrimitiveUnsigned,
-    U: WrappingFrom<S>,
+fn mod_div_list_properties_helper<
+    U: ModDiv<Output = U> + ModDivList<Output = U> + PrimitiveUnsigned + WrappingFrom<S>,
     S: PrimitiveSigned + WrappingFrom<U>,
-{
+>() {
     unsigned_triple_gen_var_12::<U>().test_properties(|(b, c, m)| {
         let result = b.mod_div_list(c, m);
         assert_eq!(mod_div_list_unsigned::<U, S>(b, c, m), result);
@@ -93,8 +91,8 @@ where
             assert!(start < stride);
             // any single quotient is start plus some multiple of stride
             assert_eq!(q.unwrap() % stride, start);
-            // Spot-check that the first few elements of the progression are quotients. While
-            // i < length, start + stride * i < m, so the arithmetic cannot overflow.
+            // Spot-check that the first few elements of the progression are quotients. While i <
+            // length, start + stride * i < m, so the arithmetic cannot overflow.
             let mut i = U::ZERO;
             while i < length && i < U::exact_from(4u8) {
                 assert_eq!((start + stride * i).mod_mul(c, m), b);

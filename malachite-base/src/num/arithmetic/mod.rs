@@ -423,6 +423,20 @@ pub mod checked_sub_mul;
 /// assert_eq!(6u8.coprime_with(35), true);
 /// ```
 pub mod coprime_with;
+/// [`Crt`](traits::Crt), a trait for combining two congruences by the Chinese remainder theorem.
+///
+/// # crt
+/// ```
+/// use malachite_base::num::arithmetic::traits::Crt;
+///
+/// // 8 is 2 mod 3 and 3 mod 5.
+/// assert_eq!(2u8.crt(3, 3, 5), Some(8));
+/// assert_eq!(100u16.crt(101, 200, 251), Some(8483));
+/// // The moduli 4 and 6 are not coprime.
+/// assert_eq!(1u32.crt(4, 3, 6), None);
+/// assert_eq!(5u64.crt(10, 0, 1), Some(5));
+/// ```
+pub mod crt;
 /// [`DivEuclidean`](traits::DivEuclidean) and [`DivEuclideanAssign`](traits::DivEuclideanAssign),
 /// traits for finding the quotient of two numbers, rounded so that the remainder would be
 /// nonnegative.

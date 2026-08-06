@@ -1051,19 +1051,74 @@ ones.
 
 ## [Chinese remaindering](https://flintlib.org/doc/fmpz.html#chinese-remaindering) {#chinese-remaindering}
 
-This section's thirteen functions are not mapped row by row; they are one facility, and
-Malachite does not have it yet. The facility is residue recombination: `fmpz_CRT` and
-`fmpz_CRT_ui` combine a pair of congruences, and the rest of the section serves the many-moduli
-case, with `fmpz_comb_t` structures that precompute a tree of products so that reducing one
-integer modulo many primes, or reassembling it from many residues, costs less than doing each
-modulus separately. It is the largest instance of the precomputed-context pattern this page has
-met as `nmod_t` and `fmpz_preinvn_t`, and the design of such contexts belongs to
-[the `fmpz_mod` page](/mapping/flint-integers-mod-n/#conventions). Until the facility exists,
-every row here would read ✗ for the same
-reason, which is no more informative than this paragraph; the two-congruence case composes
-today from mapped pieces, through
-[`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModInverse.html)
-and the arithmetic above.
+| | FLINT | Malachite |
+| :---: | --- | --- |
+| ✓ | `void fmpz_CRT_ui (fmpz_t out, const fmpz_t r1, const fmpz_t m1, ulong r2, ulong m2, int sign)` | [`Crt`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Crt.html), [`BalancedCrt`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.BalancedCrt.html) |
+| ✓ | `void fmpz_CRT (fmpz_t out, const fmpz_t r1, const fmpz_t m1, const fmpz_t r2, const fmpz_t m2, int sign)` | [`Crt`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Crt.html), [`BalancedCrt`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.BalancedCrt.html) |
+
+**`fmpz_CRT`, `fmpz_CRT_ui`.** Residue recombination for a pair of congruences: the unique
+number congruent to `r1` modulo `m1` and to `r2` modulo `m2`, for coprime moduli. FLINT's
+`sign` flag selects between the canonical representative in $[0, m_1m_2)$ and the balanced one
+in $(-m_1m_2/2, m_1m_2/2]$; Malachite's convention is a separate named function for each,
+following its `Mod`/`BalancedMod` split. `Natural::crt` is the `sign = 0` case, and
+`Integer::balanced_crt` is `sign = 1`, taking its first residue as an `Integer` anywhere in
+$[-m_1, m_1)$ — the latitude that lets one combination's balanced output feed the next as
+FLINT's chained reconstructions do. Failure conventions differ: FLINT documents coprimality as
+an unchecked precondition and throws from `fmpz_CRT` when `m1` is not invertible, while both
+Malachite functions return an
+[`Option`](https://doc.rust-lang.org/nightly/std/option/enum.Option.html), `None` exactly when
+the moduli share a factor. The word-sized case is served by the same traits: `crt` on the
+primitive unsigned types is a genuine word-level algorithm with the products kept in single
+words, and `Natural::crt` dispatches to it when everything fits, the same shape as FLINT's
+small-`fmpz` fast paths. Both functions agree with FLINT bit for bit on the shared domain,
+which the differential suite checks directly against `fmpz_CRT` at both signs.
+
+| | FLINT | Malachite |
+| :---: | --- | --- |
+| ✓ | `void fmpz_multi_CRT_init (fmpz_multi_CRT_t CRT)` | internal |
+| ✓ | `int fmpz_multi_CRT_precompute (fmpz_multi_CRT_t CRT, const fmpz * moduli, slong len)` | internal |
+| ✓ | `void fmpz_multi_CRT_precomp (fmpz_t output, const fmpz_multi_CRT_t P, const fmpz * inputs, int sign)` | internal |
+| ✓ | `int fmpz_multi_CRT (fmpz_t output, const fmpz * moduli, const fmpz * values, slong len, int sign)` | [`Natural::multi_crt`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html#method.multi_crt), [`Integer::multi_balanced_crt`](https://docs.rs/malachite-nz/latest/malachite_nz/integer/struct.Integer.html#method.multi_balanced_crt) |
+| ✓ | `void fmpz_multi_CRT_clear (fmpz_multi_CRT_t P)` | internal |
+
+**The `fmpz_multi_CRT` family.** Any number of pairwise-coprime moduli, combined through a
+compiled subproduct tree. The public surface is the one-shot form: `Natural::multi_crt` is
+`sign = 0` and `Integer::multi_balanced_crt` is `sign = 1`, the same split the pair functions
+made above. The precomputed context behind them — FLINT's `init`/`precompute`/`precomp`/`clear`
+quartet as one compiled-program type — is ported in full but kept internal: reusing a context
+across many residue lists is the multimodular-algorithm pattern, and Malachite will surface it
+when the algorithms that need it arrive, rather than exporting machinery ordinary users reach
+through the one-shots. Failure moves from `precompute`'s success flag to
+[`None`](https://doc.rust-lang.org/nightly/std/option/enum.Option.html), under exactly FLINT's
+conditions: with one modulus, only zero is unusable, and 1 is accepted; with two or more, any
+0 or 1, or any non-coprime pair, is rejected. One contract is stricter: FLINT accepts arbitrary
+`fmpz` inputs and reduces them, while Malachite requires each residue already reduced modulo
+its modulus, like the rest of its modular arithmetic. Both output conventions agree with FLINT
+bit for bit, which the differential suite checks against `fmpz_multi_CRT` at both signs, edge
+quirks included.
+
+| | FLINT | Malachite |
+| :---: | --- | --- |
+| ✓ | `void fmpz_multi_mod_ui (ulong * out, const fmpz_t in, const fmpz_comb_t comb, fmpz_comb_temp_t temp)` | internal |
+| ✓ | `void fmpz_multi_CRT_ui (fmpz_t output, nn_srcptr residues, const fmpz_comb_t comb, fmpz_comb_temp_t ctemp, int sign)` | internal |
+| ✓ | `void fmpz_comb_init (fmpz_comb_t comb, nn_srcptr primes, slong num_primes)` | internal |
+| ✓ | `void fmpz_comb_temp_init (fmpz_comb_temp_t temp, const fmpz_comb_t comb)` | internal |
+| ✓ | `void fmpz_comb_clear (fmpz_comb_t comb)` | internal |
+| ✓ | `void fmpz_comb_temp_clear (fmpz_comb_temp_t temp)` | internal |
+
+**The comb.** The multimodular workhorse: many word-sized moduli at once, with consecutive
+moduli packed in groups of up to three whose product fits a word, groups packed into multi-limb
+chunks with premultiplied combination multipliers, and the chunks handled by the subproduct
+trees above. It is the largest instance of the precomputed-context pattern this page has met as
+`nmod_t` and `fmpz_preinvn_t`. Malachite ports it in full — one type compiling both directions'
+tables at once, with `fmpz_comb_temp_t`'s workspace allocated per call — but keeps the whole of
+it internal: the comb exists to serve multimodular algorithms, and its word-slice interface is
+kernel plumbing rather than something an ordinary user composes with. It backs the public
+one-shots today only in spirit; its rows are marked mapped because the machinery exists, is
+exercised by the test suite, and agrees with FLINT bit for bit, which the differential suite
+checks against `fmpz_multi_mod_ui` and `fmpz_multi_CRT_ui` at both signs. FLINT's
+documentation asks for primes of `FLINT_BITS - 1` bits; both implementations in fact accept
+any pairwise-coprime word moduli.
 
 ## [Primality testing](https://flintlib.org/doc/fmpz.html#primality-testing) {#primality-testing}
 

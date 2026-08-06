@@ -33,6 +33,10 @@ pub mod balanced_mod;
 /// [`BinomialCoefficient`](malachite_base::num::arithmetic::traits::BinomialCoefficient), a trait
 /// for computing the binomial coefficient of two numbers.
 pub mod binomial_coefficient;
+/// Implementations of [`BalancedCrt`](malachite_base::num::arithmetic::traits::BalancedCrt), a
+/// trait for combining two congruences by the Chinese remainder theorem and returning the
+/// representative of smallest absolute value.
+pub mod crt;
 /// Division of [`Integer`](super::Integer)s.
 pub mod div;
 /// Implementations of [`DivEuclidean`](malachite_base::num::arithmetic::traits::DivEuclidean) and
@@ -124,7 +128,9 @@ pub mod mul_add_mul;
 /// of the product is discarded, a short product avoids computing the rest.
 pub mod mul_shr_round;
 pub mod mul_sub_mul;
-/// Negation of an [`Integer`](super::Integer).
+/// Negation of an [`Integer`](super::Integer). The one-shot balanced multi-modulus Chinese
+/// remainder combination, [`Integer::multi_balanced_crt`](super::Integer::multi_balanced_crt).
+pub mod multi_crt;
 pub mod neg;
 /// Implementations of [`Parity`](malachite_base::num::arithmetic::traits::Parity), a trait for
 /// determining whether a number is even or odd.

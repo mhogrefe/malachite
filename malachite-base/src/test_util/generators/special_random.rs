@@ -5507,6 +5507,46 @@ pub fn special_random_unsigned_quadruple_gen_var_12<T: PrimitiveUnsigned>(
     ))
 }
 
+// Quadruples `(r1, m1, r2, m2)` that are valid `Crt` inputs: the residues are reduced modulo their
+// moduli and the product of the moduli is representable. All values are striped before the moduli
+// are filtered on their product fitting and the residues are reduced.
+struct SpecialRandomCrtQuadruples<T: PrimitiveUnsigned> {
+    ms: It<(T, T)>,
+    rs: It<T>,
+}
+
+impl<T: PrimitiveUnsigned> Iterator for SpecialRandomCrtQuadruples<T> {
+    type Item = (T, T, T, T);
+
+    fn next(&mut self) -> Option<(T, T, T, T)> {
+        loop {
+            let (m1, m2) = self.ms.next().unwrap();
+            if m1 != T::ZERO && m2 != T::ZERO && m1.checked_mul(m2).is_some() {
+                let r1 = self.rs.next().unwrap() % m1;
+                let r2 = self.rs.next().unwrap() % m2;
+                return Some((r1, m1, r2, m2));
+            }
+        }
+    }
+}
+
+pub fn special_random_unsigned_quadruple_gen_var_13<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(T, T, T, T)> {
+    Box::new(SpecialRandomCrtQuadruples {
+        ms: Box::new(random_pairs_from_single(striped_random_unsigneds::<T>(
+            EXAMPLE_SEED.fork("ms"),
+            config.get_or("mean_stripe_n", T::WIDTH >> 1),
+            config.get_or("mean_stripe_d", 1),
+        ))),
+        rs: Box::new(striped_random_unsigneds(
+            EXAMPLE_SEED.fork("rs"),
+            config.get_or("mean_stripe_n", T::WIDTH >> 1),
+            config.get_or("mean_stripe_d", 1),
+        )),
+    })
+}
+
 // -- (PrimitiveUnsigned * 6) --
 
 pub fn special_random_unsigned_sextuple_gen_var_1<T: PrimitiveUnsigned>(

@@ -9,6 +9,7 @@
 pub mod add;
 pub mod binomial_coefficient;
 pub mod checked_sub;
+pub mod crt;
 pub mod div;
 pub mod div_exact;
 pub mod div_mod;

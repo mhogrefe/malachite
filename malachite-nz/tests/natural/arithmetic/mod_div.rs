@@ -97,8 +97,8 @@ fn test_mod_div() {
         "98765432123456789012345678990",
         "None",
     );
-    // - negative cofactor from limbs_extended_gcd in gcdinv_helper (the limbs_sub lift branch);
-    //   gcd = 1, so the witness is unique and independently checkable
+    // - negative cofactor from limbs_extended_gcd in gcdinv_helper (the limbs_sub lift branch); gcd
+    //   = 1, so the witness is unique and independently checkable
     test(
         "123",
         "12345678987654321012345678901",

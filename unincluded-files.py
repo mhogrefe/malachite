@@ -18,6 +18,8 @@
 # files and to a directory named after the file otherwise, with the names of any enclosing inline
 # modules (`mod outer { mod name; }`, as in bin.rs and tests/lib.rs) appended to the base — and
 # followed transitively. `#[path]` attributes are not supported (nothing in Malachite uses them).
+# The `crate_test_mod!` visibility macro wraps a module declaration; its invocations are rewritten
+# to plain `mod name;` before scanning.
 
 import re
 import sys
@@ -41,6 +43,8 @@ STRING_LITERAL = re.compile(r'"(?:[^"\\]|\\.)*"')
 CHAR_LITERAL = re.compile(r"'(?:[^'\\]|\\.)'")
 # a `mod` declaration (with or without a body) or a lone brace, in source order
 EVENT = re.compile(r"(?:\bmod\s+([A-Za-z_][A-Za-z0-9_]*)\s*([;{]))|([{}])")
+# a `crate_test_mod!` invocation: a module declaration behind the visibility macro
+CRATE_TEST_MOD = re.compile(r"\bcrate_test_mod!\s*\{\s*([A-Za-z_][A-Za-z0-9_]*)\s*\}")
 
 
 def crate_roots(crate: Path) -> set[Path]:
@@ -77,6 +81,7 @@ def mod_declarations(source: str) -> list[tuple[list[str], str]]:
     source = LINE_COMMENT.sub(" ", source)
     source = STRING_LITERAL.sub('""', source)
     source = CHAR_LITERAL.sub("' '", source)
+    source = CRATE_TEST_MOD.sub(lambda m: f"mod {m.group(1)};", source)
     declarations = []
     depth = 0
     inline_stack: list[tuple[str, int]] = []

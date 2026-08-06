@@ -2814,6 +2814,16 @@ pub fn unsigned_quadruple_gen_var_12<T: PrimitiveUnsigned>() -> Generator<(T, T,
     )
 }
 
+// All `(T, T, T, T)` that are valid inputs `(r1, m1, r2, m2)` to `T::crt`: the residues are reduced
+// modulo their moduli and the product of the moduli is representable.
+pub fn unsigned_quadruple_gen_var_13<T: PrimitiveUnsigned>() -> Generator<(T, T, T, T)> {
+    Generator::new(
+        &exhaustive_unsigned_quadruple_gen_var_13,
+        &random_unsigned_quadruple_gen_var_4,
+        &special_random_unsigned_quadruple_gen_var_13,
+    )
+}
+
 // -- (PrimitiveUnsigned * 6) --
 
 // All sextuples of unsigneds of the same type.

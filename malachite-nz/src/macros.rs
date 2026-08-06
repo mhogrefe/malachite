@@ -87,6 +87,23 @@ macro_rules! crate_test_const_fn {
 }
 
 #[cfg(feature = "test_build")]
+macro_rules! crate_test_mod {
+    ($( #[$meta:meta] )* $name:ident) => {
+        $( #[$meta] )*
+        pub mod $name;
+    };
+}
+
+#[cfg(not(feature = "test_build"))]
+macro_rules! crate_test_mod {
+    ($( #[$meta:meta] )* $name:ident) => {
+        $( #[$meta] )*
+        #[allow(dead_code)]
+        pub(crate) mod $name;
+    };
+}
+
+#[cfg(feature = "test_build")]
 macro_rules! crate_test_const {
     ($( #[$meta:meta] )* $name:ident $( $body:tt )*) => {
         $( #[$meta] )*

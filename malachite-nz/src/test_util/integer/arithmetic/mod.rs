@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 pub mod add;
+pub mod crt;
 pub mod divisible_by;
 pub mod mul;
 pub mod sign;

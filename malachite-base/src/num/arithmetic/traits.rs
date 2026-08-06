@@ -291,6 +291,23 @@ pub trait CoprimeWith<RHS = Self> {
     fn coprime_with(self, other: RHS) -> bool;
 }
 
+/// Combines two congruences by the Chinese remainder theorem, returning `None` if the moduli are
+/// not coprime. The residues must be already reduced modulo their moduli.
+pub trait Crt<M1 = Self, R2 = Self, M2 = Self> {
+    type Output;
+
+    fn crt(self, m1: M1, r2: R2, m2: M2) -> Option<Self::Output>;
+}
+
+/// Combines two congruences by the Chinese remainder theorem, returning the representative of
+/// smallest absolute value, or `None` if the moduli are not coprime. The first residue may be
+/// negative.
+pub trait BalancedCrt<M1 = Self, R2 = Self, M2 = Self> {
+    type Output;
+
+    fn balanced_crt(self, m1: M1, r2: R2, m2: M2) -> Option<Self::Output>;
+}
+
 /// Divides two numbers, assuming the first exactly divides the second.
 ///
 /// If it doesn't, the `div_exact` function may panic or return a meaningless result.
@@ -939,8 +956,8 @@ pub trait ModDiv<RHS = Self, M = Self> {
 /// if no quotient exists. The inputs must be already reduced modulo $m$.
 ///
 /// The quotients form an arithmetic progression: `Some((start, stride, length))` means that the
-/// quotients are exactly the numbers $\text{start} + \text{stride} \cdot i$ for
-/// $0 \leq i < \text{length}$, where `start` is the smallest quotient.
+/// quotients are exactly the numbers $\text{start} + \text{stride} \cdot i$ for $0 \leq i <
+/// \text{length}$, where `start` is the smallest quotient.
 pub trait ModDivList<RHS = Self, M = Self> {
     type Output;
 

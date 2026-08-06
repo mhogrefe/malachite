@@ -40,6 +40,15 @@ pub mod checked_sub_mul;
 /// Implementations of [`CoprimeWith`](malachite_base::num::arithmetic::traits::CoprimeWith), a
 /// trait for determining whether two numbers are coprime.
 pub mod coprime_with;
+/// Implementations of [`Crt`](malachite_base::num::arithmetic::traits::Crt), a trait for combining
+/// two congruences by the Chinese remainder theorem.
+pub mod crt;
+crate_test_mod! {
+    /// `CrtComb`, a precomputed context for reducing a number modulo many word-sized moduli at once
+    /// and combining word residues back, by the Chinese remainder theorem. Internal machinery for
+    /// future multimodular algorithms, public only under `test_build`.
+    crt_comb
+}
 /// Division of [`Natural`](super::Natural)s.
 pub mod div;
 /// Implementations of [`DivEuclidean`](malachite_base::num::arithmetic::traits::DivEuclidean) and
@@ -143,8 +152,8 @@ pub mod mod_add;
 /// Implementations of [`ModDiv`](malachite_base::num::arithmetic::traits::ModDiv), a trait for
 /// dividing two numbers modulo another number.
 pub mod mod_div;
-/// Implementations of [`ModDivList`](malachite_base::num::arithmetic::traits::ModDivList), a
-/// trait for finding all quotients of two numbers modulo another number.
+/// Implementations of [`ModDivList`](malachite_base::num::arithmetic::traits::ModDivList), a trait
+/// for finding all quotients of two numbers modulo another number.
 pub mod mod_div_list;
 /// Implementations of [`ModEuclidean`](malachite_base::num::arithmetic::traits::ModEuclidean) and
 /// [`ModEuclideanAssign`](malachite_base::num::arithmetic::traits::ModEuclideanAssign), traits for
@@ -564,6 +573,13 @@ pub mod mul_add_mul;
 /// of the product is discarded, a short product avoids computing the rest.
 pub mod mul_shr_round;
 pub mod mul_sub_mul;
+crate_test_mod! {
+    /// `MultiCrt`, a precomputed context for combining many congruences by the Chinese remainder
+    /// theorem, and the home of the public one-shot
+    /// [`Natural::multi_crt`](super::Natural::multi_crt). The context itself is internal machinery
+    /// for future multimodular algorithms, public only under `test_build`.
+    multi_crt
+}
 /// Negation of a [`Natural`](super::Natural), returning an [`Integer`](crate::integer::Integer).
 pub mod neg;
 /// Implementations of [`NextPowerOf2`](malachite_base::num::arithmetic::traits::NextPowerOf2) and

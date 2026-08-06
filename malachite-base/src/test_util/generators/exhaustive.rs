@@ -3144,6 +3144,19 @@ pub fn exhaustive_unsigned_quadruple_gen_var_12<T: PrimitiveUnsigned>() -> It<(T
     ))
 }
 
+pub fn exhaustive_unsigned_quadruple_gen_var_13<T: PrimitiveUnsigned>() -> It<(T, T, T, T)> {
+    Box::new(
+        exhaustive_quadruples_from_single(exhaustive_unsigneds()).filter_map(
+            |(r1, e1, r2, e2): (T, T, T, T)| {
+                let m1 = r1.checked_add(e1)?.checked_add(T::ONE)?;
+                let m2 = r2.checked_add(e2)?.checked_add(T::ONE)?;
+                m1.checked_mul(m2)?;
+                Some((r1, m1, r2, m2))
+            },
+        ),
+    )
+}
+
 // -- (PrimitiveUnsigned * 6) --
 
 pub fn exhaustive_unsigned_sextuple_gen_var_1<T: PrimitiveUnsigned>() -> It<(T, T, T, T, T, T)> {

@@ -54,4 +54,17 @@ int run_sqrtmod_stress(const char * arg);
 int run_fmpz_mod_divides(const char * arg);
 int run_fmpz_divides_mod_list(const char * arg);
 
+/* crt.c */
+int run_fmpz_CRT(const char * arg);
+int run_fmpz_CRT_balanced(const char * arg);
+
+/* multi_crt.c */
+int run_fmpz_multi_CRT(const char * arg);
+int run_fmpz_multi_CRT_balanced(const char * arg);
+
+/* crt_comb.c */
+int run_fmpz_multi_mod_ui(const char * arg);
+int run_fmpz_multi_CRT_ui(const char * arg);
+int run_fmpz_multi_CRT_ui_balanced(const char * arg);
+
 #endif

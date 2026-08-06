@@ -606,6 +606,19 @@ pub fn integer_natural_natural_triple_gen() -> Generator<(Integer, Natural, Natu
     )
 }
 
+// -- (Integer, Natural, Natural, Natural) --
+
+// All `(Integer, Natural, Natural, Natural)` that are valid inputs `(r1, m1, r2, m2)` to
+// `Integer::balanced_crt`: `r1` is in `[-m1, m1)` and `r2` is reduced modulo `m2`.
+pub fn integer_natural_natural_natural_quadruple_gen_var_1()
+-> Generator<(Integer, Natural, Natural, Natural)> {
+    Generator::new(
+        &exhaustive_integer_natural_natural_natural_quadruple_gen_var_1,
+        &random_integer_natural_natural_natural_quadruple_gen_var_1,
+        &special_random_integer_natural_natural_natural_quadruple_gen_var_1,
+    )
+}
+
 // -- (Integer, PrimitiveFloat) --
 
 pub fn integer_primitive_float_pair_gen<T: PrimitiveFloat>() -> Generator<(Integer, T)> {
@@ -1665,6 +1678,16 @@ pub fn natural_quadruple_gen_var_4() -> Generator<(Natural, Natural, Natural, Na
     )
 }
 
+// All `(Natural, Natural, Natural, Natural)` that are valid inputs `(r1, m1, r2, m2)` to
+// `Natural::crt`: the residues are reduced modulo their moduli.
+pub fn natural_quadruple_gen_var_5() -> Generator<(Natural, Natural, Natural, Natural)> {
+    Generator::new(
+        &exhaustive_natural_quadruple_gen_var_5,
+        &random_natural_quadruple_gen_var_5,
+        &special_random_natural_quadruple_gen_var_5,
+    )
+}
+
 // -- (Natural, Natural, Natural, PrimitiveUnsigned) --
 
 // All `(Natural, Natural, Natural, T)` where `T` is unsigned and small.
@@ -2673,6 +2696,19 @@ pub fn natural_vec_natural_pair_gen_var_4() -> Generator<(Vec<Natural>, Natural)
     )
 }
 
+// -- (Vec<Natural>, Vec<Natural>) --
+
+// All `(Vec<Natural>, Vec<Natural>)` that are valid `(moduli, values)` inputs to
+// `Natural::multi_crt` with a usable moduli list: the moduli are pairwise coprime and at least 2,
+// the lists are nonempty and of equal length, and the values are reduced modulo their moduli.
+pub fn natural_vec_pair_gen_var_1() -> Generator<(Vec<Natural>, Vec<Natural>)> {
+    Generator::new(
+        &exhaustive_natural_vec_pair_gen_var_1,
+        &random_natural_vec_pair_gen_var_1,
+        &special_random_natural_vec_pair_gen_var_1,
+    )
+}
+
 // -- (Vec<Natural>, PrimitiveUnsigned) --
 
 // All `(Vec<Natural>, u64)`, where the `u64` is positive and each `Natural` in the `Vec` is less
@@ -2708,6 +2744,18 @@ pub fn unsigned_vec_gen_var_5() -> Generator<Vec<Limb>> {
 }
 
 // var 6 is in malachite-base.
+
+// -- (Vec<PrimitiveUnsigned>, Natural) --
+
+// All `(Vec<Limb>, Natural)` where the `Limb`s are pairwise-coprime moduli that are at least 2 —
+// valid inputs to `CrtComb::new` — and the `Natural` may be any size.
+pub fn unsigned_vec_natural_pair_gen_var_1() -> Generator<(Vec<Limb>, Natural)> {
+    Generator::new(
+        &exhaustive_unsigned_vec_natural_pair_gen_var_1,
+        &random_unsigned_vec_natural_pair_gen_var_1,
+        &special_random_unsigned_vec_natural_pair_gen_var_1,
+    )
+}
 
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
 

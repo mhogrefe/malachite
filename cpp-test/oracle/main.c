@@ -31,6 +31,13 @@ static const oracle_mode modes[] = {
     {"sqrtmod_stress", run_sqrtmod_stress},
     {"fmpz_mod_divides", run_fmpz_mod_divides},
     {"fmpz_divides_mod_list", run_fmpz_divides_mod_list},
+    {"fmpz_CRT", run_fmpz_CRT},
+    {"fmpz_CRT_balanced", run_fmpz_CRT_balanced},
+    {"fmpz_multi_CRT", run_fmpz_multi_CRT},
+    {"fmpz_multi_CRT_balanced", run_fmpz_multi_CRT_balanced},
+    {"fmpz_multi_mod_ui", run_fmpz_multi_mod_ui},
+    {"fmpz_multi_CRT_ui", run_fmpz_multi_CRT_ui},
+    {"fmpz_multi_CRT_ui_balanced", run_fmpz_multi_CRT_ui_balanced},
 };
 
 int

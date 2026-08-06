@@ -4404,6 +4404,38 @@ pub fn random_unsigned_quadruple_gen_var_3<T: PrimitiveUnsigned>(
     ))
 }
 
+// Quadruples `(r1, m1, r2, m2)` that are valid `Crt` inputs: the residues are reduced modulo their
+// moduli and the product of the moduli is representable. The moduli come from a bounded-product
+// pair source, and the residues are random values reduced modulo them.
+struct RandomCrtQuadruples<T: PrimitiveUnsigned> {
+    ms: It<(T, T)>,
+    rs: It<T>,
+}
+
+impl<T: PrimitiveUnsigned> Iterator for RandomCrtQuadruples<T> {
+    type Item = (T, T, T, T);
+
+    fn next(&mut self) -> Option<(T, T, T, T)> {
+        loop {
+            let (m1, m2) = self.ms.next().unwrap();
+            if m1 != T::ZERO && m2 != T::ZERO && m1.checked_mul(m2).is_some() {
+                let r1 = self.rs.next().unwrap() % m1;
+                let r2 = self.rs.next().unwrap() % m2;
+                return Some((r1, m1, r2, m2));
+            }
+        }
+    }
+}
+
+pub fn random_unsigned_quadruple_gen_var_4<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(T, T, T, T)> {
+    Box::new(RandomCrtQuadruples {
+        ms: random_unsigned_pair_gen_var_21::<T>(config),
+        rs: Box::new(random_primitive_ints(EXAMPLE_SEED.fork("rs"))),
+    })
+}
+
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, RoundingMode) --
 
 struct UnsignedUnsignedRoundingModeTripleGenerator<T: PrimitiveUnsigned> {

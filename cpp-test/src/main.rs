@@ -172,6 +172,44 @@ fn main() {
         "demo_mod_div_list_u64",
         "fmpz_divides_mod_list",
     );
+    check_demo_against_flint(&oracle, "../malachite-nz", "demo_natural_crt", "fmpz_CRT");
+    check_demo_against_flint(&oracle, "../malachite-base", "demo_crt_u64", "fmpz_CRT");
+    check_demo_against_flint(
+        &oracle,
+        "../malachite-nz",
+        "demo_integer_balanced_crt",
+        "fmpz_CRT_balanced",
+    );
+    check_demo_against_flint(
+        &oracle,
+        "../malachite-nz",
+        "demo_natural_multi_crt",
+        "fmpz_multi_CRT",
+    );
+    check_demo_against_flint(
+        &oracle,
+        "../malachite-nz",
+        "demo_integer_multi_balanced_crt",
+        "fmpz_multi_CRT_balanced",
+    );
+    check_demo_against_flint(
+        &oracle,
+        "../malachite-nz",
+        "demo_natural_crt_comb_reduce",
+        "fmpz_multi_mod_ui",
+    );
+    check_demo_against_flint(
+        &oracle,
+        "../malachite-nz",
+        "demo_natural_crt_comb_combine",
+        "fmpz_multi_CRT_ui",
+    );
+    check_demo_against_flint(
+        &oracle,
+        "../malachite-nz",
+        "demo_natural_crt_comb_combine_balanced",
+        "fmpz_multi_CRT_ui_balanced",
+    );
 
     println!("testing primitive_root_prime unit tests");
     {
@@ -186,6 +224,31 @@ fn main() {
         write_primitive_root_prime_unit_test(&mut output_file, 8760810010780182161, 3);
     }
     run_oracle(&oracle, "n_primitive_root_prime", Some(TEST_OUT));
+
+    // Edge rows for the multi-modulus CRT quirks: a single modulus of 1 is usable, but a 1 or a
+    // 0 among two or more moduli is not, and unusable lists must report None.
+    println!("testing multi_crt unit tests");
+    {
+        let mut output_file = File::create(TEST_OUT).unwrap();
+        for line in [
+            "multi_crt([5], [3]) = Some(3)",
+            "multi_crt([1], [0]) = Some(0)",
+            "multi_crt([0], [0]) = None",
+            "multi_crt([3, 5, 7], [2, 3, 2]) = Some(23)",
+            "multi_crt([4, 6], [1, 3]) = None",
+            "multi_crt([5, 5], [1, 1]) = None",
+            "multi_crt([3, 1], [2, 0]) = None",
+            "multi_crt([0, 3], [0, 2]) = None",
+            "multi_crt_balanced([5], [3]) = Some(-2)",
+            "multi_crt_balanced([3, 5], [2, 3]) = Some(-7)",
+            "multi_crt_balanced([2, 7], [1, 0]) = Some(7)",
+            "multi_crt_balanced([4, 6], [1, 3]) = None",
+        ] {
+            writeln!(output_file, "{line}").unwrap();
+        }
+    }
+    run_oracle(&oracle, "fmpz_multi_CRT", Some(TEST_OUT));
+    run_oracle(&oracle, "fmpz_multi_CRT_balanced", Some(TEST_OUT));
 
     for demo_name in [
         "demo_u8_primitive_root_prime",
