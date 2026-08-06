@@ -597,6 +597,19 @@ pub trait CheckedSubfactorial: Sized {
     fn checked_subfactorial(n: u64) -> Option<Self>;
 }
 
+/// Computes the rising factorial of a number: the product of the `n` consecutive numbers starting
+/// at `self`, or 1 when `n` is 0.
+pub trait RisingFactorial {
+    type Output;
+
+    fn rising_factorial(self, n: u64) -> Self::Output;
+}
+
+/// Computes the rising factorial of a number, returning `None` if the result cannot be represented.
+pub trait CheckedRisingFactorial: Sized {
+    fn checked_rising_factorial(self, n: u64) -> Option<Self>;
+}
+
 /// Computes the $n$th Fibonacci number, either alone or paired with its predecessor:
 /// `fibonacci_pair(n)` returns $(F(n), F(n-1))$.
 pub trait Fibonacci: Sized {

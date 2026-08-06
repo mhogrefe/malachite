@@ -3169,6 +3169,29 @@ pub mod primorial;
 /// assert_eq!(x, 0.6666667);
 /// ```
 pub mod reciprocal;
+/// [`RisingFactorial`](traits::RisingFactorial) and
+/// [`CheckedRisingFactorial`](traits::CheckedRisingFactorial), traits for computing the rising
+/// factorial of a number.
+///
+/// # rising_factorial
+/// ```
+/// use malachite_base::num::arithmetic::traits::RisingFactorial;
+///
+/// assert_eq!(3u8.rising_factorial(0), 1);
+/// assert_eq!(3u16.rising_factorial(4), 360);
+/// assert_eq!((-5i32).rising_factorial(3), -60);
+/// assert_eq!((-2i64).rising_factorial(5), 0);
+/// ```
+///
+/// # checked_rising_factorial
+/// ```
+/// use malachite_base::num::arithmetic::traits::CheckedRisingFactorial;
+///
+/// assert_eq!(3u16.checked_rising_factorial(4), Some(360));
+/// assert_eq!(3u8.checked_rising_factorial(4), None);
+/// assert_eq!((-5i32).checked_rising_factorial(3), Some(-60));
+/// ```
+pub mod rising_factorial;
 /// Traits for taking the $n$th root of a number.
 ///
 /// The traits are [`FloorRoot`](traits::FloorRoot), [`FloorRootAssign`](traits::FloorRootAssign),

@@ -41,6 +41,7 @@ pub(crate) fn register(runner: &mut Runner) {
     parity::register(runner);
     pow::register(runner);
     power_of_2::register(runner);
+    rising_factorial::register(runner);
     root::register(runner);
     round_to_multiple::register(runner);
     round_to_multiple_of_power_of_2::register(runner);
@@ -87,6 +88,7 @@ mod neg;
 mod parity;
 mod pow;
 mod power_of_2;
+mod rising_factorial;
 mod root;
 mod round_to_multiple;
 mod round_to_multiple_of_power_of_2;

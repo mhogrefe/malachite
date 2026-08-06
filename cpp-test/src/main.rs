@@ -210,6 +210,18 @@ fn main() {
         "demo_natural_crt_comb_combine_balanced",
         "fmpz_multi_CRT_ui_balanced",
     );
+    check_demo_against_flint(
+        &oracle,
+        "../malachite-nz",
+        "demo_natural_rising_factorial",
+        "fmpz_rfac",
+    );
+    check_demo_against_flint(
+        &oracle,
+        "../malachite-nz",
+        "demo_integer_rising_factorial",
+        "fmpz_rfac",
+    );
 
     println!("testing primitive_root_prime unit tests");
     {

@@ -599,6 +599,10 @@ pub mod power_of_2;
 /// An implementation of [`Primorial`](malachite_base::num::arithmetic::traits::Primorial), a trait
 /// for computing the primorial of a number.
 pub mod primorial;
+/// Implementations of
+/// [`RisingFactorial`](malachite_base::num::arithmetic::traits::RisingFactorial), a trait for
+/// computing the rising factorial of a number.
+pub mod rising_factorial;
 /// Implementations of traits for taking the $n$th root of a number.
 ///
 /// The traits are [`FloorRoot`](malachite_base::num::arithmetic::traits::FloorRoot),

@@ -76,6 +76,7 @@ pub(crate) fn register(runner: &mut Runner) {
     checked_mul_sub_mul::register(runner);
     overflowing_mul_add_mul::register(runner);
     overflowing_mul_sub_mul::register(runner);
+    rising_factorial::register(runner);
     saturating_mul_add_mul::register(runner);
     saturating_mul_sub_mul::register(runner);
     wrapping_mul_add_mul::register(runner);
@@ -219,6 +220,7 @@ mod pow;
 mod power_of_2;
 mod primorial;
 mod reciprocal;
+mod rising_factorial;
 mod root;
 mod rotate;
 mod round_to_multiple;

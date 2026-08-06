@@ -841,8 +841,8 @@ multiply-shifts.
 | ✓ | `void fmpz_fac_ui (fmpz_t f, ulong n)` | [`Factorial`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Factorial.html) |
 | ✓ | `void fmpz_fib_ui (fmpz_t f, ulong n)` | [`Fibonacci`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Fibonacci.html) |
 | ✓ | `void fmpz_bin_uiui (fmpz_t f, ulong n, ulong k)` | [`BinomialCoefficient`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.BinomialCoefficient.html) |
-| ✗ | `void fmpz_rfac_ui (fmpz_t r, const fmpz_t x, ulong k)` | |
-| ✗ | `void fmpz_rfac_uiui (fmpz_t r, ulong x, ulong k)` | |
+| ✓ | `void fmpz_rfac_ui (fmpz_t r, const fmpz_t x, ulong k)` | [`RisingFactorial`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.RisingFactorial.html) |
+| ✓ | `void fmpz_rfac_uiui (fmpz_t r, ulong x, ulong k)` | [`RisingFactorial`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.RisingFactorial.html) |
 | ✓ | `void fmpz_mul_tdiv_q_2exp (fmpz_t f, const fmpz_t g, const fmpz_t h, ulong exp)` | [`MulShrRound`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.MulShrRound.html), [`MulShrRoundAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.MulShrRoundAssign.html) |
 | ✓ | `void fmpz_mul_si_tdiv_q_2exp (fmpz_t f, const fmpz_t g, slong x, ulong exp)` | [`MulShrRound`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.MulShrRound.html), [`MulShrRoundAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.MulShrRoundAssign.html) |
 
@@ -854,10 +854,19 @@ double, multi-, and subfactorials beyond FLINT's `fmpz` offering, and
 [`fibonacci_pair`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Fibonacci.html)
 with the Lucas variants beside it.
 
-**`fmpz_rfac_ui`, `fmpz_rfac_uiui`.** The rising factorial $$x (x+1) \cdots (x+k-1)$$ has no
-Malachite counterpart yet, at either operand size. In the meantime the identity
-$$x^{(k)} = \binom{x+k-1}{k} \, k!$$ spells it through `BinomialCoefficient` and `Factorial`,
-which handles a bignum `x` as well, since the binomial coefficient takes `Natural` arguments.
+**`fmpz_rfac_ui`, `fmpz_rfac_uiui`.** The rising factorial $$x (x+1) \cdots (x+n-1)$$, as
+`rising_factorial(n)` on the base: `Integer::rising_factorial` is `fmpz_rfac_ui`, with the
+same handling of negative bases — a factor sequence reaching or crossing zero gives exactly
+zero, and an all-negative sequence gets the parity sign — and `Natural::rising_factorial`
+covers `fmpz_rfac_uiui`, generalized to a base of any size rather than one word. Both share
+FLINT's strategy: factors packed into single-word partial products when the base is small and
+the range short, and binary splitting over the range otherwise. The primitive integer types
+implement the trait too, alongside
+[`CheckedRisingFactorial`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CheckedRisingFactorial.html)
+for the word-sized results FLINT leaves to the caller; there the zero-of-a-spanning-sequence
+rule earns its keep, since a representable zero must be found without forming its
+unrepresentable partial products. Both bignum forms agree with FLINT bit for bit, which the
+differential suite checks against `fmpz_rfac_ui` and, for word-sized bases, `fmpz_rfac_uiui`.
 
 **`fmpz_mul_tdiv_q_2exp`, `fmpz_mul_si_tdiv_q_2exp`.** `(&g).mul_shr_round(&h, exp, Down).0`.
 `tdiv` truncates toward zero, which is Malachite's `Down`; the operation accepts any

@@ -67,4 +67,7 @@ int run_fmpz_multi_mod_ui(const char * arg);
 int run_fmpz_multi_CRT_ui(const char * arg);
 int run_fmpz_multi_CRT_ui_balanced(const char * arg);
 
+/* rfac.c */
+int run_fmpz_rfac(const char * arg);
+
 #endif
