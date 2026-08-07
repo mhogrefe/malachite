@@ -73,6 +73,7 @@ $$y = 33096$$ in `f64` arithmetic, the rounding errors prevent the two enormous 
 cancelling almost exactly. `Rational` arithmetic is exact, so cancellation works.
 
 ```rust
+use malachite::base::num::arithmetic::traits::Square;
 use malachite::base::num::basic::traits::Two;
 use malachite::base::num::conversion::string::options::ToSciOptions;
 use malachite::base::num::conversion::traits::ToSci;
@@ -80,11 +81,11 @@ use malachite::Rational;
 
 fn main() {
     let (x, y) = (Rational::from(77617), Rational::from(33096));
-    let x2 = &x * &x;
-    let y2 = &y * &y;
-    let y4 = &y2 * &y2;
+    let x2 = (&x).square();
+    let y2 = (&y).square();
+    let y4 = (&y2).square();
     let y6 = &y4 * &y2;
-    let y8 = &y4 * &y4;
+    let y8 = (&y4).square();
     let inner =
         Rational::from(11) * &x2 * y2 - &y6 - Rational::from(121) * y4 - Rational::TWO;
     let exact = Rational::from_signeds(1335, 4) * y6
@@ -93,7 +94,7 @@ fn main() {
         + x / (Rational::TWO * y);
     let mut options = ToSciOptions::default();
     options.set_precision(20);
-    println!("{} ~ {}", exact, exact.to_sci_with_options(options));
+    println!("{} ≈ {}", exact, exact.to_sci_with_options(options));
 }
 ```
 The output is this:
