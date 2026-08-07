@@ -102,9 +102,7 @@ The output is this:
 ```
 The same formula evaluated in `f64` arithmetic gives roughly $$-1.18 \times 10^{21}$$: off by
 twenty-one orders of magnitude. In Rump's original 1988 paper, an IBM mainframe was wrong more
-subtly: single, double, and extended precision all agreed on $$+1.172603\ldots$$, the same
-incorrect answer at every precision — agreement between precisions is no guarantee of
-correctness.
+subtly: single, double, and extended precision all agreed on $$+1.172603\ldots$$.
 
 Malachite is designed to work with very large numbers efficiently. See [here](/performance) for a
 performance comparison against other libraries.
