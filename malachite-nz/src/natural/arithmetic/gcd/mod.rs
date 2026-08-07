@@ -390,3 +390,8 @@ pub mod extended_gcd;
 pub mod half_gcd;
 /// Code for working with 2-by-2 matrices.
 pub mod matrix_2_2;
+crate_test_mod! {
+    /// Lehmer extended GCD with early termination, `fmpz_xgcd_partial`. Internal machinery for the
+    /// planned Cornacchia and binary-quadratic-form work, public only under `test_build`.
+    extended_gcd_partial
+}

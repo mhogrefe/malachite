@@ -222,6 +222,12 @@ fn main() {
         "demo_integer_rising_factorial",
         "fmpz_rfac",
     );
+    check_demo_against_flint(
+        &oracle,
+        "../malachite-nz",
+        "demo_natural_extended_gcd_partial",
+        "fmpz_xgcd_partial",
+    );
 
     println!("testing primitive_root_prime unit tests");
     {

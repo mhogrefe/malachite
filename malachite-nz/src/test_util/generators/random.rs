@@ -2264,6 +2264,20 @@ pub fn random_natural_triple_gen_var_3(config: &GenConfig) -> It<(Natural, Natur
     )
 }
 
+pub fn random_natural_triple_gen_var_10(config: &GenConfig) -> It<(Natural, Natural, Natural)> {
+    Box::new(
+        random_triples_from_single(random_naturals(
+            EXAMPLE_SEED,
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        ))
+        .map(|(a, e, l): (Natural, Natural, Natural)| {
+            let r2 = &a + e;
+            (a, r2, l)
+        }),
+    )
+}
+
 pub fn random_natural_triple_gen_var_4(config: &GenConfig) -> It<(Natural, Natural, Natural)> {
     Box::new(random_triples_xxy(
         EXAMPLE_SEED,

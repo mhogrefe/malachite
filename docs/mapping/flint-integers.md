@@ -890,7 +890,7 @@ case does the same work as multiplying and shifting.
 | ≈ | `void fmpz_gcdinv (fmpz_t d, fmpz_t a, const fmpz_t f, const fmpz_t g)` | [`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModInverse.html), [`ExtendedGcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ExtendedGcd.html) |
 | ≈ | `void fmpz_xgcd (fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)` | [`ExtendedGcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ExtendedGcd.html) |
 | ✓ | `void fmpz_xgcd_canonical_bezout (fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)` | [`ExtendedGcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ExtendedGcd.html) |
-| ✗ | `void fmpz_xgcd_partial (fmpz_t co2, fmpz_t co1, fmpz_t r2, fmpz_t r1, const fmpz_t L)` | |
+| ✓ | `void fmpz_xgcd_partial (fmpz_t co2, fmpz_t co1, fmpz_t r2, fmpz_t r1, const fmpz_t L)` | internal |
 
 **`fmpz_gcd`, `fmpz_gcd3`, `fmpz_lcm`.** As
 [on the GMP page](/mapping/gmp-integers/#number-theoretic-functions),
@@ -930,12 +930,16 @@ needed; its normalization differs from `fmpz_gcdinv`'s, hence the ≈.
 
 **`fmpz_xgcd_partial`.** Lehmer's extended GCD with early termination, stopping once the
 remainders fall below a bound: a building block, used by FLINT's binary quadratic form module,
-for algorithms such as Cornacchia's that need only the middle of the remainder sequence.
-Malachite has half-GCD machinery internally but no public partial GCD, so this is a gap; it
+for algorithms such as Cornacchia's that need only the middle of the remainder sequence. It
 belongs to the same family of algorithm-component exports as the Lucas chains under
-[Primality testing](#primality-testing) below. It is also the engine of
-[rational reconstruction](/mapping/flint-rationals/#modular-reduction-and-rational-reconstruction),
-a gap on the rationals page; the two are one work item.
+[Primality testing](#primality-testing) below, and Malachite ports it as such: the machinery
+exists, with FLINT's in-place arguments as owned inputs and returned outputs, restricted to
+nonnegative remainders, and is kept internal until the algorithms built on it — Cornacchia's
+and binary quadratic forms, and
+[rational reconstruction](/mapping/flint-rationals/#modular-reduction-and-rational-reconstruction)
+on the rationals page — arrive to define the public surface. The outputs are a mid-sequence
+state of a Lehmer run, not canonical values, so the differential suite pins the port to FLINT's
+exact stopping states and cofactor signs, wrapping word arithmetic included.
 
 ## [Modular arithmetic](https://flintlib.org/doc/fmpz.html#modular-arithmetic) {#modular-arithmetic}
 

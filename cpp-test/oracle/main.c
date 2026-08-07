@@ -39,6 +39,7 @@ static const oracle_mode modes[] = {
     {"fmpz_multi_CRT_ui", run_fmpz_multi_CRT_ui},
     {"fmpz_multi_CRT_ui_balanced", run_fmpz_multi_CRT_ui_balanced},
     {"fmpz_rfac", run_fmpz_rfac},
+    {"fmpz_xgcd_partial", run_fmpz_xgcd_partial},
 };
 
 int

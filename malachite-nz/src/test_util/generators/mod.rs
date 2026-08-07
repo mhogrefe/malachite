@@ -1562,6 +1562,16 @@ pub fn natural_triple_gen_var_2() -> Generator<(Natural, Natural, Natural)> {
     )
 }
 
+// All `(Natural, Natural, Natural)` triples `(r1, r2, l)` where `r1` is at most `r2`: valid
+// successive-remainder inputs to `extended_gcd_partial`, with an arbitrary bound.
+pub fn natural_triple_gen_var_10() -> Generator<(Natural, Natural, Natural)> {
+    Generator::new(
+        &exhaustive_natural_triple_gen_var_10,
+        &random_natural_triple_gen_var_10,
+        &special_random_natural_triple_gen_var_10,
+    )
+}
+
 // All triples of `Natural` where the first and second elements each are less than the third.
 pub fn natural_triple_gen_var_3() -> Generator<(Natural, Natural, Natural)> {
     Generator::new(

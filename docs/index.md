@@ -18,7 +18,7 @@ MPFR's [floats](/mapping/mpfr-floats/), and num's [integers](/mapping/num-intege
 with more FLINT pages to follow.
 
 ```rust
-use malachite::num::arithmetic::traits::Factorial;
+use malachite::base::num::arithmetic::traits::Factorial;
 use malachite::Natural;
 
 fn main() {
@@ -31,30 +31,74 @@ The code above outputs the following:
 ```
 You have to scroll to see the entire output.
 
-Here's a more complex example, calculating the negative-one-millionth power of 3 and displaying the
-result with 30 digits of precision.
+Here is [Ramanujan's constant](https://en.wikipedia.org/wiki/Heegner_number#Almost_integers_and_Ramanujan's_constant),
+$$e^{\pi \sqrt{163}}$$, which is famously — and not by coincidence — within a trillionth of an
+integer. Computing it takes real arbitrary-precision machinery: a transcendental constant, a
+square root, and an exponential, each correctly rounded to 200 bits. Only the starting values
+name a precision; every operation after that inherits the precision of its input, or the larger
+precision of its two inputs. (`Float` support is enabled by the `floats` feature.)
 
 ```rust
-use malachite::num::arithmetic::traits::Pow;
-use malachite::num::conversion::string::options::ToSciOptions;
-use malachite::num::conversion::traits::ToSci;
+use malachite::base::num::arithmetic::traits::{Exp, Sqrt};
+use malachite::base::num::conversion::string::options::ToSciOptions;
+use malachite::base::num::conversion::traits::ToSci;
+use malachite::Float;
+
+fn main() {
+    let prec = 200;
+    let pi = Float::pi_prec(prec).0;
+    let sqrt_163 = Float::from_unsigned_prec(163u32, prec).0.sqrt();
+    let almost_integer = (pi * sqrt_163).exp();
+    let mut options = ToSciOptions::default();
+    options.set_precision(45);
+    println!("{}", almost_integer.to_sci_with_options(options));
+}
+```
+The output is this, with twelve nines after the decimal point:
+```
+262537412640768743.999999999999250072597198186
+```
+Every digit is correct. Each operation returns its result along with an
+[`Ordering`](https://doc.rust-lang.org/nightly/core/cmp/enum.Ordering.html) reporting whether that
+result is below, equal to, or above the exact value; the example discards them with `.0`, but they
+are how you track exactness through a computation.
+
+Exactness is sometimes the whole story. The polynomial below is
+[Rump's example](https://en.wikipedia.org/wiki/Rump%27s_example): evaluated at $$x = 77617$$ and
+$$y = 33096$$ in `f64` arithmetic, the rounding errors don't just lose precision — they get the
+magnitude and the story wrong, because two enormous terms cancel almost exactly. `Rational`
+arithmetic is exact, so cancellation costs it nothing.
+
+```rust
+use malachite::base::num::basic::traits::Two;
+use malachite::base::num::conversion::string::options::ToSciOptions;
+use malachite::base::num::conversion::traits::ToSci;
 use malachite::Rational;
 
 fn main() {
+    let (x, y) = (Rational::from(77617), Rational::from(33096));
+    let x2 = &x * &x;
+    let y2 = &y * &y;
+    let y4 = &y2 * &y2;
+    let y6 = &y4 * &y2;
+    let y8 = &y4 * &y4;
+    let inner =
+        Rational::from(11) * &x2 * y2 - &y6 - Rational::from(121) * y4 - Rational::TWO;
+    let exact = Rational::from_signeds(1335, 4) * y6
+        + x2 * inner
+        + Rational::from_signeds(11, 2) * y8
+        + x / (Rational::TWO * y);
     let mut options = ToSciOptions::default();
-    options.set_precision(30);
-    println!("{}", Rational::from(3).pow(-1_000_000i64).to_sci_with_options(options));
+    options.set_precision(20);
+    println!("{} ~ {}", exact, exact.to_sci_with_options(options));
 }
 ```
 The output is this:
 ```
-5.56263209915712886588211486263e-477122
+-54767/66192 ~ -0.82739605994682136814
 ```
-Every digit is correct, except that the least-significant digit was rounded up from 2. The default
-rounding mode,
-[`Nearest`](https://docs.rs/malachite-base/latest/malachite_base/rounding_modes/enum.RoundingMode.html#variant.Nearest),
-uses [bankers' rounding](https://en.wikipedia.org/wiki/Rounding#Rounding_half_to_even), but you may
-specify different rounding behavior via the options parameter.
+The same formula evaluated in `f64` arithmetic gives roughly $$-1.18 \times 10^{21}$$ — off by
+twenty-one orders of magnitude.
 
 Malachite is designed to work with very large numbers efficiently. See [here](/performance) for a
 performance comparison against other libraries.
@@ -67,8 +111,14 @@ To use Malachite, add the following to your project's `Cargo.toml` file:
 version = "0.10.0"
 ```
 
-By default, all of Malachite's features are included, but you can opt out of some of them. For
-example, if you want to use `Natural` and `Integer` but not `Rational`, you can instead use
+By default, Malachite includes `Natural`, `Integer`, and `Rational`. `Float` support is opt-in:
+```yaml
+[dependencies.malachite]
+version = "0.10.0"
+features = [ "floats" ]
+```
+You can also opt out of the types you don't need. For example, if you want to use `Natural` and
+`Integer` but not `Rational`, you can use
 ```yaml
 [dependencies.malachite]
 version = "0.10.0"
@@ -76,7 +126,7 @@ default-features = false
 features = [ "naturals_and_integers" ]
 ```
 
-The `malachite` crate re-exports three sub-crates.
+The `malachite` crate re-exports four sub-crates.
 - **malachite-base** ([crates.io](https://crates.io/crates/malachite-base)) is a collection of utilities
   supporting the other crates. It includes
   - Traits that wrap functions from the standard library, like

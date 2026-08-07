@@ -31,6 +31,7 @@ pub(crate) fn register(runner: &mut Runner) {
     eq_mod::register(runner);
     eq_mod_power_of_2::register(runner);
     extended_gcd::register(runner);
+    extended_gcd_partial::register(runner);
     factorial::register(runner);
     fibonacci::register(runner);
     #[cfg(feature = "float_helpers")]
@@ -119,6 +120,7 @@ mod divisible_by_power_of_2;
 mod eq_mod;
 mod eq_mod_power_of_2;
 mod extended_gcd;
+mod extended_gcd_partial;
 mod factorial;
 mod fibonacci;
 #[cfg(feature = "float_helpers")]

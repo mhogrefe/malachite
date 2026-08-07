@@ -1247,6 +1247,15 @@ pub fn exhaustive_natural_triple_gen_var_3() -> It<(Natural, Natural, Natural)> 
     )
 }
 
+pub fn exhaustive_natural_triple_gen_var_10() -> It<(Natural, Natural, Natural)> {
+    Box::new(exhaustive_triples_from_single(exhaustive_naturals()).map(
+        |(a, e, l): (Natural, Natural, Natural)| {
+            let r2 = &a + e;
+            (a, r2, l)
+        },
+    ))
+}
+
 pub fn exhaustive_natural_triple_gen_var_4() -> It<(Natural, Natural, Natural)> {
     Box::new(exhaustive_triples_xxy(
         exhaustive_naturals(),

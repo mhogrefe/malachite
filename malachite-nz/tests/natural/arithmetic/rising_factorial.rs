@@ -53,9 +53,8 @@ fn test_rising_factorial() {
         40,
         "110761315616185365335151075458942328763318272000000000",
     );
-    // - a single-limb base so near the top that some factors overflow the limb: the word-fit
-    //   guard falls through to splitting, unreachable in FLINT, whose small-operand bound
-    //   leaves headroom
+    // - a single-limb base so near the top that some factors overflow the limb: the word-fit guard
+    //   falls through to splitting, unreachable in FLINT, whose small-operand bound leaves headroom
     test(
         "18446744073709551614",
         5,

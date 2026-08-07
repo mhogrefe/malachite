@@ -70,4 +70,7 @@ int run_fmpz_multi_CRT_ui_balanced(const char * arg);
 /* rfac.c */
 int run_fmpz_rfac(const char * arg);
 
+/* xgcd_partial.c */
+int run_fmpz_xgcd_partial(const char * arg);
+
 #endif
