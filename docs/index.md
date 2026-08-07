@@ -67,10 +67,9 @@ Each operation returns its result along with an
 result is below, equal to, or above the exact value; the example discards them with `.0`, but they
 are how you track exactness through a computation.
 
-Exactness is sometimes the whole story. The polynomial below is
-[Rump's example](https://en.wikipedia.org/wiki/Rump%27s_example): evaluated at $$x = 77617$$ and
-$$y = 33096$$ in `f64` arithmetic, the rounding errors prevent the two enormous terms from
-cancelling almost exactly. `Rational` arithmetic is exact, so cancellation works.
+Exactness is sometimes the whole story. The polynomial below is from
+[Rump's example](https://www.tuhh.de/ti3/paper/rump/Ru88a.pdf), evaluated at $$x = 77617$$ and
+$$y = 33096$$.
 
 ```rust
 use malachite::base::num::arithmetic::traits::Square;
@@ -102,7 +101,10 @@ The output is this:
 -54767/66192 ≈ -0.82739605994682136814
 ```
 The same formula evaluated in `f64` arithmetic gives roughly $$-1.18 \times 10^{21}$$: off by
-twenty-one orders of magnitude.
+twenty-one orders of magnitude. In Rump's original 1988 paper, an IBM mainframe was wrong more
+subtly: single, double, and extended precision all agreed on $$+1.172603\ldots$$, the same
+incorrect answer at every precision — agreement between precisions is no guarantee of
+correctness.
 
 Malachite is designed to work with very large numbers efficiently. See [here](/performance) for a
 performance comparison against other libraries.
