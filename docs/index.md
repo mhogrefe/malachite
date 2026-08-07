@@ -32,7 +32,7 @@ The code above outputs the following:
 You have to scroll to see the entire output.
 
 Here is [Ramanujan's constant](https://en.wikipedia.org/wiki/Heegner_number#Almost_integers_and_Ramanujan's_constant),
-$$e^{\pi \sqrt{163}}$$, which is famously — and not by coincidence — within a trillionth of an
+$$e^{\pi \sqrt{163}}$$, which is famously, and not by coincidence, within a trillionth of an
 integer. Computing it takes real arbitrary-precision machinery: a transcendental constant, a
 square root, and an exponential, each correctly rounded to 200 bits. Only the starting values
 name a precision; every operation after that inherits the precision of its input, or the larger
@@ -65,9 +65,8 @@ are how you track exactness through a computation.
 
 Exactness is sometimes the whole story. The polynomial below is
 [Rump's example](https://en.wikipedia.org/wiki/Rump%27s_example): evaluated at $$x = 77617$$ and
-$$y = 33096$$ in `f64` arithmetic, the rounding errors don't just lose precision — they get the
-magnitude and the story wrong, because two enormous terms cancel almost exactly. `Rational`
-arithmetic is exact, so cancellation costs it nothing.
+$$y = 33096$$ in `f64` arithmetic, the rounding errors prevent the two enormous terms from cancelling almost exactly. `Rational`
+arithmetic is exact, so cancellation works.
 
 ```rust
 use malachite::base::num::basic::traits::Two;
@@ -95,9 +94,9 @@ fn main() {
 ```
 The output is this:
 ```
--54767/66192 ~ -0.82739605994682136814
+-54767/66192 ≈ -0.82739605994682136814
 ```
-The same formula evaluated in `f64` arithmetic gives roughly $$-1.18 \times 10^{21}$$ — off by
+The same formula evaluated in `f64` arithmetic gives roughly $$-1.18 \times 10^{21}$$: off by
 twenty-one orders of magnitude.
 
 Malachite is designed to work with very large numbers efficiently. See [here](/performance) for a
