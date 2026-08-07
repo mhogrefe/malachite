@@ -36,7 +36,10 @@ $$e^{\pi \sqrt{163}}$$, which is famously, and not by coincidence, within a tril
 integer. Computing it takes real arbitrary-precision machinery: a transcendental constant, a
 square root, and an exponential, each correctly rounded to 200 bits. Only the starting values
 name a precision; every operation after that inherits the precision of its input, or the larger
-precision of its two inputs. (`Float` support is enabled by the `floats` feature.)
+precision of its two inputs. The default rounding mode is round-to-nearest, but every function
+that rounds also has a variant that lets you specify one of six rounding modes.
+
+`Float` support is enabled by the `floats` feature.
 
 ```rust
 use malachite::base::num::arithmetic::traits::{Exp, Sqrt};
@@ -58,15 +61,16 @@ The output is this, with twelve nines after the decimal point:
 ```
 262537412640768743.999999999999250072597198186
 ```
-Every digit is correct. Each operation returns its result along with an
+Every digit is correct, except that in the least-significant place, a 5 has been rounded up to a 6.
+Each operation returns its result along with an
 [`Ordering`](https://doc.rust-lang.org/nightly/core/cmp/enum.Ordering.html) reporting whether that
 result is below, equal to, or above the exact value; the example discards them with `.0`, but they
 are how you track exactness through a computation.
 
 Exactness is sometimes the whole story. The polynomial below is
 [Rump's example](https://en.wikipedia.org/wiki/Rump%27s_example): evaluated at $$x = 77617$$ and
-$$y = 33096$$ in `f64` arithmetic, the rounding errors prevent the two enormous terms from cancelling almost exactly. `Rational`
-arithmetic is exact, so cancellation works.
+$$y = 33096$$ in `f64` arithmetic, the rounding errors prevent the two enormous terms from
+cancelling almost exactly. `Rational` arithmetic is exact, so cancellation works.
 
 ```rust
 use malachite::base::num::basic::traits::Two;
