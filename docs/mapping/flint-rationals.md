@@ -397,14 +397,13 @@ computes them.
 ## [Modular reduction and rational reconstruction](https://flintlib.org/doc/fmpq.html#modular-reduction-and-rational-reconstruction) {#modular-reduction-and-rational-reconstruction}
 
 The round trip at the heart of multimodular algorithms: project a rational to a residue, compute
-with residues, and recover the rational at the end. The projection maps; the recovery is this
-page's largest gap.
+with residues, and recover the rational at the end. Both directions map.
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
 | ✓ | `int fmpq_mod_fmpz (fmpz_t res, const fmpq_t x, const fmpz_t mod)` | [`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModInverse.html), [`ModMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModMul.html) |
-| ✗ | `int fmpq_reconstruct_fmpz_2 (fmpq_t res, const fmpz_t a, const fmpz_t m, const fmpz_t N, const fmpz_t D)` | |
-| ✗ | `int fmpq_reconstruct_fmpz (fmpq_t res, const fmpz_t a, const fmpz_t m)` | |
+| ✓ | `int fmpq_reconstruct_fmpz_2 (fmpq_t res, const fmpz_t a, const fmpz_t m, const fmpz_t N, const fmpz_t D)` | [`Rational::reconstruct_with_bounds`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html#method.reconstruct_with_bounds) |
+| ✓ | `int fmpq_reconstruct_fmpz (fmpq_t res, const fmpz_t a, const fmpz_t m)` | [`Rational::reconstruct`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html#method.reconstruct) |
 
 **`fmpq_mod_fmpz`.** The residue `a` with $$n \equiv a d \pmod m$$: reduce the denominator,
 invert it, and multiply by the reduced numerator, on the machinery of
@@ -418,15 +417,33 @@ exactly when the denominator has no inverse, so the mapped composition and FLINT
 input.
 
 **`fmpq_reconstruct_fmpz_2`, `fmpq_reconstruct_fmpz`.** The way back. Given a residue `a`
-modulo `m` and height bounds `N`, `D` with $$2ND < m$$, reconstruction finds the unique
-fraction `n/d` with $$|n| \le N$$, $$0 < d \le D$$, and $$n \equiv ad \pmod m$$, if one exists;
-the shorter form uses the balanced bounds $$N = D = \lfloor\sqrt{(m-1)/2}\rfloor$$. This is how a multimodular computation, many images
-under `fmpq_mod_fmpz` combined by CRT, becomes a rational answer again. Malachite has none of
-it yet, and the missing engine is one already on the books: reconstruction is a half-GCD run
-with early termination, precisely the algorithm exported as `fmpz_xgcd_partial`,
-[a gap on the fmpz page](/mapping/flint-integers/#greatest-common-divisor), so the two are one
-work item. The bounds `N` and `D` are height bounds, the quantity whose function is
-[committed to under Comparison](#comparison); the pieces are planned together.
+modulo `m` and positive bounds `N`, `D` with $$2ND < m$$, reconstruction finds the unique
+fraction `n/d` with $$|n| \le N$$, $$0 < d \le D$$, $$\gcd(n, d) = 1$$, and
+$$n \equiv ad \pmod m$$, if one exists; the shorter form uses the balanced bounds
+$$N = D = \lfloor\sqrt{(m-1)/2}\rfloor$$. This is how a multimodular computation, many images
+under `fmpq_mod_fmpz` combined by CRT, becomes a rational answer again. The mapped functions are
+[`Rational::reconstruct_with_bounds`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html#method.reconstruct_with_bounds)
+and
+[`Rational::reconstruct`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html#method.reconstruct),
+with
+[`Rational::reconstruct_with_bounds_ref`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html#method.reconstruct_with_bounds_ref)
+and
+[`Rational::reconstruct_ref`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html#method.reconstruct_ref)
+taking their arguments by reference. FLINT's success flag and out-parameter become an
+[`Option`](https://doc.rust-lang.org/nightly/std/option/enum.Option.html): `None` is FLINT's 0.
+The residue is a
+[`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html), so
+$$a \ge 0$$ is carried by the type, and the remaining preconditions, $$a < m$$, positive
+bounds, and $$m > 2$$ for the balanced form, are panics. Within the documented domain
+$$2ND < m$$ the two libraries agree value for value, checked against
+`fmpq_reconstruct_fmpz_2` at every size. Outside that domain the answer is no longer unique
+and neither library promises one; there the mapped functions return the convergent that
+FLINT's reference implementation, `_fmpq_reconstruct_fmpz_2_naive`, returns, while
+`fmpq_reconstruct_fmpz_2` itself can differ from its own reference: its two-limb kernel reads
+the bounds through `fmpz_get_uiui`, which keeps only the low two limbs, so a three-limb bound
+is misread and the kernel can fail on inputs its reference reconstructs. Since
+$$2ND < m$$ forces the bounds to fit wherever `m` fits, no in-contract input reaches the
+misread.
 
 ## [Rational enumeration](https://flintlib.org/doc/fmpq.html#rational-enumeration) {#rational-enumeration}
 

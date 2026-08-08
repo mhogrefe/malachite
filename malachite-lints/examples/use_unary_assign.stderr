@@ -1,0 +1,34 @@
+error: use `not_assign()` (in place) instead of `x = !x`
+  --> $DIR/use_unary_assign.rs:19:5
+   |
+LL |     parity = !parity;
+   |     ^^^^^^^^^^^^^^^^
+   |
+   = note: `#[deny(use_unary_assign)]` on by default
+
+error: use `neg_assign()` (in place) instead of `x = -x`
+  --> $DIR/use_unary_assign.rs:23:5
+   |
+LL |     x = -x;
+   |     ^^^^^^
+
+error: use `neg_assign()` (in place) instead of `x = -x`
+  --> $DIR/use_unary_assign.rs:27:5
+   |
+LL |     n = -n;
+   |     ^^^^^^
+
+error: use `not_assign()` (in place) instead of `x = !x`
+  --> $DIR/use_unary_assign.rs:30:5
+   |
+LL |     m = !m;
+   |     ^^^^^^
+
+error: use `neg_assign()` (in place) instead of `x = -x`
+  --> $DIR/use_unary_assign.rs:47:5
+   |
+LL |     f = -f;
+   |     ^^^^^^
+
+error: aborting due to 5 previous errors
+

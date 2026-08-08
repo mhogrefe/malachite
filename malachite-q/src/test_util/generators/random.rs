@@ -12,8 +12,9 @@ use crate::rational::random::{
     random_nonzero_rationals, random_positive_rationals, random_rationals,
 };
 use crate::test_util::extra_variadic::{
-    random_ordered_unique_triples, random_quadruples_from_single, random_quadruples_xxyz,
-    random_triples, random_triples_from_single, random_triples_xxy, random_triples_xyy,
+    random_ordered_unique_triples, random_quadruples, random_quadruples_from_single,
+    random_quadruples_xxyz, random_triples, random_triples_from_single, random_triples_xxy,
+    random_triples_xyy,
 };
 use crate::test_util::generators::round_to_multiple_rational_filter;
 use malachite_base::bools::random::random_bools;
@@ -58,6 +59,78 @@ use std::cmp::Ordering::*;
 use std::ops::Shr;
 
 // -- Rational --
+
+// (a, m) with a < m and m > 2: valid inputs of Rational::reconstruct
+pub fn random_natural_pair_gen_var_1(config: &GenConfig) -> It<(Natural, Natural)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_naturals(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                random_positive_naturals(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+        )
+        .map(|(a, d)| {
+            let m = &a + d;
+            (a, m)
+        })
+        .filter(|(_, m)| *m > 2u32),
+    )
+}
+
+// (a, m, n_bound, d_bound) with a < m and positive bounds: valid inputs of
+// Rational::reconstruct_with_bounds
+pub fn random_natural_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(Natural, Natural, Natural, Natural)> {
+    Box::new(
+        random_quadruples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_naturals(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                random_positive_naturals(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                random_positive_naturals(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                random_positive_naturals(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+        )
+        .map(|(a, d, n_bound, d_bound)| {
+            let m = &a + d;
+            (a, m, n_bound, d_bound)
+        }),
+    )
+}
 
 pub fn random_rational_gen(config: &GenConfig) -> It<Rational> {
     Box::new(random_rationals(

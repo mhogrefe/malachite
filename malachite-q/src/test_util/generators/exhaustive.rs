@@ -13,8 +13,8 @@ use crate::rational::exhaustive::{
 };
 use crate::test_util::extra_variadic::{
     exhaustive_ordered_unique_triples, exhaustive_quadruples_from_single,
-    exhaustive_quadruples_xxyz, exhaustive_triples_from_single, exhaustive_triples_xxy,
-    exhaustive_triples_xxy_custom_output,
+    exhaustive_quadruples_xxyz, exhaustive_quadruples_xyyy, exhaustive_triples_from_single,
+    exhaustive_triples_xxy, exhaustive_triples_xxy_custom_output,
 };
 use itertools::Itertools;
 use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
@@ -59,6 +59,31 @@ use num::BigRational;
 use std::ops::Shr;
 
 // -- Rational --
+
+// (a, m) with a < m and m > 2: valid inputs of Rational::reconstruct
+pub fn exhaustive_natural_pair_gen_var_1() -> It<(Natural, Natural)> {
+    Box::new(
+        exhaustive_pairs(exhaustive_naturals(), exhaustive_positive_naturals())
+            .map(|(a, d)| {
+                let m = &a + d;
+                (a, m)
+            })
+            .filter(|(_, m)| *m > 2u32),
+    )
+}
+
+// (a, m, n_bound, d_bound) with a < m and positive bounds: valid inputs of
+// Rational::reconstruct_with_bounds
+pub fn exhaustive_natural_quadruple_gen_var_1() -> It<(Natural, Natural, Natural, Natural)> {
+    Box::new(
+        exhaustive_quadruples_xyyy(exhaustive_naturals(), exhaustive_positive_naturals()).map(
+            |(a, d, n_bound, d_bound)| {
+                let m = &a + d;
+                (a, m, n_bound, d_bound)
+            },
+        ),
+    )
+}
 
 pub fn exhaustive_rational_gen() -> It<Rational> {
     Box::new(exhaustive_rationals())

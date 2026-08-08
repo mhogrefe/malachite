@@ -25,7 +25,7 @@ use malachite_base::{
             Abs, DivRem, DivRound, DivisibleBy, FloorRoot, Mod, Parity, UnsignedAbs,
         },
         conversion::traits::{RoundingInto, ToStringBase},
-        logic::traits::BitAccess,
+        logic::traits::{BitAccess, NotAssign},
     },
     rounding_modes::RoundingMode,
 };
@@ -646,7 +646,7 @@ where
 {
     let mut carry = true;
     for d in digits {
-        *d = !*d;
+        d.not_assign();
         if carry {
             *d = d.wrapping_add(1);
             carry = d.is_zero();

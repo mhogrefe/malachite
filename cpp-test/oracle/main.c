@@ -44,6 +44,8 @@ static const oracle_mode modes[] = {
     {"fmpq_height_bits", run_fmpq_height_bits},
     {"fmpq_gcd", run_fmpq_gcd},
     {"fmpq_gcd_cofactors", run_fmpq_gcd_cofactors},
+    {"fmpq_reconstruct", run_fmpq_reconstruct},
+    {"fmpq_reconstruct_2", run_fmpq_reconstruct_2},
 };
 
 int

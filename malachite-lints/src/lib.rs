@@ -65,6 +65,7 @@ mod use_saturating_from;
 mod use_split_in_half;
 mod use_square;
 mod use_trailing_zeros;
+mod use_unary_assign;
 mod use_width_mask;
 
 dylint_linting::dylint_library!();
@@ -452,6 +453,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         use_split_in_half::USE_SPLIT_IN_HALF,
         use_square::USE_SQUARE,
         use_trailing_zeros::USE_TRAILING_ZEROS,
+        use_unary_assign::USE_UNARY_ASSIGN,
         use_width_mask::USE_WIDTH_MASK,
     ]);
     lint_store.register_late_pass(|_| {
@@ -517,6 +519,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
     lint_store.register_late_pass(|_| Box::new(use_split_in_half::UseSplitInHalf));
     lint_store.register_late_pass(|_| Box::new(use_square::UseSquare));
     lint_store.register_late_pass(|_| Box::new(use_trailing_zeros::UseTrailingZeros));
+    lint_store.register_late_pass(|_| Box::new(use_unary_assign::UseUnaryAssign));
     lint_store.register_late_pass(|_| Box::new(use_width_mask::UseWidthMask));
 }
 

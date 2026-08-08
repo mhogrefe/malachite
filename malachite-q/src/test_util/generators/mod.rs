@@ -28,6 +28,27 @@ use malachite_nz::natural::Natural;
 use num::BigRational;
 use std::ops::Shr;
 
+// -- Natural --
+
+// (a, m) with a < m and m > 2: valid inputs of Rational::reconstruct
+pub fn natural_pair_gen_var_1() -> Generator<(Natural, Natural)> {
+    Generator::new(
+        &exhaustive_natural_pair_gen_var_1,
+        &random_natural_pair_gen_var_1,
+        &special_random_natural_pair_gen_var_1,
+    )
+}
+
+// (a, m, n_bound, d_bound) with a < m and positive bounds: valid inputs of
+// Rational::reconstruct_with_bounds
+pub fn natural_quadruple_gen_var_1() -> Generator<(Natural, Natural, Natural, Natural)> {
+    Generator::new(
+        &exhaustive_natural_quadruple_gen_var_1,
+        &random_natural_quadruple_gen_var_1,
+        &special_random_natural_quadruple_gen_var_1,
+    )
+}
+
 // -- Rational --
 
 pub fn rational_gen() -> Generator<Rational> {

@@ -81,4 +81,8 @@ int run_fmpq_height_bits(const char * arg);
 int run_fmpq_gcd(const char * arg);
 int run_fmpq_gcd_cofactors(const char * arg);
 
+/* fmpq_reconstruct.c */
+int run_fmpq_reconstruct(const char * arg);
+int run_fmpq_reconstruct_2(const char * arg);
+
 #endif

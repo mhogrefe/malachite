@@ -23,7 +23,7 @@ use alloc::vec;
 use core::cmp::Ordering::{self, *};
 use core::mem::{swap, take};
 use malachite_base::num::arithmetic::traits::{
-    Abs, Agm, CeilingLogBase2, IsPowerOf2, Ln, LnAssign, Parity, PowerOf2, Sign,
+    Abs, Agm, CeilingLogBase2, IsPowerOf2, Ln, LnAssign, NegAssign, Parity, PowerOf2, Sign,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -73,7 +73,7 @@ pub(crate) fn ln_1_plus_rational_brackets(e: &Rational, wprec: u64) -> (Rational
         k += 1;
         let mut term = &pow / Rational::from(k); // (-1)^(k+1) e^k / k, up to sign
         if k.even() {
-            term = -term;
+            term.neg_assign();
         }
         let s_next = &s + &term; // S_{k+1}
         let (lo, hi) = if negative {
@@ -337,7 +337,7 @@ fn ln_rational_near_one(eps: &Rational, prec: u64, rm: RoundingMode) -> (Float, 
         k += 1;
         let mut term = &pow / Rational::from(k); // |term| when k even, term when k odd
         if k.even() {
-            term = -term;
+            term.neg_assign();
         }
         let s_next = &s + &term; // S_k
         let (lo, hi) = if negative {

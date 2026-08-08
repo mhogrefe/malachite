@@ -39,21 +39,22 @@ pub mod div;
 /// [`ExpressAsPower`](malachite_base::num::factorization::traits::ExpressAsPower), a trait for
 /// expressing a number as a perfect power.
 pub mod express_as_power;
+/// Implementations of [`ExtendedGcd`](malachite_base::num::arithmetic::traits::ExtendedGcd), a
+/// trait for computing the GCD of two numbers along with Bézout cofactors.
+pub mod extended_gcd;
 /// Implementations of [`Floor`](malachite_base::num::arithmetic::traits::Floor) and
 /// [`FloorAssign`](malachite_base::num::arithmetic::traits::FloorAssign), traits for taking the
-/// floor of a number. Implementations of
-/// [`ExtendedGcd`](malachite_base::num::arithmetic::traits::ExtendedGcd), a trait for computing the
-/// GCD of two numbers along with Bézout cofactors.
-pub mod extended_gcd;
+/// floor of a number.
 pub mod floor;
-/// An implementation of [`IsPowerOf2`](malachite_base::num::arithmetic::traits::IsPowerOf2), a
-/// trait for determining whether a number is an integer power of 2. An implementation of the height
-/// of a [`Rational`](crate::Rational): the larger of the absolute value of its numerator and its
-/// denominator. Implementations of [`Gcd`](malachite_base::num::arithmetic::traits::Gcd) and
+/// Implementations of [`Gcd`](malachite_base::num::arithmetic::traits::Gcd) and
 /// [`GcdAssign`](malachite_base::num::arithmetic::traits::GcdAssign), traits for computing the GCD
 /// (greatest common divisor) of two numbers.
 pub mod gcd;
+/// An implementation of the height of a [`Rational`](crate::Rational): the larger of the absolute
+/// value of its numerator and its denominator.
 pub mod height;
+/// An implementation of [`IsPowerOf2`](malachite_base::num::arithmetic::traits::IsPowerOf2), a
+/// trait for determining whether a number is an integer power of 2.
 pub mod is_power_of_2;
 /// Implementations of traits for taking the base-$b$ logarithm of a number.
 ///
@@ -114,6 +115,9 @@ pub mod power_of_2;
 /// [`ReciprocalAssign`](malachite_base::num::arithmetic::traits::ReciprocalAssign), traits for
 /// computing the reciprocal of a number.
 pub mod reciprocal;
+/// Rational reconstruction: recovering a [`Rational`](crate::Rational) from its residue modulo a
+/// [`Natural`](malachite_nz::natural::Natural).
+pub mod reconstruct;
 /// Implementations of [`CheckedRoot`](malachite_base::num::arithmetic::traits::CheckedRoot), a
 /// trait for computing the root of a number, if the number is a perfect power.
 pub mod root;

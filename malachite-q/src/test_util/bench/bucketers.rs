@@ -16,6 +16,15 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use std::cmp::max;
 
+pub fn quadruple_2_natural_bit_bucketer<T, U, V>(
+    var_name: &str,
+) -> Bucketer<'_, (T, Natural, U, V)> {
+    Bucketer {
+        bucketing_function: &|(_, x, _, _)| usize::exact_from(x.significant_bits()),
+        bucketing_label: format!("{var_name}.significant_bits()"),
+    }
+}
+
 pub fn rational_bit_bucketer(var_name: &str) -> Bucketer<'_, Rational> {
     Bucketer {
         bucketing_function: &|q| usize::exact_from(q.significant_bits()),

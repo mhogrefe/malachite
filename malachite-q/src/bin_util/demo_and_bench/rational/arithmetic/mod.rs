@@ -34,6 +34,7 @@ pub(crate) fn register(runner: &mut Runner) {
     next_power_of_2::register(runner);
     pow::register(runner);
     power_of_2::register(runner);
+    reconstruct::register(runner);
     reciprocal::register(runner);
     root::register(runner);
     round_to_multiple::register(runner);
@@ -74,6 +75,7 @@ mod next_power_of_2;
 mod pow;
 mod power_of_2;
 mod reciprocal;
+mod reconstruct;
 mod root;
 mod round_to_multiple;
 mod round_to_multiple_of_power_of_2;

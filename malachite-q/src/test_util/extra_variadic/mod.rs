@@ -80,6 +80,17 @@ custom_tuples!(
     [Y, J, ys, ys_done, [2, output_type_ys_2]],
     [Z, K, zs, zs_done, [3, output_type_zs_3]]
 );
+custom_tuples!(
+    (pub(crate)),
+    ExhaustiveQuadruplesXYYY,
+    (X, Y, Y, Y),
+    (None, None, None, None),
+    unwrap_quadruple,
+    exhaustive_quadruples_xyyy,
+    exhaustive_quadruples_xyyy_custom_output,
+    [X, I, xs, xs_done, [0, output_type_xs_0]],
+    [Y, J, ys, ys_done, [1, output_type_ys_1], [2, output_type_ys_2], [3, output_type_ys_3]]
+);
 
 exhaustive_ordered_unique_tuples!(
     (pub(crate)),

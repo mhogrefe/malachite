@@ -93,6 +93,7 @@ pub mod rational {
         pub mod pow;
         pub mod power_of_2;
         pub mod reciprocal;
+        pub mod reconstruct;
         pub mod root;
         pub mod round_to_multiple;
         pub mod round_to_multiple_of_power_of_2;
