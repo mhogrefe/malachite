@@ -20,6 +20,7 @@ pub(crate) fn register(runner: &mut Runner) {
     div::register(runner);
     express_as_power::register(runner);
     floor::register(runner);
+    gcd::register(runner);
     height::register(runner);
     is_power_of_2::register(runner);
     log_base::register(runner);
@@ -58,6 +59,7 @@ mod denominators_in_closed_interval;
 mod div;
 mod express_as_power;
 mod floor;
+mod gcd;
 mod height;
 mod is_power_of_2;
 mod log_base;

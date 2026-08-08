@@ -348,8 +348,8 @@ trait.
 | ✓ | `void fmpq_div_fmpz (fmpq_t res, const fmpq_t op, const fmpz_t x)` | [`Div`](https://doc.rust-lang.org/nightly/std/ops/trait.Div.html) |
 | ✓ | `void fmpq_mul_2exp (fmpq_t res, const fmpq_t x, flint_bitcnt_t exp)` | [`Shl`](https://doc.rust-lang.org/nightly/std/ops/trait.Shl.html), [`ShlAssign`](https://doc.rust-lang.org/nightly/std/ops/trait.ShlAssign.html) |
 | ✓ | `void fmpq_div_2exp (fmpq_t res, const fmpq_t x, flint_bitcnt_t exp)` | [`Shr`](https://doc.rust-lang.org/nightly/std/ops/trait.Shr.html), [`ShrAssign`](https://doc.rust-lang.org/nightly/std/ops/trait.ShrAssign.html) |
-| ✗ | `void fmpq_gcd (fmpq_t res, const fmpq_t op1, const fmpq_t op2)` | |
-| ✗ | `void fmpq_gcd_cofactors (fmpq_t g, fmpz_t abar, fmpz_t bbar, const fmpq_t a, const fmpq_t b)` | |
+| ✓ | `void fmpq_gcd (fmpq_t res, const fmpq_t op1, const fmpq_t op2)` | [`Gcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Gcd.html), [`GcdAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.GcdAssign.html) |
+| ≈ | `void fmpq_gcd_cofactors (fmpq_t g, fmpz_t abar, fmpz_t bbar, const fmpq_t a, const fmpq_t b)` | [`ExtendedGcd`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ExtendedGcd.html) |
 
 **The operators and mixed forms.** `op1 + op2` through `op1 / op2`, with division by zero a
 panic where FLINT raises an error, and FLINT's blanket aliasing permission answered by the
@@ -383,12 +383,16 @@ whose powers stay small, here `0` and `±1`, before converting.
 
 **`fmpq_gcd`, `fmpq_gcd_cofactors`.** The GCD of two rationals, which FLINT defines as the
 canonical form of $$\gcd(ps, qr)/(qs)$$ for $$p/q$$ and $$r/s$$, noting that this "is apparently
-Euclid's original definition and is stable under scaling of numerator and denominator". No
-Malachite counterpart exists yet; one is planned. For canonical inputs the definition reduces
-to a composition over components,
-`Rational::from_naturals(p.gcd(&r), q.lcm(&s))` with numerators `p`, `r` and denominators `q`,
-`s`, and the cofactors that `fmpq_gcd_cofactors` also returns, `a/g` and `b/g`, are exact
-integers by construction.
+Euclid's original definition and is stable under scaling of numerator and denominator".
+`Rational` implements `Gcd` and `GcdAssign` with exactly this definition, which for canonical
+values — the only kind Malachite has — is $$\gcd(p, r)/\operatorname{lcm}(q, s)$$. The
+cofactor row is ≈ because the two functions return different cofactors for the same GCD:
+FLINT returns the integer quotients $$a/g$$ and $$b/g$$, while `Rational`'s `ExtendedGcd`
+returns integer Bézout cofactors $$u$$ and $$v$$ with $$ua + vb = g$$, matching the trait's
+meaning on the other types. Each is a short step from the other: FLINT's quotients are the
+exact divisions `a / &g` and `b / &g`, and since those quotients are coprime, one integer
+`extended_gcd` of them produces Malachite's cofactors, which is how the implementation
+computes them.
 
 ## [Modular reduction and rational reconstruction](https://flintlib.org/doc/fmpq.html#modular-reduction-and-rational-reconstruction) {#modular-reduction-and-rational-reconstruction}
 

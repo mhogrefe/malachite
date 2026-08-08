@@ -41,12 +41,18 @@ pub mod div;
 pub mod express_as_power;
 /// Implementations of [`Floor`](malachite_base::num::arithmetic::traits::Floor) and
 /// [`FloorAssign`](malachite_base::num::arithmetic::traits::FloorAssign), traits for taking the
-/// floor of a number.
+/// floor of a number. Implementations of
+/// [`ExtendedGcd`](malachite_base::num::arithmetic::traits::ExtendedGcd), a trait for computing the
+/// GCD of two numbers along with Bézout cofactors.
+pub mod extended_gcd;
 pub mod floor;
 /// An implementation of [`IsPowerOf2`](malachite_base::num::arithmetic::traits::IsPowerOf2), a
 /// trait for determining whether a number is an integer power of 2. An implementation of the height
 /// of a [`Rational`](crate::Rational): the larger of the absolute value of its numerator and its
-/// denominator.
+/// denominator. Implementations of [`Gcd`](malachite_base::num::arithmetic::traits::Gcd) and
+/// [`GcdAssign`](malachite_base::num::arithmetic::traits::GcdAssign), traits for computing the GCD
+/// (greatest common divisor) of two numbers.
+pub mod gcd;
 pub mod height;
 pub mod is_power_of_2;
 /// Implementations of traits for taking the base-$b$ logarithm of a number.

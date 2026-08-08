@@ -42,6 +42,8 @@ static const oracle_mode modes[] = {
     {"fmpz_xgcd_partial", run_fmpz_xgcd_partial},
     {"fmpq_height", run_fmpq_height},
     {"fmpq_height_bits", run_fmpq_height_bits},
+    {"fmpq_gcd", run_fmpq_gcd},
+    {"fmpq_gcd_cofactors", run_fmpq_gcd_cofactors},
 };
 
 int

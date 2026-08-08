@@ -246,6 +246,13 @@ fn main() {
         "demo_rational_height_significant_bits",
         "fmpq_height_bits",
     );
+    check_demo_against_flint(&oracle, "../malachite-q", "demo_rational_gcd", "fmpq_gcd");
+    check_demo_against_flint(
+        &oracle,
+        "../malachite-q",
+        "demo_rational_extended_gcd",
+        "fmpq_gcd_cofactors",
+    );
 
     println!("testing primitive_root_prime unit tests");
     {
