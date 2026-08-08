@@ -44,7 +44,10 @@ pub mod express_as_power;
 /// floor of a number.
 pub mod floor;
 /// An implementation of [`IsPowerOf2`](malachite_base::num::arithmetic::traits::IsPowerOf2), a
-/// trait for determining whether a number is an integer power of 2.
+/// trait for determining whether a number is an integer power of 2. An implementation of the height
+/// of a [`Rational`](crate::Rational): the larger of the absolute value of its numerator and its
+/// denominator.
+pub mod height;
 pub mod is_power_of_2;
 /// Implementations of traits for taking the base-$b$ logarithm of a number.
 ///

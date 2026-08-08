@@ -78,6 +78,7 @@ pub mod rational {
         pub mod div;
         pub mod express_as_power;
         pub mod floor;
+        pub mod height;
         pub mod is_power_of_2;
         pub mod log_base;
         pub mod log_base_2;

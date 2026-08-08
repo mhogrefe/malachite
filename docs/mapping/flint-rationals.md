@@ -175,8 +175,8 @@ take.
 | ✓ | `int fmpq_cmp_fmpz (const fmpq_t x, const fmpz_t y)` | [`PartialOrd`](https://doc.rust-lang.org/nightly/std/cmp/trait.PartialOrd.html) |
 | ✓ | `int fmpq_cmp_si (const fmpq_t x, slong y)` | [`PartialOrd`](https://doc.rust-lang.org/nightly/std/cmp/trait.PartialOrd.html) |
 | ✓ | `int fmpq_cmp_ui (const fmpq_t x, ulong y)` | [`PartialOrd`](https://doc.rust-lang.org/nightly/std/cmp/trait.PartialOrd.html) |
-| ✗ | `void fmpq_height (fmpz_t height, const fmpq_t x)` | |
-| ✗ | `flint_bitcnt_t fmpq_height_bits (const fmpq_t x)` | |
+| ✓ | `void fmpq_height (fmpz_t height, const fmpq_t x)` | [`Rational::to_height`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html#method.to_height), [`Rational::into_height`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html#method.into_height) |
+| ✓ | `flint_bitcnt_t fmpq_height_bits (const fmpq_t x)` | [`Rational::height_significant_bits`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html#method.height_significant_bits) |
 
 **The predicates and comparisons.** `x == 0`, `x == 1`, and `x.eq_abs(&1)` for the `pm1` test;
 `==` against another
@@ -191,10 +191,14 @@ comparison.
 **`fmpq_height`, `fmpq_height_bits`.** The height of a rational, the larger of `|p|` and `q`,
 is the measure by which Diophantine results are stated: bounds on heights are what rational
 reconstruction consumes, later in this chapter, and what approximation theorems are written in.
-Malachite has no height function yet; a dedicated one is planned. Until then the composition is
-short, since the components are already magnitudes:
-`max(x.numerator_ref(), x.denominator_ref())` is the height, and `.significant_bits()` of that
-is `fmpq_height_bits`.
+`to_height` and `into_height` follow the shape of the numerator and denominator extractors,
+by reference with a clone or by value without one, and the components are already magnitudes,
+so no absolute value is taken. `height_significant_bits` is `fmpq_height_bits`; since bit
+length is monotone, it equals `to_height().significant_bits()` without materializing the
+height. Note the distinction from
+[`significant_bits`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html#impl-SignificantBits-for-%26Rational),
+which is the *sum* of the components' bit counts, a size measure rather than a height
+measure.
 
 ## [Conversion](https://flintlib.org/doc/fmpq.html#conversion) {#conversion}
 

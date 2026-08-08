@@ -73,4 +73,8 @@ int run_fmpz_rfac(const char * arg);
 /* xgcd_partial.c */
 int run_fmpz_xgcd_partial(const char * arg);
 
+/* height.c */
+int run_fmpq_height(const char * arg);
+int run_fmpq_height_bits(const char * arg);
+
 #endif

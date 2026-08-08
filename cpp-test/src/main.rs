@@ -228,6 +228,24 @@ fn main() {
         "demo_natural_extended_gcd_partial",
         "fmpz_xgcd_partial",
     );
+    check_demo_against_flint(
+        &oracle,
+        "../malachite-q",
+        "demo_rational_to_height",
+        "fmpq_height",
+    );
+    check_demo_against_flint(
+        &oracle,
+        "../malachite-q",
+        "demo_rational_into_height",
+        "fmpq_height",
+    );
+    check_demo_against_flint(
+        &oracle,
+        "../malachite-q",
+        "demo_rational_height_significant_bits",
+        "fmpq_height_bits",
+    );
 
     println!("testing primitive_root_prime unit tests");
     {
