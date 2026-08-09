@@ -277,6 +277,18 @@ fn main() {
         "demo_rational_reconstruct_with_bounds_ref",
         "fmpq_reconstruct_2",
     );
+    check_demo_against_flint(
+        &oracle,
+        "../malachite-q",
+        "demo_rational_reconstruct_tier_rows",
+        "fmpq_reconstruct",
+    );
+    check_demo_against_flint(
+        &oracle,
+        "../malachite-q",
+        "demo_rational_reconstruct_tier_rows",
+        "fmpq_reconstruct_2",
+    );
 
     println!("testing primitive_root_prime unit tests");
     {

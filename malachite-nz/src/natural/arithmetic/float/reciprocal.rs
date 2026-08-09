@@ -41,7 +41,7 @@ use malachite_base::num::arithmetic::traits::{
     WrappingAddAssign, WrappingNegAssign, WrappingSubAssign, XMulYToZZ, XXSubYYToZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::conversion::traits::WrappingFrom;
+use malachite_base::num::conversion::traits::{SplitInHalf, WrappingFrom};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::slices::slice_test_zero;
 
@@ -291,10 +291,7 @@ fn reciprocal_float_2_approx(x_1: Limb, x_0: Limb) -> (Limb, Limb) {
     // Add floor(r_0 * inv / B) to q_0. The widening spelling is deliberate: only the floor is
     // needed, in a per-limb kernel, and `mul_shr_round` would also compute the rounding bookkeeping
     // that this call site discards.
-    #[cfg_attr(dylint_lib = "malachite_lints", expect(use_mul_shr_round))]
-    if r_0.overflowing_add_assign(Limb::wrapping_from(
-        (DoubleLimb::from(r_0) * DoubleLimb::from(inv)) >> Limb::WIDTH,
-    )) {
+    if r_0.overflowing_add_assign((DoubleLimb::from(r_0) * DoubleLimb::from(inv)).upper_half()) {
         q_1.wrapping_add_assign(1);
     }
     assert!(r_1 <= 4);

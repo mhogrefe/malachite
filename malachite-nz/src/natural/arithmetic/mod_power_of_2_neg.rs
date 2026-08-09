@@ -45,13 +45,12 @@ impl ModPowerOf2Neg for Natural {
     /// );
     /// ```
     #[inline]
-    fn mod_power_of_2_neg(mut self, pow: u64) -> Self {
+    fn mod_power_of_2_neg(self, pow: u64) -> Self {
         assert!(
             self.significant_bits() <= pow,
             "self must be reduced mod 2^pow, but {self} >= 2^{pow}"
         );
-        self.neg_mod_power_of_2_assign(pow);
-        self
+        self.neg_mod_power_of_2(pow)
     }
 }
 

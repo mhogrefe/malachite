@@ -1,0 +1,28 @@
+error: use `coprime_with()` instead of comparing a gcd with 1
+  --> $DIR/use_coprime_with.rs:17:13
+   |
+LL |     let _ = (&X).gcd(&Y) == 1u32;
+   |             ^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[deny(use_coprime_with)]` on by default
+
+error: use `!coprime_with()` instead of comparing a gcd with 1
+  --> $DIR/use_coprime_with.rs:19:13
+   |
+LL |     let _ = (&X).gcd(&Y) != 1u32;
+   |             ^^^^^^^^^^^^^^^^^^^^
+
+error: use `coprime_with()` instead of comparing a gcd with 1
+  --> $DIR/use_coprime_with.rs:21:13
+   |
+LL |     let _ = 1u32 == (&X).gcd(&Y);
+   |             ^^^^^^^^^^^^^^^^^^^^
+
+error: use `coprime_with()` instead of comparing a gcd with 1
+  --> $DIR/use_coprime_with.rs:25:13
+   |
+LL |     let _ = a.gcd(b) == 1;
+   |             ^^^^^^^^^^^^^
+
+error: aborting due to 4 previous errors
+

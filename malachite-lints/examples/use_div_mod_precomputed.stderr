@@ -13,19 +13,19 @@ LL |         let _ = &xs[i] % &d;
    |                 ^^^^^^^^^^^
 
 error: this division's divisor is loop-invariant; call `precompute_div_mod_data()` outside the loop and use `div_mod_precomputed()` here
-  --> $DIR/use_div_mod_precomputed.rs:26:17
+  --> $DIR/use_div_mod_precomputed.rs:30:17
    |
 LL |         let _ = &xs[i] / &d;
    |                 ^^^^^^^^^^^
 
 error: this division's divisor is loop-invariant; call `precompute_div_mod_data()` outside the loop and use `div_mod_precomputed()` here
-  --> $DIR/use_div_mod_precomputed.rs:30:17
+  --> $DIR/use_div_mod_precomputed.rs:34:17
    |
 LL |         let _ = y.div_rem(&e);
    |                 ^^^^^^^^^^^^^
 
 error: this division's divisor is loop-invariant; call `precompute_div_mod_data()` outside the loop and use `div_mod_precomputed()` here
-  --> $DIR/use_div_mod_precomputed.rs:34:17
+  --> $DIR/use_div_mod_precomputed.rs:38:17
    |
 LL |         let _ = x.div_assign_mod(&d);
    |                 ^^^^^^^^^^^^^^^^^^^^

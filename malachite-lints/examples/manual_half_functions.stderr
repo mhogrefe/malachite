@@ -1,0 +1,34 @@
+error: use `join_halves()` instead of assembling the halves with a shift
+  --> $DIR/manual_half_functions.rs:14:5
+   |
+LL |     (u64::from(hi) << u32::WIDTH) | u64::from(lo)
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[deny(manual_half_functions)]` on by default
+
+error: use `join_halves()` instead of assembling the halves with a shift
+  --> $DIR/manual_half_functions.rs:19:5
+   |
+LL |     (u64::from(hi) << 32) + u64::from(lo)
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `join_halves()` instead of assembling the halves with a shift
+  --> $DIR/manual_half_functions.rs:24:5
+   |
+LL |     u64::from(lo) | (u64::from(hi) << 32)
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `upper_half()` instead of shifting and converting down
+  --> $DIR/manual_half_functions.rs:29:5
+   |
+LL |     u32::wrapping_from(x >> 32)
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `upper_half()` instead of shifting and converting down
+  --> $DIR/manual_half_functions.rs:34:5
+   |
+LL |     u32::exact_from(x >> u32::WIDTH)
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: aborting due to 5 previous errors
+

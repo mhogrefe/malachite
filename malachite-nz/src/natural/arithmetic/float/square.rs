@@ -345,14 +345,14 @@ fn square_float_significand_same_prec_gt_2w_lt_3w(
         a2.wrapping_add_assign(1);
     }
     let mut carry = Limb::from(a0.overflowing_add_assign(a0));
-    let x_0_x_2_hi = Limb::wrapping_from(x_0_x_2 >> Limb::WIDTH);
+    let x_0_x_2_hi = x_0_x_2.upper_half();
     if a0.overflowing_add_assign(x_0_x_2_hi) {
         carry += 1;
     }
     if a0.overflowing_add_assign(x_0_x_2_hi) {
         carry += 1;
     }
-    if a0.overflowing_add_assign(Limb::wrapping_from(x_1_x_1 >> Limb::WIDTH)) {
+    if a0.overflowing_add_assign(x_1_x_1.upper_half()) {
         carry += 1;
     }
     // now propagate carry

@@ -27,8 +27,8 @@ use crate::platform::{
 use alloc::vec::Vec;
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    AddMulAssign, DoubleFactorial, Factorial, Gcd, Multifactorial, Parity, Pow, PowerOf2, Square,
-    Subfactorial, XMulYToZZ,
+    AddMul, AddMulAssign, DoubleFactorial, Factorial, Gcd, Multifactorial, Parity, Pow, PowerOf2,
+    Square, Subfactorial, XMulYToZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
@@ -119,9 +119,8 @@ fn subfactorial_split_only_b(lo: u64, hi: u64) -> Natural {
     } else {
         let mid = lo + ((pairs - (pairs >> 1)) << 1);
         let b_lo = subfactorial_split_only_b(lo, mid - 2);
-        let (a_hi, mut b_hi) = subfactorial_split(mid, hi);
-        b_hi.add_mul_assign(a_hi, b_lo);
-        b_hi
+        let (a_hi, b_hi) = subfactorial_split(mid, hi);
+        b_hi.add_mul(a_hi, b_lo)
     }
 }
 

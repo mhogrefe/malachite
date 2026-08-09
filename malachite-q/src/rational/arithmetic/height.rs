@@ -96,9 +96,22 @@ impl Rational {
     /// use malachite_q::Rational;
     /// use std::str::FromStr;
     ///
-    /// assert_eq!(Rational::from_str("22/7").unwrap().height_significant_bits(), 5);
-    /// assert_eq!(Rational::from_str("-1/101").unwrap().height_significant_bits(), 7);
-    /// assert_eq!(Rational::from_str("0").unwrap().height_significant_bits(), 1);
+    /// assert_eq!(
+    ///     Rational::from_str("22/7")
+    ///         .unwrap()
+    ///         .height_significant_bits(),
+    ///     5
+    /// );
+    /// assert_eq!(
+    ///     Rational::from_str("-1/101")
+    ///         .unwrap()
+    ///         .height_significant_bits(),
+    ///     7
+    /// );
+    /// assert_eq!(
+    ///     Rational::from_str("0").unwrap().height_significant_bits(),
+    ///     1
+    /// );
     /// ```
     ///
     /// This is fmpq_height_bits from fmpq/height_bits.c, FLINT 3.6.0.

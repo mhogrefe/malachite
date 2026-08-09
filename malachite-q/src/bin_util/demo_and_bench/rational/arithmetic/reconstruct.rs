@@ -6,9 +6,12 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::num::arithmetic::traits::ModInverse;
+use malachite_base::num::basic::traits::One;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
+use malachite_nz::natural::Natural;
 use malachite_nz::test_util::bench::bucketers::pair_2_natural_bit_bucketer;
 use malachite_q::Rational;
 use malachite_q::test_util::bench::bucketers::quadruple_2_natural_bit_bucketer;
@@ -19,6 +22,7 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_rational_reconstruct_ref);
     register_demo!(runner, demo_rational_reconstruct_with_bounds);
     register_demo!(runner, demo_rational_reconstruct_with_bounds_ref);
+    register_demo!(runner, demo_rational_reconstruct_tier_rows);
 
     register_bench!(runner, benchmark_rational_reconstruct_evaluation_strategy);
     register_bench!(
@@ -66,6 +70,42 @@ fn demo_rational_reconstruct_with_bounds_ref(gm: GenMode, config: &GenConfig, li
         println!(
             "Rational::reconstruct_with_bounds_ref({a}, {m}, {n_bound}, {d_bound}) = {:?}",
             Rational::reconstruct_with_bounds_ref(&a, &m, &n_bound, &d_bound)
+        );
+    }
+}
+
+// Deterministic rows that pin every size tier of the reconstruction, including the huge moduli that
+// engage the subquadratic splitter, which random demo inputs cannot reach. The residues are
+// computed here rather than written out; each line is diffed against FLINT by the oracle mode that
+// recognizes it, and the other lines are skipped.
+fn demo_rational_reconstruct_tier_rows(_gm: GenMode, _config: &GenConfig, limit: usize) {
+    let mut rows = Vec::new();
+    for (num, den, m) in [
+        (22u32, 7u32, Natural::from(97u32)),
+        (22, 7, (Natural::ONE << 64u64) - Natural::from(59u32)),
+        (22, 7, (Natural::ONE << 200u64) - Natural::from(75u32)),
+        (22, 7, (Natural::ONE << 765u64) - Natural::from(111u32)),
+        (22, 7, (Natural::ONE << 800u64) - Natural::from(105u32)),
+        (22, 7, (Natural::ONE << 2000u64) - Natural::from(63u32)),
+        (22, 7, (Natural::ONE << 66000u64) - Natural::from(63u32)),
+        (
+            12345,
+            617,
+            (Natural::ONE << 33100u64) - Natural::from(121u32),
+        ),
+    ] {
+        let a = (Natural::from(num) * Natural::from(den).mod_inverse(&m).unwrap()) % &m;
+        rows.push((a, m));
+    }
+    for (a, m) in rows.into_iter().take(limit) {
+        println!(
+            "Rational::reconstruct({a}, {m}) = {:?}",
+            Rational::reconstruct_ref(&a, &m)
+        );
+        let n_bound = Natural::from(999983u32);
+        println!(
+            "Rational::reconstruct_with_bounds({a}, {m}, {n_bound}, {n_bound}) = {:?}",
+            Rational::reconstruct_with_bounds(a.clone(), m.clone(), &n_bound, &n_bound)
         );
     }
 }

@@ -25,6 +25,8 @@ use crate::num::arithmetic::traits::{
 use crate::num::basic::floats::PrimitiveFloat;
 use crate::num::basic::integers::{PrimitiveInt, USIZE_IS_U32};
 use crate::num::basic::unsigneds::PrimitiveUnsigned;
+#[cfg(feature = "test_build")]
+use crate::num::conversion::traits::SplitInHalf;
 use crate::num::conversion::traits::{
     RawMantissaAndExponent, RoundingFrom, SaturatingFrom, WrappingFrom,
 };
@@ -658,9 +660,7 @@ private_test_fn! {cbrt_chebyshev_approx_u64(n: u64) -> u64 {
 #[cfg(feature = "test_build")]
 fn cbrt_estimate_f64(a: f64) -> f64 {
     const S: u64 = 4607182418800017408; // ((1 << 10) - 1) << 52
-    f64::from_bits(
-        u64::wrapping_from((u128::from(a.to_bits() - S) * 6148914691236517205) >> 64) + S,
-    )
+    f64::from_bits((u128::from(a.to_bits() - S) * 6148914691236517205).upper_half() + S)
 }
 
 // This is equivalent to `n_cbrt` from `ulong_extras/cbrt.c`, FLINT 2.7.1, where `FLINT64` is

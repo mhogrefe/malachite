@@ -79,6 +79,14 @@ major improvement warrants re-porting.
   cloning; use `square()`, `even()`/`odd()`, and `reciprocal()` over their spelled-out
   equivalents; use `split_in_half()` rather than taking `upper_half()` and `lower_half()`
   separately; and keep lines within 100 columns.
+- **Conversions that cannot fail**: when the surrounding argument already establishes that a value
+  fits its target type, convert with `wrapping_from` (or `as` in a `const` context, where the
+  trait methods are unavailable), not `exact_from`. `exact_from` is for conversions whose success
+  is a genuine precondition worth asserting; where the fit is already proven — a residue known to
+  be smaller than a single-limb modulus, the limb count of an allocated value into `usize` — the
+  check is dead weight, and the spelling misleads the reader into thinking the bound is in doubt.
+  Record the reason it fits in a comment instead. (This is not lint-enforced: whether a bound is
+  known is a fact about the algorithm, not the syntax.)
 - **Visibility macros**: `private_test_fn!`/`crate_test_fn!` make internals `pub` under `test_build` so
   tests, demos, and tuning code can call them. For tuner- or test-only entry points that don't fit
   the macros, add explicit `#[cfg(feature = "test_build")] pub fn ..._for_tuning` wrappers.

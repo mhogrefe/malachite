@@ -505,13 +505,13 @@ fn mul_float_significands_same_prec_gt_2w_lt_3w(
         a2.wrapping_add_assign(1);
     }
     let mut carry = Limb::from(a0.overflowing_add_assign(lo));
-    if a0.overflowing_add_assign(Limb::wrapping_from(x_2_y_0 >> Limb::WIDTH)) {
+    if a0.overflowing_add_assign(x_2_y_0.upper_half()) {
         carry += 1;
     }
-    if a0.overflowing_add_assign(Limb::wrapping_from(x_1_y_1 >> Limb::WIDTH)) {
+    if a0.overflowing_add_assign(x_1_y_1.upper_half()) {
         carry += 1;
     }
-    if a0.overflowing_add_assign(Limb::wrapping_from(x_0_y_2 >> Limb::WIDTH)) {
+    if a0.overflowing_add_assign(x_0_y_2.upper_half()) {
         carry += 1;
     }
     // now propagate carry

@@ -1,0 +1,21 @@
+error: use `floor_sqrt()` as the block's value instead of `floor_sqrt_assign` followed by the receiver
+  --> $DIR/assign_then_returned.rs:23:5
+   |
+LL | /     b.floor_sqrt_assign();
+LL | |     b
+   | |_____^
+   |
+   = help: the by-value call produces the value directly
+   = note: `#[deny(assign_then_returned)]` on by default
+
+error: use `next_power_of_2()` as the block's value instead of `next_power_of_2_assign` followed by the receiver
+  --> $DIR/assign_then_returned.rs:29:5
+   |
+LL | /     n.next_power_of_2_assign();
+LL | |     n
+   | |_____^
+   |
+   = help: the by-value call produces the value directly
+
+error: aborting due to 2 previous errors
+

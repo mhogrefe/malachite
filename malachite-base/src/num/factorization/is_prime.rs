@@ -22,8 +22,8 @@
 
 use crate::num::arithmetic::mod_pow::mul_mod_helper;
 use crate::num::arithmetic::traits::{
-    Gcd, JacobiSymbol, ModAdd, ModInverse, ModMulPrecomputed, ModMulPrecomputedAssign, ModSub,
-    Parity, PowerOf2, WrappingAddAssign, WrappingMulSubMul, WrappingNegAssign, XMulYToZZ,
+    CoprimeWith, JacobiSymbol, ModAdd, ModInverse, ModMulPrecomputed, ModMulPrecomputedAssign,
+    ModSub, Parity, PowerOf2, WrappingAddAssign, WrappingMulSubMul, WrappingNegAssign, XMulYToZZ,
     XXAddYYToZZ,
 };
 use crate::num::basic::integers::{PrimitiveInt, USIZE_IS_U32};
@@ -353,7 +353,7 @@ fn is_probable_prime_lucas(n: u64) -> bool {
     for i in 0..100 {
         d = 5 + (i << 1);
         neg_d = false;
-        if d.gcd(n % d) == 1 {
+        if d.coprime_with(n % d) {
             if i.odd() {
                 neg_d = true;
             }

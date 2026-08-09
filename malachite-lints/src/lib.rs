@@ -20,6 +20,7 @@ extern crate rustc_span;
 mod adjacent_vec_allocations;
 mod assert_ordering_equal_prefer_exact;
 mod assign_then_consumed_once;
+mod assign_then_returned;
 mod clone_with_ref_variant;
 mod collapse_adjacent_ifs;
 mod collapse_adjacent_imports;
@@ -30,6 +31,7 @@ mod let_tuple_underscore_to_field;
 mod long_lines;
 mod manual_float_from_primitive;
 mod manual_from_sign_and_abs;
+mod manual_half_functions;
 mod manual_lexicographic_cmp;
 mod manual_rational_significant_bits;
 mod missing_inline_on_delegator;
@@ -50,6 +52,8 @@ mod use_cmp_double;
 mod use_const_binding;
 mod use_const_block;
 mod use_const_cast;
+mod use_coprime_with;
+mod use_div_mod;
 mod use_div_mod_precomputed;
 mod use_divisible_by;
 mod use_exact_from;
@@ -247,6 +251,23 @@ fn assign_trait_impl<'tcx>(
     None
 }
 
+// Whether `ty` implements the trait named by the full path `path` with `Self` as its right-hand
+// side. Unlike `implements_trait_by_path`, which leaves the right-hand side to inference, this
+// works for the four-variant families: `DivMod<T>` and `DivMod<&T>` both exist on the bignum
+// types, so inference has no unambiguous choice and silently reports no implementation at all.
+fn implements_trait_with_self_rhs<'tcx>(
+    cx: &rustc_lint::LateContext<'tcx>,
+    ty: rustc_middle::ty::Ty<'tcx>,
+    path: &str,
+) -> bool {
+    use clippy_utils::paths::{PathNS, lookup_path_str};
+    use clippy_utils::ty::implements_trait;
+    lookup_path_str(cx.tcx, PathNS::Type, path)
+        .into_iter()
+        .filter(|did| cx.tcx.def_kind(*did) == rustc_hir::def::DefKind::Trait)
+        .any(|did| implements_trait(cx, ty, did, &[ty.into()]))
+}
+
 // Whether `ty` implements the trait named by the full path `path`. The traits this is used with are
 // generic in their right-hand side (`SaturatingMulAssign<RHS = Self>`, `OrdDouble<Rhs = Self>`); any
 // right-hand side counts, so every parameter past `Self` is left to inference.
@@ -408,6 +429,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         adjacent_vec_allocations::ADJACENT_VEC_ALLOCATIONS,
         assert_ordering_equal_prefer_exact::ASSERT_ORDERING_EQUAL_PREFER_EXACT,
         assign_then_consumed_once::ASSIGN_THEN_CONSUMED_ONCE,
+        assign_then_returned::ASSIGN_THEN_RETURNED,
         clone_with_ref_variant::CLONE_WITH_REF_VARIANT,
         collapse_adjacent_ifs::COLLAPSE_ADJACENT_IFS,
         collapse_adjacent_imports::COLLAPSE_ADJACENT_IMPORTS,
@@ -418,6 +440,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         long_lines::LONG_LINES,
         manual_float_from_primitive::MANUAL_FLOAT_FROM_PRIMITIVE,
         manual_from_sign_and_abs::MANUAL_FROM_SIGN_AND_ABS,
+        manual_half_functions::MANUAL_HALF_FUNCTIONS,
         manual_lexicographic_cmp::MANUAL_LEXICOGRAPHIC_CMP,
         manual_rational_significant_bits::MANUAL_RATIONAL_SIGNIFICANT_BITS,
         missing_inline_on_delegator::MISSING_INLINE_ON_DELEGATOR,
@@ -438,6 +461,8 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         use_const_binding::USE_CONST_BINDING,
         use_const_block::USE_CONST_BLOCK,
         use_const_cast::USE_CONST_CAST,
+        use_coprime_with::USE_COPRIME_WITH,
+        use_div_mod::USE_DIV_MOD,
         use_div_mod_precomputed::USE_DIV_MOD_PRECOMPUTED,
         use_divisible_by::USE_DIVISIBLE_BY,
         use_exact_from::USE_EXACT_FROM,
@@ -462,6 +487,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
     lint_store.register_late_pass(|_| Box::new(adjacent_vec_allocations::AdjacentVecAllocations));
     lint_store.register_late_pass(|_| Box::new(collapse_adjacent_ifs::CollapseAdjacentIfs));
     lint_store.register_late_pass(|_| Box::new(assign_then_consumed_once::AssignThenConsumedOnce));
+    lint_store.register_late_pass(|_| Box::new(assign_then_returned::AssignThenReturned));
     lint_store.register_late_pass(|_| Box::new(compare_with_power_of_2::CompareWithPowerOf2));
     lint_store.register_late_pass(|_| Box::new(compare_with_primitive::CompareWithPrimitive));
     lint_store.register_late_pass(|_| Box::new(duplicate_const::DuplicateConst::default()));
@@ -471,6 +497,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
     lint_store
         .register_late_pass(|_| Box::new(manual_float_from_primitive::ManualFloatFromPrimitive));
     lint_store.register_late_pass(|_| Box::new(manual_from_sign_and_abs::ManualFromSignAndAbs));
+    lint_store.register_late_pass(|_| Box::new(manual_half_functions::ManualHalfFunctions));
     lint_store.register_late_pass(|_| Box::new(manual_lexicographic_cmp::ManualLexicographicCmp));
     lint_store.register_late_pass(|_| {
         Box::new(manual_rational_significant_bits::ManualRationalSignificantBits)
@@ -504,9 +531,11 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
     lint_store.register_late_pass(|_| Box::new(use_const_binding::UseConstBinding));
     lint_store.register_late_pass(|_| Box::new(use_const_block::UseConstBlock));
     lint_store.register_late_pass(|_| Box::new(use_const_cast::UseConstCast));
+    lint_store.register_late_pass(|_| Box::new(use_coprime_with::UseCoprimeWith));
     lint_store.register_late_pass(|_| Box::new(use_divisible_by::UseDivisibleBy));
     lint_store.register_late_pass(|_| Box::new(use_exact_from::UseExactFrom));
     lint_store.register_late_pass(|_| Box::new(use_fused_mul::UseFusedMul));
+    lint_store.register_late_pass(|_| Box::new(use_div_mod::UseDivMod));
     lint_store.register_late_pass(|_| Box::new(use_div_mod_precomputed::UseDivModPrecomputed));
     lint_store.register_late_pass(|_| Box::new(use_mod_power_of_2::UseModPowerOf2));
     lint_store.register_late_pass(|_| Box::new(use_mod_square::UseModSquare));

@@ -1,0 +1,32 @@
+error: use `div_mod()` instead of computing the quotient and remainder separately
+  --> $DIR/use_div_mod.rs:19:5
+   |
+LL | /     let q = a / b;
+LL | |     let r = a % b;
+   | |__________________^
+   |
+   = note: `#[deny(use_div_mod)]` on by default
+
+error: use `div_mod()` instead of computing the quotient and remainder separately
+  --> $DIR/use_div_mod.rs:23:5
+   |
+LL | /     let r = a % b;
+LL | |     let q = a / b;
+   | |__________________^
+
+error: use `div_rem()` instead of computing the quotient and remainder separately
+  --> $DIR/use_div_mod.rs:29:5
+   |
+LL | /     let q = c / d;
+LL | |     let r = c % d;
+   | |__________________^
+
+error: use `div_mod()` instead of computing the quotient and remainder separately
+  --> $DIR/use_div_mod.rs:33:5
+   |
+LL | /     let q = (&X) / (&Y);
+LL | |     let r = (&X) % (&Y);
+   | |________________________^
+
+error: aborting due to 4 previous errors
+

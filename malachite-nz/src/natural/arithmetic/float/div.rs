@@ -49,7 +49,7 @@ use malachite_base::num::arithmetic::traits::{
     WrappingAddAssign, WrappingNegAssign, WrappingSubAssign, XMulYToZZ, XXSubYYToZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::{ExactFrom, SplitInHalf, WrappingFrom};
 use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::slices::slice_test_zero;
@@ -360,11 +360,9 @@ fn div_float_significands_same_prec_lt_w(
     // First try with an approximate quotient. The widening spelling is deliberate: only the floor
     // is needed, in a per-limb kernel, and `mul_shr_round` would also compute the rounding
     // bookkeeping that this call site discards.
-    #[cfg_attr(dylint_lib = "malachite_lints", expect(use_mul_shr_round))]
-    let mut round_bit = Limb::wrapping_from(
-        (DoubleLimb::from(x) * DoubleLimb::from(limbs_invert_limb::<DoubleLimb, Limb>(y)))
-            >> Limb::WIDTH,
-    );
+    let mut round_bit = (DoubleLimb::from(x)
+        * DoubleLimb::from(limbs_invert_limb::<DoubleLimb, Limb>(y)))
+    .upper_half();
     round_bit.wrapping_add_assign(x);
     let mut q = if increment_exp {
         round_bit >> 1
@@ -442,11 +440,10 @@ fn div_float_significands_same_prec_w(
     // First compute an approximate quotient. The widening spelling is deliberate: only the floor is
     // needed, in a per-limb kernel, and `mul_shr_round` would also compute the rounding bookkeeping
     // that this call site discards.
-    #[cfg_attr(dylint_lib = "malachite_lints", expect(use_mul_shr_round))]
-    let mut q = x.wrapping_add(Limb::wrapping_from(
+    let mut q = x.wrapping_add(
         (DoubleLimb::from(x) * DoubleLimb::from(limbs_invert_limb::<DoubleLimb, Limb>(y)))
-            >> Limb::WIDTH,
-    ));
+            .upper_half(),
+    );
     // round_bit does not exceed the true quotient floor(x * 2 ^ WIDTH / y), with error at most 2,
     // which means the rational quotient q satisfies round_bit <= q < round_bit + 3, thus the true
     // quotient is round_bit, round_bit + 1 or round_bit + 2.
@@ -526,9 +523,7 @@ fn div_float_2_approx(x_1: Limb, x_0: Limb, y_1: Limb, y_0: Limb) -> (Limb, Limb
     // Now inv <= B ^ 2 / (y_1 + 1) - B. The widening spelling is deliberate: only the floor is
     // needed, in a per-limb kernel, and `mul_shr_round` would also compute the rounding bookkeeping
     // that this call site discards.
-    #[cfg_attr(dylint_lib = "malachite_lints", expect(use_mul_shr_round))]
-    let mut q_1 =
-        Limb::wrapping_from((DoubleLimb::from(x_1) * DoubleLimb::from(inv)) >> Limb::WIDTH);
+    let mut q_1 = (DoubleLimb::from(x_1) * DoubleLimb::from(inv)).upper_half();
     q_1.wrapping_add_assign(x_1);
     // Now q_1 <= x_1 * B / (y_1 + 1) < (x_1 * B + x_0) * B / (y_1 * B + y_0).
     //
@@ -561,10 +556,7 @@ fn div_float_2_approx(x_1: Limb, x_0: Limb, y_1: Limb, y_0: Limb) -> (Limb, Limb
     // Add floor(r_0 * inv / B) to q_0. The widening spelling is deliberate: only the floor is
     // needed, in a per-limb kernel, and `mul_shr_round` would also compute the rounding bookkeeping
     // that this call site discards.
-    #[cfg_attr(dylint_lib = "malachite_lints", expect(use_mul_shr_round))]
-    if r_0.overflowing_add_assign(Limb::wrapping_from(
-        (DoubleLimb::from(r_0) * DoubleLimb::from(inv)) >> Limb::WIDTH,
-    )) {
+    if r_0.overflowing_add_assign((DoubleLimb::from(r_0) * DoubleLimb::from(inv)).upper_half()) {
         q_1.wrapping_add_assign(1);
     }
     assert!(r_1 <= 4);

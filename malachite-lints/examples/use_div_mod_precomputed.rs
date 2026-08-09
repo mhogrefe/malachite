@@ -23,6 +23,10 @@ fn main() {
     let mut i = 0;
     while i < 2 {
         let _ = &xs[i] % &d;
+        i += 1;
+    }
+    let mut i = 0;
+    while i < 2 {
         let _ = &xs[i] / &d;
         i += 1;
     }
