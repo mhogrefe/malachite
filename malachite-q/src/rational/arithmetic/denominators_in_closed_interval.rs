@@ -10,12 +10,13 @@ use crate::Rational;
 use crate::rational::arithmetic::traits::{
     DenominatorsInClosedInterval, SimplestRationalInInterval,
 };
-use crate::rational::exhaustive::exhaustive_rationals_with_denominator_inclusive_range;
 use alloc::collections::BinaryHeap;
 use alloc::vec::Vec;
 use core::cmp::{Ordering, Reverse};
-use malachite_base::num::arithmetic::traits::{Ceiling, Reciprocal, UnsignedAbs};
-use malachite_base::num::basic::traits::{One, Two, Zero};
+use malachite_base::num::arithmetic::traits::{
+    Ceiling, CoprimeWith, Floor, Reciprocal, UnsignedAbs,
+};
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::factorization::traits::Primes;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
@@ -23,21 +24,55 @@ use malachite_nz::platform::Limb;
 
 // Returns a k such that for all n >= k, any closed interval with the given diameter is guaranteed
 // to contain rationals with (reduced) denominator n.
-fn smallest_guaranteed_denominator(interval_diameter: &Rational) -> Natural {
+//
+// An interval of diameter s is guaranteed to contain a reduced fraction with denominator d whenever
+// s >= g(d)/d, where g is the Jacobsthal function: the largest gap between integers coprime to d.
+// So a d that can fail satisfies g(d) > s * d, and by Kanold's bound g(d) <= 2^w, where w is the
+// number of distinct prime factors of d, it satisfies d < 2^w/s. The smallest number with w
+// distinct prime factors is the primorial p_w#, so failures with w factors exist only while p_w# <
+// 2^w/s; the primorials outgrow the powers of two, so only finitely many w qualify, and every
+// failing d lies below the largest of their bounds. This is tighter than rounding up to the next
+// primorial, which is what this function used to do: for a diameter of 0.42 it returns 10 rather
+// than 30.
+crate_test_fn! {smallest_guaranteed_denominator(interval_diameter: &Rational) -> Natural {
     if *interval_diameter >= 1u32 {
         return Natural::ONE;
     }
-    let mut primorial = Natural::TWO;
-    let mut pow = Natural::TWO;
-    for p in Limb::primes().skip(1) {
+    let mut primorial = Natural::ONE;
+    let mut pow = Natural::ONE;
+    let mut best = Natural::ONE;
+    for p in Limb::primes() {
+        // Failing denominators with this many distinct prime factors lie below this bound. The
+        // bound doubles with each factor, so the last feasible one dominates.
+        let bound = Rational::from(&pow) / interval_diameter;
+        if bound <= primorial {
+            // No number with this many distinct prime factors is small enough to fail, and each
+            // extra factor at least triples the primorial while only doubling the bound, so larger
+            // factor counts cannot fail either.
+            break;
+        }
+        best = bound.floor().unsigned_abs() + Natural::ONE;
         primorial *= Natural::from(p);
         pow <<= 1;
-        let limit = Rational::from_naturals_ref(&pow, &primorial);
-        if *interval_diameter >= limit {
-            return primorial;
-        }
     }
-    panic!();
+    best
+}}
+
+// Whether the closed interval [a, b] contains a fraction with the given reduced denominator: some
+// integer in [ceil(ad), floor(bd)] coprime to d. The window holds about (b - a)d + 1 integers, so
+// in the scan phase, where d is at most a small multiple of 1/(b - a), it is only a few gcds wide;
+// asking the full per-denominator generator whether it is empty would construct an iterator, and
+// clone both endpoints, per candidate.
+fn denominator_present(a: &Rational, b: &Rational, d: &Natural) -> bool {
+    let mut n = (a * Rational::from(d)).ceiling();
+    let hi = (b * Rational::from(d)).floor();
+    while n <= hi {
+        if n.unsigned_abs_ref().coprime_with(d) {
+            return true;
+        }
+        n += Integer::ONE;
+    }
+    false
 }
 
 fn smallest_likely_denominator(interval_diameter: &Rational) -> Natural {
@@ -169,14 +204,7 @@ impl Iterator for DenominatorsInClosedRationalInterval {
             self.endpoint_denominators.clear();
             loop {
                 self.current += Natural::ONE;
-                if exhaustive_rationals_with_denominator_inclusive_range(
-                    self.current.clone(),
-                    self.a.clone(),
-                    self.b.clone(),
-                )
-                .next()
-                .is_some()
-                {
+                if denominator_present(&self.a, &self.b, &self.current) {
                     return Some(self.current.clone());
                 }
             }

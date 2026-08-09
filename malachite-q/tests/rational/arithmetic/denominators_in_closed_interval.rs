@@ -13,6 +13,7 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::exhaustive::exhaustive_positive_naturals;
 use malachite_q::Rational;
+use malachite_q::rational::arithmetic::denominators_in_closed_interval::*;
 use malachite_q::rational::arithmetic::traits::DenominatorsInClosedInterval;
 use malachite_q::rational::exhaustive::exhaustive_rationals_with_denominator_inclusive_range;
 use malachite_q::test_util::generators::{rational_gen, rational_pair_gen_var_3};
@@ -33,9 +34,19 @@ fn test_denominators_in_closed_interval() {
         "2",
         "[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, ...]",
     );
+    // - this row also pins every branch of the scan phase's window test: an empty window (d = 1
+    //   spans no integer), an immediate coprime hit (d = 2), and a window exhausted through
+    //   non-coprime integers only (d = 4 and d = 6)
     test(
         "1/3",
         "1/2",
+        "[2, 3, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, ...]",
+    );
+    // - a negative interval handled by the scan phase, whose window bounds are negative integers;
+    //   the sequence mirrors the positive interval's
+    test(
+        "-1/2",
+        "-1/3",
         "[2, 3, 5, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, ...]",
     );
     test(
@@ -92,6 +103,30 @@ fn test_denominators_in_closed_interval() {
 }
 
 #[test]
+fn test_smallest_guaranteed_denominator() {
+    let test = |s, out| {
+        assert_eq!(
+            smallest_guaranteed_denominator(&Rational::from_str(s).unwrap()).to_string(),
+            out
+        );
+    };
+    // Expected values cross-checked against exact Jacobsthal computations: for each diameter, an
+    // exhaustive scan verified that no denominator at or above the returned threshold has a coprime
+    // gap exceeding the diameter (the true last failures are 6, 42, 2, 2, and 990).
+    test("21/50", "10");
+    // - the largest feasible factor count dominates
+    test("1/10", "81");
+    // - a diameter close to one, where only the first factor counts are feasible
+    test("2/3", "4");
+    test("9/10", "3");
+    // - a small diameter, where the bound grows through several factor counts
+    test("1/100", "3201");
+    // - a diameter of at least one short-circuits
+    test("1", "1");
+    test("3/2", "1");
+}
+
+#[test]
 #[should_panic]
 fn denominators_in_closed_interval_fail_1() {
     Rational::denominators_in_closed_interval(Rational::ONE, Rational::ONE);
@@ -111,6 +146,20 @@ fn denominators_in_closed_interval_properties() {
             .take(20)
             .collect_vec();
         assert!(is_strictly_ascending(ds.iter()));
+        let guaranteed = smallest_guaranteed_denominator(&(&b - &a));
+        for i in 0u32..3 {
+            let d = &guaranteed + Natural::from(i);
+            assert!(
+                exhaustive_rationals_with_denominator_inclusive_range(
+                    d.clone(),
+                    a.clone(),
+                    b.clone()
+                )
+                .next()
+                .is_some(),
+                "guaranteed denominator {d} absent from [{a}, {b}]"
+            );
+        }
         for d in &ds {
             assert!(
                 exhaustive_rationals_with_denominator_inclusive_range(
