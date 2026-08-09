@@ -10,14 +10,14 @@ use crate::Rational;
 use crate::rational::arithmetic::traits::{
     DenominatorsInClosedInterval, SimplestRationalInInterval,
 };
-use crate::rational::exhaustive::{
-    exhaustive_rationals_with_denominator_inclusive_range,
-    exhaustive_rationals_with_denominator_range,
-};
-use alloc::collections::BTreeSet;
+use crate::rational::exhaustive::exhaustive_rationals_with_denominator_inclusive_range;
+use alloc::collections::BinaryHeap;
+use alloc::vec::Vec;
+use core::cmp::{Ordering, Reverse};
 use malachite_base::num::arithmetic::traits::{Ceiling, Reciprocal, UnsignedAbs};
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::factorization::traits::Primes;
+use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 
@@ -44,6 +44,76 @@ fn smallest_likely_denominator(interval_diameter: &Rational) -> Natural {
     interval_diameter.reciprocal().ceiling().unsigned_abs()
 }
 
+// A gap between two adjacent known fractions, together with the simplest fraction in its open
+// interior, which is the next fraction the gap will produce. Interior gaps — those whose ends are
+// both produced fractions rather than the original endpoints — always have Farey-adjacent ends
+// (the determinant of adjacent produced fractions is 1, by induction: the fractions simpler than
+// both ends were produced first, so each end is a best approximation from its side), and the
+// simplest fraction between Farey neighbors is their mediant. So interior gaps find their candidate
+// with a single addition, and only the two gaps touching the original endpoints pay for a
+// continued-fraction computation.
+#[derive(Clone, Debug)]
+struct Gap {
+    candidate: Rational,
+    lo: Rational,
+    hi: Rational,
+    lo_is_endpoint: bool,
+    hi_is_endpoint: bool,
+}
+
+impl Gap {
+    fn new(lo: Rational, hi: Rational, lo_is_endpoint: bool, hi_is_endpoint: bool) -> Self {
+        let candidate = if lo_is_endpoint || hi_is_endpoint {
+            Rational::simplest_rational_in_open_interval(&lo, &hi)
+        } else {
+            // The ends are Farey neighbors, so the mediant is the simplest fraction between them,
+            // and the same determinant argument shows it is already in lowest terms.
+            let n = Integer::from_sign_and_abs_ref(lo.sign, &lo.numerator)
+                + Integer::from_sign_and_abs_ref(hi.sign, &hi.numerator);
+            Rational {
+                sign: n >= 0u32,
+                numerator: n.unsigned_abs(),
+                denominator: &lo.denominator + &hi.denominator,
+            }
+        };
+        Self {
+            candidate,
+            lo,
+            hi,
+            lo_is_endpoint,
+            hi_is_endpoint,
+        }
+    }
+}
+
+// Gaps are ordered by candidate denominator, so that a min-heap of them yields denominators in
+// increasing order; the candidate value breaks ties arbitrarily but totally.
+impl PartialEq for Gap {
+    #[inline]
+    fn eq(&self, other: &Self) -> bool {
+        self.candidate == other.candidate
+    }
+}
+
+impl Eq for Gap {}
+
+impl PartialOrd for Gap {
+    #[inline]
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for Gap {
+    #[inline]
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.candidate
+            .denominator
+            .cmp(&other.candidate.denominator)
+            .then_with(|| self.candidate.cmp(&other.candidate))
+    }
+}
+
 /// Returns an iterator of all denominators that appear in the [`Rational`]s contained in a closed
 /// interval.
 ///
@@ -56,7 +126,33 @@ pub struct DenominatorsInClosedRationalInterval {
     low_threshold: Natural,
     high_threshold: Natural,
     current: Natural,
-    points: BTreeSet<Rational>,
+    gaps: BinaryHeap<Reverse<Gap>>,
+    endpoint_denominators: Vec<Natural>,
+}
+
+impl DenominatorsInClosedRationalInterval {
+    // Splits every gap whose candidate has the given denominator. The children's candidates are
+    // strictly more complex than the parent's, so the heap minimum strictly increases.
+    fn split_gaps_with_denominator(&mut self, d: &Natural) {
+        while let Some(Reverse(g)) = self.gaps.peek() {
+            if g.candidate.denominator_ref() != d {
+                break;
+            }
+            let Reverse(g) = self.gaps.pop().unwrap();
+            self.gaps.push(Reverse(Gap::new(
+                g.lo,
+                g.candidate.clone(),
+                g.lo_is_endpoint,
+                false,
+            )));
+            self.gaps.push(Reverse(Gap::new(
+                g.candidate,
+                g.hi,
+                false,
+                g.hi_is_endpoint,
+            )));
+        }
+    }
 }
 
 impl Iterator for DenominatorsInClosedRationalInterval {
@@ -64,11 +160,13 @@ impl Iterator for DenominatorsInClosedRationalInterval {
 
     fn next(&mut self) -> Option<Natural> {
         if self.current >= self.high_threshold {
-            self.points.clear();
+            self.gaps.clear();
+            self.endpoint_denominators.clear();
             self.current += Natural::ONE;
             Some(self.current.clone())
         } else if self.current >= self.low_threshold {
-            self.points.clear();
+            self.gaps.clear();
+            self.endpoint_denominators.clear();
             loop {
                 self.current += Natural::ONE;
                 if exhaustive_rationals_with_denominator_inclusive_range(
@@ -82,66 +180,53 @@ impl Iterator for DenominatorsInClosedRationalInterval {
                     return Some(self.current.clone());
                 }
             }
-        } else if self.points.is_empty() {
-            assert_eq!(self.current, 0u32);
-            self.points.insert(self.a.clone());
-            self.points.insert(self.b.clone());
-            self.points
-                .insert(Rational::simplest_rational_in_open_interval(
-                    &self.a, &self.b,
-                ));
-            let mut min_denominator = self.a.denominator_ref();
-            for p in &self.points {
-                let pd = p.denominator_ref();
-                if pd < min_denominator {
-                    min_denominator = pd;
-                }
-            }
-            self.current = min_denominator.clone();
-            for p in exhaustive_rationals_with_denominator_range(
-                self.current.clone(),
-                self.a.clone(),
-                self.b.clone(),
-            ) {
-                self.points.insert(p);
-            }
-            Some(self.current.clone())
         } else {
-            let mut previous_point = None;
-            let mut min_interior_denominator = None;
-            for p in &self.points {
-                if let Some(previous) = previous_point {
-                    let interior_denominator =
-                        Rational::simplest_rational_in_open_interval(previous, p)
-                            .into_denominator();
-                    if let Some(previous_min) = min_interior_denominator.as_ref() {
-                        if interior_denominator < *previous_min {
-                            min_interior_denominator = Some(interior_denominator);
-                        }
-                    } else {
-                        min_interior_denominator = Some(interior_denominator);
-                    }
+            if self.gaps.is_empty() {
+                assert_eq!(self.current, 0u32);
+                let ad = self.a.denominator_ref();
+                let bd = self.b.denominator_ref();
+                self.endpoint_denominators = if ad == bd {
+                    alloc::vec![ad.clone()]
+                } else if ad < bd {
+                    alloc::vec![ad.clone(), bd.clone()]
+                } else {
+                    alloc::vec![bd.clone(), ad.clone()]
+                };
+                self.gaps.push(Reverse(Gap::new(
+                    self.a.clone(),
+                    self.b.clone(),
+                    true,
+                    true,
+                )));
+            }
+            // The next denominator is the smaller of the least unconsumed endpoint denominator and
+            // the least gap candidate's denominator. When they are equal, both are consumed: the
+            // denominator is present both as an endpoint and as one or more interior fractions, and
+            // is reported once.
+            let heap_denominator = self
+                .gaps
+                .peek()
+                .unwrap()
+                .0
+                .candidate
+                .denominator_ref()
+                .clone();
+            if self
+                .endpoint_denominators
+                .first()
+                .is_some_and(|pd| *pd <= heap_denominator)
+            {
+                let pd = self.endpoint_denominators.remove(0);
+                if pd == heap_denominator {
+                    self.split_gaps_with_denominator(&heap_denominator);
                 }
-                previous_point = Some(p);
+                self.current = pd.clone();
+                Some(pd)
+            } else {
+                self.split_gaps_with_denominator(&heap_denominator);
+                self.current = heap_denominator.clone();
+                Some(heap_denominator)
             }
-            let min_interior_denominator = min_interior_denominator.unwrap();
-            assert!(min_interior_denominator > self.current);
-            let mut min_denominator = min_interior_denominator;
-            for p in &self.points {
-                let pd = p.denominator_ref();
-                if *pd > self.current && *pd < min_denominator {
-                    min_denominator = pd.clone();
-                }
-            }
-            self.current = min_denominator;
-            for p in exhaustive_rationals_with_denominator_range(
-                self.current.clone(),
-                self.a.clone(),
-                self.b.clone(),
-            ) {
-                self.points.insert(p);
-            }
-            Some(self.current.clone())
         }
     }
 }
@@ -161,12 +246,16 @@ impl DenominatorsInClosedInterval for Rational {
     /// complete list is $2, 3, 5, 7, 8, 9, 11, 12, 13, \ldots$.
     ///
     /// # Worst-case complexity per iteration
-    /// $T(n, i) = O(n + \log i)$
+    /// $T(n, i) = O(m (\log m)^2 \log\log m)$
     ///
     /// $M(n, i) = O(n + \log i)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, and $n$ is
-    /// `max(a.significant_bits(), b.significant_bits())`.
+    /// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $n$ is
+    /// `max(a.significant_bits(), b.significant_bits())`, and $m$ is $n + \log i$. Most iterations
+    /// are cheaper: a continued-fraction computation is only needed when a gap adjacent to one of
+    /// the original endpoints splits, and interior gaps find their next fraction with a single
+    /// addition, since adjacent produced fractions are always Farey neighbors and the simplest
+    /// fraction between Farey neighbors is their mediant.
     ///
     /// # Panics
     /// Panics if $a \geq b$.
@@ -230,7 +319,8 @@ impl DenominatorsInClosedInterval for Rational {
             low_threshold,
             high_threshold,
             current: Natural::ZERO,
-            points: BTreeSet::new(),
+            gaps: BinaryHeap::new(),
+            endpoint_denominators: Vec::new(),
         }
     }
 }
