@@ -41,7 +41,7 @@ use malachite_base::num::arithmetic::traits::{
     WrappingAddAssign, WrappingNegAssign, WrappingSubAssign, XMulYToZZ, XXSubYYToZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::conversion::traits::{SplitInHalf, WrappingFrom};
+use malachite_base::num::conversion::traits::SplitInHalf;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::slices::slice_test_zero;
 

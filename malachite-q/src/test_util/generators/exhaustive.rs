@@ -184,6 +184,18 @@ pub fn exhaustive_rational_natural_pair_gen_var_3() -> It<(Rational, Natural)> {
     ))
 }
 
+// (x, n) with n at least the denominator of x: valid inputs of Rational::farey_neighbors
+pub fn exhaustive_rational_natural_pair_gen_var_4() -> It<(Rational, Natural)> {
+    Box::new(
+        exhaustive_pairs_big_small(exhaustive_rationals(), exhaustive_positive_naturals()).map(
+            |(x, n)| {
+                let d = x.to_denominator();
+                (x, n + d)
+            },
+        ),
+    )
+}
+
 // -- (Rational, Natural, Natural) --
 
 pub fn exhaustive_rational_natural_natural_triple_gen() -> It<(Rational, Natural, Natural)> {

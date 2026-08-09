@@ -454,11 +454,11 @@ For the Calkin-Wilf order the two agree term for term.
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✗ | `void fmpq_next_minimal (fmpq_t res, const fmpq_t x)` | |
-| ✗ | `void fmpq_next_signed_minimal (fmpq_t res, const fmpq_t x)` | |
+| ✓ | `void fmpq_next_minimal (fmpq_t res, const fmpq_t x)` | [`exhaustive_non_negative_rationals_by_height`](https://docs.rs/malachite-q/latest/malachite_q/rational/exhaustive/fn.exhaustive_non_negative_rationals_by_height.html) |
+| ✓ | `void fmpq_next_signed_minimal (fmpq_t res, const fmpq_t x)` | [`exhaustive_rationals_by_height`](https://docs.rs/malachite-q/latest/malachite_q/rational/exhaustive/fn.exhaustive_rationals_by_height.html) |
 | ✓ | `void fmpq_next_calkin_wilf (fmpq_t res, const fmpq_t x)` | [`exhaustive_non_negative_rationals`](https://docs.rs/malachite-q/latest/malachite_q/rational/exhaustive/fn.exhaustive_non_negative_rationals.html) |
 | ✓ | `void fmpq_next_signed_calkin_wilf (fmpq_t res, const fmpq_t x)` | [`exhaustive_rationals`](https://docs.rs/malachite-q/latest/malachite_q/rational/exhaustive/fn.exhaustive_rationals.html) |
-| ✗ | `void fmpq_farey_neighbors (fmpq_t l, fmpq_t r, const fmpq_t x, const fmpz_t Q)` | [`Approximate`](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/traits/trait.Approximate.html) |
+| ✓ | `void fmpq_farey_neighbors (fmpq_t l, fmpq_t r, const fmpq_t x, const fmpz_t Q)` | [`Rational::farey_neighbors`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html#method.farey_neighbors) |
 | ≈ | `void fmpq_simplest_between (fmpq_t x, const fmpq_t l, const fmpq_t r)` | [`SimplestRationalInInterval`](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/traits/trait.SimplestRationalInInterval.html) |
 
 **`fmpq_next_calkin_wilf`, `fmpq_next_signed_calkin_wilf`.** The breadth-first traversal of the
@@ -466,19 +466,36 @@ Calkin-Wilf tree is `exhaustive_non_negative_rationals()`, and the signed interl
 `exhaustive_rationals()`; the sequences are identical, element by element, from the leading 0
 on. FLINT's stepping function becomes an iterator's `next`.
 
-**`fmpq_next_minimal`, `fmpq_next_signed_minimal`.** Enumeration in order of height, the same
-quantity behind this page's other gaps, and no Malachite iterator produces this order yet; a
-height-ordered enumeration is a natural companion to the committed height function. Malachite
-does have a different canonical well-order, the complexity order of
-[`cmp_complexity`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.cmp_complexity),
-the order behind its simplest-in-interval machinery, which sorts by denominator before
-numerator rather than by height; neither is a substitute for the other.
+**`fmpq_next_minimal`, `fmpq_next_signed_minimal`.** Enumeration in order of height, now
+[`exhaustive_non_negative_rationals_by_height`](https://docs.rs/malachite-q/latest/malachite_q/rational/exhaustive/fn.exhaustive_non_negative_rationals_by_height.html)
+and
+[`exhaustive_rationals_by_height`](https://docs.rs/malachite-q/latest/malachite_q/rational/exhaustive/fn.exhaustive_rationals_by_height.html),
+agreeing with FLINT term for term from the leading zero on. As with the Calkin-Wilf pair, the
+stepping function becomes an iterator's `next`, and the same family is filled out around it:
+[positive](https://docs.rs/malachite-q/latest/malachite_q/rational/exhaustive/fn.exhaustive_positive_rationals_by_height.html),
+[negative](https://docs.rs/malachite-q/latest/malachite_q/rational/exhaustive/fn.exhaustive_negative_rationals_by_height.html),
+and
+[nonzero](https://docs.rs/malachite-q/latest/malachite_q/rational/exhaustive/fn.exhaustive_nonzero_rationals_by_height.html)
+variants that FLINT does not have. The height is the one the
+[height function](#comparison) returns, and the ordering is by that quantity: within a height
+$$h$$, the numerators coprime to $$h$$ are visited in increasing order, each fraction
+immediately followed by its reciprocal. The practical difference from the Calkin-Wilf order is
+size: the $$n$$th element here has height $$O(\sqrt n)$$, against $$O(n^{\log_2 \phi})$$
+there, which is what FLINT's documentation means by minimal height, and it is paid for by
+FLINT's own observation that the enumeration is slower to step. Malachite's third canonical
+well-order, the complexity order of
+[`cmp_complexity`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html#method.cmp_complexity),
+sorts by denominator before numerator and is still distinct from both.
 
-**`fmpq_farey_neighbors`.** The fractions directly below and above `x` in the Farey sequence of
-order `Q` have no direct counterpart. The nearest relative is
+**`fmpq_farey_neighbors`.**
+[`Rational::farey_neighbors`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html#method.farey_neighbors),
+returning both neighbors as a pair. FLINT's `Q` is spelled `max_denominator`, matching
 [`Approximate`](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/traits/trait.Approximate.html),
-which returns the best approximation with denominator at most `Q`, one of the two neighbors;
-the pair as a pair is a gap.
+which remains the near relative: it returns the best approximation with denominator at most
+`Q`, which is always the nearer of the two neighbors, or the input itself when the input already
+qualifies. FLINT's throw on a denominator exceeding `Q` becomes a panic. Both libraries use the
+extension of the Farey sequence to all of $$\mathbb{Q}$$ rather than the classical restriction
+to $$[0, 1]$$, so the input need not be a proper fraction, and negative inputs are fine.
 
 **`fmpq_simplest_between`.** `Rational::simplest_rational_in_closed_interval(&l, &r)`, with an
 open-interval variant FLINT does not have. The ≈ is a genuine difference in what "simplest"

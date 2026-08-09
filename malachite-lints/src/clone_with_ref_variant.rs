@@ -8,6 +8,7 @@
 
 use clippy_utils::diagnostics::span_lint;
 use clippy_utils::ty::implements_trait;
+use rustc_hir::def::{DefKind, Res};
 use rustc_hir::{BinOpKind, Expr, ExprKind, LangItem};
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_middle::ty::Ty;
@@ -17,8 +18,9 @@ declare_lint! {
     /// ### What it does
     ///
     /// Flags cloning a bignum where a by-reference alternative exists: `x.clone().op(..)` when the
-    /// family has an `op_ref*` variant, `y.op(x.clone(), ..)` when it has an `op*_ref` variant, and
-    /// `x.clone() * y` (or `x *= y.clone()`, etc.) when the operator is implemented for references.
+    /// family has an `op_ref*` variant, `y.op(x.clone(), ..)` when it has an `op*_ref` variant,
+    /// `T::f(.., x.clone(), ..)` when the type has an associated `f_ref`, and `x.clone() * y` (or
+    /// `x *= y.clone()`, etc.) when the operator is implemented for references.
     ///
     /// ### Why is this bad?
     ///
@@ -164,6 +166,52 @@ impl<'tcx> LateLintPass<'tcx> for CloneWithRefVariant {
                             }
                         }
                     }
+                }
+            }
+            // An associated function called with a cloned argument, where the type provides a
+            // by-reference sibling. Malachite spells these `f` and `f_ref`, taking every bignum
+            // argument by reference in the second: `Integer::from_sign_and_abs` and
+            // `from_sign_and_abs_ref`, `Rational::from_naturals` and `from_naturals_ref`, and so
+            // on. Method calls are handled above; this is the path-call form.
+            ExprKind::Call(callee, args) => {
+                let ExprKind::Path(qpath) = &callee.kind else {
+                    return;
+                };
+                let Res::Def(DefKind::AssocFn, fn_did) = cx.qpath_res(qpath, callee.hir_id) else {
+                    return;
+                };
+                let name = cx.tcx.item_name(fn_did);
+                let name = name.as_str();
+                if name.ends_with("_ref") {
+                    return;
+                }
+                // Only inherent associated functions: a trait method's parent is the trait
+                // itself, which has no self type, and the `f`/`f_ref` convention is an inherent
+                // one anyway.
+                if cx.tcx.trait_of_assoc(fn_did).is_some() {
+                    return;
+                }
+                let parent = cx.tcx.parent(fn_did);
+                if !matches!(cx.tcx.def_kind(parent), DefKind::Impl { .. }) {
+                    return;
+                }
+                let self_ty = cx.tcx.type_of(parent).instantiate_identity();
+                let Some(adt_did) = crate::bignum_adt_did(cx, self_ty) else {
+                    return;
+                };
+                if !args.iter().any(|a| bignum_clone(cx, a).is_some()) {
+                    return;
+                }
+                let cand = format!("{name}_ref");
+                if crate::has_inherent_fn(cx, adt_did, &cand) {
+                    span_lint(
+                        cx,
+                        CLONE_WITH_REF_VARIANT,
+                        expr.span,
+                        format!(
+                            "avoid cloning the argument: use `{cand}` with a reference instead"
+                        ),
+                    );
                 }
             }
             ExprKind::Binary(_, lhs, rhs) | ExprKind::AssignOp(_, lhs, rhs) => {

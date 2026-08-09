@@ -96,9 +96,9 @@ fn log_base_rational_base_prec_round_normal(
             return d.log_base_rational_base_1_plus_x_prec_round(base, prec, rm);
         }
         SliverOfOne::Underflow => {
-            return Float::log_base_rational_rational_base_prec_round(
-                Rational::exact_from(x),
-                base.clone(),
+            return Float::log_base_rational_rational_base_prec_round_ref(
+                &Rational::exact_from(x),
+                base,
                 prec,
                 rm,
             );

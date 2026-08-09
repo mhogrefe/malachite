@@ -42,6 +42,8 @@ pub mod express_as_power;
 /// Implementations of [`ExtendedGcd`](malachite_base::num::arithmetic::traits::ExtendedGcd), a
 /// trait for computing the GCD of two numbers along with Bézout cofactors.
 pub mod extended_gcd;
+/// Finding the neighbors of a [`Rational`](super::Rational) in a Farey sequence.
+pub mod farey_neighbors;
 /// Implementations of [`Floor`](malachite_base::num::arithmetic::traits::Floor) and
 /// [`FloorAssign`](malachite_base::num::arithmetic::traits::FloorAssign), traits for taking the
 /// floor of a number.

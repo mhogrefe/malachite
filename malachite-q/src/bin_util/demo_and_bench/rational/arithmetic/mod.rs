@@ -19,6 +19,7 @@ pub(crate) fn register(runner: &mut Runner) {
     denominators_in_closed_interval::register(runner);
     div::register(runner);
     express_as_power::register(runner);
+    farey_neighbors::register(runner);
     floor::register(runner);
     gcd::register(runner);
     height::register(runner);
@@ -59,6 +60,7 @@ mod ceiling;
 mod denominators_in_closed_interval;
 mod div;
 mod express_as_power;
+mod farey_neighbors;
 mod floor;
 mod gcd;
 mod height;

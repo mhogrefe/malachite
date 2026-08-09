@@ -407,6 +407,34 @@ pub fn random_rational_natural_pair_gen_var_4(config: &GenConfig) -> It<(Rationa
     ))
 }
 
+// (x, n) with n at least the denominator of x: valid inputs of Rational::farey_neighbors
+pub fn random_rational_natural_pair_gen_var_5(config: &GenConfig) -> It<(Rational, Natural)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_rationals(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds::<u64>(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+                .map(Natural::from)
+            },
+        )
+        .map(|(x, n)| {
+            let d = x.to_denominator();
+            (x, n + d)
+        }),
+    )
+}
+
 // -- (Rational, Natural, Natural) --
 
 pub fn random_rational_natural_natural_triple_gen(

@@ -256,6 +256,24 @@ fn main() {
     check_demo_against_flint(
         &oracle,
         "../malachite-q",
+        "demo_rational_farey_neighbors",
+        "fmpq_farey_neighbors",
+    );
+    check_demo_against_flint(
+        &oracle,
+        "../malachite-q",
+        "demo_rational_exhaustive_by_height",
+        "fmpq_next_minimal",
+    );
+    check_demo_against_flint(
+        &oracle,
+        "../malachite-q",
+        "demo_rational_exhaustive_signed_by_height",
+        "fmpq_next_signed_minimal",
+    );
+    check_demo_against_flint(
+        &oracle,
+        "../malachite-q",
         "demo_rational_reconstruct",
         "fmpq_reconstruct",
     );

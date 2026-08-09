@@ -273,6 +273,277 @@ pub fn exhaustive_rationals() -> Chain<Once<Rational>, ExhaustiveNonzeroRational
     once(Rational::ZERO).chain(exhaustive_nonzero_rationals())
 }
 
+/// Generates all positive [`Rational`]s, in order of increasing height.
+///
+/// This `struct` is created by [`exhaustive_positive_rationals_by_height`]; see its documentation
+/// for more.
+#[derive(Clone, Debug)]
+pub struct ExhaustivePositiveRationalsByHeight {
+    numerator: Natural,
+    denominator: Natural,
+}
+
+impl Iterator for ExhaustivePositiveRationalsByHeight {
+    type Item = Rational;
+
+    fn next(&mut self) -> Option<Rational> {
+        let out = Rational {
+            sign: true,
+            numerator: self.numerator.clone(),
+            denominator: self.denominator.clone(),
+        };
+        // Within a height, the numerators are walked upward, each paired with its reciprocal. A
+        // fraction below 1 is followed by its reciprocal; a fraction above 1 is followed by the
+        // next coprime pair below 1, or, when the height is exhausted, by the reciprocal of the
+        // next height.
+        if self.numerator < self.denominator {
+            swap(&mut self.numerator, &mut self.denominator);
+        } else {
+            loop {
+                if self.denominator >= self.numerator {
+                    self.numerator = Natural::ONE;
+                    self.denominator += Natural::ONE;
+                    break;
+                }
+                self.denominator += Natural::ONE;
+                if (&self.denominator).coprime_with(&self.numerator) {
+                    swap(&mut self.numerator, &mut self.denominator);
+                    break;
+                }
+            }
+        }
+        Some(out)
+    }
+}
+
+/// Generates all positive [`Rational`]s, in order of increasing height.
+///
+/// The height of a [`Rational`] is the larger of its numerator and its denominator; see
+/// [`Rational::to_height`](crate::Rational::to_height). This iterator generates every positive
+/// [`Rational`] once, in nondecreasing order of height. Within a height $h$, the numerators $p$
+/// coprime to $h$ with $1 \leq p < h$ are visited in increasing order, each fraction $p/h$
+/// immediately followed by its reciprocal $h/p$.
+///
+/// The numerators and denominators grow more slowly than in the Calkin-Wilf order of
+/// [`exhaustive_positive_rationals`]: the $n$th element here has height $O(\sqrt n)$, against
+/// $O(n^{\log_2 \phi})$ there.
+///
+/// The output length is infinite.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O((\log i)^2 (\log\log i)^2 \log\log\log i)$
+///
+/// $M(i) = O(\log i)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number: a step scans
+/// denominators until one is coprime to the numerator, which happens within $O(\log i)$ tries, and
+/// each try is a gcd of $O(\log i)$-bit numbers.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_q::rational::exhaustive::exhaustive_positive_rationals_by_height;
+///
+/// assert_eq!(
+///     prefix_to_string(exhaustive_positive_rationals_by_height(), 20),
+///     "[1, 1/2, 2, 1/3, 3, 2/3, 3/2, 1/4, 4, 3/4, 4/3, 1/5, 5, 2/5, 5/2, 3/5, 5/3, 4/5, 5/4, \
+///     1/6, ...]"
+/// )
+/// ```
+///
+/// This is fmpq_next_minimal from fmpq/next_minimal.c, FLINT 3.6.0, as an iterator rather than a
+/// stepping function, and without the leading zero.
+pub const fn exhaustive_positive_rationals_by_height() -> ExhaustivePositiveRationalsByHeight {
+    ExhaustivePositiveRationalsByHeight {
+        numerator: Natural::ONE,
+        denominator: Natural::ONE,
+    }
+}
+
+/// Generates all non-negative [`Rational`]s, in order of increasing height.
+///
+/// Zero is generated first, followed by all the positive [`Rational`]s in order of increasing
+/// height. See [`exhaustive_positive_rationals_by_height`] for details.
+///
+/// The output length is infinite.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O((\log i)^2 (\log\log i)^2 \log\log\log i)$
+///
+/// $M(i) = O(\log i)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_q::rational::exhaustive::exhaustive_non_negative_rationals_by_height;
+///
+/// assert_eq!(
+///     prefix_to_string(exhaustive_non_negative_rationals_by_height(), 20),
+///     "[0, 1, 1/2, 2, 1/3, 3, 2/3, 3/2, 1/4, 4, 3/4, 4/3, 1/5, 5, 2/5, 5/2, 3/5, 5/3, 4/5, 5/4, \
+///     ...]"
+/// )
+/// ```
+///
+/// This is fmpq_next_minimal from fmpq/next_minimal.c, FLINT 3.6.0, as an iterator rather than a
+/// stepping function.
+#[inline]
+pub fn exhaustive_non_negative_rationals_by_height()
+-> Chain<Once<Rational>, ExhaustivePositiveRationalsByHeight> {
+    once(Rational::ZERO).chain(exhaustive_positive_rationals_by_height())
+}
+
+/// Generates all negative [`Rational`]s, in order of increasing height.
+///
+/// This `struct` is created by [`exhaustive_negative_rationals_by_height`]; see its documentation
+/// for more.
+#[derive(Clone, Debug)]
+pub struct ExhaustiveNegativeRationalsByHeight {
+    xs: ExhaustivePositiveRationalsByHeight,
+}
+
+impl Iterator for ExhaustiveNegativeRationalsByHeight {
+    type Item = Rational;
+
+    #[inline]
+    fn next(&mut self) -> Option<Rational> {
+        self.xs.next().map(|mut q| {
+            q.sign = false;
+            q
+        })
+    }
+}
+
+/// Generates all negative [`Rational`]s, in order of increasing height.
+///
+/// The sequence is the same as the sequence of positive [`Rational`]s in order of increasing
+/// height, but negated. See [`exhaustive_positive_rationals_by_height`] for details.
+///
+/// The output length is infinite.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O((\log i)^2 (\log\log i)^2 \log\log\log i)$
+///
+/// $M(i) = O(\log i)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_q::rational::exhaustive::exhaustive_negative_rationals_by_height;
+///
+/// assert_eq!(
+///     prefix_to_string(exhaustive_negative_rationals_by_height(), 20),
+///     "[-1, -1/2, -2, -1/3, -3, -2/3, -3/2, -1/4, -4, -3/4, -4/3, -1/5, -5, -2/5, -5/2, -3/5, \
+///     -5/3, -4/5, -5/4, -1/6, ...]"
+/// )
+/// ```
+pub const fn exhaustive_negative_rationals_by_height() -> ExhaustiveNegativeRationalsByHeight {
+    ExhaustiveNegativeRationalsByHeight {
+        xs: exhaustive_positive_rationals_by_height(),
+    }
+}
+
+/// Generates all nonzero [`Rational`]s, in order of increasing height.
+///
+/// This `struct` is created by [`exhaustive_nonzero_rationals_by_height`]; see its documentation
+/// for more.
+#[derive(Clone, Debug)]
+pub struct ExhaustiveNonzeroRationalsByHeight {
+    xs: ExhaustivePositiveRationalsByHeight,
+    x: Option<Rational>,
+    sign: bool,
+}
+
+impl Iterator for ExhaustiveNonzeroRationalsByHeight {
+    type Item = Rational;
+
+    fn next(&mut self) -> Option<Rational> {
+        if self.sign {
+            self.sign = false;
+            let mut x = None;
+            swap(&mut self.x, &mut x);
+            let mut x = x.unwrap();
+            x.sign = false;
+            Some(x)
+        } else {
+            self.sign = true;
+            self.x = self.xs.next();
+            Some(self.x.clone().unwrap())
+        }
+    }
+}
+
+/// Generates all nonzero [`Rational`]s, in order of increasing height.
+///
+/// The sequence is the sequence of positive [`Rational`]s in order of increasing height,
+/// interleaved with its negative. See [`exhaustive_positive_rationals_by_height`] for details.
+///
+/// The output length is infinite.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O((\log i)^2 (\log\log i)^2 \log\log\log i)$
+///
+/// $M(i) = O(\log i)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_q::rational::exhaustive::exhaustive_nonzero_rationals_by_height;
+///
+/// assert_eq!(
+///     prefix_to_string(exhaustive_nonzero_rationals_by_height(), 20),
+///     "[1, -1, 1/2, -1/2, 2, -2, 1/3, -1/3, 3, -3, 2/3, -2/3, 3/2, -3/2, 1/4, -1/4, 4, -4, 3/4, \
+///     -3/4, ...]"
+/// )
+/// ```
+pub const fn exhaustive_nonzero_rationals_by_height() -> ExhaustiveNonzeroRationalsByHeight {
+    ExhaustiveNonzeroRationalsByHeight {
+        xs: exhaustive_positive_rationals_by_height(),
+        x: None,
+        sign: false,
+    }
+}
+
+/// Generates all [`Rational`]s, in order of increasing height.
+///
+/// The sequence begins with zero, followed by the sequence of positive [`Rational`]s in order of
+/// increasing height, interleaved with its negative. See
+/// [`exhaustive_positive_rationals_by_height`] for details.
+///
+/// The output length is infinite.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O((\log i)^2 (\log\log i)^2 \log\log\log i)$
+///
+/// $M(i) = O(\log i)$
+///
+/// where $T$ is time, $M$ is additional memory, and $i$ is the iteration number.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_q::rational::exhaustive::exhaustive_rationals_by_height;
+///
+/// assert_eq!(
+///     prefix_to_string(exhaustive_rationals_by_height(), 20),
+///     "[0, 1, -1, 1/2, -1/2, 2, -2, 1/3, -1/3, 3, -3, 2/3, -2/3, 3/2, -3/2, 1/4, -1/4, 4, -4, \
+///     3/4, ...]"
+/// )
+/// ```
+///
+/// This is fmpq_next_signed_minimal from fmpq/next_signed_minimal.c, FLINT 3.6.0, as an iterator
+/// rather than a stepping function.
+#[inline]
+pub fn exhaustive_rationals_by_height() -> Chain<Once<Rational>, ExhaustiveNonzeroRationalsByHeight>
+{
+    once(Rational::ZERO).chain(exhaustive_nonzero_rationals_by_height())
+}
+
 /// Generates all [`Rational`]s with a specific denominator and with numerators from a given
 /// iterator. Numerators that are not coprime with the denominator are skipped.
 #[derive(Clone, Debug)]

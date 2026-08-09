@@ -243,6 +243,15 @@ pub fn rational_natural_pair_gen_var_4() -> Generator<(Rational, Natural)> {
     )
 }
 
+// (x, n) with n at least the denominator of x: valid inputs of Rational::farey_neighbors
+pub fn rational_natural_pair_gen_var_5() -> Generator<(Rational, Natural)> {
+    Generator::new(
+        &exhaustive_rational_natural_pair_gen_var_4,
+        &random_rational_natural_pair_gen_var_5,
+        &special_random_rational_natural_pair_gen_var_5,
+    )
+}
+
 // -- (Rational, Natural, Natural) --
 
 pub fn rational_natural_natural_triple_gen() -> Generator<(Rational, Natural, Natural)> {

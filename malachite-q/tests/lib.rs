@@ -77,6 +77,7 @@ pub mod rational {
         pub mod denominators_in_closed_interval;
         pub mod div;
         pub mod express_as_power;
+        pub mod farey_neighbors;
         pub mod floor;
         pub mod gcd;
         pub mod height;
@@ -186,6 +187,7 @@ pub mod rational {
         pub mod exhaustive_rational_range_to_infinity;
         pub mod exhaustive_rational_range_to_negative_infinity;
         pub mod exhaustive_rationals;
+        pub mod exhaustive_rationals_by_height;
         pub mod exhaustive_rationals_with_denominator_inclusive_range;
         pub mod exhaustive_rationals_with_denominator_range;
         pub mod exhaustive_rationals_with_denominator_range_to_infinity;

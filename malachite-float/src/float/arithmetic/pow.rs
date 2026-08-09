@@ -303,7 +303,7 @@ fn pow_pos_natural(
 // shl_prec_round applies the correct nearest-mode underflow rounding.
 fn pow_integer_underflow_nearest(x: &Float, z: &Integer, prec: u64) -> (Float, Ordering) {
     let z_bits = z.significant_bits();
-    let zz = Float::from_integer_prec_round(z.clone(), z_bits, Exact).0;
+    let zz = Float::from_integer_prec_round_ref(z, z_bits, Exact).0;
     let (y2, o) = pow_general(x, &zz, 2, Nearest, true);
     (Float::from_float_prec_round(y2, prec, Exact).0, o)
 }
