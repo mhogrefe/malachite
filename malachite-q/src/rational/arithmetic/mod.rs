@@ -30,6 +30,12 @@ pub mod average;
 /// [`CeilingAssign`](malachite_base::num::arithmetic::traits::CeilingAssign), traits for taking the
 /// ceiling of a number.
 pub mod ceiling;
+/// The shared continued-fraction and half-gcd machinery, adopted from FLINT.
+#[cfg(feature = "test_build")]
+pub mod cfrac_helpers;
+/// The shared continued-fraction and half-gcd machinery, adopted from FLINT.
+#[cfg(not(feature = "test_build"))]
+pub(crate) mod cfrac_helpers;
 /// Getting all denominators of [`Rational`](super::Rational)s that appear in a given closed
 /// interval.
 pub mod denominators_in_closed_interval;

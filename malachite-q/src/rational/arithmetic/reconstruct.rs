@@ -13,17 +13,24 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Rational;
+use crate::rational::arithmetic::cfrac_helpers::{
+    Mat22, RECONSTRUCT_HGCD_CUTOFF, fmms1, fmpq_hgcd, hgcd_word, left_shift_hi, limbs_at_most,
+    limbs_cmp,
+};
 use core::cmp::Ordering;
 use core::mem::{replace, swap, take};
 use malachite_base::num::arithmetic::traits::{
-    AddMul, AddMulAssign, CoprimeWith, DivMod, FloorSqrt, ModPowerOf2, ModPowerOf2Assign,
-    ModPowerOf2SubAssign, Parity, SubMul, SubMulAssign, WrappingAddMul,
+    AddMul, AddMulAssign, CoprimeWith, DivMod, FloorSqrt, ModPowerOf2, Parity, SubMulAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf, WrappingFrom};
-use malachite_base::num::logic::traits::{NotAssign, SignificantBits};
+use malachite_base::num::logic::traits::NotAssign;
 use malachite_nz::natural::Natural;
+use malachite_nz::natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
+use malachite_nz::natural::arithmetic::mul::limb::{
+    limbs_mul_limb_to_out, limbs_slice_mul_limb_in_place,
+};
 use malachite_nz::platform::{DoubleLimb, Limb};
 
 // The kernels below follow _fmpq_reconstruct_fmpz_2's size-dispatched structure completely: word
@@ -168,158 +175,6 @@ fn reconstruct_helper(
 // This is FMPQ_RECONSTRUCT_ARRAY_LIMIT from fmpq/reconstruct_fmpz_2.c, FLINT 3.6.0.
 const ARRAY_LIMIT: usize = 12;
 
-// This is _hgcd_uiui_no_write from fmpq/reconstruct_fmpz_2.c, FLINT 3.6.0: a half-gcd on two-limb
-// values, accumulating quotients into a word matrix whose determinant sign is tracked as `det_pos`.
-// Returns the number of quotients applied; zero means no progress and the matrix is meaningless.
-struct WordMat {
-    m11: Limb,
-    m12: Limb,
-    m21: Limb,
-    m22: Limb,
-    det_pos: bool,
-}
-
-fn hgcd_word(mut a: DoubleLimb, mut b: DoubleLimb) -> (usize, WordMat) {
-    let mut m = WordMat {
-        m11: 1,
-        m12: 0,
-        m21: 0,
-        m22: 1,
-        det_pos: true,
-    };
-    let mut written = 0;
-    let mut last_written: Limb = 0;
-    debug_assert!(a >> Limb::WIDTH != 0);
-    debug_assert!(b <= a);
-    if b >> Limb::WIDTH == 0 || b >= a {
-        return (0, m);
-    }
-    loop {
-        let (q, r) = a.div_mod(b);
-        let q = Limb::wrapping_from(q);
-        // The candidate entries may wrap; they are discarded when the remainder loses its high
-        // limb, and entries that are stored are bounded by the original a over the current b, which
-        // fits a limb.
-        let t1 = m.m12.wrapping_add_mul(q, m.m11);
-        let t2 = m.m22.wrapping_add_mul(q, m.m21);
-        if r >> Limb::WIDTH == 0 {
-            break;
-        }
-        a = b;
-        b = r;
-        m.m12 = m.m11;
-        m.m22 = m.m21;
-        m.m11 = t1;
-        m.m21 = t2;
-        m.det_pos.not_assign();
-        last_written = q;
-        written += 1;
-    }
-    // The last quotient is only trustworthy if the next remainder could not have been absorbed: a -
-    // b must be at least the relevant column sum, and b must exceed the entry that bounds the
-    // smallest representable remainder. Otherwise pop the last quotient.
-    let d = a - b;
-    let (small_entry, column_sum) = if m.det_pos {
-        (m.m21, DoubleLimb::from(m.m11) + DoubleLimb::from(m.m12))
-    } else {
-        (m.m11, DoubleLimb::from(m.m21) + DoubleLimb::from(m.m22))
-    };
-    if b <= DoubleLimb::from(small_entry) || d < column_sum {
-        debug_assert!(written >= 1);
-        debug_assert_ne!(last_written, 0);
-        written -= 1;
-        let q = last_written;
-        let t1 = m.m11 - q * m.m12;
-        let t2 = m.m21 - q * m.m22;
-        m.m11 = m.m12;
-        m.m21 = m.m22;
-        m.m12 = t1;
-        m.m22 = t2;
-        m.det_pos.not_assign();
-    }
-    (written, m)
-}
-
-// out = a * x over a's length; returns the carry limb. This is mpn_mul_1.
-fn mul_1(out: &mut [Limb], a: &[Limb], x: Limb) -> Limb {
-    let mut carry: Limb = 0;
-    for (o, &d) in out.iter_mut().zip(a.iter()) {
-        let p = DoubleLimb::from(d) * DoubleLimb::from(x) + DoubleLimb::from(carry);
-        (carry, *o) = p.split_in_half();
-    }
-    carry
-}
-
-// out *= x in place; returns the carry limb. This is mpn_mul_1 with aliased operands.
-fn mul_1_in_place(out: &mut [Limb], x: Limb) -> Limb {
-    let mut carry: Limb = 0;
-    for o in out.iter_mut() {
-        let p = DoubleLimb::from(*o) * DoubleLimb::from(x) + DoubleLimb::from(carry);
-        (carry, *o) = p.split_in_half();
-    }
-    carry
-}
-
-// out += a * x over a's length; returns the carry limb. This is mpn_addmul_1.
-fn addmul_1(out: &mut [Limb], a: &[Limb], x: Limb) -> Limb {
-    let mut carry: Limb = 0;
-    for (o, &d) in out.iter_mut().zip(a.iter()) {
-        let p = DoubleLimb::from(d) * DoubleLimb::from(x)
-            + DoubleLimb::from(*o)
-            + DoubleLimb::from(carry);
-        (carry, *o) = p.split_in_half();
-    }
-    carry
-}
-
-// out -= b * y over b's length; returns the borrow limb. This is mpn_submul_1.
-fn submul_1(out: &mut [Limb], b: &[Limb], y: Limb) -> Limb {
-    let mut borrow: Limb = 0;
-    for (o, &d) in out.iter_mut().zip(b.iter()) {
-        let p = DoubleLimb::from(d) * DoubleLimb::from(y) + DoubleLimb::from(borrow);
-        let (hi, lo) = p.split_in_half();
-        let (diff, under) = o.overflowing_sub(lo);
-        *o = diff;
-        borrow = hi + Limb::from(under);
-    }
-    borrow
-}
-
-// res = x * a - y * b over n limbs. The result must be nonnegative; returns its normalized length.
-// This is flint_mpn_fmms1 from mpn_extras.h, FLINT 3.6.0.
-fn fmms1(res: &mut [Limb], x: Limb, a: &[Limb], y: Limb, b: &[Limb], n: usize) -> usize {
-    let carry = mul_1(&mut res[..n], &a[..n], x);
-    let borrow = submul_1(&mut res[..n], &b[..n], y);
-    debug_assert_eq!(carry, borrow, "fmms1 result must be nonnegative");
-    let mut len = n;
-    while len > 0 && res[len - 1] == 0 {
-        len -= 1;
-    }
-    len
-}
-
-// Whether the number in the normalized ascending limb slice `x` is at most the one in `bound`.
-fn limbs_at_most(x: &[Limb], bound: &[Limb]) -> bool {
-    limbs_cmp(x, bound) != Ordering::Greater
-}
-
-// Compares two normalized ascending limb slices as numbers.
-fn limbs_cmp(a: &[Limb], b: &[Limb]) -> Ordering {
-    a.len()
-        .cmp(&b.len())
-        .then_with(|| a.iter().rev().cmp(b.iter().rev()))
-}
-
-// (hi << shift) | (lo >> (W - shift)), with the zero-shift case guarded. This is MPN_LEFT_SHIFT_HI
-// from mpn_extras.h, FLINT 3.6.0.
-const fn left_shift_hi(hi: Limb, lo: Limb, shift: u32) -> Limb {
-    if shift == 0 {
-        hi
-    } else {
-        (hi << shift) | (lo >> (const { Limb::WIDTH as u32 } - shift))
-    }
-}
-
 // This is _fmpq_reconstruct_fmpz_2_ui_array from fmpq/reconstruct_fmpz_2.c, FLINT 3.6.0: the
 // Euclidean loop on fixed-size limb arrays, accelerated by two-limb half-gcd windows. Where FLINT
 // calls mpn_tdiv_qr for a difficult quotient, this rounds the operands through Natural division;
@@ -414,10 +269,22 @@ fn reconstruct_array(
                 mdet_pos.not_assign();
             }
             let row_len = m_len.max(m_len_12);
-            let ex0 = mul_1(&mut r_arr[..row_len], &m11[..row_len], h.m11);
-            let ex1 = addmul_1(&mut r_arr[..row_len], &m12[..row_len], h.m21);
-            let ex2 = mul_1_in_place(&mut m12[..row_len], h.m22);
-            let ex3 = addmul_1(&mut m12[..row_len], &m11[..row_len], h.m12);
+            let ex0 = limbs_mul_limb_to_out::<DoubleLimb, Limb>(
+                &mut r_arr[..row_len],
+                &m11[..row_len],
+                h.m11,
+            );
+            let ex1 = limbs_slice_add_mul_limb_same_length_in_place_left(
+                &mut r_arr[..row_len],
+                &m12[..row_len],
+                h.m21,
+            );
+            let ex2 = limbs_slice_mul_limb_in_place(&mut m12[..row_len], h.m22);
+            let ex3 = limbs_slice_add_mul_limb_same_length_in_place_left(
+                &mut m12[..row_len],
+                &m11[..row_len],
+                h.m12,
+            );
             let sum = DoubleLimb::from(ex2) + DoubleLimb::from(ex3);
             (m12[row_len + 1], m12[row_len]) = sum.split_in_half();
             m11[..row_len].copy_from_slice(&r_arr[..row_len]);
@@ -675,7 +542,7 @@ impl Reduction {
                 if a_top > b_top {
                     let mut h = Mat22::one();
                     v.clear();
-                    fmpq_hgcd(&mut v, &mut h, &mut a_top, &mut b_top);
+                    fmpq_hgcd(Some(&mut v), &mut h, &mut a_top, &mut b_top);
                     if !h.is_one() {
                         let q = (&self.big_a).mod_power_of_2(shift_bits);
                         let r = (&self.big_b).mod_power_of_2(shift_bits);
@@ -732,440 +599,6 @@ impl Reduction {
     // Checks the candidate n = (-1)^(det M) * B over d = m11 against the denominator bound.
     fn finish(self, d_bound: &Natural) -> Option<Rational> {
         finish(self.big_b, self.m11, self.det_pos, d_bound)
-    }
-}
-
-// This is FMPQ_RECONSTRUCT_HGCD_CUTOFF from fmpq.h, FLINT 3.6.0: the limb gap between the operand
-// and the bound above which the subquadratic splitter is used.
-const RECONSTRUCT_HGCD_CUTOFF: u64 = 500;
-
-// This is _fmpz_mat22_t and its operations from fmpq/mat22.c, FLINT 3.6.0. Throughout the half-gcd
-// the entries are nonnegative, so they are [`Natural`]s, and the subtractions below all
-// reconstitute earlier nonnegative values. The determinant, always 1 or -1, is tracked as
-// `det_pos`.
-struct Mat22 {
-    m11: Natural,
-    m12: Natural,
-    m21: Natural,
-    m22: Natural,
-    det_pos: bool,
-}
-
-impl Mat22 {
-    const fn one() -> Self {
-        Self {
-            m11: Natural::ONE,
-            m12: Natural::ZERO,
-            m21: Natural::ZERO,
-            m22: Natural::ONE,
-            det_pos: true,
-        }
-    }
-
-    fn is_one(&self) -> bool {
-        self.m11 == 1u32 && self.m12 == 0u32 && self.m21 == 0u32 && self.m22 == 1u32
-    }
-
-    fn bits(&self) -> u64 {
-        self.m11
-            .significant_bits()
-            .max(self.m12.significant_bits())
-            .max(self.m21.significant_bits())
-            .max(self.m22.significant_bits())
-    }
-
-    // M = M * N
-    fn rmul(&mut self, n: &Self) {
-        let a = (&self.m11 * &n.m11).add_mul(&self.m12, &n.m21);
-        let b = (&self.m11 * &n.m12).add_mul(&self.m12, &n.m22);
-        let c = (&self.m21 * &n.m11).add_mul(&self.m22, &n.m21);
-        let d = (&self.m21 * &n.m12).add_mul(&self.m22, &n.m22);
-        self.m11 = a;
-        self.m12 = b;
-        self.m21 = c;
-        self.m22 = d;
-        if !n.det_pos {
-            self.det_pos.not_assign();
-        }
-    }
-
-    // M = M * n, where n is a word matrix
-    fn rmul_word(&mut self, n: &WordMat) {
-        let a = (&self.m11 * Natural::from(n.m11)).add_mul(&self.m12, Natural::from(n.m21));
-        self.m12 *= Natural::from(n.m22);
-        self.m12.add_mul_assign(&self.m11, Natural::from(n.m12));
-        self.m11 = a;
-        let a = (&self.m21 * Natural::from(n.m11)).add_mul(&self.m22, Natural::from(n.m21));
-        self.m22 *= Natural::from(n.m22);
-        self.m22.add_mul_assign(&self.m21, Natural::from(n.m12));
-        self.m21 = a;
-        if !n.det_pos {
-            self.det_pos.not_assign();
-        }
-    }
-
-    // M = M * n^-1, undoing an rmul_word; every difference is an entry that existed before that
-    // multiplication, so none goes negative
-    fn rmul_inv_word(&mut self, n: &WordMat) {
-        let (a, b) = if n.det_pos {
-            (
-                (&self.m11 * Natural::from(n.m22)).sub_mul(&self.m12, &Natural::from(n.m21)),
-                (&self.m12 * Natural::from(n.m11)).sub_mul(&self.m11, &Natural::from(n.m12)),
-            )
-        } else {
-            (
-                (&self.m12 * Natural::from(n.m21)).sub_mul(&self.m11, &Natural::from(n.m22)),
-                (&self.m11 * Natural::from(n.m12)).sub_mul(&self.m12, &Natural::from(n.m11)),
-            )
-        };
-        self.m11 = a;
-        self.m12 = b;
-        let (a, b) = if n.det_pos {
-            (
-                (&self.m21 * Natural::from(n.m22)).sub_mul(&self.m22, &Natural::from(n.m21)),
-                (&self.m22 * Natural::from(n.m11)).sub_mul(&self.m21, &Natural::from(n.m12)),
-            )
-        } else {
-            (
-                (&self.m22 * Natural::from(n.m21)).sub_mul(&self.m21, &Natural::from(n.m22)),
-                (&self.m21 * Natural::from(n.m12)).sub_mul(&self.m22, &Natural::from(n.m11)),
-            )
-        };
-        self.m21 = a;
-        self.m22 = b;
-        if !n.det_pos {
-            self.det_pos.not_assign();
-        }
-    }
-
-    // M = M * [q 1; 1 0]
-    fn rmul_elem(&mut self, q: &Natural) {
-        self.m12.add_mul_assign(&self.m11, q);
-        self.m22.add_mul_assign(&self.m21, q);
-        swap(&mut self.m11, &mut self.m12);
-        swap(&mut self.m21, &mut self.m22);
-        self.det_pos.not_assign();
-    }
-
-    // M = M * [q 1; 1 0]^-1 = M * [0 1; 1 -q], undoing an rmul_elem
-    fn rmul_inv_elem(&mut self, q: &Natural) {
-        self.m11.sub_mul_assign(&self.m12, q);
-        self.m21.sub_mul_assign(&self.m22, q);
-        swap(&mut self.m11, &mut self.m12);
-        swap(&mut self.m21, &mut self.m22);
-        self.det_pos.not_assign();
-    }
-
-    // (ya, yb) += N^-1 * (xa, xb); the results are remainders in the half-gcd, so the subtractions
-    // do not go negative when performed after the additions
-    fn addmul_inv_vec(&self, ya: &mut Natural, yb: &mut Natural, xa: &Natural, xb: &Natural) {
-        if self.det_pos {
-            ya.add_mul_assign(&self.m22, xa);
-            ya.sub_mul_assign(&self.m12, xb);
-            yb.add_mul_assign(&self.m11, xb);
-            yb.sub_mul_assign(&self.m21, xa);
-        } else {
-            ya.add_mul_assign(&self.m12, xb);
-            ya.sub_mul_assign(&self.m22, xa);
-            yb.add_mul_assign(&self.m21, xa);
-            yb.sub_mul_assign(&self.m11, xb);
-        }
-    }
-}
-
-// This is _hgcd_ok from fmpq/get_cfrac_helpers.c, FLINT 3.6.0: whether the matrix M and the pair a
-// > b > 0 still describe an open interval of reals greater than one. Unlike the asserts elsewhere,
-// this is control flow: the half-gcd uses it to decide when to stop.
-fn hgcd_ok(m: &Mat22, a: &Natural, b: &Natural) -> bool {
-    if *a <= *b || *b == 0u32 {
-        return false;
-    }
-    let ok = if m.det_pos {
-        *a > m.m12 && *b > m.m21
-    } else {
-        *a > m.m22 && *b > m.m11
-    };
-    if !ok {
-        return false;
-    }
-    let column_sum = if m.det_pos {
-        &m.m11 + &m.m12
-    } else {
-        &m.m21 + &m.m22
-    };
-    a - b >= column_sum
-}
-
-// This is _hgcd_split from fmpq/get_cfrac_helpers.c, FLINT 3.6.0: truncate the ball described by
-// (M, ya/yb) to a shifted pair on which the half-gcd can recurse. Returns the adjusted shift, or
-// zero if no useful truncation exists.
-fn hgcd_split(
-    xa: &mut Natural,
-    xb: &mut Natural,
-    ya: &Natural,
-    yb: &Natural,
-    m: &Mat22,
-    mut shift: u64,
-) -> u64 {
-    let (mut ta, mut tb);
-    if m.det_pos {
-        *xa = ya - &m.m12;
-        *xb = yb - &m.m21;
-        ta = ya + &m.m22;
-        tb = yb + &m.m11;
-    } else {
-        *xa = ya - &m.m22;
-        *xb = yb - &m.m11;
-        ta = ya + &m.m12;
-        tb = yb + &m.m21;
-    }
-    *xa >>= shift;
-    ta >>= shift;
-    *xb >>= shift;
-    tb >>= shift;
-    if *xb == 0u32 || *xa <= *xb {
-        return 0;
-    }
-    while *xa != ta || *xb != tb {
-        shift += 1;
-        *xa >>= 1u32;
-        ta >>= 1u32;
-        *xb >>= 1u32;
-        tb >>= 1u32;
-        if *xb == 0u32 || *xa <= *xb {
-            return 0;
-        }
-    }
-    shift
-}
-
-// This is _uiui_hgcd from fmpq/get_cfrac_helpers.c, FLINT 3.6.0: hgcd_word, but writing the
-// quotients out for the continued-fraction list.
-fn hgcd_word_write(
-    quotients: &mut [Limb; (Limb::WIDTH as usize) << 1],
-    mut a: DoubleLimb,
-    mut b: DoubleLimb,
-) -> (usize, WordMat) {
-    let mut m = WordMat {
-        m11: 1,
-        m12: 0,
-        m21: 0,
-        m22: 1,
-        det_pos: true,
-    };
-    let mut written = 0;
-    debug_assert!(a >> Limb::WIDTH != 0);
-    debug_assert!(b <= a);
-    if b >> Limb::WIDTH == 0 || b >= a {
-        return (0, m);
-    }
-    loop {
-        let (q, r) = a.div_mod(b);
-        let q = Limb::wrapping_from(q);
-        let t1 = m.m12.wrapping_add_mul(q, m.m11);
-        let t2 = m.m22.wrapping_add_mul(q, m.m21);
-        if r >> Limb::WIDTH == 0 {
-            break;
-        }
-        a = b;
-        b = r;
-        m.m12 = m.m11;
-        m.m22 = m.m21;
-        m.m11 = t1;
-        m.m21 = t2;
-        m.det_pos.not_assign();
-        quotients[written] = q;
-        written += 1;
-    }
-    let d = a - b;
-    let (small_entry, column_sum) = if m.det_pos {
-        (m.m21, DoubleLimb::from(m.m11) + DoubleLimb::from(m.m12))
-    } else {
-        (m.m11, DoubleLimb::from(m.m21) + DoubleLimb::from(m.m22))
-    };
-    if b <= DoubleLimb::from(small_entry) || d < column_sum {
-        debug_assert!(written >= 1);
-        written -= 1;
-        let q = quotients[written];
-        let t1 = m.m11 - q * m.m12;
-        let t2 = m.m21 - q * m.m22;
-        m.m11 = m.m12;
-        m.m21 = m.m22;
-        m.m12 = t1;
-        m.m22 = t2;
-        m.det_pos.not_assign();
-    }
-    (written, m)
-}
-
-// This is _lehmer_exact from fmpq/get_cfrac_helpers.c, FLINT 3.6.0, specialized to the
-// CFRAC_NEED_MATRIX | CFRAC_NEED_HGCD mode, the only one the half-gcd uses: word windows are only
-// kept when an over-strict fast version of hgcd_ok holds, and are undone otherwise. The
-// quotient-list limit is unlimited here, so FLINT's limit checks drop out.
-#[cfg_attr(dylint_lib = "malachite_lints", allow(adjacent_vec_allocations))]
-fn lehmer_exact(s: &mut Vec<Natural>, m: &mut Mat22, xa: &mut Natural, xb: &mut Natural) {
-    let mut xn = xa.to_limbs_asc();
-    let mut xn_len = xn.len();
-    if xn_len < 3 {
-        return;
-    }
-    let capacity = xn_len;
-    let mut xd = xb.to_limbs_asc();
-    let mut xd_len = xd.len();
-    xd.resize(capacity, 0);
-    // The scratch buffers are swapped with xn and xd as the windows apply.
-    let mut yn = vec![0 as Limb; capacity];
-    let mut yd = vec![0 as Limb; capacity];
-    let mut quotients = [0 as Limb; (Limb::WIDTH as usize) << 1];
-    loop {
-        let n = xn_len;
-        if n < 3
-            || xd_len <= 3 + usize::wrapping_from(m.bits() >> Limb::LOG_WIDTH)
-            || (n != xd_len && n != xd_len + 1)
-        {
-            break;
-        }
-        if n == xd_len + 1 {
-            xd[n - 1] = 0;
-        }
-        let x_lz = xn[n - 1].leading_zeros();
-        let a1 = left_shift_hi(xn[n - 1], xn[n - 2], x_lz);
-        let a0 = left_shift_hi(xn[n - 2], xn[n - 3], x_lz);
-        let b1 = left_shift_hi(xd[n - 1], xd[n - 2], x_lz);
-        let b0 = left_shift_hi(xd[n - 2], xd[n - 3], x_lz);
-        let (written, wm) = hgcd_word_write(
-            &mut quotients,
-            DoubleLimb::join_halves(a1, a0),
-            DoubleLimb::join_halves(b1, b0),
-        );
-        if written == 0 {
-            break;
-        }
-        let (yn_len, yd_len) = if wm.det_pos {
-            (
-                fmms1(&mut yn, wm.m22, &xn, wm.m12, &xd, n),
-                fmms1(&mut yd, wm.m11, &xd, wm.m21, &xn, n),
-            )
-        } else {
-            (
-                fmms1(&mut yn, wm.m12, &xd, wm.m22, &xn, n),
-                fmms1(&mut yd, wm.m21, &xn, wm.m11, &xd, n),
-            )
-        };
-        if yn_len == 0 || yd_len == 0 {
-            // defensive, unobserved: a window annihilating an operand entirely
-            break;
-        }
-        // the over-strict but fast hgcd_ok(M, yn, yd)
-        debug_assert!(yn_len >= yd_len);
-        m.rmul_word(&wm);
-        let mut its_ok = false;
-        for j in 2 + usize::wrapping_from(m.bits() >> Limb::LOG_WIDTH)..yn_len {
-            let aa = yn[j];
-            let bb = if j < yd_len { yd[j] } else { 0 };
-            if aa > bb && aa - bb > 1 {
-                its_ok = true;
-                break;
-            }
-        }
-        if !its_ok {
-            m.rmul_inv_word(&wm);
-            break;
-        }
-        for &q in &quotients[..written] {
-            s.push(Natural::from(q));
-        }
-        swap(&mut xn, &mut yn);
-        swap(&mut xd, &mut yd);
-        xn_len = yn_len;
-        xd_len = yd_len;
-    }
-    xn.truncate(xn_len);
-    *xa = Natural::from_owned_limbs_asc(xn);
-    xd.truncate(xd_len);
-    *xb = Natural::from_owned_limbs_asc(xd);
-}
-
-// This is _hgcd_step from fmpq/get_cfrac_helpers.c, FLINT 3.6.0: transport the truncated operands'
-// half-gcd result N back to the full operands. The wrap-around subtraction under mod 2^shift goes
-// through Integer, which is what fdiv_r_2exp of a negative value computes.
-fn hgcd_step(
-    m: &mut Mat22,
-    xa: &mut Natural,
-    xb: &mut Natural,
-    shift: u64,
-    n: &Mat22,
-    ya: &mut Natural,
-    yb: &mut Natural,
-) {
-    let (ca, cb) = if m.det_pos {
-        (&m.m12, &m.m21)
-    } else {
-        (&m.m22, &m.m11)
-    };
-    // xa = ((xa - ca) mod 2^shift) + ca, and likewise for xb. FLINT reaches the same value by
-    // letting the subtraction go negative and taking fdiv_r_2exp of it; subtracting modularly
-    // instead keeps everything in the Naturals. Reducing ca first is what the modular subtraction
-    // requires of its operands, and does not change the result, since ca and ca mod 2^shift are
-    // congruent.
-    xa.mod_power_of_2_assign(shift);
-    xa.mod_power_of_2_sub_assign(ca.mod_power_of_2(shift), shift);
-    *xa += ca;
-    xb.mod_power_of_2_assign(shift);
-    xb.mod_power_of_2_sub_assign(cb.mod_power_of_2(shift), shift);
-    *xb += cb;
-    *ya <<= shift;
-    *yb <<= shift;
-    n.addmul_inv_vec(ya, yb, xa, xb);
-    swap(xa, ya);
-    swap(xb, yb);
-    m.rmul(n);
-}
-
-// This is _fmpq_hgcd from fmpq/get_cfrac_helpers.c, FLINT 3.6.0: for a > b > 0, generate
-// continued-fraction terms valid for every real in the open interval M^-1(a/(b+1), (a+1)/b),
-// appending the terms to s and multiplying M on the right. Subquadratic: large operands are
-// truncated, recursed on, and stitched back with hgcd_step.
-fn fmpq_hgcd(s: &mut Vec<Natural>, m: &mut Mat22, xa: &mut Natural, xb: &mut Natural) {
-    let mut ya = Natural::ZERO;
-    let mut yb = Natural::ZERO;
-    loop {
-        debug_assert!(hgcd_ok(m, xa, xb));
-        let k = xa.significant_bits() - m.bits();
-        if k > const { RECONSTRUCT_HGCD_CUTOFF << Limb::LOG_WIDTH } {
-            let km = m.bits();
-            let shift = hgcd_split(&mut ya, &mut yb, xa, xb, m, km + (k >> 1));
-            if shift != 0 {
-                let mut n = Mat22::one();
-                fmpq_hgcd(s, &mut n, &mut ya, &mut yb);
-                if !n.is_one() {
-                    hgcd_step(m, xa, xb, shift, &n, &mut ya, &mut yb);
-                    debug_assert!(hgcd_ok(m, xa, xb));
-                    let km = m.bits();
-                    let shift = hgcd_split(&mut ya, &mut yb, xa, xb, m, km + 1);
-                    if shift != 0 {
-                        let mut n = Mat22::one();
-                        fmpq_hgcd(s, &mut n, &mut ya, &mut yb);
-                        if !n.is_one() {
-                            hgcd_step(m, xa, xb, shift, &n, &mut ya, &mut yb);
-                            debug_assert!(hgcd_ok(m, xa, xb));
-                            continue;
-                        }
-                    }
-                }
-            }
-        } else if k > const { Limb::WIDTH << 2 } {
-            lehmer_exact(s, m, xa, xb);
-        }
-        // one exact Euclidean step; stop when the interval is no longer greater than one
-        let (q, r) = (&*xa).div_mod(&*xb);
-        m.rmul_elem(&q);
-        if !hgcd_ok(m, xb, &r) {
-            m.rmul_inv_elem(&q);
-            return;
-        }
-        *xa = replace(xb, r);
-        s.push(q);
     }
 }
 

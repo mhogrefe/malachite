@@ -29,6 +29,7 @@ use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::string::options::ToSciOptions;
 use malachite_base::num::conversion::string::options::random::random_to_sci_options;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, IsInteger, ToSci};
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::num::random::geometric::{
     geometric_random_nonzero_signeds, geometric_random_positive_unsigneds,
     geometric_random_signeds, geometric_random_unsigned_inclusive_range,
@@ -1590,6 +1591,25 @@ pub fn special_random_rational_rational_unsigned_triple_gen_var_2<T: PrimitiveUn
             )
         },
     ))
+}
+
+// (x, y) with x < y and the two very close together, so that their continued fractions share a long
+// prefix, at sizes where the accelerated tiers engage.
+pub fn special_random_rational_pair_gen_var_9(config: &GenConfig) -> It<(Rational, Rational)> {
+    Box::new(
+        striped_random_rationals(
+            EXAMPLE_SEED,
+            config.get_or("mean_stripe_n", 32),
+            config.get_or("mean_stripe_d", 1),
+            config.get_or("mean_bits_n", 2000),
+            config.get_or("mean_bits_d", 1),
+        )
+        .filter(|x| *x != 0u32)
+        .map(|x| {
+            let y = &x + (Rational::ONE >> (x.significant_bits() << 1));
+            (x, y)
+        }),
+    )
 }
 
 // -- (Rational, Rational, Rational) --

@@ -70,7 +70,8 @@ private_test_fn! {limbs_add_mul_limb(xs: &[Limb], ys: &[Limb], limb: Limb) -> Ve
 // Panics if `xs` and `ys` have different lengths.
 //
 // This is equivalent to `mpn_addmul_1` from `mpn/generic/addmul_1.c`, GMP 6.2.1.
-crate_test_fn! {limbs_slice_add_mul_limb_same_length_in_place_left(
+#[doc(hidden)]
+pub fn limbs_slice_add_mul_limb_same_length_in_place_left(
     xs: &mut [Limb],
     ys: &[Limb],
     z: Limb,
@@ -87,7 +88,7 @@ crate_test_fn! {limbs_slice_add_mul_limb_same_length_in_place_left(
         carry = product_hi.wrapping_add(add_carry);
     }
     carry
-}}
+}
 
 pub(crate) fn limbs_slice_add_mul_two_limbs_matching_length_in_place_left(
     xs: &mut [Limb],

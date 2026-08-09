@@ -76,11 +76,8 @@ crate_test_fn! {limbs_sub_mul_limb_greater(
 // Panics if `xs` and `ys` have different lengths.
 //
 // This is equivalent to `mpn_submul_1` from `mpn/generic/submul_1.c`, GMP 6.2.1.
-crate_test_fn! {limbs_sub_mul_limb_same_length_in_place_left(
-    xs: &mut [Limb],
-    ys: &[Limb],
-    z: Limb
-) -> Limb {
+#[doc(hidden)]
+pub fn limbs_sub_mul_limb_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb], z: Limb) -> Limb {
     assert_eq!(xs.len(), ys.len());
     let mut borrow = 0;
     let z = DoubleLimb::from(z);
@@ -99,7 +96,7 @@ crate_test_fn! {limbs_sub_mul_limb_same_length_in_place_left(
         *x = lower;
     }
     borrow
-}}
+}
 
 // Given the limbs of two `Natural`s x and y, and a limb z, calculates x - y * z and writes the
 // limbs of the result to the first (left) input slice. If y * z > x, a nonzero borrow is returned.

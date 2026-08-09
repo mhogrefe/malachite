@@ -14,7 +14,7 @@ use malachite_q::rational::arithmetic::traits::SimplestRationalInInterval;
 use malachite_q::test_util::bench::bucketers::pair_rational_max_bit_bucketer;
 use malachite_q::test_util::generators::{
     rational_pair_gen, rational_pair_gen_var_3, rational_pair_gen_var_4, rational_pair_gen_var_5,
-    rational_pair_gen_var_6,
+    rational_pair_gen_var_6, rational_pair_gen_var_9,
 };
 use malachite_q::test_util::rational::arithmetic::simplest_rational_in_interval::*;
 use std::cmp::Ordering::*;
@@ -32,6 +32,10 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(
         runner,
         benchmark_simplest_rational_in_open_interval_algorithms_2
+    );
+    register_bench!(
+        runner,
+        benchmark_simplest_rational_in_open_interval_algorithms_large
     );
     register_bench!(runner, benchmark_simplest_rational_in_closed_interval);
     register_bench!(
@@ -114,6 +118,9 @@ fn benchmark_simplest_rational_in_open_interval_algorithms(
             ("naive", &mut |(x, y)| {
                 no_out!(simplest_rational_in_open_interval_naive(&x, &y));
             }),
+            ("term by term", &mut |(x, y)| {
+                no_out!(simplest_rational_in_open_interval_term_by_term(&x, &y));
+            }),
         ],
     );
 }
@@ -138,6 +145,35 @@ fn benchmark_simplest_rational_in_open_interval_algorithms_2(
             }),
             ("explicit", &mut |(x, y)| {
                 no_out!(simplest_rational_in_open_interval_explicit(&x, &y));
+            }),
+        ],
+    );
+}
+
+// The endpoints here are large and very close together, so the shared continued-fraction prefix is
+// long: the regime the half-gcd machinery exists for, and the one the small-input algorithms
+// benchmark never reaches. The brute-force references are omitted, since a narrow interval's answer
+// has a denominator far too large for them to search up to.
+fn benchmark_simplest_rational_in_open_interval_algorithms_large(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Rational::simplest_rational_in_open_interval(&Rational, &Rational)",
+        BenchmarkType::Algorithms,
+        rational_pair_gen_var_9().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_rational_max_bit_bucketer("x", "y"),
+        &mut [
+            ("default", &mut |(x, y)| {
+                no_out!(Rational::simplest_rational_in_open_interval(&x, &y));
+            }),
+            ("term by term", &mut |(x, y)| {
+                no_out!(simplest_rational_in_open_interval_term_by_term(&x, &y));
             }),
         ],
     );

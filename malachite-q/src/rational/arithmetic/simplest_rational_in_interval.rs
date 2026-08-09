@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Rational;
+use crate::rational::arithmetic::cfrac_helpers::{Ball, Mat22, ball_get_cfrac};
 use crate::rational::arithmetic::traits::SimplestRationalInInterval;
 use crate::rational::conversion::continued_fraction::to_continued_fraction::*;
 use crate::rational::conversion::traits::ContinuedFraction;
@@ -15,12 +16,21 @@ use core::cmp::{
     max, min,
 };
 use core::mem::swap;
-use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign, Ceiling, Floor, UnsignedAbs};
+use malachite_base::num::arithmetic::traits::{
+    AddMul, AddMulAssign, Ceiling, Floor, Reciprocal, UnsignedAbs,
+};
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::conversion::traits::IsInteger;
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::Natural;
 
 const THREE: Natural = Natural::const_from(3);
+
+// Below this many combined bits in either endpoint, the term-by-term prefix walk is used instead of
+// the ball engine. Measured on a quiet machine: the two are at parity from about 500 through 1500
+// bits, and the engine pulls ahead past 1600, so the threshold sits at the low end of the parity
+// plateau; below it the walk wins outright, and inside it the choice costs nothing.
+const BALL_THRESHOLD: u64 = 1024;
 
 fn min_helper_oo<'a>(ox: &'a Option<Natural>, oy: &'a Option<Natural>) -> &'a Natural {
     if let Some(x) = ox.as_ref() {
@@ -94,6 +104,104 @@ fn update_best(best: &mut Option<Rational>, x: &Rational, y: &Rational, candidat
     }
 }
 
+// The shared finish of the equal-floors case: once the common continued-fraction prefix is in hand
+// as the convergent pair, form the candidates and pick the best. The prefix may come from the
+// term-by-term walk or from the ball engine; everything from here on is identical.
+#[allow(clippy::too_many_arguments)]
+fn finish_same_floor(
+    x: &Rational,
+    y: &Rational,
+    neg: bool,
+    numerator: Natural,
+    denominator: Natural,
+    previous_numerator: Natural,
+    previous_denominator: Natural,
+    mut ox_n: Option<Natural>,
+    mut oy_n: Option<Natural>,
+    mut cf_x: RationalContinuedFraction,
+    mut cf_y: RationalContinuedFraction,
+) -> Rational {
+    let mut best = None;
+    // use [x_0; x_1, ... x_k] and [y_0; y_1, ... y_k]
+    let m = min_helper_oo(&ox_n, &oy_n) + Natural::ONE;
+    let n = (&previous_numerator).add_mul(&numerator, &m);
+    let d = (&previous_denominator).add_mul(&denominator, &m);
+    let candidate = Rational {
+        sign: true,
+        numerator: n,
+        denominator: d,
+    };
+    update_best(&mut best, x, y, candidate);
+    if let Some(x_n) = ox_n.as_ref()
+        && cf_x.is_done()
+    {
+        update_best(
+            &mut best,
+            x,
+            y,
+            simplest_rational_one_alt_helper(
+                x_n,
+                &oy_n,
+                cf_y.clone(),
+                &numerator,
+                &denominator,
+                &previous_numerator,
+                &previous_denominator,
+            ),
+        );
+    }
+    if let Some(y_n) = oy_n.as_ref()
+        && cf_y.is_done()
+    {
+        update_best(
+            &mut best,
+            x,
+            y,
+            simplest_rational_one_alt_helper(
+                y_n,
+                &ox_n,
+                cf_x.clone(),
+                &numerator,
+                &denominator,
+                &previous_numerator,
+                &previous_denominator,
+            ),
+        );
+    }
+    if ox_n.is_some() && oy_n.is_some() && cf_x.is_done() != cf_y.is_done() {
+        if cf_y.is_done() {
+            swap(&mut ox_n, &mut oy_n);
+            swap(&mut cf_y, &mut cf_x);
+        }
+        let x_n = ox_n.unwrap();
+        let y_n = oy_n.unwrap();
+        if y_n == x_n - Natural::ONE {
+            let next_y_n = cf_y.next().unwrap();
+            let next_numerator = (&previous_numerator).add_mul(&numerator, &y_n);
+            let next_denominator = (&previous_denominator).add_mul(&denominator, &y_n);
+            let (n, d) = if cf_y.is_done() && next_y_n == 2u32 {
+                (
+                    (numerator << 1u32).add_mul(next_numerator, THREE),
+                    (denominator << 1u32).add_mul(next_denominator, THREE),
+                )
+            } else {
+                (
+                    previous_numerator + (numerator << 1),
+                    previous_denominator + (denominator << 1),
+                )
+            };
+            let candidate = Rational {
+                sign: true,
+                numerator: n,
+                denominator: d,
+            };
+            update_best(&mut best, x, y, candidate);
+        }
+    }
+    let best = best.unwrap();
+    if neg { -best } else { best }
+}
+
 impl Rational {
     /// Compares two [`Rational`]s according to their complexity.
     ///
@@ -152,12 +260,13 @@ impl SimplestRationalInInterval for Rational {
     /// - If $x < m/q < y$, then $|p| \leq |m|$
     ///
     /// # Worst-case complexity
-    /// $T(n) = O(n^2 \log n \log\log n)$
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
     ///
     /// $M(n) = O(n \log n)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `max(x.significant_bits(),
-    /// y.significant_bits())`.
+    /// y.significant_bits())`: the endpoints' shared continued-fraction prefix is found by a
+    /// half-gcd rather than one term at a time, which is what makes this subquadratic.
     ///
     /// # Panics
     /// Panics if $x \geq y$.
@@ -211,133 +320,158 @@ impl SimplestRationalInInterval for Rational {
         let mut best = None;
         if floor_x == floor_y {
             let floor = floor_x;
-            let mut previous_numerator = Natural::ONE;
-            let mut previous_denominator = Natural::ZERO;
-            let mut numerator = floor;
-            let mut denominator = Natural::ONE;
-            let mut ox_n = cf_x.next();
-            let mut oy_n = cf_y.next();
-            while ox_n == oy_n {
-                // They are both Some
-                swap(&mut numerator, &mut previous_numerator);
-                swap(&mut denominator, &mut previous_denominator);
-                numerator.add_mul_assign(&previous_numerator, &ox_n.unwrap());
-                denominator.add_mul_assign(&previous_denominator, &oy_n.unwrap());
-                ox_n = cf_x.next();
-                oy_n = cf_y.next();
+            // Below this size the term-by-term walk wins: the engine pays for tail construction, a
+            // ball, and its matrix before extracting anything, and the batching that repays that
+            // only engages once the operands clear the Lehmer window floor. The crossover was
+            // measured at roughly 640 combined bits; erring low is safe, since the engine's
+            // overhead below the crossover is bounded while the walk's cost above it is not.
+            if max(x.significant_bits(), y.significant_bits()) < BALL_THRESHOLD {
+                let mut previous_numerator = Natural::ONE;
+                let mut previous_denominator = Natural::ZERO;
+                let mut numerator = floor;
+                let mut denominator = Natural::ONE;
+                let mut ox_n = cf_x.next();
+                let mut oy_n = cf_y.next();
+                while ox_n == oy_n {
+                    // They are both Some
+                    swap(&mut numerator, &mut previous_numerator);
+                    swap(&mut denominator, &mut previous_denominator);
+                    numerator.add_mul_assign(&previous_numerator, &ox_n.unwrap());
+                    denominator.add_mul_assign(&previous_denominator, &oy_n.unwrap());
+                    ox_n = cf_x.next();
+                    oy_n = cf_y.next();
+                }
+                return finish_same_floor(
+                    x,
+                    y,
+                    neg,
+                    numerator,
+                    denominator,
+                    previous_numerator,
+                    previous_denominator,
+                    ox_n,
+                    oy_n,
+                    cf_x,
+                    cf_y,
+                );
             }
-            // use [x_0; x_1, ... x_k] and [y_0; y_1, ... y_k]
-            let m = min_helper_oo(&ox_n, &oy_n) + Natural::ONE;
-            let n = (&previous_numerator).add_mul(&numerator, &m);
-            let d = (&previous_denominator).add_mul(&denominator, &m);
-            let candidate = Self {
+            // The common prefix of the two expansions, accumulated as the matrix of its
+            // convergents: m11/m21 is the current convergent and m12/m22 the previous one. The
+            // shared floor is taken by hand, because the ball engine below needs a ball greater
+            // than one and [floor, floor + 1) is not; the rest of the prefix comes from the engine,
+            // which takes terms in batches rather than one at a time.
+            let tail_x = x - Self::from(floor.clone());
+            let tail_y = y - Self::from(floor.clone());
+            let mut mat = Mat22 {
+                m11: floor,
+                m12: Natural::ONE,
+                m21: Natural::ONE,
+                m22: Natural::ZERO,
+                det_pos: false,
+            };
+            let (ox_n, oy_n, cf_x, cf_y) = if tail_x == 0u32 {
+                // x is the shared floor exactly, so its expansion is already over and there is no
+                // common tail to walk.
+                let (f, cf) = tail_y.reciprocal().continued_fraction();
+                (
+                    None,
+                    Some(f.unsigned_abs()),
+                    Self::ZERO.continued_fraction().1,
+                    cf,
+                )
+            } else {
+                // The two tails as a ball. The smaller tail has the larger reciprocal, so the
+                // endpoints trade places, which is exactly the one term already taken.
+                let left = tail_y.reciprocal();
+                let right = tail_x.reciprocal();
+                let mut ball = Ball {
+                    left_num: left.to_numerator(),
+                    left_den: left.to_denominator(),
+                    right_num: right.to_numerator(),
+                    right_den: right.to_denominator(),
+                };
+                let mut n = Mat22::one();
+                ball_get_cfrac(&mut n, &mut ball);
+                mat.rmul(&n);
+                // The engine's matrix is unimodular, so the reduced endpoints are still in lowest
+                // terms and the gcd in from_naturals would be wasted.
+                let left = Self {
+                    sign: true,
+                    numerator: ball.left_num,
+                    denominator: ball.left_den,
+                };
+                let right = Self {
+                    sign: true,
+                    numerator: ball.right_num,
+                    denominator: ball.right_den,
+                };
+                let left_floor = (&left).floor().unsigned_abs();
+                let right_floor = (&right).floor().unsigned_abs();
+                let (o_left, cf_left, o_right, cf_right) = if left_floor == right_floor {
+                    // The engine also stops when an endpoint reaches its own floor exactly, one
+                    // term before a term-by-term walk would; that term is taken here. The exact
+                    // endpoint is always the left one, and its expansion ends with it.
+                    let tail = (right - Self::from(left_floor.clone())).reciprocal();
+                    mat.rmul_elem(&left_floor);
+                    let (f, cf) = tail.continued_fraction();
+                    (
+                        None,
+                        Self::ZERO.continued_fraction().1,
+                        Some(f.unsigned_abs()),
+                        cf,
+                    )
+                } else {
+                    let (lf, cf_l) = left.continued_fraction();
+                    let (rf, cf_r) = right.continued_fraction();
+                    (Some(lf.unsigned_abs()), cf_l, Some(rf.unsigned_abs()), cf_r)
+                };
+                // Every term flips the interval, so an even number of them leaves the endpoints in
+                // their original roles, which is what a positive determinant records.
+                if mat.det_pos {
+                    (o_left, o_right, cf_left, cf_right)
+                } else {
+                    (o_right, o_left, cf_right, cf_left)
+                }
+            };
+            return finish_same_floor(
+                x, y, neg, mat.m11, mat.m21, mat.m12, mat.m22, ox_n, oy_n, cf_x, cf_y,
+            );
+        }
+
+        let candidate = if floor_y - Natural::ONE != floor_x || !cf_y.is_done() {
+            Self::from(floor_x + Natural::ONE)
+        } else {
+            let floor = floor_x;
+            // [f; x_1, x_2, x_3...] and [f + 1]. But to get any good candidates, we need [f; x_1,
+            // x_2, x_3...] and [f; 1]. If x_1 does not exist, the result is [f; 2].
+            let (n, d) = if cf_x.is_done() {
+                ((floor << 1) | Natural::ONE, Natural::TWO)
+            } else {
+                let x_1 = cf_x.next().unwrap();
+                if x_1 > 1u32 {
+                    if x_1 == 2u32 && cf_x.is_done() {
+                        // [f; 1, 1] and [f; 1], so [f; 1, 2] is a candidate.
+                        (Natural::TWO.add_mul(floor, THREE), THREE)
+                    } else {
+                        // If x_1 > 1, we have [f; 2] as a candidate.
+                        ((floor << 1) | Natural::ONE, Natural::TWO)
+                    }
+                } else {
+                    // x_2 exists since x_1 was 1
+                    let x_2 = cf_x.next().unwrap();
+                    // [f; 1, x_2] and [f; 1], so [f; 1, x_2 + 1] is a candidate. [f; 1, x_2 - 1, 1]
+                    // and [f; 1], but [f; 1, x_2] is not in the interval
+                    let k = &x_2 + Natural::ONE;
+                    (&floor * (&k + Natural::ONE) + k, x_2 + Natural::TWO)
+                }
+            };
+            Self {
                 sign: true,
                 numerator: n,
                 denominator: d,
-            };
-            update_best(&mut best, x, y, candidate);
-            if let Some(x_n) = ox_n.as_ref()
-                && cf_x.is_done()
-            {
-                update_best(
-                    &mut best,
-                    x,
-                    y,
-                    simplest_rational_one_alt_helper(
-                        x_n,
-                        &oy_n,
-                        cf_y.clone(),
-                        &numerator,
-                        &denominator,
-                        &previous_numerator,
-                        &previous_denominator,
-                    ),
-                );
             }
-            if let Some(y_n) = oy_n.as_ref()
-                && cf_y.is_done()
-            {
-                update_best(
-                    &mut best,
-                    x,
-                    y,
-                    simplest_rational_one_alt_helper(
-                        y_n,
-                        &ox_n,
-                        cf_x.clone(),
-                        &numerator,
-                        &denominator,
-                        &previous_numerator,
-                        &previous_denominator,
-                    ),
-                );
-            }
-            if ox_n.is_some() && oy_n.is_some() && cf_x.is_done() != cf_y.is_done() {
-                if cf_y.is_done() {
-                    swap(&mut ox_n, &mut oy_n);
-                    swap(&mut cf_y, &mut cf_x);
-                }
-                let x_n = ox_n.unwrap();
-                let y_n = oy_n.unwrap();
-                if y_n == x_n - Natural::ONE {
-                    let next_y_n = cf_y.next().unwrap();
-                    let next_numerator = (&previous_numerator).add_mul(&numerator, &y_n);
-                    let next_denominator = (&previous_denominator).add_mul(&denominator, &y_n);
-                    let (n, d) = if cf_y.is_done() && next_y_n == 2u32 {
-                        (
-                            (numerator << 1u32).add_mul(next_numerator, THREE),
-                            (denominator << 1u32).add_mul(next_denominator, THREE),
-                        )
-                    } else {
-                        (
-                            previous_numerator + (numerator << 1),
-                            previous_denominator + (denominator << 1),
-                        )
-                    };
-                    let candidate = Self {
-                        sign: true,
-                        numerator: n,
-                        denominator: d,
-                    };
-                    update_best(&mut best, x, y, candidate);
-                }
-            }
-        } else {
-            let candidate = if floor_y - Natural::ONE != floor_x || !cf_y.is_done() {
-                Self::from(floor_x + Natural::ONE)
-            } else {
-                let floor = floor_x;
-                // [f; x_1, x_2, x_3...] and [f + 1]. But to get any good candidates, we need [f;
-                // x_1, x_2, x_3...] and [f; 1]. If x_1 does not exist, the result is [f; 2].
-                let (n, d) = if cf_x.is_done() {
-                    ((floor << 1) | Natural::ONE, Natural::TWO)
-                } else {
-                    let x_1 = cf_x.next().unwrap();
-                    if x_1 > 1u32 {
-                        if x_1 == 2u32 && cf_x.is_done() {
-                            // [f; 1, 1] and [f; 1], so [f; 1, 2] is a candidate.
-                            (Natural::TWO.add_mul(floor, THREE), THREE)
-                        } else {
-                            // If x_1 > 1, we have [f; 2] as a candidate.
-                            ((floor << 1) | Natural::ONE, Natural::TWO)
-                        }
-                    } else {
-                        // x_2 exists since x_1 was 1
-                        let x_2 = cf_x.next().unwrap();
-                        // [f; 1, x_2] and [f; 1], so [f; 1, x_2 + 1] is a candidate. [f; 1, x_2 -
-                        // 1, 1] and [f; 1], but [f; 1, x_2] is not in the interval
-                        let k = &x_2 + Natural::ONE;
-                        (&floor * (&k + Natural::ONE) + k, x_2 + Natural::TWO)
-                    }
-                };
-                Self {
-                    sign: true,
-                    numerator: n,
-                    denominator: d,
-                }
-            };
-            update_best(&mut best, x, y, candidate);
-        }
+        };
+        update_best(&mut best, x, y, candidate);
         let best = best.unwrap();
         if neg { -best } else { best }
     }

@@ -42,12 +42,26 @@ fn test_simplest_rational_in_open_interval() {
             simplest_rational_in_open_interval_naive(&x, &y).to_string(),
             out
         );
+        assert_eq!(
+            simplest_rational_in_open_interval_term_by_term(&x, &y).to_string(),
+            out
+        );
     };
     test("0", "2", "1");
     test("0", "1", "1/2");
     test("-1", "1", "0");
     test("-9", "10", "0");
     test("0", "1/2", "1/3");
+    // - the lower endpoint is an integer, so its expansion is over before the shared prefix ends
+    test("1", "3/2", "4/3");
+    // - the lower endpoint's expansion ends inside the shared prefix, so the half-gcd stops one
+    //   term before a term-by-term walk would and that term is taken separately
+    test("9/7", "4/3", "13/10");
+    // - the tails diverge at once, leaving an odd number of shared terms, so the endpoints have
+    //   traded places
+    test("1/3", "1/2", "2/5");
+    // - the tails share a term, leaving an even number, so the endpoints keep their roles
+    test("10/7", "13/9", "23/16");
     test("1/2", "1", "2/3");
     test("0", "1/3", "1/4");
     test("1/3", "1", "1/2");
@@ -127,6 +141,7 @@ fn simplest_rational_in_open_interval_properties() {
         let s = Rational::simplest_rational_in_open_interval(&x, &y);
         assert!(s.is_valid());
         assert_eq!(simplest_rational_in_open_interval_explicit(&x, &y), s);
+        assert_eq!(simplest_rational_in_open_interval_term_by_term(&x, &y), s);
         assert!(s > x);
         assert!(s < y);
         assert_eq!(Rational::simplest_rational_in_open_interval(&-y, &-x), -s);

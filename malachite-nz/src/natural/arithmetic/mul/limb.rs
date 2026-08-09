@@ -94,7 +94,9 @@ crate_test_fn! {limbs_mul_limb_with_carry_to_out<
 // Panics if `out` is shorter than `xs`.
 //
 // This is equivalent to `mpn_mul_1` from `mpn/generic/mul_1.c`, GMP 6.2.1.
-crate_test_fn! {limbs_mul_limb_to_out<
+#[doc(hidden)]
+#[inline]
+pub fn limbs_mul_limb_to_out<
     DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + SplitInHalf,
     T: PrimitiveUnsigned,
 >(
@@ -103,7 +105,7 @@ crate_test_fn! {limbs_mul_limb_to_out<
     y: T,
 ) -> T {
     limbs_mul_limb_with_carry_to_out::<DT, T>(out, xs, y, T::ZERO)
-}}
+}
 
 // Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
 // limbs of the product of the `Natural` and a `Limb`, plus a carry, to the input slice. Returns the
@@ -142,9 +144,11 @@ crate_test_fn! {limbs_slice_mul_limb_with_carry_in_place(
 // where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
 //
 // This is equivalent to `mpn_mul_1` from `mpn/generic/mul_1.c`, GMP 6.2.1, where `rp == up`.
-crate_test_fn! {limbs_slice_mul_limb_in_place(xs: &mut [Limb], y: Limb) -> Limb {
+#[doc(hidden)]
+#[inline]
+pub fn limbs_slice_mul_limb_in_place(xs: &mut [Limb], y: Limb) -> Limb {
     limbs_slice_mul_limb_with_carry_in_place(xs, y, 0)
-}}
+}
 
 // Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
 // limbs of the product of the `Natural` and a `Limb` to the input `Vec`.

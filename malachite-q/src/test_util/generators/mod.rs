@@ -742,6 +742,16 @@ pub fn rational_pair_gen_var_8() -> Generator<(Rational, Rational)> {
     )
 }
 
+// (x, y) with x < y and the two very close together, so that their continued fractions share a long
+// prefix, at sizes where the accelerated tiers engage.
+pub fn rational_pair_gen_var_9() -> Generator<(Rational, Rational)> {
+    Generator::new(
+        &exhaustive_rational_pair_gen_var_9,
+        &random_rational_pair_gen_var_9,
+        &special_random_rational_pair_gen_var_9,
+    )
+}
+
 // -- (Rational, Rational, Integer) --
 
 pub fn rational_rational_integer_triple_gen() -> Generator<(Rational, Rational, Integer)> {

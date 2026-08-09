@@ -20,6 +20,12 @@ use std::collections::HashSet;
 
 #[test]
 fn test_exhaustive_positive_rationals_by_height() {
+    // This 20-term prefix exercises every branch of the stepping engine:
+    // - a fraction below one followed by its reciprocal (1/2 -> 2 and every such pair)
+    // - a height exhausted, moving to the next (3/2 -> 1/4: within height 3, the denominator
+    //   reaches the numerator)
+    // - the next coprime pair within a height (1/3 -> ... -> 2/3: denominator 2 against 3)
+    // - a non-coprime pair skipped (4/3 -> 1/5 skips 2/4; 5/4 -> 1/6 skips 2/5's mates 5/5)
     assert_eq!(
         exhaustive_positive_rationals_by_height()
             .take(20)
@@ -55,6 +61,8 @@ fn test_exhaustive_negative_rationals_by_height() {
 
 #[test]
 fn test_exhaustive_nonzero_rationals_by_height() {
+    // - both arms of the sign interleaver: each positive term is pulled and cached, then its
+    //   negative is emitted from the cache
     assert_eq!(
         exhaustive_nonzero_rationals_by_height()
             .take(20)

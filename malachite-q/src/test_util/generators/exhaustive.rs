@@ -33,6 +33,7 @@ use malachite_base::num::exhaustive::{
     exhaustive_nonzero_signeds, exhaustive_positive_primitive_ints, exhaustive_primitive_floats,
     exhaustive_signeds, exhaustive_unsigneds, primitive_int_increasing_inclusive_range,
 };
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::options::exhaustive::exhaustive_options;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
@@ -134,6 +135,16 @@ where
 
 pub fn exhaustive_rational_gen_var_7() -> It<Rational> {
     Box::new(exhaustive_positive_rationals().filter(|q| *q != 1u32))
+}
+
+// (x, y) with x < y and the two very close together, so that their continued fractions share a long
+// prefix: the case the half-gcd machinery exists for. The endpoints are also large, since the
+// accelerated tiers do not engage below a few hundred bits.
+pub fn exhaustive_rational_pair_gen_var_9() -> It<(Rational, Rational)> {
+    Box::new(exhaustive_rationals().filter(|x| *x != 0u32).map(|x| {
+        let y = &x + (Rational::ONE >> (x.significant_bits() << 1));
+        (x, y)
+    }))
 }
 
 // -- (Rational, Integer) --
