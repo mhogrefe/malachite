@@ -1,0 +1,28 @@
+error: projecting the quotient out of `div_mod` computes the other component for nothing; use `div_round` with `Floor` (or `/` on unsigned values) instead
+  --> $DIR/div_mod_projection.rs:17:13
+   |
+LL |     let _ = (&x).div_mod(&y).0;
+   |             ^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[deny(div_mod_projection)]` on by default
+
+error: projecting the remainder out of `div_rem` computes the other component for nothing; use `%` or `rem_op` instead
+  --> $DIR/div_mod_projection.rs:19:13
+   |
+LL |     let _ = (&x).div_rem(&y).1;
+   |             ^^^^^^^^^^^^^^^^^^
+
+error: projecting the quotient out of `ceiling_div_mod` computes the other component for nothing; use `div_round` with `Ceiling` instead
+  --> $DIR/div_mod_projection.rs:23:13
+   |
+LL |     let _ = (&a).ceiling_div_mod(&b).0;
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: projecting the remainder out of `ceiling_div_neg_mod` computes the other component for nothing; use `neg_mod` instead
+  --> $DIR/div_mod_projection.rs:24:13
+   |
+LL |     let _ = (&x).ceiling_div_neg_mod(&y).1;
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: aborting due to 4 previous errors
+

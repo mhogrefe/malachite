@@ -26,6 +26,7 @@ mod collapse_adjacent_ifs;
 mod collapse_adjacent_imports;
 mod compare_with_power_of_2;
 mod compare_with_primitive;
+mod div_mod_projection;
 mod duplicate_const;
 mod let_tuple_underscore_to_field;
 mod long_lines;
@@ -406,6 +407,23 @@ fn references_named_const(cx: &rustc_lint::LateContext<'_>, e: &rustc_hir::Expr<
 // Whether the span lies in test-oriented code: tests, demos and benches (`bin_util`), test
 // utilities, or any code compiled only as part of a test harness (which covers `#[cfg(test)]`
 // modules inside `src`). Such code exercises the discouraged spellings on purpose.
+// Whether the span lives in demo-and-bench or test code, where algorithm-comparison arms and
+// cross-function consistency properties legitimately spell out forms the lints would otherwise
+// flag. Unlike in_test_code, this does NOT exempt test_util: reference implementations there are
+// library code and should read like it.
+fn in_bin_util_or_tests(cx: &rustc_lint::LateContext<'_>, hir_id: rustc_hir::HirId) -> bool {
+    use rustc_lint::LintContext;
+    let span = cx.tcx.hir_span(hir_id);
+    if let rustc_span::FileName::Real(real) = cx.sess().source_map().span_to_filename(span)
+        && let Some(path) = real.local_path()
+    {
+        let path = path.to_string_lossy().replace('\\', "/");
+        path.contains("/bin_util/") || path.contains("/tests/")
+    } else {
+        false
+    }
+}
+
 fn in_test_code(cx: &rustc_lint::LateContext<'_>, span: rustc_span::Span) -> bool {
     use rustc_lint::LintContext;
     if cx.sess().opts.test {
@@ -432,6 +450,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         assign_then_returned::ASSIGN_THEN_RETURNED,
         clone_with_ref_variant::CLONE_WITH_REF_VARIANT,
         collapse_adjacent_ifs::COLLAPSE_ADJACENT_IFS,
+        div_mod_projection::DIV_MOD_PROJECTION,
         collapse_adjacent_imports::COLLAPSE_ADJACENT_IMPORTS,
         compare_with_power_of_2::COMPARE_WITH_POWER_OF_2,
         compare_with_primitive::COMPARE_WITH_PRIMITIVE,
@@ -486,6 +505,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
     });
     lint_store.register_late_pass(|_| Box::new(adjacent_vec_allocations::AdjacentVecAllocations));
     lint_store.register_late_pass(|_| Box::new(collapse_adjacent_ifs::CollapseAdjacentIfs));
+    lint_store.register_late_pass(|_| Box::new(div_mod_projection::DivModProjection));
     lint_store.register_late_pass(|_| Box::new(assign_then_consumed_once::AssignThenConsumedOnce));
     lint_store.register_late_pass(|_| Box::new(assign_then_returned::AssignThenReturned));
     lint_store.register_late_pass(|_| Box::new(compare_with_power_of_2::CompareWithPowerOf2));

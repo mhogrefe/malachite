@@ -556,20 +556,20 @@ function and is covered by the same port.
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✗ | `void fmpq_dedekind_sum (fmpq_t s, const fmpz_t h, const fmpz_t k)` | |
+| ✓ | `void fmpq_dedekind_sum (fmpq_t s, const fmpz_t h, const fmpz_t k)` | `Rational::dedekind_sum(&h, &k)` |
 | — | `void fmpq_dedekind_sum_naive (fmpq_t s, const fmpz_t h, const fmpz_t k)` | |
 
 **`fmpq_dedekind_sum`.** The Dedekind sum $$s(h, k)$$, the sawtooth correlation sum that
 appears in the transformation law of the Dedekind eta function and downstream of it, in the
-Hardy-Ramanujan-Rademacher evaluation of the partition function. The fast version is a gap.
-FLINT's manual lays out its evaluation in full: a walk down the Euclidean remainder sequence of
-`h` and `k`, accumulating a rational term at each step, which makes it one more algorithm over
-the GCD remainder sequence, the recurring machinery of this page's gaps. The formula in
-FLINT's documentation composes directly from mapped arithmetic when the sum is needed before
-the function exists.
+Hardy-Ramanujan-Rademacher evaluation of the partition function. Both libraries evaluate it
+through the alternating sum of the continued-fraction quotients of $$h/k$$, in machine words
+whenever $$k$$ fits in one. Beyond word size FLINT switches to its subquadratic
+continued-fraction ball machinery, while Malachite currently walks the remainder sequence
+directly, which is quadratic in the bit length of $$k$$; the results agree exactly, and both
+return 0 for $$k \leq 2$$, negative $$k$$ included.
 
 **`fmpq_dedekind_sum_naive`.** The reference implementation of the defining sum, slow for
 large `k` by FLINT's own description. Malachite keeps reference implementations of this kind
-out of its public API: they live in its test utilities as oracles that the fast versions are
-property-tested against, which is where a naive Dedekind sum will go when the fast one is
-built. The row is outside the public mapping rather than a gap.
+out of its public API: this one lives in its test utilities as `dedekind_sum_naive`, the oracle
+the fast version is property-tested against. The row is outside the public mapping rather than
+a gap.

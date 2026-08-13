@@ -75,6 +75,7 @@ pub mod rational {
         pub mod average;
         pub mod ceiling;
         pub mod cfrac_helpers;
+        pub mod dedekind_sum;
         pub mod denominators_in_closed_interval;
         pub mod div;
         pub mod express_as_power;

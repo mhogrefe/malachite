@@ -36,6 +36,8 @@ pub mod cfrac_helpers;
 /// The shared continued-fraction and half-gcd machinery, adopted from FLINT.
 #[cfg(not(feature = "test_build"))]
 pub(crate) mod cfrac_helpers;
+/// A function for computing Dedekind sums.
+pub mod dedekind_sum;
 /// Getting all denominators of [`Rational`](super::Rational)s that appear in a given closed
 /// interval.
 pub mod denominators_in_closed_interval;

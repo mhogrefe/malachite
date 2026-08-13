@@ -21,6 +21,7 @@ pub(crate) fn register(runner: &mut Runner) {
     express_as_power::register(runner);
     farey_neighbors::register(runner);
     floor::register(runner);
+    dedekind_sum::register(runner);
     gcd::register(runner);
     harmonic_number::register(runner);
     height::register(runner);
@@ -58,6 +59,7 @@ mod add_mul;
 mod approximate;
 mod average;
 mod ceiling;
+mod dedekind_sum;
 mod denominators_in_closed_interval;
 mod div;
 mod express_as_power;
