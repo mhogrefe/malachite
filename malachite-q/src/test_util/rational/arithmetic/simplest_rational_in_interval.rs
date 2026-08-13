@@ -331,8 +331,8 @@ pub fn simplest_rational_in_open_interval_term_by_term(x: &Rational, y: &Rationa
                 let next_denominator = (&previous_denominator).add_mul(&denominator, &y_n);
                 let (n, d) = if cf_y.is_done() && next_y_n == 2u32 {
                     (
-                        (numerator << 1u32).add_mul(next_numerator, THREE),
-                        (denominator << 1u32).add_mul(next_denominator, THREE),
+                        (numerator << 1u64).add_mul(next_numerator, THREE),
+                        (denominator << 1u64).add_mul(next_denominator, THREE),
                     )
                 } else {
                     (

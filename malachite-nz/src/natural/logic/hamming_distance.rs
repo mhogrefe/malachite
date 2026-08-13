@@ -120,7 +120,7 @@ impl HammingDistance<&Natural> for &Natural {
     ///     Natural::from(105u32).hamming_distance(&Natural::from(123u32)),
     ///     2
     /// );
-    /// let n = Natural::ONE << 100u32;
+    /// let n = Natural::ONE << 100u64;
     /// assert_eq!(n.hamming_distance(&(&n - Natural::ONE)), 101);
     /// ```
     fn hamming_distance(self, other: &Natural) -> u64 {

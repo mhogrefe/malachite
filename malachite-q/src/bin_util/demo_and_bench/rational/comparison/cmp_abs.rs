@@ -208,7 +208,7 @@ fn benchmark_rational_cmp_abs_double_algorithms(
         &mut [
             ("no doubling", &mut |(x, y)| no_out!(x.cmp_abs_double(&y))),
             ("doubling first", &mut |(x, y)| {
-                no_out!(x.cmp_abs(&(&y << 1u32)));
+                no_out!(x.cmp_abs(&(&y << 1u64)));
             }),
             ("ordinary cmp_abs, for scale", &mut |(x, y)| {
                 no_out!(x.cmp_abs(&y));

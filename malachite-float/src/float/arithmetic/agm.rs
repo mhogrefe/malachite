@@ -162,7 +162,7 @@ fn agm_prec_round_normal(
             }
         }
         u.sqrt_assign();
-        v >>= 1u32;
+        v >>= 1u64;
         scaleit = 0;
         let mut n: u64 = 1;
         let mut eq = 0;
@@ -323,7 +323,7 @@ fn agm_prec_round_ref_ref_normal(
             }
         }
         u.sqrt_assign();
-        v >>= 1u32;
+        v >>= 1u64;
         scaleit = 0;
         let mut n: u64 = 1;
         let mut eq = 0;

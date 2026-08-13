@@ -90,18 +90,18 @@ fn test_mul_shr_round_large() {
     }
     // The adversarial band: (2^k - 1)^2 = 2^(2k) - 2^(k + 1) + 1 has a long run of ones ending just
     // below bit k + 1, so cuts inside that run force the fallback.
-    let m = (Natural::ONE << 2000u32) - Natural::ONE;
+    let m = (Natural::ONE << 2000u64) - Natural::ONE;
     for bits in [1500, 1999, 2000, 2001, 2500, 3998, 3999, 4000] {
         for rm in [Down, Up, Nearest] {
             test(&m, &m, bits, rm);
         }
     }
     // Powers of 2: the exact path with maximal trailing zeros.
-    let p = Natural::ONE << 1000u32;
+    let p = Natural::ONE << 1000u64;
     assert_eq!((&p).mul_shr_round(&p, 2000, Exact), (Natural::ONE, Equal));
     assert_eq!(
         (&p).mul_shr_round(&p, 1500, Exact),
-        (Natural::ONE << 500u32, Equal)
+        (Natural::ONE << 500u64, Equal)
     );
 }
 

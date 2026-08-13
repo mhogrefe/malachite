@@ -137,7 +137,7 @@ fn crt_comb_properties() {
         assert_eq!(Natural::multi_crt(&moduli, &values), Some(combined.clone()));
 
         let y = comb.combine_balanced(&rs);
-        let doubled = y.unsigned_abs_ref() << 1u32;
+        let doubled = y.unsigned_abs_ref() << 1u64;
         if y >= 0u32 {
             assert!(doubled <= p);
         } else {

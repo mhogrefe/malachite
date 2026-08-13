@@ -165,7 +165,7 @@ fn ln_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float, O
                 const { Float::const_from_unsigned(4) }
                     .div_prec_round_val_ref(&x, working_prec, Floor)
                     .0,
-            ) << 1u32);
+            ) << 1u64);
         let exp2 = tmp2.get_exponent();
         let tmp1 = tmp2
             - Float::ln_2_prec(working_prec)
@@ -226,7 +226,7 @@ fn ln_prec_round_normal(mut x: Float, prec: u64, rm: RoundingMode) -> (Float, Or
                 const { Float::const_from_unsigned(4) }
                     .div_prec_round_val_ref(&x, working_prec, Floor)
                     .0,
-            ) << 1u32);
+            ) << 1u64);
         let exp2 = tmp2.get_exponent();
         let tmp1 = tmp2
             - Float::ln_2_prec(working_prec)
@@ -290,7 +290,7 @@ pub(crate) fn ln_prec_round_normal_extended(
                 const { Float::const_from_unsigned(4) }
                     .div_prec_round_val_ref(&x, working_prec, Floor)
                     .0,
-            ) << 1u32);
+            ) << 1u64);
         let exp2 = tmp2.get_exponent();
         let tmp1 = tmp2
             - Float::ln_2_prec(working_prec)

@@ -372,7 +372,7 @@ fn test_format_float_single_digit_rounding() {
     // examines the top limb and misses these).
     let big = Float::from_natural_prec(Natural::power_of_2(100) + Natural::ONE, 101).0;
     assert_eq!(fmt_float(&big, b'b', 0, Up), "1p+101");
-    let big_hex = Float::from_natural_prec((Natural::from(15u32) << 100u32) + Natural::ONE, 104).0;
+    let big_hex = Float::from_natural_prec((Natural::from(15u32) << 100u64) + Natural::ONE, 104).0;
     assert_eq!(fmt_float(&big_hex, b'a', 0, Up), "0x1p+104");
     // Nearest is unchanged
     assert_eq!(fmt_float(&Float::from(14.0), b'a', 0, Nearest), "0xep+0");

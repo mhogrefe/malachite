@@ -216,7 +216,7 @@ to_sci_string(x: &Float, options: ToSciOptions) -> String {
             // at most half). A tie rounds to the even option, 0.
             Nearest => {
                 log + 1 == -scale && {
-                    let two_x = Rational::exact_from(x).abs() << 1u32;
+                    let two_x = Rational::exact_from(x).abs() << 1u64;
                     two_x > Rational::from(base).pow(-scale)
                 }
             }

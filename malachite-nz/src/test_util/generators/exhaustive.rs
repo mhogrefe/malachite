@@ -211,7 +211,7 @@ pub fn exhaustive_integer_gen_var_8() -> It<Integer> {
 }
 
 pub fn exhaustive_integer_gen_var_9() -> It<Integer> {
-    Box::new(exhaustive_natural_integers().map(|n| (n << 1u32) | Integer::ONE))
+    Box::new(exhaustive_natural_integers().map(|n| (n << 1u64) | Integer::ONE))
 }
 
 // -- (Integer, Integer) --
@@ -244,7 +244,7 @@ pub fn exhaustive_integer_pair_gen_var_3() -> It<(Integer, Integer)> {
 pub fn exhaustive_integer_pair_gen_var_4() -> It<(Integer, Integer)> {
     Box::new(
         exhaustive_pairs(exhaustive_integers(), exhaustive_natural_integers())
-            .map(|(a, n)| (a, (n << 1u32) | Integer::ONE)),
+            .map(|(a, n)| (a, (n << 1u64) | Integer::ONE)),
     )
 }
 
@@ -258,7 +258,7 @@ pub fn exhaustive_integer_pair_gen_var_5() -> It<(Integer, Integer)> {
 pub fn exhaustive_integer_pair_gen_var_6() -> It<(Integer, Integer)> {
     Box::new(
         exhaustive_pairs_from_single(
-            exhaustive_natural_integers().map(|n| (n << 1u32) | Integer::ONE),
+            exhaustive_natural_integers().map(|n| (n << 1u64) | Integer::ONE),
         )
         .filter(|(x, y)| x.unsigned_abs_ref().coprime_with(y.unsigned_abs_ref())),
     )
@@ -295,14 +295,14 @@ pub fn exhaustive_integer_triple_gen_var_1() -> It<(Integer, Integer, Integer)> 
 pub fn exhaustive_integer_triple_gen_var_2() -> It<(Integer, Integer, Integer)> {
     Box::new(
         exhaustive_triples_xxy(exhaustive_integers(), exhaustive_natural_integers())
-            .map(|(a, b, n)| (a, b, (n << 1u32) | Integer::ONE)),
+            .map(|(a, b, n)| (a, b, (n << 1u64) | Integer::ONE)),
     )
 }
 
 pub fn exhaustive_integer_triple_gen_var_3() -> It<(Integer, Integer, Integer)> {
     Box::new(
         exhaustive_triples_xyy(exhaustive_integers(), exhaustive_natural_integers())
-            .map(|(a, m, n)| (a, (m << 1u32) | Integer::ONE, (n << 1u32) | Integer::ONE)),
+            .map(|(a, m, n)| (a, (m << 1u64) | Integer::ONE, (n << 1u64) | Integer::ONE)),
     )
 }
 
@@ -1082,7 +1082,7 @@ where
 }
 
 pub fn exhaustive_natural_gen_var_8() -> It<Natural> {
-    Box::new(exhaustive_naturals().map(|n| (n << 1u32) | Natural::ONE))
+    Box::new(exhaustive_naturals().map(|n| (n << 1u64) | Natural::ONE))
 }
 
 // -- (Natural, bool) --
@@ -1178,13 +1178,13 @@ pub fn exhaustive_natural_pair_gen_var_11() -> It<(Natural, Natural)> {
 pub fn exhaustive_natural_pair_gen_var_12() -> It<(Natural, Natural)> {
     Box::new(
         exhaustive_pairs_from_single(exhaustive_naturals())
-            .map(|(a, n)| (a, (n << 1u32) | Natural::ONE)),
+            .map(|(a, n)| (a, (n << 1u64) | Natural::ONE)),
     )
 }
 
 pub fn exhaustive_natural_pair_gen_var_13() -> It<(Natural, Natural)> {
     Box::new(
-        exhaustive_pairs_from_single(exhaustive_naturals().map(|n| (n << 1u32) | Natural::ONE))
+        exhaustive_pairs_from_single(exhaustive_naturals().map(|n| (n << 1u64) | Natural::ONE))
             .filter(|(x, y)| x.coprime_with(y)),
     )
 }
@@ -1288,14 +1288,14 @@ pub fn exhaustive_natural_triple_gen_var_7() -> It<(Natural, Natural, Natural)> 
 pub fn exhaustive_natural_triple_gen_var_8() -> It<(Natural, Natural, Natural)> {
     Box::new(
         exhaustive_triples_from_single(exhaustive_naturals())
-            .map(|(a, b, n)| (a, b, (n << 1u32) | Natural::ONE)),
+            .map(|(a, b, n)| (a, b, (n << 1u64) | Natural::ONE)),
     )
 }
 
 pub fn exhaustive_natural_triple_gen_var_9() -> It<(Natural, Natural, Natural)> {
     Box::new(
         exhaustive_triples_from_single(exhaustive_naturals())
-            .map(|(a, m, n)| (a, (m << 1u32) | Natural::ONE, (n << 1u32) | Natural::ONE)),
+            .map(|(a, m, n)| (a, (m << 1u64) | Natural::ONE, (n << 1u64) | Natural::ONE)),
     )
 }
 
@@ -1678,7 +1678,7 @@ impl ExhaustiveDependentPairsYsGenerator<u64, Natural, It<Natural>>
     #[inline]
     fn get_ys(&self, pow: &u64) -> It<Natural> {
         let p = Natural::power_of_2(pow << Limb::LOG_WIDTH);
-        Box::new(exhaustive_natural_range(&p >> 1u32, p))
+        Box::new(exhaustive_natural_range(&p >> 1u64, p))
     }
 }
 

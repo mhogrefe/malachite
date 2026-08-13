@@ -3180,7 +3180,7 @@ fn jacobi_symbol_properties() {
         assert_eq!(s != 0, (&a).coprime_with(&n));
         let n_mod_8: u8 = (&(&n).mod_power_of_2(3)).wrapping_into();
         assert_eq!(
-            (a << 1u32).jacobi_symbol(n),
+            (a << 1u64).jacobi_symbol(n),
             if n_mod_8 == 1 || n_mod_8 == 7 { s } else { -s }
         );
     });
@@ -3250,7 +3250,7 @@ fn kronecker_symbol_properties_helper(a: Natural, n: Natural) {
     assert_eq!(s != 0, (&a).coprime_with(&n));
     let n_mod_4: u8 = (&(&n).mod_power_of_2(2)).wrapping_into();
     if n_mod_4 == 2 {
-        let four_n = &n << 2u32;
+        let four_n = &n << 2u64;
         assert_eq!((&a + &four_n).kronecker_symbol(&n), s);
         if a >= four_n {
             assert_eq!((&a - four_n).kronecker_symbol(&n), s);
@@ -3264,7 +3264,7 @@ fn kronecker_symbol_properties_helper(a: Natural, n: Natural) {
     let a_mod_4: u8 = (&(&a).mod_power_of_2(2)).wrapping_into();
     if a != 0u32 && a_mod_4 != 3 {
         if a_mod_4 == 2 {
-            let four_a = &a << 2u32;
+            let four_a = &a << 2u64;
             assert_eq!((&a).kronecker_symbol(&n + &four_a), s);
             if n >= four_a {
                 assert_eq!((&a).kronecker_symbol(&n - four_a), s);

@@ -40,7 +40,7 @@ fn average_prec_round_helper(x: Float, y: Float, prec: u64, rm: RoundingMode) ->
         // Neither input is in the lowest binade, so halving each is exact. Since $|x/2+y/2| \leq
         // \max(|x|,|y|)$, the sum cannot overflow except when the true average itself rounds out of
         // range, and the addition is the only rounding.
-        (x >> 1u32).add_prec_round(y >> 1u32, prec, rm)
+        (x >> 1u64).add_prec_round(y >> 1u64, prec, rm)
     } else {
         // An input is in the lowest binade, where halving would underflow.
         let (big, small, e_big, e_small) = if ex >= ey {
@@ -54,7 +54,7 @@ fn average_prec_round_helper(x: Float, y: Float, prec: u64, rm: RoundingMode) ->
             // `small` lies below the last bit of both `big / 2` and the target grid, so it acts as
             // a pure sticky bit: adding it whole rounds exactly as adding its half would. `big` is
             // not in the lowest binade, since `gap` is positive, so halving it is exact.
-            (big >> 1u32).add_prec_round(small, prec, rm)
+            (big >> 1u64).add_prec_round(small, prec, rm)
         } else {
             // The exact sum spans few enough bits to be affordable. Rebasing both exponents keeps
             // the arithmetic inside `ExtendedFloat` small, and there the halving is a free

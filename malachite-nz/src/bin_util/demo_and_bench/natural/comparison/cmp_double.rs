@@ -57,7 +57,7 @@ fn benchmark_natural_cmp_double_algorithms(
         &mut [
             ("no allocation", &mut |(x, y)| no_out!(x.cmp_double(&y))),
             ("doubling first", &mut |(x, y)| {
-                let _ = x.cmp(&(&y << 1u32));
+                let _ = x.cmp(&(&y << 1u64));
             }),
         ],
     );
@@ -80,7 +80,7 @@ fn benchmark_integer_cmp_abs_double_algorithms(
         &mut [
             ("no allocation", &mut |(x, y)| no_out!(x.cmp_abs_double(&y))),
             ("doubling first", &mut |(x, y)| {
-                no_out!(x.cmp_abs(&(&y << 1u32)));
+                no_out!(x.cmp_abs(&(&y << 1u64)));
             }),
         ],
     );

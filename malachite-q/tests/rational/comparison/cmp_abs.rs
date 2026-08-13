@@ -76,7 +76,7 @@ fn test_cmp_abs_double() {
         let y = Rational::from_str(t).unwrap();
         assert_eq!(x.cmp_abs_double(&y), out);
         // the form it exists to avoid: doubling a Rational must renormalize its denominator
-        assert_eq!(x.cmp_abs(&(&y << 1u32)), out);
+        assert_eq!(x.cmp_abs(&(&y << 1u64)), out);
     };
     test("0", "0", Equal);
     test("0", "1/2", Less);
@@ -100,7 +100,7 @@ fn cmp_abs_double_properties() {
     rational_pair_gen().test_properties(|(x, y)| {
         let c = x.cmp_abs_double(&y);
         // the allocating form it replaces
-        assert_eq!(c, x.cmp_abs(&(&y << 1u32)));
+        assert_eq!(c, x.cmp_abs(&(&y << 1u64)));
         // sign changes are invisible
         assert_eq!((-&x).cmp_abs_double(&y), c);
         assert_eq!(x.cmp_abs_double(&-&y), c);

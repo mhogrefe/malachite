@@ -683,7 +683,7 @@ pub mod saturating_sub_mul;
 /// let mut x = Natural::ONE;
 /// x <<= 1u8;
 /// x <<= 2u16;
-/// x <<= 3u32;
+/// x <<= 3u64;
 /// x <<= 4u64;
 /// assert_eq!(x, 1024);
 ///
@@ -903,10 +903,10 @@ pub mod shl_round;
 /// use malachite_nz::natural::Natural;
 ///
 /// assert_eq!((Natural::ZERO >> 10u8), 0);
-/// assert_eq!((Natural::from(492u32) >> 2u32), 123);
+/// assert_eq!((Natural::from(492u32) >> 2u64), 123);
 /// assert_eq!((Natural::from(10u32).pow(12) >> 10u64), 976562500);
 /// assert_eq!((&Natural::ZERO >> 10u8), 0);
-/// assert_eq!((&Natural::from(492u32) >> 2u32), 123);
+/// assert_eq!((&Natural::from(492u32) >> 2u64), 123);
 /// assert_eq!((&Natural::from(10u32).pow(12) >> 10u64), 976562500);
 ///
 /// assert_eq!((Natural::ZERO >> 10i8), 0);
@@ -937,7 +937,7 @@ pub mod shl_round;
 /// let mut x = Natural::from(1024u32);
 /// x >>= 1u8;
 /// x >>= 2u16;
-/// x >>= 3u32;
+/// x >>= 3u64;
 /// x >>= 4u64;
 /// assert_eq!(x, 1);
 ///

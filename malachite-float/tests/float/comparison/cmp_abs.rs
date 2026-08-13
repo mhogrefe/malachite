@@ -287,9 +287,9 @@ fn test_partial_cmp_abs_double_overflow() {
     // infinite `self` compare equal rather than greater.
     let max = Float::max_finite_value_with_prec(10);
     assert_eq!(Float::INFINITY.partial_cmp_abs_double(&max), Some(Greater));
-    assert_eq!((&max << 1u32), Float::INFINITY);
+    assert_eq!((&max << 1u64), Float::INFINITY);
     assert_eq!(
-        Float::INFINITY.partial_cmp_abs(&(&max << 1u32)),
+        Float::INFINITY.partial_cmp_abs(&(&max << 1u64)),
         Some(Equal)
     );
     // a finite value is still less than the unrepresentable doubled one
@@ -308,7 +308,7 @@ fn partial_cmp_abs_double_properties() {
             return;
         }
         // the doubling form agrees except where it overflows, which is the point of this
-        let doubled = &y << 1u32;
+        let doubled = &y << 1u64;
         if doubled.is_infinite() && y.is_finite() {
             // the true doubled value is past the range, so it exceeds every finite value
             assert_eq!(c, Some(if x.is_infinite() { Greater } else { Less }));

@@ -335,7 +335,7 @@ fn test_pow_exact_bottom_binade() {
 #[test]
 fn test_pow_early_underflow_bound_equality() {
     let x = Float::from(4.0f64);
-    let y = -(Float::exact_from(&malachite_nz::natural::Natural::from(1u32)) << 29u32);
+    let y = -(Float::exact_from(&malachite_nz::natural::Natural::from(1u32)) << 29u64);
     for rm in [Floor, Ceiling, Down, Up, Nearest, Exact] {
         let (p, o) = x.pow_prec_round_ref_ref(&y, 10, rm);
         assert_eq!(o, Equal);
@@ -3900,7 +3900,7 @@ fn test_unsigned_pow_rational() {
 
     // - Ziv growth in the squeeze: 6^(1 + 2^-300) lies within 2^-300 of the rounding boundary 6.0,
     //   so the initial working precision cannot separate the brackets and must grow
-    let q = Rational::ONE + (Rational::ONE >> 300u32);
+    let q = Rational::ONE + (Rational::ONE >> 300u64);
     let (p, o) = Float::unsigned_pow_rational_prec_round(6, q.clone(), 53, Floor);
     assert_eq!(p.to_string(), "6.0000000000000000");
     assert_eq!(to_hex_string(&p), "0x6.0000000000000#53");
@@ -4043,7 +4043,7 @@ fn test_pow_integer_overflow_window_regression() {
     //   bits, t = (MAX_EXPONENT + 2^-40) / z, so z * log2(x) >= MAX_EXPONENT + 2^-40 (formerly
     //   hung)
     let z = (1u64 << 30) + 1;
-    let t = (Rational::from(Float::MAX_EXPONENT) + (Rational::ONE >> 40u32)) / Rational::from(z);
+    let t = (Rational::from(Float::MAX_EXPONENT) + (Rational::ONE >> 40u64)) / Rational::from(z);
     let x = Float::power_of_2_rational_prec_round(t, 200, Ceiling).0;
     let (v, o) = x.pow_integer_prec_round_ref_val(Integer::from(z), 53, Nearest);
     assert!(v.is_infinite());

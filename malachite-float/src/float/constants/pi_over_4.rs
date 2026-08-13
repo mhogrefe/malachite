@@ -59,7 +59,7 @@ impl Float {
     #[inline]
     pub fn pi_over_4_prec_round(prec: u64, rm: RoundingMode) -> (Self, Ordering) {
         let (pi, o) = Self::pi_prec_round(prec, rm);
-        (pi >> 2u32, o)
+        (pi >> 2u64, o)
     }
 
     /// Returns an approximation of $\pi/4$, with the given precision and rounded to the nearest

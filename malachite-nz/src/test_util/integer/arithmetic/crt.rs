@@ -19,7 +19,7 @@ pub fn balanced_crt_simple(r1: Integer, m1: Natural, r2: Natural, m2: Natural) -
     let m = &m1 * &m2;
     let r1n = Natural::exact_from(r1.mod_op(Integer::from(&m1)));
     let x = crt_simple(r1n, m1, r2, m2)?;
-    Some(if &x << 1u32 > m {
+    Some(if &x << 1u64 > m {
         Integer::from(x) - Integer::from(m)
     } else {
         Integer::from(x)

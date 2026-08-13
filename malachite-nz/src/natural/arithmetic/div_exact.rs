@@ -114,13 +114,13 @@ where
     usize: ExactFrom<T>,
 {
     assert!(x.odd());
-    let index = (x >> 1u32).mod_power_of_2(INVERT_LIMB_TABLE_LOG_SIZE);
+    let index = (x >> 1u64).mod_power_of_2(INVERT_LIMB_TABLE_LOG_SIZE);
     let mut inv = T::from(INVERT_LIMB_TABLE[usize::exact_from(index)]);
-    inv = (inv << 1u32).wrapping_sub((inv * inv).wrapping_mul(x));
-    inv = (inv << 1u32).wrapping_sub(inv.wrapping_mul(inv).wrapping_mul(x));
+    inv = (inv << 1u64).wrapping_sub((inv * inv).wrapping_mul(x));
+    inv = (inv << 1u64).wrapping_sub(inv.wrapping_mul(inv).wrapping_mul(x));
     if T::WIDTH != u32::WIDTH {
         assert_eq!(T::WIDTH, u64::WIDTH);
-        inv = (inv << 1u32).wrapping_sub(inv.wrapping_mul(inv).wrapping_mul(x));
+        inv = (inv << 1u64).wrapping_sub(inv.wrapping_mul(inv).wrapping_mul(x));
     }
     inv
 }}

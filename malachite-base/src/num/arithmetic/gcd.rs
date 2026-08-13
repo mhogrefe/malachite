@@ -88,7 +88,7 @@ pub fn gcd_fast_b<T: PrimitiveUnsigned>(mut x: T, y: T) -> T {
         v = d;
     }
     // The second value has its second-highest set.
-    while (v << 1u32).get_highest_bit() {
+    while (v << 1u64).get_highest_bit() {
         d = x - v;
         x = v;
         if d < v {

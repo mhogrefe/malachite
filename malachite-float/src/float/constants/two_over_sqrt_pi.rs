@@ -65,7 +65,7 @@ impl Float {
     #[inline]
     pub fn two_over_sqrt_pi_prec_round(prec: u64, rm: RoundingMode) -> (Self, Ordering) {
         let (pi, o) = Self::one_over_sqrt_pi_prec_round(prec, rm);
-        (pi << 1u32, o)
+        (pi << 1u64, o)
     }
 
     /// Returns an approximation of $2/\sqrt{pi}$, with the given precision and rounded to the

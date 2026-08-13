@@ -623,7 +623,7 @@ fn finish(big_b: Natural, m11: Natural, mdet_pos: bool, d_bound: &Natural) -> Op
 // The balanced bounds N = D = floor(sqrt((m - 1) / 2)) of fmpq_reconstruct_fmpz: the largest
 // symmetric bounds satisfying 2ND < m.
 fn balanced_bound(m: &Natural) -> Natural {
-    let mut b = m >> 1u32;
+    let mut b = m >> 1u64;
     if m.even() {
         b -= Natural::ONE;
     }

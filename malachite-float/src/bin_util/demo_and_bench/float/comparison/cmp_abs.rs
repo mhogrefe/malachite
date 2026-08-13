@@ -302,7 +302,7 @@ fn benchmark_float_partial_cmp_abs_double_algorithms(
                 no_out!(x.partial_cmp_abs_double(&y));
             }),
             ("doubling first", &mut |(x, y)| {
-                no_out!(x.partial_cmp_abs(&(&y << 1u32)));
+                no_out!(x.partial_cmp_abs(&(&y << 1u64)));
             }),
         ],
     );

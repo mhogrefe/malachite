@@ -47,7 +47,7 @@ impl Iterator for ExhaustivePositiveRationals {
         swap(&mut self.pred_pred, &mut anm1);
         swap(&mut self.pred, &mut self.pred_pred);
         let k = &anm1 / &self.pred_pred; // floor(a(n - 1) / a(n))
-        self.pred = ((k << 1u32) | Natural::ONE) * &self.pred_pred - anm1;
+        self.pred = ((k << 1u64) | Natural::ONE) * &self.pred_pred - anm1;
         Some(Rational {
             sign: true,
             numerator: self.pred_pred.clone(),

@@ -604,19 +604,19 @@ impl Float {
     /// use std::cmp::Ordering::*;
     ///
     /// let (p, o) =
-    ///     Float::power_of_2_of_float_round(Float::from_unsigned_prec(3u32, 100).0 >> 1u32, Floor);
+    ///     Float::power_of_2_of_float_round(Float::from_unsigned_prec(3u32, 100).0 >> 1u64, Floor);
     /// assert_eq!(p.to_string(), "2.8284271247461900976033774484184");
     /// assert_eq!(o, Less);
     ///
     /// let (p, o) = Float::power_of_2_of_float_round(
-    ///     Float::from_unsigned_prec(3u32, 100).0 >> 1u32,
+    ///     Float::from_unsigned_prec(3u32, 100).0 >> 1u64,
     ///     Ceiling,
     /// );
     /// assert_eq!(p.to_string(), "2.8284271247461900976033774484215");
     /// assert_eq!(o, Greater);
     ///
     /// let (p, o) = Float::power_of_2_of_float_round(
-    ///     Float::from_unsigned_prec(3u32, 100).0 >> 1u32,
+    ///     Float::from_unsigned_prec(3u32, 100).0 >> 1u64,
     ///     Nearest,
     /// );
     /// assert_eq!(p.to_string(), "2.8284271247461900976033774484184");
@@ -678,7 +678,7 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let x = Float::from_unsigned_prec(3u32, 100).0 >> 1u32;
+    /// let x = Float::from_unsigned_prec(3u32, 100).0 >> 1u64;
     ///
     /// let (p, o) = Float::power_of_2_of_float_round_ref(&x, Floor);
     /// assert_eq!(p.to_string(), "2.8284271247461900976033774484184");
@@ -880,15 +880,15 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let mut x = Float::from_unsigned_prec(3u32, 100).0 >> 1u32;
+    /// let mut x = Float::from_unsigned_prec(3u32, 100).0 >> 1u64;
     /// assert_eq!(x.power_of_2_of_float_round_assign(Floor), Less);
     /// assert_eq!(x.to_string(), "2.8284271247461900976033774484184");
     ///
-    /// let mut x = Float::from_unsigned_prec(3u32, 100).0 >> 1u32;
+    /// let mut x = Float::from_unsigned_prec(3u32, 100).0 >> 1u64;
     /// assert_eq!(x.power_of_2_of_float_round_assign(Ceiling), Greater);
     /// assert_eq!(x.to_string(), "2.8284271247461900976033774484215");
     ///
-    /// let mut x = Float::from_unsigned_prec(3u32, 100).0 >> 1u32;
+    /// let mut x = Float::from_unsigned_prec(3u32, 100).0 >> 1u64;
     /// assert_eq!(x.power_of_2_of_float_round_assign(Nearest), Less);
     /// assert_eq!(x.to_string(), "2.8284271247461900976033774484184");
     /// ```
@@ -1253,7 +1253,7 @@ impl PowerOf2<Self> for Float {
     /// assert_eq!(Float::power_of_2(Float::INFINITY), Float::INFINITY);
     /// assert_eq!(Float::power_of_2(Float::NEGATIVE_INFINITY), Float::ZERO);
     /// assert_eq!(
-    ///     Float::power_of_2(Float::from_unsigned_prec(3u32, 100).0 >> 1u32).to_string(),
+    ///     Float::power_of_2(Float::from_unsigned_prec(3u32, 100).0 >> 1u64).to_string(),
     ///     "2.8284271247461900976033774484184"
     /// );
     /// ```
@@ -1308,7 +1308,7 @@ impl PowerOf2<&Self> for Float {
     /// assert_eq!(Float::power_of_2(&Float::INFINITY), Float::INFINITY);
     /// assert_eq!(Float::power_of_2(&Float::NEGATIVE_INFINITY), Float::ZERO);
     /// assert_eq!(
-    ///     Float::power_of_2(&(Float::from_unsigned_prec(3u32, 100).0 >> 1u32)).to_string(),
+    ///     Float::power_of_2(&(Float::from_unsigned_prec(3u32, 100).0 >> 1u64)).to_string(),
     ///     "2.8284271247461900976033774484184"
     /// );
     /// ```
@@ -1352,7 +1352,7 @@ impl PowerOf2Assign for Float {
     /// use malachite_base::num::arithmetic::traits::PowerOf2Assign;
     /// use malachite_float::Float;
     ///
-    /// let mut x = Float::from_unsigned_prec(3u32, 100).0 >> 1u32;
+    /// let mut x = Float::from_unsigned_prec(3u32, 100).0 >> 1u64;
     /// x.power_of_2_assign();
     /// assert_eq!(x.to_string(), "2.8284271247461900976033774484184");
     /// ```

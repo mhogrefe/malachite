@@ -78,7 +78,7 @@ pub fn jacobi_symbol_unsigned_fast_2_1<T: PrimitiveUnsigned>(mut a: T, mut b: T)
     }
     let mut s = 1;
     let a_twos = a.trailing_zeros();
-    if a_twos.odd() && ((b >> 1u32) ^ b).get_bit(1) {
+    if a_twos.odd() && ((b >> 1u64) ^ b).get_bit(1) {
         s.neg_assign();
     }
     a >>= a_twos;
@@ -100,7 +100,7 @@ pub fn jacobi_symbol_unsigned_fast_2_1<T: PrimitiveUnsigned>(mut a: T, mut b: T)
             return 0;
         }
         let a_twos = a.trailing_zeros();
-        if a_twos.odd() && ((b >> 1u32) ^ b).get_bit(1) {
+        if a_twos.odd() && ((b >> 1u64) ^ b).get_bit(1) {
             s.neg_assign();
         }
         a >>= a_twos;
@@ -127,7 +127,7 @@ pub fn jacobi_symbol_unsigned_fast_2_2<T: PrimitiveUnsigned>(mut a: T, mut b: T)
     }
     let mut s = 1;
     if a.even() {
-        let two = (b >> 1u32) ^ b;
+        let two = (b >> 1u64) ^ b;
         loop {
             a >>= 1;
             if two.get_bit(1) {
@@ -155,7 +155,7 @@ pub fn jacobi_symbol_unsigned_fast_2_2<T: PrimitiveUnsigned>(mut a: T, mut b: T)
         if a == T::ZERO {
             return 0;
         }
-        let two = (b >> 1u32) ^ b;
+        let two = (b >> 1u64) ^ b;
         loop {
             a >>= 1;
             if two.get_bit(1) {
@@ -187,11 +187,11 @@ pub fn jacobi_symbol_unsigned_fast_2_3<T: PrimitiveUnsigned>(mut a: T, mut b: T)
         return 0;
     }
     let mut s = 1;
-    let two = (b >> 1u32) ^ b;
+    let two = (b >> 1u64) ^ b;
     let shift = !a & T::ONE;
     let shift_8: u8 = shift.wrapping_into();
     a >>= shift_8;
-    let mask = shift << 1u32;
+    let mask = shift << 1u64;
     if (two & mask).get_bit(1) {
         s.neg_assign();
     }
@@ -219,7 +219,7 @@ pub fn jacobi_symbol_unsigned_fast_2_3<T: PrimitiveUnsigned>(mut a: T, mut b: T)
         if a == T::ZERO {
             return 0;
         }
-        let two = (b >> 1u32) ^ b;
+        let two = (b >> 1u64) ^ b;
         let mask = !a & T::TWO;
         a >>= 1;
         if a.even() {
@@ -256,7 +256,7 @@ pub fn jacobi_symbol_unsigned_fast_2_4<T: PrimitiveUnsigned>(mut a: T, mut b: T)
         return 0;
     }
     let mut s = 1;
-    b >>= 1u32;
+    b >>= 1u64;
     let c = a.trailing_zeros();
     if (T::wrapping_from(c) & (b ^ (b >> 1))).odd() {
         s.neg_assign();
@@ -404,6 +404,6 @@ pub fn jacobi_symbol_unsigned_double_fast_1<T: PrimitiveUnsigned>(
         }
         x_0 >>= c;
     }
-    let j = ((x_0 << 1u32) | T::ONE).jacobi_symbol((y_0 << 1u32) | T::ONE);
+    let j = ((x_0 << 1u64) | T::ONE).jacobi_symbol((y_0 << 1u64) | T::ONE);
     if bit { -j } else { j }
 }

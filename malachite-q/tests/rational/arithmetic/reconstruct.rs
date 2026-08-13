@@ -342,7 +342,7 @@ fn test_reconstruct_split_tier() {
 }
 
 fn balanced_bound(m: &Natural) -> Natural {
-    let mut b = m >> 1u32;
+    let mut b = m >> 1u64;
     if m.even() {
         b -= Natural::ONE;
     }
@@ -401,7 +401,7 @@ fn reconstruct_properties() {
         );
         if let Some(x) = ox {
             check_solution(&x, &a, &m, &n_bound, &d_bound);
-        } else if m <= 1_000u32 && (&n_bound * &d_bound) << 1u32 < m {
+        } else if m <= 1_000u32 && (&n_bound * &d_bound) << 1u64 < m {
             assert_no_solution(
                 u64::exact_from(&a),
                 u64::exact_from(&m),
@@ -416,7 +416,7 @@ fn reconstruct_properties() {
         let n = x.to_numerator();
         let d = x.to_denominator();
         let k = x.to_height();
-        let mut m = ((&k * &k) << 1u32) + Natural::ONE;
+        let mut m = ((&k * &k) << 1u64) + Natural::ONE;
         while (&d).gcd(&m) != 1u32 {
             m += Natural::ONE;
         }

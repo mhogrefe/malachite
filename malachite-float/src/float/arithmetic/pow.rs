@@ -777,7 +777,7 @@ fn pow_is_exact(x: &Float, y: &Float, prec: u64, rm: RoundingMode) -> Option<(Fl
     let (mut a, mut b) = float_to_odd_mantissa_and_exponent_natural(x);
     while d != 0 {
         if b.odd() {
-            a <<= 1u32;
+            a <<= 1u64;
             b -= 1;
         }
         a = a.checked_sqrt()?;

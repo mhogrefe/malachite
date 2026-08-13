@@ -267,7 +267,7 @@ pub fn random_integer_gen_var_8(config: &GenConfig) -> It<Integer> {
             config.get_or("mean_bits_n", 64),
             config.get_or("mean_bits_d", 1),
         )
-        .map(|n| (n << 1u32) | Integer::ONE),
+        .map(|n| (n << 1u64) | Integer::ONE),
     )
 }
 
@@ -366,7 +366,7 @@ pub fn random_integer_pair_gen_var_4(config: &GenConfig) -> It<(Integer, Integer
                 )
             },
         )
-        .map(|(a, n)| (a, (n << 1u32) | Integer::ONE)),
+        .map(|(a, n)| (a, (n << 1u64) | Integer::ONE)),
     )
 }
 
@@ -389,7 +389,7 @@ pub fn random_integer_pair_gen_var_6(config: &GenConfig) -> It<(Integer, Integer
                 config.get_or("mean_bits_n", 64),
                 config.get_or("mean_bits_d", 1),
             )
-            .map(|n| (n << 1u32) | Integer::ONE),
+            .map(|n| (n << 1u64) | Integer::ONE),
         )
         .filter(|(x, y)| x.unsigned_abs_ref().coprime_with(y.unsigned_abs_ref())),
     )
@@ -474,7 +474,7 @@ pub fn random_integer_triple_gen_var_2(config: &GenConfig) -> It<(Integer, Integ
                 )
             },
         )
-        .map(|(a, b, n)| (a, b, (n << 1u32) | Integer::ONE)),
+        .map(|(a, b, n)| (a, b, (n << 1u64) | Integer::ONE)),
     )
 }
 
@@ -497,7 +497,7 @@ pub fn random_integer_triple_gen_var_3(config: &GenConfig) -> It<(Integer, Integ
                 )
             },
         )
-        .map(|(a, m, n)| (a, (m << 1u32) | Integer::ONE, (n << 1u32) | Integer::ONE)),
+        .map(|(a, m, n)| (a, (m << 1u64) | Integer::ONE, (n << 1u64) | Integer::ONE)),
     )
 }
 
@@ -1873,7 +1873,7 @@ pub fn random_natural_gen_var_8(config: &GenConfig) -> It<Natural> {
             config.get_or("mean_bits_n", 64),
             config.get_or("mean_bits_d", 1),
         )
-        .map(|n| (n << 1u32) | Natural::ONE),
+        .map(|n| (n << 1u64) | Natural::ONE),
     )
 }
 
@@ -2122,7 +2122,7 @@ pub fn random_natural_pair_gen_var_12(config: &GenConfig) -> It<(Natural, Natura
             config.get_or("mean_bits_n", 64),
             config.get_or("mean_bits_d", 1),
         ))
-        .map(|(a, n)| (a, (n << 1u32) | Natural::ONE)),
+        .map(|(a, n)| (a, (n << 1u64) | Natural::ONE)),
     )
 }
 
@@ -2134,7 +2134,7 @@ pub fn random_natural_pair_gen_var_13(config: &GenConfig) -> It<(Natural, Natura
                 config.get_or("mean_bits_n", 64),
                 config.get_or("mean_bits_d", 1),
             )
-            .map(|n| (n << 1u32) | Natural::ONE),
+            .map(|n| (n << 1u64) | Natural::ONE),
         )
         .filter(|(x, y)| x.coprime_with(y)),
     )
@@ -2339,7 +2339,7 @@ pub fn random_natural_triple_gen_var_8(config: &GenConfig) -> It<(Natural, Natur
             config.get_or("mean_bits_n", 64),
             config.get_or("mean_bits_d", 1),
         ))
-        .map(|(a, b, n)| (a, b, (n << 1u32) | Natural::ONE)),
+        .map(|(a, b, n)| (a, b, (n << 1u64) | Natural::ONE)),
     )
 }
 
@@ -2350,7 +2350,7 @@ pub fn random_natural_triple_gen_var_9(config: &GenConfig) -> It<(Natural, Natur
             config.get_or("mean_bits_n", 64),
             config.get_or("mean_bits_d", 1),
         ))
-        .map(|(a, m, n)| (a, (m << 1u32) | Natural::ONE, (n << 1u32) | Natural::ONE)),
+        .map(|(a, m, n)| (a, (m << 1u64) | Natural::ONE, (n << 1u64) | Natural::ONE)),
     )
 }
 

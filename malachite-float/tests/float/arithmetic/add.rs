@@ -10245,7 +10245,7 @@ fn add_properties() {
             ComparableFloatRef(&(Float::NEGATIVE_ZERO + &x)),
             ComparableFloatRef(&x)
         );
-        assert_eq!(ComparableFloat(&x + &x), ComparableFloat(x << 1u32));
+        assert_eq!(ComparableFloat(&x + &x), ComparableFloat(x << 1u64));
     });
 }
 

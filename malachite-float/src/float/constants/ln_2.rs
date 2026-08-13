@@ -43,7 +43,7 @@ fn sum(t: &mut [Integer], p: &mut [Integer], q: &mut [Integer], n1: u64, n2: u64
         } else {
             -Integer::from(n1)
         };
-        q[0] = ((Integer::from(n1) << 1u32) + Integer::ONE) << 2u32;
+        q[0] = ((Integer::from(n1) << 1u64) + Integer::ONE) << 2u64;
         t[0].clone_from(&p[0]);
     } else {
         let m = (n1 >> 1) + (n2 >> 1) + (n1 & 1 & n2);

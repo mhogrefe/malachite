@@ -47,7 +47,7 @@ fn test_cmp_double() {
         let y = Natural::from_str(t).unwrap();
         assert_eq!(x.cmp_double(&y), out);
         // the allocating form this exists to avoid
-        assert_eq!(x.cmp(&(&y << 1u32)), out);
+        assert_eq!(x.cmp(&(&y << 1u64)), out);
     };
     test("0", "0", Equal);
     test("0", "1", Less);
@@ -85,7 +85,7 @@ fn cmp_double_properties() {
     natural_pair_gen().test_properties(|(x, y)| {
         let c = x.cmp_double(&y);
         // the allocating comparison it replaces
-        assert_eq!(c, x.cmp(&(&y << 1u32)));
+        assert_eq!(c, x.cmp(&(&y << 1u64)));
         // a doubled value is at least the original, so this is bounded by the plain comparison
         if c == Greater {
             assert_eq!(x.cmp(&y), Greater);
@@ -99,7 +99,7 @@ fn cmp_double_properties() {
     integer_pair_gen().test_properties(|(x, y)| {
         let c = x.cmp_abs_double(&y);
         assert_eq!(c, x.unsigned_abs_ref().cmp_double(y.unsigned_abs_ref()));
-        assert_eq!(c, x.cmp_abs(&(&y << 1u32)));
+        assert_eq!(c, x.cmp_abs(&(&y << 1u64)));
         // sign changes are invisible
         assert_eq!((-&x).cmp_abs_double(&y), c);
         assert_eq!(x.cmp_abs_double(&-&y), c);

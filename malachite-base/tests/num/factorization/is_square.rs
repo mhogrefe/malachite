@@ -32,7 +32,7 @@ fn is_square_properties_helper_unsigned<T: PrimitiveUnsigned>() {
         y.mod_power_of_2_assign(T::WIDTH >> 1);
         if x != T::ZERO {
             let sqr = x.square();
-            let non_sqr = sqr + (y % (x << 1u32)) + T::ONE;
+            let non_sqr = sqr + (y % (x << 1u64)) + T::ONE;
             assert!(!non_sqr.is_square());
         }
     });

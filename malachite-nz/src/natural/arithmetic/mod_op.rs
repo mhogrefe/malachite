@@ -1573,7 +1573,7 @@ limbs_mod_limb_alt_2<
         limbs_mod_limb_small_unnormalized::<DT, T>(ns, d)
     } else if len < MOD_1_1_TO_MOD_1_2_THRESHOLD {
         limbs_mod_limb_any_leading_zeros::<DT, T>(ns, d)
-    } else if len < MOD_1_2_TO_MOD_1_4_THRESHOLD || d & !(T::MAX >> 2u32) != T::ZERO {
+    } else if len < MOD_1_2_TO_MOD_1_4_THRESHOLD || d & !(T::MAX >> 2u64) != T::ZERO {
         limbs_mod_limb_at_least_1_leading_zero::<DT, T>(ns, d)
     } else {
         limbs_mod_limb_at_least_2_leading_zeros::<DT, T>(ns, d)

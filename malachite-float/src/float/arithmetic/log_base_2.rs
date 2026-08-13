@@ -170,7 +170,7 @@ fn log_base_2_rational_near_power_of_2(
     // 2^m <= x < 2^(m + 1)
     let m = x.floor_log_base_2_abs();
     let pow_lo = Rational::power_of_2(m);
-    let pow_hi = &pow_lo << 1u32;
+    let pow_hi = &pow_lo << 1u64;
     // eps = x / 2^k - 1 for the nearer of the two surrounding powers of 2, 2^k.
     let dist_lo = x - &pow_lo;
     let dist_hi = &pow_hi - x;

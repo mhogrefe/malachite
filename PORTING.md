@@ -74,6 +74,9 @@ major improvement warrants re-porting.
   rule's rationale and exemption mechanics, lives in `malachite-lints/README.md`. Highlights: use
   the `*_prec*` shorthands rather than explicit `Nearest`; compare bignums with primitives
   directly; shift rather than multiplying or dividing by `power_of_2`, and compare exponents
+  (shift-amount literals are `u64` — `x << 1u64`, not `1u32` — matching the library-wide
+  convention that bit counts are `u64`; exceptions only where a generic bound or an
+  amount-type-specific test fixes another type)
   rather than comparing with `power_of_2`; use the named constants and convert other literals at
   compile time; use the in-place `*_assign*` variants and the by-reference variants rather than
   cloning; use `square()`, `even()`/`odd()`, and `reciprocal()` over their spelled-out

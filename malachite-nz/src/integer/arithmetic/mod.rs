@@ -176,7 +176,7 @@ pub mod round_to_multiple_of_power_of_2;
 /// assert_eq!(Integer::ZERO << 10u8, 0);
 /// assert_eq!(Integer::from(123) << 2u16, 492);
 /// assert_eq!(
-///     (Integer::from(123) << 100u32).to_string(),
+///     (Integer::from(123) << 100u64).to_string(),
 ///     "155921023828072216384094494261248"
 /// );
 /// assert_eq!(Integer::from(-123) << 2u64, -492);
@@ -187,7 +187,7 @@ pub mod round_to_multiple_of_power_of_2;
 /// assert_eq!(&Integer::ZERO << 10u8, 0);
 /// assert_eq!(&Integer::from(123) << 2u16, 492);
 /// assert_eq!(
-///     (&Integer::from(123) << 100u32).to_string(),
+///     (&Integer::from(123) << 100u64).to_string(),
 ///     "155921023828072216384094494261248"
 /// );
 /// assert_eq!(&Integer::from(-123) << 2u64, -492);
@@ -234,13 +234,13 @@ pub mod round_to_multiple_of_power_of_2;
 /// let mut x = Integer::ONE;
 /// x <<= 1u8;
 /// x <<= 2u16;
-/// x <<= 3u32;
+/// x <<= 3u64;
 /// x <<= 4u64;
 /// assert_eq!(x, 1024);
 /// let mut x = Integer::NEGATIVE_ONE;
 /// x <<= 1u8;
 /// x <<= 2u16;
-/// x <<= 3u32;
+/// x <<= 3u64;
 /// x <<= 4u64;
 /// assert_eq!(x, -1024);
 ///
@@ -467,10 +467,10 @@ pub mod shl_round;
 ///
 /// assert_eq!(Integer::ZERO >> 10u8, 0);
 /// assert_eq!(Integer::from(492) >> 2u16, 123);
-/// assert_eq!(-Integer::from(10u32).pow(12) >> 10u32, -976562500);
+/// assert_eq!(-Integer::from(10u32).pow(12) >> 10u64, -976562500);
 /// assert_eq!(&Integer::ZERO >> 10u8, 0);
 /// assert_eq!(&Integer::from(492) >> 2u16, 123);
-/// assert_eq!(&-Integer::from(10u32).pow(12) >> 10u32, -976562500);
+/// assert_eq!(&-Integer::from(10u32).pow(12) >> 10u64, -976562500);
 ///
 /// assert_eq!(Integer::ZERO >> 10i8, 0);
 /// assert_eq!(Integer::from(492) >> 2i16, 123);
@@ -510,7 +510,7 @@ pub mod shl_round;
 /// let mut x = Integer::from(1024);
 /// x >>= 1u8;
 /// x >>= 2u16;
-/// x >>= 3u32;
+/// x >>= 3u64;
 /// x >>= 4u64;
 /// assert_eq!(x, 1);
 ///
