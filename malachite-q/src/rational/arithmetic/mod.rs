@@ -58,6 +58,8 @@ pub mod floor;
 /// [`GcdAssign`](malachite_base::num::arithmetic::traits::GcdAssign), traits for computing the GCD
 /// (greatest common divisor) of two numbers.
 pub mod gcd;
+/// A function for computing harmonic numbers.
+pub mod harmonic_number;
 /// An implementation of the height of a [`Rational`](crate::Rational): the larger of the absolute
 /// value of its numerator and its denominator.
 pub mod height;

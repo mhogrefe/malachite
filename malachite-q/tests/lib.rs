@@ -81,6 +81,7 @@ pub mod rational {
         pub mod farey_neighbors;
         pub mod floor;
         pub mod gcd;
+        pub mod harmonic_number;
         pub mod height;
         pub mod is_power_of_2;
         pub mod log_base;

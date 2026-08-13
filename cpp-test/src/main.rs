@@ -129,6 +129,21 @@ fn check_demo_against_flint(oracle: &Path, crate_dir: &str, demo_name: &str, fli
     }
 }
 
+// For demos whose generators do not support the special_random mode, such as those built on
+// primitive-integer generators declared with new_no_special.
+fn check_demo_against_flint_no_special(
+    oracle: &Path,
+    crate_dir: &str,
+    demo_name: &str,
+    flint_mode: &str,
+) {
+    for mode in &MODES[..2] {
+        println!("testing {demo_name} in mode {mode}");
+        run_demo(crate_dir, demo_name, mode);
+        run_oracle(oracle, flint_mode, Some(TEST_OUT));
+    }
+}
+
 fn write_primitive_root_prime_unit_test(output_file: &mut File, n: u64, out: u64) {
     writeln!(output_file, "primitive_root_prime({n}) = {out}").unwrap();
 }
@@ -258,6 +273,12 @@ fn main() {
         "../malachite-q",
         "demo_rational_farey_neighbors",
         "fmpq_farey_neighbors",
+    );
+    check_demo_against_flint_no_special(
+        &oracle,
+        "../malachite-q",
+        "demo_rational_harmonic_number",
+        "fmpq_harmonic",
     );
     check_demo_against_flint(
         &oracle,

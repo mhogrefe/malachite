@@ -542,14 +542,15 @@ so there is nothing to bound.
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✗ | `void fmpq_harmonic_ui (fmpq_t x, ulong n)` | |
+| ✓ | `void fmpq_harmonic_ui (fmpq_t x, ulong n)` | `Rational::harmonic_number(n)` |
 
-**`fmpq_harmonic_ui`.** The harmonic number $$H_n = 1 + 1/2 + \cdots + 1/n$$, a gap. FLINT
-evaluates it by table lookup at word size and divide-and-conquer beyond, which is the
-binary-splitting shape Malachite already uses elsewhere; until the function exists, a fold of
-`Rational::from_unsigneds(1, i)` computes the value without the divide-and-conquer speed.
+**`fmpq_harmonic_ui`.** The harmonic number $$H_n = 1 + 1/2 + \cdots + 1/n$$. Both libraries use
+a table through $$H_{46}$$ and balanced binary splitting over the odd terms beyond it, with
+word-sized partial sums in the basecase; Malachite uses 64-bit accumulators on every platform,
+where FLINT drops to a 25-entry table and 32-bit words on 32-bit systems. Both reject
+$$n \geq 2^{63}$$, a sum with more terms than could ever be added.
 [`arith_harmonic_number`](/mapping/flint-arithmetic-functions/#harmonic-numbers) wraps this
-function, so the two rows are one piece of work.
+function and is covered by the same port.
 
 ## [Dedekind sums](https://flintlib.org/doc/fmpq.html#dedekind-sums) {#dedekind-sums}
 

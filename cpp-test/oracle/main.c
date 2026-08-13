@@ -45,6 +45,7 @@ static const oracle_mode modes[] = {
     {"fmpq_gcd", run_fmpq_gcd},
     {"fmpq_gcd_cofactors", run_fmpq_gcd_cofactors},
     {"fmpq_farey_neighbors", run_fmpq_farey_neighbors},
+    {"fmpq_harmonic", run_fmpq_harmonic},
     {"fmpq_next_minimal", run_fmpq_next_minimal},
     {"fmpq_next_signed_minimal", run_fmpq_next_signed_minimal},
     {"fmpq_reconstruct", run_fmpq_reconstruct},

@@ -83,6 +83,7 @@ int run_fmpq_gcd_cofactors(const char * arg);
 
 /* fmpq_enumeration.c */
 int run_fmpq_farey_neighbors(const char * arg);
+int run_fmpq_harmonic(const char * arg);
 int run_fmpq_next_minimal(const char * arg);
 int run_fmpq_next_signed_minimal(const char * arg);
 

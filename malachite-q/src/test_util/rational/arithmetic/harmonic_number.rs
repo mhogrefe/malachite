@@ -6,13 +6,14 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-pub mod add;
-pub mod add_mul;
-pub mod approximate;
-pub mod div;
-pub mod harmonic_number;
-pub mod mod_op;
-pub mod mul;
-pub mod sign;
-pub mod simplest_rational_in_interval;
-pub mod sub;
+use crate::Rational;
+use malachite_base::num::basic::traits::Zero;
+
+// Term-by-term summation, the reference the fast implementation is checked against.
+pub fn harmonic_number_naive(n: u64) -> Rational {
+    let mut sum = Rational::ZERO;
+    for k in 1..=n {
+        sum += Rational::from_unsigneds(1u64, k);
+    }
+    sum
+}

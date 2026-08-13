@@ -22,6 +22,7 @@ pub(crate) fn register(runner: &mut Runner) {
     farey_neighbors::register(runner);
     floor::register(runner);
     gcd::register(runner);
+    harmonic_number::register(runner);
     height::register(runner);
     is_power_of_2::register(runner);
     log_base::register(runner);
@@ -63,6 +64,7 @@ mod express_as_power;
 mod farey_neighbors;
 mod floor;
 mod gcd;
+mod harmonic_number;
 mod height;
 mod is_power_of_2;
 mod log_base;
