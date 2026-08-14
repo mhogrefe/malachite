@@ -195,6 +195,7 @@ pub mod num {
         pub mod arithmetic_checked_shr;
         pub mod average;
         pub mod balanced_mod;
+        pub mod bell_number;
         pub mod binomial_coefficient;
         pub mod ceiling;
         pub mod checked_abs;

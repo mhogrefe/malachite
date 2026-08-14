@@ -13,6 +13,7 @@ pub(crate) fn register(runner: &mut Runner) {
     add::register(runner);
     add_mul::register(runner);
     average::register(runner);
+    bell_number::register(runner);
     binomial_coefficient::register(runner);
     checked_mul_sub_mul::register(runner);
     checked_sub::register(runner);
@@ -102,6 +103,7 @@ mod abs_diff;
 mod add;
 mod add_mul;
 mod average;
+mod bell_number;
 mod binomial_coefficient;
 mod checked_mul_sub_mul;
 mod checked_sub;

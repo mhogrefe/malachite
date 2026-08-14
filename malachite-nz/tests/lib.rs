@@ -240,6 +240,7 @@ pub mod natural {
         pub mod add;
         pub mod add_mul;
         pub mod average;
+        pub mod bell_number;
         pub mod binomial_coefficient;
         pub mod checked_sub;
         pub mod checked_sub_mul;

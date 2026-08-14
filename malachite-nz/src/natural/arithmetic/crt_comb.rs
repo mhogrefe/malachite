@@ -313,7 +313,10 @@ impl CrtComb {
     /// Panics if `primes` is empty.
     ///
     /// # Examples
-    /// ```
+/// (The examples are not compiled: this module is public only under the `test_build` feature, so
+/// its paths do not resolve in an ordinary build.)
+///
+    /// ```rust,ignore
     /// use malachite_nz::natural::arithmetic::crt_comb::CrtComb;
     /// use malachite_nz::natural::Natural;
     ///
@@ -522,7 +525,7 @@ impl CrtComb {
     /// Constant time and additional memory.
     ///
     /// # Examples
-    /// ```
+    /// ```rust,ignore
     /// use malachite_nz::natural::arithmetic::crt_comb::CrtComb;
     ///
     /// let comb = CrtComb::new(&[3, 5, 7]).unwrap();
@@ -540,7 +543,7 @@ impl CrtComb {
     /// Constant time and additional memory.
     ///
     /// # Examples
-    /// ```
+    /// ```rust,ignore
     /// use malachite_nz::natural::arithmetic::crt_comb::CrtComb;
     /// use malachite_nz::natural::Natural;
     ///
@@ -567,7 +570,7 @@ impl CrtComb {
     /// self.modulus().significant_bits())`.
     ///
     /// # Examples
-    /// ```
+    /// ```rust,ignore
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural::arithmetic::crt_comb::CrtComb;
     ///
@@ -713,7 +716,7 @@ impl CrtComb {
     /// greater than or equal to its modulus.
     ///
     /// # Examples
-    /// ```
+    /// ```rust,ignore
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural::arithmetic::crt_comb::CrtComb;
     ///
@@ -748,7 +751,7 @@ impl CrtComb {
     /// greater than or equal to its modulus.
     ///
     /// # Examples
-    /// ```
+    /// ```rust,ignore
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::arithmetic::crt_comb::CrtComb;
     ///

@@ -71,18 +71,18 @@ impl BalancedCrt<Natural, Natural, Natural> for Integer {
     /// // 8 is 2 mod 3 and 3 mod 5, and its balanced representative mod 15 is -7.
     /// assert_eq!(
     ///     Integer::from(-1).balanced_crt(
-    ///     Natural::from(3u32),
-    ///     Natural::from(3u32),
-    ///     Natural::from(5u32),
-    /// ),
+    ///         Natural::from(3u32),
+    ///         Natural::from(3u32),
+    ///         Natural::from(5u32),
+    ///     ),
     ///     Some(Integer::from(-7))
     /// );
     /// assert_eq!(
     ///     Integer::from(1).balanced_crt(
-    ///     Natural::from(4u32),
-    ///     Natural::from(3u32),
-    ///     Natural::from(6u32),
-    /// ),
+    ///         Natural::from(4u32),
+    ///         Natural::from(3u32),
+    ///         Natural::from(6u32),
+    ///     ),
     ///     None
     /// );
     /// ```
@@ -136,18 +136,18 @@ impl BalancedCrt<Natural, Natural, &Natural> for Integer {
     /// // 8 is 2 mod 3 and 3 mod 5, and its balanced representative mod 15 is -7.
     /// assert_eq!(
     ///     Integer::from(-1).balanced_crt(
-    ///     Natural::from(3u32),
-    ///     Natural::from(3u32),
-    ///     &Natural::from(5u32),
-    /// ),
+    ///         Natural::from(3u32),
+    ///         Natural::from(3u32),
+    ///         &Natural::from(5u32),
+    ///     ),
     ///     Some(Integer::from(-7))
     /// );
     /// assert_eq!(
     ///     Integer::from(1).balanced_crt(
-    ///     Natural::from(4u32),
-    ///     Natural::from(3u32),
-    ///     &Natural::from(6u32),
-    /// ),
+    ///         Natural::from(4u32),
+    ///         Natural::from(3u32),
+    ///         &Natural::from(6u32),
+    ///     ),
     ///     None
     /// );
     /// ```
@@ -201,18 +201,18 @@ impl BalancedCrt<Natural, &Natural, Natural> for Integer {
     /// // 8 is 2 mod 3 and 3 mod 5, and its balanced representative mod 15 is -7.
     /// assert_eq!(
     ///     Integer::from(-1).balanced_crt(
-    ///     Natural::from(3u32),
-    ///     &Natural::from(3u32),
-    ///     Natural::from(5u32),
-    /// ),
+    ///         Natural::from(3u32),
+    ///         &Natural::from(3u32),
+    ///         Natural::from(5u32),
+    ///     ),
     ///     Some(Integer::from(-7))
     /// );
     /// assert_eq!(
     ///     Integer::from(1).balanced_crt(
-    ///     Natural::from(4u32),
-    ///     &Natural::from(3u32),
-    ///     Natural::from(6u32),
-    /// ),
+    ///         Natural::from(4u32),
+    ///         &Natural::from(3u32),
+    ///         Natural::from(6u32),
+    ///     ),
     ///     None
     /// );
     /// ```
@@ -266,18 +266,18 @@ impl BalancedCrt<Natural, &Natural, &Natural> for Integer {
     /// // 8 is 2 mod 3 and 3 mod 5, and its balanced representative mod 15 is -7.
     /// assert_eq!(
     ///     Integer::from(-1).balanced_crt(
-    ///     Natural::from(3u32),
-    ///     &Natural::from(3u32),
-    ///     &Natural::from(5u32),
-    /// ),
+    ///         Natural::from(3u32),
+    ///         &Natural::from(3u32),
+    ///         &Natural::from(5u32),
+    ///     ),
     ///     Some(Integer::from(-7))
     /// );
     /// assert_eq!(
     ///     Integer::from(1).balanced_crt(
-    ///     Natural::from(4u32),
-    ///     &Natural::from(3u32),
-    ///     &Natural::from(6u32),
-    /// ),
+    ///         Natural::from(4u32),
+    ///         &Natural::from(3u32),
+    ///         &Natural::from(6u32),
+    ///     ),
     ///     None
     /// );
     /// ```
@@ -331,18 +331,18 @@ impl BalancedCrt<&Natural, Natural, Natural> for Integer {
     /// // 8 is 2 mod 3 and 3 mod 5, and its balanced representative mod 15 is -7.
     /// assert_eq!(
     ///     Integer::from(-1).balanced_crt(
-    ///     &Natural::from(3u32),
-    ///     Natural::from(3u32),
-    ///     Natural::from(5u32),
-    /// ),
+    ///         &Natural::from(3u32),
+    ///         Natural::from(3u32),
+    ///         Natural::from(5u32),
+    ///     ),
     ///     Some(Integer::from(-7))
     /// );
     /// assert_eq!(
     ///     Integer::from(1).balanced_crt(
-    ///     &Natural::from(4u32),
-    ///     Natural::from(3u32),
-    ///     Natural::from(6u32),
-    /// ),
+    ///         &Natural::from(4u32),
+    ///         Natural::from(3u32),
+    ///         Natural::from(6u32),
+    ///     ),
     ///     None
     /// );
     /// ```
@@ -396,18 +396,18 @@ impl BalancedCrt<&Natural, Natural, &Natural> for Integer {
     /// // 8 is 2 mod 3 and 3 mod 5, and its balanced representative mod 15 is -7.
     /// assert_eq!(
     ///     Integer::from(-1).balanced_crt(
-    ///     &Natural::from(3u32),
-    ///     Natural::from(3u32),
-    ///     &Natural::from(5u32),
-    /// ),
+    ///         &Natural::from(3u32),
+    ///         Natural::from(3u32),
+    ///         &Natural::from(5u32),
+    ///     ),
     ///     Some(Integer::from(-7))
     /// );
     /// assert_eq!(
     ///     Integer::from(1).balanced_crt(
-    ///     &Natural::from(4u32),
-    ///     Natural::from(3u32),
-    ///     &Natural::from(6u32),
-    /// ),
+    ///         &Natural::from(4u32),
+    ///         Natural::from(3u32),
+    ///         &Natural::from(6u32),
+    ///     ),
     ///     None
     /// );
     /// ```
@@ -461,18 +461,18 @@ impl BalancedCrt<&Natural, &Natural, Natural> for Integer {
     /// // 8 is 2 mod 3 and 3 mod 5, and its balanced representative mod 15 is -7.
     /// assert_eq!(
     ///     Integer::from(-1).balanced_crt(
-    ///     &Natural::from(3u32),
-    ///     &Natural::from(3u32),
-    ///     Natural::from(5u32),
-    /// ),
+    ///         &Natural::from(3u32),
+    ///         &Natural::from(3u32),
+    ///         Natural::from(5u32),
+    ///     ),
     ///     Some(Integer::from(-7))
     /// );
     /// assert_eq!(
     ///     Integer::from(1).balanced_crt(
-    ///     &Natural::from(4u32),
-    ///     &Natural::from(3u32),
-    ///     Natural::from(6u32),
-    /// ),
+    ///         &Natural::from(4u32),
+    ///         &Natural::from(3u32),
+    ///         Natural::from(6u32),
+    ///     ),
     ///     None
     /// );
     /// ```
@@ -526,18 +526,18 @@ impl BalancedCrt<&Natural, &Natural, &Natural> for Integer {
     /// // 8 is 2 mod 3 and 3 mod 5, and its balanced representative mod 15 is -7.
     /// assert_eq!(
     ///     Integer::from(-1).balanced_crt(
-    ///     &Natural::from(3u32),
-    ///     &Natural::from(3u32),
-    ///     &Natural::from(5u32),
-    /// ),
+    ///         &Natural::from(3u32),
+    ///         &Natural::from(3u32),
+    ///         &Natural::from(5u32),
+    ///     ),
     ///     Some(Integer::from(-7))
     /// );
     /// assert_eq!(
     ///     Integer::from(1).balanced_crt(
-    ///     &Natural::from(4u32),
-    ///     &Natural::from(3u32),
-    ///     &Natural::from(6u32),
-    /// ),
+    ///         &Natural::from(4u32),
+    ///         &Natural::from(3u32),
+    ///         &Natural::from(6u32),
+    ///     ),
     ///     None
     /// );
     /// ```
@@ -591,18 +591,18 @@ impl BalancedCrt<Natural, Natural, Natural> for &Integer {
     /// // 8 is 2 mod 3 and 3 mod 5, and its balanced representative mod 15 is -7.
     /// assert_eq!(
     ///     (&Integer::from(-1)).balanced_crt(
-    ///     Natural::from(3u32),
-    ///     Natural::from(3u32),
-    ///     Natural::from(5u32),
-    /// ),
+    ///         Natural::from(3u32),
+    ///         Natural::from(3u32),
+    ///         Natural::from(5u32),
+    ///     ),
     ///     Some(Integer::from(-7))
     /// );
     /// assert_eq!(
     ///     (&Integer::from(1)).balanced_crt(
-    ///     Natural::from(4u32),
-    ///     Natural::from(3u32),
-    ///     Natural::from(6u32),
-    /// ),
+    ///         Natural::from(4u32),
+    ///         Natural::from(3u32),
+    ///         Natural::from(6u32),
+    ///     ),
     ///     None
     /// );
     /// ```
@@ -656,18 +656,18 @@ impl BalancedCrt<Natural, Natural, &Natural> for &Integer {
     /// // 8 is 2 mod 3 and 3 mod 5, and its balanced representative mod 15 is -7.
     /// assert_eq!(
     ///     (&Integer::from(-1)).balanced_crt(
-    ///     Natural::from(3u32),
-    ///     Natural::from(3u32),
-    ///     &Natural::from(5u32),
-    /// ),
+    ///         Natural::from(3u32),
+    ///         Natural::from(3u32),
+    ///         &Natural::from(5u32),
+    ///     ),
     ///     Some(Integer::from(-7))
     /// );
     /// assert_eq!(
     ///     (&Integer::from(1)).balanced_crt(
-    ///     Natural::from(4u32),
-    ///     Natural::from(3u32),
-    ///     &Natural::from(6u32),
-    /// ),
+    ///         Natural::from(4u32),
+    ///         Natural::from(3u32),
+    ///         &Natural::from(6u32),
+    ///     ),
     ///     None
     /// );
     /// ```
@@ -721,18 +721,18 @@ impl BalancedCrt<Natural, &Natural, Natural> for &Integer {
     /// // 8 is 2 mod 3 and 3 mod 5, and its balanced representative mod 15 is -7.
     /// assert_eq!(
     ///     (&Integer::from(-1)).balanced_crt(
-    ///     Natural::from(3u32),
-    ///     &Natural::from(3u32),
-    ///     Natural::from(5u32),
-    /// ),
+    ///         Natural::from(3u32),
+    ///         &Natural::from(3u32),
+    ///         Natural::from(5u32),
+    ///     ),
     ///     Some(Integer::from(-7))
     /// );
     /// assert_eq!(
     ///     (&Integer::from(1)).balanced_crt(
-    ///     Natural::from(4u32),
-    ///     &Natural::from(3u32),
-    ///     Natural::from(6u32),
-    /// ),
+    ///         Natural::from(4u32),
+    ///         &Natural::from(3u32),
+    ///         Natural::from(6u32),
+    ///     ),
     ///     None
     /// );
     /// ```
@@ -786,18 +786,18 @@ impl BalancedCrt<Natural, &Natural, &Natural> for &Integer {
     /// // 8 is 2 mod 3 and 3 mod 5, and its balanced representative mod 15 is -7.
     /// assert_eq!(
     ///     (&Integer::from(-1)).balanced_crt(
-    ///     Natural::from(3u32),
-    ///     &Natural::from(3u32),
-    ///     &Natural::from(5u32),
-    /// ),
+    ///         Natural::from(3u32),
+    ///         &Natural::from(3u32),
+    ///         &Natural::from(5u32),
+    ///     ),
     ///     Some(Integer::from(-7))
     /// );
     /// assert_eq!(
     ///     (&Integer::from(1)).balanced_crt(
-    ///     Natural::from(4u32),
-    ///     &Natural::from(3u32),
-    ///     &Natural::from(6u32),
-    /// ),
+    ///         Natural::from(4u32),
+    ///         &Natural::from(3u32),
+    ///         &Natural::from(6u32),
+    ///     ),
     ///     None
     /// );
     /// ```
@@ -851,18 +851,18 @@ impl BalancedCrt<&Natural, Natural, Natural> for &Integer {
     /// // 8 is 2 mod 3 and 3 mod 5, and its balanced representative mod 15 is -7.
     /// assert_eq!(
     ///     (&Integer::from(-1)).balanced_crt(
-    ///     &Natural::from(3u32),
-    ///     Natural::from(3u32),
-    ///     Natural::from(5u32),
-    /// ),
+    ///         &Natural::from(3u32),
+    ///         Natural::from(3u32),
+    ///         Natural::from(5u32),
+    ///     ),
     ///     Some(Integer::from(-7))
     /// );
     /// assert_eq!(
     ///     (&Integer::from(1)).balanced_crt(
-    ///     &Natural::from(4u32),
-    ///     Natural::from(3u32),
-    ///     Natural::from(6u32),
-    /// ),
+    ///         &Natural::from(4u32),
+    ///         Natural::from(3u32),
+    ///         Natural::from(6u32),
+    ///     ),
     ///     None
     /// );
     /// ```
@@ -916,18 +916,18 @@ impl BalancedCrt<&Natural, Natural, &Natural> for &Integer {
     /// // 8 is 2 mod 3 and 3 mod 5, and its balanced representative mod 15 is -7.
     /// assert_eq!(
     ///     (&Integer::from(-1)).balanced_crt(
-    ///     &Natural::from(3u32),
-    ///     Natural::from(3u32),
-    ///     &Natural::from(5u32),
-    /// ),
+    ///         &Natural::from(3u32),
+    ///         Natural::from(3u32),
+    ///         &Natural::from(5u32),
+    ///     ),
     ///     Some(Integer::from(-7))
     /// );
     /// assert_eq!(
     ///     (&Integer::from(1)).balanced_crt(
-    ///     &Natural::from(4u32),
-    ///     Natural::from(3u32),
-    ///     &Natural::from(6u32),
-    /// ),
+    ///         &Natural::from(4u32),
+    ///         Natural::from(3u32),
+    ///         &Natural::from(6u32),
+    ///     ),
     ///     None
     /// );
     /// ```
@@ -981,18 +981,18 @@ impl BalancedCrt<&Natural, &Natural, Natural> for &Integer {
     /// // 8 is 2 mod 3 and 3 mod 5, and its balanced representative mod 15 is -7.
     /// assert_eq!(
     ///     (&Integer::from(-1)).balanced_crt(
-    ///     &Natural::from(3u32),
-    ///     &Natural::from(3u32),
-    ///     Natural::from(5u32),
-    /// ),
+    ///         &Natural::from(3u32),
+    ///         &Natural::from(3u32),
+    ///         Natural::from(5u32),
+    ///     ),
     ///     Some(Integer::from(-7))
     /// );
     /// assert_eq!(
     ///     (&Integer::from(1)).balanced_crt(
-    ///     &Natural::from(4u32),
-    ///     &Natural::from(3u32),
-    ///     Natural::from(6u32),
-    /// ),
+    ///         &Natural::from(4u32),
+    ///         &Natural::from(3u32),
+    ///         Natural::from(6u32),
+    ///     ),
     ///     None
     /// );
     /// ```
@@ -1046,18 +1046,18 @@ impl BalancedCrt<&Natural, &Natural, &Natural> for &Integer {
     /// // 8 is 2 mod 3 and 3 mod 5, and its balanced representative mod 15 is -7.
     /// assert_eq!(
     ///     (&Integer::from(-1)).balanced_crt(
-    ///     &Natural::from(3u32),
-    ///     &Natural::from(3u32),
-    ///     &Natural::from(5u32),
-    /// ),
+    ///         &Natural::from(3u32),
+    ///         &Natural::from(3u32),
+    ///         &Natural::from(5u32),
+    ///     ),
     ///     Some(Integer::from(-7))
     /// );
     /// assert_eq!(
     ///     (&Integer::from(1)).balanced_crt(
-    ///     &Natural::from(4u32),
-    ///     &Natural::from(3u32),
-    ///     &Natural::from(6u32),
-    /// ),
+    ///         &Natural::from(4u32),
+    ///         &Natural::from(3u32),
+    ///         &Natural::from(6u32),
+    ///     ),
     ///     None
     /// );
     /// ```

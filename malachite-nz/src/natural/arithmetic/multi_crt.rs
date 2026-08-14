@@ -182,7 +182,10 @@ impl MultiCrt {
     /// Panics if `moduli` is empty.
     ///
     /// # Examples
-    /// ```
+/// (The examples are not compiled: this module is public only under the `test_build` feature, so
+/// its paths do not resolve in an ordinary build.)
+///
+    /// ```rust,ignore
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural::arithmetic::multi_crt::MultiCrt;
     ///
@@ -272,7 +275,7 @@ impl MultiCrt {
     /// Constant time and additional memory.
     ///
     /// # Examples
-    /// ```
+    /// ```rust,ignore
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural::arithmetic::multi_crt::MultiCrt;
     ///
@@ -291,7 +294,7 @@ impl MultiCrt {
     /// Constant time and additional memory.
     ///
     /// # Examples
-    /// ```
+    /// ```rust,ignore
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural::arithmetic::multi_crt::MultiCrt;
     ///
@@ -322,7 +325,7 @@ impl MultiCrt {
     /// than or equal to its modulus.
     ///
     /// # Examples
-    /// ```
+    /// ```rust,ignore
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural::arithmetic::multi_crt::MultiCrt;
     ///
@@ -390,7 +393,7 @@ impl MultiCrt {
     /// than or equal to its modulus.
     ///
     /// # Examples
-    /// ```
+    /// ```rust,ignore
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural::arithmetic::multi_crt::MultiCrt;
@@ -465,7 +468,7 @@ impl Natural {
     /// if any value is greater than or equal to its modulus.
     ///
     /// # Examples
-    /// ```
+    /// ```rust,ignore
     /// use malachite_nz::natural::Natural;
     ///
     /// let moduli = [

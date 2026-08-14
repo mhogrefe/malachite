@@ -286,6 +286,18 @@ fn main() {
         "demo_rational_dedekind_sum",
         "fmpq_dedekind_sum",
     );
+    check_demo_against_flint_no_special(
+        &oracle,
+        "../malachite-nz",
+        "demo_natural_bell_number",
+        "arith_bell_number",
+    );
+    check_demo_against_flint_no_special(
+        &oracle,
+        "../malachite-nz",
+        "demo_natural_bell_numbers_prefix",
+        "arith_bell_number_vec",
+    );
     check_demo_against_flint(
         &oracle,
         "../malachite-q",

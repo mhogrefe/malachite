@@ -546,6 +546,16 @@ pub trait ExtendedGcd<RHS = Self> {
     fn extended_gcd(self, other: RHS) -> (Self::Gcd, Self::Cofactor, Self::Cofactor);
 }
 
+/// Computes the $n$th Bell number: the number of ways to partition a set of $n$ elements.
+pub trait BellNumber {
+    fn bell_number(n: u64) -> Self;
+}
+
+/// Computes the $n$th Bell number, returning `None` if the result is too large to be represented.
+pub trait CheckedBellNumber: Sized {
+    fn checked_bell_number(n: u64) -> Option<Self>;
+}
+
 /// Computes the factorial of a `u64`.
 pub trait Factorial {
     fn factorial(n: u64) -> Self;

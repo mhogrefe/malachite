@@ -3037,6 +3037,18 @@ pub fn special_random_unsigned_gen_var_20<T: PrimitiveUnsigned>(config: &GenConf
     ))
 }
 
+// All `u64`s whose Bell number is representable as a `T`.
+pub fn special_random_unsigned_gen_var_30<T: PrimitiveUnsigned>(config: &GenConfig) -> It<u64> {
+    let limit = smallest_invalid_value(T::checked_bell_number);
+    Box::new(striped_random_unsigned_range(
+        EXAMPLE_SEED,
+        0,
+        limit,
+        config.get_or("mean_stripe_n", 4),
+        config.get_or("mean_stripe_d", 1),
+    ))
+}
+
 pub fn special_random_unsigned_gen_var_21<T: PrimitiveUnsigned>(config: &GenConfig) -> It<u64> {
     let limit = smallest_invalid_value(T::checked_double_factorial);
     Box::new(striped_random_unsigned_range(

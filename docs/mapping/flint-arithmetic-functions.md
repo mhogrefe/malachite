@@ -95,8 +95,8 @@ else in the first group.
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✗ | `void _arith_harmonic_number (fmpz_t num, fmpz_t den, slong n)` | |
-| ✗ | `void arith_harmonic_number (fmpq_t x, slong n)` | |
+| ✓ | `void _arith_harmonic_number (fmpz_t num, fmpz_t den, slong n)` | `Rational::harmonic_number(n).into_numerator_and_denominator()` |
+| ✓ | `void arith_harmonic_number (fmpq_t x, slong n)` | `Rational::harmonic_number(n)` |
 
 $$H_n = \sum_{k=1}^n 1/k$$, as an exact rational. FLINT stores a table of the first several
 values and computes larger ones with a balanced sum, halving the work by summing only over odd
@@ -107,10 +107,11 @@ The underscore form returns the numerator and denominator separately; Malachite 
 `Rational`, whose parts are available through
 [`into_numerator_and_denominator`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.into_numerator_and_denominator).
 
-These are the same gap as
-[`fmpq_harmonic_ui`](/mapping/flint-rationals/#special-functions) on the rationals page: FLINT's
-`arith_harmonic_number` is a wrapper around the `fmpq` routine, differing only in accepting a
-signed argument and returning zero for $$n \leq 0$$. One implementation closes both rows.
+These rows are closed by the same port as
+[`fmpq_harmonic_ui`](/mapping/flint-rationals/#special-functions) on the rationals page, which
+FLINT's `arith_harmonic_number` wraps. The one difference is the argument type: FLINT accepts a
+signed `n` and returns zero when it is negative, while `harmonic_number` takes a `u64`, so a
+caller with a signed quantity maps negative values to zero before the call.
 
 ## [Stirling numbers](https://flintlib.org/doc/arith.html#stirling-numbers) {#stirling-numbers}
 
@@ -146,26 +147,35 @@ matrix type regardless.
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✗ | `void arith_bell_number (fmpz_t b, ulong n)` | |
-| ✗ | `void arith_bell_number_dobinski (fmpz_t res, ulong n)` | |
-| ✗ | `void arith_bell_number_multi_mod (fmpz_t res, ulong n)` | |
-| ✗ | `void arith_bell_number_vec (fmpz * b, slong n)` | |
-| ✗ | `void arith_bell_number_vec_recursive (fmpz * b, slong n)` | |
-| ✗ | `void arith_bell_number_vec_multi_mod (fmpz * b, slong n)` | |
-| ✗ | `double arith_bell_number_size (ulong n)` | |
+| ✓ | `void arith_bell_number (fmpz_t b, ulong n)` | `Natural::bell_number(n)` |
+| — | `void arith_bell_number_dobinski (fmpz_t res, ulong n)` | |
+| ✓ | `void arith_bell_number_multi_mod (fmpz_t res, ulong n)` | `Natural::bell_number(n)` |
+| ✓ | `void arith_bell_number_vec (fmpz * b, slong n)` | `bell_numbers_prefix(n)` |
+| ✓ | `void arith_bell_number_vec_recursive (fmpz * b, slong n)` | `exhaustive_bell_numbers().take(n)` |
+| ✓ | `void arith_bell_number_vec_multi_mod (fmpz * b, slong n)` | `bell_numbers_prefix(n)` |
+| — | `double arith_bell_number_size (ulong n)` | |
 | — | `ulong arith_bell_number_nmod (ulong n, nmod_t mod)` | |
 | — | `void arith_bell_number_nmod_vec (nn_ptr b, slong n, nmod_t mod)` | |
 | — | `void arith_bell_number_nmod_vec_recursive (nn_ptr b, slong n, nmod_t mod)` | |
 | — | `void arith_bell_number_nmod_vec_ogf (nn_ptr b, slong n, nmod_t mod)` | |
 | — | `int arith_bell_number_nmod_vec_series (nn_ptr b, slong n, nmod_t mod)` | |
 
-$$B_n$$ counts the partitions of a set of $$n$$ elements. FLINT's default routine runs the Bell
-triangle in fixed-width words while the values still fit, then switches to a multimodular
-algorithm; the triangle alone, carried out in `Natural`s, is enough for a first implementation,
-and $$B_n = \sum_k S(n,k)$$ ties it to the section above. Dobinski's formula, despite being a
-sum of the transcendental series $$e^{-1}\sum_k k^n/k!$$, is evaluated by FLINT entirely in
-exact integer arithmetic: it accumulates a single numerator and denominator over a truncation
-whose length comes from a floating-point estimate. It too needs only `Natural`.
+$$B_n$$ counts the partitions of a set of $$n$$ elements. `Natural::bell_number` follows
+FLINT's default routine exactly: a table of the word-sized values, the Bell triangle in one-,
+two-, and three-word accumulators while the entries still fit, and beyond that the multimodular
+algorithm — the Dobinski-style sum modulo enough 61-bit primes, recombined with
+`Natural::multi_crt` — so the `arith_bell_number` and `arith_bell_number_multi_mod` rows are the
+same function here. `arith_bell_number_dobinski`, an alternative evaluation FLINT keeps
+alongside the default, and `arith_bell_number_size`, the de Bruijn bit-size bound the
+multimodular routine uses internally, are marked — as internal algorithm choices rather than
+gaps. The `_vec` rows are covered twice over: `exhaustive_bell_numbers()` is the bignum Bell
+triangle as an iterator, in the style of Malachite's other exhaustive generators, and
+`bell_numbers_prefix` is FLINT's `_vec` dispatch, collecting the iterator for short prefixes
+and switching to the multimodular batch at the same threshold FLINT uses. The batch recombines
+each entry over only the primes its size needs, replacing FLINT's graded combs with sliced
+calls to `Natural::multi_crt`; its per-prime routine is the word-sized triangle, so very long
+prefixes lack the `nmod_poly`-based inner loops FLINT can select, which is the remaining
+performance gap until Malachite grows polynomials.
 
 The `_nmod_` rows are marked — rather than ✗ because they compute Bell numbers modulo a
 single-word modulus as a means to the multimodular algorithms above, not as an end. Malachite's

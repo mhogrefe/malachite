@@ -1996,6 +1996,12 @@ pub fn exhaustive_unsigned_gen_var_32<T: PrimitiveUnsigned>() -> It<u64> {
     Box::new(primitive_int_increasing_range(1, limit))
 }
 
+// All `u64`s whose Bell number is representable as a `T`.
+pub fn exhaustive_unsigned_gen_var_33<T: PrimitiveUnsigned>() -> It<u64> {
+    let limit = smallest_invalid_value(T::checked_bell_number);
+    Box::new(primitive_int_increasing_range(0, limit))
+}
+
 // -- (PrimitiveUnsigned, PrimitiveInt) --
 
 pub fn exhaustive_unsigned_primitive_int_gen_var_1<T: PrimitiveUnsigned, U: PrimitiveInt>()

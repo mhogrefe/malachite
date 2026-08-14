@@ -28,6 +28,7 @@ pub mod balanced_mod;
 /// Implementations of
 /// [`BinomialCoefficient`](malachite_base::num::arithmetic::traits::BinomialCoefficient), a trait
 /// for computing the binomial coefficient of two numbers.
+pub mod bell_number;
 pub mod binomial_coefficient;
 pub mod checked_mul_sub_mul;
 /// Implementations of [`CheckedSub`](malachite_base::num::arithmetic::traits::CheckedSub), a trait

@@ -1866,6 +1866,15 @@ pub fn unsigned_gen_var_34<T: PrimitiveUnsigned>() -> Generator<u64> {
     )
 }
 
+// All `u64`s whose Bell number is representable as a `T`.
+pub fn unsigned_gen_var_35<T: PrimitiveUnsigned>() -> Generator<u64> {
+    Generator::new(
+        &exhaustive_unsigned_gen_var_33::<T>,
+        &random_unsigned_gen_var_29::<T>,
+        &special_random_unsigned_gen_var_30::<T>,
+    )
+}
+
 // -- (PrimitiveUnsigned, PrimitiveSigned) --
 
 pub fn unsigned_signed_pair_gen<T: PrimitiveUnsigned, U: PrimitiveSigned>() -> Generator<(T, U)> {

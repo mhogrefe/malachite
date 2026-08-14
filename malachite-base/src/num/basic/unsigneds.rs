@@ -7,24 +7,24 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::num::arithmetic::traits::{
-    AbsDiff, AbsDiffAssign, BalancedMod, CeilingDivAssignNegMod, CeilingDivNegMod, CeilingLogBase,
-    CeilingLogBase2, CeilingLogBasePowerOf2, CheckedDoubleFactorial, CheckedFactorial,
-    CheckedFibonacci, CheckedLcm, CheckedLogBase, CheckedLogBase2, CheckedLogBasePowerOf2,
-    CheckedLucasNumber, CheckedMultifactorial, CheckedNextPowerOf2, CheckedPrimorial,
-    CheckedSubfactorial, CoprimeWith, DoubleFactorial, ExtendedGcd, Factorial, Fibonacci,
-    FloorLogBase, FloorLogBase2, FloorLogBasePowerOf2, Gcd, GcdAssign, IsPowerOf2, Lcm, LcmAssign,
-    LucasNumber, ModAdd, ModAddAssign, ModInverse, ModIsReduced, ModMul, ModMulAssign,
-    ModMulPrecomputed, ModMulPrecomputedAssign, ModNeg, ModNegAssign, ModPow, ModPowAssign,
-    ModPowPrecomputed, ModPowPrecomputedAssign, ModPowerOf2, ModPowerOf2Add, ModPowerOf2AddAssign,
-    ModPowerOf2Inverse, ModPowerOf2IsReduced, ModPowerOf2Mul, ModPowerOf2MulAssign, ModPowerOf2Neg,
-    ModPowerOf2NegAssign, ModPowerOf2Pow, ModPowerOf2PowAssign, ModPowerOf2Shl,
-    ModPowerOf2ShlAssign, ModPowerOf2Shr, ModPowerOf2ShrAssign, ModPowerOf2Square,
-    ModPowerOf2SquareAssign, ModPowerOf2Sub, ModPowerOf2SubAssign, ModSquare, ModSquareAssign,
-    ModSquarePrecomputed, ModSquarePrecomputedAssign, ModSub, ModSubAssign, Multifactorial, NegMod,
-    NegModAssign, NegModPowerOf2, NegModPowerOf2Assign, NextPowerOf2, NextPowerOf2Assign,
-    Primorial, RootAssignRem, RootRem, SqrtAssignRem, SqrtRem, Subfactorial, UnsignedAbs,
-    XMulYToZZ, XXAddYYToZZ, XXDivModYToQR, XXSubYYToZZ, XXXAddYYYToZZZ, XXXSubYYYToZZZ,
-    XXXXAddYYYYToZZZZ,
+    AbsDiff, AbsDiffAssign, BalancedMod, BellNumber, CeilingDivAssignNegMod, CeilingDivNegMod,
+    CeilingLogBase, CeilingLogBase2, CeilingLogBasePowerOf2, CheckedBellNumber,
+    CheckedDoubleFactorial, CheckedFactorial, CheckedFibonacci, CheckedLcm, CheckedLogBase,
+    CheckedLogBase2, CheckedLogBasePowerOf2, CheckedLucasNumber, CheckedMultifactorial,
+    CheckedNextPowerOf2, CheckedPrimorial, CheckedSubfactorial, CoprimeWith, DoubleFactorial,
+    ExtendedGcd, Factorial, Fibonacci, FloorLogBase, FloorLogBase2, FloorLogBasePowerOf2, Gcd,
+    GcdAssign, IsPowerOf2, Lcm, LcmAssign, LucasNumber, ModAdd, ModAddAssign, ModInverse,
+    ModIsReduced, ModMul, ModMulAssign, ModMulPrecomputed, ModMulPrecomputedAssign, ModNeg,
+    ModNegAssign, ModPow, ModPowAssign, ModPowPrecomputed, ModPowPrecomputedAssign, ModPowerOf2,
+    ModPowerOf2Add, ModPowerOf2AddAssign, ModPowerOf2Inverse, ModPowerOf2IsReduced, ModPowerOf2Mul,
+    ModPowerOf2MulAssign, ModPowerOf2Neg, ModPowerOf2NegAssign, ModPowerOf2Pow,
+    ModPowerOf2PowAssign, ModPowerOf2Shl, ModPowerOf2ShlAssign, ModPowerOf2Shr,
+    ModPowerOf2ShrAssign, ModPowerOf2Square, ModPowerOf2SquareAssign, ModPowerOf2Sub,
+    ModPowerOf2SubAssign, ModSquare, ModSquareAssign, ModSquarePrecomputed,
+    ModSquarePrecomputedAssign, ModSub, ModSubAssign, Multifactorial, NegMod, NegModAssign,
+    NegModPowerOf2, NegModPowerOf2Assign, NextPowerOf2, NextPowerOf2Assign, Primorial,
+    RootAssignRem, RootRem, SqrtAssignRem, SqrtRem, Subfactorial, UnsignedAbs, XMulYToZZ,
+    XXAddYYToZZ, XXDivModYToQR, XXSubYYToZZ, XXXAddYYYToZZZ, XXXSubYYYToZZZ, XXXXAddYYYYToZZZZ,
 };
 use crate::num::basic::integers::PrimitiveInt;
 use crate::num::basic::signeds::PrimitiveSigned;
@@ -49,6 +49,8 @@ pub trait PrimitiveUnsigned:
     + CeilingDivAssignNegMod<Self, ModOutput = Self>
     + CeilingDivNegMod<Self, DivOutput = Self, ModOutput = Self>
     + CheckedDoubleFactorial
+    + BellNumber
+    + CheckedBellNumber
     + CheckedFactorial
     + CheckedFibonacci
     + CheckedMultifactorial

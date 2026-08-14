@@ -66,11 +66,19 @@ impl Crt<Self, Self, Self> for Natural {
     ///
     /// // 8 is 2 mod 3 and 3 mod 5.
     /// assert_eq!(
-    ///     Natural::from(2u32).crt(Natural::from(3u32), Natural::from(3u32), Natural::from(5u32)),
+    ///     Natural::from(2u32).crt(
+    ///         Natural::from(3u32),
+    ///         Natural::from(3u32),
+    ///         Natural::from(5u32)
+    ///     ),
     ///     Some(Natural::from(8u32))
     /// );
     /// assert_eq!(
-    ///     Natural::from(1u32).crt(Natural::from(4u32), Natural::from(3u32), Natural::from(6u32)),
+    ///     Natural::from(1u32).crt(
+    ///         Natural::from(4u32),
+    ///         Natural::from(3u32),
+    ///         Natural::from(6u32)
+    ///     ),
     ///     None
     /// );
     /// ```
@@ -120,11 +128,19 @@ impl Crt<Self, Self, &Self> for Natural {
     ///
     /// // 8 is 2 mod 3 and 3 mod 5.
     /// assert_eq!(
-    ///     Natural::from(2u32).crt(Natural::from(3u32), Natural::from(3u32), &Natural::from(5u32)),
+    ///     Natural::from(2u32).crt(
+    ///         Natural::from(3u32),
+    ///         Natural::from(3u32),
+    ///         &Natural::from(5u32)
+    ///     ),
     ///     Some(Natural::from(8u32))
     /// );
     /// assert_eq!(
-    ///     Natural::from(1u32).crt(Natural::from(4u32), Natural::from(3u32), &Natural::from(6u32)),
+    ///     Natural::from(1u32).crt(
+    ///         Natural::from(4u32),
+    ///         Natural::from(3u32),
+    ///         &Natural::from(6u32)
+    ///     ),
     ///     None
     /// );
     /// ```
@@ -174,11 +190,19 @@ impl Crt<Self, &Self, Self> for Natural {
     ///
     /// // 8 is 2 mod 3 and 3 mod 5.
     /// assert_eq!(
-    ///     Natural::from(2u32).crt(Natural::from(3u32), &Natural::from(3u32), Natural::from(5u32)),
+    ///     Natural::from(2u32).crt(
+    ///         Natural::from(3u32),
+    ///         &Natural::from(3u32),
+    ///         Natural::from(5u32)
+    ///     ),
     ///     Some(Natural::from(8u32))
     /// );
     /// assert_eq!(
-    ///     Natural::from(1u32).crt(Natural::from(4u32), &Natural::from(3u32), Natural::from(6u32)),
+    ///     Natural::from(1u32).crt(
+    ///         Natural::from(4u32),
+    ///         &Natural::from(3u32),
+    ///         Natural::from(6u32)
+    ///     ),
     ///     None
     /// );
     /// ```
@@ -229,18 +253,18 @@ impl Crt<Self, &Self, &Self> for Natural {
     /// // 8 is 2 mod 3 and 3 mod 5.
     /// assert_eq!(
     ///     Natural::from(2u32).crt(
-    ///     Natural::from(3u32),
-    ///     &Natural::from(3u32),
-    ///     &Natural::from(5u32),
-    /// ),
+    ///         Natural::from(3u32),
+    ///         &Natural::from(3u32),
+    ///         &Natural::from(5u32),
+    ///     ),
     ///     Some(Natural::from(8u32))
     /// );
     /// assert_eq!(
     ///     Natural::from(1u32).crt(
-    ///     Natural::from(4u32),
-    ///     &Natural::from(3u32),
-    ///     &Natural::from(6u32),
-    /// ),
+    ///         Natural::from(4u32),
+    ///         &Natural::from(3u32),
+    ///         &Natural::from(6u32),
+    ///     ),
     ///     None
     /// );
     /// ```
@@ -290,11 +314,19 @@ impl Crt<&Self, Self, Self> for Natural {
     ///
     /// // 8 is 2 mod 3 and 3 mod 5.
     /// assert_eq!(
-    ///     Natural::from(2u32).crt(&Natural::from(3u32), Natural::from(3u32), Natural::from(5u32)),
+    ///     Natural::from(2u32).crt(
+    ///         &Natural::from(3u32),
+    ///         Natural::from(3u32),
+    ///         Natural::from(5u32)
+    ///     ),
     ///     Some(Natural::from(8u32))
     /// );
     /// assert_eq!(
-    ///     Natural::from(1u32).crt(&Natural::from(4u32), Natural::from(3u32), Natural::from(6u32)),
+    ///     Natural::from(1u32).crt(
+    ///         &Natural::from(4u32),
+    ///         Natural::from(3u32),
+    ///         Natural::from(6u32)
+    ///     ),
     ///     None
     /// );
     /// ```
@@ -348,18 +380,18 @@ impl Crt<&Self, Self, &Self> for Natural {
     /// // 8 is 2 mod 3 and 3 mod 5.
     /// assert_eq!(
     ///     Natural::from(2u32).crt(
-    ///     &Natural::from(3u32),
-    ///     Natural::from(3u32),
-    ///     &Natural::from(5u32),
-    /// ),
+    ///         &Natural::from(3u32),
+    ///         Natural::from(3u32),
+    ///         &Natural::from(5u32),
+    ///     ),
     ///     Some(Natural::from(8u32))
     /// );
     /// assert_eq!(
     ///     Natural::from(1u32).crt(
-    ///     &Natural::from(4u32),
-    ///     Natural::from(3u32),
-    ///     &Natural::from(6u32),
-    /// ),
+    ///         &Natural::from(4u32),
+    ///         Natural::from(3u32),
+    ///         &Natural::from(6u32),
+    ///     ),
     ///     None
     /// );
     /// ```
@@ -413,18 +445,18 @@ impl Crt<&Self, &Self, Self> for Natural {
     /// // 8 is 2 mod 3 and 3 mod 5.
     /// assert_eq!(
     ///     Natural::from(2u32).crt(
-    ///     &Natural::from(3u32),
-    ///     &Natural::from(3u32),
-    ///     Natural::from(5u32),
-    /// ),
+    ///         &Natural::from(3u32),
+    ///         &Natural::from(3u32),
+    ///         Natural::from(5u32),
+    ///     ),
     ///     Some(Natural::from(8u32))
     /// );
     /// assert_eq!(
     ///     Natural::from(1u32).crt(
-    ///     &Natural::from(4u32),
-    ///     &Natural::from(3u32),
-    ///     Natural::from(6u32),
-    /// ),
+    ///         &Natural::from(4u32),
+    ///         &Natural::from(3u32),
+    ///         Natural::from(6u32),
+    ///     ),
     ///     None
     /// );
     /// ```
@@ -478,18 +510,18 @@ impl Crt<&Self, &Self, &Self> for Natural {
     /// // 8 is 2 mod 3 and 3 mod 5.
     /// assert_eq!(
     ///     Natural::from(2u32).crt(
-    ///     &Natural::from(3u32),
-    ///     &Natural::from(3u32),
-    ///     &Natural::from(5u32),
-    /// ),
+    ///         &Natural::from(3u32),
+    ///         &Natural::from(3u32),
+    ///         &Natural::from(5u32),
+    ///     ),
     ///     Some(Natural::from(8u32))
     /// );
     /// assert_eq!(
     ///     Natural::from(1u32).crt(
-    ///     &Natural::from(4u32),
-    ///     &Natural::from(3u32),
-    ///     &Natural::from(6u32),
-    /// ),
+    ///         &Natural::from(4u32),
+    ///         &Natural::from(3u32),
+    ///         &Natural::from(6u32),
+    ///     ),
     ///     None
     /// );
     /// ```
@@ -543,18 +575,18 @@ impl Crt<Natural, Natural, Natural> for &Natural {
     /// // 8 is 2 mod 3 and 3 mod 5.
     /// assert_eq!(
     ///     (&Natural::from(2u32)).crt(
-    ///     Natural::from(3u32),
-    ///     Natural::from(3u32),
-    ///     Natural::from(5u32),
-    /// ),
+    ///         Natural::from(3u32),
+    ///         Natural::from(3u32),
+    ///         Natural::from(5u32),
+    ///     ),
     ///     Some(Natural::from(8u32))
     /// );
     /// assert_eq!(
     ///     (&Natural::from(1u32)).crt(
-    ///     Natural::from(4u32),
-    ///     Natural::from(3u32),
-    ///     Natural::from(6u32),
-    /// ),
+    ///         Natural::from(4u32),
+    ///         Natural::from(3u32),
+    ///         Natural::from(6u32),
+    ///     ),
     ///     None
     /// );
     /// ```
@@ -608,18 +640,18 @@ impl Crt<Natural, Natural, &Natural> for &Natural {
     /// // 8 is 2 mod 3 and 3 mod 5.
     /// assert_eq!(
     ///     (&Natural::from(2u32)).crt(
-    ///     Natural::from(3u32),
-    ///     Natural::from(3u32),
-    ///     &Natural::from(5u32),
-    /// ),
+    ///         Natural::from(3u32),
+    ///         Natural::from(3u32),
+    ///         &Natural::from(5u32),
+    ///     ),
     ///     Some(Natural::from(8u32))
     /// );
     /// assert_eq!(
     ///     (&Natural::from(1u32)).crt(
-    ///     Natural::from(4u32),
-    ///     Natural::from(3u32),
-    ///     &Natural::from(6u32),
-    /// ),
+    ///         Natural::from(4u32),
+    ///         Natural::from(3u32),
+    ///         &Natural::from(6u32),
+    ///     ),
     ///     None
     /// );
     /// ```
@@ -673,18 +705,18 @@ impl Crt<Natural, &Natural, Natural> for &Natural {
     /// // 8 is 2 mod 3 and 3 mod 5.
     /// assert_eq!(
     ///     (&Natural::from(2u32)).crt(
-    ///     Natural::from(3u32),
-    ///     &Natural::from(3u32),
-    ///     Natural::from(5u32),
-    /// ),
+    ///         Natural::from(3u32),
+    ///         &Natural::from(3u32),
+    ///         Natural::from(5u32),
+    ///     ),
     ///     Some(Natural::from(8u32))
     /// );
     /// assert_eq!(
     ///     (&Natural::from(1u32)).crt(
-    ///     Natural::from(4u32),
-    ///     &Natural::from(3u32),
-    ///     Natural::from(6u32),
-    /// ),
+    ///         Natural::from(4u32),
+    ///         &Natural::from(3u32),
+    ///         Natural::from(6u32),
+    ///     ),
     ///     None
     /// );
     /// ```
@@ -738,18 +770,18 @@ impl Crt<Natural, &Natural, &Natural> for &Natural {
     /// // 8 is 2 mod 3 and 3 mod 5.
     /// assert_eq!(
     ///     (&Natural::from(2u32)).crt(
-    ///     Natural::from(3u32),
-    ///     &Natural::from(3u32),
-    ///     &Natural::from(5u32),
-    /// ),
+    ///         Natural::from(3u32),
+    ///         &Natural::from(3u32),
+    ///         &Natural::from(5u32),
+    ///     ),
     ///     Some(Natural::from(8u32))
     /// );
     /// assert_eq!(
     ///     (&Natural::from(1u32)).crt(
-    ///     Natural::from(4u32),
-    ///     &Natural::from(3u32),
-    ///     &Natural::from(6u32),
-    /// ),
+    ///         Natural::from(4u32),
+    ///         &Natural::from(3u32),
+    ///         &Natural::from(6u32),
+    ///     ),
     ///     None
     /// );
     /// ```
@@ -803,18 +835,18 @@ impl Crt<&Natural, Natural, Natural> for &Natural {
     /// // 8 is 2 mod 3 and 3 mod 5.
     /// assert_eq!(
     ///     (&Natural::from(2u32)).crt(
-    ///     &Natural::from(3u32),
-    ///     Natural::from(3u32),
-    ///     Natural::from(5u32),
-    /// ),
+    ///         &Natural::from(3u32),
+    ///         Natural::from(3u32),
+    ///         Natural::from(5u32),
+    ///     ),
     ///     Some(Natural::from(8u32))
     /// );
     /// assert_eq!(
     ///     (&Natural::from(1u32)).crt(
-    ///     &Natural::from(4u32),
-    ///     Natural::from(3u32),
-    ///     Natural::from(6u32),
-    /// ),
+    ///         &Natural::from(4u32),
+    ///         Natural::from(3u32),
+    ///         Natural::from(6u32),
+    ///     ),
     ///     None
     /// );
     /// ```
@@ -865,18 +897,18 @@ impl Crt<&Natural, Natural, &Natural> for &Natural {
     /// // 8 is 2 mod 3 and 3 mod 5.
     /// assert_eq!(
     ///     (&Natural::from(2u32)).crt(
-    ///     &Natural::from(3u32),
-    ///     Natural::from(3u32),
-    ///     &Natural::from(5u32),
-    /// ),
+    ///         &Natural::from(3u32),
+    ///         Natural::from(3u32),
+    ///         &Natural::from(5u32),
+    ///     ),
     ///     Some(Natural::from(8u32))
     /// );
     /// assert_eq!(
     ///     (&Natural::from(1u32)).crt(
-    ///     &Natural::from(4u32),
-    ///     Natural::from(3u32),
-    ///     &Natural::from(6u32),
-    /// ),
+    ///         &Natural::from(4u32),
+    ///         Natural::from(3u32),
+    ///         &Natural::from(6u32),
+    ///     ),
     ///     None
     /// );
     /// ```
@@ -927,18 +959,18 @@ impl Crt<&Natural, &Natural, Natural> for &Natural {
     /// // 8 is 2 mod 3 and 3 mod 5.
     /// assert_eq!(
     ///     (&Natural::from(2u32)).crt(
-    ///     &Natural::from(3u32),
-    ///     &Natural::from(3u32),
-    ///     Natural::from(5u32),
-    /// ),
+    ///         &Natural::from(3u32),
+    ///         &Natural::from(3u32),
+    ///         Natural::from(5u32),
+    ///     ),
     ///     Some(Natural::from(8u32))
     /// );
     /// assert_eq!(
     ///     (&Natural::from(1u32)).crt(
-    ///     &Natural::from(4u32),
-    ///     &Natural::from(3u32),
-    ///     Natural::from(6u32),
-    /// ),
+    ///         &Natural::from(4u32),
+    ///         &Natural::from(3u32),
+    ///         Natural::from(6u32),
+    ///     ),
     ///     None
     /// );
     /// ```
@@ -989,18 +1021,18 @@ impl Crt<&Natural, &Natural, &Natural> for &Natural {
     /// // 8 is 2 mod 3 and 3 mod 5.
     /// assert_eq!(
     ///     (&Natural::from(2u32)).crt(
-    ///     &Natural::from(3u32),
-    ///     &Natural::from(3u32),
-    ///     &Natural::from(5u32),
-    /// ),
+    ///         &Natural::from(3u32),
+    ///         &Natural::from(3u32),
+    ///         &Natural::from(5u32),
+    ///     ),
     ///     Some(Natural::from(8u32))
     /// );
     /// assert_eq!(
     ///     (&Natural::from(1u32)).crt(
-    ///     &Natural::from(4u32),
-    ///     &Natural::from(3u32),
-    ///     &Natural::from(6u32),
-    /// ),
+    ///         &Natural::from(4u32),
+    ///         &Natural::from(3u32),
+    ///         &Natural::from(6u32),
+    ///     ),
     ///     None
     /// );
     /// ```
