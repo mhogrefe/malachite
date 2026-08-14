@@ -47,6 +47,7 @@ static const oracle_mode modes[] = {
     {"fmpq_farey_neighbors", run_fmpq_farey_neighbors},
     {"arith_bell_number", run_arith_bell_number},
     {"arith_bell_number_vec", run_arith_bell_number_vec},
+    {"arith_landau_function_vec", run_arith_landau_function_vec},
     {"fmpq_dedekind_sum", run_fmpq_dedekind_sum},
     {"fmpq_harmonic", run_fmpq_harmonic},
     {"fmpq_next_minimal", run_fmpq_next_minimal},

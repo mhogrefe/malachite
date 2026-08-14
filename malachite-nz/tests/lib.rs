@@ -269,6 +269,7 @@ pub mod natural {
         pub mod gcd;
         pub mod is_power_of_2;
         pub mod kronecker_symbol;
+        pub mod landau_function;
         pub mod lcm;
         pub mod log_base;
         pub mod log_base_2;

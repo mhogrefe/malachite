@@ -248,12 +248,13 @@ and FLINT computes a single value from the series, so both rows wait on power se
 
 | | FLINT | Malachite |
 | :---: | --- | --- |
-| ✗ | `void arith_landau_function_vec (fmpz * res, slong len)` | |
+| ✓ | `void arith_landau_function_vec (fmpz * res, slong len)` | `landau_function_prefix(len)` |
 
 $$g(n)$$ is the largest order of an element of the symmetric group $$S_n$$, obtained by
-maximizing a product of prime powers whose sum is at most $$n$$. FLINT's implementation needs
-only prime generation and integer arithmetic, both of which Malachite has, so this is reachable
-as it stands.
+maximizing a product of prime powers whose sum is at most $$n$$. `landau_function_prefix`
+follows FLINT exactly: a knapsack over prime powers, offered in descending index order so each
+prime contributes at most one power per value, with primes capped at FLINT's
+$$1.328\sqrt{n \ln n}$$ bound on the largest useful prime.
 
 ## [Number of partitions](https://flintlib.org/doc/arith.html#number-of-partitions) {#number-of-partitions}
 

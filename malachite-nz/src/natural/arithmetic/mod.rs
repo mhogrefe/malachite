@@ -122,6 +122,8 @@ pub mod is_power_of_2;
 /// [`KroneckerSymbol`](malachite_base::num::arithmetic::traits::KroneckerSymbol), traits for
 /// computing the Legendre, Jacobi, and Kronecker symbols of two numbers.
 pub mod kronecker_symbol;
+/// A function for computing Landau's function.
+pub mod landau_function;
 /// Implementations of [`Lcm`](malachite_base::num::arithmetic::traits::Lcm),
 /// [`LcmAssign`](malachite_base::num::arithmetic::traits::LcmAssign), and
 /// [`CheckedLcm`](malachite_base::num::arithmetic::traits::CheckedLcm), traits for computing the

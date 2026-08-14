@@ -14,6 +14,7 @@ pub(crate) fn register(runner: &mut Runner) {
     add_mul::register(runner);
     average::register(runner);
     bell_number::register(runner);
+    landau_function::register(runner);
     binomial_coefficient::register(runner);
     checked_mul_sub_mul::register(runner);
     checked_sub::register(runner);
@@ -130,6 +131,7 @@ mod float;
 mod gcd;
 mod is_power_of_2;
 mod kronecker_symbol;
+mod landau_function;
 mod lcm;
 mod log_base;
 mod log_base_2;

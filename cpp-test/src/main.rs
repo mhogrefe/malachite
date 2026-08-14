@@ -298,6 +298,12 @@ fn main() {
         "demo_natural_bell_numbers_prefix",
         "arith_bell_number_vec",
     );
+    check_demo_against_flint_no_special(
+        &oracle,
+        "../malachite-nz",
+        "demo_natural_landau_function_prefix",
+        "arith_landau_function_vec",
+    );
     check_demo_against_flint(
         &oracle,
         "../malachite-q",
