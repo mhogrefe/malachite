@@ -129,6 +129,7 @@ pub mod float {
         pub mod eq_abs_primitive_int;
         pub mod eq_abs_rational;
         pub mod hash;
+        pub mod min_max;
         pub mod partial_cmp_abs_integer;
         pub mod partial_cmp_abs_natural;
         pub mod partial_cmp_abs_primitive_float;

@@ -425,6 +425,72 @@ pub fn float_float_unsigned_rounding_mode_quadruple_gen_var_15()
     )
 }
 
+// All `(Float, Float, u64, RoundingMode)` that are valid inputs to `Float::min_prec_round`.
+pub fn float_float_unsigned_rounding_mode_quadruple_gen_var_16()
+-> Generator<(Float, Float, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_float_unsigned_rounding_mode_quadruple_gen_var_16,
+        &random_float_float_unsigned_rounding_mode_quadruple_gen_var_16,
+        &special_random_float_float_unsigned_rounding_mode_quadruple_gen_var_16,
+    )
+}
+
+pub fn float_float_unsigned_rounding_mode_quadruple_gen_var_16_rm() -> Generator<(
+    (rug::Float, rug::Float, u64, rug::float::Round),
+    (Float, Float, u64, RoundingMode),
+)> {
+    Generator::new(
+        &|| {
+            float_float_anything_rounding_mode_quadruple_rm(
+                exhaustive_float_float_unsigned_rounding_mode_quadruple_gen_var_16(),
+            )
+        },
+        &|config| {
+            float_float_anything_rounding_mode_quadruple_rm(
+                random_float_float_unsigned_rounding_mode_quadruple_gen_var_16(config),
+            )
+        },
+        &|config| {
+            float_float_anything_rounding_mode_quadruple_rm(
+                special_random_float_float_unsigned_rounding_mode_quadruple_gen_var_16(config),
+            )
+        },
+    )
+}
+
+// All `(Float, Float, u64, RoundingMode)` that are valid inputs to `Float::max_prec_round`.
+pub fn float_float_unsigned_rounding_mode_quadruple_gen_var_17()
+-> Generator<(Float, Float, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_float_unsigned_rounding_mode_quadruple_gen_var_17,
+        &random_float_float_unsigned_rounding_mode_quadruple_gen_var_17,
+        &special_random_float_float_unsigned_rounding_mode_quadruple_gen_var_17,
+    )
+}
+
+pub fn float_float_unsigned_rounding_mode_quadruple_gen_var_17_rm() -> Generator<(
+    (rug::Float, rug::Float, u64, rug::float::Round),
+    (Float, Float, u64, RoundingMode),
+)> {
+    Generator::new(
+        &|| {
+            float_float_anything_rounding_mode_quadruple_rm(
+                exhaustive_float_float_unsigned_rounding_mode_quadruple_gen_var_17(),
+            )
+        },
+        &|config| {
+            float_float_anything_rounding_mode_quadruple_rm(
+                random_float_float_unsigned_rounding_mode_quadruple_gen_var_17(config),
+            )
+        },
+        &|config| {
+            float_float_anything_rounding_mode_quadruple_rm(
+                special_random_float_float_unsigned_rounding_mode_quadruple_gen_var_17(config),
+            )
+        },
+    )
+}
+
 pub fn float_float_unsigned_rounding_mode_quadruple_gen_var_1_rm() -> Generator<(
     (rug::Float, rug::Float, u64, rug::float::Round),
     (Float, Float, u64, RoundingMode),
@@ -1171,6 +1237,40 @@ pub fn float_float_rounding_mode_triple_gen_var_38() -> Generator<(Float, Float,
         &exhaustive_float_float_rounding_mode_triple_gen_var_38,
         &random_float_float_rounding_mode_triple_gen_var_38,
         &special_random_float_float_rounding_mode_triple_gen_var_38,
+    )
+}
+
+// All `(Float, Float, RoundingMode)`. All rounding modes, including `Exact`, are valid inputs to
+// `Float::min_round` and `Float::max_round`, since the result is one of the operands rounded to a
+// precision at least as high as its own.
+pub fn float_float_rounding_mode_triple_gen_var_39() -> Generator<(Float, Float, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_float_rounding_mode_triple_gen_var_39,
+        &random_float_float_rounding_mode_triple_gen_var_39,
+        &special_random_float_float_rounding_mode_triple_gen_var_39,
+    )
+}
+
+pub fn float_float_rounding_mode_triple_gen_var_39_rm() -> Generator<(
+    (rug::Float, rug::Float, rug::float::Round),
+    (Float, Float, RoundingMode),
+)> {
+    Generator::new(
+        &|| {
+            float_float_rounding_mode_triple_rm(
+                exhaustive_float_float_rounding_mode_triple_gen_var_39(),
+            )
+        },
+        &|config| {
+            float_float_rounding_mode_triple_rm(random_float_float_rounding_mode_triple_gen_var_39(
+                config,
+            ))
+        },
+        &|config| {
+            float_float_rounding_mode_triple_rm(
+                special_random_float_float_rounding_mode_triple_gen_var_39(config),
+            )
+        },
     )
 }
 

@@ -19,6 +19,7 @@ pub(crate) fn register(runner: &mut Runner) {
     eq_abs_primitive_int::register(runner);
     eq_abs_rational::register(runner);
     hash::register(runner);
+    min_max::register(runner);
     partial_cmp_abs_integer::register(runner);
     partial_cmp_abs_natural::register(runner);
     partial_cmp_abs_primitive_float::register(runner);
@@ -46,6 +47,7 @@ mod eq_abs_primitive_float;
 mod eq_abs_primitive_int;
 mod eq_abs_rational;
 mod hash;
+mod min_max;
 mod partial_cmp_abs_integer;
 mod partial_cmp_abs_natural;
 mod partial_cmp_abs_primitive_float;

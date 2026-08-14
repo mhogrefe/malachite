@@ -1180,8 +1180,8 @@ macro's double-evaluation mechanics are C plumbing with nothing to abbreviate.
 | ≈ | `void mpfr_nexttoward (mpfr_t x, mpfr_t y)` | [`increment`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.increment), [`decrement`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.decrement) |
 | ≈ | `void mpfr_nextabove (mpfr_t x)` | [`increment`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.increment) |
 | ≈ | `void mpfr_nextbelow (mpfr_t x)` | [`decrement`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.decrement) |
-| ✗ | `int mpfr_min (mpfr_t rop, mpfr_t op1, mpfr_t op2, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_max (mpfr_t rop, mpfr_t op1, mpfr_t op2, mpfr_rnd_t rnd)` | |
+| ✓ | `int mpfr_min (mpfr_t rop, mpfr_t op1, mpfr_t op2, mpfr_rnd_t rnd)` | [`min_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.min_prec_round) |
+| ✓ | `int mpfr_max (mpfr_t rop, mpfr_t op1, mpfr_t op2, mpfr_rnd_t rnd)` | [`max_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.max_prec_round) |
 | ✗ | `int mpfr_urandomb (mpfr_t rop, gmp_randstate_t state)` | |
 | ✗ | `int mpfr_urandom (mpfr_t rop, gmp_randstate_t state, mpfr_rnd_t rnd)` | |
 | ✗ | `int mpfr_nrandom (mpfr_t rop1, gmp_randstate_t state, mpfr_rnd_t rnd)` | |
@@ -1213,12 +1213,18 @@ of the appropriate sign, and the infinities act as endpoints, while `increment` 
 part: stepping down from a power of two, `decrement` subtracts the ulp of the binade being
 left, taking a larger step than `mpfr_nextbelow`'s move to the nearest representable below.
 
-**`mpfr_min`, `mpfr_max`.** Gaps with real content: these follow IEEE 754-2019's
-minimumNumber and maximumNumber, where a single NaN operand is ignored, "the numeric value" is
-returned, only two NaNs produce NaN, and zeros of different signs order as
-$$-0 < +0$$; the result is then rounded to `rop`'s precision. A spelled-out composition over
-`partial_cmp` must reproduce each of those rules, which is exactly why a dedicated pair
-belongs in the library.
+**`mpfr_min`, `mpfr_max`.** These follow IEEE 754-2019's minimumNumber and maximumNumber: a
+single NaN operand is ignored, only two NaNs produce NaN, and zeros of different signs order
+as $$-0 < +0$$. Malachite's [`min_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.min_prec_round) and
+[`max_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.max_prec_round) implement the same selection rules; since a `Float`
+result does not carry a preexisting precision the way `rop` does, the target precision and
+rounding mode are explicit arguments, and the MPFR ternary value is returned as an
+[`Ordering`]. The rest of the family follows the usual Malachite conventions:
+[`min_prec`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.min_prec) and [`max_prec`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.max_prec) round to nearest,
+[`min_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.min_round) and [`max_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.max_round) target the maximum of the
+operands' precisions, and [`min`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.min) and [`max`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.max) do both, in which case
+the result is always exact; each method also has `_val_ref`, `_ref_val`, and `_ref_ref`
+variants that take their arguments by reference.
 
 **The random generators.** MPFR's four are distribution samplers: `mpfr_urandomb` draws
 uniformly from $$[0, 1)$$ with exactly `rop`'s precision, `mpfr_urandom` behaves "as if a

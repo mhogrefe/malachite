@@ -77,6 +77,8 @@ pub mod eq_abs_primitive_int;
 pub mod eq_abs_rational;
 /// Hashing of [`Float`](crate::Float)s.
 pub mod hash;
+/// Functions for finding the minimum and maximum of two [`Float`](crate::Float)s.
+pub mod min_max;
 /// Implementations of [`PartialOrdAbs`](`malachite_base::num::comparison::traits::PartialOrdAbs`)
 /// (a trait for comparing the absolute values of numbers by order) for [`Float`](crate::Float)s and
 /// [`Integer`](malachite_nz::integer::Integer)s.
