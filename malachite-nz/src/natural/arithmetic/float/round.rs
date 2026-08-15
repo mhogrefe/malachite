@@ -14,13 +14,18 @@
 
 use crate::natural::InnerNatural::{Large, Small};
 use crate::natural::arithmetic::add::{limbs_add_limb_to_out, limbs_slice_add_limb_in_place};
+use crate::natural::arithmetic::sub::limbs_sub_limb_to_out;
 use crate::natural::{
-    LIMB_HIGH_BIT, LIMB_MAX_HALF, Natural, bit_to_limb_count_floor, limb_to_bit_count,
+    LIMB_HIGH_BIT, LIMB_MAX_HALF, Natural, WIDTH_MINUS_1, bit_to_limb_count_floor,
+    limb_to_bit_count,
 };
 use crate::platform::Limb;
 use core::cmp::min;
-use malachite_base::num::arithmetic::traits::{NegModPowerOf2, PowerOf2, WrappingSubAssign};
+use malachite_base::num::arithmetic::traits::{
+    IsPowerOf2, NegModPowerOf2, Parity, PowerOf2, ShrRound, WrappingSubAssign,
+};
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::LowMask;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::slices::slice_test_zero;
@@ -503,4 +508,278 @@ pub(crate) fn round_helper_2(xs: &[Limb], err0: i32, prec: u64) -> bool {
 #[inline]
 pub fn limbs_significand_slice_add_limb_in_place(xs: &mut [Limb], y: Limb) -> bool {
     limbs_slice_add_limb_in_place(xs, y)
+}
+
+// Returns whether the given rounding mode, applied to a value of the given sign, rounds toward
+// zero. This is MPFR_IS_LIKE_RNDZ from mpfr-impl.h, MPFR 4.2.2, restricted to the modes that
+// can reach it here.
+const fn is_like_rounding_toward_zero(rm: RoundingMode, neg: bool) -> bool {
+    match rm {
+        Down => true,
+        Up => false,
+        Floor => !neg,
+        Ceiling => neg,
+        _ => panic!(),
+    }
+}
+
+// This is mpfr_round_raw2 (mpfr_round_raw_2, that is, round_raw_generic with flag = 1 and
+// use_inexp = 0) from round_raw_generic.c, MPFR 4.2.2. All bits of `xs` are considered
+// significant. `rm` must already be sign-normalized: `Down` means toward zero, `Up` away from
+// zero, and `Nearest` ties to even. Returns whether rounding to `prec` bits with `rm` would
+// increment the significand at the ulp position of `prec`.
+pub fn limbs_round_would_increment(xs: &[Limb], prec: u64, rm: RoundingMode) -> bool {
+    let x_len = xs.len();
+    if limb_to_bit_count(x_len) <= prec || rm == Down {
+        return false;
+    }
+    let mut nw = usize::exact_from(prec >> Limb::LOG_WIDTH);
+    let rw = prec & Limb::WIDTH_MASK;
+    let mut k = x_len - nw - 1;
+    let (lomask, himask) = if rw != 0 {
+        nw += 1;
+        let lomask = Limb::low_mask(Limb::WIDTH - rw);
+        (lomask, !lomask)
+    } else {
+        (Limb::MAX, Limb::MAX)
+    };
+    let mut sb = xs[k] & lomask;
+    match rm {
+        Nearest => {
+            let rbmask = Limb::power_of_2(WIDTH_MINUS_1 - rw);
+            if sb & rbmask == 0 {
+                // the rounding bit is 0, so behave like rounding toward zero
+                false
+            } else {
+                sb &= !rbmask;
+                while sb == 0 && k > 0 {
+                    k -= 1;
+                    sb = xs[k];
+                }
+                if sb == 0 {
+                    // an exact tie: round to even, incrementing when the lowest kept bit is 1
+                    xs[x_len - nw] & (himask ^ (himask << 1)) != 0
+                } else {
+                    true
+                }
+            }
+        }
+        Up => {
+            while sb == 0 && k > 0 {
+                k -= 1;
+                sb = xs[k];
+            }
+            sb != 0
+        }
+        _ => unreachable!(),
+    }
+}
+
+// This is mpfr_can_round_raw from round_prec.c, MPFR 4.2.2, without the faithful-rounding
+// (RNDF) cases, which have no counterpart among Malachite's rounding modes. `xs` is the
+// significand of a nonzero finite value of the given sign, an approximation of some real
+// number x in the direction `rnd1` with error at most 2^(EXP - err), where EXP is the raw
+// exponent; the result is whether x can be correctly rounded to `prec` bits in the direction
+// `rnd2`, meaning that every real consistent with the approximation rounds to the same value.
+pub fn limbs_float_can_round_raw(
+    xs: &[Limb],
+    neg: bool,
+    err: i64,
+    rnd1: RoundingMode,
+    rnd2: RoundingMode,
+    prec: u64,
+) -> bool {
+    assert_ne!(prec, 0);
+    let mut bn = xs.len();
+    assert!(xs[bn - 1].get_highest_bit());
+    // Transform Floor and Ceiling to Down (toward zero) and Up (away from zero) using the sign
+    let rnd1 = if rnd1 == Nearest {
+        Nearest
+    } else if is_like_rounding_toward_zero(rnd1, neg) {
+        Down
+    } else {
+        Up
+    };
+    let rnd2 = if rnd2 == Nearest {
+        Nearest
+    } else if is_like_rounding_toward_zero(rnd2, neg) {
+        Down
+    } else {
+        Up
+    };
+    // For err < prec (+ 1 when rnd1 is Nearest) we can never round correctly, since the error
+    // is at least 2 ulps of the rounded value; at equality only rare cases work, requiring
+    // rnd1 to be Down or Nearest and rnd2 to be Up or Nearest.
+    let iprec = i64::exact_from(prec);
+    let n1 = i64::from(rnd1 == Nearest);
+    if err < iprec + n1 || err == iprec + n1 && (rnd1 == Up || rnd2 == Down) {
+        return false;
+    }
+    let err = u64::exact_from(err);
+    let bits = limb_to_bit_count(bn);
+    if prec > bits {
+        // prec exceeds the precision of xs; we can round iff rnd2 is compatible with rnd1 and
+        // the error is at most half an ulp of xs, except at the boundary when a change of
+        // binade could occur
+        return if (rnd1 == rnd2 || rnd2 == Nearest) && err > prec {
+            !(rnd1 != Down && err == prec + 1 && limbs_is_power_of_2_significand(xs))
+        } else {
+            false
+        };
+    }
+    if err > bits {
+        // the error is smaller than one ulp of the full significand
+        return if limbs_is_power_of_2_significand(xs) {
+            if (rnd2 == Down || rnd2 == Up) && rnd1 != rnd2 {
+                false
+            } else if rnd1 == Down {
+                true
+            } else {
+                err > prec + 1
+            }
+        } else if rnd2 == Nearest {
+            if err == prec + 1 && xs[0].odd() {
+                false
+            } else if prec < bits {
+                let k1 = usize::exact_from((prec + 1).shr_round(Limb::LOG_WIDTH, Ceiling).0);
+                let s1 = (prec + 1).neg_mod_power_of_2(Limb::LOG_WIDTH);
+                if (xs[bn - k1] >> s1).odd() && !limbs_round_would_increment(xs, prec + 1, Up) {
+                    // xs is exactly in the middle of two numbers representable at prec
+                    if rnd1 == Nearest {
+                        false
+                    } else {
+                        let k1 = usize::exact_from(prec.shr_round(Limb::LOG_WIDTH, Ceiling).0);
+                        let s1 = prec.neg_mod_power_of_2(Limb::LOG_WIDTH);
+                        (rnd1 == Down) ^ (xs[bn - k1] >> s1).even()
+                    }
+                } else {
+                    true
+                }
+            } else {
+                true
+            }
+        } else {
+            rnd1 == rnd2 || limbs_round_would_increment(xs, prec, Up)
+        };
+    }
+    // Now err <= bits. The error corresponds to bit s in limb k (counting the most significant
+    // limb as limb 0); the least significant kept bit is bit s1 in limb k1.
+    let mut k = usize::exact_from((err - 1) >> Limb::LOG_WIDTH);
+    let s = err.neg_mod_power_of_2(Limb::LOG_WIDTH);
+    let k1 = usize::exact_from((prec - 1) >> Limb::LOG_WIDTH);
+    let s1 = prec.neg_mod_power_of_2(Limb::LOG_WIDTH);
+    // The k1 most significant limbs are not needed for the rounding comparisons; they are only
+    // consulted later to detect a change of binade when adding or subtracting the error.
+    k -= k1;
+    bn -= k1;
+    let prec2 = prec - limb_to_bit_count(k1);
+    k += 1;
+    let mut tmp = vec![0; bn];
+    if bn > k {
+        tmp[..bn - k].copy_from_slice(&xs[..bn - k]);
+    }
+    // We can round iff rounding the two ends of the interval containing x gives the same
+    // result at the target precision: depending on rnd1, the ends are b and b + eps (Down),
+    // b - eps and b + eps (Nearest), or b - eps and b (Up).
+    let cc;
+    let eps = Limb::power_of_2(s);
+    let subtract;
+    if rnd1 == Down {
+        cc = (xs[bn - 1] >> s1).odd() ^ limbs_round_would_increment(&xs[..bn], prec2, rnd2);
+        // now round b + eps
+        let mut cy = limbs_add_limb_to_out(&mut tmp[bn - k..bn], &xs[bn - k..bn], eps);
+        // propagate the carry through the truncated limbs
+        let mut tn = 0;
+        while tn + 1 < k1 && cy {
+            cy = xs[bn + tn] == Limb::MAX;
+            tn += 1;
+        }
+        if !cy && err == prec {
+            return false;
+        }
+        if cy {
+            // b + eps crosses a power of 2, so b rounds below it and b + eps to it or above
+            return match rnd2 {
+                Down => false,
+                Up => err > prec && k == bn && tmp[0] == 0,
+                _ => !cc,
+            };
+        }
+        subtract = false;
+    } else if rnd1 == Nearest {
+        // first round b + eps
+        let mut cy = limbs_add_limb_to_out(&mut tmp[bn - k..bn], &xs[bn - k..bn], eps);
+        let mut tn = 0;
+        while tn + 1 < k1 && cy {
+            cy = xs[bn + tn] == Limb::MAX;
+            tn += 1;
+        }
+        cc = (tmp[bn - 1] >> s1).odd() ^ limbs_round_would_increment(&tmp[..bn], prec2, rnd2);
+        if cy {
+            return match rnd2 {
+                Down => false,
+                Up => err > prec + 1 && k == bn && tmp[0] == 0,
+                _ => err > prec + 1,
+            };
+        }
+        subtract = true;
+    } else {
+        cc = (xs[bn - 1] >> s1).odd() ^ limbs_round_would_increment(&xs[..bn], prec2, rnd2);
+        subtract = true;
+    }
+    if subtract {
+        // round b - eps, for rnd1 Nearest or Up
+        let mut cy = limbs_sub_limb_to_out(&mut tmp[bn - k..bn], &xs[bn - k..bn], eps);
+        // propagate the potential borrow through the truncated limbs; it cannot propagate
+        // beyond them, since the most significant limb has its top bit set
+        let mut tmp_hi = tmp[bn - 1];
+        let mut tn = 0;
+        while tn < k1 && cy {
+            let (diff, borrow) = xs[bn + tn].overflowing_sub(Limb::from(cy));
+            tmp_hi = diff;
+            cy = borrow;
+            tn += 1;
+        }
+        if tn == k1 && !tmp_hi.get_highest_bit() {
+            // a change of binade: b - eps falls below a power of 2 that b (or b + eps) reaches
+            if rnd2 == Down || rnd1 == Nearest && rnd2 == Up || cc {
+                return false;
+            }
+            return limbs_round_would_increment(&tmp[..bn], prec2 + 1, rnd2);
+        }
+        if err == prec + u64::from(rnd1 == Nearest) {
+            // the interval has width one ulp of b, with no binade change: only the Nearest
+            // target mode can round, when b itself is representable and even
+            return rnd2 == Nearest
+                && (xs[bn - 1] >> s1).even()
+                && limbs_round_would_increment(&xs[..bn], prec2, Down)
+                    == limbs_round_would_increment(&xs[..bn], prec2, Up);
+        }
+    }
+    let cc2 = (tmp[bn - 1] >> s1).odd();
+    cc == (cc2 ^ limbs_round_would_increment(&tmp[..bn], prec2, rnd2))
+}
+
+// Returns whether the significand consists of a single one bit.
+fn limbs_is_power_of_2_significand(xs: &[Limb]) -> bool {
+    let (xs_last, xs_init) = xs.split_last().unwrap();
+    xs_last.is_power_of_2() && slice_test_zero(xs_init)
+}
+
+// This is mpfr_can_round_raw from round_prec.c, MPFR 4.2.2, taking the significand as a
+// [`Natural`].
+pub fn float_can_round_raw(
+    x: &Natural,
+    neg: bool,
+    err: i64,
+    rnd1: RoundingMode,
+    rnd2: RoundingMode,
+    prec: u64,
+) -> bool {
+    match x {
+        Natural(Small(small)) => {
+            limbs_float_can_round_raw(core::slice::from_ref(small), neg, err, rnd1, rnd2, prec)
+        }
+        Natural(Large(xs)) => limbs_float_can_round_raw(xs, neg, err, rnd1, rnd2, prec),
+    }
 }

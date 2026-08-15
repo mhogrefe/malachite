@@ -30,6 +30,7 @@ serde = { version = "1.0.188", optional = true, default-features = false, featur
 serde_json = { version = "1.0.149", optional = true }
 num = { version = "0.4.3", optional = true, features = ["serde"] }
 rug = { version = "1.30.0", default-features = false, optional = true, features = ["float", "rand", "serde"] }
+gmp-mpfr-sys = { version = "1.7", default-features = false, optional = true, features = ["mpfr"] }
 
 [dev-dependencies]
 malachite-float = { path = ".", features = ["test_build"] }
@@ -40,7 +41,7 @@ std = ["malachite-base/std", "malachite-nz/std", "malachite-q/std"]
 enable_serde = ["serde", "malachite-nz/enable_serde", "malachite-q/enable_serde"]
 random = ["malachite-base/random", "malachite-nz/random", "malachite-q/random"]
 32_bit_limbs = ["malachite-nz/32_bit_limbs", "malachite-q/32_bit_limbs"]
-test_build = ["malachite-base/test_build", "malachite-nz/test_build", "malachite-q/test_build", "random", "serde", "serde_json", "num", "rug"]
+test_build = ["malachite-base/test_build", "malachite-nz/test_build", "malachite-q/test_build", "random", "serde", "serde_json", "num", "rug", "gmp-mpfr-sys"]
 bin_build = ["test_build"]
 
 [package.metadata.docs.rs]

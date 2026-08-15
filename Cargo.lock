@@ -516,6 +516,7 @@ dependencies = [
 name = "malachite-float"
 version = "0.10.0"
 dependencies = [
+ "gmp-mpfr-sys",
  "itertools 0.14.0",
  "malachite-base",
  "malachite-float",

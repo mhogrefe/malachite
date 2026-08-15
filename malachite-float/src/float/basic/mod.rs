@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 /// Classification of a [`Float`](super::Float) into several kinds.
+pub mod can_round;
 pub mod classification;
 /// Measuring the complexity to a [`Float`](super::Float).
 pub mod complexity;

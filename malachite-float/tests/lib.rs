@@ -109,6 +109,7 @@ pub mod float {
         pub mod sub;
     }
     pub mod basic {
+        pub mod can_round;
         pub mod classification;
         pub mod complexity;
         pub mod constants;

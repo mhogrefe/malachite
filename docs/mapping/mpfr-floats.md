@@ -1128,7 +1128,7 @@ side.
 | — | `void mpfr_set_default_rounding_mode (mpfr_rnd_t rnd)` | |
 | — | `mpfr_rnd_t mpfr_get_default_rounding_mode (void)` | |
 | ✓ | `int mpfr_prec_round (mpfr_t x, mpfr_prec_t prec, mpfr_rnd_t rnd)` | [`set_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.set_prec_round), [`set_prec`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.set_prec) |
-| ✗ | `int mpfr_can_round (mpfr_t b, mpfr_exp_t err, mpfr_rnd_t rnd1, mpfr_rnd_t rnd2, mpfr_prec_t prec)` | |
+| ✓ | `int mpfr_can_round (mpfr_t b, mpfr_exp_t err, mpfr_rnd_t rnd1, mpfr_rnd_t rnd2, mpfr_prec_t prec)` | [`can_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.can_round) |
 | ✓ | `mpfr_prec_t mpfr_min_prec (mpfr_t x)` | [`get_min_prec`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.get_min_prec) |
 | ✓ | `const char * mpfr_print_rnd_mode (mpfr_rnd_t rnd)` | [`Display`](https://docs.rs/malachite-base/latest/malachite_base/rounding_modes/enum.RoundingMode.html) |
 | — | `mpfr_round_nearest_away (foo, rop, op, ...)` | |
@@ -1150,10 +1150,11 @@ on narrowing, are C-side bookkeeping with no counterpart to need.
 **`mpfr_can_round`.** The Ziv gate, exported: given an approximation `b` "of an unknown number
 `x` in the direction `rnd1` with error at most two to the power `EXP(b) − err`", decide
 whether `x` can be correctly rounded to `prec` in `rnd2`, treating the error as two-sided when
-`rnd1` is nearest and promising that the check "does not modify its arguments". Malachite runs
-the same test inside every Ziv loop on this page, through an internal port of MPFR's own
-internal form of the check, but no public interface exists, so the row is a gap: the exported
-version, with the error-direction generality of `rnd1`, is what remains to build.
+`rnd1` is nearest. [`can_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.can_round) is the exported version of the same test,
+with the full error-direction generality of `rnd1`; Malachite's own Ziv loops continue to use
+the cheaper internal form, which assumes a two-sided error. MPFR's faithful rounding mode
+(`MPFR_RNDF`) has dedicated cases in this function; as everywhere on this page, that mode has
+no Malachite counterpart, and that does not count against the row.
 
 **`mpfr_min_prec`.** [`get_min_prec`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.get_min_prec)
 returns "the minimal number of bits required to store the significand" as an
