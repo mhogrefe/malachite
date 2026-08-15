@@ -1183,10 +1183,10 @@ macro's double-evaluation mechanics are C plumbing with nothing to abbreviate.
 | ✓ | `int mpfr_min (mpfr_t rop, mpfr_t op1, mpfr_t op2, mpfr_rnd_t rnd)` | [`min_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.min_prec_round) |
 | ✓ | `int mpfr_max (mpfr_t rop, mpfr_t op1, mpfr_t op2, mpfr_rnd_t rnd)` | [`max_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.max_prec_round) |
 | ≈ | `int mpfr_urandomb (mpfr_t rop, gmp_randstate_t state)` | [`uniform_random_non_negative_floats_less_than_one`](https://docs.rs/malachite-float/latest/malachite_float/float/random/fn.uniform_random_non_negative_floats_less_than_one.html) |
-| ✗ | `int mpfr_urandom (mpfr_t rop, gmp_randstate_t state, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_nrandom (mpfr_t rop1, gmp_randstate_t state, mpfr_rnd_t rnd)` | |
+| ≈ | `int mpfr_urandom (mpfr_t rop, gmp_randstate_t state, mpfr_rnd_t rnd)` | [`uniform_random_non_negative_floats_at_most_one`](https://docs.rs/malachite-float/latest/malachite_float/float/random/fn.uniform_random_non_negative_floats_at_most_one.html) |
+| ≈ | `int mpfr_nrandom (mpfr_t rop1, gmp_randstate_t state, mpfr_rnd_t rnd)` | [`normal_random_floats`](https://docs.rs/malachite-float/latest/malachite_float/float/random/fn.normal_random_floats.html) |
 | — | `int mpfr_grandom (mpfr_t rop1, mpfr_t rop2, gmp_randstate_t state, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_erandom (mpfr_t rop1, gmp_randstate_t state, mpfr_rnd_t rnd)` | |
+| ≈ | `int mpfr_erandom (mpfr_t rop1, gmp_randstate_t state, mpfr_rnd_t rnd)` | [`exponential_random_floats`](https://docs.rs/malachite-float/latest/malachite_float/float/random/fn.exponential_random_floats.html) |
 | ✓ | `mpfr_exp_t mpfr_get_exp (mpfr_t x)` | [`get_exponent`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.get_exponent) |
 | ≈ | `int mpfr_set_exp (mpfr_t x, mpfr_exp_t e)` | [`Shl`](https://doc.rust-lang.org/nightly/std/ops/trait.Shl.html) |
 | ✓ | `int mpfr_signbit (mpfr_t op)` | [`is_sign_negative`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.is_sign_negative) |
@@ -1230,16 +1230,21 @@ variants that take their arguments by reference.
 uniformly from $$[0, 1)$$ with exactly `rop`'s precision, `mpfr_urandom` behaves "as if a
 random real number is generated according to the continuous uniform distribution on the
 interval [0, 1] and then rounded", and `mpfr_nrandom` and `mpfr_erandom` sample the standard
-normal and mean-one exponential distributions, correctly rounded. Malachite's
+normal and mean-one exponential distributions, correctly rounded; these are available as
+[`normal_random_floats`](https://docs.rs/malachite-float/latest/malachite_float/float/random/fn.normal_random_floats.html) and
+[`exponential_random_floats`](https://docs.rs/malachite-float/latest/malachite_float/float/random/fn.exponential_random_floats.html), which use the same exact
+rejection algorithms (Karney's algorithm N and von Neumann's method, respectively). Malachite's
 [`random`](https://docs.rs/malachite-float/latest/malachite_float/float/random/index.html)
 module generates values for testing, streams with mean-parameterized precisions and
 exponents and striped bit patterns, the same philosophy noted
 [on the FLINT rationals page](/mapping/flint-rationals/#random-number-generation); the
-distribution samplers are mostly a genuine gap. The exception is `mpfr_urandomb`, whose
+distribution samplers are all available. `mpfr_urandomb`'s
 distribution — each value $k/2^p$ for uniform $k$, at a fixed precision $p$ — is sampled by
-[`uniform_random_non_negative_floats_less_than_one`](https://docs.rs/malachite-float/latest/malachite_float/float/random/fn.uniform_random_non_negative_floats_less_than_one.html); the ≈
-reflects that Malachite draws from its own seeded streams rather than a GMP randstate, so the
-two libraries produce different sequences. `mpfr_grandom` is deprecated in favor of
+[`uniform_random_non_negative_floats_less_than_one`](https://docs.rs/malachite-float/latest/malachite_float/float/random/fn.uniform_random_non_negative_floats_less_than_one.html); the latter — a continuous uniform variable on the unit
+interval, correctly rounded to a fixed precision with any rounding mode — by
+[`uniform_random_non_negative_floats_at_most_one`](https://docs.rs/malachite-float/latest/malachite_float/float/random/fn.uniform_random_non_negative_floats_at_most_one.html).
+The ≈ reflects that Malachite draws from its own seeded streams rather than a GMP randstate, so
+the two libraries produce different sequences. `mpfr_grandom` is deprecated in favor of
 `mpfr_nrandom`, which MPFR notes is "much more efficient", and rests with its replacement.
 
 **`mpfr_get_exp`, `mpfr_set_exp`.**

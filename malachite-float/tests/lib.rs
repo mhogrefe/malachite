@@ -226,6 +226,8 @@ pub mod float {
         pub mod exhaustive_positive_floats_with_sci_exponent_and_precision;
     }
     pub mod random {
+        pub mod exponential_random_floats;
+        pub mod normal_random_floats;
         pub mod random_finite_floats;
         pub mod random_floats;
         pub mod random_negative_finite_floats;
@@ -242,6 +244,7 @@ pub mod float {
         pub mod striped_random_nonzero_finite_floats;
         pub mod striped_random_positive_finite_floats;
         pub mod striped_random_positive_floats_with_precision;
+        pub mod uniform_random_non_negative_floats_at_most_one;
         pub mod uniform_random_non_negative_floats_less_than_one;
     }
 }

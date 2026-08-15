@@ -151,3 +151,38 @@ pub fn random_floats_helper_helper_no_common_values<I: Clone + Iterator<Item = F
         )
     );
 }
+
+/// Feeds a Malachite u64 stream to MPFR through rug's custom-RandGen interface, low half of each
+/// word first. Partial-word requests take the low bits of the next word, matching Malachite's
+/// conventions (rug's default takes the high bits), so MPFR driven by this generator consumes bits
+/// exactly as Malachite's samplers do, and their outputs can be compared sequence-for-sequence.
+pub struct MalachiteRandGen<J: Iterator<Item = u64> + Send + Sync> {
+    pub xs: J,
+    pub hi: Option<u32>,
+}
+
+impl<J: Iterator<Item = u64> + Send + Sync> MalachiteRandGen<J> {
+    pub const fn new(xs: J) -> Self {
+        Self { xs, hi: None }
+    }
+}
+
+impl<J: Iterator<Item = u64> + Send + Sync> rug::rand::RandGen for MalachiteRandGen<J> {
+    fn r#gen(&mut self) -> u32 {
+        if let Some(h) = self.hi.take() {
+            h
+        } else {
+            let x = self.xs.next().unwrap();
+            self.hi = Some((x >> 32) as u32);
+            x as u32
+        }
+    }
+
+    fn gen_bits(&mut self, bits: u32) -> u32 {
+        match bits {
+            0 => 0,
+            1..=31 => self.r#gen() & !(!0u32 << bits),
+            _ => self.r#gen(),
+        }
+    }
+}
