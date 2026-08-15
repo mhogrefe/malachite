@@ -1182,7 +1182,7 @@ macro's double-evaluation mechanics are C plumbing with nothing to abbreviate.
 | ≈ | `void mpfr_nextbelow (mpfr_t x)` | [`decrement`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.decrement) |
 | ✓ | `int mpfr_min (mpfr_t rop, mpfr_t op1, mpfr_t op2, mpfr_rnd_t rnd)` | [`min_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.min_prec_round) |
 | ✓ | `int mpfr_max (mpfr_t rop, mpfr_t op1, mpfr_t op2, mpfr_rnd_t rnd)` | [`max_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.max_prec_round) |
-| ✗ | `int mpfr_urandomb (mpfr_t rop, gmp_randstate_t state)` | |
+| ≈ | `int mpfr_urandomb (mpfr_t rop, gmp_randstate_t state)` | [`uniform_random_non_negative_floats_less_than_one`](https://docs.rs/malachite-float/latest/malachite_float/float/random/fn.uniform_random_non_negative_floats_less_than_one.html) |
 | ✗ | `int mpfr_urandom (mpfr_t rop, gmp_randstate_t state, mpfr_rnd_t rnd)` | |
 | ✗ | `int mpfr_nrandom (mpfr_t rop1, gmp_randstate_t state, mpfr_rnd_t rnd)` | |
 | — | `int mpfr_grandom (mpfr_t rop1, mpfr_t rop2, gmp_randstate_t state, mpfr_rnd_t rnd)` | |
@@ -1235,7 +1235,11 @@ normal and mean-one exponential distributions, correctly rounded. Malachite's
 module generates values for testing, streams with mean-parameterized precisions and
 exponents and striped bit patterns, the same philosophy noted
 [on the FLINT rationals page](/mapping/flint-rationals/#random-number-generation); the
-distribution samplers are a genuine gap. `mpfr_grandom` is deprecated in favor of
+distribution samplers are mostly a genuine gap. The exception is `mpfr_urandomb`, whose
+distribution — each value $k/2^p$ for uniform $k$, at a fixed precision $p$ — is sampled by
+[`uniform_random_non_negative_floats_less_than_one`](https://docs.rs/malachite-float/latest/malachite_float/float/random/fn.uniform_random_non_negative_floats_less_than_one.html); the ≈
+reflects that Malachite draws from its own seeded streams rather than a GMP randstate, so the
+two libraries produce different sequences. `mpfr_grandom` is deprecated in favor of
 `mpfr_nrandom`, which MPFR notes is "much more efficient", and rests with its replacement.
 
 **`mpfr_get_exp`, `mpfr_set_exp`.**

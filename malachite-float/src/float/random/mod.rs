@@ -15,17 +15,20 @@ use malachite_base::iterators::{WithSpecialValues, with_special_values};
 use malachite_base::num::arithmetic::traits::{NegModPowerOf2, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, NegativeZero, Zero};
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{LowMask, SignificantBits};
 use malachite_base::num::random::geometric::{
     GeometricRandomNaturalValues, GeometricRandomSignedRange,
     geometric_random_signed_inclusive_range,
 };
+use malachite_base::num::random::{RandomPrimitiveInts, random_primitive_ints};
 use malachite_base::random::Seed;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::random::{
     RandomNaturals, StripedRandomNaturalInclusiveRange, StripedRandomNaturals,
-    UniformRandomNaturalRange, random_positive_naturals, striped_random_natural_inclusive_range,
-    striped_random_positive_naturals, uniform_random_natural_inclusive_range,
+    UniformRandomNaturalRange, get_random_natural_with_up_to_bits, random_positive_naturals,
+    striped_random_natural_inclusive_range, striped_random_positive_naturals,
+    uniform_random_natural_inclusive_range,
 };
 use malachite_nz::platform::Limb;
 
@@ -1651,4 +1654,124 @@ pub fn striped_random_floats(
             )
         },
     )
+}
+
+// This is a translation of mpfr_urandomb from urandomb.c, MPFR 4.2.2, using Malachite's seeded
+// random streams in place of a GMP randstate.
+/// Generates uniform random [`Float`]s in the interval $[0, 1)$, with a fixed precision.
+///
+/// This `struct` is created by [`uniform_random_non_negative_floats_less_than_one`]; see its
+/// documentation for more.
+#[derive(Clone, Debug)]
+pub struct UniformRandomNonNegativeFloatsLessThanOne {
+    xs: RandomPrimitiveInts<u64>,
+    prec: u64,
+}
+
+impl Iterator for UniformRandomNonNegativeFloatsLessThanOne {
+    type Item = Float;
+
+    fn next(&mut self) -> Option<Float> {
+        // Draws exactly prec bits (in u64 chunks on every platform), mirroring mpfr_rand_raw's
+        // guarantee that the stream position is independent of the machine word size.
+        let k = get_random_natural_with_up_to_bits(&mut self.xs, self.prec);
+        if k == 0u32 {
+            // all drawn bits are zero
+            Some(Float::ZERO)
+        } else {
+            let bits = k.significant_bits();
+            // The value is k / 2^prec, so the raw exponent is bits - prec.
+            let exponent = i64::exact_from(bits) - i64::exact_from(self.prec);
+            if exponent < Float::MIN_EXPONENT_I64 {
+                // Mirrors mpfr_urandomb: if the exponent is out of range (possible only when the
+                // precision is on the order of 2^30), a NaN is returned as this is probably a user
+                // error. This branch cannot be exercised by sampling: it requires a draw whose top
+                // 2^30 or so bits are all zero, with probability around 2^(-2^30). It is not
+                // limb-width-dependent (the stream is u64-based on every platform).
+                Some(Float::NAN)
+            } else {
+                Some(Float(Finite {
+                    sign: true,
+                    exponent: i32::exact_from(exponent),
+                    precision: self.prec,
+                    significand: k
+                        << (self.prec.neg_mod_power_of_2(Limb::LOG_WIDTH) + self.prec - bits),
+                }))
+            }
+        }
+    }
+}
+
+/// Generates uniform random [`Float`]s in the interval $[0, 1)$, with a fixed precision.
+///
+/// Each output is $k/2^p$, where $p$ is `prec` and $k$ is chosen uniformly from $[0, 2^p)$, so
+/// every value is a dyadic rational whose denominator divides $2^p$, and each of the $2^p$ possible
+/// values is equally likely. Every nonzero output has precision `prec`. Zero is drawn with
+/// probability $2^{-p}$, and is a positive zero.
+///
+/// This function samples the same distribution as `mpfr_urandomb`. Like that function, it draws
+/// exactly `prec` bits from the underlying stream per output, independently of the machine word
+/// size, and returns `NaN` in the (practically unobservable) case that the scientific exponent of
+/// the drawn value falls below [`Float::MIN_EXPONENT`], which can only happen when `prec` is on the
+/// order of $2^{30}$.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// $T(n) = O(n)$
+///
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `prec`.
+///
+/// # Panics
+/// Panics if `prec` is zero.
+///
+/// # Examples
+/// ```
+/// use itertools::Itertools;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_float::float::random::uniform_random_non_negative_floats_less_than_one;
+/// use malachite_float::ComparableFloat;
+///
+/// // The number after the '#' is the precision.
+/// assert_eq!(
+///     uniform_random_non_negative_floats_less_than_one(EXAMPLE_SEED, 10)
+///         .take(20)
+///         .map(|f| ComparableFloat(f).to_string())
+///         .collect_vec()
+///         .as_slice(),
+///     &[
+///         "0.86035#10",
+///         "0.084961#10",
+///         "0.090820#10",
+///         "0.61426#10",
+///         "0.50684#10",
+///         "0.97754#10",
+///         "0.61133#10",
+///         "0.35156#10",
+///         "0.23633#10",
+///         "0.47949#10",
+///         "0.082031#10",
+///         "0.15137#10",
+///         "0.91992#10",
+///         "0.34082#10",
+///         "0.021484#10",
+///         "0.20898#10",
+///         "0.72949#10",
+///         "0.62598#10",
+///         "0.11230#10",
+///         "0.13184#10"
+///     ]
+/// );
+/// ```
+pub fn uniform_random_non_negative_floats_less_than_one(
+    seed: Seed,
+    prec: u64,
+) -> UniformRandomNonNegativeFloatsLessThanOne {
+    assert_ne!(prec, 0);
+    UniformRandomNonNegativeFloatsLessThanOne {
+        xs: random_primitive_ints(seed),
+        prec,
+    }
 }

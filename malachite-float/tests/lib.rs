@@ -242,5 +242,6 @@ pub mod float {
         pub mod striped_random_nonzero_finite_floats;
         pub mod striped_random_positive_finite_floats;
         pub mod striped_random_positive_floats_with_precision;
+        pub mod uniform_random_non_negative_floats_less_than_one;
     }
 }
