@@ -356,3 +356,61 @@ fn uniform_random_non_negative_floats_less_than_one_properties() {
 fn uniform_random_non_negative_floats_less_than_one_fail() {
     uniform_random_non_negative_floats_less_than_one(EXAMPLE_SEED, 0);
 }
+
+// Feeds Malachite's own u64 stream to MPFR (via rug's custom-RandGen interface, low half of
+// each word first) and checks that mpfr_urandomb produces bit-identical output. Only the first
+// draw per seed is compared: Malachite always consumes whole u64s while GMP requests exactly
+// `prec` bits, so the two stream positions may diverge after the first draw.
+struct MalachiteGen {
+    xs: malachite_base::num::random::RandomPrimitiveInts<u64>,
+    hi: Option<u32>,
+}
+
+impl rug::rand::RandGen for MalachiteGen {
+    fn r#gen(&mut self) -> u32 {
+        if let Some(h) = self.hi.take() {
+            h
+        } else {
+            let x = self.xs.next().unwrap();
+            self.hi = Some((x >> 32) as u32);
+            x as u32
+        }
+    }
+
+    // The default implementation takes the high `bits` of a fresh word, but Malachite's
+    // `get_random_natural_with_up_to_bits` masks to the low bits of its stream, so partial
+    // requests must do the same for the two libraries to see the same significand.
+    fn gen_bits(&mut self, bits: u32) -> u32 {
+        match bits {
+            0 => 0,
+            1..=31 => self.r#gen() & !(!0u32 << bits),
+            _ => self.r#gen(),
+        }
+    }
+}
+
+#[test]
+fn test_uniform_random_non_negative_floats_less_than_one_vs_rug() {
+    use malachite_base::num::random::random_primitive_ints;
+    use malachite_float::ComparableFloat;
+    for prec in [1u64, 2, 10, 31, 32, 33, 63, 64, 65, 100, 128, 200] {
+        for i in 0..100u32 {
+            let seed = EXAMPLE_SEED.fork(&i.to_string());
+            let ours = uniform_random_non_negative_floats_less_than_one(seed, prec)
+                .next()
+                .unwrap();
+            let mut bit_source = MalachiteGen {
+                xs: random_primitive_ints(seed),
+                hi: None,
+            };
+            let mut state = rug::rand::RandState::new_custom(&mut bit_source);
+            let theirs =
+                rug::Float::with_val(u32::exact_from(prec), rug::Float::random_bits(&mut state));
+            assert_eq!(
+                ComparableFloat(Float::from(&theirs)),
+                ComparableFloat(ours),
+                "prec {prec} seed fork {i}"
+            );
+        }
+    }
+}

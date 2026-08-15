@@ -29,7 +29,7 @@ serde = { version = "1.0.188", optional = true, default-features = false, featur
 
 serde_json = { version = "1.0.149", optional = true }
 num = { version = "0.4.3", optional = true, features = ["serde"] }
-rug = { version = "1.30.0", default-features = false, optional = true, features = ["float", "serde"] }
+rug = { version = "1.30.0", default-features = false, optional = true, features = ["float", "rand", "serde"] }
 
 [dev-dependencies]
 malachite-float = { path = ".", features = ["test_build"] }
