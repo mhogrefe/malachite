@@ -116,6 +116,7 @@ pub mod float {
         pub mod named;
         pub mod overflow_and_underflow;
         pub mod size;
+        pub mod subnormalize;
         pub mod ulp;
     }
     pub mod comparison {

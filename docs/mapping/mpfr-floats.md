@@ -1296,7 +1296,7 @@ rows, each backed by a specific answer to "where did that information go".
 | — | `mpfr_exp_t mpfr_get_emax_min (void)` | |
 | — | `mpfr_exp_t mpfr_get_emax_max (void)` | |
 | — | `int mpfr_check_range (mpfr_t x, int t, mpfr_rnd_t rnd)` | |
-| — | `int mpfr_subnormalize (mpfr_t x, int t, mpfr_rnd_t rnd)` | |
+| ≈ | `int mpfr_subnormalize (mpfr_t x, int t, mpfr_rnd_t rnd)` | [`subnormalize`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.subnormalize) |
 | — | `void mpfr_clear_underflow (void)` | |
 | — | `void mpfr_clear_overflow (void)` | |
 | — | `void mpfr_clear_divby0 (void)` | |
@@ -1336,10 +1336,15 @@ not exist here.
 
 **`mpfr_subnormalize`.** The tool for emulating gradual underflow, and through it whole IEEE
 formats; the manual's example reproduces binary64 arithmetic by setting the range and
-subnormalizing every result. Malachite has no subnormals and no movable range, so the row is
-—; its own emulation needs are met the other way around, by crate-level helpers like
-[`emulate_float_to_float_fn`](https://docs.rs/malachite-float/latest/malachite_float/fn.emulate_float_to_float_fn.html)
-that reproduce `f32` and `f64` results from `Float` computations.
+subnormalizing every result. Malachite's [`subnormalize`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.subnormalize) (with
+[`subnormalize_ref`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.subnormalize_ref) and
+[`subnormalize_assign`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.subnormalize_assign) variants) plays the same role, with two
+adaptations that follow from the fixed exponent range: the emulated format's minimum normal
+exponent is an explicit argument rather than a global setting, and values below the smallest
+subnormal — which an MPFR computation would already have flushed at its exponent floor — are
+handled by the function itself. Computing at the format's precision and then subnormalizing
+each result reproduces the format's arithmetic exactly, and Malachite's own emulation
+machinery is built this way.
 
 **The flags, translated.** MPFR's six sticky flags accumulate across a computation, thread
 locally, and are queried at the end; Malachite hands each operation's report back with the

@@ -124,42 +124,26 @@ mod macros;
 extern crate itertools;
 
 use core::cmp::Ordering::{self, *};
-use malachite_base::num::arithmetic::traits::IsPowerOf2;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{Infinity, NegativeInfinity};
-use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom, SciMantissaAndExponent};
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_q::Rational;
 
 #[allow(clippy::type_repetition_in_bounds)]
-#[doc(hidden)]
-pub fn emulate_float_to_float_fn<T: PrimitiveFloat, F: Fn(Float, u64) -> (Float, Ordering)>(
-    f: F,
-    x: T,
-) -> T
+fn emulate_finish<T: PrimitiveFloat>(mut result: Float, o: Ordering) -> T
 where
-    Float: From<T> + PartialOrd<T>,
-    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
 {
-    let x = Float::from(x);
-    let (mut result, o) = f(x.clone(), T::MANTISSA_WIDTH + 1);
     if !result.is_normal() {
         return T::exact_from(&result);
     }
-    let e = i64::from(<&Float as SciMantissaAndExponent<Float, i32, _>>::sci_exponent(&result));
-    if e < T::MIN_NORMAL_EXPONENT {
-        if e < T::MIN_EXPONENT {
-            let rm =
-                if e == T::MIN_EXPONENT - 1 && result.significand_ref().unwrap().is_power_of_2() {
-                    let down = if result > T::ZERO { Less } else { Greater };
-                    if o == down { Up } else { Down }
-                } else {
-                    Nearest
-                };
-            return T::rounding_from(&result, rm).0;
-        }
-        result = f(x, T::max_precision_for_sci_exponent(e)).0;
-    }
+    // The result was correctly rounded to MANTISSA_WIDTH + 1 bits with the ternary o; gradual
+    // underflow is then emulated with a subnormalize pass, as in MPFR's recipe for emulating IEEE
+    // arithmetic. The minimum normal exponent is converted from the scientific convention to the
+    // raw convention.
+    result.subnormalize_assign(o, T::MIN_NORMAL_EXPONENT + 1, Nearest);
     if result > T::MAX_FINITE {
         T::INFINITY
     } else if result < -T::MAX_FINITE {
@@ -171,36 +155,28 @@ where
 
 #[allow(clippy::type_repetition_in_bounds)]
 #[doc(hidden)]
+pub fn emulate_float_to_float_fn<T: PrimitiveFloat, F: Fn(Float, u64) -> (Float, Ordering)>(
+    f: F,
+    x: T,
+) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    let x = Float::from(x);
+    let (result, o) = f(x, T::MANTISSA_WIDTH + 1);
+    emulate_finish(result, o)
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+#[doc(hidden)]
 pub fn emulate_constant_to_float_fn<T: PrimitiveFloat, F: Fn(u64) -> (Float, Ordering)>(f: F) -> T
 where
     Float: PartialOrd<T>,
-    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    for<'a> T: ExactFrom<&'a Float>,
 {
-    let (mut result, o) = f(T::MANTISSA_WIDTH + 1);
-    if !result.is_normal() {
-        return T::exact_from(&result);
-    }
-    let e = i64::from(<&Float as SciMantissaAndExponent<Float, i32, _>>::sci_exponent(&result));
-    if e < T::MIN_NORMAL_EXPONENT {
-        if e < T::MIN_EXPONENT {
-            let rm =
-                if e == T::MIN_EXPONENT - 1 && result.significand_ref().unwrap().is_power_of_2() {
-                    let down = if result > T::ZERO { Less } else { Greater };
-                    if o == down { Up } else { Down }
-                } else {
-                    Nearest
-                };
-            return T::rounding_from(&result, rm).0;
-        }
-        result = f(T::max_precision_for_sci_exponent(e)).0;
-    }
-    if result > T::MAX_FINITE {
-        T::INFINITY
-    } else if result < -T::MAX_FINITE {
-        T::NEGATIVE_INFINITY
-    } else {
-        T::exact_from(&result)
-    }
+    let (result, o) = f(T::MANTISSA_WIDTH + 1);
+    emulate_finish(result, o)
 }
 
 #[allow(clippy::type_repetition_in_bounds)]
@@ -215,35 +191,12 @@ pub fn emulate_float_float_to_float_fn<
 ) -> T
 where
     Float: From<T> + PartialOrd<T>,
-    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    for<'a> T: ExactFrom<&'a Float>,
 {
     let x = Float::from(x);
     let y = Float::from(y);
-    let (mut result, o) = f(x.clone(), y.clone(), T::MANTISSA_WIDTH + 1);
-    if !result.is_normal() {
-        return T::exact_from(&result);
-    }
-    let e = i64::from(<&Float as SciMantissaAndExponent<Float, i32, _>>::sci_exponent(&result));
-    if e < T::MIN_NORMAL_EXPONENT {
-        if e < T::MIN_EXPONENT {
-            let rm =
-                if e == T::MIN_EXPONENT - 1 && result.significand_ref().unwrap().is_power_of_2() {
-                    let down = if result > T::ZERO { Less } else { Greater };
-                    if o == down { Up } else { Down }
-                } else {
-                    Nearest
-                };
-            return T::rounding_from(&result, rm).0;
-        }
-        result = f(x, y, T::max_precision_for_sci_exponent(e)).0;
-    }
-    if result > T::MAX_FINITE {
-        T::INFINITY
-    } else if result < -T::MAX_FINITE {
-        T::NEGATIVE_INFINITY
-    } else {
-        T::exact_from(&result)
-    }
+    let (result, o) = f(x, y, T::MANTISSA_WIDTH + 1);
+    emulate_finish(result, o)
 }
 
 #[allow(clippy::type_repetition_in_bounds)]
@@ -254,33 +207,10 @@ pub fn emulate_rational_to_float_fn<T: PrimitiveFloat, F: Fn(&Rational, u64) -> 
 ) -> T
 where
     Float: PartialOrd<T>,
-    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    for<'a> T: ExactFrom<&'a Float>,
 {
-    let (mut result, o) = f(x, T::MANTISSA_WIDTH + 1);
-    if !result.is_normal() {
-        return T::exact_from(&result);
-    }
-    let e = i64::from(<&Float as SciMantissaAndExponent<Float, i32, _>>::sci_exponent(&result));
-    if e < T::MIN_NORMAL_EXPONENT {
-        if e < T::MIN_EXPONENT {
-            let rm =
-                if e == T::MIN_EXPONENT - 1 && result.significand_ref().unwrap().is_power_of_2() {
-                    let down = if result > T::ZERO { Less } else { Greater };
-                    if o == down { Up } else { Down }
-                } else {
-                    Nearest
-                };
-            return T::rounding_from(&result, rm).0;
-        }
-        result = f(x, T::max_precision_for_sci_exponent(e)).0;
-    }
-    if result > T::MAX_FINITE {
-        T::INFINITY
-    } else if result < -T::MAX_FINITE {
-        T::NEGATIVE_INFINITY
-    } else {
-        T::exact_from(&result)
-    }
+    let (result, o) = f(x, T::MANTISSA_WIDTH + 1);
+    emulate_finish(result, o)
 }
 
 #[allow(clippy::type_repetition_in_bounds)]
@@ -295,33 +225,10 @@ pub fn emulate_rational_rational_to_float_fn<
 ) -> T
 where
     Float: PartialOrd<T>,
-    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    for<'a> T: ExactFrom<&'a Float>,
 {
-    let (mut result, o) = f(x, y, T::MANTISSA_WIDTH + 1);
-    if !result.is_normal() {
-        return T::exact_from(&result);
-    }
-    let e = i64::from(<&Float as SciMantissaAndExponent<Float, i32, _>>::sci_exponent(&result));
-    if e < T::MIN_NORMAL_EXPONENT {
-        if e < T::MIN_EXPONENT {
-            let rm =
-                if e == T::MIN_EXPONENT - 1 && result.significand_ref().unwrap().is_power_of_2() {
-                    let down = if result > T::ZERO { Less } else { Greater };
-                    if o == down { Up } else { Down }
-                } else {
-                    Nearest
-                };
-            return T::rounding_from(&result, rm).0;
-        }
-        result = f(x, y, T::max_precision_for_sci_exponent(e)).0;
-    }
-    if result > T::MAX_FINITE {
-        T::INFINITY
-    } else if result < -T::MAX_FINITE {
-        T::NEGATIVE_INFINITY
-    } else {
-        T::exact_from(&result)
-    }
+    let (result, o) = f(x, y, T::MANTISSA_WIDTH + 1);
+    emulate_finish(result, o)
 }
 
 /// Given the `(Float, Ordering)` result of an operation, determines whether an overflow occurred.
