@@ -1127,6 +1127,16 @@ the
 [`rem_unsigned_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.rem_unsigned_prec_round)
 family, with a zero modulus yielding NaN.
 
+**Beyond MPFR.** Both remainder families also come in mixed `Float`-`Rational` forms
+(`rem_rational_prec_round`, `rational_rem_float_prec_round`, and the `ieee_remainder`
+counterparts, along with their `*_and_quotient_bits` variants and the `%` operators between
+the two types). A remainder is unusually sensitive to its operands — perturbing the modulus by
+$$\varepsilon$$ moves the result by up to $$n\varepsilon$$ — so a
+[`Rational`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html)
+operand, which is used exactly, preserves correct rounding where a lossy conversion to `Float`
+would not. The quotient-bits forms with a `Rational` modulus serve additive argument
+reduction against non-dyadic constants.
+
 **`mpfr_integer_p`.** The one row already filled:
 [`is_integer`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.is_integer),
 via the
@@ -1238,7 +1248,12 @@ rounding mode are explicit arguments, and the MPFR ternary value is returned as 
 [`min_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.min_round) and [`max_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.max_round) target the maximum of the
 operands' precisions, and [`min`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.min) and [`max`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.max) do both, in which case
 the result is always exact; each method also has `_val_ref`, `_ref_val`, and `_ref_ref`
-variants that take their arguments by reference.
+variants that take their arguments by reference. Beyond MPFR, the family also has mixed
+`Float`-`Rational` forms (`min_rational_prec_round`, `max_rational_prec_round`, and their
+shorthands): the comparison against the
+[`Rational`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html)
+is exact and only the winning operand is rounded, so the right operand is selected even when
+a lossy conversion to `Float` would land on the other side of the comparison.
 
 **The random generators.** MPFR's four are distribution samplers: `mpfr_urandomb` draws
 uniformly from $$[0, 1)$$ with exactly `rop`'s precision, `mpfr_urandom` behaves "as if a

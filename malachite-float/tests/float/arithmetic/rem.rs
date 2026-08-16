@@ -28,7 +28,14 @@ use malachite_float::test_util::generators::{
     float_float_unsigned_rounding_mode_quadruple_gen_var_20,
     float_float_unsigned_rounding_mode_quadruple_gen_var_21, float_float_unsigned_triple_gen_var_1,
     float_float_unsigned_triple_gen_var_2, float_pair_gen, float_pair_gen_var_10,
-    float_unsigned_pair_gen,
+    float_rational_pair_gen, float_rational_rounding_mode_triple_gen_var_16,
+    float_rational_rounding_mode_triple_gen_var_17, float_rational_rounding_mode_triple_gen_var_18,
+    float_rational_rounding_mode_triple_gen_var_19,
+    float_rational_unsigned_rounding_mode_quadruple_gen_var_17,
+    float_rational_unsigned_rounding_mode_quadruple_gen_var_18,
+    float_rational_unsigned_rounding_mode_quadruple_gen_var_19,
+    float_rational_unsigned_rounding_mode_quadruple_gen_var_20,
+    float_rational_unsigned_triple_gen_var_1, float_unsigned_pair_gen,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_nz::integer::Integer;
@@ -1853,4 +1860,1490 @@ fn rem_and_quotient_bits_prec_round_fail() {
 fn rem_unsigned_prec_round_fail() {
     assert_panic!(Float::from(1u32).rem_unsigned_prec_round(3, 0, Nearest));
     assert_panic!(Float::from(1u32).rem_unsigned_prec_round_ref(3, 0, Nearest));
+}
+
+fn test_rationals() -> Vec<Rational> {
+    let mut ys = vec![
+        Rational::from_signeds(1, 3),
+        Rational::from_signeds(-1, 3),
+        Rational::from_signeds(3, 7),
+        Rational::from_signeds(10, 3),
+        Rational::from_signeds(7, 1),
+        Rational::from_signeds(3, 8),
+        Rational::from_signeds(-3, 8),
+        Rational::from_signeds(355, 113),
+        Rational::from_signeds(1, 3) >> 50i64,
+        Rational::from_signeds(1, 3) << 100i64,
+    ];
+    ys.extend(ys.clone().into_iter().map(|q| -q));
+    ys.sort_unstable();
+    ys.dedup();
+    ys
+}
+
+// All four mixed Float-Rational remainder directions versus the exact Rational identity: q = x/y
+// rounded to an integer (toward zero or to nearest-even), r = x - qy computed exactly, then rounded
+// once.
+#[test]
+fn test_rem_rational_vs_exact() {
+    let rationals = test_rationals();
+    for x in sweep_values() {
+        if !x.is_finite() || x == 0u32 {
+            continue;
+        }
+        let xr = Rational::exact_from(&x);
+        for y in &rationals {
+            for prec in [1u64, 10, 64] {
+                for rm in [Floor, Down, Nearest] {
+                    for nearest_quotient in [false, true] {
+                        let (r, o, quo) = if nearest_quotient {
+                            x.ieee_remainder_rational_and_quotient_bits_prec_round_ref_ref(
+                                y, prec, rm,
+                            )
+                        } else {
+                            x.rem_rational_and_quotient_bits_prec_round_ref_ref(y, prec, rm)
+                        };
+                        let (rr, oo) = if nearest_quotient {
+                            x.ieee_remainder_rational_prec_round_ref_ref(y, prec, rm)
+                        } else {
+                            x.rem_rational_prec_round_ref_ref(y, prec, rm)
+                        };
+                        assert_eq!(ComparableFloatRef(&rr), ComparableFloatRef(&r));
+                        assert_eq!(oo, o);
+                        let (q, _) = Integer::rounding_from(
+                            &xr / y,
+                            if nearest_quotient { Nearest } else { Down },
+                        );
+                        assert_eq!(quo, expected_quotient_bits(&q), "{x} {y} {prec} {rm}");
+                        let r_exact = &xr - Rational::from(q) * y;
+                        if r_exact == 0u32 {
+                            let expected = if x > 0u32 {
+                                Float::ZERO
+                            } else {
+                                Float::NEGATIVE_ZERO
+                            };
+                            assert_eq!(
+                                ComparableFloat(r),
+                                ComparableFloat(expected),
+                                "{x} {y} {prec} {rm}"
+                            );
+                            assert_eq!(o, Equal);
+                        } else {
+                            let (expected, expected_o) =
+                                Float::from_rational_prec_round(r_exact, prec, rm);
+                            assert_eq!(
+                                ComparableFloat(r),
+                                ComparableFloat(expected),
+                                "{x} {y} {prec} {rm} {nearest_quotient}"
+                            );
+                            assert_eq!(o, expected_o);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// The reversed direction versus the same identity.
+#[test]
+fn test_rational_rem_float_vs_exact() {
+    type MixedQuoFn = fn(&Rational, &Float, u64, RoundingMode) -> (Float, Ordering, i64);
+    let quo_fns: [MixedQuoFn; 2] = [
+        Float::rational_rem_float_and_quotient_bits_prec_round_ref_ref,
+        Float::rational_ieee_remainder_float_and_quotient_bits_prec_round_ref_ref,
+    ];
+    let rationals = test_rationals();
+    for y in sweep_values() {
+        if !y.is_finite() || y == 0u32 {
+            continue;
+        }
+        let yr = Rational::exact_from(&y);
+        for x in &rationals {
+            for prec in [1u64, 10, 64] {
+                for rm in [Floor, Down, Nearest] {
+                    for nearest_quotient in [false, true] {
+                        let (r, o, quo) = quo_fns[usize::from(nearest_quotient)](x, &y, prec, rm);
+                        let (rr, oo) = if nearest_quotient {
+                            Float::rational_ieee_remainder_float_prec_round_ref_ref(x, &y, prec, rm)
+                        } else {
+                            Float::rational_rem_float_prec_round_ref_ref(x, &y, prec, rm)
+                        };
+                        assert_eq!(ComparableFloatRef(&rr), ComparableFloatRef(&r));
+                        assert_eq!(oo, o);
+                        let (q, _) = Integer::rounding_from(
+                            x / &yr,
+                            if nearest_quotient { Nearest } else { Down },
+                        );
+                        assert_eq!(quo, expected_quotient_bits(&q), "{x} {y} {prec} {rm}");
+                        let r_exact = x - Rational::from(q) * &yr;
+                        if r_exact == 0u32 {
+                            let expected = if *x > 0u32 {
+                                Float::ZERO
+                            } else {
+                                Float::NEGATIVE_ZERO
+                            };
+                            assert_eq!(
+                                ComparableFloat(r),
+                                ComparableFloat(expected),
+                                "{x} {y} {prec} {rm}"
+                            );
+                            assert_eq!(o, Equal);
+                        } else {
+                            let (expected, expected_o) =
+                                Float::from_rational_prec_round(r_exact, prec, rm);
+                            assert_eq!(
+                                ComparableFloat(r),
+                                ComparableFloat(expected),
+                                "{x} {y} {prec} {rm} {nearest_quotient}"
+                            );
+                            assert_eq!(o, expected_o);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// With a dyadic Rational modulus, the mixed functions agree with the Float-Float functions on the
+// exactly-converted modulus.
+#[test]
+fn test_rem_rational_dyadic_consistency() {
+    for x in sweep_values() {
+        for y in [
+            Rational::from_signeds(3, 8),
+            Rational::from_signeds(-3, 8),
+            Rational::from_signeds(7, 1),
+            Rational::from_signeds(1, 4) << 60i64,
+        ] {
+            let yf = Float::from_rational_prec_round_ref(&y, 3, Floor).0;
+            assert_eq!(Rational::exact_from(&yf), y);
+            for prec in [1u64, 10] {
+                for rm in [Floor, Nearest] {
+                    let (r, o) = x.rem_rational_prec_round_ref_ref(&y, prec, rm);
+                    let (expected, expected_o) = x.rem_prec_round_ref_ref(&yf, prec, rm);
+                    assert_eq!(ComparableFloat(r), ComparableFloat(expected), "{x} {y}");
+                    assert_eq!(o, expected_o);
+                    let (r, o) = x.ieee_remainder_rational_prec_round_ref_ref(&y, prec, rm);
+                    let (expected, expected_o) = x.ieee_remainder_prec_round_ref_ref(&yf, prec, rm);
+                    assert_eq!(ComparableFloat(r), ComparableFloat(expected), "{x} {y}");
+                    assert_eq!(o, expected_o);
+                }
+            }
+        }
+    }
+}
+
+// Special values for the mixed remainder functions.
+#[test]
+fn test_rem_rational_special_values() {
+    let third = Rational::from_signeds(1, 3);
+    // NaN or infinite Float dividend, or zero Rational modulus: NaN
+    for (x, y) in [
+        (Float::NAN, third.clone()),
+        (Float::INFINITY, third.clone()),
+        (Float::NEGATIVE_INFINITY, third.clone()),
+        (Float::from(3u32), Rational::ZERO),
+        (Float::NAN, Rational::ZERO),
+        (Float::ZERO, Rational::ZERO),
+    ] {
+        let (r, o, quo) = x.rem_rational_and_quotient_bits_prec_round_ref_ref(&y, 10, Nearest);
+        assert!(r.is_nan(), "{x} {y}");
+        assert_eq!(o, Equal);
+        assert_eq!(quo, 0);
+        let (r, _, quo) =
+            x.ieee_remainder_rational_and_quotient_bits_prec_round_ref_ref(&y, 10, Nearest);
+        assert!(r.is_nan());
+        assert_eq!(quo, 0);
+    }
+    // zero Float dividend: x, with its sign
+    for x in [Float::ZERO, Float::NEGATIVE_ZERO] {
+        let (r, o, quo) = x.rem_rational_and_quotient_bits_prec_round_ref_ref(&third, 10, Nearest);
+        assert_eq!(ComparableFloat(r), ComparableFloat(x.clone()));
+        assert_eq!(o, Equal);
+        assert_eq!(quo, 0);
+    }
+    // reversed direction: NaN or zero Float modulus is NaN; an infinite modulus returns the
+    // Rational rounded; a zero Rational dividend is a positive zero
+    for y in [Float::NAN, Float::ZERO, Float::NEGATIVE_ZERO] {
+        let (r, o, quo) =
+            Float::rational_rem_float_and_quotient_bits_prec_round_ref_ref(&third, &y, 10, Nearest);
+        assert!(r.is_nan(), "{y}");
+        assert_eq!(o, Equal);
+        assert_eq!(quo, 0);
+    }
+    let (r, o, quo) = Float::rational_rem_float_and_quotient_bits_prec_round_ref_ref(
+        &third,
+        &Float::INFINITY,
+        10,
+        Nearest,
+    );
+    let (expected, expected_o) = Float::from_rational_prec_round_ref(&third, 10, Nearest);
+    assert_eq!(ComparableFloat(r), ComparableFloat(expected));
+    assert_eq!(o, expected_o);
+    assert_eq!(quo, 0);
+    let (r, o, quo) = Float::rational_rem_float_and_quotient_bits_prec_round_ref_ref(
+        &Rational::ZERO,
+        &Float::from(3u32),
+        10,
+        Nearest,
+    );
+    assert_eq!(ComparableFloat(r), ComparableFloat(Float::ZERO));
+    assert_eq!(o, Equal);
+    assert_eq!(quo, 0);
+}
+
+// The exact-oracle check shared by the mixed-remainder property tests: q and r = x - qy computed
+// exactly as Rationals, then compared with the function's rounded output and quotient bits.
+fn check_mixed_rem_exact(
+    xr: &Rational,
+    yr: &Rational,
+    nearest_quotient: bool,
+    r: &Float,
+    o: Ordering,
+    quo: i64,
+    prec: u64,
+    rm: RoundingMode,
+) {
+    let (q, _) = Integer::rounding_from(xr / yr, if nearest_quotient { Nearest } else { Down });
+    assert_eq!(quo, expected_quotient_bits(&q));
+    let r_exact = xr - Rational::from(q) * yr;
+    if r_exact == 0u32 {
+        let expected = if *xr > 0u32 {
+            Float::ZERO
+        } else {
+            Float::NEGATIVE_ZERO
+        };
+        assert_eq!(ComparableFloatRef(r), ComparableFloatRef(&expected));
+        assert_eq!(o, Equal);
+    } else {
+        let (expected, expected_o) = Float::from_rational_prec_round(r_exact, prec, rm);
+        assert_eq!(ComparableFloatRef(r), ComparableFloatRef(&expected));
+        assert_eq!(o, expected_o);
+    }
+}
+
+#[allow(clippy::needless_pass_by_value)]
+fn rem_rational_prec_round_properties_helper(
+    x: Float,
+    y: Rational,
+    prec: u64,
+    rm: RoundingMode,
+    nearest_quotient: bool,
+) {
+    type F = fn(&Float, &Rational, u64, RoundingMode) -> (Float, Ordering, i64);
+    let quo_fn: F = if nearest_quotient {
+        Float::ieee_remainder_rational_and_quotient_bits_prec_round_ref_ref
+    } else {
+        Float::rem_rational_and_quotient_bits_prec_round_ref_ref
+    };
+    let (rem, o, quo) = quo_fn(&x, &y, prec, rm);
+    assert!(rem.is_valid());
+
+    // all ownership variants and assigns agree
+    if nearest_quotient {
+        let (r2, o2) = x
+            .clone()
+            .ieee_remainder_rational_prec_round(y.clone(), prec, rm);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
+        assert_eq!(o2, o);
+        let (r2, o2) = x
+            .clone()
+            .ieee_remainder_rational_prec_round_val_ref(&y, prec, rm);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
+        assert_eq!(o2, o);
+        let (r2, o2) = x.ieee_remainder_rational_prec_round_ref_val(y.clone(), prec, rm);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
+        assert_eq!(o2, o);
+        let (r2, o2) = x.ieee_remainder_rational_prec_round_ref_ref(&y, prec, rm);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
+        assert_eq!(o2, o);
+        let mut x2 = x.clone();
+        let o2 = x2.ieee_remainder_rational_prec_round_assign(y.clone(), prec, rm);
+        assert_eq!(ComparableFloatRef(&x2), ComparableFloatRef(&rem));
+        assert_eq!(o2, o);
+        let mut x2 = x.clone();
+        let o2 = x2.ieee_remainder_rational_prec_round_assign_ref(&y, prec, rm);
+        assert_eq!(ComparableFloatRef(&x2), ComparableFloatRef(&rem));
+        assert_eq!(o2, o);
+        let (r2, o2, quo2) = x
+            .clone()
+            .ieee_remainder_rational_and_quotient_bits_prec_round(y.clone(), prec, rm);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
+        assert_eq!(o2, o);
+        assert_eq!(quo2, quo);
+    } else {
+        let (r2, o2) = x.clone().rem_rational_prec_round(y.clone(), prec, rm);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
+        assert_eq!(o2, o);
+        let (r2, o2) = x.clone().rem_rational_prec_round_val_ref(&y, prec, rm);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
+        assert_eq!(o2, o);
+        let (r2, o2) = x.rem_rational_prec_round_ref_val(y.clone(), prec, rm);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
+        assert_eq!(o2, o);
+        let (r2, o2) = x.rem_rational_prec_round_ref_ref(&y, prec, rm);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
+        assert_eq!(o2, o);
+        let mut x2 = x.clone();
+        let o2 = x2.rem_rational_prec_round_assign(y.clone(), prec, rm);
+        assert_eq!(ComparableFloatRef(&x2), ComparableFloatRef(&rem));
+        assert_eq!(o2, o);
+        let mut x2 = x.clone();
+        let o2 = x2.rem_rational_prec_round_assign_ref(&y, prec, rm);
+        assert_eq!(ComparableFloatRef(&x2), ComparableFloatRef(&rem));
+        assert_eq!(o2, o);
+        let (r2, o2, quo2) =
+            x.clone()
+                .rem_rational_and_quotient_bits_prec_round(y.clone(), prec, rm);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
+        assert_eq!(o2, o);
+        assert_eq!(quo2, quo);
+    }
+
+    if rem.is_normal() {
+        assert_eq!(rem.get_prec(), Some(prec));
+    }
+
+    if x.is_finite() && x != 0u32 && y != 0u32 {
+        check_mixed_rem_exact(
+            &Rational::exact_from(&x),
+            &y,
+            nearest_quotient,
+            &rem,
+            o,
+            quo,
+            prec,
+            rm,
+        );
+    }
+
+    // rem(-x, y) = -rem(x, y); rem(x, -y) = rem(x, y)
+    let (mut r2, mut o2, quo2) = quo_fn(&-&x, &y, prec, -rm);
+    r2.neg_assign();
+    o2 = o2.reverse();
+    assert_eq!(
+        ComparableFloat(r2.abs_negative_zero()),
+        ComparableFloat(rem.abs_negative_zero_ref())
+    );
+    assert_eq!(o2, o);
+    assert_eq!(quo2, quo.wrapping_neg());
+    let (r2, o2, quo2) = quo_fn(&x, &-&y, prec, rm);
+    assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
+    assert_eq!(o2, o);
+    assert_eq!(quo2, quo.wrapping_neg());
+
+    if o == Equal {
+        for rm in exhaustive_rounding_modes() {
+            let (s, oo, _) = quo_fn(&x, &y, prec, rm);
+            assert_eq!(
+                ComparableFloat(s.abs_negative_zero_ref()),
+                ComparableFloat(rem.abs_negative_zero_ref())
+            );
+            assert_eq!(oo, Equal);
+        }
+    } else {
+        assert_panic!(quo_fn(&x, &y, prec, Exact));
+    }
+}
+
+#[test]
+fn rem_rational_prec_round_properties() {
+    float_rational_unsigned_rounding_mode_quadruple_gen_var_17().test_properties(
+        |(x, y, prec, rm)| {
+            rem_rational_prec_round_properties_helper(x, y, prec, rm, false);
+        },
+    );
+}
+
+#[test]
+fn ieee_remainder_rational_prec_round_properties() {
+    float_rational_unsigned_rounding_mode_quadruple_gen_var_18().test_properties(
+        |(x, y, prec, rm)| {
+            rem_rational_prec_round_properties_helper(x, y, prec, rm, true);
+        },
+    );
+}
+
+#[allow(clippy::needless_pass_by_value)]
+fn rational_rem_float_prec_round_properties_helper(
+    x: Rational,
+    y: Float,
+    prec: u64,
+    rm: RoundingMode,
+    nearest_quotient: bool,
+) {
+    type F = fn(&Rational, &Float, u64, RoundingMode) -> (Float, Ordering, i64);
+    let quo_fn: F = if nearest_quotient {
+        Float::rational_ieee_remainder_float_and_quotient_bits_prec_round_ref_ref
+    } else {
+        Float::rational_rem_float_and_quotient_bits_prec_round_ref_ref
+    };
+    let (rem, o, quo) = quo_fn(&x, &y, prec, rm);
+    assert!(rem.is_valid());
+
+    if nearest_quotient {
+        let (r2, o2) =
+            Float::rational_ieee_remainder_float_prec_round(x.clone(), y.clone(), prec, rm);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
+        assert_eq!(o2, o);
+        let (r2, o2) =
+            Float::rational_ieee_remainder_float_prec_round_val_ref(x.clone(), &y, prec, rm);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
+        assert_eq!(o2, o);
+        let (r2, o2) =
+            Float::rational_ieee_remainder_float_prec_round_ref_val(&x, y.clone(), prec, rm);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
+        assert_eq!(o2, o);
+        let (r2, o2) = Float::rational_ieee_remainder_float_prec_round_ref_ref(&x, &y, prec, rm);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
+        assert_eq!(o2, o);
+        let (r2, o2, quo2) = Float::rational_ieee_remainder_float_and_quotient_bits_prec_round(
+            x.clone(),
+            y.clone(),
+            prec,
+            rm,
+        );
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
+        assert_eq!(o2, o);
+        assert_eq!(quo2, quo);
+    } else {
+        let (r2, o2) = Float::rational_rem_float_prec_round(x.clone(), y.clone(), prec, rm);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
+        assert_eq!(o2, o);
+        let (r2, o2) = Float::rational_rem_float_prec_round_val_ref(x.clone(), &y, prec, rm);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
+        assert_eq!(o2, o);
+        let (r2, o2) = Float::rational_rem_float_prec_round_ref_val(&x, y.clone(), prec, rm);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
+        assert_eq!(o2, o);
+        let (r2, o2) = Float::rational_rem_float_prec_round_ref_ref(&x, &y, prec, rm);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
+        assert_eq!(o2, o);
+        let (r2, o2, quo2) =
+            Float::rational_rem_float_and_quotient_bits_prec_round(x.clone(), y.clone(), prec, rm);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
+        assert_eq!(o2, o);
+        assert_eq!(quo2, quo);
+    }
+
+    if rem.is_normal() {
+        assert_eq!(rem.get_prec(), Some(prec));
+    }
+
+    if y.is_finite() && y != 0u32 && x != 0u32 {
+        check_mixed_rem_exact(
+            &x,
+            &Rational::exact_from(&y),
+            nearest_quotient,
+            &rem,
+            o,
+            quo,
+            prec,
+            rm,
+        );
+    }
+
+    // rem(-x, y) = -rem(x, y); rem(x, -y) = rem(x, y)
+    let (mut r2, mut o2, quo2) = quo_fn(&-&x, &y, prec, -rm);
+    r2.neg_assign();
+    o2 = o2.reverse();
+    assert_eq!(
+        ComparableFloat(r2.abs_negative_zero()),
+        ComparableFloat(rem.abs_negative_zero_ref())
+    );
+    assert_eq!(o2, o);
+    assert_eq!(quo2, quo.wrapping_neg());
+    let (r2, o2, quo2) = quo_fn(&x, &-&y, prec, rm);
+    assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
+    assert_eq!(o2, o);
+    assert_eq!(quo2, quo.wrapping_neg());
+
+    if o == Equal {
+        for rm in exhaustive_rounding_modes() {
+            let (s, oo, _) = quo_fn(&x, &y, prec, rm);
+            assert_eq!(
+                ComparableFloat(s.abs_negative_zero_ref()),
+                ComparableFloat(rem.abs_negative_zero_ref())
+            );
+            assert_eq!(oo, Equal);
+        }
+    } else {
+        assert_panic!(quo_fn(&x, &y, prec, Exact));
+    }
+}
+
+#[test]
+fn rational_rem_float_prec_round_properties() {
+    float_rational_unsigned_rounding_mode_quadruple_gen_var_19().test_properties(
+        |(x, y, prec, rm)| {
+            rational_rem_float_prec_round_properties_helper(y, x, prec, rm, false);
+        },
+    );
+}
+
+#[test]
+fn rational_ieee_remainder_float_prec_round_properties() {
+    float_rational_unsigned_rounding_mode_quadruple_gen_var_20().test_properties(
+        |(x, y, prec, rm)| {
+            rational_rem_float_prec_round_properties_helper(y, x, prec, rm, true);
+        },
+    );
+}
+
+// The shorthand levels and operators are consistent with prec_round.
+#[test]
+fn rem_rational_shorthand_properties() {
+    float_rational_unsigned_triple_gen_var_1().test_properties(|(x, y, prec)| {
+        let (rem, o) = x.rem_rational_prec_round_ref_ref(&y, prec, Nearest);
+        let (r2, o2) = x.rem_rational_prec_ref_ref(&y, prec);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
+        assert_eq!(o2, o);
+        let (r2, o2) = x.clone().rem_rational_prec(y.clone(), prec);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
+        assert_eq!(o2, o);
+        let mut x2 = x.clone();
+        let o2 = x2.rem_rational_prec_assign(y.clone(), prec);
+        assert_eq!(ComparableFloatRef(&x2), ComparableFloatRef(&rem));
+        assert_eq!(o2, o);
+        let (r2, o2, _) = x.rem_rational_and_quotient_bits_prec_ref_ref(&y, prec);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
+        assert_eq!(o2, o);
+
+        let (rem, o) = x.ieee_remainder_rational_prec_round_ref_ref(&y, prec, Nearest);
+        let (r2, o2) = x.ieee_remainder_rational_prec_ref_ref(&y, prec);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
+        assert_eq!(o2, o);
+        let (r2, o2) = Float::rational_rem_float_prec_ref_ref(&y, &x, prec);
+        let (r3, o3) = Float::rational_rem_float_prec_round_ref_ref(&y, &x, prec, Nearest);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&r3));
+        assert_eq!(o2, o3);
+    });
+}
+
+#[test]
+fn rem_rational_round_properties() {
+    float_rational_rounding_mode_triple_gen_var_16().test_properties(|(x, y, rm)| {
+        let prec = x.significant_bits();
+        let (rem, o) = x.rem_rational_prec_round_ref_ref(&y, prec, rm);
+        let (r2, o2) = x.rem_rational_round_ref_ref(&y, rm);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
+        assert_eq!(o2, o);
+        let (r2, o2) = x.clone().rem_rational_round(y.clone(), rm);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
+        assert_eq!(o2, o);
+        let mut x2 = x.clone();
+        let o2 = x2.rem_rational_round_assign_ref(&y, rm);
+        assert_eq!(ComparableFloatRef(&x2), ComparableFloatRef(&rem));
+        assert_eq!(o2, o);
+        let (r2, o2, _) = x.rem_rational_and_quotient_bits_round_ref_ref(&y, rm);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
+        assert_eq!(o2, o);
+    });
+
+    float_rational_rounding_mode_triple_gen_var_17().test_properties(|(x, y, rm)| {
+        let prec = x.significant_bits();
+        let (rem, o) = x.ieee_remainder_rational_prec_round_ref_ref(&y, prec, rm);
+        let (r2, o2) = x.ieee_remainder_rational_round_ref_ref(&y, rm);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
+        assert_eq!(o2, o);
+    });
+
+    float_rational_rounding_mode_triple_gen_var_18().test_properties(|(x, y, rm)| {
+        let prec = x.significant_bits();
+        let (rem, o) = Float::rational_rem_float_prec_round_ref_ref(&y, &x, prec, rm);
+        let (r2, o2) = Float::rational_rem_float_round_ref_ref(&y, &x, rm);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
+        assert_eq!(o2, o);
+    });
+
+    float_rational_rounding_mode_triple_gen_var_19().test_properties(|(x, y, rm)| {
+        let prec = x.significant_bits();
+        let (rem, o) = Float::rational_ieee_remainder_float_prec_round_ref_ref(&y, &x, prec, rm);
+        let (r2, o2) = Float::rational_ieee_remainder_float_round_ref_ref(&y, &x, rm);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
+        assert_eq!(o2, o);
+    });
+}
+
+#[test]
+fn rem_rational_operator_properties() {
+    float_rational_pair_gen().test_properties(|(x, y)| {
+        let rem = &x % &y;
+        assert!(rem.is_valid());
+        let r2 = &x % y.clone();
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
+        let r2 = x.clone() % &y;
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
+        let r2 = x.clone() % y.clone();
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
+        let mut x2 = x.clone();
+        x2 %= y.clone();
+        assert_eq!(ComparableFloatRef(&x2), ComparableFloatRef(&rem));
+        let mut x2 = x.clone();
+        x2 %= &y;
+        assert_eq!(ComparableFloatRef(&x2), ComparableFloatRef(&rem));
+        let (r2, _) = x.rem_rational_round_ref_ref(&y, Nearest);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
+
+        let rem = &y % &x;
+        assert!(rem.is_valid());
+        let r2 = &y % x.clone();
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
+        let r2 = y.clone() % &x;
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
+        let r2 = y.clone() % x.clone();
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
+        let (r2, _) = Float::rational_rem_float_round_ref_ref(&y, &x, Nearest);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
+
+        let ieee = x.ieee_remainder_rational_ref_ref(&y);
+        let r2 = x.clone().ieee_remainder_rational(y.clone());
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&ieee));
+        let r2 = x.clone().ieee_remainder_rational_val_ref(&y);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&ieee));
+        let r2 = x.ieee_remainder_rational_ref_val(y.clone());
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&ieee));
+        let mut x2 = x.clone();
+        x2.ieee_remainder_rational_assign_ref(&y);
+        assert_eq!(ComparableFloatRef(&x2), ComparableFloatRef(&ieee));
+
+        let ieee = Float::rational_ieee_remainder_float_ref_ref(&y, &x);
+        let r2 = Float::rational_ieee_remainder_float(y.clone(), x.clone());
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&ieee));
+
+        let (r2, _, quo) = x.rem_rational_and_quotient_bits_ref_ref(&y);
+        let (r3, _, quo2) = x.clone().rem_rational_and_quotient_bits(y.clone());
+        assert_eq!(ComparableFloatRef(&r3), ComparableFloatRef(&r2));
+        assert_eq!(quo2, quo);
+        let (r2, _, quo) = Float::rational_rem_float_and_quotient_bits_ref_ref(&y, &x);
+        let (r3, _, quo2) = Float::rational_rem_float_and_quotient_bits(y.clone(), x.clone());
+        assert_eq!(ComparableFloatRef(&r3), ComparableFloatRef(&r2));
+        assert_eq!(quo2, quo);
+    });
+}
+
+#[test]
+fn test_rem_rational() {
+    let test = |s, s_hex, t: &str, out: &str, out_hex: &str, o_out: Ordering, quo_out: i64| {
+        let x = parse_hex_string(s_hex);
+        assert_eq!(x.to_string(), s);
+        let y = t.parse::<Rational>().unwrap();
+
+        let (r, o, quo) = x.rem_rational_and_quotient_bits_prec_round_ref_ref(&y, 10, Nearest);
+        assert!(r.is_valid());
+        assert_eq!(r.to_string(), out);
+        assert_eq!(to_hex_string(&r), out_hex);
+        assert_eq!(o, o_out);
+        assert_eq!(quo, quo_out);
+
+        let (r2, o2, quo2) =
+            x.clone()
+                .rem_rational_and_quotient_bits_prec_round(y.clone(), 10, Nearest);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&r));
+        assert_eq!(o2, o);
+        assert_eq!(quo2, quo);
+        let (r2, o2, quo2) = x
+            .clone()
+            .rem_rational_and_quotient_bits_prec_round_val_ref(&y, 10, Nearest);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&r));
+        assert_eq!(o2, o);
+        assert_eq!(quo2, quo);
+        let (r2, o2, quo2) =
+            x.rem_rational_and_quotient_bits_prec_round_ref_val(y.clone(), 10, Nearest);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&r));
+        assert_eq!(o2, o);
+        assert_eq!(quo2, quo);
+
+        let (r2, o2) = x.rem_rational_prec_round_ref_ref(&y, 10, Nearest);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&r));
+        assert_eq!(o2, o);
+        let (r2, o2) = x.rem_rational_prec_ref_ref(&y, 10);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&r));
+        assert_eq!(o2, o);
+    };
+    // NaN, infinite x, or a zero Rational modulus: NaN with quotient bits 0; a zero x or a zero
+    // remainder keeps x's sign; otherwise the exact truncated-quotient remainder, rounded to
+    // precision 10
+    test("NaN", "NaN", "1/3", "NaN", "NaN", Equal, 0);
+    test("NaN", "NaN", "-1/3", "NaN", "NaN", Equal, 0);
+    test("NaN", "NaN", "22/7", "NaN", "NaN", Equal, 0);
+    test("NaN", "NaN", "7", "NaN", "NaN", Equal, 0);
+    test("NaN", "NaN", "3/8", "NaN", "NaN", Equal, 0);
+    test("NaN", "NaN", "0", "NaN", "NaN", Equal, 0);
+    test("Infinity", "Infinity", "1/3", "NaN", "NaN", Equal, 0);
+    test("Infinity", "Infinity", "-1/3", "NaN", "NaN", Equal, 0);
+    test("Infinity", "Infinity", "22/7", "NaN", "NaN", Equal, 0);
+    test("Infinity", "Infinity", "7", "NaN", "NaN", Equal, 0);
+    test("Infinity", "Infinity", "3/8", "NaN", "NaN", Equal, 0);
+    test("Infinity", "Infinity", "0", "NaN", "NaN", Equal, 0);
+    test("-Infinity", "-Infinity", "1/3", "NaN", "NaN", Equal, 0);
+    test("-Infinity", "-Infinity", "-1/3", "NaN", "NaN", Equal, 0);
+    test("-Infinity", "-Infinity", "22/7", "NaN", "NaN", Equal, 0);
+    test("-Infinity", "-Infinity", "7", "NaN", "NaN", Equal, 0);
+    test("-Infinity", "-Infinity", "3/8", "NaN", "NaN", Equal, 0);
+    test("-Infinity", "-Infinity", "0", "NaN", "NaN", Equal, 0);
+    test("0.0", "0x0.0", "1/3", "0.0", "0x0.0", Equal, 0);
+    test("0.0", "0x0.0", "-1/3", "0.0", "0x0.0", Equal, 0);
+    test("0.0", "0x0.0", "22/7", "0.0", "0x0.0", Equal, 0);
+    test("0.0", "0x0.0", "7", "0.0", "0x0.0", Equal, 0);
+    test("0.0", "0x0.0", "3/8", "0.0", "0x0.0", Equal, 0);
+    test("0.0", "0x0.0", "0", "NaN", "NaN", Equal, 0);
+    test("-0.0", "-0x0.0", "1/3", "-0.0", "-0x0.0", Equal, 0);
+    test("-0.0", "-0x0.0", "-1/3", "-0.0", "-0x0.0", Equal, 0);
+    test("-0.0", "-0x0.0", "22/7", "-0.0", "-0x0.0", Equal, 0);
+    test("-0.0", "-0x0.0", "7", "-0.0", "-0x0.0", Equal, 0);
+    test("-0.0", "-0x0.0", "3/8", "-0.0", "-0x0.0", Equal, 0);
+    test("-0.0", "-0x0.0", "0", "NaN", "NaN", Equal, 0);
+    test("10.0", "0xa.0#3", "1/3", "0.0", "0x0.0", Equal, 30);
+    test("10.0", "0xa.0#3", "-1/3", "0.0", "0x0.0", Equal, -30);
+    test("10.0", "0xa.0#3", "22/7", "0.57129", "0x0.924#10", Less, 3);
+    test("10.0", "0xa.0#3", "7", "3.0000", "0x3.00#10", Equal, 1);
+    test("10.0", "0xa.0#3", "3/8", "0.25000", "0x0.400#10", Equal, 26);
+    test("10.0", "0xa.0#3", "0", "NaN", "NaN", Equal, 0);
+    test("-10.0", "-0xa.0#3", "1/3", "-0.0", "-0x0.0", Equal, -30);
+    test("-10.0", "-0xa.0#3", "-1/3", "-0.0", "-0x0.0", Equal, 30);
+    test(
+        "-10.0",
+        "-0xa.0#3",
+        "22/7",
+        "-0.57129",
+        "-0x0.924#10",
+        Greater,
+        -3,
+    );
+    test("-10.0", "-0xa.0#3", "7", "-3.0000", "-0x3.00#10", Equal, -1);
+    test(
+        "-10.0",
+        "-0xa.0#3",
+        "3/8",
+        "-0.25000",
+        "-0x0.400#10",
+        Equal,
+        -26,
+    );
+    test("-10.0", "-0xa.0#3", "0", "NaN", "NaN", Equal, 0);
+    test("3.0", "0x3.0#2", "1/3", "0.0", "0x0.0", Equal, 9);
+    test("3.0", "0x3.0#2", "-1/3", "0.0", "0x0.0", Equal, -9);
+    test("3.0", "0x3.0#2", "22/7", "3.0000", "0x3.00#10", Equal, 0);
+    test("3.0", "0x3.0#2", "7", "3.0000", "0x3.00#10", Equal, 0);
+    test("3.0", "0x3.0#2", "3/8", "0.0", "0x0.0", Equal, 8);
+    test("3.0", "0x3.0#2", "0", "NaN", "NaN", Equal, 0);
+    test(
+        "10.5",
+        "0xa.8#6",
+        "1/3",
+        "0.16675",
+        "0x0.2ab#10",
+        Greater,
+        31,
+    );
+    test(
+        "10.5",
+        "0xa.8#6",
+        "-1/3",
+        "0.16675",
+        "0x0.2ab#10",
+        Greater,
+        -31,
+    );
+    test(
+        "10.5",
+        "0xa.8#6",
+        "22/7",
+        "1.0723",
+        "0x1.128#10",
+        Greater,
+        3,
+    );
+    test("10.5", "0xa.8#6", "7", "3.5000", "0x3.80#10", Equal, 1);
+    test("10.5", "0xa.8#6", "3/8", "0.0", "0x0.0", Equal, 28);
+    test("10.5", "0xa.8#6", "0", "NaN", "NaN", Equal, 0);
+}
+
+#[test]
+fn test_ieee_remainder_rational() {
+    let test = |s, s_hex, t: &str, out: &str, out_hex: &str, o_out: Ordering, quo_out: i64| {
+        let x = parse_hex_string(s_hex);
+        assert_eq!(x.to_string(), s);
+        let y = t.parse::<Rational>().unwrap();
+
+        let (r, o, quo) =
+            x.ieee_remainder_rational_and_quotient_bits_prec_round_ref_ref(&y, 10, Nearest);
+        assert!(r.is_valid());
+        assert_eq!(r.to_string(), out);
+        assert_eq!(to_hex_string(&r), out_hex);
+        assert_eq!(o, o_out);
+        assert_eq!(quo, quo_out);
+
+        let (r2, o2) = x.ieee_remainder_rational_prec_round_ref_ref(&y, 10, Nearest);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&r));
+        assert_eq!(o2, o);
+        let (r2, o2) = x.ieee_remainder_rational_prec_ref_ref(&y, 10);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&r));
+        assert_eq!(o2, o);
+    };
+    // the nearest-even quotient variant of the previous test's rows
+    test("NaN", "NaN", "1/3", "NaN", "NaN", Equal, 0);
+    test("NaN", "NaN", "-1/3", "NaN", "NaN", Equal, 0);
+    test("NaN", "NaN", "22/7", "NaN", "NaN", Equal, 0);
+    test("NaN", "NaN", "7", "NaN", "NaN", Equal, 0);
+    test("NaN", "NaN", "3/8", "NaN", "NaN", Equal, 0);
+    test("NaN", "NaN", "0", "NaN", "NaN", Equal, 0);
+    test("Infinity", "Infinity", "1/3", "NaN", "NaN", Equal, 0);
+    test("Infinity", "Infinity", "-1/3", "NaN", "NaN", Equal, 0);
+    test("Infinity", "Infinity", "22/7", "NaN", "NaN", Equal, 0);
+    test("Infinity", "Infinity", "7", "NaN", "NaN", Equal, 0);
+    test("Infinity", "Infinity", "3/8", "NaN", "NaN", Equal, 0);
+    test("Infinity", "Infinity", "0", "NaN", "NaN", Equal, 0);
+    test("-Infinity", "-Infinity", "1/3", "NaN", "NaN", Equal, 0);
+    test("-Infinity", "-Infinity", "-1/3", "NaN", "NaN", Equal, 0);
+    test("-Infinity", "-Infinity", "22/7", "NaN", "NaN", Equal, 0);
+    test("-Infinity", "-Infinity", "7", "NaN", "NaN", Equal, 0);
+    test("-Infinity", "-Infinity", "3/8", "NaN", "NaN", Equal, 0);
+    test("-Infinity", "-Infinity", "0", "NaN", "NaN", Equal, 0);
+    test("0.0", "0x0.0", "1/3", "0.0", "0x0.0", Equal, 0);
+    test("0.0", "0x0.0", "-1/3", "0.0", "0x0.0", Equal, 0);
+    test("0.0", "0x0.0", "22/7", "0.0", "0x0.0", Equal, 0);
+    test("0.0", "0x0.0", "7", "0.0", "0x0.0", Equal, 0);
+    test("0.0", "0x0.0", "3/8", "0.0", "0x0.0", Equal, 0);
+    test("0.0", "0x0.0", "0", "NaN", "NaN", Equal, 0);
+    test("-0.0", "-0x0.0", "1/3", "-0.0", "-0x0.0", Equal, 0);
+    test("-0.0", "-0x0.0", "-1/3", "-0.0", "-0x0.0", Equal, 0);
+    test("-0.0", "-0x0.0", "22/7", "-0.0", "-0x0.0", Equal, 0);
+    test("-0.0", "-0x0.0", "7", "-0.0", "-0x0.0", Equal, 0);
+    test("-0.0", "-0x0.0", "3/8", "-0.0", "-0x0.0", Equal, 0);
+    test("-0.0", "-0x0.0", "0", "NaN", "NaN", Equal, 0);
+    test("10.0", "0xa.0#3", "1/3", "0.0", "0x0.0", Equal, 30);
+    test("10.0", "0xa.0#3", "-1/3", "0.0", "0x0.0", Equal, -30);
+    test("10.0", "0xa.0#3", "22/7", "0.57129", "0x0.924#10", Less, 3);
+    test("10.0", "0xa.0#3", "7", "3.0000", "0x3.00#10", Equal, 1);
+    test(
+        "10.0",
+        "0xa.0#3",
+        "3/8",
+        "-0.12500",
+        "-0x0.200#10",
+        Equal,
+        27,
+    );
+    test("10.0", "0xa.0#3", "0", "NaN", "NaN", Equal, 0);
+    test("-10.0", "-0xa.0#3", "1/3", "-0.0", "-0x0.0", Equal, -30);
+    test("-10.0", "-0xa.0#3", "-1/3", "-0.0", "-0x0.0", Equal, 30);
+    test(
+        "-10.0",
+        "-0xa.0#3",
+        "22/7",
+        "-0.57129",
+        "-0x0.924#10",
+        Greater,
+        -3,
+    );
+    test("-10.0", "-0xa.0#3", "7", "-3.0000", "-0x3.00#10", Equal, -1);
+    test(
+        "-10.0",
+        "-0xa.0#3",
+        "3/8",
+        "0.12500",
+        "0x0.200#10",
+        Equal,
+        -27,
+    );
+    test("-10.0", "-0xa.0#3", "0", "NaN", "NaN", Equal, 0);
+    test("3.0", "0x3.0#2", "1/3", "0.0", "0x0.0", Equal, 9);
+    test("3.0", "0x3.0#2", "-1/3", "0.0", "0x0.0", Equal, -9);
+    test(
+        "3.0",
+        "0x3.0#2",
+        "22/7",
+        "-0.14282",
+        "-0x0.249#10",
+        Greater,
+        1,
+    );
+    test("3.0", "0x3.0#2", "7", "3.0000", "0x3.00#10", Equal, 0);
+    test("3.0", "0x3.0#2", "3/8", "0.0", "0x0.0", Equal, 8);
+    test("3.0", "0x3.0#2", "0", "NaN", "NaN", Equal, 0);
+    test(
+        "10.5",
+        "0xa.8#6",
+        "1/3",
+        "-0.16675",
+        "-0x0.2ab#10",
+        Less,
+        32,
+    );
+    test(
+        "10.5",
+        "0xa.8#6",
+        "-1/3",
+        "-0.16675",
+        "-0x0.2ab#10",
+        Less,
+        -32,
+    );
+    test(
+        "10.5",
+        "0xa.8#6",
+        "22/7",
+        "1.0723",
+        "0x1.128#10",
+        Greater,
+        3,
+    );
+    test("10.5", "0xa.8#6", "7", "-3.5000", "-0x3.80#10", Equal, 2);
+    test("10.5", "0xa.8#6", "3/8", "0.0", "0x0.0", Equal, 28);
+    test("10.5", "0xa.8#6", "0", "NaN", "NaN", Equal, 0);
+}
+
+#[test]
+fn test_rational_rem_float() {
+    let test = |t: &str, s, s_hex, out: &str, out_hex: &str, o_out: Ordering, quo_out: i64| {
+        let x = t.parse::<Rational>().unwrap();
+        let y = parse_hex_string(s_hex);
+        assert_eq!(y.to_string(), s);
+
+        let (r, o, quo) =
+            Float::rational_rem_float_and_quotient_bits_prec_round_ref_ref(&x, &y, 10, Nearest);
+        assert!(r.is_valid());
+        assert_eq!(r.to_string(), out);
+        assert_eq!(to_hex_string(&r), out_hex);
+        assert_eq!(o, o_out);
+        assert_eq!(quo, quo_out);
+
+        let (r2, o2) = Float::rational_rem_float_prec_round_ref_ref(&x, &y, 10, Nearest);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&r));
+        assert_eq!(o2, o);
+        let (r2, o2) = Float::rational_rem_float_prec_ref_ref(&x, &y, 10);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&r));
+        assert_eq!(o2, o);
+    };
+    // a NaN or zero Float modulus is NaN; an infinite modulus returns the Rational rounded; a zero
+    // Rational dividend is a positive zero
+    test("1/3", "NaN", "NaN", "NaN", "NaN", Equal, 0);
+    test("-1/3", "NaN", "NaN", "NaN", "NaN", Equal, 0);
+    test("22/7", "NaN", "NaN", "NaN", "NaN", Equal, 0);
+    test("7", "NaN", "NaN", "NaN", "NaN", Equal, 0);
+    test("3/8", "NaN", "NaN", "NaN", "NaN", Equal, 0);
+    test("0", "NaN", "NaN", "NaN", "NaN", Equal, 0);
+    test(
+        "1/3",
+        "Infinity",
+        "Infinity",
+        "0.33350",
+        "0x0.556#10",
+        Greater,
+        0,
+    );
+    test(
+        "-1/3",
+        "Infinity",
+        "Infinity",
+        "-0.33350",
+        "-0x0.556#10",
+        Less,
+        0,
+    );
+    test(
+        "22/7",
+        "Infinity",
+        "Infinity",
+        "3.1445",
+        "0x3.25#10",
+        Greater,
+        0,
+    );
+    test("7", "Infinity", "Infinity", "7.0000", "0x7.00#10", Equal, 0);
+    test(
+        "3/8",
+        "Infinity",
+        "Infinity",
+        "0.37500",
+        "0x0.600#10",
+        Equal,
+        0,
+    );
+    test("0", "Infinity", "Infinity", "0.0", "0x0.0", Equal, 0);
+    test(
+        "1/3",
+        "-Infinity",
+        "-Infinity",
+        "0.33350",
+        "0x0.556#10",
+        Greater,
+        0,
+    );
+    test(
+        "-1/3",
+        "-Infinity",
+        "-Infinity",
+        "-0.33350",
+        "-0x0.556#10",
+        Less,
+        0,
+    );
+    test(
+        "22/7",
+        "-Infinity",
+        "-Infinity",
+        "3.1445",
+        "0x3.25#10",
+        Greater,
+        0,
+    );
+    test(
+        "7",
+        "-Infinity",
+        "-Infinity",
+        "7.0000",
+        "0x7.00#10",
+        Equal,
+        0,
+    );
+    test(
+        "3/8",
+        "-Infinity",
+        "-Infinity",
+        "0.37500",
+        "0x0.600#10",
+        Equal,
+        0,
+    );
+    test("0", "-Infinity", "-Infinity", "0.0", "0x0.0", Equal, 0);
+    test("1/3", "0.0", "0x0.0", "NaN", "NaN", Equal, 0);
+    test("-1/3", "0.0", "0x0.0", "NaN", "NaN", Equal, 0);
+    test("22/7", "0.0", "0x0.0", "NaN", "NaN", Equal, 0);
+    test("7", "0.0", "0x0.0", "NaN", "NaN", Equal, 0);
+    test("3/8", "0.0", "0x0.0", "NaN", "NaN", Equal, 0);
+    test("0", "0.0", "0x0.0", "NaN", "NaN", Equal, 0);
+    test("1/3", "-0.0", "-0x0.0", "NaN", "NaN", Equal, 0);
+    test("-1/3", "-0.0", "-0x0.0", "NaN", "NaN", Equal, 0);
+    test("22/7", "-0.0", "-0x0.0", "NaN", "NaN", Equal, 0);
+    test("7", "-0.0", "-0x0.0", "NaN", "NaN", Equal, 0);
+    test("3/8", "-0.0", "-0x0.0", "NaN", "NaN", Equal, 0);
+    test("0", "-0.0", "-0x0.0", "NaN", "NaN", Equal, 0);
+    test(
+        "1/3",
+        "10.0",
+        "0xa.0#3",
+        "0.33350",
+        "0x0.556#10",
+        Greater,
+        0,
+    );
+    test(
+        "-1/3",
+        "10.0",
+        "0xa.0#3",
+        "-0.33350",
+        "-0x0.556#10",
+        Less,
+        0,
+    );
+    test("22/7", "10.0", "0xa.0#3", "3.1445", "0x3.25#10", Greater, 0);
+    test("7", "10.0", "0xa.0#3", "7.0000", "0x7.00#10", Equal, 0);
+    test("3/8", "10.0", "0xa.0#3", "0.37500", "0x0.600#10", Equal, 0);
+    test("0", "10.0", "0xa.0#3", "0.0", "0x0.0", Equal, 0);
+    test(
+        "1/3",
+        "-10.0",
+        "-0xa.0#3",
+        "0.33350",
+        "0x0.556#10",
+        Greater,
+        0,
+    );
+    test(
+        "-1/3",
+        "-10.0",
+        "-0xa.0#3",
+        "-0.33350",
+        "-0x0.556#10",
+        Less,
+        0,
+    );
+    test(
+        "22/7",
+        "-10.0",
+        "-0xa.0#3",
+        "3.1445",
+        "0x3.25#10",
+        Greater,
+        0,
+    );
+    test("7", "-10.0", "-0xa.0#3", "7.0000", "0x7.00#10", Equal, 0);
+    test(
+        "3/8",
+        "-10.0",
+        "-0xa.0#3",
+        "0.37500",
+        "0x0.600#10",
+        Equal,
+        0,
+    );
+    test("0", "-10.0", "-0xa.0#3", "0.0", "0x0.0", Equal, 0);
+    test("1/3", "3.0", "0x3.0#2", "0.33350", "0x0.556#10", Greater, 0);
+    test("-1/3", "3.0", "0x3.0#2", "-0.33350", "-0x0.556#10", Less, 0);
+    test("22/7", "3.0", "0x3.0#2", "0.14282", "0x0.249#10", Less, 1);
+    test("7", "3.0", "0x3.0#2", "1.0000", "0x1.000#10", Equal, 2);
+    test("3/8", "3.0", "0x3.0#2", "0.37500", "0x0.600#10", Equal, 0);
+    test("0", "3.0", "0x3.0#2", "0.0", "0x0.0", Equal, 0);
+    test(
+        "1/3",
+        "10.5",
+        "0xa.8#6",
+        "0.33350",
+        "0x0.556#10",
+        Greater,
+        0,
+    );
+    test(
+        "-1/3",
+        "10.5",
+        "0xa.8#6",
+        "-0.33350",
+        "-0x0.556#10",
+        Less,
+        0,
+    );
+    test("22/7", "10.5", "0xa.8#6", "3.1445", "0x3.25#10", Greater, 0);
+    test("7", "10.5", "0xa.8#6", "7.0000", "0x7.00#10", Equal, 0);
+    test("3/8", "10.5", "0xa.8#6", "0.37500", "0x0.600#10", Equal, 0);
+    test("0", "10.5", "0xa.8#6", "0.0", "0x0.0", Equal, 0);
+}
+
+#[test]
+fn test_rational_ieee_remainder_float() {
+    let test = |t: &str, s, s_hex, out: &str, out_hex: &str, o_out: Ordering, quo_out: i64| {
+        let x = t.parse::<Rational>().unwrap();
+        let y = parse_hex_string(s_hex);
+        assert_eq!(y.to_string(), s);
+
+        let (r, o, quo) = Float::rational_ieee_remainder_float_and_quotient_bits_prec_round_ref_ref(
+            &x, &y, 10, Nearest,
+        );
+        assert!(r.is_valid());
+        assert_eq!(r.to_string(), out);
+        assert_eq!(to_hex_string(&r), out_hex);
+        assert_eq!(o, o_out);
+        assert_eq!(quo, quo_out);
+
+        let (r2, o2) = Float::rational_ieee_remainder_float_prec_round_ref_ref(&x, &y, 10, Nearest);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&r));
+        assert_eq!(o2, o);
+    };
+    // the nearest-even quotient variant of the previous test's rows
+    test("1/3", "NaN", "NaN", "NaN", "NaN", Equal, 0);
+    test("-1/3", "NaN", "NaN", "NaN", "NaN", Equal, 0);
+    test("22/7", "NaN", "NaN", "NaN", "NaN", Equal, 0);
+    test("7", "NaN", "NaN", "NaN", "NaN", Equal, 0);
+    test("3/8", "NaN", "NaN", "NaN", "NaN", Equal, 0);
+    test("0", "NaN", "NaN", "NaN", "NaN", Equal, 0);
+    test(
+        "1/3",
+        "Infinity",
+        "Infinity",
+        "0.33350",
+        "0x0.556#10",
+        Greater,
+        0,
+    );
+    test(
+        "-1/3",
+        "Infinity",
+        "Infinity",
+        "-0.33350",
+        "-0x0.556#10",
+        Less,
+        0,
+    );
+    test(
+        "22/7",
+        "Infinity",
+        "Infinity",
+        "3.1445",
+        "0x3.25#10",
+        Greater,
+        0,
+    );
+    test("7", "Infinity", "Infinity", "7.0000", "0x7.00#10", Equal, 0);
+    test(
+        "3/8",
+        "Infinity",
+        "Infinity",
+        "0.37500",
+        "0x0.600#10",
+        Equal,
+        0,
+    );
+    test("0", "Infinity", "Infinity", "0.0", "0x0.0", Equal, 0);
+    test(
+        "1/3",
+        "-Infinity",
+        "-Infinity",
+        "0.33350",
+        "0x0.556#10",
+        Greater,
+        0,
+    );
+    test(
+        "-1/3",
+        "-Infinity",
+        "-Infinity",
+        "-0.33350",
+        "-0x0.556#10",
+        Less,
+        0,
+    );
+    test(
+        "22/7",
+        "-Infinity",
+        "-Infinity",
+        "3.1445",
+        "0x3.25#10",
+        Greater,
+        0,
+    );
+    test(
+        "7",
+        "-Infinity",
+        "-Infinity",
+        "7.0000",
+        "0x7.00#10",
+        Equal,
+        0,
+    );
+    test(
+        "3/8",
+        "-Infinity",
+        "-Infinity",
+        "0.37500",
+        "0x0.600#10",
+        Equal,
+        0,
+    );
+    test("0", "-Infinity", "-Infinity", "0.0", "0x0.0", Equal, 0);
+    test("1/3", "0.0", "0x0.0", "NaN", "NaN", Equal, 0);
+    test("-1/3", "0.0", "0x0.0", "NaN", "NaN", Equal, 0);
+    test("22/7", "0.0", "0x0.0", "NaN", "NaN", Equal, 0);
+    test("7", "0.0", "0x0.0", "NaN", "NaN", Equal, 0);
+    test("3/8", "0.0", "0x0.0", "NaN", "NaN", Equal, 0);
+    test("0", "0.0", "0x0.0", "NaN", "NaN", Equal, 0);
+    test("1/3", "-0.0", "-0x0.0", "NaN", "NaN", Equal, 0);
+    test("-1/3", "-0.0", "-0x0.0", "NaN", "NaN", Equal, 0);
+    test("22/7", "-0.0", "-0x0.0", "NaN", "NaN", Equal, 0);
+    test("7", "-0.0", "-0x0.0", "NaN", "NaN", Equal, 0);
+    test("3/8", "-0.0", "-0x0.0", "NaN", "NaN", Equal, 0);
+    test("0", "-0.0", "-0x0.0", "NaN", "NaN", Equal, 0);
+    test(
+        "1/3",
+        "10.0",
+        "0xa.0#3",
+        "0.33350",
+        "0x0.556#10",
+        Greater,
+        0,
+    );
+    test(
+        "-1/3",
+        "10.0",
+        "0xa.0#3",
+        "-0.33350",
+        "-0x0.556#10",
+        Less,
+        0,
+    );
+    test("22/7", "10.0", "0xa.0#3", "3.1445", "0x3.25#10", Greater, 0);
+    test("7", "10.0", "0xa.0#3", "-3.0000", "-0x3.00#10", Equal, 1);
+    test("3/8", "10.0", "0xa.0#3", "0.37500", "0x0.600#10", Equal, 0);
+    test("0", "10.0", "0xa.0#3", "0.0", "0x0.0", Equal, 0);
+    test(
+        "1/3",
+        "-10.0",
+        "-0xa.0#3",
+        "0.33350",
+        "0x0.556#10",
+        Greater,
+        0,
+    );
+    test(
+        "-1/3",
+        "-10.0",
+        "-0xa.0#3",
+        "-0.33350",
+        "-0x0.556#10",
+        Less,
+        0,
+    );
+    test(
+        "22/7",
+        "-10.0",
+        "-0xa.0#3",
+        "3.1445",
+        "0x3.25#10",
+        Greater,
+        0,
+    );
+    test("7", "-10.0", "-0xa.0#3", "-3.0000", "-0x3.00#10", Equal, -1);
+    test(
+        "3/8",
+        "-10.0",
+        "-0xa.0#3",
+        "0.37500",
+        "0x0.600#10",
+        Equal,
+        0,
+    );
+    test("0", "-10.0", "-0xa.0#3", "0.0", "0x0.0", Equal, 0);
+    test("1/3", "3.0", "0x3.0#2", "0.33350", "0x0.556#10", Greater, 0);
+    test("-1/3", "3.0", "0x3.0#2", "-0.33350", "-0x0.556#10", Less, 0);
+    test("22/7", "3.0", "0x3.0#2", "0.14282", "0x0.249#10", Less, 1);
+    test("7", "3.0", "0x3.0#2", "1.0000", "0x1.000#10", Equal, 2);
+    test("3/8", "3.0", "0x3.0#2", "0.37500", "0x0.600#10", Equal, 0);
+    test("0", "3.0", "0x3.0#2", "0.0", "0x0.0", Equal, 0);
+    test(
+        "1/3",
+        "10.5",
+        "0xa.8#6",
+        "0.33350",
+        "0x0.556#10",
+        Greater,
+        0,
+    );
+    test(
+        "-1/3",
+        "10.5",
+        "0xa.8#6",
+        "-0.33350",
+        "-0x0.556#10",
+        Less,
+        0,
+    );
+    test("22/7", "10.5", "0xa.8#6", "3.1445", "0x3.25#10", Greater, 0);
+    test("7", "10.5", "0xa.8#6", "-3.5000", "-0x3.80#10", Equal, 1);
+    test("3/8", "10.5", "0xa.8#6", "0.37500", "0x0.600#10", Equal, 0);
+    test("0", "10.5", "0xa.8#6", "0.0", "0x0.0", Equal, 0);
+}
+
+#[test]
+fn test_rem_rational_prec_round() {
+    let test = |s, s_hex, t: &str, prec, rm: RoundingMode, out: &str, out_hex: &str, o_out| {
+        let x = parse_hex_string(s_hex);
+        assert_eq!(x.to_string(), s);
+        let y = t.parse::<Rational>().unwrap();
+
+        let (r, o) = x.rem_rational_prec_round_ref_ref(&y, prec, rm);
+        assert!(r.is_valid());
+        assert_eq!(r.to_string(), out);
+        assert_eq!(to_hex_string(&r), out_hex);
+        assert_eq!(o, o_out);
+
+        let (r2, o2) = x.clone().rem_rational_prec_round(y.clone(), prec, rm);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&r));
+        assert_eq!(o2, o);
+        let mut x2 = x.clone();
+        let o2 = x2.rem_rational_prec_round_assign(y.clone(), prec, rm);
+        assert_eq!(ComparableFloatRef(&x2), ComparableFloatRef(&r));
+        assert_eq!(o2, o);
+        let mut x2 = x.clone();
+        let o2 = x2.rem_rational_prec_round_assign_ref(&y, prec, rm);
+        assert_eq!(ComparableFloatRef(&x2), ComparableFloatRef(&r));
+        assert_eq!(o2, o);
+    };
+    // 10 mod 22/7 = 4/7, rounded at precision 1 in each direction; exact multiples of 1/3 and 3/8
+    // (Exact is allowed when the remainder is exactly representable)
+    test("10.0", "0xa.0#3", "22/7", 1, Floor, "0.50", "0x0.8#1", Less);
+    test(
+        "10.0", "0xa.0#3", "22/7", 1, Ceiling, "1.0", "0x1.0#1", Greater,
+    );
+    test(
+        "10.0", "0xa.0#3", "22/7", 1, Nearest, "0.50", "0x0.8#1", Less,
+    );
+    test(
+        "-10.0", "-0xa.0#3", "22/7", 1, Floor, "-1.0", "-0x1.0#1", Less,
+    );
+    test("10.0", "0xa.0#3", "1/3", 2, Floor, "0.0", "0x0.0", Equal);
+    test("10.0", "0xa.0#3", "1/3", 2, Ceiling, "0.0", "0x0.0", Equal);
+    test("3.0", "0x3.0#2", "3/8", 4, Exact, "0.0", "0x0.0", Equal);
+}
+
+#[test]
+fn test_rem_rational_operators() {
+    let test = |s, s_hex, t: &str, out: &str, out_hex: &str| {
+        let x = parse_hex_string(s_hex);
+        assert_eq!(x.to_string(), s);
+        let y = t.parse::<Rational>().unwrap();
+
+        let r = &x % &y;
+        assert!(r.is_valid());
+        assert_eq!(r.to_string(), out);
+        assert_eq!(to_hex_string(&r), out_hex);
+        let r2 = &x % y.clone();
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&r));
+        let r2 = x.clone() % &y;
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&r));
+        let r2 = x.clone() % y.clone();
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&r));
+        let mut x2 = x.clone();
+        x2 %= y.clone();
+        assert_eq!(ComparableFloatRef(&x2), ComparableFloatRef(&r));
+        let mut x2 = x.clone();
+        x2 %= &y;
+        assert_eq!(ComparableFloatRef(&x2), ComparableFloatRef(&r));
+    };
+    // the Float-mod-Rational operator, at the Float's precision
+    test("10.0", "0xa.0#3", "22/7", "0.62", "0x0.a#3");
+    test("-10.0", "-0xa.0#3", "22/7", "-0.62", "-0x0.a#3");
+    test("3.0", "0x3.0#2", "1/3", "0.0", "0x0.0");
+}
+
+#[test]
+fn rem_rational_fail() {
+    assert_panic!(Float::from(1u32).rem_rational_prec_round(
+        Rational::from_signeds(1i32, 3i32),
+        0,
+        Nearest
+    ));
+    assert_panic!(Float::rational_rem_float_prec_round(
+        Rational::from_signeds(1i32, 3i32),
+        Float::from(1u32),
+        0,
+        Nearest
+    ));
+    // Exact with an inexact remainder
+    assert_panic!(Float::from(10u32).rem_rational_prec_round(
+        Rational::from_signeds(22i32, 7i32),
+        1,
+        Exact
+    ));
+    assert_panic!(Float::from(10u32).ieee_remainder_rational_prec_round(
+        Rational::from_signeds(22i32, 7i32),
+        1,
+        Exact
+    ));
+}
+
+#[test]
+fn test_rational_rem_float_operator() {
+    let test = |t: &str, s, s_hex, out: &str, out_hex: &str| {
+        let x = t.parse::<Rational>().unwrap();
+        let y = parse_hex_string(s_hex);
+        assert_eq!(y.to_string(), s);
+
+        let r = &x % &y;
+        assert!(r.is_valid());
+        assert_eq!(r.to_string(), out);
+        assert_eq!(to_hex_string(&r), out_hex);
+        let r2 = &x % y.clone();
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&r));
+        let r2 = x.clone() % &y;
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&r));
+        let r2 = x.clone() % y.clone();
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&r));
+    };
+    // the Rational-mod-Float operator, at the Float's precision
+    test("22/7", "3.0", "0x3.0#2", "0.12", "0x0.2#2");
+    test("-22/7", "3.0", "0x3.0#2", "-0.12", "-0x0.2#2");
+    test("1/3", "4.0", "0x4.0#1", "0.25", "0x0.4#1");
 }

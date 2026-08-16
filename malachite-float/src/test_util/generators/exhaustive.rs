@@ -3608,6 +3608,114 @@ pub fn exhaustive_float_rational_unsigned_rounding_mode_quadruple_gen_var_16()
     )
 }
 
+pub fn exhaustive_float_rational_unsigned_rounding_mode_quadruple_gen_var_17()
+-> It<(Float, Rational, u64, RoundingMode)> {
+    Box::new(
+        reshape_3_1_to_4(Box::new(lex_pairs(
+            exhaustive_triples_custom_output(
+                exhaustive_floats(),
+                exhaustive_rationals(),
+                exhaustive_positive_primitive_ints(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, prec, rm)| rem_rational_prec_round_valid(x, y, *prec, *rm, false)),
+    )
+}
+
+pub fn exhaustive_float_rational_unsigned_rounding_mode_quadruple_gen_var_18()
+-> It<(Float, Rational, u64, RoundingMode)> {
+    Box::new(
+        reshape_3_1_to_4(Box::new(lex_pairs(
+            exhaustive_triples_custom_output(
+                exhaustive_floats(),
+                exhaustive_rationals(),
+                exhaustive_positive_primitive_ints(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, prec, rm)| rem_rational_prec_round_valid(x, y, *prec, *rm, true)),
+    )
+}
+
+pub fn exhaustive_float_rational_unsigned_rounding_mode_quadruple_gen_var_19()
+-> It<(Float, Rational, u64, RoundingMode)> {
+    Box::new(
+        reshape_3_1_to_4(Box::new(lex_pairs(
+            exhaustive_triples_custom_output(
+                exhaustive_floats(),
+                exhaustive_rationals(),
+                exhaustive_positive_primitive_ints(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, prec, rm)| rational_rem_float_prec_round_valid(y, x, *prec, *rm, false)),
+    )
+}
+
+pub fn exhaustive_float_rational_unsigned_rounding_mode_quadruple_gen_var_20()
+-> It<(Float, Rational, u64, RoundingMode)> {
+    Box::new(
+        reshape_3_1_to_4(Box::new(lex_pairs(
+            exhaustive_triples_custom_output(
+                exhaustive_floats(),
+                exhaustive_rationals(),
+                exhaustive_positive_primitive_ints(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, prec, rm)| rational_rem_float_prec_round_valid(y, x, *prec, *rm, true)),
+    )
+}
+
+pub fn exhaustive_float_rational_unsigned_rounding_mode_quadruple_gen_var_21()
+-> It<(Float, Rational, u64, RoundingMode)> {
+    Box::new(
+        reshape_3_1_to_4(Box::new(lex_pairs(
+            exhaustive_triples_custom_output(
+                exhaustive_floats(),
+                exhaustive_rationals(),
+                exhaustive_positive_primitive_ints(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, prec, rm)| min_max_rational_prec_round_valid(x, y, *prec, *rm, false)),
+    )
+}
+
+pub fn exhaustive_float_rational_unsigned_rounding_mode_quadruple_gen_var_22()
+-> It<(Float, Rational, u64, RoundingMode)> {
+    Box::new(
+        reshape_3_1_to_4(Box::new(lex_pairs(
+            exhaustive_triples_custom_output(
+                exhaustive_floats(),
+                exhaustive_rationals(),
+                exhaustive_positive_primitive_ints(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, prec, rm)| min_max_rational_prec_round_valid(x, y, *prec, *rm, true)),
+    )
+}
+
 pub fn log_base_rational_base_1_plus_x_prec_round_valid(
     x: &Float,
     base: &Rational,
@@ -3842,6 +3950,87 @@ pub(crate) fn rational_div_float_round_valid(x: &Float, y: &Rational, rm: Roundi
     }
 }
 
+// Whether `rm` is a valid rounding mode for computing the remainder of the `Float` `x` by the
+// `Rational` `y` (quotient toward zero, or nearest-even if `nearest_quotient`) at precision `prec`:
+// `Exact` is only valid when the rounded remainder is exact, decided by a cheap `Floor` probe.
+pub(crate) fn rem_rational_prec_round_valid(
+    x: &Float,
+    y: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+    nearest_quotient: bool,
+) -> bool {
+    rm != Exact
+        || if nearest_quotient {
+            x.ieee_remainder_rational_prec_round_ref_ref(y, prec, Floor)
+        } else {
+            x.rem_rational_prec_round_ref_ref(y, prec, Floor)
+        }
+        .1 == Equal
+}
+
+pub(crate) fn rem_rational_round_valid(
+    x: &Float,
+    y: &Rational,
+    rm: RoundingMode,
+    nearest_quotient: bool,
+) -> bool {
+    rem_rational_prec_round_valid(x, y, x.significant_bits(), rm, nearest_quotient)
+}
+
+// The reversed direction: the remainder of the `Rational` `x` by the `Float` `y`.
+pub(crate) fn rational_rem_float_prec_round_valid(
+    x: &Rational,
+    y: &Float,
+    prec: u64,
+    rm: RoundingMode,
+    nearest_quotient: bool,
+) -> bool {
+    rm != Exact
+        || if nearest_quotient {
+            Float::rational_ieee_remainder_float_prec_round_ref_ref(x, y, prec, Floor)
+        } else {
+            Float::rational_rem_float_prec_round_ref_ref(x, y, prec, Floor)
+        }
+        .1 == Equal
+}
+
+pub(crate) fn rational_rem_float_round_valid(
+    x: &Rational,
+    y: &Float,
+    rm: RoundingMode,
+    nearest_quotient: bool,
+) -> bool {
+    rational_rem_float_prec_round_valid(x, y, y.significant_bits(), rm, nearest_quotient)
+}
+
+// Whether `rm` is valid for the mixed min or max: `Exact` is only valid when rounding the winner is
+// exact.
+pub(crate) fn min_max_rational_prec_round_valid(
+    x: &Float,
+    y: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+    is_max: bool,
+) -> bool {
+    rm != Exact
+        || if is_max {
+            x.max_rational_prec_round_ref_ref(y, prec, Floor)
+        } else {
+            x.min_rational_prec_round_ref_ref(y, prec, Floor)
+        }
+        .1 == Equal
+}
+
+pub(crate) fn min_max_rational_round_valid(
+    x: &Float,
+    y: &Rational,
+    rm: RoundingMode,
+    is_max: bool,
+) -> bool {
+    min_max_rational_prec_round_valid(x, y, x.significant_bits(), rm, is_max)
+}
+
 pub fn exhaustive_float_rational_rounding_mode_triple_gen_var_6()
 -> It<(Float, Rational, RoundingMode)> {
     Box::new(
@@ -3966,6 +4155,72 @@ pub fn exhaustive_float_rational_rounding_mode_triple_gen_var_15()
             exhaustive_rounding_modes(),
         )))
         .filter(|(x, y, rm)| log_base_rational_base_1_plus_x_round_valid(x, y, *rm)),
+    )
+}
+
+pub fn exhaustive_float_rational_rounding_mode_triple_gen_var_16()
+-> It<(Float, Rational, RoundingMode)> {
+    Box::new(
+        reshape_2_1_to_3(Box::new(lex_pairs(
+            exhaustive_pairs(exhaustive_floats(), exhaustive_rationals()),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, rm)| rem_rational_round_valid(x, y, *rm, false)),
+    )
+}
+
+pub fn exhaustive_float_rational_rounding_mode_triple_gen_var_17()
+-> It<(Float, Rational, RoundingMode)> {
+    Box::new(
+        reshape_2_1_to_3(Box::new(lex_pairs(
+            exhaustive_pairs(exhaustive_floats(), exhaustive_rationals()),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, rm)| rem_rational_round_valid(x, y, *rm, true)),
+    )
+}
+
+pub fn exhaustive_float_rational_rounding_mode_triple_gen_var_18()
+-> It<(Float, Rational, RoundingMode)> {
+    Box::new(
+        reshape_2_1_to_3(Box::new(lex_pairs(
+            exhaustive_pairs(exhaustive_floats(), exhaustive_rationals()),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, rm)| rational_rem_float_round_valid(y, x, *rm, false)),
+    )
+}
+
+pub fn exhaustive_float_rational_rounding_mode_triple_gen_var_19()
+-> It<(Float, Rational, RoundingMode)> {
+    Box::new(
+        reshape_2_1_to_3(Box::new(lex_pairs(
+            exhaustive_pairs(exhaustive_floats(), exhaustive_rationals()),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, rm)| rational_rem_float_round_valid(y, x, *rm, true)),
+    )
+}
+
+pub fn exhaustive_float_rational_rounding_mode_triple_gen_var_20()
+-> It<(Float, Rational, RoundingMode)> {
+    Box::new(
+        reshape_2_1_to_3(Box::new(lex_pairs(
+            exhaustive_pairs(exhaustive_floats(), exhaustive_rationals()),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, rm)| min_max_rational_round_valid(x, y, *rm, false)),
+    )
+}
+
+pub fn exhaustive_float_rational_rounding_mode_triple_gen_var_21()
+-> It<(Float, Rational, RoundingMode)> {
+    Box::new(
+        reshape_2_1_to_3(Box::new(lex_pairs(
+            exhaustive_pairs(exhaustive_floats(), exhaustive_rationals()),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, rm)| min_max_rational_round_valid(x, y, *rm, true)),
     )
 }
 

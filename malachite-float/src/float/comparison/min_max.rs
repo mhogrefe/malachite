@@ -11,9 +11,13 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Float;
+use crate::InnerFloat::Zero;
+use core::cmp::Ordering::{Equal, Greater, Less};
 use core::cmp::{Ordering, max};
+use malachite_base::num::basic::traits::Zero as ZeroTrait;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::rounding_modes::RoundingMode::{self, Nearest};
+use malachite_q::Rational;
 
 // Which operand mpfr_min/mpfr_max selects: one NaN gives the other; both NaN gives the first, whose
 // rounding produces the NaN result; two zeros are picked by sign (min prefers the negative zero,
@@ -1909,5 +1913,1520 @@ impl Float {
             Choice::First => Self::from_float_prec_ref(self, target_prec),
             Choice::Second => Self::from_float_prec_ref(other, target_prec),
         }
+    }
+}
+
+// The comparison of a Float with a Rational is exact, so these mixed functions choose the true
+// winner and round only it; converting the Rational to a Float first could select the wrong operand
+// when the conversion crosses the other operand's value. A NaN Float yields the other operand, as
+// in the Float-Float functions. On a tie, min returns the Float (preserving a negative zero) and
+// max prefers the positive zero, matching the zero-sign preferences of mpfr_min and mpfr_max.
+fn min_rational_helper(x: &Float, y: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    assert_ne!(prec, 0);
+    match x.partial_cmp(y) {
+        None | Some(Greater) => Float::from_rational_prec_round_ref(y, prec, rm),
+        _ => Float::from_float_prec_round_ref(x, prec, rm),
+    }
+}
+
+fn max_rational_helper(x: &Float, y: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    assert_ne!(prec, 0);
+    match x.partial_cmp(y) {
+        None | Some(Less) => Float::from_rational_prec_round_ref(y, prec, rm),
+        Some(Equal) if matches!(x, float_negative_zero!()) => (Float::ZERO, Equal),
+        _ => Float::from_float_prec_round_ref(x, prec, rm),
+    }
+}
+
+impl Float {
+    /// Computes the smaller of a [`Float`] and a [`Rational`], rounding the result to the specified
+    /// precision and with the specified rounding mode. The [`Float`] and the [`Rational`] are both
+    /// taken by value. An [`Ordering`] is also returned, indicating whether the result is less
+    /// than, equal to, or greater than the exact smaller value. Although `NaN`s are not comparable
+    /// to any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison is exact, and only the winning operand is rounded. Converting the
+    /// [`Rational`] to a [`Float`] first could select the wrong operand, when the conversion
+    /// crosses the other operand's value.
+    ///
+    /// Special cases:
+    /// - If the [`Float`] is `NaN`, the [`Rational`] operand is returned (rounded), as with the
+    ///   [`Float`]-[`Float`] functions.
+    /// - If the operands are equal, the [`Float`] operand is returned (rounded), so a negative zero
+    ///   is preserved.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits(), prec)`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` and the winning operand is not exactly
+    /// representable with `prec` bits.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (r, o) =
+    ///     Float::from(3u32).min_rational_prec_round(Rational::from_signeds(22, 7), 5, Floor);
+    /// assert_eq!(r.to_string(), "3.00");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    #[inline]
+    pub fn min_rational_prec_round(
+        self,
+        other: Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        min_rational_helper(&self, &other, prec, rm)
+    }
+
+    /// Computes the smaller of a [`Float`] and a [`Rational`], rounding the result to the specified
+    /// precision and with the specified rounding mode. The [`Float`] is taken by value and the
+    /// [`Rational`] by reference. An [`Ordering`] is also returned, indicating whether the result
+    /// is less than, equal to, or greater than the exact smaller value. Although `NaN`s are not
+    /// comparable to any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison is exact, and only the winning operand is rounded. Converting the
+    /// [`Rational`] to a [`Float`] first could select the wrong operand, when the conversion
+    /// crosses the other operand's value.
+    ///
+    /// Special cases:
+    /// - If the [`Float`] is `NaN`, the [`Rational`] operand is returned (rounded), as with the
+    ///   [`Float`]-[`Float`] functions.
+    /// - If the operands are equal, the [`Float`] operand is returned (rounded), so a negative zero
+    ///   is preserved.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits(), prec)`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` and the winning operand is not exactly
+    /// representable with `prec` bits.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let x = Float::from(3u32);
+    /// let y = Rational::from_signeds(22, 7);
+    /// let (r, o) = x.min_rational_prec_round_val_ref(&y, 5, Floor);
+    /// assert_eq!(r.to_string(), "3.00");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn min_rational_prec_round_val_ref(
+        self,
+        other: &Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        min_rational_helper(&self, other, prec, rm)
+    }
+
+    /// Computes the smaller of a [`Float`] and a [`Rational`], rounding the result to the specified
+    /// precision and with the specified rounding mode. The [`Float`] is taken by reference and the
+    /// [`Rational`] by value. An [`Ordering`] is also returned, indicating whether the result is
+    /// less than, equal to, or greater than the exact smaller value. Although `NaN`s are not
+    /// comparable to any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison is exact, and only the winning operand is rounded. Converting the
+    /// [`Rational`] to a [`Float`] first could select the wrong operand, when the conversion
+    /// crosses the other operand's value.
+    ///
+    /// Special cases:
+    /// - If the [`Float`] is `NaN`, the [`Rational`] operand is returned (rounded), as with the
+    ///   [`Float`]-[`Float`] functions.
+    /// - If the operands are equal, the [`Float`] operand is returned (rounded), so a negative zero
+    ///   is preserved.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits(), prec)`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` and the winning operand is not exactly
+    /// representable with `prec` bits.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let x = Float::from(3u32);
+    /// let y = Rational::from_signeds(22, 7);
+    /// let (r, o) = x.min_rational_prec_round_ref_val(y, 5, Floor);
+    /// assert_eq!(r.to_string(), "3.00");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    #[inline]
+    pub fn min_rational_prec_round_ref_val(
+        &self,
+        other: Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        min_rational_helper(self, &other, prec, rm)
+    }
+
+    /// Computes the smaller of a [`Float`] and a [`Rational`], rounding the result to the specified
+    /// precision and with the specified rounding mode. The [`Float`] and the [`Rational`] are both
+    /// taken by reference. An [`Ordering`] is also returned, indicating whether the result is less
+    /// than, equal to, or greater than the exact smaller value. Although `NaN`s are not comparable
+    /// to any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison is exact, and only the winning operand is rounded. Converting the
+    /// [`Rational`] to a [`Float`] first could select the wrong operand, when the conversion
+    /// crosses the other operand's value.
+    ///
+    /// Special cases:
+    /// - If the [`Float`] is `NaN`, the [`Rational`] operand is returned (rounded), as with the
+    ///   [`Float`]-[`Float`] functions.
+    /// - If the operands are equal, the [`Float`] operand is returned (rounded), so a negative zero
+    ///   is preserved.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits(), prec)`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` and the winning operand is not exactly
+    /// representable with `prec` bits.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let x = Float::from(3u32);
+    /// let y = Rational::from_signeds(22, 7);
+    /// let (r, o) = x.min_rational_prec_round_ref_ref(&y, 5, Floor);
+    /// assert_eq!(r.to_string(), "3.00");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn min_rational_prec_round_ref_ref(
+        &self,
+        other: &Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        min_rational_helper(self, other, prec, rm)
+    }
+
+    /// Computes the smaller of a [`Float`] and a [`Rational`], rounding the result to the nearest
+    /// value of the specified precision. The [`Float`] and the [`Rational`] are both taken by
+    /// value. An [`Ordering`] is also returned, indicating whether the result is less than, equal
+    /// to, or greater than the exact smaller value. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison is exact, and only the winning operand is rounded. Converting the
+    /// [`Rational`] to a [`Float`] first could select the wrong operand, when the conversion
+    /// crosses the other operand's value.
+    ///
+    /// Special cases:
+    /// - If the [`Float`] is `NaN`, the [`Rational`] operand is returned (rounded), as with the
+    ///   [`Float`]-[`Float`] functions.
+    /// - If the operands are equal, the [`Float`] operand is returned (rounded), so a negative zero
+    ///   is preserved.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits(), prec)`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (r, o) = Float::from(3u32).min_rational_prec(Rational::from_signeds(22, 7), 5);
+    /// assert_eq!(r.to_string(), "3.00");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn min_rational_prec(self, other: Rational, prec: u64) -> (Self, Ordering) {
+        self.min_rational_prec_round(other, prec, Nearest)
+    }
+
+    /// Computes the smaller of a [`Float`] and a [`Rational`], rounding the result to the nearest
+    /// value of the specified precision. The [`Float`] is taken by value and the [`Rational`] by
+    /// reference. An [`Ordering`] is also returned, indicating whether the result is less than,
+    /// equal to, or greater than the exact smaller value. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison is exact, and only the winning operand is rounded. Converting the
+    /// [`Rational`] to a [`Float`] first could select the wrong operand, when the conversion
+    /// crosses the other operand's value.
+    ///
+    /// Special cases:
+    /// - If the [`Float`] is `NaN`, the [`Rational`] operand is returned (rounded), as with the
+    ///   [`Float`]-[`Float`] functions.
+    /// - If the operands are equal, the [`Float`] operand is returned (rounded), so a negative zero
+    ///   is preserved.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits(), prec)`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (r, o) = Float::from(3u32).min_rational_prec_val_ref(&Rational::from_signeds(22, 7), 5);
+    /// assert_eq!(r.to_string(), "3.00");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn min_rational_prec_val_ref(self, other: &Rational, prec: u64) -> (Self, Ordering) {
+        self.min_rational_prec_round_val_ref(other, prec, Nearest)
+    }
+
+    /// Computes the smaller of a [`Float`] and a [`Rational`], rounding the result to the nearest
+    /// value of the specified precision. The [`Float`] is taken by reference and the [`Rational`]
+    /// by value. An [`Ordering`] is also returned, indicating whether the result is less than,
+    /// equal to, or greater than the exact smaller value. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison is exact, and only the winning operand is rounded. Converting the
+    /// [`Rational`] to a [`Float`] first could select the wrong operand, when the conversion
+    /// crosses the other operand's value.
+    ///
+    /// Special cases:
+    /// - If the [`Float`] is `NaN`, the [`Rational`] operand is returned (rounded), as with the
+    ///   [`Float`]-[`Float`] functions.
+    /// - If the operands are equal, the [`Float`] operand is returned (rounded), so a negative zero
+    ///   is preserved.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits(), prec)`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (r, o) = Float::from(3u32).min_rational_prec_ref_val(Rational::from_signeds(22, 7), 5);
+    /// assert_eq!(r.to_string(), "3.00");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn min_rational_prec_ref_val(&self, other: Rational, prec: u64) -> (Self, Ordering) {
+        self.min_rational_prec_round_ref_val(other, prec, Nearest)
+    }
+
+    /// Computes the smaller of a [`Float`] and a [`Rational`], rounding the result to the nearest
+    /// value of the specified precision. The [`Float`] and the [`Rational`] are both taken by
+    /// reference. An [`Ordering`] is also returned, indicating whether the result is less than,
+    /// equal to, or greater than the exact smaller value. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison is exact, and only the winning operand is rounded. Converting the
+    /// [`Rational`] to a [`Float`] first could select the wrong operand, when the conversion
+    /// crosses the other operand's value.
+    ///
+    /// Special cases:
+    /// - If the [`Float`] is `NaN`, the [`Rational`] operand is returned (rounded), as with the
+    ///   [`Float`]-[`Float`] functions.
+    /// - If the operands are equal, the [`Float`] operand is returned (rounded), so a negative zero
+    ///   is preserved.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits(), prec)`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (r, o) = Float::from(3u32).min_rational_prec_ref_ref(&Rational::from_signeds(22, 7), 5);
+    /// assert_eq!(r.to_string(), "3.00");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn min_rational_prec_ref_ref(&self, other: &Rational, prec: u64) -> (Self, Ordering) {
+        self.min_rational_prec_round_ref_ref(other, prec, Nearest)
+    }
+
+    /// Computes the smaller of a [`Float`] and a [`Rational`], rounding the result to the
+    /// [`Float`]'s precision, with the specified rounding mode. The [`Float`] and the [`Rational`]
+    /// are both taken by value. An [`Ordering`] is also returned, indicating whether the result is
+    /// less than, equal to, or greater than the exact smaller value. Although `NaN`s are not
+    /// comparable to any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison is exact, and only the winning operand is rounded. Converting the
+    /// [`Rational`] to a [`Float`] first could select the wrong operand, when the conversion
+    /// crosses the other operand's value.
+    ///
+    /// Special cases:
+    /// - If the [`Float`] is `NaN`, the [`Rational`] operand is returned (rounded), as with the
+    ///   [`Float`]-[`Float`] functions.
+    /// - If the operands are equal, the [`Float`] operand is returned (rounded), so a negative zero
+    ///   is preserved.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits())`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` and the winning operand is not exactly representable with the
+    /// output precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (r, o) = Float::from(3u32).min_rational_round(Rational::from_signeds(22, 7), Floor);
+    /// assert_eq!(r.to_string(), "3.0");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn min_rational_round(self, other: Rational, rm: RoundingMode) -> (Self, Ordering) {
+        let prec = self.significant_bits();
+        self.min_rational_prec_round(other, prec, rm)
+    }
+
+    /// Computes the smaller of a [`Float`] and a [`Rational`], rounding the result to the
+    /// [`Float`]'s precision, with the specified rounding mode. The [`Float`] is taken by value and
+    /// the [`Rational`] by reference. An [`Ordering`] is also returned, indicating whether the
+    /// result is less than, equal to, or greater than the exact smaller value. Although `NaN`s are
+    /// not comparable to any [`Float`], whenever this function returns a `NaN` it also returns
+    /// `Equal`.
+    ///
+    /// The comparison is exact, and only the winning operand is rounded. Converting the
+    /// [`Rational`] to a [`Float`] first could select the wrong operand, when the conversion
+    /// crosses the other operand's value.
+    ///
+    /// Special cases:
+    /// - If the [`Float`] is `NaN`, the [`Rational`] operand is returned (rounded), as with the
+    ///   [`Float`]-[`Float`] functions.
+    /// - If the operands are equal, the [`Float`] operand is returned (rounded), so a negative zero
+    ///   is preserved.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits())`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` and the winning operand is not exactly representable with the
+    /// output precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (r, o) =
+    ///     Float::from(3u32).min_rational_round_val_ref(&Rational::from_signeds(22, 7), Floor);
+    /// assert_eq!(r.to_string(), "3.0");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn min_rational_round_val_ref(
+        self,
+        other: &Rational,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        let prec = self.significant_bits();
+        self.min_rational_prec_round_val_ref(other, prec, rm)
+    }
+
+    /// Computes the smaller of a [`Float`] and a [`Rational`], rounding the result to the
+    /// [`Float`]'s precision, with the specified rounding mode. The [`Float`] is taken by reference
+    /// and the [`Rational`] by value. An [`Ordering`] is also returned, indicating whether the
+    /// result is less than, equal to, or greater than the exact smaller value. Although `NaN`s are
+    /// not comparable to any [`Float`], whenever this function returns a `NaN` it also returns
+    /// `Equal`.
+    ///
+    /// The comparison is exact, and only the winning operand is rounded. Converting the
+    /// [`Rational`] to a [`Float`] first could select the wrong operand, when the conversion
+    /// crosses the other operand's value.
+    ///
+    /// Special cases:
+    /// - If the [`Float`] is `NaN`, the [`Rational`] operand is returned (rounded), as with the
+    ///   [`Float`]-[`Float`] functions.
+    /// - If the operands are equal, the [`Float`] operand is returned (rounded), so a negative zero
+    ///   is preserved.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits())`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` and the winning operand is not exactly representable with the
+    /// output precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (r, o) =
+    ///     Float::from(3u32).min_rational_round_ref_val(Rational::from_signeds(22, 7), Floor);
+    /// assert_eq!(r.to_string(), "3.0");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn min_rational_round_ref_val(
+        &self,
+        other: Rational,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        let prec = self.significant_bits();
+        self.min_rational_prec_round_ref_val(other, prec, rm)
+    }
+
+    /// Computes the smaller of a [`Float`] and a [`Rational`], rounding the result to the
+    /// [`Float`]'s precision, with the specified rounding mode. The [`Float`] and the [`Rational`]
+    /// are both taken by reference. An [`Ordering`] is also returned, indicating whether the result
+    /// is less than, equal to, or greater than the exact smaller value. Although `NaN`s are not
+    /// comparable to any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison is exact, and only the winning operand is rounded. Converting the
+    /// [`Rational`] to a [`Float`] first could select the wrong operand, when the conversion
+    /// crosses the other operand's value.
+    ///
+    /// Special cases:
+    /// - If the [`Float`] is `NaN`, the [`Rational`] operand is returned (rounded), as with the
+    ///   [`Float`]-[`Float`] functions.
+    /// - If the operands are equal, the [`Float`] operand is returned (rounded), so a negative zero
+    ///   is preserved.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits())`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` and the winning operand is not exactly representable with the
+    /// output precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (r, o) =
+    ///     Float::from(3u32).min_rational_round_ref_ref(&Rational::from_signeds(22, 7), Floor);
+    /// assert_eq!(r.to_string(), "3.0");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn min_rational_round_ref_ref(
+        &self,
+        other: &Rational,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        let prec = self.significant_bits();
+        self.min_rational_prec_round_ref_ref(other, prec, rm)
+    }
+
+    /// Computes the smaller of a [`Float`] and a [`Rational`], rounding the result to the nearest
+    /// value of the [`Float`]'s precision. The [`Float`] and the [`Rational`] are both taken by
+    /// value. An [`Ordering`] is also returned, indicating whether the result is less than, equal
+    /// to, or greater than the exact smaller value. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison is exact, and only the winning operand is rounded. Converting the
+    /// [`Rational`] to a [`Float`] first could select the wrong operand, when the conversion
+    /// crosses the other operand's value.
+    ///
+    /// Special cases:
+    /// - If the [`Float`] is `NaN`, the [`Rational`] operand is returned (rounded), as with the
+    ///   [`Float`]-[`Float`] functions.
+    /// - If the operands are equal, the [`Float`] operand is returned (rounded), so a negative zero
+    ///   is preserved.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits())`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (r, o) = Float::from(3u32).min_rational(Rational::from_signeds(22, 7));
+    /// assert_eq!(r.to_string(), "3.0");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn min_rational(self, other: Rational) -> (Self, Ordering) {
+        self.min_rational_round(other, Nearest)
+    }
+
+    /// Computes the smaller of a [`Float`] and a [`Rational`], rounding the result to the nearest
+    /// value of the [`Float`]'s precision. The [`Float`] is taken by value and the [`Rational`] by
+    /// reference. An [`Ordering`] is also returned, indicating whether the result is less than,
+    /// equal to, or greater than the exact smaller value. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison is exact, and only the winning operand is rounded. Converting the
+    /// [`Rational`] to a [`Float`] first could select the wrong operand, when the conversion
+    /// crosses the other operand's value.
+    ///
+    /// Special cases:
+    /// - If the [`Float`] is `NaN`, the [`Rational`] operand is returned (rounded), as with the
+    ///   [`Float`]-[`Float`] functions.
+    /// - If the operands are equal, the [`Float`] operand is returned (rounded), so a negative zero
+    ///   is preserved.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits())`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (r, o) = Float::from(3u32).min_rational_val_ref(&Rational::from_signeds(22, 7));
+    /// assert_eq!(r.to_string(), "3.0");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn min_rational_val_ref(self, other: &Rational) -> (Self, Ordering) {
+        self.min_rational_round_val_ref(other, Nearest)
+    }
+
+    /// Computes the smaller of a [`Float`] and a [`Rational`], rounding the result to the nearest
+    /// value of the [`Float`]'s precision. The [`Float`] is taken by reference and the [`Rational`]
+    /// by value. An [`Ordering`] is also returned, indicating whether the result is less than,
+    /// equal to, or greater than the exact smaller value. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison is exact, and only the winning operand is rounded. Converting the
+    /// [`Rational`] to a [`Float`] first could select the wrong operand, when the conversion
+    /// crosses the other operand's value.
+    ///
+    /// Special cases:
+    /// - If the [`Float`] is `NaN`, the [`Rational`] operand is returned (rounded), as with the
+    ///   [`Float`]-[`Float`] functions.
+    /// - If the operands are equal, the [`Float`] operand is returned (rounded), so a negative zero
+    ///   is preserved.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits())`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (r, o) = Float::from(3u32).min_rational_ref_val(Rational::from_signeds(22, 7));
+    /// assert_eq!(r.to_string(), "3.0");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn min_rational_ref_val(&self, other: Rational) -> (Self, Ordering) {
+        self.min_rational_round_ref_val(other, Nearest)
+    }
+
+    /// Computes the smaller of a [`Float`] and a [`Rational`], rounding the result to the nearest
+    /// value of the [`Float`]'s precision. The [`Float`] and the [`Rational`] are both taken by
+    /// reference. An [`Ordering`] is also returned, indicating whether the result is less than,
+    /// equal to, or greater than the exact smaller value. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison is exact, and only the winning operand is rounded. Converting the
+    /// [`Rational`] to a [`Float`] first could select the wrong operand, when the conversion
+    /// crosses the other operand's value.
+    ///
+    /// Special cases:
+    /// - If the [`Float`] is `NaN`, the [`Rational`] operand is returned (rounded), as with the
+    ///   [`Float`]-[`Float`] functions.
+    /// - If the operands are equal, the [`Float`] operand is returned (rounded), so a negative zero
+    ///   is preserved.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits())`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (r, o) = Float::from(3u32).min_rational_ref_ref(&Rational::from_signeds(22, 7));
+    /// assert_eq!(r.to_string(), "3.0");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn min_rational_ref_ref(&self, other: &Rational) -> (Self, Ordering) {
+        self.min_rational_round_ref_ref(other, Nearest)
+    }
+
+    /// Computes the larger of a [`Float`] and a [`Rational`], rounding the result to the specified
+    /// precision and with the specified rounding mode. The [`Float`] and the [`Rational`] are both
+    /// taken by value. An [`Ordering`] is also returned, indicating whether the result is less
+    /// than, equal to, or greater than the exact larger value. Although `NaN`s are not comparable
+    /// to any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison is exact, and only the winning operand is rounded. Converting the
+    /// [`Rational`] to a [`Float`] first could select the wrong operand, when the conversion
+    /// crosses the other operand's value.
+    ///
+    /// Special cases:
+    /// - If the [`Float`] is `NaN`, the [`Rational`] operand is returned (rounded), as with the
+    ///   [`Float`]-[`Float`] functions.
+    /// - If the operands are equal, the [`Float`] operand is returned (rounded), except that a
+    ///   negative zero loses the tie against the (unsigned, treated as positive) zero [`Rational`]:
+    ///   the result is then a positive zero, matching the positive-zero preference of `mpfr_max`.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits(), prec)`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` and the winning operand is not exactly
+    /// representable with `prec` bits.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (r, o) =
+    ///     Float::from(3u32).max_rational_prec_round(Rational::from_signeds(22, 7), 5, Floor);
+    /// assert_eq!(r.to_string(), "3.12");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (r, o) =
+    ///     Float::from(3u32).max_rational_prec_round(Rational::from_signeds(22, 7), 5, Ceiling);
+    /// assert_eq!(r.to_string(), "3.25");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    #[inline]
+    pub fn max_rational_prec_round(
+        self,
+        other: Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        max_rational_helper(&self, &other, prec, rm)
+    }
+
+    /// Computes the larger of a [`Float`] and a [`Rational`], rounding the result to the specified
+    /// precision and with the specified rounding mode. The [`Float`] is taken by value and the
+    /// [`Rational`] by reference. An [`Ordering`] is also returned, indicating whether the result
+    /// is less than, equal to, or greater than the exact larger value. Although `NaN`s are not
+    /// comparable to any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison is exact, and only the winning operand is rounded. Converting the
+    /// [`Rational`] to a [`Float`] first could select the wrong operand, when the conversion
+    /// crosses the other operand's value.
+    ///
+    /// Special cases:
+    /// - If the [`Float`] is `NaN`, the [`Rational`] operand is returned (rounded), as with the
+    ///   [`Float`]-[`Float`] functions.
+    /// - If the operands are equal, the [`Float`] operand is returned (rounded), except that a
+    ///   negative zero loses the tie against the (unsigned, treated as positive) zero [`Rational`]:
+    ///   the result is then a positive zero, matching the positive-zero preference of `mpfr_max`.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits(), prec)`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` and the winning operand is not exactly
+    /// representable with `prec` bits.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let x = Float::from(3u32);
+    /// let y = Rational::from_signeds(22, 7);
+    /// let (r, o) = x.max_rational_prec_round_val_ref(&y, 5, Floor);
+    /// assert_eq!(r.to_string(), "3.12");
+    /// assert_eq!(o, Less);
+    ///
+    /// let x = Float::from(3u32);
+    /// let y = Rational::from_signeds(22, 7);
+    /// let (r, o) = x.max_rational_prec_round_val_ref(&y, 5, Ceiling);
+    /// assert_eq!(r.to_string(), "3.25");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn max_rational_prec_round_val_ref(
+        self,
+        other: &Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        max_rational_helper(&self, other, prec, rm)
+    }
+
+    /// Computes the larger of a [`Float`] and a [`Rational`], rounding the result to the specified
+    /// precision and with the specified rounding mode. The [`Float`] is taken by reference and the
+    /// [`Rational`] by value. An [`Ordering`] is also returned, indicating whether the result is
+    /// less than, equal to, or greater than the exact larger value. Although `NaN`s are not
+    /// comparable to any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison is exact, and only the winning operand is rounded. Converting the
+    /// [`Rational`] to a [`Float`] first could select the wrong operand, when the conversion
+    /// crosses the other operand's value.
+    ///
+    /// Special cases:
+    /// - If the [`Float`] is `NaN`, the [`Rational`] operand is returned (rounded), as with the
+    ///   [`Float`]-[`Float`] functions.
+    /// - If the operands are equal, the [`Float`] operand is returned (rounded), except that a
+    ///   negative zero loses the tie against the (unsigned, treated as positive) zero [`Rational`]:
+    ///   the result is then a positive zero, matching the positive-zero preference of `mpfr_max`.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits(), prec)`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` and the winning operand is not exactly
+    /// representable with `prec` bits.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let x = Float::from(3u32);
+    /// let y = Rational::from_signeds(22, 7);
+    /// let (r, o) = x.max_rational_prec_round_ref_val(y, 5, Floor);
+    /// assert_eq!(r.to_string(), "3.12");
+    /// assert_eq!(o, Less);
+    ///
+    /// let x = Float::from(3u32);
+    /// let y = Rational::from_signeds(22, 7);
+    /// let (r, o) = x.max_rational_prec_round_ref_val(y, 5, Ceiling);
+    /// assert_eq!(r.to_string(), "3.25");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    #[inline]
+    pub fn max_rational_prec_round_ref_val(
+        &self,
+        other: Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        max_rational_helper(self, &other, prec, rm)
+    }
+
+    /// Computes the larger of a [`Float`] and a [`Rational`], rounding the result to the specified
+    /// precision and with the specified rounding mode. The [`Float`] and the [`Rational`] are both
+    /// taken by reference. An [`Ordering`] is also returned, indicating whether the result is less
+    /// than, equal to, or greater than the exact larger value. Although `NaN`s are not comparable
+    /// to any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison is exact, and only the winning operand is rounded. Converting the
+    /// [`Rational`] to a [`Float`] first could select the wrong operand, when the conversion
+    /// crosses the other operand's value.
+    ///
+    /// Special cases:
+    /// - If the [`Float`] is `NaN`, the [`Rational`] operand is returned (rounded), as with the
+    ///   [`Float`]-[`Float`] functions.
+    /// - If the operands are equal, the [`Float`] operand is returned (rounded), except that a
+    ///   negative zero loses the tie against the (unsigned, treated as positive) zero [`Rational`]:
+    ///   the result is then a positive zero, matching the positive-zero preference of `mpfr_max`.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits(), prec)`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` and the winning operand is not exactly
+    /// representable with `prec` bits.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let x = Float::from(3u32);
+    /// let y = Rational::from_signeds(22, 7);
+    /// let (r, o) = x.max_rational_prec_round_ref_ref(&y, 5, Floor);
+    /// assert_eq!(r.to_string(), "3.12");
+    /// assert_eq!(o, Less);
+    ///
+    /// let x = Float::from(3u32);
+    /// let y = Rational::from_signeds(22, 7);
+    /// let (r, o) = x.max_rational_prec_round_ref_ref(&y, 5, Ceiling);
+    /// assert_eq!(r.to_string(), "3.25");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn max_rational_prec_round_ref_ref(
+        &self,
+        other: &Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        max_rational_helper(self, other, prec, rm)
+    }
+
+    /// Computes the larger of a [`Float`] and a [`Rational`], rounding the result to the nearest
+    /// value of the specified precision. The [`Float`] and the [`Rational`] are both taken by
+    /// value. An [`Ordering`] is also returned, indicating whether the result is less than, equal
+    /// to, or greater than the exact larger value. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison is exact, and only the winning operand is rounded. Converting the
+    /// [`Rational`] to a [`Float`] first could select the wrong operand, when the conversion
+    /// crosses the other operand's value.
+    ///
+    /// Special cases:
+    /// - If the [`Float`] is `NaN`, the [`Rational`] operand is returned (rounded), as with the
+    ///   [`Float`]-[`Float`] functions.
+    /// - If the operands are equal, the [`Float`] operand is returned (rounded), except that a
+    ///   negative zero loses the tie against the (unsigned, treated as positive) zero [`Rational`]:
+    ///   the result is then a positive zero, matching the positive-zero preference of `mpfr_max`.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits(), prec)`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (r, o) = Float::from(3u32).max_rational_prec(Rational::from_signeds(22, 7), 5);
+    /// assert_eq!(r.to_string(), "3.12");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn max_rational_prec(self, other: Rational, prec: u64) -> (Self, Ordering) {
+        self.max_rational_prec_round(other, prec, Nearest)
+    }
+
+    /// Computes the larger of a [`Float`] and a [`Rational`], rounding the result to the nearest
+    /// value of the specified precision. The [`Float`] is taken by value and the [`Rational`] by
+    /// reference. An [`Ordering`] is also returned, indicating whether the result is less than,
+    /// equal to, or greater than the exact larger value. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison is exact, and only the winning operand is rounded. Converting the
+    /// [`Rational`] to a [`Float`] first could select the wrong operand, when the conversion
+    /// crosses the other operand's value.
+    ///
+    /// Special cases:
+    /// - If the [`Float`] is `NaN`, the [`Rational`] operand is returned (rounded), as with the
+    ///   [`Float`]-[`Float`] functions.
+    /// - If the operands are equal, the [`Float`] operand is returned (rounded), except that a
+    ///   negative zero loses the tie against the (unsigned, treated as positive) zero [`Rational`]:
+    ///   the result is then a positive zero, matching the positive-zero preference of `mpfr_max`.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits(), prec)`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (r, o) = Float::from(3u32).max_rational_prec_val_ref(&Rational::from_signeds(22, 7), 5);
+    /// assert_eq!(r.to_string(), "3.12");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn max_rational_prec_val_ref(self, other: &Rational, prec: u64) -> (Self, Ordering) {
+        self.max_rational_prec_round_val_ref(other, prec, Nearest)
+    }
+
+    /// Computes the larger of a [`Float`] and a [`Rational`], rounding the result to the nearest
+    /// value of the specified precision. The [`Float`] is taken by reference and the [`Rational`]
+    /// by value. An [`Ordering`] is also returned, indicating whether the result is less than,
+    /// equal to, or greater than the exact larger value. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison is exact, and only the winning operand is rounded. Converting the
+    /// [`Rational`] to a [`Float`] first could select the wrong operand, when the conversion
+    /// crosses the other operand's value.
+    ///
+    /// Special cases:
+    /// - If the [`Float`] is `NaN`, the [`Rational`] operand is returned (rounded), as with the
+    ///   [`Float`]-[`Float`] functions.
+    /// - If the operands are equal, the [`Float`] operand is returned (rounded), except that a
+    ///   negative zero loses the tie against the (unsigned, treated as positive) zero [`Rational`]:
+    ///   the result is then a positive zero, matching the positive-zero preference of `mpfr_max`.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits(), prec)`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (r, o) = Float::from(3u32).max_rational_prec_ref_val(Rational::from_signeds(22, 7), 5);
+    /// assert_eq!(r.to_string(), "3.12");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn max_rational_prec_ref_val(&self, other: Rational, prec: u64) -> (Self, Ordering) {
+        self.max_rational_prec_round_ref_val(other, prec, Nearest)
+    }
+
+    /// Computes the larger of a [`Float`] and a [`Rational`], rounding the result to the nearest
+    /// value of the specified precision. The [`Float`] and the [`Rational`] are both taken by
+    /// reference. An [`Ordering`] is also returned, indicating whether the result is less than,
+    /// equal to, or greater than the exact larger value. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison is exact, and only the winning operand is rounded. Converting the
+    /// [`Rational`] to a [`Float`] first could select the wrong operand, when the conversion
+    /// crosses the other operand's value.
+    ///
+    /// Special cases:
+    /// - If the [`Float`] is `NaN`, the [`Rational`] operand is returned (rounded), as with the
+    ///   [`Float`]-[`Float`] functions.
+    /// - If the operands are equal, the [`Float`] operand is returned (rounded), except that a
+    ///   negative zero loses the tie against the (unsigned, treated as positive) zero [`Rational`]:
+    ///   the result is then a positive zero, matching the positive-zero preference of `mpfr_max`.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits(), prec)`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (r, o) = Float::from(3u32).max_rational_prec_ref_ref(&Rational::from_signeds(22, 7), 5);
+    /// assert_eq!(r.to_string(), "3.12");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn max_rational_prec_ref_ref(&self, other: &Rational, prec: u64) -> (Self, Ordering) {
+        self.max_rational_prec_round_ref_ref(other, prec, Nearest)
+    }
+
+    /// Computes the larger of a [`Float`] and a [`Rational`], rounding the result to the
+    /// [`Float`]'s precision, with the specified rounding mode. The [`Float`] and the [`Rational`]
+    /// are both taken by value. An [`Ordering`] is also returned, indicating whether the result is
+    /// less than, equal to, or greater than the exact larger value. Although `NaN`s are not
+    /// comparable to any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison is exact, and only the winning operand is rounded. Converting the
+    /// [`Rational`] to a [`Float`] first could select the wrong operand, when the conversion
+    /// crosses the other operand's value.
+    ///
+    /// Special cases:
+    /// - If the [`Float`] is `NaN`, the [`Rational`] operand is returned (rounded), as with the
+    ///   [`Float`]-[`Float`] functions.
+    /// - If the operands are equal, the [`Float`] operand is returned (rounded), except that a
+    ///   negative zero loses the tie against the (unsigned, treated as positive) zero [`Rational`]:
+    ///   the result is then a positive zero, matching the positive-zero preference of `mpfr_max`.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits())`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` and the winning operand is not exactly representable with the
+    /// output precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (r, o) = Float::from(3u32).max_rational_round(Rational::from_signeds(22, 7), Floor);
+    /// assert_eq!(r.to_string(), "3.0");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn max_rational_round(self, other: Rational, rm: RoundingMode) -> (Self, Ordering) {
+        let prec = self.significant_bits();
+        self.max_rational_prec_round(other, prec, rm)
+    }
+
+    /// Computes the larger of a [`Float`] and a [`Rational`], rounding the result to the
+    /// [`Float`]'s precision, with the specified rounding mode. The [`Float`] is taken by value and
+    /// the [`Rational`] by reference. An [`Ordering`] is also returned, indicating whether the
+    /// result is less than, equal to, or greater than the exact larger value. Although `NaN`s are
+    /// not comparable to any [`Float`], whenever this function returns a `NaN` it also returns
+    /// `Equal`.
+    ///
+    /// The comparison is exact, and only the winning operand is rounded. Converting the
+    /// [`Rational`] to a [`Float`] first could select the wrong operand, when the conversion
+    /// crosses the other operand's value.
+    ///
+    /// Special cases:
+    /// - If the [`Float`] is `NaN`, the [`Rational`] operand is returned (rounded), as with the
+    ///   [`Float`]-[`Float`] functions.
+    /// - If the operands are equal, the [`Float`] operand is returned (rounded), except that a
+    ///   negative zero loses the tie against the (unsigned, treated as positive) zero [`Rational`]:
+    ///   the result is then a positive zero, matching the positive-zero preference of `mpfr_max`.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits())`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` and the winning operand is not exactly representable with the
+    /// output precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (r, o) =
+    ///     Float::from(3u32).max_rational_round_val_ref(&Rational::from_signeds(22, 7), Floor);
+    /// assert_eq!(r.to_string(), "3.0");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn max_rational_round_val_ref(
+        self,
+        other: &Rational,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        let prec = self.significant_bits();
+        self.max_rational_prec_round_val_ref(other, prec, rm)
+    }
+
+    /// Computes the larger of a [`Float`] and a [`Rational`], rounding the result to the
+    /// [`Float`]'s precision, with the specified rounding mode. The [`Float`] is taken by reference
+    /// and the [`Rational`] by value. An [`Ordering`] is also returned, indicating whether the
+    /// result is less than, equal to, or greater than the exact larger value. Although `NaN`s are
+    /// not comparable to any [`Float`], whenever this function returns a `NaN` it also returns
+    /// `Equal`.
+    ///
+    /// The comparison is exact, and only the winning operand is rounded. Converting the
+    /// [`Rational`] to a [`Float`] first could select the wrong operand, when the conversion
+    /// crosses the other operand's value.
+    ///
+    /// Special cases:
+    /// - If the [`Float`] is `NaN`, the [`Rational`] operand is returned (rounded), as with the
+    ///   [`Float`]-[`Float`] functions.
+    /// - If the operands are equal, the [`Float`] operand is returned (rounded), except that a
+    ///   negative zero loses the tie against the (unsigned, treated as positive) zero [`Rational`]:
+    ///   the result is then a positive zero, matching the positive-zero preference of `mpfr_max`.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits())`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` and the winning operand is not exactly representable with the
+    /// output precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (r, o) =
+    ///     Float::from(3u32).max_rational_round_ref_val(Rational::from_signeds(22, 7), Floor);
+    /// assert_eq!(r.to_string(), "3.0");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn max_rational_round_ref_val(
+        &self,
+        other: Rational,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        let prec = self.significant_bits();
+        self.max_rational_prec_round_ref_val(other, prec, rm)
+    }
+
+    /// Computes the larger of a [`Float`] and a [`Rational`], rounding the result to the
+    /// [`Float`]'s precision, with the specified rounding mode. The [`Float`] and the [`Rational`]
+    /// are both taken by reference. An [`Ordering`] is also returned, indicating whether the result
+    /// is less than, equal to, or greater than the exact larger value. Although `NaN`s are not
+    /// comparable to any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison is exact, and only the winning operand is rounded. Converting the
+    /// [`Rational`] to a [`Float`] first could select the wrong operand, when the conversion
+    /// crosses the other operand's value.
+    ///
+    /// Special cases:
+    /// - If the [`Float`] is `NaN`, the [`Rational`] operand is returned (rounded), as with the
+    ///   [`Float`]-[`Float`] functions.
+    /// - If the operands are equal, the [`Float`] operand is returned (rounded), except that a
+    ///   negative zero loses the tie against the (unsigned, treated as positive) zero [`Rational`]:
+    ///   the result is then a positive zero, matching the positive-zero preference of `mpfr_max`.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits())`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` and the winning operand is not exactly representable with the
+    /// output precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (r, o) =
+    ///     Float::from(3u32).max_rational_round_ref_ref(&Rational::from_signeds(22, 7), Floor);
+    /// assert_eq!(r.to_string(), "3.0");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn max_rational_round_ref_ref(
+        &self,
+        other: &Rational,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        let prec = self.significant_bits();
+        self.max_rational_prec_round_ref_ref(other, prec, rm)
+    }
+
+    /// Computes the larger of a [`Float`] and a [`Rational`], rounding the result to the nearest
+    /// value of the [`Float`]'s precision. The [`Float`] and the [`Rational`] are both taken by
+    /// value. An [`Ordering`] is also returned, indicating whether the result is less than, equal
+    /// to, or greater than the exact larger value. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison is exact, and only the winning operand is rounded. Converting the
+    /// [`Rational`] to a [`Float`] first could select the wrong operand, when the conversion
+    /// crosses the other operand's value.
+    ///
+    /// Special cases:
+    /// - If the [`Float`] is `NaN`, the [`Rational`] operand is returned (rounded), as with the
+    ///   [`Float`]-[`Float`] functions.
+    /// - If the operands are equal, the [`Float`] operand is returned (rounded), except that a
+    ///   negative zero loses the tie against the (unsigned, treated as positive) zero [`Rational`]:
+    ///   the result is then a positive zero, matching the positive-zero preference of `mpfr_max`.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits())`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (r, o) = Float::from(3u32).max_rational(Rational::from_signeds(22, 7));
+    /// assert_eq!(r.to_string(), "3.0");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn max_rational(self, other: Rational) -> (Self, Ordering) {
+        self.max_rational_round(other, Nearest)
+    }
+
+    /// Computes the larger of a [`Float`] and a [`Rational`], rounding the result to the nearest
+    /// value of the [`Float`]'s precision. The [`Float`] is taken by value and the [`Rational`] by
+    /// reference. An [`Ordering`] is also returned, indicating whether the result is less than,
+    /// equal to, or greater than the exact larger value. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison is exact, and only the winning operand is rounded. Converting the
+    /// [`Rational`] to a [`Float`] first could select the wrong operand, when the conversion
+    /// crosses the other operand's value.
+    ///
+    /// Special cases:
+    /// - If the [`Float`] is `NaN`, the [`Rational`] operand is returned (rounded), as with the
+    ///   [`Float`]-[`Float`] functions.
+    /// - If the operands are equal, the [`Float`] operand is returned (rounded), except that a
+    ///   negative zero loses the tie against the (unsigned, treated as positive) zero [`Rational`]:
+    ///   the result is then a positive zero, matching the positive-zero preference of `mpfr_max`.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits())`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (r, o) = Float::from(3u32).max_rational_val_ref(&Rational::from_signeds(22, 7));
+    /// assert_eq!(r.to_string(), "3.0");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn max_rational_val_ref(self, other: &Rational) -> (Self, Ordering) {
+        self.max_rational_round_val_ref(other, Nearest)
+    }
+
+    /// Computes the larger of a [`Float`] and a [`Rational`], rounding the result to the nearest
+    /// value of the [`Float`]'s precision. The [`Float`] is taken by reference and the [`Rational`]
+    /// by value. An [`Ordering`] is also returned, indicating whether the result is less than,
+    /// equal to, or greater than the exact larger value. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison is exact, and only the winning operand is rounded. Converting the
+    /// [`Rational`] to a [`Float`] first could select the wrong operand, when the conversion
+    /// crosses the other operand's value.
+    ///
+    /// Special cases:
+    /// - If the [`Float`] is `NaN`, the [`Rational`] operand is returned (rounded), as with the
+    ///   [`Float`]-[`Float`] functions.
+    /// - If the operands are equal, the [`Float`] operand is returned (rounded), except that a
+    ///   negative zero loses the tie against the (unsigned, treated as positive) zero [`Rational`]:
+    ///   the result is then a positive zero, matching the positive-zero preference of `mpfr_max`.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits())`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (r, o) = Float::from(3u32).max_rational_ref_val(Rational::from_signeds(22, 7));
+    /// assert_eq!(r.to_string(), "3.0");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn max_rational_ref_val(&self, other: Rational) -> (Self, Ordering) {
+        self.max_rational_round_ref_val(other, Nearest)
+    }
+
+    /// Computes the larger of a [`Float`] and a [`Rational`], rounding the result to the nearest
+    /// value of the [`Float`]'s precision. The [`Float`] and the [`Rational`] are both taken by
+    /// reference. An [`Ordering`] is also returned, indicating whether the result is less than,
+    /// equal to, or greater than the exact larger value. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison is exact, and only the winning operand is rounded. Converting the
+    /// [`Rational`] to a [`Float`] first could select the wrong operand, when the conversion
+    /// crosses the other operand's value.
+    ///
+    /// Special cases:
+    /// - If the [`Float`] is `NaN`, the [`Rational`] operand is returned (rounded), as with the
+    ///   [`Float`]-[`Float`] functions.
+    /// - If the operands are equal, the [`Float`] operand is returned (rounded), except that a
+    ///   negative zero loses the tie against the (unsigned, treated as positive) zero [`Rational`]:
+    ///   the result is then a positive zero, matching the positive-zero preference of `mpfr_max`.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits())`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (r, o) = Float::from(3u32).max_rational_ref_ref(&Rational::from_signeds(22, 7));
+    /// assert_eq!(r.to_string(), "3.0");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn max_rational_ref_ref(&self, other: &Rational) -> (Self, Ordering) {
+        self.max_rational_round_ref_ref(other, Nearest)
     }
 }

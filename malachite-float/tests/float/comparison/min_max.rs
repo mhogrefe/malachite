@@ -6,7 +6,11 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::basic::traits::{Infinity, NaN, NegativeInfinity, One, Two};
+use malachite_base::assert_panic;
+use malachite_base::num::arithmetic::traits::NegAssign;
+use malachite_base::num::basic::traits::{
+    Infinity, NaN, NegativeInfinity, NegativeZero, One, Two, Zero,
+};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
@@ -22,10 +26,14 @@ use malachite_float::test_util::generators::{
     float_float_rounding_mode_triple_gen_var_39,
     float_float_unsigned_rounding_mode_quadruple_gen_var_16,
     float_float_unsigned_rounding_mode_quadruple_gen_var_17, float_float_unsigned_triple_gen_var_1,
-    float_gen, float_pair_gen, float_pair_gen_var_10,
-    float_unsigned_rounding_mode_triple_gen_var_1,
+    float_gen, float_pair_gen, float_pair_gen_var_10, float_rational_pair_gen,
+    float_rational_rounding_mode_triple_gen_var_20, float_rational_rounding_mode_triple_gen_var_21,
+    float_rational_unsigned_rounding_mode_quadruple_gen_var_21,
+    float_rational_unsigned_rounding_mode_quadruple_gen_var_22,
+    float_rational_unsigned_triple_gen_var_1, float_unsigned_rounding_mode_triple_gen_var_1,
 };
-use malachite_float::{ComparableFloatRef, Float};
+use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
+use malachite_q::Rational;
 use std::cmp::Ordering::{self, *};
 use std::cmp::max;
 use std::panic::catch_unwind;
@@ -1380,4 +1388,895 @@ fn max_properties() {
         assert_eq!(ComparableFloatRef(&max), ComparableFloatRef(&x));
         assert_eq!(o, Equal);
     });
+}
+
+// The mixed Float-Rational min and max: the comparison is exact and only the winner is rounded.
+#[test]
+fn test_min_max_rational() {
+    let third = Rational::from_signeds(1i32, 3i32);
+    // the Float wins
+    let x = Float::from(0.25f64);
+    let (r, o) = x.min_rational_prec_round_ref_ref(&third, 10, Nearest);
+    assert_eq!(
+        ComparableFloat(r),
+        ComparableFloat(Float::from_float_prec_round_ref(&x, 10, Nearest).0)
+    );
+    assert_eq!(o, Equal);
+    let (r, o) = x.max_rational_prec_round_ref_ref(&third, 10, Nearest);
+    let (expected, expected_o) = Float::from_rational_prec_round_ref(&third, 10, Nearest);
+    assert_eq!(ComparableFloat(r), ComparableFloat(expected));
+    assert_eq!(o, expected_o);
+    // a NaN Float yields the other operand, as in the Float-Float functions
+    let (r, o) = Float::NAN.min_rational_prec_round_ref_ref(&third, 10, Nearest);
+    let (expected, expected_o) = Float::from_rational_prec_round_ref(&third, 10, Nearest);
+    assert_eq!(ComparableFloat(r), ComparableFloat(expected));
+    assert_eq!(o, expected_o);
+    let (r, _) = Float::NAN.max_rational_prec_round_ref_ref(&third, 10, Nearest);
+    assert!(!r.is_nan());
+    // infinities compare exactly
+    let (r, _) = Float::INFINITY.min_rational_prec_round_ref_ref(&third, 10, Nearest);
+    assert_eq!(
+        ComparableFloat(r),
+        ComparableFloat(Float::from_rational_prec_round_ref(&third, 10, Nearest).0)
+    );
+    let (r, _) = Float::NEGATIVE_INFINITY.min_rational_prec_round_ref_ref(&third, 10, Nearest);
+    assert_eq!(
+        ComparableFloat(r),
+        ComparableFloat(Float::NEGATIVE_INFINITY)
+    );
+    // zero ties: min preserves the negative zero, max prefers the positive zero
+    let (r, o) = Float::NEGATIVE_ZERO.min_rational_prec_round_ref_ref(&Rational::ZERO, 10, Nearest);
+    assert_eq!(ComparableFloat(r), ComparableFloat(Float::NEGATIVE_ZERO));
+    assert_eq!(o, Equal);
+    let (r, o) = Float::NEGATIVE_ZERO.max_rational_prec_round_ref_ref(&Rational::ZERO, 10, Nearest);
+    assert_eq!(ComparableFloat(r), ComparableFloat(Float::ZERO));
+    assert_eq!(o, Equal);
+    let (r, _) = Float::ZERO.min_rational_prec_round_ref_ref(&Rational::ZERO, 10, Nearest);
+    assert_eq!(ComparableFloat(r), ComparableFloat(Float::ZERO));
+    // the boundary case that motivates the mixed function: q is just below x, so q is the true
+    // minimum, even though q rounds (at the output precision) to x's value
+    let x = Float::ONE;
+    let q = Rational::ONE - (Rational::ONE >> 100i64);
+    let (r, o) = x.min_rational_prec_round_ref_ref(&q, 1, Nearest);
+    assert_eq!(r.to_string(), "1.0");
+    assert_eq!(o, Greater);
+    // pre-converting q would instead compare 1.0 with 1.0 and report an exact result
+    let qf = Float::from_rational_prec_round_ref(&q, 1, Nearest).0;
+    let (r_alt, o_alt) = x.min_prec_round_ref_ref(&qf, 1, Nearest);
+    assert_eq!(r_alt.to_string(), "1.0");
+    assert_eq!(o_alt, Equal);
+}
+
+#[allow(clippy::needless_pass_by_value)]
+fn min_max_rational_prec_round_properties_helper(
+    x: Float,
+    y: Rational,
+    prec: u64,
+    rm: RoundingMode,
+    is_max: bool,
+) {
+    type F = fn(&Float, &Rational, u64, RoundingMode) -> (Float, Ordering);
+    let f: F = if is_max {
+        Float::max_rational_prec_round_ref_ref
+    } else {
+        Float::min_rational_prec_round_ref_ref
+    };
+    let (result, o) = f(&x, &y, prec, rm);
+    assert!(result.is_valid());
+
+    if is_max {
+        let (r2, o2) = x.clone().max_rational_prec_round(y.clone(), prec, rm);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&result));
+        assert_eq!(o2, o);
+        let (r2, o2) = x.clone().max_rational_prec_round_val_ref(&y, prec, rm);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&result));
+        assert_eq!(o2, o);
+        let (r2, o2) = x.max_rational_prec_round_ref_val(y.clone(), prec, rm);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&result));
+        assert_eq!(o2, o);
+    } else {
+        let (r2, o2) = x.clone().min_rational_prec_round(y.clone(), prec, rm);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&result));
+        assert_eq!(o2, o);
+        let (r2, o2) = x.clone().min_rational_prec_round_val_ref(&y, prec, rm);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&result));
+        assert_eq!(o2, o);
+        let (r2, o2) = x.min_rational_prec_round_ref_val(y.clone(), prec, rm);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&result));
+        assert_eq!(o2, o);
+    }
+
+    if result.is_normal() {
+        assert_eq!(result.get_prec(), Some(prec));
+    }
+
+    // the result is the true winner, rounded
+    match x.partial_cmp(&y) {
+        None => {
+            let (expected, expected_o) = Float::from_rational_prec_round_ref(&y, prec, rm);
+            assert_eq!(ComparableFloatRef(&result), ComparableFloatRef(&expected));
+            assert_eq!(o, expected_o);
+        }
+        Some(c) => {
+            let float_wins = if is_max { c != Less } else { c != Greater };
+            if float_wins && !(c == Equal && is_max && x == 0u32 && !x.is_sign_positive()) {
+                let (expected, expected_o) = Float::from_float_prec_round_ref(&x, prec, rm);
+                assert_eq!(ComparableFloatRef(&result), ComparableFloatRef(&expected));
+                assert_eq!(o, expected_o);
+            } else if !float_wins {
+                let (expected, expected_o) = Float::from_rational_prec_round_ref(&y, prec, rm);
+                assert_eq!(ComparableFloatRef(&result), ComparableFloatRef(&expected));
+                assert_eq!(o, expected_o);
+            } else {
+                // max on a zero tie with a negative-zero Float prefers the positive zero
+                assert_eq!(
+                    ComparableFloat(result.clone()),
+                    ComparableFloat(Float::ZERO)
+                );
+                assert_eq!(o, Equal);
+            }
+        }
+    }
+
+    // min(x, y) = -max(-x, -y)
+    let (mut r2, o2) = if is_max {
+        Float::min_rational_prec_round_ref_ref(&-&x, &-&y, prec, -rm)
+    } else {
+        Float::max_rational_prec_round_ref_ref(&-&x, &-&y, prec, -rm)
+    };
+    r2.neg_assign();
+    assert_eq!(
+        ComparableFloat(r2.abs_negative_zero()),
+        ComparableFloat(result.abs_negative_zero_ref())
+    );
+    assert_eq!(o2.reverse(), o);
+
+    if o == Equal {
+        for rm in exhaustive_rounding_modes() {
+            let (s, oo) = f(&x, &y, prec, rm);
+            assert_eq!(
+                ComparableFloat(s.abs_negative_zero_ref()),
+                ComparableFloat(result.abs_negative_zero_ref())
+            );
+            assert_eq!(oo, Equal);
+        }
+    } else {
+        assert_panic!(f(&x, &y, prec, Exact));
+    }
+}
+
+#[test]
+fn min_rational_prec_round_properties() {
+    float_rational_unsigned_rounding_mode_quadruple_gen_var_21().test_properties(
+        |(x, y, prec, rm)| {
+            min_max_rational_prec_round_properties_helper(x, y, prec, rm, false);
+        },
+    );
+}
+
+#[test]
+fn max_rational_prec_round_properties() {
+    float_rational_unsigned_rounding_mode_quadruple_gen_var_22().test_properties(
+        |(x, y, prec, rm)| {
+            min_max_rational_prec_round_properties_helper(x, y, prec, rm, true);
+        },
+    );
+}
+
+// The shorthand levels agree with prec_round.
+#[test]
+fn min_max_rational_shorthand_properties() {
+    float_rational_unsigned_triple_gen_var_1().test_properties(|(x, y, prec)| {
+        let (r, o) = x.min_rational_prec_round_ref_ref(&y, prec, Nearest);
+        let (r2, o2) = x.min_rational_prec_ref_ref(&y, prec);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&r));
+        assert_eq!(o2, o);
+        let (r2, o2) = x.clone().min_rational_prec(y.clone(), prec);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&r));
+        assert_eq!(o2, o);
+        let (r, o) = x.max_rational_prec_round_ref_ref(&y, prec, Nearest);
+        let (r2, o2) = x.max_rational_prec_ref_ref(&y, prec);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&r));
+        assert_eq!(o2, o);
+    });
+
+    float_rational_rounding_mode_triple_gen_var_20().test_properties(|(x, y, rm)| {
+        let prec = x.significant_bits();
+        let (r, o) = x.min_rational_prec_round_ref_ref(&y, prec, rm);
+        let (r2, o2) = x.min_rational_round_ref_ref(&y, rm);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&r));
+        assert_eq!(o2, o);
+    });
+
+    float_rational_rounding_mode_triple_gen_var_21().test_properties(|(x, y, rm)| {
+        let prec = x.significant_bits();
+        let (r, o) = x.max_rational_prec_round_ref_ref(&y, prec, rm);
+        let (r2, o2) = x.max_rational_round_ref_ref(&y, rm);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&r));
+        assert_eq!(o2, o);
+    });
+
+    float_rational_pair_gen().test_properties(|(x, y)| {
+        let (r, o) = x.min_rational_round_ref_ref(&y, Nearest);
+        let (r2, o2) = x.min_rational_ref_ref(&y);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&r));
+        assert_eq!(o2, o);
+        let (r2, o2) = x.clone().min_rational(y.clone());
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&r));
+        assert_eq!(o2, o);
+        let (r, o) = x.max_rational_round_ref_ref(&y, Nearest);
+        let (r2, o2) = x.max_rational_ref_ref(&y);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&r));
+        assert_eq!(o2, o);
+        let (r2, o2) = x.clone().max_rational_val_ref(&y);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&r));
+        assert_eq!(o2, o);
+    });
+}
+
+#[test]
+fn test_min_max_rational_units() {
+    let test = |s,
+                s_hex,
+                t: &str,
+                min_out: &str,
+                min_hex: &str,
+                min_o: Ordering,
+                max_out: &str,
+                max_hex: &str,
+                max_o: Ordering| {
+        let x = parse_hex_string(s_hex);
+        assert_eq!(x.to_string(), s);
+        let y = t.parse::<Rational>().unwrap();
+
+        let (r, o) = x.min_rational_prec_round_ref_ref(&y, 10, Nearest);
+        assert!(r.is_valid());
+        assert_eq!(r.to_string(), min_out);
+        assert_eq!(to_hex_string(&r), min_hex);
+        assert_eq!(o, min_o);
+        let (r2, o2) = x.clone().min_rational_prec_round(y.clone(), 10, Nearest);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&r));
+        assert_eq!(o2, o);
+        let (r2, o2) = x.min_rational_prec_ref_ref(&y, 10);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&r));
+        assert_eq!(o2, o);
+
+        let (r, o) = x.max_rational_prec_round_ref_ref(&y, 10, Nearest);
+        assert!(r.is_valid());
+        assert_eq!(r.to_string(), max_out);
+        assert_eq!(to_hex_string(&r), max_hex);
+        assert_eq!(o, max_o);
+        let (r2, o2) = x.max_rational_prec_round_ref_val(y.clone(), 10, Nearest);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&r));
+        assert_eq!(o2, o);
+    };
+    // a NaN Float yields the Rational (rounded); infinities compare exactly; on zero ties min keeps
+    // the Float's zero and max prefers the positive zero; otherwise the true winner is rounded to
+    // precision 10
+    test(
+        "NaN",
+        "NaN",
+        "1/3",
+        "0.33350",
+        "0x0.556#10",
+        Greater,
+        "0.33350",
+        "0x0.556#10",
+        Greater,
+    );
+    test(
+        "NaN",
+        "NaN",
+        "-1/3",
+        "-0.33350",
+        "-0x0.556#10",
+        Less,
+        "-0.33350",
+        "-0x0.556#10",
+        Less,
+    );
+    test(
+        "NaN",
+        "NaN",
+        "22/7",
+        "3.1445",
+        "0x3.25#10",
+        Greater,
+        "3.1445",
+        "0x3.25#10",
+        Greater,
+    );
+    test(
+        "NaN",
+        "NaN",
+        "7",
+        "7.0000",
+        "0x7.00#10",
+        Equal,
+        "7.0000",
+        "0x7.00#10",
+        Equal,
+    );
+    test(
+        "NaN",
+        "NaN",
+        "3/8",
+        "0.37500",
+        "0x0.600#10",
+        Equal,
+        "0.37500",
+        "0x0.600#10",
+        Equal,
+    );
+    test(
+        "NaN", "NaN", "0", "0.0", "0x0.0", Equal, "0.0", "0x0.0", Equal,
+    );
+    test(
+        "Infinity",
+        "Infinity",
+        "1/3",
+        "0.33350",
+        "0x0.556#10",
+        Greater,
+        "Infinity",
+        "Infinity",
+        Equal,
+    );
+    test(
+        "Infinity",
+        "Infinity",
+        "-1/3",
+        "-0.33350",
+        "-0x0.556#10",
+        Less,
+        "Infinity",
+        "Infinity",
+        Equal,
+    );
+    test(
+        "Infinity",
+        "Infinity",
+        "22/7",
+        "3.1445",
+        "0x3.25#10",
+        Greater,
+        "Infinity",
+        "Infinity",
+        Equal,
+    );
+    test(
+        "Infinity",
+        "Infinity",
+        "7",
+        "7.0000",
+        "0x7.00#10",
+        Equal,
+        "Infinity",
+        "Infinity",
+        Equal,
+    );
+    test(
+        "Infinity",
+        "Infinity",
+        "3/8",
+        "0.37500",
+        "0x0.600#10",
+        Equal,
+        "Infinity",
+        "Infinity",
+        Equal,
+    );
+    test(
+        "Infinity", "Infinity", "0", "0.0", "0x0.0", Equal, "Infinity", "Infinity", Equal,
+    );
+    test(
+        "-Infinity",
+        "-Infinity",
+        "1/3",
+        "-Infinity",
+        "-Infinity",
+        Equal,
+        "0.33350",
+        "0x0.556#10",
+        Greater,
+    );
+    test(
+        "-Infinity",
+        "-Infinity",
+        "-1/3",
+        "-Infinity",
+        "-Infinity",
+        Equal,
+        "-0.33350",
+        "-0x0.556#10",
+        Less,
+    );
+    test(
+        "-Infinity",
+        "-Infinity",
+        "22/7",
+        "-Infinity",
+        "-Infinity",
+        Equal,
+        "3.1445",
+        "0x3.25#10",
+        Greater,
+    );
+    test(
+        "-Infinity",
+        "-Infinity",
+        "7",
+        "-Infinity",
+        "-Infinity",
+        Equal,
+        "7.0000",
+        "0x7.00#10",
+        Equal,
+    );
+    test(
+        "-Infinity",
+        "-Infinity",
+        "3/8",
+        "-Infinity",
+        "-Infinity",
+        Equal,
+        "0.37500",
+        "0x0.600#10",
+        Equal,
+    );
+    test(
+        "-Infinity",
+        "-Infinity",
+        "0",
+        "-Infinity",
+        "-Infinity",
+        Equal,
+        "0.0",
+        "0x0.0",
+        Equal,
+    );
+    test(
+        "0.0",
+        "0x0.0",
+        "1/3",
+        "0.0",
+        "0x0.0",
+        Equal,
+        "0.33350",
+        "0x0.556#10",
+        Greater,
+    );
+    test(
+        "0.0",
+        "0x0.0",
+        "-1/3",
+        "-0.33350",
+        "-0x0.556#10",
+        Less,
+        "0.0",
+        "0x0.0",
+        Equal,
+    );
+    test(
+        "0.0",
+        "0x0.0",
+        "22/7",
+        "0.0",
+        "0x0.0",
+        Equal,
+        "3.1445",
+        "0x3.25#10",
+        Greater,
+    );
+    test(
+        "0.0",
+        "0x0.0",
+        "7",
+        "0.0",
+        "0x0.0",
+        Equal,
+        "7.0000",
+        "0x7.00#10",
+        Equal,
+    );
+    test(
+        "0.0",
+        "0x0.0",
+        "3/8",
+        "0.0",
+        "0x0.0",
+        Equal,
+        "0.37500",
+        "0x0.600#10",
+        Equal,
+    );
+    test(
+        "0.0", "0x0.0", "0", "0.0", "0x0.0", Equal, "0.0", "0x0.0", Equal,
+    );
+    test(
+        "-0.0",
+        "-0x0.0",
+        "1/3",
+        "-0.0",
+        "-0x0.0",
+        Equal,
+        "0.33350",
+        "0x0.556#10",
+        Greater,
+    );
+    test(
+        "-0.0",
+        "-0x0.0",
+        "-1/3",
+        "-0.33350",
+        "-0x0.556#10",
+        Less,
+        "-0.0",
+        "-0x0.0",
+        Equal,
+    );
+    test(
+        "-0.0",
+        "-0x0.0",
+        "22/7",
+        "-0.0",
+        "-0x0.0",
+        Equal,
+        "3.1445",
+        "0x3.25#10",
+        Greater,
+    );
+    test(
+        "-0.0",
+        "-0x0.0",
+        "7",
+        "-0.0",
+        "-0x0.0",
+        Equal,
+        "7.0000",
+        "0x7.00#10",
+        Equal,
+    );
+    test(
+        "-0.0",
+        "-0x0.0",
+        "3/8",
+        "-0.0",
+        "-0x0.0",
+        Equal,
+        "0.37500",
+        "0x0.600#10",
+        Equal,
+    );
+    test(
+        "-0.0", "-0x0.0", "0", "-0.0", "-0x0.0", Equal, "0.0", "0x0.0", Equal,
+    );
+    test(
+        "10.0",
+        "0xa.0#3",
+        "1/3",
+        "0.33350",
+        "0x0.556#10",
+        Greater,
+        "10.000",
+        "0xa.00#10",
+        Equal,
+    );
+    test(
+        "10.0",
+        "0xa.0#3",
+        "-1/3",
+        "-0.33350",
+        "-0x0.556#10",
+        Less,
+        "10.000",
+        "0xa.00#10",
+        Equal,
+    );
+    test(
+        "10.0",
+        "0xa.0#3",
+        "22/7",
+        "3.1445",
+        "0x3.25#10",
+        Greater,
+        "10.000",
+        "0xa.00#10",
+        Equal,
+    );
+    test(
+        "10.0",
+        "0xa.0#3",
+        "7",
+        "7.0000",
+        "0x7.00#10",
+        Equal,
+        "10.000",
+        "0xa.00#10",
+        Equal,
+    );
+    test(
+        "10.0",
+        "0xa.0#3",
+        "3/8",
+        "0.37500",
+        "0x0.600#10",
+        Equal,
+        "10.000",
+        "0xa.00#10",
+        Equal,
+    );
+    test(
+        "10.0",
+        "0xa.0#3",
+        "0",
+        "0.0",
+        "0x0.0",
+        Equal,
+        "10.000",
+        "0xa.00#10",
+        Equal,
+    );
+    test(
+        "-10.0",
+        "-0xa.0#3",
+        "1/3",
+        "-10.000",
+        "-0xa.00#10",
+        Equal,
+        "0.33350",
+        "0x0.556#10",
+        Greater,
+    );
+    test(
+        "-10.0",
+        "-0xa.0#3",
+        "-1/3",
+        "-10.000",
+        "-0xa.00#10",
+        Equal,
+        "-0.33350",
+        "-0x0.556#10",
+        Less,
+    );
+    test(
+        "-10.0",
+        "-0xa.0#3",
+        "22/7",
+        "-10.000",
+        "-0xa.00#10",
+        Equal,
+        "3.1445",
+        "0x3.25#10",
+        Greater,
+    );
+    test(
+        "-10.0",
+        "-0xa.0#3",
+        "7",
+        "-10.000",
+        "-0xa.00#10",
+        Equal,
+        "7.0000",
+        "0x7.00#10",
+        Equal,
+    );
+    test(
+        "-10.0",
+        "-0xa.0#3",
+        "3/8",
+        "-10.000",
+        "-0xa.00#10",
+        Equal,
+        "0.37500",
+        "0x0.600#10",
+        Equal,
+    );
+    test(
+        "-10.0",
+        "-0xa.0#3",
+        "0",
+        "-10.000",
+        "-0xa.00#10",
+        Equal,
+        "0.0",
+        "0x0.0",
+        Equal,
+    );
+    test(
+        "3.0",
+        "0x3.0#2",
+        "1/3",
+        "0.33350",
+        "0x0.556#10",
+        Greater,
+        "3.0000",
+        "0x3.00#10",
+        Equal,
+    );
+    test(
+        "3.0",
+        "0x3.0#2",
+        "-1/3",
+        "-0.33350",
+        "-0x0.556#10",
+        Less,
+        "3.0000",
+        "0x3.00#10",
+        Equal,
+    );
+    test(
+        "3.0",
+        "0x3.0#2",
+        "22/7",
+        "3.0000",
+        "0x3.00#10",
+        Equal,
+        "3.1445",
+        "0x3.25#10",
+        Greater,
+    );
+    test(
+        "3.0",
+        "0x3.0#2",
+        "7",
+        "3.0000",
+        "0x3.00#10",
+        Equal,
+        "7.0000",
+        "0x7.00#10",
+        Equal,
+    );
+    test(
+        "3.0",
+        "0x3.0#2",
+        "3/8",
+        "0.37500",
+        "0x0.600#10",
+        Equal,
+        "3.0000",
+        "0x3.00#10",
+        Equal,
+    );
+    test(
+        "3.0",
+        "0x3.0#2",
+        "0",
+        "0.0",
+        "0x0.0",
+        Equal,
+        "3.0000",
+        "0x3.00#10",
+        Equal,
+    );
+    test(
+        "10.5",
+        "0xa.8#6",
+        "1/3",
+        "0.33350",
+        "0x0.556#10",
+        Greater,
+        "10.500",
+        "0xa.80#10",
+        Equal,
+    );
+    test(
+        "10.5",
+        "0xa.8#6",
+        "-1/3",
+        "-0.33350",
+        "-0x0.556#10",
+        Less,
+        "10.500",
+        "0xa.80#10",
+        Equal,
+    );
+    test(
+        "10.5",
+        "0xa.8#6",
+        "22/7",
+        "3.1445",
+        "0x3.25#10",
+        Greater,
+        "10.500",
+        "0xa.80#10",
+        Equal,
+    );
+    test(
+        "10.5",
+        "0xa.8#6",
+        "7",
+        "7.0000",
+        "0x7.00#10",
+        Equal,
+        "10.500",
+        "0xa.80#10",
+        Equal,
+    );
+    test(
+        "10.5",
+        "0xa.8#6",
+        "3/8",
+        "0.37500",
+        "0x0.600#10",
+        Equal,
+        "10.500",
+        "0xa.80#10",
+        Equal,
+    );
+    test(
+        "10.5",
+        "0xa.8#6",
+        "0",
+        "0.0",
+        "0x0.0",
+        Equal,
+        "10.500",
+        "0xa.80#10",
+        Equal,
+    );
+}
+
+#[test]
+fn test_min_max_rational_prec_round() {
+    let test = |s,
+                s_hex,
+                t: &str,
+                prec,
+                rm: RoundingMode,
+                min_out: &str,
+                min_hex: &str,
+                min_o: Ordering,
+                max_out: &str,
+                max_hex: &str,
+                max_o: Ordering| {
+        let x = parse_hex_string(s_hex);
+        assert_eq!(x.to_string(), s);
+        let y = t.parse::<Rational>().unwrap();
+
+        let (r, o) = x.min_rational_prec_round_ref_ref(&y, prec, rm);
+        assert_eq!(r.to_string(), min_out);
+        assert_eq!(to_hex_string(&r), min_hex);
+        assert_eq!(o, min_o);
+        let (r, o) = x.max_rational_prec_round_ref_ref(&y, prec, rm);
+        assert_eq!(r.to_string(), max_out);
+        assert_eq!(to_hex_string(&r), max_hex);
+        assert_eq!(o, max_o);
+    };
+    // rounding the winner: 3 vs 22/7 and 4 vs 22/7 at precision 2 under each direction
+    test(
+        "3.0", "0x3.0#2", "22/7", 2, Floor, "3.0", "0x3.0#2", Equal, "3.0", "0x3.0#2", Less,
+    );
+    test(
+        "3.0", "0x3.0#2", "22/7", 2, Ceiling, "3.0", "0x3.0#2", Equal, "4.0", "0x4.0#2", Greater,
+    );
+    test(
+        "3.0", "0x3.0#2", "22/7", 2, Nearest, "3.0", "0x3.0#2", Equal, "3.0", "0x3.0#2", Less,
+    );
+    test(
+        "4.0", "0x4.0#1", "22/7", 2, Floor, "3.0", "0x3.0#2", Less, "4.0", "0x4.0#2", Equal,
+    );
+    test(
+        "4.0", "0x4.0#1", "22/7", 2, Ceiling, "4.0", "0x4.0#2", Greater, "4.0", "0x4.0#2", Equal,
+    );
+}
+
+#[test]
+fn min_max_rational_fail() {
+    assert_panic!(Float::from(1u32).min_rational_prec_round(
+        Rational::from_signeds(22i32, 7i32),
+        0,
+        Nearest
+    ));
+    assert_panic!(Float::from(1u32).max_rational_prec_round(
+        Rational::from_signeds(22i32, 7i32),
+        0,
+        Nearest
+    ));
+    // Exact when the winner needs rounding
+    assert_panic!(Float::from(4u32).min_rational_prec_round(
+        Rational::from_signeds(22i32, 7i32),
+        2,
+        Exact
+    ));
 }

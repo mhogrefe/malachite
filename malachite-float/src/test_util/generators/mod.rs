@@ -3377,6 +3377,129 @@ pub fn float_rational_unsigned_rounding_mode_quadruple_gen_var_16()
 }
 
 // All `(Float, Rational, u64, RoundingMode)` that are valid inputs to
+// `Float::rem_rational_prec_round`.
+pub fn float_rational_unsigned_rounding_mode_quadruple_gen_var_17()
+-> Generator<(Float, Rational, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_rational_unsigned_rounding_mode_quadruple_gen_var_17,
+        &random_float_rational_unsigned_rounding_mode_quadruple_gen_var_17,
+        &special_random_float_rational_unsigned_rounding_mode_quadruple_gen_var_17,
+    )
+}
+
+// All `(Float, Rational, u64, RoundingMode)` that are valid inputs to
+// `Float::ieee_remainder_rational_prec_round`.
+pub fn float_rational_unsigned_rounding_mode_quadruple_gen_var_18()
+-> Generator<(Float, Rational, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_rational_unsigned_rounding_mode_quadruple_gen_var_18,
+        &random_float_rational_unsigned_rounding_mode_quadruple_gen_var_18,
+        &special_random_float_rational_unsigned_rounding_mode_quadruple_gen_var_18,
+    )
+}
+
+// All `(Float, Rational, u64, RoundingMode)` where the reversed tuple is a valid input to
+// `Float::rational_rem_float_prec_round`.
+pub fn float_rational_unsigned_rounding_mode_quadruple_gen_var_19()
+-> Generator<(Float, Rational, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_rational_unsigned_rounding_mode_quadruple_gen_var_19,
+        &random_float_rational_unsigned_rounding_mode_quadruple_gen_var_19,
+        &special_random_float_rational_unsigned_rounding_mode_quadruple_gen_var_19,
+    )
+}
+
+// All `(Float, Rational, u64, RoundingMode)` where the reversed tuple is a valid input to
+// `Float::rational_ieee_remainder_float_prec_round`.
+pub fn float_rational_unsigned_rounding_mode_quadruple_gen_var_20()
+-> Generator<(Float, Rational, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_rational_unsigned_rounding_mode_quadruple_gen_var_20,
+        &random_float_rational_unsigned_rounding_mode_quadruple_gen_var_20,
+        &special_random_float_rational_unsigned_rounding_mode_quadruple_gen_var_20,
+    )
+}
+
+// All `(Float, Rational, u64, RoundingMode)` that are valid inputs to
+// `Float::min_rational_prec_round`.
+pub fn float_rational_unsigned_rounding_mode_quadruple_gen_var_21()
+-> Generator<(Float, Rational, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_rational_unsigned_rounding_mode_quadruple_gen_var_21,
+        &random_float_rational_unsigned_rounding_mode_quadruple_gen_var_21,
+        &special_random_float_rational_unsigned_rounding_mode_quadruple_gen_var_21,
+    )
+}
+
+// All `(Float, Rational, u64, RoundingMode)` that are valid inputs to
+// `Float::max_rational_prec_round`.
+pub fn float_rational_unsigned_rounding_mode_quadruple_gen_var_22()
+-> Generator<(Float, Rational, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_rational_unsigned_rounding_mode_quadruple_gen_var_22,
+        &random_float_rational_unsigned_rounding_mode_quadruple_gen_var_22,
+        &special_random_float_rational_unsigned_rounding_mode_quadruple_gen_var_22,
+    )
+}
+
+// All `(Float, Rational, RoundingMode)` that are valid inputs to `Float::rem_rational_round`.
+pub fn float_rational_rounding_mode_triple_gen_var_16() -> FRR {
+    Generator::new(
+        &exhaustive_float_rational_rounding_mode_triple_gen_var_16,
+        &random_float_rational_rounding_mode_triple_gen_var_16,
+        &special_random_float_rational_rounding_mode_triple_gen_var_16,
+    )
+}
+
+// All `(Float, Rational, RoundingMode)` that are valid inputs to
+// `Float::ieee_remainder_rational_round`.
+pub fn float_rational_rounding_mode_triple_gen_var_17() -> FRR {
+    Generator::new(
+        &exhaustive_float_rational_rounding_mode_triple_gen_var_17,
+        &random_float_rational_rounding_mode_triple_gen_var_17,
+        &special_random_float_rational_rounding_mode_triple_gen_var_17,
+    )
+}
+
+// All `(Float, Rational, RoundingMode)` where the reversed tuple is a valid input to
+// `Float::rational_rem_float_round`.
+pub fn float_rational_rounding_mode_triple_gen_var_18() -> FRR {
+    Generator::new(
+        &exhaustive_float_rational_rounding_mode_triple_gen_var_18,
+        &random_float_rational_rounding_mode_triple_gen_var_18,
+        &special_random_float_rational_rounding_mode_triple_gen_var_18,
+    )
+}
+
+// All `(Float, Rational, RoundingMode)` where the reversed tuple is a valid input to
+// `Float::rational_ieee_remainder_float_round`.
+pub fn float_rational_rounding_mode_triple_gen_var_19() -> FRR {
+    Generator::new(
+        &exhaustive_float_rational_rounding_mode_triple_gen_var_19,
+        &random_float_rational_rounding_mode_triple_gen_var_19,
+        &special_random_float_rational_rounding_mode_triple_gen_var_19,
+    )
+}
+
+// All `(Float, Rational, RoundingMode)` that are valid inputs to `Float::min_rational_round`.
+pub fn float_rational_rounding_mode_triple_gen_var_20() -> FRR {
+    Generator::new(
+        &exhaustive_float_rational_rounding_mode_triple_gen_var_20,
+        &random_float_rational_rounding_mode_triple_gen_var_20,
+        &special_random_float_rational_rounding_mode_triple_gen_var_20,
+    )
+}
+
+// All `(Float, Rational, RoundingMode)` that are valid inputs to `Float::max_rational_round`.
+pub fn float_rational_rounding_mode_triple_gen_var_21() -> FRR {
+    Generator::new(
+        &exhaustive_float_rational_rounding_mode_triple_gen_var_21,
+        &random_float_rational_rounding_mode_triple_gen_var_21,
+        &special_random_float_rational_rounding_mode_triple_gen_var_21,
+    )
+}
+
+// All `(Float, Rational, u64, RoundingMode)` that are valid inputs to
 // `Float.log_base_rational_base_1_plus_x_prec_round`.
 pub fn float_rational_unsigned_rounding_mode_quadruple_gen_var_13()
 -> Generator<(Float, Rational, u64, RoundingMode)> {
