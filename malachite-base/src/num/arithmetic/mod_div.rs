@@ -48,32 +48,32 @@ crate_test_fn! {gcdinv<
     // second value has its second-highest bit set
     while r.get_bit(U::WIDTH - 2) {
         d = x - r;
-        if d < r {
+        r = if d < r {
             // quot = 1
             t2 = v2;
             x = r;
             v2 = v1 - v2;
             v1 = t2;
-            r = d;
+            d
         } else if d < (r << 1) {
             // quot = 2
             x = r;
             t2 = v2;
             v2 = v1 - (v2 << 1);
             v1 = t2;
-            r = d - x;
+            d - x
         } else {
             // quot = 3
             x = r;
             t2 = v2;
             v2 = v1 - S::wrapping_from(3) * v2;
             v1 = t2;
-            r = d - (x << 1);
-        }
+            d - (x << 1)
+        };
     }
     while r != U::ZERO {
         // overflow not possible, top 2 bits of r not set
-        if x < (r << 2) {
+        r = if x < (r << 2) {
             // quot < 4
             d = x - r;
             if d < r {
@@ -82,21 +82,21 @@ crate_test_fn! {gcdinv<
                 x = r;
                 v2 = v1 - v2;
                 v1 = t2;
-                r = d;
+                d
             } else if d < (r << 1) {
                 // quot = 2
                 x = r;
                 t2 = v2;
                 v2 = v1.wrapping_sub(v2 << 1);
                 v1 = t2;
-                r = d - x;
+                d - x
             } else {
                 // quot = 3
                 x = r;
                 t2 = v2;
                 v2 = v1.wrapping_sub(S::wrapping_from(3).wrapping_mul(v2));
                 v1 = t2;
-                r = d.wrapping_sub(x << 1);
+                d.wrapping_sub(x << 1)
             }
         } else {
             let (quot, rem) = x.div_rem(r);
@@ -104,8 +104,8 @@ crate_test_fn! {gcdinv<
             t2 = v2;
             v2 = v1.wrapping_sub(S::wrapping_from(quot).wrapping_mul(v2));
             v1 = t2;
-            r = rem;
-        }
+            rem
+        };
     }
     let mut s = U::wrapping_from(v1);
     if v1 < S::ZERO {

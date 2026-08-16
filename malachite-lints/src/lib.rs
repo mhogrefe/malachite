@@ -59,6 +59,7 @@ mod use_div_mod_precomputed;
 mod use_divisible_by;
 mod use_exact_from;
 mod use_fused_mul;
+mod factor_out_assignment;
 mod use_get_bit;
 mod use_mod_power_of_2;
 mod use_mod_square;
@@ -488,6 +489,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         use_divisible_by::USE_DIVISIBLE_BY,
         use_exact_from::USE_EXACT_FROM,
         use_fused_mul::USE_FUSED_MUL,
+        factor_out_assignment::FACTOR_OUT_ASSIGNMENT,
         use_get_bit::USE_GET_BIT,
         use_mod_power_of_2::USE_MOD_POWER_OF_2,
         use_mod_square::USE_MOD_SQUARE,
@@ -561,6 +563,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
     lint_store.register_late_pass(|_| Box::new(use_fused_mul::UseFusedMul));
     lint_store.register_late_pass(|_| Box::new(use_div_mod::UseDivMod));
     lint_store.register_late_pass(|_| Box::new(use_div_mod_precomputed::UseDivModPrecomputed));
+    lint_store.register_late_pass(|_| Box::new(factor_out_assignment::FactorOutAssignment));
     lint_store.register_late_pass(|_| Box::new(use_get_bit::UseGetBit));
     lint_store.register_late_pass(|_| Box::new(use_mod_power_of_2::UseModPowerOf2));
     lint_store.register_late_pass(|_| Box::new(use_mod_square::UseModSquare));

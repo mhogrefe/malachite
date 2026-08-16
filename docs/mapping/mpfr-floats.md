@@ -1050,9 +1050,9 @@ all.
 
 ## [Integer and Remainder Related Functions](https://www.mpfr.org/mpfr-current/mpfr.html#Integer-and-Remainder-Related-Functions) {#integer-and-remainder-related-functions}
 
-Rounding a `Float` to an integral `Float` is now covered by the `round_to_integer` family;
-the fractional-part functions and the floating-point remainders remain gaps, expected to fill
-as families.
+Rounding a `Float` to an integral `Float`, and taking its fractional part, are covered by the
+`round_to_integer` and `fractional_part` families; the floating-point remainders remain the
+section's gap, expected to fill as one family.
 
 | | MPFR | Malachite |
 | :---: | --- | --- |
@@ -1067,8 +1067,8 @@ as families.
 | ✓ | `int mpfr_rint_round (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`round_to_integer_ties_away_then_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.round_to_integer_ties_away_then_prec_round) |
 | ✓ | `int mpfr_rint_roundeven (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`round_to_integer_then_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.round_to_integer_then_prec_round) |
 | ✓ | `int mpfr_rint_trunc (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`round_to_integer_then_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.round_to_integer_then_prec_round) |
-| ✗ | `int mpfr_frac (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_modf (mpfr_t iop, mpfr_t fop, mpfr_t op, mpfr_rnd_t rnd)` | |
+| ✓ | `int mpfr_frac (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`fractional_part_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.fractional_part_prec_round) |
+| ✓ | `int mpfr_modf (mpfr_t iop, mpfr_t fop, mpfr_t op, mpfr_rnd_t rnd)` | [`integer_and_fractional_parts_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.integer_and_fractional_parts_prec_round) |
 | ✗ | `int mpfr_fmod (mpfr_t r, mpfr_t x, mpfr_t y, mpfr_rnd_t rnd)` | |
 | ✗ | `int mpfr_fmod_ui (mpfr_t r, mpfr_t x, unsigned long int y, mpfr_rnd_t rnd)` | |
 | ✗ | `int mpfr_fmodquo (mpfr_t r, long int* q, mpfr_t x, mpfr_t y, mpfr_rnd_t rnd)` | |
@@ -1099,11 +1099,12 @@ single-rounding form gives 12.
 
 **`mpfr_frac`, `mpfr_modf`.** The fractional part, "having the same sign as `op`", with `rnd`
 rounding the exact fraction rather than shaping it, and zero with `op`'s sign at integers and
-infinities; `mpfr_modf` packages the truncation and the fraction in one call with a
-`mpfr_sin_cos`-style packed return. These two remain the section's rounding-family gap; in the
-meantime the truncation is
-[`round_to_integer_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.round_to_integer_prec_round) with `Down`, and the exact
-fraction is a subtraction.
+infinities: [`fractional_part_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.fractional_part_prec_round) and its family.
+`mpfr_modf` packages the truncation and the fraction in one call, with the two ternary values
+packed into one return;
+[`integer_and_fractional_parts_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.integer_and_fractional_parts_prec_round)
+returns the two pairs directly, takes an independent precision for each part as the two `rop`
+arguments do, and rounds the integral part exactly as `mpfr_rint_trunc` does.
 
 **The remainders.** $$r = x - ny$$ with the quotient `n` "rounded toward zero" for the `fmod`
 three and "to the nearest integer (ties rounded to even)" for `remainder` and `remquo`,

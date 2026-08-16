@@ -683,7 +683,6 @@ pub fn limbs_float_can_round_raw(
     // eps (Nearest), or b - eps and b (Up).
     let cc;
     let eps = Limb::power_of_2(s);
-    let subtract;
     if rnd1 == Down {
         cc = (xs[bn - 1] >> s1).odd() ^ limbs_round_would_increment(&xs[..bn], prec2, rnd2);
         // now round b + eps
@@ -705,7 +704,6 @@ pub fn limbs_float_can_round_raw(
                 _ => !cc,
             };
         }
-        subtract = false;
     } else if rnd1 == Nearest {
         // first round b + eps
         let mut cy = limbs_add_limb_to_out(&mut tmp[bn - k..bn], &xs[bn - k..bn], eps);
@@ -722,12 +720,10 @@ pub fn limbs_float_can_round_raw(
                 _ => err > prec + 1,
             };
         }
-        subtract = true;
     } else {
         cc = (xs[bn - 1] >> s1).odd() ^ limbs_round_would_increment(&xs[..bn], prec2, rnd2);
-        subtract = true;
     }
-    if subtract {
+    if rnd1 != Down {
         // round b - eps, for rnd1 Nearest or Up
         let mut cy = limbs_sub_limb_to_out(&mut tmp[bn - k..bn], &xs[bn - k..bn], eps);
         // propagate the potential borrow through the truncated limbs; it cannot propagate beyond
@@ -832,27 +828,20 @@ pub fn limbs_float_round_to_integer(
         rp.copy_from_slice(&up[un - rn..]);
         rp_offset = 0;
         if rnd_away.is_none() {
-            if !ties_away && !rp[0].get_bit(sh) {
+            rnd_away = Some(if !ties_away && !rp[0].get_bit(sh) {
                 // a halfway case rounds toward zero: the kept low bit is even
                 let (a, b) = if sh != 0 {
                     (rp[0].mod_power_of_2(sh), Limb::power_of_2(sh - 1))
                 } else {
                     (up[un - rn - 1], LIMB_HIGH_BIT)
                 };
-                let mut away = a > b;
-                if a == b {
-                    let hi = un - rn - usize::from(sh == 0);
-                    away = !slice_test_zero(&up[..hi]);
-                }
-                rnd_away = Some(away);
-            } else {
+                a > b || a == b && !slice_test_zero(&up[..un - rn - usize::from(sh == 0)])
+            } else if sh != 0 {
                 // a halfway case rounds away from zero: the rounding bit decides
-                rnd_away = Some(if sh != 0 {
-                    rp[0].get_bit(sh - 1)
-                } else {
-                    up[un - rn - 1].get_highest_bit()
-                });
-            }
+                rp[0].get_bit(sh - 1)
+            } else {
+                up[un - rn - 1].get_highest_bit()
+            });
         }
         if uflags == 0
             && (sh != 0 && rp[0] << (Limb::WIDTH - sh) != 0 || !slice_test_zero(&up[..un - rn]))
@@ -879,28 +868,23 @@ pub fn limbs_float_round_to_integer(
             sh = ush;
         }
         if rnd_away.is_none() {
-            if uj == 0 && sh == 0 {
+            rnd_away = Some(if uj == 0 && sh == 0 {
                 // the rounding bit is 0 (not represented in u)
-                rnd_away = Some(false);
+                false
             } else if !ties_away && !rp[rp_offset].get_bit(sh) {
+                // a halfway case rounds toward zero: the kept low bit is even
                 let (a, b) = if sh != 0 {
                     (rp[rp_offset].mod_power_of_2(sh), Limb::power_of_2(sh - 1))
                 } else {
                     (up[uj - 1], LIMB_HIGH_BIT)
                 };
-                let mut away = a > b;
-                if a == b {
-                    let hi = uj - usize::from(sh == 0);
-                    away = !slice_test_zero(&up[..hi]);
-                }
-                rnd_away = Some(away);
+                a > b || a == b && !slice_test_zero(&up[..uj - usize::from(sh == 0)])
+            } else if sh != 0 {
+                // a halfway case rounds away from zero: the rounding bit decides
+                rp[rp_offset].get_bit(sh - 1)
             } else {
-                rnd_away = Some(if sh != 0 {
-                    rp[rp_offset].get_bit(sh - 1)
-                } else {
-                    up[uj - 1].get_highest_bit()
-                });
-            }
+                up[uj - 1].get_highest_bit()
+            });
         }
     }
     if sh != 0 {

@@ -242,18 +242,17 @@ fn root_u_rational_generic(x: &Rational, k: u64, prec: u64, rm: RoundingMode) ->
     let ki = i64::exact_from(k);
     let mut end_shift = e;
     let x2;
-    let reduced_x: &Rational;
-    if end_shift.gt_abs(&0x3fff_0000) {
+    let reduced_x: &Rational = if end_shift.gt_abs(&0x3fff_0000) {
         // Reduce the exponent of x to the representable range by shifting by a multiple of k, so
         // that the root of the reduced value can be shifted back exactly (up to overflow or
         // underflow, which the final `shl_prec_round_assign_helper` handles).
         end_shift -= end_shift.rem_euclid(ki);
         x2 = x >> end_shift;
-        reduced_x = &x2;
+        &x2
     } else {
         end_shift = 0;
-        reduced_x = x;
-    }
+        x
+    };
     loop {
         let root = Float::from_rational_prec_round_ref(reduced_x, working_prec, Floor)
             .0

@@ -61,100 +61,68 @@ private_test_fn! {extended_gcd_unsigned_binary<
     let mut v1 = S::ZERO;
     let mut u3 = a;
     let mut v3 = b;
-    let mut d;
-    let mut t2;
-    let mut t1;
     if (a & b).get_highest_bit() {
-        d = u3 - v3;
-        t2 = v2;
-        t1 = u2;
-        u2 = u1 - u2;
-        u1 = t1;
-        u3 = v3;
-        v2 = v1 - v2;
-        v1 = t2;
-        v3 = d;
+        (u1, u2, u3, v1, v2, v3) = (u2, u1 - u2, v3, v2, v1 - v2, u3 - v3);
     }
     while v3.get_bit(U::WIDTH - 2) {
-        d = u3 - v3;
-        if d < v3 {
+        let d = u3 - v3;
+        (u1, u2, u3, v1, v2, v3) = if d < v3 {
             // quot = 1
-            t2 = v2;
-            t1 = u2;
-            u2 = u1 - u2;
-            u1 = t1;
-            u3 = v3;
-            v2 = v1 - v2;
-            v1 = t2;
-            v3 = d;
+            (u2, u1 - u2, v3, v2, v1 - v2, d)
         } else if d < (v3 << 1) {
             // quot = 2
-            t1 = u2;
-            u2 = u1 - (u2 << 1);
-            u1 = t1;
-            u3 = v3;
-            t2 = v2;
-            v2 = v1 - (v2 << 1);
-            v1 = t2;
-            v3 = d - u3;
+            (u2, u1 - (u2 << 1), v3, v2, v1 - (v2 << 1), d - v3)
         } else {
             // quot = 3
-            t1 = u2;
-            u2 = u1 - S::wrapping_from(3) * u2;
-            u1 = t1;
-            u3 = v3;
-            t2 = v2;
-            v2 = v1 - S::wrapping_from(3) * v2;
-            v1 = t2;
-            v3 = d - (u3 << 1);
-        }
+            (
+                u2,
+                u1 - S::wrapping_from(3) * u2,
+                v3,
+                v2,
+                v1 - S::wrapping_from(3) * v2,
+                d - (v3 << 1),
+            )
+        };
     }
     while v3 != U::ZERO {
-        d = u3 - v3;
+        let d = u3 - v3;
         // overflow not possible, top 2 bits of v3 not set
-        if u3 < (v3 << 2) {
+        (u1, u2, u3, v1, v2, v3) = if u3 < (v3 << 2) {
             if d < v3 {
                 // quot = 1
-                t2 = v2;
-                t1 = u2;
-                u2 = u1 - u2;
-                u1 = t1;
-                u3 = v3;
-                v2 = v1 - v2;
-                v1 = t2;
-                v3 = d;
+                (u2, u1 - u2, v3, v2, v1 - v2, d)
             } else if d < (v3 << 1) {
                 // quot = 2
-                t1 = u2;
-                u2 = u1.wrapping_sub(u2 << 1);
-                u1 = t1;
-                u3 = v3;
-                t2 = v2;
-                v2 = v1.wrapping_sub(v2 << 1);
-                v1 = t2;
-                v3 = d - u3;
+                (
+                    u2,
+                    u1.wrapping_sub(u2 << 1),
+                    v3,
+                    v2,
+                    v1.wrapping_sub(v2 << 1),
+                    d - v3,
+                )
             } else {
                 // quot = 3
-                t1 = u2;
-                u2 = u1.wrapping_sub(S::wrapping_from(3).wrapping_mul(u2));
-                u1 = t1;
-                u3 = v3;
-                t2 = v2;
-                v2 = v1.wrapping_sub(S::wrapping_from(3).wrapping_mul(v2));
-                v1 = t2;
-                v3 = d.wrapping_sub(u3 << 1);
+                (
+                    u2,
+                    u1.wrapping_sub(S::wrapping_from(3).wrapping_mul(u2)),
+                    v3,
+                    v2,
+                    v1.wrapping_sub(S::wrapping_from(3).wrapping_mul(v2)),
+                    d.wrapping_sub(v3 << 1),
+                )
             }
         } else {
             let (quot, rem) = u3.div_rem(v3);
-            t1 = u2;
-            u2 = u1.wrapping_sub(S::wrapping_from(quot).wrapping_mul(u2));
-            u1 = t1;
-            u3 = v3;
-            t2 = v2;
-            v2 = v1.wrapping_sub(S::wrapping_from(quot).wrapping_mul(v2));
-            v1 = t2;
-            v3 = rem;
-        }
+            (
+                u2,
+                u1.wrapping_sub(S::wrapping_from(quot).wrapping_mul(u2)),
+                v3,
+                v2,
+                v1.wrapping_sub(S::wrapping_from(quot).wrapping_mul(v2)),
+                rem,
+            )
+        };
     }
     // Remarkably, |u1| < x/2, thus comparison with 0 is valid
     if u1 <= S::ZERO {

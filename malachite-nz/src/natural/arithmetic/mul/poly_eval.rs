@@ -104,12 +104,12 @@ pub(crate) fn limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2(
     assert_eq!(scratch_init.len(), n);
     // scratch <- (poly_0 + 4 * poly_2) +/- (2 * poly_1 + 8 * poly_3)
     v_2[n] = limbs_shl_add_same_length_to_out(v_2, poly_2, poly_0, 2);
-    if n_high < n {
+    *scratch_last = if n_high < n {
         scratch_init[n_high] = limbs_shl_to_out(scratch_init, poly_3, 2);
-        *scratch_last = Limb::from(limbs_add_to_out_aliased(scratch_init, n_high + 1, poly_1));
+        Limb::from(limbs_add_to_out_aliased(scratch_init, n_high + 1, poly_1))
     } else {
-        *scratch_last = limbs_shl_add_same_length_to_out(scratch_init, poly_3, poly_1, 2);
-    }
+        limbs_shl_add_same_length_to_out(scratch_init, poly_3, poly_1, 2)
+    };
     limbs_slice_shl_in_place(scratch, 1);
     let v_neg_2_neg = limbs_cmp_same_length(v_2, scratch) == Less;
     if v_neg_2_neg {

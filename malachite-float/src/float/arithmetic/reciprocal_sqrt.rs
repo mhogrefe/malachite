@@ -229,15 +229,14 @@ generic_reciprocal_sqrt_rational_ref(
     let mut increment = Limb::WIDTH;
     let mut end_shift = x.floor_log_base_2();
     let x2;
-    let reduced_x: &Rational;
-    if end_shift.gt_abs(&0x3fff_0000) {
+    let reduced_x: &Rational = if end_shift.gt_abs(&0x3fff_0000) {
         end_shift &= !1;
         x2 = x >> end_shift;
-        reduced_x = &x2;
+        &x2
     } else {
         end_shift = 0;
-        reduced_x = x;
-    }
+        x
+    };
     loop {
         let sqrt = from_reciprocal_rational_prec_round_ref(reduced_x, working_prec, Floor).0.sqrt();
         // See algorithms.tex. Since we rounded down when computing fx, the absolute error of the

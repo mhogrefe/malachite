@@ -361,18 +361,18 @@ private_test_fn! {limbs_mod_pow_odd(
     let mut small_is = [0; 2];
     let mut is_vec;
     let is: &mut [Limb];
-    let redc_fn: &dyn Fn(&mut [Limb], &mut [Limb], &[Limb], &[Limb]);
-    if ms_len < REDC_1_TO_REDC_N_THRESHOLD {
+    let redc_fn: &dyn Fn(&mut [Limb], &mut [Limb], &[Limb], &[Limb]) =
+        if ms_len < REDC_1_TO_REDC_N_THRESHOLD {
         is = &mut small_is;
         is[0] = limbs_modular_invert_limb(ms[0]);
         is[0].wrapping_neg_assign();
-        redc_fn = &limbs_redc_limb_helper;
+        &limbs_redc_limb_helper
     } else {
         is_vec = vec![0; ms_len];
         is = &mut is_vec;
         limbs_modular_invert(is, ms, scratch);
-        redc_fn = &limbs_redc_helper;
-    }
+        &limbs_redc_helper
+    };
     let mut powers = vec![0; ms_len << (window_size - 1)];
     let mut powers: Vec<&mut [Limb]> = powers.chunks_mut(ms_len).collect();
     to_redc(powers[0], xs, ms);

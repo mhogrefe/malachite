@@ -186,11 +186,11 @@ impl<'a> BitIterable for &'a Natural {
         if let Some(next) = bits.limbs.next() {
             bits.current_limb_forward = next;
         }
-        if let Some(next_back) = bits.limbs.next_back() {
-            bits.current_limb_back = next_back;
+        bits.current_limb_back = if let Some(next_back) = bits.limbs.next_back() {
+            next_back
         } else {
-            bits.current_limb_back = bits.current_limb_forward;
-        }
+            bits.current_limb_forward
+        };
         bits
     }
 }

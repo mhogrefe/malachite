@@ -647,16 +647,16 @@ pub fn limbs_extended_gcd(
         // cofactor + 1, corresponding to G = A - k B, rather than -1, corresponding to G = - A +
         // (k+1) B.
         assert!(c != Equal || us_len == 1 && us0[0] == 1 && us1[0] == 1);
-        if c == Less {
+        ss_sign = if c == Less {
             us_len -= slice_trailing_zeros(&us0[..us_len]);
             ss[..us_len].copy_from_slice(&us0[..us_len]);
-            ss_sign = false;
+            false
         } else {
             us_len -= slice_trailing_zeros(&us1[..us_len]);
             assert_ne!(us_len, 0);
             ss[..us_len].copy_from_slice(&us1[..us_len]);
-            ss_sign = true;
-        }
+            true
+        };
         (n, ss_sign)
     } else if us0[0] == 0 && us_len == 1 {
         fail_on_untested_path(

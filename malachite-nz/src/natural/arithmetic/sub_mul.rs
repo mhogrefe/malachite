@@ -84,11 +84,11 @@ pub fn limbs_sub_mul_limb_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]
     for (x, &y) in xs.iter_mut().zip(ys.iter()) {
         let (upper, mut lower) = (DoubleLimb::from(y) * z).split_in_half();
         lower.wrapping_add_assign(borrow);
-        if lower < borrow {
-            borrow = upper.wrapping_add(1);
+        borrow = if lower < borrow {
+            upper.wrapping_add(1)
         } else {
-            borrow = upper;
-        }
+            upper
+        };
         lower = x.wrapping_sub(lower);
         if lower > *x {
             borrow.wrapping_add_assign(1);
@@ -155,11 +155,11 @@ crate_test_fn! {limbs_sub_mul_limb_same_length_in_place_right(
     for (&x, y) in xs.iter().zip(ys.iter_mut()) {
         let (upper, mut lower) = (DoubleLimb::from(*y) * z).split_in_half();
         lower.wrapping_add_assign(borrow);
-        if lower < borrow {
-            borrow = upper.wrapping_add(1);
+        borrow = if lower < borrow {
+            upper.wrapping_add(1)
         } else {
-            borrow = upper;
-        }
+            upper
+        };
         lower = x.wrapping_sub(lower);
         if lower > x {
             borrow.wrapping_add_assign(1);

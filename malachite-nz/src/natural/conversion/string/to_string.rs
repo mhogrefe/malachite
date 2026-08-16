@@ -552,12 +552,12 @@ impl Octal for NaturalAlt2 {
                     1 => {
                         let x_2 = xs[last_i];
                         let y = x_2 >> W_3_4;
-                        if y == 0 {
-                            result = write!(f, "{:o}", x_2 & MASK);
+                        result = if y == 0 {
+                            write!(f, "{:o}", x_2 & MASK)
                         } else {
                             write!(f, "{y:o}").unwrap();
-                            result = oz_fmt(f, x_2 & MASK);
-                        }
+                            oz_fmt(f, x_2 & MASK)
+                        };
                     }
                     2 => {
                         let x_1 = xs[last_i];

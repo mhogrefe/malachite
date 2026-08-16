@@ -459,7 +459,7 @@ private_test_fn! {limbs_compute_power_table_using_mul<'a>(
         start = 3;
         isize::exact_from(power_len) - 2
     } else {
-        if (digits_in_base + digits_per_limb) << (power_len - 2) <= exponents[0] {
+        start = if (digits_in_base + digits_per_limb) << (power_len - 2) <= exponents[0] {
             // a = 3, sometimes adjusted to 4.
             let power;
             (power, remainder) = remainder[shift..].split_at_mut(len);
@@ -485,7 +485,7 @@ private_test_fn! {limbs_compute_power_table_using_mul<'a>(
             (power, remainder) = remainder[start - 3..].split_at_mut(7 - start);
             let mut square_scratch = vec![0; limbs_square_to_out_scratch_len(len)];
             limbs_square_to_out(remainder, &power[..len], &mut square_scratch);
-            start = 7;
+            7
         } else {
             remainder[2] = remainder[start - 1];
             remainder[3] = remainder[start];
@@ -500,8 +500,8 @@ private_test_fn! {limbs_compute_power_table_using_mul<'a>(
             (power, remainder) = remainder.split_at_mut(3);
             let mut square_scratch = vec![0; limbs_square_to_out_scratch_len(len)];
             limbs_square_to_out(remainder, &power[..len], &mut square_scratch);
-            start = 6;
-        }
+            6
+        };
         isize::exact_from(power_len) - 3
     };
     if start_index >= 0 {

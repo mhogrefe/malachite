@@ -153,6 +153,58 @@ pub mod exp;
 /// [`ExpXMinus1Assign`](malachite_base::num::arithmetic::traits::ExpXMinus1Assign), traits for
 /// computing $e^x-1$ for [`Float`](super::Float)s.
 pub mod exp_x_minus_1;
+/// Left-shifting a [`Float`](super::Float) (multiplying it by a power of 2).
+///
+/// # shl
+/// ```
+/// use malachite_base::num::basic::traits::{Infinity, Zero};
+/// use malachite_float::Float;
+///
+/// assert_eq!(Float::ZERO << 10, 0);
+/// assert_eq!(Float::INFINITY << 10, Float::INFINITY);
+/// assert_eq!(
+///     (Float::from(std::f64::consts::PI) << 10u8).to_string(),
+///     "3216.9908772759482"
+/// );
+/// assert_eq!(
+///     (Float::from(std::f64::consts::PI) << -10i8).to_string(),
+///     "0.0030679615757712823"
+/// );
+///
+/// assert_eq!(&Float::ZERO << 10, 0);
+/// assert_eq!(&Float::INFINITY << 10, Float::INFINITY);
+/// assert_eq!(
+///     (&Float::from(std::f64::consts::PI) << 10u8).to_string(),
+///     "3216.9908772759482"
+/// );
+/// assert_eq!(
+///     (&Float::from(std::f64::consts::PI) << -10i8).to_string(),
+///     "0.0030679615757712823"
+/// );
+/// ```
+///
+/// # shl_assign
+/// ```
+/// use malachite_base::num::basic::traits::{Infinity, Zero};
+/// use malachite_float::Float;
+///
+/// let mut x = Float::ZERO;
+/// x <<= 10;
+/// assert_eq!(x, 0);
+///
+/// let mut x = Float::INFINITY;
+/// x <<= 10;
+/// assert_eq!(x, Float::INFINITY);
+///
+/// let mut x = Float::from(std::f64::consts::PI);
+/// x <<= 10;
+/// assert_eq!(x.to_string(), "3216.9908772759482");
+///
+/// let mut x = Float::from(std::f64::consts::PI);
+/// x <<= -10;
+/// assert_eq!(x.to_string(), "0.0030679615757712823");
+/// ```
+pub mod fractional_part;
 /// An implementation of [`IsPowerOf2`](malachite_base::num::arithmetic::traits::IsPowerOf2), a
 /// trait for determining whether a number is an integer power of 2.
 pub mod is_power_of_2;
@@ -255,57 +307,6 @@ pub mod reciprocal_sqrt;
 /// roots of [`Float`](super::Float)s.
 pub mod root;
 pub(crate) mod round_near_x;
-/// Left-shifting a [`Float`](super::Float) (multiplying it by a power of 2).
-///
-/// # shl
-/// ```
-/// use malachite_base::num::basic::traits::{Infinity, Zero};
-/// use malachite_float::Float;
-///
-/// assert_eq!(Float::ZERO << 10, 0);
-/// assert_eq!(Float::INFINITY << 10, Float::INFINITY);
-/// assert_eq!(
-///     (Float::from(std::f64::consts::PI) << 10u8).to_string(),
-///     "3216.9908772759482"
-/// );
-/// assert_eq!(
-///     (Float::from(std::f64::consts::PI) << -10i8).to_string(),
-///     "0.0030679615757712823"
-/// );
-///
-/// assert_eq!(&Float::ZERO << 10, 0);
-/// assert_eq!(&Float::INFINITY << 10, Float::INFINITY);
-/// assert_eq!(
-///     (&Float::from(std::f64::consts::PI) << 10u8).to_string(),
-///     "3216.9908772759482"
-/// );
-/// assert_eq!(
-///     (&Float::from(std::f64::consts::PI) << -10i8).to_string(),
-///     "0.0030679615757712823"
-/// );
-/// ```
-///
-/// # shl_assign
-/// ```
-/// use malachite_base::num::basic::traits::{Infinity, Zero};
-/// use malachite_float::Float;
-///
-/// let mut x = Float::ZERO;
-/// x <<= 10;
-/// assert_eq!(x, 0);
-///
-/// let mut x = Float::INFINITY;
-/// x <<= 10;
-/// assert_eq!(x, Float::INFINITY);
-///
-/// let mut x = Float::from(std::f64::consts::PI);
-/// x <<= 10;
-/// assert_eq!(x.to_string(), "3216.9908772759482");
-///
-/// let mut x = Float::from(std::f64::consts::PI);
-/// x <<= -10;
-/// assert_eq!(x.to_string(), "0.0030679615757712823");
-/// ```
 pub mod round_to_integer;
 pub mod shl;
 /// Implementations of [`ShlRound`](malachite_base::num::arithmetic::traits::ShlRound) and

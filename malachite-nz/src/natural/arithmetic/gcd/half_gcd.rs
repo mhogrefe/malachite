@@ -1024,21 +1024,19 @@ pub(crate) fn limbs_half_gcd_2(
     }
     let mut m01;
     let mut m10;
-    if (x_high, a_low) > (y_high, b_low) {
+    (m01, m10) = if (x_high, a_low) > (y_high, b_low) {
         (x_high, a_low) = Limb::xx_sub_yy_to_zz(x_high, a_low, y_high, b_low);
         if x_high < 2 {
             return false;
         }
-        m01 = 1;
-        m10 = 0;
+        (1, 0)
     } else {
         (y_high, b_low) = Limb::xx_sub_yy_to_zz(y_high, b_low, x_high, a_low);
         if y_high < 2 {
             return false;
         }
-        m01 = 0;
-        m10 = 1;
-    }
+        (0, 1)
+    };
     let mut m00 = 1;
     let mut m11 = 1;
     let mut subtract_a = x_high < y_high;

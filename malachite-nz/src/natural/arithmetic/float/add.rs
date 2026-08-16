@@ -2641,17 +2641,17 @@ fn add_float_significands_general(
             }
         }
     } else if following_bits != True {
-        if out_len.saturating_sub(k) > ys_len {
+        following_bits = if out_len.saturating_sub(k) > ys_len {
             if round_bit == Uninitialized {
                 round_bit = False;
             }
-            following_bits = False;
+            False
         } else if exp_diff > out_bits {
             // x is followed by at least a zero bit, then by y
             if round_bit == Uninitialized {
                 round_bit = False;
             }
-            following_bits = True;
+            True
         } else {
             // difw is the number of limbs from x (regarded as having an infinite precision) that
             // have already been combined with y; -n if the next n limbs from x won't be combined
@@ -2665,7 +2665,7 @@ fn add_float_significands_general(
                 if round_bit == Uninitialized {
                     round_bit = False;
                 }
-                following_bits = False;
+                False
             } else {
                 let mut y = if exp_diff_rem != 0 {
                     assert!(yi < ys_len);
@@ -2687,9 +2687,9 @@ fn add_float_significands_general(
                     yi -= 1;
                     y = ys[yi];
                 }
-                following_bits = True;
+                True
             }
-        }
+        };
     }
     add_float_significands_general_round(out, x_exp, shift_bit, round_bit, following_bits, rm)
 }

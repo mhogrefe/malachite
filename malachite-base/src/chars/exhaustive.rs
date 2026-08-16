@@ -124,12 +124,10 @@ impl Iterator for ExhaustiveChars {
                 }
                 CharType::AsciiNonAlphanumericGraphic => {
                     if self.c == '~' {
-                        if self.ascii_only {
-                            self.current_type = CharType::NonGraphic;
-                            self.c = '\0';
+                        (self.current_type, self.c) = if self.ascii_only {
+                            (CharType::NonGraphic, '\0')
                         } else {
-                            self.current_type = CharType::NonAsciiGraphic;
-                            self.c = '\u{a1}';
+                            (CharType::NonAsciiGraphic, '\u{a1}')
                         };
                     } else {
                         increment_char(&mut self.c);

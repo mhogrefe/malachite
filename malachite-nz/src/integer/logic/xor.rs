@@ -265,16 +265,16 @@ private_test_fn! {limbs_vec_pos_xor_limb_neg_in_place(xs: &mut Vec<Limb>, y: Lim
 // # Panics
 // Panics if `xs` is empty or only contains zeros.
 private_test_fn! {limbs_neg_xor_limb_neg(xs: &[Limb], y: Limb) -> Vec<Limb> {
-    let mut out;
-    if xs[0] == 0 {
+    let mut out: Vec<Limb>;
+    out[0] = if xs[0] == 0 {
         let carry;
         (out, carry) = limbs_sub_limb(xs, 1);
         assert!(!carry);
-        out[0] = y;
+        y
     } else {
         out = xs.to_vec();
-        out[0] = xs[0].wrapping_neg() ^ y;
-    }
+        xs[0].wrapping_neg() ^ y
+    };
     out
 }}
 

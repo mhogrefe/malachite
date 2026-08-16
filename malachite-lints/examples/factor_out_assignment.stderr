@@ -1,0 +1,26 @@
+error: every branch of this `if` assigns to the same target; assign the conditional expression instead
+  --> $DIR/factor_out_assignment.rs:6:5
+   |
+LL | /     if c == 0 {
+LL | |         x = 1;
+LL | |     } else {
+LL | |         x = 2;
+LL | |     }
+   | |_____^
+   |
+   = note: `#[deny(factor_out_assignment)]` on by default
+
+error: every branch of this `if` assigns to the same target; assign the conditional expression instead
+  --> $DIR/factor_out_assignment.rs:12:5
+   |
+LL | /     if c == 0 {
+LL | |         x = 3;
+LL | |     } else if c == 1 {
+LL | |         let t = c + 1;
+...  |
+LL | |         x = 4;
+LL | |     }
+   | |_____^
+
+error: aborting due to 2 previous errors
+

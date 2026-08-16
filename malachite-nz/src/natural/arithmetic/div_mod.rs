@@ -1587,8 +1587,7 @@ fn limbs_div_mod_by_two_limb(qs: &mut [Limb], rs: &mut [Limb], ns: &[Limb], ds: 
         };
         // always store n_len - 1 quotient limbs
         qs[n_len - 2] = Limb::from(limbs_div_mod_by_two_limb_normalized(qs, ns, ds));
-        rs[0] = ns[0];
-        rs[1] = ns[1];
+        (rs[0], rs[1]) = (ns[0], ns[1]);
     } else {
         let ds_0 = ds[0];
         let cobits = Limb::WIDTH - bits;
@@ -1613,8 +1612,10 @@ fn limbs_div_mod_by_two_limb(qs: &mut [Limb], rs: &mut [Limb], ns: &[Limb], ds: 
             limbs_div_mod_by_two_limb_normalized(qs, ns_shifted, ds_shifted);
         }
         let ns_shifted_1 = ns_shifted[1];
-        rs[0] = (ns_shifted[0] >> bits) | (ns_shifted_1 << cobits);
-        rs[1] = ns_shifted_1 >> bits;
+        (rs[0], rs[1]) = (
+            (ns_shifted[0] >> bits) | (ns_shifted_1 << cobits),
+            ns_shifted_1 >> bits,
+        );
     }
 }
 

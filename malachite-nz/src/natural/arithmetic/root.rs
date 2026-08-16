@@ -88,11 +88,7 @@ fn div_helper(qs: &mut [Limb], ns: &mut [Limb], ds: &mut [Limb]) {
     assert!(*ns.last().unwrap() != 0);
     assert!(*ds.last().unwrap() != 0);
     if ns.len() == 1 {
-        if ds.len() == 1 {
-            qs[0] = ns[0] / ds[0];
-        } else {
-            qs[0] = 0;
-        }
+        qs[0] = if ds.len() == 1 { ns[0] / ds[0] } else { 0 };
     } else if ds.len() == 1 {
         limbs_div_limb_to_out(qs, ns, ds[0]);
     } else {

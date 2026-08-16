@@ -711,17 +711,16 @@ fn mul_float_significands_general(
                 ys = &ys[ys_len - len..];
             } else {
                 // Add one extra limb to mantissa of x and y.
-                if xs_len > len {
-                    xs = &xs[xs_len - len - 1..];
+                xs = if xs_len > len {
+                    &xs[xs_len - len - 1..]
                 } else {
                     new_xs = vec![0; len + 1];
                     new_xs[1..].copy_from_slice(&xs[xs_len - len..xs_len]);
-                    xs = &new_xs;
-                }
+                    &new_xs
+                };
                 #[cfg(feature = "32_bit_limbs")]
                 {
-                    if ys_len > len {
-                        ys = &ys[ys_len - len - 1..];
+                    ys = if ys_len > len {
                         // This can only happen with 32-bit limbs, and is very unlikely to happen.
                         // Indeed, since len = min(z_len + 1, ys_len), with z_len = prec /
                         // Limb::WIDTH, we can have ys_len > len only when len = z_len + 1 < ys_len.
@@ -734,11 +733,12 @@ fn mul_float_significands_general(
                         // only happen for len >= 2^27 - 1, thus for a precision of 2 ^ 32 - 64 for
                         // z, and with Limb::WIDTH = 64 for n >= 2 ^ 59-1, which would give a
                         // precision >= 2^64.
+                        &ys[ys_len - len - 1..]
                     } else {
                         new_ys = vec![0; len + 1];
                         new_ys[1..].copy_from_slice(&ys[ys_len - len..ys_len]);
-                        ys = &new_ys;
-                    }
+                        &new_ys
+                    };
                 }
                 #[cfg(not(feature = "32_bit_limbs"))]
                 {

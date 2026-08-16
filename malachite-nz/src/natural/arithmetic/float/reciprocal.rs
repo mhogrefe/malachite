@@ -708,15 +708,15 @@ fn reciprocal_float_significand_general_to_out(
                 // cmp_s_r > 0, reciprocal is < q1: to determine if it is in [q1 - 2, q1 - 1] or in
                 // [q1 - 1, q1], we need to subtract the low part u0 of the dividend from q*v0
                 // subtract u0 >> extra_bit if non-zero
-                if q_high_2 {
+                cmp_s_r = if q_high_2 {
                     // whatever the value of {ns, m + k}, it will be smaller than q_high_2 + {sp, k}
-                    cmp_s_r = Greater;
+                    Greater
                 } else {
                     // subtract r
                     limbs_sub_same_length_in_place_left(sp_hi, &xs[..qs_2_len]);
                     // now compare {sp, ds_len} to y
-                    cmp_s_r = limbs_cmp_same_length(sp, ds);
-                }
+                    limbs_cmp_same_length(sp, ds)
+                };
                 if cmp_s_r <= Equal {
                     // q1 - 1 <= x / y < q1
                     if sticky_3 == 1 {

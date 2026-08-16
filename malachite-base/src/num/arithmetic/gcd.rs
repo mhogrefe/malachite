@@ -72,51 +72,44 @@ private_test_fn! {gcd_fast_a<T: PrimitiveUnsigned>(mut x: T, mut y: T) -> T {
 
 #[cfg(feature = "test_build")]
 // This is a modified version of `n_xgcd` from `ulong_extras/xgcd.c`, FLINT 2.7.1.
-pub fn gcd_fast_b<T: PrimitiveUnsigned>(mut x: T, y: T) -> T {
-    let mut v;
-    if x >= y {
-        v = y;
-    } else {
-        v = x;
-        x = y;
-    }
-    let mut d;
+pub fn gcd_fast_b<T: PrimitiveUnsigned>(x: T, y: T) -> T {
+    let (mut x, mut v) = if x >= y { (x, y) } else { (y, x) };
     // x and y both have their top bit set.
     if (x & v).get_highest_bit() {
-        d = x - v;
-        x = v;
-        v = d;
+        (x, v) = (v, x - v);
     }
     // The second value has its second-highest set.
     while (v << 1u64).get_highest_bit() {
-        d = x - v;
-        x = v;
-        if d < v {
-            v = d;
-        } else if d < (v << 1) {
-            v = d - x;
-        } else {
-            v = d - (x << 1);
-        }
+        let d = x - v;
+        (x, v) = (
+            v,
+            if d < v {
+                d
+            } else if d < (v << 1) {
+                d - v
+            } else {
+                d - (v << 1)
+            },
+        );
     }
     while v != T::ZERO {
         // Overflow is not possible due to top 2 bits of v not being set. Avoid divisions when
         // quotient < 4.
-        if x < (v << 2) {
-            d = x - v;
-            x = v;
-            if d < v {
-                v = d;
-            } else if d < (v << 1) {
-                v = d - x;
-            } else {
-                v = d - (x << 1);
-            }
+        (x, v) = if x < (v << 2) {
+            let d = x - v;
+            (
+                v,
+                if d < v {
+                    d
+                } else if d < (v << 1) {
+                    d - v
+                } else {
+                    d - (v << 1)
+                },
+            )
         } else {
-            let rem = x % v;
-            x = v;
-            v = rem;
-        }
+            (v, x % v)
+        };
     }
     x
 }

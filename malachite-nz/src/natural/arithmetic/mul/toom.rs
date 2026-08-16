@@ -936,15 +936,15 @@ crate_test_fn! {limbs_mul_greater_to_out_toom_33(
     }
     let mut v_neg_1_neg = carry == 0 && limbs_cmp_same_length(gp, xs_1) == Less;
     let (asm1_last, asm1_init) = asm1.split_last_mut().unwrap();
-    if v_neg_1_neg {
+    *asm1_last = if v_neg_1_neg {
         limbs_sub_same_length_to_out(asm1_init, xs_1, gp);
-        *asm1_last = 0;
+        0
     } else {
         if limbs_sub_same_length_to_out(asm1_init, gp, xs_1) {
             carry.wrapping_sub_assign(1);
         }
-        *asm1_last = carry;
-    }
+        carry
+    };
     // Compute as2.
     let (as2_last, as2_init) = as2.split_last_mut().unwrap();
     let carry = if s == n {

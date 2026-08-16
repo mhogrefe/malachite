@@ -143,10 +143,7 @@ fn demo_natural_mod_square_precomputed_assign(gm: GenMode, config: &GenConfig, l
         let m_old = m.clone();
         let data = ModPowPrecomputed::<Natural>::precompute_mod_pow_data(&m);
         x.mod_square_precomputed_assign(m, &data);
-        println!(
-            "x := {}; x.mod_square_precomputed_assign({}, &data); x = {}",
-            x_old, m_old, x
-        );
+        println!("x := {x_old}; x.mod_square_precomputed_assign({m_old}, &data); x = {x}");
     }
 }
 
@@ -155,10 +152,7 @@ fn demo_natural_mod_square_precomputed_assign_ref(gm: GenMode, config: &GenConfi
         let x_old = x.clone();
         let data = ModPowPrecomputed::<Natural>::precompute_mod_pow_data(&m);
         x.mod_square_precomputed_assign(&m, &data);
-        println!(
-            "x := {}; x.mod_square_precomputed_assign(&{}, &data); x = {}",
-            x_old, m, x
-        );
+        println!("x := {x_old}; x.mod_square_precomputed_assign(&{m}, &data); x = {x}");
     }
 }
 

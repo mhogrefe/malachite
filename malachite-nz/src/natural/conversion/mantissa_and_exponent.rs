@@ -112,10 +112,10 @@ impl Natural {
             }
             Self(Large(xs)) => {
                 let len = xs.len();
-                if len == 2 {
+                significant_bits = if len == 2 {
                     most_significant_limbs[0] = xs[0];
                     most_significant_limbs[1] = xs[1];
-                    significant_bits = xs[1].significant_bits() + Limb::WIDTH;
+                    xs[1].significant_bits() + Limb::WIDTH
                 } else {
                     most_significant_limbs[2] = xs[len - 1];
                     most_significant_limbs[1] = xs[len - 2];
@@ -128,7 +128,7 @@ impl Natural {
                         exact = false;
                         highest_discarded_limb = xs[len - 4];
                     }
-                    significant_bits = most_significant_limbs[2].significant_bits() + TWICE_WIDTH;
+                    most_significant_limbs[2].significant_bits() + TWICE_WIDTH
                 }
             }
         }

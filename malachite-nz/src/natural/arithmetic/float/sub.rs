@@ -3853,8 +3853,8 @@ fn sub_float_significands_general<'a>(
             }
         }
     } else if carry != 0 {
-        if rm == Floor || rm == Down || rm == Exact {
-            inexact = -1;
+        inexact = if rm == Floor || rm == Down || rm == Exact {
+            -1
         } else {
             if limbs_slice_add_limb_in_place(out, shift_bit) {
                 // result is a power of 2: 11111111111111 + 1 = 1000000000000000
@@ -3862,8 +3862,8 @@ fn sub_float_significands_general<'a>(
                 add_exp = true;
             }
             // result larger than exact value
-            inexact = 1;
-        }
+            1
+        };
         goto_truncate = true;
     }
     if !goto_truncate {
@@ -4042,7 +4042,7 @@ fn sub_float_significands_general<'a>(
                                 Greater => {
                                     // If sh = 0, then xx > yy means that low(x) - low(y) > 0.5 ulp,
                                     // and similarly when cmp_low = 2.
-                                    if cmp_low == 2 {
+                                    inexact = if cmp_low == 2 {
                                         // cases 1a, 1b1, 2a and 2b1
                                         //
                                         // shift > 0 and cmp_low > 0: this implies that the `shift`
@@ -4055,12 +4055,12 @@ fn sub_float_significands_general<'a>(
                                             add_exp = true;
                                         }
                                         // result larger than exact value
-                                        inexact = 1;
+                                        1
                                     } else {
                                         // 0 < low(x) - low(y) < 0.5 ulp, this corresponds to cases
                                         // 3a, 1d1 and 3b1
-                                        inexact = -1;
-                                    }
+                                        -1
+                                    };
                                     goto_truncate = true;
                                 }
                                 Less => {

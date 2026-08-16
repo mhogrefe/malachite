@@ -362,10 +362,7 @@ fn demo_natural_mod_mul_precomputed_assign(gm: GenMode, config: &GenConfig, limi
         let m_old = m.clone();
         let data = ModMulPrecomputed::<Natural>::precompute_mod_mul_data(&m);
         x.mod_mul_precomputed_assign(y, m, &data);
-        println!(
-            "x := {}; x.mod_mul_precomputed_assign({}, {}, &data); x = {}",
-            x_old, y_old, m_old, x
-        );
+        println!("x := {x_old}; x.mod_mul_precomputed_assign({y_old}, {m_old}, &data); x = {x}");
     }
 }
 
@@ -375,10 +372,7 @@ fn demo_natural_mod_mul_precomputed_assign_val_ref(gm: GenMode, config: &GenConf
         let y_old = y.clone();
         let data = ModMulPrecomputed::<Natural>::precompute_mod_mul_data(&m);
         x.mod_mul_precomputed_assign(y, &m, &data);
-        println!(
-            "x := {}; x.mod_mul_precomputed_assign({}, &{}, &data); x = {}",
-            x_old, y_old, m, x
-        );
+        println!("x := {x_old}; x.mod_mul_precomputed_assign({y_old}, &{m}, &data); x = {x}");
     }
 }
 
@@ -388,10 +382,7 @@ fn demo_natural_mod_mul_precomputed_assign_ref_val(gm: GenMode, config: &GenConf
         let m_old = m.clone();
         let data = ModMulPrecomputed::<Natural>::precompute_mod_mul_data(&m);
         x.mod_mul_precomputed_assign(&y, m, &data);
-        println!(
-            "x := {}; x.mod_mul_precomputed_assign(&{}, {}, &data); x = {}",
-            x_old, y, m_old, x
-        );
+        println!("x := {x_old}; x.mod_mul_precomputed_assign(&{y}, {m_old}, &data); x = {x}");
     }
 }
 
@@ -400,10 +391,7 @@ fn demo_natural_mod_mul_precomputed_assign_ref_ref(gm: GenMode, config: &GenConf
         let x_old = x.clone();
         let data = ModMulPrecomputed::<Natural>::precompute_mod_mul_data(&m);
         x.mod_mul_precomputed_assign(&y, &m, &data);
-        println!(
-            "x := {}; x.mod_mul_precomputed_assign(&{}, &{}, &data); x = {}",
-            x_old, y, m, x
-        );
+        println!("x := {x_old}; x.mod_mul_precomputed_assign(&{y}, &{m}, &data); x = {x}");
     }
 }
 

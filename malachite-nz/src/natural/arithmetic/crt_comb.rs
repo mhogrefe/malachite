@@ -662,7 +662,6 @@ impl CrtComb {
                 }
                 ad[s] = lo;
                 ad[s + 1] = hi;
-                i = *offset;
             } else {
                 for lu in &self.crt_lu[i..*offset] {
                     // The group's combined residue: each idempotent is below the group product, so
@@ -689,8 +688,8 @@ impl CrtComb {
                     ad[s + 1] += Limb::from(overflow);
                     md_pos += s;
                 }
-                i = *offset;
             }
+            i = *offset;
             a.push(Natural::from_owned_limbs_asc(ad) % &self.crt_chunks[k]);
         }
         assert_eq!(l, self.primes.len());

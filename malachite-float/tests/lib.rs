@@ -71,6 +71,7 @@ pub mod float {
         pub mod div;
         pub mod exp;
         pub mod exp_x_minus_1;
+        pub mod fractional_part;
         pub mod is_power_of_2;
         pub mod ln;
         pub mod ln_1_plus_x;

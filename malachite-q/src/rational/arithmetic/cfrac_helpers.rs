@@ -366,17 +366,11 @@ fn hgcd_split(
     mut shift: u64,
 ) -> u64 {
     let (mut ta, mut tb);
-    if m.det_pos {
-        *xa = ya - &m.m12;
-        *xb = yb - &m.m21;
-        ta = ya + &m.m22;
-        tb = yb + &m.m11;
+    (*xa, *xb, ta, tb) = if m.det_pos {
+        (ya - &m.m12, yb - &m.m21, ya + &m.m22, yb + &m.m11)
     } else {
-        *xa = ya - &m.m22;
-        *xb = yb - &m.m11;
-        ta = ya + &m.m12;
-        tb = yb + &m.m21;
-    }
+        (ya - &m.m22, yb - &m.m11, ya + &m.m12, yb + &m.m21)
+    };
     *xa >>= shift;
     ta >>= shift;
     *xb >>= shift;

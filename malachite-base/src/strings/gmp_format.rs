@@ -160,13 +160,13 @@ pub fn parse_gmp_conversion_spec<'a>(
                     return None;
                 }
                 if in_width {
-                    // a negative width means left justification
-                    if n < 0 {
+                    spec.width = if n < 0 {
+                        // a negative width means left justification
                         spec.left = true;
-                        spec.width = -n;
+                        -n
                     } else {
-                        spec.width = n;
-                    }
+                        n
+                    };
                 } else {
                     // a negative precision is not allowed
                     spec.prec = Some(max(0, n));

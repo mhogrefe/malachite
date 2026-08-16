@@ -228,8 +228,7 @@ pub fn limbs_set_str(
         let y = &mut y0[ysize..];
         assert_ne!(y[real_ysize - 1], 0);
         let count = u64::from(y[real_ysize - 1].leading_zeros());
-        let mut exp;
-        if let Some(diff_ysize) = ysize.checked_sub(real_ysize) {
+        let mut exp = if let Some(diff_ysize) = ysize.checked_sub(real_ysize) {
             // There is room to store {y, real_ysize} exactly in {y, ysize}, so the left shift loses
             // nothing and `exact` does not change.
             if count != 0 {
@@ -240,7 +239,7 @@ pub fn limbs_set_str(
                 y[..diff_ysize].fill(0);
             }
             // the negation of the total shift count
-            exp = -(i64::exact_from(limb_to_bit_count(diff_ysize)) + i64::exact_from(count));
+            -(i64::exact_from(limb_to_bit_count(diff_ysize)) + i64::exact_from(count))
         } else {
             // {y, real_ysize} does not fit in ysize limbs. Drop the low limbs that cannot be kept,
             // then shift the rest right by Limb::WIDTH - count bits, leaving the value's top bit at
@@ -261,8 +260,8 @@ pub fn limbs_set_str(
                 exact = exact && y[0] == 0;
                 y.copy_within(1..kept, 0);
             }
-            exp = i64::exact_from(limb_to_bit_count(dropped + 1)) - i64::exact_from(count);
-        }
+            i64::exact_from(limb_to_bit_count(dropped + 1)) - i64::exact_from(count)
+        };
         // Compute base ^ (exp_base - pstr_size) on ysize limbs, multiplying or dividing y by it.
         let pstr_size_i = i64::exact_from(pstr_size);
         let ysize_bits_i = i64::exact_from(ysize_bits);

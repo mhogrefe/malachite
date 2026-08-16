@@ -396,10 +396,7 @@ fn demo_natural_mod_pow_precomputed_assign(gm: GenMode, config: &GenConfig, limi
         let m_old = m.clone();
         let data = ModPowPrecomputed::<Natural>::precompute_mod_pow_data(&m);
         x.mod_pow_precomputed_assign(exp, m, &data);
-        println!(
-            "x := {}; x.mod_pow_precomputed_assign({}, {}, &data); x = {}",
-            x_old, exp_old, m_old, x
-        );
+        println!("x := {x_old}; x.mod_pow_precomputed_assign({exp_old}, {m_old}, &data); x = {x}");
     }
 }
 
@@ -409,10 +406,7 @@ fn demo_natural_mod_pow_precomputed_assign_ref(gm: GenMode, config: &GenConfig, 
         let exp_old = exp.clone();
         let data = ModPowPrecomputed::<Natural>::precompute_mod_pow_data(&m);
         x.mod_pow_precomputed_assign(exp, &m, &data);
-        println!(
-            "x := {}; x.mod_pow_precomputed_assign({}, &{}, &data); x = {}",
-            x_old, exp_old, m, x
-        );
+        println!("x := {x_old}; x.mod_pow_precomputed_assign({exp_old}, &{m}, &data); x = {x}");
     }
 }
 

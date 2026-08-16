@@ -12,6 +12,7 @@ use crate::rational::arithmetic::traits::{
 };
 use alloc::collections::BinaryHeap;
 use alloc::vec::Vec;
+use core::cmp::Ordering::*;
 use core::cmp::{Ordering, Reverse};
 use malachite_base::num::arithmetic::traits::{
     Ceiling, CoprimeWith, Floor, Reciprocal, UnsignedAbs,
@@ -213,12 +214,10 @@ impl Iterator for DenominatorsInClosedRationalInterval {
                 assert_eq!(self.current, 0u32);
                 let ad = self.a.denominator_ref();
                 let bd = self.b.denominator_ref();
-                self.endpoint_denominators = if ad == bd {
-                    alloc::vec![ad.clone()]
-                } else if ad < bd {
-                    alloc::vec![ad.clone(), bd.clone()]
-                } else {
-                    alloc::vec![bd.clone(), ad.clone()]
+                self.endpoint_denominators = match ad.cmp(bd) {
+                    Equal => alloc::vec![ad.clone()],
+                    Less => alloc::vec![ad.clone(), bd.clone()],
+                    Greater => alloc::vec![bd.clone(), ad.clone()],
                 };
                 self.gaps.push(Reverse(Gap::new(
                     self.a.clone(),

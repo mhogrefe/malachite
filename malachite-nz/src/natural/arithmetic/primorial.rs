@@ -89,12 +89,12 @@ fn limbs_product_of_first_n_primes(n: usize) -> Vec<Limb> {
     let mut prod: Limb = 1;
     let mut factors = Vec::new();
     for prime in Limb::primes().take(n) {
-        if let Some(p) = prod.checked_mul(prime) {
-            prod = p;
+        prod = if let Some(p) = prod.checked_mul(prime) {
+            p
         } else {
             factors.push(prod);
-            prod = prime;
-        }
+            prime
+        };
     }
     factors.push(prod);
     let mut out = Vec::new();

@@ -196,7 +196,7 @@ fn benchmark_natural_mod_div_list_algorithms(
         &mut [
             ("default", &mut |(x, y, m)| no_out!(x.mod_div_list(y, m))),
             ("simple", &mut |(x, y, m)| {
-                no_out!(mod_div_list_simple(x, y, m))
+                no_out!(mod_div_list_simple(x, y, m));
             }),
         ],
     );

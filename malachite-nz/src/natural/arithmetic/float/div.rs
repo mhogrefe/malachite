@@ -1585,19 +1585,19 @@ fn div_float_significands_general_to_out(
                         let l = ns_len - two_qs_2_len; // number of limbs in u0
                         let m = l.saturating_sub(k);
                         carry = extra_bit && ns[m].odd();
-                        if l >= k {
+                        carry = if l >= k {
                             // u0 has at least as many limbs than s: first look if {ns, m} is not
                             // zero, and compare {sp, k} and {ns + m, k}
                             if !carry {
                                 carry = !slice_test_zero(&ns[..m]);
                             }
                             low_x = carry;
-                            carry = sub_helper(
+                            sub_helper(
                                 sp_lo,
                                 &ns[m..m + k + usize::from(extra_bit)],
                                 carry,
                                 extra_bit,
-                            );
+                            )
                         } else {
                             // l < k: s has more limbs than u0
                             low_x = false;
@@ -1608,13 +1608,13 @@ fn div_float_significands_general_to_out(
                                     LIMB_HIGH_BIT,
                                 );
                             }
-                            carry = sub_helper(
+                            sub_helper(
                                 &mut sp_lo[kml..],
                                 &ns[..l + usize::from(extra_bit)],
                                 carry,
                                 extra_bit,
-                            );
-                        }
+                            )
+                        };
                     }
                     if carry {
                         limbs_sub_limb_in_place(sp_hi, 1);
