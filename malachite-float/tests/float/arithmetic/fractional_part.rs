@@ -12,8 +12,13 @@ use malachite_base::assert_panic;
 use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::traits::{NaN, NegativeInfinity};
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::LowMask;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
+use malachite_base::test_util::generators::primitive_float_gen;
+use malachite_float::float::arithmetic::fractional_part::{
+    primitive_float_fractional_part, primitive_float_integer_and_fractional_parts,
+};
 use malachite_float::test_util::common::{parse_hex_string, to_hex_string};
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_nz::natural::Natural;
@@ -465,4 +470,44 @@ fn integer_and_fractional_parts_prec_round_fail() {
     assert_panic!(
         parse_hex_string("0xa.50#9").integer_and_fractional_parts_prec_round(2, 1, Exact)
     );
+}
+
+// The emulated primitive-float fractional part agrees bit-for-bit with the standard library for
+// finite values; infinities follow mpfr_frac (a same-signed zero) rather than `fract`'s NaN.
+#[test]
+fn primitive_float_fractional_part_properties() {
+    primitive_float_gen::<f64>().test_properties(|x| {
+        let f = primitive_float_fractional_part(x);
+        if x.is_finite() {
+            if x.fract() == 0.0 {
+                // a zero fractional part takes the input's sign (as in mpfr_frac), while `fract`
+                // returns a positive zero for negative integers
+                assert_eq!(NiceFloat(f), NiceFloat(0.0f64.copysign(x)));
+            } else {
+                assert_eq!(NiceFloat(f), NiceFloat(x.fract()));
+            }
+        } else if x.is_infinite() {
+            assert_eq!(NiceFloat(f), NiceFloat(if x > 0.0 { 0.0 } else { -0.0 }));
+        } else {
+            assert!(f.is_nan());
+        }
+        let (i, f2) = primitive_float_integer_and_fractional_parts(x);
+        if x.is_finite() {
+            assert_eq!(NiceFloat(i), NiceFloat(x.trunc()));
+            if x.fract() == 0.0 {
+                assert_eq!(NiceFloat(f2), NiceFloat(0.0f64.copysign(x)));
+            } else {
+                assert_eq!(NiceFloat(f2), NiceFloat(x.fract()));
+            }
+        }
+    });
+
+    primitive_float_gen::<f32>().test_properties(|x| {
+        if x.is_finite() && x.fract() != 0.0 {
+            assert_eq!(
+                NiceFloat(primitive_float_fractional_part(x)),
+                NiceFloat(x.fract())
+            );
+        }
+    });
 }

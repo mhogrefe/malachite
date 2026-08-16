@@ -201,6 +201,48 @@ where
 
 #[allow(clippy::type_repetition_in_bounds)]
 #[doc(hidden)]
+pub fn emulate_float_to_float_and_i64_fn<
+    T: PrimitiveFloat,
+    F: Fn(Float, u64) -> (Float, Ordering, i64),
+>(
+    f: F,
+    x: T,
+) -> (T, i64)
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    let x = Float::from(x);
+    let (result, o, quo) = f(x, T::MANTISSA_WIDTH + 1);
+    // the quotient bits are computed from the exact values, so they are unaffected by the
+    // subnormalization of the remainder
+    (emulate_finish(result, o), quo)
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+#[doc(hidden)]
+pub fn emulate_float_float_to_float_and_i64_fn<
+    T: PrimitiveFloat,
+    F: Fn(Float, Float, u64) -> (Float, Ordering, i64),
+>(
+    f: F,
+    x: T,
+    y: T,
+) -> (T, i64)
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    let x = Float::from(x);
+    let y = Float::from(y);
+    let (result, o, quo) = f(x, y, T::MANTISSA_WIDTH + 1);
+    // the quotient bits are computed from the exact values, so they are unaffected by the
+    // subnormalization of the remainder
+    (emulate_finish(result, o), quo)
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+#[doc(hidden)]
 pub fn emulate_rational_to_float_fn<T: PrimitiveFloat, F: Fn(&Rational, u64) -> (Float, Ordering)>(
     f: F,
     x: &Rational,

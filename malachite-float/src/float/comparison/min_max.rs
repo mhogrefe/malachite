@@ -9,6 +9,9 @@
 // Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+use crate::emulate_float_to_float_fn;
+use malachite_base::num::basic::floats::PrimitiveFloat;
+use malachite_base::num::conversion::traits::ExactFrom;
 
 use crate::Float;
 use crate::InnerFloat::Zero;
@@ -3429,4 +3432,79 @@ impl Float {
     pub fn max_rational_ref_ref(&self, other: &Rational) -> (Self, Ordering) {
         self.max_rational_round_ref_ref(other, Nearest)
     }
+}
+
+/// Computes the smaller of a primitive float and a [`Rational`], correctly rounding the result to
+/// the nearest value.
+///
+/// The comparison is exact, and only the winning operand is rounded, so the right operand is
+/// selected even when converting the [`Rational`] to a primitive float first would land on the
+/// other side of the comparison. A NaN input yields the [`Rational`], rounded.
+///
+/// # Worst-case complexity
+/// $T(n) = O(n \log n \log\log n)$
+///
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `y.significant_bits()`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::comparison::min_max::primitive_float_min_rational;
+/// use malachite_q::Rational;
+///
+/// assert_eq!(
+///     NiceFloat(primitive_float_min_rational(
+///         3.0,
+///         &Rational::from_signeds(22, 7)
+///     )),
+///     NiceFloat(3.0)
+/// );
+/// ```
+#[allow(clippy::type_repetition_in_bounds)]
+#[inline]
+pub fn primitive_float_min_rational<T: PrimitiveFloat>(x: T, y: &Rational) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    emulate_float_to_float_fn(|x, prec| x.min_rational_prec_val_ref(y, prec), x)
+}
+
+/// Computes the larger of a primitive float and a [`Rational`], correctly rounding the result to
+/// the nearest value.
+///
+/// The comparison is exact, and only the winning operand is rounded. A NaN input yields the
+/// [`Rational`], rounded.
+///
+/// # Worst-case complexity
+/// $T(n) = O(n \log n \log\log n)$
+///
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `y.significant_bits()`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::comparison::min_max::primitive_float_max_rational;
+/// use malachite_q::Rational;
+///
+/// assert_eq!(
+///     NiceFloat(primitive_float_max_rational(
+///         3.0,
+///         &Rational::from_signeds(22, 7)
+///     )),
+///     NiceFloat(3.142857142857143)
+/// );
+/// ```
+#[allow(clippy::type_repetition_in_bounds)]
+#[inline]
+pub fn primitive_float_max_rational<T: PrimitiveFloat>(x: T, y: &Rational) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    emulate_float_to_float_fn(|x, prec| x.max_rational_prec_val_ref(y, prec), x)
 }

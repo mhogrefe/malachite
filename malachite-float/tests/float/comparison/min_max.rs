@@ -11,10 +11,15 @@ use malachite_base::num::arithmetic::traits::NegAssign;
 use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeZero, One, Two, Zero,
 };
-use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
+use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
+use malachite_base::test_util::generators::primitive_float_gen;
+use malachite_float::float::comparison::min_max::{
+    primitive_float_max_rational, primitive_float_min_rational,
+};
 use malachite_float::test_util::common::{
     parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
 };
@@ -2279,4 +2284,39 @@ fn min_max_rational_fail() {
         2,
         Exact
     ));
+}
+
+// The emulated mixed min and max: the winner is chosen by exact comparison and rounded correctly.
+#[test]
+fn primitive_float_min_max_rational_properties() {
+    primitive_float_gen::<f64>().test_properties(|x| {
+        for y in [
+            Rational::from_signeds(22i64, 7i64),
+            Rational::from_signeds(-22i64, 7i64),
+            Rational::from_signeds(1i64, 3i64) << 100i64,
+            Rational::ZERO,
+        ] {
+            let min = primitive_float_min_rational(x, &y);
+            let max = primitive_float_max_rational(x, &y);
+            let yf = f64::rounding_from(&y, Nearest).0;
+            if x.is_nan() {
+                assert_eq!(NiceFloat(min), NiceFloat(yf));
+                assert_eq!(NiceFloat(max), NiceFloat(yf));
+            } else {
+                match x.partial_cmp(&y).unwrap() {
+                    Less => {
+                        assert_eq!(NiceFloat(min), NiceFloat(x));
+                        assert_eq!(NiceFloat(max), NiceFloat(yf));
+                    }
+                    Greater => {
+                        assert_eq!(NiceFloat(min), NiceFloat(yf));
+                        assert_eq!(NiceFloat(max), NiceFloat(x));
+                    }
+                    Equal => {
+                        assert_eq!(NiceFloat(min), NiceFloat(x));
+                    }
+                }
+            }
+        }
+    });
 }

@@ -9,6 +9,8 @@
 // Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+use crate::emulate_float_to_float_fn;
+use malachite_base::num::basic::floats::PrimitiveFloat;
 
 use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, Zero};
@@ -753,4 +755,78 @@ impl Float {
             )
         }
     }
+}
+
+/// Computes the fractional part of a primitive float, using emulated [`Float`] arithmetic.
+///
+/// The result is always exactly representable, matching the standard library's `fract` for finite
+/// values with a nonzero fractional part; it serves as a reference implementation. As in
+/// `mpfr_frac`, a zero result takes the input's sign (where `fract` of a negative integer is a
+/// positive zero), and the fractional part of an infinity is a zero of the same sign (where `fract`
+/// returns NaN).
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::fractional_part::primitive_float_fractional_part;
+///
+/// assert_eq!(
+///     NiceFloat(primitive_float_fractional_part(10.5)),
+///     NiceFloat(0.5)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_fractional_part(-10.5)),
+///     NiceFloat(-0.5)
+/// );
+/// ```
+#[allow(clippy::type_repetition_in_bounds)]
+#[inline]
+pub fn primitive_float_fractional_part<T: PrimitiveFloat>(x: T) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    emulate_float_to_float_fn(Float::fractional_part_prec, x)
+}
+
+/// Computes the integer and fractional parts of a primitive float, using emulated [`Float`]
+/// arithmetic.
+///
+/// Both parts are always exactly representable, and their sum is the input; this matches
+/// `x.trunc()` and `x.fract()` for finite values (up to the sign of a zero fraction, which follows
+/// the input as in `mpfr_modf`) and serves as a reference implementation. An infinity keeps its
+/// integer part and has a zero fraction.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::fractional_part::*;
+///
+/// let (i, f) = primitive_float_integer_and_fractional_parts(10.5);
+/// assert_eq!(NiceFloat(i), NiceFloat(10.0));
+/// assert_eq!(NiceFloat(f), NiceFloat(0.5));
+/// ```
+#[allow(clippy::type_repetition_in_bounds)]
+#[inline]
+pub fn primitive_float_integer_and_fractional_parts<T: PrimitiveFloat>(x: T) -> (T, T)
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    (
+        emulate_float_to_float_fn(
+            |x, prec| x.integer_and_fractional_parts_prec(prec, prec).0,
+            x,
+        ),
+        emulate_float_to_float_fn(
+            |x, prec| x.integer_and_fractional_parts_prec(prec, prec).1,
+            x,
+        ),
+    )
 }

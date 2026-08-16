@@ -11,8 +11,13 @@ use gmp_mpfr_sys::mpfr::{self, rnd_t};
 use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::traits::{NaN, NegativeInfinity};
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::LowMask;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
+use malachite_base::test_util::generators::primitive_float_gen;
+use malachite_float::float::arithmetic::round_to_integer::{
+    primitive_float_round_to_integer, primitive_float_round_to_integer_ties_away,
+};
 use malachite_float::test_util::common::{parse_hex_string, to_hex_string};
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_nz::natural::Natural;
@@ -445,4 +450,53 @@ fn test_round_to_integer_then_prec_round() {
     test(
         "-10.5", "-0xa.8#6", Floor, 2, Nearest, "-12.0", "-0xc.0#2", Less,
     );
+}
+
+// The emulated primitive-float integer rounding agrees bit-for-bit with the standard library
+// wherever a standard function exists (integer rounding of a float is always exact).
+#[test]
+fn primitive_float_round_to_integer_properties() {
+    primitive_float_gen::<f64>().test_properties(|x| {
+        assert_eq!(
+            NiceFloat(primitive_float_round_to_integer(x, Floor)),
+            NiceFloat(x.floor())
+        );
+        assert_eq!(
+            NiceFloat(primitive_float_round_to_integer(x, Ceiling)),
+            NiceFloat(x.ceil())
+        );
+        assert_eq!(
+            NiceFloat(primitive_float_round_to_integer(x, Down)),
+            NiceFloat(x.trunc())
+        );
+        assert_eq!(
+            NiceFloat(primitive_float_round_to_integer(x, Nearest)),
+            NiceFloat(x.round_ties_even())
+        );
+        // Up (away from zero) has no standard equivalent; it is the sign-adjusted Ceiling
+        let away = if x.is_sign_positive() {
+            x.ceil()
+        } else {
+            x.floor()
+        };
+        assert_eq!(
+            NiceFloat(primitive_float_round_to_integer(x, Up)),
+            NiceFloat(away)
+        );
+        assert_eq!(
+            NiceFloat(primitive_float_round_to_integer_ties_away(x)),
+            NiceFloat(x.round())
+        );
+    });
+
+    primitive_float_gen::<f32>().test_properties(|x| {
+        assert_eq!(
+            NiceFloat(primitive_float_round_to_integer(x, Nearest)),
+            NiceFloat(x.round_ties_even())
+        );
+        assert_eq!(
+            NiceFloat(primitive_float_round_to_integer_ties_away(x)),
+            NiceFloat(x.round())
+        );
+    });
 }

@@ -16,10 +16,20 @@ use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeZero, One, Zero,
 };
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
+use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::{LowMask, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::{primitive_float_gen, primitive_float_pair_gen};
+use malachite_float::float::arithmetic::rem::{
+    primitive_float_ieee_remainder, primitive_float_ieee_remainder_and_quotient_bits,
+    primitive_float_ieee_remainder_rational,
+    primitive_float_ieee_remainder_rational_and_quotient_bits,
+    primitive_float_rational_ieee_remainder_float, primitive_float_rational_rem_float,
+    primitive_float_rem, primitive_float_rem_and_quotient_bits, primitive_float_rem_rational,
+    primitive_float_rem_rational_and_quotient_bits, primitive_float_rem_unsigned,
+};
 use malachite_float::test_util::common::{parse_hex_string, to_hex_string};
 use malachite_float::test_util::generators::{
     float_float_rounding_mode_triple_gen_var_40, float_float_rounding_mode_triple_gen_var_41,
@@ -3346,4 +3356,102 @@ fn test_rational_rem_float_operator() {
     test("22/7", "3.0", "0x3.0#2", "0.12", "0x0.2#2");
     test("-22/7", "3.0", "0x3.0#2", "-0.12", "-0x0.2#2");
     test("1/3", "4.0", "0x4.0#1", "0.25", "0x0.4#1");
+}
+
+// The emulated primitive-float remainders: the truncated-quotient form must agree bit-for-bit with
+// the primitive `%` operator (the floating-point remainder is always exactly representable), and
+// the others are checked against exact Rational arithmetic.
+#[test]
+fn primitive_float_rem_properties() {
+    primitive_float_pair_gen::<f64>().test_properties(|(x, y)| {
+        let r = primitive_float_rem(x, y);
+        assert_eq!(NiceFloat(r), NiceFloat(x % y));
+        let (r2, quo) = primitive_float_rem_and_quotient_bits(x, y);
+        assert_eq!(NiceFloat(r2), NiceFloat(r));
+        let ieee = primitive_float_ieee_remainder(x, y);
+        let (ieee2, iquo) = primitive_float_ieee_remainder_and_quotient_bits(x, y);
+        assert_eq!(NiceFloat(ieee2), NiceFloat(ieee));
+        if x.is_finite() && y.is_finite() && x != 0.0 && y != 0.0 {
+            let xr = Rational::exact_from(x);
+            let yr = Rational::exact_from(y);
+            let (q, _) = Integer::rounding_from(&xr / &yr, Down);
+            assert_eq!(quo, expected_quotient_bits(&q));
+            let r_exact = &xr - Rational::from(q) * &yr;
+            if r_exact != 0u32 {
+                assert_eq!(Rational::exact_from(r), r_exact);
+            } else {
+                assert_eq!(r, 0.0);
+            }
+            let (q, _) = Integer::rounding_from(&xr / &yr, Nearest);
+            assert_eq!(iquo, expected_quotient_bits(&q));
+            let r_exact = xr - Rational::from(q) * yr;
+            if r_exact != 0u32 {
+                assert_eq!(Rational::exact_from(ieee), r_exact);
+            } else {
+                assert_eq!(ieee, 0.0);
+            }
+        }
+    });
+
+    primitive_float_gen::<f64>().test_properties(|x| {
+        for y in test_rationals() {
+            let r = primitive_float_rem_rational(x, &y);
+            let (r2, quo) = primitive_float_rem_rational_and_quotient_bits(x, &y);
+            assert_eq!(NiceFloat(r2), NiceFloat(r));
+            let ieee = primitive_float_ieee_remainder_rational(x, &y);
+            let (ieee2, iquo) = primitive_float_ieee_remainder_rational_and_quotient_bits(x, &y);
+            assert_eq!(NiceFloat(ieee2), NiceFloat(ieee));
+            let rev = primitive_float_rational_rem_float(&y, x);
+            let rev_ieee = primitive_float_rational_ieee_remainder_float(&y, x);
+            if x.is_finite() && x != 0.0 {
+                let xr = Rational::exact_from(x);
+                let (q, _) = Integer::rounding_from(&xr / &y, Down);
+                assert_eq!(quo, expected_quotient_bits(&q));
+                let r_exact = &xr - Rational::from(q) * &y;
+                if r_exact != 0u32 {
+                    assert_eq!(
+                        NiceFloat(r),
+                        NiceFloat(f64::rounding_from(&r_exact, Nearest).0)
+                    );
+                }
+                let (q, _) = Integer::rounding_from(&xr / &y, Nearest);
+                assert_eq!(iquo, expected_quotient_bits(&q));
+                // reversed direction: y is the dividend
+                let (q, _) = Integer::rounding_from(&y / &xr, Down);
+                let r_exact = &y - Rational::from(q) * &xr;
+                if r_exact != 0u32 {
+                    assert_eq!(
+                        NiceFloat(rev),
+                        NiceFloat(f64::rounding_from(&r_exact, Nearest).0)
+                    );
+                }
+                let _ = rev_ieee;
+            }
+        }
+    });
+
+    primitive_float_gen::<f64>().test_properties(|x| {
+        for u in [0u64, 1, 3, 7, u64::MAX >> 1, u64::MAX] {
+            let r = primitive_float_rem_unsigned(x, u);
+            if u == 0 {
+                assert!(r.is_nan());
+            } else if x.is_finite() && x != 0.0 {
+                let xr = Rational::exact_from(x);
+                let ur = Rational::from(u);
+                let (q, _) = Integer::rounding_from(&xr / &ur, Down);
+                let r_exact = xr - Rational::from(q) * ur;
+                if r_exact != 0u32 {
+                    assert_eq!(
+                        NiceFloat(r),
+                        NiceFloat(f64::rounding_from(&r_exact, Nearest).0)
+                    );
+                }
+            }
+        }
+    });
+
+    primitive_float_pair_gen::<f32>().test_properties(|(x, y)| {
+        let r = primitive_float_rem(x, y);
+        assert_eq!(NiceFloat(r), NiceFloat(x % y));
+    });
 }

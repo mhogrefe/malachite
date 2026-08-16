@@ -9,6 +9,8 @@
 // Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+use crate::emulate_float_to_float_fn;
+use malachite_base::num::basic::floats::PrimitiveFloat;
 
 use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, Zero};
@@ -1043,4 +1045,84 @@ impl Float {
             uflags == 1,
         )
     }
+}
+
+/// Rounds a primitive float to an integer using the given rounding mode, using emulated [`Float`]
+/// arithmetic.
+///
+/// The result is always exactly representable. With `Floor`, `Ceiling`, `Down`, `Up`, and `Nearest`
+/// this matches the standard library's `floor`, `ceil`, `trunc` (with `Down`; `Up` rounds away from
+/// zero, which has no standard equivalent), and `round_ties_even`; it serves as a reference
+/// implementation. NaN, infinities, and zeros are unchanged.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Panics
+/// Panics if `rm` is `Exact` and the input is not an integer.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_base::rounding_modes::RoundingMode::*;
+/// use malachite_float::float::arithmetic::round_to_integer::primitive_float_round_to_integer;
+///
+/// assert_eq!(
+///     NiceFloat(primitive_float_round_to_integer(2.5, Floor)),
+///     NiceFloat(2.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_round_to_integer(2.5, Nearest)),
+///     NiceFloat(2.0)
+/// );
+/// ```
+#[allow(clippy::type_repetition_in_bounds)]
+#[inline]
+pub fn primitive_float_round_to_integer<T: PrimitiveFloat>(x: T, rm: RoundingMode) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    emulate_float_to_float_fn(
+        |x, prec| {
+            let (r, o, _) = x.round_to_integer_prec_round(prec, rm);
+            (r, o)
+        },
+        x,
+    )
+}
+
+/// Rounds a primitive float to the nearest integer, with ties away from zero, using emulated
+/// [`Float`] arithmetic.
+///
+/// This is IEEE 754's roundTiesToAway, matching the standard library's `round`; it serves as a
+/// reference implementation. NaN, infinities, and zeros are unchanged.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::round_to_integer::*;
+///
+/// assert_eq!(
+///     NiceFloat(primitive_float_round_to_integer_ties_away(2.5)),
+///     NiceFloat(3.0)
+/// );
+/// ```
+#[allow(clippy::type_repetition_in_bounds)]
+#[inline]
+pub fn primitive_float_round_to_integer_ties_away<T: PrimitiveFloat>(x: T) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    emulate_float_to_float_fn(
+        |x, prec| {
+            let (r, o, _) = x.round_to_integer_ties_away_prec(prec);
+            (r, o)
+        },
+        x,
+    )
 }

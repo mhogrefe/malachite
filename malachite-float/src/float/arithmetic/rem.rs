@@ -11,13 +11,18 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use crate::{Float, float_either_infinity, float_either_zero, float_nan, significand_bits};
+use crate::{
+    Float, emulate_float_float_to_float_and_i64_fn, emulate_float_float_to_float_fn,
+    emulate_float_to_float_and_i64_fn, emulate_float_to_float_fn, float_either_infinity,
+    float_either_zero, float_nan, significand_bits,
+};
 use core::cmp::Ordering::{self, *};
 use core::cmp::{max, min};
 use core::ops::{Rem, RemAssign};
 use malachite_base::num::arithmetic::traits::{
     DivMod, ModPow, ModPowerOf2, NegAssign, Parity, PowerOf2,
 };
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{NegativeZero, One, Two, Zero as ZeroTrait};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
@@ -15015,4 +15020,400 @@ impl Rem<&Float> for &Rational {
         let prec = other.significant_bits();
         Float::rational_rem_float_prec_round_ref_ref(self, other, prec, Nearest).0
     }
+}
+
+/// Computes the remainder of two primitive floats, with the quotient rounded toward zero, using
+/// emulated [`Float`] arithmetic.
+///
+/// The floating-point remainder of two values of the same format is always exactly representable,
+/// so this function returns the same values as the `%` operator on primitive floats; it serves as a
+/// reference implementation. NaN, infinite `x`, or zero `y` gives NaN; a zero remainder has the
+/// sign of `x`.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::rem::primitive_float_rem;
+///
+/// assert_eq!(NiceFloat(primitive_float_rem(10.0, 7.0)), NiceFloat(3.0));
+/// assert_eq!(NiceFloat(primitive_float_rem(10.5, 3.25)), NiceFloat(0.75));
+/// ```
+#[allow(clippy::type_repetition_in_bounds)]
+#[inline]
+pub fn primitive_float_rem<T: PrimitiveFloat>(x: T, y: T) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    emulate_float_float_to_float_fn(Float::rem_prec, x, y)
+}
+
+/// Computes the IEEE 754 `remainder` of two primitive floats, with the quotient rounded to the
+/// nearest integer (ties to even), using emulated [`Float`] arithmetic.
+///
+/// Like the truncated-quotient remainder, this value is always exactly representable. NaN, infinite
+/// `x`, or zero `y` gives NaN; a zero remainder has the sign of `x`.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::rem::primitive_float_ieee_remainder;
+///
+/// assert_eq!(
+///     NiceFloat(primitive_float_ieee_remainder(14.0, 3.0)),
+///     NiceFloat(-1.0)
+/// );
+/// ```
+#[allow(clippy::type_repetition_in_bounds)]
+#[inline]
+pub fn primitive_float_ieee_remainder<T: PrimitiveFloat>(x: T, y: T) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    emulate_float_float_to_float_fn(Float::ieee_remainder_prec, x, y)
+}
+
+/// Computes the remainder of a primitive float by a [`Rational`], with the quotient rounded toward
+/// zero, correctly rounding the result to the nearest value.
+///
+/// The [`Rational`] modulus is used exactly. A remainder is unusually sensitive to its modulus —
+/// perturbing it by $\varepsilon$ moves the result by up to the quotient times $\varepsilon$ — so
+/// no primitive-float approximation of the modulus could produce these values. NaN or infinite `x`,
+/// or zero `y`, gives NaN.
+///
+/// # Worst-case complexity
+/// $T(n) = O(n \log n \log\log n)$
+///
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `y.significant_bits()`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::rem::primitive_float_rem_rational;
+/// use malachite_q::Rational;
+///
+/// // 10 mod 22/7 = 4/7
+/// assert_eq!(
+///     NiceFloat(primitive_float_rem_rational(
+///         10.0,
+///         &Rational::from_signeds(22, 7)
+///     )),
+///     NiceFloat(0.5714285714285714)
+/// );
+/// ```
+#[allow(clippy::type_repetition_in_bounds)]
+#[inline]
+pub fn primitive_float_rem_rational<T: PrimitiveFloat>(x: T, y: &Rational) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    emulate_float_to_float_fn(|x, prec| Float::rem_rational_prec_val_ref(x, y, prec), x)
+}
+
+/// Computes the IEEE 754 `remainder` of a primitive float by a [`Rational`], with the quotient
+/// rounded to the nearest integer (ties to even), correctly rounding the result to the nearest
+/// value.
+///
+/// The [`Rational`] modulus is used exactly; see [`primitive_float_rem_rational`] for why this
+/// matters.
+///
+/// # Worst-case complexity
+/// $T(n) = O(n \log n \log\log n)$
+///
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `y.significant_bits()`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::rem::primitive_float_ieee_remainder_rational;
+/// use malachite_q::Rational;
+///
+/// assert_eq!(
+///     NiceFloat(primitive_float_ieee_remainder_rational(
+///         10.0,
+///         &Rational::from_signeds(22, 7)
+///     )),
+///     NiceFloat(0.5714285714285714)
+/// );
+/// ```
+#[allow(clippy::type_repetition_in_bounds)]
+#[inline]
+pub fn primitive_float_ieee_remainder_rational<T: PrimitiveFloat>(x: T, y: &Rational) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    emulate_float_to_float_fn(
+        |x, prec| Float::ieee_remainder_rational_prec_val_ref(x, y, prec),
+        x,
+    )
+}
+
+/// Computes the remainder of a [`Rational`] by a primitive float, with the quotient rounded toward
+/// zero, correctly rounding the result to the nearest value.
+///
+/// The [`Rational`] dividend is used exactly. NaN or zero `y` gives NaN; an infinite `y` returns
+/// the dividend, rounded.
+///
+/// # Worst-case complexity
+/// $T(n) = O(n \log n \log\log n)$
+///
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `x.significant_bits()`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::rem::primitive_float_rational_rem_float;
+/// use malachite_q::Rational;
+///
+/// // 22/7 mod 3 = 1/7
+/// assert_eq!(
+///     NiceFloat(primitive_float_rational_rem_float(
+///         &Rational::from_signeds(22, 7),
+///         3.0
+///     )),
+///     NiceFloat(0.14285714285714285)
+/// );
+/// ```
+#[allow(clippy::type_repetition_in_bounds)]
+#[inline]
+pub fn primitive_float_rational_rem_float<T: PrimitiveFloat>(x: &Rational, y: T) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    emulate_float_to_float_fn(
+        |y, prec| Float::rational_rem_float_prec_ref_val(x, y, prec),
+        y,
+    )
+}
+
+/// Computes the IEEE 754 `remainder` of a [`Rational`] by a primitive float, with the quotient
+/// rounded to the nearest integer (ties to even), correctly rounding the result to the nearest
+/// value.
+///
+/// The [`Rational`] dividend is used exactly.
+///
+/// # Worst-case complexity
+/// $T(n) = O(n \log n \log\log n)$
+///
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `x.significant_bits()`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::rem::primitive_float_rational_ieee_remainder_float;
+/// use malachite_q::Rational;
+///
+/// assert_eq!(
+///     NiceFloat(primitive_float_rational_ieee_remainder_float(
+///         &Rational::from_signeds(22, 7),
+///         3.0
+///     )),
+///     NiceFloat(0.14285714285714285)
+/// );
+/// ```
+#[allow(clippy::type_repetition_in_bounds)]
+#[inline]
+pub fn primitive_float_rational_ieee_remainder_float<T: PrimitiveFloat>(x: &Rational, y: T) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    emulate_float_to_float_fn(
+        |y, prec| Float::rational_ieee_remainder_float_prec_ref_val(x, y, prec),
+        y,
+    )
+}
+
+/// Computes the remainder of a primitive float by a `u64`, with the quotient rounded toward zero,
+/// correctly rounding the result to the nearest value.
+///
+/// The modulus is used exactly, even when it is not representable in the primitive float type (any
+/// `u64` above $2^{T::MANTISSA\\_WIDTH+1}$ has neighbors that round to the same float). A zero
+/// modulus gives NaN, matching `mpfr_fmod_ui`.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::rem::primitive_float_rem_unsigned;
+///
+/// assert_eq!(
+///     NiceFloat(primitive_float_rem_unsigned(10.5, 3)),
+///     NiceFloat(1.5)
+/// );
+/// // u64::MAX is not exactly representable as an f64, but the remainder is taken exactly
+/// assert_eq!(
+///     NiceFloat(primitive_float_rem_unsigned(1.0e30, u64::MAX)),
+///     NiceFloat(5.076964209140211e18)
+/// );
+/// ```
+#[allow(clippy::type_repetition_in_bounds)]
+#[inline]
+pub fn primitive_float_rem_unsigned<T: PrimitiveFloat>(x: T, y: u64) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    emulate_float_to_float_fn(|x, prec| x.rem_unsigned_prec(y, prec), x)
+}
+
+/// Computes the remainder of two primitive floats along with the low bits of the quotient, with the
+/// quotient rounded toward zero, using emulated [`Float`] arithmetic.
+///
+/// This is the analog of C's `fmodquo`-style functions: the `i64` agrees with the exact quotient
+/// $q$ in its low 63 bits and has $q$'s sign.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::rem::primitive_float_rem_and_quotient_bits;
+///
+/// let (r, q) = primitive_float_rem_and_quotient_bits(100.0, 7.0);
+/// assert_eq!(NiceFloat(r), NiceFloat(2.0));
+/// assert_eq!(q, 14);
+/// ```
+#[allow(clippy::type_repetition_in_bounds)]
+#[inline]
+pub fn primitive_float_rem_and_quotient_bits<T: PrimitiveFloat>(x: T, y: T) -> (T, i64)
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    emulate_float_float_to_float_and_i64_fn(Float::rem_and_quotient_bits_prec, x, y)
+}
+
+/// Computes the IEEE 754 `remainder` of two primitive floats along with the low bits of the
+/// quotient, with the quotient rounded to the nearest integer (ties to even), using emulated
+/// [`Float`] arithmetic.
+///
+/// This is the analog of C's `remquo`: the `i64` agrees with the exact quotient $q$ in its low 63
+/// bits and has $q$'s sign.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::rem::primitive_float_ieee_remainder_and_quotient_bits;
+///
+/// let (r, q) = primitive_float_ieee_remainder_and_quotient_bits(14.0, 3.0);
+/// assert_eq!(NiceFloat(r), NiceFloat(-1.0));
+/// assert_eq!(q, 5);
+/// ```
+#[allow(clippy::type_repetition_in_bounds)]
+#[inline]
+pub fn primitive_float_ieee_remainder_and_quotient_bits<T: PrimitiveFloat>(x: T, y: T) -> (T, i64)
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    emulate_float_float_to_float_and_i64_fn(Float::ieee_remainder_and_quotient_bits_prec, x, y)
+}
+
+/// Computes the remainder of a primitive float by a [`Rational`] along with the low bits of the
+/// quotient, with the quotient rounded toward zero, correctly rounding the remainder to the nearest
+/// value.
+///
+/// The [`Rational`] modulus is used exactly.
+///
+/// # Worst-case complexity
+/// $T(n) = O(n \log n \log\log n)$
+///
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `y.significant_bits()`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::rem::primitive_float_rem_rational_and_quotient_bits;
+/// use malachite_q::Rational;
+///
+/// let (r, q) =
+///     primitive_float_rem_rational_and_quotient_bits(10.0, &Rational::from_signeds(22, 7));
+/// assert_eq!(NiceFloat(r), NiceFloat(0.5714285714285714));
+/// assert_eq!(q, 3);
+/// ```
+#[allow(clippy::type_repetition_in_bounds)]
+#[inline]
+pub fn primitive_float_rem_rational_and_quotient_bits<T: PrimitiveFloat>(
+    x: T,
+    y: &Rational,
+) -> (T, i64)
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    emulate_float_to_float_and_i64_fn(
+        |x, prec| Float::rem_rational_and_quotient_bits_prec_val_ref(x, y, prec),
+        x,
+    )
+}
+
+/// Computes the IEEE 754 `remainder` of a primitive float by a [`Rational`] along with the low bits
+/// of the quotient, with the quotient rounded to the nearest integer (ties to even), correctly
+/// rounding the remainder to the nearest value.
+///
+/// The [`Rational`] modulus is used exactly. This is the natural tool for additive argument
+/// reduction against a non-dyadic constant: reducing against a [`Rational`] approximation of, say,
+/// $\pi/2$ yields the reduced argument and the quadrant bits in one call.
+///
+/// # Worst-case complexity
+/// $T(n) = O(n \log n \log\log n)$
+///
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `y.significant_bits()`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::rem::*;
+/// use malachite_q::Rational;
+///
+/// let (r, q) = primitive_float_ieee_remainder_rational_and_quotient_bits(
+///     10.0,
+///     &Rational::from_signeds(22, 7),
+/// );
+/// assert_eq!(NiceFloat(r), NiceFloat(0.5714285714285714));
+/// assert_eq!(q, 3);
+/// ```
+#[allow(clippy::type_repetition_in_bounds)]
+#[inline]
+pub fn primitive_float_ieee_remainder_rational_and_quotient_bits<T: PrimitiveFloat>(
+    x: T,
+    y: &Rational,
+) -> (T, i64)
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    emulate_float_to_float_and_i64_fn(
+        |x, prec| Float::ieee_remainder_rational_and_quotient_bits_prec_val_ref(x, y, prec),
+        x,
+    )
 }
