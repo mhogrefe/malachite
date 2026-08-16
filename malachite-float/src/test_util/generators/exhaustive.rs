@@ -943,6 +943,22 @@ pub(crate) fn rem_round_valid(
     )
 }
 
+// Whether `rm` is a valid rounding mode for computing the positive difference of `x` and `y` at
+// precision `prec`: `Exact` is only valid when the rounded result is exact, decided by a cheap
+// `Floor` probe.
+pub(crate) fn positive_difference_prec_round_valid(
+    x: &Float,
+    y: &Float,
+    prec: u64,
+    rm: RoundingMode,
+) -> bool {
+    rm != Exact || x.positive_difference_prec_round_ref_ref(y, prec, Floor).1 == Equal
+}
+
+pub(crate) fn positive_difference_round_valid(x: &Float, y: &Float, rm: RoundingMode) -> bool {
+    positive_difference_prec_round_valid(x, y, max(x.significant_bits(), y.significant_bits()), rm)
+}
+
 pub fn exhaustive_float_float_unsigned_rounding_mode_quadruple_gen_var_4()
 -> It<(Float, Float, u64, RoundingMode)> {
     Box::new(
@@ -1295,6 +1311,40 @@ pub fn exhaustive_float_float_unsigned_rounding_mode_quadruple_gen_var_21()
             exhaustive_rounding_modes(),
         )))
         .filter(|(x, y, prec, rm)| rem_prec_round_valid(x, y, *prec, *rm, true)),
+    )
+}
+
+pub fn exhaustive_float_float_unsigned_rounding_mode_quadruple_gen_var_22()
+-> It<(Float, Float, u64, RoundingMode)> {
+    Box::new(
+        reshape_3_1_to_4(Box::new(lex_pairs(
+            exhaustive_triples_xxy_custom_output(
+                exhaustive_floats(),
+                exhaustive_positive_primitive_ints::<u64>(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, prec, rm)| positive_difference_prec_round_valid(x, y, *prec, *rm)),
+    )
+}
+
+pub fn exhaustive_float_float_unsigned_rounding_mode_quadruple_gen_var_23()
+-> It<(Float, Float, u64, RoundingMode)> {
+    Box::new(
+        reshape_3_1_to_4(Box::new(lex_pairs(
+            exhaustive_triples_xxy_custom_output(
+                exhaustive_mixed_extreme_floats(),
+                exhaustive_positive_primitive_ints::<u64>(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, prec, rm)| positive_difference_prec_round_valid(x, y, *prec, *rm)),
     )
 }
 
@@ -1820,6 +1870,17 @@ pub fn exhaustive_float_float_rounding_mode_triple_gen_var_41() -> It<(Float, Fl
             exhaustive_rounding_modes(),
         )))
         .filter(|(x, y, rm)| rem_round_valid(x, y, *rm, true)),
+    )
+}
+
+pub fn exhaustive_float_float_rounding_mode_triple_gen_var_42() -> It<(Float, Float, RoundingMode)>
+{
+    Box::new(
+        reshape_2_1_to_3(Box::new(lex_pairs(
+            exhaustive_float_pair_gen_var_2(),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, rm)| positive_difference_round_valid(x, y, *rm)),
     )
 }
 

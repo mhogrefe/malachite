@@ -91,6 +91,7 @@ pub mod float {
         pub mod log_base_rational_rational_base;
         pub mod mul;
         pub mod neg;
+        pub mod positive_difference;
         pub mod pow;
         pub mod power_of_10;
         pub mod power_of_10_x_minus_1;

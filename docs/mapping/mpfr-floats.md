@@ -505,7 +505,7 @@ operands do not even need the recipe: the operators take them directly, through 
 | — | `int mpfr_root (mpfr_t rop, mpfr_t op, unsigned long int n, mpfr_rnd_t rnd)` | |
 | ✓ | `int mpfr_neg (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`Neg`](https://doc.rust-lang.org/nightly/std/ops/trait.Neg.html), [`NegAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.NegAssign.html) |
 | ✓ | `int mpfr_abs (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`Abs`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Abs.html), [`AbsAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.AbsAssign.html) |
-| ✗ | `int mpfr_dim (mpfr_t rop, mpfr_t op1, mpfr_t op2, mpfr_rnd_t rnd)` | |
+| ✓ | `int mpfr_dim (mpfr_t rop, mpfr_t op1, mpfr_t op2, mpfr_rnd_t rnd)` | [`positive_difference_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.positive_difference_prec_round) |
 | ✓ | `int mpfr_mul_2ui (mpfr_t rop, mpfr_t op1, unsigned long int op2, mpfr_rnd_t rnd)` | [`Shl`](https://doc.rust-lang.org/nightly/std/ops/trait.Shl.html), [`shl_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.shl_prec_round) |
 | ✓ | `int mpfr_mul_2si (mpfr_t rop, mpfr_t op1, long int op2, mpfr_rnd_t rnd)` | [`Shl`](https://doc.rust-lang.org/nightly/std/ops/trait.Shl.html), [`shl_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.shl_prec_round) |
 | ✓ | `int mpfr_div_2ui (mpfr_t rop, mpfr_t op1, unsigned long int op2, mpfr_rnd_t rnd)` | [`Shr`](https://doc.rust-lang.org/nightly/std/ops/trait.Shr.html), [`shr_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.shr_prec_round) |
@@ -549,8 +549,12 @@ The remark that the sign rule "also applies to NaN in order to mimic the IEEE 75
 vacuous here, the single NaN being signless.
 
 **`mpfr_dim`.** The positive difference, $$op1 - op2$$ if $$op1 > op2$$, $$+0$$ if
-$$op1 \le op2$$, and NaN if either operand is NaN, is a gap. Until it exists, a comparison and
-a subtraction spell it out, with the NaN case handled first.
+$$op1 \le op2$$, and NaN if either operand is NaN, is the
+[`positive_difference_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.positive_difference_prec_round)
+family, which follows the usual Malachite conventions for precision and rounding-mode
+shorthands. The zero for $$op1 \le op2$$ is a definition choice rather than saturation —
+negative differences are representable, and the function returns $$+0$$ anyway — so the family
+is named for the operation rather than for a saturating subtraction.
 
 **The `2exp` family.** `x << k` and `x >> k` are exact multiplications and divisions by
 $$2^k$$, adjusting the exponent, and both directions accept signed and unsigned shift amounts

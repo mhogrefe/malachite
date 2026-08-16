@@ -30,7 +30,12 @@ use malachite_float::float::arithmetic::rem::{
     primitive_float_rem, primitive_float_rem_and_quotient_bits, primitive_float_rem_rational,
     primitive_float_rem_rational_and_quotient_bits, primitive_float_rem_unsigned,
 };
-use malachite_float::test_util::common::{parse_hex_string, to_hex_string};
+use malachite_float::test_util::common::{
+    parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
+};
+use malachite_float::test_util::float::arithmetic::rem::{
+    rug_ieee_remainder, rug_ieee_remainder_prec_round, rug_rem, rug_rem_prec, rug_rem_prec_round,
+};
 use malachite_float::test_util::generators::{
     float_float_rounding_mode_triple_gen_var_40, float_float_rounding_mode_triple_gen_var_41,
     float_float_unsigned_rounding_mode_quadruple_gen_var_18,
@@ -73,6 +78,65 @@ const fn ternary_sign(o: Ordering) -> i32 {
     }
 }
 
+// Raw-FFI oracles for the functions rug does not bind (the quotient-bits pair and the u64
+// modulus). `forbid(unsafe_code)` keeps these out of the crate's test_util, but this integration
+// test crate may use unsafe, so they live here and are used inside the unit-test closures and
+// property helpers, following the usual rug-helper pattern.
+fn mpfr_fmodquo_oracle(x: &Float, y: &Float, prec: u64, rm: RoundingMode) -> (Float, i32, i64) {
+    let bx = rug::Float::exact_from(x);
+    let by = rug::Float::exact_from(y);
+    let mut r = rug::Float::new(u32::exact_from(prec));
+    let mut quo = 0i64;
+    let t = unsafe {
+        mpfr::fmodquo(
+            r.as_raw_mut(),
+            &raw mut quo,
+            bx.as_raw(),
+            by.as_raw(),
+            mpfr_rnd(rm),
+        )
+    };
+    (Float::from(&r), t.signum(), quo)
+}
+
+fn mpfr_remquo_oracle(x: &Float, y: &Float, prec: u64, rm: RoundingMode) -> (Float, i32, i64) {
+    let bx = rug::Float::exact_from(x);
+    let by = rug::Float::exact_from(y);
+    let mut r = rug::Float::new(u32::exact_from(prec));
+    let mut quo = 0i64;
+    let t = unsafe {
+        mpfr::remquo(
+            r.as_raw_mut(),
+            &raw mut quo,
+            bx.as_raw(),
+            by.as_raw(),
+            mpfr_rnd(rm),
+        )
+    };
+    (Float::from(&r), t.signum(), quo)
+}
+
+fn mpfr_fmod_ui_oracle(x: &Float, u: u64, prec: u64, rm: RoundingMode) -> (Float, i32) {
+    let bx = rug::Float::exact_from(x);
+    let mut r = rug::Float::new(u32::exact_from(prec));
+    let t = unsafe { mpfr::fmod_ui(r.as_raw_mut(), bx.as_raw(), u, mpfr_rnd(rm)) };
+    (Float::from(&r), t.signum())
+}
+
+// Checks a quotient-bits result against the corresponding MPFR function. The bits are compared
+// modulo 2^63: when the low 63 bits are all ones and the nearest-quotient rounds away, the C code
+// increments a long past LONG_MAX (undefined behavior, wrapping in practice) where we implement
+// the documented low-63-bits contract, so on any mismatch our value must be the wrapped 0.
+fn check_quo_vs_mpfr(quo: i64, mpfr_quo: i64) {
+    assert_eq!(
+        quo.unsigned_abs() & u64::low_mask(63),
+        mpfr_quo.unsigned_abs() & u64::low_mask(63)
+    );
+    if quo != mpfr_quo {
+        assert_eq!(quo, 0);
+    }
+}
+
 // Value patterns spanning both remainder regimes: exponent gaps in both directions (including gaps
 // large enough for the modular-exponentiation path), tiny-quotient cases, exact multiples, ties,
 // single-bit and all-ones significands, and both signs.
@@ -96,122 +160,6 @@ fn sweep_values() -> Vec<Float> {
         }
     }
     xs
-}
-
-// The four functions versus mpfr_fmod, mpfr_fmodquo, mpfr_remainder, and mpfr_remquo. Quotient bits
-// are compared modulo 2^63: when the returned bits are all ones and the nearest-quotient rounds
-// away, the C code increments a long past LONG_MAX (undefined behavior, wrapping in practice) where
-// we implement the documented low-63-bits contract.
-//
-// Together with the other tests in this file, this sweep was observed (via temporary first-hit
-// marks) to cover every branch of rem1_helper:
-// - the NaN and copy special arms (test_rem_special_values)
-// - ex <= ey with a zero quotient (tiny) and with a real division, each with and without the
-//   quotient-bits request
-// - ex > ey under all three moduli (Y << 63 for quotient bits, 2Y for plain nearest, Y for fmod)
-// - both sides of the modular-exponentiation threshold d > 3 * my.significant_bits()
-// - the nearest low-quotient-bit subtraction taken and not taken
-// - a zero remainder of each sign
-// - in the nearest assembly: the tiny size short-circuit, the tiny shifted comparison, and the
-//   ordinary comparison; the round-away branch taken (including on an exact tie) and not taken; the
-//   quotient-bits increment, including the all-ones wrap (test_quotient_bits_wrap_corner)
-// - the negative-x remainder negation
-#[test]
-fn test_rem_vs_mpfr() {
-    let values = sweep_values();
-    for x in &values {
-        let bx = rug::Float::exact_from(x);
-        for y in &values {
-            let by = rug::Float::exact_from(y);
-            for prec in [1u64, 10, 64] {
-                for rm in [Floor, Down, Nearest] {
-                    let (ours, o) = x.rem_prec_round_ref_ref(y, prec, rm);
-                    let mut r = rug::Float::new(u32::exact_from(prec));
-                    let t = unsafe {
-                        mpfr::fmod(r.as_raw_mut(), bx.as_raw(), by.as_raw(), mpfr_rnd(rm))
-                    };
-                    assert_eq!(
-                        ComparableFloat(Float::from(&r)),
-                        ComparableFloat(ours),
-                        "fmod {x} {y} {prec} {rm}"
-                    );
-                    assert_eq!(
-                        t.signum(),
-                        ternary_sign(o),
-                        "fmod ternary {x} {y} {prec} {rm}"
-                    );
-
-                    let (ours, o) = x.ieee_remainder_prec_round_ref_ref(y, prec, rm);
-                    let mut r = rug::Float::new(u32::exact_from(prec));
-                    let t = unsafe {
-                        mpfr::remainder(r.as_raw_mut(), bx.as_raw(), by.as_raw(), mpfr_rnd(rm))
-                    };
-                    assert_eq!(
-                        ComparableFloat(Float::from(&r)),
-                        ComparableFloat(ours),
-                        "remainder {x} {y} {prec} {rm}"
-                    );
-                    assert_eq!(
-                        t.signum(),
-                        ternary_sign(o),
-                        "remainder ternary {x} {y} {prec} {rm}"
-                    );
-                }
-                let (ours, o, quo) = x.rem_and_quotient_bits_prec_round_ref_ref(y, prec, Nearest);
-                let mut r = rug::Float::new(u32::exact_from(prec));
-                let mut t_quo = 0i64;
-                let t = unsafe {
-                    mpfr::fmodquo(
-                        r.as_raw_mut(),
-                        &raw mut t_quo,
-                        bx.as_raw(),
-                        by.as_raw(),
-                        mpfr_rnd(Nearest),
-                    )
-                };
-                assert_eq!(
-                    ComparableFloat(Float::from(&r)),
-                    ComparableFloat(ours),
-                    "fmodquo {x} {y} {prec}"
-                );
-                assert_eq!(
-                    t.signum(),
-                    ternary_sign(o),
-                    "fmodquo ternary {x} {y} {prec}"
-                );
-                assert_eq!(quo, t_quo, "fmodquo quo {x} {y} {prec}");
-
-                let (ours, o, quo) =
-                    x.ieee_remainder_and_quotient_bits_prec_round_ref_ref(y, prec, Nearest);
-                let mut r = rug::Float::new(u32::exact_from(prec));
-                let mut t_quo = 0i64;
-                let t = unsafe {
-                    mpfr::remquo(
-                        r.as_raw_mut(),
-                        &raw mut t_quo,
-                        bx.as_raw(),
-                        by.as_raw(),
-                        mpfr_rnd(Nearest),
-                    )
-                };
-                assert_eq!(
-                    ComparableFloat(Float::from(&r)),
-                    ComparableFloat(ours),
-                    "remquo {x} {y} {prec}"
-                );
-                assert_eq!(t.signum(), ternary_sign(o), "remquo ternary {x} {y} {prec}");
-                assert_eq!(
-                    quo.unsigned_abs() & u64::low_mask(63),
-                    t_quo.unsigned_abs() & u64::low_mask(63),
-                    "remquo quo bits {x} {y} {prec}"
-                );
-                if quo != t_quo {
-                    // permitted divergence: the C long overflow corner
-                    assert_eq!(quo, 0, "remquo quo divergence {x} {y} {prec}");
-                }
-            }
-        }
-    }
 }
 
 #[allow(clippy::needless_pass_by_value)]
@@ -250,20 +198,28 @@ fn rem_prec_round_properties_helper(
     assert_eq!(o_alt, o);
 
     // the quotient-bits variant computes the same remainder
-    let (rem_alt, o_alt, _) = x.rem_and_quotient_bits_prec_round_ref_ref(&y, prec, rm);
+    let (rem_alt, o_alt, quo) = x.rem_and_quotient_bits_prec_round_ref_ref(&y, prec, rm);
     assert_eq!(ComparableFloatRef(&rem_alt), ComparableFloatRef(&rem));
     assert_eq!(o_alt, o);
 
-    if rm != Exact {
-        let bx = rug::Float::exact_from(&x);
-        let by = rug::Float::exact_from(&y);
-        let mut r = rug::Float::new(u32::exact_from(prec));
-        let t = unsafe { mpfr::fmod(r.as_raw_mut(), bx.as_raw(), by.as_raw(), mpfr_rnd(rm)) };
-        assert_eq!(
-            ComparableFloat(Float::from(&r)),
-            ComparableFloat(rem.clone())
+    if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm) {
+        let (rug_rem, rug_o) = rug_rem_prec_round(
+            &rug::Float::exact_from(&x),
+            &rug::Float::exact_from(&y),
+            prec,
+            rug_rm,
         );
-        assert_eq!(t.signum(), ternary_sign(o));
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_rem)),
+            ComparableFloatRef(&rem)
+        );
+        assert_eq!(rug_o, o);
+    }
+    if rm != Exact {
+        let (mpfr_rem, mpfr_t, mpfr_quo) = mpfr_fmodquo_oracle(&x, &y, prec, rm);
+        assert_eq!(ComparableFloatRef(&mpfr_rem), ComparableFloatRef(&rem));
+        assert_eq!(mpfr_t, ternary_sign(o));
+        check_quo_vs_mpfr(quo, mpfr_quo);
     }
 
     if rem.is_normal() {
@@ -402,20 +358,28 @@ fn ieee_remainder_prec_round_properties_helper(
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&rem));
     assert_eq!(o_alt, o);
 
-    let (rem_alt, o_alt, _) = x.ieee_remainder_and_quotient_bits_prec_round_ref_ref(&y, prec, rm);
+    let (rem_alt, o_alt, quo) = x.ieee_remainder_and_quotient_bits_prec_round_ref_ref(&y, prec, rm);
     assert_eq!(ComparableFloatRef(&rem_alt), ComparableFloatRef(&rem));
     assert_eq!(o_alt, o);
 
-    if rm != Exact {
-        let bx = rug::Float::exact_from(&x);
-        let by = rug::Float::exact_from(&y);
-        let mut r = rug::Float::new(u32::exact_from(prec));
-        let t = unsafe { mpfr::remainder(r.as_raw_mut(), bx.as_raw(), by.as_raw(), mpfr_rnd(rm)) };
-        assert_eq!(
-            ComparableFloat(Float::from(&r)),
-            ComparableFloat(rem.clone())
+    if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm) {
+        let (rug_rem, rug_o) = rug_ieee_remainder_prec_round(
+            &rug::Float::exact_from(&x),
+            &rug::Float::exact_from(&y),
+            prec,
+            rug_rm,
         );
-        assert_eq!(t.signum(), ternary_sign(o));
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_rem)),
+            ComparableFloatRef(&rem)
+        );
+        assert_eq!(rug_o, o);
+    }
+    if rm != Exact {
+        let (mpfr_rem, mpfr_t, mpfr_quo) = mpfr_remquo_oracle(&x, &y, prec, rm);
+        assert_eq!(ComparableFloatRef(&mpfr_rem), ComparableFloatRef(&rem));
+        assert_eq!(mpfr_t, ternary_sign(o));
+        check_quo_vs_mpfr(quo, mpfr_quo);
     }
 
     if rem.is_normal() {
@@ -788,6 +752,9 @@ fn rem_unsigned_properties() {
                 let (rem_alt, o_alt) = x.clone().rem_unsigned_prec_round(u, prec, rm);
                 assert_eq!(ComparableFloatRef(&rem_alt), ComparableFloatRef(&rem));
                 assert_eq!(o_alt, o);
+                let (mpfr_rem, mpfr_t) = mpfr_fmod_ui_oracle(&x, u, prec, rm);
+                assert_eq!(ComparableFloatRef(&mpfr_rem), ComparableFloatRef(&rem));
+                assert_eq!(mpfr_t, ternary_sign(o));
                 if u == 0 {
                     assert!(rem.is_nan());
                 } else {
@@ -810,33 +777,6 @@ fn rem_unsigned_properties() {
         let (rem_alt, _) = x.rem_unsigned_round_ref(u, Nearest);
         assert_eq!(ComparableFloatRef(&rem_alt), ComparableFloatRef(&rem));
     });
-}
-
-// rem_unsigned versus mpfr_fmod_ui, including the zero modulus.
-#[test]
-fn test_rem_unsigned_vs_mpfr() {
-    for x in sweep_values() {
-        let bx = rug::Float::exact_from(&x);
-        for u in [0u64, 1, 2, 3, 7, 100, 1 << 32, u64::MAX >> 1, u64::MAX] {
-            for prec in [1u64, 10, 64] {
-                for rm in [Floor, Down, Nearest] {
-                    let (ours, o) = x.rem_unsigned_prec_round_ref(u, prec, rm);
-                    let mut r = rug::Float::new(u32::exact_from(prec));
-                    let t = unsafe { mpfr::fmod_ui(r.as_raw_mut(), bx.as_raw(), u, mpfr_rnd(rm)) };
-                    assert_eq!(
-                        ComparableFloat(Float::from(&r)),
-                        ComparableFloat(ours),
-                        "fmod_ui {x} {u} {prec} {rm}"
-                    );
-                    assert_eq!(
-                        t.signum(),
-                        ternary_sign(o),
-                        "fmod_ui ternary {x} {u} {prec} {rm}"
-                    );
-                }
-            }
-        }
-    }
 }
 
 // The C99 F.9.7.1 specials, and the sign of a zero remainder.
@@ -980,6 +920,19 @@ fn test_rem_underflow() {
     }
 }
 
+// The oracle comparisons woven through this file's tests and property suites were observed (via
+// temporary first-hit marks) to cover every branch of rem1_helper:
+// - the NaN and copy special arms (test_rem_special_values)
+// - ex <= ey with a zero quotient (tiny) and with a real division, each with and without the
+//   quotient-bits request
+// - ex > ey under all three moduli (Y << 63 for quotient bits, 2Y for plain nearest, Y for fmod)
+// - both sides of the modular-exponentiation threshold d > 3 * my.significant_bits()
+// - the nearest low-quotient-bit subtraction taken and not taken
+// - a zero remainder of each sign
+// - in the nearest assembly: the tiny size short-circuit, the tiny shifted comparison, and the
+//   ordinary comparison; the round-away branch taken (including on an exact tie) and not taken;
+//   the quotient-bits increment, including the all-ones wrap (test_quotient_bits_wrap_corner)
+// - the negative-x remainder negation
 #[test]
 fn test_rem() {
     let test = |s, s_hex, t, t_hex, out: &str, out_hex: &str| {
@@ -1011,6 +964,14 @@ fn test_rem() {
         x_alt %= &y;
         assert!(x_alt.is_valid());
         assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&rem));
+
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_rem(
+                &rug::Float::exact_from(&x),
+                &rug::Float::exact_from(&y)
+            ))),
+            ComparableFloatRef(&rem)
+        );
     };
     // - NaN, infinite x, or zero y: NaN
     test("NaN", "NaN", "3.0", "0x3.0#2", "NaN", "NaN");
@@ -1120,6 +1081,17 @@ fn test_rem_prec() {
         assert!(x_alt.is_valid());
         assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&rem));
         assert_eq!(o_alt, o);
+
+        let (rug_rem, rug_o) = rug_rem_prec(
+            &rug::Float::exact_from(&x),
+            &rug::Float::exact_from(&y),
+            prec,
+        );
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_rem)),
+            ComparableFloatRef(&rem)
+        );
+        assert_eq!(rug_o, o);
     };
     // - the exact remainder 3 rounds at precision 1, to nearest-even 4
     test(
@@ -1184,6 +1156,20 @@ fn test_rem_prec_round() {
             assert!(x_alt.is_valid());
             assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&rem));
             assert_eq!(o_alt, o);
+
+            if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm) {
+                let (rug_rem, rug_o) = rug_rem_prec_round(
+                    &rug::Float::exact_from(&x),
+                    &rug::Float::exact_from(&y),
+                    prec,
+                    rug_rm,
+                );
+                assert_eq!(
+                    ComparableFloatRef(&Float::from(&rug_rem)),
+                    ComparableFloatRef(&rem)
+                );
+                assert_eq!(rug_o, o);
+            }
         };
     // - NaN and copy special arms
     test(
@@ -1348,6 +1334,14 @@ fn test_ieee_remainder() {
         x_alt.ieee_remainder_assign_ref(&y);
         assert!(x_alt.is_valid());
         assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&rem));
+
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_ieee_remainder(
+                &rug::Float::exact_from(&x),
+                &rug::Float::exact_from(&y)
+            ))),
+            ComparableFloatRef(&rem)
+        );
     };
     // - NaN, infinite x, or zero y: NaN
     test("NaN", "NaN", "3.0", "0x3.0#2", "NaN", "NaN");
@@ -1438,6 +1432,20 @@ fn test_ieee_remainder_prec_round() {
             assert!(x_alt.is_valid());
             assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&rem));
             assert_eq!(o_alt, o);
+
+            if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm) {
+                let (rug_rem, rug_o) = rug_ieee_remainder_prec_round(
+                    &rug::Float::exact_from(&x),
+                    &rug::Float::exact_from(&y),
+                    prec,
+                    rug_rm,
+                );
+                assert_eq!(
+                    ComparableFloatRef(&Float::from(&rug_rem)),
+                    ComparableFloatRef(&rem)
+                );
+                assert_eq!(rug_o, o);
+            }
         };
     // - specials
     test(
@@ -1610,6 +1618,12 @@ fn test_rem_and_quotient_bits() {
         assert_eq!(ComparableFloatRef(&rem_alt), ComparableFloatRef(&rem));
         assert_eq!(o_alt, o);
         assert_eq!(quo_alt, quo);
+
+        let prec = max(x.significant_bits(), y.significant_bits());
+        let (mpfr_rem, mpfr_t, mpfr_quo) = mpfr_fmodquo_oracle(&x, &y, prec, Nearest);
+        assert_eq!(ComparableFloatRef(&mpfr_rem), ComparableFloatRef(&rem));
+        assert_eq!(mpfr_t, ternary_sign(o));
+        check_quo_vs_mpfr(quo, mpfr_quo);
     };
     // - unspecified in MPFR; our quotient bits are 0 for every special case
     test("NaN", "NaN", "3.0", "0x3.0#2", "NaN", "NaN", Equal, 0);
@@ -1720,6 +1734,12 @@ fn test_ieee_remainder_and_quotient_bits() {
         assert_eq!(ComparableFloatRef(&rem_alt), ComparableFloatRef(&rem));
         assert_eq!(o_alt, o);
         assert_eq!(quo_alt, quo);
+
+        let prec = max(x.significant_bits(), y.significant_bits());
+        let (mpfr_rem, mpfr_t, mpfr_quo) = mpfr_remquo_oracle(&x, &y, prec, Nearest);
+        assert_eq!(ComparableFloatRef(&mpfr_rem), ComparableFloatRef(&rem));
+        assert_eq!(mpfr_t, ternary_sign(o));
+        check_quo_vs_mpfr(quo, mpfr_quo);
     };
     // - specials
     test("NaN", "NaN", "3.0", "0x3.0#2", "NaN", "NaN", Equal, 0);
@@ -1810,6 +1830,9 @@ fn test_rem_unsigned() {
         let rem_alt = x.rem_unsigned_ref(u);
         assert!(rem_alt.is_valid());
         assert_eq!(ComparableFloatRef(&rem_alt), ComparableFloatRef(&rem));
+
+        let (mpfr_rem, _) = mpfr_fmod_ui_oracle(&x, u, x.significant_bits(), Nearest);
+        assert_eq!(ComparableFloatRef(&mpfr_rem), ComparableFloatRef(&rem));
     };
     // - a fractional remainder, both signs
     test("10.5", "0xa.8#5", 3, "1.50", "0x1.8#5");

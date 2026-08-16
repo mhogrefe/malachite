@@ -534,6 +534,37 @@ pub fn float_float_unsigned_rounding_mode_quadruple_gen_var_21()
     )
 }
 
+// All `(Float, Float, u64, RoundingMode)` that are valid inputs to
+// `Float::positive_difference_prec_round`.
+pub fn float_float_unsigned_rounding_mode_quadruple_gen_var_22()
+-> Generator<(Float, Float, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_float_unsigned_rounding_mode_quadruple_gen_var_22,
+        &random_float_float_unsigned_rounding_mode_quadruple_gen_var_22,
+        &special_random_float_float_unsigned_rounding_mode_quadruple_gen_var_22,
+    )
+}
+
+// All `(Float, Float, u64, RoundingMode)` that are valid inputs to
+// `Float::positive_difference_prec_round`, with extreme Floats.
+pub fn float_float_unsigned_rounding_mode_quadruple_gen_var_23()
+-> Generator<(Float, Float, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_float_unsigned_rounding_mode_quadruple_gen_var_23,
+        &random_float_float_unsigned_rounding_mode_quadruple_gen_var_23,
+        &special_random_float_float_unsigned_rounding_mode_quadruple_gen_var_23,
+    )
+}
+
+// All `(Float, Float, RoundingMode)` that are valid inputs to `Float::positive_difference_round`.
+pub fn float_float_rounding_mode_triple_gen_var_42() -> Generator<(Float, Float, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_float_rounding_mode_triple_gen_var_42,
+        &random_float_float_rounding_mode_triple_gen_var_42,
+        &special_random_float_float_rounding_mode_triple_gen_var_42,
+    )
+}
+
 pub fn float_float_unsigned_rounding_mode_quadruple_gen_var_1_rm() -> Generator<(
     (rug::Float, rug::Float, u64, rug::float::Round),
     (Float, Float, u64, RoundingMode),
