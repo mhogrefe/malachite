@@ -6,13 +6,15 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use core::cmp::Ordering::*;
+use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode::*;
-use malachite_float::test_util::common::rug_round_try_from_rounding_mode;
-use malachite_float::{ComparableFloat, Float};
+use malachite_base::rounding_modes::RoundingMode::{self, *};
+use malachite_float::test_util::common::{
+    parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
+};
+use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_nz::natural::Natural;
 
 // Dense differential sweep against rug's subnormalize_round, which wraps mpfr_subnormalize with a
@@ -134,4 +136,103 @@ fn subnormalize_properties_like() {
             }
         }
     }
+}
+
+#[test]
+fn test_subnormalize() {
+    let test = |s,
+                s_hex,
+                o_in: Ordering,
+                normal_exp_min: i64,
+                rm: RoundingMode,
+                out: &str,
+                out_hex: &str,
+                o_out: Ordering| {
+        let x = parse_hex_string(s_hex);
+        assert_eq!(x.to_string(), s);
+
+        let (r, o) = x.clone().subnormalize(o_in, normal_exp_min, rm);
+        assert!(r.is_valid());
+        assert_eq!(r.to_string(), out);
+        assert_eq!(to_hex_string(&r), out_hex);
+        assert_eq!(o, o_out);
+
+        let (r_alt, o_alt) = x.subnormalize_ref(o_in, normal_exp_min, rm);
+        assert!(r_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&r_alt), ComparableFloatRef(&r));
+        assert_eq!(o_alt, o);
+
+        let mut x_alt = x.clone();
+        let o_alt = x_alt.subnormalize_assign(o_in, normal_exp_min, rm);
+        assert!(x_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&r));
+        assert_eq!(o_alt, o);
+    };
+    // - a value in the normal range is unchanged
+    test(
+        "1.5000",
+        "0x1.800#10",
+        Equal,
+        0,
+        Nearest,
+        "1.5000",
+        "0x1.800#10",
+        Equal,
+    );
+    // - below the normal range but exactly representable at the reduced precision: unchanged
+    test(
+        "1.5000",
+        "0x1.800#10",
+        Equal,
+        5,
+        Nearest,
+        "1.5000",
+        "0x1.800#10",
+        Equal,
+    );
+    test(
+        "1.5000",
+        "0x1.800#10",
+        Equal,
+        8,
+        Nearest,
+        "1.5000",
+        "0x1.800#10",
+        Equal,
+    );
+    test(
+        "1.5000",
+        "0x1.800#10",
+        Equal,
+        5,
+        Floor,
+        "1.5000",
+        "0x1.800#10",
+        Equal,
+    );
+    test(
+        "-1.5000",
+        "-0x1.800#10",
+        Equal,
+        5,
+        Nearest,
+        "-1.5000",
+        "-0x1.800#10",
+        Equal,
+    );
+    // - a midpoint at the reduced precision: the incoming Ordering breaks the tie (the value
+    //   records which side the pre-rounded result came from)
+    test(
+        "10.31", "0xa.50#9", Less, 6, Nearest, "10.38", "0xa.60#9", Greater,
+    );
+    test(
+        "10.31", "0xa.50#9", Greater, 6, Nearest, "10.25", "0xa.40#9", Less,
+    );
+    // - specials are unchanged
+    test("2.0", "0x2.0#1", Equal, 0, Nearest, "2.0", "0x2.0#1", Equal);
+    test("NaN", "NaN", Equal, 5, Nearest, "NaN", "NaN", Equal);
+    test(
+        "Infinity", "Infinity", Equal, 5, Nearest, "Infinity", "Infinity", Equal,
+    );
+    test("0.0", "0x0.0", Equal, 5, Nearest, "0.0", "0x0.0", Equal);
 }

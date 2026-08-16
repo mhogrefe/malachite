@@ -491,6 +491,49 @@ pub fn float_float_unsigned_rounding_mode_quadruple_gen_var_17_rm() -> Generator
     )
 }
 
+// All `(Float, Float, u64, RoundingMode)` that are valid inputs to `Float::rem_prec_round`.
+pub fn float_float_unsigned_rounding_mode_quadruple_gen_var_18()
+-> Generator<(Float, Float, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_float_unsigned_rounding_mode_quadruple_gen_var_18,
+        &random_float_float_unsigned_rounding_mode_quadruple_gen_var_18,
+        &special_random_float_float_unsigned_rounding_mode_quadruple_gen_var_18,
+    )
+}
+
+// All `(Float, Float, u64, RoundingMode)` that are valid inputs to `Float::rem_prec_round`, with
+// extreme Floats.
+pub fn float_float_unsigned_rounding_mode_quadruple_gen_var_19()
+-> Generator<(Float, Float, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_float_unsigned_rounding_mode_quadruple_gen_var_19,
+        &random_float_float_unsigned_rounding_mode_quadruple_gen_var_19,
+        &special_random_float_float_unsigned_rounding_mode_quadruple_gen_var_19,
+    )
+}
+
+// All `(Float, Float, u64, RoundingMode)` that are valid inputs to
+// `Float::ieee_remainder_prec_round`.
+pub fn float_float_unsigned_rounding_mode_quadruple_gen_var_20()
+-> Generator<(Float, Float, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_float_unsigned_rounding_mode_quadruple_gen_var_20,
+        &random_float_float_unsigned_rounding_mode_quadruple_gen_var_20,
+        &special_random_float_float_unsigned_rounding_mode_quadruple_gen_var_20,
+    )
+}
+
+// All `(Float, Float, u64, RoundingMode)` that are valid inputs to
+// `Float::ieee_remainder_prec_round`, with extreme Floats.
+pub fn float_float_unsigned_rounding_mode_quadruple_gen_var_21()
+-> Generator<(Float, Float, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_float_unsigned_rounding_mode_quadruple_gen_var_21,
+        &random_float_float_unsigned_rounding_mode_quadruple_gen_var_21,
+        &special_random_float_float_unsigned_rounding_mode_quadruple_gen_var_21,
+    )
+}
+
 pub fn float_float_unsigned_rounding_mode_quadruple_gen_var_1_rm() -> Generator<(
     (rug::Float, rug::Float, u64, rug::float::Round),
     (Float, Float, u64, RoundingMode),
@@ -1271,6 +1314,24 @@ pub fn float_float_rounding_mode_triple_gen_var_39_rm() -> Generator<(
                 special_random_float_float_rounding_mode_triple_gen_var_39(config),
             )
         },
+    )
+}
+
+// All `(Float, Float, RoundingMode)` that are valid inputs to `Float::rem_round`.
+pub fn float_float_rounding_mode_triple_gen_var_40() -> Generator<(Float, Float, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_float_rounding_mode_triple_gen_var_40,
+        &random_float_float_rounding_mode_triple_gen_var_40,
+        &special_random_float_float_rounding_mode_triple_gen_var_40,
+    )
+}
+
+// All `(Float, Float, RoundingMode)` that are valid inputs to `Float::ieee_remainder_round`.
+pub fn float_float_rounding_mode_triple_gen_var_41() -> Generator<(Float, Float, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_float_rounding_mode_triple_gen_var_41,
+        &random_float_float_rounding_mode_triple_gen_var_41,
+        &special_random_float_float_rounding_mode_triple_gen_var_41,
     )
 }
 

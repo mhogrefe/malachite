@@ -13,6 +13,7 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::LowMask;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_float::Float;
+use malachite_float::test_util::common::parse_hex_string;
 use malachite_nz::natural::Natural;
 
 const fn mpfr_rnd(rm: RoundingMode) -> rnd_t {
@@ -178,4 +179,30 @@ fn can_round_fail_1() {
 #[should_panic]
 fn can_round_fail_2() {
     Float::from(3u32).can_round(100, Nearest, Nearest, 0);
+}
+
+#[test]
+fn test_can_round() {
+    let test = |s, s_hex, err, rnd1: RoundingMode, rnd2: RoundingMode, prec, out: bool| {
+        let x = parse_hex_string(s_hex);
+        assert_eq!(x.to_string(), s);
+        assert_eq!(x.can_round(err, rnd1, rnd2, prec), out);
+    };
+    // - an all-ones significand: the 2^-20 error interval does not straddle a rounding boundary at
+    //   precision 8
+    test("65535.0", "0xffff.0#16", 20, Down, Nearest, 8, true);
+    test("65535.0", "0xffff.0#16", 20, Down, Down, 8, true);
+    test("65535.0", "0xffff.0#16", 20, Up, Up, 8, true);
+    test("65535.0", "0xffff.0#16", 20, Nearest, Nearest, 8, true);
+    // - err == prec * 2: still decidable here
+    test("65535.0", "0xffff.0#16", 16, Down, Nearest, 8, true);
+    // - a significand with a bit exactly at the precision boundary: not decidable
+    test("32896.0", "0x8080.0#16", 20, Down, Nearest, 8, false);
+    test("32896.0", "0x8080.0#16", 20, Nearest, Nearest, 8, false);
+    test("32896.0", "0x8080.0#16", 12, Down, Nearest, 8, false);
+    // - a power of 2: decidable from either side
+    test("32768.0", "0x8000.0#16", 20, Down, Nearest, 8, true);
+    test("32768.0", "0x8000.0#16", 20, Up, Nearest, 8, true);
+    // - the sign does not affect the answer
+    test("-65535.0", "-0xffff.0#16", 20, Down, Nearest, 8, true);
 }

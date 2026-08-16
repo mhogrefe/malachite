@@ -1051,8 +1051,8 @@ all.
 ## [Integer and Remainder Related Functions](https://www.mpfr.org/mpfr-current/mpfr.html#Integer-and-Remainder-Related-Functions) {#integer-and-remainder-related-functions}
 
 Rounding a `Float` to an integral `Float`, and taking its fractional part, are covered by the
-`round_to_integer` and `fractional_part` families; the floating-point remainders remain the
-section's gap, expected to fill as one family.
+`round_to_integer` and `fractional_part` families, and the floating-point remainders by `%`
+and the `rem` and `ieee_remainder` families; every row in the section is filled.
 
 | | MPFR | Malachite |
 | :---: | --- | --- |
@@ -1069,11 +1069,11 @@ section's gap, expected to fill as one family.
 | ✓ | `int mpfr_rint_trunc (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`round_to_integer_then_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.round_to_integer_then_prec_round) |
 | ✓ | `int mpfr_frac (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`fractional_part_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.fractional_part_prec_round) |
 | ✓ | `int mpfr_modf (mpfr_t iop, mpfr_t fop, mpfr_t op, mpfr_rnd_t rnd)` | [`integer_and_fractional_parts_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.integer_and_fractional_parts_prec_round) |
-| ✗ | `int mpfr_fmod (mpfr_t r, mpfr_t x, mpfr_t y, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_fmod_ui (mpfr_t r, mpfr_t x, unsigned long int y, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_fmodquo (mpfr_t r, long int* q, mpfr_t x, mpfr_t y, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_remainder (mpfr_t r, mpfr_t x, mpfr_t y, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_remquo (mpfr_t r, long int* q, mpfr_t x, mpfr_t y, mpfr_rnd_t rnd)` | |
+| ✓ | `int mpfr_fmod (mpfr_t r, mpfr_t x, mpfr_t y, mpfr_rnd_t rnd)` | [`rem_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.rem_prec_round) |
+| ✓ | `int mpfr_fmod_ui (mpfr_t r, mpfr_t x, unsigned long int y, mpfr_rnd_t rnd)` | [`rem_unsigned_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.rem_unsigned_prec_round) |
+| ✓ | `int mpfr_fmodquo (mpfr_t r, long int* q, mpfr_t x, mpfr_t y, mpfr_rnd_t rnd)` | [`rem_and_quotient_bits_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.rem_and_quotient_bits_prec_round) |
+| ✓ | `int mpfr_remainder (mpfr_t r, mpfr_t x, mpfr_t y, mpfr_rnd_t rnd)` | [`ieee_remainder_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.ieee_remainder_prec_round) |
+| ✓ | `int mpfr_remquo (mpfr_t r, long int* q, mpfr_t x, mpfr_t y, mpfr_rnd_t rnd)` | [`ieee_remainder_and_quotient_bits_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.ieee_remainder_and_quotient_bits_prec_round) |
 | ✓ | `int mpfr_integer_p (mpfr_t op)` | [`is_integer`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.is_integer) |
 
 **Rounding to an integer.** Eleven rows, two carefully distinguished semantics, both
@@ -1109,16 +1109,23 @@ arguments do, and rounds the integral part exactly as `mpfr_rint_trunc` does.
 **The remainders.** $$r = x - ny$$ with the quotient `n` "rounded toward zero" for the `fmod`
 three and "to the nearest integer (ties rounded to even)" for `remainder` and `remquo`,
 following ISO C99 F.9.7.1 for specials: NaN for infinite `x` or zero `y`, `x` rounded to `r`'s
-precision for infinite `y`, and a zero `r` taking `x`'s sign. The `quo` variants also report
-the quotient's low bits with the sign of $$x/y$$. The manual notes what makes these functions
-more than one-liners: "`x` may be so large in magnitude relative to `y` that an exact
-representation of the quotient is not practical", so a dedicated implementation reduces the
-exponent gap modularly instead of materializing it, which is exactly what an exact
-[`Rational`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html)
-interim does not do; the exact route is correct and affordable only while the exponents of
-`x` and `y` stay close. MPFR points out that `remainder` and `remquo` "are useful for additive
-argument reduction", which places this gap on the same road as the trigonometric family
-above.
+precision for infinite `y`, and a zero `r` taking `x`'s sign. The truncated-quotient remainder
+is the `%` operator (at the maximum of the input precisions, rounding to nearest, like the
+other `Float` operators) and the
+[`rem_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.rem_prec_round)
+family; the nearest-quotient remainder — the IEEE 754 `remainder` operation — is the
+[`ieee_remainder_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.ieee_remainder_prec_round)
+family. Both use the modular reduction that the manual hints at ("`x` may be so large in
+magnitude relative to `y` that an exact representation of the quotient is not practical"): the
+exponent gap enters through a modular exponentiation rather than being materialized, so the
+cost scales with the operands' precisions. The `quo` variants are the `*_and_quotient_bits`
+functions, whose extra `i64` equals the quotient modulo $$2^{63}$$ with the quotient's sign,
+matching the documented `mpfr_fmodquo`/`mpfr_remquo` contract; in the corner where the low 63
+bits are all ones and the nearest quotient rounds away, incrementing them overflows a C
+`long`, and Malachite defines the result by the modular contract instead. `mpfr_fmod_ui` is
+the
+[`rem_unsigned_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.rem_unsigned_prec_round)
+family, with a zero modulus yielding NaN.
 
 **`mpfr_integer_p`.** The one row already filled:
 [`is_integer`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.is_integer),

@@ -99,6 +99,7 @@ pub mod float {
         pub mod power_of_2_x_minus_1;
         pub mod reciprocal;
         pub mod reciprocal_sqrt;
+        pub mod rem;
         pub mod root;
         pub mod round_to_integer;
         pub mod shl;

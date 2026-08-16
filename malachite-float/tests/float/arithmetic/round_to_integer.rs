@@ -13,7 +13,8 @@ use malachite_base::num::basic::traits::{NaN, NegativeInfinity};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::LowMask;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
-use malachite_float::{ComparableFloat, Float};
+use malachite_float::test_util::common::{parse_hex_string, to_hex_string};
+use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_nz::natural::Natural;
 
 const fn mpfr_rnd(rm: RoundingMode) -> rnd_t {
@@ -256,4 +257,192 @@ fn test_round_to_integer_then_overflow_extreme() {
         };
         assert_eq!(t.signum(), expected, "then-overflow ternary {rm}");
     }
+}
+
+#[test]
+fn test_round_to_integer() {
+    let test = |s, s_hex, out: &str, out_hex: &str, o_out: Ordering, is_int_out: bool| {
+        let x = parse_hex_string(s_hex);
+        assert_eq!(x.to_string(), s);
+
+        let (r, o, is_int) = x.clone().round_to_integer();
+        assert!(r.is_valid());
+        assert_eq!(r.to_string(), out);
+        assert_eq!(to_hex_string(&r), out_hex);
+        assert_eq!(o, o_out);
+        assert_eq!(is_int, is_int_out);
+
+        let (r_alt, o_alt, is_int_alt) = x.round_to_integer_ref();
+        assert!(r_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&r_alt), ComparableFloatRef(&r));
+        assert_eq!(o_alt, o);
+        assert_eq!(is_int_alt, is_int);
+    };
+    // - specials: zeros are integers, NaN and infinities are not
+    test("NaN", "NaN", "NaN", "NaN", Equal, false);
+    test("Infinity", "Infinity", "Infinity", "Infinity", Equal, false);
+    test(
+        "-Infinity",
+        "-Infinity",
+        "-Infinity",
+        "-Infinity",
+        Equal,
+        false,
+    );
+    test("0.0", "0x0.0", "0.0", "0x0.0", Equal, true);
+    test("-0.0", "-0x0.0", "-0.0", "-0x0.0", Equal, true);
+    // - integers are unchanged
+    test("2.0", "0x2.0#1", "2.0", "0x2.0#1", Equal, true);
+    test("-2.0", "-0x2.0#1", "-2.0", "-0x2.0#1", Equal, true);
+    test(
+        "1.3e30",
+        "0x1.0E+25#1",
+        "1.3e30",
+        "0x1.0E+25#1",
+        Equal,
+        true,
+    );
+    // - ties round to even, both parities and both signs
+    test("2.50", "0x2.8#4", "2.00", "0x2.0#4", Less, false);
+    test("-2.50", "-0x2.8#4", "-2.00", "-0x2.0#4", Greater, false);
+    test("3.50", "0x3.8#4", "4.00", "0x4.0#4", Greater, false);
+    test("-3.50", "-0x3.8#4", "-4.00", "-0x4.0#4", Less, false);
+    test("10.5", "0xa.8#6", "10.0", "0xa.0#6", Less, false);
+    test("-10.5", "-0xa.8#6", "-10.0", "-0xa.0#6", Greater, false);
+    // - values below 1 round to 0 or +/-1
+    test("0.75", "0x0.c#3", "1.0", "0x1.0#3", Greater, false);
+    test("-0.75", "-0x0.c#3", "-1.0", "-0x1.0#3", Less, false);
+    // - a non-tie fraction
+    test("10.31", "0xa.50#9", "10.00", "0xa.00#9", Less, false);
+}
+
+#[test]
+fn test_round_to_integer_ties_away() {
+    let test = |s, s_hex, out: &str, out_hex: &str, o_out: Ordering, is_int_out: bool| {
+        let x = parse_hex_string(s_hex);
+        assert_eq!(x.to_string(), s);
+
+        let (r, o, is_int) = x.clone().round_to_integer_ties_away();
+        assert!(r.is_valid());
+        assert_eq!(r.to_string(), out);
+        assert_eq!(to_hex_string(&r), out_hex);
+        assert_eq!(o, o_out);
+        assert_eq!(is_int, is_int_out);
+
+        let (r_alt, o_alt, is_int_alt) = x.round_to_integer_ties_away_ref();
+        assert!(r_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&r_alt), ComparableFloatRef(&r));
+        assert_eq!(o_alt, o);
+        assert_eq!(is_int_alt, is_int);
+    };
+    // - ties round away from zero (2.5 -> 3, unlike roundeven's 2)
+    test("2.50", "0x2.8#4", "3.00", "0x3.0#4", Greater, false);
+    test("-2.50", "-0x2.8#4", "-3.00", "-0x3.0#4", Less, false);
+    test("3.50", "0x3.8#4", "4.00", "0x4.0#4", Greater, false);
+    test("10.5", "0xa.8#6", "11.0", "0xb.0#6", Greater, false);
+}
+
+#[test]
+fn test_round_to_integer_prec_round() {
+    let test = |s,
+                s_hex,
+                prec,
+                rm: RoundingMode,
+                out: &str,
+                out_hex: &str,
+                o_out: Ordering,
+                is_int_out: bool| {
+        let x = parse_hex_string(s_hex);
+        assert_eq!(x.to_string(), s);
+
+        let (r, o, is_int) = x.clone().round_to_integer_prec_round(prec, rm);
+        assert!(r.is_valid());
+        assert_eq!(r.to_string(), out);
+        assert_eq!(to_hex_string(&r), out_hex);
+        assert_eq!(o, o_out);
+        assert_eq!(is_int, is_int_out);
+
+        let (r_alt, o_alt, is_int_alt) = x.round_to_integer_prec_round_ref(prec, rm);
+        assert!(r_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&r_alt), ComparableFloatRef(&r));
+        assert_eq!(o_alt, o);
+        assert_eq!(is_int_alt, is_int);
+    };
+    // - the single-rounding contract: 10.5 at precision 2 rounds to 12 (not first to 10, then to 8)
+    test(
+        "10.5", "0xa.8#6", 2, Nearest, "12.0", "0xc.0#2", Greater, false,
+    );
+    test("10.5", "0xa.8#6", 2, Floor, "8.0", "0x8.0#2", Less, false);
+    test(
+        "10.5", "0xa.8#6", 2, Ceiling, "12.0", "0xc.0#2", Greater, false,
+    );
+    test(
+        "-10.5", "-0xa.8#6", 2, Nearest, "-12.0", "-0xc.0#2", Less, false,
+    );
+    // - values below 1 under each direction
+    test(
+        "0.75", "0x0.c#3", 5, Nearest, "1.00", "0x1.0#5", Greater, false,
+    );
+    test("0.75", "0x0.c#3", 5, Floor, "0.0", "0x0.0", Less, false);
+    test(
+        "-0.75", "-0x0.c#3", 5, Ceiling, "-0.0", "-0x0.0", Greater, false,
+    );
+    test(
+        "-0.75", "-0x0.c#3", 5, Nearest, "-1.00", "-0x1.0#5", Less, false,
+    );
+    // - integers re-round to the requested precision, staying exact when representable
+    test("2.0", "0x2.0#1", 5, Nearest, "2.00", "0x2.0#5", Equal, true);
+    test(
+        "1.3e30",
+        "0x1.0E+25#1",
+        5,
+        Nearest,
+        "1.27e30",
+        "0x1.0E+25#5",
+        Equal,
+        true,
+    );
+    // - specials
+    test("NaN", "NaN", 5, Nearest, "NaN", "NaN", Equal, false);
+    test(
+        "Infinity", "Infinity", 5, Nearest, "Infinity", "Infinity", Equal, false,
+    );
+    test("0.0", "0x0.0", 5, Nearest, "0.0", "0x0.0", Equal, true);
+}
+
+#[test]
+fn test_round_to_integer_then_prec_round() {
+    let test = |s,
+                s_hex,
+                irm: RoundingMode,
+                prec,
+                rm: RoundingMode,
+                out: &str,
+                out_hex: &str,
+                o_out: Ordering| {
+        let x = parse_hex_string(s_hex);
+        assert_eq!(x.to_string(), s);
+
+        let (r, o) = x.clone().round_to_integer_then_prec_round(irm, prec, rm);
+        assert!(r.is_valid());
+        assert_eq!(r.to_string(), out);
+        assert_eq!(to_hex_string(&r), out_hex);
+        assert_eq!(o, o_out);
+
+        let (r_alt, o_alt) = x.round_to_integer_then_prec_round_ref(irm, prec, rm);
+        assert!(r_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&r_alt), ComparableFloatRef(&r));
+        assert_eq!(o_alt, o);
+    };
+    // - the double rounding: 10.5 -> 10 (integer step) -> 8 at precision 2, in contrast to the
+    //   single-rounding 12 of round_to_integer_prec_round
+    test("10.5", "0xa.8#6", Down, 2, Nearest, "8.0", "0x8.0#2", Less);
+    test(
+        "10.5", "0xa.8#6", Nearest, 2, Nearest, "8.0", "0x8.0#2", Less,
+    );
+    // - 10.5 -> 11 (Up) -> 8 (Down at precision 2)
+    test("10.5", "0xa.8#6", Up, 2, Down, "8.0", "0x8.0#2", Less);
+    test(
+        "-10.5", "-0xa.8#6", Floor, 2, Nearest, "-12.0", "-0xc.0#2", Less,
+    );
 }

@@ -8,13 +8,16 @@
 
 use core::cmp::Ordering::{self, *};
 use gmp_mpfr_sys::mpfr::{self, rnd_t};
+use malachite_base::assert_panic;
 use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::traits::{NaN, NegativeInfinity};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::LowMask;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
-use malachite_float::{ComparableFloat, Float};
+use malachite_float::test_util::common::{parse_hex_string, to_hex_string};
+use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_nz::natural::Natural;
+use std::panic::catch_unwind;
 
 const fn mpfr_rnd(rm: RoundingMode) -> rnd_t {
     match rm {
@@ -177,4 +180,289 @@ fn fractional_part_fail() {
 #[should_panic]
 fn integer_and_fractional_parts_fail() {
     Float::from(3u32).integer_and_fractional_parts_prec_round_ref(5, 0, Nearest);
+}
+
+#[test]
+fn test_fractional_part() {
+    let test = |s, s_hex, out: &str, out_hex: &str, o_out: Ordering| {
+        let x = parse_hex_string(s_hex);
+        assert_eq!(x.to_string(), s);
+
+        let (f, o) = x.clone().fractional_part();
+        assert!(f.is_valid());
+        assert_eq!(f.to_string(), out);
+        assert_eq!(to_hex_string(&f), out_hex);
+        assert_eq!(o, o_out);
+
+        let (f_alt, o_alt) = x.fractional_part_ref();
+        assert!(f_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&f_alt), ComparableFloatRef(&f));
+        assert_eq!(o_alt, o);
+    };
+    // - NaN stays NaN; the fractional part of an infinity is a zero of the same sign (as in
+    //   mpfr_frac)
+    test("NaN", "NaN", "NaN", "NaN", Equal);
+    test("Infinity", "Infinity", "0.0", "0x0.0", Equal);
+    test("-Infinity", "-Infinity", "-0.0", "-0x0.0", Equal);
+    test("0.0", "0x0.0", "0.0", "0x0.0", Equal);
+    test("-0.0", "-0x0.0", "-0.0", "-0x0.0", Equal);
+    // - an integer's fractional part is a zero with the integer's sign
+    test("2.0", "0x2.0#1", "0.0", "0x0.0", Equal);
+    test("-2.0", "-0x2.0#1", "-0.0", "-0x0.0", Equal);
+    test("1.3e30", "0x1.0E+25#1", "0.0", "0x0.0", Equal);
+    // - a value below 1 in magnitude is its own fractional part
+    test("0.75", "0x0.c#3", "0.75", "0x0.c#3", Equal);
+    test("-0.75", "-0x0.c#3", "-0.75", "-0x0.c#3", Equal);
+    // - the general extraction, both signs
+    test("10.5", "0xa.8#6", "0.500", "0x0.80#6", Equal);
+    test("-10.5", "-0xa.8#6", "-0.500", "-0x0.80#6", Equal);
+    test("10.31", "0xa.50#9", "0.3125", "0x0.500#9", Equal);
+}
+
+#[test]
+fn test_fractional_part_prec_round() {
+    let test = |s, s_hex, prec, rm: RoundingMode, out: &str, out_hex: &str, o_out: Ordering| {
+        let x = parse_hex_string(s_hex);
+        assert_eq!(x.to_string(), s);
+
+        let (f, o) = x.clone().fractional_part_prec_round(prec, rm);
+        assert!(f.is_valid());
+        assert_eq!(f.to_string(), out);
+        assert_eq!(to_hex_string(&f), out_hex);
+        assert_eq!(o, o_out);
+
+        let (f_alt, o_alt) = x.fractional_part_prec_round_ref(prec, rm);
+        assert!(f_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&f_alt), ComparableFloatRef(&f));
+        assert_eq!(o_alt, o);
+    };
+    // - rounding the extracted fraction 0.3125 at precision 1
+    test("10.31", "0xa.50#9", 1, Floor, "0.25", "0x0.4#1", Less);
+    test("10.31", "0xa.50#9", 1, Ceiling, "0.50", "0x0.8#1", Greater);
+    test("10.31", "0xa.50#9", 1, Nearest, "0.25", "0x0.4#1", Less);
+    // - a negative fraction: Floor rounds away from zero
+    test("-10.31", "-0xa.50#9", 1, Floor, "-0.50", "-0x0.8#1", Less);
+    test(
+        "-10.31",
+        "-0xa.50#9",
+        1,
+        Ceiling,
+        "-0.25",
+        "-0x0.4#1",
+        Greater,
+    );
+    // - Exact succeeds when the fraction is exactly representable
+    test("10.31", "0xa.50#9", 4, Exact, "0.312", "0x0.50#4", Equal);
+    test(
+        "10.5",
+        "0xa.8#6",
+        10,
+        Nearest,
+        "0.50000",
+        "0x0.800#10",
+        Equal,
+    );
+    // - specials and integers ignore the precision request (zeros and NaN have none)
+    test("2.0", "0x2.0#1", 10, Nearest, "0.0", "0x0.0", Equal);
+    test("NaN", "NaN", 10, Nearest, "NaN", "NaN", Equal);
+    test("Infinity", "Infinity", 10, Nearest, "0.0", "0x0.0", Equal);
+}
+
+#[test]
+fn test_integer_and_fractional_parts() {
+    let test = |s,
+                s_hex,
+                i_out: &str,
+                i_out_hex: &str,
+                io_out: Ordering,
+                f_out: &str,
+                f_out_hex: &str,
+                fo_out: Ordering| {
+        let x = parse_hex_string(s_hex);
+        assert_eq!(x.to_string(), s);
+
+        let ((i, io), (f, fo)) = x.clone().integer_and_fractional_parts();
+        assert!(i.is_valid());
+        assert!(f.is_valid());
+        assert_eq!(i.to_string(), i_out);
+        assert_eq!(to_hex_string(&i), i_out_hex);
+        assert_eq!(io, io_out);
+        assert_eq!(f.to_string(), f_out);
+        assert_eq!(to_hex_string(&f), f_out_hex);
+        assert_eq!(fo, fo_out);
+
+        let ((i_alt, io_alt), (f_alt, fo_alt)) = x.integer_and_fractional_parts_ref();
+        assert!(i_alt.is_valid());
+        assert!(f_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&i_alt), ComparableFloatRef(&i));
+        assert_eq!(io_alt, io);
+        assert_eq!(ComparableFloatRef(&f_alt), ComparableFloatRef(&f));
+        assert_eq!(fo_alt, fo);
+    };
+    // - NaN splits into two NaNs; an infinity keeps its integer part and has a zero fraction (as in
+    //   mpfr_modf)
+    test("NaN", "NaN", "NaN", "NaN", Equal, "NaN", "NaN", Equal);
+    test(
+        "Infinity", "Infinity", "Infinity", "Infinity", Equal, "0.0", "0x0.0", Equal,
+    );
+    test(
+        "-Infinity",
+        "-Infinity",
+        "-Infinity",
+        "-Infinity",
+        Equal,
+        "-0.0",
+        "-0x0.0",
+        Equal,
+    );
+    test("0.0", "0x0.0", "0.0", "0x0.0", Equal, "0.0", "0x0.0", Equal);
+    test(
+        "-0.0", "-0x0.0", "-0.0", "-0x0.0", Equal, "-0.0", "-0x0.0", Equal,
+    );
+    // - integers: the fraction is a signed zero
+    test(
+        "2.0", "0x2.0#1", "2.0", "0x2.0#1", Equal, "0.0", "0x0.0", Equal,
+    );
+    test(
+        "-2.0", "-0x2.0#1", "-2.0", "-0x2.0#1", Equal, "-0.0", "-0x0.0", Equal,
+    );
+    test(
+        "1.3e30",
+        "0x1.0E+25#1",
+        "1.3e30",
+        "0x1.0E+25#1",
+        Equal,
+        "0.0",
+        "0x0.0",
+        Equal,
+    );
+    // - values below 1: the integer part is a signed zero
+    test(
+        "0.75", "0x0.c#3", "0.0", "0x0.0", Equal, "0.75", "0x0.c#3", Equal,
+    );
+    test(
+        "-0.75", "-0x0.c#3", "-0.0", "-0x0.0", Equal, "-0.75", "-0x0.c#3", Equal,
+    );
+    // - the general split, both signs
+    test(
+        "10.5", "0xa.8#6", "10.0", "0xa.0#6", Equal, "0.500", "0x0.80#6", Equal,
+    );
+    test(
+        "-10.5",
+        "-0xa.8#6",
+        "-10.0",
+        "-0xa.0#6",
+        Equal,
+        "-0.500",
+        "-0x0.80#6",
+        Equal,
+    );
+    test(
+        "10.31",
+        "0xa.50#9",
+        "10.00",
+        "0xa.00#9",
+        Equal,
+        "0.3125",
+        "0x0.500#9",
+        Equal,
+    );
+}
+
+#[test]
+fn test_integer_and_fractional_parts_prec_round() {
+    let test = |s,
+                s_hex,
+                iprec,
+                fprec,
+                rm: RoundingMode,
+                i_out: &str,
+                i_out_hex: &str,
+                io_out: Ordering,
+                f_out: &str,
+                f_out_hex: &str,
+                fo_out: Ordering| {
+        let x = parse_hex_string(s_hex);
+        assert_eq!(x.to_string(), s);
+
+        let ((i, io), (f, fo)) = x
+            .clone()
+            .integer_and_fractional_parts_prec_round(iprec, fprec, rm);
+        assert!(i.is_valid());
+        assert!(f.is_valid());
+        assert_eq!(i.to_string(), i_out);
+        assert_eq!(to_hex_string(&i), i_out_hex);
+        assert_eq!(io, io_out);
+        assert_eq!(f.to_string(), f_out);
+        assert_eq!(to_hex_string(&f), f_out_hex);
+        assert_eq!(fo, fo_out);
+
+        let ((i_alt, io_alt), (f_alt, fo_alt)) =
+            x.integer_and_fractional_parts_prec_round_ref(iprec, fprec, rm);
+        assert!(i_alt.is_valid());
+        assert!(f_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&i_alt), ComparableFloatRef(&i));
+        assert_eq!(io_alt, io);
+        assert_eq!(ComparableFloatRef(&f_alt), ComparableFloatRef(&f));
+        assert_eq!(fo_alt, fo);
+    };
+    // - independent precisions for the two parts, and rounding both (10 -> 8 at precision 2, 0.3125
+    //   -> 0.25 at precision 1)
+    test(
+        "10.31", "0xa.50#9", 2, 1, Floor, "8.0", "0x8.0#2", Less, "0.25", "0x0.4#1", Less,
+    );
+    test(
+        "10.31", "0xa.50#9", 2, 1, Nearest, "8.0", "0x8.0#2", Less, "0.25", "0x0.4#1", Less,
+    );
+    // - a negative value: Floor rounds both parts down (away from zero)
+    test(
+        "-10.31",
+        "-0xa.50#9",
+        2,
+        1,
+        Floor,
+        "-12.0",
+        "-0xc.0#2",
+        Less,
+        "-0.50",
+        "-0x0.8#1",
+        Less,
+    );
+    // - exactly representable at the requested precisions
+    test(
+        "10.5",
+        "0xa.8#6",
+        10,
+        10,
+        Nearest,
+        "10.000",
+        "0xa.00#10",
+        Equal,
+        "0.50000",
+        "0x0.800#10",
+        Equal,
+    );
+    test(
+        "0.75", "0x0.c#3", 5, 5, Nearest, "0.0", "0x0.0", Equal, "0.750", "0x0.c0#5", Equal,
+    );
+    test(
+        "2.0", "0x2.0#1", 5, 5, Nearest, "2.00", "0x2.0#5", Equal, "0.0", "0x0.0", Equal,
+    );
+}
+
+#[test]
+fn fractional_part_prec_round_fail() {
+    assert_panic!(Float::from(1u32).fractional_part_prec_round(0, Nearest));
+    assert_panic!(Float::from(1u32).fractional_part_prec_round_ref(0, Nearest));
+    // Exact with an inexact fraction
+    assert_panic!(parse_hex_string("0xa.50#9").fractional_part_prec_round(1, Exact));
+}
+
+#[test]
+fn integer_and_fractional_parts_prec_round_fail() {
+    assert_panic!(Float::from(1u32).integer_and_fractional_parts_prec_round(0, 1, Nearest));
+    assert_panic!(Float::from(1u32).integer_and_fractional_parts_prec_round(1, 0, Nearest));
+    assert_panic!(
+        parse_hex_string("0xa.50#9").integer_and_fractional_parts_prec_round(2, 1, Exact)
+    );
 }
