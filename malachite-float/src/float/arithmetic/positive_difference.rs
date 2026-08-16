@@ -11,14 +11,15 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::NaN;
-use crate::{Float, emulate_float_float_to_float_fn, float_nan};
-use core::cmp::Ordering::{self, Equal, Greater};
+use crate::{Float, emulate_float_float_to_float_fn, emulate_float_to_float_fn, float_nan};
+use core::cmp::Ordering::{self, Equal, Greater, Less};
 use core::cmp::max;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::Zero as ZeroTrait;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, Nearest};
+use malachite_q::Rational;
 
 // This is mpfr_dim from dim.c, MPFR 4.2.2, with the result's precision passed explicitly. The
 // positive difference is x - y if x > y, and +0 otherwise (a definition choice: negative values are
@@ -1571,6 +1572,2488 @@ impl Float {
     pub fn positive_difference_assign_ref(&mut self, other: &Self) -> Ordering {
         self.positive_difference_round_assign_ref(other, Nearest)
     }
+    /// Computes the positive difference of a [`Float`] and a [`Rational`] — $x-y$ if $x>y$, and
+    /// $+0.0$ otherwise — rounding the result to the specified precision and with the specified
+    /// rounding mode. The [`Float`] and the [`Rational`] are both taken by value. An [`Ordering`]
+    /// is also returned, indicating whether the rounded result is less than, equal to, or greater
+    /// than the exact positive difference. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison and the difference are both exact: the [`Rational`] operand is never rounded
+    /// before use, so the correct branch is always chosen and the winning difference is correctly
+    /// rounded.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},y,p)=\text{NaN}$
+    /// - $f(x,y,p)=+0.0$ if $x\leq y$, including for a zero [`Float`] of either sign against a zero
+    ///   [`Rational`]
+    /// - $f(\infty,y,p)=\infty$
+    ///
+    /// $$
+    /// f(x,y,p) = \begin{cases} x-y+\varepsilon & x>y \\\ +0.0 & \text{otherwise,} \end{cases}
+    /// $$
+    /// - If $x\leq y$ or the exact difference is representable, $\varepsilon$ is 0.
+    /// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p+1}$.
+    ///
+    /// If you know you'll be using `Nearest`, consider using
+    /// [`Float::positive_difference_rational_prec`] instead. If you know that your target precision
+    /// is the [`Float`]'s, consider using [`Float::positive_difference_rational_round`] instead. If
+    /// both of these things are true, consider using [`Float::positive_difference_rational`]
+    /// instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits(), prec)`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` and the positive difference is not exactly
+    /// representable with `prec` bits.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (d, o) = Float::from(3u32).positive_difference_rational_prec_round(
+    ///     Rational::from_signeds(1, 3),
+    ///     10,
+    ///     Floor,
+    /// );
+    /// assert_eq!(d.to_string(), "2.6641");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (d, o) = Float::from(3u32).positive_difference_rational_prec_round(
+    ///     Rational::from_signeds(1, 3),
+    ///     10,
+    ///     Ceiling,
+    /// );
+    /// assert_eq!(d.to_string(), "2.6680");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn positive_difference_rational_prec_round(
+        self,
+        other: Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        if matches!(self.partial_cmp(&other), Some(Greater)) {
+            self.sub_rational_prec_round(other, prec, rm)
+        } else if matches!(self, Self(NaN)) {
+            (float_nan!(), Equal)
+        } else {
+            (Self::ZERO, Equal)
+        }
+    }
+
+    /// Computes the positive difference of a [`Float`] and a [`Rational`] — $x-y$ if $x>y$, and
+    /// $+0.0$ otherwise — rounding the result to the specified precision and with the specified
+    /// rounding mode. The [`Float`] is taken by value and the [`Rational`] by reference. An
+    /// [`Ordering`] is also returned, indicating whether the rounded result is less than, equal to,
+    /// or greater than the exact positive difference. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison and the difference are both exact: the [`Rational`] operand is never rounded
+    /// before use, so the correct branch is always chosen and the winning difference is correctly
+    /// rounded.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},y,p)=\text{NaN}$
+    /// - $f(x,y,p)=+0.0$ if $x\leq y$, including for a zero [`Float`] of either sign against a zero
+    ///   [`Rational`]
+    /// - $f(\infty,y,p)=\infty$
+    ///
+    /// $$
+    /// f(x,y,p) = \begin{cases} x-y+\varepsilon & x>y \\\ +0.0 & \text{otherwise,} \end{cases}
+    /// $$
+    /// - If $x\leq y$ or the exact difference is representable, $\varepsilon$ is 0.
+    /// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p+1}$.
+    ///
+    /// If you know you'll be using `Nearest`, consider using
+    /// [`Float::positive_difference_rational_prec`] instead. If you know that your target precision
+    /// is the [`Float`]'s, consider using [`Float::positive_difference_rational_round`] instead. If
+    /// both of these things are true, consider using [`Float::positive_difference_rational`]
+    /// instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits(), prec)`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` and the positive difference is not exactly
+    /// representable with `prec` bits.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (d, o) = Float::from(3u32).positive_difference_rational_prec_round_val_ref(
+    ///     &Rational::from_signeds(1, 3),
+    ///     10,
+    ///     Floor,
+    /// );
+    /// assert_eq!(d.to_string(), "2.6641");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (d, o) = Float::from(3u32).positive_difference_rational_prec_round_val_ref(
+    ///     &Rational::from_signeds(1, 3),
+    ///     10,
+    ///     Ceiling,
+    /// );
+    /// assert_eq!(d.to_string(), "2.6680");
+    /// assert_eq!(o, Greater);
+    /// ```
+    pub fn positive_difference_rational_prec_round_val_ref(
+        self,
+        other: &Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        if matches!(self.partial_cmp(other), Some(Greater)) {
+            self.sub_rational_prec_round_val_ref(other, prec, rm)
+        } else if matches!(self, Self(NaN)) {
+            (float_nan!(), Equal)
+        } else {
+            (Self::ZERO, Equal)
+        }
+    }
+
+    /// Computes the positive difference of a [`Float`] and a [`Rational`] — $x-y$ if $x>y$, and
+    /// $+0.0$ otherwise — rounding the result to the specified precision and with the specified
+    /// rounding mode. The [`Float`] is taken by reference and the [`Rational`] by value. An
+    /// [`Ordering`] is also returned, indicating whether the rounded result is less than, equal to,
+    /// or greater than the exact positive difference. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison and the difference are both exact: the [`Rational`] operand is never rounded
+    /// before use, so the correct branch is always chosen and the winning difference is correctly
+    /// rounded.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},y,p)=\text{NaN}$
+    /// - $f(x,y,p)=+0.0$ if $x\leq y$, including for a zero [`Float`] of either sign against a zero
+    ///   [`Rational`]
+    /// - $f(\infty,y,p)=\infty$
+    ///
+    /// $$
+    /// f(x,y,p) = \begin{cases} x-y+\varepsilon & x>y \\\ +0.0 & \text{otherwise,} \end{cases}
+    /// $$
+    /// - If $x\leq y$ or the exact difference is representable, $\varepsilon$ is 0.
+    /// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p+1}$.
+    ///
+    /// If you know you'll be using `Nearest`, consider using
+    /// [`Float::positive_difference_rational_prec`] instead. If you know that your target precision
+    /// is the [`Float`]'s, consider using [`Float::positive_difference_rational_round`] instead. If
+    /// both of these things are true, consider using [`Float::positive_difference_rational`]
+    /// instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits(), prec)`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` and the positive difference is not exactly
+    /// representable with `prec` bits.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (d, o) = Float::from(3u32).positive_difference_rational_prec_round_ref_val(
+    ///     Rational::from_signeds(1, 3),
+    ///     10,
+    ///     Floor,
+    /// );
+    /// assert_eq!(d.to_string(), "2.6641");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (d, o) = Float::from(3u32).positive_difference_rational_prec_round_ref_val(
+    ///     Rational::from_signeds(1, 3),
+    ///     10,
+    ///     Ceiling,
+    /// );
+    /// assert_eq!(d.to_string(), "2.6680");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn positive_difference_rational_prec_round_ref_val(
+        &self,
+        other: Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        if matches!((*self).partial_cmp(&other), Some(Greater)) {
+            self.sub_rational_prec_round_ref_val(other, prec, rm)
+        } else if matches!(self, Self(NaN)) {
+            (float_nan!(), Equal)
+        } else {
+            (Self::ZERO, Equal)
+        }
+    }
+
+    /// Computes the positive difference of a [`Float`] and a [`Rational`] — $x-y$ if $x>y$, and
+    /// $+0.0$ otherwise — rounding the result to the specified precision and with the specified
+    /// rounding mode. The [`Float`] and the [`Rational`] are both taken by reference. An
+    /// [`Ordering`] is also returned, indicating whether the rounded result is less than, equal to,
+    /// or greater than the exact positive difference. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison and the difference are both exact: the [`Rational`] operand is never rounded
+    /// before use, so the correct branch is always chosen and the winning difference is correctly
+    /// rounded.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},y,p)=\text{NaN}$
+    /// - $f(x,y,p)=+0.0$ if $x\leq y$, including for a zero [`Float`] of either sign against a zero
+    ///   [`Rational`]
+    /// - $f(\infty,y,p)=\infty$
+    ///
+    /// $$
+    /// f(x,y,p) = \begin{cases} x-y+\varepsilon & x>y \\\ +0.0 & \text{otherwise,} \end{cases}
+    /// $$
+    /// - If $x\leq y$ or the exact difference is representable, $\varepsilon$ is 0.
+    /// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p+1}$.
+    ///
+    /// If you know you'll be using `Nearest`, consider using
+    /// [`Float::positive_difference_rational_prec`] instead. If you know that your target precision
+    /// is the [`Float`]'s, consider using [`Float::positive_difference_rational_round`] instead. If
+    /// both of these things are true, consider using [`Float::positive_difference_rational`]
+    /// instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits(), prec)`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` and the positive difference is not exactly
+    /// representable with `prec` bits.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (d, o) = Float::from(3u32).positive_difference_rational_prec_round_ref_ref(
+    ///     &Rational::from_signeds(1, 3),
+    ///     10,
+    ///     Floor,
+    /// );
+    /// assert_eq!(d.to_string(), "2.6641");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (d, o) = Float::from(3u32).positive_difference_rational_prec_round_ref_ref(
+    ///     &Rational::from_signeds(1, 3),
+    ///     10,
+    ///     Ceiling,
+    /// );
+    /// assert_eq!(d.to_string(), "2.6680");
+    /// assert_eq!(o, Greater);
+    /// ```
+    pub fn positive_difference_rational_prec_round_ref_ref(
+        &self,
+        other: &Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        if matches!((*self).partial_cmp(other), Some(Greater)) {
+            self.sub_rational_prec_round_ref_ref(other, prec, rm)
+        } else if matches!(self, Self(NaN)) {
+            (float_nan!(), Equal)
+        } else {
+            (Self::ZERO, Equal)
+        }
+    }
+
+    /// Computes the positive difference of a [`Float`] and a [`Rational`] — $x-y$ if $x>y$, and
+    /// $+0.0$ otherwise — rounding the result to the nearest value of the specified precision.
+    /// The [`Float`] and the [`Rational`] are both taken by value. An [`Ordering`] is also
+    /// returned, indicating whether the rounded result is less than, equal to, or greater than the
+    /// exact positive difference. Although `NaN`s are not comparable to any [`Float`], whenever
+    /// this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison and the difference are both exact: the [`Rational`] operand is never rounded
+    /// before use, so the correct branch is always chosen and the winning difference is correctly
+    /// rounded.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},y,p)=\text{NaN}$
+    /// - $f(x,y,p)=+0.0$ if $x\leq y$, including for a zero [`Float`] of either sign against a zero
+    ///   [`Rational`]
+    /// - $f(\infty,y,p)=\infty$
+    ///
+    /// $$
+    /// f(x,y,p) = \begin{cases} x-y+\varepsilon & x>y \\\ +0.0 & \text{otherwise,} \end{cases}
+    /// $$
+    /// - If $x\leq y$ or the exact difference is representable, $\varepsilon$ is 0.
+    /// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p}$.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::positive_difference_rational_prec_round`] instead. If you know that your target
+    /// precision is the [`Float`]'s, consider using [`Float::positive_difference_rational`]
+    /// instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits(), prec)`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (d, o) =
+    ///     Float::from(3u32).positive_difference_rational_prec(Rational::from_signeds(1, 3), 10);
+    /// assert_eq!(d.to_string(), "2.6680");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn positive_difference_rational_prec(self, other: Rational, prec: u64) -> (Self, Ordering) {
+        self.positive_difference_rational_prec_round(other, prec, Nearest)
+    }
+
+    /// Computes the positive difference of a [`Float`] and a [`Rational`] — $x-y$ if $x>y$, and
+    /// $+0.0$ otherwise — rounding the result to the nearest value of the specified precision.
+    /// The [`Float`] is taken by value and the [`Rational`] by reference. An [`Ordering`] is also
+    /// returned, indicating whether the rounded result is less than, equal to, or greater than the
+    /// exact positive difference. Although `NaN`s are not comparable to any [`Float`], whenever
+    /// this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison and the difference are both exact: the [`Rational`] operand is never rounded
+    /// before use, so the correct branch is always chosen and the winning difference is correctly
+    /// rounded.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},y,p)=\text{NaN}$
+    /// - $f(x,y,p)=+0.0$ if $x\leq y$, including for a zero [`Float`] of either sign against a zero
+    ///   [`Rational`]
+    /// - $f(\infty,y,p)=\infty$
+    ///
+    /// $$
+    /// f(x,y,p) = \begin{cases} x-y+\varepsilon & x>y \\\ +0.0 & \text{otherwise,} \end{cases}
+    /// $$
+    /// - If $x\leq y$ or the exact difference is representable, $\varepsilon$ is 0.
+    /// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p}$.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::positive_difference_rational_prec_round`] instead. If you know that your target
+    /// precision is the [`Float`]'s, consider using [`Float::positive_difference_rational`]
+    /// instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits(), prec)`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (d, o) = Float::from(3u32)
+    ///     .positive_difference_rational_prec_val_ref(&Rational::from_signeds(1, 3), 10);
+    /// assert_eq!(d.to_string(), "2.6680");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn positive_difference_rational_prec_val_ref(
+        self,
+        other: &Rational,
+        prec: u64,
+    ) -> (Self, Ordering) {
+        self.positive_difference_rational_prec_round_val_ref(other, prec, Nearest)
+    }
+
+    /// Computes the positive difference of a [`Float`] and a [`Rational`] — $x-y$ if $x>y$, and
+    /// $+0.0$ otherwise — rounding the result to the nearest value of the specified precision.
+    /// The [`Float`] is taken by reference and the [`Rational`] by value. An [`Ordering`] is also
+    /// returned, indicating whether the rounded result is less than, equal to, or greater than the
+    /// exact positive difference. Although `NaN`s are not comparable to any [`Float`], whenever
+    /// this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison and the difference are both exact: the [`Rational`] operand is never rounded
+    /// before use, so the correct branch is always chosen and the winning difference is correctly
+    /// rounded.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},y,p)=\text{NaN}$
+    /// - $f(x,y,p)=+0.0$ if $x\leq y$, including for a zero [`Float`] of either sign against a zero
+    ///   [`Rational`]
+    /// - $f(\infty,y,p)=\infty$
+    ///
+    /// $$
+    /// f(x,y,p) = \begin{cases} x-y+\varepsilon & x>y \\\ +0.0 & \text{otherwise,} \end{cases}
+    /// $$
+    /// - If $x\leq y$ or the exact difference is representable, $\varepsilon$ is 0.
+    /// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p}$.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::positive_difference_rational_prec_round`] instead. If you know that your target
+    /// precision is the [`Float`]'s, consider using [`Float::positive_difference_rational`]
+    /// instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits(), prec)`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (d, o) = Float::from(3u32)
+    ///     .positive_difference_rational_prec_ref_val(Rational::from_signeds(1, 3), 10);
+    /// assert_eq!(d.to_string(), "2.6680");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn positive_difference_rational_prec_ref_val(
+        &self,
+        other: Rational,
+        prec: u64,
+    ) -> (Self, Ordering) {
+        self.positive_difference_rational_prec_round_ref_val(other, prec, Nearest)
+    }
+
+    /// Computes the positive difference of a [`Float`] and a [`Rational`] — $x-y$ if $x>y$, and
+    /// $+0.0$ otherwise — rounding the result to the nearest value of the specified precision.
+    /// The [`Float`] and the [`Rational`] are both taken by reference. An [`Ordering`] is also
+    /// returned, indicating whether the rounded result is less than, equal to, or greater than the
+    /// exact positive difference. Although `NaN`s are not comparable to any [`Float`], whenever
+    /// this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison and the difference are both exact: the [`Rational`] operand is never rounded
+    /// before use, so the correct branch is always chosen and the winning difference is correctly
+    /// rounded.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},y,p)=\text{NaN}$
+    /// - $f(x,y,p)=+0.0$ if $x\leq y$, including for a zero [`Float`] of either sign against a zero
+    ///   [`Rational`]
+    /// - $f(\infty,y,p)=\infty$
+    ///
+    /// $$
+    /// f(x,y,p) = \begin{cases} x-y+\varepsilon & x>y \\\ +0.0 & \text{otherwise,} \end{cases}
+    /// $$
+    /// - If $x\leq y$ or the exact difference is representable, $\varepsilon$ is 0.
+    /// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p}$.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::positive_difference_rational_prec_round`] instead. If you know that your target
+    /// precision is the [`Float`]'s, consider using [`Float::positive_difference_rational`]
+    /// instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits(), prec)`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (d, o) = Float::from(3u32)
+    ///     .positive_difference_rational_prec_ref_ref(&Rational::from_signeds(1, 3), 10);
+    /// assert_eq!(d.to_string(), "2.6680");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn positive_difference_rational_prec_ref_ref(
+        &self,
+        other: &Rational,
+        prec: u64,
+    ) -> (Self, Ordering) {
+        self.positive_difference_rational_prec_round_ref_ref(other, prec, Nearest)
+    }
+
+    /// Computes the positive difference of a [`Float`] and a [`Rational`] — $x-y$ if $x>y$, and
+    /// $+0.0$ otherwise — rounding the result to the [`Float`]'s precision, with the specified
+    /// rounding mode. The [`Float`] and the [`Rational`] are both taken by value. An [`Ordering`]
+    /// is also returned, indicating whether the rounded result is less than, equal to, or greater
+    /// than the exact positive difference. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison and the difference are both exact: the [`Rational`] operand is never rounded
+    /// before use, so the correct branch is always chosen and the winning difference is correctly
+    /// rounded.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},y,p)=\text{NaN}$
+    /// - $f(x,y,p)=+0.0$ if $x\leq y$, including for a zero [`Float`] of either sign against a zero
+    ///   [`Rational`]
+    /// - $f(\infty,y,p)=\infty$
+    ///
+    /// $$
+    /// f(x,y,p) = \begin{cases} x-y+\varepsilon & x>y \\\ +0.0 & \text{otherwise,} \end{cases}
+    /// $$
+    /// - If $x\leq y$ or the exact difference is representable, $\varepsilon$ is 0.
+    /// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p+1}$.
+    ///
+    /// If you want to specify an output precision, consider using
+    /// [`Float::positive_difference_rational_prec_round`] instead. If you know you'll be using the
+    /// `Nearest` rounding mode, consider using [`Float::positive_difference_rational`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits())`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` and the positive difference is not exactly representable with the
+    /// output precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (d, o) = Float::from(3u32)
+    ///     .positive_difference_rational_round(Rational::from_signeds(1, 3), Floor);
+    /// assert_eq!(d.to_string(), "2.0");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn positive_difference_rational_round(
+        self,
+        other: Rational,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        let prec = self.significant_bits();
+        self.positive_difference_rational_prec_round(other, prec, rm)
+    }
+
+    /// Computes the positive difference of a [`Float`] and a [`Rational`] — $x-y$ if $x>y$, and
+    /// $+0.0$ otherwise — rounding the result to the [`Float`]'s precision, with the specified
+    /// rounding mode. The [`Float`] is taken by value and the [`Rational`] by reference. An
+    /// [`Ordering`] is also returned, indicating whether the rounded result is less than, equal to,
+    /// or greater than the exact positive difference. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison and the difference are both exact: the [`Rational`] operand is never rounded
+    /// before use, so the correct branch is always chosen and the winning difference is correctly
+    /// rounded.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},y,p)=\text{NaN}$
+    /// - $f(x,y,p)=+0.0$ if $x\leq y$, including for a zero [`Float`] of either sign against a zero
+    ///   [`Rational`]
+    /// - $f(\infty,y,p)=\infty$
+    ///
+    /// $$
+    /// f(x,y,p) = \begin{cases} x-y+\varepsilon & x>y \\\ +0.0 & \text{otherwise,} \end{cases}
+    /// $$
+    /// - If $x\leq y$ or the exact difference is representable, $\varepsilon$ is 0.
+    /// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p+1}$.
+    ///
+    /// If you want to specify an output precision, consider using
+    /// [`Float::positive_difference_rational_prec_round`] instead. If you know you'll be using the
+    /// `Nearest` rounding mode, consider using [`Float::positive_difference_rational`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits())`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` and the positive difference is not exactly representable with the
+    /// output precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (d, o) = Float::from(3u32)
+    ///     .positive_difference_rational_round_val_ref(&Rational::from_signeds(1, 3), Floor);
+    /// assert_eq!(d.to_string(), "2.0");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn positive_difference_rational_round_val_ref(
+        self,
+        other: &Rational,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        let prec = self.significant_bits();
+        self.positive_difference_rational_prec_round_val_ref(other, prec, rm)
+    }
+
+    /// Computes the positive difference of a [`Float`] and a [`Rational`] — $x-y$ if $x>y$, and
+    /// $+0.0$ otherwise — rounding the result to the [`Float`]'s precision, with the specified
+    /// rounding mode. The [`Float`] is taken by reference and the [`Rational`] by value. An
+    /// [`Ordering`] is also returned, indicating whether the rounded result is less than, equal to,
+    /// or greater than the exact positive difference. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison and the difference are both exact: the [`Rational`] operand is never rounded
+    /// before use, so the correct branch is always chosen and the winning difference is correctly
+    /// rounded.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},y,p)=\text{NaN}$
+    /// - $f(x,y,p)=+0.0$ if $x\leq y$, including for a zero [`Float`] of either sign against a zero
+    ///   [`Rational`]
+    /// - $f(\infty,y,p)=\infty$
+    ///
+    /// $$
+    /// f(x,y,p) = \begin{cases} x-y+\varepsilon & x>y \\\ +0.0 & \text{otherwise,} \end{cases}
+    /// $$
+    /// - If $x\leq y$ or the exact difference is representable, $\varepsilon$ is 0.
+    /// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p+1}$.
+    ///
+    /// If you want to specify an output precision, consider using
+    /// [`Float::positive_difference_rational_prec_round`] instead. If you know you'll be using the
+    /// `Nearest` rounding mode, consider using [`Float::positive_difference_rational`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits())`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` and the positive difference is not exactly representable with the
+    /// output precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (d, o) = Float::from(3u32)
+    ///     .positive_difference_rational_round_ref_val(Rational::from_signeds(1, 3), Floor);
+    /// assert_eq!(d.to_string(), "2.0");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn positive_difference_rational_round_ref_val(
+        &self,
+        other: Rational,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        let prec = self.significant_bits();
+        self.positive_difference_rational_prec_round_ref_val(other, prec, rm)
+    }
+
+    /// Computes the positive difference of a [`Float`] and a [`Rational`] — $x-y$ if $x>y$, and
+    /// $+0.0$ otherwise — rounding the result to the [`Float`]'s precision, with the specified
+    /// rounding mode. The [`Float`] and the [`Rational`] are both taken by reference. An
+    /// [`Ordering`] is also returned, indicating whether the rounded result is less than, equal to,
+    /// or greater than the exact positive difference. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison and the difference are both exact: the [`Rational`] operand is never rounded
+    /// before use, so the correct branch is always chosen and the winning difference is correctly
+    /// rounded.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},y,p)=\text{NaN}$
+    /// - $f(x,y,p)=+0.0$ if $x\leq y$, including for a zero [`Float`] of either sign against a zero
+    ///   [`Rational`]
+    /// - $f(\infty,y,p)=\infty$
+    ///
+    /// $$
+    /// f(x,y,p) = \begin{cases} x-y+\varepsilon & x>y \\\ +0.0 & \text{otherwise,} \end{cases}
+    /// $$
+    /// - If $x\leq y$ or the exact difference is representable, $\varepsilon$ is 0.
+    /// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p+1}$.
+    ///
+    /// If you want to specify an output precision, consider using
+    /// [`Float::positive_difference_rational_prec_round`] instead. If you know you'll be using the
+    /// `Nearest` rounding mode, consider using [`Float::positive_difference_rational`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits())`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` and the positive difference is not exactly representable with the
+    /// output precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (d, o) = Float::from(3u32)
+    ///     .positive_difference_rational_round_ref_ref(&Rational::from_signeds(1, 3), Floor);
+    /// assert_eq!(d.to_string(), "2.0");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn positive_difference_rational_round_ref_ref(
+        &self,
+        other: &Rational,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        let prec = self.significant_bits();
+        self.positive_difference_rational_prec_round_ref_ref(other, prec, rm)
+    }
+
+    /// Computes the positive difference of a [`Float`] and a [`Rational`] — $x-y$ if $x>y$, and
+    /// $+0.0$ otherwise — rounding the result to the nearest value of the [`Float`]'s precision.
+    /// The [`Float`] and the [`Rational`] are both taken by value. An [`Ordering`] is also
+    /// returned, indicating whether the rounded result is less than, equal to, or greater than the
+    /// exact positive difference. Although `NaN`s are not comparable to any [`Float`], whenever
+    /// this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison and the difference are both exact: the [`Rational`] operand is never rounded
+    /// before use, so the correct branch is always chosen and the winning difference is correctly
+    /// rounded.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},y,p)=\text{NaN}$
+    /// - $f(x,y,p)=+0.0$ if $x\leq y$, including for a zero [`Float`] of either sign against a zero
+    ///   [`Rational`]
+    /// - $f(\infty,y,p)=\infty$
+    ///
+    /// $$
+    /// f(x,y,p) = \begin{cases} x-y+\varepsilon & x>y \\\ +0.0 & \text{otherwise,} \end{cases}
+    /// $$
+    /// - If $x\leq y$ or the exact difference is representable, $\varepsilon$ is 0.
+    /// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p}$.
+    ///
+    /// If you want to specify an output precision, consider using
+    /// [`Float::positive_difference_rational_prec`] instead. If you want to use a rounding mode
+    /// other than `Nearest`, consider using [`Float::positive_difference_rational_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits())`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (d, o) = Float::from(3u32).positive_difference_rational(Rational::from_signeds(1, 3));
+    /// assert_eq!(d.to_string(), "3.0");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn positive_difference_rational(self, other: Rational) -> (Self, Ordering) {
+        self.positive_difference_rational_round(other, Nearest)
+    }
+
+    /// Computes the positive difference of a [`Float`] and a [`Rational`] — $x-y$ if $x>y$, and
+    /// $+0.0$ otherwise — rounding the result to the nearest value of the [`Float`]'s precision.
+    /// The [`Float`] is taken by value and the [`Rational`] by reference. An [`Ordering`] is also
+    /// returned, indicating whether the rounded result is less than, equal to, or greater than the
+    /// exact positive difference. Although `NaN`s are not comparable to any [`Float`], whenever
+    /// this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison and the difference are both exact: the [`Rational`] operand is never rounded
+    /// before use, so the correct branch is always chosen and the winning difference is correctly
+    /// rounded.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},y,p)=\text{NaN}$
+    /// - $f(x,y,p)=+0.0$ if $x\leq y$, including for a zero [`Float`] of either sign against a zero
+    ///   [`Rational`]
+    /// - $f(\infty,y,p)=\infty$
+    ///
+    /// $$
+    /// f(x,y,p) = \begin{cases} x-y+\varepsilon & x>y \\\ +0.0 & \text{otherwise,} \end{cases}
+    /// $$
+    /// - If $x\leq y$ or the exact difference is representable, $\varepsilon$ is 0.
+    /// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p}$.
+    ///
+    /// If you want to specify an output precision, consider using
+    /// [`Float::positive_difference_rational_prec`] instead. If you want to use a rounding mode
+    /// other than `Nearest`, consider using [`Float::positive_difference_rational_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits())`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (d, o) =
+    ///     Float::from(3u32).positive_difference_rational_val_ref(&Rational::from_signeds(1, 3));
+    /// assert_eq!(d.to_string(), "3.0");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn positive_difference_rational_val_ref(self, other: &Rational) -> (Self, Ordering) {
+        self.positive_difference_rational_round_val_ref(other, Nearest)
+    }
+
+    /// Computes the positive difference of a [`Float`] and a [`Rational`] — $x-y$ if $x>y$, and
+    /// $+0.0$ otherwise — rounding the result to the nearest value of the [`Float`]'s precision.
+    /// The [`Float`] is taken by reference and the [`Rational`] by value. An [`Ordering`] is also
+    /// returned, indicating whether the rounded result is less than, equal to, or greater than the
+    /// exact positive difference. Although `NaN`s are not comparable to any [`Float`], whenever
+    /// this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison and the difference are both exact: the [`Rational`] operand is never rounded
+    /// before use, so the correct branch is always chosen and the winning difference is correctly
+    /// rounded.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},y,p)=\text{NaN}$
+    /// - $f(x,y,p)=+0.0$ if $x\leq y$, including for a zero [`Float`] of either sign against a zero
+    ///   [`Rational`]
+    /// - $f(\infty,y,p)=\infty$
+    ///
+    /// $$
+    /// f(x,y,p) = \begin{cases} x-y+\varepsilon & x>y \\\ +0.0 & \text{otherwise,} \end{cases}
+    /// $$
+    /// - If $x\leq y$ or the exact difference is representable, $\varepsilon$ is 0.
+    /// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p}$.
+    ///
+    /// If you want to specify an output precision, consider using
+    /// [`Float::positive_difference_rational_prec`] instead. If you want to use a rounding mode
+    /// other than `Nearest`, consider using [`Float::positive_difference_rational_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits())`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (d, o) =
+    ///     Float::from(3u32).positive_difference_rational_ref_val(Rational::from_signeds(1, 3));
+    /// assert_eq!(d.to_string(), "3.0");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn positive_difference_rational_ref_val(&self, other: Rational) -> (Self, Ordering) {
+        self.positive_difference_rational_round_ref_val(other, Nearest)
+    }
+
+    /// Computes the positive difference of a [`Float`] and a [`Rational`] — $x-y$ if $x>y$, and
+    /// $+0.0$ otherwise — rounding the result to the nearest value of the [`Float`]'s precision.
+    /// The [`Float`] and the [`Rational`] are both taken by reference. An [`Ordering`] is also
+    /// returned, indicating whether the rounded result is less than, equal to, or greater than the
+    /// exact positive difference. Although `NaN`s are not comparable to any [`Float`], whenever
+    /// this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison and the difference are both exact: the [`Rational`] operand is never rounded
+    /// before use, so the correct branch is always chosen and the winning difference is correctly
+    /// rounded.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},y,p)=\text{NaN}$
+    /// - $f(x,y,p)=+0.0$ if $x\leq y$, including for a zero [`Float`] of either sign against a zero
+    ///   [`Rational`]
+    /// - $f(\infty,y,p)=\infty$
+    ///
+    /// $$
+    /// f(x,y,p) = \begin{cases} x-y+\varepsilon & x>y \\\ +0.0 & \text{otherwise,} \end{cases}
+    /// $$
+    /// - If $x\leq y$ or the exact difference is representable, $\varepsilon$ is 0.
+    /// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p}$.
+    ///
+    /// If you want to specify an output precision, consider using
+    /// [`Float::positive_difference_rational_prec`] instead. If you want to use a rounding mode
+    /// other than `Nearest`, consider using [`Float::positive_difference_rational_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits())`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (d, o) =
+    ///     Float::from(3u32).positive_difference_rational_ref_ref(&Rational::from_signeds(1, 3));
+    /// assert_eq!(d.to_string(), "3.0");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn positive_difference_rational_ref_ref(&self, other: &Rational) -> (Self, Ordering) {
+        self.positive_difference_rational_round_ref_ref(other, Nearest)
+    }
+
+    /// Computes the positive difference of a [`Float`] and a [`Rational`] in place — $x-y$ if
+    /// $x>y$, and $+0.0$ otherwise — rounding the result to the specified precision and with the
+    /// specified rounding mode. The [`Rational`] is taken by value. An [`Ordering`] is also
+    /// returned, indicating whether the rounded result is less than, equal to, or greater than the
+    /// exact positive difference. Although `NaN`s are not comparable to any [`Float`], whenever
+    /// this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison and the difference are both exact: the [`Rational`] operand is never rounded
+    /// before use, so the correct branch is always chosen and the winning difference is correctly
+    /// rounded.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},y,p)=\text{NaN}$
+    /// - $f(x,y,p)=+0.0$ if $x\leq y$, including for a zero [`Float`] of either sign against a zero
+    ///   [`Rational`]
+    /// - $f(\infty,y,p)=\infty$
+    ///
+    /// $$
+    /// f(x,y,p) = \begin{cases} x-y+\varepsilon & x>y \\\ +0.0 & \text{otherwise,} \end{cases}
+    /// $$
+    /// - If $x\leq y$ or the exact difference is representable, $\varepsilon$ is 0.
+    /// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p+1}$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits(), prec)`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` and the positive difference is not exactly
+    /// representable with `prec` bits.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let mut x = Float::from(3u32);
+    /// assert_eq!(
+    ///     x.positive_difference_rational_prec_round_assign(
+    ///         Rational::from_signeds(1, 3),
+    ///         10,
+    ///         Floor
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "2.6641");
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn positive_difference_rational_prec_round_assign(
+        &mut self,
+        other: Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> Ordering {
+        assert_ne!(prec, 0);
+        if matches!((*self).partial_cmp(&other), Some(Greater)) {
+            self.sub_rational_prec_round_assign(other, prec, rm)
+        } else if matches!(self, Self(NaN)) {
+            *self = float_nan!();
+            Equal
+        } else {
+            *self = Self::ZERO;
+            Equal
+        }
+    }
+
+    /// Computes the positive difference of a [`Float`] and a [`Rational`] in place — $x-y$ if
+    /// $x>y$, and $+0.0$ otherwise — rounding the result to the specified precision and with the
+    /// specified rounding mode. The [`Rational`] is taken by reference. An [`Ordering`] is also
+    /// returned, indicating whether the rounded result is less than, equal to, or greater than the
+    /// exact positive difference. Although `NaN`s are not comparable to any [`Float`], whenever
+    /// this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison and the difference are both exact: the [`Rational`] operand is never rounded
+    /// before use, so the correct branch is always chosen and the winning difference is correctly
+    /// rounded.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},y,p)=\text{NaN}$
+    /// - $f(x,y,p)=+0.0$ if $x\leq y$, including for a zero [`Float`] of either sign against a zero
+    ///   [`Rational`]
+    /// - $f(\infty,y,p)=\infty$
+    ///
+    /// $$
+    /// f(x,y,p) = \begin{cases} x-y+\varepsilon & x>y \\\ +0.0 & \text{otherwise,} \end{cases}
+    /// $$
+    /// - If $x\leq y$ or the exact difference is representable, $\varepsilon$ is 0.
+    /// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p+1}$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits(), prec)`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` and the positive difference is not exactly
+    /// representable with `prec` bits.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let mut x = Float::from(3u32);
+    /// assert_eq!(
+    ///     x.positive_difference_rational_prec_round_assign_ref(
+    ///         &Rational::from_signeds(1, 3),
+    ///         10,
+    ///         Floor
+    ///     ),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "2.6641");
+    /// ```
+    pub fn positive_difference_rational_prec_round_assign_ref(
+        &mut self,
+        other: &Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> Ordering {
+        assert_ne!(prec, 0);
+        if matches!((*self).partial_cmp(other), Some(Greater)) {
+            self.sub_rational_prec_round_assign_ref(other, prec, rm)
+        } else if matches!(self, Self(NaN)) {
+            *self = float_nan!();
+            Equal
+        } else {
+            *self = Self::ZERO;
+            Equal
+        }
+    }
+
+    /// Computes the positive difference of a [`Float`] and a [`Rational`] in place — $x-y$ if
+    /// $x>y$, and $+0.0$ otherwise — rounding the result to the nearest value of the specified
+    /// precision. The [`Rational`] is taken by value. An [`Ordering`] is also returned, indicating
+    /// whether the rounded result is less than, equal to, or greater than the exact positive
+    /// difference. Although `NaN`s are not comparable to any [`Float`], whenever this function
+    /// returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison and the difference are both exact: the [`Rational`] operand is never rounded
+    /// before use, so the correct branch is always chosen and the winning difference is correctly
+    /// rounded.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},y,p)=\text{NaN}$
+    /// - $f(x,y,p)=+0.0$ if $x\leq y$, including for a zero [`Float`] of either sign against a zero
+    ///   [`Rational`]
+    /// - $f(\infty,y,p)=\infty$
+    ///
+    /// $$
+    /// f(x,y,p) = \begin{cases} x-y+\varepsilon & x>y \\\ +0.0 & \text{otherwise,} \end{cases}
+    /// $$
+    /// - If $x\leq y$ or the exact difference is representable, $\varepsilon$ is 0.
+    /// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p}$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits(), prec)`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let mut x = Float::from(3u32);
+    /// assert_eq!(
+    ///     x.positive_difference_rational_prec_assign(Rational::from_signeds(1, 3), 10),
+    ///     Greater
+    /// );
+    /// assert_eq!(x.to_string(), "2.6680");
+    /// ```
+    #[inline]
+    pub fn positive_difference_rational_prec_assign(
+        &mut self,
+        other: Rational,
+        prec: u64,
+    ) -> Ordering {
+        self.positive_difference_rational_prec_round_assign(other, prec, Nearest)
+    }
+
+    /// Computes the positive difference of a [`Float`] and a [`Rational`] in place — $x-y$ if
+    /// $x>y$, and $+0.0$ otherwise — rounding the result to the nearest value of the specified
+    /// precision. The [`Rational`] is taken by reference. An [`Ordering`] is also returned,
+    /// indicating whether the rounded result is less than, equal to, or greater than the exact
+    /// positive difference. Although `NaN`s are not comparable to any [`Float`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison and the difference are both exact: the [`Rational`] operand is never rounded
+    /// before use, so the correct branch is always chosen and the winning difference is correctly
+    /// rounded.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},y,p)=\text{NaN}$
+    /// - $f(x,y,p)=+0.0$ if $x\leq y$, including for a zero [`Float`] of either sign against a zero
+    ///   [`Rational`]
+    /// - $f(\infty,y,p)=\infty$
+    ///
+    /// $$
+    /// f(x,y,p) = \begin{cases} x-y+\varepsilon & x>y \\\ +0.0 & \text{otherwise,} \end{cases}
+    /// $$
+    /// - If $x\leq y$ or the exact difference is representable, $\varepsilon$ is 0.
+    /// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p}$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits(), prec)`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let mut x = Float::from(3u32);
+    /// assert_eq!(
+    ///     x.positive_difference_rational_prec_assign_ref(&Rational::from_signeds(1, 3), 10),
+    ///     Greater
+    /// );
+    /// assert_eq!(x.to_string(), "2.6680");
+    /// ```
+    #[inline]
+    pub fn positive_difference_rational_prec_assign_ref(
+        &mut self,
+        other: &Rational,
+        prec: u64,
+    ) -> Ordering {
+        self.positive_difference_rational_prec_round_assign_ref(other, prec, Nearest)
+    }
+
+    /// Computes the positive difference of a [`Float`] and a [`Rational`] in place — $x-y$ if
+    /// $x>y$, and $+0.0$ otherwise — rounding the result to the [`Float`]'s precision, with the
+    /// specified rounding mode. The [`Rational`] is taken by value. An [`Ordering`] is also
+    /// returned, indicating whether the rounded result is less than, equal to, or greater than the
+    /// exact positive difference. Although `NaN`s are not comparable to any [`Float`], whenever
+    /// this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison and the difference are both exact: the [`Rational`] operand is never rounded
+    /// before use, so the correct branch is always chosen and the winning difference is correctly
+    /// rounded.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},y,p)=\text{NaN}$
+    /// - $f(x,y,p)=+0.0$ if $x\leq y$, including for a zero [`Float`] of either sign against a zero
+    ///   [`Rational`]
+    /// - $f(\infty,y,p)=\infty$
+    ///
+    /// $$
+    /// f(x,y,p) = \begin{cases} x-y+\varepsilon & x>y \\\ +0.0 & \text{otherwise,} \end{cases}
+    /// $$
+    /// - If $x\leq y$ or the exact difference is representable, $\varepsilon$ is 0.
+    /// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p+1}$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits())`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` and the positive difference is not exactly representable with the
+    /// output precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let mut x = Float::from(3u32);
+    /// assert_eq!(
+    ///     x.positive_difference_rational_round_assign(Rational::from_signeds(1, 3), Floor),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "2.0");
+    /// ```
+    #[inline]
+    pub fn positive_difference_rational_round_assign(
+        &mut self,
+        other: Rational,
+        rm: RoundingMode,
+    ) -> Ordering {
+        let prec = self.significant_bits();
+        self.positive_difference_rational_prec_round_assign(other, prec, rm)
+    }
+
+    /// Computes the positive difference of a [`Float`] and a [`Rational`] in place — $x-y$ if
+    /// $x>y$, and $+0.0$ otherwise — rounding the result to the [`Float`]'s precision, with the
+    /// specified rounding mode. The [`Rational`] is taken by reference. An [`Ordering`] is also
+    /// returned, indicating whether the rounded result is less than, equal to, or greater than the
+    /// exact positive difference. Although `NaN`s are not comparable to any [`Float`], whenever
+    /// this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison and the difference are both exact: the [`Rational`] operand is never rounded
+    /// before use, so the correct branch is always chosen and the winning difference is correctly
+    /// rounded.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},y,p)=\text{NaN}$
+    /// - $f(x,y,p)=+0.0$ if $x\leq y$, including for a zero [`Float`] of either sign against a zero
+    ///   [`Rational`]
+    /// - $f(\infty,y,p)=\infty$
+    ///
+    /// $$
+    /// f(x,y,p) = \begin{cases} x-y+\varepsilon & x>y \\\ +0.0 & \text{otherwise,} \end{cases}
+    /// $$
+    /// - If $x\leq y$ or the exact difference is representable, $\varepsilon$ is 0.
+    /// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p+1}$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits())`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` and the positive difference is not exactly representable with the
+    /// output precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let mut x = Float::from(3u32);
+    /// assert_eq!(
+    ///     x.positive_difference_rational_round_assign_ref(&Rational::from_signeds(1, 3), Floor),
+    ///     Less
+    /// );
+    /// assert_eq!(x.to_string(), "2.0");
+    /// ```
+    #[inline]
+    pub fn positive_difference_rational_round_assign_ref(
+        &mut self,
+        other: &Rational,
+        rm: RoundingMode,
+    ) -> Ordering {
+        let prec = self.significant_bits();
+        self.positive_difference_rational_prec_round_assign_ref(other, prec, rm)
+    }
+
+    /// Computes the positive difference of a [`Float`] and a [`Rational`] in place — $x-y$ if
+    /// $x>y$, and $+0.0$ otherwise — rounding the result to the nearest value of the [`Float`]'s
+    /// precision. The [`Rational`] is taken by value. An [`Ordering`] is also returned, indicating
+    /// whether the rounded result is less than, equal to, or greater than the exact positive
+    /// difference. Although `NaN`s are not comparable to any [`Float`], whenever this function
+    /// returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison and the difference are both exact: the [`Rational`] operand is never rounded
+    /// before use, so the correct branch is always chosen and the winning difference is correctly
+    /// rounded.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},y,p)=\text{NaN}$
+    /// - $f(x,y,p)=+0.0$ if $x\leq y$, including for a zero [`Float`] of either sign against a zero
+    ///   [`Rational`]
+    /// - $f(\infty,y,p)=\infty$
+    ///
+    /// $$
+    /// f(x,y,p) = \begin{cases} x-y+\varepsilon & x>y \\\ +0.0 & \text{otherwise,} \end{cases}
+    /// $$
+    /// - If $x\leq y$ or the exact difference is representable, $\varepsilon$ is 0.
+    /// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p}$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits())`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let mut x = Float::from(3u32);
+    /// assert_eq!(
+    ///     x.positive_difference_rational_assign(Rational::from_signeds(1, 3)),
+    ///     Greater
+    /// );
+    /// assert_eq!(x.to_string(), "3.0");
+    /// ```
+    #[inline]
+    pub fn positive_difference_rational_assign(&mut self, other: Rational) -> Ordering {
+        self.positive_difference_rational_round_assign(other, Nearest)
+    }
+
+    /// Computes the positive difference of a [`Float`] and a [`Rational`] in place — $x-y$ if
+    /// $x>y$, and $+0.0$ otherwise — rounding the result to the nearest value of the [`Float`]'s
+    /// precision. The [`Rational`] is taken by reference. An [`Ordering`] is also returned,
+    /// indicating whether the rounded result is less than, equal to, or greater than the exact
+    /// positive difference. Although `NaN`s are not comparable to any [`Float`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison and the difference are both exact: the [`Rational`] operand is never rounded
+    /// before use, so the correct branch is always chosen and the winning difference is correctly
+    /// rounded.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},y,p)=\text{NaN}$
+    /// - $f(x,y,p)=+0.0$ if $x\leq y$, including for a zero [`Float`] of either sign against a zero
+    ///   [`Rational`]
+    /// - $f(\infty,y,p)=\infty$
+    ///
+    /// $$
+    /// f(x,y,p) = \begin{cases} x-y+\varepsilon & x>y \\\ +0.0 & \text{otherwise,} \end{cases}
+    /// $$
+    /// - If $x\leq y$ or the exact difference is representable, $\varepsilon$ is 0.
+    /// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p}$.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(self.complexity(),
+    /// other.significant_bits())`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let mut x = Float::from(3u32);
+    /// assert_eq!(
+    ///     x.positive_difference_rational_assign_ref(&Rational::from_signeds(1, 3)),
+    ///     Greater
+    /// );
+    /// assert_eq!(x.to_string(), "3.0");
+    /// ```
+    #[inline]
+    pub fn positive_difference_rational_assign_ref(&mut self, other: &Rational) -> Ordering {
+        self.positive_difference_rational_round_assign_ref(other, Nearest)
+    }
+
+    /// Computes the positive difference of a [`Rational`] and a [`Float`] — $x-y$ if $x>y$, and
+    /// $+0.0$ otherwise — rounding the result to the specified precision and with the specified
+    /// rounding mode. The [`Rational`] and the [`Float`] are both taken by value. An [`Ordering`]
+    /// is also returned, indicating whether the rounded result is less than, equal to, or greater
+    /// than the exact positive difference. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison and the difference are both exact: the [`Rational`] operand is never rounded
+    /// before use, so the correct branch is always chosen and the winning difference is correctly
+    /// rounded.
+    ///
+    /// Special cases:
+    /// - $f(x,\text{NaN},p)=\text{NaN}$
+    /// - $f(x,y,p)=+0.0$ if $x\leq y$, including against a zero of either sign
+    /// - $f(x,-\infty,p)=\infty$
+    ///
+    /// $$
+    /// f(x,y,p) = \begin{cases} x-y+\varepsilon & x>y \\\ +0.0 & \text{otherwise,} \end{cases}
+    /// $$
+    /// - If $x\leq y$ or the exact difference is representable, $\varepsilon$ is 0.
+    /// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p+1}$.
+    ///
+    /// If you know you'll be using `Nearest`, consider using
+    /// [`Float::rational_positive_difference_float_prec`] instead. If you know that your target
+    /// precision is the [`Float`]'s, consider using
+    /// [`Float::rational_positive_difference_float_round`] instead. If both of these things are
+    /// true, consider using [`Float::rational_positive_difference_float`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(x.significant_bits(),
+    /// y.complexity(), prec)`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` and the positive difference is not exactly
+    /// representable with `prec` bits.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (d, o) = Float::rational_positive_difference_float_prec_round(
+    ///     Rational::from_signeds(22, 7),
+    ///     Float::from(3u32),
+    ///     10,
+    ///     Floor,
+    /// );
+    /// assert_eq!(d.to_string(), "0.14282");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn rational_positive_difference_float_prec_round(
+        x: Rational,
+        y: Self,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        if matches!(y.partial_cmp(&x), Some(Less)) {
+            // x - y = -(y - x), with the rounding mode reversed
+            let (d, o) = y.sub_rational_prec_round(x, prec, -rm);
+            (-d, o.reverse())
+        } else if matches!(y, Self(NaN)) {
+            (float_nan!(), Equal)
+        } else {
+            (Self::ZERO, Equal)
+        }
+    }
+
+    /// Computes the positive difference of a [`Rational`] and a [`Float`] — $x-y$ if $x>y$, and
+    /// $+0.0$ otherwise — rounding the result to the specified precision and with the specified
+    /// rounding mode. The [`Rational`] is taken by value and the [`Float`] by reference. An
+    /// [`Ordering`] is also returned, indicating whether the rounded result is less than, equal to,
+    /// or greater than the exact positive difference. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison and the difference are both exact: the [`Rational`] operand is never rounded
+    /// before use, so the correct branch is always chosen and the winning difference is correctly
+    /// rounded.
+    ///
+    /// Special cases:
+    /// - $f(x,\text{NaN},p)=\text{NaN}$
+    /// - $f(x,y,p)=+0.0$ if $x\leq y$, including against a zero of either sign
+    /// - $f(x,-\infty,p)=\infty$
+    ///
+    /// $$
+    /// f(x,y,p) = \begin{cases} x-y+\varepsilon & x>y \\\ +0.0 & \text{otherwise,} \end{cases}
+    /// $$
+    /// - If $x\leq y$ or the exact difference is representable, $\varepsilon$ is 0.
+    /// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p+1}$.
+    ///
+    /// If you know you'll be using `Nearest`, consider using
+    /// [`Float::rational_positive_difference_float_prec`] instead. If you know that your target
+    /// precision is the [`Float`]'s, consider using
+    /// [`Float::rational_positive_difference_float_round`] instead. If both of these things are
+    /// true, consider using [`Float::rational_positive_difference_float`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(x.significant_bits(),
+    /// y.complexity(), prec)`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` and the positive difference is not exactly
+    /// representable with `prec` bits.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (d, o) = Float::rational_positive_difference_float_prec_round_val_ref(
+    ///     Rational::from_signeds(22, 7),
+    ///     &Float::from(3u32),
+    ///     10,
+    ///     Floor,
+    /// );
+    /// assert_eq!(d.to_string(), "0.14282");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn rational_positive_difference_float_prec_round_val_ref(
+        x: Rational,
+        y: &Self,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        if matches!(y.partial_cmp(&x), Some(Less)) {
+            // x - y = -(y - x), with the rounding mode reversed
+            let (d, o) = y.sub_rational_prec_round_ref_val(x, prec, -rm);
+            (-d, o.reverse())
+        } else if matches!(y, Self(NaN)) {
+            (float_nan!(), Equal)
+        } else {
+            (Self::ZERO, Equal)
+        }
+    }
+
+    /// Computes the positive difference of a [`Rational`] and a [`Float`] — $x-y$ if $x>y$, and
+    /// $+0.0$ otherwise — rounding the result to the specified precision and with the specified
+    /// rounding mode. The [`Rational`] is taken by reference and the [`Float`] by value. An
+    /// [`Ordering`] is also returned, indicating whether the rounded result is less than, equal to,
+    /// or greater than the exact positive difference. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison and the difference are both exact: the [`Rational`] operand is never rounded
+    /// before use, so the correct branch is always chosen and the winning difference is correctly
+    /// rounded.
+    ///
+    /// Special cases:
+    /// - $f(x,\text{NaN},p)=\text{NaN}$
+    /// - $f(x,y,p)=+0.0$ if $x\leq y$, including against a zero of either sign
+    /// - $f(x,-\infty,p)=\infty$
+    ///
+    /// $$
+    /// f(x,y,p) = \begin{cases} x-y+\varepsilon & x>y \\\ +0.0 & \text{otherwise,} \end{cases}
+    /// $$
+    /// - If $x\leq y$ or the exact difference is representable, $\varepsilon$ is 0.
+    /// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p+1}$.
+    ///
+    /// If you know you'll be using `Nearest`, consider using
+    /// [`Float::rational_positive_difference_float_prec`] instead. If you know that your target
+    /// precision is the [`Float`]'s, consider using
+    /// [`Float::rational_positive_difference_float_round`] instead. If both of these things are
+    /// true, consider using [`Float::rational_positive_difference_float`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(x.significant_bits(),
+    /// y.complexity(), prec)`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` and the positive difference is not exactly
+    /// representable with `prec` bits.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (d, o) = Float::rational_positive_difference_float_prec_round_ref_val(
+    ///     &Rational::from_signeds(22, 7),
+    ///     Float::from(3u32),
+    ///     10,
+    ///     Floor,
+    /// );
+    /// assert_eq!(d.to_string(), "0.14282");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn rational_positive_difference_float_prec_round_ref_val(
+        x: &Rational,
+        y: Self,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        if matches!(y.partial_cmp(x), Some(Less)) {
+            // x - y = -(y - x), with the rounding mode reversed
+            let (d, o) = y.sub_rational_prec_round_val_ref(x, prec, -rm);
+            (-d, o.reverse())
+        } else if matches!(y, Self(NaN)) {
+            (float_nan!(), Equal)
+        } else {
+            (Self::ZERO, Equal)
+        }
+    }
+
+    /// Computes the positive difference of a [`Rational`] and a [`Float`] — $x-y$ if $x>y$, and
+    /// $+0.0$ otherwise — rounding the result to the specified precision and with the specified
+    /// rounding mode. The [`Rational`] and the [`Float`] are both taken by reference. An
+    /// [`Ordering`] is also returned, indicating whether the rounded result is less than, equal to,
+    /// or greater than the exact positive difference. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison and the difference are both exact: the [`Rational`] operand is never rounded
+    /// before use, so the correct branch is always chosen and the winning difference is correctly
+    /// rounded.
+    ///
+    /// Special cases:
+    /// - $f(x,\text{NaN},p)=\text{NaN}$
+    /// - $f(x,y,p)=+0.0$ if $x\leq y$, including against a zero of either sign
+    /// - $f(x,-\infty,p)=\infty$
+    ///
+    /// $$
+    /// f(x,y,p) = \begin{cases} x-y+\varepsilon & x>y \\\ +0.0 & \text{otherwise,} \end{cases}
+    /// $$
+    /// - If $x\leq y$ or the exact difference is representable, $\varepsilon$ is 0.
+    /// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p+1}$.
+    ///
+    /// If you know you'll be using `Nearest`, consider using
+    /// [`Float::rational_positive_difference_float_prec`] instead. If you know that your target
+    /// precision is the [`Float`]'s, consider using
+    /// [`Float::rational_positive_difference_float_round`] instead. If both of these things are
+    /// true, consider using [`Float::rational_positive_difference_float`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(x.significant_bits(),
+    /// y.complexity(), prec)`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` and the positive difference is not exactly
+    /// representable with `prec` bits.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (d, o) = Float::rational_positive_difference_float_prec_round_ref_ref(
+    ///     &Rational::from_signeds(22, 7),
+    ///     &Float::from(3u32),
+    ///     10,
+    ///     Floor,
+    /// );
+    /// assert_eq!(d.to_string(), "0.14282");
+    /// assert_eq!(o, Less);
+    /// ```
+    pub fn rational_positive_difference_float_prec_round_ref_ref(
+        x: &Rational,
+        y: &Self,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        if matches!(y.partial_cmp(x), Some(Less)) {
+            // x - y = -(y - x), with the rounding mode reversed
+            let (d, o) = y.sub_rational_prec_round_ref_ref(x, prec, -rm);
+            (-d, o.reverse())
+        } else if matches!(y, Self(NaN)) {
+            (float_nan!(), Equal)
+        } else {
+            (Self::ZERO, Equal)
+        }
+    }
+
+    /// Computes the positive difference of a [`Rational`] and a [`Float`] — $x-y$ if $x>y$, and
+    /// $+0.0$ otherwise — rounding the result to the nearest value of the specified precision.
+    /// The [`Rational`] and the [`Float`] are both taken by value. An [`Ordering`] is also
+    /// returned, indicating whether the rounded result is less than, equal to, or greater than the
+    /// exact positive difference. Although `NaN`s are not comparable to any [`Float`], whenever
+    /// this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison and the difference are both exact: the [`Rational`] operand is never rounded
+    /// before use, so the correct branch is always chosen and the winning difference is correctly
+    /// rounded.
+    ///
+    /// Special cases:
+    /// - $f(x,\text{NaN},p)=\text{NaN}$
+    /// - $f(x,y,p)=+0.0$ if $x\leq y$, including against a zero of either sign
+    /// - $f(x,-\infty,p)=\infty$
+    ///
+    /// $$
+    /// f(x,y,p) = \begin{cases} x-y+\varepsilon & x>y \\\ +0.0 & \text{otherwise,} \end{cases}
+    /// $$
+    /// - If $x\leq y$ or the exact difference is representable, $\varepsilon$ is 0.
+    /// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p}$.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::rational_positive_difference_float_prec_round`] instead. If you know that your
+    /// target precision is the [`Float`]'s, consider using
+    /// [`Float::rational_positive_difference_float`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(x.significant_bits(),
+    /// y.complexity(), prec)`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (d, o) = Float::rational_positive_difference_float_prec(
+    ///     Rational::from_signeds(22, 7),
+    ///     Float::from(3u32),
+    ///     10,
+    /// );
+    /// assert_eq!(d.to_string(), "0.14282");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn rational_positive_difference_float_prec(
+        x: Rational,
+        y: Self,
+        prec: u64,
+    ) -> (Self, Ordering) {
+        Self::rational_positive_difference_float_prec_round(x, y, prec, Nearest)
+    }
+
+    /// Computes the positive difference of a [`Rational`] and a [`Float`] — $x-y$ if $x>y$, and
+    /// $+0.0$ otherwise — rounding the result to the nearest value of the specified precision.
+    /// The [`Rational`] is taken by value and the [`Float`] by reference. An [`Ordering`] is also
+    /// returned, indicating whether the rounded result is less than, equal to, or greater than the
+    /// exact positive difference. Although `NaN`s are not comparable to any [`Float`], whenever
+    /// this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison and the difference are both exact: the [`Rational`] operand is never rounded
+    /// before use, so the correct branch is always chosen and the winning difference is correctly
+    /// rounded.
+    ///
+    /// Special cases:
+    /// - $f(x,\text{NaN},p)=\text{NaN}$
+    /// - $f(x,y,p)=+0.0$ if $x\leq y$, including against a zero of either sign
+    /// - $f(x,-\infty,p)=\infty$
+    ///
+    /// $$
+    /// f(x,y,p) = \begin{cases} x-y+\varepsilon & x>y \\\ +0.0 & \text{otherwise,} \end{cases}
+    /// $$
+    /// - If $x\leq y$ or the exact difference is representable, $\varepsilon$ is 0.
+    /// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p}$.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::rational_positive_difference_float_prec_round`] instead. If you know that your
+    /// target precision is the [`Float`]'s, consider using
+    /// [`Float::rational_positive_difference_float`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(x.significant_bits(),
+    /// y.complexity(), prec)`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (d, o) = Float::rational_positive_difference_float_prec_val_ref(
+    ///     Rational::from_signeds(22, 7),
+    ///     &Float::from(3u32),
+    ///     10,
+    /// );
+    /// assert_eq!(d.to_string(), "0.14282");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn rational_positive_difference_float_prec_val_ref(
+        x: Rational,
+        y: &Self,
+        prec: u64,
+    ) -> (Self, Ordering) {
+        Self::rational_positive_difference_float_prec_round_val_ref(x, y, prec, Nearest)
+    }
+
+    /// Computes the positive difference of a [`Rational`] and a [`Float`] — $x-y$ if $x>y$, and
+    /// $+0.0$ otherwise — rounding the result to the nearest value of the specified precision.
+    /// The [`Rational`] is taken by reference and the [`Float`] by value. An [`Ordering`] is also
+    /// returned, indicating whether the rounded result is less than, equal to, or greater than the
+    /// exact positive difference. Although `NaN`s are not comparable to any [`Float`], whenever
+    /// this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison and the difference are both exact: the [`Rational`] operand is never rounded
+    /// before use, so the correct branch is always chosen and the winning difference is correctly
+    /// rounded.
+    ///
+    /// Special cases:
+    /// - $f(x,\text{NaN},p)=\text{NaN}$
+    /// - $f(x,y,p)=+0.0$ if $x\leq y$, including against a zero of either sign
+    /// - $f(x,-\infty,p)=\infty$
+    ///
+    /// $$
+    /// f(x,y,p) = \begin{cases} x-y+\varepsilon & x>y \\\ +0.0 & \text{otherwise,} \end{cases}
+    /// $$
+    /// - If $x\leq y$ or the exact difference is representable, $\varepsilon$ is 0.
+    /// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p}$.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::rational_positive_difference_float_prec_round`] instead. If you know that your
+    /// target precision is the [`Float`]'s, consider using
+    /// [`Float::rational_positive_difference_float`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(x.significant_bits(),
+    /// y.complexity(), prec)`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (d, o) = Float::rational_positive_difference_float_prec_ref_val(
+    ///     &Rational::from_signeds(22, 7),
+    ///     Float::from(3u32),
+    ///     10,
+    /// );
+    /// assert_eq!(d.to_string(), "0.14282");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn rational_positive_difference_float_prec_ref_val(
+        x: &Rational,
+        y: Self,
+        prec: u64,
+    ) -> (Self, Ordering) {
+        Self::rational_positive_difference_float_prec_round_ref_val(x, y, prec, Nearest)
+    }
+
+    /// Computes the positive difference of a [`Rational`] and a [`Float`] — $x-y$ if $x>y$, and
+    /// $+0.0$ otherwise — rounding the result to the nearest value of the specified precision.
+    /// The [`Rational`] and the [`Float`] are both taken by reference. An [`Ordering`] is also
+    /// returned, indicating whether the rounded result is less than, equal to, or greater than the
+    /// exact positive difference. Although `NaN`s are not comparable to any [`Float`], whenever
+    /// this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison and the difference are both exact: the [`Rational`] operand is never rounded
+    /// before use, so the correct branch is always chosen and the winning difference is correctly
+    /// rounded.
+    ///
+    /// Special cases:
+    /// - $f(x,\text{NaN},p)=\text{NaN}$
+    /// - $f(x,y,p)=+0.0$ if $x\leq y$, including against a zero of either sign
+    /// - $f(x,-\infty,p)=\infty$
+    ///
+    /// $$
+    /// f(x,y,p) = \begin{cases} x-y+\varepsilon & x>y \\\ +0.0 & \text{otherwise,} \end{cases}
+    /// $$
+    /// - If $x\leq y$ or the exact difference is representable, $\varepsilon$ is 0.
+    /// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p}$.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::rational_positive_difference_float_prec_round`] instead. If you know that your
+    /// target precision is the [`Float`]'s, consider using
+    /// [`Float::rational_positive_difference_float`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(x.significant_bits(),
+    /// y.complexity(), prec)`.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (d, o) = Float::rational_positive_difference_float_prec_ref_ref(
+    ///     &Rational::from_signeds(22, 7),
+    ///     &Float::from(3u32),
+    ///     10,
+    /// );
+    /// assert_eq!(d.to_string(), "0.14282");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn rational_positive_difference_float_prec_ref_ref(
+        x: &Rational,
+        y: &Self,
+        prec: u64,
+    ) -> (Self, Ordering) {
+        Self::rational_positive_difference_float_prec_round_ref_ref(x, y, prec, Nearest)
+    }
+
+    /// Computes the positive difference of a [`Rational`] and a [`Float`] — $x-y$ if $x>y$, and
+    /// $+0.0$ otherwise — rounding the result to the [`Float`]'s precision, with the specified
+    /// rounding mode. The [`Rational`] and the [`Float`] are both taken by value. An [`Ordering`]
+    /// is also returned, indicating whether the rounded result is less than, equal to, or greater
+    /// than the exact positive difference. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison and the difference are both exact: the [`Rational`] operand is never rounded
+    /// before use, so the correct branch is always chosen and the winning difference is correctly
+    /// rounded.
+    ///
+    /// Special cases:
+    /// - $f(x,\text{NaN},p)=\text{NaN}$
+    /// - $f(x,y,p)=+0.0$ if $x\leq y$, including against a zero of either sign
+    /// - $f(x,-\infty,p)=\infty$
+    ///
+    /// $$
+    /// f(x,y,p) = \begin{cases} x-y+\varepsilon & x>y \\\ +0.0 & \text{otherwise,} \end{cases}
+    /// $$
+    /// - If $x\leq y$ or the exact difference is representable, $\varepsilon$ is 0.
+    /// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p+1}$.
+    ///
+    /// If you want to specify an output precision, consider using
+    /// [`Float::rational_positive_difference_float_prec_round`] instead. If you know you'll be
+    /// using the `Nearest` rounding mode, consider using
+    /// [`Float::rational_positive_difference_float`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(x.significant_bits(),
+    /// y.complexity())`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` and the positive difference is not exactly representable with the
+    /// output precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (d, o) = Float::rational_positive_difference_float_round(
+    ///     Rational::from_signeds(22, 7),
+    ///     Float::from(3u32),
+    ///     Floor,
+    /// );
+    /// assert_eq!(d.to_string(), "0.12");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn rational_positive_difference_float_round(
+        x: Rational,
+        y: Self,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        let prec = y.significant_bits();
+        Self::rational_positive_difference_float_prec_round(x, y, prec, rm)
+    }
+
+    /// Computes the positive difference of a [`Rational`] and a [`Float`] — $x-y$ if $x>y$, and
+    /// $+0.0$ otherwise — rounding the result to the [`Float`]'s precision, with the specified
+    /// rounding mode. The [`Rational`] is taken by value and the [`Float`] by reference. An
+    /// [`Ordering`] is also returned, indicating whether the rounded result is less than, equal to,
+    /// or greater than the exact positive difference. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison and the difference are both exact: the [`Rational`] operand is never rounded
+    /// before use, so the correct branch is always chosen and the winning difference is correctly
+    /// rounded.
+    ///
+    /// Special cases:
+    /// - $f(x,\text{NaN},p)=\text{NaN}$
+    /// - $f(x,y,p)=+0.0$ if $x\leq y$, including against a zero of either sign
+    /// - $f(x,-\infty,p)=\infty$
+    ///
+    /// $$
+    /// f(x,y,p) = \begin{cases} x-y+\varepsilon & x>y \\\ +0.0 & \text{otherwise,} \end{cases}
+    /// $$
+    /// - If $x\leq y$ or the exact difference is representable, $\varepsilon$ is 0.
+    /// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p+1}$.
+    ///
+    /// If you want to specify an output precision, consider using
+    /// [`Float::rational_positive_difference_float_prec_round`] instead. If you know you'll be
+    /// using the `Nearest` rounding mode, consider using
+    /// [`Float::rational_positive_difference_float`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(x.significant_bits(),
+    /// y.complexity())`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` and the positive difference is not exactly representable with the
+    /// output precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (d, o) = Float::rational_positive_difference_float_round_val_ref(
+    ///     Rational::from_signeds(22, 7),
+    ///     &Float::from(3u32),
+    ///     Floor,
+    /// );
+    /// assert_eq!(d.to_string(), "0.12");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn rational_positive_difference_float_round_val_ref(
+        x: Rational,
+        y: &Self,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        let prec = y.significant_bits();
+        Self::rational_positive_difference_float_prec_round_val_ref(x, y, prec, rm)
+    }
+
+    /// Computes the positive difference of a [`Rational`] and a [`Float`] — $x-y$ if $x>y$, and
+    /// $+0.0$ otherwise — rounding the result to the [`Float`]'s precision, with the specified
+    /// rounding mode. The [`Rational`] is taken by reference and the [`Float`] by value. An
+    /// [`Ordering`] is also returned, indicating whether the rounded result is less than, equal to,
+    /// or greater than the exact positive difference. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison and the difference are both exact: the [`Rational`] operand is never rounded
+    /// before use, so the correct branch is always chosen and the winning difference is correctly
+    /// rounded.
+    ///
+    /// Special cases:
+    /// - $f(x,\text{NaN},p)=\text{NaN}$
+    /// - $f(x,y,p)=+0.0$ if $x\leq y$, including against a zero of either sign
+    /// - $f(x,-\infty,p)=\infty$
+    ///
+    /// $$
+    /// f(x,y,p) = \begin{cases} x-y+\varepsilon & x>y \\\ +0.0 & \text{otherwise,} \end{cases}
+    /// $$
+    /// - If $x\leq y$ or the exact difference is representable, $\varepsilon$ is 0.
+    /// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p+1}$.
+    ///
+    /// If you want to specify an output precision, consider using
+    /// [`Float::rational_positive_difference_float_prec_round`] instead. If you know you'll be
+    /// using the `Nearest` rounding mode, consider using
+    /// [`Float::rational_positive_difference_float`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(x.significant_bits(),
+    /// y.complexity())`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` and the positive difference is not exactly representable with the
+    /// output precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (d, o) = Float::rational_positive_difference_float_round_ref_val(
+    ///     &Rational::from_signeds(22, 7),
+    ///     Float::from(3u32),
+    ///     Floor,
+    /// );
+    /// assert_eq!(d.to_string(), "0.12");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn rational_positive_difference_float_round_ref_val(
+        x: &Rational,
+        y: Self,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        let prec = y.significant_bits();
+        Self::rational_positive_difference_float_prec_round_ref_val(x, y, prec, rm)
+    }
+
+    /// Computes the positive difference of a [`Rational`] and a [`Float`] — $x-y$ if $x>y$, and
+    /// $+0.0$ otherwise — rounding the result to the [`Float`]'s precision, with the specified
+    /// rounding mode. The [`Rational`] and the [`Float`] are both taken by reference. An
+    /// [`Ordering`] is also returned, indicating whether the rounded result is less than, equal to,
+    /// or greater than the exact positive difference. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison and the difference are both exact: the [`Rational`] operand is never rounded
+    /// before use, so the correct branch is always chosen and the winning difference is correctly
+    /// rounded.
+    ///
+    /// Special cases:
+    /// - $f(x,\text{NaN},p)=\text{NaN}$
+    /// - $f(x,y,p)=+0.0$ if $x\leq y$, including against a zero of either sign
+    /// - $f(x,-\infty,p)=\infty$
+    ///
+    /// $$
+    /// f(x,y,p) = \begin{cases} x-y+\varepsilon & x>y \\\ +0.0 & \text{otherwise,} \end{cases}
+    /// $$
+    /// - If $x\leq y$ or the exact difference is representable, $\varepsilon$ is 0.
+    /// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p+1}$.
+    ///
+    /// If you want to specify an output precision, consider using
+    /// [`Float::rational_positive_difference_float_prec_round`] instead. If you know you'll be
+    /// using the `Nearest` rounding mode, consider using
+    /// [`Float::rational_positive_difference_float`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(x.significant_bits(),
+    /// y.complexity())`.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` and the positive difference is not exactly representable with the
+    /// output precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (d, o) = Float::rational_positive_difference_float_round_ref_ref(
+    ///     &Rational::from_signeds(22, 7),
+    ///     &Float::from(3u32),
+    ///     Floor,
+    /// );
+    /// assert_eq!(d.to_string(), "0.12");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn rational_positive_difference_float_round_ref_ref(
+        x: &Rational,
+        y: &Self,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        let prec = y.significant_bits();
+        Self::rational_positive_difference_float_prec_round_ref_ref(x, y, prec, rm)
+    }
+
+    /// Computes the positive difference of a [`Rational`] and a [`Float`] — $x-y$ if $x>y$, and
+    /// $+0.0$ otherwise — rounding the result to the nearest value of the [`Float`]'s precision.
+    /// The [`Rational`] and the [`Float`] are both taken by value. An [`Ordering`] is also
+    /// returned, indicating whether the rounded result is less than, equal to, or greater than the
+    /// exact positive difference. Although `NaN`s are not comparable to any [`Float`], whenever
+    /// this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison and the difference are both exact: the [`Rational`] operand is never rounded
+    /// before use, so the correct branch is always chosen and the winning difference is correctly
+    /// rounded.
+    ///
+    /// Special cases:
+    /// - $f(x,\text{NaN},p)=\text{NaN}$
+    /// - $f(x,y,p)=+0.0$ if $x\leq y$, including against a zero of either sign
+    /// - $f(x,-\infty,p)=\infty$
+    ///
+    /// $$
+    /// f(x,y,p) = \begin{cases} x-y+\varepsilon & x>y \\\ +0.0 & \text{otherwise,} \end{cases}
+    /// $$
+    /// - If $x\leq y$ or the exact difference is representable, $\varepsilon$ is 0.
+    /// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p}$.
+    ///
+    /// If you want to specify an output precision, consider using
+    /// [`Float::rational_positive_difference_float_prec`] instead. If you want to use a rounding
+    /// mode other than `Nearest`, consider using
+    /// [`Float::rational_positive_difference_float_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(x.significant_bits(),
+    /// y.complexity())`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (d, o) = Float::rational_positive_difference_float(
+    ///     Rational::from_signeds(22, 7),
+    ///     Float::from(3u32),
+    /// );
+    /// assert_eq!(d.to_string(), "0.12");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn rational_positive_difference_float(x: Rational, y: Self) -> (Self, Ordering) {
+        Self::rational_positive_difference_float_round(x, y, Nearest)
+    }
+
+    /// Computes the positive difference of a [`Rational`] and a [`Float`] — $x-y$ if $x>y$, and
+    /// $+0.0$ otherwise — rounding the result to the nearest value of the [`Float`]'s precision.
+    /// The [`Rational`] is taken by value and the [`Float`] by reference. An [`Ordering`] is also
+    /// returned, indicating whether the rounded result is less than, equal to, or greater than the
+    /// exact positive difference. Although `NaN`s are not comparable to any [`Float`], whenever
+    /// this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison and the difference are both exact: the [`Rational`] operand is never rounded
+    /// before use, so the correct branch is always chosen and the winning difference is correctly
+    /// rounded.
+    ///
+    /// Special cases:
+    /// - $f(x,\text{NaN},p)=\text{NaN}$
+    /// - $f(x,y,p)=+0.0$ if $x\leq y$, including against a zero of either sign
+    /// - $f(x,-\infty,p)=\infty$
+    ///
+    /// $$
+    /// f(x,y,p) = \begin{cases} x-y+\varepsilon & x>y \\\ +0.0 & \text{otherwise,} \end{cases}
+    /// $$
+    /// - If $x\leq y$ or the exact difference is representable, $\varepsilon$ is 0.
+    /// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p}$.
+    ///
+    /// If you want to specify an output precision, consider using
+    /// [`Float::rational_positive_difference_float_prec`] instead. If you want to use a rounding
+    /// mode other than `Nearest`, consider using
+    /// [`Float::rational_positive_difference_float_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(x.significant_bits(),
+    /// y.complexity())`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (d, o) = Float::rational_positive_difference_float_val_ref(
+    ///     Rational::from_signeds(22, 7),
+    ///     &Float::from(3u32),
+    /// );
+    /// assert_eq!(d.to_string(), "0.12");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn rational_positive_difference_float_val_ref(x: Rational, y: &Self) -> (Self, Ordering) {
+        Self::rational_positive_difference_float_round_val_ref(x, y, Nearest)
+    }
+
+    /// Computes the positive difference of a [`Rational`] and a [`Float`] — $x-y$ if $x>y$, and
+    /// $+0.0$ otherwise — rounding the result to the nearest value of the [`Float`]'s precision.
+    /// The [`Rational`] is taken by reference and the [`Float`] by value. An [`Ordering`] is also
+    /// returned, indicating whether the rounded result is less than, equal to, or greater than the
+    /// exact positive difference. Although `NaN`s are not comparable to any [`Float`], whenever
+    /// this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison and the difference are both exact: the [`Rational`] operand is never rounded
+    /// before use, so the correct branch is always chosen and the winning difference is correctly
+    /// rounded.
+    ///
+    /// Special cases:
+    /// - $f(x,\text{NaN},p)=\text{NaN}$
+    /// - $f(x,y,p)=+0.0$ if $x\leq y$, including against a zero of either sign
+    /// - $f(x,-\infty,p)=\infty$
+    ///
+    /// $$
+    /// f(x,y,p) = \begin{cases} x-y+\varepsilon & x>y \\\ +0.0 & \text{otherwise,} \end{cases}
+    /// $$
+    /// - If $x\leq y$ or the exact difference is representable, $\varepsilon$ is 0.
+    /// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p}$.
+    ///
+    /// If you want to specify an output precision, consider using
+    /// [`Float::rational_positive_difference_float_prec`] instead. If you want to use a rounding
+    /// mode other than `Nearest`, consider using
+    /// [`Float::rational_positive_difference_float_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(x.significant_bits(),
+    /// y.complexity())`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (d, o) = Float::rational_positive_difference_float_ref_val(
+    ///     &Rational::from_signeds(22, 7),
+    ///     Float::from(3u32),
+    /// );
+    /// assert_eq!(d.to_string(), "0.12");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn rational_positive_difference_float_ref_val(x: &Rational, y: Self) -> (Self, Ordering) {
+        Self::rational_positive_difference_float_round_ref_val(x, y, Nearest)
+    }
+
+    /// Computes the positive difference of a [`Rational`] and a [`Float`] — $x-y$ if $x>y$, and
+    /// $+0.0$ otherwise — rounding the result to the nearest value of the [`Float`]'s precision.
+    /// The [`Rational`] and the [`Float`] are both taken by reference. An [`Ordering`] is also
+    /// returned, indicating whether the rounded result is less than, equal to, or greater than the
+    /// exact positive difference. Although `NaN`s are not comparable to any [`Float`], whenever
+    /// this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The comparison and the difference are both exact: the [`Rational`] operand is never rounded
+    /// before use, so the correct branch is always chosen and the winning difference is correctly
+    /// rounded.
+    ///
+    /// Special cases:
+    /// - $f(x,\text{NaN},p)=\text{NaN}$
+    /// - $f(x,y,p)=+0.0$ if $x\leq y$, including against a zero of either sign
+    /// - $f(x,-\infty,p)=\infty$
+    ///
+    /// $$
+    /// f(x,y,p) = \begin{cases} x-y+\varepsilon & x>y \\\ +0.0 & \text{otherwise,} \end{cases}
+    /// $$
+    /// - If $x\leq y$ or the exact difference is representable, $\varepsilon$ is 0.
+    /// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 (x-y)\rfloor-p}$.
+    ///
+    /// If you want to specify an output precision, consider using
+    /// [`Float::rational_positive_difference_float_prec`] instead. If you want to use a rounding
+    /// mode other than `Nearest`, consider using
+    /// [`Float::rational_positive_difference_float_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `max(x.significant_bits(),
+    /// y.complexity())`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    ///
+    /// let (d, o) = Float::rational_positive_difference_float_ref_ref(
+    ///     &Rational::from_signeds(22, 7),
+    ///     &Float::from(3u32),
+    /// );
+    /// assert_eq!(d.to_string(), "0.12");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn rational_positive_difference_float_ref_ref(x: &Rational, y: &Self) -> (Self, Ordering) {
+        Self::rational_positive_difference_float_round_ref_ref(x, y, Nearest)
+    }
 }
 
 /// Computes the positive difference of two primitive floats — $x-y$ if $x>y$, and $+0.0$
@@ -1605,4 +4088,79 @@ where
     for<'a> T: ExactFrom<&'a Float>,
 {
     emulate_float_float_to_float_fn(Float::positive_difference_prec, x, y)
+}
+
+/// Computes the positive difference of a primitive float and a [`Rational`] — $x-y$ if $x>y$, and
+/// $+0.0$ otherwise — correctly rounding the result to the nearest value.
+///
+/// The comparison and the difference are both exact: the [`Rational`] operand is never rounded
+/// before use, so the correct branch is always chosen and the winning difference is correctly
+/// rounded.
+///
+/// # Worst-case complexity
+/// $T(n) = O(n \log n \log\log n)$
+///
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `y.significant_bits()`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::positive_difference::*;
+/// use malachite_q::Rational;
+///
+/// let d = primitive_float_positive_difference_rational(3.0, &Rational::from_signeds(1, 3));
+/// assert_eq!(NiceFloat(d), NiceFloat(2.6666666666666665));
+/// ```
+#[allow(clippy::type_repetition_in_bounds)]
+#[inline]
+pub fn primitive_float_positive_difference_rational<T: PrimitiveFloat>(x: T, y: &Rational) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    emulate_float_to_float_fn(
+        |x, prec| Float::positive_difference_rational_prec_val_ref(x, y, prec),
+        x,
+    )
+}
+
+/// Computes the positive difference of a [`Rational`] and a primitive float — $x-y$ if $x>y$, and
+/// $+0.0$ otherwise — correctly rounding the result to the nearest value.
+///
+/// The comparison and the difference are both exact: the [`Rational`] operand is never rounded
+/// before use, so the correct branch is always chosen and the winning difference is correctly
+/// rounded.
+///
+/// # Worst-case complexity
+/// $T(n) = O(n \log n \log\log n)$
+///
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `x.significant_bits()`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::positive_difference::*;
+/// use malachite_q::Rational;
+///
+/// let d = primitive_float_rational_positive_difference_float(&Rational::from_signeds(22, 7), 3.0);
+/// assert_eq!(NiceFloat(d), NiceFloat(0.14285714285714285));
+/// ```
+#[allow(clippy::type_repetition_in_bounds)]
+#[inline]
+pub fn primitive_float_rational_positive_difference_float<T: PrimitiveFloat>(
+    x: &Rational,
+    y: T,
+) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    emulate_float_to_float_fn(
+        |y, prec| Float::rational_positive_difference_float_prec_ref_val(x, y, prec),
+        y,
+    )
 }

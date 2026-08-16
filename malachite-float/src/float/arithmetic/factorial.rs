@@ -21,26 +21,26 @@ use malachite_base::rounding_modes::RoundingMode::{self, Down, Exact, Floor, Nea
 use malachite_nz::natural::Natural;
 
 impl Float {
-    // This is mpfr_fac_ui from factorial.c, MPFR 4.2.2, with the result's precision passed
-    // explicitly. The factorial is accumulated at a working precision a little above the target,
-    // with a directed rounding, and a Ziv loop retries at higher precision until the
-    // approximation rounds unambiguously. Where MPFR runs the loop under an extended exponent
-    // range and resolves overflow in a final mpfr_check_range, here the working value is kept
-    // scaled to a small exponent with the accumulated power of 2 tracked separately, and the
-    // final exact shift resolves overflow instead. The scale also gives an exact running lower
-    // bound on the result's exponent, so a factorial too large for any `Float` is detected
-    // mid-loop without unbounded growth.
-    /// Computes the factorial of a `u64`, rounding the result to the specified precision and
-    /// with the specified rounding mode. An [`Ordering`] is also returned, indicating whether
-    /// the rounded factorial is less than, equal to, or greater than the exact factorial.
+    /// This is mpfr_fac_ui from factorial.c, MPFR 4.2.2, with the result's precision passed
+    /// explicitly. The factorial is accumulated at a working precision a little above the target,
+    /// with a directed rounding, and a Ziv loop retries at higher precision until the approximation
+    /// rounds unambiguously. Where MPFR runs the loop under an extended exponent range and resolves
+    /// overflow in a final mpfr_check_range, here the working value is kept scaled to a small
+    /// exponent with the accumulated power of 2 tracked separately, and the final exact shift
+    /// resolves overflow instead. The scale also gives an exact running lower bound on the result's
+    /// exponent, so a factorial too large for any `Float` is detected mid-loop without unbounded
+    /// growth.
     ///
-    /// The result is identical to
-    /// `Float::from_natural_prec_round(Natural::factorial(n), prec, rm)`, but the computation
-    /// works at a precision a little above `prec` throughout, which is far cheaper than
-    /// computing every bit of the exact factorial when `n` is large and `prec` is small. A
-    /// factorial too large for the exponent range yields the usual overflow values: infinity
-    /// under `Nearest`, `Up`, and `Ceiling`, and the largest representable value under `Down`
-    /// and `Floor`.
+    /// Computes the factorial of a `u64`, rounding the result to the specified precision and with
+    /// the specified rounding mode. An [`Ordering`] is also returned, indicating whether the
+    /// rounded factorial is less than, equal to, or greater than the exact factorial.
+    ///
+    /// The result is identical to `Float::from_natural_prec_round(Natural::factorial(n), prec,
+    /// rm)`, but the computation works at a precision a little above `prec` throughout, which is
+    /// far cheaper than computing every bit of the exact factorial when `n` is large and `prec` is
+    /// small. A factorial too large for the exponent range yields the usual overflow values:
+    /// infinity under `Nearest`, `Up`, and `Ceiling`, and the largest representable value under
+    /// `Down` and `Floor`.
     ///
     /// $$
     /// f(n,p) = n!+\varepsilon.
@@ -86,14 +86,14 @@ impl Float {
             return (Self::one_prec(prec), Equal);
         }
         if rm == Exact {
-            // with an inexact working value the loop cannot certify exactness, and Exact needs
-            // the full value anyway
+            // with an inexact working value the loop cannot certify exactness, and Exact needs the
+            // full value anyway
             return Self::from_natural_prec_round(Natural::factorial(n), prec, Exact);
         }
-        // A cheap exact lower bound on log2(n!): the upper half of the factors alone is at
-        // least (n/2)^(n/2), so log2(n!) >= (n/2)*floor(log2(n/2)). When even this bound
-        // exceeds the exponent range, the factorial overflows with no computation at all; the
-        // in-loop exponent bound below catches the remaining overflow window.
+        // A cheap exact lower bound on log2(n!): the upper half of the factors alone is at least
+        // (n/2)^(n/2), so log2(n!) >= (n/2)*floor(log2(n/2)). When even this bound exceeds the
+        // exponent range, the factorial overflows with no computation at all; the in-loop exponent
+        // bound below catches the remaining overflow window.
         let half = n >> 1;
         if u128::from(half) * u128::from(half.floor_log_base_2())
             > const { (Self::MAX_EXPONENT_I64 + 1) as u128 }
@@ -104,8 +104,8 @@ impl Float {
             };
         }
         let mut wprec = prec + (n.ceiling_log_base_2() << 1) + 7;
-        // the working directed rounding; restarted with the symmetric direction if the two
-        // rounding stages disagree in sign
+        // the working directed rounding; restarted with the symmetric direction if the two rounding
+        // stages disagree in sign
         let mut rnd = Down;
         loop {
             // the value accumulated so far is t*2^k, with t's exponent held at 0
@@ -125,9 +125,9 @@ impl Float {
                     k += e;
                     t >>= e;
                 }
-                // the remaining factors only increase the value, so k + 1 is a lower bound on
-                // the result's exponent; once it exceeds the representable range the result is
-                // a definite overflow
+                // the remaining factors only increase the value, so k + 1 is a lower bound on the
+                // result's exponent; once it exceeds the representable range the result is a
+                // definite overflow
                 if k > const { Self::MAX_EXPONENT_I64 + 1 } {
                     overflow = true;
                     break;
@@ -159,8 +159,8 @@ impl Float {
                     wprec += wprec >> 1;
                     continue;
                 };
-                // scale back; the exact shift saturates per rm at the exponent limit, standing
-                // in for mpfr_check_range
+                // scale back; the exact shift saturates per rm at the exponent limit, standing in
+                // for mpfr_check_range
                 let (result, o_shift) = y.shl_round(k, rm);
                 return if o_shift == Equal {
                     (result, o)
@@ -173,9 +173,9 @@ impl Float {
     }
 
     #[inline]
-    /// Computes the factorial of a `u64`, rounding the result to the nearest value of the
-    /// specified precision. An [`Ordering`] is also returned, indicating whether the rounded
-    /// factorial is less than, equal to, or greater than the exact factorial.
+    /// Computes the factorial of a `u64`, rounding the result to the nearest value of the specified
+    /// precision. An [`Ordering`] is also returned, indicating whether the rounded factorial is
+    /// less than, equal to, or greater than the exact factorial.
     ///
     /// If the factorial is equidistant from two [`Float`]s with the specified precision, the
     /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a

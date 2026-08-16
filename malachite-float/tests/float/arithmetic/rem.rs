@@ -78,10 +78,10 @@ const fn ternary_sign(o: Ordering) -> i32 {
     }
 }
 
-// Raw-FFI oracles for the functions rug does not bind (the quotient-bits pair and the u64
-// modulus). `forbid(unsafe_code)` keeps these out of the crate's test_util, but this integration
-// test crate may use unsafe, so they live here and are used inside the unit-test closures and
-// property helpers, following the usual rug-helper pattern.
+// Raw-FFI oracles for the functions rug does not bind (the quotient-bits pair and the u64 modulus).
+// `forbid(unsafe_code)` keeps these out of the crate's test_util, but this integration test crate
+// may use unsafe, so they live here and are used inside the unit-test closures and property
+// helpers, following the usual rug-helper pattern.
 fn mpfr_fmodquo_oracle(x: &Float, y: &Float, prec: u64, rm: RoundingMode) -> (Float, i32, i64) {
     let bx = rug::Float::exact_from(x);
     let by = rug::Float::exact_from(y);
@@ -125,8 +125,8 @@ fn mpfr_fmod_ui_oracle(x: &Float, u: u64, prec: u64, rm: RoundingMode) -> (Float
 
 // Checks a quotient-bits result against the corresponding MPFR function. The bits are compared
 // modulo 2^63: when the low 63 bits are all ones and the nearest-quotient rounds away, the C code
-// increments a long past LONG_MAX (undefined behavior, wrapping in practice) where we implement
-// the documented low-63-bits contract, so on any mismatch our value must be the wrapped 0.
+// increments a long past LONG_MAX (undefined behavior, wrapping in practice) where we implement the
+// documented low-63-bits contract, so on any mismatch our value must be the wrapped 0.
 fn check_quo_vs_mpfr(quo: i64, mpfr_quo: i64) {
     assert_eq!(
         quo.unsigned_abs() & u64::low_mask(63),
@@ -930,8 +930,8 @@ fn test_rem_underflow() {
 // - the nearest low-quotient-bit subtraction taken and not taken
 // - a zero remainder of each sign
 // - in the nearest assembly: the tiny size short-circuit, the tiny shifted comparison, and the
-//   ordinary comparison; the round-away branch taken (including on an exact tie) and not taken;
-//   the quotient-bits increment, including the all-ones wrap (test_quotient_bits_wrap_corner)
+//   ordinary comparison; the round-away branch taken (including on an exact tie) and not taken; the
+//   quotient-bits increment, including the all-ones wrap (test_quotient_bits_wrap_corner)
 // - the negative-x remainder negation
 #[test]
 fn test_rem() {

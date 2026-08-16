@@ -24,11 +24,11 @@ use std::panic::catch_unwind;
 // - n <= 1
 // - an exact accumulated product (the loop's o1 == Equal fast path), both fitting the target
 //   precision and needing a re-round
-// - an inexact product that can_round accepts, under every rounding mode and with the Ziv
-//   retry exercised by the property generator's precision spread
+// - an inexact product that can_round accepts, under every rounding mode and with the Ziv retry
+//   exercised by the property generator's precision spread
 // - the Exact rounding mode, delegated to the exact composition
-// - both overflow paths: the upfront exact bound (test_factorial_overflow) and the in-loop
-//   exponent bound (factorial_overflow_window_high, release-only)
+// - both overflow paths: the upfront exact bound (test_factorial_overflow) and the in-loop exponent
+//   bound (factorial_overflow_window_high, release-only)
 // The symmetric-rounding restart (opposite signs from the two rounding stages) was not observed;
 // MPFR's own comment questions whether it is reachable, and it is kept as translated.
 #[test]
@@ -114,8 +114,8 @@ fn test_factorial_overflow() {
     }
 }
 
-// The in-loop exponent bound: 60000000! overflows, but the upfront bound cannot tell, so the
-// loop runs until the accumulated exponent passes the limit. Release-only; this iterates tens of
+// The in-loop exponent bound: 60000000! overflows, but the upfront bound cannot tell, so the loop
+// runs until the accumulated exponent passes the limit. Release-only; this iterates tens of
 // millions of small multiplications.
 #[test]
 fn factorial_overflow_window_high() {

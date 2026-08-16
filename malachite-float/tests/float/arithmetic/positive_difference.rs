@@ -15,8 +15,11 @@ use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
-use malachite_base::test_util::generators::primitive_float_pair_gen;
-use malachite_float::float::arithmetic::positive_difference::primitive_float_positive_difference;
+use malachite_base::test_util::generators::{primitive_float_gen, primitive_float_pair_gen};
+use malachite_float::float::arithmetic::positive_difference::{
+    primitive_float_positive_difference, primitive_float_positive_difference_rational,
+    primitive_float_rational_positive_difference_float,
+};
 use malachite_float::test_util::common::{
     parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
 };
@@ -25,9 +28,14 @@ use malachite_float::test_util::generators::{
     float_float_rounding_mode_triple_gen_var_42,
     float_float_unsigned_rounding_mode_quadruple_gen_var_22,
     float_float_unsigned_rounding_mode_quadruple_gen_var_23, float_float_unsigned_triple_gen_var_1,
-    float_pair_gen, float_pair_gen_var_10,
+    float_pair_gen, float_pair_gen_var_10, float_rational_pair_gen,
+    float_rational_rounding_mode_triple_gen_var_22, float_rational_rounding_mode_triple_gen_var_23,
+    float_rational_unsigned_rounding_mode_quadruple_gen_var_23,
+    float_rational_unsigned_rounding_mode_quadruple_gen_var_24,
+    float_rational_unsigned_triple_gen_var_1,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
+use malachite_q::Rational;
 use std::panic::catch_unwind;
 
 #[allow(clippy::needless_pass_by_value)]
@@ -393,5 +401,383 @@ fn test_positive_difference() {
     );
     test(
         "10.0", "0xa.0#3", "7.0", "0x7.0#3", 2, Exact, "3.0", "0x3.0#2", Equal,
+    );
+}
+
+#[allow(clippy::needless_pass_by_value)]
+fn positive_difference_rational_prec_round_properties_helper(
+    x: Float,
+    y: Rational,
+    prec: u64,
+    rm: RoundingMode,
+    reversed: bool,
+) {
+    type F = fn(&Float, &Rational, u64, RoundingMode) -> (Float, Ordering);
+    let f: F = if reversed {
+        |x, y, prec, rm| {
+            Float::rational_positive_difference_float_prec_round_ref_ref(y, x, prec, rm)
+        }
+    } else {
+        Float::positive_difference_rational_prec_round_ref_ref
+    };
+    let (d, o) = f(&x, &y, prec, rm);
+    assert!(d.is_valid());
+
+    if reversed {
+        let (d2, o2) =
+            Float::rational_positive_difference_float_prec_round(y.clone(), x.clone(), prec, rm);
+        assert_eq!(ComparableFloatRef(&d2), ComparableFloatRef(&d));
+        assert_eq!(o2, o);
+        let (d2, o2) =
+            Float::rational_positive_difference_float_prec_round_val_ref(y.clone(), &x, prec, rm);
+        assert_eq!(ComparableFloatRef(&d2), ComparableFloatRef(&d));
+        assert_eq!(o2, o);
+        let (d2, o2) =
+            Float::rational_positive_difference_float_prec_round_ref_val(&y, x.clone(), prec, rm);
+        assert_eq!(ComparableFloatRef(&d2), ComparableFloatRef(&d));
+        assert_eq!(o2, o);
+    } else {
+        let (d2, o2) = x
+            .clone()
+            .positive_difference_rational_prec_round(y.clone(), prec, rm);
+        assert_eq!(ComparableFloatRef(&d2), ComparableFloatRef(&d));
+        assert_eq!(o2, o);
+        let (d2, o2) = x
+            .clone()
+            .positive_difference_rational_prec_round_val_ref(&y, prec, rm);
+        assert_eq!(ComparableFloatRef(&d2), ComparableFloatRef(&d));
+        assert_eq!(o2, o);
+        let (d2, o2) = x.positive_difference_rational_prec_round_ref_val(y.clone(), prec, rm);
+        assert_eq!(ComparableFloatRef(&d2), ComparableFloatRef(&d));
+        assert_eq!(o2, o);
+        let mut x2 = x.clone();
+        let o2 = x2.positive_difference_rational_prec_round_assign(y.clone(), prec, rm);
+        assert_eq!(ComparableFloatRef(&x2), ComparableFloatRef(&d));
+        assert_eq!(o2, o);
+        let mut x2 = x.clone();
+        let o2 = x2.positive_difference_rational_prec_round_assign_ref(&y, prec, rm);
+        assert_eq!(ComparableFloatRef(&x2), ComparableFloatRef(&d));
+        assert_eq!(o2, o);
+    }
+
+    if d.is_normal() {
+        assert_eq!(d.get_prec(), Some(prec));
+    }
+
+    // the definition: the exact difference when the first operand is larger, a positive zero
+    // otherwise, NaN for NaN
+    let c = if reversed {
+        x.partial_cmp(&y).map(Ordering::reverse)
+    } else {
+        x.partial_cmp(&y)
+    };
+    match c {
+        None => {
+            assert!(d.is_nan());
+            assert_eq!(o, Equal);
+        }
+        Some(Greater) => {
+            if reversed {
+                let (expected, expected_o) = {
+                    let (s, so) = x.sub_rational_prec_round_ref_ref(&y, prec, -rm);
+                    (-s, so.reverse())
+                };
+                assert_eq!(ComparableFloatRef(&d), ComparableFloatRef(&expected));
+                assert_eq!(o, expected_o);
+            } else {
+                let (expected, expected_o) = x.sub_rational_prec_round_ref_ref(&y, prec, rm);
+                assert_eq!(ComparableFloatRef(&d), ComparableFloatRef(&expected));
+                assert_eq!(o, expected_o);
+            }
+        }
+        Some(_) => {
+            assert_eq!(ComparableFloat(d.clone()), ComparableFloat(Float::ZERO));
+            assert_eq!(o, Equal);
+        }
+    }
+
+    if o == Equal {
+        for rm2 in exhaustive_rounding_modes() {
+            let (s, oo) = f(&x, &y, prec, rm2);
+            assert_eq!(
+                ComparableFloat(s.abs_negative_zero_ref()),
+                ComparableFloat(d.abs_negative_zero_ref())
+            );
+            assert_eq!(oo, Equal);
+        }
+    } else {
+        assert_panic!(f(&x, &y, prec, Exact));
+    }
+}
+
+#[test]
+fn positive_difference_rational_prec_round_properties() {
+    float_rational_unsigned_rounding_mode_quadruple_gen_var_23().test_properties(
+        |(x, y, prec, rm)| {
+            positive_difference_rational_prec_round_properties_helper(x, y, prec, rm, false);
+        },
+    );
+}
+
+#[test]
+fn rational_positive_difference_float_prec_round_properties() {
+    float_rational_unsigned_rounding_mode_quadruple_gen_var_24().test_properties(
+        |(x, y, prec, rm)| {
+            positive_difference_rational_prec_round_properties_helper(x, y, prec, rm, true);
+        },
+    );
+}
+
+#[test]
+fn positive_difference_rational_shorthand_properties() {
+    float_rational_unsigned_triple_gen_var_1().test_properties(|(x, y, prec)| {
+        let (d, o) = x.positive_difference_rational_prec_round_ref_ref(&y, prec, Nearest);
+        let (d2, o2) = x.positive_difference_rational_prec_ref_ref(&y, prec);
+        assert_eq!(ComparableFloatRef(&d2), ComparableFloatRef(&d));
+        assert_eq!(o2, o);
+        let mut x2 = x.clone();
+        let o2 = x2.positive_difference_rational_prec_assign_ref(&y, prec);
+        assert_eq!(ComparableFloatRef(&x2), ComparableFloatRef(&d));
+        assert_eq!(o2, o);
+        let (d, o) =
+            Float::rational_positive_difference_float_prec_round_ref_ref(&y, &x, prec, Nearest);
+        let (d2, o2) = Float::rational_positive_difference_float_prec_ref_ref(&y, &x, prec);
+        assert_eq!(ComparableFloatRef(&d2), ComparableFloatRef(&d));
+        assert_eq!(o2, o);
+    });
+
+    float_rational_rounding_mode_triple_gen_var_22().test_properties(|(x, y, rm)| {
+        let prec = x.significant_bits();
+        let (d, o) = x.positive_difference_rational_prec_round_ref_ref(&y, prec, rm);
+        let (d2, o2) = x.positive_difference_rational_round_ref_ref(&y, rm);
+        assert_eq!(ComparableFloatRef(&d2), ComparableFloatRef(&d));
+        assert_eq!(o2, o);
+        let mut x2 = x.clone();
+        let o2 = x2.positive_difference_rational_round_assign_ref(&y, rm);
+        assert_eq!(ComparableFloatRef(&x2), ComparableFloatRef(&d));
+        assert_eq!(o2, o);
+    });
+
+    float_rational_rounding_mode_triple_gen_var_23().test_properties(|(x, y, rm)| {
+        let prec = x.significant_bits();
+        let (d, o) = Float::rational_positive_difference_float_prec_round_ref_ref(&y, &x, prec, rm);
+        let (d2, o2) = Float::rational_positive_difference_float_round_ref_ref(&y, &x, rm);
+        assert_eq!(ComparableFloatRef(&d2), ComparableFloatRef(&d));
+        assert_eq!(o2, o);
+    });
+
+    float_rational_pair_gen().test_properties(|(x, y)| {
+        let (d, o) = x.positive_difference_rational_ref_ref(&y);
+        let (d2, o2) = x.positive_difference_rational_round_ref_ref(&y, Nearest);
+        assert_eq!(ComparableFloatRef(&d2), ComparableFloatRef(&d));
+        assert_eq!(o2, o);
+        let (d2, o2) = x.clone().positive_difference_rational(y.clone());
+        assert_eq!(ComparableFloatRef(&d2), ComparableFloatRef(&d));
+        assert_eq!(o2, o);
+        let mut x2 = x.clone();
+        let o2 = x2.positive_difference_rational_assign_ref(&y);
+        assert_eq!(ComparableFloatRef(&x2), ComparableFloatRef(&d));
+        assert_eq!(o2, o);
+        let (r, ro) = Float::rational_positive_difference_float_ref_ref(&y, &x);
+        let (r2, ro2) = Float::rational_positive_difference_float_round_ref_ref(&y, &x, Nearest);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&r));
+        assert_eq!(ro2, ro);
+        // at most one direction is positive; with a dyadic Rational both agree with the Float-Float
+        // function
+        if !d.is_nan() {
+            assert!(d == 0u32 || r == 0u32);
+        }
+        // with an exactly convertible Rational, the mixed function agrees with the Float-Float
+        // function at the same precision
+        if let Ok(yf) = Float::try_from(y.clone()) {
+            let prec = x.significant_bits();
+            let (d2, o2) = x.positive_difference_rational_prec_round_ref_ref(&y, prec, Nearest);
+            let (expected, expected_o) =
+                x.positive_difference_prec_round_ref_val(yf, prec, Nearest);
+            assert_eq!(ComparableFloatRef(&d2), ComparableFloatRef(&expected));
+            assert_eq!(o2, expected_o);
+        }
+    });
+}
+
+#[test]
+fn primitive_float_positive_difference_rational_properties() {
+    primitive_float_gen::<f64>().test_properties(|x| {
+        for y in [
+            Rational::from_signeds(22i64, 7i64),
+            Rational::from_signeds(-22i64, 7i64),
+            Rational::from_signeds(1i64, 3i64) << 200i64,
+        ] {
+            let d = primitive_float_positive_difference_rational(x, &y);
+            let rev = primitive_float_rational_positive_difference_float(&y, x);
+            if x.is_nan() {
+                assert!(d.is_nan());
+                assert!(rev.is_nan());
+            } else {
+                match x.partial_cmp(&y).unwrap() {
+                    Greater => {
+                        assert!(d > 0.0);
+                        assert_eq!(NiceFloat(rev), NiceFloat(0.0));
+                    }
+                    Less => {
+                        assert_eq!(NiceFloat(d), NiceFloat(0.0));
+                        assert!(rev > 0.0);
+                    }
+                    Equal => {
+                        assert_eq!(NiceFloat(d), NiceFloat(0.0));
+                        assert_eq!(NiceFloat(rev), NiceFloat(0.0));
+                    }
+                }
+            }
+        }
+    });
+}
+
+#[test]
+fn positive_difference_rational_fail() {
+    assert_panic!(Float::from(3u32).positive_difference_rational_prec_round(
+        Rational::from_signeds(1i32, 3i32),
+        0,
+        Nearest
+    ));
+    assert_panic!(Float::rational_positive_difference_float_prec_round(
+        Rational::from_signeds(1i32, 3i32),
+        Float::from(3u32),
+        0,
+        Nearest
+    ));
+    // Exact with an inexact difference
+    assert_panic!(Float::from(3u32).positive_difference_rational_prec_round(
+        Rational::from_signeds(1i32, 3i32),
+        2,
+        Exact
+    ));
+}
+
+#[test]
+fn test_positive_difference_rational() {
+    let test = |s,
+                s_hex,
+                t: &str,
+                prec,
+                rm: RoundingMode,
+                out: &str,
+                out_hex: &str,
+                o_out: Ordering,
+                rev_out: &str,
+                rev_hex: &str,
+                rev_o: Ordering| {
+        let x = parse_hex_string(s_hex);
+        assert_eq!(x.to_string(), s);
+        let y = t.parse::<Rational>().unwrap();
+
+        let (d, o) = x.positive_difference_rational_prec_round_ref_ref(&y, prec, rm);
+        assert!(d.is_valid());
+        assert_eq!(d.to_string(), out);
+        assert_eq!(to_hex_string(&d), out_hex);
+        assert_eq!(o, o_out);
+        let (d2, o2) = x
+            .clone()
+            .positive_difference_rational_prec_round(y.clone(), prec, rm);
+        assert_eq!(ComparableFloatRef(&d2), ComparableFloatRef(&d));
+        assert_eq!(o2, o);
+        let mut x2 = x.clone();
+        let o2 = x2.positive_difference_rational_prec_round_assign_ref(&y, prec, rm);
+        assert_eq!(ComparableFloatRef(&x2), ComparableFloatRef(&d));
+        assert_eq!(o2, o);
+
+        let (r, ro) =
+            Float::rational_positive_difference_float_prec_round_ref_ref(&y, &x, prec, rm);
+        assert!(r.is_valid());
+        assert_eq!(r.to_string(), rev_out);
+        assert_eq!(to_hex_string(&r), rev_hex);
+        assert_eq!(ro, rev_o);
+        let (r2, ro2) =
+            Float::rational_positive_difference_float_prec_round(y.clone(), x.clone(), prec, rm);
+        assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&r));
+        assert_eq!(ro2, ro);
+    };
+    // - a NaN Float is NaN in both directions
+    test(
+        "NaN", "NaN", "1/3", 10, Nearest, "NaN", "NaN", Equal, "NaN", "NaN", Equal,
+    );
+    // - infinities compare exactly; the smaller side is a positive zero
+    test(
+        "Infinity", "Infinity", "1/3", 10, Nearest, "Infinity", "Infinity", Equal, "0.0", "0x0.0",
+        Equal,
+    );
+    test(
+        "-Infinity",
+        "-Infinity",
+        "1/3",
+        10,
+        Nearest,
+        "0.0",
+        "0x0.0",
+        Equal,
+        "Infinity",
+        "Infinity",
+        Equal,
+    );
+    // - zero ties (of either Float sign, against the unsigned Rational zero): positive zeros
+    test(
+        "0.0", "0x0.0", "0", 10, Nearest, "0.0", "0x0.0", Equal, "0.0", "0x0.0", Equal,
+    );
+    test(
+        "-0.0", "-0x0.0", "0", 10, Nearest, "0.0", "0x0.0", Equal, "0.0", "0x0.0", Equal,
+    );
+    // - the exact difference on the winning side, correctly rounded; zero on the other
+    test(
+        "3.0",
+        "0x3.0#2",
+        "1/3",
+        10,
+        Nearest,
+        "2.6680",
+        "0x2.ab#10",
+        Greater,
+        "0.0",
+        "0x0.0",
+        Equal,
+    );
+    test(
+        "3.0", "0x3.0#2", "22/7", 2, Floor, "0.0", "0x0.0", Equal, "0.12", "0x0.2#2", Less,
+    );
+    test(
+        "3.0", "0x3.0#2", "22/7", 2, Ceiling, "0.0", "0x0.0", Equal, "0.19", "0x0.3#2", Greater,
+    );
+    test(
+        "1.0",
+        "0x1.0#1",
+        "22/7",
+        10,
+        Nearest,
+        "0.0",
+        "0x0.0",
+        Equal,
+        "2.1445",
+        "0x2.25#10",
+        Greater,
+    );
+    // - negative operands on both sides
+    test(
+        "-1.0",
+        "-0x1.0#1",
+        "-22/7",
+        10,
+        Nearest,
+        "2.1445",
+        "0x2.25#10",
+        Greater,
+        "0.0",
+        "0x0.0",
+        Equal,
+    );
+    // - equal values: positive zeros both ways
+    test(
+        "1.0", "0x1.0#1", "1", 10, Nearest, "0.0", "0x0.0", Equal, "0.0", "0x0.0", Equal,
+    );
+    test(
+        "4.0", "0x4.0#1", "22/7", 4, Nearest, "0.875", "0x0.e#4", Greater, "0.0", "0x0.0", Equal,
     );
 }

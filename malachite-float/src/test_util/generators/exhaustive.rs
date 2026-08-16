@@ -959,6 +959,34 @@ pub(crate) fn positive_difference_round_valid(x: &Float, y: &Float, rm: Rounding
     positive_difference_prec_round_valid(x, y, max(x.significant_bits(), y.significant_bits()), rm)
 }
 
+// Whether `rm` is a valid rounding mode for computing the positive difference of the `Float` `x`
+// and the `Rational` `y` at precision `prec`, in either argument order per `reversed`: `Exact` is
+// only valid when the rounded result is exact, decided by a cheap `Floor` probe.
+pub(crate) fn positive_difference_rational_prec_round_valid(
+    x: &Float,
+    y: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+    reversed: bool,
+) -> bool {
+    rm != Exact
+        || if reversed {
+            Float::rational_positive_difference_float_prec_round_ref_ref(y, x, prec, Floor)
+        } else {
+            x.positive_difference_rational_prec_round_ref_ref(y, prec, Floor)
+        }
+        .1 == Equal
+}
+
+pub(crate) fn positive_difference_rational_round_valid(
+    x: &Float,
+    y: &Rational,
+    rm: RoundingMode,
+    reversed: bool,
+) -> bool {
+    positive_difference_rational_prec_round_valid(x, y, x.significant_bits(), rm, reversed)
+}
+
 pub fn exhaustive_float_float_unsigned_rounding_mode_quadruple_gen_var_4()
 -> It<(Float, Float, u64, RoundingMode)> {
     Box::new(
@@ -3777,6 +3805,46 @@ pub fn exhaustive_float_rational_unsigned_rounding_mode_quadruple_gen_var_22()
     )
 }
 
+pub fn exhaustive_float_rational_unsigned_rounding_mode_quadruple_gen_var_23()
+-> It<(Float, Rational, u64, RoundingMode)> {
+    Box::new(
+        reshape_3_1_to_4(Box::new(lex_pairs(
+            exhaustive_triples_custom_output(
+                exhaustive_floats(),
+                exhaustive_rationals(),
+                exhaustive_positive_primitive_ints(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, prec, rm)| {
+            positive_difference_rational_prec_round_valid(x, y, *prec, *rm, false)
+        }),
+    )
+}
+
+pub fn exhaustive_float_rational_unsigned_rounding_mode_quadruple_gen_var_24()
+-> It<(Float, Rational, u64, RoundingMode)> {
+    Box::new(
+        reshape_3_1_to_4(Box::new(lex_pairs(
+            exhaustive_triples_custom_output(
+                exhaustive_floats(),
+                exhaustive_rationals(),
+                exhaustive_positive_primitive_ints(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, prec, rm)| {
+            positive_difference_rational_prec_round_valid(x, y, *prec, *rm, true)
+        }),
+    )
+}
+
 pub fn log_base_rational_base_1_plus_x_prec_round_valid(
     x: &Float,
     base: &Rational,
@@ -4282,6 +4350,28 @@ pub fn exhaustive_float_rational_rounding_mode_triple_gen_var_21()
             exhaustive_rounding_modes(),
         )))
         .filter(|(x, y, rm)| min_max_rational_round_valid(x, y, *rm, true)),
+    )
+}
+
+pub fn exhaustive_float_rational_rounding_mode_triple_gen_var_22()
+-> It<(Float, Rational, RoundingMode)> {
+    Box::new(
+        reshape_2_1_to_3(Box::new(lex_pairs(
+            exhaustive_pairs(exhaustive_floats(), exhaustive_rationals()),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, rm)| positive_difference_rational_round_valid(x, y, *rm, false)),
+    )
+}
+
+pub fn exhaustive_float_rational_rounding_mode_triple_gen_var_23()
+-> It<(Float, Rational, RoundingMode)> {
+    Box::new(
+        reshape_2_1_to_3(Box::new(lex_pairs(
+            exhaustive_pairs(exhaustive_floats(), exhaustive_rationals()),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, rm)| positive_difference_rational_round_valid(x, y, *rm, true)),
     )
 }
 
@@ -5339,8 +5429,8 @@ pub fn exhaustive_unsigned_unsigned_rounding_mode_triple_gen_var_7<T: PrimitiveU
     )))
 }
 
-// All `(u64, u64, RoundingMode)` that are valid inputs to `Float::factorial_prec_round`, with
-// the first element small.
+// All `(u64, u64, RoundingMode)` that are valid inputs to `Float::factorial_prec_round`, with the
+// first element small.
 type UURM = It<(u64, u64, RoundingMode)>;
 
 pub fn exhaustive_unsigned_unsigned_rounding_mode_triple_gen_var_11() -> UURM {

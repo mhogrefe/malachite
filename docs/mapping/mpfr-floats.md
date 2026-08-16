@@ -554,7 +554,12 @@ $$op1 \le op2$$, and NaN if either operand is NaN, is the
 family, which follows the usual Malachite conventions for precision and rounding-mode
 shorthands. The zero for $$op1 \le op2$$ is a definition choice rather than saturation —
 negative differences are representable, and the function returns $$+0$$ anyway — so the family
-is named for the operation rather than for a saturating subtraction.
+is named for the operation rather than for a saturating subtraction. Beyond MPFR, the family
+also has mixed `Float`-`Rational` forms in both argument orders
+([`positive_difference_rational_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.positive_difference_rational_prec_round)
+and
+[`rational_positive_difference_float_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.rational_positive_difference_float_prec_round)),
+in which the `Rational` operand enters the comparison and the subtraction exactly.
 
 **The `2exp` family.** `x << k` and `x >> k` are exact multiplications and divisions by
 $$2^k$$, adjusting the exponent, and both directions accept signed and unsigned shift amounts
