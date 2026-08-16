@@ -118,16 +118,29 @@ impl TryFrom<&Float> for rug::Float {
                 precision,
                 significand,
             }) => {
-                let mut f = Self::with_val_round(
-                    convert_prec(*precision)?,
-                    rug::Integer::from(significand),
-                    Round::Zero,
-                )
-                .0;
-                f >>= i32::try_from(
-                    i64::exact_from(significand_bits(significand)) - i64::from(*exponent),
-                )
-                .map_err(|_| ())?;
+                let bits = i64::exact_from(significand_bits(significand));
+                let e = i64::from(*exponent) - bits;
+                let prec = convert_prec(*precision)?;
+                let mut f = if bits < i64::from(Float::MAX_EXPONENT) && i32::try_from(-e).is_ok() {
+                    // The integer-valued intermediate stays within the exponent range.
+                    let mut f =
+                        Self::with_val_round(prec, rug::Integer::from(significand), Round::Zero).0;
+                    f >>= i32::try_from(-e).map_err(|_| ())?;
+                    f
+                } else {
+                    // A significand wider than the exponent range allows for an integer: go through
+                    // a rational, whose conversion checks the range only on the final value.
+                    let z = rug::Integer::from(significand);
+                    let q = if e >= 0 {
+                        rug::Rational::from(z << u32::try_from(e).map_err(|_| ())?)
+                    } else {
+                        rug::Rational::from((
+                            z,
+                            rug::Integer::from(1) << u32::try_from(-e).map_err(|_| ())?,
+                        ))
+                    };
+                    Self::with_val_round(prec, &q, Round::Zero).0
+                };
                 if !sign {
                     f = -f;
                 }

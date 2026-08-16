@@ -1,0 +1,10 @@
+error: this scans a slice for nonzero elements; use `!slice_test_zero(..)` instead
+  --> $DIR/use_slice_test_zero.rs:7:13
+   |
+LL |     let _ = xs[..2].iter().any(|x| *x != 0);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[deny(use_slice_test_zero)]` on by default
+
+error: aborting due to 1 previous error
+

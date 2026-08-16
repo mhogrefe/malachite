@@ -1,3 +1,4 @@
+use malachite_base::num::logic::traits::LowMask;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 
@@ -42,4 +43,8 @@ fn main() {
     // A `Natural` constant that is not a mask: not flagged.
     let _ = &n & &FOUR;
     let _ = limbs_low_bits(x);
+    // A mask built by calling low_mask: flagged, in any function.
+    let sh = std::hint::black_box(5u64);
+    let _ = n & u64::low_mask(sh);
+
 }

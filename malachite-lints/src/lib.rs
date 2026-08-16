@@ -59,11 +59,13 @@ mod use_div_mod_precomputed;
 mod use_divisible_by;
 mod use_exact_from;
 mod use_fused_mul;
+mod use_get_bit;
 mod use_mod_power_of_2;
 mod use_mod_square;
 mod use_mul_shr_round;
 mod use_named_constant;
 mod use_parity;
+mod use_slice_test_zero;
 mod use_reciprocal;
 mod use_round_variant;
 mod use_saturating_from;
@@ -486,11 +488,13 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         use_divisible_by::USE_DIVISIBLE_BY,
         use_exact_from::USE_EXACT_FROM,
         use_fused_mul::USE_FUSED_MUL,
+        use_get_bit::USE_GET_BIT,
         use_mod_power_of_2::USE_MOD_POWER_OF_2,
         use_mod_square::USE_MOD_SQUARE,
         use_mul_shr_round::USE_MUL_SHR_ROUND,
         use_named_constant::USE_NAMED_CONSTANT,
         use_parity::USE_PARITY,
+        use_slice_test_zero::USE_SLICE_TEST_ZERO,
         use_reciprocal::USE_RECIPROCAL,
         use_round_variant::USE_ROUND_VARIANT,
         use_saturating_from::USE_SATURATING_FROM,
@@ -557,11 +561,13 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
     lint_store.register_late_pass(|_| Box::new(use_fused_mul::UseFusedMul));
     lint_store.register_late_pass(|_| Box::new(use_div_mod::UseDivMod));
     lint_store.register_late_pass(|_| Box::new(use_div_mod_precomputed::UseDivModPrecomputed));
+    lint_store.register_late_pass(|_| Box::new(use_get_bit::UseGetBit));
     lint_store.register_late_pass(|_| Box::new(use_mod_power_of_2::UseModPowerOf2));
     lint_store.register_late_pass(|_| Box::new(use_mod_square::UseModSquare));
     lint_store.register_late_pass(|_| Box::new(use_mul_shr_round::UseMulShrRound));
     lint_store.register_late_pass(|_| Box::new(use_named_constant::UseNamedConstant));
     lint_store.register_late_pass(|_| Box::new(use_parity::UseParity));
+    lint_store.register_late_pass(|_| Box::new(use_slice_test_zero::UseSliceTestZero));
     lint_store.register_late_pass(|_| Box::new(use_reciprocal::UseReciprocal));
     lint_store.register_late_pass(|_| Box::new(use_round_variant::UseRoundVariant));
     lint_store.register_late_pass(|_| Box::new(use_saturating_from::UseSaturatingFrom));

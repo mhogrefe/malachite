@@ -31,8 +31,8 @@ declare_lint! {
     /// `mod_power_of_2` returns the unsigned/`Natural` remainder, so the rewrite changes the
     /// type. Masks that are named constants of primitive type, like `WIDTH_MASK`, are not
     /// flagged; the name already carries the meaning, and `use_width_mask` deliberately steers
-    /// toward one of them. Masks of 1 belong to `use_parity`. `limbs_*` functions are skipped:
-    /// in limb-level kernels the mask is the idiom.
+    /// toward one of them. Masks of 1 belong to `use_parity`. Masks built by calling
+    /// `low_mask(k)` are also flagged, with `mod_power_of_2(k)` suggested.
     ///
     /// ### Example
     ///
@@ -52,13 +52,25 @@ declare_lint! {
 
 declare_lint_pass!(UseModPowerOf2 => [USE_MOD_POWER_OF_2]);
 
-// Whether `expr` is in a function whose name marks it as exempt: the `mod_power_of_2`
-// implementations themselves, and `limbs_*` kernels, where masks are the idiom.
+// Whether `expr` is in a function whose name marks it as exempt: the `mod_power_of_2` and
+// `low_mask` implementations themselves.
 fn in_exempt_fn<'tcx>(cx: &LateContext<'tcx>, expr: &Expr<'tcx>) -> bool {
     let did = cx.tcx.hir_get_parent_item(expr.hir_id).def_id;
     let name = cx.tcx.item_name(did.to_def_id());
     let name = name.as_str();
-    name.contains("mod_power_of_2") || name.starts_with("limbs_")
+    name.contains("mod_power_of_2") || name.contains("low_mask")
+}
+
+// Whether `e` is a call to a function or method named `low_mask`.
+fn is_low_mask_call(e: &Expr<'_>) -> bool {
+    if let ExprKind::Call(callee, [_]) = &e.kind
+        && let ExprKind::Path(qpath) = &callee.kind
+        && crate::qpath_last_segment_name(qpath) == Some("low_mask")
+    {
+        true
+    } else {
+        false
+    }
 }
 
 // If `v` is one less than a power of 2 and at least 3, returns the exponent.
@@ -128,6 +140,20 @@ impl<'tcx> LateLintPass<'tcx> for UseModPowerOf2 {
                 .typeck_results()
                 .expr_ty(crate::peel_clone_and_borrows(value))
                 .peel_refs();
+            let method = if assign {
+                "mod_power_of_2_assign"
+            } else {
+                "mod_power_of_2"
+            };
+            if is_low_mask_call(mask) {
+                clippy_utils::diagnostics::span_lint(
+                    cx,
+                    USE_MOD_POWER_OF_2,
+                    expr.span,
+                    format!("this mask is built with `low_mask`; use `{method}` instead"),
+                );
+                return;
+            }
             let pow = if matches!(value_ty.kind(), TyKind::Uint(_)) {
                 literal_mask_exponent(mask)
             } else if crate::bignum_name(cx, value_ty) == Some("Natural") {
@@ -136,11 +162,6 @@ impl<'tcx> LateLintPass<'tcx> for UseModPowerOf2 {
                 None
             };
             if let Some(pow) = pow {
-                let method = if assign {
-                    "mod_power_of_2_assign"
-                } else {
-                    "mod_power_of_2"
-                };
                 clippy_utils::diagnostics::span_lint(
                     cx,
                     USE_MOD_POWER_OF_2,

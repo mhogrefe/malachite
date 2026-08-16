@@ -37,6 +37,7 @@ use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::{ExactFrom, SplitInHalf};
 use malachite_base::num::logic::traits::{LeadingZeros, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode::*;
+use malachite_base::slices::slice_test_zero;
 use wide::{f64x4, f64x8, u64x4};
 
 const VEC_SZ_2: usize = VEC_SZ << 1;
@@ -581,7 +582,7 @@ pub(crate) fn crt_data_find_bn_bound(c: &CRTData, bits: u64) -> usize {
         if !limbs_sub_limb_in_place::<u64>(xs_hi, bits - 1) {
             limbs_slice_shr_in_place::<u64>(xs_hi, 6);
             bound = usize::exact_from(xs_hi[0]);
-            if xs_hi[1..].iter().any(|&x| x != 0) {
+            if !slice_test_zero(&xs_hi[1..]) {
                 return usize::ONE.wrapping_neg();
             }
         }
@@ -4468,7 +4469,7 @@ fn flint_mpn_cmp_ui_2exp(a: &[u64], b: u64, e: u64) -> Ordering {
         return x.cmp(&b0);
     }
     q = min(q, an);
-    if a[..q].iter().any(|&x| x != 0) {
+    if !slice_test_zero(&a[..q]) {
         return Greater;
     }
     Less

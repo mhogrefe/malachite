@@ -16,25 +16,25 @@ use malachite_base::rounding_modes::RoundingMode::{self, Exact};
 use malachite_nz::natural::arithmetic::float::round::float_can_round_raw;
 
 impl Float {
-    // This is mpfr_can_round from round_prec.c, MPFR 4.2.2, without the faithful-rounding
-    // cases, which have no counterpart among Malachite's rounding modes.
+    // This is mpfr_can_round from round_prec.c, MPFR 4.2.2, without the faithful-rounding cases,
+    // which have no counterpart among Malachite's rounding modes.
     /// Determines whether an approximation is accurate enough to commit to a correctly rounded
     /// result.
     ///
-    /// `self` should be an approximation of some unknown real number $x$, obtained by rounding
-    /// in the direction `rnd1` with error at most $2^{e-\\text{{err}}}$, where $e$ is the raw
-    /// exponent of `self` (so the error is at most one ulp of `self` when `err` equals the
-    /// precision of `self`). This function returns whether that information suffices to round
-    /// $x$ correctly to precision `prec` in the direction `rnd2` — that is, whether every real
-    /// number consistent with the approximation rounds to the same value. If it returns true,
-    /// rounding `self` to precision `prec` with `rnd2` gives that value.
+    /// `self` should be an approximation of some unknown real number $x$, obtained by rounding in
+    /// the direction `rnd1` with error at most $2^{e-\\text{{err}}}$, where $e$ is the raw exponent
+    /// of `self` (so the error is at most one ulp of `self` when `err` equals the precision of
+    /// `self`). This function returns whether that information suffices to round $x$ correctly to
+    /// precision `prec` in the direction `rnd2` — that is, whether every real number consistent
+    /// with the approximation rounds to the same value. If it returns true, rounding `self` to
+    /// precision `prec` with `rnd2` gives that value.
     ///
-    /// This is the test at the heart of Ziv's strategy for computing correctly rounded
-    /// functions: compute an approximation with a known error bound, and retry with more
-    /// precision until this function accepts it.
+    /// This is the test at the heart of Ziv's strategy for computing correctly rounded functions:
+    /// compute an approximation with a known error bound, and retry with more precision until this
+    /// function accepts it.
     ///
-    /// If `self` is `NaN`, infinite, or zero, the result is `false`: no error bound of this
-    /// form conveys enough information to round those.
+    /// If `self` is `NaN`, infinite, or zero, the result is `false`: no error bound of this form
+    /// conveys enough information to round those.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$

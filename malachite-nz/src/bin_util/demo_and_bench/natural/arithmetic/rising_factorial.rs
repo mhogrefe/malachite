@@ -72,6 +72,7 @@ fn benchmark_natural_rising_factorial_evaluation_strategy(
     );
 }
 
+#[allow(unused_must_use)]
 fn benchmark_natural_rising_factorial_algorithms(
     gm: GenMode,
     config: &GenConfig,

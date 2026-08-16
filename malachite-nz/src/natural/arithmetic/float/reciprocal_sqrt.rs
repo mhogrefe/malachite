@@ -27,7 +27,7 @@ use crate::natural::{
     bit_to_limb_count_floor, limb_to_bit_count,
 };
 use crate::platform::Limb;
-use malachite_base::num::arithmetic::traits::{PowerOf2, Square, XMulYToZZ};
+use malachite_base::num::arithmetic::traits::{ModPowerOf2, PowerOf2, Square, XMulYToZZ};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 
@@ -137,7 +137,7 @@ pub fn limbs_reciprocal_sqrt(
         let i =
             usize::exact_from(xs[xs_len - 1] >> (const { Limb::WIDTH - 12 } - u64::from(parity)));
         let ab = i >> 4;
-        let ac = (ab & 0x3f0) | (i & 0xf);
+        let ac = (ab & 0x3f0) | i.mod_power_of_2(4);
         let t = T1[ab - 0x80] + u16::from(T2[ac - 0x80]); // fits on 16 bits
         // x has only one limb
         out[0] = Limb::from(t) << (Limb::WIDTH - out_prec);

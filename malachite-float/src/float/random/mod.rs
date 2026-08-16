@@ -1806,7 +1806,7 @@ impl<I: Iterator<Item = u64>> U32BitSource<I> {
 
     // Draws n bits for n <= 32, low-aligned in the low bits of one u32.
     fn u32_bits(&mut self, n: u64) -> u32 {
-        self.next_u32() & u32::low_mask(n)
+        self.next_u32().mod_power_of_2(n)
     }
 
     // Draws a uniform random value in [0, n), replicating gmp_urandomm_ui: each attempt draws

@@ -1050,23 +1050,23 @@ all.
 
 ## [Integer and Remainder Related Functions](https://www.mpfr.org/mpfr-current/mpfr.html#Integer-and-Remainder-Related-Functions) {#integer-and-remainder-related-functions}
 
-The thinnest section of the mapping: rounding a `Float` to an integral `Float`, and the
-floating-point remainders, are eighteen gaps, with only the closing predicate already in
-place. The rows are expected to fill as a family.
+Rounding a `Float` to an integral `Float` is now covered by the `round_to_integer` family;
+the fractional-part functions and the floating-point remainders remain gaps, expected to fill
+as families.
 
 | | MPFR | Malachite |
 | :---: | --- | --- |
-| ✗ | `int mpfr_rint (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_ceil (mpfr_t rop, mpfr_t op)` | |
-| ✗ | `int mpfr_floor (mpfr_t rop, mpfr_t op)` | |
-| ✗ | `int mpfr_round (mpfr_t rop, mpfr_t op)` | |
-| ✗ | `int mpfr_roundeven (mpfr_t rop, mpfr_t op)` | |
-| ✗ | `int mpfr_trunc (mpfr_t rop, mpfr_t op)` | |
-| ✗ | `int mpfr_rint_ceil (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_rint_floor (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_rint_round (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_rint_roundeven (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_rint_trunc (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | |
+| ✓ | `int mpfr_rint (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`round_to_integer_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.round_to_integer_prec_round) |
+| ✓ | `int mpfr_ceil (mpfr_t rop, mpfr_t op)` | [`round_to_integer_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.round_to_integer_prec_round) |
+| ✓ | `int mpfr_floor (mpfr_t rop, mpfr_t op)` | [`round_to_integer_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.round_to_integer_prec_round) |
+| ✓ | `int mpfr_round (mpfr_t rop, mpfr_t op)` | [`round_to_integer_ties_away_prec`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.round_to_integer_ties_away_prec) |
+| ✓ | `int mpfr_roundeven (mpfr_t rop, mpfr_t op)` | [`round_to_integer_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.round_to_integer_prec_round) |
+| ✓ | `int mpfr_trunc (mpfr_t rop, mpfr_t op)` | [`round_to_integer_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.round_to_integer_prec_round) |
+| ✓ | `int mpfr_rint_ceil (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`round_to_integer_then_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.round_to_integer_then_prec_round) |
+| ✓ | `int mpfr_rint_floor (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`round_to_integer_then_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.round_to_integer_then_prec_round) |
+| ✓ | `int mpfr_rint_round (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`round_to_integer_ties_away_then_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.round_to_integer_ties_away_then_prec_round) |
+| ✓ | `int mpfr_rint_roundeven (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`round_to_integer_then_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.round_to_integer_then_prec_round) |
+| ✓ | `int mpfr_rint_trunc (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`round_to_integer_then_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.round_to_integer_then_prec_round) |
 | ✗ | `int mpfr_frac (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | |
 | ✗ | `int mpfr_modf (mpfr_t iop, mpfr_t fop, mpfr_t op, mpfr_rnd_t rnd)` | |
 | ✗ | `int mpfr_fmod (mpfr_t r, mpfr_t x, mpfr_t y, mpfr_rnd_t rnd)` | |
@@ -1076,29 +1076,34 @@ place. The rows are expected to fill as a family.
 | ✗ | `int mpfr_remquo (mpfr_t r, long int* q, mpfr_t x, mpfr_t y, mpfr_rnd_t rnd)` | |
 | ✓ | `int mpfr_integer_p (mpfr_t op)` | [`is_integer`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.is_integer) |
 
-**Rounding to an integer.** Eleven rows, two carefully distinguished semantics, both part of
-the gap. `mpfr_rint` and the five fixed-mode functions round `op` to a *representable* integer
+**Rounding to an integer.** Eleven rows, two carefully distinguished semantics, both
+honored. `mpfr_rint` and the five fixed-mode functions round `op` to a *representable* integer
 in a single rounding: "no double rounding is performed", so 10.5 at 2-bit precision goes
-directly to 12, and the ternary value is refined beyond the usual convention, 0 for an integer
-representable as-is, $$\pm 1$$ for an integer that had to be re-rounded, $$\pm 2$$ for a
-non-integer. The `mpfr_rint_*` five are the same operations "regarded in the same way as any
-other mathematical function": round to the integer first, then correctly round that integer to
-the target precision, so 6.5 under `mpfr_rint_round` at 2 bits becomes 7 and then 8.
-`mpfr_round`'s ties-away rule (roundTiesToAway) is also the one integer-rounding mode with no
+directly to 12. [`round_to_integer_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.round_to_integer_prec_round) is that
+operation, with the fixed modes folded into its
 [`RoundingMode`](https://docs.rs/malachite-base/latest/malachite_base/rounding_modes/enum.RoundingMode.html)
-counterpart. Until the family exists, a guarded composition reproduces the `rint_*` semantics
-at fair cost: when `op.get_exponent()` is at least `op.get_prec()`, the value is already an
-integer and is its own answer; otherwise the integer part has fewer bits than the precision,
-and `Integer::rounding_from(&op, rm)` followed by
-[`from_integer_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.from_integer_prec_round)
-performs the two roundings explicitly. The single-rounding `mpfr_rint` contract is not
-reproduced by that composition; it is part of what the gap owes.
+argument, exactly as MPFR implements `mpfr_ceil`, `mpfr_floor`, `mpfr_trunc`, and
+`mpfr_roundeven` as entries into `mpfr_rint`. MPFR's refined ternary — 0 for an integer
+representable as-is, $$\pm 1$$ for an integer that had to be re-rounded, $$\pm 2$$ for a
+non-integer — is returned losslessly as an
+[`Ordering`](https://doc.rust-lang.org/nightly/core/cmp/enum.Ordering.html) paired with a
+`bool` recording whether the input was an integer. `mpfr_round`'s ties-away rule
+(roundTiesToAway) has no `RoundingMode` counterpart, so it gets its own functions,
+[`round_to_integer_ties_away_prec`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.round_to_integer_ties_away_prec) and friends. The
+`mpfr_rint_*` five, the same operations "regarded in the same way as any other mathematical
+function" — round to the integer first, then correctly round that exact integer to the target
+precision — are
+[`round_to_integer_then_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.round_to_integer_then_prec_round) and its ties-away
+sibling; under it, 10.5 with both modes nearest becomes 10 and then 8, where the
+single-rounding form gives 12.
 
 **`mpfr_frac`, `mpfr_modf`.** The fractional part, "having the same sign as `op`", with `rnd`
 rounding the exact fraction rather than shaping it, and zero with `op`'s sign at integers and
 infinities; `mpfr_modf` packages the truncation and the fraction in one call with a
-`mpfr_sin_cos`-style packed return. Both fall with the family above, and compose the same way
-in the meantime, the exact fraction being a subtraction that the guard keeps cheap.
+`mpfr_sin_cos`-style packed return. These two remain the section's rounding-family gap; in the
+meantime the truncation is
+[`round_to_integer_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.round_to_integer_prec_round) with `Down`, and the exact
+fraction is a subtraction.
 
 **The remainders.** $$r = x - ny$$ with the quotient `n` "rounded toward zero" for the `fmod`
 three and "to the nearest integer (ties rounded to even)" for `remainder` and `remquo`,

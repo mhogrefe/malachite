@@ -1,0 +1,34 @@
+error: this compares a single masked bit with 0; use `!x.get_bit(k)` instead
+  --> $DIR/use_get_bit.rs:11:13
+   |
+LL |     let _ = x & u64::power_of_2(sh) == 0;
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[deny(use_get_bit)]` on by default
+
+error: this compares a single masked bit with 0; use `x.get_bit(k)` instead
+  --> $DIR/use_get_bit.rs:12:13
+   |
+LL |     let _ = x & u64::power_of_2(sh) != 0;
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: this compares a single masked bit with 0; use `x.get_bit(k)` instead
+  --> $DIR/use_get_bit.rs:13:13
+   |
+LL |     let _ = 0 != x & u64::power_of_2(3);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: this compares a single masked bit with 0; use `x.get_highest_bit()` instead
+  --> $DIR/use_get_bit.rs:15:13
+   |
+LL |     let _ = x & HIGH_BIT != 0;
+   |             ^^^^^^^^^^^^^^^^^
+
+error: this compares a single masked bit with 0; use `!x.get_highest_bit()` instead
+  --> $DIR/use_get_bit.rs:16:13
+   |
+LL |     let _ = x & HIGH_BIT == 0;
+   |             ^^^^^^^^^^^^^^^^^
+
+error: aborting due to 5 previous errors
+

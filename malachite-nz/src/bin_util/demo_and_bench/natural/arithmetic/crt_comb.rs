@@ -58,6 +58,7 @@ fn demo_natural_crt_comb_combine_balanced(gm: GenMode, config: &GenConfig, limit
     }
 }
 
+#[allow(unused_must_use)]
 fn benchmark_natural_crt_comb_reduce_algorithms(
     gm: GenMode,
     config: &GenConfig,

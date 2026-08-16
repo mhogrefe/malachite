@@ -40,8 +40,8 @@ fn mpfr_can_round(x: &Float, err: i64, rnd1: RoundingMode, rnd2: RoundingMode, p
 }
 
 // Dense differential sweep against mpfr_can_round over significand patterns chosen to hit the
-// rounding-bit, sticky-bit, and binade boundaries, for every pair of rounding modes, both
-// signs, and errors spanning all the boundary cases in the code.
+// rounding-bit, sticky-bit, and binade boundaries, for every pair of rounding modes, both signs,
+// and errors spanning all the boundary cases in the code.
 #[test]
 fn test_can_round_vs_mpfr() {
     let rms = [Floor, Ceiling, Down, Up, Nearest];
@@ -88,8 +88,8 @@ fn test_can_round_vs_mpfr() {
     }
 }
 
-// If rounding is claimed to be possible, then every value consistent with the approximation
-// must round to the same result: check the endpoints of the error interval.
+// If rounding is claimed to be possible, then every value consistent with the approximation must
+// round to the same result: check the endpoints of the error interval.
 #[test]
 fn can_round_soundness() {
     let rms = [Floor, Ceiling, Down, Up, Nearest];

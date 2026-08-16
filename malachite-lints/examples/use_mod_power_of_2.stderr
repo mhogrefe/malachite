@@ -1,34 +1,25 @@
-error: this mask is one less than a power of 2; use `mod_power_of_2(3)` instead
-  --> $DIR/use_mod_power_of_2.rs:21:13
+error[E0277]: no implementation for `malachite_nz::natural::Natural & u64`
+  --> $DIR/use_mod_power_of_2.rs:48:15
    |
-LL |     let _ = x & 7;
-   |             ^^^^^
+LL |     let _ = n & u64::low_mask(sh);
+   |               ^ no implementation for `malachite_nz::natural::Natural & u64`
    |
-   = note: `#[deny(use_mod_power_of_2)]` on by default
-
-error: this mask is one less than a power of 2; use `mod_power_of_2(16)` instead
-  --> $DIR/use_mod_power_of_2.rs:22:13
+   = help: the trait `std::ops::BitAnd<u64>` is not implemented for `malachite_nz::natural::Natural`
+help: the following other types implement trait `std::ops::BitAnd<Rhs>`
+  --> /Users/mikhailhogrefe/rust/malachite/malachite-nz/src/natural/logic/and.rs:229:1
    |
-LL |     let _ = 0xffff & x;
-   |             ^^^^^^^^^^
+LL | impl BitAnd<Self> for Natural {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `malachite_nz::natural::Natural` implements `std::ops::BitAnd`
+...
+LL | impl<'a> BitAnd<&'a Self> for Natural {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `malachite_nz::natural::Natural` implements `std::ops::BitAnd<&malachite_nz::natural::Natural>`
+...
+LL | impl BitAnd<Natural> for &Natural {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `&malachite_nz::natural::Natural` implements `std::ops::BitAnd<malachite_nz::natural::Natural>`
+...
+LL | impl BitAnd<&Natural> for &Natural {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `&malachite_nz::natural::Natural` implements `std::ops::BitAnd`
 
-error: this mask is one less than a power of 2; use `mod_power_of_2(6)` instead
-  --> $DIR/use_mod_power_of_2.rs:23:13
-   |
-LL |     let _ = x & 0x3f == 5;
-   |             ^^^^^^^^
+error: aborting due to 1 previous error
 
-error: this mask is one less than a power of 2; use `mod_power_of_2_assign(4)` instead
-  --> $DIR/use_mod_power_of_2.rs:25:5
-   |
-LL |     y &= 15;
-   |     ^^^^^^^
-
-error: this mask is one less than a power of 2; use `mod_power_of_2(2)` instead
-  --> $DIR/use_mod_power_of_2.rs:27:13
-   |
-LL |     let _ = &n & &THREE;
-   |             ^^^^^^^^^^^
-
-error: aborting due to 5 previous errors
-
+For more information about this error, try `rustc --explain E0277`.

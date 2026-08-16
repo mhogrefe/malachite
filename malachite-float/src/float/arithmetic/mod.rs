@@ -306,6 +306,7 @@ pub(crate) mod round_near_x;
 /// x <<= -10;
 /// assert_eq!(x.to_string(), "0.0030679615757712823");
 /// ```
+pub mod round_to_integer;
 pub mod shl;
 /// Implementations of [`ShlRound`](malachite_base::num::arithmetic::traits::ShlRound) and
 /// [`ShlRoundAssign`](malachite_base::num::arithmetic::traits::ShlRoundAssign), traits for

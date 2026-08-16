@@ -477,7 +477,7 @@ private_test_fn! {limbs_sqrt_rem_to_out(
                     shift += HALF_WIDTH;
                 }
                 let r_hi = limbs_sqrt_rem_helper(out_sqrt, scratch_1, 0, scratch_2);
-                let s = out_sqrt[0] & Limb::low_mask(shift);
+                let s = out_sqrt[0].mod_power_of_2(shift);
                 let scratch_1_lo = &mut scratch_1[..out_len];
                 let mut r_lo = limbs_slice_add_mul_limb_same_length_in_place_left(
                     scratch_1_lo,
@@ -580,7 +580,7 @@ pub(crate) fn limbs_sqrt_to_out_return_inexact(out_sqrt: &mut [Limb], xs: &[Limb
                     shift += HALF_WIDTH;
                 }
                 let r_hi = limbs_sqrt_rem_helper(out_sqrt, scratch_1, 0, scratch_2);
-                let s = out_sqrt[0] & Limb::low_mask(shift);
+                let s = out_sqrt[0].mod_power_of_2(shift);
                 let scratch_1_lo = &mut scratch_1[..out_len];
                 let mut r_lo = limbs_slice_add_mul_limb_same_length_in_place_left(
                     scratch_1_lo,
@@ -613,7 +613,7 @@ pub(crate) fn limbs_sqrt_to_out_return_inexact(out_sqrt: &mut [Limb], xs: &[Limb
                 }
                 &out_rem[..]
             };
-            out[..out_len].iter().any(|&x| x != 0)
+            !slice_test_zero(&out[..out_len])
         }
     }
 }
