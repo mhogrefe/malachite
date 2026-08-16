@@ -153,6 +153,10 @@ pub mod exp;
 /// [`ExpXMinus1Assign`](malachite_base::num::arithmetic::traits::ExpXMinus1Assign), traits for
 /// computing $e^x-1$ for [`Float`](super::Float)s.
 pub mod exp_x_minus_1;
+/// [`factorial_prec_round`](super::Float::factorial_prec_round) and
+/// [`factorial_prec`](super::Float::factorial_prec), for computing correctly-rounded
+/// factorials.
+pub mod factorial;
 /// Fractional parts of [`Float`](super::Float)s: the `fractional_part` and
 /// `integer_and_fractional_parts` families.
 pub mod fractional_part;

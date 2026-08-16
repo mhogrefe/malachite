@@ -7,8 +7,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::factorial::checked_multifactorial_naive;
-use malachite_base::num::arithmetic::traits::Parity;
+use malachite_base::num::arithmetic::traits::{Factorial, Parity};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::float::NiceFloat;
 use malachite_base::test_util::generators::{
     unsigned_gen, unsigned_gen_var_23, unsigned_gen_var_24, unsigned_gen_var_25,
     unsigned_pair_gen_var_12, unsigned_pair_gen_var_43,
@@ -395,4 +396,31 @@ fn checked_subfactorial_properties_helper<T: PrimitiveUnsigned>() {
 #[test]
 fn checked_subfactorial_properties() {
     apply_fn_to_unsigneds!(checked_subfactorial_properties_helper);
+}
+
+#[test]
+fn test_primitive_float_factorial() {
+    fn test_f64(n: u64, out: f64) {
+        assert_eq!(NiceFloat(f64::factorial(n)), NiceFloat(out));
+    }
+    test_f64(0, 1.0);
+    test_f64(1, 1.0);
+    test_f64(2, 2.0);
+    test_f64(5, 120.0);
+    test_f64(10, 3628800.0);
+    test_f64(22, 1.1240007277776077e21);
+    test_f64(23, 2.585201673888498e22);
+    // the largest finite entry, and the first overflow
+    test_f64(170, 7.257415615307999e306);
+    test_f64(171, f64::INFINITY);
+    test_f64(u64::MAX, f64::INFINITY);
+
+    fn test_f32(n: u64, out: f32) {
+        assert_eq!(NiceFloat(f32::factorial(n)), NiceFloat(out));
+    }
+    test_f32(0, 1.0);
+    test_f32(5, 120.0);
+    test_f32(34, 2.952328e38);
+    test_f32(35, f32::INFINITY);
+    test_f32(u64::MAX, f32::INFINITY);
 }

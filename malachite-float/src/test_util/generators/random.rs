@@ -9009,6 +9009,34 @@ pub fn random_unsigned_unsigned_rounding_mode_triple_gen_var_10(
     )
 }
 
+pub fn random_unsigned_unsigned_rounding_mode_triple_gen_var_11(
+    config: &GenConfig,
+) -> It<(u64, u64, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                geometric_random_unsigneds::<u64>(
+                    seed,
+                    config.get_or("mean_small_n", 32),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds::<u64>(
+                    seed,
+                    config.get_or("mean_small_n", 32),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(n, prec, rm)| {
+            rm != Exact || Float::factorial_prec_round(n, prec, Floor).1 == Ordering::Equal
+        }),
+    )
+}
+
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, RoundingMode) --
 
 // vars 1 through 2 are in malachite-base.

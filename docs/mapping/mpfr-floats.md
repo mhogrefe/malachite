@@ -510,7 +510,7 @@ operands do not even need the recipe: the operators take them directly, through 
 | ✓ | `int mpfr_mul_2si (mpfr_t rop, mpfr_t op1, long int op2, mpfr_rnd_t rnd)` | [`Shl`](https://doc.rust-lang.org/nightly/std/ops/trait.Shl.html), [`shl_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.shl_prec_round) |
 | ✓ | `int mpfr_div_2ui (mpfr_t rop, mpfr_t op1, unsigned long int op2, mpfr_rnd_t rnd)` | [`Shr`](https://doc.rust-lang.org/nightly/std/ops/trait.Shr.html), [`shr_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.shr_prec_round) |
 | ✓ | `int mpfr_div_2si (mpfr_t rop, mpfr_t op1, long int op2, mpfr_rnd_t rnd)` | [`Shr`](https://doc.rust-lang.org/nightly/std/ops/trait.Shr.html), [`shr_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.shr_prec_round) |
-| ✗ | `int mpfr_fac_ui (mpfr_t rop, unsigned long int op, mpfr_rnd_t rnd)` | [`Factorial`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Factorial.html), [`from_natural_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.from_natural_prec_round) |
+| ✓ | `int mpfr_fac_ui (mpfr_t rop, unsigned long int op, mpfr_rnd_t rnd)` | [`factorial_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.factorial_prec_round) |
 | ✗ | `int mpfr_fma (mpfr_t rop, mpfr_t op1, mpfr_t op2, mpfr_t op3, mpfr_rnd_t rnd)` | |
 | ✗ | `int mpfr_fms (mpfr_t rop, mpfr_t op1, mpfr_t op2, mpfr_t op3, mpfr_rnd_t rnd)` | |
 | ✗ | `int mpfr_fmma (mpfr_t rop, mpfr_t op1, mpfr_t op2, mpfr_t op3, mpfr_t op4, mpfr_rnd_t rnd)` | |
@@ -567,14 +567,15 @@ and
 carry the mode and return the ternary value; the plain operators round to nearest at the
 boundary.
 
-**`mpfr_fac_ui`.** The rounded factorial is a gap, though not for lack of a correct spelling:
-the factorial is exact in
-[`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html), and
-`Float::from_natural_prec_round(Natural::factorial(op), prec, rnd)` produces exactly
-`mpfr_fac_ui`'s result. What it does not match is the cost. The composition computes every bit
-of the exact factorial before rounding once, while a dedicated implementation works at a
-precision near the target throughout, which is far cheaper when `prec` is small and `op` is
-large; the row is a gap until the dedicated version exists.
+**`mpfr_fac_ui`.** The rounded factorial is
+[`factorial_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.factorial_prec_round)
+(with a `factorial_prec` shorthand for rounding to nearest), producing exactly the value of
+`Float::from_natural_prec_round(Natural::factorial(op), prec, rnd)` — the factorial is exact
+in [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html) —
+but working at a precision near the target throughout, as `mpfr_fac_ui` does, which is far
+cheaper than computing every bit of the exact factorial when `prec` is small and `op` is
+large. A factorial too large for the exponent range overflows to infinity or to the largest
+representable value, depending on the rounding mode.
 
 **The fused operations.** `mpfr_fma`, `mpfr_fms`, `mpfr_fmma`, and `mpfr_fmms`, the singly
 rounded $$op1 \cdot op2 \pm op3$$ and $$op1 \cdot op2 \pm op3 \cdot op4$$, are gaps. The exact

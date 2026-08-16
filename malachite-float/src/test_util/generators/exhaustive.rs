@@ -5339,6 +5339,25 @@ pub fn exhaustive_unsigned_unsigned_rounding_mode_triple_gen_var_7<T: PrimitiveU
     )))
 }
 
+// All `(u64, u64, RoundingMode)` that are valid inputs to `Float::factorial_prec_round`, with
+// the first element small.
+type UURM = It<(u64, u64, RoundingMode)>;
+
+pub fn exhaustive_unsigned_unsigned_rounding_mode_triple_gen_var_11() -> UURM {
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(
+                primitive_int_increasing_inclusive_range(0u64, 600),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((n, prec), rm)| {
+            rm != Exact || Float::factorial_prec_round(n, prec, Floor).1 == Equal
+        }),
+    ))
+}
+
 // -- (Rational, PrimitiveUnsigned, RoundingMode) --
 
 pub fn exhaustive_rational_unsigned_rounding_mode_triple_gen_var_1()

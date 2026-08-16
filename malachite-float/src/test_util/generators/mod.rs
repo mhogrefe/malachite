@@ -4519,6 +4519,16 @@ pub fn unsigned_unsigned_rounding_mode_triple_gen_var_10() -> Generator<(u64, u6
     )
 }
 
+// All `(u64, u64, RoundingMode)` that are valid inputs to `Float::factorial_prec_round`, with
+// the first element small.
+pub fn unsigned_unsigned_rounding_mode_triple_gen_var_11() -> Generator<(u64, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_unsigned_unsigned_rounding_mode_triple_gen_var_11,
+        &random_unsigned_unsigned_rounding_mode_triple_gen_var_11,
+        &special_random_unsigned_unsigned_rounding_mode_triple_gen_var_11,
+    )
+}
+
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, RoundingMode) --
 
 // vars 1 through 4 are in malachite-base.

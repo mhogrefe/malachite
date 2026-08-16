@@ -11,6 +11,7 @@ pub mod agm;
 pub mod div;
 pub mod exp;
 pub mod exp_x_minus_1;
+pub mod factorial;
 pub mod ln;
 pub mod ln_1_plus_x;
 pub mod log_base;
