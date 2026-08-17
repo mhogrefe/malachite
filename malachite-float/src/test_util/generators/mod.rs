@@ -1014,6 +1014,82 @@ pub fn float_float_float_unsigned_rounding_mode_quintuple_gen_var_3_rm() -> Gene
     )
 }
 
+// -- (Float, Float, Rational, PrimitiveUnsigned) --
+
+// All `(Float, Float, Rational, u64)` where the `u64` is small and positive.
+pub fn float_float_rational_unsigned_quadruple_gen_var_1()
+-> Generator<(Float, Float, Rational, u64)> {
+    Generator::new(
+        &exhaustive_float_float_rational_unsigned_quadruple_gen_var_1,
+        &random_float_float_rational_unsigned_quadruple_gen_var_1,
+        &special_random_float_float_rational_unsigned_quadruple_gen_var_1,
+    )
+}
+
+// -- (Float, Float, Rational, PrimitiveUnsigned, RoundingMode) --
+
+// All `(Float, Float, Rational, u64, RoundingMode)` that are valid inputs to
+// `Float::add_mul_rational_prec_round`.
+pub fn float_float_rational_unsigned_rounding_mode_quintuple_gen_var_1() -> FFQURM {
+    Generator::new(
+        &exhaustive_float_float_rational_unsigned_rounding_mode_quintuple_gen_var_1,
+        &random_float_float_rational_unsigned_rounding_mode_quintuple_gen_var_1,
+        &special_random_float_float_rational_unsigned_rounding_mode_quintuple_gen_var_1,
+    )
+}
+
+// All `(Float, Float, Rational, u64, RoundingMode)` that are valid inputs to
+// `Float::add_mul_rational_prec_round`, with extreme Floats.
+pub fn float_float_rational_unsigned_rounding_mode_quintuple_gen_var_2() -> FFQURM {
+    Generator::new(
+        &exhaustive_float_float_rational_unsigned_rounding_mode_quintuple_gen_var_2,
+        &random_float_float_rational_unsigned_rounding_mode_quintuple_gen_var_2,
+        &special_random_float_float_rational_unsigned_rounding_mode_quintuple_gen_var_2,
+    )
+}
+
+// All `(Float, Float, Rational, u64, RoundingMode)` that are valid inputs to
+// `Float::sub_mul_rational_prec_round`.
+pub fn float_float_rational_unsigned_rounding_mode_quintuple_gen_var_3() -> FFQURM {
+    Generator::new(
+        &exhaustive_float_float_rational_unsigned_rounding_mode_quintuple_gen_var_3,
+        &random_float_float_rational_unsigned_rounding_mode_quintuple_gen_var_3,
+        &special_random_float_float_rational_unsigned_rounding_mode_quintuple_gen_var_3,
+    )
+}
+
+// All `(Float, Float, Rational, u64, RoundingMode)` that are valid inputs to
+// `Float::sub_mul_rational_prec_round`, with extreme Floats.
+pub fn float_float_rational_unsigned_rounding_mode_quintuple_gen_var_4() -> FFQURM {
+    Generator::new(
+        &exhaustive_float_float_rational_unsigned_rounding_mode_quintuple_gen_var_4,
+        &random_float_float_rational_unsigned_rounding_mode_quintuple_gen_var_4,
+        &special_random_float_float_rational_unsigned_rounding_mode_quintuple_gen_var_4,
+    )
+}
+
+// -- (Float, Float, Rational, RoundingMode) --
+
+// All `(Float, Float, Rational, RoundingMode)` that are valid inputs to
+// `Float::add_mul_rational_round`.
+pub fn float_float_rational_rounding_mode_quadruple_gen_var_1() -> FFQRM {
+    Generator::new(
+        &exhaustive_float_float_rational_rounding_mode_quadruple_gen_var_1,
+        &random_float_float_rational_rounding_mode_quadruple_gen_var_1,
+        &special_random_float_float_rational_rounding_mode_quadruple_gen_var_1,
+    )
+}
+
+// All `(Float, Float, Rational, RoundingMode)` that are valid inputs to
+// `Float::sub_mul_rational_round`.
+pub fn float_float_rational_rounding_mode_quadruple_gen_var_2() -> FFQRM {
+    Generator::new(
+        &exhaustive_float_float_rational_rounding_mode_quadruple_gen_var_2,
+        &random_float_float_rational_rounding_mode_quadruple_gen_var_2,
+        &special_random_float_float_rational_rounding_mode_quadruple_gen_var_2,
+    )
+}
+
 // -- (Float, Float, Rational) --
 
 pub fn float_float_rational_triple_gen() -> Generator<(Float, Float, Rational)> {
@@ -3934,6 +4010,8 @@ pub fn float_rational_rounding_mode_triple_gen_var_9() -> Generator<(Float, Rati
     )
 }
 
+type FFQRM = Generator<(Float, Float, Rational, RoundingMode)>;
+type FFQURM = Generator<(Float, Float, Rational, u64, RoundingMode)>;
 type FFFRM = Generator<(Float, Float, Float, RoundingMode)>;
 type FFFURM = Generator<(Float, Float, Float, u64, RoundingMode)>;
 type FRR = Generator<(Float, Rational, RoundingMode)>;

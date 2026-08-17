@@ -19,11 +19,12 @@ use malachite_float::test_util::bench::bucketers::{
     quadruple_1_2_3_4_float_float_float_primitive_int_max_complexity_bucketer,
     quadruple_1_2_3_float_max_complexity_bucketer,
     quintuple_1_2_3_4_float_float_float_primitive_int_max_complexity_bucketer,
+    quintuple_1_2_3_float_float_rational_max_complexity_bucketer,
     triple_1_2_3_float_max_complexity_bucketer,
 };
 use malachite_float::test_util::float::arithmetic::add_mul::{
-    add_mul_prec_round_naive, rug_add_mul, rug_add_mul_prec, rug_add_mul_prec_round,
-    rug_add_mul_round,
+    add_mul_prec_round_naive, add_mul_rational_prec_round_naive, rug_add_mul, rug_add_mul_prec,
+    rug_add_mul_prec_round, rug_add_mul_round,
 };
 use malachite_float::test_util::generators::{
     float_float_float_rounding_mode_quadruple_gen_var_1,
@@ -32,7 +33,10 @@ use malachite_float::test_util::generators::{
     float_float_float_unsigned_quadruple_gen_var_1_rm,
     float_float_float_unsigned_rounding_mode_quintuple_gen_var_1,
     float_float_float_unsigned_rounding_mode_quintuple_gen_var_1_rm,
-    float_float_float_unsigned_rounding_mode_quintuple_gen_var_2, float_triple_gen,
+    float_float_float_unsigned_rounding_mode_quintuple_gen_var_2,
+    float_float_rational_rounding_mode_quadruple_gen_var_1, float_float_rational_triple_gen,
+    float_float_rational_unsigned_quadruple_gen_var_1,
+    float_float_rational_unsigned_rounding_mode_quintuple_gen_var_1, float_triple_gen,
     float_triple_gen_rm,
 };
 
@@ -132,6 +136,159 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_float_add_mul_prec_library_comparison);
     register_bench!(runner, benchmark_float_add_mul_round_evaluation_strategy);
     register_bench!(runner, benchmark_float_add_mul_round_library_comparison);
+    register_demo!(runner, demo_float_add_mul_rational_prec_round);
+    register_demo!(runner, demo_float_add_mul_rational_prec_round_debug);
+    register_demo!(runner, demo_float_add_mul_rational_prec_round_val_val_ref);
+    register_demo!(
+        runner,
+        demo_float_add_mul_rational_prec_round_val_val_ref_debug
+    );
+    register_demo!(runner, demo_float_add_mul_rational_prec_round_val_ref_val);
+    register_demo!(
+        runner,
+        demo_float_add_mul_rational_prec_round_val_ref_val_debug
+    );
+    register_demo!(runner, demo_float_add_mul_rational_prec_round_val_ref_ref);
+    register_demo!(
+        runner,
+        demo_float_add_mul_rational_prec_round_val_ref_ref_debug
+    );
+    register_demo!(runner, demo_float_add_mul_rational_prec_round_ref_val_val);
+    register_demo!(
+        runner,
+        demo_float_add_mul_rational_prec_round_ref_val_val_debug
+    );
+    register_demo!(runner, demo_float_add_mul_rational_prec_round_ref_val_ref);
+    register_demo!(
+        runner,
+        demo_float_add_mul_rational_prec_round_ref_val_ref_debug
+    );
+    register_demo!(runner, demo_float_add_mul_rational_prec_round_ref_ref_val);
+    register_demo!(
+        runner,
+        demo_float_add_mul_rational_prec_round_ref_ref_val_debug
+    );
+    register_demo!(runner, demo_float_add_mul_rational_prec_round_ref_ref_ref);
+    register_demo!(
+        runner,
+        demo_float_add_mul_rational_prec_round_ref_ref_ref_debug
+    );
+    register_demo!(runner, demo_float_add_mul_rational_prec_round_assign);
+    register_demo!(runner, demo_float_add_mul_rational_prec_round_assign_debug);
+    register_demo!(
+        runner,
+        demo_float_add_mul_rational_prec_round_assign_val_ref
+    );
+    register_demo!(
+        runner,
+        demo_float_add_mul_rational_prec_round_assign_val_ref_debug
+    );
+    register_demo!(
+        runner,
+        demo_float_add_mul_rational_prec_round_assign_ref_val
+    );
+    register_demo!(
+        runner,
+        demo_float_add_mul_rational_prec_round_assign_ref_val_debug
+    );
+    register_demo!(
+        runner,
+        demo_float_add_mul_rational_prec_round_assign_ref_ref
+    );
+    register_demo!(
+        runner,
+        demo_float_add_mul_rational_prec_round_assign_ref_ref_debug
+    );
+    register_demo!(runner, demo_float_add_mul_rational_prec);
+    register_demo!(runner, demo_float_add_mul_rational_prec_debug);
+    register_demo!(runner, demo_float_add_mul_rational_prec_val_val_ref);
+    register_demo!(runner, demo_float_add_mul_rational_prec_val_val_ref_debug);
+    register_demo!(runner, demo_float_add_mul_rational_prec_val_ref_val);
+    register_demo!(runner, demo_float_add_mul_rational_prec_val_ref_val_debug);
+    register_demo!(runner, demo_float_add_mul_rational_prec_val_ref_ref);
+    register_demo!(runner, demo_float_add_mul_rational_prec_val_ref_ref_debug);
+    register_demo!(runner, demo_float_add_mul_rational_prec_ref_val_val);
+    register_demo!(runner, demo_float_add_mul_rational_prec_ref_val_val_debug);
+    register_demo!(runner, demo_float_add_mul_rational_prec_ref_val_ref);
+    register_demo!(runner, demo_float_add_mul_rational_prec_ref_val_ref_debug);
+    register_demo!(runner, demo_float_add_mul_rational_prec_ref_ref_val);
+    register_demo!(runner, demo_float_add_mul_rational_prec_ref_ref_val_debug);
+    register_demo!(runner, demo_float_add_mul_rational_prec_ref_ref_ref);
+    register_demo!(runner, demo_float_add_mul_rational_prec_ref_ref_ref_debug);
+    register_demo!(runner, demo_float_add_mul_rational_prec_assign);
+    register_demo!(runner, demo_float_add_mul_rational_prec_assign_debug);
+    register_demo!(runner, demo_float_add_mul_rational_prec_assign_val_ref);
+    register_demo!(
+        runner,
+        demo_float_add_mul_rational_prec_assign_val_ref_debug
+    );
+    register_demo!(runner, demo_float_add_mul_rational_prec_assign_ref_val);
+    register_demo!(
+        runner,
+        demo_float_add_mul_rational_prec_assign_ref_val_debug
+    );
+    register_demo!(runner, demo_float_add_mul_rational_prec_assign_ref_ref);
+    register_demo!(
+        runner,
+        demo_float_add_mul_rational_prec_assign_ref_ref_debug
+    );
+    register_demo!(runner, demo_float_add_mul_rational_round);
+    register_demo!(runner, demo_float_add_mul_rational_round_debug);
+    register_demo!(runner, demo_float_add_mul_rational_round_val_val_ref);
+    register_demo!(runner, demo_float_add_mul_rational_round_val_val_ref_debug);
+    register_demo!(runner, demo_float_add_mul_rational_round_val_ref_val);
+    register_demo!(runner, demo_float_add_mul_rational_round_val_ref_val_debug);
+    register_demo!(runner, demo_float_add_mul_rational_round_val_ref_ref);
+    register_demo!(runner, demo_float_add_mul_rational_round_val_ref_ref_debug);
+    register_demo!(runner, demo_float_add_mul_rational_round_ref_val_val);
+    register_demo!(runner, demo_float_add_mul_rational_round_ref_val_val_debug);
+    register_demo!(runner, demo_float_add_mul_rational_round_ref_val_ref);
+    register_demo!(runner, demo_float_add_mul_rational_round_ref_val_ref_debug);
+    register_demo!(runner, demo_float_add_mul_rational_round_ref_ref_val);
+    register_demo!(runner, demo_float_add_mul_rational_round_ref_ref_val_debug);
+    register_demo!(runner, demo_float_add_mul_rational_round_ref_ref_ref);
+    register_demo!(runner, demo_float_add_mul_rational_round_ref_ref_ref_debug);
+    register_demo!(runner, demo_float_add_mul_rational_round_assign);
+    register_demo!(runner, demo_float_add_mul_rational_round_assign_debug);
+    register_demo!(runner, demo_float_add_mul_rational_round_assign_val_ref);
+    register_demo!(
+        runner,
+        demo_float_add_mul_rational_round_assign_val_ref_debug
+    );
+    register_demo!(runner, demo_float_add_mul_rational_round_assign_ref_val);
+    register_demo!(
+        runner,
+        demo_float_add_mul_rational_round_assign_ref_val_debug
+    );
+    register_demo!(runner, demo_float_add_mul_rational_round_assign_ref_ref);
+    register_demo!(
+        runner,
+        demo_float_add_mul_rational_round_assign_ref_ref_debug
+    );
+    register_demo!(runner, demo_float_add_mul_rational);
+    register_demo!(runner, demo_float_add_mul_rational_debug);
+    register_demo!(runner, demo_float_add_mul_rational_val_val_ref);
+    register_demo!(runner, demo_float_add_mul_rational_val_val_ref_debug);
+    register_demo!(runner, demo_float_add_mul_rational_val_ref_val);
+    register_demo!(runner, demo_float_add_mul_rational_val_ref_val_debug);
+    register_demo!(runner, demo_float_add_mul_rational_val_ref_ref);
+    register_demo!(runner, demo_float_add_mul_rational_val_ref_ref_debug);
+    register_demo!(runner, demo_float_add_mul_rational_ref_val_val);
+    register_demo!(runner, demo_float_add_mul_rational_ref_val_val_debug);
+    register_demo!(runner, demo_float_add_mul_rational_ref_val_ref);
+    register_demo!(runner, demo_float_add_mul_rational_ref_val_ref_debug);
+    register_demo!(runner, demo_float_add_mul_rational_ref_ref_val);
+    register_demo!(runner, demo_float_add_mul_rational_ref_ref_val_debug);
+    register_demo!(runner, demo_float_add_mul_rational_ref_ref_ref);
+    register_demo!(runner, demo_float_add_mul_rational_ref_ref_ref_debug);
+    register_bench!(
+        runner,
+        benchmark_float_add_mul_rational_prec_round_evaluation_strategy
+    );
+    register_bench!(
+        runner,
+        benchmark_float_add_mul_rational_prec_round_algorithms
+    );
 }
 
 fn demo_float_add_mul_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -1560,6 +1717,1714 @@ fn benchmark_float_add_mul_round_library_comparison(
             }),
             ("rug", &mut |((x, y, z, rm), _)| {
                 no_out!(rug_add_mul_round(&x, &y, &z, rm));
+            }),
+        ],
+    );
+}
+
+fn demo_float_add_mul_rational_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z, prec, rm) in float_float_rational_unsigned_rounding_mode_quintuple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "({}).add_mul_rational_prec_round({}, {}, {}, {}) = {:?}",
+            x,
+            y,
+            z,
+            prec,
+            rm,
+            x.clone()
+                .add_mul_rational_prec_round(y.clone(), z.clone(), prec, rm)
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z, prec, rm) in float_float_rational_unsigned_rounding_mode_quintuple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let res = x
+            .clone()
+            .add_mul_rational_prec_round(y.clone(), z.clone(), prec, rm);
+        println!(
+            "({:#x}).add_mul_rational_prec_round({:#x}, {}, {}, {}) = {:?}",
+            ComparableFloat(x),
+            ComparableFloat(y),
+            z,
+            prec,
+            rm,
+            res
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_round_val_val_ref(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec, rm) in float_float_rational_unsigned_rounding_mode_quintuple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "({}).add_mul_rational_prec_round_val_val_ref({}, {}, {}, {}) = {:?}",
+            x,
+            y,
+            z,
+            prec,
+            rm,
+            x.clone()
+                .add_mul_rational_prec_round_val_val_ref(y.clone(), &z, prec, rm)
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_round_val_val_ref_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec, rm) in float_float_rational_unsigned_rounding_mode_quintuple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let res = x
+            .clone()
+            .add_mul_rational_prec_round_val_val_ref(y.clone(), &z, prec, rm);
+        println!(
+            "({:#x}).add_mul_rational_prec_round_val_val_ref({:#x}, {}, {}, {}) = {:?}",
+            ComparableFloat(x),
+            ComparableFloat(y),
+            z,
+            prec,
+            rm,
+            res
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_round_val_ref_val(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec, rm) in float_float_rational_unsigned_rounding_mode_quintuple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "({}).add_mul_rational_prec_round_val_ref_val({}, {}, {}, {}) = {:?}",
+            x,
+            y,
+            z,
+            prec,
+            rm,
+            x.clone()
+                .add_mul_rational_prec_round_val_ref_val(&y, z.clone(), prec, rm)
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_round_val_ref_val_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec, rm) in float_float_rational_unsigned_rounding_mode_quintuple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let res = x
+            .clone()
+            .add_mul_rational_prec_round_val_ref_val(&y, z.clone(), prec, rm);
+        println!(
+            "({:#x}).add_mul_rational_prec_round_val_ref_val({:#x}, {}, {}, {}) = {:?}",
+            ComparableFloat(x),
+            ComparableFloat(y),
+            z,
+            prec,
+            rm,
+            res
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_round_val_ref_ref(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec, rm) in float_float_rational_unsigned_rounding_mode_quintuple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "({}).add_mul_rational_prec_round_val_ref_ref({}, {}, {}, {}) = {:?}",
+            x,
+            y,
+            z,
+            prec,
+            rm,
+            x.clone()
+                .add_mul_rational_prec_round_val_ref_ref(&y, &z, prec, rm)
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_round_val_ref_ref_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec, rm) in float_float_rational_unsigned_rounding_mode_quintuple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let res = x
+            .clone()
+            .add_mul_rational_prec_round_val_ref_ref(&y, &z, prec, rm);
+        println!(
+            "({:#x}).add_mul_rational_prec_round_val_ref_ref({:#x}, {}, {}, {}) = {:?}",
+            ComparableFloat(x),
+            ComparableFloat(y),
+            z,
+            prec,
+            rm,
+            res
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_round_ref_val_val(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec, rm) in float_float_rational_unsigned_rounding_mode_quintuple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "(&{}).add_mul_rational_prec_round_ref_val_val({}, {}, {}, {}) = {:?}",
+            x,
+            y,
+            z,
+            prec,
+            rm,
+            x.add_mul_rational_prec_round_ref_val_val(y.clone(), z.clone(), prec, rm)
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_round_ref_val_val_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec, rm) in float_float_rational_unsigned_rounding_mode_quintuple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let res = x.add_mul_rational_prec_round_ref_val_val(y.clone(), z.clone(), prec, rm);
+        println!(
+            "(&{:#x}).add_mul_rational_prec_round_ref_val_val({:#x}, {}, {}, {}) = {:?}",
+            ComparableFloat(x),
+            ComparableFloat(y),
+            z,
+            prec,
+            rm,
+            res
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_round_ref_val_ref(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec, rm) in float_float_rational_unsigned_rounding_mode_quintuple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "(&{}).add_mul_rational_prec_round_ref_val_ref({}, {}, {}, {}) = {:?}",
+            x,
+            y,
+            z,
+            prec,
+            rm,
+            x.add_mul_rational_prec_round_ref_val_ref(y.clone(), &z, prec, rm)
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_round_ref_val_ref_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec, rm) in float_float_rational_unsigned_rounding_mode_quintuple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let res = x.add_mul_rational_prec_round_ref_val_ref(y.clone(), &z, prec, rm);
+        println!(
+            "(&{:#x}).add_mul_rational_prec_round_ref_val_ref({:#x}, {}, {}, {}) = {:?}",
+            ComparableFloat(x),
+            ComparableFloat(y),
+            z,
+            prec,
+            rm,
+            res
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_round_ref_ref_val(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec, rm) in float_float_rational_unsigned_rounding_mode_quintuple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "(&{}).add_mul_rational_prec_round_ref_ref_val({}, {}, {}, {}) = {:?}",
+            x,
+            y,
+            z,
+            prec,
+            rm,
+            x.add_mul_rational_prec_round_ref_ref_val(&y, z.clone(), prec, rm)
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_round_ref_ref_val_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec, rm) in float_float_rational_unsigned_rounding_mode_quintuple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let res = x.add_mul_rational_prec_round_ref_ref_val(&y, z.clone(), prec, rm);
+        println!(
+            "(&{:#x}).add_mul_rational_prec_round_ref_ref_val({:#x}, {}, {}, {}) = {:?}",
+            ComparableFloat(x),
+            ComparableFloat(y),
+            z,
+            prec,
+            rm,
+            res
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_round_ref_ref_ref(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec, rm) in float_float_rational_unsigned_rounding_mode_quintuple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "(&{}).add_mul_rational_prec_round_ref_ref_ref({}, {}, {}, {}) = {:?}",
+            x,
+            y,
+            z,
+            prec,
+            rm,
+            x.add_mul_rational_prec_round_ref_ref_ref(&y, &z, prec, rm)
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_round_ref_ref_ref_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec, rm) in float_float_rational_unsigned_rounding_mode_quintuple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let res = x.add_mul_rational_prec_round_ref_ref_ref(&y, &z, prec, rm);
+        println!(
+            "(&{:#x}).add_mul_rational_prec_round_ref_ref_ref({:#x}, {}, {}, {}) = {:?}",
+            ComparableFloat(x),
+            ComparableFloat(y),
+            z,
+            prec,
+            rm,
+            res
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_round_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z, prec, rm) in float_float_rational_unsigned_rounding_mode_quintuple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let mut x = x;
+        let x_old = x.clone();
+        x.add_mul_rational_prec_round_assign(y.clone(), z.clone(), prec, rm);
+        println!(
+            "x := {x_old}; x.add_mul_rational_prec_round_assign({y}, {z}, {prec}, {rm}); x = {x}"
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_round_assign_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec, rm) in float_float_rational_unsigned_rounding_mode_quintuple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let mut x = x;
+        let x_old = ComparableFloat(x.clone());
+        x.add_mul_rational_prec_round_assign(y.clone(), z.clone(), prec, rm);
+        println!(
+            "x := {:#x}; x.add_mul_rational_prec_round_assign({:#x}, {}, {}, {}); x = {:#x}",
+            x_old,
+            ComparableFloat(y),
+            z,
+            prec,
+            rm,
+            ComparableFloat(x)
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_round_assign_val_ref(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec, rm) in float_float_rational_unsigned_rounding_mode_quintuple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let mut x = x;
+        let x_old = x.clone();
+        x.add_mul_rational_prec_round_assign_val_ref(y.clone(), &z, prec, rm);
+        println!(
+            "x := {x_old}; \
+             x.add_mul_rational_prec_round_assign_val_ref({y}, {z}, {prec}, {rm}); x = \
+             {x}"
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_round_assign_val_ref_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec, rm) in float_float_rational_unsigned_rounding_mode_quintuple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let mut x = x;
+        let x_old = ComparableFloat(x.clone());
+        x.add_mul_rational_prec_round_assign_val_ref(y.clone(), &z, prec, rm);
+        println!(
+            "x := {:#x}; x.add_mul_rational_prec_round_assign_val_ref({:#x}, {}, {}, {}); x = \
+             {:#x}",
+            x_old,
+            ComparableFloat(y),
+            z,
+            prec,
+            rm,
+            ComparableFloat(x)
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_round_assign_ref_val(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec, rm) in float_float_rational_unsigned_rounding_mode_quintuple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let mut x = x;
+        let x_old = x.clone();
+        x.add_mul_rational_prec_round_assign_ref_val(&y, z.clone(), prec, rm);
+        println!(
+            "x := {x_old}; \
+             x.add_mul_rational_prec_round_assign_ref_val({y}, {z}, {prec}, {rm}); x = \
+             {x}"
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_round_assign_ref_val_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec, rm) in float_float_rational_unsigned_rounding_mode_quintuple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let mut x = x;
+        let x_old = ComparableFloat(x.clone());
+        x.add_mul_rational_prec_round_assign_ref_val(&y, z.clone(), prec, rm);
+        println!(
+            "x := {:#x}; x.add_mul_rational_prec_round_assign_ref_val({:#x}, {}, {}, {}); x = \
+             {:#x}",
+            x_old,
+            ComparableFloat(y),
+            z,
+            prec,
+            rm,
+            ComparableFloat(x)
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_round_assign_ref_ref(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec, rm) in float_float_rational_unsigned_rounding_mode_quintuple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let mut x = x;
+        let x_old = x.clone();
+        x.add_mul_rational_prec_round_assign_ref_ref(&y, &z, prec, rm);
+        println!(
+            "x := {x_old}; \
+             x.add_mul_rational_prec_round_assign_ref_ref({y}, {z}, {prec}, {rm}); x = \
+             {x}"
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_round_assign_ref_ref_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec, rm) in float_float_rational_unsigned_rounding_mode_quintuple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let mut x = x;
+        let x_old = ComparableFloat(x.clone());
+        x.add_mul_rational_prec_round_assign_ref_ref(&y, &z, prec, rm);
+        println!(
+            "x := {:#x}; x.add_mul_rational_prec_round_assign_ref_ref({:#x}, {}, {}, {}); x = \
+             {:#x}",
+            x_old,
+            ComparableFloat(y),
+            z,
+            prec,
+            rm,
+            ComparableFloat(x)
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z, prec) in float_float_rational_unsigned_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "({}).add_mul_rational_prec({}, {}, {}) = {:?}",
+            x,
+            y,
+            z,
+            prec,
+            x.clone().add_mul_rational_prec(y.clone(), z.clone(), prec)
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z, prec) in float_float_rational_unsigned_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let res = x.clone().add_mul_rational_prec(y.clone(), z.clone(), prec);
+        println!(
+            "({:#x}).add_mul_rational_prec({:#x}, {}, {}) = {:?}",
+            ComparableFloat(x),
+            ComparableFloat(y),
+            z,
+            prec,
+            res
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_val_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z, prec) in float_float_rational_unsigned_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "({}).add_mul_rational_prec_val_val_ref({}, {}, {}) = {:?}",
+            x,
+            y,
+            z,
+            prec,
+            x.clone()
+                .add_mul_rational_prec_val_val_ref(y.clone(), &z, prec)
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_val_val_ref_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec) in float_float_rational_unsigned_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let res = x
+            .clone()
+            .add_mul_rational_prec_val_val_ref(y.clone(), &z, prec);
+        println!(
+            "({:#x}).add_mul_rational_prec_val_val_ref({:#x}, {}, {}) = {:?}",
+            ComparableFloat(x),
+            ComparableFloat(y),
+            z,
+            prec,
+            res
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_val_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z, prec) in float_float_rational_unsigned_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "({}).add_mul_rational_prec_val_ref_val({}, {}, {}) = {:?}",
+            x,
+            y,
+            z,
+            prec,
+            x.clone()
+                .add_mul_rational_prec_val_ref_val(&y, z.clone(), prec)
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_val_ref_val_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec) in float_float_rational_unsigned_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let res = x
+            .clone()
+            .add_mul_rational_prec_val_ref_val(&y, z.clone(), prec);
+        println!(
+            "({:#x}).add_mul_rational_prec_val_ref_val({:#x}, {}, {}) = {:?}",
+            ComparableFloat(x),
+            ComparableFloat(y),
+            z,
+            prec,
+            res
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_val_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z, prec) in float_float_rational_unsigned_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "({}).add_mul_rational_prec_val_ref_ref({}, {}, {}) = {:?}",
+            x,
+            y,
+            z,
+            prec,
+            x.clone().add_mul_rational_prec_val_ref_ref(&y, &z, prec)
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_val_ref_ref_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec) in float_float_rational_unsigned_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let res = x.clone().add_mul_rational_prec_val_ref_ref(&y, &z, prec);
+        println!(
+            "({:#x}).add_mul_rational_prec_val_ref_ref({:#x}, {}, {}) = {:?}",
+            ComparableFloat(x),
+            ComparableFloat(y),
+            z,
+            prec,
+            res
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_ref_val_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z, prec) in float_float_rational_unsigned_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "(&{}).add_mul_rational_prec_ref_val_val({}, {}, {}) = {:?}",
+            x,
+            y,
+            z,
+            prec,
+            x.add_mul_rational_prec_ref_val_val(y.clone(), z.clone(), prec)
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_ref_val_val_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec) in float_float_rational_unsigned_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let res = x.add_mul_rational_prec_ref_val_val(y.clone(), z.clone(), prec);
+        println!(
+            "(&{:#x}).add_mul_rational_prec_ref_val_val({:#x}, {}, {}) = {:?}",
+            ComparableFloat(x),
+            ComparableFloat(y),
+            z,
+            prec,
+            res
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_ref_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z, prec) in float_float_rational_unsigned_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "(&{}).add_mul_rational_prec_ref_val_ref({}, {}, {}) = {:?}",
+            x,
+            y,
+            z,
+            prec,
+            x.add_mul_rational_prec_ref_val_ref(y.clone(), &z, prec)
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_ref_val_ref_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec) in float_float_rational_unsigned_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let res = x.add_mul_rational_prec_ref_val_ref(y.clone(), &z, prec);
+        println!(
+            "(&{:#x}).add_mul_rational_prec_ref_val_ref({:#x}, {}, {}) = {:?}",
+            ComparableFloat(x),
+            ComparableFloat(y),
+            z,
+            prec,
+            res
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_ref_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z, prec) in float_float_rational_unsigned_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "(&{}).add_mul_rational_prec_ref_ref_val({}, {}, {}) = {:?}",
+            x,
+            y,
+            z,
+            prec,
+            x.add_mul_rational_prec_ref_ref_val(&y, z.clone(), prec)
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_ref_ref_val_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec) in float_float_rational_unsigned_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let res = x.add_mul_rational_prec_ref_ref_val(&y, z.clone(), prec);
+        println!(
+            "(&{:#x}).add_mul_rational_prec_ref_ref_val({:#x}, {}, {}) = {:?}",
+            ComparableFloat(x),
+            ComparableFloat(y),
+            z,
+            prec,
+            res
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_ref_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z, prec) in float_float_rational_unsigned_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "(&{}).add_mul_rational_prec_ref_ref_ref({}, {}, {}) = {:?}",
+            x,
+            y,
+            z,
+            prec,
+            x.add_mul_rational_prec_ref_ref_ref(&y, &z, prec)
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_ref_ref_ref_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec) in float_float_rational_unsigned_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let res = x.add_mul_rational_prec_ref_ref_ref(&y, &z, prec);
+        println!(
+            "(&{:#x}).add_mul_rational_prec_ref_ref_ref({:#x}, {}, {}) = {:?}",
+            ComparableFloat(x),
+            ComparableFloat(y),
+            z,
+            prec,
+            res
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z, prec) in float_float_rational_unsigned_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let mut x = x;
+        let x_old = x.clone();
+        x.add_mul_rational_prec_assign(y.clone(), z.clone(), prec);
+        println!(
+            "x := {x_old}; x.add_mul_rational_prec_assign({y}, {z}, {prec}); x = {x}"
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_assign_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z, prec) in float_float_rational_unsigned_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let mut x = x;
+        let x_old = ComparableFloat(x.clone());
+        x.add_mul_rational_prec_assign(y.clone(), z.clone(), prec);
+        println!(
+            "x := {:#x}; x.add_mul_rational_prec_assign({:#x}, {}, {}); x = {:#x}",
+            x_old,
+            ComparableFloat(y),
+            z,
+            prec,
+            ComparableFloat(x)
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_assign_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z, prec) in float_float_rational_unsigned_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let mut x = x;
+        let x_old = x.clone();
+        x.add_mul_rational_prec_assign_val_ref(y.clone(), &z, prec);
+        println!(
+            "x := {x_old}; x.add_mul_rational_prec_assign_val_ref({y}, {z}, {prec}); x = {x}"
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_assign_val_ref_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec) in float_float_rational_unsigned_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let mut x = x;
+        let x_old = ComparableFloat(x.clone());
+        x.add_mul_rational_prec_assign_val_ref(y.clone(), &z, prec);
+        println!(
+            "x := {:#x}; x.add_mul_rational_prec_assign_val_ref({:#x}, {}, {}); x = {:#x}",
+            x_old,
+            ComparableFloat(y),
+            z,
+            prec,
+            ComparableFloat(x)
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_assign_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z, prec) in float_float_rational_unsigned_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let mut x = x;
+        let x_old = x.clone();
+        x.add_mul_rational_prec_assign_ref_val(&y, z.clone(), prec);
+        println!(
+            "x := {x_old}; x.add_mul_rational_prec_assign_ref_val({y}, {z}, {prec}); x = {x}"
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_assign_ref_val_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec) in float_float_rational_unsigned_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let mut x = x;
+        let x_old = ComparableFloat(x.clone());
+        x.add_mul_rational_prec_assign_ref_val(&y, z.clone(), prec);
+        println!(
+            "x := {:#x}; x.add_mul_rational_prec_assign_ref_val({:#x}, {}, {}); x = {:#x}",
+            x_old,
+            ComparableFloat(y),
+            z,
+            prec,
+            ComparableFloat(x)
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_assign_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z, prec) in float_float_rational_unsigned_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let mut x = x;
+        let x_old = x.clone();
+        x.add_mul_rational_prec_assign_ref_ref(&y, &z, prec);
+        println!(
+            "x := {x_old}; x.add_mul_rational_prec_assign_ref_ref({y}, {z}, {prec}); x = {x}"
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_prec_assign_ref_ref_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, prec) in float_float_rational_unsigned_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let mut x = x;
+        let x_old = ComparableFloat(x.clone());
+        x.add_mul_rational_prec_assign_ref_ref(&y, &z, prec);
+        println!(
+            "x := {:#x}; x.add_mul_rational_prec_assign_ref_ref({:#x}, {}, {}); x = {:#x}",
+            x_old,
+            ComparableFloat(y),
+            z,
+            prec,
+            ComparableFloat(x)
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_round(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z, rm) in float_float_rational_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "({}).add_mul_rational_round({}, {}, {}) = {:?}",
+            x,
+            y,
+            z,
+            rm,
+            x.clone().add_mul_rational_round(y.clone(), z.clone(), rm)
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z, rm) in float_float_rational_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let res = x.clone().add_mul_rational_round(y.clone(), z.clone(), rm);
+        println!(
+            "({:#x}).add_mul_rational_round({:#x}, {}, {}) = {:?}",
+            ComparableFloat(x),
+            ComparableFloat(y),
+            z,
+            rm,
+            res
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_round_val_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z, rm) in float_float_rational_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "({}).add_mul_rational_round_val_val_ref({}, {}, {}) = {:?}",
+            x,
+            y,
+            z,
+            rm,
+            x.clone()
+                .add_mul_rational_round_val_val_ref(y.clone(), &z, rm)
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_round_val_val_ref_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, rm) in float_float_rational_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let res = x
+            .clone()
+            .add_mul_rational_round_val_val_ref(y.clone(), &z, rm);
+        println!(
+            "({:#x}).add_mul_rational_round_val_val_ref({:#x}, {}, {}) = {:?}",
+            ComparableFloat(x),
+            ComparableFloat(y),
+            z,
+            rm,
+            res
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_round_val_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z, rm) in float_float_rational_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "({}).add_mul_rational_round_val_ref_val({}, {}, {}) = {:?}",
+            x,
+            y,
+            z,
+            rm,
+            x.clone()
+                .add_mul_rational_round_val_ref_val(&y, z.clone(), rm)
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_round_val_ref_val_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, rm) in float_float_rational_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let res = x
+            .clone()
+            .add_mul_rational_round_val_ref_val(&y, z.clone(), rm);
+        println!(
+            "({:#x}).add_mul_rational_round_val_ref_val({:#x}, {}, {}) = {:?}",
+            ComparableFloat(x),
+            ComparableFloat(y),
+            z,
+            rm,
+            res
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_round_val_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z, rm) in float_float_rational_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "({}).add_mul_rational_round_val_ref_ref({}, {}, {}) = {:?}",
+            x,
+            y,
+            z,
+            rm,
+            x.clone().add_mul_rational_round_val_ref_ref(&y, &z, rm)
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_round_val_ref_ref_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, rm) in float_float_rational_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let res = x.clone().add_mul_rational_round_val_ref_ref(&y, &z, rm);
+        println!(
+            "({:#x}).add_mul_rational_round_val_ref_ref({:#x}, {}, {}) = {:?}",
+            ComparableFloat(x),
+            ComparableFloat(y),
+            z,
+            rm,
+            res
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_round_ref_val_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z, rm) in float_float_rational_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "(&{}).add_mul_rational_round_ref_val_val({}, {}, {}) = {:?}",
+            x,
+            y,
+            z,
+            rm,
+            x.add_mul_rational_round_ref_val_val(y.clone(), z.clone(), rm)
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_round_ref_val_val_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, rm) in float_float_rational_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let res = x.add_mul_rational_round_ref_val_val(y.clone(), z.clone(), rm);
+        println!(
+            "(&{:#x}).add_mul_rational_round_ref_val_val({:#x}, {}, {}) = {:?}",
+            ComparableFloat(x),
+            ComparableFloat(y),
+            z,
+            rm,
+            res
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_round_ref_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z, rm) in float_float_rational_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "(&{}).add_mul_rational_round_ref_val_ref({}, {}, {}) = {:?}",
+            x,
+            y,
+            z,
+            rm,
+            x.add_mul_rational_round_ref_val_ref(y.clone(), &z, rm)
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_round_ref_val_ref_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, rm) in float_float_rational_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let res = x.add_mul_rational_round_ref_val_ref(y.clone(), &z, rm);
+        println!(
+            "(&{:#x}).add_mul_rational_round_ref_val_ref({:#x}, {}, {}) = {:?}",
+            ComparableFloat(x),
+            ComparableFloat(y),
+            z,
+            rm,
+            res
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_round_ref_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z, rm) in float_float_rational_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "(&{}).add_mul_rational_round_ref_ref_val({}, {}, {}) = {:?}",
+            x,
+            y,
+            z,
+            rm,
+            x.add_mul_rational_round_ref_ref_val(&y, z.clone(), rm)
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_round_ref_ref_val_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, rm) in float_float_rational_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let res = x.add_mul_rational_round_ref_ref_val(&y, z.clone(), rm);
+        println!(
+            "(&{:#x}).add_mul_rational_round_ref_ref_val({:#x}, {}, {}) = {:?}",
+            ComparableFloat(x),
+            ComparableFloat(y),
+            z,
+            rm,
+            res
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_round_ref_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z, rm) in float_float_rational_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "(&{}).add_mul_rational_round_ref_ref_ref({}, {}, {}) = {:?}",
+            x,
+            y,
+            z,
+            rm,
+            x.add_mul_rational_round_ref_ref_ref(&y, &z, rm)
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_round_ref_ref_ref_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, rm) in float_float_rational_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let res = x.add_mul_rational_round_ref_ref_ref(&y, &z, rm);
+        println!(
+            "(&{:#x}).add_mul_rational_round_ref_ref_ref({:#x}, {}, {}) = {:?}",
+            ComparableFloat(x),
+            ComparableFloat(y),
+            z,
+            rm,
+            res
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_round_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z, rm) in float_float_rational_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let mut x = x;
+        let x_old = x.clone();
+        x.add_mul_rational_round_assign(y.clone(), z.clone(), rm);
+        println!(
+            "x := {x_old}; x.add_mul_rational_round_assign({y}, {z}, {rm}); x = {x}"
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_round_assign_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z, rm) in float_float_rational_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let mut x = x;
+        let x_old = ComparableFloat(x.clone());
+        x.add_mul_rational_round_assign(y.clone(), z.clone(), rm);
+        println!(
+            "x := {:#x}; x.add_mul_rational_round_assign({:#x}, {}, {}); x = {:#x}",
+            x_old,
+            ComparableFloat(y),
+            z,
+            rm,
+            ComparableFloat(x)
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_round_assign_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z, rm) in float_float_rational_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let mut x = x;
+        let x_old = x.clone();
+        x.add_mul_rational_round_assign_val_ref(y.clone(), &z, rm);
+        println!(
+            "x := {x_old}; x.add_mul_rational_round_assign_val_ref({y}, {z}, {rm}); x = {x}"
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_round_assign_val_ref_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, rm) in float_float_rational_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let mut x = x;
+        let x_old = ComparableFloat(x.clone());
+        x.add_mul_rational_round_assign_val_ref(y.clone(), &z, rm);
+        println!(
+            "x := {:#x}; x.add_mul_rational_round_assign_val_ref({:#x}, {}, {}); x = {:#x}",
+            x_old,
+            ComparableFloat(y),
+            z,
+            rm,
+            ComparableFloat(x)
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_round_assign_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z, rm) in float_float_rational_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let mut x = x;
+        let x_old = x.clone();
+        x.add_mul_rational_round_assign_ref_val(&y, z.clone(), rm);
+        println!(
+            "x := {x_old}; x.add_mul_rational_round_assign_ref_val({y}, {z}, {rm}); x = {x}"
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_round_assign_ref_val_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, rm) in float_float_rational_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let mut x = x;
+        let x_old = ComparableFloat(x.clone());
+        x.add_mul_rational_round_assign_ref_val(&y, z.clone(), rm);
+        println!(
+            "x := {:#x}; x.add_mul_rational_round_assign_ref_val({:#x}, {}, {}); x = {:#x}",
+            x_old,
+            ComparableFloat(y),
+            z,
+            rm,
+            ComparableFloat(x)
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_round_assign_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z, rm) in float_float_rational_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let mut x = x;
+        let x_old = x.clone();
+        x.add_mul_rational_round_assign_ref_ref(&y, &z, rm);
+        println!(
+            "x := {x_old}; x.add_mul_rational_round_assign_ref_ref({y}, {z}, {rm}); x = {x}"
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_round_assign_ref_ref_debug(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for (x, y, z, rm) in float_float_rational_rounding_mode_quadruple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        let mut x = x;
+        let x_old = ComparableFloat(x.clone());
+        x.add_mul_rational_round_assign_ref_ref(&y, &z, rm);
+        println!(
+            "x := {:#x}; x.add_mul_rational_round_assign_ref_ref({:#x}, {}, {}); x = {:#x}",
+            x_old,
+            ComparableFloat(y),
+            z,
+            rm,
+            ComparableFloat(x)
+        );
+    }
+}
+
+fn demo_float_add_mul_rational(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z) in float_float_rational_triple_gen()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "({}).add_mul({}, {}) = {:?}",
+            x,
+            y,
+            z,
+            x.clone().add_mul(y.clone(), z.clone())
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z) in float_float_rational_triple_gen()
+        .get(gm, config)
+        .take(limit)
+    {
+        let res = x.clone().add_mul(y.clone(), z.clone());
+        println!(
+            "({:#x}).add_mul({:#x}, {}) = {:?}",
+            ComparableFloat(x),
+            ComparableFloat(y),
+            z,
+            res
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_val_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z) in float_float_rational_triple_gen()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "({}).add_mul({}, {}) = {:?}",
+            x,
+            y,
+            z,
+            x.clone().add_mul(y.clone(), &z)
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_val_val_ref_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z) in float_float_rational_triple_gen()
+        .get(gm, config)
+        .take(limit)
+    {
+        let res = x.clone().add_mul(y.clone(), &z);
+        println!(
+            "({:#x}).add_mul({:#x}, {}) = {:?}",
+            ComparableFloat(x),
+            ComparableFloat(y),
+            z,
+            res
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_val_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z) in float_float_rational_triple_gen()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "({}).add_mul({}, {}) = {:?}",
+            x,
+            y,
+            z,
+            x.clone().add_mul(&y, z.clone())
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_val_ref_val_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z) in float_float_rational_triple_gen()
+        .get(gm, config)
+        .take(limit)
+    {
+        let res = x.clone().add_mul(&y, z.clone());
+        println!(
+            "({:#x}).add_mul({:#x}, {}) = {:?}",
+            ComparableFloat(x),
+            ComparableFloat(y),
+            z,
+            res
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_val_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z) in float_float_rational_triple_gen()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "({}).add_mul({}, {}) = {:?}",
+            x,
+            y,
+            z,
+            x.clone().add_mul(&y, &z)
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_val_ref_ref_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z) in float_float_rational_triple_gen()
+        .get(gm, config)
+        .take(limit)
+    {
+        let res = x.clone().add_mul(&y, &z);
+        println!(
+            "({:#x}).add_mul({:#x}, {}) = {:?}",
+            ComparableFloat(x),
+            ComparableFloat(y),
+            z,
+            res
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_ref_val_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z) in float_float_rational_triple_gen()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "(&{}).add_mul({}, {}) = {:?}",
+            x,
+            y,
+            z,
+            (&x).add_mul(y.clone(), z.clone())
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_ref_val_val_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z) in float_float_rational_triple_gen()
+        .get(gm, config)
+        .take(limit)
+    {
+        let res = (&x).add_mul(y.clone(), z.clone());
+        println!(
+            "(&{:#x}).add_mul({:#x}, {}) = {:?}",
+            ComparableFloat(x),
+            ComparableFloat(y),
+            z,
+            res
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_ref_val_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z) in float_float_rational_triple_gen()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "(&{}).add_mul({}, {}) = {:?}",
+            x,
+            y,
+            z,
+            (&x).add_mul(y.clone(), &z)
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_ref_val_ref_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z) in float_float_rational_triple_gen()
+        .get(gm, config)
+        .take(limit)
+    {
+        let res = (&x).add_mul(y.clone(), &z);
+        println!(
+            "(&{:#x}).add_mul({:#x}, {}) = {:?}",
+            ComparableFloat(x),
+            ComparableFloat(y),
+            z,
+            res
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_ref_ref_val(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z) in float_float_rational_triple_gen()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "(&{}).add_mul({}, {}) = {:?}",
+            x,
+            y,
+            z,
+            (&x).add_mul(&y, z.clone())
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_ref_ref_val_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z) in float_float_rational_triple_gen()
+        .get(gm, config)
+        .take(limit)
+    {
+        let res = (&x).add_mul(&y, z.clone());
+        println!(
+            "(&{:#x}).add_mul({:#x}, {}) = {:?}",
+            ComparableFloat(x),
+            ComparableFloat(y),
+            z,
+            res
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_ref_ref_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z) in float_float_rational_triple_gen()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "(&{}).add_mul({}, {}) = {:?}",
+            x,
+            y,
+            z,
+            (&x).add_mul(&y, &z)
+        );
+    }
+}
+
+fn demo_float_add_mul_rational_ref_ref_ref_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y, z) in float_float_rational_triple_gen()
+        .get(gm, config)
+        .take(limit)
+    {
+        let res = (&x).add_mul(&y, &z);
+        println!(
+            "(&{:#x}).add_mul({:#x}, {}) = {:?}",
+            ComparableFloat(x),
+            ComparableFloat(y),
+            z,
+            res
+        );
+    }
+}
+
+fn benchmark_float_add_mul_rational_prec_round_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float.add_mul_rational_prec_round(Float, Rational, u64, RoundingMode)",
+        BenchmarkType::EvaluationStrategy,
+        float_float_rational_unsigned_rounding_mode_quintuple_gen_var_1().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &quintuple_1_2_3_float_float_rational_max_complexity_bucketer("x", "y", "z"),
+        &mut [
+            (
+                "Float.add_mul_rational_prec_round(Float, Rational, u64, RoundingMode)",
+                &mut |(x, y, z, prec, rm)| no_out!(x.add_mul_rational_prec_round(y, z, prec, rm)),
+            ),
+            (
+                "(&Float).add_mul_rational_prec_round_ref_ref_ref(&Float, &Rational, u64, \
+                RoundingMode)",
+                &mut |(x, y, z, prec, rm)| {
+                    no_out!(x.add_mul_rational_prec_round_ref_ref_ref(&y, &z, prec, rm));
+                },
+            ),
+        ],
+    );
+}
+
+fn benchmark_float_add_mul_rational_prec_round_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float.add_mul_rational_prec_round(Float, Rational, u64, RoundingMode)",
+        BenchmarkType::Algorithms,
+        float_float_rational_unsigned_rounding_mode_quintuple_gen_var_1().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &quintuple_1_2_3_float_float_rational_max_complexity_bucketer("x", "y", "z"),
+        &mut [
+            ("default", &mut |(x, y, z, prec, rm)| {
+                no_out!(x.add_mul_rational_prec_round(y, z, prec, rm));
+            }),
+            ("naive", &mut |(x, y, z, prec, rm)| {
+                no_out!(add_mul_rational_prec_round_naive(&x, &y, &z, prec, rm));
             }),
         ],
     );

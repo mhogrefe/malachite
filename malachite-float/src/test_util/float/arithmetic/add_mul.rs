@@ -96,6 +96,86 @@ pub(crate) fn add_mul_prec_round_naive_helper(
     Float::from_rational_prec_round(r, prec, rm)
 }
 
+// The mixed Float-Rational counterpart of `add_mul_prec_round_naive_helper`. A `Rational` zero is
+// treated as positive in the product's sign rules.
+pub(crate) fn add_mul_rational_prec_round_naive_helper(
+    x: &Float,
+    y: &Float,
+    z: &Rational,
+    neg_p: bool,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    assert_ne!(prec, 0);
+    if x.is_nan() || y.is_nan() {
+        return (float_nan!(), Equal);
+    }
+    if y.is_infinite() {
+        if *z == 0u32 {
+            return (float_nan!(), Equal);
+        }
+        let sp = (float_sign(y) == (*z > 0u32)) != neg_p;
+        if x.is_infinite() && float_sign(x) != sp {
+            return (float_nan!(), Equal);
+        }
+        return (
+            if sp {
+                float_infinity!()
+            } else {
+                float_negative_infinity!()
+            },
+            Equal,
+        );
+    }
+    if x.is_infinite() {
+        return (
+            if float_sign(x) {
+                float_infinity!()
+            } else {
+                float_negative_infinity!()
+            },
+            Equal,
+        );
+    }
+    let mut p = Rational::exact_from(y) * z;
+    if neg_p {
+        p = -p;
+    }
+    let r = Rational::exact_from(x) + p;
+    if r == 0u32 {
+        let sign = if *x == 0u32 {
+            let sp = (float_sign(y) == (*z >= 0u32)) != neg_p;
+            if rm == Floor {
+                sp && float_sign(x)
+            } else {
+                sp || float_sign(x)
+            }
+        } else {
+            rm != Floor
+        };
+        return (
+            if sign {
+                float_zero!()
+            } else {
+                float_negative_zero!()
+            },
+            Equal,
+        );
+    }
+    Float::from_rational_prec_round(r, prec, rm)
+}
+
+#[inline]
+pub fn add_mul_rational_prec_round_naive(
+    x: &Float,
+    y: &Float,
+    z: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    add_mul_rational_prec_round_naive_helper(x, y, z, false, prec, rm)
+}
+
 #[inline]
 pub fn add_mul_prec_round_naive(
     x: &Float,

@@ -8,10 +8,13 @@
 
 use crate::Float;
 use crate::test_util::common::rug_float_significant_bits;
-use crate::test_util::float::arithmetic::add_mul::add_mul_prec_round_naive_helper;
+use crate::test_util::float::arithmetic::add_mul::{
+    add_mul_prec_round_naive_helper, add_mul_rational_prec_round_naive_helper,
+};
 use malachite_base::max;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode;
+use malachite_q::Rational;
 use rug::float::Round;
 use rug::ops::AssignRound;
 use std::cmp::Ordering;
@@ -25,6 +28,17 @@ pub fn sub_mul_prec_round_naive(
     rm: RoundingMode,
 ) -> (Float, Ordering) {
     add_mul_prec_round_naive_helper(x, y, z, true, prec, rm)
+}
+
+#[inline]
+pub fn sub_mul_rational_prec_round_naive(
+    x: &Float,
+    y: &Float,
+    z: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    add_mul_rational_prec_round_naive_helper(x, y, z, true, prec, rm)
 }
 
 // x - y * z is x + (-y) * z; negating the multiplicand rather than the whole fms preserves the

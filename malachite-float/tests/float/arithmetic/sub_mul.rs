@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::cmp::Ordering::{self, *};
+use core::cmp::max as cmp_max;
 use malachite_base::num::arithmetic::traits::{PowerOf2, SubMul, SubMulAssign};
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::ExactFrom;
@@ -14,24 +15,32 @@ use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
-use malachite_base::test_util::generators::primitive_float_triple_gen;
+use malachite_base::test_util::generators::{primitive_float_pair_gen, primitive_float_triple_gen};
 use malachite_base::{assert_panic, max};
-use malachite_float::float::arithmetic::sub_mul::primitive_float_sub_mul;
+use malachite_float::float::arithmetic::sub_mul::{
+    primitive_float_sub_mul, primitive_float_sub_mul_rational,
+};
 use malachite_float::test_util::common::{
     parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::sub_mul::{
     rug_sub_mul, rug_sub_mul_prec, rug_sub_mul_prec_round, rug_sub_mul_round,
-    sub_mul_prec_round_naive,
+    sub_mul_prec_round_naive, sub_mul_rational_prec_round_naive,
 };
 use malachite_float::test_util::generators::{
     float_float_float_rounding_mode_quadruple_gen_var_2,
     float_float_float_unsigned_quadruple_gen_var_1,
     float_float_float_unsigned_rounding_mode_quintuple_gen_var_3,
-    float_float_float_unsigned_rounding_mode_quintuple_gen_var_4, float_triple_gen,
+    float_float_float_unsigned_rounding_mode_quintuple_gen_var_4,
+    float_float_rational_rounding_mode_quadruple_gen_var_2, float_float_rational_triple_gen,
+    float_float_rational_unsigned_quadruple_gen_var_1,
+    float_float_rational_unsigned_rounding_mode_quintuple_gen_var_3,
+    float_float_rational_unsigned_rounding_mode_quintuple_gen_var_4, float_triple_gen,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
+use malachite_q::Rational;
 use std::panic::catch_unwind;
+use std::str::FromStr;
 
 #[test]
 fn test_sub_mul_prec_round() {
@@ -1248,5 +1257,537 @@ fn primitive_float_sub_mul_properties() {
             NiceFloat(primitive_float_sub_mul(x, y, z)),
             NiceFloat((-y).mul_add(z, x))
         );
+    });
+}
+
+#[test]
+fn test_sub_mul_rational_prec_round() {
+    let test = |s: &str,
+                s_hex: &str,
+                t: &str,
+                t_hex: &str,
+                u: &str,
+                prec: u64,
+                rm: RoundingMode,
+                out: &str,
+                out_hex: &str,
+                o_out: Ordering| {
+        let x = parse_hex_string(s_hex);
+        assert_eq!(x.to_string(), s);
+        let y = parse_hex_string(t_hex);
+        assert_eq!(y.to_string(), t);
+        let z = Rational::from_str(u).unwrap();
+
+        let (diff, o) = x
+            .clone()
+            .sub_mul_rational_prec_round(y.clone(), z.clone(), prec, rm);
+        assert!(diff.is_valid());
+        assert_eq!(diff.to_string(), out);
+        assert_eq!(to_hex_string(&diff), out_hex);
+        assert_eq!(o, o_out);
+
+        let (diff_alt, o_alt) = x.sub_mul_rational_prec_round_ref_ref_ref(&y, &z, prec, rm);
+        assert!(diff_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
+        assert_eq!(o_alt, o);
+    };
+    // - a NaN in either Float position
+    test(
+        "NaN", "NaN", "1.0", "0x1.0#1", "1/3", 1, Nearest, "NaN", "NaN", Equal,
+    );
+    test(
+        "1.0", "0x1.0#1", "NaN", "NaN", "1/3", 1, Nearest, "NaN", "NaN", Equal,
+    );
+    // - an infinite addend with a finite product
+    test(
+        "Infinity", "Infinity", "2.0", "0x2.0#1", "1/3", 1, Nearest, "Infinity", "Infinity", Equal,
+    );
+    test(
+        "Infinity", "Infinity", "-2.0", "-0x2.0#1", "1/3", 1, Nearest, "Infinity", "Infinity",
+        Equal,
+    );
+    // - an infinite product against an infinite addend of the opposite sign
+    test(
+        "Infinity", "Infinity", "Infinity", "Infinity", "-1/3", 1, Nearest, "Infinity", "Infinity",
+        Equal,
+    );
+    // - a negative infinite addend
+    test(
+        "-Infinity",
+        "-Infinity",
+        "2.0",
+        "0x2.0#1",
+        "22/7",
+        1,
+        Nearest,
+        "-Infinity",
+        "-Infinity",
+        Equal,
+    );
+    // - an infinite multiplier times a zero Rational
+    test(
+        "2.0", "0x2.0#1", "Infinity", "Infinity", "0", 1, Nearest, "NaN", "NaN", Equal,
+    );
+    // - an infinite multiplier with a finite addend, both product signs
+    test(
+        "2.0", "0x2.0#1", "Infinity", "Infinity", "-1/3", 1, Nearest, "Infinity", "Infinity", Equal,
+    );
+    test(
+        "2.0",
+        "0x2.0#1",
+        "-Infinity",
+        "-Infinity",
+        "1/3",
+        1,
+        Nearest,
+        "Infinity",
+        "Infinity",
+        Equal,
+    );
+    // - zero plus a zero product: the addition sign rules, a zero Rational counting as positive
+    test(
+        "0.0", "0x0.0", "0.0", "0x0.0", "1/3", 1, Nearest, "0.0", "0x0.0", Equal,
+    );
+    test(
+        "-0.0", "-0x0.0", "0.0", "0x0.0", "1/3", 1, Floor, "-0.0", "-0x0.0", Equal,
+    );
+    test(
+        "-0.0", "-0x0.0", "-2.0", "-0x2.0#1", "0", 1, Nearest, "0.0", "0x0.0", Equal,
+    );
+    // - a zero product against a nonzero addend, exact and rounded
+    test(
+        "2.0", "0x2.0#1", "0.0", "0x0.0", "22/7", 5, Nearest, "2.00", "0x2.0#5", Equal,
+    );
+    test(
+        "5.33333325",
+        "0x5.555554#25",
+        "0.0",
+        "0x0.0",
+        "1/3",
+        4,
+        Floor,
+        "5.00",
+        "0x5.0#4",
+        Less,
+    );
+    // - a zero addend against a nonzero product; 3 * 1/3 is exactly 1
+    test(
+        "0.0", "0x0.0", "3.0", "0x3.0#2", "1/3", 5, Nearest, "-1.00", "-0x1.0#5", Equal,
+    );
+    test(
+        "-0.0", "-0x0.0", "3.0", "0x3.0#2", "-1/3", 5, Nearest, "1.00", "0x1.0#5", Equal,
+    );
+    // - finite nonzero values; a dyadic-diffming case and general rounding under all basic modes
+    test(
+        "2.0",
+        "0x2.0#1",
+        "3.0",
+        "0x3.0#2",
+        "1/3",
+        10,
+        Nearest,
+        "1.0000",
+        "0x1.000#10",
+        Equal,
+    );
+    test(
+        "2.0",
+        "0x2.0#1",
+        "3.0",
+        "0x3.0#2",
+        "22/7",
+        10,
+        Floor,
+        "-7.4297",
+        "-0x7.6e#10",
+        Less,
+    );
+    test(
+        "2.0",
+        "0x2.0#1",
+        "3.0",
+        "0x3.0#2",
+        "22/7",
+        10,
+        Ceiling,
+        "-7.4219",
+        "-0x7.6c#10",
+        Greater,
+    );
+    test(
+        "2.0",
+        "0x2.0#1",
+        "3.0",
+        "0x3.0#2",
+        "22/7",
+        10,
+        Nearest,
+        "-7.4297",
+        "-0x7.6e#10",
+        Less,
+    );
+    test(
+        "2.0", "0x2.0#1", "3.0", "0x3.0#2", "22/7", 2, Down, "-6.0", "-0x6.0#2", Greater,
+    );
+    test(
+        "2.0", "0x2.0#1", "3.0", "0x3.0#2", "22/7", 2, Up, "-8.0", "-0x8.0#2", Less,
+    );
+    // - negative Rational multiplicand with many-bit Floats
+    test(
+        "5.33333325",
+        "0x5.555554#25",
+        "1.33333334",
+        "0x1.5555558#26",
+        "-355/113",
+        20,
+        Floor,
+        "9.5221100",
+        "0x9.85a9#20",
+        Less,
+    );
+    test(
+        "5.33333325",
+        "0x5.555554#25",
+        "1.33333334",
+        "0x1.5555558#26",
+        "-355/113",
+        20,
+        Ceiling,
+        "9.5221252",
+        "0x9.85aa#20",
+        Greater,
+    );
+    test(
+        "5.33333325",
+        "0x5.555554#25",
+        "1.33333334",
+        "0x1.5555558#26",
+        "-355/113",
+        20,
+        Nearest,
+        "9.5221252",
+        "0x9.85aa#20",
+        Greater,
+    );
+    // - an integer Rational, whose denominator of 1 takes the integer assembly path
+    test(
+        "1.5",
+        "0x1.8#2",
+        "3.0",
+        "0x3.0#2",
+        "5",
+        10,
+        Floor,
+        "-13.500",
+        "-0xd.80#10",
+        Equal,
+    );
+    // - exact cancellation, x = -y * z: the zero is positive except under Floor (this is the only
+    //   reachable route to the scaled core's cancellation branch)
+    test(
+        "2.0",
+        "0x2.0#1",
+        "1.0",
+        "0x1.0#1",
+        "-2",
+        10,
+        Nearest,
+        "4.0000",
+        "0x4.00#10",
+        Equal,
+    );
+    test(
+        "2.0",
+        "0x2.0#1",
+        "1.0",
+        "0x1.0#1",
+        "-2",
+        10,
+        Floor,
+        "4.0000",
+        "0x4.00#10",
+        Equal,
+    );
+    // - Exact rounding with an exactly representable result
+    test(
+        "2.0", "0x2.0#1", "3.0", "0x3.0#2", "2/3", 4, Exact, "0.0", "0x0.0", Equal,
+    );
+    // - the product overflows: saturation per the rounding mode
+    test(
+        "3.0",
+        "0x3.0#2",
+        "1.0e323228496",
+        "0x4.0E+268435455#1",
+        "1208925819614629174706176",
+        10,
+        Nearest,
+        "-Infinity",
+        "-Infinity",
+        Less,
+    );
+    test(
+        "-3.0",
+        "-0x3.0#2",
+        "-1.0e323228496",
+        "-0x4.0E+268435455#1",
+        "1208925819614629174706176",
+        10,
+        Floor,
+        "2.0965e323228496",
+        "0x7.feE+268435455#10",
+        Less,
+    );
+    // - operands at the bottom of the exponent range: clamped alignment, both directions
+    test(
+        "4.8e-323228497",
+        "0x2.0E-268435456#1",
+        "4.8e-323228497",
+        "0x2.0E-268435456#1",
+        "1/3626777458843887524118528",
+        2,
+        Nearest,
+        "4.8e-323228497",
+        "0x2.0E-268435456#2",
+        Greater,
+    );
+    test(
+        "-4.8e-323228497",
+        "-0x2.0E-268435456#1",
+        "4.8e-323228497",
+        "0x2.0E-268435456#1",
+        "1/3626777458843887524118528",
+        2,
+        Ceiling,
+        "-4.8e-323228497",
+        "-0x2.0E-268435456#2",
+        Greater,
+    );
+    // - overflowing operands with an exactly cancelling integer Rational
+    test(
+        "1.0e323228496",
+        "0x4.0E+268435455#1",
+        "1.0e323228496",
+        "0x4.0E+268435455#1",
+        "-1",
+        10,
+        Nearest,
+        "Infinity",
+        "Infinity",
+        Greater,
+    );
+}
+
+#[test]
+fn sub_mul_rational_prec_round_fail() {
+    assert_panic!(Float::from(1u32).sub_mul_rational_prec_round(
+        Float::ONE,
+        Rational::from_signeds(1i32, 3i32),
+        0,
+        Nearest
+    ));
+    // Exact with an inexact result
+    assert_panic!(Float::from(1u32).sub_mul_rational_prec_round(
+        Float::ONE,
+        Rational::from_signeds(1i32, 3i32),
+        2,
+        Exact
+    ));
+}
+
+#[allow(clippy::needless_pass_by_value)]
+fn sub_mul_rational_prec_round_properties_helper(
+    x: Float,
+    y: Float,
+    z: Rational,
+    prec: u64,
+    rm: RoundingMode,
+    extreme: bool,
+) {
+    let (diff, o) = x.sub_mul_rational_prec_round_ref_ref_ref(&y, &z, prec, rm);
+    assert!(diff.is_valid());
+    for (diff_alt, o_alt) in [
+        x.clone()
+            .sub_mul_rational_prec_round(y.clone(), z.clone(), prec, rm),
+        x.clone()
+            .sub_mul_rational_prec_round_val_val_ref(y.clone(), &z, prec, rm),
+        x.clone()
+            .sub_mul_rational_prec_round_val_ref_val(&y, z.clone(), prec, rm),
+        x.clone()
+            .sub_mul_rational_prec_round_val_ref_ref(&y, &z, prec, rm),
+        x.sub_mul_rational_prec_round_ref_val_val(y.clone(), z.clone(), prec, rm),
+        x.sub_mul_rational_prec_round_ref_val_ref(y.clone(), &z, prec, rm),
+        x.sub_mul_rational_prec_round_ref_ref_val(&y, z.clone(), prec, rm),
+    ] {
+        assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
+        assert_eq!(o_alt, o);
+    }
+    for (x_alt, o_alt) in [
+        {
+            let mut x_alt = x.clone();
+            let o = x_alt.sub_mul_rational_prec_round_assign(y.clone(), z.clone(), prec, rm);
+            (x_alt, o)
+        },
+        {
+            let mut x_alt = x.clone();
+            let o = x_alt.sub_mul_rational_prec_round_assign_val_ref(y.clone(), &z, prec, rm);
+            (x_alt, o)
+        },
+        {
+            let mut x_alt = x.clone();
+            let o = x_alt.sub_mul_rational_prec_round_assign_ref_val(&y, z.clone(), prec, rm);
+            (x_alt, o)
+        },
+        {
+            let mut x_alt = x.clone();
+            let o = x_alt.sub_mul_rational_prec_round_assign_ref_ref(&y, &z, prec, rm);
+            (x_alt, o)
+        },
+    ] {
+        assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&diff));
+        assert_eq!(o_alt, o);
+    }
+
+    if diff.is_normal() {
+        assert_eq!(diff.get_prec(), Some(prec));
+    }
+
+    // Rational-based single-rounding oracle; skipped for extreme inputs, whose exact values would
+    // have exponent-sized integer representations
+    if !extreme {
+        let (diff_alt, o_alt) = sub_mul_rational_prec_round_naive(&x, &y, &z, prec, rm);
+        assert_eq!(
+            ComparableFloatRef(&diff_alt),
+            ComparableFloatRef(&diff),
+            "INPUTS x={x:#x} y={y:#x} z={z} prec={prec} rm={rm}"
+        );
+        assert_eq!(o_alt, o);
+    }
+
+    // a dyadic Rational multiplicand must agree with the Float-Float fused operation
+    if let Ok(zf) = Float::try_from(z.clone()) {
+        let (diff_alt, o_alt) = x.sub_mul_prec_round_ref_ref_ref(&y, &zf, prec, rm);
+        assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
+        assert_eq!(o_alt, o);
+    }
+
+    // -(x - y * z) = (-x) + y * z with the rounding direction reversed, up to the sign of zero
+    let (neg_diff, neg_o) = (-&x).add_mul_rational_prec_round_ref_ref_ref(&y, &z, prec, -rm);
+    assert_eq!(
+        ComparableFloat((-neg_diff).abs_negative_zero()),
+        ComparableFloat(diff.abs_negative_zero_ref())
+    );
+    assert_eq!(neg_o.reverse(), o);
+
+    // multiplying by an exact 1 is a plain subtraction
+    if rm != Exact {
+        let (diff_alt, o_alt) =
+            x.sub_mul_rational_prec_round_ref_ref_val(&y, Rational::ONE, prec, rm);
+        let (diff_add, o_add) = x.sub_prec_round_ref_ref(&y, prec, rm);
+        assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff_add));
+        assert_eq!(o_alt, o_add);
+    }
+
+    if o == Equal {
+        for rm in exhaustive_rounding_modes() {
+            let (s, oo) = x.sub_mul_rational_prec_round_ref_ref_ref(&y, &z, prec, rm);
+            assert_eq!(
+                ComparableFloat(s.abs_negative_zero()),
+                ComparableFloat(diff.abs_negative_zero_ref())
+            );
+            assert_eq!(oo, Equal);
+        }
+    } else {
+        assert_panic!(x.sub_mul_rational_prec_round_ref_ref_ref(&y, &z, prec, Exact));
+    }
+}
+
+#[test]
+fn sub_mul_rational_prec_round_properties() {
+    float_float_rational_unsigned_rounding_mode_quintuple_gen_var_3().test_properties(
+        |(x, y, z, prec, rm)| {
+            sub_mul_rational_prec_round_properties_helper(x, y, z, prec, rm, false);
+        },
+    );
+
+    float_float_rational_unsigned_rounding_mode_quintuple_gen_var_4().test_properties(
+        |(x, y, z, prec, rm)| {
+            sub_mul_rational_prec_round_properties_helper(x, y, z, prec, rm, true);
+        },
+    );
+}
+
+#[test]
+fn sub_mul_rational_shorthand_properties() {
+    float_float_rational_unsigned_quadruple_gen_var_1().test_properties(|(x, y, z, prec)| {
+        let (diff, o) = x.sub_mul_rational_prec_round_ref_ref_ref(&y, &z, prec, Nearest);
+        let (diff_alt, o_alt) = x.sub_mul_rational_prec_ref_ref_ref(&y, &z, prec);
+        assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
+        assert_eq!(o_alt, o);
+        let (diff_alt, o_alt) = x.clone().sub_mul_rational_prec(y.clone(), z.clone(), prec);
+        assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
+        assert_eq!(o_alt, o);
+        let mut x_alt = x.clone();
+        let o_alt = x_alt.sub_mul_rational_prec_assign(y.clone(), z.clone(), prec);
+        assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&diff));
+        assert_eq!(o_alt, o);
+    });
+
+    float_float_rational_rounding_mode_quadruple_gen_var_2().test_properties(|(x, y, z, rm)| {
+        let prec = cmp_max(x.significant_bits(), y.significant_bits());
+        let (diff, o) = x.sub_mul_rational_prec_round_ref_ref_ref(&y, &z, prec, rm);
+        let (diff_alt, o_alt) = x.sub_mul_rational_round_ref_ref_ref(&y, &z, rm);
+        assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
+        assert_eq!(o_alt, o);
+        let (diff_alt, o_alt) = x.clone().sub_mul_rational_round(y.clone(), z.clone(), rm);
+        assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
+        assert_eq!(o_alt, o);
+        let mut x_alt = x.clone();
+        let o_alt = x_alt.sub_mul_rational_round_assign(y.clone(), z.clone(), rm);
+        assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&diff));
+        assert_eq!(o_alt, o);
+    });
+
+    float_float_rational_triple_gen().test_properties(|(x, y, z)| {
+        let prec = cmp_max(x.significant_bits(), y.significant_bits());
+        let (diff, _) = x.sub_mul_rational_prec_ref_ref_ref(&y, &z, prec);
+        let diff_alt = x.clone().sub_mul(y.clone(), z.clone());
+        assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
+        let diff_alt = x.clone().sub_mul(y.clone(), &z);
+        assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
+        let diff_alt = x.clone().sub_mul(&y, z.clone());
+        assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
+        let diff_alt = x.clone().sub_mul(&y, &z);
+        assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
+        let diff_alt = (&x).sub_mul(y.clone(), z.clone());
+        assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
+        let diff_alt = (&x).sub_mul(&y, &z);
+        assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
+        let mut x_alt = x.clone();
+        x_alt.sub_mul_assign(y.clone(), z.clone());
+        assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&diff));
+        let mut x_alt = x.clone();
+        x_alt.sub_mul_assign(&y, &z);
+        assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&diff));
+    });
+}
+
+// The emulated mixed fused multiply-subtract: for a dyadic Rational that fits the primitive type,
+// it agrees with the hardware fused multiply-subtract.
+#[test]
+fn primitive_float_sub_mul_rational_properties() {
+    primitive_float_pair_gen::<f64>().test_properties(|(x, y)| {
+        for z in [
+            Rational::from_signeds(1i64, 3i64),
+            Rational::from_signeds(-22i64, 7i64),
+            Rational::from_signeds(3i64, 4i64),
+        ] {
+            let s = primitive_float_sub_mul_rational(x, y, &z);
+            if x.is_nan() || y.is_nan() {
+                assert!(s.is_nan());
+            }
+            if let Ok(zf) = f64::try_from(z.clone()) {
+                assert_eq!(NiceFloat(s), NiceFloat(primitive_float_sub_mul(x, y, zf)));
+            }
+        }
     });
 }

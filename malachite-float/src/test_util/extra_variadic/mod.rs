@@ -133,6 +133,16 @@ random_custom_tuples!(
 );
 random_custom_tuples!(
     (pub(crate)),
+    RandomQuintuplesXXYZW,
+    (X, X, Y, Z, W),
+    random_quintuples_xxyzw,
+    [X, I, xs, xs_gen, [x_0, x_0], [x_1, x_1]],
+    [Y, J, ys, ys_gen, [y_2, y_2]],
+    [Z, K, zs, zs_gen, [z_3, z_3]],
+    [W, L, ws, ws_gen, [w_4, w_4]]
+);
+random_custom_tuples!(
+    (pub(crate)),
     RandomQuintuplesXXXYZ,
     (X, X, X, Y, Z),
     random_quintuples_xxxyz,

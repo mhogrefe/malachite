@@ -599,6 +599,16 @@ subtracts the addend; the two are exact negations of each other, so
 reversed. The separately rounded spelling `&a * &b + &c` computes a different, twice-rounded
 value, which is exactly what fusing exists to avoid.
 
+Beyond MPFR, the families also come in mixed `Float`-`Rational` forms
+([`add_mul_rational_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.add_mul_rational_prec_round)
+and
+[`sub_mul_rational_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.sub_mul_rational_prec_round)),
+in which a `Rational` multiplicand enters the product exactly; rounding it to a `Float` first
+would perturb the result by the other multiplicand times the conversion error. A `Rational`
+*addend* is not offered, and neither is a product of two `Rational`s — the latter because
+`Rational` multiplication is exact, so composing it with the mixed addition forms already
+yields a single rounding.
+
 `mpfr_fmma` and `mpfr_fmms`, the singly rounded $$op1 \cdot op2 \pm op3 \cdot op4$$, remain
 gaps. The exact counterparts of that double-product pair exist on
 [the FLINT integers page](/mapping/flint-integers/#basic-arithmetic), but they do not carry
