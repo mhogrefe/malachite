@@ -201,6 +201,28 @@ where
 
 #[allow(clippy::type_repetition_in_bounds)]
 #[doc(hidden)]
+pub fn emulate_float_float_float_to_float_fn<
+    T: PrimitiveFloat,
+    F: Fn(Float, Float, Float, u64) -> (Float, Ordering),
+>(
+    f: F,
+    x: T,
+    y: T,
+    z: T,
+) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    let x = Float::from(x);
+    let y = Float::from(y);
+    let z = Float::from(z);
+    let (result, o) = f(x, y, z, T::MANTISSA_WIDTH + 1);
+    emulate_finish(result, o)
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+#[doc(hidden)]
 pub fn emulate_float_to_float_and_i64_fn<
     T: PrimitiveFloat,
     F: Fn(Float, u64) -> (Float, Ordering, i64),

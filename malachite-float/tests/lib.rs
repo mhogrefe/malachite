@@ -65,6 +65,7 @@ pub mod float {
     pub mod arithmetic {
         pub mod abs;
         pub mod add;
+        pub mod add_mul;
         pub mod agm;
         pub mod average;
         pub mod cbrt;
@@ -112,6 +113,7 @@ pub mod float {
         pub mod sqrt;
         pub mod square;
         pub mod sub;
+        pub mod sub_mul;
     }
     pub mod basic {
         pub mod can_round;

@@ -23,7 +23,8 @@ use crate::float::exhaustive::{
     exhaustive_positive_floats_with_precision, exhaustive_positive_floats_with_sci_exponent,
 };
 use crate::test_util::extra_variadic::{
-    exhaustive_triples_from_single, exhaustive_triples_xxy, exhaustive_triples_xxy_custom_output,
+    exhaustive_quadruples_xxxy_custom_output, exhaustive_triples_from_single,
+    exhaustive_triples_xxy, exhaustive_triples_xxy_custom_output,
 };
 use crate::test_util::generators::common::{
     FLOAT_FORMAT_COMBO_COUNT, SCI_STRING_COMBO_COUNT, STRTOFR_STRING_CHARS,
@@ -36,6 +37,7 @@ use alloc::vec::IntoIter;
 use core::cmp::Ordering::*;
 use core::iter::once;
 use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
+use malachite_base::max;
 use malachite_base::num::arithmetic::traits::{
     CheckedLogBase, CheckedLogBase2, IsPowerOf2, Reciprocal, Square,
 };
@@ -59,7 +61,9 @@ use malachite_base::orderings::exhaustive::exhaustive_orderings;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::strings::exhaustive::exhaustive_strings_using_chars;
-use malachite_base::test_util::generators::common::{It, reshape_2_1_to_3, reshape_3_1_to_4};
+use malachite_base::test_util::generators::common::{
+    It, reshape_2_1_to_3, reshape_3_1_to_4, reshape_4_1_to_5,
+};
 use malachite_base::test_util::generators::{exhaustive as base_gen, exhaustive_pairs_big_tiny};
 use malachite_base::tuples::exhaustive::{
     ExhaustiveDependentPairs, ExhaustiveDependentPairsYsGenerator, exhaustive_dependent_pairs,
@@ -955,6 +959,26 @@ pub(crate) fn positive_difference_prec_round_valid(
     rm != Exact || x.positive_difference_prec_round_ref_ref(y, prec, Floor).1 == Equal
 }
 
+// Whether `rm` is a valid rounding mode for computing `x` plus or minus (per `sub`) the product of
+// `y` and `z` at precision `prec`: `Exact` is only valid when the rounded result is exact, decided
+// by a cheap `Floor` probe.
+pub(crate) fn add_mul_prec_round_valid(
+    x: &Float,
+    y: &Float,
+    z: &Float,
+    prec: u64,
+    rm: RoundingMode,
+    sub: bool,
+) -> bool {
+    rm != Exact
+        || if sub {
+            x.sub_mul_prec_round_ref_ref_ref(y, z, prec, Floor)
+        } else {
+            x.add_mul_prec_round_ref_ref_ref(y, z, prec, Floor)
+        }
+        .1 == Equal
+}
+
 pub(crate) fn positive_difference_round_valid(x: &Float, y: &Float, rm: RoundingMode) -> bool {
     positive_difference_prec_round_valid(x, y, max(x.significant_bits(), y.significant_bits()), rm)
 }
@@ -1373,6 +1397,135 @@ pub fn exhaustive_float_float_unsigned_rounding_mode_quadruple_gen_var_23()
             exhaustive_rounding_modes(),
         )))
         .filter(|(x, y, prec, rm)| positive_difference_prec_round_valid(x, y, *prec, *rm)),
+    )
+}
+
+// -- (Float, Float, Float, PrimitiveUnsigned, RoundingMode) --
+
+pub(crate) fn add_mul_round_valid(
+    x: &Float,
+    y: &Float,
+    z: &Float,
+    rm: RoundingMode,
+    sub: bool,
+) -> bool {
+    add_mul_prec_round_valid(
+        x,
+        y,
+        z,
+        max!(
+            x.significant_bits(),
+            y.significant_bits(),
+            z.significant_bits()
+        ),
+        rm,
+        sub,
+    )
+}
+
+pub fn exhaustive_float_float_float_unsigned_quadruple_gen_var_1() -> It<(Float, Float, Float, u64)>
+{
+    Box::new(exhaustive_quadruples_xxxy_custom_output(
+        exhaustive_floats(),
+        exhaustive_positive_primitive_ints::<u64>(),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::tiny(),
+    ))
+}
+
+pub fn exhaustive_float_float_float_rounding_mode_quadruple_gen_var_1()
+-> It<(Float, Float, Float, RoundingMode)> {
+    Box::new(
+        reshape_3_1_to_4(Box::new(lex_pairs(
+            exhaustive_triples_from_single(exhaustive_floats()),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, z, rm)| add_mul_round_valid(x, y, z, *rm, false)),
+    )
+}
+
+pub fn exhaustive_float_float_float_rounding_mode_quadruple_gen_var_2()
+-> It<(Float, Float, Float, RoundingMode)> {
+    Box::new(
+        reshape_3_1_to_4(Box::new(lex_pairs(
+            exhaustive_triples_from_single(exhaustive_floats()),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, z, rm)| add_mul_round_valid(x, y, z, *rm, true)),
+    )
+}
+
+pub fn exhaustive_float_float_float_unsigned_rounding_mode_quintuple_gen_var_1()
+-> It<(Float, Float, Float, u64, RoundingMode)> {
+    Box::new(
+        reshape_4_1_to_5(Box::new(lex_pairs(
+            exhaustive_quadruples_xxxy_custom_output(
+                exhaustive_floats(),
+                exhaustive_positive_primitive_ints::<u64>(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, z, prec, rm)| add_mul_prec_round_valid(x, y, z, *prec, *rm, false)),
+    )
+}
+
+pub fn exhaustive_float_float_float_unsigned_rounding_mode_quintuple_gen_var_2()
+-> It<(Float, Float, Float, u64, RoundingMode)> {
+    Box::new(
+        reshape_4_1_to_5(Box::new(lex_pairs(
+            exhaustive_quadruples_xxxy_custom_output(
+                exhaustive_mixed_extreme_floats(),
+                exhaustive_positive_primitive_ints::<u64>(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, z, prec, rm)| add_mul_prec_round_valid(x, y, z, *prec, *rm, false)),
+    )
+}
+
+pub fn exhaustive_float_float_float_unsigned_rounding_mode_quintuple_gen_var_3()
+-> It<(Float, Float, Float, u64, RoundingMode)> {
+    Box::new(
+        reshape_4_1_to_5(Box::new(lex_pairs(
+            exhaustive_quadruples_xxxy_custom_output(
+                exhaustive_floats(),
+                exhaustive_positive_primitive_ints::<u64>(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, z, prec, rm)| add_mul_prec_round_valid(x, y, z, *prec, *rm, true)),
+    )
+}
+
+pub fn exhaustive_float_float_float_unsigned_rounding_mode_quintuple_gen_var_4()
+-> It<(Float, Float, Float, u64, RoundingMode)> {
+    Box::new(
+        reshape_4_1_to_5(Box::new(lex_pairs(
+            exhaustive_quadruples_xxxy_custom_output(
+                exhaustive_mixed_extreme_floats(),
+                exhaustive_positive_primitive_ints::<u64>(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, z, prec, rm)| add_mul_prec_round_valid(x, y, z, *prec, *rm, true)),
     )
 }
 

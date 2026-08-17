@@ -509,6 +509,88 @@ pub fn float_rational_rounding_mode_triple_rm(
     }))
 }
 
+pub fn float_float_float_triple_rm(
+    xs: It<(Float, Float, Float)>,
+) -> It<((rug::Float, rug::Float, rug::Float), (Float, Float, Float))> {
+    Box::new(xs.map(|(x, y, z)| {
+        (
+            (
+                rug::Float::exact_from(&x),
+                rug::Float::exact_from(&y),
+                rug::Float::exact_from(&z),
+            ),
+            (x, y, z),
+        )
+    }))
+}
+
+#[allow(clippy::type_complexity)]
+pub fn float_float_float_anything_quadruple_rm<T: Clone + 'static>(
+    xs: It<(Float, Float, Float, T)>,
+) -> It<(
+    (rug::Float, rug::Float, rug::Float, T),
+    (Float, Float, Float, T),
+)> {
+    Box::new(xs.map(|(x, y, z, w)| {
+        (
+            (
+                rug::Float::exact_from(&x),
+                rug::Float::exact_from(&y),
+                rug::Float::exact_from(&z),
+                w.clone(),
+            ),
+            (x, y, z, w),
+        )
+    }))
+}
+
+#[allow(clippy::type_complexity)]
+pub fn float_float_float_rounding_mode_quadruple_rm(
+    xs: It<(Float, Float, Float, RoundingMode)>,
+) -> It<(
+    (rug::Float, rug::Float, rug::Float, rug::float::Round),
+    (Float, Float, Float, RoundingMode),
+)> {
+    Box::new(
+        xs.filter(|(_, _, _, rm)| *rm != Exact)
+            .map(|(x, y, z, rm)| {
+                (
+                    (
+                        rug::Float::exact_from(&x),
+                        rug::Float::exact_from(&y),
+                        rug::Float::exact_from(&z),
+                        rug_round_exact_from_rounding_mode(rm),
+                    ),
+                    (x, y, z, rm),
+                )
+            }),
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn float_float_float_anything_rounding_mode_quintuple_rm<T: Clone + 'static>(
+    xs: It<(Float, Float, Float, T, RoundingMode)>,
+) -> It<(
+    (rug::Float, rug::Float, rug::Float, T, rug::float::Round),
+    (Float, Float, Float, T, RoundingMode),
+)> {
+    Box::new(
+        xs.filter(|(_, _, _, _, rm)| *rm != Exact)
+            .map(|(x, y, z, w, rm)| {
+                (
+                    (
+                        rug::Float::exact_from(&x),
+                        rug::Float::exact_from(&y),
+                        rug::Float::exact_from(&z),
+                        w.clone(),
+                        rug_round_exact_from_rounding_mode(rm),
+                    ),
+                    (x, y, z, w, rm),
+                )
+            }),
+    )
+}
+
 pub fn float_float_anything_rounding_mode_quadruple_rm<T: Clone + 'static>(
     xs: It<(Float, Float, T, RoundingMode)>,
 ) -> It<(

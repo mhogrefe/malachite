@@ -1,5 +1,5 @@
 error: use `add_mul()` instead of forming the product separately
-  --> $DIR/use_fused_mul.rs:36:13
+  --> $DIR/use_fused_mul.rs:40:13
    |
 LL |     let _ = &X + &Y * &Z;
    |             ^^^^^^^^^^^^
@@ -7,79 +7,79 @@ LL |     let _ = &X + &Y * &Z;
    = note: `#[deny(use_fused_mul)]` on by default
 
 error: use `sub_mul()` instead of forming the product separately
-  --> $DIR/use_fused_mul.rs:37:13
+  --> $DIR/use_fused_mul.rs:41:13
    |
 LL |     let _ = &X - &Y * &Z;
    |             ^^^^^^^^^^^^
 
 error: use `add_mul()` instead of forming the product separately
-  --> $DIR/use_fused_mul.rs:39:13
+  --> $DIR/use_fused_mul.rs:43:13
    |
 LL |     let _ = &Y * &Z + &X;
    |             ^^^^^^^^^^^^
 
 error: use `mul_add_mul()` instead of adding the products separately
-  --> $DIR/use_fused_mul.rs:41:13
+  --> $DIR/use_fused_mul.rs:45:13
    |
 LL |     let _ = &X * &Y + &Z * &W;
    |             ^^^^^^^^^^^^^^^^^
 
 error: use `mul_sub_mul()` instead of subtracting the products separately
-  --> $DIR/use_fused_mul.rs:42:13
+  --> $DIR/use_fused_mul.rs:46:13
    |
 LL |     let _ = &X * &Y - &Z * &W;
    |             ^^^^^^^^^^^^^^^^^
 
 error: use `add_mul_assign()` instead of forming the product separately
-  --> $DIR/use_fused_mul.rs:45:5
+  --> $DIR/use_fused_mul.rs:49:5
    |
 LL |     a += &Y * &Z;
    |     ^^^^^^^^^^^^
 
 error: use `sub_mul_assign()` instead of forming the product separately
-  --> $DIR/use_fused_mul.rs:47:5
+  --> $DIR/use_fused_mul.rs:51:5
    |
 LL |     b -= &Y * &Z;
    |     ^^^^^^^^^^^^
 
 error: use `wrapping_add_mul()` instead of forming the product separately
-  --> $DIR/use_fused_mul.rs:57:13
+  --> $DIR/use_fused_mul.rs:61:13
    |
 LL |     let _ = i.wrapping_add(i.wrapping_mul(i));
    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 error: use `wrapping_sub_mul()` instead of forming the product separately
-  --> $DIR/use_fused_mul.rs:58:13
+  --> $DIR/use_fused_mul.rs:62:13
    |
 LL |     let _ = i.wrapping_sub(i.wrapping_mul(i));
    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 error: use `wrapping_mul_add_mul()` instead of adding the products separately
-  --> $DIR/use_fused_mul.rs:59:13
+  --> $DIR/use_fused_mul.rs:63:13
    |
 LL |     let _ = i.wrapping_mul(i).wrapping_add(i.wrapping_mul(i));
    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 error: use `add_mul()` instead of forming the product separately
-  --> $DIR/use_fused_mul.rs:63:13
+  --> $DIR/use_fused_mul.rs:67:13
    |
 LL |     let _ = &P + &Q * &R;
    |             ^^^^^^^^^^^^
 
 error: use `sub_mul()` instead of forming the product separately
-  --> $DIR/use_fused_mul.rs:64:13
+  --> $DIR/use_fused_mul.rs:68:13
    |
 LL |     let _ = &P - &Q * &R;
    |             ^^^^^^^^^^^^
 
 error: the addend is also a factor: multiply by an incremented operand instead, as in `x * (y + 1)`
-  --> $DIR/use_fused_mul.rs:69:13
+  --> $DIR/use_fused_mul.rs:73:13
    |
 LL |     let _ = &n * &Y + n;
    |             ^^^^^^^^^^^
 
 error: the addend is also a factor: multiply by a decremented operand instead, as in `x * (y - 1)`
-  --> $DIR/use_fused_mul.rs:71:13
+  --> $DIR/use_fused_mul.rs:75:13
    |
 LL |     let _ = &n2 * &Y - n2;
    |             ^^^^^^^^^^^^^

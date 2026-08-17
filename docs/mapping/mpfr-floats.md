@@ -511,8 +511,8 @@ operands do not even need the recipe: the operators take them directly, through 
 | ✓ | `int mpfr_div_2ui (mpfr_t rop, mpfr_t op1, unsigned long int op2, mpfr_rnd_t rnd)` | [`Shr`](https://doc.rust-lang.org/nightly/std/ops/trait.Shr.html), [`shr_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.shr_prec_round) |
 | ✓ | `int mpfr_div_2si (mpfr_t rop, mpfr_t op1, long int op2, mpfr_rnd_t rnd)` | [`Shr`](https://doc.rust-lang.org/nightly/std/ops/trait.Shr.html), [`shr_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.shr_prec_round) |
 | ✓ | `int mpfr_fac_ui (mpfr_t rop, unsigned long int op, mpfr_rnd_t rnd)` | [`factorial_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.factorial_prec_round) |
-| ✗ | `int mpfr_fma (mpfr_t rop, mpfr_t op1, mpfr_t op2, mpfr_t op3, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_fms (mpfr_t rop, mpfr_t op1, mpfr_t op2, mpfr_t op3, mpfr_rnd_t rnd)` | |
+| ✓ | `int mpfr_fma (mpfr_t rop, mpfr_t op1, mpfr_t op2, mpfr_t op3, mpfr_rnd_t rnd)` | [`add_mul_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.add_mul_prec_round) |
+| ✓ | `int mpfr_fms (mpfr_t rop, mpfr_t op1, mpfr_t op2, mpfr_t op3, mpfr_rnd_t rnd)` | [`sub_mul_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.sub_mul_prec_round) |
 | ✗ | `int mpfr_fmma (mpfr_t rop, mpfr_t op1, mpfr_t op2, mpfr_t op3, mpfr_t op4, mpfr_rnd_t rnd)` | |
 | ✗ | `int mpfr_fmms (mpfr_t rop, mpfr_t op1, mpfr_t op2, mpfr_t op3, mpfr_t op4, mpfr_rnd_t rnd)` | |
 | ✗ | `int mpfr_hypot (mpfr_t rop, mpfr_t x, mpfr_t y, mpfr_rnd_t rnd)` | |
@@ -582,13 +582,27 @@ cheaper than computing every bit of the exact factorial when `prec` is small and
 large. A factorial too large for the exponent range overflows to infinity or to the largest
 representable value, depending on the rounding mode.
 
-**The fused operations.** `mpfr_fma`, `mpfr_fms`, `mpfr_fmma`, and `mpfr_fmms`, the singly
-rounded $$op1 \cdot op2 \pm op3$$ and $$op1 \cdot op2 \pm op3 \cdot op4$$, are gaps. The exact
-counterparts of the double-product pair exist on
+**The fused operations.** `mpfr_fma` and `mpfr_fms`, the singly rounded
+$$op1 \cdot op2 \pm op3$$, are the
+[`add_mul_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.add_mul_prec_round)
+and
+[`sub_mul_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.sub_mul_prec_round)
+families, with the usual precision and rounding-mode shorthands and with the
+[`AddMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.AddMul.html)
+and
+[`SubMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.SubMul.html)
+traits at the plain level. The argument order follows those traits rather than MPFR: the addend
+comes first, so `mpfr_fma(rop, x, y, z, rnd)` is `z.add_mul_prec_round(x, y, prec, rm)`.
+Malachite's `sub_mul` subtracts the product — $$op3 - op1 \cdot op2$$ — while `mpfr_fms`
+subtracts the addend; the two are exact negations of each other, so
+`mpfr_fms(rop, x, y, z, rnd)` is `-z.sub_mul_prec_round(x, y, prec, -rm)` with the ternary
+reversed. The separately rounded spelling `&a * &b + &c` computes a different, twice-rounded
+value, which is exactly what fusing exists to avoid.
+
+`mpfr_fmma` and `mpfr_fmms`, the singly rounded $$op1 \cdot op2 \pm op3 \cdot op4$$, remain
+gaps. The exact counterparts of that double-product pair exist on
 [the FLINT integers page](/mapping/flint-integers/#basic-arithmetic), but they do not carry
 over: for exact integers fusing is about the temporary, while here it is about the rounding.
-The separately rounded spelling `&a * &b + &c` computes a different, twice-rounded value, which
-is exactly what fusing exists to avoid; these rows are gaps rather than compositions.
 
 **`mpfr_hypot`.** The Euclidean norm $$\sqrt{x^2 + y^2}$$, with the C99 special-value rule that
 an infinite operand gives $$+\infty$$ "even if the other number is NaN", is a gap.

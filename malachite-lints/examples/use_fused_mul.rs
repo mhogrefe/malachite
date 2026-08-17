@@ -1,12 +1,16 @@
 use malachite_base::num::arithmetic::traits::{AddMul, MulAddMul, WrappingAddMul};
 use malachite_base::num::basic::traits::Two;
 use malachite_nz::natural::Natural;
+use malachite_float::Float;
 use malachite_q::Rational;
 
 const X: Natural = Natural::const_from(5);
 const Y: Natural = Natural::const_from(3);
 const Z: Natural = Natural::const_from(7);
 const W: Natural = Natural::TWO;
+const F: Float = Float::const_from_unsigned(3);
+const G: Float = Float::const_from_unsigned(5);
+const H: Float = Float::const_from_unsigned(7);
 const P: Rational = Rational::const_from_unsigned(3);
 const Q: Rational = Rational::const_from_unsigned(5);
 const R: Rational = Rational::const_from_unsigned(7);
@@ -87,6 +91,11 @@ fn main() {
     // Primitive floats are not flagged either: their `add_mul` is `self + y * z`, so it neither
     // fuses the rounding nor saves work.
     let _ = 1.5f64 + 2.5f64 * 3.5f64;
+    // `Float` has the fused traits but is not flagged: its fused operations round once instead
+    // of twice, computing a different value at a higher cost, so the choice between the
+    // spellings is semantic and the lint must not make it.
+    let _ = &F + &G * &H;
+    let _ = &F - &G * &H;
 
     println!("{a} {b} {j}");
 }

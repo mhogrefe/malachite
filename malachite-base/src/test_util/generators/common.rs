@@ -224,6 +224,12 @@ pub fn reshape_3_1_to_4<A: 'static, B: 'static, C: 'static, D: 'static>(
     Box::new(it.map(|((a, b, c), d)| (a, b, c, d)))
 }
 
+pub fn reshape_4_1_to_5<A: 'static, B: 'static, C: 'static, D: 'static, E: 'static>(
+    it: Box<dyn Iterator<Item = ((A, B, C, D), E)>>,
+) -> Box<dyn Iterator<Item = (A, B, C, D, E)>> {
+    Box::new(it.map(|((a, b, c, d), e)| (a, b, c, d, e)))
+}
+
 // The building blocks of a GMP/MPFR-style `printf` conversion specification, for generators that
 // enumerate the whole grammar accepted by `parse_gmp_conversion_spec`.
 pub const GMP_SPEC_FLAG_CHARS: [u8; 6] = *b"-+ #0'";

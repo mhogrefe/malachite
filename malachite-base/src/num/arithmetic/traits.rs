@@ -44,6 +44,12 @@ pub trait AbsDiffAssign<RHS = Self> {
 }
 
 /// Adds a number and the product of two other numbers.
+///
+/// Depending on the implementing type, the fused operation may compute the same value as the
+/// unfused `self + y * z` more efficiently; or, for types with rounding, it may compute a *more
+/// accurate* value -- the product enters the addition exactly, with a single rounding at the end --
+/// but *less* efficiently, since the exact product must be computed in full. See each
+/// implementation's documentation for which contract it provides.
 pub trait AddMul<Y = Self, Z = Self> {
     type Output;
 
@@ -51,6 +57,12 @@ pub trait AddMul<Y = Self, Z = Self> {
 }
 
 /// Adds a number and the product of two other numbers, in place.
+///
+/// Depending on the implementing type, the fused operation may compute the same value as the
+/// unfused `*self + y * z` more efficiently; or, for types with rounding, it may compute a *more
+/// accurate* value -- the product enters the addition exactly, with a single rounding at the end --
+/// but *less* efficiently, since the exact product must be computed in full. See each
+/// implementation's documentation for which contract it provides.
 pub trait AddMulAssign<Y = Self, Z = Self> {
     fn add_mul_assign(&mut self, y: Y, z: Z);
 }
@@ -2178,6 +2190,12 @@ pub trait SquareAssign {
 }
 
 /// Subtracts a number by the product of two other numbers.
+///
+/// Depending on the implementing type, the fused operation may compute the same value as the
+/// unfused `self - y * z` more efficiently; or, for types with rounding, it may compute a *more
+/// accurate* value -- the product enters the subtraction exactly, with a single rounding at the end
+/// -- but *less* efficiently, since the exact product must be computed in full. See each
+/// implementation's documentation for which contract it provides.
 pub trait SubMul<Y = Self, Z = Self> {
     type Output;
 
@@ -2185,6 +2203,12 @@ pub trait SubMul<Y = Self, Z = Self> {
 }
 
 /// Subtracts a number by the product of two other numbers, in place.
+///
+/// Depending on the implementing type, the fused operation may compute the same value as the
+/// unfused `*self - y * z` more efficiently; or, for types with rounding, it may compute a *more
+/// accurate* value -- the product enters the subtraction exactly, with a single rounding at the end
+/// -- but *less* efficiently, since the exact product must be computed in full. See each
+/// implementation's documentation for which contract it provides.
 pub trait SubMulAssign<Y = Self, Z = Self> {
     fn sub_mul_assign(&mut self, y: Y, z: Z);
 }

@@ -11,6 +11,11 @@ pub mod abs;
 /// Addition of [`Float`](super::Float)s, and of [`Float`](super::Float)s with
 /// [`Rational`](malachite_q::Rational)s.
 pub mod add;
+/// [`AddMul`](malachite_base::num::arithmetic::traits::AddMul) and
+/// [`AddMulAssign`](malachite_base::num::arithmetic::traits::AddMulAssign), traits for adding a
+/// [`Float`](super::Float) and the product of two other [`Float`](super::Float)s with a single
+/// rounding (fused multiply-add), and the associated precision- and rounding-mode-aware functions.
+pub mod add_mul;
 /// Taking the AGM (arithmetic-geometric mean) of two [`Float`](super::Float)s, and of
 /// [`Float`](super::Float)s with [`Rational`](malachite_q::Rational)s.
 pub mod agm;
@@ -745,3 +750,9 @@ pub mod square;
 /// [`Rational`](malachite_q::Rational)s, and of [`Rational`](malachite_q::Rational)s by
 /// [`Float`](super::Float)s.
 pub mod sub;
+/// [`SubMul`](malachite_base::num::arithmetic::traits::SubMul) and
+/// [`SubMulAssign`](malachite_base::num::arithmetic::traits::SubMulAssign), traits for subtracting
+/// the product of two [`Float`](super::Float)s from another [`Float`](super::Float) with a single
+/// rounding (fused multiply-subtract), and the associated precision- and rounding-mode-aware
+/// functions.
+pub mod sub_mul;

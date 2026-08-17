@@ -11,6 +11,7 @@ use malachite_base::test_util::runner::Runner;
 pub(crate) fn register(runner: &mut Runner) {
     abs::register(runner);
     add::register(runner);
+    add_mul::register(runner);
     agm::register(runner);
     average::register(runner);
     cbrt::register(runner);
@@ -53,10 +54,12 @@ pub(crate) fn register(runner: &mut Runner) {
     sqrt::register(runner);
     square::register(runner);
     sub::register(runner);
+    sub_mul::register(runner);
 }
 
 mod abs;
 mod add;
+mod add_mul;
 mod agm;
 mod average;
 mod cbrt;
@@ -99,3 +102,4 @@ mod sign;
 mod sqrt;
 mod square;
 mod sub;
+mod sub_mul;

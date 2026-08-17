@@ -14,16 +14,17 @@ use crate::float::random::{
     striped_random_positive_finite_floats, striped_random_positive_floats_with_precision,
 };
 use crate::test_util::extra_variadic::{
-    random_quadruples, random_quadruples_xxyz, random_triples, random_triples_from_single,
-    random_triples_xxy, random_triples_xyy,
+    random_quadruples, random_quadruples_xxxy, random_quadruples_xxyz, random_quintuples_xxxyz,
+    random_triples, random_triples_from_single, random_triples_xxy, random_triples_xyy,
 };
 use crate::test_util::generators::common::{
     format_string_output_is_bounded, strtofr_string_from_parts, valid_float_from_sci_string_triple,
     valid_float_get_str_quadruple, valid_strtofr_quadruple,
 };
 use crate::test_util::generators::exhaustive::{
-    add_prec_round_valid, add_rational_prec_round_valid, add_rational_round_valid, add_round_valid,
-    agm_prec_round_valid, agm_rational_prec_round_valid, agm_round_valid, average_prec_round_valid,
+    add_mul_prec_round_valid, add_mul_round_valid, add_prec_round_valid,
+    add_rational_prec_round_valid, add_rational_round_valid, add_round_valid, agm_prec_round_valid,
+    agm_rational_prec_round_valid, agm_round_valid, average_prec_round_valid,
     cbrt_prec_round_valid, cbrt_round_valid, div_prec_round_valid, div_rational_prec_round_valid,
     div_rational_round_valid, div_round_valid, exp_prec_round_valid, exp_rational_prec_round_valid,
     exp_round_valid, float_to_sci_options_valid, from_primitive_float_prec_round_valid,
@@ -1897,6 +1898,216 @@ pub fn special_random_float_float_unsigned_rounding_mode_quadruple_gen_var_23(
             &random_rounding_modes,
         )
         .filter(|(x, y, prec, rm)| positive_difference_prec_round_valid(x, y, *prec, *rm)),
+    )
+}
+
+// -- (Float, Float, Float, PrimitiveUnsigned) --
+
+pub fn special_random_float_float_float_unsigned_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(Float, Float, Float, u64)> {
+    Box::new(random_quadruples_xxxy(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_floats(
+                seed,
+                config.get_or("mean_exponent_n", 64),
+                config.get_or("mean_exponent_d", 1),
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_precision_n", 64),
+                config.get_or("mean_precision_d", 1),
+                config.get_or("mean_zero_p_n", 1),
+                config.get_or("mean_zero_p_d", 64),
+            )
+        },
+        &|seed| {
+            geometric_random_positive_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn special_random_float_float_float_rounding_mode_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(Float, Float, Float, RoundingMode)> {
+    Box::new(
+        random_quadruples_xxxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(x, y, z, rm)| add_mul_round_valid(x, y, z, *rm, false)),
+    )
+}
+
+pub fn special_random_float_float_float_rounding_mode_quadruple_gen_var_2(
+    config: &GenConfig,
+) -> It<(Float, Float, Float, RoundingMode)> {
+    Box::new(
+        random_quadruples_xxxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(x, y, z, rm)| add_mul_round_valid(x, y, z, *rm, true)),
+    )
+}
+
+// -- (Float, Float, Float, PrimitiveUnsigned, RoundingMode) --
+
+pub fn special_random_float_float_float_unsigned_rounding_mode_quintuple_gen_var_1(
+    config: &GenConfig,
+) -> It<(Float, Float, Float, u64, RoundingMode)> {
+    Box::new(
+        random_quintuples_xxxyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(x, y, z, prec, rm)| add_mul_prec_round_valid(x, y, z, *prec, *rm, false)),
+    )
+}
+
+pub fn special_random_float_float_float_unsigned_rounding_mode_quintuple_gen_var_2(
+    config: &GenConfig,
+) -> It<(Float, Float, Float, u64, RoundingMode)> {
+    Box::new(
+        random_quintuples_xxxyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_mixed_extreme_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(x, y, z, prec, rm)| add_mul_prec_round_valid(x, y, z, *prec, *rm, false)),
+    )
+}
+
+pub fn special_random_float_float_float_unsigned_rounding_mode_quintuple_gen_var_3(
+    config: &GenConfig,
+) -> It<(Float, Float, Float, u64, RoundingMode)> {
+    Box::new(
+        random_quintuples_xxxyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(x, y, z, prec, rm)| add_mul_prec_round_valid(x, y, z, *prec, *rm, true)),
+    )
+}
+
+pub fn special_random_float_float_float_unsigned_rounding_mode_quintuple_gen_var_4(
+    config: &GenConfig,
+) -> It<(Float, Float, Float, u64, RoundingMode)> {
+    Box::new(
+        random_quintuples_xxxyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_mixed_extreme_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(x, y, z, prec, rm)| add_mul_prec_round_valid(x, y, z, *prec, *rm, true)),
     )
 }
 

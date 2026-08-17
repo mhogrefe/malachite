@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 pub mod add;
+pub mod add_mul;
 pub mod agm;
 pub mod div;
 pub mod exp;
@@ -47,3 +48,4 @@ pub mod shr_round;
 pub mod sqrt;
 pub mod square;
 pub mod sub;
+pub mod sub_mul;

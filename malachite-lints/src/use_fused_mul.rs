@@ -29,12 +29,15 @@ declare_lint! {
     ///
     /// ### Known problems
     ///
-    /// Only the bignums are flagged for the operator forms. Primitive integers are excluded
-    /// because the rewrite is not sound: `add_mul` and its relatives wrap on overflow, whereas
-    /// `x + y * z` panics in a debug build, so it would silently trade an overflow check for
-    /// wrapping; on those types the lint flags an explicitly wrapping composition instead, which
-    /// the fused operation matches exactly. Primitive floats are excluded because their
-    /// `add_mul` is defined as `self + y * z`, so it saves nothing.
+    /// Only the exact bignums are flagged for the operator forms. Primitive integers are
+    /// excluded because the rewrite is not sound: `add_mul` and its relatives wrap on overflow,
+    /// whereas `x + y * z` panics in a debug build, so it would silently trade an overflow check
+    /// for wrapping; on those types the lint flags an explicitly wrapping composition instead,
+    /// which the fused operation matches exactly. Primitive floats are excluded because their
+    /// `add_mul` is defined as `self + y * z`, so it saves nothing. `Float` is excluded because
+    /// its fused operations are not the same value spelled differently: they round once instead
+    /// of twice, and pay for the exact product, so the choice between the spellings is a
+    /// semantic one that the lint must not make.
     ///
     /// ### Example
     ///
@@ -58,8 +61,8 @@ const TRAIT_ROOT: &str = "malachite_base::num::arithmetic::traits";
 
 // Whether rewriting the operator form is both sound and worth doing for values of type `ty`.
 //
-// Only the bignums qualify. They cannot overflow, so the fused form computes the same value, and
-// it avoids materializing the product -- an allocation and a pass over the limbs.
+// Only the exact bignums qualify. They cannot overflow, so the fused form computes the same
+// value, and it avoids materializing the product -- an allocation and a pass over the limbs.
 //
 // Primitive integers are excluded because the rewrite is not sound: `add_mul` and its relatives
 // wrap, while `x + y * z` panics in a debug build. They are covered instead by the `wrapping_*`
@@ -68,8 +71,15 @@ const TRAIT_ROOT: &str = "malachite_base::num::arithmetic::traits";
 // Primitive floats are excluded because there is nothing to gain: their `add_mul` is defined as
 // `self + y * z`, so it neither fuses the rounding nor saves any work, and insisting on it would
 // only make expressions like a polynomial evaluation harder to read.
+//
+// `Float` is excluded even though it has the fused traits, for the opposite reasons on both
+// axes: its fused operations compute a different value (the product enters the addition exactly,
+// with a single rounding at the end), and they cost more, not less (the exact product must be
+// computed in full, where the rounded `*` uses the short-product kernel). Rewriting would
+// silently change numeric results while pessimizing the code; reaching for `Float`'s fused
+// operations is an accuracy decision for the author to make explicitly.
 fn operator_form_is_worthwhile<'tcx>(cx: &LateContext<'tcx>, ty: Ty<'tcx>) -> bool {
-    crate::bignum_name(cx, ty).is_some()
+    crate::bignum_name(cx, ty).is_some_and(|name| name != "Float")
 }
 
 // Whether any impl of the trait named by `path` has `ty` as its self type, ignoring references and
