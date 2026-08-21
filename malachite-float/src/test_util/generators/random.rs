@@ -14,9 +14,10 @@ use crate::float::random::{
     random_positive_floats_with_precision,
 };
 use crate::test_util::extra_variadic::{
-    random_quadruples, random_quadruples_xxxy, random_quadruples_xxyz, random_quintuples_xxxyz,
-    random_quintuples_xxyzw, random_triples, random_triples_from_single, random_triples_xxy,
-    random_triples_xyy,
+    random_quadruples, random_quadruples_from_single, random_quadruples_xxxy,
+    random_quadruples_xxyz, random_quintuples_xxxxy, random_quintuples_xxxyz,
+    random_quintuples_xxyzw, random_sextuples_xxxxyz, random_sextuples_xxxyzw, random_triples,
+    random_triples_from_single, random_triples_xxy, random_triples_xyy,
 };
 use crate::test_util::generators::common::{
     FLOAT_FORMAT_COMBO_COUNT, SCI_STRING_COMBO_COUNT, STRTOFR_COMBO_COUNT, STRTOFR_STRING_CHARS,
@@ -49,7 +50,9 @@ use crate::test_util::generators::exhaustive::{
     log_base_rational_float_base_prec_round_valid, log_base_rational_prec_round_valid,
     log_base_rational_rational_base_prec_round_valid, log_base_round_valid, max_prec_round_valid,
     min_max_rational_prec_round_valid, min_max_rational_round_valid, min_prec_round_valid,
-    mul_prec_round_valid, mul_rational_prec_round_valid, mul_rational_round_valid, mul_round_valid,
+    mul_add_mul_prec_round_valid, mul_add_mul_rational_prec_round_valid,
+    mul_add_mul_rational_round_valid, mul_add_mul_round_valid, mul_prec_round_valid,
+    mul_rational_prec_round_valid, mul_rational_round_valid, mul_round_valid,
     natural_rounding_from_float_valid, positive_difference_prec_round_valid,
     positive_difference_rational_prec_round_valid, positive_difference_rational_round_valid,
     positive_difference_round_valid, pow_integer_prec_round_valid, pow_rational_prec_round_valid,
@@ -1885,6 +1888,226 @@ pub fn random_float_float_unsigned_rounding_mode_quadruple_gen_var_23(
     )
 }
 
+// -- (Float, Float, Float, Float) --
+
+pub fn random_float_quadruple_gen(config: &GenConfig) -> It<(Float, Float, Float, Float)> {
+    Box::new(random_quadruples_from_single(random_floats(
+        EXAMPLE_SEED,
+        config.get_or("mean_exponent_n", 64),
+        config.get_or("mean_exponent_d", 1),
+        config.get_or("mean_precision_n", 64),
+        config.get_or("mean_precision_d", 1),
+        config.get_or("mean_zero_p_n", 1),
+        config.get_or("mean_zero_p_d", 64),
+    )))
+}
+
+// -- (Float, Float, Float, Float, PrimitiveUnsigned) --
+
+pub fn random_float_float_float_float_unsigned_quintuple_gen_var_1(
+    config: &GenConfig,
+) -> It<(Float, Float, Float, Float, u64)> {
+    Box::new(random_quintuples_xxxxy(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_floats(
+                seed,
+                config.get_or("mean_exponent_n", 64),
+                config.get_or("mean_exponent_d", 1),
+                config.get_or("mean_precision_n", 64),
+                config.get_or("mean_precision_d", 1),
+                config.get_or("mean_zero_p_n", 1),
+                config.get_or("mean_zero_p_d", 64),
+            )
+        },
+        &|seed| {
+            geometric_random_positive_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
+// -- (Float, Float, Float, Float, PrimitiveUnsigned, RoundingMode) --
+
+pub fn random_float_float_float_float_unsigned_rounding_mode_sextuple_gen_var_1(
+    config: &GenConfig,
+) -> It<(Float, Float, Float, Float, u64, RoundingMode)> {
+    Box::new(
+        random_sextuples_xxxxyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(a, b, c, d, prec, rm)| {
+            mul_add_mul_prec_round_valid(a, b, c, d, *prec, *rm, false)
+        }),
+    )
+}
+
+pub fn random_float_float_float_float_unsigned_rounding_mode_sextuple_gen_var_2(
+    config: &GenConfig,
+) -> It<(Float, Float, Float, Float, u64, RoundingMode)> {
+    Box::new(
+        random_sextuples_xxxxyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_mixed_extreme_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(a, b, c, d, prec, rm)| {
+            mul_add_mul_prec_round_valid(a, b, c, d, *prec, *rm, false)
+        }),
+    )
+}
+
+pub fn random_float_float_float_float_unsigned_rounding_mode_sextuple_gen_var_3(
+    config: &GenConfig,
+) -> It<(Float, Float, Float, Float, u64, RoundingMode)> {
+    Box::new(
+        random_sextuples_xxxxyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(a, b, c, d, prec, rm)| {
+            mul_add_mul_prec_round_valid(a, b, c, d, *prec, *rm, true)
+        }),
+    )
+}
+
+pub fn random_float_float_float_float_unsigned_rounding_mode_sextuple_gen_var_4(
+    config: &GenConfig,
+) -> It<(Float, Float, Float, Float, u64, RoundingMode)> {
+    Box::new(
+        random_sextuples_xxxxyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_mixed_extreme_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(a, b, c, d, prec, rm)| {
+            mul_add_mul_prec_round_valid(a, b, c, d, *prec, *rm, true)
+        }),
+    )
+}
+
+// -- (Float, Float, Float, Float, RoundingMode) --
+
+pub fn random_float_float_float_float_rounding_mode_quintuple_gen_var_1(
+    config: &GenConfig,
+) -> It<(Float, Float, Float, Float, RoundingMode)> {
+    Box::new(
+        random_quintuples_xxxxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(a, b, c, d, rm)| mul_add_mul_round_valid(a, b, c, d, *rm, false)),
+    )
+}
+
+pub fn random_float_float_float_float_rounding_mode_quintuple_gen_var_2(
+    config: &GenConfig,
+) -> It<(Float, Float, Float, Float, RoundingMode)> {
+    Box::new(
+        random_quintuples_xxxxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(a, b, c, d, rm)| mul_add_mul_round_valid(a, b, c, d, *rm, true)),
+    )
+}
+
 // -- (Float, Float, Float, PrimitiveUnsigned) --
 
 pub fn random_float_float_float_unsigned_quadruple_gen_var_1(
@@ -2078,6 +2301,241 @@ pub fn random_float_float_float_unsigned_rounding_mode_quintuple_gen_var_4(
             &random_rounding_modes,
         )
         .filter(|(x, y, z, prec, rm)| add_mul_prec_round_valid(x, y, z, *prec, *rm, true)),
+    )
+}
+
+// -- (Float, Float, Float, Rational) --
+
+pub fn random_float_float_float_rational_quadruple_gen(
+    config: &GenConfig,
+) -> It<(Float, Float, Float, Rational)> {
+    Box::new(random_quadruples_xxxy(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_floats(
+                seed,
+                config.get_or("mean_exponent_n", 64),
+                config.get_or("mean_exponent_d", 1),
+                config.get_or("mean_precision_n", 64),
+                config.get_or("mean_precision_d", 1),
+                config.get_or("mean_zero_p_n", 1),
+                config.get_or("mean_zero_p_d", 64),
+            )
+        },
+        &|seed| random_rationals(seed, 32, 1),
+    ))
+}
+
+// -- (Float, Float, Float, Rational, PrimitiveUnsigned) --
+
+pub fn random_float_float_float_rational_unsigned_quintuple_gen_var_1(
+    config: &GenConfig,
+) -> It<(Float, Float, Float, Rational, u64)> {
+    Box::new(random_quintuples_xxxyz(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_floats(
+                seed,
+                config.get_or("mean_exponent_n", 64),
+                config.get_or("mean_exponent_d", 1),
+                config.get_or("mean_precision_n", 64),
+                config.get_or("mean_precision_d", 1),
+                config.get_or("mean_zero_p_n", 1),
+                config.get_or("mean_zero_p_d", 64),
+            )
+        },
+        &|seed| random_rationals(seed, 32, 1),
+        &|seed| {
+            geometric_random_positive_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
+// -- (Float, Float, Float, Rational, PrimitiveUnsigned, RoundingMode) --
+
+pub fn random_float_float_float_rational_unsigned_rounding_mode_sextuple_gen_var_1(
+    config: &GenConfig,
+) -> It<(Float, Float, Float, Rational, u64, RoundingMode)> {
+    Box::new(
+        random_sextuples_xxxyzw(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| random_rationals(seed, 32, 1),
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(x, y, z, w, prec, rm)| {
+            mul_add_mul_rational_prec_round_valid(x, y, z, w, *prec, *rm, false)
+        }),
+    )
+}
+
+pub fn random_float_float_float_rational_unsigned_rounding_mode_sextuple_gen_var_2(
+    config: &GenConfig,
+) -> It<(Float, Float, Float, Rational, u64, RoundingMode)> {
+    Box::new(
+        random_sextuples_xxxyzw(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_mixed_extreme_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| random_rationals(seed, 32, 1),
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(x, y, z, w, prec, rm)| {
+            mul_add_mul_rational_prec_round_valid(x, y, z, w, *prec, *rm, false)
+        }),
+    )
+}
+
+pub fn random_float_float_float_rational_unsigned_rounding_mode_sextuple_gen_var_3(
+    config: &GenConfig,
+) -> It<(Float, Float, Float, Rational, u64, RoundingMode)> {
+    Box::new(
+        random_sextuples_xxxyzw(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| random_rationals(seed, 32, 1),
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(x, y, z, w, prec, rm)| {
+            mul_add_mul_rational_prec_round_valid(x, y, z, w, *prec, *rm, true)
+        }),
+    )
+}
+
+pub fn random_float_float_float_rational_unsigned_rounding_mode_sextuple_gen_var_4(
+    config: &GenConfig,
+) -> It<(Float, Float, Float, Rational, u64, RoundingMode)> {
+    Box::new(
+        random_sextuples_xxxyzw(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_mixed_extreme_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| random_rationals(seed, 32, 1),
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(x, y, z, w, prec, rm)| {
+            mul_add_mul_rational_prec_round_valid(x, y, z, w, *prec, *rm, true)
+        }),
+    )
+}
+
+// -- (Float, Float, Float, Rational, RoundingMode) --
+
+pub fn random_float_float_float_rational_rounding_mode_quintuple_gen_var_1(
+    config: &GenConfig,
+) -> It<(Float, Float, Float, Rational, RoundingMode)> {
+    Box::new(
+        random_quintuples_xxxyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| random_rationals(seed, 32, 1),
+            &random_rounding_modes,
+        )
+        .filter(|(x, y, z, w, rm)| mul_add_mul_rational_round_valid(x, y, z, w, *rm, false)),
+    )
+}
+
+pub fn random_float_float_float_rational_rounding_mode_quintuple_gen_var_2(
+    config: &GenConfig,
+) -> It<(Float, Float, Float, Rational, RoundingMode)> {
+    Box::new(
+        random_quintuples_xxxyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| random_rationals(seed, 32, 1),
+            &random_rounding_modes,
+        )
+        .filter(|(x, y, z, w, rm)| mul_add_mul_rational_round_valid(x, y, z, w, *rm, true)),
     )
 }
 

@@ -381,6 +381,72 @@ pub fn pair_2_quadruple_1_2_3_4_float_float_float_primitive_int_max_complexity_b
     }
 }
 
+pub fn sextuple_1_2_3_4_float_float_float_rational_max_complexity_bucketer<'a, T, U>(
+    a_name: &'a str,
+    b_name: &'a str,
+    c_name: &'a str,
+    d_name: &'a str,
+) -> Bucketer<'a, (Float, Float, Float, Rational, T, U)> {
+    Bucketer {
+        bucketing_function: &|(a, b, c, d, _, _)| {
+            usize::exact_from(max!(
+                a.complexity(),
+                b.complexity(),
+                c.complexity(),
+                d.significant_bits()
+            ))
+        },
+        bucketing_label: format!(
+            "max({a_name}.complexity(), {b_name}.complexity(), {c_name}.complexity(), \
+            {d_name}.significant_bits())"
+        ),
+    }
+}
+
+pub fn sextuple_1_2_3_4_float_max_complexity_bucketer<'a, T, U>(
+    a_name: &'a str,
+    b_name: &'a str,
+    c_name: &'a str,
+    d_name: &'a str,
+) -> Bucketer<'a, (Float, Float, Float, Float, T, U)> {
+    Bucketer {
+        bucketing_function: &|(a, b, c, d, _, _)| {
+            usize::exact_from(max!(
+                a.complexity(),
+                b.complexity(),
+                c.complexity(),
+                d.complexity()
+            ))
+        },
+        bucketing_label: format!(
+            "max({a_name}.complexity(), {b_name}.complexity(), {c_name}.complexity(), \
+            {d_name}.complexity())"
+        ),
+    }
+}
+
+pub fn pair_2_sextuple_1_2_3_4_float_max_complexity_bucketer<'a, T, U, V>(
+    a_name: &'a str,
+    b_name: &'a str,
+    c_name: &'a str,
+    d_name: &'a str,
+) -> Bucketer<'a, (V, (Float, Float, Float, Float, T, U))> {
+    Bucketer {
+        bucketing_function: &|(_, (a, b, c, d, _, _))| {
+            usize::exact_from(max!(
+                a.complexity(),
+                b.complexity(),
+                c.complexity(),
+                d.complexity()
+            ))
+        },
+        bucketing_label: format!(
+            "max({a_name}.complexity(), {b_name}.complexity(), {c_name}.complexity(), \
+            {d_name}.complexity())"
+        ),
+    }
+}
+
 pub fn quintuple_1_2_3_float_float_rational_max_complexity_bucketer<'a, T, U>(
     x_name: &'a str,
     y_name: &'a str,

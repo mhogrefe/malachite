@@ -240,6 +240,16 @@ pub mod log_base_rational_rational_base;
 /// Multiplication of [`Float`](super::Float)s, and of [`Float`](super::Float)s with
 /// [`Rational`](malachite_q::Rational)s.
 pub mod mul;
+/// [`MulAddMul`](malachite_base::num::arithmetic::traits::MulAddMul) and
+/// [`MulAddMulAssign`](malachite_base::num::arithmetic::traits::MulAddMulAssign), traits for adding
+/// the products of two pairs of [`Float`](super::Float)s with a single rounding, and the associated
+/// precision- and rounding-mode-aware functions.
+pub mod mul_add_mul;
+/// [`MulSubMul`](malachite_base::num::arithmetic::traits::MulSubMul) and
+/// [`MulSubMulAssign`](malachite_base::num::arithmetic::traits::MulSubMulAssign), traits for
+/// subtracting the product of one pair of [`Float`](super::Float)s from the product of another pair
+/// with a single rounding, and the associated precision- and rounding-mode-aware functions.
+pub mod mul_sub_mul;
 /// Negation of [`Float`](super::Float)s.
 pub mod neg;
 /// [`positive_difference_prec_round`](super::Float::positive_difference_prec_round) and related

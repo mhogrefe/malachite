@@ -513,8 +513,8 @@ operands do not even need the recipe: the operators take them directly, through 
 | ✓ | `int mpfr_fac_ui (mpfr_t rop, unsigned long int op, mpfr_rnd_t rnd)` | [`factorial_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.factorial_prec_round) |
 | ✓ | `int mpfr_fma (mpfr_t rop, mpfr_t op1, mpfr_t op2, mpfr_t op3, mpfr_rnd_t rnd)` | [`add_mul_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.add_mul_prec_round) |
 | ✓ | `int mpfr_fms (mpfr_t rop, mpfr_t op1, mpfr_t op2, mpfr_t op3, mpfr_rnd_t rnd)` | [`sub_mul_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.sub_mul_prec_round) |
-| ✗ | `int mpfr_fmma (mpfr_t rop, mpfr_t op1, mpfr_t op2, mpfr_t op3, mpfr_t op4, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_fmms (mpfr_t rop, mpfr_t op1, mpfr_t op2, mpfr_t op3, mpfr_t op4, mpfr_rnd_t rnd)` | |
+| ✓ | `int mpfr_fmma (mpfr_t rop, mpfr_t op1, mpfr_t op2, mpfr_t op3, mpfr_t op4, mpfr_rnd_t rnd)` | [`mul_add_mul_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.mul_add_mul_prec_round) |
+| ✓ | `int mpfr_fmms (mpfr_t rop, mpfr_t op1, mpfr_t op2, mpfr_t op3, mpfr_t op4, mpfr_rnd_t rnd)` | [`mul_sub_mul_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.mul_sub_mul_prec_round) |
 | ✗ | `int mpfr_hypot (mpfr_t rop, mpfr_t x, mpfr_t y, mpfr_rnd_t rnd)` | |
 | ✗ | `int mpfr_sum (mpfr_t rop, const mpfr_ptr tab[], unsigned long int n, mpfr_rnd_t rnd)` | |
 | ✗ | `int mpfr_dot (mpfr_t rop, const mpfr_ptr a[], const mpfr_ptr b[], unsigned long int n, mpfr_rnd_t rnd)` | |
@@ -609,10 +609,26 @@ would perturb the result by the other multiplicand times the conversion error. A
 `Rational` multiplication is exact, so composing it with the mixed addition forms already
 yields a single rounding.
 
-`mpfr_fmma` and `mpfr_fmms`, the singly rounded $$op1 \cdot op2 \pm op3 \cdot op4$$, remain
-gaps. The exact counterparts of that double-product pair exist on
-[the FLINT integers page](/mapping/flint-integers/#basic-arithmetic), but they do not carry
-over: for exact integers fusing is about the temporary, while here it is about the rounding.
+`mpfr_fmma` and `mpfr_fmms`, the singly rounded $$op1 \cdot op2 \pm op3 \cdot op4$$, are the
+[`mul_add_mul_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.mul_add_mul_prec_round)
+and
+[`mul_sub_mul_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.mul_sub_mul_prec_round)
+families, with the
+[`MulAddMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.MulAddMul.html)
+and
+[`MulSubMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.MulSubMul.html)
+traits at the plain level; here the argument orders agree exactly, with no reordering or sign
+adjustment. The exact counterparts of the double-product pair on
+[the FLINT integers page](/mapping/flint-integers/#basic-arithmetic) fuse for the temporary,
+while these fuse for the rounding. Beyond MPFR, these families also come in mixed
+`Float`-`Rational` forms
+([`mul_add_mul_rational_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.mul_add_mul_rational_prec_round)
+and
+[`mul_sub_mul_rational_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.mul_sub_mul_rational_prec_round)),
+in which a `Rational` in the second product enters exactly; since each product's factors
+commute and the products of the additive form commute with each other, this one placement
+covers every one-`Rational` variant of the sum, and the subtractive variants follow by exact
+negation.
 
 **`mpfr_hypot`.** The Euclidean norm $$\sqrt{x^2 + y^2}$$, with the C99 special-value rule that
 an infinite operand gives $$+\infty$$ "even if the other number is NaN", is a gap.

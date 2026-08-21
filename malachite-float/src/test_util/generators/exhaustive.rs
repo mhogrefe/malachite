@@ -23,8 +23,10 @@ use crate::float::exhaustive::{
     exhaustive_positive_floats_with_precision, exhaustive_positive_floats_with_sci_exponent,
 };
 use crate::test_util::extra_variadic::{
-    exhaustive_quadruples_xxxy_custom_output, exhaustive_quadruples_xxyz_custom_output,
-    exhaustive_triples_from_single, exhaustive_triples_xxy, exhaustive_triples_xxy_custom_output,
+    exhaustive_quadruples_from_single, exhaustive_quadruples_xxxy_custom_output,
+    exhaustive_quadruples_xxyz_custom_output, exhaustive_quintuples_xxxxy_custom_output,
+    exhaustive_quintuples_xxxyz_custom_output, exhaustive_triples_from_single,
+    exhaustive_triples_xxy, exhaustive_triples_xxy_custom_output,
 };
 use crate::test_util::generators::common::{
     FLOAT_FORMAT_COMBO_COUNT, SCI_STRING_COMBO_COUNT, STRTOFR_STRING_CHARS,
@@ -62,7 +64,7 @@ use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::strings::exhaustive::exhaustive_strings_using_chars;
 use malachite_base::test_util::generators::common::{
-    It, reshape_2_1_to_3, reshape_3_1_to_4, reshape_4_1_to_5,
+    It, reshape_2_1_to_3, reshape_3_1_to_4, reshape_4_1_to_5, reshape_5_1_to_6,
 };
 use malachite_base::test_util::generators::{exhaustive as base_gen, exhaustive_pairs_big_tiny};
 use malachite_base::tuples::exhaustive::{
@@ -1404,7 +1406,95 @@ pub fn exhaustive_float_float_unsigned_rounding_mode_quadruple_gen_var_23()
 
 // Whether `rm` is a valid rounding mode for computing `x` plus or minus (per `sub`) the product of
 // the `Float` `y` and the `Rational` `z` at precision `prec`: `Exact` is only valid when the
-// rounded result is exact, decided by a cheap `Floor` probe.
+// rounded result is exact, decided by a cheap `Floor` probe. Whether `rm` is a valid rounding mode
+// for computing a * b plus or minus (per `sub`) c * d at precision `prec`: `Exact` is only valid
+// when the rounded result is exact, decided by a cheap `Floor` probe. Whether `rm` is a valid
+// rounding mode for computing x * y plus or minus (per `sub`) z * w, with a `Rational` w, at
+// precision `prec`: `Exact` is only valid when the rounded result is exact, decided by a cheap
+// `Floor` probe.
+pub(crate) fn mul_add_mul_rational_prec_round_valid(
+    x: &Float,
+    y: &Float,
+    z: &Float,
+    w: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+    sub: bool,
+) -> bool {
+    rm != Exact
+        || if sub {
+            x.mul_sub_mul_rational_prec_round_ref_ref_ref_ref(y, z, w, prec, Floor)
+        } else {
+            x.mul_add_mul_rational_prec_round_ref_ref_ref_ref(y, z, w, prec, Floor)
+        }
+        .1 == Equal
+}
+
+pub(crate) fn mul_add_mul_rational_round_valid(
+    x: &Float,
+    y: &Float,
+    z: &Float,
+    w: &Rational,
+    rm: RoundingMode,
+    sub: bool,
+) -> bool {
+    mul_add_mul_rational_prec_round_valid(
+        x,
+        y,
+        z,
+        w,
+        max!(
+            x.significant_bits(),
+            y.significant_bits(),
+            z.significant_bits()
+        ),
+        rm,
+        sub,
+    )
+}
+
+pub(crate) fn mul_add_mul_prec_round_valid(
+    a: &Float,
+    b: &Float,
+    c: &Float,
+    d: &Float,
+    prec: u64,
+    rm: RoundingMode,
+    sub: bool,
+) -> bool {
+    rm != Exact
+        || if sub {
+            a.mul_sub_mul_prec_round_ref_ref_ref_ref(b, c, d, prec, Floor)
+        } else {
+            a.mul_add_mul_prec_round_ref_ref_ref_ref(b, c, d, prec, Floor)
+        }
+        .1 == Equal
+}
+
+pub(crate) fn mul_add_mul_round_valid(
+    a: &Float,
+    b: &Float,
+    c: &Float,
+    d: &Float,
+    rm: RoundingMode,
+    sub: bool,
+) -> bool {
+    mul_add_mul_prec_round_valid(
+        a,
+        b,
+        c,
+        d,
+        max!(
+            a.significant_bits(),
+            b.significant_bits(),
+            c.significant_bits(),
+            d.significant_bits()
+        ),
+        rm,
+        sub,
+    )
+}
+
 pub(crate) fn add_mul_rational_prec_round_valid(
     x: &Float,
     y: &Float,
@@ -1563,6 +1653,295 @@ pub fn exhaustive_float_float_float_unsigned_rounding_mode_quintuple_gen_var_4()
             exhaustive_rounding_modes(),
         )))
         .filter(|(x, y, z, prec, rm)| add_mul_prec_round_valid(x, y, z, *prec, *rm, true)),
+    )
+}
+
+// -- (Float, Float, Float, Float) --
+
+pub fn exhaustive_float_quadruple_gen() -> It<(Float, Float, Float, Float)> {
+    Box::new(exhaustive_quadruples_from_single(exhaustive_floats()))
+}
+
+// -- (Float, Float, Float, Float, PrimitiveUnsigned) --
+
+pub fn exhaustive_float_float_float_float_unsigned_quintuple_gen_var_1()
+-> It<(Float, Float, Float, Float, u64)> {
+    Box::new(exhaustive_quintuples_xxxxy_custom_output(
+        exhaustive_floats(),
+        exhaustive_positive_primitive_ints::<u64>(),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::tiny(),
+    ))
+}
+
+// -- (Float, Float, Float, Float, PrimitiveUnsigned, RoundingMode) --
+
+pub fn exhaustive_float_float_float_float_unsigned_rounding_mode_sextuple_gen_var_1()
+-> It<(Float, Float, Float, Float, u64, RoundingMode)> {
+    Box::new(
+        reshape_5_1_to_6(Box::new(lex_pairs(
+            exhaustive_quintuples_xxxxy_custom_output(
+                exhaustive_floats(),
+                exhaustive_positive_primitive_ints::<u64>(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(a, b, c, d, prec, rm)| {
+            mul_add_mul_prec_round_valid(a, b, c, d, *prec, *rm, false)
+        }),
+    )
+}
+
+pub fn exhaustive_float_float_float_float_unsigned_rounding_mode_sextuple_gen_var_2()
+-> It<(Float, Float, Float, Float, u64, RoundingMode)> {
+    Box::new(
+        reshape_5_1_to_6(Box::new(lex_pairs(
+            exhaustive_quintuples_xxxxy_custom_output(
+                exhaustive_mixed_extreme_floats(),
+                exhaustive_positive_primitive_ints::<u64>(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(a, b, c, d, prec, rm)| {
+            mul_add_mul_prec_round_valid(a, b, c, d, *prec, *rm, false)
+        }),
+    )
+}
+
+pub fn exhaustive_float_float_float_float_unsigned_rounding_mode_sextuple_gen_var_3()
+-> It<(Float, Float, Float, Float, u64, RoundingMode)> {
+    Box::new(
+        reshape_5_1_to_6(Box::new(lex_pairs(
+            exhaustive_quintuples_xxxxy_custom_output(
+                exhaustive_floats(),
+                exhaustive_positive_primitive_ints::<u64>(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(a, b, c, d, prec, rm)| {
+            mul_add_mul_prec_round_valid(a, b, c, d, *prec, *rm, true)
+        }),
+    )
+}
+
+pub fn exhaustive_float_float_float_float_unsigned_rounding_mode_sextuple_gen_var_4()
+-> It<(Float, Float, Float, Float, u64, RoundingMode)> {
+    Box::new(
+        reshape_5_1_to_6(Box::new(lex_pairs(
+            exhaustive_quintuples_xxxxy_custom_output(
+                exhaustive_mixed_extreme_floats(),
+                exhaustive_positive_primitive_ints::<u64>(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(a, b, c, d, prec, rm)| {
+            mul_add_mul_prec_round_valid(a, b, c, d, *prec, *rm, true)
+        }),
+    )
+}
+
+// -- (Float, Float, Float, Float, RoundingMode) --
+
+pub fn exhaustive_float_float_float_float_rounding_mode_quintuple_gen_var_1()
+-> It<(Float, Float, Float, Float, RoundingMode)> {
+    Box::new(
+        reshape_4_1_to_5(Box::new(lex_pairs(
+            exhaustive_quadruples_from_single(exhaustive_floats()),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(a, b, c, d, rm)| mul_add_mul_round_valid(a, b, c, d, *rm, false)),
+    )
+}
+
+pub fn exhaustive_float_float_float_float_rounding_mode_quintuple_gen_var_2()
+-> It<(Float, Float, Float, Float, RoundingMode)> {
+    Box::new(
+        reshape_4_1_to_5(Box::new(lex_pairs(
+            exhaustive_quadruples_from_single(exhaustive_floats()),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(a, b, c, d, rm)| mul_add_mul_round_valid(a, b, c, d, *rm, true)),
+    )
+}
+
+// -- (Float, Float, Float, Rational) --
+
+pub fn exhaustive_float_float_float_rational_quadruple_gen() -> It<(Float, Float, Float, Rational)>
+{
+    Box::new(exhaustive_quadruples_xxxy_custom_output(
+        exhaustive_floats(),
+        exhaustive_rationals(),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::normal(1),
+    ))
+}
+
+// -- (Float, Float, Float, Rational, PrimitiveUnsigned) --
+
+pub fn exhaustive_float_float_float_rational_unsigned_quintuple_gen_var_1()
+-> It<(Float, Float, Float, Rational, u64)> {
+    Box::new(exhaustive_quintuples_xxxyz_custom_output(
+        exhaustive_floats(),
+        exhaustive_rationals(),
+        exhaustive_positive_primitive_ints::<u64>(),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::tiny(),
+    ))
+}
+
+// -- (Float, Float, Float, Rational, PrimitiveUnsigned, RoundingMode) --
+
+pub fn exhaustive_float_float_float_rational_unsigned_rounding_mode_sextuple_gen_var_1()
+-> It<(Float, Float, Float, Rational, u64, RoundingMode)> {
+    Box::new(
+        reshape_5_1_to_6(Box::new(lex_pairs(
+            exhaustive_quintuples_xxxyz_custom_output(
+                exhaustive_floats(),
+                exhaustive_rationals(),
+                exhaustive_positive_primitive_ints::<u64>(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, z, w, prec, rm)| {
+            mul_add_mul_rational_prec_round_valid(x, y, z, w, *prec, *rm, false)
+        }),
+    )
+}
+
+pub fn exhaustive_float_float_float_rational_unsigned_rounding_mode_sextuple_gen_var_2()
+-> It<(Float, Float, Float, Rational, u64, RoundingMode)> {
+    Box::new(
+        reshape_5_1_to_6(Box::new(lex_pairs(
+            exhaustive_quintuples_xxxyz_custom_output(
+                exhaustive_mixed_extreme_floats(),
+                exhaustive_rationals(),
+                exhaustive_positive_primitive_ints::<u64>(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, z, w, prec, rm)| {
+            mul_add_mul_rational_prec_round_valid(x, y, z, w, *prec, *rm, false)
+        }),
+    )
+}
+
+pub fn exhaustive_float_float_float_rational_unsigned_rounding_mode_sextuple_gen_var_3()
+-> It<(Float, Float, Float, Rational, u64, RoundingMode)> {
+    Box::new(
+        reshape_5_1_to_6(Box::new(lex_pairs(
+            exhaustive_quintuples_xxxyz_custom_output(
+                exhaustive_floats(),
+                exhaustive_rationals(),
+                exhaustive_positive_primitive_ints::<u64>(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, z, w, prec, rm)| {
+            mul_add_mul_rational_prec_round_valid(x, y, z, w, *prec, *rm, true)
+        }),
+    )
+}
+
+pub fn exhaustive_float_float_float_rational_unsigned_rounding_mode_sextuple_gen_var_4()
+-> It<(Float, Float, Float, Rational, u64, RoundingMode)> {
+    Box::new(
+        reshape_5_1_to_6(Box::new(lex_pairs(
+            exhaustive_quintuples_xxxyz_custom_output(
+                exhaustive_mixed_extreme_floats(),
+                exhaustive_rationals(),
+                exhaustive_positive_primitive_ints::<u64>(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, z, w, prec, rm)| {
+            mul_add_mul_rational_prec_round_valid(x, y, z, w, *prec, *rm, true)
+        }),
+    )
+}
+
+// -- (Float, Float, Float, Rational, RoundingMode) --
+
+pub fn exhaustive_float_float_float_rational_rounding_mode_quintuple_gen_var_1()
+-> It<(Float, Float, Float, Rational, RoundingMode)> {
+    Box::new(
+        reshape_4_1_to_5(Box::new(lex_pairs(
+            exhaustive_quadruples_xxxy_custom_output(
+                exhaustive_floats(),
+                exhaustive_rationals(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, z, w, rm)| mul_add_mul_rational_round_valid(x, y, z, w, *rm, false)),
+    )
+}
+
+pub fn exhaustive_float_float_float_rational_rounding_mode_quintuple_gen_var_2()
+-> It<(Float, Float, Float, Rational, RoundingMode)> {
+    Box::new(
+        reshape_4_1_to_5(Box::new(lex_pairs(
+            exhaustive_quadruples_xxxy_custom_output(
+                exhaustive_floats(),
+                exhaustive_rationals(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, z, w, rm)| mul_add_mul_rational_round_valid(x, y, z, w, *rm, true)),
     )
 }
 

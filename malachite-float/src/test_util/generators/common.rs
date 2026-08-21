@@ -509,6 +509,109 @@ pub fn float_rational_rounding_mode_triple_rm(
     }))
 }
 
+#[allow(clippy::type_complexity)]
+pub fn float_float_float_float_quadruple_rm(
+    xs: It<(Float, Float, Float, Float)>,
+) -> It<(
+    (rug::Float, rug::Float, rug::Float, rug::Float),
+    (Float, Float, Float, Float),
+)> {
+    Box::new(xs.map(|(a, b, c, d)| {
+        (
+            (
+                rug::Float::exact_from(&a),
+                rug::Float::exact_from(&b),
+                rug::Float::exact_from(&c),
+                rug::Float::exact_from(&d),
+            ),
+            (a, b, c, d),
+        )
+    }))
+}
+
+#[allow(clippy::type_complexity)]
+pub fn float_float_float_float_anything_quintuple_rm<T: Clone + 'static>(
+    xs: It<(Float, Float, Float, Float, T)>,
+) -> It<(
+    (rug::Float, rug::Float, rug::Float, rug::Float, T),
+    (Float, Float, Float, Float, T),
+)> {
+    Box::new(xs.map(|(a, b, c, d, w)| {
+        (
+            (
+                rug::Float::exact_from(&a),
+                rug::Float::exact_from(&b),
+                rug::Float::exact_from(&c),
+                rug::Float::exact_from(&d),
+                w.clone(),
+            ),
+            (a, b, c, d, w),
+        )
+    }))
+}
+
+#[allow(clippy::type_complexity)]
+pub fn float_float_float_float_rounding_mode_quintuple_rm(
+    xs: It<(Float, Float, Float, Float, RoundingMode)>,
+) -> It<(
+    (
+        rug::Float,
+        rug::Float,
+        rug::Float,
+        rug::Float,
+        rug::float::Round,
+    ),
+    (Float, Float, Float, Float, RoundingMode),
+)> {
+    Box::new(
+        xs.filter(|(_, _, _, _, rm)| *rm != Exact)
+            .map(|(a, b, c, d, rm)| {
+                (
+                    (
+                        rug::Float::exact_from(&a),
+                        rug::Float::exact_from(&b),
+                        rug::Float::exact_from(&c),
+                        rug::Float::exact_from(&d),
+                        rug_round_exact_from_rounding_mode(rm),
+                    ),
+                    (a, b, c, d, rm),
+                )
+            }),
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn float_float_float_float_anything_rounding_mode_sextuple_rm<T: Clone + 'static>(
+    xs: It<(Float, Float, Float, Float, T, RoundingMode)>,
+) -> It<(
+    (
+        rug::Float,
+        rug::Float,
+        rug::Float,
+        rug::Float,
+        T,
+        rug::float::Round,
+    ),
+    (Float, Float, Float, Float, T, RoundingMode),
+)> {
+    Box::new(
+        xs.filter(|(_, _, _, _, _, rm)| *rm != Exact)
+            .map(|(a, b, c, d, w, rm)| {
+                (
+                    (
+                        rug::Float::exact_from(&a),
+                        rug::Float::exact_from(&b),
+                        rug::Float::exact_from(&c),
+                        rug::Float::exact_from(&d),
+                        w.clone(),
+                        rug_round_exact_from_rounding_mode(rm),
+                    ),
+                    (a, b, c, d, w, rm),
+                )
+            }),
+    )
+}
+
 pub fn float_float_float_triple_rm(
     xs: It<(Float, Float, Float)>,
 ) -> It<((rug::Float, rug::Float, rug::Float), (Float, Float, Float))> {

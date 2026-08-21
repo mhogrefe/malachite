@@ -30,6 +30,8 @@ pub mod log_base_rational_base_1_plus_x;
 pub mod log_base_rational_float_base;
 pub mod log_base_rational_rational_base;
 pub mod mul;
+pub mod mul_add_mul;
+pub mod mul_sub_mul;
 pub mod positive_difference;
 pub mod pow;
 pub mod power_of_10;

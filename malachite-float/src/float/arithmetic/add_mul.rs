@@ -36,7 +36,7 @@ use malachite_q::Rational;
 const SURE_OVERFLOW_EXPONENT: i64 = Float::MAX_EXPONENT_I64 + 3;
 
 // The sign of a `Float` that is not NaN. `true` means positive.
-fn float_sign(x: &Float) -> bool {
+pub(crate) fn float_sign(x: &Float) -> bool {
     match x {
         Float(Infinity { sign } | Zero { sign } | Finite { sign, .. }) => *sign,
         _ => panic!(),
@@ -61,7 +61,7 @@ fn float_sign(x: &Float) -> bool {
 // flag that joins the final division's remainder, placing the computed value and the true value
 // strictly between the same rounding boundaries.
 #[allow(clippy::too_many_arguments)]
-fn add_scaled_round(
+pub(crate) fn add_scaled_round(
     sa: bool,
     ma: &Natural,
     ea: i64,
@@ -125,9 +125,10 @@ fn add_scaled_round(
     let vt = part(sp, mp, ep);
     let v = vd + vt;
     if v == 0 {
-        // Exact cancellation: unreachable from the Float-Float callers, which only come here when
-        // the product's magnitude range and the addend's are disjoint, but perfectly reachable from
-        // the mixed Float-Rational callers, as in 2 + 1 * (-2). The clamp cannot produce a zero,
+        // Exact cancellation: unreachable from the fma callers, which only come here when the
+        // product's magnitude range and the addend's are disjoint, but reachable from the mixed
+        // Float-Rational callers, as in 2 + 1 * (-2), and from the fmma callers, whose two products
+        // can cancel exactly even when both are out of range. The clamp cannot produce a zero,
         // since it only fires when the dominant operand towers over the other, so the sum is exact
         // here. The zero's sign follows the addition rule.
         return (
