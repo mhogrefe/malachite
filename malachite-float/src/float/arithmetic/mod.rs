@@ -165,6 +165,22 @@ pub mod factorial;
 /// Fractional parts of [`Float`](super::Float)s: the `fractional_part` and
 /// `integer_and_fractional_parts` families.
 pub mod fractional_part;
+/// [`Hypot`](malachite_base::num::arithmetic::traits::Hypot) and
+/// [`HypotAssign`](malachite_base::num::arithmetic::traits::HypotAssign), traits for computing the
+/// hypotenuse of two numbers, $\sqrt{x^2+y^2}$.
+///
+/// # hypot
+/// ```
+/// use core::f64::consts::{E, PI};
+/// use malachite_base::num::arithmetic::traits::Hypot;
+/// use malachite_float::Float;
+///
+/// assert_eq!(
+///     Float::from(PI).hypot(Float::from(E)).to_string(),
+///     "4.1543544023133130"
+/// );
+/// ```
+pub mod hypot;
 /// An implementation of [`IsPowerOf2`](malachite_base::num::arithmetic::traits::IsPowerOf2), a
 /// trait for determining whether a number is an integer power of 2.
 pub mod is_power_of_2;

@@ -125,6 +125,18 @@ pub trait AgmAssign<RHS = Self> {
     fn agm_assign(&mut self, other: RHS);
 }
 
+/// Calculates the hypotenuse of two numbers, $\sqrt{x^2+y^2}$.
+pub trait Hypot<RHS = Self> {
+    type Output;
+
+    fn hypot(self, other: RHS) -> Self::Output;
+}
+
+/// Replaces a number with the hypotenuse of it and another number.
+pub trait HypotAssign<RHS = Self> {
+    fn hypot_assign(&mut self, other: RHS);
+}
+
 /// Left-shifts a number (multiplies it by a power of 2), returning `None` if the result is not
 /// representable.
 pub trait ArithmeticCheckedShl<RHS> {

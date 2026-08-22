@@ -6644,8 +6644,7 @@ impl Float {
     /// is the maximum of the precisions of the inputs, consider using
     /// [`Float::mul_add_mul_rational_round_assign`] instead. If both of these things are true,
     /// consider using
-    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign)
-    /// instead.
+    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign) instead.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n + m)$
@@ -6735,8 +6734,7 @@ impl Float {
     /// is the maximum of the precisions of the inputs, consider using
     /// [`Float::mul_add_mul_rational_round_assign`] instead. If both of these things are true,
     /// consider using
-    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign)
-    /// instead.
+    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign) instead.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n + m)$
@@ -6832,8 +6830,7 @@ impl Float {
     /// is the maximum of the precisions of the inputs, consider using
     /// [`Float::mul_add_mul_rational_round_assign`] instead. If both of these things are true,
     /// consider using
-    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign)
-    /// instead.
+    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign) instead.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n + m)$
@@ -6929,8 +6926,7 @@ impl Float {
     /// is the maximum of the precisions of the inputs, consider using
     /// [`Float::mul_add_mul_rational_round_assign`] instead. If both of these things are true,
     /// consider using
-    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign)
-    /// instead.
+    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign) instead.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n + m)$
@@ -7020,8 +7016,7 @@ impl Float {
     /// is the maximum of the precisions of the inputs, consider using
     /// [`Float::mul_add_mul_rational_round_assign`] instead. If both of these things are true,
     /// consider using
-    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign)
-    /// instead.
+    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign) instead.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n + m)$
@@ -7117,8 +7112,7 @@ impl Float {
     /// is the maximum of the precisions of the inputs, consider using
     /// [`Float::mul_add_mul_rational_round_assign`] instead. If both of these things are true,
     /// consider using
-    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign)
-    /// instead.
+    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign) instead.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n + m)$
@@ -7208,8 +7202,7 @@ impl Float {
     /// is the maximum of the precisions of the inputs, consider using
     /// [`Float::mul_add_mul_rational_round_assign`] instead. If both of these things are true,
     /// consider using
-    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign)
-    /// instead.
+    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign) instead.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n + m)$
@@ -7299,8 +7292,7 @@ impl Float {
     /// is the maximum of the precisions of the inputs, consider using
     /// [`Float::mul_add_mul_rational_round_assign`] instead. If both of these things are true,
     /// consider using
-    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign)
-    /// instead.
+    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign) instead.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n + m)$
@@ -8231,8 +8223,7 @@ impl Float {
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::mul_add_mul_rational_prec_round_assign`] instead. If you know that your target
     /// precision is the maximum of the precisions of the inputs, consider using
-    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign)
-    /// instead.
+    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign) instead.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n + m)$
@@ -8306,8 +8297,7 @@ impl Float {
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::mul_add_mul_rational_prec_round_assign`] instead. If you know that your target
     /// precision is the maximum of the precisions of the inputs, consider using
-    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign)
-    /// instead.
+    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign) instead.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n + m)$
@@ -8384,8 +8374,7 @@ impl Float {
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::mul_add_mul_rational_prec_round_assign`] instead. If you know that your target
     /// precision is the maximum of the precisions of the inputs, consider using
-    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign)
-    /// instead.
+    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign) instead.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n + m)$
@@ -8462,8 +8451,7 @@ impl Float {
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::mul_add_mul_rational_prec_round_assign`] instead. If you know that your target
     /// precision is the maximum of the precisions of the inputs, consider using
-    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign)
-    /// instead.
+    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign) instead.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n + m)$
@@ -8534,8 +8522,7 @@ impl Float {
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::mul_add_mul_rational_prec_round_assign`] instead. If you know that your target
     /// precision is the maximum of the precisions of the inputs, consider using
-    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign)
-    /// instead.
+    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign) instead.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n + m)$
@@ -8612,8 +8599,7 @@ impl Float {
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::mul_add_mul_rational_prec_round_assign`] instead. If you know that your target
     /// precision is the maximum of the precisions of the inputs, consider using
-    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign)
-    /// instead.
+    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign) instead.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n + m)$
@@ -8684,8 +8670,7 @@ impl Float {
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::mul_add_mul_rational_prec_round_assign`] instead. If you know that your target
     /// precision is the maximum of the precisions of the inputs, consider using
-    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign)
-    /// instead.
+    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign) instead.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n + m)$
@@ -8756,8 +8741,7 @@ impl Float {
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::mul_add_mul_rational_prec_round_assign`] instead. If you know that your target
     /// precision is the maximum of the precisions of the inputs, consider using
-    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign)
-    /// instead.
+    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign) instead.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n + m)$
@@ -9930,8 +9914,7 @@ impl Float {
     /// If you want to specify an output precision, consider using
     /// [`Float::mul_add_mul_rational_prec_round_assign`] instead. If you know you'll be using the
     /// `Nearest` rounding mode, consider using
-    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign)
-    /// instead.
+    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign) instead.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n + m)$
@@ -10023,8 +10006,7 @@ impl Float {
     /// If you want to specify an output precision, consider using
     /// [`Float::mul_add_mul_rational_prec_round_assign`] instead. If you know you'll be using the
     /// `Nearest` rounding mode, consider using
-    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign)
-    /// instead.
+    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign) instead.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n + m)$
@@ -10116,8 +10098,7 @@ impl Float {
     /// If you want to specify an output precision, consider using
     /// [`Float::mul_add_mul_rational_prec_round_assign`] instead. If you know you'll be using the
     /// `Nearest` rounding mode, consider using
-    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign)
-    /// instead.
+    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign) instead.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n + m)$
@@ -10209,8 +10190,7 @@ impl Float {
     /// If you want to specify an output precision, consider using
     /// [`Float::mul_add_mul_rational_prec_round_assign`] instead. If you know you'll be using the
     /// `Nearest` rounding mode, consider using
-    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign)
-    /// instead.
+    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign) instead.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n + m)$
@@ -10299,8 +10279,7 @@ impl Float {
     /// If you want to specify an output precision, consider using
     /// [`Float::mul_add_mul_rational_prec_round_assign`] instead. If you know you'll be using the
     /// `Nearest` rounding mode, consider using
-    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign)
-    /// instead.
+    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign) instead.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n + m)$
@@ -10392,8 +10371,7 @@ impl Float {
     /// If you want to specify an output precision, consider using
     /// [`Float::mul_add_mul_rational_prec_round_assign`] instead. If you know you'll be using the
     /// `Nearest` rounding mode, consider using
-    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign)
-    /// instead.
+    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign) instead.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n + m)$
@@ -10482,8 +10460,7 @@ impl Float {
     /// If you want to specify an output precision, consider using
     /// [`Float::mul_add_mul_rational_prec_round_assign`] instead. If you know you'll be using the
     /// `Nearest` rounding mode, consider using
-    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign)
-    /// instead.
+    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign) instead.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n + m)$
@@ -10572,8 +10549,7 @@ impl Float {
     /// If you want to specify an output precision, consider using
     /// [`Float::mul_add_mul_rational_prec_round_assign`] instead. If you know you'll be using the
     /// `Nearest` rounding mode, consider using
-    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign)
-    /// instead.
+    /// [`mul_add_mul_assign`](malachite_base::num::arithmetic::traits::MulAddMulAssign) instead.
     ///
     /// # Worst-case complexity
     /// $T(n, m) = O(n \log n \log\log n + m)$

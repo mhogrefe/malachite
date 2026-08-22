@@ -1141,6 +1141,44 @@ pub fn exhaustive_float_float_unsigned_rounding_mode_quadruple_gen_var_10()
     )
 }
 
+pub fn hypot_prec_round_valid(x: &Float, y: &Float, prec: u64, rm: RoundingMode) -> bool {
+    rm != Exact || x.hypot_prec_round_ref_ref(y, prec, Floor).1 == Equal
+}
+
+pub fn exhaustive_float_float_unsigned_rounding_mode_quadruple_gen_var_24()
+-> It<(Float, Float, u64, RoundingMode)> {
+    Box::new(
+        reshape_3_1_to_4(Box::new(lex_pairs(
+            exhaustive_triples_xxy_custom_output(
+                exhaustive_floats(),
+                exhaustive_positive_primitive_ints::<u64>(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, prec, rm)| hypot_prec_round_valid(x, y, *prec, *rm)),
+    )
+}
+
+pub fn exhaustive_float_float_unsigned_rounding_mode_quadruple_gen_var_25()
+-> It<(Float, Float, u64, RoundingMode)> {
+    Box::new(
+        reshape_3_1_to_4(Box::new(lex_pairs(
+            exhaustive_triples_xxy_custom_output(
+                exhaustive_mixed_extreme_floats(),
+                exhaustive_positive_primitive_ints::<u64>(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, prec, rm)| hypot_prec_round_valid(x, y, *prec, *rm)),
+    )
+}
+
 pub fn log_base_float_base_prec_round_valid(
     x: &Float,
     base: &Float,
@@ -2390,6 +2428,35 @@ pub fn exhaustive_float_float_rounding_mode_triple_gen_var_34() -> It<(Float, Fl
             exhaustive_rounding_modes(),
         )))
         .filter(|(x, y, rm)| agm_round_valid(x, y, *rm)),
+    )
+}
+
+pub(crate) fn hypot_round_valid(x: &Float, y: &Float, rm: RoundingMode) -> bool {
+    rm != Exact || {
+        let prec = max(x.significant_bits(), y.significant_bits());
+        x.hypot_prec_round_ref_ref(y, prec, Floor).1 == Equal
+    }
+}
+
+pub fn exhaustive_float_float_rounding_mode_triple_gen_var_43() -> It<(Float, Float, RoundingMode)>
+{
+    Box::new(
+        reshape_2_1_to_3(Box::new(lex_pairs(
+            exhaustive_pairs_from_single(exhaustive_floats()),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, rm)| hypot_round_valid(x, y, *rm)),
+    )
+}
+
+pub fn exhaustive_float_float_rounding_mode_triple_gen_var_44() -> It<(Float, Float, RoundingMode)>
+{
+    Box::new(
+        reshape_2_1_to_3(Box::new(lex_pairs(
+            exhaustive_pairs_from_single(exhaustive_mixed_extreme_floats()),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(x, y, rm)| hypot_round_valid(x, y, *rm)),
     )
 }
 

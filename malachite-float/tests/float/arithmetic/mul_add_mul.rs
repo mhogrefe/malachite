@@ -1043,8 +1043,8 @@ fn test_mul_add_mul_rational_prec_round() {
         Greater,
     );
     // - a cancelling first product against an overflowing second product
-    // The huge Rational, 2^1073741821, is constructed directly; its decimal expansion has over
-    // 300 million digits.
+    // The huge Rational, 2^1073741821, is constructed directly; its decimal expansion has over 300
+    // million digits.
     let x = parse_hex_string("0x4.0E+268435455#1");
     let y = parse_hex_string("-0x4.0E+268435455#1");
     let z = parse_hex_string("0x4.0E+268435455#1");

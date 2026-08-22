@@ -515,7 +515,7 @@ operands do not even need the recipe: the operators take them directly, through 
 | ✓ | `int mpfr_fms (mpfr_t rop, mpfr_t op1, mpfr_t op2, mpfr_t op3, mpfr_rnd_t rnd)` | [`sub_mul_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.sub_mul_prec_round) |
 | ✓ | `int mpfr_fmma (mpfr_t rop, mpfr_t op1, mpfr_t op2, mpfr_t op3, mpfr_t op4, mpfr_rnd_t rnd)` | [`mul_add_mul_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.mul_add_mul_prec_round) |
 | ✓ | `int mpfr_fmms (mpfr_t rop, mpfr_t op1, mpfr_t op2, mpfr_t op3, mpfr_t op4, mpfr_rnd_t rnd)` | [`mul_sub_mul_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.mul_sub_mul_prec_round) |
-| ✗ | `int mpfr_hypot (mpfr_t rop, mpfr_t x, mpfr_t y, mpfr_rnd_t rnd)` | |
+| ✓ | `int mpfr_hypot (mpfr_t rop, mpfr_t x, mpfr_t y, mpfr_rnd_t rnd)` | [`hypot_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.hypot_prec_round) |
 | ✗ | `int mpfr_sum (mpfr_t rop, const mpfr_ptr tab[], unsigned long int n, mpfr_rnd_t rnd)` | |
 | ✗ | `int mpfr_dot (mpfr_t rop, const mpfr_ptr a[], const mpfr_ptr b[], unsigned long int n, mpfr_rnd_t rnd)` | |
 
@@ -630,8 +630,16 @@ commute and the products of the additive form commute with each other, this one 
 covers every one-`Rational` variant of the sum, and the subtractive variants follow by exact
 negation.
 
-**`mpfr_hypot`.** The Euclidean norm $$\sqrt{x^2 + y^2}$$, with the C99 special-value rule that
-an infinite operand gives $$+\infty$$ "even if the other number is NaN", is a gap.
+**`mpfr_hypot`.** The Euclidean norm $$\sqrt{x^2 + y^2}$$ is ported: `hypot_prec_round`, with
+the C99 special-value rule that an infinite operand gives $$+\infty$$ "even if the other number
+is NaN", along with the usual `prec`, `round`, and plain levels, in-place `*_assign` forms, the
+new `Hypot` and `HypotAssign` traits, and `primitive_float_hypot`, which computes a correctly
+rounded `f32` or `f64` hypotenuse with a single rounding, unlike the standard library's `hypot`.
+The MPFR source notes (in a FIXME) that the scaled second operand can underflow when the target
+precision is very large relative to the exponent range; in that regime Malachite computes the
+sum of squares exactly at the integer level, where no exponent range applies, so every input has
+a correctly rounded result. The same integer-level path decides the `Exact` rounding mode, which
+succeeds precisely on Pythagorean inputs whose hypotenuse fits in the target precision.
 
 **`mpfr_sum`, `mpfr_dot`.** Correctly rounded sums and dot products of arrays, with a single
 rounding regardless of length. These are gaps, but exactness is available in the meantime by
