@@ -11,9 +11,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Rational;
-use alloc::vec::Vec;
 use core::iter::Sum;
 use core::ops::{Add, AddAssign};
+use malachite_base::iterators::balanced_fold;
 use malachite_base::num::arithmetic::traits::{
     DivExact, DivExactAssign, Gcd, GcdAssign, UnsignedAbs,
 };
@@ -416,23 +416,12 @@ impl Sum for Rational {
     ///     "19079/2520"
     /// );
     /// ```
+    #[inline]
     fn sum<I>(xs: I) -> Self
     where
         I: Iterator<Item = Self>,
     {
-        let mut stack = Vec::new();
-        for (i, x) in xs.enumerate() {
-            let mut s = x;
-            for _ in 0..(i + 1).trailing_zeros() {
-                s += stack.pop().unwrap();
-            }
-            stack.push(s);
-        }
-        let mut s = Self::ZERO;
-        for x in stack.into_iter().rev() {
-            s += x;
-        }
-        s
+        balanced_fold(xs, |_| false, |a, b| *a += b).unwrap_or(Self::ZERO)
     }
 }
 
@@ -467,22 +456,11 @@ impl<'a> Sum<&'a Self> for Rational {
     ///     "19079/2520"
     /// );
     /// ```
+    #[inline]
     fn sum<I>(xs: I) -> Self
     where
         I: Iterator<Item = &'a Self>,
     {
-        let mut stack = Vec::new();
-        for (i, x) in xs.enumerate() {
-            let mut s = x.clone();
-            for _ in 0..(i + 1).trailing_zeros() {
-                s += stack.pop().unwrap();
-            }
-            stack.push(s);
-        }
-        let mut s = Self::ZERO;
-        for x in stack.into_iter().rev() {
-            s += x;
-        }
-        s
+        balanced_fold(xs.cloned(), |_| false, |a, b| *a += b).unwrap_or(Self::ZERO)
     }
 }

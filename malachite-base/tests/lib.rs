@@ -167,6 +167,7 @@ pub mod iterators {
         pub mod is_weakly_descending;
         pub mod is_weakly_zigzagging;
     }
+    pub mod balanced_fold;
     pub mod count_is_at_least;
     pub mod count_is_at_most;
     pub mod first_and_last;

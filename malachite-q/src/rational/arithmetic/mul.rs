@@ -11,9 +11,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Rational;
-use alloc::vec::Vec;
 use core::iter::Product;
 use core::ops::{Mul, MulAssign};
+use malachite_base::iterators::balanced_fold;
 use malachite_base::num::arithmetic::traits::{DivExact, DivExactAssign, Gcd};
 use malachite_base::num::basic::traits::{One, Zero};
 
@@ -318,26 +318,12 @@ impl Product for Rational {
     ///     "1/5"
     /// );
     /// ```
+    #[inline]
     fn product<I>(xs: I) -> Self
     where
         I: Iterator<Item = Self>,
     {
-        let mut stack = Vec::new();
-        for (i, x) in xs.enumerate() {
-            if x == 0 {
-                return Self::ZERO;
-            }
-            let mut p = x;
-            for _ in 0..(i + 1).trailing_zeros() {
-                p *= stack.pop().unwrap();
-            }
-            stack.push(p);
-        }
-        let mut p = Self::ONE;
-        for x in stack.into_iter().rev() {
-            p *= x;
-        }
-        p
+        balanced_fold(xs, |x| *x == 0u32, |a, b| *a *= b).unwrap_or(Self::ONE)
     }
 }
 
@@ -372,25 +358,11 @@ impl<'a> Product<&'a Self> for Rational {
     ///     "1/5"
     /// );
     /// ```
+    #[inline]
     fn product<I>(xs: I) -> Self
     where
         I: Iterator<Item = &'a Self>,
     {
-        let mut stack = Vec::new();
-        for (i, x) in xs.enumerate() {
-            if *x == 0 {
-                return Self::ZERO;
-            }
-            let mut p = x.clone();
-            for _ in 0..(i + 1).trailing_zeros() {
-                p *= stack.pop().unwrap();
-            }
-            stack.push(p);
-        }
-        let mut p = Self::ONE;
-        for x in stack.into_iter().rev() {
-            p *= x;
-        }
-        p
+        balanced_fold(xs.cloned(), |x| *x == 0u32, |a, b| *a *= b).unwrap_or(Self::ONE)
     }
 }
