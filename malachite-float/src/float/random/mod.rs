@@ -2481,12 +2481,9 @@ fn tail_bernoulli<I: Iterator<Item = u64>>(
             break;
         }
         q.reset();
-        if first {
-            random_deviate_less(q, x, src);
-        } else {
-            random_deviate_less(q, p, src);
+        if !random_deviate_less(q, if first { &mut *x } else { &mut *p }, src) {
             break;
-        };
+        }
         if k != 0 {
             f = choice(m, src);
         }
