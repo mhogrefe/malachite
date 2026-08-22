@@ -69,14 +69,15 @@ impl OrdAbsDouble for Integer {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_base::num::comparison::traits::OrdAbsDouble;
     /// use malachite_nz::integer::Integer;
     /// use std::cmp::Ordering::*;
     ///
-    /// assert_eq!(Integer::from(4).cmp_abs_double(&Integer::from(2)), Equal);
+    /// assert_eq!(Integer::from(4).cmp_abs_double(&Integer::TWO), Equal);
     /// assert_eq!(Integer::from(-4).cmp_abs_double(&Integer::from(-2)), Equal);
     /// assert_eq!(Integer::from(3).cmp_abs_double(&Integer::from(-2)), Less);
-    /// assert_eq!(Integer::from(-5).cmp_abs_double(&Integer::from(2)), Greater);
+    /// assert_eq!(Integer::from(-5).cmp_abs_double(&Integer::TWO), Greater);
     /// ```
     #[inline]
     fn cmp_abs_double(&self, other: &Self) -> Ordering {

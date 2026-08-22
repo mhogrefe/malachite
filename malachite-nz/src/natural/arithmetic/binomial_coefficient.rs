@@ -638,18 +638,19 @@ impl BinomialCoefficient for Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::BinomialCoefficient;
+    /// use malachite_base::num::basic::traits::{One, Two, Zero};
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
-    ///     Natural::binomial_coefficient(Natural::from(4u32), Natural::from(0u32)),
+    ///     Natural::binomial_coefficient(Natural::from(4u32), Natural::ZERO),
     ///     1
     /// );
     /// assert_eq!(
-    ///     Natural::binomial_coefficient(Natural::from(4u32), Natural::from(1u32)),
+    ///     Natural::binomial_coefficient(Natural::from(4u32), Natural::ONE),
     ///     4
     /// );
     /// assert_eq!(
-    ///     Natural::binomial_coefficient(Natural::from(4u32), Natural::from(2u32)),
+    ///     Natural::binomial_coefficient(Natural::from(4u32), Natural::TWO),
     ///     6
     /// );
     /// assert_eq!(
@@ -706,18 +707,19 @@ impl<'a> BinomialCoefficient<&'a Self> for Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::BinomialCoefficient;
+    /// use malachite_base::num::basic::traits::{One, Two, Zero};
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
-    ///     Natural::binomial_coefficient(&Natural::from(4u32), &Natural::from(0u32)),
+    ///     Natural::binomial_coefficient(&Natural::from(4u32), &Natural::ZERO),
     ///     1
     /// );
     /// assert_eq!(
-    ///     Natural::binomial_coefficient(&Natural::from(4u32), &Natural::from(1u32)),
+    ///     Natural::binomial_coefficient(&Natural::from(4u32), &Natural::ONE),
     ///     4
     /// );
     /// assert_eq!(
-    ///     Natural::binomial_coefficient(&Natural::from(4u32), &Natural::from(2u32)),
+    ///     Natural::binomial_coefficient(&Natural::from(4u32), &Natural::TWO),
     ///     6
     /// );
     /// assert_eq!(

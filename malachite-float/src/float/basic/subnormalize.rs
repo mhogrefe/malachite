@@ -300,6 +300,7 @@ impl Float {
     /// ```
     /// use core::cmp::Ordering::*;
     /// use malachite_base::num::arithmetic::traits::PowerOf2;
+    /// use malachite_base::num::basic::traits::One;
     /// use malachite_base::num::conversion::traits::ExactFrom;
     /// use malachite_base::num::float::NiceFloat;
     /// use malachite_base::rounding_modes::RoundingMode::*;
@@ -314,8 +315,8 @@ impl Float {
     ///
     /// // Emulating IEEE 754 binary64: (2^52 + 1) * 2^-1125 rounds to the second-smallest
     /// // subnormal double.
-    /// let x = Float::from_natural_prec(Natural::power_of_2(52u64) + Natural::from(1u32), 53).0
-    ///     >> 1125u64;
+    /// let x =
+    ///     Float::from_natural_prec(Natural::power_of_2(52u64) + Natural::ONE, 53).0 >> 1125u64;
     /// let (y, o) = x.subnormalize(Equal, -1021, Nearest);
     /// assert_eq!(y.to_string(), "9.8813129168249309e-324");
     /// assert_eq!(NiceFloat(f64::exact_from(&y)), NiceFloat(1.0e-323));

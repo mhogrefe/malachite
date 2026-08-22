@@ -326,6 +326,7 @@ impl MultiCrt {
     ///
     /// # Examples
     /// ```rust,ignore
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural::arithmetic::multi_crt::MultiCrt;
     ///
@@ -335,9 +336,9 @@ impl MultiCrt {
     ///     Natural::from(7u32),
     /// ];
     /// let values = [
-    ///     Natural::from(2u32),
+    ///     Natural::TWO,
     ///     Natural::from(3u32),
-    ///     Natural::from(2u32),
+    ///     Natural::TWO,
     /// ];
     /// let crt = MultiCrt::new(&moduli).unwrap();
     /// // 23 is 2 mod 3, 3 mod 5, and 2 mod 7.
@@ -394,6 +395,7 @@ impl MultiCrt {
     ///
     /// # Examples
     /// ```rust,ignore
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
     /// use malachite_nz::natural::arithmetic::multi_crt::MultiCrt;
@@ -401,7 +403,7 @@ impl MultiCrt {
     /// let crt = MultiCrt::new(&[Natural::from(3u32), Natural::from(5u32)]).unwrap();
     /// // 8 is 2 mod 3 and 3 mod 5, and its balanced representative mod 15 is -7.
     /// assert_eq!(
-    ///     crt.apply_balanced(&[Natural::from(2u32), Natural::from(3u32)]),
+    ///     crt.apply_balanced(&[Natural::TWO, Natural::from(3u32)]),
     ///     Integer::from(-7)
     /// );
     /// ```
@@ -469,6 +471,7 @@ impl Natural {
     ///
     /// # Examples
     /// ```rust,ignore
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_nz::natural::Natural;
     ///
     /// let moduli = [
@@ -477,9 +480,9 @@ impl Natural {
     ///     Natural::from(7u32),
     /// ];
     /// let values = [
-    ///     Natural::from(2u32),
+    ///     Natural::TWO,
     ///     Natural::from(3u32),
-    ///     Natural::from(2u32),
+    ///     Natural::TWO,
     /// ];
     /// // 23 is 2 mod 3, 3 mod 5, and 2 mod 7.
     /// assert_eq!(

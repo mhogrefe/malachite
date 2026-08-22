@@ -72,8 +72,32 @@ error: use `Float::ONE_HALF` instead of `one_half_prec(..)`
 LL |     let _ = Float::one_half_prec(1);
    |             ^^^^^^^^^^^^^^^^^^^^^^^
 
-error: evaluate this at compile time: use `Natural::const_from(..)` in a `const` block or a named `const`
+error: use `Float::ZERO` instead of `from(..)`
+  --> $DIR/use_named_constant.rs:20:13
+   |
+LL |     let _ = Float::from(0);
+   |             ^^^^^^^^^^^^^^
+
+error: use `Float::ONE` instead of `from(..)`
+  --> $DIR/use_named_constant.rs:21:13
+   |
+LL |     let _ = Float::from(1u32);
+   |             ^^^^^^^^^^^^^^^^^
+
+error: use `Float::TWO` instead of `from(..)`
   --> $DIR/use_named_constant.rs:22:13
+   |
+LL |     let _ = Float::from(2);
+   |             ^^^^^^^^^^^^^^
+
+error: use `Float::NEGATIVE_ONE` instead of `from(..)`
+  --> $DIR/use_named_constant.rs:23:13
+   |
+LL |     let _ = Float::from(-1);
+   |             ^^^^^^^^^^^^^^^
+
+error: evaluate this at compile time: use `Natural::const_from(..)` in a `const` block or a named `const`
+  --> $DIR/use_named_constant.rs:26:13
    |
 LL |     let _ = Natural::from(3u32);
    |             ^^^^^^^^^^^^^^^^^^^
@@ -81,16 +105,22 @@ LL |     let _ = Natural::from(3u32);
    = note: `#[deny(runtime_literal_conversion)]` on by default
 
 error: evaluate this at compile time: use `Integer::const_from_signed(..)` in a `const` block or a named `const`
-  --> $DIR/use_named_constant.rs:23:13
+  --> $DIR/use_named_constant.rs:27:13
    |
 LL |     let _ = Integer::from(-2);
    |             ^^^^^^^^^^^^^^^^^
 
 error: evaluate this at compile time: use `Rational::const_from_unsigneds(..)` in a `const` block or a named `const`
-  --> $DIR/use_named_constant.rs:24:13
+  --> $DIR/use_named_constant.rs:28:13
    |
 LL |     let _ = Rational::from_unsigneds(1u32, 3u32);
    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-error: aborting due to 15 previous errors
+error: evaluate this at compile time: use `Float::const_from_unsigned(..)` in a `const` block or a named `const`
+  --> $DIR/use_named_constant.rs:33:13
+   |
+LL |     let _ = Float::from(3);
+   |             ^^^^^^^^^^^^^^
+
+error: aborting due to 20 previous errors
 

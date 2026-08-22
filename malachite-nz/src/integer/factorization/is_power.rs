@@ -44,15 +44,16 @@ impl IsPower for Integer {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
     /// use malachite_base::num::factorization::traits::IsPower;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!(Integer::from(0).is_power(), true);
-    /// assert_eq!(Integer::from(1).is_power(), true);
+    /// assert_eq!(Integer::ZERO.is_power(), true);
+    /// assert_eq!(Integer::ONE.is_power(), true);
     /// assert_eq!(Integer::from(8).is_power(), true);
     /// assert_eq!(Integer::from(6).is_power(), false);
     ///
-    /// assert_eq!(Integer::from(-1).is_power(), true);
+    /// assert_eq!(Integer::NEGATIVE_ONE.is_power(), true);
     /// assert_eq!(Integer::from(-8).is_power(), true);
     /// assert_eq!(Integer::from(-16).is_power(), false);
     /// ```
@@ -84,13 +85,11 @@ impl ExpressAsPower for Integer {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_base::num::factorization::traits::ExpressAsPower;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!(
-    ///     Integer::from(8).express_as_power(),
-    ///     Some((Integer::from(2), 3))
-    /// );
+    /// assert_eq!(Integer::from(8).express_as_power(), Some((Integer::TWO, 3)));
     /// assert_eq!(Integer::from(6).express_as_power(), None);
     ///
     /// assert_eq!(

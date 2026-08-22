@@ -46,6 +46,7 @@ impl Integer {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
     ///
@@ -53,14 +54,14 @@ impl Integer {
     /// assert_eq!(
     ///     Integer::multi_balanced_crt(
     ///         &[Natural::from(3u32), Natural::from(5u32)],
-    ///         &[Natural::from(2u32), Natural::from(3u32)],
+    ///         &[Natural::TWO, Natural::from(3u32)],
     ///     ),
     ///     Some(Integer::from(-7))
     /// );
     /// assert_eq!(
     ///     Integer::multi_balanced_crt(
     ///         &[Natural::from(4u32), Natural::from(6u32)],
-    ///         &[Natural::from(1u32), Natural::from(3u32)],
+    ///         &[Natural::ONE, Natural::from(3u32)],
     ///     ),
     ///     None
     /// );

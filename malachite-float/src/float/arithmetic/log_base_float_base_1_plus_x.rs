@@ -310,16 +310,17 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
     /// let x = Float::from(7);
-    /// let (log, o) = x.log_base_float_base_1_plus_x_prec_round_ref(&Float::from(2), 10, Exact);
+    /// let (log, o) = x.log_base_float_base_1_plus_x_prec_round_ref(&Float::TWO, 10, Exact);
     /// assert_eq!(log.to_string(), "3.0000"); // log_2(1 + 7) = log_2(8) = 3
     /// assert_eq!(o, Equal);
     ///
-    /// let x = Float::from(1);
+    /// let x = Float::ONE;
     /// let (log, o) = x.log_base_float_base_1_plus_x_prec_round_ref(&Float::from(3), 20, Floor);
     /// assert_eq!(log.to_string(), "0.63092899"); // log_3(2), rounded down
     /// assert_eq!(o, Less);

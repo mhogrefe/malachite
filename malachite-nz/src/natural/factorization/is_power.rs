@@ -210,16 +210,17 @@ impl ExpressAsPower for Natural {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_base::num::factorization::traits::ExpressAsPower;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
     ///     Natural::from(8u32).express_as_power(),
-    ///     Some((Natural::from(2u32), 3))
+    ///     Some((Natural::TWO, 3))
     /// );
     /// assert_eq!(
     ///     Natural::from(16u32).express_as_power(),
-    ///     Some((Natural::from(2u32), 4))
+    ///     Some((Natural::TWO, 4))
     /// );
     /// assert_eq!(Natural::from(6u32).express_as_power(), None);
     /// ```
@@ -242,11 +243,12 @@ impl IsPower for Natural {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::{One, Zero};
     /// use malachite_base::num::factorization::traits::IsPower;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::from(0u32).is_power(), true);
-    /// assert_eq!(Natural::from(1u32).is_power(), true);
+    /// assert_eq!(Natural::ZERO.is_power(), true);
+    /// assert_eq!(Natural::ONE.is_power(), true);
     /// assert_eq!(Natural::from(4u32).is_power(), true);
     /// assert_eq!(Natural::from(6u32).is_power(), false);
     /// assert_eq!(Natural::from(8u32).is_power(), true);

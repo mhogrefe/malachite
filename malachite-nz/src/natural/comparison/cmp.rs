@@ -247,17 +247,14 @@ impl OrdDouble for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::num::comparison::traits::{OrdDouble, PartialOrdDouble};
+    /// use malachite_base::num::basic::traits::{Two, Zero};
+    /// use malachite_base::num::comparison::traits::OrdDouble;
     /// use malachite_nz::natural::Natural;
     /// use std::cmp::Ordering::*;
     ///
-    /// assert_eq!(Natural::from(4u32).cmp_double(&Natural::from(2u32)), Equal);
-    /// assert_eq!(Natural::from(3u32).cmp_double(&Natural::from(2u32)), Less);
-    /// assert_eq!(
-    ///     Natural::from(5u32).cmp_double(&Natural::from(2u32)),
-    ///     Greater
-    /// );
+    /// assert_eq!(Natural::from(4u32).cmp_double(&Natural::TWO), Equal);
+    /// assert_eq!(Natural::from(3u32).cmp_double(&Natural::TWO), Less);
+    /// assert_eq!(Natural::from(5u32).cmp_double(&Natural::TWO), Greater);
     /// assert_eq!(Natural::ZERO.cmp_double(&Natural::ZERO), Equal);
     /// ```
     fn cmp_double(&self, other: &Self) -> Ordering {
@@ -296,14 +293,12 @@ impl Natural {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
+    /// use malachite_base::num::basic::traits::One;
     /// use malachite_nz::natural::Natural;
     ///
     /// // 1 == 1.0 * 2^0, 4 == 1.0 * 2^2
     /// // 1.0 == 1.0
-    /// assert_eq!(
-    ///     Natural::from(1u32).cmp_normalized(&Natural::from(4u32)),
-    ///     Equal
-    /// );
+    /// assert_eq!(Natural::ONE.cmp_normalized(&Natural::from(4u32)), Equal);
     ///
     /// // 5 == 1.25 * 2^2, 6 == 1.5 * 2^2
     /// // 1.25 < 1.5

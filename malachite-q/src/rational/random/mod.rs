@@ -841,6 +841,7 @@ pub fn random_rational_with_denominator_range_to_negative_infinity(
 /// # Examples
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::num::basic::traits::OneHalf;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::natural::Natural;
 /// use malachite_q::rational::random::random_rational_with_denominator_range;
@@ -852,7 +853,7 @@ pub fn random_rational_with_denominator_range_to_negative_infinity(
 ///             EXAMPLE_SEED,
 ///             Natural::from(100u32),
 ///             Rational::from_unsigneds(1u32, 3),
-///             Rational::from_unsigneds(1u32, 2),
+///             Rational::ONE_HALF,
 ///             3,
 ///             1
 ///         ),
@@ -932,6 +933,7 @@ pub fn random_rational_with_denominator_range(
 /// # Examples
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::num::basic::traits::OneHalf;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::natural::Natural;
 /// use malachite_q::rational::random::random_rational_with_denominator_inclusive_range;
@@ -943,7 +945,7 @@ pub fn random_rational_with_denominator_range(
 ///             EXAMPLE_SEED,
 ///             Natural::from(100u32),
 ///             Rational::from_unsigneds(1u32, 3),
-///             Rational::from_unsigneds(1u32, 2),
+///             Rational::ONE_HALF,
 ///             3,
 ///             1
 ///         ),
@@ -1269,6 +1271,7 @@ impl Iterator for RandomRationalRange {
 /// # Examples
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::num::basic::traits::OneHalf;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_q::rational::random::random_rational_range;
 /// use malachite_q::Rational;
@@ -1278,7 +1281,7 @@ impl Iterator for RandomRationalRange {
 ///         random_rational_range(
 ///             EXAMPLE_SEED,
 ///             Rational::from_unsigneds(1u32, 3),
-///             Rational::from_unsigneds(1u32, 2),
+///             Rational::ONE_HALF,
 ///             3,
 ///             1,
 ///             10,
@@ -1409,6 +1412,7 @@ impl Iterator for RandomRationalInclusiveRange {
 /// # Examples
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::num::basic::traits::OneHalf;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_q::rational::random::random_rational_inclusive_range;
 /// use malachite_q::Rational;
@@ -1418,7 +1422,7 @@ impl Iterator for RandomRationalInclusiveRange {
 ///         random_rational_inclusive_range(
 ///             EXAMPLE_SEED,
 ///             Rational::from_unsigneds(1u32, 3),
-///             Rational::from_unsigneds(1u32, 2),
+///             Rational::ONE_HALF,
 ///             3,
 ///             1,
 ///             10,

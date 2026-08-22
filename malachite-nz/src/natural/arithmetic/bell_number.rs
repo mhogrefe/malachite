@@ -423,6 +423,7 @@ impl BellNumber for Natural {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::arithmetic::traits::BellNumber;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(Natural::bell_number(0), 1);

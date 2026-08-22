@@ -264,31 +264,32 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (hypot, o) = Float::from(1).hypot_prec_round(Float::from(2), 5, Floor);
+    /// let (hypot, o) = Float::ONE.hypot_prec_round(Float::TWO, 5, Floor);
     /// assert_eq!(hypot.to_string(), "2.12");
     /// assert_eq!(o, Less);
     ///
-    /// let (hypot, o) = Float::from(1).hypot_prec_round(Float::from(2), 5, Ceiling);
+    /// let (hypot, o) = Float::ONE.hypot_prec_round(Float::TWO, 5, Ceiling);
     /// assert_eq!(hypot.to_string(), "2.25");
     /// assert_eq!(o, Greater);
     ///
-    /// let (hypot, o) = Float::from(1).hypot_prec_round(Float::from(2), 5, Nearest);
+    /// let (hypot, o) = Float::ONE.hypot_prec_round(Float::TWO, 5, Nearest);
     /// assert_eq!(hypot.to_string(), "2.25");
     /// assert_eq!(o, Greater);
     ///
-    /// let (hypot, o) = Float::from(1).hypot_prec_round(Float::from(2), 20, Floor);
+    /// let (hypot, o) = Float::ONE.hypot_prec_round(Float::TWO, 20, Floor);
     /// assert_eq!(hypot.to_string(), "2.2360649");
     /// assert_eq!(o, Less);
     ///
-    /// let (hypot, o) = Float::from(1).hypot_prec_round(Float::from(2), 20, Ceiling);
+    /// let (hypot, o) = Float::ONE.hypot_prec_round(Float::TWO, 20, Ceiling);
     /// assert_eq!(hypot.to_string(), "2.2360687");
     /// assert_eq!(o, Greater);
     ///
-    /// let (hypot, o) = Float::from(1).hypot_prec_round(Float::from(2), 20, Nearest);
+    /// let (hypot, o) = Float::ONE.hypot_prec_round(Float::TWO, 20, Nearest);
     /// assert_eq!(hypot.to_string(), "2.2360687");
     /// assert_eq!(o, Greater);
     /// ```
@@ -349,31 +350,32 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (hypot, o) = Float::from(1).hypot_prec_round_val_ref(&Float::from(2), 5, Floor);
+    /// let (hypot, o) = Float::ONE.hypot_prec_round_val_ref(&Float::TWO, 5, Floor);
     /// assert_eq!(hypot.to_string(), "2.12");
     /// assert_eq!(o, Less);
     ///
-    /// let (hypot, o) = Float::from(1).hypot_prec_round_val_ref(&Float::from(2), 5, Ceiling);
+    /// let (hypot, o) = Float::ONE.hypot_prec_round_val_ref(&Float::TWO, 5, Ceiling);
     /// assert_eq!(hypot.to_string(), "2.25");
     /// assert_eq!(o, Greater);
     ///
-    /// let (hypot, o) = Float::from(1).hypot_prec_round_val_ref(&Float::from(2), 5, Nearest);
+    /// let (hypot, o) = Float::ONE.hypot_prec_round_val_ref(&Float::TWO, 5, Nearest);
     /// assert_eq!(hypot.to_string(), "2.25");
     /// assert_eq!(o, Greater);
     ///
-    /// let (hypot, o) = Float::from(1).hypot_prec_round_val_ref(&Float::from(2), 20, Floor);
+    /// let (hypot, o) = Float::ONE.hypot_prec_round_val_ref(&Float::TWO, 20, Floor);
     /// assert_eq!(hypot.to_string(), "2.2360649");
     /// assert_eq!(o, Less);
     ///
-    /// let (hypot, o) = Float::from(1).hypot_prec_round_val_ref(&Float::from(2), 20, Ceiling);
+    /// let (hypot, o) = Float::ONE.hypot_prec_round_val_ref(&Float::TWO, 20, Ceiling);
     /// assert_eq!(hypot.to_string(), "2.2360687");
     /// assert_eq!(o, Greater);
     ///
-    /// let (hypot, o) = Float::from(1).hypot_prec_round_val_ref(&Float::from(2), 20, Nearest);
+    /// let (hypot, o) = Float::ONE.hypot_prec_round_val_ref(&Float::TWO, 20, Nearest);
     /// assert_eq!(hypot.to_string(), "2.2360687");
     /// assert_eq!(o, Greater);
     /// ```
@@ -439,31 +441,32 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (hypot, o) = Float::from(1).hypot_prec_round_ref_val(Float::from(2), 5, Floor);
+    /// let (hypot, o) = Float::ONE.hypot_prec_round_ref_val(Float::TWO, 5, Floor);
     /// assert_eq!(hypot.to_string(), "2.12");
     /// assert_eq!(o, Less);
     ///
-    /// let (hypot, o) = Float::from(1).hypot_prec_round_ref_val(Float::from(2), 5, Ceiling);
+    /// let (hypot, o) = Float::ONE.hypot_prec_round_ref_val(Float::TWO, 5, Ceiling);
     /// assert_eq!(hypot.to_string(), "2.25");
     /// assert_eq!(o, Greater);
     ///
-    /// let (hypot, o) = Float::from(1).hypot_prec_round_ref_val(Float::from(2), 5, Nearest);
+    /// let (hypot, o) = Float::ONE.hypot_prec_round_ref_val(Float::TWO, 5, Nearest);
     /// assert_eq!(hypot.to_string(), "2.25");
     /// assert_eq!(o, Greater);
     ///
-    /// let (hypot, o) = Float::from(1).hypot_prec_round_ref_val(Float::from(2), 20, Floor);
+    /// let (hypot, o) = Float::ONE.hypot_prec_round_ref_val(Float::TWO, 20, Floor);
     /// assert_eq!(hypot.to_string(), "2.2360649");
     /// assert_eq!(o, Less);
     ///
-    /// let (hypot, o) = Float::from(1).hypot_prec_round_ref_val(Float::from(2), 20, Ceiling);
+    /// let (hypot, o) = Float::ONE.hypot_prec_round_ref_val(Float::TWO, 20, Ceiling);
     /// assert_eq!(hypot.to_string(), "2.2360687");
     /// assert_eq!(o, Greater);
     ///
-    /// let (hypot, o) = Float::from(1).hypot_prec_round_ref_val(Float::from(2), 20, Nearest);
+    /// let (hypot, o) = Float::ONE.hypot_prec_round_ref_val(Float::TWO, 20, Nearest);
     /// assert_eq!(hypot.to_string(), "2.2360687");
     /// assert_eq!(o, Greater);
     /// ```
@@ -528,31 +531,32 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (hypot, o) = Float::from(1).hypot_prec_round_ref_ref(&Float::from(2), 5, Floor);
+    /// let (hypot, o) = Float::ONE.hypot_prec_round_ref_ref(&Float::TWO, 5, Floor);
     /// assert_eq!(hypot.to_string(), "2.12");
     /// assert_eq!(o, Less);
     ///
-    /// let (hypot, o) = Float::from(1).hypot_prec_round_ref_ref(&Float::from(2), 5, Ceiling);
+    /// let (hypot, o) = Float::ONE.hypot_prec_round_ref_ref(&Float::TWO, 5, Ceiling);
     /// assert_eq!(hypot.to_string(), "2.25");
     /// assert_eq!(o, Greater);
     ///
-    /// let (hypot, o) = Float::from(1).hypot_prec_round_ref_ref(&Float::from(2), 5, Nearest);
+    /// let (hypot, o) = Float::ONE.hypot_prec_round_ref_ref(&Float::TWO, 5, Nearest);
     /// assert_eq!(hypot.to_string(), "2.25");
     /// assert_eq!(o, Greater);
     ///
-    /// let (hypot, o) = Float::from(1).hypot_prec_round_ref_ref(&Float::from(2), 20, Floor);
+    /// let (hypot, o) = Float::ONE.hypot_prec_round_ref_ref(&Float::TWO, 20, Floor);
     /// assert_eq!(hypot.to_string(), "2.2360649");
     /// assert_eq!(o, Less);
     ///
-    /// let (hypot, o) = Float::from(1).hypot_prec_round_ref_ref(&Float::from(2), 20, Ceiling);
+    /// let (hypot, o) = Float::ONE.hypot_prec_round_ref_ref(&Float::TWO, 20, Ceiling);
     /// assert_eq!(hypot.to_string(), "2.2360687");
     /// assert_eq!(o, Greater);
     ///
-    /// let (hypot, o) = Float::from(1).hypot_prec_round_ref_ref(&Float::from(2), 20, Nearest);
+    /// let (hypot, o) = Float::ONE.hypot_prec_round_ref_ref(&Float::TWO, 20, Nearest);
     /// assert_eq!(hypot.to_string(), "2.2360687");
     /// assert_eq!(o, Greater);
     /// ```
@@ -1107,32 +1111,33 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let mut x = Float::from(1);
-    /// assert_eq!(x.hypot_prec_round_assign(Float::from(2), 5, Floor), Less);
+    /// let mut x = Float::ONE;
+    /// assert_eq!(x.hypot_prec_round_assign(Float::TWO, 5, Floor), Less);
     /// assert_eq!(x.to_string(), "2.12");
     ///
-    /// let mut x = Float::from(1);
-    /// assert_eq!(x.hypot_prec_round_assign(Float::from(2), 5, Ceiling), Greater);
+    /// let mut x = Float::ONE;
+    /// assert_eq!(x.hypot_prec_round_assign(Float::TWO, 5, Ceiling), Greater);
     /// assert_eq!(x.to_string(), "2.25");
     ///
-    /// let mut x = Float::from(1);
-    /// assert_eq!(x.hypot_prec_round_assign(Float::from(2), 5, Nearest), Greater);
+    /// let mut x = Float::ONE;
+    /// assert_eq!(x.hypot_prec_round_assign(Float::TWO, 5, Nearest), Greater);
     /// assert_eq!(x.to_string(), "2.25");
     ///
-    /// let mut x = Float::from(1);
-    /// assert_eq!(x.hypot_prec_round_assign(Float::from(2), 20, Floor), Less);
+    /// let mut x = Float::ONE;
+    /// assert_eq!(x.hypot_prec_round_assign(Float::TWO, 20, Floor), Less);
     /// assert_eq!(x.to_string(), "2.2360649");
     ///
-    /// let mut x = Float::from(1);
-    /// assert_eq!(x.hypot_prec_round_assign(Float::from(2), 20, Ceiling), Greater);
+    /// let mut x = Float::ONE;
+    /// assert_eq!(x.hypot_prec_round_assign(Float::TWO, 20, Ceiling), Greater);
     /// assert_eq!(x.to_string(), "2.2360687");
     ///
-    /// let mut x = Float::from(1);
-    /// assert_eq!(x.hypot_prec_round_assign(Float::from(2), 20, Nearest), Greater);
+    /// let mut x = Float::ONE;
+    /// assert_eq!(x.hypot_prec_round_assign(Float::TWO, 20, Nearest), Greater);
     /// assert_eq!(x.to_string(), "2.2360687");
     /// ```
     pub fn hypot_prec_round_assign(
@@ -1191,32 +1196,45 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let mut x = Float::from(1);
-    /// assert_eq!(x.hypot_prec_round_assign_ref(&Float::from(2), 5, Floor), Less);
+    /// let mut x = Float::ONE;
+    /// assert_eq!(x.hypot_prec_round_assign_ref(&Float::TWO, 5, Floor), Less);
     /// assert_eq!(x.to_string(), "2.12");
     ///
-    /// let mut x = Float::from(1);
-    /// assert_eq!(x.hypot_prec_round_assign_ref(&Float::from(2), 5, Ceiling), Greater);
+    /// let mut x = Float::ONE;
+    /// assert_eq!(
+    ///     x.hypot_prec_round_assign_ref(&Float::TWO, 5, Ceiling),
+    ///     Greater
+    /// );
     /// assert_eq!(x.to_string(), "2.25");
     ///
-    /// let mut x = Float::from(1);
-    /// assert_eq!(x.hypot_prec_round_assign_ref(&Float::from(2), 5, Nearest), Greater);
+    /// let mut x = Float::ONE;
+    /// assert_eq!(
+    ///     x.hypot_prec_round_assign_ref(&Float::TWO, 5, Nearest),
+    ///     Greater
+    /// );
     /// assert_eq!(x.to_string(), "2.25");
     ///
-    /// let mut x = Float::from(1);
-    /// assert_eq!(x.hypot_prec_round_assign_ref(&Float::from(2), 20, Floor), Less);
+    /// let mut x = Float::ONE;
+    /// assert_eq!(x.hypot_prec_round_assign_ref(&Float::TWO, 20, Floor), Less);
     /// assert_eq!(x.to_string(), "2.2360649");
     ///
-    /// let mut x = Float::from(1);
-    /// assert_eq!(x.hypot_prec_round_assign_ref(&Float::from(2), 20, Ceiling), Greater);
+    /// let mut x = Float::ONE;
+    /// assert_eq!(
+    ///     x.hypot_prec_round_assign_ref(&Float::TWO, 20, Ceiling),
+    ///     Greater
+    /// );
     /// assert_eq!(x.to_string(), "2.2360687");
     ///
-    /// let mut x = Float::from(1);
-    /// assert_eq!(x.hypot_prec_round_assign_ref(&Float::from(2), 20, Nearest), Greater);
+    /// let mut x = Float::ONE;
+    /// assert_eq!(
+    ///     x.hypot_prec_round_assign_ref(&Float::TWO, 20, Nearest),
+    ///     Greater
+    /// );
     /// assert_eq!(x.to_string(), "2.2360687");
     /// ```
     pub fn hypot_prec_round_assign_ref(

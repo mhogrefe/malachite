@@ -24,8 +24,9 @@ declare_lint! {
     /// ### Why is this bad?
     ///
     /// The named constant says what the value is at a glance and involves no conversion. For
-    /// `Float`, only precision-1 constructions are flagged: the named constants have precision 1,
-    /// so `Float::one_prec(p)` with any other `p` is not the same value-and-precision.
+    /// `Float`, only constructions yielding precision 1 are flagged: the named constants have
+    /// precision 1. `Float::one_prec(p)` with any other `p` is not the same value-and-precision,
+    /// but `Float::from` of 0, 1, 2, or -1 is, since integer conversion strips trailing zeros.
     ///
     /// ### Example
     ///
@@ -78,7 +79,6 @@ impl<'tcx> LateLintPass<'tcx> for UseNamedConstant {
                 "NEGATIVE_ONE"
             }
             ("Float", "one_half_prec", [p]) if crate::literal_value(p) == Some(1) => "ONE_HALF",
-            ("Float", ..) => return,
             (_, "from" | "const_from" | "const_from_unsigned" | "const_from_signed", [a]) => {
                 match crate::literal_value(a) {
                     Some(0) => "ZERO",

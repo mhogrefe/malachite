@@ -34,14 +34,14 @@ impl Sub<Self> for Integer {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Pow;
-    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::basic::traits::{Two, Zero};
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(Integer::ZERO - Integer::from(123), -123);
     /// assert_eq!(Integer::from(123) - Integer::ZERO, 123);
     /// assert_eq!(Integer::from(456) - Integer::from(-123), 579);
     /// assert_eq!(
-    ///     -Integer::from(10u32).pow(12) - -Integer::from(10u32).pow(12) * Integer::from(2u32),
+    ///     -Integer::from(10u32).pow(12) - -Integer::from(10u32).pow(12) * Integer::TWO,
     ///     1000000000000u64
     /// );
     /// ```
@@ -73,14 +73,14 @@ impl Sub<&Self> for Integer {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Pow;
-    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::basic::traits::{Two, Zero};
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(Integer::ZERO - &Integer::from(123), -123);
     /// assert_eq!(Integer::from(123) - &Integer::ZERO, 123);
     /// assert_eq!(Integer::from(456) - &Integer::from(-123), 579);
     /// assert_eq!(
-    ///     -Integer::from(10u32).pow(12) - &(-Integer::from(10u32).pow(12) * Integer::from(2u32)),
+    ///     -Integer::from(10u32).pow(12) - &(-Integer::from(10u32).pow(12) * Integer::TWO),
     ///     1000000000000u64
     /// );
     /// ```
@@ -112,14 +112,14 @@ impl Sub<Integer> for &Integer {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Pow;
-    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::basic::traits::{Two, Zero};
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(&Integer::ZERO - Integer::from(123), -123);
     /// assert_eq!(&Integer::from(123) - Integer::ZERO, 123);
     /// assert_eq!(&Integer::from(456) - Integer::from(-123), 579);
     /// assert_eq!(
-    ///     &-Integer::from(10u32).pow(12) - -Integer::from(10u32).pow(12) * Integer::from(2u32),
+    ///     &-Integer::from(10u32).pow(12) - -Integer::from(10u32).pow(12) * Integer::TWO,
     ///     1000000000000u64
     /// );
     /// ```
@@ -149,14 +149,14 @@ impl Sub<&Integer> for &Integer {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Pow;
-    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::basic::traits::{Two, Zero};
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(&Integer::ZERO - &Integer::from(123), -123);
     /// assert_eq!(&Integer::from(123) - &Integer::ZERO, 123);
     /// assert_eq!(&Integer::from(456) - &Integer::from(-123), 579);
     /// assert_eq!(
-    ///     &-Integer::from(10u32).pow(12) - &(-Integer::from(10u32).pow(12) * Integer::from(2u32)),
+    ///     &-Integer::from(10u32).pow(12) - &(-Integer::from(10u32).pow(12) * Integer::TWO),
     ///     1000000000000u64
     /// );
     /// ```
@@ -224,12 +224,12 @@ impl SubAssign<Self> for Integer {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Pow;
-    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::basic::traits::{Two, Zero};
     /// use malachite_nz::integer::Integer;
     ///
     /// let mut x = Integer::ZERO;
     /// x -= -Integer::from(10u32).pow(12);
-    /// x -= Integer::from(10u32).pow(12) * Integer::from(2u32);
+    /// x -= Integer::from(10u32).pow(12) * Integer::TWO;
     /// x -= -Integer::from(10u32).pow(12) * Integer::from(3u32);
     /// x -= Integer::from(10u32).pow(12) * Integer::from(4u32);
     /// assert_eq!(x, -2000000000000i64);
@@ -289,12 +289,12 @@ impl SubAssign<&Self> for Integer {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Pow;
-    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::basic::traits::{Two, Zero};
     /// use malachite_nz::integer::Integer;
     ///
     /// let mut x = Integer::ZERO;
     /// x -= &(-Integer::from(10u32).pow(12));
-    /// x -= &(Integer::from(10u32).pow(12) * Integer::from(2u32));
+    /// x -= &(Integer::from(10u32).pow(12) * Integer::TWO);
     /// x -= &(-Integer::from(10u32).pow(12) * Integer::from(3u32));
     /// x -= &(Integer::from(10u32).pow(12) * Integer::from(4u32));
     /// assert_eq!(x, -2000000000000i64);

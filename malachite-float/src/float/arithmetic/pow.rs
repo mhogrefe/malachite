@@ -4001,11 +4001,12 @@ impl Pow<Integer> for Float {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Pow;
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_float::Float;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!(Float::from(2).pow(Integer::from(10)).to_string(), "1.0e3");
-    /// assert_eq!(Float::from(2).pow(Integer::from(-3)).to_string(), "0.12");
+    /// assert_eq!(Float::TWO.pow(Integer::from(10)).to_string(), "1.0e3");
+    /// assert_eq!(Float::TWO.pow(Integer::from(-3)).to_string(), "0.12");
     /// ```
     #[inline]
     fn pow(self, other: Integer) -> Self {
@@ -4049,11 +4050,12 @@ impl Pow<&Integer> for Float {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Pow;
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_float::Float;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!(Float::from(2).pow(&Integer::from(10)).to_string(), "1.0e3");
-    /// assert_eq!(Float::from(2).pow(&Integer::from(-3)).to_string(), "0.12");
+    /// assert_eq!(Float::TWO.pow(&Integer::from(10)).to_string(), "1.0e3");
+    /// assert_eq!(Float::TWO.pow(&Integer::from(-3)).to_string(), "0.12");
     /// ```
     #[inline]
     fn pow(self, other: &Integer) -> Self {
@@ -4097,14 +4099,12 @@ impl Pow<Integer> for &Float {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Pow;
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_float::Float;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!(
-    ///     (&Float::from(2)).pow(Integer::from(10)).to_string(),
-    ///     "1.0e3"
-    /// );
-    /// assert_eq!((&Float::from(2)).pow(Integer::from(-3)).to_string(), "0.12");
+    /// assert_eq!((&Float::TWO).pow(Integer::from(10)).to_string(), "1.0e3");
+    /// assert_eq!((&Float::TWO).pow(Integer::from(-3)).to_string(), "0.12");
     /// ```
     #[inline]
     fn pow(self, other: Integer) -> Float {
@@ -4148,17 +4148,12 @@ impl Pow<&Integer> for &Float {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Pow;
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_float::Float;
     /// use malachite_nz::integer::Integer;
     ///
-    /// assert_eq!(
-    ///     (&Float::from(2)).pow(&Integer::from(10)).to_string(),
-    ///     "1.0e3"
-    /// );
-    /// assert_eq!(
-    ///     (&Float::from(2)).pow(&Integer::from(-3)).to_string(),
-    ///     "0.12"
-    /// );
+    /// assert_eq!((&Float::TWO).pow(&Integer::from(10)).to_string(), "1.0e3");
+    /// assert_eq!((&Float::TWO).pow(&Integer::from(-3)).to_string(), "0.12");
     /// ```
     #[inline]
     fn pow(self, other: &Integer) -> Float {
@@ -4186,10 +4181,11 @@ impl PowAssign<Integer> for Float {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::PowAssign;
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_float::Float;
     /// use malachite_nz::integer::Integer;
     ///
-    /// let mut x = Float::from(2);
+    /// let mut x = Float::TWO;
     /// x.pow_assign(Integer::from(10));
     /// assert_eq!(x.to_string(), "1.0e3");
     /// ```
@@ -4219,10 +4215,11 @@ impl PowAssign<&Integer> for Float {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::PowAssign;
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_float::Float;
     /// use malachite_nz::integer::Integer;
     ///
-    /// let mut x = Float::from(2);
+    /// let mut x = Float::TWO;
     /// x.pow_assign(&Integer::from(10));
     /// assert_eq!(x.to_string(), "1.0e3");
     /// ```
@@ -4699,9 +4696,10 @@ impl Pow<u64> for Float {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Pow;
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_float::Float;
     ///
-    /// assert_eq!(Float::from(2).pow(10i64).to_string(), "1.0e3");
+    /// assert_eq!(Float::TWO.pow(10i64).to_string(), "1.0e3");
     /// assert_eq!(Float::from(0.5).pow(-1i64).to_string(), "2.0");
     /// ```
     #[inline]
@@ -4745,9 +4743,10 @@ impl Pow<u64> for &Float {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Pow;
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_float::Float;
     ///
-    /// assert_eq!((&Float::from(2)).pow(10i64).to_string(), "1.0e3");
+    /// assert_eq!((&Float::TWO).pow(10i64).to_string(), "1.0e3");
     /// assert_eq!(Float::from(0.5).pow(-1i64).to_string(), "2.0");
     /// ```
     #[inline]
@@ -4773,9 +4772,10 @@ impl PowAssign<u64> for Float {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::PowAssign;
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_float::Float;
     ///
-    /// let mut x = Float::from(2);
+    /// let mut x = Float::TWO;
     /// x.pow_assign(10i64);
     /// assert_eq!(x.to_string(), "1.0e3");
     /// ```
@@ -5634,6 +5634,7 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
@@ -5644,8 +5645,7 @@ impl Float {
     /// assert_eq!(p.to_string(), "2.0000000");
     /// assert_eq!(o, Equal);
     ///
-    /// let (p, o) =
-    ///     Float::unsigned_pow_rational_prec_round(3, Rational::from_signeds(1, 2), 2, Floor);
+    /// let (p, o) = Float::unsigned_pow_rational_prec_round(3, Rational::ONE_HALF, 2, Floor);
     /// assert_eq!(p.to_string(), "1.5");
     /// assert_eq!(o, Less);
     /// ```
@@ -5692,6 +5692,7 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
@@ -5706,12 +5707,8 @@ impl Float {
     /// assert_eq!(p.to_string(), "2.0000000");
     /// assert_eq!(o, Equal);
     ///
-    /// let (p, o) = Float::unsigned_pow_rational_prec_round_ref(
-    ///     3,
-    ///     &Rational::from_signeds(1, 2),
-    ///     2,
-    ///     Ceiling,
-    /// );
+    /// let (p, o) =
+    ///     Float::unsigned_pow_rational_prec_round_ref(3, &Rational::ONE_HALF, 2, Ceiling);
     /// assert_eq!(p.to_string(), "2.0");
     /// assert_eq!(o, Greater);
     /// ```
@@ -5755,6 +5752,7 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
@@ -5763,7 +5761,7 @@ impl Float {
     /// assert_eq!(p.to_string(), "2.0000000");
     /// assert_eq!(o, Equal);
     ///
-    /// let (p, o) = Float::unsigned_pow_rational_prec(3, Rational::from_signeds(1, 2), 53);
+    /// let (p, o) = Float::unsigned_pow_rational_prec(3, Rational::ONE_HALF, 53);
     /// assert_eq!(p.to_string(), "1.7320508075688772");
     /// assert_eq!(o, Less);
     /// ```
@@ -5803,6 +5801,7 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
@@ -5811,7 +5810,7 @@ impl Float {
     /// assert_eq!(p.to_string(), "3.0000000");
     /// assert_eq!(o, Equal);
     ///
-    /// let (p, o) = Float::unsigned_pow_rational_prec_ref(3, &Rational::from_signeds(1, 2), 53);
+    /// let (p, o) = Float::unsigned_pow_rational_prec_ref(3, &Rational::ONE_HALF, 53);
     /// assert_eq!(p.to_string(), "1.7320508075688772");
     /// assert_eq!(o, Less);
     /// ```
@@ -6048,15 +6047,13 @@ where
 ///
 /// # Examples
 /// ```
+/// use malachite_base::num::basic::traits::OneHalf;
 /// use malachite_base::num::float::NiceFloat;
 /// use malachite_float::float::arithmetic::pow::primitive_float_pow_rational;
 /// use malachite_q::Rational;
 ///
 /// assert_eq!(
-///     NiceFloat(primitive_float_pow_rational(
-///         4.0,
-///         &Rational::from_signeds(1, 2)
-///     )),
+///     NiceFloat(primitive_float_pow_rational(4.0, &Rational::ONE_HALF)),
 ///     NiceFloat(2.0)
 /// );
 /// assert_eq!(
@@ -6845,6 +6842,7 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
@@ -6871,7 +6869,7 @@ impl Float {
     /// // (9/4)^(1/2) = 3/2 is exact.
     /// let (p, o) = Float::rational_pow_rational_prec_round(
     ///     Rational::from_signeds(9, 4),
-    ///     Rational::from_signeds(1, 2),
+    ///     Rational::ONE_HALF,
     ///     10,
     ///     Floor,
     /// );
@@ -8097,18 +8095,17 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (p, o) =
-    ///     Float::from(2).pow_rational_prec_round(Rational::from_signeds(3, 2), 20, Floor);
+    /// let (p, o) = Float::TWO.pow_rational_prec_round(Rational::from_signeds(3, 2), 20, Floor);
     /// assert_eq!(p.to_string(), "2.8284264");
     /// assert_eq!(o, Less);
     ///
-    /// let (p, o) =
-    ///     Float::from(2).pow_rational_prec_round(Rational::from_signeds(3, 2), 20, Ceiling);
+    /// let (p, o) = Float::TWO.pow_rational_prec_round(Rational::from_signeds(3, 2), 20, Ceiling);
     /// assert_eq!(p.to_string(), "2.8284302");
     /// assert_eq!(o, Greater);
     ///
@@ -8256,11 +8253,12 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (p, o) = Float::from(2).pow_rational_prec(Rational::from_signeds(3, 2), 20);
+    /// let (p, o) = Float::TWO.pow_rational_prec(Rational::from_signeds(3, 2), 20);
     /// assert_eq!(p.to_string(), "2.8284264");
     /// assert_eq!(o, Less);
     ///

@@ -226,19 +226,20 @@ impl Rational {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
     /// assert_eq!(
-    ///     Rational::from_signeds(1, 2).cmp_complexity(&Rational::from_signeds(1, 3)),
+    ///     Rational::ONE_HALF.cmp_complexity(&Rational::from_signeds(1, 3)),
     ///     Less
     /// );
     /// assert_eq!(
-    ///     Rational::from_signeds(1, 2).cmp_complexity(&Rational::from_signeds(3, 2)),
+    ///     Rational::ONE_HALF.cmp_complexity(&Rational::from_signeds(3, 2)),
     ///     Less
     /// );
     /// assert_eq!(
-    ///     Rational::from_signeds(1, 2).cmp_complexity(&Rational::from_signeds(-1, 2)),
+    ///     Rational::ONE_HALF.cmp_complexity(&Rational::from_signeds(-1, 2)),
     ///     Less
     /// );
     /// ```
@@ -273,14 +274,14 @@ impl SimplestRationalInInterval for Rational {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::basic::traits::{OneHalf, Zero};
     /// use malachite_q::rational::arithmetic::traits::SimplestRationalInInterval;
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(
     ///     Rational::simplest_rational_in_open_interval(
     ///         &Rational::from_signeds(1, 3),
-    ///         &Rational::from_signeds(1, 2)
+    ///         &Rational::ONE_HALF
     ///     ),
     ///     Rational::from_signeds(2, 5)
     /// );
@@ -496,16 +497,16 @@ impl SimplestRationalInInterval for Rational {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::basic::traits::{OneHalf, Zero};
     /// use malachite_q::rational::arithmetic::traits::SimplestRationalInInterval;
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(
     ///     Rational::simplest_rational_in_closed_interval(
     ///         &Rational::from_signeds(1, 3),
-    ///         &Rational::from_signeds(1, 2)
+    ///         &Rational::ONE_HALF
     ///     ),
-    ///     Rational::from_signeds(1, 2)
+    ///     Rational::ONE_HALF
     /// );
     /// assert_eq!(
     ///     Rational::simplest_rational_in_closed_interval(

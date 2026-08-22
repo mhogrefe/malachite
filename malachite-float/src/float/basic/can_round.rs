@@ -48,12 +48,13 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     ///
     /// // A 100-bit approximation of sqrt(2), accurate to about 90 bits, is more than enough
     /// // to round to double precision...
-    /// let x = Float::from(2u32).sqrt_prec(100).0;
+    /// let x = Float::TWO.sqrt_prec(100).0;
     /// assert!(x.can_round(90, Nearest, Nearest, 53));
     ///
     /// // ...but knowing only 53 of its bits is not.

@@ -867,6 +867,7 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
@@ -876,7 +877,7 @@ impl Float {
     /// assert_eq!(log.to_string(), "0.50000"); // log_9(3) = 1/2
     /// assert_eq!(o, Equal);
     ///
-    /// let (log, o) = Float::log_base_rational_prec_round(Rational::from(2), 3, 20, Nearest);
+    /// let (log, o) = Float::log_base_rational_prec_round(Rational::TWO, 3, 20, Nearest);
     /// assert_eq!(log.to_string(), "0.63092995");
     /// assert_eq!(o, Greater);
     /// ```
@@ -1010,11 +1011,12 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (log, o) = Float::log_base_rational_prec_ref(&Rational::from(2), 3, 20);
+    /// let (log, o) = Float::log_base_rational_prec_ref(&Rational::TWO, 3, 20);
     /// assert_eq!(log.to_string(), "0.63092995");
     /// assert_eq!(o, Greater);
     /// ```

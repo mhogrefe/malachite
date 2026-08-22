@@ -131,13 +131,14 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     ///
     /// let x = Float::from(2.5f64);
     /// assert_eq!(
     ///     x.round_to_integer_prec_round_ref(4, Floor),
-    ///     (Float::from(2u32), Less, false)
+    ///     (Float::TWO, Less, false)
     /// );
     /// assert_eq!(
     ///     x.round_to_integer_prec_round_ref(4, Ceiling),
@@ -145,7 +146,7 @@ impl Float {
     /// );
     /// assert_eq!(
     ///     x.round_to_integer_prec_round_ref(4, Nearest),
-    ///     (Float::from(2u32), Less, false)
+    ///     (Float::TWO, Less, false)
     /// );
     ///
     /// // A single rounding: the nearest integer to 10.5 representable at 2 bits is 12.
@@ -210,13 +211,14 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     ///
     /// let x = Float::from(2.5f64);
     /// assert_eq!(
     ///     x.round_to_integer_prec_round_ref(4, Floor),
-    ///     (Float::from(2u32), Less, false)
+    ///     (Float::TWO, Less, false)
     /// );
     /// assert_eq!(
     ///     x.round_to_integer_prec_round_ref(4, Ceiling),
@@ -224,7 +226,7 @@ impl Float {
     /// );
     /// assert_eq!(
     ///     x.round_to_integer_prec_round_ref(4, Nearest),
-    ///     (Float::from(2u32), Less, false)
+    ///     (Float::TWO, Less, false)
     /// );
     ///
     /// // A single rounding: the nearest integer to 10.5 representable at 2 bits is 12.
@@ -286,14 +288,11 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
-    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_float::Float;
     ///
     /// let x = Float::from(2.5f64);
-    /// assert_eq!(
-    ///     x.round_to_integer_prec_ref(4),
-    ///     (Float::from(2u32), Less, false)
-    /// );
+    /// assert_eq!(x.round_to_integer_prec_ref(4), (Float::TWO, Less, false));
     /// assert_eq!(
     ///     Float::from(4u32).round_to_integer_prec(2),
     ///     (Float::from(4u32), Equal, true)
@@ -340,14 +339,11 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
-    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_float::Float;
     ///
     /// let x = Float::from(2.5f64);
-    /// assert_eq!(
-    ///     x.round_to_integer_prec_ref(4),
-    ///     (Float::from(2u32), Less, false)
-    /// );
+    /// assert_eq!(x.round_to_integer_prec_ref(4), (Float::TWO, Less, false));
     /// assert_eq!(
     ///     Float::from(4u32).round_to_integer_prec(2),
     ///     (Float::from(4u32), Equal, true)
@@ -392,6 +388,7 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     ///
@@ -402,7 +399,7 @@ impl Float {
     /// );
     /// assert_eq!(
     ///     x.round_to_integer_round_ref(Floor),
-    ///     (Float::from(2u32), Less, false)
+    ///     (Float::TWO, Less, false)
     /// );
     /// ```
     #[inline]
@@ -444,6 +441,7 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     ///
@@ -454,7 +452,7 @@ impl Float {
     /// );
     /// assert_eq!(
     ///     x.round_to_integer_round_ref(Floor),
-    ///     (Float::from(2u32), Less, false)
+    ///     (Float::TWO, Less, false)
     /// );
     /// ```
     #[inline]
@@ -492,12 +490,12 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
-    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_float::Float;
     ///
     /// // ties to even
     /// let x = Float::from(2.5f64);
-    /// assert_eq!(x.round_to_integer_ref(), (Float::from(2u32), Less, false));
+    /// assert_eq!(x.round_to_integer_ref(), (Float::TWO, Less, false));
     /// ```
     #[inline]
     pub fn round_to_integer(self) -> (Self, Ordering, bool) {
@@ -534,12 +532,12 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
-    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_float::Float;
     ///
     /// // ties to even
     /// let x = Float::from(2.5f64);
-    /// assert_eq!(x.round_to_integer_ref(), (Float::from(2u32), Less, false));
+    /// assert_eq!(x.round_to_integer_ref(), (Float::TWO, Less, false));
     /// ```
     #[inline]
     pub fn round_to_integer_ref(&self) -> (Self, Ordering, bool) {
@@ -584,7 +582,6 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
-    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     ///
     /// // ties away from zero
@@ -637,7 +634,6 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
-    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     ///
     /// // ties away from zero
@@ -686,7 +682,6 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
-    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     ///
     /// // ties away from zero
@@ -735,7 +730,6 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
-    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     ///
     /// // ties away from zero

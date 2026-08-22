@@ -632,12 +632,13 @@ pub fn exhaustive_integer_range_to_infinity(a: Integer) -> ExhaustiveIntegerRang
 /// # Examples
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::num::basic::traits::Two;
 /// use malachite_nz::integer::exhaustive::exhaustive_integer_range_to_negative_infinity;
 /// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
 ///     prefix_to_string(
-///         exhaustive_integer_range_to_negative_infinity(Integer::from(2)),
+///         exhaustive_integer_range_to_negative_infinity(Integer::TWO),
 ///         10
 ///     ),
 ///     "[0, 1, -1, 2, -2, -3, -4, -5, -6, -7, ...]"

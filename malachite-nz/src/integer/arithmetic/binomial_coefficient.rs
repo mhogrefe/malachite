@@ -39,18 +39,19 @@ impl BinomialCoefficient for Integer {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::BinomialCoefficient;
+    /// use malachite_base::num::basic::traits::{One, Two, Zero};
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(
-    ///     Integer::binomial_coefficient(Integer::from(4), Integer::from(0)),
+    ///     Integer::binomial_coefficient(Integer::from(4), Integer::ZERO),
     ///     1
     /// );
     /// assert_eq!(
-    ///     Integer::binomial_coefficient(Integer::from(4), Integer::from(1)),
+    ///     Integer::binomial_coefficient(Integer::from(4), Integer::ONE),
     ///     4
     /// );
     /// assert_eq!(
-    ///     Integer::binomial_coefficient(Integer::from(4), Integer::from(2)),
+    ///     Integer::binomial_coefficient(Integer::from(4), Integer::TWO),
     ///     6
     /// );
     /// assert_eq!(
@@ -71,15 +72,15 @@ impl BinomialCoefficient for Integer {
     /// );
     ///
     /// assert_eq!(
-    ///     Integer::binomial_coefficient(Integer::from(-3), Integer::from(0)),
+    ///     Integer::binomial_coefficient(Integer::from(-3), Integer::ZERO),
     ///     1
     /// );
     /// assert_eq!(
-    ///     Integer::binomial_coefficient(Integer::from(-3), Integer::from(1)),
+    ///     Integer::binomial_coefficient(Integer::from(-3), Integer::ONE),
     ///     -3
     /// );
     /// assert_eq!(
-    ///     Integer::binomial_coefficient(Integer::from(-3), Integer::from(2)),
+    ///     Integer::binomial_coefficient(Integer::from(-3), Integer::TWO),
     ///     6
     /// );
     /// assert_eq!(
@@ -129,18 +130,19 @@ impl<'a> BinomialCoefficient<&'a Self> for Integer {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::BinomialCoefficient;
+    /// use malachite_base::num::basic::traits::{One, Two, Zero};
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(
-    ///     Integer::binomial_coefficient(&Integer::from(4), &Integer::from(0)),
+    ///     Integer::binomial_coefficient(&Integer::from(4), &Integer::ZERO),
     ///     1
     /// );
     /// assert_eq!(
-    ///     Integer::binomial_coefficient(&Integer::from(4), &Integer::from(1)),
+    ///     Integer::binomial_coefficient(&Integer::from(4), &Integer::ONE),
     ///     4
     /// );
     /// assert_eq!(
-    ///     Integer::binomial_coefficient(&Integer::from(4), &Integer::from(2)),
+    ///     Integer::binomial_coefficient(&Integer::from(4), &Integer::TWO),
     ///     6
     /// );
     /// assert_eq!(
@@ -161,15 +163,15 @@ impl<'a> BinomialCoefficient<&'a Self> for Integer {
     /// );
     ///
     /// assert_eq!(
-    ///     Integer::binomial_coefficient(&Integer::from(-3), &Integer::from(0)),
+    ///     Integer::binomial_coefficient(&Integer::from(-3), &Integer::ZERO),
     ///     1
     /// );
     /// assert_eq!(
-    ///     Integer::binomial_coefficient(&Integer::from(-3), &Integer::from(1)),
+    ///     Integer::binomial_coefficient(&Integer::from(-3), &Integer::ONE),
     ///     -3
     /// );
     /// assert_eq!(
-    ///     Integer::binomial_coefficient(&Integer::from(-3), &Integer::from(2)),
+    ///     Integer::binomial_coefficient(&Integer::from(-3), &Integer::TWO),
     ///     6
     /// );
     /// assert_eq!(

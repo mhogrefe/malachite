@@ -64,19 +64,16 @@ impl ModDivList<Self, Self> for Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::ModDivList;
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_nz::natural::Natural;
     ///
     /// // The quotients of 6 and 4 mod 10 are 4 and 9: 4 + 5 * i for 0 <= i < 2.
     /// assert_eq!(
     ///     Natural::from(6u32).mod_div_list(Natural::from(4u32), Natural::from(10u32)),
-    ///     Some((
-    ///         Natural::from(4u32),
-    ///         Natural::from(5u32),
-    ///         Natural::from(2u32)
-    ///     ))
+    ///     Some((Natural::from(4u32), Natural::from(5u32), Natural::TWO))
     /// );
     /// assert_eq!(
-    ///     Natural::from(2u32).mod_div_list(Natural::from(5u32), Natural::from(10u32)),
+    ///     Natural::TWO.mod_div_list(Natural::from(5u32), Natural::from(10u32)),
     ///     None
     /// );
     /// ```
@@ -121,15 +118,12 @@ impl<'a> ModDivList<Self, &'a Self> for Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::ModDivList;
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
     ///     Natural::from(6u32).mod_div_list(Natural::from(4u32), &Natural::from(10u32)),
-    ///     Some((
-    ///         Natural::from(4u32),
-    ///         Natural::from(5u32),
-    ///         Natural::from(2u32)
-    ///     ))
+    ///     Some((Natural::from(4u32), Natural::from(5u32), Natural::TWO))
     /// );
     /// ```
     fn mod_div_list(self, other: Self, m: &'a Self) -> Option<(Self, Self, Self)> {
@@ -176,15 +170,12 @@ impl<'a> ModDivList<&'a Self, Self> for Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::ModDivList;
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
     ///     Natural::from(6u32).mod_div_list(&Natural::from(4u32), Natural::from(10u32)),
-    ///     Some((
-    ///         Natural::from(4u32),
-    ///         Natural::from(5u32),
-    ///         Natural::from(2u32)
-    ///     ))
+    ///     Some((Natural::from(4u32), Natural::from(5u32), Natural::TWO))
     /// );
     /// ```
     fn mod_div_list(self, other: &'a Self, m: Self) -> Option<(Self, Self, Self)> {
@@ -231,15 +222,12 @@ impl<'a, 'b> ModDivList<&'a Self, &'b Self> for Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::ModDivList;
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
     ///     Natural::from(6u32).mod_div_list(&Natural::from(4u32), &Natural::from(10u32)),
-    ///     Some((
-    ///         Natural::from(4u32),
-    ///         Natural::from(5u32),
-    ///         Natural::from(2u32)
-    ///     ))
+    ///     Some((Natural::from(4u32), Natural::from(5u32), Natural::TWO))
     /// );
     /// ```
     fn mod_div_list(self, other: &'a Self, m: &'b Self) -> Option<(Self, Self, Self)> {
@@ -286,15 +274,12 @@ impl ModDivList<Natural, Natural> for &Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::ModDivList;
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
     ///     (&Natural::from(6u32)).mod_div_list(Natural::from(4u32), Natural::from(10u32)),
-    ///     Some((
-    ///         Natural::from(4u32),
-    ///         Natural::from(5u32),
-    ///         Natural::from(2u32)
-    ///     ))
+    ///     Some((Natural::from(4u32), Natural::from(5u32), Natural::TWO))
     /// );
     /// ```
     fn mod_div_list(self, other: Natural, m: Natural) -> Option<(Natural, Natural, Natural)> {
@@ -338,15 +323,12 @@ impl ModDivList<Natural, &Natural> for &Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::ModDivList;
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
     ///     (&Natural::from(6u32)).mod_div_list(Natural::from(4u32), &Natural::from(10u32)),
-    ///     Some((
-    ///         Natural::from(4u32),
-    ///         Natural::from(5u32),
-    ///         Natural::from(2u32)
-    ///     ))
+    ///     Some((Natural::from(4u32), Natural::from(5u32), Natural::TWO))
     /// );
     /// ```
     fn mod_div_list(self, other: Natural, m: &Natural) -> Option<(Natural, Natural, Natural)> {
@@ -393,15 +375,12 @@ impl ModDivList<&Natural, Natural> for &Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::ModDivList;
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
     ///     (&Natural::from(6u32)).mod_div_list(&Natural::from(4u32), Natural::from(10u32)),
-    ///     Some((
-    ///         Natural::from(4u32),
-    ///         Natural::from(5u32),
-    ///         Natural::from(2u32)
-    ///     ))
+    ///     Some((Natural::from(4u32), Natural::from(5u32), Natural::TWO))
     /// );
     /// ```
     fn mod_div_list(self, other: &Natural, m: Natural) -> Option<(Natural, Natural, Natural)> {
@@ -448,15 +427,12 @@ impl ModDivList<&Natural, &Natural> for &Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::ModDivList;
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
     ///     (&Natural::from(6u32)).mod_div_list(&Natural::from(4u32), &Natural::from(10u32)),
-    ///     Some((
-    ///         Natural::from(4u32),
-    ///         Natural::from(5u32),
-    ///         Natural::from(2u32)
-    ///     ))
+    ///     Some((Natural::from(4u32), Natural::from(5u32), Natural::TWO))
     /// );
     /// ```
     fn mod_div_list(self, other: &Natural, m: &Natural) -> Option<(Natural, Natural, Natural)> {

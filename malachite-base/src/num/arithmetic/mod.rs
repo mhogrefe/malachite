@@ -12,7 +12,6 @@
 /// # abs_assign
 /// ```
 /// use malachite_base::num::arithmetic::traits::AbsAssign;
-/// use malachite_base::num::basic::traits::NegativeInfinity;
 /// use malachite_base::num::float::NiceFloat;
 ///
 /// let mut x = 0i8;
@@ -4109,7 +4108,6 @@ pub mod shr_round;
 /// # sign
 /// ```
 /// use malachite_base::num::arithmetic::traits::Sign;
-/// use malachite_base::num::basic::traits::NegativeInfinity;
 /// use std::cmp::Ordering::*;
 ///
 /// assert_eq!(0u8.sign(), Equal);

@@ -805,12 +805,12 @@ impl AddAssign<Self> for Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Pow;
-    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::basic::traits::{Two, Zero};
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::ZERO;
     /// x += Natural::from(10u32).pow(12);
-    /// x += Natural::from(10u32).pow(12) * Natural::from(2u32);
+    /// x += Natural::from(10u32).pow(12) * Natural::TWO;
     /// x += Natural::from(10u32).pow(12) * Natural::from(3u32);
     /// x += Natural::from(10u32).pow(12) * Natural::from(4u32);
     /// assert_eq!(x, 10000000000000u64);
@@ -847,12 +847,12 @@ impl<'a> AddAssign<&'a Self> for Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Pow;
-    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::basic::traits::{Two, Zero};
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::ZERO;
     /// x += &Natural::from(10u32).pow(12);
-    /// x += &(Natural::from(10u32).pow(12) * Natural::from(2u32));
+    /// x += &(Natural::from(10u32).pow(12) * Natural::TWO);
     /// x += &(Natural::from(10u32).pow(12) * Natural::from(3u32));
     /// x += &(Natural::from(10u32).pow(12) * Natural::from(4u32));
     /// assert_eq!(x, 10000000000000u64);

@@ -297,10 +297,10 @@ impl ModPowerOf2Add<Self> for Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Add;
-    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::basic::traits::{Two, Zero};
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::ZERO.mod_power_of_2_add(Natural::from(2u32), 5), 2);
+    /// assert_eq!(Natural::ZERO.mod_power_of_2_add(Natural::TWO, 5), 2);
     /// assert_eq!(
     ///     Natural::from(10u32).mod_power_of_2_add(Natural::from(14u32), 4),
     ///     8
@@ -333,10 +333,10 @@ impl<'a> ModPowerOf2Add<&'a Self> for Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Add;
-    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::basic::traits::{Two, Zero};
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::ZERO.mod_power_of_2_add(&Natural::from(2u32), 5), 2);
+    /// assert_eq!(Natural::ZERO.mod_power_of_2_add(&Natural::TWO, 5), 2);
     /// assert_eq!(
     ///     Natural::from(10u32).mod_power_of_2_add(&Natural::from(14u32), 4),
     ///     8
@@ -370,13 +370,10 @@ impl ModPowerOf2Add<Natural> for &Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Add;
-    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::basic::traits::{Two, Zero};
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(
-    ///     (&Natural::ZERO).mod_power_of_2_add(Natural::from(2u32), 5),
-    ///     2
-    /// );
+    /// assert_eq!((&Natural::ZERO).mod_power_of_2_add(Natural::TWO, 5), 2);
     /// assert_eq!(
     ///     (&Natural::from(10u32)).mod_power_of_2_add(Natural::from(14u32), 4),
     ///     8
@@ -411,13 +408,10 @@ impl ModPowerOf2Add<&Natural> for &Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2Add;
-    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::basic::traits::{Two, Zero};
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(
-    ///     (&Natural::ZERO).mod_power_of_2_add(&Natural::from(2u32), 5),
-    ///     2
-    /// );
+    /// assert_eq!((&Natural::ZERO).mod_power_of_2_add(&Natural::TWO, 5), 2);
     /// assert_eq!(
     ///     (&Natural::from(10u32)).mod_power_of_2_add(&Natural::from(14u32), 4),
     ///     8
@@ -463,11 +457,11 @@ impl ModPowerOf2AddAssign<Self> for Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2AddAssign;
-    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::basic::traits::{Two, Zero};
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::ZERO;
-    /// x.mod_power_of_2_add_assign(Natural::from(2u32), 5);
+    /// x.mod_power_of_2_add_assign(Natural::TWO, 5);
     /// assert_eq!(x, 2);
     ///
     /// let mut x = Natural::from(10u32);
@@ -517,11 +511,11 @@ impl<'a> ModPowerOf2AddAssign<&'a Self> for Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::ModPowerOf2AddAssign;
-    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::basic::traits::{Two, Zero};
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::ZERO;
-    /// x.mod_power_of_2_add_assign(&Natural::from(2u32), 5);
+    /// x.mod_power_of_2_add_assign(&Natural::TWO, 5);
     /// assert_eq!(x, 2);
     ///
     /// let mut x = Natural::from(10u32);

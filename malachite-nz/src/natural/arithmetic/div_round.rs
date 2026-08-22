@@ -129,12 +129,13 @@ impl DivRound<Self> for Natural {
     /// ```
     /// use core::cmp::Ordering::*;
     /// use malachite_base::num::arithmetic::traits::{DivRound, Pow};
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
     ///     Natural::from(10u32).div_round(Natural::from(4u32), Down),
-    ///     (Natural::from(2u32), Less)
+    ///     (Natural::TWO, Less)
     /// );
     /// assert_eq!(
     ///     Natural::from(10u32)
@@ -154,7 +155,7 @@ impl DivRound<Self> for Natural {
     /// );
     /// assert_eq!(
     ///     Natural::from(10u32).div_round(Natural::from(5u32), Exact),
-    ///     (Natural::from(2u32), Equal)
+    ///     (Natural::TWO, Equal)
     /// );
     /// assert_eq!(
     ///     Natural::from(10u32).div_round(Natural::from(3u32), Nearest),
@@ -166,7 +167,7 @@ impl DivRound<Self> for Natural {
     /// );
     /// assert_eq!(
     ///     Natural::from(10u32).div_round(Natural::from(4u32), Nearest),
-    ///     (Natural::from(2u32), Less)
+    ///     (Natural::TWO, Less)
     /// );
     /// assert_eq!(
     ///     Natural::from(14u32).div_round(Natural::from(4u32), Nearest),
@@ -230,12 +231,13 @@ impl<'a> DivRound<&'a Self> for Natural {
     /// ```
     /// use core::cmp::Ordering::*;
     /// use malachite_base::num::arithmetic::traits::{DivRound, Pow};
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
     ///     Natural::from(10u32).div_round(&Natural::from(4u32), Down),
-    ///     (Natural::from(2u32), Less)
+    ///     (Natural::TWO, Less)
     /// );
     /// assert_eq!(
     ///     Natural::from(10u32)
@@ -255,7 +257,7 @@ impl<'a> DivRound<&'a Self> for Natural {
     /// );
     /// assert_eq!(
     ///     Natural::from(10u32).div_round(&Natural::from(5u32), Exact),
-    ///     (Natural::from(2u32), Equal)
+    ///     (Natural::TWO, Equal)
     /// );
     /// assert_eq!(
     ///     Natural::from(10u32).div_round(&Natural::from(3u32), Nearest),
@@ -267,7 +269,7 @@ impl<'a> DivRound<&'a Self> for Natural {
     /// );
     /// assert_eq!(
     ///     Natural::from(10u32).div_round(&Natural::from(4u32), Nearest),
-    ///     (Natural::from(2u32), Less)
+    ///     (Natural::TWO, Less)
     /// );
     /// assert_eq!(
     ///     Natural::from(14u32).div_round(&Natural::from(4u32), Nearest),
@@ -331,12 +333,13 @@ impl DivRound<Natural> for &Natural {
     /// ```
     /// use core::cmp::Ordering::*;
     /// use malachite_base::num::arithmetic::traits::{DivRound, Pow};
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
     ///     (&Natural::from(10u32)).div_round(Natural::from(4u32), Down),
-    ///     (Natural::from(2u32), Less)
+    ///     (Natural::TWO, Less)
     /// );
     /// assert_eq!(
     ///     (&Natural::from(10u32).pow(12)).div_round(Natural::from(3u32), Floor),
@@ -352,7 +355,7 @@ impl DivRound<Natural> for &Natural {
     /// );
     /// assert_eq!(
     ///     (&Natural::from(10u32)).div_round(Natural::from(5u32), Exact),
-    ///     (Natural::from(2u32), Equal)
+    ///     (Natural::TWO, Equal)
     /// );
     /// assert_eq!(
     ///     (&Natural::from(10u32)).div_round(Natural::from(3u32), Nearest),
@@ -364,7 +367,7 @@ impl DivRound<Natural> for &Natural {
     /// );
     /// assert_eq!(
     ///     (&Natural::from(10u32)).div_round(Natural::from(4u32), Nearest),
-    ///     (Natural::from(2u32), Less)
+    ///     (Natural::TWO, Less)
     /// );
     /// assert_eq!(
     ///     (&Natural::from(14u32)).div_round(Natural::from(4u32), Nearest),
@@ -435,12 +438,13 @@ impl DivRound<&Natural> for &Natural {
     /// ```
     /// use core::cmp::Ordering::*;
     /// use malachite_base::num::arithmetic::traits::{DivRound, Pow};
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
     ///     (&Natural::from(10u32)).div_round(&Natural::from(4u32), Down),
-    ///     (Natural::from(2u32), Less)
+    ///     (Natural::TWO, Less)
     /// );
     /// assert_eq!(
     ///     (&Natural::from(10u32).pow(12)).div_round(&Natural::from(3u32), Floor),
@@ -456,7 +460,7 @@ impl DivRound<&Natural> for &Natural {
     /// );
     /// assert_eq!(
     ///     (&Natural::from(10u32)).div_round(&Natural::from(5u32), Exact),
-    ///     (Natural::from(2u32), Equal)
+    ///     (Natural::TWO, Equal)
     /// );
     /// assert_eq!(
     ///     (&Natural::from(10u32)).div_round(&Natural::from(3u32), Nearest),
@@ -468,7 +472,7 @@ impl DivRound<&Natural> for &Natural {
     /// );
     /// assert_eq!(
     ///     (&Natural::from(10u32)).div_round(&Natural::from(4u32), Nearest),
-    ///     (Natural::from(2u32), Less)
+    ///     (Natural::TWO, Less)
     /// );
     /// assert_eq!(
     ///     (&Natural::from(14u32)).div_round(&Natural::from(4u32), Nearest),

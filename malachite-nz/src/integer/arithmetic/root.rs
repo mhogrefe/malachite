@@ -465,7 +465,7 @@ impl RootRem<u64> for Integer {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::RootRem;
-    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::basic::traits::{One, Zero};
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(
@@ -479,7 +479,7 @@ impl RootRem<u64> for Integer {
     /// // the root is rounded down, so the remainder stays non-negative
     /// assert_eq!(
     ///     Integer::from(-999).root_rem(3),
-    ///     (Integer::from(-10), Integer::from(1))
+    ///     (Integer::from(-10), Integer::ONE)
     /// );
     /// assert_eq!(
     ///     Integer::from(-1000).root_rem(3),
@@ -527,7 +527,7 @@ impl RootRem<u64> for &Integer {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::RootRem;
-    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::num::basic::traits::{One, Zero};
     /// use malachite_nz::integer::Integer;
     ///
     /// assert_eq!(
@@ -541,7 +541,7 @@ impl RootRem<u64> for &Integer {
     /// // the root is rounded down, so the remainder stays non-negative
     /// assert_eq!(
     ///     (&Integer::from(-999)).root_rem(3),
-    ///     (Integer::from(-10), Integer::from(1))
+    ///     (Integer::from(-10), Integer::ONE)
     /// );
     /// assert_eq!(
     ///     (&Integer::from(-1000)).root_rem(3),

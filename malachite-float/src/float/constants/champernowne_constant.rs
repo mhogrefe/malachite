@@ -199,7 +199,7 @@ impl Float {
     /// ```
     /// use malachite_float::Float;
     ///
-    /// let (x, _) = Float::champernowne_constant_prec(100);
+    /// let x = Float::champernowne_constant_prec(100).0;
     /// assert_eq!(x.to_string(), "0.12345678910111213141516171819207");
     /// ```
     #[inline]

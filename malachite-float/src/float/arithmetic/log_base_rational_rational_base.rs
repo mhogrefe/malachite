@@ -169,6 +169,7 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
@@ -184,7 +185,7 @@ impl Float {
     /// assert_eq!(o, Equal);
     ///
     /// let (log, o) = Float::log_base_rational_rational_base_prec_round(
-    ///     Rational::from(2),
+    ///     Rational::TWO,
     ///     Rational::from(3),
     ///     10,
     ///     Floor,
@@ -225,6 +226,7 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
@@ -241,7 +243,7 @@ impl Float {
     ///
     /// let (log, o) = Float::log_base_rational_rational_base_prec_round_ref(
     ///     &Rational::from_signeds(1, 8),
-    ///     &Rational::from(2),
+    ///     &Rational::TWO,
     ///     10,
     ///     Exact,
     /// );

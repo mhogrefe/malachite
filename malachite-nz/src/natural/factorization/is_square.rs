@@ -214,15 +214,17 @@ impl IsSquare for Natural {
     /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
     /// # Examples
     /// ```
+    /// use malachite_base::num::arithmetic::traits::Square;
+    /// use malachite_base::num::basic::traits::One;
     /// use malachite_base::num::factorization::traits::IsSquare;
     /// use malachite_nz::natural::Natural;
     ///
     /// let x = Natural::from(12345u64);
-    /// let mut y = &x * &x;
+    /// let mut y = (&x).square();
     ///
     /// assert!((&y).is_square());
     ///
-    /// y += Natural::from(1u64);
+    /// y += Natural::ONE;
     /// assert!(!(&y).is_square());
     /// ```
     fn is_square(&self) -> bool {

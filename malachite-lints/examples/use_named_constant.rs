@@ -17,6 +17,10 @@ fn main() {
     let _ = Float::two_prec(1);
     let _ = Float::negative_one_prec(1);
     let _ = Float::one_half_prec(1);
+    let _ = Float::from(0);
+    let _ = Float::from(1u32);
+    let _ = Float::from(2);
+    let _ = Float::from(-1);
     // Other values don't get the named-constant advice (`runtime_literal_conversion` fires
     // instead).
     let _ = Natural::from(3u32);
@@ -24,6 +28,9 @@ fn main() {
     let _ = Rational::from_unsigneds(1u32, 3u32);
     // A `Float` constant at a precision other than 1 is not the named constant: fine.
     let _ = Float::one_prec(100);
+    // `Float::from` of other values is not a named constant (`runtime_literal_conversion` fires
+    // instead).
+    let _ = Float::from(3);
     // A non-literal argument: fine.
     let k = 1u32;
     let _ = Natural::from(k);

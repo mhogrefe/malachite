@@ -145,13 +145,14 @@ macro_rules! natural_mod_sqrt_doc {
         /// # Examples
         /// ```
         /// use malachite_base::num::arithmetic::traits::ModSqrt;
+        /// use malachite_base::num::basic::traits::Two;
         /// use malachite_nz::natural::Natural;
         ///
         /// assert_eq!(
         ///     (&Natural::from(4u32)).mod_sqrt(&Natural::from(5u32)),
-        ///     Some(Natural::from(2u32))
+        ///     Some(Natural::TWO)
         /// );
-        /// assert_eq!((&Natural::from(2u32)).mod_sqrt(&Natural::from(3u32)), None);
+        /// assert_eq!((&Natural::TWO).mod_sqrt(&Natural::from(3u32)), None);
         /// assert_eq!(
         ///     (&Natural::from(12909u32)).mod_sqrt(&Natural::from(65537u32)),
         ///     Some(Natural::from(50618u32))

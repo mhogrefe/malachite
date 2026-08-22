@@ -65,12 +65,13 @@ impl BalancedCrt<Natural, Natural, Natural> for Integer {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::BalancedCrt;
+    /// use malachite_base::num::basic::traits::{NegativeOne, One};
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
     ///
     /// // 8 is 2 mod 3 and 3 mod 5, and its balanced representative mod 15 is -7.
     /// assert_eq!(
-    ///     Integer::from(-1).balanced_crt(
+    ///     Integer::NEGATIVE_ONE.balanced_crt(
     ///         Natural::from(3u32),
     ///         Natural::from(3u32),
     ///         Natural::from(5u32),
@@ -78,7 +79,7 @@ impl BalancedCrt<Natural, Natural, Natural> for Integer {
     ///     Some(Integer::from(-7))
     /// );
     /// assert_eq!(
-    ///     Integer::from(1).balanced_crt(
+    ///     Integer::ONE.balanced_crt(
     ///         Natural::from(4u32),
     ///         Natural::from(3u32),
     ///         Natural::from(6u32),
@@ -130,12 +131,13 @@ impl BalancedCrt<Natural, Natural, &Natural> for Integer {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::BalancedCrt;
+    /// use malachite_base::num::basic::traits::{NegativeOne, One};
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
     ///
     /// // 8 is 2 mod 3 and 3 mod 5, and its balanced representative mod 15 is -7.
     /// assert_eq!(
-    ///     Integer::from(-1).balanced_crt(
+    ///     Integer::NEGATIVE_ONE.balanced_crt(
     ///         Natural::from(3u32),
     ///         Natural::from(3u32),
     ///         &Natural::from(5u32),
@@ -143,7 +145,7 @@ impl BalancedCrt<Natural, Natural, &Natural> for Integer {
     ///     Some(Integer::from(-7))
     /// );
     /// assert_eq!(
-    ///     Integer::from(1).balanced_crt(
+    ///     Integer::ONE.balanced_crt(
     ///         Natural::from(4u32),
     ///         Natural::from(3u32),
     ///         &Natural::from(6u32),
@@ -195,12 +197,13 @@ impl BalancedCrt<Natural, &Natural, Natural> for Integer {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::BalancedCrt;
+    /// use malachite_base::num::basic::traits::{NegativeOne, One};
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
     ///
     /// // 8 is 2 mod 3 and 3 mod 5, and its balanced representative mod 15 is -7.
     /// assert_eq!(
-    ///     Integer::from(-1).balanced_crt(
+    ///     Integer::NEGATIVE_ONE.balanced_crt(
     ///         Natural::from(3u32),
     ///         &Natural::from(3u32),
     ///         Natural::from(5u32),
@@ -208,7 +211,7 @@ impl BalancedCrt<Natural, &Natural, Natural> for Integer {
     ///     Some(Integer::from(-7))
     /// );
     /// assert_eq!(
-    ///     Integer::from(1).balanced_crt(
+    ///     Integer::ONE.balanced_crt(
     ///         Natural::from(4u32),
     ///         &Natural::from(3u32),
     ///         Natural::from(6u32),
@@ -260,12 +263,13 @@ impl BalancedCrt<Natural, &Natural, &Natural> for Integer {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::BalancedCrt;
+    /// use malachite_base::num::basic::traits::{NegativeOne, One};
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
     ///
     /// // 8 is 2 mod 3 and 3 mod 5, and its balanced representative mod 15 is -7.
     /// assert_eq!(
-    ///     Integer::from(-1).balanced_crt(
+    ///     Integer::NEGATIVE_ONE.balanced_crt(
     ///         Natural::from(3u32),
     ///         &Natural::from(3u32),
     ///         &Natural::from(5u32),
@@ -273,7 +277,7 @@ impl BalancedCrt<Natural, &Natural, &Natural> for Integer {
     ///     Some(Integer::from(-7))
     /// );
     /// assert_eq!(
-    ///     Integer::from(1).balanced_crt(
+    ///     Integer::ONE.balanced_crt(
     ///         Natural::from(4u32),
     ///         &Natural::from(3u32),
     ///         &Natural::from(6u32),
@@ -325,12 +329,13 @@ impl BalancedCrt<&Natural, Natural, Natural> for Integer {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::BalancedCrt;
+    /// use malachite_base::num::basic::traits::{NegativeOne, One};
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
     ///
     /// // 8 is 2 mod 3 and 3 mod 5, and its balanced representative mod 15 is -7.
     /// assert_eq!(
-    ///     Integer::from(-1).balanced_crt(
+    ///     Integer::NEGATIVE_ONE.balanced_crt(
     ///         &Natural::from(3u32),
     ///         Natural::from(3u32),
     ///         Natural::from(5u32),
@@ -338,7 +343,7 @@ impl BalancedCrt<&Natural, Natural, Natural> for Integer {
     ///     Some(Integer::from(-7))
     /// );
     /// assert_eq!(
-    ///     Integer::from(1).balanced_crt(
+    ///     Integer::ONE.balanced_crt(
     ///         &Natural::from(4u32),
     ///         Natural::from(3u32),
     ///         Natural::from(6u32),
@@ -390,12 +395,13 @@ impl BalancedCrt<&Natural, Natural, &Natural> for Integer {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::BalancedCrt;
+    /// use malachite_base::num::basic::traits::{NegativeOne, One};
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
     ///
     /// // 8 is 2 mod 3 and 3 mod 5, and its balanced representative mod 15 is -7.
     /// assert_eq!(
-    ///     Integer::from(-1).balanced_crt(
+    ///     Integer::NEGATIVE_ONE.balanced_crt(
     ///         &Natural::from(3u32),
     ///         Natural::from(3u32),
     ///         &Natural::from(5u32),
@@ -403,7 +409,7 @@ impl BalancedCrt<&Natural, Natural, &Natural> for Integer {
     ///     Some(Integer::from(-7))
     /// );
     /// assert_eq!(
-    ///     Integer::from(1).balanced_crt(
+    ///     Integer::ONE.balanced_crt(
     ///         &Natural::from(4u32),
     ///         Natural::from(3u32),
     ///         &Natural::from(6u32),
@@ -455,12 +461,13 @@ impl BalancedCrt<&Natural, &Natural, Natural> for Integer {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::BalancedCrt;
+    /// use malachite_base::num::basic::traits::{NegativeOne, One};
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
     ///
     /// // 8 is 2 mod 3 and 3 mod 5, and its balanced representative mod 15 is -7.
     /// assert_eq!(
-    ///     Integer::from(-1).balanced_crt(
+    ///     Integer::NEGATIVE_ONE.balanced_crt(
     ///         &Natural::from(3u32),
     ///         &Natural::from(3u32),
     ///         Natural::from(5u32),
@@ -468,7 +475,7 @@ impl BalancedCrt<&Natural, &Natural, Natural> for Integer {
     ///     Some(Integer::from(-7))
     /// );
     /// assert_eq!(
-    ///     Integer::from(1).balanced_crt(
+    ///     Integer::ONE.balanced_crt(
     ///         &Natural::from(4u32),
     ///         &Natural::from(3u32),
     ///         Natural::from(6u32),
@@ -520,12 +527,13 @@ impl BalancedCrt<&Natural, &Natural, &Natural> for Integer {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::BalancedCrt;
+    /// use malachite_base::num::basic::traits::{NegativeOne, One};
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
     ///
     /// // 8 is 2 mod 3 and 3 mod 5, and its balanced representative mod 15 is -7.
     /// assert_eq!(
-    ///     Integer::from(-1).balanced_crt(
+    ///     Integer::NEGATIVE_ONE.balanced_crt(
     ///         &Natural::from(3u32),
     ///         &Natural::from(3u32),
     ///         &Natural::from(5u32),
@@ -533,7 +541,7 @@ impl BalancedCrt<&Natural, &Natural, &Natural> for Integer {
     ///     Some(Integer::from(-7))
     /// );
     /// assert_eq!(
-    ///     Integer::from(1).balanced_crt(
+    ///     Integer::ONE.balanced_crt(
     ///         &Natural::from(4u32),
     ///         &Natural::from(3u32),
     ///         &Natural::from(6u32),
@@ -585,12 +593,13 @@ impl BalancedCrt<Natural, Natural, Natural> for &Integer {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::BalancedCrt;
+    /// use malachite_base::num::basic::traits::{NegativeOne, One};
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
     ///
     /// // 8 is 2 mod 3 and 3 mod 5, and its balanced representative mod 15 is -7.
     /// assert_eq!(
-    ///     (&Integer::from(-1)).balanced_crt(
+    ///     (&Integer::NEGATIVE_ONE).balanced_crt(
     ///         Natural::from(3u32),
     ///         Natural::from(3u32),
     ///         Natural::from(5u32),
@@ -598,7 +607,7 @@ impl BalancedCrt<Natural, Natural, Natural> for &Integer {
     ///     Some(Integer::from(-7))
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(1)).balanced_crt(
+    ///     (&Integer::ONE).balanced_crt(
     ///         Natural::from(4u32),
     ///         Natural::from(3u32),
     ///         Natural::from(6u32),
@@ -650,12 +659,13 @@ impl BalancedCrt<Natural, Natural, &Natural> for &Integer {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::BalancedCrt;
+    /// use malachite_base::num::basic::traits::{NegativeOne, One};
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
     ///
     /// // 8 is 2 mod 3 and 3 mod 5, and its balanced representative mod 15 is -7.
     /// assert_eq!(
-    ///     (&Integer::from(-1)).balanced_crt(
+    ///     (&Integer::NEGATIVE_ONE).balanced_crt(
     ///         Natural::from(3u32),
     ///         Natural::from(3u32),
     ///         &Natural::from(5u32),
@@ -663,7 +673,7 @@ impl BalancedCrt<Natural, Natural, &Natural> for &Integer {
     ///     Some(Integer::from(-7))
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(1)).balanced_crt(
+    ///     (&Integer::ONE).balanced_crt(
     ///         Natural::from(4u32),
     ///         Natural::from(3u32),
     ///         &Natural::from(6u32),
@@ -715,12 +725,13 @@ impl BalancedCrt<Natural, &Natural, Natural> for &Integer {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::BalancedCrt;
+    /// use malachite_base::num::basic::traits::{NegativeOne, One};
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
     ///
     /// // 8 is 2 mod 3 and 3 mod 5, and its balanced representative mod 15 is -7.
     /// assert_eq!(
-    ///     (&Integer::from(-1)).balanced_crt(
+    ///     (&Integer::NEGATIVE_ONE).balanced_crt(
     ///         Natural::from(3u32),
     ///         &Natural::from(3u32),
     ///         Natural::from(5u32),
@@ -728,7 +739,7 @@ impl BalancedCrt<Natural, &Natural, Natural> for &Integer {
     ///     Some(Integer::from(-7))
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(1)).balanced_crt(
+    ///     (&Integer::ONE).balanced_crt(
     ///         Natural::from(4u32),
     ///         &Natural::from(3u32),
     ///         Natural::from(6u32),
@@ -780,12 +791,13 @@ impl BalancedCrt<Natural, &Natural, &Natural> for &Integer {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::BalancedCrt;
+    /// use malachite_base::num::basic::traits::{NegativeOne, One};
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
     ///
     /// // 8 is 2 mod 3 and 3 mod 5, and its balanced representative mod 15 is -7.
     /// assert_eq!(
-    ///     (&Integer::from(-1)).balanced_crt(
+    ///     (&Integer::NEGATIVE_ONE).balanced_crt(
     ///         Natural::from(3u32),
     ///         &Natural::from(3u32),
     ///         &Natural::from(5u32),
@@ -793,7 +805,7 @@ impl BalancedCrt<Natural, &Natural, &Natural> for &Integer {
     ///     Some(Integer::from(-7))
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(1)).balanced_crt(
+    ///     (&Integer::ONE).balanced_crt(
     ///         Natural::from(4u32),
     ///         &Natural::from(3u32),
     ///         &Natural::from(6u32),
@@ -845,12 +857,13 @@ impl BalancedCrt<&Natural, Natural, Natural> for &Integer {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::BalancedCrt;
+    /// use malachite_base::num::basic::traits::{NegativeOne, One};
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
     ///
     /// // 8 is 2 mod 3 and 3 mod 5, and its balanced representative mod 15 is -7.
     /// assert_eq!(
-    ///     (&Integer::from(-1)).balanced_crt(
+    ///     (&Integer::NEGATIVE_ONE).balanced_crt(
     ///         &Natural::from(3u32),
     ///         Natural::from(3u32),
     ///         Natural::from(5u32),
@@ -858,7 +871,7 @@ impl BalancedCrt<&Natural, Natural, Natural> for &Integer {
     ///     Some(Integer::from(-7))
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(1)).balanced_crt(
+    ///     (&Integer::ONE).balanced_crt(
     ///         &Natural::from(4u32),
     ///         Natural::from(3u32),
     ///         Natural::from(6u32),
@@ -910,12 +923,13 @@ impl BalancedCrt<&Natural, Natural, &Natural> for &Integer {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::BalancedCrt;
+    /// use malachite_base::num::basic::traits::{NegativeOne, One};
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
     ///
     /// // 8 is 2 mod 3 and 3 mod 5, and its balanced representative mod 15 is -7.
     /// assert_eq!(
-    ///     (&Integer::from(-1)).balanced_crt(
+    ///     (&Integer::NEGATIVE_ONE).balanced_crt(
     ///         &Natural::from(3u32),
     ///         Natural::from(3u32),
     ///         &Natural::from(5u32),
@@ -923,7 +937,7 @@ impl BalancedCrt<&Natural, Natural, &Natural> for &Integer {
     ///     Some(Integer::from(-7))
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(1)).balanced_crt(
+    ///     (&Integer::ONE).balanced_crt(
     ///         &Natural::from(4u32),
     ///         Natural::from(3u32),
     ///         &Natural::from(6u32),
@@ -975,12 +989,13 @@ impl BalancedCrt<&Natural, &Natural, Natural> for &Integer {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::BalancedCrt;
+    /// use malachite_base::num::basic::traits::{NegativeOne, One};
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
     ///
     /// // 8 is 2 mod 3 and 3 mod 5, and its balanced representative mod 15 is -7.
     /// assert_eq!(
-    ///     (&Integer::from(-1)).balanced_crt(
+    ///     (&Integer::NEGATIVE_ONE).balanced_crt(
     ///         &Natural::from(3u32),
     ///         &Natural::from(3u32),
     ///         Natural::from(5u32),
@@ -988,7 +1003,7 @@ impl BalancedCrt<&Natural, &Natural, Natural> for &Integer {
     ///     Some(Integer::from(-7))
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(1)).balanced_crt(
+    ///     (&Integer::ONE).balanced_crt(
     ///         &Natural::from(4u32),
     ///         &Natural::from(3u32),
     ///         Natural::from(6u32),
@@ -1040,12 +1055,13 @@ impl BalancedCrt<&Natural, &Natural, &Natural> for &Integer {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::BalancedCrt;
+    /// use malachite_base::num::basic::traits::{NegativeOne, One};
     /// use malachite_nz::integer::Integer;
     /// use malachite_nz::natural::Natural;
     ///
     /// // 8 is 2 mod 3 and 3 mod 5, and its balanced representative mod 15 is -7.
     /// assert_eq!(
-    ///     (&Integer::from(-1)).balanced_crt(
+    ///     (&Integer::NEGATIVE_ONE).balanced_crt(
     ///         &Natural::from(3u32),
     ///         &Natural::from(3u32),
     ///         &Natural::from(5u32),
@@ -1053,7 +1069,7 @@ impl BalancedCrt<&Natural, &Natural, &Natural> for &Integer {
     ///     Some(Integer::from(-7))
     /// );
     /// assert_eq!(
-    ///     (&Integer::from(1)).balanced_crt(
+    ///     (&Integer::ONE).balanced_crt(
     ///         &Natural::from(4u32),
     ///         &Natural::from(3u32),
     ///         &Natural::from(6u32),

@@ -68,6 +68,7 @@ impl DivRound<Self> for Integer {
     /// ```
     /// use core::cmp::Ordering::*;
     /// use malachite_base::num::arithmetic::traits::{DivRound, Pow};
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_nz::integer::Integer;
     ///
@@ -110,7 +111,7 @@ impl DivRound<Self> for Integer {
     ///
     /// assert_eq!(
     ///     Integer::from(-10).div_round(Integer::from(-4), Down),
-    ///     (Integer::from(2), Less)
+    ///     (Integer::TWO, Less)
     /// );
     /// assert_eq!(
     ///     (-Integer::from(10u32).pow(12)).div_round(Integer::from(-3), Floor),
@@ -126,7 +127,7 @@ impl DivRound<Self> for Integer {
     /// );
     /// assert_eq!(
     ///     Integer::from(-10).div_round(Integer::from(-5), Exact),
-    ///     (Integer::from(2), Equal)
+    ///     (Integer::TWO, Equal)
     /// );
     /// assert_eq!(
     ///     Integer::from(-10).div_round(Integer::from(-3), Nearest),
@@ -138,7 +139,7 @@ impl DivRound<Self> for Integer {
     /// );
     /// assert_eq!(
     ///     Integer::from(-10).div_round(Integer::from(-4), Nearest),
-    ///     (Integer::from(2), Less)
+    ///     (Integer::TWO, Less)
     /// );
     /// assert_eq!(
     ///     Integer::from(-14).div_round(Integer::from(-4), Nearest),
@@ -210,6 +211,7 @@ impl DivRound<&Self> for Integer {
     /// ```
     /// use core::cmp::Ordering::*;
     /// use malachite_base::num::arithmetic::traits::{DivRound, Pow};
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_nz::integer::Integer;
     ///
@@ -252,7 +254,7 @@ impl DivRound<&Self> for Integer {
     ///
     /// assert_eq!(
     ///     Integer::from(-10).div_round(&Integer::from(-4), Down),
-    ///     (Integer::from(2), Less)
+    ///     (Integer::TWO, Less)
     /// );
     /// assert_eq!(
     ///     (-Integer::from(10u32).pow(12)).div_round(&Integer::from(-3), Floor),
@@ -268,7 +270,7 @@ impl DivRound<&Self> for Integer {
     /// );
     /// assert_eq!(
     ///     Integer::from(-10).div_round(&Integer::from(-5), Exact),
-    ///     (Integer::from(2), Equal)
+    ///     (Integer::TWO, Equal)
     /// );
     /// assert_eq!(
     ///     Integer::from(-10).div_round(&Integer::from(-3), Nearest),
@@ -280,7 +282,7 @@ impl DivRound<&Self> for Integer {
     /// );
     /// assert_eq!(
     ///     Integer::from(-10).div_round(&Integer::from(-4), Nearest),
-    ///     (Integer::from(2), Less)
+    ///     (Integer::TWO, Less)
     /// );
     /// assert_eq!(
     ///     Integer::from(-14).div_round(&Integer::from(-4), Nearest),
@@ -352,6 +354,7 @@ impl DivRound<Integer> for &Integer {
     /// ```
     /// use core::cmp::Ordering::*;
     /// use malachite_base::num::arithmetic::traits::{DivRound, Pow};
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_nz::integer::Integer;
     ///
@@ -394,7 +397,7 @@ impl DivRound<Integer> for &Integer {
     ///
     /// assert_eq!(
     ///     (&Integer::from(-10)).div_round(Integer::from(-4), Down),
-    ///     (Integer::from(2), Less)
+    ///     (Integer::TWO, Less)
     /// );
     /// assert_eq!(
     ///     (&-Integer::from(10u32).pow(12)).div_round(Integer::from(-3), Floor),
@@ -410,7 +413,7 @@ impl DivRound<Integer> for &Integer {
     /// );
     /// assert_eq!(
     ///     (&Integer::from(-10)).div_round(Integer::from(-5), Exact),
-    ///     (Integer::from(2), Equal)
+    ///     (Integer::TWO, Equal)
     /// );
     /// assert_eq!(
     ///     (&Integer::from(-10)).div_round(Integer::from(-3), Nearest),
@@ -422,7 +425,7 @@ impl DivRound<Integer> for &Integer {
     /// );
     /// assert_eq!(
     ///     (&Integer::from(-10)).div_round(Integer::from(-4), Nearest),
-    ///     (Integer::from(2), Less)
+    ///     (Integer::TWO, Less)
     /// );
     /// assert_eq!(
     ///     (&Integer::from(-14)).div_round(Integer::from(-4), Nearest),
@@ -496,6 +499,7 @@ impl DivRound<&Integer> for &Integer {
     /// ```
     /// use core::cmp::Ordering::*;
     /// use malachite_base::num::arithmetic::traits::{DivRound, Pow};
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_nz::integer::Integer;
     ///
@@ -538,7 +542,7 @@ impl DivRound<&Integer> for &Integer {
     ///
     /// assert_eq!(
     ///     (&Integer::from(-10)).div_round(&Integer::from(-4), Down),
-    ///     (Integer::from(2), Less)
+    ///     (Integer::TWO, Less)
     /// );
     /// assert_eq!(
     ///     (&-Integer::from(10u32).pow(12)).div_round(&Integer::from(-3), Floor),
@@ -554,7 +558,7 @@ impl DivRound<&Integer> for &Integer {
     /// );
     /// assert_eq!(
     ///     (&Integer::from(-10)).div_round(&Integer::from(-5), Exact),
-    ///     (Integer::from(2), Equal)
+    ///     (Integer::TWO, Equal)
     /// );
     /// assert_eq!(
     ///     (&Integer::from(-10)).div_round(&Integer::from(-3), Nearest),
@@ -566,7 +570,7 @@ impl DivRound<&Integer> for &Integer {
     /// );
     /// assert_eq!(
     ///     (&Integer::from(-10)).div_round(&Integer::from(-4), Nearest),
-    ///     (Integer::from(2), Less)
+    ///     (Integer::TWO, Less)
     /// );
     /// assert_eq!(
     ///     (&Integer::from(-14)).div_round(&Integer::from(-4), Nearest),

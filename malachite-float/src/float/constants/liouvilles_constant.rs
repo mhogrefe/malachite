@@ -227,7 +227,7 @@ impl Float {
     /// ```
     /// use malachite_float::Float;
     ///
-    /// let (x, _) = Float::liouvilles_constant_prec(100);
+    /// let x = Float::liouvilles_constant_prec(100).0;
     /// assert_eq!(x.to_string(), "0.11000100000000000000000099999997");
     /// ```
     #[inline]

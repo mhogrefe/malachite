@@ -202,7 +202,7 @@ impl Float {
     /// ```
     /// use malachite_float::Float;
     ///
-    /// let (x, _) = Float::copeland_erdos_constant_prec(100);
+    /// let x = Float::copeland_erdos_constant_prec(100).0;
     /// assert_eq!(x.to_string(), "0.23571113171923293137414347535966");
     /// ```
     #[inline]

@@ -16,10 +16,11 @@ pub mod is_power;
 ///
 /// # remove_power
 /// ```
+/// use malachite_base::num::basic::traits::Two;
 /// use malachite_base::num::factorization::traits::RemovePower;
 /// use malachite_nz::integer::Integer;
 ///
-/// let (q, k) = Integer::from(-12).remove_power(Integer::from(2));
+/// let (q, k) = Integer::from(-12).remove_power(Integer::TWO);
 /// assert_eq!(q, -3);
 /// assert_eq!(k, 2);
 ///
@@ -31,11 +32,12 @@ pub mod is_power;
 ///
 /// # remove_power_assign
 /// ```
+/// use malachite_base::num::basic::traits::Two;
 /// use malachite_base::num::factorization::traits::RemovePowerAssign;
 /// use malachite_nz::integer::Integer;
 ///
 /// let mut x = Integer::from(-12);
-/// assert_eq!(x.remove_power_assign(Integer::from(2)), 2);
+/// assert_eq!(x.remove_power_assign(Integer::TWO), 2);
 /// assert_eq!(x, -3);
 /// ```
 pub mod remove_power;

@@ -47,11 +47,12 @@ impl Rational {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::{OneHalf, Two};
     /// use malachite_nz::natural::Natural;
     /// use malachite_q::Rational;
     ///
     /// // In the Farey sequence of order 5, 1/2 sits between 2/5 and 3/5.
-    /// let (l, r) = Rational::from_signeds(1, 2).farey_neighbors(&Natural::from(5u32));
+    /// let (l, r) = Rational::ONE_HALF.farey_neighbors(&Natural::from(5u32));
     /// assert_eq!(l.to_string(), "2/5");
     /// assert_eq!(r.to_string(), "3/5");
     ///
@@ -61,7 +62,7 @@ impl Rational {
     /// assert_eq!(r.to_string(), "-5/7");
     ///
     /// // The neighbors of an integer are one unit of the largest denominator away.
-    /// let (l, r) = Rational::from(2).farey_neighbors(&Natural::from(3u32));
+    /// let (l, r) = Rational::TWO.farey_neighbors(&Natural::from(3u32));
     /// assert_eq!(l.to_string(), "5/3");
     /// assert_eq!(r.to_string(), "7/3");
     /// ```

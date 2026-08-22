@@ -343,12 +343,13 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
-    /// let x = Float::from_rational_prec(Rational::from_signeds(1, 2), 20).0;
+    /// let x = Float::from_rational_prec(Rational::ONE_HALF, 20).0;
     ///
     /// let (p, o) = Float::power_of_10_of_float_round(x.clone(), Floor);
     /// assert_eq!(p.to_string(), "3.1622772");
@@ -410,12 +411,13 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
-    /// let x = Float::from_rational_prec(Rational::from_signeds(1, 2), 20).0;
+    /// let x = Float::from_rational_prec(Rational::ONE_HALF, 20).0;
     ///
     /// let (p, o) = Float::power_of_10_of_float_round_ref(&x, Floor);
     /// assert_eq!(p.to_string(), "3.1622772");
@@ -581,12 +583,13 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
-    /// let x = Float::from_rational_prec(Rational::from_signeds(1, 2), 20).0;
+    /// let x = Float::from_rational_prec(Rational::ONE_HALF, 20).0;
     ///
     /// let mut x = x;
     /// assert_eq!(x.power_of_10_of_float_round_assign(Ceiling), Greater);
@@ -813,6 +816,7 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
@@ -825,7 +829,7 @@ impl Float {
     /// assert_eq!(p.to_string(), "3.9810715");
     /// assert_eq!(o, Less);
     ///
-    /// let (p, o) = Float::power_of_10_rational_prec(Rational::from(0), 10);
+    /// let (p, o) = Float::power_of_10_rational_prec(Rational::ZERO, 10);
     /// assert_eq!(p.to_string(), "1.0000");
     /// assert_eq!(o, Equal);
     /// ```
@@ -875,6 +879,7 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
@@ -887,7 +892,7 @@ impl Float {
     /// assert_eq!(p.to_string(), "3.9810715");
     /// assert_eq!(o, Less);
     ///
-    /// let (p, o) = Float::power_of_10_rational_prec_ref(&Rational::from(0), 10);
+    /// let (p, o) = Float::power_of_10_rational_prec_ref(&Rational::ZERO, 10);
     /// assert_eq!(p.to_string(), "1.0000");
     /// assert_eq!(o, Equal);
     /// ```
@@ -935,10 +940,11 @@ impl PowerOf10<Self> for Float {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::PowerOf10;
+    /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
     ///
-    /// let x = Float::from_rational_prec(Rational::from_signeds(1, 2), 20).0;
+    /// let x = Float::from_rational_prec(Rational::ONE_HALF, 20).0;
     ///
     /// assert_eq!(Float::power_of_10(x).to_string(), "3.1622772");
     /// ```
@@ -986,10 +992,11 @@ impl PowerOf10<&Self> for Float {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::PowerOf10;
+    /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
     ///
-    /// let x = Float::from_rational_prec(Rational::from_signeds(1, 2), 20).0;
+    /// let x = Float::from_rational_prec(Rational::ONE_HALF, 20).0;
     ///
     /// assert_eq!(Float::power_of_10(&x).to_string(), "3.1622772");
     /// ```
@@ -1031,10 +1038,11 @@ impl PowerOf10Assign for Float {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::PowerOf10Assign;
+    /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
     ///
-    /// let mut x = Float::from_rational_prec(Rational::from_signeds(1, 2), 20).0;
+    /// let mut x = Float::from_rational_prec(Rational::ONE_HALF, 20).0;
     /// x.power_of_10_assign();
     /// assert_eq!(x.to_string(), "3.1622772");
     /// ```

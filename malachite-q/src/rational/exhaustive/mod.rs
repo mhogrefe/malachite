@@ -592,6 +592,7 @@ impl<I: Iterator<Item = Integer>> Iterator for RationalsWithDenominator<I> {
 /// # Examples
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::num::basic::traits::Two;
 /// use malachite_nz::natural::Natural;
 /// use malachite_q::rational::exhaustive::exhaustive_rationals_with_denominator_range_to_infinity;
 /// use malachite_q::Rational;
@@ -609,7 +610,7 @@ impl<I: Iterator<Item = Integer>> Iterator for RationalsWithDenominator<I> {
 /// assert_eq!(
 ///     prefix_to_string(
 ///         exhaustive_rationals_with_denominator_range_to_infinity(
-///             Natural::from(2u32),
+///             Natural::TWO,
 ///             Rational::from_signeds(-22i32, 7)
 ///         ),
 ///         10
@@ -653,6 +654,7 @@ pub fn exhaustive_rationals_with_denominator_range_to_infinity(
 /// # Examples
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::num::basic::traits::Two;
 /// use malachite_nz::natural::Natural;
 /// use malachite_q::rational::exhaustive::*;
 /// use malachite_q::Rational;
@@ -670,7 +672,7 @@ pub fn exhaustive_rationals_with_denominator_range_to_infinity(
 /// assert_eq!(
 ///     prefix_to_string(
 ///         exhaustive_rationals_with_denominator_range_to_negative_infinity(
-///             Natural::from(2u32),
+///             Natural::TWO,
 ///             Rational::from_signeds(22i32, 7)
 ///         ),
 ///         10
@@ -714,6 +716,7 @@ pub fn exhaustive_rationals_with_denominator_range_to_negative_infinity(
 /// # Examples
 /// ```
 /// use itertools::Itertools;
+/// use malachite_base::num::basic::traits::Two;
 /// use malachite_base::strings::ToDebugString;
 /// use malachite_nz::natural::Natural;
 /// use malachite_q::rational::exhaustive::exhaustive_rationals_with_denominator_range;
@@ -721,7 +724,7 @@ pub fn exhaustive_rationals_with_denominator_range_to_negative_infinity(
 ///
 /// assert_eq!(
 ///     exhaustive_rationals_with_denominator_range(
-///         Natural::from(2u32),
+///         Natural::TWO,
 ///         Rational::from_signeds(1i32, 3),
 ///         Rational::from_signeds(5i32, 2)
 ///     )
@@ -731,7 +734,7 @@ pub fn exhaustive_rationals_with_denominator_range_to_negative_infinity(
 /// );
 /// assert_eq!(
 ///     exhaustive_rationals_with_denominator_range(
-///         Natural::from(2u32),
+///         Natural::TWO,
 ///         Rational::from_signeds(-5i32, 3),
 ///         Rational::from_signeds(5i32, 2)
 ///     )
@@ -793,6 +796,7 @@ pub fn exhaustive_rationals_with_denominator_range(
 /// # Examples
 /// ```
 /// use itertools::Itertools;
+/// use malachite_base::num::basic::traits::Two;
 /// use malachite_base::strings::ToDebugString;
 /// use malachite_nz::natural::Natural;
 /// use malachite_q::rational::exhaustive::exhaustive_rationals_with_denominator_inclusive_range;
@@ -800,7 +804,7 @@ pub fn exhaustive_rationals_with_denominator_range(
 ///
 /// assert_eq!(
 ///     exhaustive_rationals_with_denominator_inclusive_range(
-///         Natural::from(2u32),
+///         Natural::TWO,
 ///         Rational::from_signeds(1i32, 3),
 ///         Rational::from_signeds(5i32, 2)
 ///     )
@@ -810,7 +814,7 @@ pub fn exhaustive_rationals_with_denominator_range(
 /// );
 /// assert_eq!(
 ///     exhaustive_rationals_with_denominator_inclusive_range(
-///         Natural::from(2u32),
+///         Natural::TWO,
 ///         Rational::from_signeds(-5i32, 3),
 ///         Rational::from_signeds(5i32, 2)
 ///     )

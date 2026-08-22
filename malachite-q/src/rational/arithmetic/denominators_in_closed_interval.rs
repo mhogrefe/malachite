@@ -289,7 +289,7 @@ impl DenominatorsInClosedInterval for Rational {
     ///
     /// ```
     /// use malachite_base::iterators::prefix_to_string;
-    /// use malachite_base::num::basic::traits::{One, Two};
+    /// use malachite_base::num::basic::traits::{One, OneHalf, Two};
     /// use malachite_q::rational::arithmetic::traits::DenominatorsInClosedInterval;
     /// use malachite_q::Rational;
     ///
@@ -304,7 +304,7 @@ impl DenominatorsInClosedInterval for Rational {
     ///     prefix_to_string(
     ///         Rational::denominators_in_closed_interval(
     ///             Rational::from_signeds(1, 3),
-    ///             Rational::from_signeds(1, 2)
+    ///             Rational::ONE_HALF
     ///         ),
     ///         20
     ///     ),

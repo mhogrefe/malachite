@@ -630,12 +630,13 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
-    /// let x = Float::from_rational_prec(Rational::from(2u32), 20).0;
+    /// let x = Float::from_rational_prec(Rational::TWO, 20).0;
     /// let (root, o) = x.root_u_round(3, Floor);
     /// assert_eq!(root.to_string(), "1.2599201");
     /// assert_eq!(o, Less);
@@ -691,12 +692,13 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
-    /// let x = Float::from_rational_prec(Rational::from(2u32), 20).0;
+    /// let x = Float::from_rational_prec(Rational::TWO, 20).0;
     /// let (root, o) = x.root_u_round_ref(3, Floor);
     /// assert_eq!(root.to_string(), "1.2599201");
     /// assert_eq!(o, Less);
@@ -803,12 +805,13 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
-    /// let mut x = Float::from_rational_prec(Rational::from(2u32), 20).0;
+    /// let mut x = Float::from_rational_prec(Rational::TWO, 20).0;
     /// assert_eq!(x.root_u_round_assign(3, Nearest), Less);
     /// assert_eq!(x.to_string(), "1.2599201");
     /// ```
@@ -1198,12 +1201,13 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
-    /// let x = Float::from_rational_prec(Rational::from(2u32), 20).0;
+    /// let x = Float::from_rational_prec(Rational::TWO, 20).0;
     /// let (root, o) = x.root_s_round(-3, Ceiling);
     /// assert_eq!(root.to_string(), "0.79370117");
     /// assert_eq!(o, Greater);
@@ -1257,12 +1261,13 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
-    /// let x = Float::from_rational_prec(Rational::from(2u32), 20).0;
+    /// let x = Float::from_rational_prec(Rational::TWO, 20).0;
     /// let (root, o) = x.root_s_round_ref(-3, Ceiling);
     /// assert_eq!(root.to_string(), "0.79370117");
     /// assert_eq!(o, Greater);
@@ -1358,12 +1363,13 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
-    /// let mut x = Float::from_rational_prec(Rational::from(2u32), 20).0;
+    /// let mut x = Float::from_rational_prec(Rational::TWO, 20).0;
     /// assert_eq!(x.root_s_round_assign(-3, Nearest), Less);
     /// assert_eq!(x.to_string(), "0.79370022");
     /// ```

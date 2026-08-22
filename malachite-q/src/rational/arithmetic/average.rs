@@ -31,10 +31,11 @@ impl Average<Self> for Rational {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Average;
+    /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(
-    ///     Rational::from_signeds(1, 2)
+    ///     Rational::ONE_HALF
     ///         .average(Rational::from_signeds(1, 3))
     ///         .to_string(),
     ///     "5/12"
@@ -79,10 +80,11 @@ impl Average<&Self> for Rational {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Average;
+    /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(
-    ///     Rational::from_signeds(1, 2)
+    ///     Rational::ONE_HALF
     ///         .average(&Rational::from_signeds(1, 3))
     ///         .to_string(),
     ///     "5/12"
@@ -127,10 +129,11 @@ impl Average<Rational> for &Rational {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Average;
+    /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(
-    ///     (&Rational::from_signeds(1, 2))
+    ///     (&Rational::ONE_HALF)
     ///         .average(Rational::from_signeds(1, 3))
     ///         .to_string(),
     ///     "5/12"
@@ -174,10 +177,11 @@ impl Average<&Rational> for &Rational {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Average;
+    /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(
-    ///     (&Rational::from_signeds(1, 2))
+    ///     (&Rational::ONE_HALF)
     ///         .average(&Rational::from_signeds(1, 3))
     ///         .to_string(),
     ///     "5/12"
@@ -220,9 +224,10 @@ impl AverageAssign<Self> for Rational {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::AverageAssign;
+    /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_q::Rational;
     ///
-    /// let mut x = Rational::from_signeds(1, 2);
+    /// let mut x = Rational::ONE_HALF;
     /// x.average_assign(Rational::from_signeds(1, 3));
     /// assert_eq!(x.to_string(), "5/12");
     /// ```
@@ -254,9 +259,10 @@ impl AverageAssign<&Self> for Rational {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::AverageAssign;
+    /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_q::Rational;
     ///
-    /// let mut x = Rational::from_signeds(1, 2);
+    /// let mut x = Rational::ONE_HALF;
     /// x.average_assign(&Rational::from_signeds(1, 3));
     /// assert_eq!(x.to_string(), "5/12");
     /// ```

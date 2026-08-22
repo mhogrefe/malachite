@@ -145,6 +145,7 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::One;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
@@ -153,7 +154,7 @@ impl Float {
     /// assert_eq!(log.to_string(), "1.0000"); // log_10(10) = 1
     /// assert_eq!(o, Equal);
     ///
-    /// let (log, o) = Float::from(1).log_base_10_1_plus_x_prec_round(20, Nearest);
+    /// let (log, o) = Float::ONE.log_base_10_1_plus_x_prec_round(20, Nearest);
     /// assert_eq!(log.to_string(), "0.30103016"); // log_10(2)
     /// assert_eq!(o, Greater);
     /// ```
@@ -191,6 +192,7 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::One;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
@@ -199,7 +201,7 @@ impl Float {
     /// assert_eq!(log.to_string(), "2.0000"); // log_10(100) = 2
     /// assert_eq!(o, Equal);
     ///
-    /// let (log, o) = (&Float::from(1)).log_base_10_1_plus_x_prec_round_ref(20, Floor);
+    /// let (log, o) = (&Float::ONE).log_base_10_1_plus_x_prec_round_ref(20, Floor);
     /// assert_eq!(log.to_string(), "0.30102968"); // log_10(2), rounded down
     /// assert_eq!(o, Less);
     /// ```
@@ -238,6 +240,7 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::One;
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
@@ -245,7 +248,7 @@ impl Float {
     /// assert_eq!(log.to_string(), "1.0000"); // log_10(10) = 1
     /// assert_eq!(o, Equal);
     ///
-    /// let (log, o) = Float::from(1).log_base_10_1_plus_x_prec(20);
+    /// let (log, o) = Float::ONE.log_base_10_1_plus_x_prec(20);
     /// assert_eq!(log.to_string(), "0.30103016"); // log_10(2)
     /// assert_eq!(o, Greater);
     /// ```
@@ -386,6 +389,7 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::One;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
@@ -394,7 +398,7 @@ impl Float {
     /// assert_eq!(x.log_base_10_1_plus_x_prec_round_assign(10, Exact), Equal);
     /// assert_eq!(x.to_string(), "1.0000"); // log_10(10) = 1
     ///
-    /// let mut x = Float::from(1);
+    /// let mut x = Float::ONE;
     /// assert_eq!(x.log_base_10_1_plus_x_prec_round_assign(20, Floor), Less);
     /// assert_eq!(x.to_string(), "0.30102968"); // log_10(2), rounded down
     /// ```

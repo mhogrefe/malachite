@@ -438,6 +438,7 @@ impl Float {
 ///
 /// # Examples
 /// ```
+/// use malachite_base::num::basic::traits::NegativeOne;
 /// use malachite_base::num::float::NiceFloat;
 /// use malachite_float::float::arithmetic::log_base_rational_float_base::*;
 /// use malachite_q::Rational;
@@ -467,7 +468,7 @@ impl Float {
 ///     NiceFloat(-0.47712126)
 /// );
 /// assert!(
-///     primitive_float_log_base_rational_float_base::<f32>(&Rational::from(-1), 10.0).is_nan()
+///     primitive_float_log_base_rational_float_base::<f32>(&Rational::NEGATIVE_ONE, 10.0).is_nan()
 /// );
 /// assert!(
 ///     primitive_float_log_base_rational_float_base::<f32>(&Rational::from(8), f32::NAN).is_nan()

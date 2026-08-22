@@ -263,10 +263,11 @@ impl RemovePower<Self> for Natural {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_base::num::factorization::traits::RemovePower;
     /// use malachite_nz::natural::Natural;
     ///
-    /// let (q, k) = Natural::from(12u32).remove_power(Natural::from(2u32));
+    /// let (q, k) = Natural::from(12u32).remove_power(Natural::TWO);
     /// assert_eq!(q, 3);
     /// assert_eq!(k, 2);
     ///
@@ -309,10 +310,11 @@ impl RemovePower<&Self> for Natural {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_base::num::factorization::traits::RemovePower;
     /// use malachite_nz::natural::Natural;
     ///
-    /// let (q, k) = Natural::from(12u32).remove_power(Natural::from(2u32));
+    /// let (q, k) = Natural::from(12u32).remove_power(Natural::TWO);
     /// assert_eq!(q, 3);
     /// assert_eq!(k, 2);
     ///
@@ -355,10 +357,11 @@ impl RemovePower<Natural> for &Natural {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_base::num::factorization::traits::RemovePower;
     /// use malachite_nz::natural::Natural;
     ///
-    /// let (q, k) = Natural::from(12u32).remove_power(Natural::from(2u32));
+    /// let (q, k) = Natural::from(12u32).remove_power(Natural::TWO);
     /// assert_eq!(q, 3);
     /// assert_eq!(k, 2);
     ///
@@ -401,10 +404,11 @@ impl RemovePower<&Natural> for &Natural {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_base::num::factorization::traits::RemovePower;
     /// use malachite_nz::natural::Natural;
     ///
-    /// let (q, k) = Natural::from(12u32).remove_power(Natural::from(2u32));
+    /// let (q, k) = Natural::from(12u32).remove_power(Natural::TWO);
     /// assert_eq!(q, 3);
     /// assert_eq!(k, 2);
     ///
@@ -442,11 +446,12 @@ impl RemovePowerAssign<Self> for Natural {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_base::num::factorization::traits::RemovePowerAssign;
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::from(12u32);
-    /// assert_eq!(x.remove_power_assign(Natural::from(2u32)), 2);
+    /// assert_eq!(x.remove_power_assign(Natural::TWO), 2);
     /// assert_eq!(x, 3);
     /// ```
     #[inline]
@@ -475,11 +480,12 @@ impl RemovePowerAssign<&Self> for Natural {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_base::num::factorization::traits::RemovePowerAssign;
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::from(12u32);
-    /// assert_eq!(x.remove_power_assign(Natural::from(2u32)), 2);
+    /// assert_eq!(x.remove_power_assign(Natural::TWO), 2);
     /// assert_eq!(x, 3);
     /// ```
     #[inline]

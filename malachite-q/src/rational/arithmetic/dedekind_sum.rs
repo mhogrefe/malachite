@@ -109,21 +109,19 @@ impl Rational {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
     /// use malachite_nz::integer::Integer;
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(
-    ///     Rational::dedekind_sum(&Integer::from(1), &Integer::from(3)).to_string(),
+    ///     Rational::dedekind_sum(&Integer::ONE, &Integer::from(3)).to_string(),
     ///     "1/18"
     /// );
     /// assert_eq!(
     ///     Rational::dedekind_sum(&Integer::from(3), &Integer::from(7)).to_string(),
     ///     "-1/14"
     /// );
-    /// assert_eq!(
-    ///     Rational::dedekind_sum(&Integer::from(5), &Integer::from(2)),
-    ///     0
-    /// );
+    /// assert_eq!(Rational::dedekind_sum(&Integer::from(5), &Integer::TWO), 0);
     /// ```
     ///
     /// This is equivalent to `fmpq_dedekind_sum` from `fmpq/dedekind_sum.c`, FLINT 3.6.0.

@@ -8,6 +8,7 @@
 
 use crate::Float;
 use core::cmp::Ordering;
+use malachite_base::num::basic::traits::Two;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 
 impl Float {
@@ -52,7 +53,7 @@ impl Float {
     /// ```
     #[inline]
     pub fn log_10_2_prec_round(prec: u64, rm: RoundingMode) -> (Self, Ordering) {
-        Self::log_base_10_prec_round(const { Self::const_from_unsigned(2) }, prec, rm)
+        Self::log_base_10_prec_round(Self::TWO, prec, rm)
     }
 
     /// Returns an approximation of the base-10 logarithm of 2, with the given precision and rounded

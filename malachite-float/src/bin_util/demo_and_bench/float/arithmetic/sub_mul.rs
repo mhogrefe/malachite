@@ -2549,9 +2549,7 @@ fn demo_float_sub_mul_rational_prec_assign(gm: GenMode, config: &GenConfig, limi
         let mut x = x;
         let x_old = x.clone();
         x.sub_mul_rational_prec_assign(y.clone(), z.clone(), prec);
-        println!(
-            "x := {x_old}; x.sub_mul_rational_prec_assign({y}, {z}, {prec}); x = {x}"
-        );
+        println!("x := {x_old}; x.sub_mul_rational_prec_assign({y}, {z}, {prec}); x = {x}");
     }
 }
 
@@ -2582,9 +2580,7 @@ fn demo_float_sub_mul_rational_prec_assign_val_ref(gm: GenMode, config: &GenConf
         let mut x = x;
         let x_old = x.clone();
         x.sub_mul_rational_prec_assign_val_ref(y.clone(), &z, prec);
-        println!(
-            "x := {x_old}; x.sub_mul_rational_prec_assign_val_ref({y}, {z}, {prec}); x = {x}"
-        );
+        println!("x := {x_old}; x.sub_mul_rational_prec_assign_val_ref({y}, {z}, {prec}); x = {x}");
     }
 }
 
@@ -2619,9 +2615,7 @@ fn demo_float_sub_mul_rational_prec_assign_ref_val(gm: GenMode, config: &GenConf
         let mut x = x;
         let x_old = x.clone();
         x.sub_mul_rational_prec_assign_ref_val(&y, z.clone(), prec);
-        println!(
-            "x := {x_old}; x.sub_mul_rational_prec_assign_ref_val({y}, {z}, {prec}); x = {x}"
-        );
+        println!("x := {x_old}; x.sub_mul_rational_prec_assign_ref_val({y}, {z}, {prec}); x = {x}");
     }
 }
 
@@ -2656,9 +2650,7 @@ fn demo_float_sub_mul_rational_prec_assign_ref_ref(gm: GenMode, config: &GenConf
         let mut x = x;
         let x_old = x.clone();
         x.sub_mul_rational_prec_assign_ref_ref(&y, &z, prec);
-        println!(
-            "x := {x_old}; x.sub_mul_rational_prec_assign_ref_ref({y}, {z}, {prec}); x = {x}"
-        );
+        println!("x := {x_old}; x.sub_mul_rational_prec_assign_ref_ref({y}, {z}, {prec}); x = {x}");
     }
 }
 
@@ -2991,9 +2983,7 @@ fn demo_float_sub_mul_rational_round_assign(gm: GenMode, config: &GenConfig, lim
         let mut x = x;
         let x_old = x.clone();
         x.sub_mul_rational_round_assign(y.clone(), z.clone(), rm);
-        println!(
-            "x := {x_old}; x.sub_mul_rational_round_assign({y}, {z}, {rm}); x = {x}"
-        );
+        println!("x := {x_old}; x.sub_mul_rational_round_assign({y}, {z}, {rm}); x = {x}");
     }
 }
 
@@ -3024,9 +3014,7 @@ fn demo_float_sub_mul_rational_round_assign_val_ref(gm: GenMode, config: &GenCon
         let mut x = x;
         let x_old = x.clone();
         x.sub_mul_rational_round_assign_val_ref(y.clone(), &z, rm);
-        println!(
-            "x := {x_old}; x.sub_mul_rational_round_assign_val_ref({y}, {z}, {rm}); x = {x}"
-        );
+        println!("x := {x_old}; x.sub_mul_rational_round_assign_val_ref({y}, {z}, {rm}); x = {x}");
     }
 }
 
@@ -3061,9 +3049,7 @@ fn demo_float_sub_mul_rational_round_assign_ref_val(gm: GenMode, config: &GenCon
         let mut x = x;
         let x_old = x.clone();
         x.sub_mul_rational_round_assign_ref_val(&y, z.clone(), rm);
-        println!(
-            "x := {x_old}; x.sub_mul_rational_round_assign_ref_val({y}, {z}, {rm}); x = {x}"
-        );
+        println!("x := {x_old}; x.sub_mul_rational_round_assign_ref_val({y}, {z}, {rm}); x = {x}");
     }
 }
 
@@ -3098,9 +3084,7 @@ fn demo_float_sub_mul_rational_round_assign_ref_ref(gm: GenMode, config: &GenCon
         let mut x = x;
         let x_old = x.clone();
         x.sub_mul_rational_round_assign_ref_ref(&y, &z, rm);
-        println!(
-            "x := {x_old}; x.sub_mul_rational_round_assign_ref_ref({y}, {z}, {rm}); x = {x}"
-        );
+        println!("x := {x_old}; x.sub_mul_rational_round_assign_ref_ref({y}, {z}, {rm}); x = {x}");
     }
 }
 

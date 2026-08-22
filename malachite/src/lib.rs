@@ -33,10 +33,11 @@
 //! # Examples
 //! ```
 //! use malachite::base::num::arithmetic::traits::Pow;
+//! use malachite::base::num::basic::traits::{One, OneHalf, Two};
 //! use malachite::{Integer, Natural, Rational};
 //!
 //! // Arbitrary-precision unsigned integers, far larger than any primitive type:
-//! assert_eq!(Natural::from(2u32).pow(128), Natural::from(1u32) << 128u64);
+//! assert_eq!(Natural::TWO.pow(128), Natural::ONE << 128u64);
 //!
 //! // Signed integers:
 //! assert_eq!(-Integer::from(5) * Integer::from(5), Integer::from(-25));
@@ -44,7 +45,7 @@
 //! // Exact rational arithmetic: 1/3 + 1/6 = 1/2.
 //! assert_eq!(
 //!     Rational::from_unsigneds(1u32, 3u32) + Rational::from_unsigneds(1u32, 6u32),
-//!     Rational::from_unsigneds(1u32, 2u32)
+//!     Rational::ONE_HALF
 //! );
 //! ```
 //!

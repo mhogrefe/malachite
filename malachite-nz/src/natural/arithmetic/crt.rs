@@ -62,11 +62,12 @@ impl Crt<Self, Self, Self> for Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Crt;
+    /// use malachite_base::num::basic::traits::{One, Two};
     /// use malachite_nz::natural::Natural;
     ///
     /// // 8 is 2 mod 3 and 3 mod 5.
     /// assert_eq!(
-    ///     Natural::from(2u32).crt(
+    ///     Natural::TWO.crt(
     ///         Natural::from(3u32),
     ///         Natural::from(3u32),
     ///         Natural::from(5u32)
@@ -74,7 +75,7 @@ impl Crt<Self, Self, Self> for Natural {
     ///     Some(Natural::from(8u32))
     /// );
     /// assert_eq!(
-    ///     Natural::from(1u32).crt(
+    ///     Natural::ONE.crt(
     ///         Natural::from(4u32),
     ///         Natural::from(3u32),
     ///         Natural::from(6u32)
@@ -124,11 +125,12 @@ impl Crt<Self, Self, &Self> for Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Crt;
+    /// use malachite_base::num::basic::traits::{One, Two};
     /// use malachite_nz::natural::Natural;
     ///
     /// // 8 is 2 mod 3 and 3 mod 5.
     /// assert_eq!(
-    ///     Natural::from(2u32).crt(
+    ///     Natural::TWO.crt(
     ///         Natural::from(3u32),
     ///         Natural::from(3u32),
     ///         &Natural::from(5u32)
@@ -136,7 +138,7 @@ impl Crt<Self, Self, &Self> for Natural {
     ///     Some(Natural::from(8u32))
     /// );
     /// assert_eq!(
-    ///     Natural::from(1u32).crt(
+    ///     Natural::ONE.crt(
     ///         Natural::from(4u32),
     ///         Natural::from(3u32),
     ///         &Natural::from(6u32)
@@ -186,11 +188,12 @@ impl Crt<Self, &Self, Self> for Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Crt;
+    /// use malachite_base::num::basic::traits::{One, Two};
     /// use malachite_nz::natural::Natural;
     ///
     /// // 8 is 2 mod 3 and 3 mod 5.
     /// assert_eq!(
-    ///     Natural::from(2u32).crt(
+    ///     Natural::TWO.crt(
     ///         Natural::from(3u32),
     ///         &Natural::from(3u32),
     ///         Natural::from(5u32)
@@ -198,7 +201,7 @@ impl Crt<Self, &Self, Self> for Natural {
     ///     Some(Natural::from(8u32))
     /// );
     /// assert_eq!(
-    ///     Natural::from(1u32).crt(
+    ///     Natural::ONE.crt(
     ///         Natural::from(4u32),
     ///         &Natural::from(3u32),
     ///         Natural::from(6u32)
@@ -248,11 +251,12 @@ impl Crt<Self, &Self, &Self> for Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Crt;
+    /// use malachite_base::num::basic::traits::{One, Two};
     /// use malachite_nz::natural::Natural;
     ///
     /// // 8 is 2 mod 3 and 3 mod 5.
     /// assert_eq!(
-    ///     Natural::from(2u32).crt(
+    ///     Natural::TWO.crt(
     ///         Natural::from(3u32),
     ///         &Natural::from(3u32),
     ///         &Natural::from(5u32),
@@ -260,7 +264,7 @@ impl Crt<Self, &Self, &Self> for Natural {
     ///     Some(Natural::from(8u32))
     /// );
     /// assert_eq!(
-    ///     Natural::from(1u32).crt(
+    ///     Natural::ONE.crt(
     ///         Natural::from(4u32),
     ///         &Natural::from(3u32),
     ///         &Natural::from(6u32),
@@ -310,11 +314,12 @@ impl Crt<&Self, Self, Self> for Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Crt;
+    /// use malachite_base::num::basic::traits::{One, Two};
     /// use malachite_nz::natural::Natural;
     ///
     /// // 8 is 2 mod 3 and 3 mod 5.
     /// assert_eq!(
-    ///     Natural::from(2u32).crt(
+    ///     Natural::TWO.crt(
     ///         &Natural::from(3u32),
     ///         Natural::from(3u32),
     ///         Natural::from(5u32)
@@ -322,7 +327,7 @@ impl Crt<&Self, Self, Self> for Natural {
     ///     Some(Natural::from(8u32))
     /// );
     /// assert_eq!(
-    ///     Natural::from(1u32).crt(
+    ///     Natural::ONE.crt(
     ///         &Natural::from(4u32),
     ///         Natural::from(3u32),
     ///         Natural::from(6u32)
@@ -375,11 +380,12 @@ impl Crt<&Self, Self, &Self> for Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Crt;
+    /// use malachite_base::num::basic::traits::{One, Two};
     /// use malachite_nz::natural::Natural;
     ///
     /// // 8 is 2 mod 3 and 3 mod 5.
     /// assert_eq!(
-    ///     Natural::from(2u32).crt(
+    ///     Natural::TWO.crt(
     ///         &Natural::from(3u32),
     ///         Natural::from(3u32),
     ///         &Natural::from(5u32),
@@ -387,7 +393,7 @@ impl Crt<&Self, Self, &Self> for Natural {
     ///     Some(Natural::from(8u32))
     /// );
     /// assert_eq!(
-    ///     Natural::from(1u32).crt(
+    ///     Natural::ONE.crt(
     ///         &Natural::from(4u32),
     ///         Natural::from(3u32),
     ///         &Natural::from(6u32),
@@ -440,11 +446,12 @@ impl Crt<&Self, &Self, Self> for Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Crt;
+    /// use malachite_base::num::basic::traits::{One, Two};
     /// use malachite_nz::natural::Natural;
     ///
     /// // 8 is 2 mod 3 and 3 mod 5.
     /// assert_eq!(
-    ///     Natural::from(2u32).crt(
+    ///     Natural::TWO.crt(
     ///         &Natural::from(3u32),
     ///         &Natural::from(3u32),
     ///         Natural::from(5u32),
@@ -452,7 +459,7 @@ impl Crt<&Self, &Self, Self> for Natural {
     ///     Some(Natural::from(8u32))
     /// );
     /// assert_eq!(
-    ///     Natural::from(1u32).crt(
+    ///     Natural::ONE.crt(
     ///         &Natural::from(4u32),
     ///         &Natural::from(3u32),
     ///         Natural::from(6u32),
@@ -505,11 +512,12 @@ impl Crt<&Self, &Self, &Self> for Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Crt;
+    /// use malachite_base::num::basic::traits::{One, Two};
     /// use malachite_nz::natural::Natural;
     ///
     /// // 8 is 2 mod 3 and 3 mod 5.
     /// assert_eq!(
-    ///     Natural::from(2u32).crt(
+    ///     Natural::TWO.crt(
     ///         &Natural::from(3u32),
     ///         &Natural::from(3u32),
     ///         &Natural::from(5u32),
@@ -517,7 +525,7 @@ impl Crt<&Self, &Self, &Self> for Natural {
     ///     Some(Natural::from(8u32))
     /// );
     /// assert_eq!(
-    ///     Natural::from(1u32).crt(
+    ///     Natural::ONE.crt(
     ///         &Natural::from(4u32),
     ///         &Natural::from(3u32),
     ///         &Natural::from(6u32),
@@ -570,11 +578,12 @@ impl Crt<Natural, Natural, Natural> for &Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Crt;
+    /// use malachite_base::num::basic::traits::{One, Two};
     /// use malachite_nz::natural::Natural;
     ///
     /// // 8 is 2 mod 3 and 3 mod 5.
     /// assert_eq!(
-    ///     (&Natural::from(2u32)).crt(
+    ///     (&Natural::TWO).crt(
     ///         Natural::from(3u32),
     ///         Natural::from(3u32),
     ///         Natural::from(5u32),
@@ -582,7 +591,7 @@ impl Crt<Natural, Natural, Natural> for &Natural {
     ///     Some(Natural::from(8u32))
     /// );
     /// assert_eq!(
-    ///     (&Natural::from(1u32)).crt(
+    ///     (&Natural::ONE).crt(
     ///         Natural::from(4u32),
     ///         Natural::from(3u32),
     ///         Natural::from(6u32),
@@ -635,11 +644,12 @@ impl Crt<Natural, Natural, &Natural> for &Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Crt;
+    /// use malachite_base::num::basic::traits::{One, Two};
     /// use malachite_nz::natural::Natural;
     ///
     /// // 8 is 2 mod 3 and 3 mod 5.
     /// assert_eq!(
-    ///     (&Natural::from(2u32)).crt(
+    ///     (&Natural::TWO).crt(
     ///         Natural::from(3u32),
     ///         Natural::from(3u32),
     ///         &Natural::from(5u32),
@@ -647,7 +657,7 @@ impl Crt<Natural, Natural, &Natural> for &Natural {
     ///     Some(Natural::from(8u32))
     /// );
     /// assert_eq!(
-    ///     (&Natural::from(1u32)).crt(
+    ///     (&Natural::ONE).crt(
     ///         Natural::from(4u32),
     ///         Natural::from(3u32),
     ///         &Natural::from(6u32),
@@ -700,11 +710,12 @@ impl Crt<Natural, &Natural, Natural> for &Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Crt;
+    /// use malachite_base::num::basic::traits::{One, Two};
     /// use malachite_nz::natural::Natural;
     ///
     /// // 8 is 2 mod 3 and 3 mod 5.
     /// assert_eq!(
-    ///     (&Natural::from(2u32)).crt(
+    ///     (&Natural::TWO).crt(
     ///         Natural::from(3u32),
     ///         &Natural::from(3u32),
     ///         Natural::from(5u32),
@@ -712,7 +723,7 @@ impl Crt<Natural, &Natural, Natural> for &Natural {
     ///     Some(Natural::from(8u32))
     /// );
     /// assert_eq!(
-    ///     (&Natural::from(1u32)).crt(
+    ///     (&Natural::ONE).crt(
     ///         Natural::from(4u32),
     ///         &Natural::from(3u32),
     ///         Natural::from(6u32),
@@ -765,11 +776,12 @@ impl Crt<Natural, &Natural, &Natural> for &Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Crt;
+    /// use malachite_base::num::basic::traits::{One, Two};
     /// use malachite_nz::natural::Natural;
     ///
     /// // 8 is 2 mod 3 and 3 mod 5.
     /// assert_eq!(
-    ///     (&Natural::from(2u32)).crt(
+    ///     (&Natural::TWO).crt(
     ///         Natural::from(3u32),
     ///         &Natural::from(3u32),
     ///         &Natural::from(5u32),
@@ -777,7 +789,7 @@ impl Crt<Natural, &Natural, &Natural> for &Natural {
     ///     Some(Natural::from(8u32))
     /// );
     /// assert_eq!(
-    ///     (&Natural::from(1u32)).crt(
+    ///     (&Natural::ONE).crt(
     ///         Natural::from(4u32),
     ///         &Natural::from(3u32),
     ///         &Natural::from(6u32),
@@ -830,11 +842,12 @@ impl Crt<&Natural, Natural, Natural> for &Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Crt;
+    /// use malachite_base::num::basic::traits::{One, Two};
     /// use malachite_nz::natural::Natural;
     ///
     /// // 8 is 2 mod 3 and 3 mod 5.
     /// assert_eq!(
-    ///     (&Natural::from(2u32)).crt(
+    ///     (&Natural::TWO).crt(
     ///         &Natural::from(3u32),
     ///         Natural::from(3u32),
     ///         Natural::from(5u32),
@@ -842,7 +855,7 @@ impl Crt<&Natural, Natural, Natural> for &Natural {
     ///     Some(Natural::from(8u32))
     /// );
     /// assert_eq!(
-    ///     (&Natural::from(1u32)).crt(
+    ///     (&Natural::ONE).crt(
     ///         &Natural::from(4u32),
     ///         Natural::from(3u32),
     ///         Natural::from(6u32),
@@ -892,11 +905,12 @@ impl Crt<&Natural, Natural, &Natural> for &Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Crt;
+    /// use malachite_base::num::basic::traits::{One, Two};
     /// use malachite_nz::natural::Natural;
     ///
     /// // 8 is 2 mod 3 and 3 mod 5.
     /// assert_eq!(
-    ///     (&Natural::from(2u32)).crt(
+    ///     (&Natural::TWO).crt(
     ///         &Natural::from(3u32),
     ///         Natural::from(3u32),
     ///         &Natural::from(5u32),
@@ -904,7 +918,7 @@ impl Crt<&Natural, Natural, &Natural> for &Natural {
     ///     Some(Natural::from(8u32))
     /// );
     /// assert_eq!(
-    ///     (&Natural::from(1u32)).crt(
+    ///     (&Natural::ONE).crt(
     ///         &Natural::from(4u32),
     ///         Natural::from(3u32),
     ///         &Natural::from(6u32),
@@ -954,11 +968,12 @@ impl Crt<&Natural, &Natural, Natural> for &Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Crt;
+    /// use malachite_base::num::basic::traits::{One, Two};
     /// use malachite_nz::natural::Natural;
     ///
     /// // 8 is 2 mod 3 and 3 mod 5.
     /// assert_eq!(
-    ///     (&Natural::from(2u32)).crt(
+    ///     (&Natural::TWO).crt(
     ///         &Natural::from(3u32),
     ///         &Natural::from(3u32),
     ///         Natural::from(5u32),
@@ -966,7 +981,7 @@ impl Crt<&Natural, &Natural, Natural> for &Natural {
     ///     Some(Natural::from(8u32))
     /// );
     /// assert_eq!(
-    ///     (&Natural::from(1u32)).crt(
+    ///     (&Natural::ONE).crt(
     ///         &Natural::from(4u32),
     ///         &Natural::from(3u32),
     ///         Natural::from(6u32),
@@ -1016,11 +1031,12 @@ impl Crt<&Natural, &Natural, &Natural> for &Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::Crt;
+    /// use malachite_base::num::basic::traits::{One, Two};
     /// use malachite_nz::natural::Natural;
     ///
     /// // 8 is 2 mod 3 and 3 mod 5.
     /// assert_eq!(
-    ///     (&Natural::from(2u32)).crt(
+    ///     (&Natural::TWO).crt(
     ///         &Natural::from(3u32),
     ///         &Natural::from(3u32),
     ///         &Natural::from(5u32),
@@ -1028,7 +1044,7 @@ impl Crt<&Natural, &Natural, &Natural> for &Natural {
     ///     Some(Natural::from(8u32))
     /// );
     /// assert_eq!(
-    ///     (&Natural::from(1u32)).crt(
+    ///     (&Natural::ONE).crt(
     ///         &Natural::from(4u32),
     ///         &Natural::from(3u32),
     ///         &Natural::from(6u32),

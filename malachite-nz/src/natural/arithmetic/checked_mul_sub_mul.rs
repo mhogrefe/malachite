@@ -33,6 +33,7 @@ impl CheckedMulSubMul<Self, Self, Self> for Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::CheckedMulSubMul;
+    /// use malachite_base::num::basic::traits::{One, Two};
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
@@ -44,11 +45,7 @@ impl CheckedMulSubMul<Self, Self, Self> for Natural {
     ///     Some(Natural::from(10u32))
     /// );
     /// assert_eq!(
-    ///     Natural::from(1u32).checked_mul_sub_mul(
-    ///         Natural::from(1u32),
-    ///         Natural::from(2u32),
-    ///         Natural::from(2u32)
-    ///     ),
+    ///     Natural::ONE.checked_mul_sub_mul(Natural::ONE, Natural::TWO, Natural::TWO),
     ///     None
     /// );
     /// ```
@@ -83,6 +80,7 @@ impl CheckedMulSubMul<Self, Self, &Self> for Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::CheckedMulSubMul;
+    /// use malachite_base::num::basic::traits::{One, Two};
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
@@ -94,11 +92,7 @@ impl CheckedMulSubMul<Self, Self, &Self> for Natural {
     ///     Some(Natural::from(10u32))
     /// );
     /// assert_eq!(
-    ///     Natural::from(1u32).checked_mul_sub_mul(
-    ///         Natural::from(1u32),
-    ///         Natural::from(2u32),
-    ///         &Natural::from(2u32)
-    ///     ),
+    ///     Natural::ONE.checked_mul_sub_mul(Natural::ONE, Natural::TWO, &Natural::TWO),
     ///     None
     /// );
     /// ```
@@ -133,6 +127,7 @@ impl CheckedMulSubMul<Self, &Self, Self> for Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::CheckedMulSubMul;
+    /// use malachite_base::num::basic::traits::{One, Two};
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
@@ -144,11 +139,7 @@ impl CheckedMulSubMul<Self, &Self, Self> for Natural {
     ///     Some(Natural::from(10u32))
     /// );
     /// assert_eq!(
-    ///     Natural::from(1u32).checked_mul_sub_mul(
-    ///         Natural::from(1u32),
-    ///         &Natural::from(2u32),
-    ///         Natural::from(2u32)
-    ///     ),
+    ///     Natural::ONE.checked_mul_sub_mul(Natural::ONE, &Natural::TWO, Natural::TWO),
     ///     None
     /// );
     /// ```
@@ -183,6 +174,7 @@ impl CheckedMulSubMul<Self, &Self, &Self> for Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::CheckedMulSubMul;
+    /// use malachite_base::num::basic::traits::{One, Two};
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
@@ -194,11 +186,7 @@ impl CheckedMulSubMul<Self, &Self, &Self> for Natural {
     ///     Some(Natural::from(10u32))
     /// );
     /// assert_eq!(
-    ///     Natural::from(1u32).checked_mul_sub_mul(
-    ///         Natural::from(1u32),
-    ///         &Natural::from(2u32),
-    ///         &Natural::from(2u32)
-    ///     ),
+    ///     Natural::ONE.checked_mul_sub_mul(Natural::ONE, &Natural::TWO, &Natural::TWO),
     ///     None
     /// );
     /// ```
@@ -233,6 +221,7 @@ impl CheckedMulSubMul<&Self, Self, Self> for Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::CheckedMulSubMul;
+    /// use malachite_base::num::basic::traits::{One, Two};
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
@@ -244,11 +233,7 @@ impl CheckedMulSubMul<&Self, Self, Self> for Natural {
     ///     Some(Natural::from(10u32))
     /// );
     /// assert_eq!(
-    ///     Natural::from(1u32).checked_mul_sub_mul(
-    ///         &Natural::from(1u32),
-    ///         Natural::from(2u32),
-    ///         Natural::from(2u32)
-    ///     ),
+    ///     Natural::ONE.checked_mul_sub_mul(&Natural::ONE, Natural::TWO, Natural::TWO),
     ///     None
     /// );
     /// ```
@@ -283,6 +268,7 @@ impl CheckedMulSubMul<&Self, Self, &Self> for Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::CheckedMulSubMul;
+    /// use malachite_base::num::basic::traits::{One, Two};
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
@@ -294,11 +280,7 @@ impl CheckedMulSubMul<&Self, Self, &Self> for Natural {
     ///     Some(Natural::from(10u32))
     /// );
     /// assert_eq!(
-    ///     Natural::from(1u32).checked_mul_sub_mul(
-    ///         &Natural::from(1u32),
-    ///         Natural::from(2u32),
-    ///         &Natural::from(2u32)
-    ///     ),
+    ///     Natural::ONE.checked_mul_sub_mul(&Natural::ONE, Natural::TWO, &Natural::TWO),
     ///     None
     /// );
     /// ```
@@ -333,6 +315,7 @@ impl CheckedMulSubMul<&Self, &Self, Self> for Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::CheckedMulSubMul;
+    /// use malachite_base::num::basic::traits::{One, Two};
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
@@ -344,11 +327,7 @@ impl CheckedMulSubMul<&Self, &Self, Self> for Natural {
     ///     Some(Natural::from(10u32))
     /// );
     /// assert_eq!(
-    ///     Natural::from(1u32).checked_mul_sub_mul(
-    ///         &Natural::from(1u32),
-    ///         &Natural::from(2u32),
-    ///         Natural::from(2u32)
-    ///     ),
+    ///     Natural::ONE.checked_mul_sub_mul(&Natural::ONE, &Natural::TWO, Natural::TWO),
     ///     None
     /// );
     /// ```
@@ -383,6 +362,7 @@ impl CheckedMulSubMul<&Self, &Self, &Self> for Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::CheckedMulSubMul;
+    /// use malachite_base::num::basic::traits::{One, Two};
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
@@ -394,11 +374,7 @@ impl CheckedMulSubMul<&Self, &Self, &Self> for Natural {
     ///     Some(Natural::from(10u32))
     /// );
     /// assert_eq!(
-    ///     Natural::from(1u32).checked_mul_sub_mul(
-    ///         &Natural::from(1u32),
-    ///         &Natural::from(2u32),
-    ///         &Natural::from(2u32)
-    ///     ),
+    ///     Natural::ONE.checked_mul_sub_mul(&Natural::ONE, &Natural::TWO, &Natural::TWO),
     ///     None
     /// );
     /// ```
@@ -432,6 +408,7 @@ impl CheckedMulSubMul<&Natural, &Natural, &Natural> for &Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::CheckedMulSubMul;
+    /// use malachite_base::num::basic::traits::{One, Two};
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(
@@ -443,11 +420,7 @@ impl CheckedMulSubMul<&Natural, &Natural, &Natural> for &Natural {
     ///     Some(Natural::from(10u32))
     /// );
     /// assert_eq!(
-    ///     (&Natural::from(1u32)).checked_mul_sub_mul(
-    ///         &Natural::from(1u32),
-    ///         &Natural::from(2u32),
-    ///         &Natural::from(2u32)
-    ///     ),
+    ///     (&Natural::ONE).checked_mul_sub_mul(&Natural::ONE, &Natural::TWO, &Natural::TWO),
     ///     None
     /// );
     /// ```

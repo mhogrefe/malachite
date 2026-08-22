@@ -137,7 +137,6 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
-    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     ///
     /// let x = Float::from(3.25f64);
@@ -175,7 +174,6 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
-    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     ///
     /// let x = Float::from(3.25f64);
@@ -288,7 +286,6 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
-    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     ///
     /// let x = Float::from(3.25f64);
@@ -322,7 +319,6 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
-    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     ///
     /// let x = Float::from(3.25f64);
@@ -445,7 +441,6 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
-    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     ///
     /// let x = Float::from(3.25f64);
@@ -487,7 +482,6 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
-    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     ///
     /// let x = Float::from(3.25f64);
@@ -612,7 +606,6 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
-    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     ///
     /// let x = Float::from(3.25f64);
@@ -650,7 +643,6 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
-    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     ///
     /// let x = Float::from(3.25f64);

@@ -252,18 +252,19 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
     /// let (log, o) =
-    ///     (&Float::from(8)).log_base_rational_base_prec_round_ref(&Rational::from(2), 10, Exact);
+    ///     (&Float::from(8)).log_base_rational_base_prec_round_ref(&Rational::TWO, 10, Exact);
     /// assert_eq!(log.to_string(), "3.0000"); // log_2(8) = 3
     /// assert_eq!(o, Equal);
     ///
     /// let (log, o) =
-    ///     (&Float::from(2)).log_base_rational_base_prec_round_ref(&Rational::from(4), 10, Exact);
+    ///     (&Float::TWO).log_base_rational_base_prec_round_ref(&Rational::from(4), 10, Exact);
     /// assert_eq!(log.to_string(), "0.50000"); // log_4(2) = 1/2
     /// assert_eq!(o, Equal);
     /// ```
@@ -341,15 +342,16 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
-    /// let (log, o) = (&Float::from(8)).log_base_rational_base_prec_ref(&Rational::from(2), 10);
+    /// let (log, o) = (&Float::from(8)).log_base_rational_base_prec_ref(&Rational::TWO, 10);
     /// assert_eq!(log.to_string(), "3.0000"); // log_2(8) = 3
     /// assert_eq!(o, Equal);
     ///
-    /// let (log, o) = (&Float::from(2)).log_base_rational_base_prec_ref(&Rational::from(4), 10);
+    /// let (log, o) = (&Float::TWO).log_base_rational_base_prec_ref(&Rational::from(4), 10);
     /// assert_eq!(log.to_string(), "0.50000"); // log_4(2) = 1/2
     /// assert_eq!(o, Equal);
     /// ```
@@ -378,6 +380,7 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
@@ -387,7 +390,7 @@ impl Float {
     /// assert_eq!(log.to_string(), "2.00"); // log_3(9) = 2
     /// assert_eq!(o, Equal);
     ///
-    /// let (log, o) = Float::from(2).log_base_rational_base_round(&Rational::from(4), Exact);
+    /// let (log, o) = Float::TWO.log_base_rational_base_round(&Rational::from(4), Exact);
     /// assert_eq!(log.to_string(), "0.50"); // log_4(2) = 1/2
     /// assert_eq!(o, Equal);
     /// ```
@@ -551,6 +554,7 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
@@ -559,7 +563,7 @@ impl Float {
     /// x.log_base_rational_base_round_assign(&Rational::from(3), Exact);
     /// assert_eq!(x.to_string(), "2.00"); // log_3(9) = 2
     ///
-    /// let mut x = Float::from(2);
+    /// let mut x = Float::TWO;
     /// x.log_base_rational_base_round_assign(&Rational::from(4), Exact);
     /// assert_eq!(x.to_string(), "0.50"); // log_4(2) = 1/2
     /// ```
@@ -596,13 +600,11 @@ impl LogBase<Rational> for Float {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::LogBase;
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
     ///
-    /// assert_eq!(
-    ///     Float::from(2).log_base(Rational::from(4)).to_string(),
-    ///     "0.50"
-    /// ); // log_4(2) = 1/2
+    /// assert_eq!(Float::TWO.log_base(Rational::from(4)).to_string(), "0.50"); // log_4(2) = 1/2
     /// assert_eq!(
     ///     Float::from(9).log_base(Rational::from(3)).to_string(),
     ///     "2.00"

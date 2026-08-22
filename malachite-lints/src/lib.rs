@@ -429,6 +429,23 @@ fn in_bin_util_or_tests(cx: &rustc_lint::LateContext<'_>, hir_id: rustc_hir::Hir
 
 fn in_test_code(cx: &rustc_lint::LateContext<'_>, span: rustc_span::Span) -> bool {
     use rustc_lint::LintContext;
+    // The extracted-doctests crate compiles doc examples as test targets, but they are
+    // documentation, not tests, and should be linted in full; rundoc.sh sets this variable when
+    // sweeping them. The exceptions are the conversion docs and the docs of the dedicated
+    // constant constructors, whose examples demonstrate the very constructions the lints would
+    // rewrite; the extracted file names encode their origins.
+    static LINT_DOCTESTS: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    if *LINT_DOCTESTS.get_or_init(|| std::env::var_os("MALACHITE_LINT_DOCTESTS").is_some()) {
+        if let rustc_span::FileName::Real(real) = cx.sess().source_map().span_to_filename(span)
+            && let Some(path) = real.local_path()
+        {
+            let path = path.to_string_lossy().replace('\\', "/");
+            return path.contains("_conversion_")
+                || path.contains("_basic_constants_")
+                || path.contains("_comparison_");
+        }
+        return false;
+    }
     if cx.sess().opts.test {
         return true;
     }

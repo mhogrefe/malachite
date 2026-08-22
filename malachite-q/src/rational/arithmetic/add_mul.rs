@@ -41,10 +41,11 @@ impl AddMul<Self, Self> for Rational {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::AddMul;
+    /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(
-    ///     Rational::from_signeds(1, 2)
+    ///     Rational::ONE_HALF
     ///         .add_mul(Rational::from_signeds(2, 3), Rational::from_signeds(3, 4))
     ///         .to_string(),
     ///     "1"
@@ -81,10 +82,11 @@ impl<'a> AddMul<Self, &'a Self> for Rational {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::AddMul;
+    /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(
-    ///     Rational::from_signeds(1, 2)
+    ///     Rational::ONE_HALF
     ///         .add_mul(Rational::from_signeds(2, 3), &Rational::from_signeds(3, 4))
     ///         .to_string(),
     ///     "1"
@@ -115,10 +117,11 @@ impl<'a> AddMul<&'a Self, Self> for Rational {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::AddMul;
+    /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(
-    ///     Rational::from_signeds(1, 2)
+    ///     Rational::ONE_HALF
     ///         .add_mul(&Rational::from_signeds(2, 3), Rational::from_signeds(3, 4))
     ///         .to_string(),
     ///     "1"
@@ -149,10 +152,11 @@ impl<'a, 'b> AddMul<&'a Self, &'b Self> for Rational {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::AddMul;
+    /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(
-    ///     Rational::from_signeds(1, 2)
+    ///     Rational::ONE_HALF
     ///         .add_mul(&Rational::from_signeds(2, 3), &Rational::from_signeds(3, 4))
     ///         .to_string(),
     ///     "1"
@@ -183,10 +187,11 @@ impl AddMul<&Rational, &Rational> for &Rational {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::AddMul;
+    /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(
-    ///     (&Rational::from_signeds(1, 2))
+    ///     (&Rational::ONE_HALF)
     ///         .add_mul(&Rational::from_signeds(2, 3), &Rational::from_signeds(3, 4))
     ///         .to_string(),
     ///     "1"
@@ -215,9 +220,10 @@ impl AddMulAssign<Self, Self> for Rational {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::AddMulAssign;
+    /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_q::Rational;
     ///
-    /// let mut x = Rational::from_signeds(1, 2);
+    /// let mut x = Rational::ONE_HALF;
     /// x.add_mul_assign(Rational::from_signeds(2, 3), Rational::from_signeds(3, 4));
     /// assert_eq!(x.to_string(), "1");
     /// ```
@@ -244,9 +250,10 @@ impl<'a> AddMulAssign<Self, &'a Self> for Rational {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::AddMulAssign;
+    /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_q::Rational;
     ///
-    /// let mut x = Rational::from_signeds(1, 2);
+    /// let mut x = Rational::ONE_HALF;
     /// x.add_mul_assign(Rational::from_signeds(2, 3), &Rational::from_signeds(3, 4));
     /// assert_eq!(x.to_string(), "1");
     /// ```
@@ -273,9 +280,10 @@ impl<'a> AddMulAssign<&'a Self, Self> for Rational {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::AddMulAssign;
+    /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_q::Rational;
     ///
-    /// let mut x = Rational::from_signeds(1, 2);
+    /// let mut x = Rational::ONE_HALF;
     /// x.add_mul_assign(&Rational::from_signeds(2, 3), Rational::from_signeds(3, 4));
     /// assert_eq!(x.to_string(), "1");
     /// ```
@@ -302,9 +310,10 @@ impl<'a, 'b> AddMulAssign<&'a Self, &'b Self> for Rational {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::AddMulAssign;
+    /// use malachite_base::num::basic::traits::OneHalf;
     /// use malachite_q::Rational;
     ///
-    /// let mut x = Rational::from_signeds(1, 2);
+    /// let mut x = Rational::ONE_HALF;
     /// x.add_mul_assign(&Rational::from_signeds(2, 3), &Rational::from_signeds(3, 4));
     /// assert_eq!(x.to_string(), "1");
     /// ```

@@ -118,20 +118,18 @@ impl OrdAbsDouble for Rational {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::{NegativeOne, One, OneHalf};
     /// use malachite_base::num::comparison::traits::OrdAbsDouble;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
+    /// assert_eq!(Rational::ONE.cmp_abs_double(&Rational::ONE_HALF), Equal);
     /// assert_eq!(
-    ///     Rational::from(1).cmp_abs_double(&Rational::from_signeds(1, 2)),
+    ///     Rational::NEGATIVE_ONE.cmp_abs_double(&Rational::from_signeds(-1, 2)),
     ///     Equal
     /// );
     /// assert_eq!(
-    ///     Rational::from(-1).cmp_abs_double(&Rational::from_signeds(-1, 2)),
-    ///     Equal
-    /// );
-    /// assert_eq!(
-    ///     Rational::from_signeds(2, 3).cmp_abs_double(&Rational::from_signeds(1, 2)),
+    ///     Rational::from_signeds(2, 3).cmp_abs_double(&Rational::ONE_HALF),
     ///     Less
     /// );
     /// ```

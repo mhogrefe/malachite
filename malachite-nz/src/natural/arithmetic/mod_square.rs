@@ -35,9 +35,10 @@ impl ModSquare<Self> for Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::ModSquare;
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::from(2u32).mod_square(Natural::from(10u32)), 4);
+    /// assert_eq!(Natural::TWO.mod_square(Natural::from(10u32)), 4);
     /// assert_eq!(Natural::from(100u32).mod_square(Natural::from(497u32)), 60);
     /// ```
     #[inline]
@@ -67,9 +68,10 @@ impl ModSquare<&Self> for Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::ModSquare;
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(Natural::from(2u32).mod_square(&Natural::from(10u32)), 4);
+    /// assert_eq!(Natural::TWO.mod_square(&Natural::from(10u32)), 4);
     /// assert_eq!(Natural::from(100u32).mod_square(&Natural::from(497u32)), 60);
     /// ```
     #[inline]
@@ -99,9 +101,10 @@ impl ModSquare<Natural> for &Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::ModSquare;
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::from(2u32)).mod_square(Natural::from(10u32)), 4);
+    /// assert_eq!((&Natural::TWO).mod_square(Natural::from(10u32)), 4);
     /// assert_eq!(
     ///     (&Natural::from(100u32)).mod_square(Natural::from(497u32)),
     ///     60
@@ -134,9 +137,10 @@ impl ModSquare<&Natural> for &Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::ModSquare;
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!((&Natural::from(2u32)).mod_square(&Natural::from(10u32)), 4);
+    /// assert_eq!((&Natural::TWO).mod_square(&Natural::from(10u32)), 4);
     /// assert_eq!(
     ///     (&Natural::from(100u32)).mod_square(&Natural::from(497u32)),
     ///     60
@@ -167,9 +171,10 @@ impl ModSquareAssign<Self> for Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::ModSquareAssign;
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_nz::natural::Natural;
     ///
-    /// let mut x = Natural::from(2u32);
+    /// let mut x = Natural::TWO;
     /// x.mod_square_assign(Natural::from(10u32));
     /// assert_eq!(x, 4);
     ///
@@ -202,9 +207,10 @@ impl ModSquareAssign<&Self> for Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::ModSquareAssign;
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_nz::natural::Natural;
     ///
-    /// let mut x = Natural::from(2u32);
+    /// let mut x = Natural::TWO;
     /// x.mod_square_assign(&Natural::from(10u32));
     /// assert_eq!(x, 4);
     ///
@@ -241,6 +247,7 @@ impl ModSquarePrecomputed<Self, Self> for Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::{ModPowPrecomputed, ModSquarePrecomputed};
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_nz::natural::Natural;
     ///
     /// let data = ModPowPrecomputed::<Natural>::precompute_mod_pow_data(&Natural::from(497u32));
@@ -251,7 +258,7 @@ impl ModSquarePrecomputed<Self, Self> for Natural {
     ///
     /// let data = ModPowPrecomputed::<Natural>::precompute_mod_pow_data(&Natural::from(10u32));
     /// assert_eq!(
-    ///     Natural::from(2u32).mod_square_precomputed(Natural::from(10u32), &data),
+    ///     Natural::TWO.mod_square_precomputed(Natural::from(10u32), &data),
     ///     4
     /// );
     /// ```
@@ -286,6 +293,7 @@ impl<'a> ModSquarePrecomputed<Self, &'a Self> for Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::{ModPowPrecomputed, ModSquarePrecomputed};
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_nz::natural::Natural;
     ///
     /// let data = ModPowPrecomputed::<Natural>::precompute_mod_pow_data(&Natural::from(497u32));
@@ -296,7 +304,7 @@ impl<'a> ModSquarePrecomputed<Self, &'a Self> for Natural {
     ///
     /// let data = ModPowPrecomputed::<Natural>::precompute_mod_pow_data(&Natural::from(10u32));
     /// assert_eq!(
-    ///     Natural::from(2u32).mod_square_precomputed(&Natural::from(10u32), &data),
+    ///     Natural::TWO.mod_square_precomputed(&Natural::from(10u32), &data),
     ///     4
     /// );
     /// ```
@@ -331,6 +339,7 @@ impl ModSquarePrecomputed<Natural, Natural> for &Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::{ModPowPrecomputed, ModSquarePrecomputed};
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_nz::natural::Natural;
     ///
     /// let data = ModPowPrecomputed::<Natural>::precompute_mod_pow_data(&Natural::from(497u32));
@@ -341,7 +350,7 @@ impl ModSquarePrecomputed<Natural, Natural> for &Natural {
     ///
     /// let data = ModPowPrecomputed::<Natural>::precompute_mod_pow_data(&Natural::from(10u32));
     /// assert_eq!(
-    ///     (&Natural::from(2u32)).mod_square_precomputed(Natural::from(10u32), &data),
+    ///     (&Natural::TWO).mod_square_precomputed(Natural::from(10u32), &data),
     ///     4
     /// );
     /// ```
@@ -376,6 +385,7 @@ impl ModSquarePrecomputed<Natural, &Natural> for &Natural {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::{ModPowPrecomputed, ModSquarePrecomputed};
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_nz::natural::Natural;
     ///
     /// let data = ModPowPrecomputed::<Natural>::precompute_mod_pow_data(&Natural::from(497u32));
@@ -386,7 +396,7 @@ impl ModSquarePrecomputed<Natural, &Natural> for &Natural {
     ///
     /// let data = ModPowPrecomputed::<Natural>::precompute_mod_pow_data(&Natural::from(10u32));
     /// assert_eq!(
-    ///     (&Natural::from(2u32)).mod_square_precomputed(&Natural::from(10u32), &data),
+    ///     (&Natural::TWO).mod_square_precomputed(&Natural::from(10u32), &data),
     ///     4
     /// );
     /// ```
@@ -423,6 +433,7 @@ impl ModSquarePrecomputedAssign<Self, Self> for Natural {
     /// use malachite_base::num::arithmetic::traits::{
     ///     ModPowPrecomputed, ModSquarePrecomputedAssign,
     /// };
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_nz::natural::Natural;
     ///
     /// let data = ModPowPrecomputed::<Natural>::precompute_mod_pow_data(&Natural::from(497u32));
@@ -431,7 +442,7 @@ impl ModSquarePrecomputedAssign<Self, Self> for Natural {
     /// assert_eq!(x, 60);
     ///
     /// let data = ModPowPrecomputed::<Natural>::precompute_mod_pow_data(&Natural::from(10u32));
-    /// let mut x = Natural::from(2u32);
+    /// let mut x = Natural::TWO;
     /// x.mod_square_precomputed_assign(Natural::from(10u32), &data);
     /// assert_eq!(x, 4);
     /// ```
@@ -469,6 +480,7 @@ impl<'a> ModSquarePrecomputedAssign<Self, &'a Self> for Natural {
     /// use malachite_base::num::arithmetic::traits::{
     ///     ModPowPrecomputed, ModSquarePrecomputedAssign,
     /// };
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_nz::natural::Natural;
     ///
     /// let data = ModPowPrecomputed::<Natural>::precompute_mod_pow_data(&Natural::from(497u32));
@@ -477,7 +489,7 @@ impl<'a> ModSquarePrecomputedAssign<Self, &'a Self> for Natural {
     /// assert_eq!(x, 60);
     ///
     /// let data = ModPowPrecomputed::<Natural>::precompute_mod_pow_data(&Natural::from(10u32));
-    /// let mut x = Natural::from(2u32);
+    /// let mut x = Natural::TWO;
     /// x.mod_square_precomputed_assign(&Natural::from(10u32), &data);
     /// assert_eq!(x, 4);
     /// ```

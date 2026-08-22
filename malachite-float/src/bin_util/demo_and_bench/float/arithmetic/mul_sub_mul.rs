@@ -7,9 +7,10 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::MulSubMul;
-use malachite_base::test_util::bench::{run_benchmark, BenchmarkType};
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
+use malachite_float::ComparableFloat;
 use malachite_float::test_util::bench::bucketers::{
     pair_2_sextuple_1_2_3_4_float_max_complexity_bucketer,
     sextuple_1_2_3_4_float_float_float_rational_max_complexity_bucketer,
@@ -28,7 +29,6 @@ use malachite_float::test_util::generators::{
     float_float_float_rational_unsigned_quintuple_gen_var_1,
     float_float_float_rational_unsigned_rounding_mode_sextuple_gen_var_3, float_quadruple_gen,
 };
-use malachite_float::ComparableFloat;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_mul_sub_mul_prec_round);

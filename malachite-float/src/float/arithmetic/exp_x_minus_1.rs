@@ -870,6 +870,7 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
@@ -886,7 +887,7 @@ impl Float {
     /// assert_eq!(e.to_string(), "-0.45117");
     /// assert_eq!(o, Greater);
     ///
-    /// let (e, o) = Float::exp_x_minus_1_rational_prec(Rational::from(0), 10);
+    /// let (e, o) = Float::exp_x_minus_1_rational_prec(Rational::ZERO, 10);
     /// assert_eq!(e.to_string(), "0.0");
     /// assert_eq!(o, Equal);
     /// ```
@@ -941,6 +942,7 @@ impl Float {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
@@ -957,7 +959,7 @@ impl Float {
     /// assert_eq!(e.to_string(), "-0.45117");
     /// assert_eq!(o, Greater);
     ///
-    /// let (e, o) = Float::exp_x_minus_1_rational_prec_ref(&Rational::from(0), 10);
+    /// let (e, o) = Float::exp_x_minus_1_rational_prec_ref(&Rational::ZERO, 10);
     /// assert_eq!(e.to_string(), "0.0");
     /// assert_eq!(o, Equal);
     /// ```

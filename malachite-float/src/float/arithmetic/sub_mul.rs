@@ -1107,7 +1107,6 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let x = Float::from(PI);
     /// let y = Float::from(E);
     /// let z = Float::from(SQRT_2);
     ///
@@ -1192,7 +1191,6 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let x = Float::from(PI);
     /// let y = Float::from(E);
     /// let z = Float::from(SQRT_2);
     ///
@@ -1277,7 +1275,6 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let x = Float::from(PI);
     /// let y = Float::from(E);
     /// let z = Float::from(SQRT_2);
     ///
@@ -1361,7 +1358,6 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let x = Float::from(PI);
     /// let y = Float::from(E);
     /// let z = Float::from(SQRT_2);
     ///
@@ -1456,7 +1452,6 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::f64::consts::{E, PI, SQRT_2};
-    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
@@ -1538,7 +1533,6 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::f64::consts::{E, PI, SQRT_2};
-    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
@@ -1620,7 +1614,6 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::f64::consts::{E, PI, SQRT_2};
-    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
@@ -1702,7 +1695,6 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::f64::consts::{E, PI, SQRT_2};
-    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
@@ -1783,7 +1775,6 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::f64::consts::{E, PI, SQRT_2};
-    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
@@ -1865,7 +1856,6 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::f64::consts::{E, PI, SQRT_2};
-    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
@@ -1947,7 +1937,6 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::f64::consts::{E, PI, SQRT_2};
-    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
@@ -2029,7 +2018,6 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::f64::consts::{E, PI, SQRT_2};
-    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
@@ -2089,11 +2077,9 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::f64::consts::{E, PI, SQRT_2};
-    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let x = Float::from(PI);
     /// let y = Float::from(E);
     /// let z = Float::from(SQRT_2);
     ///
@@ -2151,11 +2137,9 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::f64::consts::{E, PI, SQRT_2};
-    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let x = Float::from(PI);
     /// let y = Float::from(E);
     /// let z = Float::from(SQRT_2);
     ///
@@ -2213,11 +2197,9 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::f64::consts::{E, PI, SQRT_2};
-    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let x = Float::from(PI);
     /// let y = Float::from(E);
     /// let z = Float::from(SQRT_2);
     ///
@@ -2274,11 +2256,9 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::f64::consts::{E, PI, SQRT_2};
-    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let x = Float::from(PI);
     /// let y = Float::from(E);
     /// let z = Float::from(SQRT_2);
     ///
@@ -3261,7 +3241,6 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let x = Float::from(PI);
     /// let y = Float::from(E);
     /// let z = Float::from(SQRT_2);
     ///
@@ -3339,7 +3318,6 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let x = Float::from(PI);
     /// let y = Float::from(E);
     /// let z = Float::from(SQRT_2);
     ///
@@ -3422,7 +3400,6 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let x = Float::from(PI);
     /// let y = Float::from(E);
     /// let z = Float::from(SQRT_2);
     ///
@@ -3505,7 +3482,6 @@ impl Float {
     /// use malachite_float::Float;
     /// use std::cmp::Ordering::*;
     ///
-    /// let x = Float::from(PI);
     /// let y = Float::from(E);
     /// let z = Float::from(SQRT_2);
     ///
@@ -4446,27 +4422,39 @@ impl Float {
     /// let y = Float::from(E);
     /// let z = Rational::from_signeds(22, 7);
     ///
-    /// let (diff, o) = x.clone().sub_mul_rational_prec_round(y.clone(), z.clone(), 5, Floor);
+    /// let (diff, o) = x
+    ///     .clone()
+    ///     .sub_mul_rational_prec_round(y.clone(), z.clone(), 5, Floor);
     /// assert_eq!(diff.to_string(), "-5.50");
     /// assert_eq!(o, Less);
     ///
-    /// let (diff, o) = x.clone().sub_mul_rational_prec_round(y.clone(), z.clone(), 5, Ceiling);
+    /// let (diff, o) = x
+    ///     .clone()
+    ///     .sub_mul_rational_prec_round(y.clone(), z.clone(), 5, Ceiling);
     /// assert_eq!(diff.to_string(), "-5.25");
     /// assert_eq!(o, Greater);
     ///
-    /// let (diff, o) = x.clone().sub_mul_rational_prec_round(y.clone(), z.clone(), 5, Nearest);
+    /// let (diff, o) = x
+    ///     .clone()
+    ///     .sub_mul_rational_prec_round(y.clone(), z.clone(), 5, Nearest);
     /// assert_eq!(diff.to_string(), "-5.50");
     /// assert_eq!(o, Less);
     ///
-    /// let (diff, o) = x.clone().sub_mul_rational_prec_round(y.clone(), z.clone(), 20, Floor);
+    /// let (diff, o) = x
+    ///     .clone()
+    ///     .sub_mul_rational_prec_round(y.clone(), z.clone(), 20, Floor);
     /// assert_eq!(diff.to_string(), "-5.4015808");
     /// assert_eq!(o, Less);
     ///
-    /// let (diff, o) = x.clone().sub_mul_rational_prec_round(y.clone(), z.clone(), 20, Ceiling);
+    /// let (diff, o) = x
+    ///     .clone()
+    ///     .sub_mul_rational_prec_round(y.clone(), z.clone(), 20, Ceiling);
     /// assert_eq!(diff.to_string(), "-5.4015732");
     /// assert_eq!(o, Greater);
     ///
-    /// let (diff, o) = x.clone().sub_mul_rational_prec_round(y.clone(), z.clone(), 20, Nearest);
+    /// let (diff, o) = x
+    ///     .clone()
+    ///     .sub_mul_rational_prec_round(y.clone(), z.clone(), 20, Nearest);
     /// assert_eq!(diff.to_string(), "-5.4015808");
     /// assert_eq!(o, Less);
     /// ```
@@ -4575,31 +4563,39 @@ impl Float {
     /// let y = Float::from(E);
     /// let z = Rational::from_signeds(22, 7);
     ///
-    /// let (diff, o) = x.clone().sub_mul_rational_prec_round_val_val_ref(y.clone(), &z, 5, Floor);
+    /// let (diff, o) = x
+    ///     .clone()
+    ///     .sub_mul_rational_prec_round_val_val_ref(y.clone(), &z, 5, Floor);
     /// assert_eq!(diff.to_string(), "-5.50");
     /// assert_eq!(o, Less);
     ///
     /// let (diff, o) =
-    ///     x.clone().sub_mul_rational_prec_round_val_val_ref(y.clone(), &z, 5, Ceiling);
+    ///     x.clone()
+    ///         .sub_mul_rational_prec_round_val_val_ref(y.clone(), &z, 5, Ceiling);
     /// assert_eq!(diff.to_string(), "-5.25");
     /// assert_eq!(o, Greater);
     ///
     /// let (diff, o) =
-    ///     x.clone().sub_mul_rational_prec_round_val_val_ref(y.clone(), &z, 5, Nearest);
+    ///     x.clone()
+    ///         .sub_mul_rational_prec_round_val_val_ref(y.clone(), &z, 5, Nearest);
     /// assert_eq!(diff.to_string(), "-5.50");
     /// assert_eq!(o, Less);
     ///
-    /// let (diff, o) = x.clone().sub_mul_rational_prec_round_val_val_ref(y.clone(), &z, 20, Floor);
+    /// let (diff, o) = x
+    ///     .clone()
+    ///     .sub_mul_rational_prec_round_val_val_ref(y.clone(), &z, 20, Floor);
     /// assert_eq!(diff.to_string(), "-5.4015808");
     /// assert_eq!(o, Less);
     ///
     /// let (diff, o) =
-    ///     x.clone().sub_mul_rational_prec_round_val_val_ref(y.clone(), &z, 20, Ceiling);
+    ///     x.clone()
+    ///         .sub_mul_rational_prec_round_val_val_ref(y.clone(), &z, 20, Ceiling);
     /// assert_eq!(diff.to_string(), "-5.4015732");
     /// assert_eq!(o, Greater);
     ///
     /// let (diff, o) =
-    ///     x.clone().sub_mul_rational_prec_round_val_val_ref(y.clone(), &z, 20, Nearest);
+    ///     x.clone()
+    ///         .sub_mul_rational_prec_round_val_val_ref(y.clone(), &z, 20, Nearest);
     /// assert_eq!(diff.to_string(), "-5.4015808");
     /// assert_eq!(o, Less);
     /// ```
@@ -4708,31 +4704,39 @@ impl Float {
     /// let y = Float::from(E);
     /// let z = Rational::from_signeds(22, 7);
     ///
-    /// let (diff, o) = x.clone().sub_mul_rational_prec_round_val_ref_val(&y, z.clone(), 5, Floor);
+    /// let (diff, o) = x
+    ///     .clone()
+    ///     .sub_mul_rational_prec_round_val_ref_val(&y, z.clone(), 5, Floor);
     /// assert_eq!(diff.to_string(), "-5.50");
     /// assert_eq!(o, Less);
     ///
     /// let (diff, o) =
-    ///     x.clone().sub_mul_rational_prec_round_val_ref_val(&y, z.clone(), 5, Ceiling);
+    ///     x.clone()
+    ///         .sub_mul_rational_prec_round_val_ref_val(&y, z.clone(), 5, Ceiling);
     /// assert_eq!(diff.to_string(), "-5.25");
     /// assert_eq!(o, Greater);
     ///
     /// let (diff, o) =
-    ///     x.clone().sub_mul_rational_prec_round_val_ref_val(&y, z.clone(), 5, Nearest);
+    ///     x.clone()
+    ///         .sub_mul_rational_prec_round_val_ref_val(&y, z.clone(), 5, Nearest);
     /// assert_eq!(diff.to_string(), "-5.50");
     /// assert_eq!(o, Less);
     ///
-    /// let (diff, o) = x.clone().sub_mul_rational_prec_round_val_ref_val(&y, z.clone(), 20, Floor);
+    /// let (diff, o) = x
+    ///     .clone()
+    ///     .sub_mul_rational_prec_round_val_ref_val(&y, z.clone(), 20, Floor);
     /// assert_eq!(diff.to_string(), "-5.4015808");
     /// assert_eq!(o, Less);
     ///
     /// let (diff, o) =
-    ///     x.clone().sub_mul_rational_prec_round_val_ref_val(&y, z.clone(), 20, Ceiling);
+    ///     x.clone()
+    ///         .sub_mul_rational_prec_round_val_ref_val(&y, z.clone(), 20, Ceiling);
     /// assert_eq!(diff.to_string(), "-5.4015732");
     /// assert_eq!(o, Greater);
     ///
     /// let (diff, o) =
-    ///     x.clone().sub_mul_rational_prec_round_val_ref_val(&y, z.clone(), 20, Nearest);
+    ///     x.clone()
+    ///         .sub_mul_rational_prec_round_val_ref_val(&y, z.clone(), 20, Nearest);
     /// assert_eq!(diff.to_string(), "-5.4015808");
     /// assert_eq!(o, Less);
     /// ```
@@ -4841,27 +4845,39 @@ impl Float {
     /// let y = Float::from(E);
     /// let z = Rational::from_signeds(22, 7);
     ///
-    /// let (diff, o) = x.clone().sub_mul_rational_prec_round_val_ref_ref(&y, &z, 5, Floor);
+    /// let (diff, o) = x
+    ///     .clone()
+    ///     .sub_mul_rational_prec_round_val_ref_ref(&y, &z, 5, Floor);
     /// assert_eq!(diff.to_string(), "-5.50");
     /// assert_eq!(o, Less);
     ///
-    /// let (diff, o) = x.clone().sub_mul_rational_prec_round_val_ref_ref(&y, &z, 5, Ceiling);
+    /// let (diff, o) = x
+    ///     .clone()
+    ///     .sub_mul_rational_prec_round_val_ref_ref(&y, &z, 5, Ceiling);
     /// assert_eq!(diff.to_string(), "-5.25");
     /// assert_eq!(o, Greater);
     ///
-    /// let (diff, o) = x.clone().sub_mul_rational_prec_round_val_ref_ref(&y, &z, 5, Nearest);
+    /// let (diff, o) = x
+    ///     .clone()
+    ///     .sub_mul_rational_prec_round_val_ref_ref(&y, &z, 5, Nearest);
     /// assert_eq!(diff.to_string(), "-5.50");
     /// assert_eq!(o, Less);
     ///
-    /// let (diff, o) = x.clone().sub_mul_rational_prec_round_val_ref_ref(&y, &z, 20, Floor);
+    /// let (diff, o) = x
+    ///     .clone()
+    ///     .sub_mul_rational_prec_round_val_ref_ref(&y, &z, 20, Floor);
     /// assert_eq!(diff.to_string(), "-5.4015808");
     /// assert_eq!(o, Less);
     ///
-    /// let (diff, o) = x.clone().sub_mul_rational_prec_round_val_ref_ref(&y, &z, 20, Ceiling);
+    /// let (diff, o) = x
+    ///     .clone()
+    ///     .sub_mul_rational_prec_round_val_ref_ref(&y, &z, 20, Ceiling);
     /// assert_eq!(diff.to_string(), "-5.4015732");
     /// assert_eq!(o, Greater);
     ///
-    /// let (diff, o) = x.clone().sub_mul_rational_prec_round_val_ref_ref(&y, &z, 20, Nearest);
+    /// let (diff, o) = x
+    ///     .clone()
+    ///     .sub_mul_rational_prec_round_val_ref_ref(&y, &z, 20, Nearest);
     /// assert_eq!(diff.to_string(), "-5.4015808");
     /// assert_eq!(o, Less);
     /// ```
@@ -5448,20 +5464,28 @@ impl Float {
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
-    /// let x = Float::from(PI);
     /// let y = Float::from(E);
     /// let z = Rational::from_signeds(22, 7);
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(x.sub_mul_rational_prec_round_assign(y.clone(), z.clone(), 5, Floor), Less);
+    /// assert_eq!(
+    ///     x.sub_mul_rational_prec_round_assign(y.clone(), z.clone(), 5, Floor),
+    ///     Less
+    /// );
     /// assert_eq!(x.to_string(), "-5.50");
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(x.sub_mul_rational_prec_round_assign(y.clone(), z.clone(), 5, Ceiling), Greater);
+    /// assert_eq!(
+    ///     x.sub_mul_rational_prec_round_assign(y.clone(), z.clone(), 5, Ceiling),
+    ///     Greater
+    /// );
     /// assert_eq!(x.to_string(), "-5.25");
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(x.sub_mul_rational_prec_round_assign(y.clone(), z.clone(), 5, Nearest), Less);
+    /// assert_eq!(
+    ///     x.sub_mul_rational_prec_round_assign(y.clone(), z.clone(), 5, Nearest),
+    ///     Less
+    /// );
     /// assert_eq!(x.to_string(), "-5.50");
     /// ```
     #[allow(clippy::needless_pass_by_value)]
@@ -5532,12 +5556,14 @@ impl Float {
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
-    /// let x = Float::from(PI);
     /// let y = Float::from(E);
     /// let z = Rational::from_signeds(22, 7);
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(x.sub_mul_rational_prec_round_assign_val_ref(y.clone(), &z, 5, Floor), Less);
+    /// assert_eq!(
+    ///     x.sub_mul_rational_prec_round_assign_val_ref(y.clone(), &z, 5, Floor),
+    ///     Less
+    /// );
     /// assert_eq!(x.to_string(), "-5.50");
     ///
     /// let mut x = Float::from(PI);
@@ -5548,7 +5574,10 @@ impl Float {
     /// assert_eq!(x.to_string(), "-5.25");
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(x.sub_mul_rational_prec_round_assign_val_ref(y.clone(), &z, 5, Nearest), Less);
+    /// assert_eq!(
+    ///     x.sub_mul_rational_prec_round_assign_val_ref(y.clone(), &z, 5, Nearest),
+    ///     Less
+    /// );
     /// assert_eq!(x.to_string(), "-5.50");
     /// ```
     #[allow(clippy::needless_pass_by_value)]
@@ -5619,12 +5648,14 @@ impl Float {
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
-    /// let x = Float::from(PI);
     /// let y = Float::from(E);
     /// let z = Rational::from_signeds(22, 7);
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(x.sub_mul_rational_prec_round_assign_ref_val(&y, z.clone(), 5, Floor), Less);
+    /// assert_eq!(
+    ///     x.sub_mul_rational_prec_round_assign_ref_val(&y, z.clone(), 5, Floor),
+    ///     Less
+    /// );
     /// assert_eq!(x.to_string(), "-5.50");
     ///
     /// let mut x = Float::from(PI);
@@ -5635,7 +5666,10 @@ impl Float {
     /// assert_eq!(x.to_string(), "-5.25");
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(x.sub_mul_rational_prec_round_assign_ref_val(&y, z.clone(), 5, Nearest), Less);
+    /// assert_eq!(
+    ///     x.sub_mul_rational_prec_round_assign_ref_val(&y, z.clone(), 5, Nearest),
+    ///     Less
+    /// );
     /// assert_eq!(x.to_string(), "-5.50");
     /// ```
     #[allow(clippy::needless_pass_by_value)]
@@ -5706,20 +5740,28 @@ impl Float {
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
-    /// let x = Float::from(PI);
     /// let y = Float::from(E);
     /// let z = Rational::from_signeds(22, 7);
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(x.sub_mul_rational_prec_round_assign_ref_ref(&y, &z, 5, Floor), Less);
+    /// assert_eq!(
+    ///     x.sub_mul_rational_prec_round_assign_ref_ref(&y, &z, 5, Floor),
+    ///     Less
+    /// );
     /// assert_eq!(x.to_string(), "-5.50");
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(x.sub_mul_rational_prec_round_assign_ref_ref(&y, &z, 5, Ceiling), Greater);
+    /// assert_eq!(
+    ///     x.sub_mul_rational_prec_round_assign_ref_ref(&y, &z, 5, Ceiling),
+    ///     Greater
+    /// );
     /// assert_eq!(x.to_string(), "-5.25");
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(x.sub_mul_rational_prec_round_assign_ref_ref(&y, &z, 5, Nearest), Less);
+    /// assert_eq!(
+    ///     x.sub_mul_rational_prec_round_assign_ref_ref(&y, &z, 5, Nearest),
+    ///     Less
+    /// );
     /// assert_eq!(x.to_string(), "-5.50");
     /// ```
     #[inline]
@@ -5800,7 +5842,6 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::f64::consts::{E, PI};
-    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
@@ -5888,7 +5929,6 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::f64::consts::{E, PI};
-    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
@@ -5897,11 +5937,15 @@ impl Float {
     /// let y = Float::from(E);
     /// let z = Rational::from_signeds(22, 7);
     ///
-    /// let (diff, o) = x.clone().sub_mul_rational_prec_val_val_ref(y.clone(), &z, 5);
+    /// let (diff, o) = x
+    ///     .clone()
+    ///     .sub_mul_rational_prec_val_val_ref(y.clone(), &z, 5);
     /// assert_eq!(diff.to_string(), "-5.50");
     /// assert_eq!(o, Less);
     ///
-    /// let (diff, o) = x.clone().sub_mul_rational_prec_val_val_ref(y.clone(), &z, 20);
+    /// let (diff, o) = x
+    ///     .clone()
+    ///     .sub_mul_rational_prec_val_val_ref(y.clone(), &z, 20);
     /// assert_eq!(diff.to_string(), "-5.4015808");
     /// assert_eq!(o, Less);
     /// ```
@@ -5982,7 +6026,6 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::f64::consts::{E, PI};
-    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
@@ -5991,11 +6034,15 @@ impl Float {
     /// let y = Float::from(E);
     /// let z = Rational::from_signeds(22, 7);
     ///
-    /// let (diff, o) = x.clone().sub_mul_rational_prec_val_ref_val(&y, z.clone(), 5);
+    /// let (diff, o) = x
+    ///     .clone()
+    ///     .sub_mul_rational_prec_val_ref_val(&y, z.clone(), 5);
     /// assert_eq!(diff.to_string(), "-5.50");
     /// assert_eq!(o, Less);
     ///
-    /// let (diff, o) = x.clone().sub_mul_rational_prec_val_ref_val(&y, z.clone(), 20);
+    /// let (diff, o) = x
+    ///     .clone()
+    ///     .sub_mul_rational_prec_val_ref_val(&y, z.clone(), 20);
     /// assert_eq!(diff.to_string(), "-5.4015808");
     /// assert_eq!(o, Less);
     /// ```
@@ -6076,7 +6123,6 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::f64::consts::{E, PI};
-    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
@@ -6170,7 +6216,6 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::f64::consts::{E, PI};
-    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
@@ -6264,7 +6309,6 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::f64::consts::{E, PI};
-    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
@@ -6358,7 +6402,6 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::f64::consts::{E, PI};
-    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
@@ -6451,7 +6494,6 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::f64::consts::{E, PI};
-    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
@@ -6524,21 +6566,25 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::f64::consts::{E, PI};
-    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
-    /// let x = Float::from(PI);
     /// let y = Float::from(E);
     /// let z = Rational::from_signeds(22, 7);
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(x.sub_mul_rational_prec_assign(y.clone(), z.clone(), 5), Less);
+    /// assert_eq!(
+    ///     x.sub_mul_rational_prec_assign(y.clone(), z.clone(), 5),
+    ///     Less
+    /// );
     /// assert_eq!(x.to_string(), "-5.50");
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(x.sub_mul_rational_prec_assign(y.clone(), z.clone(), 20), Less);
+    /// assert_eq!(
+    ///     x.sub_mul_rational_prec_assign(y.clone(), z.clone(), 20),
+    ///     Less
+    /// );
     /// assert_eq!(x.to_string(), "-5.4015808");
     /// ```
     #[allow(clippy::needless_pass_by_value)]
@@ -6593,21 +6639,25 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::f64::consts::{E, PI};
-    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
-    /// let x = Float::from(PI);
     /// let y = Float::from(E);
     /// let z = Rational::from_signeds(22, 7);
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(x.sub_mul_rational_prec_assign_val_ref(y.clone(), &z, 5), Less);
+    /// assert_eq!(
+    ///     x.sub_mul_rational_prec_assign_val_ref(y.clone(), &z, 5),
+    ///     Less
+    /// );
     /// assert_eq!(x.to_string(), "-5.50");
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(x.sub_mul_rational_prec_assign_val_ref(y.clone(), &z, 20), Less);
+    /// assert_eq!(
+    ///     x.sub_mul_rational_prec_assign_val_ref(y.clone(), &z, 20),
+    ///     Less
+    /// );
     /// assert_eq!(x.to_string(), "-5.4015808");
     /// ```
     #[allow(clippy::needless_pass_by_value)]
@@ -6667,21 +6717,25 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::f64::consts::{E, PI};
-    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
-    /// let x = Float::from(PI);
     /// let y = Float::from(E);
     /// let z = Rational::from_signeds(22, 7);
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(x.sub_mul_rational_prec_assign_ref_val(&y, z.clone(), 5), Less);
+    /// assert_eq!(
+    ///     x.sub_mul_rational_prec_assign_ref_val(&y, z.clone(), 5),
+    ///     Less
+    /// );
     /// assert_eq!(x.to_string(), "-5.50");
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(x.sub_mul_rational_prec_assign_ref_val(&y, z.clone(), 20), Less);
+    /// assert_eq!(
+    ///     x.sub_mul_rational_prec_assign_ref_val(&y, z.clone(), 20),
+    ///     Less
+    /// );
     /// assert_eq!(x.to_string(), "-5.4015808");
     /// ```
     #[allow(clippy::needless_pass_by_value)]
@@ -6741,12 +6795,10 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::f64::consts::{E, PI};
-    /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
-    /// let x = Float::from(PI);
     /// let y = Float::from(E);
     /// let z = Rational::from_signeds(22, 7);
     ///
@@ -6861,15 +6913,21 @@ impl Float {
     /// let y = Float::from(E);
     /// let z = Rational::from_signeds(22, 7);
     ///
-    /// let (diff, o) = x.clone().sub_mul_rational_round(y.clone(), z.clone(), Floor);
+    /// let (diff, o) = x
+    ///     .clone()
+    ///     .sub_mul_rational_round(y.clone(), z.clone(), Floor);
     /// assert_eq!(diff.to_string(), "-5.4015788072814921");
     /// assert_eq!(o, Less);
     ///
-    /// let (diff, o) = x.clone().sub_mul_rational_round(y.clone(), z.clone(), Ceiling);
+    /// let (diff, o) = x
+    ///     .clone()
+    ///     .sub_mul_rational_round(y.clone(), z.clone(), Ceiling);
     /// assert_eq!(diff.to_string(), "-5.4015788072814912");
     /// assert_eq!(o, Greater);
     ///
-    /// let (diff, o) = x.clone().sub_mul_rational_round(y.clone(), z.clone(), Nearest);
+    /// let (diff, o) = x
+    ///     .clone()
+    ///     .sub_mul_rational_round(y.clone(), z.clone(), Nearest);
     /// assert_eq!(diff.to_string(), "-5.4015788072814912");
     /// assert_eq!(o, Greater);
     /// ```
@@ -6978,15 +7036,21 @@ impl Float {
     /// let y = Float::from(E);
     /// let z = Rational::from_signeds(22, 7);
     ///
-    /// let (diff, o) = x.clone().sub_mul_rational_round_val_val_ref(y.clone(), &z, Floor);
+    /// let (diff, o) = x
+    ///     .clone()
+    ///     .sub_mul_rational_round_val_val_ref(y.clone(), &z, Floor);
     /// assert_eq!(diff.to_string(), "-5.4015788072814921");
     /// assert_eq!(o, Less);
     ///
-    /// let (diff, o) = x.clone().sub_mul_rational_round_val_val_ref(y.clone(), &z, Ceiling);
+    /// let (diff, o) = x
+    ///     .clone()
+    ///     .sub_mul_rational_round_val_val_ref(y.clone(), &z, Ceiling);
     /// assert_eq!(diff.to_string(), "-5.4015788072814912");
     /// assert_eq!(o, Greater);
     ///
-    /// let (diff, o) = x.clone().sub_mul_rational_round_val_val_ref(y.clone(), &z, Nearest);
+    /// let (diff, o) = x
+    ///     .clone()
+    ///     .sub_mul_rational_round_val_val_ref(y.clone(), &z, Nearest);
     /// assert_eq!(diff.to_string(), "-5.4015788072814912");
     /// assert_eq!(o, Greater);
     /// ```
@@ -7096,15 +7160,21 @@ impl Float {
     /// let y = Float::from(E);
     /// let z = Rational::from_signeds(22, 7);
     ///
-    /// let (diff, o) = x.clone().sub_mul_rational_round_val_ref_val(&y, z.clone(), Floor);
+    /// let (diff, o) = x
+    ///     .clone()
+    ///     .sub_mul_rational_round_val_ref_val(&y, z.clone(), Floor);
     /// assert_eq!(diff.to_string(), "-5.4015788072814921");
     /// assert_eq!(o, Less);
     ///
-    /// let (diff, o) = x.clone().sub_mul_rational_round_val_ref_val(&y, z.clone(), Ceiling);
+    /// let (diff, o) = x
+    ///     .clone()
+    ///     .sub_mul_rational_round_val_ref_val(&y, z.clone(), Ceiling);
     /// assert_eq!(diff.to_string(), "-5.4015788072814912");
     /// assert_eq!(o, Greater);
     ///
-    /// let (diff, o) = x.clone().sub_mul_rational_round_val_ref_val(&y, z.clone(), Nearest);
+    /// let (diff, o) = x
+    ///     .clone()
+    ///     .sub_mul_rational_round_val_ref_val(&y, z.clone(), Nearest);
     /// assert_eq!(diff.to_string(), "-5.4015788072814912");
     /// assert_eq!(o, Greater);
     /// ```
@@ -7218,11 +7288,15 @@ impl Float {
     /// assert_eq!(diff.to_string(), "-5.4015788072814921");
     /// assert_eq!(o, Less);
     ///
-    /// let (diff, o) = x.clone().sub_mul_rational_round_val_ref_ref(&y, &z, Ceiling);
+    /// let (diff, o) = x
+    ///     .clone()
+    ///     .sub_mul_rational_round_val_ref_ref(&y, &z, Ceiling);
     /// assert_eq!(diff.to_string(), "-5.4015788072814912");
     /// assert_eq!(o, Greater);
     ///
-    /// let (diff, o) = x.clone().sub_mul_rational_round_val_ref_ref(&y, &z, Nearest);
+    /// let (diff, o) = x
+    ///     .clone()
+    ///     .sub_mul_rational_round_val_ref_ref(&y, &z, Nearest);
     /// assert_eq!(diff.to_string(), "-5.4015788072814912");
     /// assert_eq!(o, Greater);
     /// ```
@@ -7731,7 +7805,6 @@ impl Float {
     ///   2^{\lfloor\log_2 |x-yz|\rfloor-p}$, where $p$ is the maximum precision of the input
     ///   [`Float`]s.
     ///
-    ///
     /// See the [`Float::sub_mul_rational_prec_round`] documentation for information on special
     /// cases, overflow, and underflow.
     ///
@@ -7761,20 +7834,28 @@ impl Float {
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
-    /// let x = Float::from(PI);
     /// let y = Float::from(E);
     /// let z = Rational::from_signeds(22, 7);
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(x.sub_mul_rational_round_assign(y.clone(), z.clone(), Floor), Less);
+    /// assert_eq!(
+    ///     x.sub_mul_rational_round_assign(y.clone(), z.clone(), Floor),
+    ///     Less
+    /// );
     /// assert_eq!(x.to_string(), "-5.4015788072814921");
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(x.sub_mul_rational_round_assign(y.clone(), z.clone(), Ceiling), Greater);
+    /// assert_eq!(
+    ///     x.sub_mul_rational_round_assign(y.clone(), z.clone(), Ceiling),
+    ///     Greater
+    /// );
     /// assert_eq!(x.to_string(), "-5.4015788072814912");
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(x.sub_mul_rational_round_assign(y.clone(), z.clone(), Nearest), Greater);
+    /// assert_eq!(
+    ///     x.sub_mul_rational_round_assign(y.clone(), z.clone(), Nearest),
+    ///     Greater
+    /// );
     /// assert_eq!(x.to_string(), "-5.4015788072814912");
     /// ```
     #[allow(clippy::needless_pass_by_value)]
@@ -7814,7 +7895,6 @@ impl Float {
     ///   2^{\lfloor\log_2 |x-yz|\rfloor-p}$, where $p$ is the maximum precision of the input
     ///   [`Float`]s.
     ///
-    ///
     /// See the [`Float::sub_mul_rational_prec_round`] documentation for information on special
     /// cases, overflow, and underflow.
     ///
@@ -7844,20 +7924,28 @@ impl Float {
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
-    /// let x = Float::from(PI);
     /// let y = Float::from(E);
     /// let z = Rational::from_signeds(22, 7);
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(x.sub_mul_rational_round_assign_val_ref(y.clone(), &z, Floor), Less);
+    /// assert_eq!(
+    ///     x.sub_mul_rational_round_assign_val_ref(y.clone(), &z, Floor),
+    ///     Less
+    /// );
     /// assert_eq!(x.to_string(), "-5.4015788072814921");
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(x.sub_mul_rational_round_assign_val_ref(y.clone(), &z, Ceiling), Greater);
+    /// assert_eq!(
+    ///     x.sub_mul_rational_round_assign_val_ref(y.clone(), &z, Ceiling),
+    ///     Greater
+    /// );
     /// assert_eq!(x.to_string(), "-5.4015788072814912");
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(x.sub_mul_rational_round_assign_val_ref(y.clone(), &z, Nearest), Greater);
+    /// assert_eq!(
+    ///     x.sub_mul_rational_round_assign_val_ref(y.clone(), &z, Nearest),
+    ///     Greater
+    /// );
     /// assert_eq!(x.to_string(), "-5.4015788072814912");
     /// ```
     #[allow(clippy::needless_pass_by_value)]
@@ -7897,7 +7985,6 @@ impl Float {
     ///   2^{\lfloor\log_2 |x-yz|\rfloor-p}$, where $p$ is the maximum precision of the input
     ///   [`Float`]s.
     ///
-    ///
     /// See the [`Float::sub_mul_rational_prec_round`] documentation for information on special
     /// cases, overflow, and underflow.
     ///
@@ -7927,20 +8014,28 @@ impl Float {
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
-    /// let x = Float::from(PI);
     /// let y = Float::from(E);
     /// let z = Rational::from_signeds(22, 7);
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(x.sub_mul_rational_round_assign_ref_val(&y, z.clone(), Floor), Less);
+    /// assert_eq!(
+    ///     x.sub_mul_rational_round_assign_ref_val(&y, z.clone(), Floor),
+    ///     Less
+    /// );
     /// assert_eq!(x.to_string(), "-5.4015788072814921");
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(x.sub_mul_rational_round_assign_ref_val(&y, z.clone(), Ceiling), Greater);
+    /// assert_eq!(
+    ///     x.sub_mul_rational_round_assign_ref_val(&y, z.clone(), Ceiling),
+    ///     Greater
+    /// );
     /// assert_eq!(x.to_string(), "-5.4015788072814912");
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(x.sub_mul_rational_round_assign_ref_val(&y, z.clone(), Nearest), Greater);
+    /// assert_eq!(
+    ///     x.sub_mul_rational_round_assign_ref_val(&y, z.clone(), Nearest),
+    ///     Greater
+    /// );
     /// assert_eq!(x.to_string(), "-5.4015788072814912");
     /// ```
     #[allow(clippy::needless_pass_by_value)]
@@ -7980,7 +8075,6 @@ impl Float {
     ///   2^{\lfloor\log_2 |x-yz|\rfloor-p}$, where $p$ is the maximum precision of the input
     ///   [`Float`]s.
     ///
-    ///
     /// See the [`Float::sub_mul_rational_prec_round`] documentation for information on special
     /// cases, overflow, and underflow.
     ///
@@ -8010,7 +8104,6 @@ impl Float {
     /// use malachite_q::Rational;
     /// use std::cmp::Ordering::*;
     ///
-    /// let x = Float::from(PI);
     /// let y = Float::from(E);
     /// let z = Rational::from_signeds(22, 7);
     ///
@@ -8019,11 +8112,17 @@ impl Float {
     /// assert_eq!(x.to_string(), "-5.4015788072814921");
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(x.sub_mul_rational_round_assign_ref_ref(&y, &z, Ceiling), Greater);
+    /// assert_eq!(
+    ///     x.sub_mul_rational_round_assign_ref_ref(&y, &z, Ceiling),
+    ///     Greater
+    /// );
     /// assert_eq!(x.to_string(), "-5.4015788072814912");
     ///
     /// let mut x = Float::from(PI);
-    /// assert_eq!(x.sub_mul_rational_round_assign_ref_ref(&y, &z, Nearest), Greater);
+    /// assert_eq!(
+    ///     x.sub_mul_rational_round_assign_ref_ref(&y, &z, Nearest),
+    ///     Greater
+    /// );
     /// assert_eq!(x.to_string(), "-5.4015788072814912");
     /// ```
     #[inline]
@@ -8674,7 +8773,6 @@ impl SubMulAssign<Self, Rational> for Float {
     /// - If $x-yz$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
     ///   |x-yz|\rfloor-p}$, where $p$ is the maximum precision of the input [`Float`]s.
     ///
-    ///
     /// See the [`Float::sub_mul_rational_prec_round`] documentation for information on special
     /// cases, overflow, and underflow.
     ///
@@ -8730,7 +8828,6 @@ impl SubMulAssign<Self, &Rational> for Float {
     /// - If $x-yz$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $x-yz$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
     ///   |x-yz|\rfloor-p}$, where $p$ is the maximum precision of the input [`Float`]s.
-    ///
     ///
     /// See the [`Float::sub_mul_rational_prec_round`] documentation for information on special
     /// cases, overflow, and underflow.
@@ -8788,7 +8885,6 @@ impl SubMulAssign<&Self, Rational> for Float {
     /// - If $x-yz$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
     ///   |x-yz|\rfloor-p}$, where $p$ is the maximum precision of the input [`Float`]s.
     ///
-    ///
     /// See the [`Float::sub_mul_rational_prec_round`] documentation for information on special
     /// cases, overflow, and underflow.
     ///
@@ -8844,7 +8940,6 @@ impl SubMulAssign<&Self, &Rational> for Float {
     /// - If $x-yz$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
     /// - If $x-yz$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
     ///   |x-yz|\rfloor-p}$, where $p$ is the maximum precision of the input [`Float`]s.
-    ///
     ///
     /// See the [`Float::sub_mul_rational_prec_round`] documentation for information on special
     /// cases, overflow, and underflow.

@@ -77,10 +77,11 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
+    /// use malachite_base::num::basic::traits::One;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     ///
-    /// let (d, o) = Float::from(3u32).positive_difference_prec_round(Float::from(1u32), 10, Floor);
+    /// let (d, o) = Float::from(3u32).positive_difference_prec_round(Float::ONE, 10, Floor);
     /// assert_eq!(d.to_string(), "2.0000");
     /// assert_eq!(o, Equal);
     ///
@@ -158,11 +159,12 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
+    /// use malachite_base::num::basic::traits::One;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     ///
     /// let (d, o) =
-    ///     Float::from(3u32).positive_difference_prec_round_val_ref(&Float::from(1u32), 10, Floor);
+    ///     Float::from(3u32).positive_difference_prec_round_val_ref(&Float::ONE, 10, Floor);
     /// assert_eq!(d.to_string(), "2.0000");
     /// assert_eq!(o, Equal);
     ///
@@ -244,11 +246,12 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
+    /// use malachite_base::num::basic::traits::One;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     ///
     /// let (d, o) =
-    ///     Float::from(3u32).positive_difference_prec_round_ref_val(Float::from(1u32), 10, Floor);
+    ///     Float::from(3u32).positive_difference_prec_round_ref_val(Float::ONE, 10, Floor);
     /// assert_eq!(d.to_string(), "2.0000");
     /// assert_eq!(o, Equal);
     ///
@@ -330,11 +333,12 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
+    /// use malachite_base::num::basic::traits::One;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     ///
     /// let (d, o) =
-    ///     Float::from(3u32).positive_difference_prec_round_ref_ref(&Float::from(1u32), 10, Floor);
+    ///     Float::from(3u32).positive_difference_prec_round_ref_ref(&Float::ONE, 10, Floor);
     /// assert_eq!(d.to_string(), "2.0000");
     /// assert_eq!(o, Equal);
     ///
@@ -414,9 +418,10 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
+    /// use malachite_base::num::basic::traits::One;
     /// use malachite_float::Float;
     ///
-    /// let (d, o) = Float::from(3u32).positive_difference_prec(Float::from(1u32), 10);
+    /// let (d, o) = Float::from(3u32).positive_difference_prec(Float::ONE, 10);
     /// assert_eq!(d.to_string(), "2.0000");
     /// assert_eq!(o, Equal);
     /// ```
@@ -473,9 +478,10 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
+    /// use malachite_base::num::basic::traits::One;
     /// use malachite_float::Float;
     ///
-    /// let (d, o) = Float::from(3u32).positive_difference_prec_val_ref(&Float::from(1u32), 10);
+    /// let (d, o) = Float::from(3u32).positive_difference_prec_val_ref(&Float::ONE, 10);
     /// assert_eq!(d.to_string(), "2.0000");
     /// assert_eq!(o, Equal);
     /// ```
@@ -532,9 +538,10 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
+    /// use malachite_base::num::basic::traits::One;
     /// use malachite_float::Float;
     ///
-    /// let (d, o) = Float::from(3u32).positive_difference_prec_ref_val(Float::from(1u32), 10);
+    /// let (d, o) = Float::from(3u32).positive_difference_prec_ref_val(Float::ONE, 10);
     /// assert_eq!(d.to_string(), "2.0000");
     /// assert_eq!(o, Equal);
     /// ```
@@ -591,9 +598,10 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
+    /// use malachite_base::num::basic::traits::One;
     /// use malachite_float::Float;
     ///
-    /// let (d, o) = Float::from(3u32).positive_difference_prec_ref_ref(&Float::from(1u32), 10);
+    /// let (d, o) = Float::from(3u32).positive_difference_prec_ref_ref(&Float::ONE, 10);
     /// assert_eq!(d.to_string(), "2.0000");
     /// assert_eq!(o, Equal);
     /// ```
@@ -650,10 +658,11 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
+    /// use malachite_base::num::basic::traits::One;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     ///
-    /// let (d, o) = Float::from(3u32).positive_difference_round(Float::from(1u32), Floor);
+    /// let (d, o) = Float::from(3u32).positive_difference_round(Float::ONE, Floor);
     /// assert_eq!(d.to_string(), "2.0");
     /// assert_eq!(o, Equal);
     /// ```
@@ -710,10 +719,11 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
+    /// use malachite_base::num::basic::traits::One;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     ///
-    /// let (d, o) = Float::from(3u32).positive_difference_round_val_ref(&Float::from(1u32), Floor);
+    /// let (d, o) = Float::from(3u32).positive_difference_round_val_ref(&Float::ONE, Floor);
     /// assert_eq!(d.to_string(), "2.0");
     /// assert_eq!(o, Equal);
     /// ```
@@ -774,10 +784,11 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
+    /// use malachite_base::num::basic::traits::One;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     ///
-    /// let (d, o) = Float::from(3u32).positive_difference_round_ref_val(Float::from(1u32), Floor);
+    /// let (d, o) = Float::from(3u32).positive_difference_round_ref_val(Float::ONE, Floor);
     /// assert_eq!(d.to_string(), "2.0");
     /// assert_eq!(o, Equal);
     /// ```
@@ -838,10 +849,11 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
+    /// use malachite_base::num::basic::traits::One;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     ///
-    /// let (d, o) = Float::from(3u32).positive_difference_round_ref_ref(&Float::from(1u32), Floor);
+    /// let (d, o) = Float::from(3u32).positive_difference_round_ref_ref(&Float::ONE, Floor);
     /// assert_eq!(d.to_string(), "2.0");
     /// assert_eq!(o, Equal);
     /// ```
@@ -898,9 +910,10 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
+    /// use malachite_base::num::basic::traits::One;
     /// use malachite_float::Float;
     ///
-    /// let (d, o) = Float::from(3u32).positive_difference(Float::from(1u32));
+    /// let (d, o) = Float::from(3u32).positive_difference(Float::ONE);
     /// assert_eq!(d.to_string(), "2.0");
     /// assert_eq!(o, Equal);
     ///
@@ -957,9 +970,10 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
+    /// use malachite_base::num::basic::traits::One;
     /// use malachite_float::Float;
     ///
-    /// let (d, o) = Float::from(3u32).positive_difference_val_ref(&Float::from(1u32));
+    /// let (d, o) = Float::from(3u32).positive_difference_val_ref(&Float::ONE);
     /// assert_eq!(d.to_string(), "2.0");
     /// assert_eq!(o, Equal);
     ///
@@ -1016,9 +1030,10 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
+    /// use malachite_base::num::basic::traits::One;
     /// use malachite_float::Float;
     ///
-    /// let (d, o) = Float::from(3u32).positive_difference_ref_val(Float::from(1u32));
+    /// let (d, o) = Float::from(3u32).positive_difference_ref_val(Float::ONE);
     /// assert_eq!(d.to_string(), "2.0");
     /// assert_eq!(o, Equal);
     ///
@@ -1075,9 +1090,10 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
+    /// use malachite_base::num::basic::traits::One;
     /// use malachite_float::Float;
     ///
-    /// let (d, o) = Float::from(3u32).positive_difference_ref_ref(&Float::from(1u32));
+    /// let (d, o) = Float::from(3u32).positive_difference_ref_ref(&Float::ONE);
     /// assert_eq!(d.to_string(), "2.0");
     /// assert_eq!(o, Equal);
     ///
@@ -1134,12 +1150,13 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
+    /// use malachite_base::num::basic::traits::One;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     ///
     /// let mut x = Float::from(3u32);
     /// assert_eq!(
-    ///     x.positive_difference_prec_round_assign(Float::from(1u32), 10, Floor),
+    ///     x.positive_difference_prec_round_assign(Float::ONE, 10, Floor),
     ///     Equal
     /// );
     /// assert_eq!(x.to_string(), "2.0000");
@@ -1206,11 +1223,12 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
+    /// use malachite_base::num::basic::traits::One;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     ///
     /// let mut x = Float::from(3u32);
-    /// let y = Float::from(1u32);
+    /// let y = Float::ONE;
     /// assert_eq!(
     ///     x.positive_difference_prec_round_assign_ref(&y, 10, Floor),
     ///     Equal
@@ -1278,13 +1296,11 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
+    /// use malachite_base::num::basic::traits::One;
     /// use malachite_float::Float;
     ///
     /// let mut x = Float::from(3u32);
-    /// assert_eq!(
-    ///     x.positive_difference_prec_assign(Float::from(1u32), 10),
-    ///     Equal
-    /// );
+    /// assert_eq!(x.positive_difference_prec_assign(Float::ONE, 10), Equal);
     /// assert_eq!(x.to_string(), "2.0000");
     /// ```
     #[inline]
@@ -1335,11 +1351,12 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
+    /// use malachite_base::num::basic::traits::One;
     /// use malachite_float::Float;
     ///
     /// let mut x = Float::from(3u32);
     /// assert_eq!(
-    ///     x.positive_difference_prec_assign_ref(&Float::from(1u32), 10),
+    ///     x.positive_difference_prec_assign_ref(&Float::ONE, 10),
     ///     Equal
     /// );
     /// assert_eq!(x.to_string(), "2.0000");
@@ -1393,14 +1410,12 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
+    /// use malachite_base::num::basic::traits::One;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     ///
     /// let mut x = Float::from(3u32);
-    /// assert_eq!(
-    ///     x.positive_difference_round_assign(Float::from(1u32), Floor),
-    ///     Equal
-    /// );
+    /// assert_eq!(x.positive_difference_round_assign(Float::ONE, Floor), Equal);
     /// assert_eq!(x.to_string(), "2.0");
     /// ```
     pub fn positive_difference_round_assign(&mut self, other: Self, rm: RoundingMode) -> Ordering {
@@ -1452,12 +1467,13 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
+    /// use malachite_base::num::basic::traits::One;
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_float::Float;
     ///
     /// let mut x = Float::from(3u32);
     /// assert_eq!(
-    ///     x.positive_difference_round_assign_ref(&Float::from(1u32), Floor),
+    ///     x.positive_difference_round_assign_ref(&Float::ONE, Floor),
     ///     Equal
     /// );
     /// assert_eq!(x.to_string(), "2.0");
@@ -1511,10 +1527,11 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
+    /// use malachite_base::num::basic::traits::One;
     /// use malachite_float::Float;
     ///
     /// let mut x = Float::from(3u32);
-    /// assert_eq!(x.positive_difference_assign(Float::from(1u32)), Equal);
+    /// assert_eq!(x.positive_difference_assign(Float::ONE), Equal);
     /// assert_eq!(x.to_string(), "2.0");
     /// ```
     #[inline]
@@ -1562,10 +1579,11 @@ impl Float {
     /// # Examples
     /// ```
     /// use core::cmp::Ordering::*;
+    /// use malachite_base::num::basic::traits::One;
     /// use malachite_float::Float;
     ///
     /// let mut x = Float::from(3u32);
-    /// assert_eq!(x.positive_difference_assign_ref(&Float::from(1u32)), Equal);
+    /// assert_eq!(x.positive_difference_assign_ref(&Float::ONE), Equal);
     /// assert_eq!(x.to_string(), "2.0");
     /// ```
     #[inline]
