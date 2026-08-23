@@ -14,14 +14,16 @@
 
 use crate::Float;
 use crate::InnerFloat::{Infinity, NaN, Zero};
+use crate::emulate_float_to_float_fn;
 use crate::float::arithmetic::exp::{exp_overflow, exp_underflow};
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{CeilingLogBase2, Compound, CompoundAssign, Sign};
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{
     Infinity as InfinityTrait, NaN as NaNTrait, One, Zero as ZeroTrait,
 };
-use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::arithmetic::float::round::float_can_round;
@@ -910,4 +912,58 @@ impl CompoundAssign<i64> for Float {
         let prec = self.significant_bits();
         self.compound_prec_round_assign(n, prec, Nearest);
     }
+}
+
+/// Computes the compound function $(1+x)^n$ of a primitive float and an [`i64`], returning a
+/// primitive float.
+///
+/// The result is correctly rounded to the nearest value.
+///
+/// $$
+/// f(x,n) = (1+x)^n+\varepsilon.
+/// $$
+/// - If $(1+x)^n$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or assumed to be 0.
+/// - If $(1+x)^n$ is finite and nonzero, then $|\varepsilon| < 2^{\lfloor\log_2 (1+x)^n\rfloor-p}$,
+///   where $p$ is the precision of the output (typically 24 if `T` is a [`f32`] and 53 if `T` is a
+///   [`f64`], but less if the output is subnormal).
+///
+/// Special cases:
+/// - $f(\text{NaN},n)=\text{NaN}$ if $n\neq 0$, and $1.0$ if $n=0$
+/// - $f(-\infty,n)=\text{NaN}$, even if $n=0$
+/// - $f(\infty,0)=1.0$
+/// - $f(\infty,n)=\infty$ if $n>0$, and $0.0$ if $n<0$
+/// - $f(\pm 0.0,n)=1.0$
+/// - $f(x,n)=\text{NaN}$ if $x<-1$, even if $n=0$
+/// - $f(-1.0,n)=1.0$ if $n=0$, $0.0$ if $n>0$, and $\infty$ if $n<0$
+/// - $f(x,0)=1.0$ if $x\geq -1$
+///
+/// The result is never negative. If the result overflows, $\infty$ is returned, and if it
+/// underflows, $0.0$ is returned.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::compound::primitive_float_compound;
+///
+/// assert_eq!(NiceFloat(primitive_float_compound(0.5, 2)), NiceFloat(2.25));
+/// assert_eq!(
+///     NiceFloat(primitive_float_compound(0.1, 10)),
+///     NiceFloat(2.5937424601)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_compound(-0.5, -2)),
+///     NiceFloat(4.0)
+/// );
+/// ```
+#[allow(clippy::type_repetition_in_bounds)]
+#[inline]
+pub fn primitive_float_compound<T: PrimitiveFloat>(x: T, n: i64) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_float_to_float_fn(|x, prec| x.compound_prec(n, prec), x)
 }

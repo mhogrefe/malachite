@@ -6,14 +6,18 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::assert_panic;
 use malachite_base::num::arithmetic::traits::{Compound, CompoundAssign, Pow, PowerOf2};
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, Zero,
 };
-use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom};
+use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, RoundingFrom};
+use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
+use malachite_base::test_util::generators::primitive_float_signed_pair_gen_var_4;
+use malachite_base::{apply_fn_to_primitive_floats, assert_panic};
+use malachite_float::float::arithmetic::compound::primitive_float_compound;
 use malachite_float::test_util::common::{
     parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
 };
@@ -901,4 +905,84 @@ fn compound_properties() {
             assert_eq!(ComparableFloatRef(&c), ComparableFloatRef(&Float::ONE));
         }
     });
+}
+
+#[test]
+fn test_primitive_float_compound() {
+    #[allow(clippy::type_repetition_in_bounds)]
+    fn test<T: PrimitiveFloat>(x: T, n: i64, out: T)
+    where
+        Float: From<T> + PartialOrd<T>,
+        for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    {
+        assert_eq!(NiceFloat(primitive_float_compound(x, n)), NiceFloat(out));
+    }
+    // - special cases, mirroring the compound table
+    test::<f32>(f32::NAN, 0, 1.0);
+    test::<f32>(f32::NAN, 2, f32::NAN);
+    test::<f32>(f32::NAN, -2, f32::NAN);
+    test::<f32>(f32::INFINITY, 0, 1.0);
+    test::<f32>(f32::INFINITY, 2, f32::INFINITY);
+    test::<f32>(f32::INFINITY, -2, 0.0);
+    test::<f32>(f32::NEGATIVE_INFINITY, 0, f32::NAN);
+    test::<f32>(f32::NEGATIVE_INFINITY, 2, f32::NAN);
+    test::<f32>(f32::NEGATIVE_INFINITY, -2, f32::NAN);
+    test::<f32>(0.0, 0, 1.0);
+    test::<f32>(0.0, 2, 1.0);
+    test::<f32>(0.0, -2, 1.0);
+    test::<f32>(-0.0, 0, 1.0);
+    test::<f32>(-0.0, 2, 1.0);
+    test::<f32>(-0.0, -2, 1.0);
+    test::<f32>(-1.0, 0, 1.0);
+    test::<f32>(-1.0, 2, 0.0);
+    test::<f32>(-1.0, -2, f32::INFINITY);
+    // - x < -1 is NaN, even for n == 0
+    test::<f32>(-2.0, 0, f32::NAN);
+    test::<f32>(-2.0, 2, f32::NAN);
+    test::<f32>(-2.0, -2, f32::NAN);
+    // - finite cases
+    test::<f32>(0.5, 2, 2.25);
+    test::<f32>(0.1, 10, 2.5937426);
+    test::<f32>(2.0, -3, 0.037037037);
+    // - overflow and underflow
+    test::<f32>(1.0, 130, f32::INFINITY);
+    test::<f32>(1.0, -150, 0.0);
+    test::<f64>(0.5, 2, 2.25);
+    test::<f64>(0.1, 10, 2.5937424601);
+    test::<f64>(0.1, -10, 0.38554328942953175);
+    test::<f64>(-0.5, -2, 4.0);
+    test::<f64>(6.0, 500, f64::INFINITY);
+    test::<f64>(-0.99999, 100000, 0.0);
+    // - (1+1)^-1074 = 2^-1074, the smallest positive subnormal
+    test::<f64>(1.0, -1074, 5.0e-324);
+    test::<f64>(1.0, -1080, 0.0);
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn primitive_float_compound_properties_helper<T: PrimitiveFloat>()
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    T: RoundingFrom<Rational>,
+    Rational: ExactFrom<T>,
+{
+    primitive_float_signed_pair_gen_var_4::<T, i64>().test_properties(|(x, n)| {
+        let c = primitive_float_compound::<T>(x, n);
+        if x.is_finite() {
+            if x <= T::NEGATIVE_ONE {
+                if x < T::NEGATIVE_ONE {
+                    assert!(c.is_nan());
+                }
+            } else if n.unsigned_abs() <= 24 {
+                let exact = (Rational::ONE + Rational::exact_from(x)).pow(n);
+                let (c_alt, _) = T::rounding_from(exact, Nearest);
+                assert_eq!(NiceFloat(c_alt), NiceFloat(c));
+            }
+        }
+    });
+}
+
+#[test]
+fn primitive_float_compound_properties() {
+    apply_fn_to_primitive_floats!(primitive_float_compound_properties_helper);
 }
