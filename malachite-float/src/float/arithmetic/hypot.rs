@@ -13,8 +13,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use crate::float::WIDTH_MINUS_1;
 use crate::float::arithmetic::round_near_x::float_round_near_x;
+use crate::float::{MAX_EXPONENT_I64, MIN_EXPONENT_I64, WIDTH_MINUS_1};
 use crate::{
     Float, emulate_float_float_to_float_fn, float_either_infinity, float_either_zero,
     float_infinity, float_nan, significand_bits,
@@ -35,8 +35,6 @@ use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::float::round::float_can_round;
 use malachite_nz::natural::arithmetic::float::sqrt::sqrt_float_significand_ref;
 use malachite_nz::platform::Limb;
-
-const MAX_EXPONENT_I64: i64 = Float::MAX_EXPONENT as i64;
 
 // Exact integer-level path. Both inputs are finite and nonzero. The exact sum of squares is formed
 // as x^2 + y^2 = s * 2^(2k) with s a `Natural`, and its square root is taken by the raw
@@ -177,7 +175,7 @@ fn hypot_prec_round_helper(x: &Float, y: &Float, prec: u64, rm: RoundingMode) ->
     // `Exact` also goes through the exact path, which decides exactness directly instead of
     // looping; the C code does not support an `Exact` mode at all.
     let sh = const { (MAX_EXPONENT_I64 - 1) >> 1 } - ex;
-    if rm == Exact || ey + sh < const { Float::MIN_EXPONENT as i64 } {
+    if rm == Exact || ey + sh < MIN_EXPONENT_I64 {
         return hypot_exact_helper(x, y, prec, rm);
     }
     let n = max(px, py);

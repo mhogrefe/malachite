@@ -288,6 +288,8 @@ types implement `PartialEq`/`PartialOrd` against the primitives (a total order, 
 represent every primitive value), so neither a constant nor a conversion is needed. Unsigned
 literals are preferred for nonnegative values. Operator-position `from` comparisons belong to
 `redundant_from_in_comparison`; this covers the method forms and the named-constant comparisons.
+The one exception is `cmp` against a `ZERO` constant, which is ceded to `use_sign` so that only
+the better `sign()` suggestion fires.
 
 ### `use_round_variant`
 
@@ -308,6 +310,17 @@ with `exact_from`'s panic-on-overflow is inconsistent; `saturating_from` clamps 
 bound of 0 for an unsigned target is exactly what `.max(0)` does), and is equivalent whenever the
 source cannot exceed `T`'s maximum. Only unsigned targets fire — signed `saturating_from` clamps
 the low end to `MIN`, not 0, which would differ.
+
+### `use_sign`
+
+Flags `x.cmp(&0)` for a primitive integer (with any spelling of the zero literal), and
+`x.cmp(&T::ZERO)` for a bignum type: use `x.sign()`. The `Sign` trait exists precisely for
+comparing a value against zero, and `x.sign()` names the intent directly, while `x.cmp(&0)` makes
+the reader check which operand is the zero. Functions named `sign` are exempt, since the `Sign`
+implementations are the one place `cmp(&0)` belongs. `partial_cmp(&0u32)` is deliberately not
+flagged: it returns an `Option` whose `None` arm (NaN) callers match on, which `sign` does not
+model the same way. `compare_with_primitive` cedes `cmp(&T::ZERO)` to this lint, so that only the
+better `sign()` suggestion fires.
 
 ### `use_divisible_by`
 

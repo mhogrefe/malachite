@@ -516,7 +516,7 @@ operands do not even need the recipe: the operators take them directly, through 
 | ✓ | `int mpfr_fmma (mpfr_t rop, mpfr_t op1, mpfr_t op2, mpfr_t op3, mpfr_t op4, mpfr_rnd_t rnd)` | [`mul_add_mul_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.mul_add_mul_prec_round) |
 | ✓ | `int mpfr_fmms (mpfr_t rop, mpfr_t op1, mpfr_t op2, mpfr_t op3, mpfr_t op4, mpfr_rnd_t rnd)` | [`mul_sub_mul_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.mul_sub_mul_prec_round) |
 | ✓ | `int mpfr_hypot (mpfr_t rop, mpfr_t x, mpfr_t y, mpfr_rnd_t rnd)` | [`hypot_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.hypot_prec_round) |
-| ✗ | `int mpfr_sum (mpfr_t rop, const mpfr_ptr tab[], unsigned long int n, mpfr_rnd_t rnd)` | |
+| ✓ | `int mpfr_sum (mpfr_t rop, const mpfr_ptr tab[], unsigned long int n, mpfr_rnd_t rnd)` | [`sum_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.sum_prec_round) |
 | ✗ | `int mpfr_dot (mpfr_t rop, const mpfr_ptr a[], const mpfr_ptr b[], unsigned long int n, mpfr_rnd_t rnd)` | |
 
 **The operators and mixed forms.** Thirty-two of these rows are the four operations across
@@ -642,12 +642,19 @@ a correctly rounded result. The same integer-level path decides the `Exact` roun
 succeeds precisely on Pythagorean inputs whose hypotenuse fits in the target precision.
 
 **`mpfr_sum`, `mpfr_dot`.** Correctly rounded sums and dot products of arrays, with a single
-rounding regardless of length. These are gaps, but exactness is available in the meantime by
+rounding regardless of length.
+[`sum_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.sum_prec_round)
+and its variants
+([`sum_prec`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.sum_prec),
+[`sum_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.sum_round),
+and the [`Sum`](https://doc.rust-lang.org/nightly/core/iter/trait.Sum.html) implementations,
+which use the maximum input precision and round to nearest) cover `mpfr_sum`, including its
+zero-sign conventions. `mpfr_dot` remains a gap; exactness is available in the meantime by
 leaving the field: every finite `Float` converts exactly to a
-[`Rational`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html), a
-`Rational` sum is exact, and
+[`Rational`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html),
+`Rational` products and sums are exact, and
 [`from_rational_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.from_rational_prec_round)
-performs the one rounding, reproducing `mpfr_sum` on finite inputs, at exact-arithmetic cost.
+performs the one rounding, reproducing `mpfr_dot` on finite inputs, at exact-arithmetic cost.
 MPFR notes that `mpfr_dot` is experimental and "does not yet handle intermediate overflows and
 underflows"; the `Rational` route has neither.
 

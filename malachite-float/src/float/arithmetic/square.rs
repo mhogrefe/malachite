@@ -50,22 +50,14 @@ impl Float {
     ///   returned instead.
     /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
     ///   returned instead, where `p` is the precision of the input.
-    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
-    ///   returned instead.
-    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`, $-(1-(1/2)^p)2^{2^{30}-1}$
-    ///   is returned instead, where `p` is the precision of the input.
     /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
     /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
     ///   instead.
     /// - If $0<f(x,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
     /// - If $2^{-2^{30}-1}<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
     ///   instead.
-    /// - If $-2^{-2^{30}}<f(x,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
-    /// - If $-2^{-2^{30}}<f(x,p,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
-    ///   instead.
-    /// - If $-2^{-2^{30}-1}\leq f(x,p,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
-    /// - If $-2^{-2^{30}}<f(x,p,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
-    ///   returned instead.
+    ///
+    /// Since the result is never negative, negative overflow and underflow cannot occur.
     ///
     /// If you know you'll be using `Nearest`, consider using [`Float::square_prec`] instead. If you
     /// know that your target precision is the precision of the input, consider using
@@ -149,22 +141,14 @@ impl Float {
     ///   returned instead.
     /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
     ///   returned instead, where `p` is the precision of the input.
-    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
-    ///   returned instead.
-    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`, $-(1-(1/2)^p)2^{2^{30}-1}$
-    ///   is returned instead, where `p` is the precision of the input.
     /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
     /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
     ///   instead.
     /// - If $0<f(x,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
     /// - If $2^{-2^{30}-1}<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
     ///   instead.
-    /// - If $-2^{-2^{30}}<f(x,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
-    /// - If $-2^{-2^{30}}<f(x,p,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
-    ///   instead.
-    /// - If $-2^{-2^{30}-1}\leq f(x,p,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
-    /// - If $-2^{-2^{30}}<f(x,p,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
-    ///   returned instead.
+    ///
+    /// Since the result is never negative, negative overflow and underflow cannot occur.
     ///
     /// If you know you'll be using `Nearest`, consider using [`Float::square_prec_ref`] instead. If
     /// you know that your target precision is the precision of the input, consider using
@@ -304,11 +288,10 @@ impl Float {
     ///
     /// Overflow and underflow:
     /// - If $f(x,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
-    /// - If $f(x,p)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
     /// - If $0<f(x,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
     /// - If $2^{-2^{30}-1}<f(x,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
-    /// - If $-2^{-2^{30}-1}\leq f(x,p)<0$, $-0.0$ is returned instead.
-    /// - If $-2^{-2^{30}}<f(x,p)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
+    ///
+    /// Since the result is never negative, negative overflow and underflow cannot occur.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::square_prec_round`] instead. If you know that your target precision is the
@@ -366,11 +349,10 @@ impl Float {
     ///
     /// Overflow and underflow:
     /// - If $f(x,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
-    /// - If $f(x,p)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
     /// - If $0<f(x,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
     /// - If $2^{-2^{30}-1}<f(x,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
-    /// - If $-2^{-2^{30}-1}\leq f(x,p)<0$, $-0.0$ is returned instead.
-    /// - If $-2^{-2^{30}}<f(x,p)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
+    ///
+    /// Since the result is never negative, negative overflow and underflow cannot occur.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::square_prec_round_ref`] instead. If you know that your target precision is the
@@ -432,22 +414,14 @@ impl Float {
     ///   returned instead.
     /// - If $f(x,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
     ///   returned instead, where `p` is the precision of the input.
-    /// - If $f(x,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is returned
-    ///   instead.
-    /// - If $f(x,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`, $-(1-(1/2)^p)2^{2^{30}-1}$ is
-    ///   returned instead, where `p` is the precision of the input.
     /// - If $0<f(x,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
     /// - If $0<f(x,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
     ///   instead.
     /// - If $0<f(x,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
     /// - If $2^{-2^{30}-1}<f(x,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
     ///   instead.
-    /// - If $-2^{-2^{30}}<f(x,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
-    /// - If $-2^{-2^{30}}<f(x,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
-    ///   instead.
-    /// - If $-2^{-2^{30}-1}\leq f(x,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
-    /// - If $-2^{-2^{30}}<f(x,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is returned
-    ///   instead.
+    ///
+    /// Since the result is never negative, negative overflow and underflow cannot occur.
     ///
     /// If you want to specify an output precision, consider using [`Float::square_prec_round`]
     /// instead. If you know you'll be using the `Nearest` rounding mode, consider using
@@ -518,22 +492,14 @@ impl Float {
     ///   returned instead.
     /// - If $f(x,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
     ///   returned instead, where `p` is the precision of the input.
-    /// - If $f(x,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is returned
-    ///   instead.
-    /// - If $f(x,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`, $-(1-(1/2)^p)2^{2^{30}-1}$ is
-    ///   returned instead, where `p` is the precision of the input.
     /// - If $0<f(x,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
     /// - If $0<f(x,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
     ///   instead.
     /// - If $0<f(x,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
     /// - If $2^{-2^{30}-1}<f(x,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
     ///   instead.
-    /// - If $-2^{-2^{30}}<f(x,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
-    /// - If $-2^{-2^{30}}<f(x,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
-    ///   instead.
-    /// - If $-2^{-2^{30}-1}\leq f(x,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
-    /// - If $-2^{-2^{30}}<f(x,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is returned
-    ///   instead.
+    ///
+    /// Since the result is never negative, negative overflow and underflow cannot occur.
     ///
     /// If you want to specify an output precision, consider using [`Float::square_prec_round_ref`]
     /// instead. If you know you'll be using the `Nearest` rounding mode, consider using
@@ -871,11 +837,10 @@ impl Square for Float {
     ///
     /// Overflow and underflow:
     /// - If $f(x)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
-    /// - If $f(x)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
     /// - If $0<f(x)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
     /// - If $2^{-2^{30}-1}<f(x)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
-    /// - If $-2^{-2^{30}-1}\leq f(x)<0$, $-0.0$ is returned instead.
-    /// - If $-2^{-2^{30}}<f(x)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
+    ///
+    /// Since the result is never negative, negative overflow and underflow cannot occur.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::square_prec`] instead. If you want to specify the output precision, consider using
@@ -932,11 +897,10 @@ impl Square for &Float {
     ///
     /// Overflow and underflow:
     /// - If $f(x)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
-    /// - If $f(x)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
     /// - If $0<f(x)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
     /// - If $2^{-2^{30}-1}<f(x)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
-    /// - If $-2^{-2^{30}-1}\leq f(x)<0$, $-0.0$ is returned instead.
-    /// - If $-2^{-2^{30}}<f(x)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
+    ///
+    /// Since the result is never negative, negative overflow and underflow cannot occur.
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::square_prec_ref`] instead. If you want to specify the output precision, consider

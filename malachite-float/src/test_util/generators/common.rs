@@ -694,6 +694,28 @@ pub fn float_float_float_anything_rounding_mode_quintuple_rm<T: Clone + 'static>
     )
 }
 
+pub fn float_vec_rm(xs: It<Vec<Float>>) -> It<(Vec<rug::Float>, Vec<Float>)> {
+    Box::new(xs.map(|xs| (xs.iter().map(rug::Float::exact_from).collect(), xs)))
+}
+
+pub fn float_vec_anything_rounding_mode_triple_rm<T: Clone + 'static>(
+    xs: It<(Vec<Float>, T, RoundingMode)>,
+) -> It<(
+    (Vec<rug::Float>, T, rug::float::Round),
+    (Vec<Float>, T, RoundingMode),
+)> {
+    Box::new(xs.filter(|(_, _, rm)| *rm != Exact).map(|(v, t, rm)| {
+        (
+            (
+                v.iter().map(rug::Float::exact_from).collect(),
+                t.clone(),
+                rug_round_exact_from_rounding_mode(rm),
+            ),
+            (v, t, rm),
+        )
+    }))
+}
+
 pub fn float_float_anything_rounding_mode_quadruple_rm<T: Clone + 'static>(
     xs: It<(Float, Float, T, RoundingMode)>,
 ) -> It<(

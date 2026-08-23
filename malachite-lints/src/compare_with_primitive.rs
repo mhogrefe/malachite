@@ -177,6 +177,11 @@ impl<'tcx> LateLintPass<'tcx> for CompareWithPrimitive {
                 if crate::bignum_name(cx, recv_ty).is_none() {
                     return;
                 }
+                // `cmp` against a `ZERO` constant is `use_sign`'s, with the better
+                // suggestion `sign()`.
+                if name == "cmp" && crate::is_zero_assoc_const(cx, arg) {
+                    return;
+                }
                 let Some((lit, signed)) = primitive_equivalent(cx, arg, true) else {
                     return;
                 };

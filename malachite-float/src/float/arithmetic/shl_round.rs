@@ -115,9 +115,9 @@ impl Float {
     ///   returned instead.
     /// - If $f(x,k,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$
     ///   is returned instead, where `p` is the precision of the input.
-    /// - If $f(x,k,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    /// - If $f(x,k,p,m)\leq -2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
     ///   returned instead.
-    /// - If $f(x,k,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`,
+    /// - If $f(x,k,p,m)\leq -2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`,
     ///   $-(1-(1/2)^p)2^{2^{30}-1}$ is returned instead, where `p` is `prec`.
     /// - If $0<f(x,k,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
     /// - If $0<f(x,k,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
@@ -174,9 +174,9 @@ impl Float {
     ///   returned instead.
     /// - If $f(x,k,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$
     ///   is returned instead, where `p` is the precision of the input.
-    /// - If $f(x,k,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    /// - If $f(x,k,p,m)\leq -2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
     ///   returned instead.
-    /// - If $f(x,k,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`,
+    /// - If $f(x,k,p,m)\leq -2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`,
     ///   $-(1-(1/2)^p)2^{2^{30}-1}$ is returned instead, where `p` is `prec`.
     /// - If $0<f(x,k,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
     /// - If $0<f(x,k,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
@@ -234,9 +234,9 @@ impl Float {
     ///   returned instead.
     /// - If $f(x,k,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$
     ///   is returned instead, where `p` is the precision of the input.
-    /// - If $f(x,k,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    /// - If $f(x,k,p,m)\leq -2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
     ///   returned instead.
-    /// - If $f(x,k,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`,
+    /// - If $f(x,k,p,m)\leq -2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`,
     ///   $-(1-(1/2)^p)2^{2^{30}-1}$ is returned instead, where `p` is `prec`.
     /// - If $0<f(x,k,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
     /// - If $0<f(x,k,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
@@ -301,7 +301,7 @@ impl Float {
     /// $$
     ///
     /// - If $f(x,k,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
-    /// - If $f(x,k,p)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $f(x,k,p)\leq -2^{2^{30}-1}$, $-\infty$ is returned instead.
     /// - If $0<f(x,k,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
     /// - If $2^{-2^{30}-1}<f(x,k,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
     /// - If $-2^{-2^{30}-1}\leq f(x,k,p)<0$, $-0.0$ is returned instead.
@@ -334,7 +334,7 @@ impl Float {
     /// $$
     ///
     /// - If $f(x,k,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
-    /// - If $f(x,k,p)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $f(x,k,p)\leq -2^{2^{30}-1}$, $-\infty$ is returned instead.
     /// - If $0<f(x,k,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
     /// - If $2^{-2^{30}-1}<f(x,k,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
     /// - If $-2^{-2^{30}-1}\leq f(x,k,p)<0$, $-0.0$ is returned instead.
@@ -367,7 +367,7 @@ impl Float {
     /// $$
     ///
     /// - If $f(x,k,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
-    /// - If $f(x,k,p)\geq 2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $f(x,k,p)\leq -2^{2^{30}-1}$, $-\infty$ is returned instead.
     /// - If $0<f(x,k,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
     /// - If $2^{-2^{30}-1}<f(x,k,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
     /// - If $-2^{-2^{30}-1}\leq f(x,k,p)<0$, $-0.0$ is returned instead.
@@ -485,9 +485,9 @@ macro_rules! impl_natural_shl_round {
             /// - If $f(x,k,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`,
             ///   $(1-(1/2)^p)2^{2^{30}-1}$ is returned instead, where `p` is the precision of the
             ///   input.
-            /// - If $f(x,k,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$
+            /// - If $f(x,k,m)\leq -2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$
             ///   is returned instead.
-            /// - If $f(x,k,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`,
+            /// - If $f(x,k,m)\leq -2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`,
             ///   $-(1-(1/2)^p)2^{2^{30}-1}$ is returned instead, where `p` is the precision of the
             ///   input.
             /// - If $0<f(x,k,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned
@@ -546,9 +546,9 @@ macro_rules! impl_natural_shl_round {
             /// - If $f(x,k,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`,
             ///   $(1-(1/2)^p)2^{2^{30}-1}$ is returned instead, where `p` is the precision of the
             ///   input.
-            /// - If $f(x,k,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$
+            /// - If $f(x,k,m)\leq -2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$
             ///   is returned instead.
-            /// - If $f(x,k,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`,
+            /// - If $f(x,k,m)\leq -2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`,
             ///   $-(1-(1/2)^p)2^{2^{30}-1}$ is returned instead, where `p` is the precision of the
             ///   input.
             /// - If $0<f(x,k,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned
@@ -604,9 +604,9 @@ macro_rules! impl_natural_shl_round {
             /// - If $f(x,k,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`,
             ///   $(1-(1/2)^p)2^{2^{30}-1}$ is returned instead, where `p` is the precision of the
             ///   input.
-            /// - If $f(x,k,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$
+            /// - If $f(x,k,m)\leq -2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$
             ///   is returned instead.
-            /// - If $f(x,k,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`,
+            /// - If $f(x,k,m)\leq -2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`,
             ///   $-(1-(1/2)^p)2^{2^{30}-1}$ is returned instead, where `p` is the precision of the
             ///   input.
             /// - If $0<f(x,k,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned

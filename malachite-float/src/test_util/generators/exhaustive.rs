@@ -72,7 +72,7 @@ use malachite_base::tuples::exhaustive::{
     exhaustive_pairs, exhaustive_pairs_from_single, exhaustive_triples,
     exhaustive_triples_custom_output, exhaustive_triples_xyy, lex_pairs,
 };
-use malachite_base::vecs::exhaustive::exhaustive_vecs_min_length;
+use malachite_base::vecs::exhaustive::{exhaustive_vecs, exhaustive_vecs_min_length};
 use malachite_nz::integer::Integer;
 use malachite_nz::integer::exhaustive::exhaustive_integers;
 use malachite_nz::natural::Natural;
@@ -1138,6 +1138,84 @@ pub fn exhaustive_float_float_unsigned_rounding_mode_quadruple_gen_var_10()
             exhaustive_rounding_modes(),
         )))
         .filter(|(x, y, prec, rm)| agm_prec_round_valid(x, y, *prec, *rm)),
+    )
+}
+
+pub fn sum_prec_round_valid(xs: &[Float], prec: u64, rm: RoundingMode) -> bool {
+    rm != Exact || Float::sum_prec_round(xs, prec, Floor).1 == Equal
+}
+
+pub(crate) fn sum_round_valid(xs: &[Float], rm: RoundingMode) -> bool {
+    rm != Exact || {
+        let prec = xs
+            .iter()
+            .map(SignificantBits::significant_bits)
+            .max()
+            .unwrap_or(1);
+        Float::sum_prec_round(xs, prec, Floor).1 == Equal
+    }
+}
+
+pub fn exhaustive_float_vec_gen() -> It<Vec<Float>> {
+    Box::new(exhaustive_vecs(exhaustive_floats()))
+}
+
+pub fn exhaustive_float_vec_gen_var_1() -> It<Vec<Float>> {
+    Box::new(exhaustive_vecs(exhaustive_mixed_extreme_floats()))
+}
+
+pub fn exhaustive_float_vec_unsigned_pair_gen_var_1() -> It<(Vec<Float>, u64)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_vecs(exhaustive_floats()),
+        exhaustive_positive_primitive_ints::<u64>(),
+    ))
+}
+
+pub fn exhaustive_float_vec_unsigned_rounding_mode_triple_gen_var_1()
+-> It<(Vec<Float>, u64, RoundingMode)> {
+    Box::new(
+        reshape_2_1_to_3(Box::new(lex_pairs(
+            exhaustive_pairs(
+                exhaustive_vecs(exhaustive_floats()),
+                exhaustive_positive_primitive_ints::<u64>(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(xs, prec, rm)| sum_prec_round_valid(xs, *prec, *rm)),
+    )
+}
+
+pub fn exhaustive_float_vec_unsigned_rounding_mode_triple_gen_var_2()
+-> It<(Vec<Float>, u64, RoundingMode)> {
+    Box::new(
+        reshape_2_1_to_3(Box::new(lex_pairs(
+            exhaustive_pairs(
+                exhaustive_vecs(exhaustive_mixed_extreme_floats()),
+                exhaustive_positive_primitive_ints::<u64>(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(xs, prec, rm)| sum_prec_round_valid(xs, *prec, *rm)),
+    )
+}
+
+pub fn exhaustive_float_vec_rounding_mode_pair_gen_var_1() -> It<(Vec<Float>, RoundingMode)> {
+    Box::new(
+        lex_pairs(
+            exhaustive_vecs(exhaustive_floats()),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|(xs, rm)| sum_round_valid(xs, *rm)),
+    )
+}
+
+pub fn exhaustive_float_vec_rounding_mode_pair_gen_var_2() -> It<(Vec<Float>, RoundingMode)> {
+    Box::new(
+        lex_pairs(
+            exhaustive_vecs(exhaustive_mixed_extreme_floats()),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|(xs, rm)| sum_round_valid(xs, *rm)),
     )
 }
 

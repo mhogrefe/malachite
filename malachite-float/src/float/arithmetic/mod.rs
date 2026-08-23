@@ -784,3 +784,7 @@ pub mod sub;
 /// rounding (fused multiply-subtract), and the associated precision- and rounding-mode-aware
 /// functions.
 pub mod sub_mul;
+/// Correctly-rounded summation of any number of [`Float`](super::Float)s: functions computing a
+/// slice's sum with a single rounding at the end, and the [`Sum`](core::iter::Sum) implementations
+/// built on them.
+pub mod sum;

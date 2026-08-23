@@ -66,6 +66,7 @@ mod use_mod_square;
 mod use_mul_shr_round;
 mod use_named_constant;
 mod use_parity;
+mod use_sign;
 mod use_slice_test_zero;
 mod use_reciprocal;
 mod use_round_variant;
@@ -314,6 +315,26 @@ fn assign_variant_for_ty<'tcx>(
 }
 
 // Whether `ty` is `core::cmp::Ordering`.
+// Whether `e` (after peeling `&`) is an associated constant named `ZERO`.
+fn is_zero_assoc_const<'tcx>(
+    cx: &rustc_lint::LateContext<'tcx>,
+    e: &'tcx rustc_hir::Expr<'tcx>,
+) -> bool {
+    use rustc_hir::ExprKind;
+    use rustc_hir::def::{DefKind, Res};
+    let mut e = e;
+    while let ExprKind::AddrOf(_, _, inner) = e.kind {
+        e = inner;
+    }
+    let ExprKind::Path(ref qpath) = e.kind else {
+        return false;
+    };
+    let Res::Def(DefKind::AssocConst { .. }, did) = cx.qpath_res(qpath, e.hir_id) else {
+        return false;
+    };
+    cx.tcx.item_name(did).as_str() == "ZERO"
+}
+
 fn is_ordering_ty(cx: &rustc_lint::LateContext<'_>, ty: rustc_middle::ty::Ty<'_>) -> bool {
     if let rustc_middle::ty::Adt(adt, _) = ty.kind() {
         let path = cx.get_def_path(adt.did());
@@ -513,6 +534,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         use_mul_shr_round::USE_MUL_SHR_ROUND,
         use_named_constant::USE_NAMED_CONSTANT,
         use_parity::USE_PARITY,
+        use_sign::USE_SIGN,
         use_slice_test_zero::USE_SLICE_TEST_ZERO,
         use_reciprocal::USE_RECIPROCAL,
         use_round_variant::USE_ROUND_VARIANT,
@@ -587,6 +609,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
     lint_store.register_late_pass(|_| Box::new(use_mul_shr_round::UseMulShrRound));
     lint_store.register_late_pass(|_| Box::new(use_named_constant::UseNamedConstant));
     lint_store.register_late_pass(|_| Box::new(use_parity::UseParity));
+    lint_store.register_late_pass(|_| Box::new(use_sign::UseSign));
     lint_store.register_late_pass(|_| Box::new(use_slice_test_zero::UseSliceTestZero));
     lint_store.register_late_pass(|_| Box::new(use_reciprocal::UseReciprocal));
     lint_store.register_late_pass(|_| Box::new(use_round_variant::UseRoundVariant));

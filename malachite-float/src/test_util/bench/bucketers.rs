@@ -84,6 +84,57 @@ pub fn float_complexity_bucketer(var_name: &str) -> Bucketer<'_, Float> {
     }
 }
 
+pub fn vec_float_sum_complexity_bucketer<'a>(xs_name: &'a str) -> Bucketer<'a, Vec<Float>> {
+    Bucketer {
+        bucketing_function: &|xs| usize::exact_from(xs.iter().map(Float::complexity).sum::<u64>()),
+        bucketing_label: format!("{xs_name}.map(|x| x.complexity()).sum()"),
+    }
+}
+
+pub fn pair_2_vec_float_sum_complexity_bucketer<'a, T>(
+    xs_name: &'a str,
+) -> Bucketer<'a, (T, Vec<Float>)> {
+    Bucketer {
+        bucketing_function: &|(_, xs)| {
+            usize::exact_from(xs.iter().map(Float::complexity).sum::<u64>())
+        },
+        bucketing_label: format!("{xs_name}.map(|x| x.complexity()).sum()"),
+    }
+}
+
+pub fn triple_1_vec_float_sum_complexity_bucketer<'a, T, U>(
+    xs_name: &'a str,
+) -> Bucketer<'a, (Vec<Float>, T, U)> {
+    Bucketer {
+        bucketing_function: &|(xs, _, _)| {
+            usize::exact_from(xs.iter().map(Float::complexity).sum::<u64>())
+        },
+        bucketing_label: format!("{xs_name}.map(|x| x.complexity()).sum()"),
+    }
+}
+
+pub fn pair_2_triple_1_vec_float_sum_complexity_bucketer<'a, T, U, V>(
+    xs_name: &'a str,
+) -> Bucketer<'a, (V, (Vec<Float>, T, U))> {
+    Bucketer {
+        bucketing_function: &|(_, (xs, _, _))| {
+            usize::exact_from(xs.iter().map(Float::complexity).sum::<u64>())
+        },
+        bucketing_label: format!("{xs_name}.map(|x| x.complexity()).sum()"),
+    }
+}
+
+pub fn pair_1_vec_float_sum_complexity_bucketer<'a, T>(
+    xs_name: &'a str,
+) -> Bucketer<'a, (Vec<Float>, T)> {
+    Bucketer {
+        bucketing_function: &|(xs, _)| {
+            usize::exact_from(xs.iter().map(Float::complexity).sum::<u64>())
+        },
+        bucketing_label: format!("{xs_name}.map(|x| x.complexity()).sum()"),
+    }
+}
+
 pub fn pair_float_max_complexity_bucketer<'a>(
     x_name: &'a str,
     y_name: &'a str,

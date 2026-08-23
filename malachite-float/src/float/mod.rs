@@ -125,6 +125,8 @@ pub(crate) fn floor_and_ceiling((floor, o): (Float, Ordering)) -> (Float, Float)
 
 // `Limb::WIDTH`-derived bit counts, shared across the crate so each is written out only once.
 pub(crate) const WIDTH_MINUS_1: u64 = Limb::WIDTH - 1;
+pub(crate) const MAX_EXPONENT_I64: i64 = Float::MAX_EXPONENT as i64;
+pub(crate) const MIN_EXPONENT_I64: i64 = Float::MIN_EXPONENT as i64;
 pub(crate) const TWICE_WIDTH: u64 = Limb::WIDTH << 1;
 
 impl Float {

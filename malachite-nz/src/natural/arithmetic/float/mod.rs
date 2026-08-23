@@ -29,6 +29,8 @@ pub mod round;
 pub mod set_str;
 // Square roots of significands.
 pub mod sqrt;
+/// Correctly-rounded summation of any number of significands.
+pub mod sum;
 // Squaring of significands.
 pub mod square;
 // Subtraction of significands.

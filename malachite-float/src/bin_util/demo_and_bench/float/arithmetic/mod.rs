@@ -58,6 +58,7 @@ pub(crate) fn register(runner: &mut Runner) {
     square::register(runner);
     sub::register(runner);
     sub_mul::register(runner);
+    sum::register(runner);
 }
 
 mod abs;
@@ -109,3 +110,4 @@ mod sqrt;
 mod square;
 mod sub;
 mod sub_mul;
+mod sum;

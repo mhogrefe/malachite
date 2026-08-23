@@ -1,0 +1,27 @@
+error: this compares with zero via `cmp`; use `sign` instead
+  --> $DIR/use_sign.rs:8:13
+   |
+LL |     let _ = x.cmp(&0);
+   |             ^^^^^^^^^
+   |
+   = help: `x.cmp(&0)` is `x.sign()`
+   = note: `#[deny(use_sign)]` on by default
+
+error: this compares with zero via `cmp`; use `sign` instead
+  --> $DIR/use_sign.rs:11:13
+   |
+LL |     let _ = n.cmp(&0u64);
+   |             ^^^^^^^^^^^^
+   |
+   = help: `x.cmp(&0)` is `x.sign()`
+
+error: this compares with zero via `cmp`; use `sign` instead
+  --> $DIR/use_sign.rs:14:13
+   |
+LL |     let _ = i.cmp(&Integer::ZERO);
+   |             ^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: `x.cmp(&0)` is `x.sign()`
+
+error: aborting due to 3 previous errors
+

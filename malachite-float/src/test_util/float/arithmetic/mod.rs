@@ -52,3 +52,4 @@ pub mod sqrt;
 pub mod square;
 pub mod sub;
 pub mod sub_mul;
+pub mod sum;

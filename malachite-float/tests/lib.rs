@@ -117,6 +117,7 @@ pub mod float {
         pub mod square;
         pub mod sub;
         pub mod sub_mul;
+        pub mod sum;
     }
     pub mod basic {
         pub mod can_round;
