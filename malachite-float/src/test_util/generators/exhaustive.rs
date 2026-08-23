@@ -1219,6 +1219,69 @@ pub fn exhaustive_float_vec_rounding_mode_pair_gen_var_2() -> It<(Vec<Float>, Ro
     )
 }
 
+pub fn product_prec_round_valid(xs: &[Float], prec: u64, rm: RoundingMode) -> bool {
+    rm != Exact || Float::product_prec_round(xs, prec, Floor).1 == Equal
+}
+
+pub(crate) fn product_round_valid(xs: &[Float], rm: RoundingMode) -> bool {
+    rm != Exact || {
+        let prec = xs
+            .iter()
+            .map(SignificantBits::significant_bits)
+            .max()
+            .unwrap_or(1);
+        Float::product_prec_round(xs, prec, Floor).1 == Equal
+    }
+}
+
+pub fn exhaustive_float_vec_unsigned_rounding_mode_triple_gen_var_3()
+-> It<(Vec<Float>, u64, RoundingMode)> {
+    Box::new(
+        reshape_2_1_to_3(Box::new(lex_pairs(
+            exhaustive_pairs(
+                exhaustive_vecs(exhaustive_floats()),
+                exhaustive_positive_primitive_ints::<u64>(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(xs, prec, rm)| product_prec_round_valid(xs, *prec, *rm)),
+    )
+}
+
+pub fn exhaustive_float_vec_unsigned_rounding_mode_triple_gen_var_4()
+-> It<(Vec<Float>, u64, RoundingMode)> {
+    Box::new(
+        reshape_2_1_to_3(Box::new(lex_pairs(
+            exhaustive_pairs(
+                exhaustive_vecs(exhaustive_mixed_extreme_floats()),
+                exhaustive_positive_primitive_ints::<u64>(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(xs, prec, rm)| product_prec_round_valid(xs, *prec, *rm)),
+    )
+}
+
+pub fn exhaustive_float_vec_rounding_mode_pair_gen_var_3() -> It<(Vec<Float>, RoundingMode)> {
+    Box::new(
+        lex_pairs(
+            exhaustive_vecs(exhaustive_floats()),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|(xs, rm)| product_round_valid(xs, *rm)),
+    )
+}
+
+pub fn exhaustive_float_vec_rounding_mode_pair_gen_var_4() -> It<(Vec<Float>, RoundingMode)> {
+    Box::new(
+        lex_pairs(
+            exhaustive_vecs(exhaustive_mixed_extreme_floats()),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|(xs, rm)| product_round_valid(xs, *rm)),
+    )
+}
+
 pub fn hypot_prec_round_valid(x: &Float, y: &Float, prec: u64, rm: RoundingMode) -> bool {
     rm != Exact || x.hypot_prec_round_ref_ref(y, prec, Floor).1 == Equal
 }

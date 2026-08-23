@@ -189,7 +189,7 @@ fn sum_prec_round_helper(xs: &[&Float], prec: u64, rm: RoundingMode) -> (Float, 
 
 // The precision used by `sum_round` and the `Sum` implementations: the maximum precision of the
 // inputs, or 1 if there are none.
-fn max_prec<'a, I: Iterator<Item = &'a Float>>(xs: I) -> u64 {
+pub(crate) fn max_prec<'a, I: Iterator<Item = &'a Float>>(xs: I) -> u64 {
     xs.map(SignificantBits::significant_bits).max().unwrap_or(1)
 }
 

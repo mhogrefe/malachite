@@ -284,6 +284,10 @@ pub mod power_of_2_of_float;
 /// and [`PowerOf2XMinus1Assign`](malachite_base::num::arithmetic::traits::PowerOf2XMinus1Assign),
 /// traits for computing $2^x-1$.
 pub mod power_of_2_x_minus_1;
+/// Correctly-rounded multiplication of any number of [`Float`](super::Float)s: functions computing
+/// a slice's product with a single rounding at the end, and the [`Product`](core::iter::Product)
+/// implementations built on them.
+pub mod product;
 /// Implementations of [`Reciprocal`](malachite_base::num::arithmetic::traits::Reciprocal) and
 /// [`ReciprocalAssign`](malachite_base::num::arithmetic::traits::ReciprocalAssign), traits for
 /// computing the reciprocal of a number.

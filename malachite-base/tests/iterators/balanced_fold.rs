@@ -59,8 +59,7 @@ fn test_balanced_fold() {
 #[test]
 fn balanced_fold_properties() {
     unsigned_vec_gen::<u64>().test_properties(|xs| {
-        // For an associative, commutative operation, the balanced fold agrees with the linear
-        // fold.
+        // For an associative, commutative operation, the balanced fold agrees with the linear fold.
         let sum = balanced_fold(xs.iter().copied(), |_| false, |a, b| *a = a.wrapping_add(b));
         assert_eq!(
             sum,

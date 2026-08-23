@@ -76,10 +76,10 @@ fn safe_sub(e: i64, sh: i64) -> i64 {
     e - sh
 }
 
-// Accumulate a new [minexp, maxexp[ block of the inputs into the two's-complement accumulator
-// `wp` (least significant limb first, `wq` bits in total). If, due to cancellation, the exponent
-// of the computed result minus the exponent of the error bound is less than `prec`, shift the
-// accumulator and reiterate.
+// Accumulate a new [minexp, maxexp[ block of the inputs into the two's-complement accumulator `wp`
+// (least significant limb first, `wq` bits in total). If, due to cancellation, the exponent of the
+// computed result minus the exponent of the error bound is less than `prec`, shift the accumulator
+// and reiterate.
 //
 // Returns 0 if the accumulator is 0, which implies that the exact sum for this invocation is 0;
 // otherwise the number of cancelled bits (>= 1), defined as the number of identical bits on the
@@ -123,20 +123,20 @@ pub(crate) fn sum_raw(
             let dp_offset;
             // Steps 2, 3, 4 (see sum_raw in sum.txt)
             if vd < 0 {
-                // This covers the cases where x extends below the accumulator's least
-                // significant bit.
+                // This covers the cases where x extends below the accumulator's least significant
+                // bit.
                 //
                 // Step 2 for subcase vd < 0
                 if xe <= minexp {
-                    // x is entirely after the LSB of the accumulator, so that it will be ignored
-                    // at this iteration.
+                    // x is entirely after the LSB of the accumulator, so that it will be ignored at
+                    // this iteration.
                     if xe > maxexp2 {
                         maxexp2 = xe;
                     }
                     continue;
                 }
-                // Step 3 for subcase vd < 0: if some significant bits of x are after the LSB of
-                // the accumulator, then maxexp2 will necessarily be minexp.
+                // Step 3 for subcase vd < 0: if some significant bits of x are after the LSB of the
+                // accumulator, then maxexp2 will necessarily be minexp.
                 if xe - i64::exact_from(xq) < minexp {
                     maxexp2 = minexp;
                 }
@@ -314,17 +314,17 @@ pub(crate) fn sum_raw(
             // accumulator = 0 and no bits have been ignored: the sum is 0
             return (0, 0, minexp, maxexp2);
         } else {
-            // accumulator = 0, but some bits have been ignored: reiterate with a window just
-            // below the ignored bits (the logn + 1 corresponds to cq in the main code)
+            // accumulator = 0, but some bits have been ignored: reiterate with a window just below
+            // the ignored bits (the logn + 1 corresponds to cq in the main code)
             minexp = safe_sub(maxexp2, i64::exact_from(wq - (logn + 1)));
         }
         maxexp = maxexp2;
     }
 }
 
-// The result of a sum of at least 3 regular numbers: either an exact zero (whose sign is chosen
-// by the caller from the rounding mode), or a regular value. The exponent may be out of range;
-// the caller is responsible for the range check.
+// The result of a sum of at least 3 regular numbers: either an exact zero (whose sign is chosen by
+// the caller from the rounding mode), or a regular value. The exponent may be out of range; the
+// caller is responsible for the range check.
 pub enum FloatSumResult {
     Zero,
     Regular {
@@ -335,8 +335,8 @@ pub enum FloatSumResult {
     },
 }
 
-// Whether the table maker's dilemma occurs, and if so, on what kind of value. This corresponds
-// to the values 0, 1, and 2 of the tmd variable in sum.c.
+// Whether the table maker's dilemma occurs, and if so, on what kind of value. This corresponds to
+// the values 0, 1, and 2 of the tmd variable in sum.c.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 enum Tmd {
     // The rounding can be decided from the accumulator alone.
@@ -347,8 +347,8 @@ enum Tmd {
     Midpoint,
 }
 
-// Whether `rm` rounds toward negative infinity for a value of the given sign (true if
-// nonnegative). This is MPFR_IS_LIKE_RNDD from mpfr-impl.h, MPFR 4.2.2.
+// Whether `rm` rounds toward negative infinity for a value of the given sign (true if nonnegative).
+// This is MPFR_IS_LIKE_RNDD from mpfr-impl.h, MPFR 4.2.2.
 const fn is_like_floor(rm: RoundingMode, sign: bool) -> bool {
     match rm {
         Floor => true,
@@ -373,10 +373,10 @@ const fn is_like_ceiling(rm: RoundingMode, sign: bool) -> bool {
 // (which must not be `Exact`; the caller handles that mode). `maxexp` is the maximum exponent of
 // the inputs.
 //
-// This is sum_aux from sum.c, MPFR 4.2.2, where the singular inputs have been filtered out by
-// the caller (so rn = n), the output is returned instead of written through a pointer, and the
-// final range check is left to the caller. The MPFR_RNDF branch is omitted, since Malachite has
-// no faithful-rounding mode.
+// This is sum_aux from sum.c, MPFR 4.2.2, where the singular inputs have been filtered out by the
+// caller (so rn = n), the output is returned instead of written through a pointer, and the final
+// range check is left to the caller. The MPFR_RNDF branch is omitted, since Malachite has no
+// faithful-rounding mode.
 pub fn sum_float_significands(xs: &[FloatSumInput], prec: u64, rm: RoundingMode) -> FloatSumResult {
     let n = xs.len();
     assert!(n >= 3);
@@ -392,11 +392,11 @@ pub fn sum_float_significands(xs: &[FloatSumInput], prec: u64, rm: RoundingMode)
     let wq = u64::exact_from(ws) * WIDTH;
     assert!(wq - cq - sq >= 4);
     let zs = usize::exact_from((wq - sq).div_ceil(WIDTH));
-    // An input block will have up to wq - cq bits, and its shifted value (to be correctly
-    // aligned) may take Limb::WIDTH - 1 additional bits.
+    // An input block will have up to wq - cq bits, and its shifted value (to be correctly aligned)
+    // may take Limb::WIDTH - 1 additional bits.
     let ts = usize::exact_from((wq - cq + WIDTH - 1).div_ceil(WIDTH));
-    // In C, the temporary area, the accumulator, and the TMD accumulator are a single
-    // allocation; here the TMD accumulator is allocated separately when needed.
+    // In C, the temporary area, the accumulator, and the TMD accumulator are a single allocation;
+    // here the TMD accumulator is allocated separately when needed.
     let mut buf = vec![0; ts + ws];
     let (tp, wp) = buf.split_at_mut(ts);
     // Compute the first approximation with sum_raw.
@@ -409,9 +409,9 @@ pub fn sum_float_significands(xs: &[FloatSumInput], prec: u64, rm: RoundingMode)
         // numbers. (The sign is chosen by the caller.)
         return FloatSumResult::Zero;
     }
-    // The absolute value of the truncated sum is in the binade [2^(e-1),2^e] (closed on both
-    // ends due to two's complement). The error is strictly less than 2^(maxexp + logn) (and is 0
-    // if maxexp == EXP_MIN).
+    // The absolute value of the truncated sum is in the binade [2^(e-1),2^e] (closed on both ends
+    // due to two's complement). The error is strictly less than 2^(maxexp + logn) (and is 0 if
+    // maxexp == EXP_MIN).
     //
     // u is the exponent of the ulp of the target
     let u = e - i64::exact_from(sq);
@@ -439,12 +439,12 @@ pub fn sum_float_significands(xs: &[FloatSumInput], prec: u64, rm: RoundingMode)
         (inex, tmd) = if maxexp == EXP_MIN {
             // The sum in the accumulator is exact. Determine inex: inex = 0 if the final sum is
             // exact, else 1, i.e. inex = rounding bit || sticky bit. In round to nearest, also
-            // determine the rounding direction: obtained from the rounding bit possibly except
-            // in halfway cases. Halfway cases are rounded toward -inf iff the last bit of the
+            // determine the rounding direction: obtained from the rounding bit possibly except in
+            // halfway cases. Halfway cases are rounded toward -inf iff the last bit of the
             // truncated significand in two's complement is 0.
             let inex_exact = if rbit == 0 || (rm == Nearest && lbit == 0) {
-                // We need to determine the sticky bit, either to set inex (if the rounding bit
-                // is 0) or to possibly "correct" rbit (round to nearest, halfway case rounded
+                // We need to determine the sticky bit, either to set inex (if the rounding bit is
+                // 0) or to possibly "correct" rbit (round to nearest, halfway case rounded
                 // downward) from which the rounding direction will be determined.
                 let mut in_ex = if td >= 2 {
                     wp[wi] & limb_mask(td - 1) != 0
@@ -473,17 +473,16 @@ pub fn sum_float_significands(xs: &[FloatSumInput], prec: u64, rm: RoundingMode)
             // We can round correctly -> no TMD.
             (inex_exact, Tmd::None)
         } else {
-            // maxexp > EXP_MIN
-            // We do not know whether the sum is exact.
+            // maxexp > EXP_MIN We do not know whether the sum is exact.
             let d = u - maxexp.saturating_add(i64::exact_from(logn));
             // due to prec = sq + 3 in sum_raw
             assert!(d >= 3);
             let mut d = u64::exact_from(d);
-            // Let's see whether the TMD occurs by looking at the d bits following the ulp bit,
-            // or the d-1 bits after the rounding bit.
+            // Let's see whether the TMD occurs by looking at the d bits following the ulp bit, or
+            // the d-1 bits after the rounding bit.
             //
-            // First chunk after the rounding bit...
-            // nbits: number of bits of the first chunk + 1 (the +1 is for the rounding bit)
+            // First chunk after the rounding bit... nbits: number of bits of the first chunk + 1
+            // (the +1 is for the rounding bit)
             let (mut limb, mut mask, nbits) = if td == 0 {
                 assert!(wi >= 1);
                 wi -= 1;
@@ -569,13 +568,13 @@ pub fn sum_float_significands(xs: &[FloatSumInput], prec: u64, rm: RoundingMode)
     assert!(rbit == 0 || rbit == 1);
     // Here, if the final sum is known to be exact, inex = 0, otherwise inex = 1. We have a
     // truncated significand, a trailing term t such that 0 <= t < 1 ulp, and an error on the
-    // trailing term bounded by t' in absolute value. Thus the error e on the truncated
-    // significand satisfies -t' <= e < 1 ulp + t'. Thus one has 4 correction cases denoted by a
-    // corr value between -1 and 2 depending on e, neg, rbit, and the rounding mode:
-    //   -1: equivalent to nextbelow;
-    //    0: the truncated significand is not corrected;
-    //    1: add 1 ulp;
-    //    2: add 1 ulp, then nextabove.
+    // trailing term bounded by t' in absolute value. Thus the error e on the truncated significand
+    // satisfies -t' <= e < 1 ulp + t'. Thus one has 4 correction cases denoted by a corr value
+    // between -1 and 2 depending on e, neg, rbit, and the rounding mode:
+    // - -1: equivalent to nextbelow;
+    // - 0: the truncated significand is not corrected;
+    // - 1: add 1 ulp;
+    // - 2: add 1 ulp, then nextabove.
     let corr: i8;
     if tmd == Tmd::None {
         // no TMD
@@ -593,8 +592,8 @@ pub fn sum_float_significands(xs: &[FloatSumInput], prec: u64, rm: RoundingMode)
             inex = -1;
         }
     } else {
-        // TMD case. A new window, with the same meaning as minexp, is used for the secondary
-        // term, as the minexp value is kept for the copy to the destination.
+        // TMD case. A new window, with the same meaning as minexp, is used for the secondary term,
+        // as the minexp value is kept for the copy to the destination.
         assert!(maxexp > EXP_MIN);
         let mut zp = vec![0; zs];
         let zq = u64::exact_from(zs) * WIDTH;
@@ -619,9 +618,9 @@ pub fn sum_float_significands(xs: &[FloatSumInput], prec: u64, rm: RoundingMode)
                     safe_sub(minexp, i64::exact_from(u64::exact_from(zz) * WIDTH + td)),
                 )
             } else {
-                // Since err <= minexp + logn, tq = err - minexp + 2 <= logn + 2, so a
-                // limb-aligned tq would require about 2^(Limb::WIDTH - 2) inputs; this branch is
-                // kept for fidelity to sum.c but is unreachable in practice.
+                // Since err <= minexp + logn, tq = err - minexp + 2 <= logn + 2, so a limb-aligned
+                // tq would require about 2^(Limb::WIDTH - 2) inputs; this branch is kept for
+                // fidelity to sum.c but is unreachable in practice.
                 fail_on_untested_path("sum_float_significands, TMD copy with td == 0");
                 assert!(wi > 0);
                 let zz = zs - wi;
@@ -636,17 +635,16 @@ pub fn sum_float_significands(xs: &[FloatSumInput], prec: u64, rm: RoundingMode)
             assert_eq!(minexp2, err + 2 - i64::exact_from(zq));
             minexp2
         } else {
-            // At least one of the identical bits is not represented, meaning that it is 0 and
-            // all these bits are 0's. Thus the accumulator will be 0. The new minexp is
-            // determined from maxexp, with cq bits reserved to avoid an overflow (as in the
-            // early steps).
+            // At least one of the identical bits is not represented, meaning that it is 0 and all
+            // these bits are 0's. Thus the accumulator will be 0. The new minexp is determined from
+            // maxexp, with cq bits reserved to avoid an overflow (as in the early steps).
             let minexp2 = safe_sub(maxexp, i64::exact_from(zq - cq));
             assert_eq!(minexp2, err + 1 - i64::exact_from(zq));
             minexp2
         };
         // Determine the sign sst of the secondary term. In sum_raw, since the truncated sum
-        // corresponding to this secondary term will be in [2^(e-1),2^e] and the error strictly
-        // less than 2^err, we can stop the iterations when e - err >= 1.
+        // corresponding to this secondary term will be in [2^(e-1),2^e] and the error strictly less
+        // than 2^err, we can stop the iterations when e - err >= 1.
         let (cancel2, ..) = sum_raw(&mut zp, zq, xs, minexp2, maxexp, tp, logn, 1);
         let sst: i8 = if cancel2 != 0 {
             if zp[zs - 1] >> WIDTH_M1 == 0 { 1 } else { -1 }
@@ -676,8 +674,8 @@ pub fn sum_float_significands(xs: &[FloatSumInput], prec: u64, rm: RoundingMode)
             i8::exact_from(rbit)
         };
     }
-    // Sign handling (-> absolute value and sign), together with rounding. The most common cases
-    // are corr = 0 and corr = 1 as this is necessarily the case when the TMD did not occur.
+    // Sign handling (-> absolute value and sign), together with rounding. The most common cases are
+    // corr = 0 and corr = 1 as this is necessarily the case when the TMD did not occur.
     assert!((-1..=2).contains(&corr));
     // Copy/shift the bits [max(u,minexp),e) to the most significant part of the destination, and
     // zero the least significant part (there can be one only if u < minexp).
@@ -710,9 +708,9 @@ pub fn sum_float_significands(xs: &[FloatSumInput], prec: u64, rm: RoundingMode)
         }
         slice_set_zero(&mut sump[..sn - en]);
     }
-    // Take the complement if the result is negative, and at the same time, do the rounding and
-    // zero the trailing bits. As this is valid only for precisions >= 2, there is special code
-    // for precision 1 first.
+    // Take the complement if the result is negative, and at the same time, do the rounding and zero
+    // the trailing bits. As this is valid only for precisions >= 2, there is special code for
+    // precision 1 first.
     const HIGH_BIT: Limb = 1 << (WIDTH - 1);
     if sq == 1 {
         // precision 1
@@ -726,8 +724,8 @@ pub fn sum_float_significands(xs: &[FloatSumInput], prec: u64, rm: RoundingMode)
             // Just do the correction operation on the least significant limb, then either a
             // complement or a negation on the remaining limbs, depending on the carry.
             //
-            // Note: if corr = -1, so that 1 - corr = 2, the shift below can overflow to
-            // corr2 = 0 when sd = Limb::WIDTH - 1. This case is taken into account below.
+            // Note: if corr = -1, so that 1 - corr = 2, the shift below can overflow to corr2 = 0
+            // when sd = Limb::WIDTH - 1. This case is taken into account below.
             let corr2 = Limb::exact_from(1 - i64::from(corr)).wrapping_shl(u32::exact_from(sd));
             sump[0] = (!(sump[0] | limb_mask(sd))).wrapping_add(corr2);
             if sump[0] < corr2 || (corr2 == 0 && corr < 0) {
@@ -774,8 +772,8 @@ pub fn sum_float_significands(xs: &[FloatSumInput], prec: u64, rm: RoundingMode)
         assert!(sump[sn - 1] >> WIDTH_M1 != 0);
         sump[0] &= !limb_mask(sd);
         if corr > 0 {
-            // If corr == 2 && sd == WIDTH - 1, this overflows to corr2 = 0. This case is taken
-            // into account below.
+            // If corr == 2 && sd == WIDTH - 1, this overflows to corr2 = 0. This case is taken into
+            // account below.
             let corr2 = Limb::exact_from(u8::exact_from(corr)) << sd;
             let carry_out = if corr2 != 0 {
                 limbs_slice_add_limb_in_place(&mut sump, corr2)

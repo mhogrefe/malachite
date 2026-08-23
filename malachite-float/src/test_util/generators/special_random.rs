@@ -54,15 +54,16 @@ use crate::test_util::generators::exhaustive::{
     natural_rounding_from_float_valid, positive_difference_prec_round_valid,
     positive_difference_rational_prec_round_valid, positive_difference_rational_round_valid,
     positive_difference_round_valid, pow_integer_prec_round_valid, pow_rational_prec_round_valid,
-    pow_s_prec_round_valid, pow_u_prec_round_valid, rational_div_float_prec_round_valid,
-    rational_div_float_round_valid, rational_pow_rational_prec_round_valid,
-    rational_rem_float_prec_round_valid, rational_rem_float_round_valid,
-    reciprocal_prec_round_valid, reciprocal_round_valid, reciprocal_sqrt_prec_round_valid,
-    reciprocal_sqrt_rational_prec_round_valid, reciprocal_sqrt_round_valid, rem_prec_round_valid,
-    rem_rational_prec_round_valid, rem_rational_round_valid, rem_round_valid,
-    root_s_prec_round_valid, root_s_rational_prec_round_valid, root_u_prec_round_valid,
-    root_u_rational_prec_round_valid, set_prec_round_valid, shl_prec_round_valid, shl_round_valid,
-    shr_prec_round_valid, shr_round_valid, signed_rounding_from_float_valid, sqrt_prec_round_valid,
+    pow_s_prec_round_valid, pow_u_prec_round_valid, product_prec_round_valid, product_round_valid,
+    rational_div_float_prec_round_valid, rational_div_float_round_valid,
+    rational_pow_rational_prec_round_valid, rational_rem_float_prec_round_valid,
+    rational_rem_float_round_valid, reciprocal_prec_round_valid, reciprocal_round_valid,
+    reciprocal_sqrt_prec_round_valid, reciprocal_sqrt_rational_prec_round_valid,
+    reciprocal_sqrt_round_valid, rem_prec_round_valid, rem_rational_prec_round_valid,
+    rem_rational_round_valid, rem_round_valid, root_s_prec_round_valid,
+    root_s_rational_prec_round_valid, root_u_prec_round_valid, root_u_rational_prec_round_valid,
+    set_prec_round_valid, shl_prec_round_valid, shl_round_valid, shr_prec_round_valid,
+    shr_round_valid, signed_rounding_from_float_valid, sqrt_prec_round_valid,
     sqrt_rational_prec_round_valid, sqrt_round_valid, square_prec_round_valid, square_round_valid,
     sub_prec_round_valid, sub_rational_prec_round_valid, sub_rational_round_valid, sub_round_valid,
     sum_prec_round_valid, sum_round_valid, unsigned_pow_prec_round_valid,
@@ -1716,6 +1717,72 @@ pub fn special_random_float_vec_rounding_mode_pair_gen_var_2(
             &random_rounding_modes,
         )
         .filter(|(xs, rm)| sum_round_valid(xs, *rm)),
+    )
+}
+
+pub fn special_random_float_vec_unsigned_rounding_mode_triple_gen_var_3(
+    config: &GenConfig,
+) -> It<(Vec<Float>, u64, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| striped_float_vecs(seed, config),
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(xs, prec, rm)| product_prec_round_valid(xs, *prec, *rm)),
+    )
+}
+
+pub fn special_random_float_vec_unsigned_rounding_mode_triple_gen_var_4(
+    config: &GenConfig,
+) -> It<(Vec<Float>, u64, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| striped_extreme_float_vecs(seed, config),
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(xs, prec, rm)| product_prec_round_valid(xs, *prec, *rm)),
+    )
+}
+
+pub fn special_random_float_vec_rounding_mode_pair_gen_var_3(
+    config: &GenConfig,
+) -> It<(Vec<Float>, RoundingMode)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| striped_float_vecs(seed, config),
+            &random_rounding_modes,
+        )
+        .filter(|(xs, rm)| product_round_valid(xs, *rm)),
+    )
+}
+
+pub fn special_random_float_vec_rounding_mode_pair_gen_var_4(
+    config: &GenConfig,
+) -> It<(Vec<Float>, RoundingMode)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| striped_extreme_float_vecs(seed, config),
+            &random_rounding_modes,
+        )
+        .filter(|(xs, rm)| product_round_valid(xs, *rm)),
     )
 }
 

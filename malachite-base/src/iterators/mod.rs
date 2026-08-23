@@ -232,36 +232,36 @@ where
 
 /// Folds an iterator by merging its elements in a balanced binary tree rather than linearly.
 ///
-/// A linear fold combines an ever-growing accumulator with each new element, which is wasteful
-/// when the cost of `merge` grows more than linearly in the sizes of its arguments, as it does
-/// for bignum multiplication. This function instead maintains a stack of intermediate results,
-/// where the $k$th entry from the top is the merge of about $2^k$ consecutive elements, so
-/// merges tend to combine values of comparable size. The stack never holds more than
-/// $\lceil \log_2 n \rceil + 1$ entries.
+/// A linear fold combines an ever-growing accumulator with each new element, which is wasteful when
+/// the cost of `merge` grows more than linearly in the sizes of its arguments, as it does for
+/// bignum multiplication. This function instead maintains a stack of intermediate results, where
+/// the $k$th entry from the top is the merge of about $2^k$ consecutive elements, so merges tend to
+/// combine values of comparable size. The stack never holds more than $\lceil \log_2 n \rceil + 1$
+/// entries.
 ///
 /// The `merge` function must be associative, but need not be commutative: `merge(a, b)` always
 /// receives a block of consecutive elements `a` immediately followed by the block `b`, and must
 /// store the combination of the two in `a`. `None` is returned if the iterator is empty.
 ///
-/// If an element for which `is_absorbing` returns true is encountered, it is returned
-/// immediately, and the rest of the iterator is not consumed. This short-circuits, for example,
-/// a product that encounters a zero.
+/// If an element for which `is_absorbing` returns true is encountered, it is returned immediately,
+/// and the rest of the iterator is not consumed. This short-circuits, for example, a product that
+/// encounters a zero.
 ///
-/// The pairing is oblivious to the actual sizes of the values, which is optimal when the
-/// elements have comparable sizes and within a factor of $O(\log n)$ of optimal in general.
-/// When one element dominates all the others combined (say, one million-bit factor among
-/// thousands of word-sized ones), a size-aware merge order can win that factor back; measured
-/// against a smallest-first heap, this function loses at most about $2.5\times$ on such
-/// distributions while winning on uniform ones. Callers with known-pathological size
-/// distributions can sort by size before folding.
+/// The pairing is oblivious to the actual sizes of the values, which is optimal when the elements
+/// have comparable sizes and within a factor of $O(\log n)$ of optimal in general. When one element
+/// dominates all the others combined (say, one million-bit factor among thousands of word-sized
+/// ones), a size-aware merge order can win that factor back; measured against a smallest-first
+/// heap, this function loses at most about $2.5\times$ on such distributions while winning on
+/// uniform ones. Callers with known-pathological size distributions can sort by size before
+/// folding.
 ///
 /// # Worst-case complexity
 /// $T(n) = O(n\mu)$
 ///
 /// $M(n) = O(m\log n)$
 ///
-/// where $T$ is time, $M$ is additional memory, $n$ is `xs.count()`, $\mu$ is the worst-case
-/// time of `merge`, and $m$ is the largest size of any intermediate value.
+/// where $T$ is time, $M$ is additional memory, $n$ is `xs.count()`, $\mu$ is the worst-case time
+/// of `merge`, and $m$ is the largest size of any intermediate value.
 ///
 /// # Examples
 /// ```
@@ -305,8 +305,8 @@ pub fn balanced_fold<T, I: Iterator<Item = T>>(
         }
         let mut p = x;
         // The stack behaves like a binary counter: after the (i + 1)th element, the entries
-        // correspond to the 1-bits of i + 1, and incrementing the counter merges once per
-        // trailing zero.
+        // correspond to the 1-bits of i + 1, and incrementing the counter merges once per trailing
+        // zero.
         for _ in 0..(i + 1).trailing_zeros() {
             let mut top = stack.pop().unwrap();
             merge(&mut top, p);

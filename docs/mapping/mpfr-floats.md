@@ -658,6 +658,18 @@ performs the one rounding, reproducing `mpfr_dot` on finite inputs, at exact-ari
 MPFR notes that `mpfr_dot` is experimental and "does not yet handle intermediate overflows and
 underflows"; the `Rational` route has neither.
 
+Malachite also provides correctly-rounded *products* of arrays, again with a single rounding
+regardless of length —
+[`product_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.product_prec_round),
+[`product_prec`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.product_prec),
+[`product_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.product_round),
+and the [`Product`](https://doc.rust-lang.org/nightly/core/iter/trait.Product.html)
+implementations (maximum input precision, rounding to nearest). MPFR has no corresponding
+function. Since a product cannot cancel, intermediate exactness is unnecessary: the
+implementation multiplies truncated significands at a small working precision, tracks the
+exponent exactly on the side, and rounds once, so intermediate overflow and underflow cannot
+occur either.
+
 ## [Comparison Functions](https://www.mpfr.org/mpfr-current/mpfr.html#Comparison-Functions) {#comparison-functions}
 
 As on every page of this family, comparison is where Malachite is at its most complete: the

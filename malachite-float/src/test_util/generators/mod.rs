@@ -822,6 +822,27 @@ pub fn float_vec_unsigned_rounding_mode_triple_gen_var_2()
     )
 }
 
+// All `(Vec<Float>, u64, RoundingMode)` that are valid inputs to `Float::product_prec_round`.
+pub fn float_vec_unsigned_rounding_mode_triple_gen_var_3()
+-> Generator<(Vec<Float>, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_vec_unsigned_rounding_mode_triple_gen_var_3,
+        &random_float_vec_unsigned_rounding_mode_triple_gen_var_3,
+        &special_random_float_vec_unsigned_rounding_mode_triple_gen_var_3,
+    )
+}
+
+// All `(Vec<Float>, u64, RoundingMode)` that are valid inputs to `Float::product_prec_round`, where
+// the `Float`s may be extreme.
+pub fn float_vec_unsigned_rounding_mode_triple_gen_var_4()
+-> Generator<(Vec<Float>, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_vec_unsigned_rounding_mode_triple_gen_var_4,
+        &random_float_vec_unsigned_rounding_mode_triple_gen_var_4,
+        &special_random_float_vec_unsigned_rounding_mode_triple_gen_var_4,
+    )
+}
+
 // -- (Vec<Float>, RoundingMode) --
 
 // All `(Vec<Float>, RoundingMode)` that are valid inputs to `Float::sum_round`.
@@ -840,6 +861,25 @@ pub fn float_vec_rounding_mode_pair_gen_var_2() -> Generator<(Vec<Float>, Roundi
         &exhaustive_float_vec_rounding_mode_pair_gen_var_2,
         &random_float_vec_rounding_mode_pair_gen_var_2,
         &special_random_float_vec_rounding_mode_pair_gen_var_2,
+    )
+}
+
+// All `(Vec<Float>, RoundingMode)` that are valid inputs to `Float::product_round`.
+pub fn float_vec_rounding_mode_pair_gen_var_3() -> Generator<(Vec<Float>, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_vec_rounding_mode_pair_gen_var_3,
+        &random_float_vec_rounding_mode_pair_gen_var_3,
+        &special_random_float_vec_rounding_mode_pair_gen_var_3,
+    )
+}
+
+// All `(Vec<Float>, RoundingMode)` that are valid inputs to `Float::product_round`, where the
+// `Float`s may be extreme.
+pub fn float_vec_rounding_mode_pair_gen_var_4() -> Generator<(Vec<Float>, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_vec_rounding_mode_pair_gen_var_4,
+        &random_float_vec_rounding_mode_pair_gen_var_4,
+        &special_random_float_vec_rounding_mode_pair_gen_var_4,
     )
 }
 
