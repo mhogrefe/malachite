@@ -6,7 +6,6 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::IsPowerOf2;
 use malachite_base::num::basic::traits::Log210;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
@@ -305,11 +304,9 @@ fn log_2_10_prec_properties() {
             let (log_2_10_alt, o_alt) = Float::log_2_10_prec_round(prec, Ceiling);
             let mut next_upper = log_2_10.clone();
             next_upper.increment();
-            if !next_upper.is_power_of_2() {
-                assert_eq!(ComparableFloat(log_2_10_alt), ComparableFloat(next_upper));
-                assert_eq!(o_alt, Greater);
-            }
-        } else if !log_2_10.is_power_of_2() {
+            assert_eq!(ComparableFloat(log_2_10_alt), ComparableFloat(next_upper));
+            assert_eq!(o_alt, Greater);
+        } else {
             let (log_2_10_alt, o_alt) = Float::log_2_10_prec_round(prec, Floor);
             let mut next_lower = log_2_10.clone();
             next_lower.decrement();
@@ -356,11 +353,9 @@ fn log_2_10_prec_round_properties() {
             let (log_2_10_alt, o_alt) = Float::log_2_10_prec_round(prec, Ceiling);
             let mut next_upper = log_2_10.clone();
             next_upper.increment();
-            if !next_upper.is_power_of_2() {
-                assert_eq!(ComparableFloat(log_2_10_alt), ComparableFloat(next_upper));
-                assert_eq!(o_alt, Greater);
-            }
-        } else if !log_2_10.is_power_of_2() {
+            assert_eq!(ComparableFloat(log_2_10_alt), ComparableFloat(next_upper));
+            assert_eq!(o_alt, Greater);
+        } else {
             let (log_2_10_alt, o_alt) = Float::log_2_10_prec_round(prec, Floor);
             let mut next_lower = log_2_10.clone();
             next_lower.decrement();

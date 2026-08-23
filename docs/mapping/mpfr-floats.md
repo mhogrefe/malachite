@@ -1312,12 +1312,12 @@ macro's double-evaluation mechanics are C plumbing with nothing to abbreviate.
 operations from IEEE 754", and Malachite's
 [`increment`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.increment)
 and `decrement` do the same walk along the representable numbers at the value's own precision,
-with `mpfr_nexttoward` recovered by comparing first and stepping second. Two differences make
-the rows ≈. MPFR's functions are total: NaN passes through, zero steps to the smallest float
-of the appropriate sign, and the infinities act as endpoints, while `increment` and
-`decrement` panic on NaN, infinities, and zeros. And at a binade boundary the conventions
-part: stepping down from a power of two, `decrement` subtracts the ulp of the binade being
-left, taking a larger step than `mpfr_nextbelow`'s move to the nearest representable below.
+with `mpfr_nexttoward` recovered by comparing first and stepping second. The steps agree
+everywhere, including at binade boundaries, where stepping down from a power of two moves half
+an ulp to the nearest representable below. One difference makes the rows ≈. MPFR's functions
+are total: NaN passes through, zero steps to the smallest float of the appropriate sign, and
+the infinities act as endpoints, while `increment` and `decrement` panic on NaN, infinities,
+and zeros.
 
 **`mpfr_min`, `mpfr_max`.** These follow IEEE 754-2019's minimumNumber and maximumNumber: a
 single NaN operand is ignored, only two NaNs produce NaN, and zeros of different signs order

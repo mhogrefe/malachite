@@ -147,6 +147,10 @@ pub mod agm;
 pub mod average;
 /// Cube root of [`Float`](super::Float)s and of [`Rational`](malachite_q::Rational)s.
 pub mod cbrt;
+/// [`Compound`](malachite_base::num::arithmetic::traits::Compound) and
+/// [`CompoundAssign`](malachite_base::num::arithmetic::traits::CompoundAssign), traits for
+/// computing the compound function $(1+x)^n$ for [`Float`](super::Float)s.
+pub mod compound;
 /// Division of [`Float`](super::Float)s, of [`Float`](super::Float)s by
 /// [`Rational`](malachite_q::Rational)s, and of [`Rational`](malachite_q::Rational)s by
 /// [`Float`](super::Float)s.

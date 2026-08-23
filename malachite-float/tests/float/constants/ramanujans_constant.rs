@@ -6,7 +6,6 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::IsPowerOf2;
 use malachite_base::num::basic::traits::RamanujansConstant;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
@@ -281,11 +280,9 @@ fn ramanujans_constant_prec_properties() {
             let (alt, o_alt) = Float::ramanujans_constant_prec_round(prec, Ceiling);
             let mut next_upper = ramanujans_constant.clone();
             next_upper.increment();
-            if !next_upper.is_power_of_2() {
-                assert_eq!(ComparableFloat(alt), ComparableFloat(next_upper));
-                assert_eq!(o_alt, Greater);
-            }
-        } else if !ramanujans_constant.is_power_of_2() {
+            assert_eq!(ComparableFloat(alt), ComparableFloat(next_upper));
+            assert_eq!(o_alt, Greater);
+        } else {
             let (alt, o_alt) = Float::ramanujans_constant_prec_round(prec, Floor);
             let mut next_lower = ramanujans_constant.clone();
             next_lower.decrement();
@@ -319,11 +316,9 @@ fn ramanujans_constant_prec_round_properties() {
             let (alt, o_alt) = Float::ramanujans_constant_prec_round(prec, Ceiling);
             let mut next_upper = ramanujans_constant.clone();
             next_upper.increment();
-            if !next_upper.is_power_of_2() {
-                assert_eq!(ComparableFloat(alt), ComparableFloat(next_upper));
-                assert_eq!(o_alt, Greater);
-            }
-        } else if !ramanujans_constant.is_power_of_2() {
+            assert_eq!(ComparableFloat(alt), ComparableFloat(next_upper));
+            assert_eq!(o_alt, Greater);
+        } else {
             let (alt, o_alt) = Float::ramanujans_constant_prec_round(prec, Floor);
             let mut next_lower = ramanujans_constant.clone();
             next_lower.decrement();

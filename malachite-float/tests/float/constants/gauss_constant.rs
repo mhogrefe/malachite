@@ -6,7 +6,6 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::IsPowerOf2;
 use malachite_base::num::basic::traits::GaussConstant;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
@@ -284,14 +283,12 @@ fn gauss_constant_prec_properties() {
             let (gauss_constant_alt, o_alt) = Float::gauss_constant_prec_round(prec, Ceiling);
             let mut next_upper = gauss_constant.clone();
             next_upper.increment();
-            if !next_upper.is_power_of_2() {
-                assert_eq!(
-                    ComparableFloat(gauss_constant_alt),
-                    ComparableFloat(next_upper)
-                );
-                assert_eq!(o_alt, Greater);
-            }
-        } else if !gauss_constant.is_power_of_2() {
+            assert_eq!(
+                ComparableFloat(gauss_constant_alt),
+                ComparableFloat(next_upper)
+            );
+            assert_eq!(o_alt, Greater);
+        } else {
             let (gauss_constant_alt, o_alt) = Float::gauss_constant_prec_round(prec, Floor);
             let mut next_lower = gauss_constant.clone();
             next_lower.decrement();
@@ -326,14 +323,12 @@ fn gauss_constant_prec_round_properties() {
             let (gauss_constant_alt, o_alt) = Float::gauss_constant_prec_round(prec, Ceiling);
             let mut next_upper = gauss_constant.clone();
             next_upper.increment();
-            if !next_upper.is_power_of_2() {
-                assert_eq!(
-                    ComparableFloat(gauss_constant_alt),
-                    ComparableFloat(next_upper)
-                );
-                assert_eq!(o_alt, Greater);
-            }
-        } else if !gauss_constant.is_power_of_2() {
+            assert_eq!(
+                ComparableFloat(gauss_constant_alt),
+                ComparableFloat(next_upper)
+            );
+            assert_eq!(o_alt, Greater);
+        } else {
             let (gauss_constant_alt, o_alt) = Float::gauss_constant_prec_round(prec, Floor);
             let mut next_lower = gauss_constant.clone();
             next_lower.decrement();

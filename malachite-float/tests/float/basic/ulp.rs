@@ -149,9 +149,9 @@ fn test_increment() {
         assert_eq!(x.to_string(), out);
         assert_eq!(to_hex_string(&x), out_hex);
     };
-    test("1.0", "0x1.0#1", "2.0", "0x2.0#2");
-    test("2.0", "0x2.0#1", "4.0", "0x4.0#2");
-    test("0.50", "0x0.8#1", "1.0", "0x1.0#2");
+    test("1.0", "0x1.0#1", "2.0", "0x2.0#1");
+    test("2.0", "0x2.0#1", "4.0", "0x4.0#1");
+    test("0.50", "0x0.8#1", "1.0", "0x1.0#1");
     test("1.0", "0x1.0#2", "1.5", "0x1.8#2");
     test("2.0", "0x2.0#2", "3.0", "0x3.0#2");
     test("0.50", "0x0.8#2", "0.75", "0x0.c#2");
@@ -195,7 +195,7 @@ fn test_increment() {
         "2.4e-323228497",
         "0x1.0E-268435456#1",
         "4.8e-323228497",
-        "0x2.0E-268435456#2",
+        "0x2.0E-268435456#1",
     );
     test(
         "2.4e-323228497",
@@ -204,17 +204,17 @@ fn test_increment() {
         "0x1.8E-268435456#2",
     );
 
-    test("-1.0", "-0x1.0#1", "-0.0", "-0x0.0");
-    test("-2.0", "-0x2.0#1", "-0.0", "-0x0.0");
-    test("-0.50", "-0x0.8#1", "-0.0", "-0x0.0");
-    test("-1.0", "-0x1.0#2", "-0.50", "-0x0.8#1");
-    test("-2.0", "-0x2.0#2", "-1.0", "-0x1.0#1");
-    test("-0.50", "-0x0.8#2", "-0.25", "-0x0.4#1");
+    test("-1.0", "-0x1.0#1", "-0.50", "-0x0.8#1");
+    test("-2.0", "-0x2.0#1", "-1.0", "-0x1.0#1");
+    test("-0.50", "-0x0.8#1", "-0.25", "-0x0.4#1");
+    test("-1.0", "-0x1.0#2", "-0.75", "-0x0.c#2");
+    test("-2.0", "-0x2.0#2", "-1.5", "-0x1.8#2");
+    test("-0.50", "-0x0.8#2", "-0.38", "-0x0.6#2");
     test(
         "-1.0000000000000000000000000000000",
         "-0x1.0000000000000000000000000#100",
-        "-0.9999999999999999999999999999984",
-        "-0x0.ffffffffffffffffffffffffe#99",
+        "-0.99999999999999999999999999999921",
+        "-0x0.fffffffffffffffffffffffff#100",
     );
     test(
         "-0.33333333333333331",
@@ -237,10 +237,15 @@ fn test_increment() {
     test(
         "-1.0e323228496",
         "-0x4.0E+268435455#2",
+        "-7.9e323228495",
+        "-0x3.0E+268435455#2",
+    );
+    test(
+        "-1.0e323228496",
+        "-0x4.0E+268435455#1",
         "-5.2e323228495",
         "-0x2.0E+268435455#1",
     );
-    test("-1.0e323228496", "-0x4.0E+268435455#1", "-0.0", "-0x0.0");
     test("-2.4e-323228497", "-0x1.0E-268435456#1", "-0.0", "-0x0.0");
     test("-2.4e-323228497", "-0x1.0E-268435456#2", "-0.0", "-0x0.0");
 }
@@ -275,14 +280,22 @@ fn increment_properties_helper(mut x: Float, extreme: bool) {
     let final_x = x.clone();
     assert!(x.is_valid());
     if !extreme {
+        // The step is one ulp, except when a negative value whose significand is a power of 2
+        // crosses into the next-lower binade, where the neighbor is only half an ulp away.
+        let ulp = Rational::exact_from(old_x.ulp().unwrap());
+        let step = if old_x.is_sign_negative() && (-&old_x).is_power_of_2() {
+            ulp >> 1u64
+        } else {
+            ulp
+        };
         assert_eq!(
-            Rational::exact_from(&old_x) + Rational::exact_from(old_x.ulp().unwrap()),
+            Rational::exact_from(&old_x) + step,
             Rational::exact_from(&x)
         );
     }
     if x.is_normal() {
-        assert_eq!(x.ulp(), old_x.ulp());
-        assert!(x.get_prec().unwrap().abs_diff(old_x.get_prec().unwrap()) <= 1);
+        assert!(x > old_x);
+        assert_eq!(x.get_prec(), old_x.get_prec());
         x.decrement();
         assert_eq!(ComparableFloatRef(&x), ComparableFloatRef(&old_x));
     }
@@ -326,17 +339,17 @@ fn test_decrement() {
         assert_eq!(x.to_string(), out);
         assert_eq!(to_hex_string(&x), out_hex);
     };
-    test("1.0", "0x1.0#1", "0.0", "0x0.0");
-    test("2.0", "0x2.0#1", "0.0", "0x0.0");
-    test("0.50", "0x0.8#1", "0.0", "0x0.0");
-    test("1.0", "0x1.0#2", "0.50", "0x0.8#1");
-    test("2.0", "0x2.0#2", "1.0", "0x1.0#1");
-    test("0.50", "0x0.8#2", "0.25", "0x0.4#1");
+    test("1.0", "0x1.0#1", "0.50", "0x0.8#1");
+    test("2.0", "0x2.0#1", "1.0", "0x1.0#1");
+    test("0.50", "0x0.8#1", "0.25", "0x0.4#1");
+    test("1.0", "0x1.0#2", "0.75", "0x0.c#2");
+    test("2.0", "0x2.0#2", "1.5", "0x1.8#2");
+    test("0.50", "0x0.8#2", "0.38", "0x0.6#2");
     test(
         "1.0000000000000000000000000000000",
         "0x1.0000000000000000000000000#100",
-        "0.9999999999999999999999999999984",
-        "0x0.ffffffffffffffffffffffffe#99",
+        "0.99999999999999999999999999999921",
+        "0x0.fffffffffffffffffffffffff#100",
     );
     test(
         "0.33333333333333331",
@@ -359,16 +372,21 @@ fn test_decrement() {
     test(
         "1.0e323228496",
         "0x4.0E+268435455#2",
+        "7.9e323228495",
+        "0x3.0E+268435455#2",
+    );
+    test(
+        "1.0e323228496",
+        "0x4.0E+268435455#1",
         "5.2e323228495",
         "0x2.0E+268435455#1",
     );
-    test("1.0e323228496", "0x4.0E+268435455#1", "0.0", "0x0.0");
     test("2.4e-323228497", "0x1.0E-268435456#1", "0.0", "0x0.0");
     test("2.4e-323228497", "0x1.0E-268435456#2", "0.0", "0x0.0");
 
-    test("-1.0", "-0x1.0#1", "-2.0", "-0x2.0#2");
-    test("-2.0", "-0x2.0#1", "-4.0", "-0x4.0#2");
-    test("-0.50", "-0x0.8#1", "-1.0", "-0x1.0#2");
+    test("-1.0", "-0x1.0#1", "-2.0", "-0x2.0#1");
+    test("-2.0", "-0x2.0#1", "-4.0", "-0x4.0#1");
+    test("-0.50", "-0x0.8#1", "-1.0", "-0x1.0#1");
     test("-1.0", "-0x1.0#2", "-1.5", "-0x1.8#2");
     test("-2.0", "-0x2.0#2", "-3.0", "-0x3.0#2");
     test("-0.50", "-0x0.8#2", "-0.75", "-0x0.c#2");
@@ -412,7 +430,7 @@ fn test_decrement() {
         "-2.4e-323228497",
         "-0x1.0E-268435456#1",
         "-4.8e-323228497",
-        "-0x2.0E-268435456#2",
+        "-0x2.0E-268435456#1",
     );
     test(
         "-2.4e-323228497",
@@ -452,14 +470,22 @@ fn decrement_properties_helper(mut x: Float, extreme: bool) {
     let final_x = x.clone();
     assert!(x.is_valid());
     if !extreme {
+        // The step is one ulp, except when a positive value whose significand is a power of 2
+        // crosses into the next-lower binade, where the neighbor is only half an ulp away.
+        let ulp = Rational::exact_from(old_x.ulp().unwrap());
+        let step = if old_x.is_sign_positive() && old_x.is_power_of_2() {
+            ulp >> 1u64
+        } else {
+            ulp
+        };
         assert_eq!(
-            Rational::exact_from(&old_x) - Rational::exact_from(old_x.ulp().unwrap()),
+            Rational::exact_from(&old_x) - step,
             Rational::exact_from(&x)
         );
     }
     if x.is_normal() {
-        assert_eq!(x.ulp(), old_x.ulp());
-        assert!(x.get_prec().unwrap().abs_diff(old_x.get_prec().unwrap()) <= 1);
+        assert!(x < old_x);
+        assert_eq!(x.get_prec(), old_x.get_prec());
         x.increment();
         assert_eq!(ComparableFloatRef(&x), ComparableFloatRef(&old_x));
     }

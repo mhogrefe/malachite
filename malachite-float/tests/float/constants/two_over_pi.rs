@@ -6,7 +6,6 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::IsPowerOf2;
 use malachite_base::num::basic::traits::TwoOverPi;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
@@ -281,14 +280,12 @@ fn two_over_pi_prec_properties() {
             let (two_over_pi_alt, o_alt) = Float::two_over_pi_prec_round(prec, Ceiling);
             let mut next_upper = two_over_pi.clone();
             next_upper.increment();
-            if !next_upper.is_power_of_2() {
-                assert_eq!(
-                    ComparableFloat(two_over_pi_alt),
-                    ComparableFloat(next_upper)
-                );
-                assert_eq!(o_alt, Greater);
-            }
-        } else if !two_over_pi.is_power_of_2() {
+            assert_eq!(
+                ComparableFloat(two_over_pi_alt),
+                ComparableFloat(next_upper)
+            );
+            assert_eq!(o_alt, Greater);
+        } else {
             let (two_over_pi_alt, o_alt) = Float::two_over_pi_prec_round(prec, Floor);
             let mut next_lower = two_over_pi.clone();
             next_lower.decrement();
@@ -326,14 +323,12 @@ fn two_over_pi_prec_round_properties() {
             let (two_over_pi_alt, o_alt) = Float::two_over_pi_prec_round(prec, Ceiling);
             let mut next_upper = two_over_pi.clone();
             next_upper.increment();
-            if !next_upper.is_power_of_2() {
-                assert_eq!(
-                    ComparableFloat(two_over_pi_alt),
-                    ComparableFloat(next_upper)
-                );
-                assert_eq!(o_alt, Greater);
-            }
-        } else if !two_over_pi.is_power_of_2() {
+            assert_eq!(
+                ComparableFloat(two_over_pi_alt),
+                ComparableFloat(next_upper)
+            );
+            assert_eq!(o_alt, Greater);
+        } else {
             let (two_over_pi_alt, o_alt) = Float::two_over_pi_prec_round(prec, Floor);
             let mut next_lower = two_over_pi.clone();
             next_lower.decrement();

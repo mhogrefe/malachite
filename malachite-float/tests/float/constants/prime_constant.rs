@@ -6,7 +6,6 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::IsPowerOf2;
 use malachite_base::num::basic::traits::PrimeConstant;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
@@ -290,11 +289,9 @@ fn prime_constant_prec_properties() {
             let (pc_alt, o_alt) = Float::prime_constant_prec_round(prec, Ceiling);
             let mut next_upper = pc.clone();
             next_upper.increment();
-            if !next_upper.is_power_of_2() {
-                assert_eq!(ComparableFloat(pc_alt), ComparableFloat(next_upper));
-                assert_eq!(o_alt, Greater);
-            }
-        } else if !pc.is_power_of_2() {
+            assert_eq!(ComparableFloat(pc_alt), ComparableFloat(next_upper));
+            assert_eq!(o_alt, Greater);
+        } else {
             let (pc_alt, o_alt) = Float::prime_constant_prec_round(prec, Floor);
             let mut next_lower = pc.clone();
             next_lower.decrement();
@@ -327,11 +324,9 @@ fn prime_constant_prec_round_properties() {
             let (pc_alt, o_alt) = Float::prime_constant_prec_round(prec, Ceiling);
             let mut next_upper = pc.clone();
             next_upper.increment();
-            if !next_upper.is_power_of_2() {
-                assert_eq!(ComparableFloat(pc_alt), ComparableFloat(next_upper));
-                assert_eq!(o_alt, Greater);
-            }
-        } else if !pc.is_power_of_2() {
+            assert_eq!(ComparableFloat(pc_alt), ComparableFloat(next_upper));
+            assert_eq!(o_alt, Greater);
+        } else {
             let (pc_alt, o_alt) = Float::prime_constant_prec_round(prec, Floor);
             let mut next_lower = pc.clone();
             next_lower.decrement();

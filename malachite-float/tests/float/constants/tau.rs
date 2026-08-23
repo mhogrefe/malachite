@@ -6,7 +6,6 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::IsPowerOf2;
 use malachite_base::num::basic::traits::Tau;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
@@ -281,11 +280,9 @@ fn tau_prec_properties() {
             let (tau_alt, o_alt) = Float::tau_prec_round(prec, Ceiling);
             let mut next_upper = tau.clone();
             next_upper.increment();
-            if !next_upper.is_power_of_2() {
-                assert_eq!(ComparableFloat(tau_alt), ComparableFloat(next_upper));
-                assert_eq!(o_alt, Greater);
-            }
-        } else if !tau.is_power_of_2() {
+            assert_eq!(ComparableFloat(tau_alt), ComparableFloat(next_upper));
+            assert_eq!(o_alt, Greater);
+        } else {
             let (tau_alt, o_alt) = Float::tau_prec_round(prec, Floor);
             let mut next_lower = tau.clone();
             next_lower.decrement();
@@ -314,11 +311,9 @@ fn tau_prec_round_properties() {
             let (tau_alt, o_alt) = Float::tau_prec_round(prec, Ceiling);
             let mut next_upper = tau.clone();
             next_upper.increment();
-            if !next_upper.is_power_of_2() {
-                assert_eq!(ComparableFloat(tau_alt), ComparableFloat(next_upper));
-                assert_eq!(o_alt, Greater);
-            }
-        } else if !tau.is_power_of_2() {
+            assert_eq!(ComparableFloat(tau_alt), ComparableFloat(next_upper));
+            assert_eq!(o_alt, Greater);
+        } else {
             let (tau_alt, o_alt) = Float::tau_prec_round(prec, Floor);
             let mut next_lower = tau.clone();
             next_lower.decrement();

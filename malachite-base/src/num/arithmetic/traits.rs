@@ -137,6 +137,18 @@ pub trait HypotAssign<RHS = Self> {
     fn hypot_assign(&mut self, other: RHS);
 }
 
+/// Calculates the compound function $(1+x)^n$ of a number $x$.
+pub trait Compound<N> {
+    type Output;
+
+    fn compound(self, n: N) -> Self::Output;
+}
+
+/// Replaces a number $x$ with the compound function $(1+x)^n$.
+pub trait CompoundAssign<N> {
+    fn compound_assign(&mut self, n: N);
+}
+
 /// Left-shifts a number (multiplies it by a power of 2), returning `None` if the result is not
 /// representable.
 pub trait ArithmeticCheckedShl<RHS> {

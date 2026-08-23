@@ -6,7 +6,6 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::IsPowerOf2;
 use malachite_base::num::basic::traits::PiOver8;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
@@ -284,11 +283,9 @@ fn pi_over_8_prec_properties() {
             let (pi_over_8_alt, o_alt) = Float::pi_over_8_prec_round(prec, Ceiling);
             let mut next_upper = pi_over_8.clone();
             next_upper.increment();
-            if !next_upper.is_power_of_2() {
-                assert_eq!(ComparableFloat(pi_over_8_alt), ComparableFloat(next_upper));
-                assert_eq!(o_alt, Greater);
-            }
-        } else if !pi_over_8.is_power_of_2() {
+            assert_eq!(ComparableFloat(pi_over_8_alt), ComparableFloat(next_upper));
+            assert_eq!(o_alt, Greater);
+        } else {
             let (pi_over_8_alt, o_alt) = Float::pi_over_8_prec_round(prec, Floor);
             let mut next_lower = pi_over_8.clone();
             next_lower.decrement();
@@ -320,11 +317,9 @@ fn pi_over_8_prec_round_properties() {
             let (pi_over_8_alt, o_alt) = Float::pi_over_8_prec_round(prec, Ceiling);
             let mut next_upper = pi_over_8.clone();
             next_upper.increment();
-            if !next_upper.is_power_of_2() {
-                assert_eq!(ComparableFloat(pi_over_8_alt), ComparableFloat(next_upper));
-                assert_eq!(o_alt, Greater);
-            }
-        } else if !pi_over_8.is_power_of_2() {
+            assert_eq!(ComparableFloat(pi_over_8_alt), ComparableFloat(next_upper));
+            assert_eq!(o_alt, Greater);
+        } else {
             let (pi_over_8_alt, o_alt) = Float::pi_over_8_prec_round(prec, Floor);
             let mut next_lower = pi_over_8.clone();
             next_lower.decrement();

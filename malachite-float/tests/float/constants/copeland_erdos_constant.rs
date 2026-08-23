@@ -7,7 +7,6 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::apply_fn_to_primitive_floats;
-use malachite_base::num::arithmetic::traits::IsPowerOf2;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::CopelandErdosConstant;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
@@ -315,11 +314,9 @@ fn copeland_erdos_constant_base_prec_properties() {
                 Float::copeland_erdos_constant_base_prec_round(base, prec, Ceiling);
             let mut next_upper = x.clone();
             next_upper.increment();
-            if !next_upper.is_power_of_2() {
-                assert_eq!(ComparableFloat(x_alt), ComparableFloat(next_upper));
-                assert_eq!(o_alt, Greater);
-            }
-        } else if !x.is_power_of_2() {
+            assert_eq!(ComparableFloat(x_alt), ComparableFloat(next_upper));
+            assert_eq!(o_alt, Greater);
+        } else {
             let (x_alt, o_alt) = Float::copeland_erdos_constant_base_prec_round(base, prec, Floor);
             let mut next_lower = x.clone();
             next_lower.decrement();

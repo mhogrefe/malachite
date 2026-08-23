@@ -6,7 +6,6 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::IsPowerOf2;
 use malachite_base::num::basic::traits::GelfondSchneiderConstant;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
@@ -287,14 +286,12 @@ fn gelfond_schneider_constant_prec_properties() {
                 Float::gelfond_schneider_constant_prec_round(prec, Ceiling);
             let mut next_upper = gelfond_schneider_constant.clone();
             next_upper.increment();
-            if !next_upper.is_power_of_2() {
-                assert_eq!(
-                    ComparableFloat(gelfond_schneider_constant_alt),
-                    ComparableFloat(next_upper)
-                );
-                assert_eq!(o_alt, Greater);
-            }
-        } else if !gelfond_schneider_constant.is_power_of_2() {
+            assert_eq!(
+                ComparableFloat(gelfond_schneider_constant_alt),
+                ComparableFloat(next_upper)
+            );
+            assert_eq!(o_alt, Greater);
+        } else {
             let (gelfond_schneider_constant_alt, o_alt) =
                 Float::gelfond_schneider_constant_prec_round(prec, Floor);
             let mut next_lower = gelfond_schneider_constant.clone();
@@ -337,14 +334,12 @@ fn gelfond_schneider_constant_prec_round_properties() {
                 Float::gelfond_schneider_constant_prec_round(prec, Ceiling);
             let mut next_upper = gelfond_schneider_constant.clone();
             next_upper.increment();
-            if !next_upper.is_power_of_2() {
-                assert_eq!(
-                    ComparableFloat(gelfond_schneider_constant_alt),
-                    ComparableFloat(next_upper)
-                );
-                assert_eq!(o_alt, Greater);
-            }
-        } else if !gelfond_schneider_constant.is_power_of_2() {
+            assert_eq!(
+                ComparableFloat(gelfond_schneider_constant_alt),
+                ComparableFloat(next_upper)
+            );
+            assert_eq!(o_alt, Greater);
+        } else {
             let (gelfond_schneider_constant_alt, o_alt) =
                 Float::gelfond_schneider_constant_prec_round(prec, Floor);
             let mut next_lower = gelfond_schneider_constant.clone();

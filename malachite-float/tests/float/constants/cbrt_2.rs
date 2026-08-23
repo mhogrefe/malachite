@@ -6,7 +6,6 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::IsPowerOf2;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
     unsigned_gen_var_11, unsigned_rounding_mode_pair_gen_var_4,
@@ -301,11 +300,9 @@ fn cbrt_2_prec_properties() {
             let (cbrt_2_alt, o_alt) = Float::cbrt_2_prec_round(prec, Ceiling);
             let mut next_upper = cbrt_2.clone();
             next_upper.increment();
-            if !next_upper.is_power_of_2() {
-                assert_eq!(ComparableFloat(cbrt_2_alt), ComparableFloat(next_upper));
-                assert_eq!(o_alt, Greater);
-            }
-        } else if !cbrt_2.is_power_of_2() {
+            assert_eq!(ComparableFloat(cbrt_2_alt), ComparableFloat(next_upper));
+            assert_eq!(o_alt, Greater);
+        } else {
             let (cbrt_2_alt, o_alt) = Float::cbrt_2_prec_round(prec, Floor);
             let mut next_lower = cbrt_2.clone();
             next_lower.decrement();
@@ -345,11 +342,9 @@ fn cbrt_2_prec_round_properties() {
             let (cbrt_2_alt, o_alt) = Float::cbrt_2_prec_round(prec, Ceiling);
             let mut next_upper = cbrt_2.clone();
             next_upper.increment();
-            if !next_upper.is_power_of_2() {
-                assert_eq!(ComparableFloat(cbrt_2_alt), ComparableFloat(next_upper));
-                assert_eq!(o_alt, Greater);
-            }
-        } else if !cbrt_2.is_power_of_2() {
+            assert_eq!(ComparableFloat(cbrt_2_alt), ComparableFloat(next_upper));
+            assert_eq!(o_alt, Greater);
+        } else {
             let (cbrt_2_alt, o_alt) = Float::cbrt_2_prec_round(prec, Floor);
             let mut next_lower = cbrt_2.clone();
             next_lower.decrement();

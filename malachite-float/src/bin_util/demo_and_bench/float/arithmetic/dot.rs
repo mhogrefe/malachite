@@ -267,8 +267,8 @@ fn benchmark_float_dot_prec_round_algorithms(
                 no_out!(Float::dot_prec_round(&xs, &ys, prec, rm));
             }),
             ("exact Rational route", &mut |(xs, ys, prec, rm)| {
-                // The Rational route only applies to finite inputs; fall back for the rare
-                // vectors containing specials.
+                // The Rational route only applies to finite inputs; fall back for the rare vectors
+                // containing specials.
                 if xs.iter().chain(ys.iter()).all(Float::is_finite) {
                     let exact: Rational = xs
                         .iter()
