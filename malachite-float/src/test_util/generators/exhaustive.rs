@@ -7094,6 +7094,44 @@ pub fn exhaustive_float_signed_unsigned_rounding_mode_quadruple_gen_var_14()
     ))
 }
 
+// Whether `(x, n, prec, rm)` is a valid input to `Float::compound_prec_round`: `Exact` is only
+// allowed when the compound really is exact at the given precision.
+pub fn compound_prec_round_valid(x: &Float, n: i64, prec: u64, rm: RoundingMode) -> bool {
+    rm != Exact || x.compound_prec_round_ref(n, prec, Floor).1 == Equal
+}
+
+// All `(Float, i64, u64, RoundingMode)` that are valid inputs to `Float::compound_prec_round`.
+pub fn exhaustive_float_signed_unsigned_rounding_mode_quadruple_gen_var_17()
+-> It<(Float, i64, u64, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(
+        lex_pairs(
+            exhaustive_triples(
+                exhaustive_floats(),
+                exhaustive_signeds(),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, n, prec), rm)| compound_prec_round_valid(x, n, prec, rm)),
+    ))
+}
+
+// As `..._var_17`, but the `Float` may have an extreme exponent.
+pub fn exhaustive_float_signed_unsigned_rounding_mode_quadruple_gen_var_18()
+-> It<(Float, i64, u64, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(
+        lex_pairs(
+            exhaustive_triples(
+                exhaustive_extreme_floats(),
+                exhaustive_signeds(),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, n, prec), rm)| compound_prec_round_valid(x, n, prec, rm)),
+    ))
+}
+
 // All `(Rational, u64, u64, RoundingMode)` that are valid inputs to
 // `Float::root_u_rational_prec_round`.
 pub fn exhaustive_rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_3()

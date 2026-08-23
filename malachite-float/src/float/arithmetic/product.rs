@@ -506,32 +506,29 @@ impl Float {
 
 /// Computes the product of a slice of primitive floats, with a single rounding.
 ///
-/// The result is correctly rounded to the nearest value: the product is computed as if in
-/// infinite precision and rounded only once, at the end, no matter how many inputs there are.
-/// This includes gradual underflow: results in the subnormal range are correctly rounded to their
-/// reduced precisions. Intermediate overflow and underflow cannot occur.
+/// The result is correctly rounded to the nearest value: the product is computed as if in infinite
+/// precision and rounded only once, at the end, no matter how many inputs there are. This includes
+/// gradual underflow: results in the subnormal range are correctly rounded to their reduced
+/// precisions. Intermediate overflow and underflow cannot occur.
 ///
 /// $$
 /// f((x_i)_ {i=0}^{n-1}) = \prod_ {i=0}^{n-1} x_i + \varepsilon.
 /// $$
 /// - If $\prod_ {i=0}^{n-1} x_i$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or
 ///   assumed to be 0.
-/// - If $\prod_ {i=0}^{n-1} x_i$ is finite and nonzero, then
-///   $|\varepsilon| \leq 2^{\lfloor\log_2 |\prod_ {i=0}^{n-1} x_i|\rfloor-p}$, where $p$ is
-///   the precision of the output (typically 24 if `T` is a [`f32`] and 53 if `T` is a [`f64`],
-///   but less if the output is subnormal).
+/// - If $\prod_ {i=0}^{n-1} x_i$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+///   |\prod_ {i=0}^{n-1} x_i|\rfloor-p}$, where $p$ is the precision of the output (typically 24 if
+///   `T` is a [`f32`] and 53 if `T` is a [`f64`], but less if the output is subnormal).
 ///
 /// Special cases:
 /// - The product of no floats is $1.0$.
 /// - If any input is `NaN`, or if the inputs include both a zero and an infinity, the product is
 ///   `NaN`.
-/// - Otherwise, if any input is infinite, the product is infinite; and if any input is a zero,
-///   the product is a zero. In both cases, as for a regular product, the sign is negative if and
-///   only if an odd number of the inputs are negative, negative zeros and negative infinities
-///   included.
+/// - Otherwise, if any input is infinite, the product is infinite; and if any input is a zero, the
+///   product is a zero. In both cases, as for a regular product, the sign is negative if and only
+///   if an odd number of the inputs are negative, negative zeros and negative infinities included.
 ///
-/// If the result overflows, $\pm\infty$ is returned, and if it underflows, $\pm0.0$ is
-/// returned.
+/// If the result overflows, $\pm\infty$ is returned, and if it underflows, $\pm0.0$ is returned.
 ///
 /// # Worst-case complexity
 /// $T(n) = O(n^2 \log n \log\log n)$

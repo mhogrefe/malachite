@@ -217,8 +217,8 @@ fn test_dot_prec_round() {
             }
         }
     };
-    // - the singular rules: NaN inputs, a zero times an infinity, infinite terms with and
-    //   without sign conflicts
+    // - the singular rules: NaN inputs, a zero times an infinity, infinite terms with and without
+    //   sign conflicts
     test(
         &["NaN", "0x1.0#1", "0x2.0#1"],
         &["0x1.0#1", "0x2.0#1", "0x3.0#2"],
@@ -292,8 +292,8 @@ fn test_dot_prec_round() {
         "-0x0.0",
         Equal,
     );
-    // - delegations: a single pair, a single regular term, and two regular terms (which use
-    //   the fused multiply-add-multiply)
+    // - delegations: a single pair, a single regular term, and two regular terms (which use the
+    //   fused multiply-add-multiply)
     test(
         &["0x3.0#2"],
         &["0x5.0#3"],
@@ -658,9 +658,9 @@ fn dot_prec_round_properties_helper(xs: Vec<Float>, ys: Vec<Float>, prec: u64, r
     if dot.is_nan() {
         assert!(dot_alt.is_nan());
     } else if dot == 0u32 {
-        // Zero results are not antisymmetric: the IEEE zero-sign rules prefer +0 for every
-        // rounding mode except Floor, in both the negated and non-negated computations. Only the
-        // magnitude and the (reflected) ternary are preserved.
+        // Zero results are not antisymmetric: the IEEE zero-sign rules prefer +0 for every rounding
+        // mode except Floor, in both the negated and non-negated computations. Only the magnitude
+        // and the (reflected) ternary are preserved.
         assert_eq!(dot_alt, 0u32);
         assert_eq!(o_alt, o.reverse());
     } else {
@@ -668,8 +668,7 @@ fn dot_prec_round_properties_helper(xs: Vec<Float>, ys: Vec<Float>, prec: u64, r
         assert_eq!(o_alt, o.reverse());
     }
 
-    // appending a pair with a zero changes nothing, unless every term is zero or the result is
-    // NaN
+    // appending a pair with a zero changes nothing, unless every term is zero or the result is NaN
     if !xs.is_empty()
         && !dot.is_nan()
         && xs
@@ -699,8 +698,8 @@ fn dot_prec_round_properties_helper(xs: Vec<Float>, ys: Vec<Float>, prec: u64, r
         assert_eq!(ComparableFloat(dot_alt), ComparableFloat(dot.clone()));
         assert_eq!(o_alt, o);
 
-        // rug, where its rounding modes allow (and only inside the term gate: mpfr_dot aborts
-        // on intermediate overflow or underflow)
+        // rug, where its rounding modes allow (and only inside the term gate: mpfr_dot aborts on
+        // intermediate overflow or underflow)
         if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm) {
             let rug_xs: Vec<rug::Float> = xs.iter().map(rug::Float::exact_from).collect();
             let rug_ys: Vec<rug::Float> = ys.iter().map(rug::Float::exact_from).collect();
@@ -864,8 +863,8 @@ fn test_primitive_float_dot() {
         &[2.0f64.powi(-537), 2.0f64.powi(-538)],
         1.0e-323,
     );
-    // double rounding is avoided: the exact value is just below the tie, so the result rounds
-    // down, even though the 54-bit intermediate rounds to the tie
+    // double rounding is avoided: the exact value is just below the tie, so the result rounds down,
+    // even though the 54-bit intermediate rounds to the tie
     test::<f64>(
         &[2.0f64.powi(-537), 2.0f64.powi(-537), -2.0f64.powi(-587)],
         &[2.0f64.powi(-537), 2.0f64.powi(-538), 2.0f64.powi(-588)],

@@ -65,8 +65,8 @@ pub fn naive_dot(xs: &[Float], ys: &[Float]) -> Float {
 
 // Warning: mpfr_dot computes each product with mpfr_mul at full precision and asserts that the
 // multiplication is exact, so calling this on inputs whose products overflow or underflow the
-// exponent range ABORTS the process with a GNU MP assertion failure. Callers must gate on the
-// term exponents.
+// exponent range ABORTS the process with a GNU MP assertion failure. Callers must gate on the term
+// exponents.
 pub fn rug_dot_prec_round(
     xs: &[rug::Float],
     ys: &[rug::Float],

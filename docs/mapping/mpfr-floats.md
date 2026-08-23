@@ -831,7 +831,7 @@ the rational to a float first and accepts the intermediate rounding.
 | ✓ | `int mpfr_pow_z (mpfr_t rop, mpfr_t op1, mpz_t op2, mpfr_rnd_t rnd)` | [`pow_integer_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.pow_integer_prec_round), [`Pow`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Pow.html) |
 | ✓ | `int mpfr_ui_pow_ui (mpfr_t rop, unsigned long int op1, unsigned long int op2, mpfr_rnd_t rnd)` | [`unsigned_pow_unsigned_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.unsigned_pow_unsigned_prec_round) |
 | ✓ | `int mpfr_ui_pow (mpfr_t rop, unsigned long int op1, mpfr_t op2, mpfr_rnd_t rnd)` | [`unsigned_pow_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.unsigned_pow_prec_round) |
-| ✗ | `int mpfr_compound_si (mpfr_t rop, mpfr_t op, long int n, mpfr_rnd_t rnd)` | |
+| ✓ | `int mpfr_compound_si (mpfr_t rop, mpfr_t op, long int n, mpfr_rnd_t rnd)` | [`compound_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.compound_prec_round), [`Compound`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Compound.html) |
 
 **`mpfr_pow`.** `pow_prec_round` and the
 [`Pow`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Pow.html)
@@ -858,11 +858,23 @@ exponent goes to `pow_integer_prec_round`. All are reachable through `Pow` as we
 computed at the target precision rather than exactly.
 
 **`mpfr_compound_si`.** $$(1+op)^n$$, IEEE 754's compound-interest function, accurate without
-forming $$1+op$$, is a gap. The exact interim leaves the field as usual, and pays for it:
-`Rational::from(op) + 1` is exact, its `n`th power is exact, and
-[`from_rational_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.from_rational_prec_round)
-rounds once, but the exact power grows with `n` where a dedicated implementation works at the
-target precision throughout.
+forming $$1+op$$, is ported: `compound_prec_round`, with the usual `prec`, `round`, and plain
+levels, in-place `*_assign` forms, and the new
+[`Compound`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Compound.html)
+and
+[`CompoundAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.CompoundAssign.html)
+traits at the plain level. The special-value table matches, including the corners the manual
+calls out: `compound(x, 0)` is 1 even for NaN, and `op` below $$-1$$ gives NaN even when
+`n = 0`. One caution when comparing against released MPFR: the port follows the current MPFR
+development sources, which round the inner `log2p1` toward zero, while 4.2.2 chooses that
+direction from the operands' signs — backwards for negative `n` — and its shortcut for results
+that fit in the target precision can then step the wrong way. With `op = 126` at 7 bits and
+`n = -1`, the 2-bit rounding of $$1/127$$ toward $$+\infty$$ is $$3 \cdot 2^{-8}$$, but 4.2.2
+returns $$2^{-7}$$, below the exact value, and its round-to-nearest result carries the wrong
+ternary value. Results here agree with the corrected development sources, so occasional
+one-ulp and ternary-value disagreements with released 4.2.x for negative `n` are expected.
+Intermediate quantities that MPFR keeps in its extended exponent range are computed against
+the real exponent range instead, with the same results.
 
 **Beyond MPFR.** The power lattice fills in combinations MPFR does not have: a
 [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html)

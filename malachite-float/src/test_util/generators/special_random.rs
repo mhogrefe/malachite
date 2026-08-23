@@ -28,15 +28,15 @@ use crate::test_util::generators::exhaustive::{
     add_mul_round_valid, add_prec_round_valid, add_rational_prec_round_valid,
     add_rational_round_valid, add_round_valid, agm_prec_round_valid, agm_rational_prec_round_valid,
     agm_round_valid, average_prec_round_valid, cbrt_prec_round_valid, cbrt_round_valid,
-    div_prec_round_valid, div_rational_prec_round_valid, div_rational_round_valid, div_round_valid,
-    dot_prec_round_valid, dot_round_valid, exp_prec_round_valid, exp_rational_prec_round_valid,
-    exp_round_valid, float_to_sci_options_valid, from_primitive_float_prec_round_valid,
-    hypot_prec_round_valid, hypot_round_valid, integer_rounding_from_float_valid,
-    ln_1_plus_x_prec_round_valid, ln_1_plus_x_round_valid, ln_prec_round_valid,
-    ln_rational_prec_round_valid, ln_round_valid, log_base_1_plus_x_prec_round_valid,
-    log_base_1_plus_x_round_valid, log_base_2_1_plus_x_prec_round_valid,
-    log_base_2_1_plus_x_round_valid, log_base_2_prec_round_valid,
-    log_base_2_rational_prec_round_valid, log_base_2_round_valid,
+    compound_prec_round_valid, div_prec_round_valid, div_rational_prec_round_valid,
+    div_rational_round_valid, div_round_valid, dot_prec_round_valid, dot_round_valid,
+    exp_prec_round_valid, exp_rational_prec_round_valid, exp_round_valid,
+    float_to_sci_options_valid, from_primitive_float_prec_round_valid, hypot_prec_round_valid,
+    hypot_round_valid, integer_rounding_from_float_valid, ln_1_plus_x_prec_round_valid,
+    ln_1_plus_x_round_valid, ln_prec_round_valid, ln_rational_prec_round_valid, ln_round_valid,
+    log_base_1_plus_x_prec_round_valid, log_base_1_plus_x_round_valid,
+    log_base_2_1_plus_x_prec_round_valid, log_base_2_1_plus_x_round_valid,
+    log_base_2_prec_round_valid, log_base_2_rational_prec_round_valid, log_base_2_round_valid,
     log_base_10_1_plus_x_prec_round_valid, log_base_10_1_plus_x_round_valid,
     log_base_10_prec_round_valid, log_base_10_rational_prec_round_valid, log_base_10_round_valid,
     log_base_float_base_1_plus_x_prec_round_valid, log_base_float_base_1_plus_x_round_valid,
@@ -12506,6 +12506,84 @@ pub fn special_random_float_signed_unsigned_rounding_mode_quadruple_gen_var_14(
             &random_rounding_modes,
         )
         .filter(|&(ref x, n, prec, rm)| root_s_prec_round_valid(x, n, prec, rm)),
+    )
+}
+
+pub fn special_random_float_signed_unsigned_rounding_mode_quadruple_gen_var_17(
+    config: &GenConfig,
+) -> It<(Float, i64, u64, RoundingMode)> {
+    Box::new(
+        random_quadruples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_signeds(
+                    seed,
+                    config.get_or("mean_small_n", 32),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(ref x, n, prec, rm)| compound_prec_round_valid(x, n, prec, rm)),
+    )
+}
+
+pub fn special_random_float_signed_unsigned_rounding_mode_quadruple_gen_var_18(
+    config: &GenConfig,
+) -> It<(Float, i64, u64, RoundingMode)> {
+    Box::new(
+        random_quadruples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_mixed_extreme_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_signeds(
+                    seed,
+                    config.get_or("mean_small_n", 32),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(ref x, n, prec, rm)| compound_prec_round_valid(x, n, prec, rm)),
     )
 }
 

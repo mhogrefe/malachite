@@ -157,10 +157,9 @@ pub mod compound;
 pub mod div;
 /// [`Exp`](malachite_base::num::arithmetic::traits::Exp) and
 /// [`ExpAssign`](malachite_base::num::arithmetic::traits::ExpAssign), traits for computing $e^x$
-/// for [`Float`](super::Float)s.
-/// Correctly-rounded dot products of [`Float`](super::Float) slices, with the products computed
-/// exactly and a single rounding at the end, so that intermediate overflow and underflow cannot
-/// occur.
+/// for [`Float`](super::Float)s. Correctly-rounded dot products of [`Float`](super::Float) slices,
+/// with the products computed exactly and a single rounding at the end, so that intermediate
+/// overflow and underflow cannot occur.
 pub mod dot;
 pub mod exp;
 /// [`ExpXMinus1`](malachite_base::num::arithmetic::traits::ExpXMinus1) and

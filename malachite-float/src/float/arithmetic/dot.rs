@@ -21,29 +21,27 @@ use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::float::sum::{FloatSumInput, sum_float_significands};
 
-/// Computes the dot product of two equal-length slices of primitive floats, with a single
-/// rounding.
+/// Computes the dot product of two equal-length slices of primitive floats, with a single rounding.
 ///
 /// The result is correctly rounded to the nearest value: the products are exact, the sum is
-/// computed as if in infinite precision, and only a single rounding is performed, at the end.
-/// This includes gradual underflow: results in the subnormal range are correctly rounded to their
+/// computed as if in infinite precision, and only a single rounding is performed, at the end. This
+/// includes gradual underflow: results in the subnormal range are correctly rounded to their
 /// reduced precisions. Intermediate overflow and underflow cannot occur.
 ///
 /// $$
 /// f((x_i)_ {i=0}^{n-1}, (y_i)_ {i=0}^{n-1}) = \sum_ {i=0}^{n-1} x_i y_i + \varepsilon.
 /// $$
-/// - If $\sum_ {i=0}^{n-1} x_i y_i$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored
-///   or assumed to be 0.
-/// - If $\sum_ {i=0}^{n-1} x_i y_i$ is finite and nonzero, then
-///   $|\varepsilon| \leq 2^{\lfloor\log_2 |\sum_ {i=0}^{n-1} x_i y_i|\rfloor-p}$, where $p$
-///   is the precision of the output (typically 24 if `T` is a [`f32`] and 53 if `T` is a
-///   [`f64`], but less if the output is subnormal).
+/// - If $\sum_ {i=0}^{n-1} x_i y_i$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or
+///   assumed to be 0.
+/// - If $\sum_ {i=0}^{n-1} x_i y_i$ is finite and nonzero, then $|\varepsilon| \leq
+///   2^{\lfloor\log_2 |\sum_ {i=0}^{n-1} x_i y_i|\rfloor-p}$, where $p$ is the precision of the
+///   output (typically 24 if `T` is a [`f32`] and 53 if `T` is a [`f64`], but less if the output is
+///   subnormal).
 ///
-/// See [`Float::dot_prec_round`] for a description of the special cases, which follow the rules
-/// of multiplication for each term and the rules of addition for their combination.
+/// See [`Float::dot_prec_round`] for a description of the special cases, which follow the rules of
+/// multiplication for each term and the rules of addition for their combination.
 ///
-/// If the result overflows, $\pm\infty$ is returned, and if it underflows, $\pm0.0$ is
-/// returned.
+/// If the result overflows, $\pm\infty$ is returned, and if it underflows, $\pm0.0$ is returned.
 ///
 /// # Worst-case complexity
 /// $T(n) = O(n)$
@@ -95,17 +93,17 @@ fn parts(f: &Float) -> (bool, i32, u64, &Natural) {
 impl Float {
     /// Computes the dot product of two equal-length slices of [`Float`]s, rounding the result to
     /// the specified precision and with the specified rounding mode. An [`Ordering`] is also
-    /// returned, indicating whether the rounded dot product is less than, equal to, or greater
-    /// than the exact dot product. Although `NaN`s are not comparable to any [`Float`], whenever
-    /// this function returns a `NaN` it also returns `Equal`.
+    /// returned, indicating whether the rounded dot product is less than, equal to, or greater than
+    /// the exact dot product. Although `NaN`s are not comparable to any [`Float`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
     ///
     /// The products are never rounded, and only a single rounding is performed, at the end: the
     /// result is the correctly-rounded exact dot product. Intermediate overflow and underflow
     /// cannot occur: each product is computed exactly at the significand level, with its exponent
     /// tracked over a range twice as wide as a [`Float`]'s, and only the final sum is subject to
-    /// the exponent range check. (MPFR's `mpfr_dot`, which is documented as experimental,
-    /// computes each product at full precision and requires those multiplications to be exact, so
-    /// it does not handle inputs whose products leave the exponent range.)
+    /// the exponent range check. (MPFR's `mpfr_dot`, which is documented as experimental, computes
+    /// each product at full precision and requires those multiplications to be exact, so it does
+    /// not handle inputs whose products leave the exponent range.)
     ///
     /// See [`RoundingMode`] for a description of the possible rounding modes.
     ///
@@ -113,8 +111,8 @@ impl Float {
     /// f((x_i)_ {i=0}^{n-1}, (y_i)_ {i=0}^{n-1}, p, m) = \sum_ {i=0}^{n-1} x_i y_i +
     /// \varepsilon.
     /// $$
-    /// - If $\sum_ {i=0}^{n-1} x_i y_i$ is infinite, zero, or `NaN`, $\varepsilon$ may be
-    ///   ignored or assumed to be 0.
+    /// - If $\sum_ {i=0}^{n-1} x_i y_i$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored
+    ///   or assumed to be 0.
     /// - If $\sum_ {i=0}^{n-1} x_i y_i$ is finite and nonzero, and $m$ is not `Nearest`, then
     ///   $|\varepsilon| < 2^{\lfloor\log_2 |\sum_ {i=0}^{n-1} x_i y_i|\rfloor-p+1}$.
     /// - If $\sum_ {i=0}^{n-1} x_i y_i$ is finite and nonzero, and $m$ is `Nearest`, then
@@ -129,37 +127,37 @@ impl Float {
     ///   infinity — the dot product is `NaN`.
     /// - If two infinite terms have different signs, the dot product is `NaN`. Otherwise, if any
     ///   term is infinite, the dot product is an infinity of that sign.
-    /// - If every term is a zero and all the terms have the same sign, the dot product is a zero
-    ///   of that sign. If they do not all have the same sign, the dot product is $0.0$, unless
-    ///   $m$ is `Floor`, in which case it is $-0.0$.
+    /// - If every term is a zero and all the terms have the same sign, the dot product is a zero of
+    ///   that sign. If they do not all have the same sign, the dot product is $0.0$, unless $m$ is
+    ///   `Floor`, in which case it is $-0.0$.
     /// - If some terms are nonzero but the exact dot product is zero, the dot product is $0.0$,
     ///   unless $m$ is `Floor`, in which case it is $-0.0$.
     ///
     /// Overflow and underflow:
-    /// - If $f((x_i)_ {i=0}^{n-1},(y_i)_ {i=0}^{n-1},p,m)\geq 2^{2^{30}-1}$ and $m$ is
-    ///   `Ceiling`, `Up`, or `Nearest`, $\infty$ is returned instead.
-    /// - If $f((x_i)_ {i=0}^{n-1},(y_i)_ {i=0}^{n-1},p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor`
-    ///   or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is returned instead.
+    /// - If $f((x_i)_ {i=0}^{n-1},(y_i)_ {i=0}^{n-1},p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`,
+    ///   `Up`, or `Nearest`, $\infty$ is returned instead.
+    /// - If $f((x_i)_ {i=0}^{n-1},(y_i)_ {i=0}^{n-1},p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or
+    ///   `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is returned instead.
     /// - If $f((x_i)_ {i=0}^{n-1},(y_i)_ {i=0}^{n-1},p,m)\leq -2^{2^{30}-1}$ and $m$ is `Floor`,
     ///   `Up`, or `Nearest`, $-\infty$ is returned instead.
-    /// - If $f((x_i)_ {i=0}^{n-1},(y_i)_ {i=0}^{n-1},p,m)\leq -2^{2^{30}-1}$ and $m$ is
-    ///   `Ceiling` or `Down`, $-(1-(1/2)^p)2^{2^{30}-1}$ is returned instead.
+    /// - If $f((x_i)_ {i=0}^{n-1},(y_i)_ {i=0}^{n-1},p,m)\leq -2^{2^{30}-1}$ and $m$ is `Ceiling`
+    ///   or `Down`, $-(1-(1/2)^p)2^{2^{30}-1}$ is returned instead.
     /// - If $0<f((x_i)_ {i=0}^{n-1},(y_i)_ {i=0}^{n-1},p,m)<2^{-2^{30}}$, and $m$ is `Floor` or
     ///   `Down`, $0.0$ is returned instead.
-    /// - If $0<f((x_i)_ {i=0}^{n-1},(y_i)_ {i=0}^{n-1},p,m)<2^{-2^{30}}$, and $m$ is `Ceiling`
-    ///   or `Up`, $2^{-2^{30}}$ is returned instead.
+    /// - If $0<f((x_i)_ {i=0}^{n-1},(y_i)_ {i=0}^{n-1},p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or
+    ///   `Up`, $2^{-2^{30}}$ is returned instead.
     /// - If $0<f((x_i)_ {i=0}^{n-1},(y_i)_ {i=0}^{n-1},p,m)\leq2^{-2^{30}-1}$, and $m$ is
     ///   `Nearest`, $0.0$ is returned instead.
     /// - If $2^{-2^{30}-1}<f((x_i)_ {i=0}^{n-1},(y_i)_ {i=0}^{n-1},p,m)<2^{-2^{30}}$, and $m$ is
     ///   `Nearest`, $2^{-2^{30}}$ is returned instead.
-    /// - If $-2^{-2^{30}}<f((x_i)_ {i=0}^{n-1},(y_i)_ {i=0}^{n-1},p,m)<0$, and $m$ is `Ceiling`
-    ///   or `Down`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f((x_i)_ {i=0}^{n-1},(y_i)_ {i=0}^{n-1},p,m)<0$, and $m$ is `Ceiling` or
+    ///   `Down`, $-0.0$ is returned instead.
     /// - If $-2^{-2^{30}}<f((x_i)_ {i=0}^{n-1},(y_i)_ {i=0}^{n-1},p,m)<0$, and $m$ is `Floor` or
     ///   `Up`, $-2^{-2^{30}}$ is returned instead.
     /// - If $-2^{-2^{30}-1}\leq f((x_i)_ {i=0}^{n-1},(y_i)_ {i=0}^{n-1},p,m)<0$, and $m$ is
     ///   `Nearest`, $-0.0$ is returned instead.
-    /// - If $-2^{-2^{30}}<f((x_i)_ {i=0}^{n-1},(y_i)_ {i=0}^{n-1},p,m)<-2^{-2^{30}-1}$, and $m$
-    ///   is `Nearest`, $-2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}}<f((x_i)_ {i=0}^{n-1},(y_i)_ {i=0}^{n-1},p,m)<-2^{-2^{30}-1}$, and $m$ is
+    ///   `Nearest`, $-2^{-2^{30}}$ is returned instead.
     ///
     /// If you know you'll be using `Nearest`, consider using [`Float::dot_prec`] instead. If you
     /// know that your target precision is the maximum of the precisions of the inputs, consider
@@ -172,13 +170,13 @@ impl Float {
     /// $M(n, m, p) = O(n + p + m \log m)$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `xs.len()`, $m$ is the sum of the
-    /// significant bits of the elements of `xs` and `ys`, and $p$ is `prec`: each term is an
-    /// exact significand product (mul-class in the pair's bits), and the terms then feed the
-    /// summation kernel, which inherits the summation bound.
+    /// significant bits of the elements of `xs` and `ys`, and $p$ is `prec`: each term is an exact
+    /// significand product (mul-class in the pair's bits), and the terms then feed the summation
+    /// kernel, which inherits the summation bound.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, if `xs` and `ys` have different lengths, or if `rm` is `Exact`
-    /// and the exact dot product is not exactly representable with `prec` bits.
+    /// Panics if `prec` is zero, if `xs` and `ys` have different lengths, or if `rm` is `Exact` and
+    /// the exact dot product is not exactly representable with `prec` bits.
     ///
     /// # Examples
     /// ```
@@ -211,12 +209,11 @@ impl Float {
         prec: u64,
         rm: RoundingMode,
     ) -> (Self, Ordering) {
-        // The dot product is correctly rounded: the products are never rounded, and only a
-        // single rounding is performed, at the end. Unlike MPFR's experimental `mpfr_dot`,
-        // intermediate overflow and underflow cannot occur: each product is computed exactly at
-        // the significand level, with its exponent tracked in an `i64` (twice the `Float`
-        // exponent range fits comfortably), and only the final sum is subject to the exponent
-        // range check.
+        // The dot product is correctly rounded: the products are never rounded, and only a single
+        // rounding is performed, at the end. Unlike MPFR's experimental `mpfr_dot`, intermediate
+        // overflow and underflow cannot occur: each product is computed exactly at the significand
+        // level, with its exponent tracked in an `i64` (twice the `Float` exponent range fits
+        // comfortably), and only the final sum is subject to the exponent range check.
         //
         // The `Exact` rounding mode is handled by computing with `Nearest` and panicking if the
         // result is inexact.
@@ -233,8 +230,8 @@ impl Float {
             return xs[0].mul_prec_round_ref_ref(&ys[0], prec, rm);
         }
         // Classify each term x * y according to the multiplication rules, then combine the terms
-        // according to the addition rules, determining the sign of an infinite result, the sign
-        // of an all-zero result, and the regular terms.
+        // according to the addition rules, determining the sign of an infinite result, the sign of
+        // an all-zero result, and the regular terms.
         let mut sign_inf = 0i8;
         let mut sign_zero = 0i8;
         let mut regulars: Vec<(&Self, &Self)> = Vec::new();
@@ -308,9 +305,9 @@ impl Float {
         };
         // Compute each product exactly at the significand level. A Float's significand is stored
         // limb-aligned with its top bit set, and its value is significand * 2^(exponent - 64 *
-        // len); the product of two such significands has its top bit either exactly at the
-        // combined width (in which case the product is already aligned) or one position below it
-        // (in which case a shift by 1 restores the alignment and the exponent decreases by 1).
+        // len); the product of two such significands has its top bit either exactly at the combined
+        // width (in which case the product is already aligned) or one position below it (in which
+        // case a shift by 1 restores the alignment and the exponent decreases by 1).
         let terms: Vec<(bool, i64, u64, Natural)> = regulars
             .iter()
             .map(|&(x, y)| {
@@ -349,8 +346,8 @@ impl Float {
     /// Computes the dot product of two equal-length slices of [`Float`]s, rounding the result to
     /// the nearest value of the specified precision. An [`Ordering`] is also returned, indicating
     /// whether the rounded dot product is less than, equal to, or greater than the exact dot
-    /// product. Although `NaN`s are not comparable to any [`Float`], whenever this function
-    /// returns a `NaN` it also returns `Equal`.
+    /// product. Although `NaN`s are not comparable to any [`Float`], whenever this function returns
+    /// a `NaN` it also returns `Equal`.
     ///
     /// The products are never rounded, and only a single rounding is performed, at the end: the
     /// result is the correctly-rounded exact dot product, and intermediate overflow and underflow
@@ -363,10 +360,10 @@ impl Float {
     /// $$
     /// f((x_i)_ {i=0}^{n-1}, (y_i)_ {i=0}^{n-1}, p) = \sum_ {i=0}^{n-1} x_i y_i + \varepsilon.
     /// $$
-    /// - If $\sum_ {i=0}^{n-1} x_i y_i$ is infinite, zero, or `NaN`, $\varepsilon$ may be
-    ///   ignored or assumed to be 0.
-    /// - If $\sum_ {i=0}^{n-1} x_i y_i$ is finite and nonzero, then
-    ///   $|\varepsilon| \leq 2^{\lfloor\log_2 |\sum_ {i=0}^{n-1} x_i y_i|\rfloor-p}$.
+    /// - If $\sum_ {i=0}^{n-1} x_i y_i$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored
+    ///   or assumed to be 0.
+    /// - If $\sum_ {i=0}^{n-1} x_i y_i$ is finite and nonzero, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |\sum_ {i=0}^{n-1} x_i y_i|\rfloor-p}$.
     ///
     /// If the output has a precision, it is `prec`.
     ///
@@ -408,12 +405,12 @@ impl Float {
         Self::dot_prec_round(xs, ys, prec, Nearest)
     }
 
-    /// Computes the dot product of two equal-length slices of [`Float`]s, rounding the result
-    /// with the specified rounding mode. The precision of the result is the maximum of the
-    /// precisions of the inputs (or 1 if there are no inputs). An [`Ordering`] is also returned,
-    /// indicating whether the rounded dot product is less than, equal to, or greater than the
-    /// exact dot product. Although `NaN`s are not comparable to any [`Float`], whenever this
-    /// function returns a `NaN` it also returns `Equal`.
+    /// Computes the dot product of two equal-length slices of [`Float`]s, rounding the result with
+    /// the specified rounding mode. The precision of the result is the maximum of the precisions of
+    /// the inputs (or 1 if there are no inputs). An [`Ordering`] is also returned, indicating
+    /// whether the rounded dot product is less than, equal to, or greater than the exact dot
+    /// product. Although `NaN`s are not comparable to any [`Float`], whenever this function returns
+    /// a `NaN` it also returns `Equal`.
     ///
     /// The products are never rounded, and only a single rounding is performed, at the end: the
     /// result is the correctly-rounded exact dot product, and intermediate overflow and underflow
@@ -424,14 +421,14 @@ impl Float {
     /// $$
     /// f((x_i)_ {i=0}^{n-1}, (y_i)_ {i=0}^{n-1}, m) = \sum_ {i=0}^{n-1} x_i y_i + \varepsilon.
     /// $$
-    /// - If $\sum_ {i=0}^{n-1} x_i y_i$ is infinite, zero, or `NaN`, $\varepsilon$ may be
-    ///   ignored or assumed to be 0.
+    /// - If $\sum_ {i=0}^{n-1} x_i y_i$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored
+    ///   or assumed to be 0.
     /// - If $\sum_ {i=0}^{n-1} x_i y_i$ is finite and nonzero, and $m$ is not `Nearest`, then
-    ///   $|\varepsilon| < 2^{\lfloor\log_2 |\sum_ {i=0}^{n-1} x_i y_i|\rfloor-p+1}$, where $p$
-    ///   is the maximum precision of the inputs.
+    ///   $|\varepsilon| < 2^{\lfloor\log_2 |\sum_ {i=0}^{n-1} x_i y_i|\rfloor-p+1}$, where $p$ is
+    ///   the maximum precision of the inputs.
     /// - If $\sum_ {i=0}^{n-1} x_i y_i$ is finite and nonzero, and $m$ is `Nearest`, then
-    ///   $|\varepsilon| \leq 2^{\lfloor\log_2 |\sum_ {i=0}^{n-1} x_i y_i|\rfloor-p}$, where
-    ///   $p$ is the maximum precision of the inputs.
+    ///   $|\varepsilon| \leq 2^{\lfloor\log_2 |\sum_ {i=0}^{n-1} x_i y_i|\rfloor-p}$, where $p$ is
+    ///   the maximum precision of the inputs.
     ///
     /// See [`Float::dot_prec_round`] for a description of the special cases and of overflow and
     /// underflow behavior.
@@ -475,8 +472,8 @@ impl Float {
     }
 
     /// Computes the dot product of two equal-length slices of [`Float`]s. The precision of the
-    /// result is the maximum of the precisions of the inputs (or 1 if there are no inputs), and
-    /// the dot product is rounded to nearest.
+    /// result is the maximum of the precisions of the inputs (or 1 if there are no inputs), and the
+    /// dot product is rounded to nearest.
     ///
     /// The products are never rounded, and only a single rounding is performed, at the end: the
     /// result is the correctly-rounded exact dot product, and intermediate overflow and underflow
@@ -485,11 +482,11 @@ impl Float {
     /// $$
     /// f((x_i)_ {i=0}^{n-1}, (y_i)_ {i=0}^{n-1}) = \sum_ {i=0}^{n-1} x_i y_i + \varepsilon.
     /// $$
-    /// - If $\sum_ {i=0}^{n-1} x_i y_i$ is infinite, zero, or `NaN`, $\varepsilon$ may be
-    ///   ignored or assumed to be 0.
-    /// - If $\sum_ {i=0}^{n-1} x_i y_i$ is finite and nonzero, then
-    ///   $|\varepsilon| \leq 2^{\lfloor\log_2 |\sum_ {i=0}^{n-1} x_i y_i|\rfloor-p}$, where $p$
-    ///   is the maximum precision of the inputs.
+    /// - If $\sum_ {i=0}^{n-1} x_i y_i$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored
+    ///   or assumed to be 0.
+    /// - If $\sum_ {i=0}^{n-1} x_i y_i$ is finite and nonzero, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |\sum_ {i=0}^{n-1} x_i y_i|\rfloor-p}$, where $p$ is the maximum
+    ///   precision of the inputs.
     ///
     /// See [`Float::dot_prec_round`] for a description of the special cases and of overflow and
     /// underflow behavior.

@@ -103,18 +103,17 @@ impl Float {
     /// the IEEE 754 `nextUp` operation and MPFR's `mpfr_nextabove`, except that this function
     /// panics on NaN, infinities, and zeros rather than handling them.
     ///
-    /// For most values this adds one ulp (see [`Float::ulp`]). If the [`Float`] is positive and
-    /// is the largest [`Float`] in its binade with its precision, then
+    /// For most values this adds one ulp (see [`Float::ulp`]). If the [`Float`] is positive and is
+    /// the largest [`Float`] in its binade with its precision, then
     /// - If its exponent is not the maximum exponent, it will become the power of 2 at the bottom
     ///   of the next-higher binade (still a step of one ulp);
     /// - If its exponent is the maximum exponent, it will become $\infty$.
     ///
     /// If the [`Float`] is negative and is closer to zero than any other [`Float`] in its binade
     /// with its precision (that is, its significand is a power of 2), then
-    /// - If its exponent is not the minimum exponent, it will move half an ulp toward zero, to
-    ///   the largest-magnitude [`Float`] in the next-lower binade with its precision (at
-    ///   precision 1 the next power of 2, at higher precisions the value with an all-ones
-    ///   significand);
+    /// - If its exponent is not the minimum exponent, it will move half an ulp toward zero, to the
+    ///   largest-magnitude [`Float`] in the next-lower binade with its precision (at precision 1
+    ///   the next power of 2, at higher precisions the value with an all-ones significand);
     /// - If its exponent is the minimum exponent, it will become negative zero.
     ///
     /// # Worst-case complexity
@@ -182,9 +181,9 @@ impl Float {
                 ulp,
             );
             if significand.limb_count() > limb_count {
-                // The value was the largest in its binade with its precision, so stepping up
-                // lands on the power of 2 at the bottom of the next-higher binade, which is
-                // representable with the same precision.
+                // The value was the largest in its binade with its precision, so stepping up lands
+                // on the power of 2 at the bottom of the next-higher binade, which is representable
+                // with the same precision.
                 if *exponent == Self::MAX_EXPONENT {
                     *self = Self::INFINITY;
                     return;
@@ -203,15 +202,15 @@ impl Float {
     ///
     /// For most values this subtracts one ulp (see [`Float::ulp`]). If the [`Float`] is negative
     /// and is the largest-magnitude [`Float`] in its binade with its precision, then
-    /// - If its exponent is not the maximum exponent, it will become the negative power of 2 at
-    ///   the bottom of the next-higher binade (still a step of one ulp);
+    /// - If its exponent is not the maximum exponent, it will become the negative power of 2 at the
+    ///   bottom of the next-higher binade (still a step of one ulp);
     /// - If its exponent is the maximum exponent, it will become $-\infty$.
     ///
-    /// If the [`Float`] is positive and is smaller than any other [`Float`] in its binade with
-    /// its precision (that is, its significand is a power of 2), then
-    /// - If its exponent is not the minimum exponent, it will move half an ulp toward zero, to
-    ///   the largest [`Float`] in the next-lower binade with its precision (at precision 1 the
-    ///   next power of 2, at higher precisions the value with an all-ones significand);
+    /// If the [`Float`] is positive and is smaller than any other [`Float`] in its binade with its
+    /// precision (that is, its significand is a power of 2), then
+    /// - If its exponent is not the minimum exponent, it will move half an ulp toward zero, to the
+    ///   largest [`Float`] in the next-lower binade with its precision (at precision 1 the next
+    ///   power of 2, at higher precisions the value with an all-ones significand);
     /// - If its exponent is the minimum exponent, it will become positive zero.
     ///
     /// # Worst-case complexity
@@ -291,9 +290,9 @@ impl Float {
                 }
             } else if significand.significant_bits() < bits {
                 // The value was a power of 2 with precision greater than 1, so stepping down
-                // crosses into the next-lower binade, where the closest value is half an ulp
-                // away and has an all-ones significand with the same precision — unless the
-                // lower binade is out of range.
+                // crosses into the next-lower binade, where the closest value is half an ulp away
+                // and has an all-ones significand with the same precision — unless the lower
+                // binade is out of range.
                 if *exponent == Self::MIN_EXPONENT {
                     *self = Self::ZERO;
                     return;

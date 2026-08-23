@@ -30,9 +30,9 @@ use malachite_nz::natural::arithmetic::float::sum::{
     FloatSumInput, FloatSumResult, sum_float_significands,
 };
 
-// Update the sticky sign of an all-zero result with a new zero term of sign `s` (1 or -1): if
-// all the zeros seen so far have the same sign, the result keeps that sign; otherwise the sign
-// of the zero result depends only on the rounding mode.
+// Update the sticky sign of an all-zero result with a new zero term of sign `s` (1 or -1): if all
+// the zeros seen so far have the same sign, the result keeps that sign; otherwise the sign of the
+// zero result depends only on the rounding mode.
 pub(crate) fn update_zero_sign(sign_zero: &mut i8, s: i8, rm: RoundingMode) {
     if *sign_zero == 0 {
         *sign_zero = s;
@@ -472,32 +472,28 @@ impl Float {
 /// $$
 /// - If $\sum_ {i=0}^{n-1} x_i$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or
 ///   assumed to be 0.
-/// - If $\sum_ {i=0}^{n-1} x_i$ is finite and nonzero, then
-///   $|\varepsilon| \leq 2^{\lfloor\log_2 |\sum_ {i=0}^{n-1} x_i|\rfloor-p}$, where $p$ is the
-///   precision of the output (typically 24 if `T` is a [`f32`] and 53 if `T` is a [`f64`], but
-///   less if the output is subnormal).
+/// - If $\sum_ {i=0}^{n-1} x_i$ is finite and nonzero, then $|\varepsilon| \leq 2^{\lfloor\log_2
+///   |\sum_ {i=0}^{n-1} x_i|\rfloor-p}$, where $p$ is the precision of the output (typically 24 if
+///   `T` is a [`f32`] and 53 if `T` is a [`f64`], but less if the output is subnormal).
 ///
 /// Special cases:
 /// - The sum of no floats is $0.0$.
-/// - If any input is `NaN`, or if the inputs include both $\infty$ and $-\infty$, the sum is
-///   `NaN`.
-/// - Otherwise, if any input is $\infty$, the sum is $\infty$, and if any input is $-\infty$,
-///   the sum is $-\infty$.
+/// - If any input is `NaN`, or if the inputs include both $\infty$ and $-\infty$, the sum is `NaN`.
+/// - Otherwise, if any input is $\infty$, the sum is $\infty$, and if any input is $-\infty$, the
+///   sum is $-\infty$.
 /// - If every input is a zero and all of them have the same sign, the sum is a zero of that sign.
 ///   If they do not all have the same sign, or if the inputs include a nonzero value but sum to
 ///   zero exactly, the sum is $0.0$.
 ///
-/// If the result overflows, $\pm\infty$ is returned, and if it underflows, $\pm0.0$ is
-/// returned.
+/// If the result overflows, $\pm\infty$ is returned, and if it underflows, $\pm0.0$ is returned.
 ///
 /// # Worst-case complexity
 /// $T(n) = O(n)$
 ///
 /// $M(n) = O(n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`: a primitive float's
-/// exponent range is bounded, so the summation window is repositioned only a constant number of
-/// times.
+/// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`: a primitive float's exponent
+/// range is bounded, so the summation window is repositioned only a constant number of times.
 ///
 /// # Examples
 /// ```

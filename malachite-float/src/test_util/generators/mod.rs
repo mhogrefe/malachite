@@ -5962,6 +5962,54 @@ pub fn float_signed_unsigned_rounding_mode_quadruple_gen_var_14()
     )
 }
 
+// All `(Float, i64, u64, RoundingMode)` that are valid inputs to `Float::compound_prec_round`.
+pub fn float_signed_unsigned_rounding_mode_quadruple_gen_var_17()
+-> Generator<(Float, i64, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_signed_unsigned_rounding_mode_quadruple_gen_var_17,
+        &random_float_signed_unsigned_rounding_mode_quadruple_gen_var_17,
+        &special_random_float_signed_unsigned_rounding_mode_quadruple_gen_var_17,
+    )
+}
+
+// As `..._var_17`, but the tuples are paired with their rug equivalents, `Exact` is excluded, and
+// the `i64` is restricted to values that fit in an `i32` (the type rug's `compound_i` takes).
+pub fn float_signed_unsigned_rounding_mode_quadruple_gen_var_17_rm() -> Generator<(
+    (rug::Float, i64, u64, rug::float::Round),
+    (Float, i64, u64, RoundingMode),
+)> {
+    Generator::new(
+        &|| {
+            float_t_u_rounding_mode_quadruple_rm(Box::new(
+                exhaustive_float_signed_unsigned_rounding_mode_quadruple_gen_var_17()
+                    .filter(|&(_, n, _, _)| i32::convertible_from(n)),
+            ))
+        },
+        &|config| {
+            float_t_u_rounding_mode_quadruple_rm(Box::new(
+                random_float_signed_unsigned_rounding_mode_quadruple_gen_var_17(config)
+                    .filter(|&(_, n, _, _)| i32::convertible_from(n)),
+            ))
+        },
+        &|config| {
+            float_t_u_rounding_mode_quadruple_rm(Box::new(
+                special_random_float_signed_unsigned_rounding_mode_quadruple_gen_var_17(config)
+                    .filter(|&(_, n, _, _)| i32::convertible_from(n)),
+            ))
+        },
+    )
+}
+
+// As `..._var_17`, but the `Float` may have an extreme exponent.
+pub fn float_signed_unsigned_rounding_mode_quadruple_gen_var_18()
+-> Generator<(Float, i64, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_signed_unsigned_rounding_mode_quadruple_gen_var_18,
+        &random_float_signed_unsigned_rounding_mode_quadruple_gen_var_18,
+        &special_random_float_signed_unsigned_rounding_mode_quadruple_gen_var_18,
+    )
+}
+
 // All `(Rational, u64, u64, RoundingMode)` that are valid inputs to
 // `Float::root_u_rational_prec_round`.
 pub fn rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_3()
