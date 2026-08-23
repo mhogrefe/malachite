@@ -6,12 +6,16 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::apply_fn_to_primitive_floats;
 use malachite_base::num::arithmetic::traits::{NegAssign, PowerOf2};
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{One, Zero};
-use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
+use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
+use malachite_float::float::arithmetic::dot::primitive_float_dot;
 use malachite_float::test_util::common::{
     parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
 };
@@ -23,7 +27,7 @@ use malachite_float::test_util::generators::{
     float_vec_pair_rounding_mode_triple_gen_var_1, float_vec_pair_rounding_mode_triple_gen_var_2,
     float_vec_pair_unsigned_rounding_mode_quadruple_gen_var_1,
     float_vec_pair_unsigned_rounding_mode_quadruple_gen_var_2,
-    float_vec_pair_unsigned_triple_gen_var_1,
+    float_vec_pair_unsigned_triple_gen_var_1, primitive_float_vec_pair_gen_var_1,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_q::Rational;
@@ -836,4 +840,65 @@ fn dot_properties() {
     };
     float_vec_pair_gen_var_1().test_properties(|(xs, ys)| helper(xs, ys));
     float_vec_pair_gen_var_2().test_properties(|(xs, ys)| helper(xs, ys));
+}
+
+#[test]
+#[allow(clippy::type_repetition_in_bounds)]
+fn test_primitive_float_dot() {
+    fn test<T: PrimitiveFloat>(xs: &[T], ys: &[T], out: T)
+    where
+        Float: From<T> + PartialOrd<T>,
+        for<'a> T: ExactFrom<&'a Float>,
+    {
+        assert_eq!(NiceFloat(primitive_float_dot(xs, ys)), NiceFloat(out));
+    }
+    test::<f64>(&[], &[], 0.0);
+    test::<f64>(&[f64::NAN], &[1.0], f64::NAN);
+    test::<f64>(&[f64::INFINITY], &[0.0], f64::NAN);
+    test::<f64>(&[1.0, 2.0, 3.0], &[4.0, 5.0, 6.0], 32.0);
+    // intermediate overflow does not occur
+    test::<f64>(&[1.0e300, 1.0e300], &[1.0e300, -1.0e300], 0.0);
+    // a tie on the subnormal grid rounds to even
+    test::<f64>(
+        &[2.0f64.powi(-537), 2.0f64.powi(-537)],
+        &[2.0f64.powi(-537), 2.0f64.powi(-538)],
+        1.0e-323,
+    );
+    // double rounding is avoided: the exact value is just below the tie, so the result rounds
+    // down, even though the 54-bit intermediate rounds to the tie
+    test::<f64>(
+        &[2.0f64.powi(-537), 2.0f64.powi(-537), -2.0f64.powi(-587)],
+        &[2.0f64.powi(-537), 2.0f64.powi(-538), 2.0f64.powi(-588)],
+        5.0e-324,
+    );
+    test::<f32>(&[1.0, 2.0, 3.0], &[4.0, 5.0, 6.0], 32.0);
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn primitive_float_dot_properties_helper<T: PrimitiveFloat>()
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+    T: RoundingFrom<Rational>,
+    Rational: ExactFrom<T>,
+{
+    primitive_float_vec_pair_gen_var_1::<T>().test_properties(|(xs, ys)| {
+        let dot = primitive_float_dot(&xs, &ys);
+        if xs.iter().chain(ys.iter()).all(|x| x.is_finite()) {
+            let exact: Rational = xs
+                .iter()
+                .zip(ys.iter())
+                .map(|(&x, &y)| Rational::exact_from(x) * Rational::exact_from(y))
+                .sum();
+            if exact != 0u32 {
+                let (dot_alt, _) = T::rounding_from(exact, Nearest);
+                assert_eq!(NiceFloat(dot_alt), NiceFloat(dot));
+            }
+        }
+    });
+}
+
+#[test]
+fn primitive_float_dot_properties() {
+    apply_fn_to_primitive_floats!(primitive_float_dot_properties_helper);
 }

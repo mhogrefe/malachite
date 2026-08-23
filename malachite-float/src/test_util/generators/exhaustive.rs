@@ -1219,6 +1219,19 @@ pub fn exhaustive_float_vec_rounding_mode_pair_gen_var_2() -> It<(Vec<Float>, Ro
     )
 }
 
+pub fn exhaustive_primitive_float_vec_gen_var_1<T: PrimitiveFloat>() -> It<Vec<T>> {
+    Box::new(exhaustive_vecs(exhaustive_primitive_floats()))
+}
+
+pub fn exhaustive_primitive_float_vec_pair_gen_var_1<T: PrimitiveFloat>() -> It<(Vec<T>, Vec<T>)> {
+    Box::new(
+        exhaustive_vecs(exhaustive_pairs_from_single(
+            exhaustive_primitive_floats::<T>(),
+        ))
+        .map(|ps| ps.into_iter().unzip()),
+    )
+}
+
 pub fn dot_prec_round_valid(xs: &[Float], ys: &[Float], prec: u64, rm: RoundingMode) -> bool {
     rm != Exact || Float::dot_prec_round(xs, ys, prec, Floor).1 == Equal
 }

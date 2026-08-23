@@ -7,12 +7,16 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::iter::Product;
+use malachite_base::apply_fn_to_primitive_floats;
 use malachite_base::num::arithmetic::traits::{NegAssign, PowerOf2};
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{Infinity, NegativeInfinity, One, Zero};
-use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
+use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
+use malachite_float::float::arithmetic::product::primitive_float_product;
 use malachite_float::test_util::common::{parse_hex_string, to_hex_string};
 use malachite_float::test_util::float::arithmetic::product::{
     naive_product, naive_product_prec, naive_product_prec_round, naive_product_round,
@@ -21,7 +25,7 @@ use malachite_float::test_util::generators::{
     float_vec_gen, float_vec_gen_var_1, float_vec_rounding_mode_pair_gen_var_3,
     float_vec_rounding_mode_pair_gen_var_4, float_vec_unsigned_pair_gen_var_1,
     float_vec_unsigned_rounding_mode_triple_gen_var_3,
-    float_vec_unsigned_rounding_mode_triple_gen_var_4,
+    float_vec_unsigned_rounding_mode_triple_gen_var_4, primitive_float_vec_gen_var_1,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_q::Rational;
@@ -1234,4 +1238,59 @@ fn product_properties() {
     };
     float_vec_gen().test_properties(helper);
     float_vec_gen_var_1().test_properties(helper);
+}
+
+#[test]
+#[allow(clippy::type_repetition_in_bounds)]
+fn test_primitive_float_product() {
+    fn test<T: PrimitiveFloat>(xs: &[T], out: T)
+    where
+        Float: From<T> + PartialOrd<T>,
+        for<'a> T: ExactFrom<&'a Float>,
+    {
+        assert_eq!(NiceFloat(primitive_float_product(xs)), NiceFloat(out));
+    }
+    test::<f64>(&[], 1.0);
+    test::<f64>(&[f64::NAN, 1.0], f64::NAN);
+    test::<f64>(&[f64::INFINITY, 0.0], f64::NAN);
+    test::<f64>(&[f64::INFINITY, -2.0], f64::NEGATIVE_INFINITY);
+    test::<f64>(&[0.0, -2.0, 3.0], -0.0);
+    test::<f64>(&[3.0, 5.0, 7.0], 105.0);
+    // intermediate underflow does not occur
+    test::<f64>(
+        &[1.0e-200, 1.0e-200, 1.0e300, 1.0e300],
+        1.0000000000000001e200,
+    );
+    // gradual underflow into the subnormal range
+    test::<f64>(&[2.0f64.powi(-537), 2.0f64.powi(-537)], 5.0e-324);
+    test::<f64>(&[3.0, 2.0f64.powi(-537), 2.0f64.powi(-538)], 1.0e-323);
+    // half the smallest subnormal ties to even, which is zero
+    test::<f64>(&[2.0f64.powi(-538), 2.0f64.powi(-537)], 0.0);
+    test::<f32>(&[3.0, 5.0, 7.0], 105.0);
+    test::<f32>(&[f32::MAX_FINITE, 2.0], f32::INFINITY);
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn primitive_float_product_properties_helper<T: PrimitiveFloat>()
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+    T: RoundingFrom<Rational>,
+    Rational: ExactFrom<T>,
+{
+    primitive_float_vec_gen_var_1::<T>().test_properties(|xs| {
+        let product = primitive_float_product(&xs);
+        if xs.iter().all(|x| x.is_finite()) {
+            let exact = Rational::product(xs.iter().map(|&x| Rational::exact_from(x)));
+            if exact != 0u32 {
+                let (product_alt, _) = T::rounding_from(exact, Nearest);
+                assert_eq!(NiceFloat(product_alt), NiceFloat(product));
+            }
+        }
+    });
+}
+
+#[test]
+fn primitive_float_product_properties() {
+    apply_fn_to_primitive_floats!(primitive_float_product_properties_helper);
 }

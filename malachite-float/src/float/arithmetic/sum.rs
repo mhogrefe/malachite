@@ -13,6 +13,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
+use crate::emulate_float_slice_to_float_fn;
 use crate::float::{MAX_EXPONENT_I64, MIN_EXPONENT_I64};
 use crate::{
     Float, float_infinity, float_nan, float_negative_infinity, float_negative_zero, float_zero,
@@ -21,6 +22,7 @@ use alloc::vec::Vec;
 use core::cmp::Ordering::{self, *};
 use core::iter::Sum;
 use malachite_base::num::arithmetic::traits::ShlRoundAssign;
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
@@ -456,6 +458,70 @@ impl Float {
     pub fn sum_round(xs: &[Self], rm: RoundingMode) -> (Self, Ordering) {
         Self::sum_prec_round(xs, max_prec(xs.iter()), rm)
     }
+}
+
+/// Computes the sum of a slice of primitive floats, with a single rounding.
+///
+/// The result is correctly rounded to the nearest value: the sum is computed as if in infinite
+/// precision and rounded only once, at the end, no matter how many inputs there are. This includes
+/// gradual underflow: results in the subnormal range are correctly rounded to their reduced
+/// precisions.
+///
+/// $$
+/// f((x_i)_ {i=0}^{n-1}) = \sum_ {i=0}^{n-1} x_i + \varepsilon.
+/// $$
+/// - If $\sum_ {i=0}^{n-1} x_i$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or
+///   assumed to be 0.
+/// - If $\sum_ {i=0}^{n-1} x_i$ is finite and nonzero, then
+///   $|\varepsilon| \leq 2^{\lfloor\log_2 |\sum_ {i=0}^{n-1} x_i|\rfloor-p}$, where $p$ is the
+///   precision of the output (typically 24 if `T` is a [`f32`] and 53 if `T` is a [`f64`], but
+///   less if the output is subnormal).
+///
+/// Special cases:
+/// - The sum of no floats is $0.0$.
+/// - If any input is `NaN`, or if the inputs include both $\infty$ and $-\infty$, the sum is
+///   `NaN`.
+/// - Otherwise, if any input is $\infty$, the sum is $\infty$, and if any input is $-\infty$,
+///   the sum is $-\infty$.
+/// - If every input is a zero and all of them have the same sign, the sum is a zero of that sign.
+///   If they do not all have the same sign, or if the inputs include a nonzero value but sum to
+///   zero exactly, the sum is $0.0$.
+///
+/// If the result overflows, $\pm\infty$ is returned, and if it underflows, $\pm0.0$ is
+/// returned.
+///
+/// # Worst-case complexity
+/// $T(n) = O(n)$
+///
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`: a primitive float's
+/// exponent range is bounded, so the summation window is repositioned only a constant number of
+/// times.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::sum::primitive_float_sum;
+///
+/// // Each addition of 0.1 in a naive fold rounds, but here only one rounding is performed.
+/// assert_eq!(
+///     NiceFloat(primitive_float_sum(&[0.1f64; 10])),
+///     NiceFloat(1.0)
+/// );
+/// assert_eq!(
+///     NiceFloat([0.1f64; 10].iter().sum::<f64>()),
+///     NiceFloat(0.9999999999999999)
+/// );
+/// ```
+#[allow(clippy::type_repetition_in_bounds)]
+#[inline]
+pub fn primitive_float_sum<T: PrimitiveFloat>(xs: &[T]) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    emulate_float_slice_to_float_fn(Float::sum_prec, xs)
 }
 
 impl Sum<Self> for Float {

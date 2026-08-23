@@ -7,10 +7,14 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::iter::Sum;
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::float::NiceFloat;
+use malachite_base::test_util::bench::bucketers::vec_len_bucketer;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
+use malachite_float::float::arithmetic::sum::primitive_float_sum;
 use malachite_float::test_util::bench::bucketers::{
     pair_2_triple_1_vec_float_sum_complexity_bucketer, pair_2_vec_float_sum_complexity_bucketer,
     triple_1_vec_float_sum_complexity_bucketer, vec_float_sum_complexity_bucketer,
@@ -21,7 +25,7 @@ use malachite_float::test_util::generators::{
     float_vec_rounding_mode_pair_gen_var_2, float_vec_unsigned_pair_gen_var_1,
     float_vec_unsigned_rounding_mode_triple_gen_var_1,
     float_vec_unsigned_rounding_mode_triple_gen_var_1_rm,
-    float_vec_unsigned_rounding_mode_triple_gen_var_2,
+    float_vec_unsigned_rounding_mode_triple_gen_var_2, primitive_float_vec_gen_var_1,
 };
 use malachite_float::{ComparableFloat, Float};
 use malachite_q::Rational;
@@ -43,11 +47,13 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_sum_prec_round_debug);
     register_demo!(runner, demo_float_sum_prec_round_extreme);
     register_demo!(runner, demo_float_sum_prec_round_extreme_debug);
+    register_primitive_float_demos!(runner, demo_primitive_float_sum);
 
     register_bench!(runner, benchmark_float_sum_evaluation_strategy);
     register_bench!(runner, benchmark_float_sum_library_comparison);
     register_bench!(runner, benchmark_float_sum_prec_round_library_comparison);
     register_bench!(runner, benchmark_float_sum_prec_round_algorithms);
+    register_primitive_float_benches!(runner, benchmark_primitive_float_sum);
 }
 
 fn demo_float_sum(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -348,5 +354,47 @@ fn benchmark_float_sum_prec_round_algorithms(
                 }
             }),
         ],
+    );
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn demo_primitive_float_sum<T: PrimitiveFloat>(gm: GenMode, config: &GenConfig, limit: usize)
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    for xs in primitive_float_vec_gen_var_1::<T>()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "primitive_float_sum({:?}) = {}",
+            xs.iter().copied().map(NiceFloat).collect::<Vec<_>>(),
+            NiceFloat(primitive_float_sum(&xs))
+        );
+    }
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn benchmark_primitive_float_sum<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    run_benchmark(
+        &format!("primitive_float_sum(&[{}])", T::NAME),
+        BenchmarkType::Single,
+        primitive_float_vec_gen_var_1::<T>().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &vec_len_bucketer(),
+        &mut [("malachite", &mut |xs| {
+            no_out!(primitive_float_sum(&xs));
+        })],
     );
 }

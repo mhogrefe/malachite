@@ -247,6 +247,44 @@ where
 
 #[allow(clippy::type_repetition_in_bounds)]
 #[doc(hidden)]
+pub fn emulate_float_slice_to_float_fn<
+    T: PrimitiveFloat,
+    F: Fn(&[Float], u64) -> (Float, Ordering),
+>(
+    f: F,
+    xs: &[T],
+) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    let xs: alloc::vec::Vec<Float> = xs.iter().map(|&x| Float::from(x)).collect();
+    let (result, o) = f(&xs, T::MANTISSA_WIDTH + 1);
+    emulate_finish(result, o)
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+#[doc(hidden)]
+pub fn emulate_float_slice_float_slice_to_float_fn<
+    T: PrimitiveFloat,
+    F: Fn(&[Float], &[Float], u64) -> (Float, Ordering),
+>(
+    f: F,
+    xs: &[T],
+    ys: &[T],
+) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    let xs: alloc::vec::Vec<Float> = xs.iter().map(|&x| Float::from(x)).collect();
+    let ys: alloc::vec::Vec<Float> = ys.iter().map(|&y| Float::from(y)).collect();
+    let (result, o) = f(&xs, &ys, T::MANTISSA_WIDTH + 1);
+    emulate_finish(result, o)
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+#[doc(hidden)]
 pub fn emulate_float_to_float_and_i64_fn<
     T: PrimitiveFloat,
     F: Fn(Float, u64) -> (Float, Ordering, i64),

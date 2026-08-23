@@ -1629,6 +1629,49 @@ pub fn random_float_vec_gen_var_1(config: &GenConfig) -> It<Vec<Float>> {
     ))
 }
 
+pub fn random_primitive_float_vec_gen_var_1<T: PrimitiveFloat>(config: &GenConfig) -> It<Vec<T>> {
+    Box::new(random_vecs(
+        EXAMPLE_SEED,
+        &|seed| {
+            special_random_primitive_floats(
+                seed,
+                config.get_or("exponent_mean_n", 8),
+                config.get_or("exponent_mean_d", 1),
+                config.get_or("precision_mean_n", 8),
+                config.get_or("precision_mean_d", 1),
+                config.get_or("special_p_mean_n", 1),
+                config.get_or("special_p_mean_d", 64),
+            )
+        },
+        config.get_or("mean_len_n", 4),
+        config.get_or("mean_len_d", 1),
+    ))
+}
+
+pub fn random_primitive_float_vec_pair_gen_var_1<T: PrimitiveFloat>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>)> {
+    Box::new(
+        random_vecs(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_pairs_from_single(special_random_primitive_floats::<T>(
+                    seed,
+                    config.get_or("exponent_mean_n", 8),
+                    config.get_or("exponent_mean_d", 1),
+                    config.get_or("precision_mean_n", 8),
+                    config.get_or("precision_mean_d", 1),
+                    config.get_or("special_p_mean_n", 1),
+                    config.get_or("special_p_mean_d", 64),
+                ))
+            },
+            config.get_or("mean_len_n", 4),
+            config.get_or("mean_len_d", 1),
+        )
+        .map(|ps| ps.into_iter().unzip()),
+    )
+}
+
 fn random_float_vec_pairs(seed: Seed, config: &GenConfig) -> It<(Vec<Float>, Vec<Float>)> {
     Box::new(
         random_vecs(

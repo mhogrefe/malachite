@@ -7,16 +7,75 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
+use crate::emulate_float_slice_float_slice_to_float_fn;
 use crate::float::arithmetic::sum::{complete_sum_result, max_prec, update_zero_sign};
 use crate::{
     Float, float_infinity, float_nan, float_negative_infinity, float_negative_zero, float_zero,
 };
 use alloc::vec::Vec;
 use core::cmp::Ordering::{self, *};
+use malachite_base::num::basic::floats::PrimitiveFloat;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::float::sum::{FloatSumInput, sum_float_significands};
+
+/// Computes the dot product of two equal-length slices of primitive floats, with a single
+/// rounding.
+///
+/// The result is correctly rounded to the nearest value: the products are exact, the sum is
+/// computed as if in infinite precision, and only a single rounding is performed, at the end.
+/// This includes gradual underflow: results in the subnormal range are correctly rounded to their
+/// reduced precisions. Intermediate overflow and underflow cannot occur.
+///
+/// $$
+/// f((x_i)_ {i=0}^{n-1}, (y_i)_ {i=0}^{n-1}) = \sum_ {i=0}^{n-1} x_i y_i + \varepsilon.
+/// $$
+/// - If $\sum_ {i=0}^{n-1} x_i y_i$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored
+///   or assumed to be 0.
+/// - If $\sum_ {i=0}^{n-1} x_i y_i$ is finite and nonzero, then
+///   $|\varepsilon| \leq 2^{\lfloor\log_2 |\sum_ {i=0}^{n-1} x_i y_i|\rfloor-p}$, where $p$
+///   is the precision of the output (typically 24 if `T` is a [`f32`] and 53 if `T` is a
+///   [`f64`], but less if the output is subnormal).
+///
+/// See [`Float::dot_prec_round`] for a description of the special cases, which follow the rules
+/// of multiplication for each term and the rules of addition for their combination.
+///
+/// If the result overflows, $\pm\infty$ is returned, and if it underflows, $\pm0.0$ is
+/// returned.
+///
+/// # Worst-case complexity
+/// $T(n) = O(n)$
+///
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`: the products are
+/// constant-size, and a primitive float's exponent range is bounded, so the summation window is
+/// repositioned only a constant number of times.
+///
+/// # Panics
+/// Panics if `xs` and `ys` have different lengths.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::dot::primitive_float_dot;
+///
+/// // A naive fold overflows on the first product; the correctly-rounded dot product does not.
+/// let xs = [1.0e300f64, 1.0e300];
+/// let ys = [1.0e300f64, -1.0e300];
+/// assert_eq!(NiceFloat(primitive_float_dot(&xs, &ys)), NiceFloat(0.0));
+/// ```
+#[allow(clippy::type_repetition_in_bounds)]
+#[inline]
+pub fn primitive_float_dot<T: PrimitiveFloat>(xs: &[T], ys: &[T]) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    emulate_float_slice_float_slice_to_float_fn(Float::dot_prec, xs, ys)
+}
 
 // A Float's finite fields: the sign, the exponent, the precision, and a reference to the
 // significand.

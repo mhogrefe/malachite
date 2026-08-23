@@ -843,6 +843,28 @@ pub fn float_vec_unsigned_rounding_mode_triple_gen_var_4()
     )
 }
 
+// -- Vec<PrimitiveFloat> --
+
+// All `Vec<T>`s where `T` is a primitive float.
+pub fn primitive_float_vec_gen_var_1<T: PrimitiveFloat>() -> Generator<Vec<T>> {
+    Generator::new(
+        &exhaustive_primitive_float_vec_gen_var_1,
+        &random_primitive_float_vec_gen_var_1,
+        &special_random_primitive_float_vec_gen_var_1,
+    )
+}
+
+// -- (Vec<PrimitiveFloat>, Vec<PrimitiveFloat>) --
+
+// All pairs of `Vec<T>`s with equal lengths, where `T` is a primitive float.
+pub fn primitive_float_vec_pair_gen_var_1<T: PrimitiveFloat>() -> Generator<(Vec<T>, Vec<T>)> {
+    Generator::new(
+        &exhaustive_primitive_float_vec_pair_gen_var_1,
+        &random_primitive_float_vec_pair_gen_var_1,
+        &special_random_primitive_float_vec_pair_gen_var_1,
+    )
+}
+
 // -- (Vec<Float>, Vec<Float>) --
 
 // All pairs of `Vec<Float>`s with equal lengths.

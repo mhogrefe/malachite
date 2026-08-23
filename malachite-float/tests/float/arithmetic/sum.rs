@@ -7,11 +7,15 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::iter::Sum;
+use malachite_base::apply_fn_to_primitive_floats;
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{Infinity, NegativeInfinity, Zero};
-use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
+use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
+use malachite_float::float::arithmetic::sum::primitive_float_sum;
 use malachite_float::test_util::common::{
     parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
 };
@@ -23,7 +27,7 @@ use malachite_float::test_util::generators::{
     float_vec_gen, float_vec_gen_var_1, float_vec_rounding_mode_pair_gen_var_1,
     float_vec_rounding_mode_pair_gen_var_2, float_vec_unsigned_pair_gen_var_1,
     float_vec_unsigned_rounding_mode_triple_gen_var_1,
-    float_vec_unsigned_rounding_mode_triple_gen_var_2,
+    float_vec_unsigned_rounding_mode_triple_gen_var_2, primitive_float_vec_gen_var_1,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_q::Rational;
@@ -1104,4 +1108,58 @@ fn sum_properties_helper(xs: Vec<Float>) {
 fn sum_properties() {
     float_vec_gen().test_properties(sum_properties_helper);
     float_vec_gen_var_1().test_properties(sum_properties_helper);
+}
+
+#[test]
+#[allow(clippy::type_repetition_in_bounds)]
+fn test_primitive_float_sum() {
+    fn test<T: PrimitiveFloat>(xs: &[T], out: T)
+    where
+        Float: From<T> + PartialOrd<T>,
+        for<'a> T: ExactFrom<&'a Float>,
+    {
+        assert_eq!(NiceFloat(primitive_float_sum(xs)), NiceFloat(out));
+    }
+    test::<f64>(&[], 0.0);
+    test::<f64>(&[f64::NAN, 1.0], f64::NAN);
+    test::<f64>(&[f64::INFINITY, f64::NEGATIVE_INFINITY], f64::NAN);
+    test::<f64>(&[f64::INFINITY, 1.0], f64::INFINITY);
+    test::<f64>(&[-0.0, -0.0], -0.0);
+    test::<f64>(&[-0.0, 0.0], 0.0);
+    test::<f64>(&[1.0, -1.0], 0.0);
+    // only a single rounding is performed
+    test::<f64>(&[0.1; 10], 1.0);
+    // the overflow boundary: max + ulp/2 ties to infinity, and anything less rounds back
+    test::<f64>(&[f64::MAX_FINITE, 2.0f64.powi(970)], f64::INFINITY);
+    test::<f64>(&[f64::MAX_FINITE, 2.0f64.powi(969)], f64::MAX_FINITE);
+    test::<f64>(&[f64::MAX_FINITE, f64::MAX_FINITE], f64::INFINITY);
+    // sums of subnormals are exact on the subnormal grid
+    test::<f64>(&[5e-324, 5e-324], 1.0e-323);
+    test::<f32>(&[0.1; 10], 1.0);
+    test::<f32>(&[f32::MAX_FINITE, f32::MAX_FINITE], f32::INFINITY);
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn primitive_float_sum_properties_helper<T: PrimitiveFloat>()
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+    T: RoundingFrom<Rational>,
+    Rational: ExactFrom<T>,
+{
+    primitive_float_vec_gen_var_1::<T>().test_properties(|xs| {
+        let sum = primitive_float_sum(&xs);
+        if xs.iter().all(|x| x.is_finite()) {
+            let exact: Rational = xs.iter().map(|&x| Rational::exact_from(x)).sum();
+            if exact != 0u32 {
+                let (sum_alt, _) = T::rounding_from(exact, Nearest);
+                assert_eq!(NiceFloat(sum_alt), NiceFloat(sum));
+            }
+        }
+    });
+}
+
+#[test]
+fn primitive_float_sum_properties() {
+    apply_fn_to_primitive_floats!(primitive_float_sum_properties_helper);
 }

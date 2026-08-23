@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
+use crate::emulate_float_slice_to_float_fn;
 use crate::float::arithmetic::sum::max_prec;
 use crate::{
     Float, float_infinity, float_nan, float_negative_infinity, float_negative_zero, float_zero,
@@ -17,6 +18,7 @@ use core::iter::Product;
 use malachite_base::num::arithmetic::traits::{
     CeilingLogBase2, NegAssign, PowerOf2, ShlRoundAssign, ShrRound,
 };
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{NotAssign, SignificantBits};
@@ -500,6 +502,67 @@ impl Float {
     pub fn product_round(xs: &[Self], rm: RoundingMode) -> (Self, Ordering) {
         Self::product_prec_round(xs, max_prec(xs.iter()), rm)
     }
+}
+
+/// Computes the product of a slice of primitive floats, with a single rounding.
+///
+/// The result is correctly rounded to the nearest value: the product is computed as if in
+/// infinite precision and rounded only once, at the end, no matter how many inputs there are.
+/// This includes gradual underflow: results in the subnormal range are correctly rounded to their
+/// reduced precisions. Intermediate overflow and underflow cannot occur.
+///
+/// $$
+/// f((x_i)_ {i=0}^{n-1}) = \prod_ {i=0}^{n-1} x_i + \varepsilon.
+/// $$
+/// - If $\prod_ {i=0}^{n-1} x_i$ is infinite, zero, or `NaN`, $\varepsilon$ may be ignored or
+///   assumed to be 0.
+/// - If $\prod_ {i=0}^{n-1} x_i$ is finite and nonzero, then
+///   $|\varepsilon| \leq 2^{\lfloor\log_2 |\prod_ {i=0}^{n-1} x_i|\rfloor-p}$, where $p$ is
+///   the precision of the output (typically 24 if `T` is a [`f32`] and 53 if `T` is a [`f64`],
+///   but less if the output is subnormal).
+///
+/// Special cases:
+/// - The product of no floats is $1.0$.
+/// - If any input is `NaN`, or if the inputs include both a zero and an infinity, the product is
+///   `NaN`.
+/// - Otherwise, if any input is infinite, the product is infinite; and if any input is a zero,
+///   the product is a zero. In both cases, as for a regular product, the sign is negative if and
+///   only if an odd number of the inputs are negative, negative zeros and negative infinities
+///   included.
+///
+/// If the result overflows, $\pm\infty$ is returned, and if it underflows, $\pm0.0$ is
+/// returned.
+///
+/// # Worst-case complexity
+/// $T(n) = O(n^2 \log n \log\log n)$
+///
+/// $M(n) = O(n \log n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`: for adversarially
+/// boundary-hugging products the working precision grows to the total input size, though typical
+/// inputs are handled in linear time.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::product::primitive_float_product;
+///
+/// // A naive fold underflows to zero and stays there; the correctly-rounded product does not.
+/// let xs = [1.0e-200f64, 1.0e-200, 1.0e300, 1.0e300];
+/// assert_eq!(
+///     NiceFloat(primitive_float_product(&xs)),
+///     NiceFloat(1.0000000000000001e200)
+/// );
+/// assert_eq!(NiceFloat(xs.iter().product::<f64>()), NiceFloat(0.0));
+/// ```
+#[allow(clippy::type_repetition_in_bounds)]
+#[inline]
+pub fn primitive_float_product<T: PrimitiveFloat>(xs: &[T]) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    emulate_float_slice_to_float_fn(Float::product_prec, xs)
 }
 
 impl Product<Self> for Float {

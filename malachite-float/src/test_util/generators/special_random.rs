@@ -1589,6 +1589,31 @@ pub fn special_random_float_float_unsigned_rounding_mode_quadruple_gen_var_10(
     )
 }
 
+pub fn special_random_primitive_float_vec_gen_var_1<T: PrimitiveFloat>(
+    _config: &GenConfig,
+) -> It<Vec<T>> {
+    Box::new(random_vecs(
+        EXAMPLE_SEED,
+        &|seed| random_primitive_floats(seed),
+        4,
+        1,
+    ))
+}
+
+pub fn special_random_primitive_float_vec_pair_gen_var_1<T: PrimitiveFloat>(
+    _config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>)> {
+    Box::new(
+        random_vecs(
+            EXAMPLE_SEED,
+            &|seed| random_pairs_from_single(random_primitive_floats::<T>(seed)),
+            4,
+            1,
+        )
+        .map(|ps| ps.into_iter().unzip()),
+    )
+}
+
 fn striped_float_vec_pairs(seed: Seed, config: &GenConfig) -> It<(Vec<Float>, Vec<Float>)> {
     Box::new(
         random_vecs(

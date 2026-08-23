@@ -6,10 +6,14 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::float::NiceFloat;
+use malachite_base::test_util::bench::bucketers::pair_1_vec_len_bucketer;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
+use malachite_float::float::arithmetic::dot::primitive_float_dot;
 use malachite_float::test_util::bench::bucketers::{
     pair_2_vec_pair_float_sum_complexity_bucketer, quadruple_1_2_vec_float_sum_complexity_bucketer,
 };
@@ -19,7 +23,7 @@ use malachite_float::test_util::generators::{
     float_vec_pair_rounding_mode_triple_gen_var_1, float_vec_pair_rounding_mode_triple_gen_var_2,
     float_vec_pair_unsigned_rounding_mode_quadruple_gen_var_1,
     float_vec_pair_unsigned_rounding_mode_quadruple_gen_var_2,
-    float_vec_pair_unsigned_triple_gen_var_1,
+    float_vec_pair_unsigned_triple_gen_var_1, primitive_float_vec_pair_gen_var_1,
 };
 use malachite_float::{ComparableFloat, Float};
 use malachite_q::Rational;
@@ -39,9 +43,11 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_dot_prec_round_debug);
     register_demo!(runner, demo_float_dot_prec_round_extreme);
     register_demo!(runner, demo_float_dot_prec_round_extreme_debug);
+    register_primitive_float_demos!(runner, demo_primitive_float_dot);
 
     register_bench!(runner, benchmark_float_dot_library_comparison);
     register_bench!(runner, benchmark_float_dot_prec_round_algorithms);
+    register_primitive_float_benches!(runner, benchmark_primitive_float_dot);
 }
 
 fn debug_vec(xs: &[Float]) -> Vec<ComparableFloat> {
@@ -275,5 +281,48 @@ fn benchmark_float_dot_prec_round_algorithms(
                 }
             }),
         ],
+    );
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn demo_primitive_float_dot<T: PrimitiveFloat>(gm: GenMode, config: &GenConfig, limit: usize)
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    for (xs, ys) in primitive_float_vec_pair_gen_var_1::<T>()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "primitive_float_dot({:?}, {:?}) = {}",
+            xs.iter().copied().map(NiceFloat).collect::<Vec<_>>(),
+            ys.iter().copied().map(NiceFloat).collect::<Vec<_>>(),
+            NiceFloat(primitive_float_dot(&xs, &ys))
+        );
+    }
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn benchmark_primitive_float_dot<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    run_benchmark(
+        &format!("primitive_float_dot(&[{}], &[{}])", T::NAME, T::NAME),
+        BenchmarkType::Single,
+        primitive_float_vec_pair_gen_var_1::<T>().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_1_vec_len_bucketer("xs"),
+        &mut [("malachite", &mut |(xs, ys)| {
+            no_out!(primitive_float_dot(&xs, &ys));
+        })],
     );
 }
