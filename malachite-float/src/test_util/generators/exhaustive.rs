@@ -1219,6 +1219,102 @@ pub fn exhaustive_float_vec_rounding_mode_pair_gen_var_2() -> It<(Vec<Float>, Ro
     )
 }
 
+pub fn dot_prec_round_valid(xs: &[Float], ys: &[Float], prec: u64, rm: RoundingMode) -> bool {
+    rm != Exact || Float::dot_prec_round(xs, ys, prec, Floor).1 == Equal
+}
+
+pub(crate) fn dot_round_valid(xs: &[Float], ys: &[Float], rm: RoundingMode) -> bool {
+    rm != Exact || {
+        let prec = xs
+            .iter()
+            .chain(ys.iter())
+            .map(SignificantBits::significant_bits)
+            .max()
+            .unwrap_or(1);
+        Float::dot_prec_round(xs, ys, prec, Floor).1 == Equal
+    }
+}
+
+fn unzip_float_vec_pairs(ps: It<Vec<(Float, Float)>>) -> It<(Vec<Float>, Vec<Float>)> {
+    Box::new(ps.map(|ps| ps.into_iter().unzip()))
+}
+
+pub fn exhaustive_float_vec_pair_gen_var_1() -> It<(Vec<Float>, Vec<Float>)> {
+    unzip_float_vec_pairs(Box::new(exhaustive_vecs(exhaustive_pairs_from_single(
+        exhaustive_floats(),
+    ))))
+}
+
+pub fn exhaustive_float_vec_pair_gen_var_2() -> It<(Vec<Float>, Vec<Float>)> {
+    unzip_float_vec_pairs(Box::new(exhaustive_vecs(exhaustive_pairs_from_single(
+        exhaustive_mixed_extreme_floats(),
+    ))))
+}
+
+pub fn exhaustive_float_vec_pair_unsigned_triple_gen_var_1() -> It<(Vec<Float>, Vec<Float>, u64)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_float_vec_pair_gen_var_1(),
+            exhaustive_positive_primitive_ints::<u64>(),
+        )
+        .map(|((xs, ys), prec)| (xs, ys, prec)),
+    )
+}
+
+pub fn exhaustive_float_vec_pair_unsigned_rounding_mode_quadruple_gen_var_1()
+-> It<(Vec<Float>, Vec<Float>, u64, RoundingMode)> {
+    Box::new(
+        lex_pairs(
+            exhaustive_pairs(
+                exhaustive_float_vec_pair_gen_var_1(),
+                exhaustive_positive_primitive_ints::<u64>(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .map(|(((xs, ys), prec), rm)| (xs, ys, prec, rm))
+        .filter(|(xs, ys, prec, rm)| dot_prec_round_valid(xs, ys, *prec, *rm)),
+    )
+}
+
+pub fn exhaustive_float_vec_pair_unsigned_rounding_mode_quadruple_gen_var_2()
+-> It<(Vec<Float>, Vec<Float>, u64, RoundingMode)> {
+    Box::new(
+        lex_pairs(
+            exhaustive_pairs(
+                exhaustive_float_vec_pair_gen_var_2(),
+                exhaustive_positive_primitive_ints::<u64>(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .map(|(((xs, ys), prec), rm)| (xs, ys, prec, rm))
+        .filter(|(xs, ys, prec, rm)| dot_prec_round_valid(xs, ys, *prec, *rm)),
+    )
+}
+
+pub fn exhaustive_float_vec_pair_rounding_mode_triple_gen_var_1()
+-> It<(Vec<Float>, Vec<Float>, RoundingMode)> {
+    Box::new(
+        lex_pairs(
+            exhaustive_float_vec_pair_gen_var_1(),
+            exhaustive_rounding_modes(),
+        )
+        .map(|((xs, ys), rm)| (xs, ys, rm))
+        .filter(|(xs, ys, rm)| dot_round_valid(xs, ys, *rm)),
+    )
+}
+
+pub fn exhaustive_float_vec_pair_rounding_mode_triple_gen_var_2()
+-> It<(Vec<Float>, Vec<Float>, RoundingMode)> {
+    Box::new(
+        lex_pairs(
+            exhaustive_float_vec_pair_gen_var_2(),
+            exhaustive_rounding_modes(),
+        )
+        .map(|((xs, ys), rm)| (xs, ys, rm))
+        .filter(|(xs, ys, rm)| dot_round_valid(xs, ys, *rm)),
+    )
+}
+
 pub fn product_prec_round_valid(xs: &[Float], prec: u64, rm: RoundingMode) -> bool {
     rm != Exact || Float::product_prec_round(xs, prec, Floor).1 == Equal
 }

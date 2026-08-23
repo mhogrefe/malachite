@@ -70,6 +70,7 @@ pub mod float {
         pub mod average;
         pub mod cbrt;
         pub mod div;
+        pub mod dot;
         pub mod exp;
         pub mod exp_x_minus_1;
         pub mod factorial;

@@ -698,6 +698,20 @@ pub fn float_vec_rm(xs: It<Vec<Float>>) -> It<(Vec<rug::Float>, Vec<Float>)> {
     Box::new(xs.map(|xs| (xs.iter().map(rug::Float::exact_from).collect(), xs)))
 }
 
+pub fn float_vec_pair_rm(
+    ps: It<(Vec<Float>, Vec<Float>)>,
+) -> It<((Vec<rug::Float>, Vec<rug::Float>), (Vec<Float>, Vec<Float>))> {
+    Box::new(ps.map(|(xs, ys)| {
+        (
+            (
+                xs.iter().map(rug::Float::exact_from).collect(),
+                ys.iter().map(rug::Float::exact_from).collect(),
+            ),
+            (xs, ys),
+        )
+    }))
+}
+
 pub fn float_vec_anything_rounding_mode_triple_rm<T: Clone + 'static>(
     xs: It<(Vec<Float>, T, RoundingMode)>,
 ) -> It<(

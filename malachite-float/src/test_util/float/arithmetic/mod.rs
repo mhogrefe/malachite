@@ -10,6 +10,7 @@ pub mod add;
 pub mod add_mul;
 pub mod agm;
 pub mod div;
+pub mod dot;
 pub mod exp;
 pub mod exp_x_minus_1;
 pub mod factorial;

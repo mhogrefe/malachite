@@ -16,6 +16,7 @@ pub(crate) fn register(runner: &mut Runner) {
     average::register(runner);
     cbrt::register(runner);
     div::register(runner);
+    dot::register(runner);
     exp::register(runner);
     exp_x_minus_1::register(runner);
     hypot::register(runner);
@@ -69,6 +70,7 @@ mod agm;
 mod average;
 mod cbrt;
 mod div;
+mod dot;
 mod exp;
 mod exp_x_minus_1;
 mod hypot;

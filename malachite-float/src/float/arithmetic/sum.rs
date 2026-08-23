@@ -28,6 +28,17 @@ use malachite_nz::natural::arithmetic::float::sum::{
     FloatSumInput, FloatSumResult, sum_float_significands,
 };
 
+// Update the sticky sign of an all-zero result with a new zero term of sign `s` (1 or -1): if
+// all the zeros seen so far have the same sign, the result keeps that sign; otherwise the sign
+// of the zero result depends only on the rounding mode.
+pub(crate) fn update_zero_sign(sign_zero: &mut i8, s: i8, rm: RoundingMode) {
+    if *sign_zero == 0 {
+        *sign_zero = s;
+    } else if *sign_zero != s {
+        *sign_zero = if rm == Floor { -1 } else { 1 };
+    }
+}
+
 // This is mpfr_sum from sum.c, MPFR 4.2.2, split into the singular scan below and the
 // significand-level sum_aux in malachite-nz. The `Exact` rounding mode is handled by computing with
 // `Nearest` and panicking if the result is inexact.
@@ -65,24 +76,13 @@ fn sum_prec_round_helper(xs: &[&Float], prec: u64, rm: RoundingMode) -> (Float, 
             }
             float_zero!() => {
                 if regulars.is_empty() {
-                    // Track the sign of the zero result when all inputs are zeros: if all zeros
-                    // have the same sign, the result will have this sign, otherwise the sign of the
-                    // zero result depends only on the rounding mode. (This choice is sticky when
-                    // new zeros are considered.)
-                    if sign_zero == 0 {
-                        sign_zero = 1;
-                    } else if sign_zero < 0 {
-                        sign_zero = if rm == Floor { -1 } else { 1 };
-                    }
+                    // This choice is sticky when new zeros are considered.
+                    update_zero_sign(&mut sign_zero, 1, rm);
                 }
             }
             float_negative_zero!() => {
                 if regulars.is_empty() {
-                    if sign_zero == 0 {
-                        sign_zero = -1;
-                    } else if sign_zero > 0 {
-                        sign_zero = if rm == Floor { -1 } else { 1 };
-                    }
+                    update_zero_sign(&mut sign_zero, -1, rm);
                 }
             }
             _ => regulars.push(x),
@@ -140,7 +140,26 @@ fn sum_prec_round_helper(xs: &[&Float], prec: u64, rm: RoundingMode) -> (Float, 
             }
         })
         .collect();
-    match sum_float_significands(&inputs, prec, kernel_rm) {
+    complete_sum_result(
+        sum_float_significands(&inputs, prec, kernel_rm),
+        prec,
+        rm,
+        exact,
+        "Inexact Float sum",
+    )
+}
+
+// Convert a summation-kernel result into a `Float`, applying the cancellation-zero sign rule and
+// the exponent range check. `exact_message` is the panic message demanded when the caller's
+// rounding mode was `Exact` (indicated by `exact`) but the result is inexact.
+pub(crate) fn complete_sum_result(
+    result: FloatSumResult,
+    prec: u64,
+    rm: RoundingMode,
+    exact: bool,
+    exact_message: &str,
+) -> (Float, Ordering) {
+    match result {
         FloatSumResult::Zero => {
             // The exact sum of nonzero values is zero, which is +0 except in the Floor rounding
             // mode, as specified according to the IEEE 754 rules for the addition of two numbers.
@@ -157,7 +176,7 @@ fn sum_prec_round_helper(xs: &[&Float], prec: u64, rm: RoundingMode) -> (Float, 
             o,
         } => {
             if exact {
-                assert_eq!(o, Equal, "Inexact Float sum");
+                assert_eq!(o, Equal, "{exact_message}");
             }
             if (MIN_EXPONENT_I64..=MAX_EXPONENT_I64).contains(&exp) {
                 (
@@ -173,7 +192,7 @@ fn sum_prec_round_helper(xs: &[&Float], prec: u64, rm: RoundingMode) -> (Float, 
                 // The exponent is out of range; construct the value at a safe exponent and use a
                 // saturating shift to apply the overflow or underflow rules, in the same
                 // round-then-check-range order as MPFR.
-                assert!(!exact, "Inexact Float sum");
+                assert!(!exact, "{exact_message}");
                 let mut f = Float(Finite {
                     sign,
                     exponent: 1,

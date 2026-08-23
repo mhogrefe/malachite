@@ -31,13 +31,14 @@ use crate::test_util::generators::exhaustive::{
     add_rational_round_valid, add_round_valid, agm_prec_round_valid, agm_rational_prec_round_valid,
     agm_round_valid, average_prec_round_valid, cbrt_prec_round_valid, cbrt_round_valid,
     div_prec_round_valid, div_rational_prec_round_valid, div_rational_round_valid, div_round_valid,
-    exp_prec_round_valid, exp_rational_prec_round_valid, exp_round_valid,
-    float_to_sci_options_valid, from_primitive_float_prec_round_valid, hypot_prec_round_valid,
-    hypot_round_valid, integer_rounding_from_float_valid, ln_1_plus_x_prec_round_valid,
-    ln_1_plus_x_round_valid, ln_prec_round_valid, ln_rational_prec_round_valid, ln_round_valid,
-    log_base_1_plus_x_prec_round_valid, log_base_1_plus_x_round_valid,
-    log_base_2_1_plus_x_prec_round_valid, log_base_2_1_plus_x_round_valid,
-    log_base_2_prec_round_valid, log_base_2_rational_prec_round_valid, log_base_2_round_valid,
+    dot_prec_round_valid, dot_round_valid, exp_prec_round_valid, exp_rational_prec_round_valid,
+    exp_round_valid, float_to_sci_options_valid, from_primitive_float_prec_round_valid,
+    hypot_prec_round_valid, hypot_round_valid, integer_rounding_from_float_valid,
+    ln_1_plus_x_prec_round_valid, ln_1_plus_x_round_valid, ln_prec_round_valid,
+    ln_rational_prec_round_valid, ln_round_valid, log_base_1_plus_x_prec_round_valid,
+    log_base_1_plus_x_round_valid, log_base_2_1_plus_x_prec_round_valid,
+    log_base_2_1_plus_x_round_valid, log_base_2_prec_round_valid,
+    log_base_2_rational_prec_round_valid, log_base_2_round_valid,
     log_base_10_1_plus_x_prec_round_valid, log_base_10_1_plus_x_round_valid,
     log_base_10_prec_round_valid, log_base_10_rational_prec_round_valid, log_base_10_round_valid,
     log_base_float_base_1_plus_x_prec_round_valid, log_base_float_base_1_plus_x_round_valid,
@@ -1626,6 +1627,150 @@ pub fn random_float_vec_gen_var_1(config: &GenConfig) -> It<Vec<Float>> {
         config.get_or("mean_len_n", 4),
         config.get_or("mean_len_d", 1),
     ))
+}
+
+fn random_float_vec_pairs(seed: Seed, config: &GenConfig) -> It<(Vec<Float>, Vec<Float>)> {
+    Box::new(
+        random_vecs(
+            seed,
+            &|seed_2| {
+                random_pairs_from_single(random_floats(
+                    seed_2,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                ))
+            },
+            config.get_or("mean_len_n", 4),
+            config.get_or("mean_len_d", 1),
+        )
+        .map(|ps| ps.into_iter().unzip()),
+    )
+}
+
+fn random_mixed_extreme_float_vec_pairs(
+    seed: Seed,
+    config: &GenConfig,
+) -> It<(Vec<Float>, Vec<Float>)> {
+    Box::new(
+        random_vecs(
+            seed,
+            &|seed_2| {
+                random_pairs_from_single(random_mixed_extreme_floats(
+                    seed_2,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                ))
+            },
+            config.get_or("mean_len_n", 4),
+            config.get_or("mean_len_d", 1),
+        )
+        .map(|ps| ps.into_iter().unzip()),
+    )
+}
+
+pub fn random_float_vec_pair_gen_var_1(config: &GenConfig) -> It<(Vec<Float>, Vec<Float>)> {
+    random_float_vec_pairs(EXAMPLE_SEED, config)
+}
+
+pub fn random_float_vec_pair_gen_var_2(config: &GenConfig) -> It<(Vec<Float>, Vec<Float>)> {
+    random_mixed_extreme_float_vec_pairs(EXAMPLE_SEED, config)
+}
+
+pub fn random_float_vec_pair_unsigned_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(Vec<Float>, Vec<Float>, u64)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| random_float_vec_pairs(seed, config),
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .map(|((xs, ys), prec)| (xs, ys, prec)),
+    )
+}
+
+pub fn random_float_vec_pair_unsigned_rounding_mode_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(Vec<Float>, Vec<Float>, u64, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| random_float_vec_pairs(seed, config),
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .map(|((xs, ys), prec, rm)| (xs, ys, prec, rm))
+        .filter(|(xs, ys, prec, rm)| dot_prec_round_valid(xs, ys, *prec, *rm)),
+    )
+}
+
+pub fn random_float_vec_pair_unsigned_rounding_mode_quadruple_gen_var_2(
+    config: &GenConfig,
+) -> It<(Vec<Float>, Vec<Float>, u64, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| random_mixed_extreme_float_vec_pairs(seed, config),
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .map(|((xs, ys), prec, rm)| (xs, ys, prec, rm))
+        .filter(|(xs, ys, prec, rm)| dot_prec_round_valid(xs, ys, *prec, *rm)),
+    )
+}
+
+pub fn random_float_vec_pair_rounding_mode_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(Vec<Float>, Vec<Float>, RoundingMode)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| random_float_vec_pairs(seed, config),
+            &random_rounding_modes,
+        )
+        .map(|((xs, ys), rm)| (xs, ys, rm))
+        .filter(|(xs, ys, rm)| dot_round_valid(xs, ys, *rm)),
+    )
+}
+
+pub fn random_float_vec_pair_rounding_mode_triple_gen_var_2(
+    config: &GenConfig,
+) -> It<(Vec<Float>, Vec<Float>, RoundingMode)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| random_mixed_extreme_float_vec_pairs(seed, config),
+            &random_rounding_modes,
+        )
+        .map(|((xs, ys), rm)| (xs, ys, rm))
+        .filter(|(xs, ys, rm)| dot_round_valid(xs, ys, *rm)),
+    )
 }
 
 fn random_float_vecs(seed: Seed, config: &GenConfig) -> It<Vec<Float>> {
