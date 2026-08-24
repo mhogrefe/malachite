@@ -9,6 +9,7 @@
 use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
+    catalans_constant::register(runner);
     cbrt_2::register(runner);
     champernowne_constant::register(runner);
     copeland_erdos_constant::register(runner);
@@ -49,6 +50,7 @@ pub(crate) fn register(runner: &mut Runner) {
     two_over_sqrt_pi::register(runner);
 }
 
+mod catalans_constant;
 mod cbrt_2;
 mod champernowne_constant;
 mod copeland_erdos_constant;

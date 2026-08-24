@@ -163,6 +163,7 @@ pub mod float {
         pub mod partial_eq_rational;
     }
     pub mod constants {
+        pub mod catalans_constant;
         pub mod cbrt_2;
         pub mod champernowne_constant;
         pub mod copeland_erdos_constant;

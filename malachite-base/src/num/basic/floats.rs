@@ -16,12 +16,13 @@ use crate::num::arithmetic::traits::{
     SqrtAssign, Square, SquareAssign, SubMul, SubMulAssign,
 };
 use crate::num::basic::traits::{
-    ChampernowneConstant, CopelandErdosConstant, GaussConstant, GelfondSchneiderConstant,
-    GelfondsConstant, Infinity, LemniscateConstant, LiouvillesConstant, Ln2, Ln10, Log2E, Log10E,
-    Log102, Log210, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, OneHalf, OneOverPi,
-    OneOverSqrtPi, OneOverSqrtTau, Phi, Pi, PiOver2, PiOver3, PiOver4, PiOver6, PiOver8,
-    PrimeConstant, ProuhetThueMorseConstant, RamanujansConstant, Sqrt2, Sqrt2Over2, Sqrt3,
-    Sqrt3Over3, Sqrt5, Sqrt5Over5, SqrtPi, Tau, Two, TwoOverPi, TwoOverSqrtPi, Zero,
+    CatalansConstant, ChampernowneConstant, CopelandErdosConstant, GaussConstant,
+    GelfondSchneiderConstant, GelfondsConstant, Infinity, LemniscateConstant, LiouvillesConstant,
+    Ln2, Ln10, Log2E, Log10E, Log102, Log210, NaN, NegativeInfinity, NegativeOne, NegativeZero,
+    One, OneHalf, OneOverPi, OneOverSqrtPi, OneOverSqrtTau, Phi, Pi, PiOver2, PiOver3, PiOver4,
+    PiOver6, PiOver8, PrimeConstant, ProuhetThueMorseConstant, RamanujansConstant, Sqrt2,
+    Sqrt2Over2, Sqrt3, Sqrt3Over3, Sqrt5, Sqrt5Over5, SqrtPi, Tau, Two, TwoOverPi, TwoOverSqrtPi,
+    Zero,
 };
 use crate::num::comparison::traits::{EqAbs, PartialOrdAbs};
 use crate::num::conversion::traits::{
@@ -151,6 +152,7 @@ pub trait PrimitiveFloat:
     + IsPowerOf2
     + LemniscateConstant
     + LiouvillesConstant
+    + CatalansConstant
     + ChampernowneConstant
     + CopelandErdosConstant
     + Log2E
@@ -648,6 +650,7 @@ macro_rules! impl_basic_traits_primitive_float {
         $gelfond_schneider_constant: expr,
         $lemniscate_constant: expr,
         $ramanujans_constant: expr,
+        $catalans_constant: expr,
         $liouvilles_constant: expr,
         $champernowne_constant: expr,
         $copeland_erdos_constant: expr
@@ -934,6 +937,11 @@ macro_rules! impl_basic_traits_primitive_float {
             const RAMANUJANS_CONSTANT: $t = $ramanujans_constant;
         }
 
+        /// $G=\sum_{k=0}^\infty \frac{(-1)^k}{(2k+1)^2}$.
+        impl CatalansConstant for $t {
+            const CATALANS_CONSTANT: $t = $catalans_constant;
+        }
+
         /// $\sum_{n=1}^{\infty} 10^{-n!}$.
         impl LiouvillesConstant for $t {
             const LIOUVILLES_CONSTANT: $t = $liouvilles_constant;
@@ -971,6 +979,7 @@ impl_basic_traits_primitive_float!(
     2.6651442,
     2.6220574,
     2.6253742e17,
+    0.9159656,
     0.110001,
     0.12345679,
     0.23571113
@@ -996,6 +1005,7 @@ impl_basic_traits_primitive_float!(
     2.665144142690225,
     2.6220575542921196,
     2.6253741264076874e17,
+    0.915965594177219,
     0.110001,
     0.12345678910111213,
     0.23571113171923294

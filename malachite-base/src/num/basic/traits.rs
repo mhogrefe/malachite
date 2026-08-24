@@ -205,6 +205,11 @@ pub trait TwoOverSqrtPi {
     const TWO_OVER_SQRT_PI: Self;
 }
 
+/// Provides Catalan's constant, $G=\sum_{k=0}^\infty \frac{(-1)^k}{(2k+1)^2}$.
+pub trait CatalansConstant {
+    const CATALANS_CONSTANT: Self;
+}
+
 /// Provides the Champernowne constant in base 10, $0.123456789101112\ldots$, formed by
 /// concatenating the decimal representations of the positive integers.
 pub trait ChampernowneConstant {

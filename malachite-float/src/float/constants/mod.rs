@@ -6,6 +6,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+/// Functions for approximating Catalan's constant, $G=\sum_{k=0}^\infty \frac{(-1)^k}{(2k+1)^2}$.
+pub mod catalans_constant;
 /// Functions for approximating $\sqrt\[3\]{2}$.
 pub mod cbrt_2;
 /// Functions for approximating the Champernowne constant in a given base.
