@@ -13,6 +13,7 @@ use malachite_nz::natural::conversion::to_limbs::LimbIterator;
 pub struct U32Digits<'a> {
     iter: LimbIterator<'a>,
     next_hi: Option<u32>,
+    back_lo: Option<u32>,
     last_hi_is_zero: bool,
     len: usize,
 }
@@ -26,6 +27,7 @@ impl<'a> U32Digits<'a> {
         Self {
             iter,
             next_hi: None,
+            back_lo: None,
             last_hi_is_zero,
             len,
         }
@@ -42,14 +44,18 @@ impl Iterator for U32Digits<'_> {
         }
         self.len -= 1;
 
-        self.next_hi.take().or_else(|| {
-            let limb = self.iter.next()?;
-            let hi = (limb >> 32) as u32;
-            let lo = limb as u32;
+        self.next_hi
+            .take()
+            .or_else(|| {
+                let limb = self.iter.next()?;
+                let hi = (limb >> 32) as u32;
+                let lo = limb as u32;
 
-            self.next_hi = Some(hi);
-            Some(lo)
-        })
+                self.next_hi = Some(hi);
+                Some(lo)
+            })
+            // The back end half-consumed the last remaining limb; its low half is ours.
+            .or_else(|| self.back_lo.take())
     }
 
     #[inline]
@@ -64,14 +70,8 @@ impl Iterator for U32Digits<'_> {
     }
 
     #[inline]
-    fn last(self) -> Option<Self::Item> {
-        self.iter.most_significant().map(|limb| {
-            if self.last_hi_is_zero {
-                limb as u32
-            } else {
-                (limb >> 32) as u32
-            }
-        })
+    fn last(mut self) -> Option<Self::Item> {
+        self.next_back()
     }
 }
 
@@ -82,7 +82,35 @@ impl ExactSizeIterator for U32Digits<'_> {
     }
 }
 
-// TODO: DoubleEndedIterator
+impl DoubleEndedIterator for U32Digits<'_> {
+    #[inline]
+    fn next_back(&mut self) -> Option<u32> {
+        if self.len == 0 {
+            return None;
+        }
+        self.len -= 1;
+
+        if let Some(lo) = self.back_lo.take() {
+            return Some(lo);
+        }
+        if let Some(limb) = self.iter.next_back() {
+            let hi = (limb >> 32) as u32;
+            let lo = limb as u32;
+            // Only the most significant limb can have its zero high half trimmed, and it is always
+            // the first limb the back end sees.
+            if self.last_hi_is_zero {
+                self.last_hi_is_zero = false;
+                Some(lo)
+            } else {
+                self.back_lo = Some(lo);
+                Some(hi)
+            }
+        } else {
+            // The front end half-consumed the last remaining limb; its high half is ours.
+            self.next_hi.take()
+        }
+    }
+}
 
 impl FusedIterator for U32Digits<'_> {}
 
@@ -116,8 +144,8 @@ impl Iterator for U64Digits<'_> {
     }
 
     #[inline]
-    fn last(self) -> Option<u64> {
-        self.iter.most_significant()
+    fn last(mut self) -> Option<u64> {
+        self.next_back()
     }
 
     #[inline]

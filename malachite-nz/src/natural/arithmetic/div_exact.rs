@@ -2166,7 +2166,7 @@ impl DivExact<Natural> for &Natural {
     /// );
     /// ```
     fn div_exact(self, mut other: Natural) -> Natural {
-        if *self == other {
+        if *self == other && other != 0u32 {
             return Natural::ONE;
         }
         match (self, &mut other) {
@@ -2236,7 +2236,7 @@ impl DivExact<&Natural> for &Natural {
     /// );
     /// ```
     fn div_exact(self, other: &Natural) -> Natural {
-        if self == other {
+        if self == other && *other != 0u32 {
             return Natural::ONE;
         }
         match (self, other) {
@@ -2301,7 +2301,7 @@ impl DivExactAssign<Self> for Natural {
     /// assert_eq!(x, 123456789000u64);
     /// ```
     fn div_exact_assign(&mut self, mut other: Self) {
-        if *self == other {
+        if *self == other && other != 0u32 {
             *self = Self::ONE;
             return;
         }
@@ -2367,7 +2367,7 @@ impl<'a> DivExactAssign<&'a Self> for Natural {
     /// assert_eq!(x, 123456789000u64);
     /// ```
     fn div_exact_assign(&mut self, other: &'a Self) {
-        if self == other {
+        if self == other && *other != 0u32 {
             *self = Self::ONE;
             return;
         }

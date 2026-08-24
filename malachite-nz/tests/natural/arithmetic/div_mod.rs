@@ -23463,6 +23463,83 @@ fn div_rem_ref_ref_fail() {
     (&Natural::from(10u32)).div_rem(&Natural::ZERO);
 }
 
+// 0/0 must panic too: the equal-operands fast path must not bypass the zero-divisor check.
+#[test]
+#[should_panic]
+fn div_assign_mod_zero_zero_fail() {
+    let mut n = Natural::ZERO;
+    n.div_assign_mod(Natural::ZERO);
+}
+
+#[test]
+#[should_panic]
+fn div_assign_mod_zero_zero_ref_fail() {
+    let mut n = Natural::ZERO;
+    n.div_assign_mod(&Natural::ZERO);
+}
+
+#[test]
+#[should_panic]
+fn div_mod_zero_zero_fail() {
+    Natural::ZERO.div_mod(Natural::ZERO);
+}
+
+#[test]
+#[should_panic]
+fn div_mod_zero_zero_val_ref_fail() {
+    Natural::ZERO.div_mod(&Natural::ZERO);
+}
+
+#[test]
+#[should_panic]
+fn div_mod_zero_zero_ref_val_fail() {
+    (&Natural::ZERO).div_mod(Natural::ZERO);
+}
+
+#[test]
+#[should_panic]
+fn div_mod_zero_zero_ref_ref_fail() {
+    (&Natural::ZERO).div_mod(&Natural::ZERO);
+}
+
+#[test]
+#[should_panic]
+fn div_assign_rem_zero_zero_fail() {
+    let mut n = Natural::ZERO;
+    n.div_assign_rem(Natural::ZERO);
+}
+
+#[test]
+#[should_panic]
+fn div_assign_rem_zero_zero_ref_fail() {
+    let mut n = Natural::ZERO;
+    n.div_assign_rem(&Natural::ZERO);
+}
+
+#[test]
+#[should_panic]
+fn div_rem_zero_zero_fail() {
+    Natural::ZERO.div_rem(Natural::ZERO);
+}
+
+#[test]
+#[should_panic]
+fn div_rem_zero_zero_val_ref_fail() {
+    Natural::ZERO.div_rem(&Natural::ZERO);
+}
+
+#[test]
+#[should_panic]
+fn div_rem_zero_zero_ref_val_fail() {
+    (&Natural::ZERO).div_rem(Natural::ZERO);
+}
+
+#[test]
+#[should_panic]
+fn div_rem_zero_zero_ref_ref_fail() {
+    (&Natural::ZERO).div_rem(&Natural::ZERO);
+}
+
 #[test]
 fn test_ceiling_div_neg_mod() {
     let test = |s, t, quotient, remainder| {

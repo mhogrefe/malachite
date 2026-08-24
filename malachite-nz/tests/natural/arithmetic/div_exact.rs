@@ -4548,6 +4548,45 @@ fn div_exact_ref_ref_fail() {
     (&Natural::from(10u32)).div_exact(&Natural::ZERO);
 }
 
+// 0/0 must panic too: the equal-operands fast path must not bypass the zero-divisor check.
+#[test]
+#[should_panic]
+fn div_exact_assign_zero_zero_fail() {
+    let mut n = Natural::ZERO;
+    n.div_exact_assign(Natural::ZERO);
+}
+
+#[test]
+#[should_panic]
+fn div_exact_assign_zero_zero_ref_fail() {
+    let mut n = Natural::ZERO;
+    n.div_exact_assign(&Natural::ZERO);
+}
+
+#[test]
+#[should_panic]
+fn div_exact_zero_zero_fail() {
+    Natural::ZERO.div_exact(Natural::ZERO);
+}
+
+#[test]
+#[should_panic]
+fn div_exact_zero_zero_val_ref_fail() {
+    Natural::ZERO.div_exact(&Natural::ZERO);
+}
+
+#[test]
+#[should_panic]
+fn div_exact_zero_zero_ref_val_fail() {
+    (&Natural::ZERO).div_exact(Natural::ZERO);
+}
+
+#[test]
+#[should_panic]
+fn div_exact_zero_zero_ref_ref_fail() {
+    (&Natural::ZERO).div_exact(&Natural::ZERO);
+}
+
 #[test]
 fn limbs_modular_invert_limb_properties() {
     unsigned_gen_var_22().test_properties(|x| {

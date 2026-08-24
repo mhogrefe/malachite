@@ -855,3 +855,27 @@ fn to_string_base_large_properties() {
     }
     apply_fn_to_signeds!(props_s);
 }
+
+#[test]
+fn test_fmt_flags_signed() {
+    // In base 10, primitive formatting is the ground truth: the sign must interact correctly with
+    // the `+` flag, the sign-aware zero flag, and fill and alignment.
+    for i in [-12345i32, -255, -1, 0, 255, 12345] {
+        let w = BaseFmtWrapper::new(i, 10);
+        assert_eq!(format!("{w:+}"), format!("{i:+}"));
+        assert_eq!(format!("{w:10}"), format!("{i:10}"));
+        assert_eq!(format!("{w:<10}"), format!("{i:<10}"));
+        assert_eq!(format!("{w:^10}"), format!("{i:^10}"));
+        assert_eq!(format!("{w:*>10}"), format!("{i:*>10}"));
+        assert_eq!(format!("{w:+10}"), format!("{i:+10}"));
+        assert_eq!(format!("{w:+010}"), format!("{i:+010}"));
+        assert_eq!(format!("{w:010}"), format!("{i:010}"));
+    }
+    // In other bases these are the `pad_integral` semantics, with `#` meaning uppercase.
+    let w = BaseFmtWrapper::new(-1000i32, 36);
+    assert_eq!(format!("{w:+}"), "-rs");
+    assert_eq!(format!("{w:8}"), "     -rs");
+    assert_eq!(format!("{w:*>8}"), "*****-rs");
+    assert_eq!(format!("{w:#08}"), "-00000RS");
+    assert_eq!(format!("{w:+08}"), "-00000rs");
+}

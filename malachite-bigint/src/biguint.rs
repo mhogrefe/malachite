@@ -21,7 +21,8 @@ use core::{
 use malachite_base::{
     num::{
         arithmetic::traits::{
-            DivRem, DivRound, DivisibleBy, FloorRoot, Gcd, Lcm, Mod, ModInverse, ModPow, Parity,
+            DivExact, DivMod, DivRem, DivRound, DivisibleBy, FloorRoot, Gcd, Lcm, Mod, ModInverse,
+            ModPow, Parity,
         },
         conversion::traits::{Digits, FromStringBase, PowerOf2Digits, RoundingInto, ToStringBase},
         logic::traits::{BitAccess, BitIterable, CountOnes, SignificantBits},
@@ -199,18 +200,6 @@ impl Num for BigUint {
             }
         }
 
-        // FIXME: workaround, remove the check if malachite issue fixed
-        // https://github.com/mhogrefe/malachite/issues/20
-        if radix == 16
-            && s.bytes().any(|x| {
-                !matches!(x,
-                    b'0'..=b'9' | b'a'..=b'f' | b'A'..=b'F' | b'_'
-                )
-            })
-        {
-            return Err(ParseBigIntError::invalid());
-        }
-
         // fast path
         if let Some(val) = Natural::from_string_base(radix as u8, s) {
             return Ok(val.into());
@@ -278,6 +267,55 @@ impl num_integer::Integer for BigUint {
     fn div_rem(&self, other: &Self) -> (Self, Self) {
         let (div, rem) = (&self.0).div_rem(&other.0);
         (div.into(), rem.into())
+    }
+
+    #[inline]
+    fn div_mod_floor(&self, other: &Self) -> (Self, Self) {
+        let (div, rem) = (&self.0).div_mod(&other.0);
+        (div.into(), rem.into())
+    }
+
+    #[inline]
+    fn div_ceil(&self, other: &Self) -> Self {
+        (&self.0)
+            .div_round(&other.0, RoundingMode::Ceiling)
+            .0
+            .into()
+    }
+
+    #[inline]
+    fn gcd_lcm(&self, other: &Self) -> (Self, Self) {
+        if self.is_zero() || other.is_zero() {
+            return (self.gcd(other), Self::zero());
+        }
+        let gcd = (&self.0).gcd(&other.0);
+        let lcm = (&self.0).div_exact(&gcd) * &other.0;
+        (gcd.into(), lcm.into())
+    }
+
+    #[inline]
+    fn next_multiple_of(&self, other: &Self) -> Self {
+        let rem = (&self.0).mod_op(&other.0);
+        if rem == 0u32 {
+            self.clone()
+        } else {
+            Self(&self.0 + &other.0 - rem)
+        }
+    }
+
+    #[inline]
+    fn prev_multiple_of(&self, other: &Self) -> Self {
+        Self(&self.0 - (&self.0).mod_op(&other.0))
+    }
+
+    #[inline]
+    fn dec(&mut self) {
+        self.0 -= <Natural as malachite_base::num::basic::traits::One>::ONE;
+    }
+
+    #[inline]
+    fn inc(&mut self) {
+        self.0 += <Natural as malachite_base::num::basic::traits::One>::ONE;
     }
 }
 
@@ -503,8 +541,13 @@ impl BigUint {
         if modulus.is_one() {
             return Some(Self::zero());
         }
-        // Malachite's `mod_inverse` wants an input that is already reduced.
-        (&self.0 % &modulus.0).mod_inverse(&modulus.0).map(BigUint)
+        // Malachite's `mod_inverse` wants an input that is already reduced, and panics on zero,
+        // where a zero residue simply has no inverse.
+        let residue = &self.0 % &modulus.0;
+        if residue == 0u32 {
+            return None;
+        }
+        residue.mod_inverse(&modulus.0).map(BigUint)
     }
 }
 

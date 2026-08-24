@@ -16,6 +16,10 @@ num-traits = { version = "0.2.19", default-features = false, features = ["i128"]
 num-integer = { version = "0.1.46", default-features = false, features = ["i128"] }
 paste = "1.0.15"
 num-bigint = { version = "0.4", default-features = false, optional = true }
+arbitrary = { version = "1", optional = true, default-features = false }
+quickcheck = { version = "1", optional = true, default-features = false }
+rand = { version = "0.8", optional = true, default-features = false }
+serde = { version = "1.0", optional = true, default-features = false }
 
 [dev-dependencies]
 num-bigint = "0.4"
@@ -23,3 +27,7 @@ num-bigint = "0.4"
 [features]
 default = ["std"]
 std = ["malachite-base/std", "malachite-nz/std"]
+arbitrary = ["dep:arbitrary"]
+quickcheck = ["dep:quickcheck"]
+rand = ["dep:rand"]
+serde = ["dep:serde"]

@@ -330,27 +330,21 @@ fn fmt_signed<T: Copy + Ord + UnsignedAbs + Zero>(
     f: &mut Formatter,
 ) -> Result
 where
+    <T as UnsignedAbs>::Output: Copy + Digits<u8> + Eq + Zero,
     BaseFmtWrapper<<T as UnsignedAbs>::Output>: Display,
 {
     if w.x < T::ZERO {
-        f.write_char('-')?;
-        if let Some(width) = f.width() {
-            return if f.alternate() {
-                write!(
-                    f,
-                    "{:#0width$}",
-                    BaseFmtWrapper::new(w.x.unsigned_abs(), w.base),
-                    width = width.saturating_sub(1)
-                )
+        if f.width().is_some() || f.sign_plus() {
+            // Let `pad_integral` handle the interaction of the sign with the `+` flag, the
+            // sign-aware zero flag, and fill and alignment.
+            let s = if f.alternate() {
+                to_string_base_upper_unsigned(&w.x.unsigned_abs(), w.base)
             } else {
-                write!(
-                    f,
-                    "{:0width$}",
-                    BaseFmtWrapper::new(w.x.unsigned_abs(), w.base),
-                    width = width.saturating_sub(1)
-                )
+                to_string_base_unsigned(&w.x.unsigned_abs(), w.base)
             };
+            return f.pad_integral(false, "", &s);
         }
+        f.write_char('-')?;
     }
     Display::fmt(&BaseFmtWrapper::new(w.x.unsigned_abs(), w.base), f)
 }

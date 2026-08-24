@@ -1199,3 +1199,49 @@ fn to_string_base_upper_properties() {
         },
     );
 }
+
+#[test]
+fn test_fmt_flags() {
+    // For `Display`, primitive formatting is the ground truth: the sign must interact correctly
+    // with the `+` flag, the sign-aware zero flag, and fill and alignment.
+    fn test_display(i: i64) {
+        let n = Integer::from(i);
+        assert_eq!(format!("{n:+}"), format!("{i:+}"));
+        assert_eq!(format!("{n:10}"), format!("{i:10}"));
+        assert_eq!(format!("{n:<10}"), format!("{i:<10}"));
+        assert_eq!(format!("{n:^10}"), format!("{i:^10}"));
+        assert_eq!(format!("{n:*>10}"), format!("{i:*>10}"));
+        assert_eq!(format!("{n:+10}"), format!("{i:+10}"));
+        assert_eq!(format!("{n:+010}"), format!("{i:+010}"));
+        assert_eq!(format!("{n:010}"), format!("{i:010}"));
+    }
+    test_display(-12345);
+    test_display(-255);
+    test_display(-1);
+    test_display(0);
+    test_display(255);
+    test_display(12345);
+
+    // The radix impls print negative numbers in sign-magnitude form rather than two's complement,
+    // so primitives cannot be the oracle there; these are the `pad_integral` semantics.
+    let n = Integer::from(-255);
+    assert_eq!(format!("{n:+b}"), "-11111111");
+    assert_eq!(format!("{n:12b}"), "   -11111111");
+    assert_eq!(format!("{n:*>12b}"), "***-11111111");
+    assert_eq!(format!("{n:#014b}"), "-0b00011111111");
+    assert_eq!(format!("{n:+o}"), "-377");
+    assert_eq!(format!("{n:*<8o}"), "-377****");
+    assert_eq!(format!("{n:+x}"), "-ff");
+    assert_eq!(format!("{n:8x}"), "     -ff");
+    assert_eq!(format!("{n:*>8x}"), "*****-ff");
+    assert_eq!(format!("{n:#08x}"), "-0x000ff");
+    assert_eq!(format!("{n:+8X}"), "     -FF");
+
+    let m = Integer::from(-1000);
+    let w = BaseFmtWrapper::new(&m, 36);
+    assert_eq!(format!("{w:+}"), "-rs");
+    assert_eq!(format!("{w:8}"), "     -rs");
+    assert_eq!(format!("{w:*>8}"), "*****-rs");
+    assert_eq!(format!("{w:#08}"), "-00000RS");
+    assert_eq!(format!("{w:+08}"), "-00000rs");
+}

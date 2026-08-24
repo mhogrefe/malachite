@@ -60,14 +60,22 @@ extern crate alloc;
 
 #[macro_use]
 mod macros;
+#[cfg(any(feature = "quickcheck", feature = "arbitrary"))]
+mod arbitraries;
 mod bigint;
+#[cfg(feature = "rand")]
+mod bigrand;
 mod biguint;
 mod error;
 mod iter;
 #[cfg(feature = "num-bigint")]
 mod num_bigint_conversion;
+#[cfg(feature = "serde")]
+mod serde;
 
 pub use bigint::{BigInt, Sign, ToBigInt};
+#[cfg(feature = "rand")]
+pub use bigrand::{RandBigInt, RandomBits, UniformBigInt, UniformBigUint};
 pub use biguint::{BigUint, ToBigUint};
 pub use error::{ParseBigIntError, TryFromBigIntError};
 pub use iter::{U32Digits, U64Digits};

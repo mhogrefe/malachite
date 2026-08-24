@@ -22,7 +22,8 @@ use core::{
 use malachite_base::{
     num::{
         arithmetic::traits::{
-            Abs, DivRem, DivRound, DivisibleBy, FloorRoot, Mod, Parity, UnsignedAbs,
+            Abs, DivEuclidean, DivExact, DivMod, DivModEuclidean, DivRem, DivRound, DivisibleBy,
+            Mod, ModEuclidean, Parity, UnsignedAbs,
         },
         conversion::traits::{RoundingInto, ToStringBase},
         logic::traits::{BitAccess, NotAssign},
@@ -31,7 +32,7 @@ use malachite_base::{
 };
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
-use num_integer::{Integer as NumInteger, Roots};
+use num_integer::Roots;
 use num_traits::{
     CheckedAdd, CheckedDiv, CheckedEuclid, CheckedMul, CheckedSub, Euclid, FromPrimitive, Num, One,
     Pow, Signed, ToPrimitive, Zero,
@@ -315,12 +316,88 @@ impl num_integer::Integer for BigInt {
         let (div, rem) = (&self.0).div_rem(&other.0);
         (div.into(), rem.into())
     }
+
+    #[inline]
+    fn div_mod_floor(&self, other: &Self) -> (Self, Self) {
+        let (div, rem) = (&self.0).div_mod(&other.0);
+        (div.into(), rem.into())
+    }
+
+    #[inline]
+    fn div_ceil(&self, other: &Self) -> Self {
+        (&self.0)
+            .div_round(&other.0, RoundingMode::Ceiling)
+            .0
+            .into()
+    }
+
+    #[inline]
+    fn gcd_lcm(&self, other: &Self) -> (Self, Self) {
+        let (gcd, lcm) = self.magnitude().gcd_lcm(other.magnitude());
+        (gcd.into(), lcm.into())
+    }
+
+    #[inline]
+    fn extended_gcd_lcm(&self, other: &Self) -> (num_integer::ExtendedGcd<Self>, Self) {
+        let egcd = self.extended_gcd(other);
+        let lcm = if egcd.gcd.is_zero() {
+            Self::zero()
+        } else {
+            Self((&self.0).div_exact(&egcd.gcd.0) * &other.0).abs()
+        };
+        (egcd, lcm)
+    }
+
+    #[inline]
+    fn next_multiple_of(&self, other: &Self) -> Self {
+        let rem = (&self.0).mod_op(&other.0);
+        if rem == 0 {
+            self.clone()
+        } else {
+            Self(&self.0 + &other.0 - rem)
+        }
+    }
+
+    #[inline]
+    fn prev_multiple_of(&self, other: &Self) -> Self {
+        Self(&self.0 - (&self.0).mod_op(&other.0))
+    }
+
+    #[inline]
+    fn dec(&mut self) {
+        self.0 -= <Integer as malachite_base::num::basic::traits::One>::ONE;
+    }
+
+    #[inline]
+    fn inc(&mut self) {
+        self.0 += <Integer as malachite_base::num::basic::traits::One>::ONE;
+    }
+}
+
+impl Mul for Sign {
+    type Output = Self;
+
+    #[inline]
+    fn mul(self, other: Self) -> Self {
+        match (self, other) {
+            (NoSign, _) | (_, NoSign) => NoSign,
+            (Plus, Plus) | (Minus, Minus) => Plus,
+            (Plus, Minus) | (Minus, Plus) => Minus,
+        }
+    }
 }
 
 impl Roots for BigInt {
     #[inline]
     fn nth_root(&self, n: u32) -> Self {
-        (&self.0).floor_root(u64::from(n)).into()
+        // num-bigint truncates toward zero, taking the root of the magnitude and reapplying the
+        // sign; `Integer`'s `FloorRoot` floors instead, which differs for negative inputs that are
+        // not perfect powers.
+        assert!(
+            !(self.is_negative() && n.even()),
+            "root of degree {n} is imaginary"
+        );
+        Self::from_biguint(self.sign(), self.magnitude().nth_root(n))
     }
 }
 
@@ -709,35 +786,19 @@ impl From<bool> for BigInt {
 impl Euclid for BigInt {
     #[inline]
     fn div_euclid(&self, v: &Self) -> Self {
-        let (q, r) = self.div_rem(v);
-        if r.is_negative() {
-            if v.is_positive() { q - 1 } else { q + 1 }
-        } else {
-            q
-        }
+        (&self.0).div_euclidean(&v.0).into()
     }
 
     #[inline]
     fn rem_euclid(&self, v: &Self) -> Self {
-        let r = self % v;
-        if r.is_negative() {
-            if v.is_positive() { r + v } else { r - v }
-        } else {
-            r
-        }
+        // The Euclidean remainder is non-negative, so Malachite returns a `Natural`.
+        Integer::from((&self.0).mod_euclidean(&v.0)).into()
     }
 
+    #[inline]
     fn div_rem_euclid(&self, v: &Self) -> (Self, Self) {
-        let (q, r) = self.div_rem(v);
-        if r.is_negative() {
-            if v.is_positive() {
-                (q - 1, r + v)
-            } else {
-                (q + 1, r - v)
-            }
-        } else {
-            (q, r)
-        }
+        let (q, r) = (&self.0).div_mod_euclidean(&v.0);
+        (q.into(), Integer::from(r).into())
     }
 }
 

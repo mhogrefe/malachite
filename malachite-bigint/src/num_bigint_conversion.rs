@@ -52,9 +52,9 @@ impl From<Sign> for num_bigint::Sign {
     #[inline]
     fn from(value: Sign) -> Self {
         match value {
-            Minus => num_bigint::Sign::Minus,
-            NoSign => num_bigint::Sign::NoSign,
-            Plus => num_bigint::Sign::Plus,
+            Minus => Self::Minus,
+            NoSign => Self::NoSign,
+            Plus => Self::Plus,
         }
     }
 }
@@ -86,6 +86,6 @@ fn num_bigint_conversion_test() {
     tester(50723.into());
     tester(BigInt::from(-52321));
     tester(0.into());
-    tester(BigInt::from(core::u64::MAX).pow(1000u32));
-    tester(BigInt::from(core::i64::MIN).pow(1000u32));
+    tester(BigInt::from(u64::MAX).pow(1000u32));
+    tester(BigInt::from(i64::MIN).pow(1000u32));
 }

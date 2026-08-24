@@ -13,7 +13,8 @@ use core::fmt::{Binary, Debug, Display, Formatter, LowerHex, Octal, Result, Uppe
 use malachite_base::num::conversion::string::to_string::{
     digit_to_display_byte_large, digit_to_display_byte_lower, digit_to_display_byte_upper,
 };
-use malachite_base::num::conversion::traits::{Digits, ToStringBase};
+use malachite_base::num::conversion::traits::{Digits, ToStringBase, WrappingFrom};
+use malachite_base::strings::{ToBinaryString, ToLowerHexString, ToOctalString, ToUpperHexString};
 use malachite_base::vecs::vec_pad_left;
 
 impl Display for BaseFmtWrapper<&Integer> {
@@ -46,25 +47,22 @@ impl Display for BaseFmtWrapper<&Integer> {
     /// assert_eq!(format!("{:#010}", x), "-000GJDGXS");
     /// ```
     fn fmt(&self, f: &mut Formatter) -> Result {
+        if !self.x.sign && (f.width().is_some() || f.sign_plus()) {
+            // Let `pad_integral` handle the interaction of the sign with the `+` flag, the
+            // sign-aware zero flag, and fill and alignment.
+            let s = if f.alternate() {
+                self.x
+                    .unsigned_abs_ref()
+                    .to_string_base_upper(u8::wrapping_from(self.base))
+            } else {
+                self.x
+                    .unsigned_abs_ref()
+                    .to_string_base(u8::wrapping_from(self.base))
+            };
+            return f.pad_integral(false, "", &s);
+        }
         if !self.x.sign {
             f.write_char('-')?;
-            if let Some(width) = f.width() {
-                return if f.alternate() {
-                    write!(
-                        f,
-                        "{:#0width$}",
-                        BaseFmtWrapper::new(self.x.unsigned_abs_ref(), self.base),
-                        width = width.saturating_sub(1)
-                    )
-                } else {
-                    write!(
-                        f,
-                        "{:0width$}",
-                        BaseFmtWrapper::new(self.x.unsigned_abs_ref(), self.base),
-                        width = width.saturating_sub(1)
-                    )
-                };
-            }
         }
         Display::fmt(
             &BaseFmtWrapper::new(self.x.unsigned_abs_ref(), self.base),
@@ -254,15 +252,12 @@ impl Display for Integer {
     /// ```
     fn fmt(&self, f: &mut Formatter) -> Result {
         if *self < 0 {
-            f.write_char('-')?;
-            if let Some(width) = f.width() {
-                return write!(
-                    f,
-                    "{:0width$}",
-                    self.unsigned_abs_ref(),
-                    width = width.saturating_sub(1)
-                );
+            if f.width().is_some() || f.sign_plus() {
+                // Let `pad_integral` handle the interaction of the sign with the `+` flag, the
+                // sign-aware zero flag, and fill and alignment.
+                return f.pad_integral(false, "", &self.unsigned_abs_ref().to_string());
             }
+            f.write_char('-')?;
         }
         Display::fmt(self.unsigned_abs_ref(), f)
     }
@@ -366,24 +361,12 @@ impl Binary for Integer {
     /// ```
     fn fmt(&self, f: &mut Formatter) -> Result {
         if *self < 0 {
-            f.write_char('-')?;
-            if let Some(width) = f.width() {
-                return if f.alternate() {
-                    write!(
-                        f,
-                        "{:#0width$b}",
-                        self.unsigned_abs_ref(),
-                        width = width.saturating_sub(1)
-                    )
-                } else {
-                    write!(
-                        f,
-                        "{:0width$b}",
-                        self.unsigned_abs_ref(),
-                        width = width.saturating_sub(1)
-                    )
-                };
+            if f.width().is_some() || f.sign_plus() {
+                // Let `pad_integral` handle the interaction of the sign with the `+` flag, the
+                // sign-aware zero flag, the `#` prefix, and fill and alignment.
+                return f.pad_integral(false, "0b", &self.unsigned_abs_ref().to_binary_string());
             }
+            f.write_char('-')?;
         }
         Binary::fmt(self.unsigned_abs_ref(), f)
     }
@@ -442,24 +425,12 @@ impl Octal for Integer {
     /// ```
     fn fmt(&self, f: &mut Formatter) -> Result {
         if *self < 0 {
-            f.write_char('-')?;
-            if let Some(width) = f.width() {
-                return if f.alternate() {
-                    write!(
-                        f,
-                        "{:#0width$o}",
-                        self.unsigned_abs_ref(),
-                        width = width.saturating_sub(1)
-                    )
-                } else {
-                    write!(
-                        f,
-                        "{:0width$o}",
-                        self.unsigned_abs_ref(),
-                        width = width.saturating_sub(1)
-                    )
-                };
+            if f.width().is_some() || f.sign_plus() {
+                // Let `pad_integral` handle the interaction of the sign with the `+` flag, the
+                // sign-aware zero flag, the `#` prefix, and fill and alignment.
+                return f.pad_integral(false, "0o", &self.unsigned_abs_ref().to_octal_string());
             }
+            f.write_char('-')?;
         }
         Octal::fmt(self.unsigned_abs_ref(), f)
     }
@@ -518,24 +489,12 @@ impl LowerHex for Integer {
     /// ```
     fn fmt(&self, f: &mut Formatter) -> Result {
         if *self < 0 {
-            f.write_char('-')?;
-            if let Some(width) = f.width() {
-                return if f.alternate() {
-                    write!(
-                        f,
-                        "{:#0width$x}",
-                        self.unsigned_abs_ref(),
-                        width = width.saturating_sub(1)
-                    )
-                } else {
-                    write!(
-                        f,
-                        "{:0width$x}",
-                        self.unsigned_abs_ref(),
-                        width = width.saturating_sub(1)
-                    )
-                };
+            if f.width().is_some() || f.sign_plus() {
+                // Let `pad_integral` handle the interaction of the sign with the `+` flag, the
+                // sign-aware zero flag, the `#` prefix, and fill and alignment.
+                return f.pad_integral(false, "0x", &self.unsigned_abs_ref().to_lower_hex_string());
             }
+            f.write_char('-')?;
         }
         LowerHex::fmt(self.unsigned_abs_ref(), f)
     }
@@ -594,24 +553,12 @@ impl UpperHex for Integer {
     /// ```
     fn fmt(&self, f: &mut Formatter) -> Result {
         if *self < 0 {
-            f.write_char('-')?;
-            if let Some(width) = f.width() {
-                return if f.alternate() {
-                    write!(
-                        f,
-                        "{:#0width$X}",
-                        self.unsigned_abs_ref(),
-                        width = width.saturating_sub(1)
-                    )
-                } else {
-                    write!(
-                        f,
-                        "{:0width$X}",
-                        self.unsigned_abs_ref(),
-                        width = width.saturating_sub(1)
-                    )
-                };
+            if f.width().is_some() || f.sign_plus() {
+                // Let `pad_integral` handle the interaction of the sign with the `+` flag, the
+                // sign-aware zero flag, the `#` prefix, and fill and alignment.
+                return f.pad_integral(false, "0x", &self.unsigned_abs_ref().to_upper_hex_string());
             }
+            f.write_char('-')?;
         }
         UpperHex::fmt(self.unsigned_abs_ref(), f)
     }

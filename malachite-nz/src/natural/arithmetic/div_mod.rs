@@ -2481,7 +2481,7 @@ impl DivMod<Natural> for &Natural {
     /// );
     /// ```
     fn div_mod(self, mut other: Natural) -> (Natural, Natural) {
-        if *self == other {
+        if *self == other && other != 0u32 {
             return (Natural::ONE, Natural::ZERO);
         }
         match (self, &mut other) {
@@ -2554,7 +2554,7 @@ impl DivMod<&Natural> for &Natural {
     /// );
     /// ```
     fn div_mod(self, other: &Natural) -> (Natural, Natural) {
-        if self == other {
+        if self == other && *other != 0u32 {
             return (Natural::ONE, Natural::ZERO);
         }
         match (self, other) {
@@ -2626,7 +2626,7 @@ impl DivAssignMod<Self> for Natural {
     /// assert_eq!(x, 810000006723u64);
     /// ```
     fn div_assign_mod(&mut self, mut other: Self) -> Self {
-        if *self == other {
+        if *self == other && other != 0u32 {
             *self = Self::ONE;
             return Self::ZERO;
         }
@@ -2703,7 +2703,7 @@ impl<'a> DivAssignMod<&'a Self> for Natural {
     /// assert_eq!(x, 810000006723u64);
     /// ```
     fn div_assign_mod(&mut self, other: &'a Self) -> Self {
-        if self == other {
+        if self == other && *other != 0u32 {
             *self = Self::ONE;
             return Self::ZERO;
         }
