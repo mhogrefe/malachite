@@ -28,6 +28,8 @@ mod compare_with_power_of_2;
 mod compare_with_primitive;
 mod div_mod_projection;
 mod duplicate_const;
+mod factor_out_assignment;
+mod hoist_shifts;
 mod let_tuple_underscore_to_field;
 mod long_lines;
 mod manual_float_from_primitive;
@@ -59,18 +61,17 @@ mod use_div_mod_precomputed;
 mod use_divisible_by;
 mod use_exact_from;
 mod use_fused_mul;
-mod factor_out_assignment;
 mod use_get_bit;
 mod use_mod_power_of_2;
 mod use_mod_square;
 mod use_mul_shr_round;
 mod use_named_constant;
 mod use_parity;
-mod use_sign;
-mod use_slice_test_zero;
 mod use_reciprocal;
 mod use_round_variant;
 mod use_saturating_from;
+mod use_sign;
+mod use_slice_test_zero;
 mod use_split_in_half;
 mod use_square;
 mod use_trailing_zeros;
@@ -496,6 +497,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         compare_with_power_of_2::COMPARE_WITH_POWER_OF_2,
         compare_with_primitive::COMPARE_WITH_PRIMITIVE,
         duplicate_const::DUPLICATE_CONST,
+        hoist_shifts::HOIST_SHIFTS,
         let_tuple_underscore_to_field::LET_TUPLE_UNDERSCORE_TO_FIELD,
         long_lines::LONG_LINES,
         manual_float_from_primitive::MANUAL_FLOAT_FROM_PRIMITIVE,
@@ -556,6 +558,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
     lint_store.register_late_pass(|_| Box::new(compare_with_power_of_2::CompareWithPowerOf2));
     lint_store.register_late_pass(|_| Box::new(compare_with_primitive::CompareWithPrimitive));
     lint_store.register_late_pass(|_| Box::new(duplicate_const::DuplicateConst::default()));
+    lint_store.register_late_pass(|_| Box::new(hoist_shifts::HoistShifts));
     lint_store
         .register_late_pass(|_| Box::new(let_tuple_underscore_to_field::LetTupleUnderscoreToField));
     lint_store.register_late_pass(|_| Box::new(long_lines::LongLines));

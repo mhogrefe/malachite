@@ -16,6 +16,9 @@ pub mod champernowne_constant;
 pub mod copeland_erdos_constant;
 /// Functions for approximating $e$, Euler's number.
 pub mod e;
+/// Functions for approximating Euler's constant (the Euler–Mascheroni constant),
+/// $\gamma=\lim_{n\to\infty}\left(\sum_{k=1}^n \frac{1}{k}-\log n\right)$.
+pub mod eulers_constant;
 /// Functions for approximating Gauss's constant, $G=1/\mathrm{AGM}(1,\sqrt{2})$.
 pub mod gauss_constant;
 /// Functions for approximating the Gelfond–Schneider constant, $2^{\sqrt 2}$.

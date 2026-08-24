@@ -1023,22 +1023,25 @@ which it will naturally follow.
 | :---: | --- | --- |
 | ✓ | `int mpfr_const_log2 (mpfr_t rop, mpfr_rnd_t rnd)` | [`ln_2_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.ln_2_prec_round) |
 | ✓ | `int mpfr_const_pi (mpfr_t rop, mpfr_rnd_t rnd)` | [`pi_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.pi_prec_round) |
-| ✗ | `int mpfr_const_euler (mpfr_t rop, mpfr_rnd_t rnd)` | |
+| ✓ | `int mpfr_const_euler (mpfr_t rop, mpfr_rnd_t rnd)` | [`eulers_constant_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.eulers_constant_prec_round) |
 | ✓ | `int mpfr_const_catalan (mpfr_t rop, mpfr_rnd_t rnd)` | [`catalans_constant_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.catalans_constant_prec_round) |
 
-**The constants.** `Float::ln_2_prec_round(prec, rnd)`, `Float::pi_prec_round(prec, rnd)`,
+**The constants.** All four rows are covered: `Float::ln_2_prec_round(prec, rnd)`,
+`Float::pi_prec_round(prec, rnd)`,
+[`eulers_constant_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.eulers_constant_prec_round),
 and
 [`catalans_constant_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.catalans_constant_prec_round)
-compute $$\log 2$$, $$\pi$$, and Catalan's constant $$G$$ to any requested precision,
-statically, where MPFR fills a prepared variable and caches the computation internally, the
-cache being the [state behind `mpfr_free_cache`](#memory-handling-functions). The Catalan
-computation follows MPFR's: Adamchik's
-$$G = \pi/8 \cdot \log(2+\sqrt{3}) + 3/8 \cdot \sum_{k \ge 0} k!^2/((2k)!(2k+1)^2)$$, the
-series summed by binary splitting. Euler's constant $$\gamma$$ is now the lone gap, a slightly
-surprising ✗ row given the company it would keep: Malachite currently computes around three
-dozen constants, from $$e$$, $$\tau$$, $$\varphi$$, and the square-root and logarithm families
-to the lemniscate, Gauss, Gelfond, and Ramanujan constants and digit-defined numbers like the
-Prouhet-Thue-Morse and prime constants, and MPFR's last one will join them.
+compute $$\log 2$$, $$\pi$$, Euler's constant $$\gamma$$, and Catalan's constant $$G$$ to any
+requested precision, statically, where MPFR fills a prepared variable and caches the
+computation internally, the cache being the
+[state behind `mpfr_free_cache`](#memory-handling-functions). The Euler and Catalan
+computations follow MPFR's: the Brent-McMillan algorithm
+$$\gamma = S(n)/I(n) - U(n)/I(n)^2 - \log n$$ over Bessel-function sums, and Adamchik's
+$$G = \pi/8 \cdot \log(2+\sqrt{3}) + 3/8 \cdot \sum_{k \ge 0} k!^2/((2k)!(2k+1)^2)$$, each
+series summed by binary splitting. Beyond these four, Malachite computes around three dozen
+constants, from $$e$$, $$\tau$$, $$\varphi$$, and the square-root and logarithm families to
+the lemniscate, Gauss, Gelfond, and Ramanujan constants and digit-defined numbers like the
+Prouhet-Thue-Morse and prime constants.
 
 ## [Input and Output Functions](https://www.mpfr.org/mpfr-current/mpfr.html#Input-and-Output-Functions) {#input-and-output-functions}
 

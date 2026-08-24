@@ -14,6 +14,7 @@ pub(crate) fn register(runner: &mut Runner) {
     champernowne_constant::register(runner);
     copeland_erdos_constant::register(runner);
     e::register(runner);
+    eulers_constant::register(runner);
     gauss_constant::register(runner);
     gelfond_schneider_constant::register(runner);
     gelfonds_constant::register(runner);
@@ -55,6 +56,7 @@ mod cbrt_2;
 mod champernowne_constant;
 mod copeland_erdos_constant;
 mod e;
+mod eulers_constant;
 mod gauss_constant;
 mod gelfond_schneider_constant;
 mod gelfonds_constant;

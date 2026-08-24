@@ -168,6 +168,7 @@ pub mod float {
         pub mod champernowne_constant;
         pub mod copeland_erdos_constant;
         pub mod e;
+        pub mod eulers_constant;
         pub mod gauss_constant;
         pub mod gelfond_schneider_constant;
         pub mod gelfonds_constant;

@@ -46,5 +46,4 @@ fn main() {
     // A mask built by calling low_mask: flagged, in any function.
     let sh = std::hint::black_box(5u64);
     let _ = n & u64::low_mask(sh);
-
 }

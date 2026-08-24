@@ -222,6 +222,12 @@ pub trait CopelandErdosConstant {
     const COPELAND_ERDOS_CONSTANT: Self;
 }
 
+/// Provides Euler's constant (also known as the Euler–Mascheroni constant),
+/// $\gamma=\lim_{n\to\infty}\left(\sum_{k=1}^n\frac{1}{k}-\log n\right)$.
+pub trait EulersConstant {
+    const EULERS_CONSTANT: Self;
+}
+
 /// Provides Gauss's constant, $G=1/\mathrm{AGM}(1,\sqrt{2})$.
 ///
 /// Having three consecutive esses in an identifier is awkward, so let's pretend that we sometimes

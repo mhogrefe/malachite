@@ -10,6 +10,7 @@ pub mod catalans_constant;
 pub mod cbrt_2;
 pub mod digit_constants;
 pub mod e;
+pub mod eulers_constant;
 pub mod lemniscate_constant;
 pub mod ln_10;
 pub mod ln_2;

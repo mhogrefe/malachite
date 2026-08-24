@@ -16,7 +16,7 @@ use crate::num::arithmetic::traits::{
     SqrtAssign, Square, SquareAssign, SubMul, SubMulAssign,
 };
 use crate::num::basic::traits::{
-    CatalansConstant, ChampernowneConstant, CopelandErdosConstant, GaussConstant,
+    CatalansConstant, ChampernowneConstant, CopelandErdosConstant, EulersConstant, GaussConstant,
     GelfondSchneiderConstant, GelfondsConstant, Infinity, LemniscateConstant, LiouvillesConstant,
     Ln2, Ln10, Log2E, Log10E, Log102, Log210, NaN, NegativeInfinity, NegativeOne, NegativeZero,
     One, OneHalf, OneOverPi, OneOverSqrtPi, OneOverSqrtTau, Phi, Pi, PiOver2, PiOver3, PiOver4,
@@ -155,6 +155,7 @@ pub trait PrimitiveFloat:
     + CatalansConstant
     + ChampernowneConstant
     + CopelandErdosConstant
+    + EulersConstant
     + Log2E
     + Log10E
     + Log210
@@ -651,6 +652,7 @@ macro_rules! impl_basic_traits_primitive_float {
         $lemniscate_constant: expr,
         $ramanujans_constant: expr,
         $catalans_constant: expr,
+        $eulers_constant: expr,
         $liouvilles_constant: expr,
         $champernowne_constant: expr,
         $copeland_erdos_constant: expr
@@ -942,6 +944,11 @@ macro_rules! impl_basic_traits_primitive_float {
             const CATALANS_CONSTANT: $t = $catalans_constant;
         }
 
+        /// $\gamma=\lim_{n\to\infty}\left(\sum_{k=1}^n\frac{1}{k}-\log n\right)$.
+        impl EulersConstant for $t {
+            const EULERS_CONSTANT: $t = $eulers_constant;
+        }
+
         /// $\sum_{n=1}^{\infty} 10^{-n!}$.
         impl LiouvillesConstant for $t {
             const LIOUVILLES_CONSTANT: $t = $liouvilles_constant;
@@ -980,6 +987,7 @@ impl_basic_traits_primitive_float!(
     2.6220574,
     2.6253742e17,
     0.9159656,
+    0.5772157,
     0.110001,
     0.12345679,
     0.23571113
@@ -1006,6 +1014,7 @@ impl_basic_traits_primitive_float!(
     2.6220575542921196,
     2.6253741264076874e17,
     0.915965594177219,
+    0.5772156649015329,
     0.110001,
     0.12345678910111213,
     0.23571113171923294

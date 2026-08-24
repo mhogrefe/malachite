@@ -93,6 +93,18 @@ converts to `shr_round` with `Down` (or `>>` if the floor is really what's wante
 and test utilities are exempt: they multiply by `power_of_2` on purpose, to cross-check the shift
 operators themselves.
 
+### `hoist_shifts`
+
+Flags a shifted operand inside a bignum multiplication, or a `Rational` division, when the shift
+can be hoisted out of the operation: `(a << s) * b` is `(a * b) << s`, and the hoisted form
+multiplies smaller values, shifting once at the end. Only exact rewrites are flagged: `Natural`
+and `Integer` right shifts are floor divisions and their `/` truncates, so for them only `<<`
+inside `*` qualifies; for `Rational` both shift directions commute with both `*` and `/` in
+either operand, with the direction reversing when the shifted operand is a divisor. `Float` is
+excluded, its shifts saturating at the exponent-range boundaries — `(a << s) * b` can overflow
+to infinity where `(a * b) << s` is finite — and primitive integers are excluded because the
+rewrite moves the point at which an overflow occurs.
+
 ### `long_lines`
 
 Flags source lines longer than `max_line_length` characters (default 100), ignoring trailing
