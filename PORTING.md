@@ -271,6 +271,11 @@ general-case tests — every one of them corresponds to a real bug class found i
   asserts. If the test itself is wrong, fix it and say so explicitly.
 - **Run `bash additional-lints.sh` before handing work off**; the lints enforce the mechanical
   conventions so review can focus on the algorithmic ones.
+- **Add a `CHANGELOG.md` entry when an arc lands.** Every user-visible addition, behavioral
+  change, or notable performance win gets a line in the unreleased section at the top of the
+  repo-root `CHANGELOG.md`, under its crate; breaking or behavior-changing items also go in the
+  release's "Breaking and behavioral changes" list. Writing the line is part of finishing the
+  work (step 7 for ports), not something to reconstruct from git at release time.
 
 ## Known traps
 
