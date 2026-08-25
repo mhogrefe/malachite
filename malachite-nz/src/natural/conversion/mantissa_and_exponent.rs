@@ -101,18 +101,17 @@ impl Natural {
         // the 3 most-significant limbs are needed.
         let mut most_significant_limbs = [0; 3];
         let mut exponent = T::MANTISSA_WIDTH;
-        let significant_bits;
         let mut exact = true;
         let mut half_compare = Less; // (mantissa - floor(mantissa)).cmp(&0.5)
         let mut highest_discarded_limb = 0;
-        match self {
+        let significant_bits = match self {
             Self(Small(x)) => {
                 most_significant_limbs[0] = *x;
-                significant_bits = x.significant_bits();
+                x.significant_bits()
             }
             Self(Large(xs)) => {
                 let len = xs.len();
-                significant_bits = if len == 2 {
+                if len == 2 {
                     most_significant_limbs[0] = xs[0];
                     most_significant_limbs[1] = xs[1];
                     xs[1].significant_bits() + Limb::WIDTH
@@ -131,7 +130,7 @@ impl Natural {
                     most_significant_limbs[2].significant_bits() + TWICE_WIDTH
                 }
             }
-        }
+        };
         let shift =
             i128::wrapping_from(T::MANTISSA_WIDTH + 1) - i128::wrapping_from(significant_bits);
         match shift.sign() {

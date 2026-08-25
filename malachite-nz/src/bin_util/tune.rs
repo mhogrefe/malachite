@@ -1812,14 +1812,14 @@ fn add_n_overflowing(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     carry
 }
 
-// Variant D: overflowing_add pair, 4x unrolled via chunks_exact.
+// Variant D: overflowing_add pair, 4x unrolled via as_chunks.
 #[inline(never)]
 fn add_n_overflowing_x4(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     let mut carry = false;
-    let mut out_it = out.chunks_exact_mut(4);
-    let mut xs_it = xs.chunks_exact(4);
-    let mut ys_it = ys.chunks_exact(4);
-    for ((o, x), y) in (&mut out_it).zip(&mut xs_it).zip(&mut ys_it) {
+    let (out_blocks, out_rem) = out.as_chunks_mut::<4>();
+    let (xs_blocks, xs_rem) = xs.as_chunks::<4>();
+    let (ys_blocks, ys_rem) = ys.as_chunks::<4>();
+    for ((o, x), y) in out_blocks.iter_mut().zip(xs_blocks).zip(ys_blocks) {
         for i in 0..4 {
             let (sum, c1) = x[i].overflowing_add(y[i]);
             let (sum, c2) = sum.overflowing_add(Limb::from(carry));
@@ -1827,12 +1827,7 @@ fn add_n_overflowing_x4(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
             o[i] = sum;
         }
     }
-    for ((o, &x), &y) in out_it
-        .into_remainder()
-        .iter_mut()
-        .zip(xs_it.remainder().iter())
-        .zip(ys_it.remainder().iter())
-    {
+    for ((o, &x), &y) in out_rem.iter_mut().zip(xs_rem.iter()).zip(ys_rem.iter()) {
         let (sum, c1) = x.overflowing_add(y);
         let (sum, c2) = sum.overflowing_add(Limb::from(carry));
         carry = c1 | c2;
@@ -1845,22 +1840,17 @@ fn add_n_overflowing_x4(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
 #[inline(never)]
 fn add_n_double_limb_x4(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     let mut carry = 0;
-    let mut out_it = out.chunks_exact_mut(4);
-    let mut xs_it = xs.chunks_exact(4);
-    let mut ys_it = ys.chunks_exact(4);
-    for ((o, x), y) in (&mut out_it).zip(&mut xs_it).zip(&mut ys_it) {
+    let (out_blocks, out_rem) = out.as_chunks_mut::<4>();
+    let (xs_blocks, xs_rem) = xs.as_chunks::<4>();
+    let (ys_blocks, ys_rem) = ys.as_chunks::<4>();
+    for ((o, x), y) in out_blocks.iter_mut().zip(xs_blocks).zip(ys_blocks) {
         for i in 0..4 {
             let sum = DoubleLimb::from(x[i]) + DoubleLimb::from(y[i]) + DoubleLimb::from(carry);
             o[i] = sum as Limb;
             carry = (sum >> Limb::WIDTH) as Limb;
         }
     }
-    for ((o, &x), &y) in out_it
-        .into_remainder()
-        .iter_mut()
-        .zip(xs_it.remainder().iter())
-        .zip(ys_it.remainder().iter())
-    {
+    for ((o, &x), &y) in out_rem.iter_mut().zip(xs_rem.iter()).zip(ys_rem.iter()) {
         let sum = DoubleLimb::from(x) + DoubleLimb::from(y) + DoubleLimb::from(carry);
         *o = sum as Limb;
         carry = (sum >> Limb::WIDTH) as Limb;
@@ -1902,15 +1892,15 @@ fn shl_to_out_windows_x4(out: &mut [Limb], xs: &[Limb], bits: u64) -> Limb {
     let len = xs.len();
     let cobits = Limb::WIDTH - bits;
     out[0] = xs[0] << bits;
-    let mut o_chunks = out[1..len].chunks_exact_mut(4);
+    let (o_blocks, o_rem) = out[1..len].as_chunks_mut::<4>();
     let mut i = 0;
-    for o in &mut o_chunks {
+    for o in o_blocks {
         for j in 0..4 {
             o[j] = (xs[i + j + 1] << bits) | (xs[i + j] >> cobits);
         }
         i += 4;
     }
-    for o in o_chunks.into_remainder() {
+    for o in o_rem {
         *o = (xs[i + 1] << bits) | (xs[i] >> cobits);
         i += 1;
     }

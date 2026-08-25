@@ -2786,9 +2786,7 @@ pub fn next_bit_pattern(
                     .count();
                 let tf_count = leading_false_count + true_after_false_count;
                 if tf_count == pattern.len() {
-                    for b in &mut *pattern {
-                        *b = false;
-                    }
+                    pattern.fill(false);
                     pattern.push(true);
                     *bit_count = 1;
                 } else {

@@ -365,7 +365,7 @@ struct NumberParts {
 // Returns `s` with its trailing '0' characters removed. (This inlines the strip-trailing-zeros
 // loops that `vasprintf.c` repeats in `regular_eg`, `regular_fg`, and `regular_ab`; `to_sci` uses
 // it too.)
-pub(crate) fn strip_trailing_zeros(mut s: &[u8]) -> &[u8] {
+pub(crate) const fn strip_trailing_zeros(mut s: &[u8]) -> &[u8] {
     while let [rest @ .., b'0'] = s {
         s = rest;
     }

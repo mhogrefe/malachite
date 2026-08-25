@@ -61,7 +61,7 @@ private_test_fn! {limbs_or_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) {
 //
 // # Panics
 // Panics if `xs` is empty.
-private_test_fn! {limbs_or_limb_in_place(xs: &mut [Limb], y: Limb) {
+private_test_const_fn! {limbs_or_limb_in_place(xs: &mut [Limb], y: Limb) {
     xs[0] |= y;
 }}
 

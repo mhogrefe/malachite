@@ -42,8 +42,6 @@ compatibility crate.
   `x * y ± z * w`), and the comparison family `PartialOrdDouble`/`PartialOrdAbsDouble`/
   `OrdDouble` (compare a number against twice another without computing the double — the shape
   of a round-to-nearest decision).
-- More correctly rounded `f32`/`f64` functions in the `primitive_float_*` family, computed
-  exactly via `Float` and rounded once, including sums, products, and dot products of slices.
 - New named constants for primitive floats, with corresponding traits: Catalan's constant and
   Euler's constant.
 - GMP-style formatting: `gmp_format!` and friends, with `%Z`, `%Q`, and `%R` conversions
@@ -96,6 +94,8 @@ compatibility crate.
   other MPFR samplers, plus a new suite of random and exhaustive `Float` generators for
   testing.
 - `ToStringBase` and additional string-conversion functions.
+- More correctly rounded `f32`/`f64` functions in the `primitive_float_*` family, computed
+  exactly via `Float` and rounded once, including sums, products, and dot products of slices.
 - The `increment`/`decrement` semantics change listed above.
 
 ### malachite-bigint
@@ -148,7 +148,8 @@ exponential and power families, correctly rounded at any precision — and a com
 - String-to-`Float` parsing (a port of `set_str`, bases 2 through 62), `to_sci_string`, and
   serde support for `Float`, alongside the `get_str` rewrite above.
 - New constants: e, the cube root of 2, Gelfond's constant, the Gelfond-Schneider constant, and
-  Ramanujan's constant, with the corresponding primitive-float constants and the
-  correctly-rounded-`f32`/`f64` emulation machinery (`primitive_float_*`) in malachite-base.
+  Ramanujan's constant, with the corresponding primitive-float constant traits in
+  malachite-base and the correctly-rounded-`f32`/`f64` emulation machinery
+  (`primitive_float_*`) in malachite-float.
 - Performance: string conversion with precomputed inverses and a round of division and
   conversion threshold tuning in malachite-nz.

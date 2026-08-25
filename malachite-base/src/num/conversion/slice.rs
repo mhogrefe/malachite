@@ -466,7 +466,7 @@ impl VecFromOtherTypeSlice<u64> for usize {
         let mut out;
         if USIZE_IS_U32 {
             out = ::alloc::vec![0; xs.len() << 1];
-            for (chunk, &u) in out.chunks_exact_mut(2).zip(xs.iter()) {
+            for (chunk, &u) in out.as_chunks_mut::<2>().0.iter_mut().zip(xs.iter()) {
                 let mut u = u;
                 for x in chunk {
                     *x = Self::wrapping_from(u);
@@ -541,7 +541,7 @@ impl VecFromOtherTypeSlice<usize> for u32 {
         } else {
             assert_eq!(usize::WIDTH, u64::WIDTH);
             out = ::alloc::vec![0; xs.len() << 1];
-            for (chunk, &u) in out.chunks_exact_mut(2).zip(xs.iter()) {
+            for (chunk, &u) in out.as_chunks_mut::<2>().0.iter_mut().zip(xs.iter()) {
                 let mut u = u;
                 for x in chunk {
                     *x = Self::wrapping_from(u);

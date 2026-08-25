@@ -450,20 +450,15 @@ crate_test_fn! {limbs_sub_same_length_with_borrow_in_to_out(
     assert!(out.len() >= len);
     let mut borrow = borrow_in;
     // 4x-unrolled so that LLVM chains the borrows in flags within each block.
-    let mut out_chunks = out[..len].chunks_exact_mut(4);
-    let mut xs_chunks = xs.chunks_exact(4);
-    let mut ys_chunks = ys.chunks_exact(4);
-    for ((o, x), y) in (&mut out_chunks).zip(&mut xs_chunks).zip(&mut ys_chunks) {
+    let (out_blocks, out_rem) = out[..len].as_chunks_mut::<4>();
+    let (xs_blocks, xs_rem) = xs.as_chunks::<4>();
+    let (ys_blocks, ys_rem) = ys.as_chunks::<4>();
+    for ((o, x), y) in out_blocks.iter_mut().zip(xs_blocks).zip(ys_blocks) {
         for i in 0..4 {
             (o[i], borrow) = sub_with_borrow(x[i], y[i], borrow);
         }
     }
-    for ((o, &x), &y) in out_chunks
-        .into_remainder()
-        .iter_mut()
-        .zip(xs_chunks.remainder().iter())
-        .zip(ys_chunks.remainder().iter())
-    {
+    for ((o, &x), &y) in out_rem.iter_mut().zip(xs_rem.iter()).zip(ys_rem.iter()) {
         (*o, borrow) = sub_with_borrow(x, y, borrow);
     }
     borrow
@@ -493,18 +488,14 @@ crate_test_fn! {limbs_sub_same_length_with_borrow_in_in_place_left(
     assert_eq!(xs.len(), ys.len());
     let mut borrow = borrow_in;
     // 4x-unrolled so that LLVM chains the borrows in flags within each block.
-    let mut xs_chunks = xs.chunks_exact_mut(4);
-    let mut ys_chunks = ys.chunks_exact(4);
-    for (x, y) in (&mut xs_chunks).zip(&mut ys_chunks) {
+    let (xs_blocks, xs_rem) = xs.as_chunks_mut::<4>();
+    let (ys_blocks, ys_rem) = ys.as_chunks::<4>();
+    for (x, y) in xs_blocks.iter_mut().zip(ys_blocks) {
         for i in 0..4 {
             (x[i], borrow) = sub_with_borrow(x[i], y[i], borrow);
         }
     }
-    for (x, &y) in xs_chunks
-        .into_remainder()
-        .iter_mut()
-        .zip(ys_chunks.remainder().iter())
-    {
+    for (x, &y) in xs_rem.iter_mut().zip(ys_rem.iter()) {
         (*x, borrow) = sub_with_borrow(*x, y, borrow);
     }
     borrow
@@ -534,18 +525,14 @@ crate_test_fn! {limbs_sub_same_length_with_borrow_in_in_place_right(
     assert_eq!(xs.len(), ys.len());
     let mut borrow = borrow_in;
     // 4x-unrolled so that LLVM chains the borrows in flags within each block.
-    let mut xs_chunks = xs.chunks_exact(4);
-    let mut ys_chunks = ys.chunks_exact_mut(4);
-    for (x, y) in (&mut xs_chunks).zip(&mut ys_chunks) {
+    let (xs_blocks, xs_rem) = xs.as_chunks::<4>();
+    let (ys_blocks, ys_rem) = ys.as_chunks_mut::<4>();
+    for (x, y) in xs_blocks.iter().zip(ys_blocks) {
         for i in 0..4 {
             (y[i], borrow) = sub_with_borrow(x[i], y[i], borrow);
         }
     }
-    for (&x, y) in xs_chunks
-        .remainder()
-        .iter()
-        .zip(ys_chunks.into_remainder().iter_mut())
-    {
+    for (&x, y) in xs_rem.iter().zip(ys_rem.iter_mut()) {
         (*y, borrow) = sub_with_borrow(x, *y, borrow);
     }
     borrow

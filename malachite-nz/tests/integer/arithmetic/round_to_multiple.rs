@@ -1122,15 +1122,11 @@ fn round_to_multiple_properties() {
                 Up => assert!(r.ge_abs(&x)),
                 Exact => assert_eq!(r, x),
                 Nearest => {
-                    let closest;
-                    let second_closest;
-                    if r <= x {
-                        closest = &x - &r;
-                        second_closest = &r + (&y).abs() - &x;
+                    let (closest, second_closest) = if r <= x {
+                        (&x - &r, &r + (&y).abs() - &x)
                     } else {
-                        closest = &r - &x;
-                        second_closest = x + (&y).abs() - &r;
-                    }
+                        (&r - &x, x + (&y).abs() - &r)
+                    };
                     assert!(closest <= second_closest);
                     if closest == second_closest {
                         assert!(r.div_round(y, Exact).0.even());

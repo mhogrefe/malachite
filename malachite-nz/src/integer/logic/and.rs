@@ -75,7 +75,7 @@ private_test_fn! {limbs_pos_and_limb_neg_to_out(out: &mut [Limb], xs: &[Limb], y
 //
 // # Panics
 // Panics if `xs` is empty.
-private_test_fn! {limbs_pos_and_limb_neg_in_place(xs: &mut [Limb], ys: Limb) {
+private_test_const_fn! {limbs_pos_and_limb_neg_in_place(xs: &mut [Limb], ys: Limb) {
     xs[0] &= ys;
 }}
 

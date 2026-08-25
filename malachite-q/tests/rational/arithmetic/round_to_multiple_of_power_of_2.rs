@@ -347,15 +347,11 @@ fn round_to_multiple_of_power_of_2_properties() {
             Exact => assert_eq!(r, n),
             Nearest => {
                 let k = Rational::power_of_2(pow);
-                let closest;
-                let second_closest;
-                if r <= n {
-                    closest = &n - &r;
-                    second_closest = &r + k - n;
+                let (closest, second_closest) = if r <= n {
+                    (&n - &r, &r + k - n)
                 } else {
-                    closest = &r - &n;
-                    second_closest = n + k - &r;
-                }
+                    (&r - &n, n + k - &r)
+                };
                 assert!(closest <= second_closest);
                 if closest == second_closest {
                     assert!(Integer::exact_from(r >> pow).even());

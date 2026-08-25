@@ -487,15 +487,11 @@ fn round_to_multiple_properties() {
                 Ceiling | Up => assert!(r >= x),
                 Exact => assert_eq!(r, x),
                 Nearest => {
-                    let closest;
-                    let second_closest;
-                    if r <= x {
-                        closest = &x - &r;
-                        second_closest = &r + &y - x;
+                    let (closest, second_closest) = if r <= x {
+                        (&x - &r, &r + &y - x)
                     } else {
-                        closest = &r - &x;
-                        second_closest = x + &y - &r;
-                    }
+                        (&r - &x, x + &y - &r)
+                    };
                     assert!(closest <= second_closest);
                     if closest == second_closest {
                         assert!((&r).div_round(&y, Exact).0.even());
