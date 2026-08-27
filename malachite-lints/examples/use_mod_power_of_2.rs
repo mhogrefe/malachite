@@ -8,7 +8,7 @@ const NEG_SEVEN: Integer = Integer::const_from_signed(-7);
 const N: Natural = Natural::const_from(123);
 const I: Integer = Integer::const_from_signed(-123);
 
-// A mask in a `limbs_`-named kernel: not flagged; the mask is the idiom there.
+// A mask in a `limbs_`-named kernel: flagged like anywhere else; kernels are no longer exempt.
 fn limbs_low_bits(x: u64) -> u64 {
     x & 7
 }
@@ -24,6 +24,7 @@ fn main() {
     let _ = x & 0x3f == 5;
     let mut y = x;
     y &= 15;
+    std::hint::black_box(y);
     // A `Natural` masked with a constant defined from such a literal: flagged.
     let _ = &n & &THREE;
 
@@ -45,5 +46,5 @@ fn main() {
     let _ = limbs_low_bits(x);
     // A mask built by calling low_mask: flagged, in any function.
     let sh = std::hint::black_box(5u64);
-    let _ = n & u64::low_mask(sh);
+    let _ = &n & Natural::low_mask(sh);
 }

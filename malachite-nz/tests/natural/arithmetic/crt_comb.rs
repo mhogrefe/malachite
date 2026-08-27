@@ -7,7 +7,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::Pow;
-use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::basic::traits::One;
+#[cfg(not(feature = "32_bit_limbs"))]
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::factorization::traits::Primes;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::crt_comb::CrtComb;
@@ -15,12 +17,15 @@ use malachite_nz::platform::Limb;
 use malachite_nz::test_util::generators::unsigned_vec_natural_pair_gen_var_1;
 use malachite_nz::test_util::integer::arithmetic::crt::balanced_to_canonical;
 use std::panic::catch_unwind;
+#[cfg(not(feature = "32_bit_limbs"))]
 use std::str::FromStr;
 
+#[cfg(not(feature = "32_bit_limbs"))]
 fn n(s: &str) -> Natural {
     Natural::from_str(s).unwrap()
 }
 
+#[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_crt_comb() {
     // - a single tiny group

@@ -40,6 +40,7 @@ fn main() {
     // Assigning the negation of a different value: fine.
     let w = 9i32;
     let mut z = 4i32;
+    println!("{z}");
     z = -w;
     println!("{z}");
     // Negating a float, which has NegAssign: flagged.

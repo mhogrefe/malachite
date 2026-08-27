@@ -757,7 +757,7 @@ checksum = "0ceec5bc11778974d1bcb055b18002eba7f4b3518b6a0081b3af5f21666da9ad"
 
 [[package]]
 name = "malachite-base"
-version = "0.10.0"
+version = "0.11.0"
 dependencies = [
  "hashbrown 0.16.1",
  "itertools 0.14.0",
@@ -767,7 +767,7 @@ dependencies = [
 
 [[package]]
 name = "malachite-float"
-version = "0.10.0"
+version = "0.11.0"
 dependencies = [
  "itertools 0.14.0",
  "malachite-base",
@@ -777,7 +777,7 @@ dependencies = [
 
 [[package]]
 name = "malachite-nz"
-version = "0.10.0"
+version = "0.11.0"
 dependencies = [
  "itertools 0.14.0",
  "libm",
@@ -787,7 +787,7 @@ dependencies = [
 
 [[package]]
 name = "malachite-q"
-version = "0.10.0"
+version = "0.11.0"
 dependencies = [
  "itertools 0.14.0",
  "libm",

@@ -42,4 +42,10 @@ done
 # The criterion-bench bench targets require features that `build.sh` never enables, so, like
 # `build.sh`, only check the default target.
 (cd malachite-criterion-bench && echo "Linting malachite-criterion-bench" && cargo dylint --all)
+# Count the lines of Rust in the repo, like the old additional-lints.py did: every .rs file
+# outside target directories and editor history. (`cat | wc -l` rather than `wc -l` per file, so
+# xargs batching can't produce multiple totals.)
+LINE_COUNT=$(find . -name '*.rs' -not -path '*/target/*' -not -path '*.history*' -print0 \
+    | xargs -0 cat | wc -l | tr -d ' ')
+echo "$LINE_COUNT lines of Rust"
 echo "All lints passed"

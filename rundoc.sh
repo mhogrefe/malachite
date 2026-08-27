@@ -23,13 +23,17 @@ DOCTESTS=$ROOT/../doctest_workspace/doctests
 # demonstrate the prec_round forms under Nearest, show the assign and by-value variants on
 # purpose, compare bignums where a comparison is the subject matter, and never want const-block
 # advice.
+# The extracted crate declares the same feature names as the source crate (doc_runner writes
+# them into its Cargo.toml), so the caller's feature flags are forwarded: extraction under
+# `--features random` produces doctests for random-gated items, which only compile if the lint
+# pass builds with those features too.
 (cd "$DOCTESTS" && MALACHITE_LINT_DOCTESTS=1 \
     DYLINT_RUSTFLAGS="-A runtime_literal_conversion -A redundant_nearest \
         -A assign_then_consumed_once -A assign_then_returned -A clone_with_ref_variant \
         -A use_const_block -A compare_with_primitive -A mul_div_by_power_of_2 \
         -A mul_div_by_power_of_2_literal -A use_fused_mul" \
     CARGO_TARGET_DIR="$ROOT/../doctest_workspace/target" \
-    cargo dylint --all -- --all-targets)
+    cargo dylint --all -- --all-targets "$@")
 rm -rf "$DOCTESTS"
 echo "Running Clippy"
 # The feature and target flags per crate match build.sh and additional-lints.sh.

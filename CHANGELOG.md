@@ -62,7 +62,10 @@ compatibility crate.
 - Performance: division and modular arithmetic with precomputed inverses (modular
   multiplication improved by roughly 20% in the precomputed paths) and fused shift-add limb
   kernels.
-- Fixed: the 0/0 division contract and negative-number formatting flags listed above.
+- Fixed: the 0/0 division contract and negative-number formatting flags listed above, and an
+  unsoundness in the `mpfr_can_round_raw` port with 32-bit limbs (a latent bug in MPFR itself
+  on 32-bit-limb builds): a carry absorbed by a truncated limb was misread as a binade change,
+  letting `Float::can_round` claim an undecidable rounding was decided.
 
 ### malachite-q
 

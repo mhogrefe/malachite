@@ -1,4 +1,3 @@
-use malachite_base::num::arithmetic::traits::{AddMul, MulAddMul, WrappingAddMul};
 use malachite_base::num::basic::traits::Two;
 use malachite_float::Float;
 use malachite_nz::natural::Natural;

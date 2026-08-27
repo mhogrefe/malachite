@@ -245,10 +245,9 @@ impl AverageRound<Self> for Natural {
     /// indicating whether the returned value is less than, equal to, or greater than the exact
     /// value.
     ///
-    /// Let $a = \frac{x + y}{2}$. The rounding of an inexact average follows the
-    /// [`AverageRound`](malachite_base::num::arithmetic::traits::AverageRound) documentation in
-    /// `malachite-base`, and the returned [`Ordering`] indicates whether the result is less than,
-    /// equal to, or greater than $a$.
+    /// Let $a = \frac{x + y}{2}$. The rounding of an inexact average follows the [`AverageRound`]
+    /// documentation in `malachite-base`, and the returned [`Ordering`] indicates whether the
+    /// result is less than, equal to, or greater than $a$.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -299,10 +298,9 @@ impl AverageRound<&Self> for Natural {
     /// is also returned, indicating whether the returned value is less than, equal to, or greater
     /// than the exact value.
     ///
-    /// Let $a = \frac{x + y}{2}$. The rounding of an inexact average follows the
-    /// [`AverageRound`](malachite_base::num::arithmetic::traits::AverageRound) documentation in
-    /// `malachite-base`, and the returned [`Ordering`] indicates whether the result is less than,
-    /// equal to, or greater than $a$.
+    /// Let $a = \frac{x + y}{2}$. The rounding of an inexact average follows the [`AverageRound`]
+    /// documentation in `malachite-base`, and the returned [`Ordering`] indicates whether the
+    /// result is less than, equal to, or greater than $a$.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -353,10 +351,9 @@ impl AverageRound<Natural> for &Natural {
     /// is also returned, indicating whether the returned value is less than, equal to, or greater
     /// than the exact value.
     ///
-    /// Let $a = \frac{x + y}{2}$. The rounding of an inexact average follows the
-    /// [`AverageRound`](malachite_base::num::arithmetic::traits::AverageRound) documentation in
-    /// `malachite-base`, and the returned [`Ordering`] indicates whether the result is less than,
-    /// equal to, or greater than $a$.
+    /// Let $a = \frac{x + y}{2}$. The rounding of an inexact average follows the [`AverageRound`]
+    /// documentation in `malachite-base`, and the returned [`Ordering`] indicates whether the
+    /// result is less than, equal to, or greater than $a$.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -407,10 +404,9 @@ impl AverageRound<&Natural> for &Natural {
     /// indicating whether the returned value is less than, equal to, or greater than the exact
     /// value.
     ///
-    /// Let $a = \frac{x + y}{2}$. The rounding of an inexact average follows the
-    /// [`AverageRound`](malachite_base::num::arithmetic::traits::AverageRound) documentation in
-    /// `malachite-base`, and the returned [`Ordering`] indicates whether the result is less than,
-    /// equal to, or greater than $a$.
+    /// Let $a = \frac{x + y}{2}$. The rounding of an inexact average follows the [`AverageRound`]
+    /// documentation in `malachite-base`, and the returned [`Ordering`] indicates whether the
+    /// result is less than, equal to, or greater than $a$.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -459,10 +455,9 @@ impl AverageRoundAssign<Self> for Natural {
     /// first [`Natural`] with it. An [`Ordering`] is returned, indicating whether the assigned
     /// value is less than, equal to, or greater than the exact value.
     ///
-    /// Let $a = \frac{x + y}{2}$. The rounding of an inexact average follows the
-    /// [`AverageRound`](malachite_base::num::arithmetic::traits::AverageRound) documentation in
-    /// `malachite-base`, and the returned [`Ordering`] indicates whether the result is less than,
-    /// equal to, or greater than $a$.
+    /// Let $a = \frac{x + y}{2}$. The rounding of an inexact average follows the [`AverageRound`]
+    /// documentation in `malachite-base`, and the returned [`Ordering`] indicates whether the
+    /// result is less than, equal to, or greater than $a$.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -499,10 +494,9 @@ impl AverageRoundAssign<&Self> for Natural {
     /// the first [`Natural`] with it. An [`Ordering`] is returned, indicating whether the assigned
     /// value is less than, equal to, or greater than the exact value.
     ///
-    /// Let $a = \frac{x + y}{2}$. The rounding of an inexact average follows the
-    /// [`AverageRound`](malachite_base::num::arithmetic::traits::AverageRound) documentation in
-    /// `malachite-base`, and the returned [`Ordering`] indicates whether the result is less than,
-    /// equal to, or greater than $a$.
+    /// Let $a = \frac{x + y}{2}$. The rounding of an inexact average follows the [`AverageRound`]
+    /// documentation in `malachite-base`, and the returned [`Ordering`] indicates whether the
+    /// result is less than, equal to, or greater than $a$.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$

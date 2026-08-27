@@ -25,7 +25,7 @@ LL |     m = !m;
    |     ^^^^^^
 
 error: use `neg_assign()` (in place) instead of `x = -x`
-  --> $DIR/use_unary_assign.rs:47:5
+  --> $DIR/use_unary_assign.rs:48:5
    |
 LL |     f = -f;
    |     ^^^^^^

@@ -15,6 +15,8 @@
 // reconstruction and the simplest fraction in an interval. The word-level kernels and the `Mat22`
 // matrix of accumulated quotients are here too, since both consumers use them.
 
+use alloc::vec;
+use alloc::vec::Vec;
 use core::cmp::Ordering;
 use core::mem::{replace, swap};
 use malachite_base::num::arithmetic::traits::{

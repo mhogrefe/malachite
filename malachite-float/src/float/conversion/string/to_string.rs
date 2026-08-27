@@ -116,14 +116,14 @@ impl ToStringBase for Float {
     /// Digits from 0 to 9 become [`char`]s from `'0'` to `'9'`, and digits from 10 to 35 become the
     /// lowercase [`char`]s `'a'` to `'z'`.
     ///
-    /// The output agrees with the formatting impls: base 10 writes what
-    /// [`Display`](std::fmt::Display) writes, and bases 2, 8, and 16 write what `{:b}`, `{:o}`, and
-    /// `{:x}` write, without the prefix that the `#` flag would add. The number of digits follows
-    /// from that. In a power-of-2 base the value is exactly representable, so exactly enough digits
-    /// are written to reproduce it; in any other base the count is the one that round-trips a
-    /// [`Float`] of this precision, with trailing zeros kept to reach it. The count therefore
-    /// depends only on the precision, so a printed string does not by itself determine a [`Float`];
-    /// see [`ComparableFloat`], whose output also records the precision.
+    /// The output agrees with the formatting impls: base 10 writes what [`Display`] writes, and
+    /// bases 2, 8, and 16 write what `{:b}`, `{:o}`, and `{:x}` write, without the prefix that the
+    /// `#` flag would add. The number of digits follows from that. In a power-of-2 base the value
+    /// is exactly representable, so exactly enough digits are written to reproduce it; in any other
+    /// base the count is the one that round-trips a [`Float`] of this precision, with trailing
+    /// zeros kept to reach it. The count therefore depends only on the precision, so a printed
+    /// string does not by itself determine a [`Float`]; see [`ComparableFloat`], whose output also
+    /// records the precision.
     ///
     /// Values whose exponent is far from zero use scientific notation. From base 15 upward the
     /// exponent always carries an explicit sign, since `'e'` is a digit in those bases and the sign

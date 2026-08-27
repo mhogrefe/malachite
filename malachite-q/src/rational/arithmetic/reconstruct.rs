@@ -17,6 +17,8 @@ use crate::rational::arithmetic::cfrac_helpers::{
     Mat22, RECONSTRUCT_HGCD_CUTOFF, fmms1, fmpq_hgcd, hgcd_word, left_shift_hi, limbs_at_most,
     limbs_cmp,
 };
+use alloc::vec;
+use alloc::vec::Vec;
 use core::cmp::Ordering;
 use core::mem::{replace, swap, take};
 use malachite_base::num::arithmetic::traits::{

@@ -1,3 +1,7 @@
+// Dead stores are this lint's subject matter: every example row assigns a value that a later
+// branch overwrites, so the rustc lint about it stays off.
+#![allow(unused_assignments)]
+
 fn main() {
     let c = std::hint::black_box(3u32);
     let mut x = 0;

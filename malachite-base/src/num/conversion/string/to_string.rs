@@ -302,7 +302,7 @@ macro_rules! impl_to_string_base_unsigned {
             /// from 10 to 35 become the uppercase [`char`]s 'A' to 'Z'. For bases from 37 through
             /// 62 the uppercase and lowercase letters are distinct digits and there is only one
             /// alphabet, so the result is the same as
-            /// [`to_string_base`](super::traits::ToStringBase::to_string_base)'s.
+            /// [`to_string_base`](crate::num::conversion::traits::ToStringBase::to_string_base)'s.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$
@@ -504,7 +504,7 @@ macro_rules! impl_to_string_base_signed {
             /// from 10 to 35 become the uppercase [`char`]s 'A' to 'Z'. For bases from 37 through
             /// 62 the uppercase and lowercase letters are distinct digits and there is only one
             /// alphabet, so the result is the same as
-            /// [`to_string_base`](super::traits::ToStringBase::to_string_base)'s.
+            /// [`to_string_base`](crate::num::conversion::traits::ToStringBase::to_string_base)'s.
             ///
             /// # Worst-case complexity
             /// $T(n) = O(n)$

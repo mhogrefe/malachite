@@ -620,11 +620,11 @@ pub fn gmp_format(fmt: &str, args: &[&dyn GmpFormatArg]) -> Option<String> {
 }
 
 /// Formats values according to a GMP-style `printf` format string, as
-/// [`gmp_format`](strings::gmp_format::gmp_format) does, taking the values as ordinary arguments:
+/// [`gmp_format`](crate::gmp_format) does, taking the values as ordinary arguments:
 /// `gmp_format!("%Zd of %d", n, k)`.
 ///
-/// The result is an `Option<String>`; see [`gmp_format`](strings::gmp_format::gmp_format) for the
-/// supported conversions and failure conditions.
+/// The result is an `Option<String>`; see [`gmp_format`](crate::gmp_format) for the supported
+/// conversions and failure conditions.
 ///
 /// # Examples
 /// ```

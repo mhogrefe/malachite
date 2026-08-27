@@ -87,7 +87,7 @@ impl Float {
     /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is [`Exact`] but the selected operand cannot be
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the selected operand cannot be
     /// represented exactly at a precision of `prec` bits.
     ///
     /// # Examples
@@ -148,7 +148,7 @@ impl Float {
     /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is [`Exact`] but the selected operand cannot be
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the selected operand cannot be
     /// represented exactly at a precision of `prec` bits.
     ///
     /// # Examples
@@ -214,7 +214,7 @@ impl Float {
     /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is [`Exact`] but the selected operand cannot be
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the selected operand cannot be
     /// represented exactly at a precision of `prec` bits.
     ///
     /// # Examples
@@ -280,7 +280,7 @@ impl Float {
     /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is [`Exact`] but the selected operand cannot be
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the selected operand cannot be
     /// represented exactly at a precision of `prec` bits.
     ///
     /// # Examples
@@ -1018,7 +1018,7 @@ impl Float {
     /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is [`Exact`] but the selected operand cannot be
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the selected operand cannot be
     /// represented exactly at a precision of `prec` bits.
     ///
     /// # Examples
@@ -1079,7 +1079,7 @@ impl Float {
     /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is [`Exact`] but the selected operand cannot be
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the selected operand cannot be
     /// represented exactly at a precision of `prec` bits.
     ///
     /// # Examples
@@ -1145,7 +1145,7 @@ impl Float {
     /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is [`Exact`] but the selected operand cannot be
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the selected operand cannot be
     /// represented exactly at a precision of `prec` bits.
     ///
     /// # Examples
@@ -1211,7 +1211,7 @@ impl Float {
     /// `max(self.significant_bits(), other.significant_bits())`.
     ///
     /// # Panics
-    /// Panics if `prec` is zero, or if `rm` is [`Exact`] but the selected operand cannot be
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the selected operand cannot be
     /// represented exactly at a precision of `prec` bits.
     ///
     /// # Examples

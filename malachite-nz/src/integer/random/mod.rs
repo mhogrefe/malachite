@@ -1105,8 +1105,7 @@ pub fn random_integer_range_to_infinity(
 ///
 /// # Examples
 /// ```
-/// use malachite_base::num::random::random_primitive_ints;
-/// use malachite_base::num::random::VariableRangeGenerator;
+/// use malachite_base::num::random::{random_primitive_ints, VariableRangeGenerator};
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::get_random_integer_from_range_to_infinity;
 /// use malachite_nz::integer::Integer;
@@ -1223,8 +1222,7 @@ pub fn random_integer_range_to_negative_infinity(
 ///
 /// # Examples
 /// ```
-/// use malachite_base::num::random::random_primitive_ints;
-/// use malachite_base::num::random::VariableRangeGenerator;
+/// use malachite_base::num::random::{random_primitive_ints, VariableRangeGenerator};
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::integer::random::get_random_integer_from_range_to_negative_infinity;
 /// use malachite_nz::integer::Integer;

@@ -207,7 +207,7 @@ impl GcdAssign<Self> for Rational {
     /// Replaces a [`Rational`] with the GCD of it and another [`Rational`], taking the other by
     /// value.
     ///
-    /// See [`Gcd`](malachite_base::num::arithmetic::traits::Gcd) for the definition.
+    /// See [`Gcd`] for the definition.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$
@@ -241,7 +241,7 @@ impl GcdAssign<&Self> for Rational {
     /// Replaces a [`Rational`] with the GCD of it and another [`Rational`], taking the other by
     /// reference.
     ///
-    /// See [`Gcd`](malachite_base::num::arithmetic::traits::Gcd) for the definition.
+    /// See [`Gcd`] for the definition.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$

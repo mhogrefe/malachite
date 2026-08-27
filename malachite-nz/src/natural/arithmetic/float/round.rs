@@ -20,6 +20,7 @@ use crate::natural::{
     limb_to_bit_count,
 };
 use crate::platform::Limb;
+use alloc::vec::Vec;
 use core::cmp::min;
 use malachite_base::num::arithmetic::traits::{
     IsPowerOf2, ModPowerOf2, NegModPowerOf2, Parity, PowerOf2, ShrRound, WrappingSubAssign,
@@ -687,9 +688,14 @@ pub fn limbs_float_can_round_raw(
         cc = (xs[bn - 1] >> s1).odd() ^ limbs_round_would_increment(&xs[..bn], prec2, rnd2);
         // now round b + eps
         let mut cy = limbs_add_limb_to_out(&mut tmp[bn - k..bn], &xs[bn - k..bn], eps);
-        // propagate the carry through the truncated limbs
+        // Propagate the carry through the truncated limbs. MPFR's loop here is `tn + 1 < k1`, which
+        // never consults the most significant truncated limb: when that limb is not all ones, a
+        // carry it would absorb is misread as a change of binade. With 64-bit limbs the
+        // differential sweep never reaches the difference, but with 32-bit limbs the misreading
+        // produces unsound `true`s (e.g. x = 2^100 - 2^98 - 1, err = prec = 50, Floor -> Nearest).
+        // MPFR's own borrow loop below uses `tn < k1`; do the same here.
         let mut tn = 0;
-        while tn + 1 < k1 && cy {
+        while tn < k1 && cy {
             cy = xs[bn + tn] == Limb::MAX;
             tn += 1;
         }
@@ -707,8 +713,10 @@ pub fn limbs_float_can_round_raw(
     } else if rnd1 == Nearest {
         // first round b + eps
         let mut cy = limbs_add_limb_to_out(&mut tmp[bn - k..bn], &xs[bn - k..bn], eps);
+        // See the carry-propagation comment in the Down branch: `tn < k1`, deviating from MPFR, so
+        // that the most significant truncated limb is consulted too.
         let mut tn = 0;
-        while tn + 1 < k1 && cy {
+        while tn < k1 && cy {
             cy = xs[bn + tn] == Limb::MAX;
             tn += 1;
         }

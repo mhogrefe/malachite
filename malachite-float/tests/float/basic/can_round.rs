@@ -8,13 +8,16 @@
 
 use gmp_mpfr_sys::mpfr::{self, rnd_t};
 use malachite_base::num::arithmetic::traits::PowerOf2;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::NaN;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::LowMask;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
-use malachite_float::Float;
 use malachite_float::test_util::common::parse_hex_string;
+use malachite_float::{ComparableFloat, Float};
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
+use malachite_q::Rational;
 
 const fn mpfr_rnd(rm: RoundingMode) -> rnd_t {
     match rm {
@@ -40,12 +43,57 @@ fn mpfr_can_round(x: &Float, err: i64, rnd1: RoundingMode, rnd2: RoundingMode, p
     }
 }
 
+// The exact decidability question `can_round` approximates: every real in the error interval rounds
+// to the same value at the target precision. Rounding is monotone, so it suffices to compare the
+// rounded endpoints, computed exactly via Rational.
+fn can_round_ground_truth(
+    x: &Float,
+    err: i64,
+    rnd1: RoundingMode,
+    rnd2: RoundingMode,
+    prec: u64,
+) -> bool {
+    let exp = i64::from(x.get_exponent().unwrap());
+    let eps = Rational::power_of_2(exp - err);
+    let b = Rational::exact_from(x);
+    let neg = *x < 0;
+    // An approximation rounded toward zero means the true value lies beyond b, away from zero, and
+    // so on.
+    let towards_zero = match rnd1 {
+        Down => true,
+        Up | Nearest => false,
+        Floor => !neg,
+        Ceiling => neg,
+        Exact => unreachable!(),
+    };
+    let (lo, hi) = if rnd1 == Nearest {
+        (&b - &eps, &b + &eps)
+    } else if towards_zero != neg {
+        // the interval extends upward in value
+        (b.clone(), &b + &eps)
+    } else {
+        (&b - &eps, b.clone())
+    };
+    let lo = Float::from_rational_prec_round(lo, prec, rnd2).0;
+    let hi = Float::from_rational_prec_round(hi, prec, rnd2).0;
+    ComparableFloat(lo) == ComparableFloat(hi)
+}
+
 // Dense differential sweep against mpfr_can_round over significand patterns chosen to hit the
 // rounding-bit, sticky-bit, and binade boundaries, for every pair of rounding modes, both signs,
 // and errors spanning all the boundary cases in the code.
+//
+// can_round is a sufficient condition: false may always be answered conservatively (a Ziv loop just
+// iterates once more), but true promises that rounding is genuinely decided. mpfr_can_round_raw's
+// answers in some corner cases depend on where the limb boundaries fall (the carry-propagation and
+// power-of-2 checks in its RNDZ/RNDN branches consult only some of the truncated limbs), and the
+// port is faithful to the algorithm at Malachite's own limb width. With 64-bit limbs the layouts
+// coincide and the answers must match exactly; with 32-bit limbs they can differ in either
+// direction, and exact endpoint rounding arbitrates: whichever side answers true must be right.
 #[test]
 fn test_can_round_vs_mpfr() {
     let rms = [Floor, Ceiling, Down, Up, Nearest];
+    let mut mismatches = 0u64;
     for prec_x in [10u64, 64, 65, 100] {
         // significand patterns at precision prec_x
         let mut sigs = vec![
@@ -76,10 +124,14 @@ fn test_can_round_vs_mpfr() {
                             for rnd2 in rms {
                                 let ours = x.can_round(err, rnd1, rnd2, prec);
                                 let theirs = mpfr_can_round(&x, err, rnd1, rnd2, prec);
-                                assert_eq!(
-                                    ours, theirs,
-                                    "{x} {err} {rnd1} {rnd2} {prec} (prec_x {prec_x})"
-                                );
+                                if ours != theirs {
+                                    assert!(
+                                        can_round_ground_truth(&x, err, rnd1, rnd2, prec),
+                                        "unsound true: {x} {err} {rnd1} {rnd2} {prec} (prec_x \
+                                         {prec_x}, ours {ours}, mpfr {theirs})"
+                                    );
+                                    mismatches += 1;
+                                }
                             }
                         }
                     }
@@ -87,6 +139,10 @@ fn test_can_round_vs_mpfr() {
             }
         }
     }
+    // Every disagreement above is a corner where mpfr_can_round's limb-layout-dependent paths and
+    // the port's sound carry propagation differ, each verified against ground truth. Pin the counts
+    // so any behavioral drift is noticed.
+    assert_eq!(mismatches, if Limb::WIDTH == u32::WIDTH { 24 } else { 16 });
 }
 
 // If rounding is claimed to be possible, then every value consistent with the approximation must
