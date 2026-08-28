@@ -11,12 +11,34 @@ use crate::integer::Integer;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ImaginaryFrom;
 
-// Anything that converts to an `Integer` converts to a purely imaginary `GaussianInteger`,
-// including `Integer` itself.
 impl<T> ImaginaryFrom<T> for GaussianInteger
 where
     Integer: From<T>,
 {
+    /// Converts a value of any type that converts to an [`Integer`] — including [`Integer`]
+    /// itself — to a purely imaginary [`GaussianInteger`].
+    ///
+    /// # Worst-case complexity
+    /// Same as the complexity of the corresponding [`Integer`] conversion.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::conversion::traits::ImaginaryFrom;
+    /// use malachite_nz::gaussian_integer::GaussianInteger;
+    /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!(GaussianInteger::imaginary_from(123u32).to_string(), "123i");
+    /// assert_eq!(GaussianInteger::imaginary_from(-123i64).to_string(), "-123i");
+    /// assert_eq!(
+    ///     GaussianInteger::imaginary_from(Natural::from(123u32)).to_string(),
+    ///     "123i"
+    /// );
+    /// assert_eq!(
+    ///     GaussianInteger::imaginary_from(Integer::from(-123)).to_string(),
+    ///     "-123i"
+    /// );
+    /// ```
     fn imaginary_from(x: T) -> Self {
         Self {
             real: Integer::ZERO,

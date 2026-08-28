@@ -10,9 +10,57 @@ use crate::gaussian_integer::GaussianInteger;
 use core::fmt::{Display, Formatter, Result, Write};
 
 impl Display for GaussianInteger {
-    // Purely real values display like their real part, and 0 is "0". Otherwise the imaginary unit
-    // is written as "i", "-i", or with an integer coefficient, and a nonzero real part precedes it
-    // with a joining sign: "1+i", "1-i", "2+3i", "2-3i".
+    /// Converts a [`GaussianInteger`] to a [`String`].
+    ///
+    /// A value with a zero imaginary part is written as its real part alone; in particular, zero is
+    /// `"0"`. A purely imaginary value is written as a coefficient directly followed by `'i'`, with
+    /// coefficients of 1 and -1 elided, giving `"i"` and `"-i"`. Otherwise, the real term is
+    /// written first and the imaginary term follows with a joining sign, as in `"1+i"` and
+    /// `"2-3i"`.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum number of significant
+    /// bits of the real and imaginary parts.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::conversion::traits::ImaginaryFrom;
+    /// use malachite_nz::gaussian_integer::GaussianInteger;
+    /// use malachite_nz::integer::Integer;
+    ///
+    /// assert_eq!(GaussianInteger::default().to_string(), "0");
+    /// assert_eq!(GaussianInteger::from(2).to_string(), "2");
+    /// assert_eq!(GaussianInteger::from(-2).to_string(), "-2");
+    /// assert_eq!(GaussianInteger::imaginary_from(1).to_string(), "i");
+    /// assert_eq!(GaussianInteger::imaginary_from(-1).to_string(), "-i");
+    /// assert_eq!(GaussianInteger::imaginary_from(2).to_string(), "2i");
+    /// assert_eq!(GaussianInteger::imaginary_from(-2).to_string(), "-2i");
+    ///
+    /// let g = GaussianInteger {
+    ///     real: Integer::from(1),
+    ///     imaginary: Integer::from(1),
+    /// };
+    /// assert_eq!(g.to_string(), "1+i");
+    /// let g = GaussianInteger {
+    ///     real: Integer::from(1),
+    ///     imaginary: Integer::from(-1),
+    /// };
+    /// assert_eq!(g.to_string(), "1-i");
+    /// let g = GaussianInteger {
+    ///     real: Integer::from(2),
+    ///     imaginary: Integer::from(3),
+    /// };
+    /// assert_eq!(g.to_string(), "2+3i");
+    /// let g = GaussianInteger {
+    ///     real: Integer::from(2),
+    ///     imaginary: Integer::from(-3),
+    /// };
+    /// assert_eq!(g.to_string(), "2-3i");
+    /// ```
     fn fmt(&self, f: &mut Formatter) -> Result {
         if self.imaginary == 0 {
             return Display::fmt(&self.real, f);

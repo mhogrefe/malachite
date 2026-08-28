@@ -6,5 +6,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+/// Implementations of traits for converting strings to
+/// [`GaussianInteger`](crate::gaussian_integer::GaussianInteger)s.
+pub mod from_string;
 /// Implementations of traits for converting to strings.
 pub mod to_string;

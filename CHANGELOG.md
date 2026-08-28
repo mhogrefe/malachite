@@ -6,7 +6,30 @@ Unreleased section as work lands; at release time the section is stamped with th
 date. The 0.10.0 section was reconstructed retroactively; releases before 0.10.0 are only
 documented by git history.
 
-## 0.11.0 (unreleased)
+## 0.12.0 (unreleased)
+
+### malachite-base
+
+- New traits for complex types downstream (nothing in malachite-base implements them): the
+  constant traits `I` and `NegativeI`, and the conversion traits `ImaginaryFrom` and
+  `ImaginaryInto`.
+
+### malachite-nz
+
+- A new `GaussianInteger` type, parallel to `Natural` and `Integer`: a pair of public `Integer`
+  fields `real` and `imaginary`, always valid. So far it has the constants 0, 1, 2, -1, i, and
+  -i; `Display` and `FromStr` (strict about term structure, permissive about degenerate
+  coefficients like `"1i"` and `"0i"`); blanket `From` and `ImaginaryFrom` conversions from
+  every type that converts to `Integer`; serde support; and exhaustive, random, and
+  striped-random generators, wired into the demo, benchmark, and property-test machinery.
+
+### Documentation
+
+- The `FromStr` docs for `Natural`, `Integer`, and `Rational` now mention the accepted leading
+  `'+'` (and, for `Rational`, the `'+'` allowed on the denominator), which the parsers had
+  always accepted.
+
+## 0.11.0 — 2026-08-27
 
 The main themes of this release are a large batch of number-theoretic functions (CRT, modular
 division and square roots, rational reconstruction, and a family of combinatorial sequences),

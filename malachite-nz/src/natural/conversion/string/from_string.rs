@@ -26,8 +26,8 @@ impl FromStr for Natural {
     /// Converts an string to a [`Natural`].
     ///
     /// If the string does not represent a valid [`Natural`], an `Err` is returned. To be valid, the
-    /// string must be nonempty and only contain the [`char`]s `'0'` through `'9'`. Leading zeros
-    /// are allowed.
+    /// string must be nonempty and only contain the [`char`]s `'0'` through `'9'`, with an optional
+    /// single leading `'+'`. Leading zeros are allowed. The string `"+"` is not valid.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$
@@ -44,10 +44,13 @@ impl FromStr for Natural {
     /// assert_eq!(Natural::from_str("123456").unwrap(), 123456);
     /// assert_eq!(Natural::from_str("00123456").unwrap(), 123456);
     /// assert_eq!(Natural::from_str("0").unwrap(), 0);
+    /// assert_eq!(Natural::from_str("+123456").unwrap(), 123456);
     ///
     /// assert!(Natural::from_str("").is_err());
     /// assert!(Natural::from_str("a").is_err());
     /// assert!(Natural::from_str("-5").is_err());
+    /// assert!(Natural::from_str("+").is_err());
+    /// assert!(Natural::from_str("++5").is_err());
     /// ```
     #[inline]
     fn from_str(s: &str) -> Result<Self, ()> {

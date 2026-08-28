@@ -19,6 +19,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_real_gaussian_integer_to_string);
     register_demo!(runner, demo_imaginary_gaussian_integer_to_string);
     register_bench!(runner, benchmark_gaussian_integer_to_string);
+    register_bench!(runner, benchmark_real_gaussian_integer_to_string);
+    register_bench!(runner, benchmark_imaginary_gaussian_integer_to_string);
 }
 
 fn demo_gaussian_integer_to_string(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -49,6 +51,42 @@ fn benchmark_gaussian_integer_to_string(
         "GaussianInteger.to_string()",
         BenchmarkType::Single,
         gaussian_integer_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &gaussian_integer_bit_bucketer("x"),
+        &mut [("Malachite", &mut |x| no_out!(x.to_string()))],
+    );
+}
+
+fn benchmark_real_gaussian_integer_to_string(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "GaussianInteger.to_string(), purely real",
+        BenchmarkType::Single,
+        gaussian_integer_gen_var_1().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &gaussian_integer_bit_bucketer("x"),
+        &mut [("Malachite", &mut |x| no_out!(x.to_string()))],
+    );
+}
+
+fn benchmark_imaginary_gaussian_integer_to_string(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "GaussianInteger.to_string(), purely imaginary",
+        BenchmarkType::Single,
+        gaussian_integer_gen_var_2().get(gm, config),
         gm.name(),
         limit,
         file_name,

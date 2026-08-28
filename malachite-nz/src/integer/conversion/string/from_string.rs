@@ -19,7 +19,8 @@ impl FromStr for Integer {
     ///
     /// If the string does not represent a valid [`Integer`], an `Err` is returned. To be valid, the
     /// string must be nonempty and only contain the [`char`]s `'0'` through `'9'`, with an optional
-    /// leading `'-'`. Leading zeros are allowed, as is the string `"-0"`. The string `"-"` is not.
+    /// single leading `'-'` or `'+'`. Leading zeros are allowed, as are the strings `"-0"` and
+    /// `"+0"`. The strings `"-"` and `"+"` are not.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$
@@ -39,9 +40,13 @@ impl FromStr for Integer {
     /// assert_eq!(Integer::from_str("-123456").unwrap(), -123456);
     /// assert_eq!(Integer::from_str("-00123456").unwrap(), -123456);
     /// assert_eq!(Integer::from_str("-0").unwrap(), 0);
+    /// assert_eq!(Integer::from_str("+123456").unwrap(), 123456);
+    /// assert_eq!(Integer::from_str("+0").unwrap(), 0);
     ///
     /// assert!(Integer::from_str("").is_err());
     /// assert!(Integer::from_str("a").is_err());
+    /// assert!(Integer::from_str("+").is_err());
+    /// assert!(Integer::from_str("+-5").is_err());
     /// ```
     #[inline]
     fn from_str(s: &str) -> Result<Self, ()> {

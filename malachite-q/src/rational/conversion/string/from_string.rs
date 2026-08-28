@@ -97,8 +97,9 @@ impl FromStr for Rational {
     /// Converts an string to a [`Rational`].
     ///
     /// If the string does not represent a valid [`Rational`], an `Err` is returned. The numerator
-    /// and denominator do not need to be in lowest terms, but the denominator must be nonzero. A
-    /// negative sign is only allowed at the 0th position of the string.
+    /// and denominator do not need to be in lowest terms, but the denominator must be nonzero. An
+    /// optional single leading `'-'` or `'+'` is allowed before the numerator. The denominator may
+    /// also have a single leading `'+'`, but not a `'-'`.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$
@@ -124,10 +125,13 @@ impl FromStr for Rational {
     /// assert_eq!(Rational::from_str("-22/7").unwrap().to_string(), "-22/7");
     /// assert_eq!(Rational::from_str("-01/02").unwrap().to_string(), "-1/2");
     /// assert_eq!(Rational::from_str("-3/21").unwrap().to_string(), "-1/7");
+    /// assert_eq!(Rational::from_str("+22/7").unwrap().to_string(), "22/7");
+    /// assert_eq!(Rational::from_str("22/+7").unwrap().to_string(), "22/7");
     ///
     /// assert!(Rational::from_str("").is_err());
     /// assert!(Rational::from_str("a").is_err());
     /// assert!(Rational::from_str("1/0").is_err());
+    /// assert!(Rational::from_str("1/-2").is_err());
     /// assert!(Rational::from_str("/1").is_err());
     /// assert!(Rational::from_str("1/").is_err());
     /// assert!(Rational::from_str("--1").is_err());
