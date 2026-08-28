@@ -224,6 +224,9 @@ extern crate embed_doc_image;
 /// [`Natural`](natural::Natural), a type representing arbitrarily large non-negative integers.
 #[macro_use]
 pub mod natural;
+/// [`GaussianInteger`](gaussian_integer::GaussianInteger), a type representing complex numbers
+/// whose real and imaginary parts are both integers.
+pub mod gaussian_integer;
 /// [`Integer`](integer::Integer), a type representing integers with arbitrarily large absolute
 /// values.
 pub mod integer;

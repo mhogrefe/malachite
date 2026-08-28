@@ -34,6 +34,24 @@ pub trait NegativeOne {
     const NEGATIVE_ONE: Self;
 }
 
+/// Provides the constant i, the imaginary unit.
+///
+/// No type in this crate implements this trait; it exists for complex types downstream, like
+/// Gaussian integers.
+#[allow(clippy::declare_interior_mutable_const)]
+pub trait I {
+    const I: Self;
+}
+
+/// Provides the constant -i, the negative of the imaginary unit.
+///
+/// No type in this crate implements this trait; it exists for complex types downstream, like
+/// Gaussian integers.
+#[allow(clippy::declare_interior_mutable_const)]
+pub trait NegativeI {
+    const NEGATIVE_I: Self;
+}
+
 /// Provides the constant 1/2.
 #[allow(clippy::declare_interior_mutable_const)]
 pub trait OneHalf {
