@@ -13,3 +13,7 @@ src/integer_old.rs
 # Local performance lab: machine-specific paths and benchmark results
 perf/
 CLAUDE.md
+
+# Staging copy of the mapping docs: docs/ is the live site, frozen at release state; unreleased
+# mapping edits accumulate here locally and are promoted into docs/mapping/ at release time.
+docs-staging/

@@ -275,7 +275,10 @@ general-case tests — every one of them corresponds to a real bug class found i
   change, or notable performance win gets a line in the unreleased section at the top of the
   repo-root `CHANGELOG.md`, under its crate; breaking or behavior-changing items also go in the
   release's "Breaking and behavioral changes" list. Writing the line is part of finishing the
-  work (step 7 for ports), not something to reconstruct from git at release time.
+  work (step 7 for ports), not something to reconstruct from git at release time. Likewise,
+  mapping-page updates go in `docs-staging/mapping/` (NOT `docs/mapping/`, which is the live,
+  release-frozen site). `docs-staging/` is gitignored — unreleased mapping edits stay local
+  and are promoted into `docs/mapping/` at release time; see docs-staging/README.md.
 
 ## Known traps
 

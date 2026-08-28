@@ -12,7 +12,7 @@ The main themes of this release are a large batch of number-theoretic functions 
 division and square roots, rational reconstruction, and a family of combinatorial sequences),
 broad new MPFR coverage for `Float` (correctly rounded sums, products, and fused operations;
 remainders and rounding functions; bit-exact random samplers; and the constants that complete
-the MPFR constants section), eight transition-mapping pages on the website documenting how
+the MPFR constants section), ten transition-mapping pages on the website documenting how
 Malachite corresponds to GMP, MPFR, FLINT, and num, and a substantial upgrade of the num-bigint
 compatibility crate.
 
@@ -116,9 +116,9 @@ compatibility crate.
 
 ### Documentation and website
 
-- Eight transition-mapping pages documenting the correspondence between Malachite and other
-  libraries, function by function: GMP integers and rationals, FLINT integers, integers mod n,
-  and arithmetic functions, MPFR floats, and num integers and rationals.
+- Ten transition-mapping pages documenting the correspondence between Malachite and other
+  libraries, function by function: GMP integers and rationals; FLINT integers, integers mod n,
+  rationals, and arithmetic functions; MPFR floats; and num integers, rationals, and traits.
 - A documentation audit across the workspace: complexity annotations verified and standardized
   (conventions recorded in `DOC-CONVENTIONS.md`), plus refreshed front-page examples.
 
