@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::gaussian_integer::GaussianInteger;
 use crate::integer::Integer;
 use crate::natural::Natural;
 use crate::natural::logic::significant_bits::limbs_significant_bits;
@@ -22,6 +23,21 @@ pub fn natural_bucketer(var_name: &str) -> Bucketer<'_, Natural> {
     Bucketer {
         bucketing_function: &|x| usize::exact_from(x),
         bucketing_label: var_name.to_string(),
+    }
+}
+
+pub fn gaussian_integer_bit_bucketer(var_name: &str) -> Bucketer<'_, GaussianInteger> {
+    Bucketer {
+        bucketing_function: &|x| {
+            usize::exact_from(
+                x.real
+                    .significant_bits()
+                    .max(x.imaginary.significant_bits()),
+            )
+        },
+        bucketing_label: format!(
+            "max({var_name}.real.significant_bits(), {var_name}.imaginary.significant_bits())"
+        ),
     }
 }
 

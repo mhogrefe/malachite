@@ -271,6 +271,31 @@ pub trait ConvertibleFrom<T> {
     fn convertible_from(value: T) -> bool;
 }
 
+/// Converts a value to a purely imaginary value of a complex type: the value becomes the imaginary
+/// part, and the real part is zero.
+///
+/// No type in this crate implements this trait; it exists for complex types downstream, like
+/// Gaussian integers.
+pub trait ImaginaryFrom<T>: Sized {
+    fn imaginary_from(value: T) -> Self;
+}
+
+/// Converts a value to a purely imaginary value of a complex type: the value becomes the imaginary
+/// part, and the real part is zero.
+///
+/// It is recommended that this trait is not implemented directly; it is automatically implemented
+/// when [`ImaginaryFrom`] is implemented.
+pub trait ImaginaryInto<T> {
+    fn imaginary_into(self) -> T;
+}
+
+impl<T, U: ImaginaryFrom<T>> ImaginaryInto<U> for T {
+    #[inline]
+    fn imaginary_into(self) -> U {
+        U::imaginary_from(self)
+    }
+}
+
 /// Associates with `Self` a type that's half `Self`'s size.
 pub trait HasHalf {
     /// The type that's half the size of `Self`.

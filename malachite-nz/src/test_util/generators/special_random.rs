@@ -6,6 +6,11 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::gaussian_integer::GaussianInteger;
+use crate::gaussian_integer::random::{
+    striped_random_gaussian_integers, striped_random_imaginary_gaussian_integers,
+    striped_random_real_gaussian_integers,
+};
 use crate::integer::Integer;
 use crate::integer::logic::bit_access::limbs_vec_clear_bit_neg;
 use crate::integer::random::{
@@ -134,6 +139,40 @@ use std::cmp::{Ordering::*, max};
 use std::collections::HashMap;
 use std::marker::PhantomData;
 use std::ops::{Shl, Shr};
+
+// -- GaussianInteger --
+
+pub fn special_random_gaussian_integer_gen(config: &GenConfig) -> It<GaussianInteger> {
+    Box::new(striped_random_gaussian_integers(
+        EXAMPLE_SEED,
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    ))
+}
+
+// Purely real `GaussianInteger`s.
+pub fn special_random_gaussian_integer_gen_var_1(config: &GenConfig) -> It<GaussianInteger> {
+    Box::new(striped_random_real_gaussian_integers(
+        EXAMPLE_SEED,
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    ))
+}
+
+// Purely imaginary `GaussianInteger`s.
+pub fn special_random_gaussian_integer_gen_var_2(config: &GenConfig) -> It<GaussianInteger> {
+    Box::new(striped_random_imaginary_gaussian_integers(
+        EXAMPLE_SEED,
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    ))
+}
 
 // -- Integer --
 

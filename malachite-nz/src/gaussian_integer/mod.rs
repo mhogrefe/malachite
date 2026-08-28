@@ -7,6 +7,15 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::integer::Integer;
+
+/// Functions for converting a [`GaussianInteger`] to and from other types and strings.
+pub mod conversion;
+/// Iterators that generate [`GaussianInteger`]s without repetition.
+pub mod exhaustive;
+#[cfg(feature = "random")]
+/// Iterators that generate [`GaussianInteger`]s randomly.
+pub mod random;
+
 use malachite_base::num::basic::traits::{I, NegativeI, NegativeOne, One, Two, Zero};
 
 /// A Gaussian integer: a complex number whose real and imaginary parts are both integers.

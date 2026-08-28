@@ -6,6 +6,11 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::gaussian_integer::GaussianInteger;
+use crate::gaussian_integer::exhaustive::{
+    exhaustive_gaussian_integers, exhaustive_imaginary_gaussian_integers,
+    exhaustive_real_gaussian_integers,
+};
 use crate::integer::Integer;
 use crate::integer::exhaustive::{
     exhaustive_integers, exhaustive_natural_integers, exhaustive_negative_integers,
@@ -144,6 +149,22 @@ use std::cmp::{Ordering::*, max};
 use std::iter::once;
 use std::marker::PhantomData;
 use std::ops::{Shl, Shr};
+
+// -- GaussianInteger --
+
+pub fn exhaustive_gaussian_integer_gen() -> It<GaussianInteger> {
+    Box::new(exhaustive_gaussian_integers())
+}
+
+// All purely real `GaussianInteger`s.
+pub fn exhaustive_gaussian_integer_gen_var_1() -> It<GaussianInteger> {
+    Box::new(exhaustive_real_gaussian_integers())
+}
+
+// All purely imaginary `GaussianInteger`s.
+pub fn exhaustive_gaussian_integer_gen_var_2() -> It<GaussianInteger> {
+    Box::new(exhaustive_imaginary_gaussian_integers())
+}
 
 // -- Integer --
 

@@ -6,6 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::gaussian_integer::GaussianInteger;
 use crate::integer::Integer;
 use crate::natural::Natural;
 use crate::natural::arithmetic::factorial::FAC_DSC_THRESHOLD;
@@ -36,6 +37,34 @@ use malachite_base::test_util::generators::common::Generator;
 use malachite_base::vecs::exhaustive::lex_ordered_unique_vecs;
 use num::{BigInt, BigUint};
 use std::ops::{Shl, Shr};
+
+// -- GaussianInteger --
+
+pub fn gaussian_integer_gen() -> Generator<GaussianInteger> {
+    Generator::new(
+        &exhaustive_gaussian_integer_gen,
+        &random_gaussian_integer_gen,
+        &special_random_gaussian_integer_gen,
+    )
+}
+
+// All purely real `GaussianInteger`s.
+pub fn gaussian_integer_gen_var_1() -> Generator<GaussianInteger> {
+    Generator::new(
+        &exhaustive_gaussian_integer_gen_var_1,
+        &random_gaussian_integer_gen_var_1,
+        &special_random_gaussian_integer_gen_var_1,
+    )
+}
+
+// All purely imaginary `GaussianInteger`s.
+pub fn gaussian_integer_gen_var_2() -> Generator<GaussianInteger> {
+    Generator::new(
+        &exhaustive_gaussian_integer_gen_var_2,
+        &random_gaussian_integer_gen_var_2,
+        &special_random_gaussian_integer_gen_var_2,
+    )
+}
 
 // -- Integer --
 

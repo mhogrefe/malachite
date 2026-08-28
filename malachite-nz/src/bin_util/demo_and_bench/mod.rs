@@ -46,9 +46,11 @@ macro_rules! natural_signed_single_arg_bench_with_trait {
 }
 
 pub(crate) fn register(runner: &mut Runner) {
+    gaussian_integer::register(runner);
     integer::register(runner);
     natural::register(runner);
 }
 
+mod gaussian_integer;
 mod integer;
 mod natural;

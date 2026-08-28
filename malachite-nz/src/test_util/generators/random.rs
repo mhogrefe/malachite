@@ -6,6 +6,10 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::gaussian_integer::GaussianInteger;
+use crate::gaussian_integer::random::{
+    random_gaussian_integers, random_imaginary_gaussian_integers, random_real_gaussian_integers,
+};
 use crate::integer::Integer;
 use crate::integer::logic::bit_access::limbs_vec_clear_bit_neg;
 use crate::integer::random::{
@@ -138,6 +142,34 @@ use std::cmp::{Ordering::*, max};
 use std::collections::HashMap;
 use std::marker::PhantomData;
 use std::ops::{Shl, Shr};
+
+// -- GaussianInteger --
+
+pub fn random_gaussian_integer_gen(config: &GenConfig) -> It<GaussianInteger> {
+    Box::new(random_gaussian_integers(
+        EXAMPLE_SEED,
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    ))
+}
+
+// Purely real `GaussianInteger`s.
+pub fn random_gaussian_integer_gen_var_1(config: &GenConfig) -> It<GaussianInteger> {
+    Box::new(random_real_gaussian_integers(
+        EXAMPLE_SEED,
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    ))
+}
+
+// Purely imaginary `GaussianInteger`s.
+pub fn random_gaussian_integer_gen_var_2(config: &GenConfig) -> It<GaussianInteger> {
+    Box::new(random_imaginary_gaussian_integers(
+        EXAMPLE_SEED,
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    ))
+}
 
 // -- Integer --
 
