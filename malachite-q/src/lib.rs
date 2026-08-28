@@ -144,8 +144,8 @@ extern crate num;
 extern crate rug;
 
 /// [`Rational`], the crate's rational-number type, and everything defined on it.
-/// [`GaussianRational`](gaussian_rational::GaussianRational), a type representing complex
-/// numbers whose real and imaginary parts are both rational.
+/// [`GaussianRational`](gaussian_rational::GaussianRational), a type representing complex numbers
+/// whose real and imaginary parts are both rational.
 pub mod gaussian_rational;
 pub mod rational;
 pub use rational::Rational;

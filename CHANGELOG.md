@@ -13,6 +13,10 @@ documented by git history.
 - New traits for complex types downstream (nothing in malachite-base implements them): the
   constant traits `I` and `NegativeI`, and the conversion traits `ImaginaryFrom` and
   `ImaginaryInto`.
+- New `IsGaussianInteger` and `IsReal` traits alongside `IsInteger`, implemented for all
+  primitive types (and, in the other crates, all bignum types). For every type,
+  `x.is_integer() == x.is_gaussian_integer() && x.is_real()`; for floating-point types, `NaN`
+  and the infinities are neither real nor Gaussian integers.
 
 ### malachite-nz
 
@@ -22,15 +26,41 @@ documented by git history.
   coefficients like `"1i"` and `"0i"`); blanket `From` and `ImaginaryFrom` conversions from
   every type that converts to `Integer`; serde support; and exhaustive, random, and
   striped-random generators, wired into the demo, benchmark, and property-test machinery.
+  `GaussianInteger` also implements `IsInteger`, `IsGaussianInteger`, and `IsReal`, and
+  `Natural` and `Integer` implement the two new traits (trivially).
+- Conversions between `GaussianInteger` and the real types, completing the conversion matrix:
+  `TryFrom` and `ConvertibleFrom` implementations for `Integer` (succeeding when the value is
+  real), `Natural` (real and non-negative), all primitive integers (real and representable),
+  and all primitive floats (real and exactly representable), plus `TryFrom` and
+  `ConvertibleFrom` from primitive floats (finite integers), mirroring the corresponding
+  `Rational` conversion families.
 
 ### malachite-q
 
 - A new `GaussianRational` type, parallel to `GaussianInteger`: public `Rational` fields `real`
   and `imaginary`, always valid, with the same surface — constants, `Display` and `FromStr`
-  (imaginary terms attach `i` to the numerator, as in `"i/2"` and `"2/3-5i/6"`), blanket `From`
-  and `ImaginaryFrom` conversions from every type that converts to `Rational`, serde support,
+  (imaginary terms attach `i` to the numerator, as in `"i/2"` and `"2/3-5i/6"`), `From`
+  conversions from every type that converts to `Rational` and componentwise conversions from
+  `GaussianInteger`, a blanket `ImaginaryFrom`, serde support,
   and the full exhaustive/random/striped generator set with demo, benchmark, and property-test
-  plumbing.
+  plumbing. `GaussianRational` also implements `IsInteger`, `IsGaussianInteger`, and `IsReal`,
+  and `Rational` implements the two new traits.
+- Conversions between `GaussianRational` and the real types, completing the conversion matrix:
+  `TryFrom` and `ConvertibleFrom` implementations for `Rational` (succeeding when the value is
+  real), `GaussianInteger` (both parts integers), `Integer` (a real integer), `Natural` (a real
+  non-negative integer), all primitive integers (real and representable), and all primitive
+  floats (real and exactly representable), plus `TryFrom` and `ConvertibleFrom` from primitive
+  floats (finite values) and from `GaussianInteger` (componentwise, added earlier in this
+  cycle). `Rational` also gets `TryFrom` and `ConvertibleFrom` from `GaussianInteger`.
+
+### malachite-float
+
+- `Float` implements the new `IsGaussianInteger` and `IsReal` traits; a `Float` is real unless
+  it is `NaN` or infinite.
+- Conversions between `Float` and the Gaussian types: `TryFrom` and `ConvertibleFrom`
+  implementations converting `GaussianInteger` and `GaussianRational` to `Float` (real and, for
+  the rational case, dyadic; minimal precision) and `Float` to either Gaussian type (finite,
+  and integral for `GaussianInteger`).
 
 ### Documentation
 

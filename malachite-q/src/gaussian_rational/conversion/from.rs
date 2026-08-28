@@ -9,36 +9,88 @@
 use crate::Rational;
 use crate::gaussian_rational::GaussianRational;
 use malachite_base::num::basic::traits::Zero;
+use malachite_nz::gaussian_integer::GaussianInteger;
+use malachite_nz::integer::Integer;
+use malachite_nz::natural::Natural;
 
-impl<T> From<T> for GaussianRational
-where
-    Rational: From<T>,
-{
-    /// Converts a value of any type that converts to a [`Rational`] — including [`Rational`]
-    /// itself, via the standard library's reflexive [`From`] — to a purely real
-    /// [`GaussianRational`].
+// These are enumerated rather than blanket impls (`where Rational: From<T>`) because a blanket
+// would conflict, under the coherence rules, with the componentwise `From<GaussianInteger>` impls
+// below.
+macro_rules! impl_from_purely_real {
+    ($($t: ty),*) => {
+        $(
+            impl From<$t> for GaussianRational {
+                /// Converts a value to a purely real [`GaussianRational`].
+                ///
+                /// # Worst-case complexity
+                /// Same as the complexity of the corresponding [`Rational`] conversion.
+                ///
+                /// # Examples
+                /// See [here](super::from#from).
+                fn from(x: $t) -> Self {
+                    Self {
+                        real: Rational::from(x),
+                        imaginary: Rational::ZERO,
+                    }
+                }
+            }
+        )*
+    };
+}
+impl_from_purely_real!(
+    u8, u16, u32, u64, u128, usize, i8, i16, i32, i64, i128, isize, bool, Natural, &Natural,
+    Integer, &Integer, Rational
+);
+
+impl From<GaussianInteger> for GaussianRational {
+    /// Converts a [`GaussianInteger`] to a [`GaussianRational`], componentwise, taking the
+    /// [`GaussianInteger`] by value.
     ///
     /// # Worst-case complexity
-    /// Same as the complexity of the corresponding [`Rational`] conversion.
+    /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```
-    /// use malachite_nz::integer::Integer;
-    /// use malachite_q::Rational;
+    /// use core::str::FromStr;
+    /// use malachite_nz::gaussian_integer::GaussianInteger;
     /// use malachite_q::gaussian_rational::GaussianRational;
     ///
-    /// assert_eq!(GaussianRational::from(123u32).to_string(), "123");
-    /// assert_eq!(GaussianRational::from(-123i64).to_string(), "-123");
-    /// assert_eq!(GaussianRational::from(Integer::from(-123)).to_string(), "-123");
-    /// assert_eq!(
-    ///     GaussianRational::from(Rational::from_signeds(-5, 6)).to_string(),
-    ///     "-5/6"
-    /// );
+    /// let g = GaussianInteger::from_str("2-3i").unwrap();
+    /// assert_eq!(GaussianRational::from(g).to_string(), "2-3i");
     /// ```
-    fn from(x: T) -> Self {
+    fn from(x: GaussianInteger) -> Self {
         Self {
-            real: Rational::from(x),
-            imaginary: Rational::ZERO,
+            real: Rational::from(x.real),
+            imaginary: Rational::from(x.imaginary),
+        }
+    }
+}
+
+impl From<&GaussianInteger> for GaussianRational {
+    /// Converts a [`GaussianInteger`] to a [`GaussianRational`], componentwise, taking the
+    /// [`GaussianInteger`] by reference.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum number of significant
+    /// bits of the parts of `x`.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::str::FromStr;
+    /// use malachite_nz::gaussian_integer::GaussianInteger;
+    /// use malachite_q::gaussian_rational::GaussianRational;
+    ///
+    /// let g = GaussianInteger::from_str("2-3i").unwrap();
+    /// assert_eq!(GaussianRational::from(&g).to_string(), "2-3i");
+    /// ```
+    fn from(x: &GaussianInteger) -> Self {
+        Self {
+            real: Rational::from(&x.real),
+            imaginary: Rational::from(&x.imaginary),
         }
     }
 }

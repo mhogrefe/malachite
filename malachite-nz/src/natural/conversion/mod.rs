@@ -242,11 +242,22 @@ pub mod from_primitive_float;
 /// assert_eq!(Natural::saturating_from(-123i32), 0);
 /// ```
 pub mod from_primitive_int;
+/// An implementation of
+/// [`IsGaussianInteger`](malachite_base::num::conversion::traits::IsGaussianInteger), a trait for
+/// determining whether a number is a Gaussian integer.
+///
+/// A [`Natural`](crate::natural::Natural) is always a Gaussian integer.
+pub mod is_gaussian_integer;
 /// An implementation of [`IsInteger`](malachite_base::num::conversion::traits::IsInteger), a trait
 /// for determining whether a number is an integer.
 ///
 /// A [`Natural`](crate::natural::Natural) is always an integer.
 pub mod is_integer;
+/// An implementation of [`IsReal`](malachite_base::num::conversion::traits::IsReal), a trait for
+/// determining whether a number is a real number.
+///
+/// A [`Natural`](crate::natural::Natural) is always a real number.
+pub mod is_real;
 /// A function for counting a [`Natural`](crate::natural::Natural)'s [`Limb`](crate#limbs)s.
 pub mod limb_count;
 /// Implementations of traits for converting numbers to and from mantissa-and-exponent

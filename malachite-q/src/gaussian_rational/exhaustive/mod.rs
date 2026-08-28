@@ -68,8 +68,8 @@ pub fn exhaustive_imaginary_gaussian_rationals() -> ExhaustiveGaussianRationalsF
     exhaustive_rationals().map(GaussianRational::imaginary_from)
 }
 
-// The pair generators vary their second component fastest, so drawing the real part from the
-// second component puts 1 before i in the exhaustive order.
+// The pair generators vary their second component fastest, so drawing the real part from the second
+// component puts 1 before i in the exhaustive order.
 pub(crate) fn gaussian_rational_from_pair(
     (imaginary, real): (Rational, Rational),
 ) -> GaussianRational {

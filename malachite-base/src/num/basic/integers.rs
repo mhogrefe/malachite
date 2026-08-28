@@ -41,9 +41,9 @@ use crate::num::arithmetic::traits::{
 };
 use crate::num::basic::traits::{One, Two, Zero};
 use crate::num::conversion::traits::{
-    ConvertibleFrom, ExactFrom, ExactInto, FromSciString, FromStringBase, IsInteger,
-    OverflowingFrom, OverflowingInto, RoundingFrom, RoundingInto, SaturatingFrom, SaturatingInto,
-    ToSci, ToStringBase, WrappingFrom, WrappingInto,
+    ConvertibleFrom, ExactFrom, ExactInto, FromSciString, FromStringBase, IsGaussianInteger,
+    IsInteger, IsReal, OverflowingFrom, OverflowingInto, RoundingFrom, RoundingInto,
+    SaturatingFrom, SaturatingInto, ToSci, ToStringBase, WrappingFrom, WrappingInto,
 };
 use crate::num::factorization::traits::{
     ExpressAsPower, IsPower, IsSquare, RemovePower, RemovePowerAssign,
@@ -247,8 +247,10 @@ pub trait PrimitiveInt:
     + FromStringBase
     + PrimitiveIntRandomBounds
     + Hash
+    + IsGaussianInteger
     + IsInteger
     + IsPower
+    + IsReal
     + IsSquare
     + JacobiSymbol<Self>
     + KroneckerSymbol<Self>

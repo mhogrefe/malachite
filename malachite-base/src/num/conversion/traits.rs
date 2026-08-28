@@ -345,6 +345,26 @@ pub trait IsInteger {
     fn is_integer(self) -> bool;
 }
 
+/// Tests whether a value is equal to a Gaussian integer: a complex number whose real and imaginary
+/// parts are both integers.
+///
+/// For real-valued types, this is equivalent to [`IsInteger`]. In general, `x.is_integer() ==
+/// x.is_gaussian_integer() && x.is_real()`.
+pub trait IsGaussianInteger {
+    #[allow(clippy::wrong_self_convention)]
+    fn is_gaussian_integer(self) -> bool;
+}
+
+/// Tests whether a value is equal to a real number.
+///
+/// For complex types this means that the imaginary part is zero. For floating-point types, `NaN`
+/// and the infinities are not real numbers. In general, `x.is_integer() == x.is_gaussian_integer()
+/// && x.is_real()`.
+pub trait IsReal {
+    #[allow(clippy::wrong_self_convention)]
+    fn is_real(self) -> bool;
+}
+
 /// Converts a number to or from a raw mantissa and exponent.
 ///
 /// See [here](crate::num::basic::floats::PrimitiveFloat) for a definition of raw mantissa and

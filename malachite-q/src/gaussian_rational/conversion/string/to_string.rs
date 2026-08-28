@@ -11,8 +11,8 @@ use crate::gaussian_rational::GaussianRational;
 use core::fmt::{Display, Formatter, Result, Write};
 
 // Writes the imaginary term of a nonzero imaginary part, without its sign: the absolute value of
-// the numerator directly followed by 'i', then the denominator if it is not 1. Numerators of 1
-// are elided, so 1/2 is written "i/2" and 1 is written "i".
+// the numerator directly followed by 'i', then the denominator if it is not 1. Numerators of 1 are
+// elided, so 1/2 is written "i/2" and 1 is written "i".
 fn fmt_unsigned_imaginary_term(q: &Rational, f: &mut Formatter) -> Result {
     let n = q.numerator_ref();
     let d = q.denominator_ref();
@@ -30,12 +30,12 @@ fn fmt_unsigned_imaginary_term(q: &Rational, f: &mut Formatter) -> Result {
 impl Display for GaussianRational {
     /// Converts a [`GaussianRational`] to a [`String`].
     ///
-    /// A value with a zero imaginary part is written as its real part alone; in particular, zero
-    /// is `"0"`. An imaginary term is written as the absolute value of its numerator, directly
-    /// followed by `'i'`, then a `'/'` and the denominator if the denominator is not 1;
-    /// numerators of 1 are elided. So 1/2 times i is written `"i/2"`, and 5/6 times i is
-    /// `"5i/6"`. A purely imaginary value carries its own sign, and otherwise the real term is
-    /// written first and the imaginary term follows with a joining sign, as in `"2/3-5i/6"`.
+    /// A value with a zero imaginary part is written as its real part alone; in particular, zero is
+    /// `"0"`. An imaginary term is written as the absolute value of its numerator, directly
+    /// followed by `'i'`, then a `'/'` and the denominator if the denominator is not 1; numerators
+    /// of 1 are elided. So 1/2 times i is written `"i/2"`, and 5/6 times i is `"5i/6"`. A purely
+    /// imaginary value carries its own sign, and otherwise the real term is written first and the
+    /// imaginary term follows with a joining sign, as in `"2/3-5i/6"`.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$

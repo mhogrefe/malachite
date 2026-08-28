@@ -71,7 +71,17 @@ pub mod gaussian_rational {
     }
     pub mod conversion {
         pub mod from;
+        pub mod from_primitive_float;
+        pub mod gaussian_integer_from_gaussian_rational;
         pub mod imaginary_from;
+        pub mod integer_from_gaussian_rational;
+        pub mod is_gaussian_integer;
+        pub mod is_integer;
+        pub mod is_real;
+        pub mod natural_from_gaussian_rational;
+        pub mod primitive_float_from_gaussian_rational;
+        pub mod primitive_int_from_gaussian_rational;
+        pub mod rational_from_gaussian_rational;
         #[cfg(feature = "serde")]
         pub mod serde;
         pub mod string {
@@ -187,13 +197,16 @@ pub mod rational {
         }
         pub mod from_bool;
         pub mod from_float_simplest;
+        pub mod from_gaussian_integer;
         pub mod from_integer;
         pub mod from_natural;
         pub mod from_numerator_and_denominator;
         pub mod from_primitive_float;
         pub mod from_primitive_int;
         pub mod integer_from_rational;
+        pub mod is_gaussian_integer;
         pub mod is_integer;
+        pub mod is_real;
         pub mod mutate_numerator_or_denominator;
         pub mod natural_from_rational;
         pub mod primitive_float_from_rational;

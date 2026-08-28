@@ -202,6 +202,27 @@ pub mod from;
 /// assert_eq!(0xabcd1234u32.upper_half(), 0xabcd);
 /// ```
 pub mod half;
+/// [`IsGaussianInteger`](traits::IsGaussianInteger), a trait for determining whether a value is a
+/// Gaussian integer.
+///
+/// # is_gaussian_integer
+/// ```
+/// use malachite_base::num::basic::traits::NegativeInfinity;
+/// use malachite_base::num::conversion::traits::IsGaussianInteger;
+///
+/// assert_eq!(0.is_gaussian_integer(), true);
+/// assert_eq!(1.is_gaussian_integer(), true);
+/// assert_eq!((-100).is_gaussian_integer(), true);
+///
+/// assert_eq!(0.0.is_gaussian_integer(), true);
+/// assert_eq!((-100.0).is_gaussian_integer(), true);
+///
+/// assert_eq!(0.1.is_gaussian_integer(), false);
+/// assert_eq!(f32::NAN.is_gaussian_integer(), false);
+/// assert_eq!(f32::INFINITY.is_gaussian_integer(), false);
+/// assert_eq!(f32::NEGATIVE_INFINITY.is_gaussian_integer(), false);
+/// ```
+pub mod is_gaussian_integer;
 /// [`IsInteger`](traits::IsInteger), a trait for determining whether a value is an integer.
 ///
 /// # is_integer
@@ -228,6 +249,25 @@ pub mod half;
 /// assert_eq!(f32::NEGATIVE_INFINITY.is_integer(), false);
 /// ```
 pub mod is_integer;
+/// [`IsReal`](traits::IsReal), a trait for determining whether a value is a real number.
+///
+/// # is_real
+/// ```
+/// use malachite_base::num::basic::traits::NegativeInfinity;
+/// use malachite_base::num::conversion::traits::IsReal;
+///
+/// assert_eq!(0.is_real(), true);
+/// assert_eq!((-100).is_real(), true);
+///
+/// assert_eq!(0.0.is_real(), true);
+/// assert_eq!(0.1.is_real(), true);
+/// assert_eq!((-100.0).is_real(), true);
+///
+/// assert_eq!(f32::NAN.is_real(), false);
+/// assert_eq!(f32::INFINITY.is_real(), false);
+/// assert_eq!(f32::NEGATIVE_INFINITY.is_real(), false);
+/// ```
+pub mod is_real;
 /// Traits for converting numbers to and from mantissa and exponent representations.
 ///
 /// See [`PrimitiveFloat`](super::basic::floats::PrimitiveFloat) for a description of the different

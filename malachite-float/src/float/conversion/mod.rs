@@ -11,6 +11,20 @@ pub mod from_bits;
 /// Functions for constructing a [`Float`](crate::Float) from a sequence of digits in an arbitrary
 /// base.
 pub mod from_digits;
+/// Implementations of traits for converting a
+/// [`GaussianInteger`](malachite_nz::gaussian_integer::GaussianInteger) to a
+/// [`Float`](crate::Float).
+///
+/// The traits are [`TryFrom`] and
+/// [`ConvertibleFrom`](malachite_base::num::conversion::traits::ConvertibleFrom).
+pub mod from_gaussian_integer;
+/// Implementations of traits for converting a
+/// [`GaussianRational`](malachite_q::gaussian_rational::GaussianRational) to a
+/// [`Float`](crate::Float).
+///
+/// The traits are [`TryFrom`] and
+/// [`ConvertibleFrom`](malachite_base::num::conversion::traits::ConvertibleFrom).
+pub mod from_gaussian_rational;
 /// Implementations of the [`From`] trait for converting an
 /// [`Integer`](malachite_nz::integer::Integer) to a [`Float`](crate::Float).
 pub mod from_integer;
@@ -212,6 +226,18 @@ pub mod from_primitive_int;
 /// Implementations of the [`From`] trait for converting a [`Rational`](malachite_q::Rational) to a
 /// [`Float`](crate::Float).
 pub mod from_rational;
+/// Implementations of traits for converting a [`Float`](crate::Float) to a
+/// [`GaussianInteger`](malachite_nz::gaussian_integer::GaussianInteger).
+///
+/// The traits are [`TryFrom`] and
+/// [`ConvertibleFrom`](malachite_base::num::conversion::traits::ConvertibleFrom).
+pub mod gaussian_integer_from_float;
+/// Implementations of traits for converting a [`Float`](crate::Float) to a
+/// [`GaussianRational`](malachite_q::gaussian_rational::GaussianRational).
+///
+/// The traits are [`TryFrom`] and
+/// [`ConvertibleFrom`](malachite_base::num::conversion::traits::ConvertibleFrom).
+pub mod gaussian_rational_from_float;
 /// Implementations of traits for converting a [`Float`](crate::Float) to an
 /// [`Integer`](malachite_nz::integer::Integer).
 ///
@@ -219,9 +245,18 @@ pub mod from_rational;
 /// [`ConvertibleFrom`](malachite_base::num::conversion::traits::ConvertibleFrom), and
 /// [`RoundingFrom`](malachite_base::num::conversion::traits::RoundingFrom).
 pub mod integer_from_float;
+/// An implementation of
+/// [`IsGaussianInteger`](malachite_base::num::conversion::traits::IsGaussianInteger), a trait for
+/// determining whether a number is a Gaussian integer.
+pub mod is_gaussian_integer;
 /// An implementation of [`IsInteger`](malachite_base::num::conversion::traits::IsInteger), a trait
 /// for determining whether a number is an integer.
 pub mod is_integer;
+/// An implementation of [`IsReal`](malachite_base::num::conversion::traits::IsReal), a trait for
+/// determining whether a number is a real number.
+///
+/// A [`Float`](crate::Float) is a real number unless it is `NaN` or infinite.
+pub mod is_real;
 /// Implementations of traits for converting [`Float`](crate::Float)s to and from
 /// mantissa-and-exponent representations.
 ///

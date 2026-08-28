@@ -26,8 +26,8 @@ use crate::num::basic::traits::{
 };
 use crate::num::comparison::traits::{EqAbs, PartialOrdAbs};
 use crate::num::conversion::traits::{
-    ConvertibleFrom, ExactInto, IntegerMantissaAndExponent, IsInteger, RawMantissaAndExponent,
-    RoundingFrom, RoundingInto, SciMantissaAndExponent, WrappingFrom,
+    ConvertibleFrom, ExactInto, IntegerMantissaAndExponent, IsGaussianInteger, IsInteger, IsReal,
+    RawMantissaAndExponent, RoundingFrom, RoundingInto, SciMantissaAndExponent, WrappingFrom,
 };
 use crate::num::float::FmtRyuString;
 use crate::num::logic::traits::{BitAccess, LowMask, SignificantBits, TrailingZeros};
@@ -148,8 +148,10 @@ pub trait PrimitiveFloat:
     + Infinity
     + IntegerMantissaAndExponent<u64, i64>
     + Into<f64>
+    + IsGaussianInteger
     + IsInteger
     + IsPowerOf2
+    + IsReal
     + LemniscateConstant
     + LiouvillesConstant
     + CatalansConstant

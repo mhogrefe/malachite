@@ -346,7 +346,9 @@ pub mod num {
             pub mod split_in_half;
             pub mod upper_half;
         }
+        pub mod is_gaussian_integer;
         pub mod is_integer;
+        pub mod is_real;
         pub mod mantissa_and_exponent {
             pub mod integer_mantissa_and_exponent;
             pub mod raw_mantissa_and_exponent;

@@ -12,13 +12,13 @@ use alloc::string::String;
 use core::str::FromStr;
 use malachite_base::num::basic::traits::Zero;
 
-// An imaginary term, with its sign if it has one: an optional sign, an optional numerator, an
-// 'i', and an optional denominator, as in "-5i/6". The 'i' must directly follow the numerator, so
-// "2/3i" is invalid. A missing numerator means 1, so "i/2" works, but so does "1i/2": requiring
-// producers to elide degenerate numerators would force a special case on them. The term is
-// rewritten with the 'i' deleted (and the elided numerator restored) and parsed as a `Rational`,
-// which brings along `Rational`'s permissiveness: "2i/4" means i/2, and "+i" is accepted exactly
-// where `Rational`'s parser accepts a leading '+'.
+// An imaginary term, with its sign if it has one: an optional sign, an optional numerator, an 'i',
+// and an optional denominator, as in "-5i/6". The 'i' must directly follow the numerator, so "2/3i"
+// is invalid. A missing numerator means 1, so "i/2" works, but so does "1i/2": requiring producers
+// to elide degenerate numerators would force a special case on them. The term is rewritten with the
+// 'i' deleted (and the elided numerator restored) and parsed as a `Rational`, which brings along
+// `Rational`'s permissiveness: "2i/4" means i/2, and "+i" is accepted exactly where `Rational`'s
+// parser accepts a leading '+'.
 fn parse_imaginary_term(s: &str) -> Result<Rational, ()> {
     let j = s.find('i').ok_or(())?;
     let numerator = &s[..j];
@@ -41,12 +41,12 @@ impl FromStr for GaussianRational {
     /// Converts a string to a [`GaussianRational`].
     ///
     /// If the string does not represent a valid [`GaussianRational`], an `Err` is returned. The
-    /// grammar is strict about structure: the real term must precede the imaginary term, the
-    /// `'i'` must directly follow the imaginary numerator (so `"2/3i"` is invalid), and no
-    /// whitespace is allowed. It is permissive about coefficients: `"1i/2"`, `"0i"`, and
-    /// fractions not in lowest terms like `"2i/4"` are all accepted, although
-    /// [`Display`](core::fmt::Display) never produces them. Each component follows
-    /// [`Rational`]'s syntax, including its optional leading `'+'`.
+    /// grammar is strict about structure: the real term must precede the imaginary term, the `'i'`
+    /// must directly follow the imaginary numerator (so `"2/3i"` is invalid), and no whitespace is
+    /// allowed. It is permissive about coefficients: `"1i/2"`, `"0i"`, and fractions not in lowest
+    /// terms like `"2i/4"` are all accepted, although [`Display`](core::fmt::Display) never
+    /// produces them. Each component follows [`Rational`]'s syntax, including its optional leading
+    /// `'+'`.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n (\log n)^2 \log\log n)$

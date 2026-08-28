@@ -17,6 +17,13 @@ pub mod from_bool;
 /// Functions for converting a primitive float to a [`Rational`](crate::Rational), choosing the
 /// [`Rational`](crate::Rational) with minimal denominator that rounds to the given float.
 pub mod from_float_simplest;
+/// Implementations of traits for converting a
+/// [`GaussianInteger`](malachite_nz::gaussian_integer::GaussianInteger) to a
+/// [`Rational`](crate::Rational).
+///
+/// The traits are [`TryFrom`] and
+/// [`ConvertibleFrom`](malachite_base::num::conversion::traits::ConvertibleFrom).
+pub mod from_gaussian_integer;
 /// Implementations of the [`From`] trait for converting an
 /// [`Integer`](malachite_nz::integer::Integer) to a [`Rational`](crate::Rational).
 pub mod from_integer;
@@ -82,9 +89,20 @@ pub mod from_primitive_int;
 /// [`ConvertibleFrom`](malachite_base::num::conversion::traits::ConvertibleFrom), and
 /// [`RoundingFrom`](malachite_base::num::conversion::traits::RoundingFrom).
 pub mod integer_from_rational;
+/// An implementation of
+/// [`IsGaussianInteger`](malachite_base::num::conversion::traits::IsGaussianInteger), a trait for
+/// determining whether a number is a Gaussian integer.
+///
+/// A [`Rational`](crate::Rational) is a Gaussian integer if and only if it is an integer.
+pub mod is_gaussian_integer;
 /// An implementation of [`IsInteger`](malachite_base::num::conversion::traits::IsInteger), a trait
 /// for determining whether a number is an integer.
 pub mod is_integer;
+/// An implementation of [`IsReal`](malachite_base::num::conversion::traits::IsReal), a trait for
+/// determining whether a number is a real number.
+///
+/// A [`Rational`](crate::Rational) is always a real number.
+pub mod is_real;
 /// An implementation of
 /// [`SciMantissaAndExponent`](malachite_base::num::conversion::traits::SciMantissaAndExponent), a
 /// trait for converting numbers to and from a mantissa-and-exponent representation.

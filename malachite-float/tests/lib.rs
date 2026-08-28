@@ -206,13 +206,19 @@ pub mod float {
     }
     pub mod conversion {
         pub mod clone;
+        pub mod from_gaussian_integer;
+        pub mod from_gaussian_rational;
         pub mod from_integer;
         pub mod from_natural;
         pub mod from_primitive_float;
         pub mod from_primitive_int;
         pub mod from_rational;
+        pub mod gaussian_integer_from_float;
+        pub mod gaussian_rational_from_float;
         pub mod integer_from_float;
+        pub mod is_gaussian_integer;
         pub mod is_integer;
+        pub mod is_real;
         pub mod mantissa_and_exponent;
         pub mod natural_from_float;
         pub mod primitive_float_from_float;

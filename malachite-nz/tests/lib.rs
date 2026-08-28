@@ -71,7 +71,15 @@ pub mod gaussian_integer {
     }
     pub mod conversion {
         pub mod from;
+        pub mod from_primitive_float;
         pub mod imaginary_from;
+        pub mod integer_from_gaussian_integer;
+        pub mod is_gaussian_integer;
+        pub mod is_integer;
+        pub mod is_real;
+        pub mod natural_from_gaussian_integer;
+        pub mod primitive_float_from_gaussian_integer;
+        pub mod primitive_int_from_gaussian_integer;
         #[cfg(feature = "serde")]
         pub mod serde;
         pub mod string {
@@ -174,7 +182,9 @@ pub mod integer {
         pub mod from_primitive_float;
         pub mod from_primitive_int;
         pub mod from_twos_complement_limbs;
+        pub mod is_gaussian_integer;
         pub mod is_integer;
+        pub mod is_real;
         pub mod natural_from_integer;
         pub mod primitive_float_from_integer;
         pub mod primitive_int_from_integer;
@@ -392,7 +402,9 @@ pub mod natural {
         pub mod from_limbs;
         pub mod from_primitive_float;
         pub mod from_primitive_int;
+        pub mod is_gaussian_integer;
         pub mod is_integer;
+        pub mod is_real;
         pub mod mantissa_and_exponent {
             pub mod integer_mantissa_and_exponent;
             pub mod sci_mantissa_and_exponent;
