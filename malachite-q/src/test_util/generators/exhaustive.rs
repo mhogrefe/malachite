@@ -7,6 +7,11 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Rational;
+use crate::gaussian_rational::GaussianRational;
+use crate::gaussian_rational::exhaustive::{
+    exhaustive_gaussian_rationals, exhaustive_imaginary_gaussian_rationals,
+    exhaustive_real_gaussian_rationals,
+};
 use crate::rational::exhaustive::{
     exhaustive_negative_rationals, exhaustive_non_negative_rationals, exhaustive_nonzero_rationals,
     exhaustive_positive_rationals, exhaustive_rationals,
@@ -58,6 +63,22 @@ use malachite_nz::test_util::generators::common::{
 };
 use num::BigRational;
 use std::ops::Shr;
+
+// -- GaussianRational --
+
+pub fn exhaustive_gaussian_rational_gen() -> It<GaussianRational> {
+    Box::new(exhaustive_gaussian_rationals())
+}
+
+// All purely real `GaussianRational`s.
+pub fn exhaustive_gaussian_rational_gen_var_1() -> It<GaussianRational> {
+    Box::new(exhaustive_real_gaussian_rationals())
+}
+
+// All purely imaginary `GaussianRational`s.
+pub fn exhaustive_gaussian_rational_gen_var_2() -> It<GaussianRational> {
+    Box::new(exhaustive_imaginary_gaussian_rationals())
+}
 
 // -- Rational --
 

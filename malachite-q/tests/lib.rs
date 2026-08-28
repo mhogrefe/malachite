@@ -65,6 +65,35 @@ extern crate malachite_q;
 extern crate num;
 extern crate rug;
 
+pub mod gaussian_rational {
+    pub mod basic {
+        pub mod constants;
+    }
+    pub mod conversion {
+        pub mod from;
+        pub mod imaginary_from;
+        #[cfg(feature = "serde")]
+        pub mod serde;
+        pub mod string {
+            pub mod from_string;
+            pub mod to_string;
+        }
+    }
+    pub mod exhaustive {
+        pub mod exhaustive_gaussian_rationals;
+        pub mod exhaustive_imaginary_gaussian_rationals;
+        pub mod exhaustive_real_gaussian_rationals;
+    }
+    pub mod random {
+        pub mod random_gaussian_rationals;
+        pub mod random_imaginary_gaussian_rationals;
+        pub mod random_real_gaussian_rationals;
+        pub mod striped_random_gaussian_rationals;
+        pub mod striped_random_imaginary_gaussian_rationals;
+        pub mod striped_random_real_gaussian_rationals;
+    }
+}
+
 pub mod rational {
     pub mod arithmetic {
         pub mod abs;

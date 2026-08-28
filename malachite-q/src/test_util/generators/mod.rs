@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Rational;
+use crate::gaussian_rational::GaussianRational;
 use crate::test_util::generators::common::{
     rational_integer_pair_rm, rational_natural_pair_rm, rational_nrm, rational_pair_1_nrm,
     rational_pair_1_rm, rational_pair_nm, rational_pair_nrm, rational_pair_rm, rational_rm,
@@ -46,6 +47,34 @@ pub fn natural_quadruple_gen_var_1() -> Generator<(Natural, Natural, Natural, Na
         &exhaustive_natural_quadruple_gen_var_1,
         &random_natural_quadruple_gen_var_1,
         &special_random_natural_quadruple_gen_var_1,
+    )
+}
+
+// -- GaussianRational --
+
+pub fn gaussian_rational_gen() -> Generator<GaussianRational> {
+    Generator::new(
+        &exhaustive_gaussian_rational_gen,
+        &random_gaussian_rational_gen,
+        &special_random_gaussian_rational_gen,
+    )
+}
+
+// All purely real `GaussianRational`s.
+pub fn gaussian_rational_gen_var_1() -> Generator<GaussianRational> {
+    Generator::new(
+        &exhaustive_gaussian_rational_gen_var_1,
+        &random_gaussian_rational_gen_var_1,
+        &special_random_gaussian_rational_gen_var_1,
+    )
+}
+
+// All purely imaginary `GaussianRational`s.
+pub fn gaussian_rational_gen_var_2() -> Generator<GaussianRational> {
+    Generator::new(
+        &exhaustive_gaussian_rational_gen_var_2,
+        &random_gaussian_rational_gen_var_2,
+        &special_random_gaussian_rational_gen_var_2,
     )
 }
 

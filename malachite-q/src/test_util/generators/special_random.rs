@@ -7,6 +7,11 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Rational;
+use crate::gaussian_rational::GaussianRational;
+use crate::gaussian_rational::random::{
+    striped_random_gaussian_rationals, striped_random_imaginary_gaussian_rationals,
+    striped_random_real_gaussian_rationals,
+};
 use crate::rational::random::{
     RandomRationalsFromDoubleAndSign, striped_random_negative_rationals,
     striped_random_non_negative_rationals, striped_random_nonzero_rationals,
@@ -61,6 +66,40 @@ use malachite_nz::natural::random::{
 use malachite_nz::test_util::generators::random::random_gmp_format_strings;
 use num::BigRational;
 use std::ops::Shr;
+
+// -- GaussianRational --
+
+pub fn special_random_gaussian_rational_gen(config: &GenConfig) -> It<GaussianRational> {
+    Box::new(striped_random_gaussian_rationals(
+        EXAMPLE_SEED,
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    ))
+}
+
+// Purely real `GaussianRational`s.
+pub fn special_random_gaussian_rational_gen_var_1(config: &GenConfig) -> It<GaussianRational> {
+    Box::new(striped_random_real_gaussian_rationals(
+        EXAMPLE_SEED,
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    ))
+}
+
+// Purely imaginary `GaussianRational`s.
+pub fn special_random_gaussian_rational_gen_var_2(config: &GenConfig) -> It<GaussianRational> {
+    Box::new(striped_random_imaginary_gaussian_rationals(
+        EXAMPLE_SEED,
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    ))
+}
 
 // -- Rational --
 

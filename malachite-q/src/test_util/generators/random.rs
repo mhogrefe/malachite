@@ -7,6 +7,10 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Rational;
+use crate::gaussian_rational::GaussianRational;
+use crate::gaussian_rational::random::{
+    random_gaussian_rationals, random_imaginary_gaussian_rationals, random_real_gaussian_rationals,
+};
 use crate::rational::random::{
     RandomRationalsFromDoubleAndSign, random_negative_rationals, random_non_negative_rationals,
     random_nonzero_rationals, random_positive_rationals, random_rationals,
@@ -58,6 +62,34 @@ use malachite_nz::test_util::generators::random::random_gmp_format_strings;
 use num::BigRational;
 use std::cmp::Ordering::*;
 use std::ops::Shr;
+
+// -- GaussianRational --
+
+pub fn random_gaussian_rational_gen(config: &GenConfig) -> It<GaussianRational> {
+    Box::new(random_gaussian_rationals(
+        EXAMPLE_SEED,
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    ))
+}
+
+// Purely real `GaussianRational`s.
+pub fn random_gaussian_rational_gen_var_1(config: &GenConfig) -> It<GaussianRational> {
+    Box::new(random_real_gaussian_rationals(
+        EXAMPLE_SEED,
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    ))
+}
+
+// Purely imaginary `GaussianRational`s.
+pub fn random_gaussian_rational_gen_var_2(config: &GenConfig) -> It<GaussianRational> {
+    Box::new(random_imaginary_gaussian_rationals(
+        EXAMPLE_SEED,
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    ))
+}
 
 // -- Rational --
 

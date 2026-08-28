@@ -6,12 +6,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::test_util::runner::Runner;
-
-pub(crate) fn register(runner: &mut Runner) {
-    gaussian_rational::register(runner);
-    rational::register(runner);
-}
-
-mod gaussian_rational;
-mod rational;
+/// Implementations of traits for converting strings to
+/// [`GaussianRational`](crate::gaussian_rational::GaussianRational)s.
+pub mod from_string;
+/// Implementations of traits for converting to strings.
+pub mod to_string;

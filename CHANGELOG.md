@@ -23,6 +23,15 @@ documented by git history.
   every type that converts to `Integer`; serde support; and exhaustive, random, and
   striped-random generators, wired into the demo, benchmark, and property-test machinery.
 
+### malachite-q
+
+- A new `GaussianRational` type, parallel to `GaussianInteger`: public `Rational` fields `real`
+  and `imaginary`, always valid, with the same surface — constants, `Display` and `FromStr`
+  (imaginary terms attach `i` to the numerator, as in `"i/2"` and `"2/3-5i/6"`), blanket `From`
+  and `ImaginaryFrom` conversions from every type that converts to `Rational`, serde support,
+  and the full exhaustive/random/striped generator set with demo, benchmark, and property-test
+  plumbing.
+
 ### Documentation
 
 - The `FromStr` docs for `Natural`, `Integer`, and `Rational` now mention the accepted leading

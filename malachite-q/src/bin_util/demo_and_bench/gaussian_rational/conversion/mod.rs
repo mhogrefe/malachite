@@ -9,9 +9,11 @@
 use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
-    gaussian_rational::register(runner);
-    rational::register(runner);
+    from::register(runner);
+    imaginary_from::register(runner);
+    string::register(runner);
 }
 
-mod gaussian_rational;
-mod rational;
+mod from;
+mod imaginary_from;
+mod string;

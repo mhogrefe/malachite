@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Rational;
+use crate::gaussian_rational::GaussianRational;
 use malachite_base::max;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
@@ -22,6 +23,21 @@ pub fn quadruple_2_natural_bit_bucketer<T, U, V>(
     Bucketer {
         bucketing_function: &|(_, x, _, _)| usize::exact_from(x.significant_bits()),
         bucketing_label: format!("{var_name}.significant_bits()"),
+    }
+}
+
+pub fn gaussian_rational_bit_bucketer(var_name: &str) -> Bucketer<'_, GaussianRational> {
+    Bucketer {
+        bucketing_function: &|x| {
+            usize::exact_from(
+                x.real
+                    .significant_bits()
+                    .max(x.imaginary.significant_bits()),
+            )
+        },
+        bucketing_label: format!(
+            "max({var_name}.real.significant_bits(), {var_name}.imaginary.significant_bits())"
+        ),
     }
 }
 
