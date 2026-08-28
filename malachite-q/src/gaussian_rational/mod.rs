@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Rational;
-use malachite_base::num::basic::traits::{I, NegativeI, NegativeOne, One, Two, Zero};
+use malachite_base::num::basic::traits::{I, NegativeI, NegativeOne, One, OneHalf, Two, Zero};
 
 /// Functions for converting a [`GaussianRational`] to and from other types and strings.
 pub mod conversion;
@@ -48,6 +48,14 @@ impl One for GaussianRational {
 impl Two for GaussianRational {
     const TWO: Self = Self {
         real: Rational::TWO,
+        imaginary: Rational::ZERO,
+    };
+}
+
+/// The constant 1/2.
+impl OneHalf for GaussianRational {
+    const ONE_HALF: Self = Self {
+        real: Rational::ONE_HALF,
         imaginary: Rational::ZERO,
     };
 }
