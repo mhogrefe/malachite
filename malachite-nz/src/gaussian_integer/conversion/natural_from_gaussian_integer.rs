@@ -24,8 +24,8 @@ impl TryFrom<GaussianInteger> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_nz::gaussian_integer::conversion::natural_from_gaussian_integer::*;
     /// use malachite_nz::gaussian_integer::GaussianInteger;
+    /// use malachite_nz::gaussian_integer::conversion::natural_from_gaussian_integer::*;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
@@ -62,8 +62,8 @@ impl TryFrom<&GaussianInteger> for Natural {
     ///
     /// # Examples
     /// ```
-    /// use malachite_nz::gaussian_integer::conversion::natural_from_gaussian_integer::*;
     /// use malachite_nz::gaussian_integer::GaussianInteger;
+    /// use malachite_nz::gaussian_integer::conversion::natural_from_gaussian_integer::*;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///

@@ -100,9 +100,11 @@ pub mod general_digits;
 /// use malachite_nz::natural::Natural;
 ///
 /// let n = Natural::ZERO;
-/// assert!(PowerOf2DigitIterable::<u8>::power_of_2_digits(&n, 2)
-///     .next()
-///     .is_none());
+/// assert!(
+///     PowerOf2DigitIterable::<u8>::power_of_2_digits(&n, 2)
+///         .next()
+///         .is_none()
+/// );
 ///
 /// // 107 = 1223_4
 /// let n = Natural::from(107u32);
@@ -112,9 +114,11 @@ pub mod general_digits;
 /// );
 ///
 /// let n = Natural::ZERO;
-/// assert!(PowerOf2DigitIterable::<u8>::power_of_2_digits(&n, 2)
-///     .next_back()
-///     .is_none());
+/// assert!(
+///     PowerOf2DigitIterable::<u8>::power_of_2_digits(&n, 2)
+///         .next_back()
+///         .is_none()
+/// );
 ///
 /// // 107 = 1223_4
 /// let n = Natural::from(107u32);

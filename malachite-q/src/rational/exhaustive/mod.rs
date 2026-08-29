@@ -594,8 +594,8 @@ impl<I: Iterator<Item = Integer>> Iterator for RationalsWithDenominator<I> {
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::basic::traits::Two;
 /// use malachite_nz::natural::Natural;
-/// use malachite_q::rational::exhaustive::exhaustive_rationals_with_denominator_range_to_infinity;
 /// use malachite_q::Rational;
+/// use malachite_q::rational::exhaustive::exhaustive_rationals_with_denominator_range_to_infinity;
 ///
 /// assert_eq!(
 ///     prefix_to_string(
@@ -656,8 +656,8 @@ pub fn exhaustive_rationals_with_denominator_range_to_infinity(
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::basic::traits::Two;
 /// use malachite_nz::natural::Natural;
-/// use malachite_q::rational::exhaustive::*;
 /// use malachite_q::Rational;
+/// use malachite_q::rational::exhaustive::*;
 ///
 /// assert_eq!(
 ///     prefix_to_string(
@@ -719,8 +719,8 @@ pub fn exhaustive_rationals_with_denominator_range_to_negative_infinity(
 /// use malachite_base::num::basic::traits::Two;
 /// use malachite_base::strings::ToDebugString;
 /// use malachite_nz::natural::Natural;
-/// use malachite_q::rational::exhaustive::exhaustive_rationals_with_denominator_range;
 /// use malachite_q::Rational;
+/// use malachite_q::rational::exhaustive::exhaustive_rationals_with_denominator_range;
 ///
 /// assert_eq!(
 ///     exhaustive_rationals_with_denominator_range(
@@ -799,8 +799,8 @@ pub fn exhaustive_rationals_with_denominator_range(
 /// use malachite_base::num::basic::traits::Two;
 /// use malachite_base::strings::ToDebugString;
 /// use malachite_nz::natural::Natural;
-/// use malachite_q::rational::exhaustive::exhaustive_rationals_with_denominator_inclusive_range;
 /// use malachite_q::Rational;
+/// use malachite_q::rational::exhaustive::exhaustive_rationals_with_denominator_inclusive_range;
 ///
 /// assert_eq!(
 ///     exhaustive_rationals_with_denominator_inclusive_range(
@@ -925,8 +925,8 @@ impl Iterator for ExhaustiveRationalRangeToInfinity {
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::conversion::traits::ExactFrom;
-/// use malachite_q::rational::exhaustive::exhaustive_rational_range_to_infinity;
 /// use malachite_q::Rational;
+/// use malachite_q::rational::exhaustive::exhaustive_rational_range_to_infinity;
 ///
 /// assert_eq!(
 ///     prefix_to_string(
@@ -1023,8 +1023,8 @@ impl Iterator for ExhaustiveRationalRangeToNegativeInfinity {
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::conversion::traits::ExactFrom;
-/// use malachite_q::rational::exhaustive::exhaustive_rational_range_to_negative_infinity;
 /// use malachite_q::Rational;
+/// use malachite_q::rational::exhaustive::exhaustive_rational_range_to_negative_infinity;
 ///
 /// assert_eq!(
 ///     prefix_to_string(
@@ -1137,8 +1137,8 @@ impl Iterator for ExhaustiveRationalRange {
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::conversion::traits::ExactFrom;
-/// use malachite_q::rational::exhaustive::exhaustive_rational_range;
 /// use malachite_q::Rational;
+/// use malachite_q::rational::exhaustive::exhaustive_rational_range;
 ///
 /// assert_eq!(
 ///     prefix_to_string(
@@ -1264,8 +1264,8 @@ impl Iterator for ExhaustiveRationalInclusiveRange {
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::conversion::traits::ExactFrom;
-/// use malachite_q::rational::exhaustive::exhaustive_rational_inclusive_range;
 /// use malachite_q::Rational;
+/// use malachite_q::rational::exhaustive::exhaustive_rational_inclusive_range;
 ///
 /// assert_eq!(
 ///     prefix_to_string(

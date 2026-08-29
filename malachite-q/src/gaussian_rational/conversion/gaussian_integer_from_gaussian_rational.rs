@@ -27,8 +27,8 @@ impl TryFrom<GaussianRational> for GaussianInteger {
     /// # Examples
     /// ```
     /// use malachite_nz::gaussian_integer::GaussianInteger;
-    /// use malachite_q::gaussian_rational::conversion::gaussian_integer_from_gaussian_rational::*;
     /// use malachite_q::gaussian_rational::GaussianRational;
+    /// use malachite_q::gaussian_rational::conversion::gaussian_integer_from_gaussian_rational::*;
     /// use std::str::FromStr;
     ///
     /// let x = GaussianRational::from_str("2-3i").unwrap();
@@ -74,8 +74,8 @@ impl TryFrom<&GaussianRational> for GaussianInteger {
     /// # Examples
     /// ```
     /// use malachite_nz::gaussian_integer::GaussianInteger;
-    /// use malachite_q::gaussian_rational::conversion::gaussian_integer_from_gaussian_rational::*;
     /// use malachite_q::gaussian_rational::GaussianRational;
+    /// use malachite_q::gaussian_rational::conversion::gaussian_integer_from_gaussian_rational::*;
     /// use std::str::FromStr;
     ///
     /// let x = GaussianRational::from_str("2-3i").unwrap();

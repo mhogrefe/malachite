@@ -271,8 +271,8 @@ impl GmpFormatArg for Natural {
 ///
 /// # Examples
 /// ```
-/// use malachite_nz::natural::conversion::string::format_natural::format_natural_str;
 /// use malachite_nz::natural::Natural;
+/// use malachite_nz::natural::conversion::string::format_natural::format_natural_str;
 ///
 /// let x = Natural::from(255u32);
 /// assert_eq!(format_natural_str(&x, "%Zd"), Some("255".to_string()));

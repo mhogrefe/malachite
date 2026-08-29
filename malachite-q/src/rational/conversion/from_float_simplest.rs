@@ -36,8 +36,8 @@ impl Rational {
     /// # Examples
     /// ```
     /// use malachite_base::strings::ToDebugString;
-    /// use malachite_q::rational::conversion::from_primitive_float::*;
     /// use malachite_q::Rational;
+    /// use malachite_q::rational::conversion::from_primitive_float::*;
     ///
     /// assert_eq!(
     ///     Rational::try_from_float_simplest(0.0).to_debug_string(),

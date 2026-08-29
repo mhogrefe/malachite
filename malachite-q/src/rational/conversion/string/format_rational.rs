@@ -55,8 +55,8 @@ use malachite_nz::natural::conversion::string::format_natural::{
 ///
 /// # Examples
 /// ```
-/// use malachite_q::rational::conversion::string::format_rational::format_rational_str;
 /// use malachite_q::Rational;
+/// use malachite_q::rational::conversion::string::format_rational::format_rational_str;
 ///
 /// let x = Rational::from_signeds(255, 16);
 /// assert_eq!(format_rational_str(&x, "%Qd"), Some("255/16".to_string()));

@@ -28,7 +28,7 @@ impl Ord for ComparableGaussianIntegerRef<'_> {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::{NegativeI, One, Zero, I};
+    /// use malachite_base::num::basic::traits::{I, NegativeI, One, Zero};
     /// use malachite_nz::gaussian_integer::{ComparableGaussianIntegerRef, GaussianInteger};
     ///
     /// let zero = GaussianInteger::ZERO;
@@ -81,7 +81,7 @@ impl Ord for ComparableGaussianInteger {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::{NegativeI, One, Zero, I};
+    /// use malachite_base::num::basic::traits::{I, NegativeI, One, Zero};
     /// use malachite_nz::gaussian_integer::{ComparableGaussianInteger, GaussianInteger};
     ///
     /// // 0 < i, since the real parts are equal and 0 < 1

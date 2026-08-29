@@ -356,8 +356,8 @@ pub mod mantissa_and_exponent;
 /// # try_from
 /// ```
 /// use core::str::FromStr;
-/// use malachite_nz::natural::conversion::primitive_float_from_natural::*;
 /// use malachite_nz::natural::Natural;
+/// use malachite_nz::natural::conversion::primitive_float_from_natural::*;
 ///
 /// assert_eq!(f32::try_from(&Natural::from_str("123").unwrap()), Ok(123.0));
 /// assert_eq!(
@@ -415,10 +415,10 @@ pub mod primitive_float_from_natural;
 /// ```
 /// use malachite_base::num::arithmetic::traits::Pow;
 /// use malachite_base::num::basic::traits::One;
+/// use malachite_nz::natural::Natural;
 /// use malachite_nz::natural::conversion::primitive_int_from_natural::{
 ///     SignedFromNaturalError, UnsignedFromNaturalError,
 /// };
-/// use malachite_nz::natural::Natural;
 ///
 /// assert_eq!(u32::try_from(&Natural::from(123u32)), Ok(123));
 /// assert_eq!(

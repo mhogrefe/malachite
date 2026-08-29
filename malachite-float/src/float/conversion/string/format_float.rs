@@ -1420,8 +1420,8 @@ crate_test_fn! {format_mpfr_str(fmt: &[u8], args: &[PrintfArg]) -> Option<Vec<u8
 ///
 /// # Examples
 /// ```
-/// use malachite_float::float::conversion::string::format_float::format_float_str;
 /// use malachite_float::Float;
+/// use malachite_float::float::conversion::string::format_float::format_float_str;
 ///
 /// // fixed-point, scientific, and hexadecimal conversions
 /// assert_eq!(

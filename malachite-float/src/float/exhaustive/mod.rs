@@ -83,8 +83,8 @@ impl Iterator for ExhaustivePositiveFloatsWithSciExponentAndPrecision {
 /// # Examples
 /// ```
 /// use itertools::Itertools;
-/// use malachite_float::float::exhaustive::*;
 /// use malachite_float::ComparableFloat;
+/// use malachite_float::float::exhaustive::*;
 ///
 /// // The number after the '#' is the precision.
 /// assert_eq!(
@@ -206,8 +206,8 @@ impl Iterator for ExhaustivePositiveFloatsWithSciExponent {
 /// # Examples
 /// ```
 /// use itertools::Itertools;
-/// use malachite_float::float::exhaustive::exhaustive_positive_floats_with_sci_exponent;
 /// use malachite_float::ComparableFloat;
+/// use malachite_float::float::exhaustive::exhaustive_positive_floats_with_sci_exponent;
 ///
 /// // The number after the '#' is the precision.
 /// assert_eq!(
@@ -330,8 +330,8 @@ impl Iterator for ExhaustivePositiveFloatsWithPrecision {
 /// # Examples
 /// ```
 /// use itertools::Itertools;
-/// use malachite_float::float::exhaustive::exhaustive_positive_floats_with_precision;
 /// use malachite_float::ComparableFloat;
+/// use malachite_float::float::exhaustive::exhaustive_positive_floats_with_precision;
 ///
 /// // The number after the '#' is the precision.
 /// assert_eq!(
@@ -429,8 +429,8 @@ impl Iterator for ExhaustiveFloatsWithPrecision {
 ///
 /// ```
 /// use itertools::Itertools;
-/// use malachite_float::float::exhaustive::exhaustive_floats_with_precision;
 /// use malachite_float::ComparableFloat;
+/// use malachite_float::float::exhaustive::exhaustive_floats_with_precision;
 ///
 /// // The number after the '#' is the precision.
 /// assert_eq!(
@@ -554,8 +554,8 @@ impl Iterator for ExhaustivePositiveFiniteFloats {
 ///
 /// ```
 /// use itertools::Itertools;
-/// use malachite_float::float::exhaustive::exhaustive_positive_finite_floats;
 /// use malachite_float::ComparableFloat;
+/// use malachite_float::float::exhaustive::exhaustive_positive_finite_floats;
 ///
 /// // The number after the '#' is the precision.
 /// assert_eq!(
@@ -605,8 +605,8 @@ impl Iterator for ExhaustiveNegativeFiniteFloats {
 ///
 /// ```
 /// use itertools::Itertools;
-/// use malachite_float::float::exhaustive::exhaustive_negative_finite_floats;
 /// use malachite_float::ComparableFloat;
+/// use malachite_float::float::exhaustive::exhaustive_negative_finite_floats;
 ///
 /// // The number after the '#' is the precision.
 /// assert_eq!(
@@ -668,8 +668,8 @@ impl Iterator for ExhaustiveNonzeroFiniteFloats {
 ///
 /// ```
 /// use itertools::Itertools;
-/// use malachite_float::float::exhaustive::exhaustive_nonzero_finite_floats;
 /// use malachite_float::ComparableFloat;
+/// use malachite_float::float::exhaustive::exhaustive_nonzero_finite_floats;
 ///
 /// // The number after the '#' is the precision.
 /// assert_eq!(
@@ -709,8 +709,8 @@ type ExhaustiveNonNegativeFiniteFloats = Chain<Once<Float>, ExhaustivePositiveFi
 ///
 /// ```
 /// use itertools::Itertools;
-/// use malachite_float::float::exhaustive::exhaustive_non_negative_finite_floats;
 /// use malachite_float::ComparableFloat;
+/// use malachite_float::float::exhaustive::exhaustive_non_negative_finite_floats;
 ///
 /// // The number after the '#' is the precision.
 /// assert_eq!(
@@ -746,8 +746,8 @@ type ExhaustiveNonPositiveFiniteFloats = Chain<Once<Float>, ExhaustiveNegativeFi
 ///
 /// ```
 /// use itertools::Itertools;
-/// use malachite_float::float::exhaustive::exhaustive_non_positive_finite_floats;
 /// use malachite_float::ComparableFloat;
+/// use malachite_float::float::exhaustive::exhaustive_non_positive_finite_floats;
 ///
 /// // The number after the '#' is the precision.
 /// assert_eq!(
@@ -781,8 +781,8 @@ type ExhaustiveFloats = Chain<IntoIter<Float>, ExhaustiveNonzeroFiniteFloats>;
 ///
 /// ```
 /// use itertools::Itertools;
-/// use malachite_float::float::exhaustive::exhaustive_finite_floats;
 /// use malachite_float::ComparableFloat;
+/// use malachite_float::float::exhaustive::exhaustive_finite_floats;
 ///
 /// // The number after the '#' is the precision.
 /// assert_eq!(
@@ -816,8 +816,8 @@ pub fn exhaustive_finite_floats() -> ExhaustiveFloats {
 ///
 /// ```
 /// use itertools::Itertools;
-/// use malachite_float::float::exhaustive::exhaustive_floats;
 /// use malachite_float::ComparableFloat;
+/// use malachite_float::float::exhaustive::exhaustive_floats;
 ///
 /// // The number after the '#' is the precision.
 /// assert_eq!(

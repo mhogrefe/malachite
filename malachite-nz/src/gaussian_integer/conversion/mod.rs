@@ -17,8 +17,8 @@ pub mod from;
 ///
 /// # try_from
 /// ```
-/// use malachite_nz::gaussian_integer::conversion::from_primitive_float::*;
 /// use malachite_nz::gaussian_integer::GaussianInteger;
+/// use malachite_nz::gaussian_integer::conversion::from_primitive_float::*;
 ///
 /// assert_eq!(
 ///     GaussianInteger::try_from(123.0f32).unwrap().to_string(),
@@ -99,8 +99,8 @@ pub mod natural_from_gaussian_integer;
 ///
 /// # try_from
 /// ```
-/// use malachite_nz::gaussian_integer::conversion::primitive_float_from_gaussian_integer::*;
 /// use malachite_nz::gaussian_integer::GaussianInteger;
+/// use malachite_nz::gaussian_integer::conversion::primitive_float_from_gaussian_integer::*;
 /// use std::str::FromStr;
 ///
 /// let x = GaussianInteger::from_str("123").unwrap();
@@ -148,8 +148,8 @@ pub mod primitive_float_from_gaussian_integer;
 ///
 /// # try_from
 /// ```
-/// use malachite_nz::gaussian_integer::conversion::primitive_int_from_gaussian_integer::*;
 /// use malachite_nz::gaussian_integer::GaussianInteger;
+/// use malachite_nz::gaussian_integer::conversion::primitive_int_from_gaussian_integer::*;
 /// use std::str::FromStr;
 ///
 /// let x = GaussianInteger::from_str("123").unwrap();

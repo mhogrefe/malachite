@@ -65,7 +65,7 @@ pub struct LexFixedLengthVecsOutput {
 /// ```
 /// use malachite_base::iterators::iterator_cache::IteratorCache;
 /// use malachite_base::lex_vecs_fixed_length;
-/// use malachite_base::vecs::exhaustive::{validate_oi_map, LexFixedLengthVecsOutput};
+/// use malachite_base::vecs::exhaustive::{LexFixedLengthVecsOutput, validate_oi_map};
 ///
 /// lex_vecs_fixed_length!(
 ///     (pub(crate)),

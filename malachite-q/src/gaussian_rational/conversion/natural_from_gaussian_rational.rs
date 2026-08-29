@@ -25,8 +25,8 @@ impl TryFrom<GaussianRational> for Natural {
     /// # Examples
     /// ```
     /// use malachite_nz::natural::Natural;
-    /// use malachite_q::gaussian_rational::conversion::natural_from_gaussian_rational::*;
     /// use malachite_q::gaussian_rational::GaussianRational;
+    /// use malachite_q::gaussian_rational::conversion::natural_from_gaussian_rational::*;
     /// use std::str::FromStr;
     ///
     /// let x = GaussianRational::from_str("123").unwrap();
@@ -67,8 +67,8 @@ impl TryFrom<&GaussianRational> for Natural {
     /// # Examples
     /// ```
     /// use malachite_nz::natural::Natural;
-    /// use malachite_q::gaussian_rational::conversion::natural_from_gaussian_rational::*;
     /// use malachite_q::gaussian_rational::GaussianRational;
+    /// use malachite_q::gaussian_rational::conversion::natural_from_gaussian_rational::*;
     /// use std::str::FromStr;
     ///
     /// let x = GaussianRational::from_str("123").unwrap();

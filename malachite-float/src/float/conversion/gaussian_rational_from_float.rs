@@ -40,7 +40,10 @@ impl TryFrom<Float> for GaussianRational {
     /// let x = Float::from(1.5);
     /// assert_eq!(GaussianRational::try_from(x).unwrap().to_string(), "3/2");
     ///
-    /// assert_eq!(GaussianRational::try_from(Float::NAN), Err(GaussianRationalFromFloatError));
+    /// assert_eq!(
+    ///     GaussianRational::try_from(Float::NAN),
+    ///     Err(GaussianRationalFromFloatError)
+    /// );
     /// assert_eq!(
     ///     GaussianRational::try_from(Float::INFINITY),
     ///     Err(GaussianRationalFromFloatError)
@@ -80,7 +83,10 @@ impl TryFrom<&Float> for GaussianRational {
     /// let x = Float::from(1.5);
     /// assert_eq!(GaussianRational::try_from(&x).unwrap().to_string(), "3/2");
     ///
-    /// assert_eq!(GaussianRational::try_from(&Float::NAN), Err(GaussianRationalFromFloatError));
+    /// assert_eq!(
+    ///     GaussianRational::try_from(&Float::NAN),
+    ///     Err(GaussianRationalFromFloatError)
+    /// );
     /// assert_eq!(
     ///     GaussianRational::try_from(&Float::INFINITY),
     ///     Err(GaussianRationalFromFloatError)

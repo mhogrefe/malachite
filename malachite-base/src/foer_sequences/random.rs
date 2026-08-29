@@ -60,8 +60,8 @@ where
 /// # Examples
 /// ```
 /// use itertools::Itertools;
-/// use malachite_base::foer_sequences::random::random_foer_sequences;
 /// use malachite_base::foer_sequences::FoerSequence;
+/// use malachite_base::foer_sequences::random::random_foer_sequences;
 /// use malachite_base::num::random::random_primitive_ints;
 /// use malachite_base::random::EXAMPLE_SEED;
 ///

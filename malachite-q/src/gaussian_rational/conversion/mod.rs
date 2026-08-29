@@ -17,8 +17,8 @@ pub mod from;
 ///
 /// # try_from
 /// ```
-/// use malachite_q::gaussian_rational::conversion::from_primitive_float::*;
 /// use malachite_q::gaussian_rational::GaussianRational;
+/// use malachite_q::gaussian_rational::conversion::from_primitive_float::*;
 ///
 /// assert_eq!(
 ///     GaussianRational::try_from(123.0f32).unwrap().to_string(),
@@ -106,8 +106,8 @@ pub mod natural_from_gaussian_rational;
 ///
 /// # try_from
 /// ```
-/// use malachite_q::gaussian_rational::conversion::primitive_float_from_gaussian_rational::*;
 /// use malachite_q::gaussian_rational::GaussianRational;
+/// use malachite_q::gaussian_rational::conversion::primitive_float_from_gaussian_rational::*;
 /// use std::str::FromStr;
 ///
 /// let x = GaussianRational::from_str("123").unwrap();
@@ -156,8 +156,8 @@ pub mod primitive_float_from_gaussian_rational;
 ///
 /// # try_from
 /// ```
-/// use malachite_q::gaussian_rational::conversion::primitive_int_from_gaussian_rational::*;
 /// use malachite_q::gaussian_rational::GaussianRational;
+/// use malachite_q::gaussian_rational::conversion::primitive_int_from_gaussian_rational::*;
 /// use std::str::FromStr;
 ///
 /// let x = GaussianRational::from_str("123").unwrap();

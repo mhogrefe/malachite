@@ -1572,7 +1572,7 @@ impl<
 /// ```
 /// use itertools::Itertools;
 /// use malachite_base::tuples::exhaustive::{
-///     lex_dependent_pairs, ExhaustiveDependentPairsYsGenerator,
+///     ExhaustiveDependentPairsYsGenerator, lex_dependent_pairs,
 /// };
 /// use maplit::hashmap;
 /// use std::collections::HashMap;
@@ -1686,7 +1686,7 @@ pub const fn lex_dependent_pairs<
 /// ```
 /// use itertools::Itertools;
 /// use malachite_base::tuples::exhaustive::{
-///     lex_dependent_pairs_stop_after_empty_ys, ExhaustiveDependentPairsYsGenerator,
+///     ExhaustiveDependentPairsYsGenerator, lex_dependent_pairs_stop_after_empty_ys,
 /// };
 /// use maplit::hashmap;
 /// use std::collections::HashMap;
@@ -1858,7 +1858,7 @@ impl<
 /// use malachite_base::num::exhaustive::exhaustive_positive_primitive_ints;
 /// use malachite_base::num::iterators::ruler_sequence;
 /// use malachite_base::tuples::exhaustive::{
-///     exhaustive_dependent_pairs, ExhaustiveDependentPairsYsGenerator,
+///     ExhaustiveDependentPairsYsGenerator, exhaustive_dependent_pairs,
 /// };
 /// use maplit::hashmap;
 /// use std::collections::HashMap;
@@ -2039,7 +2039,7 @@ pub const fn exhaustive_dependent_pairs<
 /// use itertools::Itertools;
 /// use malachite_base::num::iterators::ruler_sequence;
 /// use malachite_base::tuples::exhaustive::{
-///     exhaustive_dependent_pairs_stop_after_empty_ys, ExhaustiveDependentPairsYsGenerator,
+///     ExhaustiveDependentPairsYsGenerator, exhaustive_dependent_pairs_stop_after_empty_ys,
 /// };
 /// use maplit::hashmap;
 /// use std::collections::HashMap;
@@ -2474,7 +2474,7 @@ exhaustive_ordered_unique_tuples!(
 /// ```
 /// use malachite_base::iterators::iterator_cache::IteratorCache;
 /// use malachite_base::lex_unique_tuples;
-/// use malachite_base::vecs::exhaustive::{unique_indices, UniqueIndices};
+/// use malachite_base::vecs::exhaustive::{UniqueIndices, unique_indices};
 ///
 /// lex_unique_tuples!(
 ///     (pub(crate)),
@@ -2730,15 +2730,15 @@ where
 ///
 /// ```
 /// use malachite_base::exhaustive_unique_tuples;
-/// use malachite_base::num::iterators::{ruler_sequence, RulerSequence};
+/// use malachite_base::num::iterators::{RulerSequence, ruler_sequence};
 /// use malachite_base::tuples::exhaustive::{
-///     exhaustive_dependent_pairs, ExhaustiveDependentPairs,
-/// };
-/// use malachite_base::vecs::exhaustive::{
-///     exhaustive_ordered_unique_vecs_fixed_length, ExhaustiveOrderedUniqueCollections,
-///     ExhaustiveUniqueVecsGenerator,
+///     ExhaustiveDependentPairs, exhaustive_dependent_pairs,
 /// };
 /// use malachite_base::vecs::ExhaustiveVecPermutations;
+/// use malachite_base::vecs::exhaustive::{
+///     ExhaustiveOrderedUniqueCollections, ExhaustiveUniqueVecsGenerator,
+///     exhaustive_ordered_unique_vecs_fixed_length,
+/// };
 ///
 /// exhaustive_unique_tuples!(
 ///     (pub(crate)),

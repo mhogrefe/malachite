@@ -19,7 +19,7 @@ use crate::unions::Union2;
 /// See usage examples [here](self#random_union2s).
 ///
 /// ```
-/// use malachite_base::num::random::{random_unsigned_range, RandomUnsignedRange};
+/// use malachite_base::num::random::{RandomUnsignedRange, random_unsigned_range};
 /// use malachite_base::random::Seed;
 /// use malachite_base::unions::UnionFromStrError;
 /// use malachite_base::{random_unions, union_struct};

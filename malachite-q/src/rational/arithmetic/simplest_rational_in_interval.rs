@@ -275,8 +275,8 @@ impl SimplestRationalInInterval for Rational {
     /// # Examples
     /// ```
     /// use malachite_base::num::basic::traits::{OneHalf, Zero};
-    /// use malachite_q::rational::arithmetic::traits::SimplestRationalInInterval;
     /// use malachite_q::Rational;
+    /// use malachite_q::rational::arithmetic::traits::SimplestRationalInInterval;
     ///
     /// assert_eq!(
     ///     Rational::simplest_rational_in_open_interval(
@@ -498,8 +498,8 @@ impl SimplestRationalInInterval for Rational {
     /// # Examples
     /// ```
     /// use malachite_base::num::basic::traits::{OneHalf, Zero};
-    /// use malachite_q::rational::arithmetic::traits::SimplestRationalInInterval;
     /// use malachite_q::Rational;
+    /// use malachite_q::rational::arithmetic::traits::SimplestRationalInInterval;
     ///
     /// assert_eq!(
     ///     Rational::simplest_rational_in_closed_interval(

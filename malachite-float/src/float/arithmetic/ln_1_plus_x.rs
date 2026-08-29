@@ -1027,9 +1027,11 @@ impl Ln1PlusX for &Float {
     ///     (&Float::NEGATIVE_ONE).ln_1_plus_x(),
     ///     Float::NEGATIVE_INFINITY
     /// );
-    /// assert!((&Float::from_signed_prec(-10, 100).0)
-    ///     .ln_1_plus_x()
-    ///     .is_nan());
+    /// assert!(
+    ///     (&Float::from_signed_prec(-10, 100).0)
+    ///         .ln_1_plus_x()
+    ///         .is_nan()
+    /// );
     /// ```
     #[inline]
     fn ln_1_plus_x(self) -> Float {

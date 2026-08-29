@@ -81,8 +81,8 @@ impl Convergents for Rational {
     /// ```
     /// use itertools::Itertools;
     /// use malachite_base::strings::ToDebugString;
-    /// use malachite_q::rational::conversion::traits::Convergents;
     /// use malachite_q::Rational;
+    /// use malachite_q::rational::conversion::traits::Convergents;
     ///
     /// assert_eq!(
     ///     Rational::from_signeds(2, 3)
@@ -140,8 +140,8 @@ impl Convergents for &Rational {
     /// ```
     /// use itertools::Itertools;
     /// use malachite_base::strings::ToDebugString;
-    /// use malachite_q::rational::conversion::traits::Convergents;
     /// use malachite_q::Rational;
+    /// use malachite_q::rational::conversion::traits::Convergents;
     ///
     /// assert_eq!(
     ///     (&Rational::from_signeds(2, 3))

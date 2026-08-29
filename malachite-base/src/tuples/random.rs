@@ -508,7 +508,7 @@ where
 /// ```
 /// use malachite_base::random_ordered_unique_tuples;
 /// use malachite_base::sets::random::{
-///     random_b_tree_sets_fixed_length, RandomBTreeSetsFixedLength,
+///     RandomBTreeSetsFixedLength, random_b_tree_sets_fixed_length,
 /// };
 ///
 /// random_ordered_unique_tuples!(

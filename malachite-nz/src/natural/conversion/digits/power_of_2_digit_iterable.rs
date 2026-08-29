@@ -844,9 +844,11 @@ impl<'a> PowerOf2DigitIterable<Natural> for &'a Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// let n = Natural::ZERO;
-    /// assert!(PowerOf2DigitIterable::<Natural>::power_of_2_digits(&n, 2)
-    ///     .next()
-    ///     .is_none());
+    /// assert!(
+    ///     PowerOf2DigitIterable::<Natural>::power_of_2_digits(&n, 2)
+    ///         .next()
+    ///         .is_none()
+    /// );
     ///
     /// // 107 = 1223_4
     /// let n = Natural::from(107u32);
@@ -861,9 +863,11 @@ impl<'a> PowerOf2DigitIterable<Natural> for &'a Natural {
     /// );
     ///
     /// let n = Natural::ZERO;
-    /// assert!(PowerOf2DigitIterable::<Natural>::power_of_2_digits(&n, 2)
-    ///     .next_back()
-    ///     .is_none());
+    /// assert!(
+    ///     PowerOf2DigitIterable::<Natural>::power_of_2_digits(&n, 2)
+    ///         .next_back()
+    ///         .is_none()
+    /// );
     ///
     /// // 107 = 1223_4
     /// let n = Natural::from(107u32);

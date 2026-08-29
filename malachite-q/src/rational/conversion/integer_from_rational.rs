@@ -28,8 +28,8 @@ impl TryFrom<Rational> for Integer {
     /// # Examples
     /// ```
     /// use malachite_nz::integer::Integer;
-    /// use malachite_q::rational::conversion::integer_from_rational::IntegerFromRationalError;
     /// use malachite_q::Rational;
+    /// use malachite_q::rational::conversion::integer_from_rational::IntegerFromRationalError;
     ///
     /// assert_eq!(Integer::try_from(Rational::from(123)).unwrap(), 123);
     /// assert_eq!(Integer::try_from(Rational::from(-123)).unwrap(), -123);
@@ -63,8 +63,8 @@ impl TryFrom<&Rational> for Integer {
     /// # Examples
     /// ```
     /// use malachite_nz::integer::Integer;
-    /// use malachite_q::rational::conversion::integer_from_rational::IntegerFromRationalError;
     /// use malachite_q::Rational;
+    /// use malachite_q::rational::conversion::integer_from_rational::IntegerFromRationalError;
     ///
     /// assert_eq!(Integer::try_from(&Rational::from(123)).unwrap(), 123);
     /// assert_eq!(Integer::try_from(&Rational::from(-123)).unwrap(), -123);

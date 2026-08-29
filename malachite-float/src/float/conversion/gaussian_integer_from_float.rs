@@ -41,9 +41,18 @@ impl TryFrom<Float> for GaussianInteger {
     /// let x = Float::from(-123);
     /// assert_eq!(GaussianInteger::try_from(x).unwrap().to_string(), "-123");
     ///
-    /// assert_eq!(GaussianInteger::try_from(Float::from(1.5)), Err(GaussianIntegerFromFloatError));
-    /// assert_eq!(GaussianInteger::try_from(Float::NAN), Err(GaussianIntegerFromFloatError));
-    /// assert_eq!(GaussianInteger::try_from(Float::INFINITY), Err(GaussianIntegerFromFloatError));
+    /// assert_eq!(
+    ///     GaussianInteger::try_from(Float::from(1.5)),
+    ///     Err(GaussianIntegerFromFloatError)
+    /// );
+    /// assert_eq!(
+    ///     GaussianInteger::try_from(Float::NAN),
+    ///     Err(GaussianIntegerFromFloatError)
+    /// );
+    /// assert_eq!(
+    ///     GaussianInteger::try_from(Float::INFINITY),
+    ///     Err(GaussianIntegerFromFloatError)
+    /// );
     /// ```
     #[inline]
     fn try_from(x: Float) -> Result<Self, Self::Error> {
@@ -84,8 +93,14 @@ impl TryFrom<&Float> for GaussianInteger {
     ///     GaussianInteger::try_from(&Float::from(1.5)),
     ///     Err(GaussianIntegerFromFloatError)
     /// );
-    /// assert_eq!(GaussianInteger::try_from(&Float::NAN), Err(GaussianIntegerFromFloatError));
-    /// assert_eq!(GaussianInteger::try_from(&Float::INFINITY), Err(GaussianIntegerFromFloatError));
+    /// assert_eq!(
+    ///     GaussianInteger::try_from(&Float::NAN),
+    ///     Err(GaussianIntegerFromFloatError)
+    /// );
+    /// assert_eq!(
+    ///     GaussianInteger::try_from(&Float::INFINITY),
+    ///     Err(GaussianIntegerFromFloatError)
+    /// );
     /// ```
     #[inline]
     fn try_from(x: &Float) -> Result<Self, Self::Error> {

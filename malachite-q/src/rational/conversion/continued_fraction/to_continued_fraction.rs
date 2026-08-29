@@ -73,8 +73,8 @@ impl ContinuedFraction for Rational {
     /// ```
     /// use itertools::Itertools;
     /// use malachite_base::strings::ToDebugString;
-    /// use malachite_q::rational::conversion::traits::ContinuedFraction;
     /// use malachite_q::Rational;
+    /// use malachite_q::rational::conversion::traits::ContinuedFraction;
     ///
     /// let (head, tail) = Rational::from_signeds(2, 3).continued_fraction();
     /// let tail = tail.collect_vec();
@@ -130,8 +130,8 @@ impl ContinuedFraction for &Rational {
     /// ```
     /// use itertools::Itertools;
     /// use malachite_base::strings::ToDebugString;
-    /// use malachite_q::rational::conversion::traits::ContinuedFraction;
     /// use malachite_q::Rational;
+    /// use malachite_q::rational::conversion::traits::ContinuedFraction;
     ///
     /// let (head, tail) = (&Rational::from_signeds(2, 3)).continued_fraction();
     /// let tail = tail.collect_vec();

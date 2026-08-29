@@ -678,7 +678,7 @@ pub fn striped_random_unsigned_bit_chunks<T: PrimitiveUnsigned>(
 ///
 /// # Examples
 /// ```
-/// use malachite_base::num::random::striped::{get_striped_bool_vec, StripedBitSource};
+/// use malachite_base::num::random::striped::{StripedBitSource, get_striped_bool_vec};
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// let mut bit_source = StripedBitSource::new(EXAMPLE_SEED, 10, 1);
@@ -1092,7 +1092,7 @@ pub fn striped_random_bool_vecs_length_inclusive_range(
 /// # Examples
 /// ```
 /// use itertools::Itertools;
-/// use malachite_base::num::random::striped::{get_striped_unsigned_vec, StripedBitSource};
+/// use malachite_base::num::random::striped::{StripedBitSource, get_striped_unsigned_vec};
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
 ///
@@ -1292,8 +1292,9 @@ pub fn striped_random_fixed_length_unsigned_vecs<T: PrimitiveUnsigned>(
 ///
 /// assert_eq!(
 ///     prefix_to_string(
-///         striped_random_unsigned_vecs::<u8>(EXAMPLE_SEED, 10, 1, 2, 1)
-///             .map(|xs| prefix_to_string(xs.into_iter().map(|x: u8| x.to_binary_string()), 100)),
+///         striped_random_unsigned_vecs::<u8>(EXAMPLE_SEED, 10, 1, 2, 1).map(|xs| {
+///             prefix_to_string(xs.into_iter().map(|x: u8| x.to_binary_string()), 100)
+///         }),
 ///         10,
 ///     ),
 ///     "[[0, 0, 111000, 0, 11111110, 10000001], [0], \

@@ -29,8 +29,8 @@ impl TryFrom<Rational> for Natural {
     /// # Examples
     /// ```
     /// use malachite_nz::natural::Natural;
-    /// use malachite_q::rational::conversion::natural_from_rational::NaturalFromRationalError;
     /// use malachite_q::Rational;
+    /// use malachite_q::rational::conversion::natural_from_rational::NaturalFromRationalError;
     ///
     /// assert_eq!(Natural::try_from(Rational::from(123)).unwrap(), 123);
     /// assert_eq!(
@@ -67,8 +67,8 @@ impl TryFrom<&Rational> for Natural {
     /// # Examples
     /// ```
     /// use malachite_nz::natural::Natural;
-    /// use malachite_q::rational::conversion::natural_from_rational::NaturalFromRationalError;
     /// use malachite_q::Rational;
+    /// use malachite_q::rational::conversion::natural_from_rational::NaturalFromRationalError;
     ///
     /// assert_eq!(Natural::try_from(&Rational::from(123)).unwrap(), 123);
     /// assert_eq!(

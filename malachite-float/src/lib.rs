@@ -379,7 +379,7 @@ where
 /// # Examples
 /// ```
 /// use malachite_base::num::basic::traits::{Infinity, NegativeInfinity, One};
-/// use malachite_float::{test_overflow, Float};
+/// use malachite_float::{Float, test_overflow};
 /// use std::cmp::Ordering::*;
 ///
 /// assert!(test_overflow(&Float::INFINITY, Greater));
@@ -423,7 +423,7 @@ pub fn test_overflow(result: &Float, o: Ordering) -> bool {
 /// # Examples
 /// ```
 /// use malachite_base::num::basic::traits::{One, Zero};
-/// use malachite_float::{test_underflow, Float};
+/// use malachite_float::{Float, test_underflow};
 /// use std::cmp::Ordering::*;
 ///
 /// assert!(test_underflow(&Float::ZERO, Less));

@@ -118,8 +118,8 @@ impl Approximate for Rational {
     /// ```
     /// use malachite_base::num::conversion::traits::ExactFrom;
     /// use malachite_nz::natural::Natural;
-    /// use malachite_q::rational::arithmetic::traits::Approximate;
     /// use malachite_q::Rational;
+    /// use malachite_q::rational::arithmetic::traits::Approximate;
     ///
     /// assert_eq!(
     ///     Rational::exact_from(std::f64::consts::PI)
@@ -177,8 +177,8 @@ impl Approximate for &Rational {
     /// ```
     /// use malachite_base::num::conversion::traits::ExactFrom;
     /// use malachite_nz::natural::Natural;
-    /// use malachite_q::rational::arithmetic::traits::Approximate;
     /// use malachite_q::Rational;
+    /// use malachite_q::rational::arithmetic::traits::Approximate;
     ///
     /// assert_eq!(
     ///     (&Rational::exact_from(std::f64::consts::PI))
@@ -232,8 +232,8 @@ impl ApproximateAssign for Rational {
     /// ```
     /// use malachite_base::num::conversion::traits::ExactFrom;
     /// use malachite_nz::natural::Natural;
-    /// use malachite_q::rational::arithmetic::traits::ApproximateAssign;
     /// use malachite_q::Rational;
+    /// use malachite_q::rational::arithmetic::traits::ApproximateAssign;
     ///
     /// let mut x = Rational::exact_from(std::f64::consts::PI);
     /// x.approximate_assign(&Natural::from(1000u32));

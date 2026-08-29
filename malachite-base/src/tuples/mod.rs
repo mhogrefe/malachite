@@ -491,7 +491,7 @@ pub const fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 /// use itertools::Itertools;
 /// use malachite_base::iterators::iterator_cache::IteratorCache;
 /// use malachite_base::lex_unique_tuples;
-/// use malachite_base::vecs::exhaustive::{unique_indices, UniqueIndices};
+/// use malachite_base::vecs::exhaustive::{UniqueIndices, unique_indices};
 ///
 /// lex_unique_tuples!(
 ///     (pub(crate)),
@@ -534,15 +534,15 @@ pub const fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 /// ```
 /// use itertools::Itertools;
 /// use malachite_base::exhaustive_unique_tuples;
-/// use malachite_base::num::iterators::{ruler_sequence, RulerSequence};
+/// use malachite_base::num::iterators::{RulerSequence, ruler_sequence};
 /// use malachite_base::tuples::exhaustive::{
-///     exhaustive_dependent_pairs, ExhaustiveDependentPairs,
-/// };
-/// use malachite_base::vecs::exhaustive::{
-///     exhaustive_ordered_unique_vecs_fixed_length, ExhaustiveOrderedUniqueCollections,
-///     ExhaustiveUniqueVecsGenerator,
+///     ExhaustiveDependentPairs, exhaustive_dependent_pairs,
 /// };
 /// use malachite_base::vecs::ExhaustiveVecPermutations;
+/// use malachite_base::vecs::exhaustive::{
+///     ExhaustiveOrderedUniqueCollections, ExhaustiveUniqueVecsGenerator,
+///     exhaustive_ordered_unique_vecs_fixed_length,
+/// };
 ///
 /// exhaustive_unique_tuples!(
 ///     (pub(crate)),
@@ -664,7 +664,7 @@ pub mod exhaustive;
 /// use itertools::Itertools;
 /// use malachite_base::chars::random::random_char_inclusive_range;
 /// use malachite_base::num::random::random_unsigned_inclusive_range;
-/// use malachite_base::random::{Seed, EXAMPLE_SEED};
+/// use malachite_base::random::{EXAMPLE_SEED, Seed};
 /// use malachite_base::random_custom_tuples;
 ///
 /// random_custom_tuples!(
@@ -720,7 +720,7 @@ pub mod exhaustive;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::random_ordered_unique_tuples;
 /// use malachite_base::sets::random::{
-///     random_b_tree_sets_fixed_length, RandomBTreeSetsFixedLength,
+///     RandomBTreeSetsFixedLength, random_b_tree_sets_fixed_length,
 /// };
 ///
 /// random_ordered_unique_tuples!(

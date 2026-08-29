@@ -50,8 +50,8 @@ use malachite_base::strings::gmp_format::{GmpConversionSpec, GmpFormatArg};
 ///
 /// # Examples
 /// ```
-/// use malachite_nz::integer::conversion::string::format_integer::format_integer_str;
 /// use malachite_nz::integer::Integer;
+/// use malachite_nz::integer::conversion::string::format_integer::format_integer_str;
 ///
 /// let x = Integer::from(-255);
 /// assert_eq!(format_integer_str(&x, "%Zd"), Some("-255".to_string()));

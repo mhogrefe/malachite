@@ -166,7 +166,10 @@ pub fn random_gaussian_rationals(
 /// use malachite_q::gaussian_rational::random::*;
 ///
 /// assert_eq!(
-///     prefix_to_string(striped_random_real_gaussian_rationals(EXAMPLE_SEED, 16, 1, 32, 1), 4),
+///     prefix_to_string(
+///         striped_random_real_gaussian_rationals(EXAMPLE_SEED, 16, 1, 32, 1),
+///         4
+///     ),
 ///     "[-8192/127, -16776704/4396972769407, 8796093005951/648518346332962816, 87381/2863267840, .\
 ///     ..]"
 /// )
@@ -254,7 +257,10 @@ pub fn striped_random_imaginary_gaussian_rationals(
 /// use malachite_q::gaussian_rational::random::*;
 ///
 /// assert_eq!(
-///     prefix_to_string(striped_random_gaussian_rationals(EXAMPLE_SEED, 16, 1, 32, 1), 4),
+///     prefix_to_string(
+///         striped_random_gaussian_rationals(EXAMPLE_SEED, 16, 1, 32, 1),
+///         4
+///     ),
 ///     "[-16776704/4396972769407-8192i/127, 87381/2863267840+8796093005951i/648518346332962816, 51\
 ///     /58408828928-1024i/2043, 270335/7+85i/13521606402434254795714066382848, ...]"
 /// )

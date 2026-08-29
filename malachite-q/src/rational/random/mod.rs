@@ -709,8 +709,8 @@ pub fn striped_random_rationals(
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::natural::Natural;
-/// use malachite_q::rational::random::random_rational_with_denominator_range_to_infinity;
 /// use malachite_q::Rational;
+/// use malachite_q::rational::random::random_rational_with_denominator_range_to_infinity;
 ///
 /// assert_eq!(
 ///     prefix_to_string(
@@ -771,8 +771,8 @@ pub fn random_rational_with_denominator_range_to_infinity(
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::natural::Natural;
-/// use malachite_q::rational::random::random_rational_with_denominator_range_to_negative_infinity;
 /// use malachite_q::Rational;
+/// use malachite_q::rational::random::random_rational_with_denominator_range_to_negative_infinity;
 ///
 /// assert_eq!(
 ///     prefix_to_string(
@@ -844,8 +844,8 @@ pub fn random_rational_with_denominator_range_to_negative_infinity(
 /// use malachite_base::num::basic::traits::OneHalf;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::natural::Natural;
-/// use malachite_q::rational::random::random_rational_with_denominator_range;
 /// use malachite_q::Rational;
+/// use malachite_q::rational::random::random_rational_with_denominator_range;
 ///
 /// assert_eq!(
 ///     prefix_to_string(
@@ -936,8 +936,8 @@ pub fn random_rational_with_denominator_range(
 /// use malachite_base::num::basic::traits::OneHalf;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::natural::Natural;
-/// use malachite_q::rational::random::random_rational_with_denominator_inclusive_range;
 /// use malachite_q::Rational;
+/// use malachite_q::rational::random::random_rational_with_denominator_inclusive_range;
 ///
 /// assert_eq!(
 ///     prefix_to_string(
@@ -1054,8 +1054,8 @@ impl Iterator for RandomRationalRangeToInfinity {
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_q::rational::random::random_rational_range_to_infinity;
 /// use malachite_q::Rational;
+/// use malachite_q::rational::random::random_rational_range_to_infinity;
 ///
 /// assert_eq!(
 ///     prefix_to_string(
@@ -1151,8 +1151,8 @@ impl Iterator for RandomRationalRangeToNegativeInfinity {
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_q::rational::random::random_rational_range_to_negative_infinity;
 /// use malachite_q::Rational;
+/// use malachite_q::rational::random::random_rational_range_to_negative_infinity;
 ///
 /// assert_eq!(
 ///     prefix_to_string(
@@ -1273,8 +1273,8 @@ impl Iterator for RandomRationalRange {
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::basic::traits::OneHalf;
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_q::rational::random::random_rational_range;
 /// use malachite_q::Rational;
+/// use malachite_q::rational::random::random_rational_range;
 ///
 /// assert_eq!(
 ///     prefix_to_string(
@@ -1414,8 +1414,8 @@ impl Iterator for RandomRationalInclusiveRange {
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::num::basic::traits::OneHalf;
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_q::rational::random::random_rational_inclusive_range;
 /// use malachite_q::Rational;
+/// use malachite_q::rational::random::random_rational_inclusive_range;
 ///
 /// assert_eq!(
 ///     prefix_to_string(
@@ -1536,8 +1536,8 @@ impl Iterator for StripedRandomRationalRangeToInfinity {
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_q::rational::random::striped_random_rational_range_to_infinity;
 /// use malachite_q::Rational;
+/// use malachite_q::rational::random::striped_random_rational_range_to_infinity;
 ///
 /// assert_eq!(
 ///     prefix_to_string(
@@ -1654,8 +1654,8 @@ impl Iterator for StripedRandomRationalRangeToNegativeInfinity {
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_q::rational::random::striped_random_rational_range_to_negative_infinity;
 /// use malachite_q::Rational;
+/// use malachite_q::rational::random::striped_random_rational_range_to_negative_infinity;
 ///
 /// assert_eq!(
 ///     prefix_to_string(

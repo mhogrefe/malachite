@@ -22,8 +22,8 @@ pub type ExhaustiveRoundingModes = Copied<Iter<'static, RoundingMode>>;
 /// # Examples
 /// ```
 /// use itertools::Itertools;
-/// use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 /// use malachite_base::rounding_modes::RoundingMode::*;
+/// use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 ///
 /// assert_eq!(
 ///     exhaustive_rounding_modes().collect_vec(),

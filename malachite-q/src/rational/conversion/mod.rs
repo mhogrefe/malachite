@@ -41,8 +41,8 @@ pub mod from_numerator_and_denominator;
 /// # try_from
 /// ```
 /// use malachite_base::strings::ToDebugString;
-/// use malachite_q::rational::conversion::from_primitive_float::RationalFromPrimitiveFloatError;
 /// use malachite_q::Rational;
+/// use malachite_q::rational::conversion::from_primitive_float::RationalFromPrimitiveFloatError;
 ///
 /// assert_eq!(Rational::try_from(0.0).to_debug_string(), "Ok(0)");
 /// assert_eq!(Rational::try_from(1.5).to_debug_string(), "Ok(3/2)");
@@ -250,8 +250,8 @@ pub mod natural_from_rational;
 /// ```
 /// use malachite_base::num::arithmetic::traits::PowerOf2;
 /// use malachite_base::num::basic::traits::OneHalf;
-/// use malachite_q::rational::conversion::primitive_float_from_rational::FloatConversionError;
 /// use malachite_q::Rational;
+/// use malachite_q::rational::conversion::primitive_float_from_rational::FloatConversionError;
 ///
 /// assert_eq!(
 ///     f32::try_from(Rational::from_signeds(1i8, 3)),
@@ -324,10 +324,10 @@ pub mod primitive_float_from_rational;
 ///
 /// # try_from
 /// ```
+/// use malachite_q::Rational;
 /// use malachite_q::rational::conversion::primitive_int_from_rational::{
 ///     SignedFromRationalError, UnsignedFromRationalError,
 /// };
-/// use malachite_q::Rational;
 /// use std::str::FromStr;
 ///
 /// assert_eq!(u32::try_from(&Rational::from(123)).unwrap(), 123);

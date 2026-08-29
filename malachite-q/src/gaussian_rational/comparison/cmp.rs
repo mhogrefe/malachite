@@ -28,7 +28,7 @@ impl Ord for ComparableGaussianRationalRef<'_> {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::{One, OneHalf, Zero, I};
+    /// use malachite_base::num::basic::traits::{I, One, OneHalf, Zero};
     /// use malachite_q::gaussian_rational::{ComparableGaussianRationalRef, GaussianRational};
     ///
     /// let zero = GaussianRational::ZERO;
@@ -81,7 +81,7 @@ impl Ord for ComparableGaussianRational {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::{One, OneHalf, Zero, I};
+    /// use malachite_base::num::basic::traits::{I, One, OneHalf, Zero};
     /// use malachite_q::gaussian_rational::{ComparableGaussianRational, GaussianRational};
     ///
     /// // 0 < i, since the real parts are equal and 0 < 1

@@ -389,8 +389,8 @@ pub mod natural_from_float;
 /// use malachite_base::num::arithmetic::traits::PowerOf2;
 /// use malachite_base::num::basic::traits::{Infinity, NaN, Zero};
 /// use malachite_base::num::float::NiceFloat;
-/// use malachite_float::float::conversion::primitive_float_from_float::FloatFromFloatError;
 /// use malachite_float::Float;
+/// use malachite_float::float::conversion::primitive_float_from_float::FloatFromFloatError;
 ///
 /// assert_eq!(
 ///     NiceFloat(f32::try_from(Float::NAN).unwrap()),

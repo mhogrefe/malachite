@@ -32,8 +32,8 @@ impl TryFrom<Float> for Rational {
     /// # Examples
     /// ```
     /// use malachite_base::num::basic::traits::{Infinity, NaN, Zero};
-    /// use malachite_float::float::conversion::rational_from_float::RationalFromFloatError;
     /// use malachite_float::Float;
+    /// use malachite_float::float::conversion::rational_from_float::RationalFromFloatError;
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(Rational::try_from(Float::ZERO).unwrap(), 0);
@@ -86,8 +86,8 @@ impl TryFrom<&Float> for Rational {
     /// # Examples
     /// ```
     /// use malachite_base::num::basic::traits::{Infinity, NaN, Zero};
-    /// use malachite_float::float::conversion::rational_from_float::RationalFromFloatError;
     /// use malachite_float::Float;
+    /// use malachite_float::float::conversion::rational_from_float::RationalFromFloatError;
     /// use malachite_q::Rational;
     ///
     /// assert_eq!(Rational::try_from(&Float::ZERO).unwrap(), 0);

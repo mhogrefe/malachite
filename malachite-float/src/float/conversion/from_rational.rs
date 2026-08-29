@@ -698,8 +698,8 @@ impl TryFrom<Rational> for Float {
     /// ```
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_float::Float;
-    /// use malachite_q::rational::conversion::primitive_float_from_rational::FloatConversionError;
     /// use malachite_q::Rational;
+    /// use malachite_q::rational::conversion::primitive_float_from_rational::FloatConversionError;
     ///
     /// assert_eq!(Float::try_from(Rational::ZERO).unwrap(), 0);
     /// assert_eq!(
@@ -770,8 +770,8 @@ impl TryFrom<&Rational> for Float {
     /// ```
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_float::Float;
-    /// use malachite_q::rational::conversion::primitive_float_from_rational::FloatConversionError;
     /// use malachite_q::Rational;
+    /// use malachite_q::rational::conversion::primitive_float_from_rational::FloatConversionError;
     ///
     /// assert_eq!(Float::try_from(&Rational::ZERO).unwrap(), 0);
     /// assert_eq!(

@@ -962,10 +962,12 @@ impl LogBase2Of1PlusX for Float {
     ///     Float::NEGATIVE_ONE.log_base_2_1_plus_x(),
     ///     Float::NEGATIVE_INFINITY
     /// );
-    /// assert!(Float::from_signed_prec(-10, 100)
-    ///     .0
-    ///     .log_base_2_1_plus_x()
-    ///     .is_nan());
+    /// assert!(
+    ///     Float::from_signed_prec(-10, 100)
+    ///         .0
+    ///         .log_base_2_1_plus_x()
+    ///         .is_nan()
+    /// );
     /// ```
     #[inline]
     fn log_base_2_1_plus_x(self) -> Self {
@@ -1042,9 +1044,11 @@ impl LogBase2Of1PlusX for &Float {
     ///     (&Float::NEGATIVE_ONE).log_base_2_1_plus_x(),
     ///     Float::NEGATIVE_INFINITY
     /// );
-    /// assert!((&Float::from_signed_prec(-10, 100).0)
-    ///     .log_base_2_1_plus_x()
-    ///     .is_nan());
+    /// assert!(
+    ///     (&Float::from_signed_prec(-10, 100).0)
+    ///         .log_base_2_1_plus_x()
+    ///         .is_nan()
+    /// );
     /// ```
     #[inline]
     fn log_base_2_1_plus_x(self) -> Float {

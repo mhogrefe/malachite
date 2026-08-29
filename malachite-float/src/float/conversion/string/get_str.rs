@@ -150,8 +150,8 @@ pub fn get_str_digit_count(base: u64, prec: u64) -> usize {
 /// ```
 /// use core::cmp::Ordering::*;
 /// use malachite_base::rounding_modes::RoundingMode::{self, *};
-/// use malachite_float::float::conversion::string::get_str::get_str;
 /// use malachite_float::Float;
+/// use malachite_float::float::conversion::string::get_str::get_str;
 /// use malachite_q::Rational;
 ///
 /// // Render the returned digit bytes as a `String` for readability.

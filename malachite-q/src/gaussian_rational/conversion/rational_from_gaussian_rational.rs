@@ -24,9 +24,9 @@ impl TryFrom<GaussianRational> for Rational {
     ///
     /// # Examples
     /// ```
-    /// use malachite_q::gaussian_rational::conversion::rational_from_gaussian_rational::*;
-    /// use malachite_q::gaussian_rational::GaussianRational;
     /// use malachite_q::Rational;
+    /// use malachite_q::gaussian_rational::GaussianRational;
+    /// use malachite_q::gaussian_rational::conversion::rational_from_gaussian_rational::*;
     /// use std::str::FromStr;
     ///
     /// let x = GaussianRational::from_str("123").unwrap();
@@ -65,9 +65,9 @@ impl TryFrom<&GaussianRational> for Rational {
     ///
     /// # Examples
     /// ```
-    /// use malachite_q::gaussian_rational::conversion::rational_from_gaussian_rational::*;
-    /// use malachite_q::gaussian_rational::GaussianRational;
     /// use malachite_q::Rational;
+    /// use malachite_q::gaussian_rational::GaussianRational;
+    /// use malachite_q::gaussian_rational::conversion::rational_from_gaussian_rational::*;
     /// use std::str::FromStr;
     ///
     /// let x = GaussianRational::from_str("123").unwrap();
@@ -101,8 +101,8 @@ impl ConvertibleFrom<&GaussianRational> for Rational {
     /// # Examples
     /// ```
     /// use malachite_base::num::conversion::traits::ConvertibleFrom;
-    /// use malachite_q::gaussian_rational::GaussianRational;
     /// use malachite_q::Rational;
+    /// use malachite_q::gaussian_rational::GaussianRational;
     /// use std::str::FromStr;
     ///
     /// let x = GaussianRational::from_str("123").unwrap();

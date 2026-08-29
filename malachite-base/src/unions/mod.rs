@@ -189,8 +189,8 @@ union_struct!((pub), Union2, Union2<T, T>, [A, A, 'A', a], [B, B, 'B', b]);
 /// ```
 /// use itertools::Itertools;
 /// use malachite_base::bools::exhaustive::exhaustive_bools;
-/// use malachite_base::unions::exhaustive::lex_union2s;
 /// use malachite_base::unions::Union2;
+/// use malachite_base::unions::exhaustive::lex_union2s;
 ///
 /// let u2s = lex_union2s(exhaustive_bools(), 0..4).collect_vec();
 /// assert_eq!(
@@ -210,8 +210,8 @@ union_struct!((pub), Union2, Union2<T, T>, [A, A, 'A', a], [B, B, 'B', b]);
 /// ```
 /// use itertools::Itertools;
 /// use malachite_base::bools::exhaustive::exhaustive_bools;
-/// use malachite_base::unions::exhaustive::exhaustive_union2s;
 /// use malachite_base::unions::Union2;
+/// use malachite_base::unions::exhaustive::exhaustive_union2s;
 ///
 /// let u2s = exhaustive_union2s(exhaustive_bools(), 0..4).collect_vec();
 /// assert_eq!(
@@ -236,8 +236,8 @@ pub mod exhaustive;
 /// use malachite_base::chars::random::random_char_inclusive_range;
 /// use malachite_base::num::random::random_unsigned_inclusive_range;
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_base::unions::random::random_union2s;
 /// use malachite_base::unions::Union2;
+/// use malachite_base::unions::random::random_union2s;
 ///
 /// let us = random_union2s(
 ///     EXAMPLE_SEED,

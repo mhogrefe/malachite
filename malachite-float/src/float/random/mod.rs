@@ -93,8 +93,8 @@ impl<I: Iterator<Item = Natural>> Iterator for RandomPositiveFiniteFloats<I> {
 /// ```
 /// use itertools::Itertools;
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_float::float::random::random_positive_finite_floats;
 /// use malachite_float::ComparableFloat;
+/// use malachite_float::float::random::random_positive_finite_floats;
 ///
 /// // The number after the '#' is the precision.
 /// assert_eq!(
@@ -182,8 +182,8 @@ pub fn random_positive_finite_floats(
 /// ```
 /// use itertools::Itertools;
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_float::float::random::random_positive_floats_with_precision;
 /// use malachite_float::ComparableFloat;
+/// use malachite_float::float::random::random_positive_floats_with_precision;
 ///
 /// // The number after the '#' is the precision.
 /// assert_eq!(
@@ -285,8 +285,8 @@ impl<I: Iterator<Item = Natural>> Iterator for RandomNegativeFiniteFloats<I> {
 /// ```
 /// use itertools::Itertools;
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_float::float::random::random_negative_finite_floats;
 /// use malachite_float::ComparableFloat;
+/// use malachite_float::float::random::random_negative_finite_floats;
 ///
 /// // The number after the '#' is the precision.
 /// assert_eq!(
@@ -391,8 +391,8 @@ impl<I: Iterator<Item = Natural>> Iterator for RandomNonNegativeFiniteFloats<I> 
 /// ```
 /// use itertools::Itertools;
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_float::float::random::random_non_negative_finite_floats;
 /// use malachite_float::ComparableFloat;
+/// use malachite_float::float::random::random_non_negative_finite_floats;
 ///
 /// // The number after the '#' is the precision.
 /// assert_eq!(
@@ -502,8 +502,8 @@ impl<I: Iterator<Item = Natural>> Iterator for RandomNonPositiveFiniteFloats<I> 
 /// ```
 /// use itertools::Itertools;
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_float::float::random::random_non_positive_finite_floats;
 /// use malachite_float::ComparableFloat;
+/// use malachite_float::float::random::random_non_positive_finite_floats;
 ///
 /// // The number after the '#' is the precision.
 /// assert_eq!(
@@ -608,8 +608,8 @@ impl<I: Iterator<Item = Natural>> Iterator for RandomNonzeroFiniteFloats<I> {
 /// ```
 /// use itertools::Itertools;
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_float::float::random::random_nonzero_finite_floats;
 /// use malachite_float::ComparableFloat;
+/// use malachite_float::float::random::random_nonzero_finite_floats;
 ///
 /// // The number after the '#' is the precision.
 /// assert_eq!(
@@ -713,8 +713,8 @@ impl<I: Iterator<Item = Natural>> Iterator for RandomFiniteFloats<I> {
 /// ```
 /// use itertools::Itertools;
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_float::float::random::random_finite_floats;
 /// use malachite_float::ComparableFloat;
+/// use malachite_float::float::random::random_finite_floats;
 ///
 /// // The number after the '#' is the precision.
 /// assert_eq!(
@@ -801,8 +801,8 @@ pub fn random_finite_floats(
 /// ```
 /// use itertools::Itertools;
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_float::float::random::random_floats;
 /// use malachite_float::ComparableFloat;
+/// use malachite_float::float::random::random_floats;
 ///
 /// // The number after the '#' is the precision.
 /// assert_eq!(
@@ -926,8 +926,8 @@ pub fn random_floats(
 /// ```
 /// use itertools::Itertools;
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_float::float::random::striped_random_positive_finite_floats;
 /// use malachite_float::ComparableFloat;
+/// use malachite_float::float::random::striped_random_positive_finite_floats;
 ///
 /// // The number after the '#' is the precision.
 /// assert_eq!(
@@ -1014,8 +1014,8 @@ pub fn striped_random_positive_finite_floats(
 /// ```
 /// use itertools::Itertools;
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_float::float::random::striped_random_positive_floats_with_precision;
 /// use malachite_float::ComparableFloat;
+/// use malachite_float::float::random::striped_random_positive_floats_with_precision;
 ///
 /// // The number after the '#' is the precision.
 /// assert_eq!(
@@ -1107,8 +1107,8 @@ pub fn striped_random_positive_floats_with_precision(
 /// ```
 /// use itertools::Itertools;
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_float::float::random::striped_random_negative_finite_floats;
 /// use malachite_float::ComparableFloat;
+/// use malachite_float::float::random::striped_random_negative_finite_floats;
 ///
 /// // The number after the '#' is the precision.
 /// assert_eq!(
@@ -1194,8 +1194,8 @@ pub fn striped_random_negative_finite_floats(
 /// ```
 /// use itertools::Itertools;
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_float::float::random::striped_random_non_negative_finite_floats;
 /// use malachite_float::ComparableFloat;
+/// use malachite_float::float::random::striped_random_non_negative_finite_floats;
 ///
 /// // The number after the '#' is the precision.
 /// assert_eq!(
@@ -1287,8 +1287,8 @@ pub fn striped_random_non_negative_finite_floats(
 /// ```
 /// use itertools::Itertools;
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_float::float::random::striped_random_non_positive_finite_floats;
 /// use malachite_float::ComparableFloat;
+/// use malachite_float::float::random::striped_random_non_positive_finite_floats;
 ///
 /// // The number after the '#' is the precision.
 /// assert_eq!(
@@ -1379,8 +1379,8 @@ pub fn striped_random_non_positive_finite_floats(
 /// ```
 /// use itertools::Itertools;
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_float::float::random::striped_random_nonzero_finite_floats;
 /// use malachite_float::ComparableFloat;
+/// use malachite_float::float::random::striped_random_nonzero_finite_floats;
 ///
 /// // The number after the '#' is the precision.
 /// assert_eq!(
@@ -1470,8 +1470,8 @@ pub fn striped_random_nonzero_finite_floats(
 /// ```
 /// use itertools::Itertools;
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_float::float::random::striped_random_finite_floats;
 /// use malachite_float::ComparableFloat;
+/// use malachite_float::float::random::striped_random_finite_floats;
 ///
 /// // The number after the '#' is the precision.
 /// assert_eq!(
@@ -1563,8 +1563,8 @@ pub fn striped_random_finite_floats(
 /// ```
 /// use itertools::Itertools;
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_float::float::random::striped_random_floats;
 /// use malachite_float::ComparableFloat;
+/// use malachite_float::float::random::striped_random_floats;
 ///
 /// // The number after the '#' is the precision.
 /// assert_eq!(
@@ -1736,8 +1736,8 @@ impl Iterator for UniformRandomNonNegativeFloatsLessThanOne {
 /// ```
 /// use itertools::Itertools;
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_float::float::random::uniform_random_non_negative_floats_less_than_one;
 /// use malachite_float::ComparableFloat;
+/// use malachite_float::float::random::uniform_random_non_negative_floats_less_than_one;
 ///
 /// // The number after the '#' is the precision.
 /// assert_eq!(
@@ -2004,8 +2004,8 @@ crate_test_fn! {
 /// use itertools::Itertools;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::rounding_modes::RoundingMode::*;
-/// use malachite_float::float::random::uniform_random_non_negative_floats_at_most_one;
 /// use malachite_float::ComparableFloat;
+/// use malachite_float::float::random::uniform_random_non_negative_floats_at_most_one;
 ///
 /// // The number after the '#' is the precision.
 /// assert_eq!(
@@ -2348,8 +2348,8 @@ crate_test_fn! {
 /// use itertools::Itertools;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::rounding_modes::RoundingMode::*;
-/// use malachite_float::float::random::exponential_random_floats;
 /// use malachite_float::ComparableFloat;
+/// use malachite_float::float::random::exponential_random_floats;
 ///
 /// // The number after the '#' is the precision.
 /// assert_eq!(
@@ -2614,8 +2614,8 @@ crate_test_fn! {
 /// use itertools::Itertools;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::rounding_modes::RoundingMode::*;
-/// use malachite_float::float::random::normal_random_floats;
 /// use malachite_float::ComparableFloat;
+/// use malachite_float::float::random::normal_random_floats;
 ///
 /// // The number after the '#' is the precision.
 /// assert_eq!(

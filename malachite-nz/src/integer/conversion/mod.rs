@@ -280,8 +280,8 @@ pub mod natural_from_integer;
 /// # try_from
 /// ```
 /// use core::str::FromStr;
-/// use malachite_nz::integer::conversion::primitive_float_from_integer::*;
 /// use malachite_nz::integer::Integer;
+/// use malachite_nz::integer::conversion::primitive_float_from_integer::*;
 ///
 /// assert_eq!(f32::try_from(&Integer::from_str("123").unwrap()), Ok(123.0));
 /// assert_eq!(
@@ -338,10 +338,10 @@ pub mod primitive_float_from_integer;
 /// # try_from
 /// ```
 /// use malachite_base::num::arithmetic::traits::Pow;
+/// use malachite_nz::integer::Integer;
 /// use malachite_nz::integer::conversion::primitive_int_from_integer::{
 ///     SignedFromIntegerError, UnsignedFromIntegerError,
 /// };
-/// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(u32::try_from(&Integer::from(123)), Ok(123));
 /// assert_eq!(

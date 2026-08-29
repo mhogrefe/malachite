@@ -50,8 +50,8 @@ impl Display for GaussianRational {
     /// # Examples
     /// ```
     /// use malachite_base::num::conversion::traits::ImaginaryFrom;
-    /// use malachite_q::gaussian_rational::GaussianRational;
     /// use malachite_q::Rational;
+    /// use malachite_q::gaussian_rational::GaussianRational;
     ///
     /// assert_eq!(GaussianRational::default().to_string(), "0");
     /// assert_eq!(

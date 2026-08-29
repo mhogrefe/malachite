@@ -55,8 +55,8 @@ impl<T> BaseFmtWrapper<T> {
     /// # Examples
     /// ```
     /// use malachite_nz::integer::Integer;
-    /// use malachite_nz::natural::conversion::string::to_string::BaseFmtWrapper;
     /// use malachite_nz::natural::Natural;
+    /// use malachite_nz::natural::conversion::string::to_string::BaseFmtWrapper;
     ///
     /// let n = Natural::from(1000000000u32);
     /// let x = BaseFmtWrapper::new(&n, 36);
@@ -80,8 +80,8 @@ impl<T> BaseFmtWrapper<T> {
     ///
     /// # Examples
     /// ```
-    /// use malachite_nz::natural::conversion::string::to_string::BaseFmtWrapper;
     /// use malachite_nz::natural::Natural;
+    /// use malachite_nz::natural::conversion::string::to_string::BaseFmtWrapper;
     ///
     /// assert_eq!(
     ///     BaseFmtWrapper::new(Natural::from(1000000000u32), 36).unwrap(),
@@ -113,8 +113,8 @@ impl Display for BaseFmtWrapper<&Natural> {
     ///
     /// # Examples
     /// ```
-    /// use malachite_nz::natural::conversion::string::to_string::BaseFmtWrapper;
     /// use malachite_nz::natural::Natural;
+    /// use malachite_nz::natural::conversion::string::to_string::BaseFmtWrapper;
     ///
     /// let n = Natural::from(1000000000u32);
     /// let x = BaseFmtWrapper::new(&n, 36);
@@ -170,8 +170,8 @@ impl Debug for BaseFmtWrapper<&Natural> {
     ///
     /// # Examples
     /// ```
-    /// use malachite_nz::natural::conversion::string::to_string::BaseFmtWrapper;
     /// use malachite_nz::natural::Natural;
+    /// use malachite_nz::natural::conversion::string::to_string::BaseFmtWrapper;
     ///
     /// let n = Natural::from(1000000000u32);
     /// let x = BaseFmtWrapper::new(&n, 36);

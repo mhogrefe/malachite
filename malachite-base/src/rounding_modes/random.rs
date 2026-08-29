@@ -26,8 +26,8 @@ pub type RandomRoundingModes = Copied<RandomValuesFromSlice<'static, RoundingMod
 /// ```
 /// use itertools::Itertools;
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_base::rounding_modes::random::random_rounding_modes;
 /// use malachite_base::rounding_modes::RoundingMode::*;
+/// use malachite_base::rounding_modes::random::random_rounding_modes;
 ///
 /// assert_eq!(
 ///     random_rounding_modes(EXAMPLE_SEED).take(10).collect_vec(),

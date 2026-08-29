@@ -148,8 +148,8 @@ pub const fn exhaustive_positive_naturals() -> ExhaustiveNaturalRangeToInfinity 
 /// ```
 /// use itertools::Itertools;
 /// use malachite_base::strings::ToDebugString;
-/// use malachite_nz::natural::exhaustive::exhaustive_natural_range;
 /// use malachite_nz::natural::Natural;
+/// use malachite_nz::natural::exhaustive::exhaustive_natural_range;
 ///
 /// assert_eq!(
 ///     exhaustive_natural_range(Natural::from(5u32), Natural::from(10u32))
@@ -190,8 +190,8 @@ pub fn exhaustive_natural_range(a: Natural, b: Natural) -> ExhaustiveNaturalRang
 /// ```
 /// use itertools::Itertools;
 /// use malachite_base::strings::ToDebugString;
-/// use malachite_nz::natural::exhaustive::exhaustive_natural_inclusive_range;
 /// use malachite_nz::natural::Natural;
+/// use malachite_nz::natural::exhaustive::exhaustive_natural_inclusive_range;
 ///
 /// assert_eq!(
 ///     exhaustive_natural_inclusive_range(Natural::from(5u32), Natural::from(10u32))
@@ -227,8 +227,8 @@ pub fn exhaustive_natural_inclusive_range(a: Natural, b: Natural) -> ExhaustiveN
 /// # Examples
 /// ```
 /// use malachite_base::iterators::prefix_to_string;
-/// use malachite_nz::natural::exhaustive::exhaustive_natural_range_to_infinity;
 /// use malachite_nz::natural::Natural;
+/// use malachite_nz::natural::exhaustive::exhaustive_natural_range_to_infinity;
 ///
 /// assert_eq!(
 ///     prefix_to_string(

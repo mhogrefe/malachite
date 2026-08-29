@@ -1354,10 +1354,12 @@ impl LogBasePowerOf2<i64> for Float {
     ///         .to_string(),
     ///     "1.6609640474436811739351597147449"
     /// );
-    /// assert!(Float::from_signed_prec(-10, 100)
-    ///     .0
-    ///     .log_base_power_of_2(2)
-    ///     .is_nan());
+    /// assert!(
+    ///     Float::from_signed_prec(-10, 100)
+    ///         .0
+    ///         .log_base_power_of_2(2)
+    ///         .is_nan()
+    /// );
     /// ```
     #[inline]
     fn log_base_power_of_2(self, pow: i64) -> Self {
@@ -1435,9 +1437,11 @@ impl LogBasePowerOf2<i64> for &Float {
     ///         .to_string(),
     ///     "1.6609640474436811739351597147449"
     /// );
-    /// assert!((&Float::from_signed_prec(-10, 100).0)
-    ///     .log_base_power_of_2(2)
-    ///     .is_nan());
+    /// assert!(
+    ///     (&Float::from_signed_prec(-10, 100).0)
+    ///         .log_base_power_of_2(2)
+    ///         .is_nan()
+    /// );
     /// ```
     #[inline]
     fn log_base_power_of_2(self, pow: i64) -> Float {

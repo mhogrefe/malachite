@@ -848,9 +848,11 @@ impl LogBasePowerOf2Of1PlusX<i64> for Float {
     ///     Float::INFINITY.log_base_power_of_2_1_plus_x(2),
     ///     Float::INFINITY
     /// );
-    /// assert!(Float::NEGATIVE_INFINITY
-    ///     .log_base_power_of_2_1_plus_x(2)
-    ///     .is_nan());
+    /// assert!(
+    ///     Float::NEGATIVE_INFINITY
+    ///         .log_base_power_of_2_1_plus_x(2)
+    ///         .is_nan()
+    /// );
     /// assert_eq!(
     ///     Float::from_unsigned_prec(10u32, 100)
     ///         .0
@@ -918,9 +920,11 @@ impl LogBasePowerOf2Of1PlusX<i64> for &Float {
     ///     (&Float::INFINITY).log_base_power_of_2_1_plus_x(2),
     ///     Float::INFINITY
     /// );
-    /// assert!((&Float::NEGATIVE_INFINITY)
-    ///     .log_base_power_of_2_1_plus_x(2)
-    ///     .is_nan());
+    /// assert!(
+    ///     (&Float::NEGATIVE_INFINITY)
+    ///         .log_base_power_of_2_1_plus_x(2)
+    ///         .is_nan()
+    /// );
     /// assert_eq!(
     ///     (&Float::from_unsigned_prec(10u32, 100).0)
     ///         .log_base_power_of_2_1_plus_x(2)
