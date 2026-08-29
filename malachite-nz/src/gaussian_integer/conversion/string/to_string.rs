@@ -6,7 +6,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::gaussian_integer::GaussianInteger;
+use crate::gaussian_integer::{
+    ComparableGaussianInteger, ComparableGaussianIntegerRef, GaussianInteger,
+};
 use core::fmt::{Display, Formatter, Result, Write};
 
 impl Display for GaussianInteger {
@@ -79,5 +81,59 @@ impl Display for GaussianInteger {
             Display::fmt(&self.imaginary, f)?;
             f.write_char('i')
         }
+    }
+}
+
+impl Display for ComparableGaussianInteger {
+    /// Converts a [`ComparableGaussianInteger`] to a [`String`], writing the wrapped
+    /// [`GaussianInteger`] exactly as its own [`Display`] implementation does.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum number of significant
+    /// bits of the real and imaginary parts.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::I;
+    /// use malachite_nz::gaussian_integer::{ComparableGaussianInteger, GaussianInteger};
+    ///
+    /// assert_eq!(
+    ///     ComparableGaussianInteger(GaussianInteger::I).to_string(),
+    ///     "i"
+    /// );
+    /// ```
+    #[inline]
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        Display::fmt(&self.0, f)
+    }
+}
+
+impl Display for ComparableGaussianIntegerRef<'_> {
+    /// Converts a [`ComparableGaussianIntegerRef`] to a [`String`], writing the wrapped
+    /// [`GaussianInteger`] exactly as its own [`Display`] implementation does.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum number of significant
+    /// bits of the real and imaginary parts.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::I;
+    /// use malachite_nz::gaussian_integer::{ComparableGaussianIntegerRef, GaussianInteger};
+    ///
+    /// let x = GaussianInteger::I;
+    /// assert_eq!(ComparableGaussianIntegerRef(&x).to_string(), "i");
+    /// ```
+    #[inline]
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        Display::fmt(self.0, f)
     }
 }

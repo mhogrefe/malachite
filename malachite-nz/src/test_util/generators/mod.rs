@@ -66,6 +66,23 @@ pub fn gaussian_integer_gen_var_2() -> Generator<GaussianInteger> {
     )
 }
 
+pub fn gaussian_integer_pair_gen() -> Generator<(GaussianInteger, GaussianInteger)> {
+    Generator::new(
+        &exhaustive_gaussian_integer_pair_gen,
+        &random_gaussian_integer_pair_gen,
+        &special_random_gaussian_integer_pair_gen,
+    )
+}
+
+pub fn gaussian_integer_triple_gen()
+-> Generator<(GaussianInteger, GaussianInteger, GaussianInteger)> {
+    Generator::new(
+        &exhaustive_gaussian_integer_triple_gen,
+        &random_gaussian_integer_triple_gen,
+        &special_random_gaussian_integer_triple_gen,
+    )
+}
+
 // -- Integer --
 
 pub fn integer_gen() -> Generator<Integer> {

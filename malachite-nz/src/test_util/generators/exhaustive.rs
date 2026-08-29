@@ -156,6 +156,17 @@ pub fn exhaustive_gaussian_integer_gen() -> It<GaussianInteger> {
     Box::new(exhaustive_gaussian_integers())
 }
 
+pub fn exhaustive_gaussian_integer_pair_gen() -> It<(GaussianInteger, GaussianInteger)> {
+    Box::new(exhaustive_pairs_from_single(exhaustive_gaussian_integers()))
+}
+
+pub fn exhaustive_gaussian_integer_triple_gen()
+-> It<(GaussianInteger, GaussianInteger, GaussianInteger)> {
+    Box::new(exhaustive_triples_from_single(
+        exhaustive_gaussian_integers(),
+    ))
+}
+
 // All purely real `GaussianInteger`s.
 pub fn exhaustive_gaussian_integer_gen_var_1() -> It<GaussianInteger> {
     Box::new(exhaustive_real_gaussian_integers())

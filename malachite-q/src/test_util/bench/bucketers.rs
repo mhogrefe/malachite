@@ -103,6 +103,21 @@ pub fn quadruple_1_rational_bit_bucketer<T, U, V>(
     }
 }
 
+pub fn pair_gaussian_rational_max_bit_bucketer<'a>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (GaussianRational, GaussianRational)> {
+    fn bits(x: &GaussianRational) -> u64 {
+        x.real
+            .significant_bits()
+            .max(x.imaginary.significant_bits())
+    }
+    Bucketer {
+        bucketing_function: &|(x, y)| usize::exact_from(max(bits(x), bits(y))),
+        bucketing_label: format!("max({x_name}.significant_bits(), {y_name}.significant_bits())"),
+    }
+}
+
 pub fn pair_rational_max_bit_bucketer<'a>(
     x_name: &str,
     y_name: &str,

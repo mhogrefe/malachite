@@ -29,7 +29,10 @@ where
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(GaussianInteger::imaginary_from(123u32).to_string(), "123i");
-    /// assert_eq!(GaussianInteger::imaginary_from(-123i64).to_string(), "-123i");
+    /// assert_eq!(
+    ///     GaussianInteger::imaginary_from(-123i64).to_string(),
+    ///     "-123i"
+    /// );
     /// assert_eq!(
     ///     GaussianInteger::imaginary_from(Natural::from(123u32)).to_string(),
     ///     "123i"

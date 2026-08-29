@@ -36,7 +36,10 @@ impl TryFrom<GaussianRational> for Rational {
     /// assert_eq!(Rational::try_from(x).unwrap().to_string(), "-22/7");
     ///
     /// let x = GaussianRational::from_str("2/3-5i/6").unwrap();
-    /// assert_eq!(Rational::try_from(x), Err(RationalFromGaussianRationalError));
+    /// assert_eq!(
+    ///     Rational::try_from(x),
+    ///     Err(RationalFromGaussianRationalError)
+    /// );
     /// ```
     fn try_from(x: GaussianRational) -> Result<Self, Self::Error> {
         if x.imaginary == 0u32 {
@@ -74,7 +77,10 @@ impl TryFrom<&GaussianRational> for Rational {
     /// assert_eq!(Rational::try_from(&x).unwrap().to_string(), "-22/7");
     ///
     /// let x = GaussianRational::from_str("2/3-5i/6").unwrap();
-    /// assert_eq!(Rational::try_from(&x), Err(RationalFromGaussianRationalError));
+    /// assert_eq!(
+    ///     Rational::try_from(&x),
+    ///     Err(RationalFromGaussianRationalError)
+    /// );
     /// ```
     fn try_from(x: &GaussianRational) -> Result<Self, Self::Error> {
         if x.imaginary == 0u32 {

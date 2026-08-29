@@ -25,11 +25,14 @@ where
     /// ```
     /// use malachite_base::num::conversion::traits::ImaginaryFrom;
     /// use malachite_nz::integer::Integer;
-    /// use malachite_q::Rational;
     /// use malachite_q::gaussian_rational::GaussianRational;
+    /// use malachite_q::Rational;
     ///
     /// assert_eq!(GaussianRational::imaginary_from(123u32).to_string(), "123i");
-    /// assert_eq!(GaussianRational::imaginary_from(-123i64).to_string(), "-123i");
+    /// assert_eq!(
+    ///     GaussianRational::imaginary_from(-123i64).to_string(),
+    ///     "-123i"
+    /// );
     /// assert_eq!(
     ///     GaussianRational::imaginary_from(Integer::from(-123)).to_string(),
     ///     "-123i"

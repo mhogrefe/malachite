@@ -152,6 +152,32 @@ pub fn special_random_gaussian_integer_gen(config: &GenConfig) -> It<GaussianInt
     ))
 }
 
+pub fn special_random_gaussian_integer_pair_gen(
+    config: &GenConfig,
+) -> It<(GaussianInteger, GaussianInteger)> {
+    Box::new(random_pairs_from_single(striped_random_gaussian_integers(
+        EXAMPLE_SEED,
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    )))
+}
+
+pub fn special_random_gaussian_integer_triple_gen(
+    config: &GenConfig,
+) -> It<(GaussianInteger, GaussianInteger, GaussianInteger)> {
+    Box::new(random_triples_from_single(
+        striped_random_gaussian_integers(
+            EXAMPLE_SEED,
+            config.get_or("mean_stripe_n", 32),
+            config.get_or("mean_stripe_d", 1),
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        ),
+    ))
+}
+
 // Purely real `GaussianInteger`s.
 pub fn special_random_gaussian_integer_gen_var_1(config: &GenConfig) -> It<GaussianInteger> {
     Box::new(striped_random_real_gaussian_integers(

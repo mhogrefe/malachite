@@ -140,7 +140,10 @@ pub fn random_gaussian_integers(
 /// use malachite_nz::gaussian_integer::random::*;
 ///
 /// assert_eq!(
-///     prefix_to_string(striped_random_real_gaussian_integers(EXAMPLE_SEED, 16, 1, 32, 1), 6),
+///     prefix_to_string(
+///         striped_random_real_gaussian_integers(EXAMPLE_SEED, 16, 1, 32, 1),
+///         6
+///     ),
 ///     "[65536, 75521006248971741167616, 32, -2199023255520, -68719468544, -527, ...]"
 /// )
 /// ```
@@ -182,7 +185,10 @@ pub fn striped_random_real_gaussian_integers(
 /// use malachite_nz::gaussian_integer::random::*;
 ///
 /// assert_eq!(
-///     prefix_to_string(striped_random_imaginary_gaussian_integers(EXAMPLE_SEED, 16, 1, 32, 1), 6),
+///     prefix_to_string(
+///         striped_random_imaginary_gaussian_integers(EXAMPLE_SEED, 16, 1, 32, 1),
+///         6
+///     ),
 ///     "[65536i, 75521006248971741167616i, 32i, -2199023255520i, -68719468544i, -527i, ...]"
 /// )
 /// ```
@@ -223,7 +229,10 @@ pub fn striped_random_imaginary_gaussian_integers(
 /// use malachite_nz::gaussian_integer::random::*;
 ///
 /// assert_eq!(
-///     prefix_to_string(striped_random_gaussian_integers(EXAMPLE_SEED, 16, 1, 32, 1), 6),
+///     prefix_to_string(
+///         striped_random_gaussian_integers(EXAMPLE_SEED, 16, 1, 32, 1),
+///         6
+///     ),
 ///     "[75521006248971741167616+65536i, -2199023255520+32i, -527-68719468544i, -112, \
 ///     4152+131071i, -262145+262143i, ...]"
 /// )

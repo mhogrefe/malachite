@@ -69,6 +69,9 @@ pub mod gaussian_integer {
     pub mod basic {
         pub mod constants;
     }
+    pub mod comparison {
+        pub mod cmp;
+    }
     pub mod conversion {
         pub mod from;
         pub mod from_primitive_float;

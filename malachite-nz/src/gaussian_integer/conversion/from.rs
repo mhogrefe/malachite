@@ -29,8 +29,14 @@ where
     ///
     /// assert_eq!(GaussianInteger::from(123u32).to_string(), "123");
     /// assert_eq!(GaussianInteger::from(-123i64).to_string(), "-123");
-    /// assert_eq!(GaussianInteger::from(Natural::from(123u32)).to_string(), "123");
-    /// assert_eq!(GaussianInteger::from(Integer::from(-123)).to_string(), "-123");
+    /// assert_eq!(
+    ///     GaussianInteger::from(Natural::from(123u32)).to_string(),
+    ///     "123"
+    /// );
+    /// assert_eq!(
+    ///     GaussianInteger::from(Integer::from(-123)).to_string(),
+    ///     "-123"
+    /// );
     /// ```
     fn from(x: T) -> Self {
         Self {

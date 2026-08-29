@@ -78,6 +78,23 @@ pub fn gaussian_rational_gen_var_2() -> Generator<GaussianRational> {
     )
 }
 
+pub fn gaussian_rational_pair_gen() -> Generator<(GaussianRational, GaussianRational)> {
+    Generator::new(
+        &exhaustive_gaussian_rational_pair_gen,
+        &random_gaussian_rational_pair_gen,
+        &special_random_gaussian_rational_pair_gen,
+    )
+}
+
+pub fn gaussian_rational_triple_gen()
+-> Generator<(GaussianRational, GaussianRational, GaussianRational)> {
+    Generator::new(
+        &exhaustive_gaussian_rational_triple_gen,
+        &random_gaussian_rational_triple_gen,
+        &special_random_gaussian_rational_triple_gen,
+    )
+}
+
 // -- Rational --
 
 pub fn rational_gen() -> Generator<Rational> {

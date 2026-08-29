@@ -28,6 +28,13 @@ documented by git history.
   striped-random generators, wired into the demo, benchmark, and property-test machinery.
   `GaussianInteger` also implements `IsInteger`, `IsGaussianInteger`, and `IsReal`, and
   `Natural` and `Integer` implement the two new traits (trivially).
+- `ComparableGaussianInteger` and `ComparableGaussianIntegerRef`, wrappers around
+  `GaussianInteger` (by value and by reference) that implement `Ord`, comparing
+  lexicographically: first by real part, then by imaginary part. Since no total order on the
+  complex numbers is compatible with arithmetic, `GaussianInteger` itself does not implement
+  `Ord`; the wrappers provide a canonical order for sorting and for use as `BTreeMap` and
+  `BTreeSet` keys, in the spirit of malachite-float's `ComparableFloat` and
+  `ComparableFloatRef`.
 - Conversions between `GaussianInteger` and the real types, completing the conversion matrix:
   `TryFrom` and `ConvertibleFrom` implementations for `Integer` (succeeding when the value is
   real), `Natural` (real and non-negative), all primitive integers (real and representable),
@@ -45,6 +52,10 @@ documented by git history.
   and the full exhaustive/random/striped generator set with demo, benchmark, and property-test
   plumbing. `GaussianRational` also implements `IsInteger`, `IsGaussianInteger`, and `IsReal`,
   and `Rational` implements the two new traits.
+- `ComparableGaussianRational` and `ComparableGaussianRationalRef`, wrappers around
+  `GaussianRational` that implement `Ord` lexicographically (real part first, then imaginary
+  part), mirroring malachite-nz's `ComparableGaussianInteger` wrappers: a canonical order for
+  sorting and for `BTreeMap`/`BTreeSet` keys.
 - Conversions between `GaussianRational` and the real types, completing the conversion matrix:
   `TryFrom` and `ConvertibleFrom` implementations for `Rational` (succeeding when the value is
   real), `GaussianInteger` (both parts integers), `Integer` (a real integer), `Natural` (a real

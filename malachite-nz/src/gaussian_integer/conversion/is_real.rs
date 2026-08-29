@@ -20,7 +20,7 @@ impl IsReal for &GaussianInteger {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::{I, One, Zero};
+    /// use malachite_base::num::basic::traits::{One, Zero, I};
     /// use malachite_base::num::conversion::traits::IsReal;
     /// use malachite_nz::gaussian_integer::GaussianInteger;
     ///

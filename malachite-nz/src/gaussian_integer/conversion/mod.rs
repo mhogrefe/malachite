@@ -20,7 +20,10 @@ pub mod from;
 /// use malachite_nz::gaussian_integer::conversion::from_primitive_float::*;
 /// use malachite_nz::gaussian_integer::GaussianInteger;
 ///
-/// assert_eq!(GaussianInteger::try_from(123.0f32).unwrap().to_string(), "123");
+/// assert_eq!(
+///     GaussianInteger::try_from(123.0f32).unwrap().to_string(),
+///     "123"
+/// );
 /// assert_eq!(
 ///     GaussianInteger::try_from(-123.0f64).unwrap().to_string(),
 ///     "-123"

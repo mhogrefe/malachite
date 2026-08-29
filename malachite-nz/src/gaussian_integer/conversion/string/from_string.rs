@@ -70,11 +70,17 @@ impl FromStr for GaussianInteger {
     /// assert_eq!(GaussianInteger::from_str("-2").unwrap().to_string(), "-2");
     /// assert_eq!(GaussianInteger::from_str("i").unwrap().to_string(), "i");
     /// assert_eq!(GaussianInteger::from_str("-i").unwrap().to_string(), "-i");
-    /// assert_eq!(GaussianInteger::from_str("2-3i").unwrap().to_string(), "2-3i");
+    /// assert_eq!(
+    ///     GaussianInteger::from_str("2-3i").unwrap().to_string(),
+    ///     "2-3i"
+    /// );
     /// assert_eq!(GaussianInteger::from_str("1i").unwrap().to_string(), "i");
     /// assert_eq!(GaussianInteger::from_str("0i").unwrap().to_string(), "0");
     /// assert_eq!(GaussianInteger::from_str("2+0i").unwrap().to_string(), "2");
-    /// assert_eq!(GaussianInteger::from_str("+2+1i").unwrap().to_string(), "2+i");
+    /// assert_eq!(
+    ///     GaussianInteger::from_str("+2+1i").unwrap().to_string(),
+    ///     "2+i"
+    /// );
     ///
     /// assert!(GaussianInteger::from_str("").is_err());
     /// assert!(GaussianInteger::from_str("i+1").is_err());

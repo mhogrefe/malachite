@@ -61,16 +61,31 @@ impl FromStr for GaussianRational {
     /// use malachite_q::gaussian_rational::GaussianRational;
     ///
     /// assert_eq!(GaussianRational::from_str("0").unwrap().to_string(), "0");
-    /// assert_eq!(GaussianRational::from_str("-2/3").unwrap().to_string(), "-2/3");
-    /// assert_eq!(GaussianRational::from_str("i/2").unwrap().to_string(), "i/2");
-    /// assert_eq!(GaussianRational::from_str("-5i/6").unwrap().to_string(), "-5i/6");
+    /// assert_eq!(
+    ///     GaussianRational::from_str("-2/3").unwrap().to_string(),
+    ///     "-2/3"
+    /// );
+    /// assert_eq!(
+    ///     GaussianRational::from_str("i/2").unwrap().to_string(),
+    ///     "i/2"
+    /// );
+    /// assert_eq!(
+    ///     GaussianRational::from_str("-5i/6").unwrap().to_string(),
+    ///     "-5i/6"
+    /// );
     /// assert_eq!(
     ///     GaussianRational::from_str("2/3-5i/6").unwrap().to_string(),
     ///     "2/3-5i/6"
     /// );
-    /// assert_eq!(GaussianRational::from_str("2i/4").unwrap().to_string(), "i/2");
+    /// assert_eq!(
+    ///     GaussianRational::from_str("2i/4").unwrap().to_string(),
+    ///     "i/2"
+    /// );
     /// assert_eq!(GaussianRational::from_str("1i").unwrap().to_string(), "i");
-    /// assert_eq!(GaussianRational::from_str("2/3+0i").unwrap().to_string(), "2/3");
+    /// assert_eq!(
+    ///     GaussianRational::from_str("2/3+0i").unwrap().to_string(),
+    ///     "2/3"
+    /// );
     ///
     /// assert!(GaussianRational::from_str("").is_err());
     /// assert!(GaussianRational::from_str("2/3i").is_err());

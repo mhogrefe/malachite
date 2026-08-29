@@ -20,7 +20,7 @@ impl IsInteger for &GaussianRational {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::{I, One, OneHalf, Zero};
+    /// use malachite_base::num::basic::traits::{One, OneHalf, Zero, I};
     /// use malachite_base::num::conversion::traits::IsInteger;
     /// use malachite_q::gaussian_rational::GaussianRational;
     ///

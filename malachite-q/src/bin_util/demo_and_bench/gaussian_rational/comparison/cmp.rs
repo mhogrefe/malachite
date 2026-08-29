@@ -1,0 +1,51 @@
+// Copyright © 2026 Mikhail Hogrefe
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
+use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
+use malachite_base::test_util::generators::common::{GenConfig, GenMode};
+use malachite_base::test_util::runner::Runner;
+use malachite_q::gaussian_rational::ComparableGaussianRationalRef;
+use malachite_q::test_util::bench::bucketers::pair_gaussian_rational_max_bit_bucketer;
+use malachite_q::test_util::generators::gaussian_rational_pair_gen;
+use std::cmp::Ordering::*;
+
+pub(crate) fn register(runner: &mut Runner) {
+    register_demo!(runner, demo_comparable_gaussian_rational_cmp);
+    register_bench!(runner, benchmark_comparable_gaussian_rational_cmp);
+}
+
+fn demo_comparable_gaussian_rational_cmp(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, y) in gaussian_rational_pair_gen().get(gm, config).take(limit) {
+        match ComparableGaussianRationalRef(&x).cmp(&ComparableGaussianRationalRef(&y)) {
+            Less => println!("{x} < {y}"),
+            Equal => println!("{x} = {y}"),
+            Greater => println!("{x} > {y}"),
+        }
+    }
+}
+
+#[allow(unused_must_use)]
+fn benchmark_comparable_gaussian_rational_cmp(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "ComparableGaussianRationalRef.cmp(&ComparableGaussianRationalRef)",
+        BenchmarkType::Single,
+        gaussian_rational_pair_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_gaussian_rational_max_bit_bucketer("x", "y"),
+        &mut [("Malachite", &mut |(x, y)| {
+            no_out!(ComparableGaussianRationalRef(&x).cmp(&ComparableGaussianRationalRef(&y)));
+        })],
+    );
+}

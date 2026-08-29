@@ -7,7 +7,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Rational;
-use crate::gaussian_rational::GaussianRational;
+use crate::gaussian_rational::{
+    ComparableGaussianRational, ComparableGaussianRationalRef, GaussianRational,
+};
 use core::fmt::{Display, Formatter, Result, Write};
 
 // Writes the imaginary term of a nonzero imaginary part, without its sign: the absolute value of
@@ -48,8 +50,8 @@ impl Display for GaussianRational {
     /// # Examples
     /// ```
     /// use malachite_base::num::conversion::traits::ImaginaryFrom;
-    /// use malachite_q::Rational;
     /// use malachite_q::gaussian_rational::GaussianRational;
+    /// use malachite_q::Rational;
     ///
     /// assert_eq!(GaussianRational::default().to_string(), "0");
     /// assert_eq!(
@@ -92,5 +94,59 @@ impl Display for GaussianRational {
             f.write_char('-')?;
         }
         fmt_unsigned_imaginary_term(&self.imaginary, f)
+    }
+}
+
+impl Display for ComparableGaussianRational {
+    /// Converts a [`ComparableGaussianRational`] to a [`String`], writing the wrapped
+    /// [`GaussianRational`] exactly as its own [`Display`] implementation does.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum number of significant
+    /// bits of the real and imaginary parts.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::I;
+    /// use malachite_q::gaussian_rational::{ComparableGaussianRational, GaussianRational};
+    ///
+    /// assert_eq!(
+    ///     ComparableGaussianRational(GaussianRational::I).to_string(),
+    ///     "i"
+    /// );
+    /// ```
+    #[inline]
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        Display::fmt(&self.0, f)
+    }
+}
+
+impl Display for ComparableGaussianRationalRef<'_> {
+    /// Converts a [`ComparableGaussianRationalRef`] to a [`String`], writing the wrapped
+    /// [`GaussianRational`] exactly as its own [`Display`] implementation does.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum number of significant
+    /// bits of the real and imaginary parts.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::I;
+    /// use malachite_q::gaussian_rational::{ComparableGaussianRationalRef, GaussianRational};
+    ///
+    /// let x = GaussianRational::I;
+    /// assert_eq!(ComparableGaussianRationalRef(&x).to_string(), "i");
+    /// ```
+    #[inline]
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        Display::fmt(self.0, f)
     }
 }

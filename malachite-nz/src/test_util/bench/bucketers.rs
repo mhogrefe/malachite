@@ -401,6 +401,21 @@ pub fn pair_2_integer_bit_bucketer<T>(var_name: &str) -> Bucketer<'_, (T, Intege
     }
 }
 
+pub fn pair_gaussian_integer_max_bit_bucketer<'a>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (GaussianInteger, GaussianInteger)> {
+    fn bits(x: &GaussianInteger) -> u64 {
+        x.real
+            .significant_bits()
+            .max(x.imaginary.significant_bits())
+    }
+    Bucketer {
+        bucketing_function: &|(x, y)| usize::exact_from(max(bits(x), bits(y))),
+        bucketing_label: format!("max({x_name}.significant_bits(), {y_name}.significant_bits())"),
+    }
+}
+
 pub fn pair_integer_max_bit_bucketer<'a>(
     x_name: &'a str,
     y_name: &'a str,

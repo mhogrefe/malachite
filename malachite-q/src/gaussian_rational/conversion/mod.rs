@@ -20,8 +20,14 @@ pub mod from;
 /// use malachite_q::gaussian_rational::conversion::from_primitive_float::*;
 /// use malachite_q::gaussian_rational::GaussianRational;
 ///
-/// assert_eq!(GaussianRational::try_from(123.0f32).unwrap().to_string(), "123");
-/// assert_eq!(GaussianRational::try_from(0.5f64).unwrap().to_string(), "1/2");
+/// assert_eq!(
+///     GaussianRational::try_from(123.0f32).unwrap().to_string(),
+///     "123"
+/// );
+/// assert_eq!(
+///     GaussianRational::try_from(0.5f64).unwrap().to_string(),
+///     "1/2"
+/// );
 /// assert_eq!(
 ///     GaussianRational::try_from(-0.1f32).unwrap().to_string(),
 ///     "-13421773/134217728"
@@ -159,19 +165,34 @@ pub mod primitive_float_from_gaussian_rational;
 /// assert_eq!(i32::try_from(&x).unwrap(), 123);
 ///
 /// let x = GaussianRational::from_str("-123").unwrap();
-/// assert_eq!(u32::try_from(&x), Err(PrimitiveIntFromGaussianRationalError));
+/// assert_eq!(
+///     u32::try_from(&x),
+///     Err(PrimitiveIntFromGaussianRationalError)
+/// );
 /// assert_eq!(i32::try_from(&x).unwrap(), -123);
 ///
 /// let x = GaussianRational::from_str("22/7").unwrap();
-/// assert_eq!(u32::try_from(&x), Err(PrimitiveIntFromGaussianRationalError));
+/// assert_eq!(
+///     u32::try_from(&x),
+///     Err(PrimitiveIntFromGaussianRationalError)
+/// );
 ///
 /// let x = GaussianRational::from_str("1000000000000").unwrap();
-/// assert_eq!(u32::try_from(&x), Err(PrimitiveIntFromGaussianRationalError));
+/// assert_eq!(
+///     u32::try_from(&x),
+///     Err(PrimitiveIntFromGaussianRationalError)
+/// );
 /// assert_eq!(u64::try_from(&x).unwrap(), 1000000000000);
 ///
 /// let x = GaussianRational::from_str("2-3i").unwrap();
-/// assert_eq!(u32::try_from(&x), Err(PrimitiveIntFromGaussianRationalError));
-/// assert_eq!(i32::try_from(&x), Err(PrimitiveIntFromGaussianRationalError));
+/// assert_eq!(
+///     u32::try_from(&x),
+///     Err(PrimitiveIntFromGaussianRationalError)
+/// );
+/// assert_eq!(
+///     i32::try_from(&x),
+///     Err(PrimitiveIntFromGaussianRationalError)
+/// );
 /// ```
 ///
 /// # convertible_from

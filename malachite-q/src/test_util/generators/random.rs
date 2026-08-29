@@ -73,6 +73,26 @@ pub fn random_gaussian_rational_gen(config: &GenConfig) -> It<GaussianRational> 
     ))
 }
 
+pub fn random_gaussian_rational_pair_gen(
+    config: &GenConfig,
+) -> It<(GaussianRational, GaussianRational)> {
+    Box::new(random_pairs_from_single(random_gaussian_rationals(
+        EXAMPLE_SEED,
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    )))
+}
+
+pub fn random_gaussian_rational_triple_gen(
+    config: &GenConfig,
+) -> It<(GaussianRational, GaussianRational, GaussianRational)> {
+    Box::new(random_triples_from_single(random_gaussian_rationals(
+        EXAMPLE_SEED,
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    )))
+}
+
 // Purely real `GaussianRational`s.
 pub fn random_gaussian_rational_gen_var_1(config: &GenConfig) -> It<GaussianRational> {
     Box::new(random_real_gaussian_rationals(
