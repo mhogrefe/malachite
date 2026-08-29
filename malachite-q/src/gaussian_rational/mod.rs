@@ -8,6 +8,7 @@
 
 use crate::Rational;
 use core::ops::Deref;
+use malachite_base::named::Named;
 use malachite_base::num::basic::traits::{I, NegativeI, NegativeOne, One, OneHalf, Two, Zero};
 
 /// Comparison of [`ComparableGaussianRational`]s and [`ComparableGaussianRationalRef`]s.
@@ -86,6 +87,9 @@ impl NegativeI for GaussianRational {
         imaginary: Rational::NEGATIVE_ONE,
     };
 }
+
+// Implements `Named` for `GaussianRational`.
+impl_named!(GaussianRational);
 
 /// `ComparableGaussianRational` is a wrapper around a [`GaussianRational`], taking the
 /// [`GaussianRational`] by value.

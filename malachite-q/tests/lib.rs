@@ -68,6 +68,9 @@ extern crate rug;
 pub mod gaussian_rational {
     pub mod basic {
         pub mod constants;
+        pub mod default;
+        pub mod named;
+        pub mod size;
     }
     pub mod comparison {
         pub mod cmp;

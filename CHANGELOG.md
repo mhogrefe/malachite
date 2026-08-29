@@ -26,8 +26,8 @@ documented by git history.
   coefficients like `"1i"` and `"0i"`); blanket `From` and `ImaginaryFrom` conversions from
   every type that converts to `Integer`; serde support; and exhaustive, random, and
   striped-random generators, wired into the demo, benchmark, and property-test machinery.
-  `GaussianInteger` also implements `IsInteger`, `IsGaussianInteger`, and `IsReal`, and
-  `Natural` and `Integer` implement the two new traits (trivially).
+  `GaussianInteger` also implements `IsInteger`, `IsGaussianInteger`, and `IsReal` (and
+  `Named`), and `Natural` and `Integer` implement the two new traits (trivially).
 - `ComparableGaussianInteger` and `ComparableGaussianIntegerRef`, wrappers around
   `GaussianInteger` (by value and by reference) that implement `Ord`, comparing
   lexicographically: first by real part, then by imaginary part. Since no total order on the
@@ -50,8 +50,8 @@ documented by git history.
   conversions from every type that converts to `Rational` and componentwise conversions from
   `GaussianInteger`, a blanket `ImaginaryFrom`, serde support,
   and the full exhaustive/random/striped generator set with demo, benchmark, and property-test
-  plumbing. `GaussianRational` also implements `IsInteger`, `IsGaussianInteger`, and `IsReal`,
-  and `Rational` implements the two new traits.
+  plumbing. `GaussianRational` also implements `IsInteger`, `IsGaussianInteger`, and `IsReal`
+  (and `Named`), and `Rational` implements the two new traits.
 - `ComparableGaussianRational` and `ComparableGaussianRationalRef`, wrappers around
   `GaussianRational` that implement `Ord` lexicographically (real part first, then imaginary
   part), mirroring malachite-nz's `ComparableGaussianInteger` wrappers: a canonical order for

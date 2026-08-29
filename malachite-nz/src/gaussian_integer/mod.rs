@@ -19,6 +19,7 @@ pub mod exhaustive;
 /// Iterators that generate [`GaussianInteger`]s randomly.
 pub mod random;
 
+use malachite_base::named::Named;
 use malachite_base::num::basic::traits::{I, NegativeI, NegativeOne, One, Two, Zero};
 
 /// A Gaussian integer: a complex number whose real and imaginary parts are both integers.
@@ -79,6 +80,9 @@ impl NegativeI for GaussianInteger {
         imaginary: Integer::NEGATIVE_ONE,
     };
 }
+
+// Implements `Named` for `GaussianInteger`.
+impl_named!(GaussianInteger);
 
 /// `ComparableGaussianInteger` is a wrapper around a [`GaussianInteger`], taking the
 /// [`GaussianInteger`] by value.
