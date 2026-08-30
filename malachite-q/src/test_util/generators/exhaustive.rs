@@ -837,6 +837,12 @@ pub fn exhaustive_string_triple_gen_var_3() -> It<(String, String, String)> {
     }))
 }
 
+// -- Vec<GaussianRational> --
+
+pub fn exhaustive_gaussian_rational_vec_gen() -> It<Vec<GaussianRational>> {
+    Box::new(exhaustive_vecs(exhaustive_gaussian_rationals()))
+}
+
 // -- Vec<Rational> --
 
 pub fn exhaustive_rational_vec_gen() -> It<Vec<Rational>> {

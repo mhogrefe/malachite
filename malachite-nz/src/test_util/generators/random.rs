@@ -4251,6 +4251,23 @@ pub fn random_string_triple_gen_var_2(config: &GenConfig) -> It<(String, String,
     )
 }
 
+// -- Vec<GaussianInteger> --
+
+pub fn random_gaussian_integer_vec_gen(config: &GenConfig) -> It<Vec<GaussianInteger>> {
+    Box::new(random_vecs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_gaussian_integers(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        config.get_or("mean_len_n", 4),
+        config.get_or("mean_len_d", 1),
+    ))
+}
+
 // -- Vec<Integer> --
 
 pub fn random_integer_vec_gen(config: &GenConfig) -> It<Vec<Integer>> {

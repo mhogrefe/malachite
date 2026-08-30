@@ -30,8 +30,20 @@ impl Conjugate for GaussianInteger {
     /// use std::str::FromStr;
     ///
     /// assert_eq!(GaussianInteger::I.conjugate().to_string(), "-i");
-    /// assert_eq!(GaussianInteger::from_str("2-3i").unwrap().conjugate().to_string(), "2+3i");
-    /// assert_eq!(GaussianInteger::from_str("-123").unwrap().conjugate().to_string(), "-123");
+    /// assert_eq!(
+    ///     GaussianInteger::from_str("2-3i")
+    ///         .unwrap()
+    ///         .conjugate()
+    ///         .to_string(),
+    ///     "2+3i"
+    /// );
+    /// assert_eq!(
+    ///     GaussianInteger::from_str("-123")
+    ///         .unwrap()
+    ///         .conjugate()
+    ///         .to_string(),
+    ///     "-123"
+    /// );
     /// ```
     fn conjugate(mut self) -> Self {
         self.conjugate_assign();

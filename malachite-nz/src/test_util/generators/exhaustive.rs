@@ -2358,6 +2358,12 @@ pub fn exhaustive_string_triple_gen_var_2() -> It<(String, String, String)> {
 
 // var 3 is in malachite-q.
 
+// -- Vec<GaussianInteger> --
+
+pub fn exhaustive_gaussian_integer_vec_gen() -> It<Vec<GaussianInteger>> {
+    Box::new(exhaustive_vecs(exhaustive_gaussian_integers()))
+}
+
 // -- Vec<Integer> --
 
 pub fn exhaustive_integer_vec_gen() -> It<Vec<Integer>> {

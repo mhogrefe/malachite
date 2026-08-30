@@ -31,7 +31,10 @@ impl Neg for GaussianInteger {
     ///
     /// assert_eq!((-GaussianInteger::ZERO).to_string(), "0");
     /// assert_eq!((-GaussianInteger::I).to_string(), "-i");
-    /// assert_eq!((-GaussianInteger::from_str("2-3i").unwrap()).to_string(), "-2+3i");
+    /// assert_eq!(
+    ///     (-GaussianInteger::from_str("2-3i").unwrap()).to_string(),
+    ///     "-2+3i"
+    /// );
     /// ```
     fn neg(mut self) -> Self {
         self.neg_assign();

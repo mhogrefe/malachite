@@ -27,7 +27,10 @@ impl Conjugate for Rational {
     /// use malachite_base::num::arithmetic::traits::Conjugate;
     /// use malachite_q::Rational;
     ///
-    /// assert_eq!(Rational::from_signeds(-22, 7).conjugate(), Rational::from_signeds(-22, 7));
+    /// assert_eq!(
+    ///     Rational::from_signeds(-22, 7).conjugate(),
+    ///     Rational::from_signeds(-22, 7)
+    /// );
     /// ```
     #[inline]
     fn conjugate(self) -> Self {
@@ -57,7 +60,10 @@ impl Conjugate for &Rational {
     /// use malachite_base::num::arithmetic::traits::Conjugate;
     /// use malachite_q::Rational;
     ///
-    /// assert_eq!((&Rational::from_signeds(-22, 7)).conjugate(), Rational::from_signeds(-22, 7));
+    /// assert_eq!(
+    ///     (&Rational::from_signeds(-22, 7)).conjugate(),
+    ///     Rational::from_signeds(-22, 7)
+    /// );
     /// ```
     #[inline]
     fn conjugate(self) -> Rational {

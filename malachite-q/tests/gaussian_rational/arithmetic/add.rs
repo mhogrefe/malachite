@@ -8,11 +8,16 @@
 
 use malachite_base::num::arithmetic::traits::Conjugate;
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::vecs::vec_from_str;
 use malachite_nz::test_util::generators::gaussian_integer_pair_gen;
+use malachite_q::Rational;
 use malachite_q::gaussian_rational::GaussianRational;
+use malachite_q::test_util::gaussian_rational::arithmetic::add::gaussian_rational_sum_naive;
 use malachite_q::test_util::generators::{
     gaussian_rational_gen, gaussian_rational_pair_gen, gaussian_rational_triple_gen,
+    gaussian_rational_vec_gen, rational_vec_gen,
 };
+use std::iter::{Sum, once};
 use std::str::FromStr;
 
 #[test]
@@ -96,6 +101,77 @@ fn add_properties() {
         assert_eq!(
             GaussianRational::from(&x) + GaussianRational::from(&y),
             GaussianRational::from(&x + &y)
+        );
+    });
+}
+
+#[test]
+fn test_sum() {
+    let test = |xs, out: &str| {
+        let xs = vec_from_str::<GaussianRational>(xs).unwrap();
+        let sum = GaussianRational::sum(xs.iter().cloned());
+        assert!(sum.real.is_valid());
+        assert!(sum.imaginary.is_valid());
+        assert_eq!(sum.to_string(), out);
+
+        let sum_alt = GaussianRational::sum(xs.iter());
+        assert!(sum_alt.real.is_valid());
+        assert!(sum_alt.imaginary.is_valid());
+        assert_eq!(sum_alt, sum);
+
+        let sum_alt = gaussian_rational_sum_naive(xs.into_iter());
+        assert!(sum_alt.real.is_valid());
+        assert!(sum_alt.imaginary.is_valid());
+        assert_eq!(sum_alt, sum);
+    };
+    test("[]", "0");
+    test("[10]", "10");
+    test("[i/2]", "i/2");
+    test("[1/2+i/2, 1/3-i/3]", "5/6+i/6");
+    test("[2, -3i, 5/3+i, 7/2-i/2]", "43/6-5i/2");
+    test("[2/3-5i/6, i, 1/3-i/6]", "1");
+    test("[22/7+i/3, -22/7+1000000000000i, i/3]", "3000000000002i/3");
+}
+
+#[test]
+fn sum_properties() {
+    gaussian_rational_vec_gen().test_properties(|xs| {
+        let sum = GaussianRational::sum(xs.iter().cloned());
+        assert!(sum.real.is_valid());
+        assert!(sum.imaginary.is_valid());
+
+        let sum_alt = GaussianRational::sum(xs.iter());
+        assert!(sum_alt.real.is_valid());
+        assert!(sum_alt.imaginary.is_valid());
+        assert_eq!(sum_alt, sum);
+
+        assert_eq!(sum.real, Rational::sum(xs.iter().map(|x| &x.real)));
+        assert_eq!(
+            sum.imaginary,
+            Rational::sum(xs.iter().map(|x| &x.imaginary))
+        );
+
+        let sum_alt = gaussian_rational_sum_naive(xs.into_iter());
+        assert!(sum_alt.real.is_valid());
+        assert!(sum_alt.imaginary.is_valid());
+        assert_eq!(sum_alt, sum);
+    });
+
+    gaussian_rational_gen().test_properties(|x| {
+        assert_eq!(GaussianRational::sum(once(&x)), x);
+        assert_eq!(GaussianRational::sum(once(x.clone())), x);
+    });
+
+    gaussian_rational_pair_gen().test_properties(|(x, y)| {
+        let sum = &x + &y;
+        assert_eq!(GaussianRational::sum([&x, &y].into_iter()), sum);
+        assert_eq!(GaussianRational::sum([x, y].into_iter()), sum);
+    });
+
+    rational_vec_gen().test_properties(|xs| {
+        assert_eq!(
+            GaussianRational::sum(xs.iter().cloned().map(GaussianRational::from)),
+            GaussianRational::from(Rational::sum(xs.into_iter()))
         );
     });
 }

@@ -2063,6 +2063,25 @@ pub fn special_random_string_triple_gen_var_3(config: &GenConfig) -> It<(String,
     )
 }
 
+// -- Vec<GaussianRational> --
+
+pub fn special_random_gaussian_rational_vec_gen(config: &GenConfig) -> It<Vec<GaussianRational>> {
+    Box::new(random_vecs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_gaussian_rationals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        config.get_or("mean_len_n", 4),
+        config.get_or("mean_len_d", 1),
+    ))
+}
+
 // -- Vec<Rational> --
 
 pub fn special_random_rational_vec_gen(config: &GenConfig) -> It<Vec<Rational>> {

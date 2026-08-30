@@ -1102,6 +1102,16 @@ pub fn string_triple_gen_var_3() -> Generator<(String, String, String)> {
     )
 }
 
+// -- Vec<GaussianRational> --
+
+pub fn gaussian_rational_vec_gen() -> Generator<Vec<GaussianRational>> {
+    Generator::new(
+        &exhaustive_gaussian_rational_vec_gen,
+        &random_gaussian_rational_vec_gen,
+        &special_random_gaussian_rational_vec_gen,
+    )
+}
+
 // -- Vec<Rational> --
 
 pub fn rational_vec_gen() -> Generator<Vec<Rational>> {

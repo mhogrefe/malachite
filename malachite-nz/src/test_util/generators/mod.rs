@@ -2665,6 +2665,16 @@ pub fn string_triple_gen_var_2() -> Generator<(String, String, String)> {
 
 // var 3 is in malachite-q.
 
+// -- Vec<GaussianInteger> --
+
+pub fn gaussian_integer_vec_gen() -> Generator<Vec<GaussianInteger>> {
+    Generator::new(
+        &exhaustive_gaussian_integer_vec_gen,
+        &random_gaussian_integer_vec_gen,
+        &special_random_gaussian_integer_vec_gen,
+    )
+}
+
 // -- Vec<Integer> --
 
 pub fn integer_vec_gen() -> Generator<Vec<Integer>> {

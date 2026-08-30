@@ -8,10 +8,15 @@
 
 use malachite_base::num::arithmetic::traits::Conjugate;
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::vecs::vec_from_str;
 use malachite_nz::gaussian_integer::GaussianInteger;
+use malachite_nz::integer::Integer;
+use malachite_nz::test_util::gaussian_integer::arithmetic::add::gaussian_integer_sum_alt;
 use malachite_nz::test_util::generators::{
     gaussian_integer_gen, gaussian_integer_pair_gen, gaussian_integer_triple_gen,
+    gaussian_integer_vec_gen, integer_vec_gen,
 };
+use std::iter::{Sum, once};
 use std::str::FromStr;
 
 #[test]
@@ -91,5 +96,73 @@ fn add_properties() {
 
     gaussian_integer_triple_gen().test_properties(|(x, y, z)| {
         assert_eq!((&x + &y) + &z, &x + (&y + &z));
+    });
+}
+
+#[test]
+fn test_sum() {
+    let test = |xs, out: &str| {
+        let xs = vec_from_str::<GaussianInteger>(xs).unwrap();
+        let sum = GaussianInteger::sum(xs.iter().cloned());
+        assert!(sum.real.is_valid());
+        assert!(sum.imaginary.is_valid());
+        assert_eq!(sum.to_string(), out);
+
+        let sum_alt = GaussianInteger::sum(xs.iter());
+        assert!(sum_alt.real.is_valid());
+        assert!(sum_alt.imaginary.is_valid());
+        assert_eq!(sum_alt, sum);
+
+        let sum_alt = gaussian_integer_sum_alt(xs.into_iter());
+        assert!(sum_alt.real.is_valid());
+        assert!(sum_alt.imaginary.is_valid());
+        assert_eq!(sum_alt, sum);
+    };
+    test("[]", "0");
+    test("[10]", "10");
+    test("[i]", "i");
+    test("[2-3i, -1+4i]", "1+i");
+    test("[2, -3i, 5+i, 7-2i]", "14-4i");
+    test("[1000000000000+i, -i, 234i]", "1000000000000+234i");
+    test("[123+456i, -23-56i, 100+400i]", "200+800i");
+}
+
+#[test]
+fn sum_properties() {
+    gaussian_integer_vec_gen().test_properties(|xs| {
+        let sum = GaussianInteger::sum(xs.iter().cloned());
+        assert!(sum.real.is_valid());
+        assert!(sum.imaginary.is_valid());
+
+        let sum_alt = GaussianInteger::sum(xs.iter());
+        assert!(sum_alt.real.is_valid());
+        assert!(sum_alt.imaginary.is_valid());
+        assert_eq!(sum_alt, sum);
+
+        assert_eq!(sum.real, Integer::sum(xs.iter().map(|x| &x.real)));
+        assert_eq!(sum.imaginary, Integer::sum(xs.iter().map(|x| &x.imaginary)));
+
+        let sum_alt = gaussian_integer_sum_alt(xs.into_iter());
+        assert!(sum_alt.real.is_valid());
+        assert!(sum_alt.imaginary.is_valid());
+        assert_eq!(sum_alt, sum);
+    });
+
+    gaussian_integer_gen().test_properties(|x| {
+        assert_eq!(GaussianInteger::sum(once(&x)), x);
+        assert_eq!(GaussianInteger::sum(once(x.clone())), x);
+    });
+
+    gaussian_integer_pair_gen().test_properties(|(x, y)| {
+        let sum = &x + &y;
+        assert_eq!(GaussianInteger::sum([&x, &y].into_iter()), sum);
+        assert_eq!(GaussianInteger::sum([x, y].into_iter()), sum);
+    });
+
+    integer_vec_gen().test_properties(|xs| {
+        assert_eq!(
+            GaussianInteger::sum(xs.iter().cloned().map(GaussianInteger::from)),
+            GaussianInteger::from(Integer::sum(xs.into_iter()))
+        );
     });
 }

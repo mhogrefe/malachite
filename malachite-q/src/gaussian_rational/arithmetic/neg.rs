@@ -31,7 +31,10 @@ impl Neg for GaussianRational {
     ///
     /// assert_eq!((-GaussianRational::ZERO).to_string(), "0");
     /// assert_eq!((-GaussianRational::I).to_string(), "-i");
-    /// assert_eq!((-GaussianRational::from_str("2-3i").unwrap()).to_string(), "-2+3i");
+    /// assert_eq!(
+    ///     (-GaussianRational::from_str("2-3i").unwrap()).to_string(),
+    ///     "-2+3i"
+    /// );
     /// ```
     fn neg(mut self) -> Self {
         self.neg_assign();

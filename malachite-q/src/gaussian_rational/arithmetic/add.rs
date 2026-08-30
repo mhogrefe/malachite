@@ -7,7 +7,10 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::gaussian_rational::GaussianRational;
+use core::iter::Sum;
 use core::ops::{Add, AddAssign};
+use malachite_base::iterators::balanced_fold;
+use malachite_base::num::basic::traits::Zero;
 
 impl Add<Self> for GaussianRational {
     type Output = Self;
@@ -210,5 +213,85 @@ impl AddAssign<&Self> for GaussianRational {
     fn add_assign(&mut self, other: &Self) {
         self.real += &other.real;
         self.imaginary += &other.imaginary;
+    }
+}
+
+impl Sum for GaussianRational {
+    /// Adds up all the [`GaussianRational`]s in an iterator.
+    ///
+    /// $$
+    /// f((x_i)_ {i=0}^{n-1}) = \sum_ {i=0}^{n-1} x_i.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^3 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of significant bits
+    /// of the real and imaginary parts of the [`GaussianRational`]s.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::iter::Sum;
+    /// use malachite_base::vecs::vec_from_str;
+    /// use malachite_q::gaussian_rational::GaussianRational;
+    ///
+    /// assert_eq!(
+    ///     GaussianRational::sum(
+    ///         vec_from_str::<GaussianRational>("[2, -3i, 5/3+i, 7/2-i/2]")
+    ///             .unwrap()
+    ///             .into_iter()
+    ///     )
+    ///     .to_string(),
+    ///     "43/6-5i/2"
+    /// );
+    /// ```
+    #[inline]
+    fn sum<I>(xs: I) -> Self
+    where
+        I: Iterator<Item = Self>,
+    {
+        balanced_fold(xs, |_| false, |a, b| *a += b).unwrap_or(Self::ZERO)
+    }
+}
+
+impl<'a> Sum<&'a Self> for GaussianRational {
+    /// Adds up all the [`GaussianRational`]s in an iterator of [`GaussianRational`] references.
+    ///
+    /// $$
+    /// f((x_i)_ {i=0}^{n-1}) = \sum_ {i=0}^{n-1} x_i.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^3 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of significant bits
+    /// of the real and imaginary parts of the [`GaussianRational`]s.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::iter::Sum;
+    /// use malachite_base::vecs::vec_from_str;
+    /// use malachite_q::gaussian_rational::GaussianRational;
+    ///
+    /// assert_eq!(
+    ///     GaussianRational::sum(
+    ///         vec_from_str::<GaussianRational>("[2, -3i, 5/3+i, 7/2-i/2]")
+    ///             .unwrap()
+    ///             .iter()
+    ///     )
+    ///     .to_string(),
+    ///     "43/6-5i/2"
+    /// );
+    /// ```
+    #[inline]
+    fn sum<I>(xs: I) -> Self
+    where
+        I: Iterator<Item = &'a Self>,
+    {
+        balanced_fold(xs.cloned(), |_| false, |a, b| *a += b).unwrap_or(Self::ZERO)
     }
 }

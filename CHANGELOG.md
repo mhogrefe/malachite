@@ -58,7 +58,11 @@ documented by git history.
   multiplications and short-circuits purely real and purely imaginary values, and
   `GaussianRational` squaring uses the same $a^2 - b^2$, $2ab$ scheme, profiting from the fact
   that squaring a reduced fraction requires no GCD computations. Multiplying a Gaussian value
-  by itself through aliased references routes to the squaring algorithm automatically.
+  by itself through aliased references routes to the squaring algorithm automatically. Both
+  types also implement iterator `Sum` (by value and by reference), mirroring their component
+  types' strategies: `GaussianInteger` accumulates with `+=` like `Integer`, and
+  `GaussianRational` sums in a balanced binary-tree order like `Rational`, which tends to keep
+  intermediate denominators small.
 - `OrdAbs` and `PartialOrdAbs` implementations for `GaussianInteger` (and, in malachite-q, for
   `GaussianRational`), comparing absolute values — distances from the origin. Componentwise and
   crosswise part comparisons decide most cases; the squared absolute values are only computed

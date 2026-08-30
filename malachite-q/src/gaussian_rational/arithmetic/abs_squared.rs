@@ -38,9 +38,13 @@ impl AbsSquared for GaussianRational {
     ///
     /// assert_eq!(GaussianRational::ZERO.abs_squared(), 0);
     /// assert_eq!(GaussianRational::I.abs_squared(), 1);
-    /// assert_eq!(GaussianRational::from_str("2-3i").unwrap().abs_squared(), 13);
     /// assert_eq!(
-    ///     GaussianRational::from_str("2/3-5i/6").unwrap()
+    ///     GaussianRational::from_str("2-3i").unwrap().abs_squared(),
+    ///     13
+    /// );
+    /// assert_eq!(
+    ///     GaussianRational::from_str("2/3-5i/6")
+    ///         .unwrap()
     ///         .abs_squared()
     ///         .to_string(),
     ///     "41/36"

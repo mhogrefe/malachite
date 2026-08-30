@@ -52,7 +52,10 @@ impl Mul<Self> for GaussianRational {
     /// use malachite_q::gaussian_rational::GaussianRational;
     /// use std::str::FromStr;
     ///
-    /// assert_eq!(GaussianRational::I * GaussianRational::I, GaussianRational::NEGATIVE_ONE);
+    /// assert_eq!(
+    ///     GaussianRational::I * GaussianRational::I,
+    ///     GaussianRational::NEGATIVE_ONE
+    /// );
     /// let x = GaussianRational::from_str("1/2+i/2").unwrap();
     /// let y = GaussianRational::from_str("1/3-i/3").unwrap();
     /// assert_eq!((x * y).to_string(), "1/3");

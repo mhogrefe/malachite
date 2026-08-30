@@ -288,6 +288,21 @@ pub fn triple_1_2_rational_bit_i64_max_bucketer<'a, T>(
     }
 }
 
+pub fn vec_gaussian_rational_sum_bits_bucketer<'a>() -> Bucketer<'a, Vec<GaussianRational>> {
+    Bucketer {
+        bucketing_function: &|xs| {
+            usize::exact_from(
+                xs.iter()
+                    .map(|x| x.real.significant_bits() + x.imaginary.significant_bits())
+                    .sum::<u64>(),
+            )
+        },
+        bucketing_label:
+            "xs.map(|x| x.real.significant_bits() + x.imaginary.significant_bits()).sum()"
+                .to_string(),
+    }
+}
+
 pub fn vec_rational_sum_bits_bucketer<'a>() -> Bucketer<'a, Vec<Rational>> {
     Bucketer {
         bucketing_function: &|xs| {

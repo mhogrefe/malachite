@@ -7,7 +7,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::gaussian_integer::GaussianInteger;
+use core::iter::Sum;
 use core::ops::{Add, AddAssign};
+use malachite_base::num::basic::traits::Zero;
 
 impl Add<Self> for GaussianInteger {
     type Output = Self;
@@ -210,5 +212,91 @@ impl AddAssign<&Self> for GaussianInteger {
     fn add_assign(&mut self, other: &Self) {
         self.real += &other.real;
         self.imaginary += &other.imaginary;
+    }
+}
+
+impl Sum for GaussianInteger {
+    /// Adds up all the [`GaussianInteger`]s in an iterator.
+    ///
+    /// $$
+    /// f((x_i)_ {i=0}^{n-1}) = \sum_ {i=0}^{n-1} x_i.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^2)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of significant bits
+    /// of the real and imaginary parts of the [`GaussianInteger`]s.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::iter::Sum;
+    /// use malachite_base::vecs::vec_from_str;
+    /// use malachite_nz::gaussian_integer::GaussianInteger;
+    ///
+    /// assert_eq!(
+    ///     GaussianInteger::sum(
+    ///         vec_from_str::<GaussianInteger>("[2, -3i, 5+i, 7-2i]")
+    ///             .unwrap()
+    ///             .into_iter()
+    ///     )
+    ///     .to_string(),
+    ///     "14-4i"
+    /// );
+    /// ```
+    fn sum<I>(xs: I) -> Self
+    where
+        I: Iterator<Item = Self>,
+    {
+        let mut s = Self::ZERO;
+        for x in xs {
+            s += x;
+        }
+        s
+    }
+}
+
+impl<'a> Sum<&'a Self> for GaussianInteger {
+    /// Adds up all the [`GaussianInteger`]s in an iterator of [`GaussianInteger`] references.
+    ///
+    /// $$
+    /// f((x_i)_ {i=0}^{n-1}) = \sum_ {i=0}^{n-1} x_i.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n^2)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of significant bits
+    /// of the real and imaginary parts of the [`GaussianInteger`]s.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::iter::Sum;
+    /// use malachite_base::vecs::vec_from_str;
+    /// use malachite_nz::gaussian_integer::GaussianInteger;
+    ///
+    /// assert_eq!(
+    ///     GaussianInteger::sum(
+    ///         vec_from_str::<GaussianInteger>("[2, -3i, 5+i, 7-2i]")
+    ///             .unwrap()
+    ///             .iter()
+    ///     )
+    ///     .to_string(),
+    ///     "14-4i"
+    /// );
+    /// ```
+    fn sum<I>(xs: I) -> Self
+    where
+        I: Iterator<Item = &'a Self>,
+    {
+        let mut s = Self::ZERO;
+        for x in xs {
+            s += x;
+        }
+        s
     }
 }

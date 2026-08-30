@@ -171,7 +171,10 @@ impl Mul<Self> for GaussianInteger {
     /// use malachite_nz::gaussian_integer::GaussianInteger;
     /// use std::str::FromStr;
     ///
-    /// assert_eq!(GaussianInteger::I * GaussianInteger::I, GaussianInteger::NEGATIVE_ONE);
+    /// assert_eq!(
+    ///     GaussianInteger::I * GaussianInteger::I,
+    ///     GaussianInteger::NEGATIVE_ONE
+    /// );
     /// let x = GaussianInteger::from_str("2-3i").unwrap();
     /// let y = GaussianInteger::from_str("-1+4i").unwrap();
     /// assert_eq!((x * y).to_string(), "10+11i");
