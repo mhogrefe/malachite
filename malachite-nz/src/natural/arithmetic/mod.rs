@@ -10,9 +10,9 @@
 /// [`AbsDiffAssign`](malachite_base::num::arithmetic::traits::AbsDiffAssign), traits for getting
 /// the absolute value of the difference between two numbers.
 pub mod abs_diff;
-/// Implementations of [`AbsSquared`](malachite_base::num::arithmetic::traits::AbsSquared), a trait
-/// for computing the squared absolute value of a number. For real types this is the same as
-/// squaring.
+/// Implementations of [`AbsSquared`](malachite_base::num::arithmetic::traits::AbsSquared) and
+/// [`AbsSquaredAssign`](malachite_base::num::arithmetic::traits::AbsSquaredAssign), traits for
+/// computing the squared absolute value of a number. For real types this is the same as squaring.
 pub mod abs_squared;
 /// Addition of [`Natural`](super::Natural)s.
 pub mod add;
@@ -42,6 +42,10 @@ pub mod checked_sub;
 /// trait for subtracting the product of two numbers from another number, and checking whether the
 /// result is representable.
 pub mod checked_sub_mul;
+/// Implementations of [`Conjugate`](malachite_base::num::arithmetic::traits::Conjugate) and
+/// [`ConjugateAssign`](malachite_base::num::arithmetic::traits::ConjugateAssign), traits for
+/// computing the complex conjugate of a number. A real number is its own conjugate.
+pub mod conjugate;
 /// Implementations of [`CoprimeWith`](malachite_base::num::arithmetic::traits::CoprimeWith), a
 /// trait for determining whether two numbers are coprime.
 pub mod coprime_with;

@@ -15,6 +15,7 @@ pub(crate) fn register(runner: &mut Runner) {
     add_mul::register(runner);
     average::register(runner);
     bell_number::register(runner);
+    conjugate::register(runner);
     landau_function::register(runner);
     binomial_coefficient::register(runner);
     checked_mul_sub_mul::register(runner);
@@ -111,6 +112,7 @@ mod binomial_coefficient;
 mod checked_mul_sub_mul;
 mod checked_sub;
 mod checked_sub_mul;
+mod conjugate;
 mod coprime_with;
 mod crt;
 mod crt_comb;

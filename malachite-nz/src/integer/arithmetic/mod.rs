@@ -13,9 +13,9 @@ pub mod abs;
 /// [`AbsDiffAssign`](malachite_base::num::arithmetic::traits::AbsDiffAssign), traits for getting
 /// the absolute value of the difference between two numbers.
 pub mod abs_diff;
-/// Implementations of [`AbsSquared`](malachite_base::num::arithmetic::traits::AbsSquared), a trait
-/// for computing the squared absolute value of a number. For real types this is the same as
-/// squaring.
+/// Implementations of [`AbsSquared`](malachite_base::num::arithmetic::traits::AbsSquared) and
+/// [`AbsSquaredAssign`](malachite_base::num::arithmetic::traits::AbsSquaredAssign), traits for
+/// computing the squared absolute value of a number. For real types this is the same as squaring.
 pub mod abs_squared;
 /// Addition of [`Integer`](super::Integer)s.
 pub mod add;
@@ -37,6 +37,10 @@ pub mod balanced_mod;
 /// [`BinomialCoefficient`](malachite_base::num::arithmetic::traits::BinomialCoefficient), a trait
 /// for computing the binomial coefficient of two numbers.
 pub mod binomial_coefficient;
+/// Implementations of [`Conjugate`](malachite_base::num::arithmetic::traits::Conjugate) and
+/// [`ConjugateAssign`](malachite_base::num::arithmetic::traits::ConjugateAssign), traits for
+/// computing the complex conjugate of a number. A real number is its own conjugate.
+pub mod conjugate;
 /// Implementations of [`BalancedCrt`](malachite_base::num::arithmetic::traits::BalancedCrt), a
 /// trait for combining two congruences by the Chinese remainder theorem and returning the
 /// representative of smallest absolute value.

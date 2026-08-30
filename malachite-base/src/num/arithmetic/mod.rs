@@ -61,8 +61,8 @@ pub mod abs;
 /// assert_eq!(x, 10);
 /// ```
 pub mod abs_diff;
-/// [`AbsSquared`](traits::AbsSquared), a trait for computing the squared absolute value of a
-/// number.
+/// [`AbsSquared`](traits::AbsSquared) and [`AbsSquaredAssign`](traits::AbsSquaredAssign), traits
+/// for computing the squared absolute value of a number.
 ///
 /// # abs_squared
 /// ```
@@ -73,6 +73,19 @@ pub mod abs_diff;
 /// assert_eq!((-123i32).abs_squared(), 15129);
 /// assert_eq!(1.5f32.abs_squared(), 2.25);
 /// assert_eq!((-1.5f32).abs_squared(), 2.25);
+/// ```
+///
+/// # abs_squared_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::AbsSquaredAssign;
+///
+/// let mut x = -123i32;
+/// x.abs_squared_assign();
+/// assert_eq!(x, 15129);
+///
+/// let mut x = -1.5f32;
+/// x.abs_squared_assign();
+/// assert_eq!(x, 2.25);
 /// ```
 pub mod abs_squared;
 /// [`AddMul`](traits::AddMul) and [`AddMulAssign`](traits::AddMulAssign), traits for adding a
@@ -448,6 +461,27 @@ pub mod checked_sub;
 /// assert_eq!((-127i8).checked_sub_mul(2, 100), None);
 /// ```
 pub mod checked_sub_mul;
+/// [`Conjugate`](traits::Conjugate) and [`ConjugateAssign`](traits::ConjugateAssign), traits for
+/// computing the complex conjugate of a number. A real number is its own conjugate.
+///
+/// # conjugate
+/// ```
+/// use malachite_base::num::arithmetic::traits::Conjugate;
+///
+/// assert_eq!(123u32.conjugate(), 123);
+/// assert_eq!((-123i32).conjugate(), -123);
+/// assert_eq!(1.5f32.conjugate(), 1.5);
+/// ```
+///
+/// # conjugate_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::ConjugateAssign;
+///
+/// let mut x = -123i32;
+/// x.conjugate_assign();
+/// assert_eq!(x, -123);
+/// ```
+pub mod conjugate;
 /// [`CoprimeWith`](traits::CoprimeWith), a trait for determining whether two numbers are coprime.
 ///
 /// # coprime_with

@@ -68,6 +68,8 @@ extern crate rug;
 pub mod gaussian_integer {
     pub mod arithmetic {
         pub mod abs_squared;
+        pub mod conjugate;
+        pub mod neg;
     }
     pub mod basic {
         pub mod constants;
@@ -122,6 +124,7 @@ pub mod integer {
         pub mod average;
         pub mod balanced_mod;
         pub mod binomial_coefficient;
+        pub mod conjugate;
         pub mod crt;
         pub mod div;
         pub mod div_euclidean;
@@ -295,6 +298,7 @@ pub mod natural {
         pub mod binomial_coefficient;
         pub mod checked_sub;
         pub mod checked_sub_mul;
+        pub mod conjugate;
         pub mod coprime_with;
         pub mod crt;
         pub mod crt_comb;

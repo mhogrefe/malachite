@@ -25,6 +25,9 @@ pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_demos!(runner, demo_abs_squared_unsigned);
     register_signed_unsigned_match_demos!(runner, demo_abs_squared_signed);
     register_primitive_float_demos!(runner, demo_abs_squared_primitive_float);
+    register_unsigned_demos!(runner, demo_abs_squared_assign_unsigned);
+    register_signed_unsigned_match_demos!(runner, demo_abs_squared_assign_signed);
+    register_primitive_float_demos!(runner, demo_abs_squared_assign_primitive_float);
 
     register_unsigned_benches!(runner, benchmark_abs_squared_unsigned);
     register_signed_unsigned_match_benches!(runner, benchmark_abs_squared_signed);
@@ -61,6 +64,45 @@ fn demo_abs_squared_primitive_float<T: PrimitiveFloat>(
             NiceFloat(f),
             NiceFloat(f.abs_squared())
         );
+    }
+}
+
+fn demo_abs_squared_assign_unsigned<T: PrimitiveUnsigned>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for mut u in unsigned_gen_var_21::<T>().get(gm, config).take(limit) {
+        let old_u = u;
+        u.abs_squared_assign();
+        println!("u := {old_u}; u.abs_squared_assign(); u = {u}");
+    }
+}
+
+fn demo_abs_squared_assign_signed<
+    S: PrimitiveSigned + WrappingFrom<U>,
+    U: PrimitiveUnsigned + WrappingFrom<S>,
+>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for mut i in signed_gen_var_10::<U, S>().get(gm, config).take(limit) {
+        let old_i = i;
+        i.abs_squared_assign();
+        println!("i := {old_i}; i.abs_squared_assign(); i = {i}");
+    }
+}
+
+fn demo_abs_squared_assign_primitive_float<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) {
+    for mut f in primitive_float_gen::<T>().get(gm, config).take(limit) {
+        let old_f = NiceFloat(f);
+        f.abs_squared_assign();
+        println!("f := {old_f}; f.abs_squared_assign(); f = {}", NiceFloat(f));
     }
 }
 

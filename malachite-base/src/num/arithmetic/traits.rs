@@ -35,6 +35,33 @@ pub trait AbsSquared {
     fn abs_squared(self) -> Self::Output;
 }
 
+/// Replaces a number with its squared absolute value.
+///
+/// For a real number this is just squaring in place. For a complex number the result is the purely
+/// real value $|x|^2$, embedded in the same type.
+pub trait AbsSquaredAssign {
+    fn abs_squared_assign(&mut self);
+}
+
+/// Computes the complex conjugate of a number.
+///
+/// For a complex number the sign of the imaginary part is flipped. For a real number, which is its
+/// own conjugate, this is the identity; the trivial implementations let generic code use
+/// conjugation uniformly, for example when forming Hermitian products.
+pub trait Conjugate {
+    type Output;
+
+    fn conjugate(self) -> Self::Output;
+}
+
+/// Replaces a number with its complex conjugate.
+///
+/// For a complex number the sign of the imaginary part is flipped. For a real number this does
+/// nothing.
+pub trait ConjugateAssign {
+    fn conjugate_assign(&mut self);
+}
+
 /// Takes the absolute value of a number and converts to the unsigned equivalent.
 pub trait UnsignedAbs {
     type Output;

@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Float;
-use malachite_base::num::arithmetic::traits::{AbsSquared, Square};
+use malachite_base::num::arithmetic::traits::{AbsSquared, AbsSquaredAssign, Square, SquareAssign};
 
 impl AbsSquared for Float {
     type Output = Self;
@@ -80,5 +80,35 @@ impl AbsSquared for &Float {
     #[inline]
     fn abs_squared(self) -> Float {
         self.square()
+    }
+}
+
+impl AbsSquaredAssign for Float {
+    /// Replaces a [`Float`] with its squared absolute value. For real types this is the same as
+    /// squaring in place.
+    ///
+    /// $$
+    /// x \gets |x|^2 = x^2.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::AbsSquaredAssign;
+    /// use malachite_float::Float;
+    ///
+    /// let mut x = Float::from(-1.5);
+    /// x.abs_squared_assign();
+    /// assert_eq!(x.to_string(), "2.0");
+    /// ```
+    #[inline]
+    fn abs_squared_assign(&mut self) {
+        self.square_assign();
     }
 }

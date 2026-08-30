@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::{AbsSquared, Square};
+use malachite_base::num::arithmetic::traits::{AbsSquared, AbsSquaredAssign, Square};
 use malachite_nz::natural::Natural;
 use malachite_nz::test_util::generators::natural_gen;
 use std::str::FromStr;
@@ -23,6 +23,11 @@ fn test_abs_squared() {
         let squared = (&x).abs_squared();
         assert!(squared.is_valid());
         assert_eq!(squared.to_string(), out);
+
+        let mut squared = x;
+        squared.abs_squared_assign();
+        assert!(squared.is_valid());
+        assert_eq!(squared.to_string(), out);
     };
     test("0", "0");
     test("1", "1");
@@ -36,6 +41,9 @@ fn abs_squared_properties() {
         let abs_squared = x.clone().abs_squared();
         assert!(abs_squared.is_valid());
         assert_eq!((&x).abs_squared(), abs_squared);
+        let mut x_alt = x.clone();
+        x_alt.abs_squared_assign();
+        assert_eq!(x_alt, abs_squared);
         assert_eq!((&x).square(), abs_squared);
         assert_eq!(&x * &x, abs_squared);
     });

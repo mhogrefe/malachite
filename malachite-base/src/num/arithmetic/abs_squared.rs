@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::num::arithmetic::traits::{AbsSquared, Square};
+use crate::num::arithmetic::traits::{AbsSquared, AbsSquaredAssign, Square, SquareAssign};
 
 macro_rules! impl_abs_squared {
     ($t:ident) => {
@@ -26,6 +26,23 @@ macro_rules! impl_abs_squared {
             #[inline]
             fn abs_squared(self) -> $t {
                 self.square()
+            }
+        }
+
+        impl AbsSquaredAssign for $t {
+            /// Replaces a number with its squared absolute value. For real types this is the same
+            /// as squaring in place.
+            ///
+            /// $x \gets |x|^2 = x^2$.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
+            ///
+            /// # Examples
+            /// See [here](super::abs_squared#abs_squared_assign).
+            #[inline]
+            fn abs_squared_assign(&mut self) {
+                self.square_assign();
             }
         }
     };

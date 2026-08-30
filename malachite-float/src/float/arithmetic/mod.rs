@@ -8,9 +8,9 @@
 
 /// Absolute value of [`Float`](super::Float)s.
 pub mod abs;
-/// Implementations of [`AbsSquared`](malachite_base::num::arithmetic::traits::AbsSquared), a trait
-/// for computing the squared absolute value of a number. For real types this is the same as
-/// squaring.
+/// Implementations of [`AbsSquared`](malachite_base::num::arithmetic::traits::AbsSquared) and
+/// [`AbsSquaredAssign`](malachite_base::num::arithmetic::traits::AbsSquaredAssign), traits for
+/// computing the squared absolute value of a number. For real types this is the same as squaring.
 pub mod abs_squared;
 /// Addition of [`Float`](super::Float)s, and of [`Float`](super::Float)s with
 /// [`Rational`](malachite_q::Rational)s.
@@ -155,6 +155,10 @@ pub mod cbrt;
 /// [`CompoundAssign`](malachite_base::num::arithmetic::traits::CompoundAssign), traits for
 /// computing the compound function $(1+x)^n$ for [`Float`](super::Float)s.
 pub mod compound;
+/// Implementations of [`Conjugate`](malachite_base::num::arithmetic::traits::Conjugate) and
+/// [`ConjugateAssign`](malachite_base::num::arithmetic::traits::ConjugateAssign), traits for
+/// computing the complex conjugate of a number. A real number is its own conjugate.
+pub mod conjugate;
 /// Division of [`Float`](super::Float)s, of [`Float`](super::Float)s by
 /// [`Rational`](malachite_q::Rational)s, and of [`Rational`](malachite_q::Rational)s by
 /// [`Float`](super::Float)s.

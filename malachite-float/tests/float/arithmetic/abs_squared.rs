@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::{AbsSquared, Square};
+use malachite_base::num::arithmetic::traits::{AbsSquared, AbsSquaredAssign, Square};
 use malachite_float::ComparableFloat;
 use malachite_float::test_util::common::{parse_hex_string, to_hex_string};
 use malachite_float::test_util::generators::float_gen;
@@ -23,6 +23,12 @@ fn test_abs_squared() {
         assert_eq!(to_hex_string(&squared), out_hex);
 
         let squared = (&x).abs_squared();
+        assert!(squared.is_valid());
+        assert_eq!(squared.to_string(), out);
+        assert_eq!(to_hex_string(&squared), out_hex);
+
+        let mut squared = x;
+        squared.abs_squared_assign();
         assert!(squared.is_valid());
         assert_eq!(squared.to_string(), out);
         assert_eq!(to_hex_string(&squared), out_hex);
@@ -47,6 +53,9 @@ fn abs_squared_properties() {
             ComparableFloat((&x).abs_squared()),
             ComparableFloat(abs_squared.clone())
         );
+        let mut x_alt = x.clone();
+        x_alt.abs_squared_assign();
+        assert_eq!(ComparableFloat(x_alt), ComparableFloat(abs_squared.clone()));
         assert_eq!(
             ComparableFloat((&x).square()),
             ComparableFloat(abs_squared.clone())

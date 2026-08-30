@@ -50,6 +50,9 @@ fn test_abs_squared() {
 fn abs_squared_properties_helper_unsigned<T: PrimitiveUnsigned>() {
     unsigned_gen_var_21::<T>().test_properties(|x| {
         assert_eq!(x.abs_squared(), x.square());
+        let mut y = x;
+        y.abs_squared_assign();
+        assert_eq!(y, x.abs_squared());
     });
 }
 
@@ -60,6 +63,9 @@ fn abs_squared_properties_helper_signed<
     signed_gen_var_10::<U, S>().test_properties(|x| {
         let abs_squared = x.abs_squared();
         assert_eq!(abs_squared, x.square());
+        let mut y = x;
+        y.abs_squared_assign();
+        assert_eq!(y, abs_squared);
         if x != S::MIN {
             assert_eq!((-x).abs_squared(), abs_squared);
         }
@@ -71,6 +77,9 @@ fn abs_squared_properties_helper_primitive_float<T: PrimitiveFloat>() {
     primitive_float_gen::<T>().test_properties(|x| {
         let abs_squared = x.abs_squared();
         assert_eq!(NiceFloat(abs_squared), NiceFloat(x.square()));
+        let mut y = x;
+        y.abs_squared_assign();
+        assert_eq!(NiceFloat(y), NiceFloat(abs_squared));
         assert_eq!(NiceFloat((-x).abs_squared()), NiceFloat(abs_squared));
         assert!(x.is_nan() || abs_squared >= T::ZERO);
     });

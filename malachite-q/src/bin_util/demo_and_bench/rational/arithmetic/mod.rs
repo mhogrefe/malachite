@@ -17,6 +17,7 @@ pub(crate) fn register(runner: &mut Runner) {
     approximate::register(runner);
     average::register(runner);
     ceiling::register(runner);
+    conjugate::register(runner);
     denominators_in_closed_interval::register(runner);
     div::register(runner);
     express_as_power::register(runner);
@@ -61,6 +62,7 @@ mod add_mul;
 mod approximate;
 mod average;
 mod ceiling;
+mod conjugate;
 mod dedekind_sum;
 mod denominators_in_closed_interval;
 mod div;

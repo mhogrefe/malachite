@@ -8,7 +8,7 @@
 
 use crate::Rational;
 use crate::gaussian_rational::GaussianRational;
-use malachite_base::num::arithmetic::traits::{AbsSquared, Square};
+use malachite_base::num::arithmetic::traits::{AbsSquared, AbsSquaredAssign, Square, SquareAssign};
 
 impl AbsSquared for GaussianRational {
     type Output = Rational;
@@ -86,5 +86,39 @@ impl AbsSquared for &GaussianRational {
     #[inline]
     fn abs_squared(self) -> Rational {
         (&self.real).square() + (&self.imaginary).square()
+    }
+}
+
+impl AbsSquaredAssign for GaussianRational {
+    /// Replaces a [`GaussianRational`] with its squared absolute value: the purely real value
+    /// $|x|^2$, embedded in the same type. The real part becomes the sum of the squares of the real
+    /// and imaginary parts (the norm), and the imaginary part becomes zero.
+    ///
+    /// $$
+    /// x \gets |x|^2 = \Re(x)^2 + \Im(x)^2.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n \log n \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the maximum number of significant
+    /// bits of the real and imaginary parts.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::AbsSquaredAssign;
+    /// use malachite_q::gaussian_rational::GaussianRational;
+    /// use std::str::FromStr;
+    ///
+    /// let mut x = GaussianRational::from_str("2-3i").unwrap();
+    /// x.abs_squared_assign();
+    /// assert_eq!(x.to_string(), "13");
+    /// ```
+    fn abs_squared_assign(&mut self) {
+        self.real.square_assign();
+        self.imaginary.square_assign();
+        self.real += core::mem::take(&mut self.imaginary);
     }
 }

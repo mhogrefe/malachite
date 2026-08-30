@@ -206,6 +206,7 @@ pub mod num {
         pub mod checked_pow;
         pub mod checked_square;
         pub mod checked_sub_mul;
+        pub mod conjugate;
         pub mod coprime_with;
         pub mod crt;
         pub mod div_euclidean;

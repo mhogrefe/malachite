@@ -13,11 +13,18 @@ documented by git history.
 - New traits for complex types downstream (nothing in malachite-base implements them): the
   constant traits `I` and `NegativeI`, and the conversion traits `ImaginaryFrom` and
   `ImaginaryInto`.
-- A new `AbsSquared` trait for computing the squared absolute value of a number,
-  $|x|^2$, implemented for all numeric types. For real types this is the same as squaring; for
-  `GaussianInteger` and `GaussianRational` it is the sum of the squares of the real and
-  imaginary parts (the norm), returned as an `Integer` or `Rational` respectively. The trait is
-  a supertrait of `PrimitiveInt` and `PrimitiveFloat`.
+- New `AbsSquared` and `AbsSquaredAssign` traits for computing the squared absolute value of a
+  number, $|x|^2$, implemented for all numeric types. For real types this is the same as
+  squaring; for `GaussianInteger` and `GaussianRational`, `abs_squared` is the sum of the
+  squares of the real and imaginary parts (the norm), returned as an `Integer` or `Rational`
+  respectively, and `abs_squared_assign` replaces the value with the purely real $|x|^2$
+  embedded in the same type. Both traits are supertraits of `PrimitiveInt` and
+  `PrimitiveFloat`.
+- New `Conjugate` and `ConjugateAssign` traits for computing the complex conjugate of a number,
+  implemented for all numeric types. A real number is its own conjugate, so for the real types
+  these are the identity; the trivial implementations let generic code use conjugation
+  uniformly. For `GaussianInteger` and `GaussianRational` the sign of the imaginary part is
+  flipped. Both traits are supertraits of `PrimitiveInt` and `PrimitiveFloat`.
 - New `IsGaussianInteger` and `IsReal` traits alongside `IsInteger`, implemented for all
   primitive types (and, in the other crates, all bignum types). For every type,
   `x.is_integer() == x.is_gaussian_integer() && x.is_real()`; for floating-point types, `NaN`
@@ -33,6 +40,8 @@ documented by git history.
   striped-random generators, wired into the demo, benchmark, and property-test machinery.
   `GaussianInteger` also implements `IsInteger`, `IsGaussianInteger`, and `IsReal` (and
   `Named`), and `Natural` and `Integer` implement the two new traits (trivially).
+- The first arithmetic operations for the Gaussian types: `Neg` (by value and by reference) and
+  `NegAssign` for `GaussianInteger` and `GaussianRational`, negating both parts.
 - `OrdAbs` and `PartialOrdAbs` implementations for `GaussianInteger` (and, in malachite-q, for
   `GaussianRational`), comparing absolute values — distances from the origin. Componentwise and
   crosswise part comparisons decide most cases; the squared absolute values are only computed

@@ -68,6 +68,8 @@ extern crate rug;
 pub mod gaussian_rational {
     pub mod arithmetic {
         pub mod abs_squared;
+        pub mod conjugate;
+        pub mod neg;
     }
     pub mod basic {
         pub mod constants;
@@ -125,6 +127,7 @@ pub mod rational {
         pub mod average;
         pub mod ceiling;
         pub mod cfrac_helpers;
+        pub mod conjugate;
         pub mod dedekind_sum;
         pub mod denominators_in_closed_interval;
         pub mod div;

@@ -17,6 +17,7 @@ pub(crate) fn register(runner: &mut Runner) {
     average::register(runner);
     cbrt::register(runner);
     compound::register(runner);
+    conjugate::register(runner);
     div::register(runner);
     dot::register(runner);
     exp::register(runner);
@@ -73,6 +74,7 @@ mod agm;
 mod average;
 mod cbrt;
 mod compound;
+mod conjugate;
 mod div;
 mod dot;
 mod exp;

@@ -12,9 +12,9 @@ pub mod abs;
 /// [`AbsDiffAssign`](malachite_base::num::arithmetic::traits::AbsDiffAssign), traits for getting
 /// the absolute value of the difference between two numbers.
 pub mod abs_diff;
-/// Implementations of [`AbsSquared`](malachite_base::num::arithmetic::traits::AbsSquared), a trait
-/// for computing the squared absolute value of a number. For real types this is the same as
-/// squaring.
+/// Implementations of [`AbsSquared`](malachite_base::num::arithmetic::traits::AbsSquared) and
+/// [`AbsSquaredAssign`](malachite_base::num::arithmetic::traits::AbsSquaredAssign), traits for
+/// computing the squared absolute value of a number. For real types this is the same as squaring.
 pub mod abs_squared;
 /// Addition of [`Rational`](super::Rational)s.
 pub mod add;
@@ -40,6 +40,10 @@ pub mod cfrac_helpers;
 /// The shared continued-fraction and half-gcd machinery, adopted from FLINT.
 #[cfg(not(feature = "test_build"))]
 pub(crate) mod cfrac_helpers;
+/// Implementations of [`Conjugate`](malachite_base::num::arithmetic::traits::Conjugate) and
+/// [`ConjugateAssign`](malachite_base::num::arithmetic::traits::ConjugateAssign), traits for
+/// computing the complex conjugate of a number. A real number is its own conjugate.
+pub mod conjugate;
 /// A function for computing Dedekind sums.
 pub mod dedekind_sum;
 /// Getting all denominators of [`Rational`](super::Rational)s that appear in a given closed
