@@ -7,9 +7,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{AbsSquared, Square};
+use malachite_float::ComparableFloat;
 use malachite_float::test_util::common::{parse_hex_string, to_hex_string};
 use malachite_float::test_util::generators::float_gen;
-use malachite_float::ComparableFloat;
 
 #[test]
 fn test_abs_squared() {

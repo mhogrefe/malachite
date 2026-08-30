@@ -77,6 +77,7 @@ pub mod gaussian_integer {
     }
     pub mod comparison {
         pub mod cmp;
+        pub mod cmp_abs;
     }
     pub mod conversion {
         pub mod from;

@@ -12,3 +12,8 @@
 /// ordering [`GaussianInteger`](crate::gaussian_integer::GaussianInteger)s lexicographically: first
 /// by real part, then by imaginary part.
 pub mod cmp;
+/// Implementations of [`OrdAbs`](malachite_base::num::comparison::traits::OrdAbs) and
+/// [`PartialOrdAbs`](malachite_base::num::comparison::traits::PartialOrdAbs) for
+/// [`GaussianInteger`](crate::gaussian_integer::GaussianInteger), comparing absolute values
+/// (distances from the origin).
+pub mod cmp_abs;

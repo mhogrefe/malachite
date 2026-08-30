@@ -12,3 +12,8 @@
 /// ordering [`GaussianRational`](crate::gaussian_rational::GaussianRational)s lexicographically:
 /// first by real part, then by imaginary part.
 pub mod cmp;
+/// Implementations of [`OrdAbs`](malachite_base::num::comparison::traits::OrdAbs) and
+/// [`PartialOrdAbs`](malachite_base::num::comparison::traits::PartialOrdAbs) for
+/// [`GaussianRational`](crate::gaussian_rational::GaussianRational), comparing absolute values
+/// (distances from the origin).
+pub mod cmp_abs;

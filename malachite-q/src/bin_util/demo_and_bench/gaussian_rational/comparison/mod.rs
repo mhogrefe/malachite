@@ -10,6 +10,8 @@ use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
     cmp::register(runner);
+    cmp_abs::register(runner);
 }
 
 mod cmp;
+mod cmp_abs;

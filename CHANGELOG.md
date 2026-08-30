@@ -33,6 +33,10 @@ documented by git history.
   striped-random generators, wired into the demo, benchmark, and property-test machinery.
   `GaussianInteger` also implements `IsInteger`, `IsGaussianInteger`, and `IsReal` (and
   `Named`), and `Natural` and `Integer` implement the two new traits (trivially).
+- `OrdAbs` and `PartialOrdAbs` implementations for `GaussianInteger` (and, in malachite-q, for
+  `GaussianRational`), comparing absolute values — distances from the origin. Componentwise and
+  crosswise part comparisons decide most cases; the squared absolute values are only computed
+  when both pairings strictly conflict.
 - `ComparableGaussianInteger` and `ComparableGaussianIntegerRef`, wrappers around
   `GaussianInteger` (by value and by reference) that implement `Ord`, comparing
   lexicographically: first by real part, then by imaginary part. Since no total order on the
