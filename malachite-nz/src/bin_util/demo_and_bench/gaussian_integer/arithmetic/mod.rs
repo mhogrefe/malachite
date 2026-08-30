@@ -14,6 +14,7 @@ pub(crate) fn register(runner: &mut Runner) {
     conjugate::register(runner);
     mul::register(runner);
     neg::register(runner);
+    square::register(runner);
     sub::register(runner);
 }
 
@@ -22,4 +23,5 @@ mod add;
 mod conjugate;
 mod mul;
 mod neg;
+mod square;
 mod sub;

@@ -23,5 +23,9 @@ pub mod mul;
 /// [`GaussianRational`](crate::gaussian_rational::GaussianRational), negating both the real and
 /// imaginary parts.
 pub mod neg;
+/// Implementations of [`Square`](malachite_base::num::arithmetic::traits::Square) and
+/// [`SquareAssign`](malachite_base::num::arithmetic::traits::SquareAssign), traits for squaring a
+/// number.
+pub mod square;
 /// Subtraction of [`GaussianRational`](crate::gaussian_rational::GaussianRational)s.
 pub mod sub;

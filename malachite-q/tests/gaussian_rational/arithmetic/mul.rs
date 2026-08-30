@@ -93,6 +93,8 @@ fn mul_properties() {
     });
 
     gaussian_rational_gen().test_properties(|x| {
+        // Aliased references are detected and routed through the squaring algorithm.
+        assert_eq!(&x * &x, x.clone() * x.clone());
         assert_eq!(&x * GaussianRational::ONE, x);
         assert_eq!(GaussianRational::ONE * &x, x);
         assert_eq!(&x * GaussianRational::ZERO, GaussianRational::ZERO);

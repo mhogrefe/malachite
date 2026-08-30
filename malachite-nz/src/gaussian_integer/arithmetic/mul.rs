@@ -14,14 +14,15 @@ use crate::gaussian_integer::GaussianInteger;
 use crate::integer::Integer;
 use core::mem::take;
 use core::ops::{Mul, MulAssign};
-use malachite_base::num::arithmetic::traits::{MulAddMul, MulSubMul};
+use malachite_base::num::arithmetic::traits::{MulAddMul, MulSubMul, Square};
 use malachite_base::num::logic::traits::SignificantBits;
 
-// These thresholds are from `fmpzi_mul` in FLINT 3.6.0, where they are limb counts (13 limbs and 2
-// limbs, with 64-bit limbs); they are expressed here in bits so that they do not shift when
-// Malachite is built with 32-bit limbs.
+use crate::gaussian_integer::arithmetic::SIZE_BALANCE_BITS;
+
+// This threshold is from `fmpzi_mul` in FLINT 3.6.0, where it is a limb count (13 limbs, with
+// 64-bit limbs); it is expressed here in bits so that it does not shift when Malachite is built
+// with 32-bit limbs.
 const KARATSUBA_THRESHOLD_BITS: u64 = 13 * 64;
-const KARATSUBA_BALANCE_BITS: u64 = 2 * 64;
 
 enum MulAlgorithm {
     DoubleWord(i64, i64, i64, i64),
@@ -51,8 +52,8 @@ fn choose_algorithm(x: &GaussianInteger, y: &GaussianInteger) -> MulAlgorithm {
         let c_bits = y.real.significant_bits();
         let d_bits = y.imaginary.significant_bits();
         if c_bits >= KARATSUBA_THRESHOLD_BITS
-            && a_bits.abs_diff(b_bits) <= KARATSUBA_BALANCE_BITS
-            && c_bits.abs_diff(d_bits) <= KARATSUBA_BALANCE_BITS
+            && a_bits.abs_diff(b_bits) <= SIZE_BALANCE_BITS
+            && c_bits.abs_diff(d_bits) <= SIZE_BALANCE_BITS
         {
             return MulAlgorithm::Karatsuba;
         }
@@ -121,6 +122,12 @@ fn mul_val_ref(x: GaussianInteger, y: &GaussianInteger) -> GaussianInteger {
 }
 
 fn mul_ref_ref(x: &GaussianInteger, y: &GaussianInteger) -> GaussianInteger {
+    // As in fmpzi_mul, aliased operands are detected by address and routed to the squaring
+    // algorithm, which replaces general multiplications with cheaper squarings. Only this variant
+    // checks: two owned operands are always distinct objects.
+    if core::ptr::eq(x, y) {
+        return x.square();
+    }
     match choose_algorithm(x, y) {
         MulAlgorithm::DoubleWord(a, b, c, d) => mul_double_word(a, b, c, d),
         MulAlgorithm::Karatsuba => {

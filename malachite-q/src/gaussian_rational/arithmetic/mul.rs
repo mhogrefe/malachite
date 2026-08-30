@@ -9,7 +9,7 @@
 use crate::gaussian_rational::GaussianRational;
 use core::mem::take;
 use core::ops::{Mul, MulAssign};
-use malachite_base::num::arithmetic::traits::{MulAddMul, MulSubMul};
+use malachite_base::num::arithmetic::traits::{MulAddMul, MulSubMul, Square};
 
 // Each part of each operand appears in exactly two products, so an owned part is borrowed by its
 // first use and consumed by its last, letting the products reuse the operands' storage.
@@ -158,6 +158,12 @@ impl Mul<&GaussianRational> for &GaussianRational {
     /// assert_eq!((&x * &y).to_string(), "1/3");
     /// ```
     fn mul(self, other: &GaussianRational) -> GaussianRational {
+        // As in fmpzi_mul, aliased operands are detected by address and routed to the squaring
+        // algorithm, whose squarings avoid the GCD reductions of general multiplication. Only this
+        // variant checks: two owned operands are always distinct objects.
+        if core::ptr::eq(self, other) {
+            return self.square();
+        }
         GaussianRational {
             real: (&self.real).mul_sub_mul(&other.real, &self.imaginary, &other.imaginary),
             imaginary: (&self.real).mul_add_mul(&other.imaginary, &self.imaginary, &other.real),

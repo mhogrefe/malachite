@@ -7,3 +7,4 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 pub mod mul;
+pub mod square;

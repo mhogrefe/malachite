@@ -48,7 +48,12 @@ documented by git history.
   `fmpzi_mul` strategy: double-word arithmetic when all four parts fit in a signed word, a
   three-multiplication Karatsuba scheme for large balanced operands, and the fused
   `mul_add_mul`/`mul_sub_mul` kernels otherwise; `GaussianRational` multiplication uses the
-  fused kernels.
+  fused kernels. Both types also implement `Square` and `SquareAssign`; `GaussianInteger`
+  squaring uses FLINT's `fmpzi_sqr` strategy, which prefers squarings over general
+  multiplications and short-circuits purely real and purely imaginary values, and
+  `GaussianRational` squaring uses the same $a^2 - b^2$, $2ab$ scheme, profiting from the fact
+  that squaring a reduced fraction requires no GCD computations. Multiplying a Gaussian value
+  by itself through aliased references routes to the squaring algorithm automatically.
 - `OrdAbs` and `PartialOrdAbs` implementations for `GaussianInteger` (and, in malachite-q, for
   `GaussianRational`), comparing absolute values — distances from the origin. Componentwise and
   crosswise part comparisons decide most cases; the squared absolute values are only computed

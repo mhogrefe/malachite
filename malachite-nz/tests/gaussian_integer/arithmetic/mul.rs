@@ -98,6 +98,9 @@ fn mul_properties() {
     });
 
     gaussian_integer_gen().test_properties(|x| {
+        // Aliased references are detected and routed through the squaring algorithm.
+        assert_eq!(&x * &x, gaussian_integer_mul_naive(&x, &x));
+        assert_eq!(&x * &x, x.clone() * x.clone());
         assert_eq!(&x * GaussianInteger::ONE, x);
         assert_eq!(GaussianInteger::ONE * &x, x);
         assert_eq!(&x * GaussianInteger::ZERO, GaussianInteger::ZERO);
