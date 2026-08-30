@@ -68,8 +68,10 @@ extern crate rug;
 pub mod gaussian_rational {
     pub mod arithmetic {
         pub mod abs_squared;
+        pub mod add;
         pub mod conjugate;
         pub mod neg;
+        pub mod sub;
     }
     pub mod basic {
         pub mod constants;

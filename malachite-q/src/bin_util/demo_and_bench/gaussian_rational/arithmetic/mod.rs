@@ -10,10 +10,14 @@ use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
     abs_squared::register(runner);
+    add::register(runner);
     conjugate::register(runner);
     neg::register(runner);
+    sub::register(runner);
 }
 
 mod abs_squared;
+mod add;
 mod conjugate;
 mod neg;
+mod sub;

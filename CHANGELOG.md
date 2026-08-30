@@ -40,8 +40,10 @@ documented by git history.
   striped-random generators, wired into the demo, benchmark, and property-test machinery.
   `GaussianInteger` also implements `IsInteger`, `IsGaussianInteger`, and `IsReal` (and
   `Named`), and `Natural` and `Integer` implement the two new traits (trivially).
-- The first arithmetic operations for the Gaussian types: `Neg` (by value and by reference) and
-  `NegAssign` for `GaussianInteger` and `GaussianRational`, negating both parts.
+- The first arithmetic operations for the Gaussian types: `Neg` and `NegAssign` (negating both
+  parts), `Conjugate` and `ConjugateAssign` (flipping the sign of the imaginary part), and
+  componentwise addition and subtraction — `Add`, `Sub`, `AddAssign`, and `SubAssign`, in all
+  the usual ownership variants — for `GaussianInteger` and `GaussianRational`.
 - `OrdAbs` and `PartialOrdAbs` implementations for `GaussianInteger` (and, in malachite-q, for
   `GaussianRational`), comparing absolute values — distances from the origin. Componentwise and
   crosswise part comparisons decide most cases; the squared absolute values are only computed

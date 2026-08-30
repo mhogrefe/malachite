@@ -10,6 +10,8 @@
 /// [`AbsSquaredAssign`](malachite_base::num::arithmetic::traits::AbsSquaredAssign), traits for
 /// computing the squared absolute value (norm) of a number.
 pub mod abs_squared;
+/// Addition of [`GaussianInteger`](crate::gaussian_integer::GaussianInteger)s.
+pub mod add;
 /// Implementations of [`Conjugate`](malachite_base::num::arithmetic::traits::Conjugate) and
 /// [`ConjugateAssign`](malachite_base::num::arithmetic::traits::ConjugateAssign), traits for
 /// computing the complex conjugate of a number: the sign of the imaginary part is flipped.
@@ -19,3 +21,5 @@ pub mod conjugate;
 /// [`GaussianInteger`](crate::gaussian_integer::GaussianInteger), negating both the real and
 /// imaginary parts.
 pub mod neg;
+/// Subtraction of [`GaussianInteger`](crate::gaussian_integer::GaussianInteger)s.
+pub mod sub;
