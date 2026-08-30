@@ -187,6 +187,12 @@ pub mod partial_cmp_primitive_float;
 pub mod partial_cmp_primitive_int;
 /// Comparison of [`Float`](crate::Float)s and [`Rational`](malachite_q::Rational)s.
 pub mod partial_cmp_rational;
+/// Equality of [`Float`](crate::Float)s and
+/// [`GaussianInteger`](malachite_nz::gaussian_integer::GaussianInteger)s.
+pub mod partial_eq_gaussian_integer;
+/// Equality of [`Float`](crate::Float)s and
+/// [`GaussianRational`](malachite_q::gaussian_rational::GaussianRational)s.
+pub mod partial_eq_gaussian_rational;
 /// Equality of [`Float`](crate::Float)s and [`Integer`](malachite_nz::integer::Integer)s.
 pub mod partial_eq_integer;
 /// Equality of [`Float`](crate::Float)s and [`Natural`](malachite_nz::natural::Natural)s.

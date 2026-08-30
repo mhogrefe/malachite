@@ -109,6 +109,8 @@ use malachite_base::test_util::generators::random as base_gen;
 use malachite_base::tuples::random::{random_pairs, random_pairs_from_single};
 use malachite_base::vecs::random::{random_vecs, random_vecs_min_length};
 use malachite_base::vecs::random_values_from_vec;
+use malachite_nz::gaussian_integer::GaussianInteger;
+use malachite_nz::gaussian_integer::random::random_gaussian_integers;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer::random::random_integers;
 use malachite_nz::natural::Natural;
@@ -117,6 +119,8 @@ use malachite_nz::natural::random::{
 };
 use malachite_nz::platform::Limb;
 use malachite_q::Rational;
+use malachite_q::gaussian_rational::GaussianRational;
+use malachite_q::gaussian_rational::random::random_gaussian_rationals;
 use malachite_q::rational::random::{random_non_negative_rationals, random_rationals};
 use std::cmp::Ordering;
 use std::collections::HashMap;
@@ -4193,6 +4197,60 @@ pub fn random_float_float_rational_rounding_mode_quadruple_gen_var_2(
         )
         .filter(|(x, y, z, rm)| add_mul_rational_round_valid(x, y, z, *rm, true)),
     )
+}
+
+// -- (Float, GaussianInteger) --
+
+pub fn random_float_gaussian_integer_pair_gen(config: &GenConfig) -> It<(Float, GaussianInteger)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_floats(
+                seed,
+                config.get_or("mean_exponent_n", 64),
+                config.get_or("mean_exponent_d", 1),
+                config.get_or("mean_precision_n", 64),
+                config.get_or("mean_precision_d", 1),
+                config.get_or("mean_zero_p_n", 1),
+                config.get_or("mean_zero_p_d", 64),
+            )
+        },
+        &|seed| {
+            random_gaussian_integers(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+// -- (Float, GaussianRational) --
+
+pub fn random_float_gaussian_rational_pair_gen(
+    config: &GenConfig,
+) -> It<(Float, GaussianRational)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_floats(
+                seed,
+                config.get_or("mean_exponent_n", 64),
+                config.get_or("mean_exponent_d", 1),
+                config.get_or("mean_precision_n", 64),
+                config.get_or("mean_precision_d", 1),
+                config.get_or("mean_zero_p_n", 1),
+                config.get_or("mean_zero_p_d", 64),
+            )
+        },
+        &|seed| {
+            random_gaussian_rationals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
 }
 
 // -- (Float, Integer) --

@@ -15,9 +15,11 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::test_util::bench::bucketers::{Bucketer, float_size};
+use malachite_nz::gaussian_integer::GaussianInteger;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_q::Rational;
+use malachite_q::gaussian_rational::GaussianRational;
 use std::cmp::max;
 
 pub fn pair_1_float_complexity_bucketer<T>(var_name: &str) -> Bucketer<'_, (Float, T)> {
@@ -756,6 +758,38 @@ pub fn pair_2_pair_float_max_complexity_bucketer<'a, T>(
     Bucketer {
         bucketing_function: &|(_, (x, y))| usize::exact_from(max(x.complexity(), y.complexity())),
         bucketing_label: format!("max({x_name}.complexity(), {y_name}.complexity())"),
+    }
+}
+
+pub fn pair_float_gaussian_integer_max_complexity_bucketer<'a>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (Float, GaussianInteger)> {
+    Bucketer {
+        bucketing_function: &|(x, y)| {
+            usize::exact_from(
+                x.complexity()
+                    .max(y.real.significant_bits())
+                    .max(y.imaginary.significant_bits()),
+            )
+        },
+        bucketing_label: format!("max({x_name}.complexity(), {y_name}.significant_bits())"),
+    }
+}
+
+pub fn pair_float_gaussian_rational_max_complexity_bucketer<'a>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (Float, GaussianRational)> {
+    Bucketer {
+        bucketing_function: &|(x, y)| {
+            usize::exact_from(
+                x.complexity()
+                    .max(y.real.significant_bits())
+                    .max(y.imaginary.significant_bits()),
+            )
+        },
+        bucketing_label: format!("max({x_name}.complexity(), {y_name}.significant_bits())"),
     }
 }
 

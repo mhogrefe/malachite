@@ -177,6 +177,54 @@ pub fn exhaustive_gaussian_integer_gen_var_2() -> It<GaussianInteger> {
     Box::new(exhaustive_imaginary_gaussian_integers())
 }
 
+// -- (GaussianInteger, Integer) --
+
+pub fn exhaustive_gaussian_integer_integer_pair_gen() -> It<(GaussianInteger, Integer)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_gaussian_integers(),
+        exhaustive_integers(),
+    ))
+}
+
+// -- (GaussianInteger, Natural) --
+
+pub fn exhaustive_gaussian_integer_natural_pair_gen() -> It<(GaussianInteger, Natural)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_gaussian_integers(),
+        exhaustive_naturals(),
+    ))
+}
+
+// -- (GaussianInteger, PrimitiveFloat) --
+
+pub fn exhaustive_gaussian_integer_primitive_float_pair_gen<T: PrimitiveFloat>()
+-> It<(GaussianInteger, T)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_gaussian_integers(),
+        exhaustive_primitive_floats(),
+    ))
+}
+
+// -- (GaussianInteger, PrimitiveSigned) --
+
+pub fn exhaustive_gaussian_integer_signed_pair_gen<T: PrimitiveSigned>() -> It<(GaussianInteger, T)>
+{
+    Box::new(exhaustive_pairs(
+        exhaustive_gaussian_integers(),
+        exhaustive_signeds(),
+    ))
+}
+
+// -- (GaussianInteger, PrimitiveUnsigned) --
+
+pub fn exhaustive_gaussian_integer_unsigned_pair_gen<T: PrimitiveUnsigned>()
+-> It<(GaussianInteger, T)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_gaussian_integers(),
+        exhaustive_unsigneds(),
+    ))
+}
+
 // -- Integer --
 
 pub fn exhaustive_integer_gen() -> It<Integer> {

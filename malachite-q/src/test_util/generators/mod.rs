@@ -24,6 +24,7 @@ use malachite_base::num::conversion::string::options::ToSciOptions;
 use malachite_base::num::conversion::traits::ConvertibleFrom;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::test_util::generators::common::Generator;
+use malachite_nz::gaussian_integer::GaussianInteger;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use num::BigRational;
@@ -92,6 +93,79 @@ pub fn gaussian_rational_triple_gen()
         &exhaustive_gaussian_rational_triple_gen,
         &random_gaussian_rational_triple_gen,
         &special_random_gaussian_rational_triple_gen,
+    )
+}
+
+// -- (GaussianRational, GaussianInteger) --
+
+pub fn gaussian_rational_gaussian_integer_pair_gen()
+-> Generator<(GaussianRational, GaussianInteger)> {
+    Generator::new(
+        &exhaustive_gaussian_rational_gaussian_integer_pair_gen,
+        &random_gaussian_rational_gaussian_integer_pair_gen,
+        &special_random_gaussian_rational_gaussian_integer_pair_gen,
+    )
+}
+
+// -- (GaussianRational, Integer) --
+
+pub fn gaussian_rational_integer_pair_gen() -> Generator<(GaussianRational, Integer)> {
+    Generator::new(
+        &exhaustive_gaussian_rational_integer_pair_gen,
+        &random_gaussian_rational_integer_pair_gen,
+        &special_random_gaussian_rational_integer_pair_gen,
+    )
+}
+
+// -- (GaussianRational, Natural) --
+
+pub fn gaussian_rational_natural_pair_gen() -> Generator<(GaussianRational, Natural)> {
+    Generator::new(
+        &exhaustive_gaussian_rational_natural_pair_gen,
+        &random_gaussian_rational_natural_pair_gen,
+        &special_random_gaussian_rational_natural_pair_gen,
+    )
+}
+
+// -- (GaussianRational, PrimitiveFloat) --
+
+pub fn gaussian_rational_primitive_float_pair_gen<T: PrimitiveFloat>()
+-> Generator<(GaussianRational, T)> {
+    Generator::new(
+        &exhaustive_gaussian_rational_primitive_float_pair_gen,
+        &random_gaussian_rational_primitive_float_pair_gen,
+        &special_random_gaussian_rational_primitive_float_pair_gen,
+    )
+}
+
+// -- (GaussianRational, PrimitiveSigned) --
+
+pub fn gaussian_rational_signed_pair_gen<T: PrimitiveSigned>() -> Generator<(GaussianRational, T)> {
+    Generator::new(
+        &exhaustive_gaussian_rational_signed_pair_gen,
+        &random_gaussian_rational_primitive_int_pair_gen,
+        &special_random_gaussian_rational_signed_pair_gen,
+    )
+}
+
+// -- (GaussianRational, PrimitiveUnsigned) --
+
+pub fn gaussian_rational_unsigned_pair_gen<T: PrimitiveUnsigned>()
+-> Generator<(GaussianRational, T)> {
+    Generator::new(
+        &exhaustive_gaussian_rational_unsigned_pair_gen,
+        &random_gaussian_rational_primitive_int_pair_gen,
+        &special_random_gaussian_rational_unsigned_pair_gen,
+    )
+}
+
+// -- (GaussianRational, Rational) --
+
+pub fn gaussian_rational_rational_pair_gen() -> Generator<(GaussianRational, Rational)> {
+    Generator::new(
+        &exhaustive_gaussian_rational_rational_pair_gen,
+        &random_gaussian_rational_rational_pair_gen,
+        &special_random_gaussian_rational_rational_pair_gen,
     )
 }
 

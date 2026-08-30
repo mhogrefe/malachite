@@ -84,6 +84,12 @@ pub mod gaussian_rational {
     pub mod comparison {
         pub mod cmp;
         pub mod cmp_abs;
+        pub mod partial_eq_gaussian_integer;
+        pub mod partial_eq_integer;
+        pub mod partial_eq_natural;
+        pub mod partial_eq_primitive_float;
+        pub mod partial_eq_primitive_int;
+        pub mod partial_eq_rational;
     }
     pub mod conversion {
         pub mod from;

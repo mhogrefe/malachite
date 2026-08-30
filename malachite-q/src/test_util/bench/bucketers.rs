@@ -13,6 +13,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::test_util::bench::bucketers::Bucketer;
+use malachite_nz::gaussian_integer::GaussianInteger;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use std::cmp::max;
@@ -100,6 +101,92 @@ pub fn quadruple_1_rational_bit_bucketer<T, U, V>(
     Bucketer {
         bucketing_function: &|(q, _, _, _)| usize::exact_from(q.significant_bits()),
         bucketing_label: format!("{var_name}.significant_bits()"),
+    }
+}
+
+pub fn pair_gaussian_rational_gaussian_integer_max_bit_bucketer<'a>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (GaussianRational, GaussianInteger)> {
+    Bucketer {
+        bucketing_function: &|(x, y)| {
+            usize::exact_from(
+                x.real
+                    .significant_bits()
+                    .max(x.imaginary.significant_bits())
+                    .max(y.real.significant_bits())
+                    .max(y.imaginary.significant_bits()),
+            )
+        },
+        bucketing_label: format!("max({x_name}.significant_bits(), {y_name}.significant_bits())"),
+    }
+}
+
+pub fn pair_gaussian_rational_integer_max_bit_bucketer<'a>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (GaussianRational, Integer)> {
+    Bucketer {
+        bucketing_function: &|(x, y)| {
+            usize::exact_from(
+                x.real
+                    .significant_bits()
+                    .max(x.imaginary.significant_bits())
+                    .max(y.significant_bits()),
+            )
+        },
+        bucketing_label: format!("max({x_name}.significant_bits(), {y_name}.significant_bits())"),
+    }
+}
+
+pub fn pair_gaussian_rational_natural_max_bit_bucketer<'a>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (GaussianRational, Natural)> {
+    Bucketer {
+        bucketing_function: &|(x, y)| {
+            usize::exact_from(
+                x.real
+                    .significant_bits()
+                    .max(x.imaginary.significant_bits())
+                    .max(y.significant_bits()),
+            )
+        },
+        bucketing_label: format!("max({x_name}.significant_bits(), {y_name}.significant_bits())"),
+    }
+}
+
+pub fn pair_gaussian_rational_rational_max_bit_bucketer<'a>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (GaussianRational, Rational)> {
+    Bucketer {
+        bucketing_function: &|(x, y)| {
+            usize::exact_from(
+                x.real
+                    .significant_bits()
+                    .max(x.imaginary.significant_bits())
+                    .max(y.significant_bits()),
+            )
+        },
+        bucketing_label: format!("max({x_name}.significant_bits(), {y_name}.significant_bits())"),
+    }
+}
+
+pub fn pair_1_gaussian_rational_bit_bucketer<T>(
+    var_name: &str,
+) -> Bucketer<'_, (GaussianRational, T)> {
+    Bucketer {
+        bucketing_function: &|(x, _)| {
+            usize::exact_from(
+                x.real
+                    .significant_bits()
+                    .max(x.imaginary.significant_bits()),
+            )
+        },
+        bucketing_label: format!(
+            "max({var_name}.real.significant_bits(), {var_name}.imaginary.significant_bits())"
+        ),
     }
 }
 

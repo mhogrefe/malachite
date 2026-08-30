@@ -17,3 +17,43 @@ pub mod cmp;
 /// [`GaussianInteger`](crate::gaussian_integer::GaussianInteger), comparing absolute values
 /// (distances from the origin).
 pub mod cmp_abs;
+/// Equality of [`GaussianInteger`](crate::gaussian_integer::GaussianInteger)s and
+/// [`Integer`](crate::integer::Integer)s.
+pub mod partial_eq_integer;
+/// Equality of [`GaussianInteger`](crate::gaussian_integer::GaussianInteger)s and
+/// [`Natural`](crate::natural::Natural)s.
+pub mod partial_eq_natural;
+/// Equality of [`GaussianInteger`](crate::gaussian_integer::GaussianInteger)s and primitive floats.
+///
+/// # partial_eq
+/// ```
+/// use malachite_nz::gaussian_integer::GaussianInteger;
+/// use std::str::FromStr;
+///
+/// assert!(GaussianInteger::from(123) == 123.0f32);
+/// assert!(GaussianInteger::from(123) != -5.0f32);
+/// assert!(GaussianInteger::from_str("123+i").unwrap() != 123.0f32);
+///
+/// assert!(123.0f32 == GaussianInteger::from(123));
+/// assert!(-5.0f32 != GaussianInteger::from(123));
+/// ```
+pub mod partial_eq_primitive_float;
+/// Equality of [`GaussianInteger`](crate::gaussian_integer::GaussianInteger)s and primitive
+/// integers.
+///
+/// # partial_eq
+/// ```
+/// use malachite_nz::gaussian_integer::GaussianInteger;
+/// use std::str::FromStr;
+///
+/// assert!(GaussianInteger::from(123) == 123u64);
+/// assert!(GaussianInteger::from(-123) != 123u64);
+/// assert!(GaussianInteger::from_str("123+i").unwrap() != 123u64);
+///
+/// assert!(123u64 == GaussianInteger::from(123));
+/// assert!(123u64 != GaussianInteger::from(-123));
+///
+/// assert!(-123i64 == GaussianInteger::from(-123));
+/// assert!(23i64 != GaussianInteger::from(123));
+/// ```
+pub mod partial_eq_primitive_int;

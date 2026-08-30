@@ -52,6 +52,8 @@ use malachite_base::tuples::random::{
 use malachite_base::unions::Union2;
 use malachite_base::unions::random::random_union2s;
 use malachite_base::vecs::random::random_vecs;
+use malachite_nz::gaussian_integer::GaussianInteger;
+use malachite_nz::gaussian_integer::random::random_gaussian_integers;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer::random::random_integers;
 use malachite_nz::natural::Natural;
@@ -108,6 +110,148 @@ pub fn random_gaussian_rational_gen_var_2(config: &GenConfig) -> It<GaussianRati
         EXAMPLE_SEED,
         config.get_or("mean_bits_n", 64),
         config.get_or("mean_bits_d", 1),
+    ))
+}
+
+// -- (GaussianRational, GaussianInteger) --
+
+pub fn random_gaussian_rational_gaussian_integer_pair_gen(
+    config: &GenConfig,
+) -> It<(GaussianRational, GaussianInteger)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_gaussian_rationals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            random_gaussian_integers(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+// -- (GaussianRational, Integer) --
+
+pub fn random_gaussian_rational_integer_pair_gen(
+    config: &GenConfig,
+) -> It<(GaussianRational, Integer)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_gaussian_rationals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            random_integers(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+// -- (GaussianRational, Natural) --
+
+pub fn random_gaussian_rational_natural_pair_gen(
+    config: &GenConfig,
+) -> It<(GaussianRational, Natural)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_gaussian_rationals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            random_naturals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+// -- (GaussianRational, PrimitiveFloat) --
+
+pub fn random_gaussian_rational_primitive_float_pair_gen<T: PrimitiveFloat>(
+    config: &GenConfig,
+) -> It<(GaussianRational, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_gaussian_rationals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            special_random_primitive_floats(
+                seed,
+                config.get_or("exponent_mean_n", 8),
+                config.get_or("exponent_mean_d", 1),
+                config.get_or("precision_mean_n", 8),
+                config.get_or("precision_mean_d", 1),
+                config.get_or("special_p_mean_n", 1),
+                config.get_or("special_p_mean_d", 64),
+            )
+        },
+    ))
+}
+
+// -- (GaussianRational, PrimitiveInt) --
+
+pub fn random_gaussian_rational_primitive_int_pair_gen<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(GaussianRational, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_gaussian_rationals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &random_primitive_ints,
+    ))
+}
+
+// -- (GaussianRational, Rational) --
+
+pub fn random_gaussian_rational_rational_pair_gen(
+    config: &GenConfig,
+) -> It<(GaussianRational, Rational)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_gaussian_rationals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            random_rationals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
     ))
 }
 

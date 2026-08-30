@@ -83,6 +83,58 @@ pub fn gaussian_integer_triple_gen()
     )
 }
 
+// -- (GaussianInteger, Integer) --
+
+pub fn gaussian_integer_integer_pair_gen() -> Generator<(GaussianInteger, Integer)> {
+    Generator::new(
+        &exhaustive_gaussian_integer_integer_pair_gen,
+        &random_gaussian_integer_integer_pair_gen,
+        &special_random_gaussian_integer_integer_pair_gen,
+    )
+}
+
+// -- (GaussianInteger, Natural) --
+
+pub fn gaussian_integer_natural_pair_gen() -> Generator<(GaussianInteger, Natural)> {
+    Generator::new(
+        &exhaustive_gaussian_integer_natural_pair_gen,
+        &random_gaussian_integer_natural_pair_gen,
+        &special_random_gaussian_integer_natural_pair_gen,
+    )
+}
+
+// -- (GaussianInteger, PrimitiveFloat) --
+
+pub fn gaussian_integer_primitive_float_pair_gen<T: PrimitiveFloat>()
+-> Generator<(GaussianInteger, T)> {
+    Generator::new(
+        &exhaustive_gaussian_integer_primitive_float_pair_gen,
+        &random_gaussian_integer_primitive_float_pair_gen,
+        &special_random_gaussian_integer_primitive_float_pair_gen,
+    )
+}
+
+// -- (GaussianInteger, PrimitiveSigned) --
+
+pub fn gaussian_integer_signed_pair_gen<T: PrimitiveSigned>() -> Generator<(GaussianInteger, T)> {
+    Generator::new(
+        &exhaustive_gaussian_integer_signed_pair_gen,
+        &random_gaussian_integer_primitive_int_pair_gen,
+        &special_random_gaussian_integer_signed_pair_gen,
+    )
+}
+
+// -- (GaussianInteger, PrimitiveUnsigned) --
+
+pub fn gaussian_integer_unsigned_pair_gen<T: PrimitiveUnsigned>() -> Generator<(GaussianInteger, T)>
+{
+    Generator::new(
+        &exhaustive_gaussian_integer_unsigned_pair_gen,
+        &random_gaussian_integer_primitive_int_pair_gen,
+        &special_random_gaussian_integer_unsigned_pair_gen,
+    )
+}
+
 // -- Integer --
 
 pub fn integer_gen() -> Generator<Integer> {

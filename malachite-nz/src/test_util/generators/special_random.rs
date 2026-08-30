@@ -200,6 +200,134 @@ pub fn special_random_gaussian_integer_gen_var_2(config: &GenConfig) -> It<Gauss
     ))
 }
 
+// -- (GaussianInteger, Integer) --
+
+pub fn special_random_gaussian_integer_integer_pair_gen(
+    config: &GenConfig,
+) -> It<(GaussianInteger, Integer)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_gaussian_integers(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_integers(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+// -- (GaussianInteger, Natural) --
+
+pub fn special_random_gaussian_integer_natural_pair_gen(
+    config: &GenConfig,
+) -> It<(GaussianInteger, Natural)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_gaussian_integers(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_naturals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+// -- (GaussianInteger, PrimitiveFloat) --
+
+pub fn special_random_gaussian_integer_primitive_float_pair_gen<T: PrimitiveFloat>(
+    config: &GenConfig,
+) -> It<(GaussianInteger, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_gaussian_integers(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &random_primitive_floats,
+    ))
+}
+
+// -- (GaussianInteger, PrimitiveSigned) --
+
+pub fn special_random_gaussian_integer_signed_pair_gen<T: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(GaussianInteger, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_gaussian_integers(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_signeds(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+            )
+        },
+    ))
+}
+
+// -- (GaussianInteger, PrimitiveUnsigned) --
+
+pub fn special_random_gaussian_integer_unsigned_pair_gen<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(GaussianInteger, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_gaussian_integers(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_unsigneds(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+            )
+        },
+    ))
+}
+
 // -- Integer --
 
 pub fn special_random_integer_gen(config: &GenConfig) -> It<Integer> {

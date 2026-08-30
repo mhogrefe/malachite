@@ -36,7 +36,10 @@ impl AbsSquared for Float {
     ///
     /// assert_eq!(Float::NAN.abs_squared().to_string(), "NaN");
     /// assert_eq!(Float::INFINITY.abs_squared().to_string(), "Infinity");
-    /// assert_eq!(Float::NEGATIVE_INFINITY.abs_squared().to_string(), "Infinity");
+    /// assert_eq!(
+    ///     Float::NEGATIVE_INFINITY.abs_squared().to_string(),
+    ///     "Infinity"
+    /// );
     /// assert_eq!(Float::from(4.0).abs_squared().to_string(), "16.0");
     /// assert_eq!(Float::from(-1.5).abs_squared().to_string(), "2.0");
     /// ```
@@ -73,7 +76,10 @@ impl AbsSquared for &Float {
     ///
     /// assert_eq!((&Float::NAN).abs_squared().to_string(), "NaN");
     /// assert_eq!((&Float::INFINITY).abs_squared().to_string(), "Infinity");
-    /// assert_eq!((&Float::NEGATIVE_INFINITY).abs_squared().to_string(), "Infinity");
+    /// assert_eq!(
+    ///     (&Float::NEGATIVE_INFINITY).abs_squared().to_string(),
+    ///     "Infinity"
+    /// );
     /// assert_eq!((&Float::from(4.0)).abs_squared().to_string(), "16.0");
     /// assert_eq!((&Float::from(-1.5)).abs_squared().to_string(), "2.0");
     /// ```

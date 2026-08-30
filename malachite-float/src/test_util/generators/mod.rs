@@ -33,9 +33,11 @@ use malachite_base::num::conversion::string::options::{FromSciStringOptions, ToS
 use malachite_base::num::conversion::traits::ConvertibleFrom;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::test_util::generators::common::Generator;
+use malachite_nz::gaussian_integer::GaussianInteger;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_q::Rational;
+use malachite_q::gaussian_rational::GaussianRational;
 use std::cmp::Ordering;
 
 // -- Float --
@@ -2309,6 +2311,26 @@ pub fn float_float_rounding_mode_triple_gen_var_41() -> Generator<(Float, Float,
         &exhaustive_float_float_rounding_mode_triple_gen_var_41,
         &random_float_float_rounding_mode_triple_gen_var_41,
         &special_random_float_float_rounding_mode_triple_gen_var_41,
+    )
+}
+
+// -- (Float, GaussianInteger) --
+
+pub fn float_gaussian_integer_pair_gen() -> Generator<(Float, GaussianInteger)> {
+    Generator::new(
+        &exhaustive_float_gaussian_integer_pair_gen,
+        &random_float_gaussian_integer_pair_gen,
+        &special_random_float_gaussian_integer_pair_gen,
+    )
+}
+
+// -- (Float, GaussianRational) --
+
+pub fn float_gaussian_rational_pair_gen() -> Generator<(Float, GaussianRational)> {
+    Generator::new(
+        &exhaustive_float_gaussian_rational_pair_gen,
+        &random_float_gaussian_rational_pair_gen,
+        &special_random_float_gaussian_rational_pair_gen,
     )
 }
 

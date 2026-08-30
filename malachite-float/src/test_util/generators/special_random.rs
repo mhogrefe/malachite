@@ -107,6 +107,8 @@ use malachite_base::rounding_modes::random::random_rounding_modes;
 use malachite_base::test_util::generators::common::{GenConfig, It, reshape_2_1_to_3};
 use malachite_base::tuples::random::{random_pairs, random_pairs_from_single};
 use malachite_base::vecs::random::{random_vecs, random_vecs_min_length};
+use malachite_nz::gaussian_integer::GaussianInteger;
+use malachite_nz::gaussian_integer::random::striped_random_gaussian_integers;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer::random::striped_random_integers;
 use malachite_nz::natural::Natural;
@@ -116,6 +118,8 @@ use malachite_nz::natural::random::{
 };
 use malachite_nz::platform::Limb;
 use malachite_q::Rational;
+use malachite_q::gaussian_rational::GaussianRational;
+use malachite_q::gaussian_rational::random::striped_random_gaussian_rationals;
 use malachite_q::rational::random::{
     striped_random_non_negative_rationals, striped_random_rationals,
 };
@@ -4436,6 +4440,70 @@ pub fn special_random_float_float_rational_rounding_mode_quadruple_gen_var_2(
         )
         .filter(|(x, y, z, rm)| add_mul_rational_round_valid(x, y, z, *rm, true)),
     )
+}
+
+// -- (Float, GaussianInteger) --
+
+pub fn special_random_float_gaussian_integer_pair_gen(
+    config: &GenConfig,
+) -> It<(Float, GaussianInteger)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_floats(
+                seed,
+                config.get_or("mean_exponent_n", 64),
+                config.get_or("mean_exponent_d", 1),
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_precision_n", 64),
+                config.get_or("mean_precision_d", 1),
+                config.get_or("mean_zero_p_n", 1),
+                config.get_or("mean_zero_p_d", 64),
+            )
+        },
+        &|seed| {
+            striped_random_gaussian_integers(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+// -- (Float, GaussianRational) --
+
+pub fn special_random_float_gaussian_rational_pair_gen(
+    config: &GenConfig,
+) -> It<(Float, GaussianRational)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_floats(
+                seed,
+                config.get_or("mean_exponent_n", 64),
+                config.get_or("mean_exponent_d", 1),
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_precision_n", 64),
+                config.get_or("mean_precision_d", 1),
+                config.get_or("mean_zero_p_n", 1),
+                config.get_or("mean_zero_p_d", 64),
+            )
+        },
+        &|seed| {
+            striped_random_gaussian_rationals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
 }
 
 // -- (Float, Integer) --

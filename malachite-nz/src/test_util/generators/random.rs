@@ -191,6 +191,100 @@ pub fn random_gaussian_integer_gen_var_2(config: &GenConfig) -> It<GaussianInteg
     ))
 }
 
+// -- (GaussianInteger, Integer) --
+
+pub fn random_gaussian_integer_integer_pair_gen(
+    config: &GenConfig,
+) -> It<(GaussianInteger, Integer)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_gaussian_integers(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            random_integers(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+// -- (GaussianInteger, Natural) --
+
+pub fn random_gaussian_integer_natural_pair_gen(
+    config: &GenConfig,
+) -> It<(GaussianInteger, Natural)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_gaussian_integers(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            random_naturals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+// -- (GaussianInteger, PrimitiveFloat) --
+
+pub fn random_gaussian_integer_primitive_float_pair_gen<T: PrimitiveFloat>(
+    config: &GenConfig,
+) -> It<(GaussianInteger, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_gaussian_integers(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            special_random_primitive_floats(
+                seed,
+                config.get_or("exponent_mean_n", 8),
+                config.get_or("exponent_mean_d", 1),
+                config.get_or("precision_mean_n", 8),
+                config.get_or("precision_mean_d", 1),
+                config.get_or("special_p_mean_n", 1),
+                config.get_or("special_p_mean_d", 64),
+            )
+        },
+    ))
+}
+
+// -- (GaussianInteger, PrimitiveInt) --
+
+pub fn random_gaussian_integer_primitive_int_pair_gen<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(GaussianInteger, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_gaussian_integers(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &random_primitive_ints,
+    ))
+}
+
 // -- Integer --
 
 pub fn random_integer_gen(config: &GenConfig) -> It<Integer> {

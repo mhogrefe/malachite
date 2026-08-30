@@ -56,6 +56,8 @@ use malachite_base::tuples::random::{
 use malachite_base::unions::Union2;
 use malachite_base::unions::random::random_union2s;
 use malachite_base::vecs::random::random_vecs;
+use malachite_nz::gaussian_integer::GaussianInteger;
+use malachite_nz::gaussian_integer::random::striped_random_gaussian_integers;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer::random::striped_random_integers;
 use malachite_nz::natural::Natural;
@@ -124,6 +126,190 @@ pub fn special_random_gaussian_rational_gen_var_2(config: &GenConfig) -> It<Gaus
         config.get_or("mean_stripe_d", 1),
         config.get_or("mean_bits_n", 64),
         config.get_or("mean_bits_d", 1),
+    ))
+}
+
+// -- (GaussianRational, GaussianInteger) --
+
+pub fn special_random_gaussian_rational_gaussian_integer_pair_gen(
+    config: &GenConfig,
+) -> It<(GaussianRational, GaussianInteger)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_gaussian_rationals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_gaussian_integers(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+// -- (GaussianRational, Integer) --
+
+pub fn special_random_gaussian_rational_integer_pair_gen(
+    config: &GenConfig,
+) -> It<(GaussianRational, Integer)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_gaussian_rationals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_integers(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+// -- (GaussianRational, Natural) --
+
+pub fn special_random_gaussian_rational_natural_pair_gen(
+    config: &GenConfig,
+) -> It<(GaussianRational, Natural)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_gaussian_rationals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_naturals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+// -- (GaussianRational, PrimitiveFloat) --
+
+pub fn special_random_gaussian_rational_primitive_float_pair_gen<T: PrimitiveFloat>(
+    config: &GenConfig,
+) -> It<(GaussianRational, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_gaussian_rationals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &random_primitive_floats,
+    ))
+}
+
+// -- (GaussianRational, PrimitiveSigned) --
+
+pub fn special_random_gaussian_rational_signed_pair_gen<T: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(GaussianRational, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_gaussian_rationals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_signeds(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+            )
+        },
+    ))
+}
+
+// -- (GaussianRational, PrimitiveUnsigned) --
+
+pub fn special_random_gaussian_rational_unsigned_pair_gen<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(GaussianRational, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_gaussian_rationals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_unsigneds(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+            )
+        },
+    ))
+}
+
+// -- (GaussianRational, Rational) --
+
+pub fn special_random_gaussian_rational_rational_pair_gen(
+    config: &GenConfig,
+) -> It<(GaussianRational, Rational)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_gaussian_rationals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_rationals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
     ))
 }
 

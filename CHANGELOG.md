@@ -69,6 +69,13 @@ documented by git history.
   `GaussianRational`), comparing absolute values — distances from the origin. Componentwise and
   crosswise part comparisons decide most cases; the squared absolute values are only computed
   when both pairings strictly conflict.
+- The full `PartialEq` matrix for the Gaussian types, completing the equality-operator
+  convention that mixed-type comparisons get a full matrix: `GaussianInteger` can be compared
+  with `Integer`, `Natural`, primitive integers, and primitive floats;
+  `GaussianRational` (in malachite-q) with all of those plus `Rational` and `GaussianInteger`;
+  and `Float` (in malachite-float) with both Gaussian types. All comparisons work in both
+  directions. A Gaussian value equals a real one exactly when its imaginary part is zero and
+  its real part is equal; no Gaussian value equals an infinity or NaN.
 - `ComparableGaussianInteger` and `ComparableGaussianIntegerRef`, wrappers around
   `GaussianInteger` (by value and by reference) that implement `Ord`, comparing
   lexicographically: first by real part, then by imaginary part. Since no total order on the

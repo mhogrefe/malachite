@@ -52,6 +52,8 @@ use malachite_base::tuples::exhaustive::{
     exhaustive_triples_xyy_custom_output, lex_pairs,
 };
 use malachite_base::vecs::exhaustive::exhaustive_vecs;
+use malachite_nz::gaussian_integer::GaussianInteger;
+use malachite_nz::gaussian_integer::exhaustive::exhaustive_gaussian_integers;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer::exhaustive::exhaustive_integers;
 use malachite_nz::natural::Natural;
@@ -89,6 +91,73 @@ pub fn exhaustive_gaussian_rational_gen_var_1() -> It<GaussianRational> {
 // All purely imaginary `GaussianRational`s.
 pub fn exhaustive_gaussian_rational_gen_var_2() -> It<GaussianRational> {
     Box::new(exhaustive_imaginary_gaussian_rationals())
+}
+
+// -- (GaussianRational, GaussianInteger) --
+
+pub fn exhaustive_gaussian_rational_gaussian_integer_pair_gen()
+-> It<(GaussianRational, GaussianInteger)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_gaussian_rationals(),
+        exhaustive_gaussian_integers(),
+    ))
+}
+
+// -- (GaussianRational, Integer) --
+
+pub fn exhaustive_gaussian_rational_integer_pair_gen() -> It<(GaussianRational, Integer)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_gaussian_rationals(),
+        exhaustive_integers(),
+    ))
+}
+
+// -- (GaussianRational, Natural) --
+
+pub fn exhaustive_gaussian_rational_natural_pair_gen() -> It<(GaussianRational, Natural)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_gaussian_rationals(),
+        exhaustive_naturals(),
+    ))
+}
+
+// -- (GaussianRational, PrimitiveFloat) --
+
+pub fn exhaustive_gaussian_rational_primitive_float_pair_gen<T: PrimitiveFloat>()
+-> It<(GaussianRational, T)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_gaussian_rationals(),
+        exhaustive_primitive_floats(),
+    ))
+}
+
+// -- (GaussianRational, PrimitiveSigned) --
+
+pub fn exhaustive_gaussian_rational_signed_pair_gen<T: PrimitiveSigned>()
+-> It<(GaussianRational, T)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_gaussian_rationals(),
+        exhaustive_signeds(),
+    ))
+}
+
+// -- (GaussianRational, PrimitiveUnsigned) --
+
+pub fn exhaustive_gaussian_rational_unsigned_pair_gen<T: PrimitiveUnsigned>()
+-> It<(GaussianRational, T)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_gaussian_rationals(),
+        exhaustive_unsigneds(),
+    ))
+}
+
+// -- (GaussianRational, Rational) --
+
+pub fn exhaustive_gaussian_rational_rational_pair_gen() -> It<(GaussianRational, Rational)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_gaussian_rationals(),
+        exhaustive_rationals(),
+    ))
 }
 
 // -- Rational --

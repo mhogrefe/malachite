@@ -73,12 +73,16 @@ use malachite_base::tuples::exhaustive::{
     exhaustive_triples_custom_output, exhaustive_triples_xyy, lex_pairs,
 };
 use malachite_base::vecs::exhaustive::{exhaustive_vecs, exhaustive_vecs_min_length};
+use malachite_nz::gaussian_integer::GaussianInteger;
+use malachite_nz::gaussian_integer::exhaustive::exhaustive_gaussian_integers;
 use malachite_nz::integer::Integer;
 use malachite_nz::integer::exhaustive::exhaustive_integers;
 use malachite_nz::natural::Natural;
 use malachite_nz::natural::exhaustive::exhaustive_naturals;
 use malachite_nz::platform::Limb;
 use malachite_q::Rational;
+use malachite_q::gaussian_rational::GaussianRational;
+use malachite_q::gaussian_rational::exhaustive::exhaustive_gaussian_rationals;
 use malachite_q::rational::exhaustive::{exhaustive_non_negative_rationals, exhaustive_rationals};
 use std::cmp::{Ordering, max};
 use std::iter::Chain;
@@ -2917,6 +2921,24 @@ pub fn exhaustive_float_float_rational_rounding_mode_quadruple_gen_var_2()
         )))
         .filter(|(x, y, z, rm)| add_mul_rational_round_valid(x, y, z, *rm, true)),
     )
+}
+
+// -- (Float, GaussianInteger) --
+
+pub fn exhaustive_float_gaussian_integer_pair_gen() -> It<(Float, GaussianInteger)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_floats(),
+        exhaustive_gaussian_integers(),
+    ))
+}
+
+// -- (Float, GaussianRational) --
+
+pub fn exhaustive_float_gaussian_rational_pair_gen() -> It<(Float, GaussianRational)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_floats(),
+        exhaustive_gaussian_rationals(),
+    ))
 }
 
 // -- (Float, Integer) --

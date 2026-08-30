@@ -158,6 +158,8 @@ pub mod float {
         pub mod partial_cmp_primitive_float;
         pub mod partial_cmp_primitive_int;
         pub mod partial_cmp_rational;
+        pub mod partial_eq_gaussian_integer;
+        pub mod partial_eq_gaussian_rational;
         pub mod partial_eq_integer;
         pub mod partial_eq_natural;
         pub mod partial_eq_primitive_float;
