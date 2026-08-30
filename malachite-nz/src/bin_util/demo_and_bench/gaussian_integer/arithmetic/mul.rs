@@ -9,9 +9,15 @@
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::runner::Runner;
-use malachite_nz::test_util::bench::bucketers::pair_gaussian_integer_max_bit_bucketer;
-use malachite_nz::test_util::gaussian_integer::arithmetic::mul::gaussian_integer_mul_naive;
-use malachite_nz::test_util::generators::gaussian_integer_pair_gen;
+use malachite_nz::gaussian_integer::GaussianInteger;
+use malachite_nz::test_util::bench::bucketers::{
+    pair_gaussian_integer_max_bit_bucketer, vec_gaussian_integer_sum_bits_bucketer,
+};
+use malachite_nz::test_util::gaussian_integer::arithmetic::mul::{
+    gaussian_integer_mul_naive, gaussian_integer_product_naive,
+};
+use malachite_nz::test_util::generators::{gaussian_integer_pair_gen, gaussian_integer_vec_gen};
+use std::iter::Product;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_gaussian_integer_mul);
@@ -20,12 +26,19 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_gaussian_integer_mul_ref_ref);
     register_demo!(runner, demo_gaussian_integer_mul_assign);
     register_demo!(runner, demo_gaussian_integer_mul_assign_ref);
+    register_demo!(runner, demo_gaussian_integer_product);
+    register_demo!(runner, demo_gaussian_integer_ref_product);
 
     register_bench!(runner, benchmark_gaussian_integer_mul_algorithms);
     register_bench!(runner, benchmark_gaussian_integer_mul_evaluation_strategy);
     register_bench!(
         runner,
         benchmark_gaussian_integer_mul_assign_evaluation_strategy
+    );
+    register_bench!(runner, benchmark_gaussian_integer_product_algorithms);
+    register_bench!(
+        runner,
+        benchmark_gaussian_integer_product_evaluation_strategy
     );
 }
 
@@ -154,6 +167,82 @@ fn benchmark_gaussian_integer_mul_assign_evaluation_strategy(
             ("GaussianInteger *= &GaussianInteger", &mut |(mut x, y)| {
                 no_out!(x *= &y);
             }),
+        ],
+    );
+}
+
+fn demo_gaussian_integer_product(gm: GenMode, config: &GenConfig, limit: usize) {
+    for xs in gaussian_integer_vec_gen().get(gm, config).take(limit) {
+        println!(
+            "product({:?}) = {}",
+            xs.clone(),
+            GaussianInteger::product(xs.into_iter())
+        );
+    }
+}
+
+fn demo_gaussian_integer_ref_product(gm: GenMode, config: &GenConfig, limit: usize) {
+    for xs in gaussian_integer_vec_gen().get(gm, config).take(limit) {
+        println!(
+            "product({:?}) = {}",
+            xs,
+            GaussianInteger::product(xs.iter())
+        );
+    }
+}
+
+fn benchmark_gaussian_integer_product_algorithms(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "GaussianInteger::product(Iterator<Item=GaussianInteger>)",
+        BenchmarkType::Algorithms,
+        gaussian_integer_vec_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &vec_gaussian_integer_sum_bits_bucketer(),
+        &mut [
+            ("default", &mut |xs| {
+                no_out!(GaussianInteger::product(xs.into_iter()));
+            }),
+            ("naive", &mut |xs| {
+                no_out!(gaussian_integer_product_naive(xs.into_iter()));
+            }),
+        ],
+    );
+}
+
+fn benchmark_gaussian_integer_product_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "GaussianInteger::product(Iterator<Item=GaussianInteger>)",
+        BenchmarkType::EvaluationStrategy,
+        gaussian_integer_vec_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &vec_gaussian_integer_sum_bits_bucketer(),
+        &mut [
+            (
+                "GaussianInteger::product(Iterator<Item=GaussianInteger>)",
+                &mut |xs| {
+                    no_out!(GaussianInteger::product(xs.into_iter()));
+                },
+            ),
+            (
+                "GaussianInteger::product(Iterator<Item=&GaussianInteger>)",
+                &mut |xs| {
+                    no_out!(GaussianInteger::product(xs.iter()));
+                },
+            ),
         ],
     );
 }

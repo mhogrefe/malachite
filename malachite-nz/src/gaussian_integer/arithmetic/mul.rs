@@ -12,9 +12,12 @@
 
 use crate::gaussian_integer::GaussianInteger;
 use crate::integer::Integer;
+use core::iter::Product;
 use core::mem::take;
 use core::ops::{Mul, MulAssign};
+use malachite_base::iterators::balanced_fold;
 use malachite_base::num::arithmetic::traits::{MulAddMul, MulSubMul, Square};
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::logic::traits::SignificantBits;
 
 use crate::gaussian_integer::arithmetic::SIZE_BALANCE_BITS;
@@ -350,5 +353,86 @@ impl MulAssign<&Self> for GaussianInteger {
     #[inline]
     fn mul_assign(&mut self, other: &Self) {
         *self = mul_val_ref(take(self), other);
+    }
+}
+
+impl Product for GaussianInteger {
+    /// Multiplies together all the [`GaussianInteger`]s in an iterator.
+    ///
+    /// $$
+    /// f((x_i)_ {i=0}^{n-1}) = \prod_ {i=0}^{n-1} x_i.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of significant bits
+    /// of the real and imaginary parts of the [`GaussianInteger`]s.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::iter::Product;
+    /// use malachite_base::vecs::vec_from_str;
+    /// use malachite_nz::gaussian_integer::GaussianInteger;
+    ///
+    /// assert_eq!(
+    ///     GaussianInteger::product(
+    ///         vec_from_str::<GaussianInteger>("[2, -3i, 5+i, 7-2i]")
+    ///             .unwrap()
+    ///             .into_iter()
+    ///     )
+    ///     .to_string(),
+    ///     "-18-222i"
+    /// );
+    /// ```
+    #[inline]
+    fn product<I>(xs: I) -> Self
+    where
+        I: Iterator<Item = Self>,
+    {
+        balanced_fold(xs, |x| *x == Self::ZERO, |a, b| *a *= b).unwrap_or(Self::ONE)
+    }
+}
+
+impl<'a> Product<&'a Self> for GaussianInteger {
+    /// Multiplies together all the [`GaussianInteger`]s in an iterator of [`GaussianInteger`]
+    /// references.
+    ///
+    /// $$
+    /// f((x_i)_ {i=0}^{n-1}) = \prod_ {i=0}^{n-1} x_i.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n (\log n)^2 \log\log n)$
+    ///
+    /// $M(n) = O(n \log n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is the total number of significant bits
+    /// of the real and imaginary parts of the [`GaussianInteger`]s.
+    ///
+    /// # Examples
+    /// ```
+    /// use core::iter::Product;
+    /// use malachite_base::vecs::vec_from_str;
+    /// use malachite_nz::gaussian_integer::GaussianInteger;
+    ///
+    /// assert_eq!(
+    ///     GaussianInteger::product(
+    ///         vec_from_str::<GaussianInteger>("[2, -3i, 5+i, 7-2i]")
+    ///             .unwrap()
+    ///             .iter()
+    ///     )
+    ///     .to_string(),
+    ///     "-18-222i"
+    /// );
+    /// ```
+    #[inline]
+    fn product<I>(xs: I) -> Self
+    where
+        I: Iterator<Item = &'a Self>,
+    {
+        balanced_fold(xs.cloned(), |x| *x == Self::ZERO, |a, b| *a *= b).unwrap_or(Self::ONE)
     }
 }

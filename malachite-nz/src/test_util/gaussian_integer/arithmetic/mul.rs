@@ -8,6 +8,7 @@
 
 use crate::gaussian_integer::GaussianInteger;
 use malachite_base::num::arithmetic::traits::{MulAddMul, MulSubMul};
+use malachite_base::num::basic::traits::{One, Zero};
 
 // A reference implementation of Gaussian-integer multiplication: the four products, via the fused
 // kernels, with no size-based special cases. Any multiplication algorithm agrees with it.
@@ -16,4 +17,17 @@ pub fn gaussian_integer_mul_naive(x: &GaussianInteger, y: &GaussianInteger) -> G
         real: (&x.real).mul_sub_mul(&y.real, &x.imaginary, &y.imaginary),
         imaginary: (&x.real).mul_add_mul(&y.imaginary, &x.imaginary, &y.real),
     }
+}
+
+pub fn gaussian_integer_product_naive<I: Iterator<Item = GaussianInteger>>(
+    xs: I,
+) -> GaussianInteger {
+    let mut p = GaussianInteger::ONE;
+    for x in xs {
+        if x == GaussianInteger::ZERO {
+            return GaussianInteger::ZERO;
+        }
+        p *= x;
+    }
+    p
 }

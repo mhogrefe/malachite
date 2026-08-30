@@ -9,12 +9,17 @@
 use malachite_base::num::arithmetic::traits::{AbsSquared, Conjugate, PowerOf2};
 use malachite_base::num::basic::traits::{I, NegativeOne, One, Zero};
 use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::vecs::vec_from_str;
 use malachite_nz::gaussian_integer::GaussianInteger;
 use malachite_nz::integer::Integer;
-use malachite_nz::test_util::gaussian_integer::arithmetic::mul::gaussian_integer_mul_naive;
+use malachite_nz::test_util::gaussian_integer::arithmetic::mul::{
+    gaussian_integer_mul_naive, gaussian_integer_product_naive,
+};
 use malachite_nz::test_util::generators::{
     gaussian_integer_gen, gaussian_integer_pair_gen, gaussian_integer_triple_gen,
+    gaussian_integer_vec_gen, integer_vec_gen,
 };
+use std::iter::{Product, once};
 use std::str::FromStr;
 
 #[test]
@@ -193,4 +198,83 @@ fn test_mul_branch_coverage() {
         gi(big(900, 3), -big(901, 17)),
         gi(big(950, -1), Integer::from(-2)),
     );
+}
+
+#[test]
+fn test_product() {
+    let test = |xs, out: &str| {
+        let xs = vec_from_str::<GaussianInteger>(xs).unwrap();
+        let product = GaussianInteger::product(xs.iter().cloned());
+        assert!(product.real.is_valid());
+        assert!(product.imaginary.is_valid());
+        assert_eq!(product.to_string(), out);
+
+        let product_alt = GaussianInteger::product(xs.iter());
+        assert!(product_alt.real.is_valid());
+        assert!(product_alt.imaginary.is_valid());
+        assert_eq!(product_alt, product);
+
+        let product_alt = gaussian_integer_product_naive(xs.into_iter());
+        assert!(product_alt.real.is_valid());
+        assert!(product_alt.imaginary.is_valid());
+        assert_eq!(product_alt, product);
+    };
+    test("[]", "1");
+    test("[10]", "10");
+    test("[i]", "i");
+    test("[i, i]", "-1");
+    test("[i, i, i]", "-i");
+    test("[i, i, i, i]", "1");
+    test("[2-3i, -1+4i]", "10+11i");
+    test("[2, -3i, 5+i, 7-2i]", "-18-222i");
+    test("[1000000000000+i, 0, 234i]", "0");
+    test("[123+456i, -23-56i]", "22707-17376i");
+}
+
+#[test]
+fn product_properties() {
+    gaussian_integer_vec_gen().test_properties(|xs| {
+        let product = GaussianInteger::product(xs.iter().cloned());
+        assert!(product.real.is_valid());
+        assert!(product.imaginary.is_valid());
+
+        let product_alt = GaussianInteger::product(xs.iter());
+        assert!(product_alt.real.is_valid());
+        assert!(product_alt.imaginary.is_valid());
+        assert_eq!(product_alt, product);
+
+        // Conjugation distributes over products.
+        assert_eq!(
+            GaussianInteger::product(xs.iter().map(Conjugate::conjugate)),
+            (&product).conjugate()
+        );
+        // The norm is multiplicative.
+        assert_eq!(
+            Integer::product(xs.iter().map(AbsSquared::abs_squared)),
+            (&product).abs_squared()
+        );
+
+        let product_alt = gaussian_integer_product_naive(xs.into_iter());
+        assert!(product_alt.real.is_valid());
+        assert!(product_alt.imaginary.is_valid());
+        assert_eq!(product_alt, product);
+    });
+
+    gaussian_integer_gen().test_properties(|x| {
+        assert_eq!(GaussianInteger::product(once(&x)), x);
+        assert_eq!(GaussianInteger::product(once(x.clone())), x);
+    });
+
+    gaussian_integer_pair_gen().test_properties(|(x, y)| {
+        let product = &x * &y;
+        assert_eq!(GaussianInteger::product([&x, &y].into_iter()), product);
+        assert_eq!(GaussianInteger::product([x, y].into_iter()), product);
+    });
+
+    integer_vec_gen().test_properties(|xs| {
+        assert_eq!(
+            GaussianInteger::product(xs.iter().cloned().map(GaussianInteger::from)),
+            GaussianInteger::from(Integer::product(xs.into_iter()))
+        );
+    });
 }
