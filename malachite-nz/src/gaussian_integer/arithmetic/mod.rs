@@ -16,6 +16,8 @@ pub mod add;
 /// [`ConjugateAssign`](malachite_base::num::arithmetic::traits::ConjugateAssign), traits for
 /// computing the complex conjugate of a number: the sign of the imaginary part is flipped.
 pub mod conjugate;
+/// Multiplication of [`GaussianInteger`](crate::gaussian_integer::GaussianInteger)s.
+pub mod mul;
 /// Implementations of [`Neg`](core::ops::Neg) and
 /// [`NegAssign`](malachite_base::num::arithmetic::traits::NegAssign) for
 /// [`GaussianInteger`](crate::gaussian_integer::GaussianInteger), negating both the real and

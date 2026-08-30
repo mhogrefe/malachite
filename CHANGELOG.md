@@ -43,7 +43,12 @@ documented by git history.
 - The first arithmetic operations for the Gaussian types: `Neg` and `NegAssign` (negating both
   parts), `Conjugate` and `ConjugateAssign` (flipping the sign of the imaginary part), and
   componentwise addition and subtraction — `Add`, `Sub`, `AddAssign`, and `SubAssign`, in all
-  the usual ownership variants — for `GaussianInteger` and `GaussianRational`.
+  the usual ownership variants — and multiplication (`Mul` and `MulAssign`) for
+  `GaussianInteger` and `GaussianRational`. `GaussianInteger` multiplication uses FLINT's
+  `fmpzi_mul` strategy: double-word arithmetic when all four parts fit in a signed word, a
+  three-multiplication Karatsuba scheme for large balanced operands, and the fused
+  `mul_add_mul`/`mul_sub_mul` kernels otherwise; `GaussianRational` multiplication uses the
+  fused kernels.
 - `OrdAbs` and `PartialOrdAbs` implementations for `GaussianInteger` (and, in malachite-q, for
   `GaussianRational`), comparing absolute values — distances from the origin. Componentwise and
   crosswise part comparisons decide most cases; the squared absolute values are only computed

@@ -70,6 +70,7 @@ pub mod gaussian_integer {
         pub mod abs_squared;
         pub mod add;
         pub mod conjugate;
+        pub mod mul;
         pub mod neg;
         pub mod sub;
     }
