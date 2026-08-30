@@ -112,6 +112,8 @@ fn sub_properties() {
         assert_eq!(Integer::ZERO - x, -x);
         assert_eq!(x - -x, x << 1);
         assert_eq!(x - x, 0);
+        // The same value through distinct references takes the general path.
+        assert_eq!(x - &x.clone(), 0);
     });
 
     natural_pair_gen().test_properties(|(x, y)| {

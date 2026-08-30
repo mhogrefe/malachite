@@ -32,6 +32,11 @@ documented by git history.
 
 ### malachite-nz
 
+- Multiplying a `Natural`, `Integer`, `Rational`, or `Float` by itself through aliased
+  references (`&x * &x`) now routes to the squaring algorithm, which is faster, and adding a
+  `Float` to itself through aliased references routes to a doubling shift. This extends an
+  existing convention: several operations, such as `Integer` and `Natural` addition and
+  `Natural`'s modular operations, already detect aliased operands and take shortcuts.
 - A new `GaussianInteger` type, parallel to `Natural` and `Integer`: a pair of public `Integer`
   fields `real` and `imaginary`, always valid. So far it has the constants 0, 1, 2, -1, i, and
   -i; `Display` and `FromStr` (strict about term structure, permissive about degenerate

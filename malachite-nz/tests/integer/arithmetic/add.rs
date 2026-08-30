@@ -139,6 +139,8 @@ fn add_properties() {
         assert_eq!(x + Integer::ZERO, *x);
         assert_eq!(Integer::ZERO + x, *x);
         assert_eq!(x + x, x << 1);
+        // The same value through distinct references takes the general path.
+        assert_eq!(x + &x.clone(), x << 1);
         assert_eq!(x + (-x), 0);
     });
 

@@ -46,5 +46,7 @@ fn abs_squared_properties() {
         assert_eq!(x_alt, abs_squared);
         assert_eq!((&x).square(), abs_squared);
         assert_eq!(&x * &x, abs_squared);
+        // The same value through distinct references takes the general multiplication path.
+        assert_eq!(&x * &x.clone(), abs_squared);
     });
 }

@@ -55,6 +55,8 @@ fn square_properties() {
         assert_eq!(mut_x, square);
 
         assert_eq!(&x * &x, square);
+        // The same value through distinct references takes the general multiplication path.
+        assert_eq!(&x * &x.clone(), square);
         assert_eq!((-&x).square(), square);
         assert!(square >= 0);
         assert!(square >= x);

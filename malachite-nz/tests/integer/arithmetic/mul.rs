@@ -203,6 +203,8 @@ fn mul_properties() {
     });
 
     integer_gen().test_properties(|ref x| {
+        // Aliased references are detected and routed through the squaring algorithm.
+        assert_eq!(x * x, x * &x.clone());
         assert_eq!(x * Integer::ZERO, 0);
         assert_eq!(Integer::ZERO * x, 0);
         assert_eq!(x * Integer::ONE, *x);

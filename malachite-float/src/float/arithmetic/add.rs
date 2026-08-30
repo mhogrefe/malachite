@@ -4453,6 +4453,12 @@ impl Add<&Float> for &Float {
     /// ```
     #[inline]
     fn add(self, other: &Float) -> Float {
+        // Aliased operands are detected by address and routed to a doubling shift, which produces
+        // the same result: doubling is exact until the exponent overflows, and `<<` applies the
+        // same `Nearest` overflow behavior as addition.
+        if core::ptr::eq(self, other) {
+            return self << 1u64;
+        }
         let prec = max(self.significant_bits(), other.significant_bits());
         self.add_prec_round_ref_ref(other, prec, Nearest).0
     }

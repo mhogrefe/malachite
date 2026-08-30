@@ -21,7 +21,7 @@ use core::cmp::{
 use core::mem::swap;
 use core::ops::{Mul, MulAssign};
 use malachite_base::num::arithmetic::traits::{
-    CheckedLogBase2, FloorLogBase2, IsPowerOf2, NegAssign, Sign,
+    CheckedLogBase2, FloorLogBase2, IsPowerOf2, NegAssign, Sign, Square,
 };
 use malachite_base::num::basic::traits::{NegativeZero, Zero as ZeroTrait};
 use malachite_base::num::conversion::traits::ExactFrom;
@@ -4506,6 +4506,11 @@ impl Mul<&Float> for &Float {
     /// ```
     #[inline]
     fn mul(self, other: &Float) -> Float {
+        // Aliased operands are detected by address and routed to the squaring algorithm, which
+        // produces the same result.
+        if core::ptr::eq(self, other) {
+            return self.square();
+        }
         let prec = max(self.significant_bits(), other.significant_bits());
         self.mul_prec_round_ref_ref(other, prec, Nearest).0
     }

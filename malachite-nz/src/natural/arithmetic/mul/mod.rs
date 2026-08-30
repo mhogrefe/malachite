@@ -47,6 +47,7 @@ use alloc::vec::Vec;
 use core::iter::Product;
 use core::ops::{Mul, MulAssign};
 use malachite_base::iterators::balanced_fold;
+use malachite_base::num::arithmetic::traits::Square;
 use malachite_base::num::basic::traits::One;
 
 const MUL_TOOM33_THRESHOLD_LIMIT_MINUS_1: usize = MUL_TOOM33_THRESHOLD_LIMIT - 1;
@@ -719,6 +720,11 @@ impl Mul<&Natural> for &Natural {
     /// );
     /// ```
     fn mul(self, other: &Natural) -> Natural {
+        // Aliased operands are detected by address and routed to the squaring algorithm, which
+        // produces the same result.
+        if core::ptr::eq(self, other) {
+            return self.square();
+        }
         match (self, other) {
             (Natural(Small(x)), y) => y.mul_limb_ref(*x),
             (x, Natural(Small(y))) => x.mul_limb_ref(*y),

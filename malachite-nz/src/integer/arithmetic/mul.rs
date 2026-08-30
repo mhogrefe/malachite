@@ -10,6 +10,7 @@ use crate::integer::Integer;
 use core::iter::Product;
 use core::ops::{Mul, MulAssign};
 use malachite_base::iterators::balanced_fold;
+use malachite_base::num::arithmetic::traits::Square;
 use malachite_base::num::basic::traits::One;
 
 impl Mul<Self> for Integer {
@@ -151,6 +152,11 @@ impl Mul<&Integer> for &Integer {
     /// );
     /// ```
     fn mul(self, other: &Integer) -> Integer {
+        // Aliased operands are detected by address and routed to the squaring algorithm, which
+        // produces the same result.
+        if core::ptr::eq(self, other) {
+            return self.square();
+        }
         let product_abs = &self.abs * &other.abs;
         Integer {
             sign: self.sign == other.sign || product_abs == 0,

@@ -447,6 +447,8 @@ fn mod_power_of_2_sub_properties() {
             (&x).mod_power_of_2_neg(pow)
         );
         assert_eq!((&x).mod_power_of_2_sub(&x, pow), 0);
+        // The same value through distinct references takes the general path.
+        assert_eq!((&x).mod_power_of_2_sub(&x.clone(), pow), 0);
     });
 
     unsigned_triple_gen_var_11::<Limb>().test_properties(|(x, y, pow)| {

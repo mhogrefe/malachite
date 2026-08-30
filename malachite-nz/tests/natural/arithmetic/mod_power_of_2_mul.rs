@@ -274,6 +274,11 @@ fn mod_power_of_2_mul_properties() {
             assert_eq!(Natural::ONE.mod_power_of_2_mul(x, pow), *x);
         }
         assert_eq!(x.mod_power_of_2_mul(x, pow), x.mod_power_of_2_square(pow));
+        // The same value through distinct references takes the general path.
+        assert_eq!(
+            x.mod_power_of_2_mul(&x.clone(), pow),
+            x.mod_power_of_2_square(pow)
+        );
     });
 
     natural_natural_natural_unsigned_quadruple_gen_var_2().test_properties(

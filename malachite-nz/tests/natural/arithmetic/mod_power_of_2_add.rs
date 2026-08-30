@@ -527,6 +527,11 @@ fn mod_power_of_2_add_properties() {
     natural_unsigned_pair_gen_var_11().test_properties(|(x, pow)| {
         assert_eq!((&x).mod_power_of_2_add(Natural::ZERO, pow), x);
         assert_eq!(Natural::ZERO.mod_power_of_2_add(&x, pow), x);
+        // The same value through distinct references takes the general path.
+        assert_eq!(
+            (&x).mod_power_of_2_add(&x.clone(), pow),
+            (&x).mod_power_of_2_shl(1, pow)
+        );
         assert_eq!(
             (&x).mod_power_of_2_add(&x, pow),
             x.mod_power_of_2_shl(1, pow)

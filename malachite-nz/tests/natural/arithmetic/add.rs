@@ -1186,6 +1186,8 @@ fn add_properties() {
     natural_gen().test_properties(|x| {
         assert_eq!(&x + Natural::ZERO, x);
         assert_eq!(Natural::ZERO + &x, x);
+        // The same value through distinct references takes the general addition path.
+        assert_eq!(&x + &x.clone(), &x << 1);
         assert_eq!(&x + &x, x << 1);
     });
 

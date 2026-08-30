@@ -3524,6 +3524,8 @@ fn test_square() {
         assert_eq!(n, square);
 
         assert_eq!(&u * &u, square);
+        // The same value through distinct references takes the general multiplication path.
+        assert_eq!(&u * &u.clone(), square);
     };
     // - x.squaring in fft_worker_func
     // - in sd_fft_ctx_point_sqr
@@ -13386,6 +13388,8 @@ fn sign_properties() {
         assert_eq!(mut_x, square);
 
         assert_eq!(&x * &x, square);
+        // The same value through distinct references takes the general multiplication path.
+        assert_eq!(&x * &x.clone(), square);
         assert!(square >= x);
         assert_eq!((&square).checked_sqrt().unwrap(), x);
         if x > 1 {

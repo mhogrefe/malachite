@@ -33,9 +33,9 @@ use malachite_float::test_util::generators::{
     float_float_rounding_mode_triple_gen_var_9, float_float_rounding_mode_triple_gen_var_29,
     float_float_unsigned_rounding_mode_quadruple_gen_var_1,
     float_float_unsigned_rounding_mode_quadruple_gen_var_5, float_float_unsigned_triple_gen_var_1,
-    float_float_unsigned_triple_gen_var_2, float_gen, float_pair_gen, float_pair_gen_var_2,
-    float_pair_gen_var_3, float_pair_gen_var_4, float_pair_gen_var_5, float_pair_gen_var_6,
-    float_pair_gen_var_7, float_pair_gen_var_10, float_rational_pair_gen,
+    float_float_unsigned_triple_gen_var_2, float_gen, float_gen_var_12, float_pair_gen,
+    float_pair_gen_var_2, float_pair_gen_var_3, float_pair_gen_var_4, float_pair_gen_var_5,
+    float_pair_gen_var_6, float_pair_gen_var_7, float_pair_gen_var_10, float_rational_pair_gen,
     float_rational_pair_gen_var_2, float_rational_rounding_mode_triple_gen_var_1,
     float_rational_rounding_mode_triple_gen_var_8,
     float_rational_unsigned_rounding_mode_quadruple_gen_var_1,
@@ -10245,6 +10245,11 @@ fn add_properties() {
             ComparableFloatRef(&(Float::NEGATIVE_ZERO + &x)),
             ComparableFloatRef(&x)
         );
+        // The same value through distinct references takes the general addition path.
+        assert_eq!(
+            ComparableFloat(&x + &x.clone()),
+            ComparableFloat(&x << 1u64)
+        );
         assert_eq!(ComparableFloat(&x + &x), ComparableFloat(x << 1u64));
     });
 }
@@ -10890,5 +10895,15 @@ fn add_rational_properties() {
             ComparableFloat((Float::NEGATIVE_ZERO + &x).abs_negative_zero()),
             ComparableFloat(sum_alt.abs_negative_zero())
         );
+    });
+}
+
+#[test]
+fn add_aliased_properties() {
+    // Aliased references are detected and routed through a doubling shift. The extreme generator
+    // reaches exponents where both the shift and the general addition overflow to infinity, so the
+    // two paths must agree there too.
+    float_gen_var_12().test_properties(|x| {
+        assert_eq!(ComparableFloat(&x + &x), ComparableFloat(&x + &x.clone()));
     });
 }

@@ -14,7 +14,7 @@ use crate::Rational;
 use core::iter::Product;
 use core::ops::{Mul, MulAssign};
 use malachite_base::iterators::balanced_fold;
-use malachite_base::num::arithmetic::traits::{DivExact, DivExactAssign, Gcd};
+use malachite_base::num::arithmetic::traits::{DivExact, DivExactAssign, Gcd, Square};
 use malachite_base::num::basic::traits::{One, Zero};
 
 impl Mul<Self> for Rational {
@@ -172,6 +172,11 @@ impl Mul<&Rational> for &Rational {
     /// );
     /// ```
     fn mul(self, other: &Rational) -> Rational {
+        // Aliased operands are detected by address and routed to the squaring algorithm, which
+        // produces the same result.
+        if core::ptr::eq(self, other) {
+            return self.square();
+        }
         if *self == 0u32 || *other == 0u32 {
             return Rational::ZERO;
         } else if *self == 1u32 {

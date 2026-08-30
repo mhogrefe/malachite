@@ -13010,6 +13010,8 @@ fn mod_properties() {
 
     natural_gen_var_2().test_properties(|ref n| {
         assert_eq!(n % n, 0);
+        // The same value through distinct references takes the general path.
+        assert_eq!(n % &n.clone(), 0);
         assert_eq!(Natural::ZERO % n, 0);
         if *n > 1 {
             assert_eq!(Natural::ONE % n, 1);

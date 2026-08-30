@@ -11301,6 +11301,8 @@ fn mul_properties() {
     apply_fn_to_primitive_floats!(mul_properties_helper_2);
 
     float_gen().test_properties(|x| {
+        // Aliased references are detected and routed through the squaring algorithm.
+        assert_eq!(ComparableFloat(&x * &x), ComparableFloat(&x * &x.clone()));
         assert!((&x * Float::NAN).is_nan());
         assert!((Float::NAN * &x).is_nan());
         if !x.is_nan() {
