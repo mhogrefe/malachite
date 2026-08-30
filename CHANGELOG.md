@@ -76,6 +76,14 @@ documented by git history.
   and `Float` (in malachite-float) with both Gaussian types. All comparisons work in both
   directions. A Gaussian value equals a real one exactly when its imaginary part is zero and
   its real part is equal; no Gaussian value equals an infinity or NaN.
+- The same matrix for `EqAbs`, testing whether absolute values — for complex numbers, distances
+  from the origin — are equal, so that $3+4i$ is equal in absolute value to $5$. Comparisons
+  against other Gaussian values delegate to the `OrdAbs` screens, and comparisons against real
+  values only compute squared absolute values when both components are smaller in absolute
+  value than the real operand, mirroring the `OrdAbs` strategy of computing squares only as a
+  last resort. A non-integer float can never equal a Gaussian integer's absolute value (its odd
+  mantissa squares to an odd numerator), and infinities and NaN are never equal in absolute
+  value to anything.
 - `ComparableGaussianInteger` and `ComparableGaussianIntegerRef`, wrappers around
   `GaussianInteger` (by value and by reference) that implement `Ord`, comparing
   lexicographically: first by real part, then by imaginary part. Since no total order on the

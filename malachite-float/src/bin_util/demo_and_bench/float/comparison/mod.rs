@@ -13,6 +13,8 @@ pub(crate) fn register(runner: &mut Runner) {
     cmp_abs::register(runner);
     eq::register(runner);
     eq_abs::register(runner);
+    eq_abs_gaussian_integer::register(runner);
+    eq_abs_gaussian_rational::register(runner);
     eq_abs_integer::register(runner);
     eq_abs_natural::register(runner);
     eq_abs_primitive_float::register(runner);
@@ -43,6 +45,8 @@ mod cmp;
 mod cmp_abs;
 mod eq;
 mod eq_abs;
+mod eq_abs_gaussian_integer;
+mod eq_abs_gaussian_rational;
 mod eq_abs_integer;
 mod eq_abs_natural;
 mod eq_abs_primitive_float;

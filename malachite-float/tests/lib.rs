@@ -141,6 +141,8 @@ pub mod float {
         pub mod cmp_abs;
         pub mod eq;
         pub mod eq_abs;
+        pub mod eq_abs_gaussian_integer;
+        pub mod eq_abs_gaussian_rational;
         pub mod eq_abs_integer;
         pub mod eq_abs_natural;
         pub mod eq_abs_primitive_float;

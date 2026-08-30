@@ -17,6 +17,67 @@ pub mod cmp;
 /// [`GaussianRational`](crate::gaussian_rational::GaussianRational), comparing absolute values
 /// (distances from the origin).
 pub mod cmp_abs;
+/// An implementation of [`EqAbs`](malachite_base::num::comparison::traits::EqAbs) for
+/// [`GaussianRational`](crate::gaussian_rational::GaussianRational), comparing absolute values
+/// (distances from the origin) for equality.
+pub mod eq_abs;
+/// Implementations of [`EqAbs`](malachite_base::num::comparison::traits::EqAbs) for comparing the
+/// absolute values of a [`GaussianRational`](crate::gaussian_rational::GaussianRational) and a
+/// [`GaussianInteger`](malachite_nz::gaussian_integer::GaussianInteger) for equality.
+pub mod eq_abs_gaussian_integer;
+/// Implementations of [`EqAbs`](malachite_base::num::comparison::traits::EqAbs) for comparing the
+/// absolute values of a [`GaussianRational`](crate::gaussian_rational::GaussianRational) and an
+/// [`Integer`](malachite_nz::integer::Integer) for equality.
+pub mod eq_abs_integer;
+/// Implementations of [`EqAbs`](malachite_base::num::comparison::traits::EqAbs) for comparing the
+/// absolute values of a [`GaussianRational`](crate::gaussian_rational::GaussianRational) and a
+/// [`Natural`](malachite_nz::natural::Natural) for equality.
+pub mod eq_abs_natural;
+/// Implementations of [`EqAbs`](malachite_base::num::comparison::traits::EqAbs) for comparing the
+/// absolute values of a [`GaussianRational`](crate::gaussian_rational::GaussianRational) and a
+/// primitive float for equality.
+///
+/// # eq_abs
+/// ```
+/// use malachite_base::num::comparison::traits::EqAbs;
+/// use malachite_q::gaussian_rational::GaussianRational;
+/// use std::str::FromStr;
+///
+/// // |3/10+2i/5| = 1/2
+/// let x = GaussianRational::from_str("3/10+2i/5").unwrap();
+/// assert!(x.eq_abs(&-0.5f32));
+/// assert_eq!(x.eq_abs(&0.4f32), false);
+/// assert_eq!(x.eq_abs(&f32::NAN), false);
+///
+/// assert!((-0.5f32).eq_abs(&x));
+/// assert_eq!(0.4f32.eq_abs(&x), false);
+/// ```
+pub mod eq_abs_primitive_float;
+/// Implementations of [`EqAbs`](malachite_base::num::comparison::traits::EqAbs) for comparing the
+/// absolute values of a [`GaussianRational`](crate::gaussian_rational::GaussianRational) and a
+/// primitive integer for equality.
+///
+/// # eq_abs
+/// ```
+/// use malachite_base::num::comparison::traits::EqAbs;
+/// use malachite_q::gaussian_rational::GaussianRational;
+/// use std::str::FromStr;
+///
+/// // |3/5+4i/5| = 1
+/// let x = GaussianRational::from_str("3/5+4i/5").unwrap();
+/// assert!(x.eq_abs(&1u32));
+/// assert_eq!(x.eq_abs(&2u32), false);
+/// assert!(x.eq_abs(&-1i32));
+///
+/// assert!(1u32.eq_abs(&x));
+/// assert!((-1i32).eq_abs(&x));
+/// assert_eq!(2u32.eq_abs(&x), false);
+/// ```
+pub mod eq_abs_primitive_int;
+/// Implementations of [`EqAbs`](malachite_base::num::comparison::traits::EqAbs) for comparing the
+/// absolute values of a [`GaussianRational`](crate::gaussian_rational::GaussianRational) and a
+/// [`Rational`](crate::Rational) for equality.
+pub mod eq_abs_rational;
 /// Equality of [`GaussianRational`](crate::gaussian_rational::GaussianRational)s and
 /// [`GaussianInteger`](malachite_nz::gaussian_integer::GaussianInteger)s.
 pub mod partial_eq_gaussian_integer;

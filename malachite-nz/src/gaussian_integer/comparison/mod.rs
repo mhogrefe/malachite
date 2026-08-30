@@ -17,6 +17,59 @@ pub mod cmp;
 /// [`GaussianInteger`](crate::gaussian_integer::GaussianInteger), comparing absolute values
 /// (distances from the origin).
 pub mod cmp_abs;
+/// An implementation of [`EqAbs`](malachite_base::num::comparison::traits::EqAbs) for
+/// [`GaussianInteger`](crate::gaussian_integer::GaussianInteger), comparing absolute values
+/// (distances from the origin) for equality.
+pub mod eq_abs;
+/// Implementations of [`EqAbs`](malachite_base::num::comparison::traits::EqAbs) for comparing the
+/// absolute values of a [`GaussianInteger`](crate::gaussian_integer::GaussianInteger) and an
+/// [`Integer`](crate::integer::Integer) for equality.
+pub mod eq_abs_integer;
+/// Implementations of [`EqAbs`](malachite_base::num::comparison::traits::EqAbs) for comparing the
+/// absolute values of a [`GaussianInteger`](crate::gaussian_integer::GaussianInteger) and a
+/// [`Natural`](crate::natural::Natural) for equality.
+pub mod eq_abs_natural;
+/// Implementations of [`EqAbs`](malachite_base::num::comparison::traits::EqAbs) for comparing the
+/// absolute values of a [`GaussianInteger`](crate::gaussian_integer::GaussianInteger) and a
+/// primitive float for equality.
+///
+/// # eq_abs
+/// ```
+/// use malachite_base::num::comparison::traits::EqAbs;
+/// use malachite_nz::gaussian_integer::GaussianInteger;
+/// use std::str::FromStr;
+///
+/// // |3+4i| = 5
+/// let x = GaussianInteger::from_str("3+4i").unwrap();
+/// assert!(x.eq_abs(&-5.0f32));
+/// assert_eq!(x.eq_abs(&4.0f32), false);
+/// assert_eq!(x.eq_abs(&f32::NAN), false);
+///
+/// assert!((-5.0f32).eq_abs(&x));
+/// assert_eq!(4.0f32.eq_abs(&x), false);
+/// ```
+pub mod eq_abs_primitive_float;
+/// Implementations of [`EqAbs`](malachite_base::num::comparison::traits::EqAbs) for comparing the
+/// absolute values of a [`GaussianInteger`](crate::gaussian_integer::GaussianInteger) and a
+/// primitive integer for equality.
+///
+/// # eq_abs
+/// ```
+/// use malachite_base::num::comparison::traits::EqAbs;
+/// use malachite_nz::gaussian_integer::GaussianInteger;
+/// use std::str::FromStr;
+///
+/// // |3+4i| = 5
+/// let x = GaussianInteger::from_str("3+4i").unwrap();
+/// assert!(x.eq_abs(&5u32));
+/// assert_eq!(x.eq_abs(&4u32), false);
+/// assert!(x.eq_abs(&-5i32));
+///
+/// assert!(5u32.eq_abs(&x));
+/// assert!((-5i32).eq_abs(&x));
+/// assert_eq!(4u32.eq_abs(&x), false);
+/// ```
+pub mod eq_abs_primitive_int;
 /// Equality of [`GaussianInteger`](crate::gaussian_integer::GaussianInteger)s and
 /// [`Integer`](crate::integer::Integer)s.
 pub mod partial_eq_integer;

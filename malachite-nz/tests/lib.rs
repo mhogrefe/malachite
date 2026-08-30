@@ -84,6 +84,11 @@ pub mod gaussian_integer {
     pub mod comparison {
         pub mod cmp;
         pub mod cmp_abs;
+        pub mod eq_abs;
+        pub mod eq_abs_integer;
+        pub mod eq_abs_natural;
+        pub mod eq_abs_primitive_float;
+        pub mod eq_abs_primitive_int;
         pub mod partial_eq_integer;
         pub mod partial_eq_natural;
         pub mod partial_eq_primitive_float;

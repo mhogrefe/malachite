@@ -17,6 +17,14 @@ pub mod eq;
 /// Implementations of [`EqAbs`](`malachite_base::num::comparison::traits::EqAbs`) (a trait for
 /// comparing the absolute values of numbers by equality) for [`Float`](crate::Float)s.
 pub mod eq_abs;
+/// Implementations of [`EqAbs`](malachite_base::num::comparison::traits::EqAbs) for comparing the
+/// absolute values of a [`Float`](crate::Float) and a
+/// [`GaussianInteger`](malachite_nz::gaussian_integer::GaussianInteger) for equality.
+pub mod eq_abs_gaussian_integer;
+/// Implementations of [`EqAbs`](malachite_base::num::comparison::traits::EqAbs) for comparing the
+/// absolute values of a [`Float`](crate::Float) and a
+/// [`GaussianRational`](malachite_q::gaussian_rational::GaussianRational) for equality.
+pub mod eq_abs_gaussian_rational;
 /// Implementations of [`EqAbs`](`malachite_base::num::comparison::traits::EqAbs`) (a trait for
 /// comparing the absolute values of numbers for equality) for [`Float`](crate::Float)s and
 /// [`Integer`](malachite_nz::integer::Integer)s.
