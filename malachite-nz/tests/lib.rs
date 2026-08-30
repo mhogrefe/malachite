@@ -66,6 +66,9 @@ extern crate num;
 extern crate rug;
 
 pub mod gaussian_integer {
+    pub mod arithmetic {
+        pub mod abs_squared;
+    }
     pub mod basic {
         pub mod constants;
         pub mod default;
@@ -112,6 +115,7 @@ pub mod integer {
     pub mod arithmetic {
         pub mod abs;
         pub mod abs_diff;
+        pub mod abs_squared;
         pub mod add;
         pub mod add_mul;
         pub mod average;
@@ -282,6 +286,7 @@ pub mod integer {
 pub mod natural {
     pub mod arithmetic {
         pub mod abs_diff;
+        pub mod abs_squared;
         pub mod add;
         pub mod add_mul;
         pub mod average;

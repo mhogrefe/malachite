@@ -24,6 +24,17 @@ pub trait AbsAssign {
     fn abs_assign(&mut self);
 }
 
+/// Computes the squared absolute value of a number.
+///
+/// For a real number this is just its square, but for a complex number it is the sum of the squares
+/// of its real and imaginary parts. In both cases it equals $|x|^2$; for Gaussian integers and
+/// Gaussian rationals this quantity is also called the norm.
+pub trait AbsSquared {
+    type Output;
+
+    fn abs_squared(self) -> Self::Output;
+}
+
 /// Takes the absolute value of a number and converts to the unsigned equivalent.
 pub trait UnsignedAbs {
     type Output;

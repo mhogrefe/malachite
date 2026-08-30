@@ -12,6 +12,10 @@ pub mod abs;
 /// [`AbsDiffAssign`](malachite_base::num::arithmetic::traits::AbsDiffAssign), traits for getting
 /// the absolute value of the difference between two numbers.
 pub mod abs_diff;
+/// Implementations of [`AbsSquared`](malachite_base::num::arithmetic::traits::AbsSquared), a trait
+/// for computing the squared absolute value of a number. For real types this is the same as
+/// squaring.
+pub mod abs_squared;
 /// Addition of [`Rational`](super::Rational)s.
 pub mod add;
 /// Implementations of [`AddMul`](malachite_base::num::arithmetic::traits::AddMul) and

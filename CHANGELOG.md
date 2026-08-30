@@ -13,6 +13,11 @@ documented by git history.
 - New traits for complex types downstream (nothing in malachite-base implements them): the
   constant traits `I` and `NegativeI`, and the conversion traits `ImaginaryFrom` and
   `ImaginaryInto`.
+- A new `AbsSquared` trait for computing the squared absolute value of a number,
+  $|x|^2$, implemented for all numeric types. For real types this is the same as squaring; for
+  `GaussianInteger` and `GaussianRational` it is the sum of the squares of the real and
+  imaginary parts (the norm), returned as an `Integer` or `Rational` respectively. The trait is
+  a supertrait of `PrimitiveInt` and `PrimitiveFloat`.
 - New `IsGaussianInteger` and `IsReal` traits alongside `IsInteger`, implemented for all
   primitive types (and, in the other crates, all bignum types). For every type,
   `x.is_integer() == x.is_gaussian_integer() && x.is_real()`; for floating-point types, `NaN`

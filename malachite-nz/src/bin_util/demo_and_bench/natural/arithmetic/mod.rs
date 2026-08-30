@@ -9,6 +9,7 @@
 use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
+    abs_squared::register(runner);
     abs_diff::register(runner);
     add::register(runner);
     add_mul::register(runner);
@@ -101,6 +102,7 @@ pub(crate) fn register(runner: &mut Runner) {
 }
 
 mod abs_diff;
+mod abs_squared;
 mod add;
 mod add_mul;
 mod average;

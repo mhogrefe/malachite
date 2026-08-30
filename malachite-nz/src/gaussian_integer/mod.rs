@@ -9,6 +9,8 @@
 use crate::integer::Integer;
 use core::ops::Deref;
 
+/// Traits for arithmetic.
+pub mod arithmetic;
 /// Comparison of [`ComparableGaussianInteger`]s and [`ComparableGaussianIntegerRef`]s.
 pub mod comparison;
 /// Functions for converting a [`GaussianInteger`] to and from other types and strings.

@@ -9,7 +9,7 @@
 use crate::comparison::traits::{Max, Min};
 use crate::named::Named;
 use crate::num::arithmetic::traits::{
-    AbsDiff, AddMul, AddMulAssign, ArithmeticCheckedShl, ArithmeticCheckedShr, Average,
+    AbsDiff, AbsSquared, AddMul, AddMulAssign, ArithmeticCheckedShl, ArithmeticCheckedShr, Average,
     AverageAssign, AverageRound, AverageRoundAssign, BalancedMod, BinomialCoefficient, CeilingRoot,
     CeilingRootAssign, CeilingSqrt, CeilingSqrtAssign, CheckedAdd, CheckedAddMul,
     CheckedBinomialCoefficient, CheckedDiv, CheckedMul, CheckedMulAddMul, CheckedMulSubMul,
@@ -473,6 +473,7 @@ pub trait PrimitiveInt:
     + Sign
     + SignificantBits
     + Sized
+    + AbsSquared<Output = Self>
     + Square<Output = Self>
     + SquareAssign
     + Sub<Self, Output = Self>

@@ -11,6 +11,8 @@ use core::ops::Deref;
 use malachite_base::named::Named;
 use malachite_base::num::basic::traits::{I, NegativeI, NegativeOne, One, OneHalf, Two, Zero};
 
+/// Traits for arithmetic.
+pub mod arithmetic;
 /// Comparison of [`ComparableGaussianRational`]s and [`ComparableGaussianRationalRef`]s.
 pub mod comparison;
 /// Functions for converting a [`GaussianRational`] to and from other types and strings.

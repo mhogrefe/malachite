@@ -191,6 +191,7 @@ pub mod num {
     pub mod arithmetic {
         pub mod abs;
         pub mod abs_diff;
+        pub mod abs_squared;
         pub mod add_mul;
         pub mod arithmetic_checked_shl;
         pub mod arithmetic_checked_shr;

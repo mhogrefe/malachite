@@ -61,6 +61,20 @@ pub mod abs;
 /// assert_eq!(x, 10);
 /// ```
 pub mod abs_diff;
+/// [`AbsSquared`](traits::AbsSquared), a trait for computing the squared absolute value of a
+/// number.
+///
+/// # abs_squared
+/// ```
+/// use malachite_base::num::arithmetic::traits::AbsSquared;
+///
+/// assert_eq!(12u8.abs_squared(), 144);
+/// assert_eq!(123u32.abs_squared(), 15129);
+/// assert_eq!((-123i32).abs_squared(), 15129);
+/// assert_eq!(1.5f32.abs_squared(), 2.25);
+/// assert_eq!((-1.5f32).abs_squared(), 2.25);
+/// ```
+pub mod abs_squared;
 /// [`AddMul`](traits::AddMul) and [`AddMulAssign`](traits::AddMulAssign), traits for adding a
 /// number and the product of two other numbers.
 ///

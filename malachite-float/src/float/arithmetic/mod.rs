@@ -8,6 +8,10 @@
 
 /// Absolute value of [`Float`](super::Float)s.
 pub mod abs;
+/// Implementations of [`AbsSquared`](malachite_base::num::arithmetic::traits::AbsSquared), a trait
+/// for computing the squared absolute value of a number. For real types this is the same as
+/// squaring.
+pub mod abs_squared;
 /// Addition of [`Float`](super::Float)s, and of [`Float`](super::Float)s with
 /// [`Rational`](malachite_q::Rational)s.
 pub mod add;

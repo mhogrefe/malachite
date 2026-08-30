@@ -6,14 +6,6 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::test_util::runner::Runner;
-
-pub(crate) fn register(runner: &mut Runner) {
-    arithmetic::register(runner);
-    comparison::register(runner);
-    conversion::register(runner);
-}
-
-mod arithmetic;
-mod comparison;
-mod conversion;
+/// Implementations of [`AbsSquared`](malachite_base::num::arithmetic::traits::AbsSquared), a trait
+/// for computing the squared absolute value (norm) of a number.
+pub mod abs_squared;
