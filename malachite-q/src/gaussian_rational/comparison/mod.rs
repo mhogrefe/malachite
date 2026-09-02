@@ -78,6 +78,74 @@ pub mod eq_abs_primitive_int;
 /// absolute values of a [`GaussianRational`](crate::gaussian_rational::GaussianRational) and a
 /// [`Rational`](crate::Rational) for equality.
 pub mod eq_abs_rational;
+/// Implementations of [`PartialOrdAbs`](malachite_base::num::comparison::traits::PartialOrdAbs) for
+/// comparing the absolute values of a
+/// [`GaussianRational`](crate::gaussian_rational::GaussianRational) and a
+/// [`GaussianInteger`](malachite_nz::gaussian_integer::GaussianInteger).
+pub mod partial_cmp_abs_gaussian_integer;
+/// Implementations of [`PartialOrdAbs`](malachite_base::num::comparison::traits::PartialOrdAbs) for
+/// comparing the absolute values of a
+/// [`GaussianRational`](crate::gaussian_rational::GaussianRational) and an
+/// [`Integer`](malachite_nz::integer::Integer).
+pub mod partial_cmp_abs_integer;
+/// Implementations of [`PartialOrdAbs`](malachite_base::num::comparison::traits::PartialOrdAbs) for
+/// comparing the absolute values of a
+/// [`GaussianRational`](crate::gaussian_rational::GaussianRational) and a
+/// [`Natural`](malachite_nz::natural::Natural).
+pub mod partial_cmp_abs_natural;
+/// Implementations of [`PartialOrdAbs`](malachite_base::num::comparison::traits::PartialOrdAbs) for
+/// comparing the absolute values of a
+/// [`GaussianRational`](crate::gaussian_rational::GaussianRational) and a primitive float.
+///
+/// # partial_cmp_abs
+/// ```
+/// use malachite_base::num::basic::traits::NegativeInfinity;
+/// use malachite_base::num::comparison::traits::PartialOrdAbs;
+/// use malachite_q::gaussian_rational::GaussianRational;
+/// use std::str::FromStr;
+///
+/// // |3/10+2i/5| = 1/2
+/// let x = GaussianRational::from_str("3/10+2i/5").unwrap();
+/// assert!(x.gt_abs(&-0.4f32));
+/// assert!(x.lt_abs(&0.75f32));
+/// assert!(x.lt_abs(&f32::NEGATIVE_INFINITY));
+/// assert_eq!(x.partial_cmp_abs(&f32::NAN), None);
+///
+/// assert!((-0.4f32).lt_abs(&x));
+/// assert!(0.75f32.gt_abs(&x));
+/// assert!(f32::NEGATIVE_INFINITY.gt_abs(&x));
+/// ```
+pub mod partial_cmp_abs_primitive_float;
+/// Implementations of [`PartialOrdAbs`](malachite_base::num::comparison::traits::PartialOrdAbs) for
+/// comparing the absolute values of a
+/// [`GaussianRational`](crate::gaussian_rational::GaussianRational) and a primitive integer.
+///
+/// # partial_cmp_abs
+/// ```
+/// use malachite_base::num::comparison::traits::PartialOrdAbs;
+/// use malachite_q::gaussian_rational::GaussianRational;
+/// use std::str::FromStr;
+///
+/// // |3/5+4i/5| = 1
+/// let x = GaussianRational::from_str("3/5+4i/5").unwrap();
+/// assert!(x.gt_abs(&0u32));
+/// assert!(x.ge_abs(&1u32));
+/// assert!(x.le_abs(&1u32));
+/// assert!(x.lt_abs(&2u32));
+/// assert!(x.le_abs(&-1i32));
+/// assert!(x.lt_abs(&-2i32));
+///
+/// assert!(0u32.lt_abs(&x));
+/// assert!(2u32.gt_abs(&x));
+/// assert!((-1i32).ge_abs(&x));
+/// assert!((-2i32).gt_abs(&x));
+/// ```
+pub mod partial_cmp_abs_primitive_int;
+/// Implementations of [`PartialOrdAbs`](malachite_base::num::comparison::traits::PartialOrdAbs) for
+/// comparing the absolute values of a
+/// [`GaussianRational`](crate::gaussian_rational::GaussianRational) and a
+/// [`Rational`](crate::Rational).
+pub mod partial_cmp_abs_rational;
 /// Equality of [`GaussianRational`](crate::gaussian_rational::GaussianRational)s and
 /// [`GaussianInteger`](malachite_nz::gaussian_integer::GaussianInteger)s.
 pub mod partial_eq_gaussian_integer;

@@ -87,6 +87,14 @@ pub mod eq_abs_rational;
 pub mod hash;
 /// Functions for finding the minimum and maximum of two [`Float`](crate::Float)s.
 pub mod min_max;
+/// Implementations of [`PartialOrdAbs`](malachite_base::num::comparison::traits::PartialOrdAbs) for
+/// comparing the absolute values of a [`Float`](crate::Float) and a
+/// [`GaussianInteger`](malachite_nz::gaussian_integer::GaussianInteger).
+pub mod partial_cmp_abs_gaussian_integer;
+/// Implementations of [`PartialOrdAbs`](malachite_base::num::comparison::traits::PartialOrdAbs) for
+/// comparing the absolute values of a [`Float`](crate::Float) and a
+/// [`GaussianRational`](malachite_q::gaussian_rational::GaussianRational).
+pub mod partial_cmp_abs_gaussian_rational;
 /// Implementations of [`PartialOrdAbs`](`malachite_base::num::comparison::traits::PartialOrdAbs`)
 /// (a trait for comparing the absolute values of numbers by order) for [`Float`](crate::Float)s and
 /// [`Integer`](malachite_nz::integer::Integer)s.

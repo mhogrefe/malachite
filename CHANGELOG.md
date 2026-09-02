@@ -84,6 +84,14 @@ documented by git history.
   last resort. A non-integer float can never equal a Gaussian integer's absolute value (its odd
   mantissa squares to an odd numerator), and infinities and NaN are never equal in absolute
   value to anything.
+- The same matrix for `PartialOrdAbs`, ordering by absolute value, so that $3+4i$ is greater in
+  absolute value than $4$ and less than $6$. The screens are the ordering counterparts of the
+  `EqAbs` ones: against a real value, a Gaussian value with two nonzero components is greater in
+  absolute value unless both components are smaller in absolute value than the real operand,
+  and only then are the squared absolute values compared; comparisons with a float square the
+  float exactly (as an odd square times a power of two, or as a `Rational`) rather than
+  rounding. NaN is incomparable to everything, and the infinities are greater in absolute value
+  than every Gaussian value.
 - `ComparableGaussianInteger` and `ComparableGaussianIntegerRef`, wrappers around
   `GaussianInteger` (by value and by reference) that implement `Ord`, comparing
   lexicographically: first by real part, then by imaginary part. Since no total order on the
