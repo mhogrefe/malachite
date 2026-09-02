@@ -110,7 +110,7 @@ impl Reciprocal for &GaussianRational {
                 imaginary: -(&self.imaginary).reciprocal(),
             }
         } else {
-            let norm = (&*self).abs_squared();
+            let norm = self.abs_squared();
             GaussianRational {
                 real: (&self.real) / &norm,
                 imaginary: -(&self.imaginary) / norm,
@@ -160,7 +160,7 @@ impl ReciprocalAssign for GaussianRational {
             self.imaginary.reciprocal_assign();
             self.imaginary.neg_assign();
         } else {
-            let norm = (&*self).abs_squared();
+            let norm = AbsSquared::abs_squared(&*self);
             self.real /= &norm;
             self.imaginary /= norm;
             self.imaginary.neg_assign();

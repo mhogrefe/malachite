@@ -16,6 +16,9 @@ pub mod add;
 /// [`ConjugateAssign`](malachite_base::num::arithmetic::traits::ConjugateAssign), traits for
 /// computing the complex conjugate of a number: the sign of the imaginary part is flipped.
 pub mod conjugate;
+/// Division of [`GaussianRational`](crate::gaussian_rational::GaussianRational)s, including
+/// [`CheckedDiv`](malachite_base::num::arithmetic::traits::CheckedDiv).
+pub mod div;
 /// Implementations of [`DivI`](malachite_base::num::arithmetic::traits::DivI) and
 /// [`DivIAssign`](malachite_base::num::arithmetic::traits::DivIAssign), traits for dividing a
 /// number by $i$: a clockwise quarter turn.

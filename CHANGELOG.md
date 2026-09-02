@@ -115,6 +115,10 @@ documented by git history.
 - `Reciprocal` and `ReciprocalAssign` for `GaussianRational`: the conjugate divided by the squared
   absolute value, with purely real and purely imaginary values reducing to a single `Rational`
   reciprocal. Panics on zero, like `Rational`'s.
+- `Div`, `DivAssign`, and `CheckedDiv` for `GaussianRational` in all the usual ownership
+  variants. A purely real divisor divides both parts, a purely imaginary divisor does the same
+  and then turns the result a quarter turn, and any other divisor multiplies by its reciprocal
+  using the fused multiplication kernels. Division by zero panics; `checked_div` returns `None`.
 - `ComparableGaussianInteger` and `ComparableGaussianIntegerRef`, wrappers around
   `GaussianInteger` (by value and by reference) that implement `Ord`, comparing
   lexicographically: first by real part, then by imaginary part. Since no total order on the

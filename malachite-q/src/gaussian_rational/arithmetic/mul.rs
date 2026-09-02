@@ -16,7 +16,7 @@ use malachite_base::num::basic::traits::{One, Zero};
 
 // Each part of each operand appears in exactly two products, so an owned part is borrowed by its
 // first use and consumed by its last, letting the products reuse the operands' storage.
-fn mul_val_val(x: GaussianRational, y: GaussianRational) -> GaussianRational {
+pub(super) fn mul_val_val(x: GaussianRational, y: GaussianRational) -> GaussianRational {
     let real = (&x.real).mul_sub_mul(&y.real, &x.imaginary, &y.imaginary);
     GaussianRational {
         real,
@@ -24,7 +24,7 @@ fn mul_val_val(x: GaussianRational, y: GaussianRational) -> GaussianRational {
     }
 }
 
-fn mul_val_ref(x: GaussianRational, y: &GaussianRational) -> GaussianRational {
+pub(super) fn mul_val_ref(x: GaussianRational, y: &GaussianRational) -> GaussianRational {
     let real = (&x.real).mul_sub_mul(&y.real, &x.imaginary, &y.imaginary);
     GaussianRational {
         real,

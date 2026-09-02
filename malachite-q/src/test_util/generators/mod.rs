@@ -96,6 +96,15 @@ pub fn gaussian_rational_pair_gen() -> Generator<(GaussianRational, GaussianRati
     )
 }
 
+// All pairs of `GaussianRational`s where the second `GaussianRational` is nonzero.
+pub fn gaussian_rational_pair_gen_var_1() -> Generator<(GaussianRational, GaussianRational)> {
+    Generator::new(
+        &exhaustive_gaussian_rational_pair_gen_var_1,
+        &random_gaussian_rational_pair_gen_var_1,
+        &special_random_gaussian_rational_pair_gen_var_1,
+    )
+}
+
 pub fn gaussian_rational_triple_gen()
 -> Generator<(GaussianRational, GaussianRational, GaussianRational)> {
     Generator::new(

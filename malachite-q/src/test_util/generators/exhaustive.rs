@@ -76,6 +76,13 @@ pub fn exhaustive_gaussian_rational_pair_gen() -> It<(GaussianRational, Gaussian
     Box::new(exhaustive_pairs_from_single(exhaustive_gaussian_rationals()))
 }
 
+pub fn exhaustive_gaussian_rational_pair_gen_var_1() -> It<(GaussianRational, GaussianRational)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_gaussian_rationals(),
+        exhaustive_gaussian_rationals().filter(|x| x.real != 0u32 || x.imaginary != 0u32),
+    ))
+}
+
 pub fn exhaustive_gaussian_rational_triple_gen()
 -> It<(GaussianRational, GaussianRational, GaussianRational)> {
     Box::new(exhaustive_triples_from_single(
