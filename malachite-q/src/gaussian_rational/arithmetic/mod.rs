@@ -37,6 +37,10 @@ pub mod neg;
 /// Implementations of [`PowerOf2`](malachite_base::num::arithmetic::traits::PowerOf2), a trait for
 /// computing a power of 2.
 pub mod power_of_2;
+/// Implementations of [`Reciprocal`](malachite_base::num::arithmetic::traits::Reciprocal) and
+/// [`ReciprocalAssign`](malachite_base::num::arithmetic::traits::ReciprocalAssign), traits for
+/// computing the reciprocal of a number.
+pub mod reciprocal;
 /// Left-shifting a [`GaussianRational`](crate::gaussian_rational::GaussianRational) (multiplying it
 /// by a power of 2). A negative shift amount divides by a power of 2 instead.
 ///

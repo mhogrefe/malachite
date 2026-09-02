@@ -79,6 +79,15 @@ pub fn gaussian_rational_gen_var_2() -> Generator<GaussianRational> {
     )
 }
 
+// All nonzero `GaussianRational`s.
+pub fn gaussian_rational_gen_var_3() -> Generator<GaussianRational> {
+    Generator::new(
+        &exhaustive_gaussian_rational_gen_var_3,
+        &random_gaussian_rational_gen_var_3,
+        &special_random_gaussian_rational_gen_var_3,
+    )
+}
+
 pub fn gaussian_rational_pair_gen() -> Generator<(GaussianRational, GaussianRational)> {
     Generator::new(
         &exhaustive_gaussian_rational_pair_gen,

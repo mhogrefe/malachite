@@ -93,6 +93,10 @@ pub fn exhaustive_gaussian_rational_gen_var_2() -> It<GaussianRational> {
     Box::new(exhaustive_imaginary_gaussian_rationals())
 }
 
+pub fn exhaustive_gaussian_rational_gen_var_3() -> It<GaussianRational> {
+    Box::new(exhaustive_gaussian_rationals().filter(|x| x.real != 0u32 || x.imaginary != 0u32))
+}
+
 // -- (GaussianRational, GaussianInteger) --
 
 pub fn exhaustive_gaussian_rational_gaussian_integer_pair_gen()

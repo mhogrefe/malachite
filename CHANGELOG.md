@@ -112,6 +112,9 @@ documented by git history.
 - `MulI`/`MulIAssign` and `DivI`/`DivIAssign` for both Gaussian types: multiplying by $i$ maps
   $a + bi$ to $-b + ai$ and dividing by $i$ maps it to $b - ai$, by swapping the parts and
   negating one of them.
+- `Reciprocal` and `ReciprocalAssign` for `GaussianRational`: the conjugate divided by the squared
+  absolute value, with purely real and purely imaginary values reducing to a single `Rational`
+  reciprocal. Panics on zero, like `Rational`'s.
 - `ComparableGaussianInteger` and `ComparableGaussianIntegerRef`, wrappers around
   `GaussianInteger` (by value and by reference) that implement `Ord`, comparing
   lexicographically: first by real part, then by imaginary part. Since no total order on the
