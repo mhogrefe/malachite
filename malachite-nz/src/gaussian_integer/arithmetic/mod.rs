@@ -35,6 +35,36 @@ pub mod neg;
 /// An implementation of [`PowerOf2`](malachite_base::num::arithmetic::traits::PowerOf2), a trait
 /// for computing a power of 2.
 pub mod power_of_2;
+/// Left-shifting a [`GaussianInteger`](crate::gaussian_integer::GaussianInteger) (multiplying it by
+/// a power of 2).
+///
+/// # shl
+/// ```
+/// use malachite_nz::gaussian_integer::GaussianInteger;
+/// use std::str::FromStr;
+///
+/// let x = GaussianInteger::from_str("3-2i").unwrap();
+/// assert_eq!((x.clone() << 3u8).to_string(), "24-16i");
+/// assert_eq!((&x << 3u64).to_string(), "24-16i");
+/// assert_eq!(
+///     (x << 100u32).to_string(),
+///     "3802951800684688204490109616128-2535301200456458802993406410752i"
+/// );
+/// ```
+///
+/// # shl_assign
+/// ```
+/// use malachite_nz::gaussian_integer::GaussianInteger;
+/// use std::str::FromStr;
+///
+/// let mut x = GaussianInteger::from_str("1+i").unwrap();
+/// x <<= 1u8;
+/// x <<= 2u16;
+/// x <<= 3u32;
+/// x <<= 4u64;
+/// assert_eq!(x.to_string(), "1024+1024i");
+/// ```
+pub mod shl;
 /// Implementations of [`Square`](malachite_base::num::arithmetic::traits::Square) and
 /// [`SquareAssign`](malachite_base::num::arithmetic::traits::SquareAssign), traits for squaring a
 /// number.

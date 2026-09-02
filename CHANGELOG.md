@@ -100,6 +100,8 @@ documented by git history.
   its multiples do not count. `Integer` also gains `IsPowerOf2`, which `Natural` and `Rational`
   already had; negative integers are never powers of 2 (and, in malachite-base, so does every
   signed primitive integer).
+- `Shl` and `ShlAssign` for `GaussianInteger` by any unsigned primitive integer, shifting both
+  parts (multiplying by a power of 2), in value, reference, and in-place variants.
 - `ComparableGaussianInteger` and `ComparableGaussianIntegerRef`, wrappers around
   `GaussianInteger` (by value and by reference) that implement `Ord`, comparing
   lexicographically: first by real part, then by imaginary part. Since no total order on the

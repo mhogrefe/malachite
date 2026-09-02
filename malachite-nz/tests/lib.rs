@@ -74,6 +74,7 @@ pub mod gaussian_integer {
         pub mod mul;
         pub mod neg;
         pub mod power_of_2;
+        pub mod shl;
         pub mod square;
         pub mod sub;
     }
