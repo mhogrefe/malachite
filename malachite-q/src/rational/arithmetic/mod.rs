@@ -30,6 +30,15 @@ pub mod approximate;
 /// [`AverageAssign`](malachite_base::num::arithmetic::traits::AverageAssign), traits for computing
 /// the average (arithmetic mean) of two numbers.
 pub mod average;
+/// An implementation of
+/// [`CanonicalUnitIPow`](malachite_base::num::arithmetic::traits::CanonicalUnitIPow), a trait for
+/// finding the power of $i$ that brings a number into canonical unit form.
+pub mod canonical_unit_i_pow;
+/// Implementations of
+/// [`CanonicalizeUnit`](malachite_base::num::arithmetic::traits::CanonicalizeUnit) and
+/// [`CanonicalizeUnitAssign`](malachite_base::num::arithmetic::traits::CanonicalizeUnitAssign),
+/// traits for bringing a number into canonical unit form.
+pub mod canonicalize_unit;
 /// Implementations of [`Ceiling`](malachite_base::num::arithmetic::traits::Ceiling) and
 /// [`CeilingAssign`](malachite_base::num::arithmetic::traits::CeilingAssign), traits for taking the
 /// ceiling of a number.
@@ -76,6 +85,9 @@ pub mod height;
 /// An implementation of [`IsPowerOf2`](malachite_base::num::arithmetic::traits::IsPowerOf2), a
 /// trait for determining whether a number is an integer power of 2.
 pub mod is_power_of_2;
+/// An implementation of [`IsUnit`](malachite_base::num::arithmetic::traits::IsUnit), a trait for
+/// determining whether a number is a unit of its ring.
+pub mod is_unit;
 /// Implementations of traits for taking the base-$b$ logarithm of a number.
 ///
 /// The traits are [`FloorLogBase`](malachite_base::num::arithmetic::traits::FloorLogBase),

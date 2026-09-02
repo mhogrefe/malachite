@@ -199,6 +199,8 @@ pub mod num {
         pub mod balanced_mod;
         pub mod bell_number;
         pub mod binomial_coefficient;
+        pub mod canonical_unit_i_pow;
+        pub mod canonicalize_unit;
         pub mod ceiling;
         pub mod checked_abs;
         pub mod checked_add_mul;
@@ -224,6 +226,7 @@ pub mod num {
         pub mod floor;
         pub mod gcd;
         pub mod is_power_of_2;
+        pub mod is_unit;
         pub mod kronecker_symbol;
         pub mod lcm;
         pub mod log_base;

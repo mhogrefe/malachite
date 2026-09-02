@@ -69,10 +69,13 @@ pub mod gaussian_rational {
     pub mod arithmetic {
         pub mod abs_squared;
         pub mod add;
+        pub mod canonical_unit_i_pow;
+        pub mod canonicalize_unit;
         pub mod conjugate;
         pub mod div;
         pub mod div_i;
         pub mod is_power_of_2;
+        pub mod is_unit;
         pub mod mul;
         pub mod mul_i;
         pub mod neg;
@@ -156,6 +159,8 @@ pub mod rational {
         pub mod add_mul;
         pub mod approximate;
         pub mod average;
+        pub mod canonical_unit_i_pow;
+        pub mod canonicalize_unit;
         pub mod ceiling;
         pub mod cfrac_helpers;
         pub mod conjugate;
@@ -169,6 +174,7 @@ pub mod rational {
         pub mod harmonic_number;
         pub mod height;
         pub mod is_power_of_2;
+        pub mod is_unit;
         pub mod log_base;
         pub mod log_base_2;
         pub mod log_base_power_of_2;

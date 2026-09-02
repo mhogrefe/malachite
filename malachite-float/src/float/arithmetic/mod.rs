@@ -149,6 +149,15 @@ pub mod agm;
 /// assert_eq!(x, 2.0);
 /// ```
 pub mod average;
+/// An implementation of
+/// [`CanonicalUnitIPow`](malachite_base::num::arithmetic::traits::CanonicalUnitIPow), a trait for
+/// finding the power of $i$ that brings a number into canonical unit form.
+pub mod canonical_unit_i_pow;
+/// Implementations of
+/// [`CanonicalizeUnit`](malachite_base::num::arithmetic::traits::CanonicalizeUnit) and
+/// [`CanonicalizeUnitAssign`](malachite_base::num::arithmetic::traits::CanonicalizeUnitAssign),
+/// traits for bringing a number into canonical unit form.
+pub mod canonicalize_unit;
 /// Cube root of [`Float`](super::Float)s and of [`Rational`](malachite_q::Rational)s.
 pub mod cbrt;
 /// [`Compound`](malachite_base::num::arithmetic::traits::Compound) and
@@ -200,6 +209,9 @@ pub mod hypot;
 /// An implementation of [`IsPowerOf2`](malachite_base::num::arithmetic::traits::IsPowerOf2), a
 /// trait for determining whether a number is an integer power of 2.
 pub mod is_power_of_2;
+/// An implementation of [`IsUnit`](malachite_base::num::arithmetic::traits::IsUnit), a trait for
+/// determining whether a number is a unit of its ring.
+pub mod is_unit;
 /// [`Ln`](malachite_base::num::arithmetic::traits::Ln) and
 /// [`LnAssign`](malachite_base::num::arithmetic::traits::LnAssign), traits for computing the
 /// natural logarithm of [`Float`](super::Float)s.

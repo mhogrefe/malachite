@@ -34,6 +34,15 @@ pub mod balanced_mod;
 /// for computing the binomial coefficient of two numbers.
 pub mod bell_number;
 pub mod binomial_coefficient;
+/// An implementation of
+/// [`CanonicalUnitIPow`](malachite_base::num::arithmetic::traits::CanonicalUnitIPow), a trait for
+/// finding the power of $i$ that brings a number into canonical unit form.
+pub mod canonical_unit_i_pow;
+/// Implementations of
+/// [`CanonicalizeUnit`](malachite_base::num::arithmetic::traits::CanonicalizeUnit) and
+/// [`CanonicalizeUnitAssign`](malachite_base::num::arithmetic::traits::CanonicalizeUnitAssign),
+/// traits for bringing a number into canonical unit form.
+pub mod canonicalize_unit;
 pub mod checked_mul_sub_mul;
 /// Implementations of [`CheckedSub`](malachite_base::num::arithmetic::traits::CheckedSub), a trait
 /// for subtracting two numbers and checking whether the result is representable.
@@ -125,6 +134,9 @@ pub mod gcd;
 /// Implementations of [`IsPowerOf2`](malachite_base::num::arithmetic::traits::IsPowerOf2), a trait
 /// for determining whether a number is an integer power of 2.
 pub mod is_power_of_2;
+/// An implementation of [`IsUnit`](malachite_base::num::arithmetic::traits::IsUnit), a trait for
+/// determining whether a number is a unit of its ring.
+pub mod is_unit;
 /// Implementations of [`LegendreSymbol`](malachite_base::num::arithmetic::traits::LegendreSymbol),
 /// [`JacobiSymbol`](malachite_base::num::arithmetic::traits::JacobiSymbol), and
 /// [`KroneckerSymbol`](malachite_base::num::arithmetic::traits::KroneckerSymbol), traits for

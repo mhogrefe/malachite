@@ -32,6 +32,15 @@ documented by git history.
 - New `MulI`, `MulIAssign`, `DivI`, and `DivIAssign` traits for multiplying or dividing a number
   by $i$, the imaginary unit — quarter turns in the complex plane, which need no multiplication.
   Nothing in malachite-base implements them; `GaussianInteger` and `GaussianRational` do.
+- New `IsUnit`, `CanonicalUnitIPow`, `CanonicalizeUnit`, and `CanonicalizeUnitAssign` traits,
+  ports of FLINT's `fmpzi_is_unit`, `fmpzi_canonical_unit_i_pow`, and `fmpzi_canonicalise_unit`:
+  a unit test, and canonicalization of a complex number under multiplication by $\pm 1$ and
+  $\pm i$, choosing the associate whose argument lies in $(-\pi/4, \pi/4]$. They are
+  implemented for all numeric types, so that generic code can normalize associates uniformly:
+  for a real type the units are $\pm 1$ (1 alone for unsigned types, and every finite nonzero
+  value for floats), the canonical form is the absolute value, and the power of $i$ is 2 for
+  negative values and 0 otherwise. All four are supertraits of `PrimitiveInt` and
+  `PrimitiveFloat`.
 - `IsPowerOf2` is now implemented for the signed primitive integers (negative values are never
   powers of 2), and is a supertrait of `PrimitiveInt` rather than only of `PrimitiveUnsigned`.
 
@@ -119,6 +128,11 @@ documented by git history.
   variants. A purely real divisor divides both parts, a purely imaginary divisor does the same
   and then turns the result a quarter turn, and any other divisor multiplies by its reciprocal
   using the fused multiplication kernels. Division by zero panics; `checked_div` returns `None`.
+- `IsUnit`, `CanonicalUnitIPow`, `CanonicalizeUnit`, and `CanonicalizeUnitAssign` for both
+  Gaussian types, matching FLINT's choices tie for tie, and for `Natural`, `Integer` (and, in
+  the other crates, `Rational` and `Float`), where canonical unit form is the absolute value.
+  `GaussianInteger`'s units are $\pm 1$ and $\pm i$; `GaussianRational` is a field, so its
+  units are the nonzero values.
 - `ComparableGaussianInteger` and `ComparableGaussianIntegerRef`, wrappers around
   `GaussianInteger` (by value and by reference) that implement `Ord`, comparing
   lexicographically: first by real part, then by imaginary part. Since no total order on the

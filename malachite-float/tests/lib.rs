@@ -69,6 +69,8 @@ pub mod float {
         pub mod add_mul;
         pub mod agm;
         pub mod average;
+        pub mod canonical_unit_i_pow;
+        pub mod canonicalize_unit;
         pub mod cbrt;
         pub mod compound;
         pub mod conjugate;
@@ -80,6 +82,7 @@ pub mod float {
         pub mod fractional_part;
         pub mod hypot;
         pub mod is_power_of_2;
+        pub mod is_unit;
         pub mod ln;
         pub mod ln_1_plus_x;
         pub mod log_base;

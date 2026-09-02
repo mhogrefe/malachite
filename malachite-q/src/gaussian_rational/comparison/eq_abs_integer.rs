@@ -31,7 +31,7 @@ impl EqAbs<Integer> for GaussianRational {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::comparison::traits::{EqAbs, PartialOrdAbs};
+    /// use malachite_base::num::comparison::traits::EqAbs;
     /// use malachite_nz::integer::Integer;
     /// use malachite_q::gaussian_rational::GaussianRational;
     /// use std::str::FromStr;
@@ -68,7 +68,7 @@ impl EqAbs<GaussianRational> for Integer {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::comparison::traits::{EqAbs, PartialOrdAbs};
+    /// use malachite_base::num::comparison::traits::EqAbs;
     /// use malachite_nz::integer::Integer;
     /// use malachite_q::gaussian_rational::GaussianRational;
     /// use std::str::FromStr;

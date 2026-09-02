@@ -11,9 +11,12 @@ use malachite_base::test_util::runner::Runner;
 pub(crate) fn register(runner: &mut Runner) {
     abs_squared::register(runner);
     add::register(runner);
+    canonical_unit_i_pow::register(runner);
+    canonicalize_unit::register(runner);
     conjugate::register(runner);
     div_i::register(runner);
     is_power_of_2::register(runner);
+    is_unit::register(runner);
     mul::register(runner);
     mul_i::register(runner);
     neg::register(runner);
@@ -25,9 +28,12 @@ pub(crate) fn register(runner: &mut Runner) {
 
 mod abs_squared;
 mod add;
+mod canonical_unit_i_pow;
+mod canonicalize_unit;
 mod conjugate;
 mod div_i;
 mod is_power_of_2;
+mod is_unit;
 mod mul;
 mod mul_i;
 mod neg;

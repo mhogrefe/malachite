@@ -100,6 +100,49 @@ pub trait DivIAssign {
     fn div_i_assign(&mut self);
 }
 
+/// Determines whether a number is a unit of its ring, meaning that it has a multiplicative inverse
+/// in the same ring.
+///
+/// The Gaussian integers have four units, $\pm 1$ and $\pm i$; in a field every nonzero element is
+/// a unit. No type in this crate implements this trait; it exists for complex types downstream,
+/// like Gaussian integers.
+pub trait IsUnit {
+    fn is_unit(&self) -> bool;
+}
+
+/// Finds the power of $i$ that brings a complex number into canonical unit form.
+///
+/// A nonzero complex number has four associates under multiplication by the units $\pm 1$ and $\pm
+/// i$; the canonical one is the associate whose argument lies in $(-\pi/4, \pi/4]$, meaning that
+/// its real part is positive and its imaginary part $b$ satisfies $-a < b \leq a$. This function
+/// returns the $k \in \\{0, 1, 2, 3\\}$ such that $x i^k$ is canonical, and 0 for zero.
+///
+/// No type in this crate implements this trait; it exists for complex types downstream, like
+/// Gaussian integers.
+pub trait CanonicalUnitIPow {
+    fn canonical_unit_i_pow(&self) -> u64;
+}
+
+/// Brings a complex number into canonical unit form by multiplying it by a power of $i$.
+///
+/// The canonical associate is the one whose argument lies in $(-\pi/4, \pi/4]$; see
+/// [`CanonicalUnitIPow`]. No type in this crate implements this trait; it exists for complex types
+/// downstream, like Gaussian integers.
+pub trait CanonicalizeUnit {
+    type Output;
+
+    fn canonicalize_unit(self) -> Self::Output;
+}
+
+/// Replaces a complex number with its canonical unit form, multiplying it by a power of $i$.
+///
+/// The canonical associate is the one whose argument lies in $(-\pi/4, \pi/4]$; see
+/// [`CanonicalUnitIPow`]. No type in this crate implements this trait; it exists for complex types
+/// downstream, like Gaussian integers.
+pub trait CanonicalizeUnitAssign {
+    fn canonicalize_unit_assign(&mut self);
+}
+
 /// Takes the absolute value of a number and converts to the unsigned equivalent.
 pub trait UnsignedAbs {
     type Output;

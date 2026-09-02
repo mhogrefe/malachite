@@ -353,6 +353,42 @@ pub mod balanced_mod;
 /// ```
 pub mod bell_number;
 pub mod binomial_coefficient;
+/// [`CanonicalUnitIPow`](traits::CanonicalUnitIPow), a trait for finding the power of $i$ that
+/// brings a number into canonical unit form.
+///
+/// # canonical_unit_i_pow
+/// ```
+/// use malachite_base::num::arithmetic::traits::CanonicalUnitIPow;
+///
+/// assert_eq!(123u32.canonical_unit_i_pow(), 0);
+/// assert_eq!(123i32.canonical_unit_i_pow(), 0);
+/// assert_eq!((-123i32).canonical_unit_i_pow(), 2);
+/// assert_eq!((-0.0f64).canonical_unit_i_pow(), 2);
+/// assert_eq!(f64::NAN.canonical_unit_i_pow(), 0);
+/// ```
+pub mod canonical_unit_i_pow;
+/// [`CanonicalizeUnit`](traits::CanonicalizeUnit) and
+/// [`CanonicalizeUnitAssign`](traits::CanonicalizeUnitAssign), traits for bringing a number into
+/// canonical unit form.
+///
+/// # canonicalize_unit
+/// ```
+/// use malachite_base::num::arithmetic::traits::CanonicalizeUnit;
+///
+/// assert_eq!(123u32.canonicalize_unit(), 123);
+/// assert_eq!((-123i32).canonicalize_unit(), 123);
+/// assert_eq!((-1.5f64).canonicalize_unit(), 1.5);
+/// ```
+///
+/// # canonicalize_unit_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::CanonicalizeUnitAssign;
+///
+/// let mut x = -123i32;
+/// x.canonicalize_unit_assign();
+/// assert_eq!(x, 123);
+/// ```
+pub mod canonicalize_unit;
 /// [`Ceiling`](traits::Ceiling) and [`CeilingAssign`](traits::CeilingAssign), traits for computing
 /// the ceiling of a number.
 ///
@@ -1401,6 +1437,21 @@ pub mod gcd;
 /// assert_eq!((-4.0).is_power_of_2(), false);
 /// ```
 pub mod is_power_of_2;
+/// [`IsUnit`](traits::IsUnit), a trait for determining whether a number is a unit of its ring.
+///
+/// # is_unit
+/// ```
+/// use malachite_base::num::arithmetic::traits::IsUnit;
+///
+/// assert_eq!(1u32.is_unit(), true);
+/// assert_eq!(2u32.is_unit(), false);
+/// assert_eq!((-1i32).is_unit(), true);
+/// assert_eq!(0i32.is_unit(), false);
+/// assert_eq!(0.5f64.is_unit(), true);
+/// assert_eq!(0.0f64.is_unit(), false);
+/// assert_eq!(f64::INFINITY.is_unit(), false);
+/// ```
+pub mod is_unit;
 /// [`LegendreSymbol`](traits::LegendreSymbol), [`JacobiSymbol`](traits::JacobiSymbol), and
 /// [`KroneckerSymbol`](traits::KroneckerSymbol), traits for computing the Legendre, Jacobi, and
 /// Kronecker symbols of two numbers.

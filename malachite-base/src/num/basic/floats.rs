@@ -10,11 +10,11 @@ use crate::comparison::traits::{Max, Min};
 use crate::named::Named;
 use crate::num::arithmetic::traits::{
     Abs, AbsAssign, AbsSquared, AbsSquaredAssign, AddMul, AddMulAssign, Average, AverageAssign,
-    Ceiling, CeilingAssign, CeilingLogBase2, CeilingLogBasePowerOf2, CheckedLogBase2,
-    CheckedLogBasePowerOf2, Conjugate, ConjugateAssign, Floor, FloorAssign, FloorLogBase2,
-    FloorLogBasePowerOf2, IsPowerOf2, NegAssign, NextPowerOf2, NextPowerOf2Assign, Pow, PowAssign,
-    PowerOf2, Reciprocal, ReciprocalAssign, Sign, Sqrt, SqrtAssign, Square, SquareAssign, SubMul,
-    SubMulAssign,
+    CanonicalUnitIPow, CanonicalizeUnit, CanonicalizeUnitAssign, Ceiling, CeilingAssign,
+    CeilingLogBase2, CeilingLogBasePowerOf2, CheckedLogBase2, CheckedLogBasePowerOf2, Conjugate,
+    ConjugateAssign, Floor, FloorAssign, FloorLogBase2, FloorLogBasePowerOf2, IsPowerOf2, IsUnit,
+    NegAssign, NextPowerOf2, NextPowerOf2Assign, Pow, PowAssign, PowerOf2, Reciprocal,
+    ReciprocalAssign, Sign, Sqrt, SqrtAssign, Square, SquareAssign, SubMul, SubMulAssign,
 };
 use crate::num::basic::traits::{
     CatalansConstant, ChampernowneConstant, CopelandErdosConstant, EulersConstant, GaussConstant,
@@ -152,6 +152,7 @@ pub trait PrimitiveFloat:
     + IsGaussianInteger
     + IsInteger
     + IsPowerOf2
+    + IsUnit
     + IsReal
     + LemniscateConstant
     + LiouvillesConstant
@@ -247,6 +248,9 @@ pub trait PrimitiveFloat:
     + SqrtPi
     + AbsSquared<Output = Self>
     + AbsSquaredAssign
+    + CanonicalUnitIPow
+    + CanonicalizeUnit<Output = Self>
+    + CanonicalizeUnitAssign
     + Conjugate<Output = Self>
     + ConjugateAssign
     + Square<Output = Self>

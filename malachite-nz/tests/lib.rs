@@ -69,9 +69,12 @@ pub mod gaussian_integer {
     pub mod arithmetic {
         pub mod abs_squared;
         pub mod add;
+        pub mod canonical_unit_i_pow;
+        pub mod canonicalize_unit;
         pub mod conjugate;
         pub mod div_i;
         pub mod is_power_of_2;
+        pub mod is_unit;
         pub mod mul;
         pub mod mul_i;
         pub mod neg;
@@ -146,6 +149,8 @@ pub mod integer {
         pub mod average;
         pub mod balanced_mod;
         pub mod binomial_coefficient;
+        pub mod canonical_unit_i_pow;
+        pub mod canonicalize_unit;
         pub mod conjugate;
         pub mod crt;
         pub mod div;
@@ -160,6 +165,7 @@ pub mod integer {
         pub mod eq_mod_power_of_2;
         pub mod extended_gcd;
         pub mod is_power_of_2;
+        pub mod is_unit;
         pub mod kronecker_symbol;
         pub mod mod_euclidean;
         pub mod mod_op;
@@ -319,6 +325,8 @@ pub mod natural {
         pub mod average;
         pub mod bell_number;
         pub mod binomial_coefficient;
+        pub mod canonical_unit_i_pow;
+        pub mod canonicalize_unit;
         pub mod checked_sub;
         pub mod checked_sub_mul;
         pub mod conjugate;
@@ -346,6 +354,7 @@ pub mod natural {
         }
         pub mod gcd;
         pub mod is_power_of_2;
+        pub mod is_unit;
         pub mod kronecker_symbol;
         pub mod landau_function;
         pub mod lcm;

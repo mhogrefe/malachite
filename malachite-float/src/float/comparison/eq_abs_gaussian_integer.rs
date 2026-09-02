@@ -33,7 +33,7 @@ impl EqAbs<GaussianInteger> for Float {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::comparison::traits::{EqAbs, PartialOrdAbs};
+    /// use malachite_base::num::comparison::traits::EqAbs;
     /// use malachite_float::Float;
     /// use malachite_nz::gaussian_integer::GaussianInteger;
     /// use std::str::FromStr;
@@ -75,7 +75,7 @@ impl EqAbs<Float> for GaussianInteger {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::comparison::traits::{EqAbs, PartialOrdAbs};
+    /// use malachite_base::num::comparison::traits::EqAbs;
     /// use malachite_float::Float;
     /// use malachite_nz::gaussian_integer::GaussianInteger;
     /// use std::str::FromStr;
