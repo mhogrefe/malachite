@@ -159,6 +159,26 @@ pub fn gaussian_rational_unsigned_pair_gen<T: PrimitiveUnsigned>()
     )
 }
 
+// All `(GaussianRational, T)` where `T` is small and signed.
+pub fn gaussian_rational_signed_pair_gen_var_1<T: PrimitiveSigned>()
+-> Generator<(GaussianRational, T)> {
+    Generator::new(
+        &exhaustive_gaussian_rational_signed_pair_gen_var_1,
+        &random_gaussian_rational_signed_pair_gen_var_1,
+        &special_random_gaussian_rational_signed_pair_gen_var_1,
+    )
+}
+
+// All `(GaussianRational, T)` where `T` is small and unsigned.
+pub fn gaussian_rational_unsigned_pair_gen_var_1<T: PrimitiveUnsigned>()
+-> Generator<(GaussianRational, T)> {
+    Generator::new(
+        &exhaustive_gaussian_rational_unsigned_pair_gen_var_1,
+        &random_gaussian_rational_unsigned_pair_gen_var_1,
+        &special_random_gaussian_rational_unsigned_pair_gen_var_1,
+    )
+}
+
 // -- (GaussianRational, Rational) --
 
 pub fn gaussian_rational_rational_pair_gen() -> Generator<(GaussianRational, Rational)> {

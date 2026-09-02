@@ -151,6 +151,26 @@ pub fn exhaustive_gaussian_rational_unsigned_pair_gen<T: PrimitiveUnsigned>()
     ))
 }
 
+// -- (GaussianRational, PrimitiveSigned) (small shift amounts) --
+
+pub fn exhaustive_gaussian_rational_signed_pair_gen_var_1<T: PrimitiveSigned>()
+-> It<(GaussianRational, T)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_gaussian_rationals(),
+        exhaustive_signeds(),
+    ))
+}
+
+// -- (GaussianRational, PrimitiveUnsigned) (small shift amounts) --
+
+pub fn exhaustive_gaussian_rational_unsigned_pair_gen_var_1<T: PrimitiveUnsigned>()
+-> It<(GaussianRational, T)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_gaussian_rationals(),
+        exhaustive_unsigneds(),
+    ))
+}
+
 // -- (GaussianRational, Rational) --
 
 pub fn exhaustive_gaussian_rational_rational_pair_gen() -> It<(GaussianRational, Rational)> {

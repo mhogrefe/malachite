@@ -231,6 +231,54 @@ pub fn random_gaussian_rational_primitive_int_pair_gen<T: PrimitiveInt>(
     ))
 }
 
+// -- (GaussianRational, PrimitiveSigned) (small shift amounts) --
+
+pub fn random_gaussian_rational_signed_pair_gen_var_1<T: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(GaussianRational, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_gaussian_rationals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_signeds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
+// -- (GaussianRational, PrimitiveUnsigned) (small shift amounts) --
+
+pub fn random_gaussian_rational_unsigned_pair_gen_var_1<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(GaussianRational, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_gaussian_rationals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
 // -- (GaussianRational, Rational) --
 
 pub fn random_gaussian_rational_rational_pair_gen(

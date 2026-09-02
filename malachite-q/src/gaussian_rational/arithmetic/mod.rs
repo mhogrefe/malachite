@@ -29,6 +29,66 @@ pub mod neg;
 /// Implementations of [`PowerOf2`](malachite_base::num::arithmetic::traits::PowerOf2), a trait for
 /// computing a power of 2.
 pub mod power_of_2;
+/// Left-shifting a [`GaussianRational`](crate::gaussian_rational::GaussianRational) (multiplying it
+/// by a power of 2). A negative shift amount divides by a power of 2 instead.
+///
+/// # shl
+/// ```
+/// use malachite_q::gaussian_rational::GaussianRational;
+/// use std::str::FromStr;
+///
+/// let x = GaussianRational::from_str("7/22-i").unwrap();
+/// assert_eq!((x.clone() << 2u8).to_string(), "14/11-4i");
+/// assert_eq!((&x << 2u64).to_string(), "14/11-4i");
+/// assert_eq!((&x << 2i8).to_string(), "14/11-4i");
+/// assert_eq!((&x << -2i64).to_string(), "7/88-i/4");
+/// assert_eq!((x << -1i32).to_string(), "7/44-i/2");
+/// ```
+///
+/// # shl_assign
+/// ```
+/// use malachite_q::gaussian_rational::GaussianRational;
+/// use std::str::FromStr;
+///
+/// let mut x = GaussianRational::from_str("1+i").unwrap();
+/// x <<= 1u8;
+/// x <<= 2u16;
+/// assert_eq!(x.to_string(), "8+8i");
+/// x <<= -4i8;
+/// x <<= -1i64;
+/// assert_eq!(x.to_string(), "1/4+i/4");
+/// ```
+pub mod shl;
+/// Right-shifting a [`GaussianRational`](crate::gaussian_rational::GaussianRational) (dividing it
+/// by a power of 2). A negative shift amount multiplies by a power of 2 instead.
+///
+/// # shr
+/// ```
+/// use malachite_q::gaussian_rational::GaussianRational;
+/// use std::str::FromStr;
+///
+/// let x = GaussianRational::from_str("14/11-4i").unwrap();
+/// assert_eq!((x.clone() >> 2u8).to_string(), "7/22-i");
+/// assert_eq!((&x >> 2u64).to_string(), "7/22-i");
+/// assert_eq!((&x >> 2i8).to_string(), "7/22-i");
+/// assert_eq!((&x >> -2i64).to_string(), "56/11-16i");
+/// assert_eq!((x >> -1i32).to_string(), "28/11-8i");
+/// ```
+///
+/// # shr_assign
+/// ```
+/// use malachite_q::gaussian_rational::GaussianRational;
+/// use std::str::FromStr;
+///
+/// let mut x = GaussianRational::from_str("8+8i").unwrap();
+/// x >>= 1u8;
+/// x >>= 2u16;
+/// assert_eq!(x.to_string(), "1+i");
+/// x >>= -4i8;
+/// x >>= -1i64;
+/// assert_eq!(x.to_string(), "32+32i");
+/// ```
+pub mod shr;
 /// Implementations of [`Square`](malachite_base::num::arithmetic::traits::Square) and
 /// [`SquareAssign`](malachite_base::num::arithmetic::traits::SquareAssign), traits for squaring a
 /// number.

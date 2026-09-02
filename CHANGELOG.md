@@ -101,7 +101,11 @@ documented by git history.
   already had; negative integers are never powers of 2 (and, in malachite-base, so does every
   signed primitive integer).
 - `Shl` and `ShlAssign` for `GaussianInteger` by any unsigned primitive integer, shifting both
-  parts (multiplying by a power of 2), in value, reference, and in-place variants.
+  parts (multiplying by a power of 2), in value, reference, and in-place variants. Signed shift
+  amounts are deliberately not supported for `GaussianInteger`, since a negative amount would
+  be a right shift and exact division by a power of 2 is not generally possible; in malachite-q,
+  `GaussianRational` supports both unsigned and signed shift amounts, a negative amount dividing
+  both parts exactly, and likewise `Shr` and `ShrAssign` by unsigned and signed amounts.
 - `ComparableGaussianInteger` and `ComparableGaussianIntegerRef`, wrappers around
   `GaussianInteger` (by value and by reference) that implement `Ord`, comparing
   lexicographically: first by real part, then by imaginary part. Since no total order on the

@@ -74,6 +74,8 @@ pub mod gaussian_rational {
         pub mod mul;
         pub mod neg;
         pub mod power_of_2;
+        pub mod shl;
+        pub mod shr;
         pub mod square;
         pub mod sub;
     }
