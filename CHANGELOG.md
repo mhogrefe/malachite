@@ -133,6 +133,9 @@ documented by git history.
   the other crates, `Rational` and `Float`), where canonical unit form is the absolute value.
   `GaussianInteger`'s units are $\pm 1$ and $\pm i$; `GaussianRational` is a field, so its
   units are the nonzero values.
+- `SignificantBits` for both Gaussian types, summing the significant bits of the real and
+  imaginary parts, and `GaussianInteger::max_significant_bits`, the larger of the two counts,
+  which is FLINT's `fmpzi_bits` and the size measure its algorithm selection uses.
 - `ComparableGaussianInteger` and `ComparableGaussianIntegerRef`, wrappers around
   `GaussianInteger` (by value and by reference) that implement `Ord`, comparing
   lexicographically: first by real part, then by imaginary part. Since no total order on the

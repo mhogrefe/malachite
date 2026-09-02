@@ -129,6 +129,9 @@ pub mod gaussian_integer {
         pub mod exhaustive_imaginary_gaussian_integers;
         pub mod exhaustive_real_gaussian_integers;
     }
+    pub mod logic {
+        pub mod significant_bits;
+    }
     pub mod random {
         pub mod random_gaussian_integers;
         pub mod random_imaginary_gaussian_integers;

@@ -17,6 +17,8 @@ pub mod comparison;
 pub mod conversion;
 /// Iterators that generate [`GaussianInteger`]s without repetition.
 pub mod exhaustive;
+/// Traits for logic and bit manipulation.
+pub mod logic;
 #[cfg(feature = "random")]
 /// Iterators that generate [`GaussianInteger`]s randomly.
 pub mod random;

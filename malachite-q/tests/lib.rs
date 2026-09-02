@@ -140,6 +140,9 @@ pub mod gaussian_rational {
         pub mod exhaustive_imaginary_gaussian_rationals;
         pub mod exhaustive_real_gaussian_rationals;
     }
+    pub mod logic {
+        pub mod significant_bits;
+    }
     pub mod random {
         pub mod random_gaussian_rationals;
         pub mod random_imaginary_gaussian_rationals;
