@@ -62,6 +62,44 @@ pub trait ConjugateAssign {
     fn conjugate_assign(&mut self);
 }
 
+/// Multiplies a number by $i$, the imaginary unit.
+///
+/// For a complex number $a + bi$ this is $-b + ai$, a counterclockwise quarter turn. No type in
+/// this crate implements this trait; it exists for complex types downstream, like Gaussian
+/// integers.
+pub trait MulI {
+    type Output;
+
+    fn mul_i(self) -> Self::Output;
+}
+
+/// Replaces a number with its product with $i$, the imaginary unit.
+///
+/// For a complex number $a + bi$ the result is $-b + ai$, a counterclockwise quarter turn. No type
+/// in this crate implements this trait; it exists for complex types downstream, like Gaussian
+/// integers.
+pub trait MulIAssign {
+    fn mul_i_assign(&mut self);
+}
+
+/// Divides a number by $i$, the imaginary unit.
+///
+/// For a complex number $a + bi$ this is $b - ai$, a clockwise quarter turn. No type in this crate
+/// implements this trait; it exists for complex types downstream, like Gaussian integers.
+pub trait DivI {
+    type Output;
+
+    fn div_i(self) -> Self::Output;
+}
+
+/// Replaces a number with its quotient by $i$, the imaginary unit.
+///
+/// For a complex number $a + bi$ the result is $b - ai$, a clockwise quarter turn. No type in this
+/// crate implements this trait; it exists for complex types downstream, like Gaussian integers.
+pub trait DivIAssign {
+    fn div_i_assign(&mut self);
+}
+
 /// Takes the absolute value of a number and converts to the unsigned equivalent.
 pub trait UnsignedAbs {
     type Output;

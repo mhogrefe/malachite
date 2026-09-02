@@ -29,6 +29,9 @@ documented by git history.
   primitive types (and, in the other crates, all bignum types). For every type,
   `x.is_integer() == x.is_gaussian_integer() && x.is_real()`; for floating-point types, `NaN`
   and the infinities are neither real nor Gaussian integers.
+- New `MulI`, `MulIAssign`, `DivI`, and `DivIAssign` traits for multiplying or dividing a number
+  by $i$, the imaginary unit — quarter turns in the complex plane, which need no multiplication.
+  Nothing in malachite-base implements them; `GaussianInteger` and `GaussianRational` do.
 - `IsPowerOf2` is now implemented for the signed primitive integers (negative values are never
   powers of 2), and is a supertrait of `PrimitiveInt` rather than only of `PrimitiveUnsigned`.
 
@@ -106,6 +109,9 @@ documented by git history.
   be a right shift and exact division by a power of 2 is not generally possible; in malachite-q,
   `GaussianRational` supports both unsigned and signed shift amounts, a negative amount dividing
   both parts exactly, and likewise `Shr` and `ShrAssign` by unsigned and signed amounts.
+- `MulI`/`MulIAssign` and `DivI`/`DivIAssign` for both Gaussian types: multiplying by $i$ maps
+  $a + bi$ to $-b + ai$ and dividing by $i$ maps it to $b - ai$, by swapping the parts and
+  negating one of them.
 - `ComparableGaussianInteger` and `ComparableGaussianIntegerRef`, wrappers around
   `GaussianInteger` (by value and by reference) that implement `Ord`, comparing
   lexicographically: first by real part, then by imaginary part. Since no total order on the

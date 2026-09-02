@@ -70,8 +70,10 @@ pub mod gaussian_rational {
         pub mod abs_squared;
         pub mod add;
         pub mod conjugate;
+        pub mod div_i;
         pub mod is_power_of_2;
         pub mod mul;
+        pub mod mul_i;
         pub mod neg;
         pub mod power_of_2;
         pub mod shl;
