@@ -93,6 +93,9 @@ pub mod eq_mod_power_of_2;
 /// Implementations of [`ExtendedGcd`](malachite_base::num::arithmetic::traits::ExtendedGcd), a
 /// trait for computing the extended GCD of two numbers.
 pub mod extended_gcd;
+/// An implementation of [`IsPowerOf2`](malachite_base::num::arithmetic::traits::IsPowerOf2), a
+/// trait for determining whether a number is an integer power of 2.
+pub mod is_power_of_2;
 /// Implementations of [`LegendreSymbol`](malachite_base::num::arithmetic::traits::LegendreSymbol),
 /// [`JacobiSymbol`](malachite_base::num::arithmetic::traits::JacobiSymbol), and
 /// [`KroneckerSymbol`](malachite_base::num::arithmetic::traits::KroneckerSymbol), traits for

@@ -22,6 +22,9 @@ pub mod add;
 /// [`ConjugateAssign`](malachite_base::num::arithmetic::traits::ConjugateAssign), traits for
 /// computing the complex conjugate of a number: the sign of the imaginary part is flipped.
 pub mod conjugate;
+/// An implementation of [`IsPowerOf2`](malachite_base::num::arithmetic::traits::IsPowerOf2), a
+/// trait for determining whether a number is an integer power of 2.
+pub mod is_power_of_2;
 /// Multiplication of [`GaussianInteger`](crate::gaussian_integer::GaussianInteger)s.
 pub mod mul;
 /// Implementations of [`Neg`](core::ops::Neg) and
@@ -29,6 +32,9 @@ pub mod mul;
 /// [`GaussianInteger`](crate::gaussian_integer::GaussianInteger), negating both the real and
 /// imaginary parts.
 pub mod neg;
+/// An implementation of [`PowerOf2`](malachite_base::num::arithmetic::traits::PowerOf2), a trait
+/// for computing a power of 2.
+pub mod power_of_2;
 /// Implementations of [`Square`](malachite_base::num::arithmetic::traits::Square) and
 /// [`SquareAssign`](malachite_base::num::arithmetic::traits::SquareAssign), traits for squaring a
 /// number.

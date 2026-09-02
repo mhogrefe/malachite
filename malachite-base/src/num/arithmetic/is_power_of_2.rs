@@ -23,6 +23,29 @@ macro_rules! impl_is_power_of_2_unsigned {
 }
 apply_to_unsigneds!(impl_is_power_of_2_unsigned);
 
+macro_rules! impl_is_power_of_2_signed {
+    ($t:ident) => {
+        impl IsPowerOf2 for $t {
+            /// Determines whether a number is an integer power of 2.
+            ///
+            /// Negative numbers are never powers of 2.
+            ///
+            /// $f(x) = (\exists n \in \N : 2^n = x)$.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
+            ///
+            /// # Examples
+            /// See [here](super::is_power_of_2#is_power_of_2).
+            #[inline]
+            fn is_power_of_2(&self) -> bool {
+                *self > 0 && self.unsigned_abs().is_power_of_2()
+            }
+        }
+    };
+}
+apply_to_signeds!(impl_is_power_of_2_signed);
+
 macro_rules! impl_is_power_of_2_primitive_float {
     ($t:ident) => {
         impl IsPowerOf2 for $t {

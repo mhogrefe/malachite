@@ -13,10 +13,10 @@ use crate::num::arithmetic::traits::{
     CheckedLogBase2, CheckedLogBasePowerOf2, CheckedLucasNumber, CheckedMultifactorial,
     CheckedNextPowerOf2, CheckedPrimorial, CheckedSubfactorial, CoprimeWith, DoubleFactorial,
     ExtendedGcd, Factorial, Fibonacci, FloorLogBase, FloorLogBase2, FloorLogBasePowerOf2, Gcd,
-    GcdAssign, IsPowerOf2, Lcm, LcmAssign, LucasNumber, ModAdd, ModAddAssign, ModInverse,
-    ModIsReduced, ModMul, ModMulAssign, ModMulPrecomputed, ModMulPrecomputedAssign, ModNeg,
-    ModNegAssign, ModPow, ModPowAssign, ModPowPrecomputed, ModPowPrecomputedAssign, ModPowerOf2,
-    ModPowerOf2Add, ModPowerOf2AddAssign, ModPowerOf2Inverse, ModPowerOf2IsReduced, ModPowerOf2Mul,
+    GcdAssign, Lcm, LcmAssign, LucasNumber, ModAdd, ModAddAssign, ModInverse, ModIsReduced, ModMul,
+    ModMulAssign, ModMulPrecomputed, ModMulPrecomputedAssign, ModNeg, ModNegAssign, ModPow,
+    ModPowAssign, ModPowPrecomputed, ModPowPrecomputedAssign, ModPowerOf2, ModPowerOf2Add,
+    ModPowerOf2AddAssign, ModPowerOf2Inverse, ModPowerOf2IsReduced, ModPowerOf2Mul,
     ModPowerOf2MulAssign, ModPowerOf2Neg, ModPowerOf2NegAssign, ModPowerOf2Pow,
     ModPowerOf2PowAssign, ModPowerOf2Shl, ModPowerOf2ShlAssign, ModPowerOf2Shr,
     ModPowerOf2ShrAssign, ModPowerOf2Square, ModPowerOf2SquareAssign, ModPowerOf2Sub,
@@ -87,7 +87,6 @@ pub trait PrimitiveUnsigned:
     + GcdAssign<Self>
     + HammingDistance
     + IntegerMantissaAndExponent<Self, u64>
-    + IsPowerOf2
     + Lcm<Self, Output = Self>
     + LcmAssign<Self>
     + LucasNumber

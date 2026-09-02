@@ -1391,6 +1391,10 @@ pub mod gcd;
 /// ```
 /// use malachite_base::num::arithmetic::traits::IsPowerOf2;
 ///
+/// assert_eq!(4i32.is_power_of_2(), true);
+/// assert_eq!(5i32.is_power_of_2(), false);
+/// assert_eq!((-4i32).is_power_of_2(), false);
+///
 /// assert_eq!(4.0.is_power_of_2(), true);
 /// assert_eq!(0.25.is_power_of_2(), true);
 /// assert_eq!(0.2.is_power_of_2(), false);

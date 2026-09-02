@@ -29,6 +29,8 @@ documented by git history.
   primitive types (and, in the other crates, all bignum types). For every type,
   `x.is_integer() == x.is_gaussian_integer() && x.is_real()`; for floating-point types, `NaN`
   and the infinities are neither real nor Gaussian integers.
+- `IsPowerOf2` is now implemented for the signed primitive integers (negative values are never
+  powers of 2), and is a supertrait of `PrimitiveInt` rather than only of `PrimitiveUnsigned`.
 
 ### malachite-nz
 
@@ -92,6 +94,12 @@ documented by git history.
   float exactly (as an odd square times a power of two, or as a `Rational`) rather than
   rounding. NaN is incomparable to everything, and the infinities are greater in absolute value
   than every Gaussian value.
+- `PowerOf2` and `IsPowerOf2` for the Gaussian types: `GaussianInteger::power_of_2(k)` and
+  `GaussianRational::power_of_2(k)` (the latter also for negative `k`) produce purely real
+  powers of 2, and `is_power_of_2` is true only for purely real, positive powers of 2 — $i$ and
+  its multiples do not count. `Integer` also gains `IsPowerOf2`, which `Natural` and `Rational`
+  already had; negative integers are never powers of 2 (and, in malachite-base, so does every
+  signed primitive integer).
 - `ComparableGaussianInteger` and `ComparableGaussianIntegerRef`, wrappers around
   `GaussianInteger` (by value and by reference) that implement `Ord`, comparing
   lexicographically: first by real part, then by imaginary part. Since no total order on the

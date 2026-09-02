@@ -70,8 +70,10 @@ pub mod gaussian_integer {
         pub mod abs_squared;
         pub mod add;
         pub mod conjugate;
+        pub mod is_power_of_2;
         pub mod mul;
         pub mod neg;
+        pub mod power_of_2;
         pub mod square;
         pub mod sub;
     }
@@ -154,6 +156,7 @@ pub mod integer {
         pub mod eq_mod;
         pub mod eq_mod_power_of_2;
         pub mod extended_gcd;
+        pub mod is_power_of_2;
         pub mod kronecker_symbol;
         pub mod mod_euclidean;
         pub mod mod_op;
