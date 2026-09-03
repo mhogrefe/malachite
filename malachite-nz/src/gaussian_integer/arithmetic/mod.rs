@@ -72,6 +72,10 @@ pub mod mul_i_pow;
 /// [`GaussianInteger`](crate::gaussian_integer::GaussianInteger), negating both the real and
 /// imaginary parts.
 pub mod neg;
+/// Implementations of [`Pow`](malachite_base::num::arithmetic::traits::Pow) and
+/// [`PowAssign`](malachite_base::num::arithmetic::traits::PowAssign), traits for raising a number
+/// to a power.
+pub mod pow;
 /// An implementation of [`PowerOf2`](malachite_base::num::arithmetic::traits::PowerOf2), a trait
 /// for computing a power of 2.
 pub mod power_of_2;

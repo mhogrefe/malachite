@@ -83,6 +83,7 @@ pub mod gaussian_integer {
         pub mod mul_i;
         pub mod mul_i_pow;
         pub mod neg;
+        pub mod pow;
         pub mod power_of_2;
         pub mod rem;
         pub mod shl;

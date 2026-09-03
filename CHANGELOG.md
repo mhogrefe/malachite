@@ -161,6 +161,9 @@ documented by git history.
   exponent $k$ (only $k$ modulo 4 matters, and $i^{-k} = i^{3k}$), implemented for
   `GaussianInteger` and `GaussianRational` as a port of FLINT's `fmpzi_mul_i_pow_si`;
   `canonicalize_unit` is now defined through it.
+- `Pow<u64>` and `PowAssign<u64>` for `GaussianInteger`, a port of FLINT's `fmpzi_pow_ui`: binary
+  exponentiation over the fused squaring and multiplication, with purely real and purely
+  imaginary bases reduced to an `Integer` power (times $i^n$ for the latter).
 - `ComparableGaussianInteger` and `ComparableGaussianIntegerRef`, wrappers around
   `GaussianInteger` (by value and by reference) that implement `Ord`, comparing
   lexicographically: first by real part, then by imaginary part. Since no total order on the
