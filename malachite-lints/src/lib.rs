@@ -80,11 +80,13 @@ mod use_width_mask;
 
 dylint_linting::dylint_library!();
 
-const BIGNUM_TYPES: [(&[&str], &str); 4] = [
+const BIGNUM_TYPES: [(&[&str], &str); 6] = [
     (&["malachite_nz", "natural", "Natural"], "Natural"),
     (&["malachite_nz", "integer", "Integer"], "Integer"),
     (&["malachite_q", "rational", "Rational"], "Rational"),
     (&["malachite_float", "float", "Float"], "Float"),
+    (&["malachite_nz", "gaussian_integer", "GaussianInteger"], "GaussianInteger"),
+    (&["malachite_q", "gaussian_rational", "GaussianRational"], "GaussianRational"),
 ];
 
 // If `e` (possibly behind `&`) is a call to `T::power_of_2` where `T` is a Malachite bignum type,

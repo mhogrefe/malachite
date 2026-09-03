@@ -142,7 +142,10 @@ impl<'tcx> LateLintPass<'tcx> for UseMulShrRound {
             .typeck_results()
             .expr_ty(crate::peel_clone_and_borrows(product))
             .peel_refs();
-        if crate::bignum_name(cx, prod_ty).is_some() {
+        // The Gaussian types have no `mul_shr_round`.
+        if crate::bignum_name(cx, prod_ty)
+            .is_some_and(|name| !matches!(name, "GaussianInteger" | "GaussianRational"))
+        {
             span_lint(
                 cx,
                 USE_MUL_SHR_ROUND,

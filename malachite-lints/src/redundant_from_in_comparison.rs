@@ -18,7 +18,7 @@ use rustc_session::{declare_lint, declare_lint_pass};
 declare_lint! {
     /// ### What it does
     ///
-    /// Flags comparisons between a bignum type (`Natural`, `Integer`, `Rational`, or `Float`) and a
+    /// Flags comparisons between a bignum type (`Natural`, `Integer`, `Rational`, `Float`, `GaussianInteger`, or `GaussianRational`) and a
     /// value converted from a primitive with `from`, such as `x >= Integer::from(prec)`.
     ///
     /// ### Why is this bad?

@@ -51,13 +51,13 @@ impl Mul<Self> for GaussianRational {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::{I, NegativeOne};
+    /// use malachite_base::num::basic::traits::{I, One};
     /// use malachite_q::gaussian_rational::GaussianRational;
     /// use std::str::FromStr;
     ///
     /// assert_eq!(
-    ///     GaussianRational::I * GaussianRational::I,
-    ///     GaussianRational::NEGATIVE_ONE
+    ///     GaussianRational::I * -GaussianRational::I,
+    ///     GaussianRational::ONE
     /// );
     /// let x = GaussianRational::from_str("1/2+i/2").unwrap();
     /// let y = GaussianRational::from_str("1/3-i/3").unwrap();
@@ -88,7 +88,6 @@ impl Mul<&Self> for GaussianRational {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::{I, NegativeOne};
     /// use malachite_q::gaussian_rational::GaussianRational;
     /// use std::str::FromStr;
     ///
@@ -121,7 +120,6 @@ impl Mul<GaussianRational> for &GaussianRational {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::{I, NegativeOne};
     /// use malachite_q::gaussian_rational::GaussianRational;
     /// use std::str::FromStr;
     ///
@@ -155,7 +153,6 @@ impl Mul<&GaussianRational> for &GaussianRational {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::{I, NegativeOne};
     /// use malachite_q::gaussian_rational::GaussianRational;
     /// use std::str::FromStr;
     ///
@@ -195,7 +192,6 @@ impl MulAssign<Self> for GaussianRational {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::{I, NegativeOne};
     /// use malachite_q::gaussian_rational::GaussianRational;
     /// use std::str::FromStr;
     ///
@@ -229,7 +225,6 @@ impl MulAssign<&Self> for GaussianRational {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::{I, NegativeOne};
     /// use malachite_q::gaussian_rational::GaussianRational;
     /// use std::str::FromStr;
     ///
@@ -281,7 +276,7 @@ impl Product for GaussianRational {
     where
         I: Iterator<Item = Self>,
     {
-        balanced_fold(xs, |x| *x == Self::ZERO, |a, b| *a *= b).unwrap_or(Self::ONE)
+        balanced_fold(xs, |x| *x == 0u32, |a, b| *a *= b).unwrap_or(Self::ONE)
     }
 }
 
@@ -322,6 +317,6 @@ impl<'a> Product<&'a Self> for GaussianRational {
     where
         I: Iterator<Item = &'a Self>,
     {
-        balanced_fold(xs.cloned(), |x| *x == Self::ZERO, |a, b| *a *= b).unwrap_or(Self::ONE)
+        balanced_fold(xs.cloned(), |x| *x == 0u32, |a, b| *a *= b).unwrap_or(Self::ONE)
     }
 }

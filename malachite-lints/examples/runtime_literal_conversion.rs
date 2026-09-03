@@ -4,6 +4,8 @@
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_q::Rational;
+use malachite_nz::gaussian_integer::GaussianInteger;
+use malachite_q::gaussian_rational::GaussianRational;
 
 const TEN: Natural = Natural::const_from(10);
 
@@ -28,6 +30,9 @@ fn main() {
     let _ = Rational::from_signeds(-3i32, 4i32);
     let _ = Rational::const_from_unsigneds(3, 4);
     let _ = const { Rational::const_from_signeds(-3, 4) };
+    // The Gaussian types have no `const_from*` yet: not flagged.
+    let _ = GaussianInteger::from(100u32);
+    let _ = GaussianRational::from(-100i32);
 }
 
 // Inside a `const fn`, a `const_from*` call is evaluated at compile time whenever the caller is:

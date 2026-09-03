@@ -170,13 +170,13 @@ impl Mul<Self> for GaussianInteger {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::{I, NegativeOne};
+    /// use malachite_base::num::basic::traits::{I, One};
     /// use malachite_nz::gaussian_integer::GaussianInteger;
     /// use std::str::FromStr;
     ///
     /// assert_eq!(
-    ///     GaussianInteger::I * GaussianInteger::I,
-    ///     GaussianInteger::NEGATIVE_ONE
+    ///     GaussianInteger::I * -GaussianInteger::I,
+    ///     GaussianInteger::ONE
     /// );
     /// let x = GaussianInteger::from_str("2-3i").unwrap();
     /// let y = GaussianInteger::from_str("-1+4i").unwrap();
@@ -387,7 +387,7 @@ impl Product for GaussianInteger {
     where
         I: Iterator<Item = Self>,
     {
-        balanced_fold(xs, |x| *x == Self::ZERO, |a, b| *a *= b).unwrap_or(Self::ONE)
+        balanced_fold(xs, |x| *x == 0u32, |a, b| *a *= b).unwrap_or(Self::ONE)
     }
 }
 
@@ -428,6 +428,6 @@ impl<'a> Product<&'a Self> for GaussianInteger {
     where
         I: Iterator<Item = &'a Self>,
     {
-        balanced_fold(xs.cloned(), |x| *x == Self::ZERO, |a, b| *a *= b).unwrap_or(Self::ONE)
+        balanced_fold(xs.cloned(), |x| *x == 0u32, |a, b| *a *= b).unwrap_or(Self::ONE)
     }
 }

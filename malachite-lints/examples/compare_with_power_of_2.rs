@@ -4,6 +4,8 @@ use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_q::Rational;
+use malachite_nz::gaussian_integer::GaussianInteger;
+use malachite_q::gaussian_rational::GaussianRational;
 
 fn main() {
     let n = const { Natural::const_from(100) };
@@ -22,4 +24,12 @@ fn main() {
     // Comparing with something that is not power_of_2: fine.
     let m = const { Natural::const_from(32) };
     let _ = n < m;
+    let g = GaussianInteger::from(3u32);
+    let h = GaussianRational::from(3u32);
+    if g == GaussianInteger::power_of_2(10) {
+        println!("gaussian");
+    }
+    if h != GaussianRational::power_of_2(10u64) {
+        println!("gaussian rational");
+    }
 }

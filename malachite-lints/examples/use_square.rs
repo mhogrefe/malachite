@@ -1,6 +1,8 @@
 use malachite_base::num::arithmetic::traits::{Pow, PowAssign};
 use malachite_nz::natural::Natural;
 use malachite_q::Rational;
+use malachite_nz::gaussian_integer::GaussianInteger;
+use malachite_q::gaussian_rational::GaussianRational;
 
 fn main() {
     let x = const { Natural::const_from(100) };
@@ -16,4 +18,8 @@ fn main() {
     let _ = &x * &y;
     // Other exponents: fine.
     let _ = (&x).pow(3);
+    let g = GaussianInteger::from(3u32);
+    let h = GaussianRational::from(3u32);
+    let _ = &g * &g;
+    let _ = &h * &h;
 }

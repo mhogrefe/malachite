@@ -2,6 +2,7 @@ use malachite_base::num::arithmetic::traits::ShrRound;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
+use malachite_q::gaussian_rational::GaussianRational;
 
 const X: Natural = Natural::const_from(5);
 const Y: Natural = Natural::const_from(3);
@@ -39,4 +40,8 @@ fn main() {
     let _ = (u64::from(e) * u64::from(d)) >> 32;
     // A shift of something that is not a product: not flagged.
     let _ = (&X + &Y) >> 5u32;
+    // `GaussianRational` has no `mul_shr_round`: not flagged.
+    let h = GaussianRational::from(3u32);
+    let h2 = GaussianRational::from(4u32);
+    let _ = (&h * &h2) >> 3u64;
 }

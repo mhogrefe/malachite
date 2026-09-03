@@ -2,6 +2,7 @@ use malachite_base::num::basic::traits::Two;
 use malachite_float::Float;
 use malachite_nz::natural::Natural;
 use malachite_q::Rational;
+use malachite_nz::gaussian_integer::GaussianInteger;
 
 const X: Natural = Natural::const_from(5);
 const Y: Natural = Natural::const_from(3);
@@ -97,4 +98,9 @@ fn main() {
     let _ = &F - &G * &H;
 
     println!("{a} {b} {j}");
+    // The Gaussian types have no fused operations: not flagged.
+    let g = GaussianInteger::from(3u32);
+    let g2 = GaussianInteger::from(4u32);
+    let g3 = GaussianInteger::from(5u32);
+    let _ = &g + &g2 * &g3;
 }

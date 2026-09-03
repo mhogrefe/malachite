@@ -56,7 +56,8 @@ your project. Notes:
 
 ### `redundant_from_in_comparison`
 
-Flags comparisons between a bignum type (`Natural`, `Integer`, `Rational`, or `Float`) and a value
+Flags comparisons between a bignum type (`Natural`, `Integer`, `Rational`, `Float`,
+`GaussianInteger`, or `GaussianRational`) and a value
 converted from a primitive with `from`, such as `x >= Integer::from(prec)`. The bignum types
 implement `PartialEq` and `PartialOrd` directly against the primitives, so the conversion (which
 may allocate) is unnecessary: `x >= prec` means the same thing. The lint only fires when the
@@ -80,7 +81,8 @@ exponent with the power is direct and cheap. The advice is type-specific: `Natur
 through `unsigned_abs_ref()`; `Rational` additionally has the `_abs` variants; and for a `Float`,
 `get_exponent()` gives 1 more than the floor of the log. Tests, demos, and test utilities are
 exempt: they compare against `power_of_2` on purpose, to cross-check the log functions
-themselves.
+themselves. For the Gaussian types the advice is to check that the imaginary part is zero and
+compare the real part's exponent.
 
 ### `mul_div_by_power_of_2`
 
@@ -91,11 +93,13 @@ so a signed `power_of_2` argument needs no special treatment. One case needs car
 own message: `Integer` division truncates while `>>` takes the floor, so dividing an `Integer`
 converts to `shr_round` with `Down` (or `>>` if the floor is really what's wanted). Tests, demos,
 and test utilities are exempt: they multiply by `power_of_2` on purpose, to cross-check the shift
-operators themselves.
+operators themselves. `GaussianInteger` division is not flagged: it rounds to the nearest Gaussian
+integer and has no right shift.
 
 ### `hoist_shifts`
 
-Flags a shifted operand inside a bignum multiplication, or a `Rational` division, when the shift
+Flags a shifted operand inside a bignum multiplication, or a `Rational` or `GaussianRational`
+division, when the shift
 can be hoisted out of the operation: `(a << s) * b` is `(a * b) << s`, and the hoisted form
 multiplies smaller values, shifting once at the end. Only exact rewrites are flagged: `Natural`
 and `Integer` right shifts are floor divisions and their `/` truncates, so for them only `<<`
@@ -214,9 +218,9 @@ or a primitive integer: use `even()` and `odd()`. The `% 2 == 1` / `!= 1` forms 
 
 ### `use_reciprocal`
 
-Flags dividing `ONE` by a `Rational` or a `Float` (`Float::ONE / x`): use `reciprocal()`,
-`reciprocal_assign()`, or (for `Float`) the `reciprocal_prec*` family for a specific output
-precision.
+Flags dividing `ONE` by a `Rational`, a `Float`, or a `GaussianRational` (`Float::ONE / x`): use
+`reciprocal()`, `reciprocal_assign()`, or (for `Float`) the `reciprocal_prec*` family for a
+specific output precision.
 
 ### `let_tuple_underscore_to_field`
 

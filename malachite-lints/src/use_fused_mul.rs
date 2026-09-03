@@ -79,7 +79,10 @@ const TRAIT_ROOT: &str = "malachite_base::num::arithmetic::traits";
 // silently change numeric results while pessimizing the code; reaching for `Float`'s fused
 // operations is an accuracy decision for the author to make explicitly.
 fn operator_form_is_worthwhile<'tcx>(cx: &LateContext<'tcx>, ty: Ty<'tcx>) -> bool {
-    crate::bignum_name(cx, ty).is_some_and(|name| name != "Float")
+    crate::bignum_name(cx, ty).is_some_and(|name| {
+        // The Gaussian types have no fused operations yet.
+        !matches!(name, "Float" | "GaussianInteger" | "GaussianRational")
+    })
 }
 
 // Whether any impl of the trait named by `path` has `ty` as its self type, ignoring references and

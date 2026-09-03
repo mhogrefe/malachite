@@ -14,7 +14,7 @@ use rustc_session::{declare_lint, declare_lint_pass};
 declare_lint! {
     /// ### What it does
     ///
-    /// Flags a shifted operand inside a multiplication or (for `Rational`) a division when the
+    /// Flags a shifted operand inside a multiplication or (for `Rational` and `GaussianRational`) a division when the
     /// shift can be hoisted out of the operation: `(a << s) * b` computes the same value as
     /// `(a * b) << s`.
     ///
@@ -88,10 +88,10 @@ impl<'tcx> LateLintPass<'tcx> for HoistShifts {
             return;
         };
         let rational = match name {
-            "Rational" => true,
+            "Rational" | "GaussianRational" => true,
             // Float shifts saturate at the exponent-range boundaries, so hoisting is not
             // value-preserving there; see the lint documentation.
-            "Natural" | "Integer" => false,
+            "Natural" | "Integer" | "GaussianInteger" => false,
             _ => return,
         };
         for (operand, operand_is_lhs) in [(lhs, true), (rhs, false)] {

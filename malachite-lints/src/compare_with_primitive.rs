@@ -17,7 +17,7 @@ use rustc_session::{declare_lint, declare_lint_pass};
 declare_lint! {
     /// ### What it does
     ///
-    /// Flags comparing a bignum (`Natural`, `Integer`, `Rational`, or `Float`) with a small named
+    /// Flags comparing a bignum (`Natural`, `Integer`, `Rational`, `Float`, `GaussianInteger`, or `GaussianRational`) with a small named
     /// bignum constant, or with `from(primitive)` in a comparison method, when the bignum could be
     /// compared with the primitive directly: `x == Rational::ONE`, `x.cmp(&Rational::ONE)`, or
     /// `x.partial_cmp(&Natural::from(10u32))`.

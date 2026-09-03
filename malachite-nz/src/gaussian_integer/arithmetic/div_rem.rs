@@ -16,6 +16,7 @@ use core::mem::take;
 use malachite_base::num::arithmetic::traits::{
     AbsSquared, Conjugate, DivAssignRem, DivRem, DivRound,
 };
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::rounding_modes::RoundingMode::Floor;
 
 // A dividend with this many fewer bits than the divisor (both measured as the larger of the two
@@ -61,7 +62,7 @@ pub(super) fn div_rem_val_ref(
             let r = x - &q * y;
             (q, r)
         }
-        None => (GaussianInteger::from(0u32), x),
+        None => (GaussianInteger::ZERO, x),
     }
 }
 
@@ -74,7 +75,7 @@ pub(super) fn div_rem_ref_ref(
             let r = x - &q * y;
             (q, r)
         }
-        None => (GaussianInteger::from(0u32), x.clone()),
+        None => (GaussianInteger::ZERO, x.clone()),
     }
 }
 

@@ -15,8 +15,9 @@ use crate::gaussian_integer::arithmetic::mul::{mul_val_ref, mul_val_val};
 use crate::integer::Integer;
 use core::mem::take;
 use malachite_base::num::arithmetic::traits::{
-    AbsSquared, Conjugate, DivExact, DivExactAssign, DivIAssign, PowerOf2,
+    AbsSquared, Conjugate, DivExact, DivExactAssign, DivI, PowerOf2,
 };
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom, SciMantissaAndExponent};
 use malachite_base::rounding_modes::RoundingMode::Down;
 
@@ -96,16 +97,15 @@ fn div_exact_val_ref(x: GaussianInteger, y: &GaussianInteger) -> GaussianInteger
             imaginary: x.imaginary.div_exact(&y.real),
         };
     } else if y.real == 0u32 {
-        let mut q = GaussianInteger {
+        return GaussianInteger {
             real: x.real.div_exact(&y.imaginary),
             imaginary: x.imaginary.div_exact(&y.imaginary),
-        };
-        q.div_i_assign();
-        return q;
+        }
+        .div_i();
     }
     let x_bits = x.max_significant_bits();
     if x_bits == 0 {
-        return GaussianInteger::from(0u32);
+        return GaussianInteger::ZERO;
     }
     let y_bits = y.max_significant_bits();
     if x_bits < y_bits + DOUBLE_QUOTIENT_BITS {
@@ -124,16 +124,15 @@ fn div_exact_ref_ref(x: &GaussianInteger, y: &GaussianInteger) -> GaussianIntege
             imaginary: (&x.imaginary).div_exact(&y.real),
         };
     } else if y.real == 0u32 {
-        let mut q = GaussianInteger {
+        return GaussianInteger {
             real: (&x.real).div_exact(&y.imaginary),
             imaginary: (&x.imaginary).div_exact(&y.imaginary),
-        };
-        q.div_i_assign();
-        return q;
+        }
+        .div_i();
     }
     let x_bits = x.max_significant_bits();
     if x_bits == 0 {
-        return GaussianInteger::from(0u32);
+        return GaussianInteger::ZERO;
     }
     let y_bits = y.max_significant_bits();
     if x_bits < y_bits + DOUBLE_QUOTIENT_BITS {

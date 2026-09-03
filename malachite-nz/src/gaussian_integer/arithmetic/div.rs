@@ -10,9 +10,10 @@ use crate::gaussian_integer::GaussianInteger;
 use crate::gaussian_integer::arithmetic::div_rem::quotient_or_zero;
 use core::ops::{Div, DivAssign};
 use malachite_base::num::arithmetic::traits::CheckedDiv;
+use malachite_base::num::basic::traits::Zero;
 
 fn div_ref_ref(x: &GaussianInteger, y: &GaussianInteger) -> GaussianInteger {
-    quotient_or_zero(x, y).unwrap_or_else(|| GaussianInteger::from(0u32))
+    quotient_or_zero(x, y).unwrap_or(GaussianInteger::ZERO)
 }
 
 impl Div<Self> for GaussianInteger {

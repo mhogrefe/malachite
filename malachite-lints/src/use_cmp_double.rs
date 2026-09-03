@@ -14,7 +14,7 @@ use rustc_session::{declare_lint, declare_lint_pass};
 declare_lint! {
     /// ### What it does
     ///
-    /// Flags comparing a bignum (`Natural`, `Integer`, `Rational`, or `Float`) against another
+    /// Flags comparing a bignum (`Natural`, `Integer`, `Rational`, `Float`, `GaussianInteger`, or `GaussianRational`) against another
     /// value doubled by `<< 1`, like `x.cmp(&(y << 1))` or `x < y << 1`. Covers the comparison
     /// operators, `cmp`, `partial_cmp`, `lt`/`le`/`gt`/`ge`, `eq`/`ne`, and each of their `_abs`
     /// counterparts; the shift amount may be written `1` or `T::ONE`. The doubled value may be on

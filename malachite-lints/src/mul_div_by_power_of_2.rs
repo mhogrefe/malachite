@@ -14,7 +14,7 @@ use rustc_session::{declare_lint, declare_lint_pass};
 declare_lint! {
     /// ### What it does
     ///
-    /// Flags multiplying or dividing a bignum (`Natural`, `Integer`, `Rational`, or `Float`) by
+    /// Flags multiplying or dividing a bignum (`Natural`, `Integer`, `Rational`, `Float`, `GaussianInteger`, or `GaussianRational`) by
     /// `power_of_2(..)`, including the `*=` and `/=` forms.
     ///
     /// ### Why is this bad?
@@ -85,6 +85,9 @@ impl<'tcx> LateLintPass<'tcx> for MulDivByPowerOf2 {
                 (false, true, "Integer") => {
                     "use `shr_round_assign` with `Down` (or `>>=`, which takes the floor)"
                 }
+                // `GaussianInteger` division rounds to the nearest Gaussian integer and there is
+                // no right shift, so there is nothing cheaper to suggest.
+                (false, _, "GaussianInteger") => return,
                 (false, false, _) => "use `>>`",
                 (false, true, _) => "use `>>=`",
             };

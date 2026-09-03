@@ -19,7 +19,7 @@ impl IsUnit for GaussianInteger {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::IsUnit;
-    /// use malachite_base::num::basic::traits::{I, NegativeI, NegativeOne, One, Zero};
+    /// use malachite_base::num::basic::traits::{I, NegativeI, NegativeOne, One, Two, Zero};
     /// use malachite_nz::gaussian_integer::GaussianInteger;
     /// use std::str::FromStr;
     ///
@@ -29,7 +29,7 @@ impl IsUnit for GaussianInteger {
     /// assert_eq!(GaussianInteger::NEGATIVE_I.is_unit(), true);
     /// assert_eq!(GaussianInteger::ZERO.is_unit(), false);
     /// assert_eq!(GaussianInteger::from_str("1+i").unwrap().is_unit(), false);
-    /// assert_eq!(GaussianInteger::from(2).is_unit(), false);
+    /// assert_eq!(GaussianInteger::TWO.is_unit(), false);
     /// ```
     fn is_unit(&self) -> bool {
         if self.imaginary == 0u32 {

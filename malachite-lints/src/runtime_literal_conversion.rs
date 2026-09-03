@@ -85,6 +85,11 @@ impl<'tcx> LateLintPass<'tcx> for RuntimeLiteralConversion {
         let Some(t_name) = crate::bignum_name(cx, cx.typeck_results().expr_ty(expr)) else {
             return;
         };
+        // The Gaussian types have no `const_from*` constructors yet, so there is nothing to
+        // suggest for them.
+        if matches!(t_name, "GaussianInteger" | "GaussianRational") {
+            return;
+        }
         if CONST_FROM_FNS.contains(&fn_name) {
             // `const_from*` outside a const context still runs at runtime. (Literals 0, 1, 2, and
             // -1 are left to `use_named_constant`.)

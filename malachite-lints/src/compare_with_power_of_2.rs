@@ -14,7 +14,7 @@ use rustc_session::{declare_lint, declare_lint_pass};
 declare_lint! {
     /// ### What it does
     ///
-    /// Flags comparing a bignum (`Natural`, `Integer`, `Rational`, or `Float`) with
+    /// Flags comparing a bignum (`Natural`, `Integer`, `Rational`, `Float`, `GaussianInteger`, or `GaussianRational`) with
     /// `power_of_2(..)`, whether via the comparison operators or via `cmp`, `partial_cmp`, or the
     /// `*_abs` comparison methods.
     ///
@@ -111,6 +111,10 @@ impl<'tcx> LateLintPass<'tcx> for CompareWithPowerOf2 {
                 "Rational" => {
                     "compare `floor_log_base_2()`/`ceiling_log_base_2()` (or their `_abs` \
                     variants) with the power"
+                }
+                "GaussianInteger" | "GaussianRational" => {
+                    "check that the imaginary part is zero and compare the real part's exponent \
+                    with the power"
                 }
                 _ => "compare `get_exponent()` with the power",
             };

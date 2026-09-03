@@ -69,8 +69,8 @@ impl<'tcx> LateLintPass<'tcx> for UseReciprocal {
         {
             return;
         }
-        // Only `Rational` and `Float` have `Reciprocal`.
-        let Some(name @ ("Rational" | "Float")) =
+        // Only `Rational`, `Float`, and `GaussianRational` have `Reciprocal`.
+        let Some(name @ ("Rational" | "Float" | "GaussianRational")) =
             crate::bignum_name(cx, cx.typeck_results().expr_ty(num).peel_refs())
         else {
             return;

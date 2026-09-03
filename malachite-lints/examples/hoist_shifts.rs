@@ -10,6 +10,8 @@ use malachite_float::Float;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_q::Rational;
+use malachite_nz::gaussian_integer::GaussianInteger;
+use malachite_q::gaussian_rational::GaussianRational;
 
 fn main() {
     let n = const { Natural::const_from(100) };
@@ -46,4 +48,9 @@ fn main() {
     let _ = (p << 5) * p;
     // The shifted result itself: fine.
     let _ = (&n * &m) << 5u64;
+    let g = GaussianInteger::from(3u32);
+    let h = GaussianRational::from(3u32);
+    // Gaussian multiplication hoists like the real types, and `GaussianRational` division too.
+    let _ = (&g << 3u64) * &g;
+    let _ = (&h << 3u64) / &h;
 }

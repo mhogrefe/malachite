@@ -1,6 +1,8 @@
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_q::Rational;
+use malachite_nz::gaussian_integer::GaussianInteger;
+use malachite_q::gaussian_rational::GaussianRational;
 
 fn main() {
     let n = const { Natural::const_from(100) };
@@ -18,4 +20,13 @@ fn main() {
     let _ = Rational::from(three) != q;
     // The argument is not a primitive: fine.
     let _ = big > Integer::from(Natural::from(three));
+    let g = GaussianInteger::from(3u32);
+    let h = GaussianRational::from(3u32);
+    let k = 5u32;
+    if g == GaussianInteger::from(k) {
+        println!("gaussian");
+    }
+    if h != GaussianRational::from(k) {
+        println!("gaussian rational");
+    }
 }

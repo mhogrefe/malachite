@@ -24,7 +24,7 @@ pub fn gaussian_integer_product_naive<I: Iterator<Item = GaussianInteger>>(
 ) -> GaussianInteger {
     let mut p = GaussianInteger::ONE;
     for x in xs {
-        if x == GaussianInteger::ZERO {
+        if x == 0u32 {
             return GaussianInteger::ZERO;
         }
         p *= x;

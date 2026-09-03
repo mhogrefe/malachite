@@ -14,6 +14,7 @@ use crate::gaussian_integer::GaussianInteger;
 use core::cmp::Ordering::*;
 use core::mem::take;
 use malachite_base::num::arithmetic::traits::{DivIAssign, ModPowerOf2, MulIAssign, NegAssign};
+use malachite_base::num::basic::traits::Zero;
 
 // The largest power of 2 dividing both parts, and whether one more factor of 1 + i remains after
 // that power of 2 (which is (1 + i)^2 up to a unit) is removed. The input must be nonzero.
@@ -75,6 +76,7 @@ impl GaussianInteger {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::basic::traits::Two;
     /// use malachite_nz::gaussian_integer::GaussianInteger;
     /// use std::str::FromStr;
     ///
@@ -86,7 +88,7 @@ impl GaussianInteger {
     /// assert_eq!(k, 3);
     ///
     /// // 2 = (-i)(1+i)^2
-    /// let (q, k) = GaussianInteger::from(2).remove_one_plus_i();
+    /// let (q, k) = GaussianInteger::TWO.remove_one_plus_i();
     /// assert_eq!(q.to_string(), "-i");
     /// assert_eq!(k, 2);
     ///
@@ -99,7 +101,7 @@ impl GaussianInteger {
     /// ```
     pub fn remove_one_plus_i(&self) -> (Self, u64) {
         if *self == 0u32 {
-            return (Self::from(0u32), 0);
+            return (Self::ZERO, 0);
         }
         let (s, odd) = one_plus_i_valuation(self);
         let x = if s == 0 {

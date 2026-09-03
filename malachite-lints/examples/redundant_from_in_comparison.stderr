@@ -1,5 +1,5 @@
 error: `Integer::from` is redundant in a comparison with `Integer`
-  --> $DIR/redundant_from_in_comparison.rs:13:20
+  --> $DIR/redundant_from_in_comparison.rs:15:20
    |
 LL |     let _ = big >= Integer::from(prec);
    |                    ^^^^^^^^^^^^^^^^^^^ help: compare with the primitive directly: `prec`
@@ -7,28 +7,40 @@ LL |     let _ = big >= Integer::from(prec);
    = note: `#[deny(redundant_from_in_comparison)]` on by default
 
 error: `Integer::from` is redundant in a comparison with `Integer`
-  --> $DIR/redundant_from_in_comparison.rs:14:13
+  --> $DIR/redundant_from_in_comparison.rs:16:13
    |
 LL |     let _ = Integer::from(prec) < big;
    |             ^^^^^^^^^^^^^^^^^^^ help: compare with the primitive directly: `prec`
 
 error: `Natural::from` is redundant in a comparison with `Natural`
-  --> $DIR/redundant_from_in_comparison.rs:15:18
+  --> $DIR/redundant_from_in_comparison.rs:17:18
    |
 LL |     let _ = n == Natural::from(prec);
    |                  ^^^^^^^^^^^^^^^^^^^ help: compare with the primitive directly: `prec`
 
 error: `Rational::from` is redundant in a comparison with `Rational`
-  --> $DIR/redundant_from_in_comparison.rs:17:18
+  --> $DIR/redundant_from_in_comparison.rs:19:18
    |
 LL |     let _ = q <= Rational::from(r);
    |                  ^^^^^^^^^^^^^^^^^ help: compare with the primitive directly: `r`
 
 error: `Rational::from` is redundant in a comparison with `Rational`
-  --> $DIR/redundant_from_in_comparison.rs:18:13
+  --> $DIR/redundant_from_in_comparison.rs:20:13
    |
 LL |     let _ = Rational::from(three) != q;
    |             ^^^^^^^^^^^^^^^^^^^^^ help: compare with the primitive directly: `three`
 
-error: aborting due to 5 previous errors
+error: `GaussianInteger::from` is redundant in a comparison with `GaussianInteger`
+  --> $DIR/redundant_from_in_comparison.rs:26:13
+   |
+LL |     if g == GaussianInteger::from(k) {
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^ help: compare with the primitive directly: `k`
+
+error: `GaussianRational::from` is redundant in a comparison with `GaussianRational`
+  --> $DIR/redundant_from_in_comparison.rs:29:13
+   |
+LL |     if h != GaussianRational::from(k) {
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^ help: compare with the primitive directly: `k`
+
+error: aborting due to 7 previous errors
 

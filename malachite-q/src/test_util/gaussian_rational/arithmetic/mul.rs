@@ -14,7 +14,7 @@ pub fn gaussian_rational_product_naive<I: Iterator<Item = GaussianRational>>(
 ) -> GaussianRational {
     let mut p = GaussianRational::ONE;
     for x in xs {
-        if x == GaussianRational::ZERO {
+        if x == 0u32 {
             return GaussianRational::ZERO;
         }
         p *= x;

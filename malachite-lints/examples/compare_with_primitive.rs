@@ -1,7 +1,9 @@
 use core::cmp::Ordering::*;
-use malachite_base::num::basic::traits::{NegativeOne, One, Two, Zero};
+use malachite_base::num::basic::traits::{I, NegativeOne, One, Two, Zero};
 use malachite_nz::natural::Natural;
 use malachite_q::Rational;
+use malachite_nz::gaussian_integer::GaussianInteger;
+use malachite_q::gaussian_rational::GaussianRational;
 
 const X: Rational = Rational::const_from_signeds(22, 7);
 const N: Natural = Natural::const_from(10);
@@ -46,4 +48,19 @@ fn main() {
     let y = X;
     let _ = x.cmp(&y);
     if x == y {}
+    let g = GaussianInteger::from(3u32);
+    let h = GaussianRational::from(3u32);
+    // The Gaussian types compare directly with primitives too.
+    if g == GaussianInteger::ONE {
+        println!("gaussian one");
+        return;
+    }
+    if h != GaussianRational::ZERO {
+        println!("gaussian nonzero");
+        return;
+    }
+    // No primitive equals `I`, so this is not flagged.
+    if g == GaussianInteger::I {
+        println!("i");
+    }
 }
