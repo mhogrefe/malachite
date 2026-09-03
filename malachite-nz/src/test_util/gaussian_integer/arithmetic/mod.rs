@@ -9,5 +9,6 @@
 pub mod add;
 pub mod div_exact;
 pub mod div_rem;
+pub mod gcd;
 pub mod mul;
 pub mod square;

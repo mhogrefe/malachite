@@ -8,8 +8,23 @@
 
 use crate::gaussian_integer::GaussianInteger;
 use crate::integer::Integer;
-use malachite_base::num::arithmetic::traits::DivRem;
+use malachite_base::num::arithmetic::traits::{DivRem, ModPowerOf2, MulIAssign, Parity};
 use malachite_base::num::basic::traits::{One, Zero};
+
+// (1 + i)^k, as (2i)^(k/2) times 1 + i if k is odd.
+pub fn gaussian_integer_one_plus_i_pow(k: u64) -> GaussianInteger {
+    let mut p = GaussianInteger::ONE << (k >> 1);
+    for _ in 0..(k >> 1).mod_power_of_2(2) {
+        p.mul_i_assign();
+    }
+    if k.odd() {
+        p *= GaussianInteger {
+            real: Integer::ONE,
+            imaginary: Integer::ONE,
+        };
+    }
+    p
+}
 
 // Divides by 1 + i, using the nearest-quotient division, for as long as the remainder is zero.
 pub fn gaussian_integer_remove_one_plus_i_naive(x: &GaussianInteger) -> (GaussianInteger, u64) {

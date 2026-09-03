@@ -47,6 +47,10 @@ pub mod div_i;
 /// [`DivAssignRem`](malachite_base::num::arithmetic::traits::DivAssignRem), traits for dividing two
 /// numbers and returning the quotient and remainder.
 pub mod div_rem;
+/// Implementations of [`Gcd`](malachite_base::num::arithmetic::traits::Gcd) and
+/// [`GcdAssign`](malachite_base::num::arithmetic::traits::GcdAssign), traits for computing the GCD
+/// (greatest common divisor) of two numbers.
+pub mod gcd;
 /// An implementation of [`IsPowerOf2`](malachite_base::num::arithmetic::traits::IsPowerOf2), a
 /// trait for determining whether a number is an integer power of 2.
 pub mod is_power_of_2;
@@ -59,6 +63,10 @@ pub mod mul;
 /// [`MulIAssign`](malachite_base::num::arithmetic::traits::MulIAssign), traits for multiplying a
 /// number by $i$: a counterclockwise quarter turn.
 pub mod mul_i;
+/// Implementations of [`MulIPow`](malachite_base::num::arithmetic::traits::MulIPow) and
+/// [`MulIPowAssign`](malachite_base::num::arithmetic::traits::MulIPowAssign), traits for
+/// multiplying a number by a power of $i$: a multiple of a quarter turn.
+pub mod mul_i_pow;
 /// Implementations of [`Neg`](core::ops::Neg) and
 /// [`NegAssign`](malachite_base::num::arithmetic::traits::NegAssign) for
 /// [`GaussianInteger`](crate::gaussian_integer::GaussianInteger), negating both the real and

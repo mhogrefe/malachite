@@ -100,6 +100,28 @@ pub trait DivIAssign {
     fn div_i_assign(&mut self);
 }
 
+/// Multiplies a number by $i^k$, a power of the imaginary unit.
+///
+/// Only $k$ modulo 4 matters: $i^0 = 1$, $i^1 = i$, $i^2 = -1$, and $i^3 = -i$, so the result is
+/// the number itself, a counterclockwise quarter turn, a half turn, or a clockwise quarter turn.
+/// Since $i^{-k} = i^{3k}$, a negative power is a matter of tripling the exponent. No type in this
+/// crate implements this trait; it exists for complex types downstream, like Gaussian integers.
+pub trait MulIPow {
+    type Output;
+
+    fn mul_i_pow(self, k: u64) -> Self::Output;
+}
+
+/// Replaces a number with its product with $i^k$, a power of the imaginary unit.
+///
+/// Only $k$ modulo 4 matters: $i^0 = 1$, $i^1 = i$, $i^2 = -1$, and $i^3 = -i$, so the result is
+/// the number itself, a counterclockwise quarter turn, a half turn, or a clockwise quarter turn.
+/// Since $i^{-k} = i^{3k}$, a negative power is a matter of tripling the exponent. No type in this
+/// crate implements this trait; it exists for complex types downstream, like Gaussian integers.
+pub trait MulIPowAssign {
+    fn mul_i_pow_assign(&mut self, k: u64);
+}
+
 /// Determines whether a number is a unit of its ring, meaning that it has a multiplicative inverse
 /// in the same ring.
 ///

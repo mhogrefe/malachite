@@ -44,6 +44,10 @@ pub mod mul;
 /// [`MulIAssign`](malachite_base::num::arithmetic::traits::MulIAssign), traits for multiplying a
 /// number by $i$: a counterclockwise quarter turn.
 pub mod mul_i;
+/// Implementations of [`MulIPow`](malachite_base::num::arithmetic::traits::MulIPow) and
+/// [`MulIPowAssign`](malachite_base::num::arithmetic::traits::MulIPowAssign), traits for
+/// multiplying a number by a power of $i$: a multiple of a quarter turn.
+pub mod mul_i_pow;
 /// Implementations of [`Neg`](core::ops::Neg) and
 /// [`NegAssign`](malachite_base::num::arithmetic::traits::NegAssign) for
 /// [`GaussianRational`](crate::gaussian_rational::GaussianRational), negating both the real and

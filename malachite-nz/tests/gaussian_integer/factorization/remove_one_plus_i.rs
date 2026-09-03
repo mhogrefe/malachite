@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::{DivI, ModPowerOf2, MulI, MulIAssign, Parity};
+use malachite_base::num::arithmetic::traits::{DivI, ModPowerOf2, MulI, Parity};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_nz::gaussian_integer::GaussianInteger;
 use malachite_nz::integer::Integer;
@@ -59,22 +59,6 @@ fn test_remove_one_plus_i() {
     test("1000000000000+1000000000000i", "244140625", 25);
 }
 
-// (1 + i)^k, as (2i)^(k/2) times 1 + i if k is odd.
-fn one_plus_i_pow(k: u64) -> GaussianInteger {
-    let mut p = GaussianInteger::ONE << (k >> 1);
-    for _ in 0..(k >> 1).mod_power_of_2(2) {
-        p.mul_i_assign();
-    }
-    if k.odd() {
-        let one_plus_i = GaussianInteger {
-            real: Integer::ONE,
-            imaginary: Integer::ONE,
-        };
-        p *= one_plus_i;
-    }
-    p
-}
-
 #[test]
 fn remove_one_plus_i_properties() {
     gaussian_integer_gen().test_properties(|x| {
@@ -90,7 +74,7 @@ fn remove_one_plus_i_properties() {
 
         assert_eq!(gaussian_integer_remove_one_plus_i_naive(&x), (q.clone(), k));
 
-        assert_eq!(&q * one_plus_i_pow(k), x);
+        assert_eq!(&q * gaussian_integer_one_plus_i_pow(k), x);
         if x == GaussianInteger::ZERO {
             assert_eq!(q, GaussianInteger::ZERO);
             assert_eq!(k, 0);

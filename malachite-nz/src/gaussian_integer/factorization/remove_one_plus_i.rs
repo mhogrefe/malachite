@@ -13,7 +13,7 @@
 use crate::gaussian_integer::GaussianInteger;
 use core::cmp::Ordering::*;
 use core::mem::take;
-use malachite_base::num::arithmetic::traits::{DivIAssign, ModPowerOf2, MulIAssign, NegAssign};
+use malachite_base::num::arithmetic::traits::{ModPowerOf2, MulIPowAssign};
 use malachite_base::num::basic::traits::Zero;
 
 // The largest power of 2 dividing both parts, and whether one more factor of 1 + i remains after
@@ -31,21 +31,12 @@ fn one_plus_i_valuation(x: &GaussianInteger) -> (u64, bool) {
     }
 }
 
-// Multiplies by i^(-s), the unit left over when (1 + i)^(2s) = (2i)^s is removed by a shift.
-fn mul_i_pow_neg(x: &mut GaussianInteger, s: u64) {
-    match s.mod_power_of_2(2) {
-        0 => {}
-        1 => x.div_i_assign(),
-        2 => x.neg_assign(),
-        _ => x.mul_i_assign(),
-    }
-}
-
 // Given x with the common power of 2 already shifted out, fixes up the unit and removes the
 // remaining factor of 1 + i if there is one, returning the reduced number and the exponent.
 fn remove_one_plus_i_helper(mut x: GaussianInteger, s: u64, odd: bool) -> (GaussianInteger, u64) {
     if s != 0 {
-        mul_i_pow_neg(&mut x, s);
+        // Multiply by i^(-s), the unit left over when (1 + i)^(2s) = (2i)^s is removed by a shift.
+        x.mul_i_pow_assign(4 - s.mod_power_of_2(2));
     }
     if odd {
         // (a + bi) / (1 + i) = ((a + b) + (b - a)i) / 2

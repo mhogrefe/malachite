@@ -11,6 +11,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::gaussian_integer::GaussianInteger;
+use crate::gaussian_integer::arithmetic::div_exact::{
+    DOUBLE_QUOTIENT_BITS, nearest_quotient_double,
+};
 use crate::gaussian_integer::arithmetic::mul::mul_val_ref;
 use core::mem::take;
 use malachite_base::num::arithmetic::traits::{
@@ -50,6 +53,27 @@ pub(super) fn quotient_or_zero(
         None
     } else {
         Some(nearest_quotient(x, y))
+    }
+}
+
+// A port of `fmpzi_divrem_approx`: like `div_rem`, but when the operands are within 45 bits of each
+// other the quotient is computed in double precision, so it may miss the nearest quotient by one in
+// a part. The remainder is still small enough for a Euclidean step, which is all this is used for.
+pub(super) fn div_rem_approx(
+    x: &GaussianInteger,
+    y: &GaussianInteger,
+) -> (GaussianInteger, GaussianInteger) {
+    let y_bits = y.max_significant_bits();
+    assert!(y_bits != 0, "division by zero");
+    let x_bits = x.max_significant_bits();
+    if x_bits == 0 || x_bits + SMALL_DIVIDEND_BITS < y_bits {
+        (GaussianInteger::ZERO, x.clone())
+    } else if x_bits < y_bits + DOUBLE_QUOTIENT_BITS {
+        let q = nearest_quotient_double(x, y, x_bits);
+        let r = x - &q * y;
+        (q, r)
+    } else {
+        div_rem_ref_ref(x, y)
     }
 }
 

@@ -20,6 +20,7 @@ pub(crate) fn register(runner: &mut Runner) {
     is_unit::register(runner);
     mul::register(runner);
     mul_i::register(runner);
+    mul_i_pow::register(runner);
     neg::register(runner);
     power_of_2::register(runner);
     reciprocal::register(runner);
@@ -40,6 +41,7 @@ mod is_power_of_2;
 mod is_unit;
 mod mul;
 mod mul_i;
+mod mul_i_pow;
 mod neg;
 mod power_of_2;
 mod reciprocal;

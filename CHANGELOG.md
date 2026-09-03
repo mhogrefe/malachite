@@ -153,6 +153,14 @@ documented by git history.
   above 2, by shifting out the common power of 2, fixing up the unit, and dividing once more by
   $1 + i$ when the parts share a 2-adic valuation, returning the exponent; zero stays zero with
   exponent 0.
+- `Gcd` and `GcdAssign` for `GaussianInteger`, a port of FLINT's `fmpzi_gcd` without its lattice
+  tier: once all four parts fit in 50 bits the Euclidean algorithm runs entirely in double
+  precision, and until then it runs over an approximate nearest-quotient division. The result is
+  in canonical unit form, so it is unique; $\gcd(0, 0) = 0$.
+- `MulIPow` and `MulIPowAssign` traits in `malachite-base`, multiplication by $i^k$ for a `u64`
+  exponent $k$ (only $k$ modulo 4 matters, and $i^{-k} = i^{3k}$), implemented for
+  `GaussianInteger` and `GaussianRational` as a port of FLINT's `fmpzi_mul_i_pow_si`;
+  `canonicalize_unit` is now defined through it.
 - `ComparableGaussianInteger` and `ComparableGaussianIntegerRef`, wrappers around
   `GaussianInteger` (by value and by reference) that implement `Ord`, comparing
   lexicographically: first by real part, then by imaginary part. Since no total order on the

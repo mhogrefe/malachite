@@ -24,7 +24,7 @@ use malachite_base::rounding_modes::RoundingMode::Down;
 // Quotients this small are computed in double precision, as in `fmpzi_divexact`: with the quotient
 // known to be exact and below 2^45, the rounding errors of the double-precision conjugate product
 // and norm stay well below 1/2, so rounding to the nearest integer recovers it.
-const DOUBLE_QUOTIENT_BITS: u64 = 45;
+pub(super) const DOUBLE_QUOTIENT_BITS: u64 = 45;
 
 // Above this size the operands are scaled by 2^(-x_bits) before conversion to doubles, which keeps
 // the intermediate products finite without changing the quotient.
@@ -47,9 +47,14 @@ fn to_f64_scaled(x: &Integer, shift: u64) -> f64 {
     if *x < 0u32 { -v } else { v }
 }
 
-// The double-precision path of `fmpzi_divexact`: the nearest-integer rounding of the exact quotient
-// x * conj(y) / N(y), evaluated in doubles.
-fn div_exact_double(x: &GaussianInteger, y: &GaussianInteger, x_bits: u64) -> GaussianInteger {
+// The double-precision path of `fmpzi_divexact` and `fmpzi_divrem_approx`: the nearest-integer
+// rounding of the exact quotient x * conj(y) / N(y), evaluated in doubles. Exact when the division
+// is, and otherwise within one of the nearest quotient in each part.
+pub(super) fn nearest_quotient_double(
+    x: &GaussianInteger,
+    y: &GaussianInteger,
+    x_bits: u64,
+) -> GaussianInteger {
     let (a, b, c, d) = if x_bits < DOUBLE_SCALING_BITS {
         (
             to_f64_truncated(&x.real),
@@ -109,7 +114,7 @@ fn div_exact_val_ref(x: GaussianInteger, y: &GaussianInteger) -> GaussianInteger
     }
     let y_bits = y.max_significant_bits();
     if x_bits < y_bits + DOUBLE_QUOTIENT_BITS {
-        div_exact_double(&x, y, x_bits)
+        nearest_quotient_double(&x, y, x_bits)
     } else {
         let norm = y.abs_squared();
         div_exact_general(mul_val_val(x, y.conjugate()), norm)
@@ -136,7 +141,7 @@ fn div_exact_ref_ref(x: &GaussianInteger, y: &GaussianInteger) -> GaussianIntege
     }
     let y_bits = y.max_significant_bits();
     if x_bits < y_bits + DOUBLE_QUOTIENT_BITS {
-        div_exact_double(x, y, x_bits)
+        nearest_quotient_double(x, y, x_bits)
     } else {
         let norm = y.abs_squared();
         div_exact_general(mul_val_ref(y.conjugate(), x), norm)

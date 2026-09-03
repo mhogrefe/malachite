@@ -8,7 +8,7 @@
 
 use crate::gaussian_integer::GaussianInteger;
 use malachite_base::num::arithmetic::traits::{
-    CanonicalUnitIPow, CanonicalizeUnit, CanonicalizeUnitAssign, DivIAssign, MulIAssign, NegAssign,
+    CanonicalUnitIPow, CanonicalizeUnit, CanonicalizeUnitAssign, MulIPowAssign,
 };
 
 impl CanonicalizeUnit for GaussianInteger {
@@ -124,11 +124,7 @@ impl CanonicalizeUnitAssign for GaussianInteger {
     /// assert_eq!(x.to_string(), "2+i");
     /// ```
     fn canonicalize_unit_assign(&mut self) {
-        match self.canonical_unit_i_pow() {
-            0 => {}
-            1 => self.mul_i_assign(),
-            2 => self.neg_assign(),
-            _ => self.div_i_assign(),
-        }
+        let k = self.canonical_unit_i_pow();
+        self.mul_i_pow_assign(k);
     }
 }

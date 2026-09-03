@@ -76,10 +76,12 @@ pub mod gaussian_integer {
         pub mod div_exact;
         pub mod div_i;
         pub mod div_rem;
+        pub mod gcd;
         pub mod is_power_of_2;
         pub mod is_unit;
         pub mod mul;
         pub mod mul_i;
+        pub mod mul_i_pow;
         pub mod neg;
         pub mod power_of_2;
         pub mod rem;
