@@ -148,6 +148,11 @@ documented by git history.
   a dividend more than two bits smaller than the divisor short-cuts to quotient zero.
 - The `/`, `/=`, `%`, and `%=` operators and `CheckedDiv` for `GaussianInteger`, with the same
   nearest-quotient rounding as `div_rem`; `/` skips computing the remainder.
+- `GaussianInteger::remove_one_plus_i` and `remove_one_plus_i_assign`, a port of FLINT's
+  `fmpzi_remove_one_plus_i`: they divide out the largest power of $1 + i$, the Gaussian prime
+  above 2, by shifting out the common power of 2, fixing up the unit, and dividing once more by
+  $1 + i$ when the parts share a 2-adic valuation, returning the exponent; zero stays zero with
+  exponent 0.
 - `ComparableGaussianInteger` and `ComparableGaussianIntegerRef`, wrappers around
   `GaussianInteger` (by value and by reference) that implement `Ord`, comparing
   lexicographically: first by real part, then by imaginary part. Since no total order on the

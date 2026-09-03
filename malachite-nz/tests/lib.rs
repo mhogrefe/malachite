@@ -133,6 +133,9 @@ pub mod gaussian_integer {
         pub mod exhaustive_imaginary_gaussian_integers;
         pub mod exhaustive_real_gaussian_integers;
     }
+    pub mod factorization {
+        pub mod remove_one_plus_i;
+    }
     pub mod logic {
         pub mod significant_bits;
     }
