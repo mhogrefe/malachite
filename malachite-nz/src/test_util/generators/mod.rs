@@ -66,11 +66,40 @@ pub fn gaussian_integer_gen_var_2() -> Generator<GaussianInteger> {
     )
 }
 
+// All nonzero `GaussianInteger`s.
+pub fn gaussian_integer_gen_var_3() -> Generator<GaussianInteger> {
+    Generator::new(
+        &exhaustive_gaussian_integer_gen_var_3,
+        &random_gaussian_integer_gen_var_3,
+        &special_random_gaussian_integer_gen_var_3,
+    )
+}
+
 pub fn gaussian_integer_pair_gen() -> Generator<(GaussianInteger, GaussianInteger)> {
     Generator::new(
         &exhaustive_gaussian_integer_pair_gen,
         &random_gaussian_integer_pair_gen,
         &special_random_gaussian_integer_pair_gen,
+    )
+}
+
+// All pairs of `GaussianInteger`s where the first is divisible by the second, and the second is
+// nonzero.
+pub fn gaussian_integer_pair_gen_var_1() -> Generator<(GaussianInteger, GaussianInteger)> {
+    Generator::new(
+        &exhaustive_gaussian_integer_pair_gen_var_1,
+        &random_gaussian_integer_pair_gen_var_1,
+        &special_random_gaussian_integer_pair_gen_var_1,
+    )
+}
+
+// All pairs of `GaussianInteger`s where the first is divisible by the second, the second is
+// nonzero, and the quotient is small.
+pub fn gaussian_integer_pair_gen_var_2() -> Generator<(GaussianInteger, GaussianInteger)> {
+    Generator::new(
+        &exhaustive_gaussian_integer_pair_gen_var_2,
+        &random_gaussian_integer_pair_gen_var_2,
+        &special_random_gaussian_integer_pair_gen_var_2,
     )
 }
 

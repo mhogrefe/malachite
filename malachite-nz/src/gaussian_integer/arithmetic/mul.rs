@@ -76,7 +76,7 @@ fn mul_double_word(a: i64, b: i64, c: i64, d: i64) -> GaussianInteger {
 
 // Each part of each operand appears in exactly two products, so an owned part is borrowed by its
 // first use and consumed by its last, letting the products reuse the operands' storage.
-fn mul_val_val(x: GaussianInteger, y: GaussianInteger) -> GaussianInteger {
+pub(super) fn mul_val_val(x: GaussianInteger, y: GaussianInteger) -> GaussianInteger {
     match choose_algorithm(&x, &y) {
         MulAlgorithm::DoubleWord(a, b, c, d) => mul_double_word(a, b, c, d),
         MulAlgorithm::Karatsuba => {
@@ -100,7 +100,7 @@ fn mul_val_val(x: GaussianInteger, y: GaussianInteger) -> GaussianInteger {
     }
 }
 
-fn mul_val_ref(x: GaussianInteger, y: &GaussianInteger) -> GaussianInteger {
+pub(super) fn mul_val_ref(x: GaussianInteger, y: &GaussianInteger) -> GaussianInteger {
     match choose_algorithm(&x, y) {
         MulAlgorithm::DoubleWord(a, b, c, d) => mul_double_word(a, b, c, d),
         MulAlgorithm::Karatsuba => {
@@ -124,7 +124,7 @@ fn mul_val_ref(x: GaussianInteger, y: &GaussianInteger) -> GaussianInteger {
     }
 }
 
-fn mul_ref_ref(x: &GaussianInteger, y: &GaussianInteger) -> GaussianInteger {
+pub(super) fn mul_ref_ref(x: &GaussianInteger, y: &GaussianInteger) -> GaussianInteger {
     // As in fmpzi_mul, aliased operands are detected by address and routed to the squaring
     // algorithm, which replaces general multiplications with cheaper squarings. Only this variant
     // checks: two owned operands are always distinct objects.
@@ -207,7 +207,6 @@ impl Mul<&Self> for GaussianInteger {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::{I, NegativeOne};
     /// use malachite_nz::gaussian_integer::GaussianInteger;
     /// use std::str::FromStr;
     ///
@@ -240,7 +239,6 @@ impl Mul<GaussianInteger> for &GaussianInteger {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::{I, NegativeOne};
     /// use malachite_nz::gaussian_integer::GaussianInteger;
     /// use std::str::FromStr;
     ///
@@ -274,7 +272,6 @@ impl Mul<&GaussianInteger> for &GaussianInteger {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::{I, NegativeOne};
     /// use malachite_nz::gaussian_integer::GaussianInteger;
     /// use std::str::FromStr;
     ///
@@ -306,7 +303,6 @@ impl MulAssign<Self> for GaussianInteger {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::{I, NegativeOne};
     /// use malachite_nz::gaussian_integer::GaussianInteger;
     /// use std::str::FromStr;
     ///
@@ -340,7 +336,6 @@ impl MulAssign<&Self> for GaussianInteger {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::basic::traits::{I, NegativeOne};
     /// use malachite_nz::gaussian_integer::GaussianInteger;
     /// use std::str::FromStr;
     ///

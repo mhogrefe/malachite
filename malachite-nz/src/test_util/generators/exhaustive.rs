@@ -160,6 +160,20 @@ pub fn exhaustive_gaussian_integer_pair_gen() -> It<(GaussianInteger, GaussianIn
     Box::new(exhaustive_pairs_from_single(exhaustive_gaussian_integers()))
 }
 
+pub fn exhaustive_gaussian_integer_pair_gen_var_1() -> It<(GaussianInteger, GaussianInteger)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_gaussian_integers(),
+            exhaustive_gaussian_integers().filter(|x| x.real != 0u32 || x.imaginary != 0u32),
+        )
+        .map(|(x, y)| (x * &y, y)),
+    )
+}
+
+pub fn exhaustive_gaussian_integer_pair_gen_var_2() -> It<(GaussianInteger, GaussianInteger)> {
+    exhaustive_gaussian_integer_pair_gen_var_1()
+}
+
 pub fn exhaustive_gaussian_integer_triple_gen()
 -> It<(GaussianInteger, GaussianInteger, GaussianInteger)> {
     Box::new(exhaustive_triples_from_single(
@@ -175,6 +189,10 @@ pub fn exhaustive_gaussian_integer_gen_var_1() -> It<GaussianInteger> {
 // All purely imaginary `GaussianInteger`s.
 pub fn exhaustive_gaussian_integer_gen_var_2() -> It<GaussianInteger> {
     Box::new(exhaustive_imaginary_gaussian_integers())
+}
+
+pub fn exhaustive_gaussian_integer_gen_var_3() -> It<GaussianInteger> {
+    Box::new(exhaustive_gaussian_integers().filter(|x| x.real != 0u32 || x.imaginary != 0u32))
 }
 
 // -- (GaussianInteger, Integer) --

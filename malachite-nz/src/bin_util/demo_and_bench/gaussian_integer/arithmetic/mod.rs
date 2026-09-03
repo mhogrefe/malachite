@@ -14,6 +14,7 @@ pub(crate) fn register(runner: &mut Runner) {
     canonical_unit_i_pow::register(runner);
     canonicalize_unit::register(runner);
     conjugate::register(runner);
+    div_exact::register(runner);
     div_i::register(runner);
     is_power_of_2::register(runner);
     is_unit::register(runner);
@@ -31,6 +32,7 @@ mod add;
 mod canonical_unit_i_pow;
 mod canonicalize_unit;
 mod conjugate;
+mod div_exact;
 mod div_i;
 mod is_power_of_2;
 mod is_unit;

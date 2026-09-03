@@ -163,6 +163,59 @@ pub fn random_gaussian_integer_pair_gen(
     )))
 }
 
+pub fn random_gaussian_integer_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(GaussianInteger, GaussianInteger)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_gaussian_integers(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                random_gaussian_integers(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+                .filter(|x| x.real != 0u32 || x.imaginary != 0u32)
+            },
+        )
+        .map(|(x, y)| (x * &y, y)),
+    )
+}
+
+// The quotient is small (`mean_small_n` bits) and the divisor is large (`mean_bits_n` bits).
+pub fn random_gaussian_integer_pair_gen_var_2(
+    config: &GenConfig,
+) -> It<(GaussianInteger, GaussianInteger)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_gaussian_integers(
+                    seed,
+                    config.get_or("mean_small_n", 8),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &|seed| {
+                random_gaussian_integers(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+                .filter(|x| x.real != 0u32 || x.imaginary != 0u32)
+            },
+        )
+        .map(|(x, y)| (x * &y, y)),
+    )
+}
+
 pub fn random_gaussian_integer_triple_gen(
     config: &GenConfig,
 ) -> It<(GaussianInteger, GaussianInteger, GaussianInteger)> {
@@ -189,6 +242,17 @@ pub fn random_gaussian_integer_gen_var_2(config: &GenConfig) -> It<GaussianInteg
         config.get_or("mean_bits_n", 64),
         config.get_or("mean_bits_d", 1),
     ))
+}
+
+pub fn random_gaussian_integer_gen_var_3(config: &GenConfig) -> It<GaussianInteger> {
+    Box::new(
+        random_gaussian_integers(
+            EXAMPLE_SEED,
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        )
+        .filter(|x| x.real != 0u32 || x.imaginary != 0u32),
+    )
 }
 
 // -- (GaussianInteger, Integer) --

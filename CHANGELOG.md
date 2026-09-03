@@ -136,6 +136,12 @@ documented by git history.
 - `SignificantBits` for both Gaussian types, summing the significant bits of the real and
   imaginary parts, and `GaussianInteger::max_significant_bits`, the larger of the two counts,
   which is FLINT's `fmpzi_bits` and the size measure its algorithm selection uses.
+- `DivExact` and `DivExactAssign` for `GaussianInteger`, a port of FLINT's `fmpzi_divexact`: a
+  purely real divisor divides both parts, a purely imaginary one does the same and turns the
+  result a quarter turn, quotients below $2^{45}$ are recovered by rounding a double-precision
+  evaluation of $x\bar{y}/N(y)$ (exact under the divisibility contract, with the operands scaled
+  down above 500 bits), and larger quotients go through the exact conjugate-and-norm formula.
+  Like the other `div_exact`s, an inexact division may panic or return a meaningless result.
 - `ComparableGaussianInteger` and `ComparableGaussianIntegerRef`, wrappers around
   `GaussianInteger` (by value and by reference) that implement `Ord`, comparing
   lexicographically: first by real part, then by imaginary part. Since no total order on the

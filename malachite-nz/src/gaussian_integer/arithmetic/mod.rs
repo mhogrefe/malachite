@@ -31,6 +31,10 @@ pub mod canonicalize_unit;
 /// [`ConjugateAssign`](malachite_base::num::arithmetic::traits::ConjugateAssign), traits for
 /// computing the complex conjugate of a number: the sign of the imaginary part is flipped.
 pub mod conjugate;
+/// Implementations of [`DivExact`](malachite_base::num::arithmetic::traits::DivExact) and
+/// [`DivExactAssign`](malachite_base::num::arithmetic::traits::DivExactAssign), traits for dividing
+/// two numbers when it's known that the division is exact.
+pub mod div_exact;
 /// Implementations of [`DivI`](malachite_base::num::arithmetic::traits::DivI) and
 /// [`DivIAssign`](malachite_base::num::arithmetic::traits::DivIAssign), traits for dividing a
 /// number by $i$: a clockwise quarter turn.

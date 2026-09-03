@@ -72,6 +72,7 @@ pub mod gaussian_integer {
         pub mod canonical_unit_i_pow;
         pub mod canonicalize_unit;
         pub mod conjugate;
+        pub mod div_exact;
         pub mod div_i;
         pub mod is_power_of_2;
         pub mod is_unit;
