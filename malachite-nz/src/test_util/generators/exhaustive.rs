@@ -174,6 +174,13 @@ pub fn exhaustive_gaussian_integer_pair_gen_var_2() -> It<(GaussianInteger, Gaus
     exhaustive_gaussian_integer_pair_gen_var_1()
 }
 
+pub fn exhaustive_gaussian_integer_pair_gen_var_3() -> It<(GaussianInteger, GaussianInteger)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_gaussian_integers(),
+        exhaustive_gaussian_integers().filter(|x| x.real != 0u32 || x.imaginary != 0u32),
+    ))
+}
+
 pub fn exhaustive_gaussian_integer_triple_gen()
 -> It<(GaussianInteger, GaussianInteger, GaussianInteger)> {
     Box::new(exhaustive_triples_from_single(

@@ -142,6 +142,12 @@ documented by git history.
   evaluation of $x\bar{y}/N(y)$ (exact under the divisibility contract, with the operands scaled
   down above 500 bits), and larger quotients go through the exact conjugate-and-norm formula.
   Like the other `div_exact`s, an inexact division may panic or return a meaningless result.
+- `DivRem` and `DivAssignRem` for `GaussianInteger`, a port of FLINT's `fmpzi_divrem`: the
+  quotient is the exact quotient with each part rounded to the nearest integer, ties up, so the
+  remainder satisfies $N(r) \leq N(y)/2$ (the Euclidean division of the Gaussian integers), and
+  a dividend more than two bits smaller than the divisor short-cuts to quotient zero.
+- The `/`, `/=`, `%`, and `%=` operators and `CheckedDiv` for `GaussianInteger`, with the same
+  nearest-quotient rounding as `div_rem`; `/` skips computing the remainder.
 - `ComparableGaussianInteger` and `ComparableGaussianIntegerRef`, wrappers around
   `GaussianInteger` (by value and by reference) that implement `Ord`, comparing
   lexicographically: first by real part, then by imaginary part. Since no total order on the

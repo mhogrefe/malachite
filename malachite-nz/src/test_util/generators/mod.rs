@@ -103,6 +103,15 @@ pub fn gaussian_integer_pair_gen_var_2() -> Generator<(GaussianInteger, Gaussian
     )
 }
 
+// All pairs of `GaussianInteger`s where the second is nonzero.
+pub fn gaussian_integer_pair_gen_var_3() -> Generator<(GaussianInteger, GaussianInteger)> {
+    Generator::new(
+        &exhaustive_gaussian_integer_pair_gen_var_3,
+        &random_gaussian_integer_pair_gen_var_3,
+        &special_random_gaussian_integer_pair_gen_var_3,
+    )
+}
+
 pub fn gaussian_integer_triple_gen()
 -> Generator<(GaussianInteger, GaussianInteger, GaussianInteger)> {
     Generator::new(

@@ -216,6 +216,29 @@ pub fn random_gaussian_integer_pair_gen_var_2(
     )
 }
 
+pub fn random_gaussian_integer_pair_gen_var_3(
+    config: &GenConfig,
+) -> It<(GaussianInteger, GaussianInteger)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_gaussian_integers(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            random_gaussian_integers(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+            .filter(|x| x.real != 0u32 || x.imaginary != 0u32)
+        },
+    ))
+}
+
 pub fn random_gaussian_integer_triple_gen(
     config: &GenConfig,
 ) -> It<(GaussianInteger, GaussianInteger, GaussianInteger)> {

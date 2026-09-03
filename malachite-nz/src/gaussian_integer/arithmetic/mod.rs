@@ -33,12 +33,20 @@ pub mod canonicalize_unit;
 pub mod conjugate;
 /// Implementations of [`DivExact`](malachite_base::num::arithmetic::traits::DivExact) and
 /// [`DivExactAssign`](malachite_base::num::arithmetic::traits::DivExactAssign), traits for dividing
-/// two numbers when it's known that the division is exact.
+/// two numbers when it's known that the division is exact. Implementations of
+/// [`Div`](core::ops::Div), [`DivAssign`](core::ops::DivAssign), and
+/// [`CheckedDiv`](malachite_base::num::arithmetic::traits::CheckedDiv), traits for dividing two
+/// numbers.
+pub mod div;
 pub mod div_exact;
 /// Implementations of [`DivI`](malachite_base::num::arithmetic::traits::DivI) and
 /// [`DivIAssign`](malachite_base::num::arithmetic::traits::DivIAssign), traits for dividing a
 /// number by $i$: a clockwise quarter turn.
 pub mod div_i;
+/// Implementations of [`DivRem`](malachite_base::num::arithmetic::traits::DivRem) and
+/// [`DivAssignRem`](malachite_base::num::arithmetic::traits::DivAssignRem), traits for dividing two
+/// numbers and returning the quotient and remainder.
+pub mod div_rem;
 /// An implementation of [`IsPowerOf2`](malachite_base::num::arithmetic::traits::IsPowerOf2), a
 /// trait for determining whether a number is an integer power of 2.
 pub mod is_power_of_2;
@@ -59,6 +67,10 @@ pub mod neg;
 /// An implementation of [`PowerOf2`](malachite_base::num::arithmetic::traits::PowerOf2), a trait
 /// for computing a power of 2.
 pub mod power_of_2;
+/// Implementations of [`Rem`](core::ops::Rem) and [`RemAssign`](core::ops::RemAssign), traits for
+/// finding the remainder of two numbers, subject to the nearest-quotient rounding used by Gaussian
+/// integer division.
+pub mod rem;
 /// Left-shifting a [`GaussianInteger`](crate::gaussian_integer::GaussianInteger) (multiplying it by
 /// a power of 2).
 ///
