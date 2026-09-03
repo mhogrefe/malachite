@@ -12,7 +12,7 @@ use core::mem::take;
 use core::ops::{Mul, MulAssign};
 use malachite_base::iterators::balanced_fold;
 use malachite_base::num::arithmetic::traits::{MulAddMul, MulSubMul, Square};
-use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::basic::traits::One;
 
 // Each part of each operand appears in exactly two products, so an owned part is borrowed by its
 // first use and consumed by its last, letting the products reuse the operands' storage.

@@ -17,7 +17,7 @@ use core::mem::take;
 use core::ops::{Mul, MulAssign};
 use malachite_base::iterators::balanced_fold;
 use malachite_base::num::arithmetic::traits::{MulAddMul, MulSubMul, Square};
-use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::basic::traits::One;
 use malachite_base::num::logic::traits::SignificantBits;
 
 use crate::gaussian_integer::arithmetic::SIZE_BALANCE_BITS;
