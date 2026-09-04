@@ -7,8 +7,9 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{
-    AbsSquared, Conjugate, PowerOf2, Square, SquareAssign,
+    AbsSquared, CheckedSqrt, Conjugate, PowerOf2, Square, SquareAssign,
 };
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_nz::gaussian_integer::GaussianInteger;
 use malachite_nz::integer::Integer;
@@ -66,6 +67,20 @@ fn square_properties() {
         assert_eq!((-&x).square(), square);
         assert_eq!((&x).conjugate().square(), (&square).conjugate());
         assert_eq!((&square).abs_squared(), (&x).abs_squared().square());
+
+        // the square root recovers the principal one of x and -x, and both are all the roots
+        let principal = if (&x.real, &x.imaginary) >= (&Integer::ZERO, &Integer::ZERO) {
+            x.clone()
+        } else {
+            -&x
+        };
+        assert_eq!((&square).checked_sqrt(), Some(principal.clone()));
+        let roots = square.checked_sqrts();
+        if x == GaussianInteger::ZERO {
+            assert_eq!(roots, vec![GaussianInteger::ZERO]);
+        } else {
+            assert_eq!(roots, vec![principal.clone(), -principal]);
+        }
     });
 }
 
@@ -79,6 +94,11 @@ fn square_large_properties() {
         let square = (&x).square();
         assert_eq!(gaussian_integer_square_naive(&x), square);
         assert_eq!(x.clone().square(), square);
+        // large square roots too
+        assert_eq!(
+            (&square).checked_sqrt().map(|r| (&r).square()),
+            Some(square.clone())
+        );
         let mut x_alt = x;
         x_alt.square_assign();
         assert_eq!(x_alt, square);

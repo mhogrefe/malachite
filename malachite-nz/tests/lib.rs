@@ -88,6 +88,7 @@ pub mod gaussian_integer {
         pub mod power_of_2;
         pub mod rem;
         pub mod shl;
+        pub mod sqrt;
         pub mod square;
         pub mod sub;
     }

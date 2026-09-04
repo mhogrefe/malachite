@@ -93,7 +93,7 @@ use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 use malachite_base::iterators::iter_windows;
 use malachite_base::num::arithmetic::traits::{
     ArithmeticCheckedShl, CoprimeWith, DivRound, DivisibleBy, DivisibleByPowerOf2, EqMod,
-    EqModPowerOf2, Parity, PowerOf2,
+    EqModPowerOf2, Parity, PowerOf2, Square,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -200,6 +200,10 @@ pub fn exhaustive_gaussian_integer_gen_var_2() -> It<GaussianInteger> {
 
 pub fn exhaustive_gaussian_integer_gen_var_3() -> It<GaussianInteger> {
     Box::new(exhaustive_gaussian_integers().filter(|x| x.real != 0u32 || x.imaginary != 0u32))
+}
+
+pub fn exhaustive_gaussian_integer_gen_var_4() -> It<GaussianInteger> {
+    Box::new(exhaustive_gaussian_integers().map(Square::square))
 }
 
 // -- (GaussianInteger, Integer) --

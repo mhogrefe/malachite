@@ -119,6 +119,9 @@ pub mod rem;
 /// assert_eq!(x.to_string(), "1024+1024i");
 /// ```
 pub mod shl;
+/// Implementations of [`CheckedSqrt`](malachite_base::num::arithmetic::traits::CheckedSqrt), a
+/// trait for taking the square root of a number when it is a perfect square.
+pub mod sqrt;
 /// Implementations of [`Square`](malachite_base::num::arithmetic::traits::Square) and
 /// [`SquareAssign`](malachite_base::num::arithmetic::traits::SquareAssign), traits for squaring a
 /// number.

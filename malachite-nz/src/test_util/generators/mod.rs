@@ -75,6 +75,15 @@ pub fn gaussian_integer_gen_var_3() -> Generator<GaussianInteger> {
     )
 }
 
+// All `GaussianInteger`s that are perfect squares.
+pub fn gaussian_integer_gen_var_4() -> Generator<GaussianInteger> {
+    Generator::new(
+        &exhaustive_gaussian_integer_gen_var_4,
+        &random_gaussian_integer_gen_var_4,
+        &special_random_gaussian_integer_gen_var_4,
+    )
+}
+
 pub fn gaussian_integer_pair_gen() -> Generator<(GaussianInteger, GaussianInteger)> {
     Generator::new(
         &exhaustive_gaussian_integer_pair_gen,

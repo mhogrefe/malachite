@@ -12,4 +12,5 @@ pub mod div_rem;
 pub mod gcd;
 pub mod mul;
 pub mod pow;
+pub mod sqrt;
 pub mod square;

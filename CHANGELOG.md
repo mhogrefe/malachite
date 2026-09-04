@@ -173,6 +173,11 @@ documented by git history.
   a `Rational`, primitive part a `GaussianInteger` with coprime parts). `GaussianRational`'s power
   is computed through the split, so the intermediate values carry no denominators and there is one
   rational reduction per part at the end instead of several per squaring.
+- `CheckedSqrt` for `GaussianInteger`, returning the principal square root (positive real part,
+  or zero real part and non-negative imaginary part) of a perfect square and `None` otherwise. The
+  root is read off the norm: $N = \sqrt{a^2 + b^2}$, then $x = \sqrt{(N + a) / 2}$ and
+  $y = \pm \sqrt{(N - a) / 2}$ with the sign of $b$. `GaussianInteger::checked_sqrts` returns
+  all the roots as a `Vec`: none, one for zero, or the principal root and its negative.
 - `ComparableGaussianInteger` and `ComparableGaussianIntegerRef`, wrappers around
   `GaussianInteger` (by value and by reference) that implement `Ord`, comparing
   lexicographically: first by real part, then by imaginary part. Since no total order on the

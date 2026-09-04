@@ -82,7 +82,7 @@ use malachite_base::foer_sequences::FoerSequence;
 use malachite_base::iterators::with_special_value;
 use malachite_base::num::arithmetic::traits::{
     ArithmeticCheckedShl, CeilingLogBase2, CoprimeWith, DivRound, DivisibleBy, DivisibleByPowerOf2,
-    EqMod, EqModPowerOf2, Parity, PowerOf2, RoundToMultipleOfPowerOf2Assign,
+    EqMod, EqModPowerOf2, Parity, PowerOf2, RoundToMultipleOfPowerOf2Assign, Square,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -298,6 +298,19 @@ pub fn special_random_gaussian_integer_gen_var_3(config: &GenConfig) -> It<Gauss
             config.get_or("mean_bits_d", 1),
         )
         .filter(|x| x.real != 0u32 || x.imaginary != 0u32),
+    )
+}
+
+pub fn special_random_gaussian_integer_gen_var_4(config: &GenConfig) -> It<GaussianInteger> {
+    Box::new(
+        striped_random_gaussian_integers(
+            EXAMPLE_SEED,
+            config.get_or("mean_stripe_n", 32),
+            config.get_or("mean_stripe_d", 1),
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        )
+        .map(Square::square),
     )
 }
 
