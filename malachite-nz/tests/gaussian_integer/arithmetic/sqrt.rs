@@ -9,7 +9,7 @@
 use malachite_base::num::arithmetic::traits::{CheckedSqrt, Conjugate, MulI, Square};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::strings::ToDebugString;
-use malachite_nz::gaussian_integer::GaussianInteger;
+use malachite_nz::gaussian_integer::{ComparableGaussianIntegerRef, GaussianInteger};
 use malachite_nz::integer::Integer;
 use malachite_nz::test_util::gaussian_integer::arithmetic::sqrt::*;
 use malachite_nz::test_util::generators::{
@@ -94,14 +94,14 @@ fn test_checked_sqrts() {
         );
     };
     test("0", vec!["0"]);
-    test("1", vec!["1", "-1"]);
-    test("-1", vec!["i", "-i"]);
+    test("1", vec!["-1", "1"]);
+    test("-1", vec!["-i", "i"]);
     test("2", vec![]);
-    test("2i", vec!["1+i", "-1-i"]);
-    test("3+4i", vec!["2+i", "-2-i"]);
-    test("-3+4i", vec!["1+2i", "-1-2i"]);
+    test("2i", vec!["-1-i", "1+i"]);
+    test("3+4i", vec!["-2-i", "2+i"]);
+    test("-3+4i", vec!["-1-2i", "1+2i"]);
     test("2+i", vec![]);
-    test("-1000000000000", vec!["1000000i", "-1000000i"]);
+    test("-1000000000000", vec!["-1000000i", "1000000i"]);
 }
 
 fn principal(x: GaussianInteger) -> GaussianInteger {
@@ -127,7 +127,13 @@ fn checked_sqrt_properties() {
 
         // all the roots: the principal one first, then its negative unless it is zero
         let roots = x.checked_sqrts();
-        assert_eq!(roots.first(), root.as_ref());
+        assert!(roots.is_sorted_by(|a, b| {
+            ComparableGaussianIntegerRef(a) <= ComparableGaussianIntegerRef(b)
+        }));
+        assert_eq!(
+            roots.contains(root.as_ref().unwrap_or(&GaussianInteger::ZERO)),
+            root.is_some()
+        );
         match roots.as_slice() {
             [] => assert!(root.is_none()),
             [r] => assert_eq!(*r, GaussianInteger::ZERO),

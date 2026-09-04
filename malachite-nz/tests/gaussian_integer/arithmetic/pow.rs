@@ -7,9 +7,11 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{
-    AbsSquared, Conjugate, MulI, MulIPow, Parity, Pow, PowAssign, PowerOf2, Square,
+    AbsSquared, CanonicalizeUnit, CheckedRoot, Conjugate, MulI, MulIPow, Parity, Pow, PowAssign,
+    PowerOf2, Square,
 };
 use malachite_base::num::basic::traits::{I, One, Two, Zero};
+use malachite_base::num::logic::traits::TrailingZeros;
 use malachite_base::test_util::generators::unsigned_gen_var_5;
 use malachite_nz::gaussian_integer::GaussianInteger;
 use malachite_nz::integer::Integer;
@@ -106,6 +108,22 @@ fn pow_properties() {
         for f in 0..4 {
             assert_eq!((&x).pow(exp + f), &power * (&x).pow(f));
             assert_eq!((&x).pow(exp * f), (&power).pow(f));
+        }
+        // the root of the power is the principal rotation of the base, which is among the roots
+        if exp != 0 {
+            let principal = match TrailingZeros::trailing_zeros(exp) {
+                0 => x.clone(),
+                1 => {
+                    if (&x.real, &x.imaginary) > (&Integer::ZERO, &Integer::ZERO) {
+                        x.clone()
+                    } else {
+                        -&x
+                    }
+                }
+                _ => (&x).canonicalize_unit(),
+            };
+            assert_eq!((&power).checked_root(exp), Some(principal));
+            assert!(power.checked_roots(exp).contains(&x));
         }
     });
 

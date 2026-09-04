@@ -12,7 +12,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{SignificantBits, TrailingZeros};
-use malachite_nz::gaussian_integer::GaussianInteger;
+use malachite_nz::gaussian_integer::{ComparableGaussianIntegerRef, GaussianInteger};
 use malachite_nz::integer::Integer;
 use malachite_nz::test_util::gaussian_integer::arithmetic::root::*;
 use malachite_nz::test_util::generators::{
@@ -166,15 +166,25 @@ fn checked_root_properties() {
         }
 
         let roots = x.checked_roots(exp);
-        assert_eq!(roots.first(), root.as_ref());
+        assert!(roots.is_sorted_by(|a, b| {
+            ComparableGaussianIntegerRef(a) <= ComparableGaussianIntegerRef(b)
+        }));
+        assert_eq!(
+            roots.contains(root.as_ref().unwrap_or(&GaussianInteger::ZERO)),
+            root.is_some()
+        );
         if x == GaussianInteger::ZERO {
             assert_eq!(roots, vec![GaussianInteger::ZERO]);
         } else if root.is_some() {
             let g = u64::power_of_2(TrailingZeros::trailing_zeros(exp).min(2));
             assert_eq!(roots.len(), usize::exact_from(g));
-            for (j, r) in roots.iter().enumerate() {
+            // the roots are the rotations of the principal one by multiples of 2 pi / g
+            let principal = root.as_ref().unwrap();
+            for r in &roots {
                 assert_eq!(r.pow(exp), x);
-                assert_eq!(*r, (&roots[0]).mul_i_pow(u64::exact_from(j) * (4 / g)));
+            }
+            for j in 0..g {
+                assert!(roots.contains(&principal.mul_i_pow(j * (4 / g))));
             }
         } else {
             assert!(roots.is_empty());
@@ -207,8 +217,8 @@ fn checked_root_properties() {
 
     integer_unsigned_pair_gen_var_3::<u64>().test_properties(|(n, exp)| {
         // A real number can have a non-real Gaussian root (16 = (1+i)^8), so the comparison only
-        // runs one way: an integer root is the principal Gaussian root, and a real Gaussian root
-        // is the integer root.
+        // runs one way: an integer root is the principal Gaussian root, and a real Gaussian root is
+        // the integer root.
         let root = GaussianInteger::from(n.clone()).checked_root(exp);
         if let Some(r) = (&n).checked_root(exp) {
             assert_eq!(root, Some(GaussianInteger::from(r)));

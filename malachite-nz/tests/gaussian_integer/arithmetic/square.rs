@@ -11,7 +11,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::test_util::generators::common::GenConfig;
-use malachite_nz::gaussian_integer::GaussianInteger;
+use malachite_nz::gaussian_integer::{ComparableGaussianIntegerRef, GaussianInteger};
 use malachite_nz::integer::Integer;
 use malachite_nz::test_util::gaussian_integer::arithmetic::mul::gaussian_integer_mul_naive;
 use malachite_nz::test_util::gaussian_integer::arithmetic::square::gaussian_integer_square_naive;
@@ -79,7 +79,11 @@ fn square_properties() {
         if x == GaussianInteger::ZERO {
             assert_eq!(roots, vec![GaussianInteger::ZERO]);
         } else {
-            assert_eq!(roots, vec![principal.clone(), -principal]);
+            let mut expected = vec![-&principal, principal];
+            expected.sort_by(|a, b| {
+                ComparableGaussianIntegerRef(a).cmp(&ComparableGaussianIntegerRef(b))
+            });
+            assert_eq!(roots, expected);
         }
     });
 }

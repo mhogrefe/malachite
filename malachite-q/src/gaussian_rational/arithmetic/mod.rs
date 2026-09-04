@@ -70,6 +70,9 @@ pub mod power_of_2;
 /// [`ReciprocalAssign`](malachite_base::num::arithmetic::traits::ReciprocalAssign), traits for
 /// computing the reciprocal of a number.
 pub mod reciprocal;
+/// Implementations of [`CheckedRoot`](malachite_base::num::arithmetic::traits::CheckedRoot), a
+/// trait for taking the $n$th root of a number when it is a perfect $n$th power.
+pub mod root;
 /// Left-shifting a [`GaussianRational`](crate::gaussian_rational::GaussianRational) (multiplying it
 /// by a power of 2). A negative shift amount divides by a power of 2 instead.
 ///

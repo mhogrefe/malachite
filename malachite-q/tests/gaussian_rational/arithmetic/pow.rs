@@ -7,12 +7,15 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{
-    AbsSquared, Conjugate, MulI, MulIPow, Parity, Pow, PowAssign, PowerOf2, Reciprocal, Square,
+    AbsSquared, CanonicalizeUnit, CheckedRoot, Conjugate, MulI, MulIPow, Parity, Pow, PowAssign,
+    PowerOf2, Reciprocal, Square,
 };
 use malachite_base::num::basic::traits::{I, One, Two, Zero};
+use malachite_base::num::logic::traits::TrailingZeros;
 use malachite_base::test_util::generators::common::GenConfig;
 use malachite_base::test_util::generators::{signed_gen_var_5, unsigned_gen_var_5};
 use malachite_nz::test_util::generators::gaussian_integer_unsigned_pair_gen_var_1;
+use malachite_q::Rational;
 use malachite_q::gaussian_rational::GaussianRational;
 use malachite_q::test_util::gaussian_rational::arithmetic::pow::*;
 use malachite_q::test_util::generators::{
@@ -96,6 +99,21 @@ fn pow_assign_i64_fail() {
     x.pow_assign(-1i64);
 }
 
+// The root with argument in (-pi/g, pi/g], g = gcd(exp, 4), among the rotations of `x`.
+fn principal(x: GaussianRational, exp: u64) -> GaussianRational {
+    match TrailingZeros::trailing_zeros(exp) {
+        0 => x,
+        1 => {
+            if (&x.real, &x.imaginary) > (&Rational::ZERO, &Rational::ZERO) {
+                x
+            } else {
+                -x
+            }
+        }
+        _ => x.canonicalize_unit(),
+    }
+}
+
 #[test]
 fn pow_properties() {
     // Powers of Gaussian rationals grow quickly in both parts, so the exponents are kept smaller
@@ -144,6 +162,12 @@ fn pow_properties() {
             );
             assert_eq!((&x).mul_i().pow(exp), (&power).mul_i_pow(exp));
             assert_eq!((&x).pow(exp + 1), &power * &x);
+            // the root of the power is the principal rotation of the base, which is among the
+            // roots
+            if exp != 0 {
+                assert_eq!((&power).checked_root(exp), Some(principal(x.clone(), exp)));
+                assert!(power.checked_roots(exp).contains(&x));
+            }
         },
     );
 
@@ -220,6 +244,21 @@ fn pow_properties() {
             assert_eq!((&x).conjugate().pow(exp), (&power).conjugate());
             if x != GaussianRational::ZERO {
                 assert_eq!((&x).pow(-exp), (&power).reciprocal());
+            }
+            // a positive exponent's power has the base among its roots, and a negative one's has
+            // the reciprocal, since (1/x)^|e| = x^e
+            if exp != 0 {
+                let base = if exp > 0 {
+                    x.clone()
+                } else {
+                    (&x).reciprocal()
+                };
+                let abs_exp = exp.unsigned_abs();
+                assert_eq!(
+                    (&power).checked_root(abs_exp),
+                    Some(principal(base.clone(), abs_exp))
+                );
+                assert!(power.checked_roots(abs_exp).contains(&base));
             }
         },
     );

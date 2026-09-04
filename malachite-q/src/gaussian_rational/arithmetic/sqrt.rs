@@ -7,10 +7,10 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::Rational;
-use crate::gaussian_rational::GaussianRational;
 use crate::gaussian_rational::arithmetic::content_and_primitive_part::{
     scale_up_ref, scale_up_val,
 };
+use crate::gaussian_rational::{ComparableGaussianRationalRef, GaussianRational};
 use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::CheckedSqrt;
 use malachite_base::num::basic::traits::Zero;
@@ -149,7 +149,9 @@ impl CheckedSqrt for &GaussianRational {
 
 impl GaussianRational {
     /// Returns all the square roots of a [`GaussianRational`]: none if it is not a perfect square,
-    /// one if it is zero, and otherwise two, the principal root first and its negative second.
+    /// one if it is zero, and otherwise the principal root and its negative, in the canonical order
+    /// of [`ComparableGaussianRational`](crate::gaussian_rational::ComparableGaussianRational),
+    /// lexicographic by real part and then imaginary part.
     ///
     /// The principal root is the one with positive real part or, if that is zero, with non-negative
     /// imaginary part; see [`CheckedSqrt`](malachite_base::num::arithmetic::traits::CheckedSqrt).
@@ -180,8 +182,8 @@ impl GaussianRational {
     ///         .map(ToString::to_string)
     ///         .collect::<Vec<_>>()
     /// };
-    /// assert_eq!(roots("3/4+i"), ["1+i/2", "-1-i/2"]);
-    /// assert_eq!(roots("-1/4"), ["i/2", "-i/2"]);
+    /// assert_eq!(roots("3/4+i"), ["-1-i/2", "1+i/2"]);
+    /// assert_eq!(roots("-1/4"), ["-i/2", "i/2"]);
     /// assert_eq!(roots("1/2"), Vec::<String>::new());
     /// assert_eq!(
     ///     GaussianRational::ZERO.checked_sqrts(),
@@ -194,7 +196,11 @@ impl GaussianRational {
             Some(root) if root == 0u32 => vec![root],
             Some(root) => {
                 let neg_root = -&root;
-                vec![root, neg_root]
+                let mut roots = vec![root, neg_root];
+                roots.sort_by(|a, b| {
+                    ComparableGaussianRationalRef(a).cmp(&ComparableGaussianRationalRef(b))
+                });
+                roots
             }
         }
     }

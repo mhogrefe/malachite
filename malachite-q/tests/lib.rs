@@ -84,6 +84,7 @@ pub mod gaussian_rational {
         pub mod pow;
         pub mod power_of_2;
         pub mod reciprocal;
+        pub mod root;
         pub mod shl;
         pub mod shr;
         pub mod sqrt;

@@ -177,7 +177,8 @@ documented by git history.
   or zero real part and non-negative imaginary part) of a perfect square and `None` otherwise. The
   root is read off the norm: $N = \sqrt{a^2 + b^2}$, then $x = \sqrt{(N + a) / 2}$ and
   $y = \pm \sqrt{(N - a) / 2}$ with the sign of $b$. `GaussianInteger::checked_sqrts` returns
-  all the roots as a `Vec`: none, one for zero, or the principal root and its negative.
+  all the roots as a `Vec`: none, one for zero, or the principal root and its negative, in the
+  canonical order of `ComparableGaussianInteger` (lexicographic by real part, then imaginary).
 - `CheckedSqrt` and `checked_sqrts` for `GaussianRational` too, by clearing denominators: with
   $L$ the LCM of the denominators and $S = Lz$, $z$ is a square exactly when the Gaussian
   integer $SL$ is, and $\sqrt{z} = \sqrt{SL} / L$.
@@ -187,6 +188,9 @@ documented by git history.
   `checked_sqrt` convention for $n \equiv 2 \pmod 4$, and the canonical unit form for
   $4 \mid n$. The odd part of the exponent is handled exactly through the norm and a Gaussian
   GCD, and the power of 2 by iterated square roots; no floating point is involved.
+- `CheckedRoot<u64>` and `checked_roots` for `GaussianRational`, by clearing denominators: with
+  $L$ the LCM of the denominators and $S = Lz$, any root $w$ has $Lw$ integral, so $Lw$ is the
+  Gaussian integer root of $S L^{n-1}$.
 - `ComparableGaussianInteger` and `ComparableGaussianIntegerRef`, wrappers around
   `GaussianInteger` (by value and by reference) that implement `Ord`, comparing
   lexicographically: first by real part, then by imaginary part. Since no total order on the

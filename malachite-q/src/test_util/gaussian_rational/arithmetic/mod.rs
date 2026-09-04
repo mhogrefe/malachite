@@ -10,5 +10,6 @@ pub mod add;
 pub mod div;
 pub mod mul;
 pub mod pow;
+pub mod root;
 pub mod sqrt;
 pub mod square;

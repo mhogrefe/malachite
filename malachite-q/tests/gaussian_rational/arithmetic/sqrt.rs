@@ -10,7 +10,7 @@ use malachite_base::num::arithmetic::traits::{CheckedSqrt, Conjugate, MulI, Squa
 use malachite_base::num::basic::traits::Zero;
 use malachite_nz::test_util::generators::gaussian_integer_gen;
 use malachite_q::Rational;
-use malachite_q::gaussian_rational::GaussianRational;
+use malachite_q::gaussian_rational::{ComparableGaussianRationalRef, GaussianRational};
 use malachite_q::test_util::gaussian_rational::arithmetic::sqrt::*;
 use malachite_q::test_util::generators::{
     gaussian_rational_gen, gaussian_rational_gen_var_4, rational_gen,
@@ -67,10 +67,10 @@ fn test_checked_sqrts() {
         );
     };
     test("0", vec!["0"]);
-    test("1/4", vec!["1/2", "-1/2"]);
-    test("-1/4", vec!["i/2", "-i/2"]);
+    test("1/4", vec!["-1/2", "1/2"]);
+    test("-1/4", vec!["-i/2", "i/2"]);
     test("1/2", vec![]);
-    test("3/4+i", vec!["1+i/2", "-1-i/2"]);
+    test("3/4+i", vec!["-1-i/2", "1+i/2"]);
 }
 
 fn principal(x: GaussianRational) -> GaussianRational {
@@ -103,7 +103,13 @@ fn checked_sqrt_properties() {
         );
 
         let roots = x.checked_sqrts();
-        assert_eq!(roots.first(), root.as_ref());
+        assert!(roots.is_sorted_by(|a, b| {
+            ComparableGaussianRationalRef(a) <= ComparableGaussianRationalRef(b)
+        }));
+        assert_eq!(
+            roots.contains(root.as_ref().unwrap_or(&GaussianRational::ZERO)),
+            root.is_some()
+        );
         match roots.as_slice() {
             [] => assert!(root.is_none()),
             [r] => assert_eq!(*r, GaussianRational::ZERO),

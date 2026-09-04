@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::gaussian_integer::GaussianInteger;
+use crate::gaussian_integer::{ComparableGaussianIntegerRef, GaussianInteger};
 use crate::integer::Integer;
 use crate::natural::Natural;
 use alloc::vec::Vec;
@@ -204,7 +204,9 @@ impl CheckedSqrt for &GaussianInteger {
 
 impl GaussianInteger {
     /// Returns all the square roots of a [`GaussianInteger`]: none if it is not a perfect square,
-    /// one if it is zero, and otherwise two, the principal root first and its negative second.
+    /// one if it is zero, and otherwise the principal root and its negative, in the canonical order
+    /// of [`ComparableGaussianInteger`](crate::gaussian_integer::ComparableGaussianInteger),
+    /// lexicographic by real part and then imaginary part.
     ///
     /// The principal root is the one with positive real part or, if that is zero, with non-negative
     /// imaginary part; see [`CheckedSqrt`](malachite_base::num::arithmetic::traits::CheckedSqrt).
@@ -235,8 +237,8 @@ impl GaussianInteger {
     ///         .map(ToString::to_string)
     ///         .collect::<Vec<_>>()
     /// };
-    /// assert_eq!(roots("3+4i"), ["2+i", "-2-i"]);
-    /// assert_eq!(roots("-1"), ["i", "-i"]);
+    /// assert_eq!(roots("3+4i"), ["-2-i", "2+i"]);
+    /// assert_eq!(roots("-1"), ["-i", "i"]);
     /// assert_eq!(roots("2+i"), Vec::<String>::new());
     /// assert_eq!(
     ///     GaussianInteger::ZERO.checked_sqrts(),
@@ -249,7 +251,11 @@ impl GaussianInteger {
             Some(root) if root == 0u32 => vec![root],
             Some(root) => {
                 let neg_root = -&root;
-                vec![root, neg_root]
+                let mut roots = vec![root, neg_root];
+                roots.sort_by(|a, b| {
+                    ComparableGaussianIntegerRef(a).cmp(&ComparableGaussianIntegerRef(b))
+                });
+                roots
             }
         }
     }

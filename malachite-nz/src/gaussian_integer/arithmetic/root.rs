@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::gaussian_integer::GaussianInteger;
+use crate::gaussian_integer::{ComparableGaussianIntegerRef, GaussianInteger};
 use crate::integer::Integer;
 use crate::natural::Natural;
 use alloc::vec::Vec;
@@ -226,8 +226,9 @@ impl CheckedRoot<u64> for &GaussianInteger {
 
 impl GaussianInteger {
     /// Returns all the $n$th roots of a [`GaussianInteger`]: none if it is not a perfect $n$th
-    /// power, one if it is zero, and otherwise $\gcd(n, 4)$ of them, the principal root first and
-    /// then its successive rotations by $i$.
+    /// power, one if it is zero, and otherwise $\gcd(n, 4)$ of them, in the canonical order of
+    /// [`ComparableGaussianInteger`](crate::gaussian_integer::ComparableGaussianInteger),
+    /// lexicographic by real part and then imaginary part.
     ///
     /// The principal root is the one whose argument lies in $(-\pi/g, \pi/g]$ for $g = \gcd(n, 4)$;
     /// see [`CheckedRoot`](malachite_base::num::arithmetic::traits::CheckedRoot).
@@ -261,8 +262,8 @@ impl GaussianInteger {
     ///         .map(ToString::to_string)
     ///         .collect::<Vec<_>>()
     /// };
-    /// assert_eq!(roots("-4", 4), ["1+i", "-1+i", "-1-i", "1-i"]);
-    /// assert_eq!(roots("-4", 2), ["2i", "-2i"]);
+    /// assert_eq!(roots("-4", 4), ["-1-i", "-1+i", "1-i", "1+i"]);
+    /// assert_eq!(roots("-4", 2), ["-2i", "2i"]);
     /// assert_eq!(roots("-8", 3), ["-2"]);
     /// assert_eq!(roots("3+4i", 3), Vec::<String>::new());
     /// assert_eq!(
@@ -277,7 +278,7 @@ impl GaussianInteger {
         if principal == 0u32 {
             return vec![principal];
         }
-        // g = gcd(exp, 4) roots, each the previous one rotated by 2 pi / g
+        // g = gcd(exp, 4) roots, each the previous one rotated by 2 pi / g, then sorted
         let g = u64::power_of_2(TrailingZeros::trailing_zeros(exp).min(2));
         let step = 4 / g;
         let mut roots = Vec::with_capacity(usize::exact_from(g));
@@ -288,6 +289,7 @@ impl GaussianInteger {
             root = next;
         }
         roots.push(root);
+        roots.sort_by(|a, b| ComparableGaussianIntegerRef(a).cmp(&ComparableGaussianIntegerRef(b)));
         roots
     }
 }

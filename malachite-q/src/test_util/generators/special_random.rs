@@ -390,6 +390,30 @@ pub fn special_random_gaussian_rational_unsigned_pair_gen_var_1<T: PrimitiveUnsi
     ))
 }
 
+pub fn special_random_gaussian_rational_unsigned_pair_gen_var_2<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(GaussianRational, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_gaussian_rationals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_positive_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
 // -- (GaussianRational, Rational) --
 
 pub fn special_random_gaussian_rational_rational_pair_gen(
