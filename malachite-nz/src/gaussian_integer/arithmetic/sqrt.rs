@@ -88,7 +88,6 @@ impl CheckedSqrt for GaussianInteger {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::CheckedSqrt;
-    /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::gaussian_integer::GaussianInteger;
     /// use std::str::FromStr;
     ///
@@ -97,28 +96,32 @@ impl CheckedSqrt for GaussianInteger {
     ///     GaussianInteger::from_str("3+4i")
     ///         .unwrap()
     ///         .checked_sqrt()
-    ///         .to_debug_string(),
-    ///     "Some(GaussianInteger { real: 2, imaginary: 1 })"
+    ///         .unwrap()
+    ///         .to_string(),
+    ///     "2+i"
     /// );
     /// // (1-i)^2 = -2i
     /// assert_eq!(
     ///     GaussianInteger::from_str("-2i")
     ///         .unwrap()
     ///         .checked_sqrt()
-    ///         .to_debug_string(),
-    ///     "Some(GaussianInteger { real: 1, imaginary: -1 })"
+    ///         .unwrap()
+    ///         .to_string(),
+    ///     "1-i"
     /// );
     /// // -4 = (2i)^2, and 2i is the principal root
     /// assert_eq!(
-    ///     GaussianInteger::from(-4).checked_sqrt().to_debug_string(),
-    ///     "Some(GaussianInteger { real: 0, imaginary: 2 })"
+    ///     GaussianInteger::from(-4)
+    ///         .checked_sqrt()
+    ///         .unwrap()
+    ///         .to_string(),
+    ///     "2i"
     /// );
-    /// assert_eq!(
+    /// assert!(
     ///     GaussianInteger::from_str("2+i")
     ///         .unwrap()
     ///         .checked_sqrt()
-    ///         .to_debug_string(),
-    ///     "None"
+    ///         .is_none()
     /// );
     /// ```
     #[inline]
@@ -160,7 +163,6 @@ impl CheckedSqrt for &GaussianInteger {
     /// # Examples
     /// ```
     /// use malachite_base::num::arithmetic::traits::CheckedSqrt;
-    /// use malachite_base::strings::ToDebugString;
     /// use malachite_nz::gaussian_integer::GaussianInteger;
     /// use std::str::FromStr;
     ///
@@ -168,28 +170,30 @@ impl CheckedSqrt for &GaussianInteger {
     /// assert_eq!(
     ///     (&GaussianInteger::from_str("3+4i").unwrap())
     ///         .checked_sqrt()
-    ///         .to_debug_string(),
-    ///     "Some(GaussianInteger { real: 2, imaginary: 1 })"
+    ///         .unwrap()
+    ///         .to_string(),
+    ///     "2+i"
     /// );
     /// // (1-i)^2 = -2i
     /// assert_eq!(
     ///     (&GaussianInteger::from_str("-2i").unwrap())
     ///         .checked_sqrt()
-    ///         .to_debug_string(),
-    ///     "Some(GaussianInteger { real: 1, imaginary: -1 })"
+    ///         .unwrap()
+    ///         .to_string(),
+    ///     "1-i"
     /// );
     /// // -4 = (2i)^2, and 2i is the principal root
     /// assert_eq!(
     ///     (&GaussianInteger::from(-4))
     ///         .checked_sqrt()
-    ///         .to_debug_string(),
-    ///     "Some(GaussianInteger { real: 0, imaginary: 2 })"
+    ///         .unwrap()
+    ///         .to_string(),
+    ///     "2i"
     /// );
-    /// assert_eq!(
+    /// assert!(
     ///     (&GaussianInteger::from_str("2+i").unwrap())
     ///         .checked_sqrt()
-    ///         .to_debug_string(),
-    ///     "None"
+    ///         .is_none()
     /// );
     /// ```
     #[inline]

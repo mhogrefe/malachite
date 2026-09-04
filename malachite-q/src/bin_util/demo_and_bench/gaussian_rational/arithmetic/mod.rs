@@ -28,6 +28,7 @@ pub(crate) fn register(runner: &mut Runner) {
     reciprocal::register(runner);
     shl::register(runner);
     shr::register(runner);
+    sqrt::register(runner);
     square::register(runner);
     sub::register(runner);
 }
@@ -51,5 +52,6 @@ mod power_of_2;
 mod reciprocal;
 mod shl;
 mod shr;
+mod sqrt;
 mod square;
 mod sub;

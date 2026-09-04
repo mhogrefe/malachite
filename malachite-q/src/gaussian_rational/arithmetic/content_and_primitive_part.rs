@@ -19,7 +19,7 @@ use malachite_nz::natural::Natural;
 // Scales the parts up by the LCM of their denominators, which makes a Gaussian integer whose
 // content is coprime to that LCM: a prime dividing the LCM to its full power in one denominator
 // cannot divide that part's scaled numerator.
-fn scale_up_ref(x: &GaussianRational) -> (GaussianInteger, Natural) {
+pub(super) fn scale_up_ref(x: &GaussianRational) -> (GaussianInteger, Natural) {
     let l = x.real.denominator_ref().lcm(x.imaginary.denominator_ref());
     let real = Integer::from_sign_and_abs(
         x.real >= 0u32,
@@ -32,7 +32,7 @@ fn scale_up_ref(x: &GaussianRational) -> (GaussianInteger, Natural) {
     (GaussianInteger { real, imaginary }, l)
 }
 
-fn scale_up_val(x: GaussianRational) -> (GaussianInteger, Natural) {
+pub(super) fn scale_up_val(x: GaussianRational) -> (GaussianInteger, Natural) {
     let real_sign = x.real >= 0u32;
     let imaginary_sign = x.imaginary >= 0u32;
     let (real_n, real_d) = x.real.into_numerator_and_denominator();

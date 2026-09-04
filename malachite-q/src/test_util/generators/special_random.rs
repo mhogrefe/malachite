@@ -24,7 +24,7 @@ use crate::test_util::extra_variadic::{
 };
 use crate::test_util::generators::round_to_multiple_rational_filter;
 use malachite_base::bools::random::random_bools;
-use malachite_base::num::arithmetic::traits::IsPowerOf2;
+use malachite_base::num::arithmetic::traits::{IsPowerOf2, Square};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
@@ -166,6 +166,19 @@ pub fn special_random_gaussian_rational_gen_var_3(config: &GenConfig) -> It<Gaus
             config.get_or("mean_bits_d", 1),
         )
         .filter(|x| x.real != 0u32 || x.imaginary != 0u32),
+    )
+}
+
+pub fn special_random_gaussian_rational_gen_var_4(config: &GenConfig) -> It<GaussianRational> {
+    Box::new(
+        striped_random_gaussian_rationals(
+            EXAMPLE_SEED,
+            config.get_or("mean_stripe_n", 32),
+            config.get_or("mean_stripe_d", 1),
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        )
+        .map(Square::square),
     )
 }
 

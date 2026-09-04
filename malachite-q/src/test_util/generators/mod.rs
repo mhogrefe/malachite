@@ -88,6 +88,15 @@ pub fn gaussian_rational_gen_var_3() -> Generator<GaussianRational> {
     )
 }
 
+// All `GaussianRational`s that are perfect squares.
+pub fn gaussian_rational_gen_var_4() -> Generator<GaussianRational> {
+    Generator::new(
+        &exhaustive_gaussian_rational_gen_var_4,
+        &random_gaussian_rational_gen_var_4,
+        &special_random_gaussian_rational_gen_var_4,
+    )
+}
+
 pub fn gaussian_rational_pair_gen() -> Generator<(GaussianRational, GaussianRational)> {
     Generator::new(
         &exhaustive_gaussian_rational_pair_gen,

@@ -23,7 +23,7 @@ use crate::test_util::extra_variadic::{
 };
 use itertools::Itertools;
 use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
-use malachite_base::num::arithmetic::traits::IsPowerOf2;
+use malachite_base::num::arithmetic::traits::{IsPowerOf2, Square};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
@@ -102,6 +102,10 @@ pub fn exhaustive_gaussian_rational_gen_var_2() -> It<GaussianRational> {
 
 pub fn exhaustive_gaussian_rational_gen_var_3() -> It<GaussianRational> {
     Box::new(exhaustive_gaussian_rationals().filter(|x| x.real != 0u32 || x.imaginary != 0u32))
+}
+
+pub fn exhaustive_gaussian_rational_gen_var_4() -> It<GaussianRational> {
+    Box::new(exhaustive_gaussian_rationals().map(Square::square))
 }
 
 // -- (GaussianRational, GaussianInteger) --

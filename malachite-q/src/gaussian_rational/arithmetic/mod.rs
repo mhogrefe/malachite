@@ -132,7 +132,10 @@ pub mod shl;
 pub mod shr;
 /// Implementations of [`Square`](malachite_base::num::arithmetic::traits::Square) and
 /// [`SquareAssign`](malachite_base::num::arithmetic::traits::SquareAssign), traits for squaring a
-/// number.
+/// number. Implementations of
+/// [`CheckedSqrt`](malachite_base::num::arithmetic::traits::CheckedSqrt), a trait for taking the
+/// square root of a number when it is a perfect square.
+pub mod sqrt;
 pub mod square;
 /// Subtraction of [`GaussianRational`](crate::gaussian_rational::GaussianRational)s.
 pub mod sub;
