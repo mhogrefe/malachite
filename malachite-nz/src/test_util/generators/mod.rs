@@ -192,6 +192,16 @@ pub fn gaussian_integer_unsigned_pair_gen_var_1<T: PrimitiveUnsigned>()
     )
 }
 
+// All `(GaussianInteger, T)` where `T` is unsigned, small, and positive.
+pub fn gaussian_integer_unsigned_pair_gen_var_2<T: PrimitiveUnsigned>()
+-> Generator<(GaussianInteger, T)> {
+    Generator::new(
+        &exhaustive_gaussian_integer_unsigned_pair_gen_var_2,
+        &random_gaussian_integer_unsigned_pair_gen_var_2,
+        &special_random_gaussian_integer_unsigned_pair_gen_var_2,
+    )
+}
+
 // -- Integer --
 
 pub fn integer_gen() -> Generator<Integer> {

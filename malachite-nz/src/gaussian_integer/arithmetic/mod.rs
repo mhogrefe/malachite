@@ -89,6 +89,9 @@ pub mod power_of_2;
 /// finding the remainder of two numbers, subject to the nearest-quotient rounding used by Gaussian
 /// integer division.
 pub mod rem;
+/// Implementations of [`CheckedRoot`](malachite_base::num::arithmetic::traits::CheckedRoot), a
+/// trait for taking the $n$th root of a number when it is a perfect $n$th power.
+pub mod root;
 /// Left-shifting a [`GaussianInteger`](crate::gaussian_integer::GaussianInteger) (multiplying it by
 /// a power of 2).
 ///

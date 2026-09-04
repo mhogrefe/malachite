@@ -181,6 +181,12 @@ documented by git history.
 - `CheckedSqrt` and `checked_sqrts` for `GaussianRational` too, by clearing denominators: with
   $L$ the LCM of the denominators and $S = Lz$, $z$ is a square exactly when the Gaussian
   integer $SL$ is, and $\sqrt{z} = \sqrt{SL} / L$.
+- `CheckedRoot<u64>` and `checked_roots` for `GaussianInteger`. A nonzero Gaussian integer has
+  either no $n$th roots or exactly $\gcd(n, 4)$ of them; the principal one has argument in
+  $(-\pi/g, \pi/g]$ for $g = \gcd(n, 4)$, which is the unique root for odd $n$, the
+  `checked_sqrt` convention for $n \equiv 2 \pmod 4$, and the canonical unit form for
+  $4 \mid n$. The odd part of the exponent is handled exactly through the norm and a Gaussian
+  GCD, and the power of 2 by iterated square roots; no floating point is involved.
 - `ComparableGaussianInteger` and `ComparableGaussianIntegerRef`, wrappers around
   `GaussianInteger` (by value and by reference) that implement `Ord`, comparing
   lexicographically: first by real part, then by imaginary part. Since no total order on the

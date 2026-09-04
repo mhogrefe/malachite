@@ -389,6 +389,28 @@ pub fn random_gaussian_integer_unsigned_pair_gen_var_1<T: PrimitiveUnsigned>(
     ))
 }
 
+pub fn random_gaussian_integer_unsigned_pair_gen_var_2<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(GaussianInteger, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_gaussian_integers(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_positive_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
 // -- (GaussianInteger, PrimitiveInt) --
 
 pub fn random_gaussian_integer_primitive_int_pair_gen<T: PrimitiveInt>(

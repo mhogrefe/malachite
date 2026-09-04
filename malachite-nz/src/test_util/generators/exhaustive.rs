@@ -244,6 +244,14 @@ pub fn exhaustive_gaussian_integer_unsigned_pair_gen_var_1<T: PrimitiveUnsigned>
     ))
 }
 
+pub fn exhaustive_gaussian_integer_unsigned_pair_gen_var_2<T: PrimitiveUnsigned>()
+-> It<(GaussianInteger, T)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_gaussian_integers(),
+        exhaustive_positive_primitive_ints(),
+    ))
+}
+
 // -- (GaussianInteger, PrimitiveSigned) --
 
 pub fn exhaustive_gaussian_integer_signed_pair_gen<T: PrimitiveSigned>() -> It<(GaussianInteger, T)>

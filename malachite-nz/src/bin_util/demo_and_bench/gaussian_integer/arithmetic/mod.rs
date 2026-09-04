@@ -29,6 +29,7 @@ pub(crate) fn register(runner: &mut Runner) {
     pow::register(runner);
     power_of_2::register(runner);
     rem::register(runner);
+    root::register(runner);
     shl::register(runner);
     sqrt::register(runner);
     square::register(runner);
@@ -55,6 +56,7 @@ mod neg;
 mod pow;
 mod power_of_2;
 mod rem;
+mod root;
 mod shl;
 mod sqrt;
 mod square;
