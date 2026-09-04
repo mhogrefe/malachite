@@ -14,6 +14,7 @@ pub(crate) fn register(runner: &mut Runner) {
     canonical_unit_i_pow::register(runner);
     canonicalize_unit::register(runner);
     conjugate::register(runner);
+    content_and_primitive_part::register(runner);
     div::register(runner);
     div_exact::register(runner);
     div_i::register(runner);
@@ -38,6 +39,7 @@ mod add;
 mod canonical_unit_i_pow;
 mod canonicalize_unit;
 mod conjugate;
+mod content_and_primitive_part;
 mod div;
 mod div_exact;
 mod div_i;

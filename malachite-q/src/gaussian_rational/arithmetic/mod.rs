@@ -25,6 +25,12 @@ pub mod canonicalize_unit;
 /// [`ConjugateAssign`](malachite_base::num::arithmetic::traits::ConjugateAssign), traits for
 /// computing the complex conjugate of a number: the sign of the imaginary part is flipped.
 pub mod conjugate;
+/// Implementations of
+/// [`ContentAndPrimitivePart`](malachite_base::num::arithmetic::traits::ContentAndPrimitivePart),
+/// [`Content`](malachite_base::num::arithmetic::traits::Content), and
+/// [`PrimitivePart`](malachite_base::num::arithmetic::traits::PrimitivePart), traits for splitting
+/// a number into a rational scalar and a Gaussian integer with coprime parts.
+pub mod content_and_primitive_part;
 /// Division of [`GaussianRational`](crate::gaussian_rational::GaussianRational)s, including
 /// [`CheckedDiv`](malachite_base::num::arithmetic::traits::CheckedDiv).
 pub mod div;
@@ -53,6 +59,10 @@ pub mod mul_i_pow;
 /// [`GaussianRational`](crate::gaussian_rational::GaussianRational), negating both the real and
 /// imaginary parts.
 pub mod neg;
+/// Implementations of [`Pow`](malachite_base::num::arithmetic::traits::Pow) and
+/// [`PowAssign`](malachite_base::num::arithmetic::traits::PowAssign), traits for raising a number
+/// to a power.
+pub mod pow;
 /// Implementations of [`PowerOf2`](malachite_base::num::arithmetic::traits::PowerOf2), a trait for
 /// computing a power of 2.
 pub mod power_of_2;

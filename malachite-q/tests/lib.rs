@@ -72,6 +72,7 @@ pub mod gaussian_rational {
         pub mod canonical_unit_i_pow;
         pub mod canonicalize_unit;
         pub mod conjugate;
+        pub mod content_and_primitive_part;
         pub mod div;
         pub mod div_i;
         pub mod is_power_of_2;
@@ -80,6 +81,7 @@ pub mod gaussian_rational {
         pub mod mul_i;
         pub mod mul_i_pow;
         pub mod neg;
+        pub mod pow;
         pub mod power_of_2;
         pub mod reciprocal;
         pub mod shl;

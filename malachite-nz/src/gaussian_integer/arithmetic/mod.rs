@@ -31,6 +31,12 @@ pub mod canonicalize_unit;
 /// [`ConjugateAssign`](malachite_base::num::arithmetic::traits::ConjugateAssign), traits for
 /// computing the complex conjugate of a number: the sign of the imaginary part is flipped.
 pub mod conjugate;
+/// Implementations of
+/// [`ContentAndPrimitivePart`](malachite_base::num::arithmetic::traits::ContentAndPrimitivePart),
+/// [`Content`](malachite_base::num::arithmetic::traits::Content), and
+/// [`PrimitivePart`](malachite_base::num::arithmetic::traits::PrimitivePart), traits for splitting
+/// a number into a scalar and an element with coprime parts.
+pub mod content_and_primitive_part;
 /// Implementations of [`DivExact`](malachite_base::num::arithmetic::traits::DivExact) and
 /// [`DivExactAssign`](malachite_base::num::arithmetic::traits::DivExactAssign), traits for dividing
 /// two numbers when it's known that the division is exact. Implementations of

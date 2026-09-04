@@ -854,6 +854,39 @@ pub trait LcmAssign<RHS = Self> {
     fn lcm_assign(&mut self, other: RHS);
 }
 
+/// Splits a value into its content and its primitive part.
+///
+/// This applies to an element of a vector space over the rationals with a distinguished integer
+/// lattice, like a rational polynomial, a Gaussian rational, or a vector of rationals. The content
+/// is the unique non-negative rational $c$ such that the value is $c$ times a lattice element with
+/// coprime coordinates, and the primitive part is that element; the value is the product of the
+/// two. Zero has content 0 and primitive part 0. For an element of the lattice itself, the content
+/// is the GCD of the coordinates, a non-negative integer.
+pub trait ContentAndPrimitivePart {
+    type Content;
+    type PrimitivePart;
+
+    fn content_and_primitive_part(self) -> (Self::Content, Self::PrimitivePart);
+}
+
+/// Computes the content of a value: the unique non-negative rational $c$ such that the value is $c$
+/// times an element of the underlying integer lattice with coprime coordinates. See
+/// [`ContentAndPrimitivePart`].
+pub trait Content {
+    type Output;
+
+    fn content(self) -> Self::Output;
+}
+
+/// Computes the primitive part of a value: the element of the underlying integer lattice, with
+/// coprime coordinates, that the value is a non-negative rational multiple of. See
+/// [`ContentAndPrimitivePart`].
+pub trait PrimitivePart {
+    type Output;
+
+    fn primitive_part(self) -> Self::Output;
+}
+
 /// Computes $e^x$, the exponential of a number.
 pub trait Exp {
     type Output;

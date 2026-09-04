@@ -164,6 +164,15 @@ documented by git history.
 - `Pow<u64>` and `PowAssign<u64>` for `GaussianInteger`, a port of FLINT's `fmpzi_pow_ui`: binary
   exponentiation over the fused squaring and multiplication, with purely real and purely
   imaginary bases reduced to an `Integer` power (times $i^n$ for the latter).
+- `Pow<u64>`, `Pow<i64>`, and the matching `PowAssign`s for `GaussianRational`, structured like
+  the `GaussianInteger` version; a negative exponent takes the reciprocal, and zero to a negative
+  power panics, as for `Rational`.
+- `ContentAndPrimitivePart`, `Content`, and `PrimitivePart` traits in `malachite-base`, for
+  elements of vector spaces over the rationals with a distinguished integer lattice, implemented
+  for `GaussianInteger` (content a `Natural`, the GCD of the parts) and `GaussianRational` (content
+  a `Rational`, primitive part a `GaussianInteger` with coprime parts). `GaussianRational`'s power
+  is computed through the split, so the intermediate values carry no denominators and there is one
+  rational reduction per part at the end instead of several per squaring.
 - `ComparableGaussianInteger` and `ComparableGaussianIntegerRef`, wrappers around
   `GaussianInteger` (by value and by reference) that implement `Ord`, comparing
   lexicographically: first by real part, then by imaginary part. Since no total order on the
