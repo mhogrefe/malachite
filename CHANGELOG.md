@@ -238,8 +238,14 @@ documented by git history.
   of $\pi/2$ take a dedicated path that computes the distance to that multiple exactly, so the
   result is correct, and underflows correctly, even when the input agrees with the multiple to
   more than $2^{30}$ bits (a regime MPFR's wider exponent range never reaches).
-- `primitive_float_cos`, the correctly rounded cosine of an `f32` or `f64`, alongside the
-  existing `primitive_float_exp`.
+- `primitive_float_cos` and `primitive_float_cos_rational`, the correctly rounded cosine of an
+  `f32` or `f64`, or of a `Rational` as an `f32` or `f64`, alongside the existing
+  `primitive_float_exp` and `primitive_float_exp_rational`.
+- `cos_rational_prec_round` and `cos_rational_prec` (with `_ref` variants), the correctly
+  rounded cosine of a `Rational` as a `Float`, alongside the `exp_rational_*` family. Since
+  cosine is not monotonic, the result is bracketed by a Lipschitz bound around the cosine of a
+  `Float` approximation rather than by bracketing the input, with exact `Rational` handling near
+  odd multiples of $\pi/2$ and for inputs too large to be `Float`s.
 - Conversions between `Float` and the Gaussian types: `TryFrom` and `ConvertibleFrom`
   implementations converting `GaussianInteger` and `GaussianRational` to `Float` (real and, for
   the rational case, dyadic; minimal precision) and `Float` to either Gaussian type (finite,

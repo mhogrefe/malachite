@@ -21,23 +21,24 @@
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::float::arithmetic::exp::{get_z_2exp, one_neighbor};
 use crate::float::arithmetic::round_near_x::float_round_near_x;
-use crate::{Float, emulate_float_to_float_fn};
-use core::cmp::Ordering::{self, Equal};
+use crate::{ComparableFloatRef, Float, emulate_float_to_float_fn, emulate_rational_to_float_fn};
+use core::cmp::Ordering::{self, Equal, Greater, Less};
 use core::cmp::{max, min};
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     CeilingLogBase2, Cos, CosAssign, DivRoundAssign, FloorSqrt, ModPowerOf2, NegAssign, Parity,
-    PowerOf2, Square, UnsignedAbs,
+    PowerOf2, Square, SubMul, UnsignedAbs,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{NaN as NaNTrait, One};
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode::{self, Ceiling, Exact, Floor, Nearest};
+use malachite_base::rounding_modes::RoundingMode::{self, Ceiling, Down, Exact, Floor, Nearest};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::float::round::float_can_round;
 use malachite_nz::platform::Limb;
+use malachite_q::Rational;
 
 // f <- 1 - r/2! + r^2/4! + ... + (-1)^l r^l/(2l)! + ...
 //
@@ -106,6 +107,193 @@ fn cos2_aux(r: &Float, p: u64) -> (Float, u64) {
     let f = Float::from_integer_prec(s, p).0 >> (p + q);
     let l = (i - 1) >> 1; // number of iterations
     (f, ((l + 1).ceiling_log_base_2() << 1) + 1) // bound is 2l(l+1)
+}
+
+// Rounds both ends of a bracket [lo, hi] known to contain a transcendental value; if the two ends
+// round to the same `Float` on the same side of it, that settles the result. A bound that is
+// exactly representable rounds with `Equal`, which is merged with the other bound's `Ordering`. The
+// comparison is sign-sensitive, so a bracket straddling zero is never accepted.
+fn round_bracket(
+    lo: &Rational,
+    hi: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+) -> Option<(Float, Ordering)> {
+    let (f_lo, mut o_lo) = Float::from_rational_prec_round_ref(lo, prec, rm);
+    let (f_hi, mut o_hi) = Float::from_rational_prec_round_ref(hi, prec, rm);
+    if o_lo == Equal {
+        o_lo = o_hi;
+    }
+    if o_hi == Equal {
+        o_hi = o_lo;
+    }
+    (o_lo == o_hi && ComparableFloatRef(&f_lo) == ComparableFloatRef(&f_hi)).then_some((f_lo, o_lo))
+}
+
+// cos(x) for a nonzero x so small that 1 - x^2/2 <= cos(x) < 1 lies within half an ulp of 1 at
+// precision `prec`: the result is 1, or its predecessor for rounding toward zero.
+fn cos_rational_tiny(prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    match rm {
+        Floor | Down => (one_neighbor(prec, false), Less),
+        _ => (Float::one_prec(prec), Greater),
+    }
+}
+
+// Sums the cosine series 1 - x^2/2! + x^4/4! - ... in `Rational` arithmetic for a nonzero |x| < 1
+// too small to be a `Float`. The terms alternate in sign with decreasing magnitude, so cos(x) lies
+// between consecutive partial sums, and the bracket is tightened until both ends round the same
+// way. Only reachable for a precision beyond 2^31 bits: any smaller precision takes the tiny path.
+fn cos_rational_series(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    fail_on_untested_path("cos_rational_series");
+    let x_squared = x.square();
+    let mut s = Rational::ONE;
+    let mut term = Rational::ONE;
+    let mut k = 1u64;
+    loop {
+        term *= &x_squared;
+        term /= Rational::from((k << 1) * ((k << 1) - 1));
+        term.neg_assign();
+        let s_next = &s + &term;
+        let (lo, hi) = if s < s_next {
+            (&s, &s_next)
+        } else {
+            (&s_next, &s)
+        };
+        if let Some(result) = round_bracket(lo, hi, prec, rm) {
+            return result;
+        }
+        s = s_next;
+        k += 1;
+    }
+}
+
+// Reduces a `Rational` too large to be a `Float` modulo 2 pi, using pi to exp_x + w bits, so that
+// the reduced value y satisfies |x - 2 pi k - y| <= 2^(2 - w): |k| < 2^exp_x, and 2 pi is known to
+// within 2^(2 - exp_x - w).
+fn reduce_huge(x: &Rational, exp_x: i64, w: u64) -> Rational {
+    let two_pi = Rational::exact_from(&(Float::pi_prec(u64::exact_from(exp_x) + w).0 << 1u32));
+    let k = Integer::rounding_from(x / &two_pi, Nearest).0;
+    x.sub_mul(&two_pi, &Rational::from(k))
+}
+
+// cos(y) for a `Rational` y within about 2^-cancel of an odd multiple of pi/2 (cancel >= 64 and
+// cancel >= prec / 16), where the general bracket would need its working precision raised by
+// `cancel` bits. As in `cos_near_zero`, write y = n pi/2 + delta with n odd, so that cos(y) =
+// -sin(delta) if n = 1 mod 4 and sin(delta) otherwise; delta is computed exactly in `Rational`
+// arithmetic from pi to exp_y + w bits (error at most 2^(1 - w), plus `extra` for a reduced y), and
+// sin(delta) is bracketed by t - t^3/6 and t. The bracket is rounded in `Rational` arithmetic, so
+// the result underflows correctly when it must.
+fn cos_rational_near_zero(
+    y: &Rational,
+    exp_y: i64,
+    prec: u64,
+    rm: RoundingMode,
+    extra: Option<i64>,
+    mut w: u64,
+) -> (Float, Ordering) {
+    let mut increment = Limb::WIDTH;
+    // A rational y = a/b is typically no closer to n pi/2 than about 1/b (a dyadic approximation of
+    // pi/2 to k bits, for instance, is off by about 2^-k), so a precision that resolves delta at
+    // that scale is a good first target: as in `cos_near_zero`, w at least grows by half each time
+    // and by up to 8 times to reach the hint, so that the early iterations cost a small fraction of
+    // the last one.
+    let w_hint = y.denominator_ref().significant_bits() + prec + 64;
+    loop {
+        let pi = Rational::exact_from(&Float::pi_prec(u64::exact_from(max(exp_y, 1)) + w).0);
+        let n = Integer::rounding_from((y / &pi) << 1u32, Nearest).0;
+        assert!(n.odd());
+        let negate = (&n).mod_power_of_2(2) == 1u32;
+        let half_pi = pi >> 1u32;
+        let delta = y.sub_mul(&half_pi, &Rational::from(&n));
+        let mut e = Rational::power_of_2(1 - i64::exact_from(w));
+        if let Some(extra) = extra {
+            e += Rational::power_of_2(extra);
+        }
+        let d_lo = &delta - &e;
+        let d_hi = delta + e;
+        // for |t| <= 1, t - t^3/6 <= sin(t) <= t when t >= 0, and t <= sin(t) <= t - t^3/6 when t <
+        // 0; sin is increasing on [-1, 1]
+        let cubic = |t: &Rational| t - t.square() * t / const { Rational::const_from_unsigned(6) };
+        let sin_lo = if d_lo >= 0u32 { cubic(&d_lo) } else { d_lo };
+        let sin_hi = if d_hi >= 0u32 { d_hi } else { cubic(&d_hi) };
+        let (lo, hi) = if negate {
+            (-sin_hi, -sin_lo)
+        } else {
+            (sin_lo, sin_hi)
+        };
+        if let Some(result) = round_bracket(&lo, &hi, prec, rm) {
+            return result;
+        }
+        w = max(w + increment, min(w_hint, w << 3));
+        increment = w >> 1;
+    }
+}
+
+// Computes cos(x) for a nonzero `Rational` x, rounded to precision `prec` with rounding mode `rm`.
+// (cos(0) = 1 is handled by the caller.) The cosine of a nonzero rational is transcendental, so the
+// result is never exactly representable and `rm` must not be `Exact`.
+//
+// The general case rounds x to a `Float` y_f at a working precision w, takes its correctly rounded
+// cosine c_f, and brackets cos(x) using |cos(x) - cos(y_f)| <= |x - y_f|, the rounding error of
+// c_f, and, for an x too large to be a `Float`, the error of a `Rational` reduction modulo 2 pi.
+// The bracket is rounded in `Rational` arithmetic, and w is raised until both ends agree. Unlike
+// `exp_rational_helper`'s bracket of x itself, this needs no monotonicity.
+fn cos_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    assert_ne!(rm, Exact, "Inexact cos");
+    let exp_x = x.floor_log_base_2_abs() + 1; // the MPFR-style exponent of x
+    // 1 - cos(x) <= x^2/2 < 2^(2 exp_x - 1): when that is at most 2^(-prec - 1), cos(x) rounds to 1
+    if 1 - (exp_x << 1) > i64::exact_from(prec) {
+        return cos_rational_tiny(prec, rm);
+    }
+    // x is too small to be a `Float` but `prec` is so large that cos(x) does not round to 1
+    if exp_x <= Float::MIN_EXPONENT_I64 {
+        return cos_rational_series(x, prec, rm);
+    }
+    let huge = exp_x >= Float::MAX_EXPONENT_I64;
+    let mut w = prec + 10;
+    let mut increment = Limb::WIDTH;
+    loop {
+        let reduced;
+        let (y, extra) = if huge {
+            reduced = reduce_huge(x, exp_x, w);
+            (&reduced, Some(2 - i64::exact_from(w)))
+        } else {
+            (x, None)
+        };
+        let (y_f, y_o) = Float::from_rational_prec_ref(y, w);
+        if !huge && y_o == Equal {
+            // x is exactly representable at w bits, so cos(x) is simply its cosine
+            return cos_prec_round_normal_ref(&y_f, prec, rm);
+        }
+        let c_f = (&y_f).cos();
+        // The exponents of y and c_f, as `Float`s would have them (y is nonzero, and c_f is zero
+        // only if it underflowed, which counts as complete cancellation).
+        let exp_y = y.floor_log_base_2_abs() + 1;
+        let exp_c = c_f
+            .get_exponent()
+            .map_or(Float::MIN_EXPONENT_I64, i64::from);
+        // |cos(y)| < 2^exp_c (up to the bracket width): heavy cancellation means y is close to an
+        // odd multiple of pi/2, where the bracket below would have to be far narrower than 2^-w.
+        if exp_c < 0 {
+            let cancel = u64::exact_from(-exp_c);
+            if cancel >= max(NEAR_ZERO_MIN_CANCEL, prec >> 4) {
+                return cos_rational_near_zero(y, exp_y, prec, rm, extra, w);
+            }
+        }
+        // |c_f - cos(y_f)| <= 2^(exp_c - w) (half an ulp, doubled for safety), and |cos(y) -
+        // cos(y_f)| <= |y - y_f| <= 2^(exp_y - w)
+        let w_i = i64::exact_from(w);
+        let mut delta = Rational::power_of_2(exp_c - w_i) + Rational::power_of_2(exp_y - w_i);
+        if let Some(extra) = extra {
+            delta += Rational::power_of_2(extra);
+        }
+        let c = Rational::exact_from(&c_f);
+        if let Some(result) = round_bracket(&(&c - &delta), &(c + delta), prec, rm) {
+            return result;
+        }
+        w += increment;
+        increment = w >> 1;
+    }
 }
 
 // The least number of bits of cancellation (|cos(x)| < 2^-cancel) that sends an input to
@@ -1089,6 +1277,295 @@ impl Float {
     }
 }
 
+impl Float {
+    /// Computes $\cos x$, the cosine of a [`Rational`], rounding the result to the specified
+    /// precision and with the specified rounding mode and returning the result as a [`Float`]. The
+    /// [`Rational`] is taken by value. An [`Ordering`] is also returned, indicating whether the
+    /// rounded cosine is less than, equal to, or greater than the exact cosine.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,p,m) = \cos x+\varepsilon.
+    /// $$
+    /// - If $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |\cos x|\rfloor-p+1}$.
+    /// - If $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |\cos x|\rfloor-p}$.
+    ///
+    /// These bounds do not apply when the result underflows; see below.
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p,m)=1$.
+    ///
+    /// Overflow and underflow:
+    /// - Since $|\cos x|\leq 1$, the result never overflows.
+    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,p,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
+    ///
+    /// Underflow requires an input within $2^{-2^{30}}$ of an odd multiple of $\pi/2$, which takes
+    /// more than $2^{30}$ bits.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::cos_rational_prec`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m, e) = O(n^{3/2} \log n \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
+    ///
+    /// $M(n, m, e) = O((n+m+e) \log (n+m+e))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, $m$ is `x.significant_bits()`,
+    /// and $e$ is `x.floor_log_base_2_abs()` (taken as 0 when it is negative or $x = 0$): the input
+    /// is rounded to a working precision and the [`Float`] cosine taken there, which for $|x| \geq
+    /// 4$ reduces the argument modulo $2\pi$ and so needs $\pi$ to about $n + e$ bits.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision (which is the case for every nonzero input).
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::cos_rational_prec_round(Rational::from_unsigneds(3u8, 5), 5, Floor);
+    /// assert_eq!(c.to_string(), "0.812");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::cos_rational_prec_round(Rational::from_unsigneds(3u8, 5), 5, Ceiling);
+    /// assert_eq!(c.to_string(), "0.844");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) = Float::cos_rational_prec_round(Rational::from_unsigneds(3u8, 5), 20, Floor);
+    /// assert_eq!(c.to_string(), "0.82533550");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::cos_rational_prec_round(Rational::from_unsigneds(3u8, 5), 20, Ceiling);
+    /// assert_eq!(c.to_string(), "0.82533646");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn cos_rational_prec_round(x: Rational, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+        Self::cos_rational_prec_round_ref(&x, prec, rm)
+    }
+
+    /// Computes $\cos x$, the cosine of a [`Rational`], rounding the result to the specified
+    /// precision and with the specified rounding mode and returning the result as a [`Float`]. The
+    /// [`Rational`] is taken by reference. An [`Ordering`] is also returned, indicating whether the
+    /// rounded cosine is less than, equal to, or greater than the exact cosine.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,p,m) = \cos x+\varepsilon.
+    /// $$
+    /// - If $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |\cos x|\rfloor-p+1}$.
+    /// - If $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |\cos x|\rfloor-p}$.
+    ///
+    /// These bounds do not apply when the result underflows.
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p,m)=1$.
+    ///
+    /// See the [`Float::cos_rational_prec_round`] documentation for information on overflow and
+    /// underflow.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::cos_rational_prec_ref`]
+    /// instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m, e) = O(n^{3/2} \log n \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
+    ///
+    /// $M(n, m, e) = O((n+m+e) \log (n+m+e))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, $m$ is `x.significant_bits()`,
+    /// and $e$ is `x.floor_log_base_2_abs()` (taken as 0 when it is negative or $x = 0$): the input
+    /// is rounded to a working precision and the [`Float`] cosine taken there, which for $|x| \geq
+    /// 4$ reduces the argument modulo $2\pi$ and so needs $\pi$ to about $n + e$ bits.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision (which is the case for every nonzero input).
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) =
+    ///     Float::cos_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 5, Floor);
+    /// assert_eq!(c.to_string(), "0.812");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) =
+    ///     Float::cos_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 5, Ceiling);
+    /// assert_eq!(c.to_string(), "0.844");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) =
+    ///     Float::cos_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 20, Floor);
+    /// assert_eq!(c.to_string(), "0.82533550");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) =
+    ///     Float::cos_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 20, Ceiling);
+    /// assert_eq!(c.to_string(), "0.82533646");
+    /// assert_eq!(o, Greater);
+    /// ```
+    pub fn cos_rational_prec_round_ref(
+        x: &Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        if *x == 0u32 {
+            // cos(0) = 1, exactly
+            return (Self::one_prec(prec), Equal);
+        }
+        cos_rational_helper(x, prec, rm)
+    }
+
+    /// Computes $\cos x$, the cosine of a [`Rational`], rounding the result to the nearest value of
+    /// the specified precision and returning the result as a [`Float`]. The [`Rational`] is taken
+    /// by value. An [`Ordering`] is also returned, indicating whether the rounded cosine is less
+    /// than, equal to, or greater than the exact cosine.
+    ///
+    /// If the cosine is equidistant from two [`Float`]s with the specified precision, the [`Float`]
+    /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
+    /// the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,p) = \cos x+\varepsilon,
+    /// $$
+    /// where $|\varepsilon| \leq 2^{\lfloor\log_2 |\cos x|\rfloor-p}$ (unless the result
+    /// underflows; see below).
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p)=1$.
+    ///
+    /// Overflow and underflow:
+    /// - Since $|\cos x|\leq 1$, the result never overflows.
+    /// - If $0<f(x,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,p)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
+    ///
+    /// Underflow requires an input within $2^{-2^{30}}$ of an odd multiple of $\pi/2$, which takes
+    /// more than $2^{30}$ bits.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::cos_rational_prec_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m, e) = O(n^{3/2} \log n \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
+    ///
+    /// $M(n, m, e) = O((n+m+e) \log (n+m+e))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, $m$ is `x.significant_bits()`,
+    /// and $e$ is `x.floor_log_base_2_abs()` (taken as 0 when it is negative or $x = 0$): the input
+    /// is rounded to a working precision and the [`Float`] cosine taken there, which for $|x| \geq
+    /// 4$ reduces the argument modulo $2\pi$ and so needs $\pi$ to about $n + e$ bits.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::cos_rational_prec(Rational::from_unsigneds(3u8, 5), 5);
+    /// assert_eq!(c.to_string(), "0.812");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::cos_rational_prec(Rational::from_unsigneds(3u8, 5), 20);
+    /// assert_eq!(c.to_string(), "0.82533550");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn cos_rational_prec(x: Rational, prec: u64) -> (Self, Ordering) {
+        Self::cos_rational_prec_round_ref(&x, prec, Nearest)
+    }
+
+    /// Computes $\cos x$, the cosine of a [`Rational`], rounding the result to the nearest value of
+    /// the specified precision and returning the result as a [`Float`]. The [`Rational`] is taken
+    /// by reference. An [`Ordering`] is also returned, indicating whether the rounded cosine is
+    /// less than, equal to, or greater than the exact cosine.
+    ///
+    /// If the cosine is equidistant from two [`Float`]s with the specified precision, the [`Float`]
+    /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
+    /// the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,p) = \cos x+\varepsilon,
+    /// $$
+    /// where $|\varepsilon| \leq 2^{\lfloor\log_2 |\cos x|\rfloor-p}$ (unless the result
+    /// underflows).
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p)=1$.
+    ///
+    /// See the [`Float::cos_rational_prec`] documentation for information on overflow and
+    /// underflow.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::cos_rational_prec_round_ref`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m, e) = O(n^{3/2} \log n \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
+    ///
+    /// $M(n, m, e) = O((n+m+e) \log (n+m+e))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, $m$ is `x.significant_bits()`,
+    /// and $e$ is `x.floor_log_base_2_abs()` (taken as 0 when it is negative or $x = 0$): the input
+    /// is rounded to a working precision and the [`Float`] cosine taken there, which for $|x| \geq
+    /// 4$ reduces the argument modulo $2\pi$ and so needs $\pi$ to about $n + e$ bits.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::cos_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 5);
+    /// assert_eq!(c.to_string(), "0.812");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::cos_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 20);
+    /// assert_eq!(c.to_string(), "0.82533550");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn cos_rational_prec_ref(x: &Rational, prec: u64) -> (Self, Ordering) {
+        Self::cos_rational_prec_round_ref(x, prec, Nearest)
+    }
+}
+
 impl Cos for Float {
     type Output = Self;
 
@@ -1337,4 +1814,66 @@ where
     for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
 {
     emulate_float_to_float_fn(Float::cos_prec, x)
+}
+
+/// Computes $\cos x$, the cosine of a [`Rational`], returning the result as a primitive float.
+///
+/// $$
+/// f(x) = \cos x+\varepsilon,
+/// $$
+/// where $|\varepsilon| < 2^{\lfloor\log_2 |\cos x|\rfloor-p}$, and $p$ is the precision of the
+/// output (24 if `T` is a [`f32`] and 53 if `T` is a [`f64`]).
+///
+/// Special cases:
+/// - $f(0)=1$
+///
+/// Overflow and underflow are not possible: the result lies in $[-1, 1]$, and a [`Rational`] close
+/// enough to an odd multiple of $\pi/2$ for its cosine to be subnormal would need a denominator of
+/// more than 100 bits, in which case the result is still correctly rounded.
+///
+/// # Worst-case complexity
+/// $T(m, e) = O((m+e) (\log (m+e))^2 \log\log (m+e))$
+///
+/// $M(m, e) = O((m+e) \log (m+e))$
+///
+/// where $T$ is time, $M$ is additional memory, $m$ is `x.significant_bits()`, and $e$ is
+/// `x.floor_log_base_2_abs()` (taken as 0 when it is negative or $x = 0$): for $|x| \geq 4$ the
+/// argument is reduced modulo $2\pi$, which needs $\pi$ to about $e$ bits.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::Zero;
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::cos::primitive_float_cos_rational;
+/// use malachite_q::Rational;
+///
+/// assert_eq!(
+///     NiceFloat(primitive_float_cos_rational::<f64>(&Rational::ZERO)),
+///     NiceFloat(1.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_cos_rational::<f64>(
+///         &Rational::from_unsigneds(1u8, 3)
+///     )),
+///     NiceFloat(0.9449569463147377)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_cos_rational::<f32>(
+///         &Rational::from_unsigneds(1u8, 3)
+///     )),
+///     NiceFloat(0.94495696)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_cos_rational::<f64>(&Rational::from(10000))),
+///     NiceFloat(-0.9521553682590148)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_cos_rational<T: PrimitiveFloat>(x: &Rational) -> T
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_rational_to_float_fn(Float::cos_rational_prec_ref, x)
 }
