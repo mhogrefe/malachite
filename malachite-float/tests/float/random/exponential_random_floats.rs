@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::float::NiceFloat;
 use malachite_base::num::random::random_primitive_ints;
@@ -540,7 +540,7 @@ fn exponential_random_floats_properties() {
                 assert!(x.is_valid());
                 // - the result is positive; the exact deviate is positive, and rounding to zero
                 //   would require underflow, which is unreachable by sampling
-                assert!(x > Float::ZERO);
+                assert!(x > 0u32);
                 // - every output has precision `prec`
                 assert_eq!(x.get_prec(), Some(prec));
             }
@@ -631,7 +631,7 @@ fn test_exponential_random_floats_rigged() {
             10,
             rm,
         );
-        assert!(x > Float::ONE);
+        assert!(x > 1u32);
     }
 }
 
@@ -652,6 +652,6 @@ fn test_exponential_random_floats_underflow_extreme() {
     let x = run_rigged_case(head, z, &[1], 10, Nearest);
     assert_eq!(ComparableFloat(x), ComparableFloat(Float::ZERO));
     let x = run_rigged_case(head, z, &[1], 10, Ceiling);
-    assert!(x > Float::ZERO);
+    assert!(x > 0u32);
     assert_eq!(x.get_prec(), Some(10));
 }

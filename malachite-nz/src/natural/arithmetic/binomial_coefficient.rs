@@ -525,7 +525,7 @@ fn binomial_coefficient_hmul_nbnpk(n: &Natural, mut k: Limb) -> Natural {
     assert_ne!(k, 0);
     assert_ne!(*n, 0u32);
     k -= 1;
-    (((n + Natural::from(k)).square() + n) >> 1u64)
+    (((n + Natural::from(k)).square() + n) >> 1u32)
         .sub_mul(Natural::from(k + (k & 1)), Natural::from(k >> 1))
 }
 

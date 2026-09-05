@@ -57,7 +57,7 @@ fn power_bracket(b: u64, e: u64, prec: u64) -> (Natural, Natural, i64) {
     let (mut lo, mut err, mut shift) = (Natural::ONE, Natural::ZERO, 0i64);
     for i in (0..e.significant_bits()).rev() {
         // Squaring `[L, L + E)` gives `[L ^ 2, L ^ 2 + 2LE + E ^ 2)`.
-        err = ((&lo * &err) << 1u64) + (&err * &err);
+        err = ((&lo * &err) << 1u32) + (&err * &err);
         lo = &lo * &lo;
         shift *= 2;
         if e.get_bit(i) {
@@ -192,7 +192,7 @@ fn verify_get_str_bracketed(
         // The midpoints on either side bracket |x|. Below the digits that midpoint is halfway to
         // `pred`, which for the narrow case is a shorter step than half an ulp.
         Nearest => {
-            let two_d = d << 1u64;
+            let two_d = d << 1u32;
             let (lo_mid_n, lo_mid_t) = if narrow {
                 ((&two_d * &b_nat) - &one, t - 1)
             } else {

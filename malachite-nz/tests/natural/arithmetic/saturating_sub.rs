@@ -96,10 +96,10 @@ fn saturating_sub_properties() {
         assert!(diff_alt.is_valid());
 
         let reverse_diff = (&y).saturating_sub(&x);
-        if diff > 0 {
+        if diff > 0u32 {
             assert_eq!(reverse_diff, 0);
         }
-        if reverse_diff > 0 {
+        if reverse_diff > 0u32 {
             assert_eq!(diff, 0);
         }
 

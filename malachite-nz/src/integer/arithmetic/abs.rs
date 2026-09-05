@@ -225,7 +225,7 @@ impl Integer {
     /// ```
     pub fn mutate_unsigned_abs<F: FnOnce(&mut Natural) -> T, T>(&mut self, f: F) -> T {
         let out = f(&mut self.abs);
-        if !self.sign && self.abs == 0 {
+        if !self.sign && self.abs == 0u32 {
             self.sign = true;
         }
         out

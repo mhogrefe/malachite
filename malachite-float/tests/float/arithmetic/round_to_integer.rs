@@ -240,7 +240,7 @@ fn test_round_to_integer_then_overflow_extreme() {
     // Constructed through a Rational so that the exponent is in range from the start; building the
     // integer first would overflow before the scaling shift.
     let x = Float::from_rational_prec(
-        malachite_q::Rational::from(Natural::low_mask(prec_x)) >> 9u64,
+        malachite_q::Rational::from(Natural::low_mask(prec_x)) >> 9u32,
         prec_x,
     )
     .0;

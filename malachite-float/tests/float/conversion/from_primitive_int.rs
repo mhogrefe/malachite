@@ -1269,7 +1269,7 @@ where
         if r_nearest != T::ZERO {
             assert!(
                 (r_nearest - Rational::from(n))
-                    .le_abs(&(Rational::exact_from(nearest.0.ulp().unwrap()) >> 1))
+                    .le_abs(&(Rational::exact_from(nearest.0.ulp().unwrap()) >> 1u32))
             );
         }
     });
@@ -1359,7 +1359,7 @@ where
         if r_nearest != T::ZERO {
             assert!(
                 (r_nearest - Rational::from(n))
-                    .le_abs(&(Rational::exact_from(nearest.0.ulp().unwrap()) >> 1))
+                    .le_abs(&(Rational::exact_from(nearest.0.ulp().unwrap()) >> 1u32))
             );
         }
     });
@@ -1376,7 +1376,7 @@ fn const_from_unsigned_times_power_of_2_properties() {
     unsigned_signed_pair_gen_var_1().test_properties(|(n, pow)| {
         let float_n = Float::const_from_unsigned_times_power_of_2(n, pow);
         assert!(float_n.is_valid());
-        assert!(float_n >= 0);
+        assert!(float_n >= 0u32);
         assert_eq!(
             ComparableFloat(float_n),
             ComparableFloat(Float::from(n) << pow)
@@ -1396,7 +1396,7 @@ fn const_from_signed_times_power_of_2_properties() {
     signed_pair_gen_var_2().test_properties(|(n, pow)| {
         let float_n = Float::const_from_signed_times_power_of_2(n, pow);
         assert!(float_n.is_valid());
-        assert_eq!(float_n >= 0, n >= 0);
+        assert_eq!(float_n >= 0u32, n >= 0);
         assert_eq!(
             ComparableFloat(float_n),
             ComparableFloat(Float::from(n) << pow)

@@ -59,7 +59,7 @@ fn get_perfect_power_natural(n: &Natural) -> Option<(Natural, u64)> {
                 // is a single limb, so precomputing division data would cost more than it saves.
                 #[cfg_attr(dylint_lib = "malachite_lints", allow(use_div_mod_precomputed))]
                 let (new_q, r) = (&q).div_mod(&prime);
-                if r == 0 {
+                if r == 0u32 {
                     q = new_q;
                     pow_p += 1;
                 } else {
@@ -123,7 +123,7 @@ fn get_perfect_power_natural_bool(n: &Natural) -> bool {
     for &prime in PRIMES.iter().skip(1) {
         let prime = Natural::from(prime);
         let (new_q, r) = (&q).div_mod(&prime);
-        if r == 0 {
+        if r == 0u32 {
             q = new_q;
             if q.div_assign_mod(&prime) != 0u32 {
                 return false; // prime divides exactly once, reject
@@ -134,7 +134,7 @@ fn get_perfect_power_natural_bool(n: &Natural) -> bool {
                 // is a single limb, so precomputing division data would cost more than it saves.
                 #[cfg_attr(dylint_lib = "malachite_lints", allow(use_div_mod_precomputed))]
                 let (new_q, r) = (&q).div_mod(&prime);
-                if r == 0 {
+                if r == 0u32 {
                     q = new_q;
                     pow_p += 1;
                 } else {

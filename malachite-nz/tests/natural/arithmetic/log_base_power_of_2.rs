@@ -351,7 +351,7 @@ fn ceiling_log_base_power_of_2_properties() {
     natural_unsigned_pair_gen_var_8().test_properties(|(n, pow)| {
         let ceiling_log = n.ceiling_log_base_power_of_2(pow);
         assert_eq!(ceiling_log, ceiling_log_base_power_of_2_naive_nz(&n, pow));
-        assert_eq!(ceiling_log == 0, n == Natural::ONE);
+        assert_eq!(ceiling_log == 0, n == 1u32);
         assert_eq!(n.ceiling_log_base(&Natural::power_of_2(pow)), ceiling_log);
 
         let product = ceiling_log * pow;
@@ -395,7 +395,7 @@ fn checked_log_base_power_of_2_properties() {
         );
         if let Some(log) = checked_log {
             assert_eq!(Natural::power_of_2(log * pow), n);
-            assert_eq!(log == 0, n == Natural::ONE);
+            assert_eq!(log == 0, n == 1u32);
             assert_eq!(n.floor_log_base_power_of_2(pow), log);
             assert_eq!(n.ceiling_log_base_power_of_2(pow), log);
         }

@@ -275,7 +275,7 @@ impl ModAssign<Self> for Integer {
         } else {
             self.abs.neg_mod_assign(other.abs);
         };
-        self.sign = other.sign || self.abs == 0;
+        self.sign = other.sign || self.abs == 0u32;
     }
 }
 
@@ -332,7 +332,7 @@ impl ModAssign<&Self> for Integer {
         } else {
             self.abs.neg_mod_assign(&other.abs);
         };
-        self.sign = other.sign || self.abs == 0;
+        self.sign = other.sign || self.abs == 0u32;
     }
 }
 
@@ -574,7 +574,7 @@ impl RemAssign<Self> for Integer {
     #[inline]
     fn rem_assign(&mut self, other: Self) {
         self.abs %= other.abs;
-        self.sign = self.sign || self.abs == 0;
+        self.sign = self.sign || self.abs == 0u32;
     }
 }
 
@@ -628,7 +628,7 @@ impl RemAssign<&Self> for Integer {
     #[inline]
     fn rem_assign(&mut self, other: &Self) {
         self.abs %= &other.abs;
-        self.sign = self.sign || self.abs == 0;
+        self.sign = self.sign || self.abs == 0u32;
     }
 }
 
@@ -887,7 +887,7 @@ impl CeilingModAssign<Self> for Integer {
         } else {
             self.abs %= other.abs;
         };
-        self.sign = !other.sign || self.abs == 0;
+        self.sign = !other.sign || self.abs == 0u32;
     }
 }
 
@@ -944,6 +944,6 @@ impl CeilingModAssign<&Self> for Integer {
         } else {
             self.abs %= &other.abs;
         };
-        self.sign = !other.sign || self.abs == 0;
+        self.sign = !other.sign || self.abs == 0u32;
     }
 }

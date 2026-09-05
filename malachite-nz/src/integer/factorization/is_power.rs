@@ -58,7 +58,7 @@ impl IsPower for Integer {
     /// assert_eq!(Integer::from(-16).is_power(), false);
     /// ```
     fn is_power(&self) -> bool {
-        if *self >= 0 {
+        if *self >= 0u32 {
             return self.unsigned_abs_ref().is_power();
         }
         let abs = self.unsigned_abs();
@@ -99,7 +99,7 @@ impl ExpressAsPower for Integer {
     /// assert_eq!(Integer::from(-16).express_as_power(), None);
     /// ```
     fn express_as_power(&self) -> Option<(Self, u64)> {
-        if *self >= 0 {
+        if *self >= 0u32 {
             return self
                 .unsigned_abs_ref()
                 .express_as_power()

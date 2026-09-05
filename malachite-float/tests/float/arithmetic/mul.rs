@@ -10419,7 +10419,7 @@ fn mul_prec_round_properties_helper(
         assert_eq!(rug_o, o);
     }
 
-    if o == Equal && product.is_finite() && product != 0 {
+    if o == Equal && product.is_finite() && product != 0u32 {
         assert_eq!(
             ComparableFloatRef(
                 &product
@@ -10533,11 +10533,11 @@ fn mul_prec_round_properties() {
         assert_eq!(o, Equal);
 
         if !x.is_nan() {
-            if x != 0 {
+            if x != 0u32 {
                 assert_eq!(
                     x.mul_prec_round_ref_val(Float::INFINITY, prec, rm),
                     (
-                        if x > 0 {
+                        if x > 0u32 {
                             Float::INFINITY
                         } else {
                             Float::NEGATIVE_INFINITY
@@ -10548,7 +10548,7 @@ fn mul_prec_round_properties() {
                 assert_eq!(
                     Float::INFINITY.mul_prec_round_val_ref(&x, prec, rm),
                     (
-                        if x > 0 {
+                        if x > 0u32 {
                             Float::INFINITY
                         } else {
                             Float::NEGATIVE_INFINITY
@@ -10559,7 +10559,7 @@ fn mul_prec_round_properties() {
                 assert_eq!(
                     x.mul_prec_round_ref_val(Float::NEGATIVE_INFINITY, prec, rm),
                     (
-                        if x > 0 {
+                        if x > 0u32 {
                             Float::NEGATIVE_INFINITY
                         } else {
                             Float::INFINITY
@@ -10570,7 +10570,7 @@ fn mul_prec_round_properties() {
                 assert_eq!(
                     Float::NEGATIVE_INFINITY.mul_prec_round_val_ref(&x, prec, rm),
                     (
-                        if x > 0 {
+                        if x > 0u32 {
                             Float::NEGATIVE_INFINITY
                         } else {
                             Float::INFINITY
@@ -10671,7 +10671,7 @@ fn mul_prec_properties_helper(x: Float, y: Float, prec: u64, extreme: bool) {
     );
     assert_eq!(rug_o, o);
 
-    if o == Equal && product.is_finite() && product != 0 {
+    if o == Equal && product.is_finite() && product != 0u32 {
         assert_eq!(
             ComparableFloatRef(&product.div_prec_ref_ref(&x, y.significant_bits()).0),
             ComparableFloatRef(&y)
@@ -10780,11 +10780,11 @@ fn mul_prec_properties() {
         assert_eq!(o, Equal);
 
         if !x.is_nan() {
-            if x != 0 {
+            if x != 0u32 {
                 assert_eq!(
                     x.mul_prec_ref_val(Float::INFINITY, prec),
                     (
-                        if x > 0 {
+                        if x > 0u32 {
                             Float::INFINITY
                         } else {
                             Float::NEGATIVE_INFINITY
@@ -10795,7 +10795,7 @@ fn mul_prec_properties() {
                 assert_eq!(
                     Float::INFINITY.mul_prec_val_ref(&x, prec),
                     (
-                        if x > 0 {
+                        if x > 0u32 {
                             Float::INFINITY
                         } else {
                             Float::NEGATIVE_INFINITY
@@ -10806,7 +10806,7 @@ fn mul_prec_properties() {
                 assert_eq!(
                     x.mul_prec_ref_val(Float::NEGATIVE_INFINITY, prec),
                     (
-                        if x > 0 {
+                        if x > 0u32 {
                             Float::NEGATIVE_INFINITY
                         } else {
                             Float::INFINITY
@@ -10817,7 +10817,7 @@ fn mul_prec_properties() {
                 assert_eq!(
                     Float::NEGATIVE_INFINITY.mul_prec_val_ref(&x, prec),
                     (
-                        if x > 0 {
+                        if x > 0u32 {
                             Float::NEGATIVE_INFINITY
                         } else {
                             Float::INFINITY
@@ -10916,7 +10916,7 @@ fn mul_round_properties_helper(x: Float, y: Float, rm: RoundingMode, extreme: bo
     );
     assert_eq!(o_alt, o);
 
-    if o == Equal && product.is_finite() && product != 0 {
+    if o == Equal && product.is_finite() && product != 0u32 {
         assert_eq!(product.div_round_ref_ref(&x, Exact).0, y);
         assert_eq!(product.div_round_ref_ref(&y, Exact).0, x);
     }
@@ -11053,11 +11053,11 @@ fn mul_round_properties() {
         assert_eq!(o, Equal);
 
         if !x.is_nan() {
-            if x != 0 {
+            if x != 0u32 {
                 assert_eq!(
                     x.mul_round_ref_val(Float::INFINITY, rm),
                     (
-                        if x > 0 {
+                        if x > 0u32 {
                             Float::INFINITY
                         } else {
                             Float::NEGATIVE_INFINITY
@@ -11068,7 +11068,7 @@ fn mul_round_properties() {
                 assert_eq!(
                     Float::INFINITY.mul_round_val_ref(&x, rm),
                     (
-                        if x > 0 {
+                        if x > 0u32 {
                             Float::INFINITY
                         } else {
                             Float::NEGATIVE_INFINITY
@@ -11079,7 +11079,7 @@ fn mul_round_properties() {
                 assert_eq!(
                     x.mul_round_ref_val(Float::NEGATIVE_INFINITY, rm),
                     (
-                        if x > 0 {
+                        if x > 0u32 {
                             Float::NEGATIVE_INFINITY
                         } else {
                             Float::INFINITY
@@ -11090,7 +11090,7 @@ fn mul_round_properties() {
                 assert_eq!(
                     Float::NEGATIVE_INFINITY.mul_round_val_ref(&x, rm),
                     (
-                        if x > 0 {
+                        if x > 0u32 {
                             Float::NEGATIVE_INFINITY
                         } else {
                             Float::INFINITY
@@ -11191,7 +11191,7 @@ fn mul_properties_helper_1(x: Float, y: Float, extreme: bool) {
         ComparableFloatRef(&product)
     );
 
-    if o == Equal && product.is_finite() && product != 0 {
+    if o == Equal && product.is_finite() && product != 0u32 {
         assert_eq!(&product / &x, y);
         assert_eq!(&product / &y, x);
     }
@@ -11306,10 +11306,10 @@ fn mul_properties() {
         assert!((&x * Float::NAN).is_nan());
         assert!((Float::NAN * &x).is_nan());
         if !x.is_nan() {
-            if x != 0 {
+            if x != 0u32 {
                 assert_eq!(
                     &x * Float::INFINITY,
-                    if x > 0 {
+                    if x > 0u32 {
                         Float::INFINITY
                     } else {
                         Float::NEGATIVE_INFINITY
@@ -11317,7 +11317,7 @@ fn mul_properties() {
                 );
                 assert_eq!(
                     Float::INFINITY * &x,
-                    if x > 0 {
+                    if x > 0u32 {
                         Float::INFINITY
                     } else {
                         Float::NEGATIVE_INFINITY
@@ -11325,7 +11325,7 @@ fn mul_properties() {
                 );
                 assert_eq!(
                     &x * Float::NEGATIVE_INFINITY,
-                    if x > 0 {
+                    if x > 0u32 {
                         Float::NEGATIVE_INFINITY
                     } else {
                         Float::INFINITY
@@ -11333,7 +11333,7 @@ fn mul_properties() {
                 );
                 assert_eq!(
                     Float::NEGATIVE_INFINITY * &x,
-                    if x > 0 {
+                    if x > 0u32 {
                         Float::NEGATIVE_INFINITY
                     } else {
                         Float::INFINITY
@@ -11470,7 +11470,7 @@ fn mul_rational_prec_round_properties_helper(
         assert_eq!(rug_o, o);
     }
 
-    if o == Equal && product.is_finite() && product != 0 {
+    if o == Equal && product.is_finite() && product != 0u32 {
         assert_eq!(
             ComparableFloatRef(
                 &product
@@ -11581,11 +11581,11 @@ fn mul_rational_prec_round_properties() {
         assert!(product.is_nan());
         assert_eq!(o, Equal);
 
-        if x != 0 {
+        if x != 0u32 {
             assert_eq!(
                 Float::INFINITY.mul_rational_prec_round_val_ref(&x, prec, rm),
                 (
-                    if x > 0 {
+                    if x > 0u32 {
                         Float::INFINITY
                     } else {
                         Float::NEGATIVE_INFINITY
@@ -11596,7 +11596,7 @@ fn mul_rational_prec_round_properties() {
             assert_eq!(
                 Float::NEGATIVE_INFINITY.mul_rational_prec_round_val_ref(&x, prec, rm),
                 (
-                    if x > 0 {
+                    if x > 0u32 {
                         Float::NEGATIVE_INFINITY
                     } else {
                         Float::INFINITY
@@ -11609,7 +11609,7 @@ fn mul_rational_prec_round_properties() {
         let (product, o) = Float::ZERO.mul_rational_prec_round_val_ref(&x, prec, rm);
         assert_eq!(
             ComparableFloat(product),
-            ComparableFloat(if x >= 0 {
+            ComparableFloat(if x >= 0u32 {
                 Float::ZERO
             } else {
                 Float::NEGATIVE_ZERO
@@ -11620,7 +11620,7 @@ fn mul_rational_prec_round_properties() {
         let (product, o) = Float::NEGATIVE_ZERO.mul_rational_prec_round_val_ref(&x, prec, rm);
         assert_eq!(
             ComparableFloat(product),
-            ComparableFloat(if x >= 0 {
+            ComparableFloat(if x >= 0u32 {
                 Float::NEGATIVE_ZERO
             } else {
                 Float::ZERO
@@ -11698,7 +11698,7 @@ fn mul_rational_prec_properties_helper(x: Float, y: Rational, prec: u64, extreme
     );
     assert_eq!(rug_o, o);
 
-    if o == Equal && product.is_finite() && product != 0 {
+    if o == Equal && product.is_finite() && product != 0u32 {
         assert_eq!(
             ComparableFloatRef(
                 &product
@@ -11789,7 +11789,7 @@ fn mul_rational_prec_properties() {
             let (product, o) = x.mul_rational_prec_ref_val(Rational::ZERO, prec);
             assert_eq!(
                 ComparableFloat(product),
-                ComparableFloat(if x >= 0 {
+                ComparableFloat(if x >= 0u32 {
                     Float::ZERO
                 } else {
                     Float::NEGATIVE_ZERO
@@ -11804,11 +11804,11 @@ fn mul_rational_prec_properties() {
         assert!(product.is_nan());
         assert_eq!(o, Equal);
 
-        if x != 0 {
+        if x != 0u32 {
             assert_eq!(
                 Float::INFINITY.mul_rational_prec_val_ref(&x, prec),
                 (
-                    if x >= 0 {
+                    if x >= 0u32 {
                         Float::INFINITY
                     } else {
                         Float::NEGATIVE_INFINITY
@@ -11819,7 +11819,7 @@ fn mul_rational_prec_properties() {
             assert_eq!(
                 Float::NEGATIVE_INFINITY.mul_rational_prec_val_ref(&x, prec),
                 (
-                    if x >= 0 {
+                    if x >= 0u32 {
                         Float::NEGATIVE_INFINITY
                     } else {
                         Float::INFINITY
@@ -11837,7 +11837,7 @@ fn mul_rational_prec_properties() {
         let (product, o) = Float::ZERO.mul_rational_prec_val_ref(&x, prec);
         assert_eq!(
             ComparableFloat(product),
-            ComparableFloat(if x >= 0 {
+            ComparableFloat(if x >= 0u32 {
                 Float::ZERO
             } else {
                 Float::NEGATIVE_ZERO
@@ -11848,7 +11848,7 @@ fn mul_rational_prec_properties() {
         let (product, o) = Float::NEGATIVE_ZERO.mul_rational_prec_val_ref(&x, prec);
         assert_eq!(
             ComparableFloat(product),
-            ComparableFloat(if x >= 0 {
+            ComparableFloat(if x >= 0u32 {
                 Float::NEGATIVE_ZERO
             } else {
                 Float::ZERO
@@ -11922,7 +11922,7 @@ fn mul_rational_round_properties_helper(x: Float, y: Rational, rm: RoundingMode,
         ComparableFloatRef(&product)
     );
     assert_eq!(o_alt, o);
-    if o == Equal && product.is_finite() && product != 0 {
+    if o == Equal && product.is_finite() && product != 0u32 {
         assert_eq!(product.div_rational_round_ref_ref(&y, Exact).0, x);
         // TODO additional test
     }
@@ -11987,7 +11987,7 @@ fn mul_rational_round_properties_helper(x: Float, y: Rational, rm: RoundingMode,
         ComparableFloat(product.abs_negative_zero_ref())
     );
 
-    if x != 0 && y != 0 {
+    if x != 0u32 && y != 0u32 {
         let (product_alt, o_alt) = (-&x).mul_rational_round(-&y, rm);
         assert_eq!(
             ComparableFloatRef(&product_alt),
@@ -12029,7 +12029,7 @@ fn mul_rational_round_properties() {
             let (product, o) = x.mul_rational_round_ref_val(Rational::ZERO, rm);
             assert_eq!(
                 ComparableFloat(product),
-                ComparableFloat(if x >= 0 {
+                ComparableFloat(if x >= 0u32 {
                     Float::ZERO
                 } else {
                     Float::NEGATIVE_ZERO
@@ -12044,11 +12044,11 @@ fn mul_rational_round_properties() {
         assert!(product.is_nan());
         assert_eq!(o, Equal);
 
-        if x != 0 {
+        if x != 0u32 {
             assert_eq!(
                 Float::INFINITY.mul_rational_round_val_ref(&x, rm),
                 (
-                    if x >= 0 {
+                    if x >= 0u32 {
                         Float::INFINITY
                     } else {
                         Float::NEGATIVE_INFINITY
@@ -12059,7 +12059,7 @@ fn mul_rational_round_properties() {
             assert_eq!(
                 Float::NEGATIVE_INFINITY.mul_rational_round_val_ref(&x, rm),
                 (
-                    if x >= 0 {
+                    if x >= 0u32 {
                         Float::NEGATIVE_INFINITY
                     } else {
                         Float::INFINITY
@@ -12168,7 +12168,7 @@ fn mul_rational_properties_helper(x: Float, y: Rational, extreme: bool) {
         ComparableFloatRef(&product)
     );
 
-    if o == Equal && product.is_finite() && product != 0 {
+    if o == Equal && product.is_finite() && product != 0u32 {
         assert_eq!(&product / &y, x);
         // TODO additional test
     }
@@ -12250,10 +12250,10 @@ fn mul_rational_properties() {
     rational_gen().test_properties(|x| {
         assert!((&x * Float::NAN).is_nan());
         assert!((Float::NAN * &x).is_nan());
-        if x != 0 {
+        if x != 0u32 {
             assert_eq!(
                 &x * Float::INFINITY,
-                if x > 0 {
+                if x > 0u32 {
                     Float::INFINITY
                 } else {
                     Float::NEGATIVE_INFINITY
@@ -12261,7 +12261,7 @@ fn mul_rational_properties() {
             );
             assert_eq!(
                 Float::INFINITY * &x,
-                if x > 0 {
+                if x > 0u32 {
                     Float::INFINITY
                 } else {
                     Float::NEGATIVE_INFINITY
@@ -12269,7 +12269,7 @@ fn mul_rational_properties() {
             );
             assert_eq!(
                 &x * Float::NEGATIVE_INFINITY,
-                if x > 0 {
+                if x > 0u32 {
                     Float::NEGATIVE_INFINITY
                 } else {
                     Float::INFINITY
@@ -12277,7 +12277,7 @@ fn mul_rational_properties() {
             );
             assert_eq!(
                 Float::NEGATIVE_INFINITY * &x,
-                if x > 0 {
+                if x > 0u32 {
                     Float::NEGATIVE_INFINITY
                 } else {
                     Float::INFINITY

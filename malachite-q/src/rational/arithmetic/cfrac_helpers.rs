@@ -382,10 +382,10 @@ fn hgcd_split(
     }
     while *xa != ta || *xb != tb {
         shift += 1;
-        *xa >>= 1u64;
-        ta >>= 1u64;
-        *xb >>= 1u64;
-        tb >>= 1u64;
+        *xa >>= 1u32;
+        ta >>= 1u32;
+        *xb >>= 1u32;
+        tb >>= 1u32;
         if *xb == 0u32 || *xa <= *xb {
             return 0;
         }

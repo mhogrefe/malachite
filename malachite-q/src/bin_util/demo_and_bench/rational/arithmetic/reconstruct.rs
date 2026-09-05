@@ -82,16 +82,16 @@ fn demo_rational_reconstruct_tier_rows(_gm: GenMode, _config: &GenConfig, limit:
     let mut rows = Vec::new();
     for (num, den, m) in [
         (22u32, 7u32, Natural::from(97u32)),
-        (22, 7, (Natural::ONE << 64u64) - Natural::from(59u32)),
-        (22, 7, (Natural::ONE << 200u64) - Natural::from(75u32)),
-        (22, 7, (Natural::ONE << 765u64) - Natural::from(111u32)),
-        (22, 7, (Natural::ONE << 800u64) - Natural::from(105u32)),
-        (22, 7, (Natural::ONE << 2000u64) - Natural::from(63u32)),
-        (22, 7, (Natural::ONE << 66000u64) - Natural::from(63u32)),
+        (22, 7, (Natural::ONE << 64u32) - Natural::from(59u32)),
+        (22, 7, (Natural::ONE << 200u32) - Natural::from(75u32)),
+        (22, 7, (Natural::ONE << 765u32) - Natural::from(111u32)),
+        (22, 7, (Natural::ONE << 800u32) - Natural::from(105u32)),
+        (22, 7, (Natural::ONE << 2000u32) - Natural::from(63u32)),
+        (22, 7, (Natural::ONE << 66000u32) - Natural::from(63u32)),
         (
             12345,
             617,
-            (Natural::ONE << 33100u64) - Natural::from(121u32),
+            (Natural::ONE << 33100u32) - Natural::from(121u32),
         ),
     ] {
         let a = (Natural::from(num) * Natural::from(den).mod_inverse(&m).unwrap()) % &m;

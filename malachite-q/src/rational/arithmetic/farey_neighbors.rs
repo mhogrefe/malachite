@@ -99,12 +99,12 @@ impl Rational {
         // already in lowest terms and need no reduction.
         (
             Self {
-                sign: l_num >= 0,
+                sign: l_num >= 0u32,
                 numerator: l_num.unsigned_abs(),
                 denominator: l_den,
             },
             Self {
-                sign: r_num >= 0,
+                sign: r_num >= 0u32,
                 numerator: r_num.unsigned_abs(),
                 denominator: r_den,
             },

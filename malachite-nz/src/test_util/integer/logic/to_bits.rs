@@ -11,14 +11,14 @@ use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
 
 pub fn to_bits_asc_naive(n: &Integer) -> Vec<bool> {
     let mut bits = Vec::new();
-    if *n == 0 {
+    if *n == 0u32 {
         return bits;
     }
     for i in 0..n.significant_bits() {
         bits.push(n.get_bit(i));
     }
     let last_bit = *bits.last().unwrap();
-    if last_bit != (*n < 0) {
+    if last_bit != (*n < 0u32) {
         bits.push(!last_bit);
     }
     bits
@@ -26,12 +26,12 @@ pub fn to_bits_asc_naive(n: &Integer) -> Vec<bool> {
 
 pub fn to_bits_desc_naive(n: &Integer) -> Vec<bool> {
     let mut bits = Vec::new();
-    if *n == 0 {
+    if *n == 0u32 {
         return bits;
     }
     let significant_bits = n.significant_bits();
     let last_bit = n.get_bit(significant_bits - 1);
-    if last_bit != (*n < 0) {
+    if last_bit != (*n < 0u32) {
         bits.push(!last_bit);
     }
     for i in (0..significant_bits).rev() {

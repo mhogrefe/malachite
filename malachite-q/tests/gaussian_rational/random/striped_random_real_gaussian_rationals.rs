@@ -140,7 +140,7 @@ fn striped_random_real_gaussian_rationals_axis() {
     assert!(
         striped_random_real_gaussian_rationals(EXAMPLE_SEED, 16, 1, 32, 1)
             .take(100)
-            .all(|x| x.imaginary == 0)
+            .all(|x| x.imaginary == 0u32)
     );
 }
 

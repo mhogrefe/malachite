@@ -75,7 +75,7 @@ fn mutate_numerator_properties() {
     rational_rational_natural_triple_gen().test_properties(|(mut q, out, new_numerator)| {
         let out_2 = out.clone();
         let new_numerator_2 = new_numerator.clone();
-        let old_sign = q >= 0;
+        let old_sign = q >= 0u32;
         let old_denominator = q.to_denominator();
         assert_eq!(
             q.mutate_numerator(|x| {
@@ -98,7 +98,7 @@ fn mutate_denominator_properties() {
         |(mut q, out, new_denominator)| {
             let out_2 = out.clone();
             let new_denominator_2 = new_denominator.clone();
-            let old_sign = q >= 0;
+            let old_sign = q >= 0u32;
             let old_numerator = q.to_numerator();
             assert_eq!(
                 q.mutate_denominator(|x| {
@@ -123,7 +123,7 @@ fn mutate_numerator_and_denominator_properties() {
             let out_2 = out.clone();
             let new_numerator_2 = new_numerator.clone();
             let new_denominator_2 = new_denominator.clone();
-            let old_sign = q >= 0;
+            let old_sign = q >= 0u32;
             assert_eq!(
                 q.mutate_numerator_and_denominator(|x, y| {
                     *x = new_numerator;

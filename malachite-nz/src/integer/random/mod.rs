@@ -882,7 +882,7 @@ pub fn get_uniform_random_integer_from_inclusive_range(
 
 fn signed_significant_bits(a: &Integer) -> (u64, i64) {
     let unsigned_bits = a.significant_bits();
-    let bits = if *a >= 0 {
+    let bits = if *a >= 0u32 {
         i64::exact_from(unsigned_bits)
     } else {
         -i64::exact_from(unsigned_bits)
@@ -895,7 +895,7 @@ fn signed_min_bit_range(
     a: Integer,
     unsigned_min_bits: u64,
 ) -> UniformRandomIntegerRange {
-    if a >= 0 {
+    if a >= 0u32 {
         uniform_random_integer_range(seed, a, Integer::power_of_2(unsigned_min_bits))
     } else {
         uniform_random_integer_inclusive_range(seed, a, -Integer::power_of_2(unsigned_min_bits - 1))
@@ -907,7 +907,7 @@ fn signed_max_bit_range(
     a: Integer,
     unsigned_max_bits: u64,
 ) -> UniformRandomIntegerRange {
-    if a > 0 {
+    if a > 0u32 {
         uniform_random_integer_inclusive_range(seed, Integer::power_of_2(unsigned_max_bits - 1), a)
     } else {
         // also handles a == 0
@@ -924,7 +924,7 @@ fn get_random_integer_from_signed_min_bit_range(
     a: Integer,
     unsigned_min_bits: u64,
 ) -> Integer {
-    if a >= 0 {
+    if a >= 0u32 {
         get_uniform_random_integer_from_range(limbs, a, Integer::power_of_2(unsigned_min_bits))
     } else {
         get_uniform_random_integer_from_inclusive_range(
@@ -940,7 +940,7 @@ fn get_random_integer_from_signed_max_bit_range(
     a: Integer,
     unsigned_max_bits: u64,
 ) -> Integer {
-    if a > 0 {
+    if a > 0u32 {
         get_uniform_random_integer_from_inclusive_range(
             limbs,
             Integer::power_of_2(unsigned_max_bits - 1),
@@ -962,7 +962,7 @@ fn get_striped_random_integer_from_signed_min_bit_range(
     a: Integer,
     unsigned_min_bits: u64,
 ) -> Integer {
-    if a >= 0 {
+    if a >= 0u32 {
         get_striped_random_integer_from_range(
             xs,
             range_generator,
@@ -985,7 +985,7 @@ fn get_striped_random_integer_from_signed_max_bit_range(
     a: Integer,
     unsigned_max_bits: u64,
 ) -> Integer {
-    if a > 0 {
+    if a > 0u32 {
         get_striped_random_integer_from_inclusive_range(
             xs,
             range_generator,
@@ -1766,7 +1766,7 @@ fn striped_signed_min_bit_range(
     mean_stripe_numerator: u64,
     mean_stripe_denominator: u64,
 ) -> StripedRandomIntegerInclusiveRange {
-    if a >= 0 {
+    if a >= 0u32 {
         striped_random_integer_range(
             seed.fork("min_bit_xs"),
             a,
@@ -1792,7 +1792,7 @@ fn striped_signed_max_bit_range(
     mean_stripe_numerator: u64,
     mean_stripe_denominator: u64,
 ) -> StripedRandomIntegerInclusiveRange {
-    if a > 0 {
+    if a > 0u32 {
         striped_random_integer_inclusive_range(
             seed.fork("max_bit_xs"),
             Integer::power_of_2(unsigned_max_bits - 1),

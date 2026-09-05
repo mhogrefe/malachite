@@ -83,14 +83,14 @@ fn get_bit_properties() {
         let bit = n.get_bit(index);
         assert_eq!(num_get_bit(&BigUint::from(&n), index), bit);
         assert_eq!(rug::Integer::from(&n).get_bit(u32::exact_from(index)), bit);
-        assert_eq!(&n & Natural::power_of_2(index) != 0, bit);
+        assert_eq!(&n & Natural::power_of_2(index) != 0u32, bit);
         assert_ne!((!n).get_bit(index), bit);
     });
 
     natural_gen().test_properties(|n| {
         let significant_bits = n.significant_bits();
         assert!(!n.get_bit(significant_bits));
-        if n != 0 {
+        if n != 0u32 {
             assert!(n.get_bit(significant_bits - 1));
         }
     });

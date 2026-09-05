@@ -376,7 +376,7 @@ impl DivRound<Natural> for &Natural {
     /// ```
     fn div_round(self, other: Natural, rm: RoundingMode) -> (Natural, Ordering) {
         let (q, r) = self.div_mod(&other);
-        if r == 0 {
+        if r == 0u32 {
             (q, Equal)
         } else {
             match rm {
@@ -481,7 +481,7 @@ impl DivRound<&Natural> for &Natural {
     /// ```
     fn div_round(self, other: &Natural, rm: RoundingMode) -> (Natural, Ordering) {
         let (q, r) = self.div_mod(other);
-        if r == 0 {
+        if r == 0u32 {
             (q, Equal)
         } else {
             match rm {
@@ -557,7 +557,7 @@ impl DivRoundAssign<Self> for Natural {
     /// ```
     fn div_round_assign(&mut self, other: Self, rm: RoundingMode) -> Ordering {
         let r = self.div_assign_mod(&other);
-        if r == 0 {
+        if r == 0u32 {
             Equal
         } else {
             match rm {
@@ -636,7 +636,7 @@ impl<'a> DivRoundAssign<&'a Self> for Natural {
     /// ```
     fn div_round_assign(&mut self, other: &'a Self, rm: RoundingMode) -> Ordering {
         let r = self.div_assign_mod(other);
-        if r == 0 {
+        if r == 0u32 {
             Equal
         } else {
             match rm {

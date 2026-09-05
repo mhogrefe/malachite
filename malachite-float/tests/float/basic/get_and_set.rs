@@ -994,7 +994,7 @@ fn set_prec_round_properties_helper(mut x: Float, prec: u64, rm: RoundingMode) {
         assert_eq!(x.get_prec(), Some(prec));
         assert_eq!(x.partial_cmp(&old_x), Some(o));
     } else {
-        assert!(o != if x > 0 { Less } else { Greater });
+        assert!(o != if x > 0u32 { Less } else { Greater });
     }
 
     let (x_alt, o_alt) = Float::from_float_prec_round(old_x.clone(), prec, rm);
@@ -1213,7 +1213,7 @@ fn set_prec_properties_helper(mut x: Float, prec: u64) {
         assert_eq!(x.get_prec(), Some(prec));
         assert_eq!(x.partial_cmp(&old_x), Some(o));
     } else {
-        assert!(o != if x > 0 { Less } else { Greater });
+        assert!(o != if x > 0u32 { Less } else { Greater });
     }
 
     let (x_alt, o_alt) = Float::from_float_prec(old_x.clone(), prec);

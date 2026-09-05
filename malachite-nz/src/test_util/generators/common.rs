@@ -289,7 +289,7 @@ pub fn get_str_aux_inputs(
     // loop.
     let m = if m0 >= 2
         && (v1 ^ v2 ^ v3) & 1 == 1
-        && big_n < (Natural::from(b0).pow(u64::exact_from(m0 - 1)) << 1)
+        && big_n < (Natural::from(b0).pow(u64::exact_from(m0 - 1)) << 1u32)
     {
         m0 - 1
     } else {

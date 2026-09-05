@@ -24,6 +24,6 @@ fn test_exhaustive_imaginary_gaussian_rationals() {
     assert!(
         exhaustive_imaginary_gaussian_rationals()
             .take(100)
-            .all(|x| x.real == 0)
+            .all(|x| x.real == 0u32)
     );
 }

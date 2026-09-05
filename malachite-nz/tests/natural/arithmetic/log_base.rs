@@ -276,11 +276,11 @@ fn ceiling_log_base_properties() {
         let ceiling_log = n.ceiling_log_base(&base);
         assert_eq!(ceiling_log_base_naive(&n, &base), ceiling_log);
         assert_eq!(ceiling_log_base_by_squaring(&n, &base), ceiling_log);
-        assert_eq!(ceiling_log == 0, n == Natural::ONE);
+        assert_eq!(ceiling_log == 0, n == 1u32);
 
         let power = (&base).pow(ceiling_log);
         assert!(power >= n);
-        if power != 1 {
+        if power != 1u32 {
             assert!((&power).div_exact(&base) < n);
         }
 
@@ -316,7 +316,7 @@ fn checked_log_base_properties() {
         assert_eq!(checked_log_base_by_squaring(&n, &base), checked_log);
         if let Some(log) = checked_log {
             assert_eq!((&base).pow(log), n);
-            assert_eq!(log == 0, n == Natural::ONE);
+            assert_eq!(log == 0, n == 1u32);
             assert_eq!(n.floor_log_base(&base), log);
             assert_eq!(n.ceiling_log_base(&base), log);
         }

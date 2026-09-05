@@ -119,7 +119,7 @@ fn ulp_properties_helper(x: Float) {
         || {},
         |ulp| {
             assert!(ulp.is_valid());
-            assert!(*ulp > 0);
+            assert!(*ulp > 0u32);
             assert!(ulp.is_power_of_2());
         },
     );
@@ -284,7 +284,7 @@ fn increment_properties_helper(mut x: Float, extreme: bool) {
         // crosses into the next-lower binade, where the neighbor is only half an ulp away.
         let ulp = Rational::exact_from(old_x.ulp().unwrap());
         let step = if old_x.is_sign_negative() && (-&old_x).is_power_of_2() {
-            ulp >> 1u64
+            ulp >> 1u32
         } else {
             ulp
         };
@@ -474,7 +474,7 @@ fn decrement_properties_helper(mut x: Float, extreme: bool) {
         // crosses into the next-lower binade, where the neighbor is only half an ulp away.
         let ulp = Rational::exact_from(old_x.ulp().unwrap());
         let step = if old_x.is_sign_positive() && old_x.is_power_of_2() {
-            ulp >> 1u64
+            ulp >> 1u32
         } else {
             ulp
         };

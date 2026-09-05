@@ -1,7 +1,7 @@
+use malachite_nz::gaussian_integer::GaussianInteger;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_q::Rational;
-use malachite_nz::gaussian_integer::GaussianInteger;
 use malachite_q::gaussian_rational::GaussianRational;
 
 fn main() {

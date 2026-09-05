@@ -238,7 +238,7 @@ fn is_positive_zero_properties_helper(x: Float) {
         is_positive_zero,
         ComparableFloatRef(&x) == ComparableFloatRef(&Float::ZERO)
     );
-    assert_eq!(is_positive_zero, x == Float::ZERO && x.is_sign_positive());
+    assert_eq!(is_positive_zero, x == 0u32 && x.is_sign_positive());
     let fx = rug::Float::exact_from(&x);
     assert_eq!(is_positive_zero, fx.is_zero() && fx.is_sign_positive());
 }
@@ -303,7 +303,7 @@ fn is_negative_zero_properties_helper(x: Float) {
         is_negative_zero,
         ComparableFloatRef(&x) == ComparableFloatRef(&Float::NEGATIVE_ZERO)
     );
-    assert_eq!(is_negative_zero, x == Float::ZERO && x.is_sign_negative());
+    assert_eq!(is_negative_zero, x == 0u32 && x.is_sign_negative());
     let fx = rug::Float::exact_from(&x);
     assert_eq!(is_negative_zero, fx.is_zero() && fx.is_sign_negative());
 }
@@ -363,7 +363,7 @@ fn test_is_zero() {
 #[allow(clippy::needless_pass_by_value)]
 fn is_zero_properties_helper(x: Float) {
     let is_zero = x.is_zero();
-    assert_eq!(is_zero, x == Float::ZERO);
+    assert_eq!(is_zero, x == 0u32);
     assert_eq!(is_zero, x.classify() == FpCategory::Zero);
     assert_eq!(is_zero, rug::Float::exact_from(&x).is_zero());
 }
@@ -474,7 +474,7 @@ fn test_is_sign_positive() {
 #[allow(clippy::needless_pass_by_value)]
 fn is_sign_positive_properties_helper(x: Float) {
     let is_sign_positive = x.is_sign_positive();
-    assert_eq!(is_sign_positive, x.is_positive_zero() || x > Float::ZERO);
+    assert_eq!(is_sign_positive, x.is_positive_zero() || x > 0u32);
     assert_eq!(is_sign_positive, !x.is_nan() && !x.is_sign_negative());
     let fx = rug::Float::exact_from(&x);
     assert_eq!(is_sign_positive, !fx.is_nan() && fx.is_sign_positive());
@@ -536,7 +536,7 @@ fn test_is_sign_negative() {
 #[allow(clippy::needless_pass_by_value)]
 fn is_sign_negative_properties_helper(x: Float) {
     let is_sign_negative = x.is_sign_negative();
-    assert_eq!(is_sign_negative, x.is_negative_zero() || x < Float::ZERO);
+    assert_eq!(is_sign_negative, x.is_negative_zero() || x < 0u32);
     assert_eq!(is_sign_negative, !x.is_nan() && !x.is_sign_positive());
     let fx = rug::Float::exact_from(&x);
     assert_eq!(is_sign_negative, !fx.is_nan() && fx.is_sign_negative());

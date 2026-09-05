@@ -578,7 +578,7 @@ fn regular_fg(
                                 e,
                                 Down,
                             )
-                            .0 >> 1u64;
+                            .0 >> 1u32;
                             let cmp = y.partial_cmp_abs(p).unwrap();
                             if cmp != Equal {
                                 break cmp == Less;

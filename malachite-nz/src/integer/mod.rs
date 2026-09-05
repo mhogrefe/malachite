@@ -38,7 +38,7 @@ impl Integer {
     // must be `true`. All `Integer`s must be valid.
     #[cfg(feature = "test_build")]
     pub fn is_valid(&self) -> bool {
-        self.abs.is_valid() && (self.sign || self.abs != 0)
+        self.abs.is_valid() && (self.sign || self.abs != 0u32)
     }
 }
 

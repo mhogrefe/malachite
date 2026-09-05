@@ -166,13 +166,13 @@ fn rem1_core(
             // for the quotient-bits variants, to get the low 63 more bits of the quotient, we first
             // compute R = X mod Y*2^63, where X and Y are defined below. Then the low 63 bits of
             // the quotient are floor(R/Y).
-            my <<= 63u64;
+            my <<= 63u32;
         } else if nearest_quotient {
             // remainder case: let X = mx*2^(ex-ey) and Y = my. Then both X and Y are integers.
             // Assume X = R mod Y; then x = X*2^ey = R*2^ey mod (Y*2^ey=y). To be able to perform
             // the rounding, we need the least significant bit of the quotient, i.e., one more bit
             // in the remainder, which is obtained by dividing by 2Y.
-            my <<= 1u64;
+            my <<= 1u32;
         }
         let d = u64::exact_from(ex - ey);
         r = if d > 3 * my.significant_bits() {
@@ -185,7 +185,7 @@ fn rem1_core(
         r = r * mx % &my;
         if want_quo {
             // now 0 <= r < 2^63*Y
-            my >>= 63u64;
+            my >>= 63u32;
             let q;
             (q, r) = r.div_mod(&my);
             // oldr = q*my + newr
@@ -193,7 +193,7 @@ fn rem1_core(
             q_is_odd = quo.odd();
         } else if nearest_quotient {
             // now 0 <= r < 2Y in the remainder case
-            my >>= 1u64;
+            my >>= 1u32;
             // least significant bit of q
             q_is_odd = r >= my;
             if q_is_odd {
@@ -219,7 +219,7 @@ fn rem1_core(
         if nearest_quotient {
             // determine whether 2r is greater than my; both are nonnegative, so plain comparison
             // mirrors mpz_cmpabs
-            let r2 = &r << 1u64;
+            let r2 = &r << 1u32;
             let c = if tiny {
                 // if tiny, we should compare r with my*2^(ey-ex)
                 if ex + i64::exact_from(r2.significant_bits())

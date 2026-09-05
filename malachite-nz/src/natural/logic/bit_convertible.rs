@@ -45,7 +45,7 @@ impl BitConvertible for Natural {
     /// ```
     fn to_bits_asc(&self) -> Vec<bool> {
         let mut bits = Vec::new();
-        if *self == 0 {
+        if *self == 0u32 {
             return bits;
         }
         let limbs = self.limbs();

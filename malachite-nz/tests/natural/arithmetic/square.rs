@@ -13392,7 +13392,7 @@ fn sign_properties() {
         assert_eq!(&x * &x.clone(), square);
         assert!(square >= x);
         assert_eq!((&square).checked_sqrt().unwrap(), x);
-        if x > 1 {
+        if x > 1u32 {
             assert_eq!(square.checked_log_base(&x).unwrap(), 2);
         }
     });
@@ -13401,7 +13401,7 @@ fn sign_properties() {
         let x_squared = (&x).square();
         let y_squared = (&y).square();
         let xy = &x * &y;
-        assert_eq!((&x + &y).square(), &x_squared + &y_squared + (&xy << 1));
+        assert_eq!((&x + &y).square(), &x_squared + &y_squared + (&xy << 1u32));
         assert_eq!(xy.square(), x_squared * y_squared);
     });
 

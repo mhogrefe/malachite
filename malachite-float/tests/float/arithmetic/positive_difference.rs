@@ -606,7 +606,7 @@ fn primitive_float_positive_difference_rational_properties() {
         for y in [
             Rational::from_signeds(22i64, 7i64),
             Rational::from_signeds(-22i64, 7i64),
-            Rational::from_signeds(1i64, 3i64) << 200i64,
+            Rational::from_signeds(1i64, 3i64) << 200u32,
         ] {
             let d = primitive_float_positive_difference_rational(x, &y);
             let rev = primitive_float_rational_positive_difference_float(&y, x);

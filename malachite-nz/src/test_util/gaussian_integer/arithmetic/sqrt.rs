@@ -19,8 +19,8 @@ pub fn gaussian_integer_checked_sqrt_naive(z: &GaussianInteger) -> Option<Gaussi
     let norm: Natural =
         z.real.unsigned_abs_ref().square() + z.imaginary.unsigned_abs_ref().square();
     let n = Integer::from(norm.floor_sqrt());
-    let x = Integer::from(((&n + &z.real) >> 1u64).unsigned_abs().floor_sqrt());
-    let y = Integer::from(((n - &z.real) >> 1u64).unsigned_abs().floor_sqrt());
+    let x = Integer::from(((&n + &z.real) >> 1u32).unsigned_abs().floor_sqrt());
+    let y = Integer::from(((n - &z.real) >> 1u32).unsigned_abs().floor_sqrt());
     for candidate in [
         GaussianInteger {
             real: x.clone(),

@@ -140,7 +140,7 @@ fn striped_random_imaginary_gaussian_integers_axis() {
     assert!(
         striped_random_imaginary_gaussian_integers(EXAMPLE_SEED, 16, 1, 32, 1)
             .take(100)
-            .all(|x| x.real == 0)
+            .all(|x| x.real == 0u32)
     );
 }
 

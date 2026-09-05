@@ -101,12 +101,12 @@ fn mod_sqrt_properties() {
         if let Some(r) = &result {
             assert!(*r < m);
         }
-        if x <= 1 {
+        if x <= 1u32 {
             assert_eq!(result, Some(x.clone()));
         }
         // For odd moduli the sub-600 search is exhaustive: roots come in pairs t and m - t, so
         // scanning half the range decides existence.
-        if m.odd() && m < 600 {
+        if m.odd() && m < 600u32 {
             if let Some(r) = &result {
                 assert_eq!(r.mod_mul(r, &m), x);
             } else {

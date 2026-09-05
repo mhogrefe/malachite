@@ -45,7 +45,7 @@ fn significant_bits_properties() {
         assert_eq!((-&x).significant_bits(), bits);
         let x_abs = x.abs();
         assert_eq!(x_abs <= Limb::MAX, bits <= Limb::WIDTH);
-        if x_abs != 0 {
+        if x_abs != 0u32 {
             assert!(Natural::power_of_2(bits - 1) <= x_abs);
             assert!(x_abs < Natural::power_of_2(bits));
         }

@@ -3591,7 +3591,7 @@ pub fn exhaustive_float_unsigned_rounding_mode_triple_gen_var_2() -> It<(Float, 
 }
 
 pub fn reciprocal_prec_round_valid(x: &Float, prec: u64, rm: RoundingMode, extreme: bool) -> bool {
-    if rm != Exact || *x == 0 {
+    if rm != Exact || *x == 0u32 {
         true
     } else if extreme {
         x.reciprocal_prec_round_ref(prec, Floor).1 == Equal
@@ -5061,7 +5061,7 @@ pub fn exhaustive_float_rational_rounding_mode_triple_gen_var_4()
 }
 
 pub(crate) fn div_rational_round_valid(x: &Float, y: &Rational, rm: RoundingMode) -> bool {
-    if rm != Exact || *y == 0 {
+    if rm != Exact || *y == 0u32 {
         true
     } else if let Some(x_prec) = x.get_prec() {
         if let Ok(quotient) = Float::try_from(Rational::exact_from(x) / y) {
@@ -5602,7 +5602,7 @@ pub fn exhaustive_float_rounding_mode_pair_gen_var_12() -> It<(Float, RoundingMo
 }
 
 pub(crate) fn reciprocal_round_valid(x: &Float, rm: RoundingMode, extreme: bool) -> bool {
-    if rm != Exact || *x == 0 {
+    if rm != Exact || *x == 0u32 {
         true
     } else if extreme {
         x.reciprocal_round_ref(Floor).1 == Equal
@@ -6567,7 +6567,7 @@ pub fn exhaustive_rational_unsigned_rounding_mode_triple_gen_var_5()
 }
 
 pub fn ln_rational_prec_round_valid(x: &Rational, _prec: u64, rm: RoundingMode) -> bool {
-    rm != Exact || *x <= 0 || *x == 1u32
+    rm != Exact || *x <= 0u32 || *x == 1u32
 }
 
 pub fn exhaustive_rational_unsigned_rounding_mode_triple_gen_var_6()
@@ -6584,7 +6584,7 @@ pub fn exhaustive_rational_unsigned_rounding_mode_triple_gen_var_6()
 pub fn log_base_2_rational_prec_round_valid(x: &Rational, prec: u64, rm: RoundingMode) -> bool {
     // `checked_log_base_2` panics for nonpositive arguments, so the order of these tests matters.
     rm != Exact
-        || *x <= 0
+        || *x <= 0u32
         || x.checked_log_base_2()
             .is_some_and(|k| Float::from_signed_prec(k, prec).1 == Equal)
 }
@@ -6603,7 +6603,7 @@ pub fn exhaustive_rational_unsigned_rounding_mode_triple_gen_var_7()
 pub fn log_base_10_rational_prec_round_valid(x: &Rational, prec: u64, rm: RoundingMode) -> bool {
     // `checked_log_base` panics for nonpositive arguments, so the order of these tests matters.
     rm != Exact
-        || *x <= 0
+        || *x <= 0u32
         || x.checked_log_base(10)
             .is_some_and(|m| Float::from_signed_prec(m, prec).1 == Equal)
 }
@@ -6648,7 +6648,7 @@ pub fn log_base_power_of_2_rational_prec_round_valid(
     }
     // `checked_log_base_2` panics for nonpositive arguments, so the order of these tests matters.
     rm != Exact
-        || *x <= 0
+        || *x <= 0u32
         || x.checked_log_base_2()
             .is_some_and(|k| Float::from(k).div_prec(Float::from(pow), prec).1 == Equal)
 }
@@ -6685,7 +6685,7 @@ pub fn log_base_rational_prec_round_valid(
         return false;
     }
     // `checked_log_base` panics for nonpositive arguments, so the order of these tests matters.
-    if rm != Exact || *x <= 0 {
+    if rm != Exact || *x <= 0u32 {
         return true;
     }
     if base.is_power_of_2() {

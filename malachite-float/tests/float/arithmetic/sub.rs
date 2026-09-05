@@ -12422,7 +12422,7 @@ fn sub_rational_round_properties_helper(x: Float, y: Rational, rm: RoundingMode,
     assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
     assert_eq!(o_alt, o);
 
-    if o == Equal && diff.is_finite() && diff != 0 {
+    if o == Equal && diff.is_finite() && diff != 0u32 {
         assert_eq!(diff.add_rational_round_ref_ref(&y, Exact).0, x);
         // TODO additional test
     }
@@ -12608,7 +12608,7 @@ fn sub_rational_properties_helper(x: Float, y: Rational, extreme: bool) {
     let (diff_alt, o) = x.sub_rational_round_ref_ref(&y, Nearest);
     assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
 
-    if o == Equal && diff.is_finite() && diff != 0 {
+    if o == Equal && diff.is_finite() && diff != 0u32 {
         assert_eq!(&diff + &y, x);
         // TODO additional test
     }

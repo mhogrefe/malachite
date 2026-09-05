@@ -31,7 +31,7 @@ impl Integer {
     /// ```
     pub fn from_sign_and_abs(sign: bool, abs: Natural) -> Self {
         Self {
-            sign: sign || abs == 0,
+            sign: sign || abs == 0u32,
             abs,
         }
     }
@@ -64,7 +64,7 @@ impl Integer {
     /// ```
     pub fn from_sign_and_abs_ref(sign: bool, abs: &Natural) -> Self {
         Self {
-            sign: sign || *abs == 0,
+            sign: sign || *abs == 0u32,
             abs: abs.clone(),
         }
     }

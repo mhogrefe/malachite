@@ -50,7 +50,7 @@ fn neg_properties() {
         assert_eq!(Integer::from(&neg_num(BigUint::from(&x))), neg);
 
         assert_eq!(-Integer::from(&x), neg);
-        assert_eq!(neg == x, x == 0);
+        assert_eq!(neg == x, x == 0u32);
         assert_eq!(-neg, x);
     });
 }

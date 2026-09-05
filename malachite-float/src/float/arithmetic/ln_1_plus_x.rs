@@ -128,7 +128,7 @@ fn ln_1_plus_x_prec_round_normal(x: &Float, prec: u64, rm: RoundingMode) -> (Flo
             }
             // MPFR computes with an extended exponent range, so its 1 + x cannot overflow or
             // underflow; ours can, and both cases need rescuing.
-            let t = if t == 0 {
+            let t = if t == 0u32 {
                 // 1 + x underflowed, so x is just above -1 and 1 + x is positive but smaller than
                 // 2^MIN_EXPONENT. Reaching this branch requires the precision of x to exceed 2^30,
                 // which no generator produces.

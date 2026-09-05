@@ -131,7 +131,7 @@ fn cos_near_zero(x: &Float, prec: u64, rm: RoundingMode, cancel: u64) -> (Float,
     let e = u64::exact_from(x.get_exponent().unwrap());
     // n = round(2x / pi). Since 2x / pi is within 2^-62 of an odd integer, a quotient with 16 bits
     // after the binary point suffices to identify it.
-    let x_low = Float::from_float_prec_ref(x, e + 16).0 << 1u64;
+    let x_low = Float::from_float_prec_ref(x, e + 16).0 << 1u32;
     let q = x_low.div_prec(Float::pi_prec(e + 16).0, e + 16).0;
     let n = Integer::rounding_from(q, Nearest).0;
     assert!(n.odd());
@@ -265,7 +265,7 @@ fn cos_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float, 
         // ```
         let mut goto_ziv_next = false;
         let mut r = if reduce {
-            let c = Float::pi_prec(u64::exact_from(exp_x) + m - 1).0 << 1u64; // 2Pi
+            let c = Float::pi_prec(u64::exact_from(exp_x) + m - 1).0 << 1u32; // 2Pi
             let xr = x.ieee_remainder_prec_ref_val(c, m).0;
             if xr == 0u32 {
                 goto_ziv_next = true;
@@ -292,7 +292,7 @@ fn cos_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float, 
             let one = Float::one_prec(m);
             for _ in 0..k {
                 s.square_prec_round_assign(m, Ceiling); // err <= 2*olderr
-                s <<= 1u64; // Can't overflow
+                s <<= 1u32; // Can't overflow
                 s.sub_prec_assign_ref(&one, m); // err <= 4*olderr
                 if s == 0u32 {
                     fail_on_untested_path("cos_prec_round_normal_ref, s == 0 after doubling");

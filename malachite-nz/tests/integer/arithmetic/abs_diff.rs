@@ -176,7 +176,7 @@ fn abs_diff_properties() {
         assert_eq!((&x - &y).abs(), diff);
         assert_eq!((&y).abs_diff(&x), diff);
         assert_eq!((-&x).abs_diff(-&y), diff);
-        assert_eq!(diff == 0, x == y);
+        assert_eq!(diff == 0u32, x == y);
     });
 
     integer_gen().test_properties(|x| {

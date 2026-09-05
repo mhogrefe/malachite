@@ -60,7 +60,7 @@ impl ExtendedFloat {
         prec: u64,
         rm: RoundingMode,
     ) -> (Self, Ordering) {
-        if value == 0 {
+        if value == 0u32 {
             return (
                 Self {
                     x: Float::ZERO,
@@ -86,7 +86,7 @@ impl ExtendedFloat {
         prec: u64,
         rm: RoundingMode,
     ) -> (Self, Ordering) {
-        if *value == 0 {
+        if *value == 0u32 {
             return (
                 Self {
                     x: Float::ZERO,
@@ -425,7 +425,7 @@ impl Mul<&ExtendedFloat> for &ExtendedFloat {
 impl SqrtAssign for ExtendedFloat {
     fn sqrt_assign(&mut self) {
         if self.exp.odd() {
-            self.x <<= 1;
+            self.x <<= 1u32;
             self.exp = self.exp.checked_sub(1).unwrap();
         }
         self.x.sqrt_assign();

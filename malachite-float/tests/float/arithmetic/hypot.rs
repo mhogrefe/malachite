@@ -939,7 +939,7 @@ fn hypot_prec_round_fail() {
     assert_panic!(Float::from(3).hypot_prec_round(Float::from(4), 2, Exact));
     // the shortcut regime is never exact
     assert_panic!({
-        let y = Float::from(1) >> 1000u64;
+        let y = Float::from(1) >> 1000u32;
         Float::from(1).hypot_prec_round(y, 10, Exact)
     });
 }
@@ -1015,8 +1015,8 @@ fn verify_against_exact(x: &Float, y: &Float, prec: u64, rm: RoundingMode, h: &F
             assert!((hr - ulp_below).square() < r);
         }
         Nearest => match o {
-            Less => assert!((hr + (ulp_above >> 1u64)).square() >= r),
-            Greater => assert!((hr - (ulp_below >> 1u64)).square() <= r),
+            Less => assert!((hr + (ulp_above >> 1u32)).square() >= r),
+            Greater => assert!((hr - (ulp_below >> 1u32)).square() <= r),
             Equal => {}
         },
         Exact => assert_eq!(o, Equal),

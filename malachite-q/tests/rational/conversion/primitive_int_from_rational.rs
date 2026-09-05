@@ -262,7 +262,7 @@ where
     rational_rounding_mode_pair_gen_var_3::<T>().test_properties(|(x, rm)| {
         let (n, o) = T::rounding_from(&x, rm);
         if x >= T::MIN && x <= T::MAX {
-            assert!((Rational::from(n) - &x).lt_abs(&1));
+            assert!((Rational::from(n) - &x).lt_abs(&1u32));
         }
 
         assert_eq!(n.partial_cmp(&x), Some(o));

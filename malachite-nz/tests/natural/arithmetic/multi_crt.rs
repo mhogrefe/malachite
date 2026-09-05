@@ -153,7 +153,7 @@ fn multi_crt_properties() {
 
         let y = crt.apply_balanced(&vs);
         assert_eq!(Integer::multi_balanced_crt(&ms, &vs), Some(y.clone()));
-        let doubled = y.unsigned_abs_ref() << 1u64;
+        let doubled = y.unsigned_abs_ref() << 1u32;
         if y >= 0u32 {
             assert!(doubled <= p);
         } else {

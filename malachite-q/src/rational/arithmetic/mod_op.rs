@@ -89,7 +89,7 @@ impl Mod<Self> for Rational {
         let n2d1 = Integer::from_sign_and_abs(y_sign, n2 * &d1);
         let q = (&n1d2).div_round(&n2d1, Floor).0;
         let n = n1d2.sub_mul(n2d1, q);
-        Self::from_sign_and_naturals(n >= 0, n.unsigned_abs(), d1 * d2)
+        Self::from_sign_and_naturals(n >= 0u32, n.unsigned_abs(), d1 * d2)
     }
 }
 
@@ -166,7 +166,7 @@ impl Mod<&Self> for Rational {
         let n2d1 = Integer::from_sign_and_abs(*other >= 0u32, n2 * &d1);
         let q = (&n1d2).div_round(&n2d1, Floor).0;
         let n = n1d2.sub_mul(n2d1, q);
-        Self::from_sign_and_naturals(n >= 0, n.unsigned_abs(), d1 * d2)
+        Self::from_sign_and_naturals(n >= 0u32, n.unsigned_abs(), d1 * d2)
     }
 }
 
@@ -242,7 +242,7 @@ impl Mod<Rational> for &Rational {
         let n2d1 = Integer::from_sign_and_abs(y_sign, n2 * d1);
         let q = (&n1d2).div_round(&n2d1, Floor).0;
         let n = n1d2.sub_mul(n2d1, q);
-        Rational::from_sign_and_naturals(n >= 0, n.unsigned_abs(), d1 * d2)
+        Rational::from_sign_and_naturals(n >= 0u32, n.unsigned_abs(), d1 * d2)
     }
 }
 
@@ -316,7 +316,7 @@ impl Mod<&Rational> for &Rational {
         let n2d1 = Integer::from_sign_and_abs(*other >= 0u32, n2 * d1);
         let q = (&n1d2).div_round(&n2d1, Floor).0;
         let n = n1d2.sub_mul(n2d1, q);
-        Rational::from_sign_and_naturals(n >= 0, n.unsigned_abs(), d1 * d2)
+        Rational::from_sign_and_naturals(n >= 0u32, n.unsigned_abs(), d1 * d2)
     }
 }
 
@@ -485,7 +485,7 @@ impl Rem<Self> for Rational {
     /// ```
     #[inline]
     fn rem(self, other: Self) -> Self {
-        let x_sign = self >= 0;
+        let x_sign = self >= 0u32;
         let (n1, d1) = self.into_numerator_and_denominator();
         let (n2, d2) = other.into_numerator_and_denominator();
         let n1d2 = n1 * &d2;
@@ -493,7 +493,7 @@ impl Rem<Self> for Rational {
         let q = (&n1d2).div_round(&n2d1, Floor).0;
         let n2d1q = Integer::from_sign_and_abs(x_sign, n2d1 * q);
         let n = Integer::from_sign_and_abs(x_sign, n1d2) - n2d1q;
-        Self::from_sign_and_naturals(n >= 0, n.unsigned_abs(), d1 * d2)
+        Self::from_sign_and_naturals(n >= 0u32, n.unsigned_abs(), d1 * d2)
     }
 }
 
@@ -553,7 +553,7 @@ impl Rem<&Self> for Rational {
     /// ```
     #[inline]
     fn rem(self, other: &Self) -> Self {
-        let x_sign = self >= 0;
+        let x_sign = self >= 0u32;
         let (n1, d1) = self.into_numerator_and_denominator();
         let (n2, d2) = other.numerator_and_denominator_ref();
         let n1d2 = n1 * d2;
@@ -561,7 +561,7 @@ impl Rem<&Self> for Rational {
         let q = (&n1d2).div_round(&n2d1, Floor).0;
         let n2d1q = Integer::from_sign_and_abs(x_sign, n2d1 * q);
         let n = Integer::from_sign_and_abs(x_sign, n1d2) - n2d1q;
-        Self::from_sign_and_naturals(n >= 0, n.unsigned_abs(), d1 * d2)
+        Self::from_sign_and_naturals(n >= 0u32, n.unsigned_abs(), d1 * d2)
     }
 }
 
@@ -621,7 +621,7 @@ impl Rem<Rational> for &Rational {
     /// ```
     #[inline]
     fn rem(self, other: Rational) -> Rational {
-        let x_sign = *self >= 0;
+        let x_sign = *self >= 0u32;
         let (n1, d1) = self.numerator_and_denominator_ref();
         let (n2, d2) = other.into_numerator_and_denominator();
         let n1d2 = n1 * &d2;
@@ -629,7 +629,7 @@ impl Rem<Rational> for &Rational {
         let q = (&n1d2).div_round(&n2d1, Floor).0;
         let n2d1q = Integer::from_sign_and_abs(x_sign, n2d1 * q);
         let n = Integer::from_sign_and_abs(x_sign, n1d2) - n2d1q;
-        Rational::from_sign_and_naturals(n >= 0, n.unsigned_abs(), d1 * d2)
+        Rational::from_sign_and_naturals(n >= 0u32, n.unsigned_abs(), d1 * d2)
     }
 }
 
@@ -688,7 +688,7 @@ impl Rem<&Rational> for &Rational {
     /// ```
     #[inline]
     fn rem(self, other: &Rational) -> Rational {
-        let x_sign = *self >= 0;
+        let x_sign = *self >= 0u32;
         let (n1, d1) = self.numerator_and_denominator_ref();
         let (n2, d2) = other.numerator_and_denominator_ref();
         let n1d2 = n1 * d2;
@@ -696,7 +696,7 @@ impl Rem<&Rational> for &Rational {
         let q = (&n1d2).div_round(&n2d1, Floor).0;
         let n2d1q = Integer::from_sign_and_abs(x_sign, n2d1 * q);
         let n = Integer::from_sign_and_abs(x_sign, n1d2) - n2d1q;
-        Rational::from_sign_and_naturals(n >= 0, n.unsigned_abs(), d1 * d2)
+        Rational::from_sign_and_naturals(n >= 0u32, n.unsigned_abs(), d1 * d2)
     }
 }
 
@@ -883,7 +883,7 @@ impl CeilingMod<Self> for Rational {
         let n2d1 = Integer::from_sign_and_abs(y_sign, n2 * &d1);
         let q = (&n1d2).div_round(&n2d1, Ceiling).0;
         let n = n1d2.sub_mul(n2d1, q);
-        Self::from_sign_and_naturals(n >= 0, n.unsigned_abs(), d1 * d2)
+        Self::from_sign_and_naturals(n >= 0u32, n.unsigned_abs(), d1 * d2)
     }
 }
 
@@ -958,7 +958,7 @@ impl CeilingMod<&Self> for Rational {
         let n2d1 = Integer::from_sign_and_abs(*other > 0u32, n2 * &d1);
         let q = (&n1d2).div_round(&n2d1, Ceiling).0;
         let n = n1d2.sub_mul(n2d1, q);
-        Self::from_sign_and_naturals(n >= 0, n.unsigned_abs(), d1 * d2)
+        Self::from_sign_and_naturals(n >= 0u32, n.unsigned_abs(), d1 * d2)
     }
 }
 
@@ -1032,7 +1032,7 @@ impl CeilingMod<Rational> for &Rational {
         let n2d1 = Integer::from_sign_and_abs(y_sign, n2 * d1);
         let q = (&n1d2).div_round(&n2d1, Ceiling).0;
         let n = n1d2.sub_mul(n2d1, q);
-        Rational::from_sign_and_naturals(n >= 0, n.unsigned_abs(), d1 * d2)
+        Rational::from_sign_and_naturals(n >= 0u32, n.unsigned_abs(), d1 * d2)
     }
 }
 
@@ -1104,7 +1104,7 @@ impl CeilingMod<&Rational> for &Rational {
         let n2d1 = Integer::from_sign_and_abs(*other >= 0u32, n2 * d1);
         let q = (&n1d2).div_round(&n2d1, Ceiling).0;
         let n = n1d2.sub_mul(n2d1, q);
-        Rational::from_sign_and_naturals(n >= 0, n.unsigned_abs(), d1 * d2)
+        Rational::from_sign_and_naturals(n >= 0u32, n.unsigned_abs(), d1 * d2)
     }
 }
 

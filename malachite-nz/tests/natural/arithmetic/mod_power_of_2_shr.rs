@@ -117,7 +117,7 @@ where
         assert_eq!(Natural::ZERO.mod_power_of_2_shr(i, pow), 0);
         if pow != 0 {
             let shifted = Natural::ONE.mod_power_of_2_shr(i, pow);
-            assert!(shifted == 0 || shifted.is_power_of_2());
+            assert!(shifted == 0u32 || shifted.is_power_of_2());
         }
     });
 

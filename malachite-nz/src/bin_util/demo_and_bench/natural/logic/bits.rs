@@ -85,7 +85,7 @@ fn benchmark_natural_bits_get_algorithms(
                 let bits = n.to_bits_asc();
                 let u = usize::exact_from(u);
                 if u >= bits.len() {
-                    n < 0
+                    n < 0u32
                 } else {
                     bits[u]
                 };

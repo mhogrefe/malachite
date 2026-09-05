@@ -1,5 +1,5 @@
 error: use `<<` instead of multiplying by `Natural::power_of_2(..)`
-  --> $DIR/mul_div_by_power_of_2.rs:13:13
+  --> $DIR/mul_div_by_power_of_2.rs:14:13
    |
 LL |     let _ = &n * Natural::power_of_2(5);
    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -7,64 +7,82 @@ LL |     let _ = &n * Natural::power_of_2(5);
    = note: `#[deny(mul_div_by_power_of_2)]` on by default
 
 error: use `<<` instead of multiplying by `Natural::power_of_2(..)`
-  --> $DIR/mul_div_by_power_of_2.rs:14:13
+  --> $DIR/mul_div_by_power_of_2.rs:15:13
    |
 LL |     let _ = Natural::power_of_2(5) * &n;
    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 error: use `<<=` instead of multiplying by `Natural::power_of_2(..)`
-  --> $DIR/mul_div_by_power_of_2.rs:16:5
+  --> $DIR/mul_div_by_power_of_2.rs:17:5
    |
 LL |     m *= Natural::power_of_2(5);
    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 error: use `>>` instead of dividing by `Natural::power_of_2(..)`
-  --> $DIR/mul_div_by_power_of_2.rs:19:13
+  --> $DIR/mul_div_by_power_of_2.rs:20:13
    |
 LL |     let _ = &n / Natural::power_of_2(5);
    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 error: use `shr_round` with `Down` (or `>>`, which takes the floor) instead of dividing by `Integer::power_of_2(..)`
-  --> $DIR/mul_div_by_power_of_2.rs:20:13
+  --> $DIR/mul_div_by_power_of_2.rs:21:13
    |
 LL |     let _ = &i / Integer::power_of_2(5);
    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 error: use `>>` instead of dividing by `Rational::power_of_2(..)`
-  --> $DIR/mul_div_by_power_of_2.rs:21:13
+  --> $DIR/mul_div_by_power_of_2.rs:22:13
    |
 LL |     let _ = &q / Rational::power_of_2(-5i64);
    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 error: use `>>=` instead of dividing by `Rational::power_of_2(..)`
-  --> $DIR/mul_div_by_power_of_2.rs:23:5
+  --> $DIR/mul_div_by_power_of_2.rs:24:5
    |
 LL |     p /= Rational::power_of_2(5i64);
    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 error: use `<<` instead of multiplying by `GaussianInteger::power_of_2(..)`
-  --> $DIR/mul_div_by_power_of_2.rs:32:13
+  --> $DIR/mul_div_by_power_of_2.rs:33:13
    |
 LL |     let _ = &g * GaussianInteger::power_of_2(5);
    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 error: use `<<` instead of multiplying by `GaussianRational::power_of_2(..)`
-  --> $DIR/mul_div_by_power_of_2.rs:33:13
+  --> $DIR/mul_div_by_power_of_2.rs:34:13
    |
 LL |     let _ = &h * GaussianRational::power_of_2(5u64);
    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 error: use `>>` instead of dividing by `GaussianRational::power_of_2(..)`
-  --> $DIR/mul_div_by_power_of_2.rs:34:13
+  --> $DIR/mul_div_by_power_of_2.rs:35:13
    |
 LL |     let _ = &h / GaussianRational::power_of_2(-5i64);
    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 error: use `>>=` instead of dividing by `GaussianRational::power_of_2(..)`
-  --> $DIR/mul_div_by_power_of_2.rs:35:5
+  --> $DIR/mul_div_by_power_of_2.rs:36:5
    |
 LL |     h /= GaussianRational::power_of_2(2u64);
    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-error: aborting due to 11 previous errors
+error: use `shr_round(5u32, Ceiling)` instead of `div_round(Natural::power_of_2(5u32), Ceiling)`
+  --> $DIR/mul_div_by_power_of_2.rs:40:13
+   |
+LL |     let _ = (&n).div_round(Natural::power_of_2(5), Ceiling).0;
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `shr_round(5u32, Nearest)` instead of `div_round(Integer::power_of_2(5u32), Nearest)`
+  --> $DIR/mul_div_by_power_of_2.rs:41:13
+   |
+LL |     let _ = (&i).div_round(Integer::power_of_2(5), Nearest).0;
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `shr_round_assign(3u32, Floor)` instead of `div_round_assign(Integer::power_of_2(3u32), Floor)`
+  --> $DIR/mul_div_by_power_of_2.rs:44:5
+   |
+LL |     r.div_round_assign(Integer::power_of_2(3), Floor);
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: aborting due to 14 previous errors
 

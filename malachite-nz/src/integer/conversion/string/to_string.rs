@@ -143,7 +143,7 @@ impl ToStringBase for Integer {
     /// ```
     fn to_string_base(&self, base: u8) -> String {
         assert!((2..=62).contains(&base), "base out of range");
-        if *self == 0 {
+        if *self == 0u32 {
             "0".to_string()
         } else {
             let mut digits = self.unsigned_abs_ref().to_digits_desc(&base);
@@ -156,7 +156,7 @@ impl ToStringBase for Integer {
             for digit in &mut digits {
                 *digit = map(*digit).unwrap();
             }
-            if *self < 0 {
+            if *self < 0u32 {
                 vec_pad_left(&mut digits, 1, b'-');
             }
             String::from_utf8(digits).unwrap()
@@ -197,7 +197,7 @@ impl ToStringBase for Integer {
     /// ```
     fn to_string_base_upper(&self, base: u8) -> String {
         assert!((2..=62).contains(&base), "base out of range");
-        if *self == 0 {
+        if *self == 0u32 {
             "0".to_string()
         } else {
             let mut digits = self.unsigned_abs_ref().to_digits_desc(&base);
@@ -210,7 +210,7 @@ impl ToStringBase for Integer {
             for digit in &mut digits {
                 *digit = map(*digit).unwrap();
             }
-            if *self < 0 {
+            if *self < 0u32 {
                 vec_pad_left(&mut digits, 1, b'-');
             }
             String::from_utf8(digits).unwrap()
@@ -251,7 +251,7 @@ impl Display for Integer {
     /// assert_eq!(format!("{:05}", Integer::from(-123)), "-0123");
     /// ```
     fn fmt(&self, f: &mut Formatter) -> Result {
-        if *self < 0 {
+        if *self < 0u32 {
             if f.width().is_some() || f.sign_plus() {
                 // Let `pad_integral` handle the interaction of the sign with the `+` flag, the
                 // sign-aware zero flag, and fill and alignment.
@@ -360,7 +360,7 @@ impl Binary for Integer {
     /// assert_eq!(format!("{:#011b}", Integer::from(-123)), "-0b01111011");
     /// ```
     fn fmt(&self, f: &mut Formatter) -> Result {
-        if *self < 0 {
+        if *self < 0u32 {
             if f.width().is_some() || f.sign_plus() {
                 // Let `pad_integral` handle the interaction of the sign with the `+` flag, the
                 // sign-aware zero flag, the `#` prefix, and fill and alignment.
@@ -424,7 +424,7 @@ impl Octal for Integer {
     /// assert_eq!(format!("{:#07o}", Integer::from(-123)), "-0o0173");
     /// ```
     fn fmt(&self, f: &mut Formatter) -> Result {
-        if *self < 0 {
+        if *self < 0u32 {
             if f.width().is_some() || f.sign_plus() {
                 // Let `pad_integral` handle the interaction of the sign with the `+` flag, the
                 // sign-aware zero flag, the `#` prefix, and fill and alignment.
@@ -488,7 +488,7 @@ impl LowerHex for Integer {
     /// assert_eq!(format!("{:#07x}", Integer::from(-123)), "-0x007b");
     /// ```
     fn fmt(&self, f: &mut Formatter) -> Result {
-        if *self < 0 {
+        if *self < 0u32 {
             if f.width().is_some() || f.sign_plus() {
                 // Let `pad_integral` handle the interaction of the sign with the `+` flag, the
                 // sign-aware zero flag, the `#` prefix, and fill and alignment.
@@ -552,7 +552,7 @@ impl UpperHex for Integer {
     /// assert_eq!(format!("{:#07X}", Integer::from(-123)), "-0x007B");
     /// ```
     fn fmt(&self, f: &mut Formatter) -> Result {
-        if *self < 0 {
+        if *self < 0u32 {
             if f.width().is_some() || f.sign_plus() {
                 // Let `pad_integral` handle the interaction of the sign with the `+` flag, the
                 // sign-aware zero flag, the `#` prefix, and fill and alignment.

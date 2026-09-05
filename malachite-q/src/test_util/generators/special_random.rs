@@ -604,7 +604,7 @@ where
             } else {
                 f.next_higher()
             });
-            (x + y) >> 1
+            (x + y) >> 1u32
         }),
     )
 }
@@ -1177,7 +1177,7 @@ pub fn special_random_rational_signed_signed_triple_gen_var_1<T: PrimitiveSigned
                 )
             },
         )
-        .filter(|(x, e, f)| *e >= T::ZERO && *f >= T::ZERO || *x != 0),
+        .filter(|(x, e, f)| *e >= T::ZERO && *f >= T::ZERO || *x != 0u32),
     )
 }
 
@@ -1895,7 +1895,7 @@ pub fn special_random_rational_rational_signed_triple_gen_var_1<T: PrimitiveSign
                 )
             },
         )
-        .filter(|(x, y, exp)| *exp >= T::ZERO || *x != 0 && *y != 0),
+        .filter(|(x, y, exp)| *exp >= T::ZERO || *x != 0u32 && *y != 0u32),
     )
 }
 

@@ -63,6 +63,21 @@ implement `PartialEq` and `PartialOrd` directly against the primitives, so the c
 may allocate) is unnecessary: `x >= prec` means the same thing. The lint only fires when the
 direct impl for the operands in their present order actually exists.
 
+### `bignum_literal_suffix`
+
+Flags an integer literal compared with a bignum, or used as the shift count of one, when it is not
+a `u32` (or an `i32`, when negative): comparison operators, the
+`eq`/`ne`/`partial_cmp`/`cmp`/`lt`/`le`/`gt`/`ge` methods and their `*_abs` counterparts,
+`<<`/`>>` and their assignment forms, and the `shl_*`/`shr_*` method families. Every
+primitive suffix compiles, and an unsuffixed literal silently picks the `i32` implementation, so
+the convention needs enforcing. `u32`/`i32` is the fastest choice measured from first principles:
+on 64-bit limbs every width takes the same single-limb path, while on 32-bit limbs a `u64`
+comparand is wider than a limb and takes a limb loop (for `Float`, it even builds a `Natural`);
+shift counts are converted to `u64` internally whatever their type. One convention for both
+comparisons and shifts is easier to remember than two. Exempt: the comparison modules, the
+`shl`/`shr` family, and the operator examples in the arithmetic module docs, all of which
+exercise every primitive type on purpose.
+
 ### `redundant_nearest`
 
 Flags calls like `x.foo_prec_round(.., Nearest)` (in both method-call and associated-function
@@ -70,6 +85,18 @@ form) when a `foo_prec` shorthand exists on the same type. Exempt: the shorthand
 delegation, everything inside trait impls (operators, `*Assign`, `LogBase`, ..., which delegate
 via the explicit form by convention), and code under `tests/`, `bin_util/`, or `test_util/`,
 which exercises both spellings on purpose.
+
+### `use_abs_comparison`
+
+Flags comparing a bignum's `abs()` (`Integer`, `Rational`, or `Float`) with the comparison
+operators or the `eq`/`ne`/`partial_cmp`/`cmp`/`lt`/`le`/`gt`/`ge` methods, suggesting the
+`EqAbs`/`PartialOrdAbs`/`OrdAbs` spellings: `c.le_abs(&1u32)` rather than `(&c).abs() <= 1u32`.
+The `*_abs` comparisons read the sign bit and compare magnitudes in place, where `abs()` builds a
+new bignum (or consumes the old one) only to discard its sign. Because the `*_abs` methods compare
+the magnitudes of *both* operands, the rewrite is offered only when the other side is known to be
+nonnegative: a nonnegative literal, an unsigned primitive, a `Natural`, or another `abs()`. The
+suggestion is checked against the trait implementations, so it always compiles. The comparison
+modules and their tests are exempt: they cross-check the two spellings against each other.
 
 ### `compare_with_power_of_2`
 
@@ -94,7 +121,9 @@ own message: `Integer` division truncates while `>>` takes the floor, so dividin
 converts to `shr_round` with `Down` (or `>>` if the floor is really what's wanted). Tests, demos,
 and test utilities are exempt: they multiply by `power_of_2` on purpose, to cross-check the shift
 operators themselves. `GaussianInteger` division is not flagged: it rounds to the nearest Gaussian
-integer and has no right shift.
+integer and has no right shift. The rounding forms are covered too: `n.div_round(T::power_of_2(k),
+rm)` and `div_round_assign` on a `Natural` or `Integer` become `shr_round(k, rm)` and
+`shr_round_assign(k, rm)`, with the same rounding mode.
 
 ### `hoist_shifts`
 
@@ -305,7 +334,10 @@ represent every primitive value), so neither a constant nor a conversion is need
 literals are preferred for nonnegative values. Operator-position `from` comparisons belong to
 `redundant_from_in_comparison`; this covers the method forms and the named-constant comparisons.
 The one exception is `cmp` against a `ZERO` constant, which is ceded to `use_sign` so that only
-the better `sign()` suggestion fires.
+the better `sign()` suggestion fires. Unlike most lints, this one also applies to tests, demos,
+and test utilities: a comparison with a bignum constant is never something a test exercises on
+purpose. Only the `from(primitive)` method form keeps the test exemption, since comparison tests
+cross-check `Bignum::from(x).cmp(&Bignum::from(y))` against `x.cmp(&y)` deliberately.
 
 ### `use_round_variant`
 
@@ -404,7 +436,9 @@ the `*=`/`/=` forms): use a shift. This is the primitive-integer companion of
 truncates toward zero while `>>` takes the floor, so a signed `/` converts to `shr_round(k, Down)`
 (or plain `>>` when the floor is wanted). Unlike `*`, a shift does not detect value overflow — `<<`
 drops the high bits where `*` would panic in a debug build — so `<<` is appropriate only where
-overflow is already ruled out.
+overflow is already ruled out. `x.div_round(2, rm)` and `x.div_round_assign(2, rm)` (with any
+power-of-two literal or `T::WIDTH`) are flagged as well, converting to `shr_round(1, rm)` and
+`shr_round_assign(1, rm)`: both round the exact quotient the same way, so no `Down` caveat applies.
 
 ### `use_const_binding`
 

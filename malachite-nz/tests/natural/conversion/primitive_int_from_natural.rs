@@ -454,7 +454,7 @@ where
 {
     natural_gen().test_properties(|x| {
         let result = T::try_from(&x);
-        if x >= 0 && x.significant_bits() < T::WIDTH {
+        if x >= 0u32 && x.significant_bits() < T::WIDTH {
             assert_eq!(Natural::exact_from(result.unwrap()), x);
             assert_eq!(result, Ok(T::wrapping_from(&x)));
             assert_eq!(result, Ok(T::exact_from(&x)));

@@ -34,7 +34,7 @@ impl Neg for Rational {
     /// assert_eq!((-Rational::from_signeds(-22, 7)).to_string(), "22/7");
     /// ```
     fn neg(mut self) -> Self {
-        if self.numerator != 0 {
+        if self.numerator != 0u32 {
             self.sign.not_assign();
         }
         self
@@ -67,7 +67,7 @@ impl Neg for &Rational {
     /// assert_eq!((-&Rational::from_signeds(-22, 7)).to_string(), "22/7");
     /// ```
     fn neg(self) -> Rational {
-        if self.numerator == 0 {
+        if self.numerator == 0u32 {
             Rational::ZERO
         } else {
             Rational {
@@ -108,7 +108,7 @@ impl NegAssign for Rational {
     /// assert_eq!(x.to_string(), "22/7");
     /// ```
     fn neg_assign(&mut self) {
-        if self.numerator != 0 {
+        if self.numerator != 0u32 {
             self.sign.not_assign();
         }
     }

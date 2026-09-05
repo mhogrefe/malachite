@@ -60,8 +60,8 @@ fn abs_properties() {
         assert!(abs_alt.is_valid());
         assert_eq!(abs_alt, abs);
 
-        assert!(abs >= 0);
-        assert_eq!(abs == x, x >= 0);
+        assert!(abs >= 0u32);
+        assert_eq!(abs == x, x >= 0u32);
         assert_eq!((&abs).abs(), abs);
     });
 

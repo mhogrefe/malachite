@@ -1,10 +1,10 @@
 // `twenty` exists to show a `const_from*` call inside a `const fn`; it is never called.
 #![allow(dead_code)]
 
+use malachite_nz::gaussian_integer::GaussianInteger;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_q::Rational;
-use malachite_nz::gaussian_integer::GaussianInteger;
 use malachite_q::gaussian_rational::GaussianRational;
 
 const TEN: Natural = Natural::const_from(10);

@@ -67,7 +67,7 @@ pub fn extended_gcd_binary_natural(mut a: Natural, mut b: Natural) -> (Natural, 
     let mut t1;
     while v3 != 0u32 {
         d = &u3 - &v3;
-        if u3 < (&v3 << 2) {
+        if u3 < (&v3 << 2u32) {
             if d < v3 {
                 // quot = 1
                 t2 = v2.clone();
@@ -80,14 +80,14 @@ pub fn extended_gcd_binary_natural(mut a: Natural, mut b: Natural) -> (Natural, 
                 v2.neg_assign();
                 v1 = t2;
                 v3 = d;
-            } else if d < (&v3 << 1) {
+            } else if d < (&v3 << 1u32) {
                 // quot = 2
                 t1 = u2.clone();
-                u2 = u1 - (&u2 << 1);
+                u2 = u1 - (&u2 << 1u32);
                 u1 = t1;
                 u3 = v3;
                 t2 = v2.clone();
-                v2 = v1 - (v2 << 1);
+                v2 = v1 - (v2 << 1u32);
                 v1 = t2;
                 v3 = d - &u3;
             } else {
@@ -99,7 +99,7 @@ pub fn extended_gcd_binary_natural(mut a: Natural, mut b: Natural) -> (Natural, 
                 t2 = v2.clone();
                 v2 = v1 - Integer::from(3u32) * &v2;
                 v1 = t2;
-                v3 = d - (&u3 << 1);
+                v3 = d - (&u3 << 1u32);
             }
         } else {
             let (quot, rem) = u3.div_mod(&v3);
@@ -120,7 +120,7 @@ pub fn extended_gcd_binary_natural(mut a: Natural, mut b: Natural) -> (Natural, 
     let mut y = v1;
     let two_limit_a = Integer::from(a.div_exact(&gcd));
     let two_limit_b = Integer::from(b.div_exact(&gcd));
-    let limit_b = &two_limit_b >> 1u64;
+    let limit_b = &two_limit_b >> 1u32;
     if x > limit_b {
         let k = (&x - limit_b).div_round(&two_limit_b, Ceiling).0;
         x -= two_limit_b * &k;

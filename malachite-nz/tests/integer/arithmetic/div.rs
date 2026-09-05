@@ -519,7 +519,7 @@ fn div_properties_helper(x: Integer, y: Integer) {
 
     let remainder = &x - &q * &y;
     assert!(remainder.lt_abs(&y));
-    assert!(remainder == 0 || (remainder > 0) == (x > 0));
+    assert!(remainder == 0u32 || (remainder > 0u32) == (x > 0u32));
     assert_eq!(&q * &y + remainder, x);
     assert_eq!((-&x) / &y, -&q);
     assert_eq!(x / (-y), -q);
@@ -546,7 +546,7 @@ fn div_properties() {
 
     integer_gen_var_8().test_properties(|x| {
         assert_eq!(Integer::ZERO / &x, 0);
-        if x > Integer::ONE {
+        if x > 1u32 {
             assert_eq!(Integer::ONE / &x, 0);
         }
         assert_eq!(&x / Integer::ONE, x);
@@ -598,7 +598,7 @@ fn checked_div_properties() {
 
     integer_gen_var_8().test_properties(|ref x| {
         assert_eq!(Integer::ZERO.checked_div(x), Some(Integer::ZERO));
-        if *x > Integer::ONE {
+        if *x > 1u32 {
             assert_eq!(Integer::ONE.checked_div(x), Some(Integer::ZERO));
         }
         assert_eq!(x.checked_div(x), Some(Integer::ONE));

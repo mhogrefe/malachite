@@ -88,12 +88,12 @@ fn balanced_mod_properties() {
         // The congruence and the range determine the result uniquely, so together they are a
         // complete specification.
         assert!((Integer::from(&x) - &r).divisible_by(Integer::from(&y)));
-        let double = &r << 1u64;
+        let double = &r << 1u32;
         assert!(double > -Integer::from(&y));
         assert!(double <= y);
         // it agrees with the Euclidean remainder when that is already small enough
         let e = (&x).mod_euclidean(&y);
-        assert_eq!(r == e, e <= &y >> 1u64);
+        assert_eq!(r == e, e <= &y >> 1u32);
     });
 
     integer_pair_gen_var_1().test_properties(|(x, y)| {
@@ -105,7 +105,7 @@ fn balanced_mod_properties() {
         assert_eq!(mut_x, r);
 
         assert!((&x - &r).divisible_by(y.clone()));
-        let double = &r << 1u64;
+        let double = &r << 1u32;
         let abs_y = Integer::from(y.unsigned_abs_ref());
         assert!(double > -&abs_y);
         assert!(double <= abs_y);

@@ -273,7 +273,7 @@ where
         } else {
             f.next_higher()
         });
-        (x + y) >> 1
+        (x + y) >> 1u32
     }))
 }
 
@@ -460,7 +460,7 @@ pub fn exhaustive_rational_signed_signed_triple_gen_var_1<T: PrimitiveSigned>()
             BitDistributorOutputType::tiny(),
             BitDistributorOutputType::tiny(),
         )
-        .filter(|(x, e, f)| *e >= T::ZERO && *f >= T::ZERO || *x != 0),
+        .filter(|(x, e, f)| *e >= T::ZERO && *f >= T::ZERO || *x != 0u32),
     )
 }
 
@@ -695,7 +695,7 @@ pub(crate) fn round_to_multiple_rational_filter(t: &(Rational, Rational, Roundin
     if x == y {
         true
     } else if *y == 0u32 {
-        rm == Down || rm == (if *x >= 0 { Floor } else { Ceiling }) || rm == Nearest
+        rm == Down || rm == (if *x >= 0u32 { Floor } else { Ceiling }) || rm == Nearest
     } else {
         rm != Exact || (x / y).is_integer()
     }
@@ -756,7 +756,7 @@ pub fn exhaustive_rational_rational_signed_triple_gen_var_1<T: PrimitiveSigned>(
             BitDistributorOutputType::normal(1),
             BitDistributorOutputType::tiny(),
         )
-        .filter(|(x, y, exp)| *exp >= T::ZERO || *x != 0 && *y != 0),
+        .filter(|(x, y, exp)| *exp >= T::ZERO || *x != 0u32 && *y != 0u32),
     )
 }
 

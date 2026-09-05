@@ -381,8 +381,8 @@ fn integer_rounding_from_float_fail() {
     assert_panic!(Integer::rounding_from(Float::NEGATIVE_INFINITY, Nearest));
     assert_panic!(Integer::rounding_from(Float::NEGATIVE_INFINITY, Exact));
 
-    assert_panic!(Integer::rounding_from(Float::from(3u8) >> 1, Exact));
-    assert_panic!(Integer::rounding_from(Float::from(-3i8) >> 1, Exact));
+    assert_panic!(Integer::rounding_from(Float::from(3u8) >> 1u32, Exact));
+    assert_panic!(Integer::rounding_from(Float::from(-3i8) >> 1u32, Exact));
 }
 
 #[test]
@@ -408,8 +408,8 @@ fn integer_rounding_from_float_ref_fail() {
     assert_panic!(Integer::rounding_from(&Float::NEGATIVE_INFINITY, Nearest));
     assert_panic!(Integer::rounding_from(&Float::NEGATIVE_INFINITY, Exact));
 
-    assert_panic!(Integer::rounding_from(&(Float::from(3u8) >> 1), Exact));
-    assert_panic!(Integer::rounding_from(&(Float::from(-3i8) >> 1), Exact));
+    assert_panic!(Integer::rounding_from(&(Float::from(3u8) >> 1u32), Exact));
+    assert_panic!(Integer::rounding_from(&(Float::from(-3i8) >> 1u32), Exact));
 }
 
 #[test]
@@ -445,10 +445,10 @@ fn rounding_from_float_properties() {
         let no = Integer::rounding_from(&x, rm);
         assert_eq!(Integer::rounding_from(x.clone(), rm), no);
         let (n, o) = no;
-        assert!((Rational::from(&n) - Rational::exact_from(&x)).lt_abs(&1));
+        assert!((Rational::from(&n) - Rational::exact_from(&x)).lt_abs(&1u32));
 
         assert_eq!(n.partial_cmp(&x), Some(o));
-        match (x >= 0, rm) {
+        match (x >= 0u32, rm) {
             (_, Floor) | (true, Down) | (false, Up) => {
                 assert_ne!(o, Greater);
             }
@@ -472,7 +472,7 @@ fn rounding_from_float_properties() {
         assert!(floor.0 <= x);
         assert!(&floor.0 + Integer::ONE > x);
         assert_eq!(
-            Integer::rounding_from(&x, if x >= 0 { Down } else { Up }),
+            Integer::rounding_from(&x, if x >= 0u32 { Down } else { Up }),
             floor
         );
 
@@ -481,7 +481,7 @@ fn rounding_from_float_properties() {
         assert!(ceiling.0 >= x);
         assert!(&ceiling.0 - Integer::ONE < x);
         assert_eq!(
-            Integer::rounding_from(&x, if x >= 0 { Up } else { Down }),
+            Integer::rounding_from(&x, if x >= 0u32 { Up } else { Down }),
             ceiling
         );
 
@@ -500,7 +500,7 @@ fn rounding_from_float_properties() {
         assert_eq!(Integer::rounding_from(&x, Nearest), no);
         assert_eq!(Integer::rounding_from(&x, Exact), no);
 
-        let x = Float::exact_from((no.0 << 1) | Integer::ONE) >> 1;
+        let x = Float::exact_from((no.0 << 1u32) | Integer::ONE) >> 1u32;
         assert!(Integer::rounding_from(x, Nearest).0.even());
     });
 }

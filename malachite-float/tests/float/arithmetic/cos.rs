@@ -11,6 +11,7 @@ use malachite_base::num::arithmetic::traits::{Cos, CosAssign};
 use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeZero, One, Zero,
 };
+use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
@@ -401,14 +402,14 @@ fn cos_prec_round_properties_helper(x: Float, prec: u64, rm: RoundingMode) {
 
     // |cos x| <= 1
     if c.is_finite() {
-        assert!(c.abs_negative_zero_ref() <= Float::ONE);
+        assert!(c.le_abs(&1u32));
     }
     if c.is_normal() {
         assert_eq!(c.get_prec(), Some(prec));
     }
 
     if o == Equal {
-        // cos is exact only for x = 0 (and NaN): the result is rounding-mode-invariant
+        // cos is exact only for x = 0 (and NaN, and ±inf): the result is rounding-mode-invariant
         for rm2 in exhaustive_rounding_modes() {
             let (c2, o2) = x.cos_prec_round_ref(prec, rm2);
             assert_eq!(
@@ -535,7 +536,7 @@ fn cos_properties() {
 
         assert_eq!(ComparableFloatRef(&(-&x).cos()), ComparableFloatRef(&c));
         if c.is_finite() {
-            assert!(c.abs_negative_zero_ref() <= Float::ONE);
+            assert!(c.le_abs(&1u32));
         }
     });
 }
@@ -546,7 +547,7 @@ fn odd_multiple_of_half_pi(n: i64, prec: u64) -> Float {
         .0
         .mul_prec_round(Float::from(n), prec + 64, Exact)
         .0
-        >> 1u64
+        >> 1u32
 }
 
 // Inputs close to an odd multiple of pi/2, where the cosine is tiny and takes the near-zero path: n
@@ -1544,13 +1545,13 @@ fn test_cos_underflow() {
     // pi rounded down: x_lo < pi/2, so cos(x_lo) is positive, and at most half an ulp of x_lo,
     // 2^(-2^30 - 64), in magnitude
     let mut pi = Float::pi_prec_round(p, Floor).0;
-    let x_lo = &pi >> 1u64;
+    let x_lo = &pi >> 1u32;
     let (c, o) = x_lo.cos_prec_round_ref(10, Ceiling);
     assert_eq!(ComparableFloatRef(&c), ComparableFloatRef(&min_positive));
     assert_eq!(o, Greater);
     // pi rounded up: x_hi > pi/2, so cos(x_hi) is negative
     pi.increment();
-    let x_hi = pi >> 1u64;
+    let x_hi = pi >> 1u32;
     let (c, o) = x_hi.cos_prec_round_ref(10, Nearest);
     assert_eq!(ComparableFloat(c), ComparableFloat(Float::NEGATIVE_ZERO));
     assert_eq!(o, Greater);

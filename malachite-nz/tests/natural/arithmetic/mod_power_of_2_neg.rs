@@ -10,7 +10,7 @@ use malachite_base::num::arithmetic::traits::{
     ModNeg, ModPowerOf2, ModPowerOf2Add, ModPowerOf2IsReduced, ModPowerOf2Neg,
     ModPowerOf2NegAssign, PowerOf2,
 };
-use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::basic::traits::One;
 use malachite_base::test_util::generators::unsigned_pair_gen_var_17;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -77,10 +77,7 @@ fn mod_power_of_2_neg_properties() {
         assert_eq!(neg, (&n).mod_neg(Natural::power_of_2(pow)));
         assert_eq!((&neg).mod_power_of_2_neg(pow), n);
         assert_eq!((&n).mod_power_of_2_add(&neg, pow), 0);
-        assert_eq!(
-            n == neg,
-            n == Natural::ZERO || n == Natural::power_of_2(pow - 1)
-        );
+        assert_eq!(n == neg, n == 0u32 || n == Natural::power_of_2(pow - 1));
     });
 
     unsigned_pair_gen_var_17::<Limb>().test_properties(|(n, pow)| {

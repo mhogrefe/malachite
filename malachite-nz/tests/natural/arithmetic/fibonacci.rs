@@ -294,7 +294,7 @@ fn lucas_number_properties() {
         );
         // L(n) = F(n) + 2 * F(n - 1), using F(-1) = 1 at n = 0.
         let (f, f1) = Natural::fibonacci_pair(n);
-        assert_eq!(l, &f + (&f1 << 1));
+        assert_eq!(l, &f + (&f1 << 1u32));
         if n >= 2 {
             assert_eq!(
                 l,

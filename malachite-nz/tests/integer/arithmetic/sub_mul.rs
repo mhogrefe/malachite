@@ -441,7 +441,7 @@ fn limbs_overflowing_sub_mul_limb_properties() {
             Integer::from(Natural::from_owned_limbs_asc(b)),
             Integer::from(c),
         );
-        assert_eq!(sign, expected_result >= 0);
+        assert_eq!(sign, expected_result >= 0u32);
         assert_eq!(
             Natural::from_owned_limbs_asc(result),
             expected_result.unsigned_abs()
@@ -458,7 +458,7 @@ fn limbs_overflowing_sub_mul_limb_in_place_left_properties() {
             Integer::from(Natural::from_owned_limbs_asc(b)),
             Integer::from(c),
         );
-        assert_eq!(sign, expected_result >= 0);
+        assert_eq!(sign, expected_result >= 0u32);
         assert_eq!(
             Natural::from_owned_limbs_asc(a),
             expected_result.unsigned_abs(),
@@ -475,7 +475,7 @@ fn limbs_overflowing_sub_mul_limb_in_place_right_properties() {
             Integer::from(Natural::from_owned_limbs_asc(b_old)),
             Integer::from(c),
         );
-        assert_eq!(sign, expected_result >= 0);
+        assert_eq!(sign, expected_result >= 0u32);
         assert_eq!(
             Natural::from_owned_limbs_asc(b),
             expected_result.unsigned_abs()
@@ -500,7 +500,7 @@ fn limbs_overflowing_sub_mul_limb_in_place_either_properties() {
             assert_eq!(b_old, b);
             a
         });
-        assert_eq!(sign, expected_result >= 0);
+        assert_eq!(sign, expected_result >= 0u32);
         assert_eq!(result, expected_result.unsigned_abs());
     });
 }
@@ -513,8 +513,8 @@ fn limbs_overflowing_sub_mul_properties() {
             Integer::from(Natural::from_owned_limbs_asc(b)),
             Integer::from(Natural::from_owned_limbs_asc(c)),
         );
-        if expected_result != 0 {
-            assert_eq!(sign, expected_result >= 0);
+        if expected_result != 0u32 {
+            assert_eq!(sign, expected_result >= 0u32);
         }
         assert_eq!(
             Natural::from_owned_limbs_asc(result),
@@ -532,8 +532,8 @@ fn limbs_overflowing_sub_mul_in_place_left_properties() {
             Integer::from(Natural::from_owned_limbs_asc(b)),
             Integer::from(Natural::from_owned_limbs_asc(c)),
         );
-        if expected_result != 0 {
-            assert_eq!(sign, expected_result >= 0);
+        if expected_result != 0u32 {
+            assert_eq!(sign, expected_result >= 0u32);
         }
         assert_eq!(
             Natural::from_owned_limbs_asc(a),

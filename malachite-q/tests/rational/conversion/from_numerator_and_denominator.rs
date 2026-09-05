@@ -261,10 +261,10 @@ fn from_integers_properties() {
             x
         );
 
-        if n != 0 {
-            assert_eq!(x >= 0, (n >= 0) == (d >= 0));
+        if n != 0u32 {
+            assert_eq!(x >= 0u32, (n >= 0u32) == (d >= 0u32));
         }
-        if n >= 0 && d > 0 && (n.unsigned_abs_ref()).coprime_with(d.unsigned_abs_ref()) {
+        if n >= 0u32 && d > 0u32 && (n.unsigned_abs_ref()).coprime_with(d.unsigned_abs_ref()) {
             let (n_2, d_2) = x.into_numerator_and_denominator();
             assert_eq!((Integer::from(n_2), Integer::from(d_2)), (n, d));
         }
@@ -415,8 +415,8 @@ fn from_sign_and_naturals_properties() {
         assert!(x.is_valid());
         assert_eq!(x, x_alt);
 
-        if n != 0 {
-            assert_eq!(x >= 0, sign);
+        if n != 0u32 {
+            assert_eq!(x >= 0u32, sign);
         }
         if (&n).coprime_with(&d) {
             assert_eq!(x.into_numerator_and_denominator(), (n, d));

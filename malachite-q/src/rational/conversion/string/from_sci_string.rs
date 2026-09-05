@@ -195,7 +195,7 @@ impl Rational {
         if exponent >= 0 {
             Some(q)
         } else {
-            let epsilon = p >> 1;
+            let epsilon = p >> 1u32;
             Some(Self::simplest_rational_in_closed_interval(
                 &(&q - &epsilon),
                 &(q + epsilon),

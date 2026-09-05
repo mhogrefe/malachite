@@ -7,7 +7,6 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{CanonicalUnitIPow, CanonicalizeUnit, DivI, MulI};
-use malachite_base::num::basic::traits::Zero;
 use malachite_nz::gaussian_integer::GaussianInteger;
 use malachite_nz::test_util::generators::gaussian_integer_gen;
 use std::str::FromStr;
@@ -51,7 +50,7 @@ fn canonical_unit_i_pow_properties() {
             y = y.mul_i();
         }
         assert_eq!((&x).canonicalize_unit(), y);
-        if x == GaussianInteger::ZERO {
+        if x == 0u32 {
             assert_eq!(k, 0);
         } else {
             // The canonical associate has a positive real part a and an imaginary part b with -a <

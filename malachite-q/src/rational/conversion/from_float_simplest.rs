@@ -76,8 +76,8 @@ impl Rational {
         } else {
             let succ_q = Self::exact_from(x.next_higher());
             let pred_q = Self::exact_from(x.next_lower());
-            let x = (pred_q + &q) >> 1;
-            let y = (succ_q + q) >> 1;
+            let x = (pred_q + &q) >> 1u32;
+            let y = (succ_q + q) >> 1u32;
             Self::simplest_rational_in_open_interval(&x, &y)
         })
     }

@@ -126,7 +126,7 @@ fn rem_properties_helper(x: GaussianInteger, y: GaussianInteger) {
 
     assert_eq!((&x).div_rem(&y).1, r);
     assert_eq!(gaussian_integer_div_rem_naive(&x, &y).1, r);
-    assert!((&r).abs_squared() << 1u64 <= (&y).abs_squared());
+    assert!((&r).abs_squared() << 1u32 <= (&y).abs_squared());
     assert_eq!(&r % &y, r);
 }
 

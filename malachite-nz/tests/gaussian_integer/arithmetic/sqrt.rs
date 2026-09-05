@@ -170,7 +170,7 @@ fn checked_sqrt_properties() {
 
     integer_gen().test_properties(|n| {
         let root = GaussianInteger::from(n.clone()).checked_sqrt();
-        if n >= 0 {
+        if n >= 0u32 {
             assert_eq!(root, n.checked_sqrt().map(GaussianInteger::from));
         } else {
             assert_eq!(

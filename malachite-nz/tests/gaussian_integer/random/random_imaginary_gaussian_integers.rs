@@ -110,7 +110,7 @@ fn random_imaginary_gaussian_integers_axis() {
     assert!(
         random_imaginary_gaussian_integers(EXAMPLE_SEED, 32, 1)
             .take(100)
-            .all(|x| x.real == 0)
+            .all(|x| x.real == 0u32)
     );
 }
 

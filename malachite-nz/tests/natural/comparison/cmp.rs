@@ -227,7 +227,7 @@ fn cmp_properties() {
 
     natural_gen().test_properties(|x| {
         assert_eq!(x.cmp(&x), Equal);
-        assert!(x >= Natural::ZERO);
+        assert!(x >= 0u32);
     });
 
     natural_triple_gen().test_properties(|(x, y, z)| {

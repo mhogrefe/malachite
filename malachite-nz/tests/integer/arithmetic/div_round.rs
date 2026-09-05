@@ -1053,9 +1053,9 @@ fn div_round_properties() {
             assert_eq!(-q_alt, q);
             assert_eq!(o_alt, o.reverse());
 
-            assert_eq!((q * &y).cmp(&x), if y >= 0 { o } else { o.reverse() });
+            assert_eq!((q * &y).cmp(&x), if y >= 0u32 { o } else { o.reverse() });
 
-            match ((x >= 0) == (y >= 0), rm) {
+            match ((x >= 0u32) == (y >= 0u32), rm) {
                 (_, Floor) | (true, Down) | (false, Up) => {
                     assert_ne!(o, Greater);
                 }
@@ -1098,7 +1098,7 @@ fn div_round_properties() {
 
     integer_pair_gen_var_3().test_properties(|(x, y)| {
         let down = (&x).div_round(&y, Down);
-        let up = if (x >= 0) == (y >= 0) {
+        let up = if (x >= 0u32) == (y >= 0u32) {
             (&down.0 + Integer::ONE, Greater)
         } else {
             (&down.0 - Integer::ONE, Less)

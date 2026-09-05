@@ -19,7 +19,7 @@ pub fn jacobi_symbol_simple(mut a: Natural, mut n: Natural) -> i8 {
     let mut t = 1i8;
     while a != 0u32 {
         while a.even() {
-            a >>= 1u64;
+            a >>= 1u32;
             let r: u8 = (&(&n).mod_power_of_2(3)).wrapping_into();
             if r == 3 || r == 5 {
                 t.neg_assign();

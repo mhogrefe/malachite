@@ -739,7 +739,7 @@ fn benchmark_natural_eq_mod_algorithms(
             }),
             (
                 "Natural == Natural || Natural != 0 && Natural % Natural == Natural % Natural",
-                &mut |(x, y, m)| no_out!(x == y || m != 0 && x % &m == y % m),
+                &mut |(x, y, m)| no_out!(x == y || m != 0u32 && x % &m == y % m),
             ),
             (
                 "|Natural - Natural|.divisible_by(Natural)",

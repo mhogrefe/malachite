@@ -112,7 +112,7 @@ fn bell_number_triangle(n: u64) -> Natural {
         }
     }
     let (lo, hi) = t3[0];
-    (Natural::from(hi) << 128u64) | Natural::from(lo)
+    (Natural::from(hi) << 128u32) | Natural::from(lo)
 }
 
 // An upper bound on the number of bits of the nth Bell number, from de Bruijn's asymptotic

@@ -87,7 +87,7 @@ fn content_and_primitive_part_properties() {
             content,
             (&x.real).unsigned_abs().gcd((&x.imaginary).unsigned_abs())
         );
-        if x == GaussianInteger::ZERO {
+        if x == 0u32 {
             assert_eq!(content, 0);
             assert_eq!(primitive, GaussianInteger::ZERO);
         } else {
@@ -115,7 +115,7 @@ fn content_and_primitive_part_properties() {
         let (content, primitive) = (&x).content_and_primitive_part();
         let (scaled_content, scaled_primitive) = scale(&x, &n).content_and_primitive_part();
         assert_eq!(scaled_content, content * &n);
-        if n != 0 && x != GaussianInteger::ZERO {
+        if n != 0u32 && x != 0u32 {
             assert_eq!(scaled_primitive, primitive);
         }
     });

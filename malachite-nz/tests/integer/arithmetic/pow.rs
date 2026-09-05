@@ -208,7 +208,7 @@ fn pow_properties() {
         } else {
             assert_eq!(power_of_neg, -&power);
         }
-        if exp > 0 && (x >= 0 || exp.odd()) {
+        if exp > 0 && (x >= 0u32 || exp.odd()) {
             assert_eq!((&power).checked_root(exp).as_ref(), Some(&x));
         }
 

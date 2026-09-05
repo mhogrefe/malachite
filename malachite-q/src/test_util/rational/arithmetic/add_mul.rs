@@ -69,7 +69,7 @@ use malachite_nz::integer::Integer;
 /// internally. A future n-ary sum-of-products is therefore the one fused rational operation with a
 /// real algorithmic edge; the ternary one has none.
 pub fn add_mul_split(x: &Rational, y: &Rational, z: &Rational) -> Rational {
-    if y.numerator == 0 || z.numerator == 0 {
+    if y.numerator == 0u32 || z.numerator == 0u32 {
         return x.clone();
     }
     // The cross-cancellation of the product, exactly as `Mul` does it.
@@ -96,13 +96,13 @@ pub fn add_mul_split(x: &Rational, y: &Rational, z: &Rational) -> Rational {
 
     let sum_n = Integer::from_sign_and_abs(x.sign, &x.numerator * &q_1)
         + Integer::from_sign_and_abs(product_sign, &b_1 * p);
-    if sum_n == 0 {
+    if sum_n == 0u32 {
         return Rational::ZERO;
     }
     let h = (&g).gcd(sum_n.unsigned_abs_ref());
-    let sign = sum_n >= 0;
+    let sign = sum_n >= 0u32;
     let numerator = sum_n.unsigned_abs();
-    if h == 1 {
+    if h == 1u32 {
         Rational {
             sign,
             numerator,

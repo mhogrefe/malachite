@@ -191,10 +191,10 @@ fn integer_from_rational_properties() {
         let no = Integer::rounding_from(&x, rm);
         assert_eq!(Integer::rounding_from(x.clone(), rm), no);
         let (n, o) = no;
-        assert!((Rational::from(&n) - &x).lt_abs(&1));
+        assert!((Rational::from(&n) - &x).lt_abs(&1u32));
 
         assert_eq!(n.partial_cmp(&x), Some(o));
-        match (x >= 0, rm) {
+        match (x >= 0u32, rm) {
             (_, Floor) | (true, Down) | (false, Up) => {
                 assert_ne!(o, Greater);
             }
@@ -217,7 +217,7 @@ fn integer_from_rational_properties() {
         assert!(ceiling.0 >= x);
         assert!(&ceiling.0 - Integer::ONE < x);
 
-        if x >= 0 {
+        if x >= 0u32 {
             assert_eq!(Integer::rounding_from(&x, Down), floor);
             assert_eq!(Integer::rounding_from(&x, Up), ceiling);
         } else {
@@ -240,7 +240,7 @@ fn integer_from_rational_properties() {
         assert_eq!(Integer::rounding_from(&x, Nearest), no);
         assert_eq!(Integer::rounding_from(&x, Exact), no);
 
-        let x = Rational::from_integers((no.0 << 1) | Integer::ONE, Integer::TWO);
+        let x = Rational::from_integers((no.0 << 1u32) | Integer::ONE, Integer::TWO);
         assert!(Integer::rounding_from(x, Nearest).0.even());
     });
 }

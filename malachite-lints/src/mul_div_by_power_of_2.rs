@@ -7,6 +7,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use clippy_utils::diagnostics::span_lint;
+use clippy_utils::source::snippet;
+use rustc_ast::{LitIntType, LitKind};
 use rustc_hir::{BinOpKind, Expr, ExprKind};
 use rustc_lint::{LateContext, LateLintPass};
 use rustc_session::{declare_lint, declare_lint_pass};
@@ -14,8 +16,10 @@ use rustc_session::{declare_lint, declare_lint_pass};
 declare_lint! {
     /// ### What it does
     ///
-    /// Flags multiplying or dividing a bignum (`Natural`, `Integer`, `Rational`, `Float`, `GaussianInteger`, or `GaussianRational`) by
-    /// `power_of_2(..)`, including the `*=` and `/=` forms.
+    /// Flags multiplying or dividing a bignum (`Natural`, `Integer`, `Rational`, `Float`,
+    /// `GaussianInteger`, or `GaussianRational`) by `power_of_2(..)`, including the `*=` and `/=`
+    /// forms, and `div_round`/`div_round_assign` of a `Natural` or `Integer` by `power_of_2(..)`,
+    /// where `shr_round`/`shr_round_assign` with the same rounding mode says the same thing.
     ///
     /// ### Why is this bad?
     ///
@@ -30,16 +34,18 @@ declare_lint! {
     ///
     /// ```rust,ignore
     /// let y = x * Rational::power_of_2(k);
+    /// let z = n.div_round(Natural::power_of_2(k), Ceiling).0;
     /// ```
     ///
     /// Use instead:
     ///
     /// ```rust,ignore
     /// let y = x << k;
+    /// let z = n.shr_round(k, Ceiling).0;
     /// ```
     pub MUL_DIV_BY_POWER_OF_2,
     Deny,
-    "multiplying or dividing a bignum by `power_of_2` instead of shifting"
+    "multiplying, dividing, or `div_round`ing a bignum by `power_of_2` instead of shifting"
 }
 
 declare_lint_pass!(MulDivByPowerOf2 => [MUL_DIV_BY_POWER_OF_2]);
@@ -52,6 +58,46 @@ impl<'tcx> LateLintPass<'tcx> for MulDivByPowerOf2 {
         // Tests, demos, and test utilities multiply by `power_of_2` on purpose, to cross-check the
         // shift operators themselves.
         if crate::in_test_code(cx, expr.span) {
+            return;
+        }
+        // `x.div_round(T::power_of_2(k), rm)` and the assign form: `shr_round` and
+        // `shr_round_assign` take the same rounding mode, so the rewrite is direct. Only `Natural`
+        // and `Integer` have `shr_round`.
+        if let ExprKind::MethodCall(seg, _, [divisor, rm], _) = expr.kind {
+            let method = seg.ident.name.as_str();
+            let advice = match method {
+                "div_round" => "shr_round",
+                "div_round_assign" => "shr_round_assign",
+                _ => return,
+            };
+            let Some(name) = crate::power_of_2_call(cx, divisor) else {
+                return;
+            };
+            if name != "Natural" && name != "Integer" {
+                return;
+            }
+            let ExprKind::Call(_, [k]) = divisor.peel_borrows().kind else {
+                return;
+            };
+            // An unsuffixed count literal in `power_of_2` is a `u64` by its signature; as a shift
+            // count it follows the `u32` literal convention (`bignum_literal_suffix`).
+            let k = match k.kind {
+                ExprKind::Lit(lit)
+                    if matches!(lit.node, LitKind::Int(_, LitIntType::Unsuffixed)) =>
+                {
+                    format!("{}u32", snippet(cx, k.span, ".."))
+                }
+                _ => snippet(cx, k.span, "..").to_string(),
+            };
+            let rm = snippet(cx, rm.span, "..");
+            span_lint(
+                cx,
+                MUL_DIV_BY_POWER_OF_2,
+                expr.span,
+                format!(
+                    "use `{advice}({k}, {rm})` instead of `{method}({name}::power_of_2({k}), {rm})`"
+                ),
+            );
             return;
         }
         // `mul` is true for `*` and `*=`, false for `/` and `/=`; `assign` distinguishes the

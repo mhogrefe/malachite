@@ -318,7 +318,7 @@ impl Float {
                 let full = sig_x.significant_bits() + sig_y.significant_bits();
                 let mut term_prec = px + py;
                 if s.significant_bits() < full {
-                    s <<= 1;
+                    s <<= 1u32;
                     exp -= 1;
                     term_prec -= 1;
                 }

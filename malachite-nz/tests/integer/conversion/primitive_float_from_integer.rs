@@ -1148,7 +1148,7 @@ where
         assert_eq!(o_alt, o.reverse());
 
         assert_eq!(f.partial_cmp(&n), Some(o));
-        match (n >= 0, rm) {
+        match (n >= 0u32, rm) {
             (_, Floor) | (true, Down) | (false, Up) => {
                 assert_ne!(o, Greater);
             }
@@ -1191,7 +1191,7 @@ where
         let f_above = (NiceFloat(f_above.0), f_above.1);
         let (f, o) = T::rounding_from(&n, Ceiling);
         assert_eq!(f_above, (NiceFloat(f), o));
-        if n >= 0 {
+        if n >= 0u32 {
             let (f_alt, o_alt) = T::rounding_from(&n, Down);
             assert_eq!((NiceFloat(f_alt), o_alt), f_below);
             let (f_alt, o_alt) = T::rounding_from(&n, Up);

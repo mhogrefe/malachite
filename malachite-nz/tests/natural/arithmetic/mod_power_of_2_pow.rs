@@ -284,7 +284,7 @@ fn mod_power_of_2_pow_properties() {
     natural_unsigned_pair_gen().test_properties(|(exp, pow)| {
         assert_eq!(
             Natural::ZERO.mod_power_of_2_pow(&exp, pow),
-            Natural::from(exp == 0 && pow != 0),
+            Natural::from(exp == 0u32 && pow != 0),
         );
         if pow != 0 {
             assert_eq!(Natural::ONE.mod_power_of_2_pow(exp, pow), 1);

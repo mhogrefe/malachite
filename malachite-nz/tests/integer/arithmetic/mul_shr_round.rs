@@ -94,12 +94,12 @@ fn mul_shr_round_properties() {
             assert_eq!((&x).mul_shr_round(&(-&y), bits, -rm), (-&r, o.reverse()));
 
             // sign sanity
-            if x == 0 || y == 0 {
+            if x == 0u32 || y == 0u32 {
                 assert_eq!((r, o), (Integer::ZERO, Equal));
             } else {
-                let negative = (x < 0) != (y < 0);
-                if r != 0 {
-                    assert_eq!(r < 0, negative);
+                let negative = (x < 0u32) != (y < 0u32);
+                if r != 0u32 {
+                    assert_eq!(r < 0u32, negative);
                 }
             }
         },

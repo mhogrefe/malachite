@@ -1890,7 +1890,7 @@ fn power_of_10_x_minus_1_round_properties_helper(x: Float, rm: RoundingMode) {
 
     if x.is_finite() {
         // 10^x > 0, so 10^x - 1 > -1; rounding down can reach but not pass -1.
-        assert!(power_of_10_x_minus_1 >= Float::NEGATIVE_ONE);
+        assert!(power_of_10_x_minus_1 >= -1i32);
     }
 
     if power_of_10_x_minus_1.is_normal() {
@@ -2000,7 +2000,7 @@ fn power_of_10_x_minus_1_properties_helper(x: Float) {
 
     if x.is_finite() {
         // 10^x > 0, so 10^x - 1 > -1; rounding down can reach but not pass -1.
-        assert!(power_of_10_x_minus_1 >= Float::NEGATIVE_ONE);
+        assert!(power_of_10_x_minus_1 >= -1i32);
     }
 
     let rug_power_of_10_x_minus_1 = rug_power_of_10_x_minus_1(&rug::Float::exact_from(&x));

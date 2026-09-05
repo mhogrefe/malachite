@@ -76,7 +76,7 @@ fn square_properties() {
         };
         assert_eq!((&square).checked_sqrt(), Some(principal.clone()));
         let roots = square.checked_sqrts();
-        if x == GaussianInteger::ZERO {
+        if x == 0u32 {
             assert_eq!(roots, vec![GaussianInteger::ZERO]);
         } else {
             let mut expected = vec![-&principal, principal];

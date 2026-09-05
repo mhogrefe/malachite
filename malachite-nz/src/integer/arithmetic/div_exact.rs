@@ -154,7 +154,7 @@ impl DivExact<Integer> for &Integer {
     fn div_exact(self, other: Integer) -> Integer {
         let q_abs = (&self.abs).div_exact(other.abs);
         Integer {
-            sign: self.sign == other.sign || q_abs == 0,
+            sign: self.sign == other.sign || q_abs == 0u32,
             abs: q_abs,
         }
     }
@@ -201,7 +201,7 @@ impl DivExact<&Integer> for &Integer {
     fn div_exact(self, other: &Integer) -> Integer {
         let q_abs = (&self.abs).div_exact(&other.abs);
         Integer {
-            sign: self.sign == other.sign || q_abs == 0,
+            sign: self.sign == other.sign || q_abs == 0u32,
             abs: q_abs,
         }
     }
@@ -249,7 +249,7 @@ impl DivExactAssign<Self> for Integer {
     /// ```
     fn div_exact_assign(&mut self, other: Self) {
         self.abs.div_exact_assign(other.abs);
-        self.sign = self.sign == other.sign || self.abs == 0;
+        self.sign = self.sign == other.sign || self.abs == 0u32;
     }
 }
 
@@ -295,6 +295,6 @@ impl DivExactAssign<&Self> for Integer {
     /// ```
     fn div_exact_assign(&mut self, other: &Self) {
         self.abs.div_exact_assign(&other.abs);
-        self.sign = self.sign == other.sign || self.abs == 0;
+        self.sign = self.sign == other.sign || self.abs == 0u32;
     }
 }

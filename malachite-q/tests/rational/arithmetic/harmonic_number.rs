@@ -6,7 +6,6 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::basic::traits::One;
 use malachite_base::test_util::generators::unsigned_gen_var_5;
 use malachite_q::Rational;
 use malachite_q::test_util::rational::arithmetic::harmonic_number::harmonic_number_naive;
@@ -92,7 +91,7 @@ fn harmonic_number_properties() {
                 &h - Rational::harmonic_number(n - 1),
                 Rational::from_unsigneds(1u64, n)
             );
-            assert!(h >= Rational::ONE);
+            assert!(h >= 1u32);
         }
     });
 }

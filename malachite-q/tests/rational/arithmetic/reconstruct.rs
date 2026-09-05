@@ -294,7 +294,7 @@ fn test_reconstruct_split_tier() {
     //
     // A tiny numerator and denominator make the continued fraction of a/m a handful of terms around
     // one astronomical quotient, which the half-gcd hands to a single division.
-    let m = (Natural::ONE << 66000u64) - Natural::from(63u32);
+    let m = (Natural::ONE << 66000u32) - Natural::from(63u32);
     let a = (Natural::from(22u32) * Natural::from(7u32).mod_inverse(&m).unwrap()) % &m;
     assert_eq!(
         Rational::reconstruct_ref(&a, &m).unwrap(),
@@ -311,7 +311,7 @@ fn test_reconstruct_split_tier() {
     );
     // A residue just below m, with the difference under one limb, makes the truncated tops of the
     // first splitter iteration equal, so it falls to a plain division.
-    let a = &m - ((Natural::ONE << 60u64) + Natural::from(3u32));
+    let a = &m - ((Natural::ONE << 60u32) + Natural::from(3u32));
     let bound = Natural::from(999983u32);
     assert_eq!(
         Rational::reconstruct_with_bounds_ref(&a, &m, &bound, &bound),
@@ -326,13 +326,13 @@ fn test_reconstruct_split_tier() {
         Rational::reconstruct_with_bounds_ref(
             &a,
             &m,
-            &(Natural::ONE << 33090u64),
-            &(Natural::ONE << 32908u64),
+            &(Natural::ONE << 33090u32),
+            &(Natural::ONE << 32908u32),
         )
         .unwrap(),
         Rational::from_naturals(n, d)
     );
-    let m = (Natural::ONE << 33100u64) - Natural::from(121u32);
+    let m = (Natural::ONE << 33100u32) - Natural::from(121u32);
     let a = (Natural::from(12345u32) * Natural::from(617u32).mod_inverse(&m).unwrap()) % &m;
     let bound = Natural::from(999983u32);
     assert_eq!(
@@ -342,7 +342,7 @@ fn test_reconstruct_split_tier() {
 }
 
 fn balanced_bound(m: &Natural) -> Natural {
-    let mut b = m >> 1u64;
+    let mut b = m >> 1u32;
     if m.even() {
         b -= Natural::ONE;
     }
@@ -401,7 +401,7 @@ fn reconstruct_properties() {
         );
         if let Some(x) = ox {
             check_solution(&x, &a, &m, &n_bound, &d_bound);
-        } else if m <= 1_000u32 && (&n_bound * &d_bound) << 1u64 < m {
+        } else if m <= 1_000u32 && (&n_bound * &d_bound) << 1u32 < m {
             assert_no_solution(
                 u64::exact_from(&a),
                 u64::exact_from(&m),
@@ -416,7 +416,7 @@ fn reconstruct_properties() {
         let n = x.to_numerator();
         let d = x.to_denominator();
         let k = x.to_height();
-        let mut m = ((&k * &k) << 1u64) + Natural::ONE;
+        let mut m = ((&k * &k) << 1u32) + Natural::ONE;
         while (&d).gcd(&m) != 1u32 {
             m += Natural::ONE;
         }

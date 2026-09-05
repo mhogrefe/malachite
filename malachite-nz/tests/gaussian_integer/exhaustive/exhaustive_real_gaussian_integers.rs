@@ -24,6 +24,6 @@ fn test_exhaustive_real_gaussian_integers() {
     assert!(
         exhaustive_real_gaussian_integers()
             .take(100)
-            .all(|x| x.imaginary == 0)
+            .all(|x| x.imaginary == 0u32)
     );
 }

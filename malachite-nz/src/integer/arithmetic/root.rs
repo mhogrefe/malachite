@@ -80,7 +80,7 @@ impl FloorRoot<u64> for &Integer {
     /// ```
     #[inline]
     fn floor_root(self, exp: u64) -> Integer {
-        if *self >= 0 {
+        if *self >= 0u32 {
             Integer::from(self.unsigned_abs_ref().floor_root(exp))
         } else if exp.odd() {
             -self.unsigned_abs_ref().ceiling_root(exp)
@@ -132,7 +132,7 @@ impl FloorRootAssign<u64> for Integer {
     /// ```
     #[inline]
     fn floor_root_assign(&mut self, exp: u64) {
-        if *self >= 0 {
+        if *self >= 0u32 {
             self.mutate_unsigned_abs(|n| n.floor_root_assign(exp));
         } else if exp.odd() {
             self.mutate_unsigned_abs(|n| n.ceiling_root_assign(exp));
@@ -208,7 +208,7 @@ impl CeilingRoot<u64> for &Integer {
     /// ```
     #[inline]
     fn ceiling_root(self, exp: u64) -> Integer {
-        if *self >= 0 {
+        if *self >= 0u32 {
             Integer::from(self.unsigned_abs_ref().ceiling_root(exp))
         } else if exp.odd() {
             -self.unsigned_abs_ref().floor_root(exp)
@@ -260,7 +260,7 @@ impl CeilingRootAssign<u64> for Integer {
     /// ```
     #[inline]
     fn ceiling_root_assign(&mut self, exp: u64) {
-        if *self >= 0 {
+        if *self >= 0u32 {
             self.mutate_unsigned_abs(|n| n.ceiling_root_assign(exp));
         } else if exp.odd() {
             self.mutate_unsigned_abs(|n| n.floor_root_assign(exp));
@@ -335,7 +335,7 @@ impl CheckedRoot<u64> for Integer {
     /// ```
     #[inline]
     fn checked_root(self, exp: u64) -> Option<Self> {
-        if self >= 0 {
+        if self >= 0u32 {
             self.unsigned_abs().checked_root(exp).map(Self::from)
         } else if exp.odd() {
             self.unsigned_abs().checked_root(exp).map(Natural::neg)
@@ -413,7 +413,7 @@ impl CheckedRoot<u64> for &Integer {
     /// ```
     #[inline]
     fn checked_root(self, exp: u64) -> Option<Integer> {
-        if *self >= 0 {
+        if *self >= 0u32 {
             self.unsigned_abs_ref().checked_root(exp).map(Integer::from)
         } else if exp.odd() {
             self.unsigned_abs_ref().checked_root(exp).map(Natural::neg)
@@ -487,7 +487,7 @@ impl RootRem<u64> for Integer {
     /// );
     /// ```
     fn root_rem(self, exp: u64) -> (Self, Self) {
-        if self >= 0 {
+        if self >= 0u32 {
             let (root, rem) = self.unsigned_abs().root_rem(exp);
             (Self::from(root), Self::from(rem))
         } else if exp.odd() {
@@ -549,7 +549,7 @@ impl RootRem<u64> for &Integer {
     /// );
     /// ```
     fn root_rem(self, exp: u64) -> (Integer, Integer) {
-        if *self >= 0 {
+        if *self >= 0u32 {
             let (root, rem) = self.unsigned_abs_ref().root_rem(exp);
             (Integer::from(root), Integer::from(rem))
         } else if exp.odd() {

@@ -41,7 +41,7 @@ fn approximate_helper(q: &Rational, max_denominator: &Natural) -> Rational {
             // We need a term m such that previous_denominator + denominator * m is as large as
             // possible without exceeding max_denominator.
             let m = (max_denominator - &previous_denominator) / &denominator;
-            let half_n = (&n).shr_round(1, Ceiling).0;
+            let half_n = (&n).shr_round(1u32, Ceiling).0;
             if m < half_n {
             } else if m == half_n && n.even() {
                 let previous_convergent = Rational {
@@ -85,7 +85,7 @@ fn approximate_helper(q: &Rational, max_denominator: &Natural) -> Rational {
     // limit and are equidistant from 1/4, but we prefer 0 because it has the smaller denominator.
     // Unfortunately, the code above makes the wrong choice, so we need the following code to check
     // whether the approximation on the opposite side of `self` is better.
-    let opposite: Rational = (q << 1) - &result;
+    let opposite: Rational = (q << 1u32) - &result;
     if result.denominator_ref() <= opposite.denominator_ref() {
         result
     } else {

@@ -101,7 +101,7 @@ fn to_string_properties() {
         assert_eq!(BigUint::from(&x).to_string(), s);
         assert_eq!(rug::Integer::from(&x).to_string(), s);
         assert!(string_is_subset(&s, "0123456789"));
-        if x != 0 {
+        if x != 0u32 {
             assert!(!s.starts_with('0'));
         }
     });
@@ -227,7 +227,7 @@ fn to_binary_string_properties() {
         assert_eq!(rug_x.to_binary_string(), s);
         assert_eq!(format!("{rug_x:#b}"), prefixed_s);
         assert!(string_is_subset(&s, "01"));
-        if x != 0 {
+        if x != 0u32 {
             assert!(!s.starts_with('0'));
         }
     });
@@ -377,7 +377,7 @@ fn to_octal_string_properties() {
         assert_eq!(rug_x.to_octal_string(), s);
         assert_eq!(format!("{rug_x:#o}"), prefixed_s);
         assert!(string_is_subset(&s, "01234567"));
-        if x != 0 {
+        if x != 0u32 {
             assert!(!s.starts_with('0'));
         }
     });
@@ -560,7 +560,7 @@ fn to_hex_string_properties() {
         assert_eq!(rug_x.to_lower_hex_string(), s);
         assert_eq!(format!("{rug_x:#x}"), prefixed_s);
         assert!(string_is_subset(&s, "0123456789abcdef"));
-        if x != 0 {
+        if x != 0u32 {
             assert!(!s.starts_with('0'));
         }
     });
@@ -764,7 +764,7 @@ fn to_string_base_properties() {
         assert_eq!(x.to_string_base_upper(base), s.to_uppercase());
         assert_eq!(Natural::from_string_base(base, &s).unwrap(), x);
         assert!(string_is_subset(&s, "0123456789abcdefghijklmnopqrstuvwxyz"));
-        if x != 0 {
+        if x != 0u32 {
             assert!(!s.starts_with('0'));
         }
     });
@@ -944,7 +944,7 @@ fn to_string_base_upper_properties() {
         assert_eq!(x.to_string_base(base), s.to_lowercase());
         assert_eq!(Natural::from_string_base(base, &s).unwrap(), x);
         assert!(string_is_subset(&s, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"));
-        if x != 0 {
+        if x != 0u32 {
             assert!(!s.starts_with('0'));
         }
     });

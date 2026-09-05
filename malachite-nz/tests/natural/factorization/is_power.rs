@@ -101,7 +101,7 @@ fn test_is_power_edge_cases() {
     // Test some specific edge cases
 
     // Powers of 2 that are perfect powers
-    let power_of_2_power: Natural = Natural::from(1u64) << 0x1000;
+    let power_of_2_power: Natural = Natural::from(1u64) << 0x1000u32;
     assert!(power_of_2_power.is_power());
 
     let power_of_2_non_power = power_of_2_power + Natural::from(1u64);

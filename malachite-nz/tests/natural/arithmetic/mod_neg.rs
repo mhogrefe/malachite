@@ -125,7 +125,7 @@ fn mod_neg_properties() {
         assert_eq!(neg, (-&n).mod_op(Integer::from(&m)));
         assert_eq!((&neg).mod_neg(&m), n);
         assert_eq!((&n).mod_add(&neg, &m), 0);
-        assert_eq!(n == neg, n == Natural::ZERO || n << 1 == m);
+        assert_eq!(n == neg, n == 0u32 || n << 1u32 == m);
     });
 
     unsigned_pair_gen_var_16::<Limb>().test_properties(|(n, m)| {

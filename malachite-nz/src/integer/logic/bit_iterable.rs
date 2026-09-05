@@ -281,7 +281,7 @@ impl<'a> BitIterable for &'a Integer {
     /// );
     /// ```
     fn bits(self) -> IntegerBitIterator<'a> {
-        if *self == 0 {
+        if *self == 0u32 {
             IntegerBitIterator::Zero
         } else if self.sign {
             IntegerBitIterator::Positive(self.abs.bits(), false)

@@ -55,13 +55,13 @@ fn mul_rational_prec_round_assign_naive(
             Equal
         }
         (Float(Zero { sign }), y) => {
-            if y < 0 {
+            if y < 0u32 {
                 sign.not_assign();
             };
             Equal
         }
         (x, y) => {
-            let not_sign = *x < 0;
+            let not_sign = *x < 0u32;
             let mut z = Float::ZERO;
             swap(x, &mut z);
             let (mut product, o) =
@@ -95,13 +95,13 @@ fn mul_rational_prec_round_assign_naive_ref(
             Equal
         }
         (Float(Zero { sign }), y) => {
-            if *y < 0 {
+            if *y < 0u32 {
                 sign.not_assign();
             };
             Equal
         }
         (x, y) => {
-            let not_sign = *x < 0;
+            let not_sign = *x < 0u32;
             let mut z = Float::ZERO;
             swap(x, &mut z);
             let (mut product, o) =
@@ -163,7 +163,7 @@ private_test_fn! {mul_rational_prec_round_naive_ref_val(
         (x, y) => {
             let (mut product, o) =
                 Float::from_rational_prec_round(Rational::exact_from(x) * y, prec, rm);
-            if product == 0u32 && *x < 0 {
+            if product == 0u32 && *x < 0u32 {
                 product.neg_assign();
             }
             (product, o)
@@ -199,7 +199,7 @@ private_test_fn! {mul_rational_prec_round_naive_ref_ref(
         (x, y) => {
             let (mut product, o) =
                 Float::from_rational_prec_round(Rational::exact_from(x) * y, prec, rm);
-            if product == 0u32 && *x < 0 {
+            if product == 0u32 && *x < 0u32 {
                 product.neg_assign();
             }
             (product, o)
@@ -222,7 +222,7 @@ fn mul_rational_prec_round_assign_direct(
         };
         return Equal;
     }
-    let sign = y >= 0;
+    let sign = y >= 0u32;
     let (n, d) = y.into_numerator_and_denominator();
     if !sign {
         rm.neg_assign();
@@ -296,7 +296,7 @@ fn mul_rational_prec_round_assign_direct_ref(
         };
         return Equal;
     }
-    let sign = *y >= 0;
+    let sign = *y >= 0u32;
     let (n, d) = y.numerator_and_denominator_ref();
     if !sign {
         rm.neg_assign();
@@ -392,7 +392,7 @@ private_test_fn! {mul_rational_prec_round_direct_ref_val(
             Equal,
         );
     }
-    let sign = y >= 0;
+    let sign = y >= 0u32;
     let (n, d) = y.into_numerator_and_denominator();
     if !sign {
         rm.neg_assign();
@@ -470,7 +470,7 @@ private_test_fn! {mul_rational_prec_round_direct_ref_ref(
             Equal,
         );
     }
-    let sign = *y >= 0;
+    let sign = *y >= 0u32;
     let (n, d) = y.numerator_and_denominator_ref();
     if !sign {
         rm.neg_assign();

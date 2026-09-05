@@ -184,7 +184,7 @@ fn balanced_crt_properties() {
         if let Some(x) = result {
             let m = &m1 * &m2;
             // The representative is the one of smallest absolute value, positive on ties.
-            let doubled = x.unsigned_abs_ref() << 1u64;
+            let doubled = x.unsigned_abs_ref() << 1u32;
             if x >= 0u32 {
                 assert!(doubled <= m);
             } else {

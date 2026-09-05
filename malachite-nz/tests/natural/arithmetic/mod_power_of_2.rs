@@ -313,7 +313,7 @@ fn mod_power_of_2_and_rem_power_of_2_properties() {
         assert!(result <= n);
         assert_eq!((&n >> u << u) + &result, n);
         assert!(result < Natural::power_of_2(u));
-        assert_eq!(result == 0, n.divisible_by_power_of_2(u));
+        assert_eq!(result == 0u32, n.divisible_by_power_of_2(u));
         assert_eq!((&result).mod_power_of_2(u), result);
         assert_eq!(n & Natural::low_mask(u), result);
     });
@@ -381,7 +381,7 @@ fn neg_mod_power_of_2_properties() {
 
         assert_eq!(((&n).shr_round(u, Ceiling).0 << u) - &result, n);
         assert!(result < Natural::power_of_2(u));
-        assert_eq!(result == 0, n.divisible_by_power_of_2(u));
+        assert_eq!(result == 0u32, n.divisible_by_power_of_2(u));
         assert_eq!((&result).neg_mod_power_of_2(u), (&n).mod_power_of_2(u));
         assert_eq!((-n).mod_power_of_2(u), result);
     });

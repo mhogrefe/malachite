@@ -38,7 +38,7 @@ fn test_is_unit() {
 fn is_unit_properties() {
     gaussian_rational_gen().test_properties(|x| {
         let is_unit = x.is_unit();
-        assert_eq!(x.is_unit(), x != GaussianRational::ZERO);
+        assert_eq!(x.is_unit(), x != 0u32);
         assert_eq!((-&x).is_unit(), is_unit);
         assert_eq!((&x).conjugate().is_unit(), is_unit);
         assert_eq!((&x).mul_i().is_unit(), is_unit);

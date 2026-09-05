@@ -15,6 +15,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeZero, One, Zero,
 };
+use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::{LowMask, SignificantBits};
@@ -242,7 +243,7 @@ fn rem_prec_round_properties_helper(
             assert_eq!(ComparableFloatRef(&rem), ComparableFloatRef(&expected));
         } else {
             assert_eq!((r_exact > 0u32), (x > 0u32));
-            assert!((&r_exact).abs() < ry.abs());
+            assert!(r_exact.lt_abs(&ry));
             let (rem_alt, o_alt) = Float::from_rational_prec_round(r_exact.clone(), prec, rm);
             assert_eq!(ComparableFloatRef(&rem_alt), ComparableFloatRef(&rem));
             assert_eq!(o_alt, o);
@@ -392,7 +393,7 @@ fn ieee_remainder_prec_round_properties_helper(
         let (q, _) = Integer::rounding_from(&rx / &ry, Nearest);
         let r_exact = rx - Rational::from(q) * &ry;
         // remainder: |r| <= |y|/2, and r = 0 takes the sign of x
-        assert!((&r_exact).abs() << 1u64 <= ry.abs());
+        assert!((&r_exact).abs() << 1u32 <= ry.abs());
         if r_exact == 0u32 {
             assert_eq!(o, Equal);
             let expected = if x > 0u32 {
@@ -633,7 +634,7 @@ fn ieee_remainder_round_properties() {
 #[allow(clippy::needless_pass_by_value)]
 fn expected_quotient_bits(q: &Integer) -> i64 {
     let low = i64::exact_from(&q.unsigned_abs_ref().mod_power_of_2(63));
-    if *q >= 0 { low } else { -low }
+    if *q >= 0u32 { low } else { -low }
 }
 
 #[allow(clippy::needless_pass_by_value)]
@@ -876,7 +877,7 @@ fn test_rem_special_values() {
 // and the nearest quotient is 2^63 (bits all zeros).
 #[test]
 fn test_quotient_bits_wrap_corner() {
-    let x = Float::from_natural_prec(Natural::low_mask(64), 64).0 >> 1u64;
+    let x = Float::from_natural_prec(Natural::low_mask(64), 64).0 >> 1u32;
     let y = Float::ONE;
     let (r, o, quo) = x.rem_and_quotient_bits_prec_round_ref_ref(&y, 10, Nearest);
     assert_eq!(quo, i64::MAX);
@@ -1905,8 +1906,8 @@ fn test_rationals() -> Vec<Rational> {
         Rational::from_signeds(3, 8),
         Rational::from_signeds(-3, 8),
         Rational::from_signeds(355, 113),
-        Rational::from_signeds(1, 3) >> 50i64,
-        Rational::from_signeds(1, 3) << 100i64,
+        Rational::from_signeds(1, 3) >> 50u32,
+        Rational::from_signeds(1, 3) << 100u32,
     ];
     ys.extend(ys.clone().into_iter().map(|q| -q));
     ys.sort_unstable();
@@ -2048,7 +2049,7 @@ fn test_rem_rational_dyadic_consistency() {
             Rational::from_signeds(3, 8),
             Rational::from_signeds(-3, 8),
             Rational::from_signeds(7, 1),
-            Rational::from_signeds(1, 4) << 60i64,
+            Rational::from_signeds(1, 4) << 60u32,
         ] {
             let yf = Float::from_rational_prec_round_ref(&y, 3, Floor).0;
             assert_eq!(Rational::exact_from(&yf), y);

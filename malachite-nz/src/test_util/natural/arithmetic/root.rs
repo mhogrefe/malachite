@@ -9,18 +9,18 @@
 use crate::natural::Natural;
 use crate::test_util::natural::arithmetic::sqrt::floor_inverse_binary;
 use malachite_base::num::arithmetic::traits::{DivRound, Pow, PowerOf2};
-use malachite_base::num::basic::traits::{One, Two};
+use malachite_base::num::basic::traits::One;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::*;
 
 pub fn floor_root_binary(x: &Natural, exp: u64) -> Natural {
     if exp == 0 {
         panic!("Cannot take 0th root");
-    } else if exp == 1 || x < &Natural::TWO {
+    } else if exp == 1 || *x < 2u32 {
         x.clone()
     } else {
         let p = Natural::power_of_2(x.significant_bits().div_round(exp, Ceiling).0);
-        floor_inverse_binary(|x| x.pow(exp), x, &p >> 1, p)
+        floor_inverse_binary(|x| x.pow(exp), x, &p >> 1u32, p)
     }
 }
 

@@ -17,7 +17,7 @@ use std::cmp::Ordering::*;
 
 pub fn floor_log_base_naive(x: &Natural, base: &Natural) -> u64 {
     assert_ne!(*x, 0);
-    assert!(*base > 1);
+    assert!(*base > 1u32);
     let mut result = 0;
     let mut p = Natural::ONE;
     // loop always executes at least once
@@ -30,7 +30,7 @@ pub fn floor_log_base_naive(x: &Natural, base: &Natural) -> u64 {
 
 pub fn ceiling_log_base_naive(x: &Natural, base: &Natural) -> u64 {
     assert_ne!(*x, 0);
-    assert!(*base > 1);
+    assert!(*base > 1u32);
     let mut result = 0;
     let mut p = Natural::ONE;
     while p < *x {
@@ -42,7 +42,7 @@ pub fn ceiling_log_base_naive(x: &Natural, base: &Natural) -> u64 {
 
 pub fn checked_log_base_naive(x: &Natural, base: &Natural) -> Option<u64> {
     assert_ne!(*x, 0);
-    assert!(*base > 1);
+    assert!(*base > 1u32);
     let mut result = 0;
     let mut p = Natural::ONE;
     while p < *x {
@@ -54,8 +54,8 @@ pub fn checked_log_base_naive(x: &Natural, base: &Natural) -> Option<u64> {
 
 fn log_by_squaring_helper(x: &Natural, base: &Natural) -> (u64, bool) {
     assert_ne!(*x, 0);
-    assert!(*base > 1);
-    if *x == 1 {
+    assert!(*base > 1u32);
+    if *x == 1u32 {
         return (0, true);
     } else if x < base {
         return (0, false);

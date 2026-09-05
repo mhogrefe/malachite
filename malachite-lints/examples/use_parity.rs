@@ -8,7 +8,7 @@ fn main() {
     let i = const { Integer::const_from_signed(-101) };
     // Parity of a bignum via `% 2` compared with 0 or 1: flagged.
     let _ = &x % Natural::TWO == 0u32;
-    let _ = &i % Integer::TWO != 0i32;
+    let _ = &i % Integer::TWO != 0u32;
     // `divisible_by(2)`: flagged.
     let _ = (&x).divisible_by(Natural::TWO);
     // Primitives via `% 2`: flagged.

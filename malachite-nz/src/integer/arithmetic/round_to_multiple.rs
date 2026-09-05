@@ -765,7 +765,7 @@ impl RoundToMultipleAssign<Self> for Integer {
             self.abs.round_to_multiple_assign(other.abs, rm)
         } else {
             let o = self.abs.round_to_multiple_assign(other.abs, -rm);
-            self.sign = self.abs == 0;
+            self.sign = self.abs == 0u32;
             o.reverse()
         }
     }
@@ -890,7 +890,7 @@ impl RoundToMultipleAssign<&Self> for Integer {
             self.abs.round_to_multiple_assign(&other.abs, rm)
         } else {
             let o = self.abs.round_to_multiple_assign(&other.abs, -rm);
-            self.sign = self.abs == 0;
+            self.sign = self.abs == 0u32;
             o.reverse()
         }
     }

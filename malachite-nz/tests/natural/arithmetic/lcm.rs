@@ -120,13 +120,13 @@ fn lcm_properties() {
         assert!((&lcm).divisible_by(&x));
         assert!((&lcm).divisible_by(&y));
         let gcd = (&x).gcd(&y);
-        if x != 0 {
+        if x != 0u32 {
             assert_eq!((&lcm).div_exact(&x) * &gcd, y);
         }
-        if y != 0 {
+        if y != 0u32 {
             assert_eq!((&lcm).div_exact(&y) * &gcd, x);
         }
-        if gcd != 0 {
+        if gcd != 0u32 {
             assert_eq!(x.div_exact(gcd) * y, lcm);
         }
     });

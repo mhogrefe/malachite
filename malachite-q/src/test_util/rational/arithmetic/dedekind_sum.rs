@@ -28,11 +28,11 @@ pub fn dedekind_sum_naive(h: &Integer, k: &Integer) -> Rational {
         let j = h * &i;
         let r2 = j.mod_op(k);
         if r2 != 0u32 {
-            let a = (((&i).mod_op(k)) << 1u64) - k;
-            let b = (r2 << 1u64) - k;
+            let a = (((&i).mod_op(k)) << 1u32) - k;
+            let b = (r2 << 1u32) - k;
             num += a * b;
         }
         i += Integer::ONE;
     }
-    Rational::from_integers(num, k.square() << 2u64)
+    Rational::from_integers(num, k.square() << 2u32)
 }

@@ -99,7 +99,7 @@ fn test_subnormalize_vs_rug() {
 #[test]
 fn subnormalize_fail() {
     // - a value strictly inside the subnormal range that needs rounding is not exact
-    let x = Float::from_natural_prec(Natural::from(0b101u32), 3).0 >> 25u64;
+    let x = Float::from_natural_prec(Natural::from(0b101u32), 3).0 >> 25u32;
     assert!(std::panic::catch_unwind(|| x.subnormalize_ref(Equal, -20, Exact)).is_err());
 }
 

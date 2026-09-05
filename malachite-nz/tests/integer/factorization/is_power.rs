@@ -73,15 +73,15 @@ fn is_power_properties() {
             assert!(exp > 1);
             assert_eq!((&root).pow(exp), n);
             // a negative perfect power has an odd exponent and a negative root
-            if n < 0 {
+            if n < 0u32 {
                 assert!(exp.odd());
-                assert!(root < 0);
+                assert!(root < 0u32);
             }
         }
         // GMP agrees, negative operands included
         assert_eq!(rug::Integer::from(&n).is_perfect_power(), is_power);
         // a value and its negation agree exactly when the value is an odd power or zero
-        if n != 0 && (-&n).is_power() {
+        if n != 0u32 && (-&n).is_power() {
             assert!(n.unsigned_abs_ref().is_power());
         }
     });

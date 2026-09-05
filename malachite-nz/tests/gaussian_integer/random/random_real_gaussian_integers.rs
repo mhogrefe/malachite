@@ -106,7 +106,7 @@ fn random_real_gaussian_integers_axis() {
     assert!(
         random_real_gaussian_integers(EXAMPLE_SEED, 32, 1)
             .take(100)
-            .all(|x| x.imaginary == 0)
+            .all(|x| x.imaginary == 0u32)
     );
 }
 

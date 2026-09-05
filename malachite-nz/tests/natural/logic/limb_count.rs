@@ -35,7 +35,7 @@ fn limb_count_properties() {
     natural_gen().test_properties(|x| {
         let n = x.limb_count();
         assert_eq!(x <= Limb::MAX, n <= 1);
-        if x != 0 {
+        if x != 0u32 {
             assert!(Natural::power_of_2((n - 1) << Limb::LOG_WIDTH) <= x);
             assert!(x < Natural::power_of_2(n << Limb::LOG_WIDTH));
         }

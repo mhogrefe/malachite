@@ -79,17 +79,17 @@ impl Float {
             let mut a = Self::one_prec(working_prec);
             let mut big_a = a.clone();
             let mut big_b = Self::one_half_prec(working_prec);
-            let mut big_d = Self::one_prec(working_prec) >> 2;
+            let mut big_d = Self::one_prec(working_prec) >> 2u32;
             let mut k = 0;
             loop {
-                let s = (&big_a + &big_b) >> 2;
-                a = (a + big_b.sqrt()) >> 1;
+                let s = (&big_a + &big_b) >> 2u32;
+                a = (a + big_b.sqrt()) >> 1u32;
                 big_a = (&a).square();
-                big_b = (&big_a - s) << 1;
+                big_b = (&big_a - s) << 1u32;
                 let mut s = &big_a - &big_b;
                 assert!(s < 1u32);
                 let ip = i64::exact_from(working_prec);
-                let cancel = if s == 0 {
+                let cancel = if s == 0u32 {
                     ip
                 } else {
                     i64::from(-s.get_exponent().unwrap())

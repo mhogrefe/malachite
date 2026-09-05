@@ -706,7 +706,7 @@ fn limbs_limb_mod_exact_odd_limb_properties() {
     config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
     unsigned_triple_gen_var_21().test_properties_with_config(&config, |(n, d, carry)| {
         let r = Natural::from(limbs_limb_mod_exact_odd_limb(n, d, carry));
-        assert_eq!(n.eq_mod(carry, d), r == 0);
+        assert_eq!(n.eq_mod(carry, d), r == 0u32);
         assert!(r <= d);
         if carry < d {
             assert!(r < d);
@@ -735,7 +735,7 @@ fn limbs_mod_exact_odd_limb_properties() {
             let a = Natural::from_owned_limbs_asc(ns);
             let d = Natural::from(d);
             let carry = Natural::from(carry);
-            assert_eq!((&a).eq_mod(&carry, &d), r == 0 || r == d);
+            assert_eq!((&a).eq_mod(&carry, &d), r == 0u32 || r == d);
             let p_1 = &r << (ns_len * Limb::WIDTH);
             let p_2 = r << ((ns_len - 1) * Limb::WIDTH);
             assert!((p_1 + &a).eq_mod(&carry, &d) || (p_2 + a).eq_mod(carry, d));

@@ -182,21 +182,23 @@ fn test_from_rational_prec() {
         Equal,
     );
     test_big(
-        Rational::exact_from(f32::MIN_POSITIVE_SUBNORMAL) >> 1,
+        Rational::exact_from(f32::MIN_POSITIVE_SUBNORMAL) >> 1u32,
         10,
         "7.0065e-46",
         "0x4.00E-38#10",
         Equal,
     );
     test_big(
-        (Rational::exact_from(f32::MIN_POSITIVE_SUBNORMAL) >> 1) + Rational::power_of_2(-1000i64),
+        (Rational::exact_from(f32::MIN_POSITIVE_SUBNORMAL) >> 1u32)
+            + Rational::power_of_2(-1000i64),
         10,
         "7.0065e-46",
         "0x4.00E-38#10",
         Less,
     );
     test_big(
-        (Rational::exact_from(f32::MIN_POSITIVE_SUBNORMAL) >> 1) - Rational::power_of_2(-1000i64),
+        (Rational::exact_from(f32::MIN_POSITIVE_SUBNORMAL) >> 1u32)
+            - Rational::power_of_2(-1000i64),
         10,
         "7.0065e-46",
         "0x4.00E-38#10",
@@ -211,21 +213,23 @@ fn test_from_rational_prec() {
         Equal,
     );
     test_big(
-        Rational::exact_from(f64::MIN_POSITIVE_SUBNORMAL) >> 1,
+        Rational::exact_from(f64::MIN_POSITIVE_SUBNORMAL) >> 1u32,
         10,
         "2.4703e-324",
         "0x2.00E-269#10",
         Equal,
     );
     test_big(
-        (Rational::exact_from(f64::MIN_POSITIVE_SUBNORMAL) >> 1) + Rational::power_of_2(-2000i64),
+        (Rational::exact_from(f64::MIN_POSITIVE_SUBNORMAL) >> 1u32)
+            + Rational::power_of_2(-2000i64),
         10,
         "2.4703e-324",
         "0x2.00E-269#10",
         Less,
     );
     test_big(
-        (Rational::exact_from(f64::MIN_POSITIVE_SUBNORMAL) >> 1) - Rational::power_of_2(-2000i64),
+        (Rational::exact_from(f64::MIN_POSITIVE_SUBNORMAL) >> 1u32)
+            - Rational::power_of_2(-2000i64),
         10,
         "2.4703e-324",
         "0x2.00E-269#10",
@@ -4014,7 +4018,7 @@ fn from_rational_prec_properties() {
         if x != 0u32 {
             assert!(
                 (Rational::exact_from(&float_x) - &x)
-                    .le_abs(&(Rational::exact_from(float_x.ulp().unwrap()) >> 1))
+                    .le_abs(&(Rational::exact_from(float_x.ulp().unwrap()) >> 1u32))
             );
         }
     });
@@ -4036,7 +4040,7 @@ fn from_rational_prec_round_properties() {
         );
         assert_eq!(o, o_alt);
         assert_eq!(float_x.partial_cmp(&x), Some(o));
-        match (x >= 0, rm) {
+        match (x >= 0u32, rm) {
             (_, Floor) | (true, Down) | (false, Up) => {
                 assert_ne!(o, Greater);
             }
@@ -4110,7 +4114,7 @@ fn from_rational_prec_round_properties() {
             assert!(r_floor + Rational::exact_from(floor.0.ulp().unwrap()) > x);
         }
         let (floor_x_alt, o_alt) =
-            Float::from_rational_prec_round_ref(&x, prec, if x >= 0 { Down } else { Up });
+            Float::from_rational_prec_round_ref(&x, prec, if x >= 0u32 { Down } else { Up });
         assert_eq!(
             ComparableFloatRef(&floor_x_alt),
             ComparableFloatRef(&floor.0)
@@ -4124,7 +4128,7 @@ fn from_rational_prec_round_properties() {
             assert!(r_ceiling - Rational::exact_from(ceiling.0.ulp().unwrap()) < x);
         }
         let (ceiling_x_alt, o_alt) =
-            Float::from_rational_prec_round_ref(&x, prec, if x >= 0 { Up } else { Down });
+            Float::from_rational_prec_round_ref(&x, prec, if x >= 0u32 { Up } else { Down });
         assert_eq!(
             ComparableFloatRef(&ceiling_x_alt),
             ComparableFloatRef(&ceiling.0)
@@ -4139,7 +4143,9 @@ fn from_rational_prec_round_properties() {
                     && nearest.1 == ceiling.1
         );
         if r_nearest != 0u32 {
-            assert!((r_nearest - x).le_abs(&(Rational::exact_from(nearest.0.ulp().unwrap()) >> 1)));
+            assert!(
+                (r_nearest - x).le_abs(&(Rational::exact_from(nearest.0.ulp().unwrap()) >> 1u32))
+            );
         }
     });
 }

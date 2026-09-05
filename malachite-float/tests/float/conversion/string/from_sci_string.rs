@@ -78,7 +78,7 @@ fn verify_from_sci_string(s: &str, options: FromSciStringOptions, prec: u64) {
     if let Some(p) = x.get_prec() {
         assert_eq!(p, prec);
     } else {
-        assert!(x.is_nan() || x.is_infinite() || x == 0);
+        assert!(x.is_nan() || x.is_infinite() || x == 0u32);
     }
     assert!(ordering_valid_for(o, rm, x.is_sign_positive()));
     // The base-10 entry points are the same function with the default base.

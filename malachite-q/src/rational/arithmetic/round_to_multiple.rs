@@ -398,7 +398,7 @@ impl RoundToMultiple<&Rational> for &Rational {
         }
         if *other == 0u32 {
             if rm == Down || rm == Nearest || rm == if *self >= 0u32 { Floor } else { Ceiling } {
-                return (Rational::ZERO, if *self >= 0 { Less } else { Greater });
+                return (Rational::ZERO, if *self >= 0u32 { Less } else { Greater });
             }
             panic!("Cannot round {self} to zero using RoundingMode {rm}");
         }
@@ -477,7 +477,7 @@ impl RoundToMultipleAssign<Self> for Rational {
         }
         if other == 0u32 {
             if rm == Down || rm == Nearest || rm == if *self >= 0u32 { Floor } else { Ceiling } {
-                let o = if *self >= 0 { Less } else { Greater };
+                let o = if *self >= 0u32 { Less } else { Greater };
                 *self = Self::ZERO;
                 return o;
             }

@@ -59,7 +59,7 @@ impl Float {
     #[inline]
     pub fn tau_prec_round(prec: u64, rm: RoundingMode) -> (Self, Ordering) {
         let (pi, o) = Self::pi_prec_round(prec, rm);
-        (pi << 1u64, o)
+        (pi << 1u32, o)
     }
 
     /// Returns an approximation of $\tau=2\pi$, with the given precision and rounded to the nearest

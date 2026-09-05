@@ -188,7 +188,7 @@ impl Float {
                     *self = Self::INFINITY;
                     return;
                 }
-                *significand >>= 1;
+                *significand >>= 1u32;
                 *exponent += 1;
             }
         } else {

@@ -7,7 +7,6 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{AbsSquared, AbsSquaredAssign, Square};
-use malachite_base::num::basic::traits::Zero;
 use malachite_nz::gaussian_integer::GaussianInteger;
 use malachite_nz::test_util::generators::{gaussian_integer_gen, gaussian_integer_gen_var_1};
 use std::str::FromStr;
@@ -61,7 +60,7 @@ fn abs_squared_properties() {
         };
         assert_eq!(conjugate.abs_squared(), abs_squared);
         assert!(abs_squared >= 0u32);
-        assert_eq!(abs_squared == 0u32, x == GaussianInteger::ZERO);
+        assert_eq!(abs_squared == 0u32, x == 0u32);
     });
 
     gaussian_integer_gen_var_1().test_properties(|x| {

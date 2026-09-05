@@ -474,7 +474,7 @@ fn benchmark_integer_eq_mod_algorithms(
             (
                 "Integer == Integer || Integer != 0 && Integer % Natural == Integer % Natural",
                 &mut |(x, y, m)| {
-                    no_out!(x == y || m != 0 && x.unsigned_abs() % &m == y.unsigned_abs() % m);
+                    no_out!(x == y || m != 0u32 && x.unsigned_abs() % &m == y.unsigned_abs() % m);
                 },
             ),
             (

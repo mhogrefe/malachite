@@ -65,7 +65,7 @@ fn test_abs() {
     assert_eq!(remainder, 1);
 
     let mut n = Integer::from(-123);
-    n.mutate_unsigned_abs(|x| *x >>= 10);
+    n.mutate_unsigned_abs(|x| *x >>= 10u32);
     assert_eq!(n, 0);
 }
 
@@ -88,8 +88,8 @@ fn abs_properties() {
         assert!(abs_alt.is_valid());
         assert_eq!(abs_alt, abs);
 
-        assert!(abs >= 0);
-        assert_eq!(abs == x, x >= 0);
+        assert!(abs >= 0u32);
+        assert_eq!(abs == x, x >= 0u32);
         assert_eq!((&abs).abs(), abs);
 
         let abs_alt = x.clone().unsigned_abs();

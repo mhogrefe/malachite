@@ -1427,7 +1427,7 @@ fn test_root_u_exact_large_k() {
     // 2^102 has no exact 101st root (the exponent is not divisible by 101)
     assert_panic!(Float::power_of_2(102i64).root_u_prec_round_ref(101, 10, Exact));
     // 3 * 2^101 has no exact 101st root (the odd part is not a perfect power)
-    assert_panic!((Float::exact_from(3u32) << 101u64).root_u_prec_round_ref(101, 10, Exact));
+    assert_panic!((Float::exact_from(3u32) << 101u32).root_u_prec_round_ref(101, 10, Exact));
 }
 
 // The `Exact` rounding mode for k < -2 requires |x| to be 2 raised to a multiple of k.

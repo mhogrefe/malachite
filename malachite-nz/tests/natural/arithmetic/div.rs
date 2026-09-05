@@ -18584,7 +18584,7 @@ fn verify_limbs_div_approx_2(
     let q_is_too_large = q != expected_q;
     if q_is_too_large {
         assert!(q > expected_q);
-        assert!(q - &expected_q <= 4);
+        assert!(q - &expected_q <= 4u32);
         assert_eq!(expected_q * &d + expected_r, n);
     } else {
         assert_eq!(q * &d + expected_r, n);
@@ -35025,7 +35025,7 @@ fn div_properties() {
     natural_gen_var_2().test_properties(|n| {
         assert_eq!(&n / &n, 1);
         assert_eq!(Natural::ZERO / &n, Natural::ZERO);
-        if n > 1 {
+        if n > 1u32 {
             assert_eq!(Natural::ONE / n, Natural::ZERO);
         }
     });
@@ -35134,7 +35134,7 @@ fn test_limbs_div_barrett_approx_scratch_sizing() {
                 q += Natural::power_of_2(u64::exact_from(n_len - d_len) * Limb::WIDTH);
             }
             assert!(q >= expected_q, "{n_len} {d_len}");
-            assert!(q - expected_q <= 4, "{n_len} {d_len}");
+            assert!(q - expected_q <= 4u32, "{n_len} {d_len}");
         }
     }
 }

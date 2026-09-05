@@ -267,7 +267,7 @@ fn average_prec_round_properties() {
             // is prohibitively large otherwise
             let moderate = |f: &Float| f.get_exponent().is_none_or(|e| e.unsigned_abs() < 1000);
             if x.is_finite() && y.is_finite() && moderate(&x) && moderate(&y) {
-                let q = (Rational::exact_from(&x) + Rational::exact_from(&y)) >> 1u64;
+                let q = (Rational::exact_from(&x) + Rational::exact_from(&y)) >> 1u32;
                 if q == 0u32 {
                     assert_eq!(avg, 0u32);
                     assert_eq!(o, Equal);

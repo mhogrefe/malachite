@@ -184,8 +184,8 @@ fn mod_power_of_2_add_properties() {
 
         assert!(result.is_power_of_2());
         assert!(result >= n);
-        if n != 0 {
-            assert!(&result >> 1 < n);
+        if n != 0u32 {
+            assert!(&result >> 1u32 < n);
             assert_eq!(Natural::power_of_2(n.ceiling_log_base_2()), result);
         }
     });

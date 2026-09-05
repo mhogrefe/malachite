@@ -544,7 +544,7 @@ impl SubMul<&Integer, &Integer> for &Integer {
         } else {
             let (abs, abs_result_sign) = self.abs.add_mul_neg(&y.abs, &z.abs);
             Integer {
-                sign: (self.sign == abs_result_sign) || abs == 0,
+                sign: (self.sign == abs_result_sign) || abs == 0u32,
                 abs,
             }
         }

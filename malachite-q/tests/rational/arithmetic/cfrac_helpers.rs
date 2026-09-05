@@ -91,8 +91,8 @@ fn ball_get_cfrac_properties() {
         // A narrow ball greater than one, with a numerator wide enough to reach the Lehmer floor:
         // the endpoints then share a long continued-fraction prefix, which is what the engine is
         // for. A wide ball would diverge on the first term and test nothing.
-        let x = ((&a).abs() + Rational::from(2u32)) << 200u64;
-        let width = ((&b).abs() + Rational::from(2u32)).reciprocal() >> 20u64;
+        let x = ((&a).abs() + Rational::from(2u32)) << 200u32;
+        let width = ((&b).abs() + Rational::from(2u32)).reciprocal() >> 20u32;
         let y = &x + width;
         if x >= y {
             return;

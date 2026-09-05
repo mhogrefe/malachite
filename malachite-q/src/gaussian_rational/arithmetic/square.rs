@@ -41,7 +41,7 @@ fn square_val(x: GaussianRational) -> GaussianRational {
     let real = (&x.real).square() - (&x.imaginary).square();
     GaussianRational {
         real,
-        imaginary: (x.real * x.imaginary) << 1u64,
+        imaginary: (x.real * x.imaginary) << 1u32,
     }
 }
 
@@ -60,7 +60,7 @@ fn square_ref(x: &GaussianRational) -> GaussianRational {
     }
     GaussianRational {
         real: (&x.real).square() - (&x.imaginary).square(),
-        imaginary: (&x.real * &x.imaginary) << 1u64,
+        imaginary: (&x.real * &x.imaginary) << 1u32,
     }
 }
 

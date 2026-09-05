@@ -1187,8 +1187,8 @@ fn add_properties() {
         assert_eq!(&x + Natural::ZERO, x);
         assert_eq!(Natural::ZERO + &x, x);
         // The same value through distinct references takes the general addition path.
-        assert_eq!(&x + &x.clone(), &x << 1);
-        assert_eq!(&x + &x, x << 1);
+        assert_eq!(&x + &x.clone(), &x << 1u32);
+        assert_eq!(&x + &x, x << 1u32);
     });
 
     unsigned_pair_gen_var_27::<Limb>().test_properties(|(x, y)| {

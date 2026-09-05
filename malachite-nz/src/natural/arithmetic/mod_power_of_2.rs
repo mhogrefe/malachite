@@ -481,7 +481,7 @@ impl NegModPowerOf2Assign for Natural {
     /// assert_eq!(x, 5);
     /// ```
     fn neg_mod_power_of_2_assign(&mut self, pow: u64) {
-        if *self == 0 {
+        if *self == 0u32 {
         } else if pow <= Limb::WIDTH {
             *self = Self::from(Limb::wrapping_from(&*self).neg_mod_power_of_2(pow));
         } else {

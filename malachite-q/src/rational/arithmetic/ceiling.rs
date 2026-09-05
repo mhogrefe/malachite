@@ -126,7 +126,7 @@ impl CeilingAssign for Rational {
             self.numerator.div_round_assign(d, Ceiling);
         } else {
             self.numerator /= d;
-            if !self.sign && self.numerator == 0 {
+            if !self.sign && self.numerator == 0u32 {
                 self.sign = true;
             }
         }

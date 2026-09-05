@@ -2322,7 +2322,7 @@ impl NegMod<Natural> for &Natural {
     /// ```
     fn neg_mod(self, other: Natural) -> Natural {
         let r = self % &other;
-        if r == 0 { r } else { other - r }
+        if r == 0u32 { r } else { other - r }
     }
 }
 
@@ -2367,7 +2367,7 @@ impl NegMod<&Natural> for &Natural {
     /// ```
     fn neg_mod(self, other: &Natural) -> Natural {
         let r = self % other;
-        if r == 0 { r } else { other - r }
+        if r == 0u32 { r } else { other - r }
     }
 }
 
@@ -2410,7 +2410,7 @@ impl NegModAssign<Self> for Natural {
     /// ```
     fn neg_mod_assign(&mut self, other: Self) {
         *self %= &other;
-        if *self != 0 {
+        if *self != 0u32 {
             self.sub_right_assign_no_panic(&other);
         }
     }
@@ -2455,7 +2455,7 @@ impl<'a> NegModAssign<&'a Self> for Natural {
     /// ```
     fn neg_mod_assign(&mut self, other: &'a Self) {
         *self %= other;
-        if *self != 0 {
+        if *self != 0u32 {
             self.sub_right_assign_no_panic(other);
         }
     }

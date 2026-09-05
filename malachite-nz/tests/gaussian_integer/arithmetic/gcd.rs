@@ -120,7 +120,7 @@ fn gcd_properties_helper(x: GaussianInteger, y: GaussianInteger, thorough: bool)
         (&x).conjugate().gcd((&y).conjugate()),
         (&g).conjugate().canonicalize_unit()
     );
-    if g != GaussianInteger::ZERO {
+    if g != 0u32 {
         // a common divisor, and the cofactors are coprime
         assert_eq!(&x % &g, GaussianInteger::ZERO);
         assert_eq!(&y % &g, GaussianInteger::ZERO);
@@ -131,7 +131,7 @@ fn gcd_properties_helper(x: GaussianInteger, y: GaussianInteger, thorough: bool)
     }
     // an unbalanced pair takes the exact division tier of the approximate division
     if thorough {
-        let x_big = &x << 100u64;
+        let x_big = &x << 100u32;
         assert_eq!((&x_big).gcd(&y), gaussian_integer_gcd_euclidean(&x_big, &y));
     }
 }

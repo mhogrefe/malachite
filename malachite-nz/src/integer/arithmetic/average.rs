@@ -50,7 +50,7 @@ impl Average<Self> for Integer {
     /// ```
     #[inline]
     fn average(self, other: Self) -> Self {
-        (self + other).shr_round(1u64, Nearest).0
+        (self + other).shr_round(1u32, Nearest).0
     }
 }
 
@@ -92,7 +92,7 @@ impl Average<&Self> for Integer {
     /// ```
     #[inline]
     fn average(self, other: &Self) -> Self {
-        (self + other).shr_round(1u64, Nearest).0
+        (self + other).shr_round(1u32, Nearest).0
     }
 }
 
@@ -134,7 +134,7 @@ impl Average<Integer> for &Integer {
     /// ```
     #[inline]
     fn average(self, other: Integer) -> Integer {
-        (self + other).shr_round(1u64, Nearest).0
+        (self + other).shr_round(1u32, Nearest).0
     }
 }
 
@@ -175,7 +175,7 @@ impl Average<&Integer> for &Integer {
     /// ```
     #[inline]
     fn average(self, other: &Integer) -> Integer {
-        (self + other).shr_round(1u64, Nearest).0
+        (self + other).shr_round(1u32, Nearest).0
     }
 }
 
@@ -204,7 +204,7 @@ impl AverageAssign<Self> for Integer {
     #[inline]
     fn average_assign(&mut self, other: Self) {
         *self += other;
-        self.shr_round_assign(1u64, Nearest);
+        self.shr_round_assign(1u32, Nearest);
     }
 }
 
@@ -233,7 +233,7 @@ impl AverageAssign<&Self> for Integer {
     #[inline]
     fn average_assign(&mut self, other: &Self) {
         *self += other;
-        self.shr_round_assign(1u64, Nearest);
+        self.shr_round_assign(1u32, Nearest);
     }
 }
 
@@ -286,7 +286,7 @@ impl AverageRound<Self> for Integer {
     /// ```
     #[inline]
     fn average_round(self, other: Self, rm: RoundingMode) -> (Self, Ordering) {
-        (self + other).shr_round(1u64, rm)
+        (self + other).shr_round(1u32, rm)
     }
 }
 
@@ -339,7 +339,7 @@ impl AverageRound<&Self> for Integer {
     /// ```
     #[inline]
     fn average_round(self, other: &Self, rm: RoundingMode) -> (Self, Ordering) {
-        (self + other).shr_round(1u64, rm)
+        (self + other).shr_round(1u32, rm)
     }
 }
 
@@ -392,7 +392,7 @@ impl AverageRound<Integer> for &Integer {
     /// ```
     #[inline]
     fn average_round(self, other: Integer, rm: RoundingMode) -> (Integer, Ordering) {
-        (self + other).shr_round(1u64, rm)
+        (self + other).shr_round(1u32, rm)
     }
 }
 
@@ -445,7 +445,7 @@ impl AverageRound<&Integer> for &Integer {
     /// ```
     #[inline]
     fn average_round(self, other: &Integer, rm: RoundingMode) -> (Integer, Ordering) {
-        (self + other).shr_round(1u64, rm)
+        (self + other).shr_round(1u32, rm)
     }
 }
 
@@ -484,7 +484,7 @@ impl AverageRoundAssign<Self> for Integer {
     #[inline]
     fn average_round_assign(&mut self, other: Self, rm: RoundingMode) -> Ordering {
         *self += other;
-        self.shr_round_assign(1u64, rm)
+        self.shr_round_assign(1u32, rm)
     }
 }
 
@@ -523,6 +523,6 @@ impl AverageRoundAssign<&Self> for Integer {
     #[inline]
     fn average_round_assign(&mut self, other: &Self, rm: RoundingMode) -> Ordering {
         *self += other;
-        self.shr_round_assign(1u64, rm)
+        self.shr_round_assign(1u32, rm)
     }
 }

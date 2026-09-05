@@ -7,7 +7,6 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::comparison::traits::{OrdAbs, OrdAbsDouble, OrdDouble};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
@@ -90,10 +89,7 @@ fn cmp_double_properties() {
         if c == Greater {
             assert_eq!(x.cmp(&y), Greater);
         }
-        assert_eq!(
-            x == Natural::ZERO && y == Natural::ZERO,
-            c == Equal && x == y
-        );
+        assert_eq!(x == 0u32 && y == 0u32, c == Equal && x == y);
     });
 
     integer_pair_gen().test_properties(|(x, y)| {

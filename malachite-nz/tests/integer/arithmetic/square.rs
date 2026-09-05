@@ -58,7 +58,7 @@ fn square_properties() {
         // The same value through distinct references takes the general multiplication path.
         assert_eq!(&x * &x.clone(), square);
         assert_eq!((-&x).square(), square);
-        assert!(square >= 0);
+        assert!(square >= 0u32);
         assert!(square >= x);
 
         assert_eq!(square.checked_sqrt(), Some(x.abs()));
@@ -68,8 +68,8 @@ fn square_properties() {
         let x_squared = (&x).square();
         let y_squared = (&y).square();
         let xy = &x * &y;
-        assert_eq!((&x + &y).square(), &x_squared + &y_squared + (&xy << 1));
-        assert_eq!((&x - &y).square(), &x_squared + &y_squared - (&xy << 1));
+        assert_eq!((&x + &y).square(), &x_squared + &y_squared + (&xy << 1u32));
+        assert_eq!((&x - &y).square(), &x_squared + &y_squared - (&xy << 1u32));
         assert_eq!(xy.square(), x_squared * y_squared);
     });
 

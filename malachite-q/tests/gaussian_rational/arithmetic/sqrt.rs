@@ -143,7 +143,7 @@ fn checked_sqrt_properties() {
 
     rational_gen().test_properties(|q| {
         let root = GaussianRational::from(q.clone()).checked_sqrt();
-        if q >= 0 {
+        if q >= 0u32 {
             assert_eq!(root, q.checked_sqrt().map(GaussianRational::from));
         } else {
             assert_eq!(

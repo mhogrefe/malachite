@@ -159,7 +159,7 @@ impl Mul<&Integer> for &Integer {
         }
         let product_abs = &self.abs * &other.abs;
         Integer {
-            sign: self.sign == other.sign || product_abs == 0,
+            sign: self.sign == other.sign || product_abs == 0u32,
             abs: product_abs,
         }
     }
@@ -195,7 +195,7 @@ impl MulAssign<Self> for Integer {
     /// ```
     fn mul_assign(&mut self, other: Self) {
         self.abs *= other.abs;
-        self.sign = self.sign == other.sign || self.abs == 0;
+        self.sign = self.sign == other.sign || self.abs == 0u32;
     }
 }
 
@@ -229,7 +229,7 @@ impl MulAssign<&Self> for Integer {
     /// ```
     fn mul_assign(&mut self, other: &Self) {
         self.abs *= &other.abs;
-        self.sign = self.sign == other.sign || self.abs == 0;
+        self.sign = self.sign == other.sign || self.abs == 0u32;
     }
 }
 

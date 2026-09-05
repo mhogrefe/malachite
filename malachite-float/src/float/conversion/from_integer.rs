@@ -18,7 +18,7 @@ use malachite_nz::integer::Integer;
 use malachite_q::rational::conversion::primitive_float_from_rational::FloatConversionError;
 
 pub(crate) fn from_integer_zero_exponent(n: Integer) -> Float {
-    let sign = n >= 0;
+    let sign = n >= 0u32;
     let f = from_natural_zero_exponent(n.unsigned_abs());
     if sign { f } else { -f }
 }
@@ -28,7 +28,7 @@ pub(crate) fn from_integer_prec_round_zero_exponent(
     prec: u64,
     rm: RoundingMode,
 ) -> (Float, Ordering) {
-    let sign = x >= 0;
+    let sign = x >= 0u32;
     let (f, o) =
         from_natural_prec_round_zero_exponent(x.unsigned_abs(), prec, if sign { rm } else { -rm });
     if sign { (f, o) } else { (-f, o.reverse()) }
@@ -105,7 +105,7 @@ impl Float {
     /// ```
     #[inline]
     pub fn from_integer_prec_round(x: Integer, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
-        let sign = x >= 0;
+        let sign = x >= 0u32;
         let (f, o) =
             Self::from_natural_prec_round(x.unsigned_abs(), prec, if sign { rm } else { -rm });
         if sign { (f, o) } else { (-f, o.reverse()) }
@@ -185,7 +185,7 @@ impl Float {
         prec: u64,
         rm: RoundingMode,
     ) -> (Self, Ordering) {
-        let sign = *x >= 0;
+        let sign = *x >= 0u32;
         let (f, o) = Self::from_natural_prec_round_ref(
             x.unsigned_abs_ref(),
             prec,
@@ -316,7 +316,7 @@ impl Float {
     /// ```
     #[inline]
     pub fn from_integer_prec_ref(x: &Integer, prec: u64) -> (Self, Ordering) {
-        let sign = *x >= 0;
+        let sign = *x >= 0u32;
         let (f, o) = Self::from_natural_prec_ref(x.unsigned_abs_ref(), prec);
         if sign { (f, o) } else { (-f, o.reverse()) }
     }
@@ -385,7 +385,7 @@ impl TryFrom<Integer> for Float {
     /// ```
     #[inline]
     fn try_from(n: Integer) -> Result<Self, Self::Error> {
-        let sign = n >= 0;
+        let sign = n >= 0u32;
         let abs = Self::try_from(n.unsigned_abs())?;
         Ok(if sign { abs } else { -abs })
     }
@@ -454,7 +454,7 @@ impl TryFrom<&Integer> for Float {
     /// ```
     #[inline]
     fn try_from(n: &Integer) -> Result<Self, Self::Error> {
-        let sign = *n >= 0;
+        let sign = *n >= 0u32;
         let abs = Self::try_from(n.unsigned_abs())?;
         Ok(if sign { abs } else { -abs })
     }
@@ -486,7 +486,7 @@ impl ConvertibleFrom<&Integer> for Float {
     /// ```
     #[inline]
     fn convertible_from(x: &Integer) -> bool {
-        *x == 0
+        *x == 0u32
             || (Self::MIN_EXPONENT..=Self::MAX_EXPONENT).contains(
                 &i32::saturating_from(x.unsigned_abs_ref().floor_log_base_2()).saturating_add(1),
             )

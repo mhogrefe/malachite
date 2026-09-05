@@ -290,7 +290,7 @@ impl RoundToMultipleOfPowerOf2Assign<u64> for Integer {
             self.abs.round_to_multiple_of_power_of_2_assign(pow, rm)
         } else {
             let o = self.abs.round_to_multiple_of_power_of_2_assign(pow, -rm);
-            if self.abs == 0 {
+            if self.abs == 0u32 {
                 self.sign = true;
             }
             o.reverse()

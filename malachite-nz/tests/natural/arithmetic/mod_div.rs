@@ -191,7 +191,7 @@ fn mod_div_properties() {
 
     natural_pair_gen_var_8().test_properties(|(x, m)| {
         assert!((&x).mod_div(&x, &m).is_some());
-        if m > Natural::ONE {
+        if m > 1u32 {
             assert_eq!((&x).mod_div(&Natural::ONE, &m), Some(x.clone()));
             assert_eq!(Natural::ZERO.mod_div(&x, &m), Some(Natural::ZERO));
         }

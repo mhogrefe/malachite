@@ -202,7 +202,7 @@ fn odd_central_binomial_table(limit: u64) -> u64 {
     let mut binomial_limit = 0;
     for b in limit.. {
         binomial_limit = b;
-        let mut x = Natural::binomial_coefficient(Natural::from(b) << 1u64, Natural::from(b));
+        let mut x = Natural::binomial_coefficient(Natural::from(b) << 1u32, Natural::from(b));
         x >>= x.trailing_zeros().unwrap();
         if let Ok(x) = Limb::try_from(&x) {
             xs.push(x);
@@ -237,7 +237,7 @@ fn odd_central_binomial_inverse_table(limit: u64, binomial_limit: u64) {
     println!("// `ONE_LIMB_ODD_CENTRAL_BINOMIAL_INVERSE_TABLE` from `fac_table.h`, GMP 6.2.1.");
     let mut xs = Vec::new();
     for b in limit..=binomial_limit {
-        let mut x = Natural::binomial_coefficient(Natural::from(b) << 1u64, Natural::from(b));
+        let mut x = Natural::binomial_coefficient(Natural::from(b) << 1u32, Natural::from(b));
         x >>= x.trailing_zeros().unwrap();
         xs.push(Limb::exact_from(
             &(x.mod_power_of_2_inverse(Limb::WIDTH).unwrap()),
@@ -268,7 +268,7 @@ fn central_binomial_2_fac_table(limit: u64, binomial_limit: u64) {
     let mut xs = Vec::new();
     for b in limit..=binomial_limit {
         xs.push(
-            Natural::binomial_coefficient(Natural::from(b) << 1u64, Natural::from(b))
+            Natural::binomial_coefficient(Natural::from(b) << 1u32, Natural::from(b))
                 .trailing_zeros()
                 .unwrap(),
         );

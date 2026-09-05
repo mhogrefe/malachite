@@ -35,7 +35,7 @@ impl Rational {
         let gcd = (&self.numerator).gcd(&self.denominator);
         self.numerator.div_exact_assign(&gcd);
         self.denominator.div_exact_assign(gcd);
-        if !self.sign && self.numerator == 0 {
+        if !self.sign && self.numerator == 0u32 {
             self.sign = true;
         }
         out
@@ -104,7 +104,7 @@ impl Rational {
         let gcd = (&self.numerator).gcd(&self.denominator);
         self.numerator.div_exact_assign(&gcd);
         self.denominator.div_exact_assign(gcd);
-        if !self.sign && self.numerator == 0 {
+        if !self.sign && self.numerator == 0u32 {
             self.sign = true;
         }
         out

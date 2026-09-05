@@ -158,7 +158,7 @@ fn try_from_integer_properties() {
         assert!(natural_x_alt.as_ref().map_or(true, Natural::is_valid));
         assert_eq!(natural_x, natural_x_alt);
 
-        assert_eq!(natural_x.is_ok(), x >= 0);
+        assert_eq!(natural_x.is_ok(), x >= 0u32);
         assert_eq!(natural_x.is_ok(), Natural::convertible_from(&x));
         if let Ok(n) = natural_x {
             assert_eq!(n.to_string(), x.to_string());
@@ -179,7 +179,7 @@ fn saturating_from_integer_properties() {
         assert!(natural_x_alt.is_valid());
         assert_eq!(natural_x, natural_x_alt);
 
-        assert_eq!(natural_x == 0, x <= 0);
+        assert_eq!(natural_x == 0u32, x <= 0u32);
         assert!(natural_x >= x);
         assert_eq!(natural_x == x, Natural::convertible_from(x));
     });
@@ -190,6 +190,6 @@ fn convertible_from_integer_properties() {
     integer_gen().test_properties(|x| {
         let convertible = Natural::convertible_from(x.clone());
         assert_eq!(Natural::convertible_from(&x), convertible);
-        assert_eq!(convertible, x >= 0);
+        assert_eq!(convertible, x >= 0u32);
     });
 }

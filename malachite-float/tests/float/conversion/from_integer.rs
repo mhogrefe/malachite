@@ -1331,7 +1331,7 @@ fn from_integer_prec_round_properties() {
         );
         assert_eq!(o, o_alt);
         assert_eq!(float_n.partial_cmp(&n), Some(o));
-        match (n >= 0, rm) {
+        match (n >= 0u32, rm) {
             (_, Floor) | (true, Down) | (false, Up) => {
                 assert_ne!(o, Greater);
             }
@@ -1366,7 +1366,7 @@ fn from_integer_prec_round_properties() {
             assert!(r_floor + Rational::exact_from(floor.0.ulp().unwrap()) > n);
         }
         let (floor_n_alt, o_alt) =
-            Float::from_integer_prec_round_ref(&n, prec, if n >= 0 { Down } else { Up });
+            Float::from_integer_prec_round_ref(&n, prec, if n >= 0u32 { Down } else { Up });
         assert_eq!(
             ComparableFloatRef(&floor_n_alt),
             ComparableFloatRef(&floor.0)
@@ -1380,7 +1380,7 @@ fn from_integer_prec_round_properties() {
             assert!(r_ceiling - Rational::exact_from(ceiling.0.ulp().unwrap()) < n);
         }
         let (ceiling_n_alt, o_alt) =
-            Float::from_integer_prec_round_ref(&n, prec, if n >= 0 { Up } else { Down });
+            Float::from_integer_prec_round_ref(&n, prec, if n >= 0u32 { Up } else { Down });
         assert_eq!(
             ComparableFloatRef(&ceiling_n_alt),
             ComparableFloatRef(&ceiling.0)
@@ -1397,7 +1397,7 @@ fn from_integer_prec_round_properties() {
         if r_nearest != 0u32 {
             assert!(
                 (r_nearest - Rational::from(&n))
-                    .le_abs(&(Rational::exact_from(nearest.0.ulp().unwrap()) >> 1))
+                    .le_abs(&(Rational::exact_from(nearest.0.ulp().unwrap()) >> 1u32))
             );
         }
     });

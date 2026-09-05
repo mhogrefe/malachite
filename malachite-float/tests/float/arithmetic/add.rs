@@ -10248,9 +10248,9 @@ fn add_properties() {
         // The same value through distinct references takes the general addition path.
         assert_eq!(
             ComparableFloat(&x + &x.clone()),
-            ComparableFloat(&x << 1u64)
+            ComparableFloat(&x << 1u32)
         );
-        assert_eq!(ComparableFloat(&x + &x), ComparableFloat(x << 1u64));
+        assert_eq!(ComparableFloat(&x + &x), ComparableFloat(x << 1u32));
     });
 }
 
@@ -10629,7 +10629,7 @@ fn add_rational_round_properties_helper(x: Float, y: Rational, rm: RoundingMode,
     assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
     assert_eq!(o_alt, o);
 
-    if o == Equal && sum.is_finite() && sum != 0 {
+    if o == Equal && sum.is_finite() && sum != 0u32 {
         assert_eq!(sum.sub_rational_round_ref_ref(&y, Exact).0, x);
         // TODO additional test
     }
@@ -10811,7 +10811,7 @@ fn add_rational_properties_helper(x: Float, y: Rational, extreme: bool) {
     let (sum_alt, o) = x.add_rational_round_ref_ref(&y, Nearest);
     assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
 
-    if o == Equal && sum.is_finite() && sum != 0 {
+    if o == Equal && sum.is_finite() && sum != 0u32 {
         assert_eq!(&sum - &y, x);
         // TODO additional test
     }

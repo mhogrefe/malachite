@@ -75,7 +75,7 @@ fn remove_one_plus_i_properties() {
         assert_eq!(gaussian_integer_remove_one_plus_i_naive(&x), (q.clone(), k));
 
         assert_eq!(&q * gaussian_integer_one_plus_i_pow(k), x);
-        if x == GaussianInteger::ZERO {
+        if x == 0u32 {
             assert_eq!(q, GaussianInteger::ZERO);
             assert_eq!(k, 0);
         } else {
@@ -90,7 +90,7 @@ fn remove_one_plus_i_properties() {
         };
         let (q_alt, k_alt) = (&x * one_plus_i).remove_one_plus_i();
         assert_eq!(q_alt, q);
-        assert_eq!(k_alt, if x == GaussianInteger::ZERO { 0 } else { k + 1 });
+        assert_eq!(k_alt, if x == 0u32 { 0 } else { k + 1 });
         assert_eq!((&x).mul_i().remove_one_plus_i(), ((&q).mul_i(), k));
         assert_eq!((-&x).remove_one_plus_i(), (-&q, k));
         assert_eq!(q.remove_one_plus_i(), (q.clone(), 0));
@@ -100,7 +100,7 @@ fn remove_one_plus_i_properties() {
     gaussian_integer_unsigned_pair_gen_var_1::<u64>().test_properties(|(x, u)| {
         let (q, k) = x.remove_one_plus_i();
         let (q_shifted, k_shifted) = (&x << u).remove_one_plus_i();
-        if x == GaussianInteger::ZERO {
+        if x == 0u32 {
             assert_eq!(k_shifted, 0);
         } else {
             assert_eq!(k_shifted, k + (u << 1));

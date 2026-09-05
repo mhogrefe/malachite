@@ -162,7 +162,7 @@ fn agm_prec_round_normal(
             }
         }
         u.sqrt_assign();
-        v >>= 1u64;
+        v >>= 1u32;
         scaleit = 0;
         let mut n: u64 = 1;
         let mut eq = 0;
@@ -170,7 +170,7 @@ fn agm_prec_round_normal(
             let mut uf;
             let mut vf;
             loop {
-                vf = (&u + &v) >> 1;
+                vf = (&u + &v) >> 1u32;
                 // See proof in algorithms.tex
                 if eq > working_prec >> 2 {
                     // vf = V(k)
@@ -179,7 +179,7 @@ fn agm_prec_round_normal(
                     let mut underflow = test_underflow(&w, o);
                     let o = w.square_round_assign(Nearest); // e = e^2
                     underflow |= test_underflow(&w, o);
-                    let o = w.shr_round_assign(4, Nearest); // e*= (1/2)^2*1/4
+                    let o = w.shr_round_assign(4u32, Nearest); // e*= (1/2)^2*1/4
                     underflow |= test_underflow(&w, o);
                     let o = w.div_prec_assign_ref(&vf, low_p); // 1/4*e^2/V(k)
                     underflow |= test_underflow(&w, o);
@@ -323,7 +323,7 @@ fn agm_prec_round_ref_ref_normal(
             }
         }
         u.sqrt_assign();
-        v >>= 1u64;
+        v >>= 1u32;
         scaleit = 0;
         let mut n: u64 = 1;
         let mut eq = 0;
@@ -331,7 +331,7 @@ fn agm_prec_round_ref_ref_normal(
             let mut uf;
             let mut vf;
             loop {
-                vf = (&u + &v) >> 1;
+                vf = (&u + &v) >> 1u32;
                 // See proof in algorithms.tex
                 if eq > working_prec >> 2 {
                     // vf = V(k)
@@ -340,7 +340,7 @@ fn agm_prec_round_ref_ref_normal(
                     let mut underflow = test_underflow(&w, o);
                     let o = w.square_round_assign(Nearest); // e = e^2
                     underflow |= test_underflow(&w, o);
-                    let o = w.shr_round_assign(4, Nearest); // e*= (1/2)^2*1/4
+                    let o = w.shr_round_assign(4u32, Nearest); // e*= (1/2)^2*1/4
                     underflow |= test_underflow(&w, o);
                     let o = w.div_prec_assign_ref(&vf, low_p); // 1/4*e^2/V(k)
                     underflow |= test_underflow(&w, o);

@@ -83,7 +83,7 @@ fn binomial_coefficient_properties() {
             Integer::from(&rug::Integer::from(&n).binomial(u32::exact_from(&k))),
             b
         );
-        assert_eq!(b == 0, n >= 0 && n < k);
+        assert_eq!(b == 0u32, n >= 0u32 && n < k);
         if n >= k {
             assert_eq!(Integer::binomial_coefficient(&n, &(&n - &k)), b);
         }
@@ -108,7 +108,7 @@ fn binomial_coefficient_properties() {
 
     integer_gen_var_4().test_properties(|n| {
         assert_eq!(Integer::binomial_coefficient(&n, &n), 1u32);
-        if n != 0 {
+        if n != 0u32 {
             assert_eq!(Integer::binomial_coefficient(&n, &(&n - Integer::ONE)), n);
             assert_eq!(Integer::binomial_coefficient(Integer::ZERO, n), 0);
         }

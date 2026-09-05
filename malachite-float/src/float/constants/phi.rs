@@ -62,7 +62,7 @@ impl Float {
         } else {
             let (sqrt_5, o) =
                 Self::sqrt_prec_round(const { Self::const_from_unsigned(5) }, prec, rm);
-            ((sqrt_5 + Self::ONE) >> 1u64, o)
+            ((sqrt_5 + Self::ONE) >> 1u32, o)
         }
     }
 

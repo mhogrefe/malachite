@@ -15,7 +15,7 @@ use malachite_base::num::factorization::traits::{RemovePower, RemovePowerAssign}
 // factor is negative and the power is odd.
 fn remove_power_helper(x: &Integer, y: &Integer) -> (Integer, u64) {
     let (abs, k) = x.unsigned_abs_ref().remove_power(y.unsigned_abs_ref());
-    let negative = (*x < 0) != (*y < 0 && k.odd());
+    let negative = (*x < 0u32) != (*y < 0u32 && k.odd());
     (Integer::from_sign_and_abs(!negative, abs), k)
 }
 

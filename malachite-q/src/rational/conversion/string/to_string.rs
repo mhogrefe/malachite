@@ -52,7 +52,7 @@ impl ToStringBase for Rational {
             s.push('-');
         }
         s.push_str(&self.numerator.to_string_base(base));
-        if self.denominator != 1 {
+        if self.denominator != 1u32 {
             s.push('/');
             s.push_str(&self.denominator.to_string_base(base));
         }
@@ -105,7 +105,7 @@ impl ToStringBase for Rational {
             s.push('-');
         }
         s.push_str(&self.numerator.to_string_base_upper(base));
-        if self.denominator != 1 {
+        if self.denominator != 1u32 {
             s.push('/');
             s.push_str(&self.denominator.to_string_base_upper(base));
         }
@@ -159,7 +159,7 @@ impl Binary for Rational {
             f.write_char('-')?;
         }
         let result = Binary::fmt(&self.numerator, f);
-        if self.denominator == 1 {
+        if self.denominator == 1u32 {
             result
         } else {
             f.write_char('/')?;
@@ -205,7 +205,7 @@ impl Octal for Rational {
             f.write_char('-')?;
         }
         let result = Octal::fmt(&self.numerator, f);
-        if self.denominator == 1 {
+        if self.denominator == 1u32 {
             result
         } else {
             f.write_char('/')?;
@@ -254,7 +254,7 @@ impl LowerHex for Rational {
             f.write_char('-')?;
         }
         let result = LowerHex::fmt(&self.numerator, f);
-        if self.denominator == 1 {
+        if self.denominator == 1u32 {
             result
         } else {
             f.write_char('/')?;
@@ -303,7 +303,7 @@ impl UpperHex for Rational {
             f.write_char('-')?;
         }
         let result = UpperHex::fmt(&self.numerator, f);
-        if self.denominator == 1 {
+        if self.denominator == 1u32 {
             result
         } else {
             f.write_char('/')?;
@@ -337,7 +337,7 @@ impl Display for Rational {
             f.write_char('-')?;
         }
         let result = Display::fmt(&self.numerator, f);
-        if self.denominator == 1 {
+        if self.denominator == 1u32 {
             result
         } else {
             f.write_char('/')?;

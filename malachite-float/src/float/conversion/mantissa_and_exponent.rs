@@ -672,7 +672,7 @@ impl IntegerMantissaAndExponent<Natural, i64> for Float {
     ) -> Option<Self> {
         let nonzero = integer_mantissa != 0u32;
         let x = Self::exact_from(integer_mantissa) << integer_exponent;
-        if x.is_infinite() || (nonzero && x == 0) {
+        if x.is_infinite() || (nonzero && x == 0u32) {
             None
         } else {
             Some(x)

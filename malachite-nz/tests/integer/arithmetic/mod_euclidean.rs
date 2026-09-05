@@ -103,7 +103,7 @@ fn mod_euclidean_properties_helper(x: Integer, y: Integer) {
     // ...and makes the difference from x a multiple of y.
     assert_eq!((&x - Integer::from(&r)).mod_op(&y), 0);
     // For a positive divisor, the Euclidean remainder coincides with `mod_op`.
-    if y > 0 {
+    if y > 0u32 {
         assert_eq!((&x).mod_op(&y), r);
     }
 }

@@ -24096,13 +24096,13 @@ fn test_div_mod_precomputed() {
             let product = &q * &d;
             test(&product, &d, &data);
             test(&(&product + Natural::ONE), &d, &data);
-            if product != 0 {
+            if product != 0u32 {
                 test(&(product - Natural::ONE), &d, &data);
             }
             // dividends at and around the divisor itself
             test(&d, &d, &data);
             test(&(&d + Natural::ONE), &d, &data);
-            if d > 1 {
+            if d > 1u32 {
                 test(&(&d - Natural::ONE), &d, &data);
             }
             test(&Natural::ZERO, &d, &data);
@@ -24295,7 +24295,7 @@ fn div_mod_and_div_rem_properties() {
     natural_gen_var_2().test_properties(|x| {
         assert_eq!((&x).div_mod(&x), (Natural::ONE, Natural::ZERO));
         assert_eq!(Natural::ZERO.div_mod(&x), (Natural::ZERO, Natural::ZERO));
-        if x > 1 {
+        if x > 1u32 {
             assert_eq!(Natural::ONE.div_mod(x), (Natural::ZERO, Natural::ONE));
         }
     });
@@ -24388,7 +24388,7 @@ fn ceiling_div_neg_mod_properties() {
             Natural::ZERO.ceiling_div_neg_mod(&x),
             (Natural::ZERO, Natural::ZERO)
         );
-        if x > 1 {
+        if x > 1u32 {
             assert_eq!(
                 Natural::ONE.ceiling_div_neg_mod(&x),
                 (Natural::ONE, x - Natural::ONE)

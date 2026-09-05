@@ -173,7 +173,7 @@ fn checked_root_properties() {
             roots.contains(root.as_ref().unwrap_or(&GaussianInteger::ZERO)),
             root.is_some()
         );
-        if x == GaussianInteger::ZERO {
+        if x == 0u32 {
             assert_eq!(roots, vec![GaussianInteger::ZERO]);
         } else if root.is_some() {
             let g = u64::power_of_2(TrailingZeros::trailing_zeros(exp).min(2));

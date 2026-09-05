@@ -52,7 +52,7 @@ fn coprime_with_properties() {
         assert_eq!(x.clone().coprime_with(&y), c);
         assert_eq!((&x).coprime_with(y.clone()), c);
 
-        assert_eq!((&x).gcd(&y) == 1, c);
+        assert_eq!((&x).gcd(&y) == 1u32, c);
         assert_eq!(coprime_with_check_2(x.clone(), y.clone()), c);
         assert_eq!(coprime_with_check_2_3(x.clone(), y.clone()), c);
         assert_eq!(coprime_with_check_2_3_5(x.clone(), y.clone()), c);
@@ -60,9 +60,9 @@ fn coprime_with_properties() {
     });
 
     natural_gen().test_properties(|x| {
-        assert_eq!((&x).coprime_with(&x), x == 1);
+        assert_eq!((&x).coprime_with(&x), x == 1u32);
         assert!((&x).coprime_with(Natural::ONE));
-        assert_eq!((&x).coprime_with(Natural::ZERO), x == 1);
+        assert_eq!((&x).coprime_with(Natural::ZERO), x == 1u32);
         let y = &x + Natural::ONE;
         assert!(x.coprime_with(y));
     });

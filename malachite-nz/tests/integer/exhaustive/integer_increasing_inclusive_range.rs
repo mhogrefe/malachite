@@ -14,7 +14,7 @@ use malachite_nz::integer::Integer;
 use malachite_nz::integer::exhaustive::integer_increasing_inclusive_range;
 
 fn expected_range_len(a: &Integer, b: &Integer) -> usize {
-    match (*a >= 0, *b >= 0) {
+    match (*a >= 0u32, *b >= 0u32) {
         (false, false) => usize::exact_from(&-a) - usize::exact_from(&-b) + 1,
         (false, true) => usize::exact_from(&-a) + usize::exact_from(b) + 1,
         (true, false) => panic!(),

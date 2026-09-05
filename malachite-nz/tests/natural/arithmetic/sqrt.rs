@@ -717,7 +717,7 @@ fn limbs_sqrt_helper_properties() {
         let sqrt = Natural::from_limbs_asc(&out);
         let (sqrt_alt, rem) = (&x).sqrt_rem();
         assert_eq!(sqrt, sqrt_alt);
-        assert_eq!(has_remainder, rem != 0);
+        assert_eq!(has_remainder, rem != 0u32);
         assert!((&sqrt).square() <= x);
         assert!((sqrt + Natural::ONE).square() > x);
     });
@@ -869,7 +869,7 @@ fn ceiling_sqrt_properties() {
             assert_eq!(floor_sqrt, &sqrt - Natural::ONE);
         }
         assert!(square >= n);
-        if n != 0 {
+        if n != 0u32 {
             assert!((sqrt - Natural::ONE).square() < n);
         }
     });
@@ -916,7 +916,7 @@ fn sqrt_rem_properties() {
         assert_eq!(Natural::exact_from(&rug_rem), rem);
 
         assert_eq!((&n).floor_sqrt(), sqrt);
-        assert!(rem <= &sqrt << 1);
+        assert!(rem <= &sqrt << 1u32);
         assert_eq!(sqrt.square() + rem, n);
     });
 

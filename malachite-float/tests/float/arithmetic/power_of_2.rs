@@ -581,7 +581,7 @@ fn power_of_2_prec_round_properties_helper(i: i64, prec: u64, rm: RoundingMode) 
     if p.is_normal() {
         assert_eq!(p.get_prec(), Some(prec));
     } else {
-        assert_eq!(o, if p > 0 { Greater } else { Less });
+        assert_eq!(o, if p > 0u32 { Greater } else { Less });
     }
 
     if i.lt_abs(&1_000_000_000) {
@@ -714,7 +714,7 @@ fn power_of_2_prec_properties_helper(i: i64, prec: u64) {
         assert_eq!(p.get_prec(), Some(prec));
         assert!(p.is_power_of_2());
     } else {
-        assert_eq!(o, if p > 0 { Greater } else { Less });
+        assert_eq!(o, if p > 0u32 { Greater } else { Less });
     }
 
     if i.lt_abs(&1_000_000_000) {

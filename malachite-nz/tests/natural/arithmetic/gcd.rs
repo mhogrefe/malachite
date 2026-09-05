@@ -13100,11 +13100,11 @@ fn gcd_properties_helper(x: Natural, y: Natural) {
     assert_eq!((&y).gcd(&x), gcd);
     assert!((&x).divisible_by(&gcd));
     assert!((&y).divisible_by(&gcd));
-    assert_eq!(gcd == 0, x == 0 && y == 0);
-    if gcd != 0 {
+    assert_eq!(gcd == 0u32, x == 0u32 && y == 0u32);
+    if gcd != 0u32 {
         assert!(((&x).div_exact(&gcd)).coprime_with((&y).div_exact(&gcd)));
     }
-    if x != 0 && y != 0 {
+    if x != 0u32 && y != 0u32 {
         assert_eq!(&x * &y / x.lcm(y), gcd);
     }
 }

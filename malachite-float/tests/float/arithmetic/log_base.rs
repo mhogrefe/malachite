@@ -193,7 +193,7 @@ fn test_log_base_prec_round() {
     );
     // x in (0, 1): negative result.
     test(
-        Float::from(1) >> 3,
+        Float::from(1) >> 3u32,
         3,
         20,
         Nearest,
@@ -252,11 +252,11 @@ fn test_log_base_directed_consistency() {
         (Float::from(81), 3, 30),
         (Float::from(2), 3, 30),
         (Float::from(7), 5, 40),
-        (Float::from(8), 2, 30),         // power-of-2 base
-        (Float::from(64), 4, 30),        // power-of-2 base
-        (Float::from(1) >> 5, 3, 30),    // 1/32, negative result
-        (Float::from(5) >> 1, 3, 30),    // 2.5, a non-integer >= 1
-        (Float::from(3) << 1000, 5, 10), // huge exponent: exercises the balloon-safety guard
+        (Float::from(8), 2, 30),            // power-of-2 base
+        (Float::from(64), 4, 30),           // power-of-2 base
+        (Float::from(1) >> 5u32, 3, 30),    // 1/32, negative result
+        (Float::from(5) >> 1u32, 3, 30),    // 2.5, a non-integer >= 1
+        (Float::from(3) << 1000u32, 5, 10), // huge exponent: exercises the balloon-safety guard
     ];
     for (x, base, prec) in inputs {
         let (floor, _) = check(x, *base, *prec, Floor);

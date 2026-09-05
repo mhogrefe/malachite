@@ -42,8 +42,8 @@ fn remove_one_plus_i_helper(mut x: GaussianInteger, s: u64, odd: bool) -> (Gauss
         // (a + bi) / (1 + i) = ((a + b) + (b - a)i) / 2
         let t = &x.real + &x.imaginary;
         x.imaginary -= &x.real;
-        x.real = t >> 1u64;
-        x.imaginary >>= 1u64;
+        x.real = t >> 1u32;
+        x.imaginary >>= 1u32;
     }
     (x, (s << 1) | u64::from(odd))
 }

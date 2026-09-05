@@ -40,7 +40,7 @@ fn invert_mod_power_of_2(x: &Natural, pow: u64) -> Natural {
 fn get_log_base_of_2(base: u64, precision: u64) -> Natural {
     let extended_precision = precision + 16;
     let mut t = Natural::power_of_2(extended_precision);
-    let two = &t << 1;
+    let two = &t << 1u32;
     let mut log = Natural::ZERO;
     let mut base = Natural::from(base) << extended_precision;
     for i in (0..precision).rev() {
@@ -130,7 +130,7 @@ fn table() {
     for base in 2..=256 {
         let mut data = generate(base);
         let raw = get_log_base_of_2(base, Limb::WIDTH + 8);
-        let log_base_of_2 = &raw >> 8;
+        let log_base_of_2 = &raw >> 8u32;
         let log_2_of_base = Natural::low_mask((Limb::WIDTH << 1) + 5) / (raw + Natural::ONE);
         if base.is_power_of_two() {
             data.big_base = Natural::from(base.significant_bits() - 1);

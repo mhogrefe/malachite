@@ -218,7 +218,7 @@ fn pow_properties() {
     gaussian_rational_signed_pair_gen_var_1::<i64>().test_properties_with_config(
         &config,
         |(x, exp)| {
-            if x == GaussianRational::ZERO && exp < 0 {
+            if x == 0u32 && exp < 0 {
                 return;
             }
             let power = (&x).pow(exp);
@@ -242,7 +242,7 @@ fn pow_properties() {
 
             assert_eq!((&power).abs_squared(), (&x).abs_squared().pow(exp));
             assert_eq!((&x).conjugate().pow(exp), (&power).conjugate());
-            if x != GaussianRational::ZERO {
+            if x != 0u32 {
                 assert_eq!((&x).pow(-exp), (&power).reciprocal());
             }
             // a positive exponent's power has the base among its roots, and a negative one's has

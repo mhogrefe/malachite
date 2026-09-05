@@ -127,7 +127,7 @@ fn to_string_properties() {
         assert_eq!(BigInt::from(&x).to_string(), s);
         assert_eq!(rug::Integer::from(&x).to_string(), s);
         assert!(string_is_subset(&s, "-0123456789"));
-        if x != 0 {
+        if x != 0u32 {
             assert!(!s.starts_with('0'));
         }
     });
@@ -277,7 +277,7 @@ pub fn test_to_binary_string() {
 fn to_binary_string_properties() {
     integer_gen().test_properties(|x| {
         let s = x.to_binary_string();
-        let prefixed_s = if x < 0 {
+        let prefixed_s = if x < 0u32 {
             "-0b".to_owned() + &s[1..]
         } else {
             "0b".to_owned() + &s
@@ -293,7 +293,7 @@ fn to_binary_string_properties() {
         assert_eq!(rug_x.to_binary_string(), s);
         assert_eq!(format!("{rug_x:#b}"), prefixed_s);
         assert!(string_is_subset(&s, "-01"));
-        if x != 0 {
+        if x != 0u32 {
             assert!(!s.starts_with('0'));
         }
     });
@@ -447,7 +447,7 @@ pub fn test_to_octal_string() {
 fn to_octal_string_properties() {
     integer_gen().test_properties(|x| {
         let s = x.to_octal_string();
-        let prefixed_s = if x < 0 {
+        let prefixed_s = if x < 0u32 {
             "-0o".to_owned() + &s[1..]
         } else {
             "0o".to_owned() + &s
@@ -463,7 +463,7 @@ fn to_octal_string_properties() {
         assert_eq!(rug_x.to_octal_string(), s);
         assert_eq!(format!("{rug_x:#o}"), prefixed_s);
         assert!(string_is_subset(&s, "-01234567"));
-        if x != 0 {
+        if x != 0u32 {
             assert!(!s.starts_with('0'));
         }
     });
@@ -652,7 +652,7 @@ pub fn test_to_upper_hex_string() {
 fn to_hex_string_properties() {
     integer_gen().test_properties(|x| {
         let s = x.to_lower_hex_string();
-        let prefixed_s = if x < 0 {
+        let prefixed_s = if x < 0u32 {
             "-0x".to_owned() + &s[1..]
         } else {
             "0x".to_owned() + &s
@@ -661,7 +661,7 @@ fn to_hex_string_properties() {
         assert_eq!(x.to_upper_hex_string(), s.to_ascii_uppercase());
         assert_eq!(
             format!("{x:#X}"),
-            if x < 0 {
+            if x < 0u32 {
                 "-0x".to_owned() + &s[1..].to_ascii_uppercase()
             } else {
                 "0x".to_owned() + &s.to_ascii_uppercase()
@@ -672,7 +672,7 @@ fn to_hex_string_properties() {
         assert_eq!(format!("{x:00X}"), s.to_ascii_uppercase());
         assert_eq!(
             format!("{x:#00X}"),
-            if x < 0 {
+            if x < 0u32 {
                 "-0x".to_owned() + &s[1..].to_ascii_uppercase()
             } else {
                 "0x".to_owned() + &s.to_ascii_uppercase()
@@ -686,7 +686,7 @@ fn to_hex_string_properties() {
         assert_eq!(rug_x.to_lower_hex_string(), s);
         assert_eq!(format!("{rug_x:#x}"), prefixed_s);
         assert!(string_is_subset(&s, "-0123456789abcdef"));
-        if x != 0 {
+        if x != 0u32 {
             assert!(!s.starts_with('0'));
         }
     });
@@ -907,7 +907,7 @@ fn to_string_base_properties() {
             &s,
             "-0123456789abcdefghijklmnopqrstuvwxyz"
         ));
-        if x != 0 {
+        if x != 0u32 {
             assert!(!s.starts_with('0'));
         }
     });
@@ -1122,7 +1122,7 @@ fn to_string_base_upper_properties() {
             &s,
             "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         ));
-        if x != 0 {
+        if x != 0u32 {
             assert!(!s.starts_with('0'));
         }
     });

@@ -14,7 +14,7 @@ use malachite_base::num::arithmetic::traits::DivMod;
 // at least half the divisor.
 fn round_half_up(t: Integer, n: &Integer) -> Integer {
     let (q, r) = t.div_mod(n);
-    if r << 1u64 >= *n {
+    if r << 1u32 >= *n {
         q + Integer::from(1u32)
     } else {
         q

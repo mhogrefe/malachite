@@ -105,14 +105,14 @@ fn get_bit_properties() {
     integer_unsigned_pair_gen_var_2().test_properties(|(n, index)| {
         let bit = n.get_bit(index);
         assert_eq!(rug::Integer::from(&n).get_bit(u32::exact_from(index)), bit);
-        assert_eq!(&n & Integer::power_of_2(index) != 0, bit);
+        assert_eq!(&n & Integer::power_of_2(index) != 0u32, bit);
         assert_eq!(!(!n).get_bit(index), bit);
     });
 
     integer_gen_var_4().test_properties(|n| {
         let significant_bits = n.significant_bits();
         assert!(!n.get_bit(significant_bits));
-        if n != 0 {
+        if n != 0u32 {
             assert!(n.get_bit(significant_bits - 1));
         }
     });

@@ -380,7 +380,7 @@ fn twos_complement_limbs_properties() {
         } else {
             assert_eq!(
                 n.twos_complement_limbs().get_limb(u),
-                if n >= 0 { 0 } else { Limb::MAX }
+                if n >= 0u32 { 0 } else { Limb::MAX }
             );
         }
     });
@@ -395,7 +395,8 @@ fn twos_complement_limb_count_properties() {
     integer_gen().test_properties(|x| {
         let n = x.twos_complement_limb_count();
         assert_eq!(
-            (x >= 0 && x < LIMB_HIGH_BIT) || (x < 0 && x >= -Integer::from(LIMB_HIGH_BIT)),
+            (x.sign() != Less && x < LIMB_HIGH_BIT)
+                || (x < 0u32 && x >= -Integer::from(LIMB_HIGH_BIT)),
             n <= 1
         );
     });

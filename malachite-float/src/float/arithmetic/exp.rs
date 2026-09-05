@@ -135,7 +135,7 @@ fn exp2_aux(r: Float, q: u64) -> (Integer, i64, u64) {
             }
             debug_assert_eq!(expt, exps);
         }
-        if t == 0 {
+        if t == 0u32 {
             break;
         }
         s += &t; // exact
@@ -231,7 +231,7 @@ fn exp2_aux2(r: Float, q: u64) -> (Integer, i64, u64) {
         }
         t /= tmp; // err(t) <= err(rr) + 2m
         l += m as u64;
-        if t == 0 {
+        if t == 0u32 {
             break;
         }
         let (rr2, sh) = mpz_normalize(t, i64::exact_from(ql));
@@ -239,7 +239,7 @@ fn exp2_aux2(r: Float, q: u64) -> (Integer, i64, u64) {
         expr += sh;
         // in late giant steps `ql` can go <= 0 (s has grown past the working precision), so
         // normalizing t to ql bits can shift it away entirely; rr is then 0.
-        let rrbit = if rr == 0 {
+        let rrbit = if rr == 0u32 {
             1
         } else {
             i64::exact_from(rr.significant_bits())
@@ -447,7 +447,7 @@ pub(crate) fn exp_3(x: &Float, precy: u64, rm: RoundingMode) -> (Float, Ordering
         let iter = k.min(prec_x);
         for i in 1..=iter {
             let uk = extract(&x_copy, i);
-            if uk != 0 {
+            if uk != 0u32 {
                 let t = exp_rational(
                     uk,
                     i64::exact_from(twopoweri) - ttt,
@@ -478,7 +478,7 @@ pub(crate) fn exp_3(x: &Float, precy: u64, rm: RoundingMode) -> (Float, Ordering
                 // narrow band just above `normal_ref`'s `bound_emin`; exp's own test inputs never
                 // land there, but `Float::pow`'s do (its Ziv loop feeds y * ln|x| here at boundary
                 // magnitudes), and pow's property tests validate this path against MPFR.
-                tmp <<= 1;
+                tmp <<= 1u32;
                 t = tmp.square_prec_round_ref(prec, Floor).0;
                 if matches!(t.0, Zero { .. }) {
                     // exact result < 2^(emin - 2): genuine underflow.
@@ -496,7 +496,7 @@ pub(crate) fn exp_3(x: &Float, precy: u64, rm: RoundingMode) -> (Float, Ordering
             if scaled && y.is_normal() {
                 // Undo the *2 scaling: y /= 4.
                 let ey = i64::from(y.get_exponent().unwrap());
-                let inex2 = y.shr_round_assign(2, rm);
+                let inex2 = y.shr_round_assign(2u32, rm);
                 if inex2 != Equal {
                     // Underflow while unscaling.
                     if rm == Nearest

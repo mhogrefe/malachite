@@ -189,7 +189,7 @@ fn remove_power_properties() {
 
         // the defining identity, and the quotient has no factor left
         assert_eq!(&q * (&y).pow(k), x, "x={x} y={y} q={q} k={k}");
-        if x != 0 {
+        if x != 0u32 {
             assert!(!(&q).divisible_by(&y), "x={x} y={y} q={q} k={k}");
         } else {
             assert_eq!(k, 0);
@@ -203,7 +203,7 @@ fn remove_power_properties() {
     natural_pair_gen_var_16().test_properties(|(x, y)| {
         // a value built to contain a known power of the factor gives back at least that power;
         // random pairs almost never divide, so this is what exercises repeated removal
-        if x != 0 {
+        if x != 0u32 {
             let k = 5;
             let (q, found) = (&x * (&y).pow(k)).remove_power(&y);
             assert!(found >= k);

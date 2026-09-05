@@ -1,0 +1,100 @@
+error: use `100u32`: a literal compared with a bignum is a `u32`, or an `i32` when negative
+  --> $DIR/bignum_literal_suffix.rs:13:13
+   |
+LL |     if n == 100u64 {
+   |             ^^^^^^
+   |
+   = note: `#[deny(bignum_literal_suffix)]` on by default
+
+error: use `3u32`: a literal compared with a bignum is a `u32`, or an `i32` when negative
+  --> $DIR/bignum_literal_suffix.rs:18:12
+   |
+LL |     if n > 3 {
+   |            ^
+
+error: use `-1i32`: a literal compared with a bignum is a `u32`, or an `i32` when negative
+  --> $DIR/bignum_literal_suffix.rs:23:12
+   |
+LL |     if i < -1i64 {
+   |            ^^^^^
+
+error: use `0u32`: a literal compared with a bignum is a `u32`, or an `i32` when negative
+  --> $DIR/bignum_literal_suffix.rs:28:12
+   |
+LL |     if i > 0i32 {
+   |            ^^^^
+
+error: use `5u32`: a literal compared with a bignum is a `u32`, or an `i32` when negative
+  --> $DIR/bignum_literal_suffix.rs:33:8
+   |
+LL |     if 5u8 < n {
+   |        ^^^
+
+error: use `100u32`: a literal compared with a bignum is a `u32`, or an `i32` when negative
+  --> $DIR/bignum_literal_suffix.rs:38:28
+   |
+LL |     let _ = n.partial_cmp(&100u64);
+   |                            ^^^^^^
+
+error: use `1u32`: a literal compared with a bignum is a `u32`, or an `i32` when negative
+  --> $DIR/bignum_literal_suffix.rs:39:19
+   |
+LL |     let _ = f.eq(&1usize);
+   |                   ^^^^^^
+
+error: use `5u32`: a literal compared with a bignum is a `u32`, or an `i32` when negative
+  --> $DIR/bignum_literal_suffix.rs:40:19
+   |
+LL |     let _ = n.lt(&5);
+   |                   ^
+
+error: use `3u32`: a literal compared with a bignum is a `u32`, or an `i32` when negative
+  --> $DIR/bignum_literal_suffix.rs:41:23
+   |
+LL |     let _ = i.le_abs(&3i64);
+   |                       ^^^^
+
+error: use `2u32`: a literal compared with a bignum is a `u32`, or an `i32` when negative
+  --> $DIR/bignum_literal_suffix.rs:42:32
+   |
+LL |     let _ = f.partial_cmp_abs(&2u8);
+   |                                ^^^
+
+error: use `1u32`: a literal shifting a bignum is a `u32`, or an `i32` when negative
+  --> $DIR/bignum_literal_suffix.rs:44:19
+   |
+LL |     let _ = &n << 1u64;
+   |                   ^^^^
+
+error: use `2u32`: a literal shifting a bignum is a `u32`, or an `i32` when negative
+  --> $DIR/bignum_literal_suffix.rs:45:19
+   |
+LL |     let _ = &n >> 2;
+   |                   ^
+
+error: use `3u32`: a literal shifting a bignum is a `u32`, or an `i32` when negative
+  --> $DIR/bignum_literal_suffix.rs:47:11
+   |
+LL |     m <<= 3usize;
+   |           ^^^^^^
+
+error: use `-1i32`: a literal shifting a bignum is a `u32`, or an `i32` when negative
+  --> $DIR/bignum_literal_suffix.rs:48:19
+   |
+LL |     let _ = &i << -1i64;
+   |                   ^^^^^
+
+error: use `1u32`: a literal shifting a bignum is a `u32`, or an `i32` when negative
+  --> $DIR/bignum_literal_suffix.rs:49:28
+   |
+LL |     let _ = (&n).shr_round(1i64, Ceiling).0;
+   |                            ^^^^
+
+error: use `4u32`: a literal shifting a bignum is a `u32`, or an `i32` when negative
+  --> $DIR/bignum_literal_suffix.rs:50:28
+   |
+LL |     let _ = (&f).shr_round(4u64, Floor).0;
+   |                            ^^^^
+
+error: aborting due to 16 previous errors
+

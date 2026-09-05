@@ -14308,7 +14308,7 @@ fn div_prec_round_properties_helper(
         assert_eq!(rug_o, o);
     }
 
-    if o == Equal && quotient.is_finite() && quotient != 0 {
+    if o == Equal && quotient.is_finite() && quotient != 0u32 {
         assert_eq!(
             ComparableFloatRef(
                 &quotient
@@ -14481,11 +14481,11 @@ fn div_prec_round_properties() {
                     )
                 );
             }
-            if x != 0 {
+            if x != 0u32 {
                 assert_eq!(
                     x.div_prec_round_ref_val(Float::ZERO, prec, rm),
                     (
-                        if x > 0 {
+                        if x > 0u32 {
                             Float::INFINITY
                         } else {
                             Float::NEGATIVE_INFINITY
@@ -14496,7 +14496,7 @@ fn div_prec_round_properties() {
                 assert_eq!(
                     Float::ZERO.div_prec_round_val_ref(&x, prec, rm),
                     (
-                        if x > 0 {
+                        if x > 0u32 {
                             Float::ZERO
                         } else {
                             Float::NEGATIVE_ZERO
@@ -14507,7 +14507,7 @@ fn div_prec_round_properties() {
                 assert_eq!(
                     x.div_prec_round_ref_val(Float::ZERO, prec, rm),
                     (
-                        if x > 0 {
+                        if x > 0u32 {
                             Float::INFINITY
                         } else {
                             Float::NEGATIVE_INFINITY
@@ -14518,7 +14518,7 @@ fn div_prec_round_properties() {
                 assert_eq!(
                     Float::NEGATIVE_ZERO.div_prec_round_val_ref(&x, prec, rm),
                     (
-                        if x > 0 {
+                        if x > 0u32 {
                             Float::NEGATIVE_ZERO
                         } else {
                             Float::ZERO
@@ -14591,7 +14591,7 @@ fn div_prec_properties_helper(x: Float, y: Float, prec: u64, extreme: bool) {
         assert_eq!(o_alt, o);
     }
 
-    if o == Equal && quotient.is_finite() && quotient != 0 {
+    if o == Equal && quotient.is_finite() && quotient != 0u32 {
         assert_eq!(
             ComparableFloatRef(&quotient.mul_prec_ref_ref(&y, x.significant_bits()).0),
             ComparableFloatRef(&x)
@@ -14737,11 +14737,11 @@ fn div_prec_properties() {
                     )
                 );
             }
-            if x != 0 {
+            if x != 0u32 {
                 assert_eq!(
                     x.div_prec_ref_val(Float::ZERO, prec),
                     (
-                        if x > 0 {
+                        if x > 0u32 {
                             Float::INFINITY
                         } else {
                             Float::NEGATIVE_INFINITY
@@ -14752,7 +14752,7 @@ fn div_prec_properties() {
                 assert_eq!(
                     Float::ZERO.div_prec_val_ref(&x, prec),
                     (
-                        if x > 0 {
+                        if x > 0u32 {
                             Float::ZERO
                         } else {
                             Float::NEGATIVE_ZERO
@@ -14763,7 +14763,7 @@ fn div_prec_properties() {
                 assert_eq!(
                     x.div_prec_ref_val(Float::NEGATIVE_ZERO, prec),
                     (
-                        if x > 0 {
+                        if x > 0u32 {
                             Float::NEGATIVE_INFINITY
                         } else {
                             Float::INFINITY
@@ -14774,7 +14774,7 @@ fn div_prec_properties() {
                 assert_eq!(
                     Float::NEGATIVE_ZERO.div_prec_val_ref(&x, prec),
                     (
-                        if x > 0 {
+                        if x > 0u32 {
                             Float::NEGATIVE_ZERO
                         } else {
                             Float::ZERO
@@ -14854,7 +14854,7 @@ fn div_round_properties_helper(x: Float, y: Float, rm: RoundingMode, extreme: bo
     );
     assert_eq!(o_alt, o);
 
-    if o == Equal && quotient.is_finite() && quotient != 0 {
+    if o == Equal && quotient.is_finite() && quotient != 0u32 {
         assert_eq!(quotient.mul_round_ref_ref(&y, Exact).0, x);
         assert_eq!(x.div_round_ref_ref(&quotient, Exact).0, y);
     }
@@ -15036,11 +15036,11 @@ fn div_round_properties() {
                     )
                 );
             }
-            if x != 0 {
+            if x != 0u32 {
                 assert_eq!(
                     x.div_round_ref_val(Float::ZERO, rm),
                     (
-                        if x > 0 {
+                        if x > 0u32 {
                             Float::INFINITY
                         } else {
                             Float::NEGATIVE_INFINITY
@@ -15051,7 +15051,7 @@ fn div_round_properties() {
                 assert_eq!(
                     Float::ZERO.div_round_val_ref(&x, rm),
                     (
-                        if x > 0 {
+                        if x > 0u32 {
                             Float::ZERO
                         } else {
                             Float::NEGATIVE_ZERO
@@ -15062,7 +15062,7 @@ fn div_round_properties() {
                 assert_eq!(
                     x.div_round_ref_val(Float::NEGATIVE_ZERO, rm),
                     (
-                        if x > 0 {
+                        if x > 0u32 {
                             Float::NEGATIVE_INFINITY
                         } else {
                             Float::INFINITY
@@ -15073,7 +15073,7 @@ fn div_round_properties() {
                 assert_eq!(
                     Float::NEGATIVE_ZERO.div_round_val_ref(&x, rm),
                     (
-                        if x > 0 {
+                        if x > 0u32 {
                             Float::NEGATIVE_ZERO
                         } else {
                             Float::ZERO
@@ -15157,7 +15157,7 @@ fn div_properties_helper_1(x: Float, y: Float, extreme: bool) {
         ComparableFloatRef(&quotient)
     );
 
-    if o == Equal && quotient.is_finite() && quotient != 0 {
+    if o == Equal && quotient.is_finite() && quotient != 0u32 {
         assert_eq!(&quotient * &y, x);
         assert_eq!(&x / &quotient, y);
     }
@@ -15293,7 +15293,7 @@ fn div_properties() {
                     }
                 );
             }
-            if x != 0 {
+            if x != 0u32 {
                 assert_eq!(
                     &x / Float::ZERO,
                     if x.is_sign_positive() {
@@ -15450,7 +15450,7 @@ fn div_rational_prec_round_properties_helper(
         assert_eq!(rug_o, o);
     }
 
-    if o == Equal && quotient.is_finite() && quotient != 0 {
+    if o == Equal && quotient.is_finite() && quotient != 0u32 {
         assert_eq!(
             ComparableFloatRef(
                 &quotient
@@ -15492,7 +15492,7 @@ fn div_rational_prec_round_properties_helper(
     }
 
     let (mut quotient_alt, mut o_alt) = x.div_rational_prec_round_ref_val(-&y, prec, -rm);
-    if y != 0 {
+    if y != 0u32 {
         quotient_alt.neg_assign();
     }
     o_alt = o_alt.reverse();
@@ -15511,7 +15511,7 @@ fn div_rational_prec_round_properties_helper(
     );
     assert_eq!(o_alt, o);
 
-    if quotient != 0u32 && y != 0 {
+    if quotient != 0u32 && y != 0u32 {
         let (quotient_alt, o_alt) = (-&x).div_rational_prec_round(-&y, prec, rm);
         assert_eq!(
             ComparableFloatRef(&quotient_alt),
@@ -15556,11 +15556,11 @@ fn div_rational_prec_round_properties() {
             assert_eq!(ComparableFloat(quotient), ComparableFloat(quotient_alt));
             assert_eq!(o, o_alt);
         }
-        if !x.is_nan() && x != 0 {
+        if !x.is_nan() && x != 0u32 {
             assert_eq!(
                 x.div_rational_prec_round_ref_val(Rational::ZERO, prec, rm),
                 (
-                    if x > 0 {
+                    if x > 0u32 {
                         Float::INFINITY
                     } else {
                         Float::NEGATIVE_INFINITY
@@ -15578,7 +15578,7 @@ fn div_rational_prec_round_properties() {
         assert_eq!(
             Float::INFINITY.div_rational_prec_round_val_ref(&x, prec, rm),
             (
-                if x >= 0 {
+                if x >= 0u32 {
                     Float::INFINITY
                 } else {
                     Float::NEGATIVE_INFINITY
@@ -15589,7 +15589,7 @@ fn div_rational_prec_round_properties() {
         assert_eq!(
             Float::NEGATIVE_INFINITY.div_rational_prec_round_val_ref(&x, prec, rm),
             (
-                if x >= 0 {
+                if x >= 0u32 {
                     Float::NEGATIVE_INFINITY
                 } else {
                     Float::INFINITY
@@ -15597,11 +15597,11 @@ fn div_rational_prec_round_properties() {
                 Equal
             )
         );
-        if x != 0 {
+        if x != 0u32 {
             let (quotient, o) = Float::ZERO.div_rational_prec_round_val_ref(&x, prec, rm);
             assert_eq!(
                 ComparableFloat(quotient),
-                ComparableFloat(if x >= 0 {
+                ComparableFloat(if x >= 0u32 {
                     Float::ZERO
                 } else {
                     Float::NEGATIVE_ZERO
@@ -15612,7 +15612,7 @@ fn div_rational_prec_round_properties() {
             let (quotient, o) = Float::NEGATIVE_ZERO.div_rational_prec_round_val_ref(&x, prec, rm);
             assert_eq!(
                 ComparableFloat(quotient),
-                ComparableFloat(if x >= 0 {
+                ComparableFloat(if x >= 0u32 {
                     Float::NEGATIVE_ZERO
                 } else {
                     Float::ZERO
@@ -15691,7 +15691,7 @@ fn div_rational_prec_properties_helper(x: Float, y: Rational, prec: u64, extreme
     );
     assert_eq!(rug_o, o);
 
-    if o == Equal && quotient.is_finite() && quotient != 0 {
+    if o == Equal && quotient.is_finite() && quotient != 0u32 {
         assert_eq!(
             ComparableFloatRef(
                 &quotient
@@ -15778,11 +15778,11 @@ fn div_rational_prec_properties() {
             assert_eq!(o, o_alt);
         }
 
-        if x.is_finite() && x != 0 {
+        if x.is_finite() && x != 0u32 {
             let (quotient, o) = x.div_rational_prec_ref_val(Rational::ZERO, prec);
             assert_eq!(
                 ComparableFloat(quotient),
-                ComparableFloat(if x >= 0 {
+                ComparableFloat(if x >= 0u32 {
                     Float::INFINITY
                 } else {
                     Float::NEGATIVE_INFINITY
@@ -15797,11 +15797,11 @@ fn div_rational_prec_properties() {
         assert!(quotient.is_nan());
         assert_eq!(o, Equal);
 
-        if x != 0 {
+        if x != 0u32 {
             assert_eq!(
                 Float::INFINITY.div_rational_prec_val_ref(&x, prec),
                 (
-                    if x >= 0 {
+                    if x >= 0u32 {
                         Float::INFINITY
                     } else {
                         Float::NEGATIVE_INFINITY
@@ -15812,7 +15812,7 @@ fn div_rational_prec_properties() {
             assert_eq!(
                 Float::NEGATIVE_INFINITY.div_rational_prec_val_ref(&x, prec),
                 (
-                    if x >= 0 {
+                    if x >= 0u32 {
                         Float::NEGATIVE_INFINITY
                     } else {
                         Float::INFINITY
@@ -15822,11 +15822,11 @@ fn div_rational_prec_properties() {
             );
         }
 
-        if x != 0 {
+        if x != 0u32 {
             let (quotient, o) = Float::ZERO.div_rational_prec_val_ref(&x, prec);
             assert_eq!(
                 ComparableFloat(quotient),
-                ComparableFloat(if x >= 0 {
+                ComparableFloat(if x >= 0u32 {
                     Float::ZERO
                 } else {
                     Float::NEGATIVE_ZERO
@@ -15836,7 +15836,7 @@ fn div_rational_prec_properties() {
             let (quotient, o) = Float::NEGATIVE_ZERO.div_rational_prec_val_ref(&x, prec);
             assert_eq!(
                 ComparableFloat(quotient),
-                ComparableFloat(if x >= 0 {
+                ComparableFloat(if x >= 0u32 {
                     Float::NEGATIVE_ZERO
                 } else {
                     Float::ZERO
@@ -15912,7 +15912,7 @@ fn div_rational_round_properties_helper(x: Float, y: Rational, rm: RoundingMode,
     );
     assert_eq!(o_alt, o);
 
-    if o == Equal && quotient.is_finite() && quotient != 0 {
+    if o == Equal && quotient.is_finite() && quotient != 0u32 {
         assert_eq!(quotient.mul_rational_round_ref_ref(&y, Exact).0, x);
         // TODO additional test
     }
@@ -15959,7 +15959,7 @@ fn div_rational_round_properties_helper(x: Float, y: Rational, rm: RoundingMode,
         assert_eq!(rug_o, o);
     }
 
-    if y != 0 {
+    if y != 0u32 {
         let (mut quotient_alt, mut o_alt) = x.div_rational_round_ref_val(-&y, -rm);
         quotient_alt.neg_assign();
         o_alt = o_alt.reverse();
@@ -15979,7 +15979,7 @@ fn div_rational_round_properties_helper(x: Float, y: Rational, rm: RoundingMode,
         ComparableFloat(quotient.abs_negative_zero_ref())
     );
 
-    if x != 0 && y != 0 {
+    if x != 0u32 && y != 0u32 {
         let (quotient_alt, o_alt) = (-&x).div_rational_round(-&y, rm);
         assert_eq!(
             ComparableFloatRef(&quotient_alt),
@@ -16017,11 +16017,11 @@ fn div_rational_round_properties() {
         assert_eq!(ComparableFloatRef(&quotient), ComparableFloatRef(&x));
         assert_eq!(o, Equal);
 
-        if x.is_finite() && x != 0 {
+        if x.is_finite() && x != 0u32 {
             let (quotient, o) = x.div_rational_round_ref_val(Rational::ZERO, rm);
             assert_eq!(
                 ComparableFloat(quotient),
-                ComparableFloat(if x >= 0 {
+                ComparableFloat(if x >= 0u32 {
                     Float::INFINITY
                 } else {
                     Float::NEGATIVE_INFINITY
@@ -16036,11 +16036,11 @@ fn div_rational_round_properties() {
         assert!(quotient.is_nan());
         assert_eq!(o, Equal);
 
-        if x != 0 {
+        if x != 0u32 {
             assert_eq!(
                 Float::INFINITY.div_rational_round_val_ref(&x, rm),
                 (
-                    if x >= 0 {
+                    if x >= 0u32 {
                         Float::INFINITY
                     } else {
                         Float::NEGATIVE_INFINITY
@@ -16051,7 +16051,7 @@ fn div_rational_round_properties() {
             assert_eq!(
                 Float::NEGATIVE_INFINITY.div_rational_round_val_ref(&x, rm),
                 (
-                    if x >= 0 {
+                    if x >= 0u32 {
                         Float::NEGATIVE_INFINITY
                     } else {
                         Float::INFINITY
@@ -16132,7 +16132,7 @@ fn div_rational_properties_helper(x: Float, y: Rational, extreme: bool) {
         ComparableFloatRef(&quotient)
     );
 
-    if o == Equal && quotient.is_finite() && quotient != 0 {
+    if o == Equal && quotient.is_finite() && quotient != 0u32 {
         assert_eq!(&quotient * &y, x);
         // TODO additional test
     }
@@ -16164,7 +16164,7 @@ fn div_rational_properties_helper(x: Float, y: Rational, extreme: bool) {
             ComparableFloatRef(&-(-&x / &y)),
             ComparableFloatRef(&quotient)
         );
-        if y != 0 {
+        if y != 0u32 {
             assert_eq!(
                 ComparableFloatRef(&-(&x / -&y)),
                 ComparableFloatRef(&quotient)
@@ -16192,7 +16192,7 @@ fn div_rational_properties() {
             ComparableFloatRef(&(&x / Rational::ONE)),
             ComparableFloatRef(&x)
         );
-        if x.is_finite() && x != 0 {
+        if x.is_finite() && x != 0u32 {
             assert_eq!(
                 ComparableFloat(&x / Rational::ZERO),
                 ComparableFloat(if x.is_sign_positive() {
@@ -16208,7 +16208,7 @@ fn div_rational_properties() {
         assert!((&x / Float::NAN).is_nan());
         assert_eq!(
             &x / Float::INFINITY,
-            if x >= 0 {
+            if x >= 0u32 {
                 Float::ZERO
             } else {
                 Float::NEGATIVE_ZERO
@@ -16216,16 +16216,16 @@ fn div_rational_properties() {
         );
         assert_eq!(
             &x / Float::NEGATIVE_INFINITY,
-            if x >= 0 {
+            if x >= 0u32 {
                 Float::NEGATIVE_ZERO
             } else {
                 Float::ZERO
             }
         );
-        if x != 0 {
+        if x != 0u32 {
             assert_eq!(
                 &x / Float::ZERO,
-                if x > 0 {
+                if x > 0u32 {
                     Float::INFINITY
                 } else {
                     Float::NEGATIVE_INFINITY
@@ -16233,7 +16233,7 @@ fn div_rational_properties() {
             );
             assert_eq!(
                 &x / Float::NEGATIVE_ZERO,
-                if x > 0 {
+                if x > 0u32 {
                     Float::NEGATIVE_INFINITY
                 } else {
                     Float::INFINITY
@@ -16434,11 +16434,11 @@ fn rational_div_float_prec_round_properties() {
     );
 
     float_unsigned_rounding_mode_triple_gen_var_1().test_properties(|(x, prec, rm)| {
-        if !x.is_nan() && x != 0 {
+        if !x.is_nan() && x != 0u32 {
             assert_eq!(
                 Float::rational_div_float_prec_round_val_ref(Rational::ZERO, &x, prec, rm),
                 (
-                    if x > 0 {
+                    if x > 0u32 {
                         Float::ZERO
                     } else {
                         Float::NEGATIVE_ZERO
@@ -16456,7 +16456,7 @@ fn rational_div_float_prec_round_properties() {
         assert_eq!(
             Float::rational_div_float_prec_round_ref_val(&x, Float::INFINITY, prec, rm),
             (
-                if x >= 0 {
+                if x >= 0u32 {
                     Float::ZERO
                 } else {
                     Float::NEGATIVE_ZERO
@@ -16467,7 +16467,7 @@ fn rational_div_float_prec_round_properties() {
         assert_eq!(
             Float::rational_div_float_prec_round_ref_val(&x, Float::NEGATIVE_INFINITY, prec, rm),
             (
-                if x >= 0 {
+                if x >= 0u32 {
                     Float::NEGATIVE_ZERO
                 } else {
                     Float::ZERO
@@ -16475,12 +16475,12 @@ fn rational_div_float_prec_round_properties() {
                 Equal
             )
         );
-        if x != 0 {
+        if x != 0u32 {
             let (quotient, o) =
                 Float::rational_div_float_prec_round_ref_val(&x, Float::ZERO, prec, rm);
             assert_eq!(
                 ComparableFloat(quotient),
-                ComparableFloat(if x >= 0 {
+                ComparableFloat(if x >= 0u32 {
                     Float::INFINITY
                 } else {
                     Float::NEGATIVE_INFINITY
@@ -16492,7 +16492,7 @@ fn rational_div_float_prec_round_properties() {
                 Float::rational_div_float_prec_round_ref_val(&x, Float::NEGATIVE_ZERO, prec, rm);
             assert_eq!(
                 ComparableFloat(quotient),
-                ComparableFloat(if x >= 0 {
+                ComparableFloat(if x >= 0u32 {
                     Float::NEGATIVE_INFINITY
                 } else {
                     Float::INFINITY
@@ -16615,11 +16615,11 @@ fn rational_div_float_prec_properties() {
     });
 
     float_unsigned_pair_gen_var_1().test_properties(|(x, prec)| {
-        if x.is_finite() && x != 0 {
+        if x.is_finite() && x != 0u32 {
             let (quotient, o) = Float::rational_div_float_prec_val_ref(Rational::ZERO, &x, prec);
             assert_eq!(
                 ComparableFloat(quotient),
-                ComparableFloat(if x >= 0 {
+                ComparableFloat(if x >= 0u32 {
                     Float::ZERO
                 } else {
                     Float::NEGATIVE_ZERO
@@ -16634,11 +16634,11 @@ fn rational_div_float_prec_properties() {
         assert!(quotient.is_nan());
         assert_eq!(o, Equal);
 
-        if x != 0 {
+        if x != 0u32 {
             assert_eq!(
                 Float::rational_div_float_prec_ref_val(&x, Float::INFINITY, prec),
                 (
-                    if x >= 0 {
+                    if x >= 0u32 {
                         Float::ZERO
                     } else {
                         Float::NEGATIVE_ZERO
@@ -16649,7 +16649,7 @@ fn rational_div_float_prec_properties() {
             assert_eq!(
                 Float::rational_div_float_prec_ref_val(&x, Float::NEGATIVE_INFINITY, prec),
                 (
-                    if x >= 0 {
+                    if x >= 0u32 {
                         Float::NEGATIVE_ZERO
                     } else {
                         Float::ZERO
@@ -16659,11 +16659,11 @@ fn rational_div_float_prec_properties() {
             );
         }
 
-        if x != 0 {
+        if x != 0u32 {
             let (quotient, o) = Float::rational_div_float_prec_ref_val(&x, Float::ZERO, prec);
             assert_eq!(
                 ComparableFloat(quotient),
-                ComparableFloat(if x >= 0 {
+                ComparableFloat(if x >= 0u32 {
                     Float::INFINITY
                 } else {
                     Float::NEGATIVE_INFINITY
@@ -16674,7 +16674,7 @@ fn rational_div_float_prec_properties() {
                 Float::rational_div_float_prec_ref_val(&x, Float::NEGATIVE_ZERO, prec);
             assert_eq!(
                 ComparableFloat(quotient),
-                ComparableFloat(if x >= 0 {
+                ComparableFloat(if x >= 0u32 {
                     Float::NEGATIVE_INFINITY
                 } else {
                     Float::INFINITY
@@ -16775,7 +16775,7 @@ fn rational_div_float_round_properties_helper(
         }
     }
 
-    if y != 0 {
+    if y != 0u32 {
         let (mut quotient_alt, mut o_alt) = Float::rational_div_float_round_ref_val(&x, -&y, -rm);
         quotient_alt.neg_assign();
         o_alt = o_alt.reverse();
@@ -16795,7 +16795,7 @@ fn rational_div_float_round_properties_helper(
         ComparableFloat(quotient.abs_negative_zero_ref())
     );
 
-    if x != 0 && y != 0 {
+    if x != 0u32 && y != 0u32 {
         let (quotient_alt, o_alt) = Float::rational_div_float_round(-&x, -&y, rm);
         assert_eq!(
             ComparableFloatRef(&quotient_alt),
@@ -16829,11 +16829,11 @@ fn rational_div_float_round_properties() {
     });
 
     float_rounding_mode_pair_gen().test_properties(|(x, rm)| {
-        if x.is_finite() && x != 0 {
+        if x.is_finite() && x != 0u32 {
             let (quotient, o) = Float::rational_div_float_round_val_ref(Rational::ZERO, &x, rm);
             assert_eq!(
                 ComparableFloat(quotient),
-                ComparableFloat(if x >= 0 {
+                ComparableFloat(if x >= 0u32 {
                     Float::ZERO
                 } else {
                     Float::NEGATIVE_ZERO
@@ -16848,11 +16848,11 @@ fn rational_div_float_round_properties() {
         assert!(quotient.is_nan());
         assert_eq!(o, Equal);
 
-        if x != 0 {
+        if x != 0u32 {
             assert_eq!(
                 Float::rational_div_float_round_ref_val(&x, Float::INFINITY, rm),
                 (
-                    if x >= 0 {
+                    if x >= 0u32 {
                         Float::ZERO
                     } else {
                         Float::NEGATIVE_ZERO
@@ -16863,7 +16863,7 @@ fn rational_div_float_round_properties() {
             assert_eq!(
                 Float::rational_div_float_round_ref_val(&x, Float::NEGATIVE_INFINITY, rm),
                 (
-                    if x >= 0 {
+                    if x >= 0u32 {
                         Float::NEGATIVE_ZERO
                     } else {
                         Float::ZERO
@@ -16965,7 +16965,7 @@ fn rational_div_float_properties_helper(x: Rational, y: Float, extreme: bool) {
             ComparableFloatRef(&-(-&x / &y)),
             ComparableFloatRef(&quotient)
         );
-        if y != 0 {
+        if y != 0u32 {
             assert_eq!(
                 ComparableFloatRef(&-(&x / -&y)),
                 ComparableFloatRef(&quotient)
@@ -16989,7 +16989,7 @@ fn rational_div_float_properties() {
     });
 
     float_gen().test_properties(|x| {
-        if x.is_finite() && x != 0 {
+        if x.is_finite() && x != 0u32 {
             assert_eq!(
                 ComparableFloat(Rational::ZERO / &x),
                 ComparableFloat(if x.is_sign_positive() {
@@ -17013,7 +17013,7 @@ fn rational_div_float_properties() {
         assert!((Float::NAN / &x).is_nan());
         assert_eq!(
             Float::INFINITY / &x,
-            if x >= 0 {
+            if x >= 0u32 {
                 Float::INFINITY
             } else {
                 Float::NEGATIVE_INFINITY
@@ -17021,16 +17021,16 @@ fn rational_div_float_properties() {
         );
         assert_eq!(
             Float::NEGATIVE_INFINITY / &x,
-            if x >= 0 {
+            if x >= 0u32 {
                 Float::NEGATIVE_INFINITY
             } else {
                 Float::INFINITY
             }
         );
-        if x != 0 {
+        if x != 0u32 {
             assert_eq!(
                 Float::ZERO / &x,
-                if x > 0 {
+                if x > 0u32 {
                     Float::ZERO
                 } else {
                     Float::NEGATIVE_ZERO
@@ -17038,7 +17038,7 @@ fn rational_div_float_properties() {
             );
             assert_eq!(
                 Float::NEGATIVE_ZERO / &x,
-                if x > 0 {
+                if x > 0u32 {
                     Float::NEGATIVE_ZERO
                 } else {
                     Float::ZERO

@@ -182,7 +182,7 @@ fn try_from_rational_properties() {
         assert!(natural_x_alt.as_ref().map_or(true, Natural::is_valid));
         assert_eq!(natural_x, natural_x_alt);
 
-        assert_eq!(natural_x.is_ok(), x >= 0 && x.is_integer());
+        assert_eq!(natural_x.is_ok(), x >= 0u32 && x.is_integer());
         assert_eq!(natural_x.is_ok(), Natural::convertible_from(&x));
         if let Ok(n) = natural_x {
             assert_eq!(n.to_string(), x.to_string());
@@ -197,7 +197,7 @@ fn try_from_rational_properties() {
 fn convertible_from_rational_properties() {
     rational_gen().test_properties(|x| {
         let convertible = Natural::convertible_from(&x);
-        assert_eq!(convertible, x >= 0 && x.is_integer());
+        assert_eq!(convertible, x >= 0u32 && x.is_integer());
     });
 }
 
@@ -207,13 +207,13 @@ fn rounding_from_rational_properties() {
         let no = Natural::rounding_from(&x, rm);
         assert_eq!(Natural::rounding_from(x.clone(), rm), no);
         let (n, o) = no;
-        if x >= 0 {
+        if x >= 0u32 {
             assert_eq!(Integer::rounding_from(&x, rm), (Integer::from(&n), o));
-            assert!((Rational::from(&n) - &x).lt_abs(&1));
+            assert!((Rational::from(&n) - &x).lt_abs(&1u32));
         }
 
         assert_eq!(n.partial_cmp(&x), Some(o));
-        match (x >= 0, rm) {
+        match (x >= 0u32, rm) {
             (_, Floor) | (true, Down) | (false, Up) => {
                 assert_ne!(o, Greater);
             }
@@ -235,7 +235,7 @@ fn rounding_from_rational_properties() {
         let ceiling = Natural::rounding_from(&x, Ceiling);
         assert_eq!(ceiling.0, (&x).ceiling());
         assert!(ceiling.0 >= x);
-        if x > 0 {
+        if x > 0u32 {
             assert!(&ceiling.0 - Natural::ONE < x);
         }
         assert_eq!(Natural::rounding_from(&x, Up), ceiling);
@@ -255,7 +255,7 @@ fn rounding_from_rational_properties() {
         assert_eq!(Natural::rounding_from(&x, Nearest), no);
         assert_eq!(Natural::rounding_from(&x, Exact), no);
 
-        let x = Rational::from_naturals((no.0 << 1) | Natural::ONE, Natural::TWO);
+        let x = Rational::from_naturals((no.0 << 1u32) | Natural::ONE, Natural::TWO);
         assert!(Natural::rounding_from(x, Nearest).0.even());
     });
 }

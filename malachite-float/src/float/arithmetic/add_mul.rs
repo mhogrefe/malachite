@@ -124,7 +124,7 @@ pub(crate) fn add_scaled_round(
     let vd = part(sa, ma, ea);
     let vt = part(sp, mp, ep);
     let v = vd + vt;
-    if v == 0 {
+    if v == 0u32 {
         // Exact cancellation: unreachable from the fma callers, which only come here when the
         // product's magnitude range and the addend's are disjoint, but reachable from the mixed
         // Float-Rational callers, as in 2 + 1 * (-2), and from the fmma callers, whose two products
@@ -152,15 +152,15 @@ pub(crate) fn add_scaled_round(
         // the quotient is taken with enough guard bits for correct rounding, a sticky bit records a
         // nonzero remainder or clamped-away bits, and the exact power-of-2 shift is applied
         // afterwards with a saturating shl_round -- the same round-then-check-range order as MPFR.
-        let (sv, va) = (v >= 0, v.unsigned_abs());
+        let (sv, va) = (v >= 0u32, v.unsigned_abs());
         let k = (prec + 4 + den.significant_bits()).saturating_sub(va.significant_bits());
         let (w, r) = (va << k).div_mod(den);
-        let w2 = if r == 0 && !sticky_extra {
-            w << 1u64
+        let w2 = if r == 0u32 && !sticky_extra {
+            w << 1u32
         } else {
             // the sticky bit makes the padded quotient odd, placing it strictly between the same
             // rounding boundaries as the true quotient
-            (w << 1u64) + Natural::ONE
+            (w << 1u32) + Natural::ONE
         };
         let (mut f, o) =
             Float::from_integer_prec_round(Integer::from_sign_and_abs(sv, w2), prec, rm);

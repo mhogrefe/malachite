@@ -187,12 +187,12 @@ fn mul_properties() {
             product
         );
         assert_eq!(&y * &x, product);
-        if x != 0 {
+        if x != 0u32 {
             let (q, r) = (&product).div_mod(&x);
             assert_eq!(q, y);
             assert_eq!(r, 0);
         }
-        if y != 0 {
+        if y != 0u32 {
             let (q, r) = (&product).div_mod(&y);
             assert_eq!(q, x);
             assert_eq!(r, 0);

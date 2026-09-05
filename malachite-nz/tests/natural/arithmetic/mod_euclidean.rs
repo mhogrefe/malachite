@@ -100,7 +100,7 @@ fn mod_euclidean_properties() {
     natural_gen_var_2().test_properties(|ref x| {
         assert_eq!(x.mod_euclidean(x), 0);
         assert_eq!(Natural::ZERO.mod_euclidean(x), 0);
-        if *x > Natural::ONE {
+        if *x > 1u32 {
             assert_eq!(Natural::ONE.mod_euclidean(x), 1);
         }
     });

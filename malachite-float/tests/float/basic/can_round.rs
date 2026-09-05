@@ -56,7 +56,7 @@ fn can_round_ground_truth(
     let exp = i64::from(x.get_exponent().unwrap());
     let eps = Rational::power_of_2(exp - err);
     let b = Rational::exact_from(x);
-    let neg = *x < 0;
+    let neg = *x < 0u32;
     // An approximation rounded toward zero means the true value lies beyond b, away from zero, and
     // so on.
     let towards_zero = match rnd1 {

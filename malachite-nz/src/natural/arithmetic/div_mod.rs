@@ -3471,7 +3471,7 @@ impl CeilingDivNegMod<Natural> for &Natural {
     /// ```
     fn ceiling_div_neg_mod(self, other: Natural) -> (Natural, Natural) {
         let (q, r) = self.div_mod(&other);
-        if r == 0 {
+        if r == 0u32 {
             (q, r)
         } else {
             (q.add_limb(1), other - r)
@@ -3529,7 +3529,7 @@ impl CeilingDivNegMod<&Natural> for &Natural {
     /// ```
     fn ceiling_div_neg_mod(self, other: &Natural) -> (Natural, Natural) {
         let (q, r) = self.div_mod(other);
-        if r == 0 {
+        if r == 0u32 {
             (q, r)
         } else {
             (q.add_limb(1), other - r)
@@ -3584,7 +3584,7 @@ impl CeilingDivAssignNegMod<Self> for Natural {
     /// ```
     fn ceiling_div_assign_neg_mod(&mut self, other: Self) -> Self {
         let r = self.div_assign_mod(&other);
-        if r == 0 {
+        if r == 0u32 {
             Self::ZERO
         } else {
             *self += Self::ONE;
@@ -3640,7 +3640,7 @@ impl<'a> CeilingDivAssignNegMod<&'a Self> for Natural {
     /// ```
     fn ceiling_div_assign_neg_mod(&mut self, other: &'a Self) -> Self {
         let r = self.div_assign_mod(other);
-        if r == 0 {
+        if r == 0u32 {
             Self::ZERO
         } else {
             *self += Self::ONE;

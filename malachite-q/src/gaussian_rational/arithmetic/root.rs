@@ -12,7 +12,7 @@ use crate::gaussian_rational::arithmetic::content_and_primitive_part::{
 };
 use crate::gaussian_rational::{ComparableGaussianRationalRef, GaussianRational};
 use alloc::vec::Vec;
-use malachite_base::num::arithmetic::traits::{CheckedRoot, DivRound, MulIPow, PowerOf2};
+use malachite_base::num::arithmetic::traits::{CheckedRoot, MulIPow, PowerOf2, ShrRound};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::TrailingZeros;
@@ -34,10 +34,10 @@ fn checked_root_helper(scaled: GaussianInteger, l: Natural, exp: u64) -> Option<
     // If (1 + i)^e is the 1 + i part of the root's Gaussian denominator, L(w) has 2^ceil(e / 2) and
     // L(w^k) has 2^ceil(ke / 2), which pins e down to at most one value.
     let e = (l_twos << 1) / exp;
-    if (exp * e).div_round(2, Ceiling).0 != l_twos {
+    if (exp * e).shr_round(1, Ceiling).0 != l_twos {
         return None;
     }
-    let d_twos = e.div_round(2, Ceiling).0;
+    let d_twos = e.shr_round(1, Ceiling).0;
     let shift = exp * d_twos - l_twos;
     let root = GaussianInteger {
         real: scaled.real << shift,

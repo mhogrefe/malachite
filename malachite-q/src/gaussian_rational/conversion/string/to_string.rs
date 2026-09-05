@@ -18,11 +18,11 @@ use core::fmt::{Display, Formatter, Result, Write};
 fn fmt_unsigned_imaginary_term(q: &Rational, f: &mut Formatter) -> Result {
     let n = q.numerator_ref();
     let d = q.denominator_ref();
-    if *n != 1 {
+    if *n != 1u32 {
         Display::fmt(n, f)?;
     }
     f.write_char('i')?;
-    if *d != 1 {
+    if *d != 1u32 {
         f.write_char('/')?;
         Display::fmt(d, f)?;
     }
@@ -80,17 +80,17 @@ impl Display for GaussianRational {
     /// assert_eq!(g.to_string(), "1-i/2");
     /// ```
     fn fmt(&self, f: &mut Formatter) -> Result {
-        if self.imaginary == 0 {
+        if self.imaginary == 0u32 {
             return Display::fmt(&self.real, f);
         }
-        if self.real != 0 {
+        if self.real != 0u32 {
             Display::fmt(&self.real, f)?;
-            if self.imaginary > 0 {
+            if self.imaginary > 0u32 {
                 f.write_char('+')?;
             } else {
                 f.write_char('-')?;
             }
-        } else if self.imaginary < 0 {
+        } else if self.imaginary < 0u32 {
             f.write_char('-')?;
         }
         fmt_unsigned_imaginary_term(&self.imaginary, f)

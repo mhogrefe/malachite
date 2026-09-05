@@ -131,7 +131,7 @@ fn checked_root_properties() {
         assert!(root_alt.as_ref().is_none_or(Rational::is_valid));
         assert_eq!(root_alt, root);
         assert_eq!((&n).checked_root(u64::exact_from(exp)), root);
-        if n != 0 {
+        if n != 0u32 {
             assert_eq!(
                 (&n).reciprocal().checked_root(exp),
                 root.as_ref().map(Reciprocal::reciprocal)

@@ -351,7 +351,7 @@ impl num_integer::Integer for BigInt {
     #[inline]
     fn next_multiple_of(&self, other: &Self) -> Self {
         let rem = (&self.0).mod_op(&other.0);
-        if rem == 0 {
+        if rem == 0u32 {
             self.clone()
         } else {
             Self(&self.0 + &other.0 - rem)

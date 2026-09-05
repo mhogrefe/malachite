@@ -175,7 +175,7 @@ fn mod_div_list_properties() {
     });
 
     natural_pair_gen_var_8().test_properties(|(x, m)| {
-        if m > Natural::ONE {
+        if m > 1u32 {
             let g = (&x).gcd(&m);
             assert_eq!(
                 Natural::ZERO.mod_div_list(&x, &m),

@@ -77,7 +77,7 @@ fn bits_properties() {
         if u < n.significant_bits() {
             assert_eq!(n.bits()[u], n.to_bits_asc()[usize::exact_from(u)]);
         } else {
-            assert_eq!(n.bits()[u], n < 0);
+            assert_eq!(n.bits()[u], n < 0u32);
         }
     });
 

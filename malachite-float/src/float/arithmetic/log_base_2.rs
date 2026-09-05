@@ -170,7 +170,7 @@ fn log_base_2_rational_near_power_of_2(
     // 2^m <= x < 2^(m + 1)
     let m = x.floor_log_base_2_abs();
     let pow_lo = Rational::power_of_2(m);
-    let pow_hi = &pow_lo << 1u64;
+    let pow_hi = &pow_lo << 1u32;
     // eps = x / 2^k - 1 for the nearer of the two surrounding powers of 2, 2^k.
     let dist_lo = x - &pow_lo;
     let dist_hi = &pow_hi - x;
@@ -194,7 +194,7 @@ fn log_base_2_rational_near_power_of_2(
         return None;
     }
     // The offset moves the magnitude up (away from zero) iff it has the same sign as k.
-    let dir = (eps > 0) == (k > 0);
+    let dir = (eps > 0u32) == (k > 0);
     float_round_near_x(&k_float, u64::exact_from(err), dir, prec, rm)
 }
 

@@ -108,7 +108,7 @@ fn div_mod_euclidean_properties_helper(x: Integer, y: Integer) {
     // The defining relation x = q * y + r holds.
     assert_eq!(&q * &y + Integer::from(&r), x);
     // For a positive divisor, Euclidean division coincides with `div_mod`.
-    if y > 0 {
+    if y > 0u32 {
         let (q_alt, r_alt) = (&x).div_mod(&y);
         assert_eq!(q_alt, q);
         assert_eq!(r, r_alt);

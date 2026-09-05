@@ -117,7 +117,7 @@ fn test_uniform_random_non_negative_floats_at_most_one_rigged() {
     // exponent -16 - 3 = -19; significand bits 0b101010101; rounding bit 1
     for rm in [Floor, Ceiling, Down, Up, Nearest] {
         let x = run_rigged_case(2, &[0x10, 0x155, 1], 10, rm);
-        assert!(x > Float::ZERO);
+        assert!(x > 0u32);
         assert_eq!(x.get_prec(), Some(10));
     }
 }
@@ -744,13 +744,13 @@ fn uniform_random_non_negative_floats_at_most_one_properties() {
                 assert!(x.is_valid());
                 // - the value is in (0, 1]; zero can only arise from the underflow branch, which is
                 //   unreachable by sampling
-                assert!(x > Float::ZERO);
-                assert!(x <= Float::ONE);
+                assert!(x > 0u32);
+                assert!(x <= 1u32);
                 // - every output has precision `prec`
                 assert_eq!(x.get_prec(), Some(prec));
                 // - under the downward modes the value is strictly less than one
                 if rm == Floor || rm == Down {
-                    assert!(x < Float::ONE);
+                    assert!(x < 1u32);
                 }
             }
         }

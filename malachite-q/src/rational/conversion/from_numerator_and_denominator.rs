@@ -370,7 +370,7 @@ impl Rational {
     /// ```
     pub fn from_integers(numerator: Integer, denominator: Integer) -> Self {
         assert_ne!(denominator, 0);
-        let sign = numerator == 0 || ((numerator > 0) == (denominator > 0));
+        let sign = numerator == 0u32 || ((numerator > 0u32) == (denominator > 0u32));
         let mut q = Self::from_naturals(numerator.unsigned_abs(), denominator.unsigned_abs());
         q.sign = sign;
         q
@@ -423,7 +423,7 @@ impl Rational {
         assert_ne!(*denominator, 0);
         let mut q =
             Self::from_naturals_ref(numerator.unsigned_abs_ref(), denominator.unsigned_abs_ref());
-        q.sign = *numerator == 0 || ((*numerator > 0) == (*denominator > 0));
+        q.sign = *numerator == 0u32 || ((*numerator > 0u32) == (*denominator > 0u32));
         q
     }
 
@@ -506,7 +506,7 @@ impl Rational {
         assert_ne!(denominator, 0);
         let gcd = (&numerator).gcd(&denominator);
         Self {
-            sign: sign || numerator == 0,
+            sign: sign || numerator == 0u32,
             numerator: numerator.div_exact(&gcd),
             denominator: denominator.div_exact(gcd),
         }
@@ -558,7 +558,7 @@ impl Rational {
         assert_ne!(*denominator, 0);
         let gcd = numerator.gcd(denominator);
         Self {
-            sign: sign || *numerator == 0,
+            sign: sign || *numerator == 0u32,
             numerator: numerator.div_exact(&gcd),
             denominator: denominator.div_exact(gcd),
         }

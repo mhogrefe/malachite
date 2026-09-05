@@ -119,7 +119,7 @@ fn index_of_next_true_bit_properties() {
                 .map(u64::from),
             result
         );
-        assert_eq!(result.is_some(), &n >> u != 0);
+        assert_eq!(result.is_some(), &n >> u != 0u32);
         if let Some(result) = result {
             assert!(result >= u);
             assert!(n.get_bit(result));

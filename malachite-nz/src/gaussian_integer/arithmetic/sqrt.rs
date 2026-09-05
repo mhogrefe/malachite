@@ -35,7 +35,7 @@ fn checked_sqrt_helper(z: &GaussianInteger) -> Option<GaussianInteger> {
         if b.odd() {
             return None;
         }
-        let root = Integer::from((b.unsigned_abs_ref() >> 1u64).checked_sqrt()?);
+        let root = Integer::from((b.unsigned_abs_ref() >> 1u32).checked_sqrt()?);
         return Some(GaussianInteger {
             imaginary: if *b > 0u32 { root.clone() } else { -&root },
             real: root,
@@ -47,8 +47,8 @@ fn checked_sqrt_helper(z: &GaussianInteger) -> Option<GaussianInteger> {
     if x_squared.odd() {
         return None;
     }
-    let x = (x_squared >> 1u64).unsigned_abs().checked_sqrt()?;
-    let y = ((n - a) >> 1u64).unsigned_abs().checked_sqrt()?;
+    let x = (x_squared >> 1u32).unsigned_abs().checked_sqrt()?;
+    let y = ((n - a) >> 1u32).unsigned_abs().checked_sqrt()?;
     Some(GaussianInteger {
         real: Integer::from(x),
         imaginary: Integer::from_sign_and_abs(*b > 0u32, y),

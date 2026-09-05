@@ -153,7 +153,7 @@ fn add_properties() {
     rational_gen().test_properties(|ref x| {
         assert_eq!(x + Rational::ZERO, *x);
         assert_eq!(Rational::ZERO + x, *x);
-        assert_eq!(x + x, x << 1);
+        assert_eq!(x + x, x << 1u32);
         assert_eq!(x + (-x), 0);
     });
 

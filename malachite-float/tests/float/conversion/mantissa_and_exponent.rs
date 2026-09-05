@@ -2908,7 +2908,7 @@ fn sci_mantissa_and_exponent_primitive_float_properties_helper_helper<T: Primiti
         .unwrap();
         assert!(
             Rational::exact_from(x) - Rational::exact_from(&x_alt)
-                <= Rational::exact_from(x_alt.ulp().unwrap()) >> 1u64
+                <= Rational::exact_from(x_alt.ulp().unwrap()) >> 1u32
         );
     }
 

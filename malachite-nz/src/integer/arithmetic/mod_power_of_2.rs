@@ -184,7 +184,7 @@ impl RemPowerOf2 for Integer {
     fn rem_power_of_2(self, pow: u64) -> Self {
         let abs_rem = self.abs.mod_power_of_2(pow);
         Self {
-            sign: self.sign || abs_rem == 0,
+            sign: self.sign || abs_rem == 0u32,
             abs: abs_rem,
         }
     }
@@ -227,7 +227,7 @@ impl RemPowerOf2 for &Integer {
     fn rem_power_of_2(self, pow: u64) -> Integer {
         let abs_rem = (&self.abs).mod_power_of_2(pow);
         Integer {
-            sign: self.sign || abs_rem == 0,
+            sign: self.sign || abs_rem == 0u32,
             abs: abs_rem,
         }
     }
@@ -271,7 +271,7 @@ impl RemPowerOf2Assign for Integer {
     /// ```
     fn rem_power_of_2_assign(&mut self, pow: u64) {
         self.abs.mod_power_of_2_assign(pow);
-        if self.abs == 0 {
+        if self.abs == 0u32 {
             self.sign = true;
         }
     }
@@ -315,7 +315,7 @@ impl CeilingModPowerOf2 for Integer {
             self.abs.mod_power_of_2(pow)
         };
         Self {
-            sign: abs_mod == 0,
+            sign: abs_mod == 0u32,
             abs: abs_mod,
         }
     }
@@ -358,7 +358,7 @@ impl CeilingModPowerOf2 for &Integer {
             (&self.abs).mod_power_of_2(pow)
         };
         Integer {
-            sign: abs_mod == 0,
+            sign: abs_mod == 0u32,
             abs: abs_mod,
         }
     }
@@ -403,6 +403,6 @@ impl CeilingModPowerOf2Assign for Integer {
         } else {
             self.abs.mod_power_of_2_assign(pow);
         };
-        self.sign = self.abs == 0;
+        self.sign = self.abs == 0u32;
     }
 }

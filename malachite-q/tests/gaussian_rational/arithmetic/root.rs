@@ -134,7 +134,7 @@ fn checked_root_properties() {
             roots.contains(root.as_ref().unwrap_or(&GaussianRational::ZERO)),
             root.is_some()
         );
-        if x == GaussianRational::ZERO {
+        if x == 0u32 {
             assert_eq!(roots, vec![GaussianRational::ZERO]);
         } else if let Some(principal) = &root {
             let g = u64::power_of_2(TrailingZeros::trailing_zeros(exp).min(2));
@@ -181,7 +181,7 @@ fn checked_root_properties() {
         }
         // A real number can have a non-real Gaussian root, so the comparison only runs one way.
         let root = GaussianRational::from(q.clone()).checked_root(exp);
-        if q < 0 && exp.even() {
+        if q < 0u32 && exp.even() {
             // `Rational::checked_root` refuses this case; the Gaussian root, if any, is non-real
             if let Some(root) = root {
                 assert_ne!(root.imaginary, 0);

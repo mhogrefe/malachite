@@ -2412,7 +2412,7 @@ fn reciprocal_prec_round_properties_helper(x: Float, prec: u64, rm: RoundingMode
         assert_eq!(rug_o, o);
     }
 
-    if o == Equal && reciprocal.is_finite() && reciprocal != 0 {
+    if o == Equal && reciprocal.is_finite() && reciprocal != 0u32 {
         assert_eq!(
             ComparableFloatRef(
                 &reciprocal

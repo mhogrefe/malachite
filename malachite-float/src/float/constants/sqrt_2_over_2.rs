@@ -60,7 +60,7 @@ impl Float {
     #[inline]
     pub fn sqrt_2_over_2_prec_round(prec: u64, rm: RoundingMode) -> (Self, Ordering) {
         let (sqrt_2, o) = Self::sqrt_prec_round(Self::TWO, prec, rm);
-        (sqrt_2 >> 1u64, o)
+        (sqrt_2 >> 1u32, o)
     }
 
     /// Returns an approximation of half of the square root of 2, with the given precision and

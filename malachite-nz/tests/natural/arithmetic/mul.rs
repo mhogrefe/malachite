@@ -12008,7 +12008,7 @@ fn test_mul() {
         Natural::power_of_2(0x4000_0000),
     );
     big_test(
-        Natural::from(0x3d500b05e209u64) << 0x3fffffbc,
+        Natural::from(0x3d500b05e209u64) << 0x3fffffbcu32,
         Natural::power_of_2(0x4000_0028),
     );
     // - k == 1 in sd_fft_no_trunc_block
@@ -12050,7 +12050,7 @@ fn test_mul() {
     big_test(p.clone(), p);
     // - bits - j == 0 in mpn_to_ffts_hard
     big_test(
-        Natural::from(0x16fb3b96u32) << 0x3fffff34,
+        Natural::from(0x16fb3b96u32) << 0x3fffff34u32,
         Natural::power_of_2(0x4000_0100),
     );
     // - 3 >= OTRUNC in sd_fft_moth_trunc_block_1
@@ -12901,17 +12901,17 @@ fn mul_properties() {
             product
         );
         assert_eq!(&y * &x, product);
-        if x != 0 {
+        if x != 0u32 {
             let (q, r) = (&product).div_mod(&x);
             assert_eq!(q, y);
             assert_eq!(r, 0);
         }
-        if y != 0 {
+        if y != 0u32 {
             let (q, r) = (&product).div_mod(&y);
             assert_eq!(q, x);
             assert_eq!(r, 0);
         }
-        if x != 0 && y != 0 {
+        if x != 0u32 && y != 0u32 {
             assert!(product >= x);
             assert!(product >= y);
         }

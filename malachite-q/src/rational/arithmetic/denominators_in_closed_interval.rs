@@ -54,7 +54,7 @@ crate_test_fn! {smallest_guaranteed_denominator(interval_diameter: &Rational) ->
         }
         best = bound.floor().unsigned_abs() + Natural::ONE;
         primorial *= Natural::from(p);
-        pow <<= 1;
+        pow <<= 1u32;
     }
     best
 }}

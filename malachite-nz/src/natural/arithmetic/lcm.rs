@@ -134,7 +134,7 @@ impl Lcm<&Natural> for &Natural {
     /// ```
     #[inline]
     fn lcm(self, other: &Natural) -> Natural {
-        if *self == 0 || *other == 0 {
+        if *self == 0u32 || *other == 0u32 {
             return Natural::ZERO;
         }
         let gcd = self.gcd(other);
@@ -180,9 +180,9 @@ impl LcmAssign<Self> for Natural {
     /// ```
     #[inline]
     fn lcm_assign(&mut self, mut other: Self) {
-        if *self == 0 {
+        if *self == 0u32 {
             return;
-        } else if other == 0 {
+        } else if other == 0u32 {
             *self = Self::ZERO;
             return;
         }
@@ -227,9 +227,9 @@ impl<'a> LcmAssign<&'a Self> for Natural {
     /// ```
     #[inline]
     fn lcm_assign(&mut self, other: &'a Self) {
-        if *self == 0 {
+        if *self == 0u32 {
             return;
-        } else if *other == 0 {
+        } else if *other == 0u32 {
             *self = Self::ZERO;
             return;
         }

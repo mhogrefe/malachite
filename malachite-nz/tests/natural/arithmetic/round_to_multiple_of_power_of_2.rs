@@ -6,16 +6,17 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-#[cfg(not(feature = "32_bit_limbs"))]
 use core::cmp::Ordering::*;
 #[cfg(feature = "32_bit_limbs")]
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{
-    Abs, DivisibleByPowerOf2, PowerOf2, RoundToMultiple, RoundToMultipleOfPowerOf2,
+    DivisibleByPowerOf2, PowerOf2, RoundToMultiple, RoundToMultipleOfPowerOf2,
     RoundToMultipleOfPowerOf2Assign, ShrRound,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
+#[cfg(not(feature = "32_bit_limbs"))]
+use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::common::GenConfig;
@@ -1027,7 +1028,7 @@ fn round_to_multiple_of_power_of_2_properties() {
         let (s, o_alt) = (&n).shr_round(pow, rm);
         assert_eq!(s << pow, r);
         assert_eq!(o_alt, o);
-        assert!((Integer::from(&r) - Integer::from(&n)).abs() <= Natural::power_of_2(pow));
+        assert!((Integer::from(&r) - Integer::from(&n)).le_abs(&Natural::power_of_2(pow)));
         let (r_alt, o_alt) = (&n).round_to_multiple(Natural::power_of_2(pow), rm);
         assert_eq!(r_alt, r);
         assert_eq!(o_alt, o);

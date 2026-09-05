@@ -74,7 +74,7 @@ fn abs_diff_properties() {
         mut_x.abs_diff_assign(&y);
         assert!(mut_x.is_valid());
         let diff = mut_x;
-        assert!(diff >= 0);
+        assert!(diff >= 0u32);
 
         let mut mut_x = x.clone();
         mut_x.abs_diff_assign(y.clone());
@@ -100,7 +100,7 @@ fn abs_diff_properties() {
         assert_eq!((&x - &y).abs(), diff);
         assert_eq!((&y).abs_diff(&x), diff);
         assert_eq!((-&x).abs_diff(-&y), diff);
-        assert_eq!(diff == 0, x == y);
+        assert_eq!(diff == 0u32, x == y);
     });
 
     rational_gen().test_properties(|x| {

@@ -43,7 +43,7 @@ impl NextPowerOf2 for Rational {
     /// ```
     #[inline]
     fn next_power_of_2(self) -> Self {
-        assert!(self > 0);
+        assert!(self > 0u32);
         let mut exponent = i64::exact_from(self.numerator.significant_bits())
             - i64::exact_from(self.denominator.significant_bits());
         match self.numerator.cmp_normalized(&self.denominator) {
@@ -87,7 +87,7 @@ impl NextPowerOf2 for &Rational {
     /// );
     /// ```
     fn next_power_of_2(self) -> Rational {
-        assert!(*self > 0);
+        assert!(*self > 0u32);
         let mut exponent = i64::exact_from(self.numerator.significant_bits())
             - i64::exact_from(self.denominator.significant_bits());
         if self.numerator.cmp_normalized(&self.denominator) == Greater {

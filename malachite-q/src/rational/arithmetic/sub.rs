@@ -57,7 +57,7 @@ impl Sub<Self> for Rational {
                 - Integer::from_sign_and_abs(other.sign, other.numerator * &self.denominator);
             let diff_d = self.denominator * other.denominator;
             Self {
-                sign: diff_n >= 0,
+                sign: diff_n >= 0u32,
                 numerator: diff_n.unsigned_abs(),
                 denominator: diff_d,
             }
@@ -71,13 +71,13 @@ impl Sub<Self> for Rational {
             gcd.gcd_assign(diff_n.unsigned_abs_ref());
             if gcd == 1u32 {
                 Self {
-                    sign: diff_n >= 0,
+                    sign: diff_n >= 0u32,
                     numerator: diff_n.unsigned_abs(),
                     denominator: other.denominator * reduced_self_d,
                 }
             } else {
                 Self {
-                    sign: diff_n >= 0,
+                    sign: diff_n >= 0u32,
                     numerator: diff_n.unsigned_abs().div_exact(&gcd),
                     denominator: (other.denominator).div_exact(gcd) * reduced_self_d,
                 }
@@ -163,7 +163,7 @@ impl Sub<Rational> for &Rational {
                     - Integer::from_sign_and_abs(other.sign, other.numerator * &self.denominator);
             let diff_d = &self.denominator * other.denominator;
             Rational {
-                sign: diff_n >= 0,
+                sign: diff_n >= 0u32,
                 numerator: diff_n.unsigned_abs(),
                 denominator: diff_d,
             }
@@ -177,13 +177,13 @@ impl Sub<Rational> for &Rational {
             gcd.gcd_assign(diff_n.unsigned_abs_ref());
             if gcd == 1u32 {
                 Rational {
-                    sign: diff_n >= 0,
+                    sign: diff_n >= 0u32,
                     numerator: diff_n.unsigned_abs(),
                     denominator: other.denominator * reduced_self_d,
                 }
             } else {
                 Rational {
-                    sign: diff_n >= 0,
+                    sign: diff_n >= 0u32,
                     numerator: diff_n.unsigned_abs().div_exact(&gcd),
                     denominator: (other.denominator).div_exact(gcd) * reduced_self_d,
                 }
@@ -233,7 +233,7 @@ impl Sub<&Rational> for &Rational {
                     - Integer::from_sign_and_abs(other.sign, &other.numerator * &self.denominator);
             let diff_d = &self.denominator * &other.denominator;
             Rational {
-                sign: diff_n >= 0,
+                sign: diff_n >= 0u32,
                 numerator: diff_n.unsigned_abs(),
                 denominator: diff_d,
             }
@@ -247,13 +247,13 @@ impl Sub<&Rational> for &Rational {
             gcd.gcd_assign(diff_n.unsigned_abs_ref());
             if gcd == 1u32 {
                 Rational {
-                    sign: diff_n >= 0,
+                    sign: diff_n >= 0u32,
                     numerator: diff_n.unsigned_abs(),
                     denominator: &other.denominator * reduced_self_d,
                 }
             } else {
                 Rational {
-                    sign: diff_n >= 0,
+                    sign: diff_n >= 0u32,
                     numerator: diff_n.unsigned_abs().div_exact(&gcd),
                     denominator: (&other.denominator).div_exact(gcd) * reduced_self_d,
                 }
@@ -303,7 +303,7 @@ impl SubAssign<Self> for Rational {
             self.numerator *= &other.denominator;
             let diff_n = Integer::from_sign_and_abs_ref(self.sign, &self.numerator)
                 - Integer::from_sign_and_abs(other.sign, other.numerator * &self.denominator);
-            self.sign = diff_n >= 0;
+            self.sign = diff_n >= 0u32;
             self.numerator = diff_n.unsigned_abs();
             self.denominator *= other.denominator;
         } else {
@@ -312,7 +312,7 @@ impl SubAssign<Self> for Rational {
             let diff_n = Integer::from_sign_and_abs_ref(self.sign, &self.numerator)
                 - Integer::from_sign_and_abs(other.sign, other.numerator * &self.denominator);
             gcd.gcd_assign(diff_n.unsigned_abs_ref());
-            self.sign = diff_n >= 0;
+            self.sign = diff_n >= 0u32;
             if gcd == 1u32 {
                 self.numerator = diff_n.unsigned_abs();
                 self.denominator *= other.denominator;
@@ -366,7 +366,7 @@ impl SubAssign<&Self> for Rational {
             self.numerator *= &other.denominator;
             let diff_n = Integer::from_sign_and_abs_ref(self.sign, &self.numerator)
                 - Integer::from_sign_and_abs(other.sign, &other.numerator * &self.denominator);
-            self.sign = diff_n >= 0;
+            self.sign = diff_n >= 0u32;
             self.numerator = diff_n.unsigned_abs();
             self.denominator *= &other.denominator;
         } else {
@@ -375,7 +375,7 @@ impl SubAssign<&Self> for Rational {
             let diff_n = Integer::from_sign_and_abs_ref(self.sign, &self.numerator)
                 - Integer::from_sign_and_abs(other.sign, &other.numerator * &self.denominator);
             gcd.gcd_assign(diff_n.unsigned_abs_ref());
-            self.sign = diff_n >= 0;
+            self.sign = diff_n >= 0u32;
             if gcd == 1u32 {
                 self.numerator = diff_n.unsigned_abs();
                 self.denominator *= &other.denominator;

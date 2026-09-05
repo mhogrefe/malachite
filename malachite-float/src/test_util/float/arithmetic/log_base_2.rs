@@ -47,7 +47,7 @@ pub fn rug_log_base_2_rational_prec_round(
     prec: u64,
     rm: Round,
 ) -> (rug::Float, Ordering) {
-    let (k, shifted) = if *x > 0 {
+    let (k, shifted) = if *x > 0u32 {
         let k = x.floor_log_base_2_abs();
         (k, x >> k)
     } else {

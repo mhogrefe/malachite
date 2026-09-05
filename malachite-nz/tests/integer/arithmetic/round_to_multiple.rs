@@ -1100,7 +1100,7 @@ fn round_to_multiple_properties() {
 
         assert!((&r).divisible_by(&y));
         assert_eq!(r.cmp(&x), o);
-        match (x >= 0, rm) {
+        match (x >= 0u32, rm) {
             (_, Floor) | (true, Down) | (false, Up) => {
                 assert_ne!(o, Greater);
             }
@@ -1110,7 +1110,7 @@ fn round_to_multiple_properties() {
             (_, Exact) => assert_eq!(o, Equal),
             _ => {}
         }
-        if y == 0 {
+        if y == 0u32 {
             assert_eq!(r, 0);
             assert_eq!(o, Equal);
         } else {
@@ -1149,8 +1149,8 @@ fn round_to_multiple_properties() {
 
     integer_pair_gen_var_3().test_properties(|(x, y)| {
         let down = (&x).round_to_multiple(&y, Down);
-        assert_eq!(down.1, if x >= 0 { Less } else { Greater });
-        let up = if x >= 0 {
+        assert_eq!(down.1, if x >= 0u32 { Less } else { Greater });
+        let up = if x >= 0u32 {
             (&down.0 + (&y).abs(), Greater)
         } else {
             (&down.0 - (&y).abs(), Less)

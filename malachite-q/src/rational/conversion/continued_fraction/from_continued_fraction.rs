@@ -70,7 +70,7 @@ impl Rational {
             swap(&mut denominator, &mut previous_denominator);
         }
         Self {
-            sign: numerator >= 0,
+            sign: numerator >= 0u32,
             numerator: numerator.unsigned_abs(),
             denominator,
         }
@@ -135,7 +135,7 @@ impl Rational {
             swap(&mut denominator, &mut previous_denominator);
         }
         Self {
-            sign: numerator >= 0,
+            sign: numerator >= 0u32,
             numerator: numerator.unsigned_abs(),
             denominator,
         }

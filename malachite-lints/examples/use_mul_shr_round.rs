@@ -11,18 +11,18 @@ const B: Integer = Integer::const_from_unsigned(3);
 
 fn main() {
     // A bignum product immediately shift-rounded: flagged.
-    let _ = (&X * &Y).shr_round(100u64, Floor);
-    let _ = (X.clone() * Y.clone()).shr_round(3u64, Nearest);
-    let _ = (&A * &B).shr_round(10u64, Ceiling);
+    let _ = (&X * &Y).shr_round(100u32, Floor);
+    let _ = (X.clone() * Y.clone()).shr_round(3u32, Nearest);
+    let _ = (&A * &B).shr_round(10u32, Ceiling);
     // A bignum product immediately shifted: flagged, since `>>` is a Floor shift.
     let _ = (&X * &Y) >> 50u32;
-    let _ = (&A * &B) >> 5u64;
+    let _ = (&A * &B) >> 5u32;
     // The widening idiom on primitives, by `From` or by `as`: flagged.
     let a = 123_456_789_u64;
     let b = 987_654_321_u64;
     let _ = (u128::from(a) * u128::from(b)) >> 64;
     let _ = ((a as u128) * (b as u128)) >> 64;
-    let _ = (u128::from(a) * u128::from(b)).shr_round(64u64, Nearest);
+    let _ = (u128::from(a) * u128::from(b)).shr_round(64u32, Nearest);
 
     // A plain primitive product shifted: NOT flagged. The in-type product has already discarded
     // any overflow, so the fused operation, which computes the exact double-width product, is
@@ -43,5 +43,5 @@ fn main() {
     // `GaussianRational` has no `mul_shr_round`: not flagged.
     let h = GaussianRational::from(3u32);
     let h2 = GaussianRational::from(4u32);
-    let _ = (&h * &h2) >> 3u64;
+    let _ = (&h * &h2) >> 3u32;
 }

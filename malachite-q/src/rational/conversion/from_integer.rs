@@ -28,7 +28,7 @@ impl From<Integer> for Rational {
     /// ```
     fn from(value: Integer) -> Self {
         Self {
-            sign: value >= 0,
+            sign: value >= 0u32,
             numerator: value.unsigned_abs(),
             denominator: Natural::ONE,
         }
@@ -55,7 +55,7 @@ impl From<&Integer> for Rational {
     /// ```
     fn from(value: &Integer) -> Self {
         Self {
-            sign: *value >= 0,
+            sign: *value >= 0u32,
             numerator: value.unsigned_abs(),
             denominator: Natural::ONE,
         }

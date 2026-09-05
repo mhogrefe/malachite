@@ -138,7 +138,7 @@ fn from_bits_asc_properties() {
         assert_eq!(from_bits_asc_naive(bits.iter().copied()), x);
         assert_eq!(from_bits_asc_alt::<Integer, _>(bits.iter().copied()), x);
         assert_eq!(Integer::from_bits_desc(bits.iter().copied().rev()), x);
-        assert_eq!(bits.iter().all(|b| !b), x == 0);
+        assert_eq!(bits.iter().all(|b| !b), x == 0u32);
         if SignedLimb::convertible_from(&x) {
             assert_eq!(SignedLimb::from_bits_asc(bits.into_iter()), x);
         }
@@ -153,7 +153,7 @@ fn from_bits_desc_properties() {
         assert_eq!(from_bits_desc_naive(bits.iter().copied()), x);
         assert_eq!(from_bits_desc_alt::<Integer, _>(bits.iter().copied()), x);
         assert_eq!(Integer::from_bits_asc(bits.iter().copied().rev()), x);
-        assert_eq!(bits.iter().all(|b| !b), x == 0);
+        assert_eq!(bits.iter().all(|b| !b), x == 0u32);
         if SignedLimb::convertible_from(&x) {
             assert_eq!(SignedLimb::from_bits_desc(bits.into_iter()), x);
         }

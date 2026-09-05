@@ -224,7 +224,7 @@ fn div_properties() {
         assert_eq!((&x).checked_div(&y).unwrap(), quotient);
         assert_eq!(&x * (&y).reciprocal(), quotient);
         assert_eq!(&quotient * &y, x);
-        if quotient != GaussianRational::ZERO {
+        if quotient != 0u32 {
             assert_eq!(&y / &x, (&quotient).reciprocal());
             assert_eq!(&x / &quotient, y);
         }
@@ -263,7 +263,7 @@ fn checked_div_properties() {
         assert_eq!(x.clone().checked_div(y.clone()), quotient);
         assert_eq!(x.clone().checked_div(&y), quotient);
         assert_eq!((&x).checked_div(y.clone()), quotient);
-        assert_eq!(quotient.is_none(), y == GaussianRational::ZERO);
+        assert_eq!(quotient.is_none(), y == 0u32);
         if let Some(quotient) = quotient {
             assert_eq!(&x / &y, quotient);
         }

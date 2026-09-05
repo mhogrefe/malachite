@@ -112,7 +112,7 @@ pub fn rug_log_base_power_of_2_rational_prec_round(
     rm: Round,
 ) -> (rug::Float, Ordering) {
     let target_prec = u32::exact_from(prec);
-    let (k, shifted) = if *x > 0 {
+    let (k, shifted) = if *x > 0u32 {
         let k = x.floor_log_base_2_abs();
         (k, x >> k)
     } else {

@@ -108,7 +108,7 @@ fn div_mod_euclidean_properties() {
             Natural::ZERO.div_mod_euclidean(&x),
             (Natural::ZERO, Natural::ZERO)
         );
-        if x > 1 {
+        if x > 1u32 {
             assert_eq!(
                 Natural::ONE.div_mod_euclidean(&x),
                 (Natural::ZERO, Natural::ONE)

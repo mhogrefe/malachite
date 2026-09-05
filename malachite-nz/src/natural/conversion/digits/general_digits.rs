@@ -1112,7 +1112,7 @@ private_test_fn! {to_digits_asc_naive_primitive<
     let mut remainder = x.clone();
     let nat_base = Natural::from(base);
     let data = Natural::precompute_div_mod_data(&nat_base);
-    while remainder != 0 {
+    while remainder != 0u32 {
         digits.push(T::exact_from(
             &remainder.div_assign_mod_precomputed(&nat_base, &data),
         ));
@@ -1127,10 +1127,10 @@ private_test_fn! {to_digits_asc_naive_primitive<
 // where $T$ is time, $M$ is additional memory, $n$ is `x.significant_bits()`, and $m$ is
 // `base.significant_bits()`.
 private_test_fn! {to_digits_asc_naive(digits: &mut Vec<Natural>, x: &Natural, base: &Natural) {
-    assert!(*base > 1);
+    assert!(*base > 1u32);
     let mut remainder = x.clone();
     let data = Natural::precompute_div_mod_data(base);
-    while remainder != 0 {
+    while remainder != 0u32 {
         digits.push(remainder.div_assign_mod_precomputed(base, &data));
     }
 }}
@@ -1201,7 +1201,7 @@ fn to_digits_asc_divide_and_conquer_limb<
         let (q, r) = x.div_mod_precomputed(power, data);
         let start_len = digits.len();
         to_digits_asc_divide_and_conquer_limb(digits, r, base, powers, power_index - 1);
-        if q != 0 {
+        if q != 0u32 {
             for _ in digits.len() - start_len..usize::power_of_2(u64::exact_from(power_index)) {
                 digits.push(T::ZERO);
             }
@@ -1231,7 +1231,7 @@ fn to_digits_asc_divide_and_conquer(
         let (q, r) = x.div_mod_precomputed(power, data);
         let start_len = digits.len();
         to_digits_asc_divide_and_conquer(digits, &r, base, powers, power_index - 1);
-        if q != 0 {
+        if q != 0u32 {
             for _ in digits.len() - start_len..usize::power_of_2(u64::exact_from(power_index)) {
                 digits.push(Natural::ZERO);
             }
@@ -1369,7 +1369,7 @@ where
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `x.significant_bits()`.
 private_test_fn! {to_digits_asc_large(x: &Natural, base: &Natural) -> Vec<Natural> {
-    if *x == 0 {
+    if *x == 0u32 {
         Vec::new()
     } else if x < base {
         vec![x.clone()]
@@ -1403,7 +1403,7 @@ private_test_fn! {to_digits_asc_large(x: &Natural, base: &Natural) -> Vec<Natura
 //
 // where $T$ is time, $M$ is additional memory, and $n$ is `x.significant_bits()`.
 private_test_fn! {to_digits_desc_large(x: &Natural, base: &Natural) -> Vec<Natural> {
-    if *x == 0 {
+    if *x == 0u32 {
         Vec::new()
     } else if x < base {
         vec![x.clone()]
@@ -1463,7 +1463,7 @@ where
 // where $T$ is time, $M$ is additional memory, $n$ is `base.significant_bits()`, and $m$ is
 // `xs.len()`.
 private_test_fn! {from_digits_desc_naive(xs: &[Natural], base: &Natural) -> Option<Natural> {
-    assert!(*base > 1);
+    assert!(*base > 1u32);
     let mut n = Natural::ZERO;
     for x in xs {
         if x >= base {

@@ -55,7 +55,7 @@ impl Neg for Natural {
     /// ```
     #[inline]
     fn neg(self) -> Integer {
-        Integer::from_sign_and_abs(self == 0, self)
+        Integer::from_sign_and_abs(self == 0u32, self)
     }
 }
 
@@ -85,6 +85,6 @@ impl Neg for &Natural {
     /// ```
     #[inline]
     fn neg(self) -> Integer {
-        Integer::from_sign_and_abs_ref(*self == 0, self)
+        Integer::from_sign_and_abs_ref(*self == 0u32, self)
     }
 }

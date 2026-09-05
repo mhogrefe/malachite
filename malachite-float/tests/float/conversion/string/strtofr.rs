@@ -52,7 +52,7 @@ fn verify_strtofr(s: &str, base: u8, prec: u64, rm: RoundingMode) {
     if let Some(p) = x.get_prec() {
         assert_eq!(p, prec);
     } else {
-        assert!(x.is_nan() || x.is_infinite() || x == 0);
+        assert!(x.is_nan() || x.is_infinite() || x == 0u32);
     }
     // `set_str` succeeds exactly when the whole of a nonempty string is consumed, and then agrees.
     let full = set_str(s, base, prec, rm);
@@ -807,7 +807,7 @@ fn strtofr_get_str_round_trip_properties() {
     // re-reading them at the same precision must give it back exactly. This ties the two MPFR
     // string ports together: `mpfr_get_str` out, `mpfr_strtofr` back in.
     float_signed_unsigned_rounding_mode_quadruple_gen_var_9().test_properties(|(x, b0, _, _)| {
-        if !x.is_finite() || x == 0 {
+        if !x.is_finite() || x == 0u32 {
             return;
         }
         let Ok(base) = u8::try_from(b0.unsigned_abs()) else {

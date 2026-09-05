@@ -62,7 +62,7 @@ fn not_properties() {
 
         assert_ne!(not, x);
         assert_eq!(!&not, x);
-        assert_eq!(x >= 0, not < 0);
+        assert_eq!(x >= 0u32, not < 0u32);
     });
 
     signed_gen::<SignedLimb>().test_properties(|i| {

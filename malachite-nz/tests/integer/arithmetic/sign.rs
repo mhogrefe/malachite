@@ -37,7 +37,7 @@ fn sign_properties() {
         let sign = n.sign();
         assert_eq!(rug::Integer::from(&n).cmp0(), sign);
         assert_eq!(num_sign(&BigInt::from(&n)), sign);
-        assert_eq!(n.partial_cmp(&0), Some(sign));
+        assert_eq!(n.partial_cmp(&0u32), Some(sign));
         assert_eq!((-n).sign(), sign.reverse());
     });
 

@@ -18,7 +18,9 @@ declare_lint! {
     /// Flags multiplying or dividing a primitive integer by a power-of-two literal (`x * 8`, `x /
     /// 16`, and the `*=`/`/=` forms), where a shift says the same thing. Also flags multiplying or
     /// dividing by a type's bit width, `x * T::WIDTH` or `x / T::WIDTH`, where the shift amount is
-    /// `T::LOG_WIDTH`.
+    /// `T::LOG_WIDTH`. The rounding forms are covered too: `x.div_round(2, rm)` and
+    /// `x.div_round_assign(2, rm)` become `x.shr_round(1, rm)` and `x.shr_round_assign(1, rm)`,
+    /// with the same rounding mode.
     ///
     /// This is the primitive-integer companion of `mul_div_by_power_of_2`, which covers the bignum
     /// `x * T::power_of_2(k)` spelling.
@@ -31,7 +33,9 @@ declare_lint! {
     ///
     /// Two cases need care. Division of a *signed* integer truncates toward zero, whereas `>>`
     /// takes the floor, so the two disagree for negative values; the faithful rewrite is
-    /// `shr_round(k, Down)` (or plain `>>` when the floor is really what is wanted). And unlike
+    /// `shr_round(k, Down)` (or plain `>>` when the floor is really what is wanted). (`div_round`
+    /// and `shr_round` round the exact quotient the same way, so that rewrite needs no such
+    /// care.) And unlike
     /// `*`, a shift does not detect value overflow (`<<` silently drops the high bits where `*`
     /// would panic in a debug build), so only reach for `<<` where overflow is already ruled out.
     ///
@@ -41,6 +45,7 @@ declare_lint! {
     /// let y = x * 8;
     /// let z = x / 16;
     /// let w = x / Limb::WIDTH;
+    /// let v = x.div_round(2, Ceiling).0;
     /// ```
     ///
     /// Use instead:
@@ -49,10 +54,11 @@ declare_lint! {
     /// let y = x << 3;
     /// let z = x >> 4;
     /// let w = x >> Limb::LOG_WIDTH;
+    /// let v = x.shr_round(1, Ceiling).0;
     /// ```
     pub MUL_DIV_BY_POWER_OF_2_LITERAL,
     Deny,
-    "multiplying or dividing a primitive integer by a power-of-two literal or by `T::WIDTH` instead of shifting"
+    "multiplying, dividing, or `div_round`ing a primitive integer by a power-of-two literal or by `T::WIDTH` instead of shifting"
 }
 
 declare_lint_pass!(MulDivByPowerOf2Literal => [MUL_DIV_BY_POWER_OF_2_LITERAL]);
@@ -75,9 +81,47 @@ fn power_of_2_operand(cx: &LateContext<'_>, e: &Expr<'_>) -> Option<PowerOf2> {
     }
 }
 
+// The shift amount as it should appear in the advice, and the operand as written.
+fn shift_amount(cx: &LateContext<'_>, p: PowerOf2, power: &Expr<'_>) -> (String, String) {
+    match p {
+        PowerOf2::Literal(v, k) => (k.to_string(), v.to_string()),
+        PowerOf2::Width => {
+            let w = snippet(cx, power.span, "..").to_string();
+            (w.replace("WIDTH", "LOG_WIDTH"), w)
+        }
+    }
+}
+
 impl<'tcx> LateLintPass<'tcx> for MulDivByPowerOf2Literal {
     fn check_expr(&mut self, cx: &LateContext<'tcx>, expr: &'tcx Expr<'tcx>) {
         if expr.span.from_expansion() || crate::in_test_code(cx, expr.span) {
+            return;
+        }
+        // `x.div_round(pow2, rm)` and `x.div_round_assign(pow2, rm)`: `shr_round` and
+        // `shr_round_assign` take the same rounding mode and round the exact quotient the same way,
+        // so the rewrite is direct for signed and unsigned integers alike.
+        if let ExprKind::MethodCall(seg, receiver, [divisor, rm], _) = expr.kind {
+            let name = seg.ident.name.as_str();
+            let method = match name {
+                "div_round" => "shr_round",
+                "div_round_assign" => "shr_round_assign",
+                _ => return,
+            };
+            let Some(p) = power_of_2_operand(cx, divisor) else {
+                return;
+            };
+            let value_ty = cx.typeck_results().expr_ty_adjusted(receiver).peel_refs();
+            if !value_ty.is_integral() || crate::literal_value(receiver).is_some() {
+                return;
+            }
+            let (k, described) = shift_amount(cx, p, divisor);
+            let rm = snippet(cx, rm.span, "..");
+            span_lint(
+                cx,
+                MUL_DIV_BY_POWER_OF_2_LITERAL,
+                expr.span,
+                format!("use `{method}({k}, {rm})` instead of `{name}({described}, {rm})`"),
+            );
             return;
         }
         // `mul` is true for `*`/`*=`, false for `/`/`/=`; `assign` marks the compound forms. Each
@@ -109,14 +153,7 @@ impl<'tcx> LateLintPass<'tcx> for MulDivByPowerOf2Literal {
             if !value_ty.is_integral() || crate::literal_value(value).is_some() {
                 continue;
             }
-            // The shift amount as it should appear in the advice, and the operand as written.
-            let (k, described) = match p {
-                PowerOf2::Literal(v, k) => (k.to_string(), format!("`{v}`")),
-                PowerOf2::Width => {
-                    let w = snippet(cx, power.span, "..");
-                    (w.replace("WIDTH", "LOG_WIDTH"), format!("`{w}`"))
-                }
-            };
+            let (k, described) = shift_amount(cx, p, power);
             let advice = match (mul, assign, value_ty.is_signed()) {
                 (true, false, _) => format!("use `<< {k}`"),
                 (true, true, _) => format!("use `<<= {k}`"),
@@ -136,7 +173,7 @@ impl<'tcx> LateLintPass<'tcx> for MulDivByPowerOf2Literal {
                 cx,
                 MUL_DIV_BY_POWER_OF_2_LITERAL,
                 expr.span,
-                format!("{advice} instead of {verb} by {described}"),
+                format!("{advice} instead of {verb} by `{described}`"),
             );
             return;
         }

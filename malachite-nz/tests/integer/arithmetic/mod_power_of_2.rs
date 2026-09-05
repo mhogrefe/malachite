@@ -295,7 +295,7 @@ fn mod_power_of_2_properties() {
 
         assert_eq!((&n >> u << u) + &result, n);
         assert!(result < Natural::power_of_2(u));
-        assert_eq!(result == 0, n.divisible_by_power_of_2(u));
+        assert_eq!(result == 0u32, n.divisible_by_power_of_2(u));
         assert_eq!((&result).mod_power_of_2(u), result);
         assert_eq!(n & Integer::low_mask(u), result);
     });
@@ -365,7 +365,7 @@ fn rem_power_of_2_properties() {
         assert!(result.le_abs(&n));
         assert_eq!((((&n).shr_round(u, Down).0 << u) + &result), n);
         assert!(result.lt_abs(&Natural::power_of_2(u)));
-        assert_eq!(result == 0, (&n).divisible_by_power_of_2(u));
+        assert_eq!(result == 0u32, (&n).divisible_by_power_of_2(u));
         assert_eq!((&result).rem_power_of_2(u), result);
         assert_eq!(n.abs().mod_power_of_2(u), result.abs());
     });
@@ -422,9 +422,9 @@ fn ceiling_mod_power_of_2_properties() {
         assert_eq!(result_alt, result);
 
         assert_eq!((((&n).shr_round(u, Ceiling).0 << u) + &result), n);
-        assert!(result <= 0);
+        assert!(result <= 0u32);
         assert!(-&result <= Natural::power_of_2(u));
-        assert_eq!(result == 0, (&n).divisible_by_power_of_2(u));
+        assert_eq!(result == 0u32, (&n).divisible_by_power_of_2(u));
         assert_eq!((-n).mod_power_of_2(u), -result);
     });
 

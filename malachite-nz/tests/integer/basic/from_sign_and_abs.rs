@@ -42,8 +42,8 @@ fn from_sign_and_abs_properties() {
         assert!(x_alt.is_valid());
         assert_eq!(x, x_alt);
 
-        if abs != 0 {
-            assert_eq!(x >= 0, sign);
+        if abs != 0u32 {
+            assert_eq!(x >= 0u32, sign);
         }
         assert_eq!(x.unsigned_abs(), abs);
     });

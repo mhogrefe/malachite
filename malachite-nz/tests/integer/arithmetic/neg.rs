@@ -58,7 +58,7 @@ fn neg_properties() {
         assert_eq!(Integer::from(&-BigInt::from(&x)), negative);
         assert_eq!(Integer::from(&-rug::Integer::from(&x)), negative);
 
-        assert_eq!(negative == x, x == 0);
+        assert_eq!(negative == x, x == 0u32);
         assert_eq!(-&negative, x);
         assert_eq!(x + negative, 0);
     });

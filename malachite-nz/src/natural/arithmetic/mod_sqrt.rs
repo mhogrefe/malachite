@@ -57,16 +57,16 @@ fn mod_sqrt_ref_ref(x: &Natural, m: &Natural) -> Option<Natural> {
         return None;
     }
     let data = ModMulPrecomputed::<Natural>::precompute_mod_mul_data(m);
-    if m.mod_power_of_2(2) == 3 {
-        return Some(x.mod_pow((m + Natural::ONE) >> 2, m));
+    if m.mod_power_of_2(2) == 3u32 {
+        return Some(x.mod_pow((m + Natural::ONE) >> 2u32, m));
     }
-    if m.mod_power_of_2(3) == 5 {
-        let root: Natural = x.mod_pow((m + THREE) >> 3, m);
+    if m.mod_power_of_2(3) == 5u32 {
+        let root: Natural = x.mod_pow((m + THREE) >> 3u32, m);
         let square = (&root).mod_square_precomputed(m, &data);
         if square == *x {
             return Some(root);
         }
-        let g: Natural = Natural::TWO.mod_pow((m - Natural::ONE) >> 2, m);
+        let g: Natural = Natural::TWO.mod_pow((m - Natural::ONE) >> 2u32, m);
         return Some((&g).mod_mul_precomputed(&root, m, &data));
     }
     // Tonelli-Shanks. Here m == 1 mod 8, so if m is prime, 2 is a quadratic residue and the
@@ -74,7 +74,7 @@ fn mod_sqrt_ref_ref(x: &Natural, m: &Natural) -> Option<Natural> {
     let mut r = 0u64;
     let mut p1 = m - Natural::ONE;
     loop {
-        p1 >>= 1;
+        p1 >>= 1u32;
         r += 1;
         if p1.odd() {
             break;
@@ -86,16 +86,16 @@ fn mod_sqrt_ref_ref(x: &Natural, m: &Natural) -> Option<Natural> {
         k += Natural::TWO;
     }
     let mut g = k.mod_pow(&p1, m);
-    let mut root: Natural = x.mod_pow((&p1 + Natural::ONE) >> 1, m);
+    let mut root: Natural = x.mod_pow((&p1 + Natural::ONE) >> 1u32, m);
     // the maximum number of iterations if m is prime
     let mut iter = r - 1;
-    while b != 1 {
+    while b != 1u32 {
         let mut b_pow = b.clone();
         let mut new_r = 0;
         loop {
             b_pow.mod_square_precomputed_assign(m, &data);
             new_r += 1;
-            if new_r >= r || b_pow == 1 {
+            if new_r >= r || b_pow == 1u32 {
                 break;
             }
         }
@@ -114,7 +114,7 @@ fn mod_sqrt_ref_ref(x: &Natural, m: &Natural) -> Option<Natural> {
         }
         iter -= 1;
     }
-    if root == 0 { None } else { Some(root) }
+    if root == 0u32 { None } else { Some(root) }
 }
 
 macro_rules! natural_mod_sqrt_doc {

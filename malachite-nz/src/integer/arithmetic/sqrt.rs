@@ -77,7 +77,7 @@ impl FloorSqrt for &Integer {
     /// ```
     #[inline]
     fn floor_sqrt(self) -> Integer {
-        if *self >= 0 {
+        if *self >= 0u32 {
             Integer::from(self.unsigned_abs_ref().floor_sqrt())
         } else {
             panic!("Cannot take square root of {self}")
@@ -127,7 +127,7 @@ impl FloorSqrtAssign for Integer {
     /// ```
     #[inline]
     fn floor_sqrt_assign(&mut self) {
-        if *self >= 0 {
+        if *self >= 0u32 {
             self.mutate_unsigned_abs(Natural::floor_sqrt_assign);
         } else {
             panic!("Cannot take square root of {self}")
@@ -200,7 +200,7 @@ impl CeilingSqrt for &Integer {
     /// ```
     #[inline]
     fn ceiling_sqrt(self) -> Integer {
-        if *self >= 0 {
+        if *self >= 0u32 {
             Integer::from(self.unsigned_abs_ref().ceiling_sqrt())
         } else {
             panic!("Cannot take square root of {self}")
@@ -250,7 +250,7 @@ impl CeilingSqrtAssign for Integer {
     /// ```
     #[inline]
     fn ceiling_sqrt_assign(&mut self) {
-        if *self >= 0 {
+        if *self >= 0u32 {
             self.mutate_unsigned_abs(Natural::ceiling_sqrt_assign);
         } else {
             panic!("Cannot take square root of {self}")
@@ -311,7 +311,7 @@ impl CheckedSqrt for Integer {
     /// ```
     #[inline]
     fn checked_sqrt(self) -> Option<Self> {
-        if self >= 0 {
+        if self >= 0u32 {
             self.unsigned_abs().checked_sqrt().map(Self::from)
         } else {
             panic!("Cannot take square root of {self}")
@@ -375,7 +375,7 @@ impl CheckedSqrt for &Integer {
     /// ```
     #[inline]
     fn checked_sqrt(self) -> Option<Integer> {
-        if *self >= 0 {
+        if *self >= 0u32 {
             self.unsigned_abs_ref().checked_sqrt().map(Integer::from)
         } else {
             panic!("Cannot take square root of {self}")

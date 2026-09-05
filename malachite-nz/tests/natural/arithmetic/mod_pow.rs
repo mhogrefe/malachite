@@ -606,15 +606,15 @@ fn mod_pow_properties() {
     natural_pair_gen_var_5().test_properties(|(exp, m)| {
         assert_eq!(
             Natural::ZERO.mod_pow(&exp, &m),
-            Natural::from(exp == 0 && m != 1),
+            Natural::from(exp == 0u32 && m != 1u32),
         );
-        if m != 1 {
+        if m != 1u32 {
             assert_eq!(Natural::ONE.mod_pow(exp, m), 1);
         }
     });
 
     natural_pair_gen_var_8().test_properties(|(ref x, ref m)| {
-        assert_eq!(x.mod_pow(Natural::ZERO, m), Natural::from(*m != 1));
+        assert_eq!(x.mod_pow(Natural::ZERO, m), Natural::from(*m != 1u32));
         assert_eq!(x.mod_pow(Natural::ONE, m), *x);
         assert_eq!(x.mod_pow(Natural::TWO, m), x.mod_mul(x, m));
     });

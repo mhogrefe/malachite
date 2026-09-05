@@ -323,7 +323,7 @@ fn power_of_10_x_minus_1_rational_helper(
 ) -> (Float, Ordering) {
     if x.is_integer() {
         let n = Integer::exact_from(x);
-        return if n > 0 {
+        return if n > 0u32 {
             // 10^n - 1 overflows when 10^n - 1 >= 2^MAX_EXPONENT, i.e. n * log2(10) >=
             // MAX_EXPONENT.
             if x_log_2_10_ge(x, Float::MAX_EXPONENT_I64) {

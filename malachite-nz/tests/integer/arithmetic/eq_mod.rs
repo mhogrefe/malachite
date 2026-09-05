@@ -608,7 +608,7 @@ fn limbs_pos_limb_eq_neg_limb_mod_properties() {
             assert_eq!((&x).eq_mod(&y, &m), equal);
             let m = Integer::from(m);
             assert_eq!(
-                x == y || m != 0 && (&x).mod_op(&m) == (&y).mod_op(&m),
+                x == y || m != 0u32 && (&x).mod_op(&m) == (&y).mod_op(&m),
                 equal
             );
             assert_eq!((x - y).divisible_by(m), equal);
@@ -624,7 +624,7 @@ fn limbs_pos_limb_eq_neg_limb_mod_properties() {
             let m = Natural::from_owned_limbs_asc(ms);
             assert!(!(&x).eq_mod(&y, &m));
             let m = Integer::from(m);
-            assert!(x != y && (m == 0 || (&x).mod_op(&m) != (&y).mod_op(&m)));
+            assert!(x != y && (m == 0u32 || (&x).mod_op(&m) != (&y).mod_op(&m)));
             assert!(!(x - y).divisible_by(m));
         },
     );
@@ -647,7 +647,7 @@ fn limbs_pos_eq_neg_limb_mod_properties() {
             assert_eq!((&x).eq_mod(&y, &m), equal);
             let m = Integer::from(m);
             assert_eq!(
-                x == y || m != 0 && (&x).mod_op(&m) == (&y).mod_op(&m),
+                x == y || m != 0u32 && (&x).mod_op(&m) == (&y).mod_op(&m),
                 equal
             );
             assert_eq!((x - y).divisible_by(m), equal);
@@ -664,7 +664,7 @@ fn limbs_pos_eq_neg_limb_mod_properties() {
             let y = -Natural::from(y);
             assert!((&x).eq_mod(&y, &m));
             let m = Integer::from(m);
-            assert!(x == y || m != 0 && (&x).mod_op(&m) == (&y).mod_op(&m));
+            assert!(x == y || m != 0u32 && (&x).mod_op(&m) == (&y).mod_op(&m));
             assert!((x - y).divisible_by(m));
         },
     );
@@ -679,7 +679,7 @@ fn limbs_pos_eq_neg_limb_mod_properties() {
             let y = -Natural::from(y);
             assert!(!(&x).eq_mod(&y, &m));
             let m = Integer::from(m);
-            assert!(x != y && (m == 0 || (&x).mod_op(&m) != (&y).mod_op(&m)));
+            assert!(x != y && (m == 0u32 || (&x).mod_op(&m) != (&y).mod_op(&m)));
             assert!(!(x - y).divisible_by(m));
         },
     );
@@ -700,7 +700,7 @@ fn limbs_pos_eq_neg_mod_limb_properties() {
             assert_eq!((&x).eq_mod(&y, &m), equal);
             let m = Integer::from(m);
             assert_eq!(
-                x == y || m != 0 && (&x).mod_op(&m) == (&y).mod_op(&m),
+                x == y || m != 0u32 && (&x).mod_op(&m) == (&y).mod_op(&m),
                 equal
             );
             assert_eq!((x - y).divisible_by(m), equal);
@@ -716,7 +716,7 @@ fn limbs_pos_eq_neg_mod_limb_properties() {
             let m = Natural::from(m);
             assert!((&x).eq_mod(&y, &m));
             let m = Integer::from(m);
-            assert!(x == y || m != 0 && (&x).mod_op(&m) == (&y).mod_op(&m));
+            assert!(x == y || m != 0u32 && (&x).mod_op(&m) == (&y).mod_op(&m));
             assert!((x - y).divisible_by(m));
         },
     );
@@ -730,7 +730,7 @@ fn limbs_pos_eq_neg_mod_limb_properties() {
             let m = Natural::from(m);
             assert!(!(&x).eq_mod(&y, &m));
             let m = Integer::from(m);
-            assert!(x != y && (m == 0 || (&x).mod_op(&m) != (&y).mod_op(&m)));
+            assert!(x != y && (m == 0u32 || (&x).mod_op(&m) != (&y).mod_op(&m)));
             assert!(!(x - y).divisible_by(m));
         },
     );
@@ -750,7 +750,7 @@ fn limbs_pos_eq_neg_mod_properties() {
         assert_eq!((&x).eq_mod(&y, &m), equal);
         let m = Integer::from(m);
         assert_eq!(
-            x == y || m != 0 && (&x).mod_op(&m) == (&y).mod_op(&m),
+            x == y || m != 0u32 && (&x).mod_op(&m) == (&y).mod_op(&m),
             equal
         );
         assert_eq!((x - y).divisible_by(m), equal);
@@ -764,7 +764,7 @@ fn limbs_pos_eq_neg_mod_properties() {
         let y = -Natural::from_owned_limbs_asc(ys);
         assert!((&x).eq_mod(&y, &m));
         let m = Integer::from(m);
-        assert!(x == y || m != 0 && (&x).mod_op(&m) == (&y).mod_op(&m));
+        assert!(x == y || m != 0u32 && (&x).mod_op(&m) == (&y).mod_op(&m));
         assert!((x - y).divisible_by(m));
     });
 
@@ -776,7 +776,7 @@ fn limbs_pos_eq_neg_mod_properties() {
         let y = -Natural::from_owned_limbs_asc(ys);
         assert!(!(&x).eq_mod(&y, &m));
         let m = Integer::from(m);
-        assert!(x != y && (m == 0 || (&x).mod_op(&m) != (&y).mod_op(&m)));
+        assert!(x != y && (m == 0u32 || (&x).mod_op(&m) != (&y).mod_op(&m)));
         assert!(!(x - y).divisible_by(m));
     });
 }

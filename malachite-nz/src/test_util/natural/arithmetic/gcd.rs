@@ -23,7 +23,7 @@ use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_base::slices::slice_test_zero;
 
 pub fn gcd_euclidean_nz(x: Natural, y: Natural) -> Natural {
-    if y == 0 {
+    if y == 0u32 {
         x
     } else {
         let r = x % &y;
@@ -37,24 +37,24 @@ pub fn gcd_binary_nz(mut x: Natural, mut y: Natural) -> Natural {
     loop {
         if x == y {
             return x << twos;
-        } else if x == 0 {
+        } else if x == 0u32 {
             return y << twos;
-        } else if y == 0 {
+        } else if y == 0u32 {
             return x << twos;
         } else if x.even() {
-            x >>= 1;
+            x >>= 1u32;
             if y.even() {
-                y >>= 1;
+                y >>= 1u32;
                 twos += 1;
             }
         } else if y.even() {
-            y >>= 1;
+            y >>= 1u32;
         } else if x > y {
             x -= &y;
-            x >>= 1;
+            x >>= 1u32;
         } else {
             y -= &x;
-            y >>= 1;
+            y >>= 1u32;
         }
     }
 }

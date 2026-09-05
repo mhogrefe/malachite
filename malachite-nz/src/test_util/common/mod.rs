@@ -66,7 +66,7 @@ impl From<&Natural> for BigInt {
     #[inline]
     fn from(n: &Natural) -> Self {
         Self::from_biguint(
-            if *n == 0 { Sign::NoSign } else { Sign::Plus },
+            if *n == 0u32 { Sign::NoSign } else { Sign::Plus },
             BigUint::new(u32::vec_from_other_type_slice(n.as_limbs_asc())),
         )
     }
@@ -125,6 +125,6 @@ impl From<&Integer> for rug::Integer {
     #[inline]
     fn from(n: &Integer) -> Self {
         let out = Self::from(n.unsigned_abs_ref());
-        if *n >= 0 { out } else { -out }
+        if *n >= 0u32 { out } else { -out }
     }
 }

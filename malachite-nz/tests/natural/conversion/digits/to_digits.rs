@@ -1130,7 +1130,7 @@ where
         let mut digits_alt = Vec::new();
         to_digits_asc_naive_primitive(&mut digits_alt, &x, base);
         assert_eq!(digits_alt, digits);
-        if x != 0 {
+        if x != 0u32 {
             assert_ne!(*digits.last().unwrap(), T::ZERO);
             assert_eq!(
                 u64::exact_from(digits.len()),
@@ -1251,7 +1251,7 @@ where
     config.insert("mean_stripe_n", 128);
     natural_unsigned_pair_gen_var_2::<T>().test_properties_with_config(&config, |(x, base)| {
         let digits = x.to_digits_desc(&base);
-        if x != 0 {
+        if x != 0u32 {
             assert_ne!(digits[0], T::ZERO);
             assert_eq!(
                 u64::exact_from(digits.len()),
@@ -1456,7 +1456,7 @@ fn to_digits_asc_natural_properties() {
         let mut digits_alt = Vec::new();
         to_digits_asc_naive(&mut digits_alt, &x, &base);
         assert_eq!(digits_alt, digits);
-        if x != 0 {
+        if x != 0u32 {
             assert_ne!(*digits.last().unwrap(), 0);
             assert_eq!(u64::exact_from(digits.len()), x.floor_log_base(&base) + 1);
         }
@@ -1475,7 +1475,7 @@ fn to_digits_asc_natural_properties() {
         assert_eq!(
             x.to_digits_asc(&Natural::TWO)
                 .into_iter()
-                .map(|digit| digit == 1)
+                .map(|digit| digit == 1u32)
                 .collect_vec(),
             x.to_bits_asc()
         );
@@ -1633,7 +1633,7 @@ fn to_digits_desc_natural_properties() {
     config.insert("mean_stripe_n", 128);
     natural_pair_gen_var_2().test_properties_with_config(&config, |(x, base)| {
         let digits = x.to_digits_desc(&base);
-        if x != 0 {
+        if x != 0u32 {
             assert_ne!(digits[0], 0);
             assert_eq!(u64::exact_from(digits.len()), x.floor_log_base(&base) + 1);
         }
@@ -1652,7 +1652,7 @@ fn to_digits_desc_natural_properties() {
         assert_eq!(
             x.to_digits_desc(&Natural::TWO)
                 .into_iter()
-                .map(|digit| digit == 1)
+                .map(|digit| digit == 1u32)
                 .collect_vec(),
             x.to_bits_desc()
         );

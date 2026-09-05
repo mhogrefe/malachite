@@ -21,6 +21,7 @@ mod adjacent_vec_allocations;
 mod assert_ordering_equal_prefer_exact;
 mod assign_then_consumed_once;
 mod assign_then_returned;
+mod bignum_literal_suffix;
 mod clone_with_ref_variant;
 mod collapse_adjacent_ifs;
 mod collapse_adjacent_imports;
@@ -49,6 +50,7 @@ mod redundant_shift_conversion;
 mod redundant_tuple_rebuild;
 mod runtime_literal_conversion;
 mod shift_of_one;
+mod use_abs_comparison;
 mod use_assign_variant;
 mod use_checked_log_base_2;
 mod use_cmp_double;
@@ -85,8 +87,14 @@ const BIGNUM_TYPES: [(&[&str], &str); 6] = [
     (&["malachite_nz", "integer", "Integer"], "Integer"),
     (&["malachite_q", "rational", "Rational"], "Rational"),
     (&["malachite_float", "float", "Float"], "Float"),
-    (&["malachite_nz", "gaussian_integer", "GaussianInteger"], "GaussianInteger"),
-    (&["malachite_q", "gaussian_rational", "GaussianRational"], "GaussianRational"),
+    (
+        &["malachite_nz", "gaussian_integer", "GaussianInteger"],
+        "GaussianInteger",
+    ),
+    (
+        &["malachite_q", "gaussian_rational", "GaussianRational"],
+        "GaussianRational",
+    ),
 ];
 
 // If `e` (possibly behind `&`) is a call to `T::power_of_2` where `T` is a Malachite bignum type,
@@ -492,6 +500,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         assert_ordering_equal_prefer_exact::ASSERT_ORDERING_EQUAL_PREFER_EXACT,
         assign_then_consumed_once::ASSIGN_THEN_CONSUMED_ONCE,
         assign_then_returned::ASSIGN_THEN_RETURNED,
+        bignum_literal_suffix::BIGNUM_LITERAL_SUFFIX,
         clone_with_ref_variant::CLONE_WITH_REF_VARIANT,
         collapse_adjacent_ifs::COLLAPSE_ADJACENT_IFS,
         div_mod_projection::DIV_MOD_PROJECTION,
@@ -547,6 +556,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         use_square::USE_SQUARE,
         use_trailing_zeros::USE_TRAILING_ZEROS,
         use_unary_assign::USE_UNARY_ASSIGN,
+        use_abs_comparison::USE_ABS_COMPARISON,
         use_width_mask::USE_WIDTH_MASK,
     ]);
     lint_store.register_late_pass(|_| {
@@ -557,6 +567,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
     lint_store.register_late_pass(|_| Box::new(div_mod_projection::DivModProjection));
     lint_store.register_late_pass(|_| Box::new(assign_then_consumed_once::AssignThenConsumedOnce));
     lint_store.register_late_pass(|_| Box::new(assign_then_returned::AssignThenReturned));
+    lint_store.register_late_pass(|_| Box::new(bignum_literal_suffix::BignumLiteralSuffix));
     lint_store.register_late_pass(|_| Box::new(compare_with_power_of_2::CompareWithPowerOf2));
     lint_store.register_late_pass(|_| Box::new(compare_with_primitive::CompareWithPrimitive));
     lint_store.register_late_pass(|_| Box::new(duplicate_const::DuplicateConst::default()));
@@ -623,6 +634,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
     lint_store.register_late_pass(|_| Box::new(use_square::UseSquare));
     lint_store.register_late_pass(|_| Box::new(use_trailing_zeros::UseTrailingZeros));
     lint_store.register_late_pass(|_| Box::new(use_unary_assign::UseUnaryAssign));
+    lint_store.register_late_pass(|_| Box::new(use_abs_comparison::UseAbsComparison));
     lint_store.register_late_pass(|_| Box::new(use_width_mask::UseWidthMask));
 }
 

@@ -44,7 +44,7 @@ fn float_rational_sum_exponent_range(x: &Float, y: &Rational) -> (i64, i64) {
     let log_x_abs = i64::from(x.get_exponent().unwrap() - 1);
     let log_y_abs = y.floor_log_base_2_abs();
     let m = max(log_x_abs, log_y_abs);
-    if (*x > 0) == (*y > 0) {
+    if (*x > 0u32) == (*y > 0u32) {
         (m, m + 1)
     } else if log_x_abs.abs_diff(log_y_abs) > 1 {
         (m - 1, m)
@@ -71,14 +71,14 @@ fn float_rational_sum_exponent_range(x: &Float, y: &Rational) -> (i64, i64) {
 
 // x and y must be finite, nonzero, and not sum to zero
 fn float_rational_sum_sign(x: &Float, y: &Rational) -> bool {
-    match ((*x > 0), (*y > 0)) {
+    match ((*x > 0u32), (*y > 0u32)) {
         (true, true) => true,
         (false, false) => false,
         _ => {
             if x.gt_abs(y) {
-                *x > 0
+                *x > 0u32
             } else {
-                *y > 0
+                *y > 0u32
             }
         }
     }
@@ -2546,9 +2546,9 @@ impl Float {
                 }
             }
             (float_zero!(), y) => Self::from_rational_prec_round(y, prec, rm),
-            (_, y) if y == 0 => Self::from_float_prec_round_ref(self, prec, rm),
+            (_, y) if y == 0u32 => Self::from_float_prec_round_ref(self, prec, rm),
             (x, y) => {
-                if (*x > 0) != (y > 0) && x.eq_abs(&y) {
+                if (*x > 0u32) != (y > 0u32) && x.eq_abs(&y) {
                     return (
                         if rm == Floor {
                             float_negative_zero!()
@@ -2595,7 +2595,7 @@ impl Float {
                     // If EXP(q)-EXP(t)<0, <= 2^0
                     // ```
                     // We can get 0, but we can't round since q is inexact
-                    if t != 0 {
+                    if t != 0u32 {
                         let m = u64::saturating_from(q_exp - t.get_exponent().unwrap())
                             .checked_add(1)
                             .unwrap();
@@ -2761,9 +2761,9 @@ impl Float {
                 }
             }
             (float_zero!(), y) => Self::from_rational_prec_round_ref(y, prec, rm),
-            (_, y) if *y == 0 => Self::from_float_prec_round_ref(self, prec, rm),
+            (_, y) if *y == 0u32 => Self::from_float_prec_round_ref(self, prec, rm),
             (x, y) => {
-                if (*x > 0) != (*y > 0) && x.eq_abs(y) {
+                if (*x > 0u32) != (*y > 0u32) && x.eq_abs(y) {
                     return (
                         if rm == Floor {
                             float_negative_zero!()
@@ -2810,7 +2810,7 @@ impl Float {
                     // If EXP(q)-EXP(t)<0, <= 2^0
                     // ```
                     // We can get 0, but we can't round since q is inexact
-                    if t != 0 {
+                    if t != 0u32 {
                         let m = u64::saturating_from(q_exp - t.get_exponent().unwrap())
                             .checked_add(1)
                             .unwrap();
@@ -3614,9 +3614,9 @@ impl Float {
                 (*self, o) = Self::from_rational_prec_round(y, prec, rm);
                 o
             }
-            (_, y) if y == 0 => self.set_prec_round(prec, rm),
+            (_, y) if y == 0u32 => self.set_prec_round(prec, rm),
             (x, y) => {
-                if (*x > 0) != (y > 0) && x.eq_abs(&y) {
+                if (*x > 0u32) != (y > 0u32) && x.eq_abs(&y) {
                     *self = if rm == Floor {
                         float_negative_zero!()
                     } else {
@@ -3674,7 +3674,7 @@ impl Float {
                     // If EXP(q)-EXP(t)<0, <= 2^0
                     // ```
                     // We can get 0, but we can't round since q is inexact
-                    if t != 0 {
+                    if t != 0u32 {
                         let m = u64::saturating_from(q_exp - t.get_exponent().unwrap())
                             .checked_add(1)
                             .unwrap();
@@ -3810,9 +3810,9 @@ impl Float {
                 (*self, o) = Self::from_rational_prec_round_ref(y, prec, rm);
                 o
             }
-            (_, y) if *y == 0 => self.set_prec_round(prec, rm),
+            (_, y) if *y == 0u32 => self.set_prec_round(prec, rm),
             (x, y) => {
-                if (*x > 0) != (*y > 0) && x.eq_abs(y) {
+                if (*x > 0u32) != (*y > 0u32) && x.eq_abs(y) {
                     *self = if rm == Floor {
                         float_negative_zero!()
                     } else {
@@ -3871,7 +3871,7 @@ impl Float {
                     // If EXP(q)-EXP(t)<0, <= 2^0
                     // ```
                     // We can get 0, but we can't round since q is inexact
-                    if t != 0 {
+                    if t != 0u32 {
                         let m = u64::saturating_from(q_exp - t.get_exponent().unwrap())
                             .checked_add(1)
                             .unwrap();
@@ -4457,7 +4457,7 @@ impl Add<&Float> for &Float {
         // the same result: doubling is exact until the exponent overflows, and `<<` applies the
         // same `Nearest` overflow behavior as addition.
         if core::ptr::eq(self, other) {
-            return self << 1u64;
+            return self << 1u32;
         }
         let prec = max(self.significant_bits(), other.significant_bits());
         self.add_prec_round_ref_ref(other, prec, Nearest).0

@@ -921,7 +921,7 @@ fn from_natural_prec_round_properties() {
         if r_nearest != 0u32 {
             assert!(
                 (r_nearest - Rational::from(&n))
-                    .le_abs(&(Rational::exact_from(nearest.0.ulp().unwrap()) >> 1))
+                    .le_abs(&(Rational::exact_from(nearest.0.ulp().unwrap()) >> 1u32))
             );
         }
     });

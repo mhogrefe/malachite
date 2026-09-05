@@ -879,7 +879,7 @@ pub fn random_rational_with_denominator_range(
     if !upper_included {
         b_i += Integer::ONE;
     }
-    if (a_i >= 0) == (b_i >= 0) {
+    if (a_i >= 0u32) == (b_i >= 0u32) {
         let (n, d) = (Rational::from_unsigneds(
             mean_numerator_bits_numerator,
             mean_numerator_bits_denominator,
@@ -967,7 +967,7 @@ pub fn random_rational_with_denominator_inclusive_range(
     let q_d = Rational::from(&d);
     let a_i = Integer::rounding_from(a * &q_d, Ceiling).0;
     let b_i = Integer::rounding_from(b * q_d, Floor).0 + Integer::ONE;
-    if (a_i >= 0) == (b_i >= 0) {
+    if (a_i >= 0u32) == (b_i >= 0u32) {
         let (n, d) = (Rational::from_unsigneds(
             mean_numerator_bits_numerator,
             mean_numerator_bits_denominator,
@@ -1021,7 +1021,7 @@ impl Iterator for RandomRationalRangeToInfinity {
             );
             if n.unsigned_abs_ref().coprime_with(&d) {
                 return Some(Rational {
-                    sign: n >= 0,
+                    sign: n >= 0u32,
                     numerator: n.unsigned_abs(),
                     denominator: d,
                 });
@@ -1118,7 +1118,7 @@ impl Iterator for RandomRationalRangeToNegativeInfinity {
             );
             if n.unsigned_abs_ref().coprime_with(&d) {
                 return Some(Rational {
-                    sign: n >= 0,
+                    sign: n >= 0u32,
                     numerator: n.unsigned_abs(),
                     denominator: d,
                 });
@@ -1497,7 +1497,7 @@ impl Iterator for StripedRandomRationalRangeToInfinity {
             );
             if n.unsigned_abs_ref().coprime_with(&d) {
                 return Some(Rational {
-                    sign: n >= 0,
+                    sign: n >= 0u32,
                     numerator: n.unsigned_abs(),
                     denominator: d,
                 });
@@ -1615,7 +1615,7 @@ impl Iterator for StripedRandomRationalRangeToNegativeInfinity {
             );
             if n.unsigned_abs_ref().coprime_with(&d) {
                 return Some(Rational {
-                    sign: n >= 0,
+                    sign: n >= 0u32,
                     numerator: n.unsigned_abs(),
                     denominator: d,
                 });

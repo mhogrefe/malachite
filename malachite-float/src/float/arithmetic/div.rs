@@ -47,7 +47,7 @@ fn div_rational_prec_round_assign_naive(
     match (&mut *x, y) {
         (float_nan!(), _) => Equal,
         (Float(Infinity { sign }), y) => {
-            if y < 0 {
+            if y < 0u32 {
                 sign.not_assign();
             };
             Equal
@@ -61,11 +61,11 @@ fn div_rational_prec_round_assign_naive(
             Equal
         }
         (x, y) => {
-            if y == 0 {
+            if y == 0u32 {
                 *x = Float(Infinity { sign: *x > 0u32 });
                 Equal
             } else {
-                let not_sign = *x < 0;
+                let not_sign = *x < 0u32;
                 let mut z = Float::ZERO;
                 swap(x, &mut z);
                 let (mut quotient, o) =
@@ -90,7 +90,7 @@ fn div_rational_prec_round_assign_naive_ref(
     match (&mut *x, y) {
         (float_nan!(), _) => Equal,
         (Float(Infinity { sign }), y) => {
-            if *y < 0 {
+            if *y < 0u32 {
                 sign.not_assign();
             };
             Equal
@@ -104,11 +104,11 @@ fn div_rational_prec_round_assign_naive_ref(
             Equal
         }
         (x, y) => {
-            if *y == 0 {
+            if *y == 0u32 {
                 *x = Float(Infinity { sign: *x > 0u32 });
                 Equal
             } else {
-                let not_sign = *x < 0;
+                let not_sign = *x < 0u32;
                 let mut z = Float::ZERO;
                 swap(x, &mut z);
                 let (mut quotient, o) =
@@ -169,12 +169,12 @@ private_test_fn! {div_rational_prec_round_naive_ref_val(
             Equal,
         ),
         (x, y) => {
-            if y == 0 {
+            if y == 0u32 {
                 (Float(Infinity { sign: *x > 0u32 }), Equal)
             } else {
                 let (mut quotient, o) =
                     Float::from_rational_prec_round(Rational::exact_from(x) / y, prec, rm);
-                if quotient == 0u32 && *x < 0 {
+                if quotient == 0u32 && *x < 0u32 {
                     quotient.neg_assign();
                 }
                 (quotient, o)
@@ -209,12 +209,12 @@ private_test_fn! {div_rational_prec_round_naive_ref_ref(
             Equal,
         ),
         (x, y) => {
-            if *y == 0 {
+            if *y == 0u32 {
                 (Float(Infinity { sign: *x > 0u32 }), Equal)
             } else {
                 let (mut quotient, o) =
                     Float::from_rational_prec_round(Rational::exact_from(x) / y, prec, rm);
-                if quotient == 0u32 && *x < 0 {
+                if quotient == 0u32 && *x < 0u32 {
                     quotient.neg_assign();
                 }
                 (quotient, o)
@@ -238,7 +238,7 @@ fn div_rational_prec_round_assign_direct(
         };
         return Equal;
     }
-    let sign = y >= 0;
+    let sign = y >= 0u32;
     let (n, d) = y.into_numerator_and_denominator();
     if !sign {
         rm.neg_assign();
@@ -312,7 +312,7 @@ fn div_rational_prec_round_assign_direct_ref(
         };
         return Equal;
     }
-    let sign = *y >= 0;
+    let sign = *y >= 0u32;
     let (n, d) = y.numerator_and_denominator_ref();
     if !sign {
         rm.neg_assign();
@@ -398,7 +398,7 @@ private_test_fn! {div_rational_prec_round_direct_ref_val(
     mut rm: RoundingMode,
 ) -> (Float, Ordering) {
     assert_ne!(prec, 0);
-    let sign = y >= 0;
+    let sign = y >= 0u32;
     if y == 0u32 {
         return (
             match x.partial_cmp(&0u32) {
@@ -486,7 +486,7 @@ private_test_fn! {div_rational_prec_round_direct_ref_ref(
             Equal,
         );
     }
-    let sign = *y >= 0;
+    let sign = *y >= 0u32;
     let (n, d) = y.numerator_and_denominator_ref();
     if !sign {
         rm.neg_assign();
@@ -573,7 +573,7 @@ private_test_fn! {rational_div_float_prec_round_naive(
             Equal,
         ),
         (x, y) => {
-            let not_sign = y < 0;
+            let not_sign = y < 0u32;
             let (mut quotient, o) =
                 Float::from_rational_prec_round(x / Rational::exact_from(y), prec, rm);
             if quotient == 0u32 && not_sign {
@@ -612,7 +612,7 @@ private_test_fn! {rational_div_float_prec_round_naive_val_ref(
         (x, y) => {
             let (mut quotient, o) =
                 Float::from_rational_prec_round(x / Rational::exact_from(y), prec, rm);
-            if quotient == 0u32 && *y < 0 {
+            if quotient == 0u32 && *y < 0u32 {
                 quotient.neg_assign();
             }
             (quotient, o)
@@ -646,7 +646,7 @@ private_test_fn! {rational_div_float_prec_round_naive_ref_val(
             Equal,
         ),
         (x, y) => {
-            let not_sign = y < 0;
+            let not_sign = y < 0u32;
             let (mut quotient, o) =
                 Float::from_rational_prec_round(x / Rational::exact_from(y), prec, rm);
             if quotient == 0u32 && not_sign {
@@ -685,7 +685,7 @@ private_test_fn! {rational_div_float_prec_round_naive_ref_ref(
         (x, y) => {
             let (mut quotient, o) =
                 Float::from_rational_prec_round(x / Rational::exact_from(y), prec, rm);
-            if quotient == 0u32 && *y < 0 {
+            if quotient == 0u32 && *y < 0u32 {
                 quotient.neg_assign();
             }
             (quotient, o)
@@ -710,7 +710,7 @@ private_test_fn! {rational_div_float_prec_round_direct(
             Equal,
         );
     }
-    let sign = x >= 0;
+    let sign = x >= 0u32;
     let (n, d) = x.into_numerator_and_denominator();
     if !sign {
         rm.neg_assign();
@@ -800,7 +800,7 @@ private_test_fn! {rational_div_float_prec_round_direct_val_ref(
             Equal,
         );
     }
-    let sign = x >= 0;
+    let sign = x >= 0u32;
     let (n, d) = x.into_numerator_and_denominator();
     if !sign {
         rm.neg_assign();
@@ -890,7 +890,7 @@ private_test_fn! {rational_div_float_prec_round_direct_ref_val(
             Equal,
         );
     }
-    let sign = *x >= 0;
+    let sign = *x >= 0u32;
     let (n, d) = x.numerator_and_denominator_ref();
     if !sign {
         rm.neg_assign();
@@ -980,7 +980,7 @@ private_test_fn! {rational_div_float_prec_round_direct_ref_ref(
             Equal,
         );
     }
-    let sign = *x >= 0;
+    let sign = *x >= 0u32;
     let (n, d) = x.numerator_and_denominator_ref();
     if !sign {
         rm.neg_assign();
@@ -2596,7 +2596,7 @@ impl Float {
                 Equal
             }
             (_, y) if abs_is_power_of_2(&y) => {
-                let sign = y >= 0;
+                let sign = y >= 0u32;
                 let mut o = self.shr_prec_round_assign(
                     y.get_exponent().unwrap() - 1,
                     prec,
@@ -2859,7 +2859,7 @@ impl Float {
                 Equal
             }
             (_, y) if abs_is_power_of_2(y) => {
-                let sign = *y >= 0;
+                let sign = *y >= 0u32;
                 let mut o = self.shr_prec_round_assign(
                     y.get_exponent().unwrap() - 1,
                     prec,

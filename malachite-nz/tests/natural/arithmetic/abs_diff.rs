@@ -98,7 +98,7 @@ fn abs_diff_properties() {
 
         assert_eq!((Integer::from(&x) - Integer::from(&y)).abs(), diff);
         assert_eq!((&y).abs_diff(&x), diff);
-        assert_eq!(diff == 0, x == y);
+        assert_eq!(diff == 0u32, x == y);
     });
 
     natural_gen().test_properties(|x| {

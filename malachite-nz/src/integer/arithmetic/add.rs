@@ -164,7 +164,7 @@ impl Add<&Integer> for &Integer {
     /// ```
     fn add(self, other: &Integer) -> Integer {
         match (self, other) {
-            (x, y) if core::ptr::eq(x, y) => x << 1,
+            (x, y) if core::ptr::eq(x, y) => x << 1u32,
             (&integer_zero!(), y) => y.clone(),
             (x, &integer_zero!()) => x.clone(),
             // e.g. 10 + 5 or -10 + -5; sign of result is sign of self
@@ -177,7 +177,7 @@ impl Add<&Integer> for &Integer {
                     sign: sy,
                     abs: ref ay,
                 },
-            ) if sx == (sy && *ay != 0) => Integer {
+            ) if sx == (sy && *ay != 0u32) => Integer {
                 sign: sx,
                 abs: ax + ay,
             },
@@ -252,7 +252,7 @@ impl AddAssign<Self> for Integer {
                     sign: sy,
                     abs: ref ay,
                 },
-            ) if sx == (sy && *ay != 0) => *ax += ay,
+            ) if sx == (sy && *ay != 0u32) => *ax += ay,
             // e.g. 10 += -5, -10 += 5, or 5 += -5; sign of self is unchanged
             (
                 &mut Self {
@@ -315,7 +315,7 @@ impl AddAssign<&Self> for Integer {
                     sign: sy,
                     abs: ref ay,
                 },
-            ) if sx == (sy && *ay != 0) => *ax += ay,
+            ) if sx == (sy && *ay != 0u32) => *ax += ay,
             // e.g. 10 += -5, -10 += 5, or 5 += -5; sign of self is unchanged
             (
                 &mut Self {

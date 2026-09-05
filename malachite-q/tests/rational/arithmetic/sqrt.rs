@@ -51,7 +51,7 @@ fn checked_sqrt_properties() {
         let sqrt_alt = (&n).checked_sqrt();
         assert!(sqrt_alt.as_ref().is_none_or(Rational::is_valid));
         assert_eq!(sqrt_alt, sqrt);
-        if n != 0 {
+        if n != 0u32 {
             assert_eq!(
                 (&n).reciprocal().checked_sqrt(),
                 sqrt.as_ref().map(Reciprocal::reciprocal)

@@ -310,7 +310,7 @@ fn floor_cbrt_properties() {
         n_alt.floor_root_assign(3);
         assert!(cbrt_alt.is_valid());
         assert_eq!(n_alt, cbrt);
-        if n >= 0 {
+        if n >= 0u32 {
             assert_eq!(Integer::from(&BigInt::from(&n).nth_root(3)), cbrt);
             assert_eq!(Integer::from(&rug::Integer::from(&n).root(3)), cbrt);
         }
@@ -348,7 +348,7 @@ fn ceiling_cbrt_properties() {
         n_alt.ceiling_root_assign(3);
         assert!(cbrt_alt.is_valid());
         assert_eq!(n_alt, cbrt);
-        if n < 0 {
+        if n < 0u32 {
             assert_eq!(Integer::from(&BigInt::from(&n).nth_root(3)), cbrt);
             assert_eq!(Integer::from(&rug::Integer::from(&n).root(3)), cbrt);
         }
@@ -360,7 +360,7 @@ fn ceiling_cbrt_properties() {
             assert_eq!(floor_cbrt, &cbrt - Integer::ONE);
         }
         assert!(cube >= n);
-        if n != 0 {
+        if n != 0u32 {
             assert!((&cbrt - Integer::ONE).pow(3) < n);
         }
         assert_eq!(-(-n).floor_root(3), cbrt);
@@ -417,7 +417,7 @@ fn floor_root_properties() {
         n_alt.floor_root_assign(exp);
         assert!(root_alt.is_valid());
         assert_eq!(n_alt, root);
-        if n >= 0 {
+        if n >= 0u32 {
             assert_eq!(
                 Integer::from(&BigInt::from(&n).nth_root(u32::exact_from(exp))),
                 root
@@ -471,7 +471,7 @@ fn ceiling_root_properties() {
         n_alt.ceiling_root_assign(exp);
         assert!(root_alt.is_valid());
         assert_eq!(n_alt, root);
-        if n < 0 {
+        if n < 0u32 {
             assert_eq!(
                 Integer::from(&BigInt::from(&n).nth_root(u32::exact_from(exp))),
                 root
@@ -489,7 +489,7 @@ fn ceiling_root_properties() {
             assert_eq!(floor_root, &root - Integer::ONE);
         }
         assert!(pow >= n);
-        if n != 0 {
+        if n != 0u32 {
             assert!((&root - Integer::ONE).pow(exp) < n);
         }
         if exp.odd() {
@@ -611,16 +611,16 @@ fn root_rem_properties() {
         // the defining identity, and the root is the floor root
         assert_eq!((&root).pow(exp) + &rem, n);
         assert_eq!(root, (&n).floor_root(exp));
-        assert!(rem >= 0);
+        assert!(rem >= 0u32);
         // the remainder is smaller than the gap to the next power up
         assert!(rem < (&root + Integer::ONE).pow(exp) - (&root).pow(exp));
-        assert_eq!(rem == 0, (&n).checked_root(exp).is_some());
+        assert_eq!(rem == 0u32, (&n).checked_root(exp).is_some());
 
         // GMP truncates toward zero, so its root and remainder differ on a negative operand whose
         // root is inexact
         let rug_n = rug::Integer::from(&n);
         let (rug_root, rug_rem) = rug_n.root_rem(rug::Integer::new(), u32::exact_from(exp));
-        if n >= 0 || rem == 0 {
+        if n >= 0u32 || rem == 0u32 {
             assert_eq!(Integer::from(&rug_root), root);
             assert_eq!(Integer::from(&rug_rem), rem);
         } else {

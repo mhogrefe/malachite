@@ -169,7 +169,7 @@ fn div_properties() {
 
     gaussian_integer_pair_gen().test_properties(|(x, y)| {
         let q = (&x).checked_div(&y);
-        assert_eq!(q.is_none(), y == GaussianInteger::ZERO);
+        assert_eq!(q.is_none(), y == 0u32);
         if let Some(q) = q {
             assert_eq!(q, x / y);
         }

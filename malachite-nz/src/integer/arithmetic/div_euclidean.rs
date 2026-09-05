@@ -48,7 +48,7 @@ impl DivEuclidean<Self> for Integer {
     /// ```
     #[inline]
     fn div_euclidean(self, other: Self) -> Self {
-        let rm = if other > 0 { Floor } else { Ceiling };
+        let rm = if other > 0u32 { Floor } else { Ceiling };
         self.div_round(other, rm).0
     }
 }
@@ -87,7 +87,7 @@ impl DivEuclidean<&Self> for Integer {
     /// ```
     #[inline]
     fn div_euclidean(self, other: &Self) -> Self {
-        let rm = if *other > 0 { Floor } else { Ceiling };
+        let rm = if *other > 0u32 { Floor } else { Ceiling };
         self.div_round(other, rm).0
     }
 }
@@ -126,7 +126,7 @@ impl DivEuclidean<Integer> for &Integer {
     /// ```
     #[inline]
     fn div_euclidean(self, other: Integer) -> Integer {
-        let rm = if other > 0 { Floor } else { Ceiling };
+        let rm = if other > 0u32 { Floor } else { Ceiling };
         self.div_round(other, rm).0
     }
 }
@@ -164,7 +164,7 @@ impl DivEuclidean<&Integer> for &Integer {
     /// ```
     #[inline]
     fn div_euclidean(self, other: &Integer) -> Integer {
-        let rm = if *other > 0 { Floor } else { Ceiling };
+        let rm = if *other > 0u32 { Floor } else { Ceiling };
         self.div_round(other, rm).0
     }
 }
@@ -203,7 +203,7 @@ impl DivEuclideanAssign<Self> for Integer {
     /// ```
     #[inline]
     fn div_euclidean_assign(&mut self, other: Self) {
-        let rm = if other > 0 { Floor } else { Ceiling };
+        let rm = if other > 0u32 { Floor } else { Ceiling };
         self.div_round_assign(other, rm);
     }
 }
@@ -242,7 +242,7 @@ impl DivEuclideanAssign<&Self> for Integer {
     /// ```
     #[inline]
     fn div_euclidean_assign(&mut self, other: &Self) {
-        let rm = if *other > 0 { Floor } else { Ceiling };
+        let rm = if *other > 0u32 { Floor } else { Ceiling };
         self.div_round_assign(other, rm);
     }
 }

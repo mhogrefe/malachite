@@ -146,7 +146,7 @@ fn div_exact_properties_helper(x: GaussianInteger, y: GaussianInteger) {
     );
     assert_eq!((&x).mul_i().div_exact(&y), (&q).mul_i());
     assert_eq!((&x).div_exact((&y).mul_i()), (&q).div_i());
-    if q != GaussianInteger::ZERO {
+    if q != 0u32 {
         assert_eq!((&x).div_exact(&q), y);
     }
 }

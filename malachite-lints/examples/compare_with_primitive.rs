@@ -1,8 +1,8 @@
 use core::cmp::Ordering::*;
 use malachite_base::num::basic::traits::{I, NegativeOne, One, Two, Zero};
+use malachite_nz::gaussian_integer::GaussianInteger;
 use malachite_nz::natural::Natural;
 use malachite_q::Rational;
-use malachite_nz::gaussian_integer::GaussianInteger;
 use malachite_q::gaussian_rational::GaussianRational;
 
 const X: Rational = Rational::const_from_signeds(22, 7);

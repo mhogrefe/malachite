@@ -51,7 +51,7 @@ fn test_is_square_edge_cases() {
     // Test some specific edge cases
 
     // Powers of 2 that are perfect squares
-    let power_of_2_square: Natural = Natural::from(1u64) << 0x1000;
+    let power_of_2_square: Natural = Natural::from(1u64) << 0x1000u32;
     assert!(power_of_2_square.is_square());
 
     let power_of_2_non_square = power_of_2_square + Natural::from(1u64);

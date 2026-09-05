@@ -340,7 +340,7 @@ fn natural_rounding_from_float_fail() {
     assert_panic!(Natural::rounding_from(Float::NEGATIVE_ONE, Up));
     assert_panic!(Natural::rounding_from(Float::NEGATIVE_ONE, Exact));
 
-    assert_panic!(Natural::rounding_from(Float::from(3u8) >> 1, Exact));
+    assert_panic!(Natural::rounding_from(Float::from(3u8) >> 1u32, Exact));
 }
 
 #[test]
@@ -367,7 +367,7 @@ fn natural_rounding_from_float_ref_fail() {
     assert_panic!(Natural::rounding_from(&Float::NEGATIVE_ONE, Up));
     assert_panic!(Natural::rounding_from(&Float::NEGATIVE_ONE, Exact));
 
-    assert_panic!(Natural::rounding_from(&(Float::from(3u8) >> 1), Exact));
+    assert_panic!(Natural::rounding_from(&(Float::from(3u8) >> 1u32), Exact));
 }
 
 #[test]
@@ -403,13 +403,13 @@ fn rounding_from_float_properties() {
         let no = Natural::rounding_from(&x, rm);
         assert_eq!(Natural::rounding_from(x.clone(), rm), no);
         let (n, o) = no;
-        if x >= 0 {
+        if x >= 0u32 {
             assert_eq!(Integer::rounding_from(&x, rm), (Integer::from(&n), o));
-            assert!((Rational::from(&n) - Rational::exact_from(&x)).lt_abs(&1));
+            assert!((Rational::from(&n) - Rational::exact_from(&x)).lt_abs(&1u32));
         }
 
         assert_eq!(n.partial_cmp(&x), Some(o));
-        match (x >= 0, rm) {
+        match (x >= 0u32, rm) {
             (_, Floor) | (true, Down) | (false, Up) => {
                 assert_ne!(o, Greater);
             }
@@ -431,7 +431,7 @@ fn rounding_from_float_properties() {
         let ceiling = Natural::rounding_from(&x, Ceiling);
         assert_eq!(ceiling.0, Rational::exact_from(&x).ceiling());
         assert!(ceiling.0 >= x);
-        if x > 0 {
+        if x > 0u32 {
             assert!(&ceiling.0 - Natural::ONE < x);
         }
         assert_eq!(Natural::rounding_from(&x, Up), ceiling);
@@ -451,7 +451,7 @@ fn rounding_from_float_properties() {
         assert_eq!(Natural::rounding_from(&x, Nearest), no);
         assert_eq!(Natural::rounding_from(&x, Exact), no);
 
-        let x = Float::exact_from((no.0 << 1) | Natural::ONE) >> 1;
+        let x = Float::exact_from((no.0 << 1u32) | Natural::ONE) >> 1u32;
         assert!(Natural::rounding_from(x, Nearest).0.even());
     });
 }

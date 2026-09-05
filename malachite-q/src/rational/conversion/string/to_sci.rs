@@ -144,7 +144,7 @@ impl Rational {
             length = max(length, count.div_round(u64::from(m), Ceiling).0);
         }
         if let Some(temp) = temp {
-            if temp == 1 { Some(length) } else { None }
+            if temp == 1u32 { Some(length) } else { None }
         } else {
             None
         }
@@ -245,7 +245,7 @@ impl ToSci for Rational {
     /// assert!(Rational::from_signeds(1, 3).fmt_sci_valid(options));
     /// ```
     fn fmt_sci_valid(&self, options: ToSciOptions) -> bool {
-        if *self == 0 {
+        if *self == 0u32 {
             return true;
         }
         if let SciSizeOptions::Complete = options.get_size_options() {

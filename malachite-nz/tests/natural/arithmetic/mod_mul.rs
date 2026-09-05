@@ -380,7 +380,7 @@ fn mod_mul_properties() {
     natural_pair_gen_var_8().test_properties(|(x, m)| {
         assert_eq!((&x).mod_mul(Natural::ZERO, &m), 0);
         assert_eq!(Natural::ZERO.mod_mul(&x, &m), 0);
-        if m > 1 {
+        if m > 1u32 {
             assert_eq!((&x).mod_mul(Natural::ONE, &m), x);
             assert_eq!(Natural::ONE.mod_mul(&x, &m), x);
         }

@@ -12,7 +12,7 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::logic::traits::BitIterable;
 
 pub fn simple_binary_mod_pow(x: &Natural, exp: &Natural, m: &Natural) -> Natural {
-    if *m == 1 {
+    if *m == 1u32 {
         return Natural::ZERO;
     }
     let mut out = Natural::ONE;

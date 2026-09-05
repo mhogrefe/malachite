@@ -53,7 +53,7 @@ impl Average<Self> for Rational {
     /// ```
     #[inline]
     fn average(self, other: Self) -> Self {
-        (self + other) >> 1u64
+        (self + other) >> 1u32
     }
 }
 
@@ -102,7 +102,7 @@ impl Average<&Self> for Rational {
     /// ```
     #[inline]
     fn average(self, other: &Self) -> Self {
-        (self + other) >> 1u64
+        (self + other) >> 1u32
     }
 }
 
@@ -151,7 +151,7 @@ impl Average<Rational> for &Rational {
     /// ```
     #[inline]
     fn average(self, other: Rational) -> Rational {
-        (self + other) >> 1u64
+        (self + other) >> 1u32
     }
 }
 
@@ -199,7 +199,7 @@ impl Average<&Rational> for &Rational {
     /// ```
     #[inline]
     fn average(self, other: &Rational) -> Rational {
-        (self + other) >> 1u64
+        (self + other) >> 1u32
     }
 }
 
@@ -234,7 +234,7 @@ impl AverageAssign<Self> for Rational {
     #[inline]
     fn average_assign(&mut self, other: Self) {
         *self += other;
-        *self >>= 1u64;
+        *self >>= 1u32;
     }
 }
 
@@ -269,6 +269,6 @@ impl AverageAssign<&Self> for Rational {
     #[inline]
     fn average_assign(&mut self, other: &Self) {
         *self += other;
-        *self >>= 1u64;
+        *self >>= 1u32;
     }
 }

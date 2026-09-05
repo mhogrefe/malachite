@@ -3546,7 +3546,7 @@ fn sqrt_rational_prec_round_properties() {
         assert_eq!(o, o_alt);
 
         if !sqrt.is_nan() {
-            match (x >= 0, rm) {
+            match (x >= 0u32, rm) {
                 (_, Floor) | (true, Down) | (false, Up) => {
                     assert_ne!(o, Greater);
                 }

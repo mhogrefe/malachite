@@ -66,7 +66,7 @@ impl CheckedSqrt for Rational {
     /// );
     /// ```
     fn checked_sqrt(self) -> Option<Self> {
-        assert!(self >= 0);
+        assert!(self >= 0u32);
         let (n, d) = self.into_numerator_and_denominator();
         let sqrt_n;
         let sqrt_d;
@@ -78,7 +78,7 @@ impl CheckedSqrt for Rational {
             sqrt_n = n.checked_sqrt()?;
         }
         Some(Self {
-            sign: sqrt_n >= 0,
+            sign: sqrt_n >= 0u32,
             numerator: sqrt_n,
             denominator: sqrt_d,
         })
@@ -144,11 +144,11 @@ impl CheckedSqrt for &Rational {
         let sqrt_n;
         let sqrt_d;
         if n.significant_bits() <= d.significant_bits() {
-            sqrt_n = Integer::from_sign_and_abs_ref(*self >= 0, n).checked_sqrt()?;
+            sqrt_n = Integer::from_sign_and_abs_ref(*self >= 0u32, n).checked_sqrt()?;
             sqrt_d = d.checked_sqrt()?;
         } else {
             sqrt_d = d.checked_sqrt()?;
-            sqrt_n = Integer::from_sign_and_abs_ref(*self >= 0, n).checked_sqrt()?;
+            sqrt_n = Integer::from_sign_and_abs_ref(*self >= 0u32, n).checked_sqrt()?;
         }
         Some(Rational {
             sign: true,

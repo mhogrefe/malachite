@@ -104,7 +104,7 @@ pub fn limbs_product_naive(out: &mut [Limb], factors: &[Limb]) -> usize {
 pub fn natural_product_naive<I: Iterator<Item = Natural>>(xs: I) -> Natural {
     let mut p = Natural::ONE;
     for x in xs {
-        if x == 0 {
+        if x == 0u32 {
             return Natural::ZERO;
         }
         p *= x;

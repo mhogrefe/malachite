@@ -850,7 +850,7 @@ fn unsigned_rounding_from_float_fail_helper<T: PrimitiveUnsigned + RoundingFrom<
     assert_panic!(T::rounding_from(Float::NEGATIVE_ONE, Up));
     assert_panic!(T::rounding_from(Float::NEGATIVE_ONE, Exact));
 
-    assert_panic!(T::rounding_from(Float::from(3u8) >> 1, Exact));
+    assert_panic!(T::rounding_from(Float::from(3u8) >> 1u32, Exact));
 }
 
 fn signed_rounding_from_float_fail_helper<T: PrimitiveSigned + RoundingFrom<Float>>() {
@@ -869,8 +869,8 @@ fn signed_rounding_from_float_fail_helper<T: PrimitiveSigned + RoundingFrom<Floa
     assert_panic!(T::rounding_from(Float::NEGATIVE_INFINITY, Up));
     assert_panic!(T::rounding_from(Float::NEGATIVE_INFINITY, Exact));
 
-    assert_panic!(T::rounding_from(Float::from(3u8) >> 1, Exact));
-    assert_panic!(T::rounding_from(Float::from(-3i8) >> 1, Exact));
+    assert_panic!(T::rounding_from(Float::from(3u8) >> 1u32, Exact));
+    assert_panic!(T::rounding_from(Float::from(-3i8) >> 1u32, Exact));
 }
 
 #[test]
@@ -903,7 +903,7 @@ where
     assert_panic!(T::rounding_from(&Float::NEGATIVE_ONE, Up));
     assert_panic!(T::rounding_from(&Float::NEGATIVE_ONE, Exact));
 
-    assert_panic!(T::rounding_from(&(Float::from(3u8) >> 1), Exact));
+    assert_panic!(T::rounding_from(&(Float::from(3u8) >> 1u32), Exact));
 }
 
 #[allow(clippy::type_repetition_in_bounds)]
@@ -926,8 +926,8 @@ where
     assert_panic!(T::rounding_from(&Float::NEGATIVE_INFINITY, Up));
     assert_panic!(T::rounding_from(&Float::NEGATIVE_INFINITY, Exact));
 
-    assert_panic!(T::rounding_from(&(Float::from(3u8) >> 1), Exact));
-    assert_panic!(T::rounding_from(&(Float::from(-3i8) >> 1), Exact));
+    assert_panic!(T::rounding_from(&(Float::from(3u8) >> 1u32), Exact));
+    assert_panic!(T::rounding_from(&(Float::from(-3i8) >> 1u32), Exact));
 }
 
 #[test]
@@ -1063,7 +1063,7 @@ fn rounding_from_float_properties_helper_unsigned_helper<
     assert_eq!(T::rounding_from(x.clone(), rm), no);
     let (n, o) = no;
     if !extreme && x >= T::ZERO && x <= T::MAX {
-        assert!((Rational::from(n) - Rational::exact_from(&x)).lt_abs(&1));
+        assert!((Rational::from(n) - Rational::exact_from(&x)).lt_abs(&1u32));
     }
 
     assert_eq!(n.partial_cmp(&x), Some(o));
@@ -1135,7 +1135,7 @@ where
         assert_eq!(T::rounding_from(&x, Nearest), no);
         assert_eq!(T::rounding_from(&x, Exact), no);
 
-        let x = Float::from((no.0 << 1) | T::ONE) >> 1;
+        let x = Float::from((no.0 << 1) | T::ONE) >> 1u32;
         assert!(T::rounding_from(x, Nearest).0.even());
     });
 }
@@ -1157,7 +1157,7 @@ fn rounding_from_float_properties_helper_signed_helper<
     assert_eq!(T::rounding_from(x.clone(), rm), no);
     let (n, o) = no;
     if !extreme && x >= T::MIN && x <= T::MAX {
-        assert!((Rational::from(n) - Rational::exact_from(&x)).lt_abs(&1));
+        assert!((Rational::from(n) - Rational::exact_from(&x)).lt_abs(&1u32));
     }
 
     assert_eq!(n.partial_cmp(&x), Some(o));
@@ -1246,7 +1246,7 @@ where
         assert_eq!(T::rounding_from(&x, Nearest), no);
         assert_eq!(T::rounding_from(&x, Exact), no);
 
-        let x = Float::from((no.0 << 1) | T::ONE) >> 1;
+        let x = Float::from((no.0 << 1) | T::ONE) >> 1u32;
         assert!(T::rounding_from(x, Nearest).0.even());
     });
 }

@@ -6,8 +6,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::{Abs, Reciprocal, ReciprocalAssign};
+use malachite_base::num::arithmetic::traits::{Reciprocal, ReciprocalAssign};
 use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::comparison::traits::EqAbs;
 use malachite_q::Rational;
 use malachite_q::test_util::generators::rational_gen_var_1;
 use num::BigRational;
@@ -81,7 +82,7 @@ fn reciprocal_properties() {
 
         assert_ne!(reciprocal, 0);
         assert_eq!(reciprocal, -(-&x).reciprocal());
-        assert_eq!(reciprocal == x, (&x).abs() == 1);
+        assert_eq!(reciprocal == x, x.eq_abs(&1u32));
         assert_eq!((&reciprocal).reciprocal(), x);
     });
 }

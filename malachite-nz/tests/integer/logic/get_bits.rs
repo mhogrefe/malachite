@@ -215,7 +215,7 @@ fn get_bit_properties() {
         let significant_bits = n.significant_bits();
         assert_eq!(
             n.get_bits(start + significant_bits, end + significant_bits),
-            if n >= 0 {
+            if n >= 0u32 {
                 Natural::ZERO
             } else {
                 Natural::low_mask(end - start)

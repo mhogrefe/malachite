@@ -369,7 +369,7 @@ impl AddMul<&Integer, &Integer> for &Integer {
         } else {
             let (abs, abs_result_sign) = self.abs.add_mul_neg(&y.abs, &z.abs);
             Integer {
-                sign: (self.sign == abs_result_sign) || abs == 0,
+                sign: (self.sign == abs_result_sign) || abs == 0u32,
                 abs,
             }
         }
@@ -408,7 +408,7 @@ impl AddMulAssign<Self, Self> for Integer {
             self.abs.add_mul_assign(y.abs, z.abs);
         } else {
             let sign = self.abs.add_mul_assign_neg(y.abs, z.abs);
-            self.sign = (self.sign == sign) || self.abs == 0;
+            self.sign = (self.sign == sign) || self.abs == 0u32;
         }
     }
 }
@@ -445,7 +445,7 @@ impl<'a> AddMulAssign<Self, &'a Self> for Integer {
             self.abs.add_mul_assign(y.abs, &z.abs);
         } else {
             let sign = self.abs.add_mul_assign_neg_val_ref(y.abs, &z.abs);
-            self.sign = (self.sign == sign) || self.abs == 0;
+            self.sign = (self.sign == sign) || self.abs == 0u32;
         }
     }
 }
@@ -482,7 +482,7 @@ impl<'a> AddMulAssign<&'a Self, Self> for Integer {
             self.abs.add_mul_assign(&y.abs, z.abs);
         } else {
             let sign = self.abs.add_mul_assign_neg_ref_val(&y.abs, z.abs);
-            self.sign = (self.sign == sign) || self.abs == 0;
+            self.sign = (self.sign == sign) || self.abs == 0u32;
         }
     }
 }
@@ -519,7 +519,7 @@ impl<'a, 'b> AddMulAssign<&'a Self, &'b Self> for Integer {
             self.abs.add_mul_assign(&y.abs, &z.abs);
         } else {
             let sign = self.abs.add_mul_assign_neg_ref_ref(&y.abs, &z.abs);
-            self.sign = (self.sign == sign) || self.abs == 0;
+            self.sign = (self.sign == sign) || self.abs == 0u32;
         }
     }
 }

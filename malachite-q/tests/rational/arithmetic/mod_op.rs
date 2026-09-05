@@ -392,7 +392,7 @@ fn mod_properties_helper(x: Rational, y: Rational) {
     assert_eq!(remainder_alt, remainder);
 
     assert!(remainder.lt_abs(&y));
-    assert!(remainder == 0 || (remainder > 0) == (y > 0));
+    assert!(remainder == 0u32 || (remainder > 0u32) == (y > 0u32));
 
     assert_eq!((-&x).mod_op(&y), -(&x).ceiling_mod(&y));
     assert_eq!((&x).mod_op(-&y), x.ceiling_mod(y));
@@ -406,7 +406,7 @@ fn mod_properties() {
         assert_eq!(x.mod_op(x), 0);
         assert_eq!(x.mod_op(-x), 0);
         assert_eq!(Rational::ZERO.mod_op(x), 0);
-        if *x > 1 {
+        if *x > 1u32 {
             assert_eq!(Rational::ONE.mod_op(x), 1);
             assert_eq!(Rational::NEGATIVE_ONE.mod_op(x), x - Rational::ONE);
         }
@@ -456,7 +456,7 @@ fn rem_properties_helper(x: Rational, y: Rational) {
     assert_eq!(Rational::from(&num_remainder), remainder);
 
     assert!(remainder.lt_abs(&y));
-    assert!(remainder == 0 || (remainder > 0) == (x > 0));
+    assert!(remainder == 0u32 || (remainder > 0u32) == (x > 0u32));
 
     assert_eq!((-&x) % &y, -&remainder);
     assert_eq!(x % (-y), remainder);
@@ -470,7 +470,7 @@ fn rem_properties() {
         assert_eq!(x % x, 0);
         assert_eq!(x % -x, 0);
         assert_eq!(Rational::ZERO % x, 0);
-        if *x > 1 {
+        if *x > 1u32 {
             assert_eq!(Rational::ONE % x, 1);
             assert_eq!(Rational::NEGATIVE_ONE % x, -1);
         }
@@ -518,7 +518,7 @@ fn ceiling_mod_properties_helper(x: Rational, y: Rational) {
     assert_eq!(remainder_alt, remainder);
 
     assert!(remainder.lt_abs(&y));
-    assert!(remainder == 0 || (remainder >= 0) != (y > 0));
+    assert!(remainder == 0u32 || (remainder >= 0u32) != (y > 0u32));
 
     assert_eq!((-&x).ceiling_mod(&y), -(&x).mod_op(&y));
     assert_eq!((&x).ceiling_mod(-&y), x.mod_op(y));

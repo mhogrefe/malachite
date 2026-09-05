@@ -690,7 +690,7 @@ fn primitive_float_mul_add_mul_properties() {
         } else if [a, b, c, d].iter().all(|x| x.is_finite() && *x != 0.0) {
             let exact = Rational::exact_from(a) * Rational::exact_from(b)
                 + Rational::exact_from(c) * Rational::exact_from(d);
-            if exact != 0 {
+            if exact != 0u32 {
                 let approx = f64::rounding_from(&exact, Nearest).0;
                 if approx.is_normal() {
                     assert_eq!(NiceFloat(s), NiceFloat(approx));

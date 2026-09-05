@@ -54,8 +54,8 @@ impl Rational {
     // must be valid.
     #[cfg(feature = "test_build")]
     pub fn is_valid(&self) -> bool {
-        self.denominator != 0
-            && (self.sign || self.numerator != 0)
+        self.denominator != 0u32
+            && (self.sign || self.numerator != 0u32)
             && (&self.numerator).coprime_with(&self.denominator)
     }
 }

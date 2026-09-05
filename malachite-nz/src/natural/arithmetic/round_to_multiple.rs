@@ -347,7 +347,7 @@ impl RoundToMultiple<Natural> for &Natural {
             },
             (x, y) => {
                 let r = x % &y;
-                if r == 0 {
+                if r == 0u32 {
                     (x.clone(), Equal)
                 } else {
                     let floor = x - &r;
@@ -360,7 +360,7 @@ impl RoundToMultiple<Natural> for &Natural {
                                 Greater => (floor + y, Greater),
                                 Equal => {
                                     // The even multiple of y will have more trailing zeros.
-                                    if floor == 0 {
+                                    if floor == 0u32 {
                                         (floor, Less)
                                     } else {
                                         let ceiling = &floor + y;
@@ -495,7 +495,7 @@ impl RoundToMultiple<&Natural> for &Natural {
             },
             (x, y) => {
                 let r = x % y;
-                if r == 0 {
+                if r == 0u32 {
                     (x.clone(), Equal)
                 } else {
                     let floor = x - &r;
@@ -508,7 +508,7 @@ impl RoundToMultiple<&Natural> for &Natural {
                                 Greater => (floor + y, Greater),
                                 Equal => {
                                     // The even multiple of y will have more trailing zeros.
-                                    if floor == 0 {
+                                    if floor == 0u32 {
                                         (floor, Less)
                                     } else {
                                         let ceiling = &floor + y;
@@ -623,7 +623,7 @@ impl RoundToMultipleAssign<Self> for Natural {
             },
             (x, y) => {
                 let r = &*x % &y;
-                if r == 0 {
+                if r == 0u32 {
                     Equal
                 } else {
                     *x -= &r;
@@ -642,7 +642,7 @@ impl RoundToMultipleAssign<Self> for Natural {
                                 }
                                 Equal => {
                                     // The even multiple of y will have more trailing zeros.
-                                    if *x == 0 {
+                                    if *x == 0u32 {
                                         Less
                                     } else {
                                         let ceiling = &*x + y;
@@ -761,7 +761,7 @@ impl RoundToMultipleAssign<&Self> for Natural {
             },
             (x, y) => {
                 let r = &*x % y;
-                if r == 0 {
+                if r == 0u32 {
                     Equal
                 } else {
                     *x -= &r;
@@ -780,7 +780,7 @@ impl RoundToMultipleAssign<&Self> for Natural {
                                 }
                                 Equal => {
                                     // The even multiple of y will have more trailing zeros.
-                                    if *x == 0 {
+                                    if *x == 0u32 {
                                         Less
                                     } else {
                                         let ceiling = &*x + y;

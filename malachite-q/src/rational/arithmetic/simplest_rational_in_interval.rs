@@ -77,8 +77,8 @@ fn simplest_rational_one_alt_helper(
             )
         } else {
             (
-                numerator + (next_numerator << 1),
-                denominator + (next_denominator << 1),
+                numerator + (next_numerator << 1u32),
+                denominator + (next_denominator << 1u32),
             )
         }
     } else {
@@ -87,8 +87,8 @@ fn simplest_rational_one_alt_helper(
         let next_numerator = previous_numerator.add_mul(numerator, m);
         let next_denominator = previous_denominator.add_mul(denominator, m);
         (
-            numerator + (next_numerator << 1),
-            denominator + (next_denominator << 1),
+            numerator + (next_numerator << 1u32),
+            denominator + (next_denominator << 1u32),
         )
     };
     Rational {
@@ -181,13 +181,13 @@ fn finish_same_floor(
             let next_denominator = (&previous_denominator).add_mul(&denominator, &y_n);
             let (n, d) = if cf_y.is_done() && next_y_n == 2u32 {
                 (
-                    (numerator << 1u64).add_mul(next_numerator, THREE),
-                    (denominator << 1u64).add_mul(next_denominator, THREE),
+                    (numerator << 1u32).add_mul(next_numerator, THREE),
+                    (denominator << 1u32).add_mul(next_denominator, THREE),
                 )
             } else {
                 (
-                    previous_numerator + (numerator << 1),
-                    previous_denominator + (denominator << 1),
+                    previous_numerator + (numerator << 1u32),
+                    previous_denominator + (denominator << 1u32),
                 )
             };
             let candidate = Rational {
@@ -446,7 +446,7 @@ impl SimplestRationalInInterval for Rational {
             // [f; x_1, x_2, x_3...] and [f + 1]. But to get any good candidates, we need [f; x_1,
             // x_2, x_3...] and [f; 1]. If x_1 does not exist, the result is [f; 2].
             let (n, d) = if cf_x.is_done() {
-                ((floor << 1) | Natural::ONE, Natural::TWO)
+                ((floor << 1u32) | Natural::ONE, Natural::TWO)
             } else {
                 let x_1 = cf_x.next().unwrap();
                 if x_1 > 1u32 {
@@ -455,7 +455,7 @@ impl SimplestRationalInInterval for Rational {
                         (Natural::TWO.add_mul(floor, THREE), THREE)
                     } else {
                         // If x_1 > 1, we have [f; 2] as a candidate.
-                        ((floor << 1) | Natural::ONE, Natural::TWO)
+                        ((floor << 1u32) | Natural::ONE, Natural::TWO)
                     }
                 } else {
                     // x_2 exists since x_1 was 1

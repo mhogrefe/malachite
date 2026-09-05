@@ -30,6 +30,10 @@ declare_lint! {
     /// preferred when the value is nonnegative.) The operator-with-`from` form is covered by
     /// `redundant_from_in_comparison`; this lint covers named constants and the comparison methods.
     ///
+    /// Unlike most of the house lints, this one also applies to tests, demos, and test utilities,
+    /// except for the `from(primitive)` method form, which comparison tests use on purpose to
+    /// cross-check bignum `cmp` against primitive `cmp`.
+    ///
     /// ### Example
     ///
     /// ```rust,ignore
@@ -129,7 +133,12 @@ fn primitive_comparable<'tcx>(
 
 impl<'tcx> LateLintPass<'tcx> for CompareWithPrimitive {
     fn check_expr(&mut self, cx: &LateContext<'tcx>, expr: &'tcx Expr<'tcx>) {
-        if expr.span.from_expansion() || crate::in_test_code(cx, expr.span) {
+        // Unlike most lints, this one applies to tests, demos, and test utilities too: a
+        // comparison with a bignum constant is never something a test needs to exercise on purpose
+        // (the comparison operators are tested through generators, and the constants through their
+        // own tests), and the direct primitive comparison is just as clear there. Only the
+        // `from(primitive)` method form keeps the exemption, below.
+        if expr.span.from_expansion() {
             return;
         }
         match expr.kind {
@@ -182,7 +191,11 @@ impl<'tcx> LateLintPass<'tcx> for CompareWithPrimitive {
                 if name == "cmp" && crate::is_zero_assoc_const(cx, arg) {
                     return;
                 }
-                let Some((lit, signed)) = primitive_equivalent(cx, arg, true) else {
+                // The `from(primitive)` method form is exempt in test code: comparison tests
+                // cross-check `Bignum::from(x).cmp(&Bignum::from(y))` against `x.cmp(&y)` on
+                // purpose, and the rewrite would test the cross-type comparison instead.
+                let allow_from = !crate::in_test_code(cx, expr.span);
+                let Some((lit, signed)) = primitive_equivalent(cx, arg, allow_from) else {
                     return;
                 };
                 if !primitive_comparable(cx, recv_ty, signed, eq_only) {

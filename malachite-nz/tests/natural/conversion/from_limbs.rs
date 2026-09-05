@@ -87,7 +87,7 @@ fn from_limbs_asc_properties() {
         if !xs.is_empty() && *xs.last().unwrap() != 0 {
             assert_eq!(x.as_limbs_asc(), xs);
         }
-        assert_eq!(slice_test_zero(&xs), x == 0);
+        assert_eq!(slice_test_zero(&xs), x == 0u32);
     });
 }
 
@@ -114,6 +114,6 @@ fn from_limbs_desc_properties() {
         if !xs.is_empty() && xs[0] != 0 {
             assert_eq!(x.to_limbs_desc(), xs);
         }
-        assert_eq!(slice_test_zero(&xs), x == 0);
+        assert_eq!(slice_test_zero(&xs), x == 0u32);
     });
 }

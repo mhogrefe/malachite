@@ -266,14 +266,14 @@ where
             Natural::from_power_of_2_digits_asc(log_base, digits.iter().copied()).unwrap(),
             *n
         );
-        if *n != 0 {
+        if *n != 0u32 {
             assert_ne!(*digits.last().unwrap(), T::ZERO);
         }
         assert_eq!(
             digits.iter().copied().rev().collect_vec(),
             n.to_power_of_2_digits_desc(log_base)
         );
-        if *n != Natural::ZERO {
+        if *n != 0u32 {
             assert_eq!(
                 u64::exact_from(digits.len()),
                 n.floor_log_base_power_of_2(log_base) + 1
@@ -339,14 +339,14 @@ where
             Natural::from_power_of_2_digits_desc(log_base, digits.iter().copied()).unwrap(),
             *n
         );
-        if *n != 0 {
+        if *n != 0u32 {
             assert_ne!(digits[0], T::ZERO);
         }
         assert_eq!(
             digits.iter().copied().rev().collect_vec(),
             n.to_power_of_2_digits_asc(log_base)
         );
-        if *n != Natural::ZERO {
+        if *n != 0u32 {
             assert_eq!(
                 u64::exact_from(digits.len()),
                 n.floor_log_base_power_of_2(log_base) + 1
@@ -410,14 +410,14 @@ fn to_power_of_2_digits_asc_natural_properties() {
             Natural::from_power_of_2_digits_asc(log_base, digits.iter().cloned()).unwrap(),
             *n
         );
-        if *n != 0 {
+        if *n != 0u32 {
             assert_ne!(*digits.last().unwrap(), 0);
         }
         assert_eq!(
             digits.iter().cloned().rev().collect_vec(),
             PowerOf2Digits::<Natural>::to_power_of_2_digits_desc(n, log_base)
         );
-        if *n != Natural::ZERO {
+        if *n != 0u32 {
             assert_eq!(
                 u64::exact_from(digits.len()),
                 n.floor_log_base_power_of_2(log_base) + 1
@@ -434,7 +434,7 @@ fn to_power_of_2_digits_asc_natural_properties() {
         assert_eq!(
             n.to_power_of_2_digits_asc(1)
                 .into_iter()
-                .map(|digit: Natural| digit == 1)
+                .map(|digit: Natural| digit == 1u32)
                 .collect_vec(),
             n.to_bits_asc()
         );
@@ -456,14 +456,14 @@ fn to_power_of_2_digits_desc_natural_properties() {
             Natural::from_power_of_2_digits_desc(log_base, digits.iter().cloned()).unwrap(),
             *n
         );
-        if *n != 0 {
+        if *n != 0u32 {
             assert_ne!(digits[0], 0);
         }
         assert_eq!(
             digits.iter().cloned().rev().collect_vec(),
             PowerOf2Digits::<Natural>::to_power_of_2_digits_asc(n, log_base)
         );
-        if *n != Natural::ZERO {
+        if *n != 0u32 {
             assert_eq!(
                 u64::exact_from(digits.len()),
                 n.floor_log_base_power_of_2(log_base) + 1
@@ -480,7 +480,7 @@ fn to_power_of_2_digits_desc_natural_properties() {
         assert_eq!(
             n.to_power_of_2_digits_desc(1)
                 .into_iter()
-                .map(|digit: Natural| digit == 1)
+                .map(|digit: Natural| digit == 1u32)
                 .collect_vec(),
             n.to_bits_desc()
         );

@@ -119,7 +119,7 @@ impl Rational {
         mut self,
         rm: RoundingMode,
     ) -> Option<(T, i64, Ordering)> {
-        assert!(self != 0);
+        assert!(self != 0u32);
         let mut exponent = i64::exact_from(self.numerator.significant_bits())
             - i64::exact_from(self.denominator.significant_bits());
         if self.numerator.cmp_normalized(&self.denominator) == Less {
@@ -134,7 +134,7 @@ impl Rational {
         let mut bits = mantissa.significant_bits();
         if bits > T::MANTISSA_WIDTH + 1 {
             bits -= 1;
-            mantissa >>= 1;
+            mantissa >>= 1u32;
             exponent += 1;
         }
         assert_eq!(bits, T::MANTISSA_WIDTH + 1);
@@ -220,7 +220,7 @@ impl Rational {
         &self,
         rm: RoundingMode,
     ) -> Option<(T, i64, Ordering)> {
-        assert!(*self != 0);
+        assert!(*self != 0u32);
         let mut exponent = i64::exact_from(self.numerator.significant_bits())
             - i64::exact_from(self.denominator.significant_bits());
         if self.numerator.cmp_normalized(&self.denominator) == Less {
@@ -235,7 +235,7 @@ impl Rational {
         let mut bits = mantissa.significant_bits();
         if bits > T::MANTISSA_WIDTH + 1 {
             bits -= 1;
-            mantissa >>= 1;
+            mantissa >>= 1u32;
             exponent += 1;
         }
         assert_eq!(bits, T::MANTISSA_WIDTH + 1);

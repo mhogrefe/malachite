@@ -34,7 +34,7 @@ impl Neg for Integer {
     /// assert_eq!(-Integer::from(-123), 123);
     /// ```
     fn neg(mut self) -> Self {
-        if self.abs != 0 {
+        if self.abs != 0u32 {
             self.sign.not_assign();
         }
         self
@@ -67,7 +67,7 @@ impl Neg for &Integer {
     /// assert_eq!(-&Integer::from(-123), 123);
     /// ```
     fn neg(self) -> Integer {
-        if self.abs == 0 {
+        if self.abs == 0u32 {
             Integer::ZERO
         } else {
             Integer {
@@ -107,7 +107,7 @@ impl NegAssign for Integer {
     /// assert_eq!(x, 123);
     /// ```
     fn neg_assign(&mut self) {
-        if self.abs != 0 {
+        if self.abs != 0u32 {
             self.sign.not_assign();
         }
     }

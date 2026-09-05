@@ -749,7 +749,7 @@ impl Integer {
     /// }
     /// ```
     pub fn twos_complement_limbs(&self) -> TwosComplementLimbIterator<'_> {
-        if *self == 0 {
+        if *self == 0u32 {
             TwosComplementLimbIterator::Zero
         } else if self.sign {
             TwosComplementLimbIterator::Positive(self.abs.limbs(), false)
@@ -793,14 +793,14 @@ impl Integer {
     /// }
     /// ```
     pub fn twos_complement_limb_count(&self) -> u64 {
-        if *self == 0 {
+        if *self == 0u32 {
             return 0;
         }
         let abs_limbs_count = self.unsigned_abs_ref().limb_count();
         let highest_bit_of_highest_limb =
             self.unsigned_abs().limbs()[usize::exact_from(abs_limbs_count - 1)].get_highest_bit();
         if highest_bit_of_highest_limb
-            && (*self > 0 || (*self < 0 && !self.unsigned_abs_ref().is_power_of_2()))
+            && (*self > 0u32 || (*self < 0u32 && !self.unsigned_abs_ref().is_power_of_2()))
         {
             abs_limbs_count + 1
         } else {

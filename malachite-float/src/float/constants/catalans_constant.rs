@@ -31,7 +31,7 @@ fn s(n1: u64, n2: u64) -> (Natural, Natural, Natural) {
             (Natural::ONE, Natural::ONE, Natural::ONE)
         } else {
             let p = Natural::from((n1 << 1) - 1) * Natural::from(n1);
-            let q = Natural::from((n1 << 1) + 1).square() << 1u64;
+            let q = Natural::from((n1 << 1) + 1).square() << 1u32;
             (p.clone(), p, q)
         }
     } else {
@@ -107,7 +107,7 @@ impl Float {
             let x = (Self::pi_prec_round(working_prec, Up).0 * log_arg.ln_round(Up).0
                 + Self::from_natural_prec_round(t * THREE, working_prec, Up).0
                     / Self::from_natural_prec_round(q, working_prec, Down).0)
-                >> 3u64;
+                >> 3u32;
             if float_can_round(x.significand_ref().unwrap(), working_prec - 5, prec, rm) {
                 return Self::from_float_prec_round(x, prec, rm);
             }

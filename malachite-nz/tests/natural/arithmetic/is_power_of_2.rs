@@ -87,7 +87,7 @@ fn is_power_of_2_properties() {
         let trailing_zeros = x.trailing_zeros().unwrap();
         assert_eq!(trailing_zeros == x.significant_bits() - 1, is_power_of_2);
         if trailing_zeros <= u64::from(Limb::MAX) {
-            assert_eq!(x >> trailing_zeros == 1, is_power_of_2);
+            assert_eq!(x >> trailing_zeros == 1u32, is_power_of_2);
         }
     });
 

@@ -130,7 +130,7 @@ fn not_properties() {
         assert!(not_alt.is_valid());
         assert_eq!(not_alt, not);
 
-        assert!(not < 0);
+        assert!(not < 0u32);
         assert_eq!(not, -(&x + Natural::ONE));
         assert_ne!(not, x);
         assert_eq!(!not, x);

@@ -55,7 +55,7 @@ fn from_reciprocal_rational_prec_round_ref_direct(
     rm: RoundingMode,
 ) -> (Float, Ordering) {
     assert_ne!(prec, 0);
-    let sign = *x >= 0;
+    let sign = *x >= 0u32;
     if let Some(pow) = x.numerator_ref().checked_log_base_2() {
         let n = x.denominator_ref();
         let n_bits = n.significant_bits();
@@ -86,7 +86,7 @@ fn from_reciprocal_rational_prec_round_ref_direct(
         }
         let (significand, o) =
             Integer::rounding_from(x << (i128::exact_from(prec) - i128::from(exponent) - 1), rm);
-        let sign = significand >= 0;
+        let sign = significand >= 0u32;
         let mut significand = significand.unsigned_abs();
         let away_from_0 = if sign { Greater } else { Less };
         if o == away_from_0 && significand.is_power_of_2() {
@@ -148,12 +148,12 @@ fn from_reciprocal_rational_prec_round_ref_using_div(
     prec: u64,
     mut rm: RoundingMode,
 ) -> (Float, Ordering) {
-    let sign = *x >= 0;
+    let sign = *x >= 0u32;
     if !sign {
         rm.neg_assign();
     }
     let (d, n) = x.numerator_and_denominator_ref();
-    let is_zero = *n == 0;
+    let is_zero = *n == 0u32;
     let (f, o) = match (
         if is_zero {
             None
@@ -1123,7 +1123,7 @@ impl Float {
                 let n_exp = n.significant_bits();
                 let mut n = from_natural_zero_exponent(n);
                 if n_exp.odd() {
-                    n <<= 1u64;
+                    n <<= 1u32;
                 }
                 let (mut sqrt, o) = Self::exact_from(n).sqrt_prec_round(prec, rm);
                 let o = sqrt.shr_prec_round_assign_helper(
@@ -1139,7 +1139,7 @@ impl Float {
                 let d_exp = d.significant_bits();
                 let mut d = from_natural_zero_exponent(d);
                 if d_exp.odd() {
-                    d <<= 1u64;
+                    d <<= 1u32;
                 }
                 let (mut reciprocal_sqrt, o) =
                     Self::exact_from(d).reciprocal_sqrt_prec_round(prec, rm);
@@ -1285,7 +1285,7 @@ impl Float {
                 let n_exp = n.significant_bits();
                 let mut n = from_natural_zero_exponent_ref(n);
                 if n_exp.odd() {
-                    n <<= 1u64;
+                    n <<= 1u32;
                 }
                 let (mut sqrt, o) = Self::exact_from(n).sqrt_prec_round(prec, rm);
                 let o = sqrt.shr_prec_round_assign_helper(
@@ -1300,7 +1300,7 @@ impl Float {
                 let d_exp = d.significant_bits();
                 let mut d = from_natural_zero_exponent_ref(d);
                 if d_exp.odd() {
-                    d <<= 1u64;
+                    d <<= 1u32;
                 }
                 let (mut reciprocal_sqrt, o) =
                     Self::exact_from(d).reciprocal_sqrt_prec_round(prec, rm);

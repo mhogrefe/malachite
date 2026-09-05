@@ -178,7 +178,7 @@ fn ceiling_sqrt_properties() {
             assert_eq!(floor_sqrt, &sqrt - Integer::ONE);
         }
         assert!(square >= n);
-        if n != 0 {
+        if n != 0u32 {
             assert!((sqrt - Integer::ONE).square() < n);
         }
     });

@@ -1,7 +1,7 @@
 error: hoist the shift out of the multiplication: use `(a * b) << s` instead of `(a << s) * b`
   --> $DIR/hoist_shifts.rs:24:13
    |
-LL |     let _ = (&n << 5u64) * &m;
+LL |     let _ = (&n << 5u32) * &m;
    |             ^^^^^^^^^^^^^^^^^
    |
    = note: `#[deny(hoist_shifts)]` on by default
@@ -9,55 +9,55 @@ LL |     let _ = (&n << 5u64) * &m;
 error: hoist the shift out of the multiplication: use `(a * b) << s` instead of `a * (b << s)`
   --> $DIR/hoist_shifts.rs:25:13
    |
-LL |     let _ = &n * (&m << 5u64);
+LL |     let _ = &n * (&m << 5u32);
    |             ^^^^^^^^^^^^^^^^^
 
 error: hoist the shift out of the multiplication: use `(a * b) << s` instead of `(a << s) * b`
   --> $DIR/hoist_shifts.rs:28:13
    |
-LL |     let _ = (&i << 5u64) * &j;
+LL |     let _ = (&i << 5u32) * &j;
    |             ^^^^^^^^^^^^^^^^^
 
 error: hoist the shift out of the multiplication: use `(a * b) << s` instead of `(a << s) * b`
   --> $DIR/hoist_shifts.rs:36:13
    |
-LL |     let _ = (&q << 5u64) * &r;
+LL |     let _ = (&q << 5u32) * &r;
    |             ^^^^^^^^^^^^^^^^^
 
 error: hoist the shift out of the multiplication: use `(a * b) >> s` instead of `(a >> s) * b`
   --> $DIR/hoist_shifts.rs:37:13
    |
-LL |     let _ = (&q >> 5u64) * &r;
+LL |     let _ = (&q >> 5u32) * &r;
    |             ^^^^^^^^^^^^^^^^^
 
 error: hoist the shift out of the division: use `(a / b) << s` instead of `(a << s) / b`
   --> $DIR/hoist_shifts.rs:38:13
    |
-LL |     let _ = (&q << 5u64) / &r;
+LL |     let _ = (&q << 5u32) / &r;
    |             ^^^^^^^^^^^^^^^^^
 
 error: hoist the shift out of the division: use `(a / b) >> s` instead of `(a >> s) / b`
   --> $DIR/hoist_shifts.rs:39:13
    |
-LL |     let _ = (&q >> 5u64) / &r;
+LL |     let _ = (&q >> 5u32) / &r;
    |             ^^^^^^^^^^^^^^^^^
 
 error: hoist the shift out of the division: use `(a / b) >> s` instead of `a / (b << s)`
   --> $DIR/hoist_shifts.rs:40:13
    |
-LL |     let _ = &q / (&r << 5u64);
+LL |     let _ = &q / (&r << 5u32);
    |             ^^^^^^^^^^^^^^^^^
 
 error: hoist the shift out of the division: use `(a / b) << s` instead of `a / (b >> s)`
   --> $DIR/hoist_shifts.rs:41:13
    |
-LL |     let _ = &q / (&r >> 5u64);
+LL |     let _ = &q / (&r >> 5u32);
    |             ^^^^^^^^^^^^^^^^^
 
 error: this `const_from_unsigned` call is not evaluated at compile time; wrap it in a `const` block or bind it to a named `const` (or use the non-`const` equivalent if the arguments are not constants)
   --> $DIR/hoist_shifts.rs:45:28
    |
-LL |     let _ = (&f << 5u64) * Float::const_from_unsigned(5);
+LL |     let _ = (&f << 5u32) * Float::const_from_unsigned(5);
    |                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    |
    = note: `#[deny(runtime_literal_conversion)]` on by default
@@ -65,13 +65,13 @@ LL |     let _ = (&f << 5u64) * Float::const_from_unsigned(5);
 error: hoist the shift out of the multiplication: use `(a * b) << s` instead of `(a << s) * b`
   --> $DIR/hoist_shifts.rs:54:13
    |
-LL |     let _ = (&g << 3u64) * &g;
+LL |     let _ = (&g << 3u32) * &g;
    |             ^^^^^^^^^^^^^^^^^
 
 error: hoist the shift out of the division: use `(a / b) << s` instead of `(a << s) / b`
   --> $DIR/hoist_shifts.rs:55:13
    |
-LL |     let _ = (&h << 3u64) / &h;
+LL |     let _ = (&h << 3u32) / &h;
    |             ^^^^^^^^^^^^^^^^^
 
 error: aborting due to 12 previous errors

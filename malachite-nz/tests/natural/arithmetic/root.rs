@@ -577,7 +577,7 @@ fn ceiling_cbrt_properties() {
             assert_eq!(floor_cbrt, &cbrt - Natural::ONE);
         }
         assert!(cube >= n);
-        if n != 0 {
+        if n != 0u32 {
             assert!((cbrt - Natural::ONE).pow(3) < n);
         }
     });
@@ -710,7 +710,7 @@ fn ceiling_root_properties() {
             assert_eq!(floor_root, &root - Natural::ONE);
         }
         assert!(pow >= n);
-        if n != 0 {
+        if n != 0u32 {
             assert!((root - Natural::ONE).pow(exp) < n);
         }
     });

@@ -96,7 +96,7 @@ fn square_val(x: GaussianInteger) -> GaussianInteger {
             let real = (&x.real).square() - (&x.imaginary).square();
             GaussianInteger {
                 real,
-                imaginary: (x.real * x.imaginary) << 1u64,
+                imaginary: (x.real * x.imaginary) << 1u32,
             }
         }
     }
@@ -126,7 +126,7 @@ fn square_ref(x: &GaussianInteger) -> GaussianInteger {
         }
         SquareAlgorithm::General => GaussianInteger {
             real: (&x.real).square() - (&x.imaginary).square(),
-            imaginary: (&x.real * &x.imaginary) << 1u64,
+            imaginary: (&x.real * &x.imaginary) << 1u32,
         },
     }
 }

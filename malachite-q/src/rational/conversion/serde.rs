@@ -27,10 +27,10 @@ impl TryFrom<SerdeRational> for Rational {
     // The three conditions are the ones `Rational::is_valid` checks. They are spelled out here
     // rather than deferring to it because that function is only built for testing.
     fn try_from(x: SerdeRational) -> Result<Self, String> {
-        if x.denominator == 0 {
+        if x.denominator == 0u32 {
             return Err("Denominator is zero".to_string());
         }
-        if !x.sign && x.numerator == 0 {
+        if !x.sign && x.numerator == 0u32 {
             return Err("Zero is negative".to_string());
         }
         if !(&x.numerator).coprime_with(&x.denominator) {

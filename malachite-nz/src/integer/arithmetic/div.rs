@@ -232,7 +232,7 @@ impl DivAssign<Self> for Integer {
     #[inline]
     fn div_assign(&mut self, other: Self) {
         self.abs /= other.abs;
-        self.sign = self.sign == other.sign || self.abs == 0;
+        self.sign = self.sign == other.sign || self.abs == 0u32;
     }
 }
 
@@ -282,7 +282,7 @@ impl DivAssign<&Self> for Integer {
     #[inline]
     fn div_assign(&mut self, other: &Self) {
         self.abs /= &other.abs;
-        self.sign = self.sign == other.sign || self.abs == 0;
+        self.sign = self.sign == other.sign || self.abs == 0u32;
     }
 }
 

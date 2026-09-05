@@ -64,18 +64,18 @@ impl Display for GaussianInteger {
     /// assert_eq!(g.to_string(), "2-3i");
     /// ```
     fn fmt(&self, f: &mut Formatter) -> Result {
-        if self.imaginary == 0 {
+        if self.imaginary == 0u32 {
             return Display::fmt(&self.real, f);
         }
-        if self.real != 0 {
+        if self.real != 0u32 {
             Display::fmt(&self.real, f)?;
-            if self.imaginary > 0 {
+            if self.imaginary > 0u32 {
                 f.write_char('+')?;
             }
         }
-        if self.imaginary == 1 {
+        if self.imaginary == 1u32 {
             f.write_char('i')
-        } else if self.imaginary == -1 {
+        } else if self.imaginary == -1i32 {
             f.write_str("-i")
         } else {
             Display::fmt(&self.imaginary, f)?;

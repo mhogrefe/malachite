@@ -153,7 +153,7 @@ impl Float {
                 .significant_bits()
                 .divisible_by_power_of_2(Limb::LOG_WIDTH)
             {
-                significand >>= 1;
+                significand >>= 1u32;
                 exponent += 1;
             }
         }

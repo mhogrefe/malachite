@@ -50,7 +50,7 @@ fn to_string_properties() {
 
     gaussian_integer_gen_var_2().test_properties(|x| {
         let s = x.to_string();
-        if x.imaginary == 0 {
+        if x.imaginary == 0u32 {
             assert_eq!(s, "0");
         } else {
             assert!(s.ends_with('i'));

@@ -366,7 +366,7 @@ impl DivAssignMod<Self> for Integer {
             self.abs.div_assign_mod(other.abs)
         } else {
             let r = self.abs.ceiling_div_assign_neg_mod(other.abs);
-            if self.abs != 0 {
+            if self.abs != 0u32 {
                 self.sign = false;
             }
             r
@@ -432,7 +432,7 @@ impl DivAssignMod<&Self> for Integer {
             self.abs.div_assign_mod(&other.abs)
         } else {
             let r = self.abs.ceiling_div_assign_neg_mod(&other.abs);
-            if self.abs != 0 {
+            if self.abs != 0u32 {
                 self.sign = false;
             }
             r
@@ -454,7 +454,7 @@ fn div_mod_precomputed_integers(
 ) -> (Integer, Integer) {
     let q_sign = x.sign == other.sign;
     let (mut q, mut r) = (&x.abs).div_mod_precomputed(&other.abs, data);
-    if !q_sign && r != 0 {
+    if !q_sign && r != 0u32 {
         // The floor of the negative quotient is one less than the negated floor of the positive
         // quotient, and the remainder is adjusted to have the divisor's sign.
         q += Natural::ONE;
@@ -1073,7 +1073,7 @@ impl DivAssignRem<Self> for Integer {
     #[inline]
     fn div_assign_rem(&mut self, other: Self) -> Self {
         let r = Self::from_sign_and_abs(self.sign, self.abs.div_assign_mod(other.abs));
-        self.sign = self.sign == other.sign || self.abs == 0;
+        self.sign = self.sign == other.sign || self.abs == 0u32;
         r
     }
 }
@@ -1134,7 +1134,7 @@ impl DivAssignRem<&Self> for Integer {
     #[inline]
     fn div_assign_rem(&mut self, other: &Self) -> Self {
         let r = Self::from_sign_and_abs(self.sign, self.abs.div_assign_mod(&other.abs));
-        self.sign = self.sign == other.sign || self.abs == 0;
+        self.sign = self.sign == other.sign || self.abs == 0u32;
         r
     }
 }
@@ -1490,7 +1490,7 @@ impl CeilingDivAssignMod<Self> for Integer {
             self.abs.ceiling_div_assign_neg_mod(other.abs)
         } else {
             let r = self.abs.div_assign_mod(other.abs);
-            self.sign = self.abs == 0;
+            self.sign = self.abs == 0u32;
             r
         };
         Self::from_sign_and_abs(!other.sign, r)
@@ -1554,7 +1554,7 @@ impl CeilingDivAssignMod<&Self> for Integer {
             self.abs.ceiling_div_assign_neg_mod(&other.abs)
         } else {
             let r = self.abs.div_assign_mod(&other.abs);
-            self.sign = self.abs == 0;
+            self.sign = self.abs == 0u32;
             r
         };
         Self::from_sign_and_abs(!other.sign, r)

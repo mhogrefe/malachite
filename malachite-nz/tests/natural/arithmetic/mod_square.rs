@@ -154,7 +154,7 @@ fn mod_square_properties() {
 
     natural_gen_var_2().test_properties(|m| {
         assert_eq!(Natural::ZERO.mod_square(&m), 0);
-        if m != 1 {
+        if m != 1u32 {
             assert_eq!(Natural::ONE.mod_square(m), 1);
         }
     });

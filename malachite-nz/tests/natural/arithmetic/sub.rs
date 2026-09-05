@@ -1113,7 +1113,7 @@ fn limbs_sub_same_length_with_borrow_in_to_out_properties() {
             if borrow_in {
                 n -= Integer::ONE;
             }
-            assert!(n < 0);
+            assert!(n < 0u32);
             n.mod_power_of_2(limb_to_bit_count(len))
         } else {
             let mut n = Natural::from_owned_limbs_asc(xs) - Natural::from_owned_limbs_asc(ys);
@@ -1145,7 +1145,7 @@ fn limbs_sub_same_length_with_borrow_in_in_place_left_properties() {
             let mut expected_result = if borrow {
                 let bit_len = limb_to_bit_count(len);
                 let mut neg_y = Natural::from_owned_limbs_asc(ys).mod_power_of_2_neg(bit_len);
-                if neg_y == 0 {
+                if neg_y == 0u32 {
                     neg_y = Natural::power_of_2(bit_len);
                 }
                 Natural::from_owned_limbs_asc(xs_old) + neg_y

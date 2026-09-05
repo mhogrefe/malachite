@@ -73,7 +73,7 @@ fn canonicalize_unit_properties() {
         assert_eq!((&x).mul_i().canonicalize_unit(), y);
         assert_eq!((-&x).canonicalize_unit(), y);
         assert_eq!((&x).div_i().canonicalize_unit(), y);
-        if x == GaussianRational::ZERO {
+        if x == 0u32 {
             assert_eq!(y, GaussianRational::ZERO);
         } else {
             assert!(y.real > 0u32);

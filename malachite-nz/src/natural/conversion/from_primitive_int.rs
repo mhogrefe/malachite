@@ -85,7 +85,11 @@ macro_rules! impl_from_larger_than_limb_or_usize {
             /// See [here](super::from_primitive_int#from).
             #[inline]
             fn from(u: $t) -> Natural {
-                Natural::from_owned_limbs_asc(Limb::vec_from_other_type(u))
+                // A value that fits in a limb stays inline; only larger values allocate.
+                Limb::try_from(u).map_or_else(
+                    |_| Natural::from_owned_limbs_asc(Limb::vec_from_other_type(u)),
+                    |limb| Natural(Small(limb)),
+                )
             }
         }
     };

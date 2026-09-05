@@ -164,13 +164,13 @@ fn div_rem_properties_helper(x: GaussianInteger, y: GaussianInteger) {
     assert_eq!(&q * &y + &r, x);
     // N(r) <= N(y) / 2
     let norm = (&y).abs_squared();
-    assert!(r.abs_squared() << 1u64 <= norm);
+    assert!(r.abs_squared() << 1u32 <= norm);
     // Each part of the exact quotient x conj(y) / N(y) lies in [q - 1/2, q + 1/2), i.e. -N(y) <= 2
     // x conj(y) - 2 q N(y) < N(y), part by part.
     let t = &x * (&y).conjugate();
     let neg_norm = -&norm;
     for (t_part, q_part) in [(&t.real, &q.real), (&t.imaginary, &q.imaginary)] {
-        let diff: Integer = (t_part << 1u64) - ((q_part * &norm) << 1u64);
+        let diff: Integer = (t_part << 1u32) - ((q_part * &norm) << 1u32);
         assert!(diff >= neg_norm);
         assert!(diff < norm);
     }

@@ -1906,7 +1906,7 @@ impl<I: Iterator<Item = u64>> Iterator for UniformRandomNonNegativeFloatsAtMostO
             mantissa += Natural::ONE;
             if mantissa.significant_bits() > self.prec {
                 // the significand was all ones, so rounding up reaches the next binade
-                mantissa >>= 1u64;
+                mantissa >>= 1u32;
                 exponent += 1;
             }
         }

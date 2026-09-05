@@ -75,7 +75,7 @@ fn divisible_by_power_of_2_properties() {
             rug::Integer::from(&x).is_divisible_2pow(u32::exact_from(pow)),
             divisible
         );
-        if x != 0 {
+        if x != 0u32 {
             assert_eq!(x.trailing_zeros().unwrap() >= pow, divisible);
         }
         assert_eq!((-&x).divisible_by_power_of_2(pow), divisible);
@@ -86,7 +86,7 @@ fn divisible_by_power_of_2_properties() {
     integer_unsigned_pair_gen_var_4().test_properties(|(x, pow)| {
         assert!(x.divisible_by_power_of_2(pow));
         assert!(rug::Integer::from(&x).is_divisible_2pow(u32::exact_from(pow)));
-        if x != 0 {
+        if x != 0u32 {
             assert!(x.trailing_zeros().unwrap() >= pow);
         }
         assert!((-&x).divisible_by_power_of_2(pow));
@@ -96,7 +96,7 @@ fn divisible_by_power_of_2_properties() {
     integer_unsigned_pair_gen_var_5().test_properties(|(x, pow)| {
         assert!(!x.divisible_by_power_of_2(pow));
         assert!(!rug::Integer::from(&x).is_divisible_2pow(u32::exact_from(pow)));
-        if x != 0 {
+        if x != 0u32 {
             assert!(x.trailing_zeros().unwrap() < pow);
         }
         assert!(!(-&x).divisible_by_power_of_2(pow));

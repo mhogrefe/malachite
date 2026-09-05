@@ -83,8 +83,8 @@ fn content_and_primitive_part_properties() {
 
         // the product is the original number
         assert_eq!(scale(&primitive, &content), x);
-        assert!(content >= 0);
-        if x == GaussianRational::ZERO {
+        assert!(content >= 0u32);
+        if x == 0u32 {
             assert_eq!(content, 0);
             assert_eq!(primitive, GaussianInteger::ZERO);
         } else {
@@ -116,8 +116,11 @@ fn content_and_primitive_part_properties() {
         };
         let (scaled_content, scaled_primitive) = scaled.content_and_primitive_part();
         assert_eq!(scaled_content, content * (&c).abs());
-        if c != 0 && x != GaussianRational::ZERO {
-            assert_eq!(scaled_primitive, if c > 0 { primitive } else { -primitive });
+        if c != 0u32 && x != 0u32 {
+            assert_eq!(
+                scaled_primitive,
+                if c > 0u32 { primitive } else { -primitive }
+            );
         }
     });
 

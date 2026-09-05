@@ -266,7 +266,7 @@ fn benchmark_natural_divisible_by_algorithms(
         &mut [
             ("standard", &mut |(x, y)| no_out!(x.divisible_by(y))),
             ("using %", &mut |(x, y)| {
-                no_out!(x == 0 || y != 0 && x % y == 0);
+                no_out!(x == 0u32 || y != 0u32 && x % y == 0u32);
             }),
         ],
     );

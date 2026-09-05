@@ -175,7 +175,7 @@ impl Sub<&Integer> for &Integer {
                     sign: sy,
                     abs: ref ay,
                 },
-            ) if sx == (!sy && *ay != 0) => Integer {
+            ) if sx == (!sy && *ay != 0u32) => Integer {
                 sign: sx,
                 abs: ax + ay,
             },
@@ -251,7 +251,7 @@ impl SubAssign<Self> for Integer {
                     sign: sy,
                     abs: ref ay,
                 },
-            ) if sx == (!sy && *ay != 0) => *ax += ay,
+            ) if sx == (!sy && *ay != 0u32) => *ax += ay,
             // e.g. 10 - 5, -10 - -5, or 5 - 5; sign of self is unchanged
             (
                 &mut Self {
@@ -313,7 +313,7 @@ impl SubAssign<&Self> for Integer {
                     sign: sy,
                     abs: ref ay,
                 },
-            ) if sx == (!sy && *ay != 0) => *ax += ay,
+            ) if sx == (!sy && *ay != 0u32) => *ax += ay,
             // e.g. 10 - 5, -10 - -5, or 5 - 5; sign of self is unchanged
             (
                 &mut Self {

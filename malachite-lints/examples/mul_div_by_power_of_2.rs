@@ -1,8 +1,9 @@
-use malachite_base::num::arithmetic::traits::PowerOf2;
+use malachite_base::num::arithmetic::traits::{DivRound, DivRoundAssign, PowerOf2};
+use malachite_base::rounding_modes::RoundingMode::*;
+use malachite_nz::gaussian_integer::GaussianInteger;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_q::Rational;
-use malachite_nz::gaussian_integer::GaussianInteger;
 use malachite_q::gaussian_rational::GaussianRational;
 
 fn main() {
@@ -35,4 +36,12 @@ fn main() {
     h /= GaussianRational::power_of_2(2u64);
     // `GaussianInteger` division is nearest-rounding, with no right shift: not flagged.
     let _ = &g / GaussianInteger::power_of_2(5);
+    // `div_round` by power_of_2: flagged, use `shr_round` with the same rounding mode.
+    let _ = (&n).div_round(Natural::power_of_2(5), Ceiling).0;
+    let _ = (&i).div_round(Integer::power_of_2(5), Nearest).0;
+    // `div_round_assign`: flagged, use `shr_round_assign`.
+    let mut r = i.clone();
+    r.div_round_assign(Integer::power_of_2(3), Floor);
+    // `div_round` by something that is not power_of_2: fine.
+    let _ = (&n).div_round(const { Natural::const_from(32) }, Ceiling).0;
 }

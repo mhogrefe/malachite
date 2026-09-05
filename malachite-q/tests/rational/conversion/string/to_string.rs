@@ -53,7 +53,7 @@ fn to_string_properties() {
         assert_eq!(BigRational::from(&x).to_string(), s);
         assert_eq!(rug::Rational::from(&x).to_string(), s);
         assert!(string_is_subset(&s, "-/0123456789"));
-        if x != 0 {
+        if x != 0u32 {
             assert!(!s.starts_with('0'));
         }
     });
@@ -146,7 +146,7 @@ fn to_string_base_properties() {
             &s,
             "-/0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
         ));
-        if x != 0 {
+        if x != 0u32 {
             assert!(!s.starts_with('0'));
         }
     });

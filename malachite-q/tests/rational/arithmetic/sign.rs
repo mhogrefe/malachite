@@ -36,7 +36,7 @@ fn sign_properties() {
         let sign = n.sign();
         assert_eq!(rug::Rational::from(&n).cmp0(), sign);
         assert_eq!(num_sign(&BigRational::from(&n)), sign);
-        assert_eq!(n.partial_cmp(&0), Some(sign));
+        assert_eq!(n.partial_cmp(&0u32), Some(sign));
         assert_eq!((-n).sign(), sign.reverse());
     });
 

@@ -5134,7 +5134,7 @@ fn agm_prec_round_properties_helper(
             let rx = Rational::exact_from(&x);
             let ry = Rational::exact_from(&y);
             if o != Greater {
-                let arith = (&rx + &ry) >> 1u64;
+                let arith = (&rx + &ry) >> 1u32;
                 assert!(agm <= arith);
             }
             if o != Less {
@@ -5293,7 +5293,7 @@ fn agm_prec_properties_helper(x: Float, y: Float, prec: u64, extreme: bool) {
             let rx = Rational::exact_from(&x);
             let ry = Rational::exact_from(&y);
             if o != Greater {
-                let arith = (&rx + &ry) >> 1u64;
+                let arith = (&rx + &ry) >> 1u32;
                 assert!(agm <= arith);
             }
             if o != Less {
@@ -5422,7 +5422,7 @@ fn agm_round_properties_helper(x: Float, y: Float, rm: RoundingMode, extreme: bo
             let rx = Rational::exact_from(&x);
             let ry = Rational::exact_from(&y);
             if o != Greater {
-                let arith = (&rx + &ry) >> 1u64;
+                let arith = (&rx + &ry) >> 1u32;
                 assert!(agm <= arith);
             }
             if o != Less {
@@ -5695,7 +5695,7 @@ fn agm_rational_prec_round_properties() {
                 }
                 assert_eq!(agm.get_prec(), Some(prec));
                 if o != Greater {
-                    let arith = (&x + &y) >> 1u64;
+                    let arith = (&x + &y) >> 1u32;
                     assert!(agm <= arith);
                 }
                 if o != Less {
@@ -5773,7 +5773,7 @@ fn agm_rational_prec_properties() {
             }
             assert_eq!(agm.get_prec(), Some(prec));
             if o != Greater {
-                let arith = (&x + &y) >> 1u64;
+                let arith = (&x + &y) >> 1u32;
                 assert!(agm <= arith);
             }
             if o != Less {

@@ -1358,7 +1358,7 @@ fn test_reciprocal_sqrt_rational_prec() {
                     assert!(square < u);
                     let mut previous = reciprocal_sqrt.clone();
                     previous.decrement();
-                    if previous != 0 {
+                    if previous != 0u32 {
                         assert!(Rational::exact_from(&previous).square().reciprocal() > u);
                     }
                 }
@@ -2963,7 +2963,7 @@ fn reciprocal_sqrt_prec_properties_helper(x: Float, prec: u64, extreme: bool) {
                 assert!(reciprocal_square < x);
                 let mut previous = reciprocal_sqrt.clone();
                 previous.decrement();
-                if previous != 0 {
+                if previous != 0u32 {
                     assert!(Rational::exact_from(&previous).square().reciprocal() > x);
                 }
             }
@@ -3358,7 +3358,7 @@ fn reciprocal_sqrt_rational_prec_properties() {
                     assert!(square < x);
                     let mut previous = reciprocal_sqrt.clone();
                     previous.decrement();
-                    if previous != 0 {
+                    if previous != 0u32 {
                         assert!(Rational::exact_from(&previous).square().reciprocal() > x);
                     }
                 }
@@ -3383,7 +3383,7 @@ fn reciprocal_sqrt_rational_prec_round_properties() {
         assert_eq!(o, o_alt);
 
         if !reciprocal_sqrt.is_nan() {
-            match (x >= 0, rm) {
+            match (x >= 0u32, rm) {
                 (_, Floor) | (true, Down) | (false, Up) => {
                     assert_ne!(o, Greater);
                 }
@@ -3439,7 +3439,7 @@ fn reciprocal_sqrt_rational_prec_round_properties() {
                     assert!(square > x);
                     let mut next = reciprocal_sqrt.clone();
                     next.increment();
-                    if next != 0 {
+                    if next != 0u32 {
                         assert!(Rational::exact_from(&next).square().reciprocal() < x);
                     }
                 }

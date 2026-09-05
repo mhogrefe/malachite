@@ -99,7 +99,7 @@ fn div_euclidean_properties_helper(x: Integer, y: Integer) {
     // The quotient is the one Euclidean division produces.
     assert_eq!((&x).div_mod_euclidean(&y).0, q);
     // For a positive divisor, the Euclidean quotient coincides with floor division.
-    if y > 0 {
+    if y > 0u32 {
         assert_eq!((&x).div_round(&y, Floor).0, q);
     }
 }

@@ -102,10 +102,10 @@ fn s2(
 ) -> (Natural, Natural, Natural) {
     if n2 - n1 == 1 {
         if n1 == 0 {
-            (Natural::ONE, Natural::from(big_n) << 2u64, Natural::ONE)
+            (Natural::ONE, Natural::from(big_n) << 2u32, Natural::ONE)
         } else {
             let p = Natural::from((n1 << 1) - 1).pow(3);
-            let q = (Natural::from(n1) * n_squared) << 5u64;
+            let q = (Natural::from(n1) * n_squared) << 5u32;
             (p.clone(), q, p)
         }
     } else {

@@ -78,7 +78,7 @@ impl CheckedRoot<u64> for Rational {
     /// );
     /// ```
     fn checked_root(self, pow: u64) -> Option<Self> {
-        let sign = self >= 0;
+        let sign = self >= 0u32;
         let (n, d) = self.into_numerator_and_denominator();
         let root_n;
         let root_d;
@@ -90,7 +90,7 @@ impl CheckedRoot<u64> for Rational {
             root_n = Integer::from_sign_and_abs(sign, n).checked_root(pow)?;
         }
         Some(Self {
-            sign: root_n >= 0,
+            sign: root_n >= 0u32,
             numerator: root_n.unsigned_abs(),
             denominator: root_d,
         })
@@ -168,14 +168,14 @@ impl CheckedRoot<u64> for &Rational {
         let root_n;
         let root_d;
         if n.significant_bits() <= d.significant_bits() {
-            root_n = Integer::from_sign_and_abs_ref(*self >= 0, n).checked_root(pow)?;
+            root_n = Integer::from_sign_and_abs_ref(*self >= 0u32, n).checked_root(pow)?;
             root_d = d.checked_root(pow)?;
         } else {
             root_d = d.checked_root(pow)?;
-            root_n = Integer::from_sign_and_abs_ref(*self >= 0, n).checked_root(pow)?;
+            root_n = Integer::from_sign_and_abs_ref(*self >= 0u32, n).checked_root(pow)?;
         }
         Some(Rational {
-            sign: root_n >= 0,
+            sign: root_n >= 0u32,
             numerator: root_n.unsigned_abs(),
             denominator: root_d,
         })

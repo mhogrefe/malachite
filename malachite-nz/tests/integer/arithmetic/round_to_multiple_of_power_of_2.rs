@@ -1241,7 +1241,7 @@ fn round_to_multiple_of_power_of_2_properties() {
 
         assert!(r.divisible_by_power_of_2(pow));
         assert_eq!(r.cmp(&n), o);
-        match (n >= 0, rm) {
+        match (n >= 0u32, rm) {
             (_, Floor) | (true, Down) | (false, Up) => {
                 assert_ne!(o, Greater);
             }
@@ -1302,7 +1302,7 @@ fn round_to_multiple_of_power_of_2_properties() {
         assert_eq!(floor.1, Less);
         let ceiling = (&floor.0 + Integer::power_of_2(pow), Greater);
         assert_eq!((&n).round_to_multiple_of_power_of_2(pow, Ceiling), ceiling);
-        if n >= 0 {
+        if n >= 0u32 {
             assert_eq!((&n).round_to_multiple_of_power_of_2(pow, Up), ceiling);
             assert_eq!((&n).round_to_multiple_of_power_of_2(pow, Down), floor);
         } else {

@@ -22,7 +22,7 @@ impl From<&Rational> for BigRational {
             BigInt::from(n.numerator_ref()),
             BigInt::from(n.denominator_ref()),
         );
-        if *n < 0 {
+        if *n < 0u32 {
             q = -q;
         }
         q
@@ -41,7 +41,7 @@ impl From<&Rational> for rug::Rational {
             rug::Integer::from(n.numerator_ref()),
             rug::Integer::from(n.denominator_ref()),
         ));
-        if *n < 0 {
+        if *n < 0u32 {
             q = -q;
         }
         q

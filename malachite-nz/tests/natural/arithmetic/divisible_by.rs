@@ -801,7 +801,7 @@ fn test_divisible_by() {
         assert_eq!((&u).divisible_by(v.clone()), divisible);
         assert_eq!((&u).divisible_by(&v), divisible);
 
-        assert_eq!(u == 0 || v != 0 && &u % &v == 0, divisible);
+        assert_eq!(u == 0u32 || v != 0u32 && &u % &v == 0u32, divisible);
 
         assert_eq!(
             num_divisible_by(
@@ -967,7 +967,7 @@ fn divisible_by_properties() {
         assert_eq!(x.clone().divisible_by(&y), divisible);
         assert_eq!(x.clone().divisible_by(y.clone()), divisible);
 
-        assert_eq!(x == 0 || y != 0 && &x % &y == 0, divisible);
+        assert_eq!(x == 0u32 || y != 0u32 && &x % &y == 0u32, divisible);
         assert_eq!(
             num_divisible_by(&BigUint::from(&x), &BigUint::from(&y)),
             divisible
@@ -980,14 +980,14 @@ fn divisible_by_properties() {
 
     natural_pair_gen_var_6().test_properties(|(x, y)| {
         assert!((&x).divisible_by(&y));
-        assert!(x == 0 || y != 0 && &x % &y == 0);
+        assert!(x == 0u32 || y != 0u32 && &x % &y == 0u32);
         assert!(num_divisible_by(&BigUint::from(&x), &BigUint::from(&y)));
         assert!(rug::Integer::from(&x).is_divisible(&rug::Integer::from(&y)));
     });
 
     natural_pair_gen_var_7().test_properties(|(x, y)| {
         assert!(!(&x).divisible_by(&y));
-        assert!(x != 0 && (y == 0 || &x % &y != 0));
+        assert!(x != 0u32 && (y == 0u32 || &x % &y != 0u32));
         assert!(!num_divisible_by(&BigUint::from(&x), &BigUint::from(&y)));
         assert!(!rug::Integer::from(&x).is_divisible(&rug::Integer::from(&y)));
     });
@@ -999,7 +999,7 @@ fn divisible_by_properties() {
     natural_gen_var_2().test_properties(|n| {
         assert!(!(&n).divisible_by(Natural::ZERO));
         assert!(Natural::ZERO.divisible_by(&n));
-        if n > 1 {
+        if n > 1u32 {
             assert!(!Natural::ONE.divisible_by(&n));
         }
         assert!((&n).divisible_by(&n));

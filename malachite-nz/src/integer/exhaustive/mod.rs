@@ -499,9 +499,9 @@ pub const fn integer_decreasing_range_to_negative_infinity(
 /// ```
 pub fn exhaustive_integer_range(a: Integer, b: Integer) -> ExhaustiveIntegerRange {
     assert!(a <= b, "a must be less than or equal to b. a: {a}, b: {b}");
-    if a >= 0 {
+    if a >= 0u32 {
         ExhaustiveIntegerRange::NonNegative(integer_increasing_range(a, b))
-    } else if b <= 0 {
+    } else if b <= 0u32 {
         ExhaustiveIntegerRange::NonPositive(integer_increasing_range(a, b).rev())
     } else {
         ExhaustiveIntegerRange::BothSigns(
@@ -552,9 +552,9 @@ pub fn exhaustive_integer_range(a: Integer, b: Integer) -> ExhaustiveIntegerRang
 /// ```
 pub fn exhaustive_integer_inclusive_range(a: Integer, b: Integer) -> ExhaustiveIntegerRange {
     assert!(a <= b, "a must be less than or equal to b. a: {a}, b: {b}");
-    if a >= 0 {
+    if a >= 0u32 {
         ExhaustiveIntegerRange::NonNegative(integer_increasing_inclusive_range(a, b))
-    } else if b <= 0 {
+    } else if b <= 0u32 {
         ExhaustiveIntegerRange::NonPositive(integer_increasing_inclusive_range(a, b).rev())
     } else {
         ExhaustiveIntegerRange::BothSigns(
@@ -598,7 +598,7 @@ pub fn exhaustive_integer_inclusive_range(a: Integer, b: Integer) -> ExhaustiveI
 /// ```
 #[inline]
 pub fn exhaustive_integer_range_to_infinity(a: Integer) -> ExhaustiveIntegerRangeToInfinity {
-    if a >= 0 {
+    if a >= 0u32 {
         ExhaustiveIntegerRangeToInfinity::NonNegative(integer_increasing_range_to_infinity(a))
     } else {
         ExhaustiveIntegerRangeToInfinity::BothSigns(
@@ -648,7 +648,7 @@ pub fn exhaustive_integer_range_to_infinity(a: Integer) -> ExhaustiveIntegerRang
 pub fn exhaustive_integer_range_to_negative_infinity(
     a: Integer,
 ) -> ExhaustiveIntegerRangeToNegativeInfinity {
-    if a <= 0 {
+    if a <= 0u32 {
         ExhaustiveIntegerRangeToNegativeInfinity::NonPositive(
             integer_decreasing_range_to_negative_infinity(a),
         )

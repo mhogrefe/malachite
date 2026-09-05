@@ -355,7 +355,7 @@ fn pow_properties() {
         if exp != 0 {
             assert_eq!((&power).checked_root(exp).unwrap(), x);
         }
-        if x > 1 {
+        if x > 1u32 {
             assert_eq!(power.checked_log_base(&x).unwrap(), exp);
         }
     });

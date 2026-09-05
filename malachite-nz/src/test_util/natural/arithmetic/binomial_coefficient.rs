@@ -43,7 +43,7 @@ pub fn binomial_coefficient_naive_2(n: Natural, mut k: Natural) -> Natural {
     if k == 1u32 {
         n
     } else if k == 2u32 {
-        (&n >> 1) * (if n.even() { n - Natural::ONE } else { n })
+        (&n >> 1u32) * (if n.even() { n - Natural::ONE } else { n })
     } else {
         let mut product = n - &k + Natural::ONE;
         let mut numerator = product.clone();

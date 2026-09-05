@@ -1,8 +1,8 @@
 use malachite_base::num::basic::traits::Two;
 use malachite_float::Float;
+use malachite_nz::gaussian_integer::GaussianInteger;
 use malachite_nz::natural::Natural;
 use malachite_q::Rational;
-use malachite_nz::gaussian_integer::GaussianInteger;
 
 const X: Natural = Natural::const_from(5);
 const Y: Natural = Natural::const_from(3);

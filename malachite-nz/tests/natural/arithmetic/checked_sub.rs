@@ -134,7 +134,7 @@ fn checked_sub_properties() {
     natural_gen().test_properties(|x| {
         assert_eq!((&x).checked_sub(Natural::ZERO).as_ref(), Some(&x));
         assert_eq!((&x).checked_sub(&x), Some(Natural::ZERO));
-        if x != 0 {
+        if x != 0u32 {
             assert!((Natural::ZERO.checked_sub(x)).is_none());
         }
     });

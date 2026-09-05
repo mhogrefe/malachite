@@ -28,7 +28,7 @@ fn from_natural_prec_round_helper(
     rm: RoundingMode,
     bits: u64,
 ) -> (Float, Ordering) {
-    if *x == 0 {
+    if *x == 0u32 {
         return (Float::ZERO, Equal);
     }
     let mut exponent = i32::saturating_from(bits);
@@ -93,7 +93,7 @@ fn from_natural_prec_round_helper(
                     if exponent == Float::MAX_EXPONENT {
                         return (Float::INFINITY, Greater);
                     }
-                    significand >>= 1;
+                    significand >>= 1u32;
                     exponent += 1;
                 }
                 Greater
@@ -113,7 +113,7 @@ fn from_natural_prec_round_helper(
                     if exponent == Float::MAX_EXPONENT {
                         return (Float::INFINITY, Greater);
                     }
-                    significand >>= 1;
+                    significand >>= 1u32;
                     exponent += 1;
                 }
                 Greater
@@ -191,7 +191,7 @@ fn from_natural_prec_round_helper_zero_exponent(
                 significand.round_to_multiple_of_power_of_2_assign(mask_width, Floor);
                 significand += Natural::power_of_2(mask_width);
                 if significand.limb_count() > original_limb_count {
-                    significand >>= 1;
+                    significand >>= 1u32;
                     exponent += 1;
                 }
                 Greater
@@ -208,7 +208,7 @@ fn from_natural_prec_round_helper_zero_exponent(
                 significand.round_to_multiple_of_power_of_2_assign(mask_width, Floor);
                 significand += Natural::power_of_2(mask_width);
                 if significand.limb_count() > original_limb_count {
-                    significand >>= 1;
+                    significand >>= 1u32;
                     exponent += 1;
                 }
                 Greater
@@ -305,7 +305,7 @@ pub(crate) fn from_natural_prec_round_zero_exponent_ref(
 }
 
 pub(crate) fn from_natural_zero_exponent(x: Natural) -> Float {
-    if x == 0 {
+    if x == 0u32 {
         Float::ZERO
     } else {
         let bits = x.significant_bits();
@@ -315,7 +315,7 @@ pub(crate) fn from_natural_zero_exponent(x: Natural) -> Float {
 }
 
 pub(crate) fn from_natural_zero_exponent_ref(x: &Natural) -> Float {
-    if *x == 0 {
+    if *x == 0u32 {
         Float::ZERO
     } else {
         let bits = x.significant_bits();
@@ -630,7 +630,7 @@ impl TryFrom<Natural> for Float {
     /// );
     /// ```
     fn try_from(x: Natural) -> Result<Self, Self::Error> {
-        if x == 0 {
+        if x == 0u32 {
             Ok(Self::ZERO)
         } else {
             let bits = x.significant_bits();
@@ -692,7 +692,7 @@ impl TryFrom<&Natural> for Float {
     /// ```
     #[inline]
     fn try_from(x: &Natural) -> Result<Self, Self::Error> {
-        if *x == 0 {
+        if *x == 0u32 {
             Ok(Self::ZERO)
         } else {
             let bits = x.significant_bits();
@@ -733,7 +733,7 @@ impl ConvertibleFrom<&Natural> for Float {
     /// ```
     #[inline]
     fn convertible_from(x: &Natural) -> bool {
-        *x == 0
+        *x == 0u32
             || (Self::MIN_EXPONENT..=Self::MAX_EXPONENT)
                 .contains(&i32::saturating_from(x.floor_log_base_2()).saturating_add(1))
     }

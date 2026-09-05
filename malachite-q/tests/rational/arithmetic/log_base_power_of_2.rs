@@ -360,7 +360,7 @@ fn checked_log_base_power_of_2_properties() {
         );
         if let Some(log) = checked_log {
             assert_eq!(Rational::power_of_2(log * pow), n);
-            assert_eq!(log == 0, n == Rational::ONE);
+            assert_eq!(log == 0, n == 1u32);
             assert_eq!(n.floor_log_base_power_of_2(pow), log);
             assert_eq!(n.ceiling_log_base_power_of_2(pow), log);
             assert_eq!(n.checked_log_base_power_of_2(-pow), Some(-log));

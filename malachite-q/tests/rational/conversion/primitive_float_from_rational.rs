@@ -1379,7 +1379,7 @@ where
 {
     rational_rounding_mode_pair_gen_var_5::<T>().test_properties(|(x, rm)| {
         let (f, o) = T::rounding_from(&x, rm);
-        let neg_f = if x == 0 { T::ZERO } else { -f };
+        let neg_f = if x == 0u32 { T::ZERO } else { -f };
         let (f_alt, o_alt) = T::rounding_from(-&x, -rm);
         assert_eq!(NiceFloat(f_alt), NiceFloat(neg_f));
         assert_eq!(o_alt, o.reverse());
@@ -1388,7 +1388,7 @@ where
         assert_eq!(o_alt, o);
 
         assert_eq!(f.partial_cmp(&x), Some(o));
-        match (x >= 0, rm) {
+        match (x >= 0u32, rm) {
             (_, Floor) | (true, Down) | (false, Up) => {
                 assert_ne!(o, Greater);
             }
@@ -1435,7 +1435,7 @@ where
         let (f, o) = T::rounding_from(&n, Ceiling);
         assert_eq!(NiceFloat(f), NiceFloat(f_above.0));
         assert_eq!(o, Greater);
-        if n >= 0 {
+        if n >= 0u32 {
             let (f, o) = T::rounding_from(&n, Down);
             assert_eq!(NiceFloat(f), NiceFloat(f_below.0));
             assert_eq!(o, Less);
@@ -1530,7 +1530,7 @@ where
         );
         assert_eq!(
             T::try_from(-&n).map(NiceFloat),
-            of.map(|f| NiceFloat(if n == 0 { T::ZERO } else { -f }))
+            of.map(|f| NiceFloat(if n == 0u32 { T::ZERO } else { -f }))
         );
     });
 

@@ -7,9 +7,10 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{
-    Abs, DivRound, DivisibleBy, Parity, RoundToMultiple, RoundToMultipleAssign,
+    DivRound, DivisibleBy, Parity, RoundToMultiple, RoundToMultipleAssign,
 };
 use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::test_util::generators::unsigned_unsigned_rounding_mode_triple_gen_var_2;
 use malachite_nz::integer::Integer;
@@ -478,10 +479,10 @@ fn round_to_multiple_properties() {
             Exact => assert_eq!(o, Equal),
             _ => {}
         }
-        if y == 0 {
+        if y == 0u32 {
             assert_eq!(r, 0);
         } else {
-            assert!((Integer::from(&r) - Integer::from(&x)).abs() <= y);
+            assert!((Integer::from(&r) - Integer::from(&x)).le_abs(&y));
             match rm {
                 Floor | Down => assert!(r <= x),
                 Ceiling | Up => assert!(r >= x),

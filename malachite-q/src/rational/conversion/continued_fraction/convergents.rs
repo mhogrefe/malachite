@@ -43,7 +43,7 @@ impl Iterator for RationalConvergents {
             swap(&mut self.numerator, &mut self.previous_numerator);
             swap(&mut self.denominator, &mut self.previous_denominator);
             Some(Rational {
-                sign: self.numerator >= 0,
+                sign: self.numerator >= 0u32,
                 numerator: (&self.numerator).unsigned_abs(),
                 denominator: self.denominator.clone(),
             })

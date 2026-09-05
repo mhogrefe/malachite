@@ -777,7 +777,7 @@ fn pow_is_exact(x: &Float, y: &Float, prec: u64, rm: RoundingMode) -> Option<(Fl
     let (mut a, mut b) = float_to_odd_mantissa_and_exponent_natural(x);
     while d != 0 {
         if b.odd() {
-            a <<= 1u64;
+            a <<= 1u32;
             b -= 1;
         }
         a = a.checked_sqrt()?;
@@ -5859,7 +5859,7 @@ fn unsigned_pow_rational(k: u64, q: &Rational, prec: u64, rm: RoundingMode) -> (
     if let Ok(b) = u64::try_from(q.denominator_ref())
         && let Some(j) = k.checked_root(b)
     {
-        let a = Integer::from_sign_and_abs_ref(*q >= 0, q.numerator_ref());
+        let a = Integer::from_sign_and_abs_ref(*q >= 0u32, q.numerator_ref());
         return Float::from(j).pow_integer_prec_round(a, prec, rm);
     }
     // The remaining results are irrational. When `q` is tiny enough that `k ^ q` is within a few
@@ -6286,7 +6286,7 @@ fn rational_pow_exact_decomposition(
             if e.odd() {
                 return None;
             }
-            e >>= 1;
+            e >>= 1u32;
         }
     } else {
         e <<= d;

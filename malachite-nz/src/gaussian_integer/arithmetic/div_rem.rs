@@ -30,11 +30,11 @@ const SMALL_DIVIDEND_BITS: u64 = 2;
 fn nearest_quotient(x: &GaussianInteger, y: &GaussianInteger) -> GaussianInteger {
     let mut t = mul_val_ref(y.conjugate(), x);
     let mut norm = y.abs_squared();
-    t.real <<= 1u64;
-    t.imaginary <<= 1u64;
+    t.real <<= 1u32;
+    t.imaginary <<= 1u32;
     t.real += &norm;
     t.imaginary += &norm;
-    norm <<= 1u64;
+    norm <<= 1u32;
     GaussianInteger {
         real: t.real.div_round(&norm, Floor).0,
         imaginary: t.imaginary.div_round(norm, Floor).0,

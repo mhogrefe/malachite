@@ -1564,7 +1564,7 @@ fn div_mod_properties_helper(x: Integer, y: Integer) {
     assert_eq!(Integer::from(&rug_r), r);
 
     assert!(r.lt_abs(&y));
-    assert!(r == 0 || (r > 0) == (y > 0));
+    assert!(r == 0u32 || (r > 0u32) == (y > 0u32));
     assert_eq!(q * &y + r, x);
 
     let (neg_q, neg_r) = (-&x).div_mod(&y);
@@ -1601,7 +1601,7 @@ fn div_mod_properties() {
         assert_eq!(x.div_mod(x), (Integer::ONE, Integer::ZERO));
         assert_eq!(x.div_mod(-x), (Integer::NEGATIVE_ONE, Integer::ZERO));
         assert_eq!(Integer::ZERO.div_mod(x), (Integer::ZERO, Integer::ZERO));
-        if *x > 1 {
+        if *x > 1u32 {
             assert_eq!(Integer::ONE.div_mod(x), (Integer::ZERO, Integer::ONE));
             assert_eq!(
                 Integer::NEGATIVE_ONE.div_mod(x),
@@ -1678,7 +1678,7 @@ fn div_rem_properties_helper(x: Integer, y: Integer) {
     assert_eq!(Integer::from(&rug_r), r);
 
     assert!(r.lt_abs(&y));
-    assert!(r == 0 || (r > 0) == (x > 0));
+    assert!(r == 0u32 || (r > 0u32) == (x > 0u32));
     assert_eq!(&q * &y + &r, x);
 
     assert_eq!((-&x).div_rem(&y), (-&q, -&r));
@@ -1712,7 +1712,7 @@ fn div_rem_properties() {
         assert_eq!(x.div_rem(x), (Integer::ONE, Integer::ZERO));
         assert_eq!(x.div_rem(-x), (Integer::NEGATIVE_ONE, Integer::ZERO));
         assert_eq!(Integer::ZERO.div_rem(x), (Integer::ZERO, Integer::ZERO));
-        if *x > 1 {
+        if *x > 1u32 {
             assert_eq!(Integer::ONE.div_rem(x), (Integer::ZERO, Integer::ONE));
             assert_eq!(
                 Integer::NEGATIVE_ONE.div_rem(x),
@@ -1786,7 +1786,7 @@ fn ceiling_div_mod_properties_helper(x: Integer, y: Integer) {
     assert_eq!(Integer::from(&rug_r), r);
 
     assert!(r.lt_abs(&y));
-    assert!(r == 0 || (r > 0) != (y > 0));
+    assert!(r == 0u32 || (r > 0u32) != (y > 0u32));
     assert_eq!(q * &y + r, x);
 
     let (neg_q, neg_r) = (-&x).ceiling_div_mod(&y);

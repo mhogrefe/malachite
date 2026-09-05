@@ -62,7 +62,7 @@ fn abs_properties() {
         assert!(neg_alt.is_valid());
         assert_eq!(neg_alt, neg);
 
-        assert_eq!(neg == x, x == 0);
+        assert_eq!(neg == x, x == 0u32);
         assert_eq!(-&neg, x);
         assert_eq!(x + neg, 0);
     });

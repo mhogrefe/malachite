@@ -1428,7 +1428,7 @@ where
         if nearest.0 > -T::MAX_FINITE && nearest.0 < T::MAX_FINITE && nearest.0 != T::ZERO {
             let r_x: Rational = ExactFrom::<&Float>::exact_from(&x);
             let rulp: Rational = ExactFrom::exact_from(Float::from(nearest.0).ulp().unwrap());
-            assert!((Rational::exact_from(nearest.0) - r_x).le_abs(&(rulp >> 1u64)));
+            assert!((Rational::exact_from(nearest.0) - r_x).le_abs(&(rulp >> 1u32)));
         }
     });
 

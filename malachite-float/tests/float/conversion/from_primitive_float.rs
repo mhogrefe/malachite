@@ -1562,7 +1562,7 @@ where
             && r_nearest != T::ZERO
         {
             let rulp: Rational = ExactFrom::exact_from(nearest.0.ulp().unwrap());
-            assert!((r_nearest - Rational::exact_from(x)).le_abs(&(rulp >> 1)));
+            assert!((r_nearest - Rational::exact_from(x)).le_abs(&(rulp >> 1u32)));
         }
     });
 }

@@ -1,5 +1,5 @@
 error: use `<< 3` instead of multiplying by `8`
-  --> $DIR/mul_div_by_power_of_2_literal.rs:6:14
+  --> $DIR/mul_div_by_power_of_2_literal.rs:8:14
    |
 LL |     let m1 = a * 8;
    |              ^^^^^
@@ -7,58 +7,82 @@ LL |     let m1 = a * 8;
    = note: `#[deny(mul_div_by_power_of_2_literal)]` on by default
 
 error: use `<< 4` instead of multiplying by `16`
-  --> $DIR/mul_div_by_power_of_2_literal.rs:8:14
+  --> $DIR/mul_div_by_power_of_2_literal.rs:10:14
    |
 LL |     let m2 = 16 * a;
    |              ^^^^^^
 
 error: use `>> 2` instead of dividing by `4`
-  --> $DIR/mul_div_by_power_of_2_literal.rs:10:14
+  --> $DIR/mul_div_by_power_of_2_literal.rs:12:14
    |
 LL |     let d1 = a / 4;
    |              ^^^^^
 
 error: use `shr_round(3, Down)` (or `>> 3`, which takes the floor) instead of dividing by `8`
-  --> $DIR/mul_div_by_power_of_2_literal.rs:12:14
+  --> $DIR/mul_div_by_power_of_2_literal.rs:14:14
    |
 LL |     let d2 = b / 8;
    |              ^^^^^
 
 error: use `<<= 1` instead of multiplying by `2`
-  --> $DIR/mul_div_by_power_of_2_literal.rs:15:5
+  --> $DIR/mul_div_by_power_of_2_literal.rs:17:5
    |
 LL |     ma *= 2;
    |     ^^^^^^^
 
 error: use `>>= 5` instead of dividing by `32`
-  --> $DIR/mul_div_by_power_of_2_literal.rs:18:5
+  --> $DIR/mul_div_by_power_of_2_literal.rs:20:5
    |
 LL |     da /= 32;
    |     ^^^^^^^^
 
 error: use `<< Limb::LOG_WIDTH` instead of multiplying by `Limb::WIDTH`
-  --> $DIR/mul_div_by_power_of_2_literal.rs:28:14
+  --> $DIR/mul_div_by_power_of_2_literal.rs:30:14
    |
 LL |     let m1 = x * Limb::WIDTH;
    |              ^^^^^^^^^^^^^^^
 
 error: use `<< u64::LOG_WIDTH` instead of multiplying by `u64::WIDTH`
-  --> $DIR/mul_div_by_power_of_2_literal.rs:30:14
+  --> $DIR/mul_div_by_power_of_2_literal.rs:32:14
    |
 LL |     let m2 = u64::WIDTH * x;
    |              ^^^^^^^^^^^^^^
 
 error: use `>> Limb::LOG_WIDTH` instead of dividing by `Limb::WIDTH`
-  --> $DIR/mul_div_by_power_of_2_literal.rs:32:14
+  --> $DIR/mul_div_by_power_of_2_literal.rs:34:14
    |
 LL |     let d1 = x / Limb::WIDTH;
    |              ^^^^^^^^^^^^^^^
 
 error: use `>>= u64::LOG_WIDTH` instead of dividing by `u64::WIDTH`
-  --> $DIR/mul_div_by_power_of_2_literal.rs:35:5
+  --> $DIR/mul_div_by_power_of_2_literal.rs:37:5
    |
 LL |     da /= u64::WIDTH;
    |     ^^^^^^^^^^^^^^^^
 
-error: aborting due to 10 previous errors
+error: use `shr_round(1, Ceiling)` instead of `div_round(2, Ceiling)`
+  --> $DIR/mul_div_by_power_of_2_literal.rs:45:14
+   |
+LL |     let d1 = a.div_round(2, Ceiling).0;
+   |              ^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `shr_round(3, Nearest)` instead of `div_round(8, Nearest)`
+  --> $DIR/mul_div_by_power_of_2_literal.rs:47:14
+   |
+LL |     let d2 = b.div_round(8, Nearest).0;
+   |              ^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `shr_round_assign(2, Floor)` instead of `div_round_assign(4, Floor)`
+  --> $DIR/mul_div_by_power_of_2_literal.rs:50:5
+   |
+LL |     da.div_round_assign(4, Floor);
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `shr_round(Limb::LOG_WIDTH, Up)` instead of `div_round(Limb::WIDTH, Up)`
+  --> $DIR/mul_div_by_power_of_2_literal.rs:52:14
+   |
+LL |     let d3 = x.div_round(Limb::WIDTH, Up).0;
+   |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: aborting due to 14 previous errors
 

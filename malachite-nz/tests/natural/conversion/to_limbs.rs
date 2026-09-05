@@ -93,7 +93,7 @@ fn to_limbs_asc_properties() {
         assert_eq!(x.as_limbs_asc(), limbs);
         assert_eq!(x.limbs().collect_vec(), limbs);
         assert_eq!(Natural::from_limbs_asc(&limbs), x);
-        if x != 0 {
+        if x != 0u32 {
             assert_ne!(*limbs.last().unwrap(), 0);
         }
     });
@@ -106,7 +106,7 @@ fn to_limbs_desc_properties() {
         assert_eq!(x.clone().into_limbs_desc(), limbs);
         assert_eq!(x.limbs().rev().collect_vec(), limbs);
         assert_eq!(Natural::from_limbs_desc(&limbs), x);
-        if x != 0 {
+        if x != 0u32 {
             assert_ne!(limbs[0], 0);
         }
     });

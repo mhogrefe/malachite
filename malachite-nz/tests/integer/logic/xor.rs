@@ -844,7 +844,7 @@ fn limbs_slice_neg_xor_limb_in_place_properties() {
         if limbs_slice_neg_xor_limb_in_place(&mut xs, y) {
             let xor =
                 Integer::from(Natural::from_owned_limbs_asc(old_xs.clone())) ^ Integer::from(y);
-            if xor <= 0 {
+            if xor <= 0u32 {
                 let mut result = Natural::exact_from(-xor).to_limbs_asc();
                 result.resize(xs.len(), 0);
                 assert_eq!(result, xs);

@@ -353,7 +353,7 @@ impl Float {
                                 Less
                             };
                         }
-                        *significand >>= 1;
+                        *significand >>= 1u32;
                         *exponent += 1;
                     }
                     *significand >>= significant_bits - target_bits;

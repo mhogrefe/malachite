@@ -1,0 +1,64 @@
+error: use `i.le_abs(&100u32)` instead of comparing an absolute value
+  --> $DIR/use_abs_comparison.rs:16:8
+   |
+LL |     if (&i).abs() <= 100u32 {
+   |        ^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[deny(use_abs_comparison)]` on by default
+
+error: use `f.lt_abs(&2u32)` instead of comparing an absolute value
+  --> $DIR/use_abs_comparison.rs:20:8
+   |
+LL |     if (&f).abs() < 2u32 {
+   |        ^^^^^^^^^^^^^^^^^
+
+error: use `q.gt_abs(&3u32)` instead of comparing an absolute value
+  --> $DIR/use_abs_comparison.rs:24:8
+   |
+LL |     if (&q).abs() > 3u32 {
+   |        ^^^^^^^^^^^^^^^^^
+
+error: use `i.gt_abs(&5u32)` instead of comparing an absolute value
+  --> $DIR/use_abs_comparison.rs:29:8
+   |
+LL |     if 5u32 < (&i).abs() {
+   |        ^^^^^^^^^^^^^^^^^
+
+error: use `i.ge_abs(&j)` instead of comparing an absolute value
+  --> $DIR/use_abs_comparison.rs:34:8
+   |
+LL |     if (&i).abs() >= (&j).abs() {
+   |        ^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `i.eq_abs(&n)` instead of comparing an absolute value
+  --> $DIR/use_abs_comparison.rs:39:8
+   |
+LL |     if (&i).abs() == n {
+   |        ^^^^^^^^^^^^^^^
+
+error: use `i.partial_cmp_abs(&5u32)` instead of comparing an absolute value
+  --> $DIR/use_abs_comparison.rs:44:13
+   |
+LL |     let _ = (&i).abs().partial_cmp(&5u32);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `i.cmp_abs(&j)` instead of comparing an absolute value
+  --> $DIR/use_abs_comparison.rs:45:13
+   |
+LL |     let _ = (&i).abs().cmp(&(&j).abs());
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: use `i.lt_abs(&5u32)` instead of comparing an absolute value
+  --> $DIR/use_abs_comparison.rs:46:13
+   |
+LL |     let _ = (&i).abs().lt(&5u32);
+   |             ^^^^^^^^^^^^^^^^^^^^
+
+error: use `k.ne_abs(&9u32)` instead of comparing an absolute value
+  --> $DIR/use_abs_comparison.rs:48:8
+   |
+LL |     if k.abs() != 9u32 {
+   |        ^^^^^^^^^^^^^^^
+
+error: aborting due to 10 previous errors
+

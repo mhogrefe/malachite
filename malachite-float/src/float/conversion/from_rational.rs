@@ -38,7 +38,7 @@ private_test_fn! {from_rational_prec_round_direct(
     rm: RoundingMode,
 ) -> (Float, Ordering) {
     assert_ne!(prec, 0);
-    let sign = x >= 0;
+    let sign = x >= 0u32;
     if let Some(pow) = x.denominator_ref().checked_log_base_2() {
         let n = x.into_numerator();
         let n_bits = n.significant_bits();
@@ -60,7 +60,7 @@ private_test_fn! {from_rational_prec_round_direct(
         }
         let (significand, o) =
             Integer::rounding_from(x << (i128::exact_from(prec) - i128::from(exponent) - 1), rm);
-        let sign = significand >= 0;
+        let sign = significand >= 0u32;
         let mut significand = significand.unsigned_abs();
         let away_from_0 = if sign { Greater } else { Less };
         if o == away_from_0 && significand.is_power_of_2() {
@@ -122,12 +122,12 @@ private_test_fn! {from_rational_prec_round_using_div(
     prec: u64,
     mut rm: RoundingMode,
 ) -> (Float, Ordering) {
-    let sign = x >= 0;
+    let sign = x >= 0u32;
     if !sign {
         rm.neg_assign();
     }
     let (n, d) = x.into_numerator_and_denominator();
-    let is_zero = n == 0;
+    let is_zero = n == 0u32;
     let (f, o) = match (
         if is_zero {
             None
@@ -194,7 +194,7 @@ private_test_fn! {from_rational_prec_round_ref_direct(
     rm: RoundingMode,
 ) -> (Float, Ordering) {
     assert_ne!(prec, 0);
-    let sign = *x >= 0;
+    let sign = *x >= 0u32;
     if let Some(pow) = x.denominator_ref().checked_log_base_2() {
         let n = x.numerator_ref();
         let n_bits = n.significant_bits();
@@ -225,7 +225,7 @@ private_test_fn! {from_rational_prec_round_ref_direct(
         }
         let (significand, o) =
             Integer::rounding_from(x << (i128::exact_from(prec) - i128::from(exponent) - 1), rm);
-        let sign = significand >= 0;
+        let sign = significand >= 0u32;
         let mut significand = significand.unsigned_abs();
         let away_from_0 = if sign { Greater } else { Less };
         if o == away_from_0 && significand.is_power_of_2() {
@@ -287,12 +287,12 @@ private_test_fn! {from_rational_prec_round_ref_using_div(
     prec: u64,
     mut rm: RoundingMode,
 ) -> (Float, Ordering) {
-    let sign = *x >= 0;
+    let sign = *x >= 0u32;
     if !sign {
         rm.neg_assign();
     }
     let (n, d) = x.numerator_and_denominator_ref();
-    let is_zero = *n == 0;
+    let is_zero = *n == 0u32;
     let (f, o) = match (
         if is_zero {
             None
@@ -806,7 +806,7 @@ impl TryFrom<&Rational> for Float {
             let n = x.numerator_ref();
             let n_bits = n.significant_bits();
             let mut n = from_natural_zero_exponent_ref(n);
-            if *x < 0 {
+            if *x < 0u32 {
                 n.neg_assign();
             }
             Ok(n >> (i128::from(log_denominator) - i128::from(n_bits)))
@@ -855,7 +855,7 @@ impl ConvertibleFrom<&Rational> for Float {
     /// ```
     #[inline]
     fn convertible_from(x: &Rational) -> bool {
-        *x == 0
+        *x == 0u32
             || x.denominator_ref().is_power_of_2()
                 && (Self::MIN_EXPONENT..=Self::MAX_EXPONENT)
                     .contains(&i32::saturating_from(x.floor_log_base_2_abs()).saturating_add(1))

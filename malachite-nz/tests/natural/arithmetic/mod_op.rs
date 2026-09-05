@@ -13013,7 +13013,7 @@ fn mod_properties() {
         // The same value through distinct references takes the general path.
         assert_eq!(n % &n.clone(), 0);
         assert_eq!(Natural::ZERO % n, 0);
-        if *n > 1 {
+        if *n > 1u32 {
             assert_eq!(Natural::ONE % n, 1);
         }
     });

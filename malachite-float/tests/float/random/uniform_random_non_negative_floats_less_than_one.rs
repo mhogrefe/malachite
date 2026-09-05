@@ -7,7 +7,6 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::PowerOf2;
-use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::float::NiceFloat;
 use malachite_base::random::EXAMPLE_SEED;
@@ -335,8 +334,8 @@ fn uniform_random_non_negative_floats_less_than_one_properties() {
         for x in uniform_random_non_negative_floats_less_than_one(EXAMPLE_SEED, prec).take(10000) {
             assert!(x.is_valid());
             // - the value is in [0, 1)
-            assert!(x >= Float::ZERO);
-            assert!(x < Float::ONE);
+            assert!(x >= 0u32);
+            assert!(x < 1u32);
             if x == 0u32 {
                 // - a zero draw is a positive zero
                 assert!(!x.is_sign_negative());

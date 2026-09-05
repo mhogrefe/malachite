@@ -59,7 +59,7 @@ impl Float {
     #[inline]
     pub fn pi_over_8_prec_round(prec: u64, rm: RoundingMode) -> (Self, Ordering) {
         let (pi, o) = Self::pi_prec_round(prec, rm);
-        (pi >> 3u64, o)
+        (pi >> 3u32, o)
     }
 
     /// Returns an approximation of $\pi/8$, with the given precision and rounded to the nearest

@@ -392,7 +392,7 @@ impl PowerOf2Digits<Self> for Natural {
                     }
                 }
             }
-            if digit != 0 {
+            if digit != 0u32 {
                 digits.push(digit);
             }
         }

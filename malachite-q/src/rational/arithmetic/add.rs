@@ -60,7 +60,7 @@ impl Add<Self> for Rational {
                 + Integer::from_sign_and_abs(other.sign, other.numerator * &self.denominator);
             let sum_d = self.denominator * other.denominator;
             Self {
-                sign: sum_n >= 0,
+                sign: sum_n >= 0u32,
                 numerator: sum_n.unsigned_abs(),
                 denominator: sum_d,
             }
@@ -74,13 +74,13 @@ impl Add<Self> for Rational {
             gcd.gcd_assign(sum_n.unsigned_abs_ref());
             if gcd == 1u32 {
                 Self {
-                    sign: sum_n >= 0,
+                    sign: sum_n >= 0u32,
                     numerator: sum_n.unsigned_abs(),
                     denominator: other.denominator * reduced_self_d,
                 }
             } else {
                 Self {
-                    sign: sum_n >= 0,
+                    sign: sum_n >= 0u32,
                     numerator: sum_n.unsigned_abs().div_exact(&gcd),
                     denominator: (other.denominator).div_exact(gcd) * reduced_self_d,
                 }
@@ -163,7 +163,7 @@ impl Add<Rational> for &Rational {
                 + Integer::from_sign_and_abs(other.sign, other.numerator * &self.denominator);
             let sum_d = &self.denominator * other.denominator;
             Rational {
-                sign: sum_n >= 0,
+                sign: sum_n >= 0u32,
                 numerator: sum_n.unsigned_abs(),
                 denominator: sum_d,
             }
@@ -177,13 +177,13 @@ impl Add<Rational> for &Rational {
             gcd.gcd_assign(sum_n.unsigned_abs_ref());
             if gcd == 1u32 {
                 Rational {
-                    sign: sum_n >= 0,
+                    sign: sum_n >= 0u32,
                     numerator: sum_n.unsigned_abs(),
                     denominator: other.denominator * reduced_self_d,
                 }
             } else {
                 Rational {
-                    sign: sum_n >= 0,
+                    sign: sum_n >= 0u32,
                     numerator: sum_n.unsigned_abs().div_exact(&gcd),
                     denominator: (other.denominator).div_exact(gcd) * reduced_self_d,
                 }
@@ -232,7 +232,7 @@ impl Add<&Rational> for &Rational {
                 + Integer::from_sign_and_abs(other.sign, &other.numerator * &self.denominator);
             let sum_d = &self.denominator * &other.denominator;
             Rational {
-                sign: sum_n >= 0,
+                sign: sum_n >= 0u32,
                 numerator: sum_n.unsigned_abs(),
                 denominator: sum_d,
             }
@@ -246,13 +246,13 @@ impl Add<&Rational> for &Rational {
             gcd.gcd_assign(sum_n.unsigned_abs_ref());
             if gcd == 1u32 {
                 Rational {
-                    sign: sum_n >= 0,
+                    sign: sum_n >= 0u32,
                     numerator: sum_n.unsigned_abs(),
                     denominator: &other.denominator * reduced_self_d,
                 }
             } else {
                 Rational {
-                    sign: sum_n >= 0,
+                    sign: sum_n >= 0u32,
                     numerator: sum_n.unsigned_abs().div_exact(&gcd),
                     denominator: (&other.denominator).div_exact(gcd) * reduced_self_d,
                 }
@@ -302,7 +302,7 @@ impl AddAssign<Self> for Rational {
             self.numerator *= &other.denominator;
             let sum_n = Integer::from_sign_and_abs_ref(self.sign, &self.numerator)
                 + Integer::from_sign_and_abs(other.sign, other.numerator * &self.denominator);
-            self.sign = sum_n >= 0;
+            self.sign = sum_n >= 0u32;
             self.numerator = sum_n.unsigned_abs();
             self.denominator *= other.denominator;
         } else {
@@ -311,7 +311,7 @@ impl AddAssign<Self> for Rational {
             let sum_n = Integer::from_sign_and_abs_ref(self.sign, &self.numerator)
                 + Integer::from_sign_and_abs(other.sign, other.numerator * &self.denominator);
             gcd.gcd_assign(sum_n.unsigned_abs_ref());
-            self.sign = sum_n >= 0;
+            self.sign = sum_n >= 0u32;
             if gcd == 1u32 {
                 self.numerator = sum_n.unsigned_abs();
                 self.denominator *= other.denominator;
@@ -364,7 +364,7 @@ impl AddAssign<&Self> for Rational {
             self.numerator *= &other.denominator;
             let sum_n = Integer::from_sign_and_abs_ref(self.sign, &self.numerator)
                 + Integer::from_sign_and_abs(other.sign, &other.numerator * &self.denominator);
-            self.sign = sum_n >= 0;
+            self.sign = sum_n >= 0u32;
             self.numerator = sum_n.unsigned_abs();
             self.denominator *= &other.denominator;
         } else {
@@ -373,7 +373,7 @@ impl AddAssign<&Self> for Rational {
             let sum_n = Integer::from_sign_and_abs_ref(self.sign, &self.numerator)
                 + Integer::from_sign_and_abs(other.sign, &other.numerator * &self.denominator);
             gcd.gcd_assign(sum_n.unsigned_abs_ref());
-            self.sign = sum_n >= 0;
+            self.sign = sum_n >= 0u32;
             if gcd == 1u32 {
                 self.numerator = sum_n.unsigned_abs();
                 self.denominator *= &other.denominator;

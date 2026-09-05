@@ -7,7 +7,6 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{AbsSquared, NegAssign};
-use malachite_base::num::basic::traits::Zero;
 use malachite_nz::gaussian_integer::GaussianInteger;
 use malachite_nz::test_util::generators::gaussian_integer_gen;
 use std::str::FromStr;
@@ -56,7 +55,7 @@ fn neg_properties() {
         assert_eq!(neg.real, -&x.real);
         assert_eq!(neg.imaginary, -&x.imaginary);
         assert_eq!(-&neg, x);
-        assert_eq!(neg == x, x == GaussianInteger::ZERO);
+        assert_eq!(neg == x, x == 0u32);
         assert_eq!((&neg).abs_squared(), (&x).abs_squared());
     });
 }

@@ -83,7 +83,7 @@ use malachite_base::strings::gmp_format::{GmpConversionSpec, GmpFormatArg};
 /// single `%Z` integer conversion and the buffer is always large enough.
 #[inline]
 pub fn format_integer_str(x: &Integer, fmt: &str) -> Option<String> {
-    format_gmp_str(*x < 0, x.unsigned_abs_ref(), None, b'Z', fmt)
+    format_gmp_str(*x < 0u32, x.unsigned_abs_ref(), None, b'Z', fmt)
 }
 
 impl GmpFormatArg for Integer {
@@ -113,6 +113,6 @@ impl GmpFormatArg for Integer {
         if spec.type_chr != b'Z' {
             return None;
         }
-        format_gmp_integer_spec(*self < 0, self.unsigned_abs_ref(), None, spec)
+        format_gmp_integer_spec(*self < 0u32, self.unsigned_abs_ref(), None, spec)
     }
 }

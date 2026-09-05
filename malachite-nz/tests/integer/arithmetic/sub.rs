@@ -110,7 +110,7 @@ fn sub_properties() {
     integer_gen().test_properties(|ref x| {
         assert_eq!(x - Integer::ZERO, *x);
         assert_eq!(Integer::ZERO - x, -x);
-        assert_eq!(x - -x, x << 1);
+        assert_eq!(x - -x, x << 1u32);
         assert_eq!(x - x, 0);
         // The same value through distinct references takes the general path.
         assert_eq!(x - &x.clone(), 0);

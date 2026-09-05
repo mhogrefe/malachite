@@ -129,7 +129,7 @@ impl FloorAssign for Rational {
             self.numerator /= d;
         } else {
             self.numerator.div_round_assign(d, Ceiling);
-            if !self.sign && self.numerator == 0 {
+            if !self.sign && self.numerator == 0u32 {
                 self.sign = true;
             }
         }

@@ -59,7 +59,7 @@ impl Float {
     #[inline]
     pub fn pi_over_6_prec_round(prec: u64, rm: RoundingMode) -> (Self, Ordering) {
         let (pi_over_3, o) = Self::pi_over_3_prec_round(prec, rm);
-        (pi_over_3 >> 1u64, o)
+        (pi_over_3 >> 1u32, o)
     }
 
     /// Returns an approximation of $\pi/6$, with the given precision and rounded to the nearest

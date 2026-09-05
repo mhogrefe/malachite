@@ -22,7 +22,7 @@ fn mul_shr_round_integers(
     bits: u64,
     rm: RoundingMode,
 ) -> (Integer, Ordering) {
-    if *x == 0 || *y == 0 {
+    if *x == 0u32 || *y == 0u32 {
         return (Integer::ZERO, Equal);
     }
     if rm == Exact {
@@ -34,7 +34,7 @@ fn mul_shr_round_integers(
             "Product right shift is not exact: {x} * {y} >> {bits}"
         );
     }
-    let negative = (*x < 0) != (*y < 0);
+    let negative = (*x < 0u32) != (*y < 0u32);
     let (mag, o) = mul_shr_round_ref_ref(
         x.unsigned_abs_ref(),
         y.unsigned_abs_ref(),

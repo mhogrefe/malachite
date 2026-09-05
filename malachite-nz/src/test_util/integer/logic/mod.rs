@@ -12,8 +12,8 @@ use malachite_base::num::logic::traits::{BitConvertible, BitIterable};
 use std::iter::repeat;
 
 pub fn integer_op_bits(bit_fn: &dyn Fn(bool, bool) -> bool, x: &Integer, y: &Integer) -> Integer {
-    let x_negative = *x < 0;
-    let y_negative = *y < 0;
+    let x_negative = *x < 0u32;
+    let y_negative = *y < 0u32;
     let bit_zip: Box<dyn Iterator<Item = (bool, bool)>> = if x.bits().count() >= y.bits().count() {
         Box::new(x.bits().zip(y.bits().chain(repeat(y_negative))))
     } else {
@@ -23,8 +23,8 @@ pub fn integer_op_bits(bit_fn: &dyn Fn(bool, bool) -> bool, x: &Integer, y: &Int
 }
 
 pub fn integer_op_limbs(limb_fn: &dyn Fn(Limb, Limb) -> Limb, x: &Integer, y: &Integer) -> Integer {
-    let x_extension = if *x < 0 { Limb::MAX } else { 0 };
-    let y_extension = if *y < 0 { Limb::MAX } else { 0 };
+    let x_extension = if *x < 0u32 { Limb::MAX } else { 0 };
+    let y_extension = if *y < 0u32 { Limb::MAX } else { 0 };
     let limb_zip: Box<dyn Iterator<Item = (Limb, Limb)>> =
         if x.twos_complement_limbs().count() >= y.twos_complement_limbs().count() {
             Box::new(
