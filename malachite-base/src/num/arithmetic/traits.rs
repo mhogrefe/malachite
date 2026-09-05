@@ -899,6 +899,18 @@ pub trait ExpAssign {
     fn exp_assign(&mut self);
 }
 
+/// Computes $\cos(x)$, the cosine of a number.
+pub trait Cos {
+    type Output;
+
+    fn cos(self) -> Self::Output;
+}
+
+/// Replaces a number with its cosine, $\cos(x)$.
+pub trait CosAssign {
+    fn cos_assign(&mut self);
+}
+
 /// Computes $e^x-1$, the exponential of a number, minus one.
 pub trait ExpXMinus1 {
     type Output;

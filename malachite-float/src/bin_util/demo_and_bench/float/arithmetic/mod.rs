@@ -20,6 +20,7 @@ pub(crate) fn register(runner: &mut Runner) {
     cbrt::register(runner);
     compound::register(runner);
     conjugate::register(runner);
+    cos::register(runner);
     div::register(runner);
     dot::register(runner);
     exp::register(runner);
@@ -80,6 +81,7 @@ mod canonicalize_unit;
 mod cbrt;
 mod compound;
 mod conjugate;
+mod cos;
 mod div;
 mod dot;
 mod exp;

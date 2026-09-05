@@ -231,6 +231,13 @@ documented by git history.
 
 - `Float` implements the new `IsGaussianInteger` and `IsReal` traits; a `Float` is real unless
   it is `NaN` or infinite.
+- The first trigonometric function: `Cos` and `CosAssign` (new traits in malachite-base) for
+  `Float`, with the usual `cos_prec_round`, `cos_prec`, `cos_round`, and `_ref`/`_assign`
+  variants. Arguments of magnitude 4 or more are reduced modulo $2\pi$, so the cost grows with
+  the input's exponent as well as with the precision. Inputs extremely close to an odd multiple
+  of $\pi/2$ take a dedicated path that computes the distance to that multiple exactly, so the
+  result is correct, and underflows correctly, even when the input agrees with the multiple to
+  more than $2^{30}$ bits (a regime MPFR's wider exponent range never reaches).
 - Conversions between `Float` and the Gaussian types: `TryFrom` and `ConvertibleFrom`
   implementations converting `GaussianInteger` and `GaussianRational` to `Float` (real and, for
   the rational case, dyadic; minimal precision) and `Float` to either Gaussian type (finite,

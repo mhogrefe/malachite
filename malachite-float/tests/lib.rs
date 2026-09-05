@@ -74,6 +74,7 @@ pub mod float {
         pub mod cbrt;
         pub mod compound;
         pub mod conjugate;
+        pub mod cos;
         pub mod div;
         pub mod dot;
         pub mod exp;

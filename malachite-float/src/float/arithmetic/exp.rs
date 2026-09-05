@@ -82,7 +82,7 @@ fn mpz_normalize2(z: Integer, expz: i64, target: i64) -> (Integer, i64) {
 // 1, giving 2^63 * 2^(1-64) = 1).
 //
 // This is equivalent to `mpfr_get_z_2exp` from MPFR 4.2.2.
-fn get_z_2exp(x: Float) -> (Integer, i64) {
+pub(crate) fn get_z_2exp(x: Float) -> (Integer, i64) {
     if let Finite {
         sign,
         exponent,

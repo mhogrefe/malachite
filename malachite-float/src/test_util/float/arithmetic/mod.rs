@@ -10,6 +10,7 @@ pub mod add;
 pub mod add_mul;
 pub mod agm;
 pub mod compound;
+pub mod cos;
 pub mod div;
 pub mod dot;
 pub mod exp;

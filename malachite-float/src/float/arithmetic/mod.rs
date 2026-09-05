@@ -168,6 +168,10 @@ pub mod compound;
 /// [`ConjugateAssign`](malachite_base::num::arithmetic::traits::ConjugateAssign), traits for
 /// computing the complex conjugate of a number. A real number is its own conjugate.
 pub mod conjugate;
+/// Implementations of [`Cos`](malachite_base::num::arithmetic::traits::Cos) and
+/// [`CosAssign`](malachite_base::num::arithmetic::traits::CosAssign), traits for computing the
+/// cosine of [`Float`](super::Float)s.
+pub mod cos;
 /// Division of [`Float`](super::Float)s, of [`Float`](super::Float)s by
 /// [`Rational`](malachite_q::Rational)s, and of [`Rational`](malachite_q::Rational)s by
 /// [`Float`](super::Float)s.
