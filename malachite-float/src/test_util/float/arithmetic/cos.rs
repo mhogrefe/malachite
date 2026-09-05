@@ -55,3 +55,19 @@ pub fn rug_cos_rational_prec_round(x: &Rational, prec: u64, rm: Round) -> (rug::
 pub fn rug_cos_rational_prec(x: &Rational, prec: u64) -> (rug::Float, Ordering) {
     rug_cos_rational_prec_round(x, prec, Round::Nearest)
 }
+
+// `u` must fit in a `u32`, the type rug takes.
+pub fn rug_cos_with_period_prec_round(
+    x: &rug::Float,
+    u: u64,
+    prec: u64,
+    rm: Round,
+) -> (rug::Float, Ordering) {
+    let mut c = rug::Float::with_val(u32::exact_from(prec), 0);
+    let o = c.assign_round(x.cos_u_ref(u32::exact_from(u)), rm);
+    (c, o)
+}
+
+pub fn rug_cos_with_period_prec(x: &rug::Float, u: u64, prec: u64) -> (rug::Float, Ordering) {
+    rug_cos_with_period_prec_round(x, u, prec, Round::Nearest)
+}

@@ -241,6 +241,17 @@ documented by git history.
 - `primitive_float_cos` and `primitive_float_cos_rational`, the correctly rounded cosine of an
   `f32` or `f64`, or of a `Rational` as an `f32` or `f64`, alongside the existing
   `primitive_float_exp` and `primitive_float_exp_rational`.
+- Fixed `Float` remainders (`rem` and `ieee_remainder` families) by a divisor of more than
+  $2^{30}$ bits with an odd mantissa, which overflowed to infinity: the integer remainder was
+  rounded to a `Float` before the final shift brought it back into range. `cos` of an argument
+  with a near-maximal exponent reduces modulo such a $2\pi$ and was affected.
+- `cos_with_period_prec_round`, `cos_with_period_prec`, and `cos_with_period_round` (with `_ref` and `_assign` variants),
+  a port of `mpfr_cosu`: the cosine of a `Float` measured in $u$ths of a turn, so that `u = 360`
+  is degrees. Multiples of a quarter or a sixth of a turn are exact (an odd quarter turn is
+  $+0.0$, as IEEE 754-2019's `cosPi` specifies), and eighths, twelfths, fifths, and tenths of a
+  turn are computed from a single correctly rounded constant ($\sqrt2$, $\sqrt3$, or $\varphi$)
+  rather than from $\pi$ and a cosine. Inputs within $2^{-2^{30}}$ of an odd quarter turn
+  underflow correctly.
 - `cos_rational_prec_round` and `cos_rational_prec` (with `_ref` variants), the correctly
   rounded cosine of a `Rational` as a `Float`, alongside the `exp_rational_*` family. Since
   cosine is not monotonic, the result is bracketed by a Lipschitz bound around the cosine of a

@@ -7085,6 +7085,59 @@ pub fn exhaustive_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_14()
     ))
 }
 
+// Whether `(x, u, prec, rm)` is a valid input to `Float::cos_with_period_prec_round`: `Exact` is
+// only allowed when the result really is exact (x zero or non-finite, u zero, or x/u a multiple of
+// 1/4 or, when 3 divides u, of 1/6).
+pub fn cos_with_period_prec_round_valid(x: &Float, u: u64, prec: u64, rm: RoundingMode) -> bool {
+    rm != Exact || x.cos_with_period_prec_round_ref(u, prec, Floor).1 == Equal
+}
+
+// Whether `(x, u, rm)` is a valid input to `Float::cos_with_period_round`.
+pub fn cos_with_period_round_valid(x: &Float, u: u64, rm: RoundingMode) -> bool {
+    rm != Exact || x.cos_with_period_round_ref(u, Floor).1 == Equal
+}
+
+pub fn exhaustive_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_15()
+-> It<(Float, u64, u64, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(
+        lex_pairs(
+            exhaustive_triples(
+                exhaustive_floats(),
+                exhaustive_unsigneds(),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, u, prec), rm)| cos_with_period_prec_round_valid(x, u, prec, rm)),
+    ))
+}
+
+pub fn exhaustive_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_16()
+-> It<(Float, u64, u64, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(
+        lex_pairs(
+            exhaustive_triples(
+                exhaustive_extreme_floats(),
+                exhaustive_unsigneds(),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, u, prec), rm)| cos_with_period_prec_round_valid(x, u, prec, rm)),
+    ))
+}
+
+pub fn exhaustive_float_unsigned_rounding_mode_triple_gen_var_38() -> It<(Float, u64, RoundingMode)>
+{
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(exhaustive_floats(), exhaustive_unsigneds()),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, u), rm)| cos_with_period_round_valid(x, u, rm)),
+    ))
+}
+
 pub fn exhaustive_float_signed_unsigned_rounding_mode_quadruple_gen_var_13()
 -> It<(Float, i64, u64, RoundingMode)> {
     reshape_3_1_to_4(Box::new(

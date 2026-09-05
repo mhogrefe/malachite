@@ -251,14 +251,20 @@ fn rem1_core(
         // The result is r*2^sh/den. In the den = 1 case, rounding r to prec bits gives an exponent
         // of e or e + 1 (on a rounding carry), so when e is strictly inside the representable range
         // no underflow or overflow is possible: round r once and shift exactly, avoiding the
-        // Rational construction, whose denominator has |sh| bits when sh is negative. At the range
-        // edges, and whenever den is not 1, fall back to the Rational conversion, whose single
-        // rounding handles underflow. (Both paths are a single rounding of the same value, so they
-        // agree wherever both apply.)
+        // Rational construction, whose denominator has |sh| bits when sh is negative. The unshifted
+        // rounding of r must be representable too: r can have as many bits as the divisor's
+        // mantissa, which for a divisor of more than 2^30 bits would overflow the intermediate
+        // `Float` before the shift brings it back into range. At the range edges, and whenever den
+        // is not 1, fall back to the Rational conversion, whose single rounding handles underflow.
+        // (Both paths are a single rounding of the same value, so they agree wherever both apply.)
         let sh = min(ex, ey);
         let (rem, o) = if *den == 1u32 {
-            let e = i64::exact_from(r.significant_bits()) + sh;
-            if e > Float::MIN_EXPONENT_I64 && e < Float::MAX_EXPONENT_I64 {
+            let r_bits = i64::exact_from(r.significant_bits());
+            let e = r_bits + sh;
+            if e > Float::MIN_EXPONENT_I64
+                && e < Float::MAX_EXPONENT_I64
+                && r_bits < Float::MAX_EXPONENT_I64
+            {
                 let (rem, o) = Float::from_integer_prec_round(r, prec, rm);
                 (rem << sh, o)
             } else {

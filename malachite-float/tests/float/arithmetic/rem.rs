@@ -3479,3 +3479,25 @@ fn primitive_float_rem_properties() {
         assert_eq!(NiceFloat(r), NiceFloat(x % y));
     });
 }
+
+// Regression test: with a divisor of more than 2^30 bits whose mantissa is odd, the integer
+// remainder has more than 2^30 bits, and the fast path used to round it to a `Float` before
+// applying the shift, overflowing the intermediate to infinity even though the result is tiny. This
+// is the shape of `cos` reducing a near-maximal-exponent argument modulo 2 pi.
+#[test]
+fn test_ieee_remainder_huge_precision_divisor() {
+    let x = Float::from_unsigned_prec(3u32, 64).0 << ((1u64 << 30) - 3);
+    let c = (Float::ONE << 2u32)
+        .add_prec_round(Float::ONE >> ((1u64 << 30) + 70), (1u64 << 30) + 73, Exact)
+        .0;
+    let (r, o) = x.ieee_remainder_prec_round_ref_ref(&c, 77, Nearest);
+    assert!(r.is_finite());
+    assert!(r.le_abs(&(&c >> 1u32)));
+    let x_q = Rational::exact_from(&x);
+    let c_q = Rational::exact_from(&c);
+    let q = Integer::rounding_from(&x_q / &c_q, Nearest).0;
+    let r_exact = x_q - c_q * Rational::from(q);
+    let (r_expected, o_expected) = Float::from_rational_prec_round(r_exact, 77, Nearest);
+    assert_eq!(ComparableFloatRef(&r), ComparableFloatRef(&r_expected));
+    assert_eq!(o, o_expected);
+}
