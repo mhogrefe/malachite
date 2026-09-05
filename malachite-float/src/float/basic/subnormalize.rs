@@ -126,7 +126,7 @@ impl Float {
     ///
     /// // In a format with 4 significand bits and minimum normal exponent -5, the value 13 * 2^-10
     /// // is subnormal, with only 3 significand bits available; rounding ties to even.
-    /// let mut x = Float::from_natural_prec(Natural::from(13u32), 4).0 >> 10u64;
+    /// let mut x = Float::from_natural_prec(Natural::from(13u32), 4).0 >> 10u32;
     /// assert_eq!(x.to_string(), "0.0127");
     /// let o = x.subnormalize_assign(Equal, -5, Nearest);
     /// assert_eq!(x.to_string(), "0.0117");
@@ -308,7 +308,7 @@ impl Float {
     /// use malachite_nz::natural::Natural;
     ///
     /// // A value at least 2^(normal_exp_min - 1) in absolute value is unchanged.
-    /// let x = Float::from_natural_prec(Natural::from(8u32), 4).0 >> 4u64;
+    /// let x = Float::from_natural_prec(Natural::from(8u32), 4).0 >> 4u32;
     /// let (y, o) = x.subnormalize(Equal, -5, Nearest);
     /// assert_eq!(y.to_string(), "0.500");
     /// assert_eq!(o, Equal);
@@ -316,7 +316,7 @@ impl Float {
     /// // Emulating IEEE 754 binary64: (2^52 + 1) * 2^-1125 rounds to the second-smallest
     /// // subnormal double.
     /// let x =
-    ///     Float::from_natural_prec(Natural::power_of_2(52u64) + Natural::ONE, 53).0 >> 1125u64;
+    ///     Float::from_natural_prec(Natural::power_of_2(52u64) + Natural::ONE, 53).0 >> 1125u32;
     /// let (y, o) = x.subnormalize(Equal, -1021, Nearest);
     /// assert_eq!(y.to_string(), "9.8813129168249309e-324");
     /// assert_eq!(NiceFloat(f64::exact_from(&y)), NiceFloat(1.0e-323));
@@ -377,7 +377,7 @@ impl Float {
     /// use malachite_nz::natural::Natural;
     ///
     /// // Values smaller than half the minimum subnormal round to zero.
-    /// let x = Float::from_natural_prec(Natural::from(8u32), 4).0 >> 15u64;
+    /// let x = Float::from_natural_prec(Natural::from(8u32), 4).0 >> 15u32;
     /// assert_eq!(x.to_string(), "0.000244");
     /// let (y, o) = x.subnormalize_ref(Equal, -5, Nearest);
     /// assert_eq!(y.to_string(), "0.0");

@@ -220,7 +220,7 @@ impl Integer {
     /// assert_eq!(remainder, 1);
     ///
     /// let mut n = Integer::from(-123);
-    /// n.mutate_unsigned_abs(|x| *x >>= 10);
+    /// n.mutate_unsigned_abs(|x| *x >>= 10u32);
     /// assert_eq!(n, 0);
     /// ```
     pub fn mutate_unsigned_abs<F: FnOnce(&mut Natural) -> T, T>(&mut self, f: F) -> T {

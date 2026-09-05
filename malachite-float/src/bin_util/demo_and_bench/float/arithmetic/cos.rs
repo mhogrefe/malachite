@@ -7,9 +7,15 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{Cos, CosAssign};
+use malachite_base::num::basic::floats::PrimitiveFloat;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
+use malachite_base::num::float::NiceFloat;
+use malachite_base::test_util::bench::bucketers::primitive_float_bucketer;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
+use malachite_base::test_util::generators::primitive_float_gen;
 use malachite_base::test_util::runner::Runner;
+use malachite_float::float::arithmetic::cos::primitive_float_cos;
 use malachite_float::test_util::bench::bucketers::{
     float_complexity_bucketer, pair_2_float_complexity_bucketer,
     pair_2_triple_1_2_float_primitive_int_max_complexity_bucketer,
@@ -22,7 +28,7 @@ use malachite_float::test_util::generators::{
     float_unsigned_rounding_mode_triple_gen_var_36,
     float_unsigned_rounding_mode_triple_gen_var_36_rm,
 };
-use malachite_float::{ComparableFloat, ComparableFloatRef};
+use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_cos);
@@ -42,6 +48,7 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_cos_round_debug);
     register_demo!(runner, demo_float_cos_round_ref);
     register_demo!(runner, demo_float_cos_round_assign);
+    register_primitive_float_demos!(runner, demo_primitive_float_cos);
     register_demo!(runner, demo_float_cos_prec_round);
     register_demo!(runner, demo_float_cos_prec_round_debug);
     register_demo!(runner, demo_float_cos_prec_round_ref);
@@ -52,6 +59,7 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_float_cos_assign);
     register_bench!(runner, benchmark_float_cos_prec_round_evaluation_strategy);
     register_bench!(runner, benchmark_float_cos_prec_round_library_comparison);
+    register_primitive_float_benches!(runner, benchmark_primitive_float_cos);
 }
 
 fn demo_float_cos(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -388,5 +396,44 @@ fn benchmark_float_cos_prec_round_library_comparison(
                 no_out!(rug_cos_prec_round(&x, prec, rm));
             }),
         ],
+    );
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn demo_primitive_float_cos<T: PrimitiveFloat>(gm: GenMode, config: &GenConfig, limit: usize)
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    for x in primitive_float_gen::<T>().get(gm, config).take(limit) {
+        println!(
+            "primitive_float_cos({}) = {}",
+            NiceFloat(x),
+            NiceFloat(primitive_float_cos(x))
+        );
+    }
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn benchmark_primitive_float_cos<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    run_benchmark(
+        &format!("primitive_float_cos({})", T::NAME),
+        BenchmarkType::Single,
+        primitive_float_gen::<T>().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &primitive_float_bucketer("x"),
+        &mut [("malachite", &mut |x| {
+            no_out!(primitive_float_cos(x));
+        })],
     );
 }

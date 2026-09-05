@@ -432,7 +432,7 @@ pub mod primitive_float_from_natural;
 /// );
 /// assert_eq!(u64::try_from(&Natural::from(123u32)), Ok(123));
 /// assert_eq!(
-///     u64::try_from(&(Natural::ONE << 100)),
+///     u64::try_from(&(Natural::ONE << 100u32)),
 ///     Err(UnsignedFromNaturalError)
 /// );
 ///
@@ -448,7 +448,7 @@ pub mod primitive_float_from_natural;
 /// );
 /// assert_eq!(i64::try_from(&Natural::from(123u32)), Ok(123));
 /// assert_eq!(
-///     i64::try_from(&(Natural::ONE << 100)),
+///     i64::try_from(&(Natural::ONE << 100u32)),
 ///     Err(SignedFromNaturalError)
 /// );
 /// ```
@@ -468,7 +468,7 @@ pub mod primitive_float_from_natural;
 /// assert_eq!(u8::wrapping_from(&Natural::from(123u32)), 123);
 /// assert_eq!(u8::wrapping_from(&Natural::from(10u32).pow(12)), 0);
 /// assert_eq!(u64::wrapping_from(&Natural::from(123u32)), 123);
-/// assert_eq!(u64::wrapping_from(&(Natural::ONE << 100)), 0);
+/// assert_eq!(u64::wrapping_from(&(Natural::ONE << 100u32)), 0);
 ///
 /// assert_eq!(i32::wrapping_from(&Natural::from(123u32)), 123);
 /// assert_eq!(
@@ -478,7 +478,7 @@ pub mod primitive_float_from_natural;
 /// assert_eq!(i8::wrapping_from(&Natural::from(123u32)), 123);
 /// assert_eq!(i8::wrapping_from(&Natural::from(10u32).pow(12)), 0);
 /// assert_eq!(i64::wrapping_from(&Natural::from(123u32)), 123);
-/// assert_eq!(i64::wrapping_from(&(Natural::ONE << 100)), 0);
+/// assert_eq!(i64::wrapping_from(&(Natural::ONE << 100u32)), 0);
 /// ```
 ///
 /// # saturating_from
@@ -497,7 +497,7 @@ pub mod primitive_float_from_natural;
 /// assert_eq!(u8::saturating_from(&Natural::from(10u32).pow(12)), 255);
 /// assert_eq!(u64::saturating_from(&Natural::from(123u32)), 123);
 /// assert_eq!(
-///     u64::saturating_from(&(Natural::ONE << 100)),
+///     u64::saturating_from(&(Natural::ONE << 100u32)),
 ///     18446744073709551615
 /// );
 ///
@@ -510,7 +510,7 @@ pub mod primitive_float_from_natural;
 /// assert_eq!(i8::saturating_from(&Natural::from(10u32).pow(12)), 127);
 /// assert_eq!(i64::saturating_from(&Natural::from(123u32)), 123);
 /// assert_eq!(
-///     i64::saturating_from(&(Natural::ONE << 100)),
+///     i64::saturating_from(&(Natural::ONE << 100u32)),
 ///     9223372036854775807
 /// );
 /// ```
@@ -533,7 +533,7 @@ pub mod primitive_float_from_natural;
 ///     (0, true)
 /// );
 /// assert_eq!(u64::overflowing_from(&Natural::from(123u32)), (123, false));
-/// assert_eq!(u64::overflowing_from(&(Natural::ONE << 100)), (0, true));
+/// assert_eq!(u64::overflowing_from(&(Natural::ONE << 100u32)), (0, true));
 ///
 /// assert_eq!(i32::overflowing_from(&Natural::from(123u32)), (123, false));
 /// assert_eq!(
@@ -546,7 +546,7 @@ pub mod primitive_float_from_natural;
 ///     (0, true)
 /// );
 /// assert_eq!(i64::overflowing_from(&Natural::from(123u32)), (123, false));
-/// assert_eq!(i64::overflowing_from(&(Natural::ONE << 100)), (0, true));
+/// assert_eq!(i64::overflowing_from(&(Natural::ONE << 100u32)), (0, true));
 /// ```
 ///
 /// # convertible_from
@@ -561,14 +561,14 @@ pub mod primitive_float_from_natural;
 /// assert_eq!(u8::convertible_from(&Natural::from(123u32)), true);
 /// assert_eq!(u8::convertible_from(&Natural::from(10u32).pow(12)), false);
 /// assert_eq!(u64::convertible_from(&Natural::from(123u32)), true);
-/// assert_eq!(u64::convertible_from(&(Natural::ONE << 100)), false);
+/// assert_eq!(u64::convertible_from(&(Natural::ONE << 100u32)), false);
 ///
 /// assert_eq!(i32::convertible_from(&Natural::from(123u32)), true);
 /// assert_eq!(i32::convertible_from(&Natural::from(10u32).pow(12)), false);
 /// assert_eq!(i8::convertible_from(&Natural::from(123u32)), true);
 /// assert_eq!(i8::convertible_from(&Natural::from(10u32).pow(12)), false);
 /// assert_eq!(i64::convertible_from(&Natural::from(123u32)), true);
-/// assert_eq!(i64::convertible_from(&(Natural::ONE << 100)), false);
+/// assert_eq!(i64::convertible_from(&(Natural::ONE << 100u32)), false);
 /// ```
 pub mod primitive_int_from_natural;
 /// Implementations of traits for conversions between Python integers and

@@ -8,15 +8,20 @@
 
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{Cos, CosAssign};
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeZero, One, Zero,
 };
 use malachite_base::num::comparison::traits::PartialOrdAbs;
-use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
+use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
-use malachite_base::test_util::generators::unsigned_rounding_mode_pair_gen_var_3;
+use malachite_base::test_util::generators::{
+    primitive_float_gen, unsigned_rounding_mode_pair_gen_var_3,
+};
+use malachite_float::float::arithmetic::cos::primitive_float_cos;
 use malachite_float::test_util::common::{
     parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
 };
@@ -1555,4 +1560,86 @@ fn test_cos_underflow() {
     let (c, o) = x_hi.cos_prec_round_ref(10, Nearest);
     assert_eq!(ComparableFloat(c), ComparableFloat(Float::NEGATIVE_ZERO));
     assert_eq!(o, Greater);
+}
+
+#[test]
+#[allow(clippy::type_repetition_in_bounds)]
+fn test_primitive_float_cos() {
+    fn test<T: PrimitiveFloat>(x: T, out: T)
+    where
+        Float: From<T> + PartialOrd<T>,
+        for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    {
+        assert_eq!(NiceFloat(primitive_float_cos(x)), NiceFloat(out));
+    }
+    test::<f32>(f32::NAN, f32::NAN);
+    test::<f32>(f32::INFINITY, f32::NAN);
+    test::<f32>(f32::NEGATIVE_INFINITY, f32::NAN);
+    test::<f32>(0.0, 1.0);
+    test::<f32>(-0.0, 1.0);
+    test::<f32>(1.0, 0.5403023);
+    test::<f32>(-1.0, 0.5403023);
+    test::<f32>(0.5, 0.87758255);
+    test::<f32>(-0.5, 0.87758255);
+    test::<f32>(2.0, -0.41614684);
+    test::<f32>(-2.0, -0.41614684);
+    test::<f32>(core::f32::consts::PI, -1.0);
+    test::<f32>(core::f32::consts::FRAC_PI_2, -4.371139e-8);
+    test::<f32>(core::f32::consts::E, -0.91173387);
+    test::<f32>(100.0, 0.8623189);
+    test::<f32>(1.0e10, 0.87311965);
+    test::<f32>(1.0e30, -0.6116048);
+    test::<f32>(3.4028235e38, 0.853021);
+    test::<f32>(1.1754944e-38, 1.0);
+
+    test::<f64>(f64::NAN, f64::NAN);
+    test::<f64>(f64::INFINITY, f64::NAN);
+    test::<f64>(f64::NEGATIVE_INFINITY, f64::NAN);
+    test::<f64>(0.0, 1.0);
+    test::<f64>(-0.0, 1.0);
+    test::<f64>(1.0, 0.5403023058681398);
+    test::<f64>(-1.0, 0.5403023058681398);
+    test::<f64>(0.5, 0.8775825618903728);
+    test::<f64>(-0.5, 0.8775825618903728);
+    test::<f64>(2.0, -0.4161468365471424);
+    test::<f64>(-2.0, -0.4161468365471424);
+    test::<f64>(core::f64::consts::PI, -1.0);
+    test::<f64>(core::f64::consts::FRAC_PI_2, 6.123233995736766e-17);
+    test::<f64>(core::f64::consts::E, -0.9117339147869651);
+    test::<f64>(100.0, 0.8623188722876839);
+    test::<f64>(1.0e10, 0.873119622676856);
+    test::<f64>(1.0e100, 0.9247242387519338);
+    test::<f64>(1.0e300, -0.5753861119575491);
+    test::<f64>(1.7976931348623157e308, -0.9999876894265599);
+    test::<f64>(2.2250738585072014e-308, 1.0);
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn primitive_float_cos_properties_helper<T: PrimitiveFloat>()
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    primitive_float_gen::<T>().test_properties(|x| {
+        let c = primitive_float_cos(x);
+        // cos is NaN exactly for NaN and infinite inputs, and otherwise lies in [-1, 1].
+        assert_eq!(c.is_nan(), !x.is_finite());
+        if x.is_finite() {
+            assert!(c >= T::NEGATIVE_ONE && c <= T::ONE);
+            // cos is even
+            assert_eq!(NiceFloat(primitive_float_cos(-x)), NiceFloat(c));
+            // the result is the correctly rounded cosine, as computed by MPFR at the same precision
+            let rug_x = rug::Float::with_val(
+                u32::exact_from(T::MANTISSA_WIDTH + 1),
+                &rug::Float::exact_from(&Float::from(x)),
+            );
+            let rug_c: T = T::exact_from(&<Float as From<&rug::Float>>::from(&rug_x.cos()));
+            assert_eq!(NiceFloat(rug_c), NiceFloat(c));
+        }
+    });
+}
+
+#[test]
+fn primitive_float_cos_properties() {
+    apply_fn_to_primitive_floats!(primitive_float_cos_properties_helper);
 }

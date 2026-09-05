@@ -18,10 +18,10 @@
 // inside a Ziv loop. The `mpfr_cos_fast` tier, used for precisions at or above
 // `MPFR_SINCOS_THRESHOLD` and built on `mpfr_sincos_fast`, is not ported yet.
 
-use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::float::arithmetic::exp::{get_z_2exp, one_neighbor};
 use crate::float::arithmetic::round_near_x::float_round_near_x;
+use crate::{Float, emulate_float_to_float_fn};
 use core::cmp::Ordering::{self, Equal};
 use core::cmp::{max, min};
 use malachite_base::fail_on_untested_path;
@@ -29,6 +29,7 @@ use malachite_base::num::arithmetic::traits::{
     CeilingLogBase2, Cos, CosAssign, DivRoundAssign, FloorSqrt, ModPowerOf2, NegAssign, Parity,
     PowerOf2, Square, UnsignedAbs,
 };
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{NaN as NaNTrait, One};
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
@@ -1289,4 +1290,51 @@ impl CosAssign for Float {
         let prec = self.significant_bits();
         self.cos_prec_round_assign(prec, Nearest);
     }
+}
+
+/// Computes $\cos x$, the cosine of a primitive float. Using this function is more accurate than
+/// using the default `cos` function or the one provided by `libm`.
+///
+/// $$
+/// f(x) = \cos x+\varepsilon.
+/// $$
+/// - If $x$ is not finite, $\varepsilon$ may be ignored or assumed to be 0.
+/// - If $x$ is finite, then $|\varepsilon| < 2^{\lfloor\log_2 |\cos x|\rfloor-p}$, where $p$ is the
+///   precision of the output (24 if `T` is a [`f32`] and 53 if `T` is a [`f64`]).
+///
+/// Special cases:
+/// - $f(\text{NaN})=\text{NaN}$
+/// - $f(\pm\infty)=\text{NaN}$
+/// - $f(\pm0.0)=1.0$
+///
+/// Overflow and underflow are not possible: the result lies in $[-1, 1]$, and no [`f32`] or [`f64`]
+/// is close enough to an odd multiple of $\pi/2$ for its cosine to be subnormal.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::NegativeInfinity;
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::cos::primitive_float_cos;
+///
+/// assert!(primitive_float_cos(f32::NAN).is_nan());
+/// assert!(primitive_float_cos(f32::INFINITY).is_nan());
+/// assert!(primitive_float_cos(f32::NEGATIVE_INFINITY).is_nan());
+/// assert_eq!(NiceFloat(primitive_float_cos(0.0f32)), NiceFloat(1.0));
+/// assert_eq!(NiceFloat(primitive_float_cos(1.0f32)), NiceFloat(0.5403023));
+/// assert_eq!(
+///     NiceFloat(primitive_float_cos(1.0f64)),
+///     NiceFloat(0.5403023058681398)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_cos<T: PrimitiveFloat>(x: T) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_float_to_float_fn(Float::cos_prec, x)
 }

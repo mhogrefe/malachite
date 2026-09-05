@@ -40,7 +40,7 @@ impl Add<Self> for Integer {
     /// assert_eq!(Integer::from(-123) + Integer::ZERO, -123);
     /// assert_eq!(Integer::from(-123) + Integer::from(456), 333);
     /// assert_eq!(
-    ///     -Integer::from(10u32).pow(12) + (Integer::from(10u32).pow(12) << 1),
+    ///     -Integer::from(10u32).pow(12) + (Integer::from(10u32).pow(12) << 1u32),
     ///     1000000000000u64
     /// );
     /// ```
@@ -82,7 +82,7 @@ impl Add<&Self> for Integer {
     /// assert_eq!(Integer::from(-123) + &Integer::ZERO, -123);
     /// assert_eq!(Integer::from(-123) + &Integer::from(456), 333);
     /// assert_eq!(
-    ///     -Integer::from(10u32).pow(12) + &(Integer::from(10u32).pow(12) << 1),
+    ///     -Integer::from(10u32).pow(12) + &(Integer::from(10u32).pow(12) << 1u32),
     ///     1000000000000u64
     /// );
     /// ```
@@ -120,7 +120,7 @@ impl Add<Integer> for &Integer {
     /// assert_eq!(&Integer::from(-123) + Integer::ZERO, -123);
     /// assert_eq!(&Integer::from(-123) + Integer::from(456), 333);
     /// assert_eq!(
-    ///     &-Integer::from(10u32).pow(12) + (Integer::from(10u32).pow(12) << 1),
+    ///     &-Integer::from(10u32).pow(12) + (Integer::from(10u32).pow(12) << 1u32),
     ///     1000000000000u64
     /// );
     /// ```
@@ -158,7 +158,7 @@ impl Add<&Integer> for &Integer {
     /// assert_eq!(&Integer::from(-123) + &Integer::ZERO, -123);
     /// assert_eq!(&Integer::from(-123) + &Integer::from(456), 333);
     /// assert_eq!(
-    ///     &-Integer::from(10u32).pow(12) + &(Integer::from(10u32).pow(12) << 1),
+    ///     &-Integer::from(10u32).pow(12) + &(Integer::from(10u32).pow(12) << 1u32),
     ///     1000000000000u64
     /// );
     /// ```

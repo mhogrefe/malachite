@@ -651,7 +651,7 @@ impl Add<Self> for Natural {
     /// assert_eq!(Natural::from(123u32) + Natural::ZERO, 123);
     /// assert_eq!(Natural::from(123u32) + Natural::from(456u32), 579);
     /// assert_eq!(
-    ///     Natural::from(10u32).pow(12) + (Natural::from(10u32).pow(12) << 1),
+    ///     Natural::from(10u32).pow(12) + (Natural::from(10u32).pow(12) << 1u32),
     ///     3000000000000u64
     /// );
     /// ```
@@ -688,7 +688,7 @@ impl<'a> Add<&'a Self> for Natural {
     /// assert_eq!(Natural::from(123u32) + &Natural::ZERO, 123);
     /// assert_eq!(Natural::from(123u32) + &Natural::from(456u32), 579);
     /// assert_eq!(
-    ///     Natural::from(10u32).pow(12) + &(Natural::from(10u32).pow(12) << 1),
+    ///     Natural::from(10u32).pow(12) + &(Natural::from(10u32).pow(12) << 1u32),
     ///     3000000000000u64
     /// );
     /// ```
@@ -726,7 +726,7 @@ impl Add<Natural> for &Natural {
     /// assert_eq!(&Natural::from(123u32) + Natural::ZERO, 123);
     /// assert_eq!(&Natural::from(123u32) + Natural::from(456u32), 579);
     /// assert_eq!(
-    ///     &Natural::from(10u32).pow(12) + (Natural::from(10u32).pow(12) << 1),
+    ///     &Natural::from(10u32).pow(12) + (Natural::from(10u32).pow(12) << 1u32),
     ///     3000000000000u64
     /// );
     /// ```
@@ -764,7 +764,7 @@ impl Add<&Natural> for &Natural {
     /// assert_eq!(&Natural::from(123u32) + &Natural::ZERO, 123);
     /// assert_eq!(&Natural::from(123u32) + &Natural::from(456u32), 579);
     /// assert_eq!(
-    ///     &Natural::from(10u32).pow(12) + &(Natural::from(10u32).pow(12) << 1),
+    ///     &Natural::from(10u32).pow(12) + &(Natural::from(10u32).pow(12) << 1u32),
     ///     3000000000000u64
     /// );
     /// ```

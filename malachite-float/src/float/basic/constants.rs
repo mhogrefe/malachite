@@ -287,7 +287,7 @@ impl Float {
     ///
     /// assert!(Float::min_positive_value_prec(100).abs_is_min_positive_value());
     /// assert!((-Float::min_positive_value_prec(100)).abs_is_min_positive_value());
-    /// assert!(!(Float::min_positive_value_prec(100) << 1u64).abs_is_min_positive_value());
+    /// assert!(!(Float::min_positive_value_prec(100) << 1u32).abs_is_min_positive_value());
     /// ```
     pub fn abs_is_min_positive_value(&self) -> bool {
         self.get_exponent() == Some(Self::MIN_EXPONENT)
@@ -365,7 +365,7 @@ impl Float {
     /// assert!(Float::max_finite_value_with_prec(100).abs_is_max_finite_value_with_prec());
     /// assert!((-Float::max_finite_value_with_prec(100)).abs_is_max_finite_value_with_prec());
     /// assert!(
-    ///     !(Float::max_finite_value_with_prec(100) >> 1u64).abs_is_max_finite_value_with_prec()
+    ///     !(Float::max_finite_value_with_prec(100) >> 1u32).abs_is_max_finite_value_with_prec()
     /// );
     /// ```
     pub fn abs_is_max_finite_value_with_prec(&self) -> bool {
