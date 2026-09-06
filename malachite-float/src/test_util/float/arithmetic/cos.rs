@@ -101,3 +101,28 @@ pub fn rug_cos_with_period_rational_prec(
 ) -> (rug::Float, Ordering) {
     rug_cos_with_period_rational_prec_round(x, u, prec, Round::Nearest)
 }
+
+pub fn rug_cos_pi_prec_round(x: &rug::Float, prec: u64, rm: Round) -> (rug::Float, Ordering) {
+    let mut c = rug::Float::with_val(u32::exact_from(prec), 0);
+    let o = c.assign_round(x.cos_pi_ref(), rm);
+    (c, o)
+}
+
+pub fn rug_cos_pi_rational_prec_round(
+    x: &Rational,
+    prec: u64,
+    rm: Round,
+) -> (rug::Float, Ordering) {
+    let exponent_bits = if *x == 0u32 {
+        0
+    } else {
+        u64::try_from(x.floor_log_base_2_abs()).unwrap_or(0)
+    };
+    let rx = rug::Float::with_val(
+        u32::exact_from(prec + 128 + exponent_bits),
+        rug::Rational::exact_from(x),
+    );
+    let mut c = rug::Float::with_val(u32::exact_from(prec), 0);
+    let o = c.assign_round(rx.cos_pi_ref(), rm);
+    (c, o)
+}

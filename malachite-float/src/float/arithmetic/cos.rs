@@ -26,8 +26,8 @@ use core::cmp::Ordering::{self, Equal, Greater, Less};
 use core::cmp::{max, min};
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    CeilingLogBase2, Cos, CosAssign, DivRoundAssign, Floor as FloorTrait, FloorSqrt, Mod,
-    ModPowerOf2, NegAssign, Parity, PowerOf2, Square, SubMul, UnsignedAbs,
+    CeilingLogBase2, Cos, CosAssign, DivRoundAssign, Floor as FloorTrait, FloorLogBase2, FloorSqrt,
+    Mod, ModPowerOf2, NegAssign, Parity, PowerOf2, Square, SubMul, UnsignedAbs,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -108,6 +108,51 @@ fn cos2_aux(r: &Float, p: u64) -> (Float, u64) {
     let f = Float::from_integer_prec(s, p).0 >> (p + q);
     let l = (i - 1) >> 1; // number of iterations
     (f, ((l + 1).ceiling_log_base_2() << 1) + 1) // bound is 2l(l+1)
+}
+
+// Returns a partial sum S_k = t - t^3/3! + ... of the sine series for a `Rational` t with |t| < 1,
+// which is an upper bound on sin(t) if `upper` is true and a lower bound otherwise, and is within
+// |t| 2^-(w + 2) of sin(t). The bound thus tightens with the working precision w, unlike a fixed
+// bound such as t - t^3/6 <= sin(t) <= t, which for |t| near 2^-64 leaves a relative gap of about
+// 2^-128 that no amount of pi precision can close.
+//
+// The series alternates with decreasing terms, so |sin(t) - S_k| <= |t|^(2k + 1) / (2k + 1)!, and
+// S_k is above sin(t) exactly when the omitted term t^(2k + 1) / (2k + 1)! is negative, i.e. when k
+// is odd and t > 0, or k is even and t < 0. The number of terms is chosen from the bit length of t
+// alone, so when the first term suffices (as in underflow cases, where |t| is tiny) no arithmetic
+// on t is done at all, and the two-term bound costs one squaring and one product.
+fn sin_bound(t: &Rational, w: u64, upper: bool) -> Rational {
+    if *t == 0u32 {
+        return Rational::ZERO;
+    }
+    // |t| < 2^(log + 1), with log < 0
+    let log = t.floor_log_base_2_abs();
+    assert!(log < 0);
+    // |t|^(2k) / (2k + 1)! < 2^(2k (log + 1) - log_factorial), where log_factorial <= log2((2k +
+    // 1)!)
+    let mut k = 1u64;
+    let mut log_factorial = 2u64; // floor(log2(2)) + floor(log2(3))
+    let target = -i128::from(w) - 2;
+    while i128::from(k << 1) * i128::from(log + 1) - i128::from(log_factorial) > target {
+        k += 1;
+        let two_k = k << 1;
+        log_factorial += two_k.floor_log_base_2() + (two_k + 1).floor_log_base_2();
+    }
+    if upper != ((*t > 0u32) == k.odd()) {
+        k += 1;
+    }
+    let mut s = t.clone();
+    if k > 1 {
+        let t_squared = t.square();
+        let mut term = t.clone();
+        for j in 1..k {
+            term *= &t_squared;
+            term /= Rational::from((j << 1) * ((j << 1) + 1));
+            term.neg_assign();
+            s += &term;
+        }
+    }
+    s
 }
 
 // Rounds both ends of a bracket [lo, hi] known to contain a transcendental value; if the two ends
@@ -212,11 +257,10 @@ fn cos_rational_near_zero(
         }
         let d_lo = &delta - &e;
         let d_hi = delta + e;
-        // for |t| <= 1, t - t^3/6 <= sin(t) <= t when t >= 0, and t <= sin(t) <= t - t^3/6 when t <
-        // 0; sin is increasing on [-1, 1]
-        let cubic = |t: &Rational| t - t.square() * t / const { Rational::const_from_unsigned(6) };
-        let sin_lo = if d_lo >= 0u32 { cubic(&d_lo) } else { d_lo };
-        let sin_hi = if d_hi >= 0u32 { d_hi } else { cubic(&d_hi) };
+        // |delta| <= pi/4, so sin is increasing on [d_lo, d_hi] and sin(delta) lies between
+        // sin(d_lo) and sin(d_hi)
+        let sin_lo = sin_bound(&d_lo, w, false);
+        let sin_hi = sin_bound(&d_hi, w, true);
         let (lo, hi) = if negate {
             (-sin_hi, -sin_lo)
         } else {
@@ -415,7 +459,6 @@ fn cos_near_zero(x: &Float, prec: u64, rm: RoundingMode, cancel: u64) -> (Float,
             // result and `Ordering`.
             return s.shl_prec_round(d_exp - i64::exact_from(w), prec, rm);
         }
-        fail_on_untested_path("cos_near_zero, cannot round");
         p <<= 1;
     }
 }
@@ -1660,7 +1703,7 @@ fn cos_turns_special_case(q: &Rational, prec: u64, rm: RoundingMode) -> Option<(
 fn cos_turns_near_zero(q: &Rational, prec: u64, rm: RoundingMode) -> Option<(Float, Ordering)> {
     let m = Integer::rounding_from(q << 2u32, Nearest).0;
     if m.even() {
-        fail_on_untested_path("cos_with_period_near_zero, not near an odd multiple of 1/4");
+        fail_on_untested_path("cos_turns_near_zero, not near an odd multiple of 1/4");
         return None;
     }
     let negate = (&m).mod_power_of_2(2) == 1u32;
@@ -1677,14 +1720,13 @@ fn cos_turns_near_zero(q: &Rational, prec: u64, rm: RoundingMode) -> Option<(Flo
             (&two_d * pi_hi, two_d * pi_lo)
         };
         if t_hi.ge_abs(&1u32) || t_lo.ge_abs(&1u32) {
-            fail_on_untested_path("cos_with_period_near_zero, distance not small");
+            fail_on_untested_path("cos_turns_near_zero, distance not small");
             return None;
         }
-        // for |t| <= 1, t - t^3/6 <= sin(t) <= t when t >= 0, and t <= sin(t) <= t - t^3/6 when t <
-        // 0; sin is increasing on [-1, 1]
-        let cubic = |t: &Rational| t - t.square() * t / const { Rational::const_from_unsigned(6) };
-        let sin_lo = if t_lo >= 0u32 { cubic(&t_lo) } else { t_lo };
-        let sin_hi = if t_hi >= 0u32 { t_hi } else { cubic(&t_hi) };
+        // sin is increasing on [t_lo, t_hi] (a subset of [-1, 1]), so sin(2 pi d) lies between
+        // sin(t_lo) and sin(t_hi)
+        let sin_lo = sin_bound(&t_lo, w, false);
+        let sin_hi = sin_bound(&t_hi, w, true);
         let (lo, hi) = if negate {
             (-sin_hi, -sin_lo)
         } else {
@@ -1693,7 +1735,6 @@ fn cos_turns_near_zero(q: &Rational, prec: u64, rm: RoundingMode) -> Option<(Flo
         if let Some(result) = round_bracket(&lo, &hi, prec, rm) {
             return Some(result);
         }
-        fail_on_untested_path("cos_with_period_near_zero, cannot round");
         w <<= 1;
     }
 }
@@ -3094,6 +3135,447 @@ impl Float {
     }
 }
 
+impl Float {
+    /// Computes $\cos(\pi x)$, the cosine of a [`Float`] measured in half-turns, rounding the
+    /// result to the specified precision and with the specified rounding mode. The [`Float`] is
+    /// taken by value. An [`Ordering`] is also returned, indicating whether the rounded cosine is
+    /// less than, equal to, or greater than the exact cosine. Although `NaN`s are not comparable to
+    /// any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// This is `cos_with_period` with a period of 2: see [`Float::cos_with_period_prec_round`] for
+    /// the error bounds, the special and closed-form cases (integers give $\pm1$, half-integers
+    /// give $+0.0$, and multiples of $1/3$, $1/4$, $1/5$, $1/6$, and $1/10$ have closed forms),
+    /// overflow and underflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::from(0.1f64).cos_pi_prec_round(10, Floor);
+    /// assert_eq!(c.to_string(), "0.95020");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::from(0.1f64).cos_pi_prec_round(10, Ceiling);
+    /// assert_eq!(c.to_string(), "0.95117");
+    /// assert_eq!(o, Greater);
+    ///
+    /// // a half-turn is exactly -1
+    /// let (c, o) = Float::ONE.cos_pi_prec_round(10, Exact);
+    /// assert_eq!(c.to_string(), "-1.0000");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn cos_pi_prec_round(self, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+        self.cos_with_period_prec_round(2, prec, rm)
+    }
+
+    /// Computes $\cos(\pi x)$, the cosine of a [`Float`] measured in half-turns, rounding the
+    /// result to the specified precision and with the specified rounding mode. The [`Float`] is
+    /// taken by reference. An [`Ordering`] is also returned, indicating whether the rounded cosine
+    /// is less than, equal to, or greater than the exact cosine. Although `NaN`s are not comparable
+    /// to any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// This is `cos_with_period` with a period of 2: see [`Float::cos_with_period_prec_round_ref`]
+    /// for the error bounds, the special and closed-form cases (integers give $\pm1$, half-integers
+    /// give $+0.0$, and multiples of $1/3$, $1/4$, $1/5$, $1/6$, and $1/10$ have closed forms),
+    /// overflow and underflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = (Float::from(0.1f64)).cos_pi_prec_round_ref(10, Floor);
+    /// assert_eq!(c.to_string(), "0.95020");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = (Float::from(0.1f64)).cos_pi_prec_round_ref(10, Ceiling);
+    /// assert_eq!(c.to_string(), "0.95117");
+    /// assert_eq!(o, Greater);
+    ///
+    /// // a half-turn is exactly -1
+    /// let (c, o) = (&Float::ONE).cos_pi_prec_round_ref(10, Exact);
+    /// assert_eq!(c.to_string(), "-1.0000");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn cos_pi_prec_round_ref(&self, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+        self.cos_with_period_prec_round_ref(2, prec, rm)
+    }
+
+    /// Computes $\cos(\pi x)$, the cosine of a [`Float`] measured in half-turns, rounding the
+    /// result to the nearest value of the specified precision. The [`Float`] is taken by value. An
+    /// [`Ordering`] is also returned, indicating whether the rounded cosine is less than, equal to,
+    /// or greater than the exact cosine. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// This is `cos_with_period` with a period of 2: see [`Float::cos_with_period_prec`] for the
+    /// error bounds, the special and closed-form cases (integers give $\pm1$, half-integers give
+    /// $+0.0$, and multiples of $1/3$, $1/4$, $1/5$, $1/6$, and $1/10$ have closed forms), overflow
+    /// and underflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::from(0.1f64).cos_pi_prec(10);
+    /// assert_eq!(c.to_string(), "0.95117");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) = Float::from(0.1f64).cos_pi_prec(53);
+    /// assert_eq!(c.to_string(), "0.95105651629515353");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn cos_pi_prec(self, prec: u64) -> (Self, Ordering) {
+        self.cos_with_period_prec(2, prec)
+    }
+
+    /// Computes $\cos(\pi x)$, the cosine of a [`Float`] measured in half-turns, rounding the
+    /// result to the nearest value of the specified precision. The [`Float`] is taken by reference.
+    /// An [`Ordering`] is also returned, indicating whether the rounded cosine is less than, equal
+    /// to, or greater than the exact cosine. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// This is `cos_with_period` with a period of 2: see [`Float::cos_with_period_prec_ref`] for
+    /// the error bounds, the special and closed-form cases (integers give $\pm1$, half-integers
+    /// give $+0.0$, and multiples of $1/3$, $1/4$, $1/5$, $1/6$, and $1/10$ have closed forms),
+    /// overflow and underflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = (Float::from(0.1f64)).cos_pi_prec_ref(10);
+    /// assert_eq!(c.to_string(), "0.95117");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) = (Float::from(0.1f64)).cos_pi_prec_ref(53);
+    /// assert_eq!(c.to_string(), "0.95105651629515353");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn cos_pi_prec_ref(&self, prec: u64) -> (Self, Ordering) {
+        self.cos_with_period_prec_ref(2, prec)
+    }
+
+    /// Computes $\cos(\pi x)$, the cosine of a [`Float`] measured in half-turns, rounding the
+    /// result with the specified rounding mode. The precision of the output is the precision of the
+    /// input. The [`Float`] is taken by value. An [`Ordering`] is also returned, indicating whether
+    /// the rounded cosine is less than, equal to, or greater than the exact cosine. Although `NaN`s
+    /// are not comparable to any [`Float`], whenever this function returns a `NaN` it also returns
+    /// `Equal`.
+    ///
+    /// This is `cos_with_period` with a period of 2: see [`Float::cos_with_period_round`] for the
+    /// error bounds, the special and closed-form cases (integers give $\pm1$, half-integers give
+    /// $+0.0$, and multiples of $1/3$, $1/4$, $1/5$, $1/6$, and $1/10$ have closed forms), overflow
+    /// and underflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the input
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::from(0.1f64).cos_pi_round(Floor);
+    /// assert_eq!(c.to_string(), "0.95105651629515342");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::from(0.1f64).cos_pi_round(Nearest);
+    /// assert_eq!(c.to_string(), "0.95105651629515364");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn cos_pi_round(self, rm: RoundingMode) -> (Self, Ordering) {
+        self.cos_with_period_round(2, rm)
+    }
+
+    /// Computes $\cos(\pi x)$, the cosine of a [`Float`] measured in half-turns, rounding the
+    /// result with the specified rounding mode. The precision of the output is the precision of the
+    /// input. The [`Float`] is taken by reference. An [`Ordering`] is also returned, indicating
+    /// whether the rounded cosine is less than, equal to, or greater than the exact cosine.
+    /// Although `NaN`s are not comparable to any [`Float`], whenever this function returns a `NaN`
+    /// it also returns `Equal`.
+    ///
+    /// This is `cos_with_period` with a period of 2: see [`Float::cos_with_period_round_ref`] for
+    /// the error bounds, the special and closed-form cases (integers give $\pm1$, half-integers
+    /// give $+0.0$, and multiples of $1/3$, $1/4$, $1/5$, $1/6$, and $1/10$ have closed forms),
+    /// overflow and underflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the input
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = (Float::from(0.1f64)).cos_pi_round_ref(Floor);
+    /// assert_eq!(c.to_string(), "0.95105651629515342");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = (Float::from(0.1f64)).cos_pi_round_ref(Nearest);
+    /// assert_eq!(c.to_string(), "0.95105651629515364");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn cos_pi_round_ref(&self, rm: RoundingMode) -> (Self, Ordering) {
+        self.cos_with_period_round_ref(2, rm)
+    }
+
+    /// Computes $\cos(\pi x)$, the cosine of a [`Float`] measured in half-turns, rounding the
+    /// result to the specified precision and with the specified rounding mode. The [`Float`] is
+    /// replaced by the result, and an [`Ordering`] is returned, indicating whether the rounded
+    /// cosine is less than, equal to, or greater than the exact cosine. Although `NaN`s are not
+    /// comparable to any [`Float`], whenever this function sets a `NaN` it also returns `Equal`.
+    ///
+    /// This is `cos_with_period` with a period of 2: see
+    /// [`Float::cos_with_period_prec_round_assign`] for the error bounds, the special and
+    /// closed-form cases (integers give $\pm1$, half-integers give $+0.0$, and multiples of $1/3$,
+    /// $1/4$, $1/5$, $1/6$, and $1/10$ have closed forms), overflow and underflow, and the
+    /// complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from(0.1f64);
+    /// assert_eq!(x.cos_pi_prec_round_assign(10, Floor), Less);
+    /// assert_eq!(x.to_string(), "0.95020");
+    ///
+    /// let mut x = Float::from(0.1f64);
+    /// assert_eq!(x.cos_pi_prec_round_assign(10, Ceiling), Greater);
+    /// assert_eq!(x.to_string(), "0.95117");
+    /// ```
+    #[inline]
+    pub fn cos_pi_prec_round_assign(&mut self, prec: u64, rm: RoundingMode) -> Ordering {
+        self.cos_with_period_prec_round_assign(2, prec, rm)
+    }
+
+    /// Computes $\cos(\pi x)$, the cosine of a [`Float`] measured in half-turns, rounding the
+    /// result to the nearest value of the specified precision. The [`Float`] is replaced by the
+    /// result, and an [`Ordering`] is returned, indicating whether the rounded cosine is less than,
+    /// equal to, or greater than the exact cosine. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function sets a `NaN` it also returns `Equal`.
+    ///
+    /// This is `cos_with_period` with a period of 2: see [`Float::cos_with_period_prec_assign`] for
+    /// the error bounds, the special and closed-form cases (integers give $\pm1$, half-integers
+    /// give $+0.0$, and multiples of $1/3$, $1/4$, $1/5$, $1/6$, and $1/10$ have closed forms),
+    /// overflow and underflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from(0.1f64);
+    /// assert_eq!(x.cos_pi_prec_assign(10), Greater);
+    /// assert_eq!(x.to_string(), "0.95117");
+    /// ```
+    #[inline]
+    pub fn cos_pi_prec_assign(&mut self, prec: u64) -> Ordering {
+        self.cos_with_period_prec_assign(2, prec)
+    }
+
+    /// Computes $\cos(\pi x)$, the cosine of a [`Float`] measured in half-turns, rounding the
+    /// result with the specified rounding mode. The precision of the output is the precision of the
+    /// input. The [`Float`] is replaced by the result, and an [`Ordering`] is returned, indicating
+    /// whether the rounded cosine is less than, equal to, or greater than the exact cosine.
+    /// Although `NaN`s are not comparable to any [`Float`], whenever this function sets a `NaN` it
+    /// also returns `Equal`.
+    ///
+    /// This is `cos_with_period` with a period of 2: see [`Float::cos_with_period_round_assign`]
+    /// for the error bounds, the special and closed-form cases (integers give $\pm1$, half-integers
+    /// give $+0.0$, and multiples of $1/3$, $1/4$, $1/5$, $1/6$, and $1/10$ have closed forms),
+    /// overflow and underflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the input
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from(0.1f64);
+    /// assert_eq!(x.cos_pi_round_assign(Floor), Less);
+    /// assert_eq!(x.to_string(), "0.95105651629515342");
+    /// ```
+    #[inline]
+    pub fn cos_pi_round_assign(&mut self, rm: RoundingMode) -> Ordering {
+        self.cos_with_period_round_assign(2, rm)
+    }
+
+    /// Computes $\cos(\pi x)$, the cosine of a [`Rational`] measured in half-turns, rounding the
+    /// result to the specified precision and with the specified rounding mode and returning the
+    /// result as a [`Float`]. The [`Rational`] is taken by value. An [`Ordering`] is also returned,
+    /// indicating whether the rounded cosine is less than, equal to, or greater than the exact
+    /// cosine.
+    ///
+    /// This is `cos_with_period_rational` with a period of 2: see
+    /// [`Float::cos_with_period_rational_prec_round`] for the error bounds, the special and
+    /// closed-form cases, overflow and underflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::cos_pi_rational_prec_round(Rational::from_unsigneds(1u8, 7), 10, Floor);
+    /// assert_eq!(c.to_string(), "0.90039");
+    /// assert_eq!(o, Less);
+    ///
+    /// // a third of a half-turn is exactly 1/2
+    /// let (c, o) = Float::cos_pi_rational_prec_round(Rational::from_unsigneds(1u8, 3), 10, Exact);
+    /// assert_eq!(c.to_string(), "0.50000");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn cos_pi_rational_prec_round(
+        x: Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        Self::cos_with_period_rational_prec_round_ref(&x, 2, prec, rm)
+    }
+
+    /// Computes $\cos(\pi x)$, the cosine of a [`Rational`] measured in half-turns, rounding the
+    /// result to the specified precision and with the specified rounding mode and returning the
+    /// result as a [`Float`]. The [`Rational`] is taken by reference. An [`Ordering`] is also
+    /// returned, indicating whether the rounded cosine is less than, equal to, or greater than the
+    /// exact cosine.
+    ///
+    /// This is `cos_with_period_rational` with a period of 2: see
+    /// [`Float::cos_with_period_rational_prec_round_ref`] for the error bounds, the special and
+    /// closed-form cases, overflow and underflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) =
+    ///     Float::cos_pi_rational_prec_round_ref(&Rational::from_unsigneds(1u8, 7), 10, Ceiling);
+    /// assert_eq!(c.to_string(), "0.90137");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn cos_pi_rational_prec_round_ref(
+        x: &Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        Self::cos_with_period_rational_prec_round_ref(x, 2, prec, rm)
+    }
+
+    /// Computes $\cos(\pi x)$, the cosine of a [`Rational`] measured in half-turns, rounding the
+    /// result to the nearest value of the specified precision and returning the result as a
+    /// [`Float`]. The [`Rational`] is taken by value. An [`Ordering`] is also returned, indicating
+    /// whether the rounded cosine is less than, equal to, or greater than the exact cosine.
+    ///
+    /// This is `cos_with_period_rational` with a period of 2: see
+    /// [`Float::cos_with_period_rational_prec`] for the error bounds, the special and closed-form
+    /// cases, overflow and underflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::cos_pi_rational_prec(Rational::from_unsigneds(1u8, 7), 53);
+    /// assert_eq!(c.to_string(), "0.90096886790241915");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn cos_pi_rational_prec(x: Rational, prec: u64) -> (Self, Ordering) {
+        Self::cos_with_period_rational_prec_ref(&x, 2, prec)
+    }
+
+    /// Computes $\cos(\pi x)$, the cosine of a [`Rational`] measured in half-turns, rounding the
+    /// result to the nearest value of the specified precision and returning the result as a
+    /// [`Float`]. The [`Rational`] is taken by reference. An [`Ordering`] is also returned,
+    /// indicating whether the rounded cosine is less than, equal to, or greater than the exact
+    /// cosine.
+    ///
+    /// This is `cos_with_period_rational` with a period of 2: see
+    /// [`Float::cos_with_period_rational_prec_ref`] for the error bounds, the special and
+    /// closed-form cases, overflow and underflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::cos_pi_rational_prec_ref(&Rational::from_unsigneds(1u8, 7), 53);
+    /// assert_eq!(c.to_string(), "0.90096886790241915");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn cos_pi_rational_prec_ref(x: &Rational, prec: u64) -> (Self, Ordering) {
+        Self::cos_with_period_rational_prec_ref(x, 2, prec)
+    }
+}
+
 impl Cos for Float {
     type Output = Self;
 
@@ -3550,4 +4032,84 @@ where
         |x, prec| Float::cos_with_period_rational_prec_ref(x, u, prec),
         x,
     )
+}
+
+/// Computes $\cos(\pi x)$, the cosine of a primitive float measured in half-turns.
+///
+/// This is `primitive_float_cos_with_period` with a period of 2: see
+/// [`primitive_float_cos_with_period`] for the error bound and the special cases, with $u = 2$.
+/// Half-integers give exactly $+0.0$ and integers exactly $\pm1$.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::cos::primitive_float_cos_pi;
+///
+/// assert!(primitive_float_cos_pi(f32::NAN).is_nan());
+/// assert_eq!(NiceFloat(primitive_float_cos_pi(0.5f32)), NiceFloat(0.0));
+/// assert_eq!(NiceFloat(primitive_float_cos_pi(1.0f64)), NiceFloat(-1.0));
+/// assert_eq!(
+///     NiceFloat(primitive_float_cos_pi(0.1f32)),
+///     NiceFloat(0.95105654)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_cos_pi(0.1f64)),
+///     NiceFloat(0.9510565162951535)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_cos_pi<T: PrimitiveFloat>(x: T) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    primitive_float_cos_with_period(x, 2)
+}
+
+/// Computes $\cos(\pi x)$, the cosine of a [`Rational`] measured in half-turns, returning the
+/// result as a primitive float.
+///
+/// This is `primitive_float_cos_with_period_rational` with a period of 2: see
+/// [`primitive_float_cos_with_period_rational`] for the error bound, the special cases, and the
+/// complexity, with $u = 2$.
+///
+/// # Worst-case complexity
+/// $T(m) = O(m (\log m)^2 \log\log m)$
+///
+/// $M(m) = O(m \log m)$
+///
+/// where $T$ is time, $M$ is additional memory, and $m$ is `x.significant_bits()`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::cos::primitive_float_cos_pi_rational;
+/// use malachite_q::Rational;
+///
+/// // a third of a half-turn is exactly 1/2
+/// assert_eq!(
+///     NiceFloat(primitive_float_cos_pi_rational::<f64>(
+///         &Rational::from_unsigneds(1u8, 3)
+///     )),
+///     NiceFloat(0.5)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_cos_pi_rational::<f64>(
+///         &Rational::from_unsigneds(1u8, 7)
+///     )),
+///     NiceFloat(0.9009688679024191)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_cos_pi_rational<T: PrimitiveFloat>(x: &Rational) -> T
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    primitive_float_cos_with_period_rational(x, 2)
 }

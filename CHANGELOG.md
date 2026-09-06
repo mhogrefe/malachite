@@ -255,6 +255,10 @@ documented by git history.
   (with `_ref` variants) take a `Rational` instead, reaching the exact and closed-form cases
   directly, such as a third or an eighth of a turn. `primitive_float_cos_with_period` and
   `primitive_float_cos_with_period_rational` give the correctly rounded `f32` or `f64` results.
+- `cos_pi_prec_round`, `cos_pi_prec`, and `cos_pi_round` (with `_ref` and `_assign` variants),
+  `cos_pi_rational_prec_round` and `cos_pi_rational_prec` (with `_ref` variants), and
+  `primitive_float_cos_pi` and `primitive_float_cos_pi_rational`: a port of `mpfr_cospi`, the
+  cosine in half-turns, delegating to the `cos_with_period` family with a period of 2.
 - `cos_rational_prec_round` and `cos_rational_prec` (with `_ref` variants), the correctly
   rounded cosine of a `Rational` as a `Float`, alongside the `exp_rational_*` family. Since
   cosine is not monotonic, the result is bracketed by a Lipschitz bound around the cosine of a
