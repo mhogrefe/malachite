@@ -52,6 +52,7 @@ pub mod shl;
 pub mod shl_round;
 pub mod shr;
 pub mod shr_round;
+pub mod sin;
 pub mod sqrt;
 pub mod square;
 pub mod sub;

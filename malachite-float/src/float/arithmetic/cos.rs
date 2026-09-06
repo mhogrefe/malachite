@@ -344,32 +344,50 @@ fn cos_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ord
 // The least number of bits of cancellation (|cos(x)| < 2^-cancel) that sends an input to
 // `cos_near_zero`; the cancellation must also be at least prec / 16, so that the Taylor series
 // there needs only a handful of terms.
-const NEAR_ZERO_MIN_CANCEL: u64 = 64;
+pub(crate) const NEAR_ZERO_MIN_CANCEL: u64 = 64;
 
-// Computes cos(x) for an x within about 2^-cancel of an odd multiple of pi/2, so that |cos(x)| <
-// 2^-cancel, where cancel >= 64 and cancel >= prec / 16.
+// Computes cos(x) (if `cos` is true) or sin(x) for an x within about 2^-cancel of a zero of the
+// function, an odd multiple of pi/2 for cos or a nonzero multiple of pi for sin, so that the result
+// is below 2^-cancel in magnitude, where cancel >= 64 and cancel >= prec / 16.
 //
-// The Ziv loop in `cos_prec_round_normal_ref` would have to raise its working precision by `cancel`
-// bits to resolve such a result, and its halving-plus-Taylor-series scheme becomes prohibitively
-// slow long before `cancel` reaches 2^30, where the result underflows. Instead, write x = n pi/2 +
-// delta with n odd, so that cos(x) = -sin(delta) if n = 1 mod 4 and sin(delta) if n = 3 mod 4.
-// delta is computed exactly in integer arithmetic from x and an approximation of pi, and
-// sin(delta)/delta from its Taylor series, which converges very quickly since |delta| is tiny.
-// Everything is done in integers scaled by explicit powers of 2, so values far below the exponent
-// range are no problem, and only the final `shl_prec_round` can underflow.
+// The Ziv loops in `cos_prec_round_normal_ref` and `sin_prec_round_normal_ref` would have to raise
+// their working precision by `cancel` bits to resolve such a result, and their schemes become
+// prohibitively slow long before `cancel` reaches 2^30, where the result underflows. Instead, write
+// x = n pi/2 + delta with n odd, so that cos(x) = -sin(delta) if n = 1 mod 4 and sin(delta) if n =
+// 3 mod 4, or x = n pi + delta, so that sin(x) = (-1)^n sin(delta). delta is computed exactly in
+// integer arithmetic from x and an approximation of pi, and sin(delta)/delta from its Taylor
+// series, which converges very quickly since |delta| is tiny. Everything is done in integers scaled
+// by explicit powers of 2, so values far below the exponent range are no problem, and only the
+// final `shl_prec_round` can underflow.
 //
-// This has no MPFR counterpart: MPFR's exponent range is so wide that cos never underflows there,
-// and `mpfr_cos` simply keeps raising its working precision.
-fn cos_near_zero(x: &Float, prec: u64, rm: RoundingMode, cancel: u64) -> (Float, Ordering) {
+// This has no MPFR counterpart: MPFR's exponent range is so wide that cos and sin never underflow
+// there, and `mpfr_cos` and `mpfr_sin` simply keep raising their working precisions.
+pub(crate) fn trig_near_zero(
+    x: &Float,
+    prec: u64,
+    rm: RoundingMode,
+    cancel: u64,
+    cos: bool,
+) -> (Float, Ordering) {
     // |x| > 1, so its exponent is positive
     let e = u64::exact_from(x.get_exponent().unwrap());
-    // n = round(2x / pi). Since 2x / pi is within 2^-62 of an odd integer, a quotient with 16 bits
-    // after the binary point suffices to identify it.
-    let x_low = Float::from_float_prec_ref(x, e + 16).0 << 1u32;
+    // n = round(2x / pi) for cos, or round(x / pi) for sin. Since the quotient is within 2^-62 of
+    // an integer (an odd one, for cos), 16 bits after the binary point suffice to identify it.
+    let mut x_low = Float::from_float_prec_ref(x, e + 16).0;
+    if cos {
+        x_low <<= 1u32;
+    }
     let q = x_low.div_prec(Float::pi_prec(e + 16).0, e + 16).0;
     let n = Integer::rounding_from(q, Nearest).0;
-    assert!(n.odd());
-    let negate = (&n).mod_power_of_2(2) == 1u32;
+    // cos(n pi/2 + delta) = -sin(delta) if n = 1 mod 4 and sin(delta) if n = 3 mod 4; sin(n pi +
+    // delta) = (-1)^n sin(delta)
+    let negate = if cos {
+        assert!(n.odd());
+        (&n).mod_power_of_2(2) == 1u32
+    } else {
+        assert_ne!(n, 0u32);
+        n.odd()
+    };
     // x = x_sig * 2^x_exp exactly
     let x_sig = x.significand_ref().unwrap();
     let x_bits = x_sig.significant_bits();
@@ -388,8 +406,10 @@ fn cos_near_zero(x: &Float, prec: u64, rm: RoundingMode, cancel: u64) -> (Float,
     loop {
         // pi_p = pi_sig * 2^pi_exp, with |pi_p - pi| <= 2^(1 - e - p), so |n pi_p / 2 - n pi / 2| <
         // 2^-p, since |n| < 2^e.
-        let (pi_sig, pi_exp) = get_z_2exp(Float::pi_prec(e + p).0);
-        let pi_exp = pi_exp - 1; // n pi_p / 2 = n pi_sig * 2^pi_exp
+        let (pi_sig, mut pi_exp) = get_z_2exp(Float::pi_prec(e + p).0);
+        if cos {
+            pi_exp -= 1; // n pi_p / 2 = n pi_sig * 2^pi_exp
+        }
         // delta = d * 2^d_exp, up to the error in pi
         let d_exp = min(x_exp, pi_exp);
         let a = Integer::from_sign_and_abs_ref(x > &0u32, x_sig) << u64::exact_from(x_exp - d_exp);
@@ -453,14 +473,123 @@ fn cos_near_zero(x: &Float, prec: u64, rm: RoundingMode, cancel: u64) -> (Float,
         let err = m_bits - w - 2 - (terms + 2).ceiling_log_base_2();
         let s = Float::from_integer_prec(m, m_bits).0;
         if float_can_round(s.significand_ref().unwrap(), err, prec, rm) {
-            // cos(x) = m * 2^(d_exp - w). `float_can_round` guarantees that s and the exact value
-            // round the same way and lie on the same side of every power of 2, so the single
+            // The result is m * 2^(d_exp - w). `float_can_round` guarantees that s and the exact
+            // value round the same way and lie on the same side of every power of 2, so the single
             // rounding in `shl_prec_round`, including its underflow handling, gives the correct
             // result and `Ordering`.
             return s.shl_prec_round(d_exp - i64::exact_from(w), prec, rm);
         }
         p <<= 1;
     }
+}
+
+// The outcome of one iteration of the Ziv loops in `cos_prec_round_normal_ref` and
+// `sin_prec_round_normal_ref`.
+pub(crate) enum TrigStep {
+    // The working precision could not decide the result; retry at a higher one.
+    Retry,
+    // The result at the working precision, ready for the final rounding.
+    Done(Float),
+    // The input is within about 2^-cancel of a zero of the function, so the result is below
+    // 2^-cancel in magnitude and `trig_near_zero` resolves it directly.
+    NearZero(u64),
+}
+
+// One iteration of the Ziv loop at working precision `m`, which the cancellation check may raise
+// for the next iteration (the caller applies the generic increase on `Retry`). `cancel` tracks the
+// exponent of the smallest sum seen so far, so that the precision is only raised once per lost bit.
+fn cos_ziv_step(
+    x: &Float,
+    exp_x: i64,
+    prec: u64,
+    rm: RoundingMode,
+    reduce: bool,
+    k0: u64,
+    m: &mut u64,
+    cancel: &mut i64,
+) -> TrigStep {
+    // If |x| >= 4, first reduce x cmod (2*Pi) into xr, using mpfr_remainder: let e = EXP(x) >= 3,
+    // and m the target precision:
+    // ```
+    // (1) c <- 2*Pi              [precision e+m-1, nearest]
+    // (2) xr <- remainder (x, c) [precision m, nearest]
+    // We have |c - 2*Pi| <= 1/2ulp(c) = 2^(3-e-m)
+    //         |xr - x - k c| <= 1/2ulp(xr) <= 2^(1-m)
+    //         |k| <= |x|/(2*Pi) <= 2^(e-2)
+    // Thus |xr - x - 2kPi| <= |k| |c - 2Pi| + 2^(1-m) <= 2^(2-m).
+    // It follows |cos(xr) - cos(x)| <= 2^(2-m).
+    // ```
+    let mut r = if reduce {
+        let c = Float::pi_prec(u64::exact_from(exp_x) + *m - 1).0 << 1u32; // 2Pi
+        let xr = x.ieee_remainder_prec_ref_val(c, *m).0;
+        if xr == 0u32 {
+            return TrigStep::Retry;
+        }
+        // now |xr| <= 4, thus r <= 16 below
+        xr.square_round(Ceiling).0 // err <= 1 ulp
+    } else {
+        x.square_prec_round_ref(*m, Ceiling).0 // err <= 1 ulp
+    };
+    // now |x| < 4 (or xr if reduce = 1), thus |r| <= 16 we need |r| < 1/2 for mpfr_cos2_aux, i.e.,
+    // EXP(r) - 2K <= -1
+    let exp_r = i64::from(r.get_exponent().unwrap());
+    let k = k0 + 1 + (u64::exact_from(max(0, exp_r)) >> 1);
+    // since K0 >= 0, if EXP(r) < 0, then K >= 1, thus EXP(r) - 2K <= -3; otherwise if EXP(r) >= 0,
+    // then K >= 1/2 + EXP(r)/2, thus EXP(r) - 2K <= -1
+    r >>= k << 1; // Can't overflow!
+    // s <- 1 - r/2! + ... + (-1)^l r^l/(2l)!
+    let (mut s, err_ulps) = cos2_aux(&r, *m);
+    // err_ulps is the error bound in ulps on s
+    let one = Float::one_prec(*m);
+    for _ in 0..k {
+        s.square_prec_round_assign(*m, Ceiling); // err <= 2*olderr
+        s <<= 1u32; // Can't overflow
+        s.sub_prec_assign_ref(&one, *m); // err <= 4*olderr
+        if s == 0u32 {
+            fail_on_untested_path("cos_ziv_step, s == 0 after doubling");
+            return TrigStep::Retry;
+        }
+        assert!(s.get_exponent().unwrap() <= 1);
+    }
+    // The absolute error on s is bounded by (2l+1/3)*2^(2K-m) 2l+1/3 <= 2l+1. If |x| >= 4, we need
+    // to add 2^(2-m) for the argument reduction by 2Pi: if K = 0, this amounts to add 4 to 2l+1/3,
+    // i.e., to add 2 to l; if K >= 1, this amounts to add 1 to 2*l+1/3. (K >= 1 always holds here,
+    // since K0 >= 0, so the K = 0 case in the C code is dead.)
+    let mut err_ulps = (err_ulps << 1) + 1;
+    if reduce {
+        err_ulps += 1;
+    }
+    let err_bits = err_ulps.ceiling_log_base_2() + (k << 1);
+    // now the error is bounded by 2^(err_bits-m) = 2^(EXP(s)-err)
+    let exp_s = i64::from(s.get_exponent().unwrap());
+    let err = exp_s + i64::exact_from(*m) - i64::exact_from(err_bits);
+    if err > 0 && float_can_round(s.significand_ref().unwrap(), u64::exact_from(err), prec, rm) {
+        return TrigStep::Done(s);
+    }
+    if exp_s == 1 && *m > err_bits && *m - err_bits >= prec + u64::from(rm == Nearest) {
+        // s = 1 or -1, and except x=0 which was already checked above, cos(x) cannot be 1 or -1, so
+        // we can round if the error is less than 2^(-precy) for directed rounding, or 2^(-precy-1)
+        // for rounding to nearest.
+        //
+        // If round to nearest or away, result is s = 1 or -1, otherwise it is round(nexttoward (s,
+        // 0)). However, in order to have the inexact flag correctly set below, we set |s| to 1 -
+        // 2^(-m) in all cases.
+        let neighbor = one_neighbor(*m, false);
+        return TrigStep::Done(if s < 0u32 { -neighbor } else { neighbor });
+    }
+    // |cos(x)| < 2^bound
+    let bound = max(exp_s, i64::exact_from(err_bits) - i64::exact_from(*m)) + 1;
+    if bound < 0 {
+        let c = u64::exact_from(-bound);
+        if c >= max(NEAR_ZERO_MIN_CANCEL, prec >> 4) {
+            return TrigStep::NearZero(c);
+        }
+    }
+    if exp_s < *cancel {
+        *m += u64::exact_from(*cancel - exp_s);
+        *cancel = exp_s;
+    }
+    TrigStep::Retry
 }
 
 // This is mpfr_cos from cos.c, MPFR 4.2.2, without the `mpfr_cos_fast` tier for precisions at or
@@ -487,104 +616,10 @@ fn cos_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float, 
     let mut cancel: i64 = 0;
     let mut increment = Limb::WIDTH;
     let s = loop {
-        // If |x| >= 4, first reduce x cmod (2*Pi) into xr, using mpfr_remainder: let e = EXP(x) >=
-        // 3, and m the target precision:
-        // ```
-        // (1) c <- 2*Pi              [precision e+m-1, nearest]
-        // (2) xr <- remainder (x, c) [precision m, nearest]
-        // We have |c - 2*Pi| <= 1/2ulp(c) = 2^(3-e-m)
-        //         |xr - x - k c| <= 1/2ulp(xr) <= 2^(1-m)
-        //         |k| <= |x|/(2*Pi) <= 2^(e-2)
-        // Thus |xr - x - 2kPi| <= |k| |c - 2Pi| + 2^(1-m) <= 2^(2-m).
-        // It follows |cos(xr) - cos(x)| <= 2^(2-m).
-        // ```
-        let mut goto_ziv_next = false;
-        let mut r = if reduce {
-            let c = Float::pi_prec(u64::exact_from(exp_x) + m - 1).0 << 1u32; // 2Pi
-            let xr = x.ieee_remainder_prec_ref_val(c, m).0;
-            if xr == 0u32 {
-                goto_ziv_next = true;
-                Float::one_prec(m)
-            } else {
-                // now |xr| <= 4, thus r <= 16 below
-                xr.square_round(Ceiling).0 // err <= 1 ulp
-            }
-        } else {
-            x.square_prec_round_ref(m, Ceiling).0 // err <= 1 ulp
-        };
-        let mut result = None;
-        if !goto_ziv_next {
-            // now |x| < 4 (or xr if reduce = 1), thus |r| <= 16 we need |r| < 1/2 for
-            // mpfr_cos2_aux, i.e., EXP(r) - 2K <= -1
-            let exp_r = i64::from(r.get_exponent().unwrap());
-            let k = k0 + 1 + (u64::exact_from(max(0, exp_r)) >> 1);
-            // since K0 >= 0, if EXP(r) < 0, then K >= 1, thus EXP(r) - 2K <= -3; otherwise if
-            // EXP(r) >= 0, then K >= 1/2 + EXP(r)/2, thus EXP(r) - 2K <= -1
-            r >>= k << 1; // Can't overflow!
-            // s <- 1 - r/2! + ... + (-1)^l r^l/(2l)!
-            let (mut s, err_ulps) = cos2_aux(&r, m);
-            // err_ulps is the error bound in ulps on s
-            let one = Float::one_prec(m);
-            for _ in 0..k {
-                s.square_prec_round_assign(m, Ceiling); // err <= 2*olderr
-                s <<= 1u32; // Can't overflow
-                s.sub_prec_assign_ref(&one, m); // err <= 4*olderr
-                if s == 0u32 {
-                    fail_on_untested_path("cos_prec_round_normal_ref, s == 0 after doubling");
-                    goto_ziv_next = true;
-                    break;
-                }
-                assert!(s.get_exponent().unwrap() <= 1);
-            }
-            if !goto_ziv_next {
-                // The absolute error on s is bounded by (2l+1/3)*2^(2K-m) 2l+1/3 <= 2l+1. If |x| >=
-                // 4, we need to add 2^(2-m) for the argument reduction by 2Pi: if K = 0, this
-                // amounts to add 4 to 2l+1/3, i.e., to add 2 to l; if K >= 1, this amounts to add 1
-                // to 2*l+1/3. (K >= 1 always holds here, since K0 >= 0, so the K = 0 case in the C
-                // code is dead.)
-                let mut err_ulps = (err_ulps << 1) + 1;
-                if reduce {
-                    err_ulps += 1;
-                }
-                let err_bits = err_ulps.ceiling_log_base_2() + (k << 1);
-                // now the error is bounded by 2^(err_bits-m) = 2^(EXP(s)-err)
-                let exp_s = i64::from(s.get_exponent().unwrap());
-                let err = exp_s + i64::exact_from(m) - i64::exact_from(err_bits);
-                if err > 0
-                    && float_can_round(s.significand_ref().unwrap(), u64::exact_from(err), prec, rm)
-                {
-                    result = Some(s);
-                } else if exp_s == 1
-                    && m > err_bits
-                    && m - err_bits >= prec + u64::from(rm == Nearest)
-                {
-                    // s = 1 or -1, and except x=0 which was already checked above, cos(x) cannot be
-                    // 1 or -1, so we can round if the error is less than 2^(-precy) for directed
-                    // rounding, or 2^(-precy-1) for rounding to nearest.
-                    //
-                    // If round to nearest or away, result is s = 1 or -1, otherwise it is
-                    // round(nexttoward (s, 0)). However, in order to have the inexact flag
-                    // correctly set below, we set |s| to 1 - 2^(-m) in all cases.
-                    let neighbor = one_neighbor(m, false);
-                    result = Some(if s < 0u32 { -neighbor } else { neighbor });
-                } else {
-                    // |cos(x)| < 2^bound
-                    let bound = max(exp_s, i64::exact_from(err_bits) - i64::exact_from(m)) + 1;
-                    if bound < 0 {
-                        let c = u64::exact_from(-bound);
-                        if c >= max(NEAR_ZERO_MIN_CANCEL, prec >> 4) {
-                            return cos_near_zero(x, prec, rm, c);
-                        }
-                    }
-                    if exp_s < cancel {
-                        m += u64::exact_from(cancel - exp_s);
-                        cancel = exp_s;
-                    }
-                }
-            }
-        }
-        if let Some(s) = result {
-            break s;
+        match cos_ziv_step(x, exp_x, prec, rm, reduce, k0, &mut m, &mut cancel) {
+            TrigStep::Done(s) => break s,
+            TrigStep::NearZero(c) => return trig_near_zero(x, prec, rm, c, true),
+            TrigStep::Retry => {}
         }
         // ziv_next: MPFR_ZIV_NEXT (loop, m);
         m += increment;

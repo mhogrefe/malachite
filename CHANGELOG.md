@@ -238,6 +238,14 @@ documented by git history.
   of $\pi/2$ take a dedicated path that computes the distance to that multiple exactly, so the
   result is correct, and underflows correctly, even when the input agrees with the multiple to
   more than $2^{30}$ bits (a regime MPFR's wider exponent range never reaches).
+- `Sin` and `SinAssign` (new traits in malachite-base) for `Float`, with the usual
+  `sin_prec_round`, `sin_prec`, `sin_round`, and `_ref`/`_assign` variants: a port of `mpfr_sin`,
+  which derives the sine from the cosine as $\pm\sqrt{1-\cos^2 x}$ after reducing arguments of
+  magnitude 2 or more modulo $2\pi$. Inputs extremely close to a nonzero multiple of $\pi$ share
+  the cosine's exact near-zero path, so the result is correct, and underflows correctly, even
+  when the input agrees with the multiple to more than $2^{30}$ bits; the path is also taken as
+  soon as the argument reduction detects such an input, where MPFR keeps raising its working
+  precision instead.
 - `primitive_float_cos` and `primitive_float_cos_rational`, the correctly rounded cosine of an
   `f32` or `f64`, or of a `Rational` as an `f32` or `f64`, alongside the existing
   `primitive_float_exp` and `primitive_float_exp_rational`.

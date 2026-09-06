@@ -63,6 +63,7 @@ pub(crate) fn register(runner: &mut Runner) {
     shr::register(runner);
     shr_round::register(runner);
     sign::register(runner);
+    sin::register(runner);
     sqrt::register(runner);
     square::register(runner);
     sub::register(runner);
@@ -124,6 +125,7 @@ mod shl_round;
 mod shr;
 mod shr_round;
 mod sign;
+mod sin;
 mod sqrt;
 mod square;
 mod sub;

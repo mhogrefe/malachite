@@ -911,6 +911,18 @@ pub trait CosAssign {
     fn cos_assign(&mut self);
 }
 
+/// Computes $\sin(x)$, the sine of a number.
+pub trait Sin {
+    type Output;
+
+    fn sin(self) -> Self::Output;
+}
+
+/// Replaces a number with its sine, $\sin(x)$.
+pub trait SinAssign {
+    fn sin_assign(&mut self);
+}
+
 /// Computes $e^x-1$, the exponential of a number, minus one.
 pub trait ExpXMinus1 {
     type Output;

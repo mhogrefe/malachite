@@ -803,6 +803,10 @@ pub mod shr_round;
 /// An implementation of [`Sign`](malachite_base::num::arithmetic::traits::Sign), a trait for
 /// determining the sign of a number.
 pub mod sign;
+/// Implementations of [`Sin`](malachite_base::num::arithmetic::traits::Sin) and
+/// [`SinAssign`](malachite_base::num::arithmetic::traits::SinAssign), traits for computing the sine
+/// of [`Float`](super::Float)s.
+pub mod sin;
 /// [`Sqrt`](malachite_base::num::arithmetic::traits::Sqrt) and
 /// [`SqrtAssign`](malachite_base::num::arithmetic::traits::SqrtAssign), traits for computing the
 /// square root of [`Float`](super::Float)s.
