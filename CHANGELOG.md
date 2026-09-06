@@ -251,7 +251,10 @@ documented by git history.
   $+0.0$, as IEEE 754-2019's `cosPi` specifies), and eighths, twelfths, fifths, and tenths of a
   turn are computed from a single correctly rounded constant ($\sqrt2$, $\sqrt3$, or $\varphi$)
   rather than from $\pi$ and a cosine. Inputs within $2^{-2^{30}}$ of an odd quarter turn
-  underflow correctly.
+  underflow correctly. `cos_with_period_rational_prec_round` and `cos_with_period_rational_prec`
+  (with `_ref` variants) take a `Rational` instead, reaching the exact and closed-form cases
+  directly, such as a third or an eighth of a turn. `primitive_float_cos_with_period` and
+  `primitive_float_cos_with_period_rational` give the correctly rounded `f32` or `f64` results.
 - `cos_rational_prec_round` and `cos_rational_prec` (with `_ref` variants), the correctly
   rounded cosine of a `Rational` as a `Float`, alongside the `exp_rational_*` family. Since
   cosine is not monotonic, the result is bracketed by a Lipschitz bound around the cosine of a

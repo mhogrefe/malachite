@@ -30,16 +30,16 @@ use crate::test_util::generators::exhaustive::{
     add_mul_round_valid, add_prec_round_valid, add_rational_prec_round_valid,
     add_rational_round_valid, add_round_valid, agm_prec_round_valid, agm_rational_prec_round_valid,
     agm_round_valid, average_prec_round_valid, cbrt_prec_round_valid, cbrt_round_valid,
-    compound_prec_round_valid, cos_with_period_prec_round_valid, cos_with_period_round_valid,
-    div_prec_round_valid, div_rational_prec_round_valid, div_rational_round_valid, div_round_valid,
-    dot_prec_round_valid, dot_round_valid, exp_prec_round_valid, exp_rational_prec_round_valid,
-    exp_round_valid, float_to_sci_options_valid, from_primitive_float_prec_round_valid,
-    hypot_prec_round_valid, hypot_round_valid, integer_rounding_from_float_valid,
-    ln_1_plus_x_prec_round_valid, ln_1_plus_x_round_valid, ln_prec_round_valid,
-    ln_rational_prec_round_valid, ln_round_valid, log_base_1_plus_x_prec_round_valid,
-    log_base_1_plus_x_round_valid, log_base_2_1_plus_x_prec_round_valid,
-    log_base_2_1_plus_x_round_valid, log_base_2_prec_round_valid,
-    log_base_2_rational_prec_round_valid, log_base_2_round_valid,
+    compound_prec_round_valid, cos_with_period_prec_round_valid,
+    cos_with_period_rational_prec_round_valid, cos_with_period_round_valid, div_prec_round_valid,
+    div_rational_prec_round_valid, div_rational_round_valid, div_round_valid, dot_prec_round_valid,
+    dot_round_valid, exp_prec_round_valid, exp_rational_prec_round_valid, exp_round_valid,
+    float_to_sci_options_valid, from_primitive_float_prec_round_valid, hypot_prec_round_valid,
+    hypot_round_valid, integer_rounding_from_float_valid, ln_1_plus_x_prec_round_valid,
+    ln_1_plus_x_round_valid, ln_prec_round_valid, ln_rational_prec_round_valid, ln_round_valid,
+    log_base_1_plus_x_prec_round_valid, log_base_1_plus_x_round_valid,
+    log_base_2_1_plus_x_prec_round_valid, log_base_2_1_plus_x_round_valid,
+    log_base_2_prec_round_valid, log_base_2_rational_prec_round_valid, log_base_2_round_valid,
     log_base_10_1_plus_x_prec_round_valid, log_base_10_1_plus_x_round_valid,
     log_base_10_prec_round_valid, log_base_10_rational_prec_round_valid, log_base_10_round_valid,
     log_base_float_base_1_plus_x_prec_round_valid, log_base_float_base_1_plus_x_round_valid,
@@ -11814,6 +11814,39 @@ pub fn random_rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_3(
             &random_rounding_modes,
         )
         .filter(|&(ref n, k, prec, rm)| root_u_rational_prec_round_valid(n, k, prec, rm)),
+    )
+}
+
+pub fn random_rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_4(
+    config: &GenConfig,
+) -> It<(Rational, u64, u64, RoundingMode)> {
+    Box::new(
+        random_quadruples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_rationals(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_base_n", 16),
+                    config.get_or("mean_base_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(ref n, k, prec, rm)| cos_with_period_rational_prec_round_valid(n, k, prec, rm)),
     )
 }
 

@@ -26,8 +26,8 @@ use core::cmp::Ordering::{self, Equal, Greater, Less};
 use core::cmp::{max, min};
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    CeilingLogBase2, Cos, CosAssign, DivRoundAssign, FloorSqrt, Mod, ModPowerOf2, NegAssign,
-    Parity, PowerOf2, Square, SubMul, UnsignedAbs,
+    CeilingLogBase2, Cos, CosAssign, DivRoundAssign, Floor as FloorTrait, FloorSqrt, Mod,
+    ModPowerOf2, NegAssign, Parity, PowerOf2, Square, SubMul, UnsignedAbs,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -1602,20 +1602,14 @@ fn phi_minus_1_prec_round(prec: u64, rm: RoundingMode) -> (Float, Ordering) {
 // correctly rounded constant: d = 8 gives sqrt(2)/2, d = 12 gives sqrt(3)/2, and d = 5 and 10 give
 // phi/2 or (phi - 1)/2, up to sign. Those are 15 to 130 times faster than pi plus a cosine at the
 // working precision, and are never exact, so they return `None` for `Exact`.
-fn cos_with_period_special_case(
-    x: &Float,
-    u: u64,
-    prec: u64,
-    rm: RoundingMode,
-) -> Option<(Float, Ordering)> {
-    let q = Rational::exact_from(x) / Rational::from(u);
+fn cos_turns_special_case(q: &Rational, prec: u64, rm: RoundingMode) -> Option<(Float, Ordering)> {
     let d = q.denominator_ref();
     if *d > 12u32 {
         return None;
     }
     let d = u64::exact_from(d);
     // the angle in units of 1/d of a turn
-    let n = u64::exact_from(&Integer::from(q.into_numerator()).mod_op(Integer::from(d)));
+    let n = u64::exact_from(&Integer::from(q.numerator_ref()).mod_op(Integer::from(d)));
     match d {
         1 => Some((Float::one_prec(prec), Equal)),
         2 => Some((-Float::one_prec(prec), Equal)),
@@ -1654,23 +1648,17 @@ fn cos_with_period_special_case(
     }
 }
 
-// cos(2 pi x / u) for an x/u within about 2^-64 of an odd multiple of 1/4, where the cosine is
-// tiny. Since x/u is rational, so is its distance d to the nearest m/4, which is computed exactly;
-// then cos(2 pi x / u) = -sin(2 pi d) if m = 1 mod 4 and sin(2 pi d) if m = 3 mod 4, and sin is
-// bracketed by t - t^3/6 and t with pi bracketed at w bits. The bracket is rounded in `Rational`
-// arithmetic, so the result underflows correctly when it must. Returns `None` if x/u is not near an
-// odd multiple of 1/4 after all.
+// cos(2 pi q) for a fraction of a turn q within about 2^-64 of an odd multiple of 1/4, where the
+// cosine is tiny. Since q is rational, so is its distance d to the nearest m/4, which is computed
+// exactly; then cos(2 pi x / u) = -sin(2 pi d) if m = 1 mod 4 and sin(2 pi d) if m = 3 mod 4, and
+// sin is bracketed by t - t^3/6 and t with pi bracketed at w bits. The bracket is rounded in
+// `Rational` arithmetic, so the result underflows correctly when it must. Returns `None` if x/u is
+// not near an odd multiple of 1/4 after all.
 //
 // This has no MPFR counterpart: MPFR's exponent range is so wide that cosu never underflows there,
 // and `mpfr_cosu` simply keeps raising its working precision.
-fn cos_with_period_near_zero(
-    x: &Float,
-    u: u64,
-    prec: u64,
-    rm: RoundingMode,
-) -> Option<(Float, Ordering)> {
-    let q = Rational::exact_from(x) / Rational::from(u);
-    let m = Integer::rounding_from(&q << 2u32, Nearest).0;
+fn cos_turns_near_zero(q: &Rational, prec: u64, rm: RoundingMode) -> Option<(Float, Ordering)> {
+    let m = Integer::rounding_from(q << 2u32, Nearest).0;
     if m.even() {
         fail_on_untested_path("cos_with_period_near_zero, not near an odd multiple of 1/4");
         return None;
@@ -1712,7 +1700,7 @@ fn cos_with_period_near_zero(
 
 // Computes cos(2 pi x / u) for a finite nonzero `Float` x and a nonzero u, rounded to precision
 // `prec` with rounding mode `rm`. `rm` may be `Exact` only in the exact cases (see
-// `cos_with_period_special_case`).
+// `cos_turns_special_case`).
 //
 // This is mpfr_cosu from cosu.c, MPFR 4.2.2, with the additional near-zero path.
 fn cos_with_period_prec_round_normal_ref(
@@ -1739,8 +1727,7 @@ fn cos_with_period_prec_round_normal_ref(
         xr = r;
         &xr
     };
-    // now |xp/u| < 1
-    // for x small, we have |cos(2*pi*x/u)-1| < 1/2*(2*pi*x/u)^2 < 2^5*(x/u)^2
+    // now |xp/u| < 1 for x small, we have |cos(2*pi*x/u)-1| < 1/2*(2*pi*x/u)^2 < 2^5*(x/u)^2
     let exp_x = i64::from(xp.get_exponent().unwrap());
     let log2u = if u == 1 {
         0
@@ -1762,11 +1749,11 @@ fn cos_with_period_prec_round_normal_ref(
             return float_round_near_x(&Float::ONE, min(err, prec + 2), false, prec, rm).unwrap();
         }
     }
-    // The special cases need |x/u| >= 1/12, so the exponent test skips the `Rational`
-    // construction for the small x that would make it expensive (a tiny x has a huge power-of-2
-    // denominator).
+    // The special cases need |x/u| >= 1/12, so the exponent test skips the `Rational` construction
+    // for the small x that would make it expensive (a tiny x has a huge power-of-2 denominator).
     if exp_x >= i64::exact_from(u.significant_bits()) - 4
-        && let Some(result) = cos_with_period_special_case(xp, u, prec, rm)
+        && let Some(result) =
+            cos_turns_special_case(&(Rational::exact_from(xp) / Rational::from(u)), prec, rm)
     {
         return result;
     }
@@ -1811,7 +1798,8 @@ fn cos_with_period_prec_round_normal_ref(
         if exp_t < 0 {
             let cancel = u64::exact_from(-exp_t);
             if cancel >= max(NEAR_ZERO_MIN_CANCEL, prec >> 4)
-                && let Some(result) = cos_with_period_near_zero(xp, u, prec, rm)
+                && let Some(result) =
+                    cos_turns_near_zero(&(Rational::exact_from(xp) / Rational::from(u)), prec, rm)
             {
                 return result;
             }
@@ -2634,6 +2622,478 @@ impl Float {
     }
 }
 
+// Computes cos(2 pi q) for a nonzero fraction of a turn q with |q| < 1, rounded to precision `prec`
+// with rounding mode `rm`. This is the `Rational` counterpart of
+// `cos_with_period_prec_round_normal_ref`, with the same structure: the small-input shortcut, the
+// closed-form cases, and a Ziv loop around the cosine of a `Float` approximation of 2 pi q, whose
+// three roundings (q, pi, and the product) give the same error bound as MPFR's cosu. `rm` may be
+// `Exact` only in the exact cases.
+fn cos_turns_helper(q: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    let exp_q = q.floor_log_base_2_abs() + 1;
+    // for q small, we have |cos(2*pi*q)-1| < 1/2*(2*pi*q)^2 < 2^5*q^2 < 2^(5 + 2 EXP(q))
+    let err = -(exp_q << 1) - 5;
+    if err > 0 {
+        let err = u64::exact_from(err);
+        if err > prec + 1 {
+            // As in the `Float` version: the reference value 1 always rounds, the bound need not
+            // exceed prec + 2, and such a tiny q is neither a special case nor exact.
+            assert_ne!(rm, Exact, "Inexact cos_with_period");
+            return float_round_near_x(&Float::ONE, min(err, prec + 2), false, prec, rm).unwrap();
+        }
+    }
+    // The special cases need |q| >= 1/12
+    if exp_q >= -4
+        && let Some(result) = cos_turns_special_case(q, prec, rm)
+    {
+        return result;
+    }
+    // Only the exact cases can be rounded exactly
+    assert_ne!(rm, Exact, "Inexact cos_with_period");
+    let mut w = prec + prec.ceiling_log_base_2() + 8;
+    let mut increment = Limb::WIDTH;
+    loop {
+        // t = 2*pi*q * (1 + theta)^3 where |theta| <= 2^-w, from rounding q, pi, and the product
+        let mut t = Float::pi_prec(w).0 << 1u32;
+        t.mul_prec_assign(Float::from_rational_prec_ref(q, w).0, w);
+        if t == 0u32 {
+            // Unreachable in practice: such a q is caught by the small-input shortcut above unless
+            // `prec` exceeds 2^31 bits.
+            fail_on_untested_path("cos_turns_helper, 2 pi q underflowed");
+            return match rm {
+                Floor | Down => (one_neighbor(prec, false), Less),
+                _ => (Float::one_prec(prec), Greater),
+            };
+        }
+        // since w >= 2, |(1 + theta)^3 - 1| <= 4*theta <= 2^(2-w), and |cos(t) - cos(2 pi q)| <=
+        // |s| <= 2^(EXP(t) + 2 - w)
+        let exp_t = i64::from(t.get_exponent().unwrap());
+        let w_i = i64::exact_from(w);
+        let mut err = exp_t + 2 - w_i;
+        t.cos_prec_assign(w);
+        let exp_t = t.get_exponent().map_or(Float::MIN_EXPONENT_I64, i64::from);
+        if exp_t < 0 {
+            let cancel = u64::exact_from(-exp_t);
+            if cancel >= max(NEAR_ZERO_MIN_CANCEL, prec >> 4)
+                && let Some(result) = cos_turns_near_zero(q, prec, rm)
+            {
+                return result;
+            }
+        }
+        // the total error is at most 2^err + ulp(t)/2, bounded by 2^(EXP(t)-w) if err <= EXP(t)-w-1
+        // and by 2^(err+1) otherwise; then normalized for can_round
+        err = if err < exp_t - w_i {
+            exp_t - w_i
+        } else {
+            err + 1
+        };
+        err = exp_t - err;
+        if err > 0 && float_can_round(t.significand_ref().unwrap(), u64::exact_from(err), prec, rm)
+        {
+            return Float::from_float_prec_round(t, prec, rm);
+        }
+        w += increment;
+        increment = w >> 1;
+    }
+}
+
+impl Float {
+    /// Computes $\cos(2\pi x/u)$, the cosine of a [`Rational`] measured in $u$ths of a turn,
+    /// rounding the result to the specified precision and with the specified rounding mode, and
+    /// returning the result as a [`Float`]. The [`Rational`] is taken by value. An [`Ordering`] is
+    /// also returned, indicating whether the rounded cosine is less than, equal to, or greater than
+    /// the exact cosine. Although `NaN`s are not comparable to any [`Float`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,u,p,m) = \cos(2\pi x/u)+\varepsilon.
+    /// $$
+    /// - If $u=0$, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $u\neq 0$ and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |\cos(2\pi
+    ///   x/u)|\rfloor-p+1}$.
+    /// - If $u\neq 0$ and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |\cos(2\pi
+    ///   x/u)|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(x,0,p,m)=\text{NaN}$
+    /// - $f(0,u,p,m)=1$
+    /// - If $x/u$ is a multiple of $1/2$, the result is exactly $1$ or $-1$; if it is an odd
+    ///   multiple of $1/4$, the result is exactly $0.0$ (always positive, following IEEE 754-2019's
+    ///   `cosPi`); and if it is an odd multiple of $1/6$ or $1/3$, the result is exactly $1/2$ or
+    ///   $-1/2$.
+    ///
+    /// When $x/u$ in lowest terms has denominator 5, 8, 10, or 12, the result is $\pm\varphi/2$,
+    /// $\pm(\varphi-1)/2$, $\pm\sqrt2/2$, or $\pm\sqrt3/2$, and is computed from a single correctly
+    /// rounded constant rather than from $\pi$ and a cosine, which is far faster.
+    ///
+    /// Overflow and underflow:
+    /// - Since $|\cos(2\pi x/u)|\leq 1$, the result never overflows.
+    /// - If $0<f(x,u,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,u,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,u,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,u,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,u,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,u,p,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,u,p,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,u,p,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
+    ///
+    /// Underflow requires $x/u$ within $2^{-2^{30}}$ of an odd multiple of $1/4$ without being one,
+    /// which takes a denominator of more than $2^{30}$ bits.
+    ///
+    /// If you know you'll be using `Nearest`, consider using
+    /// [`Float::cos_with_period_rational_prec`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + (n+m) (\log (n+m))^2 \log\log (n+m))$
+    ///
+    /// $M(n, m) = O((n+m) \log (n+m))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`: the fraction of a turn is reduced modulo 1 exactly, so only its size
+    /// and the precision drive the cost, not the magnitude of $x$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision (which is the case unless $x/u$ is a multiple of $1/4$ or $1/6$, or
+    /// $x$ or $u$ is zero).
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::cos_with_period_rational_prec_round(Rational::ONE, 7, 10, Floor);
+    /// assert_eq!(c.to_string(), "0.62305");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::cos_with_period_rational_prec_round(Rational::ONE, 7, 10, Ceiling);
+    /// assert_eq!(c.to_string(), "0.62402");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) = Float::cos_with_period_rational_prec_round(Rational::ONE, 7, 10, Nearest);
+    /// assert_eq!(c.to_string(), "0.62305");
+    /// assert_eq!(o, Less);
+    ///
+    /// // a third of a turn is exact
+    /// let (c, o) = Float::cos_with_period_rational_prec_round(
+    ///     Rational::from_unsigneds(1u8, 3),
+    ///     1,
+    ///     10,
+    ///     Exact,
+    /// );
+    /// assert_eq!(c.to_string(), "-0.50000");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn cos_with_period_rational_prec_round(
+        x: Rational,
+        u: u64,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        Self::cos_with_period_rational_prec_round_ref(&x, u, prec, rm)
+    }
+
+    /// Computes $\cos(2\pi x/u)$, the cosine of a [`Rational`] measured in $u$ths of a turn,
+    /// rounding the result to the specified precision and with the specified rounding mode, and
+    /// returning the result as a [`Float`]. The [`Rational`] is taken by reference. An [`Ordering`]
+    /// is also returned, indicating whether the rounded cosine is less than, equal to, or greater
+    /// than the exact cosine. Although `NaN`s are not comparable to any [`Float`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,u,p,m) = \cos(2\pi x/u)+\varepsilon.
+    /// $$
+    /// - If $u=0$, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $u\neq 0$ and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |\cos(2\pi
+    ///   x/u)|\rfloor-p+1}$.
+    /// - If $u\neq 0$ and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |\cos(2\pi
+    ///   x/u)|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(x,0,p,m)=\text{NaN}$
+    /// - $f(0,u,p,m)=1$
+    /// - If $x/u$ is a multiple of $1/2$, the result is exactly $1$ or $-1$; if it is an odd
+    ///   multiple of $1/4$, the result is exactly $0.0$ (always positive, following IEEE 754-2019's
+    ///   `cosPi`); and if it is an odd multiple of $1/6$ or $1/3$, the result is exactly $1/2$ or
+    ///   $-1/2$.
+    ///
+    /// When $x/u$ in lowest terms has denominator 5, 8, 10, or 12, the result is $\pm\varphi/2$,
+    /// $\pm(\varphi-1)/2$, $\pm\sqrt2/2$, or $\pm\sqrt3/2$, and is computed from a single correctly
+    /// rounded constant rather than from $\pi$ and a cosine, which is far faster.
+    ///
+    /// Overflow and underflow:
+    /// - Since $|\cos(2\pi x/u)|\leq 1$, the result never overflows.
+    /// - If $0<f(x,u,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,u,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,u,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,u,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,u,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,u,p,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,u,p,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,u,p,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
+    ///
+    /// Underflow requires $x/u$ within $2^{-2^{30}}$ of an odd multiple of $1/4$ without being one,
+    /// which takes a denominator of more than $2^{30}$ bits.
+    ///
+    /// If you know you'll be using `Nearest`, consider using
+    /// [`Float::cos_with_period_rational_prec_ref`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + (n+m) (\log (n+m))^2 \log\log (n+m))$
+    ///
+    /// $M(n, m) = O((n+m) \log (n+m))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`: the fraction of a turn is reduced modulo 1 exactly, so only its size
+    /// and the precision drive the cost, not the magnitude of $x$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision (which is the case unless $x/u$ is a multiple of $1/4$ or $1/6$, or
+    /// $x$ or $u$ is zero).
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::cos_with_period_rational_prec_round_ref(&Rational::ONE, 7, 10, Floor);
+    /// assert_eq!(c.to_string(), "0.62305");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::cos_with_period_rational_prec_round_ref(&Rational::ONE, 7, 10, Ceiling);
+    /// assert_eq!(c.to_string(), "0.62402");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) = Float::cos_with_period_rational_prec_round_ref(&Rational::ONE, 7, 10, Nearest);
+    /// assert_eq!(c.to_string(), "0.62305");
+    /// assert_eq!(o, Less);
+    ///
+    /// // a third of a turn is exact
+    /// let (c, o) = Float::cos_with_period_rational_prec_round_ref(
+    ///     &Rational::from_unsigneds(1u8, 3),
+    ///     1,
+    ///     10,
+    ///     Exact,
+    /// );
+    /// assert_eq!(c.to_string(), "-0.50000");
+    /// assert_eq!(o, Equal);
+    /// ```
+    pub fn cos_with_period_rational_prec_round_ref(
+        x: &Rational,
+        u: u64,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        // for u = 0, return NaN
+        if u == 0 {
+            return (Self::NAN, Equal);
+        }
+        // cos(0) = 1
+        if *x == 0u32 {
+            return (Self::one_prec(prec), Equal);
+        }
+        // q = x/u, reduced to [0, 1): cos(2 pi q) has period 1 in q
+        let q = x / Rational::from(u);
+        let whole = Rational::from((&q).floor());
+        let q = q - whole;
+        if q == 0u32 {
+            return (Self::one_prec(prec), Equal);
+        }
+        cos_turns_helper(&q, prec, rm)
+    }
+
+    /// Computes $\cos(2\pi x/u)$, the cosine of a [`Rational`] measured in $u$ths of a turn,
+    /// rounding the result to the nearest value of the specified precision, and returning the
+    /// result as a [`Float`]. The [`Rational`] is taken by value. An [`Ordering`] is also returned,
+    /// indicating whether the rounded cosine is less than, equal to, or greater than the exact
+    /// cosine. Although `NaN`s are not comparable to any [`Float`], whenever this function returns
+    /// a `NaN` it also returns `Equal`.
+    ///
+    /// If the cosine is equidistant from two [`Float`]s with the specified precision, the [`Float`]
+    /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
+    /// the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,u,p) = \cos(2\pi x/u)+\varepsilon.
+    /// $$
+    /// - If $u=0$, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $u\neq 0$, then $|\varepsilon| < 2^{\lfloor\log_2 |\cos(2\pi x/u)|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(x,0,p)=\text{NaN}$
+    /// - $f(0,u,p)=1$
+    /// - If $x/u$ is a multiple of $1/2$, the result is exactly $1$ or $-1$; if it is an odd
+    ///   multiple of $1/4$, the result is exactly $0.0$ (always positive, following IEEE 754-2019's
+    ///   `cosPi`); and if it is an odd multiple of $1/6$ or $1/3$, the result is exactly $1/2$ or
+    ///   $-1/2$.
+    ///
+    /// When $x/u$ in lowest terms has denominator 5, 8, 10, or 12, the result is $\pm\varphi/2$,
+    /// $\pm(\varphi-1)/2$, $\pm\sqrt2/2$, or $\pm\sqrt3/2$, and is computed from a single correctly
+    /// rounded constant rather than from $\pi$ and a cosine, which is far faster.
+    ///
+    /// Overflow and underflow:
+    /// - Since $|\cos(2\pi x/u)|\leq 1$, the result never overflows.
+    /// - If $0<f(x,u,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,u,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,u,p)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,u,p)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
+    ///
+    /// Underflow requires $x/u$ within $2^{-2^{30}}$ of an odd multiple of $1/4$ without being one,
+    /// which takes a denominator of more than $2^{30}$ bits.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::cos_with_period_rational_prec_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + (n+m) (\log (n+m))^2 \log\log (n+m))$
+    ///
+    /// $M(n, m) = O((n+m) \log (n+m))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`: the fraction of a turn is reduced modulo 1 exactly, so only its size
+    /// and the precision drive the cost, not the magnitude of $x$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::cos_with_period_rational_prec(Rational::ONE, 7, 10);
+    /// assert_eq!(c.to_string(), "0.62305");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::cos_with_period_rational_prec(Rational::ONE, 7, 53);
+    /// assert_eq!(c.to_string(), "0.62348980185873348");
+    /// assert_eq!(o, Less);
+    ///
+    /// // an eighth of a turn: sqrt(2)/2
+    /// let (c, o) = Float::cos_with_period_rational_prec(Rational::from_unsigneds(1u8, 8), 1, 53);
+    /// assert_eq!(c.to_string(), "0.70710678118654757");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn cos_with_period_rational_prec(x: Rational, u: u64, prec: u64) -> (Self, Ordering) {
+        Self::cos_with_period_rational_prec_round_ref(&x, u, prec, Nearest)
+    }
+
+    /// Computes $\cos(2\pi x/u)$, the cosine of a [`Rational`] measured in $u$ths of a turn,
+    /// rounding the result to the nearest value of the specified precision, and returning the
+    /// result as a [`Float`]. The [`Rational`] is taken by reference. An [`Ordering`] is also
+    /// returned, indicating whether the rounded cosine is less than, equal to, or greater than the
+    /// exact cosine. Although `NaN`s are not comparable to any [`Float`], whenever this function
+    /// returns a `NaN` it also returns `Equal`.
+    ///
+    /// If the cosine is equidistant from two [`Float`]s with the specified precision, the [`Float`]
+    /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
+    /// the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,u,p) = \cos(2\pi x/u)+\varepsilon.
+    /// $$
+    /// - If $u=0$, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $u\neq 0$, then $|\varepsilon| < 2^{\lfloor\log_2 |\cos(2\pi x/u)|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(x,0,p)=\text{NaN}$
+    /// - $f(0,u,p)=1$
+    /// - If $x/u$ is a multiple of $1/2$, the result is exactly $1$ or $-1$; if it is an odd
+    ///   multiple of $1/4$, the result is exactly $0.0$ (always positive, following IEEE 754-2019's
+    ///   `cosPi`); and if it is an odd multiple of $1/6$ or $1/3$, the result is exactly $1/2$ or
+    ///   $-1/2$.
+    ///
+    /// When $x/u$ in lowest terms has denominator 5, 8, 10, or 12, the result is $\pm\varphi/2$,
+    /// $\pm(\varphi-1)/2$, $\pm\sqrt2/2$, or $\pm\sqrt3/2$, and is computed from a single correctly
+    /// rounded constant rather than from $\pi$ and a cosine, which is far faster.
+    ///
+    /// Overflow and underflow:
+    /// - Since $|\cos(2\pi x/u)|\leq 1$, the result never overflows.
+    /// - If $0<f(x,u,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,u,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,u,p)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,u,p)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
+    ///
+    /// Underflow requires $x/u$ within $2^{-2^{30}}$ of an odd multiple of $1/4$ without being one,
+    /// which takes a denominator of more than $2^{30}$ bits.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::cos_with_period_rational_prec_round_ref`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n^{3/2} \log n \log\log n + (n+m) (\log (n+m))^2 \log\log (n+m))$
+    ///
+    /// $M(n, m) = O((n+m) \log (n+m))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`: the fraction of a turn is reduced modulo 1 exactly, so only its size
+    /// and the precision drive the cost, not the magnitude of $x$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::cos_with_period_rational_prec_ref(&Rational::ONE, 7, 10);
+    /// assert_eq!(c.to_string(), "0.62305");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::cos_with_period_rational_prec_ref(&Rational::ONE, 7, 53);
+    /// assert_eq!(c.to_string(), "0.62348980185873348");
+    /// assert_eq!(o, Less);
+    ///
+    /// // an eighth of a turn: sqrt(2)/2
+    /// let (c, o) =
+    ///     Float::cos_with_period_rational_prec_ref(&Rational::from_unsigneds(1u8, 8), 1, 53);
+    /// assert_eq!(c.to_string(), "0.70710678118654757");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn cos_with_period_rational_prec_ref(x: &Rational, u: u64, prec: u64) -> (Self, Ordering) {
+        Self::cos_with_period_rational_prec_round_ref(x, u, prec, Nearest)
+    }
+}
+
 impl Cos for Float {
     type Output = Self;
 
@@ -2944,4 +3404,150 @@ where
     for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
 {
     emulate_rational_to_float_fn(Float::cos_rational_prec_ref, x)
+}
+
+/// Computes $\cos(2\pi x/u)$, the cosine of a primitive float measured in $u$ths of a turn (so that
+/// `u = 360` is degrees).
+///
+/// $$
+/// f(x,u) = \cos(2\pi x/u)+\varepsilon.
+/// $$
+/// - If $x$ is not finite or $u=0$, $\varepsilon$ may be ignored or assumed to be 0.
+/// - If $x$ is finite and $u\neq 0$, then $|\varepsilon| < 2^{\lfloor\log_2 |\cos(2\pi
+///   x/u)|\rfloor-p}$, where $p$ is the precision of the output (24 if `T` is a [`f32`] and 53 if
+///   `T` is a [`f64`]).
+///
+/// Special cases:
+/// - $f(\text{NaN},u)=\text{NaN}$
+/// - $f(\pm\infty,u)=\text{NaN}$
+/// - $f(x,0)=\text{NaN}$
+/// - $f(\pm0.0,u)=1.0$
+/// - If $x/u$ is a multiple of $1/2$, the result is exactly $1$ or $-1$; if it is an odd multiple
+///   of $1/4$, the result is exactly $0.0$ (always positive, following IEEE 754-2019's `cosPi`);
+///   and if it is an odd multiple of $1/6$ or $1/3$, the result is exactly $1/2$ or $-1/2$.
+///
+/// Overflow and underflow are not possible: the result lies in $[-1, 1]$, and no [`f32`] or [`f64`]
+/// is close enough to an odd quarter turn, without being one, for its cosine to be subnormal.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::NegativeInfinity;
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::cos::primitive_float_cos_with_period;
+///
+/// assert!(primitive_float_cos_with_period(f32::NAN, 360).is_nan());
+/// assert!(primitive_float_cos_with_period(f32::INFINITY, 360).is_nan());
+/// assert!(primitive_float_cos_with_period(1.0f32, 0).is_nan());
+/// assert_eq!(
+///     NiceFloat(primitive_float_cos_with_period(0.0f32, 360)),
+///     NiceFloat(1.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_cos_with_period(90.0f32, 360)),
+///     NiceFloat(0.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_cos_with_period(60.0f64, 360)),
+///     NiceFloat(0.5)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_cos_with_period(1.0f32, 7)),
+///     NiceFloat(0.6234898)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_cos_with_period(1.0f64, 7)),
+///     NiceFloat(0.6234898018587335)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_cos_with_period<T: PrimitiveFloat>(x: T, u: u64) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_float_to_float_fn(|x, prec| Float::cos_with_period_prec(x, u, prec), x)
+}
+
+/// Computes $\cos(2\pi x/u)$, the cosine of a [`Rational`] measured in $u$ths of a turn (so that `u
+/// = 360` is degrees), returning the result as a primitive float.
+///
+/// $$
+/// f(x,u) = \cos(2\pi x/u)+\varepsilon.
+/// $$
+/// - If $u=0$, $\varepsilon$ may be ignored or assumed to be 0.
+/// - If $u\neq 0$, then $|\varepsilon| < 2^{\lfloor\log_2 |\cos(2\pi x/u)|\rfloor-p}$, where $p$ is
+///   the precision of the output (24 if `T` is a [`f32`] and 53 if `T` is a [`f64`]).
+///
+/// Special cases:
+/// - $f(x,0)=\text{NaN}$
+/// - $f(0,u)=1$
+/// - If $x/u$ is a multiple of $1/2$, the result is exactly $1$ or $-1$; if it is an odd multiple
+///   of $1/4$, the result is exactly $0.0$ (always positive, following IEEE 754-2019's `cosPi`);
+///   and if it is an odd multiple of $1/6$ or $1/3$, the result is exactly $1/2$ or $-1/2$.
+///
+/// Overflow and underflow are not possible: the result lies in $[-1, 1]$, and a [`Rational`] close
+/// enough to an odd quarter turn, without being one, for its cosine to be subnormal would need a
+/// denominator of more than 100 bits, in which case the result is still correctly rounded.
+///
+/// # Worst-case complexity
+/// $T(m) = O(m (\log m)^2 \log\log m)$
+///
+/// $M(m) = O(m \log m)$
+///
+/// where $T$ is time, $M$ is additional memory, and $m$ is `x.significant_bits()`: the fraction of
+/// a turn is reduced modulo 1 exactly, so the magnitude of $x$ does not drive the cost.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::Zero;
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::cos::primitive_float_cos_with_period_rational;
+/// use malachite_q::Rational;
+///
+/// assert!(primitive_float_cos_with_period_rational::<f64>(&Rational::ZERO, 0).is_nan());
+/// assert_eq!(
+///     NiceFloat(primitive_float_cos_with_period_rational::<f64>(
+///         &Rational::ZERO,
+///         360
+///     )),
+///     NiceFloat(1.0)
+/// );
+/// // a third of a turn is exactly -1/2
+/// assert_eq!(
+///     NiceFloat(primitive_float_cos_with_period_rational::<f64>(
+///         &Rational::from_unsigneds(1u8, 3),
+///         1
+///     )),
+///     NiceFloat(-0.5)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_cos_with_period_rational::<f32>(
+///         &Rational::from_unsigneds(1u8, 7),
+///         1
+///     )),
+///     NiceFloat(0.6234898)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_cos_with_period_rational::<f64>(
+///         &Rational::from_unsigneds(1u8, 7),
+///         1
+///     )),
+///     NiceFloat(0.6234898018587335)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_cos_with_period_rational<T: PrimitiveFloat>(x: &Rational, u: u64) -> T
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_rational_to_float_fn(
+        |x, prec| Float::cos_with_period_rational_prec_ref(x, u, prec),
+        x,
+    )
 }

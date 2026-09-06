@@ -19,15 +19,20 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::{
-    primitive_float_gen, unsigned_rounding_mode_pair_gen_var_3,
+    primitive_float_gen, primitive_float_unsigned_pair_gen_var_1,
+    unsigned_rounding_mode_pair_gen_var_3,
 };
-use malachite_float::float::arithmetic::cos::{primitive_float_cos, primitive_float_cos_rational};
+use malachite_float::float::arithmetic::cos::{
+    primitive_float_cos, primitive_float_cos_rational, primitive_float_cos_with_period,
+    primitive_float_cos_with_period_rational,
+};
 use malachite_float::test_util::common::{
     parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::cos::{
     rug_cos, rug_cos_prec, rug_cos_prec_round, rug_cos_rational_prec, rug_cos_rational_prec_round,
     rug_cos_round, rug_cos_with_period_prec, rug_cos_with_period_prec_round,
+    rug_cos_with_period_rational_prec, rug_cos_with_period_rational_prec_round,
 };
 use malachite_float::test_util::generators::{
     float_gen, float_rounding_mode_pair_gen_var_47, float_unsigned_pair_gen_var_1,
@@ -35,10 +40,13 @@ use malachite_float::test_util::generators::{
     float_unsigned_unsigned_rounding_mode_quadruple_gen_var_15,
     float_unsigned_unsigned_rounding_mode_quadruple_gen_var_16,
     float_unsigned_unsigned_triple_gen_var_1, rational_unsigned_rounding_mode_triple_gen_var_10,
+    rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_4,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_q::Rational;
-use malachite_q::test_util::generators::{rational_gen, rational_unsigned_pair_gen_var_3};
+use malachite_q::test_util::generators::{
+    rational_gen, rational_unsigned_pair_gen_var_1, rational_unsigned_pair_gen_var_3,
+};
 use std::panic::catch_unwind;
 use std::str::FromStr;
 
@@ -11596,4 +11604,1023 @@ fn cos_with_period_round_properties() {
         assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
         assert_eq!(o_alt, o);
     });
+}
+
+// The `Rational` inputs include exact and closed-form cases hit directly (1/3, 1/8, 1/5, 1/10 of a
+// turn), which the `Float` version can only reach through a divisor, and non-dyadic inputs whose
+// cosines MPFR cannot compute exactly, since it must round the input first.
+#[test]
+fn test_cos_with_period_rational_prec_round() {
+    let test = |s, u: u64, prec: u64, rm, out: &str, out_hex: &str, o_out: Ordering| {
+        let x = Rational::from_str(s).unwrap();
+
+        let (c, o) = Float::cos_with_period_rational_prec_round(x.clone(), u, prec, rm);
+        assert!(c.is_valid());
+        assert_eq!(c.to_string(), out);
+        assert_eq!(to_hex_string(&c), out_hex);
+        assert_eq!(o, o_out);
+
+        let (c_alt, o_alt) = Float::cos_with_period_rational_prec_round_ref(&x, u, prec, rm);
+        assert!(c_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+        assert_eq!(o_alt, o);
+
+        if rm == Nearest {
+            let (c_alt, o_alt) = Float::cos_with_period_rational_prec(x.clone(), u, prec);
+            assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+            assert_eq!(o_alt, o);
+            let (c_alt, o_alt) = Float::cos_with_period_rational_prec_ref(&x, u, prec);
+            assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+            assert_eq!(o_alt, o);
+        }
+    };
+    test("0", 4, 1, Nearest, "1.0", "0x1.0#1", Equal);
+    test("0", 4, 10, Nearest, "1.0000", "0x1.000#10", Equal);
+    test("0", 4, 10, Floor, "1.0000", "0x1.000#10", Equal);
+    test("0", 4, 10, Ceiling, "1.0000", "0x1.000#10", Equal);
+    test("0", 4, 10, Exact, "1.0000", "0x1.000#10", Equal);
+    test(
+        "0",
+        4,
+        53,
+        Nearest,
+        "1.0000000000000000",
+        "0x1.0000000000000#53",
+        Equal,
+    );
+    test("0", 0, 1, Nearest, "NaN", "NaN", Equal);
+    // - u = 0: NaN
+    test("0", 0, 10, Nearest, "NaN", "NaN", Equal);
+    test("0", 0, 10, Floor, "NaN", "NaN", Equal);
+    test("0", 0, 10, Ceiling, "NaN", "NaN", Equal);
+    test("0", 0, 10, Exact, "NaN", "NaN", Equal);
+    test("0", 0, 53, Nearest, "NaN", "NaN", Equal);
+    test("1", 0, 1, Nearest, "NaN", "NaN", Equal);
+    test("1", 0, 10, Nearest, "NaN", "NaN", Equal);
+    test("1", 0, 10, Floor, "NaN", "NaN", Equal);
+    test("1", 0, 10, Ceiling, "NaN", "NaN", Equal);
+    test("1", 0, 10, Exact, "NaN", "NaN", Equal);
+    test("1", 0, 53, Nearest, "NaN", "NaN", Equal);
+    test("90", 360, 1, Nearest, "0.0", "0x0.0", Equal);
+    // - exact: a quarter turn
+    test("90", 360, 10, Nearest, "0.0", "0x0.0", Equal);
+    test("90", 360, 10, Floor, "0.0", "0x0.0", Equal);
+    test("90", 360, 10, Ceiling, "0.0", "0x0.0", Equal);
+    test("90", 360, 10, Exact, "0.0", "0x0.0", Equal);
+    test("90", 360, 53, Nearest, "0.0", "0x0.0", Equal);
+    test("180", 360, 1, Nearest, "-1.0", "-0x1.0#1", Equal);
+    test("180", 360, 10, Nearest, "-1.0000", "-0x1.000#10", Equal);
+    test("180", 360, 10, Floor, "-1.0000", "-0x1.000#10", Equal);
+    test("180", 360, 10, Ceiling, "-1.0000", "-0x1.000#10", Equal);
+    test("180", 360, 10, Exact, "-1.0000", "-0x1.000#10", Equal);
+    test(
+        "180",
+        360,
+        53,
+        Nearest,
+        "-1.0000000000000000",
+        "-0x1.0000000000000#53",
+        Equal,
+    );
+    test("270", 360, 1, Nearest, "0.0", "0x0.0", Equal);
+    test("270", 360, 10, Nearest, "0.0", "0x0.0", Equal);
+    test("270", 360, 10, Floor, "0.0", "0x0.0", Equal);
+    test("270", 360, 10, Ceiling, "0.0", "0x0.0", Equal);
+    test("270", 360, 10, Exact, "0.0", "0x0.0", Equal);
+    test("270", 360, 53, Nearest, "0.0", "0x0.0", Equal);
+    test("360", 360, 1, Nearest, "1.0", "0x1.0#1", Equal);
+    // - a full turn: reduced to 0
+    test("360", 360, 10, Nearest, "1.0000", "0x1.000#10", Equal);
+    test("360", 360, 10, Floor, "1.0000", "0x1.000#10", Equal);
+    test("360", 360, 10, Ceiling, "1.0000", "0x1.000#10", Equal);
+    test("360", 360, 10, Exact, "1.0000", "0x1.000#10", Equal);
+    test(
+        "360",
+        360,
+        53,
+        Nearest,
+        "1.0000000000000000",
+        "0x1.0000000000000#53",
+        Equal,
+    );
+    test("450", 360, 1, Nearest, "0.0", "0x0.0", Equal);
+    test("450", 360, 10, Nearest, "0.0", "0x0.0", Equal);
+    test("450", 360, 10, Floor, "0.0", "0x0.0", Equal);
+    test("450", 360, 10, Ceiling, "0.0", "0x0.0", Equal);
+    test("450", 360, 10, Exact, "0.0", "0x0.0", Equal);
+    test("450", 360, 53, Nearest, "0.0", "0x0.0", Equal);
+    test("60", 360, 1, Nearest, "0.50", "0x0.8#1", Equal);
+    // - exact: a sixth of a turn
+    test("60", 360, 10, Nearest, "0.50000", "0x0.800#10", Equal);
+    test("60", 360, 10, Floor, "0.50000", "0x0.800#10", Equal);
+    test("60", 360, 10, Ceiling, "0.50000", "0x0.800#10", Equal);
+    test("60", 360, 10, Exact, "0.50000", "0x0.800#10", Equal);
+    test(
+        "60",
+        360,
+        53,
+        Nearest,
+        "0.50000000000000000",
+        "0x0.80000000000000#53",
+        Equal,
+    );
+    test("120", 360, 1, Nearest, "-0.50", "-0x0.8#1", Equal);
+    test("120", 360, 10, Nearest, "-0.50000", "-0x0.800#10", Equal);
+    test("120", 360, 10, Floor, "-0.50000", "-0x0.800#10", Equal);
+    test("120", 360, 10, Ceiling, "-0.50000", "-0x0.800#10", Equal);
+    test("120", 360, 10, Exact, "-0.50000", "-0x0.800#10", Equal);
+    test(
+        "120",
+        360,
+        53,
+        Nearest,
+        "-0.50000000000000000",
+        "-0x0.80000000000000#53",
+        Equal,
+    );
+    test("240", 360, 1, Nearest, "-0.50", "-0x0.8#1", Equal);
+    test("240", 360, 10, Nearest, "-0.50000", "-0x0.800#10", Equal);
+    test("240", 360, 10, Floor, "-0.50000", "-0x0.800#10", Equal);
+    test("240", 360, 10, Ceiling, "-0.50000", "-0x0.800#10", Equal);
+    test("240", 360, 10, Exact, "-0.50000", "-0x0.800#10", Equal);
+    test(
+        "240",
+        360,
+        53,
+        Nearest,
+        "-0.50000000000000000",
+        "-0x0.80000000000000#53",
+        Equal,
+    );
+    test("300", 360, 1, Nearest, "0.50", "0x0.8#1", Equal);
+    test("300", 360, 10, Nearest, "0.50000", "0x0.800#10", Equal);
+    test("300", 360, 10, Floor, "0.50000", "0x0.800#10", Equal);
+    test("300", 360, 10, Ceiling, "0.50000", "0x0.800#10", Equal);
+    test("300", 360, 10, Exact, "0.50000", "0x0.800#10", Equal);
+    test(
+        "300",
+        360,
+        53,
+        Nearest,
+        "0.50000000000000000",
+        "0x0.80000000000000#53",
+        Equal,
+    );
+    test("45", 360, 1, Nearest, "0.50", "0x0.8#1", Less);
+    // - closed form: sqrt(2)/2
+    test("45", 360, 10, Nearest, "0.70703", "0x0.b50#10", Less);
+    test("45", 360, 10, Floor, "0.70703", "0x0.b50#10", Less);
+    test("45", 360, 10, Ceiling, "0.70801", "0x0.b54#10", Greater);
+    test(
+        "45",
+        360,
+        53,
+        Nearest,
+        "0.70710678118654757",
+        "0x0.b504f333f9de68#53",
+        Greater,
+    );
+    test("135", 360, 1, Nearest, "-0.50", "-0x0.8#1", Greater);
+    test("135", 360, 10, Nearest, "-0.70703", "-0x0.b50#10", Greater);
+    test("135", 360, 10, Floor, "-0.70801", "-0x0.b54#10", Less);
+    test("135", 360, 10, Ceiling, "-0.70703", "-0x0.b50#10", Greater);
+    test(
+        "135",
+        360,
+        53,
+        Nearest,
+        "-0.70710678118654757",
+        "-0x0.b504f333f9de68#53",
+        Less,
+    );
+    test("30", 360, 1, Nearest, "1.0", "0x1.0#1", Greater);
+    // - closed form: sqrt(3)/2
+    test("30", 360, 10, Nearest, "0.86621", "0x0.ddc#10", Greater);
+    test("30", 360, 10, Floor, "0.86523", "0x0.dd8#10", Less);
+    test("30", 360, 10, Ceiling, "0.86621", "0x0.ddc#10", Greater);
+    test(
+        "30",
+        360,
+        53,
+        Nearest,
+        "0.86602540378443860",
+        "0x0.ddb3d742c26550#53",
+        Less,
+    );
+    test("150", 360, 1, Nearest, "-1.0", "-0x1.0#1", Less);
+    test("150", 360, 10, Nearest, "-0.86621", "-0x0.ddc#10", Less);
+    test("150", 360, 10, Floor, "-0.86621", "-0x0.ddc#10", Less);
+    test("150", 360, 10, Ceiling, "-0.86523", "-0x0.dd8#10", Greater);
+    test(
+        "150",
+        360,
+        53,
+        Nearest,
+        "-0.86602540378443860",
+        "-0x0.ddb3d742c26550#53",
+        Greater,
+    );
+    test("72", 360, 1, Nearest, "0.25", "0x0.4#1", Less);
+    // - closed form: (phi - 1)/2
+    test("72", 360, 10, Nearest, "0.30908", "0x0.4f2#10", Greater);
+    test("72", 360, 10, Floor, "0.30859", "0x0.4f0#10", Less);
+    test("72", 360, 10, Ceiling, "0.30908", "0x0.4f2#10", Greater);
+    test(
+        "72",
+        360,
+        53,
+        Nearest,
+        "0.30901699437494745",
+        "0x0.4f1bbcdcbfa540#53",
+        Greater,
+    );
+    test("144", 360, 1, Nearest, "-1.0", "-0x1.0#1", Less);
+    test("144", 360, 10, Nearest, "-0.80859", "-0x0.cf0#10", Greater);
+    test("144", 360, 10, Floor, "-0.80957", "-0x0.cf4#10", Less);
+    test("144", 360, 10, Ceiling, "-0.80859", "-0x0.cf0#10", Greater);
+    test(
+        "144",
+        360,
+        53,
+        Nearest,
+        "-0.80901699437494745",
+        "-0x0.cf1bbcdcbfa540#53",
+        Less,
+    );
+    test("36", 360, 1, Nearest, "1.0", "0x1.0#1", Greater);
+    // - closed form: phi/2
+    test("36", 360, 10, Nearest, "0.80859", "0x0.cf0#10", Less);
+    test("36", 360, 10, Floor, "0.80859", "0x0.cf0#10", Less);
+    test("36", 360, 10, Ceiling, "0.80957", "0x0.cf4#10", Greater);
+    test(
+        "36",
+        360,
+        53,
+        Nearest,
+        "0.80901699437494745",
+        "0x0.cf1bbcdcbfa540#53",
+        Greater,
+    );
+    test("108", 360, 1, Nearest, "-0.25", "-0x0.4#1", Greater);
+    test("108", 360, 10, Nearest, "-0.30908", "-0x0.4f2#10", Less);
+    test("108", 360, 10, Floor, "-0.30908", "-0x0.4f2#10", Less);
+    test("108", 360, 10, Ceiling, "-0.30859", "-0x0.4f0#10", Greater);
+    test(
+        "108",
+        360,
+        53,
+        Nearest,
+        "-0.30901699437494745",
+        "-0x0.4f1bbcdcbfa540#53",
+        Less,
+    );
+    test("1/3", 1, 1, Nearest, "-0.50", "-0x0.8#1", Equal);
+    // - a third of a turn, from a rational directly
+    test("1/3", 1, 10, Nearest, "-0.50000", "-0x0.800#10", Equal);
+    test("1/3", 1, 10, Floor, "-0.50000", "-0x0.800#10", Equal);
+    test("1/3", 1, 10, Ceiling, "-0.50000", "-0x0.800#10", Equal);
+    test("1/3", 1, 10, Exact, "-0.50000", "-0x0.800#10", Equal);
+    test(
+        "1/3",
+        1,
+        53,
+        Nearest,
+        "-0.50000000000000000",
+        "-0x0.80000000000000#53",
+        Equal,
+    );
+    test("1/8", 1, 1, Nearest, "0.50", "0x0.8#1", Less);
+    test("1/8", 1, 10, Nearest, "0.70703", "0x0.b50#10", Less);
+    test("1/8", 1, 10, Floor, "0.70703", "0x0.b50#10", Less);
+    test("1/8", 1, 10, Ceiling, "0.70801", "0x0.b54#10", Greater);
+    test(
+        "1/8",
+        1,
+        53,
+        Nearest,
+        "0.70710678118654757",
+        "0x0.b504f333f9de68#53",
+        Greater,
+    );
+    test("1/5", 1, 1, Nearest, "0.25", "0x0.4#1", Less);
+    test("1/5", 1, 10, Nearest, "0.30908", "0x0.4f2#10", Greater);
+    test("1/5", 1, 10, Floor, "0.30859", "0x0.4f0#10", Less);
+    test("1/5", 1, 10, Ceiling, "0.30908", "0x0.4f2#10", Greater);
+    test(
+        "1/5",
+        1,
+        53,
+        Nearest,
+        "0.30901699437494745",
+        "0x0.4f1bbcdcbfa540#53",
+        Greater,
+    );
+    test("-1/10", 1, 1, Nearest, "1.0", "0x1.0#1", Greater);
+    test("-1/10", 1, 10, Nearest, "0.80859", "0x0.cf0#10", Less);
+    test("-1/10", 1, 10, Floor, "0.80859", "0x0.cf0#10", Less);
+    test("-1/10", 1, 10, Ceiling, "0.80957", "0x0.cf4#10", Greater);
+    test(
+        "-1/10",
+        1,
+        53,
+        Nearest,
+        "0.80901699437494745",
+        "0x0.cf1bbcdcbfa540#53",
+        Greater,
+    );
+    test("1/7", 1, 1, Nearest, "0.50", "0x0.8#1", Less);
+    // - general case
+    test("1/7", 1, 10, Nearest, "0.62305", "0x0.9f8#10", Less);
+    test("1/7", 1, 10, Floor, "0.62305", "0x0.9f8#10", Less);
+    test("1/7", 1, 10, Ceiling, "0.62402", "0x0.9fc#10", Greater);
+    test(
+        "1/7",
+        1,
+        53,
+        Nearest,
+        "0.62348980185873348",
+        "0x0.9f9d07145f6e88#53",
+        Less,
+    );
+    test("2/7", 1, 1, Nearest, "-0.25", "-0x0.4#1", Less);
+    test("2/7", 1, 10, Nearest, "-0.22241", "-0x0.38f#10", Greater);
+    test("2/7", 1, 10, Floor, "-0.22266", "-0x0.390#10", Less);
+    test("2/7", 1, 10, Ceiling, "-0.22241", "-0x0.38f#10", Greater);
+    test(
+        "2/7",
+        1,
+        53,
+        Nearest,
+        "-0.22252093395631439",
+        "-0x0.38f721c6048b04#53",
+        Greater,
+    );
+    test("-3/7", 1, 1, Nearest, "-1.0", "-0x1.0#1", Less);
+    test("-3/7", 1, 10, Nearest, "-0.90137", "-0x0.e6c#10", Less);
+    test("-3/7", 1, 10, Floor, "-0.90137", "-0x0.e6c#10", Less);
+    test("-3/7", 1, 10, Ceiling, "-0.90039", "-0x0.e68#10", Greater);
+    test(
+        "-3/7",
+        1,
+        53,
+        Nearest,
+        "-0.90096886790241915",
+        "-0x0.e6a5e54e5ae388#53",
+        Less,
+    );
+    test("22/7", 1, 1, Nearest, "0.50", "0x0.8#1", Less);
+    // - reduced modulo 1
+    test("22/7", 1, 10, Nearest, "0.62305", "0x0.9f8#10", Less);
+    test("22/7", 1, 10, Floor, "0.62305", "0x0.9f8#10", Less);
+    test("22/7", 1, 10, Ceiling, "0.62402", "0x0.9fc#10", Greater);
+    test(
+        "22/7",
+        1,
+        53,
+        Nearest,
+        "0.62348980185873348",
+        "0x0.9f9d07145f6e88#53",
+        Less,
+    );
+    test("1/7", 3, 1, Nearest, "1.0", "0x1.0#1", Greater);
+    test("1/7", 3, 10, Nearest, "0.95605", "0x0.f4c#10", Greater);
+    test("1/7", 3, 10, Floor, "0.95508", "0x0.f48#10", Less);
+    test("1/7", 3, 10, Ceiling, "0.95605", "0x0.f4c#10", Greater);
+    test(
+        "1/7",
+        3,
+        53,
+        Nearest,
+        "0.95557280578614068",
+        "0x0.f4a06b5dcc6628#53",
+        Less,
+    );
+    test("355/113", 360, 1, Nearest, "1.0", "0x1.0#1", Greater);
+    test("355/113", 360, 10, Nearest, "0.99805", "0x0.ff8#10", Less);
+    test("355/113", 360, 10, Floor, "0.99805", "0x0.ff8#10", Less);
+    test(
+        "355/113",
+        360,
+        10,
+        Ceiling,
+        "0.99902",
+        "0x0.ffc#10",
+        Greater,
+    );
+    test(
+        "355/113",
+        360,
+        53,
+        Nearest,
+        "0.99849714960870273",
+        "0x0.ff9d825ab7f600#53",
+        Greater,
+    );
+    test("1", 7, 1, Nearest, "0.50", "0x0.8#1", Less);
+    test("1", 7, 10, Nearest, "0.62305", "0x0.9f8#10", Less);
+    test("1", 7, 10, Floor, "0.62305", "0x0.9f8#10", Less);
+    test("1", 7, 10, Ceiling, "0.62402", "0x0.9fc#10", Greater);
+    test(
+        "1",
+        7,
+        53,
+        Nearest,
+        "0.62348980185873348",
+        "0x0.9f9d07145f6e88#53",
+        Less,
+    );
+    test("1000000", 7, 1, Nearest, "0.50", "0x0.8#1", Less);
+    test("1000000", 7, 10, Nearest, "0.62305", "0x0.9f8#10", Less);
+    test("1000000", 7, 10, Floor, "0.62305", "0x0.9f8#10", Less);
+    test("1000000", 7, 10, Ceiling, "0.62402", "0x0.9fc#10", Greater);
+    test(
+        "1000000",
+        7,
+        53,
+        Nearest,
+        "0.62348980185873348",
+        "0x0.9f9d07145f6e88#53",
+        Less,
+    );
+    test("1/1000000", 1, 1, Nearest, "1.0", "0x1.0#1", Greater);
+    test("1/1000000", 1, 10, Nearest, "1.0000", "0x1.000#10", Greater);
+    test("1/1000000", 1, 10, Floor, "0.99902", "0x0.ffc#10", Less);
+    test("1/1000000", 1, 10, Ceiling, "1.0000", "0x1.000#10", Greater);
+    test(
+        "1/1000000",
+        1,
+        53,
+        Nearest,
+        "0.99999999998026079",
+        "0x0.ffffffffea4be8#53",
+        Less,
+    );
+    test(
+        "1/1000000000000000000000000000000",
+        1,
+        1,
+        Nearest,
+        "1.0",
+        "0x1.0#1",
+        Greater,
+    );
+    // - small input: the cosine rounds to 1
+    test(
+        "1/1000000000000000000000000000000",
+        1,
+        10,
+        Nearest,
+        "1.0000",
+        "0x1.000#10",
+        Greater,
+    );
+    test(
+        "1/1000000000000000000000000000000",
+        1,
+        10,
+        Floor,
+        "0.99902",
+        "0x0.ffc#10",
+        Less,
+    );
+    test(
+        "1/1000000000000000000000000000000",
+        1,
+        10,
+        Ceiling,
+        "1.0000",
+        "0x1.000#10",
+        Greater,
+    );
+    test(
+        "1/1000000000000000000000000000000",
+        1,
+        53,
+        Nearest,
+        "1.0000000000000000",
+        "0x1.0000000000000#53",
+        Greater,
+    );
+    test(
+        "100000000000000000000000000000000000000001",
+        4,
+        1,
+        Nearest,
+        "0.0",
+        "0x0.0",
+        Equal,
+    );
+    // - huge numerator, reduced exactly
+    test(
+        "100000000000000000000000000000000000000001",
+        4,
+        10,
+        Nearest,
+        "0.0",
+        "0x0.0",
+        Equal,
+    );
+    test(
+        "100000000000000000000000000000000000000001",
+        4,
+        10,
+        Floor,
+        "0.0",
+        "0x0.0",
+        Equal,
+    );
+    test(
+        "100000000000000000000000000000000000000001",
+        4,
+        10,
+        Ceiling,
+        "0.0",
+        "0x0.0",
+        Equal,
+    );
+    test(
+        "100000000000000000000000000000000000000001",
+        4,
+        10,
+        Exact,
+        "0.0",
+        "0x0.0",
+        Equal,
+    );
+    test(
+        "100000000000000000000000000000000000000001",
+        4,
+        53,
+        Nearest,
+        "0.0",
+        "0x0.0",
+        Equal,
+    );
+    // - x/u near an odd multiple of 1/4: the near-zero path
+    test(
+        "111414603535684224740921180161/1237940039285380274899124224",
+        360,
+        53,
+        Nearest,
+        "-1.4098657419642452e-29",
+        "-0x1.1df46a2529d39E-24#53",
+        Greater,
+    );
+    test(
+        "111414603535684224740921180161/1237940039285380274899124224",
+        360,
+        53,
+        Floor,
+        "-1.4098657419642455e-29",
+        "-0x1.1df46a2529d3aE-24#53",
+        Less,
+    );
+    test(
+        "342265662061621938404109865451519/1267650600228229401496703205376",
+        360,
+        10,
+        Nearest,
+        "-1.3770e-32",
+        "-0x4.78E-27#10",
+        Less,
+    );
+}
+
+#[test]
+#[should_panic]
+fn cos_with_period_rational_prec_round_fail_1() {
+    Float::cos_with_period_rational_prec_round(Rational::ONE, 7, 0, Floor);
+}
+
+#[test]
+#[should_panic]
+fn cos_with_period_rational_prec_round_fail_2() {
+    Float::cos_with_period_rational_prec_round(Rational::ONE, 7, 10, Exact);
+}
+
+#[test]
+#[should_panic]
+fn cos_with_period_rational_prec_round_ref_fail() {
+    Float::cos_with_period_rational_prec_round_ref(&Rational::ONE, 7, 10, Exact);
+}
+
+#[test]
+#[should_panic]
+fn cos_with_period_rational_prec_fail() {
+    Float::cos_with_period_rational_prec(Rational::ONE, 7, 0);
+}
+
+#[allow(clippy::needless_pass_by_value)]
+fn cos_with_period_rational_prec_round_properties_helper(
+    x: Rational,
+    u: u64,
+    prec: u64,
+    rm: RoundingMode,
+) {
+    if rm == Exact {
+        // Exact is only allowed when the result is exactly representable; otherwise panic.
+        let (c, o) = Float::cos_with_period_rational_prec_round_ref(&x, u, prec, Nearest);
+        if o == Equal {
+            let (ce, oe) = Float::cos_with_period_rational_prec_round_ref(&x, u, prec, Exact);
+            assert_eq!(ComparableFloatRef(&ce), ComparableFloatRef(&c));
+            assert_eq!(oe, Equal);
+        } else {
+            assert_panic!(Float::cos_with_period_rational_prec_round_ref(
+                &x, u, prec, Exact
+            ));
+        }
+        return;
+    }
+    let (c, o) = Float::cos_with_period_rational_prec_round(x.clone(), u, prec, rm);
+    assert!(c.is_valid());
+
+    let (c_alt, o_alt) = Float::cos_with_period_rational_prec_round_ref(&x, u, prec, rm);
+    assert!(c_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+    assert_eq!(o_alt, o);
+
+    // MPFR rounds the input to a `Float` first, so it cannot see the exact cases of non-dyadic
+    // inputs (1/3 of a turn, say); those are checked separately below.
+    if o != Equal
+        && let Ok(rrm) = rug_round_try_from_rounding_mode(rm)
+        && u32::try_from(u).is_ok()
+    {
+        let (rug_c, rug_o) = rug_cos_with_period_rational_prec_round(&x, u, prec, rrm);
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_c)),
+            ComparableFloatRef(&c)
+        );
+        assert_eq!(rug_o, o);
+    }
+
+    // NaN exactly for u = 0, and otherwise in [-1, 1]
+    assert_eq!(c.is_nan(), u == 0);
+    if u != 0 {
+        assert!(c.le_abs(&1u32));
+        if c.is_normal() {
+            assert_eq!(c.get_prec(), Some(prec));
+        }
+        // even, and periodic with period u
+        let (c_neg, o_neg) = Float::cos_with_period_rational_prec_round(-&x, u, prec, rm);
+        assert_eq!(ComparableFloatRef(&c_neg), ComparableFloatRef(&c));
+        assert_eq!(o_neg, o);
+        let (c_shifted, o_shifted) =
+            Float::cos_with_period_rational_prec_round(&x + Rational::from(u), u, prec, rm);
+        assert_eq!(ComparableFloatRef(&c_shifted), ComparableFloatRef(&c));
+        assert_eq!(o_shifted, o);
+        // a Float input agrees with the Float version
+        if let Ok(f) = Float::try_from(&x) {
+            let (c_alt, o_alt) = f.cos_with_period_prec_round(u, prec, rm);
+            assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+            assert_eq!(o_alt, o);
+        }
+    }
+
+    if o == Equal {
+        for rm in exhaustive_rounding_modes() {
+            let (s, oo) = Float::cos_with_period_rational_prec_round_ref(&x, u, prec, rm);
+            assert_eq!(ComparableFloatRef(&s), ComparableFloatRef(&c));
+            assert_eq!(oo, Equal);
+        }
+    } else {
+        assert_panic!(Float::cos_with_period_rational_prec_round_ref(
+            &x, u, prec, Exact
+        ));
+    }
+}
+
+#[test]
+fn cos_with_period_rational_prec_round_properties() {
+    rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_4().test_properties(
+        |(x, u, prec, rm)| {
+            cos_with_period_rational_prec_round_properties_helper(x, u, prec, rm);
+        },
+    );
+
+    unsigned_rounding_mode_pair_gen_var_3().test_properties(|(prec, rm)| {
+        let (c, o) = Float::cos_with_period_rational_prec_round(Rational::ZERO, 4, prec, rm);
+        assert_eq!(ComparableFloat(c), ComparableFloat(Float::one_prec(prec)));
+        assert_eq!(o, Equal);
+        let (c, o) = Float::cos_with_period_rational_prec_round(Rational::ONE, 0, prec, rm);
+        assert!(c.is_nan());
+        assert_eq!(o, Equal);
+        // exact cases, straight from a fraction of a turn
+        for (s, expected) in [
+            ("1/4", Float::ZERO),
+            ("1/2", -Float::one_prec(prec)),
+            ("3/4", Float::ZERO),
+            ("1", Float::one_prec(prec)),
+            ("1/6", Float::one_prec(prec) >> 1u32),
+            ("1/3", -(Float::one_prec(prec) >> 1u32)),
+        ] {
+            let (c, o) = Float::cos_with_period_rational_prec_round(
+                Rational::from_str(s).unwrap(),
+                1,
+                prec,
+                rm,
+            );
+            assert_eq!(ComparableFloat(c), ComparableFloat(expected));
+            assert_eq!(o, Equal);
+        }
+    });
+}
+
+#[test]
+fn cos_with_period_rational_prec_properties() {
+    rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_4().test_properties(
+        |(x, u, prec, _)| {
+            let (c, o) = Float::cos_with_period_rational_prec(x.clone(), u, prec);
+            assert!(c.is_valid());
+            let (c_alt, o_alt) = Float::cos_with_period_rational_prec_ref(&x, u, prec);
+            assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+            assert_eq!(o_alt, o);
+            let (c_alt, o_alt) =
+                Float::cos_with_period_rational_prec_round_ref(&x, u, prec, Nearest);
+            assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+            assert_eq!(o_alt, o);
+            if o != Equal && u32::try_from(u).is_ok() {
+                let (rug_c, rug_o) = rug_cos_with_period_rational_prec(&x, u, prec);
+                assert_eq!(
+                    ComparableFloatRef(&Float::from(&rug_c)),
+                    ComparableFloatRef(&c)
+                );
+                assert_eq!(rug_o, o);
+            }
+        },
+    );
+}
+
+#[test]
+#[allow(clippy::type_repetition_in_bounds)]
+fn test_primitive_float_cos_with_period() {
+    fn test<T: PrimitiveFloat>(x: T, u: u64, out: T)
+    where
+        Float: From<T> + PartialOrd<T>,
+        for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    {
+        assert_eq!(
+            NiceFloat(primitive_float_cos_with_period(x, u)),
+            NiceFloat(out)
+        );
+    }
+    test::<f32>(f32::NAN, 360, f32::NAN);
+    test::<f32>(f32::INFINITY, 360, f32::NAN);
+    test::<f32>(f32::NEGATIVE_INFINITY, 360, f32::NAN);
+    test::<f32>(1.0, 0, f32::NAN);
+    test::<f32>(0.0, 360, 1.0);
+    test::<f32>(-0.0, 360, 1.0);
+    test::<f32>(90.0, 360, 0.0);
+    test::<f32>(180.0, 360, -1.0);
+    test::<f32>(270.0, 360, 0.0);
+    test::<f32>(360.0, 360, 1.0);
+    test::<f32>(60.0, 360, 0.5);
+    test::<f32>(120.0, 360, -0.5);
+    test::<f32>(45.0, 360, core::f32::consts::FRAC_1_SQRT_2);
+    test::<f32>(30.0, 360, 0.8660254);
+    test::<f32>(72.0, 360, 0.309017);
+    test::<f32>(36.0, 360, 0.809017);
+    test::<f32>(1.0, 7, 0.6234898);
+    test::<f32>(-1.0, 7, 0.6234898);
+    test::<f32>(2.0, 7, -0.22252093);
+    test::<f32>(1.0, 360, 0.9998477);
+    test::<f32>(100.0, 360, -0.17364818);
+    test::<f32>(1.0e10, 360, 0.17364818);
+    test::<f32>(1.0e30, 7, 0.6234898);
+    test::<f32>(1.0e-30, 7, 1.0);
+    test::<f32>(3.4028235e38, 360, 1.0);
+    test::<f32>(0.5, 1, -1.0);
+    test::<f32>(0.25, 1, 0.0);
+    test::<f32>(0.1, 1, 0.809017);
+
+    test::<f64>(f64::NAN, 360, f64::NAN);
+    test::<f64>(f64::INFINITY, 360, f64::NAN);
+    test::<f64>(f64::NEGATIVE_INFINITY, 360, f64::NAN);
+    test::<f64>(1.0, 0, f64::NAN);
+    test::<f64>(0.0, 360, 1.0);
+    test::<f64>(-0.0, 360, 1.0);
+    test::<f64>(90.0, 360, 0.0);
+    test::<f64>(180.0, 360, -1.0);
+    test::<f64>(270.0, 360, 0.0);
+    test::<f64>(360.0, 360, 1.0);
+    test::<f64>(60.0, 360, 0.5);
+    test::<f64>(120.0, 360, -0.5);
+    test::<f64>(45.0, 360, core::f64::consts::FRAC_1_SQRT_2);
+    test::<f64>(30.0, 360, 0.8660254037844386);
+    test::<f64>(72.0, 360, 0.30901699437494745);
+    test::<f64>(36.0, 360, 0.8090169943749475);
+    test::<f64>(1.0, 7, 0.6234898018587335);
+    test::<f64>(-1.0, 7, 0.6234898018587335);
+    test::<f64>(2.0, 7, -0.2225209339563144);
+    test::<f64>(1.0, 360, 0.9998476951563913);
+    test::<f64>(100.0, 360, -0.17364817766693036);
+    test::<f64>(1.0e10, 360, 0.17364817766693036);
+    test::<f64>(1.0e100, 7, -0.2225209339563144);
+    test::<f64>(1.0e-100, 7, 1.0);
+    test::<f64>(1.7976931348623157e308, 360, -0.6156614753256583);
+    test::<f64>(0.5, 1, -1.0);
+    test::<f64>(0.25, 1, 0.0);
+    test::<f64>(0.1, 1, 0.8090169943749475);
+}
+
+#[test]
+#[allow(clippy::type_repetition_in_bounds)]
+fn test_primitive_float_cos_with_period_rational() {
+    fn test<T: PrimitiveFloat>(s: &str, u: u64, out: T)
+    where
+        Float: From<T> + PartialOrd<T>,
+        for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    {
+        let x = Rational::from_str(s).unwrap();
+        assert_eq!(
+            NiceFloat(primitive_float_cos_with_period_rational::<T>(&x, u)),
+            NiceFloat(out)
+        );
+    }
+    test::<f32>("0", 360, 1.0);
+    test::<f32>("1", 0, f32::NAN);
+    test::<f32>("90", 360, 0.0);
+    test::<f32>("180", 360, -1.0);
+    test::<f32>("60", 360, 0.5);
+    test::<f32>("45", 360, core::f32::consts::FRAC_1_SQRT_2);
+    test::<f32>("36", 360, 0.809017);
+    test::<f32>("1/3", 1, -0.5);
+    test::<f32>("1/8", 1, core::f32::consts::FRAC_1_SQRT_2);
+    test::<f32>("1/5", 1, 0.309017);
+    test::<f32>("1/7", 1, 0.6234898);
+    test::<f32>("-2/7", 1, -0.22252093);
+    test::<f32>("22/7", 1, 0.6234898);
+    test::<f32>("1", 7, 0.6234898);
+    test::<f32>("1000000", 7, 0.6234898);
+    test::<f32>("1/1000000", 1, 1.0);
+    test::<f32>("355/113", 360, 0.9984971);
+
+    test::<f64>("0", 360, 1.0);
+    test::<f64>("1", 0, f64::NAN);
+    test::<f64>("90", 360, 0.0);
+    test::<f64>("180", 360, -1.0);
+    test::<f64>("60", 360, 0.5);
+    test::<f64>("45", 360, core::f64::consts::FRAC_1_SQRT_2);
+    test::<f64>("36", 360, 0.8090169943749475);
+    test::<f64>("1/3", 1, -0.5);
+    test::<f64>("1/8", 1, core::f64::consts::FRAC_1_SQRT_2);
+    test::<f64>("1/5", 1, 0.30901699437494745);
+    test::<f64>("1/7", 1, 0.6234898018587335);
+    test::<f64>("-2/7", 1, -0.2225209339563144);
+    test::<f64>("22/7", 1, 0.6234898018587335);
+    test::<f64>("1", 7, 0.6234898018587335);
+    test::<f64>("1000000", 7, 0.6234898018587335);
+    test::<f64>("1/1000000", 1, 0.9999999999802608);
+    test::<f64>("355/113", 360, 0.9984971496087027);
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn primitive_float_cos_with_period_properties_helper<T: PrimitiveFloat>()
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    primitive_float_unsigned_pair_gen_var_1::<T, u64>().test_properties(|(x, u)| {
+        let c = primitive_float_cos_with_period(x, u);
+        // NaN exactly for u = 0 (the inputs are finite), and otherwise in [-1, 1]
+        assert_eq!(c.is_nan(), u == 0);
+        if u != 0 {
+            assert!(c >= T::NEGATIVE_ONE && c <= T::ONE);
+            // even
+            assert_eq!(
+                NiceFloat(primitive_float_cos_with_period(-x, u)),
+                NiceFloat(c)
+            );
+            // the result is the correctly rounded cosine, as computed by MPFR at the same precision
+            let rug_c = rug_cos_with_period_prec(
+                &rug::Float::exact_from(&Float::from(x)),
+                u,
+                T::MANTISSA_WIDTH + 1,
+            )
+            .0;
+            let rug_c: T = T::exact_from(&<Float as From<&rug::Float>>::from(&rug_c));
+            assert_eq!(NiceFloat(rug_c), NiceFloat(c));
+        }
+    });
+
+    primitive_float_gen::<T>().test_properties(|x| {
+        // NaN exactly for NaN and infinite inputs
+        assert_eq!(
+            primitive_float_cos_with_period(x, 7).is_nan(),
+            !x.is_finite()
+        );
+    });
+}
+
+#[test]
+fn primitive_float_cos_with_period_properties() {
+    apply_fn_to_primitive_floats!(primitive_float_cos_with_period_properties_helper);
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn primitive_float_cos_with_period_rational_properties_helper<T: PrimitiveFloat>()
+where
+    Float: From<T> + PartialOrd<T>,
+    Rational: ExactFrom<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    rational_unsigned_pair_gen_var_1::<u64>().test_properties(|(x, u)| {
+        let c = primitive_float_cos_with_period_rational::<T>(&x, u);
+        assert_eq!(c.is_nan(), u == 0);
+        if u != 0 {
+            assert!(c >= T::NEGATIVE_ONE && c <= T::ONE);
+            // even, and periodic with period u
+            assert_eq!(
+                NiceFloat(primitive_float_cos_with_period_rational::<T>(&-&x, u)),
+                NiceFloat(c)
+            );
+            assert_eq!(
+                NiceFloat(primitive_float_cos_with_period_rational::<T>(
+                    &(&x + Rational::from(u)),
+                    u
+                )),
+                NiceFloat(c)
+            );
+            // MPFR agrees, except that it cannot see the exact cases of non-dyadic inputs
+            let (c_float, o) =
+                Float::cos_with_period_rational_prec_ref(&x, u, T::MANTISSA_WIDTH + 1);
+            assert_eq!(NiceFloat(T::exact_from(&c_float)), NiceFloat(c));
+            if o != Equal {
+                let rug_c = rug_cos_with_period_rational_prec(&x, u, T::MANTISSA_WIDTH + 1).0;
+                let rug_c: T = T::exact_from(&<Float as From<&rug::Float>>::from(&rug_c));
+                assert_eq!(NiceFloat(rug_c), NiceFloat(c));
+            }
+        }
+    });
+
+    primitive_float_unsigned_pair_gen_var_1::<T, u64>().test_properties(|(x, u)| {
+        // The cosine of a finite primitive float, taken through the `Rational` path, matches the
+        // direct primitive-float cosine.
+        assert_eq!(
+            NiceFloat(primitive_float_cos_with_period_rational::<T>(
+                &Rational::exact_from(x),
+                u
+            )),
+            NiceFloat(primitive_float_cos_with_period(x, u))
+        );
+    });
+}
+
+#[test]
+fn primitive_float_cos_with_period_rational_properties() {
+    apply_fn_to_primitive_floats!(primitive_float_cos_with_period_rational_properties_helper);
+}
+
+// Inputs within 2^(-2^30) of an odd quarter turn, without being one, whose cosines underflow.
+// Unlike `cos`, this needs no pi at 2^30 bits: the distance to the quarter turn is rational and
+// computed exactly, so the test is fast despite the 2^30-bit inputs.
+#[test]
+fn test_cos_with_period_underflow() {
+    let min_positive = Float::one_prec(10) >> (1u64 << 30);
+    // 90 +- 2^-(2^30 + 70), which need 2^30 + 77 bits (the offset alone is below the exponent
+    // range, so the sum is built from a `Rational`)
+    let eps = Rational::power_of_2(-((1i64 << 30) + 70));
+    let above =
+        Float::from_rational_prec_round(Rational::from(90u32) + &eps, (1u64 << 30) + 78, Exact).0;
+    let below =
+        Float::from_rational_prec_round(Rational::from(90u32) - eps, (1u64 << 30) + 78, Exact).0;
+    // just past a quarter turn: cos is negative and tiny
+    let (c, o) = above.cos_with_period_prec_round_ref(360, 10, Nearest);
+    assert_eq!(ComparableFloat(c), ComparableFloat(Float::NEGATIVE_ZERO));
+    assert_eq!(o, Greater);
+    let (c, o) = above.cos_with_period_prec_round_ref(360, 10, Floor);
+    assert_eq!(ComparableFloat(c), ComparableFloat(-&min_positive));
+    assert_eq!(o, Less);
+    // just short of it: positive and tiny
+    let (c, o) = below.cos_with_period_prec_round_ref(360, 10, Ceiling);
+    assert_eq!(ComparableFloatRef(&c), ComparableFloatRef(&min_positive));
+    assert_eq!(o, Greater);
+    let (c, o) = below.cos_with_period_prec_round_ref(360, 10, Down);
+    assert_eq!(ComparableFloat(c), ComparableFloat(Float::ZERO));
+    assert_eq!(o, Less);
+}
+
+#[test]
+fn test_cos_with_period_rational_underflow() {
+    let min_positive = Float::one_prec(10) >> (1u64 << 30);
+    let eps = Rational::power_of_2(-((1i64 << 30) + 70));
+    let above = Rational::from(90u32) + &eps;
+    let below = Rational::from(90u32) - eps;
+    let (c, o) = Float::cos_with_period_rational_prec_round_ref(&above, 360, 10, Nearest);
+    assert_eq!(ComparableFloat(c), ComparableFloat(Float::NEGATIVE_ZERO));
+    assert_eq!(o, Greater);
+    let (c, o) = Float::cos_with_period_rational_prec_round_ref(&above, 360, 10, Floor);
+    assert_eq!(ComparableFloat(c), ComparableFloat(-&min_positive));
+    assert_eq!(o, Less);
+    let (c, o) = Float::cos_with_period_rational_prec_round_ref(&below, 360, 10, Ceiling);
+    assert_eq!(ComparableFloatRef(&c), ComparableFloatRef(&min_positive));
+    assert_eq!(o, Greater);
+    let (c, o) = Float::cos_with_period_rational_prec_round_ref(&below, 360, 10, Down);
+    assert_eq!(ComparableFloat(c), ComparableFloat(Float::ZERO));
+    assert_eq!(o, Less);
+    // a non-dyadic version: 1/4 + 1/(3 * 2^(2^30 + 70)) of a turn
+    let tiny = Rational::power_of_2(-((1i64 << 30) + 70)) / Rational::from(3u32);
+    let x = Rational::from_unsigneds(1u32, 4u32) + tiny;
+    let (c, o) = Float::cos_with_period_rational_prec_round_ref(&x, 1, 10, Nearest);
+    assert_eq!(ComparableFloat(c), ComparableFloat(Float::NEGATIVE_ZERO));
+    assert_eq!(o, Greater);
 }

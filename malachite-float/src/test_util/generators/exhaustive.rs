@@ -7043,7 +7043,18 @@ pub fn root_s_prec_round_valid(x: &Float, k: i64, prec: u64, rm: RoundingMode) -
 }
 
 // Whether `(x, k, prec, rm)` is a valid input to `Float::root_u_rational_prec_round`: `Exact` is
-// only allowed when the root really is exact at the given precision.
+// only allowed when the root really is exact at the given precision. Whether `(x, u, prec, rm)` is
+// a valid input to `Float::cos_with_period_rational_prec_round`: `Exact` is only allowed when the
+// result really is exact.
+pub fn cos_with_period_rational_prec_round_valid(
+    x: &Rational,
+    u: u64,
+    prec: u64,
+    rm: RoundingMode,
+) -> bool {
+    rm != Exact || Float::cos_with_period_rational_prec_round_ref(x, u, prec, Floor).1 == Equal
+}
+
 pub fn root_u_rational_prec_round_valid(x: &Rational, k: u64, prec: u64, rm: RoundingMode) -> bool {
     rm != Exact || Float::root_u_rational_prec_round_ref(x, k, prec, Floor).1 == Equal
 }
@@ -7224,6 +7235,26 @@ pub fn exhaustive_rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_3()
             exhaustive_rounding_modes(),
         )
         .filter(|&((ref n, k, prec), rm)| root_u_rational_prec_round_valid(n, k, prec, rm)),
+    ))
+}
+
+pub fn exhaustive_rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_4()
+-> It<(Rational, u64, u64, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(
+        lex_pairs(
+            exhaustive_triples_custom_output(
+                exhaustive_rationals(),
+                exhaustive_unsigneds(),
+                exhaustive_positive_primitive_ints(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref n, k, prec), rm)| {
+            cos_with_period_rational_prec_round_valid(n, k, prec, rm)
+        }),
     ))
 }
 
