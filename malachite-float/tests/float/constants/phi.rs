@@ -11,7 +11,9 @@ use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
     unsigned_gen_var_11, unsigned_rounding_mode_pair_gen_var_4,
 };
-use malachite_float::test_util::common::{test_constant, to_hex_string};
+use malachite_float::test_util::common::{
+    assert_rounding_ordering_consistent, test_constant, to_hex_string,
+};
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use std::cmp::Ordering::{self, *};
 use std::panic::catch_unwind;
@@ -273,6 +275,7 @@ fn phi_prec_properties() {
     unsigned_gen_var_11().test_properties(|prec| {
         let (phi, o) = Float::phi_prec(prec);
         assert!(phi.is_valid());
+        assert_rounding_ordering_consistent(&phi, Nearest, o);
         assert_eq!(phi.get_prec(), Some(prec));
         assert_eq!(phi.get_exponent(), Some(if prec == 1 { 2 } else { 1 }));
         assert_ne!(o, Equal);
@@ -300,6 +303,7 @@ fn phi_prec_round_properties() {
     unsigned_rounding_mode_pair_gen_var_4().test_properties(|(prec, rm)| {
         let (phi, o) = Float::phi_prec_round(prec, rm);
         assert!(phi.is_valid());
+        assert_rounding_ordering_consistent(&phi, rm, o);
         assert_eq!(phi.get_prec(), Some(prec));
         let expected_exponent = match (prec, rm) {
             (1, Ceiling | Up | Nearest) | (2, Ceiling | Up) => 2,

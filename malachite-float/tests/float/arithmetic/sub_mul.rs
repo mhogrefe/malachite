@@ -21,7 +21,8 @@ use malachite_float::float::arithmetic::sub_mul::{
     primitive_float_sub_mul, primitive_float_sub_mul_rational,
 };
 use malachite_float::test_util::common::{
-    parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
+    assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
+    to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::sub_mul::{
     rug_sub_mul, rug_sub_mul_prec, rug_sub_mul_prec_round, rug_sub_mul_round,
@@ -675,6 +676,7 @@ fn sub_mul_prec_round_properties_helper(
 ) {
     let (diff, o) = x.sub_mul_prec_round_ref_ref_ref(&y, &z, prec, rm);
     assert!(diff.is_valid());
+    assert_rounding_ordering_consistent(&diff, rm, o);
     let (diff_alt, o_alt) = x.clone().sub_mul_prec_round(y.clone(), z.clone(), prec, rm);
     assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
     assert_eq!(o_alt, o);
@@ -1036,6 +1038,7 @@ fn test_sub_mul_round() {
 #[allow(clippy::needless_pass_by_value)]
 fn sub_mul_prec_properties_helper(x: Float, y: Float, z: Float, prec: u64) {
     let (diff, o) = x.sub_mul_prec_round_ref_ref_ref(&y, &z, prec, Nearest);
+    assert_rounding_ordering_consistent(&diff, Nearest, o);
     let (diff_alt, o_alt) = x.sub_mul_prec_ref_ref_ref(&y, &z, prec);
     assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
     assert_eq!(o_alt, o);
@@ -1105,6 +1108,7 @@ fn sub_mul_round_properties_helper(x: Float, y: Float, z: Float, rm: RoundingMod
         z.significant_bits()
     );
     let (diff, o) = x.sub_mul_prec_round_ref_ref_ref(&y, &z, prec, rm);
+    assert_rounding_ordering_consistent(&diff, rm, o);
     let (diff_alt, o_alt) = x.sub_mul_round_ref_ref_ref(&y, &z, rm);
     assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
     assert_eq!(o_alt, o);
@@ -1605,6 +1609,7 @@ fn sub_mul_rational_prec_round_properties_helper(
 ) {
     let (diff, o) = x.sub_mul_rational_prec_round_ref_ref_ref(&y, &z, prec, rm);
     assert!(diff.is_valid());
+    assert_rounding_ordering_consistent(&diff, rm, o);
     for (diff_alt, o_alt) in [
         x.clone()
             .sub_mul_rational_prec_round(y.clone(), z.clone(), prec, rm),
@@ -1720,6 +1725,7 @@ fn sub_mul_rational_prec_round_properties() {
 fn sub_mul_rational_shorthand_properties() {
     float_float_rational_unsigned_quadruple_gen_var_1().test_properties(|(x, y, z, prec)| {
         let (diff, o) = x.sub_mul_rational_prec_round_ref_ref_ref(&y, &z, prec, Nearest);
+        assert_rounding_ordering_consistent(&diff, Nearest, o);
         let (diff_alt, o_alt) = x.sub_mul_rational_prec_ref_ref_ref(&y, &z, prec);
         assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
         assert_eq!(o_alt, o);
@@ -1735,6 +1741,7 @@ fn sub_mul_rational_shorthand_properties() {
     float_float_rational_rounding_mode_quadruple_gen_var_2().test_properties(|(x, y, z, rm)| {
         let prec = cmp_max(x.significant_bits(), y.significant_bits());
         let (diff, o) = x.sub_mul_rational_prec_round_ref_ref_ref(&y, &z, prec, rm);
+        assert_rounding_ordering_consistent(&diff, rm, o);
         let (diff_alt, o_alt) = x.sub_mul_rational_round_ref_ref_ref(&y, &z, rm);
         assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
         assert_eq!(o_alt, o);

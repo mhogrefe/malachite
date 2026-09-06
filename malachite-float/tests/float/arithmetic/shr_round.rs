@@ -26,7 +26,8 @@ use malachite_base::test_util::generators::{
     unsigned_rounding_mode_pair_gen_var_5, unsigned_unsigned_rounding_mode_triple_gen_var_7,
 };
 use malachite_float::test_util::common::{
-    parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
+    assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
+    to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::shr_round::{
     rug_shr_prec_round_signed, rug_shr_prec_round_unsigned, rug_shr_prec_signed,
@@ -3157,6 +3158,7 @@ where
     let o = mut_n.shr_prec_assign(u, prec);
     assert!(mut_n.is_valid());
     let shifted = mut_n;
+    assert_rounding_ordering_consistent(&shifted, Nearest, o);
     if o == Equal {
         for rm in exhaustive_rounding_modes() {
             let (shifted_alt, o_alt) = n.shr_prec_round_ref(u, prec, rm);
@@ -3271,6 +3273,7 @@ where
     let o = mut_n.shr_prec_assign(i, prec);
     assert!(mut_n.is_valid());
     let shifted = mut_n;
+    assert_rounding_ordering_consistent(&shifted, Nearest, o);
 
     if o == Equal {
         for rm in exhaustive_rounding_modes() {
@@ -3455,16 +3458,7 @@ fn shr_prec_round_properties_helper_unsigned_helper<T: PrimitiveUnsigned>(
     assert!(mut_n.is_valid());
     let shifted = mut_n;
 
-    match (n >= 0, rm) {
-        (_, Floor) | (true, Down) | (false, Up) => {
-            assert_ne!(o, Greater);
-        }
-        (_, Ceiling) | (true, Up) | (false, Down) => {
-            assert_ne!(o, Less);
-        }
-        (_, Exact) => assert_eq!(o, Equal),
-        _ => {}
-    }
+    assert_rounding_ordering_consistent(&shifted, rm, o);
     if o == Equal {
         for rm in exhaustive_rounding_modes() {
             let (shifted_alt, o_alt) = n.shr_prec_round_ref(u, prec, rm);
@@ -3592,16 +3586,7 @@ fn shr_prec_round_properties_helper_signed_helper<T: PrimitiveSigned>(
     assert!(mut_n.is_valid());
     let shifted = mut_n;
 
-    match (n >= 0, rm) {
-        (_, Floor) | (true, Down) | (false, Up) => {
-            assert_ne!(o, Greater);
-        }
-        (_, Ceiling) | (true, Up) | (false, Down) => {
-            assert_ne!(o, Less);
-        }
-        (_, Exact) => assert_eq!(o, Equal),
-        _ => {}
-    }
+    assert_rounding_ordering_consistent(&shifted, rm, o);
     if o == Equal {
         for rm in exhaustive_rounding_modes() {
             let (shifted_alt, o_alt) = n.shr_prec_round_ref(i, prec, rm);
@@ -3799,16 +3784,7 @@ fn shr_round_properties_helper_unsigned_helper<T: PrimitiveUnsigned>(
     assert!(mut_n.is_valid());
     let shifted = mut_n;
 
-    match (n >= 0, rm) {
-        (_, Floor) | (true, Down) | (false, Up) => {
-            assert_ne!(o, Greater);
-        }
-        (_, Ceiling) | (true, Up) | (false, Down) => {
-            assert_ne!(o, Less);
-        }
-        (_, Exact) => assert_eq!(o, Equal),
-        _ => {}
-    }
+    assert_rounding_ordering_consistent(&shifted, rm, o);
     if o == Equal {
         for rm in exhaustive_rounding_modes() {
             let (shifted_alt, o_alt) = (&n).shr_round(u, rm);
@@ -3960,16 +3936,7 @@ where
     assert!(mut_n.is_valid());
     let shifted = mut_n;
 
-    match (n >= 0, rm) {
-        (_, Floor) | (true, Down) | (false, Up) => {
-            assert_ne!(o, Greater);
-        }
-        (_, Ceiling) | (true, Up) | (false, Down) => {
-            assert_ne!(o, Less);
-        }
-        (_, Exact) => assert_eq!(o, Equal),
-        _ => {}
-    }
+    assert_rounding_ordering_consistent(&shifted, rm, o);
     if o == Equal {
         for rm in exhaustive_rounding_modes() {
             let (shifted_alt, o_alt) = (&n).shr_round(i, rm);

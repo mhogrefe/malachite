@@ -12,7 +12,8 @@ use malachite_base::test_util::generators::{
     unsigned_gen_var_11, unsigned_rounding_mode_pair_gen_var_4,
 };
 use malachite_float::test_util::common::{
-    rug_round_try_from_rounding_mode, test_constant, to_hex_string,
+    assert_rounding_ordering_consistent, rug_round_try_from_rounding_mode, test_constant,
+    to_hex_string,
 };
 use malachite_float::test_util::float::constants::pi::rug_pi_prec_round;
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
@@ -307,6 +308,7 @@ fn pi_prec_properties() {
     unsigned_gen_var_11().test_properties(|prec| {
         let (pi, o) = Float::pi_prec(prec);
         assert!(pi.is_valid());
+        assert_rounding_ordering_consistent(&pi, Nearest, o);
         assert_eq!(pi.get_prec(), Some(prec));
         assert_eq!(pi.get_exponent(), Some(if prec == 1 { 3 } else { 2 }));
         assert_ne!(o, Equal);
@@ -342,6 +344,7 @@ fn pi_prec_round_properties() {
     unsigned_rounding_mode_pair_gen_var_4().test_properties(|(prec, rm)| {
         let (pi, o) = Float::pi_prec_round(prec, rm);
         assert!(pi.is_valid());
+        assert_rounding_ordering_consistent(&pi, rm, o);
         assert_eq!(pi.get_prec(), Some(prec));
         let expected_exponent = match (prec, rm) {
             (1, Ceiling | Up | Nearest) | (2, Ceiling | Up) => 3,

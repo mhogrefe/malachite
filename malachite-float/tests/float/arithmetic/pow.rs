@@ -25,7 +25,8 @@ use malachite_float::float::arithmetic::pow::{
     primitive_float_pow_u, primitive_float_rational_pow, primitive_float_unsigned_pow,
 };
 use malachite_float::test_util::common::{
-    parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
+    assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
+    to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::pow::{
     rug_pow, rug_pow_integer, rug_pow_integer_prec, rug_pow_integer_prec_round,
@@ -569,6 +570,7 @@ fn pow_prec_round_properties_helper(
     }
     let (p, o) = x.clone().pow_prec_round(y.clone(), prec, rm);
     assert!(p.is_valid());
+    assert_rounding_ordering_consistent(&p, rm, o);
     let (p_alt, o_alt) = x.clone().pow_prec_round_val_ref(&y, prec, rm);
     assert!(p_alt.is_valid());
     assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
@@ -703,6 +705,7 @@ fn pow_round_properties() {
         for rm in [Floor, Ceiling, Down, Up, Nearest] {
             let (p, o) = x.clone().pow_round(y.clone(), rm);
             assert!(p.is_valid());
+            assert_rounding_ordering_consistent(&p, rm, o);
             let (p_alt, o_alt) = x.pow_round_ref_ref(&y, rm);
             assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
             assert_eq!(o_alt, o);
@@ -888,6 +891,7 @@ fn powr_prec_round_properties_helper(
     }
     let (p, o) = x.clone().powr_prec_round(y.clone(), prec, rm);
     assert!(p.is_valid());
+    assert_rounding_ordering_consistent(&p, rm, o);
     let (p_alt, o_alt) = x.clone().powr_prec_round_val_ref(&y, prec, rm);
     assert!(p_alt.is_valid());
     assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
@@ -988,6 +992,7 @@ fn powr_round_properties() {
         for rm in [Floor, Ceiling, Down, Up, Nearest] {
             let (p, o) = x.clone().powr_round(y.clone(), rm);
             assert!(p.is_valid());
+            assert_rounding_ordering_consistent(&p, rm, o);
             let (p_alt, o_alt) = x.clone().powr_round_val_ref(&y, rm);
             assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
             assert_eq!(o_alt, o);
@@ -1536,6 +1541,7 @@ fn rational_pow_prec_round_properties_helper(x: Rational, y: Float, prec: u64, r
     }
     let (p, o) = Float::rational_pow_prec_round_ref_ref(&x, &y, prec, rm);
     assert!(p.is_valid());
+    assert_rounding_ordering_consistent(&p, rm, o);
     let (p_alt, o_alt) = Float::rational_pow_prec_round(x.clone(), y.clone(), prec, rm);
     assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
     assert_eq!(o_alt, o);
@@ -1719,6 +1725,7 @@ fn pow_integer_prec_round_properties_helper(
     }
     let (p, o) = x.clone().pow_integer_prec_round(z.clone(), prec, rm);
     assert!(p.is_valid());
+    assert_rounding_ordering_consistent(&p, rm, o);
     let (p_alt, o_alt) = x.clone().pow_integer_prec_round_val_ref(&z, prec, rm);
     assert!(p_alt.is_valid());
     assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
@@ -1811,6 +1818,7 @@ fn pow_integer_round_properties() {
         for rm in [Floor, Ceiling, Down, Up, Nearest] {
             let (p, o) = x.clone().pow_integer_round(z.clone(), rm);
             assert!(p.is_valid());
+            assert_rounding_ordering_consistent(&p, rm, o);
             let (p_alt, o_alt) = x.clone().pow_integer_round_val_ref(&z, rm);
             assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
             assert_eq!(o_alt, o);
@@ -2618,6 +2626,7 @@ fn pow_u_prec_round_properties_helper(
     }
     let (p, o) = x.clone().pow_u_prec_round(n, prec, rm);
     assert!(p.is_valid());
+    assert_rounding_ordering_consistent(&p, rm, o);
     let (p_alt, o_alt) = x.pow_u_prec_round_ref(n, prec, rm);
     assert!(p_alt.is_valid());
     assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
@@ -2692,6 +2701,7 @@ fn pow_u_round_properties() {
         for rm in [Floor, Ceiling, Down, Up, Nearest] {
             let (p, o) = x.clone().pow_u_round(n, rm);
             assert!(p.is_valid());
+            assert_rounding_ordering_consistent(&p, rm, o);
             let (p_alt, o_alt) = x.pow_u_round_ref(n, rm);
             assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
             assert_eq!(o_alt, o);
@@ -3158,6 +3168,7 @@ fn pow_s_prec_round_properties_helper(
     }
     let (p, o) = x.clone().pow_s_prec_round(n, prec, rm);
     assert!(p.is_valid());
+    assert_rounding_ordering_consistent(&p, rm, o);
     let (p_alt, o_alt) = x.pow_s_prec_round_ref(n, prec, rm);
     assert!(p_alt.is_valid());
     assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
@@ -3232,6 +3243,7 @@ fn pow_s_round_properties() {
         for rm in [Floor, Ceiling, Down, Up, Nearest] {
             let (p, o) = x.clone().pow_s_round(n, rm);
             assert!(p.is_valid());
+            assert_rounding_ordering_consistent(&p, rm, o);
             let (p_alt, o_alt) = x.pow_s_round_ref(n, rm);
             assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
             assert_eq!(o_alt, o);
@@ -3367,6 +3379,7 @@ fn unsigned_pow_unsigned_prec_round_properties() {
             }
             let (p, o) = Float::unsigned_pow_unsigned_prec_round(x, y, prec, rm);
             assert!(p.is_valid());
+            assert_rounding_ordering_consistent(&p, rm, o);
 
             // unsigned_pow_unsigned (mpfr_ui_pow_ui) must agree with pow_integer (mpfr_pow_z) on
             // the exact Float representation of the base.
@@ -3571,6 +3584,7 @@ fn unsigned_pow_prec_round_properties_helper(
     }
     let (p, o) = Float::unsigned_pow_prec_round(x, y.clone(), prec, rm);
     assert!(p.is_valid());
+    assert_rounding_ordering_consistent(&p, rm, o);
     let (p_alt, o_alt) = Float::unsigned_pow_prec_round_ref(x, &y, prec, rm);
     assert!(p_alt.is_valid());
     assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
@@ -3965,6 +3979,7 @@ fn unsigned_pow_rational_prec_round_properties_helper(
     }
     let (p, o) = Float::unsigned_pow_rational_prec_round_ref(k, &q, prec, rm);
     assert!(p.is_valid());
+    assert_rounding_ordering_consistent(&p, rm, o);
     let (p_alt, o_alt) = Float::unsigned_pow_rational_prec_round(k, q.clone(), prec, rm);
     assert!(p_alt.is_valid());
     assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
@@ -4456,6 +4471,7 @@ fn pow_rational_prec_round_properties_helper(x: Float, y: Rational, prec: u64, r
     }
     let (p, o) = x.pow_rational_prec_round_ref_ref(&y, prec, rm);
     assert!(p.is_valid());
+    assert_rounding_ordering_consistent(&p, rm, o);
     // Value/reference variants all agree.
     let (p_alt, o_alt) = x.clone().pow_rational_prec_round(y.clone(), prec, rm);
     assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
@@ -4555,6 +4571,7 @@ fn pow_rational_round_properties() {
         for rm in [Floor, Ceiling, Down, Up, Nearest] {
             let (p, o) = x.clone().pow_rational_round(y.clone(), rm);
             assert!(p.is_valid());
+            assert_rounding_ordering_consistent(&p, rm, o);
             let (p_alt, o_alt) = x.clone().pow_rational_round_val_ref(&y, rm);
             assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
             assert_eq!(o_alt, o);
@@ -4906,6 +4923,7 @@ fn rational_pow_rational_prec_round_properties_helper(
     }
     let (p, o) = Float::rational_pow_rational_prec_round_ref(x, y, prec, rm);
     assert!(p.is_valid());
+    assert_rounding_ordering_consistent(&p, rm, o);
     let (p_alt, o_alt) = Float::rational_pow_rational_prec_round(x.clone(), y.clone(), prec, rm);
     assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
     assert_eq!(o_alt, o);

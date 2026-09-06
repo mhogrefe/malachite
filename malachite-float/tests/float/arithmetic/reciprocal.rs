@@ -25,7 +25,8 @@ use malachite_base::test_util::generators::{
 };
 use malachite_float::emulate_float_to_float_fn;
 use malachite_float::test_util::common::{
-    parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
+    assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
+    to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::reciprocal::{
     reciprocal_prec_round_naive_1, reciprocal_prec_round_naive_2, rug_reciprocal,
@@ -2373,6 +2374,7 @@ fn reciprocal_prec_round_fail() {
 fn reciprocal_prec_round_properties_helper(x: Float, prec: u64, rm: RoundingMode, extreme: bool) {
     let (reciprocal, o) = x.clone().reciprocal_prec_round(prec, rm);
     assert!(reciprocal.is_valid());
+    assert_rounding_ordering_consistent(&reciprocal, rm, o);
     let (reciprocal_alt, o_alt) = x.reciprocal_prec_round_ref(prec, rm);
     assert!(reciprocal_alt.is_valid());
     assert_eq!(
@@ -2445,16 +2447,6 @@ fn reciprocal_prec_round_properties_helper(x: Float, prec: u64, rm: RoundingMode
                 let mut next = reciprocal.clone();
                 next.decrement();
                 assert!(next < r_reciprocal);
-            }
-            match (r_reciprocal >= 0u32, rm) {
-                (_, Floor) | (true, Down) | (false, Up) => {
-                    assert_ne!(o, Greater);
-                }
-                (_, Ceiling) | (true, Up) | (false, Down) => {
-                    assert_ne!(o, Less);
-                }
-                (_, Exact) => assert_eq!(o, Equal),
-                _ => {}
             }
         }
     }
@@ -2548,6 +2540,7 @@ fn reciprocal_prec_round_properties() {
 fn reciprocal_prec_properties_helper(x: Float, prec: u64, extreme: bool) {
     let (reciprocal, o) = x.clone().reciprocal_prec(prec);
     assert!(reciprocal.is_valid());
+    assert_rounding_ordering_consistent(&reciprocal, Nearest, o);
     let (reciprocal_alt, o_alt) = x.reciprocal_prec_ref(prec);
     assert!(reciprocal_alt.is_valid());
     assert_eq!(
@@ -2674,6 +2667,7 @@ fn reciprocal_prec_properties() {
 fn reciprocal_round_properties_helper(x: Float, rm: RoundingMode, extreme: bool) {
     let (reciprocal, o) = x.clone().reciprocal_round(rm);
     assert!(reciprocal.is_valid());
+    assert_rounding_ordering_consistent(&reciprocal, rm, o);
     let (reciprocal_alt, o_alt) = x.reciprocal_round_ref(rm);
     assert!(reciprocal_alt.is_valid());
     assert_eq!(
@@ -2736,16 +2730,6 @@ fn reciprocal_round_properties_helper(x: Float, rm: RoundingMode, extreme: bool)
                 let mut next = reciprocal.clone();
                 next.decrement();
                 assert!(next < r_reciprocal);
-            }
-            match (r_reciprocal >= 0u32, rm) {
-                (_, Floor) | (true, Down) | (false, Up) => {
-                    assert_ne!(o, Greater);
-                }
-                (_, Ceiling) | (true, Up) | (false, Down) => {
-                    assert_ne!(o, Less);
-                }
-                (_, Exact) => assert_eq!(o, Equal),
-                _ => {}
             }
         }
     }

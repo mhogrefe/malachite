@@ -150,6 +150,32 @@ impl TryFrom<&Float> for rug::Float {
     }
 }
 
+// Asserts that the `Ordering` returned alongside a rounded result is consistent with the rounding
+// mode: a directed mode can only err to one side, with `Down` and `Up` depending on the sign of the
+// result (which is the sign of the exact value, since zeros keep their sign), `Exact` never errs,
+// and `Nearest` may err either way. A `NaN` result is always reported as `Equal`.
+pub fn assert_rounding_ordering_consistent(x: &Float, rm: RoundingMode, o: Ordering) {
+    if x.is_nan() {
+        assert_eq!(o, Ordering::Equal);
+        return;
+    }
+    assert_rounding_ordering_consistent_for_sign(!x.is_sign_negative(), rm, o);
+}
+
+// The same check for a result that is not a `Float`, given whether the exact value is non-negative.
+pub fn assert_rounding_ordering_consistent_for_sign(
+    non_negative: bool,
+    rm: RoundingMode,
+    o: Ordering,
+) {
+    match (non_negative, rm) {
+        (_, Floor) | (true, Down) | (false, Up) => assert_ne!(o, Ordering::Greater),
+        (_, Ceiling) | (true, Up) | (false, Down) => assert_ne!(o, Ordering::Less),
+        (_, Exact) => assert_eq!(o, Ordering::Equal),
+        _ => {}
+    }
+}
+
 pub fn parse_hex_string(s_hex: &str) -> Float {
     let x = Float::from_string_base(16, s_hex).unwrap();
     assert_eq!(format!("{:#x}", ComparableFloatRef(&x)), s_hex);

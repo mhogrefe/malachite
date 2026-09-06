@@ -16,7 +16,7 @@ use malachite_base::test_util::generators::{
     string_from_sci_string_options_pair_gen_var_3, unsigned_gen,
 };
 use malachite_float::float::conversion::string::strtofr::set_str;
-use malachite_float::test_util::common::to_hex_string;
+use malachite_float::test_util::common::{assert_rounding_ordering_consistent, to_hex_string};
 use malachite_float::test_util::generators::{
     float_gen, float_gen_var_12, string_from_sci_string_options_unsigned_triple_gen_var_1,
     string_from_sci_string_options_unsigned_triple_gen_var_2,
@@ -73,6 +73,7 @@ fn verify_from_sci_string(s: &str, options: FromSciStringOptions, prec: u64) {
         return;
     };
     assert!(x.is_valid());
+    assert_rounding_ordering_consistent(&x, rm, o);
     // A finite nonzero result always has the requested precision; zeros and the specials carry
     // none.
     if let Some(p) = x.get_prec() {

@@ -14,6 +14,7 @@ use malachite_base::num::basic::traits::{
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
+use malachite_float::test_util::common::assert_rounding_ordering_consistent;
 use malachite_float::test_util::generators::float_float_unsigned_rounding_mode_quadruple_gen_var_15;
 use malachite_float::{ComparableFloatRef, Float};
 use malachite_q::Rational;
@@ -204,6 +205,7 @@ fn average_prec_round_properties() {
         |(x, y, prec, rm)| {
             let (avg, o) = x.clone().average_prec_round(y.clone(), prec, rm);
             assert!(avg.is_valid());
+            assert_rounding_ordering_consistent(&avg, rm, o);
             // every ownership variant agrees
             for (a, ao) in [
                 x.clone().average_prec_round_val_ref(&y, prec, rm),

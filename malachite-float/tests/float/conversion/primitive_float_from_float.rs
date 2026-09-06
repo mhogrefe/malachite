@@ -16,7 +16,10 @@ use malachite_base::strings::ToDebugString;
 use malachite_base::test_util::generators::primitive_float_gen;
 use malachite_float::Float;
 use malachite_float::float::conversion::primitive_float_from_float::FloatFromFloatError;
-use malachite_float::test_util::common::{parse_hex_string, rug_round_try_from_rounding_mode};
+use malachite_float::test_util::common::{
+    assert_rounding_ordering_consistent_for_sign, parse_hex_string,
+    rug_round_try_from_rounding_mode,
+};
 use malachite_float::test_util::generators::{
     float_gen, float_gen_var_4, float_gen_var_12, float_rounding_mode_pair_gen_var_6,
     float_rounding_mode_pair_gen_var_20,
@@ -1381,16 +1384,7 @@ fn rounding_from_float_properties_helper_helper<
     }
 
     assert_eq!(n.partial_cmp(&x), if x.is_nan() { None } else { Some(o) });
-    match (x >= T::ZERO, rm) {
-        (_, Floor) | (true, Down) | (false, Up) => {
-            assert_ne!(o, Greater);
-        }
-        (_, Ceiling) | (true, Up) | (false, Down) => {
-            assert_ne!(o, Less);
-        }
-        (_, Exact) => assert_eq!(o, Equal),
-        _ => {}
-    }
+    assert_rounding_ordering_consistent_for_sign(x >= T::ZERO, rm, o);
 }
 
 #[allow(clippy::type_repetition_in_bounds)]

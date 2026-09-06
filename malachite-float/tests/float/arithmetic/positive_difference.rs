@@ -21,7 +21,8 @@ use malachite_float::float::arithmetic::positive_difference::{
     primitive_float_rational_positive_difference_float,
 };
 use malachite_float::test_util::common::{
-    parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
+    assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
+    to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::positive_difference::*;
 use malachite_float::test_util::generators::{
@@ -48,6 +49,7 @@ fn positive_difference_prec_round_properties_helper(
 ) {
     let (d, o) = x.positive_difference_prec_round_ref_ref(&y, prec, rm);
     assert!(d.is_valid());
+    assert_rounding_ordering_consistent(&d, rm, o);
     let (d2, o2) = x
         .clone()
         .positive_difference_prec_round(y.clone(), prec, rm);
@@ -141,6 +143,7 @@ fn positive_difference_prec_round_properties() {
 fn positive_difference_shorthand_properties() {
     float_float_unsigned_triple_gen_var_1().test_properties(|(x, y, prec)| {
         let (d, o) = x.positive_difference_prec_round_ref_ref(&y, prec, Nearest);
+        assert_rounding_ordering_consistent(&d, Nearest, o);
         let (d2, o2) = x.positive_difference_prec_ref_ref(&y, prec);
         assert_eq!(ComparableFloatRef(&d2), ComparableFloatRef(&d));
         assert_eq!(o2, o);
@@ -160,6 +163,7 @@ fn positive_difference_shorthand_properties() {
     float_float_rounding_mode_triple_gen_var_42().test_properties(|(x, y, rm)| {
         let prec = max(x.significant_bits(), y.significant_bits());
         let (d, o) = x.positive_difference_prec_round_ref_ref(&y, prec, rm);
+        assert_rounding_ordering_consistent(&d, rm, o);
         let (d2, o2) = x.positive_difference_round_ref_ref(&y, rm);
         assert_eq!(ComparableFloatRef(&d2), ComparableFloatRef(&d));
         assert_eq!(o2, o);
@@ -422,6 +426,7 @@ fn positive_difference_rational_prec_round_properties_helper(
     };
     let (d, o) = f(&x, &y, prec, rm);
     assert!(d.is_valid());
+    assert_rounding_ordering_consistent(&d, rm, o);
 
     if reversed {
         let (d2, o2) =
@@ -532,6 +537,7 @@ fn rational_positive_difference_float_prec_round_properties() {
 fn positive_difference_rational_shorthand_properties() {
     float_rational_unsigned_triple_gen_var_1().test_properties(|(x, y, prec)| {
         let (d, o) = x.positive_difference_rational_prec_round_ref_ref(&y, prec, Nearest);
+        assert_rounding_ordering_consistent(&d, Nearest, o);
         let (d2, o2) = x.positive_difference_rational_prec_ref_ref(&y, prec);
         assert_eq!(ComparableFloatRef(&d2), ComparableFloatRef(&d));
         assert_eq!(o2, o);
@@ -541,6 +547,7 @@ fn positive_difference_rational_shorthand_properties() {
         assert_eq!(o2, o);
         let (d, o) =
             Float::rational_positive_difference_float_prec_round_ref_ref(&y, &x, prec, Nearest);
+        assert_rounding_ordering_consistent(&d, Nearest, o);
         let (d2, o2) = Float::rational_positive_difference_float_prec_ref_ref(&y, &x, prec);
         assert_eq!(ComparableFloatRef(&d2), ComparableFloatRef(&d));
         assert_eq!(o2, o);
@@ -549,6 +556,7 @@ fn positive_difference_rational_shorthand_properties() {
     float_rational_rounding_mode_triple_gen_var_22().test_properties(|(x, y, rm)| {
         let prec = x.significant_bits();
         let (d, o) = x.positive_difference_rational_prec_round_ref_ref(&y, prec, rm);
+        assert_rounding_ordering_consistent(&d, rm, o);
         let (d2, o2) = x.positive_difference_rational_round_ref_ref(&y, rm);
         assert_eq!(ComparableFloatRef(&d2), ComparableFloatRef(&d));
         assert_eq!(o2, o);
@@ -561,6 +569,7 @@ fn positive_difference_rational_shorthand_properties() {
     float_rational_rounding_mode_triple_gen_var_23().test_properties(|(x, y, rm)| {
         let prec = x.significant_bits();
         let (d, o) = Float::rational_positive_difference_float_prec_round_ref_ref(&y, &x, prec, rm);
+        assert_rounding_ordering_consistent(&d, rm, o);
         let (d2, o2) = Float::rational_positive_difference_float_round_ref_ref(&y, &x, rm);
         assert_eq!(ComparableFloatRef(&d2), ComparableFloatRef(&d));
         assert_eq!(o2, o);

@@ -32,7 +32,8 @@ use malachite_float::float::arithmetic::rem::{
     primitive_float_rem_rational_and_quotient_bits, primitive_float_rem_unsigned,
 };
 use malachite_float::test_util::common::{
-    parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
+    assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
+    to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::rem::{
     rug_ieee_remainder, rug_ieee_remainder_prec_round, rug_rem, rug_rem_prec, rug_rem_prec_round,
@@ -173,6 +174,7 @@ fn rem_prec_round_properties_helper(
 ) {
     let (rem, o) = x.clone().rem_prec_round(y.clone(), prec, rm);
     assert!(rem.is_valid());
+    assert_rounding_ordering_consistent(&rem, rm, o);
     let (rem_alt, o_alt) = x.clone().rem_prec_round_val_ref(&y, prec, rm);
     assert!(rem_alt.is_valid());
     assert_eq!(ComparableFloatRef(&rem_alt), ComparableFloatRef(&rem));
@@ -257,16 +259,6 @@ fn rem_prec_round_properties_helper(
                 next.decrement();
                 assert!(next < r_exact);
             }
-            match (r_exact >= 0u32, rm) {
-                (_, Floor) | (true, Down) | (false, Up) => {
-                    assert_ne!(o, Greater);
-                }
-                (_, Ceiling) | (true, Up) | (false, Down) => {
-                    assert_ne!(o, Less);
-                }
-                (_, Exact) => assert_eq!(o, Equal),
-                _ => {}
-            }
         }
     }
 
@@ -334,6 +326,7 @@ fn ieee_remainder_prec_round_properties_helper(
 ) {
     let (rem, o) = x.clone().ieee_remainder_prec_round(y.clone(), prec, rm);
     assert!(rem.is_valid());
+    assert_rounding_ordering_consistent(&rem, rm, o);
     let (rem_alt, o_alt) = x.clone().ieee_remainder_prec_round_val_ref(&y, prec, rm);
     assert!(rem_alt.is_valid());
     assert_eq!(ComparableFloatRef(&rem_alt), ComparableFloatRef(&rem));
@@ -468,6 +461,7 @@ fn ieee_remainder_prec_round_properties() {
 fn rem_prec_properties_helper(x: Float, y: Float, prec: u64) {
     let (rem, o) = x.clone().rem_prec(y.clone(), prec);
     assert!(rem.is_valid());
+    assert_rounding_ordering_consistent(&rem, Nearest, o);
     let (rem_alt, o_alt) = x.clone().rem_prec_val_ref(&y, prec);
     assert_eq!(ComparableFloatRef(&rem_alt), ComparableFloatRef(&rem));
     assert_eq!(o_alt, o);
@@ -511,6 +505,7 @@ fn rem_prec_properties() {
 fn ieee_remainder_prec_properties_helper(x: Float, y: Float, prec: u64) {
     let (rem, o) = x.clone().ieee_remainder_prec(y.clone(), prec);
     assert!(rem.is_valid());
+    assert_rounding_ordering_consistent(&rem, Nearest, o);
     let (rem_alt, o_alt) = x.clone().ieee_remainder_prec_val_ref(&y, prec);
     assert_eq!(ComparableFloatRef(&rem_alt), ComparableFloatRef(&rem));
     assert_eq!(o_alt, o);
@@ -554,6 +549,7 @@ fn ieee_remainder_prec_properties() {
 fn rem_round_properties_helper(x: Float, y: Float, rm: RoundingMode) {
     let (rem, o) = x.clone().rem_round(y.clone(), rm);
     assert!(rem.is_valid());
+    assert_rounding_ordering_consistent(&rem, rm, o);
     let (rem_alt, o_alt) = x.clone().rem_round_val_ref(&y, rm);
     assert_eq!(ComparableFloatRef(&rem_alt), ComparableFloatRef(&rem));
     assert_eq!(o_alt, o);
@@ -594,6 +590,7 @@ fn rem_round_properties() {
 fn ieee_remainder_round_properties_helper(x: Float, y: Float, rm: RoundingMode) {
     let (rem, o) = x.clone().ieee_remainder_round(y.clone(), rm);
     assert!(rem.is_valid());
+    assert_rounding_ordering_consistent(&rem, rm, o);
     let (rem_alt, o_alt) = x.clone().ieee_remainder_round_val_ref(&y, rm);
     assert_eq!(ComparableFloatRef(&rem_alt), ComparableFloatRef(&rem));
     assert_eq!(o_alt, o);
@@ -734,6 +731,7 @@ fn rem_unsigned_properties() {
         for rm in [Floor, Ceiling, Down, Up, Nearest] {
             let (rem, o) = x.rem_unsigned_round_ref(u, rm);
             assert!(rem.is_valid());
+            assert_rounding_ordering_consistent(&rem, rm, o);
             let (rem_alt, o_alt) = x.clone().rem_unsigned_round(u, rm);
             assert_eq!(ComparableFloatRef(&rem_alt), ComparableFloatRef(&rem));
             assert_eq!(o_alt, o);
@@ -750,6 +748,7 @@ fn rem_unsigned_properties() {
         for prec in [1u64, 32, 64] {
             for rm in [Floor, Down, Nearest] {
                 let (rem, o) = x.rem_unsigned_prec_round_ref(u, prec, rm);
+                assert_rounding_ordering_consistent(&rem, rm, o);
                 let (rem_alt, o_alt) = x.clone().rem_unsigned_prec_round(u, prec, rm);
                 assert_eq!(ComparableFloatRef(&rem_alt), ComparableFloatRef(&rem));
                 assert_eq!(o_alt, o);
@@ -765,6 +764,7 @@ fn rem_unsigned_properties() {
                 }
             }
             let (rem, o) = x.rem_unsigned_prec_ref(u, prec);
+            assert_rounding_ordering_consistent(&rem, Nearest, o);
             let (rem_alt, o_alt) = x.clone().rem_unsigned_prec(u, prec);
             assert_eq!(ComparableFloatRef(&rem_alt), ComparableFloatRef(&rem));
             assert_eq!(o_alt, o);
@@ -2174,6 +2174,7 @@ fn rem_rational_prec_round_properties_helper(
     };
     let (rem, o, quo) = quo_fn(&x, &y, prec, rm);
     assert!(rem.is_valid());
+    assert_rounding_ordering_consistent(&rem, rm, o);
 
     // all ownership variants and assigns agree
     if nearest_quotient {
@@ -2316,6 +2317,7 @@ fn rational_rem_float_prec_round_properties_helper(
     };
     let (rem, o, quo) = quo_fn(&x, &y, prec, rm);
     assert!(rem.is_valid());
+    assert_rounding_ordering_consistent(&rem, rm, o);
 
     if nearest_quotient {
         let (r2, o2) =
@@ -2431,6 +2433,7 @@ fn rational_ieee_remainder_float_prec_round_properties() {
 fn rem_rational_shorthand_properties() {
     float_rational_unsigned_triple_gen_var_1().test_properties(|(x, y, prec)| {
         let (rem, o) = x.rem_rational_prec_round_ref_ref(&y, prec, Nearest);
+        assert_rounding_ordering_consistent(&rem, Nearest, o);
         let (r2, o2) = x.rem_rational_prec_ref_ref(&y, prec);
         assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
         assert_eq!(o2, o);
@@ -2446,6 +2449,7 @@ fn rem_rational_shorthand_properties() {
         assert_eq!(o2, o);
 
         let (rem, o) = x.ieee_remainder_rational_prec_round_ref_ref(&y, prec, Nearest);
+        assert_rounding_ordering_consistent(&rem, Nearest, o);
         let (r2, o2) = x.ieee_remainder_rational_prec_ref_ref(&y, prec);
         assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
         assert_eq!(o2, o);
@@ -2461,6 +2465,7 @@ fn rem_rational_round_properties() {
     float_rational_rounding_mode_triple_gen_var_16().test_properties(|(x, y, rm)| {
         let prec = x.significant_bits();
         let (rem, o) = x.rem_rational_prec_round_ref_ref(&y, prec, rm);
+        assert_rounding_ordering_consistent(&rem, rm, o);
         let (r2, o2) = x.rem_rational_round_ref_ref(&y, rm);
         assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
         assert_eq!(o2, o);
@@ -2479,6 +2484,7 @@ fn rem_rational_round_properties() {
     float_rational_rounding_mode_triple_gen_var_17().test_properties(|(x, y, rm)| {
         let prec = x.significant_bits();
         let (rem, o) = x.ieee_remainder_rational_prec_round_ref_ref(&y, prec, rm);
+        assert_rounding_ordering_consistent(&rem, rm, o);
         let (r2, o2) = x.ieee_remainder_rational_round_ref_ref(&y, rm);
         assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
         assert_eq!(o2, o);
@@ -2487,6 +2493,7 @@ fn rem_rational_round_properties() {
     float_rational_rounding_mode_triple_gen_var_18().test_properties(|(x, y, rm)| {
         let prec = x.significant_bits();
         let (rem, o) = Float::rational_rem_float_prec_round_ref_ref(&y, &x, prec, rm);
+        assert_rounding_ordering_consistent(&rem, rm, o);
         let (r2, o2) = Float::rational_rem_float_round_ref_ref(&y, &x, rm);
         assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
         assert_eq!(o2, o);
@@ -2495,6 +2502,7 @@ fn rem_rational_round_properties() {
     float_rational_rounding_mode_triple_gen_var_19().test_properties(|(x, y, rm)| {
         let prec = x.significant_bits();
         let (rem, o) = Float::rational_ieee_remainder_float_prec_round_ref_ref(&y, &x, prec, rm);
+        assert_rounding_ordering_consistent(&rem, rm, o);
         let (r2, o2) = Float::rational_ieee_remainder_float_round_ref_ref(&y, &x, rm);
         assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&rem));
         assert_eq!(o2, o);

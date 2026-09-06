@@ -18,7 +18,9 @@ use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
     primitive_float_gen, primitive_float_unsigned_pair_gen_var_4,
 };
-use malachite_float::test_util::common::{rug_round_try_from_rounding_mode, to_hex_string};
+use malachite_float::test_util::common::{
+    assert_rounding_ordering_consistent, rug_round_try_from_rounding_mode, to_hex_string,
+};
 use malachite_float::test_util::generators::primitive_float_unsigned_rounding_mode_triple_gen_var_3;
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_q::Rational;
@@ -1456,21 +1458,12 @@ where
         |(x, prec, rm)| {
             let (float_x, o) = Float::from_primitive_float_prec_round(x, prec, rm);
             assert!(float_x.is_valid());
+            assert_rounding_ordering_consistent(&float_x, rm, o);
 
             assert_eq!(
                 float_x.partial_cmp(&x),
                 if x.is_nan() { None } else { Some(o) }
             );
-            match (x >= T::ZERO, rm) {
-                (_, Floor) | (true, Down) | (false, Up) => {
-                    assert_ne!(o, Greater);
-                }
-                (_, Ceiling) | (true, Up) | (false, Down) => {
-                    assert_ne!(o, Less);
-                }
-                (_, Exact) => assert_eq!(o, Equal),
-                _ => {}
-            }
 
             if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
                 let (rug_x, rug_o) = rug::Float::with_val_round(u32::exact_from(prec), x, rm);

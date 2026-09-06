@@ -239,6 +239,11 @@ general-case tests — every one of them corresponds to a real bug class found i
   representable (integer arguments, powers of the base, commensurable base/argument pairs) and
   dispatch them before the loop: a Ziv loop can never certify an exact result and will hang on
   one. Property tests should assert that an `Equal` ternary implies rounding-mode invariance.
+- Every property test of a function returning an `Ordering` (a `_prec_round`/`_round`/`_prec`
+  variant, an `_assign` returning the ternary, a conversion with a rounding mode, a constant) calls
+  `assert_rounding_ordering_consistent(&result, rm, o)` from `test_util::common` (or the
+  `_for_sign` variant when the result is not a `Float`): a directed mode never errs to the wrong
+  side, `Exact` is always `Equal`, and a `NaN` result comes with `Equal`.
 - **Sweep the exponent-range boundaries.** Test inputs *and* results near `MIN_EXPONENT` and
   `MAX_EXPONENT` (dyadic sweeps work well), cross-checked against rug — rug's default exponent
   range equals `Float`'s, so it is a faithful overflow/underflow oracle. Where rug is impractical

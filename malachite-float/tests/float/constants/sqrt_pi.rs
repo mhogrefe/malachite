@@ -11,7 +11,9 @@ use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
     unsigned_gen_var_11, unsigned_rounding_mode_pair_gen_var_4,
 };
-use malachite_float::test_util::common::{test_constant, to_hex_string};
+use malachite_float::test_util::common::{
+    assert_rounding_ordering_consistent, test_constant, to_hex_string,
+};
 use malachite_float::test_util::float::constants::sqrt_pi::sqrt_pi_prec_round_simple;
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use std::cmp::Ordering::{self, *};
@@ -282,6 +284,7 @@ fn sqrt_pi_prec_properties() {
     unsigned_gen_var_11().test_properties(|prec| {
         let (sqrt_pi, o) = Float::sqrt_pi_prec(prec);
         assert!(sqrt_pi.is_valid());
+        assert_rounding_ordering_consistent(&sqrt_pi, Nearest, o);
         assert_eq!(sqrt_pi.get_prec(), Some(prec));
         assert_eq!(sqrt_pi.get_exponent(), Some(if prec <= 2 { 2 } else { 1 }));
         assert_ne!(o, Equal);
@@ -319,6 +322,7 @@ fn sqrt_pi_prec_round_properties() {
     unsigned_rounding_mode_pair_gen_var_4().test_properties(|(prec, rm)| {
         let (sqrt_pi, o) = Float::sqrt_pi_prec_round(prec, rm);
         assert!(sqrt_pi.is_valid());
+        assert_rounding_ordering_consistent(&sqrt_pi, rm, o);
         assert_eq!(sqrt_pi.get_prec(), Some(prec));
         let expected_exponent = match (prec, rm) {
             (1 | 2, Ceiling | Up | Nearest) | (3, Ceiling | Up) => 2,

@@ -25,7 +25,8 @@ use malachite_base::test_util::generators::{
 };
 use malachite_float::float::arithmetic::ln_1_plus_x::primitive_float_ln_1_plus_x;
 use malachite_float::test_util::common::{
-    parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
+    assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
+    to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::ln_1_plus_x::{
     rug_ln_1_plus_x, rug_ln_1_plus_x_prec, rug_ln_1_plus_x_prec_round, rug_ln_1_plus_x_round,
@@ -1724,6 +1725,7 @@ fn ln_1_plus_x_prec_round_fail() {
 fn ln_1_plus_x_prec_round_properties_helper(x: Float, prec: u64, rm: RoundingMode) {
     let (ln_1_plus_x, o) = x.clone().ln_1_plus_x_prec_round(prec, rm);
     assert!(ln_1_plus_x.is_valid());
+    assert_rounding_ordering_consistent(&ln_1_plus_x, rm, o);
 
     let (ln_1_plus_x_alt, o_alt) = x.ln_1_plus_x_prec_round_ref(prec, rm);
     assert!(ln_1_plus_x_alt.is_valid());
@@ -1914,6 +1916,7 @@ fn ln_1_plus_x_prec_properties() {
 fn ln_1_plus_x_round_properties_helper(x: Float, rm: RoundingMode) {
     let (ln_1_plus_x, o) = x.clone().ln_1_plus_x_round(rm);
     assert!(ln_1_plus_x.is_valid());
+    assert_rounding_ordering_consistent(&ln_1_plus_x, rm, o);
 
     let (ln_1_plus_x_alt, o_alt) = x.ln_1_plus_x_round_ref(rm);
     assert!(ln_1_plus_x_alt.is_valid());

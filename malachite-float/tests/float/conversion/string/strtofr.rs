@@ -12,7 +12,9 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_float::float::conversion::string::get_str::get_str;
 use malachite_float::float::conversion::string::strtofr::{set_str, strtofr};
-use malachite_float::test_util::common::{rug_round_try_from_rounding_mode, to_hex_string};
+use malachite_float::test_util::common::{
+    assert_rounding_ordering_consistent, rug_round_try_from_rounding_mode, to_hex_string,
+};
 use malachite_float::test_util::generators::{
     float_signed_unsigned_rounding_mode_quadruple_gen_var_9,
     string_unsigned_unsigned_rounding_mode_quadruple_gen_var_1,
@@ -47,6 +49,7 @@ fn verify_strtofr(s: &str, base: u8, prec: u64, rm: RoundingMode) {
     let (x, o, len) = strtofr(s, base, prec, rm);
     assert!(len <= s.len());
     assert!(x.is_valid());
+    assert_rounding_ordering_consistent(&x, rm, o);
     // A finite nonzero result always has the requested precision; zeros and the specials carry
     // none.
     if let Some(p) = x.get_prec() {

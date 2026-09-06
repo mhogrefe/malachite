@@ -16,7 +16,9 @@ use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_float::float::arithmetic::cbrt::{
     primitive_float_cbrt, primitive_float_cbrt_rational,
 };
-use malachite_float::test_util::common::{parse_hex_string, to_hex_string};
+use malachite_float::test_util::common::{
+    assert_rounding_ordering_consistent, parse_hex_string, to_hex_string,
+};
 use malachite_float::test_util::generators::{float_gen, float_unsigned_pair_gen_var_1};
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_q::Rational;
@@ -236,6 +238,7 @@ fn cbrt_prec_round_properties_helper(x: &Float, prec: u64, rm: RoundingMode) {
     }
     let (c, o) = x.clone().cbrt_prec_round(prec, rm);
     assert!(c.is_valid());
+    assert_rounding_ordering_consistent(&c, rm, o);
 
     // cbrt is exactly root_u(., 3).
     let (r, ro) = x.root_u_prec_round_ref(3, prec, rm);

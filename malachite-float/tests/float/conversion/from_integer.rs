@@ -11,7 +11,9 @@ use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom};
 use malachite_base::rounding_modes::RoundingMode::*;
-use malachite_float::test_util::common::{rug_round_try_from_rounding_mode, to_hex_string};
+use malachite_float::test_util::common::{
+    assert_rounding_ordering_consistent, rug_round_try_from_rounding_mode, to_hex_string,
+};
 use malachite_float::test_util::generators::*;
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_nz::integer::Integer;
@@ -1322,6 +1324,7 @@ fn from_integer_prec_round_properties() {
     integer_unsigned_rounding_mode_triple_gen_var_3().test_properties(|(n, prec, rm)| {
         let (float_n, o) = Float::from_integer_prec_round(n.clone(), prec, rm);
         assert!(float_n.is_valid());
+        assert_rounding_ordering_consistent(&float_n, rm, o);
 
         let (float_n_alt, o_alt) = Float::from_integer_prec_round_ref(&n, prec, rm);
         assert!(float_n_alt.is_valid());
@@ -1331,16 +1334,6 @@ fn from_integer_prec_round_properties() {
         );
         assert_eq!(o, o_alt);
         assert_eq!(float_n.partial_cmp(&n), Some(o));
-        match (n >= 0u32, rm) {
-            (_, Floor) | (true, Down) | (false, Up) => {
-                assert_ne!(o, Greater);
-            }
-            (_, Ceiling) | (true, Up) | (false, Down) => {
-                assert_ne!(o, Less);
-            }
-            (_, Exact) => assert_eq!(o, Equal),
-            _ => {}
-        }
 
         if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
             let (rug_n, rug_o) =

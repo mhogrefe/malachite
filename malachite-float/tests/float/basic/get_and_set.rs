@@ -13,7 +13,8 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::strings::ToDebugString;
 use malachite_float::test_util::common::{
-    parse_hex_string, rug_round_exact_from_rounding_mode, to_hex_string,
+    assert_rounding_ordering_consistent, parse_hex_string, rug_round_exact_from_rounding_mode,
+    to_hex_string,
 };
 use malachite_float::test_util::generators::{
     float_gen, float_gen_var_12, float_unsigned_pair_gen_var_1, float_unsigned_pair_gen_var_4,
@@ -989,6 +990,7 @@ fn set_prec_round_properties_helper(mut x: Float, prec: u64, rm: RoundingMode) {
     let old_x = x.clone();
     let o = x.set_prec_round(prec, rm);
     assert!(x.is_valid());
+    assert_rounding_ordering_consistent(&x, rm, o);
     let final_x = x.clone();
     if x.is_normal() {
         assert_eq!(x.get_prec(), Some(prec));

@@ -11,7 +11,9 @@ use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
     unsigned_gen_var_11, unsigned_rounding_mode_pair_gen_var_4,
 };
-use malachite_float::test_util::common::{test_constant, to_hex_string};
+use malachite_float::test_util::common::{
+    assert_rounding_ordering_consistent, test_constant, to_hex_string,
+};
 use malachite_float::test_util::float::constants::pi_over_3::pi_over_3_prec_round_simple;
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use std::cmp::Ordering::{self, *};
@@ -282,6 +284,7 @@ fn pi_over_3_prec_properties() {
     unsigned_gen_var_11().test_properties(|prec| {
         let (pi_over_3, o) = Float::pi_over_3_prec(prec);
         assert!(pi_over_3.is_valid());
+        assert_rounding_ordering_consistent(&pi_over_3, Nearest, o);
         assert_eq!(pi_over_3.get_prec(), Some(prec));
         assert_eq!(pi_over_3.get_exponent(), Some(1));
         assert_ne!(o, Equal);
@@ -319,6 +322,7 @@ fn pi_over_3_prec_round_properties() {
     unsigned_rounding_mode_pair_gen_var_4().test_properties(|(prec, rm)| {
         let (pi_over_3, o) = Float::pi_over_3_prec_round(prec, rm);
         assert!(pi_over_3.is_valid());
+        assert_rounding_ordering_consistent(&pi_over_3, rm, o);
         assert_eq!(pi_over_3.get_prec(), Some(prec));
         assert_eq!(
             pi_over_3.get_exponent(),

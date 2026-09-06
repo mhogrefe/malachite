@@ -19,7 +19,8 @@ use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::primitive_float_pair_gen;
 use malachite_float::emulate_float_float_to_float_fn;
 use malachite_float::test_util::common::{
-    parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
+    assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
+    to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::add::add_prec_round_naive;
 use malachite_float::test_util::float::arithmetic::sub::{
@@ -11201,6 +11202,7 @@ fn sub_prec_round_properties_helper(
 ) {
     let (diff, o) = x.clone().sub_prec_round(y.clone(), prec, rm);
     assert!(diff.is_valid());
+    assert_rounding_ordering_consistent(&diff, rm, o);
     let (diff_alt, o_alt) = x.clone().sub_prec_round_val_ref(&y, prec, rm);
     assert!(diff_alt.is_valid());
     assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
@@ -11266,7 +11268,7 @@ fn sub_prec_round_properties_helper(
     }
 
     if !extreme {
-        let r_diff = if diff.is_finite() {
+        if diff.is_finite() {
             if diff.is_normal() {
                 assert_eq!(diff.get_prec(), Some(prec));
             }
@@ -11281,21 +11283,8 @@ fn sub_prec_round_properties_helper(
                 next.decrement();
                 assert!(next < r_diff);
             }
-            Some(r_diff)
         } else {
             assert_eq!(o, Equal);
-            None
-        };
-
-        match (r_diff.is_some() && *r_diff.as_ref().unwrap() >= 0u32, rm) {
-            (_, Floor) | (true, Down) | (false, Up) => {
-                assert_ne!(o, Greater);
-            }
-            (_, Ceiling) | (true, Up) | (false, Down) => {
-                assert_ne!(o, Less);
-            }
-            (_, Exact) => assert_eq!(o, Equal),
-            _ => {}
         }
     }
 
@@ -11429,6 +11418,7 @@ fn sub_prec_round_properties() {
 fn sub_prec_properties_helper(x: Float, y: Float, prec: u64, extreme: bool) {
     let (diff, o) = x.clone().sub_prec(y.clone(), prec);
     assert!(diff.is_valid());
+    assert_rounding_ordering_consistent(&diff, Nearest, o);
     let (diff_alt, o_alt) = x.clone().sub_prec_val_ref(&y, prec);
     assert!(diff_alt.is_valid());
     assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
@@ -11627,6 +11617,7 @@ fn sub_prec_properties() {
 fn sub_round_properties_helper(x: Float, y: Float, rm: RoundingMode, extreme: bool) {
     let (diff, o) = x.clone().sub_round(y.clone(), rm);
     assert!(diff.is_valid());
+    assert_rounding_ordering_consistent(&diff, rm, o);
     let (diff_alt, o_alt) = x.clone().sub_round_val_ref(&y, rm);
     assert!(diff_alt.is_valid());
     assert_eq!(o_alt, o);
@@ -11674,7 +11665,7 @@ fn sub_round_properties_helper(x: Float, y: Float, rm: RoundingMode, extreme: bo
     }
 
     if !extreme {
-        let r_diff = if diff.is_finite() {
+        if diff.is_finite() {
             if x.is_normal() && y.is_normal() && diff.is_normal() {
                 assert_eq!(
                     diff.get_prec(),
@@ -11692,20 +11683,8 @@ fn sub_round_properties_helper(x: Float, y: Float, rm: RoundingMode, extreme: bo
                 next.decrement();
                 assert!(next < r_diff);
             }
-            Some(r_diff)
         } else {
             assert_eq!(o, Equal);
-            None
-        };
-        match (r_diff.is_some() && *r_diff.as_ref().unwrap() >= 0u32, rm) {
-            (_, Floor) | (true, Down) | (false, Up) => {
-                assert_ne!(o, Greater);
-            }
-            (_, Ceiling) | (true, Up) | (false, Down) => {
-                assert_ne!(o, Less);
-            }
-            (_, Exact) => assert_eq!(o, Equal),
-            _ => {}
         }
     }
 
@@ -12049,6 +12028,7 @@ fn sub_rational_prec_round_properties_helper(
 ) {
     let (diff, o) = x.clone().sub_rational_prec_round(y.clone(), prec, rm);
     assert!(diff.is_valid());
+    assert_rounding_ordering_consistent(&diff, rm, o);
     let (diff_alt, o_alt) = x.clone().sub_rational_prec_round_val_ref(&y, prec, rm);
     assert!(diff_alt.is_valid());
     assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
@@ -12121,16 +12101,6 @@ fn sub_rational_prec_round_properties_helper(
                 let mut next = diff.clone();
                 next.decrement();
                 assert!(next < r_diff);
-            }
-            match (r_diff >= 0u32, rm) {
-                (_, Floor) | (true, Down) | (false, Up) => {
-                    assert_ne!(o, Greater);
-                }
-                (_, Ceiling) | (true, Up) | (false, Down) => {
-                    assert_ne!(o, Less);
-                }
-                (_, Exact) => assert_eq!(o, Equal),
-                _ => {}
             }
         }
     }
@@ -12232,6 +12202,7 @@ fn sub_rational_prec_round_properties() {
 fn sub_rational_prec_properties_helper(x: Float, y: Rational, prec: u64, extreme: bool) {
     let (diff, o) = x.clone().sub_rational_prec(y.clone(), prec);
     assert!(diff.is_valid());
+    assert_rounding_ordering_consistent(&diff, Nearest, o);
     let (diff_alt, o_alt) = x.clone().sub_rational_prec_val_ref(&y, prec);
     assert!(diff_alt.is_valid());
     assert_eq!(ComparableFloatRef(&diff_alt), ComparableFloatRef(&diff));
@@ -12386,6 +12357,7 @@ fn sub_rational_prec_properties() {
 fn sub_rational_round_properties_helper(x: Float, y: Rational, rm: RoundingMode, extreme: bool) {
     let (diff, o) = x.clone().sub_rational_round(y.clone(), rm);
     assert!(diff.is_valid());
+    assert_rounding_ordering_consistent(&diff, rm, o);
     let (diff_alt, o_alt) = x.clone().sub_rational_round_val_ref(&y, rm);
     assert!(diff_alt.is_valid());
     assert_eq!(o_alt, o);
@@ -12442,17 +12414,6 @@ fn sub_rational_round_properties_helper(x: Float, y: Rational, rm: RoundingMode,
                 let mut next = diff.clone();
                 next.decrement();
                 assert!(next < r_diff);
-            }
-
-            match (r_diff >= 0u32, rm) {
-                (_, Floor) | (true, Down) | (false, Up) => {
-                    assert_ne!(o, Greater);
-                }
-                (_, Ceiling) | (true, Up) | (false, Down) => {
-                    assert_ne!(o, Less);
-                }
-                (_, Exact) => assert_eq!(o, Equal),
-                _ => {}
             }
         }
     }

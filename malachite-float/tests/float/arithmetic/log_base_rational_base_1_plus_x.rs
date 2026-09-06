@@ -18,7 +18,9 @@ use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::unsigned_rounding_mode_pair_gen_var_3;
 use malachite_float::float::arithmetic::log_base_1_plus_x::primitive_float_log_base_1_plus_x;
 use malachite_float::float::arithmetic::log_base_rational_base_1_plus_x::*;
-use malachite_float::test_util::common::{rug_round_try_from_rounding_mode, to_hex_string};
+use malachite_float::test_util::common::{
+    assert_rounding_ordering_consistent, rug_round_try_from_rounding_mode, to_hex_string,
+};
 use malachite_float::test_util::float::arithmetic::log_base_rational_base_1_plus_x::{
     rug_log_base_rational_base_1_plus_x, rug_log_base_rational_base_1_plus_x_prec,
     rug_log_base_rational_base_1_plus_x_prec_round, rug_log_base_rational_base_1_plus_x_round,
@@ -287,6 +289,7 @@ fn log_base_rational_base_1_plus_x_prec_round_properties_helper(
     extreme: bool,
 ) {
     let (log, o) = check(x, base, prec, rm, extreme);
+    assert_rounding_ordering_consistent(&log, rm, o);
 
     // When the base is a `u64` integer, the result must match the independently-implemented
     // integer-base `log_base_1_plus_x` (which computes log_2(1 + x) / log_2(base) for an integer
@@ -378,6 +381,7 @@ fn log_base_rational_base_1_plus_x_round_properties() {
     let f = |x: Float, base: Rational, rm: RoundingMode, extreme: bool| {
         let (log, o) = x.clone().log_base_rational_base_1_plus_x_round(&base, rm);
         assert!(log.is_valid());
+        assert_rounding_ordering_consistent(&log, rm, o);
         let (log_ref, o_ref) = x.log_base_rational_base_1_plus_x_round_ref(&base, rm);
         assert_eq!(ComparableFloatRef(&log_ref), ComparableFloatRef(&log));
         assert_eq!(o_ref, o);

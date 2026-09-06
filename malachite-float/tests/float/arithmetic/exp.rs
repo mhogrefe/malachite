@@ -24,7 +24,8 @@ use malachite_base::test_util::generators::{
 };
 use malachite_float::float::arithmetic::exp::{primitive_float_exp, primitive_float_exp_rational};
 use malachite_float::test_util::common::{
-    parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
+    assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
+    to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::exp::{
     rug_exp, rug_exp_prec, rug_exp_prec_round, rug_exp_rational_prec, rug_exp_rational_prec_round,
@@ -1142,6 +1143,7 @@ fn exp_prec_fail() {
 fn exp_prec_round_properties_helper(x: Float, prec: u64, rm: RoundingMode) {
     let (e, o) = x.clone().exp_prec_round(prec, rm);
     assert!(e.is_valid());
+    assert_rounding_ordering_consistent(&e, rm, o);
 
     let (e_alt, o_alt) = x.exp_prec_round_ref(prec, rm);
     assert!(e_alt.is_valid());
@@ -1239,6 +1241,7 @@ fn exp_round_properties() {
     float_rounding_mode_pair_gen_var_47().test_properties(|(x, rm)| {
         let (e, o) = x.clone().exp_round(rm);
         assert!(e.is_valid());
+        assert_rounding_ordering_consistent(&e, rm, o);
 
         let (e_alt, o_alt) = x.exp_round_ref(rm);
         assert!(e_alt.is_valid());
@@ -2142,6 +2145,7 @@ fn exp_rational_prec_round_ref_fail() {
 fn exp_rational_prec_round_properties_helper(x: Rational, prec: u64, rm: RoundingMode) {
     let (f, o) = Float::exp_rational_prec_round(x.clone(), prec, rm);
     assert!(f.is_valid());
+    assert_rounding_ordering_consistent(&f, rm, o);
 
     let (f_alt, o_alt) = Float::exp_rational_prec_round_ref(&x, prec, rm);
     assert!(f_alt.is_valid());

@@ -11,7 +11,9 @@ use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
     unsigned_gen_var_11, unsigned_rounding_mode_pair_gen_var_4,
 };
-use malachite_float::test_util::common::{test_constant, to_hex_string};
+use malachite_float::test_util::common::{
+    assert_rounding_ordering_consistent, test_constant, to_hex_string,
+};
 use malachite_float::test_util::float::constants::one_over_sqrt_pi::*;
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use std::cmp::Ordering::{self, *};
@@ -285,6 +287,7 @@ fn one_over_sqrt_pi_prec_properties() {
     unsigned_gen_var_11().test_properties(|prec| {
         let (one_over_sqrt_pi, o) = Float::one_over_sqrt_pi_prec(prec);
         assert!(one_over_sqrt_pi.is_valid());
+        assert_rounding_ordering_consistent(&one_over_sqrt_pi, Nearest, o);
         assert_eq!(one_over_sqrt_pi.get_prec(), Some(prec));
         assert_eq!(one_over_sqrt_pi.get_exponent(), Some(0));
         assert_ne!(o, Equal);
@@ -328,6 +331,7 @@ fn one_over_sqrt_pi_prec_round_properties() {
     unsigned_rounding_mode_pair_gen_var_4().test_properties(|(prec, rm)| {
         let (one_over_sqrt_pi, o) = Float::one_over_sqrt_pi_prec_round(prec, rm);
         assert!(one_over_sqrt_pi.is_valid());
+        assert_rounding_ordering_consistent(&one_over_sqrt_pi, rm, o);
         assert_eq!(one_over_sqrt_pi.get_prec(), Some(prec));
         assert_eq!(
             one_over_sqrt_pi.get_exponent(),

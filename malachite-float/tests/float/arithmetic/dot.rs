@@ -17,7 +17,8 @@ use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_float::float::arithmetic::dot::primitive_float_dot;
 use malachite_float::test_util::common::{
-    parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
+    assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
+    to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::dot::{
     naive_dot, naive_dot_prec, naive_dot_prec_round, naive_dot_round, rug_dot_prec_round,
@@ -636,6 +637,7 @@ fn dot_beyond_mpfr() {
 fn dot_prec_round_properties_helper(xs: Vec<Float>, ys: Vec<Float>, prec: u64, rm: RoundingMode) {
     let (dot, o) = Float::dot_prec_round(&xs, &ys, prec, rm);
     assert!(dot.is_valid());
+    assert_rounding_ordering_consistent(&dot, rm, o);
 
     // reversing both slices changes nothing
     let xs_rev: Vec<Float> = xs.iter().rev().cloned().collect();
@@ -776,6 +778,7 @@ fn dot_prec_properties() {
     float_vec_pair_unsigned_triple_gen_var_1().test_properties(|(xs, ys, prec)| {
         let (dot, o) = Float::dot_prec(&xs, &ys, prec);
         assert!(dot.is_valid());
+        assert_rounding_ordering_consistent(&dot, Nearest, o);
         let (dot_alt, o_alt) = Float::dot_prec_round(&xs, &ys, prec, Nearest);
         assert_eq!(ComparableFloatRef(&dot_alt), ComparableFloatRef(&dot));
         assert_eq!(o_alt, o);
@@ -793,6 +796,7 @@ fn dot_round_properties() {
     let helper = |xs: &[Float], ys: &[Float], rm: RoundingMode| {
         let (dot, o) = Float::dot_round(xs, ys, rm);
         assert!(dot.is_valid());
+        assert_rounding_ordering_consistent(&dot, rm, o);
         let prec = xs
             .iter()
             .chain(ys.iter())

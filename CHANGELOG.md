@@ -246,6 +246,11 @@ documented by git history.
   when the input agrees with the multiple to more than $2^{30}$ bits; the path is also taken as
   soon as the argument reduction detects such an input, where MPFR keeps raising its working
   precision instead.
+- `sin_rational_prec_round` and `sin_rational_prec` (with `_ref` variants), the sine of a
+  `Rational` as a `Float`, alongside the cosine versions. Small inputs are handled by the sine
+  series in exact `Rational` arithmetic, so inputs too small to be `Float`s underflow correctly.
+- `primitive_float_sin` and `primitive_float_sin_rational`, the correctly rounded sine of an `f32`
+  or `f64`, or of a `Rational` as an `f32` or `f64`.
 - `primitive_float_cos` and `primitive_float_cos_rational`, the correctly rounded cosine of an
   `f32` or `f64`, or of a `Rational` as an `f32` or `f64`, alongside the existing
   `primitive_float_exp` and `primitive_float_exp_rational`.

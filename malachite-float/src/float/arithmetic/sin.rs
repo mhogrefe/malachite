@@ -17,21 +17,33 @@
 // - cos(x)^2) from the cosine, all inside a Ziv loop. The `mpfr_sin_fast` tier, used for precisions
 // at or above `MPFR_SINCOS_THRESHOLD` and built on `mpfr_sincos_fast`, is not ported yet.
 
-use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use crate::float::arithmetic::cos::{NEAR_ZERO_MIN_CANCEL, TrigStep, trig_near_zero};
+use crate::float::arithmetic::cos::{
+    NEAR_ZERO_MIN_CANCEL, TrigStep, reduce_huge, round_bracket, sin_bound, trig_near_zero,
+    trig_rational_near_zero,
+};
 use crate::float::arithmetic::round_near_x::float_round_near_x;
-use core::cmp::Ordering::{self, Equal};
+use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn};
+use core::cmp::Ordering::{self, Equal, Greater, Less};
 use core::cmp::{max, min};
-use malachite_base::num::arithmetic::traits::{Abs, CeilingLogBase2, NegAssign, Sin, SinAssign};
+use malachite_base::fail_on_untested_path;
+use malachite_base::num::arithmetic::traits::{
+    Abs, CeilingLogBase2, NegAssign, PowerOf2, Sin, SinAssign,
+};
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::{NaN as NaNTrait, One};
+use malachite_base::num::basic::traits::{
+    NaN as NaNTrait, NegativeZero as NegativeZeroTrait, One, Zero as ZeroTrait,
+};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
-use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode::{self, Ceiling, Down, Exact, Nearest, Up};
+use malachite_base::rounding_modes::RoundingMode::{
+    self, Ceiling, Down, Exact, Floor, Nearest, Up,
+};
 use malachite_nz::natural::arithmetic::float::round::float_can_round;
 use malachite_nz::platform::Limb;
+use malachite_q::Rational;
 
 // One iteration of the Ziv loop at working precision `m`, which the cancellation checks may raise
 // for the next iteration (the caller applies the generic increase on `Retry`).
@@ -134,6 +146,114 @@ fn sin_ziv_step(
     // toward zero.
     assert_ne!(exp_c, 1);
     TrigStep::Retry
+}
+
+// Brackets sin(x) for a nonzero `Rational` x, small enough that its series converges in a few
+// terms, between partial sums of that series, tightening the bracket until both ends round the same
+// way. This also covers inputs too small to be `Float`s, whose sines underflow, since everything is
+// done in `Rational` arithmetic.
+fn sin_rational_series(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    let mut w = prec + 10;
+    let mut increment = Limb::WIDTH;
+    loop {
+        let lo = sin_bound(x, w, false);
+        let hi = sin_bound(x, w, true);
+        if let Some(result) = round_bracket(&lo, &hi, prec, rm) {
+            return result;
+        }
+        w += increment;
+        increment = w >> 1;
+    }
+}
+
+// Computes sin(x) for a nonzero `Rational` x, rounded to precision `prec` with rounding mode `rm`.
+// (sin(0) = 0 is handled by the caller.) The sine of a nonzero rational is transcendental, so the
+// result is never exactly representable and `rm` must not be `Exact`.
+//
+// A small x is handled by its series. Otherwise, as in `cos_rational_helper`, x is rounded to a
+// `Float` y_f at a working precision w, its correctly rounded sine s_f is taken, and sin(x) is
+// bracketed using |sin(x) - sin(y_f)| <= |x - y_f|, the rounding error of s_f, and, for an x too
+// large to be a `Float`, the error of a `Rational` reduction modulo 2 pi. The bracket is rounded in
+// `Rational` arithmetic, and w is raised until both ends agree.
+fn sin_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    assert_ne!(rm, Exact, "Inexact sin");
+    let exp_x = x.floor_log_base_2_abs() + 1; // the MPFR-style exponent of x
+    // With |x| < 2^exp_x, the kth term of the series is below |x| 2^(2k exp_x), so when -exp_x is
+    // at least a sixteenth of the working precision, about 8 terms suffice, which is cheaper than a
+    // `Float` sine at that precision. This also covers every x too small to be a `Float`.
+    if exp_x < const { Float::MIN_EXPONENT_I64 - 1 } {
+        // |sin(x)| < |x| < 2^(MIN_EXPONENT - 2), a quarter of the smallest positive Float, so the
+        // result is zero or that Float, by the rounding mode alone, and no 2^30-bit arithmetic is
+        // needed.
+        let positive = *x > 0u32;
+        let away = match rm {
+            Ceiling => positive,
+            Floor => !positive,
+            Up => true,
+            _ => false,
+        };
+        let min_positive = Float::min_positive_value_prec(prec);
+        return match (positive, away) {
+            (true, true) => (min_positive, Greater),
+            (true, false) => (Float::ZERO, Less),
+            (false, true) => (-min_positive, Less),
+            (false, false) => (Float::NEGATIVE_ZERO, Greater),
+        };
+    }
+    if exp_x < 0 && u64::exact_from(-exp_x) << 4 >= prec + 10 {
+        return sin_rational_series(x, prec, rm);
+    }
+    let huge = exp_x >= Float::MAX_EXPONENT_I64;
+    let mut w = prec + 10;
+    let mut increment = Limb::WIDTH;
+    loop {
+        let reduced;
+        let (y, extra) = if huge {
+            reduced = reduce_huge(x, exp_x, w);
+            (&reduced, Some(2 - i64::exact_from(w)))
+        } else {
+            (x, None)
+        };
+        if *y == 0u32 {
+            // x is an exact multiple of 2 pi at the working precision; a higher precision breaks
+            // the coincidence
+            fail_on_untested_path("sin_rational_helper, reduced argument is zero");
+        } else {
+            let (y_f, y_o) = Float::from_rational_prec_ref(y, w);
+            if !huge && y_o == Equal {
+                // x is exactly representable at w bits, so sin(x) is simply its sine
+                return sin_prec_round_normal_ref(&y_f, prec, rm);
+            }
+            let s_f = (&y_f).sin();
+            // The exponents of y and s_f, as `Float`s would have them (s_f is zero only if it
+            // underflowed, which counts as complete cancellation).
+            let exp_y = y.floor_log_base_2_abs() + 1;
+            let exp_s = s_f
+                .get_exponent()
+                .map_or(Float::MIN_EXPONENT_I64, i64::from);
+            // |sin(y)| < 2^exp_s (up to the bracket width): heavy cancellation means y is close to
+            // a multiple of pi, where the bracket below would have to be far narrower than 2^-w.
+            if exp_s < 0 {
+                let cancel = u64::exact_from(-exp_s);
+                if cancel >= max(NEAR_ZERO_MIN_CANCEL, prec >> 4) {
+                    return trig_rational_near_zero(y, exp_y, prec, rm, extra, w, false);
+                }
+            }
+            // |s_f - sin(y_f)| <= 2^(exp_s - w) (half an ulp, doubled for safety), and |sin(y) -
+            // sin(y_f)| <= |y - y_f| <= 2^(exp_y - w)
+            let w_i = i64::exact_from(w);
+            let mut delta = Rational::power_of_2(exp_s - w_i) + Rational::power_of_2(exp_y - w_i);
+            if let Some(extra) = extra {
+                delta += Rational::power_of_2(extra);
+            }
+            let s = Rational::exact_from(&s_f);
+            if let Some(result) = round_bracket(&(&s - &delta), &(s + delta), prec, rm) {
+                return result;
+            }
+        }
+        w += increment;
+        increment = w >> 1;
+    }
 }
 
 // This is mpfr_sin from sin.c, MPFR 4.2.2, without the `mpfr_sin_fast` tier for precisions at or
@@ -928,6 +1048,295 @@ impl Float {
     }
 }
 
+impl Float {
+    /// Computes $\sin x$, the sine of a [`Rational`], rounding the result to the specified
+    /// precision and with the specified rounding mode and returning the result as a [`Float`]. The
+    /// [`Rational`] is taken by value. An [`Ordering`] is also returned, indicating whether the
+    /// rounded sine is less than, equal to, or greater than the exact sine.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,p,m) = \sin x+\varepsilon.
+    /// $$
+    /// - If $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |\sin x|\rfloor-p+1}$.
+    /// - If $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |\sin x|\rfloor-p}$.
+    ///
+    /// These bounds do not apply when the result underflows; see below.
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p,m)=0$.
+    ///
+    /// Overflow and underflow:
+    /// - Since $|\sin x|\leq 1$, the result never overflows.
+    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,p,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
+    ///
+    /// Underflow requires an input of magnitude about $2^{-2^{30}}$ or less, or one within
+    /// $2^{-2^{30}}$ of a nonzero multiple of $\pi$, which takes more than $2^{30}$ bits.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::sin_rational_prec`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m, e) = O(n^{3/2} \log n \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
+    ///
+    /// $M(n, m, e) = O((n+m+e) \log (n+m+e))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, $m$ is `x.significant_bits()`,
+    /// and $e$ is `x.floor_log_base_2_abs()` (taken as 0 when it is negative or $x = 0$): the input
+    /// is rounded to a working precision and the [`Float`] sine taken there, which for $|x| \geq 3$
+    /// reduces the argument modulo $2\pi$ and so needs $\pi$ to about $n + e$ bits.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision (which is the case for every nonzero input).
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::sin_rational_prec_round(Rational::from_unsigneds(3u8, 5), 5, Floor);
+    /// assert_eq!(c.to_string(), "0.562");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::sin_rational_prec_round(Rational::from_unsigneds(3u8, 5), 5, Ceiling);
+    /// assert_eq!(c.to_string(), "0.594");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) = Float::sin_rational_prec_round(Rational::from_unsigneds(3u8, 5), 20, Floor);
+    /// assert_eq!(c.to_string(), "0.56464195");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::sin_rational_prec_round(Rational::from_unsigneds(3u8, 5), 20, Ceiling);
+    /// assert_eq!(c.to_string(), "0.56464291");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn sin_rational_prec_round(x: Rational, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+        Self::sin_rational_prec_round_ref(&x, prec, rm)
+    }
+
+    /// Computes $\sin x$, the sine of a [`Rational`], rounding the result to the specified
+    /// precision and with the specified rounding mode and returning the result as a [`Float`]. The
+    /// [`Rational`] is taken by reference. An [`Ordering`] is also returned, indicating whether the
+    /// rounded sine is less than, equal to, or greater than the exact sine.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,p,m) = \sin x+\varepsilon.
+    /// $$
+    /// - If $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |\sin x|\rfloor-p+1}$.
+    /// - If $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |\sin x|\rfloor-p}$.
+    ///
+    /// These bounds do not apply when the result underflows.
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p,m)=0$.
+    ///
+    /// See the [`Float::sin_rational_prec_round`] documentation for information on overflow and
+    /// underflow.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::sin_rational_prec_ref`]
+    /// instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m, e) = O(n^{3/2} \log n \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
+    ///
+    /// $M(n, m, e) = O((n+m+e) \log (n+m+e))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, $m$ is `x.significant_bits()`,
+    /// and $e$ is `x.floor_log_base_2_abs()` (taken as 0 when it is negative or $x = 0$): the input
+    /// is rounded to a working precision and the [`Float`] sine taken there, which for $|x| \geq 3$
+    /// reduces the argument modulo $2\pi$ and so needs $\pi$ to about $n + e$ bits.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision (which is the case for every nonzero input).
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) =
+    ///     Float::sin_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 5, Floor);
+    /// assert_eq!(c.to_string(), "0.562");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) =
+    ///     Float::sin_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 5, Ceiling);
+    /// assert_eq!(c.to_string(), "0.594");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) =
+    ///     Float::sin_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 20, Floor);
+    /// assert_eq!(c.to_string(), "0.56464195");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) =
+    ///     Float::sin_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 20, Ceiling);
+    /// assert_eq!(c.to_string(), "0.56464291");
+    /// assert_eq!(o, Greater);
+    /// ```
+    pub fn sin_rational_prec_round_ref(
+        x: &Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        if *x == 0u32 {
+            // sin(0) = 0, exactly
+            return (Self::ZERO, Equal);
+        }
+        sin_rational_helper(x, prec, rm)
+    }
+
+    /// Computes $\sin x$, the sine of a [`Rational`], rounding the result to the nearest value of
+    /// the specified precision and returning the result as a [`Float`]. The [`Rational`] is taken
+    /// by value. An [`Ordering`] is also returned, indicating whether the rounded sine is less
+    /// than, equal to, or greater than the exact sine.
+    ///
+    /// If the sine is equidistant from two [`Float`]s with the specified precision, the [`Float`]
+    /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
+    /// the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,p) = \sin x+\varepsilon,
+    /// $$
+    /// where $|\varepsilon| \leq 2^{\lfloor\log_2 |\sin x|\rfloor-p}$ (unless the result
+    /// underflows; see below).
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p)=0$.
+    ///
+    /// Overflow and underflow:
+    /// - Since $|\sin x|\leq 1$, the result never overflows.
+    /// - If $0<f(x,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,p)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
+    ///
+    /// Underflow requires an input of magnitude about $2^{-2^{30}}$ or less, or one within
+    /// $2^{-2^{30}}$ of a nonzero multiple of $\pi$, which takes more than $2^{30}$ bits.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::sin_rational_prec_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m, e) = O(n^{3/2} \log n \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
+    ///
+    /// $M(n, m, e) = O((n+m+e) \log (n+m+e))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, $m$ is `x.significant_bits()`,
+    /// and $e$ is `x.floor_log_base_2_abs()` (taken as 0 when it is negative or $x = 0$): the input
+    /// is rounded to a working precision and the [`Float`] sine taken there, which for $|x| \geq 3$
+    /// reduces the argument modulo $2\pi$ and so needs $\pi$ to about $n + e$ bits.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::sin_rational_prec(Rational::from_unsigneds(3u8, 5), 5);
+    /// assert_eq!(c.to_string(), "0.562");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::sin_rational_prec(Rational::from_unsigneds(3u8, 5), 20);
+    /// assert_eq!(c.to_string(), "0.56464291");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn sin_rational_prec(x: Rational, prec: u64) -> (Self, Ordering) {
+        Self::sin_rational_prec_round_ref(&x, prec, Nearest)
+    }
+
+    /// Computes $\sin x$, the sine of a [`Rational`], rounding the result to the nearest value of
+    /// the specified precision and returning the result as a [`Float`]. The [`Rational`] is taken
+    /// by reference. An [`Ordering`] is also returned, indicating whether the rounded sine is less
+    /// than, equal to, or greater than the exact sine.
+    ///
+    /// If the sine is equidistant from two [`Float`]s with the specified precision, the [`Float`]
+    /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
+    /// the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,p) = \sin x+\varepsilon,
+    /// $$
+    /// where $|\varepsilon| \leq 2^{\lfloor\log_2 |\sin x|\rfloor-p}$ (unless the result
+    /// underflows).
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p)=0$.
+    ///
+    /// See the [`Float::sin_rational_prec`] documentation for information on overflow and
+    /// underflow.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::sin_rational_prec_round_ref`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m, e) = O(n^{3/2} \log n \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
+    ///
+    /// $M(n, m, e) = O((n+m+e) \log (n+m+e))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, $m$ is `x.significant_bits()`,
+    /// and $e$ is `x.floor_log_base_2_abs()` (taken as 0 when it is negative or $x = 0$): the input
+    /// is rounded to a working precision and the [`Float`] sine taken there, which for $|x| \geq 3$
+    /// reduces the argument modulo $2\pi$ and so needs $\pi$ to about $n + e$ bits.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::sin_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 5);
+    /// assert_eq!(c.to_string(), "0.562");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::sin_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 20);
+    /// assert_eq!(c.to_string(), "0.56464291");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn sin_rational_prec_ref(x: &Rational, prec: u64) -> (Self, Ordering) {
+        Self::sin_rational_prec_round_ref(x, prec, Nearest)
+    }
+}
+
 impl Sin for Float {
     type Output = Self;
 
@@ -1132,4 +1541,119 @@ impl SinAssign for Float {
         let prec = self.significant_bits();
         self.sin_prec_round_assign(prec, Nearest);
     }
+}
+
+/// Computes $\sin x$, the sine of a primitive float. Using this function is more accurate than
+/// using the default `sin` function or the one provided by `libm`.
+///
+/// $$
+/// f(x) = \sin x+\varepsilon.
+/// $$
+/// - If $x$ is not finite, $\varepsilon$ may be ignored or assumed to be 0.
+/// - If $x$ is finite, then $|\varepsilon| < 2^{\lfloor\log_2 |\sin x|\rfloor-p}$, where $p$ is the
+///   precision of the output (24 if `T` is a [`f32`] and 53 if `T` is a [`f64`]).
+///
+/// Special cases:
+/// - $f(\text{NaN})=\text{NaN}$
+/// - $f(\pm\infty)=\text{NaN}$
+/// - $f(\pm0.0)=\pm0.0$
+///
+/// Overflow is not possible, since the result lies in $[-1, 1]$. The result is subnormal only when
+/// $x$ is, and then it is $x$ itself: no [`f32`] or [`f64`] is close enough to a nonzero multiple
+/// of $\pi$ for its sine to be subnormal.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::NegativeInfinity;
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::sin::primitive_float_sin;
+///
+/// assert!(primitive_float_sin(f32::NAN).is_nan());
+/// assert!(primitive_float_sin(f32::INFINITY).is_nan());
+/// assert!(primitive_float_sin(f32::NEGATIVE_INFINITY).is_nan());
+/// assert_eq!(NiceFloat(primitive_float_sin(0.0f32)), NiceFloat(0.0));
+/// assert_eq!(NiceFloat(primitive_float_sin(-0.0f32)), NiceFloat(-0.0));
+/// assert_eq!(
+///     NiceFloat(primitive_float_sin(1.0f32)),
+///     NiceFloat(0.84147096)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_sin(1.0f64)),
+///     NiceFloat(0.8414709848078965)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_sin<T: PrimitiveFloat>(x: T) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_float_to_float_fn(Float::sin_prec, x)
+}
+
+/// Computes $\sin x$, the sine of a [`Rational`], returning the result as a primitive float.
+///
+/// $$
+/// f(x) = \sin x+\varepsilon,
+/// $$
+/// where $|\varepsilon| < 2^{\lfloor\log_2 |\sin x|\rfloor-p}$, and $p$ is the precision of the
+/// output (24 if `T` is a [`f32`] and 53 if `T` is a [`f64`]).
+///
+/// Special cases:
+/// - $f(0)=0$
+///
+/// Overflow is not possible, since the result lies in $[-1, 1]$. The result underflows, to a
+/// subnormal or to zero, when $x$ is tiny, since $\sin x$ is then very close to $x$; a [`Rational`]
+/// close enough to a nonzero multiple of $\pi$ for its sine to be subnormal would need a
+/// denominator of more than 100 bits, in which case the result is still correctly rounded.
+///
+/// # Worst-case complexity
+/// $T(m, e) = O((m+e) (\log (m+e))^2 \log\log (m+e))$
+///
+/// $M(m, e) = O((m+e) \log (m+e))$
+///
+/// where $T$ is time, $M$ is additional memory, $m$ is `x.significant_bits()`, and $e$ is
+/// `x.floor_log_base_2_abs()` (taken as 0 when it is negative or $x = 0$): for $|x| \geq 3$ the
+/// argument is reduced modulo $2\pi$, which needs $\pi$ to about $e$ bits.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::Zero;
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::sin::primitive_float_sin_rational;
+/// use malachite_q::Rational;
+///
+/// assert_eq!(
+///     NiceFloat(primitive_float_sin_rational::<f64>(&Rational::ZERO)),
+///     NiceFloat(0.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_sin_rational::<f64>(
+///         &Rational::from_unsigneds(1u8, 3)
+///     )),
+///     NiceFloat(0.32719469679615226)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_sin_rational::<f32>(
+///         &Rational::from_unsigneds(1u8, 3)
+///     )),
+///     NiceFloat(0.3271947)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_sin_rational::<f64>(&Rational::from(10000))),
+///     NiceFloat(-0.30561438888825215)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_sin_rational<T: PrimitiveFloat>(x: &Rational) -> T
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_rational_to_float_fn(Float::sin_rational_prec_ref, x)
 }

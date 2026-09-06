@@ -12,7 +12,8 @@ use malachite_base::test_util::generators::{
     unsigned_gen_var_11, unsigned_rounding_mode_pair_gen_var_4,
 };
 use malachite_float::test_util::common::{
-    rug_round_try_from_rounding_mode, test_constant, to_hex_string,
+    assert_rounding_ordering_consistent, rug_round_try_from_rounding_mode, test_constant,
+    to_hex_string,
 };
 use malachite_float::test_util::float::constants::sqrt_5_over_5::rug_sqrt_5_over_5_prec_round;
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
@@ -293,6 +294,7 @@ fn sqrt_5_over_5_prec_properties() {
     unsigned_gen_var_11().test_properties(|prec| {
         let (sqrt_5_over_5, o) = Float::sqrt_5_over_5_prec(prec);
         assert!(sqrt_5_over_5.is_valid());
+        assert_rounding_ordering_consistent(&sqrt_5_over_5, Nearest, o);
         assert_eq!(sqrt_5_over_5.get_prec(), Some(prec));
         assert_eq!(
             sqrt_5_over_5.get_exponent(),
@@ -340,6 +342,7 @@ fn sqrt_5_over_5_prec_round_properties() {
     unsigned_rounding_mode_pair_gen_var_4().test_properties(|(prec, rm)| {
         let (sqrt_5_over_5, o) = Float::sqrt_5_over_5_prec_round(prec, rm);
         assert!(sqrt_5_over_5.is_valid());
+        assert_rounding_ordering_consistent(&sqrt_5_over_5, rm, o);
         assert_eq!(sqrt_5_over_5.get_prec(), Some(prec));
         let expected_exponent = match (prec, rm) {
             (1 | 2, Ceiling | Up | Nearest) | (3, Ceiling | Up) => 0,

@@ -17,7 +17,8 @@ use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_float::float::arithmetic::sum::primitive_float_sum;
 use malachite_float::test_util::common::{
-    parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
+    assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
+    to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::sum::{
     naive_sum, naive_sum_prec, naive_sum_prec_round, naive_sum_round, rug_sum, rug_sum_prec,
@@ -948,6 +949,7 @@ fn in_gate(x: &Float) -> bool {
 fn sum_prec_round_properties_helper(xs: Vec<Float>, prec: u64, rm: RoundingMode) {
     let (sum, o) = Float::sum_prec_round(&xs, prec, rm);
     assert!(sum.is_valid());
+    assert_rounding_ordering_consistent(&sum, rm, o);
 
     // reversal invariance
     let reversed: Vec<Float> = xs.iter().rev().cloned().collect();
@@ -1044,6 +1046,7 @@ fn sum_prec_properties() {
     float_vec_unsigned_pair_gen_var_1().test_properties(|(xs, prec)| {
         let (sum, o) = Float::sum_prec(&xs, prec);
         assert!(sum.is_valid());
+        assert_rounding_ordering_consistent(&sum, Nearest, o);
         let (sum_alt, o_alt) = Float::sum_prec_round(&xs, prec, Nearest);
         assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
         assert_eq!(o_alt, o);
@@ -1055,6 +1058,7 @@ fn sum_round_properties() {
     float_vec_rounding_mode_pair_gen_var_1().test_properties(|(xs, rm)| {
         let (sum, o) = Float::sum_round(&xs, rm);
         assert!(sum.is_valid());
+        assert_rounding_ordering_consistent(&sum, rm, o);
         let prec = xs
             .iter()
             .map(SignificantBits::significant_bits)
@@ -1068,6 +1072,7 @@ fn sum_round_properties() {
     float_vec_rounding_mode_pair_gen_var_2().test_properties(|(xs, rm)| {
         let (sum, o) = Float::sum_round(&xs, rm);
         assert!(sum.is_valid());
+        assert_rounding_ordering_consistent(&sum, rm, o);
         let prec = xs
             .iter()
             .map(SignificantBits::significant_bits)

@@ -19,7 +19,9 @@ use malachite_base::test_util::generators::{
     signed_gen, signed_gen_var_5, signed_pair_gen_var_2, signed_unsigned_pair_gen_var_20,
     unsigned_gen, unsigned_pair_gen_var_32, unsigned_signed_pair_gen_var_1,
 };
-use malachite_float::test_util::common::{rug_round_try_from_rounding_mode, to_hex_string};
+use malachite_float::test_util::common::{
+    assert_rounding_ordering_consistent, rug_round_try_from_rounding_mode, to_hex_string,
+};
 use malachite_float::test_util::generators::*;
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_nz::integer::Integer;
@@ -1200,18 +1202,9 @@ where
     unsigned_unsigned_rounding_mode_triple_gen_var_5::<T>().test_properties(|(n, prec, rm)| {
         let (float_n, o) = Float::from_unsigned_prec_round(n, prec, rm);
         assert!(float_n.is_valid());
+        assert_rounding_ordering_consistent(&float_n, rm, o);
 
         assert_eq!(float_n.partial_cmp(&n), Some(o));
-        match rm {
-            Floor | Down => {
-                assert_ne!(o, Greater);
-            }
-            Ceiling | Up => {
-                assert_ne!(o, Less);
-            }
-            Exact => assert_eq!(o, Equal),
-            _ => {}
-        }
 
         if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
             let (rug_n, rug_o) = rug::Float::with_val_round(u32::exact_from(prec), n, rm);
@@ -1285,18 +1278,9 @@ where
     signed_unsigned_rounding_mode_triple_gen_var_3::<T>().test_properties(|(n, prec, rm)| {
         let (float_n, o) = Float::from_signed_prec_round(n, prec, rm);
         assert!(float_n.is_valid());
+        assert_rounding_ordering_consistent(&float_n, rm, o);
 
         assert_eq!(float_n.partial_cmp(&n), Some(o));
-        match (n >= T::ZERO, rm) {
-            (_, Floor) | (true, Down) | (false, Up) => {
-                assert_ne!(o, Greater);
-            }
-            (_, Ceiling) | (true, Up) | (false, Down) => {
-                assert_ne!(o, Less);
-            }
-            (_, Exact) => assert_eq!(o, Equal),
-            _ => {}
-        }
 
         if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
             let (rug_n, rug_o) = rug::Float::with_val_round(u32::exact_from(prec), n, rm);

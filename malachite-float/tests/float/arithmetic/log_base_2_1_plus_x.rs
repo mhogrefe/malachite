@@ -25,7 +25,8 @@ use malachite_base::test_util::generators::{
 };
 use malachite_float::float::arithmetic::log_base_2_1_plus_x::primitive_float_log_base_2_1_plus_x;
 use malachite_float::test_util::common::{
-    parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
+    assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
+    to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::log_base_2_1_plus_x::{
     rug_log_base_2_1_plus_x, rug_log_base_2_1_plus_x_prec, rug_log_base_2_1_plus_x_prec_round,
@@ -756,6 +757,7 @@ fn log_base_2_1_plus_x_prec_round_fail() {
 fn log_base_2_1_plus_x_prec_round_properties_helper(x: Float, prec: u64, rm: RoundingMode) {
     let (log_base_2_1_plus_x, o) = x.clone().log_base_2_1_plus_x_prec_round(prec, rm);
     assert!(log_base_2_1_plus_x.is_valid());
+    assert_rounding_ordering_consistent(&log_base_2_1_plus_x, rm, o);
 
     let (log_base_2_1_plus_x_alt, o_alt) = x.log_base_2_1_plus_x_prec_round_ref(prec, rm);
     assert!(log_base_2_1_plus_x_alt.is_valid());
@@ -951,6 +953,7 @@ fn log_base_2_1_plus_x_prec_properties() {
 fn log_base_2_1_plus_x_round_properties_helper(x: Float, rm: RoundingMode) {
     let (log_base_2_1_plus_x, o) = x.clone().log_base_2_1_plus_x_round(rm);
     assert!(log_base_2_1_plus_x.is_valid());
+    assert_rounding_ordering_consistent(&log_base_2_1_plus_x, rm, o);
 
     let (log_base_2_1_plus_x_alt, o_alt) = x.log_base_2_1_plus_x_round_ref(rm);
     assert!(log_base_2_1_plus_x_alt.is_valid());

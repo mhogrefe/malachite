@@ -19,7 +19,8 @@ use malachite_base::test_util::generators::primitive_float_signed_pair_gen_var_4
 use malachite_base::{apply_fn_to_primitive_floats, assert_panic};
 use malachite_float::float::arithmetic::compound::primitive_float_compound;
 use malachite_float::test_util::common::{
-    parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
+    assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
+    to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::compound::{
     rug_compound, rug_compound_prec, rug_compound_prec_round, rug_compound_round,
@@ -743,6 +744,7 @@ fn compound_prec_round_properties_helper(
     }
     let (c, o) = x.clone().compound_prec_round(n, prec, rm);
     assert!(c.is_valid());
+    assert_rounding_ordering_consistent(&c, rm, o);
     let (c_alt, o_alt) = x.compound_prec_round_ref(n, prec, rm);
     assert!(c_alt.is_valid());
     assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
@@ -846,6 +848,7 @@ fn compound_round_properties() {
         for rm in [Floor, Ceiling, Down, Up, Nearest] {
             let (c, o) = x.clone().compound_round(n, rm);
             assert!(c.is_valid());
+            assert_rounding_ordering_consistent(&c, rm, o);
             let (c_alt, o_alt) = x.compound_round_ref(n, rm);
             assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
             assert_eq!(o_alt, o);

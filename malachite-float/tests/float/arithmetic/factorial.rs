@@ -12,7 +12,9 @@ use malachite_base::num::arithmetic::traits::Factorial;
 use malachite_base::num::basic::traits::Infinity;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
-use malachite_float::test_util::common::{rug_round_try_from_rounding_mode, to_hex_string};
+use malachite_float::test_util::common::{
+    assert_rounding_ordering_consistent, rug_round_try_from_rounding_mode, to_hex_string,
+};
 use malachite_float::test_util::float::arithmetic::factorial::rug_factorial_prec_round;
 use malachite_float::test_util::generators::unsigned_unsigned_rounding_mode_triple_gen_var_11;
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
@@ -135,6 +137,7 @@ fn factorial_prec_round_properties() {
     unsigned_unsigned_rounding_mode_triple_gen_var_11().test_properties(|(n, prec, rm)| {
         let (f, o) = Float::factorial_prec_round(n, prec, rm);
         assert!(f.is_valid());
+        assert_rounding_ordering_consistent(&f, rm, o);
 
         let (f_alt, o_alt) = Float::from_natural_prec_round(Natural::factorial(n), prec, rm);
         assert_eq!(ComparableFloatRef(&f_alt), ComparableFloatRef(&f));

@@ -35,8 +35,11 @@ use malachite_base::num::basic::traits::{NaN as NaNTrait, One, Zero as ZeroTrait
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode::{self, Ceiling, Down, Exact, Floor, Nearest};
+use malachite_base::rounding_modes::RoundingMode::{
+    self, Ceiling, Down, Exact, Floor, Nearest, Up,
+};
 use malachite_nz::integer::Integer;
+use malachite_nz::natural::Natural;
 use malachite_nz::natural::arithmetic::float::round::float_can_round;
 use malachite_nz::platform::Limb;
 use malachite_q::Rational;
@@ -119,9 +122,9 @@ fn cos2_aux(r: &Float, p: u64) -> (Float, u64) {
 // The series alternates with decreasing terms, so |sin(t) - S_k| <= |t|^(2k + 1) / (2k + 1)!, and
 // S_k is above sin(t) exactly when the omitted term t^(2k + 1) / (2k + 1)! is negative, i.e. when k
 // is odd and t > 0, or k is even and t < 0. The number of terms is chosen from the bit length of t
-// alone, so when the first term suffices (as in underflow cases, where |t| is tiny) no arithmetic
-// on t is done at all, and the two-term bound costs one squaring and one product.
-fn sin_bound(t: &Rational, w: u64, upper: bool) -> Rational {
+// alone, so when the first term suffices (as in underflow cases, where |t| is tiny) t itself, or t
+// shifted by the error margin, is the bound, and no product is formed.
+pub(crate) fn sin_bound(t: &Rational, w: u64, upper: bool) -> Rational {
     if *t == 0u32 {
         return Rational::ZERO;
     }
@@ -132,14 +135,11 @@ fn sin_bound(t: &Rational, w: u64, upper: bool) -> Rational {
     // 1)!)
     let mut k = 1u64;
     let mut log_factorial = 2u64; // floor(log2(2)) + floor(log2(3))
-    let target = -i128::from(w) - 2;
+    let target = -i128::from(w) - 4;
     while i128::from(k << 1) * i128::from(log + 1) - i128::from(log_factorial) > target {
         k += 1;
         let two_k = k << 1;
         log_factorial += two_k.floor_log_base_2() + (two_k + 1).floor_log_base_2();
-    }
-    if upper != ((*t > 0u32) == k.odd()) {
-        k += 1;
     }
     let mut s = t.clone();
     if k > 1 {
@@ -152,26 +152,77 @@ fn sin_bound(t: &Rational, w: u64, upper: bool) -> Rational {
             s += &term;
         }
     }
+    // S_k is within |t| 2^-(w + 4) of sin(t). If it bounds sin(t) on the wrong side, moving it by
+    // |S_k| 2^-(w + 3) >= |t| 2^-(w + 4) (since |S_k| >= |t| / 2) gives a bound on the right side,
+    // within |t| 2^-(w + 2). The move is done as a multiplication by 2^(w + 3) ± 1 followed by a
+    // shift, which only reduces a small integer against the denominator; adding a shifted copy
+    // would instead take a GCD of two denominators, ruinous when t has a 2^30-bit one. (Taking one
+    // more series term would be worse still, squaring t.)
+    if upper != ((*t > 0u32) == k.odd()) {
+        let shift = w + 3;
+        let mut factor = Natural::power_of_2(shift);
+        if upper == (s > 0u32) {
+            factor += Natural::ONE;
+        } else {
+            factor -= Natural::ONE;
+        }
+        s *= Rational::from(factor);
+        s >>= shift;
+    }
     s
 }
 
-// Rounds both ends of a bracket [lo, hi] known to contain a transcendental value; if the two ends
-// round to the same `Float` on the same side of it, that settles the result. A bound that is
-// exactly representable rounds with `Equal`, which is merged with the other bound's `Ordering`. The
-// comparison is sign-sensitive, so a bracket straddling zero is never accepted.
-fn round_bracket(
+// Rounds both ends of an open bracket (lo, hi) known to contain a transcendental value; if the two
+// ends round to the same `Float` on the same side of it, that settles the result. The value is
+// strictly inside the bracket, so an end that is exactly representable is not itself a candidate:
+// values just inside round either to that end (with the `Ordering` of that side) or, when the mode
+// rounds them away from it, to its neighbor. (A partial sum of a series can be exactly the input,
+// as t is for sin(t); merging the end's own `Equal` with the other side's `Ordering` would then
+// never let a directed rounding resolve, however narrow the bracket.) The comparison is
+// sign-sensitive, so a bracket straddling or touching zero is never accepted.
+pub(crate) fn round_bracket(
     lo: &Rational,
     hi: &Rational,
     prec: u64,
     rm: RoundingMode,
 ) -> Option<(Float, Ordering)> {
-    let (f_lo, mut o_lo) = Float::from_rational_prec_round_ref(lo, prec, rm);
-    let (f_hi, mut o_hi) = Float::from_rational_prec_round_ref(hi, prec, rm);
+    let (mut f_lo, mut o_lo) = Float::from_rational_prec_round_ref(lo, prec, rm);
+    let (mut f_hi, mut o_hi) = Float::from_rational_prec_round_ref(hi, prec, rm);
     if o_lo == Equal {
-        o_lo = o_hi;
+        if f_lo == 0u32 {
+            return None;
+        }
+        // values just above lo
+        let up = match rm {
+            Ceiling => true,
+            Up => f_lo > 0u32,
+            Down => f_lo < 0u32,
+            _ => false,
+        };
+        o_lo = if up {
+            f_lo.increment();
+            Greater
+        } else {
+            Less
+        };
     }
     if o_hi == Equal {
-        o_hi = o_lo;
+        if f_hi == 0u32 {
+            return None;
+        }
+        // values just below hi
+        let down = match rm {
+            Floor => true,
+            Down => f_hi > 0u32,
+            Up => f_hi < 0u32,
+            _ => false,
+        };
+        o_hi = if down {
+            f_hi.decrement();
+            Less
+        } else {
+            Greater
+        };
     }
     (o_lo == o_hi && ComparableFloatRef(&f_lo) == ComparableFloatRef(&f_hi)).then_some((f_lo, o_lo))
 }
@@ -216,26 +267,29 @@ fn cos_rational_series(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ord
 // Reduces a `Rational` too large to be a `Float` modulo 2 pi, using pi to exp_x + w bits, so that
 // the reduced value y satisfies |x - 2 pi k - y| <= 2^(2 - w): |k| < 2^exp_x, and 2 pi is known to
 // within 2^(2 - exp_x - w).
-fn reduce_huge(x: &Rational, exp_x: i64, w: u64) -> Rational {
+pub(crate) fn reduce_huge(x: &Rational, exp_x: i64, w: u64) -> Rational {
     let two_pi = Rational::exact_from(&(Float::pi_prec(u64::exact_from(exp_x) + w).0 << 1u32));
     let k = Integer::rounding_from(x / &two_pi, Nearest).0;
     x.sub_mul(&two_pi, &Rational::from(k))
 }
 
-// cos(y) for a `Rational` y within about 2^-cancel of an odd multiple of pi/2 (cancel >= 64 and
-// cancel >= prec / 16), where the general bracket would need its working precision raised by
-// `cancel` bits. As in `cos_near_zero`, write y = n pi/2 + delta with n odd, so that cos(y) =
-// -sin(delta) if n = 1 mod 4 and sin(delta) otherwise; delta is computed exactly in `Rational`
-// arithmetic from pi to exp_y + w bits (error at most 2^(1 - w), plus `extra` for a reduced y), and
-// sin(delta) is bracketed by t - t^3/6 and t. The bracket is rounded in `Rational` arithmetic, so
-// the result underflows correctly when it must.
-fn cos_rational_near_zero(
+// cos(y) (if `cos` is true) or sin(y) for a `Rational` y within about 2^-cancel of a zero of the
+// function, an odd multiple of pi/2 for cos or a multiple of pi for sin (cancel >= 64 and cancel >=
+// prec / 16), where the general bracket would need its working precision raised by `cancel` bits to
+// resolve the result. As in `trig_near_zero`, write y = n pi/2 + delta with n odd, so that cos(y) =
+// -sin(delta) if n = 1 mod 4 and sin(delta) if n = 3 mod 4, or y = n pi + delta, so that sin(y) =
+// (-1)^n sin(delta); here delta is a `Rational` known up to the error in pi, and sin(delta) is
+// bracketed by partial sums of its series. `extra`, if present, is the exponent of an additional
+// error in y itself (from a reduction modulo 2 pi), and `w` is the working precision the caller
+// reached, which is raised until the bracket rounds unambiguously.
+pub(crate) fn trig_rational_near_zero(
     y: &Rational,
     exp_y: i64,
     prec: u64,
     rm: RoundingMode,
     extra: Option<i64>,
     mut w: u64,
+    cos: bool,
 ) -> (Float, Ordering) {
     let mut increment = Limb::WIDTH;
     // A rational y = a/b is typically no closer to n pi/2 than about 1/b (a dyadic approximation of
@@ -246,18 +300,24 @@ fn cos_rational_near_zero(
     let w_hint = y.denominator_ref().significant_bits() + prec + 64;
     loop {
         let pi = Rational::exact_from(&Float::pi_prec(u64::exact_from(max(exp_y, 1)) + w).0);
-        let n = Integer::rounding_from((y / &pi) << 1u32, Nearest).0;
-        assert!(n.odd());
-        let negate = (&n).mod_power_of_2(2) == 1u32;
-        let half_pi = pi >> 1u32;
-        let delta = y.sub_mul(&half_pi, &Rational::from(&n));
+        let (n, negate, multiple) = if cos {
+            let n = Integer::rounding_from((y / &pi) << 1u32, Nearest).0;
+            assert!(n.odd());
+            let negate = (&n).mod_power_of_2(2) == 1u32;
+            (n, negate, pi >> 1u32)
+        } else {
+            let n = Integer::rounding_from(y / &pi, Nearest).0;
+            let negate = n.odd();
+            (n, negate, pi)
+        };
+        let delta = y.sub_mul(&multiple, &Rational::from(&n));
         let mut e = Rational::power_of_2(1 - i64::exact_from(w));
         if let Some(extra) = extra {
             e += Rational::power_of_2(extra);
         }
         let d_lo = &delta - &e;
         let d_hi = delta + e;
-        // |delta| <= pi/4, so sin is increasing on [d_lo, d_hi] and sin(delta) lies between
+        // |delta| is tiny, so sin is increasing on [d_lo, d_hi] and sin(delta) lies between
         // sin(d_lo) and sin(d_hi)
         let sin_lo = sin_bound(&d_lo, w, false);
         let sin_hi = sin_bound(&d_hi, w, true);
@@ -322,7 +382,7 @@ fn cos_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ord
         if exp_c < 0 {
             let cancel = u64::exact_from(-exp_c);
             if cancel >= max(NEAR_ZERO_MIN_CANCEL, prec >> 4) {
-                return cos_rational_near_zero(y, exp_y, prec, rm, extra, w);
+                return trig_rational_near_zero(y, exp_y, prec, rm, extra, w, true);
             }
         }
         // |c_f - cos(y_f)| <= 2^(exp_c - w) (half an ulp, doubled for safety), and |cos(y) -

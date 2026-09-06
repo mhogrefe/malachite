@@ -12,7 +12,8 @@ use malachite_base::test_util::generators::{
     unsigned_gen_var_11, unsigned_rounding_mode_pair_gen_var_4,
 };
 use malachite_float::test_util::common::{
-    rug_round_try_from_rounding_mode, test_constant, to_hex_string,
+    assert_rounding_ordering_consistent, rug_round_try_from_rounding_mode, test_constant,
+    to_hex_string,
 };
 use malachite_float::test_util::float::constants::ln_10::rug_ln_10_prec_round;
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
@@ -297,6 +298,7 @@ fn ln_10_prec_properties() {
     unsigned_gen_var_11().test_properties(|prec| {
         let (ln_10, o) = Float::ln_10_prec(prec);
         assert!(ln_10.is_valid());
+        assert_rounding_ordering_consistent(&ln_10, Nearest, o);
         assert_eq!(ln_10.get_prec(), Some(prec));
         assert_eq!(ln_10.get_exponent(), Some(2));
         assert_ne!(o, Equal);
@@ -336,6 +338,7 @@ fn ln_10_prec_round_properties() {
     unsigned_rounding_mode_pair_gen_var_4().test_properties(|(prec, rm)| {
         let (ln_10, o) = Float::ln_10_prec_round(prec, rm);
         assert!(ln_10.is_valid());
+        assert_rounding_ordering_consistent(&ln_10, rm, o);
         assert_eq!(ln_10.get_prec(), Some(prec));
         assert_eq!(
             ln_10.get_exponent(),

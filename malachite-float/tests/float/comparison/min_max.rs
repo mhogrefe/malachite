@@ -21,7 +21,8 @@ use malachite_float::float::comparison::min_max::{
     primitive_float_max_rational, primitive_float_min_rational,
 };
 use malachite_float::test_util::common::{
-    parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
+    assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
+    to_hex_string,
 };
 use malachite_float::test_util::float::comparison::min_max::{
     rug_max, rug_max_prec, rug_max_prec_round, rug_max_round, rug_min, rug_min_prec,
@@ -875,6 +876,7 @@ fn max_prec_round_fail() {
 fn min_prec_round_properties_helper(x: Float, y: Float, prec: u64, rm: RoundingMode) {
     let (min, o) = x.clone().min_prec_round(y.clone(), prec, rm);
     assert!(min.is_valid());
+    assert_rounding_ordering_consistent(&min, rm, o);
     let (min_alt, o_alt) = x.clone().min_prec_round_val_ref(&y, prec, rm);
     assert!(min_alt.is_valid());
     assert_eq!(ComparableFloatRef(&min_alt), ComparableFloatRef(&min));
@@ -948,11 +950,13 @@ fn min_prec_round_properties() {
 
     float_unsigned_rounding_mode_triple_gen_var_1().test_properties(|(x, prec, rm)| {
         let (min, o) = x.min_prec_round_ref_val(Float::NAN, prec, rm);
+        assert_rounding_ordering_consistent(&min, rm, o);
         let (min_alt, o_alt) = Float::from_float_prec_round_ref(&x, prec, rm);
         assert_eq!(ComparableFloatRef(&min), ComparableFloatRef(&min_alt));
         assert_eq!(o, o_alt);
 
         let (min, o) = Float::NAN.min_prec_round_val_ref(&x, prec, rm);
+        assert_rounding_ordering_consistent(&min, rm, o);
         assert_eq!(ComparableFloatRef(&min), ComparableFloatRef(&min_alt));
         assert_eq!(o, o_alt);
     });
@@ -1003,6 +1007,7 @@ fn min_round_properties_helper(x: Float, y: Float, rm: RoundingMode) {
     let prec = max(x.significant_bits(), y.significant_bits());
     let (min, o) = x.clone().min_round(y.clone(), rm);
     assert!(min.is_valid());
+    assert_rounding_ordering_consistent(&min, rm, o);
     // The result is one of the operands rounded to a precision at least as high as its own, so the
     // rounding is always exact.
     assert_eq!(o, Equal);
@@ -1054,6 +1059,7 @@ fn min_round_properties() {
 fn max_prec_round_properties_helper(x: Float, y: Float, prec: u64, rm: RoundingMode) {
     let (max, o) = x.clone().max_prec_round(y.clone(), prec, rm);
     assert!(max.is_valid());
+    assert_rounding_ordering_consistent(&max, rm, o);
     let (max_alt, o_alt) = x.clone().max_prec_round_val_ref(&y, prec, rm);
     assert!(max_alt.is_valid());
     assert_eq!(ComparableFloatRef(&max_alt), ComparableFloatRef(&max));
@@ -1127,11 +1133,13 @@ fn max_prec_round_properties() {
 
     float_unsigned_rounding_mode_triple_gen_var_1().test_properties(|(x, prec, rm)| {
         let (max, o) = x.max_prec_round_ref_val(Float::NAN, prec, rm);
+        assert_rounding_ordering_consistent(&max, rm, o);
         let (max_alt, o_alt) = Float::from_float_prec_round_ref(&x, prec, rm);
         assert_eq!(ComparableFloatRef(&max), ComparableFloatRef(&max_alt));
         assert_eq!(o, o_alt);
 
         let (max, o) = Float::NAN.max_prec_round_val_ref(&x, prec, rm);
+        assert_rounding_ordering_consistent(&max, rm, o);
         assert_eq!(ComparableFloatRef(&max), ComparableFloatRef(&max_alt));
         assert_eq!(o, o_alt);
     });
@@ -1182,6 +1190,7 @@ fn max_round_properties_helper(x: Float, y: Float, rm: RoundingMode) {
     let prec = max(x.significant_bits(), y.significant_bits());
     let (max, o) = x.clone().max_round(y.clone(), rm);
     assert!(max.is_valid());
+    assert_rounding_ordering_consistent(&max, rm, o);
     // The result is one of the operands rounded to a precision at least as high as its own, so the
     // rounding is always exact.
     assert_eq!(o, Equal);
@@ -1468,6 +1477,7 @@ fn min_max_rational_prec_round_properties_helper(
     };
     let (result, o) = f(&x, &y, prec, rm);
     assert!(result.is_valid());
+    assert_rounding_ordering_consistent(&result, rm, o);
 
     if is_max {
         let (r2, o2) = x.clone().max_rational_prec_round(y.clone(), prec, rm);
@@ -1588,6 +1598,7 @@ fn min_max_rational_shorthand_properties() {
     float_rational_rounding_mode_triple_gen_var_20().test_properties(|(x, y, rm)| {
         let prec = x.significant_bits();
         let (r, o) = x.min_rational_prec_round_ref_ref(&y, prec, rm);
+        assert_rounding_ordering_consistent(&r, rm, o);
         let (r2, o2) = x.min_rational_round_ref_ref(&y, rm);
         assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&r));
         assert_eq!(o2, o);
@@ -1596,6 +1607,7 @@ fn min_max_rational_shorthand_properties() {
     float_rational_rounding_mode_triple_gen_var_21().test_properties(|(x, y, rm)| {
         let prec = x.significant_bits();
         let (r, o) = x.max_rational_prec_round_ref_ref(&y, prec, rm);
+        assert_rounding_ordering_consistent(&r, rm, o);
         let (r2, o2) = x.max_rational_round_ref_ref(&y, rm);
         assert_eq!(ComparableFloatRef(&r2), ComparableFloatRef(&r));
         assert_eq!(o2, o);

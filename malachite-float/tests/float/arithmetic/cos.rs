@@ -28,7 +28,8 @@ use malachite_float::float::arithmetic::cos::{
     primitive_float_cos_with_period_rational,
 };
 use malachite_float::test_util::common::{
-    parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
+    assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
+    to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::cos::{
     rug_cos, rug_cos_pi_prec_round, rug_cos_pi_rational_prec_round, rug_cos_prec,
@@ -397,6 +398,7 @@ fn cos_round_fail() {
 fn cos_prec_round_properties_helper(x: Float, prec: u64, rm: RoundingMode) {
     let (c, o) = x.clone().cos_prec_round(prec, rm);
     assert!(c.is_valid());
+    assert_rounding_ordering_consistent(&c, rm, o);
 
     let (c_alt, o_alt) = x.cos_prec_round_ref(prec, rm);
     assert!(c_alt.is_valid());
@@ -480,6 +482,7 @@ fn cos_round_properties() {
     float_rounding_mode_pair_gen_var_47().test_properties(|(x, rm)| {
         let (c, o) = x.clone().cos_round(rm);
         assert!(c.is_valid());
+        assert_rounding_ordering_consistent(&c, rm, o);
         let (c_alt, o_alt) = x.cos_round_ref(rm);
         assert!(c_alt.is_valid());
         assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
@@ -4225,6 +4228,7 @@ fn cos_rational_prec_round_ref_fail() {
 fn cos_rational_prec_round_properties_helper(x: Rational, prec: u64, rm: RoundingMode) {
     let (c, o) = Float::cos_rational_prec_round(x.clone(), prec, rm);
     assert!(c.is_valid());
+    assert_rounding_ordering_consistent(&c, rm, o);
 
     let (c_alt, o_alt) = Float::cos_rational_prec_round_ref(&x, prec, rm);
     assert!(c_alt.is_valid());
@@ -11464,6 +11468,7 @@ fn cos_with_period_prec_round_properties_helper(x: Float, u: u64, prec: u64, rm:
     }
     let (c, o) = x.clone().cos_with_period_prec_round(u, prec, rm);
     assert!(c.is_valid());
+    assert_rounding_ordering_consistent(&c, rm, o);
 
     let (c_alt, o_alt) = x.cos_with_period_prec_round_ref(u, prec, rm);
     assert!(c_alt.is_valid());
@@ -11596,6 +11601,7 @@ fn cos_with_period_round_properties() {
     float_unsigned_rounding_mode_triple_gen_var_38().test_properties(|(x, u, rm)| {
         let (c, o) = x.clone().cos_with_period_round(u, rm);
         assert!(c.is_valid());
+        assert_rounding_ordering_consistent(&c, rm, o);
         let (c_alt, o_alt) = x.cos_with_period_round_ref(u, rm);
         assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
         assert_eq!(o_alt, o);
@@ -12236,6 +12242,7 @@ fn cos_with_period_rational_prec_round_properties_helper(
     }
     let (c, o) = Float::cos_with_period_rational_prec_round(x.clone(), u, prec, rm);
     assert!(c.is_valid());
+    assert_rounding_ordering_consistent(&c, rm, o);
 
     let (c_alt, o_alt) = Float::cos_with_period_rational_prec_round_ref(&x, u, prec, rm);
     assert!(c_alt.is_valid());
@@ -13327,6 +13334,7 @@ fn cos_pi_properties() {
         }
         let (c, o) = x.clone().cos_pi_prec_round(prec, rm);
         assert!(c.is_valid());
+        assert_rounding_ordering_consistent(&c, rm, o);
         let (c_alt, o_alt) = x.cos_with_period_prec_round_ref(2, prec, rm);
         assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
         assert_eq!(o_alt, o);
@@ -13376,6 +13384,7 @@ fn cos_pi_properties() {
             return;
         }
         let (c, o) = x.clone().cos_pi_round(rm);
+        assert_rounding_ordering_consistent(&c, rm, o);
         let (c_alt, o_alt) = x.cos_with_period_round_ref(2, rm);
         assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
         assert_eq!(o_alt, o);
@@ -13395,6 +13404,7 @@ fn cos_pi_properties() {
         }
         let (c, o) = Float::cos_pi_rational_prec_round(x.clone(), prec, rm);
         assert!(c.is_valid());
+        assert_rounding_ordering_consistent(&c, rm, o);
         let (c_alt, o_alt) = Float::cos_with_period_rational_prec_round_ref(&x, 2, prec, rm);
         assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
         assert_eq!(o_alt, o);

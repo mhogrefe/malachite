@@ -30,7 +30,8 @@ use malachite_float::float::arithmetic::reciprocal_sqrt::{
     primitive_float_reciprocal_sqrt, primitive_float_reciprocal_sqrt_rational,
 };
 use malachite_float::test_util::common::{
-    parse_hex_string, rug_round_try_from_rounding_mode, test_constant, to_hex_string,
+    assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
+    test_constant, to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::reciprocal_sqrt::{
     reciprocal_sqrt_rational_prec_round_generic, reciprocal_sqrt_rational_prec_round_simple,
@@ -2778,6 +2779,7 @@ fn reciprocal_sqrt_prec_round_properties_helper(
 ) {
     let (reciprocal_sqrt, o) = x.clone().reciprocal_sqrt_prec_round(prec, rm);
     assert!(reciprocal_sqrt.is_valid());
+    assert_rounding_ordering_consistent(&reciprocal_sqrt, rm, o);
 
     let (reciprocal_sqrt_alt, o_alt) = x.clone().reciprocal_sqrt_prec_round_ref(prec, rm);
     assert!(reciprocal_sqrt_alt.is_valid());
@@ -2902,6 +2904,7 @@ fn reciprocal_sqrt_prec_round_properties() {
 fn reciprocal_sqrt_prec_properties_helper(x: Float, prec: u64, extreme: bool) {
     let (reciprocal_sqrt, o) = x.clone().reciprocal_sqrt_prec(prec);
     assert!(reciprocal_sqrt.is_valid());
+    assert_rounding_ordering_consistent(&reciprocal_sqrt, Nearest, o);
 
     let (reciprocal_sqrt_alt, o_alt) = x.reciprocal_sqrt_prec_ref(prec);
     assert!(reciprocal_sqrt_alt.is_valid());
@@ -3039,6 +3042,7 @@ fn reciprocal_sqrt_prec_properties() {
 fn reciprocal_sqrt_round_properties_helper(x: Float, rm: RoundingMode, extreme: bool) {
     let (reciprocal_sqrt, o) = x.clone().reciprocal_sqrt_round(rm);
     assert!(reciprocal_sqrt.is_valid());
+    assert_rounding_ordering_consistent(&reciprocal_sqrt, rm, o);
 
     let (reciprocal_sqrt_alt, o_alt) = x.reciprocal_sqrt_round_ref(rm);
     assert!(reciprocal_sqrt_alt.is_valid());
@@ -3289,6 +3293,7 @@ fn reciprocal_sqrt_rational_prec_properties() {
     rational_unsigned_pair_gen_var_7().test_properties(|(x, prec)| {
         let (reciprocal_sqrt, o) = Float::reciprocal_sqrt_rational_prec(x.clone(), prec);
         assert!(reciprocal_sqrt.is_valid());
+        assert_rounding_ordering_consistent(&reciprocal_sqrt, Nearest, o);
 
         let (reciprocal_sqrt_alt, o_alt) = Float::reciprocal_sqrt_rational_prec_ref(&x, prec);
         assert!(reciprocal_sqrt_alt.is_valid());
@@ -3372,6 +3377,7 @@ fn reciprocal_sqrt_rational_prec_round_properties() {
     rational_unsigned_rounding_mode_triple_gen_var_4().test_properties(|(x, prec, rm)| {
         let (reciprocal_sqrt, o) = Float::reciprocal_sqrt_rational_prec_round(x.clone(), prec, rm);
         assert!(reciprocal_sqrt.is_valid());
+        assert_rounding_ordering_consistent(&reciprocal_sqrt, rm, o);
 
         let (reciprocal_sqrt_alt, o_alt) =
             Float::reciprocal_sqrt_rational_prec_round_ref(&x, prec, rm);
@@ -3381,19 +3387,6 @@ fn reciprocal_sqrt_rational_prec_round_properties() {
             ComparableFloatRef(&reciprocal_sqrt)
         );
         assert_eq!(o, o_alt);
-
-        if !reciprocal_sqrt.is_nan() {
-            match (x >= 0u32, rm) {
-                (_, Floor) | (true, Down) | (false, Up) => {
-                    assert_ne!(o, Greater);
-                }
-                (_, Ceiling) | (true, Up) | (false, Down) => {
-                    assert_ne!(o, Less);
-                }
-                (_, Exact) => assert_eq!(o, Equal),
-                _ => {}
-            }
-        }
 
         let (reciprocal_sqrt_alt, o_alt) =
             reciprocal_sqrt_rational_prec_round_generic(&x, prec, rm);

@@ -11,7 +11,9 @@ use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
     unsigned_gen_var_11, unsigned_rounding_mode_pair_gen_var_4,
 };
-use malachite_float::test_util::common::{test_constant, to_hex_string};
+use malachite_float::test_util::common::{
+    assert_rounding_ordering_consistent, test_constant, to_hex_string,
+};
 use malachite_float::test_util::float::constants::prouhet_thue_morse_constant::*;
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use std::cmp::Ordering::{self, *};
@@ -299,6 +301,7 @@ fn prouhet_thue_morse_constant_prec_properties() {
     unsigned_gen_var_11().test_properties(|prec| {
         let (ptmc, o) = Float::prouhet_thue_morse_constant_prec(prec);
         assert!(ptmc.is_valid());
+        assert_rounding_ordering_consistent(&ptmc, Nearest, o);
         assert_eq!(ptmc.get_prec(), Some(prec));
         assert_eq!(ptmc.get_exponent(), Some(if prec == 1 { 0 } else { -1 }));
         assert_ne!(o, Equal);
@@ -330,6 +333,7 @@ fn prouhet_thue_morse_constant_prec_round_properties() {
     unsigned_rounding_mode_pair_gen_var_4().test_properties(|(prec, rm)| {
         let (ptmc, o) = Float::prouhet_thue_morse_constant_prec_round(prec, rm);
         assert!(ptmc.is_valid());
+        assert_rounding_ordering_consistent(&ptmc, rm, o);
         assert_eq!(ptmc.get_prec(), Some(prec));
         let expected_exponent = match (prec, rm) {
             (1, Ceiling | Up | Nearest) | (2, Ceiling | Up) => 0,

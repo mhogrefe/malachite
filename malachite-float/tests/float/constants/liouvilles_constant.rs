@@ -16,7 +16,9 @@ use malachite_base::test_util::generators::{
     unsigned_gen_var_11, unsigned_gen_var_31, unsigned_rounding_mode_pair_gen_var_4,
 };
 use malachite_float::float::constants::liouvilles_constant::*;
-use malachite_float::test_util::common::{test_constant, to_hex_string};
+use malachite_float::test_util::common::{
+    assert_rounding_ordering_consistent, test_constant, to_hex_string,
+};
 use malachite_float::test_util::float::constants::digit_constants::*;
 use malachite_float::test_util::generators::{
     unsigned_pair_gen_var_51, unsigned_unsigned_rounding_mode_triple_gen_var_10,
@@ -354,6 +356,7 @@ fn liouvilles_constant_base_prec_round_properties() {
     unsigned_unsigned_rounding_mode_triple_gen_var_10().test_properties(|(base, prec, rm)| {
         let (x, o) = Float::liouvilles_constant_base_prec_round(base, prec, rm);
         assert!(x.is_valid());
+        assert_rounding_ordering_consistent(&x, rm, o);
         assert_eq!(x.get_prec(), Some(prec));
         assert_ne!(o, Equal);
         // The constant is positive, so `Down` is `Floor` and `Up` is `Ceiling`.
@@ -694,6 +697,7 @@ fn liouvilles_constant_prec_properties() {
     unsigned_gen_var_11().test_properties(|prec| {
         let (x, o) = Float::liouvilles_constant_prec(prec);
         assert!(x.is_valid());
+        assert_rounding_ordering_consistent(&x, Nearest, o);
         assert_eq!(x.get_prec(), Some(prec));
         assert_ne!(o, Equal);
         let (x_alt, o_alt) = Float::liouvilles_constant_base_prec(10, prec);
@@ -707,6 +711,7 @@ fn liouvilles_constant_prec_round_properties() {
     unsigned_rounding_mode_pair_gen_var_4().test_properties(|(prec, rm)| {
         let (x, o) = Float::liouvilles_constant_prec_round(prec, rm);
         assert!(x.is_valid());
+        assert_rounding_ordering_consistent(&x, rm, o);
         assert_eq!(x.get_prec(), Some(prec));
         assert_ne!(o, Equal);
         let (x_alt, o_alt) = Float::liouvilles_constant_base_prec_round(10, prec, rm);

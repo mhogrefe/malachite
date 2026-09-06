@@ -19,7 +19,9 @@ use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::unsigned_rounding_mode_pair_gen_var_3;
 use malachite_float::float::arithmetic::log_base_rational_float_base::*;
 use malachite_float::float::arithmetic::log_base_rational_rational_base::*;
-use malachite_float::test_util::common::{rug_round_try_from_rounding_mode, to_hex_string};
+use malachite_float::test_util::common::{
+    assert_rounding_ordering_consistent, rug_round_try_from_rounding_mode, to_hex_string,
+};
 use malachite_float::test_util::float::arithmetic::log_base_rational_float_base::{
     rug_log_base_rational_float_base_prec, rug_log_base_rational_float_base_prec_round,
 };
@@ -221,6 +223,7 @@ fn log_base_rational_float_base_prec_round_properties_helper(
     extreme: bool,
 ) {
     let (log, o) = check(x, base, prec, rm, extreme);
+    assert_rounding_ordering_consistent(&log, rm, o);
 
     // The sign of a normal result follows whether x and base are on the same side of 1.
     if log.is_normal()

@@ -11,7 +11,9 @@ use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
     unsigned_gen_var_11, unsigned_rounding_mode_pair_gen_var_4,
 };
-use malachite_float::test_util::common::{test_constant, to_hex_string};
+use malachite_float::test_util::common::{
+    assert_rounding_ordering_consistent, test_constant, to_hex_string,
+};
 use malachite_float::test_util::float::constants::log_10_e::log_10_e_prec_round_simple;
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use std::cmp::Ordering::{self, *};
@@ -282,6 +284,7 @@ fn log_10_e_prec_properties() {
     unsigned_gen_var_11().test_properties(|prec| {
         let (log_10_e, o) = Float::log_10_e_prec(prec);
         assert!(log_10_e.is_valid());
+        assert_rounding_ordering_consistent(&log_10_e, Nearest, o);
         assert_eq!(log_10_e.get_prec(), Some(prec));
         assert_eq!(
             log_10_e.get_exponent(),
@@ -322,6 +325,7 @@ fn log_10_e_prec_round_properties() {
     unsigned_rounding_mode_pair_gen_var_4().test_properties(|(prec, rm)| {
         let (log_10_e, o) = Float::log_10_e_prec_round(prec, rm);
         assert!(log_10_e.is_valid());
+        assert_rounding_ordering_consistent(&log_10_e, rm, o);
         assert_eq!(log_10_e.get_prec(), Some(prec));
         let expected_exponent = match (prec, rm) {
             (1, Ceiling | Up | Nearest) | (2, Ceiling | Up) => 0,

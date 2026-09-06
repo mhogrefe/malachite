@@ -19,7 +19,8 @@ use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::primitive_float_pair_gen;
 use malachite_float::float::arithmetic::agm::{primitive_float_agm, primitive_float_agm_rational};
 use malachite_float::test_util::common::{
-    parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
+    assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
+    to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::agm::{
     agm_prec_round_extended, rug_agm, rug_agm_prec, rug_agm_prec_round, rug_agm_round,
@@ -5072,6 +5073,7 @@ fn agm_prec_round_properties_helper(
 ) {
     let (agm, o) = x.clone().agm_prec_round(y.clone(), prec, rm);
     assert!(agm.is_valid());
+    assert_rounding_ordering_consistent(&agm, rm, o);
     let (agm_alt, o_alt) = x.clone().agm_prec_round_val_ref(&y, prec, rm);
     assert!(agm_alt.is_valid());
     assert_eq!(ComparableFloatRef(&agm_alt), ComparableFloatRef(&agm));
@@ -5382,6 +5384,7 @@ fn agm_prec_properties() {
 fn agm_round_properties_helper(x: Float, y: Float, rm: RoundingMode, extreme: bool) {
     let (agm, o) = x.clone().agm_round(y.clone(), rm);
     assert!(agm.is_valid());
+    assert_rounding_ordering_consistent(&agm, rm, o);
     let (agm_alt, o_alt) = x.clone().agm_round_val_ref(&y, rm);
     assert!(agm_alt.is_valid());
     assert_eq!(o_alt, o);
@@ -5668,6 +5671,7 @@ fn agm_rational_prec_round_properties() {
         |(x, y, prec, rm)| {
             let (agm, o) = Float::agm_rational_prec_round(x.clone(), y.clone(), prec, rm);
             assert!(agm.is_valid());
+            assert_rounding_ordering_consistent(&agm, rm, o);
             let (agm_alt, o_alt) = Float::agm_rational_prec_round_val_ref(x.clone(), &y, prec, rm);
             assert!(agm_alt.is_valid());
             assert_eq!(ComparableFloatRef(&agm_alt), ComparableFloatRef(&agm));

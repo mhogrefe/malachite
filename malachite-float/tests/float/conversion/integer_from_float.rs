@@ -13,7 +13,10 @@ use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, Roundi
 use malachite_base::rounding_modes::RoundingMode::*;
 use malachite_base::strings::ToDebugString;
 use malachite_float::Float;
-use malachite_float::test_util::common::{parse_hex_string, rug_round_try_from_rounding_mode};
+use malachite_float::test_util::common::{
+    assert_rounding_ordering_consistent_for_sign, parse_hex_string,
+    rug_round_try_from_rounding_mode,
+};
 use malachite_float::test_util::generators::{
     float_gen, float_gen_var_4, float_rounding_mode_pair_gen_var_2,
 };
@@ -448,16 +451,7 @@ fn rounding_from_float_properties() {
         assert!((Rational::from(&n) - Rational::exact_from(&x)).lt_abs(&1u32));
 
         assert_eq!(n.partial_cmp(&x), Some(o));
-        match (x >= 0u32, rm) {
-            (_, Floor) | (true, Down) | (false, Up) => {
-                assert_ne!(o, Greater);
-            }
-            (_, Ceiling) | (true, Up) | (false, Down) => {
-                assert_ne!(o, Less);
-            }
-            (_, Exact) => assert_eq!(o, Equal),
-            _ => {}
-        }
+        assert_rounding_ordering_consistent_for_sign(x >= 0u32, rm, o);
 
         if let Ok(rm) = rug_round_try_from_rounding_mode(rm) {
             let (rn, ro) = rug::Float::exact_from(&x).to_integer_round(rm).unwrap();

@@ -16,7 +16,9 @@ use malachite_base::test_util::generators::{
     signed_gen, signed_gen_var_5, signed_unsigned_pair_gen_var_19, signed_unsigned_pair_gen_var_20,
     unsigned_gen, unsigned_gen_var_5,
 };
-use malachite_float::test_util::common::{rug_round_try_from_rounding_mode, to_hex_string};
+use malachite_float::test_util::common::{
+    assert_rounding_ordering_consistent, rug_round_try_from_rounding_mode, to_hex_string,
+};
 use malachite_float::test_util::float::arithmetic::power_of_2::{
     power_of_2_i64_naive, power_of_2_prec_naive, power_of_2_prec_round_naive, power_of_2_u64_naive,
 };
@@ -576,6 +578,7 @@ fn power_of_2_prec_round_fail() {
 fn power_of_2_prec_round_properties_helper(i: i64, prec: u64, rm: RoundingMode) {
     let (p, o) = Float::power_of_2_prec_round(i, prec, rm);
     assert!(p.is_valid());
+    assert_rounding_ordering_consistent(&p, rm, o);
     assert!(p.is_finite() || p == Float::INFINITY || p.is_positive_zero());
     assert!(p >= 0u32);
     if p.is_normal() {

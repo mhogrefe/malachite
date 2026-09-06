@@ -28,7 +28,8 @@ use malachite_float::float::arithmetic::root::{
     primitive_float_root_u_rational,
 };
 use malachite_float::test_util::common::{
-    parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
+    assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
+    to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::root::{
     rug_root_s, rug_root_s_prec, rug_root_s_prec_round, rug_root_s_round, rug_root_u,
@@ -389,6 +390,7 @@ fn root_u_prec_round_properties_helper(
     }
     let (p, o) = x.clone().root_u_prec_round(n, prec, rm);
     assert!(p.is_valid());
+    assert_rounding_ordering_consistent(&p, rm, o);
     let (p_alt, o_alt) = x.root_u_prec_round_ref(n, prec, rm);
     assert!(p_alt.is_valid());
     assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
@@ -473,6 +475,7 @@ fn root_u_round_properties() {
         for rm in [Floor, Ceiling, Down, Up, Nearest] {
             let (p, o) = x.clone().root_u_round(n, rm);
             assert!(p.is_valid());
+            assert_rounding_ordering_consistent(&p, rm, o);
             let (p_alt, o_alt) = x.root_u_round_ref(n, rm);
             assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
             assert_eq!(o_alt, o);
@@ -901,6 +904,7 @@ fn root_s_prec_round_properties_helper(
     }
     let (p, o) = x.clone().root_s_prec_round(n, prec, rm);
     assert!(p.is_valid());
+    assert_rounding_ordering_consistent(&p, rm, o);
     let (p_alt, o_alt) = x.root_s_prec_round_ref(n, prec, rm);
     assert!(p_alt.is_valid());
     assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
@@ -985,6 +989,7 @@ fn root_s_round_properties() {
         for rm in [Floor, Ceiling, Down, Up, Nearest] {
             let (p, o) = x.clone().root_s_round(n, rm);
             assert!(p.is_valid());
+            assert_rounding_ordering_consistent(&p, rm, o);
             let (p_alt, o_alt) = x.root_s_round_ref(n, rm);
             assert_eq!(ComparableFloatRef(&p_alt), ComparableFloatRef(&p));
             assert_eq!(o_alt, o);
@@ -1050,6 +1055,7 @@ fn root_u_rational_prec_round_properties_helper(x: Rational, k: u64, prec: u64, 
     }
     let (r, o) = Float::root_u_rational_prec_round(x.clone(), k, prec, rm);
     assert!(r.is_valid());
+    assert_rounding_ordering_consistent(&r, rm, o);
     let (r_alt, o_alt) = Float::root_u_rational_prec_round_ref(&x, k, prec, rm);
     assert!(r_alt.is_valid());
     assert_eq!(ComparableFloatRef(&r_alt), ComparableFloatRef(&r));
@@ -1111,6 +1117,7 @@ fn root_s_rational_prec_round_properties_helper(x: Rational, k: i64, prec: u64, 
     }
     let (r, o) = Float::root_s_rational_prec_round(x.clone(), k, prec, rm);
     assert!(r.is_valid());
+    assert_rounding_ordering_consistent(&r, rm, o);
     let (r_alt, o_alt) = Float::root_s_rational_prec_round_ref(&x, k, prec, rm);
     assert!(r_alt.is_valid());
     assert_eq!(ComparableFloatRef(&r_alt), ComparableFloatRef(&r));

@@ -31,7 +31,8 @@ use malachite_float::float::arithmetic::mul::{
     mul_rational_prec_round_naive_ref_val, mul_rational_prec_round_naive_val_ref,
 };
 use malachite_float::test_util::common::{
-    parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
+    assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
+    to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::mul::{
     mul_prec_round_naive, rug_mul, rug_mul_prec, rug_mul_prec_round, rug_mul_rational,
@@ -10362,6 +10363,7 @@ fn mul_prec_round_properties_helper(
 ) {
     let (product, o) = x.clone().mul_prec_round(y.clone(), prec, rm);
     assert!(product.is_valid());
+    assert_rounding_ordering_consistent(&product, rm, o);
     let (product_alt, o_alt) = x.clone().mul_prec_round_val_ref(&y, prec, rm);
     assert!(product_alt.is_valid());
     assert_eq!(
@@ -10453,16 +10455,6 @@ fn mul_prec_round_properties_helper(
                 let mut next = product.clone();
                 next.decrement();
                 assert!(next < r_product);
-            }
-            match (r_product >= 0u32, rm) {
-                (_, Floor) | (true, Down) | (false, Up) => {
-                    assert_ne!(o, Greater);
-                }
-                (_, Ceiling) | (true, Up) | (false, Down) => {
-                    assert_ne!(o, Less);
-                }
-                (_, Exact) => assert_eq!(o, Equal),
-                _ => {}
             }
         }
     }
@@ -10617,6 +10609,7 @@ fn mul_prec_round_properties() {
 fn mul_prec_properties_helper(x: Float, y: Float, prec: u64, extreme: bool) {
     let (product, o) = x.clone().mul_prec(y.clone(), prec);
     assert!(product.is_valid());
+    assert_rounding_ordering_consistent(&product, Nearest, o);
     let (product_alt, o_alt) = x.clone().mul_prec_val_ref(&y, prec);
     assert!(product_alt.is_valid());
     assert_eq!(
@@ -10859,6 +10852,7 @@ fn mul_prec_properties() {
 fn mul_round_properties_helper(x: Float, y: Float, rm: RoundingMode, extreme: bool) {
     let (product, o) = x.clone().mul_round(y.clone(), rm);
     assert!(product.is_valid());
+    assert_rounding_ordering_consistent(&product, rm, o);
     let (product_alt, o_alt) = x.clone().mul_round_val_ref(&y, rm);
     assert!(product_alt.is_valid());
     assert_eq!(o_alt, o);
@@ -10939,16 +10933,6 @@ fn mul_round_properties_helper(x: Float, y: Float, rm: RoundingMode, extreme: bo
                 let mut next = product.clone();
                 next.decrement();
                 assert!(next < r_product);
-            }
-            match (r_product >= 0u32, rm) {
-                (_, Floor) | (true, Down) | (false, Up) => {
-                    assert_ne!(o, Greater);
-                }
-                (_, Ceiling) | (true, Up) | (false, Down) => {
-                    assert_ne!(o, Less);
-                }
-                (_, Exact) => assert_eq!(o, Equal),
-                _ => {}
             }
         }
     }
@@ -11362,6 +11346,7 @@ fn mul_rational_prec_round_properties_helper(
 ) {
     let (product, o) = x.clone().mul_rational_prec_round(y.clone(), prec, rm);
     assert!(product.is_valid());
+    assert_rounding_ordering_consistent(&product, rm, o);
     let (product_alt, o_alt) = x.clone().mul_rational_prec_round_val_ref(&y, prec, rm);
     assert!(product_alt.is_valid());
     assert_eq!(
@@ -11498,16 +11483,6 @@ fn mul_rational_prec_round_properties_helper(
                 next.decrement();
                 assert!(next < r_product);
             }
-            match (r_product >= 0u32, rm) {
-                (_, Floor) | (true, Down) | (false, Up) => {
-                    assert_ne!(o, Greater);
-                }
-                (_, Ceiling) | (true, Up) | (false, Down) => {
-                    assert_ne!(o, Less);
-                }
-                (_, Exact) => assert_eq!(o, Equal),
-                _ => {}
-            }
         }
     }
 
@@ -11633,6 +11608,7 @@ fn mul_rational_prec_round_properties() {
 fn mul_rational_prec_properties_helper(x: Float, y: Rational, prec: u64, extreme: bool) {
     let (product, o) = x.clone().mul_rational_prec(y.clone(), prec);
     assert!(product.is_valid());
+    assert_rounding_ordering_consistent(&product, Nearest, o);
     let (product_alt, o_alt) = x.clone().mul_rational_prec_val_ref(&y, prec);
     assert!(product_alt.is_valid());
     assert_eq!(
@@ -11862,6 +11838,7 @@ fn mul_rational_prec_properties() {
 fn mul_rational_round_properties_helper(x: Float, y: Rational, rm: RoundingMode, extreme: bool) {
     let (product, o) = x.clone().mul_rational_round(y.clone(), rm);
     assert!(product.is_valid());
+    assert_rounding_ordering_consistent(&product, rm, o);
     let (product_alt, o_alt) = x.clone().mul_rational_round_val_ref(&y, rm);
     assert!(product_alt.is_valid());
     assert_eq!(o_alt, o);
@@ -11942,16 +11919,6 @@ fn mul_rational_round_properties_helper(x: Float, y: Rational, rm: RoundingMode,
                 let mut next = product.clone();
                 next.decrement();
                 assert!(next < r_product);
-            }
-            match (r_product >= 0u32, rm) {
-                (_, Floor) | (true, Down) | (false, Up) => {
-                    assert_ne!(o, Greater);
-                }
-                (_, Ceiling) | (true, Up) | (false, Down) => {
-                    assert_ne!(o, Less);
-                }
-                (_, Exact) => assert_eq!(o, Equal),
-                _ => {}
             }
         }
     }

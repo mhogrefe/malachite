@@ -26,7 +26,8 @@ use malachite_base::test_util::generators::{
 };
 use malachite_float::emulate_float_to_float_fn;
 use malachite_float::test_util::common::{
-    parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
+    assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
+    to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::square::{
     rug_square, rug_square_prec, rug_square_prec_round, rug_square_round, square_prec_round_naive,
@@ -2455,6 +2456,7 @@ fn square_prec_round_fail() {
 fn square_prec_round_properties_helper(x: Float, prec: u64, rm: RoundingMode, extreme: bool) {
     let (square, o) = x.clone().square_prec_round(prec, rm);
     assert!(square.is_valid());
+    assert_rounding_ordering_consistent(&square, rm, o);
 
     let (square_alt, o_alt) = x.clone().square_prec_round_ref(prec, rm);
     assert!(square_alt.is_valid());
@@ -2501,16 +2503,6 @@ fn square_prec_round_properties_helper(x: Float, prec: u64, rm: RoundingMode, ex
                 let mut next = square.clone();
                 next.decrement();
                 assert!(next < r_square);
-            }
-            match (r_square >= 0u32, rm) {
-                (_, Floor) | (true, Down) | (false, Up) => {
-                    assert_ne!(o, Greater);
-                }
-                (_, Ceiling) | (true, Up) | (false, Down) => {
-                    assert_ne!(o, Less);
-                }
-                (_, Exact) => assert_eq!(o, Equal),
-                _ => {}
             }
         }
     }
@@ -2695,6 +2687,7 @@ fn square_prec_properties() {
 fn square_round_properties_helper(x: Float, rm: RoundingMode, extreme: bool) {
     let (square, o) = x.clone().square_round(rm);
     assert!(square.is_valid());
+    assert_rounding_ordering_consistent(&square, rm, o);
 
     let (square_alt, o_alt) = x.square_round_ref(rm);
     assert!(square_alt.is_valid());
@@ -2736,16 +2729,6 @@ fn square_round_properties_helper(x: Float, rm: RoundingMode, extreme: bool) {
                 let mut next = square.clone();
                 next.decrement();
                 assert!(next < r_square);
-            }
-            match (r_square >= 0u32, rm) {
-                (_, Floor) | (true, Down) | (false, Up) => {
-                    assert_ne!(o, Greater);
-                }
-                (_, Ceiling) | (true, Up) | (false, Down) => {
-                    assert_ne!(o, Less);
-                }
-                (_, Exact) => assert_eq!(o, Equal),
-                _ => {}
             }
         }
     }

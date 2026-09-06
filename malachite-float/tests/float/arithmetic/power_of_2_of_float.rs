@@ -25,7 +25,8 @@ use malachite_float::float::arithmetic::power_of_2_of_float::{
     primitive_float_power_of_2, primitive_float_power_of_2_rational,
 };
 use malachite_float::test_util::common::{
-    parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
+    assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
+    to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::power_of_2_of_float::{
     rug_power_of_2_of_float, rug_power_of_2_of_float_prec, rug_power_of_2_of_float_prec_round,
@@ -342,6 +343,7 @@ fn power_of_2_of_float_prec_fail() {
 fn power_of_2_of_float_prec_round_properties_helper(x: Float, prec: u64, rm: RoundingMode) {
     let (p, o) = Float::power_of_2_of_float_prec_round(x.clone(), prec, rm);
     assert!(p.is_valid());
+    assert_rounding_ordering_consistent(&p, rm, o);
 
     let (p_alt, o_alt) = Float::power_of_2_of_float_prec_round_ref(&x, prec, rm);
     assert!(p_alt.is_valid());
@@ -431,6 +433,7 @@ fn power_of_2_of_float_round_properties() {
     float_rounding_mode_pair_gen_var_47().test_properties(|(x, rm)| {
         let (p, o) = Float::power_of_2_of_float_round(x.clone(), rm);
         assert!(p.is_valid());
+        assert_rounding_ordering_consistent(&p, rm, o);
 
         let (p_alt, o_alt) = Float::power_of_2_of_float_round_ref(&x, rm);
         assert!(p_alt.is_valid());
@@ -1028,6 +1031,7 @@ fn power_of_2_rational_prec_round_ref_fail() {
 fn power_of_2_rational_prec_round_properties_helper(x: Rational, prec: u64, rm: RoundingMode) {
     let (f, o) = Float::power_of_2_rational_prec_round(x.clone(), prec, rm);
     assert!(f.is_valid());
+    assert_rounding_ordering_consistent(&f, rm, o);
 
     let (f_alt, o_alt) = Float::power_of_2_rational_prec_round_ref(&x, prec, rm);
     assert!(f_alt.is_valid());

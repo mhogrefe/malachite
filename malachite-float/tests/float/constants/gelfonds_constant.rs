@@ -11,7 +11,9 @@ use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
     unsigned_gen_var_11, unsigned_rounding_mode_pair_gen_var_4,
 };
-use malachite_float::test_util::common::{test_constant, to_hex_string};
+use malachite_float::test_util::common::{
+    assert_rounding_ordering_consistent, test_constant, to_hex_string,
+};
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use std::cmp::Ordering::{self, *};
 use std::panic::catch_unwind;
@@ -276,6 +278,7 @@ fn gelfonds_constant_prec_properties() {
     unsigned_gen_var_11().test_properties(|prec| {
         let (gelfonds_constant, o) = Float::gelfonds_constant_prec(prec);
         assert!(gelfonds_constant.is_valid());
+        assert_rounding_ordering_consistent(&gelfonds_constant, Nearest, o);
         assert_eq!(gelfonds_constant.get_prec(), Some(prec));
         assert_eq!(gelfonds_constant.get_exponent(), Some(5));
         assert_ne!(o, Equal);
@@ -312,6 +315,7 @@ fn gelfonds_constant_prec_round_properties() {
     unsigned_rounding_mode_pair_gen_var_4().test_properties(|(prec, rm)| {
         let (gelfonds_constant, o) = Float::gelfonds_constant_prec_round(prec, rm);
         assert!(gelfonds_constant.is_valid());
+        assert_rounding_ordering_consistent(&gelfonds_constant, rm, o);
         assert_eq!(gelfonds_constant.get_prec(), Some(prec));
         // e^pi is in [16, 32), so the result has exponent 5 unless it rounds up to 32.
         let expected_exponent = match (prec, rm) {

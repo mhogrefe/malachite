@@ -22,7 +22,9 @@ use malachite_base::test_util::generators::{
 };
 use malachite_float::float::arithmetic::log_base_1_plus_x::primitive_float_log_base_1_plus_x;
 use malachite_float::float::arithmetic::log_base_10_1_plus_x::primitive_float_log_base_10_1_plus_x;
-use malachite_float::test_util::common::{rug_round_try_from_rounding_mode, to_hex_string};
+use malachite_float::test_util::common::{
+    assert_rounding_ordering_consistent, rug_round_try_from_rounding_mode, to_hex_string,
+};
 use malachite_float::test_util::float::arithmetic::log_base_10_1_plus_x::{
     rug_log_base_10_1_plus_x, rug_log_base_10_1_plus_x_prec, rug_log_base_10_1_plus_x_prec_round,
 };
@@ -72,6 +74,7 @@ fn check(x: &Float, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
 
 fn log_base_10_1_plus_x_prec_round_properties_helper(x: &Float, prec: u64, rm: RoundingMode) {
     let (log, o) = check(x, prec, rm);
+    assert_rounding_ordering_consistent(&log, rm, o);
 
     // Must match the general `log_base_1_plus_x` with base 10 (independently implemented, with its
     // own oracle).
@@ -156,6 +159,7 @@ fn log_base_10_1_plus_x_round_properties() {
     let f = |x: Float, rm: RoundingMode| {
         let (log, o) = x.clone().log_base_10_1_plus_x_round(rm);
         assert!(log.is_valid());
+        assert_rounding_ordering_consistent(&log, rm, o);
         let (log_ref, o_ref) = x.log_base_10_1_plus_x_round_ref(rm);
         assert_eq!(ComparableFloatRef(&log_ref), ComparableFloatRef(&log));
         assert_eq!(o_ref, o);

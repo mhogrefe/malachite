@@ -11,7 +11,9 @@ use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
     unsigned_gen_var_11, unsigned_rounding_mode_pair_gen_var_4,
 };
-use malachite_float::test_util::common::{test_constant, to_hex_string};
+use malachite_float::test_util::common::{
+    assert_rounding_ordering_consistent, test_constant, to_hex_string,
+};
 use malachite_float::test_util::float::constants::prime_constant::prime_constant_prec_round_naive;
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use std::cmp::Ordering::{self, *};
@@ -282,6 +284,7 @@ fn prime_constant_prec_properties() {
     unsigned_gen_var_11().test_properties(|prec| {
         let (pc, o) = Float::prime_constant_prec(prec);
         assert!(pc.is_valid());
+        assert_rounding_ordering_consistent(&pc, Nearest, o);
         assert_eq!(pc.get_prec(), Some(prec));
         assert_ne!(o, Equal);
         assert_eq!(pc.get_exponent(), Some(if prec == 1 { 0 } else { -1 }));
@@ -313,6 +316,7 @@ fn prime_constant_prec_round_properties() {
     unsigned_rounding_mode_pair_gen_var_4().test_properties(|(prec, rm)| {
         let (pc, o) = Float::prime_constant_prec_round(prec, rm);
         assert!(pc.is_valid());
+        assert_rounding_ordering_consistent(&pc, rm, o);
         assert_eq!(pc.get_prec(), Some(prec));
         assert_ne!(o, Equal);
         let expected_exponent = match (prec, rm) {

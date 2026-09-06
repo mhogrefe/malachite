@@ -12,7 +12,8 @@ use malachite_base::test_util::generators::{
     unsigned_gen_var_11, unsigned_rounding_mode_pair_gen_var_4,
 };
 use malachite_float::test_util::common::{
-    rug_round_try_from_rounding_mode, test_constant, to_hex_string,
+    assert_rounding_ordering_consistent, rug_round_try_from_rounding_mode, test_constant,
+    to_hex_string,
 };
 use malachite_float::test_util::float::constants::eulers_constant::*;
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
@@ -306,6 +307,7 @@ fn eulers_constant_prec_properties() {
     unsigned_gen_var_11().test_properties(|prec| {
         let (g, o) = Float::eulers_constant_prec(prec);
         assert!(g.is_valid());
+        assert_rounding_ordering_consistent(&g, Nearest, o);
         assert_eq!(g.get_prec(), Some(prec));
         assert_eq!(g.get_exponent(), Some(0));
         assert_ne!(o, Equal);
@@ -343,6 +345,7 @@ fn eulers_constant_prec_round_properties() {
     unsigned_rounding_mode_pair_gen_var_4().test_properties(|(prec, rm)| {
         let (g, o) = Float::eulers_constant_prec_round(prec, rm);
         assert!(g.is_valid());
+        assert_rounding_ordering_consistent(&g, rm, o);
         assert_eq!(g.get_prec(), Some(prec));
         let expected_exponent = match (prec, rm) {
             (1, Ceiling | Up) => 1,

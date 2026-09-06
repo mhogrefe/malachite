@@ -19,7 +19,8 @@ use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::primitive_float_pair_gen;
 use malachite_float::float::arithmetic::hypot::primitive_float_hypot;
 use malachite_float::test_util::common::{
-    parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
+    assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
+    to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::hypot::{
     rug_hypot, rug_hypot_prec, rug_hypot_prec_round, rug_hypot_round,
@@ -1034,6 +1035,7 @@ fn exponent_in_gate(x: &Float) -> bool {
 fn hypot_prec_round_properties_helper(x: Float, y: Float, prec: u64, rm: RoundingMode) {
     let (hypot, o) = x.clone().hypot_prec_round(y.clone(), prec, rm);
     assert!(hypot.is_valid());
+    assert_rounding_ordering_consistent(&hypot, rm, o);
     let (hypot_alt, o_alt) = x.clone().hypot_prec_round_val_ref(&y, prec, rm);
     assert!(hypot_alt.is_valid());
     assert_eq!(ComparableFloatRef(&hypot_alt), ComparableFloatRef(&hypot));
@@ -1181,6 +1183,7 @@ fn hypot_prec_round_properties() {
 fn hypot_prec_properties_helper(x: Float, y: Float, prec: u64) {
     let (hypot, o) = x.clone().hypot_prec(y.clone(), prec);
     assert!(hypot.is_valid());
+    assert_rounding_ordering_consistent(&hypot, Nearest, o);
     let (hypot_alt, o_alt) = x.clone().hypot_prec_val_ref(&y, prec);
     assert!(hypot_alt.is_valid());
     assert_eq!(ComparableFloatRef(&hypot_alt), ComparableFloatRef(&hypot));
@@ -1225,6 +1228,7 @@ fn hypot_prec_properties() {
 fn hypot_round_properties_helper(x: Float, y: Float, rm: RoundingMode) {
     let (hypot, o) = x.clone().hypot_round(y.clone(), rm);
     assert!(hypot.is_valid());
+    assert_rounding_ordering_consistent(&hypot, rm, o);
     let (hypot_alt, o_alt) = x.clone().hypot_round_val_ref(&y, rm);
     assert!(hypot_alt.is_valid());
     assert_eq!(ComparableFloatRef(&hypot_alt), ComparableFloatRef(&hypot));

@@ -30,7 +30,8 @@ use malachite_float::float::arithmetic::exp_x_minus_1::{
     primitive_float_exp_x_minus_1, primitive_float_exp_x_minus_1_rational,
 };
 use malachite_float::test_util::common::{
-    parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
+    assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
+    to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::exp_x_minus_1::{
     rug_exp_x_minus_1, rug_exp_x_minus_1_prec, rug_exp_x_minus_1_prec_round,
@@ -1704,6 +1705,7 @@ fn exp_x_minus_1_prec_round_fail_2() {
 fn exp_x_minus_1_prec_round_properties_helper(x: Float, prec: u64, rm: RoundingMode) {
     let (exp_x_minus_1, o) = x.clone().exp_x_minus_1_prec_round(prec, rm);
     assert!(exp_x_minus_1.is_valid());
+    assert_rounding_ordering_consistent(&exp_x_minus_1, rm, o);
 
     let (exp_x_minus_1_alt, o_alt) = x.exp_x_minus_1_prec_round_ref(prec, rm);
     assert!(exp_x_minus_1_alt.is_valid());
@@ -1885,6 +1887,7 @@ fn exp_x_minus_1_prec_properties() {
 fn exp_x_minus_1_round_properties_helper(x: Float, rm: RoundingMode) {
     let (exp_x_minus_1, o) = x.clone().exp_x_minus_1_round(rm);
     assert!(exp_x_minus_1.is_valid());
+    assert_rounding_ordering_consistent(&exp_x_minus_1, rm, o);
 
     let (exp_x_minus_1_alt, o_alt) = x.exp_x_minus_1_round_ref(rm);
     assert!(exp_x_minus_1_alt.is_valid());
@@ -2935,6 +2938,7 @@ fn exp_x_minus_1_rational_prec_round_ref_fail() {
 fn exp_x_minus_1_rational_prec_round_properties_helper(x: Rational, prec: u64, rm: RoundingMode) {
     let (f, o) = Float::exp_x_minus_1_rational_prec_round(x.clone(), prec, rm);
     assert!(f.is_valid());
+    assert_rounding_ordering_consistent(&f, rm, o);
 
     let (f_alt, o_alt) = Float::exp_x_minus_1_rational_prec_round_ref(&x, prec, rm);
     assert!(f_alt.is_valid());

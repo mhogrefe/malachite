@@ -11,7 +11,9 @@ use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
     unsigned_gen_var_11, unsigned_rounding_mode_pair_gen_var_4,
 };
-use malachite_float::test_util::common::{test_constant, to_hex_string};
+use malachite_float::test_util::common::{
+    assert_rounding_ordering_consistent, test_constant, to_hex_string,
+};
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use std::cmp::Ordering::{self, *};
 use std::panic::catch_unwind;
@@ -268,6 +270,7 @@ fn ramanujans_constant_prec_properties() {
     unsigned_gen_var_11().test_properties(|prec| {
         let (ramanujans_constant, o) = Float::ramanujans_constant_prec(prec);
         assert!(ramanujans_constant.is_valid());
+        assert_rounding_ordering_consistent(&ramanujans_constant, Nearest, o);
         assert_eq!(ramanujans_constant.get_prec(), Some(prec));
         // e^(pi*sqrt(163)) is just below 2^58; at very low precision it rounds up to 2^58 (exponent
         // 59).
@@ -303,6 +306,7 @@ fn ramanujans_constant_prec_round_properties() {
     unsigned_rounding_mode_pair_gen_var_4().test_properties(|(prec, rm)| {
         let (ramanujans_constant, o) = Float::ramanujans_constant_prec_round(prec, rm);
         assert!(ramanujans_constant.is_valid());
+        assert_rounding_ordering_consistent(&ramanujans_constant, rm, o);
         assert_eq!(ramanujans_constant.get_prec(), Some(prec));
         // e^(pi*sqrt(163)) is just below 2^58, so the result has exponent 58 unless it rounds up
         // across 2^58 (exponent 59) at very low precision.

@@ -26,7 +26,8 @@ use malachite_base::test_util::generators::{
 };
 use malachite_float::float::arithmetic::ln::{primitive_float_ln, primitive_float_ln_rational};
 use malachite_float::test_util::common::{
-    parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
+    assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
+    to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::ln::{
     ln_prec_round_extended, rug_ln, rug_ln_prec, rug_ln_prec_round, rug_ln_round,
@@ -2859,6 +2860,7 @@ fn ln_rational_prec_round_ref_fail() {
 fn ln_prec_round_properties_helper(x: Float, prec: u64, rm: RoundingMode) {
     let (ln, o) = x.clone().ln_prec_round(prec, rm);
     assert!(ln.is_valid());
+    assert_rounding_ordering_consistent(&ln, rm, o);
 
     let (ln_alt, o_alt) = x.ln_prec_round_ref(prec, rm);
     assert!(ln_alt.is_valid());
@@ -3044,6 +3046,7 @@ fn ln_prec_properties() {
 fn ln_round_properties_helper(x: Float, rm: RoundingMode) {
     let (ln, o) = x.clone().ln_round(rm);
     assert!(ln.is_valid());
+    assert_rounding_ordering_consistent(&ln, rm, o);
 
     let (ln_alt, o_alt) = x.ln_round_ref(rm);
     assert!(ln_alt.is_valid());
@@ -3245,6 +3248,7 @@ fn primitive_float_ln_properties() {
 fn ln_rational_prec_round_properties_helper(x: Rational, prec: u64, rm: RoundingMode) {
     let (ln, o) = Float::ln_rational_prec_round(x.clone(), prec, rm);
     assert!(ln.is_valid());
+    assert_rounding_ordering_consistent(&ln, rm, o);
 
     let (ln_alt, o_alt) = Float::ln_rational_prec_round_ref(&x, prec, rm);
     assert!(ln_alt.is_valid());
@@ -3524,6 +3528,7 @@ fn ln_unsigned_fail() {
 fn ln_unsigned_prec_round_properties_helper(n: u64, prec: u64, rm: RoundingMode) {
     let (ln, o) = Float::ln_unsigned_prec_round(n, prec, rm);
     assert!(ln.is_valid());
+    assert_rounding_ordering_consistent(&ln, rm, o);
 
     // The oracle is the natural logarithm of the same integer as a Float.
     let (ln_alt, o_alt) = Float::from(n).ln_prec_round(prec, rm);

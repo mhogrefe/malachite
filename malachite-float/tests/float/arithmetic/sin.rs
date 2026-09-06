@@ -7,33 +7,39 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::cmp::Ordering::{self, *};
-use malachite_base::num::arithmetic::traits::{Sin, SinAssign};
+use malachite_base::num::arithmetic::traits::{PowerOf2, Sin, SinAssign};
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeZero, One, Zero,
 };
 use malachite_base::num::comparison::traits::PartialOrdAbs;
-use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
+use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
-use malachite_base::test_util::generators::unsigned_rounding_mode_pair_gen_var_3;
+use malachite_base::test_util::generators::{
+    primitive_float_gen, unsigned_rounding_mode_pair_gen_var_3,
+};
+use malachite_float::float::arithmetic::sin::{primitive_float_sin, primitive_float_sin_rational};
 use malachite_float::test_util::common::{
-    parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
+    assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
+    to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::sin::{
-    rug_sin, rug_sin_prec, rug_sin_prec_round, rug_sin_round,
+    rug_sin, rug_sin_prec, rug_sin_prec_round, rug_sin_rational_prec, rug_sin_rational_prec_round,
+    rug_sin_round,
 };
 use malachite_float::test_util::generators::{
     float_gen, float_rounding_mode_pair_gen_var_47, float_unsigned_pair_gen_var_1,
     float_unsigned_rounding_mode_triple_gen_var_36,
+    rational_unsigned_rounding_mode_triple_gen_var_10,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
+use malachite_q::Rational;
+use malachite_q::test_util::generators::{rational_gen, rational_unsigned_pair_gen_var_3};
 use std::panic::catch_unwind;
-
-// rug's exponent range is much wider than `Float`'s, so it cannot see underflow
-fn rug_can_see(x: &Float) -> bool {
-    x.get_exponent().is_none_or(|e| e > Float::MIN_EXPONENT + 2)
-}
+use std::str::FromStr;
 
 // Rows reuse the cosine test's inputs. Branches of `sin_prec_round_normal_ref` covered:
 // - tiny x: the small-input shortcut rounds x directly
@@ -65,9 +71,7 @@ fn test_sin_prec_round() {
         assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
         assert_eq!(o_alt, o);
 
-        if rug_can_see(&x)
-            && let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm)
-        {
+        if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm) {
             let (rug_c, rug_o) = rug_sin_prec_round(&rug::Float::exact_from(&x), prec, rug_rm);
             assert_eq!(
                 ComparableFloatRef(&Float::from(&rug_c)),
@@ -688,6 +692,7 @@ fn sin_round_fail() {
 fn sin_prec_round_properties_helper(x: Float, prec: u64, rm: RoundingMode) {
     let (s, o) = x.clone().sin_prec_round(prec, rm);
     assert!(s.is_valid());
+    assert_rounding_ordering_consistent(&s, rm, o);
 
     let (s_alt, o_alt) = x.sin_prec_round_ref(prec, rm);
     assert!(s_alt.is_valid());
@@ -700,9 +705,7 @@ fn sin_prec_round_properties_helper(x: Float, prec: u64, rm: RoundingMode) {
     assert_eq!(ComparableFloatRef(&x_alt), ComparableFloatRef(&s));
     assert_eq!(o_alt, o);
 
-    if rug_can_see(&x)
-        && let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm)
-    {
+    if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm) {
         let (rug_s, rug_o) = rug_sin_prec_round(&rug::Float::exact_from(&x), prec, rug_rm);
         assert_eq!(
             ComparableFloatRef(&Float::from(&rug_s)),
@@ -773,6 +776,7 @@ fn sin_round_properties() {
     float_rounding_mode_pair_gen_var_47().test_properties(|(x, rm)| {
         let (s, o) = x.clone().sin_round(rm);
         assert!(s.is_valid());
+        assert_rounding_ordering_consistent(&s, rm, o);
         let (s_alt, o_alt) = x.sin_round_ref(rm);
         assert!(s_alt.is_valid());
         assert_eq!(ComparableFloatRef(&s_alt), ComparableFloatRef(&s));
@@ -788,9 +792,7 @@ fn sin_round_properties() {
         assert_eq!(ComparableFloatRef(&s_alt), ComparableFloatRef(&s));
         assert_eq!(o_alt, o);
 
-        if rug_can_see(&x)
-            && let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm)
-        {
+        if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm) {
             let (rug_s, rug_o) = rug_sin_round(&rug::Float::exact_from(&x), rug_rm);
             assert_eq!(
                 ComparableFloatRef(&Float::from(&rug_s)),
@@ -821,14 +823,12 @@ fn sin_prec_properties() {
         assert_eq!(ComparableFloatRef(&s_alt), ComparableFloatRef(&s));
         assert_eq!(o_alt, o);
 
-        if rug_can_see(&x) {
-            let (rug_s, rug_o) = rug_sin_prec(&rug::Float::exact_from(&x), prec);
-            assert_eq!(
-                ComparableFloatRef(&Float::from(&rug_s)),
-                ComparableFloatRef(&s)
-            );
-            assert_eq!(rug_o, o);
-        }
+        let (rug_s, rug_o) = rug_sin_prec(&rug::Float::exact_from(&x), prec);
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_s)),
+            ComparableFloatRef(&s)
+        );
+        assert_eq!(rug_o, o);
     });
 }
 
@@ -849,12 +849,10 @@ fn sin_properties() {
         let (s_alt, _) = x.sin_prec_round_ref(x.significant_bits(), Nearest);
         assert_eq!(ComparableFloatRef(&s_alt), ComparableFloatRef(&s));
 
-        if rug_can_see(&x) {
-            assert_eq!(
-                ComparableFloatRef(&Float::from(&rug_sin(&rug::Float::exact_from(&x)))),
-                ComparableFloatRef(&s)
-            );
-        }
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_sin(&rug::Float::exact_from(&x)))),
+            ComparableFloatRef(&s)
+        );
 
         assert_eq!(ComparableFloat((-&x).sin()), ComparableFloat(-&s));
         if s.is_finite() {
@@ -1090,4 +1088,2950 @@ fn test_sin_underflow() {
     let (s, o) = x_hi.sin_prec_round_ref(10, Nearest);
     assert_eq!(ComparableFloat(s), ComparableFloat(Float::NEGATIVE_ZERO));
     assert_eq!(o, Greater);
+}
+
+#[test]
+fn test_sin_rational_prec() {
+    let test = |s, prec, out: &str, out_hex: &str, out_o| {
+        let x = Rational::from_str(s).unwrap();
+
+        let (c, o) = Float::sin_rational_prec(x.clone(), prec);
+        assert!(c.is_valid());
+        assert_eq!(c.to_string(), out);
+        assert_eq!(to_hex_string(&c), out_hex);
+        assert_eq!(o, out_o);
+
+        let (c, o) = Float::sin_rational_prec_ref(&x, prec);
+        assert!(c.is_valid());
+        assert_eq!(c.to_string(), out);
+        assert_eq!(to_hex_string(&c), out_hex);
+        assert_eq!(o, out_o);
+    };
+    test("0", 1, "0.0", "0x0.0", Equal);
+    test("0", 5, "0.0", "0x0.0", Equal);
+    test("0", 10, "0.0", "0x0.0", Equal);
+    test("0", 20, "0.0", "0x0.0", Equal);
+    test("0", 53, "0.0", "0x0.0", Equal);
+    test("0", 100, "0.0", "0x0.0", Equal);
+    test("1", 1, "1.0", "0x1.0#1", Greater);
+    test("1", 5, "0.844", "0x0.d8#5", Greater);
+    test("1", 10, "0.84180", "0x0.d78#10", Greater);
+    test("1", 20, "0.84147072", "0x0.d76aa#20", Less);
+    test(
+        "1",
+        53,
+        "0.84147098480789650",
+        "0x0.d76aa478486770#53",
+        Less,
+    );
+    test(
+        "1",
+        100,
+        "0.84147098480789650665250232163005",
+        "0x0.d76aa47848677020c6e9e909c#100",
+        Less,
+    );
+    test("-1", 1, "-1.0", "-0x1.0#1", Less);
+    test("-1", 5, "-0.844", "-0x0.d8#5", Less);
+    test("-1", 10, "-0.84180", "-0x0.d78#10", Less);
+    test("-1", 20, "-0.84147072", "-0x0.d76aa#20", Greater);
+    test(
+        "-1",
+        53,
+        "-0.84147098480789650",
+        "-0x0.d76aa478486770#53",
+        Greater,
+    );
+    test(
+        "-1",
+        100,
+        "-0.84147098480789650665250232163005",
+        "-0x0.d76aa47848677020c6e9e909c#100",
+        Greater,
+    );
+    test("1/2", 1, "0.50", "0x0.8#1", Greater);
+    test("1/2", 5, "0.484", "0x0.7c#5", Greater);
+    test("1/2", 10, "0.47949", "0x0.7ac#10", Greater);
+    test("1/2", 20, "0.47942543", "0x0.7abba0#20", Less);
+    test(
+        "1/2",
+        53,
+        "0.47942553860420301",
+        "0x0.7abba1d12c17c0#53",
+        Greater,
+    );
+    test(
+        "1/2",
+        100,
+        "0.47942553860420300027328793521567",
+        "0x0.7abba1d12c17bfa1d92f0d93f8#100",
+        Greater,
+    );
+    test("1/3", 1, "0.25", "0x0.4#1", Less);
+    test("1/3", 5, "0.328", "0x0.54#5", Greater);
+    test("1/3", 10, "0.32715", "0x0.53c#10", Less);
+    test("1/3", 20, "0.32719469", "0x0.53c308#20", Less);
+    test(
+        "1/3",
+        53,
+        "0.32719469679615226",
+        "0x0.53c3081a2a031c#53",
+        Greater,
+    );
+    test(
+        "1/3",
+        100,
+        "0.32719469679615224417334408526753",
+        "0x0.53c3081a2a031ab144c484c790#100",
+        Less,
+    );
+    test("-1/3", 1, "-0.25", "-0x0.4#1", Greater);
+    test("-1/3", 5, "-0.328", "-0x0.54#5", Less);
+    test("-1/3", 10, "-0.32715", "-0x0.53c#10", Greater);
+    test("-1/3", 20, "-0.32719469", "-0x0.53c308#20", Greater);
+    test(
+        "-1/3",
+        53,
+        "-0.32719469679615226",
+        "-0x0.53c3081a2a031c#53",
+        Less,
+    );
+    test(
+        "-1/3",
+        100,
+        "-0.32719469679615224417334408526753",
+        "-0x0.53c3081a2a031ab144c484c790#100",
+        Greater,
+    );
+    test("3/5", 1, "0.50", "0x0.8#1", Less);
+    test("3/5", 10, "0.56445", "0x0.908#10", Less);
+    test(
+        "3/5",
+        53,
+        "0.56464247339503537",
+        "0x0.908c68bd2a0ac8#53",
+        Greater,
+    );
+    test(
+        "3/5",
+        100,
+        "0.56464247339503535720094544565865",
+        "0x0.908c68bd2a0ac6fa881b0a82b#100",
+        Less,
+    );
+    test("22/7", 1, "-0.00098", "-0x0.004#1", Greater);
+    test("22/7", 5, "-0.00128", "-0x0.0054#5", Less);
+    test("22/7", 10, "-0.0012646", "-0x0.0052e#10", Less);
+    test("22/7", 20, "-0.0012644883", "-0x0.0052de98#20", Greater);
+    test(
+        "22/7",
+        53,
+        "-0.0012644889303773533",
+        "-0x0.0052de9a9a24d90c#53",
+        Greater,
+    );
+    test(
+        "22/7",
+        100,
+        "-0.0012644889303773534003603504756467",
+        "-0x0.0052de9a9a24d90da7cdffe30130#100",
+        Less,
+    );
+    test("-22/7", 1, "0.00098", "0x0.004#1", Less);
+    test("-22/7", 5, "0.00128", "0x0.0054#5", Greater);
+    test("-22/7", 10, "0.0012646", "0x0.0052e#10", Greater);
+    test("-22/7", 20, "0.0012644883", "0x0.0052de98#20", Less);
+    test(
+        "-22/7",
+        53,
+        "0.0012644889303773533",
+        "0x0.0052de9a9a24d90c#53",
+        Less,
+    );
+    test(
+        "-22/7",
+        100,
+        "0.0012644889303773534003603504756467",
+        "0x0.0052de9a9a24d90da7cdffe30130#100",
+        Greater,
+    );
+    test("355/113", 1, "-2.4e-7", "-0x4.0E-6#1", Greater);
+    test("355/113", 5, "-2.68e-7", "-0x4.8E-6#5", Less);
+    test("355/113", 10, "-2.6682e-7", "-0x4.7aE-6#10", Less);
+    test("355/113", 20, "-2.6676435e-7", "-0x4.79be8E-6#20", Less);
+    test(
+        "355/113",
+        53,
+        "-2.6676418906241917e-7",
+        "-0x4.79be53e7511d8E-6#53",
+        Less,
+    );
+    test(
+        "355/113",
+        100,
+        "-2.6676418906241914840637452887346e-7",
+        "-0x4.79be53e7511d64791a3045970E-6#100",
+        Greater,
+    );
+    test("3", 1, "0.12", "0x0.2#1", Less);
+    test("3", 5, "0.141", "0x0.24#5", Less);
+    test("3", 10, "0.14111", "0x0.242#10", Less);
+    test("3", 20, "0.14111996", "0x0.242070#20", Less);
+    test(
+        "3",
+        53,
+        "0.14112000805986721",
+        "0x0.242070db6daab6#53",
+        Less,
+    );
+    test(
+        "3",
+        100,
+        "0.14112000805986722210074480280816",
+        "0x0.242070db6daab69e3902e84684#100",
+        Greater,
+    );
+    test("100", 1, "-0.50", "-0x0.8#1", Greater);
+    test("100", 5, "-0.500", "-0x0.80#5", Greater);
+    test("100", 10, "-0.50684", "-0x0.81c#10", Less);
+    test("100", 20, "-0.50636578", "-0x0.81a13#20", Less);
+    test(
+        "100",
+        53,
+        "-0.50636564110975879",
+        "-0x0.81a12dbc626dc0#53",
+        Greater,
+    );
+    test(
+        "100",
+        100,
+        "-0.50636564110975879365655761045969",
+        "-0x0.81a12dbc626dc03847b0aae84#100",
+        Greater,
+    );
+    test("1000000", 1, "-0.25", "-0x0.4#1", Greater);
+    test("1000000", 5, "-0.344", "-0x0.58#5", Greater);
+    test("1000000", 10, "-0.35010", "-0x0.59a#10", Less);
+    test("1000000", 20, "-0.34999371", "-0x0.599930#20", Less);
+    test(
+        "1000000",
+        53,
+        "-0.34999350217129294",
+        "-0x0.59992c95a3619c#53",
+        Greater,
+    );
+    test(
+        "1000000",
+        100,
+        "-0.34999350217129295211765248678059",
+        "-0x0.59992c95a3619d264732d26e98#100",
+        Greater,
+    );
+    test("1/1000000", 1, "9.5e-7", "0x0.00001#1", Less);
+    test("1/1000000", 5, "1.01e-6", "0x0.000011#5", Greater);
+    test("1/1000000", 10, "1.0002e-6", "0x0.000010c8#10", Greater);
+    test(
+        "1/1000000",
+        20,
+        "1.0000003e-6",
+        "0x0.000010c6f8#20",
+        Greater,
+    );
+    test(
+        "1/1000000",
+        53,
+        "9.9999999999983330e-7",
+        "0x0.000010c6f7a0b5ea7a#53",
+        Less,
+    );
+    test(
+        "1/1000000",
+        100,
+        "9.9999999999983333333333334166635e-7",
+        "0x0.000010c6f7a0b5ea7a2711cf92d7e2#100",
+        Less,
+    );
+    test("-1/1000000", 1, "-9.5e-7", "-0x0.00001#1", Greater);
+    test("-1/1000000", 5, "-1.01e-6", "-0x0.000011#5", Less);
+    test("-1/1000000", 10, "-1.0002e-6", "-0x0.000010c8#10", Less);
+    test(
+        "-1/1000000",
+        20,
+        "-1.0000003e-6",
+        "-0x0.000010c6f8#20",
+        Less,
+    );
+    test(
+        "-1/1000000",
+        53,
+        "-9.9999999999983330e-7",
+        "-0x0.000010c6f7a0b5ea7a#53",
+        Greater,
+    );
+    test(
+        "-1/1000000",
+        100,
+        "-9.9999999999983333333333334166635e-7",
+        "-0x0.000010c6f7a0b5ea7a2711cf92d7e2#100",
+        Greater,
+    );
+    test(
+        "1/1000000000000000000000000",
+        1,
+        "8.3e-25",
+        "0x1.0E-20#1",
+        Less,
+    );
+    test(
+        "1/1000000000000000000000000",
+        5,
+        "9.82e-25",
+        "0x1.3E-20#5",
+        Less,
+    );
+    test(
+        "1/1000000000000000000000000",
+        10,
+        "1.0000e-24",
+        "0x1.358E-20#10",
+        Greater,
+    );
+    test(
+        "1/1000000000000000000000000",
+        20,
+        "9.9999953e-25",
+        "0x1.357c2E-20#20",
+        Less,
+    );
+    test(
+        "1/1000000000000000000000000",
+        53,
+        "9.9999999999999992e-25",
+        "0x1.357c299a88ea7E-20#53",
+        Less,
+    );
+    test(
+        "1/1000000000000000000000000",
+        100,
+        "9.9999999999999999999999999999980e-25",
+        "0x1.357c299a88ea76a58924d52ceE-20#100",
+        Less,
+    );
+    test(
+        "124451306656115542615260972311/79228162514264337593543950336",
+        1,
+        "1.0",
+        "0x1.0#1",
+        Greater,
+    );
+    test(
+        "124451306656115542615260972311/79228162514264337593543950336",
+        5,
+        "1.00",
+        "0x1.0#5",
+        Greater,
+    );
+    test(
+        "124451306656115542615260972311/79228162514264337593543950336",
+        10,
+        "1.0000",
+        "0x1.000#10",
+        Greater,
+    );
+    test(
+        "124451306656115542615260972311/79228162514264337593543950336",
+        20,
+        "1.0000000",
+        "0x1.00000#20",
+        Greater,
+    );
+    test(
+        "124451306656115542615260972311/79228162514264337593543950336",
+        53,
+        "1.0000000000000000",
+        "0x1.0000000000000#53",
+        Greater,
+    );
+    test(
+        "124451306656115542615260972311/79228162514264337593543950336",
+        100,
+        "1.0000000000000000000000000000000",
+        "0x1.0000000000000000000000000#100",
+        Greater,
+    );
+    test(
+        "373353919968346627845782916933/79228162514264337593543950336",
+        1,
+        "-1.0",
+        "-0x1.0#1",
+        Less,
+    );
+    test(
+        "373353919968346627845782916933/79228162514264337593543950336",
+        5,
+        "-1.00",
+        "-0x1.0#5",
+        Less,
+    );
+    test(
+        "373353919968346627845782916933/79228162514264337593543950336",
+        10,
+        "-1.0000",
+        "-0x1.000#10",
+        Less,
+    );
+    test(
+        "373353919968346627845782916933/79228162514264337593543950336",
+        20,
+        "-1.0000000",
+        "-0x1.00000#20",
+        Less,
+    );
+    test(
+        "373353919968346627845782916933/79228162514264337593543950336",
+        53,
+        "-1.0000000000000000",
+        "-0x1.0000000000000#53",
+        Less,
+    );
+    test(
+        "373353919968346627845782916933/79228162514264337593543950336",
+        100,
+        "-1.0000000000000000000000000000000",
+        "-0x1.0000000000000000000000000#100",
+        Less,
+    );
+    test(
+        "124451306656115542615260972311/39614081257132168796771975168",
+        1,
+        "2.0e-31",
+        "0x4.0E-26#1",
+        Greater,
+    );
+    test(
+        "124451306656115542615260972311/39614081257132168796771975168",
+        5,
+        "1.73e-31",
+        "0x3.8E-26#5",
+        Greater,
+    );
+    test(
+        "124451306656115542615260972311/39614081257132168796771975168",
+        10,
+        "1.6948e-31",
+        "0x3.70E-26#10",
+        Less,
+    );
+    test(
+        "124451306656115542615260972311/39614081257132168796771975168",
+        20,
+        "1.6956854e-31",
+        "0x3.70734E-26#20",
+        Less,
+    );
+    test(
+        "124451306656115542615260972311/39614081257132168796771975168",
+        53,
+        "1.6956855320737799e-31",
+        "0x3.707344a409382E-26#53",
+        Less,
+    );
+    test(
+        "124451306656115542615260972311/39614081257132168796771975168",
+        100,
+        "1.6956855320737799287917402938778e-31",
+        "0x3.707344a4093822299f31d0084E-26#100",
+        Greater,
+    );
+    test(
+        "-124451306656115542615260972311/79228162514264337593543950336",
+        1,
+        "-1.0",
+        "-0x1.0#1",
+        Less,
+    );
+    test(
+        "-124451306656115542615260972311/79228162514264337593543950336",
+        5,
+        "-1.00",
+        "-0x1.0#5",
+        Less,
+    );
+    test(
+        "-124451306656115542615260972311/79228162514264337593543950336",
+        10,
+        "-1.0000",
+        "-0x1.000#10",
+        Less,
+    );
+    test(
+        "-124451306656115542615260972311/79228162514264337593543950336",
+        20,
+        "-1.0000000",
+        "-0x1.00000#20",
+        Less,
+    );
+    test(
+        "-124451306656115542615260972311/79228162514264337593543950336",
+        53,
+        "-1.0000000000000000",
+        "-0x1.0000000000000#53",
+        Less,
+    );
+    test(
+        "-124451306656115542615260972311/79228162514264337593543950336",
+        100,
+        "-1.0000000000000000000000000000000",
+        "-0x1.0000000000000000000000000#100",
+        Less,
+    );
+    test(
+        "1267650600228229401496703205376",
+        1,
+        "-1.0",
+        "-0x1.0#1",
+        Less,
+    );
+    test(
+        "1267650600228229401496703205376",
+        5,
+        "-0.875",
+        "-0x0.e0#5",
+        Less,
+    );
+    test(
+        "1267650600228229401496703205376",
+        10,
+        "-0.87207",
+        "-0x0.df4#10",
+        Greater,
+    );
+    test(
+        "1267650600228229401496703205376",
+        20,
+        "-0.87218380",
+        "-0x0.df477#20",
+        Less,
+    );
+    test(
+        "1267650600228229401496703205376",
+        53,
+        "-0.87218360541826734",
+        "-0x0.df476cbd60fac8#53",
+        Less,
+    );
+    test(
+        "1267650600228229401496703205376",
+        100,
+        "-0.87218360541826730978071977821350",
+        "-0x0.df476cbd60fac5f54ce60f245#100",
+        Less,
+    );
+    test(
+        "1/1267650600228229401496703205376",
+        1,
+        "7.9e-31",
+        "0x1.0E-25#1",
+        Greater,
+    );
+    test(
+        "1/1267650600228229401496703205376",
+        5,
+        "7.89e-31",
+        "0x1.0E-25#5",
+        Greater,
+    );
+    test(
+        "1/1267650600228229401496703205376",
+        10,
+        "7.8886e-31",
+        "0x1.000E-25#10",
+        Greater,
+    );
+    test(
+        "1/1267650600228229401496703205376",
+        20,
+        "7.8886091e-31",
+        "0x1.00000E-25#20",
+        Greater,
+    );
+    test(
+        "1/1267650600228229401496703205376",
+        53,
+        "7.8886090522101181e-31",
+        "0x1.0000000000000E-25#53",
+        Greater,
+    );
+    test(
+        "1/1267650600228229401496703205376",
+        100,
+        "7.8886090522101180541172856528279e-31",
+        "0x1.0000000000000000000000000E-25#100",
+        Greater,
+    );
+}
+
+#[test]
+fn test_sin_rational_prec_round() {
+    let test = |s, prec, rm, out: &str, out_hex: &str, out_o| {
+        let x = Rational::from_str(s).unwrap();
+
+        let (c, o) = Float::sin_rational_prec_round(x.clone(), prec, rm);
+        assert!(c.is_valid());
+        assert_eq!(c.to_string(), out);
+        assert_eq!(to_hex_string(&c), out_hex);
+        assert_eq!(o, out_o);
+
+        let (c, o) = Float::sin_rational_prec_round_ref(&x, prec, rm);
+        assert!(c.is_valid());
+        assert_eq!(c.to_string(), out);
+        assert_eq!(to_hex_string(&c), out_hex);
+        assert_eq!(o, out_o);
+    };
+    test("0", 1, Down, "0.0", "0x0.0", Equal);
+    test("0", 1, Up, "0.0", "0x0.0", Equal);
+    test("0", 1, Floor, "0.0", "0x0.0", Equal);
+    test("0", 1, Ceiling, "0.0", "0x0.0", Equal);
+    test("0", 1, Nearest, "0.0", "0x0.0", Equal);
+    test("0", 1, Exact, "0.0", "0x0.0", Equal);
+    test("0", 5, Nearest, "0.0", "0x0.0", Equal);
+    test("0", 10, Down, "0.0", "0x0.0", Equal);
+    test("0", 10, Up, "0.0", "0x0.0", Equal);
+    test("0", 10, Floor, "0.0", "0x0.0", Equal);
+    test("0", 10, Ceiling, "0.0", "0x0.0", Equal);
+    test("0", 10, Nearest, "0.0", "0x0.0", Equal);
+    test("0", 10, Exact, "0.0", "0x0.0", Equal);
+    test("0", 20, Nearest, "0.0", "0x0.0", Equal);
+    test("0", 53, Down, "0.0", "0x0.0", Equal);
+    test("0", 53, Up, "0.0", "0x0.0", Equal);
+    test("0", 53, Floor, "0.0", "0x0.0", Equal);
+    test("0", 53, Ceiling, "0.0", "0x0.0", Equal);
+    test("0", 53, Nearest, "0.0", "0x0.0", Equal);
+    test("0", 53, Exact, "0.0", "0x0.0", Equal);
+    test("0", 100, Nearest, "0.0", "0x0.0", Equal);
+    test("1", 1, Down, "0.50", "0x0.8#1", Less);
+    test("1", 1, Up, "1.0", "0x1.0#1", Greater);
+    test("1", 1, Floor, "0.50", "0x0.8#1", Less);
+    test("1", 1, Ceiling, "1.0", "0x1.0#1", Greater);
+    test("1", 1, Nearest, "1.0", "0x1.0#1", Greater);
+    test("1", 5, Nearest, "0.844", "0x0.d8#5", Greater);
+    test("1", 10, Down, "0.84082", "0x0.d74#10", Less);
+    test("1", 10, Up, "0.84180", "0x0.d78#10", Greater);
+    test("1", 10, Floor, "0.84082", "0x0.d74#10", Less);
+    test("1", 10, Ceiling, "0.84180", "0x0.d78#10", Greater);
+    test("1", 10, Nearest, "0.84180", "0x0.d78#10", Greater);
+    test("1", 20, Nearest, "0.84147072", "0x0.d76aa#20", Less);
+    test(
+        "1",
+        53,
+        Down,
+        "0.84147098480789650",
+        "0x0.d76aa478486770#53",
+        Less,
+    );
+    test(
+        "1",
+        53,
+        Up,
+        "0.84147098480789662",
+        "0x0.d76aa478486778#53",
+        Greater,
+    );
+    test(
+        "1",
+        53,
+        Floor,
+        "0.84147098480789650",
+        "0x0.d76aa478486770#53",
+        Less,
+    );
+    test(
+        "1",
+        53,
+        Ceiling,
+        "0.84147098480789662",
+        "0x0.d76aa478486778#53",
+        Greater,
+    );
+    test(
+        "1",
+        53,
+        Nearest,
+        "0.84147098480789650",
+        "0x0.d76aa478486770#53",
+        Less,
+    );
+    test(
+        "1",
+        100,
+        Nearest,
+        "0.84147098480789650665250232163005",
+        "0x0.d76aa47848677020c6e9e909c#100",
+        Less,
+    );
+    test("-1", 1, Down, "-0.50", "-0x0.8#1", Greater);
+    test("-1", 1, Up, "-1.0", "-0x1.0#1", Less);
+    test("-1", 1, Floor, "-1.0", "-0x1.0#1", Less);
+    test("-1", 1, Ceiling, "-0.50", "-0x0.8#1", Greater);
+    test("-1", 1, Nearest, "-1.0", "-0x1.0#1", Less);
+    test("-1", 5, Nearest, "-0.844", "-0x0.d8#5", Less);
+    test("-1", 10, Down, "-0.84082", "-0x0.d74#10", Greater);
+    test("-1", 10, Up, "-0.84180", "-0x0.d78#10", Less);
+    test("-1", 10, Floor, "-0.84180", "-0x0.d78#10", Less);
+    test("-1", 10, Ceiling, "-0.84082", "-0x0.d74#10", Greater);
+    test("-1", 10, Nearest, "-0.84180", "-0x0.d78#10", Less);
+    test("-1", 20, Nearest, "-0.84147072", "-0x0.d76aa#20", Greater);
+    test(
+        "-1",
+        53,
+        Down,
+        "-0.84147098480789650",
+        "-0x0.d76aa478486770#53",
+        Greater,
+    );
+    test(
+        "-1",
+        53,
+        Up,
+        "-0.84147098480789662",
+        "-0x0.d76aa478486778#53",
+        Less,
+    );
+    test(
+        "-1",
+        53,
+        Floor,
+        "-0.84147098480789662",
+        "-0x0.d76aa478486778#53",
+        Less,
+    );
+    test(
+        "-1",
+        53,
+        Ceiling,
+        "-0.84147098480789650",
+        "-0x0.d76aa478486770#53",
+        Greater,
+    );
+    test(
+        "-1",
+        53,
+        Nearest,
+        "-0.84147098480789650",
+        "-0x0.d76aa478486770#53",
+        Greater,
+    );
+    test(
+        "-1",
+        100,
+        Nearest,
+        "-0.84147098480789650665250232163005",
+        "-0x0.d76aa47848677020c6e9e909c#100",
+        Greater,
+    );
+    test("1/2", 1, Down, "0.25", "0x0.4#1", Less);
+    test("1/2", 1, Up, "0.50", "0x0.8#1", Greater);
+    test("1/2", 1, Floor, "0.25", "0x0.4#1", Less);
+    test("1/2", 1, Ceiling, "0.50", "0x0.8#1", Greater);
+    test("1/2", 1, Nearest, "0.50", "0x0.8#1", Greater);
+    test("1/2", 5, Nearest, "0.484", "0x0.7c#5", Greater);
+    test("1/2", 10, Down, "0.47900", "0x0.7aa#10", Less);
+    test("1/2", 10, Up, "0.47949", "0x0.7ac#10", Greater);
+    test("1/2", 10, Floor, "0.47900", "0x0.7aa#10", Less);
+    test("1/2", 10, Ceiling, "0.47949", "0x0.7ac#10", Greater);
+    test("1/2", 10, Nearest, "0.47949", "0x0.7ac#10", Greater);
+    test("1/2", 20, Nearest, "0.47942543", "0x0.7abba0#20", Less);
+    test(
+        "1/2",
+        53,
+        Down,
+        "0.47942553860420295",
+        "0x0.7abba1d12c17bc#53",
+        Less,
+    );
+    test(
+        "1/2",
+        53,
+        Up,
+        "0.47942553860420301",
+        "0x0.7abba1d12c17c0#53",
+        Greater,
+    );
+    test(
+        "1/2",
+        53,
+        Floor,
+        "0.47942553860420295",
+        "0x0.7abba1d12c17bc#53",
+        Less,
+    );
+    test(
+        "1/2",
+        53,
+        Ceiling,
+        "0.47942553860420301",
+        "0x0.7abba1d12c17c0#53",
+        Greater,
+    );
+    test(
+        "1/2",
+        53,
+        Nearest,
+        "0.47942553860420301",
+        "0x0.7abba1d12c17c0#53",
+        Greater,
+    );
+    test(
+        "1/2",
+        100,
+        Nearest,
+        "0.47942553860420300027328793521567",
+        "0x0.7abba1d12c17bfa1d92f0d93f8#100",
+        Greater,
+    );
+    test("1/3", 1, Down, "0.25", "0x0.4#1", Less);
+    test("1/3", 1, Up, "0.50", "0x0.8#1", Greater);
+    test("1/3", 1, Floor, "0.25", "0x0.4#1", Less);
+    test("1/3", 1, Ceiling, "0.50", "0x0.8#1", Greater);
+    test("1/3", 1, Nearest, "0.25", "0x0.4#1", Less);
+    test("1/3", 5, Nearest, "0.328", "0x0.54#5", Greater);
+    test("1/3", 10, Down, "0.32715", "0x0.53c#10", Less);
+    test("1/3", 10, Up, "0.32764", "0x0.53e#10", Greater);
+    test("1/3", 10, Floor, "0.32715", "0x0.53c#10", Less);
+    test("1/3", 10, Ceiling, "0.32764", "0x0.53e#10", Greater);
+    test("1/3", 10, Nearest, "0.32715", "0x0.53c#10", Less);
+    test("1/3", 20, Nearest, "0.32719469", "0x0.53c308#20", Less);
+    test(
+        "1/3",
+        53,
+        Down,
+        "0.32719469679615221",
+        "0x0.53c3081a2a0318#53",
+        Less,
+    );
+    test(
+        "1/3",
+        53,
+        Up,
+        "0.32719469679615226",
+        "0x0.53c3081a2a031c#53",
+        Greater,
+    );
+    test(
+        "1/3",
+        53,
+        Floor,
+        "0.32719469679615221",
+        "0x0.53c3081a2a0318#53",
+        Less,
+    );
+    test(
+        "1/3",
+        53,
+        Ceiling,
+        "0.32719469679615226",
+        "0x0.53c3081a2a031c#53",
+        Greater,
+    );
+    test(
+        "1/3",
+        53,
+        Nearest,
+        "0.32719469679615226",
+        "0x0.53c3081a2a031c#53",
+        Greater,
+    );
+    test(
+        "1/3",
+        100,
+        Nearest,
+        "0.32719469679615224417334408526753",
+        "0x0.53c3081a2a031ab144c484c790#100",
+        Less,
+    );
+    test("-1/3", 1, Down, "-0.25", "-0x0.4#1", Greater);
+    test("-1/3", 1, Up, "-0.50", "-0x0.8#1", Less);
+    test("-1/3", 1, Floor, "-0.50", "-0x0.8#1", Less);
+    test("-1/3", 1, Ceiling, "-0.25", "-0x0.4#1", Greater);
+    test("-1/3", 1, Nearest, "-0.25", "-0x0.4#1", Greater);
+    test("-1/3", 5, Nearest, "-0.328", "-0x0.54#5", Less);
+    test("-1/3", 10, Down, "-0.32715", "-0x0.53c#10", Greater);
+    test("-1/3", 10, Up, "-0.32764", "-0x0.53e#10", Less);
+    test("-1/3", 10, Floor, "-0.32764", "-0x0.53e#10", Less);
+    test("-1/3", 10, Ceiling, "-0.32715", "-0x0.53c#10", Greater);
+    test("-1/3", 10, Nearest, "-0.32715", "-0x0.53c#10", Greater);
+    test(
+        "-1/3",
+        20,
+        Nearest,
+        "-0.32719469",
+        "-0x0.53c308#20",
+        Greater,
+    );
+    test(
+        "-1/3",
+        53,
+        Down,
+        "-0.32719469679615221",
+        "-0x0.53c3081a2a0318#53",
+        Greater,
+    );
+    test(
+        "-1/3",
+        53,
+        Up,
+        "-0.32719469679615226",
+        "-0x0.53c3081a2a031c#53",
+        Less,
+    );
+    test(
+        "-1/3",
+        53,
+        Floor,
+        "-0.32719469679615226",
+        "-0x0.53c3081a2a031c#53",
+        Less,
+    );
+    test(
+        "-1/3",
+        53,
+        Ceiling,
+        "-0.32719469679615221",
+        "-0x0.53c3081a2a0318#53",
+        Greater,
+    );
+    test(
+        "-1/3",
+        53,
+        Nearest,
+        "-0.32719469679615226",
+        "-0x0.53c3081a2a031c#53",
+        Less,
+    );
+    test(
+        "-1/3",
+        100,
+        Nearest,
+        "-0.32719469679615224417334408526753",
+        "-0x0.53c3081a2a031ab144c484c790#100",
+        Greater,
+    );
+    test("3/5", 1, Down, "0.50", "0x0.8#1", Less);
+    test("3/5", 1, Up, "1.0", "0x1.0#1", Greater);
+    test("3/5", 1, Floor, "0.50", "0x0.8#1", Less);
+    test("3/5", 1, Ceiling, "1.0", "0x1.0#1", Greater);
+    test("3/5", 1, Nearest, "0.50", "0x0.8#1", Less);
+    test("3/5", 10, Down, "0.56445", "0x0.908#10", Less);
+    test("3/5", 10, Up, "0.56543", "0x0.90c#10", Greater);
+    test("3/5", 10, Floor, "0.56445", "0x0.908#10", Less);
+    test("3/5", 10, Ceiling, "0.56543", "0x0.90c#10", Greater);
+    test("3/5", 10, Nearest, "0.56445", "0x0.908#10", Less);
+    test(
+        "3/5",
+        53,
+        Down,
+        "0.56464247339503526",
+        "0x0.908c68bd2a0ac0#53",
+        Less,
+    );
+    test(
+        "3/5",
+        53,
+        Up,
+        "0.56464247339503537",
+        "0x0.908c68bd2a0ac8#53",
+        Greater,
+    );
+    test(
+        "3/5",
+        53,
+        Floor,
+        "0.56464247339503526",
+        "0x0.908c68bd2a0ac0#53",
+        Less,
+    );
+    test(
+        "3/5",
+        53,
+        Ceiling,
+        "0.56464247339503537",
+        "0x0.908c68bd2a0ac8#53",
+        Greater,
+    );
+    test(
+        "3/5",
+        53,
+        Nearest,
+        "0.56464247339503537",
+        "0x0.908c68bd2a0ac8#53",
+        Greater,
+    );
+    test(
+        "3/5",
+        100,
+        Nearest,
+        "0.56464247339503535720094544565865",
+        "0x0.908c68bd2a0ac6fa881b0a82b#100",
+        Less,
+    );
+    test("22/7", 1, Down, "-0.00098", "-0x0.004#1", Greater);
+    test("22/7", 1, Up, "-0.0020", "-0x0.008#1", Less);
+    test("22/7", 1, Floor, "-0.0020", "-0x0.008#1", Less);
+    test("22/7", 1, Ceiling, "-0.00098", "-0x0.004#1", Greater);
+    test("22/7", 1, Nearest, "-0.00098", "-0x0.004#1", Greater);
+    test("22/7", 5, Nearest, "-0.00128", "-0x0.0054#5", Less);
+    test("22/7", 10, Down, "-0.0012627", "-0x0.0052c#10", Greater);
+    test("22/7", 10, Up, "-0.0012646", "-0x0.0052e#10", Less);
+    test("22/7", 10, Floor, "-0.0012646", "-0x0.0052e#10", Less);
+    test("22/7", 10, Ceiling, "-0.0012627", "-0x0.0052c#10", Greater);
+    test("22/7", 10, Nearest, "-0.0012646", "-0x0.0052e#10", Less);
+    test(
+        "22/7",
+        20,
+        Nearest,
+        "-0.0012644883",
+        "-0x0.0052de98#20",
+        Greater,
+    );
+    test(
+        "22/7",
+        53,
+        Down,
+        "-0.0012644889303773533",
+        "-0x0.0052de9a9a24d90c#53",
+        Greater,
+    );
+    test(
+        "22/7",
+        53,
+        Up,
+        "-0.0012644889303773535",
+        "-0x0.0052de9a9a24d910#53",
+        Less,
+    );
+    test(
+        "22/7",
+        53,
+        Floor,
+        "-0.0012644889303773535",
+        "-0x0.0052de9a9a24d910#53",
+        Less,
+    );
+    test(
+        "22/7",
+        53,
+        Ceiling,
+        "-0.0012644889303773533",
+        "-0x0.0052de9a9a24d90c#53",
+        Greater,
+    );
+    test(
+        "22/7",
+        53,
+        Nearest,
+        "-0.0012644889303773533",
+        "-0x0.0052de9a9a24d90c#53",
+        Greater,
+    );
+    test(
+        "22/7",
+        100,
+        Nearest,
+        "-0.0012644889303773534003603504756467",
+        "-0x0.0052de9a9a24d90da7cdffe30130#100",
+        Less,
+    );
+    test("-22/7", 1, Down, "0.00098", "0x0.004#1", Less);
+    test("-22/7", 1, Up, "0.0020", "0x0.008#1", Greater);
+    test("-22/7", 1, Floor, "0.00098", "0x0.004#1", Less);
+    test("-22/7", 1, Ceiling, "0.0020", "0x0.008#1", Greater);
+    test("-22/7", 1, Nearest, "0.00098", "0x0.004#1", Less);
+    test("-22/7", 5, Nearest, "0.00128", "0x0.0054#5", Greater);
+    test("-22/7", 10, Down, "0.0012627", "0x0.0052c#10", Less);
+    test("-22/7", 10, Up, "0.0012646", "0x0.0052e#10", Greater);
+    test("-22/7", 10, Floor, "0.0012627", "0x0.0052c#10", Less);
+    test("-22/7", 10, Ceiling, "0.0012646", "0x0.0052e#10", Greater);
+    test("-22/7", 10, Nearest, "0.0012646", "0x0.0052e#10", Greater);
+    test(
+        "-22/7",
+        20,
+        Nearest,
+        "0.0012644883",
+        "0x0.0052de98#20",
+        Less,
+    );
+    test(
+        "-22/7",
+        53,
+        Down,
+        "0.0012644889303773533",
+        "0x0.0052de9a9a24d90c#53",
+        Less,
+    );
+    test(
+        "-22/7",
+        53,
+        Up,
+        "0.0012644889303773535",
+        "0x0.0052de9a9a24d910#53",
+        Greater,
+    );
+    test(
+        "-22/7",
+        53,
+        Floor,
+        "0.0012644889303773533",
+        "0x0.0052de9a9a24d90c#53",
+        Less,
+    );
+    test(
+        "-22/7",
+        53,
+        Ceiling,
+        "0.0012644889303773535",
+        "0x0.0052de9a9a24d910#53",
+        Greater,
+    );
+    test(
+        "-22/7",
+        53,
+        Nearest,
+        "0.0012644889303773533",
+        "0x0.0052de9a9a24d90c#53",
+        Less,
+    );
+    test(
+        "-22/7",
+        100,
+        Nearest,
+        "0.0012644889303773534003603504756467",
+        "0x0.0052de9a9a24d90da7cdffe30130#100",
+        Greater,
+    );
+    test("355/113", 1, Down, "-2.4e-7", "-0x4.0E-6#1", Greater);
+    test("355/113", 1, Up, "-4.8e-7", "-0x8.0E-6#1", Less);
+    test("355/113", 1, Floor, "-4.8e-7", "-0x8.0E-6#1", Less);
+    test("355/113", 1, Ceiling, "-2.4e-7", "-0x4.0E-6#1", Greater);
+    test("355/113", 1, Nearest, "-2.4e-7", "-0x4.0E-6#1", Greater);
+    test("355/113", 5, Nearest, "-2.68e-7", "-0x4.8E-6#5", Less);
+    test("355/113", 10, Down, "-2.6636e-7", "-0x4.78E-6#10", Greater);
+    test("355/113", 10, Up, "-2.6682e-7", "-0x4.7aE-6#10", Less);
+    test("355/113", 10, Floor, "-2.6682e-7", "-0x4.7aE-6#10", Less);
+    test(
+        "355/113",
+        10,
+        Ceiling,
+        "-2.6636e-7",
+        "-0x4.78E-6#10",
+        Greater,
+    );
+    test("355/113", 10, Nearest, "-2.6682e-7", "-0x4.7aE-6#10", Less);
+    test(
+        "355/113",
+        20,
+        Nearest,
+        "-2.6676435e-7",
+        "-0x4.79be8E-6#20",
+        Less,
+    );
+    test(
+        "355/113",
+        53,
+        Down,
+        "-2.6676418906241912e-7",
+        "-0x4.79be53e7511d4E-6#53",
+        Greater,
+    );
+    test(
+        "355/113",
+        53,
+        Up,
+        "-2.6676418906241917e-7",
+        "-0x4.79be53e7511d8E-6#53",
+        Less,
+    );
+    test(
+        "355/113",
+        53,
+        Floor,
+        "-2.6676418906241917e-7",
+        "-0x4.79be53e7511d8E-6#53",
+        Less,
+    );
+    test(
+        "355/113",
+        53,
+        Ceiling,
+        "-2.6676418906241912e-7",
+        "-0x4.79be53e7511d4E-6#53",
+        Greater,
+    );
+    test(
+        "355/113",
+        53,
+        Nearest,
+        "-2.6676418906241917e-7",
+        "-0x4.79be53e7511d8E-6#53",
+        Less,
+    );
+    test(
+        "355/113",
+        100,
+        Nearest,
+        "-2.6676418906241914840637452887346e-7",
+        "-0x4.79be53e7511d64791a3045970E-6#100",
+        Greater,
+    );
+    test("3", 1, Down, "0.12", "0x0.2#1", Less);
+    test("3", 1, Up, "0.25", "0x0.4#1", Greater);
+    test("3", 1, Floor, "0.12", "0x0.2#1", Less);
+    test("3", 1, Ceiling, "0.25", "0x0.4#1", Greater);
+    test("3", 1, Nearest, "0.12", "0x0.2#1", Less);
+    test("3", 5, Nearest, "0.141", "0x0.24#5", Less);
+    test("3", 10, Down, "0.14111", "0x0.242#10", Less);
+    test("3", 10, Up, "0.14136", "0x0.243#10", Greater);
+    test("3", 10, Floor, "0.14111", "0x0.242#10", Less);
+    test("3", 10, Ceiling, "0.14136", "0x0.243#10", Greater);
+    test("3", 10, Nearest, "0.14111", "0x0.242#10", Less);
+    test("3", 20, Nearest, "0.14111996", "0x0.242070#20", Less);
+    test(
+        "3",
+        53,
+        Down,
+        "0.14112000805986721",
+        "0x0.242070db6daab6#53",
+        Less,
+    );
+    test(
+        "3",
+        53,
+        Up,
+        "0.14112000805986724",
+        "0x0.242070db6daab8#53",
+        Greater,
+    );
+    test(
+        "3",
+        53,
+        Floor,
+        "0.14112000805986721",
+        "0x0.242070db6daab6#53",
+        Less,
+    );
+    test(
+        "3",
+        53,
+        Ceiling,
+        "0.14112000805986724",
+        "0x0.242070db6daab8#53",
+        Greater,
+    );
+    test(
+        "3",
+        53,
+        Nearest,
+        "0.14112000805986721",
+        "0x0.242070db6daab6#53",
+        Less,
+    );
+    test(
+        "3",
+        100,
+        Nearest,
+        "0.14112000805986722210074480280816",
+        "0x0.242070db6daab69e3902e84684#100",
+        Greater,
+    );
+    test("100", 1, Down, "-0.50", "-0x0.8#1", Greater);
+    test("100", 1, Up, "-1.0", "-0x1.0#1", Less);
+    test("100", 1, Floor, "-1.0", "-0x1.0#1", Less);
+    test("100", 1, Ceiling, "-0.50", "-0x0.8#1", Greater);
+    test("100", 1, Nearest, "-0.50", "-0x0.8#1", Greater);
+    test("100", 5, Nearest, "-0.500", "-0x0.80#5", Greater);
+    test("100", 10, Down, "-0.50586", "-0x0.818#10", Greater);
+    test("100", 10, Up, "-0.50684", "-0x0.81c#10", Less);
+    test("100", 10, Floor, "-0.50684", "-0x0.81c#10", Less);
+    test("100", 10, Ceiling, "-0.50586", "-0x0.818#10", Greater);
+    test("100", 10, Nearest, "-0.50684", "-0x0.81c#10", Less);
+    test("100", 20, Nearest, "-0.50636578", "-0x0.81a13#20", Less);
+    test(
+        "100",
+        53,
+        Down,
+        "-0.50636564110975879",
+        "-0x0.81a12dbc626dc0#53",
+        Greater,
+    );
+    test(
+        "100",
+        53,
+        Up,
+        "-0.50636564110975890",
+        "-0x0.81a12dbc626dc8#53",
+        Less,
+    );
+    test(
+        "100",
+        53,
+        Floor,
+        "-0.50636564110975890",
+        "-0x0.81a12dbc626dc8#53",
+        Less,
+    );
+    test(
+        "100",
+        53,
+        Ceiling,
+        "-0.50636564110975879",
+        "-0x0.81a12dbc626dc0#53",
+        Greater,
+    );
+    test(
+        "100",
+        53,
+        Nearest,
+        "-0.50636564110975879",
+        "-0x0.81a12dbc626dc0#53",
+        Greater,
+    );
+    test(
+        "100",
+        100,
+        Nearest,
+        "-0.50636564110975879365655761045969",
+        "-0x0.81a12dbc626dc03847b0aae84#100",
+        Greater,
+    );
+    test("1000000", 1, Down, "-0.25", "-0x0.4#1", Greater);
+    test("1000000", 1, Up, "-0.50", "-0x0.8#1", Less);
+    test("1000000", 1, Floor, "-0.50", "-0x0.8#1", Less);
+    test("1000000", 1, Ceiling, "-0.25", "-0x0.4#1", Greater);
+    test("1000000", 1, Nearest, "-0.25", "-0x0.4#1", Greater);
+    test("1000000", 5, Nearest, "-0.344", "-0x0.58#5", Greater);
+    test("1000000", 10, Down, "-0.34961", "-0x0.598#10", Greater);
+    test("1000000", 10, Up, "-0.35010", "-0x0.59a#10", Less);
+    test("1000000", 10, Floor, "-0.35010", "-0x0.59a#10", Less);
+    test("1000000", 10, Ceiling, "-0.34961", "-0x0.598#10", Greater);
+    test("1000000", 10, Nearest, "-0.35010", "-0x0.59a#10", Less);
+    test(
+        "1000000",
+        20,
+        Nearest,
+        "-0.34999371",
+        "-0x0.599930#20",
+        Less,
+    );
+    test(
+        "1000000",
+        53,
+        Down,
+        "-0.34999350217129294",
+        "-0x0.59992c95a3619c#53",
+        Greater,
+    );
+    test(
+        "1000000",
+        53,
+        Up,
+        "-0.34999350217129299",
+        "-0x0.59992c95a361a0#53",
+        Less,
+    );
+    test(
+        "1000000",
+        53,
+        Floor,
+        "-0.34999350217129299",
+        "-0x0.59992c95a361a0#53",
+        Less,
+    );
+    test(
+        "1000000",
+        53,
+        Ceiling,
+        "-0.34999350217129294",
+        "-0x0.59992c95a3619c#53",
+        Greater,
+    );
+    test(
+        "1000000",
+        53,
+        Nearest,
+        "-0.34999350217129294",
+        "-0x0.59992c95a3619c#53",
+        Greater,
+    );
+    test(
+        "1000000",
+        100,
+        Nearest,
+        "-0.34999350217129295211765248678059",
+        "-0x0.59992c95a3619d264732d26e98#100",
+        Greater,
+    );
+    test("1/1000000", 1, Down, "9.5e-7", "0x0.00001#1", Less);
+    test("1/1000000", 1, Up, "1.9e-6", "0x0.00002#1", Greater);
+    test("1/1000000", 1, Floor, "9.5e-7", "0x0.00001#1", Less);
+    test("1/1000000", 1, Ceiling, "1.9e-6", "0x0.00002#1", Greater);
+    test("1/1000000", 1, Nearest, "9.5e-7", "0x0.00001#1", Less);
+    test("1/1000000", 5, Nearest, "1.01e-6", "0x0.000011#5", Greater);
+    test("1/1000000", 10, Down, "9.9838e-7", "0x0.000010c0#10", Less);
+    test("1/1000000", 10, Up, "1.0002e-6", "0x0.000010c8#10", Greater);
+    test("1/1000000", 10, Floor, "9.9838e-7", "0x0.000010c0#10", Less);
+    test(
+        "1/1000000",
+        10,
+        Ceiling,
+        "1.0002e-6",
+        "0x0.000010c8#10",
+        Greater,
+    );
+    test(
+        "1/1000000",
+        10,
+        Nearest,
+        "1.0002e-6",
+        "0x0.000010c8#10",
+        Greater,
+    );
+    test(
+        "1/1000000",
+        20,
+        Nearest,
+        "1.0000003e-6",
+        "0x0.000010c6f8#20",
+        Greater,
+    );
+    test(
+        "1/1000000",
+        53,
+        Down,
+        "9.9999999999983330e-7",
+        "0x0.000010c6f7a0b5ea7a#53",
+        Less,
+    );
+    test(
+        "1/1000000",
+        53,
+        Up,
+        "9.9999999999983351e-7",
+        "0x0.000010c6f7a0b5ea7b#53",
+        Greater,
+    );
+    test(
+        "1/1000000",
+        53,
+        Floor,
+        "9.9999999999983330e-7",
+        "0x0.000010c6f7a0b5ea7a#53",
+        Less,
+    );
+    test(
+        "1/1000000",
+        53,
+        Ceiling,
+        "9.9999999999983351e-7",
+        "0x0.000010c6f7a0b5ea7b#53",
+        Greater,
+    );
+    test(
+        "1/1000000",
+        53,
+        Nearest,
+        "9.9999999999983330e-7",
+        "0x0.000010c6f7a0b5ea7a#53",
+        Less,
+    );
+    test(
+        "1/1000000",
+        100,
+        Nearest,
+        "9.9999999999983333333333334166635e-7",
+        "0x0.000010c6f7a0b5ea7a2711cf92d7e2#100",
+        Less,
+    );
+    test("-1/1000000", 1, Down, "-9.5e-7", "-0x0.00001#1", Greater);
+    test("-1/1000000", 1, Up, "-1.9e-6", "-0x0.00002#1", Less);
+    test("-1/1000000", 1, Floor, "-1.9e-6", "-0x0.00002#1", Less);
+    test("-1/1000000", 1, Ceiling, "-9.5e-7", "-0x0.00001#1", Greater);
+    test("-1/1000000", 1, Nearest, "-9.5e-7", "-0x0.00001#1", Greater);
+    test("-1/1000000", 5, Nearest, "-1.01e-6", "-0x0.000011#5", Less);
+    test(
+        "-1/1000000",
+        10,
+        Down,
+        "-9.9838e-7",
+        "-0x0.000010c0#10",
+        Greater,
+    );
+    test("-1/1000000", 10, Up, "-1.0002e-6", "-0x0.000010c8#10", Less);
+    test(
+        "-1/1000000",
+        10,
+        Floor,
+        "-1.0002e-6",
+        "-0x0.000010c8#10",
+        Less,
+    );
+    test(
+        "-1/1000000",
+        10,
+        Ceiling,
+        "-9.9838e-7",
+        "-0x0.000010c0#10",
+        Greater,
+    );
+    test(
+        "-1/1000000",
+        10,
+        Nearest,
+        "-1.0002e-6",
+        "-0x0.000010c8#10",
+        Less,
+    );
+    test(
+        "-1/1000000",
+        20,
+        Nearest,
+        "-1.0000003e-6",
+        "-0x0.000010c6f8#20",
+        Less,
+    );
+    test(
+        "-1/1000000",
+        53,
+        Down,
+        "-9.9999999999983330e-7",
+        "-0x0.000010c6f7a0b5ea7a#53",
+        Greater,
+    );
+    test(
+        "-1/1000000",
+        53,
+        Up,
+        "-9.9999999999983351e-7",
+        "-0x0.000010c6f7a0b5ea7b#53",
+        Less,
+    );
+    test(
+        "-1/1000000",
+        53,
+        Floor,
+        "-9.9999999999983351e-7",
+        "-0x0.000010c6f7a0b5ea7b#53",
+        Less,
+    );
+    test(
+        "-1/1000000",
+        53,
+        Ceiling,
+        "-9.9999999999983330e-7",
+        "-0x0.000010c6f7a0b5ea7a#53",
+        Greater,
+    );
+    test(
+        "-1/1000000",
+        53,
+        Nearest,
+        "-9.9999999999983330e-7",
+        "-0x0.000010c6f7a0b5ea7a#53",
+        Greater,
+    );
+    test(
+        "-1/1000000",
+        100,
+        Nearest,
+        "-9.9999999999983333333333334166635e-7",
+        "-0x0.000010c6f7a0b5ea7a2711cf92d7e2#100",
+        Greater,
+    );
+    test(
+        "1/1000000000000000000000000",
+        1,
+        Down,
+        "8.3e-25",
+        "0x1.0E-20#1",
+        Less,
+    );
+    test(
+        "1/1000000000000000000000000",
+        1,
+        Up,
+        "1.7e-24",
+        "0x2.0E-20#1",
+        Greater,
+    );
+    test(
+        "1/1000000000000000000000000",
+        1,
+        Floor,
+        "8.3e-25",
+        "0x1.0E-20#1",
+        Less,
+    );
+    test(
+        "1/1000000000000000000000000",
+        1,
+        Ceiling,
+        "1.7e-24",
+        "0x2.0E-20#1",
+        Greater,
+    );
+    test(
+        "1/1000000000000000000000000",
+        1,
+        Nearest,
+        "8.3e-25",
+        "0x1.0E-20#1",
+        Less,
+    );
+    test(
+        "1/1000000000000000000000000",
+        5,
+        Nearest,
+        "9.82e-25",
+        "0x1.3E-20#5",
+        Less,
+    );
+    test(
+        "1/1000000000000000000000000",
+        10,
+        Down,
+        "9.9843e-25",
+        "0x1.350E-20#10",
+        Less,
+    );
+    test(
+        "1/1000000000000000000000000",
+        10,
+        Up,
+        "1.0000e-24",
+        "0x1.358E-20#10",
+        Greater,
+    );
+    test(
+        "1/1000000000000000000000000",
+        10,
+        Floor,
+        "9.9843e-25",
+        "0x1.350E-20#10",
+        Less,
+    );
+    test(
+        "1/1000000000000000000000000",
+        10,
+        Ceiling,
+        "1.0000e-24",
+        "0x1.358E-20#10",
+        Greater,
+    );
+    test(
+        "1/1000000000000000000000000",
+        10,
+        Nearest,
+        "1.0000e-24",
+        "0x1.358E-20#10",
+        Greater,
+    );
+    test(
+        "1/1000000000000000000000000",
+        20,
+        Nearest,
+        "9.9999953e-25",
+        "0x1.357c2E-20#20",
+        Less,
+    );
+    test(
+        "1/1000000000000000000000000",
+        53,
+        Down,
+        "9.9999999999999992e-25",
+        "0x1.357c299a88ea7E-20#53",
+        Less,
+    );
+    test(
+        "1/1000000000000000000000000",
+        53,
+        Up,
+        "1.0000000000000001e-24",
+        "0x1.357c299a88ea8E-20#53",
+        Greater,
+    );
+    test(
+        "1/1000000000000000000000000",
+        53,
+        Floor,
+        "9.9999999999999992e-25",
+        "0x1.357c299a88ea7E-20#53",
+        Less,
+    );
+    test(
+        "1/1000000000000000000000000",
+        53,
+        Ceiling,
+        "1.0000000000000001e-24",
+        "0x1.357c299a88ea8E-20#53",
+        Greater,
+    );
+    test(
+        "1/1000000000000000000000000",
+        53,
+        Nearest,
+        "9.9999999999999992e-25",
+        "0x1.357c299a88ea7E-20#53",
+        Less,
+    );
+    test(
+        "1/1000000000000000000000000",
+        100,
+        Nearest,
+        "9.9999999999999999999999999999980e-25",
+        "0x1.357c299a88ea76a58924d52ceE-20#100",
+        Less,
+    );
+    test(
+        "124451306656115542615260972311/79228162514264337593543950336",
+        1,
+        Down,
+        "0.50",
+        "0x0.8#1",
+        Less,
+    );
+    test(
+        "124451306656115542615260972311/79228162514264337593543950336",
+        1,
+        Up,
+        "1.0",
+        "0x1.0#1",
+        Greater,
+    );
+    test(
+        "124451306656115542615260972311/79228162514264337593543950336",
+        1,
+        Floor,
+        "0.50",
+        "0x0.8#1",
+        Less,
+    );
+    test(
+        "124451306656115542615260972311/79228162514264337593543950336",
+        1,
+        Ceiling,
+        "1.0",
+        "0x1.0#1",
+        Greater,
+    );
+    test(
+        "124451306656115542615260972311/79228162514264337593543950336",
+        1,
+        Nearest,
+        "1.0",
+        "0x1.0#1",
+        Greater,
+    );
+    test(
+        "124451306656115542615260972311/79228162514264337593543950336",
+        5,
+        Nearest,
+        "1.00",
+        "0x1.0#5",
+        Greater,
+    );
+    test(
+        "124451306656115542615260972311/79228162514264337593543950336",
+        10,
+        Down,
+        "0.99902",
+        "0x0.ffc#10",
+        Less,
+    );
+    test(
+        "124451306656115542615260972311/79228162514264337593543950336",
+        10,
+        Up,
+        "1.0000",
+        "0x1.000#10",
+        Greater,
+    );
+    test(
+        "124451306656115542615260972311/79228162514264337593543950336",
+        10,
+        Floor,
+        "0.99902",
+        "0x0.ffc#10",
+        Less,
+    );
+    test(
+        "124451306656115542615260972311/79228162514264337593543950336",
+        10,
+        Ceiling,
+        "1.0000",
+        "0x1.000#10",
+        Greater,
+    );
+    test(
+        "124451306656115542615260972311/79228162514264337593543950336",
+        10,
+        Nearest,
+        "1.0000",
+        "0x1.000#10",
+        Greater,
+    );
+    test(
+        "124451306656115542615260972311/79228162514264337593543950336",
+        20,
+        Nearest,
+        "1.0000000",
+        "0x1.00000#20",
+        Greater,
+    );
+    test(
+        "124451306656115542615260972311/79228162514264337593543950336",
+        53,
+        Down,
+        "0.99999999999999989",
+        "0x0.fffffffffffff8#53",
+        Less,
+    );
+    test(
+        "124451306656115542615260972311/79228162514264337593543950336",
+        53,
+        Up,
+        "1.0000000000000000",
+        "0x1.0000000000000#53",
+        Greater,
+    );
+    test(
+        "124451306656115542615260972311/79228162514264337593543950336",
+        53,
+        Floor,
+        "0.99999999999999989",
+        "0x0.fffffffffffff8#53",
+        Less,
+    );
+    test(
+        "124451306656115542615260972311/79228162514264337593543950336",
+        53,
+        Ceiling,
+        "1.0000000000000000",
+        "0x1.0000000000000#53",
+        Greater,
+    );
+    test(
+        "124451306656115542615260972311/79228162514264337593543950336",
+        53,
+        Nearest,
+        "1.0000000000000000",
+        "0x1.0000000000000#53",
+        Greater,
+    );
+    test(
+        "124451306656115542615260972311/79228162514264337593543950336",
+        100,
+        Nearest,
+        "1.0000000000000000000000000000000",
+        "0x1.0000000000000000000000000#100",
+        Greater,
+    );
+    test(
+        "373353919968346627845782916933/79228162514264337593543950336",
+        1,
+        Down,
+        "-0.50",
+        "-0x0.8#1",
+        Greater,
+    );
+    test(
+        "373353919968346627845782916933/79228162514264337593543950336",
+        1,
+        Up,
+        "-1.0",
+        "-0x1.0#1",
+        Less,
+    );
+    test(
+        "373353919968346627845782916933/79228162514264337593543950336",
+        1,
+        Floor,
+        "-1.0",
+        "-0x1.0#1",
+        Less,
+    );
+    test(
+        "373353919968346627845782916933/79228162514264337593543950336",
+        1,
+        Ceiling,
+        "-0.50",
+        "-0x0.8#1",
+        Greater,
+    );
+    test(
+        "373353919968346627845782916933/79228162514264337593543950336",
+        1,
+        Nearest,
+        "-1.0",
+        "-0x1.0#1",
+        Less,
+    );
+    test(
+        "373353919968346627845782916933/79228162514264337593543950336",
+        5,
+        Nearest,
+        "-1.00",
+        "-0x1.0#5",
+        Less,
+    );
+    test(
+        "373353919968346627845782916933/79228162514264337593543950336",
+        10,
+        Down,
+        "-0.99902",
+        "-0x0.ffc#10",
+        Greater,
+    );
+    test(
+        "373353919968346627845782916933/79228162514264337593543950336",
+        10,
+        Up,
+        "-1.0000",
+        "-0x1.000#10",
+        Less,
+    );
+    test(
+        "373353919968346627845782916933/79228162514264337593543950336",
+        10,
+        Floor,
+        "-1.0000",
+        "-0x1.000#10",
+        Less,
+    );
+    test(
+        "373353919968346627845782916933/79228162514264337593543950336",
+        10,
+        Ceiling,
+        "-0.99902",
+        "-0x0.ffc#10",
+        Greater,
+    );
+    test(
+        "373353919968346627845782916933/79228162514264337593543950336",
+        10,
+        Nearest,
+        "-1.0000",
+        "-0x1.000#10",
+        Less,
+    );
+    test(
+        "373353919968346627845782916933/79228162514264337593543950336",
+        20,
+        Nearest,
+        "-1.0000000",
+        "-0x1.00000#20",
+        Less,
+    );
+    test(
+        "373353919968346627845782916933/79228162514264337593543950336",
+        53,
+        Down,
+        "-0.99999999999999989",
+        "-0x0.fffffffffffff8#53",
+        Greater,
+    );
+    test(
+        "373353919968346627845782916933/79228162514264337593543950336",
+        53,
+        Up,
+        "-1.0000000000000000",
+        "-0x1.0000000000000#53",
+        Less,
+    );
+    test(
+        "373353919968346627845782916933/79228162514264337593543950336",
+        53,
+        Floor,
+        "-1.0000000000000000",
+        "-0x1.0000000000000#53",
+        Less,
+    );
+    test(
+        "373353919968346627845782916933/79228162514264337593543950336",
+        53,
+        Ceiling,
+        "-0.99999999999999989",
+        "-0x0.fffffffffffff8#53",
+        Greater,
+    );
+    test(
+        "373353919968346627845782916933/79228162514264337593543950336",
+        53,
+        Nearest,
+        "-1.0000000000000000",
+        "-0x1.0000000000000#53",
+        Less,
+    );
+    test(
+        "373353919968346627845782916933/79228162514264337593543950336",
+        100,
+        Nearest,
+        "-1.0000000000000000000000000000000",
+        "-0x1.0000000000000000000000000#100",
+        Less,
+    );
+    test(
+        "124451306656115542615260972311/39614081257132168796771975168",
+        1,
+        Down,
+        "9.9e-32",
+        "0x2.0E-26#1",
+        Less,
+    );
+    test(
+        "124451306656115542615260972311/39614081257132168796771975168",
+        1,
+        Up,
+        "2.0e-31",
+        "0x4.0E-26#1",
+        Greater,
+    );
+    test(
+        "124451306656115542615260972311/39614081257132168796771975168",
+        1,
+        Floor,
+        "9.9e-32",
+        "0x2.0E-26#1",
+        Less,
+    );
+    test(
+        "124451306656115542615260972311/39614081257132168796771975168",
+        1,
+        Ceiling,
+        "2.0e-31",
+        "0x4.0E-26#1",
+        Greater,
+    );
+    test(
+        "124451306656115542615260972311/39614081257132168796771975168",
+        1,
+        Nearest,
+        "2.0e-31",
+        "0x4.0E-26#1",
+        Greater,
+    );
+    test(
+        "124451306656115542615260972311/39614081257132168796771975168",
+        5,
+        Nearest,
+        "1.73e-31",
+        "0x3.8E-26#5",
+        Greater,
+    );
+    test(
+        "124451306656115542615260972311/39614081257132168796771975168",
+        10,
+        Down,
+        "1.6948e-31",
+        "0x3.70E-26#10",
+        Less,
+    );
+    test(
+        "124451306656115542615260972311/39614081257132168796771975168",
+        10,
+        Up,
+        "1.6967e-31",
+        "0x3.71E-26#10",
+        Greater,
+    );
+    test(
+        "124451306656115542615260972311/39614081257132168796771975168",
+        10,
+        Floor,
+        "1.6948e-31",
+        "0x3.70E-26#10",
+        Less,
+    );
+    test(
+        "124451306656115542615260972311/39614081257132168796771975168",
+        10,
+        Ceiling,
+        "1.6967e-31",
+        "0x3.71E-26#10",
+        Greater,
+    );
+    test(
+        "124451306656115542615260972311/39614081257132168796771975168",
+        10,
+        Nearest,
+        "1.6948e-31",
+        "0x3.70E-26#10",
+        Less,
+    );
+    test(
+        "124451306656115542615260972311/39614081257132168796771975168",
+        20,
+        Nearest,
+        "1.6956854e-31",
+        "0x3.70734E-26#20",
+        Less,
+    );
+    test(
+        "124451306656115542615260972311/39614081257132168796771975168",
+        53,
+        Down,
+        "1.6956855320737799e-31",
+        "0x3.707344a409382E-26#53",
+        Less,
+    );
+    test(
+        "124451306656115542615260972311/39614081257132168796771975168",
+        53,
+        Up,
+        "1.6956855320737801e-31",
+        "0x3.707344a409384E-26#53",
+        Greater,
+    );
+    test(
+        "124451306656115542615260972311/39614081257132168796771975168",
+        53,
+        Floor,
+        "1.6956855320737799e-31",
+        "0x3.707344a409382E-26#53",
+        Less,
+    );
+    test(
+        "124451306656115542615260972311/39614081257132168796771975168",
+        53,
+        Ceiling,
+        "1.6956855320737801e-31",
+        "0x3.707344a409384E-26#53",
+        Greater,
+    );
+    test(
+        "124451306656115542615260972311/39614081257132168796771975168",
+        53,
+        Nearest,
+        "1.6956855320737799e-31",
+        "0x3.707344a409382E-26#53",
+        Less,
+    );
+    test(
+        "124451306656115542615260972311/39614081257132168796771975168",
+        100,
+        Nearest,
+        "1.6956855320737799287917402938778e-31",
+        "0x3.707344a4093822299f31d0084E-26#100",
+        Greater,
+    );
+    test(
+        "-124451306656115542615260972311/79228162514264337593543950336",
+        1,
+        Down,
+        "-0.50",
+        "-0x0.8#1",
+        Greater,
+    );
+    test(
+        "-124451306656115542615260972311/79228162514264337593543950336",
+        1,
+        Up,
+        "-1.0",
+        "-0x1.0#1",
+        Less,
+    );
+    test(
+        "-124451306656115542615260972311/79228162514264337593543950336",
+        1,
+        Floor,
+        "-1.0",
+        "-0x1.0#1",
+        Less,
+    );
+    test(
+        "-124451306656115542615260972311/79228162514264337593543950336",
+        1,
+        Ceiling,
+        "-0.50",
+        "-0x0.8#1",
+        Greater,
+    );
+    test(
+        "-124451306656115542615260972311/79228162514264337593543950336",
+        1,
+        Nearest,
+        "-1.0",
+        "-0x1.0#1",
+        Less,
+    );
+    test(
+        "-124451306656115542615260972311/79228162514264337593543950336",
+        5,
+        Nearest,
+        "-1.00",
+        "-0x1.0#5",
+        Less,
+    );
+    test(
+        "-124451306656115542615260972311/79228162514264337593543950336",
+        10,
+        Down,
+        "-0.99902",
+        "-0x0.ffc#10",
+        Greater,
+    );
+    test(
+        "-124451306656115542615260972311/79228162514264337593543950336",
+        10,
+        Up,
+        "-1.0000",
+        "-0x1.000#10",
+        Less,
+    );
+    test(
+        "-124451306656115542615260972311/79228162514264337593543950336",
+        10,
+        Floor,
+        "-1.0000",
+        "-0x1.000#10",
+        Less,
+    );
+    test(
+        "-124451306656115542615260972311/79228162514264337593543950336",
+        10,
+        Ceiling,
+        "-0.99902",
+        "-0x0.ffc#10",
+        Greater,
+    );
+    test(
+        "-124451306656115542615260972311/79228162514264337593543950336",
+        10,
+        Nearest,
+        "-1.0000",
+        "-0x1.000#10",
+        Less,
+    );
+    test(
+        "-124451306656115542615260972311/79228162514264337593543950336",
+        20,
+        Nearest,
+        "-1.0000000",
+        "-0x1.00000#20",
+        Less,
+    );
+    test(
+        "-124451306656115542615260972311/79228162514264337593543950336",
+        53,
+        Down,
+        "-0.99999999999999989",
+        "-0x0.fffffffffffff8#53",
+        Greater,
+    );
+    test(
+        "-124451306656115542615260972311/79228162514264337593543950336",
+        53,
+        Up,
+        "-1.0000000000000000",
+        "-0x1.0000000000000#53",
+        Less,
+    );
+    test(
+        "-124451306656115542615260972311/79228162514264337593543950336",
+        53,
+        Floor,
+        "-1.0000000000000000",
+        "-0x1.0000000000000#53",
+        Less,
+    );
+    test(
+        "-124451306656115542615260972311/79228162514264337593543950336",
+        53,
+        Ceiling,
+        "-0.99999999999999989",
+        "-0x0.fffffffffffff8#53",
+        Greater,
+    );
+    test(
+        "-124451306656115542615260972311/79228162514264337593543950336",
+        53,
+        Nearest,
+        "-1.0000000000000000",
+        "-0x1.0000000000000#53",
+        Less,
+    );
+    test(
+        "-124451306656115542615260972311/79228162514264337593543950336",
+        100,
+        Nearest,
+        "-1.0000000000000000000000000000000",
+        "-0x1.0000000000000000000000000#100",
+        Less,
+    );
+    test(
+        "1267650600228229401496703205376",
+        1,
+        Down,
+        "-0.50",
+        "-0x0.8#1",
+        Greater,
+    );
+    test(
+        "1267650600228229401496703205376",
+        1,
+        Up,
+        "-1.0",
+        "-0x1.0#1",
+        Less,
+    );
+    test(
+        "1267650600228229401496703205376",
+        1,
+        Floor,
+        "-1.0",
+        "-0x1.0#1",
+        Less,
+    );
+    test(
+        "1267650600228229401496703205376",
+        1,
+        Ceiling,
+        "-0.50",
+        "-0x0.8#1",
+        Greater,
+    );
+    test(
+        "1267650600228229401496703205376",
+        1,
+        Nearest,
+        "-1.0",
+        "-0x1.0#1",
+        Less,
+    );
+    test(
+        "1267650600228229401496703205376",
+        5,
+        Nearest,
+        "-0.875",
+        "-0x0.e0#5",
+        Less,
+    );
+    test(
+        "1267650600228229401496703205376",
+        10,
+        Down,
+        "-0.87207",
+        "-0x0.df4#10",
+        Greater,
+    );
+    test(
+        "1267650600228229401496703205376",
+        10,
+        Up,
+        "-0.87305",
+        "-0x0.df8#10",
+        Less,
+    );
+    test(
+        "1267650600228229401496703205376",
+        10,
+        Floor,
+        "-0.87305",
+        "-0x0.df8#10",
+        Less,
+    );
+    test(
+        "1267650600228229401496703205376",
+        10,
+        Ceiling,
+        "-0.87207",
+        "-0x0.df4#10",
+        Greater,
+    );
+    test(
+        "1267650600228229401496703205376",
+        10,
+        Nearest,
+        "-0.87207",
+        "-0x0.df4#10",
+        Greater,
+    );
+    test(
+        "1267650600228229401496703205376",
+        20,
+        Nearest,
+        "-0.87218380",
+        "-0x0.df477#20",
+        Less,
+    );
+    test(
+        "1267650600228229401496703205376",
+        53,
+        Down,
+        "-0.87218360541826723",
+        "-0x0.df476cbd60fac0#53",
+        Greater,
+    );
+    test(
+        "1267650600228229401496703205376",
+        53,
+        Up,
+        "-0.87218360541826734",
+        "-0x0.df476cbd60fac8#53",
+        Less,
+    );
+    test(
+        "1267650600228229401496703205376",
+        53,
+        Floor,
+        "-0.87218360541826734",
+        "-0x0.df476cbd60fac8#53",
+        Less,
+    );
+    test(
+        "1267650600228229401496703205376",
+        53,
+        Ceiling,
+        "-0.87218360541826723",
+        "-0x0.df476cbd60fac0#53",
+        Greater,
+    );
+    test(
+        "1267650600228229401496703205376",
+        53,
+        Nearest,
+        "-0.87218360541826734",
+        "-0x0.df476cbd60fac8#53",
+        Less,
+    );
+    test(
+        "1267650600228229401496703205376",
+        100,
+        Nearest,
+        "-0.87218360541826730978071977821350",
+        "-0x0.df476cbd60fac5f54ce60f245#100",
+        Less,
+    );
+    test(
+        "1/1267650600228229401496703205376",
+        1,
+        Down,
+        "3.9e-31",
+        "0x8.0E-26#1",
+        Less,
+    );
+    test(
+        "1/1267650600228229401496703205376",
+        1,
+        Up,
+        "7.9e-31",
+        "0x1.0E-25#1",
+        Greater,
+    );
+    test(
+        "1/1267650600228229401496703205376",
+        1,
+        Floor,
+        "3.9e-31",
+        "0x8.0E-26#1",
+        Less,
+    );
+    test(
+        "1/1267650600228229401496703205376",
+        1,
+        Ceiling,
+        "7.9e-31",
+        "0x1.0E-25#1",
+        Greater,
+    );
+    test(
+        "1/1267650600228229401496703205376",
+        1,
+        Nearest,
+        "7.9e-31",
+        "0x1.0E-25#1",
+        Greater,
+    );
+    test(
+        "1/1267650600228229401496703205376",
+        5,
+        Nearest,
+        "7.89e-31",
+        "0x1.0E-25#5",
+        Greater,
+    );
+    test(
+        "1/1267650600228229401496703205376",
+        10,
+        Down,
+        "7.8809e-31",
+        "0xf.fcE-26#10",
+        Less,
+    );
+    test(
+        "1/1267650600228229401496703205376",
+        10,
+        Up,
+        "7.8886e-31",
+        "0x1.000E-25#10",
+        Greater,
+    );
+    test(
+        "1/1267650600228229401496703205376",
+        10,
+        Floor,
+        "7.8809e-31",
+        "0xf.fcE-26#10",
+        Less,
+    );
+    test(
+        "1/1267650600228229401496703205376",
+        10,
+        Ceiling,
+        "7.8886e-31",
+        "0x1.000E-25#10",
+        Greater,
+    );
+    test(
+        "1/1267650600228229401496703205376",
+        10,
+        Nearest,
+        "7.8886e-31",
+        "0x1.000E-25#10",
+        Greater,
+    );
+    test(
+        "1/1267650600228229401496703205376",
+        20,
+        Nearest,
+        "7.8886091e-31",
+        "0x1.00000E-25#20",
+        Greater,
+    );
+    test(
+        "1/1267650600228229401496703205376",
+        53,
+        Down,
+        "7.8886090522101172e-31",
+        "0xf.ffffffffffff8E-26#53",
+        Less,
+    );
+    test(
+        "1/1267650600228229401496703205376",
+        53,
+        Up,
+        "7.8886090522101181e-31",
+        "0x1.0000000000000E-25#53",
+        Greater,
+    );
+    test(
+        "1/1267650600228229401496703205376",
+        53,
+        Floor,
+        "7.8886090522101172e-31",
+        "0xf.ffffffffffff8E-26#53",
+        Less,
+    );
+    test(
+        "1/1267650600228229401496703205376",
+        53,
+        Ceiling,
+        "7.8886090522101181e-31",
+        "0x1.0000000000000E-25#53",
+        Greater,
+    );
+    test(
+        "1/1267650600228229401496703205376",
+        53,
+        Nearest,
+        "7.8886090522101181e-31",
+        "0x1.0000000000000E-25#53",
+        Greater,
+    );
+    test(
+        "1/1267650600228229401496703205376",
+        100,
+        Nearest,
+        "7.8886090522101180541172856528279e-31",
+        "0x1.0000000000000000000000000E-25#100",
+        Greater,
+    );
+}
+
+// Inputs of magnitude around 2^(-2^30) or less, whose sines underflow: they take the series path,
+// where everything is `Rational` arithmetic, so no 2^30-bit `Float` is ever formed and the test is
+// cheap.
+#[test]
+fn test_sin_rational_tiny_underflow() {
+    let test = |x: Rational, prec, rm, out: Float, out_o| {
+        let (s, o) = Float::sin_rational_prec_round_ref(&x, prec, rm);
+        assert!(s.is_valid());
+        assert_eq!(ComparableFloat(s), ComparableFloat(out));
+        assert_eq!(o, out_o);
+    };
+    let min_exp = -(1i64 << 30);
+    let min_positive = |prec| Float::one_prec(prec) >> (1u64 << 30);
+    // x = 2^(-2^30), the smallest positive Float: sin(x) is just below it. These rows go through
+    // the series bracket with 2^30-bit denominators, and take about a minute each.
+    let x = Rational::power_of_2(min_exp);
+    test(x.clone(), 1, Floor, Float::ZERO, Less);
+    test(x.clone(), 10, Nearest, min_positive(10), Greater);
+    test(-x, 1, Down, Float::NEGATIVE_ZERO, Greater);
+    // x = 3 * 2^(-2^30 - 1): sin(x) is just below the midpoint of 2^(-2^30) and 2^(1 - 2^30)
+    let x = Rational::power_of_2(min_exp - 1) * Rational::from(3u32);
+    test(x, 1, Nearest, min_positive(1), Less);
+    // inputs far below the smallest positive Float are decided by the rounding mode alone
+    let x = Rational::power_of_2(min_exp - 5);
+    test(x.clone(), 10, Ceiling, min_positive(10), Greater);
+    test(x.clone(), 10, Nearest, Float::ZERO, Less);
+    test(-&x, 10, Nearest, Float::NEGATIVE_ZERO, Greater);
+    test(-x, 10, Floor, -min_positive(10), Less);
+    test(
+        Rational::power_of_2(min_exp << 1),
+        1,
+        Up,
+        min_positive(1),
+        Greater,
+    );
+}
+
+#[test]
+#[should_panic]
+fn sin_rational_prec_fail() {
+    Float::sin_rational_prec(Rational::ONE, 0);
+}
+
+#[test]
+#[should_panic]
+fn sin_rational_prec_ref_fail() {
+    Float::sin_rational_prec_ref(&Rational::ONE, 0);
+}
+
+#[test]
+#[should_panic]
+fn sin_rational_prec_round_fail_1() {
+    Float::sin_rational_prec_round(Rational::ONE, 0, Floor);
+}
+
+#[test]
+#[should_panic]
+fn sin_rational_prec_round_fail_2() {
+    Float::sin_rational_prec_round(Rational::ONE, 10, Exact);
+}
+
+#[test]
+#[should_panic]
+fn sin_rational_prec_round_ref_fail() {
+    Float::sin_rational_prec_round_ref(&Rational::ONE, 10, Exact);
+}
+
+#[allow(clippy::needless_pass_by_value)]
+fn sin_rational_prec_round_properties_helper(x: Rational, prec: u64, rm: RoundingMode) {
+    let (s, o) = Float::sin_rational_prec_round(x.clone(), prec, rm);
+    assert!(s.is_valid());
+    assert_rounding_ordering_consistent(&s, rm, o);
+
+    let (s_alt, o_alt) = Float::sin_rational_prec_round_ref(&x, prec, rm);
+    assert!(s_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&s_alt), ComparableFloatRef(&s));
+    assert_eq!(o_alt, o);
+
+    // |sin x| <= 1, and sin is odd (a `Rational` has no negative zero, so x = 0 is excluded)
+    assert!(s.le_abs(&1u32));
+    if x != 0u32 {
+        let (s_neg, o_neg) = Float::sin_rational_prec_round(-&x, prec, -rm);
+        assert_eq!(ComparableFloat(s_neg), ComparableFloat(-&s));
+        assert_eq!(o_neg, o.reverse());
+    }
+
+    if let Ok(rrm) = rug_round_try_from_rounding_mode(rm) {
+        let (rug_s, rug_o) = rug_sin_rational_prec_round(&x, prec, rrm);
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_s)),
+            ComparableFloatRef(&s)
+        );
+        assert_eq!(rug_o, o, "x = {x} prec = {prec} rm = {rm:?}");
+    }
+
+    if s.is_normal() {
+        assert_eq!(s.get_prec(), Some(prec));
+    }
+
+    if o == Equal {
+        // only sin(0) = 0 is exact
+        assert_eq!(x, 0u32);
+        for rm in exhaustive_rounding_modes() {
+            let (s2, oo) = Float::sin_rational_prec_round_ref(&x, prec, rm);
+            assert_eq!(ComparableFloatRef(&s2), ComparableFloatRef(&s));
+            assert_eq!(oo, Equal);
+        }
+    } else {
+        assert_panic!(Float::sin_rational_prec_round_ref(&x, prec, Exact));
+    }
+}
+
+#[test]
+fn sin_rational_prec_round_properties() {
+    rational_unsigned_rounding_mode_triple_gen_var_10().test_properties(|(x, prec, rm)| {
+        sin_rational_prec_round_properties_helper(x, prec, rm);
+    });
+
+    unsigned_rounding_mode_pair_gen_var_3().test_properties(|(prec, rm)| {
+        let (s, o) = Float::sin_rational_prec_round(Rational::ZERO, prec, rm);
+        assert_eq!(ComparableFloat(s), ComparableFloat(Float::ZERO));
+        assert_eq!(o, Equal);
+    });
+}
+
+#[allow(clippy::needless_pass_by_value)]
+fn sin_rational_prec_properties_helper(x: Rational, prec: u64) {
+    let (s, o) = Float::sin_rational_prec(x.clone(), prec);
+    assert!(s.is_valid());
+
+    let (s_alt, o_alt) = Float::sin_rational_prec_ref(&x, prec);
+    assert!(s_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&s_alt), ComparableFloatRef(&s));
+    assert_eq!(o_alt, o);
+
+    let (s_alt, o_alt) = Float::sin_rational_prec_round_ref(&x, prec, Nearest);
+    assert_eq!(ComparableFloatRef(&s_alt), ComparableFloatRef(&s));
+    assert_eq!(o_alt, o);
+
+    assert!(s.le_abs(&1u32));
+
+    let (rug_s, rug_o) = rug_sin_rational_prec(&x, prec);
+    assert_eq!(
+        ComparableFloatRef(&Float::from(&rug_s)),
+        ComparableFloatRef(&s)
+    );
+    assert_eq!(rug_o, o, "x = {x} prec = {prec}");
+
+    // the sine of an exactly representable rational is the Float sine
+    if let Ok(f) = Float::try_from(&x) {
+        let (s_alt, o_alt) = f.sin_prec(prec);
+        assert_eq!(ComparableFloatRef(&s_alt), ComparableFloatRef(&s));
+        assert_eq!(o_alt, o);
+    }
+}
+
+#[test]
+fn sin_rational_prec_properties() {
+    rational_unsigned_pair_gen_var_3().test_properties(|(x, prec)| {
+        sin_rational_prec_properties_helper(x, prec);
+    });
+}
+
+// An input too large to be a `Float`, reduced modulo 2 pi in `Rational` arithmetic with pi to about
+// 2^30 bits; slow even in release mode.
+#[test]
+fn test_sin_rational_huge() {
+    let x = Rational::power_of_2(1i64 << 30);
+    let (s, o) = Float::sin_rational_prec_round_ref(&x, 10, Nearest);
+    assert_eq!(s.to_string(), "0.62793");
+    assert_eq!(to_hex_string(&s), "0x0.a0c#10");
+    assert_eq!(o, Greater);
+}
+
+// Inputs within 2^(-2^30) of pi, whose sines underflow. Each call computes pi to about 2^30 bits,
+// so this test is slow even in release mode.
+#[test]
+fn test_sin_rational_underflow() {
+    let p = (1u64 << 30) + 64;
+    // 2^(-2^30), the smallest positive `Float`, at the output precision
+    let min_positive = Float::one_prec(10) >> (1u64 << 30);
+    // pi rounded down: x_lo < pi, so sin(x_lo) is positive, and at most half an ulp of x_lo,
+    // 2^(-2^30 - 63), in magnitude
+    let mut pi = Float::pi_prec_round(p, Floor).0;
+    let x_lo = Rational::exact_from(&pi);
+    let (s, o) = Float::sin_rational_prec_round_ref(&x_lo, 10, Ceiling);
+    assert_eq!(ComparableFloatRef(&s), ComparableFloatRef(&min_positive));
+    assert_eq!(o, Greater);
+    // pi rounded up: x_hi > pi, so sin(x_hi) is negative
+    pi.increment();
+    let x_hi = Rational::exact_from(&pi);
+    let (s, o) = Float::sin_rational_prec_round_ref(&x_hi, 10, Nearest);
+    assert_eq!(ComparableFloat(s), ComparableFloat(Float::NEGATIVE_ZERO));
+    assert_eq!(o, Greater);
+}
+
+#[test]
+#[allow(clippy::type_repetition_in_bounds)]
+fn test_primitive_float_sin() {
+    fn test<T: PrimitiveFloat>(x: T, out: T)
+    where
+        Float: From<T> + PartialOrd<T>,
+        for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    {
+        assert_eq!(NiceFloat(primitive_float_sin(x)), NiceFloat(out));
+    }
+    test::<f32>(f32::NAN, f32::NAN);
+    test::<f32>(f32::INFINITY, f32::NAN);
+    test::<f32>(f32::NEGATIVE_INFINITY, f32::NAN);
+    test::<f32>(0.0, 0.0);
+    test::<f32>(-0.0, -0.0);
+    test::<f32>(1.0, 0.84147096);
+    test::<f32>(-1.0, -0.84147096);
+    test::<f32>(0.5, 0.47942555);
+    test::<f32>(-0.5, -0.47942555);
+    test::<f32>(2.0, 0.9092974);
+    test::<f32>(-2.0, -0.9092974);
+    test::<f32>(core::f32::consts::PI, -8.742278e-8);
+    test::<f32>(core::f32::consts::FRAC_PI_2, 1.0);
+    test::<f32>(core::f32::consts::E, 0.41078135);
+    test::<f32>(100.0, -0.50636566);
+    test::<f32>(1.0e10, -0.48750603);
+    test::<f32>(1.0e30, -0.79116344);
+    test::<f32>(3.4028235e38, -0.5218765);
+    test::<f32>(1.1754944e-38, 1.1754944e-38);
+    test::<f32>(1.0e-45, 1.0e-45);
+    test::<f32>(-1.0e-45, -1.0e-45);
+    test::<f64>(f64::NAN, f64::NAN);
+    test::<f64>(f64::INFINITY, f64::NAN);
+    test::<f64>(f64::NEGATIVE_INFINITY, f64::NAN);
+    test::<f64>(0.0, 0.0);
+    test::<f64>(-0.0, -0.0);
+    test::<f64>(1.0, 0.8414709848078965);
+    test::<f64>(-1.0, -0.8414709848078965);
+    test::<f64>(0.5, 0.479425538604203);
+    test::<f64>(-0.5, -0.479425538604203);
+    test::<f64>(2.0, 0.9092974268256817);
+    test::<f64>(-2.0, -0.9092974268256817);
+    test::<f64>(core::f64::consts::PI, 1.2246467991473532e-16);
+    test::<f64>(core::f64::consts::FRAC_PI_2, 1.0);
+    test::<f64>(core::f64::consts::E, 0.41078129050290885);
+    test::<f64>(100.0, -0.5063656411097588);
+    test::<f64>(1.0e10, -0.4875060250875107);
+    test::<f64>(1.0e100, -0.3806377310050287);
+    test::<f64>(1.0e300, -0.8178819121159085);
+    test::<f64>(1.7976931348623157e308, 0.004961954789184062);
+    test::<f64>(2.2250738585072014e-308, 2.2250738585072014e-308);
+    test::<f64>(5.0e-324, 5.0e-324);
+    test::<f64>(-5.0e-324, -5.0e-324);
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn primitive_float_sin_properties_helper<T: PrimitiveFloat>()
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    primitive_float_gen::<T>().test_properties(|x| {
+        let s = primitive_float_sin(x);
+        // sin is NaN exactly for NaN and infinite inputs, and otherwise lies in [-1, 1]
+        assert_eq!(s.is_nan(), !x.is_finite());
+        if x.is_finite() {
+            assert!(s >= T::NEGATIVE_ONE && s <= T::ONE);
+            // sin is odd
+            assert_eq!(NiceFloat(primitive_float_sin(-x)), NiceFloat(-s));
+            // the result is the correctly rounded sine, as computed by MPFR with 64 bits to spare,
+            // so that a subnormal result is rounded once by the conversion rather than twice
+            let rug_x = rug::Float::with_val(
+                u32::exact_from(T::MANTISSA_WIDTH + 64),
+                &rug::Float::exact_from(&Float::from(x)),
+            );
+            let rug_s: T =
+                T::rounding_from(&<Float as From<&rug::Float>>::from(&rug_x.sin()), Nearest).0;
+            assert_eq!(NiceFloat(rug_s), NiceFloat(s));
+        }
+    });
+}
+
+#[test]
+fn primitive_float_sin_properties() {
+    apply_fn_to_primitive_floats!(primitive_float_sin_properties_helper);
+}
+
+#[test]
+#[allow(clippy::type_repetition_in_bounds)]
+fn test_primitive_float_sin_rational() {
+    fn test<T: PrimitiveFloat>(s: &str, out: T)
+    where
+        Float: From<T> + PartialOrd<T>,
+        for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    {
+        let x = Rational::from_str(s).unwrap();
+        assert_eq!(
+            NiceFloat(primitive_float_sin_rational::<T>(&x)),
+            NiceFloat(out)
+        );
+    }
+    test::<f32>("0", 0.0);
+    test::<f32>("1", 0.84147096);
+    test::<f32>("1/2", 0.47942555);
+    test::<f32>("1/3", 0.3271947);
+    test::<f32>("3/5", 0.5646425);
+    test::<f32>("22/7", -0.0012644889);
+    test::<f32>("355/113", -2.6676418e-7);
+    test::<f32>("1000000", -0.3499935);
+    test::<f32>("1/1000000", 0.000001);
+    test::<f32>("1/1000000000000000000000000", 1.0e-24);
+    test::<f32>("-1", -0.84147096);
+    test::<f32>("-1/2", -0.47942555);
+    test::<f32>("-1/3", -0.3271947);
+    test::<f32>("-22/7", 0.0012644889);
+    test::<f32>("-1000000", 0.3499935);
+    test::<f32>("10000", -0.30561438);
+    test::<f64>("0", 0.0);
+    test::<f64>("1", 0.8414709848078965);
+    test::<f64>("1/2", 0.479425538604203);
+    test::<f64>("1/3", 0.32719469679615226);
+    test::<f64>("3/5", 0.5646424733950354);
+    test::<f64>("22/7", -0.0012644889303773533);
+    test::<f64>("355/113", -2.6676418906241917e-7);
+    test::<f64>("1000000", -0.34999350217129294);
+    test::<f64>("1/1000000", 9.999999999998333e-7);
+    test::<f64>("1/1000000000000000000000000", 1.0e-24);
+    test::<f64>("-1", -0.8414709848078965);
+    test::<f64>("-1/2", -0.479425538604203);
+    test::<f64>("-1/3", -0.32719469679615226);
+    test::<f64>("-22/7", 0.0012644889303773533);
+    test::<f64>("-1000000", 0.34999350217129294);
+    test::<f64>("10000", -0.30561438888825215);
+    // tiny inputs, whose sines are subnormal or zero
+    let tiny = |zeros: usize| format!("1/1{}", "0".repeat(zeros));
+    test::<f32>(&tiny(40), 1.0e-40);
+    test::<f32>(&format!("-{}", tiny(40)), -1.0e-40);
+    test::<f32>(&tiny(50), 0.0);
+    test::<f64>(&tiny(310), 1.0e-310);
+    test::<f64>(&format!("-{}", tiny(310)), -1.0e-310);
+    test::<f64>(&tiny(330), 0.0);
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn primitive_float_sin_rational_properties_helper<T: PrimitiveFloat>()
+where
+    Float: From<T> + PartialOrd<T>,
+    Rational: ExactFrom<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    rational_gen().test_properties(|x| {
+        let s = primitive_float_sin_rational::<T>(&x);
+        // the sine of a rational is never NaN, and lies in [-1, 1]
+        assert!(s >= T::NEGATIVE_ONE && s <= T::ONE);
+        // sin is odd (a `Rational` has no negative zero, so x = 0 is excluded)
+        if x != 0u32 {
+            assert_eq!(
+                NiceFloat(primitive_float_sin_rational::<T>(&-&x)),
+                NiceFloat(-s)
+            );
+        }
+        // the result is the correctly rounded sine, as computed by MPFR with 64 bits to spare, so
+        // that a subnormal result is rounded once by the conversion rather than twice
+        let rug_s = rug_sin_rational_prec(&x, T::MANTISSA_WIDTH + 64).0;
+        let rug_s: T = T::rounding_from(&<Float as From<&rug::Float>>::from(&rug_s), Nearest).0;
+        assert_eq!(NiceFloat(rug_s), NiceFloat(s));
+    });
+
+    primitive_float_gen::<T>().test_properties(|x| {
+        // The sine of a finite nonzero primitive float, taken through the `Rational` path, matches
+        // the direct primitive-float sine (a `Rational` cannot carry the sign of a zero).
+        if x.is_finite() && x != T::ZERO {
+            assert_eq!(
+                NiceFloat(primitive_float_sin_rational::<T>(&Rational::exact_from(x))),
+                NiceFloat(primitive_float_sin(x))
+            );
+        }
+    });
+}
+
+#[test]
+fn primitive_float_sin_rational_properties() {
+    apply_fn_to_primitive_floats!(primitive_float_sin_rational_properties_helper);
 }

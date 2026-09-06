@@ -33,7 +33,8 @@ use malachite_float::float::arithmetic::div::{
     rational_div_float_prec_round_naive_ref_val, rational_div_float_prec_round_naive_val_ref,
 };
 use malachite_float::test_util::common::{
-    parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
+    assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
+    to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::div::{
     div_prec_round_naive, rug_div, rug_div_prec, rug_div_prec_round, rug_div_rational,
@@ -14251,6 +14252,7 @@ fn div_prec_round_properties_helper(
 ) {
     let (quotient, o) = x.clone().div_prec_round(y.clone(), prec, rm);
     assert!(quotient.is_valid());
+    assert_rounding_ordering_consistent(&quotient, rm, o);
     let (quotient_alt, o_alt) = x.clone().div_prec_round_val_ref(&y, prec, rm);
     assert!(quotient_alt.is_valid());
     assert_eq!(
@@ -14341,16 +14343,6 @@ fn div_prec_round_properties_helper(
                 let mut next = quotient.clone();
                 next.decrement();
                 assert!(next < r_quotient);
-            }
-            match (r_quotient >= 0u32, rm) {
-                (_, Floor) | (true, Down) | (false, Up) => {
-                    assert_ne!(o, Greater);
-                }
-                (_, Ceiling) | (true, Up) | (false, Down) => {
-                    assert_ne!(o, Less);
-                }
-                (_, Exact) => assert_eq!(o, Equal),
-                _ => {}
             }
         }
     }
@@ -14548,6 +14540,7 @@ fn div_prec_round_properties() {
 fn div_prec_properties_helper(x: Float, y: Float, prec: u64, extreme: bool) {
     let (quotient, o) = x.clone().div_prec(y.clone(), prec);
     assert!(quotient.is_valid());
+    assert_rounding_ordering_consistent(&quotient, Nearest, o);
     let (quotient_alt, o_alt) = x.clone().div_prec_val_ref(&y, prec);
     assert!(quotient_alt.is_valid());
     assert_eq!(
@@ -14798,6 +14791,7 @@ fn div_prec_properties() {
 fn div_round_properties_helper(x: Float, y: Float, rm: RoundingMode, extreme: bool) {
     let (quotient, o) = x.clone().div_round(y.clone(), rm);
     assert!(quotient.is_valid());
+    assert_rounding_ordering_consistent(&quotient, rm, o);
     let (quotient_alt, o_alt) = x.clone().div_round_val_ref(&y, rm);
     assert!(quotient_alt.is_valid());
     assert_eq!(o_alt, o);
@@ -14877,16 +14871,6 @@ fn div_round_properties_helper(x: Float, y: Float, rm: RoundingMode, extreme: bo
                 let mut next = quotient.clone();
                 next.decrement();
                 assert!(next < r_quotient);
-            }
-            match (r_quotient >= 0u32, rm) {
-                (_, Floor) | (true, Down) | (false, Up) => {
-                    assert_ne!(o, Greater);
-                }
-                (_, Ceiling) | (true, Up) | (false, Down) => {
-                    assert_ne!(o, Less);
-                }
-                (_, Exact) => assert_eq!(o, Equal),
-                _ => {}
             }
         }
     }
@@ -15342,6 +15326,7 @@ fn div_rational_prec_round_properties_helper(
 ) {
     let (quotient, o) = x.clone().div_rational_prec_round(y.clone(), prec, rm);
     assert!(quotient.is_valid());
+    assert_rounding_ordering_consistent(&quotient, rm, o);
     let (quotient_alt, o_alt) = x.clone().div_rational_prec_round_val_ref(&y, prec, rm);
     assert!(quotient_alt.is_valid());
     assert_eq!(
@@ -15477,16 +15462,6 @@ fn div_rational_prec_round_properties_helper(
                 let mut next = quotient.clone();
                 next.decrement();
                 assert!(next < r_quotient);
-            }
-            match (r_quotient >= 0u32, rm) {
-                (_, Floor) | (true, Down) | (false, Up) => {
-                    assert_ne!(o, Greater);
-                }
-                (_, Ceiling) | (true, Up) | (false, Down) => {
-                    assert_ne!(o, Less);
-                }
-                (_, Exact) => assert_eq!(o, Equal),
-                _ => {}
             }
         }
     }
@@ -15626,6 +15601,7 @@ fn div_rational_prec_round_properties() {
 fn div_rational_prec_properties_helper(x: Float, y: Rational, prec: u64, extreme: bool) {
     let (quotient, o) = x.clone().div_rational_prec(y.clone(), prec);
     assert!(quotient.is_valid());
+    assert_rounding_ordering_consistent(&quotient, Nearest, o);
     let (quotient_alt, o_alt) = x.clone().div_rational_prec_val_ref(&y, prec);
     assert!(quotient_alt.is_valid());
     assert_eq!(
@@ -15851,6 +15827,7 @@ fn div_rational_prec_properties() {
 fn div_rational_round_properties_helper(x: Float, y: Rational, rm: RoundingMode, extreme: bool) {
     let (quotient, o) = x.clone().div_rational_round(y.clone(), rm);
     assert!(quotient.is_valid());
+    assert_rounding_ordering_consistent(&quotient, rm, o);
     let (quotient_alt, o_alt) = x.clone().div_rational_round_val_ref(&y, rm);
     assert!(quotient_alt.is_valid());
     assert_eq!(o_alt, o);
@@ -15932,16 +15909,6 @@ fn div_rational_round_properties_helper(x: Float, y: Rational, rm: RoundingMode,
                 let mut next = quotient.clone();
                 next.decrement();
                 assert!(next < r_quotient);
-            }
-            match (r_quotient >= 0u32, rm) {
-                (_, Floor) | (true, Down) | (false, Up) => {
-                    assert_ne!(o, Greater);
-                }
-                (_, Ceiling) | (true, Up) | (false, Down) => {
-                    assert_ne!(o, Less);
-                }
-                (_, Exact) => assert_eq!(o, Equal),
-                _ => {}
             }
         }
     }
@@ -16253,6 +16220,7 @@ fn rational_div_float_prec_round_properties_helper(
 ) {
     let (quotient, o) = Float::rational_div_float_prec_round(x.clone(), y.clone(), prec, rm);
     assert!(quotient.is_valid());
+    assert_rounding_ordering_consistent(&quotient, rm, o);
     let (quotient_alt, o_alt) =
         Float::rational_div_float_prec_round_val_ref(x.clone(), &y, prec, rm);
     assert!(quotient_alt.is_valid());
@@ -16360,16 +16328,6 @@ fn rational_div_float_prec_round_properties_helper(
                 let mut next = quotient.clone();
                 next.decrement();
                 assert!(next < r_quotient);
-            }
-            match (r_quotient >= 0u32, rm) {
-                (_, Floor) | (true, Down) | (false, Up) => {
-                    assert_ne!(o, Greater);
-                }
-                (_, Ceiling) | (true, Up) | (false, Down) => {
-                    assert_ne!(o, Less);
-                }
-                (_, Exact) => assert_eq!(o, Equal),
-                _ => {}
             }
         }
     }
@@ -16506,6 +16464,7 @@ fn rational_div_float_prec_round_properties() {
 fn rational_div_float_prec_properties_helper(x: Rational, y: Float, prec: u64, extreme: bool) {
     let (quotient, o) = Float::rational_div_float_prec(x.clone(), y.clone(), prec);
     assert!(quotient.is_valid());
+    assert_rounding_ordering_consistent(&quotient, Nearest, o);
     let (quotient_alt, o_alt) = Float::rational_div_float_prec_val_ref(x.clone(), &y, prec);
     assert!(quotient_alt.is_valid());
     assert_eq!(
@@ -16694,6 +16653,7 @@ fn rational_div_float_round_properties_helper(
 ) {
     let (quotient, o) = Float::rational_div_float_round(x.clone(), y.clone(), rm);
     assert!(quotient.is_valid());
+    assert_rounding_ordering_consistent(&quotient, rm, o);
     let (quotient_alt, o_alt) = Float::rational_div_float_round_val_ref(x.clone(), &y, rm);
     assert!(quotient_alt.is_valid());
     assert_eq!(o_alt, o);
@@ -16761,16 +16721,6 @@ fn rational_div_float_round_properties_helper(
                 let mut next = quotient.clone();
                 next.decrement();
                 assert!(next < r_quotient);
-            }
-            match (r_quotient >= 0u32, rm) {
-                (_, Floor) | (true, Down) | (false, Up) => {
-                    assert_ne!(o, Greater);
-                }
-                (_, Ceiling) | (true, Up) | (false, Down) => {
-                    assert_ne!(o, Less);
-                }
-                (_, Exact) => assert_eq!(o, Equal),
-                _ => {}
             }
         }
     }

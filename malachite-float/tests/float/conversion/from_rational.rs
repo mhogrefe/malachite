@@ -17,7 +17,9 @@ use malachite_float::float::conversion::from_rational::{
     from_rational_prec_round_direct, from_rational_prec_round_ref_direct,
     from_rational_prec_round_ref_using_div, from_rational_prec_round_using_div,
 };
-use malachite_float::test_util::common::{rug_round_try_from_rounding_mode, to_hex_string};
+use malachite_float::test_util::common::{
+    assert_rounding_ordering_consistent, rug_round_try_from_rounding_mode, to_hex_string,
+};
 use malachite_float::test_util::generators::rational_unsigned_rounding_mode_triple_gen_var_1;
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float, emulate_rational_to_float_fn};
 use malachite_nz::test_util::generators::integer_gen;
@@ -4031,6 +4033,7 @@ fn from_rational_prec_round_properties() {
     rational_unsigned_rounding_mode_triple_gen_var_1().test_properties(|(x, prec, rm)| {
         let (float_x, o) = Float::from_rational_prec_round(x.clone(), prec, rm);
         assert!(float_x.is_valid());
+        assert_rounding_ordering_consistent(&float_x, rm, o);
 
         let (float_x_alt, o_alt) = Float::from_rational_prec_round_ref(&x, prec, rm);
         assert!(float_x_alt.is_valid());
@@ -4040,16 +4043,6 @@ fn from_rational_prec_round_properties() {
         );
         assert_eq!(o, o_alt);
         assert_eq!(float_x.partial_cmp(&x), Some(o));
-        match (x >= 0u32, rm) {
-            (_, Floor) | (true, Down) | (false, Up) => {
-                assert_ne!(o, Greater);
-            }
-            (_, Ceiling) | (true, Up) | (false, Down) => {
-                assert_ne!(o, Less);
-            }
-            (_, Exact) => assert_eq!(o, Equal),
-            _ => {}
-        }
 
         let (float_x_alt, o_alt) = from_rational_prec_round_direct(x.clone(), prec, rm);
         assert!(float_x_alt.is_valid());

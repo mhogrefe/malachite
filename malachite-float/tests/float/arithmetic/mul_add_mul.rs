@@ -22,7 +22,8 @@ use malachite_float::float::arithmetic::mul_add_mul::{
     primitive_float_mul_add_mul, primitive_float_mul_add_mul_rational,
 };
 use malachite_float::test_util::common::{
-    parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
+    assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
+    to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::mul_add_mul::{
     mul_add_mul_prec_round_naive, mul_add_mul_rational_prec_round_naive, rug_mul_add_mul_prec_round,
@@ -507,6 +508,7 @@ fn mul_add_mul_prec_round_properties_helper(
 ) {
     let (sum, o) = a.mul_add_mul_prec_round_ref_ref_ref_ref(&b, &c, &d, prec, rm);
     assert!(sum.is_valid());
+    assert_rounding_ordering_consistent(&sum, rm, o);
     for (sum_alt, o_alt) in [
         a.clone()
             .mul_add_mul_prec_round(b.clone(), c.clone(), d.clone(), prec, rm),
@@ -620,6 +622,7 @@ fn mul_add_mul_prec_round_properties() {
 fn mul_add_mul_shorthand_properties() {
     float_float_float_float_unsigned_quintuple_gen_var_1().test_properties(|(a, b, c, d, prec)| {
         let (sum, o) = a.mul_add_mul_prec_round_ref_ref_ref_ref(&b, &c, &d, prec, Nearest);
+        assert_rounding_ordering_consistent(&sum, Nearest, o);
         let (sum_alt, o_alt) = a.mul_add_mul_prec_ref_ref_ref_ref(&b, &c, &d, prec);
         assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
         assert_eq!(o_alt, o);
@@ -643,6 +646,7 @@ fn mul_add_mul_shorthand_properties() {
                 d.significant_bits()
             );
             let (sum, o) = a.mul_add_mul_prec_round_ref_ref_ref_ref(&b, &c, &d, prec, rm);
+            assert_rounding_ordering_consistent(&sum, rm, o);
             let (sum_alt, o_alt) = a.mul_add_mul_round_ref_ref_ref_ref(&b, &c, &d, rm);
             assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
             assert_eq!(o_alt, o);
@@ -1094,6 +1098,7 @@ fn mul_add_mul_rational_prec_round_properties_helper(
 ) {
     let (sum, o) = x.mul_add_mul_rational_prec_round_ref_ref_ref_ref(&y, &z, &w, prec, rm);
     assert!(sum.is_valid());
+    assert_rounding_ordering_consistent(&sum, rm, o);
     for (sum_alt, o_alt) in [
         x.clone()
             .mul_add_mul_rational_prec_round(y.clone(), z.clone(), w.clone(), prec, rm),
@@ -1232,6 +1237,7 @@ fn mul_add_mul_rational_shorthand_properties() {
                 z.significant_bits()
             );
             let (sum, o) = x.mul_add_mul_rational_prec_round_ref_ref_ref_ref(&y, &z, &w, prec, rm);
+            assert_rounding_ordering_consistent(&sum, rm, o);
             let (sum_alt, o_alt) = x.mul_add_mul_rational_round_ref_ref_ref_ref(&y, &z, &w, rm);
             assert_eq!(ComparableFloatRef(&sum_alt), ComparableFloatRef(&sum));
             assert_eq!(o_alt, o);

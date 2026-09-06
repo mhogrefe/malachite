@@ -29,7 +29,8 @@ use malachite_float::float::arithmetic::power_of_10_x_minus_1::{
     primitive_float_power_of_10_x_minus_1, primitive_float_power_of_10_x_minus_1_rational,
 };
 use malachite_float::test_util::common::{
-    parse_hex_string, rug_round_try_from_rounding_mode, to_hex_string,
+    assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
+    to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::power_of_10_x_minus_1::{
     rug_power_of_10_x_minus_1, rug_power_of_10_x_minus_1_prec,
@@ -1680,6 +1681,7 @@ fn power_of_10_x_minus_1_prec_round_fail_2() {
 fn power_of_10_x_minus_1_prec_round_properties_helper(x: Float, prec: u64, rm: RoundingMode) {
     let (power_of_10_x_minus_1, o) = x.clone().power_of_10_x_minus_1_prec_round(prec, rm);
     assert!(power_of_10_x_minus_1.is_valid());
+    assert_rounding_ordering_consistent(&power_of_10_x_minus_1, rm, o);
 
     let (power_of_10_x_minus_1_alt, o_alt) = x.power_of_10_x_minus_1_prec_round_ref(prec, rm);
     assert!(power_of_10_x_minus_1_alt.is_valid());
@@ -1862,6 +1864,7 @@ fn power_of_10_x_minus_1_prec_properties() {
 fn power_of_10_x_minus_1_round_properties_helper(x: Float, rm: RoundingMode) {
     let (power_of_10_x_minus_1, o) = x.clone().power_of_10_x_minus_1_round(rm);
     assert!(power_of_10_x_minus_1.is_valid());
+    assert_rounding_ordering_consistent(&power_of_10_x_minus_1, rm, o);
 
     let (power_of_10_x_minus_1_alt, o_alt) = x.power_of_10_x_minus_1_round_ref(rm);
     assert!(power_of_10_x_minus_1_alt.is_valid());
@@ -3114,6 +3117,7 @@ fn power_of_10_x_minus_1_rational_prec_round_properties_helper(
 ) {
     let (f, o) = Float::power_of_10_x_minus_1_rational_prec_round(x.clone(), prec, rm);
     assert!(f.is_valid());
+    assert_rounding_ordering_consistent(&f, rm, o);
 
     let (f_alt, o_alt) = Float::power_of_10_x_minus_1_rational_prec_round_ref(&x, prec, rm);
     assert!(f_alt.is_valid());

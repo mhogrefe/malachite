@@ -18,7 +18,9 @@ use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::strings::ToDebugString;
 use malachite_base::test_util::generators::{signed_gen, unsigned_gen};
 use malachite_float::Float;
-use malachite_float::test_util::common::parse_hex_string;
+use malachite_float::test_util::common::{
+    assert_rounding_ordering_consistent_for_sign, parse_hex_string,
+};
 use malachite_float::test_util::generators::{
     float_gen, float_gen_var_4, float_gen_var_5, float_gen_var_12,
     float_rounding_mode_pair_gen_var_4, float_rounding_mode_pair_gen_var_5,
@@ -1067,16 +1069,7 @@ fn rounding_from_float_properties_helper_unsigned_helper<
     }
 
     assert_eq!(n.partial_cmp(&x), Some(o));
-    match (x >= T::ZERO, rm) {
-        (_, Floor) | (true, Down) | (false, Up) => {
-            assert_ne!(o, Greater);
-        }
-        (_, Ceiling) | (true, Up) | (false, Down) => {
-            assert_ne!(o, Less);
-        }
-        (_, Exact) => assert_eq!(o, Equal),
-        _ => {}
-    }
+    assert_rounding_ordering_consistent_for_sign(x >= T::ZERO, rm, o);
 }
 
 fn rounding_from_float_properties_helper_unsigned<
@@ -1161,16 +1154,7 @@ fn rounding_from_float_properties_helper_signed_helper<
     }
 
     assert_eq!(n.partial_cmp(&x), Some(o));
-    match (x >= T::ZERO, rm) {
-        (_, Floor) | (true, Down) | (false, Up) => {
-            assert_ne!(o, Greater);
-        }
-        (_, Ceiling) | (true, Up) | (false, Down) => {
-            assert_ne!(o, Less);
-        }
-        (_, Exact) => assert_eq!(o, Equal),
-        _ => {}
-    }
+    assert_rounding_ordering_consistent_for_sign(x >= T::ZERO, rm, o);
 }
 
 fn rounding_from_float_properties_helper_signed<

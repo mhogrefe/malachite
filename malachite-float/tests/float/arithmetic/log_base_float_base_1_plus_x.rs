@@ -22,7 +22,9 @@ use malachite_base::test_util::generators::{
 };
 use malachite_float::float::arithmetic::log_base_float_base_1_plus_x::*;
 use malachite_float::float::arithmetic::log_base_rational_base_1_plus_x::*;
-use malachite_float::test_util::common::{rug_round_try_from_rounding_mode, to_hex_string};
+use malachite_float::test_util::common::{
+    assert_rounding_ordering_consistent, rug_round_try_from_rounding_mode, to_hex_string,
+};
 use malachite_float::test_util::float::arithmetic::log_base_float_base_1_plus_x::{
     rug_log_base_float_base_1_plus_x, rug_log_base_float_base_1_plus_x_prec,
     rug_log_base_float_base_1_plus_x_prec_round, rug_log_base_float_base_1_plus_x_round,
@@ -293,6 +295,7 @@ fn log_base_float_base_1_plus_x_prec_round_properties_helper(
     extreme: bool,
 ) {
     let (log, o) = check(x, base, prec, rm, extreme);
+    assert_rounding_ordering_consistent(&log, rm, o);
 
     // The sign of a normal result follows whether 1 + x and base are on the same side of 1: x > 0
     // (so 1 + x > 1) with base > 1, or x in (-1, 0) with base in (0, 1).
@@ -381,6 +384,7 @@ fn log_base_float_base_1_plus_x_round_properties() {
     let f = |x: Float, base: Float, rm: RoundingMode, extreme: bool| {
         let (log, o) = x.clone().log_base_float_base_1_plus_x_round(&base, rm);
         assert!(log.is_valid());
+        assert_rounding_ordering_consistent(&log, rm, o);
         let (log_ref, o_ref) = x.log_base_float_base_1_plus_x_round_ref(&base, rm);
         assert_eq!(ComparableFloatRef(&log_ref), ComparableFloatRef(&log));
         assert_eq!(o_ref, o);

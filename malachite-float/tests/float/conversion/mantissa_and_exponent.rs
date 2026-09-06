@@ -22,7 +22,9 @@ use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::test_util::generators::{
     primitive_float_gen_var_12, primitive_float_signed_pair_gen_var_3,
 };
-use malachite_float::test_util::common::{parse_hex_string, to_hex_string};
+use malachite_float::test_util::common::{
+    assert_rounding_ordering_consistent_for_sign, parse_hex_string, to_hex_string,
+};
 use malachite_float::test_util::generators::{
     float_gen_var_3, float_gen_var_13, float_rounding_mode_pair_gen,
     float_rounding_mode_pair_gen_var_21, float_signed_pair_gen_var_1,
@@ -2712,12 +2714,7 @@ fn sci_mantissa_and_exponent_round_properties_helper_helper<T: PrimitiveFloat>(
         // return an exponent that is larger by 1, due to rounding.
         assert!(exponent <= Float::MAX_EXPONENT);
         assert!(exponent >= Float::MIN_EXPONENT - 1);
-        match rm {
-            Floor | Down => assert_ne!(o, Greater),
-            Ceiling | Up => assert_ne!(o, Less),
-            Exact => assert_eq!(o, Equal),
-            _ => {}
-        }
+        assert_rounding_ordering_consistent_for_sign(true, rm, o);
         if !extreme {
             let x_alt = Rational::exact_from(mantissa) << exponent;
             assert_eq!(x_alt.partial_cmp_abs(&x), Some(o));

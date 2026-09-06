@@ -17,7 +17,9 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_float::float::arithmetic::product::primitive_float_product;
-use malachite_float::test_util::common::{parse_hex_string, to_hex_string};
+use malachite_float::test_util::common::{
+    assert_rounding_ordering_consistent, parse_hex_string, to_hex_string,
+};
 use malachite_float::test_util::float::arithmetic::product::{
     naive_product, naive_product_prec, naive_product_prec_round, naive_product_round,
 };
@@ -1024,6 +1026,7 @@ fn in_gate(x: &Float) -> bool {
 fn product_prec_round_properties_helper(xs: Vec<Float>, prec: u64, rm: RoundingMode) {
     let (product, o) = Float::product_prec_round(&xs, prec, rm);
     assert!(product.is_valid());
+    assert_rounding_ordering_consistent(&product, rm, o);
 
     // reversal invariance
     let reversed: Vec<Float> = xs.iter().rev().cloned().collect();
@@ -1153,6 +1156,7 @@ fn product_prec_properties() {
     float_vec_unsigned_pair_gen_var_1().test_properties(|(xs, prec)| {
         let (product, o) = Float::product_prec(&xs, prec);
         assert!(product.is_valid());
+        assert_rounding_ordering_consistent(&product, Nearest, o);
         let (product_alt, o_alt) = Float::product_prec_round(&xs, prec, Nearest);
         assert_eq!(
             ComparableFloatRef(&product_alt),
@@ -1174,6 +1178,7 @@ fn product_round_properties() {
     let helper = |xs: &[Float], rm: RoundingMode| {
         let (product, o) = Float::product_round(xs, rm);
         assert!(product.is_valid());
+        assert_rounding_ordering_consistent(&product, rm, o);
         let prec = xs
             .iter()
             .map(SignificantBits::significant_bits)

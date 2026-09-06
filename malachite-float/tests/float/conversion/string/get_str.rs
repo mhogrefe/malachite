@@ -13,7 +13,10 @@ use malachite_base::num::conversion::traits::{ExactFrom, IntegerMantissaAndExpon
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_float::float::conversion::string::get_str::{get_str, get_str_digit_count};
-use malachite_float::test_util::common::{parse_hex_string, rug_round_try_from_rounding_mode};
+use malachite_float::test_util::common::{
+    assert_rounding_ordering_consistent_for_sign, parse_hex_string,
+    rug_round_try_from_rounding_mode,
+};
 use malachite_float::test_util::generators::{
     float_signed_unsigned_rounding_mode_quadruple_gen_var_9,
     float_signed_unsigned_rounding_mode_quadruple_gen_var_10,
@@ -297,12 +300,7 @@ fn verify_get_str_exactly(
     assert_eq!(ord, v.cmp(&x_rat));
     // It is also consistent with the rounding mode and the sign of x: a directed mode can only err
     // to one side, with Down/Up depending on the sign (cf. div.rs).
-    match (x_rat >= 0u32, rnd) {
-        (_, Floor) | (true, Down) | (false, Up) => assert_ne!(ord, Greater),
-        (_, Ceiling) | (true, Up) | (false, Down) => assert_ne!(ord, Less),
-        (_, Exact) => assert_eq!(ord, Equal),
-        _ => {}
-    }
+    assert_rounding_ordering_consistent_for_sign(x_rat >= 0u32, rnd, ord);
 }
 
 // Validates `get_str(x, b0, m, rnd)`. Invalid bases give `None`; special values give their fixed
@@ -325,6 +323,7 @@ fn verify_get_str(x: &Float, b0: i64, m: usize, rnd: RoundingMode) {
     // the would-panic cases via `valid_float_get_str_quadruple`; the panic itself is checked in
     // `test_get_str_exact_panics`), so this call never panics.
     let (digits, exp, ord) = get_str(x, b0, m, rnd).unwrap();
+    assert_rounding_ordering_consistent_for_sign(*x >= 0u32, rnd, ord);
     let b = b0.unsigned_abs();
     if x.is_nan() {
         assert_eq!(digits, b"@NaN@");
