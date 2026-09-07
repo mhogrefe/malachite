@@ -6,10 +6,16 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::Float;
+use crate::float::arithmetic::cos::cos_basic;
+use crate::float::arithmetic::sin::sin_basic;
+use crate::float::arithmetic::sin_cos::{sin_cos_basic, sin_cos_fast};
 use crate::test_util::common::rug_float_significant_bits;
 use core::cmp::Ordering;
+use malachite_base::num::arithmetic::traits::CeilingLogBase2;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::rounding_modes::RoundingMode;
 use malachite_q::Rational;
 use rug::float::Round;
 use rug::ops::AssignRound;
@@ -151,4 +157,42 @@ pub fn rug_sin_cos_pi_rational_prec_round(
         rug::Rational::exact_from(x),
     );
     rug_sin_cos_pi_prec_round(&rx, prec, rm)
+}
+
+// The basic and fast tiers of `sin`, `cos`, and `sin_cos`, callable at any precision regardless of
+// `SINCOS_THRESHOLD`, for the threshold tuner. `x` must be finite, nonzero, and of exponent at
+// least 0 (so that the small-input shortcuts, which precede the tiers, do not apply).
+
+pub fn sin_basic_for_tuning(x: &Float, prec: u64, rm: RoundingMode) -> Float {
+    let exp_x = i64::from(x.get_exponent().unwrap());
+    assert!(exp_x >= 0);
+    sin_basic(x, exp_x, -(exp_x << 1), prec, rm).0
+}
+
+pub fn sin_fast_for_tuning(x: &Float, prec: u64, rm: RoundingMode) -> Float {
+    sin_cos_fast(x, prec, rm, true, false).0.unwrap().0
+}
+
+pub fn cos_basic_for_tuning(x: &Float, prec: u64, rm: RoundingMode) -> Float {
+    let exp_x = i64::from(x.get_exponent().unwrap());
+    assert!(exp_x >= 0);
+    cos_basic(x, exp_x, prec, rm).0
+}
+
+pub fn cos_fast_for_tuning(x: &Float, prec: u64, rm: RoundingMode) -> Float {
+    sin_cos_fast(x, prec, rm, false, true).1.unwrap().0
+}
+
+pub fn sin_cos_basic_for_tuning(x: &Float, prec: u64, rm: RoundingMode) -> (Float, Float) {
+    let exp_x = i64::from(x.get_exponent().unwrap());
+    assert!(exp_x >= 0);
+    // the initial working precision of `sin_cos_prec_round_normal_ref` for such an x
+    let m = prec + prec.ceiling_log_base_2() + 13;
+    let (s, c, _, _) = sin_cos_basic(x, exp_x, m, prec, rm);
+    (s, c)
+}
+
+pub fn sin_cos_fast_for_tuning(x: &Float, prec: u64, rm: RoundingMode) -> (Float, Float) {
+    let (s, c) = sin_cos_fast(x, prec, rm, true, true);
+    (s.unwrap().0, c.unwrap().0)
 }

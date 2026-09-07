@@ -15,12 +15,14 @@
 // Port of MPFR's cosine. `mpfr_cos` (`cos.c`) reduces an argument with |x| >= 4 modulo 2 pi using
 // `mpfr_remainder`, halves the (squared) reduced argument K times, sums the Taylor series of cos in
 // integer arithmetic (`mpfr_cos2_aux`), and undoes the halvings with cos(2x) = 2cos^2(x) - 1, all
-// inside a Ziv loop. The `mpfr_cos_fast` tier, used for precisions at or above
-// `MPFR_SINCOS_THRESHOLD` and built on `mpfr_sincos_fast`, is not ported yet.
+// inside a Ziv loop. For precisions at or above `SINCOS_THRESHOLD`, the binary-splitting tier
+// `sin_cos_fast` in sin_cos.rs (MPFR's `mpfr_cos_fast`, built on `mpfr_sincos_fast`) is used
+// instead.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::float::arithmetic::exp::{get_z_2exp, one_neighbor};
 use crate::float::arithmetic::round_near_x::float_round_near_x;
+use crate::float::arithmetic::sin_cos::{SINCOS_THRESHOLD, sin_cos_fast};
 use crate::{ComparableFloatRef, Float, emulate_float_to_float_fn, emulate_rational_to_float_fn};
 use core::cmp::Ordering::{self, Equal, Greater, Less};
 use core::cmp::{max, min};
@@ -68,7 +70,7 @@ fn cos2_aux(r: &Float, p: u64) -> (Float, u64) {
     let mut imax = p / u64::exact_from(-exp_r);
     imax += u64::from(imax == 0);
     let q = (imax.ceiling_log_base_2() << 1) + 4; // bound for (3l)^2
-    let mut s = Integer::ONE << (p + q); // initialize sum with 1, scaled by 2^(p+q)
+    let mut s = Integer::power_of_2(p + q); // initialize sum with 1, scaled by 2^(p+q)
     let mut t = s.clone(); // invariant: t is previous term
     let mut i: u64 = 1;
     loop {
@@ -659,8 +661,8 @@ fn cos_ziv_step(
     TrigStep::Retry
 }
 
-// This is mpfr_cos from cos.c, MPFR 4.2.2, without the `mpfr_cos_fast` tier for precisions at or
-// above `MPFR_SINCOS_THRESHOLD`, which depends on `mpfr_sincos_fast`.
+// This is mpfr_cos from cos.c, MPFR 4.2.2, including the `mpfr_cos_fast` tier for precisions at or
+// above `SINCOS_THRESHOLD`.
 fn cos_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
     assert_ne!(rm, Exact, "Inexact cos");
     // cos(x) = 1-x^2/2 + ..., so error < 2^(2*EXP(x)-1)
@@ -677,6 +679,15 @@ fn cos_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float, 
         }
     }
     // Compute initial precision
+    if prec >= SINCOS_THRESHOLD {
+        return sin_cos_fast(x, prec, rm, false, true).1.unwrap();
+    }
+    cos_basic(x, exp_x, prec, rm)
+}
+
+// The basic tier of `cos_prec_round_normal_ref`: the Ziv loop of `mpfr_cos`, for a finite nonzero x
+// of exponent `exp_x` that the small-input shortcut did not settle.
+pub(crate) fn cos_basic(x: &Float, exp_x: i64, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
     let k0 = (prec / 3).floor_sqrt();
     let mut m = prec + (prec.ceiling_log_base_2() << 1) + (k0 << 1) + 4;
     let reduce = exp_x >= 3;
@@ -744,16 +755,17 @@ impl Float {
     /// [`Float::cos`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n, m, e) = O(n^{3/2} \log n \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
+    /// $T(n, m, e) = O(n (\log n)^3 \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
     ///
     /// $M(n, m, e) = O((n+m+e) \log (n+m+e))$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, $m$ is
     /// `self.significant_bits()`, and $e$ is the exponent of `self` (0 if `self` has no exponent or
-    /// a negative one): the Taylor series at working precision $n$ costs the first term, and for
-    /// $|x| \geq 4$ the argument is reduced modulo $2\pi$, which requires $\pi$ to about $n + e$
-    /// bits and a remainder of the $m$-bit input. Unlike most functions, `cos` therefore gets
-    /// slower as the magnitude of its input grows, not just as the precision does.
+    /// a negative one): the Taylor series at working precision $n$, summed by binary splitting for
+    /// large $n$, costs the first term, and for $|x| \geq 4$ the argument is reduced modulo $2\pi$,
+    /// which requires $\pi$ to about $n + e$ bits and a remainder of the $m$-bit input. Unlike most
+    /// functions, `cos` therefore gets slower as the magnitude of its input grows, not just as the
+    /// precision does.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact`, since the cosine of a finite nonzero [`Float`] is never exactly
@@ -854,16 +866,17 @@ impl Float {
     /// `(&Float).cos()` instead.
     ///
     /// # Worst-case complexity
-    /// $T(n, m, e) = O(n^{3/2} \log n \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
+    /// $T(n, m, e) = O(n (\log n)^3 \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
     ///
     /// $M(n, m, e) = O((n+m+e) \log (n+m+e))$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, $m$ is
     /// `self.significant_bits()`, and $e$ is the exponent of `self` (0 if `self` has no exponent or
-    /// a negative one): the Taylor series at working precision $n$ costs the first term, and for
-    /// $|x| \geq 4$ the argument is reduced modulo $2\pi$, which requires $\pi$ to about $n + e$
-    /// bits and a remainder of the $m$-bit input. Unlike most functions, `cos` therefore gets
-    /// slower as the magnitude of its input grows, not just as the precision does.
+    /// a negative one): the Taylor series at working precision $n$, summed by binary splitting for
+    /// large $n$, costs the first term, and for $|x| \geq 4$ the argument is reduced modulo $2\pi$,
+    /// which requires $\pi$ to about $n + e$ bits and a remainder of the $m$-bit input. Unlike most
+    /// functions, `cos` therefore gets slower as the magnitude of its input grows, not just as the
+    /// precision does.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact`, since the cosine of a finite nonzero [`Float`] is never exactly
@@ -947,16 +960,17 @@ impl Float {
     /// of the input, consider using [`Float::cos`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n, m, e) = O(n^{3/2} \log n \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
+    /// $T(n, m, e) = O(n (\log n)^3 \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
     ///
     /// $M(n, m, e) = O((n+m+e) \log (n+m+e))$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, $m$ is
     /// `self.significant_bits()`, and $e$ is the exponent of `self` (0 if `self` has no exponent or
-    /// a negative one): the Taylor series at working precision $n$ costs the first term, and for
-    /// $|x| \geq 4$ the argument is reduced modulo $2\pi$, which requires $\pi$ to about $n + e$
-    /// bits and a remainder of the $m$-bit input. Unlike most functions, `cos` therefore gets
-    /// slower as the magnitude of its input grows, not just as the precision does.
+    /// a negative one): the Taylor series at working precision $n$, summed by binary splitting for
+    /// large $n$, costs the first term, and for $|x| \geq 4$ the argument is reduced modulo $2\pi$,
+    /// which requires $\pi$ to about $n + e$ bits and a remainder of the $m$-bit input. Unlike most
+    /// functions, `cos` therefore gets slower as the magnitude of its input grows, not just as the
+    /// precision does.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -1017,16 +1031,17 @@ impl Float {
     /// precision of the input, consider using `(&Float).cos()` instead.
     ///
     /// # Worst-case complexity
-    /// $T(n, m, e) = O(n^{3/2} \log n \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
+    /// $T(n, m, e) = O(n (\log n)^3 \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
     ///
     /// $M(n, m, e) = O((n+m+e) \log (n+m+e))$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, $m$ is
     /// `self.significant_bits()`, and $e$ is the exponent of `self` (0 if `self` has no exponent or
-    /// a negative one): the Taylor series at working precision $n$ costs the first term, and for
-    /// $|x| \geq 4$ the argument is reduced modulo $2\pi$, which requires $\pi$ to about $n + e$
-    /// bits and a remainder of the $m$-bit input. Unlike most functions, `cos` therefore gets
-    /// slower as the magnitude of its input grows, not just as the precision does.
+    /// a negative one): the Taylor series at working precision $n$, summed by binary splitting for
+    /// large $n$, costs the first term, and for $|x| \geq 4$ the argument is reduced modulo $2\pi$,
+    /// which requires $\pi$ to about $n + e$ bits and a remainder of the $m$-bit input. Unlike most
+    /// functions, `cos` therefore gets slower as the magnitude of its input grows, not just as the
+    /// precision does.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -1097,15 +1112,16 @@ impl Float {
     /// [`Float::cos`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n, e) = O(n^{3/2} \log n \log\log n + (n+e) (\log (n+e))^2 \log\log (n+e))$
+    /// $T(n, e) = O(n (\log n)^3 \log\log n + (n+e) (\log (n+e))^2 \log\log (n+e))$
     ///
     /// $M(n, e) = O((n+e) \log (n+e))$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and $e$ is
     /// the exponent of `self` (0 if `self` has no exponent or a negative one): the Taylor series at
-    /// working precision $n$ costs the first term, and for $|x| \geq 4$ the argument is reduced
-    /// modulo $2\pi$, which requires $\pi$ to about $n + e$ bits. Unlike most functions, `cos`
-    /// therefore gets slower as the magnitude of its input grows, not just as the precision does.
+    /// working precision $n$, summed by binary splitting for large $n$, costs the first term, and
+    /// for $|x| \geq 4$ the argument is reduced modulo $2\pi$, which requires $\pi$ to about $n +
+    /// e$ bits. Unlike most functions, `cos` therefore gets slower as the magnitude of its input
+    /// grows, not just as the precision does.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact`, since the cosine of a finite nonzero [`Float`] is never exactly
@@ -1183,15 +1199,16 @@ impl Float {
     /// `(&Float).cos()` instead.
     ///
     /// # Worst-case complexity
-    /// $T(n, e) = O(n^{3/2} \log n \log\log n + (n+e) (\log (n+e))^2 \log\log (n+e))$
+    /// $T(n, e) = O(n (\log n)^3 \log\log n + (n+e) (\log (n+e))^2 \log\log (n+e))$
     ///
     /// $M(n, e) = O((n+e) \log (n+e))$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and $e$ is
     /// the exponent of `self` (0 if `self` has no exponent or a negative one): the Taylor series at
-    /// working precision $n$ costs the first term, and for $|x| \geq 4$ the argument is reduced
-    /// modulo $2\pi$, which requires $\pi$ to about $n + e$ bits. Unlike most functions, `cos`
-    /// therefore gets slower as the magnitude of its input grows, not just as the precision does.
+    /// working precision $n$, summed by binary splitting for large $n$, costs the first term, and
+    /// for $|x| \geq 4$ the argument is reduced modulo $2\pi$, which requires $\pi$ to about $n +
+    /// e$ bits. Unlike most functions, `cos` therefore gets slower as the magnitude of its input
+    /// grows, not just as the precision does.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact`, since the cosine of a finite nonzero [`Float`] is never exactly
@@ -1248,16 +1265,17 @@ impl Float {
     /// [`Float::cos_assign`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n, m, e) = O(n^{3/2} \log n \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
+    /// $T(n, m, e) = O(n (\log n)^3 \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
     ///
     /// $M(n, m, e) = O((n+m+e) \log (n+m+e))$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, $m$ is
     /// `self.significant_bits()`, and $e$ is the exponent of `self` (0 if `self` has no exponent or
-    /// a negative one): the Taylor series at working precision $n$ costs the first term, and for
-    /// $|x| \geq 4$ the argument is reduced modulo $2\pi$, which requires $\pi$ to about $n + e$
-    /// bits and a remainder of the $m$-bit input. Unlike most functions, `cos` therefore gets
-    /// slower as the magnitude of its input grows, not just as the precision does.
+    /// a negative one): the Taylor series at working precision $n$, summed by binary splitting for
+    /// large $n$, costs the first term, and for $|x| \geq 4$ the argument is reduced modulo $2\pi$,
+    /// which requires $\pi$ to about $n + e$ bits and a remainder of the $m$-bit input. Unlike most
+    /// functions, `cos` therefore gets slower as the magnitude of its input grows, not just as the
+    /// precision does.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact`, since the cosine of a finite nonzero [`Float`] is never exactly
@@ -1326,16 +1344,17 @@ impl Float {
     /// precision of the input, consider using [`Float::cos_assign`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n, m, e) = O(n^{3/2} \log n \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
+    /// $T(n, m, e) = O(n (\log n)^3 \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
     ///
     /// $M(n, m, e) = O((n+m+e) \log (n+m+e))$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, $m$ is
     /// `self.significant_bits()`, and $e$ is the exponent of `self` (0 if `self` has no exponent or
-    /// a negative one): the Taylor series at working precision $n$ costs the first term, and for
-    /// $|x| \geq 4$ the argument is reduced modulo $2\pi$, which requires $\pi$ to about $n + e$
-    /// bits and a remainder of the $m$-bit input. Unlike most functions, `cos` therefore gets
-    /// slower as the magnitude of its input grows, not just as the precision does.
+    /// a negative one): the Taylor series at working precision $n$, summed by binary splitting for
+    /// large $n$, costs the first term, and for $|x| \geq 4$ the argument is reduced modulo $2\pi$,
+    /// which requires $\pi$ to about $n + e$ bits and a remainder of the $m$-bit input. Unlike most
+    /// functions, `cos` therefore gets slower as the magnitude of its input grows, not just as the
+    /// precision does.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -1386,15 +1405,16 @@ impl Float {
     /// [`Float::cos_assign`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n, e) = O(n^{3/2} \log n \log\log n + (n+e) (\log (n+e))^2 \log\log (n+e))$
+    /// $T(n, e) = O(n (\log n)^3 \log\log n + (n+e) (\log (n+e))^2 \log\log (n+e))$
     ///
     /// $M(n, e) = O((n+e) \log (n+e))$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and $e$ is
     /// the exponent of `self` (0 if `self` has no exponent or a negative one): the Taylor series at
-    /// working precision $n$ costs the first term, and for $|x| \geq 4$ the argument is reduced
-    /// modulo $2\pi$, which requires $\pi$ to about $n + e$ bits. Unlike most functions, `cos`
-    /// therefore gets slower as the magnitude of its input grows, not just as the precision does.
+    /// working precision $n$, summed by binary splitting for large $n$, costs the first term, and
+    /// for $|x| \geq 4$ the argument is reduced modulo $2\pi$, which requires $\pi$ to about $n +
+    /// e$ bits. Unlike most functions, `cos` therefore gets slower as the magnitude of its input
+    /// grows, not just as the precision does.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact`, since the cosine of a finite nonzero [`Float`] is never exactly
@@ -1467,7 +1487,7 @@ impl Float {
     /// If you know you'll be using `Nearest`, consider using [`Float::cos_rational_prec`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n, m, e) = O(n^{3/2} \log n \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
+    /// $T(n, m, e) = O(n (\log n)^3 \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
     ///
     /// $M(n, m, e) = O((n+m+e) \log (n+m+e))$
     ///
@@ -1536,7 +1556,7 @@ impl Float {
     /// instead.
     ///
     /// # Worst-case complexity
-    /// $T(n, m, e) = O(n^{3/2} \log n \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
+    /// $T(n, m, e) = O(n (\log n)^3 \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
     ///
     /// $M(n, m, e) = O((n+m+e) \log (n+m+e))$
     ///
@@ -1623,7 +1643,7 @@ impl Float {
     /// [`Float::cos_rational_prec_round`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n, m, e) = O(n^{3/2} \log n \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
+    /// $T(n, m, e) = O(n (\log n)^3 \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
     ///
     /// $M(n, m, e) = O((n+m+e) \log (n+m+e))$
     ///
@@ -1682,7 +1702,7 @@ impl Float {
     /// [`Float::cos_rational_prec_round_ref`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n, m, e) = O(n^{3/2} \log n \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
+    /// $T(n, m, e) = O(n (\log n)^3 \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
     ///
     /// $M(n, m, e) = O((n+m+e) \log (n+m+e))$
     ///
@@ -2070,7 +2090,7 @@ impl Float {
     /// using [`Float::cos_with_period_round`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n, m, e) = O(n^{3/2} \log n \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
+    /// $T(n, m, e) = O(n (\log n)^3 \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
     ///
     /// $M(n, m, e) = O((n+m+e) \log (n+m+e))$
     ///
@@ -2181,7 +2201,7 @@ impl Float {
     /// using [`Float::cos_with_period_round_ref`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n, m, e) = O(n^{3/2} \log n \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
+    /// $T(n, m, e) = O(n (\log n)^3 \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
     ///
     /// $M(n, m, e) = O((n+m+e) \log (n+m+e))$
     ///
@@ -2291,7 +2311,7 @@ impl Float {
     /// instead.
     ///
     /// # Worst-case complexity
-    /// $T(n, m, e) = O(n^{3/2} \log n \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
+    /// $T(n, m, e) = O(n (\log n)^3 \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
     ///
     /// $M(n, m, e) = O((n+m+e) \log (n+m+e))$
     ///
@@ -2377,7 +2397,7 @@ impl Float {
     /// `Nearest` instead.
     ///
     /// # Worst-case complexity
-    /// $T(n, m, e) = O(n^{3/2} \log n \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
+    /// $T(n, m, e) = O(n (\log n)^3 \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
     ///
     /// $M(n, m, e) = O((n+m+e) \log (n+m+e))$
     ///
@@ -2472,7 +2492,7 @@ impl Float {
     /// instead.
     ///
     /// # Worst-case complexity
-    /// $T(n, e) = O(n^{3/2} \log n \log\log n + (n+e) (\log (n+e))^2 \log\log (n+e))$
+    /// $T(n, e) = O(n (\log n)^3 \log\log n + (n+e) (\log (n+e))^2 \log\log (n+e))$
     ///
     /// $M(n, e) = O((n+e) \log (n+e))$
     ///
@@ -2574,7 +2594,7 @@ impl Float {
     /// instead.
     ///
     /// # Worst-case complexity
-    /// $T(n, e) = O(n^{3/2} \log n \log\log n + (n+e) (\log (n+e))^2 \log\log (n+e))$
+    /// $T(n, e) = O(n (\log n)^3 \log\log n + (n+e) (\log (n+e))^2 \log\log (n+e))$
     ///
     /// $M(n, e) = O((n+e) \log (n+e))$
     ///
@@ -2638,7 +2658,7 @@ impl Float {
     /// using [`Float::cos_with_period_round_assign`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n, m, e) = O(n^{3/2} \log n \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
+    /// $T(n, m, e) = O(n (\log n)^3 \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
     ///
     /// $M(n, m, e) = O((n+m+e) \log (n+m+e))$
     ///
@@ -2711,7 +2731,7 @@ impl Float {
     /// `Nearest` instead.
     ///
     /// # Worst-case complexity
-    /// $T(n, m, e) = O(n^{3/2} \log n \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
+    /// $T(n, m, e) = O(n (\log n)^3 \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
     ///
     /// $M(n, m, e) = O((n+m+e) \log (n+m+e))$
     ///
@@ -2771,7 +2791,7 @@ impl Float {
     /// input's precision instead.
     ///
     /// # Worst-case complexity
-    /// $T(n, e) = O(n^{3/2} \log n \log\log n + (n+e) (\log (n+e))^2 \log\log (n+e))$
+    /// $T(n, e) = O(n (\log n)^3 \log\log n + (n+e) (\log (n+e))^2 \log\log (n+e))$
     ///
     /// $M(n, e) = O((n+e) \log (n+e))$
     ///
@@ -2940,7 +2960,7 @@ impl Float {
     /// [`Float::cos_with_period_rational_prec`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n, m) = O(n^{3/2} \log n \log\log n + (n+m) (\log (n+m))^2 \log\log (n+m))$
+    /// $T(n, m) = O(n (\log n)^3 \log\log n + (n+m) (\log (n+m))^2 \log\log (n+m))$
     ///
     /// $M(n, m) = O((n+m) \log (n+m))$
     ///
@@ -3049,7 +3069,7 @@ impl Float {
     /// [`Float::cos_with_period_rational_prec_ref`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n, m) = O(n^{3/2} \log n \log\log n + (n+m) (\log (n+m))^2 \log\log (n+m))$
+    /// $T(n, m) = O(n (\log n)^3 \log\log n + (n+m) (\log (n+m))^2 \log\log (n+m))$
     ///
     /// $M(n, m) = O((n+m) \log (n+m))$
     ///
@@ -3165,7 +3185,7 @@ impl Float {
     /// [`Float::cos_with_period_rational_prec_round`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n, m) = O(n^{3/2} \log n \log\log n + (n+m) (\log (n+m))^2 \log\log (n+m))$
+    /// $T(n, m) = O(n (\log n)^3 \log\log n + (n+m) (\log (n+m))^2 \log\log (n+m))$
     ///
     /// $M(n, m) = O((n+m) \log (n+m))$
     ///
@@ -3247,7 +3267,7 @@ impl Float {
     /// [`Float::cos_with_period_rational_prec_round_ref`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n, m) = O(n^{3/2} \log n \log\log n + (n+m) (\log (n+m))^2 \log\log (n+m))$
+    /// $T(n, m) = O(n (\log n)^3 \log\log n + (n+m) (\log (n+m))^2 \log\log (n+m))$
     ///
     /// $M(n, m) = O((n+m) \log (n+m))$
     ///
@@ -3755,15 +3775,16 @@ impl Cos for Float {
     /// you want both of these things, consider using [`Float::cos_prec_round`].
     ///
     /// # Worst-case complexity
-    /// $T(n, e) = O(n^{3/2} \log n \log\log n + (n+e) (\log (n+e))^2 \log\log (n+e))$
+    /// $T(n, e) = O(n (\log n)^3 \log\log n + (n+e) (\log (n+e))^2 \log\log (n+e))$
     ///
     /// $M(n, e) = O((n+e) \log (n+e))$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and $e$ is
     /// the exponent of `self` (0 if `self` has no exponent or a negative one): the Taylor series at
-    /// working precision $n$ costs the first term, and for $|x| \geq 4$ the argument is reduced
-    /// modulo $2\pi$, which requires $\pi$ to about $n + e$ bits. Unlike most functions, `cos`
-    /// therefore gets slower as the magnitude of its input grows, not just as the precision does.
+    /// working precision $n$, summed by binary splitting for large $n$, costs the first term, and
+    /// for $|x| \geq 4$ the argument is reduced modulo $2\pi$, which requires $\pi$ to about $n +
+    /// e$ bits. Unlike most functions, `cos` therefore gets slower as the magnitude of its input
+    /// grows, not just as the precision does.
     ///
     /// # Examples
     /// ```
@@ -3821,15 +3842,16 @@ impl Cos for &Float {
     /// [`Float::cos_prec_round_ref`].
     ///
     /// # Worst-case complexity
-    /// $T(n, e) = O(n^{3/2} \log n \log\log n + (n+e) (\log (n+e))^2 \log\log (n+e))$
+    /// $T(n, e) = O(n (\log n)^3 \log\log n + (n+e) (\log (n+e))^2 \log\log (n+e))$
     ///
     /// $M(n, e) = O((n+e) \log (n+e))$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and $e$ is
     /// the exponent of `self` (0 if `self` has no exponent or a negative one): the Taylor series at
-    /// working precision $n$ costs the first term, and for $|x| \geq 4$ the argument is reduced
-    /// modulo $2\pi$, which requires $\pi$ to about $n + e$ bits. Unlike most functions, `cos`
-    /// therefore gets slower as the magnitude of its input grows, not just as the precision does.
+    /// working precision $n$, summed by binary splitting for large $n$, costs the first term, and
+    /// for $|x| \geq 4$ the argument is reduced modulo $2\pi$, which requires $\pi$ to about $n +
+    /// e$ bits. Unlike most functions, `cos` therefore gets slower as the magnitude of its input
+    /// grows, not just as the precision does.
     ///
     /// # Examples
     /// ```
@@ -3882,15 +3904,16 @@ impl CosAssign for Float {
     /// [`Float::cos_prec_round_assign`].
     ///
     /// # Worst-case complexity
-    /// $T(n, e) = O(n^{3/2} \log n \log\log n + (n+e) (\log (n+e))^2 \log\log (n+e))$
+    /// $T(n, e) = O(n (\log n)^3 \log\log n + (n+e) (\log (n+e))^2 \log\log (n+e))$
     ///
     /// $M(n, e) = O((n+e) \log (n+e))$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and $e$ is
     /// the exponent of `self` (0 if `self` has no exponent or a negative one): the Taylor series at
-    /// working precision $n$ costs the first term, and for $|x| \geq 4$ the argument is reduced
-    /// modulo $2\pi$, which requires $\pi$ to about $n + e$ bits. Unlike most functions, `cos`
-    /// therefore gets slower as the magnitude of its input grows, not just as the precision does.
+    /// working precision $n$, summed by binary splitting for large $n$, costs the first term, and
+    /// for $|x| \geq 4$ the argument is reduced modulo $2\pi$, which requires $\pi$ to about $n +
+    /// e$ bits. Unlike most functions, `cos` therefore gets slower as the magnitude of its input
+    /// grows, not just as the precision does.
     ///
     /// # Examples
     /// ```

@@ -16084,3 +16084,66 @@ where
 fn primitive_float_sin_cos_properties() {
     apply_fn_to_primitive_floats!(primitive_float_sin_cos_properties_helper);
 }
+
+// Precisions at or above the binary-splitting threshold, where `sin`, `cos`, and `sin_cos` all use
+// the `mpfr_sincos_fast` port: inputs covering the three reduction cases (0 < x <= pi/4, its
+// negative, and a remainder modulo pi/2 with every combination of quotient bits), chunk-splitting
+// with and without zero chunks, and Ziv retries (the near-multiples of pi and pi/2). The three
+// entry points must agree, and all must match rug.
+#[test]
+fn test_sin_cos_fast_tier() {
+    let inputs: Vec<Float> = vec![
+        Float::from_unsigned_prec(1u32, 100).0,
+        Float::from(0.1f64),
+        Float::from(0.75f64),
+        Float::from(0.8f64),
+        Float::from(-0.8f64),
+        Float::from(-0.1f64),
+        Float::from(3.5f64),
+        Float::from(100.25f64),
+        Float::from(-7.0f64),
+        Float::from(1.0e10f64),
+        Float::from(1.0e-5f64),
+        Float::power_of_2_prec(-20i64, 1).0,
+        Float::from_rational_prec(Rational::from_unsigneds(22u32, 7u32), 40000).0,
+        Float::pi_prec(40000).0,
+        Float::pi_prec(40000).0 >> 1u32,
+        Float::pi_prec(50000).0 * Float::from(1000u32),
+        Float::from_unsigned_prec(1u32, 100).0 << 200u32,
+    ];
+    for x in &inputs {
+        // the threshold itself, then well above it
+        for prec in [25285u64, 30000, 40000, 65537] {
+            for rm in [Nearest, Floor, Ceiling, Down, Up] {
+                let (s, c, o_s, o_c) = x.sin_cos_prec_round_ref(prec, rm);
+                assert!(s.is_valid());
+                assert!(c.is_valid());
+                assert_rounding_ordering_consistent(&s, rm, o_s);
+                assert_rounding_ordering_consistent(&c, rm, o_c);
+                let (s_alt, o_s_alt) = x.sin_prec_round_ref(prec, rm);
+                let (c_alt, o_c_alt) = x.cos_prec_round_ref(prec, rm);
+                assert_eq!(ComparableFloatRef(&s_alt), ComparableFloatRef(&s));
+                assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+                assert_eq!(o_s_alt, o_s);
+                assert_eq!(o_c_alt, o_c);
+                let (rug_s, rug_c, rug_o_s, rug_o_c) = rug_sin_cos_prec_round(
+                    &rug::Float::exact_from(x),
+                    prec,
+                    rug_round_try_from_rounding_mode(rm).unwrap(),
+                );
+                assert_eq!(
+                    ComparableFloatRef(&Float::from(&rug_s)),
+                    ComparableFloatRef(&s),
+                    "x = {x} prec = {prec} rm = {rm:?}"
+                );
+                assert_eq!(
+                    ComparableFloatRef(&Float::from(&rug_c)),
+                    ComparableFloatRef(&c),
+                    "x = {x} prec = {prec} rm = {rm:?}"
+                );
+                assert_eq!(rug_o_s, o_s);
+                assert_eq!(rug_o_c, o_c);
+            }
+        }
+    }
+}

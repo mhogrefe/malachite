@@ -1,14 +1,46 @@
 error: `(1 << n) - 1` builds a mask of the low `n` bits
-  --> $DIR/shift_of_one.rs:5:13
+  --> $DIR/shift_of_one.rs:8:13
+   |
+LL |     let a = (Natural::ONE << k) - Natural::ONE;
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: use `Natural::low_mask(k)`
+   = note: `#[deny(shift_of_one)]` on by default
+
+error: `x & (1 << n)` tests a single bit
+  --> $DIR/shift_of_one.rs:10:13
+   |
+LL |     let b = x & (Natural::ONE << k) != 0u32;
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: use `x.get_bit(k)`
+
+error: `1 << n` constructs a power of two
+  --> $DIR/shift_of_one.rs:12:13
+   |
+LL |     let c = Integer::ONE << k;
+   |             ^^^^^^^^^^^^^^^^^
+   |
+   = help: use `Integer::power_of_2(k)`
+
+error: `1 << n` constructs a power of two
+  --> $DIR/shift_of_one.rs:14:13
+   |
+LL |     let d = Rational::ONE << k;
+   |             ^^^^^^^^^^^^^^^^^^
+   |
+   = help: use `Rational::power_of_2(k)`
+
+error: `(1 << n) - 1` builds a mask of the low `n` bits
+  --> $DIR/shift_of_one.rs:22:13
    |
 LL |     let a = (1u64 << k) - 1;
    |             ^^^^^^^^^^^^^^^
    |
    = help: use `u64::low_mask(k)`
-   = note: `#[deny(shift_of_one)]` on by default
 
 error: `x & (1 << n)` tests a single bit
-  --> $DIR/shift_of_one.rs:7:13
+  --> $DIR/shift_of_one.rs:24:13
    |
 LL |     let b = x & (u64::ONE << k) != 0;
    |             ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -16,7 +48,7 @@ LL |     let b = x & (u64::ONE << k) != 0;
    = help: use `x.get_bit(k)`
 
 error: `x & (1 << n)` tests a single bit
-  --> $DIR/shift_of_one.rs:9:13
+  --> $DIR/shift_of_one.rs:26:13
    |
 LL |     let c = x & (1u64 << k) == 0;
    |             ^^^^^^^^^^^^^^^^^^^^
@@ -24,7 +56,7 @@ LL |     let c = x & (1u64 << k) == 0;
    = help: use `!x.get_bit(k)`
 
 error: `1 << n` constructs a power of two
-  --> $DIR/shift_of_one.rs:11:13
+  --> $DIR/shift_of_one.rs:28:13
    |
 LL |     let d = 1u64 << k;
    |             ^^^^^^^^^
@@ -32,7 +64,7 @@ LL |     let d = 1u64 << k;
    = help: use `u64::power_of_2(k)`
 
 error: `1 << n` constructs a power of two
-  --> $DIR/shift_of_one.rs:13:13
+  --> $DIR/shift_of_one.rs:30:13
    |
 LL |     let e = u64::ONE << k;
    |             ^^^^^^^^^^^^^
@@ -40,12 +72,12 @@ LL |     let e = u64::ONE << k;
    = help: use `u64::power_of_2(k)`
 
 error: `1 << n` constructs a power of two
-  --> $DIR/shift_of_one.rs:15:13
+  --> $DIR/shift_of_one.rs:32:13
    |
 LL |     let g = (1u64 << k) - 2;
    |             ^^^^^^^^^^^
    |
    = help: use `u64::power_of_2(k)`
 
-error: aborting due to 6 previous errors
+error: aborting due to 10 previous errors
 

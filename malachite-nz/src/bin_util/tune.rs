@@ -15,13 +15,8 @@
 //! near a crossover are nearly equal by definition, modest error in earlier levels barely
 //! perturbs later ones; iterate to a fixpoint (2-3 passes) if paranoid.
 //!
-//! Measurement notes:
-//! - Batched best-of-k timing: noise is strictly additive, so the minimum of many batch
-//!   measurements converges on the true cost, unlike means or medians.
-//! - Each call rotates through several distinct random input sets. With a single input set the
-//!   branch predictor memorizes the operands' carry patterns and flatters whichever algorithm is
-//!   branchier — at small sizes this distorted crossovers badly.
-//! - A warmup pass runs before timing to fault in pages and let the core settle.
+//! The measurement machinery (batched best-of-k interleaved timing and the crossover scan) is
+//! shared with the other crates' tuners: see `malachite_base::test_util::bench::tune`.
 //!
 //! Usage: `cargo run --release --features bin_build -p malachite-nz -- -g tune_mul`
 //! (acquire perf/bench-lock.sh first; results are garbage on a busy machine)
@@ -29,6 +24,9 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::random::random_primitive_ints;
 use malachite_base::random::EXAMPLE_SEED;
+use malachite_base::test_util::bench::tune::{
+    INPUT_SETS, find_crossover_spec, interleaved_min_pair, time_batch,
+};
 use malachite_nz::natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
 use malachite_nz::natural::arithmetic::div::{
     limbs_div_barrett_approx, limbs_div_barrett_approx_scratch_len,
@@ -94,52 +92,6 @@ use malachite_nz::natural::arithmetic::square::{
 use malachite_nz::natural::conversion::digits::general_digits::limbs_to_digits_small_base_basecase;
 use malachite_nz::platform::Limb;
 use std::hint::black_box;
-use std::time::Instant;
-
-// Number of distinct input sets rotated through during measurement (power of 2).
-const INPUT_SETS: usize = 8;
-const RUNS: usize = 9;
-const MIN_BATCH_NS: u128 = 50_000;
-
-fn time_batch(f: &mut dyn FnMut(), iters: u64) -> f64 {
-    let start = Instant::now();
-    for _ in 0..iters {
-        f();
-    }
-    start.elapsed().as_nanos() as f64 / iters as f64
-}
-
-// Calibrate the batch size so that one batch takes >= MIN_BATCH_NS.
-fn calibrate(f: &mut dyn FnMut()) -> u64 {
-    let mut iters = 1u64;
-    loop {
-        let start = Instant::now();
-        for _ in 0..iters {
-            f();
-        }
-        let ns = start.elapsed().as_nanos();
-        if ns >= MIN_BATCH_NS {
-            return iters;
-        }
-        iters = if ns == 0 { iters * 100 } else { iters * 2 };
-    }
-}
-
-// Measure best-case ns per call of two routines, INTERLEAVED: each round times one batch of A then
-// one batch of B, and the minimum over rounds is kept for each. Interleaving matters on asymmetric
-// cores (Apple Silicon): if A and B were measured in separate blocks, a P/E-core migration or
-// frequency shift between blocks would skew one side, producing impossible discontinuities. With
-// interleaving plus best-of-k, both sides see the same best environment.
-fn interleaved_min_pair(fa: &mut dyn FnMut(), fb: &mut dyn FnMut()) -> (f64, f64) {
-    let ia = calibrate(fa);
-    let ib = calibrate(fb);
-    let (mut best_a, mut best_b) = (f64::INFINITY, f64::INFINITY);
-    for _ in 0..RUNS {
-        best_a = best_a.min(time_batch(fa, ia));
-        best_b = best_b.min(time_batch(fb, ib));
-    }
-    (best_a, best_b)
-}
 
 type MulFn<'a> = &'a dyn Fn(&mut [Limb], &[Limb], &[Limb], &mut [Limb]);
 
@@ -192,31 +144,6 @@ fn measure_mul_pair(n: usize, a: &Algo, b: &Algo) -> Option<(f64, f64)> {
     Some(times)
 }
 
-// GMP's analyze_dat: given (size, d) where d > 0 means the lower algorithm was faster at that size,
-// pick the cut index minimizing the total relative time lost to mispredictions.
-fn analyze(dat: &[(usize, f64)]) -> Option<usize> {
-    let mut best_i = 0;
-    let mut best_badness = f64::INFINITY;
-    for i in 0..=dat.len() {
-        let mut badness = 0.0;
-        for (j, &(_, d)) in dat.iter().enumerate() {
-            if j < i {
-                // below the cut we'd use the lower algorithm; cost if the upper was faster
-                if d < 0.0 {
-                    badness -= d;
-                }
-            } else if d > 0.0 {
-                badness += d;
-            }
-        }
-        if badness < best_badness {
-            best_badness = badness;
-            best_i = i;
-        }
-    }
-    (best_i < dat.len()).then(|| dat[best_i].0)
-}
-
 struct Level<'a> {
     threshold_name: &'a str,
     min_size: usize,
@@ -228,83 +155,13 @@ struct Level<'a> {
 fn find_crossover(c: &Level) {
     find_crossover_spec(
         c.threshold_name,
+        "usize",
         c.lower.name,
         c.upper.name,
         c.min_size,
         c.max_size,
         &|n| measure_mul_pair(n, &c.lower, &c.upper),
     );
-}
-
-// The generic crossover loop; `measure` returns (lower time, upper time) at a size, or `None` if
-// the size is invalid for either algorithm.
-fn find_crossover_spec(
-    threshold_name: &str,
-    lower_name: &str,
-    upper_name: &str,
-    min_size: usize,
-    max_size: usize,
-    measure: &dyn Fn(usize) -> Option<(f64, f64)>,
-) {
-    let mut dat = Vec::new();
-    let mut since_change = 0;
-    let mut consecutive_upper_wins = 0;
-    let mut last_thresh = None;
-    let mut last_size = min_size;
-    let mut size = min_size as f64;
-    println!("tuning {threshold_name} ({lower_name} -> {upper_name})");
-    while (size as usize) < max_size {
-        let n = size as usize;
-        size = f64::max(size * 1.05, size + 1.0);
-        let Some((tl, tu)) = measure(n) else {
-            continue;
-        };
-        // d > 0: lower algorithm faster here
-        let d = if tu >= tl {
-            (tu - tl) / tu
-        } else {
-            (tu - tl) / tl
-        };
-        dat.push((n, d));
-        let thresh = analyze(&dat);
-        println!(
-            "  size {n:>6}  {lower_name} {tl:>10.1}ns  {upper_name} {tu:>10.1}ns  d {d:>7.4}  \
-            -> {}",
-            thresh.map_or_else(|| "-".to_string(), |t| t.to_string()),
-        );
-        // Stop when the upper algorithm has clearly won several sizes in a row; a single outlier
-        // (e.g. a stray core migration) must not end the scan.
-        consecutive_upper_wins = if d < 0.0 {
-            consecutive_upper_wins + 1
-        } else {
-            0
-        };
-        if consecutive_upper_wins >= 3 && tl >= tu * 1.2 {
-            break;
-        }
-        if thresh == last_thresh {
-            since_change += 1;
-            // Give up after a long stretch without progress -- but not while the two algorithms are
-            // running nearly glued together (|d| small): such plateaus can persist for dozens of
-            // sizes before the upper algorithm finally pulls ahead, and quitting inside one reports
-            // a bogus "never wins".
-            let glued = dat.iter().rev().take(10).any(|&(_, d)| d.abs() < 0.02);
-            if since_change > 40 && !glued {
-                break;
-            }
-        } else {
-            since_change = 0;
-            last_thresh = thresh;
-        }
-        last_size = n;
-    }
-    match analyze(&dat) {
-        None => println!(
-            "  {threshold_name}: upper algorithm never wins below {last_size} (scan limit \
-            {max_size})"
-        ),
-        Some(t) => println!("pub(crate) const {threshold_name}: usize = {t};"),
-    }
 }
 
 fn basecase_algo<'a>() -> Algo<'a> {
@@ -604,6 +461,7 @@ fn measure_div_pair(n: usize, min_d: usize, a: DivAlgoFn, b: DivAlgoFn) -> Optio
 fn tune_inv_newton() {
     find_crossover_spec(
         "INV_NEWTON_THRESHOLD",
+        "usize",
         "invert_basecase",
         "invert_newton",
         5,
@@ -709,6 +567,7 @@ fn measure_mu_pair(
 fn tune_mu_div_qr() {
     find_crossover_spec(
         "MU_DIV_QR_THRESHOLD",
+        "usize",
         "dc_div_qr",
         "barrett_div_qr",
         61,
@@ -727,6 +586,7 @@ fn tune_mu_div_qr() {
 fn tune_mu_divappr_q() {
     find_crossover_spec(
         "MU_DIVAPPR_Q_THRESHOLD",
+        "usize",
         "dc_divappr_q",
         "barrett_divappr_q",
         61,
@@ -1124,9 +984,15 @@ fn tune_unbalanced_interior(
     aspect: &dyn Fn(usize) -> usize,
     max_size: usize,
 ) {
-    find_crossover_spec(threshold_name, lower.name, upper.name, 15, max_size, &|y| {
-        measure_unbalanced_pair(aspect(y), y, lower, upper)
-    });
+    find_crossover_spec(
+        threshold_name,
+        "usize",
+        lower.name,
+        upper.name,
+        15,
+        max_size,
+        &|y| measure_unbalanced_pair(aspect(y), y, lower, upper),
+    );
 }
 
 fn tune_mul_toom32_to_toom43() {
@@ -1340,6 +1206,7 @@ fn measure_bdiv_pair(
 fn tune_dc_bdiv_qr() {
     find_crossover_spec(
         "DC_BDIV_QR_THRESHOLD",
+        "usize",
         "bdiv_qr_schoolbook",
         "bdiv_qr_dc",
         4,
@@ -1362,6 +1229,7 @@ fn tune_dc_bdiv_qr() {
 fn tune_dc_bdiv_q() {
     find_crossover_spec(
         "DC_BDIV_Q_THRESHOLD",
+        "usize",
         "bdiv_q_schoolbook",
         "bdiv_q_dc",
         4,
@@ -1433,6 +1301,7 @@ fn measure_mu_bdiv_pair(
 fn tune_mu_bdiv_qr() {
     find_crossover_spec(
         "MU_BDIV_QR_THRESHOLD",
+        "usize",
         "dc_bdiv_qr",
         "barrett_bdiv_qr",
         50,
@@ -1456,6 +1325,7 @@ fn tune_mu_bdiv_qr() {
 fn tune_mu_bdiv_q() {
     find_crossover_spec(
         "MU_BDIV_Q_THRESHOLD",
+        "usize",
         "dc_bdiv_q",
         "barrett_bdiv_q",
         50,
@@ -1505,6 +1375,7 @@ fn tune_from_digits_dc() {
     };
     find_crossover_spec(
         "FROM_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD",
+        "usize",
         "parse_basecase",
         "parse_dc",
         500,
@@ -1564,6 +1435,7 @@ fn tune_from_digits_dc() {
 fn tune_mu_bdiv_qr_vs_schoolbook() {
     find_crossover_spec(
         "MU_BDIV_QR_THRESHOLD",
+        "usize",
         "bdiv_qr_schoolbook",
         "barrett_bdiv_qr",
         10,
@@ -1587,6 +1459,7 @@ fn tune_mu_bdiv_qr_vs_schoolbook() {
 fn tune_mu_bdiv_q_vs_schoolbook() {
     find_crossover_spec(
         "MU_BDIV_Q_THRESHOLD",
+        "usize",
         "bdiv_q_schoolbook",
         "barrett_bdiv_q",
         10,
@@ -1712,6 +1585,7 @@ fn tune_invert_probe() {
 fn tune_dc_div_qr() {
     find_crossover_spec(
         "DC_DIV_QR_THRESHOLD",
+        "usize",
         "schoolbook",
         "divide_and_conquer",
         6,
@@ -1730,6 +1604,7 @@ fn tune_dc_div_qr() {
 fn tune_dc_divappr_q() {
     find_crossover_spec(
         "DC_DIVAPPR_Q_THRESHOLD",
+        "usize",
         "schoolbook_approx",
         "divide_and_conquer_approx",
         6,

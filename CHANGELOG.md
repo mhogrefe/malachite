@@ -288,6 +288,13 @@ documented by git history.
   `sin_cos_pi_round` (with `_ref` and `_assign` variants), `sin_cos_pi_rational_prec_round` and
   `sin_cos_pi_rational_prec` (with `_ref` variants), and `primitive_float_sin_cos_pi` and
   `primitive_float_sin_cos_pi_rational` are the same in half-turns, delegating with a period of 2.
+- `sin`, `cos`, and `sin_cos` now use MPFR's asymptotically fast tier (`mpfr_sincos_fast`, binary
+  splitting of the Taylor series over chunks of the reduced argument, combined by the angle-addition
+  formulas) at and above a tuned precision threshold (25285 bits), as MPFR does at its
+  `MPFR_SINCOS_THRESHOLD`, bringing their cost from $O(n^{3/2})$ to $O(n \log^3 n)$ word
+  operations up to log factors. The tuner (`-g tune_sincos` in the `malachite-float` binary)
+  shares its crossover machinery with `malachite-nz`'s, now in
+  `malachite_base::test_util::bench::tune`.
 - Fixed `cos_with_period_rational_prec_round` taking a working precision of billions of bits for a
   tiny negative input, and `cos_with_period_prec_round` doing the same for a `Float` just below a
   multiple of its period: the fraction of a turn is now reduced to $[-1/2, 1/2]$, where the

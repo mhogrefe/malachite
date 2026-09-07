@@ -21,7 +21,7 @@ use core::cmp::Ordering;
 use core::mem::{replace, swap};
 use malachite_base::num::arithmetic::traits::{
     AddMul, AddMulAssign, CheckedSub, DivMod, ModPowerOf2, ModPowerOf2Assign, ModPowerOf2SubAssign,
-    SubMul, SubMulAssign, WrappingAddMul,
+    PowerOf2, SubMul, SubMulAssign, WrappingAddMul,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
@@ -888,7 +888,7 @@ fn split(n: &mut Mat22, x: &mut Ball, k: u64, cutoff: u64) -> bool {
     }
     // The low parts of the original endpoints. The two that were rounded up above owe a borrow of
     // 2^k, which makes them negative; the reassembled endpoints are nonnegative again.
-    let two_k = Integer::from(Natural::ONE << k);
+    let two_k = Integer::power_of_2(k);
     let low_ln = Integer::from((&x.left_num).mod_power_of_2(k));
     let low_ld = Integer::from((&x.left_den).mod_power_of_2(k)) - &two_k;
     let low_rn = Integer::from((&x.right_num).mod_power_of_2(k)) - two_k;

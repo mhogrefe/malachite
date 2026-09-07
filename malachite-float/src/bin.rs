@@ -105,7 +105,13 @@ fn main() {
     } else if let Some(codegen_key) = args.codegen_key {
         match codegen_key.as_str() {
             "l2b_data" => generate_l2b_data(),
-            key => panic!("Unrecognized codegen key: {key}"),
+            key => {
+                if let Some(tune_key) = key.strip_prefix("tune_") {
+                    crate::bin_util::tune::tune(tune_key);
+                } else {
+                    panic!("Unrecognized codegen key: {key}");
+                }
+            }
         }
     } else {
         panic!();
@@ -119,4 +125,5 @@ const fn main() {}
 pub mod bin_util {
     pub mod demo_and_bench;
     pub mod generate;
+    pub mod tune;
 }

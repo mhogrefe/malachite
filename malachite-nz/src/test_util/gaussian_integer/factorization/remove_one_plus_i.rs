@@ -8,12 +8,12 @@
 
 use crate::gaussian_integer::GaussianInteger;
 use crate::integer::Integer;
-use malachite_base::num::arithmetic::traits::{DivRem, ModPowerOf2, MulIAssign, Parity};
+use malachite_base::num::arithmetic::traits::{DivRem, ModPowerOf2, MulIAssign, Parity, PowerOf2};
 use malachite_base::num::basic::traits::{One, Zero};
 
 // (1 + i)^k, as (2i)^(k/2) times 1 + i if k is odd.
 pub fn gaussian_integer_one_plus_i_pow(k: u64) -> GaussianInteger {
-    let mut p = GaussianInteger::ONE << (k >> 1);
+    let mut p = GaussianInteger::power_of_2(k >> 1);
     for _ in 0..(k >> 1).mod_power_of_2(2) {
         p.mul_i_assign();
     }
