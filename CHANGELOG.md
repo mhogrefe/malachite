@@ -288,6 +288,9 @@ documented by git history.
   `sin_cos_pi_round` (with `_ref` and `_assign` variants), `sin_cos_pi_rational_prec_round` and
   `sin_cos_pi_rational_prec` (with `_ref` variants), and `primitive_float_sin_cos_pi` and
   `primitive_float_sin_cos_pi_rational` are the same in half-turns, delegating with a period of 2.
+- The Dottie number, the fixed point of the cosine, as `dottie_number_prec_round` and
+  `dottie_number_prec` on `Float`, correctly rounded to any precision (Newton's method with a
+  certified final bracket), and as a `DottieNumber` trait with constants for primitive floats.
 - `sin`, `cos`, and `sin_cos` now use MPFR's asymptotically fast tier (`mpfr_sincos_fast`, binary
   splitting of the Taylor series over chunks of the reduced argument, combined by the angle-addition
   formulas) at and above a tuned precision threshold (25285 bits), as MPFR does at its

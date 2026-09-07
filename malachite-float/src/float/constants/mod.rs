@@ -14,6 +14,7 @@ pub mod cbrt_2;
 pub mod champernowne_constant;
 /// Functions for approximating the Copeland–Erdős constant in a given base.
 pub mod copeland_erdos_constant;
+pub mod dottie_number;
 /// Functions for approximating $e$, Euler's number.
 pub mod e;
 /// Functions for approximating Euler's constant (the Euler–Mascheroni constant),

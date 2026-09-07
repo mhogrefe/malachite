@@ -17,13 +17,13 @@ use crate::num::arithmetic::traits::{
     ReciprocalAssign, Sign, Sqrt, SqrtAssign, Square, SquareAssign, SubMul, SubMulAssign,
 };
 use crate::num::basic::traits::{
-    CatalansConstant, ChampernowneConstant, CopelandErdosConstant, EulersConstant, GaussConstant,
-    GelfondSchneiderConstant, GelfondsConstant, Infinity, LemniscateConstant, LiouvillesConstant,
-    Ln2, Ln10, Log2E, Log10E, Log102, Log210, NaN, NegativeInfinity, NegativeOne, NegativeZero,
-    One, OneHalf, OneOverPi, OneOverSqrtPi, OneOverSqrtTau, Phi, Pi, PiOver2, PiOver3, PiOver4,
-    PiOver6, PiOver8, PrimeConstant, ProuhetThueMorseConstant, RamanujansConstant, Sqrt2,
-    Sqrt2Over2, Sqrt3, Sqrt3Over3, Sqrt5, Sqrt5Over5, SqrtPi, Tau, Two, TwoOverPi, TwoOverSqrtPi,
-    Zero,
+    CatalansConstant, ChampernowneConstant, CopelandErdosConstant, DottieNumber, EulersConstant,
+    GaussConstant, GelfondSchneiderConstant, GelfondsConstant, Infinity, LemniscateConstant,
+    LiouvillesConstant, Ln2, Ln10, Log2E, Log10E, Log102, Log210, NaN, NegativeInfinity,
+    NegativeOne, NegativeZero, One, OneHalf, OneOverPi, OneOverSqrtPi, OneOverSqrtTau, Phi, Pi,
+    PiOver2, PiOver3, PiOver4, PiOver6, PiOver8, PrimeConstant, ProuhetThueMorseConstant,
+    RamanujansConstant, Sqrt2, Sqrt2Over2, Sqrt3, Sqrt3Over3, Sqrt5, Sqrt5Over5, SqrtPi, Tau, Two,
+    TwoOverPi, TwoOverSqrtPi, Zero,
 };
 use crate::num::comparison::traits::{EqAbs, PartialOrdAbs};
 use crate::num::conversion::traits::{
@@ -143,6 +143,7 @@ pub trait PrimitiveFloat:
     + FmtRyuString
     + From<f32>
     + FromStr
+    + DottieNumber
     + GaussConstant
     + GelfondSchneiderConstant
     + GelfondsConstant
@@ -658,6 +659,7 @@ macro_rules! impl_basic_traits_primitive_float {
         $one_over_sqrt_pi: expr,
         $one_over_sqrt_tau: expr,
         $gauss_constant: expr,
+        $dottie_number: expr,
         $gelfonds_constant: expr,
         $gelfond_schneider_constant: expr,
         $lemniscate_constant: expr,
@@ -930,6 +932,11 @@ macro_rules! impl_basic_traits_primitive_float {
             const GAUSS_CONSTANT: $t = $gauss_constant;
         }
 
+        /// The Dottie number, the fixed point of the cosine.
+        impl DottieNumber for $t {
+            const DOTTIE_NUMBER: $t = $dottie_number;
+        }
+
         /// $e^\pi$.
         impl GelfondsConstant for $t {
             const GELFONDS_CONSTANT: $t = $gelfonds_constant;
@@ -993,6 +1000,7 @@ impl_basic_traits_primitive_float!(
     0.5641896,
     0.3989423,
     0.83462685,
+    0.73908514,
     23.140692,
     2.6651442,
     2.6220574,
@@ -1020,6 +1028,7 @@ impl_basic_traits_primitive_float!(
     0.5641895835477563,
     0.3989422804014327,
     0.8346268416740732,
+    0.7390851332151607,
     23.14069263277927,
     2.665144142690225,
     2.6220575542921196,

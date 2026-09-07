@@ -15,6 +15,7 @@ pub(crate) fn register(runner: &mut Runner) {
     copeland_erdos_constant::register(runner);
     e::register(runner);
     eulers_constant::register(runner);
+    dottie_number::register(runner);
     gauss_constant::register(runner);
     gelfond_schneider_constant::register(runner);
     gelfonds_constant::register(runner);
@@ -55,6 +56,7 @@ mod catalans_constant;
 mod cbrt_2;
 mod champernowne_constant;
 mod copeland_erdos_constant;
+mod dottie_number;
 mod e;
 mod eulers_constant;
 mod gauss_constant;

@@ -254,6 +254,12 @@ pub trait GaussConstant {
     const GAUSS_CONSTANT: Self;
 }
 
+/// Provides the Dottie number, the unique real fixed point of the cosine: the $d$ with $\cos d =
+/// d$, about 0.739.
+pub trait DottieNumber {
+    const DOTTIE_NUMBER: Self;
+}
+
 /// Provides Gelfond's constant, $e^\pi$.
 pub trait GelfondsConstant {
     const GELFONDS_CONSTANT: Self;
