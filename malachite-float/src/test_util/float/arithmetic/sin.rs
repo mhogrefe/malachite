@@ -72,3 +72,34 @@ pub fn rug_sin_with_period_prec_round(
 pub fn rug_sin_with_period_prec(x: &rug::Float, u: u64, prec: u64) -> (rug::Float, Ordering) {
     rug_sin_with_period_prec_round(x, u, prec, Round::Nearest)
 }
+
+// As for `rug_sin_rational_prec_round`, the input carries its denominator's worth of extra bits,
+// since the sine of a fraction of a turn close to a short dyadic depends on that closeness.
+pub fn rug_sin_with_period_rational_prec_round(
+    x: &Rational,
+    u: u64,
+    prec: u64,
+    rm: Round,
+) -> (rug::Float, Ordering) {
+    let exponent_bits = if *x == 0u32 {
+        0
+    } else {
+        u64::try_from(x.floor_log_base_2_abs()).unwrap_or(0)
+    };
+    let denominator_bits = x.denominator_ref().significant_bits();
+    let rx = rug::Float::with_val(
+        u32::exact_from(prec + 128 + exponent_bits + denominator_bits),
+        rug::Rational::exact_from(x),
+    );
+    let mut s = rug::Float::with_val(u32::exact_from(prec), 0);
+    let o = s.assign_round(rx.sin_u_ref(u32::exact_from(u)), rm);
+    (s, o)
+}
+
+pub fn rug_sin_with_period_rational_prec(
+    x: &Rational,
+    u: u64,
+    prec: u64,
+) -> (rug::Float, Ordering) {
+    rug_sin_with_period_rational_prec_round(x, u, prec, Round::Nearest)
+}

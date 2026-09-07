@@ -255,7 +255,9 @@ documented by git history.
   sign of the input, as IEEE 754-2019's `sinPi` specifies), as are the twelfths whose sine is
   $\pm1/2$, and thirds, sixths, eighths, and twentieths of a turn are computed from a single
   correctly rounded constant ($\sqrt3$, $\sqrt2$, or $\varphi$). Inputs within $2^{-2^{30}}$ of a
-  half turn underflow correctly.
+  half turn underflow correctly. `sin_with_period_rational_prec_round` and
+  `sin_with_period_rational_prec` (with `_ref` variants) take a `Rational` instead, reaching the
+  exact and closed-form cases directly, such as a twelfth or a twentieth of a turn.
 - `primitive_float_sin` and `primitive_float_sin_rational`, the correctly rounded sine of an `f32`
   or `f64`, or of a `Rational` as an `f32` or `f64`.
 - `primitive_float_cos` and `primitive_float_cos_rational`, the correctly rounded cosine of an

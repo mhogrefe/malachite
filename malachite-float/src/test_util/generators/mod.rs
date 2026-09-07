@@ -6115,6 +6115,17 @@ pub fn rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_4()
     )
 }
 
+// All `(Rational, u64, u64, RoundingMode)` that are valid inputs to
+// `Float::sin_with_period_rational_prec_round`.
+pub fn rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_5()
+-> Generator<(Rational, u64, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_5,
+        &random_rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_5,
+        &special_random_rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_5,
+    )
+}
+
 // All `(Rational, i64, u64, RoundingMode)` that are valid inputs to
 // `Float::root_s_rational_prec_round`.
 pub fn rational_signed_unsigned_rounding_mode_quadruple_gen_var_2()

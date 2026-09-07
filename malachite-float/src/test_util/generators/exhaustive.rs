@@ -7055,6 +7055,15 @@ pub fn cos_with_period_rational_prec_round_valid(
     rm != Exact || Float::cos_with_period_rational_prec_round_ref(x, u, prec, Floor).1 == Equal
 }
 
+pub fn sin_with_period_rational_prec_round_valid(
+    x: &Rational,
+    u: u64,
+    prec: u64,
+    rm: RoundingMode,
+) -> bool {
+    rm != Exact || Float::sin_with_period_rational_prec_round_ref(x, u, prec, Floor).1 == Equal
+}
+
 pub fn root_u_rational_prec_round_valid(x: &Rational, k: u64, prec: u64, rm: RoundingMode) -> bool {
     rm != Exact || Float::root_u_rational_prec_round_ref(x, k, prec, Floor).1 == Equal
 }
@@ -7304,6 +7313,26 @@ pub fn exhaustive_rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_4()
         )
         .filter(|&((ref n, k, prec), rm)| {
             cos_with_period_rational_prec_round_valid(n, k, prec, rm)
+        }),
+    ))
+}
+
+pub fn exhaustive_rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_5()
+-> It<(Rational, u64, u64, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(
+        lex_pairs(
+            exhaustive_triples_custom_output(
+                exhaustive_rationals(),
+                exhaustive_unsigneds(),
+                exhaustive_positive_primitive_ints(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref n, k, prec), rm)| {
+            sin_with_period_rational_prec_round_valid(n, k, prec, rm)
         }),
     ))
 }

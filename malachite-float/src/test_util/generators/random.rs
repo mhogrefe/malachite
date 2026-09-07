@@ -68,11 +68,12 @@ use crate::test_util::generators::exhaustive::{
     root_s_rational_prec_round_valid, root_u_prec_round_valid, root_u_rational_prec_round_valid,
     set_prec_round_valid, shl_prec_round_valid, shl_round_valid, shr_prec_round_valid,
     shr_round_valid, signed_rounding_from_float_valid, sin_with_period_prec_round_valid,
-    sin_with_period_round_valid, sqrt_prec_round_valid, sqrt_rational_prec_round_valid,
-    sqrt_round_valid, square_prec_round_valid, square_round_valid, sub_prec_round_valid,
-    sub_rational_prec_round_valid, sub_rational_round_valid, sub_round_valid, sum_prec_round_valid,
-    sum_round_valid, unsigned_pow_prec_round_valid, unsigned_pow_rational_prec_round_valid,
-    unsigned_pow_unsigned_prec_round_valid, unsigned_rounding_from_float_valid,
+    sin_with_period_rational_prec_round_valid, sin_with_period_round_valid, sqrt_prec_round_valid,
+    sqrt_rational_prec_round_valid, sqrt_round_valid, square_prec_round_valid, square_round_valid,
+    sub_prec_round_valid, sub_rational_prec_round_valid, sub_rational_round_valid, sub_round_valid,
+    sum_prec_round_valid, sum_round_valid, unsigned_pow_prec_round_valid,
+    unsigned_pow_rational_prec_round_valid, unsigned_pow_unsigned_prec_round_valid,
+    unsigned_rounding_from_float_valid,
 };
 use malachite_base::bools::random::{
     RandomBools, WeightedRandomBools, random_bools, weighted_random_bools,
@@ -11951,6 +11952,39 @@ pub fn random_rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_4(
             &random_rounding_modes,
         )
         .filter(|&(ref n, k, prec, rm)| cos_with_period_rational_prec_round_valid(n, k, prec, rm)),
+    )
+}
+
+pub fn random_rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_5(
+    config: &GenConfig,
+) -> It<(Rational, u64, u64, RoundingMode)> {
+    Box::new(
+        random_quadruples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_rationals(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_base_n", 16),
+                    config.get_or("mean_base_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(ref n, k, prec, rm)| sin_with_period_rational_prec_round_valid(n, k, prec, rm)),
     )
 }
 
