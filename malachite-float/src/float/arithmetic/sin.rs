@@ -176,7 +176,7 @@ fn sin_rational_series(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ord
 // bracketed using |sin(x) - sin(y_f)| <= |x - y_f|, the rounding error of s_f, and, for an x too
 // large to be a `Float`, the error of a `Rational` reduction modulo 2 pi. The bracket is rounded in
 // `Rational` arithmetic, and w is raised until both ends agree.
-fn sin_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+pub(crate) fn sin_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
     assert_ne!(rm, Exact, "Inexact sin");
     let exp_x = x.floor_log_base_2_abs() + 1; // the MPFR-style exponent of x
     // With |x| < 2^exp_x, the kth term of the series is below |x| 2^(2k exp_x), so when -exp_x is

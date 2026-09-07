@@ -19,22 +19,27 @@
 
 use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use crate::float::arithmetic::cos::{NEAR_ZERO_MIN_CANCEL, trig_near_zero};
+use crate::float::arithmetic::cos::{
+    NEAR_ZERO_MIN_CANCEL, cos_rational_helper, cos_rational_tiny, reduce_huge, round_bracket,
+    trig_near_zero, trig_rational_near_zero,
+};
 use crate::float::arithmetic::round_near_x::float_round_near_x;
+use crate::float::arithmetic::sin::sin_rational_helper;
 use core::cmp::Ordering::{self, Equal};
 use core::cmp::{max, min};
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    Abs, CeilingLogBase2, NegAssign, SinCos, SinCosAssign,
+    Abs, CeilingLogBase2, NegAssign, PowerOf2, SinCos, SinCosAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::{NaN as NaNTrait, One};
+use malachite_base::num::basic::traits::{NaN as NaNTrait, One, Zero as ZeroTrait};
 use malachite_base::num::comparison::traits::EqAbs;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, Ceiling, Down, Exact, Nearest};
 use malachite_nz::natural::arithmetic::float::round::float_can_round;
 use malachite_nz::platform::Limb;
+use malachite_q::Rational;
 
 // The outcome of one iteration of the Ziv loop in `sin_cos_prec_round_normal_ref`.
 enum SinCosStep {
@@ -180,6 +185,118 @@ fn near_one(err: u64, negative: bool, prec: u64, rm: RoundingMode) -> (Float, Or
         (-r, o.reverse())
     } else {
         float_round_near_x(&Float::ONE, err, false, prec, rm).unwrap()
+    }
+}
+
+// Computes sin(x) and cos(x) for a nonzero `Rational` x, rounded to precision `prec` with rounding
+// mode `rm`. (x = 0 is handled by the caller.) Neither result is ever exactly representable, so
+// `rm` must not be `Exact`.
+//
+// This shares the work of `sin_rational_helper` and `cos_rational_helper`: x is rounded once to a
+// `Float` y_f at a working precision w, both functions of y_f are taken together, and both are
+// bracketed using the Lipschitz bound |f(x) - f(y_f)| <= |x - y_f|, the rounding errors, and, for
+// an x too large to be a `Float`, the error of a single `Rational` reduction modulo 2 pi, which for
+// such an x is the dominant cost. The brackets are rounded in `Rational` arithmetic, and w is
+// raised until both resolve.
+fn sin_cos_rational_helper(
+    x: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Float, Ordering, Ordering) {
+    assert_ne!(rm, Exact, "Inexact sin_cos");
+    let exp_x = x.floor_log_base_2_abs() + 1; // the MPFR-style exponent of x
+    // For an x so small that the cosine rounds to 1, both results come cheaply from the separate
+    // paths: the sine from its series (or the underflow rule, or, for a precision beyond 2^31 bits,
+    // the general path), and the cosine from 1.
+    if 1 - (exp_x << 1) > i64::exact_from(prec) {
+        let (s, o_s) = sin_rational_helper(x, prec, rm);
+        let (c, o_c) = cos_rational_tiny(prec, rm);
+        return (s, c, o_s, o_c);
+    }
+    // an x too small to be a `Float` at a precision that does not round its cosine to 1 needs the
+    // series paths of both functions, which is only reachable beyond 2^31 bits of precision
+    if exp_x <= Float::MIN_EXPONENT_I64 {
+        fail_on_untested_path("sin_cos_rational_helper, series paths");
+        let (s, o_s) = sin_rational_helper(x, prec, rm);
+        let (c, o_c) = cos_rational_helper(x, prec, rm);
+        return (s, c, o_s, o_c);
+    }
+    let near_zero_threshold = max(NEAR_ZERO_MIN_CANCEL, (prec >> 1) + 1);
+    let huge = exp_x >= Float::MAX_EXPONENT_I64;
+    let mut w = prec + 10;
+    let mut increment = Limb::WIDTH;
+    loop {
+        let reduced;
+        let (y, extra) = if huge {
+            reduced = reduce_huge(x, exp_x, w);
+            (&reduced, Some(2 - i64::exact_from(w)))
+        } else {
+            (x, None)
+        };
+        if *y == 0u32 {
+            // x is an exact multiple of 2 pi at the working precision; a higher precision breaks
+            // the coincidence
+            fail_on_untested_path("sin_cos_rational_helper, reduced argument is zero");
+        } else {
+            let (y_f, y_o) = Float::from_rational_prec_ref(y, w);
+            if !huge && y_o == Equal {
+                // x is exactly representable at w bits, so its sine and cosine are simply those
+                return sin_cos_prec_round_normal_ref(&y_f, prec, rm);
+            }
+            let (s_f, c_f, _, _) = y_f.sin_cos_round_ref(Nearest);
+            // The exponents of y, s_f, and c_f as `Float`s would have them (a zero result means
+            // complete cancellation).
+            let exp_y = y.floor_log_base_2_abs() + 1;
+            let exp_s = s_f
+                .get_exponent()
+                .map_or(Float::MIN_EXPONENT_I64, i64::from);
+            let exp_c = c_f
+                .get_exponent()
+                .map_or(Float::MIN_EXPONENT_I64, i64::from);
+            let w_i = i64::exact_from(w);
+            // |f(y) - f_f| <= 2^(exp_f - w) (half an ulp, doubled for safety) + |y - y_f| <=
+            // 2^(exp_y - w), plus the reduction error; so |f(y)| < 2^(bound + 2) with bound the
+            // largest of those exponents. Heavy cancellation in either function means y is close to
+            // one of its zeros, which its near-zero path resolves exactly, while the other function
+            // is then within 2^-2cancel of ±1 and rounds from ±1 alone.
+            let error_exp = max(exp_y - w_i, extra.unwrap_or(i64::MIN));
+            let bound_s = max(exp_s, error_exp) + 2;
+            let bound_c = max(exp_c, error_exp) + 2;
+            if bound_s < 0 {
+                let cancel = u64::exact_from(-bound_s);
+                if cancel >= near_zero_threshold {
+                    let (s, o_s) = trig_rational_near_zero(y, exp_y, prec, rm, extra, w, false);
+                    // 1 - |cos(x)| <= sin(x)^2 / 2 < 2^(2 bound_s - 1)
+                    let (c, o_c) = near_one((cancel << 1) + 2, c_f < 0u32, prec, rm);
+                    return (s, c, o_s, o_c);
+                }
+            }
+            if bound_c < 0 {
+                let cancel = u64::exact_from(-bound_c);
+                if cancel >= near_zero_threshold {
+                    let (c, o_c) = trig_rational_near_zero(y, exp_y, prec, rm, extra, w, true);
+                    // 1 - |sin(x)| <= cos(x)^2 < 2^(2 bound_c)
+                    let (s, o_s) = near_one((cancel << 1) + 1, s_f < 0u32, prec, rm);
+                    return (s, c, o_s, o_c);
+                }
+            }
+            let mut delta_s = Rational::power_of_2(exp_s - w_i) + Rational::power_of_2(exp_y - w_i);
+            let mut delta_c = Rational::power_of_2(exp_c - w_i) + Rational::power_of_2(exp_y - w_i);
+            if let Some(extra) = extra {
+                let e = Rational::power_of_2(extra);
+                delta_s += &e;
+                delta_c += e;
+            }
+            let s = Rational::exact_from(&s_f);
+            let c = Rational::exact_from(&c_f);
+            if let Some((s, o_s)) = round_bracket(&(&s - &delta_s), &(s + delta_s), prec, rm)
+                && let Some((c, o_c)) = round_bracket(&(&c - &delta_c), &(c + delta_c), prec, rm)
+            {
+                return (s, c, o_s, o_c);
+            }
+        }
+        w += increment;
+        increment = w >> 1;
     }
 }
 
@@ -633,6 +750,204 @@ impl Float {
     ) -> (Ordering, Ordering) {
         let prec = self.significant_bits();
         self.sin_cos_prec_round_assign(cos, prec, rm)
+    }
+}
+
+impl Float {
+    /// Computes $\sin x$ and $\cos x$, the sine and cosine of a [`Rational`], together, rounding
+    /// both results to the specified precision and with the specified rounding mode, and returning
+    /// the results as [`Float`]s. The [`Rational`] is taken by value. Two [`Ordering`]s are also
+    /// returned, indicating whether the rounded sine and cosine are less than, equal to, or greater
+    /// than the exact values.
+    ///
+    /// The results are the same as those of [`Float::sin_rational_prec_round`] and
+    /// [`Float::cos_rational_prec_round`], but the rounding of the input, the argument reduction,
+    /// and most of the work are shared, so this is faster than the two calls when both values are
+    /// needed.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,p,m) = (\sin x+\varepsilon_s, \cos x+\varepsilon_c).
+    /// $$
+    /// - If $m$ is not `Nearest`, then $|\varepsilon_s| < 2^{\lfloor\log_2 |\sin x|\rfloor-p+1}$
+    ///   and $|\varepsilon_c| < 2^{\lfloor\log_2 |\cos x|\rfloor-p+1}$.
+    /// - If $m$ is `Nearest`, then $|\varepsilon_s| \leq 2^{\lfloor\log_2 |\sin x|\rfloor-p}$ and
+    ///   $|\varepsilon_c| \leq 2^{\lfloor\log_2 |\cos x|\rfloor-p}$.
+    ///
+    /// These bounds do not apply when a result underflows.
+    ///
+    /// The outputs have precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p,m)=(0,1)$.
+    ///
+    /// Overflow and underflow:
+    /// - Since $|\sin x|\leq 1$ and $|\cos x|\leq 1$, the results never overflow.
+    /// - Each result underflows exactly as [`Float::sin_rational_prec_round`] or
+    ///   [`Float::cos_rational_prec_round`] does; see those functions for the inputs concerned and
+    ///   the values returned.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::sin_cos_rational_prec`]
+    /// instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m, e) = O(n^{3/2} \log n \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
+    ///
+    /// $M(n, m, e) = O((n+m+e) \log (n+m+e))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, $m$ is `x.significant_bits()`,
+    /// and $e$ is `x.floor_log_base_2_abs()` (taken as 0 when it is negative or $x = 0$): the input
+    /// is rounded to a working precision and the [`Float`] sine and cosine taken there together,
+    /// which for $|x| \geq 2$ reduces the argument modulo $2\pi$ and so needs $\pi$ to about $n +
+    /// e$ bits.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the results cannot be represented
+    /// exactly with the given precision (which is the case for every nonzero input).
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (s, c, o_s, o_c) =
+    ///     Float::sin_cos_rational_prec_round(Rational::from_unsigneds(3u8, 5), 5, Floor);
+    /// assert_eq!(s.to_string(), "0.562");
+    /// assert_eq!(c.to_string(), "0.812");
+    /// assert_eq!(o_s, Less);
+    /// assert_eq!(o_c, Less);
+    ///
+    /// let (s, c, o_s, o_c) =
+    ///     Float::sin_cos_rational_prec_round(Rational::from_unsigneds(3u8, 5), 5, Ceiling);
+    /// assert_eq!(s.to_string(), "0.594");
+    /// assert_eq!(c.to_string(), "0.844");
+    /// assert_eq!(o_s, Greater);
+    /// assert_eq!(o_c, Greater);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn sin_cos_rational_prec_round(
+        x: Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Self, Ordering, Ordering) {
+        Self::sin_cos_rational_prec_round_ref(&x, prec, rm)
+    }
+
+    /// Computes $\sin x$ and $\cos x$, the sine and cosine of a [`Rational`], together, rounding
+    /// both results to the specified precision and with the specified rounding mode, and returning
+    /// the results as [`Float`]s. The [`Rational`] is taken by reference. Two [`Ordering`]s are
+    /// also returned, indicating whether the rounded sine and cosine are less than, equal to, or
+    /// greater than the exact values.
+    ///
+    /// See [`Float::sin_cos_rational_prec_round`] for the error bounds, the special cases, overflow
+    /// and underflow, and the complexity; this function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the results cannot be represented
+    /// exactly with the given precision (which is the case for every nonzero input).
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (s, c, o_s, o_c) =
+    ///     Float::sin_cos_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 20, Floor);
+    /// assert_eq!(s.to_string(), "0.56464195");
+    /// assert_eq!(c.to_string(), "0.82533550");
+    /// assert_eq!(o_s, Less);
+    /// assert_eq!(o_c, Less);
+    /// ```
+    pub fn sin_cos_rational_prec_round_ref(
+        x: &Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Self, Ordering, Ordering) {
+        assert_ne!(prec, 0);
+        if *x == 0u32 {
+            // sin(0) = 0 and cos(0) = 1, exactly
+            return (Self::ZERO, Self::one_prec(prec), Equal, Equal);
+        }
+        sin_cos_rational_helper(x, prec, rm)
+    }
+
+    /// Computes $\sin x$ and $\cos x$, the sine and cosine of a [`Rational`], together, rounding
+    /// both results to the nearest value of the specified precision, and returning the results as
+    /// [`Float`]s. The [`Rational`] is taken by value. Two [`Ordering`]s are also returned,
+    /// indicating whether the rounded sine and cosine are less than, equal to, or greater than the
+    /// exact values.
+    ///
+    /// If a result is equidistant from two [`Float`]s with the specified precision, the [`Float`]
+    /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
+    /// the `Nearest` rounding mode.
+    ///
+    /// See [`Float::sin_cos_rational_prec_round`] for the error bounds, the special cases, overflow
+    /// and underflow, and the complexity; this function behaves the same way with `Nearest`.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::sin_cos_rational_prec_round`] instead.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (s, c, o_s, o_c) = Float::sin_cos_rational_prec(Rational::from_unsigneds(3u8, 5), 5);
+    /// assert_eq!(s.to_string(), "0.562");
+    /// assert_eq!(c.to_string(), "0.812");
+    /// assert_eq!(o_s, Less);
+    /// assert_eq!(o_c, Less);
+    ///
+    /// let (s, c, o_s, o_c) = Float::sin_cos_rational_prec(Rational::from_unsigneds(3u8, 5), 20);
+    /// assert_eq!(s.to_string(), "0.56464291");
+    /// assert_eq!(c.to_string(), "0.82533550");
+    /// assert_eq!(o_s, Greater);
+    /// assert_eq!(o_c, Less);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn sin_cos_rational_prec(x: Rational, prec: u64) -> (Self, Self, Ordering, Ordering) {
+        Self::sin_cos_rational_prec_round_ref(&x, prec, Nearest)
+    }
+
+    /// Computes $\sin x$ and $\cos x$, the sine and cosine of a [`Rational`], together, rounding
+    /// both results to the nearest value of the specified precision, and returning the results as
+    /// [`Float`]s. The [`Rational`] is taken by reference. Two [`Ordering`]s are also returned,
+    /// indicating whether the rounded sine and cosine are less than, equal to, or greater than the
+    /// exact values.
+    ///
+    /// See [`Float::sin_cos_rational_prec`] and [`Float::sin_cos_rational_prec_round`]; this
+    /// function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (s, c, o_s, o_c) =
+    ///     Float::sin_cos_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 5);
+    /// assert_eq!(s.to_string(), "0.562");
+    /// assert_eq!(c.to_string(), "0.812");
+    /// assert_eq!(o_s, Less);
+    /// assert_eq!(o_c, Less);
+    /// ```
+    #[inline]
+    pub fn sin_cos_rational_prec_ref(x: &Rational, prec: u64) -> (Self, Self, Ordering, Ordering) {
+        Self::sin_cos_rational_prec_round_ref(x, prec, Nearest)
     }
 }
 

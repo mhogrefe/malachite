@@ -271,6 +271,9 @@ documented by git history.
   write the cosine to a second `&mut Float`. Inputs extremely close to a zero of either function
   take that function's exact near-zero path, so the results are correct, and underflow correctly,
   even when the input agrees with the zero to more than $2^{30}$ bits.
+  `sin_cos_rational_prec_round` and `sin_cos_rational_prec` (with `_ref` variants) take a
+  `Rational` instead, sharing the input rounding and, for inputs too large to be `Float`s, the
+  reduction modulo $2\pi$ that dominates their cost.
 - `primitive_float_sin` and `primitive_float_sin_rational`, the correctly rounded sine of an `f32`
   or `f64`, or of a `Rational` as an `f32` or `f64`.
 - `primitive_float_cos` and `primitive_float_cos_rational`, the correctly rounded cosine of an

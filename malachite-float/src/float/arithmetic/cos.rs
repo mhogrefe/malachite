@@ -229,7 +229,7 @@ pub(crate) fn round_bracket(
 
 // cos(x) for a nonzero x so small that 1 - x^2/2 <= cos(x) < 1 lies within half an ulp of 1 at
 // precision `prec`: the result is 1, or its predecessor for rounding toward zero.
-fn cos_rational_tiny(prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+pub(crate) fn cos_rational_tiny(prec: u64, rm: RoundingMode) -> (Float, Ordering) {
     match rm {
         Floor | Down => (one_neighbor(prec, false), Less),
         _ => (Float::one_prec(prec), Greater),
@@ -343,7 +343,7 @@ pub(crate) fn trig_rational_near_zero(
 // c_f, and, for an x too large to be a `Float`, the error of a `Rational` reduction modulo 2 pi.
 // The bracket is rounded in `Rational` arithmetic, and w is raised until both ends agree. Unlike
 // `exp_rational_helper`'s bracket of x itself, this needs no monotonicity.
-fn cos_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+pub(crate) fn cos_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
     assert_ne!(rm, Exact, "Inexact cos");
     let exp_x = x.floor_log_base_2_abs() + 1; // the MPFR-style exponent of x
     // 1 - cos(x) <= x^2/2 < 2^(2 exp_x - 1): when that is at most 2^(-prec - 1), cos(x) rounds to 1
