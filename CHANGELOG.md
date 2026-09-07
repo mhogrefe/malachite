@@ -284,7 +284,10 @@ documented by git history.
   turn underflow correctly. `sin_cos_with_period_rational_prec_round` and
   `sin_cos_with_period_rational_prec` (with `_ref` variants) take a `Rational` instead, and
   `primitive_float_sin_cos_with_period` and `primitive_float_sin_cos_with_period_rational` give
-  the correctly rounded `f32` or `f64` pairs.
+  the correctly rounded `f32` or `f64` pairs. `sin_cos_pi_prec_round`, `sin_cos_pi_prec`, and
+  `sin_cos_pi_round` (with `_ref` and `_assign` variants), `sin_cos_pi_rational_prec_round` and
+  `sin_cos_pi_rational_prec` (with `_ref` variants), and `primitive_float_sin_cos_pi` and
+  `primitive_float_sin_cos_pi_rational` are the same in half-turns, delegating with a period of 2.
 - Fixed `cos_with_period_rational_prec_round` taking a working precision of billions of bits for a
   tiny negative input, and `cos_with_period_prec_round` doing the same for a `Float` just below a
   multiple of its period: the fraction of a turn is now reduced to $[-1/2, 1/2]$, where the

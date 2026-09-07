@@ -121,3 +121,34 @@ pub fn rug_sin_cos_with_period_rational_prec(
 ) -> (rug::Float, rug::Float, Ordering, Ordering) {
     rug_sin_cos_with_period_rational_prec_round(x, u, prec, Round::Nearest)
 }
+
+pub fn rug_sin_cos_pi_prec_round(
+    x: &rug::Float,
+    prec: u64,
+    rm: Round,
+) -> (rug::Float, rug::Float, Ordering, Ordering) {
+    let mut s = rug::Float::with_val(u32::exact_from(prec), 0);
+    let o_s = s.assign_round(x.sin_pi_ref(), rm);
+    let mut c = rug::Float::with_val(u32::exact_from(prec), 0);
+    let o_c = c.assign_round(x.cos_pi_ref(), rm);
+    (s, c, o_s, o_c)
+}
+
+// As for the sine oracle, the input carries its denominator's worth of extra bits.
+pub fn rug_sin_cos_pi_rational_prec_round(
+    x: &Rational,
+    prec: u64,
+    rm: Round,
+) -> (rug::Float, rug::Float, Ordering, Ordering) {
+    let exponent_bits = if *x == 0u32 {
+        0
+    } else {
+        u64::try_from(x.floor_log_base_2_abs()).unwrap_or(0)
+    };
+    let denominator_bits = x.denominator_ref().significant_bits();
+    let rx = rug::Float::with_val(
+        u32::exact_from(prec + 128 + exponent_bits + denominator_bits),
+        rug::Rational::exact_from(x),
+    );
+    rug_sin_cos_pi_prec_round(&rx, prec, rm)
+}
