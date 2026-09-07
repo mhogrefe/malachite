@@ -260,6 +260,10 @@ documented by git history.
   exact and closed-form cases directly, such as a twelfth or a twentieth of a turn.
   `primitive_float_sin_with_period` and `primitive_float_sin_with_period_rational` give the
   correctly rounded `f32` or `f64` results.
+- `sin_pi_prec_round`, `sin_pi_prec`, and `sin_pi_round` (with `_ref` and `_assign` variants),
+  `sin_pi_rational_prec_round` and `sin_pi_rational_prec` (with `_ref` variants), and
+  `primitive_float_sin_pi` and `primitive_float_sin_pi_rational`: a port of `mpfr_sinpi`, the
+  sine in half-turns, delegating to the `sin_with_period` family with a period of 2.
 - `primitive_float_sin` and `primitive_float_sin_rational`, the correctly rounded sine of an `f32`
   or `f64`, or of a `Rational` as an `f32` or `f64`.
 - `primitive_float_cos` and `primitive_float_cos_rational`, the correctly rounded cosine of an

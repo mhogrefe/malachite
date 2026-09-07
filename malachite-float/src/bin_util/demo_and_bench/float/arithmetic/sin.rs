@@ -21,7 +21,8 @@ use malachite_base::test_util::generators::{
 };
 use malachite_base::test_util::runner::Runner;
 use malachite_float::float::arithmetic::sin::{
-    primitive_float_sin, primitive_float_sin_rational, primitive_float_sin_with_period,
+    primitive_float_sin, primitive_float_sin_pi, primitive_float_sin_pi_rational,
+    primitive_float_sin_rational, primitive_float_sin_with_period,
     primitive_float_sin_with_period_rational,
 };
 use malachite_float::test_util::bench::bucketers::{
@@ -55,6 +56,19 @@ use malachite_q::test_util::generators::{
 };
 
 pub(crate) fn register(runner: &mut Runner) {
+    register_demo!(runner, demo_float_sin_pi_prec_round);
+    register_demo!(runner, demo_float_sin_pi_prec_round_debug);
+    register_demo!(runner, demo_float_sin_pi_prec);
+    register_demo!(runner, demo_float_sin_pi_round);
+    register_demo!(runner, demo_float_sin_pi_prec_round_assign);
+    register_demo!(runner, demo_float_sin_pi_rational_prec_round);
+    register_demo!(runner, demo_float_sin_pi_rational_prec);
+    register_primitive_float_demos!(runner, demo_primitive_float_sin_pi);
+    register_primitive_float_demos!(runner, demo_primitive_float_sin_pi_rational);
+    register_bench!(
+        runner,
+        benchmark_float_sin_pi_prec_round_evaluation_strategy
+    );
     register_demo!(runner, demo_float_sin_with_period_rational_prec_round);
     register_demo!(runner, demo_float_sin_with_period_rational_prec_round_debug);
     register_demo!(runner, demo_float_sin_with_period_rational_prec_round_ref);
@@ -1317,5 +1331,162 @@ fn benchmark_primitive_float_sin_with_period_rational<T: PrimitiveFloat>(
         &mut [("malachite", &mut |(x, u)| {
             no_out!(primitive_float_sin_with_period_rational::<T>(&x, u));
         })],
+    );
+}
+
+fn demo_float_sin_pi_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec, rm) in float_unsigned_rounding_mode_triple_gen_var_36()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "({}).sin_pi_prec_round({}, {}) = {:?}",
+            x.clone(),
+            prec,
+            rm,
+            x.sin_pi_prec_round(prec, rm)
+        );
+    }
+}
+
+fn demo_float_sin_pi_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec, rm) in float_unsigned_rounding_mode_triple_gen_var_36()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (c, o) = x.clone().sin_pi_prec_round(prec, rm);
+        println!(
+            "({:#x}).sin_pi_prec_round({}, {}) = ({:#x}, {:?})",
+            ComparableFloat(x),
+            prec,
+            rm,
+            ComparableFloat(c),
+            o
+        );
+    }
+}
+
+fn demo_float_sin_pi_prec(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec) in float_unsigned_pair_gen_var_1().get(gm, config).take(limit) {
+        println!(
+            "({}).sin_pi_prec({}) = {:?}",
+            x.clone(),
+            prec,
+            x.sin_pi_prec(prec)
+        );
+    }
+}
+
+fn demo_float_sin_pi_round(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, rm) in float_rounding_mode_pair_gen_var_47()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "({}).sin_pi_round({}) = {:?}",
+            x.clone(),
+            rm,
+            x.sin_pi_round(rm)
+        );
+    }
+}
+
+fn demo_float_sin_pi_prec_round_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, prec, rm) in float_unsigned_rounding_mode_triple_gen_var_36()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let o = x.sin_pi_prec_round_assign(prec, rm);
+        println!("x := {x_old}; x.sin_pi_prec_round_assign({prec}, {rm}) = {o:?}; x = {x}");
+    }
+}
+
+fn demo_float_sin_pi_rational_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec, rm) in rational_unsigned_rounding_mode_triple_gen_var_10()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "Float::sin_pi_rational_prec_round({}, {}, {}) = {:?}",
+            x.clone(),
+            prec,
+            rm,
+            Float::sin_pi_rational_prec_round(x, prec, rm)
+        );
+    }
+}
+
+fn demo_float_sin_pi_rational_prec(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec) in rational_unsigned_pair_gen_var_3()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "Float::sin_pi_rational_prec({}, {}) = {:?}",
+            x.clone(),
+            prec,
+            Float::sin_pi_rational_prec(x, prec)
+        );
+    }
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn demo_primitive_float_sin_pi<T: PrimitiveFloat>(gm: GenMode, config: &GenConfig, limit: usize)
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    for x in primitive_float_gen::<T>().get(gm, config).take(limit) {
+        println!(
+            "primitive_float_sin_pi({}) = {}",
+            NiceFloat(x),
+            NiceFloat(primitive_float_sin_pi(x))
+        );
+    }
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn demo_primitive_float_sin_pi_rational<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    for x in rational_gen().get(gm, config).take(limit) {
+        println!(
+            "primitive_float_sin_pi_rational({}) = {:?}",
+            x,
+            NiceFloat(primitive_float_sin_pi_rational::<T>(&x))
+        );
+    }
+}
+
+fn benchmark_float_sin_pi_prec_round_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float.sin_pi_prec_round(u64, RoundingMode)",
+        BenchmarkType::EvaluationStrategy,
+        float_unsigned_rounding_mode_triple_gen_var_36().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &triple_1_2_float_primitive_int_max_complexity_bucketer("x", "prec"),
+        &mut [
+            (
+                "Float.sin_pi_prec_round(u64, RoundingMode)",
+                &mut |(x, prec, rm)| no_out!(x.sin_pi_prec_round(prec, rm)),
+            ),
+            (
+                "(&Float).sin_pi_prec_round_ref(u64, RoundingMode)",
+                &mut |(x, prec, rm)| no_out!(x.sin_pi_prec_round_ref(prec, rm)),
+            ),
+        ],
     );
 }

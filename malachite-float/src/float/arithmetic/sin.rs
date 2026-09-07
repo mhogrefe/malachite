@@ -2859,6 +2859,450 @@ impl Float {
     }
 }
 
+impl Float {
+    /// Computes $\sin(\pi x)$, the sine of a [`Float`] measured in half-turns, rounding the result
+    /// to the specified precision and with the specified rounding mode. The [`Float`] is taken by
+    /// value. An [`Ordering`] is also returned, indicating whether the rounded sine is less than,
+    /// equal to, or greater than the exact sine. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// This is `sin_with_period` with a period of 2: see [`Float::sin_with_period_prec_round`] for
+    /// the error bounds, the special and closed-form cases (integers give $\pm0.0$ with the sign of
+    /// the input, half-integers give $\pm1$, odd multiples of $1/6$ give $\pm1/2$, and multiples of
+    /// $1/3$, $1/4$, and $1/10$ have closed forms), overflow and underflow, and the complexity,
+    /// with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::from(0.1f64).sin_pi_prec_round(10, Floor);
+    /// assert_eq!(c.to_string(), "0.30859");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::from(0.1f64).sin_pi_prec_round(10, Ceiling);
+    /// assert_eq!(c.to_string(), "0.30908");
+    /// assert_eq!(o, Greater);
+    ///
+    /// // a half-turn is exactly zero
+    /// let (c, o) = Float::ONE.sin_pi_prec_round(10, Exact);
+    /// assert_eq!(c.to_string(), "0.0");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn sin_pi_prec_round(self, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+        self.sin_with_period_prec_round(2, prec, rm)
+    }
+
+    /// Computes $\sin(\pi x)$, the sine of a [`Float`] measured in half-turns, rounding the result
+    /// to the specified precision and with the specified rounding mode. The [`Float`] is taken by
+    /// reference. An [`Ordering`] is also returned, indicating whether the rounded sine is less
+    /// than, equal to, or greater than the exact sine. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// This is `sin_with_period` with a period of 2: see [`Float::sin_with_period_prec_round_ref`]
+    /// for the error bounds, the special and closed-form cases (integers give $\pm0.0$ with the
+    /// sign of the input, half-integers give $\pm1$, odd multiples of $1/6$ give $\pm1/2$, and
+    /// multiples of $1/3$, $1/4$, and $1/10$ have closed forms), overflow and underflow, and the
+    /// complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = (Float::from(0.1f64)).sin_pi_prec_round_ref(10, Floor);
+    /// assert_eq!(c.to_string(), "0.30859");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = (Float::from(0.1f64)).sin_pi_prec_round_ref(10, Ceiling);
+    /// assert_eq!(c.to_string(), "0.30908");
+    /// assert_eq!(o, Greater);
+    ///
+    /// // a half-turn is exactly zero
+    /// let (c, o) = (&Float::ONE).sin_pi_prec_round_ref(10, Exact);
+    /// assert_eq!(c.to_string(), "0.0");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn sin_pi_prec_round_ref(&self, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+        self.sin_with_period_prec_round_ref(2, prec, rm)
+    }
+
+    /// Computes $\sin(\pi x)$, the sine of a [`Float`] measured in half-turns, rounding the result
+    /// to the nearest value of the specified precision. The [`Float`] is taken by value. An
+    /// [`Ordering`] is also returned, indicating whether the rounded sine is less than, equal to,
+    /// or greater than the exact sine. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// This is `sin_with_period` with a period of 2: see [`Float::sin_with_period_prec`] for the
+    /// error bounds, the special and closed-form cases (integers give $\pm1$, half-integers give
+    /// $+0.0$, and multiples of $1/3$, $1/4$, $1/5$, $1/6$, and $1/10$ have closed forms), overflow
+    /// and underflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::from(0.1f64).sin_pi_prec(10);
+    /// assert_eq!(c.to_string(), "0.30908");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) = Float::from(0.1f64).sin_pi_prec(53);
+    /// assert_eq!(c.to_string(), "0.30901699437494745");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn sin_pi_prec(self, prec: u64) -> (Self, Ordering) {
+        self.sin_with_period_prec(2, prec)
+    }
+
+    /// Computes $\sin(\pi x)$, the sine of a [`Float`] measured in half-turns, rounding the result
+    /// to the nearest value of the specified precision. The [`Float`] is taken by reference. An
+    /// [`Ordering`] is also returned, indicating whether the rounded sine is less than, equal to,
+    /// or greater than the exact sine. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// This is `sin_with_period` with a period of 2: see [`Float::sin_with_period_prec_ref`] for
+    /// the error bounds, the special and closed-form cases (integers give $\pm0.0$ with the sign of
+    /// the input, half-integers give $\pm1$, odd multiples of $1/6$ give $\pm1/2$, and multiples of
+    /// $1/3$, $1/4$, and $1/10$ have closed forms), overflow and underflow, and the complexity,
+    /// with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = (Float::from(0.1f64)).sin_pi_prec_ref(10);
+    /// assert_eq!(c.to_string(), "0.30908");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) = (Float::from(0.1f64)).sin_pi_prec_ref(53);
+    /// assert_eq!(c.to_string(), "0.30901699437494745");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn sin_pi_prec_ref(&self, prec: u64) -> (Self, Ordering) {
+        self.sin_with_period_prec_ref(2, prec)
+    }
+
+    /// Computes $\sin(\pi x)$, the sine of a [`Float`] measured in half-turns, rounding the result
+    /// with the specified rounding mode. The precision of the output is the precision of the input.
+    /// The [`Float`] is taken by value. An [`Ordering`] is also returned, indicating whether the
+    /// rounded sine is less than, equal to, or greater than the exact sine. Although `NaN`s are not
+    /// comparable to any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// This is `sin_with_period` with a period of 2: see [`Float::sin_with_period_round`] for the
+    /// error bounds, the special and closed-form cases (integers give $\pm1$, half-integers give
+    /// $+0.0$, and multiples of $1/3$, $1/4$, $1/5$, $1/6$, and $1/10$ have closed forms), overflow
+    /// and underflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the input
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::from(0.1f64).sin_pi_round(Floor);
+    /// assert_eq!(c.to_string(), "0.30901699437494734");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::from(0.1f64).sin_pi_round(Nearest);
+    /// assert_eq!(c.to_string(), "0.30901699437494745");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn sin_pi_round(self, rm: RoundingMode) -> (Self, Ordering) {
+        self.sin_with_period_round(2, rm)
+    }
+
+    /// Computes $\sin(\pi x)$, the sine of a [`Float`] measured in half-turns, rounding the result
+    /// with the specified rounding mode. The precision of the output is the precision of the input.
+    /// The [`Float`] is taken by reference. An [`Ordering`] is also returned, indicating whether
+    /// the rounded sine is less than, equal to, or greater than the exact sine. Although `NaN`s are
+    /// not comparable to any [`Float`], whenever this function returns a `NaN` it also returns
+    /// `Equal`.
+    ///
+    /// This is `sin_with_period` with a period of 2: see [`Float::sin_with_period_round_ref`] for
+    /// the error bounds, the special and closed-form cases (integers give $\pm0.0$ with the sign of
+    /// the input, half-integers give $\pm1$, odd multiples of $1/6$ give $\pm1/2$, and multiples of
+    /// $1/3$, $1/4$, and $1/10$ have closed forms), overflow and underflow, and the complexity,
+    /// with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the input
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = (Float::from(0.1f64)).sin_pi_round_ref(Floor);
+    /// assert_eq!(c.to_string(), "0.30901699437494734");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = (Float::from(0.1f64)).sin_pi_round_ref(Nearest);
+    /// assert_eq!(c.to_string(), "0.30901699437494745");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn sin_pi_round_ref(&self, rm: RoundingMode) -> (Self, Ordering) {
+        self.sin_with_period_round_ref(2, rm)
+    }
+
+    /// Computes $\sin(\pi x)$, the sine of a [`Float`] measured in half-turns, rounding the result
+    /// to the specified precision and with the specified rounding mode. The [`Float`] is replaced
+    /// by the result, and an [`Ordering`] is returned, indicating whether the rounded sine is less
+    /// than, equal to, or greater than the exact sine. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function sets a `NaN` it also returns `Equal`.
+    ///
+    /// This is `sin_with_period` with a period of 2: see
+    /// [`Float::sin_with_period_prec_round_assign`] for the error bounds, the special and
+    /// closed-form cases (integers give $\pm1$, half-integers give $+0.0$, and multiples of $1/3$,
+    /// $1/4$, $1/5$, $1/6$, and $1/10$ have closed forms), overflow and underflow, and the
+    /// complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from(0.1f64);
+    /// assert_eq!(x.sin_pi_prec_round_assign(10, Floor), Less);
+    /// assert_eq!(x.to_string(), "0.30859");
+    ///
+    /// let mut x = Float::from(0.1f64);
+    /// assert_eq!(x.sin_pi_prec_round_assign(10, Ceiling), Greater);
+    /// assert_eq!(x.to_string(), "0.30908");
+    /// ```
+    #[inline]
+    pub fn sin_pi_prec_round_assign(&mut self, prec: u64, rm: RoundingMode) -> Ordering {
+        self.sin_with_period_prec_round_assign(2, prec, rm)
+    }
+
+    /// Computes $\sin(\pi x)$, the sine of a [`Float`] measured in half-turns, rounding the result
+    /// to the nearest value of the specified precision. The [`Float`] is replaced by the result,
+    /// and an [`Ordering`] is returned, indicating whether the rounded sine is less than, equal to,
+    /// or greater than the exact sine. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function sets a `NaN` it also returns `Equal`.
+    ///
+    /// This is `sin_with_period` with a period of 2: see [`Float::sin_with_period_prec_assign`] for
+    /// the error bounds, the special and closed-form cases (integers give $\pm0.0$ with the sign of
+    /// the input, half-integers give $\pm1$, odd multiples of $1/6$ give $\pm1/2$, and multiples of
+    /// $1/3$, $1/4$, and $1/10$ have closed forms), overflow and underflow, and the complexity,
+    /// with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from(0.1f64);
+    /// assert_eq!(x.sin_pi_prec_assign(10), Greater);
+    /// assert_eq!(x.to_string(), "0.30908");
+    /// ```
+    #[inline]
+    pub fn sin_pi_prec_assign(&mut self, prec: u64) -> Ordering {
+        self.sin_with_period_prec_assign(2, prec)
+    }
+
+    /// Computes $\sin(\pi x)$, the sine of a [`Float`] measured in half-turns, rounding the result
+    /// with the specified rounding mode. The precision of the output is the precision of the input.
+    /// The [`Float`] is replaced by the result, and an [`Ordering`] is returned, indicating whether
+    /// the rounded sine is less than, equal to, or greater than the exact sine. Although `NaN`s are
+    /// not comparable to any [`Float`], whenever this function sets a `NaN` it also returns
+    /// `Equal`.
+    ///
+    /// This is `sin_with_period` with a period of 2: see [`Float::sin_with_period_round_assign`]
+    /// for the error bounds, the special and closed-form cases (integers give $\pm0.0$ with the
+    /// sign of the input, half-integers give $\pm1$, odd multiples of $1/6$ give $\pm1/2$, and
+    /// multiples of $1/3$, $1/4$, and $1/10$ have closed forms), overflow and underflow, and the
+    /// complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the input
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from(0.1f64);
+    /// assert_eq!(x.sin_pi_round_assign(Floor), Less);
+    /// assert_eq!(x.to_string(), "0.30901699437494734");
+    /// ```
+    #[inline]
+    pub fn sin_pi_round_assign(&mut self, rm: RoundingMode) -> Ordering {
+        self.sin_with_period_round_assign(2, rm)
+    }
+
+    /// Computes $\sin(\pi x)$, the sine of a [`Rational`] measured in half-turns, rounding the
+    /// result to the specified precision and with the specified rounding mode and returning the
+    /// result as a [`Float`]. The [`Rational`] is taken by value. An [`Ordering`] is also returned,
+    /// indicating whether the rounded sine is less than, equal to, or greater than the exact sine.
+    ///
+    /// This is `sin_with_period_rational` with a period of 2: see
+    /// [`Float::sin_with_period_rational_prec_round`] for the error bounds, the special and
+    /// closed-form cases, overflow and underflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::sin_pi_rational_prec_round(Rational::from_unsigneds(1u8, 7), 10, Floor);
+    /// assert_eq!(c.to_string(), "0.43359");
+    /// assert_eq!(o, Less);
+    ///
+    /// // a sixth of a half-turn is exactly 1/2
+    /// let (c, o) = Float::sin_pi_rational_prec_round(Rational::from_unsigneds(1u8, 6), 10, Exact);
+    /// assert_eq!(c.to_string(), "0.50000");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn sin_pi_rational_prec_round(
+        x: Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        Self::sin_with_period_rational_prec_round_ref(&x, 2, prec, rm)
+    }
+
+    /// Computes $\sin(\pi x)$, the sine of a [`Rational`] measured in half-turns, rounding the
+    /// result to the specified precision and with the specified rounding mode and returning the
+    /// result as a [`Float`]. The [`Rational`] is taken by reference. An [`Ordering`] is also
+    /// returned, indicating whether the rounded sine is less than, equal to, or greater than the
+    /// exact sine.
+    ///
+    /// This is `sin_with_period_rational` with a period of 2: see
+    /// [`Float::sin_with_period_rational_prec_round_ref`] for the error bounds, the special and
+    /// closed-form cases, overflow and underflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) =
+    ///     Float::sin_pi_rational_prec_round_ref(&Rational::from_unsigneds(1u8, 7), 10, Ceiling);
+    /// assert_eq!(c.to_string(), "0.43408");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn sin_pi_rational_prec_round_ref(
+        x: &Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        Self::sin_with_period_rational_prec_round_ref(x, 2, prec, rm)
+    }
+
+    /// Computes $\sin(\pi x)$, the sine of a [`Rational`] measured in half-turns, rounding the
+    /// result to the nearest value of the specified precision and returning the result as a
+    /// [`Float`]. The [`Rational`] is taken by value. An [`Ordering`] is also returned, indicating
+    /// whether the rounded sine is less than, equal to, or greater than the exact sine.
+    ///
+    /// This is `sin_with_period_rational` with a period of 2: see
+    /// [`Float::sin_with_period_rational_prec`] for the error bounds, the special and closed-form
+    /// cases, overflow and underflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::sin_pi_rational_prec(Rational::from_unsigneds(1u8, 7), 53);
+    /// assert_eq!(c.to_string(), "0.43388373911755812");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn sin_pi_rational_prec(x: Rational, prec: u64) -> (Self, Ordering) {
+        Self::sin_with_period_rational_prec_ref(&x, 2, prec)
+    }
+
+    /// Computes $\sin(\pi x)$, the sine of a [`Rational`] measured in half-turns, rounding the
+    /// result to the nearest value of the specified precision and returning the result as a
+    /// [`Float`]. The [`Rational`] is taken by reference. An [`Ordering`] is also returned,
+    /// indicating whether the rounded sine is less than, equal to, or greater than the exact sine.
+    ///
+    /// This is `sin_with_period_rational` with a period of 2: see
+    /// [`Float::sin_with_period_rational_prec_ref`] for the error bounds, the special and
+    /// closed-form cases, overflow and underflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::sin_pi_rational_prec_ref(&Rational::from_unsigneds(1u8, 7), 53);
+    /// assert_eq!(c.to_string(), "0.43388373911755812");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn sin_pi_rational_prec_ref(x: &Rational, prec: u64) -> (Self, Ordering) {
+        Self::sin_with_period_rational_prec_ref(x, 2, prec)
+    }
+}
+
 impl Sin for Float {
     type Output = Self;
 
@@ -3329,4 +3773,84 @@ where
         |x, prec| Float::sin_with_period_rational_prec_ref(x, u, prec),
         x,
     )
+}
+
+/// Computes $\sin(\pi x)$, the sine of a primitive float measured in half-turns.
+///
+/// This is `primitive_float_sin_with_period` with a period of 2: see
+/// [`primitive_float_sin_with_period`] for the error bound and the special cases, with $u = 2$.
+/// Half-integers give exactly $\pm1$ and integers exactly $\pm0.0$ with the sign of the input.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::sin::primitive_float_sin_pi;
+///
+/// assert!(primitive_float_sin_pi(f32::NAN).is_nan());
+/// assert_eq!(NiceFloat(primitive_float_sin_pi(0.5f32)), NiceFloat(1.0));
+/// assert_eq!(NiceFloat(primitive_float_sin_pi(1.0f64)), NiceFloat(0.0));
+/// assert_eq!(
+///     NiceFloat(primitive_float_sin_pi(0.1f32)),
+///     NiceFloat(0.309017)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_sin_pi(0.1f64)),
+///     NiceFloat(0.30901699437494745)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_sin_pi<T: PrimitiveFloat>(x: T) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    primitive_float_sin_with_period(x, 2)
+}
+
+/// Computes $\sin(\pi x)$, the sine of a [`Rational`] measured in half-turns, returning the result
+/// as a primitive float.
+///
+/// This is `primitive_float_sin_with_period_rational` with a period of 2: see
+/// [`primitive_float_sin_with_period_rational`] for the error bound, the special cases, and the
+/// complexity, with $u = 2$.
+///
+/// # Worst-case complexity
+/// $T(m) = O(m (\log m)^2 \log\log m)$
+///
+/// $M(m) = O(m \log m)$
+///
+/// where $T$ is time, $M$ is additional memory, and $m$ is `x.significant_bits()`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::sin::primitive_float_sin_pi_rational;
+/// use malachite_q::Rational;
+///
+/// // a sixth of a half-turn is exactly 1/2
+/// assert_eq!(
+///     NiceFloat(primitive_float_sin_pi_rational::<f64>(
+///         &Rational::from_unsigneds(1u8, 6)
+///     )),
+///     NiceFloat(0.5)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_sin_pi_rational::<f64>(
+///         &Rational::from_unsigneds(1u8, 7)
+///     )),
+///     NiceFloat(0.4338837391175581)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_sin_pi_rational<T: PrimitiveFloat>(x: &Rational) -> T
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    primitive_float_sin_with_period_rational(x, 2)
 }

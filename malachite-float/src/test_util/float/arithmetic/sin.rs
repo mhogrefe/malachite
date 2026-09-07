@@ -103,3 +103,29 @@ pub fn rug_sin_with_period_rational_prec(
 ) -> (rug::Float, Ordering) {
     rug_sin_with_period_rational_prec_round(x, u, prec, Round::Nearest)
 }
+
+pub fn rug_sin_pi_prec_round(x: &rug::Float, prec: u64, rm: Round) -> (rug::Float, Ordering) {
+    let mut s = rug::Float::with_val(u32::exact_from(prec), 0);
+    let o = s.assign_round(x.sin_pi_ref(), rm);
+    (s, o)
+}
+
+pub fn rug_sin_pi_rational_prec_round(
+    x: &Rational,
+    prec: u64,
+    rm: Round,
+) -> (rug::Float, Ordering) {
+    let exponent_bits = if *x == 0u32 {
+        0
+    } else {
+        u64::try_from(x.floor_log_base_2_abs()).unwrap_or(0)
+    };
+    let denominator_bits = x.denominator_ref().significant_bits();
+    let rx = rug::Float::with_val(
+        u32::exact_from(prec + 128 + exponent_bits + denominator_bits),
+        rug::Rational::exact_from(x),
+    );
+    let mut s = rug::Float::with_val(u32::exact_from(prec), 0);
+    let o = s.assign_round(rx.sin_pi_ref(), rm);
+    (s, o)
+}
