@@ -3179,3 +3179,154 @@ where
 {
     emulate_rational_to_float_fn(Float::sin_rational_prec_ref, x)
 }
+
+/// Computes $\sin(2\pi x/u)$, the sine of a primitive float measured in $u$ths of a turn (so that
+/// `u = 360` is degrees).
+///
+/// $$
+/// f(x,u) = \sin(2\pi x/u)+\varepsilon.
+/// $$
+/// - If $x$ is not finite or $u=0$, $\varepsilon$ may be ignored or assumed to be 0.
+/// - If $x$ is finite and $u\neq 0$, then $|\varepsilon| < 2^{\lfloor\log_2 |\sin(2\pi
+///   x/u)|\rfloor-p}$, where $p$ is the precision of the output (24 if `T` is a [`f32`] and 53 if
+///   `T` is a [`f64`]).
+///
+/// Special cases:
+/// - $f(\text{NaN},u)=\text{NaN}$
+/// - $f(\pm\infty,u)=\text{NaN}$
+/// - $f(x,0)=\text{NaN}$
+/// - $f(\pm0.0,u)=\pm0.0$
+/// - If $x/u$ is a multiple of $1/2$, the result is exactly $0.0$ with the sign of $x$ (following
+///   IEEE 754-2019's `sinPi`, so that the function is odd); if it is an odd multiple of $1/4$, the
+///   result is exactly $1$ or $-1$; and if it is $\pm1/12$ or $\pm5/12$ modulo $1$, the result is
+///   exactly $1/2$ or $-1/2$.
+///
+/// Overflow is not possible, since the result lies in $[-1, 1]$. The result underflows, to a
+/// subnormal or to zero, only when $2\pi x/u$ does, which takes a subnormal $x$ or a large $u$; no
+/// [`f32`] or [`f64`] is close enough to a half turn, without being one, for its sine to be
+/// subnormal.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::NegativeInfinity;
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::sin::primitive_float_sin_with_period;
+///
+/// assert!(primitive_float_sin_with_period(f32::NAN, 360).is_nan());
+/// assert!(primitive_float_sin_with_period(f32::INFINITY, 360).is_nan());
+/// assert!(primitive_float_sin_with_period(1.0f32, 0).is_nan());
+/// assert_eq!(
+///     NiceFloat(primitive_float_sin_with_period(-0.0f32, 360)),
+///     NiceFloat(-0.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_sin_with_period(90.0f32, 360)),
+///     NiceFloat(1.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_sin_with_period(30.0f64, 360)),
+///     NiceFloat(0.5)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_sin_with_period(1.0f32, 7)),
+///     NiceFloat(0.7818315)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_sin_with_period(1.0f64, 7)),
+///     NiceFloat(0.7818314824680298)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_sin_with_period<T: PrimitiveFloat>(x: T, u: u64) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_float_to_float_fn(|x, prec| Float::sin_with_period_prec(x, u, prec), x)
+}
+
+/// Computes $\sin(2\pi x/u)$, the sine of a [`Rational`] measured in $u$ths of a turn (so that `u =
+/// 360` is degrees), returning the result as a primitive float.
+///
+/// $$
+/// f(x,u) = \sin(2\pi x/u)+\varepsilon.
+/// $$
+/// - If $u=0$, $\varepsilon$ may be ignored or assumed to be 0.
+/// - If $u\neq 0$, then $|\varepsilon| < 2^{\lfloor\log_2 |\sin(2\pi x/u)|\rfloor-p}$, where $p$ is
+///   the precision of the output (24 if `T` is a [`f32`] and 53 if `T` is a [`f64`]).
+///
+/// Special cases:
+/// - $f(x,0)=\text{NaN}$
+/// - $f(0,u)=0$
+/// - If $x/u$ is a multiple of $1/2$, the result is exactly $0.0$ with the sign of $x$ (following
+///   IEEE 754-2019's `sinPi`, so that the function is odd); if it is an odd multiple of $1/4$, the
+///   result is exactly $1$ or $-1$; and if it is $\pm1/12$ or $\pm5/12$ modulo $1$, the result is
+///   exactly $1/2$ or $-1/2$.
+///
+/// Overflow is not possible, since the result lies in $[-1, 1]$. The result underflows, to a
+/// subnormal or to zero, only when $2\pi x/u$ does, for a tiny $x/u$; a [`Rational`] close enough
+/// to a half turn, without being one, for its sine to be subnormal would need a denominator of more
+/// than 100 bits, in which case the result is still correctly rounded.
+///
+/// # Worst-case complexity
+/// $T(m) = O(m (\log m)^2 \log\log m)$
+///
+/// $M(m) = O(m \log m)$
+///
+/// where $T$ is time, $M$ is additional memory, and $m$ is `x.significant_bits()`: the fraction of
+/// a turn is reduced modulo 1 exactly, so the magnitude of $x$ does not drive the cost.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::Zero;
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::sin::primitive_float_sin_with_period_rational;
+/// use malachite_q::Rational;
+///
+/// assert!(primitive_float_sin_with_period_rational::<f64>(&Rational::ZERO, 0).is_nan());
+/// assert_eq!(
+///     NiceFloat(primitive_float_sin_with_period_rational::<f64>(
+///         &Rational::ZERO,
+///         360
+///     )),
+///     NiceFloat(0.0)
+/// );
+/// // a twelfth of a turn is exactly 1/2
+/// assert_eq!(
+///     NiceFloat(primitive_float_sin_with_period_rational::<f64>(
+///         &Rational::from_unsigneds(1u8, 12),
+///         1
+///     )),
+///     NiceFloat(0.5)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_sin_with_period_rational::<f32>(
+///         &Rational::from_unsigneds(1u8, 7),
+///         1
+///     )),
+///     NiceFloat(0.7818315)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_sin_with_period_rational::<f64>(
+///         &Rational::from_unsigneds(1u8, 7),
+///         1
+///     )),
+///     NiceFloat(0.7818314824680298)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_sin_with_period_rational<T: PrimitiveFloat>(x: &Rational, u: u64) -> T
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_rational_to_float_fn(
+        |x, prec| Float::sin_with_period_rational_prec_ref(x, u, prec),
+        x,
+    )
+}

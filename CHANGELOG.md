@@ -258,6 +258,8 @@ documented by git history.
   half turn underflow correctly. `sin_with_period_rational_prec_round` and
   `sin_with_period_rational_prec` (with `_ref` variants) take a `Rational` instead, reaching the
   exact and closed-form cases directly, such as a twelfth or a twentieth of a turn.
+  `primitive_float_sin_with_period` and `primitive_float_sin_with_period_rational` give the
+  correctly rounded `f32` or `f64` results.
 - `primitive_float_sin` and `primitive_float_sin_rational`, the correctly rounded sine of an `f32`
   or `f64`, or of a `Rational` as an `f32` or `f64`.
 - `primitive_float_cos` and `primitive_float_cos_rational`, the correctly rounded cosine of an

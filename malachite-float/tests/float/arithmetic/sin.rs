@@ -19,9 +19,13 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::{
-    primitive_float_gen, unsigned_rounding_mode_pair_gen_var_3,
+    primitive_float_gen, primitive_float_unsigned_pair_gen_var_1,
+    unsigned_rounding_mode_pair_gen_var_3,
 };
-use malachite_float::float::arithmetic::sin::{primitive_float_sin, primitive_float_sin_rational};
+use malachite_float::float::arithmetic::sin::{
+    primitive_float_sin, primitive_float_sin_rational, primitive_float_sin_with_period,
+    primitive_float_sin_with_period_rational,
+};
 use malachite_float::test_util::common::{
     assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
     to_hex_string,
@@ -41,7 +45,9 @@ use malachite_float::test_util::generators::{
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_q::Rational;
-use malachite_q::test_util::generators::{rational_gen, rational_unsigned_pair_gen_var_3};
+use malachite_q::test_util::generators::{
+    rational_gen, rational_unsigned_pair_gen_var_1, rational_unsigned_pair_gen_var_3,
+};
 use std::panic::catch_unwind;
 use std::str::FromStr;
 
@@ -12656,4 +12662,262 @@ fn test_sin_with_period_rational_underflow() {
     let (s, o) = Float::sin_with_period_rational_prec_round_ref(&x, 1, 10, Nearest);
     assert_eq!(ComparableFloat(s), ComparableFloat(Float::NEGATIVE_ZERO));
     assert_eq!(o, Greater);
+}
+
+#[test]
+#[allow(clippy::type_repetition_in_bounds)]
+fn test_primitive_float_sin_with_period() {
+    fn test<T: PrimitiveFloat>(x: T, u: u64, out: T)
+    where
+        Float: From<T> + PartialOrd<T>,
+        for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    {
+        assert_eq!(
+            NiceFloat(primitive_float_sin_with_period(x, u)),
+            NiceFloat(out)
+        );
+    }
+    test::<f32>(f32::NAN, 360, f32::NAN);
+    test::<f32>(f32::INFINITY, 360, f32::NAN);
+    test::<f32>(f32::NEGATIVE_INFINITY, 360, f32::NAN);
+    test::<f32>(1.0, 0, f32::NAN);
+    test::<f32>(0.0, 360, 0.0);
+    test::<f32>(-0.0, 360, -0.0);
+    test::<f32>(90.0, 360, 1.0);
+    test::<f32>(180.0, 360, 0.0);
+    test::<f32>(-180.0, 360, -0.0);
+    test::<f32>(270.0, 360, -1.0);
+    test::<f32>(360.0, 360, 0.0);
+    test::<f32>(-360.0, 360, -0.0);
+    test::<f32>(30.0, 360, 0.5);
+    test::<f32>(150.0, 360, 0.5);
+    test::<f32>(210.0, 360, -0.5);
+    test::<f32>(45.0, 360, core::f32::consts::FRAC_1_SQRT_2);
+    test::<f32>(60.0, 360, 0.8660254);
+    test::<f32>(18.0, 360, 0.309017);
+    test::<f32>(54.0, 360, 0.809017);
+    test::<f32>(1.0, 7, 0.7818315);
+    test::<f32>(-1.0, 7, -0.7818315);
+    test::<f32>(2.0, 7, 0.9749279);
+    test::<f32>(1.0, 360, 0.017452406);
+    test::<f32>(100.0, 360, 0.9848077);
+    test::<f32>(1.0e10, 360, -0.9848077);
+    test::<f32>(1.0e30, 7, 0.7818315);
+    test::<f32>(1.0e-30, 7, 8.975979e-31);
+    test::<f32>(3.4028235e38, 360, 0.0);
+    test::<f32>(0.5, 1, 0.0);
+    test::<f32>(0.25, 1, 1.0);
+    test::<f32>(0.1, 1, 0.58778524);
+    test::<f32>(1.0e-45, 1, 8.0e-45);
+    test::<f32>(1.0e-45, 360, 0.0);
+    test::<f32>(-1.0e-45, 1, -8.0e-45);
+    test::<f64>(f64::NAN, 360, f64::NAN);
+    test::<f64>(f64::INFINITY, 360, f64::NAN);
+    test::<f64>(f64::NEGATIVE_INFINITY, 360, f64::NAN);
+    test::<f64>(1.0, 0, f64::NAN);
+    test::<f64>(0.0, 360, 0.0);
+    test::<f64>(-0.0, 360, -0.0);
+    test::<f64>(90.0, 360, 1.0);
+    test::<f64>(180.0, 360, 0.0);
+    test::<f64>(-180.0, 360, -0.0);
+    test::<f64>(270.0, 360, -1.0);
+    test::<f64>(360.0, 360, 0.0);
+    test::<f64>(-360.0, 360, -0.0);
+    test::<f64>(30.0, 360, 0.5);
+    test::<f64>(150.0, 360, 0.5);
+    test::<f64>(210.0, 360, -0.5);
+    test::<f64>(45.0, 360, core::f64::consts::FRAC_1_SQRT_2);
+    test::<f64>(60.0, 360, 0.8660254037844386);
+    test::<f64>(18.0, 360, 0.30901699437494745);
+    test::<f64>(54.0, 360, 0.8090169943749475);
+    test::<f64>(1.0, 7, 0.7818314824680298);
+    test::<f64>(-1.0, 7, -0.7818314824680298);
+    test::<f64>(2.0, 7, 0.9749279121818236);
+    test::<f64>(1.0, 360, 0.01745240643728351);
+    test::<f64>(100.0, 360, 0.984807753012208);
+    test::<f64>(1.0e10, 360, -0.984807753012208);
+    test::<f64>(1.0e100, 7, 0.9749279121818236);
+    test::<f64>(1.0e-100, 7, 8.975979010256552e-101);
+    test::<f64>(1.7976931348623157e308, 360, 0.7880107536067219);
+    test::<f64>(0.5, 1, 0.0);
+    test::<f64>(0.25, 1, 1.0);
+    test::<f64>(0.1, 1, 0.5877852522924731);
+    test::<f64>(5.0e-324, 1, 3.0e-323);
+    test::<f64>(5.0e-324, 360, 0.0);
+    test::<f64>(-5.0e-324, 1, -3.0e-323);
+}
+
+#[test]
+#[allow(clippy::type_repetition_in_bounds)]
+fn test_primitive_float_sin_with_period_rational() {
+    fn test<T: PrimitiveFloat>(s: &str, u: u64, out: T)
+    where
+        Float: From<T> + PartialOrd<T>,
+        for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    {
+        let x = Rational::from_str(s).unwrap();
+        assert_eq!(
+            NiceFloat(primitive_float_sin_with_period_rational::<T>(&x, u)),
+            NiceFloat(out)
+        );
+    }
+    test::<f32>("0", 360, 0.0);
+    test::<f32>("1", 0, f32::NAN);
+    test::<f32>("90", 360, 1.0);
+    test::<f32>("180", 360, 0.0);
+    test::<f32>("-180", 360, -0.0);
+    test::<f32>("30", 360, 0.5);
+    test::<f32>("45", 360, core::f32::consts::FRAC_1_SQRT_2);
+    test::<f32>("60", 360, 0.8660254);
+    test::<f32>("18", 360, 0.309017);
+    test::<f32>("54", 360, 0.809017);
+    test::<f32>("1/12", 1, 0.5);
+    test::<f32>("1/3", 1, 0.8660254);
+    test::<f32>("1/8", 1, core::f32::consts::FRAC_1_SQRT_2);
+    test::<f32>("1/20", 1, 0.309017);
+    test::<f32>("1/5", 1, 0.95105654);
+    test::<f32>("1/7", 1, 0.7818315);
+    test::<f32>("-2/7", 1, -0.9749279);
+    test::<f32>("22/7", 1, 0.7818315);
+    test::<f32>("1", 7, 0.7818315);
+    test::<f32>("1000000", 7, 0.7818315);
+    test::<f32>("1/1000000", 1, 0.0000062831855);
+    test::<f32>("355/113", 360, 0.05480367);
+    test::<f64>("0", 360, 0.0);
+    test::<f64>("1", 0, f64::NAN);
+    test::<f64>("90", 360, 1.0);
+    test::<f64>("180", 360, 0.0);
+    test::<f64>("-180", 360, -0.0);
+    test::<f64>("30", 360, 0.5);
+    test::<f64>("45", 360, core::f64::consts::FRAC_1_SQRT_2);
+    test::<f64>("60", 360, 0.8660254037844386);
+    test::<f64>("18", 360, 0.30901699437494745);
+    test::<f64>("54", 360, 0.8090169943749475);
+    test::<f64>("1/12", 1, 0.5);
+    test::<f64>("1/3", 1, 0.8660254037844386);
+    test::<f64>("1/8", 1, core::f64::consts::FRAC_1_SQRT_2);
+    test::<f64>("1/20", 1, 0.30901699437494745);
+    test::<f64>("1/5", 1, 0.9510565162951535);
+    test::<f64>("1/7", 1, 0.7818314824680298);
+    test::<f64>("-2/7", 1, -0.9749279121818236);
+    test::<f64>("22/7", 1, 0.7818314824680298);
+    test::<f64>("1", 7, 0.7818314824680298);
+    test::<f64>("1000000", 7, 0.7818314824680298);
+    test::<f64>("1/1000000", 1, 6.283185307138245e-6);
+    test::<f64>("355/113", 360, 0.05480366979770582);
+    // tiny inputs, whose sines are subnormal or zero
+    let tiny = |zeros: usize| format!("1/1{}", "0".repeat(zeros));
+    test::<f32>(&tiny(40), 1, 6.28318e-40);
+    test::<f32>(&tiny(40), 360, 1.746e-42);
+    test::<f32>(&tiny(50), 1, 0.0);
+    test::<f64>(&tiny(310), 1, 6.28318530717956e-310);
+    test::<f64>(&format!("-{}", tiny(310)), 7, -8.9759790102563e-311);
+    test::<f64>(&tiny(330), 1, 0.0);
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn primitive_float_sin_with_period_properties_helper<T: PrimitiveFloat>()
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    primitive_float_unsigned_pair_gen_var_1::<T, u64>().test_properties(|(x, u)| {
+        let s = primitive_float_sin_with_period(x, u);
+        // NaN exactly for u = 0 (the inputs are finite), and otherwise in [-1, 1]
+        assert_eq!(s.is_nan(), u == 0);
+        if u != 0 {
+            assert!(s >= T::NEGATIVE_ONE && s <= T::ONE);
+            // odd
+            assert_eq!(
+                NiceFloat(primitive_float_sin_with_period(-x, u)),
+                NiceFloat(-s)
+            );
+            // the result is the correctly rounded sine, as computed by MPFR with 64 bits to spare,
+            // so that a subnormal result is rounded once by the conversion
+            let rug_s = rug_sin_with_period_prec(
+                &rug::Float::exact_from(&Float::from(x)),
+                u,
+                T::MANTISSA_WIDTH + 64,
+            )
+            .0;
+            let rug_s: T = T::rounding_from(&<Float as From<&rug::Float>>::from(&rug_s), Nearest).0;
+            assert_eq!(NiceFloat(rug_s), NiceFloat(s));
+        }
+    });
+
+    primitive_float_gen::<T>().test_properties(|x| {
+        // NaN exactly for NaN and infinite inputs
+        assert_eq!(
+            primitive_float_sin_with_period(x, 7).is_nan(),
+            !x.is_finite()
+        );
+    });
+}
+
+#[test]
+fn primitive_float_sin_with_period_properties() {
+    apply_fn_to_primitive_floats!(primitive_float_sin_with_period_properties_helper);
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn primitive_float_sin_with_period_rational_properties_helper<T: PrimitiveFloat>()
+where
+    Float: From<T> + PartialOrd<T>,
+    Rational: ExactFrom<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    rational_unsigned_pair_gen_var_1::<u64>().test_properties(|(x, u)| {
+        let s = primitive_float_sin_with_period_rational::<T>(&x, u);
+        assert_eq!(s.is_nan(), u == 0);
+        if u != 0 {
+            assert!(s >= T::NEGATIVE_ONE && s <= T::ONE);
+            // odd (a `Rational` has no negative zero), and periodic with period u up to the sign of
+            // a zero
+            if x != 0u32 {
+                assert_eq!(
+                    NiceFloat(primitive_float_sin_with_period_rational::<T>(&-&x, u)),
+                    NiceFloat(-s)
+                );
+            }
+            assert_eq!(
+                NiceFloat(
+                    primitive_float_sin_with_period_rational::<T>(&(&x + Rational::from(u)), u)
+                        .abs()
+                ),
+                NiceFloat(s.abs())
+            );
+            // MPFR agrees, except that it cannot see the exact cases of non-dyadic inputs
+            let (s_float, o) =
+                Float::sin_with_period_rational_prec_ref(&x, u, T::MANTISSA_WIDTH + 64);
+            assert_eq!(
+                NiceFloat(T::rounding_from(&s_float, Nearest).0),
+                NiceFloat(s)
+            );
+            if o != Equal {
+                let rug_s = rug_sin_with_period_rational_prec(&x, u, T::MANTISSA_WIDTH + 64).0;
+                let rug_s: T =
+                    T::rounding_from(&<Float as From<&rug::Float>>::from(&rug_s), Nearest).0;
+                assert_eq!(NiceFloat(rug_s), NiceFloat(s));
+            }
+        }
+    });
+
+    primitive_float_unsigned_pair_gen_var_1::<T, u64>().test_properties(|(x, u)| {
+        // The sine of a finite nonzero primitive float, taken through the `Rational` path, matches
+        // the direct primitive-float sine (a `Rational` cannot carry the sign of a zero).
+        if x != T::ZERO {
+            assert_eq!(
+                NiceFloat(primitive_float_sin_with_period_rational::<T>(
+                    &Rational::exact_from(x),
+                    u
+                )),
+                NiceFloat(primitive_float_sin_with_period(x, u))
+            );
+        }
+    });
+}
+
+#[test]
+fn primitive_float_sin_with_period_rational_properties() {
+    apply_fn_to_primitive_floats!(primitive_float_sin_with_period_rational_properties_helper);
 }

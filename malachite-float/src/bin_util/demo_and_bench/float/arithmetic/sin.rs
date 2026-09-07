@@ -11,12 +11,19 @@ use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
 use malachite_base::rounding_modes::RoundingMode::Exact;
-use malachite_base::test_util::bench::bucketers::{primitive_float_bucketer, quadruple_3_bucketer};
+use malachite_base::test_util::bench::bucketers::{
+    pair_1_primitive_float_bucketer, primitive_float_bucketer, quadruple_3_bucketer,
+};
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
-use malachite_base::test_util::generators::primitive_float_gen;
+use malachite_base::test_util::generators::{
+    primitive_float_gen, primitive_float_unsigned_pair_gen_var_1,
+};
 use malachite_base::test_util::runner::Runner;
-use malachite_float::float::arithmetic::sin::{primitive_float_sin, primitive_float_sin_rational};
+use malachite_float::float::arithmetic::sin::{
+    primitive_float_sin, primitive_float_sin_rational, primitive_float_sin_with_period,
+    primitive_float_sin_with_period_rational,
+};
 use malachite_float::test_util::bench::bucketers::{
     float_complexity_bucketer, pair_2_float_complexity_bucketer,
     pair_2_triple_1_2_float_primitive_int_max_complexity_bucketer,
@@ -40,10 +47,12 @@ use malachite_float::test_util::generators::{
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_q::test_util::bench::bucketers::{
-    pair_rational_bit_u64_max_bucketer, rational_bit_bucketer,
+    pair_1_rational_bit_bucketer, pair_rational_bit_u64_max_bucketer, rational_bit_bucketer,
     triple_1_2_rational_bit_u64_max_bucketer,
 };
-use malachite_q::test_util::generators::{rational_gen, rational_unsigned_pair_gen_var_3};
+use malachite_q::test_util::generators::{
+    rational_gen, rational_unsigned_pair_gen_var_1, rational_unsigned_pair_gen_var_3,
+};
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_float_sin_with_period_rational_prec_round);
@@ -91,8 +100,12 @@ pub(crate) fn register(runner: &mut Runner) {
     );
     register_primitive_float_demos!(runner, demo_primitive_float_sin);
     register_primitive_float_demos!(runner, demo_primitive_float_sin_rational);
+    register_primitive_float_demos!(runner, demo_primitive_float_sin_with_period);
+    register_primitive_float_demos!(runner, demo_primitive_float_sin_with_period_rational);
     register_primitive_float_benches!(runner, benchmark_primitive_float_sin);
     register_primitive_float_benches!(runner, benchmark_primitive_float_sin_rational);
+    register_primitive_float_benches!(runner, benchmark_primitive_float_sin_with_period);
+    register_primitive_float_benches!(runner, benchmark_primitive_float_sin_with_period_rational);
     register_demo!(runner, demo_float_sin);
     register_demo!(runner, demo_float_sin_debug);
     register_demo!(runner, demo_float_sin_extreme);
@@ -1212,5 +1225,97 @@ fn benchmark_float_sin_with_period_rational_prec_evaluation_strategy(
                 },
             ),
         ],
+    );
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn demo_primitive_float_sin_with_period<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    for (x, u) in primitive_float_unsigned_pair_gen_var_1::<T, u64>()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "primitive_float_sin_with_period({}, {}) = {}",
+            NiceFloat(x),
+            u,
+            NiceFloat(primitive_float_sin_with_period(x, u))
+        );
+    }
+}
+#[allow(clippy::type_repetition_in_bounds)]
+fn benchmark_primitive_float_sin_with_period<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    run_benchmark(
+        &format!("primitive_float_sin_with_period({}, u64)", T::NAME),
+        BenchmarkType::Single,
+        primitive_float_unsigned_pair_gen_var_1::<T, u64>().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_1_primitive_float_bucketer("x"),
+        &mut [("malachite", &mut |(x, u)| {
+            no_out!(primitive_float_sin_with_period(x, u));
+        })],
+    );
+}
+#[allow(clippy::type_repetition_in_bounds)]
+fn demo_primitive_float_sin_with_period_rational<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    for (x, u) in rational_unsigned_pair_gen_var_1::<u64>()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "primitive_float_sin_with_period_rational({}, {}) = {:?}",
+            x,
+            u,
+            NiceFloat(primitive_float_sin_with_period_rational::<T>(&x, u))
+        );
+    }
+}
+#[allow(clippy::type_repetition_in_bounds)]
+fn benchmark_primitive_float_sin_with_period_rational<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    run_benchmark(
+        &format!(
+            "primitive_float_sin_with_period_rational::<{}>(&Rational, u64)",
+            T::NAME
+        ),
+        BenchmarkType::Single,
+        rational_unsigned_pair_gen_var_1::<u64>().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_1_rational_bit_bucketer("x"),
+        &mut [("malachite", &mut |(x, u)| {
+            no_out!(primitive_float_sin_with_period_rational::<T>(&x, u));
+        })],
     );
 }
