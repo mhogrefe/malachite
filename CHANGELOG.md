@@ -275,6 +275,20 @@ documented by git history.
   `Rational` instead, sharing the input rounding and, for inputs too large to be `Float`s, the
   reduction modulo $2\pi$ that dominates their cost. `primitive_float_sin_cos` and
   `primitive_float_sin_cos_rational` give the correctly rounded `f32` or `f64` pairs.
+- `sin_cos_with_period_prec_round`, `sin_cos_with_period_prec`, and `sin_cos_with_period_round`
+  (with `_ref` and `_assign` variants): the sine and cosine of a `Float` measured in $u$ths of a
+  turn, together, with one argument reduction, one computation of $2\pi x/u$, and one `sin_cos`
+  per iteration. MPFR has no such function. The results are those of the `sin_with_period` and
+  `cos_with_period` families, including the exact quarter turns, the closed-form twelfths, sixths,
+  and eighths, and the near-zero paths, so inputs within $2^{-2^{30}}$ of a multiple of a quarter
+  turn underflow correctly. `sin_cos_with_period_rational_prec_round` and
+  `sin_cos_with_period_rational_prec` (with `_ref` variants) take a `Rational` instead, and
+  `primitive_float_sin_cos_with_period` and `primitive_float_sin_cos_with_period_rational` give
+  the correctly rounded `f32` or `f64` pairs.
+- Fixed `cos_with_period_rational_prec_round` taking a working precision of billions of bits for a
+  tiny negative input, and `cos_with_period_prec_round` doing the same for a `Float` just below a
+  multiple of its period: the fraction of a turn is now reduced to $[-1/2, 1/2]$, where the
+  small-input shortcut applies.
 - `primitive_float_sin` and `primitive_float_sin_rational`, the correctly rounded sine of an `f32`
   or `f64`, or of a `Rational` as an `f32` or `f64`.
 - `primitive_float_cos` and `primitive_float_cos_rational`, the correctly rounded cosine of an

@@ -12635,6 +12635,53 @@ fn test_cos_with_period_rational_underflow() {
     assert_eq!(o, Greater);
 }
 
+// Inputs within 2^(-2^30) of a multiple of the period, on either side, whose cosines are just below
+// 1: the fraction of a turn is reduced to [-1/2, 1/2], so these take the small-input shortcut
+// rather than a Ziv loop that would have to reach 2^31 bits to see the cancellation in 1 - cos (the
+// negative `Rational` inputs used to do exactly that).
+#[test]
+fn test_cos_with_period_near_turn() {
+    let eps = Rational::power_of_2(-((1i64 << 30) + 70));
+    // 720 - eps needs 10 + 2^30 + 70 bits
+    let p = (1u64 << 30) + 80;
+    let below_turn = Float::from_rational_prec_round(Rational::from(360u32) - &eps, p, Exact).0;
+    // the offset alone is below the exponent range, so the negative input is the smallest one
+    let neg = -(Float::one_prec(10) >> (1u64 << 30));
+    let below_two_turns =
+        Float::from_rational_prec_round(Rational::from(720u32) - &eps, p, Exact).0;
+    let one = Float::one_prec(10);
+    for x in [&below_turn, &neg, &below_two_turns] {
+        let (c, o) = x.cos_with_period_prec_round_ref(360, 10, Nearest);
+        assert_eq!(ComparableFloatRef(&c), ComparableFloatRef(&one));
+        assert_eq!(o, Greater);
+        let (c, o) = x.cos_with_period_prec_round_ref(360, 10, Floor);
+        assert_eq!(c.to_string(), "0.99902");
+        assert_eq!(o, Less);
+        let (c, o) = x.cos_with_period_prec_round_ref(360, 10, Ceiling);
+        assert_eq!(ComparableFloatRef(&c), ComparableFloatRef(&one));
+        assert_eq!(o, Greater);
+    }
+    for x in [
+        Rational::from(360u32) - &eps,
+        -&eps,
+        Rational::from(720u32) - &eps,
+        -Rational::from(360u32) - &eps,
+        -(&eps / Rational::from(3u32)),
+    ] {
+        let (c, o) = Float::cos_with_period_rational_prec_round_ref(&x, 360, 10, Nearest);
+        assert_eq!(ComparableFloatRef(&c), ComparableFloatRef(&one));
+        assert_eq!(o, Greater);
+        let (c, o) = Float::cos_with_period_rational_prec_round_ref(&x, 360, 10, Floor);
+        assert_eq!(c.to_string(), "0.99902");
+        assert_eq!(o, Less);
+    }
+    // a `Rational` with a modest denominator, well within a Float's reach, just below a turn
+    let x = Rational::from(360u32) - Rational::power_of_2(-100i64);
+    let (c, o) = Float::cos_with_period_rational_prec_round_ref(&x, 360, 10, Floor);
+    assert_eq!(c.to_string(), "0.99902");
+    assert_eq!(o, Less);
+}
+
 #[test]
 fn test_cos_pi_prec_round() {
     let test = |s, s_hex, prec: u64, rm, out: &str, out_hex: &str, o_out: Ordering| {

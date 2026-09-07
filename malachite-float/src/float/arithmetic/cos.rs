@@ -26,8 +26,8 @@ use core::cmp::Ordering::{self, Equal, Greater, Less};
 use core::cmp::{max, min};
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    CeilingLogBase2, Cos, CosAssign, DivRoundAssign, Floor as FloorTrait, FloorLogBase2, FloorSqrt,
-    Mod, ModPowerOf2, NegAssign, Parity, PowerOf2, Square, SubMul, UnsignedAbs,
+    CeilingLogBase2, Cos, CosAssign, DivRoundAssign, FloorLogBase2, FloorSqrt, Mod, ModPowerOf2,
+    NegAssign, Parity, PowerOf2, Square, SubMul, UnsignedAbs,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -1747,7 +1747,11 @@ pub(crate) fn phi_minus_1_prec_round(prec: u64, rm: RoundingMode) -> (Float, Ord
 // correctly rounded constant: d = 8 gives sqrt(2)/2, d = 12 gives sqrt(3)/2, and d = 5 and 10 give
 // phi/2 or (phi - 1)/2, up to sign. Those are 15 to 130 times faster than pi plus a cosine at the
 // working precision, and are never exact, so they return `None` for `Exact`.
-fn cos_turns_special_case(q: &Rational, prec: u64, rm: RoundingMode) -> Option<(Float, Ordering)> {
+pub(crate) fn cos_turns_special_case(
+    q: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+) -> Option<(Float, Ordering)> {
     let d = q.denominator_ref();
     if *d > 12u32 {
         return None;
@@ -1859,7 +1863,7 @@ pub(crate) fn trig_turns_near_zero(
 // `cos_turns_special_case`).
 //
 // This is mpfr_cosu from cosu.c, MPFR 4.2.2, with the additional near-zero path.
-fn cos_with_period_prec_round_normal_ref(
+pub(crate) fn cos_with_period_prec_round_normal_ref(
     x: &Float,
     u: u64,
     prec: u64,
@@ -1883,7 +1887,31 @@ fn cos_with_period_prec_round_normal_ref(
         xr = r;
         &xr
     };
-    // now |xp/u| < 1 for x small, we have |cos(2*pi*x/u)-1| < 1/2*(2*pi*x/u)^2 < 2^5*(x/u)^2
+    // now |xp/u| < 1; fold it into [-1/2, 1/2], exactly, so that an x just below a multiple of u
+    // lands near 0 rather than near 1, where the small-input shortcut below applies (the cosine is
+    // even, so the sign is immaterial; otherwise the working precision would have to grow to the
+    // whole cancellation in 1 - cos)
+    let xf;
+    let xp = if (xp << 1u32).gt_abs(&u) {
+        let p = i64::exact_from(xp.get_prec().unwrap()) - i64::from(xp.get_exponent().unwrap());
+        let step = if *xp > 0u32 {
+            -Float::from(u)
+        } else {
+            Float::from(u)
+        };
+        let (f, o) = xp.add_prec_ref_val(step, u64::WIDTH + u64::exact_from(max(p, 0)));
+        if o != Equal {
+            // The precision suffices, so the difference underflowed: x is within 2^(-2^30) of a
+            // multiple of u, and the cosine rounds from 1 alone (and is not exact).
+            assert_ne!(rm, Exact, "Inexact cos_with_period");
+            return float_round_near_x(&Float::ONE, prec + 2, false, prec, rm).unwrap();
+        }
+        xf = f;
+        &xf
+    } else {
+        xp
+    };
+    // for x small, we have |cos(2*pi*x/u)-1| < 1/2*(2*pi*x/u)^2 < 2^5*(x/u)^2
     let exp_x = i64::from(xp.get_exponent().unwrap());
     let log2u = if u == 1 {
         0
@@ -2788,7 +2816,7 @@ impl Float {
 // closed-form cases, and a Ziv loop around the cosine of a `Float` approximation of 2 pi q, whose
 // three roundings (q, pi, and the product) give the same error bound as MPFR's cosu. `rm` may be
 // `Exact` only in the exact cases.
-fn cos_turns_helper(q: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+pub(crate) fn cos_turns_helper(q: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
     let exp_q = q.floor_log_base_2_abs() + 1;
     // for q small, we have |cos(2*pi*q)-1| < 1/2*(2*pi*q)^2 < 2^5*q^2 < 2^(5 + 2 EXP(q))
     let err = -(exp_q << 1) - 5;
@@ -3079,9 +3107,12 @@ impl Float {
         if *x == 0u32 {
             return (Self::one_prec(prec), Equal);
         }
-        // q = x/u, reduced to [0, 1): cos(2 pi q) has period 1 in q
+        // q = x/u, reduced to [-1/2, 1/2]: cos(2 pi q) has period 1 in q, and an input just below a
+        // multiple of the period must land near 0, not near 1, for the small-input shortcut to
+        // apply (otherwise the working precision would have to grow to the whole cancellation in 1
+        // - cos)
         let q = x / Rational::from(u);
-        let whole = Rational::from((&q).floor());
+        let whole = Rational::from(Integer::rounding_from(&q, Nearest).0);
         let q = q - whole;
         if q == 0u32 {
             return (Self::one_prec(prec), Equal);

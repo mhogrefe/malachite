@@ -270,7 +270,7 @@ const SCALE: u64 = 64;
 // The exponent of the scaled smallest positive Float, 2^(MIN_EXPONENT - 1) * 2^SCALE.
 const MIN_SCALED_EXPONENT: i64 = Float::MIN_EXPONENT_I64 + SCALE as i64;
 // Inputs with at most this exponent are scaled.
-const SCALED_INPUT_EXPONENT: i64 = Float::MIN_EXPONENT_I64 + 66;
+pub(crate) const SCALED_INPUT_EXPONENT: i64 = Float::MIN_EXPONENT_I64 + 66;
 
 // Given t = 2^SCALE * 2 pi x/u to within a relative 2^(2 - prec), returns the result if the true
 // value, and so its sine, which is just below it, is below the smallest positive Float: zero or
@@ -311,7 +311,11 @@ fn scaled_underflow(
 // gives sqrt(2)/2, and d = 20 gives phi/2 or (phi - 1)/2, up to sign. (Fifths and tenths of a turn
 // have no such form for the sine.) Those constants are never exact, so they return `None` for
 // `Exact`.
-fn sin_turns_special_case(q: &Rational, prec: u64, rm: RoundingMode) -> Option<(Float, Ordering)> {
+pub(crate) fn sin_turns_special_case(
+    q: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+) -> Option<(Float, Ordering)> {
     let d = q.denominator_ref();
     if *d > 20u32 {
         return None;
@@ -378,7 +382,7 @@ fn sin_turns_special_case(q: &Rational, prec: u64, rm: RoundingMode) -> Option<(
 // `sin_turns_special_case`).
 //
 // This is mpfr_sinu from sinu.c, MPFR 4.2.2, with the additional near-zero path.
-fn sin_with_period_prec_round_normal_ref(
+pub(crate) fn sin_with_period_prec_round_normal_ref(
     x: &Float,
     u: u64,
     prec: u64,
@@ -501,7 +505,7 @@ fn sin_with_period_prec_round_normal_ref(
 // precision `prec` with rounding mode `rm`. `rm` may be `Exact` only in the exact cases (see
 // `sin_turns_special_case`). This is the `Float` algorithm with the fraction of a turn taken
 // directly: since q is exact, only pi and the product are rounded.
-fn sin_turns_helper(q: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+pub(crate) fn sin_turns_helper(q: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
     let exp_q = q.floor_log_base_2_abs() + 1;
     // The special cases need |q| >= 1/20
     if exp_q >= -4
