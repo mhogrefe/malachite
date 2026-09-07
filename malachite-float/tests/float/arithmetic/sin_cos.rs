@@ -8,15 +8,24 @@
 
 use core::cmp::Ordering::{self, *};
 use malachite_base::num::arithmetic::traits::{Cos, PowerOf2, Sin, SinCos, SinCosAssign};
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeZero, One, Zero,
 };
 use malachite_base::num::comparison::traits::PartialOrdAbs;
-use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
+use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
-use malachite_base::test_util::generators::unsigned_rounding_mode_pair_gen_var_3;
+use malachite_base::test_util::generators::{
+    primitive_float_gen, unsigned_rounding_mode_pair_gen_var_3,
+};
+use malachite_float::float::arithmetic::cos::{primitive_float_cos, primitive_float_cos_rational};
+use malachite_float::float::arithmetic::sin::{primitive_float_sin, primitive_float_sin_rational};
+use malachite_float::float::arithmetic::sin_cos::{
+    primitive_float_sin_cos, primitive_float_sin_cos_rational,
+};
 use malachite_float::test_util::common::{
     assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
     to_hex_string,
@@ -32,7 +41,7 @@ use malachite_float::test_util::generators::{
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_q::Rational;
-use malachite_q::test_util::generators::rational_unsigned_pair_gen_var_3;
+use malachite_q::test_util::generators::{rational_gen, rational_unsigned_pair_gen_var_3};
 use std::panic::catch_unwind;
 use std::str::FromStr;
 
@@ -7659,4 +7668,117 @@ fn test_sin_cos_rational_underflow() {
     assert_eq!(o_s, Less);
     assert_eq!(ComparableFloat(c), ComparableFloat(Float::ZERO));
     assert_eq!(o_c, Less);
+}
+
+#[test]
+#[allow(clippy::type_repetition_in_bounds)]
+fn test_primitive_float_sin_cos() {
+    fn test<T: PrimitiveFloat>(x: T, out_s: T, out_c: T)
+    where
+        Float: From<T> + PartialOrd<T>,
+        for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    {
+        let (s, c) = primitive_float_sin_cos(x);
+        assert_eq!(NiceFloat(s), NiceFloat(out_s));
+        assert_eq!(NiceFloat(c), NiceFloat(out_c));
+    }
+    test::<f32>(f32::NAN, f32::NAN, f32::NAN);
+    test::<f32>(f32::INFINITY, f32::NAN, f32::NAN);
+    test::<f32>(f32::NEGATIVE_INFINITY, f32::NAN, f32::NAN);
+    test::<f32>(0.0, 0.0, 1.0);
+    test::<f32>(-0.0, -0.0, 1.0);
+    test::<f32>(1.0, 0.84147096, 0.5403023);
+    test::<f32>(-1.0, -0.84147096, 0.5403023);
+    test::<f32>(0.5, 0.47942555, 0.87758255);
+    test::<f32>(2.0, 0.9092974, -0.41614684);
+    test::<f32>(core::f32::consts::PI, -8.742278e-8, -1.0);
+    test::<f32>(core::f32::consts::FRAC_PI_2, 1.0, -4.371139e-8);
+    test::<f32>(100.0, -0.50636566, 0.8623189);
+    test::<f32>(1.0e10, -0.48750603, 0.87311965);
+    test::<f32>(3.4028235e38, -0.5218765, 0.853021);
+    test::<f32>(1.0e-45, 1.0e-45, 1.0);
+
+    test::<f64>(f64::NAN, f64::NAN, f64::NAN);
+    test::<f64>(f64::INFINITY, f64::NAN, f64::NAN);
+    test::<f64>(f64::NEGATIVE_INFINITY, f64::NAN, f64::NAN);
+    test::<f64>(0.0, 0.0, 1.0);
+    test::<f64>(-0.0, -0.0, 1.0);
+    test::<f64>(1.0, 0.8414709848078965, 0.5403023058681398);
+    test::<f64>(-1.0, -0.8414709848078965, 0.5403023058681398);
+    test::<f64>(0.5, 0.479425538604203, 0.8775825618903728);
+    test::<f64>(2.0, 0.9092974268256817, -0.4161468365471424);
+    test::<f64>(core::f64::consts::PI, 1.2246467991473532e-16, -1.0);
+    test::<f64>(core::f64::consts::FRAC_PI_2, 1.0, 6.123233995736766e-17);
+    test::<f64>(100.0, -0.5063656411097588, 0.8623188722876839);
+    test::<f64>(1.0e100, -0.3806377310050287, 0.9247242387519338);
+    test::<f64>(
+        1.7976931348623157e308,
+        0.004961954789184062,
+        -0.9999876894265599,
+    );
+    test::<f64>(5.0e-324, 5.0e-324, 1.0);
+}
+
+#[test]
+#[allow(clippy::type_repetition_in_bounds)]
+fn test_primitive_float_sin_cos_rational() {
+    fn test<T: PrimitiveFloat>(s: &str, out_s: T, out_c: T)
+    where
+        Float: From<T> + PartialOrd<T>,
+        for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    {
+        let x = Rational::from_str(s).unwrap();
+        let (sin, cos) = primitive_float_sin_cos_rational::<T>(&x);
+        assert_eq!(NiceFloat(sin), NiceFloat(out_s));
+        assert_eq!(NiceFloat(cos), NiceFloat(out_c));
+    }
+    test::<f32>("0", 0.0, 1.0);
+    test::<f32>("1", 0.84147096, 0.5403023);
+    test::<f32>("1/2", 0.47942555, 0.87758255);
+    test::<f32>("1/3", 0.3271947, 0.94495696);
+    test::<f32>("22/7", -0.0012644889, -0.9999992);
+    test::<f32>("355/113", -2.6676418e-7, -1.0);
+    test::<f32>("-1000000", 0.3499935, 0.93675214);
+    test::<f32>("1/1000000", 0.000001, 1.0);
+    test::<f32>("10000", -0.30561438, -0.95215535);
+    test::<f64>("0", 0.0, 1.0);
+    test::<f64>("1", 0.8414709848078965, 0.5403023058681398);
+    test::<f64>("1/2", 0.479425538604203, 0.8775825618903728);
+    test::<f64>("1/3", 0.32719469679615226, 0.9449569463147377);
+    test::<f64>("22/7", -0.0012644889303773533, -0.999999200533553);
+    test::<f64>("355/113", -2.6676418906241917e-7, -0.9999999999999645);
+    test::<f64>("-1000000", 0.34999350217129294, 0.9367521275331447);
+    test::<f64>("1/1000000", 9.999999999998333e-7, 0.9999999999995);
+    test::<f64>("10000", -0.30561438888825215, -0.9521553682590148);
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn primitive_float_sin_cos_properties_helper<T: PrimitiveFloat>()
+where
+    Float: From<T> + PartialOrd<T>,
+    Rational: ExactFrom<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    primitive_float_gen::<T>().test_properties(|x| {
+        // the two results are those of the separate functions
+        let (s, c) = primitive_float_sin_cos(x);
+        assert_eq!(NiceFloat(s), NiceFloat(primitive_float_sin(x)));
+        assert_eq!(NiceFloat(c), NiceFloat(primitive_float_cos(x)));
+    });
+    rational_gen().test_properties(|x| {
+        let (s, c) = primitive_float_sin_cos_rational::<T>(&x);
+        assert_eq!(
+            NiceFloat(s),
+            NiceFloat(primitive_float_sin_rational::<T>(&x))
+        );
+        assert_eq!(
+            NiceFloat(c),
+            NiceFloat(primitive_float_cos_rational::<T>(&x))
+        );
+    });
+}
+
+#[test]
+fn primitive_float_sin_cos_properties() {
+    apply_fn_to_primitive_floats!(primitive_float_sin_cos_properties_helper);
 }

@@ -7,10 +7,19 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{Cos, Sin, SinCos, SinCosAssign};
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::NaN;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
+use malachite_base::num::float::NiceFloat;
+use malachite_base::test_util::bench::bucketers::primitive_float_bucketer;
 use malachite_base::test_util::bench::{BenchmarkType, run_benchmark};
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
+use malachite_base::test_util::generators::primitive_float_gen;
 use malachite_base::test_util::runner::Runner;
+use malachite_float::float::arithmetic::sin_cos::{
+    primitive_float_sin_cos, primitive_float_sin_cos_rational,
+};
+use malachite_float::float::arithmetic::{cos, sin};
 use malachite_float::test_util::bench::bucketers::{
     float_complexity_bucketer, pair_2_float_complexity_bucketer,
     pair_2_triple_1_2_float_primitive_int_max_complexity_bucketer,
@@ -25,11 +34,17 @@ use malachite_float::test_util::generators::{
 };
 use malachite_float::{ComparableFloat, Float};
 use malachite_q::test_util::bench::bucketers::{
-    pair_rational_bit_u64_max_bucketer, triple_1_2_rational_bit_u64_max_bucketer,
+    pair_rational_bit_u64_max_bucketer, rational_bit_bucketer,
+    triple_1_2_rational_bit_u64_max_bucketer,
 };
-use malachite_q::test_util::generators::rational_unsigned_pair_gen_var_3;
+use malachite_q::test_util::generators::{rational_gen, rational_unsigned_pair_gen_var_3};
 
 pub(crate) fn register(runner: &mut Runner) {
+    register_primitive_float_demos!(runner, demo_primitive_float_sin_cos);
+    register_primitive_float_demos!(runner, demo_primitive_float_sin_cos_rational);
+    register_primitive_float_benches!(runner, benchmark_primitive_float_sin_cos);
+    register_primitive_float_benches!(runner, benchmark_primitive_float_sin_cos_algorithms);
+    register_primitive_float_benches!(runner, benchmark_primitive_float_sin_cos_rational);
     register_demo!(runner, demo_float_sin_cos_rational_prec_round);
     register_demo!(runner, demo_float_sin_cos_rational_prec_round_debug);
     register_demo!(runner, demo_float_sin_cos_rational_prec_round_ref);
@@ -553,5 +568,119 @@ fn benchmark_float_sin_cos_rational_prec_evaluation_strategy(
                 &mut |(n, p)| no_out!(Float::sin_cos_rational_prec_ref(&n, p)),
             ),
         ],
+    );
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn demo_primitive_float_sin_cos<T: PrimitiveFloat>(gm: GenMode, config: &GenConfig, limit: usize)
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    for x in primitive_float_gen::<T>().get(gm, config).take(limit) {
+        let (s, c) = primitive_float_sin_cos(x);
+        println!(
+            "primitive_float_sin_cos({}) = ({}, {})",
+            NiceFloat(x),
+            NiceFloat(s),
+            NiceFloat(c)
+        );
+    }
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn demo_primitive_float_sin_cos_rational<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    for x in rational_gen().get(gm, config).take(limit) {
+        let (s, c) = primitive_float_sin_cos_rational::<T>(&x);
+        println!(
+            "primitive_float_sin_cos_rational({}) = ({}, {})",
+            x,
+            NiceFloat(s),
+            NiceFloat(c)
+        );
+    }
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn benchmark_primitive_float_sin_cos<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    run_benchmark(
+        &format!("primitive_float_sin_cos({})", T::NAME),
+        BenchmarkType::Single,
+        primitive_float_gen::<T>().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &primitive_float_bucketer("x"),
+        &mut [("malachite", &mut |x| {
+            no_out!(primitive_float_sin_cos(x));
+        })],
+    );
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn benchmark_primitive_float_sin_cos_algorithms<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    run_benchmark(
+        &format!("primitive_float_sin_cos({})", T::NAME),
+        BenchmarkType::Algorithms,
+        primitive_float_gen::<T>().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &primitive_float_bucketer("x"),
+        &mut [
+            ("together", &mut |x| {
+                no_out!(primitive_float_sin_cos(x));
+            }),
+            ("separately", &mut |x| {
+                no_out!((sin::primitive_float_sin(x), cos::primitive_float_cos(x)));
+            }),
+        ],
+    );
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn benchmark_primitive_float_sin_cos_rational<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    run_benchmark(
+        &format!("primitive_float_sin_cos_rational::<{}>(&Rational)", T::NAME),
+        BenchmarkType::Single,
+        rational_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &rational_bit_bucketer("x"),
+        &mut [("malachite", &mut |x| {
+            no_out!(primitive_float_sin_cos_rational::<T>(&x));
+        })],
     );
 }

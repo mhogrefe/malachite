@@ -17,7 +17,6 @@
 // ±sqrt(1 - cos^2), all inside one Ziv loop that must certify both results. The `mpfr_sincos_fast`
 // tier, used for precisions at or above `MPFR_SINCOS_THRESHOLD`, is not ported yet.
 
-use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::float::arithmetic::cos::{
     NEAR_ZERO_MIN_CANCEL, cos_rational_helper, cos_rational_tiny, reduce_huge, round_bracket,
@@ -25,16 +24,18 @@ use crate::float::arithmetic::cos::{
 };
 use crate::float::arithmetic::round_near_x::float_round_near_x;
 use crate::float::arithmetic::sin::sin_rational_helper;
+use crate::{Float, emulate_float_to_float_pair_fn, emulate_rational_to_float_pair_fn};
 use core::cmp::Ordering::{self, Equal};
 use core::cmp::{max, min};
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     Abs, CeilingLogBase2, NegAssign, PowerOf2, SinCos, SinCosAssign,
 };
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{NaN as NaNTrait, One, Zero as ZeroTrait};
 use malachite_base::num::comparison::traits::EqAbs;
-use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, Ceiling, Down, Exact, Nearest};
 use malachite_nz::natural::arithmetic::float::round::float_can_round;
@@ -1060,4 +1061,131 @@ impl SinCosAssign for Float {
         let prec = self.significant_bits();
         self.sin_cos_prec_round_assign(cos, prec, Nearest);
     }
+}
+
+/// Computes $\sin x$ and $\cos x$, the sine and cosine of a primitive float, together. Using this
+/// function is more accurate than using the default `sin_cos` function or the ones provided by
+/// `libm`.
+///
+/// The results are those of
+/// [`primitive_float_sin`](crate::float::arithmetic::sin::primitive_float_sin) and
+/// [`primitive_float_cos`](crate::float::arithmetic::cos::primitive_float_cos), but the argument
+/// reduction and most of the work are shared, so this is faster than the two calls when both values
+/// are needed.
+///
+/// $$
+/// f(x) = (\sin x+\varepsilon_s, \cos x+\varepsilon_c).
+/// $$
+/// - If $x$ is not finite, $\varepsilon_s$ and $\varepsilon_c$ may be ignored or assumed to be 0.
+/// - If $x$ is finite, then $|\varepsilon_s| < 2^{\lfloor\log_2 |\sin x|\rfloor-p}$ and
+///   $|\varepsilon_c| < 2^{\lfloor\log_2 |\cos x|\rfloor-p}$, where $p$ is the precision of the
+///   output (24 if `T` is a [`f32`] and 53 if `T` is a [`f64`]).
+///
+/// Special cases:
+/// - $f(\text{NaN})=(\text{NaN},\text{NaN})$
+/// - $f(\pm\infty)=(\text{NaN},\text{NaN})$
+/// - $f(\pm0.0)=(\pm0.0,1.0)$
+///
+/// Overflow is not possible, since the results lie in $[-1, 1]$. The sine is subnormal only when
+/// $x$ is, and then it is $x$ itself; the cosine is never subnormal. See
+/// [`primitive_float_sin`](crate::float::arithmetic::sin::primitive_float_sin) and
+/// [`primitive_float_cos`](crate::float::arithmetic::cos::primitive_float_cos).
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::sin_cos::primitive_float_sin_cos;
+///
+/// let (s, c) = primitive_float_sin_cos(f32::NAN);
+/// assert!(s.is_nan());
+/// assert!(c.is_nan());
+///
+/// let (s, c) = primitive_float_sin_cos(0.0f32);
+/// assert_eq!(NiceFloat(s), NiceFloat(0.0));
+/// assert_eq!(NiceFloat(c), NiceFloat(1.0));
+///
+/// let (s, c) = primitive_float_sin_cos(1.0f32);
+/// assert_eq!(NiceFloat(s), NiceFloat(0.84147096));
+/// assert_eq!(NiceFloat(c), NiceFloat(0.5403023));
+///
+/// let (s, c) = primitive_float_sin_cos(1.0f64);
+/// assert_eq!(NiceFloat(s), NiceFloat(0.8414709848078965));
+/// assert_eq!(NiceFloat(c), NiceFloat(0.5403023058681398));
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_sin_cos<T: PrimitiveFloat>(x: T) -> (T, T)
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_float_to_float_pair_fn(Float::sin_cos_prec, x)
+}
+
+/// Computes $\sin x$ and $\cos x$, the sine and cosine of a [`Rational`], together, returning the
+/// results as primitive floats.
+///
+/// The results are those of
+/// [`primitive_float_sin_rational`](crate::float::arithmetic::sin::primitive_float_sin_rational)
+/// and
+/// [`primitive_float_cos_rational`](crate::float::arithmetic::cos::primitive_float_cos_rational),
+/// but the rounding of the input, the argument reduction, and most of the work are shared, so this
+/// is faster than the two calls when both values are needed.
+///
+/// $$
+/// f(x) = (\sin x+\varepsilon_s, \cos x+\varepsilon_c),
+/// $$
+/// where $|\varepsilon_s| < 2^{\lfloor\log_2 |\sin x|\rfloor-p}$ and $|\varepsilon_c| <
+/// 2^{\lfloor\log_2 |\cos x|\rfloor-p}$, and $p$ is the precision of the output (24 if `T` is a
+/// [`f32`] and 53 if `T` is a [`f64`]).
+///
+/// Special cases:
+/// - $f(0)=(0,1)$
+///
+/// Overflow is not possible, since the results lie in $[-1, 1]$. The sine underflows, to a
+/// subnormal or to zero, when $x$ is tiny, since $\sin x$ is then very close to $x$; the cosine is
+/// never subnormal. See
+/// [`primitive_float_sin_rational`](crate::float::arithmetic::sin::primitive_float_sin_rational)
+/// and
+/// [`primitive_float_cos_rational`](crate::float::arithmetic::cos::primitive_float_cos_rational).
+///
+/// # Worst-case complexity
+/// $T(m, e) = O((m+e) (\log (m+e))^2 \log\log (m+e))$
+///
+/// $M(m, e) = O((m+e) \log (m+e))$
+///
+/// where $T$ is time, $M$ is additional memory, $m$ is `x.significant_bits()`, and $e$ is
+/// `x.floor_log_base_2_abs()` (taken as 0 when it is negative or $x = 0$): for $|x| \geq 2$ the
+/// argument is reduced modulo $2\pi$, which needs $\pi$ to about $e$ bits.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::Zero;
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::sin_cos::primitive_float_sin_cos_rational;
+/// use malachite_q::Rational;
+///
+/// let (s, c) = primitive_float_sin_cos_rational::<f64>(&Rational::ZERO);
+/// assert_eq!(NiceFloat(s), NiceFloat(0.0));
+/// assert_eq!(NiceFloat(c), NiceFloat(1.0));
+///
+/// let (s, c) = primitive_float_sin_cos_rational::<f64>(&Rational::from_unsigneds(1u8, 3));
+/// assert_eq!(NiceFloat(s), NiceFloat(0.32719469679615226));
+/// assert_eq!(NiceFloat(c), NiceFloat(0.9449569463147377));
+///
+/// let (s, c) = primitive_float_sin_cos_rational::<f32>(&Rational::from_unsigneds(1u8, 3));
+/// assert_eq!(NiceFloat(s), NiceFloat(0.3271947));
+/// assert_eq!(NiceFloat(c), NiceFloat(0.94495696));
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_sin_cos_rational<T: PrimitiveFloat>(x: &Rational) -> (T, T)
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_rational_to_float_pair_fn(Float::sin_cos_rational_prec_ref, x)
 }

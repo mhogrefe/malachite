@@ -170,6 +170,41 @@ where
 
 #[allow(clippy::type_repetition_in_bounds)]
 #[doc(hidden)]
+pub fn emulate_float_to_float_pair_fn<
+    T: PrimitiveFloat,
+    F: Fn(Float, u64) -> (Float, Float, Ordering, Ordering),
+>(
+    f: F,
+    x: T,
+) -> (T, T)
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    let x = Float::from(x);
+    let (a, b, o_a, o_b) = f(x, T::MANTISSA_WIDTH + 1);
+    (emulate_finish(a, o_a), emulate_finish(b, o_b))
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+#[doc(hidden)]
+pub fn emulate_rational_to_float_pair_fn<
+    T: PrimitiveFloat,
+    F: Fn(&Rational, u64) -> (Float, Float, Ordering, Ordering),
+>(
+    f: F,
+    x: &Rational,
+) -> (T, T)
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    let (a, b, o_a, o_b) = f(x, T::MANTISSA_WIDTH + 1);
+    (emulate_finish(a, o_a), emulate_finish(b, o_b))
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+#[doc(hidden)]
 pub fn emulate_constant_to_float_fn<T: PrimitiveFloat, F: Fn(u64) -> (Float, Ordering)>(f: F) -> T
 where
     Float: PartialOrd<T>,

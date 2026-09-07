@@ -273,7 +273,8 @@ documented by git history.
   even when the input agrees with the zero to more than $2^{30}$ bits.
   `sin_cos_rational_prec_round` and `sin_cos_rational_prec` (with `_ref` variants) take a
   `Rational` instead, sharing the input rounding and, for inputs too large to be `Float`s, the
-  reduction modulo $2\pi$ that dominates their cost.
+  reduction modulo $2\pi$ that dominates their cost. `primitive_float_sin_cos` and
+  `primitive_float_sin_cos_rational` give the correctly rounded `f32` or `f64` pairs.
 - `primitive_float_sin` and `primitive_float_sin_rational`, the correctly rounded sine of an `f32`
   or `f64`, or of a `Rational` as an `f32` or `f64`.
 - `primitive_float_cos` and `primitive_float_cos_rational`, the correctly rounded cosine of an
