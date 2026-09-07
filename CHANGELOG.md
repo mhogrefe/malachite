@@ -249,6 +249,13 @@ documented by git history.
 - `sin_rational_prec_round` and `sin_rational_prec` (with `_ref` variants), the sine of a
   `Rational` as a `Float`, alongside the cosine versions. Small inputs are handled by the sine
   series in exact `Rational` arithmetic, so inputs too small to be `Float`s underflow correctly.
+- `sin_with_period_prec_round`, `sin_with_period_prec`, and `sin_with_period_round` (with `_ref`
+  and `_assign` variants), a port of `mpfr_sinu`: the sine of a `Float` measured in $u$ths of a
+  turn. Multiples of a quarter of a turn are exact (a multiple of a half turn is a zero with the
+  sign of the input, as IEEE 754-2019's `sinPi` specifies), as are the twelfths whose sine is
+  $\pm1/2$, and thirds, sixths, eighths, and twentieths of a turn are computed from a single
+  correctly rounded constant ($\sqrt3$, $\sqrt2$, or $\varphi$). Inputs within $2^{-2^{30}}$ of a
+  half turn underflow correctly.
 - `primitive_float_sin` and `primitive_float_sin_rational`, the correctly rounded sine of an `f32`
   or `f64`, or of a `Rational` as an `f32` or `f64`.
 - `primitive_float_cos` and `primitive_float_cos_rational`, the correctly rounded cosine of an

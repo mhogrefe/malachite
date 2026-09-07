@@ -1709,7 +1709,7 @@ impl Float {
 
 // Halves a correctly rounded constant, negating it if `negative`: the shift is exact, and a
 // negative result mirrors the rounding mode and reverses the `Ordering`.
-fn half_constant<F: Fn(u64, RoundingMode) -> (Float, Ordering)>(
+pub(crate) fn half_constant<F: Fn(u64, RoundingMode) -> (Float, Ordering)>(
     constant: F,
     negative: bool,
     prec: u64,
@@ -1726,7 +1726,7 @@ fn half_constant<F: Fn(u64, RoundingMode) -> (Float, Ordering)>(
 
 // phi - 1 = 1/phi, correctly rounded to `prec` bits: phi rounded to `prec + 1` bits, minus 1, has
 // exactly `prec` bits, and the rounding carries over since phi - 1 lies in [1/2, 1).
-fn phi_minus_1_prec_round(prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+pub(crate) fn phi_minus_1_prec_round(prec: u64, rm: RoundingMode) -> (Float, Ordering) {
     let (phi, o) = Float::phi_prec_round(prec + 1, rm);
     let (r, o_sub) = phi.sub_prec_round(Float::ONE, prec, Exact);
     assert_eq!(o_sub, Equal);
@@ -1786,23 +1786,36 @@ fn cos_turns_special_case(q: &Rational, prec: u64, rm: RoundingMode) -> Option<(
     }
 }
 
-// cos(2 pi q) for a fraction of a turn q within about 2^-64 of an odd multiple of 1/4, where the
-// cosine is tiny. Since q is rational, so is its distance d to the nearest m/4, which is computed
-// exactly; then cos(2 pi x / u) = -sin(2 pi d) if m = 1 mod 4 and sin(2 pi d) if m = 3 mod 4, and
-// sin is bracketed by t - t^3/6 and t with pi bracketed at w bits. The bracket is rounded in
-// `Rational` arithmetic, so the result underflows correctly when it must. Returns `None` if x/u is
-// not near an odd multiple of 1/4 after all.
+// cos(2 pi q) (if `cos` is true) or sin(2 pi q) for a fraction of a turn q within about 2^-64 of a
+// zero of the function, an odd multiple of 1/4 for cos or a multiple of 1/2 for sin, where the
+// result is tiny. Since q is rational, so is its distance d to the nearest such point, which is
+// computed exactly; then cos(2 pi q) = -sin(2 pi d) if the point is m/4 with m = 1 mod 4 and sin(2
+// pi d) if m = 3 mod 4, or sin(2 pi q) = (-1)^m sin(2 pi d) for the point m/2, and sin is bracketed
+// by partial sums of its series with pi bracketed at w bits. The bracket is rounded in `Rational`
+// arithmetic, so the result underflows correctly when it must. Returns `None` if q is not near such
+// a point after all.
 //
-// This has no MPFR counterpart: MPFR's exponent range is so wide that cosu never underflows there,
-// and `mpfr_cosu` simply keeps raising its working precision.
-fn cos_turns_near_zero(q: &Rational, prec: u64, rm: RoundingMode) -> Option<(Float, Ordering)> {
-    let m = Integer::rounding_from(q << 2u32, Nearest).0;
-    if m.even() {
-        fail_on_untested_path("cos_turns_near_zero, not near an odd multiple of 1/4");
-        return None;
-    }
-    let negate = (&m).mod_power_of_2(2) == 1u32;
-    let d = q - (Rational::from(m) >> 2u32);
+// This has no MPFR counterpart: MPFR's exponent range is so wide that cosu and sinu never underflow
+// there, and they simply keep raising their working precision.
+pub(crate) fn trig_turns_near_zero(
+    q: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+    cos: bool,
+) -> Option<(Float, Ordering)> {
+    let (negate, d) = if cos {
+        let m = Integer::rounding_from(q << 2u32, Nearest).0;
+        if m.even() {
+            fail_on_untested_path("trig_turns_near_zero, not near an odd multiple of 1/4");
+            return None;
+        }
+        let negate = (&m).mod_power_of_2(2) == 1u32;
+        (negate, q - (Rational::from(m) >> 2u32))
+    } else {
+        let m = Integer::rounding_from(q << 1u32, Nearest).0;
+        let negate = m.odd();
+        (negate, q - (Rational::from(m) >> 1u32))
+    };
     let mut w = prec + 64;
     loop {
         // pi_lo <= pi <= pi_lo + 2^(2 - w)
@@ -1815,7 +1828,7 @@ fn cos_turns_near_zero(q: &Rational, prec: u64, rm: RoundingMode) -> Option<(Flo
             (&two_d * pi_hi, two_d * pi_lo)
         };
         if t_hi.ge_abs(&1u32) || t_lo.ge_abs(&1u32) {
-            fail_on_untested_path("cos_turns_near_zero, distance not small");
+            fail_on_untested_path("trig_turns_near_zero, distance not small");
             return None;
         }
         // sin is increasing on [t_lo, t_hi] (a subset of [-1, 1]), so sin(2 pi d) lies between
@@ -1934,8 +1947,12 @@ fn cos_with_period_prec_round_normal_ref(
         if exp_t < 0 {
             let cancel = u64::exact_from(-exp_t);
             if cancel >= max(NEAR_ZERO_MIN_CANCEL, prec >> 4)
-                && let Some(result) =
-                    cos_turns_near_zero(&(Rational::exact_from(xp) / Rational::from(u)), prec, rm)
+                && let Some(result) = trig_turns_near_zero(
+                    &(Rational::exact_from(xp) / Rational::from(u)),
+                    prec,
+                    rm,
+                    true,
+                )
             {
                 return result;
             }
@@ -2810,7 +2827,7 @@ fn cos_turns_helper(q: &Rational, prec: u64, rm: RoundingMode) -> (Float, Orderi
         if exp_t < 0 {
             let cancel = u64::exact_from(-exp_t);
             if cancel >= max(NEAR_ZERO_MIN_CANCEL, prec >> 4)
-                && let Some(result) = cos_turns_near_zero(q, prec, rm)
+                && let Some(result) = trig_turns_near_zero(q, prec, rm, true)
             {
                 return result;
             }

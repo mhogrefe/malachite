@@ -19,8 +19,8 @@
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::float::arithmetic::cos::{
-    NEAR_ZERO_MIN_CANCEL, TrigStep, reduce_huge, round_bracket, sin_bound, trig_near_zero,
-    trig_rational_near_zero,
+    NEAR_ZERO_MIN_CANCEL, TrigStep, half_constant, phi_minus_1_prec_round, reduce_huge,
+    round_bracket, sin_bound, trig_near_zero, trig_rational_near_zero, trig_turns_near_zero,
 };
 use crate::float::arithmetic::round_near_x::float_round_near_x;
 use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn};
@@ -28,7 +28,7 @@ use core::cmp::Ordering::{self, Equal, Greater, Less};
 use core::cmp::{max, min};
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    Abs, CeilingLogBase2, NegAssign, PowerOf2, Sin, SinAssign,
+    Abs, CeilingLogBase2, Mod, NegAssign, PowerOf2, Sin, SinAssign,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -41,6 +41,7 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{
     self, Ceiling, Down, Exact, Floor, Nearest, Up,
 };
+use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::float::round::float_can_round;
 use malachite_nz::platform::Limb;
 use malachite_q::Rational;
@@ -185,20 +186,7 @@ fn sin_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ord
         // |sin(x)| < |x| < 2^(MIN_EXPONENT - 2), a quarter of the smallest positive Float, so the
         // result is zero or that Float, by the rounding mode alone, and no 2^30-bit arithmetic is
         // needed.
-        let positive = *x > 0u32;
-        let away = match rm {
-            Ceiling => positive,
-            Floor => !positive,
-            Up => true,
-            _ => false,
-        };
-        let min_positive = Float::min_positive_value_prec(prec);
-        return match (positive, away) {
-            (true, true) => (min_positive, Greater),
-            (true, false) => (Float::ZERO, Less),
-            (false, true) => (-min_positive, Less),
-            (false, false) => (Float::NEGATIVE_ZERO, Greater),
-        };
+        return underflowed(*x > 0u32, prec, rm);
     }
     if exp_x < 0 && u64::exact_from(-exp_x) << 4 >= prec + 10 {
         return sin_rational_series(x, prec, rm);
@@ -253,6 +241,246 @@ fn sin_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ord
         }
         w += increment;
         increment = w >> 1;
+    }
+}
+
+// The result of a function whose exact value is nonzero, has the given sign, and is below a quarter
+// of the smallest positive `Float` in magnitude: zero or that `Float`, by the rounding mode alone.
+fn underflowed(positive: bool, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    let away = match rm {
+        Ceiling => positive,
+        Floor => !positive,
+        Up => true,
+        _ => false,
+    };
+    let min_positive = Float::min_positive_value_prec(prec);
+    match (positive, away) {
+        (true, true) => (min_positive, Greater),
+        (true, false) => (Float::ZERO, Less),
+        (false, true) => (-min_positive, Less),
+        (false, false) => (Float::NEGATIVE_ZERO, Greater),
+    }
+}
+
+// The closed-form cases of sin(2 pi x / u), keyed by the denominator d of x/u in lowest terms (with
+// |x| < u, so the numerator n is the angle in units of 1/d of a turn). MPFR's exact cases are (a) d
+// dividing 4, where the sine is 0 (with the sign of x, following IEEE 754-2019's sinPi, so that the
+// function is odd), 1, or -1, and (b) d = 12, where it is 1/2 or -1/2. Beyond MPFR, the algebraic
+// cases are dispatched to a single correctly rounded constant: d = 3 or 6 gives sqrt(3)/2, d = 8
+// gives sqrt(2)/2, and d = 20 gives phi/2 or (phi - 1)/2, up to sign. (Fifths and tenths of a turn
+// have no such form for the sine.) Those constants are never exact, so they return `None` for
+// `Exact`.
+fn sin_turns_special_case(q: &Rational, prec: u64, rm: RoundingMode) -> Option<(Float, Ordering)> {
+    let d = q.denominator_ref();
+    if *d > 20u32 {
+        return None;
+    }
+    let d = u64::exact_from(d);
+    // the angle in units of 1/d of a turn (the numerator of a `Rational` is unsigned, so the sign
+    // is restored before reducing modulo d)
+    let n = u64::exact_from(
+        &Integer::from_sign_and_abs_ref(*q >= 0u32, q.numerator_ref()).mod_op(Integer::from(d)),
+    );
+    // the sine is negative in the second half of the turn
+    let negative = n > d >> 1;
+    match d {
+        // sin(0) = sin(180°) = 0, with the sign of x
+        1 | 2 => Some((
+            if *q < 0u32 {
+                Float::NEGATIVE_ZERO
+            } else {
+                Float::ZERO
+            },
+            Equal,
+        )),
+        // sin(90°) = 1, sin(270°) = -1
+        4 => Some((
+            if negative {
+                -Float::one_prec(prec)
+            } else {
+                Float::one_prec(prec)
+            },
+            Equal,
+        )),
+        // sin(30°) = sin(150°) = 1/2, sin(210°) = sin(330°) = -1/2
+        12 => Some((
+            if negative {
+                -(Float::one_prec(prec) >> 1u32)
+            } else {
+                Float::one_prec(prec) >> 1u32
+            },
+            Equal,
+        )),
+        _ if rm == Exact => None,
+        // sin(60°) = sin(120°) = sqrt(3)/2, sin(240°) = sin(300°) = -sqrt(3)/2
+        3 | 6 => Some(half_constant(
+            |prec, rm| const { Float::const_from_unsigned(3) }.sqrt_prec_round(prec, rm),
+            negative,
+            prec,
+            rm,
+        )),
+        // sin(45°) = sin(135°) = sqrt(2)/2, sin(225°) = sin(315°) = -sqrt(2)/2
+        8 => Some(half_constant(Float::sqrt_2_prec_round, negative, prec, rm)),
+        // sin(18°) = sin(162°) = (phi - 1)/2, sin(54°) = sin(126°) = phi/2, and their negatives
+        // at 198°, 342°, 234°, and 306°
+        20 => Some(if n == 1 || n == 9 || n == 11 || n == 19 {
+            half_constant(phi_minus_1_prec_round, negative, prec, rm)
+        } else {
+            half_constant(Float::phi_prec_round, negative, prec, rm)
+        }),
+        _ => None,
+    }
+}
+
+// Computes sin(2 pi x / u) for a finite nonzero `Float` x and a nonzero u, rounded to precision
+// `prec` with rounding mode `rm`. `rm` may be `Exact` only in the exact cases (see
+// `sin_turns_special_case`).
+//
+// This is mpfr_sinu from sinu.c, MPFR 4.2.2, with the additional near-zero path.
+fn sin_with_period_prec_round_normal_ref(
+    x: &Float,
+    u: u64,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    // Range reduction. We do not need to reduce the argument if it is already reduced (|x| < u).
+    // Note that the case |x| = u is better in the "else" branch as it will give xr = 0.
+    let xr;
+    let xp = if x.lt_abs(&u) {
+        x
+    } else {
+        // xr = x mod u, with the sign of x, exactly: its precision is the size of u plus the length
+        // of the fractional part of x.
+        let p = i64::exact_from(x.get_prec().unwrap()) - i64::from(x.get_exponent().unwrap());
+        let (r, o) =
+            x.rem_unsigned_prec_round_ref(u, u64::WIDTH + u64::exact_from(max(p, 0)), Exact);
+        assert_eq!(o, Equal);
+        if r == 0u32 {
+            // x is a multiple of u: the sine is zero, with the sign of x (IEEE 754-2019's sinPi)
+            return (
+                if *x < 0u32 {
+                    Float::NEGATIVE_ZERO
+                } else {
+                    Float::ZERO
+                },
+                Equal,
+            );
+        }
+        xr = r;
+        &xr
+    };
+    // now |xp/u| < 1
+    let exp_x = i64::from(xp.get_exponent().unwrap());
+    // The special cases need |x/u| >= 1/20, so the exponent test skips the `Rational` construction
+    // for the small x that would make it expensive (a tiny x has a huge power-of-2 denominator).
+    let u_bits = i64::exact_from(u.significant_bits());
+    if exp_x >= u_bits - 5
+        && let Some(result) =
+            sin_turns_special_case(&(Rational::exact_from(xp) / Rational::from(u)), prec, rm)
+    {
+        return result;
+    }
+    // Only the exact cases can be rounded exactly
+    assert_ne!(rm, Exact, "Inexact sin_with_period");
+    // For x large, since argument reduction is expensive, we want to avoid any failure in Ziv's
+    // strategy, thus we take into account expx too.
+    let mut prec_t =
+        prec + u64::exact_from(max(exp_x, i64::exact_from(prec.ceiling_log_base_2()))) + 8;
+    let mut increment = Limb::WIDTH;
+    let u_float = Float::from(u);
+    // MPFR computes in a widened exponent range, so 2*pi*x/u never underflows there. Here, for an x
+    // within 2^66 of the bottom of the range, the computation is scaled up by 2^64 and the
+    // underflow decided by hand: a division that rounded up to the smallest positive Float would
+    // otherwise make the Ziv loop below retry forever, since sin of that power of 2 can never be
+    // certified.
+    const SCALE: u64 = 64;
+    const MIN_SCALED_EXPONENT: i64 = Float::MIN_EXPONENT_I64 + SCALE as i64;
+    let scaled = exp_x <= const { Float::MIN_EXPONENT_I64 + 66 };
+    let xs;
+    let xp_scaled = if scaled {
+        xs = xp << SCALE;
+        &xs
+    } else {
+        xp
+    };
+    loop {
+        // We first compute an approximation t of 2*pi*x/u, then call sin(t). If t = 2*pi*x/u + s,
+        // then |sin(t) - sin(2*pi*x/u)| <= |s|. t = 2*pi * (1 + theta1) where |theta1| <= 2^-prec
+        let mut t = Float::pi_prec(prec_t).0 << 1u32;
+        // t = 2*pi*x * (1 + theta2)^2 where |theta2| <= 2^-prec
+        t.mul_prec_assign_ref(xp_scaled, prec_t);
+        // t = 2*pi*x/u * (1 + theta3)^3 where |theta3| <= 2^-prec
+        t.div_prec_assign_ref(&u_float, prec_t);
+        if scaled {
+            // t is 2^64 times the true value, to within a relative 2^(2 - prec). The smallest
+            // positive Float, 2^(MIN_EXPONENT - 1), has exponent MIN_EXPONENT, so the true value is
+            // below it exactly when the exponent of t is below MIN_EXPONENT + 64, and then
+            // sin(2*pi*x/u), which is just below the value, underflows too.
+            let exp_t = i64::from(t.get_exponent().unwrap());
+            if exp_t < MIN_SCALED_EXPONENT {
+                let positive = *xp > 0u32;
+                // to nearest, the smallest positive Float wins from half of it upward, i.e. from
+                // one exponent below (the value cannot be exactly half, being transcendental)
+                let away = match rm {
+                    Ceiling => positive,
+                    Floor => !positive,
+                    Up => true,
+                    Nearest => exp_t == const { MIN_SCALED_EXPONENT - 1 },
+                    _ => false,
+                };
+                let min_positive = Float::min_positive_value_prec(prec);
+                return match (positive, away) {
+                    (true, true) => (min_positive, Greater),
+                    (true, false) => (Float::ZERO, Less),
+                    (false, true) => (-min_positive, Less),
+                    (false, false) => (Float::NEGATIVE_ZERO, Greater),
+                };
+            }
+            t >>= SCALE;
+        }
+        // since prec >= 2, |(1 + theta3)^3 - 1| <= 4*theta3 <= 2^(2-prec)
+        let exp_t = i64::from(t.get_exponent().unwrap());
+        // we have |s| <= 2^(expt + 2 - prec)
+        let prec_t_i = i64::exact_from(prec_t);
+        let mut err = exp_t + 2 - prec_t_i;
+        // rounding away from zero, so that t cannot be zero here: we excluded t = 0 before, which
+        // is the only exact case where sin(t) = 0
+        t.sin_prec_round_assign(prec_t, Up);
+        let exp_t = i64::from(t.get_exponent().unwrap());
+        // A tiny sine with x/u not itself tiny means x/u is close to a multiple of 1/2, which the
+        // near-zero path resolves exactly; the Ziv loop would need its precision raised by the
+        // whole cancellation. (For a tiny x/u the sine is simply close to 2 pi x/u, with no
+        // cancellation, and the `Rational` construction would be expensive.)
+        if exp_t < 0 && exp_x >= u_bits - 2 {
+            let cancel = u64::exact_from(-exp_t);
+            if cancel >= max(NEAR_ZERO_MIN_CANCEL, prec >> 4)
+                && let Some(result) = trig_turns_near_zero(
+                    &(Rational::exact_from(xp) / Rational::from(u)),
+                    prec,
+                    rm,
+                    false,
+                )
+            {
+                return result;
+            }
+        }
+        // the total error is bounded by 2^err + ulp(t) = 2^err + 2^(expt-prec) thus if err <=
+        // expt-prec, it is bounded by 2^(expt-prec+1), otherwise it is bounded by 2^(err+1).
+        err = if err <= exp_t - prec_t_i {
+            exp_t - prec_t_i + 1
+        } else {
+            err + 1
+        };
+        // normalize err for mpfr_can_round
+        err = exp_t - err;
+        if err > 0 && float_can_round(t.significand_ref().unwrap(), u64::exact_from(err), prec, rm)
+        {
+            return Float::from_float_prec_round(t, prec, rm);
+        }
+        // (MPFR checks its exact cases here, after the first level of Ziv's strategy; the special
+        // cases above cover them before the loop, since the check is cheap.)
+        prec_t += increment;
+        increment = prec_t >> 1;
     }
 }
 
@@ -1334,6 +1562,810 @@ impl Float {
     #[inline]
     pub fn sin_rational_prec_ref(x: &Rational, prec: u64) -> (Self, Ordering) {
         Self::sin_rational_prec_round_ref(x, prec, Nearest)
+    }
+}
+
+impl Float {
+    /// Computes $\sin(2\pi x/u)$, the sine of a [`Float`] measured in $u$ths of a turn, rounding
+    /// the result to the specified precision and with the specified rounding mode. The [`Float`] is
+    /// taken by value. An [`Ordering`] is also returned, indicating whether the rounded sine is
+    /// less than, equal to, or greater than the exact sine. Although `NaN`s are not comparable to
+    /// any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,u,p,m) = \sin(2\pi x/u)+\varepsilon.
+    /// $$
+    /// - If $x$ is not finite or $u=0$, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x$ is finite, $u\neq 0$, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |\sin(2\pi x/u)|\rfloor-p+1}$.
+    /// - If $x$ is finite, $u\neq 0$, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |\sin(2\pi x/u)|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},u,p,m)=\text{NaN}$
+    /// - $f(\pm\infty,u,p,m)=\text{NaN}$
+    /// - $f(x,0,p,m)=\text{NaN}$
+    /// - $f(\pm0.0,u,p,m)=\pm0.0$
+    /// - If $x/u$ is a multiple of $1/2$, the result is exactly $0.0$ with the sign of $x$
+    ///   (following IEEE 754-2019's `sinPi`, so that the function is odd); if it is an odd multiple
+    ///   of $1/4$, the result is exactly $1$ or $-1$; and if it is $\pm1/12$ or $\pm5/12$ modulo
+    ///   $1$, the result is exactly $1/2$ or $-1/2$.
+    ///
+    /// When $x/u$ in lowest terms has denominator 3, 6, 8, or 20, the result is $\pm\sqrt3/2$,
+    /// $\pm\sqrt2/2$, $\pm\varphi/2$, or $\pm(\varphi-1)/2$, and is computed from a single
+    /// correctly rounded constant rather than from $\pi$ and a sine, which is far faster.
+    ///
+    /// Overflow and underflow:
+    /// - Since $|\sin(2\pi x/u)|\leq 1$, the result never overflows.
+    /// - If $0<f(x,u,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,u,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,u,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,u,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,u,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,u,p,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,u,p,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,u,p,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
+    ///
+    /// Underflow requires $x/u$ within $2^{-2^{30}}$ of a multiple of $1/2$ without being one,
+    /// which takes more than $2^{30}$ bits of precision, or an $x$ so small that $2\pi x/u$ is
+    /// below $2^{-2^{30}}$.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::sin_with_period_prec`]
+    /// instead. If you know that your target precision is the precision of the input, consider
+    /// using [`Float::sin_with_period_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m, e) = O(n^{3/2} \log n \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
+    ///
+    /// $M(n, m, e) = O((n+m+e) \log (n+m+e))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, $m$ is
+    /// `self.significant_bits()`, and $e$ is the exponent of `self` (0 if `self` has no exponent or
+    /// a negative one): the argument is reduced modulo $u$ exactly, and the sine of $2\pi x/u$ is
+    /// then taken at a working precision of about $n + e$ bits, which needs $\pi$ to that many
+    /// bits.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision (which is the case unless $x/u$ is a multiple of $1/4$, or is
+    /// $\pm1/12$ or $\pm5/12$ modulo $1$, or $x$ is zero or not finite, or $u$ is zero).
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::ONE.sin_with_period_prec_round(7, 10, Floor);
+    /// assert_eq!(c.to_string(), "0.78125");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::ONE.sin_with_period_prec_round(7, 10, Ceiling);
+    /// assert_eq!(c.to_string(), "0.78223");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) = Float::ONE.sin_with_period_prec_round(7, 10, Nearest);
+    /// assert_eq!(c.to_string(), "0.78223");
+    /// assert_eq!(o, Greater);
+    ///
+    /// // a twelfth of a turn is exact
+    /// let (c, o) = Float::from(30u32).sin_with_period_prec_round(360, 10, Exact);
+    /// assert_eq!(c.to_string(), "0.50000");
+    /// assert_eq!(o, Equal);
+    ///
+    /// // a half turn is exactly zero
+    /// let (c, o) = Float::from(180u32).sin_with_period_prec_round(360, 10, Nearest);
+    /// assert_eq!(c.to_string(), "0.0");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn sin_with_period_prec_round(
+        self,
+        u: u64,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        self.sin_with_period_prec_round_ref(u, prec, rm)
+    }
+
+    /// Computes $\sin(2\pi x/u)$, the sine of a [`Float`] measured in $u$ths of a turn, rounding
+    /// the result to the specified precision and with the specified rounding mode. The [`Float`] is
+    /// taken by reference. An [`Ordering`] is also returned, indicating whether the rounded sine is
+    /// less than, equal to, or greater than the exact sine. Although `NaN`s are not comparable to
+    /// any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,u,p,m) = \sin(2\pi x/u)+\varepsilon.
+    /// $$
+    /// - If $x$ is not finite or $u=0$, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x$ is finite, $u\neq 0$, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |\sin(2\pi x/u)|\rfloor-p+1}$.
+    /// - If $x$ is finite, $u\neq 0$, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |\sin(2\pi x/u)|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},u,p,m)=\text{NaN}$
+    /// - $f(\pm\infty,u,p,m)=\text{NaN}$
+    /// - $f(x,0,p,m)=\text{NaN}$
+    /// - $f(\pm0.0,u,p,m)=\pm0.0$
+    /// - If $x/u$ is a multiple of $1/2$, the result is exactly $0.0$ with the sign of $x$
+    ///   (following IEEE 754-2019's `sinPi`, so that the function is odd); if it is an odd multiple
+    ///   of $1/4$, the result is exactly $1$ or $-1$; and if it is $\pm1/12$ or $\pm5/12$ modulo
+    ///   $1$, the result is exactly $1/2$ or $-1/2$.
+    ///
+    /// When $x/u$ in lowest terms has denominator 3, 6, 8, or 20, the result is $\pm\sqrt3/2$,
+    /// $\pm\sqrt2/2$, $\pm\varphi/2$, or $\pm(\varphi-1)/2$, and is computed from a single
+    /// correctly rounded constant rather than from $\pi$ and a sine, which is far faster.
+    ///
+    /// Overflow and underflow:
+    /// - Since $|\sin(2\pi x/u)|\leq 1$, the result never overflows.
+    /// - If $0<f(x,u,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,u,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,u,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,u,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,u,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,u,p,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,u,p,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,u,p,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
+    ///
+    /// Underflow requires $x/u$ within $2^{-2^{30}}$ of a multiple of $1/2$ without being one,
+    /// which takes more than $2^{30}$ bits of precision, or an $x$ so small that $2\pi x/u$ is
+    /// below $2^{-2^{30}}$.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::sin_with_period_prec_ref`]
+    /// instead. If you know that your target precision is the precision of the input, consider
+    /// using [`Float::sin_with_period_round_ref`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m, e) = O(n^{3/2} \log n \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
+    ///
+    /// $M(n, m, e) = O((n+m+e) \log (n+m+e))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, $m$ is
+    /// `self.significant_bits()`, and $e$ is the exponent of `self` (0 if `self` has no exponent or
+    /// a negative one): the argument is reduced modulo $u$ exactly, and the sine of $2\pi x/u$ is
+    /// then taken at a working precision of about $n + e$ bits, which needs $\pi$ to that many
+    /// bits.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision (which is the case unless $x/u$ is a multiple of $1/4$, or is
+    /// $\pm1/12$ or $\pm5/12$ modulo $1$, or $x$ is zero or not finite, or $u$ is zero).
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = (&Float::ONE).sin_with_period_prec_round_ref(7, 10, Floor);
+    /// assert_eq!(c.to_string(), "0.78125");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = (&Float::ONE).sin_with_period_prec_round_ref(7, 10, Ceiling);
+    /// assert_eq!(c.to_string(), "0.78223");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) = (&Float::ONE).sin_with_period_prec_round_ref(7, 10, Nearest);
+    /// assert_eq!(c.to_string(), "0.78223");
+    /// assert_eq!(o, Greater);
+    ///
+    /// // a twelfth of a turn is exact
+    /// let (c, o) = (&Float::from(30u32)).sin_with_period_prec_round_ref(360, 10, Exact);
+    /// assert_eq!(c.to_string(), "0.50000");
+    /// assert_eq!(o, Equal);
+    ///
+    /// // a half turn is exactly zero
+    /// let (c, o) = (&Float::from(180u32)).sin_with_period_prec_round_ref(360, 10, Nearest);
+    /// assert_eq!(c.to_string(), "0.0");
+    /// assert_eq!(o, Equal);
+    /// ```
+    pub fn sin_with_period_prec_round_ref(
+        &self,
+        u: u64,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        match &self.0 {
+            // for u=0, return NaN
+            _ if u == 0 => (Self::NAN, Equal),
+            NaN | Infinity { .. } => (Self::NAN, Equal),
+            // x is zero: sin(±0) = ±0
+            Zero { .. } => (self.clone(), Equal),
+            Finite { .. } => sin_with_period_prec_round_normal_ref(self, u, prec, rm),
+        }
+    }
+
+    /// Computes $\sin(2\pi x/u)$, the sine of a [`Float`] measured in $u$ths of a turn, rounding
+    /// the result to the nearest value of the specified precision. The [`Float`] is taken by value.
+    /// An [`Ordering`] is also returned, indicating whether the rounded sine is less than, equal
+    /// to, or greater than the exact sine. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// If the sine is equidistant from two [`Float`]s with the specified precision, the [`Float`]
+    /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
+    /// the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,u,p) = \sin(2\pi x/u)+\varepsilon.
+    /// $$
+    /// - If $x$ is not finite or $u=0$, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x$ is finite and $u\neq 0$, then $|\varepsilon| < 2^{\lfloor\log_2 |\sin(2\pi
+    ///   x/u)|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},u,p)=\text{NaN}$
+    /// - $f(\pm\infty,u,p)=\text{NaN}$
+    /// - $f(x,0,p)=\text{NaN}$
+    /// - $f(\pm0.0,u,p)=\pm0.0$
+    /// - If $x/u$ is a multiple of $1/2$, the result is exactly $0.0$ with the sign of $x$
+    ///   (following IEEE 754-2019's `sinPi`, so that the function is odd); if it is an odd multiple
+    ///   of $1/4$, the result is exactly $1$ or $-1$; and if it is $\pm1/12$ or $\pm5/12$ modulo
+    ///   $1$, the result is exactly $1/2$ or $-1/2$.
+    ///
+    /// When $x/u$ in lowest terms has denominator 3, 6, 8, or 20, the result is $\pm\sqrt3/2$,
+    /// $\pm\sqrt2/2$, $\pm\varphi/2$, or $\pm(\varphi-1)/2$, and is computed from a single
+    /// correctly rounded constant rather than from $\pi$ and a sine, which is far faster.
+    ///
+    /// Overflow and underflow:
+    /// - Since $|\sin(2\pi x/u)|\leq 1$, the result never overflows.
+    /// - If $0<f(x,u,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,u,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,u,p)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,u,p)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
+    ///
+    /// Underflow requires $x/u$ within $2^{-2^{30}}$ of a multiple of $1/2$ without being one,
+    /// which takes more than $2^{30}$ bits of precision, or an $x$ so small that $2\pi x/u$ is
+    /// below $2^{-2^{30}}$.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::sin_with_period_prec_round`] instead. If you know that your target precision is the
+    /// precision of the input, consider using [`Float::sin_with_period_round`] with `Nearest`
+    /// instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m, e) = O(n^{3/2} \log n \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
+    ///
+    /// $M(n, m, e) = O((n+m+e) \log (n+m+e))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, $m$ is
+    /// `self.significant_bits()`, and $e$ is the exponent of `self` (0 if `self` has no exponent or
+    /// a negative one): the argument is reduced modulo $u$ exactly, and the sine of $2\pi x/u$ is
+    /// then taken at a working precision of about $n + e$ bits, which needs $\pi$ to that many
+    /// bits.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::ONE.sin_with_period_prec(7, 10);
+    /// assert_eq!(c.to_string(), "0.78223");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) = Float::ONE.sin_with_period_prec(360, 53);
+    /// assert_eq!(c.to_string(), "0.017452406437283512");
+    /// assert_eq!(o, Less);
+    ///
+    /// // an eighth of a turn: sqrt(2)/2
+    /// let (c, o) = Float::ONE.sin_with_period_prec(8, 10);
+    /// assert_eq!(c.to_string(), "0.70703");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn sin_with_period_prec(self, u: u64, prec: u64) -> (Self, Ordering) {
+        self.sin_with_period_prec_round(u, prec, Nearest)
+    }
+
+    /// Computes $\sin(2\pi x/u)$, the sine of a [`Float`] measured in $u$ths of a turn, rounding
+    /// the result to the nearest value of the specified precision. The [`Float`] is taken by
+    /// reference. An [`Ordering`] is also returned, indicating whether the rounded sine is less
+    /// than, equal to, or greater than the exact sine. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// If the sine is equidistant from two [`Float`]s with the specified precision, the [`Float`]
+    /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
+    /// the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,u,p) = \sin(2\pi x/u)+\varepsilon.
+    /// $$
+    /// - If $x$ is not finite or $u=0$, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x$ is finite and $u\neq 0$, then $|\varepsilon| < 2^{\lfloor\log_2 |\sin(2\pi
+    ///   x/u)|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},u,p)=\text{NaN}$
+    /// - $f(\pm\infty,u,p)=\text{NaN}$
+    /// - $f(x,0,p)=\text{NaN}$
+    /// - $f(\pm0.0,u,p)=\pm0.0$
+    /// - If $x/u$ is a multiple of $1/2$, the result is exactly $0.0$ with the sign of $x$
+    ///   (following IEEE 754-2019's `sinPi`, so that the function is odd); if it is an odd multiple
+    ///   of $1/4$, the result is exactly $1$ or $-1$; and if it is $\pm1/12$ or $\pm5/12$ modulo
+    ///   $1$, the result is exactly $1/2$ or $-1/2$.
+    ///
+    /// When $x/u$ in lowest terms has denominator 3, 6, 8, or 20, the result is $\pm\sqrt3/2$,
+    /// $\pm\sqrt2/2$, $\pm\varphi/2$, or $\pm(\varphi-1)/2$, and is computed from a single
+    /// correctly rounded constant rather than from $\pi$ and a sine, which is far faster.
+    ///
+    /// Overflow and underflow:
+    /// - Since $|\sin(2\pi x/u)|\leq 1$, the result never overflows.
+    /// - If $0<f(x,u,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,u,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,u,p)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,u,p)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
+    ///
+    /// Underflow requires $x/u$ within $2^{-2^{30}}$ of a multiple of $1/2$ without being one,
+    /// which takes more than $2^{30}$ bits of precision, or an $x$ so small that $2\pi x/u$ is
+    /// below $2^{-2^{30}}$.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::sin_with_period_prec_round_ref`] instead. If you know that your target precision is
+    /// the precision of the input, consider using [`Float::sin_with_period_round_ref`] with
+    /// `Nearest` instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m, e) = O(n^{3/2} \log n \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
+    ///
+    /// $M(n, m, e) = O((n+m+e) \log (n+m+e))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, $m$ is
+    /// `self.significant_bits()`, and $e$ is the exponent of `self` (0 if `self` has no exponent or
+    /// a negative one): the argument is reduced modulo $u$ exactly, and the sine of $2\pi x/u$ is
+    /// then taken at a working precision of about $n + e$ bits, which needs $\pi$ to that many
+    /// bits.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = (&Float::ONE).sin_with_period_prec_ref(7, 10);
+    /// assert_eq!(c.to_string(), "0.78223");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) = (&Float::ONE).sin_with_period_prec_ref(360, 53);
+    /// assert_eq!(c.to_string(), "0.017452406437283512");
+    /// assert_eq!(o, Less);
+    ///
+    /// // an eighth of a turn: sqrt(2)/2
+    /// let (c, o) = (&Float::ONE).sin_with_period_prec_ref(8, 10);
+    /// assert_eq!(c.to_string(), "0.70703");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn sin_with_period_prec_ref(&self, u: u64, prec: u64) -> (Self, Ordering) {
+        self.sin_with_period_prec_round_ref(u, prec, Nearest)
+    }
+
+    /// Computes $\sin(2\pi x/u)$, the sine of a [`Float`] measured in $u$ths of a turn, rounding
+    /// the result with the specified rounding mode. The [`Float`] is taken by value. An
+    /// [`Ordering`] is also returned, indicating whether the rounded sine is less than, equal to,
+    /// or greater than the exact sine. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The precision of the output is the precision of the input. See [`RoundingMode`] for a
+    /// description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,u,m) = \sin(2\pi x/u)+\varepsilon.
+    /// $$
+    /// - If $x$ is not finite or $u=0$, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x$ is finite, $u\neq 0$, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |\sin(2\pi x/u)|\rfloor-p+1}$, where $p$ is the precision of the input.
+    /// - If $x$ is finite, $u\neq 0$, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |\sin(2\pi x/u)|\rfloor-p}$, where $p$ is the precision of the input.
+    ///
+    /// If the output has a precision, it is the precision of the input.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},u,m)=\text{NaN}$
+    /// - $f(\pm\infty,u,m)=\text{NaN}$
+    /// - $f(x,0,m)=\text{NaN}$
+    /// - $f(\pm0.0,u,m)=\pm0.0$
+    /// - If $x/u$ is a multiple of $1/2$, the result is exactly $0.0$ with the sign of $x$
+    ///   (following IEEE 754-2019's `sinPi`, so that the function is odd); if it is an odd multiple
+    ///   of $1/4$, the result is exactly $1$ or $-1$; and if it is $\pm1/12$ or $\pm5/12$ modulo
+    ///   $1$, the result is exactly $1/2$ or $-1/2$.
+    ///
+    /// When $x/u$ in lowest terms has denominator 3, 6, 8, or 20, the result is $\pm\sqrt3/2$,
+    /// $\pm\sqrt2/2$, $\pm\varphi/2$, or $\pm(\varphi-1)/2$, and is computed from a single
+    /// correctly rounded constant rather than from $\pi$ and a sine, which is far faster.
+    ///
+    /// Overflow and underflow:
+    /// - Since $|\sin(2\pi x/u)|\leq 1$, the result never overflows.
+    /// - If $0<f(x,u,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,u,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,u,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,u,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,u,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,u,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,u,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,u,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
+    ///
+    /// Underflow requires $x/u$ within $2^{-2^{30}}$ of a multiple of $1/2$ without being one,
+    /// which takes more than $2^{30}$ bits of precision, or an $x$ so small that $2\pi x/u$ is
+    /// below $2^{-2^{30}}$.
+    ///
+    /// If you want to specify an output precision, consider using
+    /// [`Float::sin_with_period_prec_round`] instead. If you know you'll be using the `Nearest`
+    /// rounding mode, consider using [`Float::sin_with_period_prec`] with the input's precision
+    /// instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, e) = O(n^{3/2} \log n \log\log n + (n+e) (\log (n+e))^2 \log\log (n+e))$
+    ///
+    /// $M(n, e) = O((n+e) \log (n+e))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and $e$ is
+    /// the exponent of `self` (0 if `self` has no exponent or a negative one): the argument is
+    /// reduced modulo $u$ exactly, and the sine of $2\pi x/u$ is then taken at a working precision
+    /// of about $n + e$ bits, which needs $\pi$ to that many bits.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the input
+    /// precision (which is the case unless $x/u$ is a multiple of $1/4$ or $1/6$, or $x$ is zero or
+    /// not finite, or $u$ is zero).
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::from_unsigned_prec(1u32, 10)
+    ///     .0
+    ///     .sin_with_period_round(7, Floor);
+    /// assert_eq!(c.to_string(), "0.78125");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::from_unsigned_prec(1u32, 10)
+    ///     .0
+    ///     .sin_with_period_round(7, Ceiling);
+    /// assert_eq!(c.to_string(), "0.78223");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) = Float::from_unsigned_prec(1u32, 10)
+    ///     .0
+    ///     .sin_with_period_round(7, Nearest);
+    /// assert_eq!(c.to_string(), "0.78223");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn sin_with_period_round(self, u: u64, rm: RoundingMode) -> (Self, Ordering) {
+        let prec = self.significant_bits();
+        self.sin_with_period_prec_round(u, prec, rm)
+    }
+
+    /// Computes $\sin(2\pi x/u)$, the sine of a [`Float`] measured in $u$ths of a turn, rounding
+    /// the result with the specified rounding mode. The [`Float`] is taken by reference. An
+    /// [`Ordering`] is also returned, indicating whether the rounded sine is less than, equal to,
+    /// or greater than the exact sine. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The precision of the output is the precision of the input. See [`RoundingMode`] for a
+    /// description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,u,m) = \sin(2\pi x/u)+\varepsilon.
+    /// $$
+    /// - If $x$ is not finite or $u=0$, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x$ is finite, $u\neq 0$, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |\sin(2\pi x/u)|\rfloor-p+1}$, where $p$ is the precision of the input.
+    /// - If $x$ is finite, $u\neq 0$, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |\sin(2\pi x/u)|\rfloor-p}$, where $p$ is the precision of the input.
+    ///
+    /// If the output has a precision, it is the precision of the input.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},u,m)=\text{NaN}$
+    /// - $f(\pm\infty,u,m)=\text{NaN}$
+    /// - $f(x,0,m)=\text{NaN}$
+    /// - $f(\pm0.0,u,m)=\pm0.0$
+    /// - If $x/u$ is a multiple of $1/2$, the result is exactly $0.0$ with the sign of $x$
+    ///   (following IEEE 754-2019's `sinPi`, so that the function is odd); if it is an odd multiple
+    ///   of $1/4$, the result is exactly $1$ or $-1$; and if it is $\pm1/12$ or $\pm5/12$ modulo
+    ///   $1$, the result is exactly $1/2$ or $-1/2$.
+    ///
+    /// When $x/u$ in lowest terms has denominator 3, 6, 8, or 20, the result is $\pm\sqrt3/2$,
+    /// $\pm\sqrt2/2$, $\pm\varphi/2$, or $\pm(\varphi-1)/2$, and is computed from a single
+    /// correctly rounded constant rather than from $\pi$ and a sine, which is far faster.
+    ///
+    /// Overflow and underflow:
+    /// - Since $|\sin(2\pi x/u)|\leq 1$, the result never overflows.
+    /// - If $0<f(x,u,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,u,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,u,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,u,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,u,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,u,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,u,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,u,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
+    ///
+    /// Underflow requires $x/u$ within $2^{-2^{30}}$ of a multiple of $1/2$ without being one,
+    /// which takes more than $2^{30}$ bits of precision, or an $x$ so small that $2\pi x/u$ is
+    /// below $2^{-2^{30}}$.
+    ///
+    /// If you want to specify an output precision, consider using
+    /// [`Float::sin_with_period_prec_round_ref`] instead. If you know you'll be using the `Nearest`
+    /// rounding mode, consider using [`Float::sin_with_period_prec_ref`] with the input's precision
+    /// instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, e) = O(n^{3/2} \log n \log\log n + (n+e) (\log (n+e))^2 \log\log (n+e))$
+    ///
+    /// $M(n, e) = O((n+e) \log (n+e))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and $e$ is
+    /// the exponent of `self` (0 if `self` has no exponent or a negative one): the argument is
+    /// reduced modulo $u$ exactly, and the sine of $2\pi x/u$ is then taken at a working precision
+    /// of about $n + e$ bits, which needs $\pi$ to that many bits.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the input
+    /// precision (which is the case unless $x/u$ is a multiple of $1/4$ or $1/6$, or $x$ is zero or
+    /// not finite, or $u$ is zero).
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = (&Float::from_unsigned_prec(1u32, 10).0).sin_with_period_round_ref(7, Floor);
+    /// assert_eq!(c.to_string(), "0.78125");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = (&Float::from_unsigned_prec(1u32, 10).0).sin_with_period_round_ref(7, Ceiling);
+    /// assert_eq!(c.to_string(), "0.78223");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) = (&Float::from_unsigned_prec(1u32, 10).0).sin_with_period_round_ref(7, Nearest);
+    /// assert_eq!(c.to_string(), "0.78223");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn sin_with_period_round_ref(&self, u: u64, rm: RoundingMode) -> (Self, Ordering) {
+        self.sin_with_period_prec_round_ref(u, self.significant_bits(), rm)
+    }
+
+    /// Computes $\sin(2\pi x/u)$, the sine of a [`Float`] measured in $u$ths of a turn, rounding
+    /// the result to the specified precision and with the specified rounding mode. The [`Float`] is
+    /// replaced by the result, and an [`Ordering`] is returned, indicating whether the rounded sine
+    /// is less than, equal to, or greater than the exact sine. Although `NaN`s are not comparable
+    /// to any [`Float`], whenever this function sets a `NaN` it also returns `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// x \gets \sin(2\pi x/u)+\varepsilon.
+    /// $$
+    /// - If $x$ is not finite or $u=0$, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x$ is finite, $u\neq 0$, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |\sin(2\pi x/u)|\rfloor-p+1}$.
+    /// - If $x$ is finite, $u\neq 0$, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |\sin(2\pi x/u)|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// See the [`Float::sin_with_period_prec_round`] documentation for information on special
+    /// cases, overflow, and underflow.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::sin_with_period_prec_assign`]
+    /// instead. If you know that your target precision is the precision of the input, consider
+    /// using [`Float::sin_with_period_round_assign`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m, e) = O(n^{3/2} \log n \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
+    ///
+    /// $M(n, m, e) = O((n+m+e) \log (n+m+e))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, $m$ is
+    /// `self.significant_bits()`, and $e$ is the exponent of `self` (0 if `self` has no exponent or
+    /// a negative one): the argument is reduced modulo $u$ exactly, and the sine of $2\pi x/u$ is
+    /// then taken at a working precision of about $n + e$ bits, which needs $\pi$ to that many
+    /// bits.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision (which is the case unless $x/u$ is a multiple of $1/4$, or is
+    /// $\pm1/12$ or $\pm5/12$ modulo $1$, or $x$ is zero or not finite, or $u$ is zero).
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
+    /// assert_eq!(x.sin_with_period_prec_round_assign(7, 10, Floor), Less);
+    /// assert_eq!(x.to_string(), "0.78125");
+    ///
+    /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
+    /// assert_eq!(x.sin_with_period_prec_round_assign(7, 10, Ceiling), Greater);
+    /// assert_eq!(x.to_string(), "0.78223");
+    ///
+    /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
+    /// assert_eq!(x.sin_with_period_prec_round_assign(7, 10, Nearest), Greater);
+    /// assert_eq!(x.to_string(), "0.78223");
+    /// ```
+    #[inline]
+    pub fn sin_with_period_prec_round_assign(
+        &mut self,
+        u: u64,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> Ordering {
+        let o;
+        (*self, o) = self.sin_with_period_prec_round_ref(u, prec, rm);
+        o
+    }
+
+    /// Computes $\sin(2\pi x/u)$, the sine of a [`Float`] measured in $u$ths of a turn, rounding
+    /// the result to the nearest value of the specified precision. The [`Float`] is replaced by the
+    /// result, and an [`Ordering`] is returned, indicating whether the rounded sine is less than,
+    /// equal to, or greater than the exact sine. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function sets a `NaN` it also returns `Equal`.
+    ///
+    /// If the sine is equidistant from two [`Float`]s with the specified precision, the [`Float`]
+    /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
+    /// the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// x \gets \sin(2\pi x/u)+\varepsilon.
+    /// $$
+    /// - If $x$ is not finite or $u=0$, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x$ is finite and $u\neq 0$, then $|\varepsilon| < 2^{\lfloor\log_2 |\sin(2\pi
+    ///   x/u)|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// See the [`Float::sin_with_period_prec`] documentation for information on special cases,
+    /// overflow, and underflow.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::sin_with_period_prec_round_assign`] instead. If you know that your target precision
+    /// is the precision of the input, consider using [`Float::sin_with_period_round_assign`] with
+    /// `Nearest` instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m, e) = O(n^{3/2} \log n \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
+    ///
+    /// $M(n, m, e) = O((n+m+e) \log (n+m+e))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, $m$ is
+    /// `self.significant_bits()`, and $e$ is the exponent of `self` (0 if `self` has no exponent or
+    /// a negative one): the argument is reduced modulo $u$ exactly, and the sine of $2\pi x/u$ is
+    /// then taken at a working precision of about $n + e$ bits, which needs $\pi$ to that many
+    /// bits.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
+    /// assert_eq!(x.sin_with_period_prec_assign(7, 10), Greater);
+    /// assert_eq!(x.to_string(), "0.78223");
+    ///
+    /// let mut x = Float::from_unsigned_prec(1u32, 100).0;
+    /// assert_eq!(x.sin_with_period_prec_assign(8, 10), Less);
+    /// assert_eq!(x.to_string(), "0.70703");
+    /// ```
+    #[inline]
+    pub fn sin_with_period_prec_assign(&mut self, u: u64, prec: u64) -> Ordering {
+        self.sin_with_period_prec_round_assign(u, prec, Nearest)
+    }
+
+    /// Computes $\sin(2\pi x/u)$, the sine of a [`Float`] measured in $u$ths of a turn, rounding
+    /// the result with the specified rounding mode. The [`Float`] is replaced by the result, and an
+    /// [`Ordering`] is returned, indicating whether the rounded sine is less than, equal to, or
+    /// greater than the exact sine. Although `NaN`s are not comparable to any [`Float`], whenever
+    /// this function sets a `NaN` it also returns `Equal`.
+    ///
+    /// The precision of the output is the precision of the input. See [`RoundingMode`] for a
+    /// description of the possible rounding modes.
+    ///
+    /// $$
+    /// x \gets \sin(2\pi x/u)+\varepsilon.
+    /// $$
+    /// - If $x$ is not finite or $u=0$, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x$ is finite, $u\neq 0$, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |\sin(2\pi x/u)|\rfloor-p+1}$, where $p$ is the precision of the input.
+    /// - If $x$ is finite, $u\neq 0$, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |\sin(2\pi x/u)|\rfloor-p}$, where $p$ is the precision of the input.
+    ///
+    /// If the output has a precision, it is the precision of the input.
+    ///
+    /// See the [`Float::sin_with_period_round`] documentation for information on special cases,
+    /// overflow, and underflow.
+    ///
+    /// If you want to specify an output precision, consider using
+    /// [`Float::sin_with_period_prec_round_assign`] instead. If you know you'll be using the
+    /// `Nearest` rounding mode, consider using [`Float::sin_with_period_prec_assign`] with the
+    /// input's precision instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, e) = O(n^{3/2} \log n \log\log n + (n+e) (\log (n+e))^2 \log\log (n+e))$
+    ///
+    /// $M(n, e) = O((n+e) \log (n+e))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and $e$ is
+    /// the exponent of `self` (0 if `self` has no exponent or a negative one): the argument is
+    /// reduced modulo $u$ exactly, and the sine of $2\pi x/u$ is then taken at a working precision
+    /// of about $n + e$ bits, which needs $\pi$ to that many bits.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the input
+    /// precision (which is the case unless $x/u$ is a multiple of $1/4$ or $1/6$, or $x$ is zero or
+    /// not finite, or $u$ is zero).
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from_unsigned_prec(1u32, 10).0;
+    /// assert_eq!(x.sin_with_period_round_assign(7, Floor), Less);
+    /// assert_eq!(x.to_string(), "0.78125");
+    ///
+    /// let mut x = Float::from_unsigned_prec(1u32, 10).0;
+    /// assert_eq!(x.sin_with_period_round_assign(7, Ceiling), Greater);
+    /// assert_eq!(x.to_string(), "0.78223");
+    ///
+    /// let mut x = Float::from_unsigned_prec(1u32, 10).0;
+    /// assert_eq!(x.sin_with_period_round_assign(7, Nearest), Greater);
+    /// assert_eq!(x.to_string(), "0.78223");
+    /// ```
+    #[inline]
+    pub fn sin_with_period_round_assign(&mut self, u: u64, rm: RoundingMode) -> Ordering {
+        let prec = self.significant_bits();
+        self.sin_with_period_prec_round_assign(u, prec, rm)
     }
 }
 

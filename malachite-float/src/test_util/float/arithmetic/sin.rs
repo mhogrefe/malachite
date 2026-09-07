@@ -56,3 +56,19 @@ pub fn rug_sin_rational_prec_round(x: &Rational, prec: u64, rm: Round) -> (rug::
 pub fn rug_sin_rational_prec(x: &Rational, prec: u64) -> (rug::Float, Ordering) {
     rug_sin_rational_prec_round(x, prec, Round::Nearest)
 }
+
+// `u` must fit in a `u32`, the type rug takes.
+pub fn rug_sin_with_period_prec_round(
+    x: &rug::Float,
+    u: u64,
+    prec: u64,
+    rm: Round,
+) -> (rug::Float, Ordering) {
+    let mut s = rug::Float::with_val(u32::exact_from(prec), 0);
+    let o = s.assign_round(x.sin_u_ref(u32::exact_from(u)), rm);
+    (s, o)
+}
+
+pub fn rug_sin_with_period_prec(x: &rug::Float, u: u64, prec: u64) -> (rug::Float, Ordering) {
+    rug_sin_with_period_prec_round(x, u, prec, Round::Nearest)
+}
