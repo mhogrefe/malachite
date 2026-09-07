@@ -53,6 +53,7 @@ pub mod shl_round;
 pub mod shr;
 pub mod shr_round;
 pub mod sin;
+pub mod sin_cos;
 pub mod sqrt;
 pub mod square;
 pub mod sub;

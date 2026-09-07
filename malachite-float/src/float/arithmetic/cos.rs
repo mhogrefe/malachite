@@ -483,9 +483,14 @@ pub(crate) fn trig_near_zero(
         let delta_exp = d_exp + i64::exact_from(d_bits);
         // delta must be resolved to w bits, i.e. its error 2^-p must be below 2^(delta_exp - w)
         if delta_exp + i64::exact_from(p) <= i64::exact_from(w) {
+            // The precision that resolves delta as currently estimated (its exponent can only fall
+            // further, so this is a lower bound on what is needed), which also caps the geometric
+            // growth: a caller that observed the cancellation from an underflowed value passes a
+            // `cancel` near 2^30, and doubling from there would ask for pi at 2^31 bits.
+            let needed = u64::exact_from(i64::exact_from(w) - delta_exp + 2);
             p = max(
-                max(p << 1, min(p_hint, p << 3)),
-                u64::exact_from(i64::exact_from(w) - delta_exp + 2),
+                needed,
+                min(max(p << 1, min(p_hint, p << 3)), max(p_hint, needed)),
             );
             continue;
         }
@@ -539,7 +544,9 @@ pub(crate) fn trig_near_zero(
             // result and `Ordering`.
             return s.shl_prec_round(d_exp - i64::exact_from(w), prec, rm);
         }
-        p <<= 1;
+        // a rounding boundary within the error: a modest increase suffices, and keeps pi away from
+        // 2^31 bits when p is already near 2^30
+        p += max(p >> 2, Limb::WIDTH);
     }
 }
 

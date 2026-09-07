@@ -264,6 +264,13 @@ documented by git history.
   `sin_pi_rational_prec_round` and `sin_pi_rational_prec` (with `_ref` variants), and
   `primitive_float_sin_pi` and `primitive_float_sin_pi_rational`: a port of `mpfr_sinpi`, the
   sine in half-turns, delegating to the `sin_with_period` family with a period of 2.
+- `SinCos` and `SinCosAssign` (new traits in malachite-base) for `Float`, with the usual
+  `sin_cos_prec_round`, `sin_cos_prec`, `sin_cos_round`, and `_ref`/`_assign` variants: a port of
+  `mpfr_sin_cos`, computing the sine and cosine together with one argument reduction. The two
+  results and their two ternary `Ordering`s are returned as a 4-tuple, and the `_assign` variants
+  write the cosine to a second `&mut Float`. Inputs extremely close to a zero of either function
+  take that function's exact near-zero path, so the results are correct, and underflow correctly,
+  even when the input agrees with the zero to more than $2^{30}$ bits.
 - `primitive_float_sin` and `primitive_float_sin_rational`, the correctly rounded sine of an `f32`
   or `f64`, or of a `Rational` as an `f32` or `f64`.
 - `primitive_float_cos` and `primitive_float_cos_rational`, the correctly rounded cosine of an

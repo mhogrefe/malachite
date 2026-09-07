@@ -923,6 +923,19 @@ pub trait SinAssign {
     fn sin_assign(&mut self);
 }
 
+/// Computes $\sin(x)$ and $\cos(x)$, the sine and cosine of a number, together.
+pub trait SinCos {
+    type Output;
+
+    fn sin_cos(self) -> (Self::Output, Self::Output);
+}
+
+/// Replaces a number with its sine, $\sin(x)$, and writes its cosine, $\cos(x)$, to a second
+/// number.
+pub trait SinCosAssign {
+    fn sin_cos_assign(&mut self, cos: &mut Self);
+}
+
 /// Computes $e^x-1$, the exponential of a number, minus one.
 pub trait ExpXMinus1 {
     type Output;
