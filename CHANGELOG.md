@@ -288,6 +288,12 @@ documented by git history.
   `sin_cos_pi_round` (with `_ref` and `_assign` variants), `sin_cos_pi_rational_prec_round` and
   `sin_cos_pi_rational_prec` (with `_ref` variants), and `primitive_float_sin_cos_pi` and
   `primitive_float_sin_cos_pi_rational` are the same in half-turns, delegating with a period of 2.
+- `Tan` and `TanAssign` (new traits in malachite-base) for `Float`, with the usual
+  `tan_prec_round`, `tan_prec`, `tan_round`, and `_ref`/`_assign` variants: a port of `mpfr_tan`,
+  the sine and cosine together and their quotient in one Ziv loop. Unlike MPFR's, the result can
+  overflow (an input within $2^{-2^{30}}$ of an odd multiple of $\pi/2$) or underflow (within that
+  distance of a multiple of $\pi$); both are decided from exact brackets. `primitive_float_tan`
+  gives the correctly rounded `f32` or `f64` tangent.
 - The Dottie number, the fixed point of the cosine, as `dottie_number_prec_round` and
   `dottie_number_prec` on `Float`, correctly rounded to any precision (Newton's method with a
   certified final bracket), and as a `DottieNumber` trait with constants for primitive floats.

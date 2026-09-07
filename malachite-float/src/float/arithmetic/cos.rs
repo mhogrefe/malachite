@@ -408,29 +408,17 @@ pub(crate) fn cos_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> 
 // there needs only a handful of terms.
 pub(crate) const NEAR_ZERO_MIN_CANCEL: u64 = 64;
 
-// Computes cos(x) (if `cos` is true) or sin(x) for an x within about 2^-cancel of a zero of the
-// function, an odd multiple of pi/2 for cos or a nonzero multiple of pi for sin, so that the result
-// is below 2^-cancel in magnitude, where cancel >= 64 and cancel >= prec / 16.
-//
-// The Ziv loops in `cos_prec_round_normal_ref` and `sin_prec_round_normal_ref` would have to raise
-// their working precision by `cancel` bits to resolve such a result, and their schemes become
-// prohibitively slow long before `cancel` reaches 2^30, where the result underflows. Instead, write
-// x = n pi/2 + delta with n odd, so that cos(x) = -sin(delta) if n = 1 mod 4 and sin(delta) if n =
-// 3 mod 4, or x = n pi + delta, so that sin(x) = (-1)^n sin(delta). delta is computed exactly in
-// integer arithmetic from x and an approximation of pi, and sin(delta)/delta from its Taylor
-// series, which converges very quickly since |delta| is tiny. Everything is done in integers scaled
-// by explicit powers of 2, so values far below the exponent range are no problem, and only the
-// final `shl_prec_round` can underflow.
-//
-// This has no MPFR counterpart: MPFR's exponent range is so wide that cos and sin never underflow
-// there, and `mpfr_cos` and `mpfr_sin` simply keep raising their working precisions.
-pub(crate) fn trig_near_zero(
+// The core of `trig_near_zero` and `trig_near_zero_bracket`: an approximation m 2^shift of the tiny
+// value, with |f(x) - m 2^shift| <= 2^(abs_err + shift), computed at working precision w with pi at
+// precision p, which is raised as needed to resolve delta to w bits (and left raised, so that a
+// retry starts higher). Returns (m, abs_err, shift).
+fn trig_near_zero_approx(
     x: &Float,
-    prec: u64,
-    rm: RoundingMode,
-    cancel: u64,
+    w: u64,
+    p: &mut u64,
+    p_hint: u64,
     cos: bool,
-) -> (Float, Ordering) {
+) -> (Integer, u64, i64) {
     // |x| > 1, so its exponent is positive
     let e = u64::exact_from(x.get_exponent().unwrap());
     // n = round(2x / pi) for cos, or round(x / pi) for sin. Since the quotient is within 2^-62 of
@@ -454,25 +442,13 @@ pub(crate) fn trig_near_zero(
     let x_sig = x.significand_ref().unwrap();
     let x_bits = x_sig.significant_bits();
     let x_exp = i64::from(x.get_exponent().unwrap()) - i64::exact_from(x_bits);
-    // The working precision: delta and sin(delta) / delta are computed to w bits.
-    let w = prec + 64;
-    // The precision of pi: since |delta| < 2^(1 - cancel), delta is resolved to w bits once p
-    // exceeds w + cancel, unless delta is even smaller than the cancellation suggests. In that
-    // case, x is typically n pi/2 rounded to its own precision, so that |delta| is about 2^(e -
-    // x_bits), and p_hint is the precision that resolves that. The precision at least doubles each
-    // time, and grows by up to 8 times to reach p_hint, so that the cost of the early iterations is
-    // a small fraction of that of the last one, without wildly overshooting if x is only stored at
-    // a higher precision than the one it agrees with n pi/2 to.
-    let mut p = w + cancel + 2;
-    let p_hint = (x_bits + w + 2).saturating_sub(e);
     loop {
         // pi_p = pi_sig * 2^pi_exp, with |pi_p - pi| <= 2^(1 - e - p), so |n pi_p / 2 - n pi / 2| <
         // 2^-p, since |n| < 2^e.
-        let (pi_sig, mut pi_exp) = get_z_2exp(Float::pi_prec(e + p).0);
+        let (pi_sig, mut pi_exp) = get_z_2exp(Float::pi_prec(e + *p).0);
         if cos {
             pi_exp -= 1; // n pi_p / 2 = n pi_sig * 2^pi_exp
         }
-        // delta = d * 2^d_exp, up to the error in pi
         let d_exp = min(x_exp, pi_exp);
         let a = Integer::from_sign_and_abs_ref(x > &0u32, x_sig) << u64::exact_from(x_exp - d_exp);
         let b = (&n * pi_sig) << u64::exact_from(pi_exp - d_exp);
@@ -480,39 +456,24 @@ pub(crate) fn trig_near_zero(
         let d_neg = d < 0u32;
         let mut d_abs = d.unsigned_abs();
         let d_bits = d_abs.significant_bits();
-        // 2^(delta_exp - 1) <= |delta| < 2^delta_exp. Since x has bits beyond the precision of pi,
-        // d is practically never zero; if it is, the bound below is trivially true.
         let delta_exp = d_exp + i64::exact_from(d_bits);
-        // delta must be resolved to w bits, i.e. its error 2^-p must be below 2^(delta_exp - w)
-        if delta_exp + i64::exact_from(p) <= i64::exact_from(w) {
-            // The precision that resolves delta as currently estimated (its exponent can only fall
-            // further, so this is a lower bound on what is needed), which also caps the geometric
-            // growth: a caller that observed the cancellation from an underflowed value passes a
-            // `cancel` near 2^30, and doubling from there would ask for pi at 2^31 bits.
+        if delta_exp + i64::exact_from(*p) <= i64::exact_from(w) {
             let needed = u64::exact_from(i64::exact_from(w) - delta_exp + 2);
-            p = max(
+            *p = max(
                 needed,
-                min(max(p << 1, min(p_hint, p << 3)), max(p_hint, needed)),
+                min(max(*p << 1, min(p_hint, *p << 3)), max(p_hint, needed)),
             );
             continue;
         }
-        // Truncate d to w bits: |delta| = d_abs * 2^d_exp, with |d_abs| < 2^w, up to 1 unit of
-        // truncation error and 2^(-p - d_exp) < 1 unit of error from pi.
         let mut d_exp = d_exp;
         if d_bits > w {
             let shift = d_bits - w;
             d_abs >>= shift;
             d_exp += i64::exact_from(shift);
         }
-        // q = delta^2 * 2^w = d_abs^2 * 2^(2 d_exp + w), a fixed-point number with w fractional
-        // bits, up to 1 unit. Since d_exp <= -p < -w, the shift is always to the right.
         let q = Integer::from(
             (&d_abs).square() >> u64::exact_from(-((d_exp << 1) + i64::exact_from(w))),
         );
-        // r = (sin(delta) / delta) * 2^w = 2^w - q / 3! + q^2 / (5! 2^w) - ..., each term computed
-        // with at most 2 units of rounding error. Since |delta| < 2^-63, each term is at most
-        // 2^-126 times the previous one, so the error on r is at most 2 * terms + 2 units,
-        // including the tail after the last nonzero term.
         let mut r = Integer::power_of_2(w);
         let mut term = Integer::power_of_2(w);
         let mut k = 1u64;
@@ -529,31 +490,92 @@ pub(crate) fn trig_near_zero(
             k += 1;
             terms += 1;
         }
-        // m = d_abs * r approximates |sin(delta)| * 2^(w - d_exp). Its error is at most d_abs * (2
-        // terms + 2) + r * 2 < 2^w (2 terms + 4) < 2^(w + 2) (terms + 2) units.
         let mut m = Integer::from(d_abs) * r;
         if d_neg != negate {
             m.neg_assign();
         }
+        // the truncations of delta and of the series terms each cost a few units in the last place
+        // of m, which has w bits beyond the value's leading bit
+        return (
+            m,
+            w + 2 + (terms + 2).ceiling_log_base_2(),
+            d_exp - i64::exact_from(w),
+        );
+    }
+}
+
+// The initial precision of pi for `trig_near_zero_approx`, and the precision that resolves delta
+// when x is n pi/2 or n pi rounded to its own precision (see `trig_near_zero`).
+fn trig_near_zero_pi_precs(x: &Float, w: u64, cancel: u64) -> (u64, u64) {
+    let e = u64::exact_from(x.get_exponent().unwrap());
+    let x_bits = x.significand_ref().unwrap().significant_bits();
+    (w + cancel + 2, (x_bits + w + 2).saturating_sub(e))
+}
+
+// Computes cos(x) (if `cos` is true) or sin(x) for an x within about 2^-cancel of a zero of the
+// function, an odd multiple of pi/2 for cos or a nonzero multiple of pi for sin, so that the result
+// is below 2^-cancel in magnitude, where cancel >= 64 and cancel >= prec / 16.
+//
+// The Ziv loops in `cos_prec_round_normal_ref` and `sin_prec_round_normal_ref` would have to raise
+// their working precision by `cancel` bits to resolve such a result, and their schemes become
+// prohibitively slow long before `cancel` reaches 2^30, where the result underflows. Instead, write
+// x = n pi/2 + delta with n odd, so that cos(x) = -sin(delta) if n = 1 mod 4 and sin(delta) if n =
+// 3 mod 4, or x = n pi + delta, so that sin(x) = (-1)^n sin(delta). delta is computed exactly in
+// integer arithmetic from x and an approximation of pi, and sin(delta)/delta from its Taylor
+// series, which converges very quickly since |delta| is tiny. Everything is done in integers scaled
+// by explicit powers of 2, so values far below the exponent range are no problem, and only the
+// final `shl_prec_round` can underflow.
+//
+// This has no MPFR counterpart: MPFR's exponent range is so wide that cos and sin never underflow
+// there, and `mpfr_cos` and `mpfr_sin` simply keep raising their working precisions.
+pub(crate) fn trig_near_zero(
+    x: &Float,
+    prec: u64,
+    rm: RoundingMode,
+    cancel: u64,
+    cos: bool,
+) -> (Float, Ordering) {
+    // The working precision: delta and sin(delta) / delta are computed to w bits.
+    let w = prec + 64;
+    // The precision of pi: since |delta| < 2^(1 - cancel), delta is resolved to w bits once p
+    // exceeds w + cancel, unless delta is even smaller than the cancellation suggests. In that
+    // case, x is typically n pi/2 rounded to its own precision, so that |delta| is about 2^(e -
+    // x_bits), and p_hint is the precision that resolves that. The precision at least doubles each
+    // time, and grows by up to 8 times to reach p_hint, so that the cost of the early iterations is
+    // a small fraction of that of the last one, without wildly overshooting if x is only stored at
+    // a higher precision than the one it agrees with n pi/2 to.
+    let (mut p, p_hint) = trig_near_zero_pi_precs(x, w, cancel);
+    loop {
+        let (m, abs_err, shift) = trig_near_zero_approx(x, w, &mut p, p_hint, cos);
         let m_bits = m.significant_bits();
         assert!(m_bits <= const { Float::MAX_EXPONENT as u64 });
-        let err = m_bits - w - 2 - (terms + 2).ceiling_log_base_2();
+        let err = m_bits - abs_err;
         let s = Float::from_integer_prec(m, m_bits).0;
         if float_can_round(s.significand_ref().unwrap(), err, prec, rm) {
-            // The result is m * 2^(d_exp - w). `float_can_round` guarantees that s and the exact
-            // value round the same way and lie on the same side of every power of 2, so the single
-            // rounding in `shl_prec_round`, including its underflow handling, gives the correct
-            // result and `Ordering`.
-            return s.shl_prec_round(d_exp - i64::exact_from(w), prec, rm);
+            return s.shl_prec_round(shift, prec, rm);
         }
-        // a rounding boundary within the error: a modest increase suffices, and keeps pi away from
-        // 2^31 bits when p is already near 2^30
         p += max(p >> 2, Limb::WIDTH);
     }
 }
 
-// The outcome of one iteration of the Ziv loops in `cos_prec_round_normal_ref` and
-// `sin_prec_round_normal_ref`.
+// A `Rational` bracket [lo, hi] containing cos(x) or sin(x), as for `trig_near_zero`, about 2^-w
+// wide relative to the value: for a consumer that combines the tiny value with others before
+// rounding (the tangent).
+pub(crate) fn trig_near_zero_bracket(
+    x: &Float,
+    w: u64,
+    cancel: u64,
+    cos: bool,
+) -> (Rational, Rational) {
+    let (mut p, p_hint) = trig_near_zero_pi_precs(x, w, cancel);
+    let (m, abs_err, shift) = trig_near_zero_approx(x, w, &mut p, p_hint, cos);
+    let e = Integer::power_of_2(abs_err);
+    (
+        Rational::from(&m - &e) << shift,
+        Rational::from(m + e) << shift,
+    )
+}
+
 pub(crate) enum TrigStep {
     // The working precision could not decide the result; retry at a higher one.
     Retry,

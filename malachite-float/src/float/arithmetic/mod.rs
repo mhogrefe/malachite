@@ -832,3 +832,4 @@ pub mod sub_mul;
 /// slice's sum with a single rounding at the end, and the [`Sum`](core::iter::Sum) implementations
 /// built on them.
 pub mod sum;
+pub mod tan;

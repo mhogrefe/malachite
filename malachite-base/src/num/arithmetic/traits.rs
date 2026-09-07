@@ -930,6 +930,18 @@ pub trait SinCos {
     fn sin_cos(self) -> (Self::Output, Self::Output);
 }
 
+/// Computes $\tan(x)$, the tangent of a number.
+pub trait Tan {
+    type Output;
+
+    fn tan(self) -> Self::Output;
+}
+
+/// Replaces a number with its tangent, $\tan(x)$.
+pub trait TanAssign {
+    fn tan_assign(&mut self);
+}
+
 /// Replaces a number with its sine, $\sin(x)$, and writes its cosine, $\cos(x)$, to a second
 /// number.
 pub trait SinCosAssign {
