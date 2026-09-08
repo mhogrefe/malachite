@@ -292,8 +292,10 @@ documented by git history.
   `tan_prec_round`, `tan_prec`, `tan_round`, and `_ref`/`_assign` variants: a port of `mpfr_tan`,
   the sine and cosine together and their quotient in one Ziv loop. Unlike MPFR's, the result can
   overflow (an input within $2^{-2^{30}}$ of an odd multiple of $\pi/2$) or underflow (within that
-  distance of a multiple of $\pi$); both are decided from exact brackets. `primitive_float_tan`
-  gives the correctly rounded `f32` or `f64` tangent.
+  distance of a multiple of $\pi$); both are decided from exact brackets. `tan_rational_prec_round`
+  and `tan_rational_prec` (with `_ref` variants) take a `Rational` instead, with a direct series
+  bracket for tiny inputs, including those below the `Float` exponent range. `primitive_float_tan`
+  and `primitive_float_tan_rational` give the correctly rounded `f32` or `f64` tangent.
 - The Dottie number, the fixed point of the cosine, as `dottie_number_prec_round` and
   `dottie_number_prec` on `Float`, correctly rounded to any precision (Newton's method with a
   certified final bracket), and as a `DottieNumber` trait with constants for primitive floats.

@@ -28,8 +28,8 @@ use core::cmp::Ordering::{self, Equal, Greater, Less};
 use core::cmp::{max, min};
 use malachite_base::fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    CeilingLogBase2, Cos, CosAssign, DivRoundAssign, FloorLogBase2, FloorSqrt, Mod, ModPowerOf2,
-    NegAssign, Parity, PowerOf2, Square, SubMul, UnsignedAbs,
+    Abs, CeilingLogBase2, Cos, CosAssign, DivRoundAssign, FloorLogBase2, FloorSqrt, Mod,
+    ModPowerOf2, NegAssign, Parity, PowerOf2, Square, SubMul, UnsignedAbs,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -283,7 +283,67 @@ pub(crate) fn reduce_huge(x: &Rational, exp_x: i64, w: u64) -> Rational {
 // (-1)^n sin(delta); here delta is a `Rational` known up to the error in pi, and sin(delta) is
 // bracketed by partial sums of its series. `extra`, if present, is the exponent of an additional
 // error in y itself (from a reduction modulo 2 pi), and `w` is the working precision the caller
-// reached, which is raised until the bracket rounds unambiguously.
+// reached, which is raised until the bracket rounds unambiguously. The bracket of
+// `trig_rational_near_zero`, computed with the working precision raised, as there, until the
+// bracket is narrower than 2^-(target + 4) relative to the value: for a consumer that combines the
+// tiny value with others before rounding (the tangent).
+pub(crate) fn trig_rational_near_zero_bracket(
+    y: &Rational,
+    exp_y: i64,
+    extra: Option<i64>,
+    mut w: u64,
+    target: u64,
+    cos: bool,
+) -> (Rational, Rational) {
+    let mut increment = Limb::WIDTH;
+    let w_hint = y.denominator_ref().significant_bits() + target + 64;
+    loop {
+        let (lo, hi) = trig_rational_near_zero_step(y, exp_y, extra, w, cos);
+        if (&hi - &lo) << (target + 4) <= (&lo).abs() {
+            return (lo, hi);
+        }
+        w = max(w + increment, min(w_hint, w << 3));
+        increment = w >> 1;
+    }
+}
+
+// One bracket of `trig_rational_near_zero` at working precision w.
+fn trig_rational_near_zero_step(
+    y: &Rational,
+    exp_y: i64,
+    extra: Option<i64>,
+    w: u64,
+    cos: bool,
+) -> (Rational, Rational) {
+    let pi = Rational::exact_from(&Float::pi_prec(u64::exact_from(max(exp_y, 1)) + w).0);
+    let (n, negate, multiple) = if cos {
+        let n = Integer::rounding_from((y / &pi) << 1u32, Nearest).0;
+        assert!(n.odd());
+        let negate = (&n).mod_power_of_2(2) == 1u32;
+        (n, negate, pi >> 1u32)
+    } else {
+        let n = Integer::rounding_from(y / &pi, Nearest).0;
+        let negate = n.odd();
+        (n, negate, pi)
+    };
+    let delta = y.sub_mul(&multiple, &Rational::from(&n));
+    let mut e = Rational::power_of_2(1 - i64::exact_from(w));
+    if let Some(extra) = extra {
+        e += Rational::power_of_2(extra);
+    }
+    let d_lo = &delta - &e;
+    let d_hi = delta + e;
+    // |delta| is tiny, so sin is increasing on [d_lo, d_hi] and sin(delta) lies between sin(d_lo)
+    // and sin(d_hi)
+    let sin_lo = sin_bound(&d_lo, w, false);
+    let sin_hi = sin_bound(&d_hi, w, true);
+    if negate {
+        (-sin_hi, -sin_lo)
+    } else {
+        (sin_lo, sin_hi)
+    }
+}
+
 pub(crate) fn trig_rational_near_zero(
     y: &Rational,
     exp_y: i64,
@@ -301,33 +361,7 @@ pub(crate) fn trig_rational_near_zero(
     // the last one.
     let w_hint = y.denominator_ref().significant_bits() + prec + 64;
     loop {
-        let pi = Rational::exact_from(&Float::pi_prec(u64::exact_from(max(exp_y, 1)) + w).0);
-        let (n, negate, multiple) = if cos {
-            let n = Integer::rounding_from((y / &pi) << 1u32, Nearest).0;
-            assert!(n.odd());
-            let negate = (&n).mod_power_of_2(2) == 1u32;
-            (n, negate, pi >> 1u32)
-        } else {
-            let n = Integer::rounding_from(y / &pi, Nearest).0;
-            let negate = n.odd();
-            (n, negate, pi)
-        };
-        let delta = y.sub_mul(&multiple, &Rational::from(&n));
-        let mut e = Rational::power_of_2(1 - i64::exact_from(w));
-        if let Some(extra) = extra {
-            e += Rational::power_of_2(extra);
-        }
-        let d_lo = &delta - &e;
-        let d_hi = delta + e;
-        // |delta| is tiny, so sin is increasing on [d_lo, d_hi] and sin(delta) lies between
-        // sin(d_lo) and sin(d_hi)
-        let sin_lo = sin_bound(&d_lo, w, false);
-        let sin_hi = sin_bound(&d_hi, w, true);
-        let (lo, hi) = if negate {
-            (-sin_hi, -sin_lo)
-        } else {
-            (sin_lo, sin_hi)
-        };
+        let (lo, hi) = trig_rational_near_zero_step(y, exp_y, extra, w, cos);
         if let Some(result) = round_bracket(&lo, &hi, prec, rm) {
             return result;
         }

@@ -20,18 +20,21 @@
 // is decided from exact brackets instead.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use crate::float::arithmetic::cos::{round_bracket, trig_near_zero_bracket};
+use crate::float::arithmetic::cos::{
+    reduce_huge, round_bracket, sin_bound, trig_near_zero_bracket, trig_rational_near_zero_bracket,
+};
 use crate::float::arithmetic::round_near_x::float_round_near_x;
-use crate::{Float, emulate_float_to_float_fn};
+use crate::float::arithmetic::sin_cos::sin_cos_rational_helper;
+use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn};
 use core::cmp::Ordering::{self, Equal, Greater, Less};
 use core::cmp::min;
 use malachite_base::num::arithmetic::traits::{
-    Abs, CeilingLogBase2, IsPowerOf2, PowerOf2, Tan, TanAssign,
+    Abs, AddMul, CeilingLogBase2, IsPowerOf2, Parity, Pow, PowerOf2, Square, Tan, TanAssign,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{
-    Infinity as InfinityTrait, NaN as NaNTrait, NegativeInfinity, Zero as ZeroTrait,
+    Infinity as InfinityTrait, NaN as NaNTrait, NegativeInfinity, One, Zero as ZeroTrait,
 };
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
@@ -39,6 +42,11 @@ use malachite_base::rounding_modes::RoundingMode::{self, Ceiling, Down, Exact, F
 use malachite_nz::natural::arithmetic::float::round::float_can_round;
 use malachite_nz::platform::Limb;
 use malachite_q::Rational;
+
+// A quotient whose exponent lies strictly between these can be rounded to any precision without
+// leaving the exponent range, so the `Float` division settles it; the rest go to the brackets.
+const MIN_SETTLED_EXPONENT: i64 = Float::MIN_EXPONENT_I64 + 1;
+const MAX_SETTLED_EXPONENT: i64 = Float::MAX_EXPONENT_I64 - 1;
 
 // As in mpfr_overflow, with the overflow's sign: the toward-zero modes give the largest finite
 // value, and the other modes an infinity.
@@ -156,10 +164,7 @@ fn tan_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float, 
         // underflowed.
         let exp_q = q.as_ref().and_then(Float::get_exponent).map(i64::from);
         match exp_q {
-            Some(e)
-                if e > const { Float::MIN_EXPONENT_I64 + 1 }
-                    && e < const { Float::MAX_EXPONENT_I64 - 1 } =>
-            {
+            Some(e) if e > MIN_SETTLED_EXPONENT && e < MAX_SETTLED_EXPONENT => {
                 let q = q.unwrap();
                 if float_can_round(q.significand_ref().unwrap(), m - 2, prec, rm) {
                     return Float::from_float_prec_round(q, prec, rm);
@@ -963,6 +968,469 @@ impl Float {
     }
 }
 
+// Computes tan(x) for a nonzero `Rational` x, rounded to precision `prec` with rounding mode `rm`.
+// (x = 0 is handled by the caller.) The result is never exactly representable, so `rm` must not be
+// `Exact`.
+//
+// This is the `Float` algorithm with the sine and cosine taken from `sin_cos_rational_helper`,
+// which rounds the input once and shares the argument reduction, and with a direct bracket for a
+// tiny input, where tan x is x + x^3/3 + O(x^5): that also covers inputs below the `Float` exponent
+// range, which no other path could even round.
+pub(crate) fn tan_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    assert_ne!(rm, Exact, "Inexact tan");
+    let exp_x = x.floor_log_base_2_abs() + 1; // the MPFR-style exponent of x
+    // For |x| <= 1/2, |x| + |x|^3/3 <= |tan x| <= |x| + |x|^3/3 + |x|^5 (the remaining terms of the
+    // series sum to less than |x|^5 there), a bracket of relative width below x^4, which decides
+    // the rounding once x^4 is below 2^-(prec + 3), unless the tangent lies within that of a
+    // rounding boundary.
+    if exp_x < 0 && -(exp_x << 2) > i64::exact_from(prec) + 3 {
+        let ax = x.abs();
+        let ax3 = (&ax).pow(3u64);
+        let lo = &ax + &ax3 / const { Rational::const_from_unsigned(3) };
+        let hi = (&lo).add_mul(&ax3, &(&ax).square());
+        if let Some(result) = round_bracket_signed(x, lo, hi, prec, rm) {
+            return result;
+        }
+        // The bracket straddles a rounding boundary. Below the exponent range, where the general
+        // path could not even round x, tighten it from the series of the sine and cosine, which
+        // narrows without bound; otherwise the general path takes over.
+        if exp_x <= const { Float::MIN_EXPONENT_I64 + 2 } {
+            return tan_rational_tiny(x, &ax, prec, rm);
+        }
+    }
+    let mut m = prec + prec.ceiling_log_base_2() + 13;
+    let mut increment = Limb::WIDTH;
+    loop {
+        // the sine and cosine correctly rounded at m, even within 2^(-2^30) of a zero of either,
+        // where they may underflow
+        let (s, c, _, _) = sin_cos_rational_helper(x, m, Nearest);
+        // err <= 4 ulps
+        let q = if s == 0u32 || c == 0u32 {
+            None
+        } else {
+            Some(s.div_prec_ref_ref(&c, m).0)
+        };
+        let exp_q = q.as_ref().and_then(Float::get_exponent).map(i64::from);
+        match exp_q {
+            Some(e) if e > MIN_SETTLED_EXPONENT && e < MAX_SETTLED_EXPONENT => {
+                let q = q.unwrap();
+                if float_can_round(q.significand_ref().unwrap(), m - 2, prec, rm) {
+                    return Float::from_float_prec_round(q, prec, rm);
+                }
+            }
+            _ => {
+                if let Some(result) = tan_rational_bracket(x, exp_x, &s, &c, m, prec, rm) {
+                    return result;
+                }
+            }
+        }
+        m += increment;
+        increment = m >> 1;
+    }
+}
+
+// `round_bracket` for a bracket [lo, hi] of the magnitude of the tangent, restoring the sign of x.
+fn round_bracket_signed(
+    x: &Rational,
+    lo: Rational,
+    hi: Rational,
+    prec: u64,
+    rm: RoundingMode,
+) -> Option<(Float, Ordering)> {
+    if *x < 0u32 {
+        round_bracket(&-hi, &-lo, prec, rm)
+    } else {
+        round_bracket(&lo, &hi, prec, rm)
+    }
+}
+
+// tan x for a tiny x (|x| <= 1/2, in fact far below the `Float` exponent range) whose two-term
+// bracket straddles a rounding boundary: the sine is bracketed by `sin_bound` at a growing working
+// precision, and the cosine by consecutive partial sums of its alternating series, until the
+// quotient's bracket rounds unambiguously (the tangent is transcendental, so it eventually does).
+fn tan_rational_tiny(
+    x: &Rational,
+    ax: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    let x2 = ax.square();
+    let mut w = prec + 64;
+    let mut terms = 2u64;
+    loop {
+        let s_lo = sin_bound(ax, w, false);
+        let s_hi = sin_bound(ax, w, true);
+        // cos x = 1 - x^2/2 + x^4/24 - ..., an alternating series with decreasing terms for |x| <=
+        // 1, so the partial sums with an even and an odd number of terms bracket it
+        let mut c_lo = Rational::ONE;
+        let mut term = Rational::ONE;
+        let mut c_hi = Rational::ONE;
+        for k in 1..=terms {
+            term *= &x2;
+            term /= Rational::from((k << 1) * ((k << 1) - 1));
+            if k.odd() {
+                c_lo = &c_hi - &term;
+            } else {
+                c_hi = &c_lo + &term;
+            }
+        }
+        let lo = s_lo / &c_hi;
+        let hi = s_hi / c_lo;
+        if let Some(result) = round_bracket_signed(x, lo, hi, prec, rm) {
+            return result;
+        }
+        w <<= 1;
+        terms += 1;
+    }
+}
+
+// `tan_bracket` for a `Rational` input: the sine's exact bracket, when it underflowed, comes from
+// the `Rational` near-zero machinery, on the input reduced modulo 2 pi if it is too large to be a
+// `Float`.
+fn tan_rational_bracket(
+    x: &Rational,
+    exp_x: i64,
+    s: &Float,
+    c: &Float,
+    m: u64,
+    prec: u64,
+    rm: RoundingMode,
+) -> Option<(Float, Ordering)> {
+    let negative = s.is_sign_negative() != c.is_sign_negative();
+    if *c == 0u32
+        || (c.get_exponent() == Some(Float::MIN_EXPONENT)
+            && c.significand_ref().unwrap().is_power_of_2())
+    {
+        return Some(tan_overflow(negative, prec, rm));
+    }
+    let (c_lo, c_hi) = nearest_bracket(c, m);
+    let (s_lo, s_hi) = if *s == 0u32 {
+        let w = m + 64;
+        let reduced;
+        let (y, extra) = if exp_x >= Float::MAX_EXPONENT_I64 {
+            reduced = reduce_huge(x, exp_x, w);
+            (&reduced, Some(2 - i64::exact_from(w)))
+        } else {
+            (x, None)
+        };
+        let exp_y = y.floor_log_base_2_abs() + 1;
+        let (lo, hi) = trig_rational_near_zero_bracket(y, exp_y, extra, w, m, false);
+        if lo < 0u32 { (-hi, -lo) } else { (lo, hi) }
+    } else {
+        nearest_bracket(s, m)
+    };
+    let lo = s_lo / c_hi;
+    let hi = s_hi / c_lo;
+    if negative {
+        round_bracket(&-hi, &-lo, prec, rm)
+    } else {
+        round_bracket(&lo, &hi, prec, rm)
+    }
+}
+
+impl Float {
+    /// Computes $\tan x$, the tangent of a [`Rational`], rounding the result to the specified
+    /// precision and with the specified rounding mode and returning the result as a [`Float`]. The
+    /// [`Rational`] is taken by value. An [`Ordering`] is also returned, indicating whether the
+    /// rounded tangent is less than, equal to, or greater than the exact tangent.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,p,m) = \tan x+\varepsilon.
+    /// $$
+    /// - If $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |\tan x|\rfloor-p+1}$.
+    /// - If $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |\tan x|\rfloor-p}$.
+    ///
+    /// These bounds do not apply when the result underflows; see below.
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p,m)=0$.
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)\leq -2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)\leq -2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`, $-(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead.
+    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,p,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
+    ///
+    /// Overflow requires an input within $2^{-2^{30}}$ of an odd multiple of $\pi/2$, and underflow
+    /// an input of magnitude about $2^{-2^{30}}$ or less, or one within $2^{-2^{30}}$ of a nonzero
+    /// multiple of $\pi$; either near-multiple case takes more than $2^{30}$ bits.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::tan_rational_prec`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m, e) = O(n (\log n)^3 \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
+    ///
+    /// $M(n, m, e) = O((n+m+e) \log (n+m+e))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, $m$ is `x.significant_bits()`,
+    /// and $e$ is `x.floor_log_base_2_abs()` (taken as 0 when it is negative or $x = 0$): the input
+    /// is rounded to a working precision and the [`Float`] sine and cosine taken there together,
+    /// and their quotient, which for $|x| \geq 2$ reduces the argument modulo $2\pi$ and so needs
+    /// $\pi$ to about $n + e$ bits.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision (which is the case for every nonzero input).
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::tan_rational_prec_round(Rational::from_unsigneds(3u8, 5), 5, Floor);
+    /// assert_eq!(c.to_string(), "0.656");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::tan_rational_prec_round(Rational::from_unsigneds(3u8, 5), 5, Ceiling);
+    /// assert_eq!(c.to_string(), "0.688");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) = Float::tan_rational_prec_round(Rational::from_unsigneds(3u8, 5), 20, Floor);
+    /// assert_eq!(c.to_string(), "0.68413639");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::tan_rational_prec_round(Rational::from_unsigneds(3u8, 5), 20, Ceiling);
+    /// assert_eq!(c.to_string(), "0.68413734");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn tan_rational_prec_round(x: Rational, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+        Self::tan_rational_prec_round_ref(&x, prec, rm)
+    }
+
+    /// Computes $\tan x$, the tangent of a [`Rational`], rounding the result to the specified
+    /// precision and with the specified rounding mode and returning the result as a [`Float`]. The
+    /// [`Rational`] is taken by reference. An [`Ordering`] is also returned, indicating whether the
+    /// rounded tangent is less than, equal to, or greater than the exact tangent.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,p,m) = \tan x+\varepsilon.
+    /// $$
+    /// - If $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |\tan x|\rfloor-p+1}$.
+    /// - If $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |\tan x|\rfloor-p}$.
+    ///
+    /// These bounds do not apply when the result underflows.
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p,m)=0$.
+    ///
+    /// See the [`Float::tan_rational_prec_round`] documentation for information on overflow and
+    /// underflow.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::tan_rational_prec_ref`]
+    /// instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m, e) = O(n (\log n)^3 \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
+    ///
+    /// $M(n, m, e) = O((n+m+e) \log (n+m+e))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, $m$ is `x.significant_bits()`,
+    /// and $e$ is `x.floor_log_base_2_abs()` (taken as 0 when it is negative or $x = 0$): the input
+    /// is rounded to a working precision and the [`Float`] sine and cosine taken there together,
+    /// and their quotient, which for $|x| \geq 2$ reduces the argument modulo $2\pi$ and so needs
+    /// $\pi$ to about $n + e$ bits.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision (which is the case for every nonzero input).
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) =
+    ///     Float::tan_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 5, Floor);
+    /// assert_eq!(c.to_string(), "0.656");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) =
+    ///     Float::tan_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 5, Ceiling);
+    /// assert_eq!(c.to_string(), "0.688");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) =
+    ///     Float::tan_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 20, Floor);
+    /// assert_eq!(c.to_string(), "0.68413639");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) =
+    ///     Float::tan_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 20, Ceiling);
+    /// assert_eq!(c.to_string(), "0.68413734");
+    /// assert_eq!(o, Greater);
+    /// ```
+    pub fn tan_rational_prec_round_ref(
+        x: &Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        if *x == 0u32 {
+            // tan(0) = 0, exactly
+            return (Self::ZERO, Equal);
+        }
+        tan_rational_helper(x, prec, rm)
+    }
+
+    /// Computes $\tan x$, the tangent of a [`Rational`], rounding the result to the nearest value
+    /// of the specified precision and returning the result as a [`Float`]. The [`Rational`] is
+    /// taken by value. An [`Ordering`] is also returned, indicating whether the rounded tangent is
+    /// less than, equal to, or greater than the exact tangent.
+    ///
+    /// If the tangent is equidistant from two [`Float`]s with the specified precision, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,p) = \tan x+\varepsilon,
+    /// $$
+    /// where $|\varepsilon| \leq 2^{\lfloor\log_2 |\tan x|\rfloor-p}$ (unless the result
+    /// underflows; see below).
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p)=0$.
+    ///
+    /// Overflow and underflow:
+    /// - If $f(x,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,p)\leq -2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $0<f(x,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,p)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
+    ///
+    /// Overflow requires an input within $2^{-2^{30}}$ of an odd multiple of $\pi/2$, and underflow
+    /// an input of magnitude about $2^{-2^{30}}$ or less, or one within $2^{-2^{30}}$ of a nonzero
+    /// multiple of $\pi$; either near-multiple case takes more than $2^{30}$ bits.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::tan_rational_prec_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m, e) = O(n (\log n)^3 \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
+    ///
+    /// $M(n, m, e) = O((n+m+e) \log (n+m+e))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, $m$ is `x.significant_bits()`,
+    /// and $e$ is `x.floor_log_base_2_abs()` (taken as 0 when it is negative or $x = 0$): the input
+    /// is rounded to a working precision and the [`Float`] sine and cosine taken there together,
+    /// and their quotient, which for $|x| \geq 2$ reduces the argument modulo $2\pi$ and so needs
+    /// $\pi$ to about $n + e$ bits.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::tan_rational_prec(Rational::from_unsigneds(3u8, 5), 5);
+    /// assert_eq!(c.to_string(), "0.688");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) = Float::tan_rational_prec(Rational::from_unsigneds(3u8, 5), 20);
+    /// assert_eq!(c.to_string(), "0.68413639");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn tan_rational_prec(x: Rational, prec: u64) -> (Self, Ordering) {
+        Self::tan_rational_prec_round_ref(&x, prec, Nearest)
+    }
+
+    /// Computes $\tan x$, the tangent of a [`Rational`], rounding the result to the nearest value
+    /// of the specified precision and returning the result as a [`Float`]. The [`Rational`] is
+    /// taken by reference. An [`Ordering`] is also returned, indicating whether the rounded tangent
+    /// is less than, equal to, or greater than the exact tangent.
+    ///
+    /// If the tangent is equidistant from two [`Float`]s with the specified precision, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,p) = \tan x+\varepsilon,
+    /// $$
+    /// where $|\varepsilon| \leq 2^{\lfloor\log_2 |\tan x|\rfloor-p}$ (unless the result
+    /// underflows).
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p)=0$.
+    ///
+    /// See the [`Float::tan_rational_prec`] documentation for information on overflow and
+    /// underflow.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::tan_rational_prec_round_ref`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m, e) = O(n (\log n)^3 \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
+    ///
+    /// $M(n, m, e) = O((n+m+e) \log (n+m+e))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, $m$ is `x.significant_bits()`,
+    /// and $e$ is `x.floor_log_base_2_abs()` (taken as 0 when it is negative or $x = 0$): the input
+    /// is rounded to a working precision and the [`Float`] sine and cosine taken there together,
+    /// and their quotient, which for $|x| \geq 2$ reduces the argument modulo $2\pi$ and so needs
+    /// $\pi$ to about $n + e$ bits.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::tan_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 5);
+    /// assert_eq!(c.to_string(), "0.688");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) = Float::tan_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 20);
+    /// assert_eq!(c.to_string(), "0.68413639");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn tan_rational_prec_ref(x: &Rational, prec: u64) -> (Self, Ordering) {
+        Self::tan_rational_prec_round_ref(x, prec, Nearest)
+    }
+}
+
 impl Tan for Float {
     type Output = Self;
 
@@ -1223,4 +1691,69 @@ where
     for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
 {
     emulate_float_to_float_fn(Float::tan_prec, x)
+}
+
+/// Computes $\tan x$, the tangent of a [`Rational`], returning the result as a primitive float.
+///
+/// $$
+/// f(x) = \tan x+\varepsilon,
+/// $$
+/// where $|\varepsilon| < 2^{\lfloor\log_2 |\tan x|\rfloor-p}$, and $p$ is the precision of the
+/// output (24 if `T` is a [`f32`] and 53 if `T` is a [`f64`]).
+///
+/// Special cases:
+/// - $f(0)=0$
+///
+/// Overflow is possible: a [`Rational`] within about $2^{-128}$ of an odd multiple of $\pi/2$ has a
+/// tangent beyond the largest [`f32`], and one within about $2^{-1024}$ of it beyond the largest
+/// [`f64`], and the result is then $\pm\infty$. The result underflows, to a subnormal or to zero,
+/// when $x$ is tiny, since $\tan x$ is then very close to $x$; a [`Rational`] close enough to a
+/// nonzero multiple of $\pi$ for its tangent to be subnormal would need a denominator of more than
+/// 100 bits, in which case the result is still correctly rounded.
+///
+/// # Worst-case complexity
+/// $T(m, e) = O((m+e) (\log (m+e))^2 \log\log (m+e))$
+///
+/// $M(m, e) = O((m+e) \log (m+e))$
+///
+/// where $T$ is time, $M$ is additional memory, $m$ is `x.significant_bits()`, and $e$ is
+/// `x.floor_log_base_2_abs()` (taken as 0 when it is negative or $x = 0$): for $|x| \geq 3$ the
+/// argument is reduced modulo $2\pi$, which needs $\pi$ to about $e$ bits.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::Zero;
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::tan::primitive_float_tan_rational;
+/// use malachite_q::Rational;
+///
+/// assert_eq!(
+///     NiceFloat(primitive_float_tan_rational::<f64>(&Rational::ZERO)),
+///     NiceFloat(0.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_tan_rational::<f64>(
+///         &Rational::from_unsigneds(1u8, 3)
+///     )),
+///     NiceFloat(0.34625354951057546)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_tan_rational::<f32>(
+///         &Rational::from_unsigneds(1u8, 3)
+///     )),
+///     NiceFloat(0.34625354)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_tan_rational::<f64>(&Rational::from(10000))),
+///     NiceFloat(0.3209711346238147)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_tan_rational<T: PrimitiveFloat>(x: &Rational) -> T
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_rational_to_float_fn(Float::tan_rational_prec_ref, x)
 }

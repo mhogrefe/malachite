@@ -214,7 +214,7 @@ fn near_one(err: u64, negative: bool, prec: u64, rm: RoundingMode) -> (Float, Or
 // an x too large to be a `Float`, the error of a single `Rational` reduction modulo 2 pi, which for
 // such an x is the dominant cost. The brackets are rounded in `Rational` arithmetic, and w is
 // raised until both resolve.
-fn sin_cos_rational_helper(
+pub(crate) fn sin_cos_rational_helper(
     x: &Rational,
     prec: u64,
     rm: RoundingMode,
