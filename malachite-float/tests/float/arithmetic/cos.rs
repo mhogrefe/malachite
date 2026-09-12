@@ -39,8 +39,8 @@ use malachite_float::test_util::float::arithmetic::cos::{
 };
 use malachite_float::test_util::generators::{
     float_gen, float_rounding_mode_pair_gen_var_47, float_unsigned_pair_gen_var_1,
-    float_unsigned_rounding_mode_triple_gen_var_36, float_unsigned_rounding_mode_triple_gen_var_37,
-    float_unsigned_rounding_mode_triple_gen_var_38,
+    float_unsigned_pair_gen_var_2, float_unsigned_rounding_mode_triple_gen_var_36,
+    float_unsigned_rounding_mode_triple_gen_var_37, float_unsigned_rounding_mode_triple_gen_var_38,
     float_unsigned_unsigned_rounding_mode_quadruple_gen_var_15,
     float_unsigned_unsigned_rounding_mode_quadruple_gen_var_16,
     float_unsigned_unsigned_triple_gen_var_1, rational_unsigned_rounding_mode_triple_gen_var_10,
@@ -11615,6 +11615,29 @@ fn cos_with_period_round_properties() {
     });
 }
 
+#[test]
+fn cos_with_period_properties() {
+    float_unsigned_pair_gen_var_2::<u64>().test_properties(|(x, u)| {
+        let c = x.clone().cos_with_period(u);
+        assert!(c.is_valid());
+        let c_alt = x.cos_with_period_ref(u);
+        assert!(c_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+        let mut c_alt = x.clone();
+        c_alt.cos_with_period_assign(u);
+        assert!(c_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+        // the same as rounding to the input's precision, to nearest
+        let (c_alt, _) = x.cos_with_period_prec_round_ref(u, x.significant_bits(), Nearest);
+        assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+        // cos_with_period is even
+        assert_eq!(
+            ComparableFloatRef(&(-&x).cos_with_period(u)),
+            ComparableFloatRef(&c)
+        );
+    });
+}
+
 // The `Rational` inputs include exact and closed-form cases hit directly (1/3, 1/8, 1/5, 1/10 of a
 // turn), which the `Float` version can only reach through a divisor, and non-dyadic inputs whose
 // cosines MPFR cannot compute exactly, since it must round the input first.
@@ -13479,6 +13502,24 @@ fn cos_pi_properties() {
         let (c_alt, o_alt) = Float::cos_pi_rational_prec_ref(&x, prec);
         assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
         assert_eq!(o_alt, o);
+    });
+
+    float_gen().test_properties(|x| {
+        let c = x.clone().cos_pi();
+        assert!(c.is_valid());
+        let c_alt = x.cos_pi_ref();
+        assert!(c_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+        let mut c_alt = x.clone();
+        c_alt.cos_pi_assign();
+        assert!(c_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+        // the same as cos_with_period with a period of 2, and as rounding to the input's precision,
+        // to nearest
+        let c_alt = x.cos_with_period_ref(2);
+        assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+        let (c_alt, _) = x.cos_pi_prec_round_ref(x.significant_bits(), Nearest);
+        assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
     });
 }
 

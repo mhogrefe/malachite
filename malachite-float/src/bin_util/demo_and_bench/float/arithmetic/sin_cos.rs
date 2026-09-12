@@ -28,7 +28,7 @@ use malachite_float::float::arithmetic::sin_cos::{
 };
 use malachite_float::float::arithmetic::{cos, sin};
 use malachite_float::test_util::bench::bucketers::{
-    float_complexity_bucketer, pair_2_float_complexity_bucketer,
+    float_complexity_bucketer, pair_1_float_complexity_bucketer, pair_2_float_complexity_bucketer,
     pair_2_triple_1_2_float_primitive_int_max_complexity_bucketer,
     quadruple_1_float_complexity_bucketer, triple_1_2_float_primitive_int_max_complexity_bucketer,
     triple_1_float_complexity_bucketer,
@@ -39,7 +39,8 @@ use malachite_float::test_util::float::arithmetic::sin_cos::{
 };
 use malachite_float::test_util::generators::{
     float_gen, float_gen_rm, float_gen_var_12, float_rounding_mode_pair_gen_var_47,
-    float_unsigned_pair_gen_var_1, float_unsigned_rounding_mode_triple_gen_var_36,
+    float_unsigned_pair_gen_var_1, float_unsigned_pair_gen_var_2,
+    float_unsigned_rounding_mode_triple_gen_var_36,
     float_unsigned_rounding_mode_triple_gen_var_36_rm,
     float_unsigned_rounding_mode_triple_gen_var_39,
     float_unsigned_unsigned_rounding_mode_quadruple_gen_var_17,
@@ -184,6 +185,19 @@ pub(crate) fn register(runner: &mut Runner) {
         runner,
         benchmark_float_sin_cos_prec_round_library_comparison
     );
+    register_demo!(runner, demo_float_sin_cos_with_period);
+    register_demo!(runner, demo_float_sin_cos_with_period_debug);
+    register_demo!(runner, demo_float_sin_cos_with_period_ref);
+    register_demo!(runner, demo_float_sin_cos_with_period_assign);
+    register_bench!(
+        runner,
+        benchmark_float_sin_cos_with_period_evaluation_strategy
+    );
+    register_demo!(runner, demo_float_sin_cos_pi);
+    register_demo!(runner, demo_float_sin_cos_pi_debug);
+    register_demo!(runner, demo_float_sin_cos_pi_ref);
+    register_demo!(runner, demo_float_sin_cos_pi_assign);
+    register_bench!(runner, benchmark_float_sin_cos_pi_evaluation_strategy);
 }
 
 fn demo_float_sin_cos(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -1636,5 +1650,146 @@ fn benchmark_primitive_float_sin_cos_rational<T: PrimitiveFloat>(
         &mut [("malachite", &mut |x| {
             no_out!(primitive_float_sin_cos_rational::<T>(&x));
         })],
+    );
+}
+
+fn demo_float_sin_cos_with_period(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, u) in float_unsigned_pair_gen_var_2::<u64>()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        println!(
+            "({}).sin_cos_with_period({}) = {:?}",
+            x_old,
+            u,
+            x.sin_cos_with_period(u)
+        );
+    }
+}
+
+fn demo_float_sin_cos_with_period_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, u) in float_unsigned_pair_gen_var_2::<u64>()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let (s, c) = x.sin_cos_with_period(u);
+        println!(
+            "({:#x}).sin_cos_with_period({}) = ({:#x}, {:#x})",
+            ComparableFloat(x_old),
+            u,
+            ComparableFloat(s),
+            ComparableFloat(c)
+        );
+    }
+}
+
+fn demo_float_sin_cos_with_period_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, u) in float_unsigned_pair_gen_var_2::<u64>()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "(&{}).sin_cos_with_period_ref({}) = {:?}",
+            x,
+            u,
+            x.sin_cos_with_period_ref(u)
+        );
+    }
+}
+
+fn demo_float_sin_cos_with_period_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, u) in float_unsigned_pair_gen_var_2::<u64>()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let mut c = Float::NAN;
+        x.sin_cos_with_period_assign(&mut c, u);
+        println!("x := {x_old}; x.sin_cos_with_period_assign(&mut c, {u}); x = {x}; c = {c}");
+    }
+}
+
+fn benchmark_float_sin_cos_with_period_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float.sin_cos_with_period(u64)",
+        BenchmarkType::EvaluationStrategy,
+        float_unsigned_pair_gen_var_2::<u64>().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_1_float_complexity_bucketer("x"),
+        &mut [
+            ("Float.sin_cos_with_period(u64)", &mut |(x, u)| {
+                no_out!(x.sin_cos_with_period(u));
+            }),
+            ("(&Float).sin_cos_with_period_ref(u64)", &mut |(x, u)| {
+                no_out!(x.sin_cos_with_period_ref(u));
+            }),
+        ],
+    );
+}
+
+fn demo_float_sin_cos_pi(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen().get(gm, config).take(limit) {
+        let x_old = x.clone();
+        println!("({}).sin_cos_pi() = {:?}", x_old, x.sin_cos_pi());
+    }
+}
+
+fn demo_float_sin_cos_pi_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen().get(gm, config).take(limit) {
+        let x_old = x.clone();
+        let (s, c) = x.sin_cos_pi();
+        println!(
+            "({:#x}).sin_cos_pi() = ({:#x}, {:#x})",
+            ComparableFloat(x_old),
+            ComparableFloat(s),
+            ComparableFloat(c)
+        );
+    }
+}
+
+fn demo_float_sin_cos_pi_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen().get(gm, config).take(limit) {
+        println!("(&{}).sin_cos_pi_ref() = {:?}", x, x.sin_cos_pi_ref());
+    }
+}
+
+fn demo_float_sin_cos_pi_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for mut x in float_gen().get(gm, config).take(limit) {
+        let x_old = x.clone();
+        let mut c = Float::NAN;
+        x.sin_cos_pi_assign(&mut c);
+        println!("x := {x_old}; x.sin_cos_pi_assign(&mut c); x = {x}; c = {c}");
+    }
+}
+
+fn benchmark_float_sin_cos_pi_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float.sin_cos_pi()",
+        BenchmarkType::EvaluationStrategy,
+        float_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &float_complexity_bucketer("x"),
+        &mut [
+            ("Float.sin_cos_pi()", &mut |x| no_out!(x.sin_cos_pi())),
+            ("(&Float).sin_cos_pi_ref()", &mut |x| {
+                no_out!(x.sin_cos_pi_ref());
+            }),
+        ],
     );
 }

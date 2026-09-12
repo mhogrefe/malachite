@@ -39,8 +39,8 @@ use malachite_float::test_util::float::arithmetic::sin::{
 };
 use malachite_float::test_util::generators::{
     float_gen, float_rounding_mode_pair_gen_var_47, float_unsigned_pair_gen_var_1,
-    float_unsigned_rounding_mode_triple_gen_var_36, float_unsigned_rounding_mode_triple_gen_var_37,
-    float_unsigned_rounding_mode_triple_gen_var_39,
+    float_unsigned_pair_gen_var_2, float_unsigned_rounding_mode_triple_gen_var_36,
+    float_unsigned_rounding_mode_triple_gen_var_37, float_unsigned_rounding_mode_triple_gen_var_39,
     float_unsigned_unsigned_rounding_mode_quadruple_gen_var_17,
     float_unsigned_unsigned_rounding_mode_quadruple_gen_var_18,
     float_unsigned_unsigned_triple_gen_var_1, rational_unsigned_rounding_mode_triple_gen_var_10,
@@ -11497,6 +11497,29 @@ fn sin_with_period_round_properties() {
     });
 }
 
+#[test]
+fn sin_with_period_properties() {
+    float_unsigned_pair_gen_var_2::<u64>().test_properties(|(x, u)| {
+        let s = x.clone().sin_with_period(u);
+        assert!(s.is_valid());
+        let s_alt = x.sin_with_period_ref(u);
+        assert!(s_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&s_alt), ComparableFloatRef(&s));
+        let mut s_alt = x.clone();
+        s_alt.sin_with_period_assign(u);
+        assert!(s_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&s_alt), ComparableFloatRef(&s));
+        // the same as rounding to the input's precision, to nearest
+        let (s_alt, _) = x.sin_with_period_prec_round_ref(u, x.significant_bits(), Nearest);
+        assert_eq!(ComparableFloatRef(&s_alt), ComparableFloatRef(&s));
+        // sin_with_period is odd
+        assert_eq!(
+            ComparableFloat((-&x).sin_with_period(u)),
+            ComparableFloat(-&s)
+        );
+    });
+}
+
 // Inputs within 2^(-2^30) of a half turn, whose sines underflow: cheap, since the near-zero path
 // works with the exact distance to the half turn rather than with pi to 2^30 bits.
 #[test]
@@ -13868,6 +13891,24 @@ fn sin_pi_properties() {
         let (s_alt, o_alt) = Float::sin_pi_rational_prec_ref(&x, prec);
         assert_eq!(ComparableFloatRef(&s_alt), ComparableFloatRef(&s));
         assert_eq!(o_alt, o);
+    });
+
+    float_gen().test_properties(|x| {
+        let s = x.clone().sin_pi();
+        assert!(s.is_valid());
+        let s_alt = x.sin_pi_ref();
+        assert!(s_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&s_alt), ComparableFloatRef(&s));
+        let mut s_alt = x.clone();
+        s_alt.sin_pi_assign();
+        assert!(s_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&s_alt), ComparableFloatRef(&s));
+        // the same as sin_with_period with a period of 2, and as rounding to the input's precision,
+        // to nearest
+        let s_alt = x.sin_with_period_ref(2);
+        assert_eq!(ComparableFloatRef(&s_alt), ComparableFloatRef(&s));
+        let (s_alt, _) = x.sin_pi_prec_round_ref(x.significant_bits(), Nearest);
+        assert_eq!(ComparableFloatRef(&s_alt), ComparableFloatRef(&s));
     });
 }
 

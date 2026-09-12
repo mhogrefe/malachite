@@ -47,8 +47,8 @@ use malachite_float::test_util::float::arithmetic::sin_cos::{
 };
 use malachite_float::test_util::generators::{
     float_gen, float_rounding_mode_pair_gen_var_47, float_unsigned_pair_gen_var_1,
-    float_unsigned_rounding_mode_triple_gen_var_36, float_unsigned_rounding_mode_triple_gen_var_37,
-    float_unsigned_rounding_mode_triple_gen_var_39,
+    float_unsigned_pair_gen_var_2, float_unsigned_rounding_mode_triple_gen_var_36,
+    float_unsigned_rounding_mode_triple_gen_var_37, float_unsigned_rounding_mode_triple_gen_var_39,
     float_unsigned_unsigned_rounding_mode_quadruple_gen_var_17,
     float_unsigned_unsigned_rounding_mode_quadruple_gen_var_18,
     float_unsigned_unsigned_triple_gen_var_1, rational_unsigned_rounding_mode_triple_gen_var_10,
@@ -10805,6 +10805,39 @@ fn sin_cos_with_period_round_properties() {
     });
 }
 
+#[test]
+fn sin_cos_with_period_properties() {
+    float_unsigned_pair_gen_var_2::<u64>().test_properties(|(x, u)| {
+        let (s, c) = x.clone().sin_cos_with_period(u);
+        assert!(s.is_valid());
+        assert!(c.is_valid());
+        let (s_alt, c_alt) = x.sin_cos_with_period_ref(u);
+        assert_eq!(ComparableFloatRef(&s_alt), ComparableFloatRef(&s));
+        assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+        let mut s_alt = x.clone();
+        let mut c_alt = Float::NAN;
+        s_alt.sin_cos_with_period_assign(&mut c_alt, u);
+        assert!(s_alt.is_valid());
+        assert!(c_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&s_alt), ComparableFloatRef(&s));
+        assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+        // the same as rounding to the input's precision, to nearest
+        let (s_alt, c_alt, _, _) =
+            x.sin_cos_with_period_prec_round_ref(u, x.significant_bits(), Nearest);
+        assert_eq!(ComparableFloatRef(&s_alt), ComparableFloatRef(&s));
+        assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+        // the pair agrees with the sine and cosine taken separately
+        assert_eq!(
+            ComparableFloatRef(&x.sin_with_period_ref(u)),
+            ComparableFloatRef(&s)
+        );
+        assert_eq!(
+            ComparableFloatRef(&x.cos_with_period_ref(u)),
+            ComparableFloatRef(&c)
+        );
+    });
+}
+
 // n quarter turns plus or minus 2^-k, exactly: inputs close to a zero of the sine (n even) or of
 // the cosine (n odd), where that result is tiny and, for a cancellation of at least 64 bits and
 // half the precision, takes its near-zero path while the other is within 2^-2k of ±1 and rounds
@@ -15943,6 +15976,29 @@ fn sin_cos_pi_properties() {
         assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
         assert_eq!(o_s_alt, o_s);
         assert_eq!(o_c_alt, o_c);
+    });
+
+    float_gen().test_properties(|x| {
+        let (s, c) = x.clone().sin_cos_pi();
+        assert!(s.is_valid());
+        assert!(c.is_valid());
+        let (s_alt, c_alt) = x.sin_cos_pi_ref();
+        assert_eq!(ComparableFloatRef(&s_alt), ComparableFloatRef(&s));
+        assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+        let mut s_alt = x.clone();
+        let mut c_alt = Float::NAN;
+        s_alt.sin_cos_pi_assign(&mut c_alt);
+        assert!(s_alt.is_valid());
+        assert!(c_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&s_alt), ComparableFloatRef(&s));
+        assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+        // the same as sin_cos_with_period with a period of 2
+        let (s_alt, c_alt) = x.sin_cos_with_period_ref(2);
+        assert_eq!(ComparableFloatRef(&s_alt), ComparableFloatRef(&s));
+        assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+        // the pair agrees with the sine and cosine taken separately
+        assert_eq!(ComparableFloatRef(&x.sin_pi_ref()), ComparableFloatRef(&s));
+        assert_eq!(ComparableFloatRef(&x.cos_pi_ref()), ComparableFloatRef(&c));
     });
 }
 

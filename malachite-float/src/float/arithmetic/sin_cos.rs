@@ -1958,6 +1958,69 @@ impl Float {
         self.sin_cos_with_period_prec_round_ref(u, self.significant_bits(), rm)
     }
 
+    /// Computes $\sin(2\pi x/u)$ and $\cos(2\pi x/u)$, the sine and cosine of a [`Float`] measured
+    /// in $u$ths of a turn (so that `u = 360` is degrees), together, rounding both results to the
+    /// precision of the input and to the nearest [`Float`]s. The [`Float`] is taken by value.
+    ///
+    /// If either result is equidistant from two [`Float`]s with the precision of the input, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// See [`Float::sin_cos_with_period_prec_round`] for the error bounds, the special and
+    /// closed-form cases, overflow and underflow, and the complexity; this function behaves the
+    /// same way with `prec` equal to the precision of the input and `rm` equal to `Nearest`.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::sin_cos_with_period_round`] instead. If you want to specify an output precision,
+    /// consider using [`Float::sin_cos_with_period_prec`]. If you want both of these things,
+    /// consider using [`Float::sin_cos_with_period_prec_round`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// let (s, c) = Float::from_unsigned_prec(1u32, 10).0.sin_cos_with_period(7);
+    /// assert_eq!(s.to_string(), "0.78223");
+    /// assert_eq!(c.to_string(), "0.62305");
+    /// ```
+    #[inline]
+    pub fn sin_cos_with_period(self, u: u64) -> (Self, Self) {
+        let prec = self.significant_bits();
+        let (s, c, _, _) = self.sin_cos_with_period_prec(u, prec);
+        (s, c)
+    }
+
+    /// Computes $\sin(2\pi x/u)$ and $\cos(2\pi x/u)$, the sine and cosine of a [`Float`] measured
+    /// in $u$ths of a turn (so that `u = 360` is degrees), together, rounding both results to the
+    /// precision of the input and to the nearest [`Float`]s. The [`Float`] is taken by reference.
+    ///
+    /// If either result is equidistant from two [`Float`]s with the precision of the input, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// See [`Float::sin_cos_with_period_prec_round`] for the error bounds, the special and
+    /// closed-form cases, overflow and underflow, and the complexity; this function behaves the
+    /// same way with `prec` equal to the precision of the input and `rm` equal to `Nearest`.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::sin_cos_with_period_round_ref`] instead. If you want to specify an output
+    /// precision, consider using [`Float::sin_cos_with_period_prec_ref`]. If you want both of these
+    /// things, consider using [`Float::sin_cos_with_period_prec_round_ref`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// let (s, c) = (&Float::from_unsigned_prec(1u32, 10).0).sin_cos_with_period_ref(7);
+    /// assert_eq!(s.to_string(), "0.78223");
+    /// assert_eq!(c.to_string(), "0.62305");
+    /// ```
+    #[inline]
+    pub fn sin_cos_with_period_ref(&self, u: u64) -> (Self, Self) {
+        let (s, c, _, _) = self.sin_cos_with_period_prec_ref(u, self.significant_bits());
+        (s, c)
+    }
+
     /// Replaces a [`Float`] measured in $u$ths of a turn with its sine and writes its cosine to
     /// `cos`, rounding both results to the specified precision and with the specified rounding
     /// mode. The previous value of `cos` is discarded. Two [`Ordering`]s are returned, indicating
@@ -2086,6 +2149,41 @@ impl Float {
     ) -> (Ordering, Ordering) {
         let prec = self.significant_bits();
         self.sin_cos_with_period_prec_round_assign(cos, u, prec, rm)
+    }
+
+    /// Computes $\sin(2\pi x/u)$ and $\cos(2\pi x/u)$, the sine and cosine of a [`Float`] measured
+    /// in $u$ths of a turn (so that `u = 360` is degrees), together, rounding both results to the
+    /// precision of the input and to the nearest [`Float`]s. The [`Float`] is replaced by the sine,
+    /// and the cosine is written to `cos`, whose previous value is discarded.
+    ///
+    /// If either result is equidistant from two [`Float`]s with the precision of the input, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// See [`Float::sin_cos_with_period_prec_round`] for the error bounds, the special and
+    /// closed-form cases, overflow and underflow, and the complexity; this function behaves the
+    /// same way with `prec` equal to the precision of the input and `rm` equal to `Nearest`.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::sin_cos_with_period_round_assign`] instead. If you want to specify an output
+    /// precision, consider using [`Float::sin_cos_with_period_prec_assign`]. If you want both of
+    /// these things, consider using [`Float::sin_cos_with_period_prec_round_assign`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::NaN;
+    /// use malachite_float::Float;
+    ///
+    /// let mut x = Float::from_unsigned_prec(1u32, 10).0;
+    /// let mut c = Float::NAN;
+    /// x.sin_cos_with_period_assign(&mut c, 7);
+    /// assert_eq!(x.to_string(), "0.78223");
+    /// assert_eq!(c.to_string(), "0.62305");
+    /// ```
+    #[inline]
+    pub fn sin_cos_with_period_assign(&mut self, cos: &mut Self, u: u64) {
+        let prec = self.significant_bits();
+        self.sin_cos_with_period_prec_assign(cos, u, prec);
     }
 }
 
@@ -2591,6 +2689,69 @@ impl Float {
         self.sin_cos_with_period_round_ref(2, rm)
     }
 
+    /// Computes $\sin(\pi x)$ and $\cos(\pi x)$, the sine and cosine of a [`Float`] measured in
+    /// half-turns, together, rounding both results to the precision of the input and to the nearest
+    /// [`Float`]s. The [`Float`] is taken by value.
+    ///
+    /// If either result is equidistant from two [`Float`]s with the precision of the input, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// This is `sin_cos_with_period` with a period of 2: see [`Float::sin_cos_with_period`] for the
+    /// error bounds, the special and closed-form cases, overflow and underflow, and the complexity,
+    /// with $u = 2$.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::sin_cos_pi_round`] instead. If you want to specify an output precision, consider
+    /// using [`Float::sin_cos_pi_prec`]. If you want both of these things, consider using
+    /// [`Float::sin_cos_pi_prec_round`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// let (s, c) = Float::from(0.1f64).sin_cos_pi();
+    /// assert_eq!(s.to_string(), "0.30901699437494745");
+    /// assert_eq!(c.to_string(), "0.95105651629515364");
+    /// ```
+    #[inline]
+    pub fn sin_cos_pi(self) -> (Self, Self) {
+        let prec = self.significant_bits();
+        let (s, c, _, _) = self.sin_cos_pi_prec(prec);
+        (s, c)
+    }
+
+    /// Computes $\sin(\pi x)$ and $\cos(\pi x)$, the sine and cosine of a [`Float`] measured in
+    /// half-turns, together, rounding both results to the precision of the input and to the nearest
+    /// [`Float`]s. The [`Float`] is taken by reference.
+    ///
+    /// If either result is equidistant from two [`Float`]s with the precision of the input, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// This is `sin_cos_with_period` with a period of 2: see [`Float::sin_cos_with_period`] for the
+    /// error bounds, the special and closed-form cases, overflow and underflow, and the complexity,
+    /// with $u = 2$.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::sin_cos_pi_round_ref`] instead. If you want to specify an output precision,
+    /// consider using [`Float::sin_cos_pi_prec_ref`]. If you want both of these things, consider
+    /// using [`Float::sin_cos_pi_prec_round_ref`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// let (s, c) = (&Float::from(0.1f64)).sin_cos_pi_ref();
+    /// assert_eq!(s.to_string(), "0.30901699437494745");
+    /// assert_eq!(c.to_string(), "0.95105651629515364");
+    /// ```
+    #[inline]
+    pub fn sin_cos_pi_ref(&self) -> (Self, Self) {
+        let (s, c, _, _) = self.sin_cos_pi_prec_ref(self.significant_bits());
+        (s, c)
+    }
+
     /// Replaces a [`Float`] measured in half-turns with its sine and writes its cosine to `cos`,
     /// rounding both results to the specified precision and with the specified rounding mode. The
     /// previous value of `cos` is discarded. Two [`Ordering`]s are returned, indicating whether the
@@ -2698,6 +2859,41 @@ impl Float {
         rm: RoundingMode,
     ) -> (Ordering, Ordering) {
         self.sin_cos_with_period_round_assign(cos, 2, rm)
+    }
+
+    /// Computes $\sin(\pi x)$ and $\cos(\pi x)$, the sine and cosine of a [`Float`] measured in
+    /// half-turns, together, rounding both results to the precision of the input and to the nearest
+    /// [`Float`]s. The [`Float`] is replaced by the sine, and the cosine is written to `cos`, whose
+    /// previous value is discarded.
+    ///
+    /// If either result is equidistant from two [`Float`]s with the precision of the input, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// This is `sin_cos_with_period` with a period of 2: see [`Float::sin_cos_with_period`] for the
+    /// error bounds, the special and closed-form cases, overflow and underflow, and the complexity,
+    /// with $u = 2$.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::sin_cos_pi_round_assign`] instead. If you want to specify an output precision,
+    /// consider using [`Float::sin_cos_pi_prec_assign`]. If you want both of these things, consider
+    /// using [`Float::sin_cos_pi_prec_round_assign`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::NaN;
+    /// use malachite_float::Float;
+    ///
+    /// let mut x = Float::from(0.1f64);
+    /// let mut c = Float::NAN;
+    /// x.sin_cos_pi_assign(&mut c);
+    /// assert_eq!(x.to_string(), "0.30901699437494745");
+    /// assert_eq!(c.to_string(), "0.95105651629515364");
+    /// ```
+    #[inline]
+    pub fn sin_cos_pi_assign(&mut self, cos: &mut Self) {
+        let prec = self.significant_bits();
+        self.sin_cos_pi_prec_assign(cos, prec);
     }
 }
 

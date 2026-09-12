@@ -21,11 +21,12 @@ use malachite_base::test_util::generators::{
 };
 use malachite_base::test_util::runner::Runner;
 use malachite_float::float::arithmetic::tan::{
-    primitive_float_tan, primitive_float_tan_rational, primitive_float_tan_with_period,
+    primitive_float_tan, primitive_float_tan_pi, primitive_float_tan_pi_rational,
+    primitive_float_tan_rational, primitive_float_tan_with_period,
     primitive_float_tan_with_period_rational,
 };
 use malachite_float::test_util::bench::bucketers::{
-    float_complexity_bucketer, pair_2_float_complexity_bucketer,
+    float_complexity_bucketer, pair_1_float_complexity_bucketer, pair_2_float_complexity_bucketer,
     pair_2_triple_1_2_float_primitive_int_max_complexity_bucketer,
     quadruple_1_float_complexity_bucketer, triple_1_2_float_primitive_int_max_complexity_bucketer,
     triple_1_float_complexity_bucketer,
@@ -36,7 +37,7 @@ use malachite_float::test_util::float::arithmetic::tan::{
 };
 use malachite_float::test_util::generators::{
     float_gen, float_gen_rm, float_gen_var_12, float_rounding_mode_pair_gen_var_47,
-    float_unsigned_pair_gen_var_1, float_unsigned_pair_gen_var_4,
+    float_unsigned_pair_gen_var_1, float_unsigned_pair_gen_var_2, float_unsigned_pair_gen_var_4,
     float_unsigned_rounding_mode_triple_gen_var_36,
     float_unsigned_rounding_mode_triple_gen_var_36_rm,
     float_unsigned_rounding_mode_triple_gen_var_39,
@@ -148,6 +149,29 @@ pub(crate) fn register(runner: &mut Runner) {
     register_primitive_float_demos!(runner, demo_primitive_float_tan_with_period_rational);
     register_primitive_float_benches!(runner, benchmark_primitive_float_tan_with_period);
     register_primitive_float_benches!(runner, benchmark_primitive_float_tan_with_period_rational);
+    register_demo!(runner, demo_float_tan_with_period);
+    register_demo!(runner, demo_float_tan_with_period_debug);
+    register_demo!(runner, demo_float_tan_with_period_ref);
+    register_demo!(runner, demo_float_tan_with_period_assign);
+    register_bench!(runner, benchmark_float_tan_with_period_evaluation_strategy);
+    register_demo!(runner, demo_float_tan_pi_prec_round);
+    register_demo!(runner, demo_float_tan_pi_prec_round_debug);
+    register_demo!(runner, demo_float_tan_pi_prec);
+    register_demo!(runner, demo_float_tan_pi_round);
+    register_demo!(runner, demo_float_tan_pi_prec_round_assign);
+    register_demo!(runner, demo_float_tan_pi_rational_prec_round);
+    register_demo!(runner, demo_float_tan_pi_rational_prec);
+    register_primitive_float_demos!(runner, demo_primitive_float_tan_pi);
+    register_primitive_float_demos!(runner, demo_primitive_float_tan_pi_rational);
+    register_bench!(
+        runner,
+        benchmark_float_tan_pi_prec_round_evaluation_strategy
+    );
+    register_demo!(runner, demo_float_tan_pi);
+    register_demo!(runner, demo_float_tan_pi_debug);
+    register_demo!(runner, demo_float_tan_pi_ref);
+    register_demo!(runner, demo_float_tan_pi_assign);
+    register_bench!(runner, benchmark_float_tan_pi_evaluation_strategy);
 }
 
 fn demo_float_tan(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -1320,5 +1344,297 @@ fn benchmark_primitive_float_tan_with_period_rational<T: PrimitiveFloat>(
         &mut [("malachite", &mut |(x, u)| {
             no_out!(primitive_float_tan_with_period_rational::<T>(&x, u));
         })],
+    );
+}
+
+fn demo_float_tan_with_period(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, u) in float_unsigned_pair_gen_var_2::<u64>()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        println!(
+            "({}).tan_with_period({}) = {}",
+            x_old,
+            u,
+            x.tan_with_period(u)
+        );
+    }
+}
+
+fn demo_float_tan_with_period_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, u) in float_unsigned_pair_gen_var_2::<u64>()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let s = x.tan_with_period(u);
+        println!(
+            "({:#x}).tan_with_period({}) = {:#x}",
+            ComparableFloat(x_old),
+            u,
+            ComparableFloat(s)
+        );
+    }
+}
+
+fn demo_float_tan_with_period_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, u) in float_unsigned_pair_gen_var_2::<u64>()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "(&{}).tan_with_period_ref({}) = {}",
+            x,
+            u,
+            x.tan_with_period_ref(u)
+        );
+    }
+}
+
+fn demo_float_tan_with_period_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, u) in float_unsigned_pair_gen_var_2::<u64>()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        x.tan_with_period_assign(u);
+        println!("x := {x_old}; x.tan_with_period_assign({u}); x = {x}");
+    }
+}
+
+fn benchmark_float_tan_with_period_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float.tan_with_period(u64)",
+        BenchmarkType::EvaluationStrategy,
+        float_unsigned_pair_gen_var_2::<u64>().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_1_float_complexity_bucketer("x"),
+        &mut [
+            ("Float.tan_with_period(u64)", &mut |(x, u)| {
+                no_out!(x.tan_with_period(u));
+            }),
+            ("(&Float).tan_with_period_ref(u64)", &mut |(x, u)| {
+                no_out!(x.tan_with_period_ref(u));
+            }),
+        ],
+    );
+}
+
+fn demo_float_tan_pi_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec, rm) in float_unsigned_rounding_mode_triple_gen_var_36()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "({}).tan_pi_prec_round({}, {}) = {:?}",
+            x.clone(),
+            prec,
+            rm,
+            x.tan_pi_prec_round(prec, rm)
+        );
+    }
+}
+
+fn demo_float_tan_pi_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec, rm) in float_unsigned_rounding_mode_triple_gen_var_36()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (c, o) = x.clone().tan_pi_prec_round(prec, rm);
+        println!(
+            "({:#x}).tan_pi_prec_round({}, {}) = ({:#x}, {:?})",
+            ComparableFloat(x),
+            prec,
+            rm,
+            ComparableFloat(c),
+            o
+        );
+    }
+}
+
+fn demo_float_tan_pi_prec(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec) in float_unsigned_pair_gen_var_1().get(gm, config).take(limit) {
+        println!(
+            "({}).tan_pi_prec({}) = {:?}",
+            x.clone(),
+            prec,
+            x.tan_pi_prec(prec)
+        );
+    }
+}
+
+fn demo_float_tan_pi_round(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, rm) in float_rounding_mode_pair_gen_var_47()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "({}).tan_pi_round({}) = {:?}",
+            x.clone(),
+            rm,
+            x.tan_pi_round(rm)
+        );
+    }
+}
+
+fn demo_float_tan_pi_prec_round_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, prec, rm) in float_unsigned_rounding_mode_triple_gen_var_36()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let o = x.tan_pi_prec_round_assign(prec, rm);
+        println!("x := {x_old}; x.tan_pi_prec_round_assign({prec}, {rm}) = {o:?}; x = {x}");
+    }
+}
+
+fn demo_float_tan_pi_rational_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec, rm) in rational_unsigned_rounding_mode_triple_gen_var_10()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "Float::tan_pi_rational_prec_round({}, {}, {}) = {:?}",
+            x.clone(),
+            prec,
+            rm,
+            Float::tan_pi_rational_prec_round(x, prec, rm)
+        );
+    }
+}
+
+fn demo_float_tan_pi_rational_prec(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec) in rational_unsigned_pair_gen_var_3()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "Float::tan_pi_rational_prec({}, {}) = {:?}",
+            x.clone(),
+            prec,
+            Float::tan_pi_rational_prec(x, prec)
+        );
+    }
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn demo_primitive_float_tan_pi<T: PrimitiveFloat>(gm: GenMode, config: &GenConfig, limit: usize)
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    for x in primitive_float_gen::<T>().get(gm, config).take(limit) {
+        println!(
+            "primitive_float_tan_pi({}) = {}",
+            NiceFloat(x),
+            NiceFloat(primitive_float_tan_pi(x))
+        );
+    }
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn demo_primitive_float_tan_pi_rational<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    for x in rational_gen().get(gm, config).take(limit) {
+        println!(
+            "primitive_float_tan_pi_rational({}) = {:?}",
+            x,
+            NiceFloat(primitive_float_tan_pi_rational::<T>(&x))
+        );
+    }
+}
+
+fn benchmark_float_tan_pi_prec_round_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float.tan_pi_prec_round(u64, RoundingMode)",
+        BenchmarkType::EvaluationStrategy,
+        float_unsigned_rounding_mode_triple_gen_var_36().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &triple_1_2_float_primitive_int_max_complexity_bucketer("x", "prec"),
+        &mut [
+            (
+                "Float.tan_pi_prec_round(u64, RoundingMode)",
+                &mut |(x, prec, rm)| no_out!(x.tan_pi_prec_round(prec, rm)),
+            ),
+            (
+                "(&Float).tan_pi_prec_round_ref(u64, RoundingMode)",
+                &mut |(x, prec, rm)| no_out!(x.tan_pi_prec_round_ref(prec, rm)),
+            ),
+        ],
+    );
+}
+
+fn demo_float_tan_pi(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen().get(gm, config).take(limit) {
+        let x_old = x.clone();
+        println!("({}).tan_pi() = {}", x_old, x.tan_pi());
+    }
+}
+
+fn demo_float_tan_pi_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen().get(gm, config).take(limit) {
+        let x_old = x.clone();
+        let s = x.tan_pi();
+        println!(
+            "({:#x}).tan_pi() = {:#x}",
+            ComparableFloat(x_old),
+            ComparableFloat(s)
+        );
+    }
+}
+
+fn demo_float_tan_pi_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen().get(gm, config).take(limit) {
+        println!("(&{}).tan_pi_ref() = {}", x, x.tan_pi_ref());
+    }
+}
+
+fn demo_float_tan_pi_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for mut x in float_gen().get(gm, config).take(limit) {
+        let x_old = x.clone();
+        x.tan_pi_assign();
+        println!("x := {x_old}; x.tan_pi_assign(); x = {x}");
+    }
+}
+
+fn benchmark_float_tan_pi_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float.tan_pi()",
+        BenchmarkType::EvaluationStrategy,
+        float_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &float_complexity_bucketer("x"),
+        &mut [
+            ("Float.tan_pi()", &mut |x| no_out!(x.tan_pi())),
+            ("(&Float).tan_pi_ref()", &mut |x| no_out!(x.tan_pi_ref())),
+        ],
     );
 }

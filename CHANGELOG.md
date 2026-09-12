@@ -308,6 +308,18 @@ documented by git history.
   `primitive_float_tan_with_period` and `primitive_float_tan_with_period_rational` give the
   correctly rounded `f32` or `f64` tangent; a primitive float is never merely close enough to a
   pole to overflow, but a `Rational` can be.
+- `tan_pi_prec_round`, `tan_pi_prec`, `tan_pi_round`, and `tan_pi` (with `_ref` and `_assign`
+  variants), a port of `mpfr_tanpi`: the tangent of a `Float` measured in half-turns, delegating to
+  `tan_with_period` with a period of 2. Integers give a signed zero, half-integers are poles and
+  give an infinity, odd multiples of a quarter give $\pm1$, and thirds and sixths give $\pm\sqrt3$
+  or $\pm\sqrt3/3$. `tan_pi_rational_prec_round` and `tan_pi_rational_prec` (with `_ref` variants)
+  take a `Rational` instead, and `primitive_float_tan_pi` and `primitive_float_tan_pi_rational`
+  give the correctly rounded `f32` or `f64` tangent.
+- `sin_with_period`, `cos_with_period`, `tan_with_period`, `sin_cos_with_period`, `sin_pi`,
+  `cos_pi`, and `sin_cos_pi` on `Float` (each with `_ref` and `_assign` variants), rounding to the
+  precision of the input and to the nearest `Float`. This is the tier that `sin`, `cos`, `tan`, and
+  `sin_cos` already had through their traits; a function that takes a period cannot go through one,
+  since `Sin` and its siblings take no extra argument, so these are inherent methods.
 - The Dottie number, the fixed point of the cosine, as `dottie_number_prec_round` and
   `dottie_number_prec` on `Float`, correctly rounded to any precision (Newton's method with a
   certified final bracket), and as a `DottieNumber` trait with constants for primitive floats.

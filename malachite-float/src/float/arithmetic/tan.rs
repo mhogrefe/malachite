@@ -2038,6 +2038,71 @@ impl Float {
         self.tan_with_period_prec_round_ref(u, self.significant_bits(), rm)
     }
 
+    /// Computes $\tan(2\pi x/u)$, the tangent of a [`Float`] measured in $u$ths of a turn (so that
+    /// `u = 360` is degrees), rounding the result to the precision of the input and to the nearest
+    /// [`Float`]. The [`Float`] is taken by value.
+    ///
+    /// If the tangent is equidistant from two [`Float`]s with the precision of the input, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// See [`Float::tan_with_period_prec_round`] for the error bounds, the special and closed-form
+    /// cases, overflow and underflow, and the complexity; this function behaves the same way with
+    /// `prec` equal to the precision of the input and `rm` equal to `Nearest`.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::tan_with_period_round`] instead. If you want to specify an output precision,
+    /// consider using [`Float::tan_with_period_prec`]. If you want both of these things, consider
+    /// using [`Float::tan_with_period_prec_round`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// let t = Float::from_unsigned_prec(1u32, 10).0.tan_with_period(7);
+    /// assert_eq!(t.to_string(), "1.2539");
+    ///
+    /// // a quarter turn is a pole
+    /// assert_eq!(
+    ///     Float::from(90u32).tan_with_period(360).to_string(),
+    ///     "Infinity"
+    /// );
+    /// ```
+    #[inline]
+    pub fn tan_with_period(self, u: u64) -> Self {
+        let prec = self.significant_bits();
+        self.tan_with_period_prec(u, prec).0
+    }
+
+    /// Computes $\tan(2\pi x/u)$, the tangent of a [`Float`] measured in $u$ths of a turn (so that
+    /// `u = 360` is degrees), rounding the result to the precision of the input and to the nearest
+    /// [`Float`]. The [`Float`] is taken by reference.
+    ///
+    /// If the tangent is equidistant from two [`Float`]s with the precision of the input, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// See [`Float::tan_with_period_prec_round`] for the error bounds, the special and closed-form
+    /// cases, overflow and underflow, and the complexity; this function behaves the same way with
+    /// `prec` equal to the precision of the input and `rm` equal to `Nearest`.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::tan_with_period_round_ref`] instead. If you want to specify an output precision,
+    /// consider using [`Float::tan_with_period_prec_ref`]. If you want both of these things,
+    /// consider using [`Float::tan_with_period_prec_round_ref`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// let t = (&Float::from_unsigned_prec(1u32, 10).0).tan_with_period_ref(7);
+    /// assert_eq!(t.to_string(), "1.2539");
+    /// ```
+    #[inline]
+    pub fn tan_with_period_ref(&self, u: u64) -> Self {
+        self.tan_with_period_prec_ref(u, self.significant_bits()).0
+    }
+
     /// Replaces a [`Float`] measured in $u$ths of a turn with its tangent, rounding the result to
     /// the specified precision and with the specified rounding mode. An [`Ordering`] is returned,
     /// indicating whether the rounded tangent is less than, equal to, or greater than the exact
@@ -2128,6 +2193,37 @@ impl Float {
     pub fn tan_with_period_round_assign(&mut self, u: u64, rm: RoundingMode) -> Ordering {
         let prec = self.significant_bits();
         self.tan_with_period_prec_round_assign(u, prec, rm)
+    }
+
+    /// Computes $\tan(2\pi x/u)$, the tangent of a [`Float`] measured in $u$ths of a turn (so that
+    /// `u = 360` is degrees), rounding the result to the precision of the input and to the nearest
+    /// [`Float`]. The [`Float`] is replaced by the result.
+    ///
+    /// If the tangent is equidistant from two [`Float`]s with the precision of the input, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// See [`Float::tan_with_period_prec_round`] for the error bounds, the special and closed-form
+    /// cases, overflow and underflow, and the complexity; this function behaves the same way with
+    /// `prec` equal to the precision of the input and `rm` equal to `Nearest`.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::tan_with_period_round_assign`] instead. If you want to specify an output precision,
+    /// consider using [`Float::tan_with_period_prec_assign`]. If you want both of these things,
+    /// consider using [`Float::tan_with_period_prec_round_assign`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// let mut x = Float::from_unsigned_prec(1u32, 10).0;
+    /// x.tan_with_period_assign(7);
+    /// assert_eq!(x.to_string(), "1.2539");
+    /// ```
+    #[inline]
+    pub fn tan_with_period_assign(&mut self, u: u64) {
+        let prec = self.significant_bits();
+        self.tan_with_period_prec_assign(u, prec);
     }
 }
 
@@ -2364,6 +2460,555 @@ impl Float {
     #[inline]
     pub fn tan_with_period_rational_prec_ref(x: &Rational, u: u64, prec: u64) -> (Self, Ordering) {
         Self::tan_with_period_rational_prec_round_ref(x, u, prec, Nearest)
+    }
+
+    /// Computes $\tan(\pi x)$, the tangent of a [`Float`] measured in half-turns, rounding the
+    /// result to the specified precision and with the specified rounding mode. The [`Float`] is
+    /// taken by value. An [`Ordering`] is also returned, indicating whether the rounded tangent is
+    /// less than, equal to, or greater than the exact tangent. Although `NaN`s are not comparable
+    /// to any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// This is `tan_with_period` with a period of 2: see [`Float::tan_with_period_prec_round`] for
+    /// the error bounds, the special and closed-form cases (integers give $\pm0.0$, with the sign
+    /// of the input at even integers and the opposite sign at odd ones; half-integers are poles and
+    /// give $\pm\infty$; odd multiples of $1/4$ give $\pm1$; and multiples of $1/3$ and $1/6$ give
+    /// $\pm\sqrt3$ or $\pm\sqrt3/3$), overflow and underflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::from(0.1f64).tan_pi_prec_round(10, Floor);
+    /// assert_eq!(t.to_string(), "0.32471");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (t, o) = Float::from(0.1f64).tan_pi_prec_round(10, Ceiling);
+    /// assert_eq!(t.to_string(), "0.32520");
+    /// assert_eq!(o, Greater);
+    ///
+    /// // a half-turn is exactly zero, reached from below
+    /// let (t, o) = Float::ONE.tan_pi_prec_round(10, Exact);
+    /// assert_eq!(t.to_string(), "-0.0");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn tan_pi_prec_round(self, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+        self.tan_with_period_prec_round(2, prec, rm)
+    }
+
+    /// Computes $\tan(\pi x)$, the tangent of a [`Float`] measured in half-turns, rounding the
+    /// result to the specified precision and with the specified rounding mode. The [`Float`] is
+    /// taken by reference. An [`Ordering`] is also returned, indicating whether the rounded tangent
+    /// is less than, equal to, or greater than the exact tangent. Although `NaN`s are not
+    /// comparable to any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// This is `tan_with_period` with a period of 2: see [`Float::tan_with_period_prec_round_ref`]
+    /// for the error bounds, the special and closed-form cases (integers give $\pm0.0$, with the
+    /// sign of the input at even integers and the opposite sign at odd ones; half-integers are
+    /// poles and give $\pm\infty$; odd multiples of $1/4$ give $\pm1$; and multiples of $1/3$ and
+    /// $1/6$ give $\pm\sqrt3$ or $\pm\sqrt3/3$), overflow and underflow, and the complexity, with
+    /// $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = (Float::from(0.1f64)).tan_pi_prec_round_ref(10, Floor);
+    /// assert_eq!(t.to_string(), "0.32471");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (t, o) = (Float::from(0.1f64)).tan_pi_prec_round_ref(10, Ceiling);
+    /// assert_eq!(t.to_string(), "0.32520");
+    /// assert_eq!(o, Greater);
+    ///
+    /// // a half-turn is exactly zero, reached from below
+    /// let (t, o) = (&Float::ONE).tan_pi_prec_round_ref(10, Exact);
+    /// assert_eq!(t.to_string(), "-0.0");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn tan_pi_prec_round_ref(&self, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+        self.tan_with_period_prec_round_ref(2, prec, rm)
+    }
+
+    /// Computes $\tan(\pi x)$, the tangent of a [`Float`] measured in half-turns, rounding the
+    /// result to the nearest value of the specified precision. The [`Float`] is taken by value. An
+    /// [`Ordering`] is also returned, indicating whether the rounded tangent is less than, equal
+    /// to, or greater than the exact tangent. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// This is `tan_with_period` with a period of 2: see [`Float::tan_with_period_prec`] for the
+    /// error bounds, the special and closed-form cases (integers give $\pm0.0$, with the sign of
+    /// the input at even integers and the opposite sign at odd ones; half-integers are poles and
+    /// give $\pm\infty$; odd multiples of $1/4$ give $\pm1$; and multiples of $1/3$ and $1/6$ give
+    /// $\pm\sqrt3$ or $\pm\sqrt3/3$), overflow and underflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::from(0.1f64).tan_pi_prec(10);
+    /// assert_eq!(t.to_string(), "0.32471");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (t, o) = Float::from(0.1f64).tan_pi_prec(53);
+    /// assert_eq!(t.to_string(), "0.32491969623290634");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn tan_pi_prec(self, prec: u64) -> (Self, Ordering) {
+        self.tan_with_period_prec(2, prec)
+    }
+
+    /// Computes $\tan(\pi x)$, the tangent of a [`Float`] measured in half-turns, rounding the
+    /// result to the nearest value of the specified precision. The [`Float`] is taken by reference.
+    /// An [`Ordering`] is also returned, indicating whether the rounded tangent is less than, equal
+    /// to, or greater than the exact tangent. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// This is `tan_with_period` with a period of 2: see [`Float::tan_with_period_prec_ref`] for
+    /// the error bounds, the special and closed-form cases (integers give $\pm0.0$, with the sign
+    /// of the input at even integers and the opposite sign at odd ones; half-integers are poles and
+    /// give $\pm\infty$; odd multiples of $1/4$ give $\pm1$; and multiples of $1/3$ and $1/6$ give
+    /// $\pm\sqrt3$ or $\pm\sqrt3/3$), overflow and underflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = (Float::from(0.1f64)).tan_pi_prec_ref(10);
+    /// assert_eq!(t.to_string(), "0.32471");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (t, o) = (Float::from(0.1f64)).tan_pi_prec_ref(53);
+    /// assert_eq!(t.to_string(), "0.32491969623290634");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn tan_pi_prec_ref(&self, prec: u64) -> (Self, Ordering) {
+        self.tan_with_period_prec_ref(2, prec)
+    }
+
+    /// Computes $\tan(\pi x)$, the tangent of a [`Float`] measured in half-turns, rounding the
+    /// result with the specified rounding mode. The precision of the output is the precision of the
+    /// input. The [`Float`] is taken by value. An [`Ordering`] is also returned, indicating whether
+    /// the rounded tangent is less than, equal to, or greater than the exact tangent. Although
+    /// `NaN`s are not comparable to any [`Float`], whenever this function returns a `NaN` it also
+    /// returns `Equal`.
+    ///
+    /// This is `tan_with_period` with a period of 2: see [`Float::tan_with_period_round`] for the
+    /// error bounds, the special and closed-form cases (integers give $\pm0.0$, with the sign of
+    /// the input at even integers and the opposite sign at odd ones; half-integers are poles and
+    /// give $\pm\infty$; odd multiples of $1/4$ give $\pm1$; and multiples of $1/3$ and $1/6$ give
+    /// $\pm\sqrt3$ or $\pm\sqrt3/3$), overflow and underflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the input
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::from(0.1f64).tan_pi_round(Floor);
+    /// assert_eq!(t.to_string(), "0.32491969623290629");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (t, o) = Float::from(0.1f64).tan_pi_round(Nearest);
+    /// assert_eq!(t.to_string(), "0.32491969623290640");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn tan_pi_round(self, rm: RoundingMode) -> (Self, Ordering) {
+        self.tan_with_period_round(2, rm)
+    }
+
+    /// Computes $\tan(\pi x)$, the tangent of a [`Float`] measured in half-turns, rounding the
+    /// result with the specified rounding mode. The precision of the output is the precision of the
+    /// input. The [`Float`] is taken by reference. An [`Ordering`] is also returned, indicating
+    /// whether the rounded tangent is less than, equal to, or greater than the exact tangent.
+    /// Although `NaN`s are not comparable to any [`Float`], whenever this function returns a `NaN`
+    /// it also returns `Equal`.
+    ///
+    /// This is `tan_with_period` with a period of 2: see [`Float::tan_with_period_round_ref`] for
+    /// the error bounds, the special and closed-form cases (integers give $\pm0.0$, with the sign
+    /// of the input at even integers and the opposite sign at odd ones; half-integers are poles and
+    /// give $\pm\infty$; odd multiples of $1/4$ give $\pm1$; and multiples of $1/3$ and $1/6$ give
+    /// $\pm\sqrt3$ or $\pm\sqrt3/3$), overflow and underflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the input
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = (Float::from(0.1f64)).tan_pi_round_ref(Floor);
+    /// assert_eq!(t.to_string(), "0.32491969623290629");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (t, o) = (Float::from(0.1f64)).tan_pi_round_ref(Nearest);
+    /// assert_eq!(t.to_string(), "0.32491969623290640");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn tan_pi_round_ref(&self, rm: RoundingMode) -> (Self, Ordering) {
+        self.tan_with_period_round_ref(2, rm)
+    }
+
+    /// Computes $\tan(\pi x)$, the tangent of a [`Float`] measured in half-turns, rounding the
+    /// result to the precision of the input and to the nearest [`Float`]. The [`Float`] is taken by
+    /// value.
+    ///
+    /// If the tangent is equidistant from two [`Float`]s with the precision of the input, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// This is `tan_with_period` with a period of 2: see [`Float::tan_with_period`] for the error
+    /// bounds, the special and closed-form cases (integers give $\pm0.0$, with the sign of the
+    /// input at even integers and the opposite sign at odd ones; half-integers are poles and give
+    /// $\pm\infty$; odd multiples of $1/4$ give $\pm1$; and multiples of $1/3$ and $1/6$ give
+    /// $\pm\sqrt3$ or $\pm\sqrt3/3$), overflow and underflow, and the complexity, with $u = 2$.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::tan_pi_round`] instead. If you want to specify an output precision, consider using
+    /// [`Float::tan_pi_prec`]. If you want both of these things, consider using
+    /// [`Float::tan_pi_prec_round`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// let t = Float::from(0.1f64).tan_pi();
+    /// assert_eq!(t.to_string(), "0.32491969623290640");
+    ///
+    /// // a half-integer is a pole
+    /// assert_eq!(Float::from(0.5f64).tan_pi().to_string(), "Infinity");
+    /// ```
+    #[inline]
+    pub fn tan_pi(self) -> Self {
+        let prec = self.significant_bits();
+        self.tan_pi_prec(prec).0
+    }
+
+    /// Computes $\tan(\pi x)$, the tangent of a [`Float`] measured in half-turns, rounding the
+    /// result to the precision of the input and to the nearest [`Float`]. The [`Float`] is taken by
+    /// reference.
+    ///
+    /// If the tangent is equidistant from two [`Float`]s with the precision of the input, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// This is `tan_with_period` with a period of 2: see [`Float::tan_with_period`] for the error
+    /// bounds, the special and closed-form cases (integers give $\pm0.0$, with the sign of the
+    /// input at even integers and the opposite sign at odd ones; half-integers are poles and give
+    /// $\pm\infty$; odd multiples of $1/4$ give $\pm1$; and multiples of $1/3$ and $1/6$ give
+    /// $\pm\sqrt3$ or $\pm\sqrt3/3$), overflow and underflow, and the complexity, with $u = 2$.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::tan_pi_round_ref`] instead. If you want to specify an output precision, consider
+    /// using [`Float::tan_pi_prec_ref`]. If you want both of these things, consider using
+    /// [`Float::tan_pi_prec_round_ref`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// let t = (&Float::from(0.1f64)).tan_pi_ref();
+    /// assert_eq!(t.to_string(), "0.32491969623290640");
+    /// ```
+    #[inline]
+    pub fn tan_pi_ref(&self) -> Self {
+        self.tan_pi_prec_ref(self.significant_bits()).0
+    }
+
+    /// Computes $\tan(\pi x)$, the tangent of a [`Float`] measured in half-turns, rounding the
+    /// result to the specified precision and with the specified rounding mode. The [`Float`] is
+    /// replaced by the result, and an [`Ordering`] is returned, indicating whether the rounded
+    /// tangent is less than, equal to, or greater than the exact tangent. Although `NaN`s are not
+    /// comparable to any [`Float`], whenever this function sets a `NaN` it also returns `Equal`.
+    ///
+    /// This is `tan_with_period` with a period of 2: see
+    /// [`Float::tan_with_period_prec_round_assign`] for the error bounds, the special and
+    /// closed-form cases (integers give $\pm0.0$, with the sign of the input at even integers and
+    /// the opposite sign at odd ones; half-integers are poles and give $\pm\infty$; odd multiples
+    /// of $1/4$ give $\pm1$; and multiples of $1/3$ and $1/6$ give $\pm\sqrt3$ or $\pm\sqrt3/3$),
+    /// overflow and underflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from(0.1f64);
+    /// assert_eq!(x.tan_pi_prec_round_assign(10, Floor), Less);
+    /// assert_eq!(x.to_string(), "0.32471");
+    ///
+    /// let mut x = Float::from(0.1f64);
+    /// assert_eq!(x.tan_pi_prec_round_assign(10, Ceiling), Greater);
+    /// assert_eq!(x.to_string(), "0.32520");
+    /// ```
+    #[inline]
+    pub fn tan_pi_prec_round_assign(&mut self, prec: u64, rm: RoundingMode) -> Ordering {
+        self.tan_with_period_prec_round_assign(2, prec, rm)
+    }
+
+    /// Computes $\tan(\pi x)$, the tangent of a [`Float`] measured in half-turns, rounding the
+    /// result to the nearest value of the specified precision. The [`Float`] is replaced by the
+    /// result, and an [`Ordering`] is returned, indicating whether the rounded tangent is less
+    /// than, equal to, or greater than the exact tangent. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function sets a `NaN` it also returns `Equal`.
+    ///
+    /// This is `tan_with_period` with a period of 2: see [`Float::tan_with_period_prec_assign`] for
+    /// the error bounds, the special and closed-form cases (integers give $\pm0.0$, with the sign
+    /// of the input at even integers and the opposite sign at odd ones; half-integers are poles and
+    /// give $\pm\infty$; odd multiples of $1/4$ give $\pm1$; and multiples of $1/3$ and $1/6$ give
+    /// $\pm\sqrt3$ or $\pm\sqrt3/3$), overflow and underflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from(0.1f64);
+    /// assert_eq!(x.tan_pi_prec_assign(10), Less);
+    /// assert_eq!(x.to_string(), "0.32471");
+    /// ```
+    #[inline]
+    pub fn tan_pi_prec_assign(&mut self, prec: u64) -> Ordering {
+        self.tan_with_period_prec_assign(2, prec)
+    }
+
+    /// Computes $\tan(\pi x)$, the tangent of a [`Float`] measured in half-turns, rounding the
+    /// result with the specified rounding mode. The precision of the output is the precision of the
+    /// input. The [`Float`] is replaced by the result, and an [`Ordering`] is returned, indicating
+    /// whether the rounded tangent is less than, equal to, or greater than the exact tangent.
+    /// Although `NaN`s are not comparable to any [`Float`], whenever this function sets a `NaN` it
+    /// also returns `Equal`.
+    ///
+    /// This is `tan_with_period` with a period of 2: see [`Float::tan_with_period_round_assign`]
+    /// for the error bounds, the special and closed-form cases (integers give $\pm0.0$, with the
+    /// sign of the input at even integers and the opposite sign at odd ones; half-integers are
+    /// poles and give $\pm\infty$; odd multiples of $1/4$ give $\pm1$; and multiples of $1/3$ and
+    /// $1/6$ give $\pm\sqrt3$ or $\pm\sqrt3/3$), overflow and underflow, and the complexity, with
+    /// $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the input
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from(0.1f64);
+    /// assert_eq!(x.tan_pi_round_assign(Floor), Less);
+    /// assert_eq!(x.to_string(), "0.32491969623290629");
+    /// ```
+    #[inline]
+    pub fn tan_pi_round_assign(&mut self, rm: RoundingMode) -> Ordering {
+        self.tan_with_period_round_assign(2, rm)
+    }
+
+    /// Computes $\tan(\pi x)$, the tangent of a [`Float`] measured in half-turns, rounding the
+    /// result to the precision of the input and to the nearest [`Float`]. The [`Float`] is replaced
+    /// by the result.
+    ///
+    /// If the tangent is equidistant from two [`Float`]s with the precision of the input, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// This is `tan_with_period` with a period of 2: see [`Float::tan_with_period`] for the error
+    /// bounds, the special and closed-form cases (integers give $\pm0.0$, with the sign of the
+    /// input at even integers and the opposite sign at odd ones; half-integers are poles and give
+    /// $\pm\infty$; odd multiples of $1/4$ give $\pm1$; and multiples of $1/3$ and $1/6$ give
+    /// $\pm\sqrt3$ or $\pm\sqrt3/3$), overflow and underflow, and the complexity, with $u = 2$.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::tan_pi_round_assign`] instead. If you want to specify an output precision, consider
+    /// using [`Float::tan_pi_prec_assign`]. If you want both of these things, consider using
+    /// [`Float::tan_pi_prec_round_assign`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// let mut x = Float::from(0.1f64);
+    /// x.tan_pi_assign();
+    /// assert_eq!(x.to_string(), "0.32491969623290640");
+    /// ```
+    #[inline]
+    pub fn tan_pi_assign(&mut self) {
+        let prec = self.significant_bits();
+        self.tan_pi_prec_assign(prec);
+    }
+
+    /// Computes $\tan(\pi x)$, the tangent of a [`Rational`] measured in half-turns, rounding the
+    /// result to the specified precision and with the specified rounding mode and returning the
+    /// result as a [`Float`]. The [`Rational`] is taken by value. An [`Ordering`] is also returned,
+    /// indicating whether the rounded tangent is less than, equal to, or greater than the exact
+    /// tangent.
+    ///
+    /// This is `tan_with_period_rational` with a period of 2: see
+    /// [`Float::tan_with_period_rational_prec_round`] for the error bounds, the special and
+    /// closed-form cases, overflow and underflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::tan_pi_rational_prec_round(Rational::from_unsigneds(1u8, 7), 10, Floor);
+    /// assert_eq!(t.to_string(), "0.48145");
+    /// assert_eq!(o, Less);
+    ///
+    /// // a quarter of a half-turn is exactly 1
+    /// let (t, o) = Float::tan_pi_rational_prec_round(Rational::from_unsigneds(1u8, 4), 10, Exact);
+    /// assert_eq!(t.to_string(), "1.0000");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn tan_pi_rational_prec_round(
+        x: Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        Self::tan_with_period_rational_prec_round_ref(&x, 2, prec, rm)
+    }
+
+    /// Computes $\tan(\pi x)$, the tangent of a [`Rational`] measured in half-turns, rounding the
+    /// result to the specified precision and with the specified rounding mode and returning the
+    /// result as a [`Float`]. The [`Rational`] is taken by reference. An [`Ordering`] is also
+    /// returned, indicating whether the rounded tangent is less than, equal to, or greater than the
+    /// exact tangent.
+    ///
+    /// This is `tan_with_period_rational` with a period of 2: see
+    /// [`Float::tan_with_period_rational_prec_round_ref`] for the error bounds, the special and
+    /// closed-form cases, overflow and underflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) =
+    ///     Float::tan_pi_rational_prec_round_ref(&Rational::from_unsigneds(1u8, 7), 10, Ceiling);
+    /// assert_eq!(t.to_string(), "0.48193");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn tan_pi_rational_prec_round_ref(
+        x: &Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        Self::tan_with_period_rational_prec_round_ref(x, 2, prec, rm)
+    }
+
+    /// Computes $\tan(\pi x)$, the tangent of a [`Rational`] measured in half-turns, rounding the
+    /// result to the nearest value of the specified precision and returning the result as a
+    /// [`Float`]. The [`Rational`] is taken by value. An [`Ordering`] is also returned, indicating
+    /// whether the rounded tangent is less than, equal to, or greater than the exact tangent.
+    ///
+    /// This is `tan_with_period_rational` with a period of 2: see
+    /// [`Float::tan_with_period_rational_prec`] for the error bounds, the special and closed-form
+    /// cases, overflow and underflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::tan_pi_rational_prec(Rational::from_unsigneds(1u8, 7), 53);
+    /// assert_eq!(t.to_string(), "0.48157461880752866");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn tan_pi_rational_prec(x: Rational, prec: u64) -> (Self, Ordering) {
+        Self::tan_with_period_rational_prec_ref(&x, 2, prec)
+    }
+
+    /// Computes $\tan(\pi x)$, the tangent of a [`Rational`] measured in half-turns, rounding the
+    /// result to the nearest value of the specified precision and returning the result as a
+    /// [`Float`]. The [`Rational`] is taken by reference. An [`Ordering`] is also returned,
+    /// indicating whether the rounded tangent is less than, equal to, or greater than the exact
+    /// tangent.
+    ///
+    /// This is `tan_with_period_rational` with a period of 2: see
+    /// [`Float::tan_with_period_rational_prec_ref`] for the error bounds, the special and
+    /// closed-form cases, overflow and underflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::tan_pi_rational_prec_ref(&Rational::from_unsigneds(1u8, 7), 53);
+    /// assert_eq!(t.to_string(), "0.48157461880752866");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn tan_pi_rational_prec_ref(x: &Rational, prec: u64) -> (Self, Ordering) {
+        Self::tan_with_period_rational_prec_ref(x, 2, prec)
     }
 }
 
@@ -2881,4 +3526,99 @@ where
         |x, prec| Float::tan_with_period_rational_prec_ref(x, u, prec),
         x,
     )
+}
+
+/// Computes $\tan(\pi x)$, the tangent of a primitive float measured in half-turns.
+///
+/// This is `primitive_float_tan_with_period` with a period of 2: see
+/// [`primitive_float_tan_with_period`] for the error bound and the special cases, with $u = 2$.
+/// Half-integers are poles and give exactly $\pm\infty$; integers give exactly $\pm0.0$, with the
+/// sign of the input at even integers and the opposite sign at odd ones; and odd multiples of $1/4$
+/// give exactly $\pm1$.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::tan::primitive_float_tan_pi;
+///
+/// assert!(primitive_float_tan_pi(f32::NAN).is_nan());
+/// // a half-integer is a pole
+/// assert_eq!(
+///     NiceFloat(primitive_float_tan_pi(0.5f32)),
+///     NiceFloat(f32::INFINITY)
+/// );
+/// // an odd integer is a zero, reached from below
+/// assert_eq!(NiceFloat(primitive_float_tan_pi(1.0f64)), NiceFloat(-0.0));
+/// // an odd multiple of a quarter is exactly 1
+/// assert_eq!(NiceFloat(primitive_float_tan_pi(0.25f32)), NiceFloat(1.0));
+/// assert_eq!(
+///     NiceFloat(primitive_float_tan_pi(0.1f32)),
+///     NiceFloat(0.3249197)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_tan_pi(0.1f64)),
+///     NiceFloat(0.32491969623290634)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_tan_pi<T: PrimitiveFloat>(x: T) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    primitive_float_tan_with_period(x, 2)
+}
+
+/// Computes $\tan(\pi x)$, the tangent of a [`Rational`] measured in half-turns, returning the
+/// result as a primitive float.
+///
+/// This is `primitive_float_tan_with_period_rational` with a period of 2: see
+/// [`primitive_float_tan_with_period_rational`] for the error bound, the special cases, and the
+/// complexity, with $u = 2$.
+///
+/// # Worst-case complexity
+/// $T(m) = O(m (\log m)^2 \log\log m)$
+///
+/// $M(m) = O(m \log m)$
+///
+/// where $T$ is time, $M$ is additional memory, and $m$ is `x.significant_bits()`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::OneHalf;
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::tan::primitive_float_tan_pi_rational;
+/// use malachite_q::Rational;
+///
+/// // a half of a half-turn is a pole
+/// assert_eq!(
+///     NiceFloat(primitive_float_tan_pi_rational::<f64>(&Rational::ONE_HALF)),
+///     NiceFloat(f64::INFINITY)
+/// );
+/// // a sixth of a half-turn is sqrt(3)/3
+/// assert_eq!(
+///     NiceFloat(primitive_float_tan_pi_rational::<f64>(
+///         &Rational::from_unsigneds(1u8, 6)
+///     )),
+///     NiceFloat(0.5773502691896257)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_tan_pi_rational::<f64>(
+///         &Rational::from_unsigneds(1u8, 7)
+///     )),
+///     NiceFloat(0.48157461880752866)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_tan_pi_rational<T: PrimitiveFloat>(x: &Rational) -> T
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    primitive_float_tan_with_period_rational(x, 2)
 }

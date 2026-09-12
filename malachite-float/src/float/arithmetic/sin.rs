@@ -2281,6 +2281,68 @@ impl Float {
         self.sin_with_period_prec_round_ref(u, self.significant_bits(), rm)
     }
 
+    /// Computes $\sin(2\pi x/u)$, the sine of a [`Float`] measured in $u$ths of a turn (so that `u
+    /// = 360` is degrees), rounding the result to the precision of the input and to the nearest
+    /// [`Float`]. The [`Float`] is taken by value.
+    ///
+    /// If the sine is equidistant from two [`Float`]s with the precision of the input, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// See [`Float::sin_with_period_prec_round`] for the error bounds, the special and closed-form
+    /// cases, overflow and underflow, and the complexity; this function behaves the same way with
+    /// `prec` equal to the precision of the input and `rm` equal to `Nearest`.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::sin_with_period_round`] instead. If you want to specify an output precision,
+    /// consider using [`Float::sin_with_period_prec`]. If you want both of these things, consider
+    /// using [`Float::sin_with_period_prec_round`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// let s = Float::from_unsigned_prec(1u32, 10).0.sin_with_period(7);
+    /// assert_eq!(s.to_string(), "0.78223");
+    ///
+    /// // a quarter turn is exactly 1
+    /// assert_eq!(Float::from(90u32).sin_with_period(360).to_string(), "1.00");
+    /// ```
+    #[inline]
+    pub fn sin_with_period(self, u: u64) -> Self {
+        let prec = self.significant_bits();
+        self.sin_with_period_prec(u, prec).0
+    }
+
+    /// Computes $\sin(2\pi x/u)$, the sine of a [`Float`] measured in $u$ths of a turn (so that `u
+    /// = 360` is degrees), rounding the result to the precision of the input and to the nearest
+    /// [`Float`]. The [`Float`] is taken by reference.
+    ///
+    /// If the sine is equidistant from two [`Float`]s with the precision of the input, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// See [`Float::sin_with_period_prec_round`] for the error bounds, the special and closed-form
+    /// cases, overflow and underflow, and the complexity; this function behaves the same way with
+    /// `prec` equal to the precision of the input and `rm` equal to `Nearest`.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::sin_with_period_round_ref`] instead. If you want to specify an output precision,
+    /// consider using [`Float::sin_with_period_prec_ref`]. If you want both of these things,
+    /// consider using [`Float::sin_with_period_prec_round_ref`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// let s = (&Float::from_unsigned_prec(1u32, 10).0).sin_with_period_ref(7);
+    /// assert_eq!(s.to_string(), "0.78223");
+    /// ```
+    #[inline]
+    pub fn sin_with_period_ref(&self, u: u64) -> Self {
+        self.sin_with_period_prec_ref(u, self.significant_bits()).0
+    }
+
     /// Computes $\sin(2\pi x/u)$, the sine of a [`Float`] measured in $u$ths of a turn, rounding
     /// the result to the specified precision and with the specified rounding mode. The [`Float`] is
     /// replaced by the result, and an [`Ordering`] is returned, indicating whether the rounded sine
@@ -2477,6 +2539,37 @@ impl Float {
     pub fn sin_with_period_round_assign(&mut self, u: u64, rm: RoundingMode) -> Ordering {
         let prec = self.significant_bits();
         self.sin_with_period_prec_round_assign(u, prec, rm)
+    }
+
+    /// Computes $\sin(2\pi x/u)$, the sine of a [`Float`] measured in $u$ths of a turn (so that `u
+    /// = 360` is degrees), rounding the result to the precision of the input and to the nearest
+    /// [`Float`]. The [`Float`] is replaced by the result.
+    ///
+    /// If the sine is equidistant from two [`Float`]s with the precision of the input, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// See [`Float::sin_with_period_prec_round`] for the error bounds, the special and closed-form
+    /// cases, overflow and underflow, and the complexity; this function behaves the same way with
+    /// `prec` equal to the precision of the input and `rm` equal to `Nearest`.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::sin_with_period_round_assign`] instead. If you want to specify an output precision,
+    /// consider using [`Float::sin_with_period_prec_assign`]. If you want both of these things,
+    /// consider using [`Float::sin_with_period_prec_round_assign`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// let mut x = Float::from_unsigned_prec(1u32, 10).0;
+    /// x.sin_with_period_assign(7);
+    /// assert_eq!(x.to_string(), "0.78223");
+    /// ```
+    #[inline]
+    pub fn sin_with_period_assign(&mut self, u: u64) {
+        let prec = self.significant_bits();
+        self.sin_with_period_prec_assign(u, prec);
     }
 }
 
@@ -2978,9 +3071,10 @@ impl Float {
     /// whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// This is `sin_with_period` with a period of 2: see [`Float::sin_with_period_prec`] for the
-    /// error bounds, the special and closed-form cases (integers give $\pm1$, half-integers give
-    /// $+0.0$, and multiples of $1/3$, $1/4$, $1/5$, $1/6$, and $1/10$ have closed forms), overflow
-    /// and underflow, and the complexity, with $u = 2$.
+    /// error bounds, the special and closed-form cases (integers give $\pm0.0$ with the sign of the
+    /// input, half-integers give $\pm1$, odd multiples of $1/6$ give $\pm1/2$, and multiples of
+    /// $1/3$, $1/4$, and $1/10$ have closed forms), overflow and underflow, and the complexity,
+    /// with $u = 2$.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -3043,9 +3137,10 @@ impl Float {
     /// comparable to any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
     ///
     /// This is `sin_with_period` with a period of 2: see [`Float::sin_with_period_round`] for the
-    /// error bounds, the special and closed-form cases (integers give $\pm1$, half-integers give
-    /// $+0.0$, and multiples of $1/3$, $1/4$, $1/5$, $1/6$, and $1/10$ have closed forms), overflow
-    /// and underflow, and the complexity, with $u = 2$.
+    /// error bounds, the special and closed-form cases (integers give $\pm0.0$ with the sign of the
+    /// input, half-integers give $\pm1$, odd multiples of $1/6$ give $\pm1/2$, and multiples of
+    /// $1/3$, $1/4$, and $1/10$ have closed forms), overflow and underflow, and the complexity,
+    /// with $u = 2$.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the input
@@ -3107,6 +3202,71 @@ impl Float {
     }
 
     /// Computes $\sin(\pi x)$, the sine of a [`Float`] measured in half-turns, rounding the result
+    /// to the precision of the input and to the nearest [`Float`]. The [`Float`] is taken by value.
+    ///
+    /// If the sine is equidistant from two [`Float`]s with the precision of the input, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// This is `sin_with_period` with a period of 2: see [`Float::sin_with_period`] for the error
+    /// bounds, the special and closed-form cases (integers give $\pm0.0$ with the sign of the
+    /// input, half-integers give $\pm1$, odd multiples of $1/6$ give $\pm1/2$, and multiples of
+    /// $1/3$, $1/4$, and $1/10$ have closed forms), overflow and underflow, and the complexity,
+    /// with $u = 2$.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::sin_pi_round`] instead. If you want to specify an output precision, consider using
+    /// [`Float::sin_pi_prec`]. If you want both of these things, consider using
+    /// [`Float::sin_pi_prec_round`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// let s = Float::from(0.1f64).sin_pi();
+    /// assert_eq!(s.to_string(), "0.30901699437494745");
+    ///
+    /// // a half-integer is exactly 1
+    /// assert_eq!(Float::from(0.5f64).sin_pi().to_string(), "1.0");
+    /// ```
+    #[inline]
+    pub fn sin_pi(self) -> Self {
+        let prec = self.significant_bits();
+        self.sin_pi_prec(prec).0
+    }
+
+    /// Computes $\sin(\pi x)$, the sine of a [`Float`] measured in half-turns, rounding the result
+    /// to the precision of the input and to the nearest [`Float`]. The [`Float`] is taken by
+    /// reference.
+    ///
+    /// If the sine is equidistant from two [`Float`]s with the precision of the input, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// This is `sin_with_period` with a period of 2: see [`Float::sin_with_period`] for the error
+    /// bounds, the special and closed-form cases (integers give $\pm0.0$ with the sign of the
+    /// input, half-integers give $\pm1$, odd multiples of $1/6$ give $\pm1/2$, and multiples of
+    /// $1/3$, $1/4$, and $1/10$ have closed forms), overflow and underflow, and the complexity,
+    /// with $u = 2$.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::sin_pi_round_ref`] instead. If you want to specify an output precision, consider
+    /// using [`Float::sin_pi_prec_ref`]. If you want both of these things, consider using
+    /// [`Float::sin_pi_prec_round_ref`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// let s = (&Float::from(0.1f64)).sin_pi_ref();
+    /// assert_eq!(s.to_string(), "0.30901699437494745");
+    /// ```
+    #[inline]
+    pub fn sin_pi_ref(&self) -> Self {
+        self.sin_pi_prec_ref(self.significant_bits()).0
+    }
+
+    /// Computes $\sin(\pi x)$, the sine of a [`Float`] measured in half-turns, rounding the result
     /// to the specified precision and with the specified rounding mode. The [`Float`] is replaced
     /// by the result, and an [`Ordering`] is returned, indicating whether the rounded sine is less
     /// than, equal to, or greater than the exact sine. Although `NaN`s are not comparable to any
@@ -3114,9 +3274,9 @@ impl Float {
     ///
     /// This is `sin_with_period` with a period of 2: see
     /// [`Float::sin_with_period_prec_round_assign`] for the error bounds, the special and
-    /// closed-form cases (integers give $\pm1$, half-integers give $+0.0$, and multiples of $1/3$,
-    /// $1/4$, $1/5$, $1/6$, and $1/10$ have closed forms), overflow and underflow, and the
-    /// complexity, with $u = 2$.
+    /// closed-form cases (integers give $\pm0.0$ with the sign of the input, half-integers give
+    /// $\pm1$, odd multiples of $1/6$ give $\pm1/2$, and multiples of $1/3$, $1/4$, and $1/10$ have
+    /// closed forms), overflow and underflow, and the complexity, with $u = 2$.
     ///
     /// # Panics
     /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
@@ -3200,6 +3360,39 @@ impl Float {
     #[inline]
     pub fn sin_pi_round_assign(&mut self, rm: RoundingMode) -> Ordering {
         self.sin_with_period_round_assign(2, rm)
+    }
+
+    /// Computes $\sin(\pi x)$, the sine of a [`Float`] measured in half-turns, rounding the result
+    /// to the precision of the input and to the nearest [`Float`]. The [`Float`] is replaced by the
+    /// result.
+    ///
+    /// If the sine is equidistant from two [`Float`]s with the precision of the input, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// This is `sin_with_period` with a period of 2: see [`Float::sin_with_period`] for the error
+    /// bounds, the special and closed-form cases (integers give $\pm0.0$ with the sign of the
+    /// input, half-integers give $\pm1$, odd multiples of $1/6$ give $\pm1/2$, and multiples of
+    /// $1/3$, $1/4$, and $1/10$ have closed forms), overflow and underflow, and the complexity,
+    /// with $u = 2$.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::sin_pi_round_assign`] instead. If you want to specify an output precision, consider
+    /// using [`Float::sin_pi_prec_assign`]. If you want both of these things, consider using
+    /// [`Float::sin_pi_prec_round_assign`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// let mut x = Float::from(0.1f64);
+    /// x.sin_pi_assign();
+    /// assert_eq!(x.to_string(), "0.30901699437494745");
+    /// ```
+    #[inline]
+    pub fn sin_pi_assign(&mut self) {
+        let prec = self.significant_bits();
+        self.sin_pi_prec_assign(prec);
     }
 
     /// Computes $\sin(\pi x)$, the sine of a [`Rational`] measured in half-turns, rounding the

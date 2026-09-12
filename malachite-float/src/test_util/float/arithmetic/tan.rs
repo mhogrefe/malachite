@@ -96,3 +96,29 @@ pub fn rug_tan_with_period_rational_prec(
 ) -> (rug::Float, Ordering) {
     rug_tan_with_period_rational_prec_round(x, u, prec, Round::Nearest)
 }
+
+pub fn rug_tan_pi_prec_round(x: &rug::Float, prec: u64, rm: Round) -> (rug::Float, Ordering) {
+    let mut t = rug::Float::with_val(u32::exact_from(prec), 0);
+    let o = t.assign_round(x.tan_pi_ref(), rm);
+    (t, o)
+}
+
+pub fn rug_tan_pi_rational_prec_round(
+    x: &Rational,
+    prec: u64,
+    rm: Round,
+) -> (rug::Float, Ordering) {
+    let exponent_bits = if *x == 0u32 {
+        0
+    } else {
+        u64::try_from(x.floor_log_base_2_abs()).unwrap_or(0)
+    };
+    let denominator_bits = x.denominator_ref().significant_bits();
+    let rx = rug::Float::with_val(
+        u32::exact_from(prec + 128 + exponent_bits + denominator_bits),
+        rug::Rational::exact_from(x),
+    );
+    let mut t = rug::Float::with_val(u32::exact_from(prec), 0);
+    let o = t.assign_round(rx.tan_pi_ref(), rm);
+    (t, o)
+}

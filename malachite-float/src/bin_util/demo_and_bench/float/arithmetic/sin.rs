@@ -26,7 +26,7 @@ use malachite_float::float::arithmetic::sin::{
     primitive_float_sin_with_period_rational,
 };
 use malachite_float::test_util::bench::bucketers::{
-    float_complexity_bucketer, pair_2_float_complexity_bucketer,
+    float_complexity_bucketer, pair_1_float_complexity_bucketer, pair_2_float_complexity_bucketer,
     pair_2_triple_1_2_float_primitive_int_max_complexity_bucketer,
     quadruple_1_float_complexity_bucketer, triple_1_2_float_primitive_int_max_complexity_bucketer,
     triple_1_float_complexity_bucketer,
@@ -37,7 +37,7 @@ use malachite_float::test_util::float::arithmetic::sin::{
 };
 use malachite_float::test_util::generators::{
     float_gen, float_gen_rm, float_gen_var_12, float_rounding_mode_pair_gen_var_47,
-    float_unsigned_pair_gen_var_1, float_unsigned_pair_gen_var_4,
+    float_unsigned_pair_gen_var_1, float_unsigned_pair_gen_var_2, float_unsigned_pair_gen_var_4,
     float_unsigned_rounding_mode_triple_gen_var_36,
     float_unsigned_rounding_mode_triple_gen_var_36_rm,
     float_unsigned_rounding_mode_triple_gen_var_39,
@@ -162,6 +162,16 @@ pub(crate) fn register(runner: &mut Runner) {
         runner,
         benchmark_float_sin_rational_prec_round_evaluation_strategy
     );
+    register_demo!(runner, demo_float_sin_with_period);
+    register_demo!(runner, demo_float_sin_with_period_debug);
+    register_demo!(runner, demo_float_sin_with_period_ref);
+    register_demo!(runner, demo_float_sin_with_period_assign);
+    register_bench!(runner, benchmark_float_sin_with_period_evaluation_strategy);
+    register_demo!(runner, demo_float_sin_pi);
+    register_demo!(runner, demo_float_sin_pi_debug);
+    register_demo!(runner, demo_float_sin_pi_ref);
+    register_demo!(runner, demo_float_sin_pi_assign);
+    register_bench!(runner, benchmark_float_sin_pi_evaluation_strategy);
 }
 
 fn demo_float_sin(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -1487,6 +1497,141 @@ fn benchmark_float_sin_pi_prec_round_evaluation_strategy(
                 "(&Float).sin_pi_prec_round_ref(u64, RoundingMode)",
                 &mut |(x, prec, rm)| no_out!(x.sin_pi_prec_round_ref(prec, rm)),
             ),
+        ],
+    );
+}
+
+fn demo_float_sin_with_period(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, u) in float_unsigned_pair_gen_var_2::<u64>()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        println!(
+            "({}).sin_with_period({}) = {}",
+            x_old,
+            u,
+            x.sin_with_period(u)
+        );
+    }
+}
+
+fn demo_float_sin_with_period_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, u) in float_unsigned_pair_gen_var_2::<u64>()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let s = x.sin_with_period(u);
+        println!(
+            "({:#x}).sin_with_period({}) = {:#x}",
+            ComparableFloat(x_old),
+            u,
+            ComparableFloat(s)
+        );
+    }
+}
+
+fn demo_float_sin_with_period_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, u) in float_unsigned_pair_gen_var_2::<u64>()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "(&{}).sin_with_period_ref({}) = {}",
+            x,
+            u,
+            x.sin_with_period_ref(u)
+        );
+    }
+}
+
+fn demo_float_sin_with_period_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, u) in float_unsigned_pair_gen_var_2::<u64>()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        x.sin_with_period_assign(u);
+        println!("x := {x_old}; x.sin_with_period_assign({u}); x = {x}");
+    }
+}
+
+fn benchmark_float_sin_with_period_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float.sin_with_period(u64)",
+        BenchmarkType::EvaluationStrategy,
+        float_unsigned_pair_gen_var_2::<u64>().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_1_float_complexity_bucketer("x"),
+        &mut [
+            ("Float.sin_with_period(u64)", &mut |(x, u)| {
+                no_out!(x.sin_with_period(u));
+            }),
+            ("(&Float).sin_with_period_ref(u64)", &mut |(x, u)| {
+                no_out!(x.sin_with_period_ref(u));
+            }),
+        ],
+    );
+}
+
+fn demo_float_sin_pi(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen().get(gm, config).take(limit) {
+        let x_old = x.clone();
+        println!("({}).sin_pi() = {}", x_old, x.sin_pi());
+    }
+}
+
+fn demo_float_sin_pi_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen().get(gm, config).take(limit) {
+        let x_old = x.clone();
+        let s = x.sin_pi();
+        println!(
+            "({:#x}).sin_pi() = {:#x}",
+            ComparableFloat(x_old),
+            ComparableFloat(s)
+        );
+    }
+}
+
+fn demo_float_sin_pi_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen().get(gm, config).take(limit) {
+        println!("(&{}).sin_pi_ref() = {}", x, x.sin_pi_ref());
+    }
+}
+
+fn demo_float_sin_pi_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for mut x in float_gen().get(gm, config).take(limit) {
+        let x_old = x.clone();
+        x.sin_pi_assign();
+        println!("x := {x_old}; x.sin_pi_assign(); x = {x}");
+    }
+}
+
+fn benchmark_float_sin_pi_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float.sin_pi()",
+        BenchmarkType::EvaluationStrategy,
+        float_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &float_complexity_bucketer("x"),
+        &mut [
+            ("Float.sin_pi()", &mut |x| no_out!(x.sin_pi())),
+            ("(&Float).sin_pi_ref()", &mut |x| no_out!(x.sin_pi_ref())),
         ],
     );
 }
