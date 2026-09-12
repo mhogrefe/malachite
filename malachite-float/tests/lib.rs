@@ -117,6 +117,7 @@ pub mod float {
         pub mod rem;
         pub mod root;
         pub mod round_to_integer;
+        pub mod sec;
         pub mod shl;
         pub mod shl_round;
         pub mod shr;

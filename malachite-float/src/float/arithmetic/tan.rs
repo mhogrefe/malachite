@@ -55,7 +55,7 @@ use malachite_q::Rational;
 // A quotient whose exponent lies strictly between these can be rounded to any precision without
 // leaving the exponent range, so the `Float` division settles it; the rest go to the brackets.
 const MIN_SETTLED_EXPONENT: i64 = Float::MIN_EXPONENT_I64 + 1;
-const MAX_SETTLED_EXPONENT: i64 = Float::MAX_EXPONENT_I64 - 1;
+pub(crate) const MAX_SETTLED_EXPONENT: i64 = Float::MAX_EXPONENT_I64 - 1;
 
 // As in mpfr_overflow, with the overflow's sign: the toward-zero modes give the largest finite
 // value, and the other modes an infinity.
@@ -1044,7 +1044,7 @@ fn round_bracket_signed(
 }
 
 // `round_bracket` for a bracket [lo, hi] of the magnitude of the tangent, negated if `negative`.
-fn round_bracket_signed_by(
+pub(crate) fn round_bracket_signed_by(
     negative: bool,
     lo: Rational,
     hi: Rational,

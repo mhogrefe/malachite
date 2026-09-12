@@ -65,6 +65,7 @@ pub(crate) fn register(runner: &mut Runner) {
     sign::register(runner);
     sin::register(runner);
     sin_cos::register(runner);
+    sec::register(runner);
     tan::register(runner);
     sqrt::register(runner);
     square::register(runner);
@@ -122,6 +123,7 @@ mod product;
 mod reciprocal;
 mod reciprocal_sqrt;
 mod root;
+mod sec;
 mod shl;
 mod shl_round;
 mod shr;

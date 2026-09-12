@@ -308,6 +308,13 @@ documented by git history.
   `primitive_float_tan_with_period` and `primitive_float_tan_with_period_rational` give the
   correctly rounded `f32` or `f64` tangent; a primitive float is never merely close enough to a
   pole to overflow, but a `Rational` can be.
+- `Sec` and `SecAssign` (new traits in malachite-base) for `Float`, with the usual
+  `sec_prec_round`, `sec_prec`, `sec_round`, and `_ref`/`_assign` variants: a port of `mpfr_sec`,
+  which instantiates MPFR's generic reciprocal template with the cosine. The secant never
+  underflows, since its magnitude is at least 1, but unlike MPFR's it can overflow, for an input
+  within $2^{-2^{30}}$ of an odd multiple of $\pi/2$; such a result is decided from an exact
+  bracket on the cosine. `primitive_float_sec` gives the correctly rounded `f32` or `f64` secant,
+  which neither the standard library nor `libm` provides.
 - `tan_pi_prec_round`, `tan_pi_prec`, `tan_pi_round`, and `tan_pi` (with `_ref` and `_assign`
   variants), a port of `mpfr_tanpi`: the tangent of a `Float` measured in half-turns, delegating to
   `tan_with_period` with a period of 2. Integers give a signed zero, half-integers are poles and

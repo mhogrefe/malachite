@@ -336,6 +336,10 @@ pub mod rem;
 pub mod root;
 pub(crate) mod round_near_x;
 pub mod round_to_integer;
+/// Implementations of [`Sec`](malachite_base::num::arithmetic::traits::Sec) and
+/// [`SecAssign`](malachite_base::num::arithmetic::traits::SecAssign), traits for computing the
+/// secant of [`Float`](super::Float)s.
+pub mod sec;
 /// Left-shifting a [`Float`](super::Float) (multiplying it by a power of 2).
 ///
 /// # shl

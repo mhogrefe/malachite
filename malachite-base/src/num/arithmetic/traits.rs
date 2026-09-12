@@ -942,6 +942,18 @@ pub trait TanAssign {
     fn tan_assign(&mut self);
 }
 
+/// Computes $\sec(x)$, the secant of a number.
+pub trait Sec {
+    type Output;
+
+    fn sec(self) -> Self::Output;
+}
+
+/// Replaces a number with its secant, $\sec(x)$.
+pub trait SecAssign {
+    fn sec_assign(&mut self);
+}
+
 /// Replaces a number with its sine, $\sin(x)$, and writes its cosine, $\cos(x)$, to a second
 /// number.
 pub trait SinCosAssign {
