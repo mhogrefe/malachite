@@ -1,0 +1,27 @@
+error: this subtracts a `Rational`'s integer part from it
+  --> $DIR/manual_fractional_part.rs:10:13
+   |
+LL |     let a = &q - whole;
+   |             ^^^^^^^^^^
+   |
+   = help: use `(&q) % Rational::ONE`
+   = note: `#[deny(manual_fractional_part)]` on by default
+
+error: this subtracts a `Rational`'s integer part from it
+  --> $DIR/manual_fractional_part.rs:12:13
+   |
+LL |     let b = &q - Rational::from(Integer::rounding_from(&q, Down).0);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: use `(&q) % Rational::ONE`
+
+error: this subtracts a `Rational`'s integer part from it
+  --> $DIR/manual_fractional_part.rs:14:13
+   |
+LL |     let c = &q - Rational::from(Integer::rounding_from(&q, Floor).0);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: use `(&q).mod_op(Rational::ONE)`
+
+error: aborting due to 3 previous errors
+

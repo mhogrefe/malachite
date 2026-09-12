@@ -268,16 +268,16 @@ fn underflowed(positive: bool, prec: u64, rm: RoundingMode) -> (Float, Ordering)
 // an x/u within 2^66 of the bottom of the range, the computation is scaled up by 2^64 and the
 // underflow decided by hand: a division that rounded up to the smallest positive Float would
 // otherwise make the Ziv loop retry forever, since sin of that power of 2 can never be certified.
-const SCALE: u64 = 64;
+pub(crate) const SCALE: u64 = 64;
 // The exponent of the scaled smallest positive Float, 2^(MIN_EXPONENT - 1) * 2^SCALE.
 const MIN_SCALED_EXPONENT: i64 = Float::MIN_EXPONENT_I64 + SCALE as i64;
 // Inputs with at most this exponent are scaled.
 pub(crate) const SCALED_INPUT_EXPONENT: i64 = Float::MIN_EXPONENT_I64 + 66;
 
 // Given t = 2^SCALE * 2 pi x/u to within a relative 2^(2 - prec), returns the result if the true
-// value, and so its sine, which is just below it, is below the smallest positive Float: zero or
-// that Float, by the rounding mode alone.
-fn scaled_underflow(
+// value is below the smallest positive Float, and so is its sine, which is just below it, or its
+// tangent, which exceeds it by less than its cube: zero or that Float, by the rounding mode alone.
+pub(crate) fn scaled_underflow(
     t: &Float,
     positive: bool,
     prec: u64,
@@ -2707,9 +2707,7 @@ impl Float {
         }
         // q = x/u, reduced to (-1, 1) with the sign of x: sin(2 pi q) has period 1 in q, and a
         // multiple of u gives a zero with the sign of x (IEEE 754-2019's sinPi)
-        let q = x / Rational::from(u);
-        let whole = Rational::from(Integer::rounding_from(&q, Down).0);
-        let q = q - whole;
+        let q = x / Rational::from(u) % Rational::ONE;
         if q == 0u32 {
             return (
                 if *x < 0u32 {
@@ -3689,7 +3687,6 @@ where
 ///
 /// # Examples
 /// ```
-/// use malachite_base::num::basic::traits::NegativeInfinity;
 /// use malachite_base::num::float::NiceFloat;
 /// use malachite_float::float::arithmetic::sin::primitive_float_sin_with_period;
 ///

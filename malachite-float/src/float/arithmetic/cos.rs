@@ -1798,12 +1798,23 @@ pub(crate) fn half_constant<F: Fn(u64, RoundingMode) -> (Float, Ordering)>(
     prec: u64,
     rm: RoundingMode,
 ) -> (Float, Ordering) {
+    let (c, o) = signed_constant(constant, negative, prec, rm);
+    (c >> 1u32, o)
+}
+
+// `constant` rounded to `prec` with `rm`, negated if `negative`; the negative case reuses the
+// positive one with the rounding mode mirrored.
+pub(crate) fn signed_constant<F: Fn(u64, RoundingMode) -> (Float, Ordering)>(
+    constant: F,
+    negative: bool,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
     if negative {
         let (c, o) = constant(prec, -rm);
-        (-(c >> 1u32), o.reverse())
+        (-c, o.reverse())
     } else {
-        let (c, o) = constant(prec, rm);
-        (c >> 1u32, o)
+        constant(prec, rm)
     }
 }
 
@@ -1883,52 +1894,83 @@ pub(crate) fn cos_turns_special_case(
 // a point after all.
 //
 // This has no MPFR counterpart: MPFR's exponent range is so wide that cosu and sinu never underflow
-// there, and they simply keep raising their working precision.
+// there, and they simply keep raising their working precision. The distance d from a fraction of a
+// turn q to the nearest zero of the function, and whether the value is the negative of sin(2 pi d);
+// `None` if q is not near such a zero after all.
+fn trig_turns_near_zero_reduce(q: &Rational, cos: bool) -> Option<(bool, Rational)> {
+    Some(if cos {
+        let m = Integer::rounding_from(q << 2u32, Nearest).0;
+        if m.even() {
+            fail_on_untested_path("trig_turns_near_zero, not near an odd multiple of 1/4");
+            return None;
+        }
+        (
+            (&m).mod_power_of_2(2) == 1u32,
+            q - (Rational::from(m) >> 2u32),
+        )
+    } else {
+        let m = Integer::rounding_from(q << 1u32, Nearest).0;
+        (m.odd(), q - (Rational::from(m) >> 1u32))
+    })
+}
+
+// One bracket of `trig_turns_near_zero` at working precision w, with pi bracketed to w bits.
+fn trig_turns_near_zero_step(negate: bool, d: &Rational, w: u64) -> Option<(Rational, Rational)> {
+    // pi_lo <= pi <= pi_lo + 2^(2 - w)
+    let pi_lo = Rational::exact_from(&Float::pi_prec_round(w, Floor).0);
+    let pi_hi = &pi_lo + Rational::power_of_2(2 - i64::exact_from(w));
+    let two_d = d << 1u32;
+    let (t_lo, t_hi) = if two_d >= 0u32 {
+        (&two_d * pi_lo, two_d * pi_hi)
+    } else {
+        (&two_d * pi_hi, two_d * pi_lo)
+    };
+    if t_hi.ge_abs(&1u32) || t_lo.ge_abs(&1u32) {
+        fail_on_untested_path("trig_turns_near_zero, distance not small");
+        return None;
+    }
+    // sin is increasing on [t_lo, t_hi] (a subset of [-1, 1]), so sin(2 pi d) lies between
+    // sin(t_lo) and sin(t_hi)
+    let sin_lo = sin_bound(&t_lo, w, false);
+    let sin_hi = sin_bound(&t_hi, w, true);
+    Some(if negate {
+        (-sin_hi, -sin_lo)
+    } else {
+        (sin_lo, sin_hi)
+    })
+}
+
 pub(crate) fn trig_turns_near_zero(
     q: &Rational,
     prec: u64,
     rm: RoundingMode,
     cos: bool,
 ) -> Option<(Float, Ordering)> {
-    let (negate, d) = if cos {
-        let m = Integer::rounding_from(q << 2u32, Nearest).0;
-        if m.even() {
-            fail_on_untested_path("trig_turns_near_zero, not near an odd multiple of 1/4");
-            return None;
-        }
-        let negate = (&m).mod_power_of_2(2) == 1u32;
-        (negate, q - (Rational::from(m) >> 2u32))
-    } else {
-        let m = Integer::rounding_from(q << 1u32, Nearest).0;
-        let negate = m.odd();
-        (negate, q - (Rational::from(m) >> 1u32))
-    };
+    let (negate, d) = trig_turns_near_zero_reduce(q, cos)?;
     let mut w = prec + 64;
     loop {
-        // pi_lo <= pi <= pi_lo + 2^(2 - w)
-        let pi_lo = Rational::exact_from(&Float::pi_prec_round(w, Floor).0);
-        let pi_hi = &pi_lo + Rational::power_of_2(2 - i64::exact_from(w));
-        let two_d = &d << 1u32;
-        let (t_lo, t_hi) = if two_d >= 0u32 {
-            (&two_d * pi_lo, two_d * pi_hi)
-        } else {
-            (&two_d * pi_hi, two_d * pi_lo)
-        };
-        if t_hi.ge_abs(&1u32) || t_lo.ge_abs(&1u32) {
-            fail_on_untested_path("trig_turns_near_zero, distance not small");
-            return None;
-        }
-        // sin is increasing on [t_lo, t_hi] (a subset of [-1, 1]), so sin(2 pi d) lies between
-        // sin(t_lo) and sin(t_hi)
-        let sin_lo = sin_bound(&t_lo, w, false);
-        let sin_hi = sin_bound(&t_hi, w, true);
-        let (lo, hi) = if negate {
-            (-sin_hi, -sin_lo)
-        } else {
-            (sin_lo, sin_hi)
-        };
+        let (lo, hi) = trig_turns_near_zero_step(negate, &d, w)?;
         if let Some(result) = round_bracket(&lo, &hi, prec, rm) {
             return Some(result);
+        }
+        w <<= 1;
+    }
+}
+
+// The bracket of `trig_turns_near_zero`, tightened until it is narrower than 2^-(target + 4)
+// relative to the value: for a consumer that combines the tiny value with others before rounding
+// (the tangent).
+pub(crate) fn trig_turns_near_zero_bracket(
+    q: &Rational,
+    target: u64,
+    cos: bool,
+) -> Option<(Rational, Rational)> {
+    let (negate, d) = trig_turns_near_zero_reduce(q, cos)?;
+    let mut w = target + 64;
+    loop {
+        let (lo, hi) = trig_turns_near_zero_step(negate, &d, w)?;
+        if (&hi - &lo) << (target + 4) <= (&lo).abs() {
+            return Some((lo, hi));
         }
         w <<= 1;
     }
@@ -4145,7 +4187,6 @@ where
 ///
 /// # Examples
 /// ```
-/// use malachite_base::num::basic::traits::NegativeInfinity;
 /// use malachite_base::num::float::NiceFloat;
 /// use malachite_float::float::arithmetic::cos::primitive_float_cos_with_period;
 ///

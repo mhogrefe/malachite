@@ -862,7 +862,7 @@ fn sin_cos_turns_step(
 // `sin_with_period_prec_round_normal_ref` and `cos_with_period_prec_round_normal_ref`) around one
 // approximation of 2 pi x/u per Ziv iteration, and one `sin_cos` of it, with the near-zero paths of
 // both.
-fn sin_cos_with_period_prec_round_normal_ref(
+pub(crate) fn sin_cos_with_period_prec_round_normal_ref(
     x: &Float,
     u: u64,
     prec: u64,
@@ -1557,7 +1557,7 @@ impl Float {
 // rounded to precision `prec` with rounding mode `rm`. `rm` may be `Exact` only when both results
 // are exact, that is, when q is a multiple of 1/4. This is the `Float` algorithm with the fraction
 // of a turn taken directly: since q is exact, only pi and the product are rounded.
-fn sin_cos_turns_helper(
+pub(crate) fn sin_cos_turns_helper(
     q: &Rational,
     prec: u64,
     rm: RoundingMode,
@@ -2274,9 +2274,7 @@ impl Float {
         // q = x/u, reduced to (-1, 1) with the sign of x: both functions have period 1 in q, and a
         // multiple of u gives a sine of zero with the sign of x (IEEE 754-2019's sinPi) and a
         // cosine of 1
-        let q = x / Rational::from(u);
-        let whole = Rational::from(Integer::rounding_from(&q, Down).0);
-        let q = q - whole;
+        let q = x / Rational::from(u) % Rational::ONE;
         if q == 0u32 {
             return (
                 if *x < 0u32 {

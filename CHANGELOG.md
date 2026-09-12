@@ -296,6 +296,18 @@ documented by git history.
   and `tan_rational_prec` (with `_ref` variants) take a `Rational` instead, with a direct series
   bracket for tiny inputs, including those below the `Float` exponent range. `primitive_float_tan`
   and `primitive_float_tan_rational` give the correctly rounded `f32` or `f64` tangent.
+- `tan_with_period_prec_round`, `tan_with_period_prec`, and `tan_with_period_round` (with `_ref`
+  and `_assign` variants), a port of `mpfr_tanu`: the tangent of a `Float` measured in $u$ths of a
+  turn. Multiples of a quarter turn are exact: a multiple of a half turn is a zero (reached from
+  below, so that the function is odd), and an odd multiple of a quarter turn is a pole, returning
+  an infinity; odd multiples of an eighth of a turn are $\pm1$, and thirds, sixths, and twelfths
+  of a turn are computed from $\sqrt3$ or $\sqrt3/3$. Inputs within $2^{-2^{30}}$ of a multiple of
+  a quarter turn overflow or underflow correctly. `tan_with_period_rational_prec_round` and
+  `tan_with_period_rational_prec` (with `_ref` variants) take a `Rational` instead, reaching the
+  exact and closed-form cases directly and needing no argument reduction beyond the exact one.
+  `primitive_float_tan_with_period` and `primitive_float_tan_with_period_rational` give the
+  correctly rounded `f32` or `f64` tangent; a primitive float is never merely close enough to a
+  pole to overflow, but a `Rational` can be.
 - The Dottie number, the fixed point of the cosine, as `dottie_number_prec_round` and
   `dottie_number_prec` on `Float`, correctly rounded to any precision (Newton's method with a
   certified final bracket), and as a `DottieNumber` trait with constants for primitive floats.
