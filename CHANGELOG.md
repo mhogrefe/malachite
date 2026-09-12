@@ -315,6 +315,11 @@ documented by git history.
   within $2^{-2^{30}}$ of an odd multiple of $\pi/2$; such a result is decided from an exact
   bracket on the cosine. `primitive_float_sec` gives the correctly rounded `f32` or `f64` secant,
   which neither the standard library nor `libm` provides.
+  `sec_rational_prec_round` and `sec_rational_prec` (with `_ref` variants) take a `Rational`
+  instead, with a direct series bracket for a tiny input: there the cosine rounds toward zero to
+  the `Float` just below 1, whose reciprocal ties back to 1 at every working precision, so the Ziv
+  loop would not terminate without it. `primitive_float_sec_rational` gives the correctly rounded
+  `f32` or `f64` secant of a `Rational`.
 - `tan_pi_prec_round`, `tan_pi_prec`, `tan_pi_round`, and `tan_pi` (with `_ref` and `_assign`
   variants), a port of `mpfr_tanpi`: the tangent of a `Float` measured in half-turns, delegating to
   `tan_with_period` with a period of 2. Integers give a signed zero, half-integers are poles and
