@@ -240,7 +240,7 @@ fn sec_turns_special_case(q: &Rational, prec: u64, rm: RoundingMode) -> Option<(
 }
 
 // Multiplies a correctly rounded value by 2, which is exact and so leaves the `Ordering` alone.
-fn doubled((x, o): (Float, Ordering)) -> (Float, Ordering) {
+pub(crate) fn doubled((x, o): (Float, Ordering)) -> (Float, Ordering) {
     (x << 1u32, o)
 }
 

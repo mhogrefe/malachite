@@ -22,7 +22,8 @@
 // certify a reciprocal that is exactly representable.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use crate::float::arithmetic::cos::sin_bound;
+use crate::float::arithmetic::cos::{phi_minus_1_prec_round, signed_constant, sin_bound};
+use crate::float::arithmetic::sec::doubled;
 use crate::float::arithmetic::sin::sin_rational_helper;
 use crate::float::arithmetic::tan::{
     MAX_SETTLED_EXPONENT, round_bracket_signed, round_bracket_signed_by,
@@ -31,18 +32,20 @@ use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn};
 use core::cmp::Ordering::{self, Equal, Greater, Less};
 use core::cmp::max;
 use malachite_base::num::arithmetic::traits::{
-    Abs, CeilingLogBase2, Csc, CscAssign, PowerOf2, Reciprocal,
+    Abs, CeilingLogBase2, Csc, CscAssign, Mod, PowerOf2, Reciprocal,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{
     Infinity as InfinityTrait, NaN as NaNTrait, NegativeInfinity,
 };
+use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{
     self, Ceiling, Down, Exact, Floor, Nearest, Up,
 };
+use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::float::round::float_can_round;
 use malachite_nz::platform::Limb;
 use malachite_q::Rational;
@@ -201,6 +204,154 @@ pub(crate) fn csc_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> 
         // err < 1 ulp, and of a known sign: rounding toward zero puts the sine below the true one
         // in magnitude
         let s = sin_rational_helper(x, m, Down).0;
+        // err < 1/2 + 2 < 4 ulps in all, as in algorithms.tex
+        let r = (&s).reciprocal();
+        match r.get_exponent().map(i64::from) {
+            Some(e) if e < MAX_SETTLED_EXPONENT => {
+                if float_can_round(r.significand_ref().unwrap(), m - 2, prec, rm) {
+                    return Float::from_float_prec_round(r, prec, rm);
+                }
+            }
+            _ => {
+                if let Some(result) = csc_bracket(&s, m, prec, rm) {
+                    return result;
+                }
+            }
+        }
+        m += increment;
+        increment = m >> 1;
+    }
+}
+
+// The exact and closed-form values of csc(2 pi q) at the eighths, twelfths, and twentieths of a
+// turn, where the sine is 0, ±1, ±1/2, ±sqrt(2)/2, ±sqrt(3)/2, ±phi/2, or ±(phi - 1)/2.
+// Returns `None` when q is none of them, or when only an inexact value is available and `rm` is
+// `Exact`.
+fn csc_turns_special_case(q: &Rational, prec: u64, rm: RoundingMode) -> Option<(Float, Ordering)> {
+    let d = q.denominator_ref();
+    if *d > 20u32 {
+        return None;
+    }
+    let d = u64::exact_from(d);
+    // the angle in units of 1/d of a turn (the numerator of a `Rational` is unsigned, so the sign
+    // is restored before reducing modulo d)
+    let n = u64::exact_from(
+        &Integer::from_sign_and_abs_ref(*q >= 0u32, q.numerator_ref()).mod_op(Integer::from(d)),
+    );
+    // the cosecant, like the sine, is negative in the second half of the turn
+    let negative = n > d >> 1;
+    match d {
+        // The poles at 0 and 180°, where the sine is a zero carrying the sign of q, so its
+        // reciprocal is an infinity with that sign; that keeps the cosecant odd.
+        1 | 2 => Some((
+            if *q < 0u32 {
+                Float::NEGATIVE_INFINITY
+            } else {
+                Float::INFINITY
+            },
+            Equal,
+        )),
+        // csc(90°) = 1, csc(270°) = -1
+        4 => Some((
+            if negative {
+                -Float::one_prec(prec)
+            } else {
+                Float::one_prec(prec)
+            },
+            Equal,
+        )),
+        // csc(30°) = csc(150°) = 2, csc(210°) = csc(330°) = -2
+        12 => Some((
+            if negative {
+                -(Float::one_prec(prec) << 1u32)
+            } else {
+                Float::one_prec(prec) << 1u32
+            },
+            Equal,
+        )),
+        _ if rm == Exact => None,
+        // csc(60°) = csc(120°) = 2 sqrt(3)/3, and its negative at 240° and 300°. Doubling is
+        // exact, so the correctly rounded constant stays correctly rounded.
+        3 | 6 => Some(doubled(signed_constant(
+            Float::sqrt_3_over_3_prec_round,
+            negative,
+            prec,
+            rm,
+        ))),
+        // csc(45°) = csc(135°) = sqrt(2), and its negative at 225° and 315°
+        8 => Some(signed_constant(
+            Float::sqrt_2_prec_round,
+            negative,
+            prec,
+            rm,
+        )),
+        // The sine is (phi - 1)/2 at 18° and phi/2 at 54°, so the cosecant is 2 phi and 2(phi -
+        // 1) there, and their negatives in the second half of the turn.
+        20 => Some(if n == 1 || n == 9 || n == 11 || n == 19 {
+            doubled(signed_constant(Float::phi_prec_round, negative, prec, rm))
+        } else {
+            doubled(signed_constant(phi_minus_1_prec_round, negative, prec, rm))
+        }),
+        _ => None,
+    }
+}
+
+// Computes csc(2 pi x/u) for a finite nonzero `Float` x and a nonzero u. This has no MPFR
+// counterpart; it is `csc` with the sine taken in uths of a turn, which reduces the argument
+// exactly rather than modulo an approximation of 2 pi, and so reaches the exact and closed-form
+// cases that the radian version cannot see. MPFR's shortcut for a tiny input is not needed here:
+// the angle 2 pi x/u is never a `Float`, so the reciprocal of the rounded sine is not stuck on an
+// exactly representable value, and an angle below the exponent range makes the sine underflow,
+// which the bracket reads as an overflow.
+fn csc_with_period_prec_round_normal_ref(
+    x: &Float,
+    u: u64,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    // Range reduction, as in `tan_with_period`: the argument is already reduced if |x| < u.
+    let xr;
+    let xp = if x.lt_abs(&u) {
+        x
+    } else {
+        // xr = x mod u, with the sign of x, exactly
+        let p = i64::exact_from(x.get_prec().unwrap()) - i64::from(x.get_exponent().unwrap());
+        let (r, o) =
+            x.rem_unsigned_prec_round_ref(u, u64::WIDTH + u64::exact_from(max(p, 0)), Exact);
+        assert_eq!(o, Equal);
+        if r == 0u32 {
+            // x is a multiple of u, so the sine is a zero with the sign of x and the cosecant is an
+            // infinity with that sign
+            return (
+                if *x < 0u32 {
+                    Float::NEGATIVE_INFINITY
+                } else {
+                    Float::INFINITY
+                },
+                Equal,
+            );
+        }
+        xr = r;
+        &xr
+    };
+    // now |xp/u| < 1
+    let exp_x = i64::from(xp.get_exponent().unwrap());
+    // The special cases need |x/u| >= 1/20, so the exponent test skips the `Rational` construction
+    // for the small x that would make it expensive (a tiny x has a huge power-of-2 denominator).
+    if exp_x >= i64::exact_from(u.significant_bits()) - 5
+        && let Some(result) =
+            csc_turns_special_case(&(Rational::exact_from(xp) / Rational::from(u)), prec, rm)
+    {
+        return result;
+    }
+    // Only the exact cases can be rounded exactly
+    assert_ne!(rm, Exact, "Inexact csc_with_period");
+    let mut m = prec + prec.ceiling_log_base_2() + 3;
+    let mut increment = Limb::WIDTH;
+    loop {
+        // err < 1 ulp, and of a known sign: rounding toward zero puts the sine below the true one
+        // in magnitude
+        let s = xp.sin_with_period_prec_round_ref(u, m, Down).0;
         // err < 1/2 + 2 < 4 ulps in all, as in algorithms.tex
         let r = (&s).reciprocal();
         match r.get_exponent().map(i64::from) {
@@ -1249,6 +1400,486 @@ impl Float {
     pub fn csc_rational_prec_ref(x: &Rational, prec: u64) -> (Self, Ordering) {
         Self::csc_rational_prec_round_ref(x, prec, Nearest)
     }
+
+    /// Computes $\csc(2\pi x/u)$, the cosecant of a [`Float`] measured in $u$ths of a turn,
+    /// rounding the result to the specified precision and with the specified rounding mode. The
+    /// [`Float`] is taken by value. An [`Ordering`] is also returned, indicating whether the
+    /// rounded cosecant is less than, equal to, or greater than the exact cosecant. Although `NaN`s
+    /// are not comparable to any [`Float`], whenever this function returns a `NaN` it also returns
+    /// `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,u,p,m) = \csc(2\pi x/u)+\varepsilon.
+    /// $$
+    /// - If $x$ is not finite, $u=0$, or $x/u$ is a multiple of $1/4$ or has denominator 12 in
+    ///   lowest terms, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $x$ is finite, $u\neq 0$, and $m$ is not `Nearest`, then $|\varepsilon| <
+    ///   2^{\lfloor\log_2 |\csc(2\pi x/u)|\rfloor-p+1}$.
+    /// - If $x$ is finite, $u\neq 0$, and $m$ is `Nearest`, then $|\varepsilon| \leq
+    ///   2^{\lfloor\log_2 |\csc(2\pi x/u)|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},u,p,m)=\text{NaN}$
+    /// - $f(\pm\infty,u,p,m)=\text{NaN}$
+    /// - $f(x,0,p,m)=\text{NaN}$
+    /// - $f(\pm0.0,u,p,m)=\pm\infty$
+    /// - If $x/u$ is a multiple of $1/2$, the cosecant has a pole there, and the result is exactly
+    ///   $\pm\infty$ with the sign of $x$: the sine is a zero carrying that sign, and the cosecant
+    ///   is its reciprocal, which keeps the function odd.
+    /// - If $x/u$ in lowest terms has denominator 4, the result is exactly $\pm1$, and if it has
+    ///   denominator 12, exactly $\pm2$.
+    ///
+    /// When $x/u$ in lowest terms has denominator 3 or 6, the result is $\pm2\sqrt3/3$; when it has
+    /// denominator 8, $\pm\sqrt2$; and when it has denominator 20, $\pm2\varphi$ or
+    /// $\pm2(\varphi-1)$, where $\varphi$ is the golden ratio. Each is computed from a single
+    /// correctly rounded constant rather than from $\pi$ and a sine, which is far faster.
+    ///
+    /// Overflow:
+    /// - If $f(x,u,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,u,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead.
+    /// - If $f(x,u,p,m)\leq -2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    ///   returned instead.
+    /// - If $f(x,u,p,m)\leq -2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`,
+    ///   $-(1-(1/2)^p)2^{2^{30}-1}$ is returned instead.
+    /// - If $0<f(x,u,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,u,p,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    ///
+    /// Underflow is not possible, since $|\csc(2\pi x/u)| \geq 1$. Overflow requires $x/u$ within
+    /// $2^{-2^{30}}$ of a multiple of $1/2$ without being one, which takes more than $2^{30}$ bits
+    /// of precision, or an $x/u$ so small that $2\pi x/u$ is below $2^{-2^{30}}$.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::csc_with_period_prec`]
+    /// instead. If you know that your target precision is the precision of the input, consider
+    /// using [`Float::csc_with_period_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m, e) = O(n (\log n)^3 \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
+    ///
+    /// $M(n, m, e) = O((n+m+e) \log (n+m+e))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, $m$ is
+    /// `self.significant_bits()`, and $e$ is the exponent of `self` (0 if `self` has no exponent or
+    /// a negative one): the argument is reduced modulo $u$ exactly, and the sine of $2\pi x/u$ is
+    /// then taken at a working precision of about $n + e$ bits, which needs $\pi$ to that many
+    /// bits, and reciprocated.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision (which is the case unless $x/u$ is a multiple of $1/4$ or has
+    /// denominator 12 in lowest terms, or $x$ is zero or not finite, or $u$ is zero).
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::ONE.csc_with_period_prec_round(7, 10, Floor);
+    /// assert_eq!(t.to_string(), "1.2773");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (t, o) = Float::ONE.csc_with_period_prec_round(7, 10, Ceiling);
+    /// assert_eq!(t.to_string(), "1.2793");
+    /// assert_eq!(o, Greater);
+    ///
+    /// // a quarter turn is exactly 1
+    /// let (t, o) = Float::from(90u32).csc_with_period_prec_round(360, 10, Exact);
+    /// assert_eq!(t.to_string(), "1.0000");
+    /// assert_eq!(o, Equal);
+    ///
+    /// // a half turn is a pole
+    /// let (t, o) = Float::from(180u32).csc_with_period_prec_round(360, 10, Exact);
+    /// assert_eq!(t.to_string(), "Infinity");
+    /// assert_eq!(o, Equal);
+    ///
+    /// // a twelfth of a turn is exactly 2
+    /// let (t, o) = Float::from(30u32).csc_with_period_prec_round(360, 10, Nearest);
+    /// assert_eq!(t.to_string(), "2.0000");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn csc_with_period_prec_round(
+        self,
+        u: u64,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        self.csc_with_period_prec_round_ref(u, prec, rm)
+    }
+
+    /// Computes $\csc(2\pi x/u)$, the cosecant of a [`Float`] measured in $u$ths of a turn,
+    /// rounding the result to the specified precision and with the specified rounding mode. The
+    /// [`Float`] is taken by reference. An [`Ordering`] is also returned, indicating whether the
+    /// rounded cosecant is less than, equal to, or greater than the exact cosecant. Although `NaN`s
+    /// are not comparable to any [`Float`], whenever this function returns a `NaN` it also returns
+    /// `Equal`.
+    ///
+    /// See [`Float::csc_with_period_prec_round`] for the error bounds, the special and closed-form
+    /// cases, overflow, and the complexity; this function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::ONE.csc_with_period_prec_round_ref(7, 10, Floor);
+    /// assert_eq!(t.to_string(), "1.2773");
+    /// assert_eq!(o, Less);
+    /// ```
+    pub fn csc_with_period_prec_round_ref(
+        &self,
+        u: u64,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        match &self.0 {
+            // for u=0, return NaN
+            _ if u == 0 => (Self::NAN, Equal),
+            NaN | Infinity { .. } => (Self::NAN, Equal),
+            // x is zero: csc(±0) = ±infinity
+            Zero { .. } => (
+                if self.is_sign_negative() {
+                    Self::NEGATIVE_INFINITY
+                } else {
+                    Self::INFINITY
+                },
+                Equal,
+            ),
+            Finite { .. } => csc_with_period_prec_round_normal_ref(self, u, prec, rm),
+        }
+    }
+
+    /// Computes $\csc(2\pi x/u)$, the cosecant of a [`Float`] measured in $u$ths of a turn,
+    /// rounding the result to the nearest value of the specified precision. The [`Float`] is taken
+    /// by value. An [`Ordering`] is also returned, indicating whether the rounded cosecant is less
+    /// than, equal to, or greater than the exact cosecant. Although `NaN`s are not comparable to
+    /// any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// If the cosecant is equidistant from two [`Float`]s with the specified precision, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// See [`Float::csc_with_period_prec_round`] for the error bounds, the special and closed-form
+    /// cases, overflow, and the complexity; this function behaves the same way with `Nearest`.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::csc_with_period_prec_round`] instead.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::ONE.csc_with_period_prec(7, 10);
+    /// assert_eq!(t.to_string(), "1.2793");
+    /// assert_eq!(o, Greater);
+    ///
+    /// // an eighth of a turn: sqrt(2)
+    /// let (t, o) = Float::ONE.csc_with_period_prec(8, 10);
+    /// assert_eq!(t.to_string(), "1.4141");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn csc_with_period_prec(self, u: u64, prec: u64) -> (Self, Ordering) {
+        self.csc_with_period_prec_round(u, prec, Nearest)
+    }
+
+    /// Computes $\csc(2\pi x/u)$, the cosecant of a [`Float`] measured in $u$ths of a turn,
+    /// rounding the result to the nearest value of the specified precision. The [`Float`] is taken
+    /// by reference. An [`Ordering`] is also returned, indicating whether the rounded cosecant is
+    /// less than, equal to, or greater than the exact cosecant. Although `NaN`s are not comparable
+    /// to any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`Float::csc_with_period_prec`] and [`Float::csc_with_period_prec_round`]; this function
+    /// behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::ONE.csc_with_period_prec_ref(7, 10);
+    /// assert_eq!(t.to_string(), "1.2793");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn csc_with_period_prec_ref(&self, u: u64, prec: u64) -> (Self, Ordering) {
+        self.csc_with_period_prec_round_ref(u, prec, Nearest)
+    }
+
+    /// Computes $\csc(2\pi x/u)$, the cosecant of a [`Float`] measured in $u$ths of a turn,
+    /// rounding the result to the precision of the input and with the specified rounding mode. The
+    /// [`Float`] is taken by value. An [`Ordering`] is also returned, indicating whether the
+    /// rounded cosecant is less than, equal to, or greater than the exact cosecant. Although `NaN`s
+    /// are not comparable to any [`Float`], whenever this function returns a `NaN` it also returns
+    /// `Equal`.
+    ///
+    /// See [`Float::csc_with_period_prec_round`] for the error bounds, the special and closed-form
+    /// cases, overflow, and the complexity; this function behaves the same way with `prec` equal to
+    /// the precision of the input.
+    ///
+    /// If you want to specify an output precision, consider using
+    /// [`Float::csc_with_period_prec_round`] instead.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the precision of
+    /// the input.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::from_unsigned_prec(1u32, 10)
+    ///     .0
+    ///     .csc_with_period_round(7, Floor);
+    /// assert_eq!(t.to_string(), "1.2773");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn csc_with_period_round(self, u: u64, rm: RoundingMode) -> (Self, Ordering) {
+        let prec = self.significant_bits();
+        self.csc_with_period_prec_round(u, prec, rm)
+    }
+
+    /// Computes $\csc(2\pi x/u)$, the cosecant of a [`Float`] measured in $u$ths of a turn,
+    /// rounding the result to the precision of the input and with the specified rounding mode. The
+    /// [`Float`] is taken by reference. An [`Ordering`] is also returned, indicating whether the
+    /// rounded cosecant is less than, equal to, or greater than the exact cosecant. Although `NaN`s
+    /// are not comparable to any [`Float`], whenever this function returns a `NaN` it also returns
+    /// `Equal`.
+    ///
+    /// See [`Float::csc_with_period_round`] and [`Float::csc_with_period_prec_round`]; this
+    /// function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the precision of
+    /// the input.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::from_unsigned_prec(1u32, 10)
+    ///     .0
+    ///     .csc_with_period_round_ref(7, Floor);
+    /// assert_eq!(t.to_string(), "1.2773");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn csc_with_period_round_ref(&self, u: u64, rm: RoundingMode) -> (Self, Ordering) {
+        self.csc_with_period_prec_round_ref(u, self.significant_bits(), rm)
+    }
+
+    /// Computes $\csc(2\pi x/u)$, the cosecant of a [`Float`] measured in $u$ths of a turn (so that
+    /// `u = 360` is degrees), rounding the result to the precision of the input and to the nearest
+    /// [`Float`]. The [`Float`] is taken by value.
+    ///
+    /// If the cosecant is equidistant from two [`Float`]s with the precision of the input, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// See [`Float::csc_with_period_prec_round`] for the error bounds, the special and closed-form
+    /// cases, overflow, and the complexity; this function behaves the same way with `prec` equal to
+    /// the precision of the input and `rm` equal to `Nearest`.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::csc_with_period_round`] instead. If you want to specify an output precision,
+    /// consider using [`Float::csc_with_period_prec`]. If you want both of these things, consider
+    /// using [`Float::csc_with_period_prec_round`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// let t = Float::from_unsigned_prec(1u32, 10).0.csc_with_period(7);
+    /// assert_eq!(t.to_string(), "1.2793");
+    ///
+    /// // a quarter turn is exactly 1
+    /// assert_eq!(Float::from(90u32).csc_with_period(360).to_string(), "1.00");
+    /// ```
+    #[inline]
+    pub fn csc_with_period(self, u: u64) -> Self {
+        let prec = self.significant_bits();
+        self.csc_with_period_prec(u, prec).0
+    }
+
+    /// Computes $\csc(2\pi x/u)$, the cosecant of a [`Float`] measured in $u$ths of a turn (so that
+    /// `u = 360` is degrees), rounding the result to the precision of the input and to the nearest
+    /// [`Float`]. The [`Float`] is taken by reference.
+    ///
+    /// If the cosecant is equidistant from two [`Float`]s with the precision of the input, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// See [`Float::csc_with_period_prec_round`] for the error bounds, the special and closed-form
+    /// cases, overflow, and the complexity; this function behaves the same way with `prec` equal to
+    /// the precision of the input and `rm` equal to `Nearest`.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::csc_with_period_round_ref`] instead. If you want to specify an output precision,
+    /// consider using [`Float::csc_with_period_prec_ref`]. If you want both of these things,
+    /// consider using [`Float::csc_with_period_prec_round_ref`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// let t = (&Float::from_unsigned_prec(1u32, 10).0).csc_with_period_ref(7);
+    /// assert_eq!(t.to_string(), "1.2793");
+    /// ```
+    #[inline]
+    pub fn csc_with_period_ref(&self, u: u64) -> Self {
+        self.csc_with_period_prec_ref(u, self.significant_bits()).0
+    }
+
+    /// Replaces a [`Float`] measured in $u$ths of a turn with its cosecant, rounding the result to
+    /// the specified precision and with the specified rounding mode. An [`Ordering`] is returned,
+    /// indicating whether the rounded cosecant is less than, equal to, or greater than the exact
+    /// cosecant. Although `NaN`s are not comparable to any [`Float`], whenever this function sets a
+    /// `NaN` it also returns `Equal`.
+    ///
+    /// See [`Float::csc_with_period_prec_round`] for the error bounds, the special and closed-form
+    /// cases, overflow, and the complexity; this function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::ONE;
+    /// assert_eq!(x.csc_with_period_prec_round_assign(7, 10, Floor), Less);
+    /// assert_eq!(x.to_string(), "1.2773");
+    /// ```
+    #[inline]
+    pub fn csc_with_period_prec_round_assign(
+        &mut self,
+        u: u64,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> Ordering {
+        let (t, o) = self.csc_with_period_prec_round_ref(u, prec, rm);
+        *self = t;
+        o
+    }
+
+    /// Replaces a [`Float`] measured in $u$ths of a turn with its cosecant, rounding the result to
+    /// the nearest value of the specified precision. An [`Ordering`] is returned, indicating
+    /// whether the rounded cosecant is less than, equal to, or greater than the exact cosecant.
+    /// Although `NaN`s are not comparable to any [`Float`], whenever this function sets a `NaN` it
+    /// also returns `Equal`.
+    ///
+    /// See [`Float::csc_with_period_prec`] and [`Float::csc_with_period_prec_round`]; this function
+    /// behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::ONE;
+    /// assert_eq!(x.csc_with_period_prec_assign(7, 10), Greater);
+    /// assert_eq!(x.to_string(), "1.2793");
+    /// ```
+    #[inline]
+    pub fn csc_with_period_prec_assign(&mut self, u: u64, prec: u64) -> Ordering {
+        self.csc_with_period_prec_round_assign(u, prec, Nearest)
+    }
+
+    /// Replaces a [`Float`] measured in $u$ths of a turn with its cosecant, rounding the result to
+    /// the precision of the input and with the specified rounding mode. An [`Ordering`] is
+    /// returned, indicating whether the rounded cosecant is less than, equal to, or greater than
+    /// the exact cosecant. Although `NaN`s are not comparable to any [`Float`], whenever this
+    /// function sets a `NaN` it also returns `Equal`.
+    ///
+    /// See [`Float::csc_with_period_round`] and [`Float::csc_with_period_prec_round`]; this
+    /// function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the precision of
+    /// the input.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from_unsigned_prec(1u32, 10).0;
+    /// assert_eq!(x.csc_with_period_round_assign(7, Floor), Less);
+    /// assert_eq!(x.to_string(), "1.2773");
+    /// ```
+    #[inline]
+    pub fn csc_with_period_round_assign(&mut self, u: u64, rm: RoundingMode) -> Ordering {
+        let prec = self.significant_bits();
+        self.csc_with_period_prec_round_assign(u, prec, rm)
+    }
+
+    /// Computes $\csc(2\pi x/u)$, the cosecant of a [`Float`] measured in $u$ths of a turn (so that
+    /// `u = 360` is degrees), rounding the result to the precision of the input and to the nearest
+    /// [`Float`]. The [`Float`] is replaced by the result.
+    ///
+    /// If the cosecant is equidistant from two [`Float`]s with the precision of the input, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// See [`Float::csc_with_period_prec_round`] for the error bounds, the special and closed-form
+    /// cases, overflow, and the complexity; this function behaves the same way with `prec` equal to
+    /// the precision of the input and `rm` equal to `Nearest`.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::csc_with_period_round_assign`] instead. If you want to specify an output precision,
+    /// consider using [`Float::csc_with_period_prec_assign`]. If you want both of these things,
+    /// consider using [`Float::csc_with_period_prec_round_assign`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// let mut x = Float::from_unsigned_prec(1u32, 10).0;
+    /// x.csc_with_period_assign(7);
+    /// assert_eq!(x.to_string(), "1.2793");
+    /// ```
+    #[inline]
+    pub fn csc_with_period_assign(&mut self, u: u64) {
+        let prec = self.significant_bits();
+        self.csc_with_period_prec_assign(u, prec);
+    }
 }
 
 impl Csc for Float {
@@ -1581,4 +2212,91 @@ where
     for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
 {
     emulate_rational_to_float_fn(Float::csc_rational_prec_ref, x)
+}
+
+/// Computes $\csc(2\pi x/u)$, the cosecant of a primitive float measured in $u$ths of a turn (so
+/// that `u = 360` is degrees).
+///
+/// $$
+/// f(x,u) = \csc(2\pi x/u)+\varepsilon.
+/// $$
+/// - If $x$ is not finite, $u=0$, or $x/u$ is a multiple of $1/4$ or has denominator 12 in lowest
+///   terms, $\varepsilon$ may be ignored or assumed to be 0.
+/// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 |\csc(2\pi x/u)|\rfloor-p}$, where $p$ is the
+///   precision of the output (24 if `T` is a [`f32`] and 53 if `T` is a [`f64`]).
+///
+/// Special cases:
+/// - $f(\text{NaN},u)=\text{NaN}$
+/// - $f(\pm\infty,u)=\text{NaN}$
+/// - $f(x,0)=\text{NaN}$
+/// - $f(\pm0.0,u)=\pm\infty$
+/// - If $x/u$ is a multiple of $1/2$, the cosecant has a pole there, and the result is exactly
+///   $\pm\infty$ with the sign of $x$: the sine is a zero carrying that sign, and the cosecant is
+///   its reciprocal, which keeps the function odd.
+/// - If $x/u$ in lowest terms has denominator 4, the result is exactly $\pm1$, and if it has
+///   denominator 12, exactly $\pm2$.
+/// - If $x/u$ in lowest terms has denominator 3 or 6, the result is $\pm2\sqrt3/3$; if 8,
+///   $\pm\sqrt2$; and if 20, $\pm2\varphi$ or $\pm2(\varphi-1)$, where $\varphi$ is the golden
+///   ratio.
+///
+/// Overflow happens at a pole, where the result is exactly $\pm\infty$, and for a tiny $x/u$, whose
+/// cosecant is close to $u/(2\pi x)$: an [`f32`] or [`f64`] whose fraction of a turn is not a
+/// multiple of $1/2$ is more than $2^{-66}$ of a turn away from one, so a cosecant that is not a
+/// pole stays below $2^{64}$ unless the angle itself is tiny. Underflow is not possible, since
+/// $|\csc(2\pi x/u)| \geq 1$.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::NegativeInfinity;
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::csc::primitive_float_csc_with_period;
+///
+/// assert!(primitive_float_csc_with_period(f32::NAN, 360).is_nan());
+/// assert!(primitive_float_csc_with_period(f32::INFINITY, 360).is_nan());
+/// assert!(primitive_float_csc_with_period(f32::NEGATIVE_INFINITY, 360).is_nan());
+/// assert!(primitive_float_csc_with_period(1.0f32, 0).is_nan());
+/// assert_eq!(
+///     NiceFloat(primitive_float_csc_with_period(-0.0f32, 360)),
+///     NiceFloat(f32::NEGATIVE_INFINITY)
+/// );
+/// // a quarter turn is exactly 1
+/// assert_eq!(
+///     NiceFloat(primitive_float_csc_with_period(90.0f32, 360)),
+///     NiceFloat(1.0)
+/// );
+/// // a half turn is a pole
+/// assert_eq!(
+///     NiceFloat(primitive_float_csc_with_period(180.0f32, 360)),
+///     NiceFloat(f32::INFINITY)
+/// );
+/// // a sixth of a turn: 2 sqrt(3)/3
+/// assert_eq!(
+///     NiceFloat(primitive_float_csc_with_period(60.0f32, 360)),
+///     NiceFloat(1.1547005)
+/// );
+/// // a twelfth of a turn is exactly 2
+/// assert_eq!(
+///     NiceFloat(primitive_float_csc_with_period(30.0f64, 360)),
+///     NiceFloat(2.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_csc_with_period(1.0f32, 7)),
+///     NiceFloat(1.279048)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_csc_with_period(1.0f64, 7)),
+///     NiceFloat(1.2790480076899327)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_csc_with_period<T: PrimitiveFloat>(x: T, u: u64) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_float_to_float_fn(|x, prec| Float::csc_with_period_prec(x, u, prec), x)
 }

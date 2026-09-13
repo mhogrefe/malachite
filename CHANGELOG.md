@@ -323,6 +323,19 @@ documented by git history.
   covers inputs below the `Float` exponent range, which no other path could round.
   `primitive_float_csc_rational` gives the correctly rounded `f32` or `f64` cosecant of a
   `Rational`.
+- `csc_with_period_prec_round`, `csc_with_period_prec`, `csc_with_period_round`, and
+  `csc_with_period` (with `_ref` and `_assign` variants), the cosecant of a `Float` measured in
+  $u$ths of a turn. MPFR has no `cscu`; this is `csc` with the sine taken in turns, which reduces
+  the argument exactly and so reaches the exact and closed-form cases the radian version cannot
+  see: odd quarter turns give $\pm1$, odd twelfths give $\pm2$, eighths give $\pm\sqrt2$, thirds
+  and sixths give $\pm2\sqrt3/3$, and twentieths give $\pm2\varphi$ or $\pm2(\varphi-1)$, where
+  $\varphi$ is the golden ratio. Multiples of a half turn are poles, where the sine is a zero
+  carrying the sign of the input and the cosecant is its reciprocal, an infinity with that sign;
+  keeping that identity is what makes the function odd everywhere, at the cost of period $u$ at a
+  pole alone. Unlike the secant's, this cosecant can overflow away from a pole, since a tiny angle
+  has a huge cosecant; such a result is decided from an exact bracket on the sine.
+  `primitive_float_csc_with_period` gives the correctly rounded `f32` or `f64` cosecant in $u$ths
+  of a turn, which does overflow for a small enough angle.
 - `Sec` and `SecAssign` (new traits in malachite-base) for `Float`, with the usual
   `sec_prec_round`, `sec_prec`, `sec_round`, and `_ref`/`_assign` variants: a port of `mpfr_sec`,
   which instantiates MPFR's generic reciprocal template with the cosine. The secant never
