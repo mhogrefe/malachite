@@ -320,6 +320,16 @@ documented by git history.
   the `Float` just below 1, whose reciprocal ties back to 1 at every working precision, so the Ziv
   loop would not terminate without it. `primitive_float_sec_rational` gives the correctly rounded
   `f32` or `f64` secant of a `Rational`.
+- `sec_with_period_prec_round`, `sec_with_period_prec`, `sec_with_period_round`, and
+  `sec_with_period` (with `_ref` and `_assign` variants), the secant of a `Float` measured in $u$ths
+  of a turn. MPFR has no `secu`; this is `sec` with the cosine taken in turns, which reduces the
+  argument exactly and so reaches the exact and closed-form cases the radian version cannot see:
+  even multiples of a half turn give $1$ and odd ones $-1$, thirds and sixths give $\pm2$, eighths
+  give $\pm\sqrt2$, and twelfths give $\pm2\sqrt3/3$. Odd multiples of a quarter turn are poles,
+  where the cosine is $+0.0$ and the secant is its reciprocal, $\infty$; keeping that identity is
+  what makes the function even everywhere. `primitive_float_sec_with_period` gives the correctly
+  rounded `f32` or `f64` secant in $u$ths of a turn; like the tangent's, it can only reach an
+  infinity at an exact pole, never through overflow.
 - `tan_pi_prec_round`, `tan_pi_prec`, `tan_pi_round`, and `tan_pi` (with `_ref` and `_assign`
   variants), a port of `mpfr_tanpi`: the tangent of a `Float` measured in half-turns, delegating to
   `tan_with_period` with a period of 2. Integers give a signed zero, half-integers are poles and

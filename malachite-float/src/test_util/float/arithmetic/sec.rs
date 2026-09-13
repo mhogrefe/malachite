@@ -7,9 +7,12 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::test_util::common::rug_float_significant_bits;
+use crate::{ComparableFloat, Float};
 use core::cmp::Ordering;
+use malachite_base::num::arithmetic::traits::{Abs, PowerOf2, Reciprocal};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::rounding_modes::RoundingMode::{self, Down};
 use malachite_q::Rational;
 use rug::float::Round;
 use rug::ops::AssignRound;
@@ -50,4 +53,41 @@ pub fn rug_sec_rational_prec_round(x: &Rational, prec: u64, rm: Round) -> (rug::
 
 pub fn rug_sec_rational_prec(x: &Rational, prec: u64) -> (rug::Float, Ordering) {
     rug_sec_rational_prec_round(x, prec, Round::Nearest)
+}
+
+// The secant in uths of a turn, from a bracket on the cosine: `cos_with_period` rounded toward zero
+// at a wider precision puts the true cosine in [|c|, |c| + ulp), and so the secant in the
+// reciprocal interval. Both ends are rounded independently, and the result is returned only when
+// they agree and neither is exact, which pins the secant's rounding. This is an oracle for
+// `sec_with_period`, which has no MPFR counterpart; `None` means the bracket did not settle it, and
+// the caller skips.
+pub fn sec_with_period_naive(
+    x: &Float,
+    u: u64,
+    prec: u64,
+    rm: RoundingMode,
+) -> Option<(Float, Ordering)> {
+    let w = prec + 64;
+    let c = x.cos_with_period_prec_round_ref(u, w, Down).0;
+    if c == 0u32 || !c.is_finite() {
+        return None;
+    }
+    let negative = c.is_sign_negative();
+    let lo = Rational::exact_from(&c).abs();
+    let hi = &lo + Rational::power_of_2(i64::from(c.get_exponent().unwrap()) - i64::exact_from(w));
+    let (b_lo, b_hi) = if negative {
+        (-lo.reciprocal(), -hi.reciprocal())
+    } else {
+        (hi.reciprocal(), lo.reciprocal())
+    };
+    let (f_lo, o_lo) = Float::from_rational_prec_round_ref(&b_lo, prec, rm);
+    let (f_hi, o_hi) = Float::from_rational_prec_round_ref(&b_hi, prec, rm);
+    if o_lo == o_hi
+        && o_lo != Ordering::Equal
+        && ComparableFloat(f_lo) == ComparableFloat(f_hi.clone())
+    {
+        Some((f_hi, o_hi))
+    } else {
+        None
+    }
 }
