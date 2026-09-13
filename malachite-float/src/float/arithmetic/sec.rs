@@ -20,7 +20,9 @@
 // range never sees; a reciprocal at the top of the range is decided from an exact bracket instead.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use crate::float::arithmetic::cos::{cos_rational_helper, round_bracket, signed_constant};
+use crate::float::arithmetic::cos::{
+    cos_rational_helper, cos_turns_helper, phi_minus_1_prec_round, round_bracket, signed_constant,
+};
 use crate::float::arithmetic::round_near_x::float_round_near_x;
 use crate::float::arithmetic::tan::{MAX_SETTLED_EXPONENT, round_bracket_signed_by};
 use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn};
@@ -219,6 +221,20 @@ fn sec_turns_special_case(q: &Rational, prec: u64, rm: RoundingMode) -> Option<(
                 rm,
             ))),
         },
+        _ if rm == Exact => None,
+        // Fifths and tenths of a turn, where the cosine is ±phi/2 or ±(phi - 1)/2, so the secant
+        // is ±2(phi - 1) or ±2 phi. sec(72°) = 2 phi, sec(144°) = -2(phi - 1)
+        5 => Some(if n == 1 || n == 4 {
+            doubled(signed_constant(Float::phi_prec_round, false, prec, rm))
+        } else {
+            doubled(signed_constant(phi_minus_1_prec_round, true, prec, rm))
+        }),
+        // sec(36°) = 2(phi - 1), sec(108°) = -2 phi
+        10 => Some(if n == 1 || n == 9 {
+            doubled(signed_constant(phi_minus_1_prec_round, false, prec, rm))
+        } else {
+            doubled(signed_constant(Float::phi_prec_round, true, prec, rm))
+        }),
         _ => None,
     }
 }
@@ -291,6 +307,58 @@ fn sec_with_period_prec_round_normal_ref(
         // err < 1 ulp, and of a known sign: rounding toward zero puts the cosine below the true one
         // in magnitude
         let c = xp.cos_with_period_prec_round_ref(u, m, Down).0;
+        // err < 1/2 + 2 < 4 ulps in all, as in algorithms.tex
+        let r = (&c).reciprocal();
+        match r.get_exponent().map(i64::from) {
+            Some(e) if e < MAX_SETTLED_EXPONENT => {
+                if float_can_round(r.significand_ref().unwrap(), m - 2, prec, rm) {
+                    return Float::from_float_prec_round(r, prec, rm);
+                }
+            }
+            _ => {
+                if let Some(result) = sec_bracket(&c, m, prec, rm) {
+                    return result;
+                }
+            }
+        }
+        m += increment;
+        increment = m >> 1;
+    }
+}
+
+// Computes sec(2 pi q) for a nonzero fraction of a turn q with |q| < 1, rounded to precision `prec`
+// with rounding mode `rm`. This is the `Rational` counterpart of
+// `sec_with_period_prec_round_normal_ref`, with the same structure: the small-input shortcut, the
+// closed-form cases, and a Ziv loop around the reciprocal of `cos_turns_helper`. `rm` may be
+// `Exact` only in the exact cases.
+fn sec_turns_helper(q: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    let exp_q = q.floor_log_base_2_abs() + 1;
+    // sec(t) = 1 + t^2/2 + ... with |sec(t) - 1| < t^2 for |t| <= 1, and |2 pi q| < 2^(exp_q + 3),
+    // so |sec(2 pi q) - 1| < 2^(6 + 2 EXP(q)), and the secant lies above 1
+    let err = -(exp_q << 1) - 6;
+    if err > 0 {
+        let err = u64::exact_from(err);
+        if err > prec + 1 {
+            // As in the `Float` version: the reference value 1 always rounds, the bound need not
+            // exceed prec + 2, and such a tiny q is neither a special case nor exact.
+            assert_ne!(rm, Exact, "Inexact sec_with_period");
+            return float_round_near_x(&Float::ONE, min(err, prec + 2), true, prec, rm).unwrap();
+        }
+    }
+    // The special cases need |q| >= 1/12
+    if exp_q >= -4
+        && let Some(result) = sec_turns_special_case(q, prec, rm)
+    {
+        return result;
+    }
+    // Only the exact cases can be rounded exactly
+    assert_ne!(rm, Exact, "Inexact sec_with_period");
+    let mut m = prec + prec.ceiling_log_base_2() + 3;
+    let mut increment = Limb::WIDTH;
+    loop {
+        // err < 1 ulp, and of a known sign: rounding toward zero puts the cosine below the true one
+        // in magnitude
+        let c = cos_turns_helper(q, m, Down).0;
         // err < 1/2 + 2 < 4 ulps in all, as in algorithms.tex
         let r = (&c).reciprocal();
         match r.get_exponent().map(i64::from) {
@@ -1358,8 +1426,9 @@ impl Float {
     /// - If $x/u$ is an odd multiple of $1/8$, the result is $\pm\sqrt2$.
     ///
     /// When $x/u$ in lowest terms has denominator 3 or 6, the result is exactly $\pm2$; when it has
-    /// denominator 8 or 12, the result is $\pm\sqrt2$ or $\pm2\sqrt3/3$, computed from a single
-    /// correctly rounded constant rather than from $\pi$ and a cosine, which is far faster.
+    /// denominator 5, 8, 10, or 12, the result is $\pm2\varphi$, $\pm\sqrt2$, $\pm2(\varphi-1)$, or
+    /// $\pm2\sqrt3/3$, computed from a single correctly rounded constant rather than from $\pi$ and
+    /// a cosine, which is far faster.
     ///
     /// Overflow:
     /// - If $f(x,u,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
@@ -1507,7 +1576,7 @@ impl Float {
     /// assert_eq!(t.to_string(), "1.6035");
     /// assert_eq!(o, Less);
     ///
-    /// // an eighth of a turn is exactly 1
+    /// // an eighth of a turn: sqrt(2)
     /// let (t, o) = Float::ONE.sec_with_period_prec(8, 10);
     /// assert_eq!(t.to_string(), "1.4141");
     /// assert_eq!(o, Less);
@@ -1795,6 +1864,232 @@ impl Float {
     pub fn sec_with_period_assign(&mut self, u: u64) {
         let prec = self.significant_bits();
         self.sec_with_period_prec_assign(u, prec);
+    }
+
+    /// Computes $\sec(2\pi x/u)$, the secant of a [`Rational`] measured in $u$ths of a turn,
+    /// rounding the result to the specified precision and with the specified rounding mode, and
+    /// returning the result as a [`Float`]. The [`Rational`] is taken by value. An [`Ordering`] is
+    /// also returned, indicating whether the rounded secant is less than, equal to, or greater than
+    /// the exact secant. Although `NaN`s are not comparable to any [`Float`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,u,p,m) = \sec(2\pi x/u)+\varepsilon.
+    /// $$
+    /// - If $u=0$ or $x/u$ is an odd multiple of $1/4$, $\varepsilon$ may be ignored or assumed to
+    ///   be 0.
+    /// - If $u\neq 0$ and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |\sec(2\pi
+    ///   x/u)|\rfloor-p+1}$.
+    /// - If $u\neq 0$ and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |\sec(2\pi
+    ///   x/u)|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(x,0,p,m)=\text{NaN}$
+    /// - $f(0,u,p,m)=1$
+    /// - If $x/u$ is an even multiple of $1/2$, the result is exactly $1$, and at an odd multiple
+    ///   exactly $-1$.
+    /// - If $x/u$ is an odd multiple of $1/4$, the secant has a pole there, and the result is
+    ///   exactly $\infty$: the cosine is $+0.0$ at every such point, and the secant is its
+    ///   reciprocal.
+    /// - If $x/u$ is an odd multiple of $1/8$, the result is $\pm\sqrt2$.
+    ///
+    /// When $x/u$ in lowest terms has denominator 3 or 6, the result is exactly $\pm2$; when it has
+    /// denominator 5, 8, 10, or 12, the result is $\pm2\varphi$, $\pm\sqrt2$, $\pm2(\varphi-1)$, or
+    /// $\pm2\sqrt3/3$, computed from a single correctly rounded constant rather than from $\pi$ and
+    /// a cosine, which is far faster.
+    ///
+    /// Underflow is not possible, since $|\sec(2\pi x/u)| \geq 1$. Overflow is as for
+    /// [`Float::sec_with_period_prec_round`], and requires $x/u$ within $2^{-2^{30}}$ of an odd
+    /// multiple of $1/4$ without being one, which takes a denominator of more than $2^{30}$ bits.
+    ///
+    /// If you know you'll be using `Nearest`, consider using
+    /// [`Float::sec_with_period_rational_prec`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n (\log n)^3 \log\log n + (n+m) (\log (n+m))^2 \log\log (n+m))$
+    ///
+    /// $M(n, m) = O((n+m) \log (n+m))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`: the fraction of a turn is reduced modulo 1 exactly, so only its size
+    /// and the precision drive the cost, not the magnitude of $x$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision (which is the case unless $x/u$ is a multiple of $1/8$, or $x$ or
+    /// $u$ is zero).
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::sec_with_period_rational_prec_round(Rational::ONE, 7, 10, Floor);
+    /// assert_eq!(t.to_string(), "1.6035");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (t, o) = Float::sec_with_period_rational_prec_round(Rational::ONE, 7, 10, Ceiling);
+    /// assert_eq!(t.to_string(), "1.6055");
+    /// assert_eq!(o, Greater);
+    ///
+    /// // a quarter turn is a pole
+    /// let (t, o) = Float::sec_with_period_rational_prec_round(
+    ///     Rational::from_unsigneds(1u8, 4),
+    ///     1,
+    ///     10,
+    ///     Exact,
+    /// );
+    /// assert_eq!(t.to_string(), "Infinity");
+    /// assert_eq!(o, Equal);
+    ///
+    /// // a twelfth of a turn: 2 sqrt(3)/3
+    /// let (t, o) = Float::sec_with_period_rational_prec_round(
+    ///     Rational::from_unsigneds(1u8, 12),
+    ///     1,
+    ///     10,
+    ///     Nearest,
+    /// );
+    /// assert_eq!(t.to_string(), "1.1543");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn sec_with_period_rational_prec_round(
+        x: Rational,
+        u: u64,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        Self::sec_with_period_rational_prec_round_ref(&x, u, prec, rm)
+    }
+
+    /// Computes $\sec(2\pi x/u)$, the secant of a [`Rational`] measured in $u$ths of a turn,
+    /// rounding the result to the specified precision and with the specified rounding mode, and
+    /// returning the result as a [`Float`]. The [`Rational`] is taken by reference. An [`Ordering`]
+    /// is also returned, indicating whether the rounded secant is less than, equal to, or greater
+    /// than the exact secant. Although `NaN`s are not comparable to any [`Float`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`Float::sec_with_period_rational_prec_round`] for the error bounds, the special and
+    /// closed-form cases, overflow, and the complexity; this function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::sec_with_period_rational_prec_round_ref(&Rational::ONE, 7, 10, Floor);
+    /// assert_eq!(t.to_string(), "1.6035");
+    /// assert_eq!(o, Less);
+    /// ```
+    pub fn sec_with_period_rational_prec_round_ref(
+        x: &Rational,
+        u: u64,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        // for u = 0, return NaN
+        if u == 0 {
+            return (Self::NAN, Equal);
+        }
+        // sec(0) = 1
+        if *x == 0u32 {
+            return (Self::one_prec(prec), Equal);
+        }
+        // q = x/u, reduced to (-1, 1): sec(2 pi q) has period 1 in q, and a multiple of u gives a
+        // cosine of 1, so a secant of 1
+        let q = x / Rational::from(u) % Rational::ONE;
+        if q == 0u32 {
+            return (Self::one_prec(prec), Equal);
+        }
+        sec_turns_helper(&q, prec, rm)
+    }
+
+    /// Computes $\sec(2\pi x/u)$, the secant of a [`Rational`] measured in $u$ths of a turn,
+    /// rounding the result to the nearest value of the specified precision, and returning the
+    /// result as a [`Float`]. The [`Rational`] is taken by value. An [`Ordering`] is also returned,
+    /// indicating whether the rounded secant is less than, equal to, or greater than the exact
+    /// secant. Although `NaN`s are not comparable to any [`Float`], whenever this function returns
+    /// a `NaN` it also returns `Equal`.
+    ///
+    /// If the secant is equidistant from two [`Float`]s with the specified precision, the [`Float`]
+    /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
+    /// the `Nearest` rounding mode.
+    ///
+    /// See [`Float::sec_with_period_rational_prec_round`] for the error bounds, the special and
+    /// closed-form cases, overflow, and the complexity; this function behaves the same way with
+    /// `Nearest`.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::sec_with_period_rational_prec_round`] instead.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::sec_with_period_rational_prec(Rational::ONE, 7, 10);
+    /// assert_eq!(t.to_string(), "1.6035");
+    /// assert_eq!(o, Less);
+    ///
+    /// // an eighth of a turn: sqrt(2)
+    /// let (t, o) = Float::sec_with_period_rational_prec(Rational::ONE, 8, 10);
+    /// assert_eq!(t.to_string(), "1.4141");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn sec_with_period_rational_prec(x: Rational, u: u64, prec: u64) -> (Self, Ordering) {
+        Self::sec_with_period_rational_prec_round_ref(&x, u, prec, Nearest)
+    }
+
+    /// Computes $\sec(2\pi x/u)$, the secant of a [`Rational`] measured in $u$ths of a turn,
+    /// rounding the result to the nearest value of the specified precision, and returning the
+    /// result as a [`Float`]. The [`Rational`] is taken by reference. An [`Ordering`] is also
+    /// returned, indicating whether the rounded secant is less than, equal to, or greater than the
+    /// exact secant. Although `NaN`s are not comparable to any [`Float`], whenever this function
+    /// returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`Float::sec_with_period_rational_prec`] and
+    /// [`Float::sec_with_period_rational_prec_round`]; this function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::sec_with_period_rational_prec_ref(&Rational::ONE, 7, 10);
+    /// assert_eq!(t.to_string(), "1.6035");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn sec_with_period_rational_prec_ref(x: &Rational, u: u64, prec: u64) -> (Self, Ordering) {
+        Self::sec_with_period_rational_prec_round_ref(x, u, prec, Nearest)
     }
 }
 
@@ -2203,4 +2498,107 @@ where
     for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
 {
     emulate_float_to_float_fn(|x, prec| Float::sec_with_period_prec(x, u, prec), x)
+}
+
+/// Computes $\sec(2\pi x/u)$, the secant of a [`Rational`] measured in $u$ths of a turn (so that `u
+/// = 360` is degrees), returning the result as a primitive float.
+///
+/// $$
+/// f(x,u) = \sec(2\pi x/u)+\varepsilon.
+/// $$
+/// - If $u=0$ or $x/u$ is an odd multiple of $1/4$, $\varepsilon$ may be ignored or assumed to be
+///   0.
+/// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 |\sec(2\pi x/u)|\rfloor-p}$, where $p$ is the
+///   precision of the output (24 if `T` is a [`f32`] and 53 if `T` is a [`f64`]).
+///
+/// Special cases:
+/// - $f(x,0)=\text{NaN}$
+/// - $f(0,u)=1$
+/// - If $x/u$ is an even multiple of $1/2$, the result is exactly $1$, and at an odd multiple
+///   exactly $-1$.
+/// - If $x/u$ is an odd multiple of $1/4$, the secant has a pole there, and the result is exactly
+///   $\infty$: the cosine is $+0.0$ at every such point, and the secant is its reciprocal.
+/// - If $x/u$ is an odd multiple of $1/8$, the result is $\pm\sqrt2$; if it is a multiple of $1/3$
+///   or $1/6$ but not of $1/2$, the result is exactly $\pm2$; if it is an odd multiple of $1/12$,
+///   the result is $\pm2\sqrt3/3$; and fifths and tenths give $\pm2\varphi$ or $\pm2(\varphi-1)$,
+///   where $\varphi$ is the golden ratio.
+///
+/// Overflow is possible away from a pole too: a fraction of a turn within about $2^{-130}$ of an
+/// odd multiple of $1/4$ has a secant beyond the largest [`f32`], and one within about $2^{-1026}$
+/// of one beyond the largest [`f64`], and the result is then $\pm\infty$. Underflow is not
+/// possible, since $|\sec(2\pi x/u)| \geq 1$.
+///
+/// # Worst-case complexity
+/// $T(m) = O(m (\log m)^2 \log\log m)$
+///
+/// $M(m) = O(m \log m)$
+///
+/// where $T$ is time, $M$ is additional memory, and $m$ is `x.significant_bits()`: the fraction of
+/// a turn is reduced modulo 1 exactly, so the magnitude of $x$ does not drive the cost.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::Zero;
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::sec::primitive_float_sec_with_period_rational;
+/// use malachite_q::Rational;
+///
+/// assert!(primitive_float_sec_with_period_rational::<f64>(&Rational::ZERO, 0).is_nan());
+/// assert_eq!(
+///     NiceFloat(primitive_float_sec_with_period_rational::<f64>(
+///         &Rational::ZERO,
+///         360
+///     )),
+///     NiceFloat(1.0)
+/// );
+/// // a quarter turn is a pole
+/// assert_eq!(
+///     NiceFloat(primitive_float_sec_with_period_rational::<f64>(
+///         &Rational::from_unsigneds(1u8, 4),
+///         1
+///     )),
+///     NiceFloat(f64::INFINITY)
+/// );
+/// // an eighth of a turn: sqrt(2)
+/// assert_eq!(
+///     NiceFloat(primitive_float_sec_with_period_rational::<f64>(
+///         &Rational::from_unsigneds(1u8, 8),
+///         1
+///     )),
+///     NiceFloat(core::f64::consts::SQRT_2)
+/// );
+/// // a twelfth of a turn: 2 sqrt(3)/3
+/// assert_eq!(
+///     NiceFloat(primitive_float_sec_with_period_rational::<f64>(
+///         &Rational::from_unsigneds(1u8, 12),
+///         1
+///     )),
+///     NiceFloat(1.1547005383792515)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_sec_with_period_rational::<f32>(
+///         &Rational::from_unsigneds(1u8, 7),
+///         1
+///     )),
+///     NiceFloat(1.6038755)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_sec_with_period_rational::<f64>(
+///         &Rational::from_unsigneds(1u8, 7),
+///         1
+///     )),
+///     NiceFloat(1.6038754716096766)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_sec_with_period_rational<T: PrimitiveFloat>(x: &Rational, u: u64) -> T
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_rational_to_float_fn(
+        |x, prec| Float::sec_with_period_rational_prec_ref(x, u, prec),
+        x,
+    )
 }

@@ -325,11 +325,16 @@ documented by git history.
   of a turn. MPFR has no `secu`; this is `sec` with the cosine taken in turns, which reduces the
   argument exactly and so reaches the exact and closed-form cases the radian version cannot see:
   even multiples of a half turn give $1$ and odd ones $-1$, thirds and sixths give $\pm2$, eighths
-  give $\pm\sqrt2$, and twelfths give $\pm2\sqrt3/3$. Odd multiples of a quarter turn are poles,
+  give $\pm\sqrt2$, twelfths give $\pm2\sqrt3/3$, and fifths and tenths give $\pm2\varphi$ or
+  $\pm2(\varphi-1)$, where $\varphi$ is the golden ratio. Odd multiples of a quarter turn are poles,
   where the cosine is $+0.0$ and the secant is its reciprocal, $\infty$; keeping that identity is
   what makes the function even everywhere. `primitive_float_sec_with_period` gives the correctly
   rounded `f32` or `f64` secant in $u$ths of a turn; like the tangent's, it can only reach an
   infinity at an exact pole, never through overflow.
+  `sec_with_period_rational_prec_round` and `sec_with_period_rational_prec` (with `_ref` variants)
+  take a `Rational` instead, reaching the exact and closed-form cases directly and needing no
+  argument reduction beyond the exact one. `primitive_float_sec_with_period_rational` gives the
+  correctly rounded `f32` or `f64` secant of a `Rational` fraction of a turn.
 - `tan_pi_prec_round`, `tan_pi_prec`, `tan_pi_round`, and `tan_pi` (with `_ref` and `_assign`
   variants), a port of `mpfr_tanpi`: the tangent of a `Float` measured in half-turns, delegating to
   `tan_with_period` with a period of 2. Integers give a signed zero, half-integers are poles and
