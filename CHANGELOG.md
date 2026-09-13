@@ -318,6 +318,11 @@ documented by git history.
   representable reciprocal. `csc(\pm0.0)` is $\pm\infty$, and the function is odd.
   `primitive_float_csc` gives the correctly rounded `f32` or `f64` cosecant, which overflows for a
   small enough input.
+  `csc_rational_prec_round` and `csc_rational_prec` (with `_ref` variants) take a `Rational`
+  instead, with a direct bracket for a tiny input, inverting a bracket on the sine; that also
+  covers inputs below the `Float` exponent range, which no other path could round.
+  `primitive_float_csc_rational` gives the correctly rounded `f32` or `f64` cosecant of a
+  `Rational`.
 - `Sec` and `SecAssign` (new traits in malachite-base) for `Float`, with the usual
   `sec_prec_round`, `sec_prec`, `sec_round`, and `_ref`/`_assign` variants: a port of `mpfr_sec`,
   which instantiates MPFR's generic reciprocal template with the cosine. The secant never

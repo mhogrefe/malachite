@@ -22,8 +22,12 @@
 // certify a reciprocal that is exactly representable.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use crate::float::arithmetic::tan::{MAX_SETTLED_EXPONENT, round_bracket_signed_by};
-use crate::{Float, emulate_float_to_float_fn};
+use crate::float::arithmetic::cos::sin_bound;
+use crate::float::arithmetic::sin::sin_rational_helper;
+use crate::float::arithmetic::tan::{
+    MAX_SETTLED_EXPONENT, round_bracket_signed, round_bracket_signed_by,
+};
+use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn};
 use core::cmp::Ordering::{self, Equal, Greater, Less};
 use core::cmp::max;
 use malachite_base::num::arithmetic::traits::{
@@ -139,6 +143,74 @@ fn csc_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float, 
             }
             _ => {
                 if let Some(result) = csc_bracket(&c, m, prec, rm) {
+                    return result;
+                }
+            }
+        }
+        m += increment;
+        increment = m >> 1;
+    }
+}
+
+// csc x for a tiny nonzero `Rational` x, bracketed by inverting a bracket on the sine: `sin_bound`
+// pins sin x from both sides at a growing working precision, and the reciprocals of those bounds
+// bracket the cosecant until the rounding is unambiguous (the cosecant of a nonzero rational is
+// transcendental, so it eventually is). The general path cannot settle such an x: there csc x is
+// 1/x + x/6 + ..., with the correction far below the resolution of any reciprocal of a rounded
+// sine, so the Ziv loop would have to raise the working precision to about twice the input's
+// exponent, which is unbounded below the `Float` exponent range.
+fn csc_rational_tiny(
+    x: &Rational,
+    ax: &Rational,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    let mut w = prec + 64;
+    loop {
+        // sin x lies in [s_lo, s_hi], so its reciprocal lies in [1/s_hi, 1/s_lo]
+        let s_lo = sin_bound(ax, w, false);
+        let s_hi = sin_bound(ax, w, true);
+        if let Some(result) =
+            round_bracket_signed(x, s_hi.reciprocal(), s_lo.reciprocal(), prec, rm)
+        {
+            return result;
+        }
+        w <<= 1;
+    }
+}
+
+// Computes csc(x) for a nonzero `Rational` x, rounded to precision `prec` with rounding mode `rm`.
+// (csc(0) = infinity is handled by the caller.) The cosecant of a nonzero rational is
+// transcendental, so the result is never exactly representable and `rm` must not be `Exact`.
+//
+// This is the `Float` algorithm with the sine taken from `sin_rational_helper`, which rounds the
+// input once and handles both a tiny x and an x too large to be a `Float`, and with a direct
+// bracket for a tiny input, standing in for MPFR's shortcut there.
+pub(crate) fn csc_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    assert_ne!(rm, Exact, "Inexact csc");
+    let exp_x = x.floor_log_base_2_abs() + 1; // the MPFR-style exponent of x
+    // Below this the reciprocal of a rounded sine can never be certified: the correction x/6 is
+    // smaller than any ulp the loop could reach without raising the working precision to about
+    // twice the input's exponent.
+    if exp_x < 0 && -(exp_x << 2) > i64::exact_from(prec) + 3 {
+        return csc_rational_tiny(x, &x.abs(), prec, rm);
+    }
+    let mut m = prec + prec.ceiling_log_base_2() + 3;
+    let mut increment = Limb::WIDTH;
+    loop {
+        // err < 1 ulp, and of a known sign: rounding toward zero puts the sine below the true one
+        // in magnitude
+        let s = sin_rational_helper(x, m, Down).0;
+        // err < 1/2 + 2 < 4 ulps in all, as in algorithms.tex
+        let r = (&s).reciprocal();
+        match r.get_exponent().map(i64::from) {
+            Some(e) if e < MAX_SETTLED_EXPONENT => {
+                if float_can_round(r.significand_ref().unwrap(), m - 2, prec, rm) {
+                    return Float::from_float_prec_round(r, prec, rm);
+                }
+            }
+            _ => {
+                if let Some(result) = csc_bracket(&s, m, prec, rm) {
                     return result;
                 }
             }
@@ -888,6 +960,295 @@ impl Float {
         let prec = self.significant_bits();
         self.csc_prec_round_assign(prec, rm)
     }
+
+    /// Computes $\csc x$, the cosecant of a [`Rational`], rounding the result to the specified
+    /// precision and with the specified rounding mode and returning the result as a [`Float`]. The
+    /// [`Rational`] is taken by value. An [`Ordering`] is also returned, indicating whether the
+    /// rounded cosecant is less than, equal to, or greater than the exact cosecant.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,p,m) = \csc x+\varepsilon.
+    /// $$
+    /// - If $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |\csc x|\rfloor-p+1}$.
+    /// - If $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |\csc x|\rfloor-p}$.
+    ///
+    /// These bounds do not apply when the result overflows; see below.
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p,m)=\infty$.
+    ///
+    /// Overflow:
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Ceiling`, `Up`, or `Nearest`, $\infty$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)\geq 2^{2^{30}-1}$ and $m$ is `Floor` or `Down`, $(1-(1/2)^p)2^{2^{30}-1}$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)\leq -2^{2^{30}-1}$ and $m$ is `Floor`, `Up`, or `Nearest`, $-\infty$ is
+    ///   returned instead.
+    /// - If $f(x,p,m)\leq -2^{2^{30}-1}$ and $m$ is `Ceiling` or `Down`, $-(1-(1/2)^p)2^{2^{30}-1}$
+    ///   is returned instead.
+    /// - If $0<f(x,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,p,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    ///
+    /// Underflow is not possible, since $|\csc x| \geq 1$. Overflow requires an input within
+    /// $2^{-2^{30}}$ of a nonzero multiple of $\pi$, which takes a denominator of more than
+    /// $2^{30}$ bits, or an input of magnitude about $2^{-2^{30}}$ or below, whose reciprocal alone
+    /// is beyond the largest finite [`Float`].
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::csc_rational_prec`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m, e) = O(n (\log n)^3 \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
+    ///
+    /// $M(n, m, e) = O((n+m+e) \log (n+m+e))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, $m$ is `x.significant_bits()`,
+    /// and $e$ is `x.floor_log_base_2_abs()` (taken as 0 when it is negative or $x = 0$): the input
+    /// is rounded to a working precision and its [`Float`] cosine taken there, then reciprocated,
+    /// which for $|x| \geq 2$ reduces the argument modulo $2\pi$ and so needs $\pi$ to about $n +
+    /// e$ bits.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision (which is the case for every nonzero input).
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::csc_rational_prec_round(Rational::from_unsigneds(3u8, 5), 5, Floor);
+    /// assert_eq!(c.to_string(), "1.75");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::csc_rational_prec_round(Rational::from_unsigneds(3u8, 5), 5, Ceiling);
+    /// assert_eq!(c.to_string(), "1.81");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) = Float::csc_rational_prec_round(Rational::from_unsigneds(3u8, 5), 20, Floor);
+    /// assert_eq!(c.to_string(), "1.7710304");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::csc_rational_prec_round(Rational::from_unsigneds(3u8, 5), 20, Ceiling);
+    /// assert_eq!(c.to_string(), "1.7710323");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn csc_rational_prec_round(x: Rational, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+        Self::csc_rational_prec_round_ref(&x, prec, rm)
+    }
+
+    /// Computes $\csc x$, the cosecant of a [`Rational`], rounding the result to the specified
+    /// precision and with the specified rounding mode and returning the result as a [`Float`]. The
+    /// [`Rational`] is taken by reference. An [`Ordering`] is also returned, indicating whether the
+    /// rounded cosecant is less than, equal to, or greater than the exact cosecant.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,p,m) = \csc x+\varepsilon.
+    /// $$
+    /// - If $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |\csc x|\rfloor-p+1}$.
+    /// - If $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |\csc x|\rfloor-p}$.
+    ///
+    /// These bounds do not apply when the result overflows.
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p,m)=\infty$.
+    ///
+    /// See the [`Float::csc_rational_prec_round`] documentation for information on overflow.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::csc_rational_prec_ref`]
+    /// instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m, e) = O(n (\log n)^3 \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
+    ///
+    /// $M(n, m, e) = O((n+m+e) \log (n+m+e))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, $m$ is `x.significant_bits()`,
+    /// and $e$ is `x.floor_log_base_2_abs()` (taken as 0 when it is negative or $x = 0$): the input
+    /// is rounded to a working precision and its [`Float`] cosine taken there, then reciprocated,
+    /// which for $|x| \geq 2$ reduces the argument modulo $2\pi$ and so needs $\pi$ to about $n +
+    /// e$ bits.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision (which is the case for every nonzero input).
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) =
+    ///     Float::csc_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 5, Floor);
+    /// assert_eq!(c.to_string(), "1.75");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) =
+    ///     Float::csc_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 5, Ceiling);
+    /// assert_eq!(c.to_string(), "1.81");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) =
+    ///     Float::csc_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 20, Floor);
+    /// assert_eq!(c.to_string(), "1.7710304");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) =
+    ///     Float::csc_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 20, Ceiling);
+    /// assert_eq!(c.to_string(), "1.7710323");
+    /// assert_eq!(o, Greater);
+    /// ```
+    pub fn csc_rational_prec_round_ref(
+        x: &Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        if *x == 0u32 {
+            // csc(0) = infinity; a `Rational` zero has no sign, so the result is positive
+            return (Self::INFINITY, Equal);
+        }
+        csc_rational_helper(x, prec, rm)
+    }
+
+    /// Computes $\csc x$, the cosecant of a [`Rational`], rounding the result to the nearest value
+    /// of the specified precision and returning the result as a [`Float`]. The [`Rational`] is
+    /// taken by value. An [`Ordering`] is also returned, indicating whether the rounded cosecant is
+    /// less than, equal to, or greater than the exact cosecant.
+    ///
+    /// If the cosecant is equidistant from two [`Float`]s with the specified precision, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,p) = \csc x+\varepsilon,
+    /// $$
+    /// where $|\varepsilon| \leq 2^{\lfloor\log_2 |\csc x|\rfloor-p}$ (unless the result overflows;
+    /// see below).
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p)=\infty$.
+    ///
+    /// Overflow:
+    /// - If $f(x,p)\geq 2^{2^{30}-1}$, $\infty$ is returned instead.
+    /// - If $f(x,p)\leq -2^{2^{30}-1}$, $-\infty$ is returned instead.
+    /// - If $0<f(x,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,p)<0$, $-0.0$ is returned instead.
+    ///
+    /// Underflow is not possible, since $|\csc x| \geq 1$. Overflow requires an input within
+    /// $2^{-2^{30}}$ of a nonzero multiple of $\pi$, which takes a denominator of more than
+    /// $2^{30}$ bits, or an input of magnitude about $2^{-2^{30}}$ or below, whose reciprocal alone
+    /// is beyond the largest finite [`Float`].
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::csc_rational_prec_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m, e) = O(n (\log n)^3 \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
+    ///
+    /// $M(n, m, e) = O((n+m+e) \log (n+m+e))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, $m$ is `x.significant_bits()`,
+    /// and $e$ is `x.floor_log_base_2_abs()` (taken as 0 when it is negative or $x = 0$): the input
+    /// is rounded to a working precision and its [`Float`] cosine taken there, then reciprocated,
+    /// which for $|x| \geq 2$ reduces the argument modulo $2\pi$ and so needs $\pi$ to about $n +
+    /// e$ bits.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::csc_rational_prec(Rational::from_unsigneds(3u8, 5), 5);
+    /// assert_eq!(c.to_string(), "1.75");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::csc_rational_prec(Rational::from_unsigneds(3u8, 5), 20);
+    /// assert_eq!(c.to_string(), "1.7710323");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn csc_rational_prec(x: Rational, prec: u64) -> (Self, Ordering) {
+        Self::csc_rational_prec_round_ref(&x, prec, Nearest)
+    }
+
+    /// Computes $\csc x$, the cosecant of a [`Rational`], rounding the result to the nearest value
+    /// of the specified precision and returning the result as a [`Float`]. The [`Rational`] is
+    /// taken by reference. An [`Ordering`] is also returned, indicating whether the rounded
+    /// cosecant is less than, equal to, or greater than the exact cosecant.
+    ///
+    /// If the cosecant is equidistant from two [`Float`]s with the specified precision, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,p) = \csc x+\varepsilon,
+    /// $$
+    /// where $|\varepsilon| \leq 2^{\lfloor\log_2 |\csc x|\rfloor-p}$ (unless the result
+    /// overflows).
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p)=\infty$.
+    ///
+    /// See the [`Float::csc_rational_prec`] documentation for information on overflow.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::csc_rational_prec_round_ref`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m, e) = O(n (\log n)^3 \log\log n + (n+m+e) (\log (n+m+e))^2 \log\log (n+m+e))$
+    ///
+    /// $M(n, m, e) = O((n+m+e) \log (n+m+e))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, $m$ is `x.significant_bits()`,
+    /// and $e$ is `x.floor_log_base_2_abs()` (taken as 0 when it is negative or $x = 0$): the input
+    /// is rounded to a working precision and its [`Float`] cosine taken there, then reciprocated,
+    /// which for $|x| \geq 2$ reduces the argument modulo $2\pi$ and so needs $\pi$ to about $n +
+    /// e$ bits.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::csc_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 5);
+    /// assert_eq!(c.to_string(), "1.75");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::csc_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 20);
+    /// assert_eq!(c.to_string(), "1.7710323");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn csc_rational_prec_ref(x: &Rational, prec: u64) -> (Self, Ordering) {
+        Self::csc_rational_prec_round_ref(x, prec, Nearest)
+    }
 }
 
 impl Csc for Float {
@@ -1156,4 +1517,68 @@ where
     for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
 {
     emulate_float_to_float_fn(Float::csc_prec, x)
+}
+
+/// Computes $\csc x$, the cosecant of a [`Rational`], returning the result as a primitive float.
+///
+/// $$
+/// f(x) = \csc x+\varepsilon,
+/// $$
+/// where $|\varepsilon| < 2^{\lfloor\log_2 |\csc x|\rfloor-p}$, and $p$ is the precision of the
+/// output (24 if `T` is a [`f32`] and 53 if `T` is a [`f64`]).
+///
+/// Special cases:
+/// - $f(0)=\infty$
+///
+/// Overflow is possible: a [`Rational`] within about $2^{-129}$ of a nonzero multiple of $\pi$ has
+/// a cosecant beyond the largest [`f32`], and one within about $2^{-1025}$ of one beyond the
+/// largest [`f64`]; so does any [`Rational`] small enough that its reciprocal alone leaves the
+/// range, and $0$ itself, whose cosecant is $\infty$. Underflow is not possible, since $|\csc x|
+/// \geq 1$.
+///
+/// # Worst-case complexity
+/// $T(m, e) = O((m+e) (\log (m+e))^2 \log\log (m+e))$
+///
+/// $M(m, e) = O((m+e) \log (m+e))$
+///
+/// where $T$ is time, $M$ is additional memory, $m$ is `x.significant_bits()`, and $e$ is
+/// `x.floor_log_base_2_abs()` (taken as 0 when it is negative or $x = 0$): for $|x| \geq 3$ the
+/// argument is reduced modulo $2\pi$, which needs $\pi$ to about $e$ bits.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::Zero;
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::csc::primitive_float_csc_rational;
+/// use malachite_q::Rational;
+///
+/// assert_eq!(
+///     NiceFloat(primitive_float_csc_rational::<f64>(&Rational::ZERO)),
+///     NiceFloat(f64::INFINITY)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_csc_rational::<f64>(
+///         &Rational::from_unsigneds(1u8, 3)
+///     )),
+///     NiceFloat(3.0562842545795195)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_csc_rational::<f32>(
+///         &Rational::from_unsigneds(1u8, 3)
+///     )),
+///     NiceFloat(3.0562842)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_csc_rational::<f64>(&Rational::from(10000))),
+///     NiceFloat(-3.2720972452826818)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_csc_rational<T: PrimitiveFloat>(x: &Rational) -> T
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_rational_to_float_fn(Float::csc_rational_prec_ref, x)
 }

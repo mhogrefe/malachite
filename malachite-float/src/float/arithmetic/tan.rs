@@ -1033,7 +1033,7 @@ pub(crate) fn tan_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> 
 }
 
 // `round_bracket` for a bracket [lo, hi] of the magnitude of the tangent, restoring the sign of x.
-fn round_bracket_signed(
+pub(crate) fn round_bracket_signed(
     x: &Rational,
     lo: Rational,
     hi: Rational,
