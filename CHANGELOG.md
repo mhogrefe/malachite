@@ -308,6 +308,16 @@ documented by git history.
   `primitive_float_tan_with_period` and `primitive_float_tan_with_period_rational` give the
   correctly rounded `f32` or `f64` tangent; a primitive float is never merely close enough to a
   pole to overflow, but a `Rational` can be.
+- `Csc` and `CscAssign` (new traits in malachite-base) for `Float`, with the usual
+  `csc_prec_round`, `csc_prec`, `csc_round`, and `_ref`/`_assign` variants: a port of `mpfr_csc`,
+  MPFR's generic reciprocal template with the sine. The cosecant never underflows, since its
+  magnitude is at least 1, but unlike MPFR's it can overflow: within $2^{-2^{30}}$ of a multiple of
+  $\pi$, and for any input whose reciprocal alone leaves the range. MPFR's shortcut for a tiny
+  input is kept, where $\csc x$ is $1/x + x/6 + \ldots$ and rounding $1/x$ settles the result
+  except when $x$ is a power of 2; without it the Ziv loop could never certify an exactly
+  representable reciprocal. `csc(\pm0.0)` is $\pm\infty$, and the function is odd.
+  `primitive_float_csc` gives the correctly rounded `f32` or `f64` cosecant, which overflows for a
+  small enough input.
 - `Sec` and `SecAssign` (new traits in malachite-base) for `Float`, with the usual
   `sec_prec_round`, `sec_prec`, `sec_round`, and `_ref`/`_assign` variants: a port of `mpfr_sec`,
   which instantiates MPFR's generic reciprocal template with the cosine. The secant never

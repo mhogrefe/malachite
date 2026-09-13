@@ -954,6 +954,18 @@ pub trait SecAssign {
     fn sec_assign(&mut self);
 }
 
+/// Computes $\csc(x)$, the cosecant of a number.
+pub trait Csc {
+    type Output;
+
+    fn csc(self) -> Self::Output;
+}
+
+/// Replaces a number with its cosecant, $\csc(x)$.
+pub trait CscAssign {
+    fn csc_assign(&mut self);
+}
+
 /// Replaces a number with its sine, $\sin(x)$, and writes its cosine, $\cos(x)$, to a second
 /// number.
 pub trait SinCosAssign {
