@@ -2091,6 +2091,565 @@ impl Float {
     pub fn sec_with_period_rational_prec_ref(x: &Rational, u: u64, prec: u64) -> (Self, Ordering) {
         Self::sec_with_period_rational_prec_round_ref(x, u, prec, Nearest)
     }
+
+    /// Computes $\sec(\pi x)$, the secant of a [`Float`] measured in half-turns, rounding the
+    /// result to the specified precision and with the specified rounding mode. The [`Float`] is
+    /// taken by value. An [`Ordering`] is also returned, indicating whether the rounded secant is
+    /// less than, equal to, or greater than the exact secant. Although `NaN`s are not comparable to
+    /// any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// This is `sec_with_period` with a period of 2: see [`Float::sec_with_period_prec_round`] for
+    /// the error bounds, the special and closed-form cases (even integers give $1$ and odd ones
+    /// $-1$; half-integers are poles and give $\infty$; odd multiples of $1/4$ give $\pm\sqrt2$;
+    /// multiples of $1/3$ give $\pm2$; and odd multiples of $1/6$, and multiples of $1/5$ and
+    /// $1/10$, give $\pm2\sqrt3/3$, $\pm2\varphi$, or $\pm2(\varphi-1)$, where $\varphi$ is the
+    /// golden ratio), overflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::from(0.1f64).sec_pi_prec_round(10, Floor);
+    /// assert_eq!(t.to_string(), "1.0508");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (t, o) = Float::from(0.1f64).sec_pi_prec_round(10, Ceiling);
+    /// assert_eq!(t.to_string(), "1.0527");
+    /// assert_eq!(o, Greater);
+    ///
+    /// // a half-turn is exactly zero, reached from below
+    /// let (t, o) = Float::ONE.sec_pi_prec_round(10, Exact);
+    /// assert_eq!(t.to_string(), "-1.0000");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn sec_pi_prec_round(self, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+        self.sec_with_period_prec_round(2, prec, rm)
+    }
+
+    /// Computes $\sec(\pi x)$, the secant of a [`Float`] measured in half-turns, rounding the
+    /// result to the specified precision and with the specified rounding mode. The [`Float`] is
+    /// taken by reference. An [`Ordering`] is also returned, indicating whether the rounded secant
+    /// is less than, equal to, or greater than the exact secant. Although `NaN`s are not comparable
+    /// to any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// This is `sec_with_period` with a period of 2: see [`Float::sec_with_period_prec_round_ref`]
+    /// for the error bounds, the special and closed-form cases (even integers give $1$ and odd ones
+    /// $-1$; half-integers are poles and give $\infty$; odd multiples of $1/4$ give $\pm\sqrt2$;
+    /// multiples of $1/3$ give $\pm2$; and odd multiples of $1/6$, and multiples of $1/5$ and
+    /// $1/10$, give $\pm2\sqrt3/3$, $\pm2\varphi$, or $\pm2(\varphi-1)$, where $\varphi$ is the
+    /// golden ratio), overflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = (Float::from(0.1f64)).sec_pi_prec_round_ref(10, Floor);
+    /// assert_eq!(t.to_string(), "1.0508");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (t, o) = (Float::from(0.1f64)).sec_pi_prec_round_ref(10, Ceiling);
+    /// assert_eq!(t.to_string(), "1.0527");
+    /// assert_eq!(o, Greater);
+    ///
+    /// // a half-turn is exactly zero, reached from below
+    /// let (t, o) = (&Float::ONE).sec_pi_prec_round_ref(10, Exact);
+    /// assert_eq!(t.to_string(), "-1.0000");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn sec_pi_prec_round_ref(&self, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+        self.sec_with_period_prec_round_ref(2, prec, rm)
+    }
+
+    /// Computes $\sec(\pi x)$, the secant of a [`Float`] measured in half-turns, rounding the
+    /// result to the nearest value of the specified precision. The [`Float`] is taken by value. An
+    /// [`Ordering`] is also returned, indicating whether the rounded secant is less than, equal to,
+    /// or greater than the exact secant. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// This is `sec_with_period` with a period of 2: see [`Float::sec_with_period_prec`] for the
+    /// error bounds, the special and closed-form cases (even integers give $1$ and odd ones $-1$;
+    /// half-integers are poles and give $\infty$; odd multiples of $1/4$ give $\pm\sqrt2$;
+    /// multiples of $1/3$ give $\pm2$; and odd multiples of $1/6$, and multiples of $1/5$ and
+    /// $1/10$, give $\pm2\sqrt3/3$, $\pm2\varphi$, or $\pm2(\varphi-1)$, where $\varphi$ is the
+    /// golden ratio), overflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::from(0.1f64).sec_pi_prec(10);
+    /// assert_eq!(t.to_string(), "1.0508");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (t, o) = Float::from(0.1f64).sec_pi_prec(53);
+    /// assert_eq!(t.to_string(), "1.0514622242382672");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn sec_pi_prec(self, prec: u64) -> (Self, Ordering) {
+        self.sec_with_period_prec(2, prec)
+    }
+
+    /// Computes $\sec(\pi x)$, the secant of a [`Float`] measured in half-turns, rounding the
+    /// result to the nearest value of the specified precision. The [`Float`] is taken by reference.
+    /// An [`Ordering`] is also returned, indicating whether the rounded secant is less than, equal
+    /// to, or greater than the exact secant. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// This is `sec_with_period` with a period of 2: see [`Float::sec_with_period_prec_ref`] for
+    /// the error bounds, the special and closed-form cases (even integers give $1$ and odd ones
+    /// $-1$; half-integers are poles and give $\infty$; odd multiples of $1/4$ give $\pm\sqrt2$;
+    /// multiples of $1/3$ give $\pm2$; and odd multiples of $1/6$, and multiples of $1/5$ and
+    /// $1/10$, give $\pm2\sqrt3/3$, $\pm2\varphi$, or $\pm2(\varphi-1)$, where $\varphi$ is the
+    /// golden ratio), overflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = (Float::from(0.1f64)).sec_pi_prec_ref(10);
+    /// assert_eq!(t.to_string(), "1.0508");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (t, o) = (Float::from(0.1f64)).sec_pi_prec_ref(53);
+    /// assert_eq!(t.to_string(), "1.0514622242382672");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn sec_pi_prec_ref(&self, prec: u64) -> (Self, Ordering) {
+        self.sec_with_period_prec_ref(2, prec)
+    }
+
+    /// Computes $\sec(\pi x)$, the secant of a [`Float`] measured in half-turns, rounding the
+    /// result with the specified rounding mode. The precision of the output is the precision of the
+    /// input. The [`Float`] is taken by value. An [`Ordering`] is also returned, indicating whether
+    /// the rounded secant is less than, equal to, or greater than the exact secant. Although `NaN`s
+    /// are not comparable to any [`Float`], whenever this function returns a `NaN` it also returns
+    /// `Equal`.
+    ///
+    /// This is `sec_with_period` with a period of 2: see [`Float::sec_with_period_round`] for the
+    /// error bounds, the special and closed-form cases (even integers give $1$ and odd ones $-1$;
+    /// half-integers are poles and give $\infty$; odd multiples of $1/4$ give $\pm\sqrt2$;
+    /// multiples of $1/3$ give $\pm2$; and odd multiples of $1/6$, and multiples of $1/5$ and
+    /// $1/10$, give $\pm2\sqrt3/3$, $\pm2\varphi$, or $\pm2(\varphi-1)$, where $\varphi$ is the
+    /// golden ratio), overflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the input
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::from(0.1f64).sec_pi_round(Floor);
+    /// assert_eq!(t.to_string(), "1.0514622242382670");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (t, o) = Float::from(0.1f64).sec_pi_round(Nearest);
+    /// assert_eq!(t.to_string(), "1.0514622242382674");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn sec_pi_round(self, rm: RoundingMode) -> (Self, Ordering) {
+        self.sec_with_period_round(2, rm)
+    }
+
+    /// Computes $\sec(\pi x)$, the secant of a [`Float`] measured in half-turns, rounding the
+    /// result with the specified rounding mode. The precision of the output is the precision of the
+    /// input. The [`Float`] is taken by reference. An [`Ordering`] is also returned, indicating
+    /// whether the rounded secant is less than, equal to, or greater than the exact secant.
+    /// Although `NaN`s are not comparable to any [`Float`], whenever this function returns a `NaN`
+    /// it also returns `Equal`.
+    ///
+    /// This is `sec_with_period` with a period of 2: see [`Float::sec_with_period_round_ref`] for
+    /// the error bounds, the special and closed-form cases (even integers give $1$ and odd ones
+    /// $-1$; half-integers are poles and give $\infty$; odd multiples of $1/4$ give $\pm\sqrt2$;
+    /// multiples of $1/3$ give $\pm2$; and odd multiples of $1/6$, and multiples of $1/5$ and
+    /// $1/10$, give $\pm2\sqrt3/3$, $\pm2\varphi$, or $\pm2(\varphi-1)$, where $\varphi$ is the
+    /// golden ratio), overflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the input
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = (Float::from(0.1f64)).sec_pi_round_ref(Floor);
+    /// assert_eq!(t.to_string(), "1.0514622242382670");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (t, o) = (Float::from(0.1f64)).sec_pi_round_ref(Nearest);
+    /// assert_eq!(t.to_string(), "1.0514622242382674");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn sec_pi_round_ref(&self, rm: RoundingMode) -> (Self, Ordering) {
+        self.sec_with_period_round_ref(2, rm)
+    }
+
+    /// Computes $\sec(\pi x)$, the secant of a [`Float`] measured in half-turns, rounding the
+    /// result to the precision of the input and to the nearest [`Float`]. The [`Float`] is taken by
+    /// value.
+    ///
+    /// If the secant is equidistant from two [`Float`]s with the precision of the input, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// This is `sec_with_period` with a period of 2: see [`Float::sec_with_period`] for the error
+    /// bounds, the special and closed-form cases (even integers give $1$ and odd ones $-1$;
+    /// half-integers are poles and give $\infty$; odd multiples of $1/4$ give $\pm\sqrt2$;
+    /// multiples of $1/3$ give $\pm2$; and odd multiples of $1/6$, and multiples of $1/5$ and
+    /// $1/10$, give $\pm2\sqrt3/3$, $\pm2\varphi$, or $\pm2(\varphi-1)$, where $\varphi$ is the
+    /// golden ratio), overflow, and the complexity, with $u = 2$.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::sec_pi_round`] instead. If you want to specify an output precision, consider using
+    /// [`Float::sec_pi_prec`]. If you want both of these things, consider using
+    /// [`Float::sec_pi_prec_round`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// let t = Float::from(0.1f64).sec_pi();
+    /// assert_eq!(t.to_string(), "1.0514622242382674");
+    ///
+    /// // a half-integer is a pole
+    /// assert_eq!(Float::from(0.5f64).sec_pi().to_string(), "Infinity");
+    /// ```
+    #[inline]
+    pub fn sec_pi(self) -> Self {
+        let prec = self.significant_bits();
+        self.sec_pi_prec(prec).0
+    }
+
+    /// Computes $\sec(\pi x)$, the secant of a [`Float`] measured in half-turns, rounding the
+    /// result to the precision of the input and to the nearest [`Float`]. The [`Float`] is taken by
+    /// reference.
+    ///
+    /// If the secant is equidistant from two [`Float`]s with the precision of the input, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// This is `sec_with_period` with a period of 2: see [`Float::sec_with_period`] for the error
+    /// bounds, the special and closed-form cases (even integers give $1$ and odd ones $-1$;
+    /// half-integers are poles and give $\infty$; odd multiples of $1/4$ give $\pm\sqrt2$;
+    /// multiples of $1/3$ give $\pm2$; and odd multiples of $1/6$, and multiples of $1/5$ and
+    /// $1/10$, give $\pm2\sqrt3/3$, $\pm2\varphi$, or $\pm2(\varphi-1)$, where $\varphi$ is the
+    /// golden ratio), overflow, and the complexity, with $u = 2$.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::sec_pi_round_ref`] instead. If you want to specify an output precision, consider
+    /// using [`Float::sec_pi_prec_ref`]. If you want both of these things, consider using
+    /// [`Float::sec_pi_prec_round_ref`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// let t = (&Float::from(0.1f64)).sec_pi_ref();
+    /// assert_eq!(t.to_string(), "1.0514622242382674");
+    /// ```
+    #[inline]
+    pub fn sec_pi_ref(&self) -> Self {
+        self.sec_pi_prec_ref(self.significant_bits()).0
+    }
+
+    /// Computes $\sec(\pi x)$, the secant of a [`Float`] measured in half-turns, rounding the
+    /// result to the specified precision and with the specified rounding mode. The [`Float`] is
+    /// replaced by the result, and an [`Ordering`] is returned, indicating whether the rounded
+    /// secant is less than, equal to, or greater than the exact secant. Although `NaN`s are not
+    /// comparable to any [`Float`], whenever this function sets a `NaN` it also returns `Equal`.
+    ///
+    /// This is `sec_with_period` with a period of 2: see
+    /// [`Float::sec_with_period_prec_round_assign`] for the error bounds, the special and
+    /// closed-form cases (even integers give $1$ and odd ones $-1$; half-integers are poles and
+    /// give $\infty$; odd multiples of $1/4$ give $\pm\sqrt2$; multiples of $1/3$ give $\pm2$; and
+    /// odd multiples of $1/6$, and multiples of $1/5$ and $1/10$, give $\pm2\sqrt3/3$,
+    /// $\pm2\varphi$, or $\pm2(\varphi-1)$, where $\varphi$ is the golden ratio), overflow, and the
+    /// complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from(0.1f64);
+    /// assert_eq!(x.sec_pi_prec_round_assign(10, Floor), Less);
+    /// assert_eq!(x.to_string(), "1.0508");
+    ///
+    /// let mut x = Float::from(0.1f64);
+    /// assert_eq!(x.sec_pi_prec_round_assign(10, Ceiling), Greater);
+    /// assert_eq!(x.to_string(), "1.0527");
+    /// ```
+    #[inline]
+    pub fn sec_pi_prec_round_assign(&mut self, prec: u64, rm: RoundingMode) -> Ordering {
+        self.sec_with_period_prec_round_assign(2, prec, rm)
+    }
+
+    /// Computes $\sec(\pi x)$, the secant of a [`Float`] measured in half-turns, rounding the
+    /// result to the nearest value of the specified precision. The [`Float`] is replaced by the
+    /// result, and an [`Ordering`] is returned, indicating whether the rounded secant is less than,
+    /// equal to, or greater than the exact secant. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function sets a `NaN` it also returns `Equal`.
+    ///
+    /// This is `sec_with_period` with a period of 2: see [`Float::sec_with_period_prec_assign`] for
+    /// the error bounds, the special and closed-form cases (even integers give $1$ and odd ones
+    /// $-1$; half-integers are poles and give $\infty$; odd multiples of $1/4$ give $\pm\sqrt2$;
+    /// multiples of $1/3$ give $\pm2$; and odd multiples of $1/6$, and multiples of $1/5$ and
+    /// $1/10$, give $\pm2\sqrt3/3$, $\pm2\varphi$, or $\pm2(\varphi-1)$, where $\varphi$ is the
+    /// golden ratio), overflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from(0.1f64);
+    /// assert_eq!(x.sec_pi_prec_assign(10), Less);
+    /// assert_eq!(x.to_string(), "1.0508");
+    /// ```
+    #[inline]
+    pub fn sec_pi_prec_assign(&mut self, prec: u64) -> Ordering {
+        self.sec_with_period_prec_assign(2, prec)
+    }
+
+    /// Computes $\sec(\pi x)$, the secant of a [`Float`] measured in half-turns, rounding the
+    /// result with the specified rounding mode. The precision of the output is the precision of the
+    /// input. The [`Float`] is replaced by the result, and an [`Ordering`] is returned, indicating
+    /// whether the rounded secant is less than, equal to, or greater than the exact secant.
+    /// Although `NaN`s are not comparable to any [`Float`], whenever this function sets a `NaN` it
+    /// also returns `Equal`.
+    ///
+    /// This is `sec_with_period` with a period of 2: see [`Float::sec_with_period_round_assign`]
+    /// for the error bounds, the special and closed-form cases (even integers give $1$ and odd ones
+    /// $-1$; half-integers are poles and give $\infty$; odd multiples of $1/4$ give $\pm\sqrt2$;
+    /// multiples of $1/3$ give $\pm2$; and odd multiples of $1/6$, and multiples of $1/5$ and
+    /// $1/10$, give $\pm2\sqrt3/3$, $\pm2\varphi$, or $\pm2(\varphi-1)$, where $\varphi$ is the
+    /// golden ratio), overflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the input
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from(0.1f64);
+    /// assert_eq!(x.sec_pi_round_assign(Floor), Less);
+    /// assert_eq!(x.to_string(), "1.0514622242382670");
+    /// ```
+    #[inline]
+    pub fn sec_pi_round_assign(&mut self, rm: RoundingMode) -> Ordering {
+        self.sec_with_period_round_assign(2, rm)
+    }
+
+    /// Computes $\sec(\pi x)$, the secant of a [`Float`] measured in half-turns, rounding the
+    /// result to the precision of the input and to the nearest [`Float`]. The [`Float`] is replaced
+    /// by the result.
+    ///
+    /// If the secant is equidistant from two [`Float`]s with the precision of the input, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// This is `sec_with_period` with a period of 2: see [`Float::sec_with_period`] for the error
+    /// bounds, the special and closed-form cases (even integers give $1$ and odd ones $-1$;
+    /// half-integers are poles and give $\infty$; odd multiples of $1/4$ give $\pm\sqrt2$;
+    /// multiples of $1/3$ give $\pm2$; and odd multiples of $1/6$, and multiples of $1/5$ and
+    /// $1/10$, give $\pm2\sqrt3/3$, $\pm2\varphi$, or $\pm2(\varphi-1)$, where $\varphi$ is the
+    /// golden ratio), overflow, and the complexity, with $u = 2$.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::sec_pi_round_assign`] instead. If you want to specify an output precision, consider
+    /// using [`Float::sec_pi_prec_assign`]. If you want both of these things, consider using
+    /// [`Float::sec_pi_prec_round_assign`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// let mut x = Float::from(0.1f64);
+    /// x.sec_pi_assign();
+    /// assert_eq!(x.to_string(), "1.0514622242382674");
+    /// ```
+    #[inline]
+    pub fn sec_pi_assign(&mut self) {
+        let prec = self.significant_bits();
+        self.sec_pi_prec_assign(prec);
+    }
+
+    /// Computes $\sec(\pi x)$, the secant of a [`Rational`] measured in half-turns, rounding the
+    /// result to the specified precision and with the specified rounding mode and returning the
+    /// result as a [`Float`]. The [`Rational`] is taken by value. An [`Ordering`] is also returned,
+    /// indicating whether the rounded secant is less than, equal to, or greater than the exact
+    /// secant.
+    ///
+    /// This is `sec_with_period_rational` with a period of 2: see
+    /// [`Float::sec_with_period_rational_prec_round`] for the error bounds, the special and
+    /// closed-form cases, overflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::sec_pi_rational_prec_round(Rational::from_unsigneds(1u8, 7), 10, Floor);
+    /// assert_eq!(t.to_string(), "1.1094");
+    /// assert_eq!(o, Less);
+    ///
+    /// // a third of a half-turn is exactly 2
+    /// let (t, o) = Float::sec_pi_rational_prec_round(Rational::from_unsigneds(1u8, 3), 10, Exact);
+    /// assert_eq!(t.to_string(), "2.0000");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn sec_pi_rational_prec_round(
+        x: Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        Self::sec_with_period_rational_prec_round_ref(&x, 2, prec, rm)
+    }
+
+    /// Computes $\sec(\pi x)$, the secant of a [`Rational`] measured in half-turns, rounding the
+    /// result to the specified precision and with the specified rounding mode and returning the
+    /// result as a [`Float`]. The [`Rational`] is taken by reference. An [`Ordering`] is also
+    /// returned, indicating whether the rounded secant is less than, equal to, or greater than the
+    /// exact secant.
+    ///
+    /// This is `sec_with_period_rational` with a period of 2: see
+    /// [`Float::sec_with_period_rational_prec_round_ref`] for the error bounds, the special and
+    /// closed-form cases, overflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) =
+    ///     Float::sec_pi_rational_prec_round_ref(&Rational::from_unsigneds(1u8, 7), 10, Ceiling);
+    /// assert_eq!(t.to_string(), "1.1113");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn sec_pi_rational_prec_round_ref(
+        x: &Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        Self::sec_with_period_rational_prec_round_ref(x, 2, prec, rm)
+    }
+
+    /// Computes $\sec(\pi x)$, the secant of a [`Rational`] measured in half-turns, rounding the
+    /// result to the nearest value of the specified precision and returning the result as a
+    /// [`Float`]. The [`Rational`] is taken by value. An [`Ordering`] is also returned, indicating
+    /// whether the rounded secant is less than, equal to, or greater than the exact secant.
+    ///
+    /// This is `sec_with_period_rational` with a period of 2: see
+    /// [`Float::sec_with_period_rational_prec`] for the error bounds, the special and closed-form
+    /// cases, overflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::sec_pi_rational_prec(Rational::from_unsigneds(1u8, 7), 53);
+    /// assert_eq!(t.to_string(), "1.1099162641747424");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn sec_pi_rational_prec(x: Rational, prec: u64) -> (Self, Ordering) {
+        Self::sec_with_period_rational_prec_ref(&x, 2, prec)
+    }
+
+    /// Computes $\sec(\pi x)$, the secant of a [`Rational`] measured in half-turns, rounding the
+    /// result to the nearest value of the specified precision and returning the result as a
+    /// [`Float`]. The [`Rational`] is taken by reference. An [`Ordering`] is also returned,
+    /// indicating whether the rounded secant is less than, equal to, or greater than the exact
+    /// secant.
+    ///
+    /// This is `sec_with_period_rational` with a period of 2: see
+    /// [`Float::sec_with_period_rational_prec_ref`] for the error bounds, the special and
+    /// closed-form cases, overflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::sec_pi_rational_prec_ref(&Rational::from_unsigneds(1u8, 7), 53);
+    /// assert_eq!(t.to_string(), "1.1099162641747424");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn sec_pi_rational_prec_ref(x: &Rational, prec: u64) -> (Self, Ordering) {
+        Self::sec_with_period_rational_prec_ref(x, 2, prec)
+    }
 }
 
 impl Sec for Float {
@@ -2601,4 +3160,101 @@ where
         |x, prec| Float::sec_with_period_rational_prec_ref(x, u, prec),
         x,
     )
+}
+
+/// Computes $\sec(\pi x)$, the secant of a primitive float measured in half-turns.
+///
+/// This is `primitive_float_sec_with_period` with a period of 2: see
+/// [`primitive_float_sec_with_period`] for the error bound and the special cases, with $u = 2$.
+/// Half-integers are poles and give exactly $\infty$; even integers give exactly $1$ and odd ones
+/// $-1$; odd multiples of $1/4$ give $\pm\sqrt2$; and multiples of $1/3$ give exactly $\pm2$.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::sec::primitive_float_sec_pi;
+///
+/// assert!(primitive_float_sec_pi(f32::NAN).is_nan());
+/// // a half-integer is a pole
+/// assert_eq!(
+///     NiceFloat(primitive_float_sec_pi(0.5f32)),
+///     NiceFloat(f32::INFINITY)
+/// );
+/// // an odd integer is exactly -1
+/// assert_eq!(NiceFloat(primitive_float_sec_pi(1.0f64)), NiceFloat(-1.0));
+/// // an odd multiple of a quarter: sqrt(2)
+/// assert_eq!(
+///     NiceFloat(primitive_float_sec_pi(0.25f32)),
+///     NiceFloat(core::f32::consts::SQRT_2)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_sec_pi(0.1f32)),
+///     NiceFloat(1.0514622)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_sec_pi(0.1f64)),
+///     NiceFloat(1.0514622242382672)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_sec_pi<T: PrimitiveFloat>(x: T) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    primitive_float_sec_with_period(x, 2)
+}
+
+/// Computes $\sec(\pi x)$, the secant of a [`Rational`] measured in half-turns, returning the
+/// result as a primitive float.
+///
+/// This is `primitive_float_sec_with_period_rational` with a period of 2: see
+/// [`primitive_float_sec_with_period_rational`] for the error bound, the special cases, and the
+/// complexity, with $u = 2$.
+///
+/// # Worst-case complexity
+/// $T(m) = O(m (\log m)^2 \log\log m)$
+///
+/// $M(m) = O(m \log m)$
+///
+/// where $T$ is time, $M$ is additional memory, and $m$ is `x.significant_bits()`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::OneHalf;
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::sec::primitive_float_sec_pi_rational;
+/// use malachite_q::Rational;
+///
+/// // a half of a half-turn is a pole
+/// assert_eq!(
+///     NiceFloat(primitive_float_sec_pi_rational::<f64>(&Rational::ONE_HALF)),
+///     NiceFloat(f64::INFINITY)
+/// );
+/// // a sixth of a half-turn: 2 sqrt(3)/3
+/// assert_eq!(
+///     NiceFloat(primitive_float_sec_pi_rational::<f64>(
+///         &Rational::from_unsigneds(1u8, 6)
+///     )),
+///     NiceFloat(1.1547005383792515)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_sec_pi_rational::<f64>(
+///         &Rational::from_unsigneds(1u8, 7)
+///     )),
+///     NiceFloat(1.1099162641747424)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_sec_pi_rational<T: PrimitiveFloat>(x: &Rational) -> T
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    primitive_float_sec_with_period_rational(x, 2)
 }

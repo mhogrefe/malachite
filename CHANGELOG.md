@@ -335,6 +335,13 @@ documented by git history.
   take a `Rational` instead, reaching the exact and closed-form cases directly and needing no
   argument reduction beyond the exact one. `primitive_float_sec_with_period_rational` gives the
   correctly rounded `f32` or `f64` secant of a `Rational` fraction of a turn.
+- `sec_pi_prec_round`, `sec_pi_prec`, `sec_pi_round`, and `sec_pi` (with `_ref` and `_assign`
+  variants), the secant of a `Float` measured in half-turns, delegating to `sec_with_period` with a
+  period of 2; MPFR has no `secpi` to match its `sinpi` and `cospi`. Even integers give $1$ and odd
+  ones $-1$, half-integers are poles and give $\infty$, odd multiples of $1/4$ give $\pm\sqrt2$,
+  and multiples of $1/3$ give $\pm2$. `sec_pi_rational_prec_round` and `sec_pi_rational_prec` (with
+  `_ref` variants) take a `Rational` instead, and `primitive_float_sec_pi` and
+  `primitive_float_sec_pi_rational` give the correctly rounded `f32` or `f64` secant.
 - `tan_pi_prec_round`, `tan_pi_prec`, `tan_pi_round`, and `tan_pi` (with `_ref` and `_assign`
   variants), a port of `mpfr_tanpi`: the tangent of a `Float` measured in half-turns, delegating to
   `tan_with_period` with a period of 2. Integers give a signed zero, half-integers are poles and
