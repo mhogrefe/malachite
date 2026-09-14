@@ -322,6 +322,23 @@ documented by git history.
   could certify. `cot(\pm0.0)` is $\pm\infty$, and the function is odd.
   `primitive_float_cot` gives the correctly rounded `f32` or `f64` cotangent, which neither the
   standard library nor `libm` provides; it overflows for a small enough input.
+  `cot_rational_prec_round` and `cot_rational_prec` (with `_ref` variants) take a `Rational`
+  instead, with a direct bracket for a tiny input, inverting the tangent's own series bracket; that
+  also covers inputs below the `Float` exponent range, which no other path could round, and the
+  powers of 2, whose reciprocals are exactly representable and which the Ziv loop could therefore
+  never certify. `primitive_float_cot_rational` gives the correctly rounded `f32` or `f64`
+  cotangent of a `Rational`.
+- `cot_with_period_prec_round`, `cot_with_period_prec`, `cot_with_period_round`, and
+  `cot_with_period` (with `_ref` and `_assign` variants), the cotangent of a `Float` measured in
+  $u$ths of a turn. MPFR has no `cotu`; this is `cot` with the sine and cosine taken in turns, which
+  reduces the argument exactly and so reaches the exact and closed-form cases the radian version
+  cannot see. These are the tangent's, reciprocated: odd multiples of $1/8$ of a turn give exactly
+  $\pm1$, odd multiples of $1/4$ give exactly $\pm0.0$, and thirds and sixths give
+  $\pm\sqrt3/3$ while twelfths give $\pm\sqrt3$. Multiples of a half turn are the poles, where
+  the sine is a zero carrying the sign of $x$ and the cosine is $\pm1$, so the infinity takes the
+  sign of $x$ at an even multiple and the opposite at an odd one; keeping that identity is what
+  makes the function odd. `primitive_float_cot_with_period` gives the correctly rounded `f32` or
+  `f64` cotangent in $u$ths of a turn.
 - `Csc` and `CscAssign` (new traits in malachite-base) for `Float`, with the usual
   `csc_prec_round`, `csc_prec`, `csc_round`, and `_ref`/`_assign` variants: a port of `mpfr_csc`,
   MPFR's generic reciprocal template with the sine. The cosecant never underflows, since its
