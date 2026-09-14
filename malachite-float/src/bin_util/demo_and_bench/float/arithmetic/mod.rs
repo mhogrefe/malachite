@@ -22,6 +22,7 @@ pub(crate) fn register(runner: &mut Runner) {
     conjugate::register(runner);
     cos::register(runner);
     csc::register(runner);
+    cot::register(runner);
     div::register(runner);
     dot::register(runner);
     exp::register(runner);
@@ -87,6 +88,7 @@ mod cbrt;
 mod compound;
 mod conjugate;
 mod cos;
+mod cot;
 mod csc;
 mod div;
 mod dot;

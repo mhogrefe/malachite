@@ -54,8 +54,12 @@ use malachite_q::Rational;
 
 // A quotient whose exponent lies strictly between these can be rounded to any precision without
 // leaving the exponent range, so the `Float` division settles it; the rest go to the brackets.
-const MIN_SETTLED_EXPONENT: i64 = Float::MIN_EXPONENT_I64 + 1;
+pub(crate) const MIN_SETTLED_EXPONENT: i64 = Float::MIN_EXPONENT_I64 + 1;
 pub(crate) const MAX_SETTLED_EXPONENT: i64 = Float::MAX_EXPONENT_I64 - 1;
+
+// The cancellation the exact bracket of an underflowed sine or cosine must allow for: the value can
+// be as small as the bottom of the exponent range, plus a margin.
+pub(crate) const MAX_CANCEL: u64 = Float::MAX_EXPONENT as u64 + 2;
 
 // As in mpfr_overflow, with the overflow's sign: the toward-zero modes give the largest finite
 // value, and the other modes an infinity.
@@ -74,7 +78,7 @@ fn tan_overflow(negative: bool, prec: u64, rm: RoundingMode) -> (Float, Ordering
 // bounds: a zero stands for a magnitude of at most 2^(MIN_EXPONENT - 2), half the smallest positive
 // `Float`, and the smallest positive `Float` itself may have been reached from as low as half of
 // it.
-fn nearest_bracket(v: &Float, m: u64) -> (Rational, Rational) {
+pub(crate) fn nearest_bracket(v: &Float, m: u64) -> (Rational, Rational) {
     if *v == 0u32 {
         return (
             Rational::ZERO,
@@ -119,8 +123,7 @@ fn tan_bracket(
         // positive `Float`, and the tangent, barely larger than the sine, cannot be placed against
         // that same bound: take the sine's exact bracket from the distance to the nearest multiple
         // of pi, as the near-zero path does.
-        let (lo, hi) =
-            trig_near_zero_bracket(x, m + 64, const { Float::MAX_EXPONENT as u64 + 2 }, false);
+        let (lo, hi) = trig_near_zero_bracket(x, m + 64, MAX_CANCEL, false);
         if lo < 0u32 { (-hi, -lo) } else { (lo, hi) }
     } else {
         nearest_bracket(s, m)

@@ -308,6 +308,20 @@ documented by git history.
   `primitive_float_tan_with_period` and `primitive_float_tan_with_period_rational` give the
   correctly rounded `f32` or `f64` tangent; a primitive float is never merely close enough to a
   pole to overflow, but a `Rational` can be.
+- `Cot` and `CotAssign` (new traits in malachite-base) for `Float`, with the usual
+  `cot_prec_round`, `cot_prec`, `cot_round`, and `_ref`/`_assign` variants: a port of `mpfr_cot`,
+  MPFR's generic reciprocal template with the tangent. MPFR's tangent is itself a quotient of a
+  sine and a cosine, so the cotangent is taken as $\cos x/\sin x$ directly, which saves the middle
+  rounding and treats the two ends of the exponent range alike. Unlike the secant and the cosecant,
+  the cotangent is not bounded away from zero, so it both overflows, within $2^{-2^{30}}$ of a
+  multiple of $\pi$, and underflows, within $2^{-2^{30}}$ of an odd multiple of $\pi/2$; each end
+  is decided from an exact bracket. MPFR's shortcut for a tiny input is kept and is load-bearing:
+  there $\cot x$ is $1/x - x/3 + \ldots$, so rounding $1/x$ settles the result, except when $x$ is
+  a power of 2 and $1/x$ is exact, where the true value lies one step short of it, toward zero.
+  Without it the Ziv loop would face an exactly representable quotient that no working precision
+  could certify. `cot(\pm0.0)` is $\pm\infty$, and the function is odd.
+  `primitive_float_cot` gives the correctly rounded `f32` or `f64` cotangent, which neither the
+  standard library nor `libm` provides; it overflows for a small enough input.
 - `Csc` and `CscAssign` (new traits in malachite-base) for `Float`, with the usual
   `csc_prec_round`, `csc_prec`, `csc_round`, and `_ref`/`_assign` variants: a port of `mpfr_csc`,
   MPFR's generic reciprocal template with the sine. The cosecant never underflows, since its
