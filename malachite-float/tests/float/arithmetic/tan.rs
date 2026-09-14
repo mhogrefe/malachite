@@ -8141,6 +8141,15 @@ fn test_tan_with_period_rational_tiny() {
     // a non-dyadic input a third of the way down
     let x = Rational::from_unsigneds(1u32, 3u32) >> (1u64 << 30);
     test(&x, 1, 10, Nearest, "4.9885e-323228497", Less);
+    // beyond the scaling window, where even 2^64 times the angle underflows and the rounding mode
+    // alone decides
+    let x = Rational::power_of_2(min_exp - 70);
+    test(&x, 1, 10, Nearest, "0.0", Less);
+    test(&x, 1, 10, Down, "0.0", Less);
+    test(&x, 1, 10, Up, "2.3826e-323228497", Greater);
+    let x = -x;
+    test(&x, 1, 10, Nearest, "-0.0", Greater);
+    test(&x, 1, 10, Floor, "-2.3826e-323228497", Less);
 }
 
 #[test]

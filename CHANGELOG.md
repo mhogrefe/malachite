@@ -336,6 +336,15 @@ documented by git history.
   has a huge cosecant; such a result is decided from an exact bracket on the sine.
   `primitive_float_csc_with_period` gives the correctly rounded `f32` or `f64` cosecant in $u$ths
   of a turn, which does overflow for a small enough angle.
+  `csc_with_period_rational_prec_round` and `csc_with_period_rational_prec` (with `_ref` variants)
+  take a `Rational` instead, reaching the exact and closed-form cases directly and needing no
+  argument reduction beyond the exact one. The radian version's shortcut for a tiny input has no
+  counterpart here: in turns the angle is never a `Float`, so by Niven's theorem the sine past the
+  closed-form cases is irrational and its reciprocal is never exactly representable, which is what
+  stalls the radian loop. A `Rational` fraction of a turn can be small enough, or close enough to a
+  multiple of a half turn, that the sine falls below the `Float` exponent range; the bracket reads
+  that as the overflow it is. `primitive_float_csc_with_period_rational` gives the correctly
+  rounded `f32` or `f64` cosecant of a `Rational` fraction of a turn.
 - `Sec` and `SecAssign` (new traits in malachite-base) for `Float`, with the usual
   `sec_prec_round`, `sec_prec`, `sec_round`, and `_ref`/`_assign` variants: a port of `mpfr_sec`,
   which instantiates MPFR's generic reciprocal template with the cosine. The secant never

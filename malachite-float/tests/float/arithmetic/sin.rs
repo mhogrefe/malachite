@@ -12483,6 +12483,14 @@ fn test_sin_with_period_rational_tiny() {
         min_positive(10),
         Greater,
     );
+    // beyond the scaling window, where even 2^64 times the angle underflows and the rounding mode
+    // alone decides
+    let x = Rational::power_of_2(min_exp - 70);
+    test(x.clone(), 1, 10, Nearest, Float::ZERO, Less);
+    test(x.clone(), 1, 10, Down, Float::ZERO, Less);
+    test(x.clone(), 1, 10, Up, min_positive(10), Greater);
+    test(-&x, 1, 10, Nearest, Float::NEGATIVE_ZERO, Greater);
+    test(-&x, 1, 10, Floor, -min_positive(10), Less);
 }
 
 #[test]

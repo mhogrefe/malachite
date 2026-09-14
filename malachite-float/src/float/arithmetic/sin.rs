@@ -283,7 +283,13 @@ pub(crate) fn scaled_underflow(
     prec: u64,
     rm: RoundingMode,
 ) -> Option<(Float, Ordering)> {
-    let exp_t = i64::from(t.get_exponent().unwrap());
+    // a `Rational` input can be so far below the bottom of the range that the scaling by 2^SCALE
+    // does not save it and t is zero; such a t is more than one exponent below the scaled smallest
+    // positive `Float`, which is all the test below needs
+    let exp_t = match t.get_exponent() {
+        Some(e) => i64::from(e),
+        None => const { MIN_SCALED_EXPONENT - 2 },
+    };
     if exp_t >= MIN_SCALED_EXPONENT {
         return None;
     }

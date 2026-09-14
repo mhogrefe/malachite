@@ -95,3 +95,40 @@ pub fn csc_with_period_naive(
         None
     }
 }
+
+// The cosecant of a `Rational` fraction of a turn, bracketed from the sine exactly as
+// `csc_with_period_naive` does for a `Float`. `None` means the bracket did not settle it.
+pub fn csc_with_period_rational_naive(
+    x: &Rational,
+    u: u64,
+    prec: u64,
+    rm: RoundingMode,
+) -> Option<(Float, Ordering)> {
+    // the bracket's ends are not representable, so `Exact` has nothing to say here
+    if rm == RoundingMode::Exact {
+        return None;
+    }
+    let w = prec + 64;
+    let s = Float::sin_with_period_rational_prec_round_ref(x, u, w, Down).0;
+    if s == 0u32 || !s.is_finite() {
+        return None;
+    }
+    let negative = s.is_sign_negative();
+    let lo = Rational::exact_from(&s).abs();
+    let hi = &lo + Rational::power_of_2(i64::from(s.get_exponent().unwrap()) - i64::exact_from(w));
+    let (b_lo, b_hi) = if negative {
+        (-lo.reciprocal(), -hi.reciprocal())
+    } else {
+        (hi.reciprocal(), lo.reciprocal())
+    };
+    let (f_lo, o_lo) = Float::from_rational_prec_round_ref(&b_lo, prec, rm);
+    let (f_hi, o_hi) = Float::from_rational_prec_round_ref(&b_hi, prec, rm);
+    if o_lo == o_hi
+        && o_lo != Ordering::Equal
+        && ComparableFloat(f_lo) == ComparableFloat(f_hi.clone())
+    {
+        Some((f_hi, o_hi))
+    } else {
+        None
+    }
+}
