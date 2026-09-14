@@ -28,7 +28,7 @@ use crate::float::arithmetic::cos::{
     trig_rational_near_zero_bracket, trig_turns_near_zero_bracket,
 };
 use crate::float::arithmetic::sin_cos::{
-    sin_cos_rational_helper, sin_cos_with_period_prec_round_normal_ref,
+    sin_cos_rational_helper, sin_cos_turns_helper, sin_cos_with_period_prec_round_normal_ref,
 };
 use crate::float::arithmetic::tan::{
     MAX_CANCEL, MAX_SETTLED_EXPONENT, MIN_SETTLED_EXPONENT, nearest_bracket, round_bracket_signed,
@@ -398,6 +398,56 @@ fn cot_turns_bracket<F: Fn() -> Rational>(
         nearest_bracket(c, m)
     };
     round_bracket_signed_by(negative, c_lo / s_hi, c_hi / s_lo, prec, rm)
+}
+
+// Computes cot(2 pi q) for a nonzero `Rational` fraction of a turn q in (-1, 1), rounded to
+// precision `prec` with rounding mode `rm`. `rm` may be `Exact` only in the exact cases (see
+// `cot_turns_special_case`). This is the `Float` algorithm with the fraction of a turn taken
+// directly: since q is exact, only pi and the sine and cosine are rounded, and no argument
+// reduction is needed beyond the exact one the caller has already done. The tangent's shortcut for
+// a tiny q is not needed here either: `sin_cos_turns_helper` rounds the sine through its own
+// near-zero path, and a sine that underflows there, with the cosine at 1, is the overflow the
+// bracket reads it as.
+fn cot_turns_helper(q: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    let exp_q = q.floor_log_base_2_abs() + 1;
+    // The special cases need |q| >= 1/12
+    if exp_q >= -4
+        && let Some(result) = cot_turns_special_case(q, prec, rm)
+    {
+        return result;
+    }
+    // Only the exact cases can be rounded exactly
+    assert_ne!(rm, Exact, "Inexact cot_with_period");
+    let mut m = prec + prec.ceiling_log_base_2() + 13;
+    let mut increment = Limb::WIDTH;
+    loop {
+        // err <= 1/2 ulp on s and c, each correctly rounded even within 2^(-2^30) of a zero of its
+        // function, where it may underflow
+        let (s, c, _, _) = sin_cos_turns_helper(q, m, Nearest);
+        // err <= 4 ulps
+        let t = if s == 0u32 || c == 0u32 {
+            None
+        } else {
+            Some(c.div_prec_ref_ref(&s, m).0)
+        };
+        // as in the `Float` version, a quotient at either end of the exponent range, or a sine or
+        // cosine that underflowed, is decided from brackets
+        match t.as_ref().and_then(Float::get_exponent).map(i64::from) {
+            Some(e) if e > MIN_SETTLED_EXPONENT && e < MAX_SETTLED_EXPONENT => {
+                let t = t.unwrap();
+                if float_can_round(t.significand_ref().unwrap(), m - 2, prec, rm) {
+                    return Float::from_float_prec_round(t, prec, rm);
+                }
+            }
+            _ => {
+                if let Some(result) = cot_turns_bracket(|| q.clone(), &s, &c, m, prec, rm) {
+                    return result;
+                }
+            }
+        }
+        m += increment;
+        increment = m >> 1;
+    }
 }
 
 // Computes cot(2 pi x/u) for a finite nonzero `Float` x and a nonzero u, rounded to precision
@@ -2009,6 +2059,242 @@ impl Float {
         let prec = self.significant_bits();
         self.cot_with_period_prec_assign(u, prec);
     }
+
+    /// Computes $\cot(2\pi x/u)$, the cotangent of a [`Rational`] measured in $u$ths of a turn,
+    /// rounding the result to the specified precision and with the specified rounding mode, and
+    /// returning the result as a [`Float`]. The [`Rational`] is taken by value. An [`Ordering`] is
+    /// also returned, indicating whether the rounded cotangent is less than, equal to, or greater
+    /// than the exact cotangent. Although `NaN`s are not comparable to any [`Float`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,u,p,m) = \cot(2\pi x/u)+\varepsilon.
+    /// $$
+    /// - If $u=0$ or $x/u$ is a multiple of $1/8$, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - If $u\neq 0$ and $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |\cot(2\pi
+    ///   x/u)|\rfloor-p+1}$.
+    /// - If $u\neq 0$ and $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |\cot(2\pi
+    ///   x/u)|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(x,0,p,m)=\text{NaN}$
+    /// - $f(0,u,p,m)=\infty$
+    /// - If $x/u$ is a multiple of $1/2$, the cotangent has a pole there, and the result is exactly
+    ///   $\\pm\\infty$: the sine is a zero carrying the sign of $x$ and the cosine is $\\pm1$, so
+    ///   the sign is that of $x$ at an even multiple and the opposite at an odd one. Keeping that
+    ///   identity is what makes the function odd.
+    /// - If $x/u$ is an odd multiple of $1/4$, the result is exactly $\\pm0.0$, with the sign of
+    ///   the sine there.
+    /// - If $x/u$ is an odd multiple of $1/8$, the result is exactly $\\pm1$.
+    ///
+    /// When $x/u$ in lowest terms has denominator 3 or 6, the result is $\pm\sqrt3/3$, and when it
+    /// has denominator 12, $\pm\sqrt3$; each is computed from a single correctly rounded constant
+    /// rather than from $\pi$, a sine, and a cosine, which is far faster.
+    ///
+    /// Overflow and underflow are as for [`Float::cot_with_period_prec_round`]. Overflow requires
+    /// $x/u$ within $2^{-2^{30}}$ of a multiple of $1/2$ without being one, and underflow $x/u$
+    /// within $2^{-2^{30}}$ of an odd multiple of $1/4$ without being one, either of which takes a
+    /// denominator of more than $2^{30}$ bits; overflow also occurs for an $x/u$ so small that
+    /// $2\pi x/u$ is below $2^{-2^{30}}$, which a [`Rational`] can be however large its denominator
+    /// is not.
+    ///
+    /// If you know you'll be using `Nearest`, consider using
+    /// [`Float::cot_with_period_rational_prec`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n (\log n)^3 \log\log n + (n+m) (\log (n+m))^2 \log\log (n+m))$
+    ///
+    /// $M(n, m) = O((n+m) \log (n+m))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`: the fraction of a turn is reduced modulo 1 exactly, so only its size
+    /// and the precision drive the cost, not the magnitude of $x$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision (which is the case unless $x/u$ is a multiple of $1/8$, or $x$ or
+    /// $u$ is zero).
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::cot_with_period_rational_prec_round(Rational::ONE, 7, 10, Floor);
+    /// assert_eq!(t.to_string(), "0.79688");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (t, o) = Float::cot_with_period_rational_prec_round(Rational::ONE, 7, 10, Ceiling);
+    /// assert_eq!(t.to_string(), "0.79785");
+    /// assert_eq!(o, Greater);
+    ///
+    /// // a quarter turn is exactly 0
+    /// let (t, o) = Float::cot_with_period_rational_prec_round(
+    ///     Rational::from_unsigneds(1u8, 4),
+    ///     1,
+    ///     10,
+    ///     Exact,
+    /// );
+    /// assert_eq!(t.to_string(), "0.0");
+    /// assert_eq!(o, Equal);
+    ///
+    /// // a twelfth of a turn: sqrt(3)
+    /// let (t, o) = Float::cot_with_period_rational_prec_round(
+    ///     Rational::from_unsigneds(1u8, 12),
+    ///     1,
+    ///     10,
+    ///     Nearest,
+    /// );
+    /// assert_eq!(t.to_string(), "1.7324");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn cot_with_period_rational_prec_round(
+        x: Rational,
+        u: u64,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        Self::cot_with_period_rational_prec_round_ref(&x, u, prec, rm)
+    }
+
+    /// Computes $\cot(2\pi x/u)$, the cotangent of a [`Rational`] measured in $u$ths of a turn,
+    /// rounding the result to the specified precision and with the specified rounding mode, and
+    /// returning the result as a [`Float`]. The [`Rational`] is taken by reference. An [`Ordering`]
+    /// is also returned, indicating whether the rounded cotangent is less than, equal to, or
+    /// greater than the exact cotangent. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`Float::cot_with_period_rational_prec_round`] for the error bounds, the special and
+    /// closed-form cases, overflow, and the complexity; this function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::cot_with_period_rational_prec_round_ref(&Rational::ONE, 7, 10, Floor);
+    /// assert_eq!(t.to_string(), "0.79688");
+    /// assert_eq!(o, Less);
+    /// ```
+    pub fn cot_with_period_rational_prec_round_ref(
+        x: &Rational,
+        u: u64,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        // for u = 0, return NaN
+        if u == 0 {
+            return (Self::NAN, Equal);
+        }
+        // cot(0) = infinity (a `Rational` zero has no sign)
+        if *x == 0u32 {
+            return (Self::INFINITY, Equal);
+        }
+        // q = x/u, reduced to (-1, 1) with the sign of x: cot(2 pi q) has period 1 in q, and a
+        // multiple of u is a pole, where the sine is a zero with the sign of x and the cosine is 1,
+        // so the cotangent is an infinity with that sign
+        let q = x / Rational::from(u) % Rational::ONE;
+        if q == 0u32 {
+            return (
+                if *x < 0u32 {
+                    Self::NEGATIVE_INFINITY
+                } else {
+                    Self::INFINITY
+                },
+                Equal,
+            );
+        }
+        cot_turns_helper(&q, prec, rm)
+    }
+
+    /// Computes $\cot(2\pi x/u)$, the cotangent of a [`Rational`] measured in $u$ths of a turn,
+    /// rounding the result to the nearest value of the specified precision, and returning the
+    /// result as a [`Float`]. The [`Rational`] is taken by value. An [`Ordering`] is also returned,
+    /// indicating whether the rounded cotangent is less than, equal to, or greater than the exact
+    /// cotangent. Although `NaN`s are not comparable to any [`Float`], whenever this function
+    /// returns a `NaN` it also returns `Equal`.
+    ///
+    /// If the cotangent is equidistant from two [`Float`]s with the specified precision, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// See [`Float::cot_with_period_rational_prec_round`] for the error bounds, the special and
+    /// closed-form cases, overflow, and the complexity; this function behaves the same way with
+    /// `Nearest`.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::cot_with_period_rational_prec_round`] instead.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::cot_with_period_rational_prec(Rational::ONE, 7, 10);
+    /// assert_eq!(t.to_string(), "0.79785");
+    /// assert_eq!(o, Greater);
+    ///
+    /// // an eighth of a turn is exactly 1
+    /// let (t, o) = Float::cot_with_period_rational_prec(Rational::ONE, 8, 10);
+    /// assert_eq!(t.to_string(), "1.0000");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn cot_with_period_rational_prec(x: Rational, u: u64, prec: u64) -> (Self, Ordering) {
+        Self::cot_with_period_rational_prec_round_ref(&x, u, prec, Nearest)
+    }
+
+    /// Computes $\cot(2\pi x/u)$, the cotangent of a [`Rational`] measured in $u$ths of a turn,
+    /// rounding the result to the nearest value of the specified precision, and returning the
+    /// result as a [`Float`]. The [`Rational`] is taken by reference. An [`Ordering`] is also
+    /// returned, indicating whether the rounded cotangent is less than, equal to, or greater than
+    /// the exact cotangent. Although `NaN`s are not comparable to any [`Float`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`Float::cot_with_period_rational_prec`] and
+    /// [`Float::cot_with_period_rational_prec_round`]; this function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::cot_with_period_rational_prec_ref(&Rational::ONE, 7, 10);
+    /// assert_eq!(t.to_string(), "0.79785");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn cot_with_period_rational_prec_ref(x: &Rational, u: u64, prec: u64) -> (Self, Ordering) {
+        Self::cot_with_period_rational_prec_round_ref(x, u, prec, Nearest)
+    }
 }
 
 impl Cot for Float {
@@ -2432,4 +2718,106 @@ where
     for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
 {
     emulate_float_to_float_fn(|x, prec| Float::cot_with_period_prec(x, u, prec), x)
+}
+
+/// Computes $\cot(2\pi x/u)$, the cotangent of a [`Rational`] measured in $u$ths of a turn (so that
+/// `u = 360` is degrees), returning the result as a primitive float.
+///
+/// $$
+/// f(x,u) = \cot(2\pi x/u)+\varepsilon.
+/// $$
+/// - If $u=0$ or $x/u$ is a multiple of $1/8$, $\varepsilon$ may be ignored or assumed to be 0.
+/// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 |\cot(2\pi x/u)|\rfloor-p}$, where $p$ is the
+///   precision of the output (24 if `T` is a [`f32`] and 53 if `T` is a [`f64`]).
+///
+/// Special cases:
+/// - $f(x,0)=\text{NaN}$
+/// - $f(0,u)=\infty$
+/// - If $x/u$ is a multiple of $1/2$, the cotangent has a pole there, and the result is exactly
+///   $\\pm\\infty$: the sine is a zero carrying the sign of $x$ and the cosine is $\\pm1$, so the
+///   sign is that of $x$ at an even multiple and the opposite at an odd one.
+/// - If $x/u$ is an odd multiple of $1/4$, the result is exactly $\\pm0.0$, and if it is an odd
+///   multiple of $1/8$, exactly $\\pm1$.
+/// - If $x/u$ in lowest terms has denominator 3 or 6, the result is $\\pm\\sqrt3/3$, and if it has
+///   denominator 12, $\\pm\\sqrt3$.
+///
+/// Overflow is possible away from a pole too: a fraction of a turn within about $2^{-130}$ of a
+/// multiple of $1/2$ has a cotangent beyond the largest [`f32`], and one within about $2^{-1026}$
+/// of one beyond the largest [`f64`]; so does a fraction of a turn small enough on its own, which a
+/// [`Rational`] can be however large its denominator is not. The result is then $\pm\infty$. A
+/// fraction of a turn as close to an odd multiple of $1/4$ underflows instead, to $\pm0.0$.
+///
+/// # Worst-case complexity
+/// $T(m) = O(m (\log m)^2 \log\log m)$
+///
+/// $M(m) = O(m \log m)$
+///
+/// where $T$ is time, $M$ is additional memory, and $m$ is `x.significant_bits()`: the fraction of
+/// a turn is reduced modulo 1 exactly, so the magnitude of $x$ does not drive the cost.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::Zero;
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::cot::primitive_float_cot_with_period_rational;
+/// use malachite_q::Rational;
+///
+/// assert!(primitive_float_cot_with_period_rational::<f64>(&Rational::ZERO, 0).is_nan());
+/// assert_eq!(
+///     NiceFloat(primitive_float_cot_with_period_rational::<f64>(
+///         &Rational::ZERO,
+///         360
+///     )),
+///     NiceFloat(f64::INFINITY)
+/// );
+/// // a quarter turn is exactly 0
+/// assert_eq!(
+///     NiceFloat(primitive_float_cot_with_period_rational::<f64>(
+///         &Rational::from_unsigneds(1u8, 4),
+///         1
+///     )),
+///     NiceFloat(0.0)
+/// );
+/// // an eighth of a turn is exactly 1
+/// assert_eq!(
+///     NiceFloat(primitive_float_cot_with_period_rational::<f64>(
+///         &Rational::from_unsigneds(1u8, 8),
+///         1
+///     )),
+///     NiceFloat(1.0)
+/// );
+/// // a twelfth of a turn: sqrt(3)
+/// assert_eq!(
+///     NiceFloat(primitive_float_cot_with_period_rational::<f64>(
+///         &Rational::from_unsigneds(1u8, 12),
+///         1
+///     )),
+///     NiceFloat(1.7320508075688772)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_cot_with_period_rational::<f32>(
+///         &Rational::from_unsigneds(1u8, 7),
+///         1
+///     )),
+///     NiceFloat(0.7974734)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_cot_with_period_rational::<f64>(
+///         &Rational::from_unsigneds(1u8, 7),
+///         1
+///     )),
+///     NiceFloat(0.7974733888824039)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_cot_with_period_rational<T: PrimitiveFloat>(x: &Rational, u: u64) -> T
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_rational_to_float_fn(
+        |x, prec| Float::cot_with_period_rational_prec_ref(x, u, prec),
+        x,
+    )
 }

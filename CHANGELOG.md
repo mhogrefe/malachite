@@ -339,6 +339,13 @@ documented by git history.
   sign of $x$ at an even multiple and the opposite at an odd one; keeping that identity is what
   makes the function odd. `primitive_float_cot_with_period` gives the correctly rounded `f32` or
   `f64` cotangent in $u$ths of a turn.
+  `cot_with_period_rational_prec_round` and `cot_with_period_rational_prec` (with `_ref` variants)
+  take a `Rational` instead, reaching the exact and closed-form cases directly and needing no
+  argument reduction beyond the exact one. A `Rational` fraction of a turn can be small enough, or
+  close enough to a multiple of a half turn, to overflow, and as close to an odd quarter turn to
+  underflow; each end is decided from an exact bracket.
+  `primitive_float_cot_with_period_rational` gives the correctly rounded `f32` or `f64` cotangent
+  of a `Rational` fraction of a turn.
 - `Csc` and `CscAssign` (new traits in malachite-base) for `Float`, with the usual
   `csc_prec_round`, `csc_prec`, `csc_round`, and `_ref`/`_assign` variants: a port of `mpfr_csc`,
   MPFR's generic reciprocal template with the sine. The cosecant never underflows, since its

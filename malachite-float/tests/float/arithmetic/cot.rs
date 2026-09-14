@@ -23,14 +23,15 @@ use malachite_base::test_util::generators::{
 };
 use malachite_float::float::arithmetic::cot::{
     primitive_float_cot, primitive_float_cot_rational, primitive_float_cot_with_period,
+    primitive_float_cot_with_period_rational,
 };
 use malachite_float::test_util::common::{
     assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
     to_hex_string,
 };
 use malachite_float::test_util::float::arithmetic::cot::{
-    cot_with_period_naive, rug_cot, rug_cot_prec, rug_cot_prec_round, rug_cot_rational_prec,
-    rug_cot_rational_prec_round, rug_cot_round,
+    cot_with_period_naive, cot_with_period_rational_naive, rug_cot, rug_cot_prec,
+    rug_cot_prec_round, rug_cot_rational_prec, rug_cot_rational_prec_round, rug_cot_round,
 };
 use malachite_float::test_util::generators::{
     float_gen, float_rounding_mode_pair_gen_var_47, float_unsigned_pair_gen_var_1,
@@ -39,10 +40,13 @@ use malachite_float::test_util::generators::{
     float_unsigned_unsigned_rounding_mode_quadruple_gen_var_17,
     float_unsigned_unsigned_rounding_mode_quadruple_gen_var_18,
     float_unsigned_unsigned_triple_gen_var_1, rational_unsigned_rounding_mode_triple_gen_var_10,
+    rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_5,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_q::Rational;
-use malachite_q::test_util::generators::{rational_gen, rational_unsigned_pair_gen_var_3};
+use malachite_q::test_util::generators::{
+    rational_gen, rational_unsigned_pair_gen_var_1, rational_unsigned_pair_gen_var_3,
+};
 use std::panic::catch_unwind;
 use std::str::FromStr;
 
@@ -4991,6 +4995,612 @@ fn test_cot_with_period_underflow_and_overflow() {
     let (t, o) = below.cot_with_period_prec_round_ref(4, 10, Up);
     assert_eq!(ComparableFloatRef(&t), ComparableFloatRef(&min));
     assert_eq!(o, Greater);
+}
+
+#[test]
+fn test_cot_with_period_rational_prec_round() {
+    let test = |s: &str,
+                u: u64,
+                prec: u64,
+                rm: RoundingMode,
+                out: &str,
+                out_hex: &str,
+                o_out: Ordering| {
+        let x = Rational::from_str(s).unwrap();
+
+        let (t, o) = Float::cot_with_period_rational_prec_round(x.clone(), u, prec, rm);
+        assert!(t.is_valid());
+        assert_eq!(t.to_string(), out);
+        assert_eq!(to_hex_string(&t), out_hex);
+        assert_eq!(o, o_out);
+
+        let (t_alt, o_alt) = Float::cot_with_period_rational_prec_round_ref(&x, u, prec, rm);
+        assert!(t_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
+        assert_eq!(o_alt, o);
+
+        if rm == Nearest {
+            let (t_alt, o_alt) = Float::cot_with_period_rational_prec(x.clone(), u, prec);
+            assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
+            assert_eq!(o_alt, o);
+            let (t_alt, o_alt) = Float::cot_with_period_rational_prec_ref(&x, u, prec);
+            assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
+            assert_eq!(o_alt, o);
+        }
+
+        // the cotangent is the cosine over the sine in the same units
+        if let Some((t_alt, o_alt)) = cot_with_period_rational_naive(&x, u, prec, rm) {
+            assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
+            assert_eq!(o_alt, o);
+        }
+    };
+    test("0", 4, 1, Nearest, "Infinity", "Infinity", Equal);
+    test("0", 4, 10, Nearest, "Infinity", "Infinity", Equal);
+    test("0", 4, 10, Floor, "Infinity", "Infinity", Equal);
+    test("0", 4, 10, Ceiling, "Infinity", "Infinity", Equal);
+    test("0", 4, 10, Exact, "Infinity", "Infinity", Equal);
+    test("0", 4, 53, Nearest, "Infinity", "Infinity", Equal);
+    test("0", 0, 1, Nearest, "NaN", "NaN", Equal);
+    test("0", 0, 10, Nearest, "NaN", "NaN", Equal);
+    test("0", 0, 10, Floor, "NaN", "NaN", Equal);
+    test("0", 0, 10, Ceiling, "NaN", "NaN", Equal);
+    test("0", 0, 10, Exact, "NaN", "NaN", Equal);
+    test("0", 0, 53, Nearest, "NaN", "NaN", Equal);
+    test("1", 0, 1, Nearest, "NaN", "NaN", Equal);
+    test("1", 0, 10, Nearest, "NaN", "NaN", Equal);
+    test("1", 0, 10, Floor, "NaN", "NaN", Equal);
+    test("1", 0, 10, Ceiling, "NaN", "NaN", Equal);
+    test("1", 0, 10, Exact, "NaN", "NaN", Equal);
+    test("1", 0, 53, Nearest, "NaN", "NaN", Equal);
+    test("90", 360, 1, Nearest, "0.0", "0x0.0", Equal);
+    test("90", 360, 10, Nearest, "0.0", "0x0.0", Equal);
+    test("90", 360, 10, Floor, "0.0", "0x0.0", Equal);
+    test("90", 360, 10, Ceiling, "0.0", "0x0.0", Equal);
+    test("90", 360, 10, Exact, "0.0", "0x0.0", Equal);
+    test("90", 360, 53, Nearest, "0.0", "0x0.0", Equal);
+    test("180", 360, 1, Nearest, "-Infinity", "-Infinity", Equal);
+    test("180", 360, 10, Nearest, "-Infinity", "-Infinity", Equal);
+    test("180", 360, 10, Floor, "-Infinity", "-Infinity", Equal);
+    test("180", 360, 10, Ceiling, "-Infinity", "-Infinity", Equal);
+    test("180", 360, 10, Exact, "-Infinity", "-Infinity", Equal);
+    test("180", 360, 53, Nearest, "-Infinity", "-Infinity", Equal);
+    test("270", 360, 1, Nearest, "-0.0", "-0x0.0", Equal);
+    test("270", 360, 10, Nearest, "-0.0", "-0x0.0", Equal);
+    test("270", 360, 10, Floor, "-0.0", "-0x0.0", Equal);
+    test("270", 360, 10, Ceiling, "-0.0", "-0x0.0", Equal);
+    test("270", 360, 10, Exact, "-0.0", "-0x0.0", Equal);
+    test("270", 360, 53, Nearest, "-0.0", "-0x0.0", Equal);
+    test("360", 360, 1, Nearest, "Infinity", "Infinity", Equal);
+    test("360", 360, 10, Nearest, "Infinity", "Infinity", Equal);
+    test("360", 360, 10, Floor, "Infinity", "Infinity", Equal);
+    test("360", 360, 10, Ceiling, "Infinity", "Infinity", Equal);
+    test("360", 360, 10, Exact, "Infinity", "Infinity", Equal);
+    test("450", 360, 10, Ceiling, "0.0", "0x0.0", Equal);
+    test("60", 360, 10, Floor, "0.57715", "0x0.93c#10", Less);
+    test("120", 360, 10, Floor, "-0.57812", "-0x0.940#10", Less);
+    test("240", 360, 10, Floor, "0.57715", "0x0.93c#10", Less);
+    test("300", 360, 10, Floor, "-0.57812", "-0x0.940#10", Less);
+    test("45", 360, 10, Floor, "1.0000", "0x1.000#10", Equal);
+    test("135", 360, 10, Floor, "-1.0000", "-0x1.000#10", Equal);
+    test("30", 360, 10, Floor, "1.7305", "0x1.bb0#10", Less);
+    test("150", 360, 10, Floor, "-1.7324", "-0x1.bb8#10", Less);
+    test("72", 360, 10, Floor, "0.32471", "0x0.532#10", Less);
+    test("144", 360, 10, Floor, "-1.3770", "-0x1.608#10", Less);
+    test("36", 360, 10, Floor, "1.3750", "0x1.600#10", Less);
+    test("108", 360, 10, Floor, "-0.32520", "-0x0.534#10", Less);
+    test("1/3", 1, 10, Floor, "-0.57812", "-0x0.940#10", Less);
+    test("1/8", 1, 10, Floor, "1.0000", "0x1.000#10", Equal);
+    test("1/5", 1, 10, Floor, "0.32471", "0x0.532#10", Less);
+    test("-1/10", 1, 10, Floor, "-1.3770", "-0x1.608#10", Less);
+    test("1/7", 1, 10, Floor, "0.79688", "0x0.cc0#10", Less);
+    test("2/7", 1, 10, Floor, "-0.22827", "-0x0.3a7#10", Less);
+    test("-3/7", 1, 10, Floor, "2.0742", "0x2.13#10", Less);
+    test("22/7", 1, 10, Floor, "0.79688", "0x0.cc0#10", Less);
+    test("1/7", 3, 10, Floor, "3.2383", "0x3.3d#10", Less);
+    test("355/113", 360, 10, Floor, "18.219", "0x12.38#10", Less);
+    test("1", 7, 10, Floor, "0.79688", "0x0.cc0#10", Less);
+    test("1000000", 7, 10, Floor, "0.79688", "0x0.cc0#10", Less);
+    test("1/1000000", 1, 10, Floor, "1.5898e5", "0x2.6dE+4#10", Less);
+    test(
+        "1/1000000000000000000000000000000",
+        1,
+        10,
+        Floor,
+        "1.5908e29",
+        "0x2.02E+24#10",
+        Less,
+    );
+    test(
+        "100000000000000000000000000000000000000001",
+        4,
+        10,
+        Floor,
+        "0.0",
+        "0x0.0",
+        Equal,
+    );
+    test(
+        "111414603535684224740921180161/1237940039285380274899124224",
+        360,
+        53,
+        Floor,
+        "-1.4098657419642455e-29",
+        "-0x1.1df46a2529d3aE-24#53",
+        Less,
+    );
+    test(
+        "3/20",
+        1,
+        30,
+        Nearest,
+        "0.72654252779",
+        "0x0.b9feb0ec#30",
+        Less,
+    );
+    test(
+        "11/20",
+        1,
+        30,
+        Floor,
+        "3.0776835345",
+        "0x3.13e3117#30",
+        Less,
+    );
+    test(
+        "17/20",
+        1,
+        30,
+        Nearest,
+        "-0.72654252779",
+        "-0x0.b9feb0ec#30",
+        Greater,
+    );
+    test(
+        "-1/3",
+        1,
+        30,
+        Nearest,
+        "0.57735026907",
+        "0x0.93cd3a2c#30",
+        Less,
+    );
+    test(
+        "3/8",
+        1,
+        30,
+        Nearest,
+        "-1.0000000000",
+        "-0x1.00000000#30",
+        Equal,
+    );
+    test("1/2", 1, 10, Exact, "-Infinity", "-Infinity", Equal);
+    test("-5", 1, 10, Exact, "-Infinity", "-Infinity", Equal);
+    test(
+        "-1/1000000000000000000000000000000",
+        7,
+        10,
+        Floor,
+        "-1.1141e30",
+        "-0xe.10E+24#10",
+        Less,
+    );
+    // fifths and tenths of a turn, the poles, and a half turn
+    test("1", 5, 20, Nearest, "0.32491970", "0x0.532df0#20", Greater);
+    test("2", 5, 20, Nearest, "-1.3763828", "-0x1.605aa#20", Less);
+    test("1", 10, 20, Nearest, "1.3763828", "0x1.605aa#20", Greater);
+    test("3", 10, 20, Nearest, "-0.32491970", "-0x0.532df0#20", Less);
+    test("1", 4, 20, Nearest, "0.0", "0x0.0", Equal);
+    test("3", 4, 20, Nearest, "-0.0", "-0x0.0", Equal);
+    test("1", 2, 20, Nearest, "-Infinity", "-Infinity", Equal);
+    test(
+        "1/5",
+        1,
+        20,
+        Nearest,
+        "0.32491970",
+        "0x0.532df0#20",
+        Greater,
+    );
+    test("2/5", 1, 20, Nearest, "-1.3763828", "-0x1.605aa#20", Less);
+    test("1/10", 1, 20, Nearest, "1.3763828", "0x1.605aa#20", Greater);
+    test(
+        "-1/5",
+        1,
+        20,
+        Nearest,
+        "-0.32491970",
+        "-0x0.532df0#20",
+        Less,
+    );
+    test("7/5", 1, 20, Nearest, "-1.3763828", "-0x1.605aa#20", Less);
+}
+
+#[test]
+#[should_panic]
+fn cot_with_period_rational_prec_round_fail_1() {
+    Float::cot_with_period_rational_prec_round(Rational::ONE, 7, 0, Floor);
+}
+
+#[test]
+#[should_panic]
+fn cot_with_period_rational_prec_round_fail_2() {
+    Float::cot_with_period_rational_prec_round(Rational::ONE, 7, 10, Exact);
+}
+
+#[test]
+#[should_panic]
+fn cot_with_period_rational_prec_round_fail_3() {
+    // a twelfth of a turn is sqrt(3), which is not exact
+    Float::cot_with_period_rational_prec_round(Rational::from_unsigneds(1u8, 12), 1, 10, Exact);
+}
+
+#[test]
+#[should_panic]
+fn cot_with_period_rational_prec_round_ref_fail() {
+    Float::cot_with_period_rational_prec_round_ref(&Rational::ONE, 7, 10, Exact);
+}
+
+#[test]
+#[should_panic]
+fn cot_with_period_rational_prec_fail() {
+    Float::cot_with_period_rational_prec(Rational::ONE, 7, 0);
+}
+
+#[allow(clippy::needless_pass_by_value)]
+fn cot_with_period_rational_prec_round_properties_helper(
+    x: Rational,
+    u: u64,
+    prec: u64,
+    rm: RoundingMode,
+) {
+    if rm == Exact {
+        // Exact is only allowed when the result is exactly representable; otherwise panic.
+        let (t, o) = Float::cot_with_period_rational_prec_round_ref(&x, u, prec, Nearest);
+        if o == Equal {
+            let (te, oe) = Float::cot_with_period_rational_prec_round_ref(&x, u, prec, Exact);
+            assert_eq!(ComparableFloatRef(&te), ComparableFloatRef(&t));
+            assert_eq!(oe, Equal);
+        } else {
+            assert_panic!(Float::cot_with_period_rational_prec_round_ref(
+                &x, u, prec, Exact
+            ));
+        }
+        return;
+    }
+    let (t, o) = Float::cot_with_period_rational_prec_round(x.clone(), u, prec, rm);
+    assert!(t.is_valid());
+    assert_rounding_ordering_consistent(&t, rm, o);
+
+    let (t_alt, o_alt) = Float::cot_with_period_rational_prec_round_ref(&x, u, prec, rm);
+    assert!(t_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
+    assert_eq!(o_alt, o);
+
+    // MPFR has no cotu, so the oracle is a wider cosine over a wider sine, bracketed
+    if let Some((t_alt, o_alt)) = cot_with_period_rational_naive(&x, u, prec, rm) {
+        assert_eq!(
+            ComparableFloatRef(&t_alt),
+            ComparableFloatRef(&t),
+            "NAIVEPROBE x = {x} u = {u} prec = {prec} rm = {rm:?}"
+        );
+        assert_eq!(o_alt, o);
+    }
+
+    // NaN exactly for u = 0
+    assert_eq!(t.is_nan(), u == 0);
+    if u != 0 {
+        // an infinity is either a pole, which is exact, or an overflow, which is not; a finite
+        // result carries the requested precision
+        if t.is_normal() {
+            assert_eq!(t.get_prec(), Some(prec));
+        }
+        // cot is odd (a `Rational` has no negative zero, so x = 0 is excluded: its cotangent is the
+        // pole's positive infinity either way)
+        if x != 0u32 {
+            let (t_neg, o_neg) = Float::cot_with_period_rational_prec_round(-&x, u, prec, -rm);
+            assert_eq!(ComparableFloatRef(&t_neg), ComparableFloatRef(&-&t));
+            assert_eq!(o_neg, o.reverse());
+        }
+        // cot has period u, except at a pole, where the infinity's sign follows the sign of x
+        // rather than the angle
+        if !t.is_infinite() {
+            let (t_shifted, o_shifted) =
+                Float::cot_with_period_rational_prec_round(&x + Rational::from(u), u, prec, rm);
+            assert_eq!(ComparableFloatRef(&t_shifted), ComparableFloatRef(&t));
+            assert_eq!(o_shifted, o);
+        }
+        // a `Float` input agrees with the `Float` version
+        if let Ok(f) = Float::try_from(&x) {
+            let (t_alt, o_alt) = f.cot_with_period_prec_round(u, prec, rm);
+            assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
+            assert_eq!(o_alt, o);
+        }
+    }
+
+    if o == Equal {
+        for rm in exhaustive_rounding_modes() {
+            let (t2, oo) = Float::cot_with_period_rational_prec_round_ref(&x, u, prec, rm);
+            assert_eq!(ComparableFloatRef(&t2), ComparableFloatRef(&t));
+            assert_eq!(oo, Equal);
+        }
+    } else {
+        assert_panic!(Float::cot_with_period_rational_prec_round_ref(
+            &x, u, prec, Exact
+        ));
+    }
+}
+
+#[test]
+fn cot_with_period_rational_prec_round_properties() {
+    rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_5().test_properties(
+        |(x, u, prec, rm)| {
+            cot_with_period_rational_prec_round_properties_helper(x, u, prec, rm);
+        },
+    );
+
+    unsigned_rounding_mode_pair_gen_var_3().test_properties(|(prec, rm)| {
+        // cot(0) = infinity, exactly
+        let (t, o) = Float::cot_with_period_rational_prec_round(Rational::ZERO, 4, prec, rm);
+        assert_eq!(ComparableFloat(t), ComparableFloat(Float::INFINITY));
+        assert_eq!(o, Equal);
+        let (t, o) = Float::cot_with_period_rational_prec_round(Rational::ONE, 0, prec, rm);
+        assert!(t.is_nan());
+        assert_eq!(o, Equal);
+        // exact cases, straight from a fraction of a turn: the half turns are the poles, the odd
+        // quarter turns are the zeros, and the odd eighths are ±1
+        let one = Float::one_prec(prec);
+        for (s, expected) in [
+            ("1/4", Float::ZERO),
+            ("3/4", Float::NEGATIVE_ZERO),
+            ("-1/4", Float::NEGATIVE_ZERO),
+            ("1/2", Float::NEGATIVE_INFINITY),
+            ("-1/2", Float::INFINITY),
+            ("1", Float::INFINITY),
+            ("-1", Float::NEGATIVE_INFINITY),
+            ("1/8", one.clone()),
+            ("-1/8", -&one),
+            ("3/8", -&one),
+            ("5/8", one.clone()),
+        ] {
+            let (t, o) = Float::cot_with_period_rational_prec_round(
+                Rational::from_str(s).unwrap(),
+                1,
+                prec,
+                rm,
+            );
+            assert_eq!(ComparableFloat(t), ComparableFloat(expected));
+            assert_eq!(o, Equal);
+        }
+    });
+}
+
+#[test]
+fn cot_with_period_rational_prec_properties() {
+    rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_5().test_properties(
+        |(x, u, prec, _)| {
+            let (t, o) = Float::cot_with_period_rational_prec(x.clone(), u, prec);
+            assert!(t.is_valid());
+            assert_rounding_ordering_consistent(&t, Nearest, o);
+            let (t_alt, o_alt) = Float::cot_with_period_rational_prec_ref(&x, u, prec);
+            assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
+            assert_eq!(o_alt, o);
+            let (t_alt, o_alt) =
+                Float::cot_with_period_rational_prec_round_ref(&x, u, prec, Nearest);
+            assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
+            assert_eq!(o_alt, o);
+            if let Some((t_alt, o_alt)) = cot_with_period_rational_naive(&x, u, prec, Nearest) {
+                assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
+                assert_eq!(o_alt, o);
+            }
+        },
+    );
+}
+
+// Fractions of a turn within 2^(-2^30) of a half turn, whose cotangents overflow, and a fraction of
+
+#[test]
+#[allow(clippy::type_repetition_in_bounds)]
+fn test_primitive_float_cot_with_period_rational() {
+    fn test<T: PrimitiveFloat>(s: &str, u: u64, out: T)
+    where
+        Float: From<T> + PartialOrd<T>,
+        for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    {
+        let x = Rational::from_str(s).unwrap();
+        assert_eq!(
+            NiceFloat(primitive_float_cot_with_period_rational::<T>(&x, u)),
+            NiceFloat(out)
+        );
+    }
+    test::<f32>("0", 0, f32::NAN);
+    test::<f32>("0", 360, f32::INFINITY);
+    test::<f32>("1", 0, f32::NAN);
+    test::<f32>("90", 360, 0.0);
+    test::<f32>("-90", 360, -0.0);
+    test::<f32>("270", 360, -0.0);
+    test::<f32>("180", 360, f32::NEGATIVE_INFINITY);
+    test::<f32>("-180", 360, f32::INFINITY);
+    test::<f32>("360", 360, f32::INFINITY);
+    test::<f32>("45", 360, 1.0);
+    test::<f32>("135", 360, -1.0);
+    test::<f32>("30", 360, 1.7320508);
+    test::<f32>("60", 360, 0.57735026);
+    test::<f32>("120", 360, -0.57735026);
+    test::<f32>("72", 360, 0.3249197);
+    test::<f32>("36", 360, 1.3763819);
+    test::<f32>("1/4", 1, 0.0);
+    test::<f32>("3/4", 1, -0.0);
+    test::<f32>("1/2", 1, f32::NEGATIVE_INFINITY);
+    test::<f32>("1/8", 1, 1.0);
+    test::<f32>("1/12", 1, 1.7320508);
+    test::<f32>("1/6", 1, 0.57735026);
+    test::<f32>("1/3", 1, -0.57735026);
+    test::<f32>("1/5", 1, 0.3249197);
+    test::<f32>("2/5", 1, -1.3763819);
+    test::<f32>("1/10", 1, 1.3763819);
+    test::<f32>("-1/5", 1, -0.3249197);
+    test::<f32>("1/7", 1, 0.7974734);
+    test::<f32>("-2/7", 1, 0.22824347);
+    test::<f32>("22/7", 1, 0.7974734);
+    test::<f32>("1", 7, 0.7974734);
+    test::<f32>("1000000", 7, 0.7974734);
+    test::<f32>("1/1000000", 1, 159154.94);
+    test::<f32>("355/113", 360, 18.21953);
+    test::<f64>("0", 0, f64::NAN);
+    test::<f64>("0", 360, f64::INFINITY);
+    test::<f64>("1", 0, f64::NAN);
+    test::<f64>("90", 360, 0.0);
+    test::<f64>("-90", 360, -0.0);
+    test::<f64>("270", 360, -0.0);
+    test::<f64>("180", 360, f64::NEGATIVE_INFINITY);
+    test::<f64>("-180", 360, f64::INFINITY);
+    test::<f64>("360", 360, f64::INFINITY);
+    test::<f64>("45", 360, 1.0);
+    test::<f64>("135", 360, -1.0);
+    test::<f64>("30", 360, 1.7320508075688772);
+    test::<f64>("60", 360, 0.5773502691896257);
+    test::<f64>("120", 360, -0.5773502691896257);
+    test::<f64>("72", 360, 0.32491969623290634);
+    test::<f64>("36", 360, 1.3763819204711736);
+    test::<f64>("1/4", 1, 0.0);
+    test::<f64>("3/4", 1, -0.0);
+    test::<f64>("1/2", 1, f64::NEGATIVE_INFINITY);
+    test::<f64>("1/8", 1, 1.0);
+    test::<f64>("1/12", 1, 1.7320508075688772);
+    test::<f64>("1/6", 1, 0.5773502691896257);
+    test::<f64>("1/3", 1, -0.5773502691896257);
+    test::<f64>("1/5", 1, 0.32491969623290634);
+    test::<f64>("2/5", 1, -1.3763819204711736);
+    test::<f64>("1/10", 1, 1.3763819204711736);
+    test::<f64>("-1/5", 1, -0.32491969623290634);
+    test::<f64>("1/7", 1, 0.7974733888824039);
+    test::<f64>("-2/7", 1, 0.22824347439014994);
+    test::<f64>("22/7", 1, 0.7974733888824039);
+    test::<f64>("1", 7, 0.7974733888824039);
+    test::<f64>("1000000", 7, 0.7974733888824039);
+    test::<f64>("1/1000000", 1, 159154.94308980095);
+    test::<f64>("355/113", 360, 18.219530795919468);
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn primitive_float_cot_with_period_rational_properties_helper<T: PrimitiveFloat>()
+where
+    Float: From<T> + PartialOrd<T>,
+    Rational: ExactFrom<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    rational_unsigned_pair_gen_var_1::<u64>().test_properties(|(x, u)| {
+        let s = primitive_float_cot_with_period_rational::<T>(&x, u);
+        assert_eq!(s.is_nan(), u == 0);
+        if u != 0 {
+            // odd, and periodic with period u away from a pole, where the infinity's sign follows
+            // the sign of x rather than the angle (a `Rational` has no negative zero, so x = 0 is
+            // excluded from the oddness check)
+            if x != 0u32 {
+                assert_eq!(
+                    NiceFloat(primitive_float_cot_with_period_rational::<T>(&-&x, u)),
+                    NiceFloat(-s)
+                );
+            }
+            if s.is_finite() {
+                assert_eq!(
+                    NiceFloat(primitive_float_cot_with_period_rational::<T>(
+                        &(&x + Rational::from(u)),
+                        u
+                    )),
+                    NiceFloat(s)
+                );
+            }
+            // the same as the `Float` cotangent taken with 64 bits to spare and rounded once
+            let (s_float, _) =
+                Float::cot_with_period_rational_prec_ref(&x, u, T::MANTISSA_WIDTH + 64);
+            assert_eq!(
+                NiceFloat(T::rounding_from(&s_float, Nearest).0),
+                NiceFloat(s)
+            );
+        }
+    });
+
+    primitive_float_unsigned_pair_gen_var_1::<T, u64>().test_properties(|(x, u)| {
+        // The cotangent of a finite primitive float, taken through the `Rational` path, matches the
+        // direct primitive-float cotangent.
+        assert_eq!(
+            NiceFloat(primitive_float_cot_with_period_rational::<T>(
+                &Rational::exact_from(x),
+                u
+            )),
+            NiceFloat(primitive_float_cot_with_period(x, u))
+        );
+    });
+}
+
+#[test]
+fn primitive_float_cot_with_period_rational_properties() {
+    apply_fn_to_primitive_floats!(primitive_float_cot_with_period_rational_properties_helper);
+}
+
+// Fractions of a turn within 2^(-2^30) of a half turn, whose cotangents overflow, of a quarter
+// turn, where they underflow instead, and a fraction of a turn small enough that its cotangent
+// overflows on its own. The near-zero paths work with the exact distance to the multiple of 1/4, so
+// no 2^30-bit pi is ever formed.
+#[test]
+fn test_cot_with_period_rational_underflow_and_overflow() {
+    let max = Float::max_finite_value_with_prec(10);
+    let min = Float::min_positive_value_prec(10);
+    let eps = Rational::power_of_2(-((1i64 << 30) + 70));
+    // just past a half turn: the sine is negative and tiny while the cosine is just below -1, so
+    // the cotangent is positive and beyond the largest finite `Float`
+    let above = Rational::from_unsigneds(1u32, 2u32) + &eps;
+    let (t, o) = Float::cot_with_period_rational_prec_round_ref(&above, 1, 10, Nearest);
+    assert_eq!(ComparableFloat(t), ComparableFloat(Float::INFINITY));
+    assert_eq!(o, Greater);
+    let (t, o) = Float::cot_with_period_rational_prec_round_ref(&above, 1, 10, Down);
+    assert_eq!(ComparableFloatRef(&t), ComparableFloatRef(&max));
+    assert_eq!(o, Less);
+    // just below a half turn: the cotangent is negative and beyond the largest finite `Float`
+    let below = Rational::from_unsigneds(1u32, 2u32) - &eps;
+    let (t, o) = Float::cot_with_period_rational_prec_round_ref(&below, 1, 10, Nearest);
+    assert_eq!(
+        ComparableFloat(t),
+        ComparableFloat(Float::NEGATIVE_INFINITY)
+    );
+    assert_eq!(o, Less);
+    let (t, o) = Float::cot_with_period_rational_prec_round_ref(&below, 1, 10, Down);
+    assert_eq!(ComparableFloatRef(&t), ComparableFloatRef(&-max.clone()));
+    assert_eq!(o, Greater);
+    // a non-dyadic version: 1/2 + 1/(3 * 2^(2^30 + 70)) of a turn
+    let above = Rational::from_unsigneds(1u32, 2u32) + &eps / Rational::from(3u32);
+    let (t, o) = Float::cot_with_period_rational_prec_round_ref(&above, 1, 10, Nearest);
+    assert_eq!(ComparableFloat(t), ComparableFloat(Float::INFINITY));
+    assert_eq!(o, Greater);
+    // just past a quarter turn: the cosine is negative and tiny while the sine is just below 1, so
+    // the cotangent is a negative underflow
+    let above = Rational::from_unsigneds(1u32, 4u32) + &eps;
+    let (t, o) = Float::cot_with_period_rational_prec_round_ref(&above, 1, 10, Nearest);
+    assert_eq!(ComparableFloat(t), ComparableFloat(Float::NEGATIVE_ZERO));
+    assert_eq!(o, Greater);
+    let (t, o) = Float::cot_with_period_rational_prec_round_ref(&above, 1, 10, Up);
+    assert_eq!(ComparableFloatRef(&t), ComparableFloatRef(&-min.clone()));
+    assert_eq!(o, Less);
+    // just below a quarter turn: a positive underflow
+    let below = Rational::from_unsigneds(1u32, 4u32) - &eps;
+    let (t, o) = Float::cot_with_period_rational_prec_round_ref(&below, 1, 10, Nearest);
+    assert_eq!(ComparableFloat(t), ComparableFloat(Float::ZERO));
+    assert_eq!(o, Less);
+    let (t, o) = Float::cot_with_period_rational_prec_round_ref(&below, 1, 10, Up);
+    assert_eq!(ComparableFloatRef(&t), ComparableFloatRef(&min));
+    assert_eq!(o, Greater);
+    // a tiny fraction of a turn, whose cotangent is about u/(2 pi x) and overflows on its own; the
+    // `Float` version cannot reach this, since no `Float` is this small
+    let (t, o) = Float::cot_with_period_rational_prec_round_ref(&eps, 1, 10, Nearest);
+    assert_eq!(ComparableFloat(t), ComparableFloat(Float::INFINITY));
+    assert_eq!(o, Greater);
+    let (t, o) = Float::cot_with_period_rational_prec_round_ref(&-eps, 1, 10, Nearest);
+    assert_eq!(
+        ComparableFloat(t),
+        ComparableFloat(Float::NEGATIVE_INFINITY)
+    );
+    assert_eq!(o, Less);
 }
 
 // An input too large to be a `Float`, reduced modulo 2 pi in `Rational` arithmetic with pi to about
