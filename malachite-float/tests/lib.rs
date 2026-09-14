@@ -68,6 +68,7 @@ pub mod float {
         pub mod add;
         pub mod add_mul;
         pub mod agm;
+        pub mod atan;
         pub mod average;
         pub mod canonical_unit_i_pow;
         pub mod canonicalize_unit;

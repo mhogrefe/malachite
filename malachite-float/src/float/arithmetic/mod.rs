@@ -24,6 +24,10 @@ pub mod add_mul;
 /// Taking the AGM (arithmetic-geometric mean) of two [`Float`](super::Float)s, and of
 /// [`Float`](super::Float)s with [`Rational`](malachite_q::Rational)s.
 pub mod agm;
+/// Implementations of [`Atan`](malachite_base::num::arithmetic::traits::Atan) and
+/// [`AtanAssign`](malachite_base::num::arithmetic::traits::AtanAssign), traits for computing the
+/// arctangent of [`Float`](super::Float)s.
+pub mod atan;
 /// [`Average`](malachite_base::num::arithmetic::traits::Average) and
 /// [`AverageAssign`](malachite_base::num::arithmetic::traits::AverageAssign), traits for computing
 /// the average (arithmetic mean) of two numbers, and the associated precision- and

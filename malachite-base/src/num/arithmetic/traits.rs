@@ -978,6 +978,18 @@ pub trait CotAssign {
     fn cot_assign(&mut self);
 }
 
+/// Computes $\arctan(x)$, the arctangent of a number.
+pub trait Atan {
+    type Output;
+
+    fn atan(self) -> Self::Output;
+}
+
+/// Replaces a number with its arctangent, $\arctan(x)$.
+pub trait AtanAssign {
+    fn atan_assign(&mut self);
+}
+
 /// Replaces a number with its sine, $\sin(x)$, and writes its cosine, $\cos(x)$, to a second
 /// number.
 pub trait SinCosAssign {

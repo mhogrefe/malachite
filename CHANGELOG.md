@@ -308,6 +308,17 @@ documented by git history.
   `primitive_float_tan_with_period` and `primitive_float_tan_with_period_rational` give the
   correctly rounded `f32` or `f64` tangent; a primitive float is never merely close enough to a
   pole to overflow, but a `Rational` can be.
+- `Atan` and `AtanAssign` (new traits in malachite-base) for `Float`, with the usual
+  `atan_prec_round`, `atan_prec`, `atan_round`, and `_ref`/`_assign` variants: a port of
+  `mpfr_atan`, the first of the inverse trigonometric functions. An input above 1 in magnitude is
+  inverted and its arctangent taken from $\pi/2$; the argument is then halved through $\arctan x
+  = 2\arctan((\sqrt{1+x^2}-1)/x)$ until it is below about $1/\sqrt{p}$, and split into binary
+  chunks whose arctangents are summed by binary splitting of the series for $\arctan(x)/x$, with
+  MPFR's table of the twenty most common small chunks for precisions up to 192 bits. The
+  arctangent is bounded, so it never overflows; it underflows only for the smallest positive
+  `Float` rounded toward zero, a case MPFR's small-input shortcut declines and a series bracket
+  decides. `atan(\pm0.0)` is $\pm0.0$, `atan(\pm\infty)` is $\pm\pi/2$ rounded, and the
+  function is odd. `primitive_float_atan` gives the correctly rounded `f32` or `f64` arctangent.
 - `Cot` and `CotAssign` (new traits in malachite-base) for `Float`, with the usual
   `cot_prec_round`, `cot_prec`, `cot_round`, and `_ref`/`_assign` variants: a port of `mpfr_cot`,
   MPFR's generic reciprocal template with the tangent. MPFR's tangent is itself a quotient of a
