@@ -2295,6 +2295,566 @@ impl Float {
     pub fn cot_with_period_rational_prec_ref(x: &Rational, u: u64, prec: u64) -> (Self, Ordering) {
         Self::cot_with_period_rational_prec_round_ref(x, u, prec, Nearest)
     }
+
+    /// Computes $\cot(\pi x)$, the cotangent of a [`Float`] measured in half-turns, rounding the
+    /// result to the specified precision and with the specified rounding mode. The [`Float`] is
+    /// taken by value. An [`Ordering`] is also returned, indicating whether the rounded cotangent
+    /// is less than, equal to, or greater than the exact cotangent. Although `NaN`s are not
+    /// comparable to any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// This is `cot_with_period` with a period of 2: see [`Float::cot_with_period_prec_round`] for
+    /// the error bounds, the special and closed-form cases (integers are poles and give
+    /// $\pm\infty$, with the sign of $x$ at an even integer and the opposite at an odd one;
+    /// half-integers give $\pm0.0$; odd multiples of $1/4$ give $\pm1$; odd multiples of $1/6$ give
+    /// $\pm\sqrt3$; and multiples of $1/3$ that are not integers give $\pm\sqrt3/3$), overflow,
+    /// underflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::from(0.1f64).cot_pi_prec_round(10, Floor);
+    /// assert_eq!(t.to_string(), "3.0742");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (t, o) = Float::from(0.1f64).cot_pi_prec_round(10, Ceiling);
+    /// assert_eq!(t.to_string(), "3.0781");
+    /// assert_eq!(o, Greater);
+    ///
+    /// // an integer is a pole
+    /// let (t, o) = Float::ONE.cot_pi_prec_round(10, Exact);
+    /// assert_eq!(t.to_string(), "-Infinity");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn cot_pi_prec_round(self, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+        self.cot_with_period_prec_round(2, prec, rm)
+    }
+
+    /// Computes $\cot(\pi x)$, the cotangent of a [`Float`] measured in half-turns, rounding the
+    /// result to the specified precision and with the specified rounding mode. The [`Float`] is
+    /// taken by reference. An [`Ordering`] is also returned, indicating whether the rounded
+    /// cotangent is less than, equal to, or greater than the exact cotangent. Although `NaN`s are
+    /// not comparable to any [`Float`], whenever this function returns a `NaN` it also returns
+    /// `Equal`.
+    ///
+    /// This is `cot_with_period` with a period of 2: see [`Float::cot_with_period_prec_round_ref`]
+    /// for the error bounds, the special and closed-form cases (integers are poles and give
+    /// $\pm\infty$, with the sign of $x$ at an even integer and the opposite at an odd one;
+    /// half-integers give $\pm0.0$; odd multiples of $1/4$ give $\pm1$; odd multiples of $1/6$ give
+    /// $\pm\sqrt3$; and multiples of $1/3$ that are not integers give $\pm\sqrt3/3$), overflow,
+    /// underflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = (Float::from(0.1f64)).cot_pi_prec_round_ref(10, Floor);
+    /// assert_eq!(t.to_string(), "3.0742");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (t, o) = (Float::from(0.1f64)).cot_pi_prec_round_ref(10, Ceiling);
+    /// assert_eq!(t.to_string(), "3.0781");
+    /// assert_eq!(o, Greater);
+    ///
+    /// // an integer is a pole
+    /// let (t, o) = (&Float::ONE).cot_pi_prec_round_ref(10, Exact);
+    /// assert_eq!(t.to_string(), "-Infinity");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn cot_pi_prec_round_ref(&self, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+        self.cot_with_period_prec_round_ref(2, prec, rm)
+    }
+
+    /// Computes $\cot(\pi x)$, the cotangent of a [`Float`] measured in half-turns, rounding the
+    /// result to the nearest value of the specified precision. The [`Float`] is taken by value. An
+    /// [`Ordering`] is also returned, indicating whether the rounded cotangent is less than, equal
+    /// to, or greater than the exact cotangent. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// This is `cot_with_period` with a period of 2: see [`Float::cot_with_period_prec`] for the
+    /// error bounds, the special and closed-form cases (integers are poles and give $\pm\infty$,
+    /// with the sign of $x$ at an even integer and the opposite at an odd one; half-integers give
+    /// $\pm0.0$; odd multiples of $1/4$ give $\pm1$; odd multiples of $1/6$ give $\pm\sqrt3$; and
+    /// multiples of $1/3$ that are not integers give $\pm\sqrt3/3$), overflow, underflow, and the
+    /// complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::from(0.1f64).cot_pi_prec(10);
+    /// assert_eq!(t.to_string(), "3.0781");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (t, o) = Float::from(0.1f64).cot_pi_prec(53);
+    /// assert_eq!(t.to_string(), "3.0776835371752531");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn cot_pi_prec(self, prec: u64) -> (Self, Ordering) {
+        self.cot_with_period_prec(2, prec)
+    }
+
+    /// Computes $\cot(\pi x)$, the cotangent of a [`Float`] measured in half-turns, rounding the
+    /// result to the nearest value of the specified precision. The [`Float`] is taken by reference.
+    /// An [`Ordering`] is also returned, indicating whether the rounded cotangent is less than,
+    /// equal to, or greater than the exact cotangent. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// This is `cot_with_period` with a period of 2: see [`Float::cot_with_period_prec_ref`] for
+    /// the error bounds, the special and closed-form cases (integers are poles and give
+    /// $\pm\infty$, with the sign of $x$ at an even integer and the opposite at an odd one;
+    /// half-integers give $\pm0.0$; odd multiples of $1/4$ give $\pm1$; odd multiples of $1/6$ give
+    /// $\pm\sqrt3$; and multiples of $1/3$ that are not integers give $\pm\sqrt3/3$), overflow,
+    /// underflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = (Float::from(0.1f64)).cot_pi_prec_ref(10);
+    /// assert_eq!(t.to_string(), "3.0781");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (t, o) = (Float::from(0.1f64)).cot_pi_prec_ref(53);
+    /// assert_eq!(t.to_string(), "3.0776835371752531");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn cot_pi_prec_ref(&self, prec: u64) -> (Self, Ordering) {
+        self.cot_with_period_prec_ref(2, prec)
+    }
+
+    /// Computes $\cot(\pi x)$, the cotangent of a [`Float`] measured in half-turns, rounding the
+    /// result with the specified rounding mode. The precision of the output is the precision of the
+    /// input. The [`Float`] is taken by value. An [`Ordering`] is also returned, indicating whether
+    /// the rounded cotangent is less than, equal to, or greater than the exact cotangent. Although
+    /// `NaN`s are not comparable to any [`Float`], whenever this function returns a `NaN` it also
+    /// returns `Equal`.
+    ///
+    /// This is `cot_with_period` with a period of 2: see [`Float::cot_with_period_round`] for the
+    /// error bounds, the special and closed-form cases (integers are poles and give $\pm\infty$,
+    /// with the sign of $x$ at an even integer and the opposite at an odd one; half-integers give
+    /// $\pm0.0$; odd multiples of $1/4$ give $\pm1$; odd multiples of $1/6$ give $\pm\sqrt3$; and
+    /// multiples of $1/3$ that are not integers give $\pm\sqrt3/3$), overflow, underflow, and the
+    /// complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the input
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::from(0.1f64).cot_pi_round(Floor);
+    /// assert_eq!(t.to_string(), "3.0776835371752531");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (t, o) = Float::from(0.1f64).cot_pi_round(Nearest);
+    /// assert_eq!(t.to_string(), "3.0776835371752531");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn cot_pi_round(self, rm: RoundingMode) -> (Self, Ordering) {
+        self.cot_with_period_round(2, rm)
+    }
+
+    /// Computes $\cot(\pi x)$, the cotangent of a [`Float`] measured in half-turns, rounding the
+    /// result with the specified rounding mode. The precision of the output is the precision of the
+    /// input. The [`Float`] is taken by reference. An [`Ordering`] is also returned, indicating
+    /// whether the rounded cotangent is less than, equal to, or greater than the exact cotangent.
+    /// Although `NaN`s are not comparable to any [`Float`], whenever this function returns a `NaN`
+    /// it also returns `Equal`.
+    ///
+    /// This is `cot_with_period` with a period of 2: see [`Float::cot_with_period_round_ref`] for
+    /// the error bounds, the special and closed-form cases (integers are poles and give
+    /// $\pm\infty$, with the sign of $x$ at an even integer and the opposite at an odd one;
+    /// half-integers give $\pm0.0$; odd multiples of $1/4$ give $\pm1$; odd multiples of $1/6$ give
+    /// $\pm\sqrt3$; and multiples of $1/3$ that are not integers give $\pm\sqrt3/3$), overflow,
+    /// underflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the input
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = (Float::from(0.1f64)).cot_pi_round_ref(Floor);
+    /// assert_eq!(t.to_string(), "3.0776835371752531");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (t, o) = (Float::from(0.1f64)).cot_pi_round_ref(Nearest);
+    /// assert_eq!(t.to_string(), "3.0776835371752531");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn cot_pi_round_ref(&self, rm: RoundingMode) -> (Self, Ordering) {
+        self.cot_with_period_round_ref(2, rm)
+    }
+
+    /// Computes $\cot(\pi x)$, the cotangent of a [`Float`] measured in half-turns, rounding the
+    /// result to the precision of the input and to the nearest [`Float`]. The [`Float`] is taken by
+    /// value.
+    ///
+    /// If the cotangent is equidistant from two [`Float`]s with the precision of the input, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// This is `cot_with_period` with a period of 2: see [`Float::cot_with_period`] for the error
+    /// bounds, the special and closed-form cases (integers are poles and give $\pm\infty$, with the
+    /// sign of $x$ at an even integer and the opposite at an odd one; half-integers give $\pm0.0$;
+    /// odd multiples of $1/4$ give $\pm1$; odd multiples of $1/6$ give $\pm\sqrt3$; and multiples
+    /// of $1/3$ that are not integers give $\pm\sqrt3/3$), overflow, underflow, and the complexity,
+    /// with $u = 2$.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::cot_pi_round`] instead. If you want to specify an output precision, consider using
+    /// [`Float::cot_pi_prec`]. If you want both of these things, consider using
+    /// [`Float::cot_pi_prec_round`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// let t = Float::from(0.1f64).cot_pi();
+    /// assert_eq!(t.to_string(), "3.0776835371752531");
+    ///
+    /// // a half-integer is exactly 0
+    /// assert_eq!(Float::from(0.5f64).cot_pi().to_string(), "0.0");
+    /// ```
+    #[inline]
+    pub fn cot_pi(self) -> Self {
+        let prec = self.significant_bits();
+        self.cot_pi_prec(prec).0
+    }
+
+    /// Computes $\cot(\pi x)$, the cotangent of a [`Float`] measured in half-turns, rounding the
+    /// result to the precision of the input and to the nearest [`Float`]. The [`Float`] is taken by
+    /// reference.
+    ///
+    /// If the cotangent is equidistant from two [`Float`]s with the precision of the input, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// This is `cot_with_period` with a period of 2: see [`Float::cot_with_period`] for the error
+    /// bounds, the special and closed-form cases (integers are poles and give $\pm\infty$, with the
+    /// sign of $x$ at an even integer and the opposite at an odd one; half-integers give $\pm0.0$;
+    /// odd multiples of $1/4$ give $\pm1$; odd multiples of $1/6$ give $\pm\sqrt3$; and multiples
+    /// of $1/3$ that are not integers give $\pm\sqrt3/3$), overflow, underflow, and the complexity,
+    /// with $u = 2$.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::cot_pi_round_ref`] instead. If you want to specify an output precision, consider
+    /// using [`Float::cot_pi_prec_ref`]. If you want both of these things, consider using
+    /// [`Float::cot_pi_prec_round_ref`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// let t = (&Float::from(0.1f64)).cot_pi_ref();
+    /// assert_eq!(t.to_string(), "3.0776835371752531");
+    /// ```
+    #[inline]
+    pub fn cot_pi_ref(&self) -> Self {
+        self.cot_pi_prec_ref(self.significant_bits()).0
+    }
+
+    /// Computes $\cot(\pi x)$, the cotangent of a [`Float`] measured in half-turns, rounding the
+    /// result to the specified precision and with the specified rounding mode. The [`Float`] is
+    /// replaced by the result, and an [`Ordering`] is returned, indicating whether the rounded
+    /// cotangent is less than, equal to, or greater than the exact cotangent. Although `NaN`s are
+    /// not comparable to any [`Float`], whenever this function sets a `NaN` it also returns
+    /// `Equal`.
+    ///
+    /// This is `cot_with_period` with a period of 2: see
+    /// [`Float::cot_with_period_prec_round_assign`] for the error bounds, the special and
+    /// closed-form cases (integers are poles and give $\pm\infty$, with the sign of $x$ at an even
+    /// integer and the opposite at an odd one; half-integers give $\pm0.0$; odd multiples of $1/4$
+    /// give $\pm1$; odd multiples of $1/6$ give $\pm\sqrt3$; and multiples of $1/3$ that are not
+    /// integers give $\pm\sqrt3/3$), overflow, underflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from(0.1f64);
+    /// assert_eq!(x.cot_pi_prec_round_assign(10, Floor), Less);
+    /// assert_eq!(x.to_string(), "3.0742");
+    ///
+    /// let mut x = Float::from(0.1f64);
+    /// assert_eq!(x.cot_pi_prec_round_assign(10, Ceiling), Greater);
+    /// assert_eq!(x.to_string(), "3.0781");
+    /// ```
+    #[inline]
+    pub fn cot_pi_prec_round_assign(&mut self, prec: u64, rm: RoundingMode) -> Ordering {
+        self.cot_with_period_prec_round_assign(2, prec, rm)
+    }
+
+    /// Computes $\cot(\pi x)$, the cotangent of a [`Float`] measured in half-turns, rounding the
+    /// result to the nearest value of the specified precision. The [`Float`] is replaced by the
+    /// result, and an [`Ordering`] is returned, indicating whether the rounded cotangent is less
+    /// than, equal to, or greater than the exact cotangent. Although `NaN`s are not comparable to
+    /// any [`Float`], whenever this function sets a `NaN` it also returns `Equal`.
+    ///
+    /// This is `cot_with_period` with a period of 2: see [`Float::cot_with_period_prec_assign`] for
+    /// the error bounds, the special and closed-form cases (integers are poles and give
+    /// $\pm\infty$, with the sign of $x$ at an even integer and the opposite at an odd one;
+    /// half-integers give $\pm0.0$; odd multiples of $1/4$ give $\pm1$; odd multiples of $1/6$ give
+    /// $\pm\sqrt3$; and multiples of $1/3$ that are not integers give $\pm\sqrt3/3$), overflow,
+    /// underflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from(0.1f64);
+    /// assert_eq!(x.cot_pi_prec_assign(10), Greater);
+    /// assert_eq!(x.to_string(), "3.0781");
+    /// ```
+    #[inline]
+    pub fn cot_pi_prec_assign(&mut self, prec: u64) -> Ordering {
+        self.cot_with_period_prec_assign(2, prec)
+    }
+
+    /// Computes $\cot(\pi x)$, the cotangent of a [`Float`] measured in half-turns, rounding the
+    /// result with the specified rounding mode. The precision of the output is the precision of the
+    /// input. The [`Float`] is replaced by the result, and an [`Ordering`] is returned, indicating
+    /// whether the rounded cotangent is less than, equal to, or greater than the exact cotangent.
+    /// Although `NaN`s are not comparable to any [`Float`], whenever this function sets a `NaN` it
+    /// also returns `Equal`.
+    ///
+    /// This is `cot_with_period` with a period of 2: see [`Float::cot_with_period_round_assign`]
+    /// for the error bounds, the special and closed-form cases (integers are poles and give
+    /// $\pm\infty$, with the sign of $x$ at an even integer and the opposite at an odd one;
+    /// half-integers give $\pm0.0$; odd multiples of $1/4$ give $\pm1$; odd multiples of $1/6$ give
+    /// $\pm\sqrt3$; and multiples of $1/3$ that are not integers give $\pm\sqrt3/3$), overflow,
+    /// underflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the input
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from(0.1f64);
+    /// assert_eq!(x.cot_pi_round_assign(Floor), Less);
+    /// assert_eq!(x.to_string(), "3.0776835371752531");
+    /// ```
+    #[inline]
+    pub fn cot_pi_round_assign(&mut self, rm: RoundingMode) -> Ordering {
+        self.cot_with_period_round_assign(2, rm)
+    }
+
+    /// Computes $\cot(\pi x)$, the cotangent of a [`Float`] measured in half-turns, rounding the
+    /// result to the precision of the input and to the nearest [`Float`]. The [`Float`] is replaced
+    /// by the result.
+    ///
+    /// If the cotangent is equidistant from two [`Float`]s with the precision of the input, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// This is `cot_with_period` with a period of 2: see [`Float::cot_with_period`] for the error
+    /// bounds, the special and closed-form cases (integers are poles and give $\pm\infty$, with the
+    /// sign of $x$ at an even integer and the opposite at an odd one; half-integers give $\pm0.0$;
+    /// odd multiples of $1/4$ give $\pm1$; odd multiples of $1/6$ give $\pm\sqrt3$; and multiples
+    /// of $1/3$ that are not integers give $\pm\sqrt3/3$), overflow, underflow, and the complexity,
+    /// with $u = 2$.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::cot_pi_round_assign`] instead. If you want to specify an output precision, consider
+    /// using [`Float::cot_pi_prec_assign`]. If you want both of these things, consider using
+    /// [`Float::cot_pi_prec_round_assign`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// let mut x = Float::from(0.1f64);
+    /// x.cot_pi_assign();
+    /// assert_eq!(x.to_string(), "3.0776835371752531");
+    /// ```
+    #[inline]
+    pub fn cot_pi_assign(&mut self) {
+        let prec = self.significant_bits();
+        self.cot_pi_prec_assign(prec);
+    }
+
+    /// Computes $\cot(\pi x)$, the cotangent of a [`Rational`] measured in half-turns, rounding the
+    /// result to the specified precision and with the specified rounding mode and returning the
+    /// result as a [`Float`]. The [`Rational`] is taken by value. An [`Ordering`] is also returned,
+    /// indicating whether the rounded cotangent is less than, equal to, or greater than the exact
+    /// cotangent.
+    ///
+    /// This is `cot_with_period_rational` with a period of 2: see
+    /// [`Float::cot_with_period_rational_prec_round`] for the error bounds, the special and
+    /// closed-form cases, overflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::cot_pi_rational_prec_round(Rational::from_unsigneds(1u8, 7), 10, Floor);
+    /// assert_eq!(t.to_string(), "2.0742");
+    /// assert_eq!(o, Less);
+    ///
+    /// // a quarter of a half-turn is exactly 1
+    /// let (t, o) = Float::cot_pi_rational_prec_round(Rational::from_unsigneds(1u8, 4), 10, Exact);
+    /// assert_eq!(t.to_string(), "1.0000");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn cot_pi_rational_prec_round(
+        x: Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        Self::cot_with_period_rational_prec_round_ref(&x, 2, prec, rm)
+    }
+
+    /// Computes $\cot(\pi x)$, the cotangent of a [`Rational`] measured in half-turns, rounding the
+    /// result to the specified precision and with the specified rounding mode and returning the
+    /// result as a [`Float`]. The [`Rational`] is taken by reference. An [`Ordering`] is also
+    /// returned, indicating whether the rounded cotangent is less than, equal to, or greater than
+    /// the exact cotangent.
+    ///
+    /// This is `cot_with_period_rational` with a period of 2: see
+    /// [`Float::cot_with_period_rational_prec_round_ref`] for the error bounds, the special and
+    /// closed-form cases, overflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) =
+    ///     Float::cot_pi_rational_prec_round_ref(&Rational::from_unsigneds(1u8, 7), 10, Ceiling);
+    /// assert_eq!(t.to_string(), "2.0781");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn cot_pi_rational_prec_round_ref(
+        x: &Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        Self::cot_with_period_rational_prec_round_ref(x, 2, prec, rm)
+    }
+
+    /// Computes $\cot(\pi x)$, the cotangent of a [`Rational`] measured in half-turns, rounding the
+    /// result to the nearest value of the specified precision and returning the result as a
+    /// [`Float`]. The [`Rational`] is taken by value. An [`Ordering`] is also returned, indicating
+    /// whether the rounded cotangent is less than, equal to, or greater than the exact cotangent.
+    ///
+    /// This is `cot_with_period_rational` with a period of 2: see
+    /// [`Float::cot_with_period_rational_prec`] for the error bounds, the special and closed-form
+    /// cases, overflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::cot_pi_rational_prec(Rational::from_unsigneds(1u8, 7), 53);
+    /// assert_eq!(t.to_string(), "2.0765213965723364");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn cot_pi_rational_prec(x: Rational, prec: u64) -> (Self, Ordering) {
+        Self::cot_with_period_rational_prec_ref(&x, 2, prec)
+    }
+
+    /// Computes $\cot(\pi x)$, the cotangent of a [`Rational`] measured in half-turns, rounding the
+    /// result to the nearest value of the specified precision and returning the result as a
+    /// [`Float`]. The [`Rational`] is taken by reference. An [`Ordering`] is also returned,
+    /// indicating whether the rounded cotangent is less than, equal to, or greater than the exact
+    /// cotangent.
+    ///
+    /// This is `cot_with_period_rational` with a period of 2: see
+    /// [`Float::cot_with_period_rational_prec_ref`] for the error bounds, the special and
+    /// closed-form cases, overflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::cot_pi_rational_prec_ref(&Rational::from_unsigneds(1u8, 7), 53);
+    /// assert_eq!(t.to_string(), "2.0765213965723364");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn cot_pi_rational_prec_ref(x: &Rational, prec: u64) -> (Self, Ordering) {
+        Self::cot_with_period_rational_prec_ref(x, 2, prec)
+    }
 }
 
 impl Cot for Float {
@@ -2820,4 +3380,101 @@ where
         |x, prec| Float::cot_with_period_rational_prec_ref(x, u, prec),
         x,
     )
+}
+
+/// Computes $\cot(\pi x)$, the cotangent of a primitive float measured in half-turns.
+///
+/// This is `primitive_float_cot_with_period` with a period of 2: see
+/// [`primitive_float_cot_with_period`] for the error bound and the special cases, with $u = 2$.
+/// Integers are poles and give exactly $\pm\infty$, with the sign of $x$ at an even integer and the
+/// opposite at an odd one; half-integers give exactly $\pm0.0$; odd multiples of $1/4$ give exactly
+/// $\pm1$; odd multiples of $1/6$ give $\pm\sqrt3$; and multiples of $1/3$ that are not integers
+/// give $\pm\sqrt3/3$.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::NegativeInfinity;
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::cot::primitive_float_cot_pi;
+///
+/// assert!(primitive_float_cot_pi(f32::NAN).is_nan());
+/// // a half-integer is exactly 0
+/// assert_eq!(NiceFloat(primitive_float_cot_pi(0.5f32)), NiceFloat(0.0));
+/// // an integer is a pole
+/// assert_eq!(
+///     NiceFloat(primitive_float_cot_pi(1.0f64)),
+///     NiceFloat(f64::NEGATIVE_INFINITY)
+/// );
+/// // an odd multiple of a quarter is exactly 1
+/// assert_eq!(NiceFloat(primitive_float_cot_pi(0.25f32)), NiceFloat(1.0));
+/// assert_eq!(
+///     NiceFloat(primitive_float_cot_pi(0.1f32)),
+///     NiceFloat(3.0776834)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_cot_pi(0.1f64)),
+///     NiceFloat(3.077683537175253)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_cot_pi<T: PrimitiveFloat>(x: T) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    primitive_float_cot_with_period(x, 2)
+}
+
+/// Computes $\cot(\pi x)$, the cotangent of a [`Rational`] measured in half-turns, returning the
+/// result as a primitive float.
+///
+/// This is `primitive_float_cot_with_period_rational` with a period of 2: see
+/// [`primitive_float_cot_with_period_rational`] for the error bound, the special cases, and the
+/// complexity, with $u = 2$.
+///
+/// # Worst-case complexity
+/// $T(m) = O(m (\log m)^2 \log\log m)$
+///
+/// $M(m) = O(m \log m)$
+///
+/// where $T$ is time, $M$ is additional memory, and $m$ is `x.significant_bits()`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::OneHalf;
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::cot::primitive_float_cot_pi_rational;
+/// use malachite_q::Rational;
+///
+/// // a half of a half-turn is exactly 0
+/// assert_eq!(
+///     NiceFloat(primitive_float_cot_pi_rational::<f64>(&Rational::ONE_HALF)),
+///     NiceFloat(0.0)
+/// );
+/// // a sixth of a half-turn: sqrt(3)
+/// assert_eq!(
+///     NiceFloat(primitive_float_cot_pi_rational::<f64>(
+///         &Rational::from_unsigneds(1u8, 6)
+///     )),
+///     NiceFloat(1.7320508075688772)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_cot_pi_rational::<f64>(
+///         &Rational::from_unsigneds(1u8, 7)
+///     )),
+///     NiceFloat(2.0765213965723364)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_cot_pi_rational<T: PrimitiveFloat>(x: &Rational) -> T
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    primitive_float_cot_with_period_rational(x, 2)
 }

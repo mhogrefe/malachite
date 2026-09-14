@@ -346,6 +346,15 @@ documented by git history.
   underflow; each end is decided from an exact bracket.
   `primitive_float_cot_with_period_rational` gives the correctly rounded `f32` or `f64` cotangent
   of a `Rational` fraction of a turn.
+- `cot_pi_prec_round`, `cot_pi_prec`, `cot_pi_round`, and `cot_pi` (with `_ref` and `_assign`
+  variants), the cotangent of a `Float` measured in half-turns, delegating to `cot_with_period`
+  with a period of 2; MPFR has no `cotpi` to match its `sinpi` and `cospi`. Integers are poles and
+  give $\pm\infty$, with the sign of $x$ at an even integer and the opposite at an odd one;
+  half-integers give $\pm0.0$, odd multiples of $1/4$ give $\pm1$, odd multiples of $1/6$ give
+  $\pm\sqrt3$, and multiples of $1/3$ that are not integers give $\pm\sqrt3/3$.
+  `cot_pi_rational_prec_round` and `cot_pi_rational_prec` (with `_ref` variants) take a `Rational`
+  instead, and `primitive_float_cot_pi` and `primitive_float_cot_pi_rational` give the correctly
+  rounded `f32` or `f64` cotangent.
 - `Csc` and `CscAssign` (new traits in malachite-base) for `Float`, with the usual
   `csc_prec_round`, `csc_prec`, `csc_round`, and `_ref`/`_assign` variants: a port of `mpfr_csc`,
   MPFR's generic reciprocal template with the sine. The cosecant never underflows, since its
