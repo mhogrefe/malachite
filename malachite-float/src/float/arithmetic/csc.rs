@@ -2160,6 +2160,565 @@ impl Float {
     pub fn csc_with_period_rational_prec_ref(x: &Rational, u: u64, prec: u64) -> (Self, Ordering) {
         Self::csc_with_period_rational_prec_round_ref(x, u, prec, Nearest)
     }
+
+    /// Computes $\csc(\pi x)$, the cosecant of a [`Float`] measured in half-turns, rounding the
+    /// result to the specified precision and with the specified rounding mode. The [`Float`] is
+    /// taken by value. An [`Ordering`] is also returned, indicating whether the rounded cosecant is
+    /// less than, equal to, or greater than the exact cosecant. Although `NaN`s are not comparable
+    /// to any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// This is `csc_with_period` with a period of 2: see [`Float::csc_with_period_prec_round`] for
+    /// the error bounds, the special and closed-form cases (integers are poles and give $\pm\infty$
+    /// with the sign of $x$; half-integers give $\pm1$; odd multiples of $1/6$ give $\pm2$; odd
+    /// multiples of $1/4$ give $\pm\sqrt2$; multiples of $1/3$ that are not integers give
+    /// $\pm2\sqrt3/3$; and odd multiples of $1/10$ give $\pm2\varphi$ or $\pm2(\varphi-1)$, where
+    /// $\varphi$ is the golden ratio), overflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::from(0.1f64).csc_pi_prec_round(10, Floor);
+    /// assert_eq!(t.to_string(), "3.2344");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (t, o) = Float::from(0.1f64).csc_pi_prec_round(10, Ceiling);
+    /// assert_eq!(t.to_string(), "3.2383");
+    /// assert_eq!(o, Greater);
+    ///
+    /// // an integer is a pole
+    /// let (t, o) = Float::ONE.csc_pi_prec_round(10, Exact);
+    /// assert_eq!(t.to_string(), "Infinity");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn csc_pi_prec_round(self, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+        self.csc_with_period_prec_round(2, prec, rm)
+    }
+
+    /// Computes $\csc(\pi x)$, the cosecant of a [`Float`] measured in half-turns, rounding the
+    /// result to the specified precision and with the specified rounding mode. The [`Float`] is
+    /// taken by reference. An [`Ordering`] is also returned, indicating whether the rounded
+    /// cosecant is less than, equal to, or greater than the exact cosecant. Although `NaN`s are not
+    /// comparable to any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// This is `csc_with_period` with a period of 2: see [`Float::csc_with_period_prec_round_ref`]
+    /// for the error bounds, the special and closed-form cases (integers are poles and give
+    /// $\pm\infty$ with the sign of $x$; half-integers give $\pm1$; odd multiples of $1/6$ give
+    /// $\pm2$; odd multiples of $1/4$ give $\pm\sqrt2$; multiples of $1/3$ that are not integers
+    /// give $\pm2\sqrt3/3$; and odd multiples of $1/10$ give $\pm2\varphi$ or $\pm2(\varphi-1)$,
+    /// where $\varphi$ is the golden ratio), overflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = (Float::from(0.1f64)).csc_pi_prec_round_ref(10, Floor);
+    /// assert_eq!(t.to_string(), "3.2344");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (t, o) = (Float::from(0.1f64)).csc_pi_prec_round_ref(10, Ceiling);
+    /// assert_eq!(t.to_string(), "3.2383");
+    /// assert_eq!(o, Greater);
+    ///
+    /// // an integer is a pole
+    /// let (t, o) = (&Float::ONE).csc_pi_prec_round_ref(10, Exact);
+    /// assert_eq!(t.to_string(), "Infinity");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn csc_pi_prec_round_ref(&self, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+        self.csc_with_period_prec_round_ref(2, prec, rm)
+    }
+
+    /// Computes $\csc(\pi x)$, the cosecant of a [`Float`] measured in half-turns, rounding the
+    /// result to the nearest value of the specified precision. The [`Float`] is taken by value. An
+    /// [`Ordering`] is also returned, indicating whether the rounded cosecant is less than, equal
+    /// to, or greater than the exact cosecant. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// This is `csc_with_period` with a period of 2: see [`Float::csc_with_period_prec`] for the
+    /// error bounds, the special and closed-form cases (integers are poles and give $\pm\infty$
+    /// with the sign of $x$; half-integers give $\pm1$; odd multiples of $1/6$ give $\pm2$; odd
+    /// multiples of $1/4$ give $\pm\sqrt2$; multiples of $1/3$ that are not integers give
+    /// $\pm2\sqrt3/3$; and odd multiples of $1/10$ give $\pm2\varphi$ or $\pm2(\varphi-1)$, where
+    /// $\varphi$ is the golden ratio), overflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::from(0.1f64).csc_pi_prec(10);
+    /// assert_eq!(t.to_string(), "3.2344");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (t, o) = Float::from(0.1f64).csc_pi_prec(53);
+    /// assert_eq!(t.to_string(), "3.2360679774997894");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn csc_pi_prec(self, prec: u64) -> (Self, Ordering) {
+        self.csc_with_period_prec(2, prec)
+    }
+
+    /// Computes $\csc(\pi x)$, the cosecant of a [`Float`] measured in half-turns, rounding the
+    /// result to the nearest value of the specified precision. The [`Float`] is taken by reference.
+    /// An [`Ordering`] is also returned, indicating whether the rounded cosecant is less than,
+    /// equal to, or greater than the exact cosecant. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// This is `csc_with_period` with a period of 2: see [`Float::csc_with_period_prec_ref`] for
+    /// the error bounds, the special and closed-form cases (integers are poles and give $\pm\infty$
+    /// with the sign of $x$; half-integers give $\pm1$; odd multiples of $1/6$ give $\pm2$; odd
+    /// multiples of $1/4$ give $\pm\sqrt2$; multiples of $1/3$ that are not integers give
+    /// $\pm2\sqrt3/3$; and odd multiples of $1/10$ give $\pm2\varphi$ or $\pm2(\varphi-1)$, where
+    /// $\varphi$ is the golden ratio), overflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = (Float::from(0.1f64)).csc_pi_prec_ref(10);
+    /// assert_eq!(t.to_string(), "3.2344");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (t, o) = (Float::from(0.1f64)).csc_pi_prec_ref(53);
+    /// assert_eq!(t.to_string(), "3.2360679774997894");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn csc_pi_prec_ref(&self, prec: u64) -> (Self, Ordering) {
+        self.csc_with_period_prec_ref(2, prec)
+    }
+
+    /// Computes $\csc(\pi x)$, the cosecant of a [`Float`] measured in half-turns, rounding the
+    /// result with the specified rounding mode. The precision of the output is the precision of the
+    /// input. The [`Float`] is taken by value. An [`Ordering`] is also returned, indicating whether
+    /// the rounded cosecant is less than, equal to, or greater than the exact cosecant. Although
+    /// `NaN`s are not comparable to any [`Float`], whenever this function returns a `NaN` it also
+    /// returns `Equal`.
+    ///
+    /// This is `csc_with_period` with a period of 2: see [`Float::csc_with_period_round`] for the
+    /// error bounds, the special and closed-form cases (integers are poles and give $\pm\infty$
+    /// with the sign of $x$; half-integers give $\pm1$; odd multiples of $1/6$ give $\pm2$; odd
+    /// multiples of $1/4$ give $\pm\sqrt2$; multiples of $1/3$ that are not integers give
+    /// $\pm2\sqrt3/3$; and odd multiples of $1/10$ give $\pm2\varphi$ or $\pm2(\varphi-1)$, where
+    /// $\varphi$ is the golden ratio), overflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the input
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::from(0.1f64).csc_pi_round(Floor);
+    /// assert_eq!(t.to_string(), "3.2360679774997889");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (t, o) = Float::from(0.1f64).csc_pi_round(Nearest);
+    /// assert_eq!(t.to_string(), "3.2360679774997898");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn csc_pi_round(self, rm: RoundingMode) -> (Self, Ordering) {
+        self.csc_with_period_round(2, rm)
+    }
+
+    /// Computes $\csc(\pi x)$, the cosecant of a [`Float`] measured in half-turns, rounding the
+    /// result with the specified rounding mode. The precision of the output is the precision of the
+    /// input. The [`Float`] is taken by reference. An [`Ordering`] is also returned, indicating
+    /// whether the rounded cosecant is less than, equal to, or greater than the exact cosecant.
+    /// Although `NaN`s are not comparable to any [`Float`], whenever this function returns a `NaN`
+    /// it also returns `Equal`.
+    ///
+    /// This is `csc_with_period` with a period of 2: see [`Float::csc_with_period_round_ref`] for
+    /// the error bounds, the special and closed-form cases (integers are poles and give $\pm\infty$
+    /// with the sign of $x$; half-integers give $\pm1$; odd multiples of $1/6$ give $\pm2$; odd
+    /// multiples of $1/4$ give $\pm\sqrt2$; multiples of $1/3$ that are not integers give
+    /// $\pm2\sqrt3/3$; and odd multiples of $1/10$ give $\pm2\varphi$ or $\pm2(\varphi-1)$, where
+    /// $\varphi$ is the golden ratio), overflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the input
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = (Float::from(0.1f64)).csc_pi_round_ref(Floor);
+    /// assert_eq!(t.to_string(), "3.2360679774997889");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (t, o) = (Float::from(0.1f64)).csc_pi_round_ref(Nearest);
+    /// assert_eq!(t.to_string(), "3.2360679774997898");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn csc_pi_round_ref(&self, rm: RoundingMode) -> (Self, Ordering) {
+        self.csc_with_period_round_ref(2, rm)
+    }
+
+    /// Computes $\csc(\pi x)$, the cosecant of a [`Float`] measured in half-turns, rounding the
+    /// result to the precision of the input and to the nearest [`Float`]. The [`Float`] is taken by
+    /// value.
+    ///
+    /// If the cosecant is equidistant from two [`Float`]s with the precision of the input, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// This is `csc_with_period` with a period of 2: see [`Float::csc_with_period`] for the error
+    /// bounds, the special and closed-form cases (integers are poles and give $\pm\infty$ with the
+    /// sign of $x$; half-integers give $\pm1$; odd multiples of $1/6$ give $\pm2$; odd multiples of
+    /// $1/4$ give $\pm\sqrt2$; multiples of $1/3$ that are not integers give $\pm2\sqrt3/3$; and
+    /// odd multiples of $1/10$ give $\pm2\varphi$ or $\pm2(\varphi-1)$, where $\varphi$ is the
+    /// golden ratio), overflow, and the complexity, with $u = 2$.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::csc_pi_round`] instead. If you want to specify an output precision, consider using
+    /// [`Float::csc_pi_prec`]. If you want both of these things, consider using
+    /// [`Float::csc_pi_prec_round`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// let t = Float::from(0.1f64).csc_pi();
+    /// assert_eq!(t.to_string(), "3.2360679774997898");
+    ///
+    /// // a half-integer is exactly 1
+    /// assert_eq!(Float::from(0.5f64).csc_pi().to_string(), "1.0");
+    /// ```
+    #[inline]
+    pub fn csc_pi(self) -> Self {
+        let prec = self.significant_bits();
+        self.csc_pi_prec(prec).0
+    }
+
+    /// Computes $\csc(\pi x)$, the cosecant of a [`Float`] measured in half-turns, rounding the
+    /// result to the precision of the input and to the nearest [`Float`]. The [`Float`] is taken by
+    /// reference.
+    ///
+    /// If the cosecant is equidistant from two [`Float`]s with the precision of the input, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// This is `csc_with_period` with a period of 2: see [`Float::csc_with_period`] for the error
+    /// bounds, the special and closed-form cases (integers are poles and give $\pm\infty$ with the
+    /// sign of $x$; half-integers give $\pm1$; odd multiples of $1/6$ give $\pm2$; odd multiples of
+    /// $1/4$ give $\pm\sqrt2$; multiples of $1/3$ that are not integers give $\pm2\sqrt3/3$; and
+    /// odd multiples of $1/10$ give $\pm2\varphi$ or $\pm2(\varphi-1)$, where $\varphi$ is the
+    /// golden ratio), overflow, and the complexity, with $u = 2$.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::csc_pi_round_ref`] instead. If you want to specify an output precision, consider
+    /// using [`Float::csc_pi_prec_ref`]. If you want both of these things, consider using
+    /// [`Float::csc_pi_prec_round_ref`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// let t = (&Float::from(0.1f64)).csc_pi_ref();
+    /// assert_eq!(t.to_string(), "3.2360679774997898");
+    /// ```
+    #[inline]
+    pub fn csc_pi_ref(&self) -> Self {
+        self.csc_pi_prec_ref(self.significant_bits()).0
+    }
+
+    /// Computes $\csc(\pi x)$, the cosecant of a [`Float`] measured in half-turns, rounding the
+    /// result to the specified precision and with the specified rounding mode. The [`Float`] is
+    /// replaced by the result, and an [`Ordering`] is returned, indicating whether the rounded
+    /// cosecant is less than, equal to, or greater than the exact cosecant. Although `NaN`s are not
+    /// comparable to any [`Float`], whenever this function sets a `NaN` it also returns `Equal`.
+    ///
+    /// This is `csc_with_period` with a period of 2: see
+    /// [`Float::csc_with_period_prec_round_assign`] for the error bounds, the special and
+    /// closed-form cases (integers are poles and give $\pm\infty$ with the sign of $x$;
+    /// half-integers give $\pm1$; odd multiples of $1/6$ give $\pm2$; odd multiples of $1/4$ give
+    /// $\pm\sqrt2$; multiples of $1/3$ that are not integers give $\pm2\sqrt3/3$; and odd multiples
+    /// of $1/10$ give $\pm2\varphi$ or $\pm2(\varphi-1)$, where $\varphi$ is the golden ratio),
+    /// overflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from(0.1f64);
+    /// assert_eq!(x.csc_pi_prec_round_assign(10, Floor), Less);
+    /// assert_eq!(x.to_string(), "3.2344");
+    ///
+    /// let mut x = Float::from(0.1f64);
+    /// assert_eq!(x.csc_pi_prec_round_assign(10, Ceiling), Greater);
+    /// assert_eq!(x.to_string(), "3.2383");
+    /// ```
+    #[inline]
+    pub fn csc_pi_prec_round_assign(&mut self, prec: u64, rm: RoundingMode) -> Ordering {
+        self.csc_with_period_prec_round_assign(2, prec, rm)
+    }
+
+    /// Computes $\csc(\pi x)$, the cosecant of a [`Float`] measured in half-turns, rounding the
+    /// result to the nearest value of the specified precision. The [`Float`] is replaced by the
+    /// result, and an [`Ordering`] is returned, indicating whether the rounded cosecant is less
+    /// than, equal to, or greater than the exact cosecant. Although `NaN`s are not comparable to
+    /// any [`Float`], whenever this function sets a `NaN` it also returns `Equal`.
+    ///
+    /// This is `csc_with_period` with a period of 2: see [`Float::csc_with_period_prec_assign`] for
+    /// the error bounds, the special and closed-form cases (integers are poles and give $\pm\infty$
+    /// with the sign of $x$; half-integers give $\pm1$; odd multiples of $1/6$ give $\pm2$; odd
+    /// multiples of $1/4$ give $\pm\sqrt2$; multiples of $1/3$ that are not integers give
+    /// $\pm2\sqrt3/3$; and odd multiples of $1/10$ give $\pm2\varphi$ or $\pm2(\varphi-1)$, where
+    /// $\varphi$ is the golden ratio), overflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from(0.1f64);
+    /// assert_eq!(x.csc_pi_prec_assign(10), Less);
+    /// assert_eq!(x.to_string(), "3.2344");
+    /// ```
+    #[inline]
+    pub fn csc_pi_prec_assign(&mut self, prec: u64) -> Ordering {
+        self.csc_with_period_prec_assign(2, prec)
+    }
+
+    /// Computes $\csc(\pi x)$, the cosecant of a [`Float`] measured in half-turns, rounding the
+    /// result with the specified rounding mode. The precision of the output is the precision of the
+    /// input. The [`Float`] is replaced by the result, and an [`Ordering`] is returned, indicating
+    /// whether the rounded cosecant is less than, equal to, or greater than the exact cosecant.
+    /// Although `NaN`s are not comparable to any [`Float`], whenever this function sets a `NaN` it
+    /// also returns `Equal`.
+    ///
+    /// This is `csc_with_period` with a period of 2: see [`Float::csc_with_period_round_assign`]
+    /// for the error bounds, the special and closed-form cases (integers are poles and give
+    /// $\pm\infty$ with the sign of $x$; half-integers give $\pm1$; odd multiples of $1/6$ give
+    /// $\pm2$; odd multiples of $1/4$ give $\pm\sqrt2$; multiples of $1/3$ that are not integers
+    /// give $\pm2\sqrt3/3$; and odd multiples of $1/10$ give $\pm2\varphi$ or $\pm2(\varphi-1)$,
+    /// where $\varphi$ is the golden ratio), overflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the input
+    /// precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from(0.1f64);
+    /// assert_eq!(x.csc_pi_round_assign(Floor), Less);
+    /// assert_eq!(x.to_string(), "3.2360679774997889");
+    /// ```
+    #[inline]
+    pub fn csc_pi_round_assign(&mut self, rm: RoundingMode) -> Ordering {
+        self.csc_with_period_round_assign(2, rm)
+    }
+
+    /// Computes $\csc(\pi x)$, the cosecant of a [`Float`] measured in half-turns, rounding the
+    /// result to the precision of the input and to the nearest [`Float`]. The [`Float`] is replaced
+    /// by the result.
+    ///
+    /// If the cosecant is equidistant from two [`Float`]s with the precision of the input, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// This is `csc_with_period` with a period of 2: see [`Float::csc_with_period`] for the error
+    /// bounds, the special and closed-form cases (integers are poles and give $\pm\infty$ with the
+    /// sign of $x$; half-integers give $\pm1$; odd multiples of $1/6$ give $\pm2$; odd multiples of
+    /// $1/4$ give $\pm\sqrt2$; multiples of $1/3$ that are not integers give $\pm2\sqrt3/3$; and
+    /// odd multiples of $1/10$ give $\pm2\varphi$ or $\pm2(\varphi-1)$, where $\varphi$ is the
+    /// golden ratio), overflow, and the complexity, with $u = 2$.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::csc_pi_round_assign`] instead. If you want to specify an output precision, consider
+    /// using [`Float::csc_pi_prec_assign`]. If you want both of these things, consider using
+    /// [`Float::csc_pi_prec_round_assign`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// let mut x = Float::from(0.1f64);
+    /// x.csc_pi_assign();
+    /// assert_eq!(x.to_string(), "3.2360679774997898");
+    /// ```
+    #[inline]
+    pub fn csc_pi_assign(&mut self) {
+        let prec = self.significant_bits();
+        self.csc_pi_prec_assign(prec);
+    }
+
+    /// Computes $\csc(\pi x)$, the cosecant of a [`Rational`] measured in half-turns, rounding the
+    /// result to the specified precision and with the specified rounding mode and returning the
+    /// result as a [`Float`]. The [`Rational`] is taken by value. An [`Ordering`] is also returned,
+    /// indicating whether the rounded cosecant is less than, equal to, or greater than the exact
+    /// cosecant.
+    ///
+    /// This is `csc_with_period_rational` with a period of 2: see
+    /// [`Float::csc_with_period_rational_prec_round`] for the error bounds, the special and
+    /// closed-form cases, overflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::csc_pi_rational_prec_round(Rational::from_unsigneds(1u8, 7), 10, Floor);
+    /// assert_eq!(t.to_string(), "2.3047");
+    /// assert_eq!(o, Less);
+    ///
+    /// // a sixth of a half-turn is exactly 2
+    /// let (t, o) = Float::csc_pi_rational_prec_round(Rational::from_unsigneds(1u8, 6), 10, Exact);
+    /// assert_eq!(t.to_string(), "2.0000");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn csc_pi_rational_prec_round(
+        x: Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        Self::csc_with_period_rational_prec_round_ref(&x, 2, prec, rm)
+    }
+
+    /// Computes $\csc(\pi x)$, the cosecant of a [`Rational`] measured in half-turns, rounding the
+    /// result to the specified precision and with the specified rounding mode and returning the
+    /// result as a [`Float`]. The [`Rational`] is taken by reference. An [`Ordering`] is also
+    /// returned, indicating whether the rounded cosecant is less than, equal to, or greater than
+    /// the exact cosecant.
+    ///
+    /// This is `csc_with_period_rational` with a period of 2: see
+    /// [`Float::csc_with_period_rational_prec_round_ref`] for the error bounds, the special and
+    /// closed-form cases, overflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) =
+    ///     Float::csc_pi_rational_prec_round_ref(&Rational::from_unsigneds(1u8, 7), 10, Ceiling);
+    /// assert_eq!(t.to_string(), "2.3086");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn csc_pi_rational_prec_round_ref(
+        x: &Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        Self::csc_with_period_rational_prec_round_ref(x, 2, prec, rm)
+    }
+
+    /// Computes $\csc(\pi x)$, the cosecant of a [`Rational`] measured in half-turns, rounding the
+    /// result to the nearest value of the specified precision and returning the result as a
+    /// [`Float`]. The [`Rational`] is taken by value. An [`Ordering`] is also returned, indicating
+    /// whether the rounded cosecant is less than, equal to, or greater than the exact cosecant.
+    ///
+    /// This is `csc_with_period_rational` with a period of 2: see
+    /// [`Float::csc_with_period_rational_prec`] for the error bounds, the special and closed-form
+    /// cases, overflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::csc_pi_rational_prec(Rational::from_unsigneds(1u8, 7), 53);
+    /// assert_eq!(t.to_string(), "2.3047648709624866");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn csc_pi_rational_prec(x: Rational, prec: u64) -> (Self, Ordering) {
+        Self::csc_with_period_rational_prec_ref(&x, 2, prec)
+    }
+
+    /// Computes $\csc(\pi x)$, the cosecant of a [`Rational`] measured in half-turns, rounding the
+    /// result to the nearest value of the specified precision and returning the result as a
+    /// [`Float`]. The [`Rational`] is taken by reference. An [`Ordering`] is also returned,
+    /// indicating whether the rounded cosecant is less than, equal to, or greater than the exact
+    /// cosecant.
+    ///
+    /// This is `csc_with_period_rational` with a period of 2: see
+    /// [`Float::csc_with_period_rational_prec_ref`] for the error bounds, the special and
+    /// closed-form cases, overflow, and the complexity, with $u = 2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::csc_pi_rational_prec_ref(&Rational::from_unsigneds(1u8, 7), 53);
+    /// assert_eq!(t.to_string(), "2.3047648709624866");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn csc_pi_rational_prec_ref(x: &Rational, prec: u64) -> (Self, Ordering) {
+        Self::csc_with_period_rational_prec_ref(x, 2, prec)
+    }
 }
 
 impl Csc for Float {
@@ -2683,4 +3242,102 @@ where
         |x, prec| Float::csc_with_period_rational_prec_ref(x, u, prec),
         x,
     )
+}
+
+/// Computes $\csc(\pi x)$, the cosecant of a primitive float measured in half-turns.
+///
+/// This is `primitive_float_csc_with_period` with a period of 2: see
+/// [`primitive_float_csc_with_period`] for the error bound and the special cases, with $u = 2$.
+/// Integers are poles and give exactly $\pm\infty$ with the sign of $x$; half-integers give exactly
+/// $\pm1$; odd multiples of $1/6$ give exactly $\pm2$; odd multiples of $1/4$ give $\pm\sqrt2$; and
+/// multiples of $1/3$ that are not integers give $\pm2\sqrt3/3$.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::csc::primitive_float_csc_pi;
+///
+/// assert!(primitive_float_csc_pi(f32::NAN).is_nan());
+/// // a half-integer is exactly 1
+/// assert_eq!(NiceFloat(primitive_float_csc_pi(0.5f32)), NiceFloat(1.0));
+/// // an integer is a pole
+/// assert_eq!(
+///     NiceFloat(primitive_float_csc_pi(1.0f64)),
+///     NiceFloat(f64::INFINITY)
+/// );
+/// // an odd multiple of a quarter: sqrt(2)
+/// assert_eq!(
+///     NiceFloat(primitive_float_csc_pi(0.25f32)),
+///     NiceFloat(core::f32::consts::SQRT_2)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_csc_pi(0.1f32)),
+///     NiceFloat(3.236068)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_csc_pi(0.1f64)),
+///     NiceFloat(3.2360679774997894)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_csc_pi<T: PrimitiveFloat>(x: T) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    primitive_float_csc_with_period(x, 2)
+}
+
+/// Computes $\csc(\pi x)$, the cosecant of a [`Rational`] measured in half-turns, returning the
+/// result as a primitive float.
+///
+/// This is `primitive_float_csc_with_period_rational` with a period of 2: see
+/// [`primitive_float_csc_with_period_rational`] for the error bound, the special cases, and the
+/// complexity, with $u = 2$.
+///
+/// # Worst-case complexity
+/// $T(m) = O(m (\log m)^2 \log\log m)$
+///
+/// $M(m) = O(m \log m)$
+///
+/// where $T$ is time, $M$ is additional memory, and $m$ is `x.significant_bits()`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::OneHalf;
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::csc::primitive_float_csc_pi_rational;
+/// use malachite_q::Rational;
+///
+/// // a half of a half-turn is exactly 1
+/// assert_eq!(
+///     NiceFloat(primitive_float_csc_pi_rational::<f64>(&Rational::ONE_HALF)),
+///     NiceFloat(1.0)
+/// );
+/// // a sixth of a half-turn is exactly 2
+/// assert_eq!(
+///     NiceFloat(primitive_float_csc_pi_rational::<f64>(
+///         &Rational::from_unsigneds(1u8, 6)
+///     )),
+///     NiceFloat(2.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_csc_pi_rational::<f64>(
+///         &Rational::from_unsigneds(1u8, 7)
+///     )),
+///     NiceFloat(2.3047648709624866)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_csc_pi_rational<T: PrimitiveFloat>(x: &Rational) -> T
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    primitive_float_csc_with_period_rational(x, 2)
 }

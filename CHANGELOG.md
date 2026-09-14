@@ -345,6 +345,14 @@ documented by git history.
   multiple of a half turn, that the sine falls below the `Float` exponent range; the bracket reads
   that as the overflow it is. `primitive_float_csc_with_period_rational` gives the correctly
   rounded `f32` or `f64` cosecant of a `Rational` fraction of a turn.
+- `csc_pi_prec_round`, `csc_pi_prec`, `csc_pi_round`, and `csc_pi` (with `_ref` and `_assign`
+  variants), the cosecant of a `Float` measured in half-turns, delegating to `csc_with_period` with
+  a period of 2; MPFR has no `cscpi` to match its `sinpi` and `cospi`. Integers are poles and give
+  $\pm\infty$ with the sign of $x$, half-integers give $\pm1$, odd multiples of $1/6$ give
+  $\pm2$, odd multiples of $1/4$ give $\pm\sqrt2$, and multiples of $1/3$ that are not integers
+  give $\pm2\sqrt3/3$. `csc_pi_rational_prec_round` and `csc_pi_rational_prec` (with `_ref`
+  variants) take a `Rational` instead, and `primitive_float_csc_pi` and
+  `primitive_float_csc_pi_rational` give the correctly rounded `f32` or `f64` cosecant.
 - `Sec` and `SecAssign` (new traits in malachite-base) for `Float`, with the usual
   `sec_prec_round`, `sec_prec`, `sec_round`, and `_ref`/`_assign` variants: a port of `mpfr_sec`,
   which instantiates MPFR's generic reciprocal template with the cosine. The secant never
