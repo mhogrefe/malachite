@@ -319,6 +319,15 @@ documented by git history.
   `Float` rounded toward zero, a case MPFR's small-input shortcut declines and a series bracket
   decides. `atan(\pm0.0)` is $\pm0.0$, `atan(\pm\infty)` is $\pm\pi/2$ rounded, and the
   function is odd. `primitive_float_atan` gives the correctly rounded `f32` or `f64` arctangent.
+  `atan_rational_prec_round` and `atan_rational_prec` (with `_ref` variants) take a `Rational`
+  instead. The general case rounds the input once and takes its `Float` arctangent, which is sound
+  because the arctangent is 1-Lipschitz, so the input's half-ulp carries to the result unmagnified,
+  and because the result is never much smaller than the input. The two ends of the exponent range,
+  where the input itself is not a `Float`, are bracketed instead: below it the result is smaller
+  than the input and so underflows, decided by the rounding mode alone; above it neither the input
+  nor its reciprocal is a `Float`, and $\arctan x = \pi/2 - \arctan(1/x)$ is settled from a
+  bracket on $\pi/2$. `primitive_float_atan_rational` gives the correctly rounded `f32` or `f64`
+  arctangent of a `Rational`.
 - `Cot` and `CotAssign` (new traits in malachite-base) for `Float`, with the usual
   `cot_prec_round`, `cot_prec`, `cot_round`, and `_ref`/`_assign` variants: a port of `mpfr_cot`,
   MPFR's generic reciprocal template with the tangent. MPFR's tangent is itself a quotient of a

@@ -184,7 +184,7 @@ pub(crate) fn sin_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> 
     // With |x| < 2^exp_x, the kth term of the series is below |x| 2^(2k exp_x), so when -exp_x is
     // at least a sixteenth of the working precision, about 8 terms suffice, which is cheaper than a
     // `Float` sine at that precision. This also covers every x too small to be a `Float`.
-    if exp_x < const { Float::MIN_EXPONENT_I64 - 1 } {
+    if exp_x < UNDERFLOW_EXPONENT {
         // |sin(x)| < |x| < 2^(MIN_EXPONENT - 2), a quarter of the smallest positive Float, so the
         // result is zero or that Float, by the rounding mode alone, and no 2^30-bit arithmetic is
         // needed.
@@ -248,7 +248,11 @@ pub(crate) fn sin_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> 
 
 // The result of a function whose exact value is nonzero, has the given sign, and is below a quarter
 // of the smallest positive `Float` in magnitude: zero or that `Float`, by the rounding mode alone.
-fn underflowed(positive: bool, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+// An input at or below this exponent has |sin x| and |atan x| below 2^(MIN_EXPONENT - 2), half the
+// smallest positive `Float`, so the rounding mode alone decides the result.
+pub(crate) const UNDERFLOW_EXPONENT: i64 = Float::MIN_EXPONENT_I64 - 1;
+
+pub(crate) fn underflowed(positive: bool, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
     let away = match rm {
         Ceiling => positive,
         Floor => !positive,

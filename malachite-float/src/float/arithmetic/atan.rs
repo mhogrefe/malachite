@@ -23,14 +23,15 @@
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::float::arithmetic::round_near_x::float_round_near_x;
+use crate::float::arithmetic::sin::{UNDERFLOW_EXPONENT, underflowed};
 use crate::float::arithmetic::tan::round_bracket_signed_by;
-use crate::{Float, emulate_float_to_float_fn};
+use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn};
 use alloc::vec;
 use core::cmp::Ordering::{self, Equal, Greater};
 use core::cmp::min;
 use core::mem::take;
 use malachite_base::num::arithmetic::traits::{
-    Abs, Atan, AtanAssign, CeilingLogBase2, Parity, PowerOf2, Square, SquareAssign,
+    Abs, Atan, AtanAssign, CeilingLogBase2, Parity, PowerOf2, Reciprocal, Square, SquareAssign,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -261,15 +262,15 @@ fn atan_aux(mut p: Integer, mut r: u64, m: usize, precy: u64) -> Float {
     .0
 }
 
-// atan x for a tiny nonzero x, bracketed by consecutive partial sums of its alternating series: x -
-// x^3/3 < atan x < x - x^3/3 + x^5/5 < x, and so on, a bracket that narrows without bound; the
-// arctangent is transcendental, so it eventually rounds unambiguously. This is the fallback for the
-// tiny inputs that MPFR's small-input shortcut declines, which are those at the very bottom of the
-// exponent range whose result underflows; the general algorithm would otherwise work at a precision
-// of about 2^30 bits for them.
-fn atan_tiny(x: &Float, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+// atan x for a tiny nonzero `Rational` x, bracketed by consecutive partial sums of its alternating
+// series: x - x^3/3 < atan x < x - x^3/3 + x^5/5 < x, and so on, a bracket that narrows without
+// bound; the arctangent is transcendental, so it eventually rounds unambiguously. This is the
+// fallback for the tiny inputs that MPFR's small-input shortcut declines, which are those at the
+// very bottom of the exponent range whose result underflows; the general algorithm would otherwise
+// work at a precision of about 2^30 bits for them.
+fn atan_series(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
     let negative = *x < 0u32;
-    let ax = Rational::exact_from(x).abs();
+    let ax = x.abs();
     let x2 = (&ax).square();
     // hi and lo are the partial sums with an odd and an even number of terms
     let mut term = ax.clone();
@@ -291,6 +292,107 @@ fn atan_tiny(x: &Float, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
     }
 }
 
+// One step of `atan_rational_huge`: pi to w bits gives pi/2 to within 2^(1 - w), and [lo, hi]
+// brackets atan(1/|x|), so pi/2 - atan(1/|x|) lies between the two ends below.
+fn atan_huge_step(
+    negative: bool,
+    lo: &Rational,
+    hi: &Rational,
+    w: u64,
+    prec: u64,
+    rm: RoundingMode,
+) -> Option<(Float, Ordering)> {
+    // pi_lo <= pi <= pi_lo + 2^(2 - w)
+    let pi_lo = Rational::exact_from(&Float::pi_prec_round(w, Floor).0);
+    let pi_hi = &pi_lo + Rational::power_of_2(2 - i64::exact_from(w));
+    round_bracket_signed_by(
+        negative,
+        (pi_lo >> 1u32) - hi,
+        (pi_hi >> 1u32) - lo,
+        prec,
+        rm,
+    )
+}
+
+// atan x for a `Rational` x beyond the top of the exponent range, where neither x nor 1/x is a
+// `Float`: atan x = pi/2 - atan(1/x), and atan(1/x) is bracketed by the partial sums of its
+// alternating series, so pi/2 minus that bracket settles the result.
+fn atan_rational_huge(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    let negative = *x < 0u32;
+    // 0 < t < 2^(-2^30)
+    let t = x.abs().reciprocal();
+    let mut lo = Rational::ZERO;
+    let mut hi = t.clone();
+    let mut w = prec + 64;
+    // The first bracket, atan(t) in (0, t), is already far narrower than an ulp of pi/2 for a t
+    // this small, and needs none of the powers of t, each of which is as long as the input itself.
+    if let Some(result) = atan_huge_step(negative, &lo, &hi, w, prec, rm) {
+        return result;
+    }
+    let t2 = (&t).square();
+    let mut term = t;
+    let mut k = 1u64;
+    loop {
+        w <<= 1;
+        term *= &t2;
+        let d = &term / Rational::from((k << 1) + 1);
+        if k.odd() {
+            lo = &hi - d;
+        } else {
+            hi = &lo + d;
+        }
+        if let Some(result) = atan_huge_step(negative, &lo, &hi, w, prec, rm) {
+            return result;
+        }
+        k += 1;
+    }
+}
+
+// Computes atan(x) for a nonzero `Rational` x, rounded to precision `prec` with rounding mode `rm`.
+// (x = 0 is handled by the caller.) The result is never exactly representable, so `rm` must not be
+// `Exact`.
+//
+// The general case rounds the input once and takes its `Float` arctangent at a working precision.
+// That is sound because the arctangent is 1-Lipschitz, so the half-ulp of the input carries to the
+// result unmagnified, and because the result is never much smaller than the input: |atan t| > |t|/2
+// for |t| <= 1, while for |t| > 1 the result lies in (pi/4, pi/2) and the input error is damped by
+// 1/(1 + t^2). Both errors together stay below 2^(EXP(a) - m + 1). The two ends of the exponent
+// range, where the input itself is not a `Float`, are bracketed instead.
+pub(crate) fn atan_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    assert_ne!(rm, Exact, "Inexact atan");
+    let exp_x = x.floor_log_base_2_abs() + 1; // the MPFR-style exponent of x
+    if exp_x < UNDERFLOW_EXPONENT {
+        // |atan x| < |x| < 2^(MIN_EXPONENT - 2), below half the smallest positive `Float`, so the
+        // result is zero or that `Float` by the rounding mode alone, and no 2^30-bit arithmetic is
+        // needed
+        return underflowed(*x > 0u32, prec, rm);
+    }
+    // For |x| <= 1/2, |x| - |x|^3/3 <= |atan x| <= |x| - |x|^3/3 + |x|^5/5, a bracket of relative
+    // width below x^4, which decides the rounding once x^4 is below 2^-(prec + 3); a handful of
+    // terms is cheaper than a `Float` arctangent at the working precision.
+    if exp_x < 0 && -(exp_x << 2) > i64::exact_from(prec) + 3 {
+        return atan_series(x, prec, rm);
+    }
+    if exp_x > Float::MAX_EXPONENT_I64 {
+        return atan_rational_huge(x, prec, rm);
+    }
+    let mut m = prec + prec.ceiling_log_base_2() + 8;
+    let mut increment = Limb::WIDTH;
+    loop {
+        let (f, o_f) = Float::from_rational_prec_ref(x, m);
+        if o_f == Equal {
+            // x is exactly representable at m bits, so its arctangent is simply the `Float` one
+            return atan_prec_round_normal_ref(&f, prec, rm);
+        }
+        let a = (&f).atan();
+        if float_can_round(a.significand_ref().unwrap(), m - 2, prec, rm) {
+            return Float::from_float_prec_round(a, prec, rm);
+        }
+        m += increment;
+        increment = m >> 1;
+    }
+}
+
 // This is mpfr_atan from atan.c, MPFR 4.2.2, for a finite nonzero input, with a series bracket for
 // the tiny inputs whose result underflows.
 fn atan_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
@@ -309,7 +411,7 @@ fn atan_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float,
             if let Some(result) = float_round_near_x(x, min(err, prec + 2), false, prec, rm) {
                 return result;
             }
-            return atan_tiny(x, prec, rm);
+            return atan_series(&Rational::exact_from(x), prec, rm);
         }
     }
     let negative = *x < 0u32;
@@ -1173,6 +1275,295 @@ impl Float {
     }
 }
 
+impl Float {
+    /// Computes $\arctan x$, the arctangent of a [`Rational`], rounding the result to the specified
+    /// precision and with the specified rounding mode and returning the result as a [`Float`]. The
+    /// [`Rational`] is taken by value. An [`Ordering`] is also returned, indicating whether the
+    /// rounded arctangent is less than, equal to, or greater than the exact arctangent.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,p,m) = \arctan x+\varepsilon.
+    /// $$
+    /// - If $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |\arctan x|\rfloor-p+1}$.
+    /// - If $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |\arctan x|\rfloor-p}$.
+    ///
+    /// These bounds do not apply when the result underflows; see below.
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p,m)=0$.
+    ///
+    /// Overflow and underflow:
+    /// - Since $|\arctan x| < \pi/2$, the result never overflows.
+    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,p,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
+    ///   returned instead.
+    ///
+    /// Underflow requires an input of magnitude about $2^{-2^{30}}$ or less: since $|\arctan x| <
+    /// |x|$ for nonzero $x$, no other input can reach it.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::atan_rational_prec`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n (\log n)^3 \log\log n + (n+m) (\log (n+m))^2 \log\log (n+m))$
+    ///
+    /// $M(n, m) = O((n+m) \log (n+m))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`: the input is rounded once to a working precision of about $n$ bits
+    /// and its [`Float`] arctangent taken there, which costs the first term; the rounding of the
+    /// $m$-bit input is the second. The magnitude of the input does not drive the cost.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision (which is the case for every nonzero input).
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::atan_rational_prec_round(Rational::from_unsigneds(3u8, 5), 5, Floor);
+    /// assert_eq!(c.to_string(), "0.531");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::atan_rational_prec_round(Rational::from_unsigneds(3u8, 5), 5, Ceiling);
+    /// assert_eq!(c.to_string(), "0.562");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) = Float::atan_rational_prec_round(Rational::from_unsigneds(3u8, 5), 20, Floor);
+    /// assert_eq!(c.to_string(), "0.54041862");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::atan_rational_prec_round(Rational::from_unsigneds(3u8, 5), 20, Ceiling);
+    /// assert_eq!(c.to_string(), "0.54041958");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn atan_rational_prec_round(x: Rational, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+        Self::atan_rational_prec_round_ref(&x, prec, rm)
+    }
+
+    /// Computes $\arctan x$, the arctangent of a [`Rational`], rounding the result to the specified
+    /// precision and with the specified rounding mode and returning the result as a [`Float`]. The
+    /// [`Rational`] is taken by reference. An [`Ordering`] is also returned, indicating whether the
+    /// rounded arctangent is less than, equal to, or greater than the exact arctangent.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,p,m) = \arctan x+\varepsilon.
+    /// $$
+    /// - If $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |\arctan x|\rfloor-p+1}$.
+    /// - If $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |\arctan x|\rfloor-p}$.
+    ///
+    /// These bounds do not apply when the result underflows.
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p,m)=0$.
+    ///
+    /// See the [`Float::atan_rational_prec_round`] documentation for information on overflow and
+    /// underflow.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::atan_rational_prec_ref`]
+    /// instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n (\log n)^3 \log\log n + (n+m) (\log (n+m))^2 \log\log (n+m))$
+    ///
+    /// $M(n, m) = O((n+m) \log (n+m))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`: the input is rounded once to a working precision of about $n$ bits
+    /// and its [`Float`] arctangent taken there, which costs the first term; the rounding of the
+    /// $m$-bit input is the second. The magnitude of the input does not drive the cost.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision (which is the case for every nonzero input).
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) =
+    ///     Float::atan_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 5, Floor);
+    /// assert_eq!(c.to_string(), "0.531");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) =
+    ///     Float::atan_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 5, Ceiling);
+    /// assert_eq!(c.to_string(), "0.562");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) =
+    ///     Float::atan_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 20, Floor);
+    /// assert_eq!(c.to_string(), "0.54041862");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) =
+    ///     Float::atan_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 20, Ceiling);
+    /// assert_eq!(c.to_string(), "0.54041958");
+    /// assert_eq!(o, Greater);
+    /// ```
+    pub fn atan_rational_prec_round_ref(
+        x: &Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        if *x == 0u32 {
+            // atan(0) = 0, exactly
+            return (Self::ZERO, Equal);
+        }
+        atan_rational_helper(x, prec, rm)
+    }
+
+    /// Computes $\arctan x$, the arctangent of a [`Rational`], rounding the result to the nearest
+    /// value of the specified precision and returning the result as a [`Float`]. The [`Rational`]
+    /// is taken by value. An [`Ordering`] is also returned, indicating whether the rounded
+    /// arctangent is less than, equal to, or greater than the exact arctangent.
+    ///
+    /// If the arctangent is equidistant from two [`Float`]s with the specified precision, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,p) = \arctan x+\varepsilon,
+    /// $$
+    /// where $|\varepsilon| \leq 2^{\lfloor\log_2 |\arctan x|\rfloor-p}$ (unless the result
+    /// underflows; see below).
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p)=0$.
+    ///
+    /// Overflow and underflow:
+    /// - Since $|\arctan x| < \pi/2$, the result never overflows.
+    /// - If $0<f(x,p)\leq2^{-2^{30}-1}$, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p)<2^{-2^{30}}$, $2^{-2^{30}}$ is returned instead.
+    /// - If $-2^{-2^{30}-1}\leq f(x,p)<0$, $-0.0$ is returned instead.
+    /// - If $-2^{-2^{30}}<f(x,p)<-2^{-2^{30}-1}$, $-2^{-2^{30}}$ is returned instead.
+    ///
+    /// Underflow requires an input of magnitude about $2^{-2^{30}}$ or less: since $|\arctan x| <
+    /// |x|$ for nonzero $x$, no other input can reach it.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::atan_rational_prec_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n (\log n)^3 \log\log n + (n+m) (\log (n+m))^2 \log\log (n+m))$
+    ///
+    /// $M(n, m) = O((n+m) \log (n+m))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`: the input is rounded once to a working precision of about $n$ bits
+    /// and its [`Float`] arctangent taken there, which costs the first term; the rounding of the
+    /// $m$-bit input is the second. The magnitude of the input does not drive the cost.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::atan_rational_prec(Rational::from_unsigneds(3u8, 5), 5);
+    /// assert_eq!(c.to_string(), "0.531");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::atan_rational_prec(Rational::from_unsigneds(3u8, 5), 20);
+    /// assert_eq!(c.to_string(), "0.54041958");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn atan_rational_prec(x: Rational, prec: u64) -> (Self, Ordering) {
+        Self::atan_rational_prec_round_ref(&x, prec, Nearest)
+    }
+
+    /// Computes $\arctan x$, the arctangent of a [`Rational`], rounding the result to the nearest
+    /// value of the specified precision and returning the result as a [`Float`]. The [`Rational`]
+    /// is taken by reference. An [`Ordering`] is also returned, indicating whether the rounded
+    /// arctangent is less than, equal to, or greater than the exact arctangent.
+    ///
+    /// If the arctangent is equidistant from two [`Float`]s with the specified precision, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// $$
+    /// f(x,p) = \arctan x+\varepsilon,
+    /// $$
+    /// where $|\varepsilon| \leq 2^{\lfloor\log_2 |\arctan x|\rfloor-p}$ (unless the result
+    /// underflows).
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(0,p)=0$.
+    ///
+    /// See the [`Float::atan_rational_prec`] documentation for information on overflow and
+    /// underflow.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::atan_rational_prec_round_ref`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n (\log n)^3 \log\log n + (n+m) (\log (n+m))^2 \log\log (n+m))$
+    ///
+    /// $M(n, m) = O((n+m) \log (n+m))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`: the input is rounded once to a working precision of about $n$ bits
+    /// and its [`Float`] arctangent taken there, which costs the first term; the rounding of the
+    /// $m$-bit input is the second. The magnitude of the input does not drive the cost.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::atan_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 5);
+    /// assert_eq!(c.to_string(), "0.531");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::atan_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 20);
+    /// assert_eq!(c.to_string(), "0.54041958");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn atan_rational_prec_ref(x: &Rational, prec: u64) -> (Self, Ordering) {
+        Self::atan_rational_prec_round_ref(x, prec, Nearest)
+    }
+}
+
 impl Atan for Float {
     type Output = Self;
 
@@ -1443,4 +1834,65 @@ where
     for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
 {
     emulate_float_to_float_fn(Float::atan_prec, x)
+}
+
+/// Computes $\arctan x$, the arctangent of a [`Rational`], returning the result as a primitive
+/// float.
+///
+/// $$
+/// f(x) = \arctan x+\varepsilon,
+/// $$
+/// where $|\varepsilon| < 2^{\lfloor\log_2 |\arctan x|\rfloor-p}$, and $p$ is the precision of the
+/// output (24 if `T` is a [`f32`] and 53 if `T` is a [`f64`]).
+///
+/// Special cases:
+/// - $f(0)=0$
+///
+/// Overflow is not possible, since the result lies in $(-\pi/2, \pi/2)$. The result underflows, to
+/// a subnormal or to zero, only when $x$ is tiny, since $|\arctan x| < |x|$ and $\arctan x$ is very
+/// close to $x$ there.
+///
+/// # Worst-case complexity
+/// $T(m) = O(m (\log m)^2 \log\log m)$
+///
+/// $M(m) = O(m \log m)$
+///
+/// where $T$ is time, $M$ is additional memory, and $m$ is `x.significant_bits()`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::Zero;
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::atan::primitive_float_atan_rational;
+/// use malachite_q::Rational;
+///
+/// assert_eq!(
+///     NiceFloat(primitive_float_atan_rational::<f64>(&Rational::ZERO)),
+///     NiceFloat(0.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_atan_rational::<f64>(
+///         &Rational::from_unsigneds(1u8, 3)
+///     )),
+///     NiceFloat(0.3217505543966422)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_atan_rational::<f32>(
+///         &Rational::from_unsigneds(1u8, 3)
+///     )),
+///     NiceFloat(0.32175055)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_atan_rational::<f64>(&Rational::from(10000))),
+///     NiceFloat(1.5706963267952299)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_atan_rational<T: PrimitiveFloat>(x: &Rational) -> T
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_rational_to_float_fn(Float::atan_rational_prec_ref, x)
 }
