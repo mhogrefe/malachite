@@ -348,6 +348,15 @@ documented by git history.
   large $u$ can lift the quotient back into the range, where the `Rational` arctangent's own
   underflow answer would be wrong. `primitive_float_atan_with_period_rational` gives the correctly
   rounded `f32` or `f64` arctangent of a `Rational` in $u$ths of a turn.
+- `atan_pi_prec_round`, `atan_pi_prec`, `atan_pi_round`, and `atan_pi` (with `_ref` and `_assign`
+  variants), together with `atan_pi_rational_prec_round` and `atan_pi_rational_prec` (with `_ref`
+  variants): the arctangent measured in half-turns, $\arctan(x)/\pi$. This is IEEE 754's `atanPi`,
+  which MPFR has no direct equivalent of, and it is `atan_with_period` with $u = 2$. Because a half
+  and a quarter each need only one bit, the exact cases are exact at *every* precision, unlike the
+  general periodic version: an infinite input gives $\pm1/2$, an input of $\pm1$ gives $\pm1/4$,
+  and a zero input gives $\pm0.0$. Overflow is impossible, since the result is under $1/2$ in
+  magnitude. `primitive_float_atan_pi` and `primitive_float_atan_pi_rational` give the correctly
+  rounded `f32` or `f64` arctangent in half-turns.
 - `Cot` and `CotAssign` (new traits in malachite-base) for `Float`, with the usual
   `cot_prec_round`, `cot_prec`, `cot_round`, and `_ref`/`_assign` variants: a port of `mpfr_cot`,
   MPFR's generic reciprocal template with the tangent. MPFR's tangent is itself a quotient of a
