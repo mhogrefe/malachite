@@ -328,6 +328,17 @@ documented by git history.
   nor its reciprocal is a `Float`, and $\arctan x = \pi/2 - \arctan(1/x)$ is settled from a
   bracket on $\pi/2$. `primitive_float_atan_rational` gives the correctly rounded `f32` or `f64`
   arctangent of a `Rational`.
+- `atan_with_period_prec_round`, `atan_with_period_prec`, `atan_with_period_round`, and
+  `atan_with_period` (with `_ref` and `_assign` variants), a port of `mpfr_atanu`: the arctangent
+  measured in $u$ths of a turn, $\arctan(x)u/(2\pi)$, which is the inverse of the convention
+  `sin_with_period` uses for its input. An infinite input gives a quarter turn and an input of
+  $\pm1$ an eighth of a turn, both exactly when `prec` is wide enough to hold them; a zero input,
+  or $u = 0$, gives a zero with the sign of $x$, which keeps the function odd. Those are the only
+  exact cases. The result never overflows, being under $u/4$, but it underflows for a tiny $x$
+  together with a small $u$, where it is about $xu/(2\pi)$; MPFR's wider exponent range never sees
+  that, so the quotient is formed with the numerator scaled up and the underflow decided by the
+  rounding mode alone. `primitive_float_atan_with_period` gives the correctly rounded `f32` or
+  `f64` arctangent in $u$ths of a turn.
 - `Cot` and `CotAssign` (new traits in malachite-base) for `Float`, with the usual
   `cot_prec_round`, `cot_prec`, `cot_round`, and `_ref`/`_assign` variants: a port of `mpfr_cot`,
   MPFR's generic reciprocal template with the tangent. MPFR's tangent is itself a quotient of a

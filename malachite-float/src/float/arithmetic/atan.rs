@@ -23,22 +23,25 @@
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::float::arithmetic::round_near_x::float_round_near_x;
-use crate::float::arithmetic::sin::{UNDERFLOW_EXPONENT, underflowed};
+use crate::float::arithmetic::sin::{SCALE, UNDERFLOW_EXPONENT, scaled_underflow, underflowed};
 use crate::float::arithmetic::tan::round_bracket_signed_by;
 use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn};
 use alloc::vec;
 use core::cmp::Ordering::{self, Equal, Greater};
-use core::cmp::min;
+use core::cmp::{max, min};
 use core::mem::take;
 use malachite_base::num::arithmetic::traits::{
-    Abs, Atan, AtanAssign, CeilingLogBase2, Parity, PowerOf2, Reciprocal, Square, SquareAssign,
+    Abs, Atan, AtanAssign, CeilingLogBase2, IsPowerOf2, Parity, PowerOf2, Reciprocal, Square,
+    SquareAssign,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::{NaN as NaNTrait, One, Zero as ZeroTrait};
+use malachite_base::num::basic::traits::{
+    NaN as NaNTrait, NegativeZero as NegativeZeroTrait, One, Zero as ZeroTrait,
+};
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode::{self, Down, Exact, Floor, Nearest};
+use malachite_base::rounding_modes::RoundingMode::{self, Down, Exact, Floor, Nearest, Up};
 use malachite_base::split_into_chunks_mut;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
@@ -405,13 +408,17 @@ fn atan_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float,
     let err1 = -(exp_x << 1);
     if err1 > 0 {
         let err = u64::exact_from(err1) + 1;
-        // The error bound only has to clear prec + 1; passing an enormous err (a tiny x has one
-        // around 2^31) would make float_round_near_x do work proportional to it.
-        if err > prec + 1 {
-            if let Some(result) = float_round_near_x(x, min(err, prec + 2), false, prec, rm) {
-                return result;
-            }
-            return atan_series(&Rational::exact_from(x), prec, rm);
+        // `float_round_near_x` only needs an error bound clearing prec + 1, and a bound above the
+        // input's own precision spares it the `float_can_round` test, which is the only way it
+        // declines. Capping there rather than passing the true bound, which for a tiny x runs to
+        // about 2^31, keeps the shortcut from being handed a pointlessly large number; capping any
+        // lower would let it decline, and the general algorithm works at a precision of about
+        // -EXP(x) bits, which for such an x does not terminate in reasonable time.
+        let cap = max(prec + 2, x.get_prec().unwrap() + 1);
+        if err > prec + 1
+            && let Some(result) = float_round_near_x(x, min(err, cap), false, prec, rm)
+        {
+            return result;
         }
     }
     let negative = *x < 0u32;
@@ -530,6 +537,87 @@ fn atan_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float,
         }
         realprec += increment;
         increment = realprec >> 1;
+    }
+}
+
+// u/2^k with the sign of `positive`, rounded to `prec` with `rm`. The shift is exact, so the
+// ternary value is the conversion's, reversed along with the sign.
+fn scaled_unsigned(
+    u: u64,
+    k: u32,
+    positive: bool,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    let (f, o) = Float::from_unsigned_prec_round(u, prec, if positive { rm } else { -rm });
+    let f = f >> k;
+    if positive { (f, o) } else { (-f, o.reverse()) }
+}
+
+// Computes atan(x) u/(2 pi) for a finite nonzero `Float` x and a nonzero u, rounded to precision
+// `prec` with rounding mode `rm`. `rm` may be `Exact` only for |x| = 1, where the result is u/8.
+//
+// This is mpfr_atanu from atanu.c, MPFR 4.2.2. The quotient is formed with the numerator scaled up
+// by 2^SCALE, since atan(x) u/(2 pi) can fall below the smallest positive `Float` for a tiny x and
+// a small u, which MPFR's wider exponent range never sees; a result below it is then decided by the
+// rounding mode alone, as in `sin_with_period`.
+fn atan_with_period_prec_round_normal_ref(
+    x: &Float,
+    u: u64,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    let positive = *x > 0u32;
+    let exp_x = i64::from(x.get_exponent().unwrap());
+    // |x| = 1: atanu(1, u) = u/8, atanu(-1, u) = -u/8, both exact
+    if exp_x == 1 && x.significand_ref().unwrap().is_power_of_2() {
+        return scaled_unsigned(u, 3, positive, prec, rm);
+    }
+    // Only |x| = 1 can be rounded exactly
+    assert_ne!(rm, Exact, "Inexact atan_with_period");
+    // For x >= 1, pi/2 - 1/x < atan(x) < pi/2, so u/4 - u/(2 pi x) < atanu(x, u) < u/4, and the
+    // relative difference from u/4 is below 2/(pi x) < 1/x <= 2^(1 - EXP(x)). Once that is at most
+    // 2^(-prec - 2), the difference is at most a quarter ulp of u/4, hence at most half an ulp of
+    // u/4 at the target precision, so the result rounds like the value one ulp below u/4 at a
+    // working precision above the target's. Requiring EXP(x) >= 65 also gives x > 2u/pi, which
+    // keeps that value above (u - 1)/4.
+    if exp_x >= 65 && exp_x > i64::exact_from(prec) + 2 {
+        let w = if prec <= 63 { 65 } else { prec + 2 };
+        // exact, since w >= 64
+        let mut t = Float::from_unsigned_prec_round(u, w, Exact).0;
+        t.decrement();
+        // the last bit of t is 1 and w exceeds the target precision, so t is not representable
+        // there, which pins the ternary value below
+        t >>= 2u32;
+        return Float::from_float_prec_round(if positive { t } else { -t }, prec, rm);
+    }
+    let mut w = prec + prec.ceiling_log_base_2() + 10;
+    let mut increment = Limb::WIDTH;
+    let u_float = Float::from(u);
+    loop {
+        // In the error analysis below, each theta denotes a value with |theta| <= 2^(1 - w).
+        //
+        // t = atan(x) (1 + theta), nonzero since we rounded away from zero and x is not
+        let t = x.atan_prec_round_ref(w, Up).0;
+        // scaling by a power of 2 is exact, and atan(x) u 2^SCALE stays far below the top of the
+        // range, since |atan x| < pi/2 and u < 2^64
+        let mut t = t << SCALE;
+        // t = atan(x) u 2^SCALE (1 + theta)^2
+        t.mul_prec_round_assign_ref(&u_float, w, Up);
+        // 2 pi rounded toward zero, so that the quotient rounds away
+        let two_pi = Float::pi_prec_round(w, Down).0 << 1u32;
+        // t = atan(x) u 2^SCALE/(2 pi) (1 + theta)^4, whose relative error is below 2^(4 - w) since
+        // |(1 + theta)^4 - 1| <= 8 |theta| for w >= 3
+        t.div_prec_round_assign(two_pi, w, Up);
+        if let Some(result) = scaled_underflow(&t, positive, prec, rm) {
+            return result;
+        }
+        let t = t >> SCALE;
+        if float_can_round(t.significand_ref().unwrap(), w - 4, prec, rm) {
+            return Float::from_float_prec_round(t, prec, rm);
+        }
+        w += increment;
+        increment = w >> 1;
     }
 }
 
@@ -1276,6 +1364,508 @@ impl Float {
 }
 
 impl Float {
+    /// Computes $\arctan(x)u/(2\pi)$, the arctangent of a [`Float`] measured in $u$ths of a turn,
+    /// rounding the result to the specified precision and with the specified rounding mode. The
+    /// [`Float`] is taken by value. An [`Ordering`] is also returned, indicating whether the
+    /// rounded arctangent is less than, equal to, or greater than the exact arctangent. Although
+    /// `NaN`s are not comparable to any [`Float`], whenever this function returns a `NaN` it also
+    /// returns `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,u,p,m) = \arctan(x)u/(2\pi)+\varepsilon.
+    /// $$
+    /// - If $x$ is NaN or zero, $u = 0$, or $|x|$ is 1 or infinite, $\varepsilon$ may be ignored or
+    ///   assumed to be 0.
+    /// - Otherwise, if $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2
+    ///   |\arctan(x)u/(2\pi)|\rfloor-p+1}$.
+    /// - Otherwise, if $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |\arctan(x)u/(2\pi)|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},u,p,m)=\text{NaN}$
+    /// - $f(\pm\infty,u,p,m)=\pm u/4$, a quarter turn
+    /// - $f(\pm0.0,u,p,m)=\pm0.0$
+    /// - $f(x,0,p,m)=\pm0.0$, with the sign of $x$, so that the function stays odd
+    /// - $f(\pm1,u,p,m)=\pm u/8$, an eighth of a turn
+    ///
+    /// The last three are the only exact cases, and the quarter and eighth turns are exact only
+    /// when $p$ is large enough to hold them.
+    ///
+    /// Underflow:
+    /// - If $0<f(x,u,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,u,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,u,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,u,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - The negative cases mirror these, since the function is odd.
+    ///
+    /// Overflow is not possible, since $|f(x,u,p,m)| < u/4 < 2^{62}$. Underflow requires a tiny $x$
+    /// together with a small $u$, since the result is about $xu/(2\pi)$ there.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::atan_with_period_prec`]
+    /// instead. If you know that your target precision is the precision of the input, consider
+    /// using [`Float::atan_with_period_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n (\log n)^3 \log\log n + (n+m) (\log (n+m))^2 \log\log (n+m))$
+    ///
+    /// $M(n, m) = O((n+m) \log (n+m))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `self.significant_bits()`: the arctangent is taken at a working precision of about $n$ bits,
+    /// which costs the first term, and is then scaled by $u/(2\pi)$, which needs $\pi$ to that many
+    /// bits; the second term covers the $m$-bit input. The magnitude of the input does not drive
+    /// the cost.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision (which is the case unless $x$ is zero or NaN, $u$ is zero, or $|x|$
+    /// is 1 or infinite and $p$ is large enough to hold a quarter or an eighth of a turn).
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::ONE.atan_with_period_prec_round(360, 10, Exact);
+    /// assert_eq!(t.to_string(), "45.000");
+    /// assert_eq!(o, Equal);
+    ///
+    /// let (t, o) = Float::TWO.atan_with_period_prec_round(360, 10, Floor);
+    /// assert_eq!(t.to_string(), "63.375");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (t, o) = Float::TWO.atan_with_period_prec_round(360, 10, Ceiling);
+    /// assert_eq!(t.to_string(), "63.438");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn atan_with_period_prec_round(
+        self,
+        u: u64,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        self.atan_with_period_prec_round_ref(u, prec, rm)
+    }
+
+    /// Computes $\arctan(x)u/(2\pi)$, the arctangent of a [`Float`] measured in $u$ths of a turn,
+    /// rounding the result to the specified precision and with the specified rounding mode. The
+    /// [`Float`] is taken by reference. An [`Ordering`] is also returned, indicating whether the
+    /// rounded arctangent is less than, equal to, or greater than the exact arctangent. Although
+    /// `NaN`s are not comparable to any [`Float`], whenever this function returns a `NaN` it also
+    /// returns `Equal`.
+    ///
+    /// See [`Float::atan_with_period_prec_round`] for the error bounds, the special and closed-form
+    /// cases, overflow, and the complexity; this function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = (&Float::ONE).atan_with_period_prec_round_ref(360, 10, Exact);
+    /// assert_eq!(t.to_string(), "45.000");
+    /// assert_eq!(o, Equal);
+    ///
+    /// let (t, o) = (&Float::TWO).atan_with_period_prec_round_ref(360, 10, Floor);
+    /// assert_eq!(t.to_string(), "63.375");
+    /// assert_eq!(o, Less);
+    /// ```
+    pub fn atan_with_period_prec_round_ref(
+        &self,
+        u: u64,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        match &self.0 {
+            NaN => (Self::NAN, Equal),
+            // atanu(+infinity, u) = u/4, atanu(-infinity, u) = -u/4, a quarter turn
+            Infinity { sign } => {
+                if u == 0 {
+                    (
+                        if *sign {
+                            Self::ZERO
+                        } else {
+                            Self::NEGATIVE_ZERO
+                        },
+                        Equal,
+                    )
+                } else {
+                    scaled_unsigned(u, 2, *sign, prec, rm)
+                }
+            }
+            // atanu(±0.0, u) = ±0.0, even for u = 0
+            Zero { .. } => (self.clone(), Equal),
+            Finite { .. } => {
+                if u == 0 {
+                    // atanu(x, 0) = 0 with the sign of x, which agrees with the x = 0 case and
+                    // keeps the function odd
+                    (
+                        if *self < 0u32 {
+                            Self::NEGATIVE_ZERO
+                        } else {
+                            Self::ZERO
+                        },
+                        Equal,
+                    )
+                } else {
+                    atan_with_period_prec_round_normal_ref(self, u, prec, rm)
+                }
+            }
+        }
+    }
+
+    /// Computes $\arctan(x)u/(2\pi)$, the arctangent of a [`Float`] measured in $u$ths of a turn,
+    /// rounding the result to the nearest value of the specified precision. The [`Float`] is taken
+    /// by value. An [`Ordering`] is also returned, indicating whether the rounded arctangent is
+    /// less than, equal to, or greater than the exact arctangent. Although `NaN`s are not
+    /// comparable to any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// If the arctangent is equidistant from two [`Float`]s with the specified precision, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// See [`Float::atan_with_period_prec_round`] for the error bounds, the special and closed-form
+    /// cases, overflow, and the complexity; this function behaves the same way with `Nearest`.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::atan_with_period_prec_round`] instead.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::ONE.atan_with_period_prec(360, 10);
+    /// assert_eq!(t.to_string(), "45.000");
+    /// assert_eq!(o, Equal);
+    ///
+    /// let (t, o) = Float::TWO.atan_with_period_prec(360, 10);
+    /// assert_eq!(t.to_string(), "63.438");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn atan_with_period_prec(self, u: u64, prec: u64) -> (Self, Ordering) {
+        self.atan_with_period_prec_round(u, prec, Nearest)
+    }
+
+    /// Computes $\arctan(x)u/(2\pi)$, the arctangent of a [`Float`] measured in $u$ths of a turn,
+    /// rounding the result to the nearest value of the specified precision. The [`Float`] is taken
+    /// by reference. An [`Ordering`] is also returned, indicating whether the rounded arctangent is
+    /// less than, equal to, or greater than the exact arctangent. Although `NaN`s are not
+    /// comparable to any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`Float::atan_with_period_prec`] and [`Float::atan_with_period_prec_round`]; this
+    /// function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = (&Float::TWO).atan_with_period_prec_ref(360, 10);
+    /// assert_eq!(t.to_string(), "63.438");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn atan_with_period_prec_ref(&self, u: u64, prec: u64) -> (Self, Ordering) {
+        self.atan_with_period_prec_round_ref(u, prec, Nearest)
+    }
+
+    /// Computes $\arctan(x)u/(2\pi)$, the arctangent of a [`Float`] measured in $u$ths of a turn,
+    /// rounding the result to the precision of the input and with the specified rounding mode. The
+    /// [`Float`] is taken by value. An [`Ordering`] is also returned, indicating whether the
+    /// rounded arctangent is less than, equal to, or greater than the exact arctangent. Although
+    /// `NaN`s are not comparable to any [`Float`], whenever this function returns a `NaN` it also
+    /// returns `Equal`.
+    ///
+    /// See [`Float::atan_with_period_prec_round`] for the error bounds, the special and closed-form
+    /// cases, overflow, and the complexity; this function behaves the same way with `prec` equal to
+    /// the precision of the input.
+    ///
+    /// If you want to specify an output precision, consider using
+    /// [`Float::atan_with_period_prec_round`] instead.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the precision of
+    /// the input.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// // the output takes the input's precision, here 10 bits
+    /// let (t, o) = Float::from_unsigned_prec(2u32, 10)
+    ///     .0
+    ///     .atan_with_period_round(360, Floor);
+    /// assert_eq!(t.to_string(), "63.375");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn atan_with_period_round(self, u: u64, rm: RoundingMode) -> (Self, Ordering) {
+        let prec = self.significant_bits();
+        self.atan_with_period_prec_round(u, prec, rm)
+    }
+
+    /// Computes $\arctan(x)u/(2\pi)$, the arctangent of a [`Float`] measured in $u$ths of a turn,
+    /// rounding the result to the precision of the input and with the specified rounding mode. The
+    /// [`Float`] is taken by reference. An [`Ordering`] is also returned, indicating whether the
+    /// rounded arctangent is less than, equal to, or greater than the exact arctangent. Although
+    /// `NaN`s are not comparable to any [`Float`], whenever this function returns a `NaN` it also
+    /// returns `Equal`.
+    ///
+    /// See [`Float::atan_with_period_round`] and [`Float::atan_with_period_prec_round`]; this
+    /// function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the precision of
+    /// the input.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// // the output takes the input's precision, here 10 bits
+    /// let x = Float::from_unsigned_prec(2u32, 10).0;
+    /// let (t, o) = (&x).atan_with_period_round_ref(360, Floor);
+    /// assert_eq!(t.to_string(), "63.375");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn atan_with_period_round_ref(&self, u: u64, rm: RoundingMode) -> (Self, Ordering) {
+        self.atan_with_period_prec_round_ref(u, self.significant_bits(), rm)
+    }
+
+    /// Computes $\arctan(x)u/(2\pi)$, the arctangent of a [`Float`] measured in $u$ths of a turn
+    /// (so that `u = 360` is degrees), rounding the result to the precision of the input and to the
+    /// nearest [`Float`]. The [`Float`] is taken by value.
+    ///
+    /// If the arctangent is equidistant from two [`Float`]s with the precision of the input, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// See [`Float::atan_with_period_prec_round`] for the error bounds, the special and closed-form
+    /// cases, overflow, and the complexity; this function behaves the same way with `prec` equal to
+    /// the precision of the input and `rm` equal to `Nearest`.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::atan_with_period_round`] instead. If you want to specify an output precision,
+    /// consider using [`Float::atan_with_period_prec`]. If you want both of these things, consider
+    /// using [`Float::atan_with_period_prec_round`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let t = Float::from_unsigned_prec(2u32, 10).0.atan_with_period(360);
+    /// assert_eq!(t.to_string(), "63.438");
+    /// ```
+    #[inline]
+    pub fn atan_with_period(self, u: u64) -> Self {
+        let prec = self.significant_bits();
+        self.atan_with_period_prec(u, prec).0
+    }
+
+    /// Computes $\arctan(x)u/(2\pi)$, the arctangent of a [`Float`] measured in $u$ths of a turn
+    /// (so that `u = 360` is degrees), rounding the result to the precision of the input and to the
+    /// nearest [`Float`]. The [`Float`] is taken by reference.
+    ///
+    /// If the arctangent is equidistant from two [`Float`]s with the precision of the input, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// See [`Float::atan_with_period_prec_round`] for the error bounds, the special and closed-form
+    /// cases, overflow, and the complexity; this function behaves the same way with `prec` equal to
+    /// the precision of the input and `rm` equal to `Nearest`.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::atan_with_period_round_ref`] instead. If you want to specify an output precision,
+    /// consider using [`Float::atan_with_period_prec_ref`]. If you want both of these things,
+    /// consider using [`Float::atan_with_period_prec_round_ref`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let t = (&Float::from_unsigned_prec(2u32, 10).0).atan_with_period_ref(360);
+    /// assert_eq!(t.to_string(), "63.438");
+    /// ```
+    #[inline]
+    pub fn atan_with_period_ref(&self, u: u64) -> Self {
+        self.atan_with_period_prec_ref(u, self.significant_bits()).0
+    }
+
+    /// Replaces a [`Float`] measured in $u$ths of a turn with its arctangent, rounding the result
+    /// to the specified precision and with the specified rounding mode. An [`Ordering`] is
+    /// returned, indicating whether the rounded arctangent is less than, equal to, or greater than
+    /// the exact arctangent. Although `NaN`s are not comparable to any [`Float`], whenever this
+    /// function sets a `NaN` it also returns `Equal`.
+    ///
+    /// See [`Float::atan_with_period_prec_round`] for the error bounds, the special and closed-form
+    /// cases, overflow, and the complexity; this function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::TWO;
+    /// let o = x.atan_with_period_prec_round_assign(360, 10, Floor);
+    /// assert_eq!(x.to_string(), "63.375");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn atan_with_period_prec_round_assign(
+        &mut self,
+        u: u64,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> Ordering {
+        let (t, o) = self.atan_with_period_prec_round_ref(u, prec, rm);
+        *self = t;
+        o
+    }
+
+    /// Replaces a [`Float`] measured in $u$ths of a turn with its arctangent, rounding the result
+    /// to the nearest value of the specified precision. An [`Ordering`] is returned, indicating
+    /// whether the rounded arctangent is less than, equal to, or greater than the exact arctangent.
+    /// Although `NaN`s are not comparable to any [`Float`], whenever this function sets a `NaN` it
+    /// also returns `Equal`.
+    ///
+    /// See [`Float::atan_with_period_prec`] and [`Float::atan_with_period_prec_round`]; this
+    /// function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::TWO;
+    /// let o = x.atan_with_period_prec_assign(360, 10);
+    /// assert_eq!(x.to_string(), "63.438");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn atan_with_period_prec_assign(&mut self, u: u64, prec: u64) -> Ordering {
+        self.atan_with_period_prec_round_assign(u, prec, Nearest)
+    }
+
+    /// Replaces a [`Float`] measured in $u$ths of a turn with its arctangent, rounding the result
+    /// to the precision of the input and with the specified rounding mode. An [`Ordering`] is
+    /// returned, indicating whether the rounded arctangent is less than, equal to, or greater than
+    /// the exact arctangent. Although `NaN`s are not comparable to any [`Float`], whenever this
+    /// function sets a `NaN` it also returns `Equal`.
+    ///
+    /// See [`Float::atan_with_period_round`] and [`Float::atan_with_period_prec_round`]; this
+    /// function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the precision of
+    /// the input.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// // the output takes the input's precision, here 10 bits
+    /// let mut x = Float::from_unsigned_prec(2u32, 10).0;
+    /// let o = x.atan_with_period_round_assign(360, Floor);
+    /// assert_eq!(x.to_string(), "63.375");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn atan_with_period_round_assign(&mut self, u: u64, rm: RoundingMode) -> Ordering {
+        let prec = self.significant_bits();
+        self.atan_with_period_prec_round_assign(u, prec, rm)
+    }
+
+    /// Computes $\arctan(x)u/(2\pi)$, the arctangent of a [`Float`] measured in $u$ths of a turn
+    /// (so that `u = 360` is degrees), rounding the result to the precision of the input and to the
+    /// nearest [`Float`]. The [`Float`] is replaced by the result.
+    ///
+    /// If the arctangent is equidistant from two [`Float`]s with the precision of the input, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// See [`Float::atan_with_period_prec_round`] for the error bounds, the special and closed-form
+    /// cases, overflow, and the complexity; this function behaves the same way with `prec` equal to
+    /// the precision of the input and `rm` equal to `Nearest`.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::atan_with_period_round_assign`] instead. If you want to specify an output
+    /// precision, consider using [`Float::atan_with_period_prec_assign`]. If you want both of these
+    /// things, consider using [`Float::atan_with_period_prec_round_assign`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from_unsigned_prec(2u32, 10).0;
+    /// x.atan_with_period_assign(360);
+    /// assert_eq!(x.to_string(), "63.438");
+    /// ```
+    #[inline]
+    pub fn atan_with_period_assign(&mut self, u: u64) {
+        let prec = self.significant_bits();
+        self.atan_with_period_prec_assign(u, prec);
+    }
+}
+
+impl Float {
     /// Computes $\arctan x$, the arctangent of a [`Rational`], rounding the result to the specified
     /// precision and with the specified rounding mode and returning the result as a [`Float`]. The
     /// [`Rational`] is taken by value. An [`Ordering`] is also returned, indicating whether the
@@ -1895,4 +2485,71 @@ where
     for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
 {
     emulate_rational_to_float_fn(Float::atan_rational_prec_ref, x)
+}
+
+/// Computes $\arctan(x)u/(2\pi)$, the arctangent of a primitive float measured in $u$ths of a turn
+/// (so that `u = 360` gives degrees).
+///
+/// $$
+/// f(x,u) = \arctan(x)u/(2\pi)+\varepsilon.
+/// $$
+/// - If $x$ is NaN or zero, $u = 0$, or $|x|$ is 1 or infinite, $\varepsilon$ may be ignored or
+///   assumed to be 0.
+/// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 |\arctan(x)u/(2\pi)|\rfloor-p}$, where $p$ is the
+///   precision of the output (24 if `T` is a [`f32`] and 53 if `T` is a [`f64`]).
+///
+/// Special cases:
+/// - $f(\text{NaN},u)=\text{NaN}$
+/// - $f(\pm\infty,u)=\pm u/4$, a quarter turn
+/// - $f(\pm0.0,u)=\pm0.0$
+/// - $f(x,0)=\pm0.0$, with the sign of $x$, so that the function stays odd
+/// - $f(\pm1,u)=\pm u/8$, an eighth of a turn
+///
+/// Overflow is not possible, since $|f(x,u)| < u/4 < 2^{62}$. The result is subnormal, or zero,
+/// only when $x$ is tiny and $u$ is small, since the result is about $xu/(2\pi)$ there.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::NegativeInfinity;
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::atan::primitive_float_atan_with_period;
+///
+/// assert!(primitive_float_atan_with_period(f32::NAN, 360).is_nan());
+/// // an infinite input is a quarter turn
+/// assert_eq!(
+///     NiceFloat(primitive_float_atan_with_period(f32::INFINITY, 360)),
+///     NiceFloat(90.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_atan_with_period(
+///         f32::NEGATIVE_INFINITY,
+///         360
+///     )),
+///     NiceFloat(-90.0)
+/// );
+/// // an input of 1 is an eighth of a turn
+/// assert_eq!(
+///     NiceFloat(primitive_float_atan_with_period(1.0f32, 360)),
+///     NiceFloat(45.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_atan_with_period(2.0f32, 360)),
+///     NiceFloat(63.434948)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_atan_with_period(2.0f64, 360)),
+///     NiceFloat(63.43494882292201)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_atan_with_period<T: PrimitiveFloat>(x: T, u: u64) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_float_to_float_fn(|x, prec| Float::atan_with_period_prec(x, u, prec), x)
 }

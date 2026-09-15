@@ -12,17 +12,18 @@ use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeZero, One, Zero,
 };
-use malachite_base::num::comparison::traits::PartialOrdAbs;
+use malachite_base::num::comparison::traits::{EqAbs, PartialOrdAbs};
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::{
-    primitive_float_gen, unsigned_rounding_mode_pair_gen_var_3,
+    primitive_float_gen, primitive_float_unsigned_pair_gen_var_1,
+    unsigned_rounding_mode_pair_gen_var_3,
 };
 use malachite_float::float::arithmetic::atan::{
-    primitive_float_atan, primitive_float_atan_rational,
+    primitive_float_atan, primitive_float_atan_rational, primitive_float_atan_with_period,
 };
 use malachite_float::test_util::common::{
     assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
@@ -30,12 +31,15 @@ use malachite_float::test_util::common::{
 };
 use malachite_float::test_util::float::arithmetic::atan::{
     rug_atan, rug_atan_prec, rug_atan_prec_round, rug_atan_rational_prec,
-    rug_atan_rational_prec_round, rug_atan_round,
+    rug_atan_rational_prec_round, rug_atan_round, rug_atan_with_period_prec_round,
 };
 use malachite_float::test_util::generators::{
     float_gen, float_rounding_mode_pair_gen_var_47, float_unsigned_pair_gen_var_1,
-    float_unsigned_rounding_mode_triple_gen_var_36,
-    rational_unsigned_rounding_mode_triple_gen_var_10,
+    float_unsigned_pair_gen_var_2, float_unsigned_rounding_mode_triple_gen_var_36,
+    float_unsigned_rounding_mode_triple_gen_var_39,
+    float_unsigned_unsigned_rounding_mode_quadruple_gen_var_17,
+    float_unsigned_unsigned_rounding_mode_quadruple_gen_var_18,
+    float_unsigned_unsigned_triple_gen_var_1, rational_unsigned_rounding_mode_triple_gen_var_10,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_q::Rational;
@@ -3209,4 +3213,2123 @@ fn test_atan_rational_underflow() {
         assert_eq!(ComparableFloat(a), ComparableFloat(expected));
         assert_eq!(o, o_out);
     }
+}
+
+// Rows reuse the cosecant's `with_period` inputs. Branches of
+// `atan_with_period_prec_round_normal_ref` covered: |x| = 1, which is an exact eighth of a turn;
+// the shortcut for a huge x, whose result is one ulp below a quarter turn; and the general Ziv
+// loop, at its first working precision and after a retry.
+#[test]
+fn test_atan_with_period_prec_round() {
+    let test = |s: &str,
+                s_hex: &str,
+                u: u64,
+                prec: u64,
+                rm: RoundingMode,
+                out: &str,
+                out_hex: &str,
+                o_out: Ordering| {
+        let x = parse_hex_string(s_hex);
+        assert_eq!(x.to_string(), s);
+
+        let (t, o) = x.clone().atan_with_period_prec_round(u, prec, rm);
+        assert!(t.is_valid());
+        assert_eq!(t.to_string(), out);
+        assert_eq!(to_hex_string(&t), out_hex);
+        assert_eq!(o, o_out);
+
+        let (t_alt, o_alt) = x.atan_with_period_prec_round_ref(u, prec, rm);
+        assert!(t_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
+        assert_eq!(o_alt, o);
+
+        let mut t_alt = x.clone();
+        let o_alt = t_alt.atan_with_period_prec_round_assign(u, prec, rm);
+        assert!(t_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
+        assert_eq!(o_alt, o);
+
+        if rm == Nearest {
+            let (t_alt, o_alt) = x.atan_with_period_prec_ref(u, prec);
+            assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
+            assert_eq!(o_alt, o);
+        }
+    };
+    test("NaN", "NaN", 4, 10, Nearest, "NaN", "NaN", Equal);
+    test(
+        "Infinity",
+        "Infinity",
+        4,
+        10,
+        Nearest,
+        "1.0000",
+        "0x1.000#10",
+        Equal,
+    );
+    test(
+        "-Infinity",
+        "-Infinity",
+        4,
+        10,
+        Nearest,
+        "-1.0000",
+        "-0x1.000#10",
+        Equal,
+    );
+    test("0.0", "0x0.0", 4, 10, Nearest, "0.0", "0x0.0", Equal);
+    test("-0.0", "-0x0.0", 4, 10, Nearest, "-0.0", "-0x0.0", Equal);
+    test("1.0", "0x1.0#1", 0, 10, Nearest, "0.0", "0x0.0", Equal);
+    test("0.0", "0x0.0", 0, 10, Nearest, "0.0", "0x0.0", Equal);
+    test("NaN", "NaN", 0, 10, Nearest, "NaN", "NaN", Equal);
+    test("0.0", "0x0.0", 360, 10, Nearest, "0.0", "0x0.0", Equal);
+    test("0.0", "0x0.0", 360, 10, Floor, "0.0", "0x0.0", Equal);
+    test("0.0", "0x0.0", 360, 10, Exact, "0.0", "0x0.0", Equal);
+    test(
+        "90.0",
+        "0x5a.0#6",
+        360,
+        10,
+        Nearest,
+        "89.375",
+        "0x59.6#10",
+        Greater,
+    );
+    test(
+        "90.0",
+        "0x5a.0#6",
+        360,
+        10,
+        Floor,
+        "89.250",
+        "0x59.4#10",
+        Less,
+    );
+    test(
+        "90.0",
+        "0x5a.0#6",
+        360,
+        10,
+        Nearest,
+        "89.375",
+        "0x59.6#10",
+        Greater,
+    );
+    test(
+        "180.0",
+        "0xb4.0#6",
+        360,
+        10,
+        Nearest,
+        "89.625",
+        "0x59.a#10",
+        Less,
+    );
+    test(
+        "180.0",
+        "0xb4.0#6",
+        360,
+        10,
+        Floor,
+        "89.625",
+        "0x59.a#10",
+        Less,
+    );
+    test(
+        "180.0",
+        "0xb4.0#6",
+        360,
+        10,
+        Nearest,
+        "89.625",
+        "0x59.a#10",
+        Less,
+    );
+    test(
+        "270.0",
+        "0x10e.0#8",
+        360,
+        10,
+        Nearest,
+        "89.750",
+        "0x59.c#10",
+        Less,
+    );
+    test(
+        "270.0",
+        "0x10e.0#8",
+        360,
+        10,
+        Floor,
+        "89.750",
+        "0x59.c#10",
+        Less,
+    );
+    test(
+        "270.0",
+        "0x10e.0#8",
+        360,
+        10,
+        Nearest,
+        "89.750",
+        "0x59.c#10",
+        Less,
+    );
+    test(
+        "360.0",
+        "0x168.0#6",
+        360,
+        10,
+        Nearest,
+        "89.875",
+        "0x59.e#10",
+        Greater,
+    );
+    test(
+        "360.0",
+        "0x168.0#6",
+        360,
+        10,
+        Floor,
+        "89.750",
+        "0x59.c#10",
+        Less,
+    );
+    test(
+        "360.0",
+        "0x168.0#6",
+        360,
+        10,
+        Nearest,
+        "89.875",
+        "0x59.e#10",
+        Greater,
+    );
+    test(
+        "60.0",
+        "0x3c.0#4",
+        360,
+        10,
+        Nearest,
+        "89.000",
+        "0x59.0#10",
+        Less,
+    );
+    test(
+        "60.0",
+        "0x3c.0#4",
+        360,
+        10,
+        Floor,
+        "89.000",
+        "0x59.0#10",
+        Less,
+    );
+    test(
+        "120.0",
+        "0x78.0#4",
+        360,
+        10,
+        Nearest,
+        "89.500",
+        "0x59.8#10",
+        Less,
+    );
+    test(
+        "120.0",
+        "0x78.0#4",
+        360,
+        10,
+        Floor,
+        "89.500",
+        "0x59.8#10",
+        Less,
+    );
+    test(
+        "240.0",
+        "0xf.0E+1#4",
+        360,
+        10,
+        Nearest,
+        "89.750",
+        "0x59.c#10",
+        Less,
+    );
+    test(
+        "240.0",
+        "0xf.0E+1#4",
+        360,
+        10,
+        Floor,
+        "89.750",
+        "0x59.c#10",
+        Less,
+    );
+    test(
+        "300.0",
+        "0x12c.0#7",
+        360,
+        10,
+        Nearest,
+        "89.750",
+        "0x59.c#10",
+        Less,
+    );
+    test(
+        "300.0",
+        "0x12c.0#7",
+        360,
+        10,
+        Floor,
+        "89.750",
+        "0x59.c#10",
+        Less,
+    );
+    test(
+        "450.0",
+        "0x1c2.0#8",
+        360,
+        10,
+        Nearest,
+        "89.875",
+        "0x59.e#10",
+        Greater,
+    );
+    test(
+        "450.0",
+        "0x1c2.0#8",
+        360,
+        10,
+        Floor,
+        "89.750",
+        "0x59.c#10",
+        Less,
+    );
+    test(
+        "450.0",
+        "0x1c2.0#8",
+        360,
+        10,
+        Nearest,
+        "89.875",
+        "0x59.e#10",
+        Greater,
+    );
+    test(
+        "1.0",
+        "0x1.0#1",
+        1,
+        10,
+        Ceiling,
+        "0.12500",
+        "0x0.200#10",
+        Equal,
+    );
+    test(
+        "1.0",
+        "0x1.0#1",
+        3,
+        10,
+        Nearest,
+        "0.37500",
+        "0x0.600#10",
+        Equal,
+    );
+    test(
+        "1.0",
+        "0x1.0#1",
+        4,
+        10,
+        Ceiling,
+        "0.50000",
+        "0x0.800#10",
+        Equal,
+    );
+    test(
+        "1.0",
+        "0x1.0#1",
+        7,
+        10,
+        Nearest,
+        "0.87500",
+        "0x0.e00#10",
+        Equal,
+    );
+    test(
+        "1.0",
+        "0x1.0#1",
+        360,
+        10,
+        Nearest,
+        "45.000",
+        "0x2d.0#10",
+        Equal,
+    );
+    test(
+        "1.0",
+        "0x1.0#1",
+        1000000,
+        10,
+        Ceiling,
+        "1.2506e5",
+        "0x1.e88E+4#10",
+        Greater,
+    );
+    test(
+        "0.50",
+        "0x0.8#1",
+        1,
+        10,
+        Floor,
+        "0.073730",
+        "0x0.12e0#10",
+        Less,
+    );
+    test(
+        "0.50",
+        "0x0.8#1",
+        2,
+        53,
+        Nearest,
+        "0.14758361765043326",
+        "0x0.25c80a3b3be610#53",
+        Less,
+    );
+    test(
+        "0.50",
+        "0x0.8#1",
+        4,
+        10,
+        Floor,
+        "0.29492",
+        "0x0.4b8#10",
+        Less,
+    );
+    test(
+        "0.50",
+        "0x0.8#1",
+        6,
+        53,
+        Nearest,
+        "0.44275085295129984",
+        "0x0.71581eb1b3b234#53",
+        Greater,
+    );
+    test(
+        "0.50",
+        "0x0.8#1",
+        12,
+        10,
+        Ceiling,
+        "0.88574",
+        "0x0.e2c#10",
+        Greater,
+    );
+    test(
+        "0.50",
+        "0x0.8#1",
+        1000000,
+        10,
+        Floor,
+        "73728.0",
+        "0x1.200E+4#10",
+        Less,
+    );
+    test(
+        "0.25",
+        "0x0.4#1",
+        1,
+        10,
+        Nearest,
+        "0.039001",
+        "0x0.09fc#10",
+        Greater,
+    );
+    test(
+        "0.25",
+        "0x0.4#1",
+        2,
+        10,
+        Ceiling,
+        "0.078003",
+        "0x0.13f8#10",
+        Greater,
+    );
+    test(
+        "0.25",
+        "0x0.4#1",
+        4,
+        10,
+        Nearest,
+        "0.15601",
+        "0x0.27f#10",
+        Greater,
+    );
+    test(
+        "0.25",
+        "0x0.4#1",
+        6,
+        10,
+        Ceiling,
+        "0.23413",
+        "0x0.3bf#10",
+        Greater,
+    );
+    test(
+        "0.25",
+        "0x0.4#1",
+        12,
+        10,
+        Floor,
+        "0.46777",
+        "0x0.77c#10",
+        Less,
+    );
+    test(
+        "0.25",
+        "0x0.4#1",
+        1000000,
+        10,
+        Nearest,
+        "38976.0",
+        "0x9.84E+3#10",
+        Less,
+    );
+    test(
+        "0.25",
+        "0x0.4#1",
+        1099511627776,
+        53,
+        Nearest,
+        "42869480286.889137",
+        "0x9fb385b5e.e39e8#53",
+        Less,
+    );
+    test(
+        "1.5",
+        "0x1.8#2",
+        2,
+        10,
+        Floor,
+        "0.31250",
+        "0x0.500#10",
+        Less,
+    );
+    test(
+        "1.5",
+        "0x1.8#2",
+        3,
+        53,
+        Nearest,
+        "0.46924943728350177",
+        "0x0.7820bb2acc8e18#53",
+        Less,
+    );
+    test(
+        "1.5",
+        "0x1.8#2",
+        6,
+        10,
+        Floor,
+        "0.93848",
+        "0x0.f04#10",
+        Less,
+    );
+    test(
+        "1.5",
+        "0x1.8#2",
+        12,
+        10,
+        Nearest,
+        "1.8770",
+        "0x1.e08#10",
+        Less,
+    );
+    test(
+        "1.5",
+        "0x1.8#2",
+        360,
+        53,
+        Nearest,
+        "56.309932474020215",
+        "0x38.4f57bc0fe29c#53",
+        Greater,
+    );
+    test(
+        "1.5",
+        "0x1.8#2",
+        1099511627776,
+        10,
+        Ceiling,
+        "1.7207e11",
+        "0x2.81E+9#10",
+        Greater,
+    );
+    test(
+        "2.0",
+        "0x2.0#1",
+        2,
+        10,
+        Nearest,
+        "0.35254",
+        "0x0.5a4#10",
+        Greater,
+    );
+    test(
+        "2.0",
+        "0x2.0#1",
+        3,
+        10,
+        Ceiling,
+        "0.52930",
+        "0x0.878#10",
+        Greater,
+    );
+    test(
+        "2.0",
+        "0x2.0#1",
+        6,
+        10,
+        Nearest,
+        "1.0566",
+        "0x1.0e8#10",
+        Less,
+    );
+    test(
+        "2.0",
+        "0x2.0#1",
+        7,
+        10,
+        Ceiling,
+        "1.2344",
+        "0x1.3c0#10",
+        Greater,
+    );
+    test(
+        "2.0",
+        "0x2.0#1",
+        360,
+        10,
+        Ceiling,
+        "63.438",
+        "0x3f.7#10",
+        Greater,
+    );
+    test(
+        "2.0",
+        "0x2.0#1",
+        1099511627776,
+        10,
+        Floor,
+        "1.9354e11",
+        "0x2.d1E+9#10",
+        Less,
+    );
+    test(
+        "3.0",
+        "0x3.0#2",
+        1,
+        53,
+        Nearest,
+        "0.19879180882521663",
+        "0x0.32e4051d9df308#53",
+        Less,
+    );
+    test(
+        "3.0",
+        "0x3.0#2",
+        3,
+        10,
+        Floor,
+        "0.59570",
+        "0x0.988#10",
+        Less,
+    );
+    test(
+        "3.0",
+        "0x3.0#2",
+        4,
+        53,
+        Nearest,
+        "0.79516723530086653",
+        "0x0.cb90147677cc20#53",
+        Less,
+    );
+    test("3.0", "0x3.0#2", 7, 10, Floor, "1.3906", "0x1.640#10", Less);
+    test(
+        "3.0",
+        "0x3.0#2",
+        360,
+        10,
+        Floor,
+        "71.500",
+        "0x47.8#10",
+        Less,
+    );
+    test(
+        "3.0",
+        "0x3.0#2",
+        1099511627776,
+        10,
+        Nearest,
+        "2.1851e11",
+        "0x3.2eE+9#10",
+        Less,
+    );
+    test(
+        "-1.0",
+        "-0x1.0#1",
+        1,
+        10,
+        Ceiling,
+        "-0.12500",
+        "-0x0.200#10",
+        Equal,
+    );
+    test(
+        "-1.0",
+        "-0x1.0#1",
+        3,
+        10,
+        Nearest,
+        "-0.37500",
+        "-0x0.600#10",
+        Equal,
+    );
+    test(
+        "-1.0",
+        "-0x1.0#1",
+        4,
+        10,
+        Ceiling,
+        "-0.50000",
+        "-0x0.800#10",
+        Equal,
+    );
+    test(
+        "-1.0",
+        "-0x1.0#1",
+        7,
+        10,
+        Nearest,
+        "-0.87500",
+        "-0x0.e00#10",
+        Equal,
+    );
+    test(
+        "-1.0",
+        "-0x1.0#1",
+        360,
+        10,
+        Nearest,
+        "-45.000",
+        "-0x2d.0#10",
+        Equal,
+    );
+    test(
+        "-1.0",
+        "-0x1.0#1",
+        1000000,
+        10,
+        Ceiling,
+        "-1.2493e5",
+        "-0x1.e80E+4#10",
+        Greater,
+    );
+    test(
+        "100.0",
+        "0x64.0#5",
+        1,
+        10,
+        Floor,
+        "0.24829",
+        "0x0.3f9#10",
+        Less,
+    );
+    test(
+        "100.0",
+        "0x64.0#5",
+        2,
+        53,
+        Nearest,
+        "0.49681700723509176",
+        "0x0.7f2f663e2bdb44#53",
+        Greater,
+    );
+    test(
+        "100.0",
+        "0x64.0#5",
+        4,
+        10,
+        Floor,
+        "0.99316",
+        "0x0.fe4#10",
+        Less,
+    );
+    test(
+        "100.0",
+        "0x64.0#5",
+        6,
+        53,
+        Nearest,
+        "1.4904510217052753",
+        "0x1.7d8e32ba8391d#53",
+        Greater,
+    );
+    test(
+        "100.0",
+        "0x64.0#5",
+        12,
+        10,
+        Ceiling,
+        "2.9844",
+        "0x2.fc#10",
+        Greater,
+    );
+    test(
+        "100.0",
+        "0x64.0#5",
+        1000000,
+        10,
+        Floor,
+        "2.4832e5",
+        "0x3.caE+4#10",
+        Less,
+    );
+    test(
+        "123.45600000000000",
+        "0x7b.74bc6a7ef9dc#53",
+        1,
+        10,
+        Nearest,
+        "0.24878",
+        "0x0.3fb#10",
+        Greater,
+    );
+    test(
+        "123.45600000000000",
+        "0x7b.74bc6a7ef9dc#53",
+        2,
+        10,
+        Ceiling,
+        "0.49756",
+        "0x0.7f6#10",
+        Greater,
+    );
+    test(
+        "123.45600000000000",
+        "0x7b.74bc6a7ef9dc#53",
+        4,
+        10,
+        Nearest,
+        "0.99512",
+        "0x0.fec#10",
+        Greater,
+    );
+    test(
+        "123.45600000000000",
+        "0x7b.74bc6a7ef9dc#53",
+        6,
+        10,
+        Ceiling,
+        "1.4941",
+        "0x1.7e8#10",
+        Greater,
+    );
+    test(
+        "123.45600000000000",
+        "0x7b.74bc6a7ef9dc#53",
+        12,
+        10,
+        Floor,
+        "2.9844",
+        "0x2.fc#10",
+        Less,
+    );
+    test(
+        "123.45600000000000",
+        "0x7b.74bc6a7ef9dc#53",
+        1000000,
+        10,
+        Nearest,
+        "2.4883e5",
+        "0x3.ccE+4#10",
+        Greater,
+    );
+    test(
+        "123.45600000000000",
+        "0x7b.74bc6a7ef9dc#53",
+        1099511627776,
+        53,
+        Nearest,
+        "273460487915.69312",
+        "0x3fab83e6eb.b170#53",
+        Less,
+    );
+    test(
+        "1.00000000e10",
+        "0x2.540be4E+8#24",
+        2,
+        10,
+        Floor,
+        "0.49951",
+        "0x0.7fe#10",
+        Less,
+    );
+    test(
+        "1.00000000e10",
+        "0x2.540be4E+8#24",
+        3,
+        53,
+        Nearest,
+        "0.74999999995225353",
+        "0x0.bfffffffcb8090#53",
+        Greater,
+    );
+    test(
+        "1.00000000e10",
+        "0x2.540be4E+8#24",
+        6,
+        10,
+        Floor,
+        "1.4980",
+        "0x1.7f8#10",
+        Less,
+    );
+    test(
+        "1.00000000e10",
+        "0x2.540be4E+8#24",
+        12,
+        10,
+        Nearest,
+        "3.0000",
+        "0x3.00#10",
+        Greater,
+    );
+    test(
+        "1.00000000e10",
+        "0x2.540be4E+8#24",
+        360,
+        53,
+        Nearest,
+        "89.999999994270425",
+        "0x59.ffffffe76444#53",
+        Greater,
+    );
+    test(
+        "1.00000000e10",
+        "0x2.540be4E+8#24",
+        1099511627776,
+        10,
+        Ceiling,
+        "2.7488e11",
+        "0x4.00E+9#10",
+        Greater,
+    );
+    test(
+        "-0.75",
+        "-0x0.c#2",
+        2,
+        10,
+        Nearest,
+        "-0.20483",
+        "-0x0.347#10",
+        Less,
+    );
+    test(
+        "-0.75",
+        "-0x0.c#2",
+        3,
+        10,
+        Ceiling,
+        "-0.30713",
+        "-0x0.4ea#10",
+        Greater,
+    );
+    test(
+        "-0.75",
+        "-0x0.c#2",
+        6,
+        10,
+        Nearest,
+        "-0.61426",
+        "-0x0.9d4#10",
+        Greater,
+    );
+    test(
+        "-0.75",
+        "-0x0.c#2",
+        7,
+        10,
+        Ceiling,
+        "-0.71680",
+        "-0x0.b78#10",
+        Greater,
+    );
+    test(
+        "-0.75",
+        "-0x0.c#2",
+        360,
+        10,
+        Ceiling,
+        "-36.812",
+        "-0x24.d#10",
+        Greater,
+    );
+    test(
+        "-0.75",
+        "-0x0.c#2",
+        1099511627776,
+        10,
+        Floor,
+        "-1.1261e11",
+        "-0x1.a38E+9#10",
+        Less,
+    );
+    test(
+        "1.0000000000000000e-10",
+        "0x6.df37f675ef6ecE-9#53",
+        1,
+        53,
+        Nearest,
+        "1.5915494309189536e-11",
+        "0x1.17fd03a5404edE-9#53",
+        Greater,
+    );
+    test(
+        "1.0000000000000000e-10",
+        "0x6.df37f675ef6ecE-9#53",
+        3,
+        10,
+        Floor,
+        "4.7692e-11",
+        "0x3.47E-9#10",
+        Less,
+    );
+    test(
+        "1.0000000000000000e-10",
+        "0x6.df37f675ef6ecE-9#53",
+        4,
+        53,
+        Nearest,
+        "6.3661977236758143e-11",
+        "0x4.5ff40e95013b4E-9#53",
+        Greater,
+    );
+    test(
+        "1.0000000000000000e-10",
+        "0x6.df37f675ef6ecE-9#53",
+        7,
+        10,
+        Floor,
+        "1.1130e-10",
+        "0x7.a6E-9#10",
+        Less,
+    );
+    test(
+        "1.0000000000000000e-10",
+        "0x6.df37f675ef6ecE-9#53",
+        360,
+        10,
+        Floor,
+        "5.7262e-9",
+        "0x1.898E-7#10",
+        Less,
+    );
+    test(
+        "1.0000000000000000e-10",
+        "0x6.df37f675ef6ecE-9#53",
+        1099511627776,
+        10,
+        Nearest,
+        "17.500",
+        "0x11.80#10",
+        Greater,
+    );
+    test(
+        "0.12",
+        "0x0.2#1",
+        1,
+        10,
+        Ceiling,
+        "0.019806",
+        "0x0.0512#10",
+        Greater,
+    );
+    test(
+        "0.12",
+        "0x0.2#1",
+        3,
+        10,
+        Nearest,
+        "0.059387",
+        "0x0.0f34#10",
+        Greater,
+    );
+    test(
+        "0.12",
+        "0x0.2#1",
+        4,
+        10,
+        Ceiling,
+        "0.079224",
+        "0x0.1448#10",
+        Greater,
+    );
+    test(
+        "0.12",
+        "0x0.2#1",
+        7,
+        10,
+        Nearest,
+        "0.13843",
+        "0x0.237#10",
+        Less,
+    );
+    test(
+        "0.12",
+        "0x0.2#1",
+        360,
+        10,
+        Nearest,
+        "7.1250",
+        "0x7.20#10",
+        Less,
+    );
+    test(
+        "0.12",
+        "0x0.2#1",
+        1000000,
+        10,
+        Ceiling,
+        "19808.0",
+        "0x4.d6E+3#10",
+        Greater,
+    );
+    test(
+        "1.000000000000000e-30",
+        "0x1.4484bfeebc2aE-25#48",
+        1,
+        53,
+        Floor,
+        "1.5915494309189534e-31",
+        "0x3.3a6134be12ffeE-26#53",
+        Less,
+    );
+    test(
+        "-90.000000000000000000000000000808",
+        "-0x5a.000000000000000000000040#100",
+        360,
+        53,
+        Nearest,
+        "-89.363406424036512",
+        "-0x59.5d08341264a4#53",
+        Greater,
+    );
+    test(
+        "1.0",
+        "0x1.0#1",
+        8,
+        10,
+        Ceiling,
+        "1.0000",
+        "0x1.000#10",
+        Equal,
+    );
+    test(
+        "-3.0",
+        "-0x3.0#2",
+        8,
+        10,
+        Nearest,
+        "-1.5898",
+        "-0x1.970#10",
+        Greater,
+    );
+    test("5.0", "0x5.0#3", 8, 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("5.0", "0x5.0#3", 8, 10, Up, "1.7500", "0x1.c00#10", Greater);
+    test(
+        "7.0",
+        "0x7.0#3",
+        8,
+        10,
+        Ceiling,
+        "1.8203",
+        "0x1.d20#10",
+        Greater,
+    );
+    test(
+        "-9.00",
+        "-0x9.0#4",
+        8,
+        10,
+        Nearest,
+        "-1.8594",
+        "-0x1.dc0#10",
+        Less,
+    );
+    test("1.0", "0x1.0#1", 12, 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("1.0", "0x1.0#1", 12, 10, Up, "1.5000", "0x1.800#10", Equal);
+    test(
+        "5.0",
+        "0x5.0#3",
+        12,
+        10,
+        Ceiling,
+        "2.6250",
+        "0x2.a0#10",
+        Greater,
+    );
+    test(
+        "-7.0",
+        "-0x7.0#3",
+        12,
+        10,
+        Nearest,
+        "-2.7305",
+        "-0x2.bb#10",
+        Less,
+    );
+    test("11.0", "0xb.0#4", 12, 1, Nearest, "2.0", "0x2.0#1", Less);
+    test(
+        "11.0",
+        "0xb.0#4",
+        12,
+        10,
+        Up,
+        "2.8281",
+        "0x2.d4#10",
+        Greater,
+    );
+    test(
+        "1.0",
+        "0x1.0#1",
+        5,
+        10,
+        Ceiling,
+        "0.62500",
+        "0x0.a00#10",
+        Equal,
+    );
+    test(
+        "-2.0",
+        "-0x2.0#1",
+        5,
+        10,
+        Nearest,
+        "-0.88086",
+        "-0x0.e18#10",
+        Greater,
+    );
+    test("3.0", "0x3.0#2", 5, 1, Nearest, "1.0", "0x1.0#1", Greater);
+    test(
+        "3.0",
+        "0x3.0#2",
+        5,
+        10,
+        Up,
+        "0.99414",
+        "0x0.fe8#10",
+        Greater,
+    );
+    test(
+        "4.0",
+        "0x4.0#1",
+        5,
+        10,
+        Ceiling,
+        "1.0566",
+        "0x1.0e8#10",
+        Greater,
+    );
+    test(
+        "-6.0",
+        "-0x6.0#2",
+        5,
+        10,
+        Nearest,
+        "-1.1191",
+        "-0x1.1e8#10",
+        Less,
+    );
+    test("1.0", "0x1.0#1", 10, 1, Nearest, "1.0", "0x1.0#1", Less);
+    test("1.0", "0x1.0#1", 10, 10, Up, "1.2500", "0x1.400#10", Equal);
+    test(
+        "3.0",
+        "0x3.0#2",
+        10,
+        10,
+        Ceiling,
+        "1.9883",
+        "0x1.fd0#10",
+        Greater,
+    );
+    test(
+        "-7.0",
+        "-0x7.0#3",
+        10,
+        10,
+        Nearest,
+        "-2.2734",
+        "-0x2.46#10",
+        Greater,
+    );
+    test("9.00", "0x9.0#4", 10, 1, Nearest, "2.0", "0x2.0#1", Less);
+    test(
+        "9.00",
+        "0x9.0#4",
+        10,
+        10,
+        Up,
+        "2.3242",
+        "0x2.53#10",
+        Greater,
+    );
+    test(
+        "45.0",
+        "0x2d.0#6",
+        360,
+        10,
+        Ceiling,
+        "88.750",
+        "0x58.c#10",
+        Greater,
+    );
+    test(
+        "-135.0",
+        "-0x87.0#8",
+        360,
+        10,
+        Nearest,
+        "-89.625",
+        "-0x59.a#10",
+        Less,
+    );
+    test(
+        "30.0",
+        "0x1e.0#4",
+        360,
+        1,
+        Nearest,
+        "64.0",
+        "0x4.0E+1#1",
+        Less,
+    );
+    test(
+        "30.0",
+        "0x1e.0#4",
+        360,
+        10,
+        Up,
+        "88.125",
+        "0x58.2#10",
+        Greater,
+    );
+    test(
+        "150.0",
+        "0x96.0#7",
+        360,
+        10,
+        Ceiling,
+        "89.625",
+        "0x59.a#10",
+        Greater,
+    );
+    test(
+        "-72.0",
+        "-0x48.0#4",
+        360,
+        10,
+        Nearest,
+        "-89.250",
+        "-0x59.4#10",
+        Less,
+    );
+    test(
+        "144.0",
+        "0x9.0E+1#4",
+        360,
+        1,
+        Nearest,
+        "64.0",
+        "0x4.0E+1#1",
+        Less,
+    );
+    test(
+        "144.0",
+        "0x9.0E+1#4",
+        360,
+        10,
+        Up,
+        "89.625",
+        "0x59.a#10",
+        Greater,
+    );
+    test(
+        "36.0",
+        "0x24.0#4",
+        360,
+        10,
+        Ceiling,
+        "88.500",
+        "0x58.8#10",
+        Greater,
+    );
+    test(
+        "-108.0",
+        "-0x6c.0#5",
+        360,
+        10,
+        Nearest,
+        "-89.500",
+        "-0x59.8#10",
+        Less,
+    );
+    test("2.0", "0x2.0#1", 16, 1, Nearest, "2.0", "0x2.0#1", Less);
+    test("2.0", "0x2.0#1", 16, 10, Up, "2.8203", "0x2.d2#10", Greater);
+    test(
+        "3.0",
+        "0x3.0#2",
+        24,
+        10,
+        Ceiling,
+        "4.7734",
+        "0x4.c6#10",
+        Greater,
+    );
+    test(
+        "-4.0",
+        "-0x4.0#1",
+        20,
+        10,
+        Nearest,
+        "-4.2188",
+        "-0x4.38#10",
+        Greater,
+    );
+    test(
+        "6.0",
+        "0x6.0#2",
+        60,
+        1,
+        Nearest,
+        "16.0",
+        "0x1.0E+1#1",
+        Greater,
+    );
+    test("6.0", "0x6.0#2", 60, 10, Up, "13.438", "0xd.70#10", Greater);
+    test(
+        "3.0",
+        "0x3.0#2",
+        20,
+        30,
+        Ceiling,
+        "3.9758361802",
+        "0x3.f9d0666#30",
+        Greater,
+    );
+    test(
+        "9.00",
+        "0x9.0#4",
+        20,
+        30,
+        Ceiling,
+        "4.6477671266",
+        "0x4.a5d4110#30",
+        Greater,
+    );
+    test(
+        "13.0",
+        "0xd.0#4",
+        20,
+        30,
+        Ceiling,
+        "4.7556274831",
+        "0x4.c170cd8#30",
+        Greater,
+    );
+    test(
+        "19.0",
+        "0x13.0#5",
+        20,
+        30,
+        Ceiling,
+        "4.8326229230",
+        "0x4.d526c6a#30",
+        Greater,
+    );
+    test(
+        "1.0",
+        "0x1.0#1",
+        6,
+        30,
+        Floor,
+        "0.75000000000",
+        "0x0.c0000000#30",
+        Equal,
+    );
+    test(
+        "1.0",
+        "0x1.0#1",
+        8,
+        30,
+        Nearest,
+        "1.0000000000",
+        "0x1.00000000#30",
+        Equal,
+    );
+    test(
+        "2.0",
+        "0x2.0#2",
+        4,
+        10,
+        Nearest,
+        "0.70508",
+        "0x0.b48#10",
+        Greater,
+    );
+    test(
+        "-2.4e-323228497",
+        "-0x1.0E-268435456#1",
+        100,
+        10,
+        Floor,
+        "-3.7935e-323228496",
+        "-0xf.ecE-268435456#10",
+        Less,
+    );
+    test(
+        "-2.4e-323228497",
+        "-0x1.0E-268435456#1",
+        100,
+        10,
+        Down,
+        "-3.7898e-323228496",
+        "-0xf.e8E-268435456#10",
+        Greater,
+    );
+    test(
+        "2.4e-323228497",
+        "0x1.0E-268435456#1",
+        4,
+        1,
+        Up,
+        "2.4e-323228497",
+        "0x1.0E-268435456#1",
+        Greater,
+    );
+    // fifths and tenths of a turn, where the cosine is a multiple of the golden ratio
+    test(
+        "1.0",
+        "0x1.0#1",
+        5,
+        10,
+        Nearest,
+        "0.62500",
+        "0x0.a00#10",
+        Equal,
+    );
+    test(
+        "1.0",
+        "0x1.0#1",
+        5,
+        20,
+        Nearest,
+        "0.62500000",
+        "0x0.a0000#20",
+        Equal,
+    );
+    test(
+        "1.0",
+        "0x1.0#1",
+        5,
+        20,
+        Floor,
+        "0.62500000",
+        "0x0.a0000#20",
+        Equal,
+    );
+    test(
+        "1.0",
+        "0x1.0#1",
+        5,
+        20,
+        Ceiling,
+        "0.62500000",
+        "0x0.a0000#20",
+        Equal,
+    );
+    test(
+        "2.0",
+        "0x2.0#1",
+        5,
+        20,
+        Nearest,
+        "0.88104057",
+        "0x0.e18be#20",
+        Less,
+    );
+    test(
+        "3.0",
+        "0x3.0#2",
+        5,
+        20,
+        Nearest,
+        "0.99395943",
+        "0x0.fe742#20",
+        Greater,
+    );
+    test(
+        "4.0",
+        "0x4.0#1",
+        5,
+        20,
+        Nearest,
+        "1.0550518",
+        "0x1.0e17e#20",
+        Less,
+    );
+    test(
+        "-1.0",
+        "-0x1.0#1",
+        5,
+        20,
+        Nearest,
+        "-0.62500000",
+        "-0x0.a0000#20",
+        Equal,
+    );
+    test(
+        "-2.0",
+        "-0x2.0#1",
+        5,
+        20,
+        Nearest,
+        "-0.88104057",
+        "-0x0.e18be#20",
+        Greater,
+    );
+    test(
+        "6.0",
+        "0x6.0#2",
+        5,
+        20,
+        Nearest,
+        "1.1185780",
+        "0x1.1e5b2#20",
+        Less,
+    );
+    test(
+        "1.0",
+        "0x1.0#1",
+        10,
+        10,
+        Nearest,
+        "1.2500",
+        "0x1.400#10",
+        Equal,
+    );
+    test(
+        "1.0",
+        "0x1.0#1",
+        10,
+        20,
+        Nearest,
+        "1.2500000",
+        "0x1.40000#20",
+        Equal,
+    );
+    test(
+        "1.0",
+        "0x1.0#1",
+        10,
+        20,
+        Floor,
+        "1.2500000",
+        "0x1.40000#20",
+        Equal,
+    );
+    test(
+        "1.0",
+        "0x1.0#1",
+        10,
+        20,
+        Ceiling,
+        "1.2500000",
+        "0x1.40000#20",
+        Equal,
+    );
+    test(
+        "3.0",
+        "0x3.0#2",
+        10,
+        20,
+        Nearest,
+        "1.9879189",
+        "0x1.fce84#20",
+        Greater,
+    );
+    test(
+        "7.0",
+        "0x7.0#3",
+        10,
+        20,
+        Nearest,
+        "2.2741623",
+        "0x2.462f8#20",
+        Less,
+    );
+    test(
+        "9.00",
+        "0x9.0#4",
+        10,
+        20,
+        Nearest,
+        "2.3238831",
+        "0x2.52ea0#20",
+        Less,
+    );
+    test(
+        "-1.0",
+        "-0x1.0#1",
+        10,
+        20,
+        Nearest,
+        "-1.2500000",
+        "-0x1.40000#20",
+        Equal,
+    );
+    test(
+        "-3.0",
+        "-0x3.0#2",
+        10,
+        20,
+        Nearest,
+        "-1.9879189",
+        "-0x1.fce84#20",
+        Less,
+    );
+    test(
+        "11.0",
+        "0xb.0#4",
+        10,
+        20,
+        Nearest,
+        "2.3557091",
+        "0x2.5b0fc#20",
+        Less,
+    );
+    test(
+        "72.0",
+        "0x48.0#4",
+        360,
+        20,
+        Nearest,
+        "89.204224",
+        "0x59.3448#20",
+        Less,
+    );
+    test(
+        "36.0",
+        "0x24.0#4",
+        360,
+        20,
+        Nearest,
+        "88.408813",
+        "0x58.68a8#20",
+        Less,
+    );
+    test(
+        "108.0",
+        "0x6c.0#5",
+        360,
+        20,
+        Nearest,
+        "89.469482",
+        "0x59.7830#20",
+        Less,
+    );
+    test(
+        "144.0",
+        "0x9.0E+1#4",
+        360,
+        20,
+        Nearest,
+        "89.602173",
+        "0x59.9a28#20",
+        Greater,
+    );
+}
+
+#[test]
+#[should_panic]
+fn atan_with_period_prec_round_fail_1() {
+    Float::ONE.atan_with_period_prec_round(7, 0, Floor);
+}
+
+#[test]
+#[should_panic]
+fn atan_with_period_prec_round_fail_2() {
+    // atan(2) is not an exact number of sevenths of a turn
+    Float::from(2u32).atan_with_period_prec_round(7, 10, Exact);
+}
+
+#[test]
+#[should_panic]
+fn atan_with_period_prec_round_fail_3() {
+    // an eighth of a turn needs more than 3 bits when u = 7
+    Float::ONE.atan_with_period_prec_round(7, 1, Exact);
+}
+
+#[test]
+#[should_panic]
+fn atan_with_period_prec_round_ref_fail() {
+    Float::ONE.atan_with_period_prec_round_ref(7, 0, Floor);
+}
+
+#[test]
+#[should_panic]
+fn atan_with_period_prec_fail() {
+    Float::ONE.atan_with_period_prec(7, 0);
+}
+
+#[test]
+#[should_panic]
+fn atan_with_period_round_fail() {
+    Float::from(2u32).atan_with_period_round(7, Exact);
+}
+
+// Whether atanu(x, u) is exactly representable at `prec`: only at zero and NaN, at u = 0, and at
+// |x| = 1 or infinity, where the result is an eighth or a quarter turn and `prec` must be wide
+// enough to hold it.
+fn atan_with_period_exact(x: &Float, u: u64, prec: u64) -> bool {
+    x.is_nan()
+        || *x == 0u32
+        || u == 0
+        || (x.eq_abs(&1u32) && Float::from_unsigned_prec(u, prec).1 == Equal)
+        || (!x.is_finite() && Float::from_unsigned_prec(u, prec).1 == Equal)
+}
+
+#[allow(clippy::needless_pass_by_value)]
+fn atan_with_period_prec_round_properties_helper(x: Float, u: u64, prec: u64, rm: RoundingMode) {
+    if rm == Exact && !atan_with_period_exact(&x, u, prec) {
+        assert_panic!(x.atan_with_period_prec_round_ref(u, prec, Exact));
+        return;
+    }
+    let (t, o) = x.clone().atan_with_period_prec_round(u, prec, rm);
+    assert!(t.is_valid());
+    assert_rounding_ordering_consistent(&t, rm, o);
+
+    let (t_alt, o_alt) = x.atan_with_period_prec_round_ref(u, prec, rm);
+    assert!(t_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
+    assert_eq!(o_alt, o);
+
+    let mut t_alt = x.clone();
+    let o_alt = t_alt.atan_with_period_prec_round_assign(u, prec, rm);
+    assert!(t_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
+    assert_eq!(o_alt, o);
+
+    if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm)
+        && u <= u64::from(u32::MAX)
+    {
+        let (rug_t, rug_o) =
+            rug_atan_with_period_prec_round(&rug::Float::exact_from(&x), u, prec, rug_rm);
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_t)),
+            ComparableFloatRef(&t)
+        );
+        assert_eq!(rug_o, o);
+    }
+
+    // NaN exactly for a NaN input
+    assert_eq!(t.is_nan(), x.is_nan());
+    if !t.is_nan() {
+        // |atanu(x, u)| <= u/4, a quarter turn, and the result never overflows
+        assert!(t.is_finite());
+        assert!(PartialOrdAbs::le_abs(
+            &t,
+            &Float::from_unsigned_prec(u, prec + 2).0
+        ));
+        if t.is_normal() {
+            assert_eq!(t.get_prec(), Some(prec));
+        }
+        // atan_with_period is odd
+        let (t_neg, o_neg) = (-&x).atan_with_period_prec_round(u, prec, -rm);
+        assert_eq!(ComparableFloatRef(&t_neg), ComparableFloatRef(&-&t));
+        assert_eq!(o_neg, o.reverse());
+    }
+
+    if o == Equal {
+        assert!(atan_with_period_exact(&x, u, prec));
+        for rm in exhaustive_rounding_modes() {
+            let (t2, oo) = x.atan_with_period_prec_round_ref(u, prec, rm);
+            assert_eq!(ComparableFloatRef(&t2), ComparableFloatRef(&t));
+            assert_eq!(oo, Equal);
+        }
+    } else {
+        assert_panic!(x.atan_with_period_prec_round_ref(u, prec, Exact));
+    }
+}
+
+#[test]
+fn atan_with_period_prec_round_properties() {
+    float_unsigned_unsigned_rounding_mode_quadruple_gen_var_17().test_properties(
+        |(x, u, prec, rm)| {
+            atan_with_period_prec_round_properties_helper(x, u, prec, rm);
+        },
+    );
+
+    float_unsigned_unsigned_rounding_mode_quadruple_gen_var_18().test_properties(
+        |(x, u, prec, rm)| {
+            atan_with_period_prec_round_properties_helper(x, u, prec, rm);
+        },
+    );
+
+    unsigned_rounding_mode_pair_gen_var_3().test_properties(|(prec, rm)| {
+        // atanu(NaN, u) = NaN
+        let (t, o) = Float::NAN.atan_with_period_prec_round(4, prec, rm);
+        assert!(t.is_nan());
+        assert_eq!(o, Equal);
+        // atanu(±0.0, u) = ±0.0, exactly
+        let (t, o) = Float::ZERO.atan_with_period_prec_round(4, prec, rm);
+        assert_eq!(ComparableFloat(t), ComparableFloat(Float::ZERO));
+        assert_eq!(o, Equal);
+        let (t, o) = Float::NEGATIVE_ZERO.atan_with_period_prec_round(4, prec, rm);
+        assert_eq!(ComparableFloat(t), ComparableFloat(Float::NEGATIVE_ZERO));
+        assert_eq!(o, Equal);
+        // atanu(x, 0) = ±0.0 with the sign of x, exactly, which keeps the function odd
+        let (t, o) = Float::ONE.atan_with_period_prec_round(0, prec, rm);
+        assert_eq!(ComparableFloat(t), ComparableFloat(Float::ZERO));
+        assert_eq!(o, Equal);
+        let (t, o) = (-Float::ONE).atan_with_period_prec_round(0, prec, rm);
+        assert_eq!(ComparableFloat(t), ComparableFloat(Float::NEGATIVE_ZERO));
+        assert_eq!(o, Equal);
+        let (t, o) = Float::INFINITY.atan_with_period_prec_round(0, prec, rm);
+        assert_eq!(ComparableFloat(t), ComparableFloat(Float::ZERO));
+        assert_eq!(o, Equal);
+        // atanu(±infinity, u) = ±u/4 and atanu(±1, u) = ±u/8, both exact when `prec` holds them
+        for (x, k) in [(Float::INFINITY, 2u32), (Float::ONE, 3)] {
+            let (q, o_q) = Float::from_unsigned_prec_round(8u32, prec, rm);
+            let (t, o) = x.atan_with_period_prec_round(8, prec, rm);
+            assert_eq!(ComparableFloat(t), ComparableFloat(q >> k));
+            assert_eq!(o, o_q);
+        }
+    });
+}
+
+#[test]
+fn atan_with_period_prec_properties() {
+    float_unsigned_unsigned_triple_gen_var_1::<u64, u64>().test_properties(|(x, u, prec)| {
+        let (t, o) = x.clone().atan_with_period_prec(u, prec);
+        assert!(t.is_valid());
+        let (t_alt, o_alt) = x.atan_with_period_prec_ref(u, prec);
+        assert!(t_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
+        assert_eq!(o_alt, o);
+        let (t_alt, o_alt) = x.atan_with_period_prec_round_ref(u, prec, Nearest);
+        assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
+        assert_eq!(o_alt, o);
+        let mut t_alt = x.clone();
+        let o_alt = t_alt.atan_with_period_prec_assign(u, prec);
+        assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
+        assert_eq!(o_alt, o);
+    });
+}
+
+#[test]
+fn atan_with_period_round_properties() {
+    float_unsigned_rounding_mode_triple_gen_var_39().test_properties(|(x, u, rm)| {
+        if rm == Exact && !atan_with_period_exact(&x, u, x.significant_bits()) {
+            assert_panic!(x.atan_with_period_round_ref(u, Exact));
+            return;
+        }
+        let (t, o) = x.clone().atan_with_period_round(u, rm);
+        assert!(t.is_valid());
+        assert_rounding_ordering_consistent(&t, rm, o);
+        let (t_alt, o_alt) = x.atan_with_period_round_ref(u, rm);
+        assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
+        assert_eq!(o_alt, o);
+        let (t_alt, o_alt) = x.atan_with_period_prec_round_ref(u, x.significant_bits(), rm);
+        assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
+        assert_eq!(o_alt, o);
+        let mut t_alt = x.clone();
+        let o_alt = t_alt.atan_with_period_round_assign(u, rm);
+        assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
+        assert_eq!(o_alt, o);
+    });
+}
+
+#[test]
+fn atan_with_period_properties() {
+    float_unsigned_pair_gen_var_2::<u64>().test_properties(|(x, u)| {
+        let t = x.clone().atan_with_period(u);
+        assert!(t.is_valid());
+        let t_alt = x.atan_with_period_ref(u);
+        assert!(t_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
+        let mut t_alt = x.clone();
+        t_alt.atan_with_period_assign(u);
+        assert!(t_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
+        let (t_alt, _) = x.atan_with_period_prec_round_ref(u, x.significant_bits(), Nearest);
+        assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
+        // atan_with_period is odd
+        assert_eq!(
+            ComparableFloatRef(&(-&x).atan_with_period_ref(u)),
+            ComparableFloatRef(&-&t)
+        );
+    });
+}
+
+#[test]
+#[allow(clippy::type_repetition_in_bounds)]
+fn test_primitive_float_atan_with_period() {
+    fn test<T: PrimitiveFloat>(x: T, u: u64, out: T)
+    where
+        Float: From<T> + PartialOrd<T>,
+        for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    {
+        assert_eq!(
+            NiceFloat(primitive_float_atan_with_period(x, u)),
+            NiceFloat(out)
+        );
+    }
+    test::<f32>(f32::NAN, 360, f32::NAN);
+    test::<f32>(f32::INFINITY, 360, 90.0);
+    test::<f32>(f32::NEGATIVE_INFINITY, 360, -90.0);
+    test::<f32>(1.0, 0, 0.0);
+    test::<f32>(0.0, 360, 0.0);
+    test::<f32>(-0.0, 360, -0.0);
+    test::<f32>(90.0, 360, 89.3634);
+    test::<f32>(-90.0, 360, -89.3634);
+    test::<f32>(270.0, 360, 89.787796);
+    test::<f32>(180.0, 360, 89.681694);
+    test::<f32>(-180.0, 360, -89.681694);
+    test::<f32>(360.0, 360, 89.84084);
+    test::<f32>(45.0, 360, 88.72697);
+    test::<f32>(135.0, 360, 89.57559);
+    test::<f32>(30.0, 360, 88.09085);
+    test::<f32>(60.0, 360, 89.04516);
+    test::<f32>(120.0, 360, 89.522545);
+    test::<f32>(1.0, 7, 0.875);
+    test::<f32>(-1.0, 7, -0.875);
+    test::<f32>(2.0, 7, 1.2334573);
+    test::<f32>(1.0, 360, 45.0);
+    test::<f32>(100.0, 360, 89.42706);
+    test::<f32>(10000000000.0, 360, 90.0);
+    test::<f32>(1.0e30, 7, 1.75);
+    test::<f32>(1.0e-30, 7, 1.1140846e-30);
+    test::<f32>(3.4028235e38, 360, 90.0);
+    test::<f32>(0.5, 1, 0.07379181);
+    test::<f32>(0.25, 1, 0.038989566);
+    test::<f32>(0.1, 1, 0.01586276);
+    test::<f32>(1.0e-45, 1, 0.0);
+    test::<f32>(1.0e-45, 360, 8.0e-44);
+    test::<f64>(f64::NAN, 360, f64::NAN);
+    test::<f64>(f64::INFINITY, 360, 90.0);
+    test::<f64>(f64::NEGATIVE_INFINITY, 360, -90.0);
+    test::<f64>(1.0, 0, 0.0);
+    test::<f64>(0.0, 360, 0.0);
+    test::<f64>(-0.0, 360, -0.0);
+    test::<f64>(90.0, 360, 89.36340642403651);
+    test::<f64>(-90.0, 360, -89.36340642403651);
+    test::<f64>(270.0, 360, 89.78779437951188);
+    test::<f64>(180.0, 360, 89.68169338854864);
+    test::<f64>(-180.0, 360, -89.68169338854864);
+    test::<f64>(360.0, 360, 89.84084546625535);
+    test::<f64>(45.0, 360, 88.72696997994329);
+    test::<f64>(135.0, 360, 89.57559458063852);
+    test::<f64>(30.0, 360, 88.09084756700362);
+    test::<f64>(60.0, 360, 89.04515874612781);
+    test::<f64>(120.0, 360, 89.52254622269042);
+    test::<f64>(1.0, 7, 0.875);
+    test::<f64>(-1.0, 7, -0.875);
+    test::<f64>(2.0, 7, 1.2334573382234835);
+    test::<f64>(1.0, 360, 45.0);
+    test::<f64>(100.0, 360, 89.42706130231652);
+    test::<f64>(10000000000.0, 360, 89.99999999427042);
+    test::<f64>(1.0e100, 7, 1.75);
+    test::<f64>(1.0e-100, 7, 1.1140846016432673e-100);
+    test::<f64>(1.7976931348623157e308, 360, 90.0);
+    test::<f64>(0.5, 1, 0.07379180882521663);
+    test::<f64>(0.25, 1, 0.03898956518868466);
+    test::<f64>(0.1, 1, 0.015862758715276787);
+    test::<f64>(5.0e-324, 1, 0.0);
+    test::<f64>(5.0e-324, 360, 2.8e-322);
+    test::<f32>(72.0, 360, 89.20428);
+    test::<f32>(36.0, 360, 88.40886);
+    test::<f32>(108.0, 360, 89.4695);
+    test::<f32>(144.0, 360, 89.60212);
+    test::<f64>(72.0, 360, 89.20427644726072);
+    test::<f64>(36.0, 360, 88.40885972880541);
+    test::<f64>(108.0, 360, 89.4694986833262);
+    test::<f64>(144.0, 360, 89.60211903816541);
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn primitive_float_atan_with_period_properties_helper<T: PrimitiveFloat>()
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    primitive_float_unsigned_pair_gen_var_1::<T, u64>().test_properties(|(x, u)| {
+        let t = primitive_float_atan_with_period(x, u);
+        // NaN exactly for a NaN input
+        assert_eq!(t.is_nan(), x.is_nan());
+        if !x.is_nan() {
+            // odd
+            assert_eq!(
+                NiceFloat(primitive_float_atan_with_period(-x, u)),
+                NiceFloat(-t)
+            );
+            // the same as the `Float` version taken with 64 bits to spare and rounded once
+            let (t_float, _) =
+                Float::atan_with_period_prec(Float::from(x), u, T::MANTISSA_WIDTH + 64);
+            assert_eq!(
+                NiceFloat(T::rounding_from(&t_float, Nearest).0),
+                NiceFloat(t)
+            );
+            // the result never overflows, since it is at most a quarter turn
+            assert!(t.is_finite());
+        }
+    });
+
+    primitive_float_gen::<T>().test_properties(|x| {
+        // u = 0 gives a zero with the sign of x, and an infinite input a quarter turn
+        assert_eq!(primitive_float_atan_with_period(x, 0).is_nan(), x.is_nan());
+    });
+}
+
+#[test]
+fn primitive_float_atan_with_period_properties() {
+    apply_fn_to_primitive_floats!(primitive_float_atan_with_period_properties_helper);
+}
+
+// A tiny input with a small period, where the result is about xu/(2 pi) and falls below the
+// smallest positive `Float`. MPFR's wider exponent range never reaches this, so the quotient is
+// formed with the numerator scaled up and the underflow decided by the rounding mode alone.
+#[test]
+fn test_atan_with_period_underflow() {
+    let min_positive = Float::min_positive_value_prec(10);
+    let tiny = Float::one_prec(10) >> (1u64 << 30);
+    for (rm, expected, o_out) in [
+        (Nearest, Float::ZERO, Less),
+        (Floor, Float::ZERO, Less),
+        (Down, Float::ZERO, Less),
+        (Ceiling, min_positive.clone(), Greater),
+        (Up, min_positive.clone(), Greater),
+    ] {
+        let (t, o) = tiny.atan_with_period_prec_round_ref(1, 10, rm);
+        assert_eq!(ComparableFloat(t), ComparableFloat(expected));
+        assert_eq!(o, o_out);
+    }
+    // the function is odd, so the negation mirrors
+    let (t, o) = (-&tiny).atan_with_period_prec_round_ref(1, 10, Nearest);
+    assert_eq!(ComparableFloat(t), ComparableFloat(Float::NEGATIVE_ZERO));
+    assert_eq!(o, Greater);
+    // with u = 8 the result is representable after all
+    let (t, o) = tiny.atan_with_period_prec_round_ref(8, 10, Nearest);
+    assert!(t > 0u32);
+    assert_eq!(o, Greater);
 }
