@@ -339,6 +339,15 @@ documented by git history.
   that, so the quotient is formed with the numerator scaled up and the underflow decided by the
   rounding mode alone. `primitive_float_atan_with_period` gives the correctly rounded `f32` or
   `f64` arctangent in $u$ths of a turn.
+- `atan_with_period_rational_prec_round` and `atan_with_period_rational_prec` (with `_ref`
+  variants), which take a `Rational` instead. MPFR has no such function. The scaled Ziv loop is
+  shared with the `Float` version, with the arctangent supplied by the `Rational` one, so the two
+  ends of the exponent range are handled as they are there. The exception is an input below the
+  bottom of the range, which is not a `Float` at all: its arctangent is its own leading term, so
+  the quotient is formed from the input itself. That is not merely cheaper but necessary, since a
+  large $u$ can lift the quotient back into the range, where the `Rational` arctangent's own
+  underflow answer would be wrong. `primitive_float_atan_with_period_rational` gives the correctly
+  rounded `f32` or `f64` arctangent of a `Rational` in $u$ths of a turn.
 - `Cot` and `CotAssign` (new traits in malachite-base) for `Float`, with the usual
   `cot_prec_round`, `cot_prec`, `cot_round`, and `_ref`/`_assign` variants: a port of `mpfr_cot`,
   MPFR's generic reciprocal template with the tangent. MPFR's tangent is itself a quotient of a
