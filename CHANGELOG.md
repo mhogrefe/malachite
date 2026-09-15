@@ -357,6 +357,18 @@ documented by git history.
   and a zero input gives $\pm0.0$. Overflow is impossible, since the result is under $1/2$ in
   magnitude. `primitive_float_atan_pi` and `primitive_float_atan_pi_rational` give the correctly
   rounded `f32` or `f64` arctangent in half-turns.
+- `Atan2` and `Atan2Assign` (new traits in malachite-base) for `Float`, with the usual
+  `atan2_prec_round`, `atan2_prec`, `atan2_round`, and `_val_ref`/`_ref_val`/`_ref_ref`/`_assign`
+  variants: a port of `mpfr_atan2`, the angle of the point $(x,y)$ measured from the positive
+  $x$-axis. The twenty ISO C99 special cases are honored, with the sign of a zero argument choosing
+  the quadrant: an infinite $y$ gives a quarter turn against a finite $x$, an eighth against
+  $+\infty$, and three-eighths against $-\infty$; a zero $y$ gives $\pm0.0$ for a positive-signed
+  $x$ and $\pm\pi$ for a negative-signed one. The zero results are the only exact cases. Overflow
+  is impossible, since the result is at most $\pi$ in magnitude, but the result underflows for a
+  positive $x$ with a tiny $|y/x|$. MPFR widens its exponent range for the whole computation, so
+  its quotient $y/x$ is always representable; in Malachite's range it need not be, and a quotient
+  beyond the top is taken from the limit $\pi/2$ instead. `primitive_float_atan2` gives the
+  correctly rounded `f32` or `f64` angle.
 - `Cot` and `CotAssign` (new traits in malachite-base) for `Float`, with the usual
   `cot_prec_round`, `cot_prec`, `cot_round`, and `_ref`/`_assign` variants: a port of `mpfr_cot`,
   MPFR's generic reciprocal template with the tangent. MPFR's tangent is itself a quotient of a

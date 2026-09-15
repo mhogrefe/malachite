@@ -990,6 +990,20 @@ pub trait AtanAssign {
     fn atan_assign(&mut self);
 }
 
+/// Computes $\operatorname{atan2}(y,x)$, the angle of the point $(x,y)$ measured from the positive
+/// $x$-axis.
+pub trait Atan2<RHS = Self> {
+    type Output;
+
+    fn atan2(self, other: RHS) -> Self::Output;
+}
+
+/// Replaces a number $y$ with $\operatorname{atan2}(y,x)$, the angle of the point $(x,y)$ measured
+/// from the positive $x$-axis.
+pub trait Atan2Assign<RHS = Self> {
+    fn atan2_assign(&mut self, other: RHS);
+}
+
 /// Replaces a number with its sine, $\sin(x)$, and writes its cosine, $\cos(x)$, to a second
 /// number.
 pub trait SinCosAssign {

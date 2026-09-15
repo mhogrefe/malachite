@@ -23,6 +23,7 @@ pub(crate) fn register(runner: &mut Runner) {
     cos::register(runner);
     csc::register(runner);
     atan::register(runner);
+    atan2::register(runner);
     cot::register(runner);
     div::register(runner);
     dot::register(runner);
@@ -83,6 +84,7 @@ mod add;
 mod add_mul;
 mod agm;
 mod atan;
+mod atan2;
 mod average;
 mod canonical_unit_i_pow;
 mod canonicalize_unit;

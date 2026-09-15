@@ -28,6 +28,10 @@ pub mod agm;
 /// [`AtanAssign`](malachite_base::num::arithmetic::traits::AtanAssign), traits for computing the
 /// arctangent of [`Float`](super::Float)s.
 pub mod atan;
+/// Implementations of [`Atan2`](malachite_base::num::arithmetic::traits::Atan2) and
+/// [`Atan2Assign`](malachite_base::num::arithmetic::traits::Atan2Assign), traits for computing the
+/// angle of a point given by two [`Float`](super::Float) coordinates.
+pub mod atan2;
 /// [`Average`](malachite_base::num::arithmetic::traits::Average) and
 /// [`AverageAssign`](malachite_base::num::arithmetic::traits::AverageAssign), traits for computing
 /// the average (arithmetic mean) of two numbers, and the associated precision- and
