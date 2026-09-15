@@ -6767,6 +6767,33 @@ pub fn exhaustive_rational_rational_unsigned_rounding_mode_quadruple_gen_var_1()
     )
 }
 
+// The result is exact only when it is zero, which needs y = 0 and a nonnegative x.
+pub fn atan2_rational_prec_round_valid(
+    y: &Rational,
+    x: &Rational,
+    _prec: u64,
+    rm: RoundingMode,
+) -> bool {
+    rm != Exact || (*y == 0u32 && *x >= 0u32)
+}
+
+pub fn exhaustive_rational_rational_unsigned_rounding_mode_quadruple_gen_var_4()
+-> It<(Rational, Rational, u64, RoundingMode)> {
+    Box::new(
+        reshape_3_1_to_4(Box::new(lex_pairs(
+            exhaustive_triples_xxy_custom_output(
+                exhaustive_rationals(),
+                exhaustive_positive_primitive_ints::<u64>(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )))
+        .filter(|(y, x, prec, rm)| atan2_rational_prec_round_valid(y, x, *prec, *rm)),
+    )
+}
+
 pub fn log_base_rational_rational_base_prec_round_valid(
     x: &Rational,
     base: &Rational,

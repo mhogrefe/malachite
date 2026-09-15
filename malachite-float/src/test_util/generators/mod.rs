@@ -5745,6 +5745,17 @@ pub fn rational_rational_unsigned_rounding_mode_quadruple_gen_var_3()
     )
 }
 
+// All `(Rational, Rational, u64, RoundingMode)` that are valid inputs to
+// `Float::atan2_rational_prec_round`.
+pub fn rational_rational_unsigned_rounding_mode_quadruple_gen_var_4()
+-> Generator<(Rational, Rational, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_rational_rational_unsigned_rounding_mode_quadruple_gen_var_4,
+        &random_rational_rational_unsigned_rounding_mode_quadruple_gen_var_4,
+        &special_random_rational_rational_unsigned_rounding_mode_quadruple_gen_var_4,
+    )
+}
+
 // -- (Rational, Float, PrimitiveUnsigned, RoundingMode) --
 
 // All `(Rational, Float, u64, RoundingMode)` that are valid inputs to

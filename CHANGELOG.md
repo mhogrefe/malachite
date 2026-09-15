@@ -369,6 +369,13 @@ documented by git history.
   its quotient $y/x$ is always representable; in Malachite's range it need not be, and a quotient
   beyond the top is taken from the limit $\pi/2$ instead. `primitive_float_atan2` gives the
   correctly rounded `f32` or `f64` angle.
+- `atan2_rational_prec_round` and `atan2_rational_prec` (with `_ref` variants), which take
+  `Rational` arguments. MPFR has no such function. A `Rational` has no NaN, no infinities, and no
+  signed zeros, so the special cases collapse to two: a zero $y$ gives $0.0$ for a nonnegative $x$
+  and $\pi$ for a negative one, and a zero $x$ gives $\pm\pi/2$ with the sign of $y$. The zero
+  result is the only exact case. The quotient $y/x$ is formed exactly, so nothing corresponds to
+  the `Float` case's division, its underflow, or its overflow beyond the exponent range.
+  `primitive_float_atan2_rational` gives the correctly rounded `f32` or `f64` angle.
 - `Cot` and `CotAssign` (new traits in malachite-base) for `Float`, with the usual
   `cot_prec_round`, `cot_prec`, `cot_round`, and `_ref`/`_assign` variants: a port of `mpfr_cot`,
   MPFR's generic reciprocal template with the tangent. MPFR's tangent is itself a quotient of a

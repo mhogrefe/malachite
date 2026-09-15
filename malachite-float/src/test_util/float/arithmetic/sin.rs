@@ -41,7 +41,7 @@ pub fn rug_sin_rational_prec_round(x: &Rational, prec: u64, rm: Round) -> (rug::
     let exponent_bits = if *x == 0u32 {
         0
     } else {
-        u64::try_from(x.floor_log_base_2_abs()).unwrap_or(0)
+        x.floor_log_base_2_abs().unsigned_abs()
     };
     let denominator_bits = x.denominator_ref().significant_bits();
     let rx = rug::Float::with_val(
@@ -84,7 +84,7 @@ pub fn rug_sin_with_period_rational_prec_round(
     let exponent_bits = if *x == 0u32 {
         0
     } else {
-        u64::try_from(x.floor_log_base_2_abs()).unwrap_or(0)
+        x.floor_log_base_2_abs().unsigned_abs()
     };
     let denominator_bits = x.denominator_ref().significant_bits();
     let rx = rug::Float::with_val(
@@ -118,7 +118,7 @@ pub fn rug_sin_pi_rational_prec_round(
     let exponent_bits = if *x == 0u32 {
         0
     } else {
-        u64::try_from(x.floor_log_base_2_abs()).unwrap_or(0)
+        x.floor_log_base_2_abs().unsigned_abs()
     };
     let denominator_bits = x.denominator_ref().significant_bits();
     let rx = rug::Float::with_val(

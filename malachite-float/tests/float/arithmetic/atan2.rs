@@ -14,13 +14,18 @@ use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeZero, One, Zero,
 };
 use malachite_base::num::comparison::traits::PartialOrdAbs;
-use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
-use malachite_base::test_util::generators::{primitive_float_gen, primitive_float_pair_gen};
-use malachite_float::float::arithmetic::atan2::primitive_float_atan2;
+use malachite_base::test_util::generators::{
+    primitive_float_gen, primitive_float_pair_gen, primitive_float_pair_gen_var_1,
+    unsigned_rounding_mode_pair_gen_var_3,
+};
+use malachite_float::float::arithmetic::atan2::{
+    primitive_float_atan2, primitive_float_atan2_rational,
+};
 use malachite_float::test_util::common::{
     assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
     to_hex_string,
@@ -31,9 +36,13 @@ use malachite_float::test_util::generators::{
     float_float_unsigned_rounding_mode_quadruple_gen_var_24,
     float_float_unsigned_rounding_mode_quadruple_gen_var_25, float_float_unsigned_triple_gen_var_1,
     float_pair_gen, float_unsigned_rounding_mode_triple_gen_var_1,
+    rational_rational_unsigned_rounding_mode_quadruple_gen_var_4,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
+use malachite_q::Rational;
+use malachite_q::test_util::generators::rational_pair_gen;
 use std::panic::catch_unwind;
+use std::str::FromStr;
 
 #[test]
 fn test_atan2_prec_round() {
@@ -23212,4 +23221,9107 @@ fn test_atan2_out_of_range_quotient() {
         }
     }
     assert_eq!(count, 420);
+}
+
+// Whether atan2(y, x) is exactly representable for `Rational` arguments: only the zero result.
+fn atan2_rational_exact(y: &Rational, x: &Rational) -> bool {
+    *y == 0u32 && *x >= 0u32
+}
+
+#[allow(clippy::needless_pass_by_value)]
+fn atan2_rational_prec_round_properties_helper(
+    y: Rational,
+    x: Rational,
+    prec: u64,
+    rm: RoundingMode,
+) {
+    if rm == Exact && !atan2_rational_exact(&y, &x) {
+        assert_panic!(Float::atan2_rational_prec_round_ref(&y, &x, prec, Exact));
+        return;
+    }
+    let (t, o) = Float::atan2_rational_prec_round(y.clone(), x.clone(), prec, rm);
+    assert!(t.is_valid());
+    assert_rounding_ordering_consistent(&t, rm, o);
+
+    let (t_alt, o_alt) = Float::atan2_rational_prec_round_ref(&y, &x, prec, rm);
+    assert!(t_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
+    assert_eq!(o_alt, o);
+
+    // the oracle: rug's atan2 on inputs widened by their denominators' worth of extra bits and by
+    // the quotient's exponent. That last term is load-bearing: when y/x is a short dyadic z,
+    // atan(z) sits a relative z^2/3 below z, so an input perturbation above that size pushes the
+    // oracle to the wrong side of a representable value.
+    if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm) {
+        let exponent_bits = if y == 0u32 || x == 0u32 {
+            0
+        } else {
+            (&y / &x).floor_log_base_2_abs().unsigned_abs()
+        };
+        let extra = 128
+            + (exponent_bits << 1)
+            + y.denominator_ref().significant_bits()
+            + x.denominator_ref().significant_bits();
+        let ry = rug::Float::with_val(u32::exact_from(prec + extra), rug::Rational::exact_from(&y));
+        let rx = rug::Float::with_val(u32::exact_from(prec + extra), rug::Rational::exact_from(&x));
+        let (rug_t, rug_o) = rug_atan2_prec_round(&ry, &rx, prec, rug_rm);
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_t)),
+            ComparableFloatRef(&t)
+        );
+        assert_eq!(rug_o, o, "y = {y} x = {x} prec = {prec} rm = {rm:?}");
+    }
+
+    // |atan2(y, x)| <= pi, so the result never overflows, and it is never NaN
+    assert!(t.is_finite());
+    assert!(PartialOrdAbs::le_abs(
+        &t,
+        &Float::from_unsigned_prec(4u32, 1).0
+    ));
+    if t.is_normal() {
+        assert_eq!(t.get_prec(), Some(prec));
+    }
+    // atan2 is odd in y (a `Rational` has no negative zero, so y = 0 is excluded)
+    if y != 0u32 {
+        let (t_neg, o_neg) = Float::atan2_rational_prec_round_ref(&-&y, &x, prec, -rm);
+        assert_eq!(ComparableFloatRef(&t_neg), ComparableFloatRef(&-&t));
+        assert_eq!(o_neg, o.reverse());
+    }
+    // scaling both arguments by a positive amount leaves the angle alone
+    if y != 0u32 || x != 0u32 {
+        let (t_alt, o_alt) = Float::atan2_rational_prec_round(
+            &y * Rational::from(3),
+            &x * Rational::from(3),
+            prec,
+            rm,
+        );
+        assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
+        assert_eq!(o_alt, o);
+    }
+    // a `Float` pair agrees with the `Float` version
+    if let (Ok(fy), Ok(fx)) = (Float::try_from(&y), Float::try_from(&x)) {
+        let (t_alt, o_alt) = fy.atan2_prec_round_ref_ref(&fx, prec, rm);
+        assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
+        assert_eq!(o_alt, o);
+    }
+
+    if o == Equal {
+        assert!(atan2_rational_exact(&y, &x));
+        for rm in exhaustive_rounding_modes() {
+            let (t2, oo) = Float::atan2_rational_prec_round_ref(&y, &x, prec, rm);
+            assert_eq!(ComparableFloatRef(&t2), ComparableFloatRef(&t));
+            assert_eq!(oo, Equal);
+        }
+    } else {
+        assert_panic!(Float::atan2_rational_prec_round_ref(&y, &x, prec, Exact));
+    }
+}
+
+#[test]
+fn atan2_rational_prec_round_properties() {
+    rational_rational_unsigned_rounding_mode_quadruple_gen_var_4().test_properties(
+        |(y, x, prec, rm)| {
+            atan2_rational_prec_round_properties_helper(y, x, prec, rm);
+        },
+    );
+
+    unsigned_rounding_mode_pair_gen_var_3().test_properties(|(prec, rm)| {
+        // atan2(0, x) = 0 exactly for a nonnegative x
+        for x in [Rational::ZERO, Rational::ONE] {
+            let (t, o) = Float::atan2_rational_prec_round(Rational::ZERO, x, prec, rm);
+            assert_eq!(ComparableFloat(t), ComparableFloat(Float::ZERO));
+            assert_eq!(o, Equal);
+        }
+        if rm == Exact {
+            // every remaining case is a nonzero multiple of pi, which is never exact
+            return;
+        }
+        // atan2(0, x) = pi for a negative x, and atan2(y, 0) = +-pi/2
+        let (pi, o_pi) = Float::pi_prec_round(prec, rm);
+        let (t, o) = Float::atan2_rational_prec_round(Rational::ZERO, -Rational::ONE, prec, rm);
+        assert_eq!(ComparableFloatRef(&t), ComparableFloatRef(&pi));
+        assert_eq!(o, o_pi);
+        let (t, o) = Float::atan2_rational_prec_round(Rational::ONE, Rational::ZERO, prec, rm);
+        assert_eq!(ComparableFloat(t), ComparableFloat(pi.clone() >> 1u32));
+        assert_eq!(o, o_pi);
+    });
+}
+
+#[test]
+fn atan2_rational_prec_properties() {
+    rational_rational_unsigned_rounding_mode_quadruple_gen_var_4().test_properties(
+        |(y, x, prec, _)| {
+            let (t, o) = Float::atan2_rational_prec(y.clone(), x.clone(), prec);
+            assert!(t.is_valid());
+            assert_rounding_ordering_consistent(&t, Nearest, o);
+            let (t_alt, o_alt) = Float::atan2_rational_prec_ref(&y, &x, prec);
+            assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
+            assert_eq!(o_alt, o);
+            let (t_alt, o_alt) = Float::atan2_rational_prec_round_ref(&y, &x, prec, Nearest);
+            assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
+            assert_eq!(o_alt, o);
+        },
+    );
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn primitive_float_atan2_rational_properties_helper<T: PrimitiveFloat>()
+where
+    Float: From<T> + PartialOrd<T>,
+    Rational: ExactFrom<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    rational_pair_gen().test_properties(|(y, x)| {
+        let t = primitive_float_atan2_rational::<T>(&y, &x);
+        // never NaN, and never overflowing, since the result is at most pi in magnitude
+        assert!(!t.is_nan());
+        assert!(t.is_finite());
+        // odd in y (a `Rational` has no negative zero, so y = 0 is excluded)
+        if y != 0u32 {
+            assert_eq!(
+                NiceFloat(primitive_float_atan2_rational::<T>(&-&y, &x)),
+                NiceFloat(-t)
+            );
+        }
+        // the same as the `Float` version taken with 64 bits to spare and rounded once
+        let (t_float, _) = Float::atan2_rational_prec_ref(&y, &x, T::MANTISSA_WIDTH + 64);
+        assert_eq!(
+            NiceFloat(T::rounding_from(&t_float, Nearest).0),
+            NiceFloat(t)
+        );
+    });
+
+    primitive_float_pair_gen_var_1::<T>().test_properties(|(y, x)| {
+        // A `Rational` cannot hold a NaN or an infinity, and it has no signed zeros: a zero
+        // argument's sign chooses the quadrant for the primitive-float version but is lost on the
+        // way through a `Rational`, so those inputs are excluded.
+        if !y.is_finite() || !x.is_finite() || y == T::ZERO || x == T::ZERO {
+            return;
+        }
+        // a finite primitive-float pair, taken through the `Rational` path, matches the direct
+        // primitive-float atan2
+        assert_eq!(
+            NiceFloat(primitive_float_atan2_rational::<T>(
+                &Rational::exact_from(y),
+                &Rational::exact_from(x)
+            )),
+            NiceFloat(primitive_float_atan2(y, x))
+        );
+    });
+}
+
+#[test]
+fn primitive_float_atan2_rational_properties() {
+    apply_fn_to_primitive_floats!(primitive_float_atan2_rational_properties_helper);
+}
+
+#[test]
+#[should_panic]
+fn atan2_rational_prec_round_fail_1() {
+    Float::atan2_rational_prec_round(Rational::ONE, Rational::ONE, 0, Floor);
+}
+
+#[test]
+#[should_panic]
+fn atan2_rational_prec_round_fail_2() {
+    // atan2(1, 1) is pi/4, which no precision represents exactly
+    Float::atan2_rational_prec_round(Rational::ONE, Rational::ONE, 10, Exact);
+}
+
+#[test]
+#[should_panic]
+fn atan2_rational_prec_fail() {
+    Float::atan2_rational_prec(Rational::ONE, Rational::ONE, 0);
+}
+
+#[test]
+fn test_atan2_rational_prec_round() {
+    let test = |ys: &str,
+                xs: &str,
+                prec: u64,
+                rm: RoundingMode,
+                out: &str,
+                out_hex: &str,
+                o_out: Ordering| {
+        let y = Rational::from_str(ys).unwrap();
+        let x = Rational::from_str(xs).unwrap();
+
+        let (t, o) = Float::atan2_rational_prec_round(y.clone(), x.clone(), prec, rm);
+        assert!(t.is_valid());
+        assert_eq!(t.to_string(), out);
+        assert_eq!(to_hex_string(&t), out_hex);
+        assert_eq!(o, o_out);
+
+        let (t_alt, o_alt) = Float::atan2_rational_prec_round_ref(&y, &x, prec, rm);
+        assert!(t_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
+        assert_eq!(o_alt, o);
+
+        if rm == Nearest {
+            let (t_alt, o_alt) = Float::atan2_rational_prec(y.clone(), x.clone(), prec);
+            assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
+            assert_eq!(o_alt, o);
+            let (t_alt, o_alt) = Float::atan2_rational_prec_ref(&y, &x, prec);
+            assert_eq!(ComparableFloatRef(&t_alt), ComparableFloatRef(&t));
+            assert_eq!(o_alt, o);
+        }
+    };
+    test("0", "0", 10, Nearest, "0.0", "0x0.0", Equal);
+    test("0", "0", 10, Floor, "0.0", "0x0.0", Equal);
+    test("0", "0", 10, Ceiling, "0.0", "0x0.0", Equal);
+    test("0", "0", 10, Down, "0.0", "0x0.0", Equal);
+    test("0", "0", 10, Up, "0.0", "0x0.0", Equal);
+    test("0", "0", 53, Nearest, "0.0", "0x0.0", Equal);
+    test("0", "0", 1, Nearest, "0.0", "0x0.0", Equal);
+    test("0", "0", 2, Floor, "0.0", "0x0.0", Equal);
+    test("0", "1", 10, Nearest, "0.0", "0x0.0", Equal);
+    test("0", "1", 10, Floor, "0.0", "0x0.0", Equal);
+    test("0", "1", 10, Ceiling, "0.0", "0x0.0", Equal);
+    test("0", "1", 10, Down, "0.0", "0x0.0", Equal);
+    test("0", "1", 10, Up, "0.0", "0x0.0", Equal);
+    test("0", "1", 53, Nearest, "0.0", "0x0.0", Equal);
+    test("0", "1", 1, Nearest, "0.0", "0x0.0", Equal);
+    test("0", "1", 2, Floor, "0.0", "0x0.0", Equal);
+    test("0", "-1", 10, Nearest, "3.1406", "0x3.24#10", Less);
+    test("0", "-1", 10, Floor, "3.1406", "0x3.24#10", Less);
+    test("0", "-1", 10, Ceiling, "3.1445", "0x3.25#10", Greater);
+    test("0", "-1", 10, Down, "3.1406", "0x3.24#10", Less);
+    test("0", "-1", 10, Up, "3.1445", "0x3.25#10", Greater);
+    test(
+        "0",
+        "-1",
+        53,
+        Nearest,
+        "3.1415926535897931",
+        "0x3.243f6a8885a30#53",
+        Less,
+    );
+    test("0", "-1", 1, Nearest, "4.0", "0x4.0#1", Greater);
+    test("0", "-1", 2, Floor, "3.0", "0x3.0#2", Less);
+    test("0", "3/4", 10, Nearest, "0.0", "0x0.0", Equal);
+    test("0", "3/4", 10, Floor, "0.0", "0x0.0", Equal);
+    test("0", "3/4", 10, Ceiling, "0.0", "0x0.0", Equal);
+    test("0", "3/4", 10, Down, "0.0", "0x0.0", Equal);
+    test("0", "3/4", 10, Up, "0.0", "0x0.0", Equal);
+    test("0", "3/4", 53, Nearest, "0.0", "0x0.0", Equal);
+    test("0", "3/4", 1, Nearest, "0.0", "0x0.0", Equal);
+    test("0", "3/4", 2, Floor, "0.0", "0x0.0", Equal);
+    test("0", "-3/4", 10, Nearest, "3.1406", "0x3.24#10", Less);
+    test("0", "-3/4", 10, Floor, "3.1406", "0x3.24#10", Less);
+    test("0", "-3/4", 10, Ceiling, "3.1445", "0x3.25#10", Greater);
+    test("0", "-3/4", 10, Down, "3.1406", "0x3.24#10", Less);
+    test("0", "-3/4", 10, Up, "3.1445", "0x3.25#10", Greater);
+    test(
+        "0",
+        "-3/4",
+        53,
+        Nearest,
+        "3.1415926535897931",
+        "0x3.243f6a8885a30#53",
+        Less,
+    );
+    test("0", "-3/4", 1, Nearest, "4.0", "0x4.0#1", Greater);
+    test("0", "-3/4", 2, Floor, "3.0", "0x3.0#2", Less);
+    test("0", "1/3", 10, Nearest, "0.0", "0x0.0", Equal);
+    test("0", "1/3", 10, Floor, "0.0", "0x0.0", Equal);
+    test("0", "1/3", 10, Ceiling, "0.0", "0x0.0", Equal);
+    test("0", "1/3", 10, Down, "0.0", "0x0.0", Equal);
+    test("0", "1/3", 10, Up, "0.0", "0x0.0", Equal);
+    test("0", "1/3", 53, Nearest, "0.0", "0x0.0", Equal);
+    test("0", "1/3", 1, Nearest, "0.0", "0x0.0", Equal);
+    test("0", "1/3", 2, Floor, "0.0", "0x0.0", Equal);
+    test("0", "-1/3", 10, Nearest, "3.1406", "0x3.24#10", Less);
+    test("0", "-1/3", 10, Floor, "3.1406", "0x3.24#10", Less);
+    test("0", "-1/3", 10, Ceiling, "3.1445", "0x3.25#10", Greater);
+    test("0", "-1/3", 10, Down, "3.1406", "0x3.24#10", Less);
+    test("0", "-1/3", 10, Up, "3.1445", "0x3.25#10", Greater);
+    test(
+        "0",
+        "-1/3",
+        53,
+        Nearest,
+        "3.1415926535897931",
+        "0x3.243f6a8885a30#53",
+        Less,
+    );
+    test("0", "-1/3", 1, Nearest, "4.0", "0x4.0#1", Greater);
+    test("0", "-1/3", 2, Floor, "3.0", "0x3.0#2", Less);
+    test("0", "2", 10, Nearest, "0.0", "0x0.0", Equal);
+    test("0", "2", 10, Floor, "0.0", "0x0.0", Equal);
+    test("0", "2", 10, Ceiling, "0.0", "0x0.0", Equal);
+    test("0", "2", 10, Down, "0.0", "0x0.0", Equal);
+    test("0", "2", 10, Up, "0.0", "0x0.0", Equal);
+    test("0", "2", 53, Nearest, "0.0", "0x0.0", Equal);
+    test("0", "2", 1, Nearest, "0.0", "0x0.0", Equal);
+    test("0", "2", 2, Floor, "0.0", "0x0.0", Equal);
+    test("0", "-2", 10, Nearest, "3.1406", "0x3.24#10", Less);
+    test("0", "-2", 10, Floor, "3.1406", "0x3.24#10", Less);
+    test("0", "-2", 10, Ceiling, "3.1445", "0x3.25#10", Greater);
+    test("0", "-2", 10, Down, "3.1406", "0x3.24#10", Less);
+    test("0", "-2", 10, Up, "3.1445", "0x3.25#10", Greater);
+    test(
+        "0",
+        "-2",
+        53,
+        Nearest,
+        "3.1415926535897931",
+        "0x3.243f6a8885a30#53",
+        Less,
+    );
+    test("0", "-2", 1, Nearest, "4.0", "0x4.0#1", Greater);
+    test("0", "-2", 2, Floor, "3.0", "0x3.0#2", Less);
+    test("0", "7/2", 10, Nearest, "0.0", "0x0.0", Equal);
+    test("0", "7/2", 10, Floor, "0.0", "0x0.0", Equal);
+    test("0", "7/2", 10, Ceiling, "0.0", "0x0.0", Equal);
+    test("0", "7/2", 10, Down, "0.0", "0x0.0", Equal);
+    test("0", "7/2", 10, Up, "0.0", "0x0.0", Equal);
+    test("0", "7/2", 53, Nearest, "0.0", "0x0.0", Equal);
+    test("0", "7/2", 1, Nearest, "0.0", "0x0.0", Equal);
+    test("0", "7/2", 2, Floor, "0.0", "0x0.0", Equal);
+    test("0", "1/1000", 10, Nearest, "0.0", "0x0.0", Equal);
+    test("0", "1/1000", 10, Floor, "0.0", "0x0.0", Equal);
+    test("0", "1/1000", 10, Ceiling, "0.0", "0x0.0", Equal);
+    test("0", "1/1000", 10, Down, "0.0", "0x0.0", Equal);
+    test("0", "1/1000", 10, Up, "0.0", "0x0.0", Equal);
+    test("0", "1/1000", 53, Nearest, "0.0", "0x0.0", Equal);
+    test("0", "1/1000", 1, Nearest, "0.0", "0x0.0", Equal);
+    test("0", "1/1000", 2, Floor, "0.0", "0x0.0", Equal);
+    test("0", "999/1000", 10, Nearest, "0.0", "0x0.0", Equal);
+    test("0", "999/1000", 10, Floor, "0.0", "0x0.0", Equal);
+    test("0", "999/1000", 10, Ceiling, "0.0", "0x0.0", Equal);
+    test("0", "999/1000", 10, Down, "0.0", "0x0.0", Equal);
+    test("0", "999/1000", 10, Up, "0.0", "0x0.0", Equal);
+    test("0", "999/1000", 53, Nearest, "0.0", "0x0.0", Equal);
+    test("0", "999/1000", 1, Nearest, "0.0", "0x0.0", Equal);
+    test("0", "999/1000", 2, Floor, "0.0", "0x0.0", Equal);
+    test("0", "123456789/7", 10, Nearest, "0.0", "0x0.0", Equal);
+    test("0", "123456789/7", 10, Floor, "0.0", "0x0.0", Equal);
+    test("0", "123456789/7", 10, Ceiling, "0.0", "0x0.0", Equal);
+    test("0", "123456789/7", 10, Down, "0.0", "0x0.0", Equal);
+    test("0", "123456789/7", 10, Up, "0.0", "0x0.0", Equal);
+    test("0", "123456789/7", 53, Nearest, "0.0", "0x0.0", Equal);
+    test("0", "123456789/7", 1, Nearest, "0.0", "0x0.0", Equal);
+    test("0", "123456789/7", 2, Floor, "0.0", "0x0.0", Equal);
+    test("0", "1/123456789", 10, Nearest, "0.0", "0x0.0", Equal);
+    test("0", "1/123456789", 10, Floor, "0.0", "0x0.0", Equal);
+    test("0", "1/123456789", 10, Ceiling, "0.0", "0x0.0", Equal);
+    test("0", "1/123456789", 10, Down, "0.0", "0x0.0", Equal);
+    test("0", "1/123456789", 10, Up, "0.0", "0x0.0", Equal);
+    test("0", "1/123456789", 53, Nearest, "0.0", "0x0.0", Equal);
+    test("0", "1/123456789", 1, Nearest, "0.0", "0x0.0", Equal);
+    test("0", "1/123456789", 2, Floor, "0.0", "0x0.0", Equal);
+    test("0", "22/7", 10, Nearest, "0.0", "0x0.0", Equal);
+    test("0", "22/7", 10, Floor, "0.0", "0x0.0", Equal);
+    test("0", "22/7", 10, Ceiling, "0.0", "0x0.0", Equal);
+    test("0", "22/7", 10, Down, "0.0", "0x0.0", Equal);
+    test("0", "22/7", 10, Up, "0.0", "0x0.0", Equal);
+    test("0", "22/7", 53, Nearest, "0.0", "0x0.0", Equal);
+    test("0", "22/7", 1, Nearest, "0.0", "0x0.0", Equal);
+    test("0", "22/7", 2, Floor, "0.0", "0x0.0", Equal);
+    test("0", "-22/7", 10, Nearest, "3.1406", "0x3.24#10", Less);
+    test("0", "-22/7", 10, Floor, "3.1406", "0x3.24#10", Less);
+    test("0", "-22/7", 10, Ceiling, "3.1445", "0x3.25#10", Greater);
+    test("0", "-22/7", 10, Down, "3.1406", "0x3.24#10", Less);
+    test("0", "-22/7", 10, Up, "3.1445", "0x3.25#10", Greater);
+    test(
+        "0",
+        "-22/7",
+        53,
+        Nearest,
+        "3.1415926535897931",
+        "0x3.243f6a8885a30#53",
+        Less,
+    );
+    test("0", "-22/7", 1, Nearest, "4.0", "0x4.0#1", Greater);
+    test("0", "-22/7", 2, Floor, "3.0", "0x3.0#2", Less);
+    test("0", "355/113", 10, Nearest, "0.0", "0x0.0", Equal);
+    test("0", "355/113", 10, Floor, "0.0", "0x0.0", Equal);
+    test("0", "355/113", 10, Ceiling, "0.0", "0x0.0", Equal);
+    test("0", "355/113", 10, Down, "0.0", "0x0.0", Equal);
+    test("0", "355/113", 10, Up, "0.0", "0x0.0", Equal);
+    test("0", "355/113", 53, Nearest, "0.0", "0x0.0", Equal);
+    test("0", "355/113", 1, Nearest, "0.0", "0x0.0", Equal);
+    test("0", "355/113", 2, Floor, "0.0", "0x0.0", Equal);
+    test("1", "0", 10, Nearest, "1.5703", "0x1.920#10", Less);
+    test("1", "0", 10, Floor, "1.5703", "0x1.920#10", Less);
+    test("1", "0", 10, Ceiling, "1.5723", "0x1.928#10", Greater);
+    test("1", "0", 10, Down, "1.5703", "0x1.920#10", Less);
+    test("1", "0", 10, Up, "1.5723", "0x1.928#10", Greater);
+    test(
+        "1",
+        "0",
+        53,
+        Nearest,
+        "1.5707963267948966",
+        "0x1.921fb54442d18#53",
+        Less,
+    );
+    test("1", "0", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("1", "0", 2, Floor, "1.5", "0x1.8#2", Less);
+    test("1", "1", 10, Nearest, "0.78516", "0x0.c90#10", Less);
+    test("1", "1", 10, Floor, "0.78516", "0x0.c90#10", Less);
+    test("1", "1", 10, Ceiling, "0.78613", "0x0.c94#10", Greater);
+    test("1", "1", 10, Down, "0.78516", "0x0.c90#10", Less);
+    test("1", "1", 10, Up, "0.78613", "0x0.c94#10", Greater);
+    test(
+        "1",
+        "1",
+        53,
+        Nearest,
+        "0.78539816339744828",
+        "0x0.c90fdaa22168c0#53",
+        Less,
+    );
+    test("1", "1", 1, Nearest, "1.0", "0x1.0#1", Greater);
+    test("1", "1", 2, Floor, "0.75", "0x0.c#2", Less);
+    test("1", "-1", 10, Nearest, "2.3555", "0x2.5b#10", Less);
+    test("1", "-1", 10, Floor, "2.3555", "0x2.5b#10", Less);
+    test("1", "-1", 10, Ceiling, "2.3594", "0x2.5c#10", Greater);
+    test("1", "-1", 10, Down, "2.3555", "0x2.5b#10", Less);
+    test("1", "-1", 10, Up, "2.3594", "0x2.5c#10", Greater);
+    test(
+        "1",
+        "-1",
+        53,
+        Nearest,
+        "2.3561944901923448",
+        "0x2.5b2f8fe6643a4#53",
+        Less,
+    );
+    test("1", "-1", 1, Nearest, "2.0", "0x2.0#1", Less);
+    test("1", "-1", 2, Floor, "2.0", "0x2.0#2", Less);
+    test("1", "3/4", 10, Nearest, "0.92773", "0x0.ed8#10", Greater);
+    test("1", "3/4", 10, Floor, "0.92676", "0x0.ed4#10", Less);
+    test("1", "3/4", 10, Ceiling, "0.92773", "0x0.ed8#10", Greater);
+    test("1", "3/4", 10, Down, "0.92676", "0x0.ed4#10", Less);
+    test("1", "3/4", 10, Up, "0.92773", "0x0.ed8#10", Greater);
+    test(
+        "1",
+        "3/4",
+        53,
+        Nearest,
+        "0.92729521800161219",
+        "0x0.ed63382b0dda78#53",
+        Less,
+    );
+    test("1", "3/4", 1, Nearest, "1.0", "0x1.0#1", Greater);
+    test("1", "3/4", 2, Floor, "0.75", "0x0.c#2", Less);
+    test("1", "-3/4", 10, Nearest, "2.2148", "0x2.37#10", Greater);
+    test("1", "-3/4", 10, Floor, "2.2109", "0x2.36#10", Less);
+    test("1", "-3/4", 10, Ceiling, "2.2148", "0x2.37#10", Greater);
+    test("1", "-3/4", 10, Down, "2.2109", "0x2.36#10", Less);
+    test("1", "-3/4", 10, Up, "2.2148", "0x2.37#10", Greater);
+    test(
+        "1",
+        "-3/4",
+        53,
+        Nearest,
+        "2.2142974355881808",
+        "0x2.36dc325d77c88#53",
+        Less,
+    );
+    test("1", "-3/4", 1, Nearest, "2.0", "0x2.0#1", Less);
+    test("1", "-3/4", 2, Floor, "2.0", "0x2.0#2", Less);
+    test("1", "1/3", 10, Nearest, "1.2500", "0x1.400#10", Greater);
+    test("1", "1/3", 10, Floor, "1.2480", "0x1.3f8#10", Less);
+    test("1", "1/3", 10, Ceiling, "1.2500", "0x1.400#10", Greater);
+    test("1", "1/3", 10, Down, "1.2480", "0x1.3f8#10", Less);
+    test("1", "1/3", 10, Up, "1.2500", "0x1.400#10", Greater);
+    test(
+        "1",
+        "1/3",
+        53,
+        Nearest,
+        "1.2490457723982544",
+        "0x1.3fc176b7a8560#53",
+        Greater,
+    );
+    test("1", "1/3", 1, Nearest, "1.0", "0x1.0#1", Less);
+    test("1", "1/3", 2, Floor, "1.0", "0x1.0#2", Less);
+    test("1", "-1/3", 10, Nearest, "1.8926", "0x1.e48#10", Greater);
+    test("1", "-1/3", 10, Floor, "1.8906", "0x1.e40#10", Less);
+    test("1", "-1/3", 10, Ceiling, "1.8926", "0x1.e48#10", Greater);
+    test("1", "-1/3", 10, Down, "1.8906", "0x1.e40#10", Less);
+    test("1", "-1/3", 10, Up, "1.8926", "0x1.e48#10", Greater);
+    test(
+        "1",
+        "-1/3",
+        53,
+        Nearest,
+        "1.8925468811915389",
+        "0x1.e47df3d0dd4d1#53",
+        Greater,
+    );
+    test("1", "-1/3", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("1", "-1/3", 2, Floor, "1.5", "0x1.8#2", Less);
+    test("1", "2", 10, Nearest, "0.46387", "0x0.76c#10", Greater);
+    test("1", "2", 10, Floor, "0.46338", "0x0.76a#10", Less);
+    test("1", "2", 10, Ceiling, "0.46387", "0x0.76c#10", Greater);
+    test("1", "2", 10, Down, "0.46338", "0x0.76a#10", Less);
+    test("1", "2", 10, Up, "0.46387", "0x0.76c#10", Greater);
+    test(
+        "1",
+        "2",
+        53,
+        Nearest,
+        "0.46364760900080609",
+        "0x0.76b19c1586ed3c#53",
+        Less,
+    );
+    test("1", "2", 1, Nearest, "0.50", "0x0.8#1", Greater);
+    test("1", "2", 2, Floor, "0.38", "0x0.6#2", Less);
+    test("1", "-2", 10, Nearest, "2.6797", "0x2.ae#10", Greater);
+    test("1", "-2", 10, Floor, "2.6758", "0x2.ad#10", Less);
+    test("1", "-2", 10, Ceiling, "2.6797", "0x2.ae#10", Greater);
+    test("1", "-2", 10, Down, "2.6758", "0x2.ad#10", Less);
+    test("1", "-2", 10, Up, "2.6797", "0x2.ae#10", Greater);
+    test(
+        "1",
+        "-2",
+        53,
+        Nearest,
+        "2.6779450445889870",
+        "0x2.ad8dce72feb5c#53",
+        Less,
+    );
+    test("1", "-2", 1, Nearest, "2.0", "0x2.0#1", Less);
+    test("1", "-2", 2, Floor, "2.0", "0x2.0#2", Less);
+    test("1", "7/2", 10, Nearest, "0.27832", "0x0.474#10", Greater);
+    test("1", "7/2", 10, Floor, "0.27783", "0x0.472#10", Less);
+    test("1", "7/2", 10, Ceiling, "0.27832", "0x0.474#10", Greater);
+    test("1", "7/2", 10, Down, "0.27783", "0x0.472#10", Less);
+    test("1", "7/2", 10, Up, "0.27832", "0x0.474#10", Greater);
+    test(
+        "1",
+        "7/2",
+        53,
+        Nearest,
+        "0.27829965900511133",
+        "0x0.473ea57dea3738#53",
+        Less,
+    );
+    test("1", "7/2", 1, Nearest, "0.25", "0x0.4#1", Less);
+    test("1", "7/2", 2, Floor, "0.25", "0x0.4#2", Less);
+    test("1", "1/1000", 10, Nearest, "1.5703", "0x1.920#10", Greater);
+    test("1", "1/1000", 10, Floor, "1.5684", "0x1.918#10", Less);
+    test("1", "1/1000", 10, Ceiling, "1.5703", "0x1.920#10", Greater);
+    test("1", "1/1000", 10, Down, "1.5684", "0x1.918#10", Less);
+    test("1", "1/1000", 10, Up, "1.5703", "0x1.920#10", Greater);
+    test(
+        "1",
+        "1/1000",
+        53,
+        Nearest,
+        "1.5697963271282298",
+        "0x1.91de2c0e658bd#53",
+        Greater,
+    );
+    test("1", "1/1000", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("1", "1/1000", 2, Floor, "1.5", "0x1.8#2", Less);
+    test(
+        "1",
+        "999/1000",
+        10,
+        Nearest,
+        "0.78613",
+        "0x0.c94#10",
+        Greater,
+    );
+    test("1", "999/1000", 10, Floor, "0.78516", "0x0.c90#10", Less);
+    test(
+        "1",
+        "999/1000",
+        10,
+        Ceiling,
+        "0.78613",
+        "0x0.c94#10",
+        Greater,
+    );
+    test("1", "999/1000", 10, Down, "0.78516", "0x0.c90#10", Less);
+    test("1", "999/1000", 10, Up, "0.78613", "0x0.c94#10", Greater);
+    test(
+        "1",
+        "999/1000",
+        53,
+        Nearest,
+        "0.78589841348078160",
+        "0x0.c930a36fe0d480#53",
+        Less,
+    );
+    test("1", "999/1000", 1, Nearest, "1.0", "0x1.0#1", Greater);
+    test("1", "999/1000", 2, Floor, "0.75", "0x0.c#2", Less);
+    test(
+        "1",
+        "123456789/7",
+        10,
+        Nearest,
+        "5.6694e-8",
+        "0xf.38E-7#10",
+        Less,
+    );
+    test(
+        "1",
+        "123456789/7",
+        10,
+        Floor,
+        "5.6694e-8",
+        "0xf.38E-7#10",
+        Less,
+    );
+    test(
+        "1",
+        "123456789/7",
+        10,
+        Ceiling,
+        "5.6752e-8",
+        "0xf.3cE-7#10",
+        Greater,
+    );
+    test(
+        "1",
+        "123456789/7",
+        10,
+        Down,
+        "5.6694e-8",
+        "0xf.38E-7#10",
+        Less,
+    );
+    test(
+        "1",
+        "123456789/7",
+        10,
+        Up,
+        "5.6752e-8",
+        "0xf.3cE-7#10",
+        Greater,
+    );
+    test(
+        "1",
+        "123456789/7",
+        53,
+        Nearest,
+        "5.6700000515969946e-8",
+        "0xf.3864f53214c10E-7#53",
+        Greater,
+    );
+    test(
+        "1",
+        "123456789/7",
+        1,
+        Nearest,
+        "6.0e-8",
+        "0x1.0E-6#1",
+        Greater,
+    );
+    test("1", "123456789/7", 2, Floor, "4.5e-8", "0xc.0E-7#2", Less);
+    test(
+        "1",
+        "1/123456789",
+        10,
+        Nearest,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test("1", "1/123456789", 10, Floor, "1.5703", "0x1.920#10", Less);
+    test(
+        "1",
+        "1/123456789",
+        10,
+        Ceiling,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test("1", "1/123456789", 10, Down, "1.5703", "0x1.920#10", Less);
+    test("1", "1/123456789", 10, Up, "1.5723", "0x1.928#10", Greater);
+    test(
+        "1",
+        "1/123456789",
+        53,
+        Nearest,
+        "1.5707963186948966",
+        "0x1.921fb52178c63#53",
+        Greater,
+    );
+    test("1", "1/123456789", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("1", "1/123456789", 2, Floor, "1.5", "0x1.8#2", Less);
+    test("1", "22/7", 10, Nearest, "0.30811", "0x0.4ee#10", Greater);
+    test("1", "22/7", 10, Floor, "0.30762", "0x0.4ec#10", Less);
+    test("1", "22/7", 10, Ceiling, "0.30811", "0x0.4ee#10", Greater);
+    test("1", "22/7", 10, Down, "0.30762", "0x0.4ec#10", Less);
+    test("1", "22/7", 10, Up, "0.30811", "0x0.4ee#10", Greater);
+    test(
+        "1",
+        "22/7",
+        53,
+        Nearest,
+        "0.30805278102377642",
+        "0x0.4edc8c0bf06048#53",
+        Greater,
+    );
+    test("1", "22/7", 1, Nearest, "0.25", "0x0.4#1", Less);
+    test("1", "22/7", 2, Floor, "0.25", "0x0.4#2", Less);
+    test("1", "-22/7", 10, Nearest, "2.8320", "0x2.d5#10", Less);
+    test("1", "-22/7", 10, Floor, "2.8320", "0x2.d5#10", Less);
+    test("1", "-22/7", 10, Ceiling, "2.8359", "0x2.d6#10", Greater);
+    test("1", "-22/7", 10, Down, "2.8320", "0x2.d5#10", Less);
+    test("1", "-22/7", 10, Up, "2.8359", "0x2.d6#10", Greater);
+    test(
+        "1",
+        "-22/7",
+        53,
+        Nearest,
+        "2.8335398725660168",
+        "0x2.d562de7c9542c#53",
+        Less,
+    );
+    test("1", "-22/7", 1, Nearest, "2.0", "0x2.0#1", Less);
+    test("1", "-22/7", 2, Floor, "2.0", "0x2.0#2", Less);
+    test("1", "355/113", 10, Nearest, "0.30811", "0x0.4ee#10", Less);
+    test("1", "355/113", 10, Floor, "0.30811", "0x0.4ee#10", Less);
+    test(
+        "1",
+        "355/113",
+        10,
+        Ceiling,
+        "0.30859",
+        "0x0.4f0#10",
+        Greater,
+    );
+    test("1", "355/113", 10, Down, "0.30811", "0x0.4ee#10", Less);
+    test("1", "355/113", 10, Up, "0.30859", "0x0.4f0#10", Greater);
+    test(
+        "1",
+        "355/113",
+        53,
+        Nearest,
+        "0.30816904657376992",
+        "0x0.4ee42aa8ac80f4#53",
+        Greater,
+    );
+    test("1", "355/113", 1, Nearest, "0.25", "0x0.4#1", Less);
+    test("1", "355/113", 2, Floor, "0.25", "0x0.4#2", Less);
+    test("-1", "0", 10, Nearest, "-1.5703", "-0x1.920#10", Greater);
+    test("-1", "0", 10, Floor, "-1.5723", "-0x1.928#10", Less);
+    test("-1", "0", 10, Ceiling, "-1.5703", "-0x1.920#10", Greater);
+    test("-1", "0", 10, Down, "-1.5703", "-0x1.920#10", Greater);
+    test("-1", "0", 10, Up, "-1.5723", "-0x1.928#10", Less);
+    test(
+        "-1",
+        "0",
+        53,
+        Nearest,
+        "-1.5707963267948966",
+        "-0x1.921fb54442d18#53",
+        Greater,
+    );
+    test("-1", "0", 1, Nearest, "-2.0", "-0x2.0#1", Less);
+    test("-1", "0", 2, Floor, "-2.0", "-0x2.0#2", Less);
+    test("-1", "1", 10, Nearest, "-0.78516", "-0x0.c90#10", Greater);
+    test("-1", "1", 10, Floor, "-0.78613", "-0x0.c94#10", Less);
+    test("-1", "1", 10, Ceiling, "-0.78516", "-0x0.c90#10", Greater);
+    test("-1", "1", 10, Down, "-0.78516", "-0x0.c90#10", Greater);
+    test("-1", "1", 10, Up, "-0.78613", "-0x0.c94#10", Less);
+    test(
+        "-1",
+        "1",
+        53,
+        Nearest,
+        "-0.78539816339744828",
+        "-0x0.c90fdaa22168c0#53",
+        Greater,
+    );
+    test("-1", "1", 1, Nearest, "-1.0", "-0x1.0#1", Less);
+    test("-1", "1", 2, Floor, "-1.0", "-0x1.0#2", Less);
+    test("-1", "-1", 10, Nearest, "-2.3555", "-0x2.5b#10", Greater);
+    test("-1", "-1", 10, Floor, "-2.3594", "-0x2.5c#10", Less);
+    test("-1", "-1", 10, Ceiling, "-2.3555", "-0x2.5b#10", Greater);
+    test("-1", "-1", 10, Down, "-2.3555", "-0x2.5b#10", Greater);
+    test("-1", "-1", 10, Up, "-2.3594", "-0x2.5c#10", Less);
+    test(
+        "-1",
+        "-1",
+        53,
+        Nearest,
+        "-2.3561944901923448",
+        "-0x2.5b2f8fe6643a4#53",
+        Greater,
+    );
+    test("-1", "-1", 1, Nearest, "-2.0", "-0x2.0#1", Greater);
+    test("-1", "-1", 2, Floor, "-3.0", "-0x3.0#2", Less);
+    test("-1", "3/4", 10, Nearest, "-0.92773", "-0x0.ed8#10", Less);
+    test("-1", "3/4", 10, Floor, "-0.92773", "-0x0.ed8#10", Less);
+    test("-1", "3/4", 10, Ceiling, "-0.92676", "-0x0.ed4#10", Greater);
+    test("-1", "3/4", 10, Down, "-0.92676", "-0x0.ed4#10", Greater);
+    test("-1", "3/4", 10, Up, "-0.92773", "-0x0.ed8#10", Less);
+    test(
+        "-1",
+        "3/4",
+        53,
+        Nearest,
+        "-0.92729521800161219",
+        "-0x0.ed63382b0dda78#53",
+        Greater,
+    );
+    test("-1", "3/4", 1, Nearest, "-1.0", "-0x1.0#1", Less);
+    test("-1", "3/4", 2, Floor, "-1.0", "-0x1.0#2", Less);
+    test("-1", "-3/4", 10, Nearest, "-2.2148", "-0x2.37#10", Less);
+    test("-1", "-3/4", 10, Floor, "-2.2148", "-0x2.37#10", Less);
+    test("-1", "-3/4", 10, Ceiling, "-2.2109", "-0x2.36#10", Greater);
+    test("-1", "-3/4", 10, Down, "-2.2109", "-0x2.36#10", Greater);
+    test("-1", "-3/4", 10, Up, "-2.2148", "-0x2.37#10", Less);
+    test(
+        "-1",
+        "-3/4",
+        53,
+        Nearest,
+        "-2.2142974355881808",
+        "-0x2.36dc325d77c88#53",
+        Greater,
+    );
+    test("-1", "-3/4", 1, Nearest, "-2.0", "-0x2.0#1", Greater);
+    test("-1", "-3/4", 2, Floor, "-3.0", "-0x3.0#2", Less);
+    test("-1", "1/3", 10, Nearest, "-1.2500", "-0x1.400#10", Less);
+    test("-1", "1/3", 10, Floor, "-1.2500", "-0x1.400#10", Less);
+    test("-1", "1/3", 10, Ceiling, "-1.2480", "-0x1.3f8#10", Greater);
+    test("-1", "1/3", 10, Down, "-1.2480", "-0x1.3f8#10", Greater);
+    test("-1", "1/3", 10, Up, "-1.2500", "-0x1.400#10", Less);
+    test(
+        "-1",
+        "1/3",
+        53,
+        Nearest,
+        "-1.2490457723982544",
+        "-0x1.3fc176b7a8560#53",
+        Less,
+    );
+    test("-1", "1/3", 1, Nearest, "-1.0", "-0x1.0#1", Greater);
+    test("-1", "1/3", 2, Floor, "-1.5", "-0x1.8#2", Less);
+    test("-1", "-1/3", 10, Nearest, "-1.8926", "-0x1.e48#10", Less);
+    test("-1", "-1/3", 10, Floor, "-1.8926", "-0x1.e48#10", Less);
+    test("-1", "-1/3", 10, Ceiling, "-1.8906", "-0x1.e40#10", Greater);
+    test("-1", "-1/3", 10, Down, "-1.8906", "-0x1.e40#10", Greater);
+    test("-1", "-1/3", 10, Up, "-1.8926", "-0x1.e48#10", Less);
+    test(
+        "-1",
+        "-1/3",
+        53,
+        Nearest,
+        "-1.8925468811915389",
+        "-0x1.e47df3d0dd4d1#53",
+        Less,
+    );
+    test("-1", "-1/3", 1, Nearest, "-2.0", "-0x2.0#1", Less);
+    test("-1", "-1/3", 2, Floor, "-2.0", "-0x2.0#2", Less);
+    test("-1", "2", 10, Nearest, "-0.46387", "-0x0.76c#10", Less);
+    test("-1", "2", 10, Floor, "-0.46387", "-0x0.76c#10", Less);
+    test("-1", "2", 10, Ceiling, "-0.46338", "-0x0.76a#10", Greater);
+    test("-1", "2", 10, Down, "-0.46338", "-0x0.76a#10", Greater);
+    test("-1", "2", 10, Up, "-0.46387", "-0x0.76c#10", Less);
+    test(
+        "-1",
+        "2",
+        53,
+        Nearest,
+        "-0.46364760900080609",
+        "-0x0.76b19c1586ed3c#53",
+        Greater,
+    );
+    test("-1", "2", 1, Nearest, "-0.50", "-0x0.8#1", Less);
+    test("-1", "2", 2, Floor, "-0.50", "-0x0.8#2", Less);
+    test("-1", "-2", 10, Nearest, "-2.6797", "-0x2.ae#10", Less);
+    test("-1", "-2", 10, Floor, "-2.6797", "-0x2.ae#10", Less);
+    test("-1", "-2", 10, Ceiling, "-2.6758", "-0x2.ad#10", Greater);
+    test("-1", "-2", 10, Down, "-2.6758", "-0x2.ad#10", Greater);
+    test("-1", "-2", 10, Up, "-2.6797", "-0x2.ae#10", Less);
+    test(
+        "-1",
+        "-2",
+        53,
+        Nearest,
+        "-2.6779450445889870",
+        "-0x2.ad8dce72feb5c#53",
+        Greater,
+    );
+    test("-1", "-2", 1, Nearest, "-2.0", "-0x2.0#1", Greater);
+    test("-1", "-2", 2, Floor, "-3.0", "-0x3.0#2", Less);
+    test("-1", "7/2", 10, Nearest, "-0.27832", "-0x0.474#10", Less);
+    test("-1", "7/2", 10, Floor, "-0.27832", "-0x0.474#10", Less);
+    test("-1", "7/2", 10, Ceiling, "-0.27783", "-0x0.472#10", Greater);
+    test("-1", "7/2", 10, Down, "-0.27783", "-0x0.472#10", Greater);
+    test("-1", "7/2", 10, Up, "-0.27832", "-0x0.474#10", Less);
+    test(
+        "-1",
+        "7/2",
+        53,
+        Nearest,
+        "-0.27829965900511133",
+        "-0x0.473ea57dea3738#53",
+        Greater,
+    );
+    test("-1", "7/2", 1, Nearest, "-0.25", "-0x0.4#1", Greater);
+    test("-1", "7/2", 2, Floor, "-0.38", "-0x0.6#2", Less);
+    test("-1", "1/1000", 10, Nearest, "-1.5703", "-0x1.920#10", Less);
+    test("-1", "1/1000", 10, Floor, "-1.5703", "-0x1.920#10", Less);
+    test(
+        "-1",
+        "1/1000",
+        10,
+        Ceiling,
+        "-1.5684",
+        "-0x1.918#10",
+        Greater,
+    );
+    test("-1", "1/1000", 10, Down, "-1.5684", "-0x1.918#10", Greater);
+    test("-1", "1/1000", 10, Up, "-1.5703", "-0x1.920#10", Less);
+    test(
+        "-1",
+        "1/1000",
+        53,
+        Nearest,
+        "-1.5697963271282298",
+        "-0x1.91de2c0e658bd#53",
+        Less,
+    );
+    test("-1", "1/1000", 1, Nearest, "-2.0", "-0x2.0#1", Less);
+    test("-1", "1/1000", 2, Floor, "-2.0", "-0x2.0#2", Less);
+    test(
+        "-1",
+        "999/1000",
+        10,
+        Nearest,
+        "-0.78613",
+        "-0x0.c94#10",
+        Less,
+    );
+    test("-1", "999/1000", 10, Floor, "-0.78613", "-0x0.c94#10", Less);
+    test(
+        "-1",
+        "999/1000",
+        10,
+        Ceiling,
+        "-0.78516",
+        "-0x0.c90#10",
+        Greater,
+    );
+    test(
+        "-1",
+        "999/1000",
+        10,
+        Down,
+        "-0.78516",
+        "-0x0.c90#10",
+        Greater,
+    );
+    test("-1", "999/1000", 10, Up, "-0.78613", "-0x0.c94#10", Less);
+    test(
+        "-1",
+        "999/1000",
+        53,
+        Nearest,
+        "-0.78589841348078160",
+        "-0x0.c930a36fe0d480#53",
+        Greater,
+    );
+    test("-1", "999/1000", 1, Nearest, "-1.0", "-0x1.0#1", Less);
+    test("-1", "999/1000", 2, Floor, "-1.0", "-0x1.0#2", Less);
+    test(
+        "-1",
+        "123456789/7",
+        10,
+        Nearest,
+        "-5.6694e-8",
+        "-0xf.38E-7#10",
+        Greater,
+    );
+    test(
+        "-1",
+        "123456789/7",
+        10,
+        Floor,
+        "-5.6752e-8",
+        "-0xf.3cE-7#10",
+        Less,
+    );
+    test(
+        "-1",
+        "123456789/7",
+        10,
+        Ceiling,
+        "-5.6694e-8",
+        "-0xf.38E-7#10",
+        Greater,
+    );
+    test(
+        "-1",
+        "123456789/7",
+        10,
+        Down,
+        "-5.6694e-8",
+        "-0xf.38E-7#10",
+        Greater,
+    );
+    test(
+        "-1",
+        "123456789/7",
+        10,
+        Up,
+        "-5.6752e-8",
+        "-0xf.3cE-7#10",
+        Less,
+    );
+    test(
+        "-1",
+        "123456789/7",
+        53,
+        Nearest,
+        "-5.6700000515969946e-8",
+        "-0xf.3864f53214c10E-7#53",
+        Less,
+    );
+    test(
+        "-1",
+        "123456789/7",
+        1,
+        Nearest,
+        "-6.0e-8",
+        "-0x1.0E-6#1",
+        Less,
+    );
+    test(
+        "-1",
+        "123456789/7",
+        2,
+        Floor,
+        "-6.0e-8",
+        "-0x1.0E-6#2",
+        Less,
+    );
+    test(
+        "-1",
+        "1/123456789",
+        10,
+        Nearest,
+        "-1.5703",
+        "-0x1.920#10",
+        Greater,
+    );
+    test(
+        "-1",
+        "1/123456789",
+        10,
+        Floor,
+        "-1.5723",
+        "-0x1.928#10",
+        Less,
+    );
+    test(
+        "-1",
+        "1/123456789",
+        10,
+        Ceiling,
+        "-1.5703",
+        "-0x1.920#10",
+        Greater,
+    );
+    test(
+        "-1",
+        "1/123456789",
+        10,
+        Down,
+        "-1.5703",
+        "-0x1.920#10",
+        Greater,
+    );
+    test("-1", "1/123456789", 10, Up, "-1.5723", "-0x1.928#10", Less);
+    test(
+        "-1",
+        "1/123456789",
+        53,
+        Nearest,
+        "-1.5707963186948966",
+        "-0x1.921fb52178c63#53",
+        Less,
+    );
+    test("-1", "1/123456789", 1, Nearest, "-2.0", "-0x2.0#1", Less);
+    test("-1", "1/123456789", 2, Floor, "-2.0", "-0x2.0#2", Less);
+    test("-1", "22/7", 10, Nearest, "-0.30811", "-0x0.4ee#10", Less);
+    test("-1", "22/7", 10, Floor, "-0.30811", "-0x0.4ee#10", Less);
+    test(
+        "-1",
+        "22/7",
+        10,
+        Ceiling,
+        "-0.30762",
+        "-0x0.4ec#10",
+        Greater,
+    );
+    test("-1", "22/7", 10, Down, "-0.30762", "-0x0.4ec#10", Greater);
+    test("-1", "22/7", 10, Up, "-0.30811", "-0x0.4ee#10", Less);
+    test(
+        "-1",
+        "22/7",
+        53,
+        Nearest,
+        "-0.30805278102377642",
+        "-0x0.4edc8c0bf06048#53",
+        Less,
+    );
+    test("-1", "22/7", 1, Nearest, "-0.25", "-0x0.4#1", Greater);
+    test("-1", "22/7", 2, Floor, "-0.38", "-0x0.6#2", Less);
+    test("-1", "-22/7", 10, Nearest, "-2.8320", "-0x2.d5#10", Greater);
+    test("-1", "-22/7", 10, Floor, "-2.8359", "-0x2.d6#10", Less);
+    test("-1", "-22/7", 10, Ceiling, "-2.8320", "-0x2.d5#10", Greater);
+    test("-1", "-22/7", 10, Down, "-2.8320", "-0x2.d5#10", Greater);
+    test("-1", "-22/7", 10, Up, "-2.8359", "-0x2.d6#10", Less);
+    test(
+        "-1",
+        "-22/7",
+        53,
+        Nearest,
+        "-2.8335398725660168",
+        "-0x2.d562de7c9542c#53",
+        Greater,
+    );
+    test("-1", "-22/7", 1, Nearest, "-2.0", "-0x2.0#1", Greater);
+    test("-1", "-22/7", 2, Floor, "-3.0", "-0x3.0#2", Less);
+    test(
+        "-1",
+        "355/113",
+        10,
+        Nearest,
+        "-0.30811",
+        "-0x0.4ee#10",
+        Greater,
+    );
+    test("-1", "355/113", 10, Floor, "-0.30859", "-0x0.4f0#10", Less);
+    test(
+        "-1",
+        "355/113",
+        10,
+        Ceiling,
+        "-0.30811",
+        "-0x0.4ee#10",
+        Greater,
+    );
+    test(
+        "-1",
+        "355/113",
+        10,
+        Down,
+        "-0.30811",
+        "-0x0.4ee#10",
+        Greater,
+    );
+    test("-1", "355/113", 10, Up, "-0.30859", "-0x0.4f0#10", Less);
+    test(
+        "-1",
+        "355/113",
+        53,
+        Nearest,
+        "-0.30816904657376992",
+        "-0x0.4ee42aa8ac80f4#53",
+        Less,
+    );
+    test("-1", "355/113", 1, Nearest, "-0.25", "-0x0.4#1", Greater);
+    test("-1", "355/113", 2, Floor, "-0.38", "-0x0.6#2", Less);
+    test("3/4", "0", 10, Nearest, "1.5703", "0x1.920#10", Less);
+    test("3/4", "0", 10, Floor, "1.5703", "0x1.920#10", Less);
+    test("3/4", "0", 10, Ceiling, "1.5723", "0x1.928#10", Greater);
+    test("3/4", "0", 10, Down, "1.5703", "0x1.920#10", Less);
+    test("3/4", "0", 10, Up, "1.5723", "0x1.928#10", Greater);
+    test(
+        "3/4",
+        "0",
+        53,
+        Nearest,
+        "1.5707963267948966",
+        "0x1.921fb54442d18#53",
+        Less,
+    );
+    test("3/4", "0", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("3/4", "0", 2, Floor, "1.5", "0x1.8#2", Less);
+    test("3/4", "1", 10, Nearest, "0.64355", "0x0.a4c#10", Greater);
+    test("3/4", "1", 10, Floor, "0.64258", "0x0.a48#10", Less);
+    test("3/4", "1", 10, Ceiling, "0.64355", "0x0.a4c#10", Greater);
+    test("3/4", "1", 10, Down, "0.64258", "0x0.a48#10", Less);
+    test("3/4", "1", 10, Up, "0.64355", "0x0.a4c#10", Greater);
+    test(
+        "3/4",
+        "1",
+        53,
+        Nearest,
+        "0.64350110879328437",
+        "0x0.a4bc7d1934f708#53",
+        Less,
+    );
+    test("3/4", "1", 1, Nearest, "0.50", "0x0.8#1", Less);
+    test("3/4", "1", 2, Floor, "0.50", "0x0.8#2", Less);
+    test("3/4", "-1", 10, Nearest, "2.5000", "0x2.80#10", Greater);
+    test("3/4", "-1", 10, Floor, "2.4961", "0x2.7f#10", Less);
+    test("3/4", "-1", 10, Ceiling, "2.5000", "0x2.80#10", Greater);
+    test("3/4", "-1", 10, Down, "2.4961", "0x2.7f#10", Less);
+    test("3/4", "-1", 10, Up, "2.5000", "0x2.80#10", Greater);
+    test(
+        "3/4",
+        "-1",
+        53,
+        Nearest,
+        "2.4980915447965089",
+        "0x2.7f82ed6f50ac0#53",
+        Greater,
+    );
+    test("3/4", "-1", 1, Nearest, "2.0", "0x2.0#1", Less);
+    test("3/4", "-1", 2, Floor, "2.0", "0x2.0#2", Less);
+    test("3/4", "3/4", 10, Nearest, "0.78516", "0x0.c90#10", Less);
+    test("3/4", "3/4", 10, Floor, "0.78516", "0x0.c90#10", Less);
+    test("3/4", "3/4", 10, Ceiling, "0.78613", "0x0.c94#10", Greater);
+    test("3/4", "3/4", 10, Down, "0.78516", "0x0.c90#10", Less);
+    test("3/4", "3/4", 10, Up, "0.78613", "0x0.c94#10", Greater);
+    test(
+        "3/4",
+        "3/4",
+        53,
+        Nearest,
+        "0.78539816339744828",
+        "0x0.c90fdaa22168c0#53",
+        Less,
+    );
+    test("3/4", "3/4", 1, Nearest, "1.0", "0x1.0#1", Greater);
+    test("3/4", "3/4", 2, Floor, "0.75", "0x0.c#2", Less);
+    test("3/4", "-3/4", 10, Nearest, "2.3555", "0x2.5b#10", Less);
+    test("3/4", "-3/4", 10, Floor, "2.3555", "0x2.5b#10", Less);
+    test("3/4", "-3/4", 10, Ceiling, "2.3594", "0x2.5c#10", Greater);
+    test("3/4", "-3/4", 10, Down, "2.3555", "0x2.5b#10", Less);
+    test("3/4", "-3/4", 10, Up, "2.3594", "0x2.5c#10", Greater);
+    test(
+        "3/4",
+        "-3/4",
+        53,
+        Nearest,
+        "2.3561944901923448",
+        "0x2.5b2f8fe6643a4#53",
+        Less,
+    );
+    test("3/4", "-3/4", 1, Nearest, "2.0", "0x2.0#1", Less);
+    test("3/4", "-3/4", 2, Floor, "2.0", "0x2.0#2", Less);
+    test("3/4", "1/3", 10, Nearest, "1.1523", "0x1.270#10", Less);
+    test("3/4", "1/3", 10, Floor, "1.1523", "0x1.270#10", Less);
+    test("3/4", "1/3", 10, Ceiling, "1.1543", "0x1.278#10", Greater);
+    test("3/4", "1/3", 10, Down, "1.1523", "0x1.270#10", Less);
+    test("3/4", "1/3", 10, Up, "1.1543", "0x1.278#10", Greater);
+    test(
+        "3/4",
+        "1/3",
+        53,
+        Nearest,
+        "1.1525719972156676",
+        "0x1.270ef55a53a25#53",
+        Greater,
+    );
+    test("3/4", "1/3", 1, Nearest, "1.0", "0x1.0#1", Less);
+    test("3/4", "1/3", 2, Floor, "1.0", "0x1.0#2", Less);
+    test("3/4", "-1/3", 10, Nearest, "1.9883", "0x1.fd0#10", Less);
+    test("3/4", "-1/3", 10, Floor, "1.9883", "0x1.fd0#10", Less);
+    test("3/4", "-1/3", 10, Ceiling, "1.9902", "0x1.fd8#10", Greater);
+    test("3/4", "-1/3", 10, Down, "1.9883", "0x1.fd0#10", Less);
+    test("3/4", "-1/3", 10, Up, "1.9902", "0x1.fd8#10", Greater);
+    test(
+        "3/4",
+        "-1/3",
+        53,
+        Nearest,
+        "1.9890206563741257",
+        "0x1.fd30752e3200c#53",
+        Greater,
+    );
+    test("3/4", "-1/3", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("3/4", "-1/3", 2, Floor, "1.5", "0x1.8#2", Less);
+    test("3/4", "2", 10, Nearest, "0.35889", "0x0.5be#10", Greater);
+    test("3/4", "2", 10, Floor, "0.35840", "0x0.5bc#10", Less);
+    test("3/4", "2", 10, Ceiling, "0.35889", "0x0.5be#10", Greater);
+    test("3/4", "2", 10, Down, "0.35840", "0x0.5bc#10", Less);
+    test("3/4", "2", 10, Up, "0.35889", "0x0.5be#10", Greater);
+    test(
+        "3/4",
+        "2",
+        53,
+        Nearest,
+        "0.35877067027057225",
+        "0x0.5bd86507937bc4#53",
+        Greater,
+    );
+    test("3/4", "2", 1, Nearest, "0.25", "0x0.4#1", Less);
+    test("3/4", "2", 2, Floor, "0.25", "0x0.4#2", Less);
+    test("3/4", "-2", 10, Nearest, "2.7812", "0x2.c8#10", Less);
+    test("3/4", "-2", 10, Floor, "2.7812", "0x2.c8#10", Less);
+    test("3/4", "-2", 10, Ceiling, "2.7852", "0x2.c9#10", Greater);
+    test("3/4", "-2", 10, Down, "2.7812", "0x2.c8#10", Less);
+    test("3/4", "-2", 10, Up, "2.7852", "0x2.c9#10", Greater);
+    test(
+        "3/4",
+        "-2",
+        53,
+        Nearest,
+        "2.7828219833192209",
+        "0x2.c8670580f2274#53",
+        Less,
+    );
+    test("3/4", "-2", 1, Nearest, "2.0", "0x2.0#1", Less);
+    test("3/4", "-2", 2, Floor, "2.0", "0x2.0#2", Less);
+    test("3/4", "7/2", 10, Nearest, "0.21118", "0x0.361#10", Greater);
+    test("3/4", "7/2", 10, Floor, "0.21094", "0x0.360#10", Less);
+    test("3/4", "7/2", 10, Ceiling, "0.21118", "0x0.361#10", Greater);
+    test("3/4", "7/2", 10, Down, "0.21094", "0x0.360#10", Less);
+    test("3/4", "7/2", 10, Up, "0.21118", "0x0.361#10", Greater);
+    test(
+        "3/4",
+        "7/2",
+        53,
+        Nearest,
+        "0.21109333322274654",
+        "0x0.360a3672986754#53",
+        Less,
+    );
+    test("3/4", "7/2", 1, Nearest, "0.25", "0x0.4#1", Greater);
+    test("3/4", "7/2", 2, Floor, "0.19", "0x0.3#2", Less);
+    test(
+        "3/4",
+        "1/1000",
+        10,
+        Nearest,
+        "1.5703",
+        "0x1.920#10",
+        Greater,
+    );
+    test("3/4", "1/1000", 10, Floor, "1.5684", "0x1.918#10", Less);
+    test(
+        "3/4",
+        "1/1000",
+        10,
+        Ceiling,
+        "1.5703",
+        "0x1.920#10",
+        Greater,
+    );
+    test("3/4", "1/1000", 10, Down, "1.5684", "0x1.918#10", Less);
+    test("3/4", "1/1000", 10, Up, "1.5703", "0x1.920#10", Greater);
+    test(
+        "3/4",
+        "1/1000",
+        53,
+        Nearest,
+        "1.5694629942516860",
+        "0x1.91c853a897ddc#53",
+        Greater,
+    );
+    test("3/4", "1/1000", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("3/4", "1/1000", 2, Floor, "1.5", "0x1.8#2", Less);
+    test(
+        "3/4",
+        "999/1000",
+        10,
+        Nearest,
+        "0.64355",
+        "0x0.a4c#10",
+        Less,
+    );
+    test("3/4", "999/1000", 10, Floor, "0.64355", "0x0.a4c#10", Less);
+    test(
+        "3/4",
+        "999/1000",
+        10,
+        Ceiling,
+        "0.64453",
+        "0x0.a50#10",
+        Greater,
+    );
+    test("3/4", "999/1000", 10, Down, "0.64355", "0x0.a4c#10", Less);
+    test("3/4", "999/1000", 10, Up, "0.64453", "0x0.a50#10", Greater);
+    test(
+        "3/4",
+        "999/1000",
+        53,
+        Nearest,
+        "0.64398141615308346",
+        "0x0.a4dbf7519bf870#53",
+        Greater,
+    );
+    test("3/4", "999/1000", 1, Nearest, "0.50", "0x0.8#1", Less);
+    test("3/4", "999/1000", 2, Floor, "0.50", "0x0.8#2", Less);
+    test(
+        "3/4",
+        "123456789/7",
+        10,
+        Nearest,
+        "4.2550e-8",
+        "0xb.6cE-7#10",
+        Greater,
+    );
+    test(
+        "3/4",
+        "123456789/7",
+        10,
+        Floor,
+        "4.2492e-8",
+        "0xb.68E-7#10",
+        Less,
+    );
+    test(
+        "3/4",
+        "123456789/7",
+        10,
+        Ceiling,
+        "4.2550e-8",
+        "0xb.6cE-7#10",
+        Greater,
+    );
+    test(
+        "3/4",
+        "123456789/7",
+        10,
+        Down,
+        "4.2492e-8",
+        "0xb.68E-7#10",
+        Less,
+    );
+    test(
+        "3/4",
+        "123456789/7",
+        10,
+        Up,
+        "4.2550e-8",
+        "0xb.6cE-7#10",
+        Greater,
+    );
+    test(
+        "3/4",
+        "123456789/7",
+        53,
+        Nearest,
+        "4.2525000386977476e-8",
+        "0xb.6a4bb7e58f920E-7#53",
+        Less,
+    );
+    test(
+        "3/4",
+        "123456789/7",
+        1,
+        Nearest,
+        "3.0e-8",
+        "0x8.0E-7#1",
+        Less,
+    );
+    test("3/4", "123456789/7", 2, Floor, "3.0e-8", "0x8.0E-7#2", Less);
+    test(
+        "3/4",
+        "1/123456789",
+        10,
+        Nearest,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "3/4",
+        "1/123456789",
+        10,
+        Floor,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "3/4",
+        "1/123456789",
+        10,
+        Ceiling,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test("3/4", "1/123456789", 10, Down, "1.5703", "0x1.920#10", Less);
+    test(
+        "3/4",
+        "1/123456789",
+        10,
+        Up,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test(
+        "3/4",
+        "1/123456789",
+        53,
+        Nearest,
+        "1.5707963159948966",
+        "0x1.921fb515e017c#53",
+        Greater,
+    );
+    test("3/4", "1/123456789", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("3/4", "1/123456789", 2, Floor, "1.5", "0x1.8#2", Less);
+    test("3/4", "22/7", 10, Nearest, "0.23438", "0x0.3c0#10", Greater);
+    test("3/4", "22/7", 10, Floor, "0.23413", "0x0.3bf#10", Less);
+    test("3/4", "22/7", 10, Ceiling, "0.23438", "0x0.3c0#10", Greater);
+    test("3/4", "22/7", 10, Down, "0.23413", "0x0.3bf#10", Less);
+    test("3/4", "22/7", 10, Up, "0.23438", "0x0.3c0#10", Greater);
+    test(
+        "3/4",
+        "22/7",
+        53,
+        Nearest,
+        "0.23425521359425089",
+        "0x0.3bf826514e0784#53",
+        Greater,
+    );
+    test("3/4", "22/7", 1, Nearest, "0.25", "0x0.4#1", Greater);
+    test("3/4", "22/7", 2, Floor, "0.19", "0x0.3#2", Less);
+    test("3/4", "-22/7", 10, Nearest, "2.9062", "0x2.e8#10", Less);
+    test("3/4", "-22/7", 10, Floor, "2.9062", "0x2.e8#10", Less);
+    test("3/4", "-22/7", 10, Ceiling, "2.9102", "0x2.e9#10", Greater);
+    test("3/4", "-22/7", 10, Down, "2.9062", "0x2.e8#10", Less);
+    test("3/4", "-22/7", 10, Up, "2.9102", "0x2.e9#10", Greater);
+    test(
+        "3/4",
+        "-22/7",
+        53,
+        Nearest,
+        "2.9073374399955423",
+        "0x2.e8474437379b8#53",
+        Less,
+    );
+    test("3/4", "-22/7", 1, Nearest, "2.0", "0x2.0#1", Less);
+    test("3/4", "-22/7", 2, Floor, "2.0", "0x2.0#2", Less);
+    test(
+        "3/4",
+        "355/113",
+        10,
+        Nearest,
+        "0.23438",
+        "0x0.3c0#10",
+        Greater,
+    );
+    test("3/4", "355/113", 10, Floor, "0.23413", "0x0.3bf#10", Less);
+    test(
+        "3/4",
+        "355/113",
+        10,
+        Ceiling,
+        "0.23438",
+        "0x0.3c0#10",
+        Greater,
+    );
+    test("3/4", "355/113", 10, Down, "0.23413", "0x0.3bf#10", Less);
+    test("3/4", "355/113", 10, Up, "0.23438", "0x0.3c0#10", Greater);
+    test(
+        "3/4",
+        "355/113",
+        53,
+        Nearest,
+        "0.23434606830973920",
+        "0x0.3bfe1a9b5625a4#53",
+        Less,
+    );
+    test("3/4", "355/113", 1, Nearest, "0.25", "0x0.4#1", Greater);
+    test("3/4", "355/113", 2, Floor, "0.19", "0x0.3#2", Less);
+    test("-3/4", "0", 10, Nearest, "-1.5703", "-0x1.920#10", Greater);
+    test("-3/4", "0", 10, Floor, "-1.5723", "-0x1.928#10", Less);
+    test("-3/4", "0", 10, Ceiling, "-1.5703", "-0x1.920#10", Greater);
+    test("-3/4", "0", 10, Down, "-1.5703", "-0x1.920#10", Greater);
+    test("-3/4", "0", 10, Up, "-1.5723", "-0x1.928#10", Less);
+    test(
+        "-3/4",
+        "0",
+        53,
+        Nearest,
+        "-1.5707963267948966",
+        "-0x1.921fb54442d18#53",
+        Greater,
+    );
+    test("-3/4", "0", 1, Nearest, "-2.0", "-0x2.0#1", Less);
+    test("-3/4", "0", 2, Floor, "-2.0", "-0x2.0#2", Less);
+    test("-3/4", "1", 10, Nearest, "-0.64355", "-0x0.a4c#10", Less);
+    test("-3/4", "1", 10, Floor, "-0.64355", "-0x0.a4c#10", Less);
+    test("-3/4", "1", 10, Ceiling, "-0.64258", "-0x0.a48#10", Greater);
+    test("-3/4", "1", 10, Down, "-0.64258", "-0x0.a48#10", Greater);
+    test("-3/4", "1", 10, Up, "-0.64355", "-0x0.a4c#10", Less);
+    test(
+        "-3/4",
+        "1",
+        53,
+        Nearest,
+        "-0.64350110879328437",
+        "-0x0.a4bc7d1934f708#53",
+        Greater,
+    );
+    test("-3/4", "1", 1, Nearest, "-0.50", "-0x0.8#1", Greater);
+    test("-3/4", "1", 2, Floor, "-0.75", "-0x0.c#2", Less);
+    test("-3/4", "-1", 10, Nearest, "-2.5000", "-0x2.80#10", Less);
+    test("-3/4", "-1", 10, Floor, "-2.5000", "-0x2.80#10", Less);
+    test("-3/4", "-1", 10, Ceiling, "-2.4961", "-0x2.7f#10", Greater);
+    test("-3/4", "-1", 10, Down, "-2.4961", "-0x2.7f#10", Greater);
+    test("-3/4", "-1", 10, Up, "-2.5000", "-0x2.80#10", Less);
+    test(
+        "-3/4",
+        "-1",
+        53,
+        Nearest,
+        "-2.4980915447965089",
+        "-0x2.7f82ed6f50ac0#53",
+        Less,
+    );
+    test("-3/4", "-1", 1, Nearest, "-2.0", "-0x2.0#1", Greater);
+    test("-3/4", "-1", 2, Floor, "-3.0", "-0x3.0#2", Less);
+    test(
+        "-3/4",
+        "3/4",
+        10,
+        Nearest,
+        "-0.78516",
+        "-0x0.c90#10",
+        Greater,
+    );
+    test("-3/4", "3/4", 10, Floor, "-0.78613", "-0x0.c94#10", Less);
+    test(
+        "-3/4",
+        "3/4",
+        10,
+        Ceiling,
+        "-0.78516",
+        "-0x0.c90#10",
+        Greater,
+    );
+    test("-3/4", "3/4", 10, Down, "-0.78516", "-0x0.c90#10", Greater);
+    test("-3/4", "3/4", 10, Up, "-0.78613", "-0x0.c94#10", Less);
+    test(
+        "-3/4",
+        "3/4",
+        53,
+        Nearest,
+        "-0.78539816339744828",
+        "-0x0.c90fdaa22168c0#53",
+        Greater,
+    );
+    test("-3/4", "3/4", 1, Nearest, "-1.0", "-0x1.0#1", Less);
+    test("-3/4", "3/4", 2, Floor, "-1.0", "-0x1.0#2", Less);
+    test(
+        "-3/4",
+        "-3/4",
+        10,
+        Nearest,
+        "-2.3555",
+        "-0x2.5b#10",
+        Greater,
+    );
+    test("-3/4", "-3/4", 10, Floor, "-2.3594", "-0x2.5c#10", Less);
+    test(
+        "-3/4",
+        "-3/4",
+        10,
+        Ceiling,
+        "-2.3555",
+        "-0x2.5b#10",
+        Greater,
+    );
+    test("-3/4", "-3/4", 10, Down, "-2.3555", "-0x2.5b#10", Greater);
+    test("-3/4", "-3/4", 10, Up, "-2.3594", "-0x2.5c#10", Less);
+    test(
+        "-3/4",
+        "-3/4",
+        53,
+        Nearest,
+        "-2.3561944901923448",
+        "-0x2.5b2f8fe6643a4#53",
+        Greater,
+    );
+    test("-3/4", "-3/4", 1, Nearest, "-2.0", "-0x2.0#1", Greater);
+    test("-3/4", "-3/4", 2, Floor, "-3.0", "-0x3.0#2", Less);
+    test(
+        "-3/4",
+        "1/3",
+        10,
+        Nearest,
+        "-1.1523",
+        "-0x1.270#10",
+        Greater,
+    );
+    test("-3/4", "1/3", 10, Floor, "-1.1543", "-0x1.278#10", Less);
+    test(
+        "-3/4",
+        "1/3",
+        10,
+        Ceiling,
+        "-1.1523",
+        "-0x1.270#10",
+        Greater,
+    );
+    test("-3/4", "1/3", 10, Down, "-1.1523", "-0x1.270#10", Greater);
+    test("-3/4", "1/3", 10, Up, "-1.1543", "-0x1.278#10", Less);
+    test(
+        "-3/4",
+        "1/3",
+        53,
+        Nearest,
+        "-1.1525719972156676",
+        "-0x1.270ef55a53a25#53",
+        Less,
+    );
+    test("-3/4", "1/3", 1, Nearest, "-1.0", "-0x1.0#1", Greater);
+    test("-3/4", "1/3", 2, Floor, "-1.5", "-0x1.8#2", Less);
+    test(
+        "-3/4",
+        "-1/3",
+        10,
+        Nearest,
+        "-1.9883",
+        "-0x1.fd0#10",
+        Greater,
+    );
+    test("-3/4", "-1/3", 10, Floor, "-1.9902", "-0x1.fd8#10", Less);
+    test(
+        "-3/4",
+        "-1/3",
+        10,
+        Ceiling,
+        "-1.9883",
+        "-0x1.fd0#10",
+        Greater,
+    );
+    test("-3/4", "-1/3", 10, Down, "-1.9883", "-0x1.fd0#10", Greater);
+    test("-3/4", "-1/3", 10, Up, "-1.9902", "-0x1.fd8#10", Less);
+    test(
+        "-3/4",
+        "-1/3",
+        53,
+        Nearest,
+        "-1.9890206563741257",
+        "-0x1.fd30752e3200c#53",
+        Less,
+    );
+    test("-3/4", "-1/3", 1, Nearest, "-2.0", "-0x2.0#1", Less);
+    test("-3/4", "-1/3", 2, Floor, "-2.0", "-0x2.0#2", Less);
+    test("-3/4", "2", 10, Nearest, "-0.35889", "-0x0.5be#10", Less);
+    test("-3/4", "2", 10, Floor, "-0.35889", "-0x0.5be#10", Less);
+    test("-3/4", "2", 10, Ceiling, "-0.35840", "-0x0.5bc#10", Greater);
+    test("-3/4", "2", 10, Down, "-0.35840", "-0x0.5bc#10", Greater);
+    test("-3/4", "2", 10, Up, "-0.35889", "-0x0.5be#10", Less);
+    test(
+        "-3/4",
+        "2",
+        53,
+        Nearest,
+        "-0.35877067027057225",
+        "-0x0.5bd86507937bc4#53",
+        Less,
+    );
+    test("-3/4", "2", 1, Nearest, "-0.25", "-0x0.4#1", Greater);
+    test("-3/4", "2", 2, Floor, "-0.38", "-0x0.6#2", Less);
+    test("-3/4", "-2", 10, Nearest, "-2.7812", "-0x2.c8#10", Greater);
+    test("-3/4", "-2", 10, Floor, "-2.7852", "-0x2.c9#10", Less);
+    test("-3/4", "-2", 10, Ceiling, "-2.7812", "-0x2.c8#10", Greater);
+    test("-3/4", "-2", 10, Down, "-2.7812", "-0x2.c8#10", Greater);
+    test("-3/4", "-2", 10, Up, "-2.7852", "-0x2.c9#10", Less);
+    test(
+        "-3/4",
+        "-2",
+        53,
+        Nearest,
+        "-2.7828219833192209",
+        "-0x2.c8670580f2274#53",
+        Greater,
+    );
+    test("-3/4", "-2", 1, Nearest, "-2.0", "-0x2.0#1", Greater);
+    test("-3/4", "-2", 2, Floor, "-3.0", "-0x3.0#2", Less);
+    test("-3/4", "7/2", 10, Nearest, "-0.21118", "-0x0.361#10", Less);
+    test("-3/4", "7/2", 10, Floor, "-0.21118", "-0x0.361#10", Less);
+    test(
+        "-3/4",
+        "7/2",
+        10,
+        Ceiling,
+        "-0.21094",
+        "-0x0.360#10",
+        Greater,
+    );
+    test("-3/4", "7/2", 10, Down, "-0.21094", "-0x0.360#10", Greater);
+    test("-3/4", "7/2", 10, Up, "-0.21118", "-0x0.361#10", Less);
+    test(
+        "-3/4",
+        "7/2",
+        53,
+        Nearest,
+        "-0.21109333322274654",
+        "-0x0.360a3672986754#53",
+        Greater,
+    );
+    test("-3/4", "7/2", 1, Nearest, "-0.25", "-0x0.4#1", Less);
+    test("-3/4", "7/2", 2, Floor, "-0.25", "-0x0.4#2", Less);
+    test(
+        "-3/4",
+        "1/1000",
+        10,
+        Nearest,
+        "-1.5703",
+        "-0x1.920#10",
+        Less,
+    );
+    test("-3/4", "1/1000", 10, Floor, "-1.5703", "-0x1.920#10", Less);
+    test(
+        "-3/4",
+        "1/1000",
+        10,
+        Ceiling,
+        "-1.5684",
+        "-0x1.918#10",
+        Greater,
+    );
+    test(
+        "-3/4",
+        "1/1000",
+        10,
+        Down,
+        "-1.5684",
+        "-0x1.918#10",
+        Greater,
+    );
+    test("-3/4", "1/1000", 10, Up, "-1.5703", "-0x1.920#10", Less);
+    test(
+        "-3/4",
+        "1/1000",
+        53,
+        Nearest,
+        "-1.5694629942516860",
+        "-0x1.91c853a897ddc#53",
+        Less,
+    );
+    test("-3/4", "1/1000", 1, Nearest, "-2.0", "-0x2.0#1", Less);
+    test("-3/4", "1/1000", 2, Floor, "-2.0", "-0x2.0#2", Less);
+    test(
+        "-3/4",
+        "999/1000",
+        10,
+        Nearest,
+        "-0.64355",
+        "-0x0.a4c#10",
+        Greater,
+    );
+    test(
+        "-3/4",
+        "999/1000",
+        10,
+        Floor,
+        "-0.64453",
+        "-0x0.a50#10",
+        Less,
+    );
+    test(
+        "-3/4",
+        "999/1000",
+        10,
+        Ceiling,
+        "-0.64355",
+        "-0x0.a4c#10",
+        Greater,
+    );
+    test(
+        "-3/4",
+        "999/1000",
+        10,
+        Down,
+        "-0.64355",
+        "-0x0.a4c#10",
+        Greater,
+    );
+    test("-3/4", "999/1000", 10, Up, "-0.64453", "-0x0.a50#10", Less);
+    test(
+        "-3/4",
+        "999/1000",
+        53,
+        Nearest,
+        "-0.64398141615308346",
+        "-0x0.a4dbf7519bf870#53",
+        Less,
+    );
+    test("-3/4", "999/1000", 1, Nearest, "-0.50", "-0x0.8#1", Greater);
+    test("-3/4", "999/1000", 2, Floor, "-0.75", "-0x0.c#2", Less);
+    test(
+        "-3/4",
+        "123456789/7",
+        10,
+        Nearest,
+        "-4.2550e-8",
+        "-0xb.6cE-7#10",
+        Less,
+    );
+    test(
+        "-3/4",
+        "123456789/7",
+        10,
+        Floor,
+        "-4.2550e-8",
+        "-0xb.6cE-7#10",
+        Less,
+    );
+    test(
+        "-3/4",
+        "123456789/7",
+        10,
+        Ceiling,
+        "-4.2492e-8",
+        "-0xb.68E-7#10",
+        Greater,
+    );
+    test(
+        "-3/4",
+        "123456789/7",
+        10,
+        Down,
+        "-4.2492e-8",
+        "-0xb.68E-7#10",
+        Greater,
+    );
+    test(
+        "-3/4",
+        "123456789/7",
+        10,
+        Up,
+        "-4.2550e-8",
+        "-0xb.6cE-7#10",
+        Less,
+    );
+    test(
+        "-3/4",
+        "123456789/7",
+        53,
+        Nearest,
+        "-4.2525000386977476e-8",
+        "-0xb.6a4bb7e58f920E-7#53",
+        Greater,
+    );
+    test(
+        "-3/4",
+        "123456789/7",
+        1,
+        Nearest,
+        "-3.0e-8",
+        "-0x8.0E-7#1",
+        Greater,
+    );
+    test(
+        "-3/4",
+        "123456789/7",
+        2,
+        Floor,
+        "-4.5e-8",
+        "-0xc.0E-7#2",
+        Less,
+    );
+    test(
+        "-3/4",
+        "1/123456789",
+        10,
+        Nearest,
+        "-1.5703",
+        "-0x1.920#10",
+        Greater,
+    );
+    test(
+        "-3/4",
+        "1/123456789",
+        10,
+        Floor,
+        "-1.5723",
+        "-0x1.928#10",
+        Less,
+    );
+    test(
+        "-3/4",
+        "1/123456789",
+        10,
+        Ceiling,
+        "-1.5703",
+        "-0x1.920#10",
+        Greater,
+    );
+    test(
+        "-3/4",
+        "1/123456789",
+        10,
+        Down,
+        "-1.5703",
+        "-0x1.920#10",
+        Greater,
+    );
+    test(
+        "-3/4",
+        "1/123456789",
+        10,
+        Up,
+        "-1.5723",
+        "-0x1.928#10",
+        Less,
+    );
+    test(
+        "-3/4",
+        "1/123456789",
+        53,
+        Nearest,
+        "-1.5707963159948966",
+        "-0x1.921fb515e017c#53",
+        Less,
+    );
+    test("-3/4", "1/123456789", 1, Nearest, "-2.0", "-0x2.0#1", Less);
+    test("-3/4", "1/123456789", 2, Floor, "-2.0", "-0x2.0#2", Less);
+    test("-3/4", "22/7", 10, Nearest, "-0.23438", "-0x0.3c0#10", Less);
+    test("-3/4", "22/7", 10, Floor, "-0.23438", "-0x0.3c0#10", Less);
+    test(
+        "-3/4",
+        "22/7",
+        10,
+        Ceiling,
+        "-0.23413",
+        "-0x0.3bf#10",
+        Greater,
+    );
+    test("-3/4", "22/7", 10, Down, "-0.23413", "-0x0.3bf#10", Greater);
+    test("-3/4", "22/7", 10, Up, "-0.23438", "-0x0.3c0#10", Less);
+    test(
+        "-3/4",
+        "22/7",
+        53,
+        Nearest,
+        "-0.23425521359425089",
+        "-0x0.3bf826514e0784#53",
+        Less,
+    );
+    test("-3/4", "22/7", 1, Nearest, "-0.25", "-0x0.4#1", Less);
+    test("-3/4", "22/7", 2, Floor, "-0.25", "-0x0.4#2", Less);
+    test(
+        "-3/4",
+        "-22/7",
+        10,
+        Nearest,
+        "-2.9062",
+        "-0x2.e8#10",
+        Greater,
+    );
+    test("-3/4", "-22/7", 10, Floor, "-2.9102", "-0x2.e9#10", Less);
+    test(
+        "-3/4",
+        "-22/7",
+        10,
+        Ceiling,
+        "-2.9062",
+        "-0x2.e8#10",
+        Greater,
+    );
+    test("-3/4", "-22/7", 10, Down, "-2.9062", "-0x2.e8#10", Greater);
+    test("-3/4", "-22/7", 10, Up, "-2.9102", "-0x2.e9#10", Less);
+    test(
+        "-3/4",
+        "-22/7",
+        53,
+        Nearest,
+        "-2.9073374399955423",
+        "-0x2.e8474437379b8#53",
+        Greater,
+    );
+    test("-3/4", "-22/7", 1, Nearest, "-2.0", "-0x2.0#1", Greater);
+    test("-3/4", "-22/7", 2, Floor, "-3.0", "-0x3.0#2", Less);
+    test(
+        "-3/4",
+        "355/113",
+        10,
+        Nearest,
+        "-0.23438",
+        "-0x0.3c0#10",
+        Less,
+    );
+    test(
+        "-3/4",
+        "355/113",
+        10,
+        Floor,
+        "-0.23438",
+        "-0x0.3c0#10",
+        Less,
+    );
+    test(
+        "-3/4",
+        "355/113",
+        10,
+        Ceiling,
+        "-0.23413",
+        "-0x0.3bf#10",
+        Greater,
+    );
+    test(
+        "-3/4",
+        "355/113",
+        10,
+        Down,
+        "-0.23413",
+        "-0x0.3bf#10",
+        Greater,
+    );
+    test("-3/4", "355/113", 10, Up, "-0.23438", "-0x0.3c0#10", Less);
+    test(
+        "-3/4",
+        "355/113",
+        53,
+        Nearest,
+        "-0.23434606830973920",
+        "-0x0.3bfe1a9b5625a4#53",
+        Greater,
+    );
+    test("-3/4", "355/113", 1, Nearest, "-0.25", "-0x0.4#1", Less);
+    test("-3/4", "355/113", 2, Floor, "-0.25", "-0x0.4#2", Less);
+    test("1/3", "0", 10, Nearest, "1.5703", "0x1.920#10", Less);
+    test("1/3", "0", 10, Floor, "1.5703", "0x1.920#10", Less);
+    test("1/3", "0", 10, Ceiling, "1.5723", "0x1.928#10", Greater);
+    test("1/3", "0", 10, Down, "1.5703", "0x1.920#10", Less);
+    test("1/3", "0", 10, Up, "1.5723", "0x1.928#10", Greater);
+    test(
+        "1/3",
+        "0",
+        53,
+        Nearest,
+        "1.5707963267948966",
+        "0x1.921fb54442d18#53",
+        Less,
+    );
+    test("1/3", "0", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("1/3", "0", 2, Floor, "1.5", "0x1.8#2", Less);
+    test("1/3", "1", 10, Nearest, "0.32178", "0x0.526#10", Greater);
+    test("1/3", "1", 10, Floor, "0.32129", "0x0.524#10", Less);
+    test("1/3", "1", 10, Ceiling, "0.32178", "0x0.526#10", Greater);
+    test("1/3", "1", 10, Down, "0.32129", "0x0.524#10", Less);
+    test("1/3", "1", 10, Up, "0.32178", "0x0.526#10", Greater);
+    test(
+        "1/3",
+        "1",
+        53,
+        Nearest,
+        "0.32175055439664219",
+        "0x0.525e3e8c9a7b84#53",
+        Less,
+    );
+    test("1/3", "1", 1, Nearest, "0.25", "0x0.4#1", Less);
+    test("1/3", "1", 2, Floor, "0.25", "0x0.4#2", Less);
+    test("1/3", "-1", 10, Nearest, "2.8203", "0x2.d2#10", Greater);
+    test("1/3", "-1", 10, Floor, "2.8164", "0x2.d1#10", Less);
+    test("1/3", "-1", 10, Ceiling, "2.8203", "0x2.d2#10", Greater);
+    test("1/3", "-1", 10, Down, "2.8164", "0x2.d1#10", Less);
+    test("1/3", "-1", 10, Up, "2.8203", "0x2.d2#10", Greater);
+    test(
+        "1/3",
+        "-1",
+        53,
+        Nearest,
+        "2.8198420991931510",
+        "0x2.d1e12bfbeb278#53",
+        Less,
+    );
+    test("1/3", "-1", 1, Nearest, "2.0", "0x2.0#1", Less);
+    test("1/3", "-1", 2, Floor, "2.0", "0x2.0#2", Less);
+    test("1/3", "3/4", 10, Nearest, "0.41846", "0x0.6b2#10", Greater);
+    test("1/3", "3/4", 10, Floor, "0.41797", "0x0.6b0#10", Less);
+    test("1/3", "3/4", 10, Ceiling, "0.41846", "0x0.6b2#10", Greater);
+    test("1/3", "3/4", 10, Down, "0.41797", "0x0.6b0#10", Less);
+    test("1/3", "3/4", 10, Up, "0.41846", "0x0.6b2#10", Greater);
+    test(
+        "1/3",
+        "3/4",
+        53,
+        Nearest,
+        "0.41822432957922911",
+        "0x0.6b10bfe9ef2f3c#53",
+        Greater,
+    );
+    test("1/3", "3/4", 1, Nearest, "0.50", "0x0.8#1", Greater);
+    test("1/3", "3/4", 2, Floor, "0.38", "0x0.6#2", Less);
+    test("1/3", "-3/4", 10, Nearest, "2.7227", "0x2.b9#10", Less);
+    test("1/3", "-3/4", 10, Floor, "2.7227", "0x2.b9#10", Less);
+    test("1/3", "-3/4", 10, Ceiling, "2.7266", "0x2.ba#10", Greater);
+    test("1/3", "-3/4", 10, Down, "2.7227", "0x2.b9#10", Less);
+    test("1/3", "-3/4", 10, Up, "2.7266", "0x2.ba#10", Greater);
+    test(
+        "1/3",
+        "-3/4",
+        53,
+        Nearest,
+        "2.7233683240105639",
+        "0x2.b92eaa9e9673c#53",
+        Less,
+    );
+    test("1/3", "-3/4", 1, Nearest, "2.0", "0x2.0#1", Less);
+    test("1/3", "-3/4", 2, Floor, "2.0", "0x2.0#2", Less);
+    test("1/3", "1/3", 10, Nearest, "0.78516", "0x0.c90#10", Less);
+    test("1/3", "1/3", 10, Floor, "0.78516", "0x0.c90#10", Less);
+    test("1/3", "1/3", 10, Ceiling, "0.78613", "0x0.c94#10", Greater);
+    test("1/3", "1/3", 10, Down, "0.78516", "0x0.c90#10", Less);
+    test("1/3", "1/3", 10, Up, "0.78613", "0x0.c94#10", Greater);
+    test(
+        "1/3",
+        "1/3",
+        53,
+        Nearest,
+        "0.78539816339744828",
+        "0x0.c90fdaa22168c0#53",
+        Less,
+    );
+    test("1/3", "1/3", 1, Nearest, "1.0", "0x1.0#1", Greater);
+    test("1/3", "1/3", 2, Floor, "0.75", "0x0.c#2", Less);
+    test("1/3", "-1/3", 10, Nearest, "2.3555", "0x2.5b#10", Less);
+    test("1/3", "-1/3", 10, Floor, "2.3555", "0x2.5b#10", Less);
+    test("1/3", "-1/3", 10, Ceiling, "2.3594", "0x2.5c#10", Greater);
+    test("1/3", "-1/3", 10, Down, "2.3555", "0x2.5b#10", Less);
+    test("1/3", "-1/3", 10, Up, "2.3594", "0x2.5c#10", Greater);
+    test(
+        "1/3",
+        "-1/3",
+        53,
+        Nearest,
+        "2.3561944901923448",
+        "0x2.5b2f8fe6643a4#53",
+        Less,
+    );
+    test("1/3", "-1/3", 1, Nearest, "2.0", "0x2.0#1", Less);
+    test("1/3", "-1/3", 2, Floor, "2.0", "0x2.0#2", Less);
+    test("1/3", "2", 10, Nearest, "0.16504", "0x0.2a4#10", Less);
+    test("1/3", "2", 10, Floor, "0.16504", "0x0.2a4#10", Less);
+    test("1/3", "2", 10, Ceiling, "0.16528", "0x0.2a5#10", Greater);
+    test("1/3", "2", 10, Down, "0.16504", "0x0.2a4#10", Less);
+    test("1/3", "2", 10, Up, "0.16528", "0x0.2a5#10", Greater);
+    test(
+        "1/3",
+        "2",
+        53,
+        Nearest,
+        "0.16514867741462683",
+        "0x0.2a472f087935ba#53",
+        Less,
+    );
+    test("1/3", "2", 1, Nearest, "0.12", "0x0.2#1", Less);
+    test("1/3", "2", 2, Floor, "0.12", "0x0.2#2", Less);
+    test("1/3", "-2", 10, Nearest, "2.9766", "0x2.fa#10", Greater);
+    test("1/3", "-2", 10, Floor, "2.9727", "0x2.f9#10", Less);
+    test("1/3", "-2", 10, Ceiling, "2.9766", "0x2.fa#10", Greater);
+    test("1/3", "-2", 10, Down, "2.9727", "0x2.f9#10", Less);
+    test("1/3", "-2", 10, Up, "2.9766", "0x2.fa#10", Greater);
+    test(
+        "1/3",
+        "-2",
+        53,
+        Nearest,
+        "2.9764439761751662",
+        "0x2.f9f83b800c6d4#53",
+        Less,
+    );
+    test("1/3", "-2", 1, Nearest, "2.0", "0x2.0#1", Less);
+    test("1/3", "-2", 2, Floor, "2.0", "0x2.0#2", Less);
+    test(
+        "1/3",
+        "7/2",
+        10,
+        Nearest,
+        "0.094971",
+        "0x0.1850#10",
+        Greater,
+    );
+    test("1/3", "7/2", 10, Floor, "0.094849", "0x0.1848#10", Less);
+    test(
+        "1/3",
+        "7/2",
+        10,
+        Ceiling,
+        "0.094971",
+        "0x0.1850#10",
+        Greater,
+    );
+    test("1/3", "7/2", 10, Down, "0.094849", "0x0.1848#10", Less);
+    test("1/3", "7/2", 10, Up, "0.094971", "0x0.1850#10", Greater);
+    test(
+        "1/3",
+        "7/2",
+        53,
+        Nearest,
+        "0.094951706342756320",
+        "0x0.184ec149710862#53",
+        Greater,
+    );
+    test("1/3", "7/2", 1, Nearest, "0.12", "0x0.2#1", Greater);
+    test("1/3", "7/2", 2, Floor, "0.094", "0x0.18#2", Less);
+    test(
+        "1/3",
+        "1/1000",
+        10,
+        Nearest,
+        "1.5684",
+        "0x1.918#10",
+        Greater,
+    );
+    test("1/3", "1/1000", 10, Floor, "1.5664", "0x1.910#10", Less);
+    test(
+        "1/3",
+        "1/1000",
+        10,
+        Ceiling,
+        "1.5684",
+        "0x1.918#10",
+        Greater,
+    );
+    test("1/3", "1/1000", 10, Down, "1.5664", "0x1.910#10", Less);
+    test("1/3", "1/1000", 10, Up, "1.5684", "0x1.918#10", Greater);
+    test(
+        "1/3",
+        "1/1000",
+        53,
+        Nearest,
+        "1.5677963357948481",
+        "0x1.915b19c5070ab#53",
+        Greater,
+    );
+    test("1/3", "1/1000", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("1/3", "1/1000", 2, Floor, "1.5", "0x1.8#2", Less);
+    test(
+        "1/3",
+        "999/1000",
+        10,
+        Nearest,
+        "0.32227",
+        "0x0.528#10",
+        Greater,
+    );
+    test("1/3", "999/1000", 10, Floor, "0.32178", "0x0.526#10", Less);
+    test(
+        "1/3",
+        "999/1000",
+        10,
+        Ceiling,
+        "0.32227",
+        "0x0.528#10",
+        Greater,
+    );
+    test("1/3", "999/1000", 10, Down, "0.32178", "0x0.526#10", Less);
+    test("1/3", "999/1000", 10, Up, "0.32227", "0x0.528#10", Greater);
+    test(
+        "1/3",
+        "999/1000",
+        53,
+        Nearest,
+        "0.32205082463083673",
+        "0x0.5271ec3f707454#53",
+        Less,
+    );
+    test("1/3", "999/1000", 1, Nearest, "0.25", "0x0.4#1", Less);
+    test("1/3", "999/1000", 2, Floor, "0.25", "0x0.4#2", Less);
+    test(
+        "1/3",
+        "123456789/7",
+        10,
+        Nearest,
+        "1.8888e-8",
+        "0x5.12E-7#10",
+        Less,
+    );
+    test(
+        "1/3",
+        "123456789/7",
+        10,
+        Floor,
+        "1.8888e-8",
+        "0x5.12E-7#10",
+        Less,
+    );
+    test(
+        "1/3",
+        "123456789/7",
+        10,
+        Ceiling,
+        "1.8917e-8",
+        "0x5.14E-7#10",
+        Greater,
+    );
+    test(
+        "1/3",
+        "123456789/7",
+        10,
+        Down,
+        "1.8888e-8",
+        "0x5.12E-7#10",
+        Less,
+    );
+    test(
+        "1/3",
+        "123456789/7",
+        10,
+        Up,
+        "1.8917e-8",
+        "0x5.14E-7#10",
+        Greater,
+    );
+    test(
+        "1/3",
+        "123456789/7",
+        53,
+        Nearest,
+        "1.8900000171990001e-8",
+        "0x5.12cc51bb5c41cE-7#53",
+        Greater,
+    );
+    test(
+        "1/3",
+        "123456789/7",
+        1,
+        Nearest,
+        "1.5e-8",
+        "0x4.0E-7#1",
+        Less,
+    );
+    test("1/3", "123456789/7", 2, Floor, "1.5e-8", "0x4.0E-7#2", Less);
+    test(
+        "1/3",
+        "1/123456789",
+        10,
+        Nearest,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "1/3",
+        "1/123456789",
+        10,
+        Floor,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "1/3",
+        "1/123456789",
+        10,
+        Ceiling,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test("1/3", "1/123456789", 10, Down, "1.5703", "0x1.920#10", Less);
+    test(
+        "1/3",
+        "1/123456789",
+        10,
+        Up,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test(
+        "1/3",
+        "1/123456789",
+        53,
+        Nearest,
+        "1.5707963024948963",
+        "0x1.921fb4dbe4af8#53",
+        Less,
+    );
+    test("1/3", "1/123456789", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("1/3", "1/123456789", 2, Floor, "1.5", "0x1.8#2", Less);
+    test(
+        "1/3",
+        "22/7",
+        10,
+        Nearest,
+        "0.10571",
+        "0x0.1b10#10",
+        Greater,
+    );
+    test("1/3", "22/7", 10, Floor, "0.10559", "0x0.1b08#10", Less);
+    test(
+        "1/3",
+        "22/7",
+        10,
+        Ceiling,
+        "0.10571",
+        "0x0.1b10#10",
+        Greater,
+    );
+    test("1/3", "22/7", 10, Down, "0.10559", "0x0.1b08#10", Less);
+    test("1/3", "22/7", 10, Up, "0.10571", "0x0.1b10#10", Greater);
+    test(
+        "1/3",
+        "22/7",
+        53,
+        Nearest,
+        "0.10566558209985577",
+        "0x0.1b0ce64b6e82d0#53",
+        Greater,
+    );
+    test("1/3", "22/7", 1, Nearest, "0.12", "0x0.2#1", Greater);
+    test("1/3", "22/7", 2, Floor, "0.094", "0x0.18#2", Less);
+    test("1/3", "-22/7", 10, Nearest, "3.0352", "0x3.09#10", Less);
+    test("1/3", "-22/7", 10, Floor, "3.0352", "0x3.09#10", Less);
+    test("1/3", "-22/7", 10, Ceiling, "3.0391", "0x3.0a#10", Greater);
+    test("1/3", "-22/7", 10, Down, "3.0352", "0x3.09#10", Less);
+    test("1/3", "-22/7", 10, Up, "3.0391", "0x3.0a#10", Greater);
+    test(
+        "1/3",
+        "-22/7",
+        53,
+        Nearest,
+        "3.0359270714899376",
+        "0x3.0932843d17204#53",
+        Greater,
+    );
+    test("1/3", "-22/7", 1, Nearest, "4.0", "0x4.0#1", Greater);
+    test("1/3", "-22/7", 2, Floor, "3.0", "0x3.0#2", Less);
+    test(
+        "1/3",
+        "355/113",
+        10,
+        Nearest,
+        "0.10571",
+        "0x0.1b10#10",
+        Greater,
+    );
+    test("1/3", "355/113", 10, Floor, "0.10559", "0x0.1b08#10", Less);
+    test(
+        "1/3",
+        "355/113",
+        10,
+        Ceiling,
+        "0.10571",
+        "0x0.1b10#10",
+        Greater,
+    );
+    test("1/3", "355/113", 10, Down, "0.10559", "0x0.1b08#10", Less);
+    test("1/3", "355/113", 10, Up, "0.10571", "0x0.1b10#10", Greater);
+    test(
+        "1/3",
+        "355/113",
+        53,
+        Nearest,
+        "0.10570778747116763",
+        "0x0.1b0faa621f05e2#53",
+        Less,
+    );
+    test("1/3", "355/113", 1, Nearest, "0.12", "0x0.2#1", Greater);
+    test("1/3", "355/113", 2, Floor, "0.094", "0x0.18#2", Less);
+    test("-1/3", "0", 10, Nearest, "-1.5703", "-0x1.920#10", Greater);
+    test("-1/3", "0", 10, Floor, "-1.5723", "-0x1.928#10", Less);
+    test("-1/3", "0", 10, Ceiling, "-1.5703", "-0x1.920#10", Greater);
+    test("-1/3", "0", 10, Down, "-1.5703", "-0x1.920#10", Greater);
+    test("-1/3", "0", 10, Up, "-1.5723", "-0x1.928#10", Less);
+    test(
+        "-1/3",
+        "0",
+        53,
+        Nearest,
+        "-1.5707963267948966",
+        "-0x1.921fb54442d18#53",
+        Greater,
+    );
+    test("-1/3", "0", 1, Nearest, "-2.0", "-0x2.0#1", Less);
+    test("-1/3", "0", 2, Floor, "-2.0", "-0x2.0#2", Less);
+    test("-1/3", "1", 10, Nearest, "-0.32178", "-0x0.526#10", Less);
+    test("-1/3", "1", 10, Floor, "-0.32178", "-0x0.526#10", Less);
+    test("-1/3", "1", 10, Ceiling, "-0.32129", "-0x0.524#10", Greater);
+    test("-1/3", "1", 10, Down, "-0.32129", "-0x0.524#10", Greater);
+    test("-1/3", "1", 10, Up, "-0.32178", "-0x0.526#10", Less);
+    test(
+        "-1/3",
+        "1",
+        53,
+        Nearest,
+        "-0.32175055439664219",
+        "-0x0.525e3e8c9a7b84#53",
+        Greater,
+    );
+    test("-1/3", "1", 1, Nearest, "-0.25", "-0x0.4#1", Greater);
+    test("-1/3", "1", 2, Floor, "-0.38", "-0x0.6#2", Less);
+    test("-1/3", "-1", 10, Nearest, "-2.8203", "-0x2.d2#10", Less);
+    test("-1/3", "-1", 10, Floor, "-2.8203", "-0x2.d2#10", Less);
+    test("-1/3", "-1", 10, Ceiling, "-2.8164", "-0x2.d1#10", Greater);
+    test("-1/3", "-1", 10, Down, "-2.8164", "-0x2.d1#10", Greater);
+    test("-1/3", "-1", 10, Up, "-2.8203", "-0x2.d2#10", Less);
+    test(
+        "-1/3",
+        "-1",
+        53,
+        Nearest,
+        "-2.8198420991931510",
+        "-0x2.d1e12bfbeb278#53",
+        Greater,
+    );
+    test("-1/3", "-1", 1, Nearest, "-2.0", "-0x2.0#1", Greater);
+    test("-1/3", "-1", 2, Floor, "-3.0", "-0x3.0#2", Less);
+    test("-1/3", "3/4", 10, Nearest, "-0.41846", "-0x0.6b2#10", Less);
+    test("-1/3", "3/4", 10, Floor, "-0.41846", "-0x0.6b2#10", Less);
+    test(
+        "-1/3",
+        "3/4",
+        10,
+        Ceiling,
+        "-0.41797",
+        "-0x0.6b0#10",
+        Greater,
+    );
+    test("-1/3", "3/4", 10, Down, "-0.41797", "-0x0.6b0#10", Greater);
+    test("-1/3", "3/4", 10, Up, "-0.41846", "-0x0.6b2#10", Less);
+    test(
+        "-1/3",
+        "3/4",
+        53,
+        Nearest,
+        "-0.41822432957922911",
+        "-0x0.6b10bfe9ef2f3c#53",
+        Less,
+    );
+    test("-1/3", "3/4", 1, Nearest, "-0.50", "-0x0.8#1", Less);
+    test("-1/3", "3/4", 2, Floor, "-0.50", "-0x0.8#2", Less);
+    test(
+        "-1/3",
+        "-3/4",
+        10,
+        Nearest,
+        "-2.7227",
+        "-0x2.b9#10",
+        Greater,
+    );
+    test("-1/3", "-3/4", 10, Floor, "-2.7266", "-0x2.ba#10", Less);
+    test(
+        "-1/3",
+        "-3/4",
+        10,
+        Ceiling,
+        "-2.7227",
+        "-0x2.b9#10",
+        Greater,
+    );
+    test("-1/3", "-3/4", 10, Down, "-2.7227", "-0x2.b9#10", Greater);
+    test("-1/3", "-3/4", 10, Up, "-2.7266", "-0x2.ba#10", Less);
+    test(
+        "-1/3",
+        "-3/4",
+        53,
+        Nearest,
+        "-2.7233683240105639",
+        "-0x2.b92eaa9e9673c#53",
+        Greater,
+    );
+    test("-1/3", "-3/4", 1, Nearest, "-2.0", "-0x2.0#1", Greater);
+    test("-1/3", "-3/4", 2, Floor, "-3.0", "-0x3.0#2", Less);
+    test(
+        "-1/3",
+        "1/3",
+        10,
+        Nearest,
+        "-0.78516",
+        "-0x0.c90#10",
+        Greater,
+    );
+    test("-1/3", "1/3", 10, Floor, "-0.78613", "-0x0.c94#10", Less);
+    test(
+        "-1/3",
+        "1/3",
+        10,
+        Ceiling,
+        "-0.78516",
+        "-0x0.c90#10",
+        Greater,
+    );
+    test("-1/3", "1/3", 10, Down, "-0.78516", "-0x0.c90#10", Greater);
+    test("-1/3", "1/3", 10, Up, "-0.78613", "-0x0.c94#10", Less);
+    test(
+        "-1/3",
+        "1/3",
+        53,
+        Nearest,
+        "-0.78539816339744828",
+        "-0x0.c90fdaa22168c0#53",
+        Greater,
+    );
+    test("-1/3", "1/3", 1, Nearest, "-1.0", "-0x1.0#1", Less);
+    test("-1/3", "1/3", 2, Floor, "-1.0", "-0x1.0#2", Less);
+    test(
+        "-1/3",
+        "-1/3",
+        10,
+        Nearest,
+        "-2.3555",
+        "-0x2.5b#10",
+        Greater,
+    );
+    test("-1/3", "-1/3", 10, Floor, "-2.3594", "-0x2.5c#10", Less);
+    test(
+        "-1/3",
+        "-1/3",
+        10,
+        Ceiling,
+        "-2.3555",
+        "-0x2.5b#10",
+        Greater,
+    );
+    test("-1/3", "-1/3", 10, Down, "-2.3555", "-0x2.5b#10", Greater);
+    test("-1/3", "-1/3", 10, Up, "-2.3594", "-0x2.5c#10", Less);
+    test(
+        "-1/3",
+        "-1/3",
+        53,
+        Nearest,
+        "-2.3561944901923448",
+        "-0x2.5b2f8fe6643a4#53",
+        Greater,
+    );
+    test("-1/3", "-1/3", 1, Nearest, "-2.0", "-0x2.0#1", Greater);
+    test("-1/3", "-1/3", 2, Floor, "-3.0", "-0x3.0#2", Less);
+    test("-1/3", "2", 10, Nearest, "-0.16504", "-0x0.2a4#10", Greater);
+    test("-1/3", "2", 10, Floor, "-0.16528", "-0x0.2a5#10", Less);
+    test("-1/3", "2", 10, Ceiling, "-0.16504", "-0x0.2a4#10", Greater);
+    test("-1/3", "2", 10, Down, "-0.16504", "-0x0.2a4#10", Greater);
+    test("-1/3", "2", 10, Up, "-0.16528", "-0x0.2a5#10", Less);
+    test(
+        "-1/3",
+        "2",
+        53,
+        Nearest,
+        "-0.16514867741462683",
+        "-0x0.2a472f087935ba#53",
+        Greater,
+    );
+    test("-1/3", "2", 1, Nearest, "-0.12", "-0x0.2#1", Greater);
+    test("-1/3", "2", 2, Floor, "-0.19", "-0x0.3#2", Less);
+    test("-1/3", "-2", 10, Nearest, "-2.9766", "-0x2.fa#10", Less);
+    test("-1/3", "-2", 10, Floor, "-2.9766", "-0x2.fa#10", Less);
+    test("-1/3", "-2", 10, Ceiling, "-2.9727", "-0x2.f9#10", Greater);
+    test("-1/3", "-2", 10, Down, "-2.9727", "-0x2.f9#10", Greater);
+    test("-1/3", "-2", 10, Up, "-2.9766", "-0x2.fa#10", Less);
+    test(
+        "-1/3",
+        "-2",
+        53,
+        Nearest,
+        "-2.9764439761751662",
+        "-0x2.f9f83b800c6d4#53",
+        Greater,
+    );
+    test("-1/3", "-2", 1, Nearest, "-2.0", "-0x2.0#1", Greater);
+    test("-1/3", "-2", 2, Floor, "-3.0", "-0x3.0#2", Less);
+    test(
+        "-1/3",
+        "7/2",
+        10,
+        Nearest,
+        "-0.094971",
+        "-0x0.1850#10",
+        Less,
+    );
+    test("-1/3", "7/2", 10, Floor, "-0.094971", "-0x0.1850#10", Less);
+    test(
+        "-1/3",
+        "7/2",
+        10,
+        Ceiling,
+        "-0.094849",
+        "-0x0.1848#10",
+        Greater,
+    );
+    test(
+        "-1/3",
+        "7/2",
+        10,
+        Down,
+        "-0.094849",
+        "-0x0.1848#10",
+        Greater,
+    );
+    test("-1/3", "7/2", 10, Up, "-0.094971", "-0x0.1850#10", Less);
+    test(
+        "-1/3",
+        "7/2",
+        53,
+        Nearest,
+        "-0.094951706342756320",
+        "-0x0.184ec149710862#53",
+        Less,
+    );
+    test("-1/3", "7/2", 1, Nearest, "-0.12", "-0x0.2#1", Less);
+    test("-1/3", "7/2", 2, Floor, "-0.12", "-0x0.2#2", Less);
+    test(
+        "-1/3",
+        "1/1000",
+        10,
+        Nearest,
+        "-1.5684",
+        "-0x1.918#10",
+        Less,
+    );
+    test("-1/3", "1/1000", 10, Floor, "-1.5684", "-0x1.918#10", Less);
+    test(
+        "-1/3",
+        "1/1000",
+        10,
+        Ceiling,
+        "-1.5664",
+        "-0x1.910#10",
+        Greater,
+    );
+    test(
+        "-1/3",
+        "1/1000",
+        10,
+        Down,
+        "-1.5664",
+        "-0x1.910#10",
+        Greater,
+    );
+    test("-1/3", "1/1000", 10, Up, "-1.5684", "-0x1.918#10", Less);
+    test(
+        "-1/3",
+        "1/1000",
+        53,
+        Nearest,
+        "-1.5677963357948481",
+        "-0x1.915b19c5070ab#53",
+        Less,
+    );
+    test("-1/3", "1/1000", 1, Nearest, "-2.0", "-0x2.0#1", Less);
+    test("-1/3", "1/1000", 2, Floor, "-2.0", "-0x2.0#2", Less);
+    test(
+        "-1/3",
+        "999/1000",
+        10,
+        Nearest,
+        "-0.32227",
+        "-0x0.528#10",
+        Less,
+    );
+    test(
+        "-1/3",
+        "999/1000",
+        10,
+        Floor,
+        "-0.32227",
+        "-0x0.528#10",
+        Less,
+    );
+    test(
+        "-1/3",
+        "999/1000",
+        10,
+        Ceiling,
+        "-0.32178",
+        "-0x0.526#10",
+        Greater,
+    );
+    test(
+        "-1/3",
+        "999/1000",
+        10,
+        Down,
+        "-0.32178",
+        "-0x0.526#10",
+        Greater,
+    );
+    test("-1/3", "999/1000", 10, Up, "-0.32227", "-0x0.528#10", Less);
+    test(
+        "-1/3",
+        "999/1000",
+        53,
+        Nearest,
+        "-0.32205082463083673",
+        "-0x0.5271ec3f707454#53",
+        Greater,
+    );
+    test("-1/3", "999/1000", 1, Nearest, "-0.25", "-0x0.4#1", Greater);
+    test("-1/3", "999/1000", 2, Floor, "-0.38", "-0x0.6#2", Less);
+    test(
+        "-1/3",
+        "123456789/7",
+        10,
+        Nearest,
+        "-1.8888e-8",
+        "-0x5.12E-7#10",
+        Greater,
+    );
+    test(
+        "-1/3",
+        "123456789/7",
+        10,
+        Floor,
+        "-1.8917e-8",
+        "-0x5.14E-7#10",
+        Less,
+    );
+    test(
+        "-1/3",
+        "123456789/7",
+        10,
+        Ceiling,
+        "-1.8888e-8",
+        "-0x5.12E-7#10",
+        Greater,
+    );
+    test(
+        "-1/3",
+        "123456789/7",
+        10,
+        Down,
+        "-1.8888e-8",
+        "-0x5.12E-7#10",
+        Greater,
+    );
+    test(
+        "-1/3",
+        "123456789/7",
+        10,
+        Up,
+        "-1.8917e-8",
+        "-0x5.14E-7#10",
+        Less,
+    );
+    test(
+        "-1/3",
+        "123456789/7",
+        53,
+        Nearest,
+        "-1.8900000171990001e-8",
+        "-0x5.12cc51bb5c41cE-7#53",
+        Less,
+    );
+    test(
+        "-1/3",
+        "123456789/7",
+        1,
+        Nearest,
+        "-1.5e-8",
+        "-0x4.0E-7#1",
+        Greater,
+    );
+    test(
+        "-1/3",
+        "123456789/7",
+        2,
+        Floor,
+        "-2.2e-8",
+        "-0x6.0E-7#2",
+        Less,
+    );
+    test(
+        "-1/3",
+        "1/123456789",
+        10,
+        Nearest,
+        "-1.5703",
+        "-0x1.920#10",
+        Greater,
+    );
+    test(
+        "-1/3",
+        "1/123456789",
+        10,
+        Floor,
+        "-1.5723",
+        "-0x1.928#10",
+        Less,
+    );
+    test(
+        "-1/3",
+        "1/123456789",
+        10,
+        Ceiling,
+        "-1.5703",
+        "-0x1.920#10",
+        Greater,
+    );
+    test(
+        "-1/3",
+        "1/123456789",
+        10,
+        Down,
+        "-1.5703",
+        "-0x1.920#10",
+        Greater,
+    );
+    test(
+        "-1/3",
+        "1/123456789",
+        10,
+        Up,
+        "-1.5723",
+        "-0x1.928#10",
+        Less,
+    );
+    test(
+        "-1/3",
+        "1/123456789",
+        53,
+        Nearest,
+        "-1.5707963024948963",
+        "-0x1.921fb4dbe4af8#53",
+        Greater,
+    );
+    test("-1/3", "1/123456789", 1, Nearest, "-2.0", "-0x2.0#1", Less);
+    test("-1/3", "1/123456789", 2, Floor, "-2.0", "-0x2.0#2", Less);
+    test(
+        "-1/3",
+        "22/7",
+        10,
+        Nearest,
+        "-0.10571",
+        "-0x0.1b10#10",
+        Less,
+    );
+    test("-1/3", "22/7", 10, Floor, "-0.10571", "-0x0.1b10#10", Less);
+    test(
+        "-1/3",
+        "22/7",
+        10,
+        Ceiling,
+        "-0.10559",
+        "-0x0.1b08#10",
+        Greater,
+    );
+    test(
+        "-1/3",
+        "22/7",
+        10,
+        Down,
+        "-0.10559",
+        "-0x0.1b08#10",
+        Greater,
+    );
+    test("-1/3", "22/7", 10, Up, "-0.10571", "-0x0.1b10#10", Less);
+    test(
+        "-1/3",
+        "22/7",
+        53,
+        Nearest,
+        "-0.10566558209985577",
+        "-0x0.1b0ce64b6e82d0#53",
+        Less,
+    );
+    test("-1/3", "22/7", 1, Nearest, "-0.12", "-0x0.2#1", Less);
+    test("-1/3", "22/7", 2, Floor, "-0.12", "-0x0.2#2", Less);
+    test(
+        "-1/3",
+        "-22/7",
+        10,
+        Nearest,
+        "-3.0352",
+        "-0x3.09#10",
+        Greater,
+    );
+    test("-1/3", "-22/7", 10, Floor, "-3.0391", "-0x3.0a#10", Less);
+    test(
+        "-1/3",
+        "-22/7",
+        10,
+        Ceiling,
+        "-3.0352",
+        "-0x3.09#10",
+        Greater,
+    );
+    test("-1/3", "-22/7", 10, Down, "-3.0352", "-0x3.09#10", Greater);
+    test("-1/3", "-22/7", 10, Up, "-3.0391", "-0x3.0a#10", Less);
+    test(
+        "-1/3",
+        "-22/7",
+        53,
+        Nearest,
+        "-3.0359270714899376",
+        "-0x3.0932843d17204#53",
+        Less,
+    );
+    test("-1/3", "-22/7", 1, Nearest, "-4.0", "-0x4.0#1", Less);
+    test("-1/3", "-22/7", 2, Floor, "-4.0", "-0x4.0#2", Less);
+    test(
+        "-1/3",
+        "355/113",
+        10,
+        Nearest,
+        "-0.10571",
+        "-0x0.1b10#10",
+        Less,
+    );
+    test(
+        "-1/3",
+        "355/113",
+        10,
+        Floor,
+        "-0.10571",
+        "-0x0.1b10#10",
+        Less,
+    );
+    test(
+        "-1/3",
+        "355/113",
+        10,
+        Ceiling,
+        "-0.10559",
+        "-0x0.1b08#10",
+        Greater,
+    );
+    test(
+        "-1/3",
+        "355/113",
+        10,
+        Down,
+        "-0.10559",
+        "-0x0.1b08#10",
+        Greater,
+    );
+    test("-1/3", "355/113", 10, Up, "-0.10571", "-0x0.1b10#10", Less);
+    test(
+        "-1/3",
+        "355/113",
+        53,
+        Nearest,
+        "-0.10570778747116763",
+        "-0x0.1b0faa621f05e2#53",
+        Greater,
+    );
+    test("-1/3", "355/113", 1, Nearest, "-0.12", "-0x0.2#1", Less);
+    test("-1/3", "355/113", 2, Floor, "-0.12", "-0x0.2#2", Less);
+    test("2", "0", 10, Nearest, "1.5703", "0x1.920#10", Less);
+    test("2", "0", 10, Floor, "1.5703", "0x1.920#10", Less);
+    test("2", "0", 10, Ceiling, "1.5723", "0x1.928#10", Greater);
+    test("2", "0", 10, Down, "1.5703", "0x1.920#10", Less);
+    test("2", "0", 10, Up, "1.5723", "0x1.928#10", Greater);
+    test(
+        "2",
+        "0",
+        53,
+        Nearest,
+        "1.5707963267948966",
+        "0x1.921fb54442d18#53",
+        Less,
+    );
+    test("2", "0", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("2", "0", 2, Floor, "1.5", "0x1.8#2", Less);
+    test("2", "1", 10, Nearest, "1.1074", "0x1.1b8#10", Greater);
+    test("2", "1", 10, Floor, "1.1055", "0x1.1b0#10", Less);
+    test("2", "1", 10, Ceiling, "1.1074", "0x1.1b8#10", Greater);
+    test("2", "1", 10, Down, "1.1055", "0x1.1b0#10", Less);
+    test("2", "1", 10, Up, "1.1074", "0x1.1b8#10", Greater);
+    test(
+        "2",
+        "1",
+        53,
+        Nearest,
+        "1.1071487177940904",
+        "0x1.1b6e192ebbe44#53",
+        Less,
+    );
+    test("2", "1", 1, Nearest, "1.0", "0x1.0#1", Less);
+    test("2", "1", 2, Floor, "1.0", "0x1.0#2", Less);
+    test("2", "-1", 10, Nearest, "2.0352", "0x2.09#10", Greater);
+    test("2", "-1", 10, Floor, "2.0312", "0x2.08#10", Less);
+    test("2", "-1", 10, Ceiling, "2.0352", "0x2.09#10", Greater);
+    test("2", "-1", 10, Down, "2.0312", "0x2.08#10", Less);
+    test("2", "-1", 10, Up, "2.0352", "0x2.09#10", Greater);
+    test(
+        "2",
+        "-1",
+        53,
+        Nearest,
+        "2.0344439357957027",
+        "0x2.08d15159c9bec#53",
+        Less,
+    );
+    test("2", "-1", 1, Nearest, "2.0", "0x2.0#1", Less);
+    test("2", "-1", 2, Floor, "2.0", "0x2.0#2", Less);
+    test("2", "3/4", 10, Nearest, "1.2129", "0x1.368#10", Greater);
+    test("2", "3/4", 10, Floor, "1.2109", "0x1.360#10", Less);
+    test("2", "3/4", 10, Ceiling, "1.2129", "0x1.368#10", Greater);
+    test("2", "3/4", 10, Down, "1.2109", "0x1.360#10", Less);
+    test("2", "3/4", 10, Up, "1.2129", "0x1.368#10", Greater);
+    test(
+        "2",
+        "3/4",
+        53,
+        Nearest,
+        "1.2120256565243244",
+        "0x1.3647503caf55c#53",
+        Less,
+    );
+    test("2", "3/4", 1, Nearest, "1.0", "0x1.0#1", Less);
+    test("2", "3/4", 2, Floor, "1.0", "0x1.0#2", Less);
+    test("2", "-3/4", 10, Nearest, "1.9297", "0x1.ee0#10", Greater);
+    test("2", "-3/4", 10, Floor, "1.9277", "0x1.ed8#10", Less);
+    test("2", "-3/4", 10, Ceiling, "1.9297", "0x1.ee0#10", Greater);
+    test("2", "-3/4", 10, Down, "1.9277", "0x1.ed8#10", Less);
+    test("2", "-3/4", 10, Up, "1.9297", "0x1.ee0#10", Greater);
+    test(
+        "2",
+        "-3/4",
+        53,
+        Nearest,
+        "1.9295669970654687",
+        "0x1.edf81a4bd64d4#53",
+        Less,
+    );
+    test("2", "-3/4", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("2", "-3/4", 2, Floor, "1.5", "0x1.8#2", Less);
+    test("2", "1/3", 10, Nearest, "1.4062", "0x1.680#10", Greater);
+    test("2", "1/3", 10, Floor, "1.4043", "0x1.678#10", Less);
+    test("2", "1/3", 10, Ceiling, "1.4062", "0x1.680#10", Greater);
+    test("2", "1/3", 10, Down, "1.4043", "0x1.678#10", Less);
+    test("2", "1/3", 10, Up, "1.4062", "0x1.680#10", Greater);
+    test(
+        "2",
+        "1/3",
+        53,
+        Nearest,
+        "1.4056476493802699",
+        "0x1.67d8863bc99bd#53",
+        Greater,
+    );
+    test("2", "1/3", 1, Nearest, "1.0", "0x1.0#1", Less);
+    test("2", "1/3", 2, Floor, "1.0", "0x1.0#2", Less);
+    test("2", "-1/3", 10, Nearest, "1.7363", "0x1.bc8#10", Greater);
+    test("2", "-1/3", 10, Floor, "1.7344", "0x1.bc0#10", Less);
+    test("2", "-1/3", 10, Ceiling, "1.7363", "0x1.bc8#10", Greater);
+    test("2", "-1/3", 10, Down, "1.7344", "0x1.bc0#10", Less);
+    test("2", "-1/3", 10, Up, "1.7363", "0x1.bc8#10", Greater);
+    test(
+        "2",
+        "-1/3",
+        53,
+        Nearest,
+        "1.7359450042095235",
+        "0x1.bc66e44cbc074#53",
+        Greater,
+    );
+    test("2", "-1/3", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("2", "-1/3", 2, Floor, "1.5", "0x1.8#2", Less);
+    test("2", "2", 10, Nearest, "0.78516", "0x0.c90#10", Less);
+    test("2", "2", 10, Floor, "0.78516", "0x0.c90#10", Less);
+    test("2", "2", 10, Ceiling, "0.78613", "0x0.c94#10", Greater);
+    test("2", "2", 10, Down, "0.78516", "0x0.c90#10", Less);
+    test("2", "2", 10, Up, "0.78613", "0x0.c94#10", Greater);
+    test(
+        "2",
+        "2",
+        53,
+        Nearest,
+        "0.78539816339744828",
+        "0x0.c90fdaa22168c0#53",
+        Less,
+    );
+    test("2", "2", 1, Nearest, "1.0", "0x1.0#1", Greater);
+    test("2", "2", 2, Floor, "0.75", "0x0.c#2", Less);
+    test("2", "-2", 10, Nearest, "2.3555", "0x2.5b#10", Less);
+    test("2", "-2", 10, Floor, "2.3555", "0x2.5b#10", Less);
+    test("2", "-2", 10, Ceiling, "2.3594", "0x2.5c#10", Greater);
+    test("2", "-2", 10, Down, "2.3555", "0x2.5b#10", Less);
+    test("2", "-2", 10, Up, "2.3594", "0x2.5c#10", Greater);
+    test(
+        "2",
+        "-2",
+        53,
+        Nearest,
+        "2.3561944901923448",
+        "0x2.5b2f8fe6643a4#53",
+        Less,
+    );
+    test("2", "-2", 1, Nearest, "2.0", "0x2.0#1", Less);
+    test("2", "-2", 2, Floor, "2.0", "0x2.0#2", Less);
+    test("2", "7/2", 10, Nearest, "0.51953", "0x0.850#10", Greater);
+    test("2", "7/2", 10, Floor, "0.51855", "0x0.84c#10", Less);
+    test("2", "7/2", 10, Ceiling, "0.51953", "0x0.850#10", Greater);
+    test("2", "7/2", 10, Down, "0.51855", "0x0.84c#10", Less);
+    test("2", "7/2", 10, Up, "0.51953", "0x0.850#10", Greater);
+    test(
+        "2",
+        "7/2",
+        53,
+        Nearest,
+        "0.51914611424652291",
+        "0x0.84e6c27e88c798#53",
+        Less,
+    );
+    test("2", "7/2", 1, Nearest, "0.50", "0x0.8#1", Less);
+    test("2", "7/2", 2, Floor, "0.50", "0x0.8#2", Less);
+    test("2", "1/1000", 10, Nearest, "1.5703", "0x1.920#10", Greater);
+    test("2", "1/1000", 10, Floor, "1.5684", "0x1.918#10", Less);
+    test("2", "1/1000", 10, Ceiling, "1.5703", "0x1.920#10", Greater);
+    test("2", "1/1000", 10, Down, "1.5684", "0x1.918#10", Less);
+    test("2", "1/1000", 10, Up, "1.5703", "0x1.920#10", Greater);
+    test(
+        "2",
+        "1/1000",
+        53,
+        Nearest,
+        "1.5702963268365633",
+        "0x1.91fef0a8cabe5#53",
+        Greater,
+    );
+    test("2", "1/1000", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("2", "1/1000", 2, Floor, "1.5", "0x1.8#2", Less);
+    test("2", "999/1000", 10, Nearest, "1.1074", "0x1.1b8#10", Less);
+    test("2", "999/1000", 10, Floor, "1.1074", "0x1.1b8#10", Less);
+    test(
+        "2",
+        "999/1000",
+        10,
+        Ceiling,
+        "1.1094",
+        "0x1.1c0#10",
+        Greater,
+    );
+    test("2", "999/1000", 10, Down, "1.1074", "0x1.1b8#10", Less);
+    test("2", "999/1000", 10, Up, "1.1094", "0x1.1c0#10", Greater);
+    test(
+        "2",
+        "999/1000",
+        53,
+        Nearest,
+        "1.1075487977887475",
+        "0x1.1b8851693a0ec#53",
+        Less,
+    );
+    test("2", "999/1000", 1, Nearest, "1.0", "0x1.0#1", Less);
+    test("2", "999/1000", 2, Floor, "1.0", "0x1.0#2", Less);
+    test(
+        "2",
+        "123456789/7",
+        10,
+        Nearest,
+        "1.1339e-7",
+        "0x1.e70E-6#10",
+        Less,
+    );
+    test(
+        "2",
+        "123456789/7",
+        10,
+        Floor,
+        "1.1339e-7",
+        "0x1.e70E-6#10",
+        Less,
+    );
+    test(
+        "2",
+        "123456789/7",
+        10,
+        Ceiling,
+        "1.1350e-7",
+        "0x1.e78E-6#10",
+        Greater,
+    );
+    test(
+        "2",
+        "123456789/7",
+        10,
+        Down,
+        "1.1339e-7",
+        "0x1.e70E-6#10",
+        Less,
+    );
+    test(
+        "2",
+        "123456789/7",
+        10,
+        Up,
+        "1.1350e-7",
+        "0x1.e78E-6#10",
+        Greater,
+    );
+    test(
+        "2",
+        "123456789/7",
+        53,
+        Nearest,
+        "1.1340000103193952e-7",
+        "0x1.e70c9ea642966E-6#53",
+        Less,
+    );
+    test(
+        "2",
+        "123456789/7",
+        1,
+        Nearest,
+        "1.2e-7",
+        "0x2.0E-6#1",
+        Greater,
+    );
+    test("2", "123456789/7", 2, Floor, "8.9e-8", "0x1.8E-6#2", Less);
+    test(
+        "2",
+        "1/123456789",
+        10,
+        Nearest,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test("2", "1/123456789", 10, Floor, "1.5703", "0x1.920#10", Less);
+    test(
+        "2",
+        "1/123456789",
+        10,
+        Ceiling,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test("2", "1/123456789", 10, Down, "1.5703", "0x1.920#10", Less);
+    test("2", "1/123456789", 10, Up, "1.5723", "0x1.928#10", Greater);
+    test(
+        "2",
+        "1/123456789",
+        53,
+        Nearest,
+        "1.5707963227448967",
+        "0x1.921fb532ddcbe#53",
+        Greater,
+    );
+    test("2", "1/123456789", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("2", "1/123456789", 2, Floor, "1.5", "0x1.8#2", Less);
+    test("2", "22/7", 10, Nearest, "0.56641", "0x0.910#10", Less);
+    test("2", "22/7", 10, Floor, "0.56641", "0x0.910#10", Less);
+    test("2", "22/7", 10, Ceiling, "0.56738", "0x0.914#10", Greater);
+    test("2", "22/7", 10, Down, "0.56641", "0x0.910#10", Less);
+    test("2", "22/7", 10, Up, "0.56738", "0x0.914#10", Greater);
+    test(
+        "2",
+        "22/7",
+        53,
+        Nearest,
+        "0.56672921752350636",
+        "0x0.91152a7ef37d40#53",
+        Greater,
+    );
+    test("2", "22/7", 1, Nearest, "0.50", "0x0.8#1", Less);
+    test("2", "22/7", 2, Floor, "0.50", "0x0.8#2", Less);
+    test("2", "-22/7", 10, Nearest, "2.5742", "0x2.93#10", Less);
+    test("2", "-22/7", 10, Floor, "2.5742", "0x2.93#10", Less);
+    test("2", "-22/7", 10, Ceiling, "2.5781", "0x2.94#10", Greater);
+    test("2", "-22/7", 10, Down, "2.5742", "0x2.93#10", Less);
+    test("2", "-22/7", 10, Up, "2.5781", "0x2.94#10", Greater);
+    test(
+        "2",
+        "-22/7",
+        53,
+        Nearest,
+        "2.5748634360662868",
+        "0x2.932a40099225c#53",
+        Less,
+    );
+    test("2", "-22/7", 1, Nearest, "2.0", "0x2.0#1", Less);
+    test("2", "-22/7", 2, Floor, "2.0", "0x2.0#2", Less);
+    test(
+        "2",
+        "355/113",
+        10,
+        Nearest,
+        "0.56738",
+        "0x0.914#10",
+        Greater,
+    );
+    test("2", "355/113", 10, Floor, "0.56641", "0x0.910#10", Less);
+    test(
+        "2",
+        "355/113",
+        10,
+        Ceiling,
+        "0.56738",
+        "0x0.914#10",
+        Greater,
+    );
+    test("2", "355/113", 10, Down, "0.56641", "0x0.910#10", Less);
+    test("2", "355/113", 10, Up, "0.56738", "0x0.914#10", Greater);
+    test(
+        "2",
+        "355/113",
+        53,
+        Nearest,
+        "0.56691146647355706",
+        "0x0.91211c203b3850#53",
+        Less,
+    );
+    test("2", "355/113", 1, Nearest, "0.50", "0x0.8#1", Less);
+    test("2", "355/113", 2, Floor, "0.50", "0x0.8#2", Less);
+    test("-2", "0", 10, Nearest, "-1.5703", "-0x1.920#10", Greater);
+    test("-2", "0", 10, Floor, "-1.5723", "-0x1.928#10", Less);
+    test("-2", "0", 10, Ceiling, "-1.5703", "-0x1.920#10", Greater);
+    test("-2", "0", 10, Down, "-1.5703", "-0x1.920#10", Greater);
+    test("-2", "0", 10, Up, "-1.5723", "-0x1.928#10", Less);
+    test(
+        "-2",
+        "0",
+        53,
+        Nearest,
+        "-1.5707963267948966",
+        "-0x1.921fb54442d18#53",
+        Greater,
+    );
+    test("-2", "0", 1, Nearest, "-2.0", "-0x2.0#1", Less);
+    test("-2", "0", 2, Floor, "-2.0", "-0x2.0#2", Less);
+    test("-2", "1", 10, Nearest, "-1.1074", "-0x1.1b8#10", Less);
+    test("-2", "1", 10, Floor, "-1.1074", "-0x1.1b8#10", Less);
+    test("-2", "1", 10, Ceiling, "-1.1055", "-0x1.1b0#10", Greater);
+    test("-2", "1", 10, Down, "-1.1055", "-0x1.1b0#10", Greater);
+    test("-2", "1", 10, Up, "-1.1074", "-0x1.1b8#10", Less);
+    test(
+        "-2",
+        "1",
+        53,
+        Nearest,
+        "-1.1071487177940904",
+        "-0x1.1b6e192ebbe44#53",
+        Greater,
+    );
+    test("-2", "1", 1, Nearest, "-1.0", "-0x1.0#1", Greater);
+    test("-2", "1", 2, Floor, "-1.5", "-0x1.8#2", Less);
+    test("-2", "-1", 10, Nearest, "-2.0352", "-0x2.09#10", Less);
+    test("-2", "-1", 10, Floor, "-2.0352", "-0x2.09#10", Less);
+    test("-2", "-1", 10, Ceiling, "-2.0312", "-0x2.08#10", Greater);
+    test("-2", "-1", 10, Down, "-2.0312", "-0x2.08#10", Greater);
+    test("-2", "-1", 10, Up, "-2.0352", "-0x2.09#10", Less);
+    test(
+        "-2",
+        "-1",
+        53,
+        Nearest,
+        "-2.0344439357957027",
+        "-0x2.08d15159c9bec#53",
+        Greater,
+    );
+    test("-2", "-1", 1, Nearest, "-2.0", "-0x2.0#1", Greater);
+    test("-2", "-1", 2, Floor, "-3.0", "-0x3.0#2", Less);
+    test("-2", "3/4", 10, Nearest, "-1.2129", "-0x1.368#10", Less);
+    test("-2", "3/4", 10, Floor, "-1.2129", "-0x1.368#10", Less);
+    test("-2", "3/4", 10, Ceiling, "-1.2109", "-0x1.360#10", Greater);
+    test("-2", "3/4", 10, Down, "-1.2109", "-0x1.360#10", Greater);
+    test("-2", "3/4", 10, Up, "-1.2129", "-0x1.368#10", Less);
+    test(
+        "-2",
+        "3/4",
+        53,
+        Nearest,
+        "-1.2120256565243244",
+        "-0x1.3647503caf55c#53",
+        Greater,
+    );
+    test("-2", "3/4", 1, Nearest, "-1.0", "-0x1.0#1", Greater);
+    test("-2", "3/4", 2, Floor, "-1.5", "-0x1.8#2", Less);
+    test("-2", "-3/4", 10, Nearest, "-1.9297", "-0x1.ee0#10", Less);
+    test("-2", "-3/4", 10, Floor, "-1.9297", "-0x1.ee0#10", Less);
+    test("-2", "-3/4", 10, Ceiling, "-1.9277", "-0x1.ed8#10", Greater);
+    test("-2", "-3/4", 10, Down, "-1.9277", "-0x1.ed8#10", Greater);
+    test("-2", "-3/4", 10, Up, "-1.9297", "-0x1.ee0#10", Less);
+    test(
+        "-2",
+        "-3/4",
+        53,
+        Nearest,
+        "-1.9295669970654687",
+        "-0x1.edf81a4bd64d4#53",
+        Greater,
+    );
+    test("-2", "-3/4", 1, Nearest, "-2.0", "-0x2.0#1", Less);
+    test("-2", "-3/4", 2, Floor, "-2.0", "-0x2.0#2", Less);
+    test("-2", "1/3", 10, Nearest, "-1.4062", "-0x1.680#10", Less);
+    test("-2", "1/3", 10, Floor, "-1.4062", "-0x1.680#10", Less);
+    test("-2", "1/3", 10, Ceiling, "-1.4043", "-0x1.678#10", Greater);
+    test("-2", "1/3", 10, Down, "-1.4043", "-0x1.678#10", Greater);
+    test("-2", "1/3", 10, Up, "-1.4062", "-0x1.680#10", Less);
+    test(
+        "-2",
+        "1/3",
+        53,
+        Nearest,
+        "-1.4056476493802699",
+        "-0x1.67d8863bc99bd#53",
+        Less,
+    );
+    test("-2", "1/3", 1, Nearest, "-1.0", "-0x1.0#1", Greater);
+    test("-2", "1/3", 2, Floor, "-1.5", "-0x1.8#2", Less);
+    test("-2", "-1/3", 10, Nearest, "-1.7363", "-0x1.bc8#10", Less);
+    test("-2", "-1/3", 10, Floor, "-1.7363", "-0x1.bc8#10", Less);
+    test("-2", "-1/3", 10, Ceiling, "-1.7344", "-0x1.bc0#10", Greater);
+    test("-2", "-1/3", 10, Down, "-1.7344", "-0x1.bc0#10", Greater);
+    test("-2", "-1/3", 10, Up, "-1.7363", "-0x1.bc8#10", Less);
+    test(
+        "-2",
+        "-1/3",
+        53,
+        Nearest,
+        "-1.7359450042095235",
+        "-0x1.bc66e44cbc074#53",
+        Less,
+    );
+    test("-2", "-1/3", 1, Nearest, "-2.0", "-0x2.0#1", Less);
+    test("-2", "-1/3", 2, Floor, "-2.0", "-0x2.0#2", Less);
+    test("-2", "2", 10, Nearest, "-0.78516", "-0x0.c90#10", Greater);
+    test("-2", "2", 10, Floor, "-0.78613", "-0x0.c94#10", Less);
+    test("-2", "2", 10, Ceiling, "-0.78516", "-0x0.c90#10", Greater);
+    test("-2", "2", 10, Down, "-0.78516", "-0x0.c90#10", Greater);
+    test("-2", "2", 10, Up, "-0.78613", "-0x0.c94#10", Less);
+    test(
+        "-2",
+        "2",
+        53,
+        Nearest,
+        "-0.78539816339744828",
+        "-0x0.c90fdaa22168c0#53",
+        Greater,
+    );
+    test("-2", "2", 1, Nearest, "-1.0", "-0x1.0#1", Less);
+    test("-2", "2", 2, Floor, "-1.0", "-0x1.0#2", Less);
+    test("-2", "-2", 10, Nearest, "-2.3555", "-0x2.5b#10", Greater);
+    test("-2", "-2", 10, Floor, "-2.3594", "-0x2.5c#10", Less);
+    test("-2", "-2", 10, Ceiling, "-2.3555", "-0x2.5b#10", Greater);
+    test("-2", "-2", 10, Down, "-2.3555", "-0x2.5b#10", Greater);
+    test("-2", "-2", 10, Up, "-2.3594", "-0x2.5c#10", Less);
+    test(
+        "-2",
+        "-2",
+        53,
+        Nearest,
+        "-2.3561944901923448",
+        "-0x2.5b2f8fe6643a4#53",
+        Greater,
+    );
+    test("-2", "-2", 1, Nearest, "-2.0", "-0x2.0#1", Greater);
+    test("-2", "-2", 2, Floor, "-3.0", "-0x3.0#2", Less);
+    test("-2", "7/2", 10, Nearest, "-0.51953", "-0x0.850#10", Less);
+    test("-2", "7/2", 10, Floor, "-0.51953", "-0x0.850#10", Less);
+    test("-2", "7/2", 10, Ceiling, "-0.51855", "-0x0.84c#10", Greater);
+    test("-2", "7/2", 10, Down, "-0.51855", "-0x0.84c#10", Greater);
+    test("-2", "7/2", 10, Up, "-0.51953", "-0x0.850#10", Less);
+    test(
+        "-2",
+        "7/2",
+        53,
+        Nearest,
+        "-0.51914611424652291",
+        "-0x0.84e6c27e88c798#53",
+        Greater,
+    );
+    test("-2", "7/2", 1, Nearest, "-0.50", "-0x0.8#1", Greater);
+    test("-2", "7/2", 2, Floor, "-0.75", "-0x0.c#2", Less);
+    test("-2", "1/1000", 10, Nearest, "-1.5703", "-0x1.920#10", Less);
+    test("-2", "1/1000", 10, Floor, "-1.5703", "-0x1.920#10", Less);
+    test(
+        "-2",
+        "1/1000",
+        10,
+        Ceiling,
+        "-1.5684",
+        "-0x1.918#10",
+        Greater,
+    );
+    test("-2", "1/1000", 10, Down, "-1.5684", "-0x1.918#10", Greater);
+    test("-2", "1/1000", 10, Up, "-1.5703", "-0x1.920#10", Less);
+    test(
+        "-2",
+        "1/1000",
+        53,
+        Nearest,
+        "-1.5702963268365633",
+        "-0x1.91fef0a8cabe5#53",
+        Less,
+    );
+    test("-2", "1/1000", 1, Nearest, "-2.0", "-0x2.0#1", Less);
+    test("-2", "1/1000", 2, Floor, "-2.0", "-0x2.0#2", Less);
+    test(
+        "-2",
+        "999/1000",
+        10,
+        Nearest,
+        "-1.1074",
+        "-0x1.1b8#10",
+        Greater,
+    );
+    test("-2", "999/1000", 10, Floor, "-1.1094", "-0x1.1c0#10", Less);
+    test(
+        "-2",
+        "999/1000",
+        10,
+        Ceiling,
+        "-1.1074",
+        "-0x1.1b8#10",
+        Greater,
+    );
+    test(
+        "-2",
+        "999/1000",
+        10,
+        Down,
+        "-1.1074",
+        "-0x1.1b8#10",
+        Greater,
+    );
+    test("-2", "999/1000", 10, Up, "-1.1094", "-0x1.1c0#10", Less);
+    test(
+        "-2",
+        "999/1000",
+        53,
+        Nearest,
+        "-1.1075487977887475",
+        "-0x1.1b8851693a0ec#53",
+        Greater,
+    );
+    test("-2", "999/1000", 1, Nearest, "-1.0", "-0x1.0#1", Greater);
+    test("-2", "999/1000", 2, Floor, "-1.5", "-0x1.8#2", Less);
+    test(
+        "-2",
+        "123456789/7",
+        10,
+        Nearest,
+        "-1.1339e-7",
+        "-0x1.e70E-6#10",
+        Greater,
+    );
+    test(
+        "-2",
+        "123456789/7",
+        10,
+        Floor,
+        "-1.1350e-7",
+        "-0x1.e78E-6#10",
+        Less,
+    );
+    test(
+        "-2",
+        "123456789/7",
+        10,
+        Ceiling,
+        "-1.1339e-7",
+        "-0x1.e70E-6#10",
+        Greater,
+    );
+    test(
+        "-2",
+        "123456789/7",
+        10,
+        Down,
+        "-1.1339e-7",
+        "-0x1.e70E-6#10",
+        Greater,
+    );
+    test(
+        "-2",
+        "123456789/7",
+        10,
+        Up,
+        "-1.1350e-7",
+        "-0x1.e78E-6#10",
+        Less,
+    );
+    test(
+        "-2",
+        "123456789/7",
+        53,
+        Nearest,
+        "-1.1340000103193952e-7",
+        "-0x1.e70c9ea642966E-6#53",
+        Greater,
+    );
+    test(
+        "-2",
+        "123456789/7",
+        1,
+        Nearest,
+        "-1.2e-7",
+        "-0x2.0E-6#1",
+        Less,
+    );
+    test(
+        "-2",
+        "123456789/7",
+        2,
+        Floor,
+        "-1.2e-7",
+        "-0x2.0E-6#2",
+        Less,
+    );
+    test(
+        "-2",
+        "1/123456789",
+        10,
+        Nearest,
+        "-1.5703",
+        "-0x1.920#10",
+        Greater,
+    );
+    test(
+        "-2",
+        "1/123456789",
+        10,
+        Floor,
+        "-1.5723",
+        "-0x1.928#10",
+        Less,
+    );
+    test(
+        "-2",
+        "1/123456789",
+        10,
+        Ceiling,
+        "-1.5703",
+        "-0x1.920#10",
+        Greater,
+    );
+    test(
+        "-2",
+        "1/123456789",
+        10,
+        Down,
+        "-1.5703",
+        "-0x1.920#10",
+        Greater,
+    );
+    test("-2", "1/123456789", 10, Up, "-1.5723", "-0x1.928#10", Less);
+    test(
+        "-2",
+        "1/123456789",
+        53,
+        Nearest,
+        "-1.5707963227448967",
+        "-0x1.921fb532ddcbe#53",
+        Less,
+    );
+    test("-2", "1/123456789", 1, Nearest, "-2.0", "-0x2.0#1", Less);
+    test("-2", "1/123456789", 2, Floor, "-2.0", "-0x2.0#2", Less);
+    test(
+        "-2",
+        "22/7",
+        10,
+        Nearest,
+        "-0.56641",
+        "-0x0.910#10",
+        Greater,
+    );
+    test("-2", "22/7", 10, Floor, "-0.56738", "-0x0.914#10", Less);
+    test(
+        "-2",
+        "22/7",
+        10,
+        Ceiling,
+        "-0.56641",
+        "-0x0.910#10",
+        Greater,
+    );
+    test("-2", "22/7", 10, Down, "-0.56641", "-0x0.910#10", Greater);
+    test("-2", "22/7", 10, Up, "-0.56738", "-0x0.914#10", Less);
+    test(
+        "-2",
+        "22/7",
+        53,
+        Nearest,
+        "-0.56672921752350636",
+        "-0x0.91152a7ef37d40#53",
+        Less,
+    );
+    test("-2", "22/7", 1, Nearest, "-0.50", "-0x0.8#1", Greater);
+    test("-2", "22/7", 2, Floor, "-0.75", "-0x0.c#2", Less);
+    test("-2", "-22/7", 10, Nearest, "-2.5742", "-0x2.93#10", Greater);
+    test("-2", "-22/7", 10, Floor, "-2.5781", "-0x2.94#10", Less);
+    test("-2", "-22/7", 10, Ceiling, "-2.5742", "-0x2.93#10", Greater);
+    test("-2", "-22/7", 10, Down, "-2.5742", "-0x2.93#10", Greater);
+    test("-2", "-22/7", 10, Up, "-2.5781", "-0x2.94#10", Less);
+    test(
+        "-2",
+        "-22/7",
+        53,
+        Nearest,
+        "-2.5748634360662868",
+        "-0x2.932a40099225c#53",
+        Greater,
+    );
+    test("-2", "-22/7", 1, Nearest, "-2.0", "-0x2.0#1", Greater);
+    test("-2", "-22/7", 2, Floor, "-3.0", "-0x3.0#2", Less);
+    test(
+        "-2",
+        "355/113",
+        10,
+        Nearest,
+        "-0.56738",
+        "-0x0.914#10",
+        Less,
+    );
+    test("-2", "355/113", 10, Floor, "-0.56738", "-0x0.914#10", Less);
+    test(
+        "-2",
+        "355/113",
+        10,
+        Ceiling,
+        "-0.56641",
+        "-0x0.910#10",
+        Greater,
+    );
+    test(
+        "-2",
+        "355/113",
+        10,
+        Down,
+        "-0.56641",
+        "-0x0.910#10",
+        Greater,
+    );
+    test("-2", "355/113", 10, Up, "-0.56738", "-0x0.914#10", Less);
+    test(
+        "-2",
+        "355/113",
+        53,
+        Nearest,
+        "-0.56691146647355706",
+        "-0x0.91211c203b3850#53",
+        Greater,
+    );
+    test("-2", "355/113", 1, Nearest, "-0.50", "-0x0.8#1", Greater);
+    test("-2", "355/113", 2, Floor, "-0.75", "-0x0.c#2", Less);
+    test("7/2", "0", 10, Nearest, "1.5703", "0x1.920#10", Less);
+    test("7/2", "0", 10, Floor, "1.5703", "0x1.920#10", Less);
+    test("7/2", "0", 10, Ceiling, "1.5723", "0x1.928#10", Greater);
+    test("7/2", "0", 10, Down, "1.5703", "0x1.920#10", Less);
+    test("7/2", "0", 10, Up, "1.5723", "0x1.928#10", Greater);
+    test(
+        "7/2",
+        "0",
+        53,
+        Nearest,
+        "1.5707963267948966",
+        "0x1.921fb54442d18#53",
+        Less,
+    );
+    test("7/2", "0", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("7/2", "0", 2, Floor, "1.5", "0x1.8#2", Less);
+    test("7/2", "1", 10, Nearest, "1.2930", "0x1.4b0#10", Greater);
+    test("7/2", "1", 10, Floor, "1.2910", "0x1.4a8#10", Less);
+    test("7/2", "1", 10, Ceiling, "1.2930", "0x1.4b0#10", Greater);
+    test("7/2", "1", 10, Down, "1.2910", "0x1.4a8#10", Less);
+    test("7/2", "1", 10, Up, "1.2930", "0x1.4b0#10", Greater);
+    test(
+        "7/2",
+        "1",
+        53,
+        Nearest,
+        "1.2924966677897853",
+        "0x1.4ae10fc6589a5#53",
+        Greater,
+    );
+    test("7/2", "1", 1, Nearest, "1.0", "0x1.0#1", Less);
+    test("7/2", "1", 2, Floor, "1.0", "0x1.0#2", Less);
+    test("7/2", "-1", 10, Nearest, "1.8496", "0x1.d98#10", Greater);
+    test("7/2", "-1", 10, Floor, "1.8477", "0x1.d90#10", Less);
+    test("7/2", "-1", 10, Ceiling, "1.8496", "0x1.d98#10", Greater);
+    test("7/2", "-1", 10, Down, "1.8477", "0x1.d90#10", Less);
+    test("7/2", "-1", 10, Up, "1.8496", "0x1.d98#10", Greater);
+    test(
+        "7/2",
+        "-1",
+        53,
+        Nearest,
+        "1.8490959858000080",
+        "0x1.d95e5ac22d08c#53",
+        Greater,
+    );
+    test("7/2", "-1", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("7/2", "-1", 2, Floor, "1.5", "0x1.8#2", Less);
+    test("7/2", "3/4", 10, Nearest, "1.3594", "0x1.5c0#10", Less);
+    test("7/2", "3/4", 10, Floor, "1.3594", "0x1.5c0#10", Less);
+    test("7/2", "3/4", 10, Ceiling, "1.3613", "0x1.5c8#10", Greater);
+    test("7/2", "3/4", 10, Down, "1.3594", "0x1.5c0#10", Less);
+    test("7/2", "3/4", 10, Up, "1.3613", "0x1.5c8#10", Greater);
+    test(
+        "7/2",
+        "3/4",
+        53,
+        Nearest,
+        "1.3597029935721501",
+        "0x1.5c157ed1aa6a3#53",
+        Greater,
+    );
+    test("7/2", "3/4", 1, Nearest, "1.0", "0x1.0#1", Less);
+    test("7/2", "3/4", 2, Floor, "1.0", "0x1.0#2", Less);
+    test("7/2", "-3/4", 10, Nearest, "1.7812", "0x1.c80#10", Less);
+    test("7/2", "-3/4", 10, Floor, "1.7812", "0x1.c80#10", Less);
+    test("7/2", "-3/4", 10, Ceiling, "1.7832", "0x1.c88#10", Greater);
+    test("7/2", "-3/4", 10, Down, "1.7812", "0x1.c80#10", Less);
+    test("7/2", "-3/4", 10, Up, "1.7832", "0x1.c88#10", Greater);
+    test(
+        "7/2",
+        "-3/4",
+        53,
+        Nearest,
+        "1.7818896600176433",
+        "0x1.c829ebb6db38e#53",
+        Greater,
+    );
+    test("7/2", "-3/4", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("7/2", "-3/4", 2, Floor, "1.5", "0x1.8#2", Less);
+    test("7/2", "1/3", 10, Nearest, "1.4766", "0x1.7a0#10", Greater);
+    test("7/2", "1/3", 10, Floor, "1.4746", "0x1.798#10", Less);
+    test("7/2", "1/3", 10, Ceiling, "1.4766", "0x1.7a0#10", Greater);
+    test("7/2", "1/3", 10, Down, "1.4746", "0x1.798#10", Less);
+    test("7/2", "1/3", 10, Up, "1.4766", "0x1.7a0#10", Greater);
+    test(
+        "7/2",
+        "1/3",
+        53,
+        Nearest,
+        "1.4758446204521403",
+        "0x1.79d0f3fad1c92#53",
+        Less,
+    );
+    test("7/2", "1/3", 1, Nearest, "1.0", "0x1.0#1", Less);
+    test("7/2", "1/3", 2, Floor, "1.0", "0x1.0#2", Less);
+    test("7/2", "-1/3", 10, Nearest, "1.6660", "0x1.aa8#10", Greater);
+    test("7/2", "-1/3", 10, Floor, "1.6641", "0x1.aa0#10", Less);
+    test("7/2", "-1/3", 10, Ceiling, "1.6660", "0x1.aa8#10", Greater);
+    test("7/2", "-1/3", 10, Down, "1.6641", "0x1.aa0#10", Less);
+    test("7/2", "-1/3", 10, Up, "1.6660", "0x1.aa8#10", Greater);
+    test(
+        "7/2",
+        "-1/3",
+        53,
+        Nearest,
+        "1.6657480331376529",
+        "0x1.aa6e768db3d9e#53",
+        Less,
+    );
+    test("7/2", "-1/3", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("7/2", "-1/3", 2, Floor, "1.5", "0x1.8#2", Less);
+    test("7/2", "2", 10, Nearest, "1.0508", "0x1.0d0#10", Less);
+    test("7/2", "2", 10, Floor, "1.0508", "0x1.0d0#10", Less);
+    test("7/2", "2", 10, Ceiling, "1.0527", "0x1.0d8#10", Greater);
+    test("7/2", "2", 10, Down, "1.0508", "0x1.0d0#10", Less);
+    test("7/2", "2", 10, Up, "1.0527", "0x1.0d8#10", Greater);
+    test(
+        "7/2",
+        "2",
+        53,
+        Nearest,
+        "1.0516502125483738",
+        "0x1.0d38f2c5ba09f#53",
+        Greater,
+    );
+    test("7/2", "2", 1, Nearest, "1.0", "0x1.0#1", Less);
+    test("7/2", "2", 2, Floor, "1.0", "0x1.0#2", Less);
+    test("7/2", "-2", 10, Nearest, "2.0898", "0x2.17#10", Less);
+    test("7/2", "-2", 10, Floor, "2.0898", "0x2.17#10", Less);
+    test("7/2", "-2", 10, Ceiling, "2.0938", "0x2.18#10", Greater);
+    test("7/2", "-2", 10, Down, "2.0898", "0x2.17#10", Less);
+    test("7/2", "-2", 10, Up, "2.0938", "0x2.18#10", Greater);
+    test(
+        "7/2",
+        "-2",
+        53,
+        Nearest,
+        "2.0899424410414196",
+        "0x2.170677c2cb992#53",
+        Greater,
+    );
+    test("7/2", "-2", 1, Nearest, "2.0", "0x2.0#1", Less);
+    test("7/2", "-2", 2, Floor, "2.0", "0x2.0#2", Less);
+    test("7/2", "7/2", 10, Nearest, "0.78516", "0x0.c90#10", Less);
+    test("7/2", "7/2", 10, Floor, "0.78516", "0x0.c90#10", Less);
+    test("7/2", "7/2", 10, Ceiling, "0.78613", "0x0.c94#10", Greater);
+    test("7/2", "7/2", 10, Down, "0.78516", "0x0.c90#10", Less);
+    test("7/2", "7/2", 10, Up, "0.78613", "0x0.c94#10", Greater);
+    test(
+        "7/2",
+        "7/2",
+        53,
+        Nearest,
+        "0.78539816339744828",
+        "0x0.c90fdaa22168c0#53",
+        Less,
+    );
+    test("7/2", "7/2", 1, Nearest, "1.0", "0x1.0#1", Greater);
+    test("7/2", "7/2", 2, Floor, "0.75", "0x0.c#2", Less);
+    test("7/2", "1/1000", 10, Nearest, "1.5703", "0x1.920#10", Less);
+    test("7/2", "1/1000", 10, Floor, "1.5703", "0x1.920#10", Less);
+    test(
+        "7/2",
+        "1/1000",
+        10,
+        Ceiling,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test("7/2", "1/1000", 10, Down, "1.5703", "0x1.920#10", Less);
+    test("7/2", "1/1000", 10, Up, "1.5723", "0x1.928#10", Greater);
+    test(
+        "7/2",
+        "1/1000",
+        53,
+        Nearest,
+        "1.5705106125169568",
+        "0x1.920cfbc6c8008#53",
+        Less,
+    );
+    test("7/2", "1/1000", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("7/2", "1/1000", 2, Floor, "1.5", "0x1.8#2", Less);
+    test(
+        "7/2",
+        "999/1000",
+        10,
+        Nearest,
+        "1.2930",
+        "0x1.4b0#10",
+        Greater,
+    );
+    test("7/2", "999/1000", 10, Floor, "1.2910", "0x1.4a8#10", Less);
+    test(
+        "7/2",
+        "999/1000",
+        10,
+        Ceiling,
+        "1.2930",
+        "0x1.4b0#10",
+        Greater,
+    );
+    test("7/2", "999/1000", 10, Down, "1.2910", "0x1.4a8#10", Less);
+    test("7/2", "999/1000", 10, Up, "1.2930", "0x1.4b0#10", Greater);
+    test(
+        "7/2",
+        "999/1000",
+        53,
+        Nearest,
+        "1.2927608386644613",
+        "0x1.4af25fd39d076#53",
+        Greater,
+    );
+    test("7/2", "999/1000", 1, Nearest, "1.0", "0x1.0#1", Less);
+    test("7/2", "999/1000", 2, Floor, "1.0", "0x1.0#2", Less);
+    test(
+        "7/2",
+        "123456789/7",
+        10,
+        Nearest,
+        "1.9837e-7",
+        "0x3.54E-6#10",
+        Less,
+    );
+    test(
+        "7/2",
+        "123456789/7",
+        10,
+        Floor,
+        "1.9837e-7",
+        "0x3.54E-6#10",
+        Less,
+    );
+    test(
+        "7/2",
+        "123456789/7",
+        10,
+        Ceiling,
+        "1.9860e-7",
+        "0x3.55E-6#10",
+        Greater,
+    );
+    test(
+        "7/2",
+        "123456789/7",
+        10,
+        Down,
+        "1.9837e-7",
+        "0x3.54E-6#10",
+        Less,
+    );
+    test(
+        "7/2",
+        "123456789/7",
+        10,
+        Up,
+        "1.9860e-7",
+        "0x3.55E-6#10",
+        Greater,
+    );
+    test(
+        "7/2",
+        "123456789/7",
+        53,
+        Nearest,
+        "1.9845000180589241e-7",
+        "0x3.545615a2f47eeE-6#53",
+        Less,
+    );
+    test(
+        "7/2",
+        "123456789/7",
+        1,
+        Nearest,
+        "2.4e-7",
+        "0x4.0E-6#1",
+        Greater,
+    );
+    test("7/2", "123456789/7", 2, Floor, "1.8e-7", "0x3.0E-6#2", Less);
+    test(
+        "7/2",
+        "1/123456789",
+        10,
+        Nearest,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "7/2",
+        "1/123456789",
+        10,
+        Floor,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "7/2",
+        "1/123456789",
+        10,
+        Ceiling,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test("7/2", "1/123456789", 10, Down, "1.5703", "0x1.920#10", Less);
+    test(
+        "7/2",
+        "1/123456789",
+        10,
+        Up,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test(
+        "7/2",
+        "1/123456789",
+        53,
+        Nearest,
+        "1.5707963244806109",
+        "0x1.921fb53a523c0#53",
+        Greater,
+    );
+    test("7/2", "1/123456789", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("7/2", "1/123456789", 2, Floor, "1.5", "0x1.8#2", Less);
+    test("7/2", "22/7", 10, Nearest, "0.83887", "0x0.d6c#10", Less);
+    test("7/2", "22/7", 10, Floor, "0.83887", "0x0.d6c#10", Less);
+    test("7/2", "22/7", 10, Ceiling, "0.83984", "0x0.d70#10", Greater);
+    test("7/2", "22/7", 10, Down, "0.83887", "0x0.d6c#10", Less);
+    test("7/2", "22/7", 10, Up, "0.83984", "0x0.d70#10", Greater);
+    test(
+        "7/2",
+        "22/7",
+        53,
+        Nearest,
+        "0.83910989270068093",
+        "0x0.d6cfe7eae64538#53",
+        Greater,
+    );
+    test("7/2", "22/7", 1, Nearest, "1.0", "0x1.0#1", Greater);
+    test("7/2", "22/7", 2, Floor, "0.75", "0x0.c#2", Less);
+    test("7/2", "-22/7", 10, Nearest, "2.3008", "0x2.4d#10", Less);
+    test("7/2", "-22/7", 10, Floor, "2.3008", "0x2.4d#10", Less);
+    test("7/2", "-22/7", 10, Ceiling, "2.3047", "0x2.4e#10", Greater);
+    test("7/2", "-22/7", 10, Down, "2.3008", "0x2.4d#10", Less);
+    test("7/2", "-22/7", 10, Up, "2.3047", "0x2.4e#10", Greater);
+    test(
+        "7/2",
+        "-22/7",
+        53,
+        Nearest,
+        "2.3024827608891125",
+        "0x2.4d6f829d9f5de#53",
+        Greater,
+    );
+    test("7/2", "-22/7", 1, Nearest, "2.0", "0x2.0#1", Less);
+    test("7/2", "-22/7", 2, Floor, "2.0", "0x2.0#2", Less);
+    test("7/2", "355/113", 10, Nearest, "0.83887", "0x0.d6c#10", Less);
+    test("7/2", "355/113", 10, Floor, "0.83887", "0x0.d6c#10", Less);
+    test(
+        "7/2",
+        "355/113",
+        10,
+        Ceiling,
+        "0.83984",
+        "0x0.d70#10",
+        Greater,
+    );
+    test("7/2", "355/113", 10, Down, "0.83887", "0x0.d6c#10", Less);
+    test("7/2", "355/113", 10, Up, "0.83984", "0x0.d70#10", Greater);
+    test(
+        "7/2",
+        "355/113",
+        53,
+        Nearest,
+        "0.83930989555519775",
+        "0x0.d6dd03689e6668#53",
+        Less,
+    );
+    test("7/2", "355/113", 1, Nearest, "1.0", "0x1.0#1", Greater);
+    test("7/2", "355/113", 2, Floor, "0.75", "0x0.c#2", Less);
+    test("1/1000", "0", 10, Nearest, "1.5703", "0x1.920#10", Less);
+    test("1/1000", "0", 10, Floor, "1.5703", "0x1.920#10", Less);
+    test("1/1000", "0", 10, Ceiling, "1.5723", "0x1.928#10", Greater);
+    test("1/1000", "0", 10, Down, "1.5703", "0x1.920#10", Less);
+    test("1/1000", "0", 10, Up, "1.5723", "0x1.928#10", Greater);
+    test(
+        "1/1000",
+        "0",
+        53,
+        Nearest,
+        "1.5707963267948966",
+        "0x1.921fb54442d18#53",
+        Less,
+    );
+    test("1/1000", "0", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("1/1000", "0", 2, Floor, "1.5", "0x1.8#2", Less);
+    test(
+        "1/1000",
+        "1",
+        10,
+        Nearest,
+        "0.00099945",
+        "0x0.00418#10",
+        Less,
+    );
+    test("1/1000", "1", 10, Floor, "0.00099945", "0x0.00418#10", Less);
+    test(
+        "1/1000",
+        "1",
+        10,
+        Ceiling,
+        "0.0010014",
+        "0x0.0041a#10",
+        Greater,
+    );
+    test("1/1000", "1", 10, Down, "0.00099945", "0x0.00418#10", Less);
+    test("1/1000", "1", 10, Up, "0.0010014", "0x0.0041a#10", Greater);
+    test(
+        "1/1000",
+        "1",
+        53,
+        Nearest,
+        "0.00099999966666686657",
+        "0x0.00418935dd45b854#53",
+        Less,
+    );
+    test("1/1000", "1", 1, Nearest, "0.00098", "0x0.004#1", Less);
+    test("1/1000", "1", 2, Floor, "0.00098", "0x0.004#2", Less);
+    test("1/1000", "-1", 10, Nearest, "3.1406", "0x3.24#10", Greater);
+    test("1/1000", "-1", 10, Floor, "3.1367", "0x3.23#10", Less);
+    test("1/1000", "-1", 10, Ceiling, "3.1406", "0x3.24#10", Greater);
+    test("1/1000", "-1", 10, Down, "3.1367", "0x3.23#10", Less);
+    test("1/1000", "-1", 10, Up, "3.1406", "0x3.24#10", Greater);
+    test(
+        "1/1000",
+        "-1",
+        53,
+        Nearest,
+        "3.1405926539231266",
+        "0x3.23fde152a85d6#53",
+        Greater,
+    );
+    test("1/1000", "-1", 1, Nearest, "4.0", "0x4.0#1", Greater);
+    test("1/1000", "-1", 2, Floor, "3.0", "0x3.0#2", Less);
+    test(
+        "1/1000",
+        "3/4",
+        10,
+        Nearest,
+        "0.0013332",
+        "0x0.00576#10",
+        Less,
+    );
+    test(
+        "1/1000",
+        "3/4",
+        10,
+        Floor,
+        "0.0013332",
+        "0x0.00576#10",
+        Less,
+    );
+    test(
+        "1/1000",
+        "3/4",
+        10,
+        Ceiling,
+        "0.0013351",
+        "0x0.00578#10",
+        Greater,
+    );
+    test("1/1000", "3/4", 10, Down, "0.0013332", "0x0.00576#10", Less);
+    test(
+        "1/1000",
+        "3/4",
+        10,
+        Up,
+        "0.0013351",
+        "0x0.00578#10",
+        Greater,
+    );
+    test(
+        "1/1000",
+        "3/4",
+        53,
+        Nearest,
+        "0.0013333325432107193",
+        "0x0.0057619baaf3cc04#53",
+        Less,
+    );
+    test("1/1000", "3/4", 1, Nearest, "0.00098", "0x0.004#1", Less);
+    test("1/1000", "3/4", 2, Floor, "0.00098", "0x0.004#2", Less);
+    test(
+        "1/1000",
+        "-3/4",
+        10,
+        Nearest,
+        "3.1406",
+        "0x3.24#10",
+        Greater,
+    );
+    test("1/1000", "-3/4", 10, Floor, "3.1367", "0x3.23#10", Less);
+    test(
+        "1/1000",
+        "-3/4",
+        10,
+        Ceiling,
+        "3.1406",
+        "0x3.24#10",
+        Greater,
+    );
+    test("1/1000", "-3/4", 10, Down, "3.1367", "0x3.23#10", Less);
+    test("1/1000", "-3/4", 10, Up, "3.1406", "0x3.24#10", Greater);
+    test(
+        "1/1000",
+        "-3/4",
+        53,
+        Nearest,
+        "3.1402593210465826",
+        "0x3.23e808ecdaaf4#53",
+        Greater,
+    );
+    test("1/1000", "-3/4", 1, Nearest, "4.0", "0x4.0#1", Greater);
+    test("1/1000", "-3/4", 2, Floor, "3.0", "0x3.0#2", Less);
+    test(
+        "1/1000",
+        "1/3",
+        10,
+        Nearest,
+        "0.0029984",
+        "0x0.00c48#10",
+        Less,
+    );
+    test(
+        "1/1000",
+        "1/3",
+        10,
+        Floor,
+        "0.0029984",
+        "0x0.00c48#10",
+        Less,
+    );
+    test(
+        "1/1000",
+        "1/3",
+        10,
+        Ceiling,
+        "0.0030022",
+        "0x0.00c4c#10",
+        Greater,
+    );
+    test("1/1000", "1/3", 10, Down, "0.0029984", "0x0.00c48#10", Less);
+    test(
+        "1/1000",
+        "1/3",
+        10,
+        Up,
+        "0.0030022",
+        "0x0.00c4c#10",
+        Greater,
+    );
+    test(
+        "1/1000",
+        "1/3",
+        53,
+        Nearest,
+        "0.0029999910000485996",
+        "0x0.00c49b7f3bc6db70#53",
+        Less,
+    );
+    test("1/1000", "1/3", 1, Nearest, "0.0039", "0x0.01#1", Greater);
+    test("1/1000", "1/3", 2, Floor, "0.0029", "0x0.00c#2", Less);
+    test("1/1000", "-1/3", 10, Nearest, "3.1367", "0x3.23#10", Less);
+    test("1/1000", "-1/3", 10, Floor, "3.1367", "0x3.23#10", Less);
+    test(
+        "1/1000",
+        "-1/3",
+        10,
+        Ceiling,
+        "3.1406",
+        "0x3.24#10",
+        Greater,
+    );
+    test("1/1000", "-1/3", 10, Down, "3.1367", "0x3.23#10", Less);
+    test("1/1000", "-1/3", 10, Up, "3.1406", "0x3.24#10", Greater);
+    test(
+        "1/1000",
+        "-1/3",
+        53,
+        Nearest,
+        "3.1385926625897445",
+        "0x3.237acf0949dc2#53",
+        Less,
+    );
+    test("1/1000", "-1/3", 1, Nearest, "4.0", "0x4.0#1", Greater);
+    test("1/1000", "-1/3", 2, Floor, "3.0", "0x3.0#2", Less);
+    test(
+        "1/1000",
+        "2",
+        10,
+        Nearest,
+        "0.00049973",
+        "0x0.0020c#10",
+        Less,
+    );
+    test("1/1000", "2", 10, Floor, "0.00049973", "0x0.0020c#10", Less);
+    test(
+        "1/1000",
+        "2",
+        10,
+        Ceiling,
+        "0.00050068",
+        "0x0.0020d#10",
+        Greater,
+    );
+    test("1/1000", "2", 10, Down, "0.00049973", "0x0.0020c#10", Less);
+    test("1/1000", "2", 10, Up, "0.00050068", "0x0.0020d#10", Greater);
+    test(
+        "1/1000",
+        "2",
+        53,
+        Nearest,
+        "0.00049999995833333955",
+        "0x0.0020c49b781334aa#53",
+        Less,
+    );
+    test("1/1000", "2", 1, Nearest, "0.00049", "0x0.002#1", Less);
+    test("1/1000", "2", 2, Floor, "0.00049", "0x0.002#2", Less);
+    test("1/1000", "-2", 10, Nearest, "3.1406", "0x3.24#10", Less);
+    test("1/1000", "-2", 10, Floor, "3.1406", "0x3.24#10", Less);
+    test("1/1000", "-2", 10, Ceiling, "3.1445", "0x3.25#10", Greater);
+    test("1/1000", "-2", 10, Down, "3.1406", "0x3.24#10", Less);
+    test("1/1000", "-2", 10, Up, "3.1445", "0x3.25#10", Greater);
+    test(
+        "1/1000",
+        "-2",
+        53,
+        Nearest,
+        "3.1410926536314601",
+        "0x3.241ea5ed0d8fe#53",
+        Greater,
+    );
+    test("1/1000", "-2", 1, Nearest, "4.0", "0x4.0#1", Greater);
+    test("1/1000", "-2", 2, Floor, "3.0", "0x3.0#2", Less);
+    test(
+        "1/1000",
+        "7/2",
+        10,
+        Nearest,
+        "0.00028563",
+        "0x0.0012b8#10",
+        Less,
+    );
+    test(
+        "1/1000",
+        "7/2",
+        10,
+        Floor,
+        "0.00028563",
+        "0x0.0012b8#10",
+        Less,
+    );
+    test(
+        "1/1000",
+        "7/2",
+        10,
+        Ceiling,
+        "0.00028610",
+        "0x0.0012c0#10",
+        Greater,
+    );
+    test(
+        "1/1000",
+        "7/2",
+        10,
+        Down,
+        "0.00028563",
+        "0x0.0012b8#10",
+        Less,
+    );
+    test(
+        "1/1000",
+        "7/2",
+        10,
+        Up,
+        "0.00028610",
+        "0x0.0012c0#10",
+        Greater,
+    );
+    test(
+        "1/1000",
+        "7/2",
+        53,
+        Nearest,
+        "0.00028571427793974772",
+        "0x0.0012b97d7ad0fe0d#53",
+        Greater,
+    );
+    test("1/1000", "7/2", 1, Nearest, "0.00024", "0x0.001#1", Less);
+    test("1/1000", "7/2", 2, Floor, "0.00024", "0x0.0010#2", Less);
+    test(
+        "1/1000",
+        "1/1000",
+        10,
+        Nearest,
+        "0.78516",
+        "0x0.c90#10",
+        Less,
+    );
+    test("1/1000", "1/1000", 10, Floor, "0.78516", "0x0.c90#10", Less);
+    test(
+        "1/1000",
+        "1/1000",
+        10,
+        Ceiling,
+        "0.78613",
+        "0x0.c94#10",
+        Greater,
+    );
+    test("1/1000", "1/1000", 10, Down, "0.78516", "0x0.c90#10", Less);
+    test("1/1000", "1/1000", 10, Up, "0.78613", "0x0.c94#10", Greater);
+    test(
+        "1/1000",
+        "1/1000",
+        53,
+        Nearest,
+        "0.78539816339744828",
+        "0x0.c90fdaa22168c0#53",
+        Less,
+    );
+    test("1/1000", "1/1000", 1, Nearest, "1.0", "0x1.0#1", Greater);
+    test("1/1000", "1/1000", 2, Floor, "0.75", "0x0.c#2", Less);
+    test(
+        "1/1000",
+        "999/1000",
+        10,
+        Nearest,
+        "0.0010014",
+        "0x0.0041a#10",
+        Greater,
+    );
+    test(
+        "1/1000",
+        "999/1000",
+        10,
+        Floor,
+        "0.00099945",
+        "0x0.00418#10",
+        Less,
+    );
+    test(
+        "1/1000",
+        "999/1000",
+        10,
+        Ceiling,
+        "0.0010014",
+        "0x0.0041a#10",
+        Greater,
+    );
+    test(
+        "1/1000",
+        "999/1000",
+        10,
+        Down,
+        "0.00099945",
+        "0x0.00418#10",
+        Less,
+    );
+    test(
+        "1/1000",
+        "999/1000",
+        10,
+        Up,
+        "0.0010014",
+        "0x0.0041a#10",
+        Greater,
+    );
+    test(
+        "1/1000",
+        "999/1000",
+        53,
+        Nearest,
+        "0.0010010006666658652",
+        "0x0.00419a0120692024#53",
+        Less,
+    );
+    test(
+        "1/1000",
+        "999/1000",
+        1,
+        Nearest,
+        "0.00098",
+        "0x0.004#1",
+        Less,
+    );
+    test("1/1000", "999/1000", 2, Floor, "0.00098", "0x0.004#2", Less);
+    test(
+        "1/1000",
+        "123456789/7",
+        10,
+        Nearest,
+        "5.6673e-11",
+        "0x3.e5E-9#10",
+        Less,
+    );
+    test(
+        "1/1000",
+        "123456789/7",
+        10,
+        Floor,
+        "5.6673e-11",
+        "0x3.e5E-9#10",
+        Less,
+    );
+    test(
+        "1/1000",
+        "123456789/7",
+        10,
+        Ceiling,
+        "5.6730e-11",
+        "0x3.e6E-9#10",
+        Greater,
+    );
+    test(
+        "1/1000",
+        "123456789/7",
+        10,
+        Down,
+        "5.6673e-11",
+        "0x3.e5E-9#10",
+        Less,
+    );
+    test(
+        "1/1000",
+        "123456789/7",
+        10,
+        Up,
+        "5.6730e-11",
+        "0x3.e6E-9#10",
+        Greater,
+    );
+    test(
+        "1/1000",
+        "123456789/7",
+        53,
+        Nearest,
+        "5.6700000515970007e-11",
+        "0x3.e57a19e7f4ef0E-9#53",
+        Greater,
+    );
+    test(
+        "1/1000",
+        "123456789/7",
+        1,
+        Nearest,
+        "5.8e-11",
+        "0x4.0E-9#1",
+        Greater,
+    );
+    test(
+        "1/1000",
+        "123456789/7",
+        2,
+        Floor,
+        "4.4e-11",
+        "0x3.0E-9#2",
+        Less,
+    );
+    test(
+        "1/1000",
+        "1/123456789",
+        10,
+        Nearest,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "1/1000",
+        "1/123456789",
+        10,
+        Floor,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "1/1000",
+        "1/123456789",
+        10,
+        Ceiling,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test(
+        "1/1000",
+        "1/123456789",
+        10,
+        Down,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "1/1000",
+        "1/123456789",
+        10,
+        Up,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test(
+        "1/1000",
+        "1/123456789",
+        53,
+        Nearest,
+        "1.5707882267948230",
+        "0x1.921f2d5f068d7#53",
+        Less,
+    );
+    test(
+        "1/1000",
+        "1/123456789",
+        1,
+        Nearest,
+        "2.0",
+        "0x2.0#1",
+        Greater,
+    );
+    test("1/1000", "1/123456789", 2, Floor, "1.5", "0x1.8#2", Less);
+    test(
+        "1/1000",
+        "22/7",
+        10,
+        Nearest,
+        "0.00031805",
+        "0x0.0014d8#10",
+        Less,
+    );
+    test(
+        "1/1000",
+        "22/7",
+        10,
+        Floor,
+        "0.00031805",
+        "0x0.0014d8#10",
+        Less,
+    );
+    test(
+        "1/1000",
+        "22/7",
+        10,
+        Ceiling,
+        "0.00031853",
+        "0x0.0014e0#10",
+        Greater,
+    );
+    test(
+        "1/1000",
+        "22/7",
+        10,
+        Down,
+        "0.00031805",
+        "0x0.0014d8#10",
+        Less,
+    );
+    test(
+        "1/1000",
+        "22/7",
+        10,
+        Up,
+        "0.00031853",
+        "0x0.0014e0#10",
+        Greater,
+    );
+    test(
+        "1/1000",
+        "22/7",
+        53,
+        Nearest,
+        "0.00031818180744427811",
+        "0x0.0014da34750821f3#53",
+        Less,
+    );
+    test("1/1000", "22/7", 1, Nearest, "0.00024", "0x0.001#1", Less);
+    test("1/1000", "22/7", 2, Floor, "0.00024", "0x0.0010#2", Less);
+    test("1/1000", "-22/7", 10, Nearest, "3.1406", "0x3.24#10", Less);
+    test("1/1000", "-22/7", 10, Floor, "3.1406", "0x3.24#10", Less);
+    test(
+        "1/1000",
+        "-22/7",
+        10,
+        Ceiling,
+        "3.1445",
+        "0x3.25#10",
+        Greater,
+    );
+    test("1/1000", "-22/7", 10, Down, "3.1406", "0x3.24#10", Less);
+    test("1/1000", "-22/7", 10, Up, "3.1445", "0x3.25#10", Greater);
+    test(
+        "1/1000",
+        "-22/7",
+        53,
+        Nearest,
+        "3.1412744717823489",
+        "0x3.242a9054109ae#53",
+        Less,
+    );
+    test("1/1000", "-22/7", 1, Nearest, "4.0", "0x4.0#1", Greater);
+    test("1/1000", "-22/7", 2, Floor, "3.0", "0x3.0#2", Less);
+    test(
+        "1/1000",
+        "355/113",
+        10,
+        Nearest,
+        "0.00031853",
+        "0x0.0014e0#10",
+        Greater,
+    );
+    test(
+        "1/1000",
+        "355/113",
+        10,
+        Floor,
+        "0.00031805",
+        "0x0.0014d8#10",
+        Less,
+    );
+    test(
+        "1/1000",
+        "355/113",
+        10,
+        Ceiling,
+        "0.00031853",
+        "0x0.0014e0#10",
+        Greater,
+    );
+    test(
+        "1/1000",
+        "355/113",
+        10,
+        Down,
+        "0.00031805",
+        "0x0.0014d8#10",
+        Less,
+    );
+    test(
+        "1/1000",
+        "355/113",
+        10,
+        Up,
+        "0.00031853",
+        "0x0.0014e0#10",
+        Greater,
+    );
+    test(
+        "1/1000",
+        "355/113",
+        53,
+        Nearest,
+        "0.00031830984840442150",
+        "0x0.0014dc5a638e6830#53",
+        Greater,
+    );
+    test(
+        "1/1000",
+        "355/113",
+        1,
+        Nearest,
+        "0.00024",
+        "0x0.001#1",
+        Less,
+    );
+    test("1/1000", "355/113", 2, Floor, "0.00024", "0x0.0010#2", Less);
+    test("999/1000", "0", 10, Nearest, "1.5703", "0x1.920#10", Less);
+    test("999/1000", "0", 10, Floor, "1.5703", "0x1.920#10", Less);
+    test(
+        "999/1000",
+        "0",
+        10,
+        Ceiling,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test("999/1000", "0", 10, Down, "1.5703", "0x1.920#10", Less);
+    test("999/1000", "0", 10, Up, "1.5723", "0x1.928#10", Greater);
+    test(
+        "999/1000",
+        "0",
+        53,
+        Nearest,
+        "1.5707963267948966",
+        "0x1.921fb54442d18#53",
+        Less,
+    );
+    test("999/1000", "0", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("999/1000", "0", 2, Floor, "1.5", "0x1.8#2", Less);
+    test(
+        "999/1000",
+        "1",
+        10,
+        Nearest,
+        "0.78516",
+        "0x0.c90#10",
+        Greater,
+    );
+    test("999/1000", "1", 10, Floor, "0.78418", "0x0.c8c#10", Less);
+    test(
+        "999/1000",
+        "1",
+        10,
+        Ceiling,
+        "0.78516",
+        "0x0.c90#10",
+        Greater,
+    );
+    test("999/1000", "1", 10, Down, "0.78418", "0x0.c8c#10", Less);
+    test("999/1000", "1", 10, Up, "0.78516", "0x0.c90#10", Greater);
+    test(
+        "999/1000",
+        "1",
+        53,
+        Nearest,
+        "0.78489791331411496",
+        "0x0.c8ef11d461fd00#53",
+        Less,
+    );
+    test("999/1000", "1", 1, Nearest, "1.0", "0x1.0#1", Greater);
+    test("999/1000", "1", 2, Floor, "0.75", "0x0.c#2", Less);
+    test("999/1000", "-1", 10, Nearest, "2.3555", "0x2.5b#10", Less);
+    test("999/1000", "-1", 10, Floor, "2.3555", "0x2.5b#10", Less);
+    test(
+        "999/1000",
+        "-1",
+        10,
+        Ceiling,
+        "2.3594",
+        "0x2.5c#10",
+        Greater,
+    );
+    test("999/1000", "-1", 10, Down, "2.3555", "0x2.5b#10", Less);
+    test("999/1000", "-1", 10, Up, "2.3594", "0x2.5c#10", Greater);
+    test(
+        "999/1000",
+        "-1",
+        53,
+        Nearest,
+        "2.3566947402756782",
+        "0x2.5b5058b423a60#53",
+        Less,
+    );
+    test("999/1000", "-1", 1, Nearest, "2.0", "0x2.0#1", Less);
+    test("999/1000", "-1", 2, Floor, "2.0", "0x2.0#2", Less);
+    test(
+        "999/1000",
+        "3/4",
+        10,
+        Nearest,
+        "0.92676",
+        "0x0.ed4#10",
+        Less,
+    );
+    test("999/1000", "3/4", 10, Floor, "0.92676", "0x0.ed4#10", Less);
+    test(
+        "999/1000",
+        "3/4",
+        10,
+        Ceiling,
+        "0.92773",
+        "0x0.ed8#10",
+        Greater,
+    );
+    test("999/1000", "3/4", 10, Down, "0.92676", "0x0.ed4#10", Less);
+    test("999/1000", "3/4", 10, Up, "0.92773", "0x0.ed8#10", Greater);
+    test(
+        "999/1000",
+        "3/4",
+        53,
+        Nearest,
+        "0.92681491064181321",
+        "0x0.ed43bdf2a6d918#53",
+        Greater,
+    );
+    test("999/1000", "3/4", 1, Nearest, "1.0", "0x1.0#1", Greater);
+    test("999/1000", "3/4", 2, Floor, "0.75", "0x0.c#2", Less);
+    test(
+        "999/1000",
+        "-3/4",
+        10,
+        Nearest,
+        "2.2148",
+        "0x2.37#10",
+        Greater,
+    );
+    test("999/1000", "-3/4", 10, Floor, "2.2109", "0x2.36#10", Less);
+    test(
+        "999/1000",
+        "-3/4",
+        10,
+        Ceiling,
+        "2.2148",
+        "0x2.37#10",
+        Greater,
+    );
+    test("999/1000", "-3/4", 10, Down, "2.2109", "0x2.36#10", Less);
+    test("999/1000", "-3/4", 10, Up, "2.2148", "0x2.37#10", Greater);
+    test(
+        "999/1000",
+        "-3/4",
+        53,
+        Nearest,
+        "2.2147777429479802",
+        "0x2.36fbac95deca0#53",
+        Greater,
+    );
+    test("999/1000", "-3/4", 1, Nearest, "2.0", "0x2.0#1", Less);
+    test("999/1000", "-3/4", 2, Floor, "2.0", "0x2.0#2", Less);
+    test("999/1000", "1/3", 10, Nearest, "1.2480", "0x1.3f8#10", Less);
+    test("999/1000", "1/3", 10, Floor, "1.2480", "0x1.3f8#10", Less);
+    test(
+        "999/1000",
+        "1/3",
+        10,
+        Ceiling,
+        "1.2500",
+        "0x1.400#10",
+        Greater,
+    );
+    test("999/1000", "1/3", 10, Down, "1.2480", "0x1.3f8#10", Less);
+    test("999/1000", "1/3", 10, Up, "1.2500", "0x1.400#10", Greater);
+    test(
+        "999/1000",
+        "1/3",
+        53,
+        Nearest,
+        "1.2487455021640599",
+        "0x1.3fadc904d25d3#53",
+        Greater,
+    );
+    test("999/1000", "1/3", 1, Nearest, "1.0", "0x1.0#1", Less);
+    test("999/1000", "1/3", 2, Floor, "1.0", "0x1.0#2", Less);
+    test(
+        "999/1000",
+        "-1/3",
+        10,
+        Nearest,
+        "1.8926",
+        "0x1.e48#10",
+        Less,
+    );
+    test("999/1000", "-1/3", 10, Floor, "1.8926", "0x1.e48#10", Less);
+    test(
+        "999/1000",
+        "-1/3",
+        10,
+        Ceiling,
+        "1.8945",
+        "0x1.e50#10",
+        Greater,
+    );
+    test("999/1000", "-1/3", 10, Down, "1.8926", "0x1.e48#10", Less);
+    test("999/1000", "-1/3", 10, Up, "1.8945", "0x1.e50#10", Greater);
+    test(
+        "999/1000",
+        "-1/3",
+        53,
+        Nearest,
+        "1.8928471514257335",
+        "0x1.e491a183b345e#53",
+        Greater,
+    );
+    test("999/1000", "-1/3", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("999/1000", "-1/3", 2, Floor, "1.5", "0x1.8#2", Less);
+    test(
+        "999/1000",
+        "2",
+        10,
+        Nearest,
+        "0.46338",
+        "0x0.76a#10",
+        Greater,
+    );
+    test("999/1000", "2", 10, Floor, "0.46289", "0x0.768#10", Less);
+    test(
+        "999/1000",
+        "2",
+        10,
+        Ceiling,
+        "0.46338",
+        "0x0.76a#10",
+        Greater,
+    );
+    test("999/1000", "2", 10, Down, "0.46289", "0x0.768#10", Less);
+    test("999/1000", "2", 10, Up, "0.46338", "0x0.76a#10", Greater);
+    test(
+        "999/1000",
+        "2",
+        53,
+        Nearest,
+        "0.46324752900614907",
+        "0x0.769763db08c2c0#53",
+        Greater,
+    );
+    test("999/1000", "2", 1, Nearest, "0.50", "0x0.8#1", Greater);
+    test("999/1000", "2", 2, Floor, "0.38", "0x0.6#2", Less);
+    test(
+        "999/1000",
+        "-2",
+        10,
+        Nearest,
+        "2.6797",
+        "0x2.ae#10",
+        Greater,
+    );
+    test("999/1000", "-2", 10, Floor, "2.6758", "0x2.ad#10", Less);
+    test(
+        "999/1000",
+        "-2",
+        10,
+        Ceiling,
+        "2.6797",
+        "0x2.ae#10",
+        Greater,
+    );
+    test("999/1000", "-2", 10, Down, "2.6758", "0x2.ad#10", Less);
+    test("999/1000", "-2", 10, Up, "2.6797", "0x2.ae#10", Greater);
+    test(
+        "999/1000",
+        "-2",
+        53,
+        Nearest,
+        "2.6783451245836440",
+        "0x2.ada806ad7ce04#53",
+        Less,
+    );
+    test("999/1000", "-2", 1, Nearest, "2.0", "0x2.0#1", Less);
+    test("999/1000", "-2", 2, Floor, "2.0", "0x2.0#2", Less);
+    test(
+        "999/1000",
+        "7/2",
+        10,
+        Nearest,
+        "0.27783",
+        "0x0.472#10",
+        Less,
+    );
+    test("999/1000", "7/2", 10, Floor, "0.27783", "0x0.472#10", Less);
+    test(
+        "999/1000",
+        "7/2",
+        10,
+        Ceiling,
+        "0.27832",
+        "0x0.474#10",
+        Greater,
+    );
+    test("999/1000", "7/2", 10, Down, "0.27783", "0x0.472#10", Less);
+    test("999/1000", "7/2", 10, Up, "0.27832", "0x0.474#10", Greater);
+    test(
+        "999/1000",
+        "7/2",
+        53,
+        Nearest,
+        "0.27803548813043533",
+        "0x0.472d5570a5ca28#53",
+        Greater,
+    );
+    test("999/1000", "7/2", 1, Nearest, "0.25", "0x0.4#1", Less);
+    test("999/1000", "7/2", 2, Floor, "0.25", "0x0.4#2", Less);
+    test(
+        "999/1000",
+        "1/1000",
+        10,
+        Nearest,
+        "1.5703",
+        "0x1.920#10",
+        Greater,
+    );
+    test(
+        "999/1000",
+        "1/1000",
+        10,
+        Floor,
+        "1.5684",
+        "0x1.918#10",
+        Less,
+    );
+    test(
+        "999/1000",
+        "1/1000",
+        10,
+        Ceiling,
+        "1.5703",
+        "0x1.920#10",
+        Greater,
+    );
+    test("999/1000", "1/1000", 10, Down, "1.5684", "0x1.918#10", Less);
+    test(
+        "999/1000",
+        "1/1000",
+        10,
+        Up,
+        "1.5703",
+        "0x1.920#10",
+        Greater,
+    );
+    test(
+        "999/1000",
+        "1/1000",
+        53,
+        Nearest,
+        "1.5697953261282307",
+        "0x1.91de1b4322686#53",
+        Less,
+    );
+    test("999/1000", "1/1000", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("999/1000", "1/1000", 2, Floor, "1.5", "0x1.8#2", Less);
+    test(
+        "999/1000",
+        "999/1000",
+        10,
+        Nearest,
+        "0.78516",
+        "0x0.c90#10",
+        Less,
+    );
+    test(
+        "999/1000",
+        "999/1000",
+        10,
+        Floor,
+        "0.78516",
+        "0x0.c90#10",
+        Less,
+    );
+    test(
+        "999/1000",
+        "999/1000",
+        10,
+        Ceiling,
+        "0.78613",
+        "0x0.c94#10",
+        Greater,
+    );
+    test(
+        "999/1000",
+        "999/1000",
+        10,
+        Down,
+        "0.78516",
+        "0x0.c90#10",
+        Less,
+    );
+    test(
+        "999/1000",
+        "999/1000",
+        10,
+        Up,
+        "0.78613",
+        "0x0.c94#10",
+        Greater,
+    );
+    test(
+        "999/1000",
+        "999/1000",
+        53,
+        Nearest,
+        "0.78539816339744828",
+        "0x0.c90fdaa22168c0#53",
+        Less,
+    );
+    test(
+        "999/1000", "999/1000", 1, Nearest, "1.0", "0x1.0#1", Greater,
+    );
+    test("999/1000", "999/1000", 2, Floor, "0.75", "0x0.c#2", Less);
+    test(
+        "999/1000",
+        "123456789/7",
+        10,
+        Nearest,
+        "5.6636e-8",
+        "0xf.34E-7#10",
+        Less,
+    );
+    test(
+        "999/1000",
+        "123456789/7",
+        10,
+        Floor,
+        "5.6636e-8",
+        "0xf.34E-7#10",
+        Less,
+    );
+    test(
+        "999/1000",
+        "123456789/7",
+        10,
+        Ceiling,
+        "5.6694e-8",
+        "0xf.38E-7#10",
+        Greater,
+    );
+    test(
+        "999/1000",
+        "123456789/7",
+        10,
+        Down,
+        "5.6636e-8",
+        "0xf.34E-7#10",
+        Less,
+    );
+    test(
+        "999/1000",
+        "123456789/7",
+        10,
+        Up,
+        "5.6694e-8",
+        "0xf.38E-7#10",
+        Greater,
+    );
+    test(
+        "999/1000",
+        "123456789/7",
+        53,
+        Nearest,
+        "5.6643300515453975e-8",
+        "0xf.347f7b182ccc0E-7#53",
+        Greater,
+    );
+    test(
+        "999/1000",
+        "123456789/7",
+        1,
+        Nearest,
+        "6.0e-8",
+        "0x1.0E-6#1",
+        Greater,
+    );
+    test(
+        "999/1000",
+        "123456789/7",
+        2,
+        Floor,
+        "4.5e-8",
+        "0xc.0E-7#2",
+        Less,
+    );
+    test(
+        "999/1000",
+        "1/123456789",
+        10,
+        Nearest,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "999/1000",
+        "1/123456789",
+        10,
+        Floor,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "999/1000",
+        "1/123456789",
+        10,
+        Ceiling,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test(
+        "999/1000",
+        "1/123456789",
+        10,
+        Down,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "999/1000",
+        "1/123456789",
+        10,
+        Up,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test(
+        "999/1000",
+        "1/123456789",
+        53,
+        Nearest,
+        "1.5707963186867884",
+        "0x1.921fb5216fdbf#53",
+        Less,
+    );
+    test(
+        "999/1000",
+        "1/123456789",
+        1,
+        Nearest,
+        "2.0",
+        "0x2.0#1",
+        Greater,
+    );
+    test("999/1000", "1/123456789", 2, Floor, "1.5", "0x1.8#2", Less);
+    test(
+        "999/1000",
+        "22/7",
+        10,
+        Nearest,
+        "0.30762",
+        "0x0.4ec#10",
+        Less,
+    );
+    test("999/1000", "22/7", 10, Floor, "0.30762", "0x0.4ec#10", Less);
+    test(
+        "999/1000",
+        "22/7",
+        10,
+        Ceiling,
+        "0.30811",
+        "0x0.4ee#10",
+        Greater,
+    );
+    test("999/1000", "22/7", 10, Down, "0.30762", "0x0.4ec#10", Less);
+    test("999/1000", "22/7", 10, Up, "0.30811", "0x0.4ee#10", Greater);
+    test(
+        "999/1000",
+        "22/7",
+        53,
+        Nearest,
+        "0.30776382388566453",
+        "0x0.4ec99c267b17dc#53",
+        Greater,
+    );
+    test("999/1000", "22/7", 1, Nearest, "0.25", "0x0.4#1", Less);
+    test("999/1000", "22/7", 2, Floor, "0.25", "0x0.4#2", Less);
+    test(
+        "999/1000",
+        "-22/7",
+        10,
+        Nearest,
+        "2.8320",
+        "0x2.d5#10",
+        Less,
+    );
+    test("999/1000", "-22/7", 10, Floor, "2.8320", "0x2.d5#10", Less);
+    test(
+        "999/1000",
+        "-22/7",
+        10,
+        Ceiling,
+        "2.8359",
+        "0x2.d6#10",
+        Greater,
+    );
+    test("999/1000", "-22/7", 10, Down, "2.8320", "0x2.d5#10", Less);
+    test("999/1000", "-22/7", 10, Up, "2.8359", "0x2.d6#10", Greater);
+    test(
+        "999/1000",
+        "-22/7",
+        53,
+        Nearest,
+        "2.8338288297041285",
+        "0x2.d575ce620a8b2#53",
+        Less,
+    );
+    test("999/1000", "-22/7", 1, Nearest, "2.0", "0x2.0#1", Less);
+    test("999/1000", "-22/7", 2, Floor, "2.0", "0x2.0#2", Less);
+    test(
+        "999/1000",
+        "355/113",
+        10,
+        Nearest,
+        "0.30811",
+        "0x0.4ee#10",
+        Greater,
+    );
+    test(
+        "999/1000",
+        "355/113",
+        10,
+        Floor,
+        "0.30762",
+        "0x0.4ec#10",
+        Less,
+    );
+    test(
+        "999/1000",
+        "355/113",
+        10,
+        Ceiling,
+        "0.30811",
+        "0x0.4ee#10",
+        Greater,
+    );
+    test(
+        "999/1000",
+        "355/113",
+        10,
+        Down,
+        "0.30762",
+        "0x0.4ec#10",
+        Less,
+    );
+    test(
+        "999/1000",
+        "355/113",
+        10,
+        Up,
+        "0.30811",
+        "0x0.4ee#10",
+        Greater,
+    );
+    test(
+        "999/1000",
+        "355/113",
+        53,
+        Nearest,
+        "0.30787999452693526",
+        "0x0.4ed1392b95fa00#53",
+        Greater,
+    );
+    test("999/1000", "355/113", 1, Nearest, "0.25", "0x0.4#1", Less);
+    test("999/1000", "355/113", 2, Floor, "0.25", "0x0.4#2", Less);
+    test(
+        "123456789/7",
+        "0",
+        10,
+        Nearest,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test("123456789/7", "0", 10, Floor, "1.5703", "0x1.920#10", Less);
+    test(
+        "123456789/7",
+        "0",
+        10,
+        Ceiling,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test("123456789/7", "0", 10, Down, "1.5703", "0x1.920#10", Less);
+    test("123456789/7", "0", 10, Up, "1.5723", "0x1.928#10", Greater);
+    test(
+        "123456789/7",
+        "0",
+        53,
+        Nearest,
+        "1.5707963267948966",
+        "0x1.921fb54442d18#53",
+        Less,
+    );
+    test("123456789/7", "0", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("123456789/7", "0", 2, Floor, "1.5", "0x1.8#2", Less);
+    test(
+        "123456789/7",
+        "1",
+        10,
+        Nearest,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test("123456789/7", "1", 10, Floor, "1.5703", "0x1.920#10", Less);
+    test(
+        "123456789/7",
+        "1",
+        10,
+        Ceiling,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test("123456789/7", "1", 10, Down, "1.5703", "0x1.920#10", Less);
+    test("123456789/7", "1", 10, Up, "1.5723", "0x1.928#10", Greater);
+    test(
+        "123456789/7",
+        "1",
+        53,
+        Nearest,
+        "1.5707962700948961",
+        "0x1.921fb450bc823#53",
+        Less,
+    );
+    test("123456789/7", "1", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("123456789/7", "1", 2, Floor, "1.5", "0x1.8#2", Less);
+    test(
+        "123456789/7",
+        "-1",
+        10,
+        Nearest,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test("123456789/7", "-1", 10, Floor, "1.5703", "0x1.920#10", Less);
+    test(
+        "123456789/7",
+        "-1",
+        10,
+        Ceiling,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test("123456789/7", "-1", 10, Down, "1.5703", "0x1.920#10", Less);
+    test("123456789/7", "-1", 10, Up, "1.5723", "0x1.928#10", Greater);
+    test(
+        "123456789/7",
+        "-1",
+        53,
+        Nearest,
+        "1.5707963834948970",
+        "0x1.921fb637c920d#53",
+        Less,
+    );
+    test("123456789/7", "-1", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("123456789/7", "-1", 2, Floor, "1.5", "0x1.8#2", Less);
+    test(
+        "123456789/7",
+        "3/4",
+        10,
+        Nearest,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "123456789/7",
+        "3/4",
+        10,
+        Floor,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "123456789/7",
+        "3/4",
+        10,
+        Ceiling,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test("123456789/7", "3/4", 10, Down, "1.5703", "0x1.920#10", Less);
+    test(
+        "123456789/7",
+        "3/4",
+        10,
+        Up,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test(
+        "123456789/7",
+        "3/4",
+        53,
+        Nearest,
+        "1.5707962842698961",
+        "0x1.921fb48d9e160#53",
+        Less,
+    );
+    test("123456789/7", "3/4", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("123456789/7", "3/4", 2, Floor, "1.5", "0x1.8#2", Less);
+    test(
+        "123456789/7",
+        "-3/4",
+        10,
+        Nearest,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "123456789/7",
+        "-3/4",
+        10,
+        Floor,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "123456789/7",
+        "-3/4",
+        10,
+        Ceiling,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test(
+        "123456789/7",
+        "-3/4",
+        10,
+        Down,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "123456789/7",
+        "-3/4",
+        10,
+        Up,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test(
+        "123456789/7",
+        "-3/4",
+        53,
+        Nearest,
+        "1.5707963693198970",
+        "0x1.921fb5fae78d0#53",
+        Less,
+    );
+    test("123456789/7", "-3/4", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("123456789/7", "-3/4", 2, Floor, "1.5", "0x1.8#2", Less);
+    test(
+        "123456789/7",
+        "1/3",
+        10,
+        Nearest,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "123456789/7",
+        "1/3",
+        10,
+        Floor,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "123456789/7",
+        "1/3",
+        10,
+        Ceiling,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test("123456789/7", "1/3", 10, Down, "1.5703", "0x1.920#10", Less);
+    test(
+        "123456789/7",
+        "1/3",
+        10,
+        Up,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test(
+        "123456789/7",
+        "1/3",
+        53,
+        Nearest,
+        "1.5707963078948965",
+        "0x1.921fb4f3160c7#53",
+        Greater,
+    );
+    test("123456789/7", "1/3", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("123456789/7", "1/3", 2, Floor, "1.5", "0x1.8#2", Less);
+    test(
+        "123456789/7",
+        "-1/3",
+        10,
+        Nearest,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "123456789/7",
+        "-1/3",
+        10,
+        Floor,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "123456789/7",
+        "-1/3",
+        10,
+        Ceiling,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test(
+        "123456789/7",
+        "-1/3",
+        10,
+        Down,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "123456789/7",
+        "-1/3",
+        10,
+        Up,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test(
+        "123456789/7",
+        "-1/3",
+        53,
+        Nearest,
+        "1.5707963456948968",
+        "0x1.921fb5956f96a#53",
+        Less,
+    );
+    test("123456789/7", "-1/3", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("123456789/7", "-1/3", 2, Floor, "1.5", "0x1.8#2", Less);
+    test(
+        "123456789/7",
+        "2",
+        10,
+        Nearest,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test("123456789/7", "2", 10, Floor, "1.5703", "0x1.920#10", Less);
+    test(
+        "123456789/7",
+        "2",
+        10,
+        Ceiling,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test("123456789/7", "2", 10, Down, "1.5703", "0x1.920#10", Less);
+    test("123456789/7", "2", 10, Up, "1.5723", "0x1.928#10", Greater);
+    test(
+        "123456789/7",
+        "2",
+        53,
+        Nearest,
+        "1.5707962133948956",
+        "0x1.921fb35d3632e#53",
+        Greater,
+    );
+    test("123456789/7", "2", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("123456789/7", "2", 2, Floor, "1.5", "0x1.8#2", Less);
+    test(
+        "123456789/7",
+        "-2",
+        10,
+        Nearest,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test("123456789/7", "-2", 10, Floor, "1.5703", "0x1.920#10", Less);
+    test(
+        "123456789/7",
+        "-2",
+        10,
+        Ceiling,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test("123456789/7", "-2", 10, Down, "1.5703", "0x1.920#10", Less);
+    test("123456789/7", "-2", 10, Up, "1.5723", "0x1.928#10", Greater);
+    test(
+        "123456789/7",
+        "-2",
+        53,
+        Nearest,
+        "1.5707964401948977",
+        "0x1.921fb72b4f703#53",
+        Greater,
+    );
+    test("123456789/7", "-2", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("123456789/7", "-2", 2, Floor, "1.5", "0x1.8#2", Less);
+    test(
+        "123456789/7",
+        "7/2",
+        10,
+        Nearest,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "123456789/7",
+        "7/2",
+        10,
+        Floor,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "123456789/7",
+        "7/2",
+        10,
+        Ceiling,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test("123456789/7", "7/2", 10, Down, "1.5703", "0x1.920#10", Less);
+    test(
+        "123456789/7",
+        "7/2",
+        10,
+        Up,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test(
+        "123456789/7",
+        "7/2",
+        53,
+        Nearest,
+        "1.5707961283448948",
+        "0x1.921fb1efecbbe#53",
+        Less,
+    );
+    test("123456789/7", "7/2", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("123456789/7", "7/2", 2, Floor, "1.5", "0x1.8#2", Less);
+    test(
+        "123456789/7",
+        "1/1000",
+        10,
+        Nearest,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "123456789/7",
+        "1/1000",
+        10,
+        Floor,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "123456789/7",
+        "1/1000",
+        10,
+        Ceiling,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test(
+        "123456789/7",
+        "1/1000",
+        10,
+        Down,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "123456789/7",
+        "1/1000",
+        10,
+        Up,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test(
+        "123456789/7",
+        "1/1000",
+        53,
+        Nearest,
+        "1.5707963267381966",
+        "0x1.921fb5440479e#53",
+        Less,
+    );
+    test(
+        "123456789/7",
+        "1/1000",
+        1,
+        Nearest,
+        "2.0",
+        "0x2.0#1",
+        Greater,
+    );
+    test("123456789/7", "1/1000", 2, Floor, "1.5", "0x1.8#2", Less);
+    test(
+        "123456789/7",
+        "999/1000",
+        10,
+        Nearest,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "123456789/7",
+        "999/1000",
+        10,
+        Floor,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "123456789/7",
+        "999/1000",
+        10,
+        Ceiling,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test(
+        "123456789/7",
+        "999/1000",
+        10,
+        Down,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "123456789/7",
+        "999/1000",
+        10,
+        Up,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test(
+        "123456789/7",
+        "999/1000",
+        53,
+        Nearest,
+        "1.5707962701515961",
+        "0x1.921fb450fad9d#53",
+        Less,
+    );
+    test(
+        "123456789/7",
+        "999/1000",
+        1,
+        Nearest,
+        "2.0",
+        "0x2.0#1",
+        Greater,
+    );
+    test("123456789/7", "999/1000", 2, Floor, "1.5", "0x1.8#2", Less);
+    test(
+        "123456789/7",
+        "123456789/7",
+        10,
+        Nearest,
+        "0.78516",
+        "0x0.c90#10",
+        Less,
+    );
+    test(
+        "123456789/7",
+        "123456789/7",
+        10,
+        Floor,
+        "0.78516",
+        "0x0.c90#10",
+        Less,
+    );
+    test(
+        "123456789/7",
+        "123456789/7",
+        10,
+        Ceiling,
+        "0.78613",
+        "0x0.c94#10",
+        Greater,
+    );
+    test(
+        "123456789/7",
+        "123456789/7",
+        10,
+        Down,
+        "0.78516",
+        "0x0.c90#10",
+        Less,
+    );
+    test(
+        "123456789/7",
+        "123456789/7",
+        10,
+        Up,
+        "0.78613",
+        "0x0.c94#10",
+        Greater,
+    );
+    test(
+        "123456789/7",
+        "123456789/7",
+        53,
+        Nearest,
+        "0.78539816339744828",
+        "0x0.c90fdaa22168c0#53",
+        Less,
+    );
+    test(
+        "123456789/7",
+        "123456789/7",
+        1,
+        Nearest,
+        "1.0",
+        "0x1.0#1",
+        Greater,
+    );
+    test(
+        "123456789/7",
+        "123456789/7",
+        2,
+        Floor,
+        "0.75",
+        "0x0.c#2",
+        Less,
+    );
+    test(
+        "123456789/7",
+        "1/123456789",
+        10,
+        Nearest,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "123456789/7",
+        "1/123456789",
+        10,
+        Floor,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "123456789/7",
+        "1/123456789",
+        10,
+        Ceiling,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test(
+        "123456789/7",
+        "1/123456789",
+        10,
+        Down,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "123456789/7",
+        "1/123456789",
+        10,
+        Up,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test(
+        "123456789/7",
+        "1/123456789",
+        53,
+        Nearest,
+        "1.5707963267948961",
+        "0x1.921fb54442d16#53",
+        Less,
+    );
+    test(
+        "123456789/7",
+        "1/123456789",
+        1,
+        Nearest,
+        "2.0",
+        "0x2.0#1",
+        Greater,
+    );
+    test(
+        "123456789/7",
+        "1/123456789",
+        2,
+        Floor,
+        "1.5",
+        "0x1.8#2",
+        Less,
+    );
+    test(
+        "123456789/7",
+        "22/7",
+        10,
+        Nearest,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "123456789/7",
+        "22/7",
+        10,
+        Floor,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "123456789/7",
+        "22/7",
+        10,
+        Ceiling,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test(
+        "123456789/7",
+        "22/7",
+        10,
+        Down,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "123456789/7",
+        "22/7",
+        10,
+        Up,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test(
+        "123456789/7",
+        "22/7",
+        53,
+        Nearest,
+        "1.5707961485948949",
+        "0x1.921fb246e5d83#53",
+        Less,
+    );
+    test("123456789/7", "22/7", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("123456789/7", "22/7", 2, Floor, "1.5", "0x1.8#2", Less);
+    test(
+        "123456789/7",
+        "-22/7",
+        10,
+        Nearest,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "123456789/7",
+        "-22/7",
+        10,
+        Floor,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "123456789/7",
+        "-22/7",
+        10,
+        Ceiling,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test(
+        "123456789/7",
+        "-22/7",
+        10,
+        Down,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "123456789/7",
+        "-22/7",
+        10,
+        Up,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test(
+        "123456789/7",
+        "-22/7",
+        53,
+        Nearest,
+        "1.5707965049948982",
+        "0x1.921fb8419fcad#53",
+        Less,
+    );
+    test(
+        "123456789/7",
+        "-22/7",
+        1,
+        Nearest,
+        "2.0",
+        "0x2.0#1",
+        Greater,
+    );
+    test("123456789/7", "-22/7", 2, Floor, "1.5", "0x1.8#2", Less);
+    test(
+        "123456789/7",
+        "355/113",
+        10,
+        Nearest,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "123456789/7",
+        "355/113",
+        10,
+        Floor,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "123456789/7",
+        "355/113",
+        10,
+        Ceiling,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test(
+        "123456789/7",
+        "355/113",
+        10,
+        Down,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "123456789/7",
+        "355/113",
+        10,
+        Up,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test(
+        "123456789/7",
+        "355/113",
+        53,
+        Nearest,
+        "1.5707961486665765",
+        "0x1.921fb24734a8c#53",
+        Greater,
+    );
+    test(
+        "123456789/7",
+        "355/113",
+        1,
+        Nearest,
+        "2.0",
+        "0x2.0#1",
+        Greater,
+    );
+    test("123456789/7", "355/113", 2, Floor, "1.5", "0x1.8#2", Less);
+    test(
+        "1/123456789",
+        "0",
+        10,
+        Nearest,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test("1/123456789", "0", 10, Floor, "1.5703", "0x1.920#10", Less);
+    test(
+        "1/123456789",
+        "0",
+        10,
+        Ceiling,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test("1/123456789", "0", 10, Down, "1.5703", "0x1.920#10", Less);
+    test("1/123456789", "0", 10, Up, "1.5723", "0x1.928#10", Greater);
+    test(
+        "1/123456789",
+        "0",
+        53,
+        Nearest,
+        "1.5707963267948966",
+        "0x1.921fb54442d18#53",
+        Less,
+    );
+    test("1/123456789", "0", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("1/123456789", "0", 2, Floor, "1.5", "0x1.8#2", Less);
+    test(
+        "1/123456789",
+        "1",
+        10,
+        Nearest,
+        "8.1054e-9",
+        "0x2.2dE-7#10",
+        Greater,
+    );
+    test(
+        "1/123456789",
+        "1",
+        10,
+        Floor,
+        "8.0909e-9",
+        "0x2.2cE-7#10",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "1",
+        10,
+        Ceiling,
+        "8.1054e-9",
+        "0x2.2dE-7#10",
+        Greater,
+    );
+    test(
+        "1/123456789",
+        "1",
+        10,
+        Down,
+        "8.0909e-9",
+        "0x2.2cE-7#10",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "1",
+        10,
+        Up,
+        "8.1054e-9",
+        "0x2.2dE-7#10",
+        Greater,
+    );
+    test(
+        "1/123456789",
+        "1",
+        53,
+        Nearest,
+        "8.1000000737100013e-9",
+        "0x2.2ca0b5504c1c4E-7#53",
+        Greater,
+    );
+    test("1/123456789", "1", 1, Nearest, "7.5e-9", "0x2.0E-7#1", Less);
+    test("1/123456789", "1", 2, Floor, "7.5e-9", "0x2.0E-7#2", Less);
+    test(
+        "1/123456789",
+        "-1",
+        10,
+        Nearest,
+        "3.1406",
+        "0x3.24#10",
+        Less,
+    );
+    test("1/123456789", "-1", 10, Floor, "3.1406", "0x3.24#10", Less);
+    test(
+        "1/123456789",
+        "-1",
+        10,
+        Ceiling,
+        "3.1445",
+        "0x3.25#10",
+        Greater,
+    );
+    test("1/123456789", "-1", 10, Down, "3.1406", "0x3.24#10", Less);
+    test("1/123456789", "-1", 10, Up, "3.1445", "0x3.25#10", Greater);
+    test(
+        "1/123456789",
+        "-1",
+        53,
+        Nearest,
+        "3.1415926454897933",
+        "0x3.243f6a65bb97c#53",
+        Greater,
+    );
+    test("1/123456789", "-1", 1, Nearest, "4.0", "0x4.0#1", Greater);
+    test("1/123456789", "-1", 2, Floor, "3.0", "0x3.0#2", Less);
+    test(
+        "1/123456789",
+        "3/4",
+        10,
+        Nearest,
+        "1.0798e-8",
+        "0x2.e6E-7#10",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "3/4",
+        10,
+        Floor,
+        "1.0798e-8",
+        "0x2.e6E-7#10",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "3/4",
+        10,
+        Ceiling,
+        "1.0812e-8",
+        "0x2.e7E-7#10",
+        Greater,
+    );
+    test(
+        "1/123456789",
+        "3/4",
+        10,
+        Down,
+        "1.0798e-8",
+        "0x2.e6E-7#10",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "3/4",
+        10,
+        Up,
+        "1.0812e-8",
+        "0x2.e7E-7#10",
+        Greater,
+    );
+    test(
+        "1/123456789",
+        "3/4",
+        53,
+        Nearest,
+        "1.0800000098280001e-8",
+        "0x2.e62b9c6b1025aE-7#53",
+        Greater,
+    );
+    test(
+        "1/123456789",
+        "3/4",
+        1,
+        Nearest,
+        "7.5e-9",
+        "0x2.0E-7#1",
+        Less,
+    );
+    test("1/123456789", "3/4", 2, Floor, "7.5e-9", "0x2.0E-7#2", Less);
+    test(
+        "1/123456789",
+        "-3/4",
+        10,
+        Nearest,
+        "3.1406",
+        "0x3.24#10",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "-3/4",
+        10,
+        Floor,
+        "3.1406",
+        "0x3.24#10",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "-3/4",
+        10,
+        Ceiling,
+        "3.1445",
+        "0x3.25#10",
+        Greater,
+    );
+    test("1/123456789", "-3/4", 10, Down, "3.1406", "0x3.24#10", Less);
+    test(
+        "1/123456789",
+        "-3/4",
+        10,
+        Up,
+        "3.1445",
+        "0x3.25#10",
+        Greater,
+    );
+    test(
+        "1/123456789",
+        "-3/4",
+        53,
+        Nearest,
+        "3.1415926427897931",
+        "0x3.243f6a5a22e94#53",
+        Less,
+    );
+    test("1/123456789", "-3/4", 1, Nearest, "4.0", "0x4.0#1", Greater);
+    test("1/123456789", "-3/4", 2, Floor, "3.0", "0x3.0#2", Less);
+    test(
+        "1/123456789",
+        "1/3",
+        10,
+        Nearest,
+        "2.4302e-8",
+        "0x6.86E-7#10",
+        Greater,
+    );
+    test(
+        "1/123456789",
+        "1/3",
+        10,
+        Floor,
+        "2.4273e-8",
+        "0x6.84E-7#10",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "1/3",
+        10,
+        Ceiling,
+        "2.4302e-8",
+        "0x6.86E-7#10",
+        Greater,
+    );
+    test(
+        "1/123456789",
+        "1/3",
+        10,
+        Down,
+        "2.4273e-8",
+        "0x6.84E-7#10",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "1/3",
+        10,
+        Up,
+        "2.4302e-8",
+        "0x6.86E-7#10",
+        Greater,
+    );
+    test(
+        "1/123456789",
+        "1/3",
+        53,
+        Nearest,
+        "2.4300000221129997e-8",
+        "0x6.85e21ff0e4544E-7#53",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "1/3",
+        1,
+        Nearest,
+        "3.0e-8",
+        "0x8.0E-7#1",
+        Greater,
+    );
+    test("1/123456789", "1/3", 2, Floor, "2.2e-8", "0x6.0E-7#2", Less);
+    test(
+        "1/123456789",
+        "-1/3",
+        10,
+        Nearest,
+        "3.1406",
+        "0x3.24#10",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "-1/3",
+        10,
+        Floor,
+        "3.1406",
+        "0x3.24#10",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "-1/3",
+        10,
+        Ceiling,
+        "3.1445",
+        "0x3.25#10",
+        Greater,
+    );
+    test("1/123456789", "-1/3", 10, Down, "3.1406", "0x3.24#10", Less);
+    test(
+        "1/123456789",
+        "-1/3",
+        10,
+        Up,
+        "3.1445",
+        "0x3.25#10",
+        Greater,
+    );
+    test(
+        "1/123456789",
+        "-1/3",
+        53,
+        Nearest,
+        "3.1415926292897929",
+        "0x3.243f6a2027810#53",
+        Less,
+    );
+    test("1/123456789", "-1/3", 1, Nearest, "4.0", "0x4.0#1", Greater);
+    test("1/123456789", "-1/3", 2, Floor, "3.0", "0x3.0#2", Less);
+    test(
+        "1/123456789",
+        "2",
+        10,
+        Nearest,
+        "4.0527e-9",
+        "0x1.168E-7#10",
+        Greater,
+    );
+    test(
+        "1/123456789",
+        "2",
+        10,
+        Floor,
+        "4.0454e-9",
+        "0x1.160E-7#10",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "2",
+        10,
+        Ceiling,
+        "4.0527e-9",
+        "0x1.168E-7#10",
+        Greater,
+    );
+    test(
+        "1/123456789",
+        "2",
+        10,
+        Down,
+        "4.0454e-9",
+        "0x1.160E-7#10",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "2",
+        10,
+        Up,
+        "4.0527e-9",
+        "0x1.168E-7#10",
+        Greater,
+    );
+    test(
+        "1/123456789",
+        "2",
+        53,
+        Nearest,
+        "4.0500000368550006e-9",
+        "0x1.16505aa8260e2E-7#53",
+        Greater,
+    );
+    test("1/123456789", "2", 1, Nearest, "3.7e-9", "0x1.0E-7#1", Less);
+    test("1/123456789", "2", 2, Floor, "3.7e-9", "0x1.0E-7#2", Less);
+    test(
+        "1/123456789",
+        "-2",
+        10,
+        Nearest,
+        "3.1406",
+        "0x3.24#10",
+        Less,
+    );
+    test("1/123456789", "-2", 10, Floor, "3.1406", "0x3.24#10", Less);
+    test(
+        "1/123456789",
+        "-2",
+        10,
+        Ceiling,
+        "3.1445",
+        "0x3.25#10",
+        Greater,
+    );
+    test("1/123456789", "-2", 10, Down, "3.1406", "0x3.24#10", Less);
+    test("1/123456789", "-2", 10, Up, "3.1445", "0x3.25#10", Greater);
+    test(
+        "1/123456789",
+        "-2",
+        53,
+        Nearest,
+        "3.1415926495397932",
+        "0x3.243f6a77209d6#53",
+        Greater,
+    );
+    test("1/123456789", "-2", 1, Nearest, "4.0", "0x4.0#1", Greater);
+    test("1/123456789", "-2", 2, Floor, "3.0", "0x3.0#2", Less);
+    test(
+        "1/123456789",
+        "7/2",
+        10,
+        Nearest,
+        "2.3138e-9",
+        "0x9.f0E-8#10",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "7/2",
+        10,
+        Floor,
+        "2.3138e-9",
+        "0x9.f0E-8#10",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "7/2",
+        10,
+        Ceiling,
+        "2.3174e-9",
+        "0x9.f4E-8#10",
+        Greater,
+    );
+    test(
+        "1/123456789",
+        "7/2",
+        10,
+        Down,
+        "2.3138e-9",
+        "0x9.f0E-8#10",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "7/2",
+        10,
+        Up,
+        "2.3174e-9",
+        "0x9.f4E-8#10",
+        Greater,
+    );
+    test(
+        "1/123456789",
+        "7/2",
+        53,
+        Nearest,
+        "2.3142857353457143e-9",
+        "0x9.f09586015bee8E-8#53",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "7/2",
+        1,
+        Nearest,
+        "1.9e-9",
+        "0x8.0E-8#1",
+        Less,
+    );
+    test("1/123456789", "7/2", 2, Floor, "1.9e-9", "0x8.0E-8#2", Less);
+    test(
+        "1/123456789",
+        "1/1000",
+        10,
+        Nearest,
+        "8.1062e-6",
+        "0x0.0000880#10",
+        Greater,
+    );
+    test(
+        "1/123456789",
+        "1/1000",
+        10,
+        Floor,
+        "8.0913e-6",
+        "0x0.000087c#10",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "1/1000",
+        10,
+        Ceiling,
+        "8.1062e-6",
+        "0x0.0000880#10",
+        Greater,
+    );
+    test(
+        "1/123456789",
+        "1/1000",
+        10,
+        Down,
+        "8.0913e-6",
+        "0x0.000087c#10",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "1/1000",
+        10,
+        Up,
+        "8.1062e-6",
+        "0x0.0000880#10",
+        Greater,
+    );
+    test(
+        "1/123456789",
+        "1/1000",
+        53,
+        Nearest,
+        "8.1000000735328533e-6",
+        "0x0.000087e53c440dd118#53",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "1/1000",
+        1,
+        Nearest,
+        "7.6e-6",
+        "0x0.00008#1",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "1/1000",
+        2,
+        Floor,
+        "7.6e-6",
+        "0x0.00008#2",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "999/1000",
+        10,
+        Nearest,
+        "8.1054e-9",
+        "0x2.2dE-7#10",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "999/1000",
+        10,
+        Floor,
+        "8.1054e-9",
+        "0x2.2dE-7#10",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "999/1000",
+        10,
+        Ceiling,
+        "8.1200e-9",
+        "0x2.2eE-7#10",
+        Greater,
+    );
+    test(
+        "1/123456789",
+        "999/1000",
+        10,
+        Down,
+        "8.1054e-9",
+        "0x2.2dE-7#10",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "999/1000",
+        10,
+        Up,
+        "8.1200e-9",
+        "0x2.2eE-7#10",
+        Greater,
+    );
+    test(
+        "1/123456789",
+        "999/1000",
+        53,
+        Nearest,
+        "8.1081081818918917e-9",
+        "0x2.2d2f58fc94f68E-7#53",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "999/1000",
+        1,
+        Nearest,
+        "7.5e-9",
+        "0x2.0E-7#1",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "999/1000",
+        2,
+        Floor,
+        "7.5e-9",
+        "0x2.0E-7#2",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "123456789/7",
+        10,
+        Nearest,
+        "4.5970e-16",
+        "0x2.12E-13#10",
+        Greater,
+    );
+    test(
+        "1/123456789",
+        "123456789/7",
+        10,
+        Floor,
+        "4.5883e-16",
+        "0x2.11E-13#10",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "123456789/7",
+        10,
+        Ceiling,
+        "4.5970e-16",
+        "0x2.12E-13#10",
+        Greater,
+    );
+    test(
+        "1/123456789",
+        "123456789/7",
+        10,
+        Down,
+        "4.5883e-16",
+        "0x2.11E-13#10",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "123456789/7",
+        10,
+        Up,
+        "4.5970e-16",
+        "0x2.12E-13#10",
+        Greater,
+    );
+    test(
+        "1/123456789",
+        "123456789/7",
+        53,
+        Nearest,
+        "4.5927000835871411e-16",
+        "0x2.118094b478bbeE-13#53",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "123456789/7",
+        1,
+        Nearest,
+        "4.4e-16",
+        "0x2.0E-13#1",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "123456789/7",
+        2,
+        Floor,
+        "4.4e-16",
+        "0x2.0E-13#2",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "1/123456789",
+        10,
+        Nearest,
+        "0.78516",
+        "0x0.c90#10",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "1/123456789",
+        10,
+        Floor,
+        "0.78516",
+        "0x0.c90#10",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "1/123456789",
+        10,
+        Ceiling,
+        "0.78613",
+        "0x0.c94#10",
+        Greater,
+    );
+    test(
+        "1/123456789",
+        "1/123456789",
+        10,
+        Down,
+        "0.78516",
+        "0x0.c90#10",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "1/123456789",
+        10,
+        Up,
+        "0.78613",
+        "0x0.c94#10",
+        Greater,
+    );
+    test(
+        "1/123456789",
+        "1/123456789",
+        53,
+        Nearest,
+        "0.78539816339744828",
+        "0x0.c90fdaa22168c0#53",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "1/123456789",
+        1,
+        Nearest,
+        "1.0",
+        "0x1.0#1",
+        Greater,
+    );
+    test(
+        "1/123456789",
+        "1/123456789",
+        2,
+        Floor,
+        "0.75",
+        "0x0.c#2",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "22/7",
+        10,
+        Nearest,
+        "2.5757e-9",
+        "0xb.10E-8#10",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "22/7",
+        10,
+        Floor,
+        "2.5757e-9",
+        "0xb.10E-8#10",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "22/7",
+        10,
+        Ceiling,
+        "2.5793e-9",
+        "0xb.14E-8#10",
+        Greater,
+    );
+    test(
+        "1/123456789",
+        "22/7",
+        10,
+        Down,
+        "2.5757e-9",
+        "0xb.10E-8#10",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "22/7",
+        10,
+        Up,
+        "2.5793e-9",
+        "0xb.14E-8#10",
+        Greater,
+    );
+    test(
+        "1/123456789",
+        "22/7",
+        53,
+        Nearest,
+        "2.5772727507259095e-9",
+        "0xb.11bdc998c94a0E-8#53",
+        Greater,
+    );
+    test(
+        "1/123456789",
+        "22/7",
+        1,
+        Nearest,
+        "1.9e-9",
+        "0x8.0E-8#1",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "22/7",
+        2,
+        Floor,
+        "1.9e-9",
+        "0x8.0E-8#2",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "-22/7",
+        10,
+        Nearest,
+        "3.1406",
+        "0x3.24#10",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "-22/7",
+        10,
+        Floor,
+        "3.1406",
+        "0x3.24#10",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "-22/7",
+        10,
+        Ceiling,
+        "3.1445",
+        "0x3.25#10",
+        Greater,
+    );
+    test(
+        "1/123456789",
+        "-22/7",
+        10,
+        Down,
+        "3.1406",
+        "0x3.24#10",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "-22/7",
+        10,
+        Up,
+        "3.1445",
+        "0x3.25#10",
+        Greater,
+    );
+    test(
+        "1/123456789",
+        "-22/7",
+        53,
+        Nearest,
+        "3.1415926510125205",
+        "0x3.243f6a7d73e54#53",
+        Greater,
+    );
+    test(
+        "1/123456789",
+        "-22/7",
+        1,
+        Nearest,
+        "4.0",
+        "0x4.0#1",
+        Greater,
+    );
+    test("1/123456789", "-22/7", 2, Floor, "3.0", "0x3.0#2", Less);
+    test(
+        "1/123456789",
+        "355/113",
+        10,
+        Nearest,
+        "2.5793e-9",
+        "0xb.14E-8#10",
+        Greater,
+    );
+    test(
+        "1/123456789",
+        "355/113",
+        10,
+        Floor,
+        "2.5757e-9",
+        "0xb.10E-8#10",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "355/113",
+        10,
+        Ceiling,
+        "2.5793e-9",
+        "0xb.14E-8#10",
+        Greater,
+    );
+    test(
+        "1/123456789",
+        "355/113",
+        10,
+        Down,
+        "2.5757e-9",
+        "0xb.10E-8#10",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "355/113",
+        10,
+        Up,
+        "2.5793e-9",
+        "0xb.14E-8#10",
+        Greater,
+    );
+    test(
+        "1/123456789",
+        "355/113",
+        53,
+        Nearest,
+        "2.5783098826175496e-9",
+        "0xb.12e1b6d35caf8E-8#53",
+        Greater,
+    );
+    test(
+        "1/123456789",
+        "355/113",
+        1,
+        Nearest,
+        "1.9e-9",
+        "0x8.0E-8#1",
+        Less,
+    );
+    test(
+        "1/123456789",
+        "355/113",
+        2,
+        Floor,
+        "1.9e-9",
+        "0x8.0E-8#2",
+        Less,
+    );
+    test("22/7", "0", 10, Nearest, "1.5703", "0x1.920#10", Less);
+    test("22/7", "0", 10, Floor, "1.5703", "0x1.920#10", Less);
+    test("22/7", "0", 10, Ceiling, "1.5723", "0x1.928#10", Greater);
+    test("22/7", "0", 10, Down, "1.5703", "0x1.920#10", Less);
+    test("22/7", "0", 10, Up, "1.5723", "0x1.928#10", Greater);
+    test(
+        "22/7",
+        "0",
+        53,
+        Nearest,
+        "1.5707963267948966",
+        "0x1.921fb54442d18#53",
+        Less,
+    );
+    test("22/7", "0", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("22/7", "0", 2, Floor, "1.5", "0x1.8#2", Less);
+    test("22/7", "1", 10, Nearest, "1.2637", "0x1.438#10", Greater);
+    test("22/7", "1", 10, Floor, "1.2617", "0x1.430#10", Less);
+    test("22/7", "1", 10, Ceiling, "1.2637", "0x1.438#10", Greater);
+    test("22/7", "1", 10, Down, "1.2617", "0x1.430#10", Less);
+    test("22/7", "1", 10, Up, "1.2637", "0x1.438#10", Greater);
+    test(
+        "22/7",
+        "1",
+        53,
+        Nearest,
+        "1.2627435457711202",
+        "0x1.4343293852714#53",
+        Greater,
+    );
+    test("22/7", "1", 1, Nearest, "1.0", "0x1.0#1", Less);
+    test("22/7", "1", 2, Floor, "1.0", "0x1.0#2", Less);
+    test("22/7", "-1", 10, Nearest, "1.8789", "0x1.e10#10", Greater);
+    test("22/7", "-1", 10, Floor, "1.8770", "0x1.e08#10", Less);
+    test("22/7", "-1", 10, Ceiling, "1.8789", "0x1.e10#10", Greater);
+    test("22/7", "-1", 10, Down, "1.8770", "0x1.e08#10", Less);
+    test("22/7", "-1", 10, Up, "1.8789", "0x1.e10#10", Greater);
+    test(
+        "22/7",
+        "-1",
+        53,
+        Nearest,
+        "1.8788491078186731",
+        "0x1.e0fc41503331d#53",
+        Greater,
+    );
+    test("22/7", "-1", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("22/7", "-1", 2, Floor, "1.5", "0x1.8#2", Less);
+    test("22/7", "3/4", 10, Nearest, "1.3359", "0x1.560#10", Less);
+    test("22/7", "3/4", 10, Floor, "1.3359", "0x1.560#10", Less);
+    test("22/7", "3/4", 10, Ceiling, "1.3379", "0x1.568#10", Greater);
+    test("22/7", "3/4", 10, Down, "1.3359", "0x1.560#10", Less);
+    test("22/7", "3/4", 10, Up, "1.3379", "0x1.568#10", Greater);
+    test(
+        "22/7",
+        "3/4",
+        53,
+        Nearest,
+        "1.3365411132006457",
+        "0x1.56278ef2f4ca0#53",
+        Less,
+    );
+    test("22/7", "3/4", 1, Nearest, "1.0", "0x1.0#1", Less);
+    test("22/7", "3/4", 2, Floor, "1.0", "0x1.0#2", Less);
+    test("22/7", "-3/4", 10, Nearest, "1.8047", "0x1.ce0#10", Less);
+    test("22/7", "-3/4", 10, Floor, "1.8047", "0x1.ce0#10", Less);
+    test("22/7", "-3/4", 10, Ceiling, "1.8066", "0x1.ce8#10", Greater);
+    test("22/7", "-3/4", 10, Down, "1.8047", "0x1.ce0#10", Less);
+    test("22/7", "-3/4", 10, Up, "1.8066", "0x1.ce8#10", Greater);
+    test(
+        "22/7",
+        "-3/4",
+        53,
+        Nearest,
+        "1.8050515403891476",
+        "0x1.ce17db9590d91#53",
+        Greater,
+    );
+    test("22/7", "-3/4", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("22/7", "-3/4", 2, Floor, "1.5", "0x1.8#2", Less);
+    test("22/7", "1/3", 10, Nearest, "1.4648", "0x1.770#10", Less);
+    test("22/7", "1/3", 10, Floor, "1.4648", "0x1.770#10", Less);
+    test("22/7", "1/3", 10, Ceiling, "1.4668", "0x1.778#10", Greater);
+    test("22/7", "1/3", 10, Down, "1.4648", "0x1.770#10", Less);
+    test("22/7", "1/3", 10, Up, "1.4668", "0x1.778#10", Greater);
+    test(
+        "22/7",
+        "1/3",
+        53,
+        Nearest,
+        "1.4651307446950408",
+        "0x1.7712cef8d44eb#53",
+        Less,
+    );
+    test("22/7", "1/3", 1, Nearest, "1.0", "0x1.0#1", Less);
+    test("22/7", "1/3", 2, Floor, "1.0", "0x1.0#2", Less);
+    test("22/7", "-1/3", 10, Nearest, "1.6758", "0x1.ad0#10", Less);
+    test("22/7", "-1/3", 10, Floor, "1.6758", "0x1.ad0#10", Less);
+    test("22/7", "-1/3", 10, Ceiling, "1.6777", "0x1.ad8#10", Greater);
+    test("22/7", "-1/3", 10, Down, "1.6758", "0x1.ad0#10", Less);
+    test("22/7", "-1/3", 10, Up, "1.6777", "0x1.ad8#10", Greater);
+    test(
+        "22/7",
+        "-1/3",
+        53,
+        Nearest,
+        "1.6764619088947523",
+        "0x1.ad2c9b8fb1545#53",
+        Less,
+    );
+    test("22/7", "-1/3", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("22/7", "-1/3", 2, Floor, "1.5", "0x1.8#2", Less);
+    test("22/7", "2", 10, Nearest, "1.0039", "0x1.010#10", Less);
+    test("22/7", "2", 10, Floor, "1.0039", "0x1.010#10", Less);
+    test("22/7", "2", 10, Ceiling, "1.0059", "0x1.018#10", Greater);
+    test("22/7", "2", 10, Down, "1.0039", "0x1.010#10", Less);
+    test("22/7", "2", 10, Up, "1.0059", "0x1.018#10", Greater);
+    test(
+        "22/7",
+        "2",
+        53,
+        Nearest,
+        "1.0040671092713902",
+        "0x1.010a8ac54f544#53",
+        Less,
+    );
+    test("22/7", "2", 1, Nearest, "1.0", "0x1.0#1", Less);
+    test("22/7", "2", 2, Floor, "1.0", "0x1.0#2", Less);
+    test("22/7", "-2", 10, Nearest, "2.1367", "0x2.23#10", Less);
+    test("22/7", "-2", 10, Floor, "2.1367", "0x2.23#10", Less);
+    test("22/7", "-2", 10, Ceiling, "2.1406", "0x2.24#10", Greater);
+    test("22/7", "-2", 10, Down, "2.1367", "0x2.23#10", Less);
+    test("22/7", "-2", 10, Up, "2.1406", "0x2.24#10", Greater);
+    test(
+        "22/7",
+        "-2",
+        53,
+        Nearest,
+        "2.1375255443184029",
+        "0x2.2334dfc3364ec#53",
+        Less,
+    );
+    test("22/7", "-2", 1, Nearest, "2.0", "0x2.0#1", Less);
+    test("22/7", "-2", 2, Floor, "2.0", "0x2.0#2", Less);
+    test("22/7", "7/2", 10, Nearest, "0.73145", "0x0.bb4#10", Less);
+    test("22/7", "7/2", 10, Floor, "0.73145", "0x0.bb4#10", Less);
+    test("22/7", "7/2", 10, Ceiling, "0.73242", "0x0.bb8#10", Greater);
+    test("22/7", "7/2", 10, Down, "0.73145", "0x0.bb4#10", Less);
+    test("22/7", "7/2", 10, Up, "0.73242", "0x0.bb8#10", Greater);
+    test(
+        "22/7",
+        "7/2",
+        53,
+        Nearest,
+        "0.73168643409421574",
+        "0x0.bb4fcd595c8c50#53",
+        Greater,
+    );
+    test("22/7", "7/2", 1, Nearest, "0.50", "0x0.8#1", Less);
+    test("22/7", "7/2", 2, Floor, "0.50", "0x0.8#2", Less);
+    test("22/7", "1/1000", 10, Nearest, "1.5703", "0x1.920#10", Less);
+    test("22/7", "1/1000", 10, Floor, "1.5703", "0x1.920#10", Less);
+    test(
+        "22/7",
+        "1/1000",
+        10,
+        Ceiling,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test("22/7", "1/1000", 10, Down, "1.5703", "0x1.920#10", Less);
+    test("22/7", "1/1000", 10, Up, "1.5723", "0x1.928#10", Greater);
+    test(
+        "22/7",
+        "1/1000",
+        53,
+        Nearest,
+        "1.5704781449874523",
+        "0x1.920adb0fcdc96#53",
+        Less,
+    );
+    test("22/7", "1/1000", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("22/7", "1/1000", 2, Floor, "1.5", "0x1.8#2", Less);
+    test(
+        "22/7",
+        "999/1000",
+        10,
+        Nearest,
+        "1.2637",
+        "0x1.438#10",
+        Greater,
+    );
+    test("22/7", "999/1000", 10, Floor, "1.2617", "0x1.430#10", Less);
+    test(
+        "22/7",
+        "999/1000",
+        10,
+        Ceiling,
+        "1.2637",
+        "0x1.438#10",
+        Greater,
+    );
+    test("22/7", "999/1000", 10, Down, "1.2617", "0x1.430#10", Less);
+    test("22/7", "999/1000", 10, Up, "1.2637", "0x1.438#10", Greater);
+    test(
+        "22/7",
+        "999/1000",
+        53,
+        Nearest,
+        "1.2630325029092322",
+        "0x1.4356191dc7b9b#53",
+        Greater,
+    );
+    test("22/7", "999/1000", 1, Nearest, "1.0", "0x1.0#1", Less);
+    test("22/7", "999/1000", 2, Floor, "1.0", "0x1.0#2", Less);
+    test(
+        "22/7",
+        "123456789/7",
+        10,
+        Nearest,
+        "1.7812e-7",
+        "0x2.fdE-6#10",
+        Less,
+    );
+    test(
+        "22/7",
+        "123456789/7",
+        10,
+        Floor,
+        "1.7812e-7",
+        "0x2.fdE-6#10",
+        Less,
+    );
+    test(
+        "22/7",
+        "123456789/7",
+        10,
+        Ceiling,
+        "1.7835e-7",
+        "0x2.feE-6#10",
+        Greater,
+    );
+    test(
+        "22/7",
+        "123456789/7",
+        10,
+        Down,
+        "1.7812e-7",
+        "0x2.fdE-6#10",
+        Less,
+    );
+    test(
+        "22/7",
+        "123456789/7",
+        10,
+        Up,
+        "1.7835e-7",
+        "0x2.feE-6#10",
+        Greater,
+    );
+    test(
+        "22/7",
+        "123456789/7",
+        53,
+        Nearest,
+        "1.7820000162161813e-7",
+        "0x2.fd5cf94e689deE-6#53",
+        Less,
+    );
+    test(
+        "22/7",
+        "123456789/7",
+        1,
+        Nearest,
+        "1.2e-7",
+        "0x2.0E-6#1",
+        Less,
+    );
+    test(
+        "22/7",
+        "123456789/7",
+        2,
+        Floor,
+        "1.2e-7",
+        "0x2.0E-6#2",
+        Less,
+    );
+    test(
+        "22/7",
+        "1/123456789",
+        10,
+        Nearest,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "22/7",
+        "1/123456789",
+        10,
+        Floor,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "22/7",
+        "1/123456789",
+        10,
+        Ceiling,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test(
+        "22/7",
+        "1/123456789",
+        10,
+        Down,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "22/7",
+        "1/123456789",
+        10,
+        Up,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test(
+        "22/7",
+        "1/123456789",
+        53,
+        Nearest,
+        "1.5707963242176239",
+        "0x1.921fb5393113c#53",
+        Greater,
+    );
+    test("22/7", "1/123456789", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("22/7", "1/123456789", 2, Floor, "1.5", "0x1.8#2", Less);
+    test("22/7", "22/7", 10, Nearest, "0.78516", "0x0.c90#10", Less);
+    test("22/7", "22/7", 10, Floor, "0.78516", "0x0.c90#10", Less);
+    test(
+        "22/7",
+        "22/7",
+        10,
+        Ceiling,
+        "0.78613",
+        "0x0.c94#10",
+        Greater,
+    );
+    test("22/7", "22/7", 10, Down, "0.78516", "0x0.c90#10", Less);
+    test("22/7", "22/7", 10, Up, "0.78613", "0x0.c94#10", Greater);
+    test(
+        "22/7",
+        "22/7",
+        53,
+        Nearest,
+        "0.78539816339744828",
+        "0x0.c90fdaa22168c0#53",
+        Less,
+    );
+    test("22/7", "22/7", 1, Nearest, "1.0", "0x1.0#1", Greater);
+    test("22/7", "22/7", 2, Floor, "0.75", "0x0.c#2", Less);
+    test("22/7", "-22/7", 10, Nearest, "2.3555", "0x2.5b#10", Less);
+    test("22/7", "-22/7", 10, Floor, "2.3555", "0x2.5b#10", Less);
+    test("22/7", "-22/7", 10, Ceiling, "2.3594", "0x2.5c#10", Greater);
+    test("22/7", "-22/7", 10, Down, "2.3555", "0x2.5b#10", Less);
+    test("22/7", "-22/7", 10, Up, "2.3594", "0x2.5c#10", Greater);
+    test(
+        "22/7",
+        "-22/7",
+        53,
+        Nearest,
+        "2.3561944901923448",
+        "0x2.5b2f8fe6643a4#53",
+        Less,
+    );
+    test("22/7", "-22/7", 1, Nearest, "2.0", "0x2.0#1", Less);
+    test("22/7", "-22/7", 2, Floor, "2.0", "0x2.0#2", Less);
+    test(
+        "22/7",
+        "355/113",
+        10,
+        Nearest,
+        "0.78516",
+        "0x0.c90#10",
+        Less,
+    );
+    test("22/7", "355/113", 10, Floor, "0.78516", "0x0.c90#10", Less);
+    test(
+        "22/7",
+        "355/113",
+        10,
+        Ceiling,
+        "0.78613",
+        "0x0.c94#10",
+        Greater,
+    );
+    test("22/7", "355/113", 10, Down, "0.78516", "0x0.c90#10", Less);
+    test("22/7", "355/113", 10, Up, "0.78613", "0x0.c94#10", Greater);
+    test(
+        "22/7",
+        "355/113",
+        53,
+        Nearest,
+        "0.78559933016198480",
+        "0x0.c91d09a6ce23a0#53",
+        Greater,
+    );
+    test("22/7", "355/113", 1, Nearest, "1.0", "0x1.0#1", Greater);
+    test("22/7", "355/113", 2, Floor, "0.75", "0x0.c#2", Less);
+    test("-22/7", "0", 10, Nearest, "-1.5703", "-0x1.920#10", Greater);
+    test("-22/7", "0", 10, Floor, "-1.5723", "-0x1.928#10", Less);
+    test("-22/7", "0", 10, Ceiling, "-1.5703", "-0x1.920#10", Greater);
+    test("-22/7", "0", 10, Down, "-1.5703", "-0x1.920#10", Greater);
+    test("-22/7", "0", 10, Up, "-1.5723", "-0x1.928#10", Less);
+    test(
+        "-22/7",
+        "0",
+        53,
+        Nearest,
+        "-1.5707963267948966",
+        "-0x1.921fb54442d18#53",
+        Greater,
+    );
+    test("-22/7", "0", 1, Nearest, "-2.0", "-0x2.0#1", Less);
+    test("-22/7", "0", 2, Floor, "-2.0", "-0x2.0#2", Less);
+    test("-22/7", "1", 10, Nearest, "-1.2637", "-0x1.438#10", Less);
+    test("-22/7", "1", 10, Floor, "-1.2637", "-0x1.438#10", Less);
+    test("-22/7", "1", 10, Ceiling, "-1.2617", "-0x1.430#10", Greater);
+    test("-22/7", "1", 10, Down, "-1.2617", "-0x1.430#10", Greater);
+    test("-22/7", "1", 10, Up, "-1.2637", "-0x1.438#10", Less);
+    test(
+        "-22/7",
+        "1",
+        53,
+        Nearest,
+        "-1.2627435457711202",
+        "-0x1.4343293852714#53",
+        Less,
+    );
+    test("-22/7", "1", 1, Nearest, "-1.0", "-0x1.0#1", Greater);
+    test("-22/7", "1", 2, Floor, "-1.5", "-0x1.8#2", Less);
+    test("-22/7", "-1", 10, Nearest, "-1.8789", "-0x1.e10#10", Less);
+    test("-22/7", "-1", 10, Floor, "-1.8789", "-0x1.e10#10", Less);
+    test(
+        "-22/7",
+        "-1",
+        10,
+        Ceiling,
+        "-1.8770",
+        "-0x1.e08#10",
+        Greater,
+    );
+    test("-22/7", "-1", 10, Down, "-1.8770", "-0x1.e08#10", Greater);
+    test("-22/7", "-1", 10, Up, "-1.8789", "-0x1.e10#10", Less);
+    test(
+        "-22/7",
+        "-1",
+        53,
+        Nearest,
+        "-1.8788491078186731",
+        "-0x1.e0fc41503331d#53",
+        Less,
+    );
+    test("-22/7", "-1", 1, Nearest, "-2.0", "-0x2.0#1", Less);
+    test("-22/7", "-1", 2, Floor, "-2.0", "-0x2.0#2", Less);
+    test(
+        "-22/7",
+        "3/4",
+        10,
+        Nearest,
+        "-1.3359",
+        "-0x1.560#10",
+        Greater,
+    );
+    test("-22/7", "3/4", 10, Floor, "-1.3379", "-0x1.568#10", Less);
+    test(
+        "-22/7",
+        "3/4",
+        10,
+        Ceiling,
+        "-1.3359",
+        "-0x1.560#10",
+        Greater,
+    );
+    test("-22/7", "3/4", 10, Down, "-1.3359", "-0x1.560#10", Greater);
+    test("-22/7", "3/4", 10, Up, "-1.3379", "-0x1.568#10", Less);
+    test(
+        "-22/7",
+        "3/4",
+        53,
+        Nearest,
+        "-1.3365411132006457",
+        "-0x1.56278ef2f4ca0#53",
+        Greater,
+    );
+    test("-22/7", "3/4", 1, Nearest, "-1.0", "-0x1.0#1", Greater);
+    test("-22/7", "3/4", 2, Floor, "-1.5", "-0x1.8#2", Less);
+    test(
+        "-22/7",
+        "-3/4",
+        10,
+        Nearest,
+        "-1.8047",
+        "-0x1.ce0#10",
+        Greater,
+    );
+    test("-22/7", "-3/4", 10, Floor, "-1.8066", "-0x1.ce8#10", Less);
+    test(
+        "-22/7",
+        "-3/4",
+        10,
+        Ceiling,
+        "-1.8047",
+        "-0x1.ce0#10",
+        Greater,
+    );
+    test("-22/7", "-3/4", 10, Down, "-1.8047", "-0x1.ce0#10", Greater);
+    test("-22/7", "-3/4", 10, Up, "-1.8066", "-0x1.ce8#10", Less);
+    test(
+        "-22/7",
+        "-3/4",
+        53,
+        Nearest,
+        "-1.8050515403891476",
+        "-0x1.ce17db9590d91#53",
+        Less,
+    );
+    test("-22/7", "-3/4", 1, Nearest, "-2.0", "-0x2.0#1", Less);
+    test("-22/7", "-3/4", 2, Floor, "-2.0", "-0x2.0#2", Less);
+    test(
+        "-22/7",
+        "1/3",
+        10,
+        Nearest,
+        "-1.4648",
+        "-0x1.770#10",
+        Greater,
+    );
+    test("-22/7", "1/3", 10, Floor, "-1.4668", "-0x1.778#10", Less);
+    test(
+        "-22/7",
+        "1/3",
+        10,
+        Ceiling,
+        "-1.4648",
+        "-0x1.770#10",
+        Greater,
+    );
+    test("-22/7", "1/3", 10, Down, "-1.4648", "-0x1.770#10", Greater);
+    test("-22/7", "1/3", 10, Up, "-1.4668", "-0x1.778#10", Less);
+    test(
+        "-22/7",
+        "1/3",
+        53,
+        Nearest,
+        "-1.4651307446950408",
+        "-0x1.7712cef8d44eb#53",
+        Greater,
+    );
+    test("-22/7", "1/3", 1, Nearest, "-1.0", "-0x1.0#1", Greater);
+    test("-22/7", "1/3", 2, Floor, "-1.5", "-0x1.8#2", Less);
+    test(
+        "-22/7",
+        "-1/3",
+        10,
+        Nearest,
+        "-1.6758",
+        "-0x1.ad0#10",
+        Greater,
+    );
+    test("-22/7", "-1/3", 10, Floor, "-1.6777", "-0x1.ad8#10", Less);
+    test(
+        "-22/7",
+        "-1/3",
+        10,
+        Ceiling,
+        "-1.6758",
+        "-0x1.ad0#10",
+        Greater,
+    );
+    test("-22/7", "-1/3", 10, Down, "-1.6758", "-0x1.ad0#10", Greater);
+    test("-22/7", "-1/3", 10, Up, "-1.6777", "-0x1.ad8#10", Less);
+    test(
+        "-22/7",
+        "-1/3",
+        53,
+        Nearest,
+        "-1.6764619088947523",
+        "-0x1.ad2c9b8fb1545#53",
+        Greater,
+    );
+    test("-22/7", "-1/3", 1, Nearest, "-2.0", "-0x2.0#1", Less);
+    test("-22/7", "-1/3", 2, Floor, "-2.0", "-0x2.0#2", Less);
+    test("-22/7", "2", 10, Nearest, "-1.0039", "-0x1.010#10", Greater);
+    test("-22/7", "2", 10, Floor, "-1.0059", "-0x1.018#10", Less);
+    test("-22/7", "2", 10, Ceiling, "-1.0039", "-0x1.010#10", Greater);
+    test("-22/7", "2", 10, Down, "-1.0039", "-0x1.010#10", Greater);
+    test("-22/7", "2", 10, Up, "-1.0059", "-0x1.018#10", Less);
+    test(
+        "-22/7",
+        "2",
+        53,
+        Nearest,
+        "-1.0040671092713902",
+        "-0x1.010a8ac54f544#53",
+        Greater,
+    );
+    test("-22/7", "2", 1, Nearest, "-1.0", "-0x1.0#1", Greater);
+    test("-22/7", "2", 2, Floor, "-1.5", "-0x1.8#2", Less);
+    test("-22/7", "-2", 10, Nearest, "-2.1367", "-0x2.23#10", Greater);
+    test("-22/7", "-2", 10, Floor, "-2.1406", "-0x2.24#10", Less);
+    test("-22/7", "-2", 10, Ceiling, "-2.1367", "-0x2.23#10", Greater);
+    test("-22/7", "-2", 10, Down, "-2.1367", "-0x2.23#10", Greater);
+    test("-22/7", "-2", 10, Up, "-2.1406", "-0x2.24#10", Less);
+    test(
+        "-22/7",
+        "-2",
+        53,
+        Nearest,
+        "-2.1375255443184029",
+        "-0x2.2334dfc3364ec#53",
+        Greater,
+    );
+    test("-22/7", "-2", 1, Nearest, "-2.0", "-0x2.0#1", Greater);
+    test("-22/7", "-2", 2, Floor, "-3.0", "-0x3.0#2", Less);
+    test(
+        "-22/7",
+        "7/2",
+        10,
+        Nearest,
+        "-0.73145",
+        "-0x0.bb4#10",
+        Greater,
+    );
+    test("-22/7", "7/2", 10, Floor, "-0.73242", "-0x0.bb8#10", Less);
+    test(
+        "-22/7",
+        "7/2",
+        10,
+        Ceiling,
+        "-0.73145",
+        "-0x0.bb4#10",
+        Greater,
+    );
+    test("-22/7", "7/2", 10, Down, "-0.73145", "-0x0.bb4#10", Greater);
+    test("-22/7", "7/2", 10, Up, "-0.73242", "-0x0.bb8#10", Less);
+    test(
+        "-22/7",
+        "7/2",
+        53,
+        Nearest,
+        "-0.73168643409421574",
+        "-0x0.bb4fcd595c8c50#53",
+        Less,
+    );
+    test("-22/7", "7/2", 1, Nearest, "-0.50", "-0x0.8#1", Greater);
+    test("-22/7", "7/2", 2, Floor, "-0.75", "-0x0.c#2", Less);
+    test(
+        "-22/7",
+        "1/1000",
+        10,
+        Nearest,
+        "-1.5703",
+        "-0x1.920#10",
+        Greater,
+    );
+    test("-22/7", "1/1000", 10, Floor, "-1.5723", "-0x1.928#10", Less);
+    test(
+        "-22/7",
+        "1/1000",
+        10,
+        Ceiling,
+        "-1.5703",
+        "-0x1.920#10",
+        Greater,
+    );
+    test(
+        "-22/7",
+        "1/1000",
+        10,
+        Down,
+        "-1.5703",
+        "-0x1.920#10",
+        Greater,
+    );
+    test("-22/7", "1/1000", 10, Up, "-1.5723", "-0x1.928#10", Less);
+    test(
+        "-22/7",
+        "1/1000",
+        53,
+        Nearest,
+        "-1.5704781449874523",
+        "-0x1.920adb0fcdc96#53",
+        Greater,
+    );
+    test("-22/7", "1/1000", 1, Nearest, "-2.0", "-0x2.0#1", Less);
+    test("-22/7", "1/1000", 2, Floor, "-2.0", "-0x2.0#2", Less);
+    test(
+        "-22/7",
+        "999/1000",
+        10,
+        Nearest,
+        "-1.2637",
+        "-0x1.438#10",
+        Less,
+    );
+    test(
+        "-22/7",
+        "999/1000",
+        10,
+        Floor,
+        "-1.2637",
+        "-0x1.438#10",
+        Less,
+    );
+    test(
+        "-22/7",
+        "999/1000",
+        10,
+        Ceiling,
+        "-1.2617",
+        "-0x1.430#10",
+        Greater,
+    );
+    test(
+        "-22/7",
+        "999/1000",
+        10,
+        Down,
+        "-1.2617",
+        "-0x1.430#10",
+        Greater,
+    );
+    test("-22/7", "999/1000", 10, Up, "-1.2637", "-0x1.438#10", Less);
+    test(
+        "-22/7",
+        "999/1000",
+        53,
+        Nearest,
+        "-1.2630325029092322",
+        "-0x1.4356191dc7b9b#53",
+        Less,
+    );
+    test("-22/7", "999/1000", 1, Nearest, "-1.0", "-0x1.0#1", Greater);
+    test("-22/7", "999/1000", 2, Floor, "-1.5", "-0x1.8#2", Less);
+    test(
+        "-22/7",
+        "123456789/7",
+        10,
+        Nearest,
+        "-1.7812e-7",
+        "-0x2.fdE-6#10",
+        Greater,
+    );
+    test(
+        "-22/7",
+        "123456789/7",
+        10,
+        Floor,
+        "-1.7835e-7",
+        "-0x2.feE-6#10",
+        Less,
+    );
+    test(
+        "-22/7",
+        "123456789/7",
+        10,
+        Ceiling,
+        "-1.7812e-7",
+        "-0x2.fdE-6#10",
+        Greater,
+    );
+    test(
+        "-22/7",
+        "123456789/7",
+        10,
+        Down,
+        "-1.7812e-7",
+        "-0x2.fdE-6#10",
+        Greater,
+    );
+    test(
+        "-22/7",
+        "123456789/7",
+        10,
+        Up,
+        "-1.7835e-7",
+        "-0x2.feE-6#10",
+        Less,
+    );
+    test(
+        "-22/7",
+        "123456789/7",
+        53,
+        Nearest,
+        "-1.7820000162161813e-7",
+        "-0x2.fd5cf94e689deE-6#53",
+        Greater,
+    );
+    test(
+        "-22/7",
+        "123456789/7",
+        1,
+        Nearest,
+        "-1.2e-7",
+        "-0x2.0E-6#1",
+        Greater,
+    );
+    test(
+        "-22/7",
+        "123456789/7",
+        2,
+        Floor,
+        "-1.8e-7",
+        "-0x3.0E-6#2",
+        Less,
+    );
+    test(
+        "-22/7",
+        "1/123456789",
+        10,
+        Nearest,
+        "-1.5703",
+        "-0x1.920#10",
+        Greater,
+    );
+    test(
+        "-22/7",
+        "1/123456789",
+        10,
+        Floor,
+        "-1.5723",
+        "-0x1.928#10",
+        Less,
+    );
+    test(
+        "-22/7",
+        "1/123456789",
+        10,
+        Ceiling,
+        "-1.5703",
+        "-0x1.920#10",
+        Greater,
+    );
+    test(
+        "-22/7",
+        "1/123456789",
+        10,
+        Down,
+        "-1.5703",
+        "-0x1.920#10",
+        Greater,
+    );
+    test(
+        "-22/7",
+        "1/123456789",
+        10,
+        Up,
+        "-1.5723",
+        "-0x1.928#10",
+        Less,
+    );
+    test(
+        "-22/7",
+        "1/123456789",
+        53,
+        Nearest,
+        "-1.5707963242176239",
+        "-0x1.921fb5393113c#53",
+        Less,
+    );
+    test("-22/7", "1/123456789", 1, Nearest, "-2.0", "-0x2.0#1", Less);
+    test("-22/7", "1/123456789", 2, Floor, "-2.0", "-0x2.0#2", Less);
+    test(
+        "-22/7",
+        "22/7",
+        10,
+        Nearest,
+        "-0.78516",
+        "-0x0.c90#10",
+        Greater,
+    );
+    test("-22/7", "22/7", 10, Floor, "-0.78613", "-0x0.c94#10", Less);
+    test(
+        "-22/7",
+        "22/7",
+        10,
+        Ceiling,
+        "-0.78516",
+        "-0x0.c90#10",
+        Greater,
+    );
+    test(
+        "-22/7",
+        "22/7",
+        10,
+        Down,
+        "-0.78516",
+        "-0x0.c90#10",
+        Greater,
+    );
+    test("-22/7", "22/7", 10, Up, "-0.78613", "-0x0.c94#10", Less);
+    test(
+        "-22/7",
+        "22/7",
+        53,
+        Nearest,
+        "-0.78539816339744828",
+        "-0x0.c90fdaa22168c0#53",
+        Greater,
+    );
+    test("-22/7", "22/7", 1, Nearest, "-1.0", "-0x1.0#1", Less);
+    test("-22/7", "22/7", 2, Floor, "-1.0", "-0x1.0#2", Less);
+    test(
+        "-22/7",
+        "-22/7",
+        10,
+        Nearest,
+        "-2.3555",
+        "-0x2.5b#10",
+        Greater,
+    );
+    test("-22/7", "-22/7", 10, Floor, "-2.3594", "-0x2.5c#10", Less);
+    test(
+        "-22/7",
+        "-22/7",
+        10,
+        Ceiling,
+        "-2.3555",
+        "-0x2.5b#10",
+        Greater,
+    );
+    test("-22/7", "-22/7", 10, Down, "-2.3555", "-0x2.5b#10", Greater);
+    test("-22/7", "-22/7", 10, Up, "-2.3594", "-0x2.5c#10", Less);
+    test(
+        "-22/7",
+        "-22/7",
+        53,
+        Nearest,
+        "-2.3561944901923448",
+        "-0x2.5b2f8fe6643a4#53",
+        Greater,
+    );
+    test("-22/7", "-22/7", 1, Nearest, "-2.0", "-0x2.0#1", Greater);
+    test("-22/7", "-22/7", 2, Floor, "-3.0", "-0x3.0#2", Less);
+    test(
+        "-22/7",
+        "355/113",
+        10,
+        Nearest,
+        "-0.78516",
+        "-0x0.c90#10",
+        Greater,
+    );
+    test(
+        "-22/7",
+        "355/113",
+        10,
+        Floor,
+        "-0.78613",
+        "-0x0.c94#10",
+        Less,
+    );
+    test(
+        "-22/7",
+        "355/113",
+        10,
+        Ceiling,
+        "-0.78516",
+        "-0x0.c90#10",
+        Greater,
+    );
+    test(
+        "-22/7",
+        "355/113",
+        10,
+        Down,
+        "-0.78516",
+        "-0x0.c90#10",
+        Greater,
+    );
+    test("-22/7", "355/113", 10, Up, "-0.78613", "-0x0.c94#10", Less);
+    test(
+        "-22/7",
+        "355/113",
+        53,
+        Nearest,
+        "-0.78559933016198480",
+        "-0x0.c91d09a6ce23a0#53",
+        Less,
+    );
+    test("-22/7", "355/113", 1, Nearest, "-1.0", "-0x1.0#1", Less);
+    test("-22/7", "355/113", 2, Floor, "-1.0", "-0x1.0#2", Less);
+    test("355/113", "0", 10, Nearest, "1.5703", "0x1.920#10", Less);
+    test("355/113", "0", 10, Floor, "1.5703", "0x1.920#10", Less);
+    test("355/113", "0", 10, Ceiling, "1.5723", "0x1.928#10", Greater);
+    test("355/113", "0", 10, Down, "1.5703", "0x1.920#10", Less);
+    test("355/113", "0", 10, Up, "1.5723", "0x1.928#10", Greater);
+    test(
+        "355/113",
+        "0",
+        53,
+        Nearest,
+        "1.5707963267948966",
+        "0x1.921fb54442d18#53",
+        Less,
+    );
+    test("355/113", "0", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("355/113", "0", 2, Floor, "1.5", "0x1.8#2", Less);
+    test("355/113", "1", 10, Nearest, "1.2617", "0x1.430#10", Less);
+    test("355/113", "1", 10, Floor, "1.2617", "0x1.430#10", Less);
+    test("355/113", "1", 10, Ceiling, "1.2637", "0x1.438#10", Greater);
+    test("355/113", "1", 10, Down, "1.2617", "0x1.430#10", Less);
+    test("355/113", "1", 10, Up, "1.2637", "0x1.438#10", Greater);
+    test(
+        "355/113",
+        "1",
+        53,
+        Nearest,
+        "1.2626272802211267",
+        "0x1.433b8a9b96509#53",
+        Less,
+    );
+    test("355/113", "1", 1, Nearest, "1.0", "0x1.0#1", Less);
+    test("355/113", "1", 2, Floor, "1.0", "0x1.0#2", Less);
+    test("355/113", "-1", 10, Nearest, "1.8789", "0x1.e10#10", Less);
+    test("355/113", "-1", 10, Floor, "1.8789", "0x1.e10#10", Less);
+    test(
+        "355/113",
+        "-1",
+        10,
+        Ceiling,
+        "1.8809",
+        "0x1.e18#10",
+        Greater,
+    );
+    test("355/113", "-1", 10, Down, "1.8789", "0x1.e10#10", Less);
+    test("355/113", "-1", 10, Up, "1.8809", "0x1.e18#10", Greater);
+    test(
+        "355/113",
+        "-1",
+        53,
+        Nearest,
+        "1.8789653733686664",
+        "0x1.e103dfecef527#53",
+        Less,
+    );
+    test("355/113", "-1", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("355/113", "-1", 2, Floor, "1.5", "0x1.8#2", Less);
+    test("355/113", "3/4", 10, Nearest, "1.3359", "0x1.560#10", Less);
+    test("355/113", "3/4", 10, Floor, "1.3359", "0x1.560#10", Less);
+    test(
+        "355/113",
+        "3/4",
+        10,
+        Ceiling,
+        "1.3379",
+        "0x1.568#10",
+        Greater,
+    );
+    test("355/113", "3/4", 10, Down, "1.3359", "0x1.560#10", Less);
+    test("355/113", "3/4", 10, Up, "1.3379", "0x1.568#10", Greater);
+    test(
+        "355/113",
+        "3/4",
+        53,
+        Nearest,
+        "1.3364502584851574",
+        "0x1.56219aa8ecabe#53",
+        Greater,
+    );
+    test("355/113", "3/4", 1, Nearest, "1.0", "0x1.0#1", Less);
+    test("355/113", "3/4", 2, Floor, "1.0", "0x1.0#2", Less);
+    test("355/113", "-3/4", 10, Nearest, "1.8047", "0x1.ce0#10", Less);
+    test("355/113", "-3/4", 10, Floor, "1.8047", "0x1.ce0#10", Less);
+    test(
+        "355/113",
+        "-3/4",
+        10,
+        Ceiling,
+        "1.8066",
+        "0x1.ce8#10",
+        Greater,
+    );
+    test("355/113", "-3/4", 10, Down, "1.8047", "0x1.ce0#10", Less);
+    test("355/113", "-3/4", 10, Up, "1.8066", "0x1.ce8#10", Greater);
+    test(
+        "355/113",
+        "-3/4",
+        53,
+        Nearest,
+        "1.8051423951046359",
+        "0x1.ce1dcfdf98f73#53",
+        Greater,
+    );
+    test("355/113", "-3/4", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("355/113", "-3/4", 2, Floor, "1.5", "0x1.8#2", Less);
+    test("355/113", "1/3", 10, Nearest, "1.4648", "0x1.770#10", Less);
+    test("355/113", "1/3", 10, Floor, "1.4648", "0x1.770#10", Less);
+    test(
+        "355/113",
+        "1/3",
+        10,
+        Ceiling,
+        "1.4668",
+        "0x1.778#10",
+        Greater,
+    );
+    test("355/113", "1/3", 10, Down, "1.4648", "0x1.770#10", Less);
+    test("355/113", "1/3", 10, Up, "1.4668", "0x1.778#10", Greater);
+    test(
+        "355/113",
+        "1/3",
+        53,
+        Nearest,
+        "1.4650885393237290",
+        "0x1.77100ae223cba#53",
+        Less,
+    );
+    test("355/113", "1/3", 1, Nearest, "1.0", "0x1.0#1", Less);
+    test("355/113", "1/3", 2, Floor, "1.0", "0x1.0#2", Less);
+    test("355/113", "-1/3", 10, Nearest, "1.6758", "0x1.ad0#10", Less);
+    test("355/113", "-1/3", 10, Floor, "1.6758", "0x1.ad0#10", Less);
+    test(
+        "355/113",
+        "-1/3",
+        10,
+        Ceiling,
+        "1.6777",
+        "0x1.ad8#10",
+        Greater,
+    );
+    test("355/113", "-1/3", 10, Down, "1.6758", "0x1.ad0#10", Less);
+    test("355/113", "-1/3", 10, Up, "1.6777", "0x1.ad8#10", Greater);
+    test(
+        "355/113",
+        "-1/3",
+        53,
+        Nearest,
+        "1.6765041142660642",
+        "0x1.ad2f5fa661d76#53",
+        Less,
+    );
+    test("355/113", "-1/3", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("355/113", "-1/3", 2, Floor, "1.5", "0x1.8#2", Less);
+    test("355/113", "2", 10, Nearest, "1.0039", "0x1.010#10", Greater);
+    test("355/113", "2", 10, Floor, "1.0020", "0x1.008#10", Less);
+    test("355/113", "2", 10, Ceiling, "1.0039", "0x1.010#10", Greater);
+    test("355/113", "2", 10, Down, "1.0020", "0x1.008#10", Less);
+    test("355/113", "2", 10, Up, "1.0039", "0x1.010#10", Greater);
+    test(
+        "355/113",
+        "2",
+        53,
+        Nearest,
+        "1.0038848603213395",
+        "0x1.00fe992407993#53",
+        Less,
+    );
+    test("355/113", "2", 1, Nearest, "1.0", "0x1.0#1", Less);
+    test("355/113", "2", 2, Floor, "1.0", "0x1.0#2", Less);
+    test("355/113", "-2", 10, Nearest, "2.1367", "0x2.23#10", Less);
+    test("355/113", "-2", 10, Floor, "2.1367", "0x2.23#10", Less);
+    test("355/113", "-2", 10, Ceiling, "2.1406", "0x2.24#10", Greater);
+    test("355/113", "-2", 10, Down, "2.1367", "0x2.23#10", Less);
+    test("355/113", "-2", 10, Up, "2.1406", "0x2.24#10", Greater);
+    test(
+        "355/113",
+        "-2",
+        53,
+        Nearest,
+        "2.1377077932684538",
+        "0x2.2340d1647e09e#53",
+        Greater,
+    );
+    test("355/113", "-2", 1, Nearest, "2.0", "0x2.0#1", Less);
+    test("355/113", "-2", 2, Floor, "2.0", "0x2.0#2", Less);
+    test("355/113", "7/2", 10, Nearest, "0.73145", "0x0.bb4#10", Less);
+    test("355/113", "7/2", 10, Floor, "0.73145", "0x0.bb4#10", Less);
+    test(
+        "355/113",
+        "7/2",
+        10,
+        Ceiling,
+        "0.73242",
+        "0x0.bb8#10",
+        Greater,
+    );
+    test("355/113", "7/2", 10, Down, "0.73145", "0x0.bb4#10", Less);
+    test("355/113", "7/2", 10, Up, "0.73242", "0x0.bb8#10", Greater);
+    test(
+        "355/113",
+        "7/2",
+        53,
+        Nearest,
+        "0.73148643123969881",
+        "0x0.bb42b1dba46b18#53",
+        Less,
+    );
+    test("355/113", "7/2", 1, Nearest, "0.50", "0x0.8#1", Less);
+    test("355/113", "7/2", 2, Floor, "0.50", "0x0.8#2", Less);
+    test(
+        "355/113",
+        "1/1000",
+        10,
+        Nearest,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test("355/113", "1/1000", 10, Floor, "1.5703", "0x1.920#10", Less);
+    test(
+        "355/113",
+        "1/1000",
+        10,
+        Ceiling,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test("355/113", "1/1000", 10, Down, "1.5703", "0x1.920#10", Less);
+    test("355/113", "1/1000", 10, Up, "1.5723", "0x1.928#10", Greater);
+    test(
+        "355/113",
+        "1/1000",
+        53,
+        Nearest,
+        "1.5704780169464923",
+        "0x1.920ad8e9df432#53",
+        Greater,
+    );
+    test("355/113", "1/1000", 1, Nearest, "2.0", "0x2.0#1", Greater);
+    test("355/113", "1/1000", 2, Floor, "1.5", "0x1.8#2", Less);
+    test(
+        "355/113",
+        "999/1000",
+        10,
+        Nearest,
+        "1.2637",
+        "0x1.438#10",
+        Greater,
+    );
+    test(
+        "355/113",
+        "999/1000",
+        10,
+        Floor,
+        "1.2617",
+        "0x1.430#10",
+        Less,
+    );
+    test(
+        "355/113",
+        "999/1000",
+        10,
+        Ceiling,
+        "1.2637",
+        "0x1.438#10",
+        Greater,
+    );
+    test(
+        "355/113",
+        "999/1000",
+        10,
+        Down,
+        "1.2617",
+        "0x1.430#10",
+        Less,
+    );
+    test(
+        "355/113",
+        "999/1000",
+        10,
+        Up,
+        "1.2637",
+        "0x1.438#10",
+        Greater,
+    );
+    test(
+        "355/113",
+        "999/1000",
+        53,
+        Nearest,
+        "1.2629163322679613",
+        "0x1.434e7c18acd78#53",
+        Less,
+    );
+    test("355/113", "999/1000", 1, Nearest, "1.0", "0x1.0#1", Less);
+    test("355/113", "999/1000", 2, Floor, "1.0", "0x1.0#2", Less);
+    test(
+        "355/113",
+        "123456789/7",
+        10,
+        Nearest,
+        "1.7812e-7",
+        "0x2.fdE-6#10",
+        Less,
+    );
+    test(
+        "355/113",
+        "123456789/7",
+        10,
+        Floor,
+        "1.7812e-7",
+        "0x2.fdE-6#10",
+        Less,
+    );
+    test(
+        "355/113",
+        "123456789/7",
+        10,
+        Ceiling,
+        "1.7835e-7",
+        "0x2.feE-6#10",
+        Greater,
+    );
+    test(
+        "355/113",
+        "123456789/7",
+        10,
+        Down,
+        "1.7812e-7",
+        "0x2.fdE-6#10",
+        Less,
+    );
+    test(
+        "355/113",
+        "123456789/7",
+        10,
+        Up,
+        "1.7835e-7",
+        "0x2.feE-6#10",
+        Greater,
+    );
+    test(
+        "355/113",
+        "123456789/7",
+        53,
+        Nearest,
+        "1.7812832020503662e-7",
+        "0x2.fd0e28c7fe18cE-6#53",
+        Less,
+    );
+    test(
+        "355/113",
+        "123456789/7",
+        1,
+        Nearest,
+        "1.2e-7",
+        "0x2.0E-6#1",
+        Less,
+    );
+    test(
+        "355/113",
+        "123456789/7",
+        2,
+        Floor,
+        "1.2e-7",
+        "0x2.0E-6#2",
+        Less,
+    );
+    test(
+        "355/113",
+        "1/123456789",
+        10,
+        Nearest,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "355/113",
+        "1/123456789",
+        10,
+        Floor,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "355/113",
+        "1/123456789",
+        10,
+        Ceiling,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test(
+        "355/113",
+        "1/123456789",
+        10,
+        Down,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+    test(
+        "355/113",
+        "1/123456789",
+        10,
+        Up,
+        "1.5723",
+        "0x1.928#10",
+        Greater,
+    );
+    test(
+        "355/113",
+        "1/123456789",
+        53,
+        Nearest,
+        "1.5707963242165868",
+        "0x1.921fb5392fefd#53",
+        Greater,
+    );
+    test(
+        "355/113",
+        "1/123456789",
+        1,
+        Nearest,
+        "2.0",
+        "0x2.0#1",
+        Greater,
+    );
+    test("355/113", "1/123456789", 2, Floor, "1.5", "0x1.8#2", Less);
+    test(
+        "355/113",
+        "22/7",
+        10,
+        Nearest,
+        "0.78516",
+        "0x0.c90#10",
+        Less,
+    );
+    test("355/113", "22/7", 10, Floor, "0.78516", "0x0.c90#10", Less);
+    test(
+        "355/113",
+        "22/7",
+        10,
+        Ceiling,
+        "0.78613",
+        "0x0.c94#10",
+        Greater,
+    );
+    test("355/113", "22/7", 10, Down, "0.78516", "0x0.c90#10", Less);
+    test("355/113", "22/7", 10, Up, "0.78613", "0x0.c94#10", Greater);
+    test(
+        "355/113",
+        "22/7",
+        53,
+        Nearest,
+        "0.78519699663291187",
+        "0x0.c902ab9d74ade8#53",
+        Greater,
+    );
+    test("355/113", "22/7", 1, Nearest, "1.0", "0x1.0#1", Greater);
+    test("355/113", "22/7", 2, Floor, "0.75", "0x0.c#2", Less);
+    test("355/113", "-22/7", 10, Nearest, "2.3555", "0x2.5b#10", Less);
+    test("355/113", "-22/7", 10, Floor, "2.3555", "0x2.5b#10", Less);
+    test(
+        "355/113",
+        "-22/7",
+        10,
+        Ceiling,
+        "2.3594",
+        "0x2.5c#10",
+        Greater,
+    );
+    test("355/113", "-22/7", 10, Down, "2.3555", "0x2.5b#10", Less);
+    test("355/113", "-22/7", 10, Up, "2.3594", "0x2.5c#10", Greater);
+    test(
+        "355/113",
+        "-22/7",
+        53,
+        Nearest,
+        "2.3563956569568814",
+        "0x2.5b3cbeeb10f52#53",
+        Less,
+    );
+    test("355/113", "-22/7", 1, Nearest, "2.0", "0x2.0#1", Less);
+    test("355/113", "-22/7", 2, Floor, "2.0", "0x2.0#2", Less);
+    test(
+        "355/113",
+        "355/113",
+        10,
+        Nearest,
+        "0.78516",
+        "0x0.c90#10",
+        Less,
+    );
+    test(
+        "355/113",
+        "355/113",
+        10,
+        Floor,
+        "0.78516",
+        "0x0.c90#10",
+        Less,
+    );
+    test(
+        "355/113",
+        "355/113",
+        10,
+        Ceiling,
+        "0.78613",
+        "0x0.c94#10",
+        Greater,
+    );
+    test(
+        "355/113",
+        "355/113",
+        10,
+        Down,
+        "0.78516",
+        "0x0.c90#10",
+        Less,
+    );
+    test(
+        "355/113",
+        "355/113",
+        10,
+        Up,
+        "0.78613",
+        "0x0.c94#10",
+        Greater,
+    );
+    test(
+        "355/113",
+        "355/113",
+        53,
+        Nearest,
+        "0.78539816339744828",
+        "0x0.c90fdaa22168c0#53",
+        Less,
+    );
+    test("355/113", "355/113", 1, Nearest, "1.0", "0x1.0#1", Greater);
+    test("355/113", "355/113", 2, Floor, "0.75", "0x0.c#2", Less);
 }
