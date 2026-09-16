@@ -1784,6 +1784,553 @@ impl Float {
     pub fn asin_with_period_rational_prec_ref(x: &Rational, u: u64, prec: u64) -> (Self, Ordering) {
         Self::asin_with_period_rational_prec_round_ref(x, u, prec, Nearest)
     }
+
+    /// Computes $\arcsin(x)/\pi$, the arcsine of a [`Float`] measured in half-turns, rounding the
+    /// result to the specified precision and with the specified rounding mode. The [`Float`] is
+    /// taken by value. An [`Ordering`] is also returned, indicating whether the rounded arcsine is
+    /// less than, equal to, or greater than the exact arcsine. Although `NaN`s are not comparable
+    /// to any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// This is `asin_with_period` with a period of 2: see [`Float::asin_with_period_prec_round`]
+    /// for the error bounds, the special cases, underflow, and the complexity, with $u = 2$. An
+    /// input of $\pm1$ gives $\pm1/2$, exact at every precision, since a half needs only one bit,
+    /// and a zero input gives $\pm0.0$; those are the only exact cases. NaN, either infinity, and
+    /// any $|x|>1$ give NaN. Overflow is not possible, since $|\arcsin(x)/\pi| \leq 1/2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::from(0.1f64).asin_pi_prec_round(10, Floor);
+    /// assert_eq!(t.to_string(), "0.031860");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (t, o) = Float::from(0.1f64).asin_pi_prec_round(10, Ceiling);
+    /// assert_eq!(t.to_string(), "0.031921");
+    /// assert_eq!(o, Greater);
+    ///
+    /// // an input of 1 gives a quarter turn, which is half of a half-turn, exactly
+    /// let (t, o) = Float::ONE.asin_pi_prec_round(10, Exact);
+    /// assert_eq!(t.to_string(), "0.50000");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn asin_pi_prec_round(self, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+        self.asin_with_period_prec_round(2, prec, rm)
+    }
+
+    /// Computes $\arcsin(x)/\pi$, the arcsine of a [`Float`] measured in half-turns, rounding the
+    /// result to the specified precision and with the specified rounding mode. The [`Float`] is
+    /// taken by reference. An [`Ordering`] is also returned, indicating whether the rounded arcsine
+    /// is less than, equal to, or greater than the exact arcsine. Although `NaN`s are not
+    /// comparable to any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// This is `asin_with_period` with a period of 2: see
+    /// [`Float::asin_with_period_prec_round_ref`] for the error bounds, the special cases,
+    /// underflow, and the complexity, with $u = 2$. An input of $\pm1$ gives $\pm1/2$, exact at
+    /// every precision, since a half needs only one bit, and a zero input gives $\pm0.0$; those are
+    /// the only exact cases. NaN, either infinity, and any $|x|>1$ give NaN. Overflow is not
+    /// possible, since $|\arcsin(x)/\pi| \leq 1/2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = (&Float::from(0.1f64)).asin_pi_prec_round_ref(10, Floor);
+    /// assert_eq!(t.to_string(), "0.031860");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (t, o) = (&Float::from(0.1f64)).asin_pi_prec_round_ref(10, Ceiling);
+    /// assert_eq!(t.to_string(), "0.031921");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn asin_pi_prec_round_ref(&self, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+        self.asin_with_period_prec_round_ref(2, prec, rm)
+    }
+
+    /// Computes $\arcsin(x)/\pi$, the arcsine of a [`Float`] measured in half-turns, rounding the
+    /// result to the nearest value of the specified precision. The [`Float`] is taken by value. An
+    /// [`Ordering`] is also returned, indicating whether the rounded arcsine is less than, equal
+    /// to, or greater than the exact arcsine. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// This is `asin_with_period` with a period of 2: see [`Float::asin_with_period_prec`] for the
+    /// error bounds, the special cases, underflow, and the complexity, with $u = 2$. An input of
+    /// $\pm1$ gives $\pm1/2$, exact at every precision, since a half needs only one bit, and a zero
+    /// input gives $\pm0.0$; those are the only exact cases. NaN, either infinity, and any $|x|>1$
+    /// give NaN. Overflow is not possible, since $|\arcsin(x)/\pi| \leq 1/2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::from(0.1f64).asin_pi_prec(10);
+    /// assert_eq!(t.to_string(), "0.031860");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (t, o) = Float::from(0.1f64).asin_pi_prec(53);
+    /// assert_eq!(t.to_string(), "0.031884280429259927");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn asin_pi_prec(self, prec: u64) -> (Self, Ordering) {
+        self.asin_with_period_prec(2, prec)
+    }
+
+    /// Computes $\arcsin(x)/\pi$, the arcsine of a [`Float`] measured in half-turns, rounding the
+    /// result to the nearest value of the specified precision. The [`Float`] is taken by reference.
+    /// An [`Ordering`] is also returned, indicating whether the rounded arcsine is less than, equal
+    /// to, or greater than the exact arcsine. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// This is `asin_with_period` with a period of 2: see [`Float::asin_with_period_prec_ref`] for
+    /// the error bounds, the special cases, underflow, and the complexity, with $u = 2$. An input
+    /// of $\pm1$ gives $\pm1/2$, exact at every precision, since a half needs only one bit, and a
+    /// zero input gives $\pm0.0$; those are the only exact cases. NaN, either infinity, and any
+    /// $|x|>1$ give NaN. Overflow is not possible, since $|\arcsin(x)/\pi| \leq 1/2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = (&Float::from(0.1f64)).asin_pi_prec_ref(10);
+    /// assert_eq!(t.to_string(), "0.031860");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (t, o) = (&Float::from(0.1f64)).asin_pi_prec_ref(53);
+    /// assert_eq!(t.to_string(), "0.031884280429259927");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn asin_pi_prec_ref(&self, prec: u64) -> (Self, Ordering) {
+        self.asin_with_period_prec_ref(2, prec)
+    }
+
+    /// Computes $\arcsin(x)/\pi$, the arcsine of a [`Float`] measured in half-turns, rounding the
+    /// result with the specified rounding mode. The precision of the output is the precision of the
+    /// input. The [`Float`] is taken by value. An [`Ordering`] is also returned, indicating whether
+    /// the rounded arcsine is less than, equal to, or greater than the exact arcsine. Although
+    /// `NaN`s are not comparable to any [`Float`], whenever this function returns a `NaN` it also
+    /// returns `Equal`.
+    ///
+    /// This is `asin_with_period` with a period of 2: see [`Float::asin_with_period_round`] for the
+    /// error bounds, the special cases, underflow, and the complexity, with $u = 2$. An input of
+    /// $\pm1$ gives $\pm1/2$, exact at every precision, since a half needs only one bit, and a zero
+    /// input gives $\pm0.0$; those are the only exact cases. NaN, either infinity, and any $|x|>1$
+    /// give NaN. Overflow is not possible, since $|\arcsin(x)/\pi| \leq 1/2$.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the precision of
+    /// the input.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::from(0.1f64).asin_pi_round(Floor);
+    /// assert_eq!(t.to_string(), "0.031884280429259920");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (t, o) = Float::from(0.1f64).asin_pi_round(Ceiling);
+    /// assert_eq!(t.to_string(), "0.031884280429259934");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn asin_pi_round(self, rm: RoundingMode) -> (Self, Ordering) {
+        self.asin_with_period_round(2, rm)
+    }
+
+    /// Computes $\arcsin(x)/\pi$, the arcsine of a [`Float`] measured in half-turns, rounding the
+    /// result with the specified rounding mode. The precision of the output is the precision of the
+    /// input. The [`Float`] is taken by reference. An [`Ordering`] is also returned, indicating
+    /// whether the rounded arcsine is less than, equal to, or greater than the exact arcsine.
+    /// Although `NaN`s are not comparable to any [`Float`], whenever this function returns a `NaN`
+    /// it also returns `Equal`.
+    ///
+    /// This is `asin_with_period` with a period of 2: see [`Float::asin_with_period_round_ref`] for
+    /// the error bounds, the special cases, underflow, and the complexity, with $u = 2$. An input
+    /// of $\pm1$ gives $\pm1/2$, exact at every precision, since a half needs only one bit, and a
+    /// zero input gives $\pm0.0$; those are the only exact cases. NaN, either infinity, and any
+    /// $|x|>1$ give NaN. Overflow is not possible, since $|\arcsin(x)/\pi| \leq 1/2$.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the precision of
+    /// the input.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = (&Float::from(0.1f64)).asin_pi_round_ref(Floor);
+    /// assert_eq!(t.to_string(), "0.031884280429259920");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn asin_pi_round_ref(&self, rm: RoundingMode) -> (Self, Ordering) {
+        self.asin_with_period_round_ref(2, rm)
+    }
+
+    /// Computes $\arcsin(x)/\pi$, the arcsine of a [`Float`] measured in half-turns, rounding the
+    /// result to the precision of the input and to the nearest [`Float`]. The [`Float`] is taken by
+    /// value.
+    ///
+    /// If the arcsine is equidistant from two [`Float`]s with the precision of the input, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// This is `asin_with_period` with a period of 2: see [`Float::asin_with_period`] for the error
+    /// bounds, the special cases, underflow, and the complexity, with $u = 2$. An input of $\pm1$
+    /// gives $\pm1/2$, exact at every precision, since a half needs only one bit, and a zero input
+    /// gives $\pm0.0$; those are the only exact cases. NaN, either infinity, and any $|x|>1$ give
+    /// NaN. Overflow is not possible, since $|\arcsin(x)/\pi| \leq 1/2$.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// assert_eq!(
+    ///     Float::from(0.1f64).asin_pi().to_string(),
+    ///     "0.031884280429259920"
+    /// );
+    /// ```
+    #[inline]
+    pub fn asin_pi(self) -> Self {
+        self.asin_with_period(2)
+    }
+
+    /// Computes $\arcsin(x)/\pi$, the arcsine of a [`Float`] measured in half-turns, rounding the
+    /// result to the precision of the input and to the nearest [`Float`]. The [`Float`] is taken by
+    /// reference.
+    ///
+    /// If the arcsine is equidistant from two [`Float`]s with the precision of the input, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// This is `asin_with_period` with a period of 2: see [`Float::asin_with_period_ref`] for the
+    /// error bounds, the special cases, underflow, and the complexity, with $u = 2$. An input of
+    /// $\pm1$ gives $\pm1/2$, exact at every precision, since a half needs only one bit, and a zero
+    /// input gives $\pm0.0$; those are the only exact cases. NaN, either infinity, and any $|x|>1$
+    /// give NaN. Overflow is not possible, since $|\arcsin(x)/\pi| \leq 1/2$.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// assert_eq!(
+    ///     (&Float::from(0.1f64)).asin_pi_ref().to_string(),
+    ///     "0.031884280429259920"
+    /// );
+    /// ```
+    #[inline]
+    pub fn asin_pi_ref(&self) -> Self {
+        self.asin_with_period_ref(2)
+    }
+
+    /// Computes $\arcsin(x)/\pi$, the arcsine of a [`Float`] measured in half-turns, rounding the
+    /// result to the specified precision and with the specified rounding mode. The [`Float`] is
+    /// replaced by the result. An [`Ordering`] is returned, indicating whether the rounded arcsine
+    /// is less than, equal to, or greater than the exact arcsine. Although `NaN`s are not
+    /// comparable to any [`Float`], whenever this function assigns a `NaN` it also returns `Equal`.
+    ///
+    /// This is `asin_with_period` with a period of 2: see
+    /// [`Float::asin_with_period_prec_round_assign`] for the error bounds, the special cases,
+    /// underflow, and the complexity, with $u = 2$. An input of $\pm1$ gives $\pm1/2$, exact at
+    /// every precision, since a half needs only one bit, and a zero input gives $\pm0.0$; those are
+    /// the only exact cases. NaN, either infinity, and any $|x|>1$ give NaN. Overflow is not
+    /// possible, since $|\arcsin(x)/\pi| \leq 1/2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from(0.1f64);
+    /// let o = x.asin_pi_prec_round_assign(10, Floor);
+    /// assert_eq!(x.to_string(), "0.031860");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn asin_pi_prec_round_assign(&mut self, prec: u64, rm: RoundingMode) -> Ordering {
+        self.asin_with_period_prec_round_assign(2, prec, rm)
+    }
+
+    /// Computes $\arcsin(x)/\pi$, the arcsine of a [`Float`] measured in half-turns, rounding the
+    /// result to the nearest value of the specified precision. The [`Float`] is replaced by the
+    /// result. An [`Ordering`] is returned, indicating whether the rounded arcsine is less than,
+    /// equal to, or greater than the exact arcsine. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function assigns a `NaN` it also returns `Equal`.
+    ///
+    /// This is `asin_with_period` with a period of 2: see [`Float::asin_with_period_prec_assign`]
+    /// for the error bounds, the special cases, underflow, and the complexity, with $u = 2$. An
+    /// input of $\pm1$ gives $\pm1/2$, exact at every precision, since a half needs only one bit,
+    /// and a zero input gives $\pm0.0$; those are the only exact cases. NaN, either infinity, and
+    /// any $|x|>1$ give NaN. Overflow is not possible, since $|\arcsin(x)/\pi| \leq 1/2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from(0.1f64);
+    /// let o = x.asin_pi_prec_assign(10);
+    /// assert_eq!(x.to_string(), "0.031860");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn asin_pi_prec_assign(&mut self, prec: u64) -> Ordering {
+        self.asin_with_period_prec_assign(2, prec)
+    }
+
+    /// Computes $\arcsin(x)/\pi$, the arcsine of a [`Float`] measured in half-turns, rounding the
+    /// result with the specified rounding mode. The precision of the output is the precision of the
+    /// input. The [`Float`] is replaced by the result. An [`Ordering`] is returned, indicating
+    /// whether the rounded arcsine is less than, equal to, or greater than the exact arcsine.
+    /// Although `NaN`s are not comparable to any [`Float`], whenever this function assigns a `NaN`
+    /// it also returns `Equal`.
+    ///
+    /// This is `asin_with_period` with a period of 2: see [`Float::asin_with_period_round_assign`]
+    /// for the error bounds, the special cases, underflow, and the complexity, with $u = 2$. An
+    /// input of $\pm1$ gives $\pm1/2$, exact at every precision, since a half needs only one bit,
+    /// and a zero input gives $\pm0.0$; those are the only exact cases. NaN, either infinity, and
+    /// any $|x|>1$ give NaN. Overflow is not possible, since $|\arcsin(x)/\pi| \leq 1/2$.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the precision of
+    /// the input.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from(0.1f64);
+    /// let o = x.asin_pi_round_assign(Floor);
+    /// assert_eq!(x.to_string(), "0.031884280429259920");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn asin_pi_round_assign(&mut self, rm: RoundingMode) -> Ordering {
+        self.asin_with_period_round_assign(2, rm)
+    }
+
+    /// Computes $\arcsin(x)/\pi$, the arcsine of a [`Float`] measured in half-turns, rounding the
+    /// result to the precision of the input and to the nearest [`Float`]. The [`Float`] is replaced
+    /// by the result.
+    ///
+    /// If the arcsine is equidistant from two [`Float`]s with the precision of the input, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// This is `asin_with_period` with a period of 2: see [`Float::asin_with_period_assign`] for
+    /// the error bounds, the special cases, underflow, and the complexity, with $u = 2$. An input
+    /// of $\pm1$ gives $\pm1/2$, exact at every precision, since a half needs only one bit, and a
+    /// zero input gives $\pm0.0$; those are the only exact cases. NaN, either infinity, and any
+    /// $|x|>1$ give NaN. Overflow is not possible, since $|\arcsin(x)/\pi| \leq 1/2$.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// let mut x = Float::from(0.1f64);
+    /// x.asin_pi_assign();
+    /// assert_eq!(x.to_string(), "0.031884280429259920");
+    /// ```
+    #[inline]
+    pub fn asin_pi_assign(&mut self) {
+        let prec = self.significant_bits();
+        self.asin_pi_prec_assign(prec);
+    }
+
+    /// Computes $\arcsin(x)/\pi$, the arcsine of a [`Rational`] measured in half-turns, rounding
+    /// the result to the specified precision and with the specified rounding mode and returning the
+    /// result as a [`Float`]. The [`Rational`] is taken by value. An [`Ordering`] is also returned,
+    /// indicating whether the rounded arcsine is less than, equal to, or greater than the exact
+    /// arcsine.
+    ///
+    /// This is `asin_with_period_rational` with a period of 2: see
+    /// [`Float::asin_with_period_rational_prec_round`] for the error bounds, the special cases,
+    /// underflow, and the complexity, with $u = 2$. An input of $\pm1$ gives $\pm1/2$, exact at
+    /// every precision, since a half needs only one bit, and a zero input gives $0.0$; those are
+    /// the only exact cases. Any $|x|>1$ gives NaN. Overflow is not possible, since
+    /// $|\arcsin(x)/\pi| \leq 1/2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) =
+    ///     Float::asin_pi_rational_prec_round(Rational::from_unsigneds(3u8, 5), 10, Floor);
+    /// assert_eq!(t.to_string(), "0.20459");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (t, o) =
+    ///     Float::asin_pi_rational_prec_round(Rational::from_unsigneds(3u8, 5), 10, Ceiling);
+    /// assert_eq!(t.to_string(), "0.20483");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn asin_pi_rational_prec_round(
+        x: Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        Self::asin_with_period_rational_prec_round(x, 2, prec, rm)
+    }
+
+    /// Computes $\arcsin(x)/\pi$, the arcsine of a [`Rational`] measured in half-turns, rounding
+    /// the result to the specified precision and with the specified rounding mode and returning the
+    /// result as a [`Float`]. The [`Rational`] is taken by reference. An [`Ordering`] is also
+    /// returned, indicating whether the rounded arcsine is less than, equal to, or greater than the
+    /// exact arcsine.
+    ///
+    /// This is `asin_with_period_rational` with a period of 2: see
+    /// [`Float::asin_with_period_rational_prec_round_ref`] for the error bounds, the special cases,
+    /// underflow, and the complexity, with $u = 2$. An input of $\pm1$ gives $\pm1/2$, exact at
+    /// every precision, since a half needs only one bit, and a zero input gives $0.0$; those are
+    /// the only exact cases. Any $|x|>1$ gives NaN. Overflow is not possible, since
+    /// $|\arcsin(x)/\pi| \leq 1/2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) =
+    ///     Float::asin_pi_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 10, Floor);
+    /// assert_eq!(t.to_string(), "0.20459");
+    /// assert_eq!(o, Less);
+    ///
+    /// // an input of 1 gives a quarter turn, which is half of a half-turn, exactly
+    /// let (t, o) = Float::asin_pi_rational_prec_round_ref(&Rational::ONE, 10, Exact);
+    /// assert_eq!(t.to_string(), "0.50000");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    pub fn asin_pi_rational_prec_round_ref(
+        x: &Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        Self::asin_with_period_rational_prec_round_ref(x, 2, prec, rm)
+    }
+
+    /// Computes $\arcsin(x)/\pi$, the arcsine of a [`Rational`] measured in half-turns, rounding
+    /// the result to the nearest value of the specified precision and returning the result as a
+    /// [`Float`]. The [`Rational`] is taken by value. An [`Ordering`] is also returned, indicating
+    /// whether the rounded arcsine is less than, equal to, or greater than the exact arcsine.
+    ///
+    /// This is `asin_with_period_rational` with a period of 2: see
+    /// [`Float::asin_with_period_rational_prec`] for the error bounds, the special cases,
+    /// underflow, and the complexity, with $u = 2$. An input of $\pm1$ gives $\pm1/2$, exact at
+    /// every precision, since a half needs only one bit, and a zero input gives $0.0$; those are
+    /// the only exact cases. Any $|x|>1$ gives NaN. Overflow is not possible, since
+    /// $|\arcsin(x)/\pi| \leq 1/2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::asin_pi_rational_prec(Rational::from_unsigneds(3u8, 5), 10);
+    /// assert_eq!(t.to_string(), "0.20483");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (t, o) = Float::asin_pi_rational_prec(Rational::from_unsigneds(3u8, 5), 53);
+    /// assert_eq!(t.to_string(), "0.20483276469913345");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn asin_pi_rational_prec(x: Rational, prec: u64) -> (Self, Ordering) {
+        Self::asin_with_period_rational_prec(x, 2, prec)
+    }
+
+    /// Computes $\arcsin(x)/\pi$, the arcsine of a [`Rational`] measured in half-turns, rounding
+    /// the result to the nearest value of the specified precision and returning the result as a
+    /// [`Float`]. The [`Rational`] is taken by reference. An [`Ordering`] is also returned,
+    /// indicating whether the rounded arcsine is less than, equal to, or greater than the exact
+    /// arcsine.
+    ///
+    /// This is `asin_with_period_rational` with a period of 2: see
+    /// [`Float::asin_with_period_rational_prec_ref`] for the error bounds, the special cases,
+    /// underflow, and the complexity, with $u = 2$. An input of $\pm1$ gives $\pm1/2$, exact at
+    /// every precision, since a half needs only one bit, and a zero input gives $0.0$; those are
+    /// the only exact cases. Any $|x|>1$ gives NaN. Overflow is not possible, since
+    /// $|\arcsin(x)/\pi| \leq 1/2$.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::asin_pi_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 10);
+    /// assert_eq!(t.to_string(), "0.20483");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (t, o) = Float::asin_pi_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 53);
+    /// assert_eq!(t.to_string(), "0.20483276469913345");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn asin_pi_rational_prec_ref(x: &Rational, prec: u64) -> (Self, Ordering) {
+        Self::asin_with_period_rational_prec_ref(x, 2, prec)
+    }
 }
 
 impl Asin for Float {
@@ -2263,4 +2810,103 @@ where
         |x, prec| Float::asin_with_period_rational_prec_ref(x, u, prec),
         x,
     )
+}
+
+/// Computes $\arcsin(x)/\pi$, the arcsine of a primitive float measured in half-turns, returning
+/// the result as a primitive float.
+///
+/// This is `primitive_float_asin_with_period` with a period of 2: see
+/// [`primitive_float_asin_with_period`] for the error bounds, the special cases, and the
+/// complexity, with $u = 2$. An input of $\pm1$ gives $\pm1/2$ and a zero input gives $\pm0.0$;
+/// NaN, either infinity, and any $|x|>1$ give NaN. Overflow is not possible, since
+/// $|\arcsin(x)/\pi| \leq 1/2$.
+///
+/// # Worst-case complexity
+/// $T(m) = O(m \log m \log\log m)$
+///
+/// $M(m) = O(m \log m)$
+///
+/// where $T$ is time, $M$ is additional memory, and $m$ is `x.significant_bits()`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::asin::primitive_float_asin_pi;
+///
+/// assert!(primitive_float_asin_pi(f32::NAN).is_nan());
+/// // an input outside [-1, 1] is NaN
+/// assert!(primitive_float_asin_pi(2.0f32).is_nan());
+/// // an input of 1 is half a half-turn
+/// assert_eq!(NiceFloat(primitive_float_asin_pi(1.0f32)), NiceFloat(0.5));
+/// assert_eq!(
+///     NiceFloat(primitive_float_asin_pi(0.1f32)),
+///     NiceFloat(0.03188428)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_asin_pi(0.1f64)),
+///     NiceFloat(0.03188428042925993)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_asin_pi<T: PrimitiveFloat>(x: T) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    primitive_float_asin_with_period(x, 2)
+}
+
+/// Computes $\arcsin(x)/\pi$, the arcsine of a [`Rational`] measured in half-turns, returning the
+/// result as a primitive float.
+///
+/// This is `primitive_float_asin_with_period_rational` with a period of 2: see
+/// [`primitive_float_asin_with_period_rational`] for the error bounds, the special cases, and the
+/// complexity, with $u = 2$. An input of $\pm1$ gives $\pm1/2$ and a zero input gives $0.0$; any
+/// $|x|>1$ gives NaN. Overflow is not possible, since $|\arcsin(x)/\pi| \leq 1/2$.
+///
+/// # Worst-case complexity
+/// $T(m) = O(m \log m \log\log m)$
+///
+/// $M(m) = O(m \log m)$
+///
+/// where $T$ is time, $M$ is additional memory, and $m$ is `x.significant_bits()`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::{One, Zero};
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::asin::primitive_float_asin_pi_rational;
+/// use malachite_q::Rational;
+///
+/// assert_eq!(
+///     NiceFloat(primitive_float_asin_pi_rational::<f64>(&Rational::ZERO)),
+///     NiceFloat(0.0)
+/// );
+/// // an input of 1 is half a half-turn
+/// assert_eq!(
+///     NiceFloat(primitive_float_asin_pi_rational::<f64>(&Rational::ONE)),
+///     NiceFloat(0.5)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_asin_pi_rational::<f64>(
+///         &Rational::from_unsigneds(3u8, 5)
+///     )),
+///     NiceFloat(0.20483276469913345)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_asin_pi_rational::<f32>(
+///         &Rational::from_unsigneds(3u8, 5)
+///     )),
+///     NiceFloat(0.20483276)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_asin_pi_rational<T: PrimitiveFloat>(x: &Rational) -> T
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    primitive_float_asin_with_period_rational(x, 2)
 }

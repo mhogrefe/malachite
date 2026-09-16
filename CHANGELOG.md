@@ -442,6 +442,14 @@ documented by git history.
   `Rational` arcsine reports such an input as an underflow and a large $u$ can lift the quotient
   back into range. `primitive_float_asin_with_period_rational` gives the correctly rounded `f32` or
   `f64` angle.
+- `asin_pi_prec_round`, `asin_pi_prec`, `asin_pi_round`, and `asin_pi` (with `_ref` and `_assign`
+  variants), along with `asin_pi_rational_prec_round` and `asin_pi_rational_prec` (with `_ref`
+  variants), a port of `mpfr_asinpi`: the arcsine measured in half-turns, which MPFR defines as
+  `asinu` with $u = 2$ and Malachite delegates the same way. An input of $\pm1$ gives $\pm1/2$,
+  exact at every precision since a half needs only one bit, and a zero input gives a zero; those
+  are the only exact cases, and any $|x|>1$ (or, for a `Float`, NaN or either infinity) gives NaN.
+  `primitive_float_asin_pi` and `primitive_float_asin_pi_rational` give the correctly rounded `f32`
+  or `f64` angle in half-turns.
 - `Cot` and `CotAssign` (new traits in malachite-base) for `Float`, with the usual
   `cot_prec_round`, `cot_prec`, `cot_round`, and `_ref`/`_assign` variants: a port of `mpfr_cot`,
   MPFR's generic reciprocal template with the tangent. MPFR's tangent is itself a quotient of a
