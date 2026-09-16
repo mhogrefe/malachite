@@ -26,11 +26,11 @@ use crate::test_util::generators::common::{
     valid_strtofr_quadruple,
 };
 use crate::test_util::generators::exhaustive::{
-    acos_prec_round_valid, acos_round_valid, add_mul_prec_round_valid,
-    add_mul_rational_prec_round_valid, add_mul_rational_round_valid, add_mul_round_valid,
-    add_prec_round_valid, add_rational_prec_round_valid, add_rational_round_valid, add_round_valid,
-    agm_prec_round_valid, agm_rational_prec_round_valid, agm_round_valid,
-    asin_with_period_prec_round_valid, asin_with_period_rational_prec_round_valid,
+    acos_prec_round_valid, acos_rational_prec_round_valid, acos_round_valid,
+    add_mul_prec_round_valid, add_mul_rational_prec_round_valid, add_mul_rational_round_valid,
+    add_mul_round_valid, add_prec_round_valid, add_rational_prec_round_valid,
+    add_rational_round_valid, add_round_valid, agm_prec_round_valid, agm_rational_prec_round_valid,
+    agm_round_valid, asin_with_period_prec_round_valid, asin_with_period_rational_prec_round_valid,
     asin_with_period_round_valid, atan_with_period_prec_round_valid,
     atan_with_period_rational_prec_round_valid, atan_with_period_round_valid,
     atan2_rational_prec_round_valid, average_prec_round_valid, cbrt_prec_round_valid,
@@ -10957,6 +10957,32 @@ pub fn random_rational_unsigned_rounding_mode_triple_gen_var_10(
             &random_rounding_modes,
         )
         .filter(|&(ref n, prec, rm)| exp_rational_prec_round_valid(n, prec, rm)),
+    )
+}
+
+pub fn random_rational_unsigned_rounding_mode_triple_gen_var_11(
+    config: &GenConfig,
+) -> It<(Rational, u64, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_rationals(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(ref n, prec, rm)| acos_rational_prec_round_valid(n, prec, rm)),
     )
 }
 

@@ -6638,6 +6638,13 @@ pub fn exp_rational_prec_round_valid(x: &Rational, _prec: u64, rm: RoundingMode)
     rm != Exact || *x == 0u32
 }
 
+// Whether `(x, prec, rm)` is a valid input to `Float::acos_rational_prec_round`.
+pub fn acos_rational_prec_round_valid(x: &Rational, _prec: u64, rm: RoundingMode) -> bool {
+    // the arccosine of a rational is transcendental except at x = 1, where it is zero, and is NaN
+    // outside [-1, 1]; unlike the arcsine, x = 0 is not an exact case, since acos(0) is pi/2
+    rm != Exact || *x == 1u32 || *x > 1u32 || *x < -1i32
+}
+
 pub fn exhaustive_rational_unsigned_rounding_mode_triple_gen_var_10()
 -> It<(Rational, u64, RoundingMode)> {
     reshape_2_1_to_3(Box::new(
@@ -6646,6 +6653,17 @@ pub fn exhaustive_rational_unsigned_rounding_mode_triple_gen_var_10()
             exhaustive_rounding_modes(),
         )
         .filter(|&((ref n, prec), rm)| exp_rational_prec_round_valid(n, prec, rm)),
+    ))
+}
+
+pub fn exhaustive_rational_unsigned_rounding_mode_triple_gen_var_11()
+-> It<(Rational, u64, RoundingMode)> {
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(exhaustive_rationals(), exhaustive_positive_primitive_ints()),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref n, prec), rm)| acos_rational_prec_round_valid(n, prec, rm)),
     ))
 }
 

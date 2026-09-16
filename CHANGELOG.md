@@ -458,6 +458,16 @@ documented by git history.
   $-1$ gives $\pi$. The zero at $x=1$ is the only exact case — unlike the arcsine, a zero input is
   not one, since $\pi/2$ is never exactly representable. Overflow is not possible, since the result
   lies in $[0,\pi]$. `primitive_float_acos` gives the correctly rounded `f32` or `f64` arccosine.
+- `acos_rational_prec_round` and `acos_rational_prec` (with `_ref` variants), which take a
+  `Rational`. MPFR has no such function. The identity is rearranged to
+  $\arccos x = \arctan(\sqrt{(1-x^2)/x^2})$, whose argument is an exact `Rational`: for a positive
+  $x$ that is the whole answer, and nothing cancels anywhere, so unlike the `Float` version the cost
+  does not grow as $x$ approaches 1. A negative $x$ is $\pi$ minus that, which loses a single bit at
+  worst. Underflow, impossible for the `Float` arccosine, is reachable here, since a `Rational` may
+  lie within $2^{-2^{31}}$ of 1; there $\arccos x$ is about $\sqrt{2(1-x)}$, and that form is used
+  directly, which also avoids squaring an input that close to 1.
+  `primitive_float_acos_rational` gives the correctly rounded `f32` or `f64` arccosine of a
+  `Rational`.
 - `Cot` and `CotAssign` (new traits in malachite-base) for `Float`, with the usual
   `cot_prec_round`, `cot_prec`, `cot_round`, and `_ref`/`_assign` variants: a port of `mpfr_cot`,
   MPFR's generic reciprocal template with the tangent. MPFR's tangent is itself a quotient of a

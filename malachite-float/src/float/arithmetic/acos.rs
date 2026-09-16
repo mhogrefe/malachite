@@ -14,19 +14,21 @@
 
 use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use crate::emulate_float_to_float_fn;
 use crate::float::arithmetic::asin::{asin_at_prec, asin_cancellation};
+use crate::float::arithmetic::sin::{SCALE, SCALED_INPUT_EXPONENT, scaled_underflow};
+use crate::{emulate_float_to_float_fn, emulate_rational_to_float_fn};
 use core::cmp::Ordering::{self, Equal, Greater, Less};
-use malachite_base::num::arithmetic::traits::{Acos, AcosAssign, CeilingLogBase2};
+use malachite_base::num::arithmetic::traits::{Acos, AcosAssign, CeilingLogBase2, Square};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::{NaN as NaNTrait, Zero as ZeroTrait};
+use malachite_base::num::basic::traits::{NaN as NaNTrait, One, Zero as ZeroTrait};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode::{self, Exact, Nearest};
+use malachite_base::rounding_modes::RoundingMode::{self, Exact, Nearest, Up};
 use malachite_nz::natural::arithmetic::float::round::float_can_round;
 use malachite_nz::platform::Limb;
+use malachite_q::Rational;
 
 // Computes acos(x) for a finite nonzero `Float` x, rounded to precision `prec` with rounding mode
 // `rm`.
@@ -68,6 +70,72 @@ fn acos_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float,
                 increment = w >> 1;
             }
         }
+    }
+}
+
+// Computes acos(x) for a `Rational` x with 0 < |x| < 1, rounded to precision `prec` with rounding
+// mode `rm`. (The rest is handled by the caller.)
+//
+// MPFR has no arccosine of a rational. Its `Float` algorithm takes pi/2 - atan(x/sqrt(1 - x^2)) and
+// pays for the cancellation in both the subtraction and the quotient; here the identity is used in
+// the form
+//
+//     acos(x) = atan(sqrt((1 - x^2)/x^2)),
+//
+// whose argument is an exact `Rational`. For a positive x that is the whole answer, and nothing
+// cancels anywhere: the arctangent of a small argument is small, which is exactly what acos(x) is
+// when x is near 1. A negative x is pi minus that, which loses a single bit at worst, since the
+// result is then at least pi/2.
+pub(crate) fn acos_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    assert_ne!(rm, Exact, "Inexact acos_rational");
+    let positive = *x > 0u32;
+    let mut w = prec + prec.ceiling_log_base_2() + 10;
+    let mut increment = Limb::WIDTH;
+    if positive {
+        // With u = 1 - x, acos(x) = sqrt(2u)(1 + u/12 + ...). A `Rational` can sit close enough to
+        // 1 to put that below the smallest positive `Float`, which is a regime the `Float`
+        // arccosine cannot reach; there u is below 2^(2 SCALED_INPUT_EXPONENT), so the correction
+        // is invisible at any working precision the loop can reach and the answer is sqrt(2u),
+        // rounded. It is formed scaled up, the radicand by 2^(2 SCALE) so that its square root is
+        // scaled by 2^SCALE, and the underflow is then decided by the rounding mode alone. Taking
+        // the square root of 2u rather than of (1 - x^2)/x^2 also keeps this path cheap: an x this
+        // close to 1 has a huge numerator and denominator, and squaring it would double their size.
+        let u = Rational::ONE - x;
+        if u.floor_log_base_2_abs() + 2 <= const { SCALED_INPUT_EXPONENT << 1 } {
+            let scaled = u << const { (SCALE << 1) + 1 };
+            loop {
+                // rounded away from zero, the side acos(x) is on
+                let t = Float::sqrt_rational_prec_round_ref(&scaled, w, Up).0;
+                if let Some(result) = scaled_underflow(&t, true, prec, rm) {
+                    return result;
+                }
+                let t = t >> SCALE;
+                if float_can_round(t.significand_ref().unwrap(), w - 2, prec, rm) {
+                    return Float::from_float_prec_round(t, prec, rm);
+                }
+                w += increment;
+                increment = w >> 1;
+            }
+        }
+    }
+    let x2 = x.square();
+    // exact, and positive since |x| < 1
+    let r = (Rational::ONE - &x2) / x2;
+    loop {
+        // The square root is correctly rounded and the arctangent neither amplifies a relative
+        // error nor adds more than its own half ulp, so two bits of slack cover the positive case;
+        // pi and the subtraction take two more.
+        let t = Float::sqrt_rational_prec_ref(&r, w).0.atan_prec(w).0;
+        let (t, err) = if positive {
+            (t, 3)
+        } else {
+            (Float::pi_prec(w).0.sub_prec(t, w).0, 4)
+        };
+        if float_can_round(t.significand_ref().unwrap(), w - err, prec, rm) {
+            return Float::from_float_prec_round(t, prec, rm);
+        }
+        w += increment;
+        increment = w >> 1;
     }
 }
 
@@ -425,6 +493,206 @@ impl Float {
         let prec = self.significant_bits();
         self.acos_prec_round_assign(prec, rm)
     }
+
+    /// Computes $\arccos x$, the arccosine of a [`Rational`], rounding the result to the specified
+    /// precision and with the specified rounding mode and returning the result as a [`Float`]. The
+    /// [`Rational`] is taken by value. An [`Ordering`] is also returned, indicating whether the
+    /// rounded arccosine is less than, equal to, or greater than the exact arccosine.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,p,m) = \arccos x+\varepsilon.
+    /// $$
+    /// - If the result is NaN, or if $x$ is 1, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - Otherwise, if $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |\arccos
+    ///   x|\rfloor-p+1}$.
+    /// - Otherwise, if $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |\arccos
+    ///   x|\rfloor-p}$.
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(x,p,m)=\text{NaN}$ for $|x|>1$
+    /// - $f(0,p,m)=\pi/2$, rounded
+    /// - $f(1,p,m)=0.0$
+    /// - $f(-1,p,m)=\pi$, rounded
+    ///
+    /// The zero at $x=1$ is the only exact case.
+    ///
+    /// Underflow:
+    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    ///
+    /// Overflow is not possible, since the result lies in $[0,\pi]$. Underflow, which the [`Float`]
+    /// arccosine cannot reach, is possible here: a [`Rational`] may lie within $2^{-2^{31}}$ of 1,
+    /// and there $\arccos x$ is about $\sqrt{2(1-x)}$, which is below the smallest positive
+    /// [`Float`].
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::acos_rational_prec`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n (\log n)^3 \log\log n + m (\log m)^2 \log\log m)$
+    ///
+    /// $M(n, m) = O(n \log n + m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`: $(1-x^2)/x^2$ is formed exactly, and its square root and arctangent
+    /// are taken at a working precision of about $n$ bits, which costs the first term; the second
+    /// covers the $m$-bit input. The magnitude of the input does not drive the cost, and unlike the
+    /// [`Float`] arccosine neither does its closeness to $\pm1$, since nothing cancels.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision (which is the case unless $|x|>1$ or $x$ is 1).
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::acos_rational_prec_round(Rational::from_unsigneds(3u8, 5), 10, Floor);
+    /// assert_eq!(c.to_string(), "0.92676");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::acos_rational_prec_round(Rational::from_unsigneds(3u8, 5), 10, Ceiling);
+    /// assert_eq!(c.to_string(), "0.92773");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) = Float::acos_rational_prec_round(Rational::from_signeds(-3i8, 5), 10, Nearest);
+    /// assert_eq!(c.to_string(), "2.2148");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn acos_rational_prec_round(x: Rational, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+        Self::acos_rational_prec_round_ref(&x, prec, rm)
+    }
+
+    /// Computes $\arccos x$, the arccosine of a [`Rational`], rounding the result to the specified
+    /// precision and with the specified rounding mode and returning the result as a [`Float`]. The
+    /// [`Rational`] is taken by reference. An [`Ordering`] is also returned, indicating whether the
+    /// rounded arccosine is less than, equal to, or greater than the exact arccosine.
+    ///
+    /// See [`Float::acos_rational_prec_round`] for the error bounds, the special cases, underflow,
+    /// and the complexity; this function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) =
+    ///     Float::acos_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 10, Floor);
+    /// assert_eq!(c.to_string(), "0.92676");
+    /// assert_eq!(o, Less);
+    ///
+    /// // acos(1) is zero, exactly
+    /// let (c, o) = Float::acos_rational_prec_round_ref(&Rational::ONE, 10, Exact);
+    /// assert_eq!(c.to_string(), "0.0");
+    /// assert_eq!(o, Equal);
+    /// ```
+    pub fn acos_rational_prec_round_ref(
+        x: &Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        // acos(0) = pi/2
+        if *x == 0u32 {
+            let (pi, o) = Self::pi_prec_round(prec, rm);
+            // exact
+            return (pi >> 1u32, o);
+        }
+        match x.partial_cmp_abs(&1u32).unwrap() {
+            // the arccosine is NaN outside [-1, 1]
+            Greater => (Self::NAN, Equal),
+            // acos(1) = +0, exactly, and acos(-1) = pi
+            Equal => {
+                if *x > 0u32 {
+                    (Self::ZERO, Equal)
+                } else {
+                    Self::pi_prec_round(prec, rm)
+                }
+            }
+            Less => acos_rational_helper(x, prec, rm),
+        }
+    }
+
+    /// Computes $\arccos x$, the arccosine of a [`Rational`], rounding the result to the nearest
+    /// value of the specified precision and returning the result as a [`Float`]. The [`Rational`]
+    /// is taken by value. An [`Ordering`] is also returned, indicating whether the rounded
+    /// arccosine is less than, equal to, or greater than the exact arccosine.
+    ///
+    /// If the arccosine is equidistant from two [`Float`]s with the specified precision, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen.
+    ///
+    /// See [`Float::acos_rational_prec_round`] for the error bounds, the special cases, underflow,
+    /// and the complexity; this function behaves the same way.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::acos_rational_prec_round`] instead.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::acos_rational_prec(Rational::from_unsigneds(3u8, 5), 10);
+    /// assert_eq!(c.to_string(), "0.92773");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) = Float::acos_rational_prec(Rational::from_unsigneds(3u8, 5), 53);
+    /// assert_eq!(c.to_string(), "0.92729521800161219");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn acos_rational_prec(x: Rational, prec: u64) -> (Self, Ordering) {
+        Self::acos_rational_prec_round(x, prec, Nearest)
+    }
+
+    /// Computes $\arccos x$, the arccosine of a [`Rational`], rounding the result to the nearest
+    /// value of the specified precision and returning the result as a [`Float`]. The [`Rational`]
+    /// is taken by reference. An [`Ordering`] is also returned, indicating whether the rounded
+    /// arccosine is less than, equal to, or greater than the exact arccosine.
+    ///
+    /// See [`Float::acos_rational_prec`] and [`Float::acos_rational_prec_round`]; this function
+    /// behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::acos_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 53);
+    /// assert_eq!(c.to_string(), "0.92729521800161219");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn acos_rational_prec_ref(x: &Rational, prec: u64) -> (Self, Ordering) {
+        Self::acos_rational_prec_round_ref(x, prec, Nearest)
+    }
 }
 
 impl Acos for Float {
@@ -670,4 +938,65 @@ where
     for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
 {
     emulate_float_to_float_fn(Float::acos_prec, x)
+}
+
+/// Computes $\arccos x$, the arccosine of a [`Rational`], returning the result as a primitive
+/// float.
+///
+/// $$
+/// f(x) = \arccos x+\varepsilon,
+/// $$
+/// where $|\varepsilon| < 2^{\lfloor\log_2 |\arccos x|\rfloor-p}$ and $p$ is the precision of the
+/// output (24 if `T` is a [`f32`] and 53 if `T` is a [`f64`]); the special cases below are exact.
+///
+/// Special cases:
+/// - $f(x)=\text{NaN}$ for $|x|>1$
+/// - $f(0)=\pi/2$, rounded
+/// - $f(1)=0.0$
+/// - $f(-1)=\pi$, rounded
+///
+/// Overflow is not possible, since the result lies in $[0,\pi]$. The result is subnormal, or zero,
+/// only for an $x$ within $2^{-2^{31}}$ of 1.
+///
+/// # Worst-case complexity
+/// $T(m) = O(m \log m \log\log m)$
+///
+/// $M(m) = O(m \log m)$
+///
+/// where $T$ is time, $M$ is additional memory, and $m$ is `x.significant_bits()`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::{One, Two};
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::acos::primitive_float_acos_rational;
+/// use malachite_q::Rational;
+///
+/// // the arccosine is NaN outside [-1, 1]
+/// assert!(primitive_float_acos_rational::<f64>(&Rational::TWO).is_nan());
+/// assert_eq!(
+///     NiceFloat(primitive_float_acos_rational::<f64>(&Rational::ONE)),
+///     NiceFloat(0.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_acos_rational::<f64>(
+///         &Rational::from_unsigneds(3u8, 5)
+///     )),
+///     NiceFloat(0.9272952180016122)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_acos_rational::<f32>(
+///         &Rational::from_unsigneds(3u8, 5)
+///     )),
+///     NiceFloat(0.9272952)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_acos_rational<T: PrimitiveFloat>(x: &Rational) -> T
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    emulate_rational_to_float_fn(Float::acos_rational_prec_ref, x)
 }
