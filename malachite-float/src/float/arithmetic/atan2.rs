@@ -12,21 +12,22 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::float::arithmetic::atan::atan_rational_helper;
+use crate::float::arithmetic::atan::{atan_rational_helper, scaled_unsigned};
+use crate::float::arithmetic::sin::{SCALE, SCALED_INPUT_EXPONENT, scaled_underflow};
 use crate::{Float, emulate_float_float_to_float_fn, emulate_rational_rational_to_float_fn};
 use core::cmp::Ordering::{self, Equal, Greater, Less};
 use core::cmp::{max, min};
 use malachite_base::num::arithmetic::traits::{
-    Abs, Atan2, Atan2Assign, CeilingLogBase2, IsPowerOf2,
+    Abs, AbsAssign, Atan2, Atan2Assign, CeilingLogBase2, IsPowerOf2,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{
     NaN as NaNTrait, NegativeZero as NegativeZeroTrait, Zero as ZeroTrait,
 };
-use malachite_base::num::comparison::traits::PartialOrdAbs;
+use malachite_base::num::comparison::traits::{EqAbs, PartialOrdAbs};
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::num::logic::traits::{SignificantBits, TrailingZeros};
 use malachite_base::rounding_modes::RoundingMode::{
     self, Ceiling, Down, Exact, Floor, Nearest, Up,
 };
@@ -276,6 +277,207 @@ fn atan2_rational_prec_round_normal_ref(
     }
 }
 
+// The number of bits in MPFR's unsigned long, which bounds u.
+const ULSIZE: u64 = 64;
+// Wide enough to hold 3u exactly, and so u/2 and u/4 as well.
+const AUX_PREC: u64 = ULSIZE + 2;
+
+// z = s 3u 2^-k, with k between 1 and 3. This is mpfr_atan2u_aux2 from atan2u.c, MPFR 4.2.2.
+fn atan2u_aux2(u: u64, k: u32, positive: bool, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    // 3u needs at most ULSIZE + 2 bits, so t is exact
+    let t = Float::from_unsigned_prec_round(u, AUX_PREC, Exact)
+        .0
+        .mul_prec_round(const { Float::const_from_unsigned(3) }, AUX_PREC, Exact)
+        .0
+        >> k;
+    Float::from_float_prec_round(if positive { t } else { -t }, prec, rm)
+}
+
+// round(s (u/2 - eps)), where eps < 1/2 ulp(u/2). This is mpfr_atan2u_aux3.
+fn atan2u_aux3(u: u64, positive: bool, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    // exact, since the working precision is at least ULSIZE
+    let mut t = Float::from_unsigned_prec_round(u, max(prec + 2, ULSIZE), Exact).0 >> 1u32;
+    // u/2 - 1/4 ulp_p(u/2) <= t <= u/2 for p = prec, which makes t round like u/2 - eps
+    t.decrement();
+    Float::from_float_prec_round(if positive { t } else { -t }, prec, rm)
+}
+
+// round(sign(y) (u/4 - sign(x) eps)), where eps < 1/2 ulp(u/4). This is mpfr_atan2u_aux4.
+fn atan2u_aux4(
+    u: u64,
+    x_positive: bool,
+    y_positive: bool,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    let w = if prec > ULSIZE { prec + 2 } else { AUX_PREC };
+    // exact
+    let mut t = Float::from_unsigned_prec_round(u, w, Exact).0 >> 2u32;
+    if x_positive {
+        t.decrement();
+    } else {
+        t.increment();
+    }
+    Float::from_float_prec_round(if y_positive { t } else { -t }, prec, rm)
+}
+
+// atan2u(y, x, u) when |y/x| is below the bottom of the exponent range and x is positive.
+//
+// MPFR reaches this only when the result underflows too, and asserts as much; here a large u can
+// lift |y/x| u/(2 pi) back into the range, since Malachite's range is so much narrower. For a |y/x|
+// this small atan|y/x| is its own leading term, so the quotient is formed from the numerator scaled
+// up by 2^SCALE, exactly as `sin_with_period` and `atan_with_period_rational` do, and the underflow
+// that remains is decided by the rounding mode alone.
+fn atan2u_tiny(
+    y: &Float,
+    x: &Float,
+    u: u64,
+    positive: bool,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    // |y| 2^SCALE stays well inside the range: this branch needs EXP(y) <= EXP(x) + MIN_EXPONENT,
+    // and EXP(x) is at most MAX_EXPONENT = -MIN_EXPONENT, so EXP(y) is at most 1 x is positive in
+    // this branch, so the quotient carries the sign of y; keeping it here rather than taking
+    // absolute values is what makes `Up` mean away from zero and lets the rounding mode see the
+    // sign it must round with
+    let ys = y << SCALE;
+    let xa = x.clone();
+    let mut w = prec + prec.ceiling_log_base_2() + 10;
+    let mut increment = Limb::WIDTH;
+    let u_float = Float::from(u);
+    loop {
+        // rounded away from zero throughout, so each step is a relative 1 + theta with |theta| <=
+        // 2^(1 - w)
+        let mut t = ys.div_prec_round_ref_ref(&xa, w, Up).0;
+        t.mul_prec_round_assign_ref(&u_float, w, Up);
+        // 2 pi rounded toward zero, so that the quotient rounds away
+        let two_pi = Float::pi_prec_round(w, Down).0 << 1u32;
+        t.div_prec_round_assign(two_pi, w, Up);
+        if let Some(result) = scaled_underflow(&t, positive, prec, rm) {
+            return result;
+        }
+        let t = t >> SCALE;
+        if float_can_round(t.significand_ref().unwrap(), w - 4, prec, rm) {
+            return Float::from_float_prec_round(t, prec, rm);
+        }
+        w += increment;
+        increment = w >> 1;
+    }
+}
+
+// Computes atan2u(y, x, u) = atan2(y, x) u/(2 pi) for finite nonzero y and x with |y| != |x| and
+// nonzero u, rounded to precision `prec` with rounding mode `rm`.
+//
+// This is mpfr_atan2u from atan2u.c, MPFR 4.2.2, past the special cases.
+fn atan2_with_period_prec_round_normal_ref(
+    y: &Float,
+    x: &Float,
+    u: u64,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    assert_ne!(rm, Exact, "Inexact atan2_with_period");
+    let x_positive = *x > 0u32;
+    let y_positive = *y > 0u32;
+    // When |y/x| is extreme the result lies astronomically close to a quadrant boundary: u/4 as
+    // |y/x| grows without bound, and u/2 as it shrinks to nothing with x negative. If that boundary
+    // is also a rounding boundary at the target precision -- that is, if u is representable in prec
+    // + 1 bits, so that u/4 and u/2 are either representable or exactly halfway between two
+    // representable numbers -- the loop below cannot settle the rounding until its working
+    // precision passes |EXP(y) - EXP(x)|, which the exponent range allows to be about 2^31. The two
+    // helpers answer such cases directly.
+    //
+    // MPFR reaches those helpers only when the division returns zero or an infinity, which is a
+    // much rarer condition than the situation itself, so mpfr_atan2u hangs here; this is the one
+    // place where the port deliberately departs from its structure. Where u is not representable in
+    // prec + 1 bits the loop settles quickly, since the boundary then lies strictly inside a
+    // rounding interval.
+    let exp_y = i64::from(y.get_exponent().unwrap());
+    let exp_x = i64::from(x.get_exponent().unwrap());
+    let d = exp_y - exp_x;
+    let p = i64::exact_from(prec);
+    if i64::exact_from(u.significant_bits() - TrailingZeros::trailing_zeros(u)) <= p + 1 {
+        // |y/x| >= 2^(d - 1) and u/(2 pi) < 2^(EXP(u) - 2), so u/(2 pi |y/x|) is below half an ulp
+        // of u/4 once d >= p + 2
+        if d >= p + 2 {
+            return atan2u_aux4(u, x_positive, y_positive, prec, rm);
+        }
+        // |y/x| < 2^(d + 1), so atanu(|y/x|) is below half an ulp of u/2 once d <= -p - 1; for a
+        // negative x the result is then just below u/2. For a positive x it is just above zero,
+        // which the loop handles, since there the limit is approached relatively rather than
+        // absolutely.
+        if !x_positive && d < -p {
+            return atan2u_aux3(u, y_positive, prec, rm);
+        }
+    }
+    // The periodic arctangent underflows for a tiny quotient with a small u, which MPFR's wider
+    // exponent range never sees. This is decided from the exponents rather than from the computed
+    // value: an arctangent that rounded up to the smallest positive `Float` is not zero, so a test
+    // on the value misses it, and no working precision can ever certify it, so the loop below would
+    // spin forever. The bound is the one `sin_with_period` scales at; past it |y/x| is above
+    // 2^(MIN_EXPONENT + 65), whose arctangent in u ths of a turn is far clear of the bottom.
+    if d <= SCALED_INPUT_EXPONENT {
+        return if x_positive {
+            atan2u_tiny(y, x, u, y_positive, prec, rm)
+        } else {
+            // u/2 minus a quantity this small rounds like u/2 stepped one ulp toward zero, whether
+            // or not u/2 lies on a rounding boundary
+            atan2u_aux3(u, y_positive, prec, rm)
+        };
+    }
+    let log_u = u.ceiling_log_base_2();
+    let mut w = prec + prec.ceiling_log_base_2() + 10;
+    let mut increment = Limb::WIDTH;
+    loop {
+        // In atan2pi units the four quadrants are [0, 1/2], [1/2, 1], [-1, -1/2] and [-1/2, 0];
+        // here they are [0, u/4], [u/4, u/2], [-u/2, -u/4] and [-u/4, 0].
+        let t = y.div_prec_ref_ref(x, w).0;
+        // the quotient can still overflow, which MPFR's range does not let it do
+        if !t.is_finite() {
+            return atan2u_aux4(u, x_positive, y_positive, prec, rm);
+        }
+        let mut t = t;
+        t.abs_assign();
+        let exp_t = i64::from(t.get_exponent().unwrap());
+        // |t - |y/x|| <= e1 := 1/2 ulp(t) = 2^(exp_t - w - 1)
+        t.atan_with_period_prec_assign(u, w);
+        // the derivative of atanu(s) is u/(1 + s^2)/(2 pi), so the new t is within 1/2 ulp(t) + e1
+        // u/(1 + s^2)/4 of atanu(|y/x|)
+        let e = if exp_t < 1 { 0 } else { exp_t - 1 };
+        // max(1, |t|) >= 2^e, so 1/(1 + t^2) <= 2^(-2 e)
+        let mut e = exp_t - (e << 1) + i64::exact_from(log_u) - 2;
+        // now e1 u/(1 + t^2)/4 <= 2^(e - w - 1), so |t - atanu(y/x)| <= 2^(e - w)
+        let mut exp_t = i64::from(t.get_exponent().unwrap());
+        e = max(e, exp_t);
+        if !x_positive {
+            // compute u/2 - t
+            t <<= 1u32; // error <= 2^(e + 1 - w)
+            t = Float::from(u).sub_prec(t, w).0;
+            exp_t = i64::from(t.get_exponent().unwrap());
+            // error <= 2^(exp_t - w - 1) + 2^(e + 1 - w)
+            e = max(exp_t - 1, e + 1);
+            // error <= 2^(e + 1 - w)
+            t >>= 1u32;
+            // error <= 2^(e - w)
+            exp_t = i64::from(t.get_exponent().unwrap());
+        }
+        // either way the error is at most 2^(e - w); expressed relative to t, that is 2^(exp_t - w
+        // + err) with err = e - exp_t
+        e -= exp_t;
+        // atan2u is odd with respect to y
+        let t = if y_positive { t } else { -t };
+        // a negative e claims better than half-ulp accuracy, which cannot beat t's own precision
+        let err = min(i64::exact_from(w), i64::exact_from(w) - e);
+        if err > 0 && float_can_round(t.significand_ref().unwrap(), u64::exact_from(err), prec, rm)
+        {
+            return Float::from_float_prec_round(t, prec, rm);
+        }
+        w += increment;
+        increment = w >> 1;
+    }
+}
+
 // A signed zero, exactly.
 const fn signed_zero(negative: bool) -> (Float, Ordering) {
     (
@@ -366,6 +568,842 @@ impl Float {
             };
         }
         atan2_prec_round_normal_ref(y, x, prec, rm)
+    }
+
+    /// Computes $\operatorname{atan2}(y,x)u/(2\pi)$, the angle of the point $(x,y)$ measured from
+    /// the positive $x$-axis in $u$ths of a turn, rounding the result to the specified precision
+    /// and with the specified rounding mode. The [`Float`]s are both taken by reference. An
+    /// [`Ordering`] is also returned, indicating whether the rounded angle is less than, equal to,
+    /// or greater than the exact angle. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`Float::atan2_with_period_prec_round`] for the error bounds, the special cases,
+    /// underflow, and the complexity; this function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// // an eighth of a turn
+    /// let (t, o) =
+    ///     (&Float::ONE).atan2_with_period_prec_round_ref_ref(&Float::ONE, 360, 10, Exact);
+    /// assert_eq!(t.to_string(), "45.000");
+    /// assert_eq!(o, Equal);
+    ///
+    /// let (t, o) =
+    ///     (&Float::ONE).atan2_with_period_prec_round_ref_ref(&Float::TWO, 360, 10, Floor);
+    /// assert_eq!(t.to_string(), "26.562");
+    /// assert_eq!(o, Less);
+    /// ```
+    pub fn atan2_with_period_prec_round_ref_ref(
+        &self,
+        other: &Self,
+        u: u64,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        let (y, x) = (self, other);
+        // atan2u is NaN if either argument is
+        if y.is_nan() || x.is_nan() {
+            return (Self::NAN, Equal);
+        }
+        // the quadrant is chosen by the sign bits, so a signed zero behaves like a signed number
+        let y_positive = y.is_sign_positive();
+        let x_positive = x.is_sign_positive();
+        if !x.is_finite() {
+            if !y.is_finite() {
+                return if x_positive {
+                    // atan2u(+-infinity, +infinity, u) = +-u/8
+                    scaled_unsigned(u, 3, y_positive, prec, rm)
+                } else {
+                    // atan2u(+-infinity, -infinity, u) = +-3u/8
+                    atan2u_aux2(u, 3, y_positive, prec, rm)
+                };
+            }
+            // atan2u(+-y, -infinity, u) = +-u/2 and atan2u(+-y, +infinity, u) = +-0, which are also
+            // the IEEE 754-2019 answers for a zero y against a nonzero x
+            return if x_positive {
+                signed_zero(!y_positive)
+            } else {
+                scaled_unsigned(u, 1, y_positive, prec, rm)
+            };
+        }
+        // atan2u(+-infinity, x, u) = +-u/4 for a finite x
+        if !y.is_finite() {
+            return scaled_unsigned(u, 2, y_positive, prec, rm);
+        }
+        if *y == 0u32 {
+            return if x_positive {
+                // atan2u(+-0.0, x, u) = +-0.0 for a positive-signed x
+                signed_zero(!y_positive)
+            } else {
+                // atan2u(+-0.0, x, u) = +-u/2 for a negative-signed x
+                scaled_unsigned(u, 1, y_positive, prec, rm)
+            };
+        }
+        // atan2u(y, +-0.0, u) = +-u/4, with the sign of y
+        if *x == 0u32 {
+            return scaled_unsigned(u, 2, y_positive, prec, rm);
+        }
+        // |y| = |x| puts the angle on a quadrant diagonal, an exact eighth or three eighths of a
+        // turn
+        if y.eq_abs(x) {
+            return if x_positive {
+                scaled_unsigned(u, 3, y_positive, prec, rm)
+            } else {
+                atan2u_aux2(u, 3, y_positive, prec, rm)
+            };
+        }
+        // Every angle measures zero units when the whole turn does. MPFR returns +-1 here for a
+        // negative x, which disagrees with its own definition, with the formula it uses for that
+        // quadrant (u/2 - atanu, which is 0 - 0), and with the branches above, all of which return
+        // zero for u = 0.
+        if u == 0 {
+            return signed_zero(!y_positive);
+        }
+        atan2_with_period_prec_round_normal_ref(y, x, u, prec, rm)
+    }
+
+    /// Computes $\operatorname{atan2}(y,x)u/(2\pi)$, the angle of the point $(x,y)$ measured from
+    /// the positive $x$-axis in $u$ths of a turn, rounding the result to the specified precision
+    /// and with the specified rounding mode. The [`Float`]s are both taken by value. An
+    /// [`Ordering`] is also returned, indicating whether the rounded angle is less than, equal to,
+    /// or greater than the exact angle. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(y,x,u,p,m) = \operatorname{atan2}(y,x)u/(2\pi)+\varepsilon.
+    /// $$
+    /// - If $y$ or $x$ is NaN, or the result is one of the exact cases below, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - Otherwise, if $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2
+    ///   |\operatorname{atan2}(y,x)u/(2\pi)|\rfloor-p+1}$.
+    /// - Otherwise, if $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |\operatorname{atan2}(y,x)u/(2\pi)|\rfloor-p}$.
+    ///
+    /// Special cases, in which the sign of a zero argument selects the quadrant:
+    /// - $f(\text{NaN},x,u,p,m)=f(y,\text{NaN},u,p,m)=\text{NaN}$
+    /// - $f(\pm\infty,+\infty,u,p,m)=\pm u/8$ and $f(\pm\infty,-\infty,u,p,m)=\pm3u/8$
+    /// - $f(\pm\infty,x,u,p,m)=\pm u/4$ for finite $x$
+    /// - $f(y,+\infty,u,p,m)=\pm0.0$ and $f(y,-\infty,u,p,m)=\pm u/2$, with the sign of $y$
+    /// - $f(\pm0.0,x,u,p,m)=\pm0.0$ if $x$ is positive or $+0.0$, and $\pm u/2$ if $x$ is negative
+    ///   or $-0.0$
+    /// - $f(y,\pm0.0,u,p,m)=\pm u/4$, with the sign of $y$, for nonzero $y$
+    /// - $f(\pm x,x,u,p,m)=\pm u/8$ for positive $x$, and $\pm3u/8$ for negative $x$
+    /// - $f(y,x,0,p,m)=\pm0.0$, with the sign of $y$
+    ///
+    /// These are the only exact cases, and the turn fractions are exact only when $p$ is large
+    /// enough to hold them.
+    ///
+    /// The last is a deliberate divergence from MPFR, whose `mpfr_atan2u` returns $\pm1$ for a
+    /// negative $x$ when $u$ is zero. That disagrees with the function's own definition, with the
+    /// formula MPFR uses for that quadrant, and with MPFR's own answers when $y$ is zero or
+    /// infinite or $|y|=|x|$, all of which are zero.
+    ///
+    /// Overflow is not possible, since $|f(y,x,u,p,m)| \leq u/2 < 2^{63}$. The result underflows
+    /// only for a positive $x$ with $|y/x|$ tiny and $u$ small, where it is about $yu/(2\pi x)$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::atan2_with_period_prec`]
+    /// instead. If you know that your target precision is the precision of the inputs, consider
+    /// using [`Float::atan2_with_period_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n (\log n)^3 \log\log n + m (\log m)^2 \log\log m)$
+    ///
+    /// $M(n, m) = O(n \log n + m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(self.significant_bits(), other.significant_bits())`: the quotient is formed at a
+    /// working precision of about $n$ bits and its periodic arctangent taken there, which costs the
+    /// first term; the second covers the inputs. The magnitudes of the inputs do not drive the
+    /// cost.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// // an eighth of a turn
+    /// let (t, o) = Float::ONE.atan2_with_period_prec_round(Float::ONE, 360, 10, Exact);
+    /// assert_eq!(t.to_string(), "45.000");
+    /// assert_eq!(o, Equal);
+    ///
+    /// let (t, o) = Float::ONE.atan2_with_period_prec_round(Float::TWO, 360, 10, Floor);
+    /// assert_eq!(t.to_string(), "26.562");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn atan2_with_period_prec_round(
+        self,
+        other: Self,
+        u: u64,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        self.atan2_with_period_prec_round_ref_ref(&other, u, prec, rm)
+    }
+
+    /// Computes $\operatorname{atan2}(y,x)u/(2\pi)$, the angle of the point $(x,y)$ measured from
+    /// the positive $x$-axis in $u$ths of a turn, rounding the result to the specified precision
+    /// and with the specified rounding mode. The first [`Float`] is taken by value and the second
+    /// by reference. An [`Ordering`] is also returned, indicating whether the rounded angle is less
+    /// than, equal to, or greater than the exact angle. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`Float::atan2_with_period_prec_round`] for the error bounds, the special cases,
+    /// underflow, and the complexity; this function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// // an eighth of a turn
+    /// let (t, o) = Float::ONE.atan2_with_period_prec_round_val_ref(&Float::ONE, 360, 10, Exact);
+    /// assert_eq!(t.to_string(), "45.000");
+    /// assert_eq!(o, Equal);
+    ///
+    /// let (t, o) = Float::ONE.atan2_with_period_prec_round_val_ref(&Float::TWO, 360, 10, Floor);
+    /// assert_eq!(t.to_string(), "26.562");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn atan2_with_period_prec_round_val_ref(
+        self,
+        other: &Self,
+        u: u64,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        self.atan2_with_period_prec_round_ref_ref(other, u, prec, rm)
+    }
+
+    /// Computes $\operatorname{atan2}(y,x)u/(2\pi)$, the angle of the point $(x,y)$ measured from
+    /// the positive $x$-axis in $u$ths of a turn, rounding the result to the specified precision
+    /// and with the specified rounding mode. The first [`Float`] is taken by reference and the
+    /// second by value. An [`Ordering`] is also returned, indicating whether the rounded angle is
+    /// less than, equal to, or greater than the exact angle. Although `NaN`s are not comparable to
+    /// any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`Float::atan2_with_period_prec_round`] for the error bounds, the special cases,
+    /// underflow, and the complexity; this function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// // an eighth of a turn
+    /// let (t, o) = (&Float::ONE).atan2_with_period_prec_round_ref_val(Float::ONE, 360, 10, Exact);
+    /// assert_eq!(t.to_string(), "45.000");
+    /// assert_eq!(o, Equal);
+    ///
+    /// let (t, o) = (&Float::ONE).atan2_with_period_prec_round_ref_val(Float::TWO, 360, 10, Floor);
+    /// assert_eq!(t.to_string(), "26.562");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn atan2_with_period_prec_round_ref_val(
+        &self,
+        other: Self,
+        u: u64,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        self.atan2_with_period_prec_round_ref_ref(&other, u, prec, rm)
+    }
+
+    /// Computes $\operatorname{atan2}(y,x)u/(2\pi)$, the angle of the point $(x,y)$ measured from
+    /// the positive $x$-axis in $u$ths of a turn, rounding the result to the nearest value of the
+    /// specified precision. The [`Float`]s are both taken by value. An [`Ordering`] is also
+    /// returned, indicating whether the rounded angle is less than, equal to, or greater than the
+    /// exact angle. Although `NaN`s are not comparable to any [`Float`], whenever this function
+    /// returns a `NaN` it also returns `Equal`.
+    ///
+    /// If the angle is equidistant from two [`Float`]s with the specified precision, the [`Float`]
+    /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
+    /// the `Nearest` rounding mode.
+    ///
+    /// See [`Float::atan2_with_period_prec_round`] for the error bounds, the special cases,
+    /// underflow, and the complexity; this function is that one with `Nearest`.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::atan2_with_period_prec_round`] instead.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::ONE.atan2_with_period_prec(Float::TWO, 360, 10);
+    /// assert_eq!(t.to_string(), "26.562");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn atan2_with_period_prec(self, other: Self, u: u64, prec: u64) -> (Self, Ordering) {
+        self.atan2_with_period_prec_ref_ref(&other, u, prec)
+    }
+
+    /// Computes $\operatorname{atan2}(y,x)u/(2\pi)$, the angle of the point $(x,y)$ measured from
+    /// the positive $x$-axis in $u$ths of a turn, rounding the result to the nearest value of the
+    /// specified precision. The first [`Float`] is taken by value and the second by reference. An
+    /// [`Ordering`] is also returned, indicating whether the rounded angle is less than, equal to,
+    /// or greater than the exact angle. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// If the angle is equidistant from two [`Float`]s with the specified precision, the [`Float`]
+    /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
+    /// the `Nearest` rounding mode.
+    ///
+    /// See [`Float::atan2_with_period_prec_round`] for the error bounds, the special cases,
+    /// underflow, and the complexity; this function is that one with `Nearest`.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::atan2_with_period_prec_round`] instead.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::ONE.atan2_with_period_prec_val_ref(&Float::TWO, 360, 10);
+    /// assert_eq!(t.to_string(), "26.562");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn atan2_with_period_prec_val_ref(
+        self,
+        other: &Self,
+        u: u64,
+        prec: u64,
+    ) -> (Self, Ordering) {
+        self.atan2_with_period_prec_ref_ref(other, u, prec)
+    }
+
+    /// Computes $\operatorname{atan2}(y,x)u/(2\pi)$, the angle of the point $(x,y)$ measured from
+    /// the positive $x$-axis in $u$ths of a turn, rounding the result to the nearest value of the
+    /// specified precision. The first [`Float`] is taken by reference and the second by value. An
+    /// [`Ordering`] is also returned, indicating whether the rounded angle is less than, equal to,
+    /// or greater than the exact angle. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// If the angle is equidistant from two [`Float`]s with the specified precision, the [`Float`]
+    /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
+    /// the `Nearest` rounding mode.
+    ///
+    /// See [`Float::atan2_with_period_prec_round`] for the error bounds, the special cases,
+    /// underflow, and the complexity; this function is that one with `Nearest`.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::atan2_with_period_prec_round`] instead.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = (&Float::ONE).atan2_with_period_prec_ref_val(Float::TWO, 360, 10);
+    /// assert_eq!(t.to_string(), "26.562");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn atan2_with_period_prec_ref_val(
+        &self,
+        other: Self,
+        u: u64,
+        prec: u64,
+    ) -> (Self, Ordering) {
+        self.atan2_with_period_prec_ref_ref(&other, u, prec)
+    }
+
+    /// Computes $\operatorname{atan2}(y,x)u/(2\pi)$, the angle of the point $(x,y)$ measured from
+    /// the positive $x$-axis in $u$ths of a turn, rounding the result to the nearest value of the
+    /// specified precision. The [`Float`]s are both taken by reference. An [`Ordering`] is also
+    /// returned, indicating whether the rounded angle is less than, equal to, or greater than the
+    /// exact angle. Although `NaN`s are not comparable to any [`Float`], whenever this function
+    /// returns a `NaN` it also returns `Equal`.
+    ///
+    /// If the angle is equidistant from two [`Float`]s with the specified precision, the [`Float`]
+    /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
+    /// the `Nearest` rounding mode.
+    ///
+    /// See [`Float::atan2_with_period_prec_round`] for the error bounds, the special cases,
+    /// underflow, and the complexity; this function is that one with `Nearest`.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::atan2_with_period_prec_round`] instead.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = (&Float::ONE).atan2_with_period_prec_ref_ref(&Float::TWO, 360, 10);
+    /// assert_eq!(t.to_string(), "26.562");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn atan2_with_period_prec_ref_ref(
+        &self,
+        other: &Self,
+        u: u64,
+        prec: u64,
+    ) -> (Self, Ordering) {
+        self.atan2_with_period_prec_round_ref_ref(other, u, prec, Nearest)
+    }
+
+    /// Computes $\operatorname{atan2}(y,x)u/(2\pi)$, the angle of the point $(x,y)$ measured from
+    /// the positive $x$-axis in $u$ths of a turn, rounding the result to the specified rounding
+    /// mode. The [`Float`]s are both taken by value. An [`Ordering`] is also returned, indicating
+    /// whether the rounded angle is less than, equal to, or greater than the exact angle. Although
+    /// `NaN`s are not comparable to any [`Float`], whenever this function returns a `NaN` it also
+    /// returns `Equal`.
+    ///
+    /// The precision of the output is the maximum of the precisions of the inputs. See
+    /// [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// See [`Float::atan2_with_period_prec_round`] for the error bounds, the special cases,
+    /// underflow, and the complexity; this function is that one with `prec` the maximum input
+    /// precision.
+    ///
+    /// If you want to specify the output precision, consider using
+    /// [`Float::atan2_with_period_prec_round`] instead.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the precision of
+    /// the inputs.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::from(0.3f64).atan2_with_period_round(Float::from(0.4f64), 360, Floor);
+    /// assert_eq!(t.to_string(), "36.869897645844013");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn atan2_with_period_round(
+        self,
+        other: Self,
+        u: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        let prec = max(self.significant_bits(), other.significant_bits());
+        self.atan2_with_period_prec_round_ref_ref(&other, u, prec, rm)
+    }
+
+    /// Computes $\operatorname{atan2}(y,x)u/(2\pi)$, the angle of the point $(x,y)$ measured from
+    /// the positive $x$-axis in $u$ths of a turn, rounding the result to the specified rounding
+    /// mode. The first [`Float`] is taken by value and the second by reference. An [`Ordering`] is
+    /// also returned, indicating whether the rounded angle is less than, equal to, or greater than
+    /// the exact angle. Although `NaN`s are not comparable to any [`Float`], whenever this function
+    /// returns a `NaN` it also returns `Equal`.
+    ///
+    /// The precision of the output is the maximum of the precisions of the inputs. See
+    /// [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// See [`Float::atan2_with_period_prec_round`] for the error bounds, the special cases,
+    /// underflow, and the complexity; this function is that one with `prec` the maximum input
+    /// precision.
+    ///
+    /// If you want to specify the output precision, consider using
+    /// [`Float::atan2_with_period_prec_round`] instead.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the precision of
+    /// the inputs.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) =
+    ///     Float::from(0.3f64).atan2_with_period_round_val_ref(&Float::from(0.4f64), 360, Floor);
+    /// assert_eq!(t.to_string(), "36.869897645844013");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn atan2_with_period_round_val_ref(
+        self,
+        other: &Self,
+        u: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        let prec = max(self.significant_bits(), other.significant_bits());
+        self.atan2_with_period_prec_round_ref_ref(other, u, prec, rm)
+    }
+
+    /// Computes $\operatorname{atan2}(y,x)u/(2\pi)$, the angle of the point $(x,y)$ measured from
+    /// the positive $x$-axis in $u$ths of a turn, rounding the result to the specified rounding
+    /// mode. The first [`Float`] is taken by reference and the second by value. An [`Ordering`] is
+    /// also returned, indicating whether the rounded angle is less than, equal to, or greater than
+    /// the exact angle. Although `NaN`s are not comparable to any [`Float`], whenever this function
+    /// returns a `NaN` it also returns `Equal`.
+    ///
+    /// The precision of the output is the maximum of the precisions of the inputs. See
+    /// [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// See [`Float::atan2_with_period_prec_round`] for the error bounds, the special cases,
+    /// underflow, and the complexity; this function is that one with `prec` the maximum input
+    /// precision.
+    ///
+    /// If you want to specify the output precision, consider using
+    /// [`Float::atan2_with_period_prec_round`] instead.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the precision of
+    /// the inputs.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) =
+    ///     (&Float::from(0.3f64)).atan2_with_period_round_ref_val(Float::from(0.4f64), 360, Floor);
+    /// assert_eq!(t.to_string(), "36.869897645844013");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn atan2_with_period_round_ref_val(
+        &self,
+        other: Self,
+        u: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        let prec = max(self.significant_bits(), other.significant_bits());
+        self.atan2_with_period_prec_round_ref_ref(&other, u, prec, rm)
+    }
+
+    /// Computes $\operatorname{atan2}(y,x)u/(2\pi)$, the angle of the point $(x,y)$ measured from
+    /// the positive $x$-axis in $u$ths of a turn, rounding the result to the specified rounding
+    /// mode. The [`Float`]s are both taken by reference. An [`Ordering`] is also returned,
+    /// indicating whether the rounded angle is less than, equal to, or greater than the exact
+    /// angle. Although `NaN`s are not comparable to any [`Float`], whenever this function returns a
+    /// `NaN` it also returns `Equal`.
+    ///
+    /// The precision of the output is the maximum of the precisions of the inputs. See
+    /// [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// See [`Float::atan2_with_period_prec_round`] for the error bounds, the special cases,
+    /// underflow, and the complexity; this function is that one with `prec` the maximum input
+    /// precision.
+    ///
+    /// If you want to specify the output precision, consider using
+    /// [`Float::atan2_with_period_prec_round`] instead.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the precision of
+    /// the inputs.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let y = Float::from(0.3f64);
+    /// let x = Float::from(0.4f64);
+    /// let (t, o) = (&y).atan2_with_period_round_ref_ref(&x, 360, Floor);
+    /// assert_eq!(t.to_string(), "36.869897645844013");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn atan2_with_period_round_ref_ref(
+        &self,
+        other: &Self,
+        u: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        let prec = max(self.significant_bits(), other.significant_bits());
+        self.atan2_with_period_prec_round_ref_ref(other, u, prec, rm)
+    }
+
+    /// Computes $\operatorname{atan2}(y,x)u/(2\pi)$, the angle of the point $(x,y)$ measured from
+    /// the positive $x$-axis in $u$ths of a turn, rounding the result to the specified precision
+    /// and with the specified rounding mode. The first [`Float`] is replaced by the result, and the
+    /// second is taken by value. An [`Ordering`] is returned, indicating whether the rounded angle
+    /// is less than, equal to, or greater than the exact angle.
+    ///
+    /// See [`Float::atan2_with_period_prec_round`] for the error bounds, the special cases,
+    /// underflow, and the complexity; this function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut y = Float::ONE;
+    /// assert_eq!(
+    ///     y.atan2_with_period_prec_round_assign(Float::TWO, 360, 10, Floor),
+    ///     Less
+    /// );
+    /// assert_eq!(y.to_string(), "26.562");
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn atan2_with_period_prec_round_assign(
+        &mut self,
+        other: Self,
+        u: u64,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> Ordering {
+        let (t, o) = self.atan2_with_period_prec_round_ref_ref(&other, u, prec, rm);
+        *self = t;
+        o
+    }
+
+    /// Computes $\operatorname{atan2}(y,x)u/(2\pi)$, the angle of the point $(x,y)$ measured from
+    /// the positive $x$-axis in $u$ths of a turn, rounding the result to the specified precision
+    /// and with the specified rounding mode. The first [`Float`] is replaced by the result, and the
+    /// second is taken by reference. An [`Ordering`] is returned, indicating whether the rounded
+    /// angle is less than, equal to, or greater than the exact angle.
+    ///
+    /// See [`Float::atan2_with_period_prec_round`] for the error bounds, the special cases,
+    /// underflow, and the complexity; this function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut y = Float::ONE;
+    /// assert_eq!(
+    ///     y.atan2_with_period_prec_round_assign_ref(&Float::TWO, 360, 10, Floor),
+    ///     Less
+    /// );
+    /// assert_eq!(y.to_string(), "26.562");
+    /// ```
+    #[inline]
+    pub fn atan2_with_period_prec_round_assign_ref(
+        &mut self,
+        other: &Self,
+        u: u64,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> Ordering {
+        let (t, o) = self.atan2_with_period_prec_round_ref_ref(other, u, prec, rm);
+        *self = t;
+        o
+    }
+
+    /// Computes $\operatorname{atan2}(y,x)u/(2\pi)$, the angle of the point $(x,y)$ measured from
+    /// the positive $x$-axis in $u$ths of a turn, rounding the result to the nearest value of the
+    /// specified precision. The first [`Float`] is replaced by the result, and the second is taken
+    /// by value. An [`Ordering`] is returned, indicating whether the rounded angle is less than,
+    /// equal to, or greater than the exact angle.
+    ///
+    /// See [`Float::atan2_with_period_prec_round`] for the error bounds, the special cases,
+    /// underflow, and the complexity; this function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut y = Float::ONE;
+    /// assert_eq!(y.atan2_with_period_prec_assign(Float::TWO, 360, 10), Less);
+    /// assert_eq!(y.to_string(), "26.562");
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn atan2_with_period_prec_assign(&mut self, other: Self, u: u64, prec: u64) -> Ordering {
+        let (t, o) = self.atan2_with_period_prec_ref_ref(&other, u, prec);
+        *self = t;
+        o
+    }
+
+    /// Computes $\operatorname{atan2}(y,x)u/(2\pi)$, the angle of the point $(x,y)$ measured from
+    /// the positive $x$-axis in $u$ths of a turn, rounding the result to the nearest value of the
+    /// specified precision. The first [`Float`] is replaced by the result, and the second is taken
+    /// by reference. An [`Ordering`] is returned, indicating whether the rounded angle is less
+    /// than, equal to, or greater than the exact angle.
+    ///
+    /// See [`Float::atan2_with_period_prec_round`] for the error bounds, the special cases,
+    /// underflow, and the complexity; this function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut y = Float::ONE;
+    /// assert_eq!(
+    ///     y.atan2_with_period_prec_assign_ref(&Float::TWO, 360, 10),
+    ///     Less
+    /// );
+    /// assert_eq!(y.to_string(), "26.562");
+    /// ```
+    #[inline]
+    pub fn atan2_with_period_prec_assign_ref(
+        &mut self,
+        other: &Self,
+        u: u64,
+        prec: u64,
+    ) -> Ordering {
+        let (t, o) = self.atan2_with_period_prec_ref_ref(other, u, prec);
+        *self = t;
+        o
+    }
+
+    /// Computes $\operatorname{atan2}(y,x)u/(2\pi)$, the angle of the point $(x,y)$ measured from
+    /// the positive $x$-axis in $u$ths of a turn, rounding the result to the specified rounding
+    /// mode. The first [`Float`] is replaced by the result, and the second is taken by value. An
+    /// [`Ordering`] is returned, indicating whether the rounded angle is less than, equal to, or
+    /// greater than the exact angle.
+    ///
+    /// See [`Float::atan2_with_period_prec_round`] for the error bounds, the special cases,
+    /// underflow, and the complexity; this function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the precision of
+    /// the inputs.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut y = Float::from(0.3f64);
+    /// assert_eq!(
+    ///     y.atan2_with_period_round_assign(Float::from(0.4f64), 360, Floor),
+    ///     Less
+    /// );
+    /// assert_eq!(y.to_string(), "36.869897645844013");
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn atan2_with_period_round_assign(
+        &mut self,
+        other: Self,
+        u: u64,
+        rm: RoundingMode,
+    ) -> Ordering {
+        let prec = max(self.significant_bits(), other.significant_bits());
+        let (t, o) = self.atan2_with_period_prec_round_ref_ref(&other, u, prec, rm);
+        *self = t;
+        o
+    }
+
+    /// Computes $\operatorname{atan2}(y,x)u/(2\pi)$, the angle of the point $(x,y)$ measured from
+    /// the positive $x$-axis in $u$ths of a turn, rounding the result to the specified rounding
+    /// mode. The first [`Float`] is replaced by the result, and the second is taken by reference.
+    /// An [`Ordering`] is returned, indicating whether the rounded angle is less than, equal to, or
+    /// greater than the exact angle.
+    ///
+    /// See [`Float::atan2_with_period_prec_round`] for the error bounds, the special cases,
+    /// underflow, and the complexity; this function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the precision of
+    /// the inputs.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut y = Float::from(0.3f64);
+    /// assert_eq!(
+    ///     y.atan2_with_period_round_assign_ref(&Float::from(0.4f64), 360, Floor),
+    ///     Less
+    /// );
+    /// assert_eq!(y.to_string(), "36.869897645844013");
+    /// ```
+    #[inline]
+    pub fn atan2_with_period_round_assign_ref(
+        &mut self,
+        other: &Self,
+        u: u64,
+        rm: RoundingMode,
+    ) -> Ordering {
+        let prec = max(self.significant_bits(), other.significant_bits());
+        let (t, o) = self.atan2_with_period_prec_round_ref_ref(other, u, prec, rm);
+        *self = t;
+        o
     }
 
     /// Computes $\operatorname{atan2}(y,x)$, the angle of the point $(x,y)$ measured from the
@@ -1478,4 +2516,70 @@ where
     for<'a> T: ExactFrom<&'a Float>,
 {
     emulate_rational_rational_to_float_fn(Float::atan2_rational_prec_ref, y, x)
+}
+
+/// Computes $\operatorname{atan2}(y,x)u/(2\pi)$, the angle of the point $(x,y)$ measured from the
+/// positive $x$-axis in $u$ths of a turn (so that `u = 360` gives degrees), for primitive floats.
+///
+/// $$
+/// f(y,x,u) = \operatorname{atan2}(y,x)u/(2\pi)+\varepsilon,
+/// $$
+/// where $|\varepsilon| < 2^{\lfloor\log_2 |\operatorname{atan2}(y,x)u/(2\pi)|\rfloor-p}$ and $p$
+/// is the precision of the output (24 if `T` is a [`f32`] and 53 if `T` is a [`f64`]); the special
+/// cases below are exact when the output can hold them.
+///
+/// Special cases, in which the sign of a zero argument selects the quadrant:
+/// - $f(\text{NaN},x,u)=f(y,\text{NaN},u)=\text{NaN}$
+/// - $f(\pm\infty,+\infty,u)=\pm u/8$ and $f(\pm\infty,-\infty,u)=\pm3u/8$
+/// - $f(\pm\infty,x,u)=\pm u/4$ for finite $x$
+/// - $f(y,+\infty,u)=\pm0.0$ and $f(y,-\infty,u)=\pm u/2$, with the sign of $y$
+/// - $f(\pm0.0,x,u)=\pm0.0$ if $x$ is positive or $+0.0$, and $\pm u/2$ otherwise
+/// - $f(y,\pm0.0,u)=\pm u/4$, with the sign of $y$, for nonzero $y$
+/// - $f(\pm x,x,u)=\pm u/8$ for positive $x$, and $\pm3u/8$ for negative $x$
+/// - $f(y,x,0)=\pm0.0$, with the sign of $y$
+///
+/// Overflow is not possible, since $|f(y,x,u)| \leq u/2 < 2^{63}$. The result is subnormal, or
+/// zero, only for a positive $x$ with $|y/x|$ tiny and $u$ small.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::atan2::primitive_float_atan2_with_period;
+///
+/// assert!(primitive_float_atan2_with_period(f32::NAN, 1.0, 360).is_nan());
+/// // the first quadrant's diagonal is an eighth of a turn
+/// assert_eq!(
+///     NiceFloat(primitive_float_atan2_with_period(1.0f32, 1.0, 360)),
+///     NiceFloat(45.0)
+/// );
+/// // the second quadrant's diagonal is three eighths
+/// assert_eq!(
+///     NiceFloat(primitive_float_atan2_with_period(1.0f32, -1.0, 360)),
+///     NiceFloat(135.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_atan2_with_period(3.0f64, 4.0, 360)),
+///     NiceFloat(36.86989764584402)
+/// );
+/// // a negative x with a zero y is half a turn
+/// assert_eq!(
+///     NiceFloat(primitive_float_atan2_with_period(0.0f64, -1.0, 360)),
+///     NiceFloat(180.0)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_atan2_with_period<T: PrimitiveFloat>(y: T, x: T, u: u64) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    emulate_float_float_to_float_fn(
+        |y, x, prec| y.atan2_with_period_prec_ref_ref(&x, u, prec),
+        y,
+        x,
+    )
 }

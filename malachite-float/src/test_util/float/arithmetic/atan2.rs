@@ -36,3 +36,24 @@ pub fn rug_atan2(y: &rug::Float, x: &rug::Float) -> rug::Float {
     )
     .0
 }
+
+pub fn rug_atan2_with_period_prec_round(
+    y: &rug::Float,
+    x: &rug::Float,
+    u: u64,
+    prec: u64,
+    rm: Round,
+) -> (rug::Float, Ordering) {
+    let mut a = rug::Float::with_val(u32::exact_from(prec), 0);
+    let o = a.assign_round(y.atan2_u_ref(x, u32::exact_from(u)), rm);
+    (a, o)
+}
+
+pub fn rug_atan2_with_period_prec(
+    y: &rug::Float,
+    x: &rug::Float,
+    u: u64,
+    prec: u64,
+) -> (rug::Float, Ordering) {
+    rug_atan2_with_period_prec_round(y, x, u, prec, Round::Nearest)
+}

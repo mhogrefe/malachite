@@ -18,7 +18,7 @@ use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::primitive_float_pair_gen;
 use malachite_base::test_util::runner::Runner;
 use malachite_float::float::arithmetic::atan2::{
-    primitive_float_atan2, primitive_float_atan2_rational,
+    primitive_float_atan2, primitive_float_atan2_rational, primitive_float_atan2_with_period,
 };
 use malachite_float::test_util::bench::bucketers::*;
 use malachite_float::test_util::generators::{
@@ -50,6 +50,17 @@ pub(crate) fn register(runner: &mut Runner) {
         benchmark_float_atan2_rational_prec_round_evaluation_strategy
     );
     register_primitive_float_benches!(runner, benchmark_primitive_float_atan2_rational);
+    register_demo!(runner, demo_float_atan2_with_period_prec_round);
+    register_demo!(runner, demo_float_atan2_with_period_prec_round_debug);
+    register_demo!(runner, demo_float_atan2_with_period_prec);
+    register_demo!(runner, demo_float_atan2_with_period_round);
+    register_demo!(runner, demo_float_atan2_with_period_prec_round_assign);
+    register_primitive_float_demos!(runner, demo_primitive_float_atan2_with_period);
+    register_bench!(
+        runner,
+        benchmark_float_atan2_with_period_prec_round_evaluation_strategy
+    );
+    register_primitive_float_benches!(runner, benchmark_primitive_float_atan2_with_period);
 }
 
 fn demo_float_atan2_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -354,6 +365,165 @@ fn benchmark_primitive_float_atan2_rational<T: PrimitiveFloat>(
         &pair_1_rational_bit_bucketer("y"),
         &mut [("malachite", &mut |(y, x)| {
             no_out!(primitive_float_atan2_rational::<T>(&y, &x));
+        })],
+    );
+}
+
+fn demo_float_atan2_with_period_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (y, x, prec, rm) in float_float_unsigned_rounding_mode_quadruple_gen_var_24()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "({}).atan2_with_period_prec_round({}, 360, {}, {}) = {:?}",
+            y.clone(),
+            x.clone(),
+            prec,
+            rm,
+            y.atan2_with_period_prec_round(x, 360, prec, rm)
+        );
+    }
+}
+
+fn demo_float_atan2_with_period_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (y, x, prec, rm) in float_float_unsigned_rounding_mode_quadruple_gen_var_24()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (t, o) = y
+            .clone()
+            .atan2_with_period_prec_round(x.clone(), 360, prec, rm);
+        println!(
+            "({:#x}).atan2_with_period_prec_round({:#x}, 360, {}, {}) = ({:#x}, {:?})",
+            ComparableFloat(y),
+            ComparableFloat(x),
+            prec,
+            rm,
+            ComparableFloat(t),
+            o
+        );
+    }
+}
+
+fn demo_float_atan2_with_period_prec(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (y, x, prec) in float_float_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "({}).atan2_with_period_prec({}, 360, {}) = {:?}",
+            y.clone(),
+            x.clone(),
+            prec,
+            y.atan2_with_period_prec(x, 360, prec)
+        );
+    }
+}
+
+fn demo_float_atan2_with_period_round(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (y, x, rm) in float_float_rounding_mode_triple_gen_var_43()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "({}).atan2_with_period_round({}, 360, {}) = {:?}",
+            y.clone(),
+            x.clone(),
+            rm,
+            y.atan2_with_period_round(x, 360, rm)
+        );
+    }
+}
+
+fn demo_float_atan2_with_period_prec_round_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (y, x, prec, rm) in float_float_unsigned_rounding_mode_quadruple_gen_var_24()
+        .get(gm, config)
+        .take(limit)
+    {
+        let mut t = y.clone();
+        let o = t.atan2_with_period_prec_round_assign(x.clone(), 360, prec, rm);
+        println!(
+            "t := {y}; t.atan2_with_period_prec_round_assign({x}, 360, {prec}, {rm}) = {o:?}; \
+             t = {t}"
+        );
+    }
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn demo_primitive_float_atan2_with_period<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    for (y, x) in primitive_float_pair_gen::<T>().get(gm, config).take(limit) {
+        println!(
+            "primitive_float_atan2_with_period({}, {}, 360) = {}",
+            NiceFloat(y),
+            NiceFloat(x),
+            NiceFloat(primitive_float_atan2_with_period(y, x, 360))
+        );
+    }
+}
+
+fn benchmark_float_atan2_with_period_prec_round_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float::atan2_with_period_prec_round(Float, u64, u64, RoundingMode)",
+        BenchmarkType::EvaluationStrategy,
+        float_float_unsigned_rounding_mode_quadruple_gen_var_24().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &quadruple_1_2_3_float_float_primitive_int_max_complexity_bucketer("y", "x", "prec"),
+        &mut [
+            (
+                "Float::atan2_with_period_prec_round(Float, u64, u64, RoundingMode)",
+                &mut |(y, x, prec, rm)| {
+                    no_out!(y.atan2_with_period_prec_round(x, 360, prec, rm));
+                },
+            ),
+            (
+                "Float::atan2_with_period_prec_round_ref_ref(&Float, u64, u64, RoundingMode)",
+                &mut |(y, x, prec, rm)| {
+                    no_out!(y.atan2_with_period_prec_round_ref_ref(&x, 360, prec, rm));
+                },
+            ),
+        ],
+    );
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn benchmark_primitive_float_atan2_with_period<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    run_benchmark(
+        &format!(
+            "primitive_float_atan2_with_period::<{}>({}, {}, u64)",
+            T::NAME,
+            T::NAME,
+            T::NAME
+        ),
+        BenchmarkType::Single,
+        primitive_float_pair_gen::<T>().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_max_primitive_float_bucketer("y", "x"),
+        &mut [("malachite", &mut |(y, x)| {
+            no_out!(primitive_float_atan2_with_period(y, x, 360));
         })],
     );
 }

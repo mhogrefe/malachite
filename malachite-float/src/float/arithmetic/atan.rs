@@ -544,7 +544,7 @@ fn atan_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float,
 
 // u/2^k with the sign of `positive`, rounded to `prec` with `rm`. The shift is exact, so the
 // ternary value is the conversion's, reversed along with the sign.
-fn scaled_unsigned(
+pub(crate) fn scaled_unsigned(
     u: u64,
     k: u32,
     positive: bool,

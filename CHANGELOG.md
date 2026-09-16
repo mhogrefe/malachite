@@ -376,6 +376,19 @@ documented by git history.
   result is the only exact case. The quotient $y/x$ is formed exactly, so nothing corresponds to
   the `Float` case's division, its underflow, or its overflow beyond the exponent range.
   `primitive_float_atan2_rational` gives the correctly rounded `f32` or `f64` angle.
+- `atan2_with_period_prec_round`, `atan2_with_period_prec`, and `atan2_with_period_round` (with
+  `_val_ref`/`_ref_val`/`_ref_ref`/`_assign` variants): a port of `mpfr_atan2u`, the angle of the
+  point $(x,y)$ measured in $u$ths of a turn. The quadrant diagonals are exact, at an eighth and
+  three eighths of a turn, as are the axes, and an infinite $y$ against an infinite $x$ gives one
+  or the other. Overflow is impossible, since the result is at most $u/2$; the result underflows
+  for a positive $x$ with a tiny $|y/x|$ and a small $u$. Two deliberate divergences from MPFR:
+  when $u$ is zero this returns a zero with the sign of $y$ throughout, where `mpfr_atan2u` returns
+  $\pm1$ for a negative $x$ — contradicting its own definition, the formula it uses for that
+  quadrant, and its own answers when $y$ is zero or infinite or $|y|=|x|$; and a quotient beyond
+  the exponent range is answered from the turn fraction it approaches, where MPFR, whose widened
+  range keeps the quotient representable, can instead spend an unbounded amount of time separating
+  that fraction from the representable one beside it. `primitive_float_atan2_with_period` gives the
+  correctly rounded `f32` or `f64` angle in $u$ths of a turn.
 - `Cot` and `CotAssign` (new traits in malachite-base) for `Float`, with the usual
   `cot_prec_round`, `cot_prec`, `cot_round`, and `_ref`/`_assign` variants: a port of `mpfr_cot`,
   MPFR's generic reciprocal template with the tangent. MPFR's tangent is itself a quotient of a
