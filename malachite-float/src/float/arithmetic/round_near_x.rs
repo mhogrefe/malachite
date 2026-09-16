@@ -14,6 +14,7 @@
 
 use crate::Float;
 use core::cmp::Ordering::{self, *};
+use core::cmp::{max, min};
 use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
@@ -65,7 +66,40 @@ fn step_toward_zero(y: Float, prec: u64) -> Float {
 // Panics if `v` is NaN, infinite, or zero, or if `rm` is `Exact` (the result is never exact).
 //
 // This is equivalent to `mpfr_round_near_x` from `round_near_x.c`, MPFR 4.3.0, where the result is
-// returned along with the ternary value, and a `None` return corresponds to a 0 return in C.
+// returned along with the ternary value, and a `None` return corresponds to a 0 return in C. MPFR's
+// MPFR_FAST_COMPUTE_IF_SMALL_INPUT, for a function whose value is x plus a correction of order x^3:
+// returns the correctly rounded result directly when x is small enough for that correction to be
+// invisible at the target precision, and `None` when the caller must compute the function properly.
+//
+// `err1` and `err2` are the two halves of MPFR's error exponent, which together bound the
+// correction by 2^(EXP(x) - err1 - err2); `dir` says whether the correction carries the value away
+// from zero. A nonpositive `err1` means x is too large for the shortcut.
+//
+// The bound handed to `float_round_near_x` is capped rather than passed at its true size, which for
+// a tiny x runs to about 2^31: a pointlessly large bound makes it round a huge value, and the
+// general path its callers fall back to works at a precision of about -EXP(x) bits. The cap sits
+// above the input's own precision where it can, which spares `float_round_near_x` its
+// `float_can_round` test; where the true bound is smaller than that the test does run and can
+// decline, but only for an x large enough that the general path is cheap.
+pub(crate) fn small_input_shortcut(
+    x: &Float,
+    err1: i64,
+    err2: u64,
+    dir: bool,
+    prec: u64,
+    rm: RoundingMode,
+) -> Option<(Float, Ordering)> {
+    if err1 <= 0 {
+        return None;
+    }
+    let err = u64::exact_from(err1) + err2;
+    if err <= prec + 1 {
+        return None;
+    }
+    let cap = max(prec + 2, x.get_prec().unwrap() + 1);
+    float_round_near_x(x, min(err, cap), dir, prec, rm)
+}
+
 crate_test_fn! {float_round_near_x(
     v: &Float,
     err: u64,

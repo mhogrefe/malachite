@@ -404,6 +404,14 @@ documented by git history.
   $1/4$ and $3/4$, all representable in two bits, so every special case is exact at every precision
   except $\pm3/4$, which needs two. `primitive_float_atan2_pi` and
   `primitive_float_atan2_pi_rational` give the correctly rounded `f32` or `f64` angle in half-turns.
+- `Asin` and `AsinAssign` (new traits in malachite-base) for `Float`, with the usual
+  `asin_prec_round`, `asin_prec`, `asin_round`, and `_ref`/`_assign` variants: a port of
+  `mpfr_asin`, computed as $\arctan(x/\sqrt{1-x^2})$ at a working precision that covers the
+  cancellation in $1-x^2$. The result is NaN for a NaN input, for either infinity, and for any
+  $|x|>1$; $\pm0.0$ is exact; and $\pm1$ gives $\pm\pi/2$. Those are the only exact cases. Unlike
+  the tangent family the arcsine can neither overflow nor underflow, since the result lies in
+  $[-\pi/2,\pi/2]$ and $|\arcsin x|>|x|$, so a representable input always has a representable
+  result. `primitive_float_asin` gives the correctly rounded `f32` or `f64` arcsine.
 - `Cot` and `CotAssign` (new traits in malachite-base) for `Float`, with the usual
   `cot_prec_round`, `cot_prec`, `cot_round`, and `_ref`/`_assign` variants: a port of `mpfr_cot`,
   MPFR's generic reciprocal template with the tangent. MPFR's tangent is itself a quotient of a

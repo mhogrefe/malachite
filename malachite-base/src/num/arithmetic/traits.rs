@@ -1004,6 +1004,18 @@ pub trait Atan2Assign<RHS = Self> {
     fn atan2_assign(&mut self, other: RHS);
 }
 
+/// Computes $\arcsin(x)$, the arcsine of a number.
+pub trait Asin {
+    type Output;
+
+    fn asin(self) -> Self::Output;
+}
+
+/// Replaces a number with its arcsine, $\arcsin(x)$.
+pub trait AsinAssign {
+    fn asin_assign(&mut self);
+}
+
 /// Replaces a number with its sine, $\sin(x)$, and writes its cosine, $\cos(x)$, to a second
 /// number.
 pub trait SinCosAssign {

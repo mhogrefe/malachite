@@ -22,7 +22,7 @@
 // itself rounded toward zero, which MPFR's small-input shortcut decides directly.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use crate::float::arithmetic::round_near_x::float_round_near_x;
+use crate::float::arithmetic::round_near_x::small_input_shortcut;
 use crate::float::arithmetic::sin::{
     SCALE, SCALED_INPUT_EXPONENT, UNDERFLOW_EXPONENT, scaled_underflow, underflowed,
 };
@@ -30,7 +30,7 @@ use crate::float::arithmetic::tan::round_bracket_signed_by;
 use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn};
 use alloc::vec;
 use core::cmp::Ordering::{self, Equal, Greater};
-use core::cmp::{max, min};
+
 use core::mem::take;
 use malachite_base::num::arithmetic::traits::{
     Abs, Atan, AtanAssign, CeilingLogBase2, IsPowerOf2, Parity, PowerOf2, Reciprocal, Square,
@@ -407,21 +407,10 @@ fn atan_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float,
     // - 1)` = -2 EXP(x) + 1
     //
     // MPFR_FAST_COMPUTE_IF_SMALL_INPUT (atan, x, -2 * MPFR_GET_EXP (x), 1, 0, rnd_mode, {});
-    let err1 = -(exp_x << 1);
-    if err1 > 0 {
-        let err = u64::exact_from(err1) + 1;
-        // `float_round_near_x` only needs an error bound clearing prec + 1, and a bound above the
-        // input's own precision spares it the `float_can_round` test, which is the only way it
-        // declines. Capping there rather than passing the true bound, which for a tiny x runs to
-        // about 2^31, keeps the shortcut from being handed a pointlessly large number; capping any
-        // lower would let it decline, and the general algorithm works at a precision of about
-        // -EXP(x) bits, which for such an x does not terminate in reasonable time.
-        let cap = max(prec + 2, x.get_prec().unwrap() + 1);
-        if err > prec + 1
-            && let Some(result) = float_round_near_x(x, min(err, cap), false, prec, rm)
-        {
-            return result;
-        }
+    // atan(x) = x - x^3/3 + ..., so the correction is below 2^(3 EXP(x) - 1) and carries the value
+    // toward zero
+    if let Some(result) = small_input_shortcut(x, -(exp_x << 1), 1, false, prec, rm) {
+        return result;
     }
     let negative = *x < 0u32;
     let xp = x.clone().abs();
