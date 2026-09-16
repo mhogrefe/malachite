@@ -397,6 +397,13 @@ documented by git history.
   and $u/2$ for a negative one, a zero $x$ gives $\pm u/4$ with the sign of $y$, and the quadrant
   diagonals give $\pm u/8$ and $\pm3u/8$. `primitive_float_atan2_with_period_rational` gives the
   correctly rounded `f32` or `f64` angle.
+- `atan2_pi_prec_round`, `atan2_pi_prec`, and `atan2_pi_round` (with the usual variants), together
+  with `atan2_pi_rational_prec_round` and `atan2_pi_rational_prec`: the angle measured in
+  half-turns, $\operatorname{atan2}(y,x)/\pi$. This is IEEE 754's `atan2Pi` and a port of
+  `mpfr_atan2pi`, and it is `atan2_with_period` with $u = 2$. The turn fractions are $1$, $1/2$,
+  $1/4$ and $3/4$, all representable in two bits, so every special case is exact at every precision
+  except $\pm3/4$, which needs two. `primitive_float_atan2_pi` and
+  `primitive_float_atan2_pi_rational` give the correctly rounded `f32` or `f64` angle in half-turns.
 - `Cot` and `CotAssign` (new traits in malachite-base) for `Float`, with the usual
   `cot_prec_round`, `cot_prec`, `cot_round`, and `_ref`/`_assign` variants: a port of `mpfr_cot`,
   MPFR's generic reciprocal template with the tangent. MPFR's tangent is itself a quotient of a

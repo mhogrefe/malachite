@@ -2558,6 +2558,808 @@ impl Float {
     ) -> (Self, Ordering) {
         Self::atan2_with_period_rational_prec_round_ref(y, x, u, prec, Nearest)
     }
+
+    /// Computes $\operatorname{atan2}(y,x)/\pi$, the angle of the point $(x,y)$ measured from the
+    /// positive $x$-axis in half-turns, rounding the result to the specified precision and with the
+    /// specified rounding mode. The [`Float`]s are both taken by value. An [`Ordering`] is also
+    /// returned, indicating whether the rounded angle is less than, equal to, or greater than the
+    /// exact angle. Although `NaN`s are not comparable to any [`Float`], whenever this function
+    /// returns a `NaN` it also returns `Equal`.
+    ///
+    /// This is `atan2_with_period` with a period of 2: see [`Float::atan2_with_period_prec_round`]
+    /// for the error bounds, the special cases, underflow, and the complexity, with $u = 2$. An
+    /// infinite $y$ gives $\pm1/4$ against $+\infty$ and $\pm3/4$ against $-\infty$, and $\pm1/2$
+    /// against a finite $x$; a zero $y$ gives $\pm0.0$ for a positive-signed $x$ and $\pm1$ for a
+    /// negative-signed one; a zero $x$ gives $\pm1/2$; and the quadrant diagonals give $\pm1/4$ and
+    /// $\pm3/4$. All of those are exact at every precision except $\pm3/4$, which needs two bits.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// // the first quadrant's diagonal is a quarter turn
+    /// let (t, o) = Float::ONE.atan2_pi_prec_round(Float::ONE, 10, Exact);
+    /// assert_eq!(t.to_string(), "0.25000");
+    /// assert_eq!(o, Equal);
+    ///
+    /// let (t, o) = Float::ONE.atan2_pi_prec_round(Float::TWO, 10, Floor);
+    /// assert_eq!(t.to_string(), "0.14746");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn atan2_pi_prec_round(self, other: Self, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+        self.atan2_with_period_prec_round(other, 2, prec, rm)
+    }
+
+    /// Computes $\operatorname{atan2}(y,x)/\pi$, the angle of the point $(x,y)$ measured from the
+    /// positive $x$-axis in half-turns, rounding the result to the specified precision and with the
+    /// specified rounding mode. The first [`Float`] is taken by value and the second by reference.
+    /// An [`Ordering`] is also returned, indicating whether the rounded angle is less than, equal
+    /// to, or greater than the exact angle. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// This is `atan2_with_period` with a period of 2: see [`Float::atan2_with_period_prec_round`]
+    /// for the error bounds, the special cases, underflow, and the complexity, with $u = 2$. An
+    /// infinite $y$ gives $\pm1/4$ against $+\infty$ and $\pm3/4$ against $-\infty$, and $\pm1/2$
+    /// against a finite $x$; a zero $y$ gives $\pm0.0$ for a positive-signed $x$ and $\pm1$ for a
+    /// negative-signed one; a zero $x$ gives $\pm1/2$; and the quadrant diagonals give $\pm1/4$ and
+    /// $\pm3/4$. All of those are exact at every precision except $\pm3/4$, which needs two bits.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// // the first quadrant's diagonal is a quarter turn
+    /// let (t, o) = Float::ONE.atan2_pi_prec_round_val_ref(&Float::ONE, 10, Exact);
+    /// assert_eq!(t.to_string(), "0.25000");
+    /// assert_eq!(o, Equal);
+    ///
+    /// let (t, o) = Float::ONE.atan2_pi_prec_round_val_ref(&Float::TWO, 10, Floor);
+    /// assert_eq!(t.to_string(), "0.14746");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn atan2_pi_prec_round_val_ref(
+        self,
+        other: &Self,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        self.atan2_with_period_prec_round_val_ref(other, 2, prec, rm)
+    }
+
+    /// Computes $\operatorname{atan2}(y,x)/\pi$, the angle of the point $(x,y)$ measured from the
+    /// positive $x$-axis in half-turns, rounding the result to the specified precision and with the
+    /// specified rounding mode. The first [`Float`] is taken by reference and the second by value.
+    /// An [`Ordering`] is also returned, indicating whether the rounded angle is less than, equal
+    /// to, or greater than the exact angle. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// This is `atan2_with_period` with a period of 2: see [`Float::atan2_with_period_prec_round`]
+    /// for the error bounds, the special cases, underflow, and the complexity, with $u = 2$. An
+    /// infinite $y$ gives $\pm1/4$ against $+\infty$ and $\pm3/4$ against $-\infty$, and $\pm1/2$
+    /// against a finite $x$; a zero $y$ gives $\pm0.0$ for a positive-signed $x$ and $\pm1$ for a
+    /// negative-signed one; a zero $x$ gives $\pm1/2$; and the quadrant diagonals give $\pm1/4$ and
+    /// $\pm3/4$. All of those are exact at every precision except $\pm3/4$, which needs two bits.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// // the first quadrant's diagonal is a quarter turn
+    /// let (t, o) = (&Float::ONE).atan2_pi_prec_round_ref_val(Float::ONE, 10, Exact);
+    /// assert_eq!(t.to_string(), "0.25000");
+    /// assert_eq!(o, Equal);
+    ///
+    /// let (t, o) = (&Float::ONE).atan2_pi_prec_round_ref_val(Float::TWO, 10, Floor);
+    /// assert_eq!(t.to_string(), "0.14746");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn atan2_pi_prec_round_ref_val(
+        &self,
+        other: Self,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        self.atan2_with_period_prec_round_ref_val(other, 2, prec, rm)
+    }
+
+    /// Computes $\operatorname{atan2}(y,x)/\pi$, the angle of the point $(x,y)$ measured from the
+    /// positive $x$-axis in half-turns, rounding the result to the specified precision and with the
+    /// specified rounding mode. The [`Float`]s are both taken by reference. An [`Ordering`] is also
+    /// returned, indicating whether the rounded angle is less than, equal to, or greater than the
+    /// exact angle. Although `NaN`s are not comparable to any [`Float`], whenever this function
+    /// returns a `NaN` it also returns `Equal`.
+    ///
+    /// This is `atan2_with_period` with a period of 2: see [`Float::atan2_with_period_prec_round`]
+    /// for the error bounds, the special cases, underflow, and the complexity, with $u = 2$. An
+    /// infinite $y$ gives $\pm1/4$ against $+\infty$ and $\pm3/4$ against $-\infty$, and $\pm1/2$
+    /// against a finite $x$; a zero $y$ gives $\pm0.0$ for a positive-signed $x$ and $\pm1$ for a
+    /// negative-signed one; a zero $x$ gives $\pm1/2$; and the quadrant diagonals give $\pm1/4$ and
+    /// $\pm3/4$. All of those are exact at every precision except $\pm3/4$, which needs two bits.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// // the first quadrant's diagonal is a quarter turn
+    /// let (t, o) = (&Float::ONE).atan2_pi_prec_round_ref_ref(&Float::ONE, 10, Exact);
+    /// assert_eq!(t.to_string(), "0.25000");
+    /// assert_eq!(o, Equal);
+    ///
+    /// let (t, o) = (&Float::ONE).atan2_pi_prec_round_ref_ref(&Float::TWO, 10, Floor);
+    /// assert_eq!(t.to_string(), "0.14746");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn atan2_pi_prec_round_ref_ref(
+        &self,
+        other: &Self,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        self.atan2_with_period_prec_round_ref_ref(other, 2, prec, rm)
+    }
+
+    /// Computes $\operatorname{atan2}(y,x)/\pi$, the angle of the point $(x,y)$ measured from the
+    /// positive $x$-axis in half-turns, rounding the result to the nearest value of the specified
+    /// precision. The [`Float`]s are both taken by value. An [`Ordering`] is also returned,
+    /// indicating whether the rounded angle is less than, equal to, or greater than the exact
+    /// angle. Although `NaN`s are not comparable to any [`Float`], whenever this function returns a
+    /// `NaN` it also returns `Equal`.
+    ///
+    /// This is `atan2_with_period` with a period of 2: see [`Float::atan2_with_period_prec_round`]
+    /// for the error bounds, the special cases, underflow, and the complexity, with $u = 2$. An
+    /// infinite $y$ gives $\pm1/4$ against $+\infty$ and $\pm3/4$ against $-\infty$, and $\pm1/2$
+    /// against a finite $x$; a zero $y$ gives $\pm0.0$ for a positive-signed $x$ and $\pm1$ for a
+    /// negative-signed one; a zero $x$ gives $\pm1/2$; and the quadrant diagonals give $\pm1/4$ and
+    /// $\pm3/4$. All of those are exact at every precision except $\pm3/4$, which needs two bits.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::ONE.atan2_pi_prec(Float::TWO, 10);
+    /// assert_eq!(t.to_string(), "0.14771");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn atan2_pi_prec(self, other: Self, prec: u64) -> (Self, Ordering) {
+        self.atan2_with_period_prec(other, 2, prec)
+    }
+
+    /// Computes $\operatorname{atan2}(y,x)/\pi$, the angle of the point $(x,y)$ measured from the
+    /// positive $x$-axis in half-turns, rounding the result to the nearest value of the specified
+    /// precision. The first [`Float`] is taken by value and the second by reference. An
+    /// [`Ordering`] is also returned, indicating whether the rounded angle is less than, equal to,
+    /// or greater than the exact angle. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// This is `atan2_with_period` with a period of 2: see [`Float::atan2_with_period_prec_round`]
+    /// for the error bounds, the special cases, underflow, and the complexity, with $u = 2$. An
+    /// infinite $y$ gives $\pm1/4$ against $+\infty$ and $\pm3/4$ against $-\infty$, and $\pm1/2$
+    /// against a finite $x$; a zero $y$ gives $\pm0.0$ for a positive-signed $x$ and $\pm1$ for a
+    /// negative-signed one; a zero $x$ gives $\pm1/2$; and the quadrant diagonals give $\pm1/4$ and
+    /// $\pm3/4$. All of those are exact at every precision except $\pm3/4$, which needs two bits.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::ONE.atan2_pi_prec_val_ref(&Float::TWO, 10);
+    /// assert_eq!(t.to_string(), "0.14771");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn atan2_pi_prec_val_ref(self, other: &Self, prec: u64) -> (Self, Ordering) {
+        self.atan2_with_period_prec_val_ref(other, 2, prec)
+    }
+
+    /// Computes $\operatorname{atan2}(y,x)/\pi$, the angle of the point $(x,y)$ measured from the
+    /// positive $x$-axis in half-turns, rounding the result to the nearest value of the specified
+    /// precision. The first [`Float`] is taken by reference and the second by value. An
+    /// [`Ordering`] is also returned, indicating whether the rounded angle is less than, equal to,
+    /// or greater than the exact angle. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// This is `atan2_with_period` with a period of 2: see [`Float::atan2_with_period_prec_round`]
+    /// for the error bounds, the special cases, underflow, and the complexity, with $u = 2$. An
+    /// infinite $y$ gives $\pm1/4$ against $+\infty$ and $\pm3/4$ against $-\infty$, and $\pm1/2$
+    /// against a finite $x$; a zero $y$ gives $\pm0.0$ for a positive-signed $x$ and $\pm1$ for a
+    /// negative-signed one; a zero $x$ gives $\pm1/2$; and the quadrant diagonals give $\pm1/4$ and
+    /// $\pm3/4$. All of those are exact at every precision except $\pm3/4$, which needs two bits.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = (&Float::ONE).atan2_pi_prec_ref_val(Float::TWO, 10);
+    /// assert_eq!(t.to_string(), "0.14771");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn atan2_pi_prec_ref_val(&self, other: Self, prec: u64) -> (Self, Ordering) {
+        self.atan2_with_period_prec_ref_val(other, 2, prec)
+    }
+
+    /// Computes $\operatorname{atan2}(y,x)/\pi$, the angle of the point $(x,y)$ measured from the
+    /// positive $x$-axis in half-turns, rounding the result to the nearest value of the specified
+    /// precision. The [`Float`]s are both taken by reference. An [`Ordering`] is also returned,
+    /// indicating whether the rounded angle is less than, equal to, or greater than the exact
+    /// angle. Although `NaN`s are not comparable to any [`Float`], whenever this function returns a
+    /// `NaN` it also returns `Equal`.
+    ///
+    /// This is `atan2_with_period` with a period of 2: see [`Float::atan2_with_period_prec_round`]
+    /// for the error bounds, the special cases, underflow, and the complexity, with $u = 2$. An
+    /// infinite $y$ gives $\pm1/4$ against $+\infty$ and $\pm3/4$ against $-\infty$, and $\pm1/2$
+    /// against a finite $x$; a zero $y$ gives $\pm0.0$ for a positive-signed $x$ and $\pm1$ for a
+    /// negative-signed one; a zero $x$ gives $\pm1/2$; and the quadrant diagonals give $\pm1/4$ and
+    /// $\pm3/4$. All of those are exact at every precision except $\pm3/4$, which needs two bits.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = (&Float::ONE).atan2_pi_prec_ref_ref(&Float::TWO, 10);
+    /// assert_eq!(t.to_string(), "0.14771");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn atan2_pi_prec_ref_ref(&self, other: &Self, prec: u64) -> (Self, Ordering) {
+        self.atan2_with_period_prec_ref_ref(other, 2, prec)
+    }
+
+    /// Computes $\operatorname{atan2}(y,x)/\pi$, the angle of the point $(x,y)$ measured from the
+    /// positive $x$-axis in half-turns, rounding the result to the specified rounding mode. The
+    /// [`Float`]s are both taken by value. An [`Ordering`] is also returned, indicating whether the
+    /// rounded angle is less than, equal to, or greater than the exact angle. Although `NaN`s are
+    /// not comparable to any [`Float`], whenever this function returns a `NaN` it also returns
+    /// `Equal`.
+    ///
+    /// This is `atan2_with_period` with a period of 2: see [`Float::atan2_with_period_prec_round`]
+    /// for the error bounds, the special cases, underflow, and the complexity, with $u = 2$. An
+    /// infinite $y$ gives $\pm1/4$ against $+\infty$ and $\pm3/4$ against $-\infty$, and $\pm1/2$
+    /// against a finite $x$; a zero $y$ gives $\pm0.0$ for a positive-signed $x$ and $\pm1$ for a
+    /// negative-signed one; a zero $x$ gives $\pm1/2$; and the quadrant diagonals give $\pm1/4$ and
+    /// $\pm3/4$. All of those are exact at every precision except $\pm3/4$, which needs two bits.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the precision of
+    /// the inputs.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::from(0.3f64).atan2_pi_round(Float::from(0.4f64), Floor);
+    /// assert_eq!(t.to_string(), "0.20483276469913342");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn atan2_pi_round(self, other: Self, rm: RoundingMode) -> (Self, Ordering) {
+        self.atan2_with_period_round(other, 2, rm)
+    }
+
+    /// Computes $\operatorname{atan2}(y,x)/\pi$, the angle of the point $(x,y)$ measured from the
+    /// positive $x$-axis in half-turns, rounding the result to the specified rounding mode. The
+    /// first [`Float`] is taken by value and the second by reference. An [`Ordering`] is also
+    /// returned, indicating whether the rounded angle is less than, equal to, or greater than the
+    /// exact angle. Although `NaN`s are not comparable to any [`Float`], whenever this function
+    /// returns a `NaN` it also returns `Equal`.
+    ///
+    /// This is `atan2_with_period` with a period of 2: see [`Float::atan2_with_period_prec_round`]
+    /// for the error bounds, the special cases, underflow, and the complexity, with $u = 2$. An
+    /// infinite $y$ gives $\pm1/4$ against $+\infty$ and $\pm3/4$ against $-\infty$, and $\pm1/2$
+    /// against a finite $x$; a zero $y$ gives $\pm0.0$ for a positive-signed $x$ and $\pm1$ for a
+    /// negative-signed one; a zero $x$ gives $\pm1/2$; and the quadrant diagonals give $\pm1/4$ and
+    /// $\pm3/4$. All of those are exact at every precision except $\pm3/4$, which needs two bits.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the precision of
+    /// the inputs.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::from(0.3f64).atan2_pi_round_val_ref(&Float::from(0.4f64), Floor);
+    /// assert_eq!(t.to_string(), "0.20483276469913342");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn atan2_pi_round_val_ref(self, other: &Self, rm: RoundingMode) -> (Self, Ordering) {
+        self.atan2_with_period_round_val_ref(other, 2, rm)
+    }
+
+    /// Computes $\operatorname{atan2}(y,x)/\pi$, the angle of the point $(x,y)$ measured from the
+    /// positive $x$-axis in half-turns, rounding the result to the specified rounding mode. The
+    /// first [`Float`] is taken by reference and the second by value. An [`Ordering`] is also
+    /// returned, indicating whether the rounded angle is less than, equal to, or greater than the
+    /// exact angle. Although `NaN`s are not comparable to any [`Float`], whenever this function
+    /// returns a `NaN` it also returns `Equal`.
+    ///
+    /// This is `atan2_with_period` with a period of 2: see [`Float::atan2_with_period_prec_round`]
+    /// for the error bounds, the special cases, underflow, and the complexity, with $u = 2$. An
+    /// infinite $y$ gives $\pm1/4$ against $+\infty$ and $\pm3/4$ against $-\infty$, and $\pm1/2$
+    /// against a finite $x$; a zero $y$ gives $\pm0.0$ for a positive-signed $x$ and $\pm1$ for a
+    /// negative-signed one; a zero $x$ gives $\pm1/2$; and the quadrant diagonals give $\pm1/4$ and
+    /// $\pm3/4$. All of those are exact at every precision except $\pm3/4$, which needs two bits.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the precision of
+    /// the inputs.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = (&Float::from(0.3f64)).atan2_pi_round_ref_val(Float::from(0.4f64), Floor);
+    /// assert_eq!(t.to_string(), "0.20483276469913342");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn atan2_pi_round_ref_val(&self, other: Self, rm: RoundingMode) -> (Self, Ordering) {
+        self.atan2_with_period_round_ref_val(other, 2, rm)
+    }
+
+    /// Computes $\operatorname{atan2}(y,x)/\pi$, the angle of the point $(x,y)$ measured from the
+    /// positive $x$-axis in half-turns, rounding the result to the specified rounding mode. The
+    /// [`Float`]s are both taken by reference. An [`Ordering`] is also returned, indicating whether
+    /// the rounded angle is less than, equal to, or greater than the exact angle. Although `NaN`s
+    /// are not comparable to any [`Float`], whenever this function returns a `NaN` it also returns
+    /// `Equal`.
+    ///
+    /// This is `atan2_with_period` with a period of 2: see [`Float::atan2_with_period_prec_round`]
+    /// for the error bounds, the special cases, underflow, and the complexity, with $u = 2$. An
+    /// infinite $y$ gives $\pm1/4$ against $+\infty$ and $\pm3/4$ against $-\infty$, and $\pm1/2$
+    /// against a finite $x$; a zero $y$ gives $\pm0.0$ for a positive-signed $x$ and $\pm1$ for a
+    /// negative-signed one; a zero $x$ gives $\pm1/2$; and the quadrant diagonals give $\pm1/4$ and
+    /// $\pm3/4$. All of those are exact at every precision except $\pm3/4$, which needs two bits.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the precision of
+    /// the inputs.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = (&Float::from(0.3f64)).atan2_pi_round_ref_ref(&Float::from(0.4f64), Floor);
+    /// assert_eq!(t.to_string(), "0.20483276469913342");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn atan2_pi_round_ref_ref(&self, other: &Self, rm: RoundingMode) -> (Self, Ordering) {
+        self.atan2_with_period_round_ref_ref(other, 2, rm)
+    }
+
+    /// Computes $\operatorname{atan2}(y,x)/\pi$, the angle of the point $(x,y)$ measured from the
+    /// positive $x$-axis in half-turns, rounding the result to the specified precision and with the
+    /// specified rounding mode. The first [`Float`] is replaced by the result, and the second is
+    /// taken by value. An [`Ordering`] is returned, indicating whether the rounded angle is less
+    /// than, equal to, or greater than the exact angle.
+    ///
+    /// This is `atan2_with_period` with a period of 2: see [`Float::atan2_with_period_prec_round`]
+    /// for the error bounds, the special cases, underflow, and the complexity, with $u = 2$. An
+    /// infinite $y$ gives $\pm1/4$ against $+\infty$ and $\pm3/4$ against $-\infty$, and $\pm1/2$
+    /// against a finite $x$; a zero $y$ gives $\pm0.0$ for a positive-signed $x$ and $\pm1$ for a
+    /// negative-signed one; a zero $x$ gives $\pm1/2$; and the quadrant diagonals give $\pm1/4$ and
+    /// $\pm3/4$. All of those are exact at every precision except $\pm3/4$, which needs two bits.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut y = Float::ONE;
+    /// assert_eq!(y.atan2_pi_prec_round_assign(Float::TWO, 10, Floor), Less);
+    /// assert_eq!(y.to_string(), "0.14746");
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn atan2_pi_prec_round_assign(
+        &mut self,
+        other: Self,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> Ordering {
+        self.atan2_with_period_prec_round_assign(other, 2, prec, rm)
+    }
+
+    /// Computes $\operatorname{atan2}(y,x)/\pi$, the angle of the point $(x,y)$ measured from the
+    /// positive $x$-axis in half-turns, rounding the result to the specified precision and with the
+    /// specified rounding mode. The first [`Float`] is replaced by the result, and the second is
+    /// taken by reference. An [`Ordering`] is returned, indicating whether the rounded angle is
+    /// less than, equal to, or greater than the exact angle.
+    ///
+    /// This is `atan2_with_period` with a period of 2: see [`Float::atan2_with_period_prec_round`]
+    /// for the error bounds, the special cases, underflow, and the complexity, with $u = 2$. An
+    /// infinite $y$ gives $\pm1/4$ against $+\infty$ and $\pm3/4$ against $-\infty$, and $\pm1/2$
+    /// against a finite $x$; a zero $y$ gives $\pm0.0$ for a positive-signed $x$ and $\pm1$ for a
+    /// negative-signed one; a zero $x$ gives $\pm1/2$; and the quadrant diagonals give $\pm1/4$ and
+    /// $\pm3/4$. All of those are exact at every precision except $\pm3/4$, which needs two bits.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut y = Float::ONE;
+    /// assert_eq!(
+    ///     y.atan2_pi_prec_round_assign_ref(&Float::TWO, 10, Floor),
+    ///     Less
+    /// );
+    /// assert_eq!(y.to_string(), "0.14746");
+    /// ```
+    #[inline]
+    pub fn atan2_pi_prec_round_assign_ref(
+        &mut self,
+        other: &Self,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> Ordering {
+        self.atan2_with_period_prec_round_assign_ref(other, 2, prec, rm)
+    }
+
+    /// Computes $\operatorname{atan2}(y,x)/\pi$, the angle of the point $(x,y)$ measured from the
+    /// positive $x$-axis in half-turns, rounding the result to the nearest value of the specified
+    /// precision. The first [`Float`] is replaced by the result, and the second is taken by value.
+    /// An [`Ordering`] is returned, indicating whether the rounded angle is less than, equal to, or
+    /// greater than the exact angle.
+    ///
+    /// This is `atan2_with_period` with a period of 2: see [`Float::atan2_with_period_prec_round`]
+    /// for the error bounds, the special cases, underflow, and the complexity, with $u = 2$. An
+    /// infinite $y$ gives $\pm1/4$ against $+\infty$ and $\pm3/4$ against $-\infty$, and $\pm1/2$
+    /// against a finite $x$; a zero $y$ gives $\pm0.0$ for a positive-signed $x$ and $\pm1$ for a
+    /// negative-signed one; a zero $x$ gives $\pm1/2$; and the quadrant diagonals give $\pm1/4$ and
+    /// $\pm3/4$. All of those are exact at every precision except $\pm3/4$, which needs two bits.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut y = Float::ONE;
+    /// assert_eq!(y.atan2_pi_prec_assign(Float::TWO, 10), Greater);
+    /// assert_eq!(y.to_string(), "0.14771");
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn atan2_pi_prec_assign(&mut self, other: Self, prec: u64) -> Ordering {
+        self.atan2_with_period_prec_assign(other, 2, prec)
+    }
+
+    /// Computes $\operatorname{atan2}(y,x)/\pi$, the angle of the point $(x,y)$ measured from the
+    /// positive $x$-axis in half-turns, rounding the result to the nearest value of the specified
+    /// precision. The first [`Float`] is replaced by the result, and the second is taken by
+    /// reference. An [`Ordering`] is returned, indicating whether the rounded angle is less than,
+    /// equal to, or greater than the exact angle.
+    ///
+    /// This is `atan2_with_period` with a period of 2: see [`Float::atan2_with_period_prec_round`]
+    /// for the error bounds, the special cases, underflow, and the complexity, with $u = 2$. An
+    /// infinite $y$ gives $\pm1/4$ against $+\infty$ and $\pm3/4$ against $-\infty$, and $\pm1/2$
+    /// against a finite $x$; a zero $y$ gives $\pm0.0$ for a positive-signed $x$ and $\pm1$ for a
+    /// negative-signed one; a zero $x$ gives $\pm1/2$; and the quadrant diagonals give $\pm1/4$ and
+    /// $\pm3/4$. All of those are exact at every precision except $\pm3/4$, which needs two bits.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut y = Float::ONE;
+    /// assert_eq!(y.atan2_pi_prec_assign_ref(&Float::TWO, 10), Greater);
+    /// assert_eq!(y.to_string(), "0.14771");
+    /// ```
+    #[inline]
+    pub fn atan2_pi_prec_assign_ref(&mut self, other: &Self, prec: u64) -> Ordering {
+        self.atan2_with_period_prec_assign_ref(other, 2, prec)
+    }
+
+    /// Computes $\operatorname{atan2}(y,x)/\pi$, the angle of the point $(x,y)$ measured from the
+    /// positive $x$-axis in half-turns, rounding the result to the specified rounding mode. The
+    /// first [`Float`] is replaced by the result, and the second is taken by value. An [`Ordering`]
+    /// is returned, indicating whether the rounded angle is less than, equal to, or greater than
+    /// the exact angle.
+    ///
+    /// This is `atan2_with_period` with a period of 2: see [`Float::atan2_with_period_prec_round`]
+    /// for the error bounds, the special cases, underflow, and the complexity, with $u = 2$. An
+    /// infinite $y$ gives $\pm1/4$ against $+\infty$ and $\pm3/4$ against $-\infty$, and $\pm1/2$
+    /// against a finite $x$; a zero $y$ gives $\pm0.0$ for a positive-signed $x$ and $\pm1$ for a
+    /// negative-signed one; a zero $x$ gives $\pm1/2$; and the quadrant diagonals give $\pm1/4$ and
+    /// $\pm3/4$. All of those are exact at every precision except $\pm3/4$, which needs two bits.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the precision of
+    /// the inputs.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut y = Float::ONE;
+    /// assert_eq!(y.atan2_pi_round_assign(Float::TWO, Floor), Less);
+    /// assert_eq!(y.to_string(), "0.12");
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn atan2_pi_round_assign(&mut self, other: Self, rm: RoundingMode) -> Ordering {
+        self.atan2_with_period_round_assign(other, 2, rm)
+    }
+
+    /// Computes $\operatorname{atan2}(y,x)/\pi$, the angle of the point $(x,y)$ measured from the
+    /// positive $x$-axis in half-turns, rounding the result to the specified rounding mode. The
+    /// first [`Float`] is replaced by the result, and the second is taken by reference. An
+    /// [`Ordering`] is returned, indicating whether the rounded angle is less than, equal to, or
+    /// greater than the exact angle.
+    ///
+    /// This is `atan2_with_period` with a period of 2: see [`Float::atan2_with_period_prec_round`]
+    /// for the error bounds, the special cases, underflow, and the complexity, with $u = 2$. An
+    /// infinite $y$ gives $\pm1/4$ against $+\infty$ and $\pm3/4$ against $-\infty$, and $\pm1/2$
+    /// against a finite $x$; a zero $y$ gives $\pm0.0$ for a positive-signed $x$ and $\pm1$ for a
+    /// negative-signed one; a zero $x$ gives $\pm1/2$; and the quadrant diagonals give $\pm1/4$ and
+    /// $\pm3/4$. All of those are exact at every precision except $\pm3/4$, which needs two bits.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the precision of
+    /// the inputs.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, Two};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut y = Float::ONE;
+    /// assert_eq!(y.atan2_pi_round_assign_ref(&Float::TWO, Floor), Less);
+    /// assert_eq!(y.to_string(), "0.12");
+    /// ```
+    #[inline]
+    pub fn atan2_pi_round_assign_ref(&mut self, other: &Self, rm: RoundingMode) -> Ordering {
+        self.atan2_with_period_round_assign_ref(other, 2, rm)
+    }
+
+    /// Computes $\operatorname{atan2}(y,x)/\pi$, the angle of the point $(x,y)$ measured from the
+    /// positive $x$-axis in half-turns, rounding the result to the specified precision and with the
+    /// specified rounding mode and returning the result as a [`Float`]. The [`Rational`]s are both
+    /// taken by value. An [`Ordering`] is also returned, indicating whether the rounded angle is
+    /// less than, equal to, or greater than the exact angle.
+    ///
+    /// This is `atan2_with_period_rational` with a period of 2: see
+    /// [`Float::atan2_with_period_rational_prec_round`] for the error bounds, the special cases,
+    /// underflow, and the complexity, with $u = 2$. A zero $y$ gives $0.0$ for a nonnegative $x$
+    /// and $1$ for a negative one, a zero $x$ gives $\pm1/2$ with the sign of $y$, and the quadrant
+    /// diagonals give $\pm1/4$ and $\pm3/4$. All of those are exact at every precision except
+    /// $\pm3/4$, which needs two bits.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// // the first quadrant's diagonal is a quarter turn
+    /// let (t, o) = Float::atan2_pi_rational_prec_round(Rational::ONE, Rational::ONE, 10, Exact);
+    /// assert_eq!(t.to_string(), "0.25000");
+    /// assert_eq!(o, Equal);
+    ///
+    /// let (t, o) =
+    ///     Float::atan2_pi_rational_prec_round(Rational::from(3), Rational::from(4), 10, Floor);
+    /// assert_eq!(t.to_string(), "0.20459");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn atan2_pi_rational_prec_round(
+        y: Rational,
+        x: Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        Self::atan2_with_period_rational_prec_round(y, x, 2, prec, rm)
+    }
+
+    /// Computes $\operatorname{atan2}(y,x)/\pi$, the angle of the point $(x,y)$ measured from the
+    /// positive $x$-axis in half-turns, rounding the result to the specified precision and with the
+    /// specified rounding mode and returning the result as a [`Float`]. The [`Rational`]s are both
+    /// taken by reference. An [`Ordering`] is also returned, indicating whether the rounded angle
+    /// is less than, equal to, or greater than the exact angle.
+    ///
+    /// This is `atan2_with_period_rational` with a period of 2: see
+    /// [`Float::atan2_with_period_rational_prec_round`] for the error bounds, the special cases,
+    /// underflow, and the complexity, with $u = 2$. A zero $y$ gives $0.0$ for a nonnegative $x$
+    /// and $1$ for a negative one, a zero $x$ gives $\pm1/2$ with the sign of $y$, and the quadrant
+    /// diagonals give $\pm1/4$ and $\pm3/4$. All of those are exact at every precision except
+    /// $\pm3/4$, which needs two bits.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::atan2_pi_rational_prec_round_ref(
+    ///     &Rational::from(3),
+    ///     &Rational::from(4),
+    ///     10,
+    ///     Ceiling,
+    /// );
+    /// assert_eq!(t.to_string(), "0.20483");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn atan2_pi_rational_prec_round_ref(
+        y: &Rational,
+        x: &Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        Self::atan2_with_period_rational_prec_round_ref(y, x, 2, prec, rm)
+    }
+
+    /// Computes $\operatorname{atan2}(y,x)/\pi$, the angle of the point $(x,y)$ measured from the
+    /// positive $x$-axis in half-turns, rounding the result to the nearest value of the specified
+    /// precision and returning the result as a [`Float`]. The [`Rational`]s are both taken by
+    /// value. An [`Ordering`] is also returned, indicating whether the rounded angle is less than,
+    /// equal to, or greater than the exact angle.
+    ///
+    /// This is `atan2_with_period_rational` with a period of 2: see
+    /// [`Float::atan2_with_period_rational_prec_round`] for the error bounds, the special cases,
+    /// underflow, and the complexity, with $u = 2$. A zero $y$ gives $0.0$ for a nonnegative $x$
+    /// and $1$ for a negative one, a zero $x$ gives $\pm1/2$ with the sign of $y$, and the quadrant
+    /// diagonals give $\pm1/4$ and $\pm3/4$. All of those are exact at every precision except
+    /// $\pm3/4$, which needs two bits.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::atan2_pi_rational_prec(Rational::from(3), Rational::from(4), 53);
+    /// assert_eq!(t.to_string(), "0.20483276469913345");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn atan2_pi_rational_prec(y: Rational, x: Rational, prec: u64) -> (Self, Ordering) {
+        Self::atan2_with_period_rational_prec(y, x, 2, prec)
+    }
+
+    /// Computes $\operatorname{atan2}(y,x)/\pi$, the angle of the point $(x,y)$ measured from the
+    /// positive $x$-axis in half-turns, rounding the result to the nearest value of the specified
+    /// precision and returning the result as a [`Float`]. The [`Rational`]s are both taken by
+    /// reference. An [`Ordering`] is also returned, indicating whether the rounded angle is less
+    /// than, equal to, or greater than the exact angle.
+    ///
+    /// This is `atan2_with_period_rational` with a period of 2: see
+    /// [`Float::atan2_with_period_rational_prec_round`] for the error bounds, the special cases,
+    /// underflow, and the complexity, with $u = 2$. A zero $y$ gives $0.0$ for a nonnegative $x$
+    /// and $1$ for a negative one, a zero $x$ gives $\pm1/2$ with the sign of $y$, and the quadrant
+    /// diagonals give $\pm1/4$ and $\pm3/4$. All of those are exact at every precision except
+    /// $\pm3/4$, which needs two bits.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::atan2_pi_rational_prec_ref(&Rational::from(3), &Rational::from(4), 53);
+    /// assert_eq!(t.to_string(), "0.20483276469913345");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn atan2_pi_rational_prec_ref(y: &Rational, x: &Rational, prec: u64) -> (Self, Ordering) {
+        Self::atan2_with_period_rational_prec_ref(y, x, 2, prec)
+    }
 }
 
 impl Atan2<Self> for Float {
@@ -2973,4 +3775,92 @@ where
         y,
         x,
     )
+}
+
+/// Computes $\operatorname{atan2}(y,x)/\pi$, the angle of the point $(x,y)$ measured from the
+/// positive $x$-axis in half-turns, for primitive floats.
+///
+/// This is `primitive_float_atan2_with_period` with a period of 2: see
+/// [`primitive_float_atan2_with_period`] for the error bound and the special cases, with $u = 2$.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::atan2::primitive_float_atan2_pi;
+///
+/// assert!(primitive_float_atan2_pi(f32::NAN, 1.0).is_nan());
+/// // the first quadrant's diagonal is a quarter turn
+/// assert_eq!(
+///     NiceFloat(primitive_float_atan2_pi(1.0f32, 1.0)),
+///     NiceFloat(0.25)
+/// );
+/// // the second quadrant's is three quarters
+/// assert_eq!(
+///     NiceFloat(primitive_float_atan2_pi(1.0f32, -1.0)),
+///     NiceFloat(0.75)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_atan2_pi(3.0f64, 4.0)),
+///     NiceFloat(0.20483276469913345)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_atan2_pi<T: PrimitiveFloat>(y: T, x: T) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    primitive_float_atan2_with_period(y, x, 2)
+}
+
+/// Computes $\operatorname{atan2}(y,x)/\pi$, the angle of the point $(x,y)$ measured from the
+/// positive $x$-axis in half-turns, for [`Rational`]s, returning the result as a primitive float.
+///
+/// This is `primitive_float_atan2_with_period_rational` with a period of 2: see
+/// [`primitive_float_atan2_with_period_rational`] for the error bound and the special cases, with
+/// $u = 2$.
+///
+/// # Worst-case complexity
+/// $T(m) = O(m \log m \log\log m)$
+///
+/// $M(m) = O(m \log m)$
+///
+/// where $T$ is time, $M$ is additional memory, and $m$ is `max(y.significant_bits(),
+/// x.significant_bits())`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::{NegativeOne, Zero};
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::atan2::primitive_float_atan2_pi_rational;
+/// use malachite_q::Rational;
+///
+/// assert_eq!(
+///     NiceFloat(primitive_float_atan2_pi_rational::<f64>(
+///         &Rational::from(3),
+///         &Rational::from(4)
+///     )),
+///     NiceFloat(0.20483276469913345)
+/// );
+/// // a negative x with a zero y is half a turn
+/// assert_eq!(
+///     NiceFloat(primitive_float_atan2_pi_rational::<f64>(
+///         &Rational::ZERO,
+///         &Rational::NEGATIVE_ONE
+///     )),
+///     NiceFloat(1.0)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_atan2_pi_rational<T: PrimitiveFloat>(y: &Rational, x: &Rational) -> T
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    primitive_float_atan2_with_period_rational(y, x, 2)
 }

@@ -18,7 +18,8 @@ use malachite_base::test_util::generators::common::{GenConfig, GenMode};
 use malachite_base::test_util::generators::primitive_float_pair_gen;
 use malachite_base::test_util::runner::Runner;
 use malachite_float::float::arithmetic::atan2::{
-    primitive_float_atan2, primitive_float_atan2_rational, primitive_float_atan2_with_period,
+    primitive_float_atan2, primitive_float_atan2_pi, primitive_float_atan2_pi_rational,
+    primitive_float_atan2_rational, primitive_float_atan2_with_period,
     primitive_float_atan2_with_period_rational,
 };
 use malachite_float::test_util::bench::bucketers::*;
@@ -70,6 +71,16 @@ pub(crate) fn register(runner: &mut Runner) {
         benchmark_float_atan2_with_period_rational_prec_round_evaluation_strategy
     );
     register_primitive_float_benches!(runner, benchmark_primitive_float_atan2_with_period_rational);
+    register_demo!(runner, demo_float_atan2_pi_prec_round);
+    register_demo!(runner, demo_float_atan2_pi_prec);
+    register_demo!(runner, demo_float_atan2_pi_round);
+    register_demo!(runner, demo_float_atan2_pi_rational_prec_round);
+    register_primitive_float_demos!(runner, demo_primitive_float_atan2_pi);
+    register_primitive_float_demos!(runner, demo_primitive_float_atan2_pi_rational);
+    register_bench!(
+        runner,
+        benchmark_float_atan2_pi_prec_round_evaluation_strategy
+    );
 }
 
 fn demo_float_atan2_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -648,5 +659,129 @@ fn benchmark_primitive_float_atan2_with_period_rational<T: PrimitiveFloat>(
         &mut [("malachite", &mut |(y, x)| {
             no_out!(primitive_float_atan2_with_period_rational::<T>(&y, &x, 360));
         })],
+    );
+}
+
+fn demo_float_atan2_pi_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (y, x, prec, rm) in float_float_unsigned_rounding_mode_quadruple_gen_var_24()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "({}).atan2_pi_prec_round({}, {}, {}) = {:?}",
+            y.clone(),
+            x.clone(),
+            prec,
+            rm,
+            y.atan2_pi_prec_round(x, prec, rm)
+        );
+    }
+}
+
+fn demo_float_atan2_pi_prec(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (y, x, prec) in float_float_unsigned_triple_gen_var_1()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "({}).atan2_pi_prec({}, {}) = {:?}",
+            y.clone(),
+            x.clone(),
+            prec,
+            y.atan2_pi_prec(x, prec)
+        );
+    }
+}
+
+fn demo_float_atan2_pi_round(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (y, x, rm) in float_float_rounding_mode_triple_gen_var_43()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "({}).atan2_pi_round({}, {}) = {:?}",
+            y.clone(),
+            x.clone(),
+            rm,
+            y.atan2_pi_round(x, rm)
+        );
+    }
+}
+
+fn demo_float_atan2_pi_rational_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (y, x, prec, rm) in rational_rational_unsigned_rounding_mode_quadruple_gen_var_4()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "Float::atan2_pi_rational_prec_round({}, {}, {}, {}) = {:?}",
+            y.clone(),
+            x.clone(),
+            prec,
+            rm,
+            Float::atan2_pi_rational_prec_round(y, x, prec, rm)
+        );
+    }
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn demo_primitive_float_atan2_pi<T: PrimitiveFloat>(gm: GenMode, config: &GenConfig, limit: usize)
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    for (y, x) in primitive_float_pair_gen::<T>().get(gm, config).take(limit) {
+        println!(
+            "primitive_float_atan2_pi({}, {}) = {}",
+            NiceFloat(y),
+            NiceFloat(x),
+            NiceFloat(primitive_float_atan2_pi(y, x))
+        );
+    }
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn demo_primitive_float_atan2_pi_rational<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    for (y, x) in rational_pair_gen().get(gm, config).take(limit) {
+        println!(
+            "primitive_float_atan2_pi_rational({}, {}) = {:?}",
+            y,
+            x,
+            NiceFloat(primitive_float_atan2_pi_rational::<T>(&y, &x))
+        );
+    }
+}
+
+fn benchmark_float_atan2_pi_prec_round_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float::atan2_pi_prec_round(Float, u64, RoundingMode)",
+        BenchmarkType::EvaluationStrategy,
+        float_float_unsigned_rounding_mode_quadruple_gen_var_24().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &quadruple_1_2_3_float_float_primitive_int_max_complexity_bucketer("y", "x", "prec"),
+        &mut [
+            (
+                "Float::atan2_pi_prec_round(Float, u64, RoundingMode)",
+                &mut |(y, x, prec, rm)| no_out!(y.atan2_pi_prec_round(x, prec, rm)),
+            ),
+            (
+                "Float::atan2_pi_prec_round_ref_ref(&Float, u64, RoundingMode)",
+                &mut |(y, x, prec, rm)| no_out!(y.atan2_pi_prec_round_ref_ref(&x, prec, rm)),
+            ),
+        ],
     );
 }
