@@ -412,6 +412,16 @@ documented by git history.
   the tangent family the arcsine can neither overflow nor underflow, since the result lies in
   $[-\pi/2,\pi/2]$ and $|\arcsin x|>|x|$, so a representable input always has a representable
   result. `primitive_float_asin` gives the correctly rounded `f32` or `f64` arcsine.
+- `asin_rational_prec_round` and `asin_rational_prec` (with `_ref` variants), which take a
+  `Rational`. MPFR has no such function. The identity is rearranged to
+  $\arcsin x = \operatorname{sign}(x)\arctan(\sqrt{x^2/(1-x^2)})$, whose argument is an exact
+  `Rational`: nothing cancels, so unlike the `Float` version the cost does not grow as $x$
+  approaches $\pm1$, and the input never needs rounding — which matters because the arcsine is not
+  1-Lipschitz, so the round-once approach `atan_rational` can afford would cost about half the
+  cancelled bits here. Underflow, impossible for the `Float` arcsine, is reachable for a `Rational`
+  below the exponent range, and is handled by the scaled path the periodic sine uses.
+  `primitive_float_asin_rational` gives the correctly rounded `f32` or `f64` arcsine of a
+  `Rational`.
 - `Cot` and `CotAssign` (new traits in malachite-base) for `Float`, with the usual
   `cot_prec_round`, `cot_prec`, `cot_round`, and `_ref`/`_assign` variants: a port of `mpfr_cot`,
   MPFR's generic reciprocal template with the tangent. MPFR's tangent is itself a quotient of a

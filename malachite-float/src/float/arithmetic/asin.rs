@@ -14,9 +14,14 @@
 
 use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
-use crate::emulate_float_to_float_fn;
 use crate::float::arithmetic::round_near_x::small_input_shortcut;
+use crate::float::arithmetic::sin::{SCALE, SCALED_INPUT_EXPONENT, scaled_underflow};
+use crate::{emulate_float_to_float_fn, emulate_rational_to_float_fn};
 use core::cmp::Ordering::{self, Equal, Greater, Less};
+use malachite_base::num::arithmetic::traits::{CeilingLogBase2, Square};
+use malachite_base::num::basic::traits::Zero as ZeroTrait;
+use malachite_base::num::comparison::traits::PartialOrdAbs;
+use malachite_q::Rational;
 
 use malachite_base::num::arithmetic::traits::{Abs, Asin, AsinAssign};
 use malachite_base::num::basic::floats::PrimitiveFloat;
@@ -24,7 +29,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{NaN as NaNTrait, One};
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode::{self, Exact, Floor, Nearest};
+use malachite_base::rounding_modes::RoundingMode::{self, Exact, Floor, Nearest, Up};
 use malachite_nz::natural::arithmetic::float::round::float_can_round;
 use malachite_nz::platform::Limb;
 
@@ -82,6 +87,64 @@ fn asin_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float,
                 increment = w >> 1;
             }
         }
+    }
+}
+
+// Computes asin(x) for a nonzero `Rational` x with |x| < 1, rounded to precision `prec` with
+// rounding mode `rm`. (The rest is handled by the caller.)
+//
+// MPFR has no arcsine of a rational. Its `Float` algorithm takes atan(x/sqrt(1 - x^2)) and pays for
+// the cancellation in 1 - x^2 with extra working precision; here that subtraction is exact, so the
+// identity is used in the form
+//
+//     asin(x) = sign(x) atan(sqrt(x^2/(1 - x^2))),
+//
+// whose argument is an exact `Rational`. Nothing cancels, and the input needs no rounding at all,
+// which matters because the arcsine is not 1-Lipschitz: its derivative grows without bound toward
+// +-1, so rounding the input first -- the approach `atan_rational` can afford -- would cost about
+// half the cancelled bits.
+//
+// The errors that remain do not compound: the square root is correctly rounded, and the arctangent
+// neither amplifies a relative error (q/((1 + q^2) atan q) <= 1 for every positive q) nor adds more
+// than its own half ulp.
+pub(crate) fn asin_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    assert_ne!(rm, Exact, "Inexact asin_rational");
+    let positive = *x > 0u32;
+    let exp_x = x.floor_log_base_2_abs() + 1;
+    // asin(x) = x(1 + x^2/6 + ...), so for an x at or below the bottom of the exponent range the
+    // correction is below 2^(2 SCALED_INPUT_EXPONENT) and invisible at any working precision the
+    // loop can reach: the answer is x itself, rounded. It is formed scaled up by 2^SCALE, since a
+    // `Rational` can sit far below the smallest positive `Float` and the general path's own
+    // rounding would collapse to zero there, leaving the loop below a value it can never certify.
+    if exp_x <= SCALED_INPUT_EXPONENT {
+        let scaled = x << SCALE;
+        let mut w = prec + prec.ceiling_log_base_2() + 10;
+        let mut increment = Limb::WIDTH;
+        loop {
+            // rounded away from zero, which is the side asin(x) lies on
+            let t = Float::from_rational_prec_round_ref(&scaled, w, Up).0;
+            if let Some(result) = scaled_underflow(&t, positive, prec, rm) {
+                return result;
+            }
+            let t = t >> SCALE;
+            if float_can_round(t.significand_ref().unwrap(), w - 2, prec, rm) {
+                return Float::from_float_prec_round(t, prec, rm);
+            }
+            w += increment;
+            increment = w >> 1;
+        }
+    }
+    let x2 = (&x.abs()).square();
+    let r = (&x2 / (Rational::ONE - &x2)).abs();
+    let mut w = prec + prec.ceiling_log_base_2() + 10;
+    let mut increment = Limb::WIDTH;
+    loop {
+        let t = Float::sqrt_rational_prec_ref(&r, w).0.atan_prec(w).0;
+        if float_can_round(t.significand_ref().unwrap(), w - 3, prec, rm) {
+            return Float::from_float_prec_round(if positive { t } else { -t }, prec, rm);
+        }
+        w += increment;
+        increment = w >> 1;
     }
 }
 
@@ -805,6 +868,199 @@ impl Float {
         let prec = self.significant_bits();
         self.asin_prec_round_assign(prec, rm)
     }
+
+    /// Computes $\arcsin x$, the arcsine of a [`Rational`], rounding the result to the specified
+    /// precision and with the specified rounding mode and returning the result as a [`Float`]. The
+    /// [`Rational`] is taken by value. An [`Ordering`] is also returned, indicating whether the
+    /// rounded arcsine is less than, equal to, or greater than the exact arcsine.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,p,m) = \arcsin x+\varepsilon.
+    /// $$
+    /// - If the result is NaN or zero, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - Otherwise, if $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2 |\arcsin
+    ///   x|\rfloor-p+1}$.
+    /// - Otherwise, if $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2 |\arcsin
+    ///   x|\rfloor-p}$.
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(x,p,m)=\text{NaN}$ for $|x|>1$
+    /// - $f(0,p,m)=0.0$
+    /// - $f(\pm1,p,m)=\pm\pi/2$, rounded
+    ///
+    /// The zero and the NaNs are the only exact cases. A [`Rational`] has no signed zeros, so the
+    /// zero result is positive.
+    ///
+    /// Overflow is not possible, since the result lies in $[-\pi/2, \pi/2]$. Underflow, which the
+    /// [`Float`] arcsine cannot reach, is possible here: a [`Rational`] may lie far below the
+    /// bottom of the exponent range, and there $\arcsin x$ is about $x$, so $0.0$ or
+    /// $\pm2^{-2^{30}}$ is returned instead, by the rounding mode alone.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::asin_rational_prec`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n (\log n)^3 \log\log n + m (\log m)^2 \log\log m)$
+    ///
+    /// $M(n, m) = O(n \log n + m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`: $x^2/(1-x^2)$ is formed exactly, and its square root and arctangent
+    /// are taken at a working precision of about $n$ bits, which costs the first term; the second
+    /// covers the $m$-bit input. The magnitude of the input does not drive the cost, and unlike the
+    /// [`Float`] arcsine neither does its closeness to $\pm1$, since nothing cancels.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision (which is the case unless $x$ is zero or $|x|>1$).
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::asin_rational_prec_round(Rational::from_unsigneds(3u8, 5), 10, Floor);
+    /// assert_eq!(t.to_string(), "0.64258");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (t, o) = Float::asin_rational_prec_round(Rational::from_unsigneds(3u8, 5), 10, Ceiling);
+    /// assert_eq!(t.to_string(), "0.64355");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn asin_rational_prec_round(x: Rational, prec: u64, rm: RoundingMode) -> (Self, Ordering) {
+        Self::asin_rational_prec_round_ref(&x, prec, rm)
+    }
+
+    /// Computes $\arcsin x$, the arcsine of a [`Rational`], rounding the result to the specified
+    /// precision and with the specified rounding mode and returning the result as a [`Float`]. The
+    /// [`Rational`] is taken by reference. An [`Ordering`] is also returned, indicating whether the
+    /// rounded arcsine is less than, equal to, or greater than the exact arcsine.
+    ///
+    /// See [`Float::asin_rational_prec_round`] for the error bounds, the special cases, underflow,
+    /// and the complexity; this function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) =
+    ///     Float::asin_rational_prec_round_ref(&Rational::from_unsigneds(3u8, 5), 20, Floor);
+    /// assert_eq!(t.to_string(), "0.64350033");
+    /// assert_eq!(o, Less);
+    ///
+    /// // an input of 1 is a quarter turn
+    /// let (t, o) = Float::asin_rational_prec_round_ref(&Rational::ONE, 20, Floor);
+    /// assert_eq!(t.to_string(), "1.5707951");
+    /// assert_eq!(o, Less);
+    /// ```
+    pub fn asin_rational_prec_round_ref(
+        x: &Rational,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        // asin(0) = 0, exactly (a `Rational` zero has no sign, so the result is positive)
+        if *x == 0u32 {
+            return (Self::ZERO, Equal);
+        }
+        match x.partial_cmp_abs(&1u32).unwrap() {
+            // the arcsine is NaN outside [-1, 1]
+            Greater => (Self::NAN, Equal),
+            // asin(1) = pi/2, asin(-1) = -pi/2
+            Equal => {
+                assert_ne!(rm, Exact, "Inexact asin_rational");
+                let negative = *x < 0u32;
+                let (pi, o) = Self::pi_prec_round(prec, if negative { -rm } else { rm });
+                // exact
+                let half = pi >> 1u32;
+                if negative {
+                    (-half, o.reverse())
+                } else {
+                    (half, o)
+                }
+            }
+            Less => asin_rational_helper(x, prec, rm),
+        }
+    }
+
+    /// Computes $\arcsin x$, the arcsine of a [`Rational`], rounding the result to the nearest
+    /// value of the specified precision and returning the result as a [`Float`]. The [`Rational`]
+    /// is taken by value. An [`Ordering`] is also returned, indicating whether the rounded arcsine
+    /// is less than, equal to, or greater than the exact arcsine.
+    ///
+    /// If the arcsine is equidistant from two [`Float`]s with the specified precision, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// See [`Float::asin_rational_prec_round`] for the error bounds, the special cases, underflow,
+    /// and the complexity; this function is that one with `Nearest`.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::asin_rational_prec_round`] instead.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::asin_rational_prec(Rational::from_unsigneds(3u8, 5), 10);
+    /// assert_eq!(t.to_string(), "0.64355");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (t, o) = Float::asin_rational_prec(Rational::from_unsigneds(3u8, 5), 53);
+    /// assert_eq!(t.to_string(), "0.64350110879328437");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn asin_rational_prec(x: Rational, prec: u64) -> (Self, Ordering) {
+        Self::asin_rational_prec_round_ref(&x, prec, Nearest)
+    }
+
+    /// Computes $\arcsin x$, the arcsine of a [`Rational`], rounding the result to the nearest
+    /// value of the specified precision and returning the result as a [`Float`]. The [`Rational`]
+    /// is taken by reference. An [`Ordering`] is also returned, indicating whether the rounded
+    /// arcsine is less than, equal to, or greater than the exact arcsine.
+    ///
+    /// See [`Float::asin_rational_prec`] for the error bounds, the special cases, underflow, and
+    /// the complexity; this function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::asin_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 53);
+    /// assert_eq!(t.to_string(), "0.64350110879328437");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn asin_rational_prec_ref(x: &Rational, prec: u64) -> (Self, Ordering) {
+        Self::asin_rational_prec_round_ref(x, prec, Nearest)
+    }
 }
 
 impl Asin for Float {
@@ -1079,4 +1335,65 @@ where
     for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
 {
     emulate_float_to_float_fn(Float::asin_prec, x)
+}
+
+/// Computes $\arcsin x$, the arcsine of a [`Rational`], returning the result as a primitive float.
+///
+/// $$
+/// f(x) = \arcsin x+\varepsilon,
+/// $$
+/// where $|\varepsilon| < 2^{\lfloor\log_2 |\arcsin x|\rfloor-p}$ and $p$ is the precision of the
+/// output (24 if `T` is a [`f32`] and 53 if `T` is a [`f64`]); the special cases below are exact.
+///
+/// Special cases:
+/// - $f(x)=\text{NaN}$ for $|x|>1$
+/// - $f(0)=0.0$
+/// - $f(\pm1)=\pm\pi/2$, rounded
+///
+/// Overflow is not possible, since the result lies in $[-\pi/2, \pi/2]$. The result is subnormal,
+/// or zero, only for an $x$ that is itself that small.
+///
+/// # Worst-case complexity
+/// $T(m) = O(m \log m \log\log m)$
+///
+/// $M(m) = O(m \log m)$
+///
+/// where $T$ is time, $M$ is additional memory, and $m$ is `x.significant_bits()`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::{One, Zero};
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::asin::primitive_float_asin_rational;
+/// use malachite_q::Rational;
+///
+/// assert_eq!(
+///     NiceFloat(primitive_float_asin_rational::<f64>(&Rational::ZERO)),
+///     NiceFloat(0.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_asin_rational::<f64>(&Rational::ONE)),
+///     NiceFloat(1.5707963267948966)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_asin_rational::<f64>(
+///         &Rational::from_unsigneds(3u8, 5)
+///     )),
+///     NiceFloat(0.6435011087932844)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_asin_rational::<f32>(
+///         &Rational::from_unsigneds(3u8, 5)
+///     )),
+///     NiceFloat(0.6435011)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_asin_rational<T: PrimitiveFloat>(x: &Rational) -> T
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    emulate_rational_to_float_fn(Float::asin_rational_prec_ref, x)
 }
