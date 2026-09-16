@@ -26,10 +26,11 @@ use crate::test_util::generators::common::{
     valid_strtofr_quadruple,
 };
 use crate::test_util::generators::exhaustive::{
-    add_mul_prec_round_valid, add_mul_rational_prec_round_valid, add_mul_rational_round_valid,
-    add_mul_round_valid, add_prec_round_valid, add_rational_prec_round_valid,
-    add_rational_round_valid, add_round_valid, agm_prec_round_valid, agm_rational_prec_round_valid,
-    agm_round_valid, asin_with_period_prec_round_valid, asin_with_period_rational_prec_round_valid,
+    acos_prec_round_valid, acos_round_valid, add_mul_prec_round_valid,
+    add_mul_rational_prec_round_valid, add_mul_rational_round_valid, add_mul_round_valid,
+    add_prec_round_valid, add_rational_prec_round_valid, add_rational_round_valid, add_round_valid,
+    agm_prec_round_valid, agm_rational_prec_round_valid, agm_round_valid,
+    asin_with_period_prec_round_valid, asin_with_period_rational_prec_round_valid,
     asin_with_period_round_valid, atan_with_period_prec_round_valid,
     atan_with_period_rational_prec_round_valid, atan_with_period_round_valid,
     atan2_rational_prec_round_valid, average_prec_round_valid, cbrt_prec_round_valid,
@@ -6197,6 +6198,36 @@ pub fn random_float_unsigned_rounding_mode_triple_gen_var_12(
     )
 }
 
+pub fn random_float_unsigned_rounding_mode_triple_gen_var_43(
+    config: &GenConfig,
+) -> It<(Float, u64, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_extreme_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(ref x, p, rm)| acos_prec_round_valid(x, p, rm)),
+    )
+}
+
 pub fn random_float_unsigned_rounding_mode_triple_gen_var_13(
     config: &GenConfig,
 ) -> It<(Float, u64, RoundingMode)> {
@@ -11415,6 +11446,36 @@ pub fn random_float_unsigned_rounding_mode_triple_gen_var_36(
     )
 }
 
+pub fn random_float_unsigned_rounding_mode_triple_gen_var_42(
+    config: &GenConfig,
+) -> It<(Float, u64, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(ref x, p, rm)| acos_prec_round_valid(x, p, rm)),
+    )
+}
+
 pub fn random_float_unsigned_rounding_mode_triple_gen_var_38(
     config: &GenConfig,
 ) -> It<(Float, u64, RoundingMode)> {
@@ -11553,6 +11614,27 @@ pub fn random_float_rounding_mode_pair_gen_var_47(config: &GenConfig) -> It<(Flo
             &random_rounding_modes,
         )
         .filter(|(f, rm)| exp_round_valid(f, *rm)),
+    )
+}
+
+pub fn random_float_rounding_mode_pair_gen_var_49(config: &GenConfig) -> It<(Float, RoundingMode)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|(f, rm)| acos_round_valid(f, *rm)),
     )
 }
 

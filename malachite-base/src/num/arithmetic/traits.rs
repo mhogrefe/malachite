@@ -1016,6 +1016,18 @@ pub trait AsinAssign {
     fn asin_assign(&mut self);
 }
 
+/// Computes $\arccos(x)$, the arccosine of a number.
+pub trait Acos {
+    type Output;
+
+    fn acos(self) -> Self::Output;
+}
+
+/// Replaces a number with its arccosine, $\arccos(x)$.
+pub trait AcosAssign {
+    fn acos_assign(&mut self);
+}
+
 /// Replaces a number with its sine, $\sin(x)$, and writes its cosine, $\cos(x)$, to a second
 /// number.
 pub trait SinCosAssign {

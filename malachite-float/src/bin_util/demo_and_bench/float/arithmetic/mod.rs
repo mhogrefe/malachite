@@ -24,6 +24,7 @@ pub(crate) fn register(runner: &mut Runner) {
     csc::register(runner);
     atan::register(runner);
     atan2::register(runner);
+    acos::register(runner);
     asin::register(runner);
     cot::register(runner);
     div::register(runner);
@@ -81,6 +82,7 @@ pub(crate) fn register(runner: &mut Runner) {
 
 mod abs;
 mod abs_squared;
+mod acos;
 mod add;
 mod add_mul;
 mod agm;

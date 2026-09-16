@@ -450,6 +450,14 @@ documented by git history.
   are the only exact cases, and any $|x|>1$ (or, for a `Float`, NaN or either infinity) gives NaN.
   `primitive_float_asin_pi` and `primitive_float_asin_pi_rational` give the correctly rounded `f32`
   or `f64` angle in half-turns.
+- `Acos` and `AcosAssign` (new traits in malachite-base) for `Float`, with the usual
+  `acos_prec_round`, `acos_prec`, `acos_round`, and `_ref`/`_assign` variants: a port of
+  `mpfr_acos`, computed as $\pi/2-\arctan(x/\sqrt{1-x^2})$ at a working precision that covers both
+  the cancellation in that subtraction and the blow-up of the quotient. The result is NaN for a NaN
+  input, for either infinity, and for any $|x|>1$; $\pm0.0$ gives $\pi/2$, $1$ gives $0.0$, and
+  $-1$ gives $\pi$. The zero at $x=1$ is the only exact case — unlike the arcsine, a zero input is
+  not one, since $\pi/2$ is never exactly representable. Overflow is not possible, since the result
+  lies in $[0,\pi]$. `primitive_float_acos` gives the correctly rounded `f32` or `f64` arccosine.
 - `Cot` and `CotAssign` (new traits in malachite-base) for `Float`, with the usual
   `cot_prec_round`, `cot_prec`, `cot_round`, and `_ref`/`_assign` variants: a port of `mpfr_cot`,
   MPFR's generic reciprocal template with the tangent. MPFR's tangent is itself a quotient of a

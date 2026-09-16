@@ -12,6 +12,10 @@ pub mod abs;
 /// [`AbsSquaredAssign`](malachite_base::num::arithmetic::traits::AbsSquaredAssign), traits for
 /// computing the squared absolute value of a number. For real types this is the same as squaring.
 pub mod abs_squared;
+/// Implementations of [`Acos`](malachite_base::num::arithmetic::traits::Acos) and
+/// [`AcosAssign`](malachite_base::num::arithmetic::traits::AcosAssign), traits for computing the
+/// arccosine of [`Float`](super::Float)s.
+pub mod acos;
 /// Addition of [`Float`](super::Float)s, and of [`Float`](super::Float)s with
 /// [`Rational`](malachite_q::Rational)s.
 pub mod add;

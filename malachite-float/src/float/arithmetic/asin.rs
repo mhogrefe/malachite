@@ -45,8 +45,7 @@ fn asin_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float,
     if let Some(result) = small_input_shortcut(x, -(exp_x << 1), 2, true, prec, rm) {
         return result;
     }
-    let xp = x.abs();
-    match xp.partial_cmp(&1u32).unwrap() {
+    match x.partial_cmp_abs(&1u32).unwrap() {
         // asin(x) = NaN for |x| > 1
         Greater => (Float::NAN, Equal),
         // asin(1) = pi/2, asin(-1) = -pi/2
@@ -64,22 +63,13 @@ fn asin_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float,
         }
         Less => {
             assert_ne!(rm, Exact, "Inexact asin");
-            // The subtraction 1 - x^2 below cancels away about -EXP(1 - |x|) bits, since x^2 is
-            // that close to 1. Both the working precision and the slack in the rounding test have
-            // to cover that loss, so it is measured once here, from 1 - |x| rounded down.
-            let p = x.get_prec().unwrap();
-            let one_minus = Float::one_prec(p).sub_prec_round(xp, p, Floor).0;
-            let cancel = u64::exact_from(2 - i64::from(one_minus.get_exponent().unwrap()));
+            // Both the working precision and the slack in the rounding test have to cover the bits
+            // that 1 - x^2 loses, so the loss is measured once, here.
+            let cancel = asin_cancellation(x, *x > 0u32);
             let mut w = prec + 10 + cancel;
             let mut increment = Limb::WIDTH;
             loop {
-                // asin(x) = atan(x/sqrt(1 - x^2))
-                let t = Float::ONE
-                    .sub_prec_ref_val(x.square_prec_ref(w).0, w)
-                    .0
-                    .sqrt_prec(w)
-                    .0;
-                let t = x.div_prec_ref_val(t, w).0.atan_prec(w).0;
+                let t = asin_at_prec(x, w);
                 if w > cancel && float_can_round(t.significand_ref().unwrap(), w - cancel, prec, rm)
                 {
                     return Float::from_float_prec_round(t, prec, rm);
@@ -89,6 +79,36 @@ fn asin_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float,
             }
         }
     }
+}
+
+// The number of bits that the subtraction 1 - x^2 loses when the arcsine of x is taken as
+// atan(x/sqrt(1 - x^2)): x^2 is as close to 1 as |x| is, so the loss is 2 - EXP(1 - |x|), measured
+// from 1 - |x| rounded down at the input's precision. `positive` must say whether x is positive,
+// and |x| must be less than 1.
+//
+// This is the `supplement` of mpfr_acos from acos.c, MPFR 4.2.2, in the form that MPFR charges for
+// a negative input. The arccosine of a positive input also cancels in its pi/2 subtraction and
+// charges twice as much, less 2.
+pub(crate) fn asin_cancellation(x: &Float, positive: bool) -> u64 {
+    let p = x.get_prec().unwrap();
+    // 1 - |x|, rounded down, which is where the loss is visible
+    let one_minus = if positive {
+        Float::one_prec(p).sub_prec_round_val_ref(x, p, Floor).0
+    } else {
+        Float::one_prec(p).add_prec_round_val_ref(x, p, Floor).0
+    };
+    u64::exact_from(2 - i64::from(one_minus.get_exponent().unwrap()))
+}
+
+// asin(x) = atan(x/sqrt(1 - x^2)) for an x with |x| < 1, evaluated at a working precision of `w`.
+// The arccosine subtracts this from pi/2.
+pub(crate) fn asin_at_prec(x: &Float, w: u64) -> Float {
+    let t = Float::ONE
+        .sub_prec_ref_val(x.square_prec_ref(w).0, w)
+        .0
+        .sqrt_prec(w)
+        .0;
+    x.div_prec_ref_val(t, w).0.atan_prec(w).0
 }
 
 // Computes asin(x) u/(2 pi) for a finite nonzero `Float` x with |x| <= 1 and a nonzero u, rounded
