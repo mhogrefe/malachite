@@ -389,6 +389,14 @@ documented by git history.
   range keeps the quotient representable, can instead spend an unbounded amount of time separating
   that fraction from the representable one beside it. `primitive_float_atan2_with_period` gives the
   correctly rounded `f32` or `f64` angle in $u$ths of a turn.
+- `atan2_with_period_rational_prec_round` and `atan2_with_period_rational_prec` (with `_ref`
+  variants), which take `Rational` arguments. MPFR has no such function. The quotient $y/x$ is
+  exact, so for a positive $x$ the whole computation is the `Rational` arctangent in $u$ths of a
+  turn, and only the negative-$x$ reflection needs a loop. The special cases are those a type
+  without NaNs, infinities, or signed zeros can have: a zero $y$ gives $0.0$ for a nonnegative $x$
+  and $u/2$ for a negative one, a zero $x$ gives $\pm u/4$ with the sign of $y$, and the quadrant
+  diagonals give $\pm u/8$ and $\pm3u/8$. `primitive_float_atan2_with_period_rational` gives the
+  correctly rounded `f32` or `f64` angle.
 - `Cot` and `CotAssign` (new traits in malachite-base) for `Float`, with the usual
   `cot_prec_round`, `cot_prec`, `cot_round`, and `_ref`/`_assign` variants: a port of `mpfr_cot`,
   MPFR's generic reciprocal template with the tangent. MPFR's tangent is itself a quotient of a

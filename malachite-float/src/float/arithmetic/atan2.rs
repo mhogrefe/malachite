@@ -12,7 +12,9 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use crate::float::arithmetic::atan::{atan_rational_helper, scaled_unsigned};
+use crate::float::arithmetic::atan::{
+    atan_rational_helper, atan_with_period_rational_helper, scaled_unsigned,
+};
 use crate::float::arithmetic::sin::{SCALE, SCALED_INPUT_EXPONENT, scaled_underflow};
 use crate::{Float, emulate_float_float_to_float_fn, emulate_rational_rational_to_float_fn};
 use core::cmp::Ordering::{self, Equal, Greater, Less};
@@ -468,6 +470,77 @@ fn atan2_with_period_prec_round_normal_ref(
         // atan2u is odd with respect to y
         let t = if y_positive { t } else { -t };
         // a negative e claims better than half-ulp accuracy, which cannot beat t's own precision
+        let err = min(i64::exact_from(w), i64::exact_from(w) - e);
+        if err > 0 && float_can_round(t.significand_ref().unwrap(), u64::exact_from(err), prec, rm)
+        {
+            return Float::from_float_prec_round(t, prec, rm);
+        }
+        w += increment;
+        increment = w >> 1;
+    }
+}
+
+// Computes atan2u(y, x, u) = atan2(y, x) u/(2 pi) for nonzero `Rational`s y and x with |y| != |x|
+// and nonzero u, rounded to precision `prec` with rounding mode `rm`. (The rest is handled by the
+// caller.)
+//
+// The quotient y/x is exact here, so nothing corresponds to the `Float` case's division or to its
+// underflow and overflow: for a positive x the whole computation is the `Rational` arctangent in u
+// ths of a turn, which already covers every magnitude. Only the negative-x reflection needs a loop,
+// and it is MPFR's, with the arctangent taken from the `Rational` directly.
+fn atan2_with_period_rational_prec_round_normal_ref(
+    y: &Rational,
+    x: &Rational,
+    u: u64,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    assert_ne!(rm, Exact, "Inexact atan2_with_period_rational");
+    let q = y / x;
+    if *x > 0u32 {
+        // atan2u(y, x, u) = atanu(y/x, u)
+        return atan_with_period_rational_helper(&q, u, prec, rm);
+    }
+    // atan2u(y, x, u) = sign(y) (u/2 - atanu(|y/x|, u))
+    let y_positive = *y > 0u32;
+    let aq = q.abs();
+    let d = aq.floor_log_base_2_abs() + 1;
+    let p = i64::exact_from(prec);
+    // An arctangent this small underflows, and would leave the loop below with a value it can never
+    // certify; u/2 minus it rounds like u/2 stepped one ulp toward zero either way.
+    if d <= SCALED_INPUT_EXPONENT {
+        return atan2u_aux3(u, y_positive, prec, rm);
+    }
+    // As in the `Float` case, an extreme quotient puts the result astronomically close to a
+    // quadrant boundary, which the loop cannot settle when that boundary is also a rounding
+    // boundary. Here |y/x| growing takes the result to u/4 from above, and |y/x| shrinking takes it
+    // to u/2 from below.
+    if i64::exact_from(u.significant_bits() - TrailingZeros::trailing_zeros(u)) <= p + 1 {
+        if d >= p + 2 {
+            return atan2u_aux4(u, false, y_positive, prec, rm);
+        }
+        if d < -p {
+            return atan2u_aux3(u, y_positive, prec, rm);
+        }
+    }
+    let mut w = prec + prec.ceiling_log_base_2() + 10;
+    let mut increment = Limb::WIDTH;
+    loop {
+        // correctly rounded, so the error is under an ulp: e below is EXP(t), which states it as
+        // 2^(e - w)
+        let t = atan_with_period_rational_helper(&aq, u, w, Nearest).0;
+        let mut e = i64::from(t.get_exponent().unwrap());
+        // u/2 - t, formed as (u - 2 t)/2 so that u stays an integer
+        let t = Float::from(u).sub_prec(t << 1u32, w).0;
+        let exp_t = i64::from(t.get_exponent().unwrap());
+        // error <= 2^(exp_t - w - 1) + 2^(e + 1 - w) <= 2^(e + 1 - w) for the e below
+        e = max(exp_t - 1, e + 1);
+        let t = t >> 1u32;
+        let exp_t = i64::from(t.get_exponent().unwrap());
+        // the error is at most 2^(e - w); relative to t that is 2^(exp_t - w + err)
+        e -= exp_t;
+        // atan2u is odd with respect to y
+        let t = if y_positive { t } else { -t };
         let err = min(i64::exact_from(w), i64::exact_from(w) - e);
         if err > 0 && float_can_round(t.significand_ref().unwrap(), u64::exact_from(err), prec, rm)
         {
@@ -2246,6 +2319,245 @@ impl Float {
     pub fn atan2_rational_prec_ref(y: &Rational, x: &Rational, prec: u64) -> (Self, Ordering) {
         Self::atan2_rational_prec_round_ref(y, x, prec, Nearest)
     }
+
+    /// Computes $\operatorname{atan2}(y,x)u/(2\pi)$, the angle of the point $(x,y)$ measured from
+    /// the positive $x$-axis in $u$ths of a turn, rounding the result to the specified precision
+    /// and with the specified rounding mode and returning the result as a [`Float`]. The
+    /// [`Rational`]s are both taken by value. An [`Ordering`] is also returned, indicating whether
+    /// the rounded angle is less than, equal to, or greater than the exact angle.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(y,x,u,p,m) = \operatorname{atan2}(y,x)u/(2\pi)+\varepsilon.
+    /// $$
+    /// - If the result is one of the exact cases below, $\varepsilon$ may be ignored or assumed to
+    ///   be 0.
+    /// - Otherwise, if $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2
+    ///   |\operatorname{atan2}(y,x)u/(2\pi)|\rfloor-p+1}$.
+    /// - Otherwise, if $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |\operatorname{atan2}(y,x)u/(2\pi)|\rfloor-p}$.
+    ///
+    /// Special cases:
+    /// - $f(0,x,u,p,m)=0.0$ if $x \geq 0$, and $u/2$ if $x < 0$
+    /// - $f(y,0,u,p,m)=\pm u/4$, with the sign of $y$, for nonzero $y$
+    /// - $f(\pm x,x,u,p,m)=\pm u/8$ for positive $x$, and $\pm3u/8$ for negative $x$
+    /// - $f(y,x,0,p,m)=0.0$
+    ///
+    /// These are the only exact cases, and the turn fractions are exact only when $p$ is large
+    /// enough to hold them. A [`Rational`] has no NaN, no infinities, and no signed zeros, so the
+    /// quadrant-selecting sign of a zero argument has no counterpart here. As in the [`Float`]
+    /// case, $u = 0$ gives a zero throughout, where MPFR's `mpfr_atan2u` returns $\pm1$ for a
+    /// negative $x$.
+    ///
+    /// Overflow is not possible, since $|f(y,x,u,p,m)| \leq u/2 < 2^{63}$. The result underflows
+    /// only for a positive $x$ with $|y/x|$ tiny and $u$ small.
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// If you know you'll be using `Nearest`, consider using
+    /// [`Float::atan2_with_period_rational_prec`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n (\log n)^3 \log\log n + m (\log m)^2 \log\log m)$
+    ///
+    /// $M(n, m) = O(n \log n + m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `max(y.significant_bits(), x.significant_bits())`: the quotient is formed exactly, then
+    /// rounded once and its periodic arctangent taken at a working precision of about $n$ bits,
+    /// which costs the first term; the second covers the inputs.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::atan2_with_period_rational_prec_round(
+    ///     Rational::from(3),
+    ///     Rational::from(4),
+    ///     360,
+    ///     10,
+    ///     Floor,
+    /// );
+    /// assert_eq!(t.to_string(), "36.812");
+    /// assert_eq!(o, Less);
+    ///
+    /// // the first quadrant's diagonal is an eighth of a turn
+    /// let (t, o) = Float::atan2_with_period_rational_prec_round(
+    ///     Rational::ONE,
+    ///     Rational::ONE,
+    ///     360,
+    ///     10,
+    ///     Exact,
+    /// );
+    /// assert_eq!(t.to_string(), "45.000");
+    /// assert_eq!(o, Equal);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn atan2_with_period_rational_prec_round(
+        y: Rational,
+        x: Rational,
+        u: u64,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        Self::atan2_with_period_rational_prec_round_ref(&y, &x, u, prec, rm)
+    }
+
+    /// Computes $\operatorname{atan2}(y,x)u/(2\pi)$, the angle of the point $(x,y)$ measured from
+    /// the positive $x$-axis in $u$ths of a turn, rounding the result to the specified precision
+    /// and with the specified rounding mode and returning the result as a [`Float`]. The
+    /// [`Rational`]s are both taken by reference. An [`Ordering`] is also returned, indicating
+    /// whether the rounded angle is less than, equal to, or greater than the exact angle.
+    ///
+    /// See [`Float::atan2_with_period_rational_prec_round`] for the error bounds, the special
+    /// cases, underflow, and the complexity; this function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::atan2_with_period_rational_prec_round_ref(
+    ///     &Rational::from(3),
+    ///     &Rational::from(4),
+    ///     360,
+    ///     10,
+    ///     Ceiling,
+    /// );
+    /// assert_eq!(t.to_string(), "36.875");
+    /// assert_eq!(o, Greater);
+    /// ```
+    pub fn atan2_with_period_rational_prec_round_ref(
+        y: &Rational,
+        x: &Rational,
+        u: u64,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        // atan2u(0, x, u) = 0 for a nonnegative x and u/2 for a negative one
+        if *y == 0u32 {
+            return if *x < 0u32 {
+                scaled_unsigned(u, 1, true, prec, rm)
+            } else {
+                (Self::ZERO, Equal)
+            };
+        }
+        let y_positive = *y > 0u32;
+        // atan2u(y, 0, u) = +-u/4, with the sign of y
+        if *x == 0u32 {
+            return scaled_unsigned(u, 2, y_positive, prec, rm);
+        }
+        // |y| = |x| puts the angle on a quadrant diagonal, an exact eighth or three eighths of a
+        // turn
+        if y.eq_abs(x) {
+            return if *x > 0u32 {
+                scaled_unsigned(u, 3, y_positive, prec, rm)
+            } else {
+                atan2u_aux2(u, 3, y_positive, prec, rm)
+            };
+        }
+        // every angle measures zero units when the whole turn does; see the `Float` version for why
+        // this departs from MPFR
+        if u == 0 {
+            return (Self::ZERO, Equal);
+        }
+        atan2_with_period_rational_prec_round_normal_ref(y, x, u, prec, rm)
+    }
+
+    /// Computes $\operatorname{atan2}(y,x)u/(2\pi)$, the angle of the point $(x,y)$ measured from
+    /// the positive $x$-axis in $u$ths of a turn, rounding the result to the nearest value of the
+    /// specified precision and returning the result as a [`Float`]. The [`Rational`]s are both
+    /// taken by value. An [`Ordering`] is also returned, indicating whether the rounded angle is
+    /// less than, equal to, or greater than the exact angle.
+    ///
+    /// If the angle is equidistant from two [`Float`]s with the specified precision, the [`Float`]
+    /// with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a description of
+    /// the `Nearest` rounding mode.
+    ///
+    /// See [`Float::atan2_with_period_rational_prec_round`] for the error bounds, the special
+    /// cases, underflow, and the complexity; this function is that one with `Nearest`.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::atan2_with_period_rational_prec_round`] instead.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) =
+    ///     Float::atan2_with_period_rational_prec(Rational::from(3), Rational::from(4), 360, 53);
+    /// assert_eq!(t.to_string(), "36.869897645844020");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn atan2_with_period_rational_prec(
+        y: Rational,
+        x: Rational,
+        u: u64,
+        prec: u64,
+    ) -> (Self, Ordering) {
+        Self::atan2_with_period_rational_prec_round_ref(&y, &x, u, prec, Nearest)
+    }
+
+    /// Computes $\operatorname{atan2}(y,x)u/(2\pi)$, the angle of the point $(x,y)$ measured from
+    /// the positive $x$-axis in $u$ths of a turn, rounding the result to the nearest value of the
+    /// specified precision and returning the result as a [`Float`]. The [`Rational`]s are both
+    /// taken by reference. An [`Ordering`] is also returned, indicating whether the rounded angle
+    /// is less than, equal to, or greater than the exact angle.
+    ///
+    /// See [`Float::atan2_with_period_rational_prec`] for the error bounds, the special cases,
+    /// underflow, and the complexity; this function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::atan2_with_period_rational_prec_ref(
+    ///     &Rational::from(3),
+    ///     &Rational::from(4),
+    ///     360,
+    ///     53,
+    /// );
+    /// assert_eq!(t.to_string(), "36.869897645844020");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn atan2_with_period_rational_prec_ref(
+        y: &Rational,
+        x: &Rational,
+        u: u64,
+        prec: u64,
+    ) -> (Self, Ordering) {
+        Self::atan2_with_period_rational_prec_round_ref(y, x, u, prec, Nearest)
+    }
 }
 
 impl Atan2<Self> for Float {
@@ -2579,6 +2891,85 @@ where
 {
     emulate_float_float_to_float_fn(
         |y, x, prec| y.atan2_with_period_prec_ref_ref(&x, u, prec),
+        y,
+        x,
+    )
+}
+
+/// Computes $\operatorname{atan2}(y,x)u/(2\pi)$, the angle of the point $(x,y)$ measured from the
+/// positive $x$-axis in $u$ths of a turn (so that `u = 360` gives degrees), for [`Rational`]s,
+/// returning the result as a primitive float.
+///
+/// $$
+/// f(y,x,u) = \operatorname{atan2}(y,x)u/(2\pi)+\varepsilon,
+/// $$
+/// where $|\varepsilon| < 2^{\lfloor\log_2 |\operatorname{atan2}(y,x)u/(2\pi)|\rfloor-p}$ and $p$
+/// is the precision of the output (24 if `T` is a [`f32`] and 53 if `T` is a [`f64`]); the special
+/// cases below are exact when the output can hold them.
+///
+/// Special cases:
+/// - $f(0,x,u)=0.0$ if $x \geq 0$, and $u/2$ if $x < 0$
+/// - $f(y,0,u)=\pm u/4$, with the sign of $y$, for nonzero $y$
+/// - $f(\pm x,x,u)=\pm u/8$ for positive $x$, and $\pm3u/8$ for negative $x$
+/// - $f(y,x,0)=0.0$
+///
+/// Overflow is not possible, since $|f(y,x,u)| \leq u/2 < 2^{63}$. The result is subnormal, or
+/// zero, only for a positive $x$ with $|y/x|$ tiny and $u$ small.
+///
+/// # Worst-case complexity
+/// $T(m) = O(m \log m \log\log m)$
+///
+/// $M(m) = O(m \log m)$
+///
+/// where $T$ is time, $M$ is additional memory, and $m$ is `max(y.significant_bits(),
+/// x.significant_bits())`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::{NegativeOne, Zero};
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::atan2::primitive_float_atan2_with_period_rational;
+/// use malachite_q::Rational;
+///
+/// assert_eq!(
+///     NiceFloat(primitive_float_atan2_with_period_rational::<f64>(
+///         &Rational::from(3),
+///         &Rational::from(4),
+///         360
+///     )),
+///     NiceFloat(36.86989764584402)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_atan2_with_period_rational::<f32>(
+///         &Rational::from(3),
+///         &Rational::from(4),
+///         360
+///     )),
+///     NiceFloat(36.869896)
+/// );
+/// // a negative x with a zero y is half a turn
+/// assert_eq!(
+///     NiceFloat(primitive_float_atan2_with_period_rational::<f64>(
+///         &Rational::ZERO,
+///         &Rational::NEGATIVE_ONE,
+///         360
+///     )),
+///     NiceFloat(180.0)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_atan2_with_period_rational<T: PrimitiveFloat>(
+    y: &Rational,
+    x: &Rational,
+    u: u64,
+) -> T
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    emulate_rational_rational_to_float_fn(
+        |y, x, prec| Float::atan2_with_period_rational_prec_ref(y, x, u, prec),
         y,
         x,
     )

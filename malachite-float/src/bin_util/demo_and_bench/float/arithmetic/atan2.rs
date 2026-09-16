@@ -19,6 +19,7 @@ use malachite_base::test_util::generators::primitive_float_pair_gen;
 use malachite_base::test_util::runner::Runner;
 use malachite_float::float::arithmetic::atan2::{
     primitive_float_atan2, primitive_float_atan2_rational, primitive_float_atan2_with_period,
+    primitive_float_atan2_with_period_rational,
 };
 use malachite_float::test_util::bench::bucketers::*;
 use malachite_float::test_util::generators::{
@@ -61,6 +62,14 @@ pub(crate) fn register(runner: &mut Runner) {
         benchmark_float_atan2_with_period_prec_round_evaluation_strategy
     );
     register_primitive_float_benches!(runner, benchmark_primitive_float_atan2_with_period);
+    register_demo!(runner, demo_float_atan2_with_period_rational_prec_round);
+    register_demo!(runner, demo_float_atan2_with_period_rational_prec);
+    register_primitive_float_demos!(runner, demo_primitive_float_atan2_with_period_rational);
+    register_bench!(
+        runner,
+        benchmark_float_atan2_with_period_rational_prec_round_evaluation_strategy
+    );
+    register_primitive_float_benches!(runner, benchmark_primitive_float_atan2_with_period_rational);
 }
 
 fn demo_float_atan2_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -524,6 +533,120 @@ fn benchmark_primitive_float_atan2_with_period<T: PrimitiveFloat>(
         &pair_max_primitive_float_bucketer("y", "x"),
         &mut [("malachite", &mut |(y, x)| {
             no_out!(primitive_float_atan2_with_period(y, x, 360));
+        })],
+    );
+}
+
+fn demo_float_atan2_with_period_rational_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (y, x, prec, rm) in rational_rational_unsigned_rounding_mode_quadruple_gen_var_4()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "Float::atan2_with_period_rational_prec_round({}, {}, 360, {}, {}) = {:?}",
+            y.clone(),
+            x.clone(),
+            prec,
+            rm,
+            Float::atan2_with_period_rational_prec_round(y, x, 360, prec, rm)
+        );
+    }
+}
+
+fn demo_float_atan2_with_period_rational_prec(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (y, x, prec, _) in rational_rational_unsigned_rounding_mode_quadruple_gen_var_4()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "Float::atan2_with_period_rational_prec({}, {}, 360, {}) = {:?}",
+            y.clone(),
+            x.clone(),
+            prec,
+            Float::atan2_with_period_rational_prec(y, x, 360, prec)
+        );
+    }
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn demo_primitive_float_atan2_with_period_rational<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    for (y, x) in rational_pair_gen().get(gm, config).take(limit) {
+        println!(
+            "primitive_float_atan2_with_period_rational({}, {}, 360) = {:?}",
+            y,
+            x,
+            NiceFloat(primitive_float_atan2_with_period_rational::<T>(&y, &x, 360))
+        );
+    }
+}
+
+fn benchmark_float_atan2_with_period_rational_prec_round_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float::atan2_with_period_rational_prec_round(Rational, Rational, u64, u64, RoundingMode)",
+        BenchmarkType::EvaluationStrategy,
+        rational_rational_unsigned_rounding_mode_quadruple_gen_var_4().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &quadruple_3_bucketer("prec"),
+        &mut [
+            (
+                "Float::atan2_with_period_rational_prec_round(Rational, Rational, u64, u64, \
+                 RoundingMode)",
+                &mut |(y, x, prec, rm)| {
+                    no_out!(Float::atan2_with_period_rational_prec_round(
+                        y, x, 360, prec, rm
+                    ));
+                },
+            ),
+            (
+                "Float::atan2_with_period_rational_prec_round_ref(&Rational, &Rational, u64, \
+                 u64, RoundingMode)",
+                &mut |(y, x, prec, rm)| {
+                    no_out!(Float::atan2_with_period_rational_prec_round_ref(
+                        &y, &x, 360, prec, rm
+                    ));
+                },
+            ),
+        ],
+    );
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn benchmark_primitive_float_atan2_with_period_rational<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    run_benchmark(
+        &format!(
+            "primitive_float_atan2_with_period_rational::<{}>(&Rational, &Rational, u64)",
+            T::NAME
+        ),
+        BenchmarkType::Single,
+        rational_pair_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_1_rational_bit_bucketer("y"),
+        &mut [("malachite", &mut |(y, x)| {
+            no_out!(primitive_float_atan2_with_period_rational::<T>(&y, &x, 360));
         })],
     );
 }
