@@ -468,6 +468,16 @@ documented by git history.
   directly, which also avoids squaring an input that close to 1.
   `primitive_float_acos_rational` gives the correctly rounded `f32` or `f64` arccosine of a
   `Rational`.
+- `acos_with_period_prec_round`, `acos_with_period_prec`, `acos_with_period_round`, and
+  `acos_with_period` (with `_ref` and `_assign` variants), a port of `mpfr_acosu`: the arccosine
+  measured in $u$ths of a turn, so that $u = 360$ gives degrees. The result is NaN wherever the
+  plain arccosine is, even when $u = 0$; a zero input gives $u/4$, a quarter turn; $1$ gives $0.0$,
+  following IEEE 754-2019's `acosPi`; $-1$ gives $u/2$; and $\pm1/2$ gives $u/6$ or $u/3$ when $u$
+  is a multiple of 3. A zero period gives $+0.0$, since the arccosine is never negative. Like
+  MPFR's, the implementation answers a tiny input from the neighbour of $u/4$ on the correct side,
+  and like the other periodic inverse functions, the quotient is formed with the numerator scaled
+  up so that an underflowing result is decided by the rounding mode alone.
+  `primitive_float_acos_with_period` gives the correctly rounded `f32` or `f64` angle.
 - `Cot` and `CotAssign` (new traits in malachite-base) for `Float`, with the usual
   `cot_prec_round`, `cot_prec`, `cot_round`, and `_ref`/`_assign` variants: a port of `mpfr_cot`,
   MPFR's generic reciprocal template with the tangent. MPFR's tangent is itself a quotient of a
