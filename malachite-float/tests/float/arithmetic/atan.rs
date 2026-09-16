@@ -39,11 +39,11 @@ use malachite_float::test_util::float::arithmetic::atan::{
 use malachite_float::test_util::generators::{
     float_gen, float_rounding_mode_pair_gen_var_47, float_unsigned_pair_gen_var_1,
     float_unsigned_pair_gen_var_2, float_unsigned_rounding_mode_triple_gen_var_36,
-    float_unsigned_rounding_mode_triple_gen_var_37, float_unsigned_rounding_mode_triple_gen_var_39,
-    float_unsigned_unsigned_rounding_mode_quadruple_gen_var_17,
-    float_unsigned_unsigned_rounding_mode_quadruple_gen_var_18,
+    float_unsigned_rounding_mode_triple_gen_var_37, float_unsigned_rounding_mode_triple_gen_var_40,
+    float_unsigned_unsigned_rounding_mode_quadruple_gen_var_19,
+    float_unsigned_unsigned_rounding_mode_quadruple_gen_var_20,
     float_unsigned_unsigned_triple_gen_var_1, rational_unsigned_rounding_mode_triple_gen_var_10,
-    rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_5,
+    rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_6,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_q::Rational;
@@ -5080,13 +5080,13 @@ fn atan_with_period_prec_round_properties_helper(x: Float, u: u64, prec: u64, rm
 
 #[test]
 fn atan_with_period_prec_round_properties() {
-    float_unsigned_unsigned_rounding_mode_quadruple_gen_var_17().test_properties(
+    float_unsigned_unsigned_rounding_mode_quadruple_gen_var_19().test_properties(
         |(x, u, prec, rm)| {
             atan_with_period_prec_round_properties_helper(x, u, prec, rm);
         },
     );
 
-    float_unsigned_unsigned_rounding_mode_quadruple_gen_var_18().test_properties(
+    float_unsigned_unsigned_rounding_mode_quadruple_gen_var_20().test_properties(
         |(x, u, prec, rm)| {
             atan_with_period_prec_round_properties_helper(x, u, prec, rm);
         },
@@ -5145,7 +5145,7 @@ fn atan_with_period_prec_properties() {
 
 #[test]
 fn atan_with_period_round_properties() {
-    float_unsigned_rounding_mode_triple_gen_var_39().test_properties(|(x, u, rm)| {
+    float_unsigned_rounding_mode_triple_gen_var_40().test_properties(|(x, u, rm)| {
         if rm == Exact && !atan_with_period_exact(&x, u, x.significant_bits()) {
             assert_panic!(x.atan_with_period_round_ref(u, Exact));
             return;
@@ -8057,7 +8057,7 @@ fn atan_with_period_rational_prec_round_properties_helper(
 
 #[test]
 fn atan_with_period_rational_prec_round_properties() {
-    rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_5().test_properties(
+    rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_6().test_properties(
         |(x, u, prec, rm)| {
             atan_with_period_rational_prec_round_properties_helper(x, u, prec, rm);
         },
@@ -8091,7 +8091,7 @@ fn atan_with_period_rational_prec_round_properties() {
 
 #[test]
 fn atan_with_period_rational_prec_properties() {
-    rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_5().test_properties(
+    rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_6().test_properties(
         |(x, u, prec, _)| {
             let (t, o) = Float::atan_with_period_rational_prec(x.clone(), u, prec);
             assert!(t.is_valid());

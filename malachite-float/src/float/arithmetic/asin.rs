@@ -14,11 +14,12 @@
 
 use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
+use crate::float::arithmetic::atan::{arc_with_period_scale, scaled_unsigned};
 use crate::float::arithmetic::round_near_x::small_input_shortcut;
 use crate::float::arithmetic::sin::{SCALE, SCALED_INPUT_EXPONENT, scaled_underflow};
 use crate::{emulate_float_to_float_fn, emulate_rational_to_float_fn};
 use core::cmp::Ordering::{self, Equal, Greater, Less};
-use malachite_base::num::arithmetic::traits::{CeilingLogBase2, Square};
+use malachite_base::num::arithmetic::traits::{CeilingLogBase2, IsPowerOf2, Square};
 use malachite_base::num::basic::traits::Zero as ZeroTrait;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_q::Rational;
@@ -26,7 +27,7 @@ use malachite_q::Rational;
 use malachite_base::num::arithmetic::traits::{Abs, Asin, AsinAssign};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::{NaN as NaNTrait, One};
+use malachite_base::num::basic::traits::{NaN as NaNTrait, NegativeZero, One};
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, Exact, Floor, Nearest, Up};
@@ -90,6 +91,44 @@ fn asin_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float,
     }
 }
 
+// Computes asin(x) u/(2 pi) for a finite nonzero `Float` x with |x| <= 1 and a nonzero u, rounded
+// to precision `prec` with rounding mode `rm`. `rm` may be `Exact` only for |x| = 1, where the
+// result is u/4, and for |x| = 1/2 with u a multiple of 3, where it is u/12.
+//
+// This is mpfr_asinu from asinu.c, MPFR 4.2.2. The quotient is formed with the numerator scaled up
+// by 2^SCALE, since asin(x) u/(2 pi) can fall below the smallest positive `Float` for a tiny x and
+// a small u, which MPFR's wider exponent range never sees; a result below it is then decided by the
+// rounding mode alone, as in `sin_with_period`.
+fn asin_with_period_prec_round_normal_ref(
+    x: &Float,
+    u: u64,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    let positive = *x > 0u32;
+    let exp_x = i64::from(x.get_exponent().unwrap());
+    let power_of_2 = x.significand_ref().unwrap().is_power_of_2();
+    // |x| = 1: asinu(1, u) = u/4, asinu(-1, u) = -u/4, both exact
+    if exp_x == 1 && power_of_2 {
+        return scaled_unsigned(u, 2, positive, prec, rm);
+    }
+    // asin(+-1/2) = +-pi/6, so asinu(+-1/2, u) = +-u/12 is exact when u is a multiple of 3
+    if exp_x == 0 && power_of_2 && u.is_multiple_of(3) {
+        return scaled_unsigned(u / 3, 2, positive, prec, rm);
+    }
+    // Nothing else can be rounded exactly
+    assert_ne!(rm, Exact, "Inexact asin_with_period");
+    arc_with_period_scale(
+        // scaling by a power of 2 is exact, and asin(x) u 2^SCALE stays far below the top of the
+        // range, since |asin x| <= pi/2 and u < 2^64
+        |w| x.asin_prec_round_ref(w, Up).0 << SCALE,
+        u,
+        positive,
+        prec,
+        rm,
+    )
+}
+
 // Computes asin(x) for a nonzero `Rational` x with |x| < 1, rounded to precision `prec` with
 // rounding mode `rm`. (The rest is handled by the caller.)
 //
@@ -148,6 +187,56 @@ pub(crate) fn asin_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) ->
     }
 }
 
+// Computes asin(x) u/(2 pi) for a nonzero `Rational` x with |x| <= 1 and a nonzero u, rounded to
+// precision `prec` with rounding mode `rm`. (x = 0, u = 0, and |x| > 1 are handled by the caller.)
+// `rm` may be `Exact` only for |x| = 1, where the result is u/4, and for |x| = 1/2 with u a
+// multiple of 3, where it is u/12.
+//
+// MPFR has no arcsine of a rational. The branches match the `Float` case, with one addition: an x
+// below the bottom of the exponent range is not a `Float`, but its arcsine is its own leading term,
+// so the quotient is formed from x itself. That substitution neglects a relative x^2/6, which for
+// such an x is below 2^(2 SCALED_INPUT_EXPONENT) and so far beneath any working precision the loop
+// can reach. It is also needed rather than merely cheaper: `asin_rational_helper` reports such an x
+// as an underflow, and a large u can lift the quotient back into the range, where that answer would
+// be wrong.
+pub(crate) fn asin_with_period_rational_helper(
+    x: &Rational,
+    u: u64,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    let positive = *x > 0u32;
+    let exp_x = x.floor_log_base_2_abs() + 1; // the MPFR-style exponent of x
+    // |x| = 1, since the caller has ruled out everything above it: asinu(1, u) = u/4 and asinu(-1,
+    // u) = -u/4, both exact
+    if exp_x == 1 {
+        return scaled_unsigned(u, 2, positive, prec, rm);
+    }
+    // asin(+-1/2) = +-pi/6, so asinu(+-1/2, u) = +-u/12 is exact when u is a multiple of 3
+    if u.is_multiple_of(3) && x.numerator_ref() == &1u32 && x.denominator_ref() == &2u32 {
+        return scaled_unsigned(u / 3, 2, positive, prec, rm);
+    }
+    // Nothing else can be rounded exactly
+    assert_ne!(rm, Exact, "Inexact asin_with_period_rational");
+    if exp_x <= SCALED_INPUT_EXPONENT {
+        let scaled = x << SCALE;
+        return arc_with_period_scale(
+            |w| Float::from_rational_prec_round_ref(&scaled, w, Up).0,
+            u,
+            positive,
+            prec,
+            rm,
+        );
+    }
+    arc_with_period_scale(
+        |w| asin_rational_helper(x, w, Up).0 << SCALE,
+        u,
+        positive,
+        prec,
+        rm,
+    )
+}
+
 impl Float {
     /// Computes $\arcsin x$, the arcsine of a [`Float`], rounding the result to the specified
     /// precision and with the specified rounding mode. The [`Float`] is taken by value. An
@@ -174,23 +263,9 @@ impl Float {
     /// - $f(\pm0.0,p,m)=\pm0.0$
     /// - $f(\pm1,p,m)=\pm\pi/2$, rounded
     ///
-    /// Overflow and underflow:
-    /// - Since $|\arcsin x| < \pi/2$, the result never overflows.
-    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
-    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
-    ///   instead.
-    /// - If $0<f(x,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
-    /// - If $2^{-2^{30}-1}<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
-    ///   instead.
-    /// - If $-2^{-2^{30}}<f(x,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
-    /// - If $-2^{-2^{30}}<f(x,p,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
-    ///   instead.
-    /// - If $-2^{-2^{30}-1}\leq f(x,p,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
-    /// - If $-2^{-2^{30}}<f(x,p,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
-    ///   returned instead.
-    ///
-    /// Underflow requires an input of magnitude $2^{-2^{30}}$, the smallest positive [`Float`],
-    /// rounded toward zero: since $|\arcsin x| < |x|$ for nonzero $x$, no other input can reach it.
+    /// Neither overflow nor underflow is possible: the result lies in $[-\pi/2, \pi/2]$, and
+    /// $|\arcsin x| > |x|$ for nonzero $x$, so a representable input always has a representable
+    /// result.
     ///
     /// If you know you'll be using `Nearest`, consider using [`Float::asin_prec`] instead. If you
     /// know that your target precision is the precision of the input, consider using
@@ -198,16 +273,15 @@ impl Float {
     /// [`Float::asin`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n, m) = O(n (\log n)^3 \log\log n + (n+m) (\log (n+m))^2 \log\log (n+m))$
+    /// $T(n, m) = O((n+m) (\log (n+m))^3 \log\log (n+m))$
     ///
     /// $M(n, m) = O((n+m) \log (n+m))$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
-    /// `self.significant_bits()`: an input above 1 in magnitude is first inverted, and the argument
-    /// is then halved a logarithmic number of times and split into chunks whose arcsines are summed
-    /// by binary splitting, all at a working precision of about $n$; the summation is the first
-    /// term, and the inversion of the $m$-bit input the second. The magnitude of the input does not
-    /// drive the cost.
+    /// `self.significant_bits()`: the arcsine is taken as $\arctan(x/\sqrt{1-x^2})$ at a working
+    /// precision of about $n$ plus the number of bits that cancel in $1-x^2$, which an input within
+    /// $2^{-m}$ of $\pm1$ pushes to $m$; the arctangent at that width dominates. The magnitude of
+    /// the input does not otherwise drive the cost.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` and `self` is nonzero and not NaN, since the arcsine of a finite
@@ -286,23 +360,9 @@ impl Float {
     /// - $f(\pm0.0,p,m)=\pm0.0$
     /// - $f(\pm1,p,m)=\pm\pi/2$, rounded
     ///
-    /// Overflow and underflow:
-    /// - Since $|\arcsin x| < \pi/2$, the result never overflows.
-    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
-    /// - If $0<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
-    ///   instead.
-    /// - If $0<f(x,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
-    /// - If $2^{-2^{30}-1}<f(x,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
-    ///   instead.
-    /// - If $-2^{-2^{30}}<f(x,p,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
-    /// - If $-2^{-2^{30}}<f(x,p,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
-    ///   instead.
-    /// - If $-2^{-2^{30}-1}\leq f(x,p,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
-    /// - If $-2^{-2^{30}}<f(x,p,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is
-    ///   returned instead.
-    ///
-    /// Underflow requires an input of magnitude $2^{-2^{30}}$, the smallest positive [`Float`],
-    /// rounded toward zero: since $|\arcsin x| < |x|$ for nonzero $x$, no other input can reach it.
+    /// Neither overflow nor underflow is possible: the result lies in $[-\pi/2, \pi/2]$, and
+    /// $|\arcsin x| > |x|$ for nonzero $x$, so a representable input always has a representable
+    /// result.
     ///
     /// If you know you'll be using `Nearest`, consider using [`Float::asin_prec_ref`] instead. If
     /// you know that your target precision is the precision of the input, consider using
@@ -310,16 +370,15 @@ impl Float {
     /// `(&Float).asin()` instead.
     ///
     /// # Worst-case complexity
-    /// $T(n, m) = O(n (\log n)^3 \log\log n + (n+m) (\log (n+m))^2 \log\log (n+m))$
+    /// $T(n, m) = O((n+m) (\log (n+m))^3 \log\log (n+m))$
     ///
     /// $M(n, m) = O((n+m) \log (n+m))$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
-    /// `self.significant_bits()`: an input above 1 in magnitude is first inverted, and the argument
-    /// is then halved a logarithmic number of times and split into chunks whose arcsines are summed
-    /// by binary splitting, all at a working precision of about $n$; the summation is the first
-    /// term, and the inversion of the $m$-bit input the second. The magnitude of the input does not
-    /// drive the cost.
+    /// `self.significant_bits()`: the arcsine is taken as $\arctan(x/\sqrt{1-x^2})$ at a working
+    /// precision of about $n$ plus the number of bits that cancel in $1-x^2$, which an input within
+    /// $2^{-m}$ of $\pm1$ pushes to $m$; the arctangent at that width dominates. The magnitude of
+    /// the input does not otherwise drive the cost.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` and `self` is nonzero and not NaN, since the arcsine of a finite
@@ -400,16 +459,15 @@ impl Float {
     /// of the input, consider using [`Float::asin`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n, m) = O(n (\log n)^3 \log\log n + (n+m) (\log (n+m))^2 \log\log (n+m))$
+    /// $T(n, m) = O((n+m) (\log (n+m))^3 \log\log (n+m))$
     ///
     /// $M(n, m) = O((n+m) \log (n+m))$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
-    /// `self.significant_bits()`: an input above 1 in magnitude is first inverted, and the argument
-    /// is then halved a logarithmic number of times and split into chunks whose arcsines are summed
-    /// by binary splitting, all at a working precision of about $n$; the summation is the first
-    /// term, and the inversion of the $m$-bit input the second. The magnitude of the input does not
-    /// drive the cost.
+    /// `self.significant_bits()`: the arcsine is taken as $\arctan(x/\sqrt{1-x^2})$ at a working
+    /// precision of about $n$ plus the number of bits that cancel in $1-x^2$, which an input within
+    /// $2^{-m}$ of $\pm1$ pushes to $m$; the arctangent at that width dominates. The magnitude of
+    /// the input does not otherwise drive the cost.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -465,16 +523,15 @@ impl Float {
     /// precision of the input, consider using `(&Float).asin()` instead.
     ///
     /// # Worst-case complexity
-    /// $T(n, m) = O(n (\log n)^3 \log\log n + (n+m) (\log (n+m))^2 \log\log (n+m))$
+    /// $T(n, m) = O((n+m) (\log (n+m))^3 \log\log (n+m))$
     ///
     /// $M(n, m) = O((n+m) \log (n+m))$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
-    /// `self.significant_bits()`: an input above 1 in magnitude is first inverted, and the argument
-    /// is then halved a logarithmic number of times and split into chunks whose arcsines are summed
-    /// by binary splitting, all at a working precision of about $n$; the summation is the first
-    /// term, and the inversion of the $m$-bit input the second. The magnitude of the input does not
-    /// drive the cost.
+    /// `self.significant_bits()`: the arcsine is taken as $\arctan(x/\sqrt{1-x^2})$ at a working
+    /// precision of about $n$ plus the number of bits that cancel in $1-x^2$, which an input within
+    /// $2^{-m}$ of $\pm1$ pushes to $m$; the arctangent at that width dominates. The magnitude of
+    /// the input does not otherwise drive the cost.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -523,23 +580,9 @@ impl Float {
     /// - $f(\pm0.0,p,m)=\pm0.0$
     /// - $f(\pm1,p,m)=\pm\pi/2$, rounded
     ///
-    /// Overflow and underflow:
-    /// - Since $|\arcsin x| < \pi/2$, the result never overflows.
-    /// - If $0<f(x,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
-    /// - If $0<f(x,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
-    ///   instead.
-    /// - If $0<f(x,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
-    /// - If $2^{-2^{30}-1}<f(x,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
-    ///   instead.
-    /// - If $-2^{-2^{30}}<f(x,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
-    /// - If $-2^{-2^{30}}<f(x,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
-    ///   instead.
-    /// - If $-2^{-2^{30}-1}\leq f(x,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
-    /// - If $-2^{-2^{30}}<f(x,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is returned
-    ///   instead.
-    ///
-    /// Underflow requires an input of magnitude $2^{-2^{30}}$, the smallest positive [`Float`],
-    /// rounded toward zero: since $|\arcsin x| < |x|$ for nonzero $x$, no other input can reach it.
+    /// Neither overflow nor underflow is possible: the result lies in $[-\pi/2, \pi/2]$, and
+    /// $|\arcsin x| > |x|$ for nonzero $x$, so a representable input always has a representable
+    /// result.
     ///
     /// If you want to specify an output precision, consider using [`Float::asin_prec_round`]
     /// instead. If you know you'll be using the `Nearest` rounding mode, consider using
@@ -550,10 +593,11 @@ impl Float {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`: an input
-    /// above 1 in magnitude is first inverted, and the argument is then halved a logarithmic number
-    /// of times and split into chunks whose arcsines are summed by binary splitting, all at a
-    /// working precision of about $n$. The magnitude of the input does not drive the cost.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`: the
+    /// arcsine is taken as $\arctan(x/\sqrt{1-x^2})$ at a working precision of about $n$ plus the
+    /// number of bits that cancel in $1-x^2$, which an input within $2^{-n}$ of $\pm1$ pushes to
+    /// another $n$; the arctangent at that width dominates. The magnitude of the input does not
+    /// otherwise drive the cost.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` and `self` is nonzero and not NaN, since the arcsine of a finite
@@ -609,23 +653,9 @@ impl Float {
     /// - $f(\pm0.0,p,m)=\pm0.0$
     /// - $f(\pm1,p,m)=\pm\pi/2$, rounded
     ///
-    /// Overflow and underflow:
-    /// - Since $|\arcsin x| < \pi/2$, the result never overflows.
-    /// - If $0<f(x,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
-    /// - If $0<f(x,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
-    ///   instead.
-    /// - If $0<f(x,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
-    /// - If $2^{-2^{30}-1}<f(x,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
-    ///   instead.
-    /// - If $-2^{-2^{30}}<f(x,m)<0$, and $m$ is `Ceiling` or `Down`, $-0.0$ is returned instead.
-    /// - If $-2^{-2^{30}}<f(x,m)<0$, and $m$ is `Floor` or `Up`, $-2^{-2^{30}}$ is returned
-    ///   instead.
-    /// - If $-2^{-2^{30}-1}\leq f(x,m)<0$, and $m$ is `Nearest`, $-0.0$ is returned instead.
-    /// - If $-2^{-2^{30}}<f(x,m)<-2^{-2^{30}-1}$, and $m$ is `Nearest`, $-2^{-2^{30}}$ is returned
-    ///   instead.
-    ///
-    /// Underflow requires an input of magnitude $2^{-2^{30}}$, the smallest positive [`Float`],
-    /// rounded toward zero: since $|\arcsin x| < |x|$ for nonzero $x$, no other input can reach it.
+    /// Neither overflow nor underflow is possible: the result lies in $[-\pi/2, \pi/2]$, and
+    /// $|\arcsin x| > |x|$ for nonzero $x$, so a representable input always has a representable
+    /// result.
     ///
     /// If you want to specify an output precision, consider using [`Float::asin_prec_round_ref`]
     /// instead. If you know you'll be using the `Nearest` rounding mode, consider using
@@ -636,10 +666,11 @@ impl Float {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`: an input
-    /// above 1 in magnitude is first inverted, and the argument is then halved a logarithmic number
-    /// of times and split into chunks whose arcsines are summed by binary splitting, all at a
-    /// working precision of about $n$. The magnitude of the input does not drive the cost.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`: the
+    /// arcsine is taken as $\arctan(x/\sqrt{1-x^2})$ at a working precision of about $n$ plus the
+    /// number of bits that cancel in $1-x^2$, which an input within $2^{-n}$ of $\pm1$ pushes to
+    /// another $n$; the arctangent at that width dominates. The magnitude of the input does not
+    /// otherwise drive the cost.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` and `self` is nonzero and not NaN, since the arcsine of a finite
@@ -695,16 +726,15 @@ impl Float {
     /// [`Float::asin_assign`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n, m) = O(n (\log n)^3 \log\log n + (n+m) (\log (n+m))^2 \log\log (n+m))$
+    /// $T(n, m) = O((n+m) (\log (n+m))^3 \log\log (n+m))$
     ///
     /// $M(n, m) = O((n+m) \log (n+m))$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
-    /// `self.significant_bits()`: an input above 1 in magnitude is first inverted, and the argument
-    /// is then halved a logarithmic number of times and split into chunks whose arcsines are summed
-    /// by binary splitting, all at a working precision of about $n$; the summation is the first
-    /// term, and the inversion of the $m$-bit input the second. The magnitude of the input does not
-    /// drive the cost.
+    /// `self.significant_bits()`: the arcsine is taken as $\arctan(x/\sqrt{1-x^2})$ at a working
+    /// precision of about $n$ plus the number of bits that cancel in $1-x^2$, which an input within
+    /// $2^{-m}$ of $\pm1$ pushes to $m$; the arctangent at that width dominates. The magnitude of
+    /// the input does not otherwise drive the cost.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` and `self` is nonzero and not NaN, since the arcsine of a finite
@@ -773,16 +803,15 @@ impl Float {
     /// precision of the input, consider using [`Float::asin_assign`] instead.
     ///
     /// # Worst-case complexity
-    /// $T(n, m) = O(n (\log n)^3 \log\log n + (n+m) (\log (n+m))^2 \log\log (n+m))$
+    /// $T(n, m) = O((n+m) (\log (n+m))^3 \log\log (n+m))$
     ///
     /// $M(n, m) = O((n+m) \log (n+m))$
     ///
     /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
-    /// `self.significant_bits()`: an input above 1 in magnitude is first inverted, and the argument
-    /// is then halved a logarithmic number of times and split into chunks whose arcsines are summed
-    /// by binary splitting, all at a working precision of about $n$; the summation is the first
-    /// term, and the inversion of the $m$-bit input the second. The magnitude of the input does not
-    /// drive the cost.
+    /// `self.significant_bits()`: the arcsine is taken as $\arctan(x/\sqrt{1-x^2})$ at a working
+    /// precision of about $n$ plus the number of bits that cancel in $1-x^2$, which an input within
+    /// $2^{-m}$ of $\pm1$ pushes to $m$; the arctangent at that width dominates. The magnitude of
+    /// the input does not otherwise drive the cost.
     ///
     /// # Panics
     /// Panics if `prec` is zero.
@@ -836,10 +865,11 @@ impl Float {
     ///
     /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`: an input
-    /// above 1 in magnitude is first inverted, and the argument is then halved a logarithmic number
-    /// of times and split into chunks whose arcsines are summed by binary splitting, all at a
-    /// working precision of about $n$. The magnitude of the input does not drive the cost.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`: the
+    /// arcsine is taken as $\arctan(x/\sqrt{1-x^2})$ at a working precision of about $n$ plus the
+    /// number of bits that cancel in $1-x^2$, which an input within $2^{-n}$ of $\pm1$ pushes to
+    /// another $n$; the arctangent at that width dominates. The magnitude of the input does not
+    /// otherwise drive the cost.
     ///
     /// # Panics
     /// Panics if `rm` is `Exact` and `self` is nonzero and not NaN, since the arcsine of a finite
@@ -1063,6 +1093,699 @@ impl Float {
     }
 }
 
+impl Float {
+    /// Computes $\arcsin(x)u/(2\pi)$, the arcsine of a [`Float`] measured in $u$ths of a turn,
+    /// rounding the result to the specified precision and with the specified rounding mode. The
+    /// [`Float`] is taken by value. An [`Ordering`] is also returned, indicating whether the
+    /// rounded arcsine is less than, equal to, or greater than the exact arcsine. Although `NaN`s
+    /// are not comparable to any [`Float`], whenever this function returns a `NaN` it also returns
+    /// `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,u,p,m) = \arcsin(x)u/(2\pi)+\varepsilon.
+    /// $$
+    /// - If $x$ is NaN or zero, $|x|>1$, $u = 0$, $|x|$ is 1, or $|x|$ is $1/2$ and $u$ is a
+    ///   multiple of 3, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - Otherwise, if $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2
+    ///   |\arcsin(x)u/(2\pi)|\rfloor-p+1}$.
+    /// - Otherwise, if $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |\arcsin(x)u/(2\pi)|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},u,p,m)=f(\pm\infty,u,p,m)=\text{NaN}$
+    /// - $f(x,u,p,m)=\text{NaN}$ for $|x|>1$, including when $u=0$
+    /// - $f(\pm0.0,u,p,m)=\pm0.0$
+    /// - $f(x,0,p,m)=\pm0.0$, with the sign of $x$, so that the function stays odd
+    /// - $f(\pm1,u,p,m)=\pm u/4$, a quarter turn
+    /// - $f(\pm1/2,u,p,m)=\pm u/12$, a twelfth of a turn, when $u$ is a multiple of 3
+    ///
+    /// The last four are the only exact cases, and the quarter and twelfth turns are exact only
+    /// when $p$ is large enough to hold them.
+    ///
+    /// Underflow:
+    /// - If $0<f(x,u,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,u,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,u,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,u,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - The negative cases mirror these, since the function is odd.
+    ///
+    /// Overflow is not possible, since $|f(x,u,p,m)| \leq u/4 < 2^{62}$. Underflow requires a tiny
+    /// $x$ together with a small $u$, since the result is about $xu/(2\pi)$ there.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::asin_with_period_prec`]
+    /// instead. If you know that your target precision is the precision of the input, consider
+    /// using [`Float::asin_with_period_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O((n+m) (\log (n+m))^3 \log\log (n+m))$
+    ///
+    /// $M(n, m) = O((n+m) \log (n+m))$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `self.significant_bits()`: the arcsine is taken at a working precision of about $n$ plus the
+    /// bits that cancel in $1-x^2$, which an input within $2^{-m}$ of $\pm1$ pushes to $m$, and is
+    /// then scaled by $u/(2\pi)$, which needs $\pi$ to that many bits; the arcsine dominates.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision (which is the case unless $x$ is zero or NaN, $|x|>1$, $u$ is zero,
+    /// or $p$ is large enough to hold the quarter or twelfth turn that $|x|=1$ or $|x|=1/2$ gives).
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, OneHalf};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::ONE.asin_with_period_prec_round(360, 10, Exact);
+    /// assert_eq!(t.to_string(), "90.000");
+    /// assert_eq!(o, Equal);
+    ///
+    /// let (t, o) = Float::ONE_HALF.asin_with_period_prec_round(360, 10, Exact);
+    /// assert_eq!(t.to_string(), "30.000");
+    /// assert_eq!(o, Equal);
+    ///
+    /// let (t, o) = (Float::ONE_HALF >> 1u32).asin_with_period_prec_round(360, 10, Floor);
+    /// assert_eq!(t.to_string(), "14.469");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (t, o) = (Float::ONE_HALF >> 1u32).asin_with_period_prec_round(360, 10, Ceiling);
+    /// assert_eq!(t.to_string(), "14.484");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn asin_with_period_prec_round(
+        self,
+        u: u64,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        self.asin_with_period_prec_round_ref(u, prec, rm)
+    }
+
+    /// Computes $\arcsin(x)u/(2\pi)$, the arcsine of a [`Float`] measured in $u$ths of a turn,
+    /// rounding the result to the specified precision and with the specified rounding mode. The
+    /// [`Float`] is taken by reference. An [`Ordering`] is also returned, indicating whether the
+    /// rounded arcsine is less than, equal to, or greater than the exact arcsine. Although `NaN`s
+    /// are not comparable to any [`Float`], whenever this function returns a `NaN` it also returns
+    /// `Equal`.
+    ///
+    /// See [`Float::asin_with_period_prec_round`] for the error bounds, the special and closed-form
+    /// cases, underflow, and the complexity; this function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, OneHalf};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = (&Float::ONE).asin_with_period_prec_round_ref(360, 10, Exact);
+    /// assert_eq!(t.to_string(), "90.000");
+    /// assert_eq!(o, Equal);
+    ///
+    /// let (t, o) = (&(Float::ONE_HALF >> 1u32)).asin_with_period_prec_round_ref(360, 10, Floor);
+    /// assert_eq!(t.to_string(), "14.469");
+    /// assert_eq!(o, Less);
+    /// ```
+    pub fn asin_with_period_prec_round_ref(
+        &self,
+        u: u64,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        match &self.0 {
+            // the arcsine is NaN outside [-1, 1], and both infinities are outside it; this holds
+            // for u = 0 too, since NaN times 0 is NaN
+            NaN | Infinity { .. } => (Self::NAN, Equal),
+            // asinu(±0.0, u) = ±0.0, even for u = 0
+            Zero { .. } => (self.clone(), Equal),
+            Finite { .. } => {
+                if self.gt_abs(&1u32) {
+                    (Self::NAN, Equal)
+                } else if u == 0 {
+                    // asinu(x, 0) = 0 with the sign of x, which agrees with the x = 0 case and
+                    // keeps the function odd. (MPFR returns +0 here for every x, although its own x
+                    // = 0 case keeps the sign for exactly this reason.)
+                    (
+                        if *self < 0u32 {
+                            Self::NEGATIVE_ZERO
+                        } else {
+                            Self::ZERO
+                        },
+                        Equal,
+                    )
+                } else {
+                    asin_with_period_prec_round_normal_ref(self, u, prec, rm)
+                }
+            }
+        }
+    }
+
+    /// Computes $\arcsin(x)u/(2\pi)$, the arcsine of a [`Float`] measured in $u$ths of a turn,
+    /// rounding the result to the nearest value of the specified precision. The [`Float`] is taken
+    /// by value. An [`Ordering`] is also returned, indicating whether the rounded arcsine is less
+    /// than, equal to, or greater than the exact arcsine. Although `NaN`s are not comparable to any
+    /// [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// If the arcsine is equidistant from two [`Float`]s with the specified precision, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen.
+    ///
+    /// See [`Float::asin_with_period_prec_round`] for the error bounds, the special and closed-form
+    /// cases, underflow, and the complexity; this function behaves the same way.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::asin_with_period_prec_round`] instead.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, OneHalf};
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::ONE.asin_with_period_prec(360, 10);
+    /// assert_eq!(t.to_string(), "90.000");
+    /// assert_eq!(o, Equal);
+    ///
+    /// let (t, o) = (Float::ONE_HALF >> 1u32).asin_with_period_prec(360, 10);
+    /// assert_eq!(t.to_string(), "14.484");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn asin_with_period_prec(self, u: u64, prec: u64) -> (Self, Ordering) {
+        self.asin_with_period_prec_round(u, prec, Nearest)
+    }
+
+    /// Computes $\arcsin(x)u/(2\pi)$, the arcsine of a [`Float`] measured in $u$ths of a turn,
+    /// rounding the result to the nearest value of the specified precision. The [`Float`] is taken
+    /// by reference. An [`Ordering`] is also returned, indicating whether the rounded arcsine is
+    /// less than, equal to, or greater than the exact arcsine. Although `NaN`s are not comparable
+    /// to any [`Float`], whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`Float::asin_with_period_prec`] and [`Float::asin_with_period_prec_round`]; this
+    /// function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::OneHalf;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = (&(Float::ONE_HALF >> 1u32)).asin_with_period_prec_ref(360, 10);
+    /// assert_eq!(t.to_string(), "14.484");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn asin_with_period_prec_ref(&self, u: u64, prec: u64) -> (Self, Ordering) {
+        self.asin_with_period_prec_round_ref(u, prec, Nearest)
+    }
+
+    /// Computes $\arcsin(x)u/(2\pi)$, the arcsine of a [`Float`] measured in $u$ths of a turn,
+    /// rounding the result with the specified rounding mode. The [`Float`] is taken by value. An
+    /// [`Ordering`] is also returned, indicating whether the rounded arcsine is less than, equal
+    /// to, or greater than the exact arcsine. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// The precision of the output is the precision of the input.
+    ///
+    /// See [`Float::asin_with_period_prec_round`] for the error bounds, the special and closed-form
+    /// cases, underflow, and the complexity; this function behaves the same way.
+    ///
+    /// If you want to specify an output precision, consider using
+    /// [`Float::asin_with_period_prec_round`] instead.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the precision of
+    /// the input.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let x = Float::from_unsigned_prec(1u32, 10).0 >> 2u32;
+    /// let (t, o) = x.asin_with_period_round(360, Floor);
+    /// assert_eq!(t.to_string(), "14.469");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn asin_with_period_round(self, u: u64, rm: RoundingMode) -> (Self, Ordering) {
+        let prec = self.significant_bits();
+        self.asin_with_period_prec_round(u, prec, rm)
+    }
+
+    /// Computes $\arcsin(x)u/(2\pi)$, the arcsine of a [`Float`] measured in $u$ths of a turn,
+    /// rounding the result with the specified rounding mode. The [`Float`] is taken by reference.
+    /// An [`Ordering`] is also returned, indicating whether the rounded arcsine is less than, equal
+    /// to, or greater than the exact arcsine. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`Float::asin_with_period_round`] and [`Float::asin_with_period_prec_round`]; this
+    /// function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the precision of
+    /// the input.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let x = Float::from_unsigned_prec(1u32, 10).0 >> 2u32;
+    /// let (t, o) = (&x).asin_with_period_round_ref(360, Floor);
+    /// assert_eq!(t.to_string(), "14.469");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn asin_with_period_round_ref(&self, u: u64, rm: RoundingMode) -> (Self, Ordering) {
+        self.asin_with_period_prec_round_ref(u, self.significant_bits(), rm)
+    }
+
+    /// Computes $\arcsin(x)u/(2\pi)$, the arcsine of a [`Float`] measured in $u$ths of a turn,
+    /// rounding the result to the nearest value of the input's precision. The [`Float`] is taken by
+    /// value.
+    ///
+    /// If the arcsine is equidistant from two [`Float`]s with the specified precision, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen.
+    ///
+    /// See [`Float::asin_with_period_prec_round`] for the error bounds, the special and closed-form
+    /// cases, underflow, and the complexity; this function behaves the same way.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::asin_with_period_round`] instead. If you want to specify an output precision,
+    /// consider using [`Float::asin_with_period_prec`]. If you want both of these things, consider
+    /// using [`Float::asin_with_period_prec_round`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// let x = Float::from_unsigned_prec(1u32, 10).0 >> 2u32;
+    /// assert_eq!(x.asin_with_period(360).to_string(), "14.484");
+    /// ```
+    #[inline]
+    pub fn asin_with_period(self, u: u64) -> Self {
+        let prec = self.significant_bits();
+        self.asin_with_period_prec(u, prec).0
+    }
+
+    /// Computes $\arcsin(x)u/(2\pi)$, the arcsine of a [`Float`] measured in $u$ths of a turn,
+    /// rounding the result to the nearest value of the input's precision. The [`Float`] is taken by
+    /// reference.
+    ///
+    /// See [`Float::asin_with_period`] and [`Float::asin_with_period_prec_round`]; this function
+    /// behaves the same way.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// let x = Float::from_unsigned_prec(1u32, 10).0 >> 2u32;
+    /// assert_eq!((&x).asin_with_period_ref(360).to_string(), "14.484");
+    /// ```
+    #[inline]
+    pub fn asin_with_period_ref(&self, u: u64) -> Self {
+        self.asin_with_period_prec_ref(u, self.significant_bits()).0
+    }
+
+    /// Computes $\arcsin(x)u/(2\pi)$, the arcsine of a [`Float`] measured in $u$ths of a turn, in
+    /// place, rounding the result to the specified precision and with the specified rounding mode.
+    /// An [`Ordering`] is returned, indicating whether the rounded arcsine is less than, equal to,
+    /// or greater than the exact arcsine. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function assigns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`Float::asin_with_period_prec_round`] for the error bounds, the special and closed-form
+    /// cases, underflow, and the complexity; this function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::OneHalf;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::ONE_HALF >> 1u32;
+    /// let o = x.asin_with_period_prec_round_assign(360, 10, Floor);
+    /// assert_eq!(x.to_string(), "14.469");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn asin_with_period_prec_round_assign(
+        &mut self,
+        u: u64,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> Ordering {
+        let (t, o) = self.asin_with_period_prec_round_ref(u, prec, rm);
+        *self = t;
+        o
+    }
+
+    /// Computes $\arcsin(x)u/(2\pi)$, the arcsine of a [`Float`] measured in $u$ths of a turn, in
+    /// place, rounding the result to the nearest value of the specified precision. An [`Ordering`]
+    /// is returned, indicating whether the rounded arcsine is less than, equal to, or greater than
+    /// the exact arcsine. Although `NaN`s are not comparable to any [`Float`], whenever this
+    /// function assigns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`Float::asin_with_period_prec`] and [`Float::asin_with_period_prec_round`]; this
+    /// function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::OneHalf;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::ONE_HALF >> 1u32;
+    /// let o = x.asin_with_period_prec_assign(360, 10);
+    /// assert_eq!(x.to_string(), "14.484");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn asin_with_period_prec_assign(&mut self, u: u64, prec: u64) -> Ordering {
+        self.asin_with_period_prec_round_assign(u, prec, Nearest)
+    }
+
+    /// Computes $\arcsin(x)u/(2\pi)$, the arcsine of a [`Float`] measured in $u$ths of a turn, in
+    /// place, rounding the result with the specified rounding mode. An [`Ordering`] is returned,
+    /// indicating whether the rounded arcsine is less than, equal to, or greater than the exact
+    /// arcsine. Although `NaN`s are not comparable to any [`Float`], whenever this function assigns
+    /// a `NaN` it also returns `Equal`.
+    ///
+    /// See [`Float::asin_with_period_round`] and [`Float::asin_with_period_prec_round`]; this
+    /// function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the precision of
+    /// the input.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from_unsigned_prec(1u32, 10).0 >> 2u32;
+    /// let o = x.asin_with_period_round_assign(360, Floor);
+    /// assert_eq!(x.to_string(), "14.469");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn asin_with_period_round_assign(&mut self, u: u64, rm: RoundingMode) -> Ordering {
+        let prec = self.significant_bits();
+        self.asin_with_period_prec_round_assign(u, prec, rm)
+    }
+
+    /// Computes $\arcsin(x)u/(2\pi)$, the arcsine of a [`Float`] measured in $u$ths of a turn, in
+    /// place, rounding the result to the nearest value of the input's precision.
+    ///
+    /// If the arcsine is equidistant from two [`Float`]s with the specified precision, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen.
+    ///
+    /// See [`Float::asin_with_period_prec_round`] for the error bounds, the special and closed-form
+    /// cases, underflow, and the complexity; this function behaves the same way.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::asin_with_period_round_assign`] instead. If you want to specify an output
+    /// precision, consider using [`Float::asin_with_period_prec_assign`]. If you want both of these
+    /// things, consider using [`Float::asin_with_period_prec_round_assign`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// let mut x = Float::from_unsigned_prec(1u32, 10).0 >> 2u32;
+    /// x.asin_with_period_assign(360);
+    /// assert_eq!(x.to_string(), "14.484");
+    /// ```
+    #[inline]
+    pub fn asin_with_period_assign(&mut self, u: u64) {
+        let prec = self.significant_bits();
+        self.asin_with_period_prec_assign(u, prec);
+    }
+
+    /// Computes $\arcsin(x)u/(2\pi)$, the arcsine of a [`Rational`] measured in $u$ths of a turn,
+    /// rounding the result to the specified precision and with the specified rounding mode and
+    /// returning the result as a [`Float`]. The [`Rational`] is taken by value. An [`Ordering`] is
+    /// also returned, indicating whether the rounded arcsine is less than, equal to, or greater
+    /// than the exact arcsine.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,u,p,m) = \arcsin(x)u/(2\pi)+\varepsilon.
+    /// $$
+    /// - If $x$ is zero, $|x|>1$, $u = 0$, $|x|$ is 1, or $|x|$ is $1/2$ and $u$ is a multiple of
+    ///   3, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - Otherwise, if $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2
+    ///   |\arcsin(x)u/(2\pi)|\rfloor-p+1}$.
+    /// - Otherwise, if $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |\arcsin(x)u/(2\pi)|\rfloor-p}$.
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(x,u,p,m)=\text{NaN}$ for $|x|>1$, including when $u=0$
+    /// - $f(0,u,p,m)=0.0$
+    /// - $f(x,0,p,m)=\pm0.0$, with the sign of $x$, so that the function stays odd
+    /// - $f(\pm1,u,p,m)=\pm u/4$, a quarter turn
+    /// - $f(\pm1/2,u,p,m)=\pm u/12$, a twelfth of a turn, when $u$ is a multiple of 3
+    ///
+    /// These are the only exact cases, and the quarter and twelfth turns are exact only when $p$ is
+    /// large enough to hold them. A [`Rational`] has no signed zeros, so a zero $x$ gives a
+    /// positive zero.
+    ///
+    /// Underflow:
+    /// - If $0<f(x,u,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,u,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,u,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,u,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - The negative cases mirror these, since the function is odd.
+    ///
+    /// Overflow is not possible, since $|f(x,u,p,m)| \leq u/4 < 2^{62}$. Underflow requires a tiny
+    /// $x$ together with a small $u$, since the result is about $xu/(2\pi)$ there. Unlike the
+    /// [`Float`] case, $x$ itself may be far below the bottom of the exponent range.
+    ///
+    /// If you know you'll be using `Nearest`, consider using
+    /// [`Float::asin_with_period_rational_prec`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n (\log n)^3 \log\log n + m (\log m)^2 \log\log m)$
+    ///
+    /// $M(n, m) = O(n \log n + m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`: $x^2/(1-x^2)$ is formed exactly, and its square root and arctangent
+    /// are taken at a working precision of about $n$ bits and scaled by $u/(2\pi)$, which needs
+    /// $\pi$ to that many bits; those cost the first term, and the second covers the $m$-bit input.
+    /// The magnitude of the input does not drive the cost, and unlike the [`Float`] arcsine neither
+    /// does its closeness to $\pm1$, since nothing cancels.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision (which is the case unless $x$ is zero, $|x|>1$, $u$ is zero, or $p$
+    /// is large enough to hold the quarter or twelfth turn that $|x|=1$ or $|x|=1/2$ gives).
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{One, OneHalf};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) = Float::asin_with_period_rational_prec_round(Rational::ONE, 360, 10, Exact);
+    /// assert_eq!(t.to_string(), "90.000");
+    /// assert_eq!(o, Equal);
+    ///
+    /// let (t, o) =
+    ///     Float::asin_with_period_rational_prec_round(Rational::ONE_HALF, 360, 10, Exact);
+    /// assert_eq!(t.to_string(), "30.000");
+    /// assert_eq!(o, Equal);
+    ///
+    /// let (t, o) = Float::asin_with_period_rational_prec_round(
+    ///     Rational::from_unsigneds(3u8, 5),
+    ///     360,
+    ///     10,
+    ///     Floor,
+    /// );
+    /// assert_eq!(t.to_string(), "36.812");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (t, o) = Float::asin_with_period_rational_prec_round(
+    ///     Rational::from_unsigneds(3u8, 5),
+    ///     360,
+    ///     10,
+    ///     Ceiling,
+    /// );
+    /// assert_eq!(t.to_string(), "36.875");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn asin_with_period_rational_prec_round(
+        x: Rational,
+        u: u64,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        Self::asin_with_period_rational_prec_round_ref(&x, u, prec, rm)
+    }
+
+    /// Computes $\arcsin(x)u/(2\pi)$, the arcsine of a [`Rational`] measured in $u$ths of a turn,
+    /// rounding the result to the specified precision and with the specified rounding mode and
+    /// returning the result as a [`Float`]. The [`Rational`] is taken by reference. An [`Ordering`]
+    /// is also returned, indicating whether the rounded arcsine is less than, equal to, or greater
+    /// than the exact arcsine.
+    ///
+    /// See [`Float::asin_with_period_rational_prec_round`] for the error bounds, the special and
+    /// closed-form cases, underflow, and the complexity; this function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::One;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) =
+    ///     Float::asin_with_period_rational_prec_round_ref(&Rational::ONE, 360, 10, Exact);
+    /// assert_eq!(t.to_string(), "90.000");
+    /// assert_eq!(o, Equal);
+    ///
+    /// let (t, o) = Float::asin_with_period_rational_prec_round_ref(
+    ///     &Rational::from_unsigneds(3u8, 5),
+    ///     360,
+    ///     10,
+    ///     Floor,
+    /// );
+    /// assert_eq!(t.to_string(), "36.812");
+    /// assert_eq!(o, Less);
+    /// ```
+    pub fn asin_with_period_rational_prec_round_ref(
+        x: &Rational,
+        u: u64,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        if x.gt_abs(&1u32) {
+            // asinu(x, u) = NaN for |x| > 1, including for u = 0, since NaN times 0 is NaN
+            return (Self::NAN, Equal);
+        }
+        if *x == 0u32 || u == 0 {
+            // asinu(0, u) = 0, and asinu(x, 0) = 0 with the sign of x, so that the function stays
+            // odd; a `Rational` zero has no sign, so the first case gives a positive zero
+            return (
+                if *x < 0u32 {
+                    Self::NEGATIVE_ZERO
+                } else {
+                    Self::ZERO
+                },
+                Equal,
+            );
+        }
+        asin_with_period_rational_helper(x, u, prec, rm)
+    }
+
+    /// Computes $\arcsin(x)u/(2\pi)$, the arcsine of a [`Rational`] measured in $u$ths of a turn,
+    /// rounding the result to the nearest value of the specified precision and returning the result
+    /// as a [`Float`]. The [`Rational`] is taken by value. An [`Ordering`] is also returned,
+    /// indicating whether the rounded arcsine is less than, equal to, or greater than the exact
+    /// arcsine.
+    ///
+    /// If the arcsine is equidistant from two [`Float`]s with the specified precision, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen.
+    ///
+    /// See [`Float::asin_with_period_rational_prec_round`] for the error bounds, the special and
+    /// closed-form cases, underflow, and the complexity; this function behaves the same way.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::asin_with_period_rational_prec_round`] instead.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) =
+    ///     Float::asin_with_period_rational_prec(Rational::from_unsigneds(3u8, 5), 360, 10);
+    /// assert_eq!(t.to_string(), "36.875");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn asin_with_period_rational_prec(x: Rational, u: u64, prec: u64) -> (Self, Ordering) {
+        Self::asin_with_period_rational_prec_round(x, u, prec, Nearest)
+    }
+
+    /// Computes $\arcsin(x)u/(2\pi)$, the arcsine of a [`Rational`] measured in $u$ths of a turn,
+    /// rounding the result to the nearest value of the specified precision and returning the result
+    /// as a [`Float`]. The [`Rational`] is taken by reference. An [`Ordering`] is also returned,
+    /// indicating whether the rounded arcsine is less than, equal to, or greater than the exact
+    /// arcsine.
+    ///
+    /// See [`Float::asin_with_period_rational_prec`] and
+    /// [`Float::asin_with_period_rational_prec_round`]; this function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (t, o) =
+    ///     Float::asin_with_period_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 360, 10);
+    /// assert_eq!(t.to_string(), "36.875");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn asin_with_period_rational_prec_ref(x: &Rational, u: u64, prec: u64) -> (Self, Ordering) {
+        Self::asin_with_period_rational_prec_round_ref(x, u, prec, Nearest)
+    }
+}
+
 impl Asin for Float {
     type Output = Self;
 
@@ -1081,12 +1804,10 @@ impl Asin for Float {
     ///   $p$ is the precision of the input.
     ///
     /// Special cases:
-    /// - $f(\text{NaN},p,m)=f(\pm\infty,p,m)=\text{NaN}$
-    /// - $f(x,p,m)=\text{NaN}$ for $|x|>1$
-    /// - $f(\pm0.0,p,m)=\pm0.0$
-    /// - $f(\pm1,p,m)=\pm\pi/2$, rounded
-    ///
-    /// See the [`Float::asin_round`] documentation for information on the special cases.
+    /// - $f(\text{NaN})=f(\pm\infty)=\text{NaN}$
+    /// - $f(x)=\text{NaN}$ for $|x|>1$
+    /// - $f(\pm0.0)=\pm0.0$
+    /// - $f(\pm1)=\pm\pi/2$, rounded
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::asin_round`] instead. If you want to specify the output precision, consider using
@@ -1094,16 +1815,15 @@ impl Asin for Float {
     /// [`Float::asin_prec_round`].
     ///
     /// # Worst-case complexity
-    /// $T(n, e) = O(n (\log n)^3 \log\log n + (n+e) (\log (n+e))^2 \log\log (n+e))$
+    /// $T(n) = O(n (\log n)^3 \log\log n)$
     ///
-    /// $M(n, e) = O((n+e) \log (n+e))$
+    /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and $e$ is
-    /// the exponent of `self` (0 if `self` has no exponent or a negative one): the Taylor series at
-    /// working precision $n$, summed by binary splitting for large $n$, costs the first term, and
-    /// for $|x| \geq 4$ the argument is reduced modulo $2\pi$, which requires $\pi$ to about $n +
-    /// e$ bits. Unlike most functions, `asin` therefore gets slower as the magnitude of its input
-    /// grows, not just as the precision does.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`: the
+    /// arcsine is taken as $\arctan(x/\sqrt{1-x^2})$ at a working precision of about $n$ plus the
+    /// number of bits that cancel in $1-x^2$, which an input within $2^{-n}$ of $\pm1$ pushes to
+    /// another $n$; the arctangent at that width dominates. The magnitude of the input does not
+    /// otherwise drive the cost.
     ///
     /// # Examples
     /// ```
@@ -1112,7 +1832,7 @@ impl Asin for Float {
     /// use malachite_float::Float;
     ///
     /// assert!(Float::NAN.asin().is_nan());
-    /// // an infinity has a precision of 1, so pi/2 rounds to 2
+    /// // the arcsine is NaN outside [-1, 1], and both infinities are outside it
     /// assert_eq!(Float::INFINITY.asin().to_string(), "NaN");
     /// assert_eq!(Float::NEGATIVE_INFINITY.asin().to_string(), "NaN");
     /// assert_eq!(Float::ZERO.asin().to_string(), "0.0");
@@ -1151,12 +1871,10 @@ impl Asin for &Float {
     ///   $p$ is the precision of the input.
     ///
     /// Special cases:
-    /// - $f(\text{NaN},p,m)=f(\pm\infty,p,m)=\text{NaN}$
-    /// - $f(x,p,m)=\text{NaN}$ for $|x|>1$
-    /// - $f(\pm0.0,p,m)=\pm0.0$
-    /// - $f(\pm1,p,m)=\pm\pi/2$, rounded
-    ///
-    /// See the [`Float::asin_round`] documentation for information on the special cases.
+    /// - $f(\text{NaN})=f(\pm\infty)=\text{NaN}$
+    /// - $f(x)=\text{NaN}$ for $|x|>1$
+    /// - $f(\pm0.0)=\pm0.0$
+    /// - $f(\pm1)=\pm\pi/2$, rounded
     ///
     /// If you want to use a rounding mode other than `Nearest`, consider using
     /// [`Float::asin_round_ref`] instead. If you want to specify the output precision, consider
@@ -1164,16 +1882,15 @@ impl Asin for &Float {
     /// [`Float::asin_prec_round_ref`].
     ///
     /// # Worst-case complexity
-    /// $T(n, e) = O(n (\log n)^3 \log\log n + (n+e) (\log (n+e))^2 \log\log (n+e))$
+    /// $T(n) = O(n (\log n)^3 \log\log n)$
     ///
-    /// $M(n, e) = O((n+e) \log (n+e))$
+    /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and $e$ is
-    /// the exponent of `self` (0 if `self` has no exponent or a negative one): the Taylor series at
-    /// working precision $n$, summed by binary splitting for large $n$, costs the first term, and
-    /// for $|x| \geq 4$ the argument is reduced modulo $2\pi$, which requires $\pi$ to about $n +
-    /// e$ bits. Unlike most functions, `asin` therefore gets slower as the magnitude of its input
-    /// grows, not just as the precision does.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`: the
+    /// arcsine is taken as $\arctan(x/\sqrt{1-x^2})$ at a working precision of about $n$ plus the
+    /// number of bits that cancel in $1-x^2$, which an input within $2^{-n}$ of $\pm1$ pushes to
+    /// another $n$; the arctangent at that width dominates. The magnitude of the input does not
+    /// otherwise drive the cost.
     ///
     /// # Examples
     /// ```
@@ -1182,7 +1899,7 @@ impl Asin for &Float {
     /// use malachite_float::Float;
     ///
     /// assert!(Float::NAN.asin().is_nan());
-    /// // an infinity has a precision of 1, so pi/2 rounds to 2
+    /// // the arcsine is NaN outside [-1, 1], and both infinities are outside it
     /// assert_eq!(Float::INFINITY.asin().to_string(), "NaN");
     /// assert_eq!(Float::NEGATIVE_INFINITY.asin().to_string(), "NaN");
     /// assert_eq!(Float::ZERO.asin().to_string(), "0.0");
@@ -1227,16 +1944,15 @@ impl AsinAssign for Float {
     /// [`Float::asin_prec_round_assign`].
     ///
     /// # Worst-case complexity
-    /// $T(n, e) = O(n (\log n)^3 \log\log n + (n+e) (\log (n+e))^2 \log\log (n+e))$
+    /// $T(n) = O(n (\log n)^3 \log\log n)$
     ///
-    /// $M(n, e) = O((n+e) \log (n+e))$
+    /// $M(n) = O(n \log n)$
     ///
-    /// where $T$ is time, $M$ is additional memory, $n$ is `self.significant_bits()`, and $e$ is
-    /// the exponent of `self` (0 if `self` has no exponent or a negative one): the Taylor series at
-    /// working precision $n$, summed by binary splitting for large $n$, costs the first term, and
-    /// for $|x| \geq 4$ the argument is reduced modulo $2\pi$, which requires $\pi$ to about $n +
-    /// e$ bits. Unlike most functions, `asin` therefore gets slower as the magnitude of its input
-    /// grows, not just as the precision does.
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`: the
+    /// arcsine is taken as $\arctan(x/\sqrt{1-x^2})$ at a working precision of about $n$ plus the
+    /// number of bits that cancel in $1-x^2$, which an input within $2^{-n}$ of $\pm1$ pushes to
+    /// another $n$; the arctangent at that width dominates. The magnitude of the input does not
+    /// otherwise drive the cost.
     ///
     /// # Examples
     /// ```
@@ -1396,4 +2112,155 @@ where
     for<'a> T: ExactFrom<&'a Float>,
 {
     emulate_rational_to_float_fn(Float::asin_rational_prec_ref, x)
+}
+
+/// Computes $\arcsin(x)u/(2\pi)$, the arcsine of a primitive float measured in $u$ths of a turn (so
+/// that `u = 360` gives degrees), returning the result as a primitive float.
+///
+/// $$
+/// f(x,u) = \arcsin(x)u/(2\pi)+\varepsilon.
+/// $$
+/// - If $x$ is zero, $|x|>1$, $u = 0$, $|x|$ is 1, or $|x|$ is $1/2$ and $u$ is a multiple of 3,
+///   $\varepsilon$ may be ignored or assumed to be 0.
+/// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 |\arcsin(x)u/(2\pi)|\rfloor-p}$, where $p$ is the
+///   precision of the output (24 if `T` is a [`f32`] and 53 if `T` is a [`f64`]).
+///
+/// Special cases:
+/// - $f(x,u)=\text{NaN}$ for $|x|>1$, including when $u=0$
+/// - $f(\pm0.0,u)=\pm0.0$
+/// - $f(x,0)=\pm0.0$, with the sign of $x$, so that the function stays odd
+/// - $f(\pm1,u)=\pm u/4$, a quarter turn
+/// - $f(\pm1/2,u)=\pm u/12$, a twelfth of a turn, when $u$ is a multiple of 3
+///
+/// Overflow is not possible, since $|f(x,u)| \leq u/4 < 2^{62}$. The result is subnormal, or zero,
+/// only when $x$ is tiny and $u$ is small, since the result is about $xu/(2\pi)$ there.
+///
+/// # Worst-case complexity
+/// $T(m) = O(m \log m \log\log m)$
+///
+/// $M(m) = O(m \log m)$
+///
+/// where $T$ is time, $M$ is additional memory, and $m$ is `x.significant_bits()`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::asin::primitive_float_asin_with_period;
+///
+/// assert!(primitive_float_asin_with_period(f32::NAN, 360).is_nan());
+/// // an input outside [-1, 1] is NaN
+/// assert!(primitive_float_asin_with_period(2.0f32, 360).is_nan());
+/// // an input of 1 is a quarter turn
+/// assert_eq!(
+///     NiceFloat(primitive_float_asin_with_period(1.0f32, 360)),
+///     NiceFloat(90.0)
+/// );
+/// // an input of 1/2 is a twelfth of a turn
+/// assert_eq!(
+///     NiceFloat(primitive_float_asin_with_period(0.5f32, 360)),
+///     NiceFloat(30.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_asin_with_period(0.25f32, 360)),
+///     NiceFloat(14.477512)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_asin_with_period(0.25f64, 360)),
+///     NiceFloat(14.477512185929925)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_asin_with_period<T: PrimitiveFloat>(x: T, u: u64) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_float_to_float_fn(|x, prec| Float::asin_with_period_prec(x, u, prec), x)
+}
+
+/// Computes $\arcsin(x)u/(2\pi)$, the arcsine of a [`Rational`] measured in $u$ths of a turn (so
+/// that `u = 360` gives degrees), returning the result as a primitive float.
+///
+/// $$
+/// f(x,u) = \arcsin(x)u/(2\pi)+\varepsilon.
+/// $$
+/// - If $x$ is zero, $|x|>1$, $u = 0$, $|x|$ is 1, or $|x|$ is $1/2$ and $u$ is a multiple of 3,
+///   $\varepsilon$ may be ignored or assumed to be 0.
+/// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 |\arcsin(x)u/(2\pi)|\rfloor-p}$, where $p$ is the
+///   precision of the output (24 if `T` is a [`f32`] and 53 if `T` is a [`f64`]).
+///
+/// Special cases:
+/// - $f(x,u)=\text{NaN}$ for $|x|>1$, including when $u=0$
+/// - $f(0,u)=0.0$
+/// - $f(x,0)=\pm0.0$, with the sign of $x$, so that the function stays odd
+/// - $f(\pm1,u)=\pm u/4$, a quarter turn
+/// - $f(\pm1/2,u)=\pm u/12$, a twelfth of a turn, when $u$ is a multiple of 3
+///
+/// Overflow is not possible, since $|f(x,u)| \leq u/4 < 2^{62}$. The result is subnormal, or zero,
+/// only when $x$ is tiny and $u$ is small, since the result is about $xu/(2\pi)$ there.
+///
+/// # Worst-case complexity
+/// $T(m) = O(m \log m \log\log m)$
+///
+/// $M(m) = O(m \log m)$
+///
+/// where $T$ is time, $M$ is additional memory, and $m$ is `x.significant_bits()`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::{One, OneHalf, Zero};
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::asin::primitive_float_asin_with_period_rational;
+/// use malachite_q::Rational;
+///
+/// assert_eq!(
+///     NiceFloat(primitive_float_asin_with_period_rational::<f64>(
+///         &Rational::ZERO,
+///         360
+///     )),
+///     NiceFloat(0.0)
+/// );
+/// // an input of 1 is a quarter turn
+/// assert_eq!(
+///     NiceFloat(primitive_float_asin_with_period_rational::<f64>(
+///         &Rational::ONE,
+///         360
+///     )),
+///     NiceFloat(90.0)
+/// );
+/// // an input of 1/2 is a twelfth of a turn
+/// assert_eq!(
+///     NiceFloat(primitive_float_asin_with_period_rational::<f64>(
+///         &Rational::ONE_HALF,
+///         360
+///     )),
+///     NiceFloat(30.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_asin_with_period_rational::<f64>(
+///         &Rational::from_unsigneds(3u8, 5),
+///         360
+///     )),
+///     NiceFloat(36.86989764584402)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_asin_with_period_rational::<f32>(
+///         &Rational::from_unsigneds(3u8, 5),
+///         360
+///     )),
+///     NiceFloat(36.869896)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_asin_with_period_rational<T: PrimitiveFloat>(x: &Rational, u: u64) -> T
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    emulate_rational_to_float_fn(
+        |x, prec| Float::asin_with_period_rational_prec_ref(x, u, prec),
+        x,
+    )
 }

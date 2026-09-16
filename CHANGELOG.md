@@ -422,6 +422,26 @@ documented by git history.
   below the exponent range, and is handled by the scaled path the periodic sine uses.
   `primitive_float_asin_rational` gives the correctly rounded `f32` or `f64` arcsine of a
   `Rational`.
+- `asin_with_period_prec_round`, `asin_with_period_prec`, `asin_with_period_round`, and
+  `asin_with_period` (with `_ref` and `_assign` variants), a port of `mpfr_asinu`: the arcsine
+  measured in $u$ths of a turn, so that $u = 360$ gives degrees. The result is NaN wherever the
+  plain arcsine is, even when $u = 0$; $\pm1$ gives $\pm u/4$, a quarter turn; and $\pm1/2$ gives
+  $\pm u/12$, a twelfth, when $u$ is a multiple of 3. Two divergences from MPFR: at $u = 0$ MPFR
+  returns $+0$ for every $x$, although its own $x = 0$ case keeps the sign so that the function
+  stays odd, and Malachite keeps the sign throughout, as `mpfr_atanu` does; and the quotient is
+  formed with the numerator scaled up, since $\arcsin(x)u/(2\pi)$ falls below the smallest
+  positive `Float` for a tiny $x$ with a small $u$ — a regime MPFR's wider exponent range never
+  reaches — with the underflowing result then decided by the rounding mode alone.
+  `primitive_float_asin_with_period` gives the correctly rounded `f32` or `f64` angle.
+- `asin_with_period_rational_prec_round` and `asin_with_period_rational_prec` (with `_ref`
+  variants), which take a `Rational`. MPFR has no such function. The special cases match the
+  `Float` version, except that a `Rational` has no signed zeros, so a zero input gives a positive
+  zero. Underflow is reachable here for the same reason it is in `asin_rational`: a `Rational` may
+  sit far below the bottom of the exponent range, where the arcsine is its own leading term, so the
+  quotient is formed from the input itself — necessary rather than merely cheaper, since the
+  `Rational` arcsine reports such an input as an underflow and a large $u$ can lift the quotient
+  back into range. `primitive_float_asin_with_period_rational` gives the correctly rounded `f32` or
+  `f64` angle.
 - `Cot` and `CotAssign` (new traits in malachite-base) for `Float`, with the usual
   `cot_prec_round`, `cot_prec`, `cot_round`, and `_ref`/`_assign` variants: a port of `mpfr_cot`,
   MPFR's generic reciprocal template with the tangent. MPFR's tangent is itself a quotient of a

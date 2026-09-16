@@ -7091,6 +7091,26 @@ pub fn sin_with_period_rational_prec_round_valid(
     rm != Exact || Float::sin_with_period_rational_prec_round_ref(x, u, prec, Floor).1 == Equal
 }
 
+// Whether `(x, u, prec, rm)` is a valid input to `Float::atan_with_period_rational_prec_round`.
+pub fn atan_with_period_rational_prec_round_valid(
+    x: &Rational,
+    u: u64,
+    prec: u64,
+    rm: RoundingMode,
+) -> bool {
+    rm != Exact || Float::atan_with_period_rational_prec_round_ref(x, u, prec, Floor).1 == Equal
+}
+
+// Whether `(x, u, prec, rm)` is a valid input to `Float::asin_with_period_rational_prec_round`.
+pub fn asin_with_period_rational_prec_round_valid(
+    x: &Rational,
+    u: u64,
+    prec: u64,
+    rm: RoundingMode,
+) -> bool {
+    rm != Exact || Float::asin_with_period_rational_prec_round_ref(x, u, prec, Floor).1 == Equal
+}
+
 pub fn root_u_rational_prec_round_valid(x: &Rational, k: u64, prec: u64, rm: RoundingMode) -> bool {
     rm != Exact || Float::root_u_rational_prec_round_ref(x, k, prec, Floor).1 == Equal
 }
@@ -7148,6 +7168,26 @@ pub fn sin_with_period_round_valid(x: &Float, u: u64, rm: RoundingMode) -> bool 
     rm != Exact || x.sin_with_period_round_ref(u, Floor).1 == Equal
 }
 
+// Whether `(x, u, prec, rm)` is a valid input to `Float::atan_with_period_prec_round`.
+pub fn atan_with_period_prec_round_valid(x: &Float, u: u64, prec: u64, rm: RoundingMode) -> bool {
+    rm != Exact || x.atan_with_period_prec_round_ref(u, prec, Floor).1 == Equal
+}
+
+// Whether `(x, u, rm)` is a valid input to `Float::atan_with_period_round`.
+pub fn atan_with_period_round_valid(x: &Float, u: u64, rm: RoundingMode) -> bool {
+    rm != Exact || x.atan_with_period_round_ref(u, Floor).1 == Equal
+}
+
+// Whether `(x, u, prec, rm)` is a valid input to `Float::asin_with_period_prec_round`.
+pub fn asin_with_period_prec_round_valid(x: &Float, u: u64, prec: u64, rm: RoundingMode) -> bool {
+    rm != Exact || x.asin_with_period_prec_round_ref(u, prec, Floor).1 == Equal
+}
+
+// Whether `(x, u, rm)` is a valid input to `Float::asin_with_period_round`.
+pub fn asin_with_period_round_valid(x: &Float, u: u64, rm: RoundingMode) -> bool {
+    rm != Exact || x.asin_with_period_round_ref(u, Floor).1 == Equal
+}
+
 // Whether `(x, u, rm)` is a valid input to `Float::cos_with_period_round`.
 pub fn cos_with_period_round_valid(x: &Float, u: u64, rm: RoundingMode) -> bool {
     rm != Exact || x.cos_with_period_round_ref(u, Floor).1 == Equal
@@ -7183,6 +7223,36 @@ pub fn exhaustive_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_17()
     ))
 }
 
+pub fn exhaustive_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_19()
+-> It<(Float, u64, u64, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(
+        lex_pairs(
+            exhaustive_triples(
+                exhaustive_floats(),
+                exhaustive_unsigneds(),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, u, prec), rm)| atan_with_period_prec_round_valid(x, u, prec, rm)),
+    ))
+}
+
+pub fn exhaustive_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_21()
+-> It<(Float, u64, u64, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(
+        lex_pairs(
+            exhaustive_triples(
+                exhaustive_floats(),
+                exhaustive_unsigneds(),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, u, prec), rm)| asin_with_period_prec_round_valid(x, u, prec, rm)),
+    ))
+}
+
 pub fn exhaustive_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_16()
 -> It<(Float, u64, u64, RoundingMode)> {
     reshape_3_1_to_4(Box::new(
@@ -7213,6 +7283,36 @@ pub fn exhaustive_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_18()
     ))
 }
 
+pub fn exhaustive_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_20()
+-> It<(Float, u64, u64, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(
+        lex_pairs(
+            exhaustive_triples(
+                exhaustive_extreme_floats(),
+                exhaustive_unsigneds(),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, u, prec), rm)| atan_with_period_prec_round_valid(x, u, prec, rm)),
+    ))
+}
+
+pub fn exhaustive_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_22()
+-> It<(Float, u64, u64, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(
+        lex_pairs(
+            exhaustive_triples(
+                exhaustive_extreme_floats(),
+                exhaustive_unsigneds(),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, u, prec), rm)| asin_with_period_prec_round_valid(x, u, prec, rm)),
+    ))
+}
+
 pub fn exhaustive_float_unsigned_rounding_mode_triple_gen_var_38() -> It<(Float, u64, RoundingMode)>
 {
     reshape_2_1_to_3(Box::new(
@@ -7232,6 +7332,28 @@ pub fn exhaustive_float_unsigned_rounding_mode_triple_gen_var_39() -> It<(Float,
             exhaustive_rounding_modes(),
         )
         .filter(|&((ref x, u), rm)| sin_with_period_round_valid(x, u, rm)),
+    ))
+}
+
+pub fn exhaustive_float_unsigned_rounding_mode_triple_gen_var_40() -> It<(Float, u64, RoundingMode)>
+{
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(exhaustive_floats(), exhaustive_unsigneds()),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, u), rm)| atan_with_period_round_valid(x, u, rm)),
+    ))
+}
+
+pub fn exhaustive_float_unsigned_rounding_mode_triple_gen_var_41() -> It<(Float, u64, RoundingMode)>
+{
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(exhaustive_floats(), exhaustive_unsigneds()),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, u), rm)| asin_with_period_round_valid(x, u, rm)),
     ))
 }
 
@@ -7360,6 +7482,46 @@ pub fn exhaustive_rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_5()
         )
         .filter(|&((ref n, k, prec), rm)| {
             sin_with_period_rational_prec_round_valid(n, k, prec, rm)
+        }),
+    ))
+}
+
+pub fn exhaustive_rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_6()
+-> It<(Rational, u64, u64, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(
+        lex_pairs(
+            exhaustive_triples_custom_output(
+                exhaustive_rationals(),
+                exhaustive_unsigneds(),
+                exhaustive_positive_primitive_ints(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref n, k, prec), rm)| {
+            atan_with_period_rational_prec_round_valid(n, k, prec, rm)
+        }),
+    ))
+}
+
+pub fn exhaustive_rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_7()
+-> It<(Rational, u64, u64, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(
+        lex_pairs(
+            exhaustive_triples_custom_output(
+                exhaustive_rationals(),
+                exhaustive_unsigneds(),
+                exhaustive_positive_primitive_ints(),
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref n, k, prec), rm)| {
+            asin_with_period_rational_prec_round_valid(n, k, prec, rm)
         }),
     ))
 }

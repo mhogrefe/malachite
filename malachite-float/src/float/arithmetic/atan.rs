@@ -582,7 +582,7 @@ fn atan_with_period_prec_round_normal_ref(
         t >>= 2u32;
         return Float::from_float_prec_round(if positive { t } else { -t }, prec, rm);
     }
-    atan_with_period_scale(
+    arc_with_period_scale(
         // scaling by a power of 2 is exact, and atan(x) u 2^SCALE stays far below the top of the
         // range, since |atan x| < pi/2 and u < 2^64
         |w| x.atan_prec_round_ref(w, Up).0 << SCALE,
@@ -593,16 +593,17 @@ fn atan_with_period_prec_round_normal_ref(
     )
 }
 
-// The Ziv loop shared by the `Float` and `Rational` arctangents with a period: given a way to
-// compute atan(x) 2^SCALE rounded away from zero at a working precision, forms atan(x) u/(2 pi).
+// The Ziv loop shared by the inverse trigonometric functions with a period: given a way to compute
+// f(x) 2^SCALE rounded away from zero at a working precision, forms f(x) u/(2 pi). It is used by
+// the `Float` and `Rational` arctangents and by the arcsine, whose error analyses agree.
 //
-// The numerator is scaled up by 2^SCALE throughout, since atan(x) u/(2 pi) can fall below the
-// smallest positive `Float` for a tiny x and a small u, which MPFR's wider exponent range never
-// sees; a result below it is then decided by the rounding mode alone, as in `sin_with_period`.
-// Scaling before the multiplication rather than after also lets a `Rational` x too small to be a
-// `Float` at all reach the loop, which is why the shift belongs to the caller.
-fn atan_with_period_scale<F: FnMut(u64) -> Float>(
-    mut scaled_atan: F,
+// The numerator is scaled up by 2^SCALE throughout, since f(x) u/(2 pi) can fall below the smallest
+// positive `Float` for a tiny x and a small u, which MPFR's wider exponent range never sees; a
+// result below it is then decided by the rounding mode alone, as in `sin_with_period`. Scaling
+// before the multiplication rather than after also lets a `Rational` x too small to be a `Float` at
+// all reach the loop, which is why the shift belongs to the caller.
+pub(crate) fn arc_with_period_scale<F: FnMut(u64) -> Float>(
+    mut scaled_f: F,
     u: u64,
     positive: bool,
     prec: u64,
@@ -614,13 +615,13 @@ fn atan_with_period_scale<F: FnMut(u64) -> Float>(
     loop {
         // In the error analysis below, each theta denotes a value with |theta| <= 2^(1 - w).
         //
-        // t = atan(x) 2^SCALE (1 + theta), nonzero since we rounded away from zero and x is not
-        let mut t = scaled_atan(w);
-        // t = atan(x) u 2^SCALE (1 + theta)^2
+        // t = f(x) 2^SCALE (1 + theta), nonzero since we rounded away from zero and x is not
+        let mut t = scaled_f(w);
+        // t = f(x) u 2^SCALE (1 + theta)^2
         t.mul_prec_round_assign_ref(&u_float, w, Up);
         // 2 pi rounded toward zero, so that the quotient rounds away
         let two_pi = Float::pi_prec_round(w, Down).0 << 1u32;
-        // t = atan(x) u 2^SCALE/(2 pi) (1 + theta)^4, whose relative error is below 2^(4 - w) since
+        // t = f(x) u 2^SCALE/(2 pi) (1 + theta)^4, whose relative error is below 2^(4 - w) since
         // |(1 + theta)^4 - 1| <= 8 |theta| for w >= 3
         t.div_prec_round_assign(two_pi, w, Up);
         if let Some(result) = scaled_underflow(&t, positive, prec, rm) {
@@ -670,7 +671,7 @@ pub(crate) fn atan_with_period_rational_helper(
     }
     if exp_x <= SCALED_INPUT_EXPONENT {
         let scaled = x << SCALE;
-        return atan_with_period_scale(
+        return arc_with_period_scale(
             |w| Float::from_rational_prec_round_ref(&scaled, w, Up).0,
             u,
             positive,
@@ -678,7 +679,7 @@ pub(crate) fn atan_with_period_rational_helper(
             rm,
         );
     }
-    atan_with_period_scale(
+    arc_with_period_scale(
         |w| atan_rational_helper(x, w, Up).0 << SCALE,
         u,
         positive,
