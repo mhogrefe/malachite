@@ -20,7 +20,8 @@ use malachite_base::test_util::generators::{
 };
 use malachite_base::test_util::runner::Runner;
 use malachite_float::float::arithmetic::acsc::{
-    primitive_float_acsc, primitive_float_acsc_rational, primitive_float_acsc_with_period,
+    primitive_float_acsc, primitive_float_acsc_pi, primitive_float_acsc_pi_rational,
+    primitive_float_acsc_rational, primitive_float_acsc_with_period,
     primitive_float_acsc_with_period_rational,
 };
 use malachite_float::test_util::bench::bucketers::*;
@@ -88,6 +89,20 @@ pub(crate) fn register(runner: &mut Runner) {
         benchmark_float_acsc_with_period_rational_prec_round_evaluation_strategy
     );
     register_primitive_float_benches!(runner, benchmark_primitive_float_acsc_with_period_rational);
+    register_demo!(runner, demo_float_acsc_pi_prec_round);
+    register_demo!(runner, demo_float_acsc_pi_prec_round_debug);
+    register_demo!(runner, demo_float_acsc_pi_prec);
+    register_demo!(runner, demo_float_acsc_pi_round);
+    register_demo!(runner, demo_float_acsc_pi_prec_round_assign);
+    register_demo!(runner, demo_float_acsc_pi_rational_prec_round);
+    register_demo!(runner, demo_float_acsc_pi_rational_prec);
+    register_primitive_float_demos!(runner, demo_primitive_float_acsc_pi);
+    register_primitive_float_demos!(runner, demo_primitive_float_acsc_pi_rational);
+    register_demo!(runner, demo_float_acsc_pi);
+    register_demo!(runner, demo_float_acsc_pi_debug);
+    register_demo!(runner, demo_float_acsc_pi_ref);
+    register_demo!(runner, demo_float_acsc_pi_assign);
+    register_bench!(runner, benchmark_float_acsc_pi_evaluation_strategy);
 }
 
 fn demo_float_acsc_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
@@ -694,5 +709,188 @@ fn benchmark_primitive_float_acsc_with_period_rational<T: PrimitiveFloat>(
         &mut [("malachite", &mut |(x, u)| {
             no_out!(primitive_float_acsc_with_period_rational::<T>(&x, u));
         })],
+    );
+}
+
+fn demo_float_acsc_pi_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec, rm) in float_unsigned_rounding_mode_triple_gen_var_48()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "({}).acsc_pi_prec_round({}, {}) = {:?}",
+            x.clone(),
+            prec,
+            rm,
+            x.acsc_pi_prec_round(prec, rm)
+        );
+    }
+}
+
+fn demo_float_acsc_pi_prec_round_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec, rm) in float_unsigned_rounding_mode_triple_gen_var_48()
+        .get(gm, config)
+        .take(limit)
+    {
+        let (c, o) = x.clone().acsc_pi_prec_round(prec, rm);
+        println!(
+            "({:#x}).acsc_pi_prec_round({}, {}) = ({:#x}, {:?})",
+            ComparableFloat(x),
+            prec,
+            rm,
+            ComparableFloat(c),
+            o
+        );
+    }
+}
+
+fn demo_float_acsc_pi_prec(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec) in float_unsigned_pair_gen_var_1().get(gm, config).take(limit) {
+        println!(
+            "({}).acsc_pi_prec({}) = {:?}",
+            x.clone(),
+            prec,
+            x.acsc_pi_prec(prec)
+        );
+    }
+}
+
+fn demo_float_acsc_pi_round(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, rm) in float_rounding_mode_pair_gen_var_51()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "({}).acsc_pi_round({}) = {:?}",
+            x.clone(),
+            rm,
+            x.acsc_pi_round(rm)
+        );
+    }
+}
+
+fn demo_float_acsc_pi_prec_round_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (mut x, prec, rm) in float_unsigned_rounding_mode_triple_gen_var_48()
+        .get(gm, config)
+        .take(limit)
+    {
+        let x_old = x.clone();
+        let o = x.acsc_pi_prec_round_assign(prec, rm);
+        println!("x := {x_old}; x.acsc_pi_prec_round_assign({prec}, {rm}) = {o:?}; x = {x}");
+    }
+}
+
+fn demo_float_acsc_pi_rational_prec_round(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec, rm) in rational_unsigned_rounding_mode_triple_gen_var_13()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "Float::acsc_pi_rational_prec_round({}, {}, {}) = {:?}",
+            x.clone(),
+            prec,
+            rm,
+            Float::acsc_pi_rational_prec_round(x, prec, rm)
+        );
+    }
+}
+
+fn demo_float_acsc_pi_rational_prec(gm: GenMode, config: &GenConfig, limit: usize) {
+    for (x, prec) in rational_unsigned_pair_gen_var_3()
+        .get(gm, config)
+        .take(limit)
+    {
+        println!(
+            "Float::acsc_pi_rational_prec({}, {}) = {:?}",
+            x.clone(),
+            prec,
+            Float::acsc_pi_rational_prec(x, prec)
+        );
+    }
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn demo_primitive_float_acsc_pi<T: PrimitiveFloat>(gm: GenMode, config: &GenConfig, limit: usize)
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    for x in primitive_float_gen::<T>().get(gm, config).take(limit) {
+        println!(
+            "primitive_float_acsc_pi({}) = {}",
+            NiceFloat(x),
+            NiceFloat(primitive_float_acsc_pi(x))
+        );
+    }
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn demo_primitive_float_acsc_pi_rational<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+) where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    for x in rational_gen().get(gm, config).take(limit) {
+        println!(
+            "primitive_float_acsc_pi_rational({}) = {}",
+            x,
+            NiceFloat(primitive_float_acsc_pi_rational::<T>(&x))
+        );
+    }
+}
+
+fn demo_float_acsc_pi(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen().get(gm, config).take(limit) {
+        let x_old = x.clone();
+        println!("({}).acsc_pi() = {}", x_old, x.acsc_pi());
+    }
+}
+
+fn demo_float_acsc_pi_debug(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen().get(gm, config).take(limit) {
+        let x_old = x.clone();
+        println!(
+            "({:#x}).acsc_pi() = {:#x}",
+            ComparableFloat(x_old),
+            ComparableFloat(x.acsc_pi())
+        );
+    }
+}
+
+fn demo_float_acsc_pi_ref(gm: GenMode, config: &GenConfig, limit: usize) {
+    for x in float_gen().get(gm, config).take(limit) {
+        println!("(&{}).acsc_pi_ref() = {}", x, x.acsc_pi_ref());
+    }
+}
+
+fn demo_float_acsc_pi_assign(gm: GenMode, config: &GenConfig, limit: usize) {
+    for mut x in float_gen().get(gm, config).take(limit) {
+        let x_old = x.clone();
+        x.acsc_pi_assign();
+        println!("x := {x_old}; x.acsc_pi_assign(); x = {x}");
+    }
+}
+
+fn benchmark_float_acsc_pi_evaluation_strategy(
+    gm: GenMode,
+    config: &GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Float.acsc_pi()",
+        BenchmarkType::EvaluationStrategy,
+        float_gen().get(gm, config),
+        gm.name(),
+        limit,
+        file_name,
+        &float_complexity_bucketer("x"),
+        &mut [
+            ("Float.acsc_pi()", &mut |x| no_out!(x.acsc_pi())),
+            ("(&Float).acsc_pi_ref()", &mut |x| no_out!(x.acsc_pi_ref())),
+        ],
     );
 }
