@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::cmp::Ordering::{self, *};
-use malachite_base::num::arithmetic::traits::{Asec, AsecAssign, Reciprocal};
+use malachite_base::num::arithmetic::traits::{Asec, AsecAssign, PowerOf2, Reciprocal};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, OneHalf, Two, Zero,
@@ -19,21 +19,28 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode::{self, *};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::test_util::generators::{
-    primitive_float_gen, unsigned_rounding_mode_pair_gen_var_3,
+    primitive_float_gen, primitive_float_gen_var_1, unsigned_rounding_mode_pair_gen_var_3,
 };
-use malachite_float::float::arithmetic::asec::primitive_float_asec;
+use malachite_float::float::arithmetic::asec::{
+    primitive_float_asec, primitive_float_asec_rational,
+};
 use malachite_float::test_util::common::{
     assert_rounding_ordering_consistent, parse_hex_string, rug_round_try_from_rounding_mode,
     to_hex_string,
 };
-use malachite_float::test_util::float::arithmetic::asec::{rug_asec, rug_asec_prec_round};
+use malachite_float::test_util::float::arithmetic::asec::{
+    rug_asec, rug_asec_prec_round, rug_asec_rational_prec_round,
+};
 use malachite_float::test_util::generators::{
     float_gen, float_rounding_mode_pair_gen_var_50, float_unsigned_pair_gen_var_1,
     float_unsigned_rounding_mode_triple_gen_var_45, float_unsigned_rounding_mode_triple_gen_var_46,
+    rational_unsigned_rounding_mode_triple_gen_var_12,
 };
 use malachite_float::{ComparableFloat, ComparableFloatRef, Float};
 use malachite_q::Rational;
+use malachite_q::test_util::generators::{rational_gen, rational_unsigned_pair_gen_var_3};
 use std::panic::catch_unwind;
+use std::str::FromStr;
 
 // The arcsecant of x is the arccosine of its reciprocal, and a `Float`'s reciprocal is an exact
 // `Rational`, so the `Rational` arccosine gives the same correctly rounded answer. That identity is
@@ -581,4 +588,420 @@ where
 #[test]
 fn primitive_float_asec_properties() {
     apply_fn_to_primitive_floats!(primitive_float_asec_properties_helper);
+}
+
+#[test]
+fn test_asec_rational_prec_round() {
+    let test = |s: &str, prec: u64, rm: RoundingMode, out: &str, out_hex: &str, o_out: Ordering| {
+        let x = Rational::from_str(s).unwrap();
+
+        let (c, o) = Float::asec_rational_prec_round(x.clone(), prec, rm);
+        assert!(c.is_valid());
+        assert_eq!(c.to_string(), out);
+        assert_eq!(to_hex_string(&c), out_hex);
+        assert_eq!(o, o_out);
+
+        let (c_alt, o_alt) = Float::asec_rational_prec_round_ref(&x, prec, rm);
+        assert!(c_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+        assert_eq!(o_alt, o);
+
+        if rm == Nearest {
+            let (c_alt, o_alt) = Float::asec_rational_prec(x.clone(), prec);
+            assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+            assert_eq!(o_alt, o);
+            let (c_alt, o_alt) = Float::asec_rational_prec_ref(&x, prec);
+            assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+            assert_eq!(o_alt, o);
+        }
+
+        // the arccosine of the exact reciprocal, which is the same real number
+        if x != 0u32 {
+            let (c_alt, o_alt) = Float::acos_rational_prec_round(x.clone().reciprocal(), prec, rm);
+            assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+            assert_eq!(o_alt, o);
+        }
+
+        if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm) {
+            let (rug_c, rug_o) = rug_asec_rational_prec_round(&x, prec, rug_rm);
+            assert_eq!(
+                ComparableFloatRef(&Float::from(&rug_c)),
+                ComparableFloatRef(&c)
+            );
+            assert_eq!(rug_o, o);
+        }
+    };
+    test("0", 10, Exact, "NaN", "NaN", Equal);
+    test("1/2", 10, Exact, "NaN", "NaN", Equal);
+    test("-1/2", 10, Nearest, "NaN", "NaN", Equal);
+    test("999999/1000000", 10, Nearest, "NaN", "NaN", Equal);
+    test("1", 10, Exact, "0.0", "0x0.0", Equal);
+    test("1", 1, Exact, "0.0", "0x0.0", Equal);
+    test("-1", 10, Floor, "3.1406", "0x3.24#10", Less);
+    test("-1", 10, Ceiling, "3.1445", "0x3.25#10", Greater);
+    test(
+        "-1",
+        53,
+        Nearest,
+        "3.1415926535897931",
+        "0x3.243f6a8885a30#53",
+        Less,
+    );
+    test("2", 10, Floor, "1.0469", "0x1.0c0#10", Less);
+    test("2", 10, Ceiling, "1.0488", "0x1.0c8#10", Greater);
+    test("2", 10, Nearest, "1.0469", "0x1.0c0#10", Less);
+    test(
+        "2",
+        53,
+        Nearest,
+        "1.0471975511965979",
+        "0x1.0c152382d7366#53",
+        Greater,
+    );
+    test(
+        "-2",
+        53,
+        Nearest,
+        "2.0943951023931957",
+        "0x2.182a4705ae6cc#53",
+        Greater,
+    );
+    test("5/3", 10, Floor, "0.92676", "0x0.ed4#10", Less);
+    test("5/3", 10, Ceiling, "0.92773", "0x0.ed8#10", Greater);
+    test(
+        "5/3",
+        53,
+        Nearest,
+        "0.92729521800161219",
+        "0x0.ed63382b0dda78#53",
+        Less,
+    );
+    test(
+        "-5/3",
+        53,
+        Nearest,
+        "2.2142974355881808",
+        "0x2.36dc325d77c88#53",
+        Less,
+    );
+    test(
+        "1000001/1000000",
+        20,
+        Nearest,
+        "0.0014142133",
+        "0x0.005cae90#20",
+        Greater,
+    );
+    test(
+        "1000001/1000000",
+        100,
+        Nearest,
+        "0.0014142129731178241296276027330038",
+        "0x0.005cae8e78183f43b1be300096a0#100",
+        Less,
+    );
+    test(
+        "-1000001/1000000",
+        20,
+        Nearest,
+        "3.1401787",
+        "0x3.23e2c#20",
+        Greater,
+    );
+    test("1000000", 20, Nearest, "1.5707951", "0x1.921fa#20", Less);
+    test(
+        "-1000000",
+        53,
+        Nearest,
+        "1.5707973267948967",
+        "0x1.921fc60b3a724#53",
+        Greater,
+    );
+    test(
+        "1000000000000000000000000000001/1000000000000000000000000000000",
+        53,
+        Nearest,
+        "1.4142135623730951e-15",
+        "0x6.5e7a2ba008448E-13#53",
+        Greater,
+    );
+    test(
+        "340282366920938463463374607431768211456",
+        53,
+        Nearest,
+        "1.5707963267948966",
+        "0x1.921fb54442d18#53",
+        Less,
+    );
+    test(
+        "115792089237316195423570985008687907853269984665640564039457584007913129639936",
+        20,
+        Nearest,
+        "1.5707970",
+        "0x1.921fc#20",
+        Greater,
+    );
+}
+
+#[test]
+#[should_panic]
+fn asec_rational_prec_round_fail_1() {
+    Float::asec_rational_prec_round(Rational::TWO, 0, Floor);
+}
+
+#[test]
+#[should_panic]
+fn asec_rational_prec_round_fail_2() {
+    // asec(2) = pi/3 is not exactly representable
+    Float::asec_rational_prec_round(Rational::TWO, 10, Exact);
+}
+
+#[test]
+#[should_panic]
+fn asec_rational_prec_round_fail_3() {
+    // asec(-1) = pi is not exactly representable either
+    Float::asec_rational_prec_round(Rational::NEGATIVE_ONE, 10, Exact);
+}
+
+#[test]
+#[should_panic]
+fn asec_rational_prec_round_ref_fail() {
+    Float::asec_rational_prec_round_ref(&Rational::TWO, 0, Floor);
+}
+
+#[test]
+#[should_panic]
+fn asec_rational_prec_fail() {
+    Float::asec_rational_prec(Rational::TWO, 0);
+}
+
+// A `Rational` within 2^(-2^31) of 1, where asec(x) is about sqrt(2(x - 1)) and falls below the
+// smallest positive `Float` -- a regime the `Float` arcsecant cannot reach, since it would need an
+// input of more than 2^31 bits. The `Rational` here has about that many, so each call costs a few
+// seconds.
+#[test]
+fn test_asec_rational_underflow() {
+    let min_positive = Float::min_positive_value_prec(53);
+    let x = Rational::ONE + Rational::power_of_2(-((1i64 << 31) + 4));
+    for (rm, expected, o_out) in
+        [(Nearest, Float::ZERO, Less), (Ceiling, min_positive.clone(), Greater)]
+    {
+        let (c, o) = Float::asec_rational_prec_round_ref(&x, 53, rm);
+        assert_eq!(ComparableFloat(c), ComparableFloat(expected), "rm = {rm:?}");
+        assert_eq!(o, o_out, "rm = {rm:?}");
+    }
+    // two exponents up, the same path returns a representable value instead
+    let x = Rational::ONE + Rational::power_of_2(-(1i64 << 31));
+    let (c, o) = Float::asec_rational_prec_round_ref(&x, 53, Nearest);
+    assert!(c > min_positive);
+    assert_eq!(o, Greater);
+}
+
+// Whether asec(x) is exactly representable for a `Rational` x: inside (-1, 1), where the result is
+// NaN, and at x = 1, where it is zero. The arcsecant of -1 is pi, which is never representable.
+fn asec_rational_exact(x: &Rational) -> bool {
+    x.lt_abs(&1u32) || *x == 1u32
+}
+
+#[allow(clippy::needless_pass_by_value)]
+fn asec_rational_prec_round_properties_helper(x: Rational, prec: u64, rm: RoundingMode) {
+    if rm == Exact && !asec_rational_exact(&x) {
+        assert_panic!(Float::asec_rational_prec_round_ref(&x, prec, Exact));
+        return;
+    }
+    let (c, o) = Float::asec_rational_prec_round(x.clone(), prec, rm);
+    assert!(c.is_valid());
+    assert_rounding_ordering_consistent(&c, rm, o);
+
+    let (c_alt, o_alt) = Float::asec_rational_prec_round_ref(&x, prec, rm);
+    assert!(c_alt.is_valid());
+    assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+    assert_eq!(o_alt, o);
+
+    // the arccosine of the exact reciprocal, which is the same real number
+    if x != 0u32 {
+        let (c_alt, o_alt) = Float::acos_rational_prec_round(x.clone().reciprocal(), prec, rm);
+        assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+        assert_eq!(o_alt, o, "x = {x} prec = {prec} rm = {rm:?}");
+    }
+
+    if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm) {
+        let (rug_c, rug_o) = rug_asec_rational_prec_round(&x, prec, rug_rm);
+        assert_eq!(
+            ComparableFloatRef(&Float::from(&rug_c)),
+            ComparableFloatRef(&c)
+        );
+        assert_eq!(rug_o, o);
+    }
+
+    // NaN exactly for an input inside (-1, 1)
+    assert_eq!(c.is_nan(), x.lt_abs(&1u32));
+    if !c.is_nan() {
+        // 0 <= asec(x) <= pi, so the result never overflows, and it is zero only at x = 1
+        assert!(c.is_finite());
+        assert!(c >= 0u32);
+        assert!(c <= Float::pi_prec_round(prec, Ceiling).0);
+        assert_eq!(c == 0u32, x == 1u32);
+        if c.is_normal() {
+            assert_eq!(c.get_prec(), Some(prec));
+        }
+    }
+    // a `Float` input agrees with the `Float` version
+    if let Ok(f) = Float::try_from(&x) {
+        let (c_alt, o_alt) = f.asec_prec_round(prec, rm);
+        assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+        assert_eq!(o_alt, o);
+    }
+
+    if o == Equal {
+        assert!(asec_rational_exact(&x));
+        for rm in exhaustive_rounding_modes() {
+            let (c2, oo) = Float::asec_rational_prec_round_ref(&x, prec, rm);
+            assert_eq!(ComparableFloatRef(&c2), ComparableFloatRef(&c));
+            assert_eq!(oo, Equal);
+        }
+    } else {
+        assert_panic!(Float::asec_rational_prec_round_ref(&x, prec, Exact));
+    }
+}
+
+#[test]
+fn asec_rational_prec_round_properties() {
+    rational_unsigned_rounding_mode_triple_gen_var_12().test_properties(|(x, prec, rm)| {
+        asec_rational_prec_round_properties_helper(x, prec, rm);
+    });
+
+    unsigned_rounding_mode_pair_gen_var_3().test_properties(|(prec, rm)| {
+        // asec(x) = NaN inside (-1, 1), zero included
+        for x in [Rational::ZERO, Rational::ONE_HALF, -Rational::ONE_HALF] {
+            let (c, o) = Float::asec_rational_prec_round(x, prec, rm);
+            assert!(c.is_nan());
+            assert_eq!(o, Equal);
+        }
+        // asec(1) = +0, exactly
+        let (c, o) = Float::asec_rational_prec_round(Rational::ONE, prec, rm);
+        assert_eq!(ComparableFloat(c), ComparableFloat(Float::ZERO));
+        assert_eq!(o, Equal);
+        if rm == Exact {
+            // pi is never exactly representable
+            assert_panic!(Float::asec_rational_prec_round(
+                Rational::NEGATIVE_ONE,
+                prec,
+                Exact
+            ));
+            return;
+        }
+        // asec(-1) = pi
+        let (pi, o_pi) = Float::pi_prec_round(prec, rm);
+        let (c, o) = Float::asec_rational_prec_round(Rational::NEGATIVE_ONE, prec, rm);
+        assert_eq!(ComparableFloat(c), ComparableFloat(pi));
+        assert_eq!(o, o_pi);
+    });
+}
+
+#[test]
+fn asec_rational_prec_properties() {
+    rational_unsigned_pair_gen_var_3().test_properties(|(x, prec)| {
+        let (c, o) = Float::asec_rational_prec(x.clone(), prec);
+        assert!(c.is_valid());
+        let (c_alt, o_alt) = Float::asec_rational_prec_ref(&x, prec);
+        assert!(c_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+        assert_eq!(o_alt, o);
+        let (c_alt, o_alt) = Float::asec_rational_prec_round_ref(&x, prec, Nearest);
+        assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+        assert_eq!(o_alt, o);
+    });
+}
+
+#[test]
+// As in `test_primitive_float_asec`, some of the pinned values are the pi constants.
+#[allow(clippy::approx_constant, clippy::type_repetition_in_bounds)]
+fn test_primitive_float_asec_rational() {
+    fn test<T: PrimitiveFloat>(s: &str, out: T)
+    where
+        Float: PartialOrd<T>,
+        for<'a> T: ExactFrom<&'a Float>,
+    {
+        assert_eq!(
+            NiceFloat(primitive_float_asec_rational::<T>(
+                &Rational::from_str(s).unwrap()
+            )),
+            NiceFloat(out)
+        );
+    }
+    test::<f32>("0", f32::NAN);
+    test::<f32>("1/2", f32::NAN);
+    test::<f32>("-1/2", f32::NAN);
+    test::<f32>("1", 0.0);
+    test::<f32>("-1", 3.1415927);
+    test::<f32>("2", 1.0471976);
+    test::<f32>("-2", 2.0943952);
+    test::<f32>("5/3", 0.9272952);
+    test::<f32>("-5/3", 2.2142975);
+    test::<f32>("1000001/1000000", 0.001414213);
+    test::<f32>("1000000", 1.5707953);
+    test::<f32>("-1000000", 1.5707973);
+    test::<f32>(
+        "1000000000000000000000000000001/1000000000000000000000000000000",
+        1.4142135e-15,
+    );
+    test::<f64>("0", f64::NAN);
+    test::<f64>("1/2", f64::NAN);
+    test::<f64>("-1/2", f64::NAN);
+    test::<f64>("1", 0.0);
+    test::<f64>("-1", 3.141592653589793);
+    test::<f64>("2", 1.0471975511965979);
+    test::<f64>("-2", 2.0943951023931957);
+    test::<f64>("5/3", 0.9272952180016122);
+    test::<f64>("-5/3", 2.214297435588181);
+    test::<f64>("1000001/1000000", 0.0014142129731178241);
+    test::<f64>("1000000", 1.5707953267948966);
+    test::<f64>("-1000000", 1.5707973267948967);
+    test::<f64>(
+        "1000000000000000000000000000001/1000000000000000000000000000000",
+        1.414213562373095e-15,
+    );
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn primitive_float_asec_rational_properties_helper<T: PrimitiveFloat>()
+where
+    Float: From<T> + PartialOrd<T>,
+    Rational: ExactFrom<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    rational_gen().test_properties(|x| {
+        let c = primitive_float_asec_rational::<T>(&x);
+        // NaN exactly for an input inside (-1, 1)
+        assert_eq!(c.is_nan(), x.lt_abs(&1u32));
+        if !c.is_nan() {
+            // the result lies in [0, pi], so it never overflows
+            assert!(c.is_finite());
+            assert!(c >= T::ZERO);
+            // the same as the `Float` version taken with 64 bits to spare and rounded once
+            let (c_float, _) = Float::asec_rational_prec_ref(&x, T::MANTISSA_WIDTH + 64);
+            assert_eq!(
+                NiceFloat(T::rounding_from(&c_float, Nearest).0),
+                NiceFloat(c)
+            );
+        }
+    });
+
+    primitive_float_gen_var_1::<T>().test_properties(|x| {
+        // The arcsecant of a finite primitive float, taken through the `Rational` path, matches the
+        // direct primitive-float arcsecant. A zero is excluded, since `Rational` has no signed
+        // zeros, though both give NaN there.
+        if x != T::ZERO {
+            assert_eq!(
+                NiceFloat(primitive_float_asec_rational::<T>(&Rational::exact_from(x))),
+                NiceFloat(primitive_float_asec(x))
+            );
+        }
+    });
+}
+
+#[test]
+fn primitive_float_asec_rational_properties() {
+    apply_fn_to_primitive_floats!(primitive_float_asec_rational_properties_helper);
 }

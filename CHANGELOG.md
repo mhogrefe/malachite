@@ -504,6 +504,14 @@ documented by git history.
   including the zeros; $\pm\infty$ gives $\pi/2$, the value the secant grows toward; $1$ gives
   $0.0$, the only exact case; and $-1$ gives $\pi$. `primitive_float_asec` gives the correctly
   rounded `f32` or `f64` arcsecant.
+- `asec_rational_prec_round` and `asec_rational_prec` (with `_ref` variants), which take a
+  `Rational`. There $x^2-1$ is exact with no working precision to choose at all, so the identity
+  $\operatorname{asec} x = \arctan(\sqrt{x^2-1})$ applies directly; a large $x$ skips the square
+  altogether, its arcsecant being the arctangent of $|x|$ to within the working precision. Underflow,
+  impossible for the `Float` arcsecant, is reachable here, since a `Rational` may lie within
+  $2^{-2^{31}}$ of 1; there $\operatorname{asec} x$ is about $\sqrt{2(x-1)}$, and that form is used
+  directly. `primitive_float_asec_rational` gives the correctly rounded `f32` or `f64` arcsecant of
+  a `Rational`.
 - `Cot` and `CotAssign` (new traits in malachite-base) for `Float`, with the usual
   `cot_prec_round`, `cot_prec`, `cot_round`, and `_ref`/`_assign` variants: a port of `mpfr_cot`,
   MPFR's generic reciprocal template with the tangent. MPFR's tangent is itself a quotient of a

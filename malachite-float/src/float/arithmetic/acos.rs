@@ -33,12 +33,13 @@ use malachite_nz::natural::arithmetic::float::round::float_can_round;
 use malachite_nz::platform::Limb;
 use malachite_q::Rational;
 
-// An arccosine whose radicand 2(1 - x) has at most this exponent falls at or below the bottom of
-// the exponent range, since the square root halves it.
-const SCALED_RADICAND_EXPONENT: i64 = SCALED_INPUT_EXPONENT << 1;
+// An inverse cosine or secant whose radicand -- 2(1 - x) for the one, 2(x - 1) for the other -- has
+// at most this exponent falls at or below the bottom of the exponent range, since the square root
+// halves it.
+pub(crate) const SCALED_RADICAND_EXPONENT: i64 = SCALED_INPUT_EXPONENT << 1;
 // The radicand is scaled by this much, so that its square root is scaled by 2^SCALE: one shift for
 // the doubling, and two SCALEs for the root.
-const SCALED_RADICAND_SHIFT: u64 = (SCALE << 1) + 1;
+pub(crate) const SCALED_RADICAND_SHIFT: u64 = (SCALE << 1) + 1;
 
 // Computes acos(x) for a finite nonzero `Float` x, rounded to precision `prec` with rounding mode
 // `rm`.
