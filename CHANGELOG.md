@@ -478,6 +478,14 @@ documented by git history.
   and like the other periodic inverse functions, the quotient is formed with the numerator scaled
   up so that an underflowing result is decided by the rounding mode alone.
   `primitive_float_acos_with_period` gives the correctly rounded `f32` or `f64` angle.
+- `acos_with_period_rational_prec_round` and `acos_with_period_rational_prec` (with `_ref`
+  variants), which take a `Rational`. MPFR has no such function. The special cases match the
+  `Float` version. Underflow is reachable here for the same reason it is in `acos_rational`: a
+  `Rational` may lie within $2^{-2^{31}}$ of 1, where $\arccos x$ falls below the smallest positive
+  `Float`. That case is answered from $\sqrt{2(1-x)}$ directly, which is necessary rather than
+  merely cheaper — the `Rational` arccosine reports such an input as an underflow, and a large $u$
+  can lift the quotient back into range. `primitive_float_acos_with_period_rational` gives the
+  correctly rounded `f32` or `f64` angle.
 - `Cot` and `CotAssign` (new traits in malachite-base) for `Float`, with the usual
   `cot_prec_round`, `cot_prec`, `cot_round`, and `_ref`/`_assign` variants: a port of `mpfr_cot`,
   MPFR's generic reciprocal template with the tangent. MPFR's tangent is itself a quotient of a

@@ -33,6 +33,13 @@ use malachite_nz::natural::arithmetic::float::round::float_can_round;
 use malachite_nz::platform::Limb;
 use malachite_q::Rational;
 
+// An arccosine whose radicand 2(1 - x) has at most this exponent falls at or below the bottom of
+// the exponent range, since the square root halves it.
+const SCALED_RADICAND_EXPONENT: i64 = SCALED_INPUT_EXPONENT << 1;
+// The radicand is scaled by this much, so that its square root is scaled by 2^SCALE: one shift for
+// the doubling, and two SCALEs for the root.
+const SCALED_RADICAND_SHIFT: u64 = (SCALE << 1) + 1;
+
 // Computes acos(x) for a finite nonzero `Float` x, rounded to precision `prec` with rounding mode
 // `rm`.
 //
@@ -166,8 +173,8 @@ pub(crate) fn acos_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) ->
         // the square root of 2u rather than of (1 - x^2)/x^2 also keeps this path cheap: an x this
         // close to 1 has a huge numerator and denominator, and squaring it would double their size.
         let u = Rational::ONE - x;
-        if u.floor_log_base_2_abs() + 2 <= const { SCALED_INPUT_EXPONENT << 1 } {
-            let scaled = u << const { (SCALE << 1) + 1 };
+        if u.floor_log_base_2_abs() + 2 <= SCALED_RADICAND_EXPONENT {
+            let scaled = u << SCALED_RADICAND_SHIFT;
             loop {
                 // rounded away from zero, the side acos(x) is on
                 let t = Float::sqrt_rational_prec_round_ref(&scaled, w, Up).0;
@@ -202,6 +209,78 @@ pub(crate) fn acos_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) ->
         w += increment;
         increment = w >> 1;
     }
+}
+
+// Computes acos(x) u/(2 pi) for a `Rational` x with 0 < |x| <= 1 and a nonzero u, rounded to
+// precision `prec` with rounding mode `rm`. (x = 0, u = 0, and |x| > 1 are handled by the caller.)
+// `rm` may be `Exact` only at |x| = 1, where the result is zero or u/2, and at |x| = 1/2 with u a
+// multiple of 3, where it is u/6 or u/3.
+//
+// MPFR has no arccosine of a rational. The branches match the `Float` case, with one addition: an x
+// close enough to 1 that acos(x) falls below the bottom of the exponent range is answered from
+// sqrt(2(1 - x)) directly. That substitution is needed rather than merely cheaper, since
+// `acos_rational_helper` reports such an x as an underflow, and a large u can lift the quotient
+// back into the range, where that answer would be wrong.
+pub(crate) fn acos_with_period_rational_helper(
+    x: &Rational,
+    u: u64,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    let positive = *x > 0u32;
+    let exp_x = x.floor_log_base_2_abs() + 1; // the MPFR-style exponent of x
+    // |x| = 1: acosu(1, u) = +0, following IEEE 754-2019's acosPi, and acosu(-1, u) = u/2
+    if exp_x == 1 {
+        return if positive {
+            (Float::ZERO, Equal)
+        } else {
+            scaled_unsigned(u, 1, true, prec, rm)
+        };
+    }
+    // acos(1/2) = pi/3 and acos(-1/2) = 2 pi/3, so acosu(1/2, u) = u/6 and acosu(-1/2, u) = u/3,
+    // both exact when u is a multiple of 3
+    if u.is_multiple_of(3) && x.numerator_ref() == &1u32 && x.denominator_ref() == &2u32 {
+        return scaled_unsigned(u / 3, u32::from(positive), true, prec, rm);
+    }
+    // Nothing else can be rounded exactly
+    assert_ne!(rm, Exact, "Inexact acos_with_period_rational");
+    // as in the `Float` case, a tiny x is answered from the neighbour of u/4
+    if exp_x <= -64 && exp_x <= -i64::exact_from(prec) - 3 {
+        let w = if prec <= 63 { 65 } else { prec + 2 };
+        // exact, since w >= 64
+        let mut t = Float::from_unsigned_prec_round(u, w, Exact).0;
+        if positive {
+            t.decrement();
+        } else {
+            t.increment();
+        }
+        t >>= 2u32;
+        return Float::from_float_prec_round(t, prec, rm);
+    }
+    if positive {
+        // An x within 2^(2 SCALED_INPUT_EXPONENT) of 1 puts acos(x) = sqrt(2(1 - x))(1 + ...) below
+        // the smallest positive `Float`, where `acos_rational_helper` would report an underflow --
+        // but a large u can lift acos(x) u/(2 pi) back into the range, so the square root is taken
+        // here instead, scaled up by 2^SCALE for the quotient below.
+        let v = Rational::ONE - x;
+        if v.floor_log_base_2_abs() + 2 <= SCALED_RADICAND_EXPONENT {
+            let scaled = v << SCALED_RADICAND_SHIFT;
+            return arc_with_period_scale(
+                |w| Float::sqrt_rational_prec_round_ref(&scaled, w, Up).0,
+                u,
+                true,
+                prec,
+                rm,
+            );
+        }
+    }
+    arc_with_period_scale(
+        |w| acos_rational_helper(x, w, Up).0 << SCALE,
+        u,
+        true,
+        prec,
+        rm,
+    )
 }
 
 impl Float {
@@ -1207,6 +1286,240 @@ impl Float {
         let prec = self.significant_bits();
         self.acos_with_period_prec_assign(u, prec);
     }
+
+    /// Computes $\arccos(x)u/(2\pi)$, the arccosine of a [`Rational`] measured in $u$ths of a turn,
+    /// rounding the result to the specified precision and with the specified rounding mode and
+    /// returning the result as a [`Float`]. The [`Rational`] is taken by value. An [`Ordering`] is
+    /// also returned, indicating whether the rounded arccosine is less than, equal to, or greater
+    /// than the exact arccosine.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,u,p,m) = \arccos(x)u/(2\pi)+\varepsilon.
+    /// $$
+    /// - If $|x|>1$, if $u = 0$, if $x$ is zero, if $|x|$ is 1, or if $|x|$ is $1/2$ and $u$ is a
+    ///   multiple of 3, $\varepsilon$ may be ignored or assumed to be 0.
+    /// - Otherwise, if $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2
+    ///   |\arccos(x)u/(2\pi)|\rfloor-p+1}$.
+    /// - Otherwise, if $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |\arccos(x)u/(2\pi)|\rfloor-p}$.
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(x,u,p,m)=\text{NaN}$ for $|x|>1$, including when $u=0$
+    /// - $f(0,u,p,m)=u/4$, a quarter turn
+    /// - $f(x,0,p,m)=0.0$, since the arccosine is never negative
+    /// - $f(1,u,p,m)=0.0$
+    /// - $f(-1,u,p,m)=u/2$, a half turn
+    /// - $f(1/2,u,p,m)=u/6$ and $f(-1/2,u,p,m)=u/3$, a sixth and a third of a turn, when $u$ is a
+    ///   multiple of 3
+    ///
+    /// Those are the only exact cases, and the turn fractions are exact only when $p$ is large
+    /// enough to hold them.
+    ///
+    /// Underflow:
+    /// - If $0<f(x,u,p,m)<2^{-2^{30}}$, and $m$ is `Floor` or `Down`, $0.0$ is returned instead.
+    /// - If $0<f(x,u,p,m)<2^{-2^{30}}$, and $m$ is `Ceiling` or `Up`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    /// - If $0<f(x,u,p,m)\leq2^{-2^{30}-1}$, and $m$ is `Nearest`, $0.0$ is returned instead.
+    /// - If $2^{-2^{30}-1}<f(x,u,p,m)<2^{-2^{30}}$, and $m$ is `Nearest`, $2^{-2^{30}}$ is returned
+    ///   instead.
+    ///
+    /// Overflow is not possible, since $f(x,u,p,m) \leq u/2 < 2^{63}$. Underflow needs a small $u$
+    /// together with an $x$ within about $2^{-2^{31}}$ of 1; unlike the [`Float`] case, a
+    /// [`Rational`] can be that close.
+    ///
+    /// If you know you'll be using `Nearest`, consider using
+    /// [`Float::acos_with_period_rational_prec`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n (\log n)^3 \log\log n + m (\log m)^2 \log\log m)$
+    ///
+    /// $M(n, m) = O(n \log n + m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`: $(1-x^2)/x^2$ is formed exactly, and its square root and arctangent
+    /// are taken at a working precision of about $n$ bits and scaled by $u/(2\pi)$, which needs
+    /// $\pi$ to that many bits; those cost the first term, and the second covers the $m$-bit input.
+    /// The magnitude of the input does not drive the cost, and unlike the [`Float`] arccosine
+    /// neither does its closeness to $\pm1$, since nothing cancels.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// // a zero input is a quarter turn
+    /// let (c, o) = Float::acos_with_period_rational_prec_round(Rational::ZERO, 360, 10, Exact);
+    /// assert_eq!(c.to_string(), "90.000");
+    /// assert_eq!(o, Equal);
+    ///
+    /// let (c, o) = Float::acos_with_period_rational_prec_round(
+    ///     Rational::from_unsigneds(3u8, 5),
+    ///     360,
+    ///     10,
+    ///     Floor,
+    /// );
+    /// assert_eq!(c.to_string(), "53.125");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) = Float::acos_with_period_rational_prec_round(
+    ///     Rational::from_unsigneds(3u8, 5),
+    ///     360,
+    ///     10,
+    ///     Ceiling,
+    /// );
+    /// assert_eq!(c.to_string(), "53.188");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn acos_with_period_rational_prec_round(
+        x: Rational,
+        u: u64,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        Self::acos_with_period_rational_prec_round_ref(&x, u, prec, rm)
+    }
+
+    /// Computes $\arccos(x)u/(2\pi)$, the arccosine of a [`Rational`] measured in $u$ths of a turn,
+    /// rounding the result to the specified precision and with the specified rounding mode and
+    /// returning the result as a [`Float`]. The [`Rational`] is taken by reference. An [`Ordering`]
+    /// is also returned, indicating whether the rounded arccosine is less than, equal to, or
+    /// greater than the exact arccosine.
+    ///
+    /// See [`Float::acos_with_period_rational_prec_round`] for the error bounds, the special and
+    /// closed-form cases, underflow, and the complexity; this function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::NegativeOne;
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// // an input of -1 is a half turn
+    /// let (c, o) = Float::acos_with_period_rational_prec_round_ref(
+    ///     &Rational::NEGATIVE_ONE,
+    ///     360,
+    ///     10,
+    ///     Exact,
+    /// );
+    /// assert_eq!(c.to_string(), "180.00");
+    /// assert_eq!(o, Equal);
+    ///
+    /// let (c, o) = Float::acos_with_period_rational_prec_round_ref(
+    ///     &Rational::from_unsigneds(3u8, 5),
+    ///     360,
+    ///     10,
+    ///     Floor,
+    /// );
+    /// assert_eq!(c.to_string(), "53.125");
+    /// assert_eq!(o, Less);
+    /// ```
+    pub fn acos_with_period_rational_prec_round_ref(
+        x: &Rational,
+        u: u64,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        if x.gt_abs(&1u32) {
+            // acosu(x, u) = NaN for |x| > 1, including for u = 0, since NaN times 0 is NaN
+            return (Self::NAN, Equal);
+        }
+        if u == 0 {
+            // acosu(x, 0) = +0, since the arccosine is never negative
+            return (Self::ZERO, Equal);
+        }
+        if *x == 0u32 {
+            // acos(0) = pi/2, so acosu(0, u) = u/4
+            return scaled_unsigned(u, 2, true, prec, rm);
+        }
+        acos_with_period_rational_helper(x, u, prec, rm)
+    }
+
+    /// Computes $\arccos(x)u/(2\pi)$, the arccosine of a [`Rational`] measured in $u$ths of a turn,
+    /// rounding the result to the nearest value of the specified precision and returning the result
+    /// as a [`Float`]. The [`Rational`] is taken by value. An [`Ordering`] is also returned,
+    /// indicating whether the rounded arccosine is less than, equal to, or greater than the exact
+    /// arccosine.
+    ///
+    /// If the arccosine is equidistant from two [`Float`]s with the specified precision, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen.
+    ///
+    /// See [`Float::acos_with_period_rational_prec_round`] for the error bounds, the special and
+    /// closed-form cases, underflow, and the complexity; this function behaves the same way.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::acos_with_period_rational_prec_round`] instead.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) =
+    ///     Float::acos_with_period_rational_prec(Rational::from_unsigneds(3u8, 5), 360, 10);
+    /// assert_eq!(c.to_string(), "53.125");
+    /// assert_eq!(o, Less);
+    ///
+    /// let (c, o) =
+    ///     Float::acos_with_period_rational_prec(Rational::from_unsigneds(3u8, 5), 360, 53);
+    /// assert_eq!(c.to_string(), "53.130102354155980");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn acos_with_period_rational_prec(x: Rational, u: u64, prec: u64) -> (Self, Ordering) {
+        Self::acos_with_period_rational_prec_round(x, u, prec, Nearest)
+    }
+
+    /// Computes $\arccos(x)u/(2\pi)$, the arccosine of a [`Rational`] measured in $u$ths of a turn,
+    /// rounding the result to the nearest value of the specified precision and returning the result
+    /// as a [`Float`]. The [`Rational`] is taken by reference. An [`Ordering`] is also returned,
+    /// indicating whether the rounded arccosine is less than, equal to, or greater than the exact
+    /// arccosine.
+    ///
+    /// See [`Float::acos_with_period_rational_prec`] and
+    /// [`Float::acos_with_period_rational_prec_round`]; this function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) =
+    ///     Float::acos_with_period_rational_prec_ref(&Rational::from_unsigneds(3u8, 5), 360, 53);
+    /// assert_eq!(c.to_string(), "53.130102354155980");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn acos_with_period_rational_prec_ref(x: &Rational, u: u64, prec: u64) -> (Self, Ordering) {
+        Self::acos_with_period_rational_prec_round_ref(x, u, prec, Nearest)
+    }
 }
 
 impl Acos for Float {
@@ -1583,4 +1896,90 @@ where
     for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
 {
     emulate_float_to_float_fn(|x, prec| Float::acos_with_period_prec(x, u, prec), x)
+}
+
+/// Computes $\arccos(x)u/(2\pi)$, the arccosine of a [`Rational`] measured in $u$ths of a turn (so
+/// that `u = 360` gives degrees), returning the result as a primitive float.
+///
+/// $$
+/// f(x,u) = \arccos(x)u/(2\pi)+\varepsilon.
+/// $$
+/// - If $|x|>1$, if $u = 0$, if $x$ is zero, if $|x|$ is 1, or if $|x|$ is $1/2$ and $u$ is a
+///   multiple of 3, $\varepsilon$ may be ignored or assumed to be 0.
+/// - Otherwise, $|\varepsilon| < 2^{\lfloor\log_2 |\arccos(x)u/(2\pi)|\rfloor-p}$, where $p$ is the
+///   precision of the output (24 if `T` is a [`f32`] and 53 if `T` is a [`f64`]).
+///
+/// Special cases:
+/// - $f(x,u)=\text{NaN}$ for $|x|>1$, including when $u=0$
+/// - $f(0,u)=u/4$, a quarter turn
+/// - $f(x,0)=0.0$, since the arccosine is never negative
+/// - $f(1,u)=0.0$
+/// - $f(-1,u)=u/2$, a half turn
+/// - $f(1/2,u)=u/6$ and $f(-1/2,u)=u/3$, a sixth and a third of a turn, when $u$ is a multiple of 3
+///
+/// Overflow is not possible, since $f(x,u) \leq u/2 < 2^{63}$. The result is subnormal, or zero,
+/// only when $u$ is small and $x$ is within about $2^{-2^{31}}$ of 1.
+///
+/// # Worst-case complexity
+/// $T(m) = O(m \log m \log\log m)$
+///
+/// $M(m) = O(m \log m)$
+///
+/// where $T$ is time, $M$ is additional memory, and $m$ is `x.significant_bits()`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::acos::primitive_float_acos_with_period_rational;
+/// use malachite_q::Rational;
+///
+/// // a zero input is a quarter turn, an input of 1 zero, and one of -1 a half turn
+/// assert_eq!(
+///     NiceFloat(primitive_float_acos_with_period_rational::<f64>(
+///         &Rational::ZERO,
+///         360
+///     )),
+///     NiceFloat(90.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_acos_with_period_rational::<f64>(
+///         &Rational::ONE,
+///         360
+///     )),
+///     NiceFloat(0.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_acos_with_period_rational::<f64>(
+///         &Rational::NEGATIVE_ONE,
+///         360
+///     )),
+///     NiceFloat(180.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_acos_with_period_rational::<f64>(
+///         &Rational::from_unsigneds(3u8, 5),
+///         360
+///     )),
+///     NiceFloat(53.13010235415598)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_acos_with_period_rational::<f32>(
+///         &Rational::from_unsigneds(3u8, 5),
+///         360
+///     )),
+///     NiceFloat(53.130104)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_acos_with_period_rational<T: PrimitiveFloat>(x: &Rational, u: u64) -> T
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    emulate_rational_to_float_fn(
+        |x, prec| Float::acos_with_period_rational_prec_ref(x, u, prec),
+        x,
+    )
 }
