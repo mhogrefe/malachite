@@ -6666,6 +6666,13 @@ pub fn asec_rational_prec_round_valid(x: &Rational, _prec: u64, rm: RoundingMode
     rm != Exact || *x == 1u32 || (*x < 1u32 && *x > -1i32)
 }
 
+// Whether `(x, prec, rm)` is a valid input to `Float::acsc_rational_prec_round`.
+pub fn acsc_rational_prec_round_valid(x: &Rational, _prec: u64, rm: RoundingMode) -> bool {
+    // the arccosecant of a rational is transcendental for |x| >= 1 -- pi/2 included, unlike the
+    // arcsecant's zero at x = 1 -- and is NaN inside (-1, 1)
+    rm != Exact || (*x < 1u32 && *x > -1i32)
+}
+
 pub fn exhaustive_rational_unsigned_rounding_mode_triple_gen_var_10()
 -> It<(Rational, u64, RoundingMode)> {
     reshape_2_1_to_3(Box::new(
@@ -7084,6 +7091,16 @@ pub fn asec_prec_round_valid(x: &Float, prec: u64, rm: RoundingMode) -> bool {
 // Whether `(x, rm)` is a valid input to `Float.asec_round`.
 pub fn asec_round_valid(x: &Float, rm: RoundingMode) -> bool {
     rm != Exact || x.asec_round_ref(Floor).1 == Equal
+}
+
+// Whether `(x, prec, rm)` is a valid input to `Float.acsc_prec_round`.
+pub fn acsc_prec_round_valid(x: &Float, prec: u64, rm: RoundingMode) -> bool {
+    rm != Exact || x.acsc_prec_round_ref(prec, Floor).1 == Equal
+}
+
+// Whether `(x, rm)` is a valid input to `Float.acsc_round`.
+pub fn acsc_round_valid(x: &Float, rm: RoundingMode) -> bool {
+    rm != Exact || x.acsc_round_ref(Floor).1 == Equal
 }
 
 pub(crate) fn exp_round_valid(x: &Float, rm: RoundingMode) -> bool {
@@ -8008,4 +8025,47 @@ pub fn exhaustive_string_from_sci_string_options_unsigned_triple_gen_var_2()
         .map(|((s, options), prec)| (s, options, prec))
         .filter(|(s, options, prec)| valid_float_from_sci_string_triple(s, *options, *prec)),
     )
+}
+
+pub fn exhaustive_float_unsigned_rounding_mode_triple_gen_var_48() -> It<(Float, u64, RoundingMode)>
+{
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(exhaustive_floats(), exhaustive_positive_primitive_ints()),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, p), rm)| acsc_prec_round_valid(x, p, rm)),
+    ))
+}
+
+pub fn exhaustive_float_unsigned_rounding_mode_triple_gen_var_49() -> It<(Float, u64, RoundingMode)>
+{
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(
+                exhaustive_extreme_floats(),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, p), rm)| acsc_prec_round_valid(x, p, rm)),
+    ))
+}
+
+pub fn exhaustive_float_rounding_mode_pair_gen_var_51() -> It<(Float, RoundingMode)> {
+    Box::new(
+        lex_pairs(exhaustive_floats(), exhaustive_rounding_modes())
+            .filter(|(f, rm)| acsc_round_valid(f, *rm)),
+    )
+}
+
+pub fn exhaustive_rational_unsigned_rounding_mode_triple_gen_var_13()
+-> It<(Rational, u64, RoundingMode)> {
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(exhaustive_rationals(), exhaustive_positive_primitive_ints()),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref n, prec), rm)| acsc_rational_prec_round_valid(n, prec, rm)),
+    ))
 }

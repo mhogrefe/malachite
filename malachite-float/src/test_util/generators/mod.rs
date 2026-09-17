@@ -6475,3 +6475,39 @@ pub fn string_from_sci_string_options_unsigned_triple_gen_var_2()
         &random_string_from_sci_string_options_unsigned_triple_gen_var_2,
     )
 }
+
+// All `(Float, u64, RoundingMode)` that are valid inputs to `Float.acsc_prec_round`.
+pub fn float_unsigned_rounding_mode_triple_gen_var_48() -> Generator<(Float, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_unsigned_rounding_mode_triple_gen_var_48,
+        &random_float_unsigned_rounding_mode_triple_gen_var_48,
+        &special_random_float_unsigned_rounding_mode_triple_gen_var_48,
+    )
+}
+
+// As `..._var_48`, but the `Float` may have an extreme exponent.
+pub fn float_unsigned_rounding_mode_triple_gen_var_49() -> Generator<(Float, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_unsigned_rounding_mode_triple_gen_var_49,
+        &random_float_unsigned_rounding_mode_triple_gen_var_49,
+        &special_random_float_unsigned_rounding_mode_triple_gen_var_49,
+    )
+}
+
+// All `(Float, RoundingMode)` that are valid inputs to `Float.acsc_round`.
+pub fn float_rounding_mode_pair_gen_var_51() -> Generator<(Float, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_rounding_mode_pair_gen_var_51,
+        &random_float_rounding_mode_pair_gen_var_51,
+        &special_random_float_rounding_mode_pair_gen_var_51,
+    )
+}
+
+// All `(Rational, u64, RoundingMode)` that are valid inputs to `Float::acsc_rational_prec_round`.
+pub fn rational_unsigned_rounding_mode_triple_gen_var_13() -> GT3 {
+    Generator::new(
+        &exhaustive_rational_unsigned_rounding_mode_triple_gen_var_13,
+        &random_rational_unsigned_rounding_mode_triple_gen_var_13,
+        &special_random_rational_unsigned_rounding_mode_triple_gen_var_13,
+    )
+}

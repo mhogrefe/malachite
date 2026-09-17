@@ -1040,6 +1040,18 @@ pub trait AsecAssign {
     fn asec_assign(&mut self);
 }
 
+/// Computes $\operatorname{acsc}(x)$, the arccosecant of a number.
+pub trait Acsc {
+    type Output;
+
+    fn acsc(self) -> Self::Output;
+}
+
+/// Replaces a number with its arccosecant, $\operatorname{acsc}(x)$.
+pub trait AcscAssign {
+    fn acsc_assign(&mut self);
+}
+
 /// Replaces a number with its sine, $\sin(x)$, and writes its cosine, $\cos(x)$, to a second
 /// number.
 pub trait SinCosAssign {

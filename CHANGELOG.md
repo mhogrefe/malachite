@@ -538,6 +538,27 @@ documented by git history.
   half-turn not being representable. NaN and any $|x|<1$, including the zeros, give NaN.
   `primitive_float_asec_pi` and `primitive_float_asec_pi_rational` give the correctly rounded `f32`
   or `f64` angle in half-turns. This closes the arcsecant, a function MPFR does not have.
+- `Acsc` and `AcscAssign` (new traits in malachite-base) for `Float`, with the usual
+  `acsc_prec_round`, `acsc_prec`, `acsc_round`, and `_ref`/`_assign` variants. MPFR has no
+  arccosecant. Rather than take $\arcsin(1/x)$, which would round the reciprocal first and pay for
+  it — the arcsine is not Lipschitz at 1, and $1/x$ lands there exactly when $x$ is near $\pm1$, so
+  about half the bits of the reciprocal would be lost — the identity is used in the form
+  $\operatorname{acsc} x = \arctan(1/\sqrt{x^2-1})$. The subtraction $x^2-1$ is done at twice the
+  input's precision, where it is exact, and the reciprocal and the square root are taken together by
+  one correctly rounded `reciprocal_sqrt`, so the working precision does not grow as the input
+  approaches $\pm1$. The arccosecant is odd, so the sign is stripped and restored with the rounding
+  mode reflected along with it. The result is NaN for a NaN input and for any $|x|<1$, including the
+  zeros; $\pm\infty$ give $\pm0.0$, the only exact cases; $1$ gives $\pi/2$ and $-1$ gives
+  $-\pi/2$. Neither overflow nor underflow is possible: $|\operatorname{acsc} x|\leq\pi/2$, and a
+  [`Float`]'s bounded exponent keeps $1/|x|$ above twice the smallest positive `Float`.
+  `primitive_float_acsc` gives the correctly rounded `f32` or `f64` arccosecant.
+- `acsc_rational_prec_round` and `acsc_rational_prec` (with `_ref` variants), which take a
+  `Rational`. There $x^2-1$ is exact with no working precision to choose at all; a large $|x|$ skips
+  the square altogether, its arccosecant being the arctangent of the reciprocal of $|x|$ to within
+  the working precision. Underflow, impossible for the `Float` arccosecant, is reachable here, a
+  `Rational` having no exponent bound: $\operatorname{acsc} x$ is about $1/x$, so a large enough
+  $|x|$ puts it below the smallest positive `Float`. `primitive_float_acsc_rational` gives the
+  correctly rounded `f32` or `f64` arccosecant of a `Rational`.
 - `Cot` and `CotAssign` (new traits in malachite-base) for `Float`, with the usual
   `cot_prec_round`, `cot_prec`, `cot_round`, and `_ref`/`_assign` variants: a port of `mpfr_cot`,
   MPFR's generic reciprocal template with the tangent. MPFR's tangent is itself a quotient of a
