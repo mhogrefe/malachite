@@ -486,6 +486,13 @@ documented by git history.
   merely cheaper — the `Rational` arccosine reports such an input as an underflow, and a large $u$
   can lift the quotient back into range. `primitive_float_acos_with_period_rational` gives the
   correctly rounded `f32` or `f64` angle.
+- `acos_pi_prec_round`, `acos_pi_prec`, `acos_pi_round`, and `acos_pi` (with `_ref` and `_assign`
+  variants), along with `acos_pi_rational_prec_round` and `acos_pi_rational_prec` (with `_ref`
+  variants), a port of `mpfr_acospi`: the arccosine measured in half-turns, which MPFR defines as
+  `acosu` with $u = 2$ and Malachite delegates the same way. A zero input gives $1/2$, an input of
+  1 gives $0.0$, and an input of $-1$ gives $1$; all three are exact at every precision, and they
+  are the only exact cases. `primitive_float_acos_pi` and `primitive_float_acos_pi_rational` give
+  the correctly rounded `f32` or `f64` angle in half-turns.
 - `Cot` and `CotAssign` (new traits in malachite-base) for `Float`, with the usual
   `cot_prec_round`, `cot_prec`, `cot_round`, and `_ref`/`_assign` variants: a port of `mpfr_cot`,
   MPFR's generic reciprocal template with the tangent. MPFR's tangent is itself a quotient of a

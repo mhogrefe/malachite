@@ -23,7 +23,8 @@ use malachite_base::test_util::generators::{
     unsigned_rounding_mode_pair_gen_var_3,
 };
 use malachite_float::float::arithmetic::acos::{
-    primitive_float_acos, primitive_float_acos_rational, primitive_float_acos_with_period,
+    primitive_float_acos, primitive_float_acos_pi, primitive_float_acos_pi_rational,
+    primitive_float_acos_rational, primitive_float_acos_with_period,
     primitive_float_acos_with_period_rational,
 };
 use malachite_float::test_util::common::{
@@ -2231,4 +2232,528 @@ where
 #[test]
 fn primitive_float_acos_with_period_rational_properties() {
     apply_fn_to_primitive_floats!(primitive_float_acos_with_period_rational_properties_helper);
+}
+
+#[test]
+fn test_acos_pi_prec_round() {
+    let test = |s: &str,
+                s_hex: &str,
+                prec: u64,
+                rm: RoundingMode,
+                out: &str,
+                out_hex: &str,
+                o_out: Ordering| {
+        let x = parse_hex_string(s_hex);
+        assert_eq!(x.to_string(), s);
+
+        let (c, o) = x.clone().acos_pi_prec_round(prec, rm);
+        assert!(c.is_valid());
+        assert_eq!(c.to_string(), out);
+        assert_eq!(to_hex_string(&c), out_hex);
+        assert_eq!(o, o_out);
+
+        let (c_alt, o_alt) = x.acos_pi_prec_round_ref(prec, rm);
+        assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+        assert_eq!(o_alt, o);
+
+        let mut c_alt = x.clone();
+        let o_alt = c_alt.acos_pi_prec_round_assign(prec, rm);
+        assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+        assert_eq!(o_alt, o);
+
+        if rm == Nearest {
+            let (c_alt, o_alt) = x.acos_pi_prec_ref(prec);
+            assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+            assert_eq!(o_alt, o);
+        }
+
+        // acosu with u = 2, which MPFR's acos_u gives directly
+        if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm) {
+            let (rug_c, rug_o) =
+                rug_acos_with_period_prec_round(&rug::Float::exact_from(&x), 2, prec, rug_rm);
+            assert_eq!(
+                ComparableFloatRef(&Float::from(&rug_c)),
+                ComparableFloatRef(&c)
+            );
+            assert_eq!(rug_o, o);
+        }
+    };
+    test("NaN", "NaN", 10, Nearest, "NaN", "NaN", Equal);
+    test("Infinity", "Infinity", 10, Nearest, "NaN", "NaN", Equal);
+    test("-Infinity", "-Infinity", 10, Nearest, "NaN", "NaN", Equal);
+    test("0.0", "0x0.0", 1, Exact, "0.50", "0x0.8#1", Equal);
+    test("0.0", "0x0.0", 10, Exact, "0.50000", "0x0.800#10", Equal);
+    test("-0.0", "-0x0.0", 10, Exact, "0.50000", "0x0.800#10", Equal);
+    test("2.0", "0x2.0#1", 10, Nearest, "NaN", "NaN", Equal);
+    test("-2.0", "-0x2.0#1", 10, Nearest, "NaN", "NaN", Equal);
+    test("1.0", "0x1.0#1", 10, Exact, "0.0", "0x0.0", Equal);
+    test("1.0", "0x1.0#1", 1, Exact, "0.0", "0x0.0", Equal);
+    test("-1.0", "-0x1.0#1", 10, Exact, "1.0000", "0x1.000#10", Equal);
+    test("-1.0", "-0x1.0#1", 1, Exact, "1.0", "0x1.0#1", Equal);
+    test("0.50", "0x0.8#1", 10, Floor, "0.33301", "0x0.554#10", Less);
+    test(
+        "0.50",
+        "0x0.8#1",
+        10,
+        Ceiling,
+        "0.33350",
+        "0x0.556#10",
+        Greater,
+    );
+    test(
+        "0.50",
+        "0x0.8#1",
+        53,
+        Nearest,
+        "0.33333333333333331",
+        "0x0.55555555555554#53",
+        Less,
+    );
+    test(
+        "-0.50",
+        "-0x0.8#1",
+        53,
+        Nearest,
+        "0.66666666666666663",
+        "0x0.aaaaaaaaaaaaa8#53",
+        Less,
+    );
+    test("0.25", "0x0.4#1", 10, Floor, "0.41943", "0x0.6b6#10", Less);
+    test(
+        "0.25",
+        "0x0.4#1",
+        10,
+        Ceiling,
+        "0.41992",
+        "0x0.6b8#10",
+        Greater,
+    );
+    test(
+        "0.25",
+        "0x0.4#1",
+        10,
+        Nearest,
+        "0.41943",
+        "0x0.6b6#10",
+        Less,
+    );
+    test(
+        "0.25",
+        "0x0.4#1",
+        53,
+        Nearest,
+        "0.41956937674483374",
+        "0x0.6b68e60f85ac88#53",
+        Less,
+    );
+    test(
+        "-0.25",
+        "-0x0.4#1",
+        53,
+        Nearest,
+        "0.58043062325516626",
+        "0x0.949719f07a5378#53",
+        Greater,
+    );
+    test(
+        "0.99902",
+        "0x0.ffc#10",
+        20,
+        Nearest,
+        "0.014068589",
+        "0x0.0399ffc#20",
+        Greater,
+    );
+    test(
+        "-0.99902",
+        "-0x0.ffc#10",
+        20,
+        Nearest,
+        "0.98593140",
+        "0x0.fc660#20",
+        Less,
+    );
+    test(
+        "7.9e-31",
+        "0x1.0E-25#1",
+        20,
+        Nearest,
+        "0.50000000",
+        "0x0.80000#20",
+        Greater,
+    );
+    test(
+        "7.9e-31",
+        "0x1.0E-25#1",
+        53,
+        Nearest,
+        "0.50000000000000000",
+        "0x0.80000000000000#53",
+        Greater,
+    );
+    test(
+        "-7.9e-31",
+        "-0x1.0E-25#1",
+        53,
+        Nearest,
+        "0.50000000000000000",
+        "0x0.80000000000000#53",
+        Less,
+    );
+}
+
+#[test]
+fn test_acos_pi_rational_prec_round() {
+    let test = |s: &str, prec: u64, rm: RoundingMode, out: &str, out_hex: &str, o_out: Ordering| {
+        let x = Rational::from_str(s).unwrap();
+
+        let (c, o) = Float::acos_pi_rational_prec_round(x.clone(), prec, rm);
+        assert!(c.is_valid());
+        assert_eq!(c.to_string(), out);
+        assert_eq!(to_hex_string(&c), out_hex);
+        assert_eq!(o, o_out);
+
+        let (c_alt, o_alt) = Float::acos_pi_rational_prec_round_ref(&x, prec, rm);
+        assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+        assert_eq!(o_alt, o);
+
+        if rm == Nearest {
+            let (c_alt, o_alt) = Float::acos_pi_rational_prec(x.clone(), prec);
+            assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+            assert_eq!(o_alt, o);
+            let (c_alt, o_alt) = Float::acos_pi_rational_prec_ref(&x, prec);
+            assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+            assert_eq!(o_alt, o);
+        }
+
+        if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm) {
+            let (rug_c, rug_o) = rug_acos_with_period_rational_prec_round(&x, 2, prec, rug_rm);
+            assert_eq!(
+                ComparableFloatRef(&Float::from(&rug_c)),
+                ComparableFloatRef(&c)
+            );
+            assert_eq!(rug_o, o);
+        }
+    };
+    test("0", 10, Exact, "0.50000", "0x0.800#10", Equal);
+    test("0", 1, Exact, "0.50", "0x0.8#1", Equal);
+    test("2", 10, Nearest, "NaN", "NaN", Equal);
+    test("-2", 10, Nearest, "NaN", "NaN", Equal);
+    test("1", 10, Exact, "0.0", "0x0.0", Equal);
+    test("-1", 10, Exact, "1.0000", "0x1.000#10", Equal);
+    test("-1", 1, Exact, "1.0", "0x1.0#1", Equal);
+    test("1/2", 10, Floor, "0.33301", "0x0.554#10", Less);
+    test("1/2", 10, Ceiling, "0.33350", "0x0.556#10", Greater);
+    test(
+        "1/2",
+        53,
+        Nearest,
+        "0.33333333333333331",
+        "0x0.55555555555554#53",
+        Less,
+    );
+    test(
+        "-1/2",
+        53,
+        Nearest,
+        "0.66666666666666663",
+        "0x0.aaaaaaaaaaaaa8#53",
+        Less,
+    );
+    test("3/5", 10, Floor, "0.29492", "0x0.4b8#10", Less);
+    test("3/5", 10, Ceiling, "0.29541", "0x0.4ba#10", Greater);
+    test(
+        "3/5",
+        53,
+        Nearest,
+        "0.29516723530086653",
+        "0x0.4b90147677cc20#53",
+        Less,
+    );
+    test(
+        "-3/5",
+        53,
+        Nearest,
+        "0.70483276469913347",
+        "0x0.b46feb898833e0#53",
+        Greater,
+    );
+    test("1/3", 20, Nearest, "0.39182663", "0x0.644ec0#20", Greater);
+    test(
+        "999999/1000000",
+        20,
+        Nearest,
+        "0.00045015803",
+        "0x0.001d8066#20",
+        Less,
+    );
+    test(
+        "1/1000000",
+        20,
+        Nearest,
+        "0.49999952",
+        "0x0.7ffff8#20",
+        Less,
+    );
+}
+
+#[test]
+#[should_panic]
+fn acos_pi_prec_round_fail_1() {
+    Float::ONE.acos_pi_prec_round(0, Floor);
+}
+
+#[test]
+#[should_panic]
+fn acos_pi_prec_round_fail_2() {
+    // acos(1/4)/pi is not exactly representable
+    Float::from(0.25).acos_pi_prec_round(10, Exact);
+}
+
+#[test]
+#[should_panic]
+fn acos_pi_rational_prec_round_fail() {
+    Float::acos_pi_rational_prec_round(Rational::from_unsigneds(1u8, 4), 10, Exact);
+}
+
+#[test]
+fn acos_pi_properties() {
+    // The borrowed generators admit `Exact` for inputs whose arccosine is not exact, so `Exact` is
+    // checked against the exactness of the result.
+    let exact_ok = |x: &Float, prec: u64, rm: RoundingMode| {
+        rm != Exact || x.acos_with_period_prec_round_ref(2, prec, Nearest).1 == Equal
+    };
+    float_unsigned_rounding_mode_triple_gen_var_42().test_properties(|(x, prec, rm)| {
+        if !exact_ok(&x, prec, rm) {
+            assert_panic!(x.acos_pi_prec_round_ref(prec, Exact));
+            return;
+        }
+        let (c, o) = x.clone().acos_pi_prec_round(prec, rm);
+        assert!(c.is_valid());
+        assert_rounding_ordering_consistent(&c, rm, o);
+        let (c_alt, o_alt) = x.acos_with_period_prec_round_ref(2, prec, rm);
+        assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+        assert_eq!(o_alt, o);
+        let (c_alt, o_alt) = x.acos_pi_prec_round_ref(prec, rm);
+        assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+        assert_eq!(o_alt, o);
+        let mut c_alt = x.clone();
+        let o_alt = c_alt.acos_pi_prec_round_assign(prec, rm);
+        assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+        assert_eq!(o_alt, o);
+        // 0 <= acos(x)/pi <= 1, so the result never overflows
+        if !c.is_nan() {
+            assert!(c.is_finite());
+            assert!(c >= 0u32);
+            assert!(c <= 1u32);
+        }
+        if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm) {
+            let (rug_c, rug_o) =
+                rug_acos_with_period_prec_round(&rug::Float::exact_from(&x), 2, prec, rug_rm);
+            assert_eq!(
+                ComparableFloatRef(&Float::from(&rug_c)),
+                ComparableFloatRef(&c)
+            );
+            assert_eq!(rug_o, o);
+        }
+    });
+
+    float_unsigned_rounding_mode_triple_gen_var_43().test_properties(|(x, prec, rm)| {
+        if !exact_ok(&x, prec, rm) {
+            return;
+        }
+        let (c, o) = x.acos_pi_prec_round_ref(prec, rm);
+        let (c_alt, o_alt) = x.acos_with_period_prec_round_ref(2, prec, rm);
+        assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+        assert_eq!(o_alt, o);
+    });
+
+    float_unsigned_pair_gen_var_1().test_properties(|(x, prec)| {
+        let (c, o) = x.clone().acos_pi_prec(prec);
+        let (c_alt, o_alt) = x.acos_with_period_prec_ref(2, prec);
+        assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+        assert_eq!(o_alt, o);
+        let (c_alt, o_alt) = x.acos_pi_prec_ref(prec);
+        assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+        assert_eq!(o_alt, o);
+        let mut c_alt = x.clone();
+        let o_alt = c_alt.acos_pi_prec_assign(prec);
+        assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+        assert_eq!(o_alt, o);
+    });
+
+    float_rounding_mode_pair_gen_var_49().test_properties(|(x, rm)| {
+        if !exact_ok(&x, x.significant_bits(), rm) {
+            return;
+        }
+        let (c, o) = x.clone().acos_pi_round(rm);
+        assert_rounding_ordering_consistent(&c, rm, o);
+        let (c_alt, o_alt) = x.acos_with_period_round_ref(2, rm);
+        assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+        assert_eq!(o_alt, o);
+        let (c_alt, o_alt) = x.acos_pi_round_ref(rm);
+        assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+        assert_eq!(o_alt, o);
+        let mut c_alt = x.clone();
+        let o_alt = c_alt.acos_pi_round_assign(rm);
+        assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+        assert_eq!(o_alt, o);
+    });
+
+    rational_unsigned_rounding_mode_triple_gen_var_11().test_properties(|(x, prec, rm)| {
+        if rm == Exact && Float::acos_with_period_rational_prec_ref(&x, 2, prec).1 != Equal {
+            assert_panic!(Float::acos_pi_rational_prec_round_ref(&x, prec, Exact));
+            return;
+        }
+        let (c, o) = Float::acos_pi_rational_prec_round(x.clone(), prec, rm);
+        assert!(c.is_valid());
+        assert_rounding_ordering_consistent(&c, rm, o);
+        let (c_alt, o_alt) = Float::acos_with_period_rational_prec_round_ref(&x, 2, prec, rm);
+        assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+        assert_eq!(o_alt, o);
+        let (c_alt, o_alt) = Float::acos_pi_rational_prec_round_ref(&x, prec, rm);
+        assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+        assert_eq!(o_alt, o);
+        if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm) {
+            let (rug_c, rug_o) = rug_acos_with_period_rational_prec_round(&x, 2, prec, rug_rm);
+            assert_eq!(
+                ComparableFloatRef(&Float::from(&rug_c)),
+                ComparableFloatRef(&c)
+            );
+            assert_eq!(rug_o, o);
+        }
+    });
+
+    rational_unsigned_pair_gen_var_3().test_properties(|(x, prec)| {
+        let (c, o) = Float::acos_pi_rational_prec(x.clone(), prec);
+        let (c_alt, o_alt) = Float::acos_with_period_rational_prec_ref(&x, 2, prec);
+        assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+        assert_eq!(o_alt, o);
+        let (c_alt, o_alt) = Float::acos_pi_rational_prec_ref(&x, prec);
+        assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+        assert_eq!(o_alt, o);
+    });
+
+    float_gen().test_properties(|x| {
+        let c = x.clone().acos_pi();
+        assert!(c.is_valid());
+        let c_alt = x.acos_pi_ref();
+        assert!(c_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+        let mut c_alt = x.clone();
+        c_alt.acos_pi_assign();
+        assert!(c_alt.is_valid());
+        assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+        // the same as acos_with_period with a period of 2, and as rounding to the input's
+        // precision, to nearest
+        let c_alt = x.acos_with_period_ref(2);
+        assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+        let (c_alt, _) = x.acos_pi_prec_round_ref(x.significant_bits(), Nearest);
+        assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+    });
+}
+
+#[test]
+#[allow(clippy::type_repetition_in_bounds)]
+fn test_primitive_float_acos_pi() {
+    fn test<T: PrimitiveFloat>(x: T, out: T)
+    where
+        Float: From<T> + PartialOrd<T>,
+        for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+    {
+        assert_eq!(NiceFloat(primitive_float_acos_pi(x)), NiceFloat(out));
+    }
+    test::<f32>(f32::NAN, f32::NAN);
+    test::<f32>(f32::INFINITY, f32::NAN);
+    test::<f32>(f32::NEGATIVE_INFINITY, f32::NAN);
+    test::<f32>(2.0, f32::NAN);
+    test::<f32>(-2.0, f32::NAN);
+    test::<f32>(0.0, 0.5);
+    test::<f32>(-0.0, 0.5);
+    test::<f32>(1.0, 0.0);
+    test::<f32>(-1.0, 1.0);
+    test::<f32>(0.5, 0.33333334);
+    test::<f32>(-0.5, 0.6666667);
+    test::<f32>(0.25, 0.41956937);
+    test::<f32>(0.99, 0.045053393);
+    test::<f32>(1.0e-30, 0.5);
+    test::<f64>(f64::NAN, f64::NAN);
+    test::<f64>(f64::INFINITY, f64::NAN);
+    test::<f64>(f64::NEGATIVE_INFINITY, f64::NAN);
+    test::<f64>(2.0, f64::NAN);
+    test::<f64>(-2.0, f64::NAN);
+    test::<f64>(0.0, 0.5);
+    test::<f64>(-0.0, 0.5);
+    test::<f64>(1.0, 0.0);
+    test::<f64>(-1.0, 1.0);
+    test::<f64>(0.5, 0.3333333333333333);
+    test::<f64>(-0.5, 0.6666666666666666);
+    test::<f64>(0.25, 0.41956937674483374);
+    test::<f64>(0.99, 0.04505341364441212);
+    test::<f64>(1.0e-300, 0.5);
+}
+
+#[test]
+#[allow(clippy::type_repetition_in_bounds)]
+fn test_primitive_float_acos_pi_rational() {
+    fn test<T: PrimitiveFloat>(s: &str, out: T)
+    where
+        Float: PartialOrd<T>,
+        for<'a> T: ExactFrom<&'a Float>,
+    {
+        assert_eq!(
+            NiceFloat(primitive_float_acos_pi_rational::<T>(
+                &Rational::from_str(s).unwrap()
+            )),
+            NiceFloat(out)
+        );
+    }
+    test::<f32>("0", 0.5);
+    test::<f32>("1", 0.0);
+    test::<f32>("-1", 1.0);
+    test::<f32>("2", f32::NAN);
+    test::<f32>("1/2", 0.33333334);
+    test::<f32>("-1/2", 0.6666667);
+    test::<f32>("3/5", 0.29516724);
+    test::<f32>("1/3", 0.39182654);
+    test::<f32>("999999/1000000", 0.0004501582);
+    test::<f32>("1/1000000", 0.49999967);
+    test::<f64>("0", 0.5);
+    test::<f64>("1", 0.0);
+    test::<f64>("-1", 1.0);
+    test::<f64>("2", f64::NAN);
+    test::<f64>("1/2", 0.3333333333333333);
+    test::<f64>("-1/2", 0.6666666666666666);
+    test::<f64>("3/5", 0.2951672353008665);
+    test::<f64>("1/3", 0.3918265520306073);
+    test::<f64>("999999/1000000", 0.0004501581955917413);
+    test::<f64>("1/1000000", 0.49999968169011383);
+}
+
+#[allow(clippy::type_repetition_in_bounds)]
+fn primitive_float_acos_pi_properties_helper<T: PrimitiveFloat>()
+where
+    Float: From<T> + PartialOrd<T>,
+    Rational: ExactFrom<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    primitive_float_gen::<T>().test_properties(|x| {
+        // the same as the period-2 version
+        assert_eq!(
+            NiceFloat(primitive_float_acos_pi(x)),
+            NiceFloat(primitive_float_acos_with_period(x, 2))
+        );
+    });
+
+    rational_gen().test_properties(|x| {
+        assert_eq!(
+            NiceFloat(primitive_float_acos_pi_rational::<T>(&x)),
+            NiceFloat(primitive_float_acos_with_period_rational::<T>(&x, 2))
+        );
+    });
+}
+
+#[test]
+fn primitive_float_acos_pi_properties() {
+    apply_fn_to_primitive_floats!(primitive_float_acos_pi_properties_helper);
 }
