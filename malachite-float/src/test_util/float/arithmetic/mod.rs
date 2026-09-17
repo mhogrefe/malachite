@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 pub mod acos;
+pub mod acot;
 pub mod acsc;
 pub mod add;
 pub mod add_mul;

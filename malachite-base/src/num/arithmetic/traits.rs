@@ -1052,6 +1052,18 @@ pub trait AcscAssign {
     fn acsc_assign(&mut self);
 }
 
+/// Computes $\operatorname{acot}(x)$, the arccotangent of a number.
+pub trait Acot {
+    type Output;
+
+    fn acot(self) -> Self::Output;
+}
+
+/// Replaces a number with its arccotangent, $\operatorname{acot}(x)$.
+pub trait AcotAssign {
+    fn acot_assign(&mut self);
+}
+
 /// Replaces a number with its sine, $\sin(x)$, and writes its cosine, $\cos(x)$, to a second
 /// number.
 pub trait SinCosAssign {

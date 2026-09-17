@@ -30,7 +30,7 @@ use malachite_q::Rational;
 
 // acsc(1) = pi/2 and acsc(-1) = -pi/2, neither of them representable. The arccosecant being odd,
 // the sign is stripped and restored with the rounding mode reflected along with it.
-fn signed_half_pi(negative: bool, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+pub(crate) fn signed_half_pi(negative: bool, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
     let (pi, o) = Float::pi_prec_round(prec, if negative { -rm } else { rm });
     // exact
     let half = pi >> 1u32;
@@ -76,7 +76,7 @@ fn acsc_from_huge_reciprocal(
 
 // Whether `v`, the exact 1/|x|, is exactly halfway between two `prec`-bit `Float`s, which `Nearest`
 // would otherwise break on its own.
-fn reciprocal_is_tie(wide: &Float, o_wide: Ordering, prec: u64) -> bool {
+pub(crate) fn reciprocal_is_tie(wide: &Float, o_wide: Ordering, prec: u64) -> bool {
     o_wide == Equal && Float::from_float_prec_round_ref(wide, prec, Down).1 != Equal
 }
 

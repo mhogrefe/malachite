@@ -585,6 +585,25 @@ documented by git history.
   representable. NaN and any $|x|<1$, including the zeros, give NaN. `primitive_float_acsc_pi` and
   `primitive_float_acsc_pi_rational` give the correctly rounded `f32` or `f64` angle in half-turns.
   This closes the arccosecant, a function MPFR does not have.
+- `Acot` and `AcotAssign` (new traits in malachite-base) for `Float`, with the usual
+  `acot_prec_round`, `acot_prec`, `acot_round`, and `_ref`/`_assign` variants. MPFR has no
+  arccotangent. This is the odd branch, $\operatorname{acot} x = \arctan(1/x)$, with range
+  $(-\pi/2,\pi/2]$: the one that makes the arcsecant, arccosecant and arccotangent a uniform
+  family of inverses of reciprocal arguments, that inverts `cot` on its own signed behaviour
+  ($\cot(\pm0)=\pm\infty$ and so $\operatorname{acot}(\pm\infty)=\pm0$), and that Mathematica uses;
+  the continuous branch $\pi/2-\arctan x$ with range $(0,\pi)$ is not provided. Unlike the other two
+  inverses of reciprocals, nothing is lost to the reciprocal's rounding here, the arctangent being
+  smooth everywhere; below 1 the reciprocal is not taken at all, the identity
+  $\operatorname{acot} x = \pi/2 - \arctan x$ being used instead, which cannot cancel. NaN gives
+  NaN; $\pm\infty$ give $\pm0.0$, the only exact cases; $\pm0.0$ give $\pm\pi/2$, the sign choosing
+  the side of the jump; and $\pm1$ give $\pm\pi/4$. Neither overflow nor underflow is possible.
+  `primitive_float_acot` gives the correctly rounded `f32` or `f64` arccotangent.
+- `acot_rational_prec_round` and `acot_rational_prec` (with `_ref` variants), which take a
+  `Rational`. Above 1 in magnitude the reciprocal is exact and the arctangent of it is the same real
+  number, so the arctangent's own machinery decides everything, underflow at a huge $|x|$ included;
+  below 1 the subtraction from $\pi/2$ is used. A `Rational` zero has no sign, so it gives $\pi/2$,
+  the side the positive inputs approach. `primitive_float_acot_rational` gives the correctly rounded
+  `f32` or `f64` arccotangent of a `Rational`.
 - `Cot` and `CotAssign` (new traits in malachite-base) for `Float`, with the usual
   `cot_prec_round`, `cot_prec`, `cot_round`, and `_ref`/`_assign` variants: a port of `mpfr_cot`,
   MPFR's generic reciprocal template with the tangent. MPFR's tangent is itself a quotient of a

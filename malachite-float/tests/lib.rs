@@ -66,6 +66,7 @@ pub mod float {
         pub mod abs;
         pub mod abs_squared;
         pub mod acos;
+        pub mod acot;
         pub mod acsc;
         pub mod add;
         pub mod add_mul;
