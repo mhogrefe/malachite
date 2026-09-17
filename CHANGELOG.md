@@ -521,6 +521,14 @@ documented by git history.
   $+0.0$, the arcsecant never being negative. A large $x$ is answered from the neighbour of $u/4$,
   as the arccosine answers a tiny one. `primitive_float_asec_with_period` gives the correctly
   rounded `f32` or `f64` angle.
+- `asec_with_period_rational_prec_round` and `asec_with_period_rational_prec` (with `_ref`
+  variants), which take a `Rational`. The exact cases are the `Float` version's, minus the
+  infinities a `Rational` cannot be: every $|x|<1$ gives NaN, even when $u = 0$; a zero period gives
+  $+0.0$; $1$ gives $0.0$; $-1$ gives $u/2$; and $\pm2$ give $u/6$ and $u/3$ when $u$ is a multiple
+  of 3. As for the `Rational` arccosine, an input close enough to 1 makes the arcsecant itself
+  underflow, so the quotient is formed from $\sqrt{2(x-1)}$ directly, a large $u$ being able to lift
+  it back into the range. `primitive_float_asec_with_period_rational` gives the correctly rounded
+  `f32` or `f64` angle of a `Rational`.
 - `Cot` and `CotAssign` (new traits in malachite-base) for `Float`, with the usual
   `cot_prec_round`, `cot_prec`, `cot_round`, and `_ref`/`_assign` variants: a port of `mpfr_cot`,
   MPFR's generic reciprocal template with the tangent. MPFR's tangent is itself a quotient of a

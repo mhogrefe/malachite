@@ -77,3 +77,31 @@ pub fn rug_asec_with_period_prec_round(
 pub fn rug_asec_with_period_prec(x: &rug::Float, u: u64, prec: u64) -> (rug::Float, Ordering) {
     rug_asec_with_period_prec_round(x, u, prec, Round::Nearest)
 }
+
+// The `Rational` widening of `rug_asec_rational_prec_round`, with a period.
+pub fn rug_asec_with_period_rational_prec_round(
+    x: &Rational,
+    u: u64,
+    prec: u64,
+    rm: Round,
+) -> (rug::Float, Ordering) {
+    let exponent_bits = if *x == 0u32 {
+        0
+    } else {
+        x.floor_log_base_2_abs().unsigned_abs()
+    };
+    let denominator_bits = x.denominator_ref().significant_bits();
+    let rx = rug::Float::with_val(
+        u32::exact_from(prec + 128 + (exponent_bits << 1) + denominator_bits),
+        rug::Rational::exact_from(x),
+    );
+    rug_asec_with_period_prec_round(&rx, u, prec, rm)
+}
+
+pub fn rug_asec_with_period_rational_prec(
+    x: &Rational,
+    u: u64,
+    prec: u64,
+) -> (rug::Float, Ordering) {
+    rug_asec_with_period_rational_prec_round(x, u, prec, Round::Nearest)
+}
