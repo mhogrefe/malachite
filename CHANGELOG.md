@@ -559,6 +559,15 @@ documented by git history.
   `Rational` having no exponent bound: $\operatorname{acsc} x$ is about $1/x$, so a large enough
   $|x|$ puts it below the smallest positive `Float`. `primitive_float_acsc_rational` gives the
   correctly rounded `f32` or `f64` arccosecant of a `Rational`.
+- `acsc_with_period_prec_round`, `acsc_with_period_prec`, `acsc_with_period_round`, and
+  `acsc_with_period` (with `_ref` and `_assign` variants), the arccosecant measured in $u$ths of a
+  turn, so that $u = 360$ gives degrees. Its exact cases are the arcsine's, seen through the
+  reciprocal: NaN and every $|x|<1$ give NaN, even when $u = 0$; $\pm\infty$ give $\pm0.0$; a
+  zero period gives a zero with the sign of $x$, the function being odd; $\pm1$ give $\pm u/4$, a
+  quarter turn; and $\pm2$ give $\pm u/12$ when $u$ is a multiple of 3, where the arcsine has
+  $\pm1/2$. Unlike the arccosecant alone, this can underflow: for the largest `Float`s
+  $1/|x|$ is only twice the smallest positive one, and a small $u$ carries the quotient below it.
+  `primitive_float_acsc_with_period` gives the correctly rounded `f32` or `f64` angle.
 - `Cot` and `CotAssign` (new traits in malachite-base) for `Float`, with the usual
   `cot_prec_round`, `cot_prec`, `cot_round`, and `_ref`/`_assign` variants: a port of `mpfr_cot`,
   MPFR's generic reciprocal template with the tangent. MPFR's tangent is itself a quotient of a

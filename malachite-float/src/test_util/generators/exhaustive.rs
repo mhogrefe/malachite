@@ -7103,6 +7103,16 @@ pub fn acsc_round_valid(x: &Float, rm: RoundingMode) -> bool {
     rm != Exact || x.acsc_round_ref(Floor).1 == Equal
 }
 
+// Whether `(x, u, prec, rm)` is a valid input to `Float.acsc_with_period_prec_round`.
+pub fn acsc_with_period_prec_round_valid(x: &Float, u: u64, prec: u64, rm: RoundingMode) -> bool {
+    rm != Exact || x.acsc_with_period_prec_round_ref(u, prec, Floor).1 == Equal
+}
+
+// Whether `(x, u, rm)` is a valid input to `Float.acsc_with_period_round`.
+pub fn acsc_with_period_round_valid(x: &Float, u: u64, rm: RoundingMode) -> bool {
+    rm != Exact || x.acsc_with_period_round_ref(u, Floor).1 == Equal
+}
+
 pub(crate) fn exp_round_valid(x: &Float, rm: RoundingMode) -> bool {
     rm != Exact || !x.is_normal()
 }
@@ -8067,5 +8077,46 @@ pub fn exhaustive_rational_unsigned_rounding_mode_triple_gen_var_13()
             exhaustive_rounding_modes(),
         )
         .filter(|&((ref n, prec), rm)| acsc_rational_prec_round_valid(n, prec, rm)),
+    ))
+}
+
+pub fn exhaustive_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_27()
+-> It<(Float, u64, u64, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(
+        lex_pairs(
+            exhaustive_triples(
+                exhaustive_floats(),
+                exhaustive_unsigneds(),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, u, prec), rm)| acsc_with_period_prec_round_valid(x, u, prec, rm)),
+    ))
+}
+
+pub fn exhaustive_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_28()
+-> It<(Float, u64, u64, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(
+        lex_pairs(
+            exhaustive_triples(
+                exhaustive_extreme_floats(),
+                exhaustive_unsigneds(),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, u, prec), rm)| acsc_with_period_prec_round_valid(x, u, prec, rm)),
+    ))
+}
+
+pub fn exhaustive_float_unsigned_rounding_mode_triple_gen_var_50() -> It<(Float, u64, RoundingMode)>
+{
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(exhaustive_floats(), exhaustive_unsigneds()),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, u), rm)| acsc_with_period_round_valid(x, u, rm)),
     ))
 }

@@ -55,3 +55,25 @@ pub fn rug_acsc_rational_prec_round(x: &Rational, prec: u64, rm: Round) -> (rug:
 pub fn rug_acsc_rational_prec(x: &Rational, prec: u64) -> (rug::Float, Ordering) {
     rug_acsc_rational_prec_round(x, prec, Round::Nearest)
 }
+
+// As for the plain arccosecant, the oracle is MPFR's arcsine of the reciprocal -- with a period,
+// this time.
+pub fn rug_acsc_with_period_prec_round(
+    x: &rug::Float,
+    u: u64,
+    prec: u64,
+    rm: Round,
+) -> (rug::Float, Ordering) {
+    let mut t = rug::Float::with_val(
+        u32::exact_from(prec + 128 + rug_float_significant_bits(x)),
+        0,
+    );
+    t.assign_round(x.recip_ref(), Round::Nearest);
+    let mut a = rug::Float::with_val(u32::exact_from(prec), 0);
+    let o = a.assign_round(t.asin_u_ref(u32::exact_from(u)), rm);
+    (a, o)
+}
+
+pub fn rug_acsc_with_period_prec(x: &rug::Float, u: u64, prec: u64) -> (rug::Float, Ordering) {
+    rug_acsc_with_period_prec_round(x, u, prec, Round::Nearest)
+}
