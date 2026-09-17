@@ -28,6 +28,10 @@ pub mod add_mul;
 /// Taking the AGM (arithmetic-geometric mean) of two [`Float`](super::Float)s, and of
 /// [`Float`](super::Float)s with [`Rational`](malachite_q::Rational)s.
 pub mod agm;
+/// Implementations of [`Asec`](malachite_base::num::arithmetic::traits::Asec) and
+/// [`AsecAssign`](malachite_base::num::arithmetic::traits::AsecAssign), traits for computing the
+/// arcsecant of [`Float`](super::Float)s.
+pub mod asec;
 /// Implementations of [`Asin`](malachite_base::num::arithmetic::traits::Asin) and
 /// [`AsinAssign`](malachite_base::num::arithmetic::traits::AsinAssign), traits for computing the
 /// arcsine of [`Float`](super::Float)s.

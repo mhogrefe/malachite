@@ -69,6 +69,7 @@ pub mod float {
         pub mod add;
         pub mod add_mul;
         pub mod agm;
+        pub mod asec;
         pub mod asin;
         pub mod atan;
         pub mod atan2;

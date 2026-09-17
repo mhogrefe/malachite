@@ -493,6 +493,17 @@ documented by git history.
   1 gives $0.0$, and an input of $-1$ gives $1$; all three are exact at every precision, and they
   are the only exact cases. `primitive_float_acos_pi` and `primitive_float_acos_pi_rational` give
   the correctly rounded `f32` or `f64` angle in half-turns.
+- `Asec` and `AsecAssign` (new traits in malachite-base) for `Float`, with the usual
+  `asec_prec_round`, `asec_prec`, `asec_round`, and `_ref`/`_assign` variants. MPFR has no
+  arcsecant. Rather than take $\arccos(1/x)$, which would round the reciprocal first and pay for it
+  — the arccosine is not Lipschitz at 1, so an input near $\pm1$ would lose about half the bits of
+  the reciprocal — the identity is used as $\operatorname{asec} x = \arctan(\sqrt{x^2-1})$ for a
+  positive $x$, and $\pi$ minus that for a negative one. The subtraction $x^2-1$ is done at twice
+  the input's precision, where it is exact, so unlike the arccosine the working precision does not
+  grow as the input approaches $\pm1$. The result is NaN for a NaN input and for any $|x|<1$,
+  including the zeros; $\pm\infty$ gives $\pi/2$, the value the secant grows toward; $1$ gives
+  $0.0$, the only exact case; and $-1$ gives $\pi$. `primitive_float_asec` gives the correctly
+  rounded `f32` or `f64` arcsecant.
 - `Cot` and `CotAssign` (new traits in malachite-base) for `Float`, with the usual
   `cot_prec_round`, `cot_prec`, `cot_round`, and `_ref`/`_assign` variants: a port of `mpfr_cot`,
   MPFR's generic reciprocal template with the tangent. MPFR's tangent is itself a quotient of a
