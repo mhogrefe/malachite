@@ -529,6 +529,15 @@ documented by git history.
   underflow, so the quotient is formed from $\sqrt{2(x-1)}$ directly, a large $u$ being able to lift
   it back into the range. `primitive_float_asec_with_period_rational` gives the correctly rounded
   `f32` or `f64` angle of a `Rational`.
+- `asec_pi_prec_round`, `asec_pi_prec`, `asec_pi_round`, and `asec_pi` (with `_ref` and `_assign`
+  variants), along with `asec_pi_rational_prec_round` and `asec_pi_rational_prec` (with `_ref`
+  variants): the arcsecant measured in half-turns, which is `asec_with_period` with $u = 2$ and
+  Malachite delegates the same way. Either infinity gives $1/2$, an input of 1 gives $0.0$, and an
+  input of $-1$ gives $1$; all three are exact at every precision, and they are the only exact
+  cases. Unlike every other period, $\pm2$ are not exact ones here, a third and a two-thirds of a
+  half-turn not being representable. NaN and any $|x|<1$, including the zeros, give NaN.
+  `primitive_float_asec_pi` and `primitive_float_asec_pi_rational` give the correctly rounded `f32`
+  or `f64` angle in half-turns. This closes the arcsecant, a function MPFR does not have.
 - `Cot` and `CotAssign` (new traits in malachite-base) for `Float`, with the usual
   `cot_prec_round`, `cot_prec`, `cot_round`, and `_ref`/`_assign` variants: a port of `mpfr_cot`,
   MPFR's generic reciprocal template with the tangent. MPFR's tangent is itself a quotient of a
