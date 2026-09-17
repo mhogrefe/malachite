@@ -10,7 +10,7 @@ use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::float::MAX_EXPONENT_I64;
 use crate::float::arithmetic::atan::{arc_with_period_scale, scaled_unsigned};
-use crate::float::arithmetic::sin::{SCALE, SCALED_INPUT_EXPONENT, scaled_underflow};
+use crate::float::arithmetic::sin::{SCALE, SCALE_I64, SCALED_INPUT_EXPONENT, scaled_underflow};
 use crate::{emulate_float_to_float_fn, emulate_rational_to_float_fn};
 use core::cmp::Ordering::{self, Equal, Greater, Less};
 use core::cmp::max;
@@ -178,7 +178,7 @@ pub(crate) fn acsc_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) ->
     // can reach and the answer is 1/|x|, rounded. It is formed scaled up by 2^SCALE, and the
     // underflow is then decided by the rounding mode alone.
     if 1 - exp_x <= SCALED_INPUT_EXPONENT {
-        let scaled = Rational::power_of_2(const { SCALE as i64 }) / &xp;
+        let scaled = Rational::power_of_2(SCALE_I64) / &xp;
         loop {
             // rounded away from zero, the side acsc(x) is on
             let t = Float::from_rational_prec_round_ref(&scaled, w, Up).0;
@@ -256,6 +256,53 @@ fn acsc_with_period_prec_round_normal_ref(
         // range, since |acsc x| <= pi/2 and u < 2^64. Rounding away from zero is what the
         // arccosecant's large-x shortcut needs too, `Up` being its own reflection.
         |w| x.acsc_prec_round_ref(w, Up).0 << SCALE,
+        u,
+        positive,
+        prec,
+        rm,
+    )
+}
+
+// Computes acsc(x) u/(2 pi) for a `Rational` x with |x| >= 1, rounded to precision `prec` with
+// rounding mode `rm`.
+pub(crate) fn acsc_with_period_rational_helper(
+    x: &Rational,
+    u: u64,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    let positive = *x > 0u32;
+    let exp_x = x.floor_log_base_2_abs() + 1;
+    let integer = x.denominator_ref() == &1u32;
+    // |x| = 1: acscu(1, u) = u/4 and acscu(-1, u) = -u/4, both exact
+    if integer && x.numerator_ref() == &1u32 {
+        return scaled_unsigned(u, 2, positive, prec, rm);
+    }
+    // acsc(+-2) = +-pi/6, so acscu(+-2, u) = +-u/12 is exact when u is a multiple of 3
+    if integer && x.numerator_ref() == &2u32 && u.is_multiple_of(3) {
+        return scaled_unsigned(u / 3, 2, positive, prec, rm);
+    }
+    // Nothing else can be rounded exactly
+    assert_ne!(rm, Exact, "Inexact acsc_with_period_rational");
+    // An |x| large enough to put acsc(x) = (1/x)(1 + O(x^-2)) below the smallest positive `Float`,
+    // where `acsc_rational_helper` would report an underflow -- but a large u can lift acsc(x) u/(2
+    // pi) back into the range, so the reciprocal, exact as a `Rational` and with the correction
+    // invisible at any reachable working precision, is taken here instead, scaled up by 2^SCALE for
+    // the quotient. It keeps the sign of x, the arccosecant being odd.
+    if 1 - exp_x <= SCALED_INPUT_EXPONENT {
+        let scaled = Rational::power_of_2(SCALE_I64) / x;
+        return arc_with_period_scale(
+            |w| Float::from_rational_prec_round_ref(&scaled, w, Up).0,
+            u,
+            positive,
+            prec,
+            rm,
+        );
+    }
+    arc_with_period_scale(
+        // scaling by a power of 2 is exact, and acsc(x) u 2^SCALE stays far below the top of the
+        // range, since |acsc x| <= pi/2 and u < 2^64
+        |w| acsc_rational_helper(x, w, Up).0 << SCALE,
         u,
         positive,
         prec,
@@ -1248,6 +1295,227 @@ impl Float {
         let prec = self.significant_bits();
         self.acsc_with_period_prec_assign(u, prec);
     }
+
+    /// Computes $\operatorname{acsc}(x)u/(2\pi)$, the arccosecant of a [`Rational`] measured in
+    /// $u$ths of a turn, rounding the result to the specified precision and with the specified
+    /// rounding mode and returning the result as a [`Float`]. The [`Rational`] is taken by value.
+    /// An [`Ordering`] is also returned, indicating whether the rounded arccosecant is less than,
+    /// equal to, or greater than the exact arccosecant.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,u,p,m) = \operatorname{acsc}(x)u/(2\pi)+\varepsilon.
+    /// $$
+    /// - If $|x|<1$, if $u = 0$, if $|x|$ is 1, or if $|x|$ is 2 and $u$ is a multiple of 3,
+    ///   $\varepsilon$ may be ignored or assumed to be 0.
+    /// - Otherwise, if $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2
+    ///   |\operatorname{acsc}(x)u/(2\pi)|\rfloor-p+1}$.
+    /// - Otherwise, if $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |\operatorname{acsc}(x)u/(2\pi)|\rfloor-p}$.
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(x,u,p,m)=\text{NaN}$ for $|x|<1$, including zero and when $u=0$
+    /// - $f(x,0,p,m)=\pm0.0$ for $|x|\geq1$, with the sign of $x$
+    /// - $f(\pm1,u,p,m)=\pm u/4$, a quarter turn
+    /// - $f(\pm2,u,p,m)=\pm u/12$, a twelfth of a turn, when $u$ is a multiple of 3
+    ///
+    /// Those are the only exact cases, and the turn fractions are exact only when $p$ is large
+    /// enough to hold them.
+    ///
+    /// The arccosecant is odd, so $f(-x,u,p,m)=-f(x,u,p,-m)$, with $-m$ the reflection of $m$ that
+    /// swaps `Floor` and `Ceiling`.
+    ///
+    /// Underflow:
+    /// - If $0<|f(x,u,p,m)|<2^{-2^{30}}$, and $m$ is `Floor`, `Down`, or `Nearest` with the result
+    ///   at most $2^{-2^{30}-1}$ in magnitude, a zero of the result's sign is returned instead.
+    /// - Otherwise, if $0<|f(x,u,p,m)|<2^{-2^{30}}$, $\pm2^{-2^{30}}$ is returned instead, with the
+    ///   sign of the result.
+    ///
+    /// Overflow is not possible, since $|f(x,u,p,m)| \leq u/4 < 2^{62}$. Underflow needs a small
+    /// $u$ together with a large $|x|$; a [`Rational`] has no exponent bound, so $|x|$ can be large
+    /// enough for that at any $u$.
+    ///
+    /// If you know you'll be using `Nearest`, consider using
+    /// [`Float::acsc_with_period_rational_prec`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n (\log n)^3 \log\log n + m \log m \log\log m)$
+    ///
+    /// $M(n, m) = O(n \log n + m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`: $x^2-1$ is formed exactly, and the arctangent of the reciprocal of
+    /// its square root is taken at a working precision of about $n$ bits and scaled by $u/(2\pi)$,
+    /// which needs $\pi$ to that many bits; those cost the first term, and the second is the
+    /// square. A large $x$ skips the square, its arccosecant being the reciprocal of $|x|$ to
+    /// within the working precision.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{NegativeOne, Two};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// // an input of 2 is a twelfth of a turn, and one of -1 minus a quarter
+    /// let (c, o) = Float::acsc_with_period_rational_prec_round(Rational::TWO, 360, 10, Exact);
+    /// assert_eq!(c.to_string(), "30.000");
+    /// assert_eq!(o, Equal);
+    ///
+    /// let (c, o) =
+    ///     Float::acsc_with_period_rational_prec_round(Rational::NEGATIVE_ONE, 360, 10, Exact);
+    /// assert_eq!(c.to_string(), "-90.000");
+    /// assert_eq!(o, Equal);
+    ///
+    /// let (c, o) = Float::acsc_with_period_rational_prec_round(
+    ///     Rational::from_unsigneds(5u8, 3),
+    ///     360,
+    ///     10,
+    ///     Floor,
+    /// );
+    /// assert_eq!(c.to_string(), "36.812");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn acsc_with_period_rational_prec_round(
+        x: Rational,
+        u: u64,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        Self::acsc_with_period_rational_prec_round_ref(&x, u, prec, rm)
+    }
+
+    /// Computes $\operatorname{acsc}(x)u/(2\pi)$, the arccosecant of a [`Rational`] measured in
+    /// $u$ths of a turn, rounding the result to the specified precision and with the specified
+    /// rounding mode and returning the result as a [`Float`]. The [`Rational`] is taken by
+    /// reference. An [`Ordering`] is also returned, indicating whether the rounded arccosecant is
+    /// less than, equal to, or greater than the exact arccosecant.
+    ///
+    /// See [`Float::acsc_with_period_rational_prec_round`] for the error bounds, the special and
+    /// closed-form cases, underflow, and the complexity; this function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::acsc_with_period_rational_prec_round_ref(
+    ///     &Rational::from_unsigneds(5u8, 3),
+    ///     360,
+    ///     10,
+    ///     Ceiling,
+    /// );
+    /// assert_eq!(c.to_string(), "36.875");
+    /// assert_eq!(o, Greater);
+    /// ```
+    pub fn acsc_with_period_rational_prec_round_ref(
+        x: &Rational,
+        u: u64,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        if x.lt_abs(&1u32) {
+            // the arccosecant is NaN inside (-1, 1), zero included; this holds for a zero period
+            // too, since NaN times 0 is NaN
+            return (Self::NAN, Equal);
+        }
+        if u == 0 {
+            // acscu(x, 0) = 0 with the sign of x, which keeps the function odd
+            return (
+                if *x > 0u32 {
+                    Self::ZERO
+                } else {
+                    Self::NEGATIVE_ZERO
+                },
+                Equal,
+            );
+        }
+        acsc_with_period_rational_helper(x, u, prec, rm)
+    }
+
+    /// Computes $\operatorname{acsc}(x)u/(2\pi)$, the arccosecant of a [`Rational`] measured in
+    /// $u$ths of a turn, rounding the result to the nearest value of the specified precision and
+    /// returning the result as a [`Float`]. The [`Rational`] is taken by value. An [`Ordering`] is
+    /// also returned, indicating whether the rounded arccosecant is less than, equal to, or greater
+    /// than the exact arccosecant.
+    ///
+    /// If the arccosecant is equidistant from two [`Float`]s with the specified precision, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen.
+    ///
+    /// See [`Float::acsc_with_period_rational_prec_round`] for the error bounds, the special and
+    /// closed-form cases, underflow, and the complexity; this function behaves the same way.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::acsc_with_period_rational_prec_round`] instead.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) =
+    ///     Float::acsc_with_period_rational_prec(Rational::from_unsigneds(5u8, 3), 360, 10);
+    /// assert_eq!(c.to_string(), "36.875");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) =
+    ///     Float::acsc_with_period_rational_prec(Rational::from_unsigneds(5u8, 3), 360, 53);
+    /// assert_eq!(c.to_string(), "36.869897645844020");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn acsc_with_period_rational_prec(x: Rational, u: u64, prec: u64) -> (Self, Ordering) {
+        Self::acsc_with_period_rational_prec_round(x, u, prec, Nearest)
+    }
+
+    /// Computes $\operatorname{acsc}(x)u/(2\pi)$, the arccosecant of a [`Rational`] measured in
+    /// $u$ths of a turn, rounding the result to the nearest value of the specified precision and
+    /// returning the result as a [`Float`]. The [`Rational`] is taken by reference. An [`Ordering`]
+    /// is also returned, indicating whether the rounded arccosecant is less than, equal to, or
+    /// greater than the exact arccosecant.
+    ///
+    /// See [`Float::acsc_with_period_rational_prec`] and
+    /// [`Float::acsc_with_period_rational_prec_round`]; this function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) =
+    ///     Float::acsc_with_period_rational_prec_ref(&Rational::from_unsigneds(5u8, 3), 360, 53);
+    /// assert_eq!(c.to_string(), "36.869897645844020");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn acsc_with_period_rational_prec_ref(x: &Rational, u: u64, prec: u64) -> (Self, Ordering) {
+        Self::acsc_with_period_rational_prec_round_ref(x, u, prec, Nearest)
+    }
 }
 
 impl Acsc for Float {
@@ -1529,4 +1797,68 @@ where
     for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
 {
     emulate_float_to_float_fn(|x, prec| Float::acsc_with_period_prec(x, u, prec), x)
+}
+
+/// Computes $\operatorname{acsc}(x)u/(2\pi)$, the arccosecant of a [`Rational`] measured in $u$ths
+/// of a turn (so that `u = 360` gives degrees), returning the result as a primitive float.
+///
+/// This is `primitive_float_acsc_rational` scaled by $u/(2\pi)$: see
+/// [`Float::acsc_with_period_rational_prec_round`] for the error bounds and the special cases.
+/// Every $|x|<1$ gives NaN, even when $u=0$; a zero period gives a zero with the sign of $x$;
+/// $\pm1$ give $\pm u/4$; and $\pm2$ give $\pm u/12$ when $u$ is a multiple of 3.
+///
+/// Overflow is not possible, since $|f(x,u)| \leq u/4 < 2^{62}$. The result is subnormal, or zero,
+/// only when $u$ is small and $|x|$ is large enough to put $u/(2\pi|x|)$ below the bottom of the
+/// type's normal range.
+///
+/// # Worst-case complexity
+/// $T(m) = O(m \log m \log\log m)$
+///
+/// $M(m) = O(m \log m)$
+///
+/// where $T$ is time, $M$ is additional memory, and $m$ is `x.significant_bits()`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::{NegativeOne, OneHalf, Two};
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::acsc::primitive_float_acsc_with_period_rational;
+/// use malachite_q::Rational;
+///
+/// // the arccosecant is NaN inside (-1, 1)
+/// assert!(primitive_float_acsc_with_period_rational::<f64>(&Rational::ONE_HALF, 360).is_nan());
+/// // an input of 2 is a twelfth of a turn, and one of -1 minus a quarter
+/// assert_eq!(
+///     NiceFloat(primitive_float_acsc_with_period_rational::<f64>(
+///         &Rational::TWO,
+///         360
+///     )),
+///     NiceFloat(30.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_acsc_with_period_rational::<f64>(
+///         &Rational::NEGATIVE_ONE,
+///         360
+///     )),
+///     NiceFloat(-90.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_acsc_with_period_rational::<f64>(
+///         &Rational::from_unsigneds(5u8, 3),
+///         360
+///     )),
+///     NiceFloat(36.86989764584402)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_acsc_with_period_rational<T: PrimitiveFloat>(x: &Rational, u: u64) -> T
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    emulate_rational_to_float_fn(
+        |x, prec| Float::acsc_with_period_rational_prec_ref(x, u, prec),
+        x,
+    )
 }

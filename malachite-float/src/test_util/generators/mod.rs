@@ -6541,3 +6541,14 @@ pub fn float_unsigned_rounding_mode_triple_gen_var_50() -> Generator<(Float, u64
         &special_random_float_unsigned_rounding_mode_triple_gen_var_50,
     )
 }
+
+// All `(Rational, u64, u64, RoundingMode)` that are valid inputs to
+// `Float::acsc_with_period_rational_prec_round`.
+pub fn rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_10()
+-> Generator<(Rational, u64, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_10,
+        &random_rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_10,
+        &special_random_rational_unsigned_unsigned_rounding_mode_quadruple_gen_var_10,
+    )
+}

@@ -568,6 +568,14 @@ documented by git history.
   $\pm1/2$. Unlike the arccosecant alone, this can underflow: for the largest `Float`s
   $1/|x|$ is only twice the smallest positive one, and a small $u$ carries the quotient below it.
   `primitive_float_acsc_with_period` gives the correctly rounded `f32` or `f64` angle.
+- `acsc_with_period_rational_prec_round` and `acsc_with_period_rational_prec` (with `_ref`
+  variants), which take a `Rational`. The exact cases are the `Float` version's, minus the
+  infinities a `Rational` cannot be: every $|x|<1$ gives NaN, even when $u = 0$; a zero period gives
+  a zero with the sign of $x$; $\pm1$ give $\pm u/4$; and $\pm2$ give $\pm u/12$ when $u$ is a
+  multiple of 3. A `Rational` having no exponent bound, an $|x|$ large enough makes the arccosecant
+  itself underflow, so the quotient is formed from the exact reciprocal directly, a large $u$ being
+  able to lift it back into the range. `primitive_float_acsc_with_period_rational` gives the
+  correctly rounded `f32` or `f64` angle of a `Rational`.
 - `Cot` and `CotAssign` (new traits in malachite-base) for `Float`, with the usual
   `cot_prec_round`, `cot_prec`, `cot_round`, and `_ref`/`_assign` variants: a port of `mpfr_cot`,
   MPFR's generic reciprocal template with the tangent. MPFR's tangent is itself a quotient of a

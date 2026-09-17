@@ -273,8 +273,9 @@ pub(crate) fn underflowed(positive: bool, prec: u64, rm: RoundingMode) -> (Float
 // underflow decided by hand: a division that rounded up to the smallest positive Float would
 // otherwise make the Ziv loop retry forever, since sin of that power of 2 can never be certified.
 pub(crate) const SCALE: u64 = 64;
+pub(crate) const SCALE_I64: i64 = SCALE as i64;
 // The exponent of the scaled smallest positive Float, 2^(MIN_EXPONENT - 1) * 2^SCALE.
-const MIN_SCALED_EXPONENT: i64 = Float::MIN_EXPONENT_I64 + SCALE as i64;
+const MIN_SCALED_EXPONENT: i64 = Float::MIN_EXPONENT_I64 + SCALE_I64;
 // Inputs with at most this exponent are scaled.
 pub(crate) const SCALED_INPUT_EXPONENT: i64 = Float::MIN_EXPONENT_I64 + 66;
 
