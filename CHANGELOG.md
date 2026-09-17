@@ -512,6 +512,15 @@ documented by git history.
   $2^{-2^{31}}$ of 1; there $\operatorname{asec} x$ is about $\sqrt{2(x-1)}$, and that form is used
   directly. `primitive_float_asec_rational` gives the correctly rounded `f32` or `f64` arcsecant of
   a `Rational`.
+- `asec_with_period_prec_round`, `asec_with_period_prec`, `asec_with_period_round`, and
+  `asec_with_period` (with `_ref` and `_assign` variants), the arcsecant measured in $u$ths of a
+  turn, so that $u = 360$ gives degrees. Its exact cases are the arccosine's, seen through the
+  reciprocal: NaN and every $|x|<1$ give NaN, even when $u = 0$; $\pm\infty$ gives $u/4$, a quarter
+  turn, where the arccosine has a zero input; $1$ gives $0.0$; $-1$ gives $u/2$; and $\pm2$ give
+  $u/6$ and $u/3$ when $u$ is a multiple of 3, where the arccosine has $\pm1/2$. A zero period gives
+  $+0.0$, the arcsecant never being negative. A large $x$ is answered from the neighbour of $u/4$,
+  as the arccosine answers a tiny one. `primitive_float_asec_with_period` gives the correctly
+  rounded `f32` or `f64` angle.
 - `Cot` and `CotAssign` (new traits in malachite-base) for `Float`, with the usual
   `cot_prec_round`, `cot_prec`, `cot_round`, and `_ref`/`_assign` variants: a port of `mpfr_cot`,
   MPFR's generic reciprocal template with the tangent. MPFR's tangent is itself a quotient of a

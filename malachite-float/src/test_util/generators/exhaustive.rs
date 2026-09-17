@@ -7328,6 +7328,16 @@ pub fn acos_with_period_round_valid(x: &Float, u: u64, rm: RoundingMode) -> bool
     rm != Exact || x.acos_with_period_round_ref(u, Floor).1 == Equal
 }
 
+// Whether `(x, u, prec, rm)` is a valid input to `Float.asec_with_period_prec_round`.
+pub fn asec_with_period_prec_round_valid(x: &Float, u: u64, prec: u64, rm: RoundingMode) -> bool {
+    rm != Exact || x.asec_with_period_prec_round_ref(u, prec, Floor).1 == Equal
+}
+
+// Whether `(x, u, rm)` is a valid input to `Float.asec_with_period_round`.
+pub fn asec_with_period_round_valid(x: &Float, u: u64, rm: RoundingMode) -> bool {
+    rm != Exact || x.asec_with_period_round_ref(u, Floor).1 == Equal
+}
+
 // Whether `(x, u, rm)` is a valid input to `Float::cos_with_period_round`.
 pub fn cos_with_period_round_valid(x: &Float, u: u64, rm: RoundingMode) -> bool {
     rm != Exact || x.cos_with_period_round_ref(u, Floor).1 == Equal
@@ -7408,6 +7418,21 @@ pub fn exhaustive_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_23()
     ))
 }
 
+pub fn exhaustive_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_25()
+-> It<(Float, u64, u64, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(
+        lex_pairs(
+            exhaustive_triples(
+                exhaustive_floats(),
+                exhaustive_unsigneds(),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, u, prec), rm)| asec_with_period_prec_round_valid(x, u, prec, rm)),
+    ))
+}
+
 pub fn exhaustive_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_16()
 -> It<(Float, u64, u64, RoundingMode)> {
     reshape_3_1_to_4(Box::new(
@@ -7483,6 +7508,21 @@ pub fn exhaustive_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_24()
     ))
 }
 
+pub fn exhaustive_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_26()
+-> It<(Float, u64, u64, RoundingMode)> {
+    reshape_3_1_to_4(Box::new(
+        lex_pairs(
+            exhaustive_triples(
+                exhaustive_extreme_floats(),
+                exhaustive_unsigneds(),
+                exhaustive_positive_primitive_ints(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, u, prec), rm)| asec_with_period_prec_round_valid(x, u, prec, rm)),
+    ))
+}
+
 pub fn exhaustive_float_unsigned_rounding_mode_triple_gen_var_38() -> It<(Float, u64, RoundingMode)>
 {
     reshape_2_1_to_3(Box::new(
@@ -7535,6 +7575,17 @@ pub fn exhaustive_float_unsigned_rounding_mode_triple_gen_var_44() -> It<(Float,
             exhaustive_rounding_modes(),
         )
         .filter(|&((ref x, u), rm)| acos_with_period_round_valid(x, u, rm)),
+    ))
+}
+
+pub fn exhaustive_float_unsigned_rounding_mode_triple_gen_var_47() -> It<(Float, u64, RoundingMode)>
+{
+    reshape_2_1_to_3(Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_tiny(exhaustive_floats(), exhaustive_unsigneds()),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&((ref x, u), rm)| asec_with_period_round_valid(x, u, rm)),
     ))
 }
 
