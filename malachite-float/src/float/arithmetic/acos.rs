@@ -91,7 +91,8 @@ fn acos_prec_round_normal_ref(x: &Float, prec: u64, rm: RoundingMode) -> (Float,
 //
 // This is mpfr_acosu from acosu.c, MPFR 4.2.2. The quotient is formed with the numerator scaled up
 // by 2^SCALE, as in `atan_with_period`, since acos(x) u/(2 pi) can fall below the smallest positive
-// `Float` for an x near 1 and a small u, which MPFR's wider exponent range never sees.
+// `Float` for an x near 1 and a small u, which MPFR, computing inside a temporarily extended
+// exponent range, never sees.
 fn acos_with_period_prec_round_normal_ref(
     x: &Float,
     u: u64,

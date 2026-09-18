@@ -15,7 +15,9 @@
 use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::float::arithmetic::atan::{arc_with_period_scale, scaled_unsigned};
-use crate::float::arithmetic::round_near_x::small_input_shortcut;
+use crate::float::arithmetic::round_near_x::{
+    round_from_below, small_input_shortcut, value_is_tie,
+};
 use crate::float::arithmetic::sin::{SCALE, SCALED_INPUT_EXPONENT, scaled_underflow};
 use crate::{emulate_float_to_float_fn, emulate_rational_to_float_fn};
 use core::cmp::Ordering::{self, Equal, Greater, Less};
@@ -117,8 +119,8 @@ pub(crate) fn asin_at_prec(x: &Float, w: u64) -> Float {
 //
 // This is mpfr_asinu from asinu.c, MPFR 4.2.2. The quotient is formed with the numerator scaled up
 // by 2^SCALE, since asin(x) u/(2 pi) can fall below the smallest positive `Float` for a tiny x and
-// a small u, which MPFR's wider exponent range never sees; a result below it is then decided by the
-// rounding mode alone, as in `sin_with_period`.
+// a small u, which MPFR, computing inside a temporarily extended exponent range, never sees; a
+// result below it is then decided by the rounding mode alone, as in `sin_with_period`.
 fn asin_with_period_prec_round_normal_ref(
     x: &Float,
     u: u64,
@@ -192,6 +194,24 @@ pub(crate) fn asin_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) ->
             w += increment;
             increment = w >> 1;
         }
+    }
+    // asin(x) = x(1 + x^2/6 + ...), so x falls short of it by less than 2^(3 EXP(x) - 2). Once that
+    // is below the distance from x to the nearest midpoint of the target precision -- at least
+    // 2^(EXP(x) - prec - 1)/d for a denominator of d, the two coinciding only when x is itself a
+    // midpoint, which is the tie case -- x's own rounding is the answer. Without this the general
+    // path below forms x^2/(1 - x^2) exactly, and for a tiny x that is a DENSE `Rational` of about
+    // 2 |EXP(x)| bits whose square root the loop then takes over and over, at a precision of the
+    // same order: 22 minutes for x = 2^-536870908, against milliseconds here.
+    if -(exp_x << 1) > i64::exact_from(prec + x.denominator_ref().significant_bits()) + 4 {
+        let ax = x.abs();
+        // the arcsine is odd, so the sign is stripped and restored, the rounding mode reflected
+        // along with it
+        let rm_abs = if positive { rm } else { -rm };
+        let (wide, o_wide) = Float::from_rational_prec_ref(&ax, prec + 1);
+        let tie = rm_abs == Nearest && value_is_tie(&wide, o_wide, prec);
+        let (t, o) = Float::from_rational_prec_round(ax, prec, rm_abs);
+        let (t, o) = round_from_below(t, o, tie, rm_abs);
+        return if positive { (t, o) } else { (-t, o.reverse()) };
     }
     let x2 = (&x.abs()).square();
     let r = (&x2 / (Rational::ONE - &x2)).abs();

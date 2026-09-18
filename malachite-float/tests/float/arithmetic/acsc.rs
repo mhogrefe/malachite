@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::cmp::Ordering::{self, *};
-use malachite_base::num::arithmetic::traits::{Acsc, AcscAssign, PowerOf2, Reciprocal};
+use malachite_base::num::arithmetic::traits::{Acsc, AcscAssign, IsPowerOf2, PowerOf2, Reciprocal};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, OneHalf, Two, Zero,
@@ -58,7 +58,7 @@ use std::str::FromStr;
 //
 // It is only applied to inputs of moderate magnitude: the `Rational` holds the `Float`'s exponent
 // in full, so a `Float` with an extreme exponent would turn into a `Rational` of hundreds of
-// megabytes.
+// megabytes; the huge regime is covered by `test_acsc_huge` instead, a few inputs at a time.
 fn asin_of_reciprocal(x: &Float, prec: u64, rm: RoundingMode) -> Option<(Float, Ordering)> {
     if !x.is_finite() || *x == 0u32 || x.get_exponent().unwrap().unsigned_abs() > 1000 {
         return None;
@@ -913,7 +913,8 @@ fn primitive_float_acsc_rational_properties() {
 
 // The arccosecant in u-ths of a turn is the arcsine of the reciprocal in the same units, and a
 // `Float`'s reciprocal is an exact `Rational`. As for the plain arccosecant, the check is confined
-// to inputs of moderate magnitude, since the `Rational` holds the exponent in full.
+// to inputs of moderate magnitude, since the `Rational` holds the exponent in full;
+// `test_acsc_with_period_huge` covers the huge regime instead.
 fn asinu_of_reciprocal(
     x: &Float,
     u: u64,
@@ -931,13 +932,212 @@ fn asinu_of_reciprocal(
     ))
 }
 
-// Whether MPFR and Malachite are expected to disagree on acscu(x, u): for a zero period MPFR's
-// `asinu` returns +0 even for a negative argument, so its arcsine of the reciprocal of a negative x
-// is +0, while Malachite keeps the sign, the function being odd. An input of extreme exponent is
-// also kept away from the oracle: its quotient underflows here and not in MPFR's wider range.
-fn mpfr_divergence(x: &Float, u: u64) -> bool {
-    (u == 0 && *x < 0u32 && !x.lt_abs(&1u32))
-        || (x.is_finite() && x != &0u32 && x.get_exponent().unwrap().unsigned_abs() > 1000)
+// The exact identity behind the arccosecant -- the arcsine of the reciprocal -- applied to the huge
+// inputs that `asin_of_reciprocal` above cannot afford: a `Float` near the top of the exponent
+// range becomes a `Rational` of hundreds of megabytes, so the property tests stop at an exponent of
+// 1000. These are the only checks of the huge-|x| shortcut against anything but itself, and they
+// caught the inverted ternary described in `acsc_abs_prec_round`.
+//
+// Where 1/x is exactly representable -- x a power of two, the case that reaches the exact-value
+// nudge -- the identity is taken through the `Float` arcsine, which is instant. Otherwise it goes
+// through the `Rational` one, at about five seconds a call.
+fn asin_of_reciprocal_huge(x: &Float, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    if x.significand_ref().unwrap().is_power_of_2() {
+        let (r, o_r) = x.reciprocal_prec_round_ref(64, Exact);
+        assert_eq!(o_r, Equal);
+        r.asin_prec_round(prec, rm)
+    } else {
+        Float::asin_rational_prec_round(Rational::exact_from(x).reciprocal(), prec, rm)
+    }
+}
+
+// As `asin_of_reciprocal_huge`, in u-ths of a turn.
+fn asinu_of_reciprocal_huge(x: &Float, u: u64, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    if x.significand_ref().unwrap().is_power_of_2() {
+        let (r, o_r) = x.reciprocal_prec_round_ref(64, Exact);
+        assert_eq!(o_r, Equal);
+        r.asin_with_period_prec_round(u, prec, rm)
+    } else {
+        Float::asin_with_period_rational_prec_round(
+            Rational::exact_from(x).reciprocal(),
+            u,
+            prec,
+            rm,
+        )
+    }
+}
+
+#[test]
+fn test_acsc_huge() {
+    let test =
+        |s_hex: &str, prec: u64, rm: RoundingMode, out: &str, out_hex: &str, o_out: Ordering| {
+            let x = parse_hex_string(s_hex);
+            let (c, o) = x.acsc_prec_round_ref(prec, rm);
+            assert!(c.is_valid());
+            assert_eq!(c.to_string(), out);
+            assert_eq!(to_hex_string(&c), out_hex);
+            assert_eq!(o, o_out);
+            let (c_alt, o_alt) = asin_of_reciprocal_huge(&x, prec, rm);
+            assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+            assert_eq!(o_alt, o);
+        };
+    test(
+        "0x1.0E+134217727#1",
+        53,
+        Nearest,
+        "7.8098438886530598e-161614248",
+        "0x1.0000000000000E-134217727#53",
+        Less,
+    );
+    test(
+        "0x1.0E+134217728#1",
+        53,
+        Nearest,
+        "4.8811524304081624e-161614249",
+        "0x1.0000000000000E-134217728#53",
+        Less,
+    );
+    test(
+        "0x1.0E+134217728#1",
+        53,
+        Floor,
+        "4.8811524304081624e-161614249",
+        "0x1.0000000000000E-134217728#53",
+        Less,
+    );
+    test(
+        "0x1.0E+134217728#1",
+        53,
+        Ceiling,
+        "4.8811524304081635e-161614249",
+        "0x1.0000000000001E-134217728#53",
+        Greater,
+    );
+    test(
+        "0x4.0E+268435455#1",
+        20,
+        Nearest,
+        "9.5302596e-323228497",
+        "0x4.00000E-268435456#20",
+        Less,
+    );
+    test(
+        "0x3.0E+134217728#2",
+        53,
+        Nearest,
+        "1.6270508101360540e-161614249",
+        "0x5.5555555555554E-134217729#53",
+        Less,
+    );
+    test(
+        "-0x4.0E+268435455#1",
+        20,
+        Nearest,
+        "-9.5302596e-323228497",
+        "-0x4.00000E-268435456#20",
+        Greater,
+    );
+    test(
+        "-0x1.0E+134217728#1",
+        53,
+        Nearest,
+        "-4.8811524304081624e-161614249",
+        "-0x1.0000000000000E-134217728#53",
+        Greater,
+    );
+}
+
+#[test]
+fn test_acsc_with_period_huge() {
+    let test = |s_hex: &str,
+                u: u64,
+                prec: u64,
+                rm: RoundingMode,
+                out: &str,
+                out_hex: &str,
+                o_out: Ordering| {
+        let x = parse_hex_string(s_hex);
+        let (c, o) = x.acsc_with_period_prec_round_ref(u, prec, rm);
+        assert!(c.is_valid());
+        assert_eq!(c.to_string(), out);
+        assert_eq!(to_hex_string(&c), out_hex);
+        assert_eq!(o, o_out);
+        let (c_alt, o_alt) = asinu_of_reciprocal_huge(&x, u, prec, rm);
+        assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+        assert_eq!(o_alt, o);
+    };
+    test(
+        "0x1.0E+134217728#1",
+        360,
+        53,
+        Nearest,
+        "2.7966943342241198e-161614247",
+        "0x3.94bb834c783f0E-134217727#53",
+        Greater,
+    );
+    test(
+        "0x1.0E+134217728#1",
+        1,
+        53,
+        Nearest,
+        "7.7685953728447774e-161614250",
+        "0x2.8be60db939106E-134217729#53",
+        Greater,
+    );
+    test(
+        "0x1.0E+134217728#1",
+        1,
+        53,
+        Ceiling,
+        "7.7685953728447774e-161614250",
+        "0x2.8be60db939106E-134217729#53",
+        Greater,
+    );
+    test(
+        "0x1.0E+134217728#1",
+        1,
+        53,
+        Floor,
+        "7.7685953728447761e-161614250",
+        "0x2.8be60db939104E-134217729#53",
+        Less,
+    );
+    test(
+        "0x4.0E+268435455#1",
+        1,
+        20,
+        Nearest,
+        "2.3825649e-323228497",
+        "0x1.00000E-268435456#20",
+        Greater,
+    );
+    test(
+        "0x3.0E+134217728#2",
+        360,
+        53,
+        Nearest,
+        "9.3223144474137315e-161614248",
+        "0x1.3193d66ed2bfaE-134217727#53",
+        Less,
+    );
+    test(
+        "-0x4.0E+268435455#1",
+        1,
+        20,
+        Nearest,
+        "-2.3825649e-323228497",
+        "-0x1.00000E-268435456#20",
+        Less,
+    );
+    test(
+        "-0x1.0E+134217728#1",
+        360,
+        53,
+        Nearest,
+        "-2.7966943342241198e-161614247",
+        "-0x3.94bb834c783f0E-134217727#53",
+        Less,
+    );
 }
 
 #[test]
@@ -984,7 +1184,6 @@ fn test_acsc_with_period_prec_round() {
 
         if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm)
             && u <= u64::from(u32::MAX)
-            && !mpfr_divergence(&x, u)
         {
             let (rug_c, rug_o) =
                 rug_acsc_with_period_prec_round(&rug::Float::exact_from(&x), u, prec, rug_rm);
@@ -1442,7 +1641,6 @@ fn acsc_with_period_prec_round_properties_helper(x: Float, u: u64, prec: u64, rm
 
     if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm)
         && u <= u64::from(u32::MAX)
-        && !mpfr_divergence(&x, u)
     {
         let (rug_c, rug_o) =
             rug_acsc_with_period_prec_round(&rug::Float::exact_from(&x), u, prec, rug_rm);
@@ -1692,12 +1890,6 @@ fn primitive_float_acsc_with_period_properties() {
     apply_fn_to_primitive_floats!(primitive_float_acsc_with_period_properties_helper);
 }
 
-// As `mpfr_divergence`, for a `Rational` input: only the signed zero at a zero period, a `Rational`
-// having no exponent to be extreme in.
-fn mpfr_rational_divergence(x: &Rational, u: u64) -> bool {
-    u == 0 && *x < 0u32 && !x.lt_abs(&1u32)
-}
-
 #[test]
 fn test_acsc_with_period_rational_prec_round() {
     let test = |s: &str,
@@ -1740,7 +1932,6 @@ fn test_acsc_with_period_rational_prec_round() {
         if !c.is_nan()
             && let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm)
             && u <= u64::from(u32::MAX)
-            && !mpfr_rational_divergence(&x, u)
         {
             let (rug_c, rug_o) = rug_acsc_with_period_rational_prec_round(&x, u, prec, rug_rm);
             assert_eq!(
@@ -2020,7 +2211,6 @@ fn acsc_with_period_rational_prec_round_properties_helper(
     if !c.is_nan()
         && let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm)
         && u <= u64::from(u32::MAX)
-        && !mpfr_rational_divergence(&x, u)
     {
         let (rug_c, rug_o) = rug_acsc_with_period_rational_prec_round(&x, u, prec, rug_rm);
         assert_eq!(

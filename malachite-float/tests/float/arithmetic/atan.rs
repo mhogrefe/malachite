@@ -5313,8 +5313,9 @@ fn primitive_float_atan_with_period_properties() {
 }
 
 // A tiny input with a small period, where the result is about xu/(2 pi) and falls below the
-// smallest positive `Float`. MPFR's wider exponent range never reaches this, so the quotient is
-// formed with the numerator scaled up and the underflow decided by the rounding mode alone.
+// smallest positive `Float`. MPFR computes inside a temporarily extended exponent range and only
+// clamps its output, so its own code never sees this underflow; here the quotient is formed with
+// the numerator scaled up and the underflow decided by the rounding mode alone.
 #[test]
 fn test_atan_with_period_underflow() {
     let min_positive = Float::min_positive_value_prec(10);

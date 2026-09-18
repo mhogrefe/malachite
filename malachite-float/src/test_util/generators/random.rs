@@ -29,7 +29,8 @@ use crate::test_util::generators::exhaustive::{
     acos_prec_round_valid, acos_rational_prec_round_valid, acos_round_valid,
     acos_with_period_prec_round_valid, acos_with_period_rational_prec_round_valid,
     acos_with_period_round_valid, acot_prec_round_valid, acot_rational_prec_round_valid,
-    acot_round_valid, acsc_prec_round_valid, acsc_rational_prec_round_valid, acsc_round_valid,
+    acot_round_valid, acot_with_period_prec_round_valid, acot_with_period_round_valid,
+    acsc_prec_round_valid, acsc_rational_prec_round_valid, acsc_round_valid,
     acsc_with_period_prec_round_valid, acsc_with_period_rational_prec_round_valid,
     acsc_with_period_round_valid, add_mul_prec_round_valid, add_mul_rational_prec_round_valid,
     add_mul_rational_round_valid, add_mul_round_valid, add_prec_round_valid,
@@ -13379,5 +13380,109 @@ pub fn random_rational_unsigned_rounding_mode_triple_gen_var_14(
             &random_rounding_modes,
         )
         .filter(|&(ref n, prec, rm)| acot_rational_prec_round_valid(n, prec, rm)),
+    )
+}
+
+pub fn random_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_29(
+    config: &GenConfig,
+) -> It<(Float, u64, u64, RoundingMode)> {
+    Box::new(
+        random_quadruples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 32),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(ref x, n, prec, rm)| acot_with_period_prec_round_valid(x, n, prec, rm)),
+    )
+}
+
+pub fn random_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_30(
+    config: &GenConfig,
+) -> It<(Float, u64, u64, RoundingMode)> {
+    Box::new(
+        random_quadruples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_mixed_extreme_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 32),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(ref x, n, prec, rm)| acot_with_period_prec_round_valid(x, n, prec, rm)),
+    )
+}
+
+pub fn random_float_unsigned_rounding_mode_triple_gen_var_53(
+    config: &GenConfig,
+) -> It<(Float, u64, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_floats(
+                    seed,
+                    config.get_or("mean_exponent_n", 64),
+                    config.get_or("mean_exponent_d", 1),
+                    config.get_or("mean_precision_n", 64),
+                    config.get_or("mean_precision_d", 1),
+                    config.get_or("mean_zero_p_n", 1),
+                    config.get_or("mean_zero_p_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(ref x, u, rm)| acot_with_period_round_valid(x, u, rm)),
     )
 }

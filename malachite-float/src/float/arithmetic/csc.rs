@@ -16,10 +16,10 @@
 // (`gen_inverse.h`) with the sine: the sine is taken at the working precision, rounded toward zero,
 // its reciprocal is rounded to nearest, and the result is certified with two bits of slack, inside
 // a Ziv loop. The cosecant never underflows, since its magnitude is at least 1, but it overflows
-// for an input within 2^(-2^30) of a multiple of pi, which MPFR's wider exponent range never sees;
-// a reciprocal at the top of the range is decided from an exact bracket instead. MPFR's shortcut
-// for a tiny input, where csc x is 1/x + x/6 + O(x^3), is kept: there the Ziv loop could never
-// certify a reciprocal that is exactly representable.
+// for an input within 2^(-2^30) of a multiple of pi, which MPFR, computing inside a temporarily
+// extended exponent range, never sees; a reciprocal at the top of the range is decided from an
+// exact bracket instead. MPFR's shortcut for a tiny input, where csc x is 1/x + x/6 + O(x^3), is
+// kept: there the Ziv loop could never certify a reciprocal that is exactly representable.
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::float::arithmetic::cos::{phi_minus_1_prec_round, signed_constant, sin_bound};

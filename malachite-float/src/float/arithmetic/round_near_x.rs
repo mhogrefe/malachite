@@ -173,3 +173,47 @@ crate_test_fn! {float_round_near_x(
     assert_ne!(o, Equal);
     Some((y, o))
 }}
+
+// Whether `wide`, an exact value rounded to `prec + 1` bits, is exactly halfway between two
+// `prec`-bit `Float`s, which `Nearest` would otherwise break on its own. `o_wide` is the ternary of
+// that rounding, so `wide` holds the value itself only when it is `Equal`.
+pub(crate) fn value_is_tie(wide: &Float, o_wide: Ordering, prec: u64) -> bool {
+    o_wide == Equal && Float::from_float_prec_round_ref(wide, prec, Down).1 != Equal
+}
+
+// Turns the correctly rounded leading term of a function into the correctly rounded function, where
+// the true value lies strictly above the term and nearer to it than the target precision can
+// resolve. `t` and `o` are the term rounded to `prec` with `rm`, and `tie` says whether the term
+// lands exactly halfway between two `prec`-bit `Float`s. The term's own rounding is the answer but
+// for two cases -- a term landing exactly on a representable value, and one landing on a tie --
+// both of which have to move up, the true value being strictly above.
+//
+// Callers working on |x| for an odd function pass the reflected rounding mode, so "up" there means
+// away from zero.
+pub(crate) fn round_from_below(
+    t: Float,
+    o: Ordering,
+    tie: bool,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    if o == Equal {
+        return if rm == Ceiling || rm == Up {
+            let mut t = t;
+            t.increment();
+            (t, Greater)
+        } else {
+            (t, Less)
+        };
+    }
+    if tie {
+        // `Nearest` broke the tie its own way; the true value is above it, so the upper neighbour
+        // wins
+        if o == Greater {
+            return (t, Greater);
+        }
+        let mut t = t;
+        t.increment();
+        return (t, Greater);
+    }
+    (t, o)
+}

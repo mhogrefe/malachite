@@ -10,6 +10,7 @@ use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::float::MAX_EXPONENT_I64;
 use crate::float::arithmetic::atan::{arc_with_period_scale, scaled_unsigned};
+use crate::float::arithmetic::round_near_x::{round_from_below, value_is_tie};
 use crate::float::arithmetic::sin::{SCALE, SCALE_I64, SCALED_INPUT_EXPONENT, scaled_underflow};
 use crate::{emulate_float_to_float_fn, emulate_rational_to_float_fn};
 use core::cmp::Ordering::{self, Equal, Greater, Less};
@@ -23,7 +24,7 @@ use malachite_base::num::basic::traits::{NaN as NaNTrait, NegativeZero, One, Zer
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode::{self, Ceiling, Down, Exact, Nearest, Up};
+use malachite_base::rounding_modes::RoundingMode::{self, Exact, Nearest, Up};
 use malachite_nz::natural::arithmetic::float::round::float_can_round;
 use malachite_nz::platform::Limb;
 use malachite_q::Rational;
@@ -39,45 +40,6 @@ pub(crate) fn signed_half_pi(negative: bool, prec: u64, rm: RoundingMode) -> (Fl
     } else {
         (half, o)
     }
-}
-
-// Turns the correctly rounded 1/|x| into the correctly rounded acsc(|x|), for an |x| so large that
-// x^2 would leave the exponent range. There 1/|x| is below 2^(1 - 2^29), so acsc(x), which exceeds
-// it by a factor below 1 + 2^(-2^30), is nearer to it than any representable precision can resolve:
-// the reciprocal's own rounding is the answer. The two exceptions are a reciprocal that lands
-// exactly on a representable value and one that lands exactly on a tie, both of which have to move
-// up, acsc(x) being strictly above 1/|x|.
-fn acsc_from_huge_reciprocal(
-    t: Float,
-    o: Ordering,
-    tie: bool,
-    rm: RoundingMode,
-) -> (Float, Ordering) {
-    if o == Equal {
-        return if rm == Ceiling || rm == Up {
-            let mut t = t;
-            t.increment();
-            (t, Greater)
-        } else {
-            (t, Less)
-        };
-    }
-    if tie {
-        // `Nearest` broke the tie its own way; acsc(x) is above it, so the upper neighbour wins
-        let mut t = t;
-        if o == Greater {
-            return (t, Greater);
-        }
-        t.increment();
-        return (t, Greater);
-    }
-    (t, o)
-}
-
-// Whether `v`, the exact 1/|x|, is exactly halfway between two `prec`-bit `Float`s, which `Nearest`
-// would otherwise break on its own.
-pub(crate) fn reciprocal_is_tie(wide: &Float, o_wide: Ordering, prec: u64) -> bool {
-    o_wide == Equal && Float::from_float_prec_round_ref(wide, prec, Down).1 != Equal
 }
 
 // Computes acsc(|x|) for a finite `Float` x with |x| > 1, rounded to precision `prec` with rounding
@@ -96,26 +58,28 @@ pub(crate) fn reciprocal_is_tie(wide: &Float, o_wide: Ordering, prec: u64) -> bo
 fn acsc_abs_prec_round(x: &Float, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
     let exp_x = i64::from(x.get_exponent().unwrap());
     // acsc(x) = (1/x)(1 + 1/(6x^2) + ...), so once 2 EXP(x) is past the target precision the
-    // correction is invisible there and the answer is decided by 1/|x| together with the fact that
-    // acsc(x) lies just above it. That has to be settled without a Ziv loop, and the test has to be
-    // on `prec` rather than on the working precision: acsc(x) is within 2^(-2 EXP(x)) of 1/x, so a
-    // loop would balloon to billions of bits for an extreme exponent, and a reciprocal taken at
-    // such a precision falls out of the exponent range and flushes to zero. Keeping the test off
-    // the working precision also keeps the square below from overflowing, since it is only reached
-    // when 2 EXP(x) is at most prec + 66. The square below is the whole computation, and it is only
-    // out of reach when it would leave the exponent range. There acsc(x) is within 2^(-2^30) of
-    // 1/|x| -- closer than any representable precision can resolve -- so the reciprocal alone
-    // decides the answer, and a Ziv loop is both unnecessary and ruinous: it would balloon toward 2
-    // EXP(x) bits, billions of them, and a reciprocal taken at such a precision falls out of the
-    // exponent range entirely.
-    if exp_x << 1 > MAX_EXPONENT_I64 {
+    // acsc(x) = (1/x)(1 + 1/(6x^2) + ...), a relative correction below 2^(-2 EXP(x) - 2). Once that
+    // is below the distance from 1/|x| to the nearest midpoint of the target precision -- which for
+    // a p-bit x is at least a relative 2^(-prec - p - 1) -- the reciprocal's own rounding is the
+    // answer, bar the exactly-representable and tie cases handled below. It has to be settled here
+    // rather than in the loop, for two reasons. The loop cannot certify an exactly representable
+    // result at all -- `float_can_round` refuses one -- so it would balloon toward 2 EXP(x) bits,
+    // billions of them for an extreme exponent, and a reciprocal taken at such a precision falls
+    // out of the exponent range and flushes to zero. And past 3 EXP(x) > MAX_EXPONENT the cubic
+    // term of the arctangent below underflows, so the arctangent stops moving and the loop exits
+    // reporting atan's side of 1/|x| -- the opposite of acsc's, the two corrections having opposite
+    // signs. Keeping the test off the working precision also keeps the square below from
+    // overflowing.
+    if exp_x << 1 > MAX_EXPONENT_I64
+        || exp_x << 1 > i64::exact_from(prec + x.get_prec().unwrap()) + 4
+    {
         let a = x.abs();
         let tie = rm == Nearest && {
             let (wide, o_wide) = a.reciprocal_prec_ref(prec + 1);
-            reciprocal_is_tie(&wide, o_wide, prec)
+            value_is_tie(&wide, o_wide, prec)
         };
         let (t, o) = a.reciprocal_prec_round(prec, rm);
-        return acsc_from_huge_reciprocal(t, o, tie, rm);
+        return round_from_below(t, o, tie, rm);
     }
     // the width at which x^2 - 1 is exact
     let exact_w = (x.get_prec().unwrap() << 1) + 2;
@@ -196,17 +160,21 @@ pub(crate) fn acsc_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) ->
             increment = w >> 1;
         }
     }
-    // As in the `Float` case, a square that would leave the exponent range is answered from the
-    // reciprocal alone; the difference between 1/|x| and acsc(x) is below 2^(-2^30) of it, beyond
-    // every representable precision. This also spares a huge `Rational` from being squared.
-    if exp_x << 1 > MAX_EXPONENT_I64 {
+    // As in the `Float` case, the reciprocal alone is the answer once the relative correction
+    // 1/(6x^2) falls below the distance from 1/|x| to the nearest midpoint of the target precision,
+    // which for a numerator of n bits is at least a relative 2^(-prec - n - 1). This spares a huge
+    // `Rational` from being squared, and settles the exactly-representable and tie cases that the
+    // loop below could never certify.
+    if exp_x << 1 > MAX_EXPONENT_I64
+        || exp_x << 1 > i64::exact_from(prec + xp.numerator_ref().significant_bits()) + 4
+    {
         let recip = (&xp).reciprocal();
         let tie = rm == Nearest && {
             let (wide, o_wide) = Float::from_rational_prec_ref(&recip, prec + 1);
-            reciprocal_is_tie(&wide, o_wide, prec)
+            value_is_tie(&wide, o_wide, prec)
         };
         let (t, o) = Float::from_rational_prec_round(recip, prec, rm);
-        let (t, o) = acsc_from_huge_reciprocal(t, o, tie, rm);
+        let (t, o) = round_from_below(t, o, tie, rm);
         return if negative { (-t, o.reverse()) } else { (t, o) };
     }
     let mut r = None;

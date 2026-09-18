@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use core::cmp::Ordering::{self, *};
-use malachite_base::num::arithmetic::traits::{Asec, AsecAssign, PowerOf2, Reciprocal};
+use malachite_base::num::arithmetic::traits::{Asec, AsecAssign, IsPowerOf2, PowerOf2, Reciprocal};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::{
     Infinity, NaN, NegativeInfinity, NegativeOne, NegativeZero, One, OneHalf, Two, Zero,
@@ -58,7 +58,7 @@ use std::str::FromStr;
 //
 // It is only applied to inputs of moderate magnitude: the `Rational` holds the `Float`'s exponent
 // in full, so a `Float` with an extreme exponent would turn into a `Rational` of hundreds of
-// megabytes.
+// megabytes; the huge regime is covered by `test_asec_huge` instead, a few inputs at a time.
 fn acos_of_reciprocal(x: &Float, prec: u64, rm: RoundingMode) -> Option<(Float, Ordering)> {
     if !x.is_finite() || *x == 0u32 || x.get_exponent().unwrap().unsigned_abs() > 1000 {
         return None;
@@ -1018,7 +1018,8 @@ fn primitive_float_asec_rational_properties() {
 
 // The arcsecant in u-ths of a turn is the arccosine of the reciprocal in the same units, and a
 // `Float`'s reciprocal is an exact `Rational`. As for the plain arcsecant, the check is confined to
-// inputs of moderate magnitude, since the `Rational` holds the exponent in full.
+// inputs of moderate magnitude, since the `Rational` holds the exponent in full;
+// `test_asec_with_period_huge` covers the huge regime instead.
 fn acosu_of_reciprocal(
     x: &Float,
     u: u64,
@@ -1034,6 +1035,214 @@ fn acosu_of_reciprocal(
         prec,
         rm,
     ))
+}
+
+// The exact identity behind the arcsecant -- the arccosine of the reciprocal -- applied to the huge
+// inputs that `acos_of_reciprocal` above cannot afford: a `Float` near the top of the exponent
+// range becomes a `Rational` of hundreds of megabytes, so the property tests stop at an exponent of
+// 1000. Its huge-|x| branch substitutes |x| for sqrt(x^2 - 1) inside the loop; nothing else checks
+// that substitution where the square would actually leave the exponent range.
+//
+// Where 1/x is exactly representable -- x a power of two, the case that reaches the exact-value
+// nudge -- the identity is taken through the `Float` arccosine, which is instant. Otherwise it goes
+// through the `Rational` one, at about five seconds a call.
+fn acos_of_reciprocal_huge(x: &Float, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    if x.significand_ref().unwrap().is_power_of_2() {
+        let (r, o_r) = x.reciprocal_prec_round_ref(64, Exact);
+        assert_eq!(o_r, Equal);
+        r.acos_prec_round(prec, rm)
+    } else {
+        Float::acos_rational_prec_round(Rational::exact_from(x).reciprocal(), prec, rm)
+    }
+}
+
+// As `acos_of_reciprocal_huge`, in u-ths of a turn.
+fn acosu_of_reciprocal_huge(x: &Float, u: u64, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
+    if x.significand_ref().unwrap().is_power_of_2() {
+        let (r, o_r) = x.reciprocal_prec_round_ref(64, Exact);
+        assert_eq!(o_r, Equal);
+        r.acos_with_period_prec_round(u, prec, rm)
+    } else {
+        Float::acos_with_period_rational_prec_round(
+            Rational::exact_from(x).reciprocal(),
+            u,
+            prec,
+            rm,
+        )
+    }
+}
+
+#[test]
+fn test_asec_huge() {
+    let test =
+        |s_hex: &str, prec: u64, rm: RoundingMode, out: &str, out_hex: &str, o_out: Ordering| {
+            let x = parse_hex_string(s_hex);
+            let (c, o) = x.asec_prec_round_ref(prec, rm);
+            assert!(c.is_valid());
+            assert_eq!(c.to_string(), out);
+            assert_eq!(to_hex_string(&c), out_hex);
+            assert_eq!(o, o_out);
+            let (c_alt, o_alt) = acos_of_reciprocal_huge(&x, prec, rm);
+            assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+            assert_eq!(o_alt, o);
+        };
+    test(
+        "0x1.0E+134217727#1",
+        53,
+        Nearest,
+        "1.5707963267948966",
+        "0x1.921fb54442d18#53",
+        Less,
+    );
+    test(
+        "0x1.0E+134217728#1",
+        53,
+        Nearest,
+        "1.5707963267948966",
+        "0x1.921fb54442d18#53",
+        Less,
+    );
+    test(
+        "0x1.0E+134217728#1",
+        53,
+        Floor,
+        "1.5707963267948966",
+        "0x1.921fb54442d18#53",
+        Less,
+    );
+    test(
+        "0x1.0E+134217728#1",
+        53,
+        Ceiling,
+        "1.5707963267948968",
+        "0x1.921fb54442d19#53",
+        Greater,
+    );
+    test(
+        "0x4.0E+268435455#1",
+        20,
+        Nearest,
+        "1.5707970",
+        "0x1.921fc#20",
+        Greater,
+    );
+    test(
+        "0x3.0E+134217728#2",
+        53,
+        Nearest,
+        "1.5707963267948966",
+        "0x1.921fb54442d18#53",
+        Less,
+    );
+    test(
+        "-0x4.0E+268435455#1",
+        20,
+        Nearest,
+        "1.5707970",
+        "0x1.921fc#20",
+        Greater,
+    );
+    test(
+        "-0x1.0E+134217728#1",
+        53,
+        Nearest,
+        "1.5707963267948966",
+        "0x1.921fb54442d18#53",
+        Less,
+    );
+}
+
+#[test]
+fn test_asec_with_period_huge() {
+    let test = |s_hex: &str,
+                u: u64,
+                prec: u64,
+                rm: RoundingMode,
+                out: &str,
+                out_hex: &str,
+                o_out: Ordering| {
+        let x = parse_hex_string(s_hex);
+        let (c, o) = x.asec_with_period_prec_round_ref(u, prec, rm);
+        assert!(c.is_valid());
+        assert_eq!(c.to_string(), out);
+        assert_eq!(to_hex_string(&c), out_hex);
+        assert_eq!(o, o_out);
+        let (c_alt, o_alt) = acosu_of_reciprocal_huge(&x, u, prec, rm);
+        assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+        assert_eq!(o_alt, o);
+    };
+    test(
+        "0x1.0E+134217728#1",
+        360,
+        53,
+        Nearest,
+        "90.000000000000000",
+        "0x5a.000000000000#53",
+        Greater,
+    );
+    test(
+        "0x1.0E+134217728#1",
+        1,
+        53,
+        Nearest,
+        "0.25000000000000000",
+        "0x0.40000000000000#53",
+        Greater,
+    );
+    test(
+        "0x1.0E+134217728#1",
+        1,
+        53,
+        Ceiling,
+        "0.25000000000000000",
+        "0x0.40000000000000#53",
+        Greater,
+    );
+    test(
+        "0x1.0E+134217728#1",
+        1,
+        53,
+        Floor,
+        "0.24999999999999997",
+        "0x0.3ffffffffffffe#53",
+        Less,
+    );
+    test(
+        "0x4.0E+268435455#1",
+        1,
+        20,
+        Nearest,
+        "0.25000000",
+        "0x0.400000#20",
+        Greater,
+    );
+    test(
+        "0x3.0E+134217728#2",
+        360,
+        53,
+        Nearest,
+        "90.000000000000000",
+        "0x5a.000000000000#53",
+        Greater,
+    );
+    test(
+        "-0x4.0E+268435455#1",
+        1,
+        20,
+        Nearest,
+        "0.25000000",
+        "0x0.400000#20",
+        Less,
+    );
+    test(
+        "-0x1.0E+134217728#1",
+        360,
+        53,
+        Nearest,
+        "90.000000000000000",
+        "0x5a.000000000000#53",
+        Less,
+    );
 }
 
 #[test]

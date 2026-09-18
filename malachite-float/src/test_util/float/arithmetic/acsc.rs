@@ -71,6 +71,14 @@ pub fn rug_acsc_with_period_prec_round(
     t.assign_round(x.recip_ref(), Round::Nearest);
     let mut a = rug::Float::with_val(u32::exact_from(prec), 0);
     let o = a.assign_round(t.asin_u_ref(u32::exact_from(u)), rm);
+    // MPFR 4.2.2's `mpfr_asinu` returns +0 for a zero period whatever the sign of its argument
+    // (here the reciprocal) -- asinu.c:69 reads "return 0 with sign of x" and then sets the sign
+    // positive -- although its zero-input case, like `mpfr_atanu`, keeps the sign so that the
+    // function stays odd. The sign is restored here, so that the oracle is the function the comment
+    // describes.
+    if u == 0 && t.is_sign_negative() && !t.is_zero() {
+        a = -a;
+    }
     (a, o)
 }
 

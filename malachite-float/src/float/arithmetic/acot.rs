@@ -9,18 +9,24 @@
 use crate::Float;
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::float::MAX_EXPONENT_I64;
-use crate::float::arithmetic::acsc::{reciprocal_is_tie, signed_half_pi};
-use crate::float::arithmetic::atan::atan_rational_helper;
+use crate::float::arithmetic::acsc::signed_half_pi;
+use crate::float::arithmetic::atan::{
+    arc_with_period_scale, atan_rational_helper, scaled_unsigned,
+};
+use crate::float::arithmetic::round_near_x::value_is_tie;
+use crate::float::arithmetic::sin::SCALE;
 use crate::{emulate_float_to_float_fn, emulate_rational_to_float_fn};
 use core::cmp::Ordering::{self, Equal, Greater, Less};
-use malachite_base::num::arithmetic::traits::{Abs, Acot, AcotAssign, CeilingLogBase2, Reciprocal};
+use malachite_base::num::arithmetic::traits::{
+    Abs, Acot, AcotAssign, CeilingLogBase2, IsPowerOf2, NegAssign, Reciprocal,
+};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{NaN as NaNTrait, NegativeZero, Zero as ZeroTrait};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode::{self, Down, Exact, Floor, Nearest};
+use malachite_base::rounding_modes::RoundingMode::{self, Down, Exact, Floor, Nearest, Up};
 use malachite_nz::natural::arithmetic::float::round::float_can_round;
 use malachite_nz::platform::Limb;
 use malachite_q::Rational;
@@ -70,14 +76,19 @@ fn acot_from_huge_reciprocal(
 fn acot_abs_prec_round(x: &Float, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
     let exp_x = i64::from(x.get_exponent().unwrap());
     let xp = x.abs();
-    // An |x| so large that acot(x) = (1/x)(1 - 1/(3x^2) + ...) sits within 2^(-2^30) of 1/|x| --
-    // closer than any representable precision can resolve. The reciprocal alone decides the answer,
-    // and a Ziv loop would be ruinous: for a power of two, it would balloon toward 2 EXP(x) bits,
-    // billions of them, trying to see the difference.
-    if exp_x << 1 > MAX_EXPONENT_I64 {
+    // acot(x) = (1/x)(1 - 1/(3x^2) + ...), a relative correction below 2^(-2 EXP(x) - 1). Once that
+    // is below the distance from 1/|x| to the nearest midpoint of the target precision -- at least
+    // a relative 2^(-prec - p - 1) for a p-bit x -- the reciprocal alone decides the answer, bar
+    // the exactly-representable and tie cases handled below. A Ziv loop cannot settle those at all,
+    // `float_can_round` refusing an exactly representable result: for a power of two it would
+    // balloon toward 2 EXP(x) bits, billions of them, trying to see a difference it can never
+    // certify.
+    if exp_x << 1 > MAX_EXPONENT_I64
+        || exp_x << 1 > i64::exact_from(prec + x.get_prec().unwrap()) + 4
+    {
         let tie = rm == Nearest && {
             let (wide, o_wide) = xp.reciprocal_prec_ref(prec + 1);
-            reciprocal_is_tie(&wide, o_wide, prec)
+            value_is_tie(&wide, o_wide, prec)
         };
         let (t, o) = xp.reciprocal_prec_round(prec, rm);
         return acot_from_huge_reciprocal(t, o, tie, rm);
@@ -159,6 +170,56 @@ pub(crate) fn acot_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) ->
         }
     };
     if negative { (-t, o.reverse()) } else { (t, o) }
+}
+
+// Computes acot(x) u/(2 pi) for a finite nonzero `Float` x, rounded to precision `prec` with
+// rounding mode `rm`.
+//
+// The exact cases are the arctangent's, seen through the reciprocal: |x| = 1 gives an eighth of a
+// turn, where the arctangent has |x| = 1 too. The arccotangent is odd, so it carries the sign of x.
+fn acot_with_period_prec_round_normal_ref(
+    x: &Float,
+    u: u64,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    let positive = *x > 0u32;
+    let exp_x = i64::from(x.get_exponent().unwrap());
+    // |x| = 1: acotu(1, u) = u/8 and acotu(-1, u) = -u/8, both exact
+    if exp_x == 1 && x.significand_ref().unwrap().is_power_of_2() {
+        return scaled_unsigned(u, 3, positive, prec, rm);
+    }
+    // Nothing else can be rounded exactly
+    assert_ne!(rm, Exact, "Inexact acot_with_period");
+    // For 0 < x < 1, acot(x) = pi/2 - x r(x) with 0 < r(x) < 1, so acotu(x, u) = u/4 (1 - x s(x))
+    // with 0 < s(x) < 1, and the function is odd. Once EXP(x) <= -prec - 3 that correction is below
+    // an eighth of an ulp of u/4, so the result is the neighbour of u/4 on the side of zero, with
+    // the sign of x. Requiring EXP(x) <= -64 as well keeps the correction below the last bit of u
+    // when u/4 is inexact. Without this, a tiny x would send the Ziv loop below toward the
+    // precision of x itself, the quarter turn being exactly representable.
+    if exp_x <= -64 && exp_x <= -i64::exact_from(prec) - 3 {
+        let w = if prec <= 63 { 65 } else { prec + 2 };
+        // exact, since w >= 64
+        let mut t = Float::from_unsigned_prec_round(u, w, Exact).0;
+        t.decrement();
+        // the last bit of t is 1 and w exceeds the target precision, so t is not representable
+        // there, which pins the ternary value below
+        t >>= 2u32;
+        if !positive {
+            t.neg_assign();
+        }
+        return Float::from_float_prec_round(t, prec, rm);
+    }
+    arc_with_period_scale(
+        // scaling by a power of 2 is exact, and acot(x) u 2^SCALE stays far below the top of the
+        // range, since |acot x| <= pi/2 and u < 2^64. Rounding away from zero is what the
+        // arccotangent's large-x shortcut needs too, `Up` being its own reflection.
+        |w| x.acot_prec_round_ref(w, Up).0 << SCALE,
+        u,
+        positive,
+        prec,
+        rm,
+    )
 }
 
 impl Float {
@@ -690,6 +751,479 @@ impl Float {
     pub fn acot_rational_prec_ref(x: &Rational, prec: u64) -> (Self, Ordering) {
         Self::acot_rational_prec_round_ref(x, prec, Nearest)
     }
+    /// Computes $\operatorname{acot}(x)u/(2\pi)$, the arccotangent of a [`Float`] measured in
+    /// $u$ths of a turn, rounding the result to the specified precision and with the specified
+    /// rounding mode. The [`Float`] is taken by value. An [`Ordering`] is also returned, indicating
+    /// whether the rounded arccotangent is less than, equal to, or greater than the exact
+    /// arccotangent. Although `NaN`s are not comparable to any [`Float`], whenever this function
+    /// returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,u,p,m) = \operatorname{acot}(x)u/(2\pi)+\varepsilon.
+    /// $$
+    /// - If $x$ is NaN, infinite, or zero, if $u = 0$, or if $|x|$ is 1, $\varepsilon$ may be
+    ///   ignored or assumed to be 0.
+    /// - Otherwise, if $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2
+    ///   |\operatorname{acot}(x)u/(2\pi)|\rfloor-p+1}$.
+    /// - Otherwise, if $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |\operatorname{acot}(x)u/(2\pi)|\rfloor-p}$.
+    ///
+    /// If the output has a precision, it is `prec`.
+    ///
+    /// Special cases:
+    /// - $f(\text{NaN},u,p,m)=\text{NaN}$
+    /// - $f(\pm\infty,u,p,m)=\pm0.0$
+    /// - $f(x,0,p,m)=\pm0.0$, with the sign of $x$
+    /// - $f(\pm0.0,u,p,m)=\pm u/4$, a quarter turn: the two sides of the arccotangent's jump at
+    ///   zero, which a period makes exact
+    /// - $f(\pm1,u,p,m)=\pm u/8$, an eighth of a turn
+    ///
+    /// Those are the only exact cases -- the arccotangent's exact values are the arctangent's, seen
+    /// through the reciprocal -- and the turn fractions are exact only when $p$ is large enough to
+    /// hold them. This is the odd arccotangent, $\arctan(1/x)$; see [`Float::acot_prec_round`].
+    ///
+    /// The arccotangent is odd, so $f(-x,u,p,m)=-f(x,u,p,-m)$, with $-m$ the reflection of $m$ that
+    /// swaps `Floor` and `Ceiling`; a zero period gives a zero with the sign of $x$ for the same
+    /// reason.
+    ///
+    /// Underflow:
+    /// - If $0<|f(x,u,p,m)|<2^{-2^{30}}$, and $m$ is `Floor`, `Down`, or `Nearest` with the result
+    ///   at most $2^{-2^{30}-1}$ in magnitude, a zero of the result's sign is returned instead.
+    /// - Otherwise, if $0<|f(x,u,p,m)|<2^{-2^{30}}$, $\pm2^{-2^{30}}$ is returned instead, with the
+    ///   sign of the result.
+    ///
+    /// Overflow is not possible, since $|f(x,u,p,m)| \leq u/4 < 2^{62}$. Underflow, which the
+    /// arccotangent alone cannot reach, is possible here: $|\operatorname{acot}(x)|$ is about
+    /// $1/|x|$, which for the largest [`Float`]s is only twice the smallest positive one, so a
+    /// small $u$ carries the quotient below it.
+    ///
+    /// If you know you'll be using `Nearest`, consider using [`Float::acot_with_period_prec`]
+    /// instead. If you know that your target precision is the precision of the input, consider
+    /// using [`Float::acot_with_period_round`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n (\log n)^3 \log\log n + m \log m \log\log m)$
+    ///
+    /// $M(n, m) = O(n \log n + m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `self.significant_bits()`: the arccotangent is taken at a working precision of about $n$
+    /// bits and scaled by $u/(2\pi)$, which needs $\pi$ to that many bits, and both cost the first
+    /// term; the second is the reciprocal of an $m$-bit input. A large $x$ skips the arctangent,
+    /// its arccotangent being the reciprocal of $|x|$ to within the working precision.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{NegativeOne, One};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// // an input of 1 is an eighth of a turn, and one of -1 minus an eighth
+    /// let (c, o) = Float::ONE.acot_with_period_prec_round(360, 10, Exact);
+    /// assert_eq!(c.to_string(), "45.000");
+    /// assert_eq!(o, Equal);
+    ///
+    /// let (c, o) = Float::NEGATIVE_ONE.acot_with_period_prec_round(360, 10, Exact);
+    /// assert_eq!(c.to_string(), "-45.000");
+    /// assert_eq!(o, Equal);
+    ///
+    /// let (c, o) = Float::from(2.5).acot_with_period_prec_round(360, 10, Floor);
+    /// assert_eq!(c.to_string(), "21.781");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn acot_with_period_prec_round(
+        self,
+        u: u64,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        self.acot_with_period_prec_round_ref(u, prec, rm)
+    }
+
+    /// Computes $\operatorname{acot}(x)u/(2\pi)$, the arccotangent of a [`Float`] measured in
+    /// $u$ths of a turn, rounding the result to the specified precision and with the specified
+    /// rounding mode. The [`Float`] is taken by reference. An [`Ordering`] is also returned,
+    /// indicating whether the rounded arccotangent is less than, equal to, or greater than the
+    /// exact arccotangent. Although `NaN`s are not comparable to any [`Float`], whenever this
+    /// function returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`Float::acot_with_period_prec_round`] for the error bounds, the special and closed-form
+    /// cases, underflow, and the complexity; this function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = (&Float::from(2.5)).acot_with_period_prec_round_ref(360, 10, Ceiling);
+    /// assert_eq!(c.to_string(), "21.812");
+    /// assert_eq!(o, Greater);
+    /// ```
+    pub fn acot_with_period_prec_round_ref(
+        &self,
+        u: u64,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        match &self.0 {
+            NaN => (Self::NAN, Equal),
+            // acot(±infinity) = ±0, so acotu(±infinity, u) = ±0 for every u, zero included
+            Infinity { sign } => (
+                if *sign {
+                    Self::ZERO
+                } else {
+                    Self::NEGATIVE_ZERO
+                },
+                Equal,
+            ),
+            // acot(±0) = ±pi/2, so acotu(±0, u) = ±u/4, a quarter turn -- and ±0 when u is
+            // zero, as for every other input, which keeps the function odd
+            Zero { sign } => {
+                if u == 0 {
+                    (
+                        if *sign {
+                            Self::ZERO
+                        } else {
+                            Self::NEGATIVE_ZERO
+                        },
+                        Equal,
+                    )
+                } else {
+                    scaled_unsigned(u, 2, *sign, prec, rm)
+                }
+            }
+            Finite { sign, .. } => {
+                if u == 0 {
+                    // acotu(x, 0) = 0 with the sign of x, which agrees with the infinite case and
+                    // keeps the function odd
+                    (
+                        if *sign {
+                            Self::ZERO
+                        } else {
+                            Self::NEGATIVE_ZERO
+                        },
+                        Equal,
+                    )
+                } else {
+                    acot_with_period_prec_round_normal_ref(self, u, prec, rm)
+                }
+            }
+        }
+    }
+
+    /// Computes $\operatorname{acot}(x)u/(2\pi)$, the arccotangent of a [`Float`] measured in
+    /// $u$ths of a turn, rounding the result to the nearest value of the specified precision. The
+    /// [`Float`] is taken by value. An [`Ordering`] is also returned, indicating whether the
+    /// rounded arccotangent is less than, equal to, or greater than the exact arccotangent.
+    /// Although `NaN`s are not comparable to any [`Float`], whenever this function returns a `NaN`
+    /// it also returns `Equal`.
+    ///
+    /// If the arccotangent is equidistant from two [`Float`]s with the specified precision, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen.
+    ///
+    /// See [`Float::acot_with_period_prec_round`] for the error bounds, the special and closed-form
+    /// cases, underflow, and the complexity; this function behaves the same way.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::acot_with_period_prec_round`] instead.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::from(2.5).acot_with_period_prec(360, 10);
+    /// assert_eq!(c.to_string(), "21.812");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) = Float::from(2.5).acot_with_period_prec(360, 53);
+    /// assert_eq!(c.to_string(), "21.801409486351812");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn acot_with_period_prec(self, u: u64, prec: u64) -> (Self, Ordering) {
+        self.acot_with_period_prec_round(u, prec, Nearest)
+    }
+
+    /// Computes $\operatorname{acot}(x)u/(2\pi)$, the arccotangent of a [`Float`] measured in
+    /// $u$ths of a turn, rounding the result to the nearest value of the specified precision. The
+    /// [`Float`] is taken by reference. An [`Ordering`] is also returned, indicating whether the
+    /// rounded arccotangent is less than, equal to, or greater than the exact arccotangent.
+    /// Although `NaN`s are not comparable to any [`Float`], whenever this function returns a `NaN`
+    /// it also returns `Equal`.
+    ///
+    /// See [`Float::acot_with_period_prec`] and [`Float::acot_with_period_prec_round`]; this
+    /// function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = (&Float::from(2.5)).acot_with_period_prec_ref(360, 53);
+    /// assert_eq!(c.to_string(), "21.801409486351812");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn acot_with_period_prec_ref(&self, u: u64, prec: u64) -> (Self, Ordering) {
+        self.acot_with_period_prec_round_ref(u, prec, Nearest)
+    }
+
+    /// Computes $\operatorname{acot}(x)u/(2\pi)$, the arccotangent of a [`Float`] measured in
+    /// $u$ths of a turn, rounding the result with the specified rounding mode. The precision of the
+    /// output is the precision of the input. The [`Float`] is taken by value. An [`Ordering`] is
+    /// also returned, indicating whether the rounded arccotangent is less than, equal to, or
+    /// greater than the exact arccotangent. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`Float::acot_with_period_prec_round`] for the error bounds, the special and closed-form
+    /// cases, underflow, and the complexity; this function behaves the same way, with `prec` the
+    /// precision of the input.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the precision of
+    /// the input.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let x = Float::from_unsigned_prec(5u32, 100).0 >> 1u32;
+    /// let (c, o) = x.acot_with_period_round(360, Floor);
+    /// assert_eq!(c.to_string(), "21.801409486351811770244866086938");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn acot_with_period_round(self, u: u64, rm: RoundingMode) -> (Self, Ordering) {
+        let prec = self.significant_bits();
+        self.acot_with_period_prec_round(u, prec, rm)
+    }
+
+    /// Computes $\operatorname{acot}(x)u/(2\pi)$, the arccotangent of a [`Float`] measured in
+    /// $u$ths of a turn, rounding the result with the specified rounding mode. The precision of the
+    /// output is the precision of the input. The [`Float`] is taken by reference. An [`Ordering`]
+    /// is also returned, indicating whether the rounded arccotangent is less than, equal to, or
+    /// greater than the exact arccotangent. Although `NaN`s are not comparable to any [`Float`],
+    /// whenever this function returns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`Float::acot_with_period_round`] and [`Float::acot_with_period_prec_round`]; this
+    /// function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the precision of
+    /// the input.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let x = Float::from_unsigned_prec(5u32, 100).0 >> 1u32;
+    /// let (c, o) = (&x).acot_with_period_round_ref(360, Ceiling);
+    /// assert_eq!(c.to_string(), "21.801409486351811770244866086963");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn acot_with_period_round_ref(&self, u: u64, rm: RoundingMode) -> (Self, Ordering) {
+        self.acot_with_period_prec_round_ref(u, self.significant_bits(), rm)
+    }
+
+    /// Computes $\operatorname{acot}(x)u/(2\pi)$, the arccotangent of a [`Float`] measured in
+    /// $u$ths of a turn, rounding the result to the precision of the input and to the nearest
+    /// [`Float`]. The [`Float`] is taken by value.
+    ///
+    /// If the arccotangent is equidistant from two [`Float`]s with the precision of the input, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// See [`Float::acot_with_period_prec_round`] for the error bounds, the special and closed-form
+    /// cases, underflow, and the complexity; this function behaves the same way, with `prec` the
+    /// precision of the input and `Nearest` rounding.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::acot_with_period_round`] instead. If you want to specify an output precision,
+    /// consider using [`Float::acot_with_period_prec`]. If you want both of these things, consider
+    /// using [`Float::acot_with_period_prec_round`].
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// let x = Float::from_unsigned_prec(5u32, 100).0 >> 1u32;
+    /// assert_eq!(
+    ///     x.acot_with_period(360).to_string(),
+    ///     "21.801409486351811770244866086938"
+    /// );
+    /// ```
+    #[inline]
+    pub fn acot_with_period(self, u: u64) -> Self {
+        let prec = self.significant_bits();
+        self.acot_with_period_prec(u, prec).0
+    }
+
+    /// Computes $\operatorname{acot}(x)u/(2\pi)$, the arccotangent of a [`Float`] measured in
+    /// $u$ths of a turn, rounding the result to the precision of the input and to the nearest
+    /// [`Float`]. The [`Float`] is taken by reference.
+    ///
+    /// See [`Float::acot_with_period`] and [`Float::acot_with_period_prec_round`]; this function
+    /// behaves the same way.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// let x = Float::from_unsigned_prec(5u32, 100).0 >> 1u32;
+    /// assert_eq!(
+    ///     (&x).acot_with_period_ref(360).to_string(),
+    ///     "21.801409486351811770244866086938"
+    /// );
+    /// ```
+    #[inline]
+    pub fn acot_with_period_ref(&self, u: u64) -> Self {
+        self.acot_with_period_prec_ref(u, self.significant_bits()).0
+    }
+
+    /// Computes $\operatorname{acot}(x)u/(2\pi)$, the arccotangent of a [`Float`] measured in
+    /// $u$ths of a turn, in place, rounding the result to the specified precision and with the
+    /// specified rounding mode. An [`Ordering`] is returned, indicating whether the rounded
+    /// arccotangent is less than, equal to, or greater than the exact arccotangent. Although `NaN`s
+    /// are not comparable to any [`Float`], whenever this function assigns a `NaN` it also returns
+    /// `Equal`.
+    ///
+    /// See [`Float::acot_with_period_prec_round`] for the error bounds, the special and closed-form
+    /// cases, underflow, and the complexity; this function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from(2.5);
+    /// let o = x.acot_with_period_prec_round_assign(360, 10, Floor);
+    /// assert_eq!(x.to_string(), "21.781");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn acot_with_period_prec_round_assign(
+        &mut self,
+        u: u64,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> Ordering {
+        let (s, o) = self.acot_with_period_prec_round_ref(u, prec, rm);
+        *self = s;
+        o
+    }
+
+    /// Computes $\operatorname{acot}(x)u/(2\pi)$, the arccotangent of a [`Float`] measured in
+    /// $u$ths of a turn, in place, rounding the result to the nearest value of the specified
+    /// precision. An [`Ordering`] is returned, indicating whether the rounded arccotangent is less
+    /// than, equal to, or greater than the exact arccotangent. Although `NaN`s are not comparable
+    /// to any [`Float`], whenever this function assigns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`Float::acot_with_period_prec`] and [`Float::acot_with_period_prec_round`]; this
+    /// function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from(2.5);
+    /// let o = x.acot_with_period_prec_assign(360, 10);
+    /// assert_eq!(x.to_string(), "21.812");
+    /// assert_eq!(o, Greater);
+    /// ```
+    #[inline]
+    pub fn acot_with_period_prec_assign(&mut self, u: u64, prec: u64) -> Ordering {
+        self.acot_with_period_prec_round_assign(u, prec, Nearest)
+    }
+
+    /// Computes $\operatorname{acot}(x)u/(2\pi)$, the arccotangent of a [`Float`] measured in
+    /// $u$ths of a turn, in place, rounding the result with the specified rounding mode. The
+    /// precision of the output is the precision of the input. An [`Ordering`] is returned,
+    /// indicating whether the rounded arccotangent is less than, equal to, or greater than the
+    /// exact arccotangent. Although `NaN`s are not comparable to any [`Float`], whenever this
+    /// function assigns a `NaN` it also returns `Equal`.
+    ///
+    /// See [`Float::acot_with_period_round`] and [`Float::acot_with_period_prec_round`]; this
+    /// function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `rm` is `Exact` but the result cannot be represented exactly with the precision of
+    /// the input.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let mut x = Float::from_unsigned_prec(5u32, 100).0 >> 1u32;
+    /// let o = x.acot_with_period_round_assign(360, Floor);
+    /// assert_eq!(x.to_string(), "21.801409486351811770244866086938");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn acot_with_period_round_assign(&mut self, u: u64, rm: RoundingMode) -> Ordering {
+        self.acot_with_period_prec_round_assign(u, self.significant_bits(), rm)
+    }
+
+    /// Computes $\operatorname{acot}(x)u/(2\pi)$, the arccotangent of a [`Float`] measured in
+    /// $u$ths of a turn, in place, rounding the result to the precision of the input and to the
+    /// nearest [`Float`].
+    ///
+    /// If the arccotangent is equidistant from two [`Float`]s with the precision of the input, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen. See [`RoundingMode`] for a
+    /// description of the `Nearest` rounding mode.
+    ///
+    /// See [`Float::acot_with_period`] and [`Float::acot_with_period_prec_round`]; this function
+    /// behaves the same way.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    ///
+    /// let mut x = Float::from_unsigned_prec(5u32, 100).0 >> 1u32;
+    /// x.acot_with_period_assign(360);
+    /// assert_eq!(x.to_string(), "21.801409486351811770244866086938");
+    /// ```
+    #[inline]
+    pub fn acot_with_period_assign(&mut self, u: u64) {
+        let prec = self.significant_bits();
+        self.acot_with_period_prec_assign(u, prec);
+    }
 }
 
 impl Acot for Float {
@@ -930,4 +1464,61 @@ where
     for<'a> T: ExactFrom<&'a Float>,
 {
     emulate_rational_to_float_fn(Float::acot_rational_prec_ref, x)
+}
+
+/// Computes $\operatorname{acot}(x)u/(2\pi)$, the arccotangent of a primitive float measured in
+/// $u$ths of a turn (so that `u = 360` gives degrees), returning the result as a primitive float.
+///
+/// This is `primitive_float_acot` scaled by $u/(2\pi)$: see [`Float::acot_with_period_prec_round`]
+/// for the error bounds and the special cases. NaN gives NaN; $\pm\infty$ give $\pm0.0$; a zero
+/// period gives a zero with the sign of $x$; $\pm0.0$ give $\pm u/4$, a quarter turn; and $\pm1$
+/// give $\pm u/8$, an eighth. This is the odd arccotangent, $\arctan(1/x)$.
+///
+/// Overflow is not possible, since $|f(x,u)| \leq u/4 < 2^{62}$. The result is subnormal, or zero,
+/// only when $u$ is small and $|x|$ is large enough to put $u/(2\pi|x|)$ below the bottom of the
+/// type's normal range.
+///
+/// # Worst-case complexity
+/// $T(m) = O(m \log m \log\log m)$
+///
+/// $M(m) = O(m \log m)$
+///
+/// where $T$ is time, $M$ is additional memory, and $m$ is `x.significant_bits()`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::acot::primitive_float_acot_with_period;
+///
+/// assert!(primitive_float_acot_with_period(f32::NAN, 360).is_nan());
+/// assert_eq!(
+///     NiceFloat(primitive_float_acot_with_period(f32::INFINITY, 360)),
+///     NiceFloat(0.0)
+/// );
+/// // a zero is a quarter turn, an input of 1 an eighth, and one of -1 minus an eighth
+/// assert_eq!(
+///     NiceFloat(primitive_float_acot_with_period(0.0f32, 360)),
+///     NiceFloat(90.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_acot_with_period(1.0f32, 360)),
+///     NiceFloat(45.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_acot_with_period(-1.0f32, 360)),
+///     NiceFloat(-45.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_acot_with_period(2.5f64, 360)),
+///     NiceFloat(21.80140948635181)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_acot_with_period<T: PrimitiveFloat>(x: T, u: u64) -> T
+where
+    Float: From<T> + PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
+{
+    emulate_float_to_float_fn(|x, prec| Float::acot_with_period_prec(x, u, prec), x)
 }

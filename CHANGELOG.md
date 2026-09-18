@@ -604,6 +604,15 @@ documented by git history.
   below 1 the subtraction from $\pi/2$ is used. A `Rational` zero has no sign, so it gives $\pi/2$,
   the side the positive inputs approach. `primitive_float_acot_rational` gives the correctly rounded
   `f32` or `f64` arccotangent of a `Rational`.
+- `acot_with_period_prec_round`, `acot_with_period_prec`, `acot_with_period_round`, and
+  `acot_with_period` (with `_ref` and `_assign` variants), the arccotangent measured in $u$ths of a
+  turn, so that $u = 360$ gives degrees. Its exact cases are the arctangent's, seen through the
+  reciprocal: NaN gives NaN; $\pm\infty$ give $\pm0.0$ for every period; a zero period gives a zero
+  with the sign of $x$, the function being odd; $\pm0.0$ give $\pm u/4$, a quarter turn -- the two
+  sides of the arccotangent's jump, which a period makes exact; and $\pm1$ give $\pm u/8$, an
+  eighth. As for the arccosecant, this can underflow: for the largest `Float`s $1/|x|$ is only about
+  twice the smallest positive one, and a small $u$ carries the quotient below it.
+  `primitive_float_acot_with_period` gives the correctly rounded `f32` or `f64` angle.
 - `Cot` and `CotAssign` (new traits in malachite-base) for `Float`, with the usual
   `cot_prec_round`, `cot_prec`, `cot_round`, and `_ref`/`_assign` variants: a port of `mpfr_cot`,
   MPFR's generic reciprocal template with the tangent. MPFR's tangent is itself a quotient of a

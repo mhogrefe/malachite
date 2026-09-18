@@ -550,8 +550,8 @@ pub(crate) fn scaled_unsigned(
 //
 // This is mpfr_atanu from atanu.c, MPFR 4.2.2. The quotient is formed with the numerator scaled up
 // by 2^SCALE, since atan(x) u/(2 pi) can fall below the smallest positive `Float` for a tiny x and
-// a small u, which MPFR's wider exponent range never sees; a result below it is then decided by the
-// rounding mode alone, as in `sin_with_period`.
+// a small u, which MPFR, computing inside a temporarily extended exponent range, never sees; a
+// result below it is then decided by the rounding mode alone, as in `sin_with_period`.
 fn atan_with_period_prec_round_normal_ref(
     x: &Float,
     u: u64,
@@ -598,10 +598,10 @@ fn atan_with_period_prec_round_normal_ref(
 // the `Float` and `Rational` arctangents and by the arcsine, whose error analyses agree.
 //
 // The numerator is scaled up by 2^SCALE throughout, since f(x) u/(2 pi) can fall below the smallest
-// positive `Float` for a tiny x and a small u, which MPFR's wider exponent range never sees; a
-// result below it is then decided by the rounding mode alone, as in `sin_with_period`. Scaling
-// before the multiplication rather than after also lets a `Rational` x too small to be a `Float` at
-// all reach the loop, which is why the shift belongs to the caller.
+// positive `Float` for a tiny x and a small u, which MPFR, computing inside a temporarily extended
+// exponent range, never sees; a result below it is then decided by the rounding mode alone, as in
+// `sin_with_period`. Scaling before the multiplication rather than after also lets a `Rational` x
+// too small to be a `Float` at all reach the loop, which is why the shift belongs to the caller.
 pub(crate) fn arc_with_period_scale<F: FnMut(u64) -> Float>(
     mut scaled_f: F,
     u: u64,

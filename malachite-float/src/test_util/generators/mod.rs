@@ -6588,3 +6588,33 @@ pub fn rational_unsigned_rounding_mode_triple_gen_var_14() -> GT3 {
         &special_random_rational_unsigned_rounding_mode_triple_gen_var_14,
     )
 }
+
+// All `(Float, u64, u64, RoundingMode)` that are valid inputs to
+// `Float::acot_with_period_prec_round`.
+pub fn float_unsigned_unsigned_rounding_mode_quadruple_gen_var_29()
+-> Generator<(Float, u64, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_29,
+        &random_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_29,
+        &special_random_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_29,
+    )
+}
+
+// As `..._var_29`, but the `Float` may have an extreme exponent.
+pub fn float_unsigned_unsigned_rounding_mode_quadruple_gen_var_30()
+-> Generator<(Float, u64, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_30,
+        &random_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_30,
+        &special_random_float_unsigned_unsigned_rounding_mode_quadruple_gen_var_30,
+    )
+}
+
+// All `(Float, u64, RoundingMode)` that are valid inputs to `Float::acot_with_period_round`.
+pub fn float_unsigned_rounding_mode_triple_gen_var_53() -> Generator<(Float, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_float_unsigned_rounding_mode_triple_gen_var_53,
+        &random_float_unsigned_rounding_mode_triple_gen_var_53,
+        &special_random_float_unsigned_rounding_mode_triple_gen_var_53,
+    )
+}

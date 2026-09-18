@@ -1732,6 +1732,93 @@ fn test_asin_rational_prec_round() {
     test("123456789/1000000000", 2, Floor, "0.094", "0x0.18#2", Less);
 }
 
+// A `Rational` far below the target precision but above the bottom of the exponent range. There
+// asin(x) is x plus a correction beneath the last bit of the result, and `asin_rational_helper`
+// answers from x's own rounding, nudged up: forming x^2/(1 - x^2) instead, as the general path
+// does, would build a dense `Rational` of about 2 |EXP(x)| bits -- 134 MB for the first rows here,
+// and 22 minutes a call before this branch existed. Where x is dyadic it is exactly a `Float`, so
+// the `Float` arcsine, whose own small-input shortcut is independent code, must agree.
+#[test]
+fn test_asin_rational_tiny() {
+    let test =
+        |x: Rational, prec: u64, rm: RoundingMode, out: &str, out_hex: &str, o_out: Ordering| {
+            let (c, o) = Float::asin_rational_prec_round_ref(&x, prec, rm);
+            assert!(c.is_valid());
+            assert_eq!(c.to_string(), out);
+            assert_eq!(to_hex_string(&c), out_hex);
+            assert_eq!(o, o_out);
+            if let Ok(f) = Float::try_from(&x) {
+                let (c_alt, o_alt) = f.asin_prec_round(prec, rm);
+                assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+                assert_eq!(o_alt, o);
+            }
+        };
+    test(
+        Rational::power_of_2(-536870908i64),
+        53,
+        Nearest,
+        "7.8098438886530598e-161614248",
+        "0x1.0000000000000E-134217727#53",
+        Less,
+    );
+    test(
+        Rational::power_of_2(-536870908i64),
+        53,
+        Floor,
+        "7.8098438886530598e-161614248",
+        "0x1.0000000000000E-134217727#53",
+        Less,
+    );
+    test(
+        Rational::power_of_2(-536870908i64),
+        53,
+        Ceiling,
+        "7.8098438886530616e-161614248",
+        "0x1.0000000000001E-134217727#53",
+        Greater,
+    );
+    test(
+        -Rational::power_of_2(-536870908i64),
+        53,
+        Nearest,
+        "-7.8098438886530598e-161614248",
+        "-0x1.0000000000000E-134217727#53",
+        Greater,
+    );
+    test(
+        Rational::power_of_2(-100000000i64),
+        53,
+        Nearest,
+        "2.7139502389176927e-30103000",
+        "0x1.0000000000000E-25000000#53",
+        Less,
+    );
+    test(
+        Rational::power_of_2(-536870912i64) / Rational::from(3u32),
+        53,
+        Nearest,
+        "1.6270508101360540e-161614249",
+        "0x5.5555555555554E-134217729#53",
+        Less,
+    );
+    test(
+        Rational::power_of_2(-1000i64),
+        10,
+        Nearest,
+        "9.3326e-302",
+        "0x1.000E-250#10",
+        Less,
+    );
+    test(
+        Rational::power_of_2(-1000i64),
+        10,
+        Up,
+        "9.3509e-302",
+        "0x1.008E-250#10",
+        Greater,
+    );
+}
+
 #[test]
 #[should_panic]
 fn asin_rational_prec_round_fail_1() {
@@ -1882,13 +1969,6 @@ fn primitive_float_asin_rational_properties() {
     apply_fn_to_primitive_floats!(primitive_float_asin_rational_properties_helper);
 }
 
-// Whether MPFR and Malachite are expected to disagree on `asinu(x, u)`. For a zero period MPFR
-// returns +0 even for a negative x, although its own zero-input case keeps the sign so that the
-// function stays odd; Malachite keeps the sign in both cases, as `mpfr_atanu` does.
-fn mpfr_signed_zero_divergence(x: &Float, u: u64) -> bool {
-    u == 0 && *x < 0u32 && x.le_abs(&1u32)
-}
-
 #[test]
 fn test_asin_with_period_prec_round() {
     let test = |s: &str,
@@ -1927,7 +2007,6 @@ fn test_asin_with_period_prec_round() {
 
         if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm)
             && u <= u64::from(u32::MAX)
-            && !mpfr_signed_zero_divergence(&x, u)
         {
             let (rug_t, rug_o) =
                 rug_asin_with_period_prec_round(&rug::Float::exact_from(&x), u, prec, rug_rm);
@@ -2312,8 +2391,9 @@ fn asin_with_period_round_fail() {
 }
 
 // A tiny input with a small period, where the result is about xu/(2 pi) and falls below the
-// smallest positive `Float`. MPFR's wider exponent range never reaches this, so the quotient is
-// formed with the numerator scaled up and the underflow decided by the rounding mode alone.
+// smallest positive `Float`. MPFR computes inside a temporarily extended exponent range and only
+// clamps its output, so its own code never sees this underflow; here the quotient is formed with
+// the numerator scaled up and the underflow decided by the rounding mode alone.
 #[test]
 fn test_asin_with_period_underflow() {
     let min_positive = Float::min_positive_value_prec(10);
@@ -2378,7 +2458,6 @@ fn asin_with_period_prec_round_properties_helper(x: Float, u: u64, prec: u64, rm
 
     if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm)
         && u <= u64::from(u32::MAX)
-        && !mpfr_signed_zero_divergence(&x, u)
     {
         let (rug_t, rug_o) =
             rug_asin_with_period_prec_round(&rug::Float::exact_from(&x), u, prec, rug_rm);
@@ -2656,11 +2735,6 @@ fn primitive_float_asin_with_period_properties() {
     apply_fn_to_primitive_floats!(primitive_float_asin_with_period_properties_helper);
 }
 
-// As `mpfr_signed_zero_divergence`, for a `Rational` input.
-fn mpfr_rational_signed_zero_divergence(x: &Rational, u: u64) -> bool {
-    u == 0 && *x < 0u32 && x.le_abs(&1u32)
-}
-
 #[test]
 fn test_asin_with_period_rational_prec_round() {
     let test = |s: &str,
@@ -2694,7 +2768,6 @@ fn test_asin_with_period_rational_prec_round() {
 
         if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm)
             && u <= u64::from(u32::MAX)
-            && !mpfr_rational_signed_zero_divergence(&x, u)
         {
             let (rug_t, rug_o) = rug_asin_with_period_rational_prec_round(&x, u, prec, rug_rm);
             assert_eq!(
@@ -2966,7 +3039,6 @@ fn asin_with_period_rational_prec_round_properties_helper(
 
     if let Ok(rug_rm) = rug_round_try_from_rounding_mode(rm)
         && u <= u64::from(u32::MAX)
-        && !mpfr_rational_signed_zero_divergence(&x, u)
     {
         let (rug_t, rug_o) = rug_asin_with_period_rational_prec_round(&x, u, prec, rug_rm);
         assert_eq!(
