@@ -1,4 +1,4 @@
-<img width="500" src="docs/assets/logo-and-name.svg" alt="Logo">
+<img width="500" src="https://github.com/mhogrefe/malachite/raw/HEAD/docs/assets/logo-and-name.svg" alt="Logo">
 
 An arbitrary-precision arithmetic library for Rust.
 
