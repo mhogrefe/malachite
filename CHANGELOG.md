@@ -620,6 +620,15 @@ documented by git history.
   eighth. Those are the only exact cases. As for the arccosecant, this can underflow, and a
   `Rational` has no exponent bound, so a large enough $|x|$ reaches that at any $u$.
   `primitive_float_acot_with_period_rational` gives the correctly rounded `f32` or `f64` angle.
+- `acot_pi_prec_round`, `acot_pi_prec`, `acot_pi_round`, and `acot_pi` (with `_ref` and `_assign`
+  variants), the arccotangent measured in half-turns, along with `acot_pi_rational_prec_round` and
+  `acot_pi_rational_prec` (with `_ref` variants) and the two `primitive_float_acot_pi[_rational]`
+  functions. This is `acot_with_period` with a period of 2: NaN gives NaN, either infinity gives a
+  zero of its sign, $\pm0.0$ give $\pm1/2$, and $\pm1$ give $\pm1/4$. Those are the only exact
+  cases, and unlike the arcsecant's and arccosecant's half-turns none is lost, a half and a quarter
+  each needing only one bit. Overflow is not possible, since $|\operatorname{acot}(x)/\pi| \leq
+  1/2$; underflow is, for an $|x|$ large enough that $1/(\pi|x|)$ falls below the smallest positive
+  `Float`.
 - `Cot` and `CotAssign` (new traits in malachite-base) for `Float`, with the usual
   `cot_prec_round`, `cot_prec`, `cot_round`, and `_ref`/`_assign` variants: a port of `mpfr_cot`,
   MPFR's generic reciprocal template with the tangent. MPFR's tangent is itself a quotient of a
