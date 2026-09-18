@@ -174,6 +174,12 @@ crate_test_fn! {float_round_near_x(
     Some((y, o))
 }}
 
+// The lowest input exponent at which a leading-term shortcut built on `round_from_below` or
+// `round_from_above` is safe. Below it the `prec + 1`-bit tie test and the nudge would be working
+// with `Float`s that underflow -- or, for a reciprocal, overflow -- so such inputs are left to the
+// exact paths that follow.
+pub(crate) const LEADING_TERM_MIN_EXPONENT: i64 = Float::MIN_EXPONENT_I64 + 4;
+
 // Whether `wide`, an exact value rounded to `prec + 1` bits, is exactly halfway between two
 // `prec`-bit `Float`s, which `Nearest` would otherwise break on its own. `o_wide` is the ternary of
 // that rounding, so `wide` holds the value itself only when it is `Equal`.
@@ -189,7 +195,36 @@ pub(crate) fn value_is_tie(wide: &Float, o_wide: Ordering, prec: u64) -> bool {
 // both of which have to move up, the true value being strictly above.
 //
 // Callers working on |x| for an odd function pass the reflected rounding mode, so "up" there means
-// away from zero.
+// away from zero. The counterpart of `round_from_below` for a function whose true value lies
+// strictly BELOW its leading term: the two exceptional cases move down instead.
+pub(crate) fn round_from_above(
+    t: Float,
+    o: Ordering,
+    tie: bool,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    if o == Equal {
+        return if rm == Floor || rm == Down {
+            let mut t = t;
+            t.decrement();
+            (t, Less)
+        } else {
+            (t, Greater)
+        };
+    }
+    if tie {
+        // `Nearest` broke the tie its own way; the true value is below it, so the lower neighbour
+        // wins
+        if o == Less {
+            return (t, Less);
+        }
+        let mut t = t;
+        t.decrement();
+        return (t, Less);
+    }
+    (t, o)
+}
+
 pub(crate) fn round_from_below(
     t: Float,
     o: Ordering,

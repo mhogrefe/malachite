@@ -4373,6 +4373,85 @@ fn test_tan_rational_prec_round() {
     );
 }
 
+// A `Rational` far below the target precision but above the bottom of the exponent range, where
+// tan(x) = x + x^3/3 + ..., a correction beneath the last bit of the result: `tan_rational_helper`
+// answers from x's own rounding, nudged away from zero, instead of forming the series bracket
+// exactly -- for these inputs a dense `Rational` of hundreds of millions of bits, 26 seconds a call
+// before that branch existed. Where x is dyadic it is exactly a `Float`, so the `Float` tangent,
+// reached through independent code, must agree.
+#[test]
+fn test_tan_rational_tiny() {
+    let test =
+        |x: Rational, prec: u64, rm: RoundingMode, out: &str, out_hex: &str, o_out: Ordering| {
+            let (c, o) = Float::tan_rational_prec_round_ref(&x, prec, rm);
+            assert!(c.is_valid());
+            assert_eq!(c.to_string(), out);
+            assert_eq!(to_hex_string(&c), out_hex);
+            assert_eq!(o, o_out);
+            if let Ok(f) = Float::try_from(&x) {
+                let (c_alt, o_alt) = f.tan_prec_round(prec, rm);
+                assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+                assert_eq!(o_alt, o);
+            }
+        };
+    test(
+        Rational::power_of_2(-536870908i64),
+        53,
+        Nearest,
+        "7.8098438886530598e-161614248",
+        "0x1.0000000000000E-134217727#53",
+        Less,
+    );
+    test(
+        Rational::power_of_2(-536870908i64),
+        53,
+        Floor,
+        "7.8098438886530598e-161614248",
+        "0x1.0000000000000E-134217727#53",
+        Less,
+    );
+    test(
+        Rational::power_of_2(-536870908i64),
+        53,
+        Ceiling,
+        "7.8098438886530616e-161614248",
+        "0x1.0000000000001E-134217727#53",
+        Greater,
+    );
+    test(
+        -Rational::power_of_2(-536870908i64),
+        53,
+        Nearest,
+        "-7.8098438886530598e-161614248",
+        "-0x1.0000000000000E-134217727#53",
+        Greater,
+    );
+    test(
+        Rational::power_of_2(-536870912i64) / Rational::from(3u32),
+        53,
+        Nearest,
+        "1.6270508101360540e-161614249",
+        "0x5.5555555555554E-134217729#53",
+        Less,
+    );
+    test(
+        Rational::power_of_2(-1000i64),
+        10,
+        Nearest,
+        "9.3326e-302",
+        "0x1.000E-250#10",
+        Less,
+    );
+    test(
+        Rational::power_of_2(-1000i64),
+        10,
+        Up,
+        "9.3509e-302",
+        "0x1.008E-250#10",
+        Greater,
+    );
+}
+
 // Inputs of magnitude around 2^(-2^30) or less, whose tangents underflow: they take the tiny
 // bracket, where everything is `Rational` arithmetic, so no 2^30-bit `Float` is ever formed. The
 // cube and fifth power of such an input have denominators three and five times its own, which makes

@@ -24,7 +24,9 @@ use crate::float::arithmetic::cos::{
     reduce_huge, round_bracket, signed_constant, sin_bound, trig_near_zero_bracket,
     trig_rational_near_zero_bracket, trig_turns_near_zero_bracket,
 };
-use crate::float::arithmetic::round_near_x::float_round_near_x;
+use crate::float::arithmetic::round_near_x::{
+    LEADING_TERM_MIN_EXPONENT, float_round_near_x, round_from_below, value_is_tie,
+};
 use crate::float::arithmetic::sin::{SCALE, SCALED_INPUT_EXPONENT, scaled_underflow};
 use crate::float::arithmetic::sin_cos::{
     sin_cos_rational_helper, sin_cos_turns_helper, sin_cos_with_period_prec_round_normal_ref,
@@ -985,6 +987,26 @@ impl Float {
 pub(crate) fn tan_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
     assert_ne!(rm, Exact, "Inexact tan");
     let exp_x = x.floor_log_base_2_abs() + 1; // the MPFR-style exponent of x
+    // tan(x) = x(1 + x^2/3 + ...), so |x| falls short of |tan x| by less than 2^(3 EXP(x) - 1).
+    // Once that is below the distance from x to the nearest (prec + 1)-bit dyadic -- at least
+    // 2^(EXP(x) - prec - 1)/d for a denominator of d, the two coinciding only when x is itself such
+    // a dyadic, the exact and tie cases -- x's own rounding is the answer, nudged away from zero.
+    // The bracket below would say the same, but forming it exactly builds a dense `Rational` of
+    // about 2 |EXP(x)| bits: 26 seconds for x = 2^-536870908. Inputs at the bottom of the exponent
+    // range are left to the bracket below: there the nudge and the tie test would be working with
+    // `Float`s that underflow.
+    if exp_x > LEADING_TERM_MIN_EXPONENT
+        && -(exp_x << 1) > i64::exact_from(prec + x.denominator_ref().significant_bits()) + 4
+    {
+        let positive = *x > 0u32;
+        let ax = x.abs();
+        let rm_abs = if positive { rm } else { -rm };
+        let (wide, o_wide) = Float::from_rational_prec_ref(&ax, prec + 1);
+        let tie = rm_abs == Nearest && value_is_tie(&wide, o_wide, prec);
+        let (t, o) = Float::from_rational_prec_round(ax, prec, rm_abs);
+        let (t, o) = round_from_below(t, o, tie, rm_abs);
+        return if positive { (t, o) } else { (-t, o.reverse()) };
+    }
     // For |x| <= 1/2, |x| + |x|^3/3 <= |tan x| <= |x| + |x|^3/3 + |x|^5 (the remaining terms of the
     // series sum to less than |x|^5 there), a bracket of relative width below x^4, which decides
     // the rounding once x^4 is below 2^-(prec + 3), unless the tangent lies within that of a

@@ -21,15 +21,15 @@
 
 use crate::InnerFloat::{Finite, Infinity, NaN, Zero};
 use crate::float::arithmetic::cos::{
-    cos_rational_helper, cos_turns_helper, phi_minus_1_prec_round, round_bracket, signed_constant,
+    cos_rational_helper, cos_turns_helper, phi_minus_1_prec_round, signed_constant,
 };
-use crate::float::arithmetic::round_near_x::float_round_near_x;
+use crate::float::arithmetic::round_near_x::{float_round_near_x, round_from_below};
 use crate::float::arithmetic::tan::{MAX_SETTLED_EXPONENT, round_bracket_signed_by};
 use crate::{Float, emulate_float_to_float_fn, emulate_rational_to_float_fn};
 use core::cmp::Ordering::{self, Equal, Greater, Less};
 use core::cmp::{max, min};
 use malachite_base::num::arithmetic::traits::{
-    Abs, CeilingLogBase2, Mod, PowerOf2, Reciprocal, Sec, SecAssign, Square,
+    Abs, CeilingLogBase2, Mod, PowerOf2, Reciprocal, Sec, SecAssign,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -136,15 +136,14 @@ pub(crate) fn sec_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> 
     assert_ne!(rm, Exact, "Inexact sec");
     let exp_x = x.floor_log_base_2_abs() + 1; // the MPFR-style exponent of x
     // sec(x) = 1 + x^2/2 + 5x^4/24 + ..., with every term positive, and for |x| <= 1/2 the terms
-    // past x^2/2 sum to less than x^4, so [1 + x^2/2, 1 + x^2/2 + x^4] brackets the secant.
+    // past x^2/2 sum to less than x^4, so [1 + x^2/2, 1 + x^2/2 + x^4] brackets the secant. x^2 <
+    // 2^(-prec - 1) here, so the secant lies strictly between 1 and 1 + 2^(-prec - 1), short of the
+    // next `Float` above 1 and of the midpoint below it: the answer is 1 itself, nudged up by the
+    // rounding mode. Forming the bracket [1 + x^2/2, 1 + x^2/2 + x^4] exactly would say the same,
+    // at the cost of a dense `Rational` of about 2 |EXP(x)| bits -- 14 seconds for x =
+    // 2^-536870908.
     if -(exp_x << 1) > i64::exact_from(prec) + 1 {
-        let x2 = x.square();
-        let lo = Rational::ONE + (&x2 >> 1u32);
-        let hi = &lo + x2.square();
-        // x^2 < 2^(-prec - 1) here, so the whole bracket lies between 1 and 1 + 2^(-prec - 1),
-        // short of the next `Float` above 1 and of the midpoint below it: every rounding mode sends
-        // both ends to the same place, and `round_bracket` always succeeds.
-        return round_bracket(&lo, &hi, prec, rm).unwrap();
+        return round_from_below(Float::one_prec(prec), Equal, false, rm);
     }
     let mut m = prec + prec.ceiling_log_base_2() + 3;
     let mut increment = Limb::WIDTH;

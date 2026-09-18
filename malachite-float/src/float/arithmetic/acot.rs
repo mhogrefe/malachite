@@ -13,7 +13,7 @@ use crate::float::arithmetic::acsc::signed_half_pi;
 use crate::float::arithmetic::atan::{
     arc_with_period_scale, atan_rational_helper, scaled_unsigned,
 };
-use crate::float::arithmetic::round_near_x::value_is_tie;
+use crate::float::arithmetic::round_near_x::{round_from_above, value_is_tie};
 use crate::float::arithmetic::sin::SCALE;
 use crate::{emulate_float_to_float_fn, emulate_rational_to_float_fn};
 use core::cmp::Ordering::{self, Equal, Greater, Less};
@@ -26,43 +26,10 @@ use malachite_base::num::basic::traits::{NaN as NaNTrait, NegativeZero, Zero as 
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base::rounding_modes::RoundingMode::{self, Down, Exact, Floor, Nearest, Up};
+use malachite_base::rounding_modes::RoundingMode::{self, Exact, Nearest, Up};
 use malachite_nz::natural::arithmetic::float::round::float_can_round;
 use malachite_nz::platform::Limb;
 use malachite_q::Rational;
-
-// Turns the correctly rounded 1/|x| into the correctly rounded acot(|x|), for an |x| so large that
-// 1/|x| is below 2^(1 - 2^29). There acot(x), which falls short of 1/|x| by a factor below 1 -
-// 2^(-2^30), is nearer to it than any representable precision can resolve: the reciprocal's own
-// rounding is the answer. The two exceptions are a reciprocal that lands exactly on a representable
-// value and one that lands exactly on a tie, both of which have to move down, acot(x) being
-// strictly below 1/|x|.
-fn acot_from_huge_reciprocal(
-    t: Float,
-    o: Ordering,
-    tie: bool,
-    rm: RoundingMode,
-) -> (Float, Ordering) {
-    if o == Equal {
-        return if rm == Floor || rm == Down {
-            let mut t = t;
-            t.decrement();
-            (t, Less)
-        } else {
-            (t, Greater)
-        };
-    }
-    if tie {
-        // `Nearest` broke the tie its own way; acot(x) is below it, so the lower neighbour wins
-        let mut t = t;
-        if o == Less {
-            return (t, Less);
-        }
-        t.decrement();
-        return (t, Less);
-    }
-    (t, o)
-}
 
 // Computes acot(|x|) for a finite `Float` x with |x| neither 0 nor 1, rounded to precision `prec`
 // with rounding mode `rm`. The caller restores the sign, the arccotangent being odd.
@@ -91,7 +58,7 @@ fn acot_abs_prec_round(x: &Float, prec: u64, rm: RoundingMode) -> (Float, Orderi
             value_is_tie(&wide, o_wide, prec)
         };
         let (t, o) = xp.reciprocal_prec_round(prec, rm);
-        return acot_from_huge_reciprocal(t, o, tie, rm);
+        return round_from_above(t, o, tie, rm);
     }
     // |x| > 1 exactly when the exponent is positive, |x| = 1 having been handled by the caller
     let big = exp_x >= 1;

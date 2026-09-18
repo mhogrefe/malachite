@@ -2945,6 +2945,85 @@ fn test_sec_rational_prec_round() {
     );
 }
 
+// A `Rational` far below the target precision but above the bottom of the exponent range, where
+// sec(x) = 1 + x^2/2 + ..., a correction beneath the last bit of the result: `sec_rational_helper`
+// answers 1 itself, nudged up, instead of forming the bracket [1 + x^2/2, 1 + x^2/2 + x^4] exactly
+// -- for these inputs a dense `Rational` of hundreds of millions of bits, 14 seconds a call before
+// that branch existed. Where x is dyadic it is exactly a `Float`, so the `Float` secant, reached
+// through independent code, must agree.
+#[test]
+fn test_sec_rational_tiny() {
+    let test =
+        |x: Rational, prec: u64, rm: RoundingMode, out: &str, out_hex: &str, o_out: Ordering| {
+            let (c, o) = Float::sec_rational_prec_round_ref(&x, prec, rm);
+            assert!(c.is_valid());
+            assert_eq!(c.to_string(), out);
+            assert_eq!(to_hex_string(&c), out_hex);
+            assert_eq!(o, o_out);
+            if let Ok(f) = Float::try_from(&x) {
+                let (c_alt, o_alt) = f.sec_prec_round(prec, rm);
+                assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+                assert_eq!(o_alt, o);
+            }
+        };
+    test(
+        Rational::power_of_2(-536870908i64),
+        53,
+        Nearest,
+        "1.0000000000000000",
+        "0x1.0000000000000#53",
+        Less,
+    );
+    test(
+        Rational::power_of_2(-536870908i64),
+        53,
+        Floor,
+        "1.0000000000000000",
+        "0x1.0000000000000#53",
+        Less,
+    );
+    test(
+        Rational::power_of_2(-536870908i64),
+        53,
+        Ceiling,
+        "1.0000000000000002",
+        "0x1.0000000000001#53",
+        Greater,
+    );
+    test(
+        -Rational::power_of_2(-536870908i64),
+        53,
+        Nearest,
+        "1.0000000000000000",
+        "0x1.0000000000000#53",
+        Less,
+    );
+    test(
+        Rational::power_of_2(-536870912i64) / Rational::from(3u32),
+        53,
+        Nearest,
+        "1.0000000000000000",
+        "0x1.0000000000000#53",
+        Less,
+    );
+    test(
+        Rational::power_of_2(-1000i64),
+        10,
+        Nearest,
+        "1.0000",
+        "0x1.000#10",
+        Less,
+    );
+    test(
+        Rational::power_of_2(-1000i64),
+        10,
+        Up,
+        "1.0020",
+        "0x1.008#10",
+        Greater,
+    );
+}
+
 #[allow(clippy::needless_pass_by_value)]
 fn sec_rational_prec_round_properties_helper(x: Rational, prec: u64, rm: RoundingMode) {
     let (s, o) = Float::sec_rational_prec_round(x.clone(), prec, rm);

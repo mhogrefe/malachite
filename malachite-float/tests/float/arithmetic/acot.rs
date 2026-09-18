@@ -727,6 +727,84 @@ fn test_acot_rational_prec_round() {
     );
 }
 
+// A `Rational` far below the target precision but above the bottom of the exponent range, where the
+// arccotangent is the arctangent of the reciprocal, exact for a `Rational`, so the huge inputs lean
+// on `atan_rational_helper`'s cheap tiny-input branch and the tiny ones on its use inside pi/2 -
+// atan(x): 7 seconds a call at either end before that branch existed. Where x is dyadic it is
+// exactly a `Float`, so the `Float` arccotangent, reached through independent code, must agree.
+#[test]
+fn test_acot_rational_tiny() {
+    let test =
+        |x: Rational, prec: u64, rm: RoundingMode, out: &str, out_hex: &str, o_out: Ordering| {
+            let (c, o) = Float::acot_rational_prec_round_ref(&x, prec, rm);
+            assert!(c.is_valid());
+            assert_eq!(c.to_string(), out);
+            assert_eq!(to_hex_string(&c), out_hex);
+            assert_eq!(o, o_out);
+            if let Ok(f) = Float::try_from(&x) {
+                let (c_alt, o_alt) = f.acot_prec_round(prec, rm);
+                assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+                assert_eq!(o_alt, o);
+            }
+        };
+    test(
+        Rational::power_of_2(-536870908i64),
+        53,
+        Nearest,
+        "1.5707963267948966",
+        "0x1.921fb54442d18#53",
+        Less,
+    );
+    test(
+        Rational::power_of_2(-536870908i64),
+        53,
+        Ceiling,
+        "1.5707963267948968",
+        "0x1.921fb54442d19#53",
+        Greater,
+    );
+    test(
+        -Rational::power_of_2(-536870908i64),
+        53,
+        Nearest,
+        "-1.5707963267948966",
+        "-0x1.921fb54442d18#53",
+        Greater,
+    );
+    test(
+        Rational::power_of_2(-536870912i64) / Rational::from(3u32),
+        53,
+        Nearest,
+        "1.5707963267948966",
+        "0x1.921fb54442d18#53",
+        Less,
+    );
+    test(
+        Rational::power_of_2(536870908i64),
+        53,
+        Nearest,
+        "7.8098438886530598e-161614248",
+        "0x1.0000000000000E-134217727#53",
+        Greater,
+    );
+    test(
+        Rational::power_of_2(536870908i64),
+        53,
+        Floor,
+        "7.8098438886530590e-161614248",
+        "0xf.ffffffffffff8E-134217728#53",
+        Less,
+    );
+    test(
+        Rational::power_of_2(536870912i64) * Rational::from(3u32),
+        53,
+        Nearest,
+        "1.6270508101360540e-161614249",
+        "0x5.5555555555554E-134217729#53",
+        Less,
+    );
+}
+
 #[test]
 #[should_panic]
 fn acot_rational_prec_round_fail_1() {

@@ -413,12 +413,13 @@ fn atan2_with_period_prec_round_normal_ref(
             return atan2u_aux3(u, y_positive, prec, rm);
         }
     }
-    // The periodic arctangent underflows for a tiny quotient with a small u, which MPFR's wider
-    // exponent range never sees. This is decided from the exponents rather than from the computed
-    // value: an arctangent that rounded up to the smallest positive `Float` is not zero, so a test
-    // on the value misses it, and no working precision can ever certify it, so the loop below would
-    // spin forever. The bound is the one `sin_with_period` scales at; past it |y/x| is above
-    // 2^(MIN_EXPONENT + 65), whose arctangent in u ths of a turn is far clear of the bottom.
+    // The periodic arctangent underflows for a tiny quotient with a small u, which MPFR, computing
+    // inside a temporarily extended exponent range, never sees. This is decided from the exponents
+    // rather than from the computed value: an arctangent that rounded up to the smallest positive
+    // `Float` is not zero, so a test on the value misses it, and no working precision can ever
+    // certify it, so the loop below would spin forever. The bound is the one `sin_with_period`
+    // scales at; past it |y/x| is above 2^(MIN_EXPONENT + 65), whose arctangent in u ths of a turn
+    // is far clear of the bottom.
     if d <= SCALED_INPUT_EXPONENT {
         return if x_positive {
             atan2u_tiny(y, x, u, y_positive, prec, rm)

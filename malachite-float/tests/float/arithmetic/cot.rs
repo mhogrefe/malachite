@@ -2905,6 +2905,85 @@ fn test_cot_rational_prec_round() {
     );
 }
 
+// A `Rational` far below the target precision but above the bottom of the exponent range, where
+// cot(x) = 1/x - x/3 - ..., a correction beneath the last bit of the result: `cot_rational_helper`
+// answers from the exact reciprocal's own rounding, nudged toward zero, instead of forming the
+// series bracket exactly -- for these inputs a dense `Rational` of hundreds of millions of bits, 27
+// seconds a call before that branch existed. Where x is dyadic it is exactly a `Float`, so the
+// `Float` cotangent, reached through independent code, must agree.
+#[test]
+fn test_cot_rational_tiny() {
+    let test =
+        |x: Rational, prec: u64, rm: RoundingMode, out: &str, out_hex: &str, o_out: Ordering| {
+            let (c, o) = Float::cot_rational_prec_round_ref(&x, prec, rm);
+            assert!(c.is_valid());
+            assert_eq!(c.to_string(), out);
+            assert_eq!(to_hex_string(&c), out_hex);
+            assert_eq!(o, o_out);
+            if let Ok(f) = Float::try_from(&x) {
+                let (c_alt, o_alt) = f.cot_prec_round(prec, rm);
+                assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+                assert_eq!(o_alt, o);
+            }
+        };
+    test(
+        Rational::power_of_2(-536870908i64),
+        53,
+        Nearest,
+        "1.2804353252859539e161614247",
+        "0x1.0000000000000E+134217727#53",
+        Greater,
+    );
+    test(
+        Rational::power_of_2(-536870908i64),
+        53,
+        Floor,
+        "1.2804353252859538e161614247",
+        "0xf.ffffffffffff8E+134217726#53",
+        Less,
+    );
+    test(
+        Rational::power_of_2(-536870908i64),
+        53,
+        Ceiling,
+        "1.2804353252859539e161614247",
+        "0x1.0000000000000E+134217727#53",
+        Greater,
+    );
+    test(
+        -Rational::power_of_2(-536870908i64),
+        53,
+        Nearest,
+        "-1.2804353252859539e161614247",
+        "-0x1.0000000000000E+134217727#53",
+        Less,
+    );
+    test(
+        Rational::power_of_2(-536870912i64) / Rational::from(3u32),
+        53,
+        Nearest,
+        "6.1460895613725788e161614248",
+        "0x3.0000000000000E+134217728#53",
+        Greater,
+    );
+    test(
+        Rational::power_of_2(-1000i64),
+        10,
+        Nearest,
+        "1.0715e301",
+        "0x1.000E+250#10",
+        Greater,
+    );
+    test(
+        Rational::power_of_2(-1000i64),
+        10,
+        Down,
+        "1.0705e301",
+        "0xf.fcE+249#10",
+        Less,
+    );
+}
+
 #[allow(clippy::needless_pass_by_value)]
 fn cot_rational_prec_round_properties_helper(x: Rational, prec: u64, rm: RoundingMode) {
     let (s, o) = Float::cot_rational_prec_round(x.clone(), prec, rm);

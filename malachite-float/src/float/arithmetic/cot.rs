@@ -27,6 +27,9 @@ use crate::float::arithmetic::cos::{
     reduce_huge, signed_constant, sin_bound, trig_near_zero_bracket,
     trig_rational_near_zero_bracket, trig_turns_near_zero_bracket,
 };
+use crate::float::arithmetic::round_near_x::{
+    LEADING_TERM_MIN_EXPONENT, round_from_above, value_is_tie,
+};
 use crate::float::arithmetic::sin_cos::{
     sin_cos_rational_helper, sin_cos_turns_helper, sin_cos_with_period_prec_round_normal_ref,
 };
@@ -272,6 +275,32 @@ fn cot_rational_bracket(
 pub(crate) fn cot_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) -> (Float, Ordering) {
     assert_ne!(rm, Exact, "Inexact cot");
     let exp_x = x.floor_log_base_2_abs() + 1; // the MPFR-style exponent of x
+    // cot(x) = 1/x - x/3 - ..., so 1/|x| exceeds |cot x| by less than |x|/2. Once that is below the
+    // distance from 1/|x| to the nearest (prec + 1)-bit dyadic, the reciprocal's own rounding is
+    // the answer, nudged toward zero. For a numerator of n bits -- 1/x has x's numerator for its
+    // denominator -- that distance is at least 2^(-n) when the dyadics around 1/|x| are integers,
+    // which is when 1/|x| has more than prec bits before the point, and 2^(-n) times their spacing
+    // 2^(-EXP(x) - prec) otherwise; the two conditions below cover the two cases, and 1/|x| lands
+    // on a dyadic only in the exact and tie cases the nudge handles. The bracket below would say
+    // the same, but forming it exactly builds a dense `Rational` of about 2 |EXP(x)| bits: 27
+    // seconds for x = 2^-536870908.
+    //
+    // Inputs at the bottom of the exponent range, whose reciprocals reach the top, are left to the
+    // bracket below: there the nudge and the tie test would be working with `Float`s that overflow.
+    let n = i64::exact_from(x.numerator_ref().significant_bits());
+    if exp_x > LEADING_TERM_MIN_EXPONENT
+        && -exp_x > n + 2
+        && -(exp_x << 1) > i64::exact_from(prec) + n + 4
+    {
+        let positive = *x > 0u32;
+        let recip = x.abs().reciprocal();
+        let rm_abs = if positive { rm } else { -rm };
+        let (wide, o_wide) = Float::from_rational_prec_ref(&recip, prec + 1);
+        let tie = rm_abs == Nearest && value_is_tie(&wide, o_wide, prec);
+        let (t, o) = Float::from_rational_prec_round(recip, prec, rm_abs);
+        let (t, o) = round_from_above(t, o, tie, rm_abs);
+        return if positive { (t, o) } else { (-t, o.reverse()) };
+    }
     // For |x| <= 1/2, |x| + |x|^3/3 <= |tan x| <= |x| + |x|^3/3 + |x|^5, so the cotangent lies
     // between the reciprocals of those, a bracket of relative width below x^4, which decides the
     // rounding once x^4 is below 2^-(prec + 3), unless the cotangent lies within that of a rounding

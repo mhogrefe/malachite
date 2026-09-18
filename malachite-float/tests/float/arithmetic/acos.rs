@@ -770,6 +770,77 @@ fn test_acos_rational_prec_round() {
     );
 }
 
+// A `Rational` far below the target precision but above the bottom of the exponent range, where
+// acos(x) = pi/2 - x - ..., where no leading term is rational: `acos_rational_helper` takes the
+// `Float` arccosine of x rounded to the working precision, which the arccosine's unit slope passes
+// on unamplified, instead of forming 1 - x^2 exactly -- for these inputs a dense `Rational` of
+// hundreds of millions of bits, 5 seconds a call before that branch existed. Where x is dyadic it
+// is exactly a `Float`, so the `Float` arccosine, reached through independent code, must agree.
+#[test]
+fn test_acos_rational_tiny() {
+    let test =
+        |x: Rational, prec: u64, rm: RoundingMode, out: &str, out_hex: &str, o_out: Ordering| {
+            let (c, o) = Float::acos_rational_prec_round_ref(&x, prec, rm);
+            assert!(c.is_valid());
+            assert_eq!(c.to_string(), out);
+            assert_eq!(to_hex_string(&c), out_hex);
+            assert_eq!(o, o_out);
+            if let Ok(f) = Float::try_from(&x) {
+                let (c_alt, o_alt) = f.acos_prec_round(prec, rm);
+                assert_eq!(ComparableFloatRef(&c_alt), ComparableFloatRef(&c));
+                assert_eq!(o_alt, o);
+            }
+        };
+    test(
+        Rational::power_of_2(-536870908i64),
+        53,
+        Nearest,
+        "1.5707963267948966",
+        "0x1.921fb54442d18#53",
+        Less,
+    );
+    test(
+        Rational::power_of_2(-536870908i64),
+        53,
+        Floor,
+        "1.5707963267948966",
+        "0x1.921fb54442d18#53",
+        Less,
+    );
+    test(
+        Rational::power_of_2(-536870908i64),
+        53,
+        Ceiling,
+        "1.5707963267948968",
+        "0x1.921fb54442d19#53",
+        Greater,
+    );
+    test(
+        -Rational::power_of_2(-536870908i64),
+        53,
+        Nearest,
+        "1.5707963267948966",
+        "0x1.921fb54442d18#53",
+        Less,
+    );
+    test(
+        Rational::power_of_2(-536870912i64) / Rational::from(3u32),
+        53,
+        Nearest,
+        "1.5707963267948966",
+        "0x1.921fb54442d18#53",
+        Less,
+    );
+    test(
+        Rational::power_of_2(-1000i64),
+        10,
+        Nearest,
+        "1.5703",
+        "0x1.920#10",
+        Less,
+    );
+}
+
 #[test]
 #[should_panic]
 fn acos_rational_prec_round_fail_1() {

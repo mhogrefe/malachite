@@ -192,6 +192,27 @@ pub(crate) fn acos_rational_helper(x: &Rational, prec: u64, rm: RoundingMode) ->
             }
         }
     }
+    // For a tiny x, acos(x) = pi/2 - x - ..., and no leading term is rational: the answer is pi/2
+    // to the target precision unless pi/2 sits within about |x| of a rounding boundary. So x is
+    // rounded to a `Float` at the working precision -- losing under 2^(EXP(x) - w), which the
+    // arccosine, of slope below 1.16 for |x| <= 1/2, passes on unamplified -- and the `Float`
+    // arccosine, whose own tiny-input handling is instant, is taken there. The general path below
+    // would instead form 1 - x^2 exactly, a dense `Rational` of about 2 |EXP(x)| bits: 5 seconds
+    // for x = 2^-536870908. Here x^2 is already below the initial working precision, so that
+    // exactness would buy nothing.
+    let exp_x = x.floor_log_base_2_abs() + 1;
+    if -(exp_x << 1) > i64::exact_from(prec) + 10 {
+        loop {
+            // half an ulp from the arccosine, and under 2^(EXP(x) - w + 1) from the rounding of x
+            // -- below another half ulp of a result near pi/2 -- so two bits of slack cover it
+            let t = Float::from_rational_prec_ref(x, w).0.acos_prec(w).0;
+            if float_can_round(t.significand_ref().unwrap(), w - 2, prec, rm) {
+                return Float::from_float_prec_round(t, prec, rm);
+            }
+            w += increment;
+            increment = w >> 1;
+        }
+    }
     let x2 = x.square();
     // exact, and positive since |x| < 1
     let r = (Rational::ONE - &x2) / x2;
