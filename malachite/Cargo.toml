@@ -21,16 +21,20 @@ serde = { version = "1.0.188", optional = true, features = ["derive"] }
 embed-doc-image = { version = "0.1.4", optional = true }
 
 [features]
-default = [ "std", "naturals_and_integers", "rationals" ]
-std = [ "malachite-base/std", "malachite-nz/std", "malachite-q/std", "malachite-float/std" ]
-enable_pyo3 = [ "malachite-nz/enable_pyo3" ]
-enable_serde = [ "malachite-nz/enable_serde", "malachite-q/enable_serde", "malachite-float/enable_serde" ]
-random = ["malachite-base/random", "malachite-nz/random", "malachite-q/random", "malachite-float/random"]
-32_bit_limbs = ["malachite-nz/32_bit_limbs", "malachite-q/32_bit_limbs", "malachite-float/32_bit_limbs"]
+default = [ "std", "naturals_and_integers", "rationals", "floats" ]
+# These modify whichever sub-crates are enabled; the `?` keeps them from pulling in a sub-crate
+# that was not asked for. (malachite-base is not optional, so it takes no `?`.)
+std = [ "malachite-base/std", "malachite-nz?/std", "malachite-q?/std", "malachite-float?/std" ]
+enable_pyo3 = [ "naturals_and_integers", "malachite-nz/enable_pyo3" ]
+enable_serde = [ "malachite-nz?/enable_serde", "malachite-q?/enable_serde", "malachite-float?/enable_serde" ]
+random = ["malachite-base/random", "malachite-nz?/random", "malachite-q?/random", "malachite-float?/random"]
+32_bit_limbs = ["malachite-nz?/32_bit_limbs", "malachite-q?/32_bit_limbs", "malachite-float?/32_bit_limbs"]
 
+# Each of these builds on the one before it, matching the sub-crates' own dependencies, so that
+# asking for one of them is enough to get a usable type.
 naturals_and_integers = [ "malachite-nz" ]
-rationals = [ "malachite-q" ]
-floats = [ "malachite-float" ]
+rationals = [ "naturals_and_integers", "malachite-q" ]
+floats = [ "rationals", "malachite-float" ]
 
 [package.metadata.docs.rs]
 # docs.rs uses a nightly compiler, so by instructing it to use our `doc-images` feature we

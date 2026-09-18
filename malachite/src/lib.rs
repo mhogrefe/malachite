@@ -19,9 +19,9 @@
 //! - [`Rational`], arbitrary-precision rational numbers, is re-exported from
 //!   [`malachite-q`](https://docs.rs/malachite-q). (Requires the `rationals` feature, which is
 //!   enabled by default.)
-//! - `Float`, arbitrary-precision floating-point numbers, is re-exported from
-//!   [`malachite-float`](https://docs.rs/malachite-float). (Requires the `floats` feature; floats
-//!   are not yet feature-complete.)
+//! - [`Float`], arbitrary-precision floating-point numbers, is re-exported from
+//!   [`malachite-float`](https://docs.rs/malachite-float). (Requires the `floats` feature, which is
+//!   enabled by default; floats are not yet feature-complete.)
 //! - The [`base`] module re-exports [`malachite-base`](https://docs.rs/malachite-base), which
 //!   provides the numeric traits (and their implementations for primitive types) used throughout
 //!   Malachite, along with tools for generating values for tests and benchmarks.
@@ -34,7 +34,7 @@
 //! ```
 //! use malachite::base::num::arithmetic::traits::Pow;
 //! use malachite::base::num::basic::traits::{One, OneHalf, Two};
-//! use malachite::{Integer, Natural, Rational};
+//! use malachite::{Float, Integer, Natural, Rational};
 //!
 //! // Arbitrary-precision unsigned integers, far larger than any primitive type:
 //! assert_eq!(Natural::TWO.pow(128), Natural::ONE << 128u64);
@@ -47,6 +47,10 @@
 //!     Rational::from_unsigneds(1u32, 3u32) + Rational::from_unsigneds(1u32, 6u32),
 //!     Rational::ONE_HALF
 //! );
+//!
+//! // Floating-point numbers of any precision you choose, correctly rounded:
+//! let (x, _) = Float::from_rational_prec(Rational::from_unsigneds(1u32, 3u32), 20);
+//! assert_eq!(x.to_string(), "0.33333349");
 //! ```
 //!
 //! For documentation of individual items, follow the re-export links below.
@@ -61,6 +65,13 @@ pub mod base {
     pub use malachite_base::*;
 }
 
+#[cfg(feature = "naturals_and_integers")]
+#[cfg(feature = "rationals")]
+#[cfg(feature = "floats")]
+/// [`Float`], a type representing floating-point numbers with arbitrarily large precision.
+pub mod float {
+    pub use malachite_float::*;
+}
 #[cfg(feature = "naturals_and_integers")]
 #[cfg(feature = "rationals")]
 #[cfg(feature = "floats")]
