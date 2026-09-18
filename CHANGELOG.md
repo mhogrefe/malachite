@@ -310,325 +310,100 @@ documented by git history.
   pole to overflow, but a `Rational` can be.
 - `Atan` and `AtanAssign` (new traits in malachite-base) for `Float`, with the usual
   `atan_prec_round`, `atan_prec`, `atan_round`, and `_ref`/`_assign` variants: a port of
-  `mpfr_atan`, the first of the inverse trigonometric functions. An input above 1 in magnitude is
-  inverted and its arctangent taken from $\pi/2$; the argument is then halved through $\arctan x
-  = 2\arctan((\sqrt{1+x^2}-1)/x)$ until it is below about $1/\sqrt{p}$, and split into binary
-  chunks whose arctangents are summed by binary splitting of the series for $\arctan(x)/x$, with
-  MPFR's table of the twenty most common small chunks for precisions up to 192 bits. The
-  arctangent is bounded, so it never overflows; it underflows only for the smallest positive
-  `Float` rounded toward zero, a case MPFR's small-input shortcut declines and a series bracket
-  decides. `atan(\pm0.0)` is $\pm0.0$, `atan(\pm\infty)` is $\pm\pi/2$ rounded, and the
-  function is odd. `primitive_float_atan` gives the correctly rounded `f32` or `f64` arctangent.
-  `atan_rational_prec_round` and `atan_rational_prec` (with `_ref` variants) take a `Rational`
-  instead. The general case rounds the input once and takes its `Float` arctangent, which is sound
-  because the arctangent is 1-Lipschitz, so the input's half-ulp carries to the result unmagnified,
-  and because the result is never much smaller than the input. The two ends of the exponent range,
-  where the input itself is not a `Float`, are bracketed instead: below it the result is smaller
-  than the input and so underflows, decided by the rounding mode alone; above it neither the input
-  nor its reciprocal is a `Float`, and $\arctan x = \pi/2 - \arctan(1/x)$ is settled from a
-  bracket on $\pi/2$. `primitive_float_atan_rational` gives the correctly rounded `f32` or `f64`
-  arctangent of a `Rational`.
-- `atan_with_period_prec_round`, `atan_with_period_prec`, `atan_with_period_round`, and
-  `atan_with_period` (with `_ref` and `_assign` variants), a port of `mpfr_atanu`: the arctangent
-  measured in $u$ths of a turn, $\arctan(x)u/(2\pi)$, which is the inverse of the convention
-  `sin_with_period` uses for its input. An infinite input gives a quarter turn and an input of
-  $\pm1$ an eighth of a turn, both exactly when `prec` is wide enough to hold them; a zero input,
-  or $u = 0$, gives a zero with the sign of $x$, which keeps the function odd. Those are the only
-  exact cases. The result never overflows, being under $u/4$, but it underflows for a tiny $x$
-  together with a small $u$, where it is about $xu/(2\pi)$; MPFR's wider exponent range never sees
-  that, so the quotient is formed with the numerator scaled up and the underflow decided by the
-  rounding mode alone. `primitive_float_atan_with_period` gives the correctly rounded `f32` or
-  `f64` arctangent in $u$ths of a turn.
-- `atan_with_period_rational_prec_round` and `atan_with_period_rational_prec` (with `_ref`
-  variants), which take a `Rational` instead. MPFR has no such function. The scaled Ziv loop is
-  shared with the `Float` version, with the arctangent supplied by the `Rational` one, so the two
-  ends of the exponent range are handled as they are there. The exception is an input below the
-  bottom of the range, which is not a `Float` at all: its arctangent is its own leading term, so
-  the quotient is formed from the input itself. That is not merely cheaper but necessary, since a
-  large $u$ can lift the quotient back into the range, where the `Rational` arctangent's own
-  underflow answer would be wrong. `primitive_float_atan_with_period_rational` gives the correctly
-  rounded `f32` or `f64` arctangent of a `Rational` in $u$ths of a turn.
-- `atan_pi_prec_round`, `atan_pi_prec`, `atan_pi_round`, and `atan_pi` (with `_ref` and `_assign`
-  variants), together with `atan_pi_rational_prec_round` and `atan_pi_rational_prec` (with `_ref`
-  variants): the arctangent measured in half-turns, $\arctan(x)/\pi$. This is IEEE 754's `atanPi`,
-  which MPFR has no direct equivalent of, and it is `atan_with_period` with $u = 2$. Because a half
-  and a quarter each need only one bit, the exact cases are exact at *every* precision, unlike the
-  general periodic version: an infinite input gives $\pm1/2$, an input of $\pm1$ gives $\pm1/4$,
-  and a zero input gives $\pm0.0$. Overflow is impossible, since the result is under $1/2$ in
-  magnitude. `primitive_float_atan_pi` and `primitive_float_atan_pi_rational` give the correctly
-  rounded `f32` or `f64` arctangent in half-turns.
+  `mpfr_atan`, the first of the inverse trigonometric functions. $\pm0.0$ gives $\pm0.0$, the only
+  exact case, and $\pm\infty$ gives $\pm\pi/2$; the arctangent is odd and bounded, so it never
+  overflows. `atan_with_period_prec_round`, `atan_with_period_prec`, `atan_with_period_round`, and
+  `atan_with_period` (with `_ref` and `_assign` variants) are a port of `mpfr_atanu`, measuring it
+  in $u$ths of a turn as $\arctan(x)u/(2\pi)$ — the inverse of the convention `sin_with_period`
+  uses for its input — where an infinite input gives a quarter turn, $\pm1$ an eighth, and a zero
+  input or a zero period a zero with the sign of $x$; those are the only exact cases, and the
+  result underflows for a tiny $x$ with a small $u$. `atan_pi_prec_round`, `atan_pi_prec`,
+  `atan_pi_round`, and `atan_pi` (with the usual variants) are that with $u = 2$: IEEE 754's
+  `atanPi`, whose exact cases hold at every precision. Each of the three has `_rational` variants
+  taking a `Rational`, which MPFR has no equivalent of, and `primitive_float_*` variants giving
+  correctly rounded `f32` and `f64` results.
 - `Atan2` and `Atan2Assign` (new traits in malachite-base) for `Float`, with the usual
   `atan2_prec_round`, `atan2_prec`, `atan2_round`, and `_val_ref`/`_ref_val`/`_ref_ref`/`_assign`
   variants: a port of `mpfr_atan2`, the angle of the point $(x,y)$ measured from the positive
   $x$-axis. The twenty ISO C99 special cases are honored, with the sign of a zero argument choosing
-  the quadrant: an infinite $y$ gives a quarter turn against a finite $x$, an eighth against
-  $+\infty$, and three-eighths against $-\infty$; a zero $y$ gives $\pm0.0$ for a positive-signed
-  $x$ and $\pm\pi$ for a negative-signed one. The zero results are the only exact cases. Overflow
-  is impossible, since the result is at most $\pi$ in magnitude, but the result underflows for a
-  positive $x$ with a tiny $|y/x|$. MPFR widens its exponent range for the whole computation, so
-  its quotient $y/x$ is always representable; in Malachite's range it need not be, and a quotient
-  beyond the top is taken from the limit $\pi/2$ instead. `primitive_float_atan2` gives the
-  correctly rounded `f32` or `f64` angle.
-- `atan2_rational_prec_round` and `atan2_rational_prec` (with `_ref` variants), which take
-  `Rational` arguments. MPFR has no such function. A `Rational` has no NaN, no infinities, and no
-  signed zeros, so the special cases collapse to two: a zero $y$ gives $0.0$ for a nonnegative $x$
-  and $\pi$ for a negative one, and a zero $x$ gives $\pm\pi/2$ with the sign of $y$. The zero
-  result is the only exact case. The quotient $y/x$ is formed exactly, so nothing corresponds to
-  the `Float` case's division, its underflow, or its overflow beyond the exponent range.
-  `primitive_float_atan2_rational` gives the correctly rounded `f32` or `f64` angle.
-- `atan2_with_period_prec_round`, `atan2_with_period_prec`, and `atan2_with_period_round` (with
-  `_val_ref`/`_ref_val`/`_ref_ref`/`_assign` variants): a port of `mpfr_atan2u`, the angle of the
-  point $(x,y)$ measured in $u$ths of a turn. The quadrant diagonals are exact, at an eighth and
-  three eighths of a turn, as are the axes, and an infinite $y$ against an infinite $x$ gives one
-  or the other. Overflow is impossible, since the result is at most $u/2$; the result underflows
-  for a positive $x$ with a tiny $|y/x|$ and a small $u$. Two deliberate divergences from MPFR:
-  when $u$ is zero this returns a zero with the sign of $y$ throughout, where `mpfr_atan2u` returns
-  $\pm1$ for a negative $x$ — contradicting its own definition, the formula it uses for that
-  quadrant, and its own answers when $y$ is zero or infinite or $|y|=|x|$; and a quotient beyond
-  the exponent range is answered from the turn fraction it approaches, where MPFR, whose widened
-  range keeps the quotient representable, can instead spend an unbounded amount of time separating
-  that fraction from the representable one beside it. `primitive_float_atan2_with_period` gives the
-  correctly rounded `f32` or `f64` angle in $u$ths of a turn.
-- `atan2_with_period_rational_prec_round` and `atan2_with_period_rational_prec` (with `_ref`
-  variants), which take `Rational` arguments. MPFR has no such function. The quotient $y/x$ is
-  exact, so for a positive $x$ the whole computation is the `Rational` arctangent in $u$ths of a
-  turn, and only the negative-$x$ reflection needs a loop. The special cases are those a type
-  without NaNs, infinities, or signed zeros can have: a zero $y$ gives $0.0$ for a nonnegative $x$
-  and $u/2$ for a negative one, a zero $x$ gives $\pm u/4$ with the sign of $y$, and the quadrant
-  diagonals give $\pm u/8$ and $\pm3u/8$. `primitive_float_atan2_with_period_rational` gives the
-  correctly rounded `f32` or `f64` angle.
-- `atan2_pi_prec_round`, `atan2_pi_prec`, and `atan2_pi_round` (with the usual variants), together
-  with `atan2_pi_rational_prec_round` and `atan2_pi_rational_prec`: the angle measured in
-  half-turns, $\operatorname{atan2}(y,x)/\pi$. This is IEEE 754's `atan2Pi` and a port of
-  `mpfr_atan2pi`, and it is `atan2_with_period` with $u = 2$. The turn fractions are $1$, $1/2$,
-  $1/4$ and $3/4$, all representable in two bits, so every special case is exact at every precision
-  except $\pm3/4$, which needs two. `primitive_float_atan2_pi` and
-  `primitive_float_atan2_pi_rational` give the correctly rounded `f32` or `f64` angle in half-turns.
+  the quadrant, and the zero results are the only exact ones. `atan2_with_period_prec_round`,
+  `atan2_with_period_prec`, and `atan2_with_period_round` are a port of `mpfr_atan2u`, measuring
+  the angle in $u$ths of a turn, where the axes and the quadrant diagonals are exact;
+  `atan2_pi_prec_round`, `atan2_pi_prec`, and `atan2_pi_round` are that with $u = 2$, IEEE 754's
+  `atan2Pi` and a port of `mpfr_atan2pi`. The result underflows for a positive $x$ with a tiny
+  $|y/x|$. Two deliberate divergences from MPFR: when $u$ is zero this returns a zero with the sign
+  of $y$ throughout, where `mpfr_atan2u` returns $\pm1$ for a negative $x$, contradicting its own
+  definition and its own answers when $y$ is zero or infinite; and a quotient beyond the exponent
+  range is answered from the turn fraction it approaches, where MPFR, whose widened range keeps the
+  quotient representable, can instead spend an unbounded amount of time separating that fraction
+  from the one beside it. With `_rational` and `primitive_float_*` variants throughout.
 - `Asin` and `AsinAssign` (new traits in malachite-base) for `Float`, with the usual
   `asin_prec_round`, `asin_prec`, `asin_round`, and `_ref`/`_assign` variants: a port of
-  `mpfr_asin`, computed as $\arctan(x/\sqrt{1-x^2})$ at a working precision that covers the
-  cancellation in $1-x^2$. The result is NaN for a NaN input, for either infinity, and for any
-  $|x|>1$; $\pm0.0$ is exact; and $\pm1$ gives $\pm\pi/2$. Those are the only exact cases. Unlike
-  the tangent family the arcsine can neither overflow nor underflow, since the result lies in
-  $[-\pi/2,\pi/2]$ and $|\arcsin x|>|x|$, so a representable input always has a representable
-  result. `primitive_float_asin` gives the correctly rounded `f32` or `f64` arcsine.
-- `asin_rational_prec_round` and `asin_rational_prec` (with `_ref` variants), which take a
-  `Rational`. MPFR has no such function. The identity is rearranged to
-  $\arcsin x = \operatorname{sign}(x)\arctan(\sqrt{x^2/(1-x^2)})$, whose argument is an exact
-  `Rational`: nothing cancels, so unlike the `Float` version the cost does not grow as $x$
-  approaches $\pm1$, and the input never needs rounding — which matters because the arcsine is not
-  1-Lipschitz, so the round-once approach `atan_rational` can afford would cost about half the
-  cancelled bits here. Underflow, impossible for the `Float` arcsine, is reachable for a `Rational`
-  below the exponent range, and is handled by the scaled path the periodic sine uses.
-  `primitive_float_asin_rational` gives the correctly rounded `f32` or `f64` arcsine of a
-  `Rational`.
-- `asin_with_period_prec_round`, `asin_with_period_prec`, `asin_with_period_round`, and
-  `asin_with_period` (with `_ref` and `_assign` variants), a port of `mpfr_asinu`: the arcsine
-  measured in $u$ths of a turn, so that $u = 360$ gives degrees. The result is NaN wherever the
-  plain arcsine is, even when $u = 0$; $\pm1$ gives $\pm u/4$, a quarter turn; and $\pm1/2$ gives
-  $\pm u/12$, a twelfth, when $u$ is a multiple of 3. Two divergences from MPFR: at $u = 0$ MPFR
-  returns $+0$ for every $x$, although its own $x = 0$ case keeps the sign so that the function
-  stays odd, and Malachite keeps the sign throughout, as `mpfr_atanu` does; and the quotient is
-  formed with the numerator scaled up, since $\arcsin(x)u/(2\pi)$ falls below the smallest
-  positive `Float` for a tiny $x$ with a small $u$ — a regime MPFR's wider exponent range never
-  reaches — with the underflowing result then decided by the rounding mode alone.
-  `primitive_float_asin_with_period` gives the correctly rounded `f32` or `f64` angle.
-- `asin_with_period_rational_prec_round` and `asin_with_period_rational_prec` (with `_ref`
-  variants), which take a `Rational`. MPFR has no such function. The special cases match the
-  `Float` version, except that a `Rational` has no signed zeros, so a zero input gives a positive
-  zero. Underflow is reachable here for the same reason it is in `asin_rational`: a `Rational` may
-  sit far below the bottom of the exponent range, where the arcsine is its own leading term, so the
-  quotient is formed from the input itself — necessary rather than merely cheaper, since the
-  `Rational` arcsine reports such an input as an underflow and a large $u$ can lift the quotient
-  back into range. `primitive_float_asin_with_period_rational` gives the correctly rounded `f32` or
-  `f64` angle.
-- `asin_pi_prec_round`, `asin_pi_prec`, `asin_pi_round`, and `asin_pi` (with `_ref` and `_assign`
-  variants), along with `asin_pi_rational_prec_round` and `asin_pi_rational_prec` (with `_ref`
-  variants), a port of `mpfr_asinpi`: the arcsine measured in half-turns, which MPFR defines as
-  `asinu` with $u = 2$ and Malachite delegates the same way. An input of $\pm1$ gives $\pm1/2$,
-  exact at every precision since a half needs only one bit, and a zero input gives a zero; those
-  are the only exact cases, and any $|x|>1$ (or, for a `Float`, NaN or either infinity) gives NaN.
-  `primitive_float_asin_pi` and `primitive_float_asin_pi_rational` give the correctly rounded `f32`
-  or `f64` angle in half-turns.
+  `mpfr_asin`. NaN, either infinity, and any $|x|>1$ give NaN; $\pm0.0$ is exact and $\pm1$ gives
+  $\pm\pi/2$. The arcsine can neither overflow nor underflow. `asin_with_period_prec_round`,
+  `asin_with_period_prec`, `asin_with_period_round`, and `asin_with_period` (with the usual
+  variants) are a port of `mpfr_asinu`, measuring it in $u$ths of a turn, so that $u = 360$ gives
+  degrees, where $\pm1$ gives $\pm u/4$ and $\pm1/2$ gives $\pm u/12$ when $u$ is a multiple of 3;
+  `asin_pi_prec_round` and friends are a port of `mpfr_asinpi`, that with $u = 2$. One deliberate
+  divergence from MPFR: at $u = 0$ `mpfr_asinu` returns $+0$ for every $x$, although its own
+  $x = 0$ case keeps the sign so that the function stays odd; Malachite keeps it throughout, as
+  `mpfr_atanu` does. The `_rational` variants, which MPFR has no equivalent of, can underflow where
+  the `Float` ones cannot, a `Rational` reaching below the exponent range. With `primitive_float_*`
+  variants throughout.
 - `Acos` and `AcosAssign` (new traits in malachite-base) for `Float`, with the usual
   `acos_prec_round`, `acos_prec`, `acos_round`, and `_ref`/`_assign` variants: a port of
-  `mpfr_acos`, computed as $\pi/2-\arctan(x/\sqrt{1-x^2})$ at a working precision that covers both
-  the cancellation in that subtraction and the blow-up of the quotient. The result is NaN for a NaN
-  input, for either infinity, and for any $|x|>1$; $\pm0.0$ gives $\pi/2$, $1$ gives $0.0$, and
-  $-1$ gives $\pi$. The zero at $x=1$ is the only exact case — unlike the arcsine, a zero input is
-  not one, since $\pi/2$ is never exactly representable. Overflow is not possible, since the result
-  lies in $[0,\pi]$. `primitive_float_acos` gives the correctly rounded `f32` or `f64` arccosine.
-- `acos_rational_prec_round` and `acos_rational_prec` (with `_ref` variants), which take a
-  `Rational`. MPFR has no such function. The identity is rearranged to
-  $\arccos x = \arctan(\sqrt{(1-x^2)/x^2})$, whose argument is an exact `Rational`: for a positive
-  $x$ that is the whole answer, and nothing cancels anywhere, so unlike the `Float` version the cost
-  does not grow as $x$ approaches 1. A negative $x$ is $\pi$ minus that, which loses a single bit at
-  worst. Underflow, impossible for the `Float` arccosine, is reachable here, since a `Rational` may
-  lie within $2^{-2^{31}}$ of 1; there $\arccos x$ is about $\sqrt{2(1-x)}$, and that form is used
-  directly, which also avoids squaring an input that close to 1.
-  `primitive_float_acos_rational` gives the correctly rounded `f32` or `f64` arccosine of a
-  `Rational`.
-- `acos_with_period_prec_round`, `acos_with_period_prec`, `acos_with_period_round`, and
-  `acos_with_period` (with `_ref` and `_assign` variants), a port of `mpfr_acosu`: the arccosine
-  measured in $u$ths of a turn, so that $u = 360$ gives degrees. The result is NaN wherever the
-  plain arccosine is, even when $u = 0$; a zero input gives $u/4$, a quarter turn; $1$ gives $0.0$,
-  following IEEE 754-2019's `acosPi`; $-1$ gives $u/2$; and $\pm1/2$ gives $u/6$ or $u/3$ when $u$
-  is a multiple of 3. A zero period gives $+0.0$, since the arccosine is never negative. Like
-  MPFR's, the implementation answers a tiny input from the neighbour of $u/4$ on the correct side,
-  and like the other periodic inverse functions, the quotient is formed with the numerator scaled
-  up so that an underflowing result is decided by the rounding mode alone.
-  `primitive_float_acos_with_period` gives the correctly rounded `f32` or `f64` angle.
-- `acos_with_period_rational_prec_round` and `acos_with_period_rational_prec` (with `_ref`
-  variants), which take a `Rational`. MPFR has no such function. The special cases match the
-  `Float` version. Underflow is reachable here for the same reason it is in `acos_rational`: a
-  `Rational` may lie within $2^{-2^{31}}$ of 1, where $\arccos x$ falls below the smallest positive
-  `Float`. That case is answered from $\sqrt{2(1-x)}$ directly, which is necessary rather than
-  merely cheaper — the `Rational` arccosine reports such an input as an underflow, and a large $u$
-  can lift the quotient back into range. `primitive_float_acos_with_period_rational` gives the
-  correctly rounded `f32` or `f64` angle.
-- `acos_pi_prec_round`, `acos_pi_prec`, `acos_pi_round`, and `acos_pi` (with `_ref` and `_assign`
-  variants), along with `acos_pi_rational_prec_round` and `acos_pi_rational_prec` (with `_ref`
-  variants), a port of `mpfr_acospi`: the arccosine measured in half-turns, which MPFR defines as
-  `acosu` with $u = 2$ and Malachite delegates the same way. A zero input gives $1/2$, an input of
-  1 gives $0.0$, and an input of $-1$ gives $1$; all three are exact at every precision, and they
-  are the only exact cases. `primitive_float_acos_pi` and `primitive_float_acos_pi_rational` give
-  the correctly rounded `f32` or `f64` angle in half-turns.
+  `mpfr_acos`. NaN, either infinity, and any $|x|>1$ give NaN; $\pm0.0$ gives $\pi/2$, $1$ gives
+  $0.0$, and $-1$ gives $\pi$. The zero at $x = 1$ is the only exact case — unlike the arcsine, a
+  zero input is not one, $\pi/2$ never being representable — and overflow is not possible, the
+  result lying in $[0,\pi]$. `acos_with_period_prec_round`, `acos_with_period_prec`,
+  `acos_with_period_round`, and `acos_with_period` (with the usual variants) are a port of
+  `mpfr_acosu`, measuring it in $u$ths of a turn, where a zero input gives $u/4$, $1$ gives $0.0$
+  following IEEE 754-2019's `acosPi`, $-1$ gives $u/2$, and $\pm1/2$ gives $u/6$ or $u/3$ when $u$
+  is a multiple of 3; `acos_pi_prec_round` and friends are a port of `mpfr_acospi`, that with
+  $u = 2$. The `_rational` variants can underflow where the `Float` ones cannot, a `Rational` being
+  able to lie within $2^{-2^{31}}$ of 1. With `primitive_float_*` variants throughout.
 - `Asec` and `AsecAssign` (new traits in malachite-base) for `Float`, with the usual
   `asec_prec_round`, `asec_prec`, `asec_round`, and `_ref`/`_assign` variants. MPFR has no
-  arcsecant. Rather than take $\arccos(1/x)$, which would round the reciprocal first and pay for it
-  — the arccosine is not Lipschitz at 1, so an input near $\pm1$ would lose about half the bits of
-  the reciprocal — the identity is used as $\operatorname{asec} x = \arctan(\sqrt{x^2-1})$ for a
-  positive $x$, and $\pi$ minus that for a negative one. The subtraction $x^2-1$ is done at twice
-  the input's precision, where it is exact, so unlike the arccosine the working precision does not
-  grow as the input approaches $\pm1$. The result is NaN for a NaN input and for any $|x|<1$,
-  including the zeros; $\pm\infty$ gives $\pi/2$, the value the secant grows toward; $1$ gives
-  $0.0$, the only exact case; and $-1$ gives $\pi$. `primitive_float_asec` gives the correctly
-  rounded `f32` or `f64` arcsecant.
-- `asec_rational_prec_round` and `asec_rational_prec` (with `_ref` variants), which take a
-  `Rational`. There $x^2-1$ is exact with no working precision to choose at all, so the identity
-  $\operatorname{asec} x = \arctan(\sqrt{x^2-1})$ applies directly; a large $x$ skips the square
-  altogether, its arcsecant being the arctangent of $|x|$ to within the working precision. Underflow,
-  impossible for the `Float` arcsecant, is reachable here, since a `Rational` may lie within
-  $2^{-2^{31}}$ of 1; there $\operatorname{asec} x$ is about $\sqrt{2(x-1)}$, and that form is used
-  directly. `primitive_float_asec_rational` gives the correctly rounded `f32` or `f64` arcsecant of
-  a `Rational`.
-- `asec_with_period_prec_round`, `asec_with_period_prec`, `asec_with_period_round`, and
-  `asec_with_period` (with `_ref` and `_assign` variants), the arcsecant measured in $u$ths of a
-  turn, so that $u = 360$ gives degrees. Its exact cases are the arccosine's, seen through the
-  reciprocal: NaN and every $|x|<1$ give NaN, even when $u = 0$; $\pm\infty$ gives $u/4$, a quarter
-  turn, where the arccosine has a zero input; $1$ gives $0.0$; $-1$ gives $u/2$; and $\pm2$ give
-  $u/6$ and $u/3$ when $u$ is a multiple of 3, where the arccosine has $\pm1/2$. A zero period gives
-  $+0.0$, the arcsecant never being negative. A large $x$ is answered from the neighbour of $u/4$,
-  as the arccosine answers a tiny one. `primitive_float_asec_with_period` gives the correctly
-  rounded `f32` or `f64` angle.
-- `asec_with_period_rational_prec_round` and `asec_with_period_rational_prec` (with `_ref`
-  variants), which take a `Rational`. The exact cases are the `Float` version's, minus the
-  infinities a `Rational` cannot be: every $|x|<1$ gives NaN, even when $u = 0$; a zero period gives
-  $+0.0$; $1$ gives $0.0$; $-1$ gives $u/2$; and $\pm2$ give $u/6$ and $u/3$ when $u$ is a multiple
-  of 3. As for the `Rational` arccosine, an input close enough to 1 makes the arcsecant itself
-  underflow, so the quotient is formed from $\sqrt{2(x-1)}$ directly, a large $u$ being able to lift
-  it back into the range. `primitive_float_asec_with_period_rational` gives the correctly rounded
-  `f32` or `f64` angle of a `Rational`.
-- `asec_pi_prec_round`, `asec_pi_prec`, `asec_pi_round`, and `asec_pi` (with `_ref` and `_assign`
-  variants), along with `asec_pi_rational_prec_round` and `asec_pi_rational_prec` (with `_ref`
-  variants): the arcsecant measured in half-turns, which is `asec_with_period` with $u = 2$ and
-  Malachite delegates the same way. Either infinity gives $1/2$, an input of 1 gives $0.0$, and an
-  input of $-1$ gives $1$; all three are exact at every precision, and they are the only exact
-  cases. Unlike every other period, $\pm2$ are not exact ones here, a third and a two-thirds of a
-  half-turn not being representable. NaN and any $|x|<1$, including the zeros, give NaN.
-  `primitive_float_asec_pi` and `primitive_float_asec_pi_rational` give the correctly rounded `f32`
-  or `f64` angle in half-turns. This closes the arcsecant, a function MPFR does not have.
+  arcsecant, nor any of the forms below. NaN and every $|x|<1$, including the zeros, give NaN;
+  $\pm\infty$ gives $\pi/2$, the value the secant grows toward; $1$ gives $0.0$, the only exact
+  case; and $-1$ gives $\pi$. `asec_with_period_prec_round`, `asec_with_period_prec`,
+  `asec_with_period_round`, and `asec_with_period` (with the usual variants) measure it in $u$ths
+  of a turn, with the arccosine's exact cases seen through the reciprocal: $\pm\infty$ gives $u/4$,
+  $1$ gives $0.0$, $-1$ gives $u/2$, and $\pm2$ give $u/6$ and $u/3$ when $u$ is a multiple of 3.
+  `asec_pi_prec_round` and friends are that with $u = 2$, where $\pm2$ are no longer exact, a third
+  of a half-turn not being representable. The `_rational` variants can underflow, a `Rational`
+  being able to lie within $2^{-2^{31}}$ of 1. With `primitive_float_*` variants throughout.
 - `Acsc` and `AcscAssign` (new traits in malachite-base) for `Float`, with the usual
   `acsc_prec_round`, `acsc_prec`, `acsc_round`, and `_ref`/`_assign` variants. MPFR has no
-  arccosecant. Rather than take $\arcsin(1/x)$, which would round the reciprocal first and pay for
-  it — the arcsine is not Lipschitz at 1, and $1/x$ lands there exactly when $x$ is near $\pm1$, so
-  about half the bits of the reciprocal would be lost — the identity is used in the form
-  $\operatorname{acsc} x = \arctan(1/\sqrt{x^2-1})$. The subtraction $x^2-1$ is done at twice the
-  input's precision, where it is exact, and the reciprocal and the square root are taken together by
-  one correctly rounded `reciprocal_sqrt`, so the working precision does not grow as the input
-  approaches $\pm1$. The arccosecant is odd, so the sign is stripped and restored with the rounding
-  mode reflected along with it. The result is NaN for a NaN input and for any $|x|<1$, including the
-  zeros; $\pm\infty$ give $\pm0.0$, the only exact cases; $1$ gives $\pi/2$ and $-1$ gives
-  $-\pi/2$. Neither overflow nor underflow is possible: $|\operatorname{acsc} x|\leq\pi/2$, and a
-  [`Float`]'s bounded exponent keeps $1/|x|$ above twice the smallest positive `Float`.
-  `primitive_float_acsc` gives the correctly rounded `f32` or `f64` arccosecant.
-- `acsc_rational_prec_round` and `acsc_rational_prec` (with `_ref` variants), which take a
-  `Rational`. There $x^2-1$ is exact with no working precision to choose at all; a large $|x|$ skips
-  the square altogether, its arccosecant being the arctangent of the reciprocal of $|x|$ to within
-  the working precision. Underflow, impossible for the `Float` arccosecant, is reachable here, a
-  `Rational` having no exponent bound: $\operatorname{acsc} x$ is about $1/x$, so a large enough
-  $|x|$ puts it below the smallest positive `Float`. `primitive_float_acsc_rational` gives the
-  correctly rounded `f32` or `f64` arccosecant of a `Rational`.
-- `acsc_with_period_prec_round`, `acsc_with_period_prec`, `acsc_with_period_round`, and
-  `acsc_with_period` (with `_ref` and `_assign` variants), the arccosecant measured in $u$ths of a
-  turn, so that $u = 360$ gives degrees. Its exact cases are the arcsine's, seen through the
-  reciprocal: NaN and every $|x|<1$ give NaN, even when $u = 0$; $\pm\infty$ give $\pm0.0$; a
-  zero period gives a zero with the sign of $x$, the function being odd; $\pm1$ give $\pm u/4$, a
-  quarter turn; and $\pm2$ give $\pm u/12$ when $u$ is a multiple of 3, where the arcsine has
-  $\pm1/2$. Unlike the arccosecant alone, this can underflow: for the largest `Float`s
-  $1/|x|$ is only twice the smallest positive one, and a small $u$ carries the quotient below it.
-  `primitive_float_acsc_with_period` gives the correctly rounded `f32` or `f64` angle.
-- `acsc_with_period_rational_prec_round` and `acsc_with_period_rational_prec` (with `_ref`
-  variants), which take a `Rational`. The exact cases are the `Float` version's, minus the
-  infinities a `Rational` cannot be: every $|x|<1$ gives NaN, even when $u = 0$; a zero period gives
-  a zero with the sign of $x$; $\pm1$ give $\pm u/4$; and $\pm2$ give $\pm u/12$ when $u$ is a
-  multiple of 3. A `Rational` having no exponent bound, an $|x|$ large enough makes the arccosecant
-  itself underflow, so the quotient is formed from the exact reciprocal directly, a large $u$ being
-  able to lift it back into the range. `primitive_float_acsc_with_period_rational` gives the
-  correctly rounded `f32` or `f64` angle of a `Rational`.
-- `acsc_pi_prec_round`, `acsc_pi_prec`, `acsc_pi_round`, and `acsc_pi` (with `_ref` and `_assign`
-  variants), along with `acsc_pi_rational_prec_round` and `acsc_pi_rational_prec` (with `_ref`
-  variants): the arccosecant measured in half-turns, which is `acsc_with_period` with $u = 2$ and
-  Malachite delegates the same way. Either infinity gives a zero of its sign and an input of $\pm1$
-  gives $\pm1/2$; both are exact at every precision, and they are the only exact cases. Unlike
-  every other period, $\pm2$ are not exact ones here, a sixth of a half-turn not being
-  representable. NaN and any $|x|<1$, including the zeros, give NaN. `primitive_float_acsc_pi` and
-  `primitive_float_acsc_pi_rational` give the correctly rounded `f32` or `f64` angle in half-turns.
-  This closes the arccosecant, a function MPFR does not have.
+  arccosecant, nor any of the forms below. The arccosecant is odd. NaN and every $|x|<1$, including
+  the zeros, give NaN; $\pm\infty$ give $\pm0.0$, the only exact cases; and $\pm1$ give $\pm\pi/2$.
+  Neither overflow nor underflow is possible, a `Float`'s bounded exponent keeping $1/|x|$ above
+  twice the smallest positive one. `acsc_with_period_prec_round`, `acsc_with_period_prec`,
+  `acsc_with_period_round`, and `acsc_with_period` (with the usual variants) measure it in $u$ths
+  of a turn, with the arcsine's exact cases seen through the reciprocal: a zero period gives a zero
+  with the sign of $x$, $\pm1$ give $\pm u/4$, and $\pm2$ give $\pm u/12$ when $u$ is a multiple of
+  3. `acsc_pi_prec_round` and friends are that with $u = 2$, where $\pm2$ are no longer exact, a
+  sixth of a half-turn not being representable. Unlike the arccosecant alone, the periodic forms
+  underflow, a small $u$ carrying the quotient below the smallest positive `Float`. With
+  `_rational` and `primitive_float_*` variants throughout.
 - `Acot` and `AcotAssign` (new traits in malachite-base) for `Float`, with the usual
   `acot_prec_round`, `acot_prec`, `acot_round`, and `_ref`/`_assign` variants. MPFR has no
-  arccotangent. This is the odd branch, $\operatorname{acot} x = \arctan(1/x)$, with range
-  $(-\pi/2,\pi/2]$: the one that makes the arcsecant, arccosecant and arccotangent a uniform
-  family of inverses of reciprocal arguments, that inverts `cot` on its own signed behaviour
-  ($\cot(\pm0)=\pm\infty$ and so $\operatorname{acot}(\pm\infty)=\pm0$), and that Mathematica uses;
-  the continuous branch $\pi/2-\arctan x$ with range $(0,\pi)$ is not provided. Unlike the other two
-  inverses of reciprocals, nothing is lost to the reciprocal's rounding here, the arctangent being
-  smooth everywhere; below 1 the reciprocal is not taken at all, the identity
-  $\operatorname{acot} x = \pi/2 - \arctan x$ being used instead, which cannot cancel. NaN gives
-  NaN; $\pm\infty$ give $\pm0.0$, the only exact cases; $\pm0.0$ give $\pm\pi/2$, the sign choosing
-  the side of the jump; and $\pm1$ give $\pm\pi/4$. Neither overflow nor underflow is possible.
-  `primitive_float_acot` gives the correctly rounded `f32` or `f64` arccotangent.
-- `acot_rational_prec_round` and `acot_rational_prec` (with `_ref` variants), which take a
-  `Rational`. Above 1 in magnitude the reciprocal is exact and the arctangent of it is the same real
-  number, so the arctangent's own machinery decides everything, underflow at a huge $|x|$ included;
-  below 1 the subtraction from $\pi/2$ is used. A `Rational` zero has no sign, so it gives $\pi/2$,
-  the side the positive inputs approach. `primitive_float_acot_rational` gives the correctly rounded
-  `f32` or `f64` arccotangent of a `Rational`.
-- `acot_with_period_prec_round`, `acot_with_period_prec`, `acot_with_period_round`, and
-  `acot_with_period` (with `_ref` and `_assign` variants), the arccotangent measured in $u$ths of a
-  turn, so that $u = 360$ gives degrees. Its exact cases are the arctangent's, seen through the
-  reciprocal: NaN gives NaN; $\pm\infty$ give $\pm0.0$ for every period; a zero period gives a zero
-  with the sign of $x$, the function being odd; $\pm0.0$ give $\pm u/4$, a quarter turn -- the two
-  sides of the arccotangent's jump, which a period makes exact; and $\pm1$ give $\pm u/8$, an
-  eighth. As for the arccosecant, this can underflow: for the largest `Float`s $1/|x|$ is only about
-  twice the smallest positive one, and a small $u$ carries the quotient below it.
-  `primitive_float_acot_with_period` gives the correctly rounded `f32` or `f64` angle.
-- `acot_with_period_rational_prec_round` and `acot_with_period_rational_prec` (with `_ref`
-  variants), which take a `Rational` and return the arccotangent measured in $u$ths of a turn as a
-  `Float`. A zero period gives a zero with the sign of $x$, a `Rational` zero having no sign and so
-  taking the positive one; a zero input gives $u/4$, a quarter turn; and $\pm1$ give $\pm u/8$, an
-  eighth. Those are the only exact cases. As for the arccosecant, this can underflow, and a
-  `Rational` has no exponent bound, so a large enough $|x|$ reaches that at any $u$.
-  `primitive_float_acot_with_period_rational` gives the correctly rounded `f32` or `f64` angle.
-- `acot_pi_prec_round`, `acot_pi_prec`, `acot_pi_round`, and `acot_pi` (with `_ref` and `_assign`
-  variants), the arccotangent measured in half-turns, along with `acot_pi_rational_prec_round` and
-  `acot_pi_rational_prec` (with `_ref` variants) and the two `primitive_float_acot_pi[_rational]`
-  functions. This is `acot_with_period` with a period of 2: NaN gives NaN, either infinity gives a
-  zero of its sign, $\pm0.0$ give $\pm1/2$, and $\pm1$ give $\pm1/4$. Those are the only exact
-  cases, and unlike the arcsecant's and arccosecant's half-turns none is lost, a half and a quarter
-  each needing only one bit. Overflow is not possible, since $|\operatorname{acot}(x)/\pi| \leq
-  1/2$; underflow is, for an $|x|$ large enough that $1/(\pi|x|)$ falls below the smallest positive
-  `Float`.
+  arccotangent, nor any of the forms below. This is the odd branch,
+  $\operatorname{acot} x = \arctan(1/x)$, with range $(-\pi/2,\pi/2]$: the one that makes the
+  arcsecant, arccosecant and arccotangent a uniform family of inverses of reciprocal arguments,
+  that inverts `cot` on its own signed behaviour ($\cot(\pm0)=\pm\infty$ and so
+  $\operatorname{acot}(\pm\infty)=\pm0$), and that Mathematica uses; the continuous branch
+  $\pi/2-\arctan x$ with range $(0,\pi)$ is not provided. NaN gives NaN; $\pm\infty$ give $\pm0.0$,
+  the only exact cases; $\pm0.0$ give $\pm\pi/2$, the sign choosing the side of the jump; and
+  $\pm1$ give $\pm\pi/4$. Neither overflow nor underflow is possible.
+  `acot_with_period_prec_round`, `acot_with_period_prec`, `acot_with_period_round`, and
+  `acot_with_period` (with the usual variants) measure it in $u$ths of a turn, where a zero period
+  gives a zero with the sign of $x$, $\pm0.0$ give $\pm u/4$ — the jump's two sides, which a period
+  makes exact — and $\pm1$ give $\pm u/8$. `acot_pi_prec_round` and friends are that with $u = 2$,
+  which unlike the arcsecant's and arccosecant's half-turns loses no exact case, a half and a
+  quarter each needing one bit. The periodic forms underflow for a large enough $|x|$. A `Rational`
+  zero has no sign, so the `_rational` variants give it the positive side. With `primitive_float_*`
+  variants throughout.
 - `Cot` and `CotAssign` (new traits in malachite-base) for `Float`, with the usual
   `cot_prec_round`, `cot_prec`, `cot_round`, and `_ref`/`_assign` variants: a port of `mpfr_cot`,
   MPFR's generic reciprocal template with the tangent. MPFR's tangent is itself a quotient of a
