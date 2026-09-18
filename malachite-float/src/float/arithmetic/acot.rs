@@ -14,11 +14,11 @@ use crate::float::arithmetic::atan::{
     arc_with_period_scale, atan_rational_helper, scaled_unsigned,
 };
 use crate::float::arithmetic::round_near_x::{round_from_above, value_is_tie};
-use crate::float::arithmetic::sin::SCALE;
+use crate::float::arithmetic::sin::{SCALE, SCALE_I64, SCALED_INPUT_EXPONENT};
 use crate::{emulate_float_to_float_fn, emulate_rational_to_float_fn};
 use core::cmp::Ordering::{self, Equal, Greater, Less};
 use malachite_base::num::arithmetic::traits::{
-    Abs, Acot, AcotAssign, CeilingLogBase2, IsPowerOf2, NegAssign, Reciprocal,
+    Abs, Acot, AcotAssign, CeilingLogBase2, IsPowerOf2, NegAssign, PowerOf2, Reciprocal,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -182,6 +182,70 @@ fn acot_with_period_prec_round_normal_ref(
         // range, since |acot x| <= pi/2 and u < 2^64. Rounding away from zero is what the
         // arccotangent's large-x shortcut needs too, `Up` being its own reflection.
         |w| x.acot_prec_round_ref(w, Up).0 << SCALE,
+        u,
+        positive,
+        prec,
+        rm,
+    )
+}
+
+// Computes acot(x) u/(2 pi) for a nonzero `Rational` x and a nonzero u, rounded to precision `prec`
+// with rounding mode `rm`. (x = 0 and u = 0 are handled by the caller.)
+//
+// The exact cases are the arctangent's, seen through the reciprocal: |x| = 1 gives an eighth of a
+// turn. The arccotangent is odd, so it carries the sign of x.
+pub(crate) fn acot_with_period_rational_helper(
+    x: &Rational,
+    u: u64,
+    prec: u64,
+    rm: RoundingMode,
+) -> (Float, Ordering) {
+    let positive = *x > 0u32;
+    let exp_x = x.floor_log_base_2_abs() + 1;
+    // |x| = 1: acotu(1, u) = u/8 and acotu(-1, u) = -u/8, both exact
+    if x.denominator_ref() == &1u32 && x.numerator_ref() == &1u32 {
+        return scaled_unsigned(u, 3, positive, prec, rm);
+    }
+    // Nothing else can be rounded exactly
+    assert_ne!(rm, Exact, "Inexact acot_with_period_rational");
+    // As in the `Float` case, a tiny x is answered from the neighbour of u/4: acot(x) = pi/2 - x
+    // r(x) with 0 < r(x) < 1, so the correction is below an eighth of an ulp of u/4 once EXP(x) is
+    // at most -prec - 3. A `Rational` reaches far below the exponent range, where the general path
+    // would work at a precision of the order of EXP(x), the quarter turn being exactly
+    // representable.
+    if exp_x <= -64 && exp_x <= -i64::exact_from(prec) - 3 {
+        let w = if prec <= 63 { 65 } else { prec + 2 };
+        // exact, since w >= 64
+        let mut t = Float::from_unsigned_prec_round(u, w, Exact).0;
+        t.decrement();
+        // the last bit of t is 1 and w exceeds the target precision, so t is not representable
+        // there, which pins the ternary value below
+        t >>= 2u32;
+        if !positive {
+            t.neg_assign();
+        }
+        return Float::from_float_prec_round(t, prec, rm);
+    }
+    // An |x| large enough to put acot(x) = (1/x)(1 - O(x^-2)) below the smallest positive `Float`,
+    // where `acot_rational_helper` would report an underflow -- but a large u can lift acot(x) u/(2
+    // pi) back into the range, so the reciprocal, exact as a `Rational` and above acot(x) by less
+    // than any reachable working precision can resolve, is taken here instead, scaled up by 2^SCALE
+    // for the quotient. It keeps the sign of x, the arccotangent being odd.
+    if 1 - exp_x <= SCALED_INPUT_EXPONENT {
+        let scaled = Rational::power_of_2(SCALE_I64) / x;
+        return arc_with_period_scale(
+            |w| Float::from_rational_prec_round_ref(&scaled, w, Up).0,
+            u,
+            positive,
+            prec,
+            rm,
+        );
+    }
+    arc_with_period_scale(
+        // scaling by a power of 2 is exact, and acot(x) u 2^SCALE stays far below the top of the
+        // range, since |acot x| <= pi/2 and u < 2^64. Rounding away from zero is what the
+        // arccotangent's own large-x handling needs too, `Up` being its own reflection.
+        |w| acot_rational_helper(x, w, Up).0 << SCALE,
         u,
         positive,
         prec,
@@ -1191,6 +1255,233 @@ impl Float {
         let prec = self.significant_bits();
         self.acot_with_period_prec_assign(u, prec);
     }
+    /// Computes $\operatorname{acot}(x)u/(2\pi)$, the arccotangent of a [`Rational`] measured in
+    /// $u$ths of a turn, rounding the result to the specified precision and with the specified
+    /// rounding mode and returning the result as a [`Float`]. The [`Rational`] is taken by value.
+    /// An [`Ordering`] is also returned, indicating whether the rounded arccotangent is less than,
+    /// equal to, or greater than the exact arccotangent.
+    ///
+    /// See [`RoundingMode`] for a description of the possible rounding modes.
+    ///
+    /// $$
+    /// f(x,u,p,m) = \operatorname{acot}(x)u/(2\pi)+\varepsilon.
+    /// $$
+    /// - If $x$ is zero, if $u = 0$, or if $|x|$ is 1, $\varepsilon$ may be ignored or assumed to
+    ///   be 0.
+    /// - Otherwise, if $m$ is not `Nearest`, then $|\varepsilon| < 2^{\lfloor\log_2
+    ///   |\operatorname{acot}(x)u/(2\pi)|\rfloor-p+1}$.
+    /// - Otherwise, if $m$ is `Nearest`, then $|\varepsilon| \leq 2^{\lfloor\log_2
+    ///   |\operatorname{acot}(x)u/(2\pi)|\rfloor-p}$.
+    ///
+    /// The output has precision `prec`.
+    ///
+    /// Special cases:
+    /// - $f(x,0,p,m)=\pm0.0$, with the sign of $x$; a [`Rational`] zero has no sign, so it takes
+    ///   the positive one
+    /// - $f(0,u,p,m)=u/4$, a quarter turn, the value the positive side approaches
+    /// - $f(\pm1,u,p,m)=\pm u/8$, an eighth of a turn
+    ///
+    /// Those are the only exact cases -- the arccotangent's exact values are the arctangent's, seen
+    /// through the reciprocal -- and the turn fractions are exact only when $p$ is large enough to
+    /// hold them. This is the odd arccotangent, $\arctan(1/x)$; see
+    /// [`Float::acot_rational_prec_round`].
+    ///
+    /// The arccotangent is odd, so $f(-x,u,p,m)=-f(x,u,p,-m)$, with $-m$ the reflection of $m$ that
+    /// swaps `Floor` and `Ceiling`.
+    ///
+    /// Underflow:
+    /// - If $0<|f(x,u,p,m)|<2^{-2^{30}}$, and $m$ is `Floor`, `Down`, or `Nearest` with the result
+    ///   at most $2^{-2^{30}-1}$ in magnitude, a zero of the result's sign is returned instead.
+    /// - Otherwise, if $0<|f(x,u,p,m)|<2^{-2^{30}}$, $\pm2^{-2^{30}}$ is returned instead, with the
+    ///   sign of the result.
+    ///
+    /// Overflow is not possible, since $|f(x,u,p,m)| \leq u/4 < 2^{62}$. Underflow needs a small
+    /// $u$ together with a large $|x|$; a [`Rational`] has no exponent bound, so $|x|$ can be large
+    /// enough for that at any $u$.
+    ///
+    /// If you know you'll be using `Nearest`, consider using
+    /// [`Float::acot_with_period_rational_prec`] instead.
+    ///
+    /// # Worst-case complexity
+    /// $T(n, m) = O(n (\log n)^3 \log\log n + m \log m \log\log m)$
+    ///
+    /// $M(n, m) = O(n \log n + m \log m)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `prec`, and $m$ is
+    /// `x.significant_bits()`: the reciprocal is exact, and its arctangent, or $\pi/2$ minus the
+    /// arctangent of $x$ itself below 1, is taken at a working precision of about $n$ bits and
+    /// scaled by $u/(2\pi)$, which needs $\pi$ to that many bits; those cost the first term, and
+    /// the second is the reciprocal. A tiny $x$ skips the arctangent, its arccotangent being a
+    /// quarter turn to within the working precision, and a large one is the reciprocal of $|x|$ to
+    /// within it.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// // a zero is a quarter turn, an input of 1 an eighth, and one of -1 minus an eighth
+    /// let (c, o) = Float::acot_with_period_rational_prec_round(Rational::ZERO, 360, 10, Exact);
+    /// assert_eq!(c.to_string(), "90.000");
+    /// assert_eq!(o, Equal);
+    ///
+    /// let (c, o) = Float::acot_with_period_rational_prec_round(Rational::ONE, 360, 10, Exact);
+    /// assert_eq!(c.to_string(), "45.000");
+    /// assert_eq!(o, Equal);
+    ///
+    /// let (c, o) =
+    ///     Float::acot_with_period_rational_prec_round(Rational::NEGATIVE_ONE, 360, 10, Exact);
+    /// assert_eq!(c.to_string(), "-45.000");
+    /// assert_eq!(o, Equal);
+    ///
+    /// let (c, o) = Float::acot_with_period_rational_prec_round(
+    ///     Rational::from_unsigneds(5u8, 3),
+    ///     360,
+    ///     10,
+    ///     Floor,
+    /// );
+    /// assert_eq!(c.to_string(), "30.938");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    #[allow(clippy::needless_pass_by_value)]
+    pub fn acot_with_period_rational_prec_round(
+        x: Rational,
+        u: u64,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        Self::acot_with_period_rational_prec_round_ref(&x, u, prec, rm)
+    }
+
+    /// Computes $\operatorname{acot}(x)u/(2\pi)$, the arccotangent of a [`Rational`] measured in
+    /// $u$ths of a turn, rounding the result to the specified precision and with the specified
+    /// rounding mode and returning the result as a [`Float`]. The [`Rational`] is taken by
+    /// reference. An [`Ordering`] is also returned, indicating whether the rounded arccotangent is
+    /// less than, equal to, or greater than the exact arccotangent.
+    ///
+    /// See [`Float::acot_with_period_rational_prec_round`] for the error bounds, the special and
+    /// closed-form cases, underflow, and the complexity; this function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero, or if `rm` is `Exact` but the result cannot be represented exactly
+    /// with the given precision.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) = Float::acot_with_period_rational_prec_round_ref(
+    ///     &Rational::from_unsigneds(5u8, 3),
+    ///     360,
+    ///     10,
+    ///     Ceiling,
+    /// );
+    /// assert_eq!(c.to_string(), "30.969");
+    /// assert_eq!(o, Greater);
+    /// ```
+    pub fn acot_with_period_rational_prec_round_ref(
+        x: &Rational,
+        u: u64,
+        prec: u64,
+        rm: RoundingMode,
+    ) -> (Self, Ordering) {
+        assert_ne!(prec, 0);
+        if u == 0 {
+            // acotu(x, 0) = 0 with the sign of x, which keeps the function odd; a `Rational` zero
+            // has no sign, so it takes the positive one
+            return (
+                if *x < 0u32 {
+                    Self::NEGATIVE_ZERO
+                } else {
+                    Self::ZERO
+                },
+                Equal,
+            );
+        }
+        if *x == 0u32 {
+            // acot(0) = pi/2, so acotu(0, u) = u/4, a quarter turn
+            return scaled_unsigned(u, 2, true, prec, rm);
+        }
+        acot_with_period_rational_helper(x, u, prec, rm)
+    }
+
+    /// Computes $\operatorname{acot}(x)u/(2\pi)$, the arccotangent of a [`Rational`] measured in
+    /// $u$ths of a turn, rounding the result to the nearest value of the specified precision and
+    /// returning the result as a [`Float`]. The [`Rational`] is taken by value. An [`Ordering`] is
+    /// also returned, indicating whether the rounded arccotangent is less than, equal to, or
+    /// greater than the exact arccotangent.
+    ///
+    /// If the arccotangent is equidistant from two [`Float`]s with the specified precision, the
+    /// [`Float`] with fewer 1s in its binary expansion is chosen.
+    ///
+    /// See [`Float::acot_with_period_rational_prec_round`] for the error bounds, the special and
+    /// closed-form cases, underflow, and the complexity; this function behaves the same way.
+    ///
+    /// If you want to use a rounding mode other than `Nearest`, consider using
+    /// [`Float::acot_with_period_rational_prec_round`] instead.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) =
+    ///     Float::acot_with_period_rational_prec(Rational::from_unsigneds(5u8, 3), 360, 10);
+    /// assert_eq!(c.to_string(), "30.969");
+    /// assert_eq!(o, Greater);
+    ///
+    /// let (c, o) =
+    ///     Float::acot_with_period_rational_prec(Rational::from_unsigneds(5u8, 3), 360, 53);
+    /// assert_eq!(c.to_string(), "30.963756532073521");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn acot_with_period_rational_prec(x: Rational, u: u64, prec: u64) -> (Self, Ordering) {
+        Self::acot_with_period_rational_prec_round(x, u, prec, Nearest)
+    }
+
+    /// Computes $\operatorname{acot}(x)u/(2\pi)$, the arccotangent of a [`Rational`] measured in
+    /// $u$ths of a turn, rounding the result to the nearest value of the specified precision and
+    /// returning the result as a [`Float`]. The [`Rational`] is taken by reference. An [`Ordering`]
+    /// is also returned, indicating whether the rounded arccotangent is less than, equal to, or
+    /// greater than the exact arccotangent.
+    ///
+    /// See [`Float::acot_with_period_rational_prec`] and
+    /// [`Float::acot_with_period_rational_prec_round`]; this function behaves the same way.
+    ///
+    /// # Panics
+    /// Panics if `prec` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_float::Float;
+    /// use malachite_q::Rational;
+    /// use std::cmp::Ordering::*;
+    ///
+    /// let (c, o) =
+    ///     Float::acot_with_period_rational_prec_ref(&Rational::from_unsigneds(5u8, 3), 360, 53);
+    /// assert_eq!(c.to_string(), "30.963756532073521");
+    /// assert_eq!(o, Less);
+    /// ```
+    #[inline]
+    pub fn acot_with_period_rational_prec_ref(x: &Rational, u: u64, prec: u64) -> (Self, Ordering) {
+        Self::acot_with_period_rational_prec_round_ref(x, u, prec, Nearest)
+    }
 }
 
 impl Acot for Float {
@@ -1488,4 +1779,74 @@ where
     for<'a> T: ExactFrom<&'a Float> + RoundingFrom<&'a Float>,
 {
     emulate_float_to_float_fn(|x, prec| Float::acot_with_period_prec(x, u, prec), x)
+}
+
+/// Computes $\operatorname{acot}(x)u/(2\pi)$, the arccotangent of a [`Rational`] measured in $u$ths
+/// of a turn (so that `u = 360` gives degrees), returning the result as a primitive float.
+///
+/// This is `primitive_float_acot_rational` scaled by $u/(2\pi)$: see
+/// [`Float::acot_with_period_rational_prec_round`] for the error bounds and the special cases. A
+/// zero period gives a zero with the sign of $x$, a [`Rational`] zero having no sign and so taking
+/// the positive one; a zero input gives $u/4$, a quarter turn; and $\pm1$ give $\pm u/8$, an
+/// eighth. This is the odd arccotangent, $\arctan(1/x)$.
+///
+/// Overflow is not possible, since $|f(x,u)| \leq u/4 < 2^{62}$. The result is subnormal, or zero,
+/// only when $u$ is small and $|x|$ is large enough to put $u/(2\pi|x|)$ below the bottom of the
+/// type's normal range.
+///
+/// # Worst-case complexity
+/// $T(m) = O(m \log m \log\log m)$
+///
+/// $M(m) = O(m \log m)$
+///
+/// where $T$ is time, $M$ is additional memory, and $m$ is `x.significant_bits()`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_float::float::arithmetic::acot::primitive_float_acot_with_period_rational;
+/// use malachite_q::Rational;
+///
+/// // a zero is a quarter turn, an input of 1 an eighth, and one of -1 minus an eighth
+/// assert_eq!(
+///     NiceFloat(primitive_float_acot_with_period_rational::<f64>(
+///         &Rational::ZERO,
+///         360
+///     )),
+///     NiceFloat(90.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_acot_with_period_rational::<f64>(
+///         &Rational::ONE,
+///         360
+///     )),
+///     NiceFloat(45.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_acot_with_period_rational::<f64>(
+///         &Rational::NEGATIVE_ONE,
+///         360
+///     )),
+///     NiceFloat(-45.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(primitive_float_acot_with_period_rational::<f64>(
+///         &Rational::from_unsigneds(5u8, 3),
+///         360
+///     )),
+///     NiceFloat(30.96375653207352)
+/// );
+/// ```
+#[inline]
+#[allow(clippy::type_repetition_in_bounds)]
+pub fn primitive_float_acot_with_period_rational<T: PrimitiveFloat>(x: &Rational, u: u64) -> T
+where
+    Float: PartialOrd<T>,
+    for<'a> T: ExactFrom<&'a Float>,
+{
+    emulate_rational_to_float_fn(
+        |x, prec| Float::acot_with_period_rational_prec_ref(x, u, prec),
+        x,
+    )
 }

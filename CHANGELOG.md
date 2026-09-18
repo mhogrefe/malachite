@@ -613,6 +613,13 @@ documented by git history.
   eighth. As for the arccosecant, this can underflow: for the largest `Float`s $1/|x|$ is only about
   twice the smallest positive one, and a small $u$ carries the quotient below it.
   `primitive_float_acot_with_period` gives the correctly rounded `f32` or `f64` angle.
+- `acot_with_period_rational_prec_round` and `acot_with_period_rational_prec` (with `_ref`
+  variants), which take a `Rational` and return the arccotangent measured in $u$ths of a turn as a
+  `Float`. A zero period gives a zero with the sign of $x$, a `Rational` zero having no sign and so
+  taking the positive one; a zero input gives $u/4$, a quarter turn; and $\pm1$ give $\pm u/8$, an
+  eighth. Those are the only exact cases. As for the arccosecant, this can underflow, and a
+  `Rational` has no exponent bound, so a large enough $|x|$ reaches that at any $u$.
+  `primitive_float_acot_with_period_rational` gives the correctly rounded `f32` or `f64` angle.
 - `Cot` and `CotAssign` (new traits in malachite-base) for `Float`, with the usual
   `cot_prec_round`, `cot_prec`, `cot_round`, and `_ref`/`_assign` variants: a port of `mpfr_cot`,
   MPFR's generic reciprocal template with the tangent. MPFR's tangent is itself a quotient of a
