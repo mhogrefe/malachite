@@ -6,6 +6,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::chars::latex::fmt_latex_chars;
+use alloc::string::String;
 use core::fmt::{Display, Formatter, Result};
 
 /// Converts a value to a LaTeX math-mode fragment.
@@ -59,5 +61,51 @@ impl<T: ToLatex> Display for LatexWrapper<'_, T> {
     #[inline]
     fn fmt(&self, f: &mut Formatter) -> Result {
         self.x.fmt_latex(f)
+    }
+}
+
+impl ToLatex for &str {
+    /// Writes a string slice as a LaTeX math-mode fragment.
+    ///
+    /// The fragment depicts the string: ordinary characters are gathered into `\text{...}` groups
+    /// and typeset as themselves, with LaTeX's special characters escaped, while characters that
+    /// LaTeX spells with a math-mode macro are written as that macro, outside any group. A string
+    /// mixing the two therefore comes out as, for example, `\text{100\% }\alpha`. No quotation
+    /// marks are added; the fragment is the string's content and nothing else.
+    ///
+    /// The empty string becomes `\text{}` rather than nothing at all.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.chars().count()`.
+    ///
+    /// # Examples
+    /// See [here](super::latex#fmt_latex).
+    #[inline]
+    fn fmt_latex(&self, f: &mut Formatter) -> Result {
+        fmt_latex_chars(self.chars(), f)
+    }
+}
+
+impl ToLatex for String {
+    /// Writes a [`String`] as a LaTeX math-mode fragment.
+    ///
+    /// This is identical to the [`&str`] implementation.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.chars().count()`.
+    ///
+    /// # Examples
+    /// See [here](super::latex#fmt_latex).
+    #[inline]
+    fn fmt_latex(&self, f: &mut Formatter) -> Result {
+        fmt_latex_chars(self.chars(), f)
     }
 }

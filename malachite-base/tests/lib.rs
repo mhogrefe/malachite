@@ -126,6 +126,7 @@ pub mod comparison {
 pub mod chars {
     pub mod char_type;
     pub mod constants;
+    pub mod latex;
     pub mod crement {
         pub mod char_to_contiguous_range;
         pub mod contiguous_range_to_char;
@@ -704,6 +705,7 @@ pub mod slices {
     pub mod split_into_chunks;
 }
 pub mod strings {
+    pub mod latex;
     pub mod exhaustive {
         pub mod exhaustive_fixed_length_strings;
         pub mod exhaustive_fixed_length_strings_using_chars;

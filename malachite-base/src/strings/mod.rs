@@ -300,6 +300,29 @@ pub mod gmp_format;
 /// assert_eq!(Negated(5).to_string(), r"-\left(5\right)");
 /// ```
 /// That fragment renders as $-\left(5\right)$.
+///
+/// The [`&str`] and [`String`] implementations live here too. A fragment depicts the string, with
+/// no quotation marks around it: ordinary characters are gathered into `\text{...}` groups and
+/// LaTeX's special characters are escaped, while characters that LaTeX spells with a math-mode
+/// macro are written as that macro, outside any group.
+///
+/// ```
+/// use malachite_base::strings::latex::ToLatex;
+///
+/// assert_eq!("hello".to_latex().to_string(), r"\text{hello}");
+/// assert_eq!("100%".to_latex().to_string(), r"\text{100\%}");
+/// assert_eq!("100% α".to_latex().to_string(), r"\text{100\% }\alpha");
+/// assert_eq!("A ≤ B".to_latex().to_string(), r"\text{A }\leq\text{ B}");
+/// assert_eq!("--flag".to_latex().to_string(), r"\text{-{}-flag}");
+/// ```
+///
+/// | value       | fragment                  | renders as                |
+/// |-------------|---------------------------|---------------------------|
+/// | `"hello"`   | `\text{hello}`            | $\text{hello}$            |
+/// | `"100%"`    | `\text{100\%}`            | $\text{100\\%}$            |
+/// | `"100% α"`  | `\text{100\% }\alpha`     | $\text{100\\% }\alpha$     |
+/// | `"A ≤ B"`   | `\text{A }\leq\text{ B}`  | $\text{A }\leq\text{ B}$  |
+/// | `"--flag"`  | `\text{-{}-flag}`         | $\text{-{}-flag}$         |
 pub mod latex;
 #[cfg(feature = "random")]
 /// Iterators that generate [`String`]s randomly.
