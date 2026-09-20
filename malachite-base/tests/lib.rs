@@ -367,6 +367,7 @@ pub mod num {
         pub mod string {
             pub mod from_sci_string;
             pub mod from_string;
+            pub mod latex;
             pub mod options {
                 pub mod from_sci_string_options;
                 pub mod to_sci_options;

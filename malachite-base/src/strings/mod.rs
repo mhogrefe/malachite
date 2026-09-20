@@ -266,6 +266,41 @@ pub mod exhaustive;
 /// function, for formatting values according to GMP-style `printf` format strings; the
 /// [`gmp_format!`](crate::gmp_format) macro wraps them.
 pub mod gmp_format;
+/// The [`ToLatex`](latex::ToLatex) trait, for converting a value to a LaTeX math-mode fragment, and
+/// the [`LatexWrapper`](latex::LatexWrapper) struct that its `to_latex` method returns.
+///
+/// # to_latex
+/// ```
+/// use malachite_base::strings::latex::ToLatex;
+///
+/// assert_eq!(123u32.to_latex().to_string(), "123");
+/// assert_eq!((-45i16).to_latex().to_string(), "-45");
+///
+/// // The output is a fragment, so it can be embedded in a larger expression.
+/// assert_eq!(format!("x^{{{}}}", 10u8.to_latex()), "x^{10}");
+/// ```
+/// Those fragments render as $123$, $-45$, and, once embedded, $x^{10}$.
+///
+/// # fmt_latex
+/// ```
+/// use malachite_base::strings::latex::ToLatex;
+/// use std::fmt::{Display, Formatter, Result};
+///
+/// // A type that embeds another value's fragment inside its own.
+/// struct Negated(i32);
+///
+/// impl Display for Negated {
+///     fn fmt(&self, f: &mut Formatter) -> Result {
+///         f.write_str("-\\left(")?;
+///         self.0.fmt_latex(f)?;
+///         f.write_str("\\right)")
+///     }
+/// }
+///
+/// assert_eq!(Negated(5).to_string(), r"-\left(5\right)");
+/// ```
+/// That fragment renders as $-\left(5\right)$.
+pub mod latex;
 #[cfg(feature = "random")]
 /// Iterators that generate [`String`]s randomly.
 pub mod random;

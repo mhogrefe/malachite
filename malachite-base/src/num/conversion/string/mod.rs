@@ -45,6 +45,20 @@ pub mod from_sci_string;
 /// [`FromStringBase`](super::traits::FromStringBase), a trait for converting strings in a specified
 /// base to numbers.
 pub mod from_string;
+/// [`ToLatex`](crate::strings::latex::ToLatex) implementations for primitive integers, converting
+/// them to LaTeX math-mode fragments.
+///
+/// # fmt_latex
+/// ```
+/// use malachite_base::strings::latex::ToLatex;
+///
+/// assert_eq!(0u8.to_latex().to_string(), "0");
+/// assert_eq!(123u32.to_latex().to_string(), "123");
+/// assert_eq!((-45i16).to_latex().to_string(), "-45");
+/// assert_eq!(i64::MIN.to_latex().to_string(), "-9223372036854775808");
+/// ```
+/// Those fragments render as $0$, $123$, $-45$, and $-9223372036854775808$.
+pub mod latex;
 /// [`ToSciOptions`](options::ToSciOptions) and
 /// [`FromSciSringOptions`](options::FromSciStringOptions), `struct`s for specifying parameters when
 /// using the [`FromSciString`](super::traits::FromSciString) and [`ToSci`](super::traits::ToSci)

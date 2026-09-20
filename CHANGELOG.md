@@ -6,7 +6,20 @@ Unreleased section as work lands; at release time the section is stamped with th
 date. The 0.10.0 section was reconstructed retroactively; releases before 0.10.0 are only
 documented by git history.
 
-## 0.12.0 (unreleased)
+## Unreleased
+
+### malachite-base
+
+- A new `ToLatex` trait, for converting a value to a LaTeX math-mode fragment, along with the
+  `LatexWrapper` struct that its `to_latex` method returns. The output is a fragment rather than a
+  complete expression, carrying no `$`, `\(`, `\[`, or environment of its own and leaving those
+  to the caller, so that one fragment can be embedded in another. `fmt_latex`, the method
+  implementors define, takes a `Formatter` rather than returning a `String`, so that a value
+  built out of smaller values writes its parts into a single buffer instead of allocating once per
+  level of nesting. So far it is implemented for the primitive integers, where the fragment is
+  identical to the `Display` output.
+
+## 0.12.0 — 2026-09-20
 
 ### Breaking and behavioral changes
 
