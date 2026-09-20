@@ -112,6 +112,7 @@ const SAMPLE_OUTPUT_TYPES_3: [[BitDistributorOutputType; 3]; 9] = [
 pub mod bools {
     pub mod constants;
     pub mod exhaustive;
+    pub mod latex;
     pub mod not_assign;
     pub mod random {
         pub mod get_weighted_random_bool;
@@ -580,6 +581,7 @@ pub mod options {
 }
 pub mod orderings {
     pub mod exhaustive;
+    pub mod latex;
     pub mod ordering_from_str;
     pub mod random;
 }
@@ -623,6 +625,7 @@ pub mod rounding_modes {
     pub mod exhaustive;
     pub mod from_str;
     pub mod hash;
+    pub mod latex;
     pub mod neg;
     pub mod random;
     pub mod size;
@@ -753,6 +756,7 @@ pub mod tuples {
         pub mod random_unique_tuples;
         pub mod random_units;
     }
+    pub mod latex;
     pub mod singletons;
 }
 pub mod unions {

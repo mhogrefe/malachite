@@ -9,7 +9,9 @@
 use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
+    latex::register(runner);
     not_assign::register(runner);
 }
 
+mod latex;
 mod not_assign;

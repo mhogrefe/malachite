@@ -581,6 +581,20 @@ pub const fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 /// );
 /// ```
 pub mod exhaustive;
+/// The implementation of [`ToLatex`](crate::strings::latex::ToLatex) for the unit type, the
+/// 0-tuple.
+///
+/// # fmt_latex
+/// ```
+/// use malachite_base::strings::latex::ToLatex;
+///
+/// assert_eq!(().to_latex().to_string(), "()");
+/// ```
+///
+/// | value | fragment | renders as |
+/// |-------|----------|------------|
+/// | `()`  | `()`     | $()$       |
+pub mod latex;
 #[cfg(feature = "random")]
 /// Iterators that generate tuples randomly.
 ///

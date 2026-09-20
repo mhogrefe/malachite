@@ -6,22 +6,10 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::test_util::runner::Runner;
+use malachite_base::strings::latex::ToLatex;
 
-pub(crate) fn register(runner: &mut Runner) {
-    clone::register(runner);
-    eq::register(runner);
-    from_str::register(runner);
-    hash::register(runner);
-    latex::register(runner);
-    neg::register(runner);
-    to_string::register(runner);
+#[test]
+fn test_to_latex() {
+    // The unit type has one value, so this assertion covers the whole domain.
+    assert_eq!(().to_latex().to_string(), "()");
 }
-
-mod clone;
-mod eq;
-mod from_str;
-mod hash;
-mod latex;
-mod neg;
-mod to_string;

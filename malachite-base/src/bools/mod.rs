@@ -14,6 +14,21 @@
 pub mod constants;
 /// An iterator that generates [`bool`]s without repetition.
 pub mod exhaustive;
+/// The implementation of [`ToLatex`](crate::strings::latex::ToLatex) for [`bool`].
+///
+/// # fmt_latex
+/// ```
+/// use malachite_base::strings::latex::ToLatex;
+///
+/// assert_eq!(true.to_latex().to_string(), r"\text{T}");
+/// assert_eq!(false.to_latex().to_string(), r"\text{F}");
+/// ```
+///
+/// | value   | fragment   | renders as |
+/// |---------|------------|------------|
+/// | `true`  | `\text{T}` | $\text{T}$ |
+/// | `false` | `\text{F}` | $\text{F}$ |
+pub mod latex;
 /// The implementation of [`NotAssign`](crate::num::logic::traits::NotAssign) for [`bool`].
 pub mod not_assign;
 #[cfg(feature = "random")]

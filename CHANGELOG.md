@@ -20,7 +20,11 @@ documented by git history.
   identical to the `Display` output, and for the primitive floats, where the infinities become
   `\infty` and `-\infty`, `NaN` becomes `\text{NaN}`, the zeros keep their signs as `0.0` and
   `-0.0`, and a finite value starts from its shortest round-tripping `NiceFloat` representation,
-  with an exponent rewritten in the form `1.0 \times 10^{-45}`.
+  with an exponent rewritten in the form `1.0 \times 10^{-45}`. It is also implemented for the
+  unit type, which becomes `()`; for `bool`, which becomes `\text{T}` or `\text{F}`; for
+  `Ordering`, which becomes the relation symbol it stands for, `<`, `=`, or `>`; and for
+  `RoundingMode`, which becomes its name in uppercase, such as `\text{FLOOR}` — there being no
+  conventional mathematical symbol for a rounding mode.
 
 ## 0.12.0 — 2026-09-20
 
