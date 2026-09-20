@@ -8,3 +8,6 @@
 
 /// Iterators that generate maps without repetition.
 pub mod exhaustive;
+#[cfg(feature = "random")]
+/// Iterators that generate maps randomly.
+pub mod random;

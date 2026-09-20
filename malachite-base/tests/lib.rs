@@ -205,6 +205,28 @@ pub mod maps {
         pub mod exhaustive_hash_maps_unique_value_count_inclusive_range;
         pub mod exhaustive_hash_maps_unique_value_count_range;
     }
+    pub mod random {
+        pub mod random_b_tree_maps;
+        pub mod random_b_tree_maps_fixed_size;
+        pub mod random_b_tree_maps_fixed_unique_value_count;
+        pub mod random_b_tree_maps_from_size_iterator;
+        pub mod random_b_tree_maps_min_size;
+        pub mod random_b_tree_maps_size_and_unique_value_count_inclusive_range;
+        pub mod random_b_tree_maps_size_inclusive_range;
+        pub mod random_b_tree_maps_size_range;
+        pub mod random_b_tree_maps_unique_value_count_inclusive_range;
+        pub mod random_b_tree_maps_unique_value_count_range;
+        pub mod random_hash_maps;
+        pub mod random_hash_maps_fixed_size;
+        pub mod random_hash_maps_fixed_unique_value_count;
+        pub mod random_hash_maps_from_size_iterator;
+        pub mod random_hash_maps_min_size;
+        pub mod random_hash_maps_size_and_unique_value_count_inclusive_range;
+        pub mod random_hash_maps_size_inclusive_range;
+        pub mod random_hash_maps_size_range;
+        pub mod random_hash_maps_unique_value_count_inclusive_range;
+        pub mod random_hash_maps_unique_value_count_range;
+    }
 }
 pub mod named;
 pub mod nevers {

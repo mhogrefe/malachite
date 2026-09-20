@@ -80,6 +80,24 @@ documented by git history.
   `_size_and_unique_value_count_inclusive_range`, which restricts both. A map with $k$ entries has
   between 1 and $k$ distinct values, or 0 if $k$ is 0, so the two restrictions are intersected with
   that range rather than applied independently.
+- Random generators of [`HashMap`]s and [`BTreeMap`]s, matching the new exhaustive ones:
+  `random_hash_maps` and `random_b_tree_maps`, with `_fixed_size`, `_from_size_iterator`,
+  `_min_size`, `_size_range`, and `_size_inclusive_range` variants, plus
+  `_fixed_unique_value_count`, `_unique_value_count_range`, `_unique_value_count_inclusive_range`,
+  and `_size_and_unique_value_count_inclusive_range`, which restrict the number of distinct values
+  as the exhaustive generators do. Sizes come from a geometric distribution, as lengths do
+  elsewhere, except where a size range is given and they are uniform. A map with $k$ entries has
+  between 1 and $k$ distinct values, or 0 if $k$ is 0, so the size is drawn first and the
+  distinct-value count is then drawn uniformly from those the size admits; when both are restricted,
+  the sizes are drawn only from those that admit an allowed count. Maps with the same size and
+  distinct-value count are not equally likely — those whose values are spread evenly over the keys
+  are favored — but every such map is reachable. Each entry consumes exactly one draw from the value
+  iterator, and a repeated key costs a key draw but no value draw; pairing keys with values by the
+  map's own iteration order instead would make a [`HashMap`]'s contents depend on the hasher, and so
+  differ between runs. As for random sets, the key iterator must be able to produce as many distinct
+  keys as the largest size requested — and, for the unique-value-count generators, the value
+  iterator as many distinct values as the largest count requested — or the generator will hang.
+
 - `exhaustive_vecs_fixed_length_with_distinct_count_inclusive_range`, generating the [`Vec`]s of a
   fixed length whose number of distinct elements lies in a range. Filtering unrestricted [`Vec`]s
   would not do: asking for one distinct element among length-$k$ [`Vec`]s over $n$ elements passes
