@@ -273,3 +273,7 @@ pub mod latex;
 #[cfg(feature = "random")]
 /// Iterators that generate [`String`]s randomly.
 pub mod random;
+/// The [`ToTypst`](typst::ToTypst) trait, for converting a value to a Typst math-mode fragment, the
+/// [`TypstWrapper`](typst::TypstWrapper) struct that its `to_typst` method returns, and the
+/// implementations for [`&str`] and [`String`].
+pub mod typst;

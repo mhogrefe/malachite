@@ -44,3 +44,5 @@ pub mod latex;
 #[cfg(feature = "random")]
 /// Iterators that generate [`Ordering`]s randomly.
 pub mod random;
+/// The implementation of [`ToTypst`](crate::strings::typst::ToTypst) for [`Ordering`].
+pub mod typst;

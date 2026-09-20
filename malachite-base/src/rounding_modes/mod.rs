@@ -89,3 +89,5 @@ pub mod neg;
 pub mod random;
 /// Functions for displaying a [`RoundingMode`].
 pub mod to_string;
+/// The implementation of [`ToTypst`](crate::strings::typst::ToTypst) for [`RoundingMode`].
+pub mod typst;

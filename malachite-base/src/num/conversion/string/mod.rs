@@ -248,3 +248,55 @@ pub mod to_sci;
 /// assert_eq!((-1000i16).to_string_base_upper(36), "-RS");
 /// ```
 pub mod to_string;
+/// [`ToTypst`](crate::strings::typst::ToTypst) implementations for primitive integers and primitive
+/// floats, converting them to Typst math-mode fragments.
+///
+/// # fmt_typst
+/// ```
+/// use malachite_base::strings::typst::ToTypst;
+///
+/// assert_eq!(0u8.to_typst().to_string(), "0");
+/// assert_eq!(123u32.to_typst().to_string(), "123");
+/// assert_eq!((-45i16).to_typst().to_string(), "-45");
+/// assert_eq!(i64::MIN.to_typst().to_string(), "-9223372036854775808");
+/// ```
+///
+/// | value      | fragment               |
+/// |------------|------------------------|
+/// | `0u8`      | `0`                    |
+/// | `123u32`   | `123`                  |
+/// | `-45i16`   | `-45`                  |
+/// | `i64::MIN` | `-9223372036854775808` |
+///
+/// ```
+/// use malachite_base::num::basic::floats::PrimitiveFloat;
+/// use malachite_base::num::basic::traits::NegativeInfinity;
+/// use malachite_base::strings::typst::ToTypst;
+///
+/// assert_eq!(f64::NAN.to_typst().to_string(), r#""NaN""#);
+/// assert_eq!(f64::INFINITY.to_typst().to_string(), "infinity");
+/// assert_eq!(f64::NEGATIVE_INFINITY.to_typst().to_string(), "-infinity");
+/// assert_eq!(0.0f64.to_typst().to_string(), "0.0");
+/// assert_eq!((-0.0f64).to_typst().to_string(), "-0.0");
+///
+/// assert_eq!(1.0f64.to_typst().to_string(), "1.0");
+/// assert_eq!(0.00123f64.to_typst().to_string(), "0.00123");
+/// assert_eq!(1.0e16f64.to_typst().to_string(), "1.0 times 10^(16)");
+/// assert_eq!(
+///     f32::MIN_POSITIVE_SUBNORMAL.to_typst().to_string(),
+///     "1.0 times 10^(-45)"
+/// );
+/// ```
+///
+/// | value                         | fragment             |
+/// |-------------------------------|----------------------|
+/// | `f64::NAN`                    | `"NaN"`              |
+/// | `f64::INFINITY`               | `infinity`           |
+/// | `f64::NEGATIVE_INFINITY`      | `-infinity`          |
+/// | `0.0`                         | `0.0`                |
+/// | `-0.0`                        | `-0.0`               |
+/// | `1.0`                         | `1.0`                |
+/// | `0.00123`                     | `0.00123`            |
+/// | `1.0e16`                      | `1.0 times 10^(16)`  |
+/// | `f32::MIN_POSITIVE_SUBNORMAL` | `1.0 times 10^(-45)` |
+pub mod typst;

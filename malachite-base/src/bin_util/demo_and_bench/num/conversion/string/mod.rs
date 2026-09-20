@@ -15,6 +15,7 @@ pub(crate) fn register(runner: &mut Runner) {
     options::register(runner);
     to_sci::register(runner);
     to_string::register(runner);
+    typst::register(runner);
 }
 
 mod from_sci_string;
@@ -23,3 +24,4 @@ mod latex;
 mod options;
 mod to_sci;
 mod to_string;
+mod typst;

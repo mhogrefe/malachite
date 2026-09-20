@@ -75,3 +75,5 @@ pub mod latex;
 #[cfg(feature = "random")]
 /// Iterators that generate [`Option`]s randomly.
 pub mod random;
+/// The implementation of [`ToTypst`](crate::strings::typst::ToTypst) for [`Option`].
+pub mod typst;

@@ -813,3 +813,6 @@ pub mod latex;
 /// );
 /// ```
 pub mod random;
+/// The implementation of [`ToTypst`](crate::strings::typst::ToTypst) for the unit type, the
+/// 0-tuple.
+pub mod typst;

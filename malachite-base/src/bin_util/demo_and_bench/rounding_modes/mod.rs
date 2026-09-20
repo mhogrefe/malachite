@@ -16,6 +16,7 @@ pub(crate) fn register(runner: &mut Runner) {
     latex::register(runner);
     neg::register(runner);
     to_string::register(runner);
+    typst::register(runner);
 }
 
 mod clone;
@@ -25,3 +26,4 @@ mod hash;
 mod latex;
 mod neg;
 mod to_string;
+mod typst;

@@ -47,6 +47,12 @@ bin_build = ["walkdir", "test_build"]
 [dev-dependencies]
 malachite-base = { workspace = true, features = ["test_build"] }
 maplit = "1.0.2"
+# An oracle for the `ToTypst` tests: every fragment is compiled by Typst itself, so that a
+# fragment that Typst would reject cannot pass. Test-only; the library depends on neither.
+typst = "0.15.1"
+typst-as-lib = "0.16.0"
+typst-layout = "0.15.1"
+typst-assets = { version = "0.15.1", features = ["fonts"] }
 
 [package.metadata.docs.rs]
 # The `random` module is behind the `random` feature, so without this docs.rs would omit it

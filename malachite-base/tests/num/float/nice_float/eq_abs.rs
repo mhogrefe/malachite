@@ -16,7 +16,7 @@ use malachite_base::test_util::generators::{
 
 #[test]
 fn test_eq_abs() {
-    let test = |s, t, eq| {
+    let test = |s: f64, t: f64, eq: bool| {
         let u = NiceFloat(s);
         let v = NiceFloat(t);
         assert_eq!(u.eq_abs(&v), eq);

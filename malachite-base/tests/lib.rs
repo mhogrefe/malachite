@@ -119,6 +119,7 @@ pub mod bools {
         pub mod random_bools;
         pub mod weighted_random_bools;
     }
+    pub mod typst;
 }
 pub mod comparison {
     pub mod macros;
@@ -150,6 +151,7 @@ pub mod chars {
         pub mod random_char_range;
         pub mod random_chars;
     }
+    pub mod typst;
 }
 pub mod extra_variadic;
 pub mod iterators {
@@ -420,6 +422,7 @@ pub mod num {
             }
             pub mod to_sci;
             pub mod to_string;
+            pub mod typst;
         }
     }
     pub mod exhaustive {
@@ -624,12 +627,14 @@ pub mod options {
         pub mod random_options;
         pub mod random_somes;
     }
+    pub mod typst;
 }
 pub mod orderings {
     pub mod exhaustive;
     pub mod latex;
     pub mod ordering_from_str;
     pub mod random;
+    pub mod typst;
 }
 pub mod random {
     pub mod fork;
@@ -676,6 +681,7 @@ pub mod rounding_modes {
     pub mod random;
     pub mod size;
     pub mod to_string;
+    pub mod typst;
 }
 pub mod sets {
     pub mod exhaustive {
@@ -777,6 +783,7 @@ pub mod strings {
     pub mod to_lower_hex_string;
     pub mod to_octal_string;
     pub mod to_upper_hex_string;
+    pub mod typst;
 }
 pub mod tuples {
     pub mod exhaustive {
@@ -805,6 +812,7 @@ pub mod tuples {
     }
     pub mod latex;
     pub mod singletons;
+    pub mod typst;
 }
 pub mod unions {
     pub mod clone;

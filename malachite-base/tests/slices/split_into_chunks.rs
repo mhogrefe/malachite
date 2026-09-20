@@ -29,8 +29,8 @@ fn test_split_into_chunks() {
     assert_eq!(xs_3, &[2, 3, 4, 5, 6, 7]);
 
     split_into_chunks!(xs, 0, [xs_1, xs_2], xs_3);
-    assert_eq!(xs_1, &[]);
-    assert_eq!(xs_2, &[]);
+    assert_eq!(xs_1, &[0i32; 0]);
+    assert_eq!(xs_2, &[0i32; 0]);
     assert_eq!(xs_3, &[0, 1, 2, 3, 4, 5, 6, 7]);
 
     split_into_chunks!(xs, 5, [], xs_1);
@@ -62,8 +62,8 @@ fn test_split_into_chunks_mut() {
     assert_eq!(xs_3, &[2, 3, 4, 5, 6, 7]);
 
     split_into_chunks_mut!(xs, 0, [xs_1, xs_2], xs_3);
-    assert_eq!(xs_1, &[]);
-    assert_eq!(xs_2, &[]);
+    assert_eq!(xs_1, &[0i32; 0]);
+    assert_eq!(xs_2, &[0i32; 0]);
     assert_eq!(xs_3, &[0, 1, 2, 3, 4, 5, 6, 7]);
 
     split_into_chunks_mut!(xs, 5, [], xs_1);

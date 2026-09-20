@@ -42,6 +42,18 @@ documented by git history.
   [pylatexenc](https://github.com/phfaist/pylatexenc) (MIT, © 2015-2023 Philippe Faist), which in
   turn adapted it from latexcodec (MIT, © 2011-2014 Matthias C. M. Troffaes); both notices are
   reproduced in the generated table.
+- A new `ToTypst` trait, for converting a value to a Typst math-mode fragment, along with the
+  `TypstWrapper` struct that its `to_typst` method returns. It mirrors `ToLatex`, with an
+  implementation for every type that has one: the primitive integers and floats, `()`, `bool`,
+  `Ordering`, `RoundingMode`, `char`, `&str`, `String`, and `Option<T>` whenever `T: ToTypst`. Typst
+  reads Unicode natively and a quoted string typesets its contents as text, so a string needs no
+  character table at all: it is one string literal, with only `\` and `"` escaped and control
+  characters spelled rather than written, and `"100% α"` comes out as itself. A run of superscript
+  or subscript characters is the exception, and becomes a real script, since a text font often lacks
+  the Superscripts and Subscripts block. Where LaTeX writes `\text{NaN}`, `\infty`, `\bot`, and
+  `\left[5\right]`, Typst writes `"NaN"`, `infinity`, `bot`, and `[5]`, the last of which Typst
+  grows to fit its contents without being asked. Every fragment the tests produce is compiled by
+  Typst itself, so a fragment Typst would reject cannot pass.
 - `ToLatex` for `Option<T>` whenever `T: ToLatex`. `None` becomes `\bot`, and `Some` wraps its
   value in square brackets written with `\left` and `\right`, so that they grow to fit a value
   taller than one line: `Some(5)` becomes `\left[5\right]`. The brackets are not decoration:

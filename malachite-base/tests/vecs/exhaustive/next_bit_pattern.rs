@@ -44,7 +44,7 @@ fn next_bit_pattern_helper(
         patterns.len(),
         (min_bits..=max_bits)
             .map(|b| usize::binomial_coefficient(width, b))
-            .sum()
+            .sum::<usize>()
     );
     assert_eq!(patterns, expected_patterns);
 }
