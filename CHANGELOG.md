@@ -43,6 +43,25 @@ documented by git history.
   without them `Some(None)` and `None` would share a fragment, and distinct values would be
   indistinguishable. Braces would have served as well, but this crate's documentation already
   spells the Iverson bracket with them.
+- Exhaustive generators of ordered [`Vec`]s, the fourth quadrant alongside all `Vec`s, unique
+  `Vec`s, and ordered unique `Vec`s: the elements of each `Vec` appear in the order of the source
+  iterator but may repeat, so the `Vec`s are the multisets of the elements, each written in source
+  order. `exhaustive_ordered_vecs_fixed_length` generates those of one length by pairing each
+  ordered unique `Vec` with the compositions that assign its elements multiplicities, which is how
+  `exhaustive_unique_vecs` is built from ordered unique `Vec`s and permutations, and
+  `exhaustive_ordered_vecs_from_length_iterator` runs that for each length an iterator produces, the
+  way `exhaustive_vecs_from_length_iterator` does; `exhaustive_ordered_vecs`, with `_min_length`,
+  `_length_range`, and `_length_inclusive_range` variants, are built on it, so that the lengths of
+  their output grow logarithmically, as the all-`Vec`s family's do. (Interleaving subsets rather
+  than lengths, whatever the index sequence, gives one subset a constant share of the output and
+  makes lengths grow linearly instead.) `shortlex_ordered_vecs` and its `_min_length`,
+  `_length_range`, and `_length_inclusive_range` variants generate them in order of increasing
+  length and lexicographically within each length; and `lex_ordered_vecs_fixed_length`,
+  `_length_range`, and `_length_inclusive_range` generate them lexicographically. There is no
+  unbounded lexicographic variant, since with repetition allowed it would produce `[x]`, `[x, x]`,
+  `[x, x, x]`, and so on forever without reaching a second element — the same reason the all-`Vec`s
+  family has `shortlex_vecs` but no `lex_vecs`. The count for a fixed length $k$ from $n$ elements
+  is $\binom{n+k-1}{k}$, and over a nonempty source the unbounded generators are infinite.
 
 ### Documentation
 

@@ -786,6 +786,12 @@ pub mod vecs {
         pub mod exhaustive_ordered_unique_vecs_length_inclusive_range;
         pub mod exhaustive_ordered_unique_vecs_length_range;
         pub mod exhaustive_ordered_unique_vecs_min_length;
+        pub mod exhaustive_ordered_vecs;
+        pub mod exhaustive_ordered_vecs_fixed_length;
+        pub mod exhaustive_ordered_vecs_from_length_iterator;
+        pub mod exhaustive_ordered_vecs_length_inclusive_range;
+        pub mod exhaustive_ordered_vecs_length_range;
+        pub mod exhaustive_ordered_vecs_min_length;
         pub mod exhaustive_unique_vecs;
         pub mod exhaustive_unique_vecs_fixed_length;
         pub mod exhaustive_unique_vecs_length_inclusive_range;
@@ -805,6 +811,9 @@ pub mod vecs {
         pub mod lex_ordered_unique_vecs_length_inclusive_range;
         pub mod lex_ordered_unique_vecs_length_range;
         pub mod lex_ordered_unique_vecs_min_length;
+        pub mod lex_ordered_vecs_fixed_length;
+        pub mod lex_ordered_vecs_length_inclusive_range;
+        pub mod lex_ordered_vecs_length_range;
         pub mod lex_unique_vecs;
         pub mod lex_unique_vecs_fixed_length;
         pub mod lex_unique_vecs_length_inclusive_range;
@@ -818,6 +827,10 @@ pub mod vecs {
         pub mod shortlex_ordered_unique_vecs_length_inclusive_range;
         pub mod shortlex_ordered_unique_vecs_length_range;
         pub mod shortlex_ordered_unique_vecs_min_length;
+        pub mod shortlex_ordered_vecs;
+        pub mod shortlex_ordered_vecs_length_inclusive_range;
+        pub mod shortlex_ordered_vecs_length_range;
+        pub mod shortlex_ordered_vecs_min_length;
         pub mod shortlex_unique_vecs;
         pub mod shortlex_unique_vecs_length_inclusive_range;
         pub mod shortlex_unique_vecs_length_range;
