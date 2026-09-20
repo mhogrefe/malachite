@@ -45,8 +45,8 @@ pub mod from_sci_string;
 /// [`FromStringBase`](super::traits::FromStringBase), a trait for converting strings in a specified
 /// base to numbers.
 pub mod from_string;
-/// [`ToLatex`](crate::strings::latex::ToLatex) implementations for primitive integers, converting
-/// them to LaTeX math-mode fragments.
+/// [`ToLatex`](crate::strings::latex::ToLatex) implementations for primitive integers and primitive
+/// floats, converting them to LaTeX math-mode fragments.
 ///
 /// # fmt_latex
 /// ```
@@ -57,7 +57,45 @@ pub mod from_string;
 /// assert_eq!((-45i16).to_latex().to_string(), "-45");
 /// assert_eq!(i64::MIN.to_latex().to_string(), "-9223372036854775808");
 /// ```
-/// Those fragments render as $0$, $123$, $-45$, and $-9223372036854775808$.
+///
+/// | value      | fragment               | renders as             |
+/// |------------|------------------------|------------------------|
+/// | `0u8`      | `0`                    | $0$                    |
+/// | `123u32`   | `123`                  | $123$                  |
+/// | `-45i16`   | `-45`                  | $-45$                  |
+/// | `i64::MIN` | `-9223372036854775808` | $-9223372036854775808$ |
+///
+/// ```
+/// use malachite_base::num::basic::floats::PrimitiveFloat;
+/// use malachite_base::num::basic::traits::NegativeInfinity;
+/// use malachite_base::strings::latex::ToLatex;
+///
+/// assert_eq!(f64::NAN.to_latex().to_string(), r"\text{NaN}");
+/// assert_eq!(f64::INFINITY.to_latex().to_string(), r"\infty");
+/// assert_eq!(f64::NEGATIVE_INFINITY.to_latex().to_string(), r"-\infty");
+/// assert_eq!(0.0f64.to_latex().to_string(), "0.0");
+/// assert_eq!((-0.0f64).to_latex().to_string(), "-0.0");
+///
+/// assert_eq!(1.0f64.to_latex().to_string(), "1.0");
+/// assert_eq!(0.00123f64.to_latex().to_string(), "0.00123");
+/// assert_eq!(1.0e16f64.to_latex().to_string(), r"1.0 \times 10^{16}");
+/// assert_eq!(
+///     f32::MIN_POSITIVE_SUBNORMAL.to_latex().to_string(),
+///     r"1.0 \times 10^{-45}"
+/// );
+/// ```
+///
+/// | value                         | fragment              | renders as            |
+/// |-------------------------------|-----------------------|-----------------------|
+/// | `f64::NAN`                    | `\text{NaN}`          | $\text{NaN}$          |
+/// | `f64::INFINITY`               | `\infty`              | $\infty$              |
+/// | `f64::NEGATIVE_INFINITY`      | `-\infty`             | $-\infty$             |
+/// | `0.0`                         | `0.0`                 | $0.0$                 |
+/// | `-0.0`                        | `-0.0`                | $-0.0$                |
+/// | `1.0`                         | `1.0`                 | $1.0$                 |
+/// | `0.00123`                     | `0.00123`             | $0.00123$             |
+/// | `1.0e16`                      | `1.0 \times 10^{16}`  | $1.0 \times 10^{16}$  |
+/// | `f32::MIN_POSITIVE_SUBNORMAL` | `1.0 \times 10^{-45}` | $1.0 \times 10^{-45}$ |
 pub mod latex;
 /// [`ToSciOptions`](options::ToSciOptions) and
 /// [`FromSciSringOptions`](options::FromSciStringOptions), `struct`s for specifying parameters when

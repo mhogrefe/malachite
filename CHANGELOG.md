@@ -17,7 +17,10 @@ documented by git history.
   implementors define, takes a `Formatter` rather than returning a `String`, so that a value
   built out of smaller values writes its parts into a single buffer instead of allocating once per
   level of nesting. So far it is implemented for the primitive integers, where the fragment is
-  identical to the `Display` output.
+  identical to the `Display` output, and for the primitive floats, where the infinities become
+  `\infty` and `-\infty`, `NaN` becomes `\text{NaN}`, the zeros keep their signs as `0.0` and
+  `-0.0`, and a finite value starts from its shortest round-tripping `NiceFloat` representation,
+  with an exponent rewritten in the form `1.0 \times 10^{-45}`.
 
 ## 0.12.0 — 2026-09-20
 
