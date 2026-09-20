@@ -11,6 +11,7 @@ use crate::gaussian_rational::arithmetic::content_and_primitive_part::{
     scale_up_ref, scale_up_val,
 };
 use crate::gaussian_rational::{ComparableGaussianRationalRef, GaussianRational};
+use alloc::vec;
 use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::CheckedSqrt;
 use malachite_base::num::basic::traits::Zero;
@@ -47,7 +48,7 @@ impl CheckedSqrt for GaussianRational {
     ///
     /// The root is found by clearing denominators: with $L$ the LCM of the two denominators and $S
     /// = Lz$ a Gaussian integer, $z$ is a square in $\mathbb{Q}(i)$ exactly when $SL$ is a square
-    /// in $\mathbb{Z}[i]$, and then $\sqrt{z} = \sqrt{SL} / L$.
+    /// in $\mathbb{Z}\[i\]$, and then $\sqrt{z} = \sqrt{SL} / L$.
     ///
     /// $$
     /// f(z) = \begin{cases}
@@ -104,7 +105,7 @@ impl CheckedSqrt for &GaussianRational {
     ///
     /// The root is found by clearing denominators: with $L$ the LCM of the two denominators and $S
     /// = Lz$ a Gaussian integer, $z$ is a square in $\mathbb{Q}(i)$ exactly when $SL$ is a square
-    /// in $\mathbb{Z}[i]$, and then $\sqrt{z} = \sqrt{SL} / L$.
+    /// in $\mathbb{Z}\[i\]$, and then $\sqrt{z} = \sqrt{SL} / L$.
     ///
     /// $$
     /// f(z) = \begin{cases}
@@ -154,7 +155,7 @@ impl GaussianRational {
     /// lexicographic by real part and then imaginary part.
     ///
     /// The principal root is the one with positive real part or, if that is zero, with non-negative
-    /// imaginary part; see [`CheckedSqrt`](malachite_base::num::arithmetic::traits::CheckedSqrt).
+    /// imaginary part; see [`CheckedSqrt`].
     ///
     /// $$
     /// f(z) = \\{ w \in \mathbb{Q}(i) : w^2 = z \\}.

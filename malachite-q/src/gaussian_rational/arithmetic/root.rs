@@ -11,6 +11,7 @@ use crate::gaussian_rational::arithmetic::content_and_primitive_part::{
     scale_up_ref, scale_up_val,
 };
 use crate::gaussian_rational::{ComparableGaussianRationalRef, GaussianRational};
+use alloc::vec;
 use alloc::vec::Vec;
 use malachite_base::num::arithmetic::traits::{CheckedRoot, MulIPow, PowerOf2, ShrRound};
 use malachite_base::num::basic::traits::Zero;
@@ -191,7 +192,7 @@ impl GaussianRational {
     /// lexicographic by real part and then imaginary part.
     ///
     /// The principal root is the one whose argument lies in $(-\pi/g, \pi/g]$ for $g = \gcd(n, 4)$;
-    /// see [`CheckedRoot`](malachite_base::num::arithmetic::traits::CheckedRoot).
+    /// see [`CheckedRoot`].
     ///
     /// $$
     /// f(z, n) = \\{ w \in \mathbb{Q}(i) : w^n = z \\}.

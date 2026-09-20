@@ -1561,7 +1561,9 @@ fn test_cos_near_zero() {
 // Inputs within 2^(-2^30) of an odd multiple of pi/2, whose cosines underflow. Constructing an
 // input and each call computes pi to about 2^30 bits (~6 minutes each), so this test is slow even
 // in release mode; the two calls cover both signs, rounding to zero and rounding away from it, and
-// `Nearest` and a directed mode.
+// `Nearest` and a directed mode. Slow enough to dominate a test run, and its result does not depend
+// on the limb width, so it runs only in the 64-bit-limb configuration.
+#[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_cos_underflow() {
     let p = (1u64 << 30) + 64;
@@ -4318,7 +4320,10 @@ fn cos_rational_prec_properties() {
 
 // An input too large to be a `Float`, reduced modulo 2 pi in `Rational` arithmetic with pi to about
 // 2^30 bits (~14 minutes in release mode; MPFR cannot serve as an oracle here, so the value was
-// cross-checked by temporarily routing moderate inputs through the same reduction).
+// cross-checked by temporarily routing moderate inputs through the same reduction). Slow enough to
+// dominate a test run, and its result does not depend on the limb width, so it runs only in the
+// 64-bit-limb configuration.
+#[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_cos_rational_huge() {
     let x = Rational::power_of_2(1i64 << 30);
@@ -4331,7 +4336,10 @@ fn test_cos_rational_huge() {
 // Dyadic rationals within 2^(-2^30) of pi/2, whose cosines underflow: the near-zero path computes
 // the distance to pi/2 exactly and rounds the bracket in `Rational` arithmetic, so the underflow
 // decision and the `Ordering` are exact. Constructing the inputs and each call computes pi to about
-// 2^30 bits (~6 minutes each), so this test is slow even in release mode.
+// 2^30 bits (~6 minutes each), so this test is slow even in release mode. Slow enough to dominate a
+// test run, and its result does not depend on the limb width, so it runs only in the 64-bit-limb
+// configuration.
+#[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_cos_rational_underflow() {
     let p = (1u64 << 30) + 64;

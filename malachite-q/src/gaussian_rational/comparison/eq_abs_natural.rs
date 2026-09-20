@@ -12,8 +12,8 @@ use malachite_base::num::comparison::traits::{EqAbs, PartialOrdAbs};
 use malachite_nz::natural::Natural;
 
 impl EqAbs<Natural> for GaussianRational {
-    /// Determines whether the absolute values of a [`GaussianRational`] and a
-    /// [`Natural`](malachite_nz::natural::Natural) are equal.
+    /// Determines whether the absolute values of a [`GaussianRational`] and a [`Natural`] are
+    /// equal.
     ///
     /// The absolute value of a complex number is its distance from the origin, so two values are
     /// equal in absolute value exactly when their squared absolute values are equal. Purely real
@@ -55,8 +55,8 @@ impl EqAbs<Natural> for GaussianRational {
 }
 
 impl EqAbs<GaussianRational> for Natural {
-    /// Determines whether the absolute values of a [`Natural`](malachite_nz::natural::Natural) and
-    /// a [`GaussianRational`] are equal.
+    /// Determines whether the absolute values of a [`Natural`] and a [`GaussianRational`] are
+    /// equal.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$

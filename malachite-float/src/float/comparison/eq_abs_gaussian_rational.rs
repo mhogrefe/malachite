@@ -14,8 +14,7 @@ use malachite_q::Rational;
 use malachite_q::gaussian_rational::GaussianRational;
 
 impl EqAbs<GaussianRational> for Float {
-    /// Determines whether the absolute values of a [`Float`] and a
-    /// [`GaussianRational`](malachite_q::gaussian_rational::GaussianRational) are equal.
+    /// Determines whether the absolute values of a [`Float`] and a [`GaussianRational`] are equal.
     ///
     /// The absolute value of a complex number is its distance from the origin, so two values are
     /// equal in absolute value exactly when their squared absolute values are equal. Equality is
@@ -59,9 +58,7 @@ impl EqAbs<GaussianRational> for Float {
 }
 
 impl EqAbs<Float> for GaussianRational {
-    /// Determines whether the absolute values of a
-    /// [`GaussianRational`](malachite_q::gaussian_rational::GaussianRational) and a [`Float`] are
-    /// equal.
+    /// Determines whether the absolute values of a [`GaussianRational`] and a [`Float`] are equal.
     ///
     /// No [`GaussianRational`] is equal in absolute value to $\infty$, $-\infty$, or NaN.
     ///

@@ -8,6 +8,25 @@ documented by git history.
 
 ## 0.12.0 (unreleased)
 
+### Breaking and behavioral changes
+
+- `PrimitiveInt` and `PrimitiveFloat` have gained supertraits, so a type outside Malachite that
+  implements either of them must now implement those too. Both gained `AbsSquared`,
+  `AbsSquaredAssign`, `Conjugate`, `ConjugateAssign`, `IsGaussianInteger`, `IsReal`, `IsUnit`,
+  `CanonicalizeUnit`, `CanonicalizeUnitAssign`, and `CanonicalUnitIPow`; `PrimitiveInt` also
+  gained `IsPowerOf2`, and `PrimitiveFloat` also gained `DottieNumber`. Code that uses these
+  traits only as bounds is unaffected, and gains the new methods on every primitive type.
+- The `malachite` crate now enables the `floats` feature by default, so `Float` and the `float`
+  module are re-exported at its root. This costs nothing to compile, since `malachite-float` was
+  already being built by every default build, but a glob import of `malachite` alongside another
+  `Float` is now ambiguous.
+- The `malachite` crate's `std`, `random`, `enable_serde`, and `32_bit_limbs` features no longer
+  drag the optional sub-crates into the build; each now configures whichever of
+  `naturals_and_integers`, `rationals`, and `floats` is enabled. Those three build on one another
+  in turn, so asking for `floats` alone is now enough to get a usable `Float`. A build combining
+  `--no-default-features` with only a modifier feature, such as `--features std`, now gets
+  malachite-base alone instead of the whole workspace.
+
 ### malachite-base
 
 - New traits for complex types downstream (nothing in malachite-base implements them): the

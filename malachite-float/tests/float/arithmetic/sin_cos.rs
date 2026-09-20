@@ -3534,7 +3534,10 @@ fn test_sin_cos_near_zero() {
 }
 
 // Inputs within 2^(-2^30) of pi and of pi/2, where the sine or the cosine underflows. Each call
-// computes pi to about 2^30 bits, so this test is slow even in release mode.
+// computes pi to about 2^30 bits, so this test is slow even in release mode. Slow enough to
+// dominate a test run, and its result does not depend on the limb width, so it runs only in the
+// 64-bit-limb configuration.
+#[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_sin_cos_underflow() {
     let p = (1u64 << 30) + 64;
@@ -7651,7 +7654,10 @@ fn sin_cos_rational_prec_properties() {
 }
 
 // An input too large to be a `Float`, reduced modulo 2 pi once for both results, with pi to about
-// 2^30 bits; slow even in release mode. The values are those of the separate functions.
+// 2^30 bits; slow even in release mode. The values are those of the separate functions. Slow enough
+// to dominate a test run, and its result does not depend on the limb width, so it runs only in the
+// 64-bit-limb configuration.
+#[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_sin_cos_rational_huge() {
     let x = Rational::power_of_2(1i64 << 30);
@@ -7666,7 +7672,9 @@ fn test_sin_cos_rational_huge() {
 
 // Inputs within 2^(-2^30) of pi and of pi/2, where the sine or the cosine underflows while the
 // other result is just short of ±1. Each call computes pi to about 2^30 bits, so this test is slow
-// even in release mode.
+// even in release mode. Slow enough to dominate a test run, and its result does not depend on the
+// limb width, so it runs only in the 64-bit-limb configuration.
+#[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_sin_cos_rational_underflow() {
     let p = (1u64 << 30) + 64;

@@ -26,8 +26,7 @@ fn combine(x: Ordering, y: Ordering) -> Option<Ordering> {
 }
 
 impl PartialOrdAbs<GaussianInteger> for GaussianRational {
-    /// Compares the absolute values of a [`GaussianRational`] and a
-    /// [`GaussianInteger`](malachite_nz::gaussian_integer::GaussianInteger).
+    /// Compares the absolute values of a [`GaussianRational`] and a [`GaussianInteger`].
     ///
     /// The absolute value of a complex number is its distance from the origin, so this is
     /// equivalent to comparing squared absolute values. The squared absolute values are usually not
@@ -73,9 +72,7 @@ impl PartialOrdAbs<GaussianInteger> for GaussianRational {
 }
 
 impl PartialOrdAbs<GaussianRational> for GaussianInteger {
-    /// Compares the absolute values of a
-    /// [`GaussianInteger`](malachite_nz::gaussian_integer::GaussianInteger) and a
-    /// [`GaussianRational`].
+    /// Compares the absolute values of a [`GaussianInteger`] and a [`GaussianRational`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$

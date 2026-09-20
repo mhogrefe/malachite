@@ -23,8 +23,8 @@ functions produce exactly the same result as their counterparts in MPFR, unless 
 noted", and much of its arithmetic is ported directly from MPFR's. The consequence for the
 mapping is that agreement here is usually exact, down to the rounding of the last bit and the
 sign of a zero, and the notes can spend their time on the exceptions. The other consequence is
-that this is the page with the most ✗ rows: `Float` is younger than its model, and the rows
-mark, function by function, what remains to be built.
+that this page carries one of the longest lists of ✗ rows: `Float` is younger than its model,
+and the rows mark, function by function, what remains to be built.
 
 ## Conventions {#conventions}
 
@@ -887,61 +887,198 @@ and a `u64` base under a `Rational` exponent (`unsigned_pow_rational_prec_round`
 
 | | MPFR | Malachite |
 | :---: | --- | --- |
-| ✗ | `int mpfr_cos (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_sin (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_tan (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_cosu (mpfr_t rop, mpfr_t op, unsigned long int u, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_sinu (mpfr_t rop, mpfr_t op, unsigned long int u, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_tanu (mpfr_t rop, mpfr_t op, unsigned long int u, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_cospi (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_sinpi (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_tanpi (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_sin_cos (mpfr_t sop, mpfr_t cop, mpfr_t op, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_sec (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_csc (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_cot (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_acos (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_asin (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_atan (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_acosu (mpfr_t rop, mpfr_t op, unsigned long int u, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_asinu (mpfr_t rop, mpfr_t op, unsigned long int u, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_atanu (mpfr_t rop, mpfr_t op, unsigned long int u, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_acospi (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_asinpi (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_atanpi (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_atan2 (mpfr_t rop, mpfr_t y, mpfr_t x, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_atan2u (mpfr_t rop, mpfr_t y, mpfr_t x, unsigned long int u, mpfr_rnd_t rnd)` | |
-| ✗ | `int mpfr_atan2pi (mpfr_t rop, mpfr_t y, mpfr_t x, mpfr_rnd_t rnd)` | |
+| ✓ | `int mpfr_cos (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`cos_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.cos_prec_round), [`Cos`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Cos.html) |
+| ✓ | `int mpfr_sin (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`sin_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.sin_prec_round) |
+| ✓ | `int mpfr_tan (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`tan_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.tan_prec_round), [`Tan`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Tan.html) |
+| ✓ | `int mpfr_cosu (mpfr_t rop, mpfr_t op, unsigned long int u, mpfr_rnd_t rnd)` | [`cos_with_period_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.cos_with_period_prec_round) |
+| ✓ | `int mpfr_sinu (mpfr_t rop, mpfr_t op, unsigned long int u, mpfr_rnd_t rnd)` | [`sin_with_period_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.sin_with_period_prec_round) |
+| ✓ | `int mpfr_tanu (mpfr_t rop, mpfr_t op, unsigned long int u, mpfr_rnd_t rnd)` | [`tan_with_period_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.tan_with_period_prec_round) |
+| ✓ | `int mpfr_cospi (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`cos_pi_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.cos_pi_prec_round) |
+| ✓ | `int mpfr_sinpi (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`sin_pi_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.sin_pi_prec_round) |
+| ✓ | `int mpfr_tanpi (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`tan_pi_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.tan_pi_prec_round) |
+| ✓ | `int mpfr_sin_cos (mpfr_t sop, mpfr_t cop, mpfr_t op, mpfr_rnd_t rnd)` | [`sin_cos_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.sin_cos_prec_round) |
+| ✓ | `int mpfr_sec (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`sec_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.sec_prec_round) |
+| ✓ | `int mpfr_csc (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`csc_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.csc_prec_round) |
+| ✓ | `int mpfr_cot (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`cot_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.cot_prec_round) |
+| ✓ | `int mpfr_acos (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`acos_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.acos_prec_round) |
+| ✓ | `int mpfr_asin (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`asin_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.asin_prec_round) |
+| ✓ | `int mpfr_atan (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`atan_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.atan_prec_round) |
+| ✓ | `int mpfr_acosu (mpfr_t rop, mpfr_t op, unsigned long int u, mpfr_rnd_t rnd)` | [`acos_with_period_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.acos_with_period_prec_round) |
+| ✓ | `int mpfr_asinu (mpfr_t rop, mpfr_t op, unsigned long int u, mpfr_rnd_t rnd)` | [`asin_with_period_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.asin_with_period_prec_round) |
+| ✓ | `int mpfr_atanu (mpfr_t rop, mpfr_t op, unsigned long int u, mpfr_rnd_t rnd)` | [`atan_with_period_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.atan_with_period_prec_round) |
+| ✓ | `int mpfr_acospi (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`acos_pi_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.acos_pi_prec_round) |
+| ✓ | `int mpfr_asinpi (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`asin_pi_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.asin_pi_prec_round) |
+| ✓ | `int mpfr_atanpi (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`atan_pi_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.atan_pi_prec_round) |
+| ✓ | `int mpfr_atan2 (mpfr_t rop, mpfr_t y, mpfr_t x, mpfr_rnd_t rnd)` | [`atan2_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.atan2_prec_round) |
+| ✓ | `int mpfr_atan2u (mpfr_t rop, mpfr_t y, mpfr_t x, unsigned long int u, mpfr_rnd_t rnd)` | [`atan2_with_period_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.atan2_with_period_prec_round) |
+| ✓ | `int mpfr_atan2pi (mpfr_t rop, mpfr_t y, mpfr_t x, mpfr_rnd_t rnd)` | [`atan2_pi_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.atan2_pi_prec_round) |
 
-**The family.** Twenty-five rows, one gap: trigonometry is the next port after the exponential
-and power families, and none of it exists in Malachite yet, with no interim spelling to offer,
-correct rounding not being something a detour through `f64` can provide. This is also the
-family MPFR's cost warning names first: for large arguments the work is dominated by argument
-reduction, dividing out a $$2\pi$$ known to enough precision, and that cost is intrinsic to
-the specification.
+**The family.** Twenty-five rows, no gaps. Trigonometry was ported after the exponential and
+power families, and it is the family MPFR's cost warning names first: for large arguments the
+work is dominated by argument reduction, dividing out a $$2\pi$$ known to enough precision, and
+that cost is intrinsic to the specification rather than to any implementation of it — Malachite
+inherits it along with the algorithms. Past these twenty-five rows the section grows in two
+directions MPFR does not take: the periodic and half-turn variants it leaves out, covered in the
+notes below, and a `Rational`-argument variant of every function here.
 
 **The `u` and `pi` variants.** MPFR measures angles three ways: in radians, in turns scaled by
 `u` (`mpfr_sinu` computes the sine of $$op \times 2\pi/u$$, so `u = 360` "gets the... sine...
 for `op` in degrees"), and in half-turns (`mpfr_sinpi` and kin; `mpfr_atan2pi` "is the same as
-`mpfr_atan2u` with `u = 2`"). The scaled variants carry IEEE 754 exactness contracts that any
-future implementation inherits: `mpfr_cosu` returns $$+0$$ at half-integers of
-$$op \times 2/u$$ "so that the function is even", and `mpfr_sinu` returns a zero with the sign
-of `op` at integers "so that the function is odd", which means the rational points with exact
-answers must be detected rather than approached through ever-higher precision.
+`mpfr_atan2u` with `u = 2`"). The scaled variants carry IEEE 754 exactness contracts:
+`mpfr_cosu` returns $$+0$$ at half-integers of $$op \times 2/u$$ "so that the function is even",
+and `mpfr_sinu` returns a zero with the sign of `op` at integers "so that the function is odd",
+which means the rational points with exact answers must be detected rather than approached
+through ever-higher precision. `cos_with_period_prec_round` and `sin_with_period_prec_round`
+honor those contracts, and go a step further: the algebraic fractions of a turn (eighths,
+twelfths, fifths, and tenths for the cosine; thirds, sixths, eighths, and twentieths for the
+sine) are answered from a single correctly rounded constant ($$\sqrt2$$, $$\sqrt3$$, or
+$$\varphi$$) rather than from $$\pi$$ and a cosine or sine.
 
-**`mpfr_sin_cos`.** Both values in one argument reduction. The C signature forces two rounded
+**`mpfr_sin_cos`.** Both values in one argument reduction, and, at and above
+`MPFR_SINCOS_THRESHOLD`, the home of `mpfr_sincos_fast`, the binary-splitting tier that
+`mpfr_sin` and `mpfr_cos` also dispatch to; Malachite ports all of it, with the same dispatch from
+`sin_prec_round` and `cos_prec_round` at a threshold tuned the same way (25285 bits on Apple
+Silicon, against MPFR's 28990 for its arm build). The C signature forces two rounded
 results into one `int`, "s + 4c", zero "iff both results are exact", and forbids aliasing
-between the outputs; a Rust return of two values with two ternary
-[`Ordering`](https://doc.rust-lang.org/nightly/std/cmp/enum.Ordering.html)s makes both
-constraints structural when this is built. `mpfr_sec`, `mpfr_csc`, and `mpfr_cot` are the
-reciprocal trio, gaps with their primaries.
+between the outputs; `sin_cos_prec_round` returns two values with two ternary
+[`Ordering`](https://doc.rust-lang.org/nightly/std/cmp/enum.Ordering.html)s, which makes both
+constraints structural, and its `_assign` form takes the cosine's destination as a second `&mut`
+argument. Malachite also has `sin_cos_with_period_prec_round`, the sine and cosine in $$u$$ths
+of a turn together, which has no MPFR counterpart: `mpfr_sinu` and `mpfr_cosu` each reduce the
+argument and compute $$2\pi x/u$$ on their own.
 
-**The inverse functions.** `acos`, `asin`, `atan`, their `u` and `pi` scalings, and the
-two-argument `atan2` family with its twenty ISO C99 special cases, signed zeros along the axes
-and quarter-$$\pi$$ values at the infinite corners. One remark from the manual is worth keeping
-for its subtlety, and will hold in Malachite too: `acos(-1)` rounds $$\pi$$, and the rounded
-number "might not be in the output range" of the mathematical function; "still, the result
-lies in the image of the output range by the rounding function".
+**`mpfr_tan`.** The sine and cosine together, then their quotient, in one Ziv loop;
+`tan_prec_round` is the same. In Malachite's narrower exponent range the tangent can overflow
+(within $$2^{-2^{30}}$$ of an odd multiple of $$\pi/2$$) and underflow (within that distance of a
+multiple of $$\pi$$), neither of which MPFR's range reaches. `mpfr_tanu` is the one member of the
+family with poles in range, returning an exact infinity at an odd multiple of a quarter turn, and
+`tan_with_period_prec_round` does the same; `mpfr_tanpi` is that with $$u = 2$$, with poles at the
+half-integers. Malachite adds `tan_rational_prec_round` and `tan_with_period_rational_prec_round`,
+which take a `Rational` angle.
+
+**The reciprocal trio.** `mpfr_sec`, `mpfr_csc`, and `mpfr_cot` are instances of MPFR's generic
+reciprocal template, `gen_inverse.h`; `sec_prec_round`, `csc_prec_round`, and `cot_prec_round`
+match them. All three can overflow in Malachite's range where MPFR's cannot, and the cotangent,
+alone among them, can also underflow. MPFR has no `secu`, `cscu`, or `cotu` to match its `sinu` and
+`cosu`, nor the `pi` scalings; Malachite supplies all six, along with a `Rational` variant of each
+function. Measuring the angle in $$u$$ths of a turn reduces the argument exactly, so the algebraic
+fractions of a turn are answered from a single correctly rounded constant, and the poles return an
+exact infinity whose sign follows the input rather than the angle, which keeps each function odd or
+even as it should be.
+
+**The inverse functions.** `mpfr_atan` and `mpfr_atanu` map to `atan_prec_round` and
+`atan_with_period_prec_round`, the latter measuring the result in $$u$$ths of a turn, which is the
+inverse of the convention the periodic sine and cosine use for their inputs. `mpfr_atanpi` is
+`mpfr_atanu` with $$u = 2$$, the angle in half-turns, and `atan_pi_prec_round` matches it.
+Malachite adds a `Rational` variant of each. `mpfr_atan2` maps to
+`atan2_prec_round`, with the twenty ISO C99 special cases: signed zeros along the axes, quarter-
+and three-quarter-$$\pi$$ values at the infinite corners, and the sign of a zero argument choosing
+the quadrant. MPFR widens its exponent range for the whole of `atan2`, so its quotient $$y/x$$ is
+always representable; in Malachite's range it need not be, and a quotient beyond the top is taken
+from the limit $$\pi/2$$ instead. `atan2_rational_prec_round` takes `Rational` arguments, which
+MPFR has no equivalent of; there the quotient is exact, and the special cases collapse to the two
+that a type without NaNs, infinities, or signed zeros can have. `mpfr_atan2u` measures the angle in
+$$u$$ths of a turn, and `atan2_with_period_prec_round` matches it, with two deliberate divergences.
+At $$u = 0$$ MPFR returns $$\pm1$$ for a negative $$x$$, which contradicts its own definition and
+its own answers in the neighbouring branches, all of which are zero; Malachite returns a signed
+zero throughout. And a quotient beyond the exponent range is answered from the turn fraction it
+approaches, which is what MPFR's own overflow helper does — but MPFR only reaches that helper when
+its widened range overflows too, so for these inputs it instead runs a Ziv loop that cannot
+separate the result from the representable fraction beside it in any reasonable time.
+`atan2_with_period_rational_prec_round` takes `Rational` arguments, which MPFR again has no
+equivalent of; the quotient is exact there, so a positive $$x$$ reduces the whole computation to
+the `Rational` arctangent in $$u$$ths of a turn. `mpfr_atan2pi` is `mpfr_atan2u` with $$u = 2$$,
+the angle in half-turns, and `atan2_pi_prec_round` delegates the same way; its turn fractions are
+all representable in two bits, so its special cases are exact at every precision except $$\pm3/4$$.
+`mpfr_asin` maps to `asin_prec_round`, taken as $$\arctan(x/\sqrt{1-x^2})$$ at a working precision
+that covers the cancellation in $$1-x^2$$; it is NaN outside $$[-1,1]$$ and at either infinity, and
+alone among this arc it can neither overflow nor underflow, since $$|\arcsin x|>|x|$$ puts a
+representable input's result back in range. `asin_rational_prec_round` takes a `Rational`, which
+MPFR has no equivalent of; there the identity is rearranged to
+$$\operatorname{sign}(x)\arctan(\sqrt{x^2/(1-x^2)})$$, whose argument is exact, so nothing cancels
+and the cost does not grow as $$x$$ approaches $$\pm1$$. `mpfr_asinu` maps to
+`asin_with_period_prec_round`, the arcsine measured in $$u$$ths of a turn; it is exact at
+$$|x|=1$$, a quarter turn, and at $$|x|=1/2$$ with $$u$$ a multiple of 3, a twelfth. Two
+divergences from MPFR: at $$u=0$$ MPFR returns $$+0$$ for every $$x$$, although its own $$x=0$$
+case keeps the sign so that the function stays odd, and Malachite keeps it throughout, as
+`mpfr_atanu` does; and the quotient is formed with the numerator scaled up, since a tiny $$x$$ with
+a small $$u$$ falls below the smallest positive `Float`, which MPFR's wider exponent range never
+sees. `asin_with_period_rational_prec_round` takes a `Rational`, which MPFR has no equivalent of;
+there a tiny input is not a `Float` at all, and its arcsine is its own leading term, so the
+quotient is formed from the input itself. `mpfr_asinpi` is `mpfr_asinu` with $$u = 2$$, the angle
+in half-turns, and `asin_pi_prec_round` delegates the same way; $$\pm1$$ gives $$\pm1/2$$, which
+one bit holds, so it is exact at every precision. `mpfr_acos` maps to `acos_prec_round`, taken as
+$$\pi/2-\arctan(x/\sqrt{1-x^2})$$ at a working precision that covers both the cancellation in that
+subtraction, which an input just below 1 makes severe, and the blow-up of the quotient there; a
+negative input loses nothing in the subtraction, so it is charged half as much. Its only exact case
+is $$\arccos 1 = 0$$: unlike the arcsine, a zero input is not one, since $$\pi/2$$ is never
+representable. `acos_rational_prec_round` takes a `Rational`, which MPFR has no equivalent of;
+there the identity is rearranged to $$\arctan(\sqrt{(1-x^2)/x^2})$$, whose argument is exact, so
+nothing cancels and the cost does not grow as $$x$$ approaches 1. Underflow, which the `Float`
+arccosine cannot reach, is possible for a `Rational` within $$2^{-2^{31}}$$ of 1. `mpfr_acosu` maps
+to `acos_with_period_prec_round`, the arccosine in $$u$$ths of a turn; it is exact at a zero input,
+a quarter turn, at $$\pm1$$, where it is zero or a half turn, and at $$|x|=1/2$$ with $$u$$ a
+multiple of 3, a sixth or a third. A zero period gives $$+0$$, which unlike the arcsine's case is
+what MPFR does too, the arccosine never being negative. `acos_with_period_rational_prec_round`
+takes a `Rational`, which MPFR has no equivalent of; there an input close enough to 1 makes the
+arccosine itself underflow, so the quotient is formed from $$\sqrt{2(1-x)}$$ directly, since a
+large $$u$$ can lift it back into the range. `mpfr_acospi` is `mpfr_acosu` with $$u = 2$$, the
+angle in half-turns, and `acos_pi_prec_round` delegates the same way; a zero input gives $$1/2$$,
+$$1$$ gives $$0$$, and $$-1$$ gives $$1$$, all of which one bit holds, so they are exact at every
+precision. That closes MPFR's own inverse trigonometric functions; the three that follow are ones
+MPFR does not have, the inverses of the reciprocal functions. `asec_prec_round` is the arcsecant,
+the arccosine of the reciprocal. It is not computed that way, though — the arccosine is not
+Lipschitz at 1, so rounding the reciprocal first would cost about half its bits for an input near
+$$\pm1$$. It is taken as $$\arctan(\sqrt{x^2-1})$$ instead, with the subtraction done at twice the
+input's precision, where it is exact; the working precision therefore does not grow as the input
+approaches $$\pm1$$, as the arccosine's does; `asec_rational_prec_round` takes a `Rational`, where
+$$x^2-1$$ is exact and there is no working precision to choose for it at all.
+`asec_with_period_prec_round` measures it in $$u$$ths of a turn, with the arccosine's exact cases
+seen through the reciprocal: $$\pm\infty$$ gives a quarter turn, $$-1$$ a half, and $$\pm2$$ a
+sixth or a third. `asec_with_period_rational_prec_round` takes a `Rational`, where the infinities
+fall away and, as for the `Rational` arccosine, an input close enough to 1 makes the arcsecant
+itself underflow, so the quotient is formed from $$\sqrt{2(x-1)}$$ directly. `asec_pi_prec_round`
+and `asec_pi_rational_prec_round` are the half-turn case, delegating with $$u = 2$$ as the `_pi`
+variants of MPFR's own functions do; there $$\pm\infty$$ gives $$1/2$$, $$1$$ gives $$0$$ and
+$$-1$$ gives $$1$$, but $$\pm2$$ stop being exact, a third of a half-turn not being representable.
+`acsc_prec_round` is the arccosecant, the arcsine of the reciprocal, and it avoids that form for
+the same reason the arcsecant avoids the arccosine's: the arcsine is not Lipschitz at 1, and
+$$1/x$$ lands there exactly when $$x$$ is near $$\pm1$$. It is taken as $$\arctan(1/\sqrt{x^2-1})$$
+instead, with the subtraction exact at twice the input's precision and the reciprocal and the
+square root taken together by one correctly rounded `reciprocal_sqrt`. Being odd, it strips the
+sign and restores it with the rounding mode reflected. Its exact cases are the arcsine's seen
+through the reciprocal, which leaves only the infinities, where the arcsine has a zero; $$\pm1$$
+give $$\pm\pi/2$$, which is not representable. `acsc_rational_prec_round` takes a `Rational`, where
+$$x^2-1$$ is exact and, a `Rational` having no exponent bound, a large enough $$|x|$$ makes the
+result underflow -- which the `Float` arccosecant cannot reach. `acsc_with_period_prec_round`
+measures it in $$u$$ths of a turn, with the arcsine's exact cases seen through the reciprocal:
+$$\pm\infty$$ gives $$\pm0$$, $$\pm1$$ a quarter turn, and $$\pm2$$ a twelfth; a zero period keeps
+the sign of $$x$$, as Malachite's `asin_with_period` does and MPFR's `asinu` does not. Here the
+`Float` version can underflow too, $$1/|x|$$ sitting at the bottom of the range for the largest
+inputs. `acsc_with_period_rational_prec_round` takes a `Rational`, where an $$|x|$$ large enough
+makes the arccosecant itself underflow and the quotient is formed from the exact reciprocal
+directly, a large $$u$$ being able to lift it back into the range. `acsc_pi_prec_round` and
+`acsc_pi_rational_prec_round` are the half-turn case, delegating with $$u = 2$$; there
+$$\pm\infty$$ gives $$\pm0$$ and $$\pm1$$ gives $$\pm1/2$$, but $$\pm2$$ stop being exact, a sixth
+of a half-turn not being representable. `acot_prec_round` is the arccotangent, the odd branch
+$$\arctan(1/x)$$ with range $$(-\pi/2,\pi/2]$$, chosen so that the three inverses of reciprocal
+arguments form one family and so that it inverts `cot` on its signed behaviour
+($$\cot(\pm0)=\pm\infty$$, $$\operatorname{acot}(\pm\infty)=\pm0$$); the continuous branch with
+range $$(0,\pi)$$ is not provided. The arctangent being smooth, nothing is lost to the reciprocal's
+rounding, and below 1 the reciprocal is not taken at all, $$\pi/2-\arctan x$$ serving instead.
+`acot_rational_prec_round` takes a `Rational`, where the reciprocal is exact and the arctangent of
+it is the same real number, so that even a huge $$|x|$$ is the arctangent's own affair.
+`acot_with_period_prec_round` measures it in $$u$$ths of a turn, with the arctangent's exact cases
+seen through the reciprocal: $$\pm\infty$$ gives $$\pm0$$, $$\pm0$$ a quarter turn each way, and
+$$\pm1$$ an eighth; a zero period keeps the sign of $$x$$, as `atanu` itself does. The `Float`
+version can underflow here too, as the arccosecant's can. `acot_with_period_rational_prec_round`
+takes a $$\mathbb{Q}$$ input, where a zero gives a quarter turn exactly and the unbounded exponent
+makes underflow reachable at any period. `acot_pi_prec_round` and `acot_pi_rational_prec_round`
+are the same with a period of 2, so that $$\pm0$$ give $$\pm1/2$$ and $$\pm1$$ give $$\pm1/4$$,
+all exact; MPFR has no `acotpi` any more than it has `acot`. One remark from the manual is worth
+keeping for its subtlety: `acos(-1)` rounds $$\pi$$, and the rounded number "might not be in the
+output range" of the mathematical function; "still, the result lies in the image of the output
+range by the rounding function".
 
 ### Hyperbolic functions
 
@@ -958,8 +1095,8 @@ lies in the image of the output range by the rounding function".
 | ✗ | `int mpfr_asinh (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | |
 | ✗ | `int mpfr_atanh (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | |
 
-**The family.** Ten rows, one gap, but a different kind of gap from the trigonometric block
-above. The hyperbolic functions are algebraic combinations of the exponential machinery this
+**The family.** Ten rows, still empty — a shallower gap than the trigonometric block above
+once was. The hyperbolic functions are algebraic combinations of the exponential machinery this
 page has already marked ✓: $$\sinh x = (e^x - e^{-x})/2$$ with `exp_x_minus_1` carrying the
 accuracy near zero, and $$\operatorname{atanh} x$$ living the same way on `ln_1_plus_x`. There
 is no argument-reduction wall here; when these are built they will be layers over the ported
@@ -1040,8 +1177,8 @@ $$\gamma = S(n)/I(n) - U(n)/I(n)^2 - \log n$$ over Bessel-function sums, and Ada
 $$G = \pi/8 \cdot \log(2+\sqrt{3}) + 3/8 \cdot \sum_{k \ge 0} k!^2/((2k)!(2k+1)^2)$$, each
 series summed by binary splitting. Beyond these four, Malachite computes around three dozen
 constants, from $$e$$, $$\tau$$, $$\varphi$$, and the square-root and logarithm families to
-the lemniscate, Gauss, Gelfond, and Ramanujan constants and digit-defined numbers like the
-Prouhet-Thue-Morse and prime constants.
+the lemniscate, Gauss, Gelfond, Ramanujan, and Dottie constants and digit-defined numbers like
+the Prouhet-Thue-Morse and prime constants.
 
 ## [Input and Output Functions](https://www.mpfr.org/mpfr-current/mpfr.html#Input-and-Output-Functions) {#input-and-output-functions}
 

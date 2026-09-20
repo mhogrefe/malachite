@@ -162,8 +162,7 @@ fn pow_properties() {
             );
             assert_eq!((&x).mul_i().pow(exp), (&power).mul_i_pow(exp));
             assert_eq!((&x).pow(exp + 1), &power * &x);
-            // the root of the power is the principal rotation of the base, which is among the
-            // roots
+            // the root of the power is the principal rotation of the base, which is among the roots
             if exp != 0 {
                 assert_eq!((&power).checked_root(exp), Some(principal(x.clone(), exp)));
                 assert!(power.checked_roots(exp).contains(&x));

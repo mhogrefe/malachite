@@ -10,8 +10,7 @@ use crate::gaussian_rational::GaussianRational;
 use malachite_nz::integer::Integer;
 
 impl PartialEq<Integer> for GaussianRational {
-    /// Determines whether a [`GaussianRational`] is equal to an
-    /// [`Integer`](malachite_nz::integer::Integer).
+    /// Determines whether a [`GaussianRational`] is equal to an [`Integer`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -36,8 +35,7 @@ impl PartialEq<Integer> for GaussianRational {
 }
 
 impl PartialEq<GaussianRational> for Integer {
-    /// Determines whether an [`Integer`](malachite_nz::integer::Integer) is equal to a
-    /// [`GaussianRational`].
+    /// Determines whether an [`Integer`] is equal to a [`GaussianRational`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$

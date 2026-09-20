@@ -14,9 +14,8 @@ impl GaussianInteger {
     /// [`GaussianInteger`], each taken in absolute value.
     ///
     /// This is the size measure that FLINT's `fmpzi_bits` computes, and the one that the sizes of
-    /// the parts are compared against when an algorithm is chosen; the
-    /// [`SignificantBits`](malachite_base::num::logic::traits::SignificantBits) implementation sums
-    /// the two counts instead.
+    /// the parts are compared against when an algorithm is chosen; the [`SignificantBits`]
+    /// implementation sums the two counts instead.
     ///
     /// $$
     /// f(a + bi) = \max(\operatorname{bits}(a), \operatorname{bits}(b)),

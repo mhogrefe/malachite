@@ -15,7 +15,7 @@ use crate::gaussian_integer::arithmetic::mul::{mul_val_ref, mul_val_val};
 use crate::integer::Integer;
 use core::mem::take;
 use malachite_base::num::arithmetic::traits::{
-    AbsSquared, Conjugate, DivExact, DivExactAssign, DivI, PowerOf2,
+    AbsSquared, Conjugate, DivExact, DivExactAssign, DivI, Floor, PowerOf2,
 };
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{ExactFrom, RoundingFrom, SciMantissaAndExponent};
@@ -77,8 +77,8 @@ pub(super) fn nearest_quotient_double(
     let t = (2.0 * t + v) * w;
     let u = (2.0 * u + v) * w;
     GaussianInteger {
-        real: Integer::exact_from(t.floor()),
-        imaginary: Integer::exact_from(u.floor()),
+        real: Integer::exact_from(Floor::floor(t)),
+        imaginary: Integer::exact_from(Floor::floor(u)),
     }
 }
 

@@ -2357,7 +2357,9 @@ fn test_tan_near_zero() {
 // computes pi to about 2^30 bits twice (once for the sine and cosine, once for the exact bracket of
 // the underflowed one), about half an hour each, so this test is slow even in release mode and
 // makes just one call of each kind: the underflow exercises the sine's exact bracket, and the
-// overflow the shortcut for an underflowed cosine.
+// overflow the shortcut for an underflowed cosine. Slow enough to dominate a test run, and its
+// result does not depend on the limb width, so it runs only in the 64-bit-limb configuration.
+#[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_tan_underflow_and_overflow() {
     let p = (1u64 << 30) + 64;
@@ -4618,7 +4620,9 @@ fn tan_rational_prec_properties() {
 }
 
 // An input too large to be a `Float`, reduced modulo 2 pi in `Rational` arithmetic with pi to about
-// 2^30 bits; slow even in release mode.
+// 2^30 bits; slow even in release mode. Slow enough to dominate a test run, and its result does not
+// depend on the limb width, so it runs only in the 64-bit-limb configuration.
+#[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_tan_rational_huge() {
     let x = Rational::power_of_2(1i64 << 30);
@@ -4629,7 +4633,10 @@ fn test_tan_rational_huge() {
 }
 
 // Inputs within 2^(-2^30) of pi and of pi/2, whose tangents underflow and overflow. Each call
-// computes pi to about 2^30 bits twice, so this test is slow even in release mode.
+// computes pi to about 2^30 bits twice, so this test is slow even in release mode. Slow enough to
+// dominate a test run, and its result does not depend on the limb width, so it runs only in the
+// 64-bit-limb configuration.
+#[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_tan_rational_underflow_and_overflow() {
     let p = (1u64 << 30) + 64;

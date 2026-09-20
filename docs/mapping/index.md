@@ -38,6 +38,8 @@ MPFR, so the float mapping belongs with
   residues.
 - [Rationals](/mapping/flint-rationals/): the `fmpq_t` type, mapped onto
   [`Rational`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html).
+- [Gaussian integers](/mapping/flint-gaussian-integers/): the `fmpzi_t` type, mapped onto
+  [`GaussianInteger`](https://docs.rs/malachite-nz/latest/malachite_nz/gaussian_integer/struct.GaussianInteger.html).
 - [Arithmetic functions](/mapping/flint-arithmetic-functions/): the `arith.h` module, which
   computes number-theoretic and combinatorial sequences.
 

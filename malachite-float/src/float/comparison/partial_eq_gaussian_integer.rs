@@ -10,8 +10,7 @@ use crate::Float;
 use malachite_nz::gaussian_integer::GaussianInteger;
 
 impl PartialEq<GaussianInteger> for Float {
-    /// Determines whether a [`Float`] is equal to a
-    /// [`GaussianInteger`](malachite_nz::gaussian_integer::GaussianInteger).
+    /// Determines whether a [`Float`] is equal to a [`GaussianInteger`].
     ///
     /// $\infty$, $-\infty$, and NaN are not equal to any [`GaussianInteger`]. Both the [`Float`]
     /// zero and the [`Float`] negative zero are equal to the [`GaussianInteger`] zero.
@@ -40,8 +39,7 @@ impl PartialEq<GaussianInteger> for Float {
 }
 
 impl PartialEq<Float> for GaussianInteger {
-    /// Determines whether a [`GaussianInteger`](malachite_nz::gaussian_integer::GaussianInteger) is
-    /// equal to a [`Float`].
+    /// Determines whether a [`GaussianInteger`] is equal to a [`Float`].
     ///
     /// No [`GaussianInteger`] is equal to $\infty$, $-\infty$, or NaN. The [`GaussianInteger`] zero
     /// is equal to both the [`Float`] zero and the [`Float`] negative zero.

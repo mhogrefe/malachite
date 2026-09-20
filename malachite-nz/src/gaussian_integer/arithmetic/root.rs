@@ -121,7 +121,7 @@ impl CheckedRoot<u64> for GaussianInteger {
     ///
     /// $$
     /// f(z, n) = \begin{cases}
-    ///     \operatorname{Some}(\sqrt\[n\]{z}) & \text{if} \quad \sqrt\[n\]{z} \in \Z[i], \\\\
+    ///     \operatorname{Some}(\sqrt\[n\]{z}) & \text{if} \quad \sqrt\[n\]{z} \in \Z\[i\], \\\\
     ///     \operatorname{None} & \textrm{otherwise}.
     /// \end{cases}
     /// $$
@@ -183,7 +183,7 @@ impl CheckedRoot<u64> for &GaussianInteger {
     ///
     /// $$
     /// f(z, n) = \begin{cases}
-    ///     \operatorname{Some}(\sqrt\[n\]{z}) & \text{if} \quad \sqrt\[n\]{z} \in \Z[i], \\\\
+    ///     \operatorname{Some}(\sqrt\[n\]{z}) & \text{if} \quad \sqrt\[n\]{z} \in \Z\[i\], \\\\
     ///     \operatorname{None} & \textrm{otherwise}.
     /// \end{cases}
     /// $$
@@ -231,10 +231,10 @@ impl GaussianInteger {
     /// lexicographic by real part and then imaginary part.
     ///
     /// The principal root is the one whose argument lies in $(-\pi/g, \pi/g]$ for $g = \gcd(n, 4)$;
-    /// see [`CheckedRoot`](malachite_base::num::arithmetic::traits::CheckedRoot).
+    /// see [`CheckedRoot`].
     ///
     /// $$
-    /// f(z, n) = \\{ w \in \Z[i] : w^n = z \\}.
+    /// f(z, n) = \\{ w \in \Z\[i\] : w^n = z \\}.
     /// $$
     ///
     /// # Worst-case complexity

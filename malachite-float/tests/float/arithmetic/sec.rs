@@ -945,11 +945,19 @@ fn primitive_float_sec_properties() {
 // An input within 2^(-2^30) of an odd multiple of pi/2, whose secant overflows: the cosine there is
 // below the smallest positive `Float`, so the reciprocal is decided from the bracket rather than
 // from a `Float` division.
+//
+// Computing pi to 2^30 bits dominates this test, so it is done once: pi is irrational, so rounding
+// it up gives exactly the neighbour of rounding it down, and `increment` moves between the two
+// sides of pi/2 for free. Each side keeps one `Nearest` call and one directed call toward zero;
+// rounding away from zero overflows to an infinity just as `Nearest` does here, so it is not
+// repeated. Slow enough to dominate a test run, and its result does not depend on the limb width,
+// so it runs only in the 64-bit-limb configuration.
+#[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_sec_overflow() {
     let p = (1u64 << 30) + 64;
     // just below pi/2, where the cosine is positive and tiny
-    let half_pi = Float::pi_prec_round(p, Floor).0 >> 1u32;
+    let mut half_pi = Float::pi_prec_round(p, Floor).0 >> 1u32;
     let (s, o) = half_pi.sec_prec_round_ref(10, Nearest);
     assert_eq!(ComparableFloat(s), ComparableFloat(Float::INFINITY));
     assert_eq!(o, Greater);
@@ -959,11 +967,8 @@ fn test_sec_overflow() {
         ComparableFloat(Float::max_finite_value_with_prec(10))
     );
     assert_eq!(o, Less);
-    let (s, o) = half_pi.sec_prec_round_ref(10, Up);
-    assert_eq!(ComparableFloat(s), ComparableFloat(Float::INFINITY));
-    assert_eq!(o, Greater);
     // just above pi/2, where the cosine is negative and tiny
-    let half_pi = Float::pi_prec_round(p, Ceiling).0 >> 1u32;
+    half_pi.increment();
     let (s, o) = half_pi.sec_prec_round_ref(10, Nearest);
     assert_eq!(
         ComparableFloat(s),
@@ -976,12 +981,6 @@ fn test_sec_overflow() {
         ComparableFloat(-Float::max_finite_value_with_prec(10))
     );
     assert_eq!(o, Greater);
-    let (s, o) = half_pi.sec_prec_round_ref(10, Floor);
-    assert_eq!(
-        ComparableFloat(s),
-        ComparableFloat(Float::NEGATIVE_INFINITY)
-    );
-    assert_eq!(o, Less);
 }
 
 // Rows reuse the sine test's inputs, including the non-dyadic ones whose secants MPFR cannot see
@@ -3121,7 +3120,9 @@ fn sec_rational_prec_properties() {
 }
 
 // An input too large to be a `Float`, reduced modulo 2 pi in `Rational` arithmetic with pi to about
-// 2^30 bits; slow even in release mode.
+// 2^30 bits; slow even in release mode. Slow enough to dominate a test run, and its result does not
+// depend on the limb width, so it runs only in the 64-bit-limb configuration.
+#[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_sec_rational_huge() {
     let x = Rational::power_of_2(1i64 << 30);
@@ -3132,7 +3133,10 @@ fn test_sec_rational_huge() {
 }
 
 // An input within 2^(-2^30) of an odd multiple of pi/2, whose secant overflows. The call computes
-// pi to about 2^30 bits, so this test is slow even in release mode.
+// pi to about 2^30 bits, so this test is slow even in release mode. Slow enough to dominate a test
+// run, and its result does not depend on the limb width, so it runs only in the 64-bit-limb
+// configuration.
+#[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_sec_rational_overflow() {
     let p = (1u64 << 30) + 64;

@@ -946,13 +946,18 @@ fn primitive_float_csc_properties() {
 }
 
 // Inputs whose cosecants overflow: one within 2^(-2^30) of pi, where the sine is tiny, and the
-// smallest positive `Float`, whose reciprocal alone is beyond the largest finite one.
+// smallest positive `Float`, whose reciprocal alone is beyond the largest finite one. Slow enough
+// to dominate a test run, and its result does not depend on the limb width, so it runs only in the
+// 64-bit-limb configuration.
+#[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_csc_overflow() {
     let max = Float::max_finite_value_with_prec(10);
     let p = (1u64 << 30) + 64;
-    // just below pi, where the sine is positive and tiny
-    let pi = Float::pi_prec_round(p, Floor).0;
+    // just below pi, where the sine is positive and tiny pi is irrational, so rounding it up gives
+    // exactly the neighbour of rounding it down; `increment` moves between the two sides for free,
+    // rather than computing pi to 2^30 bits twice
+    let mut pi = Float::pi_prec_round(p, Floor).0;
     let (s, o) = pi.csc_prec_round_ref(10, Nearest);
     assert_eq!(ComparableFloat(s), ComparableFloat(Float::INFINITY));
     assert_eq!(o, Greater);
@@ -960,7 +965,7 @@ fn test_csc_overflow() {
     assert_eq!(ComparableFloatRef(&s), ComparableFloatRef(&max));
     assert_eq!(o, Less);
     // just above pi, where the sine is negative and tiny
-    let pi = Float::pi_prec_round(p, Ceiling).0;
+    pi.increment();
     let (s, o) = pi.csc_prec_round_ref(10, Nearest);
     assert_eq!(
         ComparableFloat(s),
@@ -3051,7 +3056,9 @@ fn csc_rational_prec_properties() {
 }
 
 // An input too large to be a `Float`, reduced modulo 2 pi in `Rational` arithmetic with pi to about
-// 2^30 bits; slow even in release mode.
+// 2^30 bits; slow even in release mode. Slow enough to dominate a test run, and its result does not
+// depend on the limb width, so it runs only in the 64-bit-limb configuration.
+#[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_csc_rational_huge() {
     let x = Rational::power_of_2(1i64 << 30);
@@ -3062,7 +3069,10 @@ fn test_csc_rational_huge() {
 }
 
 // An input within 2^(-2^30) of an odd multiple of pi/2, whose cosecant overflows. The call computes
-// pi to about 2^30 bits, so this test is slow even in release mode.
+// pi to about 2^30 bits, so this test is slow even in release mode. Slow enough to dominate a test
+// run, and its result does not depend on the limb width, so it runs only in the 64-bit-limb
+// configuration.
+#[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_csc_rational_overflow() {
     let max = Float::max_finite_value_with_prec(10);

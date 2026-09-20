@@ -11,7 +11,7 @@ use malachite_base::num::arithmetic::traits::IsUnit;
 
 impl IsUnit for GaussianInteger {
     /// Determines whether a [`GaussianInteger`] is a unit: one of $1$, $-1$, $i$, and $-i$, the
-    /// four elements of $\mathbb{Z}[i]$ with a multiplicative inverse in $\mathbb{Z}[i]$.
+    /// four elements of $\mathbb{Z}\[i\]$ with a multiplicative inverse in $\mathbb{Z}\[i\]$.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.

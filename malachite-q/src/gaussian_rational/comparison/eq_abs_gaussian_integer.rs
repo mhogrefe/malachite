@@ -26,8 +26,8 @@ fn combine(x: Ordering, y: Ordering) -> Option<Ordering> {
 }
 
 impl EqAbs<GaussianInteger> for GaussianRational {
-    /// Determines whether the absolute values of a [`GaussianRational`] and a
-    /// [`GaussianInteger`](malachite_nz::gaussian_integer::GaussianInteger) are equal.
+    /// Determines whether the absolute values of a [`GaussianRational`] and a [`GaussianInteger`]
+    /// are equal.
     ///
     /// The absolute value of a complex number is its distance from the origin, so two values are
     /// equal in absolute value exactly when their squared absolute values are equal. The squared
@@ -77,9 +77,8 @@ impl EqAbs<GaussianInteger> for GaussianRational {
 }
 
 impl EqAbs<GaussianRational> for GaussianInteger {
-    /// Determines whether the absolute values of a
-    /// [`GaussianInteger`](malachite_nz::gaussian_integer::GaussianInteger) and a
-    /// [`GaussianRational`] are equal.
+    /// Determines whether the absolute values of a [`GaussianInteger`] and a [`GaussianRational`]
+    /// are equal.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$

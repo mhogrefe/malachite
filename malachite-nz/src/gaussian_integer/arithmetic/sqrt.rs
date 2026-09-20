@@ -72,7 +72,7 @@ impl CheckedSqrt for GaussianInteger {
     ///
     /// $$
     /// f(z) = \begin{cases}
-    ///     \operatorname{Some}(\sqrt{z}) & \text{if} \quad \sqrt{z} \in \Z[i], \\\\
+    ///     \operatorname{Some}(\sqrt{z}) & \text{if} \quad \sqrt{z} \in \Z\[i\], \\\\
     ///     \operatorname{None} & \textrm{otherwise}.
     /// \end{cases}
     /// $$
@@ -147,7 +147,7 @@ impl CheckedSqrt for &GaussianInteger {
     ///
     /// $$
     /// f(z) = \begin{cases}
-    ///     \operatorname{Some}(\sqrt{z}) & \text{if} \quad \sqrt{z} \in \Z[i], \\\\
+    ///     \operatorname{Some}(\sqrt{z}) & \text{if} \quad \sqrt{z} \in \Z\[i\], \\\\
     ///     \operatorname{None} & \textrm{otherwise}.
     /// \end{cases}
     /// $$
@@ -209,10 +209,10 @@ impl GaussianInteger {
     /// lexicographic by real part and then imaginary part.
     ///
     /// The principal root is the one with positive real part or, if that is zero, with non-negative
-    /// imaginary part; see [`CheckedSqrt`](malachite_base::num::arithmetic::traits::CheckedSqrt).
+    /// imaginary part; see [`CheckedSqrt`].
     ///
     /// $$
-    /// f(z) = \\{ w \in \Z[i] : w^2 = z \\}.
+    /// f(z) = \\{ w \in \Z\[i\] : w^2 = z \\}.
     /// $$
     ///
     /// # Worst-case complexity

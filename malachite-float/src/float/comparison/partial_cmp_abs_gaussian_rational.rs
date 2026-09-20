@@ -15,8 +15,7 @@ use malachite_q::Rational;
 use malachite_q::gaussian_rational::GaussianRational;
 
 impl PartialOrdAbs<GaussianRational> for Float {
-    /// Compares the absolute values of a [`Float`] and a
-    /// [`GaussianRational`](malachite_q::gaussian_rational::GaussianRational).
+    /// Compares the absolute values of a [`Float`] and a [`GaussianRational`].
     ///
     /// The absolute value of a complex number is its distance from the origin, so this is
     /// equivalent to comparing squared absolute values. The [`Float`] is smaller in absolute value
@@ -68,8 +67,7 @@ impl PartialOrdAbs<GaussianRational> for Float {
 }
 
 impl PartialOrdAbs<Float> for GaussianRational {
-    /// Compares the absolute values of a
-    /// [`GaussianRational`](malachite_q::gaussian_rational::GaussianRational) and a [`Float`].
+    /// Compares the absolute values of a [`GaussianRational`] and a [`Float`].
     ///
     /// No [`GaussianRational`] is comparable to NaN, and every [`GaussianRational`] is smaller in
     /// absolute value than $\infty$ and $-\infty$.

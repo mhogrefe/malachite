@@ -14,7 +14,7 @@ use crate::gaussian_integer::GaussianInteger;
 use crate::gaussian_integer::arithmetic::div_rem::div_rem_approx;
 use crate::integer::Integer;
 use core::mem::take;
-use malachite_base::num::arithmetic::traits::{CanonicalizeUnit, Gcd, GcdAssign};
+use malachite_base::num::arithmetic::traits::{CanonicalizeUnit, Floor, Gcd, GcdAssign};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 
@@ -37,8 +37,8 @@ fn gcd_double(mut a: f64, mut b: f64, mut c: f64, mut d: f64) -> GaussianInteger
         let u = b * c - a * d;
         let v = c * c + d * d;
         let w = 0.5 / v;
-        let qa = ((2.0 * t + v) * w).floor();
-        let qb = ((2.0 * u + v) * w).floor();
+        let qa = Floor::floor((2.0 * t + v) * w);
+        let qb = Floor::floor((2.0 * u + v) * w);
         let t = a - (qa * c - qb * d);
         let u = b - (qb * c + qa * d);
         a = c;
@@ -89,11 +89,10 @@ impl Gcd<Self> for GaussianInteger {
     ///
     /// The Gaussian integers are a Euclidean domain, so any two have a GCD, defined up to
     /// multiplication by one of the four units $\pm 1, \pm i$. The one returned is in canonical
-    /// unit form (see
-    /// [`CanonicalizeUnit`](malachite_base::num::arithmetic::traits::CanonicalizeUnit)): its real
-    /// part is positive and its imaginary part lies in $(-\text{real}, \text{real}]$, unless it is
-    /// zero. The GCD of 0 and $x$ is the canonical form of $x$; in particular $\gcd(0, 0) = 0$,
-    /// which makes sense if we interpret "greatest" to mean "greatest by the divisibility order".
+    /// unit form (see [`CanonicalizeUnit`]): its real part is positive and its imaginary part lies
+    /// in $(-\text{real}, \text{real}]$, unless it is zero. The GCD of 0 and $x$ is the canonical
+    /// form of $x$; in particular $\gcd(0, 0) = 0$, which makes sense if we interpret "greatest" to
+    /// mean "greatest by the divisibility order".
     ///
     /// $$
     /// f(x, y) = \gcd(x, y).
@@ -132,11 +131,10 @@ impl Gcd<&Self> for GaussianInteger {
     ///
     /// The Gaussian integers are a Euclidean domain, so any two have a GCD, defined up to
     /// multiplication by one of the four units $\pm 1, \pm i$. The one returned is in canonical
-    /// unit form (see
-    /// [`CanonicalizeUnit`](malachite_base::num::arithmetic::traits::CanonicalizeUnit)): its real
-    /// part is positive and its imaginary part lies in $(-\text{real}, \text{real}]$, unless it is
-    /// zero. The GCD of 0 and $x$ is the canonical form of $x$; in particular $\gcd(0, 0) = 0$,
-    /// which makes sense if we interpret "greatest" to mean "greatest by the divisibility order".
+    /// unit form (see [`CanonicalizeUnit`]): its real part is positive and its imaginary part lies
+    /// in $(-\text{real}, \text{real}]$, unless it is zero. The GCD of 0 and $x$ is the canonical
+    /// form of $x$; in particular $\gcd(0, 0) = 0$, which makes sense if we interpret "greatest" to
+    /// mean "greatest by the divisibility order".
     ///
     /// $$
     /// f(x, y) = \gcd(x, y).
@@ -175,11 +173,10 @@ impl Gcd<GaussianInteger> for &GaussianInteger {
     ///
     /// The Gaussian integers are a Euclidean domain, so any two have a GCD, defined up to
     /// multiplication by one of the four units $\pm 1, \pm i$. The one returned is in canonical
-    /// unit form (see
-    /// [`CanonicalizeUnit`](malachite_base::num::arithmetic::traits::CanonicalizeUnit)): its real
-    /// part is positive and its imaginary part lies in $(-\text{real}, \text{real}]$, unless it is
-    /// zero. The GCD of 0 and $x$ is the canonical form of $x$; in particular $\gcd(0, 0) = 0$,
-    /// which makes sense if we interpret "greatest" to mean "greatest by the divisibility order".
+    /// unit form (see [`CanonicalizeUnit`]): its real part is positive and its imaginary part lies
+    /// in $(-\text{real}, \text{real}]$, unless it is zero. The GCD of 0 and $x$ is the canonical
+    /// form of $x$; in particular $\gcd(0, 0) = 0$, which makes sense if we interpret "greatest" to
+    /// mean "greatest by the divisibility order".
     ///
     /// $$
     /// f(x, y) = \gcd(x, y).
@@ -218,11 +215,10 @@ impl Gcd<&GaussianInteger> for &GaussianInteger {
     ///
     /// The Gaussian integers are a Euclidean domain, so any two have a GCD, defined up to
     /// multiplication by one of the four units $\pm 1, \pm i$. The one returned is in canonical
-    /// unit form (see
-    /// [`CanonicalizeUnit`](malachite_base::num::arithmetic::traits::CanonicalizeUnit)): its real
-    /// part is positive and its imaginary part lies in $(-\text{real}, \text{real}]$, unless it is
-    /// zero. The GCD of 0 and $x$ is the canonical form of $x$; in particular $\gcd(0, 0) = 0$,
-    /// which makes sense if we interpret "greatest" to mean "greatest by the divisibility order".
+    /// unit form (see [`CanonicalizeUnit`]): its real part is positive and its imaginary part lies
+    /// in $(-\text{real}, \text{real}]$, unless it is zero. The GCD of 0 and $x$ is the canonical
+    /// form of $x$; in particular $\gcd(0, 0) = 0$, which makes sense if we interpret "greatest" to
+    /// mean "greatest by the divisibility order".
     ///
     /// $$
     /// f(x, y) = \gcd(x, y).
@@ -259,11 +255,10 @@ impl GcdAssign<Self> for GaussianInteger {
     ///
     /// The Gaussian integers are a Euclidean domain, so any two have a GCD, defined up to
     /// multiplication by one of the four units $\pm 1, \pm i$. The one returned is in canonical
-    /// unit form (see
-    /// [`CanonicalizeUnit`](malachite_base::num::arithmetic::traits::CanonicalizeUnit)): its real
-    /// part is positive and its imaginary part lies in $(-\text{real}, \text{real}]$, unless it is
-    /// zero. The GCD of 0 and $x$ is the canonical form of $x$; in particular $\gcd(0, 0) = 0$,
-    /// which makes sense if we interpret "greatest" to mean "greatest by the divisibility order".
+    /// unit form (see [`CanonicalizeUnit`]): its real part is positive and its imaginary part lies
+    /// in $(-\text{real}, \text{real}]$, unless it is zero. The GCD of 0 and $x$ is the canonical
+    /// form of $x$; in particular $\gcd(0, 0) = 0$, which makes sense if we interpret "greatest" to
+    /// mean "greatest by the divisibility order".
     ///
     /// $$
     /// x \gets \gcd(x, y).
@@ -300,11 +295,10 @@ impl GcdAssign<&Self> for GaussianInteger {
     ///
     /// The Gaussian integers are a Euclidean domain, so any two have a GCD, defined up to
     /// multiplication by one of the four units $\pm 1, \pm i$. The one returned is in canonical
-    /// unit form (see
-    /// [`CanonicalizeUnit`](malachite_base::num::arithmetic::traits::CanonicalizeUnit)): its real
-    /// part is positive and its imaginary part lies in $(-\text{real}, \text{real}]$, unless it is
-    /// zero. The GCD of 0 and $x$ is the canonical form of $x$; in particular $\gcd(0, 0) = 0$,
-    /// which makes sense if we interpret "greatest" to mean "greatest by the divisibility order".
+    /// unit form (see [`CanonicalizeUnit`]): its real part is positive and its imaginary part lies
+    /// in $(-\text{real}, \text{real}]$, unless it is zero. The GCD of 0 and $x$ is the canonical
+    /// form of $x$; in particular $\gcd(0, 0) = 0$, which makes sense if we interpret "greatest" to
+    /// mean "greatest by the divisibility order".
     ///
     /// $$
     /// x \gets \gcd(x, y).

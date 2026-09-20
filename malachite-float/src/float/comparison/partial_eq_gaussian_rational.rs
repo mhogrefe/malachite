@@ -10,8 +10,7 @@ use crate::Float;
 use malachite_q::gaussian_rational::GaussianRational;
 
 impl PartialEq<GaussianRational> for Float {
-    /// Determines whether a [`Float`] is equal to a
-    /// [`GaussianRational`](malachite_q::gaussian_rational::GaussianRational).
+    /// Determines whether a [`Float`] is equal to a [`GaussianRational`].
     ///
     /// $\infty$, $-\infty$, and NaN are not equal to any [`GaussianRational`]. Both the [`Float`]
     /// zero and the [`Float`] negative zero are equal to the [`GaussianRational`] zero.
@@ -41,8 +40,7 @@ impl PartialEq<GaussianRational> for Float {
 }
 
 impl PartialEq<Float> for GaussianRational {
-    /// Determines whether a [`GaussianRational`](malachite_q::gaussian_rational::GaussianRational)
-    /// is equal to a [`Float`].
+    /// Determines whether a [`GaussianRational`] is equal to a [`Float`].
     ///
     /// No [`GaussianRational`] is equal to $\infty$, $-\infty$, or NaN. The [`GaussianRational`]
     /// zero is equal to both the [`Float`] zero and the [`Float`] negative zero.

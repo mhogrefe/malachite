@@ -13,8 +13,7 @@ use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_nz::integer::Integer;
 
 impl PartialOrdAbs<Integer> for GaussianRational {
-    /// Compares the absolute values of a [`GaussianRational`] and an
-    /// [`Integer`](malachite_nz::integer::Integer).
+    /// Compares the absolute values of a [`GaussianRational`] and an [`Integer`].
     ///
     /// The absolute value of a complex number is its distance from the origin, so this is
     /// equivalent to comparing squared absolute values. Purely real and purely imaginary values are
@@ -58,8 +57,7 @@ impl PartialOrdAbs<Integer> for GaussianRational {
 }
 
 impl PartialOrdAbs<GaussianRational> for Integer {
-    /// Compares the absolute values of an [`Integer`](malachite_nz::integer::Integer) and a
-    /// [`GaussianRational`].
+    /// Compares the absolute values of an [`Integer`] and a [`GaussianRational`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n \log n \log\log n)$

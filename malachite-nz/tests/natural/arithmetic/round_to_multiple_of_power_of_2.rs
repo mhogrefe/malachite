@@ -6,16 +6,15 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use core::cmp::Ordering::*;
 #[cfg(feature = "32_bit_limbs")]
-use core::cmp::Ordering::{self, *};
+use core::cmp::Ordering;
+use core::cmp::Ordering::*;
 use malachite_base::num::arithmetic::traits::{
     DivisibleByPowerOf2, PowerOf2, RoundToMultiple, RoundToMultipleOfPowerOf2,
     RoundToMultipleOfPowerOf2Assign, ShrRound,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
-#[cfg(not(feature = "32_bit_limbs"))]
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode::{self, *};

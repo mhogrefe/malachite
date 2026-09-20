@@ -12,7 +12,7 @@ use malachite_base::num::arithmetic::traits::IsUnit;
 impl IsUnit for GaussianRational {
     /// Determines whether a [`GaussianRational`] is a unit: nonzero. $\mathbb{Q}(i)$ is a field, so
     /// every nonzero element has a multiplicative inverse and the only non-unit is zero. This
-    /// differs from the four units of $\mathbb{Z}[i]$, which are the only
+    /// differs from the four units of $\mathbb{Z}\[i\]$, which are the only
     /// [`GaussianInteger`](malachite_nz::gaussian_integer::GaussianInteger) units.
     ///
     /// # Worst-case complexity

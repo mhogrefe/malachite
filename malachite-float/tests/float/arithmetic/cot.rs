@@ -5777,7 +5777,9 @@ fn primitive_float_cot_rational_properties() {
 }
 
 // An input too large to be a `Float`, reduced modulo 2 pi in `Rational` arithmetic with pi to about
-// 2^30 bits; slow even in release mode.
+// 2^30 bits; slow even in release mode. Slow enough to dominate a test run, and its result does not
+// depend on the limb width, so it runs only in the 64-bit-limb configuration.
+#[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_cot_rational_huge() {
     let x = Rational::power_of_2(1i64 << 30);
@@ -5790,7 +5792,10 @@ fn test_cot_rational_huge() {
 // `Rational` inputs at both ends: within 2^(-2^30) of pi, where the cotangent overflows, and of
 // pi/2, where it underflows. Each call computes pi to about 2^30 bits twice, so this test is slow
 // even in release mode and makes just one call of each kind, off a single pi. The tiny input, far
-// below the `Float` exponent range, takes the cheap series bracket and needs no pi at all.
+// below the `Float` exponent range, takes the cheap series bracket and needs no pi at all. Slow
+// enough to dominate a test run, and its result does not depend on the limb width, so it runs only
+// in the 64-bit-limb configuration.
+#[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_cot_rational_underflow_and_overflow() {
     let p = (1u64 << 30) + 64;
@@ -5834,7 +5839,9 @@ fn test_cot_rational_underflow_and_overflow() {
 // the underflowed one), so this test is slow even in release mode and makes just one call of each
 // kind, off a single pi: the overflow exercises the shortcut for an underflowed sine, and the
 // underflow the cosine's exact bracket. The tiny input, whose reciprocal alone leaves the range,
-// takes the cheap reciprocal path and needs no pi at all.
+// takes the cheap reciprocal path and needs no pi at all. Slow enough to dominate a test run, and
+// its result does not depend on the limb width, so it runs only in the 64-bit-limb configuration.
+#[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_cot_underflow_and_overflow() {
     let p = (1u64 << 30) + 64;

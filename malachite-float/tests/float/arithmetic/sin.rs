@@ -1082,7 +1082,9 @@ fn test_sin_near_zero() {
 // Inputs within 2^(-2^30) of a nonzero multiple of pi, whose sines underflow. Constructing an input
 // and each call computes pi to about 2^30 bits (~6 minutes each), so this test is slow even in
 // release mode; the two calls cover both signs, rounding to zero and rounding away from it, and
-// `Nearest` and a directed mode.
+// `Nearest` and a directed mode. Slow enough to dominate a test run, and its result does not depend
+// on the limb width, so it runs only in the 64-bit-limb configuration.
+#[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_sin_underflow() {
     let p = (1u64 << 30) + 64;
@@ -3832,7 +3834,9 @@ fn sin_rational_prec_properties() {
 }
 
 // An input too large to be a `Float`, reduced modulo 2 pi in `Rational` arithmetic with pi to about
-// 2^30 bits; slow even in release mode.
+// 2^30 bits; slow even in release mode. Slow enough to dominate a test run, and its result does not
+// depend on the limb width, so it runs only in the 64-bit-limb configuration.
+#[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_sin_rational_huge() {
     let x = Rational::power_of_2(1i64 << 30);
@@ -3843,7 +3847,9 @@ fn test_sin_rational_huge() {
 }
 
 // Inputs within 2^(-2^30) of pi, whose sines underflow. Each call computes pi to about 2^30 bits,
-// so this test is slow even in release mode.
+// so this test is slow even in release mode. Slow enough to dominate a test run, and its result
+// does not depend on the limb width, so it runs only in the 64-bit-limb configuration.
+#[cfg(not(feature = "32_bit_limbs"))]
 #[test]
 fn test_sin_rational_underflow() {
     let p = (1u64 << 30) + 64;

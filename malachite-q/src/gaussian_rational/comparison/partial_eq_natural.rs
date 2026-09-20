@@ -10,8 +10,7 @@ use crate::gaussian_rational::GaussianRational;
 use malachite_nz::natural::Natural;
 
 impl PartialEq<Natural> for GaussianRational {
-    /// Determines whether a [`GaussianRational`] is equal to a
-    /// [`Natural`](malachite_nz::natural::Natural).
+    /// Determines whether a [`GaussianRational`] is equal to a [`Natural`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -36,8 +35,7 @@ impl PartialEq<Natural> for GaussianRational {
 }
 
 impl PartialEq<GaussianRational> for Natural {
-    /// Determines whether a [`Natural`](malachite_nz::natural::Natural) is equal to a
-    /// [`GaussianRational`].
+    /// Determines whether a [`Natural`] is equal to a [`GaussianRational`].
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
