@@ -144,7 +144,21 @@ impl ToLatex for char {
     /// Constant time and additional memory.
     ///
     /// # Examples
-    /// See [here](super::latex#fmt_latex).
+    /// ```
+    /// use malachite_base::strings::latex::ToLatex;
+    ///
+    /// assert_eq!('a'.to_latex().to_string(), r"\text{a}");
+    /// assert_eq!('%'.to_latex().to_string(), r"\text{\%}");
+    /// assert_eq!('α'.to_latex().to_string(), r"\alpha");
+    /// assert_eq!('∞'.to_latex().to_string(), r"\infty");
+    /// ```
+    ///
+    /// | value | fragment    | renders as   |
+    /// |-------|-------------|--------------|
+    /// | `'a'` | `\text{a}`  | $\text{a}$   |
+    /// | `'%'` | `\text{\%}` | $\text{\\%}$ |
+    /// | `'α'` | `\alpha`    | $\alpha$     |
+    /// | `'∞'` | `\infty`    | $\infty$     |
     #[inline]
     fn fmt_latex(&self, f: &mut Formatter) -> Result {
         fmt_latex_chars(core::iter::once(*self), f)

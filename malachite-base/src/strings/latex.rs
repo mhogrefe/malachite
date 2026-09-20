@@ -28,7 +28,24 @@ pub trait ToLatex {
     /// fragment embeddable without an allocation per level of nesting.
     ///
     /// # Examples
-    /// See [here](super::latex#fmt_latex).
+    /// ```
+    /// use malachite_base::strings::latex::ToLatex;
+    /// use std::fmt::{Display, Formatter, Result};
+    ///
+    /// // A type that embeds another value's fragment inside its own.
+    /// struct Negated(i32);
+    ///
+    /// impl Display for Negated {
+    ///     fn fmt(&self, f: &mut Formatter) -> Result {
+    ///         f.write_str("-\\left(")?;
+    ///         self.0.fmt_latex(f)?;
+    ///         f.write_str("\\right)")
+    ///     }
+    /// }
+    ///
+    /// assert_eq!(Negated(5).to_string(), r"-\left(5\right)");
+    /// ```
+    /// That fragment renders as $-\left(5\right)$.
     fn fmt_latex(&self, f: &mut Formatter) -> Result;
 
     /// Converts a value to a LaTeX math-mode fragment.
@@ -40,7 +57,16 @@ pub trait ToLatex {
     /// Constant time and additional memory.
     ///
     /// # Examples
-    /// See [here](super::latex#to_latex).
+    /// ```
+    /// use malachite_base::strings::latex::ToLatex;
+    ///
+    /// assert_eq!(123u32.to_latex().to_string(), "123");
+    /// assert_eq!((-45i16).to_latex().to_string(), "-45");
+    ///
+    /// // The output is a fragment, so it can be embedded in a larger expression.
+    /// assert_eq!(format!("x^{{{}}}", 10u8.to_latex()), "x^{10}");
+    /// ```
+    /// Those fragments render as $123$, $-45$, and, once embedded, $x^{10}$.
     #[inline]
     fn to_latex(&self) -> LatexWrapper<'_, Self>
     where
@@ -83,7 +109,23 @@ impl ToLatex for &str {
     /// where $T$ is time, $M$ is additional memory, and $n$ is `self.chars().count()`.
     ///
     /// # Examples
-    /// See [here](super::latex#fmt_latex).
+    /// ```
+    /// use malachite_base::strings::latex::ToLatex;
+    ///
+    /// assert_eq!("hello".to_latex().to_string(), r"\text{hello}");
+    /// assert_eq!("100%".to_latex().to_string(), r"\text{100\%}");
+    /// assert_eq!("100% α".to_latex().to_string(), r"\text{100\% }\alpha");
+    /// assert_eq!("A ≤ B".to_latex().to_string(), r"\text{A }\leq\text{ B}");
+    /// assert_eq!("--flag".to_latex().to_string(), r"\text{-{}-flag}");
+    /// ```
+    ///
+    /// | value      | fragment                 | renders as               |
+    /// |------------|--------------------------|--------------------------|
+    /// | `"hello"`  | `\text{hello}`           | $\text{hello}$           |
+    /// | `"100%"`   | `\text{100\%}`           | $\text{100\\%}$          |
+    /// | `"100% α"` | `\text{100\% }\alpha`    | $\text{100\\% }\alpha$   |
+    /// | `"A ≤ B"`  | `\text{A }\leq\text{ B}` | $\text{A }\leq\text{ B}$ |
+    /// | `"--flag"` | `\text{-{}-flag}`        | $\text{-{}-flag}$        |
     #[inline]
     fn fmt_latex(&self, f: &mut Formatter) -> Result {
         fmt_latex_chars(self.chars(), f)
@@ -103,7 +145,14 @@ impl ToLatex for String {
     /// where $T$ is time, $M$ is additional memory, and $n$ is `self.chars().count()`.
     ///
     /// # Examples
-    /// See [here](super::latex#fmt_latex).
+    /// ```
+    /// use malachite_base::strings::latex::ToLatex;
+    ///
+    /// assert_eq!(
+    ///     "100% α".to_string().to_latex().to_string(),
+    ///     r"\text{100\% }\alpha"
+    /// );
+    /// ```
     #[inline]
     fn fmt_latex(&self, f: &mut Formatter) -> Result {
         fmt_latex_chars(self.chars(), f)

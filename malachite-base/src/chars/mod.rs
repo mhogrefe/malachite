@@ -96,23 +96,6 @@ pub mod crement;
 /// Iterators that generate [`char`]s without repetition.
 pub mod exhaustive;
 /// The implementation of [`ToLatex`](crate::strings::latex::ToLatex) for [`char`].
-///
-/// # fmt_latex
-/// ```
-/// use malachite_base::strings::latex::ToLatex;
-///
-/// assert_eq!('a'.to_latex().to_string(), r"\text{a}");
-/// assert_eq!('%'.to_latex().to_string(), r"\text{\%}");
-/// assert_eq!('α'.to_latex().to_string(), r"\alpha");
-/// assert_eq!('∞'.to_latex().to_string(), r"\infty");
-/// ```
-///
-/// | value | fragment      | renders as    |
-/// |-------|---------------|---------------|
-/// | `'a'` | `\text{a}`    | $\text{a}$    |
-/// | `'%'` | `\text{\%}`   | $\text{\\%}$   |
-/// | `'α'` | `\alpha`      | $\alpha$      |
-/// | `'∞'` | `\infty`      | $\infty$      |
 pub mod latex;
 // The generated `char`-to-LaTeX table that `latex` consults; see the note in that module.
 mod latex_table;

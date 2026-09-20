@@ -40,22 +40,6 @@ pub fn ordering_from_str(src: &str) -> Option<Ordering> {
 /// Iterators that generate [`Ordering`]s without repetition.
 pub mod exhaustive;
 /// The implementation of [`ToLatex`](crate::strings::latex::ToLatex) for [`Ordering`].
-///
-/// # fmt_latex
-/// ```
-/// use core::cmp::Ordering::*;
-/// use malachite_base::strings::latex::ToLatex;
-///
-/// assert_eq!(Less.to_latex().to_string(), "<");
-/// assert_eq!(Equal.to_latex().to_string(), "=");
-/// assert_eq!(Greater.to_latex().to_string(), ">");
-/// ```
-///
-/// | value     | fragment | renders as |
-/// |-----------|----------|------------|
-/// | `Less`    | `<`      | $<$        |
-/// | `Equal`   | `=`      | $=$        |
-/// | `Greater` | `>`      | $>$        |
 pub mod latex;
 #[cfg(feature = "random")]
 /// Iterators that generate [`Ordering`]s randomly.

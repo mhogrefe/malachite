@@ -81,24 +81,6 @@ pub mod exhaustive;
 /// Functions for converting a string to a [`RoundingMode`].
 pub mod from_str;
 /// The implementation of [`ToLatex`](crate::strings::latex::ToLatex) for [`RoundingMode`].
-///
-/// # fmt_latex
-/// ```
-/// use malachite_base::rounding_modes::RoundingMode::*;
-/// use malachite_base::strings::latex::ToLatex;
-///
-/// assert_eq!(Floor.to_latex().to_string(), r"\text{FLOOR}");
-/// assert_eq!(Nearest.to_latex().to_string(), r"\text{NEAREST}");
-/// ```
-///
-/// | value     | fragment          | renders as        |
-/// |-----------|-------------------|-------------------|
-/// | `Down`    | `\text{DOWN}`     | $\text{DOWN}$     |
-/// | `Up`      | `\text{UP}`       | $\text{UP}$       |
-/// | `Floor`   | `\text{FLOOR}`    | $\text{FLOOR}$    |
-/// | `Ceiling` | `\text{CEILING}`  | $\text{CEILING}$  |
-/// | `Nearest` | `\text{NEAREST}`  | $\text{NEAREST}$  |
-/// | `Exact`   | `\text{EXACT}`    | $\text{EXACT}$    |
 pub mod latex;
 /// Functions for negating a [`RoundingMode`].
 pub mod neg;

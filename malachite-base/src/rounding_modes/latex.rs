@@ -21,7 +21,22 @@ impl ToLatex for RoundingMode {
     /// Constant time and additional memory.
     ///
     /// # Examples
-    /// See [here](super::latex#fmt_latex).
+    /// ```
+    /// use malachite_base::rounding_modes::RoundingMode::*;
+    /// use malachite_base::strings::latex::ToLatex;
+    ///
+    /// assert_eq!(Floor.to_latex().to_string(), r"\text{FLOOR}");
+    /// assert_eq!(Nearest.to_latex().to_string(), r"\text{NEAREST}");
+    /// ```
+    ///
+    /// | value     | fragment         | renders as       |
+    /// |-----------|------------------|------------------|
+    /// | `Down`    | `\text{DOWN}`    | $\text{DOWN}$    |
+    /// | `Up`      | `\text{UP}`      | $\text{UP}$      |
+    /// | `Floor`   | `\text{FLOOR}`   | $\text{FLOOR}$   |
+    /// | `Ceiling` | `\text{CEILING}` | $\text{CEILING}$ |
+    /// | `Nearest` | `\text{NEAREST}` | $\text{NEAREST}$ |
+    /// | `Exact`   | `\text{EXACT}`   | $\text{EXACT}$   |
     #[inline]
     fn fmt_latex(&self, f: &mut Formatter) -> Result {
         f.write_str(match self {

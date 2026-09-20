@@ -18,7 +18,15 @@ impl ToLatex for () {
     /// Constant time and additional memory.
     ///
     /// # Examples
-    /// See [here](super::latex#fmt_latex).
+    /// ```
+    /// use malachite_base::strings::latex::ToLatex;
+    ///
+    /// assert_eq!(().to_latex().to_string(), "()");
+    /// ```
+    ///
+    /// | value | fragment | renders as |
+    /// |-------|----------|------------|
+    /// | `()`  | `()`     | $()$       |
     #[inline]
     fn fmt_latex(&self, f: &mut Formatter) -> Result {
         f.write_str("()")

@@ -71,33 +71,6 @@ pub fn option_from_str_custom<T>(f: &dyn Fn(&str) -> Option<T>, src: &str) -> Op
 /// Iterators that generate [`Option`]s without repetition.
 pub mod exhaustive;
 /// The implementation of [`ToLatex`](crate::strings::latex::ToLatex) for [`Option`].
-///
-/// # fmt_latex
-/// ```
-/// use malachite_base::strings::latex::ToLatex;
-///
-/// assert_eq!(None::<u8>.to_latex().to_string(), r"\bot");
-/// assert_eq!(Some(5u8).to_latex().to_string(), r"\left[5\right]");
-/// assert_eq!(Some("hi").to_latex().to_string(), r"\left[\text{hi}\right]");
-///
-/// // The brackets keep nested `Option`s apart.
-/// assert_eq!(
-///     Some(None::<u8>).to_latex().to_string(),
-///     r"\left[\bot\right]"
-/// );
-/// assert_eq!(
-///     Some(Some(5u8)).to_latex().to_string(),
-///     r"\left[\left[5\right]\right]"
-/// );
-/// ```
-///
-/// | value              | fragment                        | renders as                      |
-/// |--------------------|---------------------------------|---------------------------------|
-/// | `None::<u8>`       | `\bot`                          | $\bot$                          |
-/// | `Some(5u8)`        | `\left[5\right]`                | $\left[5\right]$                |
-/// | `Some("hi")`       | `\left[\text{hi}\right]`        | $\left[\text{hi}\right]$        |
-/// | `Some(None::<u8>)` | `\left[\bot\right]`             | $\left[\bot\right]$             |
-/// | `Some(Some(5u8))`  | `\left[\left[5\right]\right]`   | $\left[\left[5\right]\right]$   |
 pub mod latex;
 #[cfg(feature = "random")]
 /// Iterators that generate [`Option`]s randomly.

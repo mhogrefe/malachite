@@ -19,7 +19,17 @@ impl ToLatex for bool {
     /// Constant time and additional memory.
     ///
     /// # Examples
-    /// See [here](super::latex#fmt_latex).
+    /// ```
+    /// use malachite_base::strings::latex::ToLatex;
+    ///
+    /// assert_eq!(true.to_latex().to_string(), r"\text{T}");
+    /// assert_eq!(false.to_latex().to_string(), r"\text{F}");
+    /// ```
+    ///
+    /// | value   | fragment   | renders as |
+    /// |---------|------------|------------|
+    /// | `true`  | `\text{T}` | $\text{T}$ |
+    /// | `false` | `\text{F}` | $\text{F}$ |
     #[inline]
     fn fmt_latex(&self, f: &mut Formatter) -> Result {
         f.write_str(if *self { "\\text{T}" } else { "\\text{F}" })

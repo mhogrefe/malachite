@@ -19,7 +19,20 @@ impl ToLatex for Ordering {
     /// Constant time and additional memory.
     ///
     /// # Examples
-    /// See [here](super::latex#fmt_latex).
+    /// ```
+    /// use core::cmp::Ordering::*;
+    /// use malachite_base::strings::latex::ToLatex;
+    ///
+    /// assert_eq!(Less.to_latex().to_string(), "<");
+    /// assert_eq!(Equal.to_latex().to_string(), "=");
+    /// assert_eq!(Greater.to_latex().to_string(), ">");
+    /// ```
+    ///
+    /// | value     | fragment | renders as |
+    /// |-----------|----------|------------|
+    /// | `Less`    | `<`      | $<$        |
+    /// | `Equal`   | `=`      | $=$        |
+    /// | `Greater` | `>`      | $>$        |
     #[inline]
     fn fmt_latex(&self, f: &mut Formatter) -> Result {
         f.write_str(match self {
