@@ -17,9 +17,9 @@ use crate::num::exhaustive::{
 use crate::num::iterators::{RulerSequence, ruler_sequence};
 use crate::num::logic::traits::SignificantBits;
 use crate::tuples::exhaustive::{
-    ExhaustiveDependentPairs, ExhaustiveDependentPairsYsGenerator, LexDependentPairs,
-    exhaustive_dependent_pairs, exhaustive_dependent_pairs_stop_after_empty_ys,
-    lex_dependent_pairs_stop_after_empty_ys,
+    ExhaustiveDependentPairs, ExhaustiveDependentPairsYsGenerator, ExhaustivePairs,
+    LexDependentPairs, exhaustive_dependent_pairs, exhaustive_dependent_pairs_stop_after_empty_ys,
+    exhaustive_pairs, lex_dependent_pairs_stop_after_empty_ys,
 };
 use crate::vecs::{ExhaustiveVecPermutations, exhaustive_vec_permutations};
 use alloc::vec;
@@ -5998,6 +5998,333 @@ where
             exhaustive_ordered_unique_vecs_length_inclusive_range(a, b, xs),
             ExhaustiveUniqueVecsGenerator::new(),
         ),
+    }
+}
+
+// Given a distinct-value count $d$, generates the pairs of a restricted growth string and the $d$
+// distinct values that its symbols stand for, in order of first appearance.
+#[derive(Clone, Debug)]
+struct ExhaustiveVecsWithDistinctCountGenerator<I: Clone + Iterator>
+where
+    I::Item: Clone,
+{
+    len: usize,
+    xs: I,
+}
+
+impl<I: Clone + Iterator>
+    ExhaustiveDependentPairsYsGenerator<
+        usize,
+        (Vec<usize>, Vec<I::Item>),
+        ExhaustivePairs<
+            Vec<usize>,
+            RestrictedGrowthStrings,
+            Vec<I::Item>,
+            ExhaustiveUniqueVecsFixedLength<I>,
+        >,
+    > for ExhaustiveVecsWithDistinctCountGenerator<I>
+where
+    I::Item: Clone,
+{
+    #[inline]
+    fn get_ys(
+        &self,
+        &d: &usize,
+    ) -> ExhaustivePairs<
+        Vec<usize>,
+        RestrictedGrowthStrings,
+        Vec<I::Item>,
+        ExhaustiveUniqueVecsFixedLength<I>,
+    > {
+        exhaustive_pairs(
+            restricted_growth_strings(self.len, d),
+            exhaustive_unique_vecs_fixed_length(u64::exact_from(d), self.xs.clone()),
+        )
+    }
+}
+
+/// Generates all [`Vec`]s of a fixed length whose number of distinct elements lies in a range.
+#[derive(Clone)]
+pub struct ExhaustiveVecsFixedLengthWithDistinctCount<I: Clone + Iterator>
+where
+    I::Item: Clone,
+{
+    xs: ExhaustiveDependentPairs<
+        usize,
+        (Vec<usize>, Vec<I::Item>),
+        RulerSequence<usize>,
+        ExhaustiveVecsWithDistinctCountGenerator<I>,
+        PrimitiveIntIncreasingRange<usize>,
+        ExhaustivePairs<
+            Vec<usize>,
+            RestrictedGrowthStrings,
+            Vec<I::Item>,
+            ExhaustiveUniqueVecsFixedLength<I>,
+        >,
+    >,
+}
+
+impl<I: Clone + Iterator> Iterator for ExhaustiveVecsFixedLengthWithDistinctCount<I>
+where
+    I::Item: Clone,
+{
+    type Item = Vec<I::Item>;
+
+    #[inline]
+    fn next(&mut self) -> Option<Vec<I::Item>> {
+        self.xs
+            .next()
+            .map(|(_, (pattern, values))| pattern.iter().map(|&i| values[i].clone()).collect())
+    }
+}
+
+/// Generates [`Vec`]s of a given length with elements from a single iterator, such that the number
+/// of distinct elements in each [`Vec`] is in the closed interval $[a, b]$.
+///
+/// The source iterator should not repeat any elements, but this is not enforced.
+///
+/// Each [`Vec`] is generated once. A [`Vec`] of length $k$ with $d$ distinct elements is built from
+/// two independent choices: a restricted growth string of length $k$ with $d$ symbols, which says
+/// which positions share an element, and a [`Vec`] of $d$ distinct elements, which says what those
+/// symbols stand for in order of first appearance. Every such [`Vec`] arises from exactly one such
+/// pair.
+///
+/// A [`Vec`] of length $k$ has between 1 and $k$ distinct elements, or 0 if $k$ is 0, so the
+/// interval is intersected with that range; if the intersection is empty, so is the output.
+///
+/// If the input iterator is infinite and the intersected interval is nonempty, the output length is
+/// infinite. If the input iterator length is $n$, the output length is
+/// $$
+/// \sum_{i=a}^b S(k, i) \frac{n!}{(n-i)!},
+/// $$
+/// where $S$ is a Stirling number of the second kind.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell + T^\prime(i))$
+///
+/// $M(i) = O(\ell + M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $\ell$ is `k`.
+///
+/// # Examples
+/// ```
+/// use itertools::Itertools;
+/// use malachite_base::vecs::exhaustive::*;
+///
+/// let xss = exhaustive_vecs_fixed_length_with_distinct_count_inclusive_range(3, 1, 2, 1..=3)
+///     .collect_vec();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[
+///         &[1, 1, 1],
+///         &[1, 1, 2],
+///         &[2, 2, 2],
+///         &[3, 3, 3],
+///         &[2, 2, 1],
+///         &[1, 2, 1],
+///         &[2, 1, 2],
+///         &[1, 1, 3],
+///         &[3, 3, 1],
+///         &[1, 3, 1],
+///         &[3, 1, 3],
+///         &[1, 2, 2],
+///         &[2, 1, 1],
+///         &[1, 3, 3],
+///         &[3, 1, 1],
+///         &[2, 2, 3],
+///         &[3, 3, 2],
+///         &[2, 3, 2],
+///         &[3, 2, 3],
+///         &[2, 3, 3],
+///         &[3, 2, 2]
+///     ]
+/// );
+/// ```
+pub fn exhaustive_vecs_fixed_length_with_distinct_count_inclusive_range<I: Clone + Iterator>(
+    k: u64,
+    mut a: u64,
+    mut b: u64,
+    xs: I,
+) -> ExhaustiveVecsFixedLengthWithDistinctCount<I>
+where
+    I::Item: Clone,
+{
+    // A length-$k$ `Vec` has at least one distinct element unless it is empty, and never more than
+    // $k$.
+    let lo = min(k, 1);
+    if a < lo {
+        a = lo;
+    }
+    if b > k {
+        b = k;
+    }
+    if a > b {
+        a = 1;
+        b = 0;
+    }
+    ExhaustiveVecsFixedLengthWithDistinctCount {
+        xs: exhaustive_dependent_pairs(
+            ruler_sequence(),
+            primitive_int_increasing_range(
+                usize::exact_from(a),
+                usize::exact_from(b).saturating_add(1),
+            ),
+            ExhaustiveVecsWithDistinctCountGenerator {
+                len: usize::exact_from(k),
+                xs,
+            },
+        ),
+    }
+}
+
+/// Generates all restricted growth strings of a given length with a given number of distinct
+/// symbols.
+///
+/// This `struct` is created by [`restricted_growth_strings`]; see its documentation for more.
+#[derive(Clone, Debug)]
+pub struct RestrictedGrowthStrings {
+    done: bool,
+    first: bool,
+    // `xs[i]` is the symbol at position `i`; `maxes[i]` is the largest symbol in `xs[..=i]`.
+    xs: Vec<usize>,
+    maxes: Vec<usize>,
+    block_count: usize,
+}
+
+impl Iterator for RestrictedGrowthStrings {
+    type Item = Vec<usize>;
+
+    fn next(&mut self) -> Option<Vec<usize>> {
+        if self.done {
+            return None;
+        }
+        if self.first {
+            self.first = false;
+            return Some(self.xs.clone());
+        }
+        let k = self.xs.len();
+        let d = self.block_count;
+        // Find the rightmost position that can be incremented. A position may take any symbol up to
+        // one more than the largest symbol before it, and never more than `d - 1`; and whatever is
+        // left of the string after it must still be long enough to reach `d - 1`.
+        let mut i = k;
+        loop {
+            // Position 0 is always 0, so there is nothing before it to carry into; a length-0
+            // string has no positions at all.
+            if i <= 1 {
+                self.done = true;
+                return None;
+            }
+            i -= 1;
+            let before = self.maxes[i - 1];
+            if self.xs[i] <= before && self.xs[i] + 1 < d && before + 1 + (k - 1 - i) >= d {
+                break;
+            }
+        }
+        self.xs[i] += 1;
+        self.maxes[i] = max(self.maxes[i - 1], self.xs[i]);
+        // Fill the suffix with the smallest symbols that still reach `d - 1` by the end: hold at
+        // zero while there is room to spare, then climb one symbol at a time.
+        for j in i + 1..k {
+            let before = self.maxes[j - 1];
+            self.xs[j] = if before + 1 + (k - 1 - j) >= d {
+                0
+            } else {
+                before + 1
+            };
+            self.maxes[j] = max(before, self.xs[j]);
+        }
+        Some(self.xs.clone())
+    }
+}
+
+/// Generates all restricted growth strings of a given length with a given number of distinct
+/// symbols.
+///
+/// A restricted growth string is a [`Vec`] $(a_0, \ldots, a_{k-1})$ of [`usize`]s with $a_0 = 0$
+/// and $a_i \leq 1 + \max(a_0, \ldots, a_{i-1})$. Such a string records which positions share a
+/// symbol, with the symbols numbered in order of first appearance, so the strings of length $k$
+/// using exactly $d$ symbols correspond to the partitions of $k$ labeled objects into $d$ nonempty
+/// blocks.
+///
+/// The strings are output in lexicographic order.
+///
+/// If $k = 0$, the output consists of one empty [`Vec`] if $d$ is 0, and is empty otherwise. If $k$
+/// is nonzero, the output is empty unless $1 \leq d \leq k$.
+///
+/// The output length is $S(k, d)$, a Stirling number of the second kind.
+///
+/// # Worst-case complexity per iteration
+/// $T(k) = O(k)$
+///
+/// $M(k) = O(k)$
+///
+/// where $T$ is time, $M$ is additional memory, and $k$ is `len`.
+///
+/// # Examples
+/// ```
+/// use itertools::Itertools;
+/// use malachite_base::vecs::exhaustive::restricted_growth_strings;
+///
+/// let xss = restricted_growth_strings(4, 2).collect_vec();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[
+///         &[0, 0, 0, 1],
+///         &[0, 0, 1, 0],
+///         &[0, 0, 1, 1],
+///         &[0, 1, 0, 0],
+///         &[0, 1, 0, 1],
+///         &[0, 1, 1, 0],
+///         &[0, 1, 1, 1]
+///     ]
+/// );
+/// ```
+pub fn restricted_growth_strings(len: usize, block_count: usize) -> RestrictedGrowthStrings {
+    if len == 0 {
+        return RestrictedGrowthStrings {
+            done: block_count != 0,
+            first: true,
+            xs: Vec::new(),
+            maxes: Vec::new(),
+            block_count,
+        };
+    }
+    if block_count == 0 || block_count > len {
+        return RestrictedGrowthStrings {
+            done: true,
+            first: true,
+            xs: Vec::new(),
+            maxes: Vec::new(),
+            block_count,
+        };
+    }
+    // The lexicographically first string holds at zero as long as it can and then climbs, so that
+    // it still uses every symbol by the end.
+    let mut xs = vec![0; len];
+    let mut m = 0;
+    for (j, x) in xs.iter_mut().enumerate().skip(1) {
+        *x = if m + 1 + (len - 1 - j) >= block_count {
+            0
+        } else {
+            m + 1
+        };
+        m = max(m, *x);
+    }
+    let maxes = xs
+        .iter()
+        .scan(0, |m, &x| {
+            *m = max(*m, x);
+            Some(*m)
+        })
+        .collect();
+    RestrictedGrowthStrings {
+        done: false,
+        first: true,
+        xs,
+        maxes,
+        block_count,
     }
 }
 

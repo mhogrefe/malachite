@@ -184,6 +184,28 @@ pub mod iterators {
     pub mod with_special_value;
     pub mod with_special_values;
 }
+pub mod maps {
+    pub mod exhaustive {
+        pub mod exhaustive_b_tree_maps;
+        pub mod exhaustive_b_tree_maps_fixed_size;
+        pub mod exhaustive_b_tree_maps_fixed_unique_value_count;
+        pub mod exhaustive_b_tree_maps_min_size;
+        pub mod exhaustive_b_tree_maps_size_and_unique_value_count_inclusive_range;
+        pub mod exhaustive_b_tree_maps_size_inclusive_range;
+        pub mod exhaustive_b_tree_maps_size_range;
+        pub mod exhaustive_b_tree_maps_unique_value_count_inclusive_range;
+        pub mod exhaustive_b_tree_maps_unique_value_count_range;
+        pub mod exhaustive_hash_maps;
+        pub mod exhaustive_hash_maps_fixed_size;
+        pub mod exhaustive_hash_maps_fixed_unique_value_count;
+        pub mod exhaustive_hash_maps_min_size;
+        pub mod exhaustive_hash_maps_size_and_unique_value_count_inclusive_range;
+        pub mod exhaustive_hash_maps_size_inclusive_range;
+        pub mod exhaustive_hash_maps_size_range;
+        pub mod exhaustive_hash_maps_unique_value_count_inclusive_range;
+        pub mod exhaustive_hash_maps_unique_value_count_range;
+    }
+}
 pub mod named;
 pub mod nevers {
     #[allow(clippy::module_inception)]
@@ -800,6 +822,7 @@ pub mod vecs {
         pub mod exhaustive_vecs;
         pub mod exhaustive_vecs_fixed_length_from_single;
         pub mod exhaustive_vecs_fixed_length_m_inputs;
+        pub mod exhaustive_vecs_fixed_length_with_distinct_count_inclusive_range;
         pub mod exhaustive_vecs_from_length_iterator;
         pub mod exhaustive_vecs_length_inclusive_range;
         pub mod exhaustive_vecs_length_n;
@@ -823,6 +846,7 @@ pub mod vecs {
         pub mod lex_vecs_fixed_length_m_inputs;
         pub mod lex_vecs_length_n;
         pub mod next_bit_pattern;
+        pub mod restricted_growth_strings;
         pub mod shortlex_ordered_unique_vecs;
         pub mod shortlex_ordered_unique_vecs_length_inclusive_range;
         pub mod shortlex_ordered_unique_vecs_length_range;

@@ -167,7 +167,9 @@ pub const fn fail_on_untested_path(_message: &str) {}
 
 // TODO links for malachite-nz and malachite-q
 
-/// The [`Named`](named::Named) trait, for getting a type's name.
+/// The [`Named`](named::Named) trait, for getting a type's name. Functions for working with
+/// [`HashMap`](std::collections::HashMap)s and [`BTreeMap`](std::collections::BTreeMap)s.
+pub mod maps;
 #[macro_use]
 pub mod named;
 
