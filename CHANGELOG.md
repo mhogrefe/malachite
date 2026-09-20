@@ -63,6 +63,14 @@ documented by git history.
   family has `shortlex_vecs` but no `lex_vecs`. The count for a fixed length $k$ from $n$ elements
   is $\binom{n+k-1}{k}$, and over a nonempty source the unbounded generators are infinite.
 
+- Random generators of ordered [`Vec`]s, matching the new exhaustive ones: `random_ordered_vecs`,
+  with `_fixed_length`, `_from_length_iterator`, `_min_length`, `_length_range`, and
+  `_length_inclusive_range` variants. As for random ordered unique [`Vec`]s, "ordered" here means
+  sorted by [`Ord`] rather than by a source iterator's order, so each generator draws a random
+  [`Vec`] and sorts it. Unlike the unique versions, these place no demand on the element iterator:
+  since elements may repeat, the requested length is always reachable, and no iteration can hang
+  waiting for distinct values.
+
 ### Documentation
 
 - Fixed ten `Float` logarithm doc comments whose set braces did not render. Rustdoc runs doc

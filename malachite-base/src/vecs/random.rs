@@ -1348,6 +1348,548 @@ where
     )
 }
 
+/// Generates random [`Vec`]s of a fixed length, where the elements are in ascending order and may
+/// repeat.
+///
+/// This `struct` is created by [`random_ordered_vecs_fixed_length`]; see its documentation for
+/// more.
+#[derive(Clone, Debug)]
+pub struct RandomOrderedVecsFixedLength<I: Iterator>
+where
+    I::Item: Ord,
+{
+    xs: RandomFixedLengthVecsFromSingle<I>,
+}
+
+impl<I: Iterator> Iterator for RandomOrderedVecsFixedLength<I>
+where
+    I::Item: Ord,
+{
+    type Item = Vec<I::Item>;
+
+    #[inline]
+    fn next(&mut self) -> Option<Vec<I::Item>> {
+        let mut xs = self.xs.next().unwrap();
+        xs.sort_unstable();
+        Some(xs)
+    }
+}
+
+/// Randomly generates [`Vec`]s of a given length, where the elements are in ascending order and may
+/// repeat.
+///
+/// Unlike the analogous generator for [`Vec`]s without repetitions, this one places no demand on
+/// the element iterator: since elements may repeat, `len` draws always suffice.
+///
+/// $$
+/// P((x\_i)\_{i=0}^{n-1}) = \frac{n!}{\prod\_j m\_j!} \prod\_{i=0}^{n-1}P(x\_i),
+/// $$
+/// where $m\_j$ is the number of times that the $j$th distinct value occurs. The formula assumes
+/// that the [`Vec`] is valid, \emph{i.e.} its elements are nondecreasing; the probability of an
+/// invalid [`Vec`] is zero. The multinomial coefficient counts the orderings of the elements that
+/// sort to the same [`Vec`].
+///
+/// If `len` is 0, the output consists of the empty list, repeated.
+///
+/// Sorting gives every multiset a single representation, so two output [`Vec`]s are equal exactly
+/// when they hold the same elements with the same multiplicities.
+///
+/// `xs` must be infinite.
+///
+/// # Expected complexity per iteration
+/// $T(i) = O(n \log n + n T^\prime(i))$
+///
+/// $M(i) = O(n M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $n$ is `len`.
+///
+/// # Examples
+/// ```
+/// use itertools::Itertools;
+/// use malachite_base::num::random::random_unsigned_inclusive_range;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::vecs::random::random_ordered_vecs_fixed_length;
+///
+/// let xss = random_ordered_vecs_fixed_length(
+///     2,
+///     random_unsigned_inclusive_range::<u32>(EXAMPLE_SEED, 1, 100),
+/// )
+/// .take(10)
+/// .collect_vec();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[
+///         &[24, 95],
+///         &[71, 99],
+///         &[53, 93],
+///         &[34, 85],
+///         &[2, 48],
+///         &[11, 55],
+///         &[18, 48],
+///         &[90, 93],
+///         &[67, 93],
+///         &[93, 95]
+///     ]
+/// );
+/// ```
+#[inline]
+pub const fn random_ordered_vecs_fixed_length<I: Iterator>(
+    len: u64,
+    xs: I,
+) -> RandomOrderedVecsFixedLength<I>
+where
+    I::Item: Ord,
+{
+    RandomOrderedVecsFixedLength {
+        xs: random_vecs_fixed_length_from_single(len, xs),
+    }
+}
+
+/// Generates random [`Vec`]s with lengths from an iterator, where the elements are in ascending
+/// order and may repeat.
+///
+/// This `struct` is created by [`random_ordered_vecs`] and similar functions; see their
+/// documentation for more.
+#[derive(Clone, Debug)]
+pub struct RandomOrderedVecs<T: Ord, I: Iterator<Item = u64>, J: Iterator<Item = T>> {
+    xs: RandomVecs<T, I, J>,
+}
+
+impl<T: Ord, I: Iterator<Item = u64>, J: Iterator<Item = T>> Iterator
+    for RandomOrderedVecs<T, I, J>
+{
+    type Item = Vec<T>;
+
+    #[inline]
+    fn next(&mut self) -> Option<Vec<T>> {
+        let mut xs = self.xs.next().unwrap();
+        xs.sort_unstable();
+        Some(xs)
+    }
+}
+
+/// Generates random [`Vec`]s using elements from an iterator and with lengths from another
+/// iterator, where the elements are in ascending order and may repeat.
+///
+/// Unlike the analogous generator for [`Vec`]s without repetitions, this one places no demand on
+/// the element iterator: since elements may repeat, any length is reachable.
+///
+/// $$
+/// P((x\_i)\_{i=0}^{n-1}) = \frac{n!}{\prod\_j m\_j!} P(n) \prod\_{i=0}^{n-1}P(x\_i),
+/// $$
+/// where $m\_j$ is the number of times that the $j$th distinct value occurs. The formula assumes
+/// that the [`Vec`] is valid, \emph{i.e.} its elements are nondecreasing; the probability of an
+/// invalid [`Vec`] is zero.
+///
+/// Sorting gives every multiset a single representation, so two output [`Vec`]s are equal exactly
+/// when they hold the same elements with the same multiplicities.
+///
+/// `lengths_gen` must produce only nonnegative values. `xs_gen` must be infinite.
+///
+/// # Expected complexity per iteration
+/// $T(i) = O(n \log n + n T^\prime(i))$
+///
+/// $M(i) = O(n M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of the iterators produced by `xs_gen`, and $n$ is
+/// the mean length.
+///
+/// # Examples
+/// ```
+/// use itertools::Itertools;
+/// use malachite_base::num::random::random_primitive_ints;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::vecs::random::random_ordered_vecs_from_length_iterator;
+/// use malachite_base::vecs::random_values_from_vec;
+///
+/// let xs = random_ordered_vecs_from_length_iterator(
+///     EXAMPLE_SEED,
+///     &|seed| random_values_from_vec(seed, vec![0, 2, 4]),
+///     &random_primitive_ints::<u8>,
+/// );
+/// let values = xs.take(20).collect_vec();
+/// assert_eq!(
+///     values.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[
+///         &[11, 85][..],
+///         &[134, 136, 200, 235],
+///         &[203, 223],
+///         &[38, 177, 217, 235],
+///         &[32, 162, 166, 234],
+///         &[30, 218],
+///         &[],
+///         &[90, 106],
+///         &[],
+///         &[9, 151, 204, 216],
+///         &[78, 97, 213, 253],
+///         &[39, 91],
+///         &[170, 175, 191, 232],
+///         &[2, 233],
+///         &[22, 35, 198, 217],
+///         &[17, 32, 114, 173],
+///         &[65, 114, 121, 222],
+///         &[],
+///         &[25, 144, 148, 173],
+///         &[]
+///     ]
+/// );
+/// ```
+pub fn random_ordered_vecs_from_length_iterator<
+    T: Ord,
+    I: Iterator<Item = u64>,
+    J: Iterator<Item = T>,
+>(
+    seed: Seed,
+    lengths_gen: &dyn Fn(Seed) -> I,
+    xs_gen: &dyn Fn(Seed) -> J,
+) -> RandomOrderedVecs<T, I, J> {
+    RandomOrderedVecs {
+        xs: random_vecs_from_length_iterator(seed, lengths_gen, xs_gen),
+    }
+}
+
+/// Generates random [`Vec`]s using elements from an iterator, where the elements are in ascending
+/// order and may repeat.
+///
+/// The lengths of the [`Vec`]s are sampled from a geometric distribution with a specified mean $m$,
+/// equal to `mean_length_numerator / mean_length_denominator`. $m$ must be greater than 0.
+///
+/// $$
+/// P((x\_i)\_{i=0}^{n-1}) = \frac{n!}{\prod\_j m\_j!} P(n) \prod\_{i=0}^{n-1}P(x\_i),
+/// $$
+/// where $m\_j$ is the number of times that the $j$th distinct value occurs. The formula assumes
+/// that the [`Vec`] is valid, \emph{i.e.} its elements are nondecreasing; the probability of an
+/// invalid [`Vec`] is zero.
+///
+/// Sorting gives every multiset a single representation, so two output [`Vec`]s are equal exactly
+/// when they hold the same elements with the same multiplicities.
+///
+/// `xs_gen` must be infinite.
+///
+/// # Expected complexity per iteration
+/// $T(i) = O(m \log m + m T^\prime(i))$
+///
+/// $M(i) = O(m M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $m$ is `mean_length_numerator /
+/// mean_length_denominator`.
+///
+/// # Panics
+/// Panics if `mean_length_numerator` or `mean_length_denominator` are zero, or, if after being
+/// reduced to lowest terms, their sum is greater than or equal to $2^{64}$.
+///
+/// # Examples
+/// ```
+/// use itertools::Itertools;
+/// use malachite_base::num::random::random_primitive_ints;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::vecs::random::random_ordered_vecs;
+///
+/// let xs = random_ordered_vecs(EXAMPLE_SEED, &random_primitive_ints::<u8>, 4, 1);
+/// let values = xs.take(20).collect_vec();
+/// assert_eq!(
+///     values.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[
+///         &[][..],
+///         &[11, 32, 38, 85, 134, 136, 162, 177, 200, 203, 217, 223, 235, 235],
+///         &[30, 166, 218, 234],
+///         &[9, 90, 106, 216],
+///         &[204],
+///         &[],
+///         &[78, 97, 151, 213, 253],
+///         &[39, 91],
+///         &[170, 175, 191, 232],
+///         &[],
+///         &[2, 22, 35, 198, 217, 233],
+///         &[],
+///         &[],
+///         &[17, 25, 32, 65, 114, 114, 121, 144, 173, 173, 222],
+///         &[52, 69, 73, 79, 91, 115, 137, 148],
+///         &[],
+///         &[112, 153, 178],
+///         &[],
+///         &[34, 95, 106, 167, 197],
+///         &[86, 122, 130, 150, 168, 172, 177, 207, 221]
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn random_ordered_vecs<I: Iterator>(
+    seed: Seed,
+    xs_gen: &dyn Fn(Seed) -> I,
+    mean_length_numerator: u64,
+    mean_length_denominator: u64,
+) -> RandomOrderedVecs<I::Item, GeometricRandomNaturalValues<u64>, I>
+where
+    I::Item: Ord,
+{
+    random_ordered_vecs_from_length_iterator(
+        seed,
+        &|seed_2| {
+            geometric_random_unsigneds(seed_2, mean_length_numerator, mean_length_denominator)
+        },
+        xs_gen,
+    )
+}
+
+/// Generates random [`Vec`]s with a minimum length, using elements from an iterator, where the
+/// elements are in ascending order and may repeat.
+///
+/// The lengths of the [`Vec`]s are sampled from a geometric distribution with a specified mean $m$,
+/// equal to `mean_length_numerator / mean_length_denominator`. $m$ must be greater than
+/// `min_length`.
+///
+/// $$
+/// P((x\_i)\_{i=0}^{n-1}) = \frac{n!}{\prod\_j m\_j!} P(n) \prod\_{i=0}^{n-1}P(x\_i),
+/// $$
+/// where $m\_j$ is the number of times that the $j$th distinct value occurs. The formula assumes
+/// that the [`Vec`] is valid, \emph{i.e.} its elements are nondecreasing; the probability of an
+/// invalid [`Vec`] is zero.
+///
+/// Sorting gives every multiset a single representation, so two output [`Vec`]s are equal exactly
+/// when they hold the same elements with the same multiplicities.
+///
+/// `xs_gen` must be infinite.
+///
+/// # Expected complexity per iteration
+/// $T(i) = O(m \log m + m T^\prime(i))$
+///
+/// $M(i) = O(m M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $m$ is `mean_length_numerator /
+/// mean_length_denominator`.
+///
+/// # Panics
+/// Panics if `mean_length_numerator` or `mean_length_denominator` are zero, if their ratio is less
+/// than or equal to `min_length`, or if they are too large and manipulating them leads to
+/// arithmetic overflow.
+///
+/// # Examples
+/// ```
+/// use itertools::Itertools;
+/// use malachite_base::num::random::random_primitive_ints;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::vecs::random::random_ordered_vecs_min_length;
+///
+/// let xs = random_ordered_vecs_min_length(EXAMPLE_SEED, 2, &random_primitive_ints::<u8>, 6, 1);
+/// let values = xs.take(20).collect_vec();
+/// assert_eq!(
+///     values.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[
+///         &[11, 85][..],
+///         &[30, 32, 38, 134, 136, 162, 166, 177, 200, 203, 217, 218, 223, 234, 235, 235],
+///         &[9, 90, 106, 151, 204, 216],
+///         &[39, 78, 91, 97, 213, 253],
+///         &[170, 175, 191],
+///         &[232, 233],
+///         &[2, 17, 22, 35, 114, 198, 217],
+///         &[32, 65, 114, 173],
+///         &[25, 121, 144, 148, 173, 222],
+///         &[79, 115],
+///         &[52, 69, 73, 91, 112, 137, 153, 178],
+///         &[34, 95],
+///         &[106, 167],
+///         &[86, 101, 115, 122, 130, 150, 168, 172, 177, 197, 207, 218, 221],
+///         &[9, 48, 52, 74, 109, 123, 159, 201, 247, 250],
+///         &[133, 235],
+///         &[40, 68, 97, 104, 196],
+///         &[190, 216],
+///         &[7, 43, 43, 112, 157, 216, 217],
+///         &[11, 24, 29, 55, 65, 84, 89, 103, 135, 206, 211]
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn random_ordered_vecs_min_length<I: Iterator>(
+    seed: Seed,
+    min_length: u64,
+    xs_gen: &dyn Fn(Seed) -> I,
+    mean_length_numerator: u64,
+    mean_length_denominator: u64,
+) -> RandomOrderedVecs<I::Item, GeometricRandomNaturalValues<u64>, I>
+where
+    I::Item: Ord,
+{
+    random_ordered_vecs_from_length_iterator(
+        seed,
+        &|seed_2| {
+            geometric_random_unsigned_inclusive_range(
+                seed_2,
+                min_length,
+                u64::MAX,
+                mean_length_numerator,
+                mean_length_denominator,
+            )
+        },
+        xs_gen,
+    )
+}
+
+/// Generates random [`Vec`]s with lengths in $[a, b)$, using elements from an iterator, where the
+/// elements are in ascending order and may repeat.
+///
+/// $$
+/// P((x\_i)\_{i=0}^{n-1}) = \frac{n!}{\prod\_j m\_j!} P(n) \prod\_{i=0}^{n-1}P(x\_i),
+/// $$
+/// where $m\_j$ is the number of times that the $j$th distinct value occurs. The formula assumes
+/// that the [`Vec`] is valid, \emph{i.e.} its elements are nondecreasing; the probability of an
+/// invalid [`Vec`] is zero.
+///
+/// Sorting gives every multiset a single representation, so two output [`Vec`]s are equal exactly
+/// when they hold the same elements with the same multiplicities.
+///
+/// `xs_gen` must be infinite.
+///
+/// # Expected complexity per iteration
+/// $T(i) = O(m \log m + m T^\prime(i))$
+///
+/// $M(i) = O(m M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $m$ is $(a + b) / 2$.
+///
+/// # Panics
+/// Panics if $a \geq b$.
+///
+/// # Examples
+/// ```
+/// use itertools::Itertools;
+/// use malachite_base::num::random::random_primitive_ints;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::vecs::random::random_ordered_vecs_length_range;
+///
+/// let xs = random_ordered_vecs_length_range(EXAMPLE_SEED, 2, 5, &random_primitive_ints::<u8>);
+/// let values = xs.take(20).collect_vec();
+/// assert_eq!(
+///     values.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[
+///         &[11, 85, 136][..],
+///         &[134, 200, 203, 235],
+///         &[38, 223, 235],
+///         &[32, 162, 177, 217],
+///         &[30, 166, 218, 234],
+///         &[9, 90, 106],
+///         &[204, 216],
+///         &[97, 151, 213],
+///         &[78, 253],
+///         &[39, 91, 175, 191],
+///         &[2, 170, 232, 233],
+///         &[22, 35, 217],
+///         &[17, 32, 114, 198],
+///         &[65, 114, 173],
+///         &[25, 121, 173, 222],
+///         &[79, 115, 144, 148],
+///         &[52, 69, 73, 137],
+///         &[91, 153],
+///         &[34, 95, 112, 178],
+///         &[106, 167]
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn random_ordered_vecs_length_range<I: Iterator>(
+    seed: Seed,
+    a: u64,
+    b: u64,
+    xs_gen: &dyn Fn(Seed) -> I,
+) -> RandomOrderedVecs<I::Item, RandomUnsignedRange<u64>, I>
+where
+    I::Item: Ord,
+{
+    random_ordered_vecs_from_length_iterator(
+        seed,
+        &|seed_2| random_unsigned_range(seed_2, a, b),
+        xs_gen,
+    )
+}
+
+/// Generates random [`Vec`]s with lengths in $[a, b]$, using elements from an iterator, where the
+/// elements are in ascending order and may repeat.
+///
+/// $$
+/// P((x\_i)\_{i=0}^{n-1}) = \frac{n!}{\prod\_j m\_j!} P(n) \prod\_{i=0}^{n-1}P(x\_i),
+/// $$
+/// where $m\_j$ is the number of times that the $j$th distinct value occurs. The formula assumes
+/// that the [`Vec`] is valid, \emph{i.e.} its elements are nondecreasing; the probability of an
+/// invalid [`Vec`] is zero.
+///
+/// Sorting gives every multiset a single representation, so two output [`Vec`]s are equal exactly
+/// when they hold the same elements with the same multiplicities.
+///
+/// `xs_gen` must be infinite.
+///
+/// # Expected complexity per iteration
+/// $T(i) = O(m \log m + m T^\prime(i))$
+///
+/// $M(i) = O(m M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs`, and $m$ is $(a + b) / 2$.
+///
+/// # Panics
+/// Panics if $a > b$.
+///
+/// # Examples
+/// ```
+/// use itertools::Itertools;
+/// use malachite_base::num::random::random_primitive_ints;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::vecs::random::random_ordered_vecs_length_inclusive_range;
+///
+/// let xs = random_ordered_vecs_length_inclusive_range(
+///     EXAMPLE_SEED,
+///     2,
+///     4,
+///     &random_primitive_ints::<u8>,
+/// );
+/// let values = xs.take(20).collect_vec();
+/// assert_eq!(
+///     values.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[
+///         &[11, 85, 136][..],
+///         &[134, 200, 203, 235],
+///         &[38, 223, 235],
+///         &[32, 162, 177, 217],
+///         &[30, 166, 218, 234],
+///         &[9, 90, 106],
+///         &[204, 216],
+///         &[97, 151, 213],
+///         &[78, 253],
+///         &[39, 91, 175, 191],
+///         &[2, 170, 232, 233],
+///         &[22, 35, 217],
+///         &[17, 32, 114, 198],
+///         &[65, 114, 173],
+///         &[25, 121, 173, 222],
+///         &[79, 115, 144, 148],
+///         &[52, 69, 73, 137],
+///         &[91, 153],
+///         &[34, 95, 112, 178],
+///         &[106, 167]
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn random_ordered_vecs_length_inclusive_range<I: Iterator>(
+    seed: Seed,
+    a: u64,
+    b: u64,
+    xs_gen: &dyn Fn(Seed) -> I,
+) -> RandomOrderedVecs<I::Item, RandomUnsignedInclusiveRange<u64>, I>
+where
+    I::Item: Ord,
+{
+    random_ordered_vecs_from_length_iterator(
+        seed,
+        &|seed_2| random_unsigned_inclusive_range(seed_2, a, b),
+        xs_gen,
+    )
+}
+
 #[doc(hidden)]
 #[derive(Clone, Debug)]
 pub struct RandomUniqueVecsLength2<I: Iterator>

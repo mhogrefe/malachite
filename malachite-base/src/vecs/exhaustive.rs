@@ -3329,7 +3329,10 @@ where
 /// elements in each [`Vec`] are ordered the same way as they are in the source iterator. Elements
 /// may repeat, so the [`Vec`]s are the multisets of the given size, each written in source order.
 ///
-/// The source iterator should not repeat any elements, but this is not enforced.
+/// The source iterator should not repeat any elements, but this is not enforced. Fixing the order
+/// within each [`Vec`] gives every multiset a single representation, so each is generated exactly
+/// once. A repeated source element defeats this, and any multiset that can be formed in more than
+/// one way is generated more than once.
 ///
 /// If $k$ is 0, the output length is 1.
 ///
@@ -3445,8 +3448,11 @@ impl<T: Clone, I: Iterator<Item = u64>, J: Clone + Iterator<Item = T>> Iterator
 ///
 /// The length-generating iterator is `lengths`, and the element-generating iterator is `xs`.
 ///
-/// The source iterator should not repeat any elements, but this is not enforced. If the lengths
-/// iterator has repetitions, then the generated [`Vec`]s will be repeated too.
+/// The source iterator should not repeat any elements, but this is not enforced. Fixing the order
+/// within each [`Vec`] gives every multiset a single representation, so each is generated exactly
+/// once. A repeated source element defeats this, and any multiset that can be formed in more than
+/// one way is generated more than once. If the lengths iterator has repetitions, then the generated
+/// [`Vec`]s will be repeated too.
 ///
 /// There's one quirk if `xs` is empty: then the iterator will stop at some point after it
 /// encounters a nonzero $\ell$, even if there are zeros later on. This prevents the iterator
@@ -3521,7 +3527,10 @@ pub const fn exhaustive_ordered_vecs_from_length_iterator<
 /// are ordered the same way as they are in the source iterator. Elements may repeat, so the
 /// [`Vec`]s are the finite multisets of the elements, each written in source order.
 ///
-/// The source iterator should not repeat any elements, but this is not enforced.
+/// The source iterator should not repeat any elements, but this is not enforced. Fixing the order
+/// within each [`Vec`] gives every multiset a single representation, so each is generated exactly
+/// once. A repeated source element defeats this, and any multiset that can be formed in more than
+/// one way is generated more than once.
 ///
 /// The lengths of the output [`Vec`]s grow logarithmically.
 ///
@@ -3586,7 +3595,10 @@ where
 /// may repeat, so the [`Vec`]s are the multisets of at least the given size, each written in source
 /// order.
 ///
-/// The source iterator should not repeat any elements, but this is not enforced.
+/// The source iterator should not repeat any elements, but this is not enforced. Fixing the order
+/// within each [`Vec`] gives every multiset a single representation, so each is generated exactly
+/// once. A repeated source element defeats this, and any multiset that can be formed in more than
+/// one way is generated more than once.
 ///
 /// The lengths of the output [`Vec`]s grow logarithmically.
 ///
@@ -3658,7 +3670,10 @@ where
 /// Elements may repeat, so the [`Vec`]s are the multisets whose sizes lie in the range, each
 /// written in source order.
 ///
-/// The source iterator should not repeat any elements, but this is not enforced.
+/// The source iterator should not repeat any elements, but this is not enforced. Fixing the order
+/// within each [`Vec`] gives every multiset a single representation, so each is generated exactly
+/// once. A repeated source element defeats this, and any multiset that can be formed in more than
+/// one way is generated more than once.
 ///
 /// The lengths of the output [`Vec`]s grow logarithmically.
 ///
@@ -3710,7 +3725,10 @@ where
 /// Elements may repeat, so the [`Vec`]s are the multisets whose sizes lie in the range, each
 /// written in source order.
 ///
-/// The source iterator should not repeat any elements, but this is not enforced.
+/// The source iterator should not repeat any elements, but this is not enforced. Fixing the order
+/// within each [`Vec`] gives every multiset a single representation, so each is generated exactly
+/// once. A repeated source element defeats this, and any multiset that can be formed in more than
+/// one way is generated more than once.
 ///
 /// The lengths of the output [`Vec`]s grow logarithmically.
 ///
@@ -4010,7 +4028,10 @@ where
 ///
 /// The [`Vec`]s are ordered lexicographically with respect to the order of the element iterator.
 ///
-/// The source iterator should not repeat any elements, but this is not enforced.
+/// The source iterator should not repeat any elements, but this is not enforced. Fixing the order
+/// within each [`Vec`] gives every multiset a single representation, so each is generated exactly
+/// once. A repeated source element defeats this, and any multiset that can be formed in more than
+/// one way is generated more than once.
 ///
 /// The iterator should be finite; if it is infinite, only prefixes of the iterator will be
 /// generated.
@@ -4074,7 +4095,10 @@ where
 /// The [`Vec`]s are ordered lexicographically with respect to the order of the element iterator,
 /// with a [`Vec`] coming before every longer [`Vec`] that begins with it.
 ///
-/// The source iterator should not repeat any elements, but this is not enforced.
+/// The source iterator should not repeat any elements, but this is not enforced. Fixing the order
+/// within each [`Vec`] gives every multiset a single representation, so each is generated exactly
+/// once. A repeated source element defeats this, and any multiset that can be formed in more than
+/// one way is generated more than once.
 ///
 /// The iterator should be finite; if it is infinite, only prefixes of the iterator will be
 /// generated.
@@ -4135,7 +4159,10 @@ where
 /// The [`Vec`]s are ordered lexicographically with respect to the order of the element iterator,
 /// with a [`Vec`] coming before every longer [`Vec`] that begins with it.
 ///
-/// The source iterator should not repeat any elements, but this is not enforced.
+/// The source iterator should not repeat any elements, but this is not enforced. Fixing the order
+/// within each [`Vec`] gives every multiset a single representation, so each is generated exactly
+/// once. A repeated source element defeats this, and any multiset that can be formed in more than
+/// one way is generated more than once.
 ///
 /// The iterator should be finite; if it is infinite, only prefixes of the iterator will be
 /// generated.
@@ -4207,7 +4234,10 @@ where
 /// The [`Vec`]s are generated in order of increasing length, and within each length they are
 /// ordered lexicographically with respect to the order of the element iterator.
 ///
-/// The source iterator should not repeat any elements, but this is not enforced.
+/// The source iterator should not repeat any elements, but this is not enforced. Fixing the order
+/// within each [`Vec`] gives every multiset a single representation, so each is generated exactly
+/// once. A repeated source element defeats this, and any multiset that can be formed in more than
+/// one way is generated more than once.
 ///
 /// The iterator should be finite; if it is infinite, [`Vec`]s of length 2 and above will never be
 /// generated.
@@ -4274,7 +4304,10 @@ where
 /// The [`Vec`]s are generated in order of increasing length, and within each length they are
 /// ordered lexicographically with respect to the order of the element iterator.
 ///
-/// The source iterator should not repeat any elements, but this is not enforced.
+/// The source iterator should not repeat any elements, but this is not enforced. Fixing the order
+/// within each [`Vec`] gives every multiset a single representation, so each is generated exactly
+/// once. A repeated source element defeats this, and any multiset that can be formed in more than
+/// one way is generated more than once.
 ///
 /// The iterator should be finite; if it is infinite, [`Vec`]s of length `\max(2, \ell + 1)` and
 /// above will never be generated, where $\ell$ is `min_length`.
@@ -4347,7 +4380,10 @@ where
 /// The [`Vec`]s are generated in order of increasing length, and within each length they are
 /// ordered lexicographically with respect to the order of the element iterator.
 ///
-/// The source iterator should not repeat any elements, but this is not enforced.
+/// The source iterator should not repeat any elements, but this is not enforced. Fixing the order
+/// within each [`Vec`] gives every multiset a single representation, so each is generated exactly
+/// once. A repeated source element defeats this, and any multiset that can be formed in more than
+/// one way is generated more than once.
 ///
 /// The iterator should be finite; if it is infinite, [`Vec`]s of length `\max(2, a + 1)` and above
 /// will never be generated.
@@ -4408,7 +4444,10 @@ where
 /// The [`Vec`]s are generated in order of increasing length, and within each length they are
 /// ordered lexicographically with respect to the order of the element iterator.
 ///
-/// The source iterator should not repeat any elements, but this is not enforced.
+/// The source iterator should not repeat any elements, but this is not enforced. Fixing the order
+/// within each [`Vec`] gives every multiset a single representation, so each is generated exactly
+/// once. A repeated source element defeats this, and any multiset that can be formed in more than
+/// one way is generated more than once.
 ///
 /// The iterator should be finite; if it is infinite, [`Vec`]s of length `\max(2, a + 1)` and above
 /// will never be generated.
