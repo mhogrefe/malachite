@@ -162,6 +162,17 @@ pub fn random_from_sci_string_options_rounding_mode_pair_gen(
     ))
 }
 
+// -- Option<PrimitiveUnsigned> --
+
+pub fn random_option_unsigned_gen<T: PrimitiveUnsigned>(config: &GenConfig) -> It<Option<T>> {
+    Box::new(random_options(
+        EXAMPLE_SEED,
+        config.get_or("none_p_n", 1),
+        config.get_or("none_p_d", 4),
+        &random_primitive_ints,
+    ))
+}
+
 // -- PrimitiveFloat --
 
 pub fn random_primitive_float_gen<T: PrimitiveFloat>(config: &GenConfig) -> It<T> {

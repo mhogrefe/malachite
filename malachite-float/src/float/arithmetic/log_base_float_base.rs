@@ -246,8 +246,8 @@ impl Float {
     /// - $f(\infty,b,p,m)=\infty$ for $b>1$, and $-\infty$ for $0\leq b<1$
     /// - $f(\pm0.0,b,p,m)=-\infty$ for $b>1$, and $\infty$ for $0<b<1$
     /// - $f(1.0,b,p,m)=0$ (with the sign of $1/\ln b$)
-    /// - $f(x,\infty,p,m)=0$ for finite $x>0$ (and $\text{NaN}$ for $x\in\{\pm\infty,\pm0.0\}$)
-    /// - $f(x,\pm0.0,p,m)=0$ for finite $x>0$ (and $\text{NaN}$ for $x\in\{\pm\infty,\pm0.0\}$)
+    /// - $f(x,\infty,p,m)=0$ for finite $x>0$ (and $\text{NaN}$ for $x\in\\{\pm\infty,\pm0.0\\}$)
+    /// - $f(x,\pm0.0,p,m)=0$ for finite $x>0$ (and $\text{NaN}$ for $x\in\\{\pm\infty,\pm0.0\\}$)
     /// - $f(x,1.0,p,m)=\infty$ for $x>1$ or $x=\infty$, $-\infty$ for $0\leq x<1$, and $\text{NaN}$
     ///   for $x=1$
     /// - $f(g^a,g^e,p,m)=a/e$ for a common rational $g$, rounded to precision $p$; the result is
@@ -700,8 +700,8 @@ impl LogBaseAssign<&Self> for Float {
 /// - $f(\infty,b)=\infty$ for $b>1$, and $-\infty$ for $0\leq b<1$
 /// - $f(\pm0.0,b)=-\infty$ for $b>1$, and $\infty$ for $0<b<1$
 /// - $f(1.0,b)=0.0$ (with the sign of $1/\ln b$)
-/// - $f(x,\infty)=0.0$ for finite $x>0$ (and $\text{NaN}$ for $x\in\{\pm\infty,\pm0.0\}$)
-/// - $f(x,\pm0.0)=0.0$ for finite $x>0$ (and $\text{NaN}$ for $x\in\{\pm\infty,\pm0.0\}$)
+/// - $f(x,\infty)=0.0$ for finite $x>0$ (and $\text{NaN}$ for $x\in\\{\pm\infty,\pm0.0\\}$)
+/// - $f(x,\pm0.0)=0.0$ for finite $x>0$ (and $\text{NaN}$ for $x\in\\{\pm\infty,\pm0.0\\}$)
 /// - $f(x,1.0)=\infty$ for $x>1$ or $x=\infty$, $-\infty$ for $0\leq x<1$, and $\text{NaN}$ for
 ///   $x=1$
 ///

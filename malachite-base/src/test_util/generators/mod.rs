@@ -188,6 +188,12 @@ pub fn from_sci_string_options_rounding_mode_pair_gen()
     )
 }
 
+// -- Option<PrimitiveUnsigned> --
+
+pub fn option_unsigned_gen<T: PrimitiveUnsigned>() -> Generator<Option<T>> {
+    Generator::new_no_special(&exhaustive_option_unsigned_gen, &random_option_unsigned_gen)
+}
+
 // -- PrimitiveFloat --
 
 pub fn primitive_float_gen<T: PrimitiveFloat>() -> Generator<T> {

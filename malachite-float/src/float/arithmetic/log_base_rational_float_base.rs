@@ -209,7 +209,7 @@ impl Float {
     /// - $f(x,\text{NaN},p,m)=\text{NaN}$
     /// - $f(x,b,p,m)=\text{NaN}$ for $x<0$ or $b<0$ (including $b=-\infty$)
     /// - $f(0,b,p,m)=-\infty$ for $b>1$, and $\infty$ for $0<b<1$ (and $\text{NaN}$ for
-    ///   $b\in\{\infty,\pm0.0\}$)
+    ///   $b\in\\{\infty,\pm0.0\\}$)
     /// - $f(1,b,p,m)=0$ (with the sign of $1/\ln b$)
     /// - $f(x,\infty,p,m)=0$ for $x>0$ (and $\text{NaN}$ for $x=0$)
     /// - $f(x,\pm0.0,p,m)=0$ for $x>0$ (and $\text{NaN}$ for $x=0$)
@@ -421,7 +421,7 @@ impl Float {
 /// - $f(x,\text{NaN})=\text{NaN}$
 /// - $f(x,b)=\text{NaN}$ for $x<0$ or $b<0$ (including $b=-\infty$)
 /// - $f(0,b)=-\infty$ for $b>1$, and $\infty$ for $0<b<1$ (and $\text{NaN}$ for
-///   $b\in\{\infty,\pm0.0\}$)
+///   $b\in\\{\infty,\pm0.0\\}$)
 /// - $f(1,b)=0.0$ (with the sign of $1/\ln b$)
 /// - $f(x,\infty)=0.0$ for $x>0$ (and $\text{NaN}$ for $x=0$)
 /// - $f(x,\pm0.0)=0.0$ for $x>0$ (and $\text{NaN}$ for $x=0$)

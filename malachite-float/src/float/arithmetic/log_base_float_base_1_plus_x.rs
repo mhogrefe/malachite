@@ -238,9 +238,9 @@ impl Float {
     /// - $f(-1.0,b,p,m)=-\infty$ for $b>1$, and $\infty$ for $0<b<1$
     /// - $f(\pm0.0,b,p,m)=0$ (the sign of $\pm0.0$ times the sign of $1/\ln b$)
     /// - $f(x,\infty,p,m)=0$ for finite $x>-1$ with $x\neq0$ (and $\text{NaN}$ for
-    ///   $x\in\{\infty,-1\}$)
+    ///   $x\in\\{\infty,-1\\}$)
     /// - $f(x,\pm0.0,p,m)=0$ for finite $x>-1$ with $x\neq0$ (and $\text{NaN}$ for
-    ///   $x\in\{\infty,-1\}$)
+    ///   $x\in\\{\infty,-1\\}$)
     /// - $f(x,1.0,p,m)=\infty$ for $x>0$ or $x=\infty$, $-\infty$ for $-1\leq x<0$, and
     ///   $\text{NaN}$ for $x=\pm0.0$
     /// - $f(g^a-1,g^e,p,m)=a/e$ for a common rational $g$, rounded to precision $p$; the result is
@@ -715,8 +715,8 @@ impl LogBaseOf1PlusXAssign<&Self> for Float {
 /// - $f(\infty,b)=\infty$ for $b>1$, and $-\infty$ for $0\leq b<1$
 /// - $f(-1.0,b)=-\infty$ for $b>1$, and $\infty$ for $0<b<1$
 /// - $f(\pm0.0,b)=0$ (the sign of $\pm0.0$ times the sign of $1/\ln b$)
-/// - $f(x,\infty)=0$ for finite $x>-1$ with $x\neq0$ (and $\text{NaN}$ for $x\in\{\infty,-1\}$)
-/// - $f(x,\pm0.0)=0$ for finite $x>-1$ with $x\neq0$ (and $\text{NaN}$ for $x\in\{\infty,-1\}$)
+/// - $f(x,\infty)=0$ for finite $x>-1$ with $x\neq0$ (and $\text{NaN}$ for $x\in\\{\infty,-1\\}$)
+/// - $f(x,\pm0.0)=0$ for finite $x>-1$ with $x\neq0$ (and $\text{NaN}$ for $x\in\\{\infty,-1\\}$)
 /// - $f(x,1.0)=\infty$ for $x>0$ or $x=\infty$, $-\infty$ for $-1\leq x<0$, and $\text{NaN}$ for
 ///   $x=\pm0.0$
 ///

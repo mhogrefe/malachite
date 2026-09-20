@@ -155,6 +155,12 @@ pub fn exhaustive_from_sci_string_options_rounding_mode_pair_gen()
     ))
 }
 
+// -- Option<PrimitiveUnsigned> --
+
+pub fn exhaustive_option_unsigned_gen<T: PrimitiveUnsigned>() -> It<Option<T>> {
+    Box::new(exhaustive_options(exhaustive_unsigneds()))
+}
+
 // -- PrimitiveFloat --
 
 pub fn exhaustive_primitive_float_gen<T: PrimitiveFloat>() -> It<T> {

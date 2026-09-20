@@ -9,7 +9,7 @@
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::strings::latex::ToLatex;
 use malachite_base::test_util::generators::common::{GenConfig, GenMode};
-use malachite_base::test_util::generators::unsigned_gen;
+use malachite_base::test_util::generators::option_unsigned_gen;
 use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
@@ -21,8 +21,7 @@ fn demo_option_to_latex_unsigned<T: PrimitiveUnsigned + ToLatex>(
     config: &GenConfig,
     limit: usize,
 ) {
-    println!("None.to_latex() = {}", None::<T>.to_latex());
-    for x in unsigned_gen::<T>().get(gm, config).take(limit) {
-        println!("Some({}).to_latex() = {}", x, Some(x).to_latex());
+    for o in option_unsigned_gen::<T>().get(gm, config).take(limit) {
+        println!("{:?}.to_latex() = {}", o, o.to_latex());
     }
 }

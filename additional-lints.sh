@@ -17,6 +17,10 @@ python3 unincluded-files.py
 # a `where` line defining exactly the variables used. See DOC-AUDIT.md.
 echo "Checking complexity doc blocks"
 python3 complexity-doc-check.py
+# Markdown runs before KaTeX and eats a backslash before ASCII punctuation, so `$\text{100\%}$`
+# reaches KaTeX as a LaTeX comment and renders nothing. See math-escape-check.py.
+echo "Checking math-span escapes"
+python3 math-escape-check.py
 # A stale `#[expect(long_lines)]` exemption surfaces as an unfulfilled-expectation warning; make
 # it fail the run like any other lint hit.
 export DYLINT_RUSTFLAGS="-D unfulfilled_lint_expectations"

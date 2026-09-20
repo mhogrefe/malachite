@@ -8,12 +8,11 @@
 
 use itertools::Itertools;
 use malachite_base::chars::exhaustive::exhaustive_chars;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::exhaustive::exhaustive_unsigneds;
-use malachite_base::num::random::random_primitive_ints;
 use malachite_base::options::exhaustive::exhaustive_options;
-use malachite_base::options::random::random_options;
-use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::strings::latex::ToLatex;
+use malachite_base::test_util::generators::option_unsigned_gen;
 
 #[test]
 fn test_option_to_latex() {
@@ -72,17 +71,17 @@ fn check<T: ToLatex>(o: &Option<T>) {
 
 #[test]
 fn option_to_latex_properties() {
-    for o in exhaustive_options(exhaustive_unsigneds::<u8>()).take(300) {
-        check(&o);
+    fn helper<T: PrimitiveUnsigned + ToLatex>() {
+        option_unsigned_gen::<T>().test_properties(|o| check(&o));
     }
-    for o in exhaustive_options(exhaustive_chars()).take(300) {
-        check(&o);
-    }
-    // `Option<Option<_>>`, where a missing bracket would be visible
+    apply_fn_to_unsigneds!(helper);
+
+    // `Option<Option<_>>` and a non-numeric element type have no generator of their own, and a
+    // missing bracket would show up in the nested case, so they are covered directly.
     for o in exhaustive_options(exhaustive_options(exhaustive_unsigneds::<u8>())).take(300) {
         check(&o);
     }
-    for o in random_options(EXAMPLE_SEED, 1, 4, &random_primitive_ints::<u32>).take(300) {
+    for o in exhaustive_options(exhaustive_chars()).take(300) {
         check(&o);
     }
 }

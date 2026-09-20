@@ -44,6 +44,16 @@ documented by git history.
   indistinguishable. Braces would have served as well, but this crate's documentation already
   spells the Iverson bracket with them.
 
+### Documentation
+
+- Fixed ten `Float` logarithm doc comments whose set braces did not render. Rustdoc runs doc
+  comments through Markdown before KaTeX sees them, and Markdown drops a backslash before ASCII
+  punctuation, so a `\{` written in a math span reached KaTeX as a bare `{`, which groups silently
+  instead of being typeset; `$x\in\{\pm\infty,\pm0.0\}$` was rendering without its braces. A new
+  `math-escape-check.py`, run as part of `additional-lints.sh`, now fails the lint sweep on any
+  math span whose backslash would not survive Markdown — including the `\%`, `\$`, `\#`, and `\&`
+  cases, where the bare character starts a comment, ends the span, or is a macro parameter.
+
 ## 0.12.0 — 2026-09-20
 
 ### Breaking and behavioral changes
