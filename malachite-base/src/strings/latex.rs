@@ -99,6 +99,11 @@ impl ToLatex for &str {
     /// mixing the two therefore comes out as, for example, `\text{100\% }\alpha`. No quotation
     /// marks are added; the fragment is the string's content and nothing else.
     ///
+    /// A run of superscript or subscript characters becomes a single script, so that `"2¹⁰"` is
+    /// two raised to the tenth rather than two raised to the first and then to the zeroth. A run of
+    /// one kind does not run into the next: `"x¹₂"` keeps its one beside its two rather than
+    /// stacking them.
+    ///
     /// The empty string becomes `\text{}` rather than nothing at all.
     ///
     /// # Worst-case complexity
@@ -117,6 +122,8 @@ impl ToLatex for &str {
     /// assert_eq!("100% α".to_latex().to_string(), r"\text{100\% }\alpha");
     /// assert_eq!("A ≤ B".to_latex().to_string(), r"\text{A }\leq\text{ B}");
     /// assert_eq!("--flag".to_latex().to_string(), r"\text{-{}-flag}");
+    /// assert_eq!("2¹⁰".to_latex().to_string(), r"\text{2}^{10}");
+    /// assert_eq!("H₂O".to_latex().to_string(), r"\text{H}_2\text{O}");
     /// ```
     ///
     /// | value      | fragment                 | renders as               |
@@ -126,6 +133,8 @@ impl ToLatex for &str {
     /// | `"100% α"` | `\text{100\% }\alpha`    | $\text{100\\% }\alpha$   |
     /// | `"A ≤ B"`  | `\text{A }\leq\text{ B}` | $\text{A }\leq\text{ B}$ |
     /// | `"--flag"` | `\text{-{}-flag}`        | $\text{-{}-flag}$        |
+    /// | `"2¹⁰"`    | `\text{2}^{10}`          | $\text{2}^{10}$          |
+    /// | `"H₂O"`    | `\text{H}_2\text{O}`     | $\text{H}_2\text{O}$     |
     #[inline]
     fn fmt_latex(&self, f: &mut Formatter) -> Result {
         fmt_latex_chars(self.chars(), f)
@@ -135,7 +144,20 @@ impl ToLatex for &str {
 impl ToLatex for String {
     /// Writes a [`String`] as a LaTeX math-mode fragment.
     ///
-    /// This is identical to the [`&str`] implementation.
+    /// This is the same as the [`&str`] implementation.
+    ///
+    /// The fragment depicts the string: ordinary characters are gathered into `\text{...}` groups
+    /// and typeset as themselves, with LaTeX's special characters escaped, while characters that
+    /// LaTeX spells with a math-mode macro are written as that macro, outside any group. A string
+    /// mixing the two therefore comes out as, for example, `\text{100\% }\alpha`. No quotation
+    /// marks are added; the fragment is the string's content and nothing else.
+    ///
+    /// A run of superscript or subscript characters becomes a single script, so that `"2¹⁰"` is
+    /// two raised to the tenth rather than two raised to the first and then to the zeroth. A run of
+    /// one kind does not run into the next: `"x¹₂"` keeps its one beside its two rather than
+    /// stacking them.
+    ///
+    /// The empty string becomes `\text{}` rather than nothing at all.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$
@@ -148,11 +170,36 @@ impl ToLatex for String {
     /// ```
     /// use malachite_base::strings::latex::ToLatex;
     ///
+    /// assert_eq!("hello".to_string().to_latex().to_string(), r"\text{hello}");
+    /// assert_eq!("100%".to_string().to_latex().to_string(), r"\text{100\%}");
     /// assert_eq!(
     ///     "100% α".to_string().to_latex().to_string(),
     ///     r"\text{100\% }\alpha"
     /// );
+    /// assert_eq!(
+    ///     "A ≤ B".to_string().to_latex().to_string(),
+    ///     r"\text{A }\leq\text{ B}"
+    /// );
+    /// assert_eq!(
+    ///     "--flag".to_string().to_latex().to_string(),
+    ///     r"\text{-{}-flag}"
+    /// );
+    /// assert_eq!("2¹⁰".to_string().to_latex().to_string(), r"\text{2}^{10}");
+    /// assert_eq!(
+    ///     "H₂O".to_string().to_latex().to_string(),
+    ///     r"\text{H}_2\text{O}"
+    /// );
     /// ```
+    ///
+    /// | value      | fragment                 | renders as               |
+    /// |------------|--------------------------|--------------------------|
+    /// | `"hello"`  | `\text{hello}`           | $\text{hello}$           |
+    /// | `"100%"`   | `\text{100\%}`           | $\text{100\\%}$          |
+    /// | `"100% α"` | `\text{100\% }\alpha`    | $\text{100\\% }\alpha$   |
+    /// | `"A ≤ B"`  | `\text{A }\leq\text{ B}` | $\text{A }\leq\text{ B}$ |
+    /// | `"--flag"` | `\text{-{}-flag}`        | $\text{-{}-flag}$        |
+    /// | `"2¹⁰"`    | `\text{2}^{10}`          | $\text{2}^{10}$          |
+    /// | `"H₂O"`    | `\text{H}_2\text{O}`     | $\text{H}_2\text{O}$     |
     #[inline]
     fn fmt_latex(&self, f: &mut Formatter) -> Result {
         fmt_latex_chars(self.chars(), f)

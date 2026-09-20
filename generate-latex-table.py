@@ -16,12 +16,24 @@ from pylatexenc.latexencode._uni2latexmap import uni2latex
 
 PURE_MATH = re.compile(r'^\\ensuremath\{(.*)\}$')
 
-# The three entries that mix a text-mode part with an \ensuremath part are resolved by hand into
-# a single math-mode spelling; there is no way to derive them mechanically.
+# Entries resolved by hand into a single math-mode spelling.
+#
+# The first three mix a text-mode part with an \ensuremath part, and there is no way to derive them
+# mechanically.
+#
+# The last three are the superscript digits one, two, and three. Unicode splits the superscript
+# digits between Latin-1 Supplement (¹²³) and Superscripts and Subscripts (⁰ and ⁴-⁹), and
+# pylatexenc mirrors the split: the first three get text-mode \textonesuperior and friends, the
+# other seven get math-mode ^0, ^4, and so on. A string like "2¹⁰" would then be spelled in two
+# different modes at once. Spelling all ten the same way lets a run of them coalesce into a single
+# superscript, and avoids \text*superior, which not every renderer provides.
 HAND: dict[int, str] = {
     0x038F: r'\acute{\Omega}',   # was \'{}\ensuremath{\Omega}
     0x2109: r'{}^\circ\mathrm{F}',  # was \ensuremath{^\circ}F
     0x25AA: r'\blacksquare',     # was {\small\ensuremath{\blacksquare}}, dropping the \small
+    0x00B9: r'^1',               # was \textonesuperior
+    0x00B2: r'^2',               # was \texttwosuperior
+    0x00B3: r'^3',               # was \textthreesuperior
 }
 
 entries = []  # (codepoint, is_math, latex)

@@ -25,15 +25,20 @@ documented by git history.
   `Ordering`, which becomes the relation symbol it stands for, `<`, `=`, or `>`; and for
   `RoundingMode`, which becomes its name in uppercase, such as `\text{FLOOR}` — there being no
   conventional mathematical symbol for a rounding mode.
-- `ToLatex` for `char`, `&str`, and `String`. A fragment depicts the string rather than
-  translating it, and adds no quotation marks: ordinary characters are gathered into `\text{...}`
-  groups and typeset as themselves, with LaTeX's special characters escaped, while a character
-  that LaTeX spells with a math-mode macro is written as that macro outside any group, so that
-  `"100% α"` becomes `\text{100\% }\alpha`. Runs of spaces are preserved rather than collapsed,
-  text-mode ligatures are broken so that `"--flag"` does not acquire an en dash, and control words
-  are braced so that `"\n"` cannot become the undefined `\textbackslashn`. A character with no
-  LaTeX spelling is written literally, which needs an engine and a font that can render it. The
-  1553-entry character table is adapted from
+- `ToLatex` for `char`, `&str`, and `String`. A fragment depicts the string rather than translating
+  it, and adds no quotation marks: ordinary characters are gathered into `\text{...}` groups and
+  typeset as themselves, with LaTeX's special characters escaped, while a character that LaTeX
+  spells with a math-mode macro is written as that macro outside any group, so that `"100% α"`
+  becomes `\text{100\% }\alpha`. Runs of spaces are preserved rather than collapsed, text-mode
+  ligatures are broken so that `"--flag"` does not acquire an en dash, and control words are braced
+  so that `"\n"` cannot become the undefined `\textbackslashn`. A run of superscript or subscript
+  characters becomes a single script, so that `"2¹⁰"` is two raised to the tenth rather than two
+  raised to the first and then to the zeroth, and `"H₂O"` becomes `\text{H}_2\text{O}`; a run of one
+  kind does not run into the next, since the two would stack rather than sit side by side. The three
+  superscript digits that Unicode puts in Latin-1 Supplement (`¹²³`) are respelled in math mode to
+  match the other seven, which pylatexenc spells in text mode, so that a run of them is unbroken. A
+  character with no LaTeX spelling is written literally, which needs an engine and a font that can
+  render it. The 1553-entry character table is adapted from
   [pylatexenc](https://github.com/phfaist/pylatexenc) (MIT, © 2015-2023 Philippe Faist), which in
   turn adapted it from latexcodec (MIT, © 2011-2014 Matthias C. M. Troffaes); both notices are
   reproduced in the generated table.

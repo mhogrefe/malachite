@@ -18,6 +18,18 @@ fn lookup(c: char) -> Option<(bool, &'static str)> {
         .map(|i| (LATEX_TABLE[i].1, LATEX_TABLE[i].2))
 }
 
+// The superscript and subscript characters are spelled `^0`, `_1`, and so on. Gives which of the
+// two a `char` is, if it is one at all.
+fn script_kind(c: char) -> Option<char> {
+    match lookup(c) {
+        Some((true, latex)) => match latex.as_bytes().first() {
+            Some(&k @ (b'^' | b'_')) => Some(char::from(k)),
+            _ => None,
+        },
+        _ => None,
+    }
+}
+
 // A spelling that is a control word — a backslash followed by letters — swallows a letter
 // written after it, so a `\textbackslash` beside an `n` would become the undefined
 // `\textbackslashn`. Wrapping such a spelling in braces terminates it in every context. The test is
@@ -55,29 +67,58 @@ const fn forms_ligature(prev: char, c: char) -> bool {
 // A math-mode macro never needs bracing: whatever follows it is either another macro or a `\text{`,
 // and both begin with a backslash, which ends a control word on its own.
 pub(crate) fn fmt_latex_chars<I: Iterator<Item = char>>(cs: I, f: &mut Formatter) -> Result {
+    let mut cs = cs.peekable();
     let mut in_text = false;
     // The last character written into the open `\text{...}` group, for ligature detection.
     let mut last = None;
     let mut any = false;
-    for c in cs {
+    // Whether a superscript or subscript written next would have nothing to attach to: either
+    // nothing has been written yet, or what was written last is itself a script group, and a second
+    // script on the same base would both stack the two and, for two of a kind, be a double
+    // superscript, which is an error.
+    let mut needs_base = true;
+    while let Some(c) = cs.next() {
         any = true;
         match lookup(c) {
+            Some((true, latex)) if script_kind(c).is_some() => {
+                let kind = script_kind(c).unwrap();
+                if in_text {
+                    f.write_char('}')?;
+                    in_text = false;
+                    last = None;
+                }
+                if needs_base {
+                    f.write_str("{}")?;
+                }
+                f.write_char(kind)?;
+                // A run of them is one script, so that "2¹⁰" is two raised to the tenth rather
+                // than two raised to the first and then to the zeroth. Braces are what make it one;
+                // a single character does not need them.
+                let braced = cs.peek().copied().and_then(script_kind) == Some(kind);
+                if braced {
+                    f.write_str("{")?;
+                }
+                f.write_str(&latex[1..])?;
+                while cs.peek().copied().and_then(script_kind) == Some(kind) {
+                    let c = cs.next().unwrap();
+                    f.write_str(&lookup(c).unwrap().1[1..])?;
+                }
+                if braced {
+                    f.write_str("}")?;
+                }
+                needs_base = true;
+            }
             Some((true, latex)) => {
                 if in_text {
                     f.write_char('}')?;
                     in_text = false;
                     last = None;
                 }
-                // The superscript and subscript characters are spelled `^0`, `_1`, and so on, which
-                // need something to attach to: alone they have no base, and two in a row would be a
-                // double superscript, which is an error. An empty group gives each one a base of
-                // its own.
-                if latex.starts_with('^') || latex.starts_with('_') {
-                    f.write_str("{}")?;
-                }
                 f.write_str(latex)?;
+                needs_base = false;
             }
             Some((false, latex)) => {
+                needs_base = false;
                 if !in_text {
                     f.write_str("\\text{")?;
                     in_text = true;
@@ -98,6 +139,7 @@ pub(crate) fn fmt_latex_chars<I: Iterator<Item = char>>(cs: I, f: &mut Formatter
                 };
             }
             None => {
+                needs_base = false;
                 if !in_text {
                     f.write_str("\\text{")?;
                     in_text = true;
@@ -140,6 +182,9 @@ impl ToLatex for char {
     /// no LaTeX spelling at all is written literally inside the group, which needs an engine and a
     /// font that can render it.
     ///
+    /// A superscript or subscript character is math-mode, and is given an empty base to attach to,
+    /// since on its own it has none: `'²'` becomes `{}^2`.
+    ///
     /// # Worst-case complexity
     /// Constant time and additional memory.
     ///
@@ -151,6 +196,7 @@ impl ToLatex for char {
     /// assert_eq!('%'.to_latex().to_string(), r"\text{\%}");
     /// assert_eq!('α'.to_latex().to_string(), r"\alpha");
     /// assert_eq!('∞'.to_latex().to_string(), r"\infty");
+    /// assert_eq!('²'.to_latex().to_string(), r"{}^2");
     /// ```
     ///
     /// | value | fragment    | renders as   |
@@ -159,6 +205,7 @@ impl ToLatex for char {
     /// | `'%'` | `\text{\%}` | $\text{\\%}$ |
     /// | `'α'` | `\alpha`    | $\alpha$     |
     /// | `'∞'` | `\infty`    | $\infty$     |
+    /// | `'²'` | `{}^2`      | ${}^2$       |
     #[inline]
     fn fmt_latex(&self, f: &mut Formatter) -> Result {
         fmt_latex_chars(core::iter::once(*self), f)

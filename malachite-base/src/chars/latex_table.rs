@@ -29,8 +29,8 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 // This file is generated; see the note in `chars::latex`. Each entry maps a `char` to the LaTeX
-// that depicts it, together with whether that LaTeX is math-mode (933 entries, written outside a
-// `\text{}` group) or text-mode (620 entries, written inside one).
+// that depicts it, together with whether that LaTeX is math-mode (936 entries, written outside a
+// `\text{}` group) or text-mode (617 entries, written inside one).
 pub(crate) static LATEX_TABLE: [(char, bool, &str); 1553] = [
     ('\u{22}', false, "''"),
     ('\u{23}', false, "\\#"),
@@ -63,13 +63,13 @@ pub(crate) static LATEX_TABLE: [(char, bool, &str); 1553] = [
     ('\u{AF}', false, "\\textasciimacron"),
     ('\u{B0}', false, "\\textdegree"),
     ('\u{B1}', true, "\\pm"),
-    ('\u{B2}', false, "\\texttwosuperior"),
-    ('\u{B3}', false, "\\textthreesuperior"),
+    ('\u{B2}', true, "^2"),
+    ('\u{B3}', true, "^3"),
     ('\u{B4}', false, "\\textasciiacute"),
     ('\u{B5}', false, "\\textmu"),
     ('\u{B6}', false, "\\textparagraph"),
     ('\u{B7}', false, "\\textperiodcentered"),
-    ('\u{B9}', false, "\\textonesuperior"),
+    ('\u{B9}', true, "^1"),
     ('\u{BA}', false, "\\textordmasculine"),
     ('\u{BB}', false, "\\guillemotright"),
     ('\u{BC}', false, "\\textonequarter"),
