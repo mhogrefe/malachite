@@ -9,6 +9,8 @@
 use crate::num::arithmetic::traits::Abs;
 use crate::num::basic::floats::PrimitiveFloat;
 use crate::num::comparison::traits::{EqAbs, OrdAbs, PartialOrdAbs};
+use crate::strings::latex::ToLatex;
+use crate::strings::typst::ToTypst;
 use core::cmp::Ordering::{self, *};
 use core::fmt::{self, Debug, Display, Formatter};
 use core::hash::{Hash, Hasher};
@@ -425,5 +427,67 @@ impl<T: PrimitiveFloat> FromStr for NiceFloat<T> {
             src => T::from_str(src),
         }
         .map(NiceFloat)
+    }
+}
+
+impl<T: PrimitiveFloat + ToLatex> ToLatex for NiceFloat<T> {
+    /// Writes a [`NiceFloat`] as a LaTeX math-mode fragment.
+    ///
+    /// The fragment is the wrapped float's own. The float implementation already builds its output
+    /// from the [`NiceFloat`] representation, so the wrapper asks for nothing it would not
+    /// otherwise get.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::floats::PrimitiveFloat;
+    /// use malachite_base::num::float::NiceFloat;
+    /// use malachite_base::strings::latex::ToLatex;
+    ///
+    /// assert_eq!(NiceFloat(1.0f64).to_latex().to_string(), "1.0");
+    /// assert_eq!(NiceFloat(f64::NAN).to_latex().to_string(), r"\text{NaN}");
+    /// assert_eq!(
+    ///     NiceFloat(f32::MIN_POSITIVE_SUBNORMAL)
+    ///         .to_latex()
+    ///         .to_string(),
+    ///     r"1.0 \times 10^{-45}"
+    /// );
+    /// ```
+    #[inline]
+    fn fmt_latex(&self, f: &mut Formatter) -> fmt::Result {
+        self.0.fmt_latex(f)
+    }
+}
+
+impl<T: PrimitiveFloat + ToTypst> ToTypst for NiceFloat<T> {
+    /// Writes a [`NiceFloat`] as a Typst math-mode fragment.
+    ///
+    /// The fragment is the wrapped float's own. The float implementation already builds its output
+    /// from the [`NiceFloat`] representation, so the wrapper asks for nothing it would not
+    /// otherwise get.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::basic::floats::PrimitiveFloat;
+    /// use malachite_base::num::float::NiceFloat;
+    /// use malachite_base::strings::typst::ToTypst;
+    ///
+    /// assert_eq!(NiceFloat(1.0f64).to_typst().to_string(), "1.0");
+    /// assert_eq!(NiceFloat(f64::NAN).to_typst().to_string(), r#""NaN""#);
+    /// assert_eq!(
+    ///     NiceFloat(f32::MIN_POSITIVE_SUBNORMAL)
+    ///         .to_typst()
+    ///         .to_string(),
+    ///     "1.0 times 10^(-45)"
+    /// );
+    /// ```
+    #[inline]
+    fn fmt_typst(&self, f: &mut Formatter) -> fmt::Result {
+        self.0.fmt_typst(f)
     }
 }

@@ -6,6 +6,8 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use crate::strings::latex::ToLatex;
+use crate::strings::typst::ToTypst;
 use core::fmt::{Display, Formatter};
 use core::iter::{Empty, empty};
 use core::str::FromStr;
@@ -26,6 +28,52 @@ pub enum Never {}
 impl Display for Never {
     /// Would convert a [`Never`] to a [`String`].
     fn fmt(&self, _f: &mut Formatter) -> core::fmt::Result {
+        unreachable!()
+    }
+}
+
+impl ToLatex for Never {
+    /// Would write a [`Never`] as a LaTeX math-mode fragment.
+    ///
+    /// A [`Never`] cannot be instantiated, so this can never be called. The implementation exists
+    /// so that a type parameter bounded by [`ToLatex`] may be [`Never`], which is what lets
+    /// `Option<Never>` have a fragment of its own.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::nevers::Never;
+    /// use malachite_base::strings::latex::ToLatex;
+    ///
+    /// // The only `Option<Never>` there is.
+    /// assert_eq!(None::<Never>.to_latex().to_string(), r"\bot");
+    /// ```
+    fn fmt_latex(&self, _f: &mut Formatter) -> core::fmt::Result {
+        unreachable!()
+    }
+}
+
+impl ToTypst for Never {
+    /// Would write a [`Never`] as a Typst math-mode fragment.
+    ///
+    /// A [`Never`] cannot be instantiated, so this can never be called. The implementation exists
+    /// so that a type parameter bounded by [`ToTypst`] may be [`Never`], which is what lets
+    /// `Option<Never>` have a fragment of its own.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::nevers::Never;
+    /// use malachite_base::strings::typst::ToTypst;
+    ///
+    /// // The only `Option<Never>` there is.
+    /// assert_eq!(None::<Never>.to_typst().to_string(), "bot");
+    /// ```
+    fn fmt_typst(&self, _f: &mut Formatter) -> core::fmt::Result {
         unreachable!()
     }
 }

@@ -54,6 +54,11 @@ documented by git history.
   `\left[5\right]`, Typst writes `"NaN"`, `infinity`, `bot`, and `[5]`, the last of which Typst
   grows to fit its contents without being asked. Every fragment the tests produce is compiled by
   Typst itself, so a fragment Typst would reject cannot pass.
+- `ToLatex` and `ToTypst` for `Never` and for `NiceFloat<T>`. A `Never` cannot be instantiated, so
+  its implementations can never be called; they exist so that a type parameter bounded by either
+  trait may be `Never`, which is what lets `Option<Never>` have a fragment. A `NiceFloat`'s fragment
+  is the wrapped float's own, since the float implementations already build their output from the
+  `NiceFloat` representation.
 - `ToLatex` for `Option<T>` whenever `T: ToLatex`. `None` becomes `\bot`, and `Some` wraps its
   value in square brackets written with `\left` and `\right`, so that they grow to fit a value
   taller than one line: `Some(5)` becomes `\left[5\right]`. The brackets are not decoration:

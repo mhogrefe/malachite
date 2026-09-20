@@ -232,8 +232,10 @@ pub mod maps {
 }
 pub mod named;
 pub mod nevers {
+    pub mod latex;
     #[allow(clippy::module_inception)]
     pub mod nevers;
+    pub mod typst;
 }
 pub mod num {
     pub mod arithmetic {
@@ -493,7 +495,9 @@ pub mod num {
             pub mod eq_abs;
             pub mod from_str;
             pub mod hash;
+            pub mod latex;
             pub mod to_string;
+            pub mod typst;
         }
     }
     pub mod iterators {
