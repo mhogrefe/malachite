@@ -505,19 +505,19 @@ operands do not even need the recipe: the operators take them directly, through 
 | — | `int mpfr_root (mpfr_t rop, mpfr_t op, unsigned long int n, mpfr_rnd_t rnd)` | |
 | ✓ | `int mpfr_neg (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`Neg`](https://doc.rust-lang.org/nightly/std/ops/trait.Neg.html), [`NegAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.NegAssign.html) |
 | ✓ | `int mpfr_abs (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`Abs`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Abs.html), [`AbsAssign`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.AbsAssign.html) |
-| ✓ | `int mpfr_dim (mpfr_t rop, mpfr_t op1, mpfr_t op2, mpfr_rnd_t rnd)` | [`positive_difference_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.positive_difference_prec_round) |
+| ✓ | `int mpfr_dim (mpfr_t rop, mpfr_t op1, mpfr_t op2, mpfr_rnd_t rnd)` | [`positive_difference_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.positive_difference_prec_round) |
 | ✓ | `int mpfr_mul_2ui (mpfr_t rop, mpfr_t op1, unsigned long int op2, mpfr_rnd_t rnd)` | [`Shl`](https://doc.rust-lang.org/nightly/std/ops/trait.Shl.html), [`shl_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.shl_prec_round) |
 | ✓ | `int mpfr_mul_2si (mpfr_t rop, mpfr_t op1, long int op2, mpfr_rnd_t rnd)` | [`Shl`](https://doc.rust-lang.org/nightly/std/ops/trait.Shl.html), [`shl_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.shl_prec_round) |
 | ✓ | `int mpfr_div_2ui (mpfr_t rop, mpfr_t op1, unsigned long int op2, mpfr_rnd_t rnd)` | [`Shr`](https://doc.rust-lang.org/nightly/std/ops/trait.Shr.html), [`shr_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.shr_prec_round) |
 | ✓ | `int mpfr_div_2si (mpfr_t rop, mpfr_t op1, long int op2, mpfr_rnd_t rnd)` | [`Shr`](https://doc.rust-lang.org/nightly/std/ops/trait.Shr.html), [`shr_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.shr_prec_round) |
-| ✓ | `int mpfr_fac_ui (mpfr_t rop, unsigned long int op, mpfr_rnd_t rnd)` | [`factorial_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.factorial_prec_round) |
-| ✓ | `int mpfr_fma (mpfr_t rop, mpfr_t op1, mpfr_t op2, mpfr_t op3, mpfr_rnd_t rnd)` | [`add_mul_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.add_mul_prec_round) |
-| ✓ | `int mpfr_fms (mpfr_t rop, mpfr_t op1, mpfr_t op2, mpfr_t op3, mpfr_rnd_t rnd)` | [`sub_mul_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.sub_mul_prec_round) |
-| ✓ | `int mpfr_fmma (mpfr_t rop, mpfr_t op1, mpfr_t op2, mpfr_t op3, mpfr_t op4, mpfr_rnd_t rnd)` | [`mul_add_mul_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.mul_add_mul_prec_round) |
-| ✓ | `int mpfr_fmms (mpfr_t rop, mpfr_t op1, mpfr_t op2, mpfr_t op3, mpfr_t op4, mpfr_rnd_t rnd)` | [`mul_sub_mul_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.mul_sub_mul_prec_round) |
-| ✓ | `int mpfr_hypot (mpfr_t rop, mpfr_t x, mpfr_t y, mpfr_rnd_t rnd)` | [`hypot_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.hypot_prec_round) |
-| ✓ | `int mpfr_sum (mpfr_t rop, const mpfr_ptr tab[], unsigned long int n, mpfr_rnd_t rnd)` | [`sum_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.sum_prec_round) |
-| ✓ | `int mpfr_dot (mpfr_t rop, const mpfr_ptr a[], const mpfr_ptr b[], unsigned long int n, mpfr_rnd_t rnd)` | [`dot_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.dot_prec_round) |
+| ✓ | `int mpfr_fac_ui (mpfr_t rop, unsigned long int op, mpfr_rnd_t rnd)` | [`factorial_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.factorial_prec_round) |
+| ✓ | `int mpfr_fma (mpfr_t rop, mpfr_t op1, mpfr_t op2, mpfr_t op3, mpfr_rnd_t rnd)` | [`add_mul_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.add_mul_prec_round) |
+| ✓ | `int mpfr_fms (mpfr_t rop, mpfr_t op1, mpfr_t op2, mpfr_t op3, mpfr_rnd_t rnd)` | [`sub_mul_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.sub_mul_prec_round) |
+| ✓ | `int mpfr_fmma (mpfr_t rop, mpfr_t op1, mpfr_t op2, mpfr_t op3, mpfr_t op4, mpfr_rnd_t rnd)` | [`mul_add_mul_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.mul_add_mul_prec_round) |
+| ✓ | `int mpfr_fmms (mpfr_t rop, mpfr_t op1, mpfr_t op2, mpfr_t op3, mpfr_t op4, mpfr_rnd_t rnd)` | [`mul_sub_mul_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.mul_sub_mul_prec_round) |
+| ✓ | `int mpfr_hypot (mpfr_t rop, mpfr_t x, mpfr_t y, mpfr_rnd_t rnd)` | [`hypot_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.hypot_prec_round) |
+| ✓ | `int mpfr_sum (mpfr_t rop, const mpfr_ptr tab[], unsigned long int n, mpfr_rnd_t rnd)` | [`sum_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.sum_prec_round) |
+| ✓ | `int mpfr_dot (mpfr_t rop, const mpfr_ptr a[], const mpfr_ptr b[], unsigned long int n, mpfr_rnd_t rnd)` | [`dot_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.dot_prec_round) |
 
 **The operators and mixed forms.** Thirty-two of these rows are the four operations across
 their operand types, and the section intro's recipe disposes of them; `mpfr_add_q` and its kin
@@ -550,15 +550,15 @@ vacuous here, the single NaN being signless.
 
 **`mpfr_dim`.** The positive difference, $$op1 - op2$$ if $$op1 > op2$$, $$+0$$ if
 $$op1 \le op2$$, and NaN if either operand is NaN, is the
-[`positive_difference_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.positive_difference_prec_round)
+[`positive_difference_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.positive_difference_prec_round)
 family, which follows the usual Malachite conventions for precision and rounding-mode
 shorthands. The zero for $$op1 \le op2$$ is a definition choice rather than saturation —
 negative differences are representable, and the function returns $$+0$$ anyway — so the family
 is named for the operation rather than for a saturating subtraction. Beyond MPFR, the family
 also has mixed `Float`-`Rational` forms in both argument orders
-([`positive_difference_rational_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.positive_difference_rational_prec_round)
+([`positive_difference_rational_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.positive_difference_rational_prec_round)
 and
-[`rational_positive_difference_float_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.rational_positive_difference_float_prec_round)),
+[`rational_positive_difference_float_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.rational_positive_difference_float_prec_round)),
 in which the `Rational` operand enters the comparison and the subtraction exactly.
 
 **The `2exp` family.** `x << k` and `x >> k` are exact multiplications and divisions by
@@ -573,7 +573,7 @@ carry the mode and return the ternary value; the plain operators round to neares
 boundary.
 
 **`mpfr_fac_ui`.** The rounded factorial is
-[`factorial_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.factorial_prec_round)
+[`factorial_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.factorial_prec_round)
 (with a `factorial_prec` shorthand for rounding to nearest), producing exactly the value of
 `Float::from_natural_prec_round(Natural::factorial(op), prec, rnd)` — the factorial is exact
 in [`Natural`](https://docs.rs/malachite-nz/latest/malachite_nz/natural/struct.Natural.html) —
@@ -584,9 +584,9 @@ representable value, depending on the rounding mode.
 
 **The fused operations.** `mpfr_fma` and `mpfr_fms`, the singly rounded
 $$op1 \cdot op2 \pm op3$$, are the
-[`add_mul_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.add_mul_prec_round)
+[`add_mul_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.add_mul_prec_round)
 and
-[`sub_mul_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.sub_mul_prec_round)
+[`sub_mul_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.sub_mul_prec_round)
 families, with the usual precision and rounding-mode shorthands and with the
 [`AddMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.AddMul.html)
 and
@@ -600,9 +600,9 @@ reversed. The separately rounded spelling `&a * &b + &c` computes a different, t
 value, which is exactly what fusing exists to avoid.
 
 Beyond MPFR, the families also come in mixed `Float`-`Rational` forms
-([`add_mul_rational_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.add_mul_rational_prec_round)
+([`add_mul_rational_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.add_mul_rational_prec_round)
 and
-[`sub_mul_rational_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.sub_mul_rational_prec_round)),
+[`sub_mul_rational_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.sub_mul_rational_prec_round)),
 in which a `Rational` multiplicand enters the product exactly; rounding it to a `Float` first
 would perturb the result by the other multiplicand times the conversion error. A `Rational`
 *addend* is not offered, and neither is a product of two `Rational`s — the latter because
@@ -610,9 +610,9 @@ would perturb the result by the other multiplicand times the conversion error. A
 yields a single rounding.
 
 `mpfr_fmma` and `mpfr_fmms`, the singly rounded $$op1 \cdot op2 \pm op3 \cdot op4$$, are the
-[`mul_add_mul_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.mul_add_mul_prec_round)
+[`mul_add_mul_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.mul_add_mul_prec_round)
 and
-[`mul_sub_mul_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.mul_sub_mul_prec_round)
+[`mul_sub_mul_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.mul_sub_mul_prec_round)
 families, with the
 [`MulAddMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.MulAddMul.html)
 and
@@ -622,9 +622,9 @@ adjustment. The exact counterparts of the double-product pair on
 [the FLINT integers page](/mapping/flint-integers/#basic-arithmetic) fuse for the temporary,
 while these fuse for the rounding. Beyond MPFR, these families also come in mixed
 `Float`-`Rational` forms
-([`mul_add_mul_rational_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.mul_add_mul_rational_prec_round)
+([`mul_add_mul_rational_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.mul_add_mul_rational_prec_round)
 and
-[`mul_sub_mul_rational_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.mul_sub_mul_rational_prec_round)),
+[`mul_sub_mul_rational_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.mul_sub_mul_rational_prec_round)),
 in which a `Rational` in the second product enters exactly; since each product's factors
 commute and the products of the additive form commute with each other, this one placement
 covers every one-`Rational` variant of the sum, and the subtractive variants follow by exact
@@ -643,18 +643,18 @@ succeeds precisely on Pythagorean inputs whose hypotenuse fits in the target pre
 
 **`mpfr_sum`, `mpfr_dot`.** Correctly rounded sums and dot products of arrays, with a single
 rounding regardless of length.
-[`sum_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.sum_prec_round)
+[`sum_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.sum_prec_round)
 and its variants
-([`sum_prec`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.sum_prec),
-[`sum_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.sum_round),
+([`sum_prec`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.sum_prec),
+[`sum_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.sum_round),
 and the [`Sum`](https://doc.rust-lang.org/nightly/core/iter/trait.Sum.html) implementations,
 which use the maximum input precision and round to nearest) cover `mpfr_sum`, including its
 zero-sign conventions.
-[`dot_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.dot_prec_round)
+[`dot_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.dot_prec_round)
 and its variants
-([`dot_prec`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.dot_prec),
-[`dot_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.dot_round),
-and [`dot`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.dot))
+([`dot_prec`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.dot_prec),
+[`dot_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.dot_round),
+and [`dot`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.dot))
 cover `mpfr_dot`, and go further on one axis: MPFR notes that `mpfr_dot` is experimental and
 "does not yet handle intermediate overflows and underflows" — it computes each product at full
 precision and requires those multiplications to be exact, so inputs whose products leave the
@@ -665,9 +665,9 @@ check.
 
 Malachite also provides correctly-rounded *products* of arrays, again with a single rounding
 regardless of length —
-[`product_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.product_prec_round),
-[`product_prec`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.product_prec),
-[`product_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.product_round),
+[`product_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.product_prec_round),
+[`product_prec`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.product_prec),
+[`product_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.product_round),
 and the [`Product`](https://doc.rust-lang.org/nightly/core/iter/trait.Product.html)
 implementations (maximum input precision, rounding to nearest). MPFR has no corresponding
 function. Since a product cannot cancel, intermediate exactness is unnecessary: the
@@ -831,7 +831,7 @@ the rational to a float first and accepts the intermediate rounding.
 | ✓ | `int mpfr_pow_z (mpfr_t rop, mpfr_t op1, mpz_t op2, mpfr_rnd_t rnd)` | [`pow_integer_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.pow_integer_prec_round), [`Pow`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Pow.html) |
 | ✓ | `int mpfr_ui_pow_ui (mpfr_t rop, unsigned long int op1, unsigned long int op2, mpfr_rnd_t rnd)` | [`unsigned_pow_unsigned_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.unsigned_pow_unsigned_prec_round) |
 | ✓ | `int mpfr_ui_pow (mpfr_t rop, unsigned long int op1, mpfr_t op2, mpfr_rnd_t rnd)` | [`unsigned_pow_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.unsigned_pow_prec_round) |
-| ✓ | `int mpfr_compound_si (mpfr_t rop, mpfr_t op, long int n, mpfr_rnd_t rnd)` | [`compound_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.compound_prec_round), [`Compound`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Compound.html) |
+| ✓ | `int mpfr_compound_si (mpfr_t rop, mpfr_t op, long int n, mpfr_rnd_t rnd)` | [`compound_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.compound_prec_round), [`Compound`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Compound.html) |
 
 **`mpfr_pow`.** `pow_prec_round` and the
 [`Pow`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.Pow.html)
@@ -1294,30 +1294,30 @@ and the `rem` and `ieee_remainder` families; every row in the section is filled.
 
 | | MPFR | Malachite |
 | :---: | --- | --- |
-| ✓ | `int mpfr_rint (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`round_to_integer_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.round_to_integer_prec_round) |
-| ✓ | `int mpfr_ceil (mpfr_t rop, mpfr_t op)` | [`round_to_integer_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.round_to_integer_prec_round) |
-| ✓ | `int mpfr_floor (mpfr_t rop, mpfr_t op)` | [`round_to_integer_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.round_to_integer_prec_round) |
-| ✓ | `int mpfr_round (mpfr_t rop, mpfr_t op)` | [`round_to_integer_ties_away_prec`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.round_to_integer_ties_away_prec) |
-| ✓ | `int mpfr_roundeven (mpfr_t rop, mpfr_t op)` | [`round_to_integer_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.round_to_integer_prec_round) |
-| ✓ | `int mpfr_trunc (mpfr_t rop, mpfr_t op)` | [`round_to_integer_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.round_to_integer_prec_round) |
-| ✓ | `int mpfr_rint_ceil (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`round_to_integer_then_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.round_to_integer_then_prec_round) |
-| ✓ | `int mpfr_rint_floor (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`round_to_integer_then_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.round_to_integer_then_prec_round) |
-| ✓ | `int mpfr_rint_round (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`round_to_integer_ties_away_then_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.round_to_integer_ties_away_then_prec_round) |
-| ✓ | `int mpfr_rint_roundeven (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`round_to_integer_then_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.round_to_integer_then_prec_round) |
-| ✓ | `int mpfr_rint_trunc (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`round_to_integer_then_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.round_to_integer_then_prec_round) |
-| ✓ | `int mpfr_frac (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`fractional_part_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.fractional_part_prec_round) |
-| ✓ | `int mpfr_modf (mpfr_t iop, mpfr_t fop, mpfr_t op, mpfr_rnd_t rnd)` | [`integer_and_fractional_parts_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.integer_and_fractional_parts_prec_round) |
-| ✓ | `int mpfr_fmod (mpfr_t r, mpfr_t x, mpfr_t y, mpfr_rnd_t rnd)` | [`rem_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.rem_prec_round) |
-| ✓ | `int mpfr_fmod_ui (mpfr_t r, mpfr_t x, unsigned long int y, mpfr_rnd_t rnd)` | [`rem_unsigned_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.rem_unsigned_prec_round) |
-| ✓ | `int mpfr_fmodquo (mpfr_t r, long int* q, mpfr_t x, mpfr_t y, mpfr_rnd_t rnd)` | [`rem_and_quotient_bits_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.rem_and_quotient_bits_prec_round) |
-| ✓ | `int mpfr_remainder (mpfr_t r, mpfr_t x, mpfr_t y, mpfr_rnd_t rnd)` | [`ieee_remainder_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.ieee_remainder_prec_round) |
-| ✓ | `int mpfr_remquo (mpfr_t r, long int* q, mpfr_t x, mpfr_t y, mpfr_rnd_t rnd)` | [`ieee_remainder_and_quotient_bits_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.ieee_remainder_and_quotient_bits_prec_round) |
+| ✓ | `int mpfr_rint (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`round_to_integer_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.round_to_integer_prec_round) |
+| ✓ | `int mpfr_ceil (mpfr_t rop, mpfr_t op)` | [`round_to_integer_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.round_to_integer_prec_round) |
+| ✓ | `int mpfr_floor (mpfr_t rop, mpfr_t op)` | [`round_to_integer_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.round_to_integer_prec_round) |
+| ✓ | `int mpfr_round (mpfr_t rop, mpfr_t op)` | [`round_to_integer_ties_away_prec`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.round_to_integer_ties_away_prec) |
+| ✓ | `int mpfr_roundeven (mpfr_t rop, mpfr_t op)` | [`round_to_integer_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.round_to_integer_prec_round) |
+| ✓ | `int mpfr_trunc (mpfr_t rop, mpfr_t op)` | [`round_to_integer_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.round_to_integer_prec_round) |
+| ✓ | `int mpfr_rint_ceil (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`round_to_integer_then_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.round_to_integer_then_prec_round) |
+| ✓ | `int mpfr_rint_floor (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`round_to_integer_then_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.round_to_integer_then_prec_round) |
+| ✓ | `int mpfr_rint_round (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`round_to_integer_ties_away_then_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.round_to_integer_ties_away_then_prec_round) |
+| ✓ | `int mpfr_rint_roundeven (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`round_to_integer_then_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.round_to_integer_then_prec_round) |
+| ✓ | `int mpfr_rint_trunc (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`round_to_integer_then_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.round_to_integer_then_prec_round) |
+| ✓ | `int mpfr_frac (mpfr_t rop, mpfr_t op, mpfr_rnd_t rnd)` | [`fractional_part_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.fractional_part_prec_round) |
+| ✓ | `int mpfr_modf (mpfr_t iop, mpfr_t fop, mpfr_t op, mpfr_rnd_t rnd)` | [`integer_and_fractional_parts_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.integer_and_fractional_parts_prec_round) |
+| ✓ | `int mpfr_fmod (mpfr_t r, mpfr_t x, mpfr_t y, mpfr_rnd_t rnd)` | [`rem_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.rem_prec_round) |
+| ✓ | `int mpfr_fmod_ui (mpfr_t r, mpfr_t x, unsigned long int y, mpfr_rnd_t rnd)` | [`rem_unsigned_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.rem_unsigned_prec_round) |
+| ✓ | `int mpfr_fmodquo (mpfr_t r, long int* q, mpfr_t x, mpfr_t y, mpfr_rnd_t rnd)` | [`rem_and_quotient_bits_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.rem_and_quotient_bits_prec_round) |
+| ✓ | `int mpfr_remainder (mpfr_t r, mpfr_t x, mpfr_t y, mpfr_rnd_t rnd)` | [`ieee_remainder_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.ieee_remainder_prec_round) |
+| ✓ | `int mpfr_remquo (mpfr_t r, long int* q, mpfr_t x, mpfr_t y, mpfr_rnd_t rnd)` | [`ieee_remainder_and_quotient_bits_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.ieee_remainder_and_quotient_bits_prec_round) |
 | ✓ | `int mpfr_integer_p (mpfr_t op)` | [`is_integer`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.is_integer) |
 
 **Rounding to an integer.** Eleven rows, two carefully distinguished semantics, both
 honored. `mpfr_rint` and the five fixed-mode functions round `op` to a *representable* integer
 in a single rounding: "no double rounding is performed", so 10.5 at 2-bit precision goes
-directly to 12. [`round_to_integer_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.round_to_integer_prec_round) is that
+directly to 12. [`round_to_integer_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.round_to_integer_prec_round) is that
 operation, with the fixed modes folded into its
 [`RoundingMode`](https://docs.rs/malachite-base/latest/malachite_base/rounding_modes/enum.RoundingMode.html)
 argument, exactly as MPFR implements `mpfr_ceil`, `mpfr_floor`, `mpfr_trunc`, and
@@ -1327,20 +1327,20 @@ non-integer — is returned losslessly as an
 [`Ordering`](https://doc.rust-lang.org/nightly/core/cmp/enum.Ordering.html) paired with a
 `bool` recording whether the input was an integer. `mpfr_round`'s ties-away rule
 (roundTiesToAway) has no `RoundingMode` counterpart, so it gets its own functions,
-[`round_to_integer_ties_away_prec`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.round_to_integer_ties_away_prec) and friends. The
+[`round_to_integer_ties_away_prec`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.round_to_integer_ties_away_prec) and friends. The
 `mpfr_rint_*` five, the same operations "regarded in the same way as any other mathematical
 function" — round to the integer first, then correctly round that exact integer to the target
 precision — are
-[`round_to_integer_then_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.round_to_integer_then_prec_round) and its ties-away
+[`round_to_integer_then_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.round_to_integer_then_prec_round) and its ties-away
 sibling; under it, 10.5 with both modes nearest becomes 10 and then 8, where the
 single-rounding form gives 12.
 
 **`mpfr_frac`, `mpfr_modf`.** The fractional part, "having the same sign as `op`", with `rnd`
 rounding the exact fraction rather than shaping it, and zero with `op`'s sign at integers and
-infinities: [`fractional_part_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.fractional_part_prec_round) and its family.
+infinities: [`fractional_part_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.fractional_part_prec_round) and its family.
 `mpfr_modf` packages the truncation and the fraction in one call, with the two ternary values
 packed into one return;
-[`integer_and_fractional_parts_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.integer_and_fractional_parts_prec_round)
+[`integer_and_fractional_parts_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.integer_and_fractional_parts_prec_round)
 returns the two pairs directly, takes an independent precision for each part as the two `rop`
 arguments do, and rounds the integral part exactly as `mpfr_rint_trunc` does.
 
@@ -1350,9 +1350,9 @@ following ISO C99 F.9.7.1 for specials: NaN for infinite `x` or zero `y`, `x` ro
 precision for infinite `y`, and a zero `r` taking `x`'s sign. The truncated-quotient remainder
 is the `%` operator (at the maximum of the input precisions, rounding to nearest, like the
 other `Float` operators) and the
-[`rem_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.rem_prec_round)
+[`rem_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.rem_prec_round)
 family; the nearest-quotient remainder — the IEEE 754 `remainder` operation — is the
-[`ieee_remainder_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.ieee_remainder_prec_round)
+[`ieee_remainder_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.ieee_remainder_prec_round)
 family. Both use the modular reduction that the manual hints at ("`x` may be so large in
 magnitude relative to `y` that an exact representation of the quotient is not practical"): the
 exponent gap enters through a modular exponentiation rather than being materialized, so the
@@ -1362,7 +1362,7 @@ matching the documented `mpfr_fmodquo`/`mpfr_remquo` contract; in the corner whe
 bits are all ones and the nearest quotient rounds away, incrementing them overflows a C
 `long`, and Malachite defines the result by the modular contract instead. `mpfr_fmod_ui` is
 the
-[`rem_unsigned_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.rem_unsigned_prec_round)
+[`rem_unsigned_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.rem_unsigned_prec_round)
 family, with a zero modulus yielding NaN.
 
 **Beyond MPFR.** Both remainder families also come in mixed `Float`-`Rational` forms
@@ -1389,7 +1389,7 @@ side.
 | — | `void mpfr_set_default_rounding_mode (mpfr_rnd_t rnd)` | |
 | — | `mpfr_rnd_t mpfr_get_default_rounding_mode (void)` | |
 | ✓ | `int mpfr_prec_round (mpfr_t x, mpfr_prec_t prec, mpfr_rnd_t rnd)` | [`set_prec_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.set_prec_round), [`set_prec`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.set_prec) |
-| ✓ | `int mpfr_can_round (mpfr_t b, mpfr_exp_t err, mpfr_rnd_t rnd1, mpfr_rnd_t rnd2, mpfr_prec_t prec)` | [`can_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.can_round) |
+| ✓ | `int mpfr_can_round (mpfr_t b, mpfr_exp_t err, mpfr_rnd_t rnd1, mpfr_rnd_t rnd2, mpfr_prec_t prec)` | [`can_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.can_round) |
 | ✓ | `mpfr_prec_t mpfr_min_prec (mpfr_t x)` | [`get_min_prec`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.get_min_prec) |
 | ✓ | `const char * mpfr_print_rnd_mode (mpfr_rnd_t rnd)` | [`Display`](https://docs.rs/malachite-base/latest/malachite_base/rounding_modes/enum.RoundingMode.html) |
 | — | `mpfr_round_nearest_away (foo, rop, op, ...)` | |
@@ -1411,7 +1411,7 @@ on narrowing, are C-side bookkeeping with no counterpart to need.
 **`mpfr_can_round`.** The Ziv gate, exported: given an approximation `b` "of an unknown number
 `x` in the direction `rnd1` with error at most two to the power `EXP(b) − err`", decide
 whether `x` can be correctly rounded to `prec` in `rnd2`, treating the error as two-sided when
-`rnd1` is nearest. [`can_round`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.can_round) is the exported version of the same test,
+`rnd1` is nearest. [`can_round`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.can_round) is the exported version of the same test,
 with the full error-direction generality of `rnd1`; Malachite's own Ziv loops continue to use
 the cheaper internal form, which assumes a two-sided error. MPFR's faithful rounding mode
 (`MPFR_RNDF`) has dedicated cases in this function; as everywhere on this page, that mode has
@@ -1563,7 +1563,7 @@ rows, each backed by a specific answer to "where did that information go".
 | — | `mpfr_exp_t mpfr_get_emax_min (void)` | |
 | — | `mpfr_exp_t mpfr_get_emax_max (void)` | |
 | — | `int mpfr_check_range (mpfr_t x, int t, mpfr_rnd_t rnd)` | |
-| ≈ | `int mpfr_subnormalize (mpfr_t x, int t, mpfr_rnd_t rnd)` | [`subnormalize`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.subnormalize) |
+| ≈ | `int mpfr_subnormalize (mpfr_t x, int t, mpfr_rnd_t rnd)` | [`subnormalize`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.subnormalize) |
 | — | `void mpfr_clear_underflow (void)` | |
 | — | `void mpfr_clear_overflow (void)` | |
 | — | `void mpfr_clear_divby0 (void)` | |
@@ -1603,9 +1603,9 @@ not exist here.
 
 **`mpfr_subnormalize`.** The tool for emulating gradual underflow, and through it whole IEEE
 formats; the manual's example reproduces binary64 arithmetic by setting the range and
-subnormalizing every result. Malachite's [`subnormalize`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.subnormalize) (with
-[`subnormalize_ref`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.subnormalize_ref) and
-[`subnormalize_assign`](https://docs.rs/malachite-float/latest/malachite_float/struct.Float.html#method.subnormalize_assign) variants) plays the same role, with two
+subnormalizing every result. Malachite's [`subnormalize`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.subnormalize) (with
+[`subnormalize_ref`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.subnormalize_ref) and
+[`subnormalize_assign`](https://docs.rs/malachite-float/latest/malachite_float/float/struct.Float.html#method.subnormalize_assign) variants) plays the same role, with two
 adaptations that follow from the fixed exponent range: the emulated format's minimum normal
 exponent is an explicit argument rather than a global setting, and values below the smallest
 subnormal — which an MPFR computation would already have flushed at its exponent floor — are

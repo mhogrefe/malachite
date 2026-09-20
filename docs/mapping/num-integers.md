@@ -431,7 +431,7 @@ specializations,
 [`ModPowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModPowerOf2.html),
 [`RoundToMultipleOfPowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.RoundToMultipleOfPowerOf2.html),
 and
-[`EqModPowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/logic/traits/trait.EqModPowerOf2.html),
+[`EqModPowerOf2`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.EqModPowerOf2.html),
 do their work with shifts and masks. None of these have num counterparts.
 
 ## Bits and logic {#bits-and-logic}

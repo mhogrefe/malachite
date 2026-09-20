@@ -42,7 +42,7 @@ Malachite's algorithm needs to be able to do three things:
 2. Generate all rationals with a given denominator in an interval;
 3. Given infinitely many iterators, each generating rationals with different denominators, interleave the iterators into a single iterator.
 
-Number 2 is easy to do and not very interesting. You can see the details [here](https://docs.rs/malachite-q/latest/malachite_q/exhaustive/fn.exhaustive_rationals_with_denominator_inclusive_range.html). Number 3 is more interesting, but already solved. I'll post about it in the future, but for now I'll just leave a link to the relevant function [here](https://docs.rs/malachite-base/latest/malachite_base/tuples/exhaustive/fn.exhaustive_dependent_pairs.html). That leaves number 1.
+Number 2 is easy to do and not very interesting. You can see the details [here](https://docs.rs/malachite-q/latest/malachite_q/rational/exhaustive/fn.exhaustive_rationals_with_denominator_inclusive_range.html). Number 3 is more interesting, but already solved. I'll post about it in the future, but for now I'll just leave a link to the relevant function [here](https://docs.rs/malachite-base/latest/malachite_base/tuples/exhaustive/fn.exhaustive_dependent_pairs.html). That leaves number 1.
 
 ## Finding all denominators in an interval
 

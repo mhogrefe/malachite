@@ -175,8 +175,8 @@ take.
 | ✓ | `int fmpq_cmp_fmpz (const fmpq_t x, const fmpz_t y)` | [`PartialOrd`](https://doc.rust-lang.org/nightly/std/cmp/trait.PartialOrd.html) |
 | ✓ | `int fmpq_cmp_si (const fmpq_t x, slong y)` | [`PartialOrd`](https://doc.rust-lang.org/nightly/std/cmp/trait.PartialOrd.html) |
 | ✓ | `int fmpq_cmp_ui (const fmpq_t x, ulong y)` | [`PartialOrd`](https://doc.rust-lang.org/nightly/std/cmp/trait.PartialOrd.html) |
-| ✓ | `void fmpq_height (fmpz_t height, const fmpq_t x)` | [`Rational::to_height`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html#method.to_height), [`Rational::into_height`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html#method.into_height) |
-| ✓ | `flint_bitcnt_t fmpq_height_bits (const fmpq_t x)` | [`Rational::height_significant_bits`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html#method.height_significant_bits) |
+| ✓ | `void fmpq_height (fmpz_t height, const fmpq_t x)` | [`Rational::to_height`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.to_height), [`Rational::into_height`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.into_height) |
+| ✓ | `flint_bitcnt_t fmpq_height_bits (const fmpq_t x)` | [`Rational::height_significant_bits`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.height_significant_bits) |
 
 **The predicates and comparisons.** `x == 0`, `x == 1`, and `x.eq_abs(&1)` for the `pm1` test;
 `==` against another
@@ -196,7 +196,7 @@ by reference with a clone or by value without one, and the components are alread
 so no absolute value is taken. `height_significant_bits` is `fmpq_height_bits`; since bit
 length is monotone, it equals `to_height().significant_bits()` without materializing the
 height. Note the distinction from
-[`significant_bits`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html#impl-SignificantBits-for-%26Rational),
+[`significant_bits`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#impl-SignificantBits-for-%26Rational),
 which is the *sum* of the components' bit counts, a size measure rather than a height
 measure.
 
@@ -402,8 +402,8 @@ with residues, and recover the rational at the end. Both directions map.
 | | FLINT | Malachite |
 | :---: | --- | --- |
 | ✓ | `int fmpq_mod_fmpz (fmpz_t res, const fmpq_t x, const fmpz_t mod)` | [`ModInverse`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModInverse.html), [`ModMul`](https://docs.rs/malachite-base/latest/malachite_base/num/arithmetic/traits/trait.ModMul.html) |
-| ✓ | `int fmpq_reconstruct_fmpz_2 (fmpq_t res, const fmpz_t a, const fmpz_t m, const fmpz_t N, const fmpz_t D)` | [`Rational::reconstruct_with_bounds`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html#method.reconstruct_with_bounds) |
-| ✓ | `int fmpq_reconstruct_fmpz (fmpq_t res, const fmpz_t a, const fmpz_t m)` | [`Rational::reconstruct`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html#method.reconstruct) |
+| ✓ | `int fmpq_reconstruct_fmpz_2 (fmpq_t res, const fmpz_t a, const fmpz_t m, const fmpz_t N, const fmpz_t D)` | [`Rational::reconstruct_with_bounds`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.reconstruct_with_bounds) |
+| ✓ | `int fmpq_reconstruct_fmpz (fmpq_t res, const fmpz_t a, const fmpz_t m)` | [`Rational::reconstruct`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.reconstruct) |
 
 **`fmpq_mod_fmpz`.** The residue `a` with $$n \equiv a d \pmod m$$: reduce the denominator,
 invert it, and multiply by the reduced numerator, on the machinery of
@@ -422,13 +422,13 @@ fraction `n/d` with $$|n| \le N$$, $$0 < d \le D$$, $$\gcd(n, d) = 1$$, and
 $$n \equiv ad \pmod m$$, if one exists; the shorter form uses the balanced bounds
 $$N = D = \lfloor\sqrt{(m-1)/2}\rfloor$$. This is how a multimodular computation, many images
 under `fmpq_mod_fmpz` combined by CRT, becomes a rational answer again. The mapped functions are
-[`Rational::reconstruct_with_bounds`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html#method.reconstruct_with_bounds)
+[`Rational::reconstruct_with_bounds`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.reconstruct_with_bounds)
 and
-[`Rational::reconstruct`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html#method.reconstruct),
+[`Rational::reconstruct`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.reconstruct),
 with
-[`Rational::reconstruct_with_bounds_ref`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html#method.reconstruct_with_bounds_ref)
+[`Rational::reconstruct_with_bounds_ref`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.reconstruct_with_bounds_ref)
 and
-[`Rational::reconstruct_ref`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html#method.reconstruct_ref)
+[`Rational::reconstruct_ref`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.reconstruct_ref)
 taking their arguments by reference. FLINT's success flag and out-parameter become an
 [`Option`](https://doc.rust-lang.org/nightly/std/option/enum.Option.html): `None` is FLINT's 0.
 The residue is a
@@ -458,7 +458,7 @@ For the Calkin-Wilf order the two agree term for term.
 | ✓ | `void fmpq_next_signed_minimal (fmpq_t res, const fmpq_t x)` | [`exhaustive_rationals_by_height`](https://docs.rs/malachite-q/latest/malachite_q/rational/exhaustive/fn.exhaustive_rationals_by_height.html) |
 | ✓ | `void fmpq_next_calkin_wilf (fmpq_t res, const fmpq_t x)` | [`exhaustive_non_negative_rationals`](https://docs.rs/malachite-q/latest/malachite_q/rational/exhaustive/fn.exhaustive_non_negative_rationals.html) |
 | ✓ | `void fmpq_next_signed_calkin_wilf (fmpq_t res, const fmpq_t x)` | [`exhaustive_rationals`](https://docs.rs/malachite-q/latest/malachite_q/rational/exhaustive/fn.exhaustive_rationals.html) |
-| ✓ | `void fmpq_farey_neighbors (fmpq_t l, fmpq_t r, const fmpq_t x, const fmpz_t Q)` | [`Rational::farey_neighbors`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html#method.farey_neighbors) |
+| ✓ | `void fmpq_farey_neighbors (fmpq_t l, fmpq_t r, const fmpq_t x, const fmpz_t Q)` | [`Rational::farey_neighbors`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.farey_neighbors) |
 | ≈ | `void fmpq_simplest_between (fmpq_t x, const fmpq_t l, const fmpq_t r)` | [`SimplestRationalInInterval`](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/traits/trait.SimplestRationalInInterval.html) |
 
 **`fmpq_next_calkin_wilf`, `fmpq_next_signed_calkin_wilf`.** The breadth-first traversal of the
@@ -484,11 +484,11 @@ size: the $$n$$th element here has height $$O(\sqrt n)$$, against $$O(n^{\log_2 
 there, which is what FLINT's documentation means by minimal height, and it is paid for by
 FLINT's own observation that the enumeration is slower to step. Malachite's third canonical
 well-order, the complexity order of
-[`cmp_complexity`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html#method.cmp_complexity),
+[`cmp_complexity`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.cmp_complexity),
 sorts by denominator before numerator and is still distinct from both.
 
 **`fmpq_farey_neighbors`.**
-[`Rational::farey_neighbors`](https://docs.rs/malachite-q/latest/malachite_q/struct.Rational.html#method.farey_neighbors),
+[`Rational::farey_neighbors`](https://docs.rs/malachite-q/latest/malachite_q/rational/struct.Rational.html#method.farey_neighbors),
 returning both neighbors as a pair. FLINT's `Q` is spelled `max_denominator`, matching
 [`Approximate`](https://docs.rs/malachite-q/latest/malachite_q/rational/arithmetic/traits/trait.Approximate.html),
 which remains the near relative: it returns the best approximation with denominator at most
