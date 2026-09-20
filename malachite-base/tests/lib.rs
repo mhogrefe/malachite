@@ -574,6 +574,7 @@ pub mod options {
         pub mod exhaustive_options;
         pub mod exhaustive_somes;
     }
+    pub mod latex;
     pub mod option_from_str;
     pub mod random {
         pub mod random_options;

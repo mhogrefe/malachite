@@ -37,6 +37,12 @@ documented by git history.
   [pylatexenc](https://github.com/phfaist/pylatexenc) (MIT, © 2015-2023 Philippe Faist), which in
   turn adapted it from latexcodec (MIT, © 2011-2014 Matthias C. M. Troffaes); both notices are
   reproduced in the generated table.
+- `ToLatex` for `Option<T>` whenever `T: ToLatex`. `None` becomes `\bot`, and `Some` wraps its
+  value in square brackets written with `\left` and `\right`, so that they grow to fit a value
+  taller than one line: `Some(5)` becomes `\left[5\right]`. The brackets are not decoration:
+  without them `Some(None)` and `None` would share a fragment, and distinct values would be
+  indistinguishable. Braces would have served as well, but this crate's documentation already
+  spells the Iverson bracket with them.
 
 ## 0.12.0 — 2026-09-20
 

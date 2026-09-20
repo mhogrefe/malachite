@@ -1,0 +1,39 @@
+// Copyright © 2026 Mikhail Hogrefe
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
+use crate::strings::latex::ToLatex;
+use core::fmt::{Formatter, Result};
+
+impl<T: ToLatex> ToLatex for Option<T> {
+    /// Writes an [`Option`] as a LaTeX math-mode fragment.
+    ///
+    /// [`None`] becomes $\bot$, and [`Some`] wraps its value in square brackets. The brackets are
+    /// not decoration: without them `Some(None)` and [`None`] would both be $\bot$, and distinct
+    /// values would have the same fragment. Braces would have served as well, but this crate's
+    /// documentation already spells the Iverson bracket with them.
+    ///
+    /// The brackets are written with `\left` and `\right`, so that they grow to fit a value that is
+    /// taller than one line, such as a fraction or a nested [`Option`].
+    ///
+    /// # Worst-case complexity
+    /// Same as the time and additional memory complexity of `fmt_latex` for `T`.
+    ///
+    /// # Examples
+    /// See [here](super::latex#fmt_latex).
+    #[inline]
+    fn fmt_latex(&self, f: &mut Formatter) -> Result {
+        match self {
+            None => f.write_str("\\bot"),
+            Some(x) => {
+                f.write_str("\\left[")?;
+                x.fmt_latex(f)?;
+                f.write_str("\\right]")
+            }
+        }
+    }
+}
