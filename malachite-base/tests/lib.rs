@@ -749,6 +749,7 @@ pub mod sets {
 }
 pub mod slices {
     pub mod exhaustive_slice_permutations;
+    pub mod latex;
     pub mod min_repeating_len;
     pub mod random_slice_permutations;
     pub mod random_values_from_slice;
@@ -758,6 +759,7 @@ pub mod slices {
     pub mod slice_test_zero;
     pub mod slice_trailing_zeros;
     pub mod split_into_chunks;
+    pub mod typst;
 }
 pub mod strings {
     pub mod latex;

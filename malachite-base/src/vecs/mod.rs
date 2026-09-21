@@ -509,6 +509,8 @@ pub fn random_vec_permutations<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomVecPer
 /// );
 /// ```
 pub mod exhaustive;
+/// The implementation of [`ToLatex`](crate::strings::latex::ToLatex) for [`Vec`].
+pub mod latex;
 #[cfg(feature = "random")]
 /// Iterators that generate [`Vec`]s randomly.
 ///
@@ -600,3 +602,5 @@ pub mod exhaustive;
 /// );
 /// ```
 pub mod random;
+/// The implementation of [`ToTypst`](crate::strings::typst::ToTypst) for [`Vec`].
+pub mod typst;

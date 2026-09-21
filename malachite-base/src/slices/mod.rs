@@ -24,6 +24,11 @@ use rand::prelude::SliceRandom;
 #[cfg(feature = "random")]
 use rand_chacha::ChaCha20Rng;
 
+/// The implementation of [`ToLatex`](crate::strings::latex::ToLatex) for slices.
+pub mod latex;
+/// The implementation of [`ToTypst`](crate::strings::typst::ToTypst) for slices.
+pub mod typst;
+
 /// Sets all values in a slice to 0.
 ///
 /// # Worst-case complexity

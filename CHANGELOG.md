@@ -59,6 +59,12 @@ documented by git history.
   trait may be `Never`, which is what lets `Option<Never>` have a fragment. A `NiceFloat`'s fragment
   is the wrapped float's own, since the float implementations already build their output from the
   `NiceFloat` representation.
+- `ToLatex` and `ToTypst` for slices and for `Vec<T>`, whenever the element type has them. The
+  elements' fragments are separated by commas and wrapped in square brackets, as `Option`'s are, so
+  that a sequence's fragment is built out of its elements' own: `vec![1u8, 2, 3]` becomes `\left[1,
+  2, 3\right]` and `[1, 2, 3]`. The brackets are not decoration; without them `[1, 2]` and `[[1],
+  [2]]` would share a fragment. LaTeX's grow with `\left` and `\right`, and Typst's grow on their
+  own.
 - `ToLatex` for `Option<T>` whenever `T: ToLatex`. `None` becomes `\bot`, and `Some` wraps its
   value in square brackets written with `\left` and `\right`, so that they grow to fit a value
   taller than one line: `Some(5)` becomes `\left[5\right]`. The brackets are not decoration:
