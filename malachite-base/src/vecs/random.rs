@@ -706,6 +706,449 @@ pub fn random_vecs_length_inclusive_range<I: Iterator>(
     )
 }
 
+/// Generates random [`Vec`]s of a given length whose last element comes from a different iterator
+/// than the rest.
+///
+/// This `struct` is created by [`random_vecs_with_last_fixed_length`]; see its documentation for
+/// more.
+#[derive(Clone, Debug)]
+pub struct RandomFixedLengthVecsWithLast<T, I: Iterator<Item = T>, J: Iterator<Item = T>> {
+    len: u64,
+    xs: I,
+    ys: J,
+}
+
+impl<T, I: Iterator<Item = T>, J: Iterator<Item = T>> Iterator
+    for RandomFixedLengthVecsWithLast<T, I, J>
+{
+    type Item = Vec<T>;
+
+    fn next(&mut self) -> Option<Vec<T>> {
+        Some(next_with_last(self.len, &mut self.xs, &mut self.ys))
+    }
+}
+
+// Takes one `Vec` of a given length, its first elements from `xs` and its last from `ys`.
+//
+// A length of zero takes nothing from either, since the empty `Vec` has no last element. Both
+// iterators must be infinite, as they must be everywhere else in this module.
+fn next_with_last<T, I: Iterator<Item = T>, J: Iterator<Item = T>>(
+    len: u64,
+    xs: &mut I,
+    ys: &mut J,
+) -> Vec<T> {
+    if len == 0 {
+        return Vec::new();
+    }
+    let mut out: Vec<T> = xs.take(usize::exact_from(len - 1)).collect();
+    out.push(ys.next().unwrap());
+    out
+}
+
+/// Randomly generates length-$n$ [`Vec`]s whose last element is drawn from a different iterator
+/// than the rest.
+///
+/// The first $n-1$ elements come from `xs` and the last comes from `ys`. If `len` is 0 there is no
+/// last element, and the output is the empty [`Vec`], repeated.
+///
+/// The probability of a particular [`Vec`] being generated is the product of the probabilities of
+/// each of its elements.
+///
+/// `xs` and `ys` must be infinite.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(n T^\prime(i))$
+///
+/// $M(i) = O(n M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of `xs` and `ys`, and $n$ is `len`.
+///
+/// # Examples
+/// ```
+/// use itertools::Itertools;
+/// use malachite_base::num::random::random_unsigned_inclusive_range;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::vecs::random::random_vecs_with_last_fixed_length;
+///
+/// let xs = random_unsigned_inclusive_range::<u32>(EXAMPLE_SEED.fork("xs"), 0, 9);
+/// let ys = random_unsigned_inclusive_range::<u32>(EXAMPLE_SEED.fork("ys"), 90, 99);
+/// let xss = random_vecs_with_last_fixed_length(3, xs, ys)
+///     .take(5)
+///     .collect_vec();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[
+///         &[5, 5, 92][..],
+///         &[0, 8, 96],
+///         &[8, 8, 98],
+///         &[6, 8, 96],
+///         &[6, 2, 98]
+///     ]
+/// );
+/// ```
+#[inline]
+pub const fn random_vecs_with_last_fixed_length<T, I: Iterator<Item = T>, J: Iterator<Item = T>>(
+    len: u64,
+    xs: I,
+    ys: J,
+) -> RandomFixedLengthVecsWithLast<T, I, J> {
+    RandomFixedLengthVecsWithLast { len, xs, ys }
+}
+
+/// Generates random [`Vec`]s whose last element comes from a different iterator than the rest, and
+/// with lengths from a third iterator.
+///
+/// This `struct` is created by [`random_vecs_with_last_from_length_iterator`]; see its
+/// documentation for more.
+#[derive(Clone, Debug)]
+pub struct RandomVecsWithLast<
+    T,
+    I: Iterator<Item = u64>,
+    J: Iterator<Item = T>,
+    K: Iterator<Item = T>,
+> {
+    lengths: I,
+    xs: J,
+    ys: K,
+}
+
+impl<T, I: Iterator<Item = u64>, J: Iterator<Item = T>, K: Iterator<Item = T>> Iterator
+    for RandomVecsWithLast<T, I, J, K>
+{
+    type Item = Vec<T>;
+
+    fn next(&mut self) -> Option<Vec<T>> {
+        let len = self.lengths.next().unwrap();
+        Some(next_with_last(len, &mut self.xs, &mut self.ys))
+    }
+}
+
+/// Generates random [`Vec`]s whose last element is drawn from a different iterator than the rest,
+/// and with lengths from a third iterator.
+///
+/// A [`Vec`] of length $n \geq 1$ has its first $n-1$ elements from `xs` and its last from `ys`;
+/// the empty [`Vec`], which has no last element, takes nothing from either.
+///
+/// The probability of a particular [`Vec`] being generated is the product of the probabilities of
+/// each of its elements, multiplied by the probability of its length being generated.
+///
+/// `lengths`, `xs`, and `ys` must be infinite.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(T^{\prime\prime}(i) + \ell T^\prime(i))$
+///
+/// $M(i) = O(M^{\prime\prime}(i) + \ell M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of the iterators produced by `xs_gen` and `ys_gen`,
+/// $T^{\prime\prime}$ and $M^{\prime\prime}$ are the time and memory functions of `lengths`, and
+/// $\ell$ is the $i$th generated length.
+///
+/// # Examples
+/// ```
+/// use itertools::Itertools;
+/// use malachite_base::num::random::random_unsigned_inclusive_range;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::vecs::random::random_vecs_with_last_from_length_iterator;
+/// use malachite_base::vecs::random_values_from_vec;
+///
+/// let xss = random_vecs_with_last_from_length_iterator(
+///     EXAMPLE_SEED,
+///     &|seed| random_values_from_vec(seed, vec![0, 1, 2]),
+///     &|seed| random_unsigned_inclusive_range::<u32>(seed, 0, 9),
+///     &|seed| random_unsigned_inclusive_range::<u32>(seed, 90, 99),
+/// )
+/// .take(8)
+/// .collect_vec();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[&[92][..], &[5, 96], &[98], &[5, 96], &[0, 98], &[92], &[], &[94]]
+/// );
+/// ```
+#[inline]
+pub fn random_vecs_with_last_from_length_iterator<
+    T,
+    I: Iterator<Item = u64>,
+    J: Iterator<Item = T>,
+    K: Iterator<Item = T>,
+>(
+    seed: Seed,
+    lengths_gen: &dyn Fn(Seed) -> I,
+    xs_gen: &dyn Fn(Seed) -> J,
+    ys_gen: &dyn Fn(Seed) -> K,
+) -> RandomVecsWithLast<T, I, J, K> {
+    RandomVecsWithLast {
+        lengths: lengths_gen(seed.fork("lengths")),
+        xs: xs_gen(seed.fork("xs")),
+        ys: ys_gen(seed.fork("ys")),
+    }
+}
+
+/// Randomly generates [`Vec`]s whose last element is drawn from a different iterator than the rest.
+///
+/// A [`Vec`] of length $n \geq 1$ has its first $n-1$ elements from `xs` and its last from `ys`;
+/// the empty [`Vec`], which has no last element, takes nothing from either.
+///
+/// The lengths of the [`Vec`]s are sampled from a geometric distribution with a specified mean $m$,
+/// equal to `mean_length_numerator / mean_length_denominator`. $m$ must be greater than 0.
+///
+/// `xs` and `ys` must be infinite.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell T^\prime(i))$
+///
+/// $M(i) = O(\ell M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of the iterators produced by `xs_gen` and `ys_gen`,
+/// and $\ell$ is the $i$th generated length.
+///
+/// # Panics
+/// Panics if `mean_length_numerator` or `mean_length_denominator` are zero, or if their ratio is
+/// greater than or equal to $2^{64}$.
+///
+/// # Examples
+/// ```
+/// use itertools::Itertools;
+/// use malachite_base::num::random::random_unsigned_inclusive_range;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::vecs::random::random_vecs_with_last;
+///
+/// let xss = random_vecs_with_last(
+///     EXAMPLE_SEED,
+///     &|seed| random_unsigned_inclusive_range::<u32>(seed, 0, 9),
+///     &|seed| random_unsigned_inclusive_range::<u32>(seed, 90, 99),
+///     2,
+///     1,
+/// )
+/// .take(8)
+/// .collect_vec();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[
+///         &[5, 5, 0, 8, 8, 92][..],
+///         &[96],
+///         &[8, 6, 8, 6, 2, 9, 1, 98],
+///         &[96],
+///         &[2, 0, 2, 6, 1, 5, 6, 9, 0, 8, 7, 9, 5, 98],
+///         &[],
+///         &[1, 6, 4, 5, 92],
+///         &[7, 2, 8, 94]
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn random_vecs_with_last<T, I: Iterator<Item = T>, J: Iterator<Item = T>>(
+    seed: Seed,
+    xs_gen: &dyn Fn(Seed) -> I,
+    ys_gen: &dyn Fn(Seed) -> J,
+    mean_length_numerator: u64,
+    mean_length_denominator: u64,
+) -> RandomVecsWithLast<T, GeometricRandomNaturalValues<u64>, I, J> {
+    random_vecs_with_last_from_length_iterator(
+        seed,
+        &|seed_2| {
+            geometric_random_unsigneds(seed_2, mean_length_numerator, mean_length_denominator)
+        },
+        xs_gen,
+        ys_gen,
+    )
+}
+
+/// Randomly generates [`Vec`]s with a minimum length, whose last element is drawn from a different
+/// iterator than the rest.
+///
+/// The lengths of the [`Vec`]s are sampled from a geometric distribution with a specified mean $m$,
+/// equal to `mean_length_numerator / mean_length_denominator`. $m$ must be greater than
+/// `min_length`.
+///
+/// `xs` and `ys` must be infinite.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell T^\prime(i))$
+///
+/// $M(i) = O(\ell M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of the iterators produced by `xs_gen` and `ys_gen`,
+/// and $\ell$ is the $i$th generated length.
+///
+/// # Panics
+/// Panics if `mean_length_numerator` or `mean_length_denominator` are zero, or if their ratio is
+/// less than or equal to `min_length`.
+///
+/// # Examples
+/// ```
+/// use itertools::Itertools;
+/// use malachite_base::num::random::random_unsigned_inclusive_range;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::vecs::random::random_vecs_with_last_min_length;
+///
+/// let xss = random_vecs_with_last_min_length(
+///     EXAMPLE_SEED,
+///     2,
+///     &|seed| random_unsigned_inclusive_range::<u32>(seed, 0, 9),
+///     &|seed| random_unsigned_inclusive_range::<u32>(seed, 90, 99),
+///     4,
+///     1,
+/// )
+/// .take(5)
+/// .collect_vec();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[
+///         &[5, 5, 0, 8, 8, 8, 6, 92][..],
+///         &[8, 6, 96],
+///         &[2, 9, 1, 2, 0, 2, 6, 1, 5, 98],
+///         &[6, 9, 96],
+///         &[0, 8, 7, 9, 5, 1, 6, 4, 5, 7, 2, 8, 9, 2, 0, 98]
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn random_vecs_with_last_min_length<T, I: Iterator<Item = T>, J: Iterator<Item = T>>(
+    seed: Seed,
+    min_length: u64,
+    xs_gen: &dyn Fn(Seed) -> I,
+    ys_gen: &dyn Fn(Seed) -> J,
+    mean_length_numerator: u64,
+    mean_length_denominator: u64,
+) -> RandomVecsWithLast<T, GeometricRandomNaturalValues<u64>, I, J> {
+    random_vecs_with_last_from_length_iterator(
+        seed,
+        &|seed_2| {
+            geometric_random_unsigned_inclusive_range(
+                seed_2,
+                min_length,
+                u64::MAX,
+                mean_length_numerator,
+                mean_length_denominator,
+            )
+        },
+        xs_gen,
+        ys_gen,
+    )
+}
+
+/// Randomly generates [`Vec`]s with lengths in $[a, b)$, whose last element is drawn from a
+/// different iterator than the rest.
+///
+/// The lengths of the [`Vec`]s are sampled from a uniform distribution on $[a, b)$. $a$ must be
+/// less than $b$.
+///
+/// `xs` and `ys` must be infinite.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell T^\prime(i))$
+///
+/// $M(i) = O(\ell M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of the iterators produced by `xs_gen` and `ys_gen`,
+/// and $\ell$ is the $i$th generated length.
+///
+/// # Panics
+/// Panics if $a \geq b$.
+///
+/// # Examples
+/// ```
+/// use itertools::Itertools;
+/// use malachite_base::num::random::random_unsigned_inclusive_range;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::vecs::random::random_vecs_with_last_length_range;
+///
+/// let xss = random_vecs_with_last_length_range(
+///     EXAMPLE_SEED,
+///     1,
+///     3,
+///     &|seed| random_unsigned_inclusive_range::<u32>(seed, 0, 9),
+///     &|seed| random_unsigned_inclusive_range::<u32>(seed, 90, 99),
+/// )
+/// .take(5)
+/// .collect_vec();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[&[5, 92][..], &[96], &[5, 98], &[0, 96], &[98]]
+/// );
+/// ```
+#[inline]
+pub fn random_vecs_with_last_length_range<T, I: Iterator<Item = T>, J: Iterator<Item = T>>(
+    seed: Seed,
+    a: u64,
+    b: u64,
+    xs_gen: &dyn Fn(Seed) -> I,
+    ys_gen: &dyn Fn(Seed) -> J,
+) -> RandomVecsWithLast<T, RandomUnsignedRange<u64>, I, J> {
+    random_vecs_with_last_from_length_iterator(
+        seed,
+        &|seed_2| random_unsigned_range(seed_2, a, b),
+        xs_gen,
+        ys_gen,
+    )
+}
+
+/// Randomly generates [`Vec`]s with lengths in $[a, b]$, whose last element is drawn from a
+/// different iterator than the rest.
+///
+/// The lengths of the [`Vec`]s are sampled from a uniform distribution on $[a, b]$. $a$ must be
+/// less than or equal to $b$.
+///
+/// `xs` and `ys` must be infinite.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell T^\prime(i))$
+///
+/// $M(i) = O(\ell M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of the iterators produced by `xs_gen` and `ys_gen`,
+/// and $\ell$ is the $i$th generated length.
+///
+/// # Panics
+/// Panics if $a > b$.
+///
+/// # Examples
+/// ```
+/// use itertools::Itertools;
+/// use malachite_base::num::random::random_unsigned_inclusive_range;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::vecs::random::random_vecs_with_last_length_inclusive_range;
+///
+/// let xss = random_vecs_with_last_length_inclusive_range(
+///     EXAMPLE_SEED,
+///     1,
+///     2,
+///     &|seed| random_unsigned_inclusive_range::<u32>(seed, 0, 9),
+///     &|seed| random_unsigned_inclusive_range::<u32>(seed, 90, 99),
+/// )
+/// .take(5)
+/// .collect_vec();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[&[5, 92][..], &[96], &[5, 98], &[0, 96], &[98]]
+/// );
+/// ```
+#[inline]
+pub fn random_vecs_with_last_length_inclusive_range<
+    T,
+    I: Iterator<Item = T>,
+    J: Iterator<Item = T>,
+>(
+    seed: Seed,
+    a: u64,
+    b: u64,
+    xs_gen: &dyn Fn(Seed) -> I,
+    ys_gen: &dyn Fn(Seed) -> J,
+) -> RandomVecsWithLast<T, RandomUnsignedInclusiveRange<u64>, I, J> {
+    random_vecs_with_last_from_length_iterator(
+        seed,
+        &|seed_2| random_unsigned_inclusive_range(seed_2, a, b),
+        xs_gen,
+        ys_gen,
+    )
+}
+
 #[doc(hidden)]
 #[derive(Clone, Debug)]
 pub struct RandomOrderedUniqueVecsLength2<I: Iterator>

@@ -17,6 +17,9 @@ use malachite_base::num::conversion::traits::ExactFrom;
 pub mod conversion;
 /// Iterators that generate [`NaturalPolynomial`]s without repetition.
 pub mod exhaustive;
+#[cfg(feature = "random")]
+/// Iterators that generate [`NaturalPolynomial`]s randomly.
+pub mod random;
 
 // The zero `Natural`, as something a reference can be handed out to.
 //
