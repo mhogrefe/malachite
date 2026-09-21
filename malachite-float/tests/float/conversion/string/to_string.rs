@@ -10,7 +10,7 @@ use malachite_base::assert_panic;
 use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::{FromStringBase, ToStringBase};
-use malachite_base::strings::{ToDebugString, string_is_subset};
+use malachite_base::strings::*;
 use malachite_float::float::conversion::string::get_str::get_str_digit_count;
 use malachite_float::test_util::common::parse_hex_string;
 use malachite_float::test_util::generators::{
@@ -128,7 +128,7 @@ fn to_string_properties() {
 pub fn test_to_binary_string() {
     fn test(s_hex: &str, out: &str, out_prefixed: &str) {
         let x = parse_hex_string(s_hex);
-        assert_eq!(format!("{x:b}"), out);
+        assert_eq!(x.to_binary_string(), out);
         assert_eq!(format!("{x:#b}"), out_prefixed);
     }
     test("NaN", "NaN", "NaN");
@@ -153,7 +153,7 @@ pub fn test_to_binary_string() {
 #[test]
 fn to_binary_string_properties() {
     fn check(x: &Float) {
-        let s = format!("{x:b}");
+        let s = x.to_binary_string();
         assert!(s.is_ascii());
         // the alternate form only inserts the prefix, after any sign, for non-special values
         let prefixed = if x.is_nan() || x.is_infinite() {
@@ -195,7 +195,7 @@ fn to_binary_string_properties() {
 pub fn test_to_octal_string() {
     fn test(s_hex: &str, out: &str, out_prefixed: &str) {
         let x = parse_hex_string(s_hex);
-        assert_eq!(format!("{x:o}"), out);
+        assert_eq!(x.to_octal_string(), out);
         assert_eq!(format!("{x:#o}"), out_prefixed);
     }
     test("NaN", "NaN", "NaN");
@@ -216,7 +216,7 @@ pub fn test_to_octal_string() {
 #[test]
 fn to_octal_string_properties() {
     fn check(x: &Float) {
-        let s = format!("{x:o}");
+        let s = x.to_octal_string();
         assert!(s.is_ascii());
         let prefixed = if x.is_nan() || x.is_infinite() {
             s.clone()
@@ -247,7 +247,7 @@ fn to_octal_string_properties() {
 pub fn test_to_lower_hex_string() {
     fn test(s_hex: &str, out: &str, out_prefixed: &str) {
         let x = parse_hex_string(s_hex);
-        assert_eq!(format!("{x:x}"), out);
+        assert_eq!(x.to_lower_hex_string(), out);
         assert_eq!(format!("{x:#x}"), out_prefixed);
     }
     test("NaN", "NaN", "NaN");
@@ -269,7 +269,7 @@ pub fn test_to_lower_hex_string() {
 pub fn test_to_upper_hex_string() {
     fn test(s_hex: &str, out: &str, out_prefixed: &str) {
         let x = parse_hex_string(s_hex);
-        assert_eq!(format!("{x:X}"), out);
+        assert_eq!(x.to_upper_hex_string(), out);
         assert_eq!(format!("{x:#X}"), out_prefixed);
     }
     test("NaN", "NaN", "NaN");
@@ -290,8 +290,8 @@ pub fn test_to_upper_hex_string() {
 #[test]
 fn to_hex_string_properties() {
     fn check(x: &Float) {
-        let lower = format!("{x:x}");
-        let upper = format!("{x:X}");
+        let lower = x.to_lower_hex_string();
+        let upper = x.to_upper_hex_string();
         assert!(lower.is_ascii());
         let prefixed = if x.is_nan() || x.is_infinite() {
             lower.clone()
@@ -385,9 +385,9 @@ fn to_string_base_properties() {
     float_gen().test_properties(|x| {
         // each base agrees with the corresponding formatting impl
         assert_eq!(x.to_string_base(10), x.to_string());
-        assert_eq!(x.to_string_base(2), format!("{x:b}"));
-        assert_eq!(x.to_string_base(8), format!("{x:o}"));
-        assert_eq!(x.to_string_base(16), format!("{x:x}"));
-        assert_eq!(x.to_string_base_upper(16), format!("{x:X}"));
+        assert_eq!(x.to_string_base(2), x.to_binary_string());
+        assert_eq!(x.to_string_base(8), x.to_octal_string());
+        assert_eq!(x.to_string_base(16), x.to_lower_hex_string());
+        assert_eq!(x.to_string_base_upper(16), x.to_upper_hex_string());
     });
 }

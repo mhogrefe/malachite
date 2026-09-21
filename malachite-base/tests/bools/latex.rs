@@ -11,6 +11,6 @@ use malachite_base::strings::latex::ToLatex;
 #[test]
 fn test_to_latex() {
     // A `bool` has two values, so these two assertions cover the whole domain.
-    assert_eq!(true.to_latex().to_string(), r"\text{T}");
-    assert_eq!(false.to_latex().to_string(), r"\text{F}");
+    assert_eq!(true.to_latex_string(), r"\text{T}");
+    assert_eq!(false.to_latex_string(), r"\text{F}");
 }

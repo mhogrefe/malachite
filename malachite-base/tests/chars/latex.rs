@@ -124,7 +124,7 @@ fn assert_scripts_separated_accepts_separated_scripts() {
 
 #[test]
 fn test_char_to_latex() {
-    let test = |c: char, out: &str| assert_eq!(c.to_latex().to_string(), out);
+    let test = |c: char, out: &str| assert_eq!(c.to_latex_string(), out);
     // ordinary characters are typeset as themselves, inside a text group
     test('a', r"\text{a}");
     test('Z', r"\text{Z}");
@@ -170,7 +170,7 @@ fn test_char_to_latex() {
 #[test]
 fn char_to_latex_properties() {
     char_gen().test_properties(|c| {
-        let s = c.to_latex().to_string();
+        let s = c.to_latex_string();
         assert!(!s.is_empty());
         assert_specials_escaped(&s);
         assert_braces_balanced(&s);

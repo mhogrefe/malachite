@@ -12,7 +12,7 @@ use malachite_base::strings::typst::ToTypst;
 
 #[test]
 fn test_factors_to_typst() {
-    let test = |n: u32, out: &str| assert_eq!(n.factor().to_typst().to_string(), out);
+    let test = |n: u32, out: &str| assert_eq!(n.factor().to_typst_string(), out);
     // 1 has no prime factors, so its fragment is the empty product
     test(1, "1");
     test(2, "2");
@@ -44,7 +44,7 @@ fn test_factors_to_typst_multiplies_out() {
             .map(|(f, e)| f.pow(u32::from(e)))
             .product();
         assert_eq!(product, n);
-        let s = n.factor().to_typst().to_string();
+        let s = n.factor().to_typst_string();
         assert!(!s.is_empty());
         // The exponent 1 never appears, since it is left off.
         assert!(!s.contains("^1 ") && !s.ends_with("^1"));

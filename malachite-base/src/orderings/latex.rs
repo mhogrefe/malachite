@@ -23,9 +23,9 @@ impl ToLatex for Ordering {
     /// use core::cmp::Ordering::*;
     /// use malachite_base::strings::latex::ToLatex;
     ///
-    /// assert_eq!(Less.to_latex().to_string(), "<");
-    /// assert_eq!(Equal.to_latex().to_string(), "=");
-    /// assert_eq!(Greater.to_latex().to_string(), ">");
+    /// assert_eq!(Less.to_latex_string(), "<");
+    /// assert_eq!(Equal.to_latex_string(), "=");
+    /// assert_eq!(Greater.to_latex_string(), ">");
     /// ```
     ///
     /// | value     | fragment | renders as |

@@ -17,7 +17,7 @@ use malachite_base::test_util::generators::char_gen;
 fn test_char_to_typst() {
     let mut frags = Vec::new();
     let mut test = |c: char, out: &str| {
-        assert_eq!(c.to_typst().to_string(), out);
+        assert_eq!(c.to_typst_string(), out);
         frags.push(out.to_string());
     };
     // an ordinary character is typeset as itself, inside a quoted string
@@ -71,7 +71,7 @@ fn test_char_to_typst() {
 fn char_to_typst_properties() {
     let mut frags = Vec::new();
     char_gen().test_properties(|c| {
-        let s = c.to_typst().to_string();
+        let s = c.to_typst_string();
         assert!(!s.is_empty());
         assert_strings_closed(&s);
         assert_delimiters_balanced(&s);

@@ -96,7 +96,7 @@ impl ToLatex for () {
     /// ```
     /// use malachite_base::strings::latex::ToLatex;
     ///
-    /// assert_eq!(().to_latex().to_string(), "()");
+    /// assert_eq!(().to_latex_string(), "()");
     /// ```
     ///
     /// | value | fragment | renders as |

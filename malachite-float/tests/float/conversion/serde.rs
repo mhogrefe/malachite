@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::strings::string_is_subset;
+use malachite_base::strings::{ToDebugString, string_is_subset};
 use malachite_base::test_util::generators::string_gen;
 use malachite_float::test_util::common::{parse_hex_string, to_hex_string};
 use malachite_float::test_util::generators::{float_gen, float_gen_var_12};
@@ -81,7 +81,7 @@ fn serde_properties() {
     // Deserializing an arbitrary string must fail rather than panic, and must never produce an
     // invalid `Float`.
     string_gen().test_properties(|s| {
-        if let Ok(x) = serde_json::from_str::<Float>(&format!("{s:?}")) {
+        if let Ok(x) = serde_json::from_str::<Float>(&s.to_debug_string()) {
             assert!(x.is_valid());
         }
     });

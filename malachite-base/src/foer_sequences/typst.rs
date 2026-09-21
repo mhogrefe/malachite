@@ -40,16 +40,16 @@ impl<T: ToTypst + Eq> ToTypst for FoerSequence<T> {
     /// use malachite_base::strings::typst::ToTypst;
     ///
     /// let empty = FoerSequence::<u8>::from_vecs(vec![], vec![]);
-    /// assert_eq!(empty.to_typst().to_string(), "[]");
+    /// assert_eq!(empty.to_typst_string(), "[]");
     ///
     /// let finite = FoerSequence::<u8>::from_vecs(vec![1, 2], vec![]);
-    /// assert_eq!(finite.to_typst().to_string(), "[1, 2]");
+    /// assert_eq!(finite.to_typst_string(), "[1, 2]");
     ///
     /// let repeating = FoerSequence::<u8>::from_vecs(vec![], vec![3, 4]);
-    /// assert_eq!(repeating.to_typst().to_string(), "[overline(3 comma 4)]");
+    /// assert_eq!(repeating.to_typst_string(), "[overline(3 comma 4)]");
     ///
     /// let both = FoerSequence::<u8>::from_vecs(vec![1, 2], vec![3, 4]);
-    /// assert_eq!(both.to_typst().to_string(), "[1, 2, overline(3 comma 4)]");
+    /// assert_eq!(both.to_typst_string(), "[1, 2, overline(3 comma 4)]");
     /// ```
     ///
     /// | value            | fragment                      |

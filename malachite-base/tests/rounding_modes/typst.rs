@@ -14,7 +14,7 @@ use malachite_base::strings::typst::ToTypst;
 
 #[test]
 fn test_to_typst() {
-    let test = |rm: RoundingMode, out: &str| assert_eq!(rm.to_typst().to_string(), out);
+    let test = |rm: RoundingMode, out: &str| assert_eq!(rm.to_typst_string(), out);
     test(Down, r#""DOWN""#);
     test(Up, r#""UP""#);
     test(Floor, r#""FLOOR""#);
@@ -23,7 +23,7 @@ fn test_to_typst() {
     test(Exact, r#""EXACT""#);
     assert_typst_compiles(
         &exhaustive_rounding_modes()
-            .map(|rm| rm.to_typst().to_string())
+            .map(|rm| rm.to_typst_string())
             .collect_vec(),
     );
 }
@@ -32,7 +32,7 @@ fn test_to_typst() {
 fn to_typst_distinguishes_rounding_modes() {
     // Distinct modes never share a fragment.
     let fragments = exhaustive_rounding_modes()
-        .map(|rm| rm.to_typst().to_string())
+        .map(|rm| rm.to_typst_string())
         .collect_vec();
     assert_eq!(fragments.iter().unique().count(), fragments.len());
 }

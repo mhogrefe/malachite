@@ -15,9 +15,9 @@ use malachite_base::test_util::generators::string_gen;
 #[test]
 fn test_str_to_latex() {
     let test = |s: &str, out: &str| {
-        assert_eq!(s.to_latex().to_string(), out);
+        assert_eq!(s.to_latex_string(), out);
         // The `String` implementation agrees with the `&str` one.
-        assert_eq!(s.to_string().to_latex().to_string(), out);
+        assert_eq!(s.to_string().to_latex_string(), out);
     };
     // ordinary text is gathered into one group; no quotation marks are added
     test("hello", r"\text{hello}");
@@ -77,7 +77,7 @@ fn test_str_to_latex() {
 #[test]
 fn str_to_latex_properties() {
     string_gen().test_properties(|s| {
-        let latex = s.to_latex().to_string();
+        let latex = s.to_latex_string();
         assert!(!latex.is_empty());
         assert_specials_escaped(&latex);
         assert_braces_balanced(&latex);
@@ -87,11 +87,42 @@ fn str_to_latex_properties() {
         // A fragment never opens with a bare superscript or subscript, which would have no base.
         assert!(!latex.starts_with('^') && !latex.starts_with('_'));
         // The `String` implementation agrees with the `&str` one.
-        assert_eq!(s.clone().to_latex().to_string(), latex);
+        assert_eq!(s.clone().to_latex_string(), latex);
         // A one-character string agrees with that character on its own.
         let mut cs = s.chars();
         if let (Some(c), None) = (cs.next(), cs.next()) {
-            assert_eq!(c.to_latex().to_string(), latex);
+            assert_eq!(c.to_latex_string(), latex);
         }
+    });
+}
+
+#[test]
+// The long form is the point of this test, which is that the short one agrees with it.
+#[cfg_attr(dylint_lib = "malachite_lints", expect(use_to_string_variant))]
+fn test_to_latex_string() {
+    // The convenience method is exactly the wrapper's `to_string`.
+    assert_eq!(123u32.to_latex_string(), 123u32.to_latex().to_string());
+    assert_eq!("100% α".to_latex_string(), "100% α".to_latex().to_string());
+    assert_eq!(().to_latex_string(), ().to_latex().to_string());
+    assert_eq!(
+        None::<u8>.to_latex_string(),
+        None::<u8>.to_latex().to_string()
+    );
+    assert_eq!(
+        vec![1u8, 2].to_latex_string(),
+        vec![1u8, 2].to_latex().to_string()
+    );
+    // and it agrees with what the fragments are
+    assert_eq!(123u32.to_latex_string(), "123");
+    assert_eq!("hello".to_latex_string(), r"\text{hello}");
+    assert_eq!(vec![1u8, 2].to_latex_string(), r"\left[1, 2\right]");
+}
+
+#[test]
+// As above: the two forms are compared, so both have to appear.
+#[cfg_attr(dylint_lib = "malachite_lints", expect(use_to_string_variant))]
+fn to_latex_string_properties() {
+    string_gen().test_properties(|s| {
+        assert_eq!(s.to_latex_string(), s.to_latex().to_string());
     });
 }

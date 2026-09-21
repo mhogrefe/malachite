@@ -20,20 +20,20 @@ fn test_option_to_typst() {
         assert_eq!(s, out);
         frags.push(s);
     };
-    test(None::<u8>.to_typst().to_string(), "bot");
-    test(None::<char>.to_typst().to_string(), "bot");
-    test(None::<&str>.to_typst().to_string(), "bot");
-    test(Some(0u8).to_typst().to_string(), "[0]");
-    test(Some(5u8).to_typst().to_string(), "[5]");
-    test(Some(-5i32).to_typst().to_string(), "[-5]");
-    test(Some('α').to_typst().to_string(), r#"["α"]"#);
-    test(Some("hi").to_typst().to_string(), r#"["hi"]"#);
-    test(Some(true).to_typst().to_string(), r#"["T"]"#);
-    test(Some(()).to_typst().to_string(), "[()]");
+    test(None::<u8>.to_typst_string(), "bot");
+    test(None::<char>.to_typst_string(), "bot");
+    test(None::<&str>.to_typst_string(), "bot");
+    test(Some(0u8).to_typst_string(), "[0]");
+    test(Some(5u8).to_typst_string(), "[5]");
+    test(Some(-5i32).to_typst_string(), "[-5]");
+    test(Some('α').to_typst_string(), r#"["α"]"#);
+    test(Some("hi").to_typst_string(), r#"["hi"]"#);
+    test(Some(true).to_typst_string(), r#"["T"]"#);
+    test(Some(()).to_typst_string(), "[()]");
     // nesting
-    test(Some(None::<u8>).to_typst().to_string(), "[bot]");
-    test(Some(Some(5u8)).to_typst().to_string(), "[[5]]");
-    test(Some(Some(None::<u8>)).to_typst().to_string(), "[[bot]]");
+    test(Some(None::<u8>).to_typst_string(), "[bot]");
+    test(Some(Some(5u8)).to_typst_string(), "[[5]]");
+    test(Some(Some(None::<u8>)).to_typst_string(), "[[bot]]");
     assert_typst_compiles(&frags);
 }
 
@@ -42,10 +42,10 @@ fn test_option_to_typst_is_injective_over_nesting() {
     // The brackets exist so that distinct `Option`s never share a fragment. Without them every one
     // of these would collapse onto the same string.
     let fragments = [
-        None::<Option<Option<u8>>>.to_typst().to_string(),
-        Some(None::<Option<u8>>).to_typst().to_string(),
-        Some(Some(None::<u8>)).to_typst().to_string(),
-        Some(Some(Some(0u8))).to_typst().to_string(),
+        None::<Option<Option<u8>>>.to_typst_string(),
+        Some(None::<Option<u8>>).to_typst_string(),
+        Some(Some(None::<u8>)).to_typst_string(),
+        Some(Some(Some(0u8))).to_typst_string(),
     ];
     assert_eq!(fragments.iter().unique().count(), fragments.len());
 }
@@ -54,7 +54,7 @@ fn test_option_to_typst_is_injective_over_nesting() {
 fn option_to_typst_properties() {
     let mut frags = Vec::new();
     option_unsigned_gen::<u8>().test_properties(|o| {
-        let s = o.to_typst().to_string();
+        let s = o.to_typst_string();
         assert!(!s.is_empty());
         assert_strings_closed(&s);
         assert_delimiters_balanced(&s);

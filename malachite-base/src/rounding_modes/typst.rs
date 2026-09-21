@@ -24,12 +24,12 @@ impl ToTypst for RoundingMode {
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_base::strings::typst::ToTypst;
     ///
-    /// assert_eq!(Down.to_typst().to_string(), r#""DOWN""#);
-    /// assert_eq!(Up.to_typst().to_string(), r#""UP""#);
-    /// assert_eq!(Floor.to_typst().to_string(), r#""FLOOR""#);
-    /// assert_eq!(Ceiling.to_typst().to_string(), r#""CEILING""#);
-    /// assert_eq!(Nearest.to_typst().to_string(), r#""NEAREST""#);
-    /// assert_eq!(Exact.to_typst().to_string(), r#""EXACT""#);
+    /// assert_eq!(Down.to_typst_string(), r#""DOWN""#);
+    /// assert_eq!(Up.to_typst_string(), r#""UP""#);
+    /// assert_eq!(Floor.to_typst_string(), r#""FLOOR""#);
+    /// assert_eq!(Ceiling.to_typst_string(), r#""CEILING""#);
+    /// assert_eq!(Nearest.to_typst_string(), r#""NEAREST""#);
+    /// assert_eq!(Exact.to_typst_string(), r#""EXACT""#);
     /// ```
     ///
     /// | value     | fragment    |

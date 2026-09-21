@@ -22,8 +22,8 @@ impl ToTypst for bool {
     /// ```
     /// use malachite_base::strings::typst::ToTypst;
     ///
-    /// assert_eq!(true.to_typst().to_string(), r#""T""#);
-    /// assert_eq!(false.to_typst().to_string(), r#""F""#);
+    /// assert_eq!(true.to_typst_string(), r#""T""#);
+    /// assert_eq!(false.to_typst_string(), r#""F""#);
     /// ```
     ///
     /// | value   | fragment |

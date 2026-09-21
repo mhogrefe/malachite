@@ -61,10 +61,10 @@ impl<K: ToTypst, V: ToTypst> ToTypst for BTreeMap<K, V> {
     /// use std::collections::BTreeMap;
     ///
     /// let empty = BTreeMap::<u8, u8>::new();
-    /// assert_eq!(empty.to_typst().to_string(), "{}");
+    /// assert_eq!(empty.to_typst_string(), "{}");
     ///
     /// let m = BTreeMap::from([(2u8, 20u8), (1, 10)]);
-    /// assert_eq!(m.to_typst().to_string(), "{1 |-> 10, 2 |-> 20}");
+    /// assert_eq!(m.to_typst_string(), "{1 |-> 10, 2 |-> 20}");
     /// ```
     ///
     /// | value                                    | fragment                 |
@@ -108,11 +108,11 @@ impl<K: Eq + Hash + Ord + ToTypst, V: ToTypst> ToTypst for HashMap<K, V> {
     /// use std::collections::HashMap;
     ///
     /// let empty = HashMap::<u8, u8>::new();
-    /// assert_eq!(empty.to_typst().to_string(), "{}");
+    /// assert_eq!(empty.to_typst_string(), "{}");
     ///
     /// // The entries are sorted by key, so the fragment does not depend on the hasher.
     /// let m = HashMap::from([(2u8, 20u8), (1, 10)]);
-    /// assert_eq!(m.to_typst().to_string(), "{1 |-> 10, 2 |-> 20}");
+    /// assert_eq!(m.to_typst_string(), "{1 |-> 10, 2 |-> 20}");
     /// ```
     ///
     /// | value                                   | fragment                 |

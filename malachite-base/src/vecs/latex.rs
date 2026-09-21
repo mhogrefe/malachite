@@ -28,14 +28,11 @@ impl<T: ToLatex> ToLatex for Vec<T> {
     /// ```
     /// use malachite_base::strings::latex::ToLatex;
     ///
-    /// assert_eq!(Vec::<u8>::new().to_latex().to_string(), r"\left[\right]");
-    /// assert_eq!(vec![5u8].to_latex().to_string(), r"\left[5\right]");
+    /// assert_eq!(Vec::<u8>::new().to_latex_string(), r"\left[\right]");
+    /// assert_eq!(vec![5u8].to_latex_string(), r"\left[5\right]");
+    /// assert_eq!(vec![1u8, 2, 3].to_latex_string(), r"\left[1, 2, 3\right]");
     /// assert_eq!(
-    ///     vec![1u8, 2, 3].to_latex().to_string(),
-    ///     r"\left[1, 2, 3\right]"
-    /// );
-    /// assert_eq!(
-    ///     vec![vec![1u8], vec![2, 3]].to_latex().to_string(),
+    ///     vec![vec![1u8], vec![2, 3]].to_latex_string(),
     ///     r"\left[\left[1\right], \left[2, 3\right]\right]"
     /// );
     /// ```

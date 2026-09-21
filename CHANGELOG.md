@@ -54,6 +54,13 @@ documented by git history.
   `\left[5\right]`, Typst writes `"NaN"`, `infinity`, `bot`, and `[5]`, the last of which Typst
   grows to fit its contents without being asked. Every fragment the tests produce is compiled by
   Typst itself, so a fragment Typst would reject cannot pass.
+- `ToLatex::to_latex_string` and `ToTypst::to_typst_string`, which give the fragment as a `String`
+  in one call rather than as a wrapper to be turned into one. A new `use_to_string_variant` lint
+  prefers them, and the rest of the `to_*_string` family, over the long ways of saying the same
+  thing: a `to_latex` or `to_typst` wrapper immediately turned into a `String`, and a `format!`
+  whose whole format string is a single `{:?}`, `{:b}`, `{:o}`, `{:x}`, or `{:X}`. A method's own
+  definition is left alone, since `to_binary_string` is written with `format!("{self:b}")` and
+  cannot be asked to call itself.
 - `ToLatex` and `ToTypst` for `Never` and for `NiceFloat<T>`. A `Never` cannot be instantiated, so
   its implementations can never be called; they exist so that a type parameter bounded by either
   trait may be `Never`, which is what lets `Option<Never>` have a fragment. A `NiceFloat`'s fragment

@@ -321,13 +321,13 @@ pub mod tuples;
 /// let mut u: Union3<char, u32, bool>;
 ///
 /// u = Union3::A('a');
-/// assert_eq!(u.to_latex().to_string(), r"\text{A}\left(\text{a}\right)");
+/// assert_eq!(u.to_latex_string(), r"\text{A}\left(\text{a}\right)");
 ///
 /// u = Union3::B(5);
-/// assert_eq!(u.to_latex().to_string(), r"\text{B}\left(5\right)");
+/// assert_eq!(u.to_latex_string(), r"\text{B}\left(5\right)");
 ///
 /// u = Union3::C(false);
-/// assert_eq!(u.to_latex().to_string(), r"\text{C}\left(\text{F}\right)");
+/// assert_eq!(u.to_latex_string(), r"\text{C}\left(\text{F}\right)");
 /// ```
 ///
 /// | value              | fragment                        | renders as                      |
@@ -356,13 +356,13 @@ pub mod tuples;
 /// let mut u: Union3<char, u32, bool>;
 ///
 /// u = Union3::A('a');
-/// assert_eq!(u.to_typst().to_string(), r#""A"("a")"#);
+/// assert_eq!(u.to_typst_string(), r#""A"("a")"#);
 ///
 /// u = Union3::B(5);
-/// assert_eq!(u.to_typst().to_string(), r#""B"(5)"#);
+/// assert_eq!(u.to_typst_string(), r#""B"(5)"#);
 ///
 /// u = Union3::C(false);
-/// assert_eq!(u.to_typst().to_string(), r#""C"("F")"#);
+/// assert_eq!(u.to_typst_string(), r#""C"("F")"#);
 /// ```
 ///
 /// | value              | fragment   |

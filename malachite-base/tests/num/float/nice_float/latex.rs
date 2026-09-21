@@ -15,7 +15,7 @@ use malachite_base::test_util::generators::primitive_float_gen;
 #[test]
 pub fn test_nice_float_to_latex() {
     fn test<T: PrimitiveFloat + ToLatex>(x: T, out: &str) {
-        assert_eq!(NiceFloat(x).to_latex().to_string(), out);
+        assert_eq!(NiceFloat(x).to_latex_string(), out);
     }
     test(f64::NAN, r"\text{NaN}");
     test(f64::INFINITY, r"\infty");
@@ -32,15 +32,9 @@ pub fn test_nice_float_to_latex() {
 fn nice_float_to_latex_properties() {
     primitive_float_gen::<f64>().test_properties(|x| {
         // The wrapper adds nothing of its own.
-        assert_eq!(
-            NiceFloat(x).to_latex().to_string(),
-            x.to_latex().to_string()
-        );
+        assert_eq!(NiceFloat(x).to_latex_string(), x.to_latex_string());
     });
     primitive_float_gen::<f32>().test_properties(|x| {
-        assert_eq!(
-            NiceFloat(x).to_latex().to_string(),
-            x.to_latex().to_string()
-        );
+        assert_eq!(NiceFloat(x).to_latex_string(), x.to_latex_string());
     });
 }

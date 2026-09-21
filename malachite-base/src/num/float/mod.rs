@@ -446,12 +446,10 @@ impl<T: PrimitiveFloat + ToLatex> ToLatex for NiceFloat<T> {
     /// use malachite_base::num::float::NiceFloat;
     /// use malachite_base::strings::latex::ToLatex;
     ///
-    /// assert_eq!(NiceFloat(1.0f64).to_latex().to_string(), "1.0");
-    /// assert_eq!(NiceFloat(f64::NAN).to_latex().to_string(), r"\text{NaN}");
+    /// assert_eq!(NiceFloat(1.0f64).to_latex_string(), "1.0");
+    /// assert_eq!(NiceFloat(f64::NAN).to_latex_string(), r"\text{NaN}");
     /// assert_eq!(
-    ///     NiceFloat(f32::MIN_POSITIVE_SUBNORMAL)
-    ///         .to_latex()
-    ///         .to_string(),
+    ///     NiceFloat(f32::MIN_POSITIVE_SUBNORMAL).to_latex_string(),
     ///     r"1.0 \times 10^{-45}"
     /// );
     /// ```
@@ -477,12 +475,10 @@ impl<T: PrimitiveFloat + ToTypst> ToTypst for NiceFloat<T> {
     /// use malachite_base::num::float::NiceFloat;
     /// use malachite_base::strings::typst::ToTypst;
     ///
-    /// assert_eq!(NiceFloat(1.0f64).to_typst().to_string(), "1.0");
-    /// assert_eq!(NiceFloat(f64::NAN).to_typst().to_string(), r#""NaN""#);
+    /// assert_eq!(NiceFloat(1.0f64).to_typst_string(), "1.0");
+    /// assert_eq!(NiceFloat(f64::NAN).to_typst_string(), r#""NaN""#);
     /// assert_eq!(
-    ///     NiceFloat(f32::MIN_POSITIVE_SUBNORMAL)
-    ///         .to_typst()
-    ///         .to_string(),
+    ///     NiceFloat(f32::MIN_POSITIVE_SUBNORMAL).to_typst_string(),
     ///     "1.0 times 10^(-45)"
     /// );
     /// ```

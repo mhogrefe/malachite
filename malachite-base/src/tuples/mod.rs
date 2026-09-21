@@ -597,26 +597,24 @@ pub mod exhaustive;
 /// ```
 /// use malachite_base::strings::latex::ToLatex;
 ///
-/// assert_eq!((1u8,).to_latex().to_string(), r"\left(1\right)");
-/// assert_eq!((1u8, 2u8).to_latex().to_string(), r"\left(1, 2\right)");
+/// assert_eq!((1u8,).to_latex_string(), r"\left(1\right)");
+/// assert_eq!((1u8, 2u8).to_latex_string(), r"\left(1, 2\right)");
 ///
 /// // the elements need not have the same type, and each writes its own fragment
 /// assert_eq!(
-///     ('α', "hi", true).to_latex().to_string(),
+///     ('α', "hi", true).to_latex_string(),
 ///     r"\left(\alpha, \text{hi}, \text{T}\right)"
 /// );
 ///
 /// // tuples nest
 /// assert_eq!(
-///     ((1u8, 2u8), 3u8).to_latex().to_string(),
+///     ((1u8, 2u8), 3u8).to_latex_string(),
 ///     r"\left(\left(1, 2\right), 3\right)"
 /// );
 ///
 /// // up to eight elements
 /// assert_eq!(
-///     (1u8, 2u8, 3u8, 4u8, 5u8, 6u8, 7u8, 8u8)
-///         .to_latex()
-///         .to_string(),
+///     (1u8, 2u8, 3u8, 4u8, 5u8, 6u8, 7u8, 8u8).to_latex_string(),
 ///     r"\left(1, 2, 3, 4, 5, 6, 7, 8\right)"
 /// );
 /// ```
@@ -874,23 +872,18 @@ pub mod random;
 /// ```
 /// use malachite_base::strings::typst::ToTypst;
 ///
-/// assert_eq!((1u8,).to_typst().to_string(), "(1)");
-/// assert_eq!((1u8, 2u8).to_typst().to_string(), "(1, 2)");
+/// assert_eq!((1u8,).to_typst_string(), "(1)");
+/// assert_eq!((1u8, 2u8).to_typst_string(), "(1, 2)");
 ///
 /// // the elements need not have the same type, and each writes its own fragment
-/// assert_eq!(
-///     ('α', "hi", true).to_typst().to_string(),
-///     r#"("α", "hi", "T")"#
-/// );
+/// assert_eq!(('α', "hi", true).to_typst_string(), r#"("α", "hi", "T")"#);
 ///
 /// // tuples nest
-/// assert_eq!(((1u8, 2u8), 3u8).to_typst().to_string(), "((1, 2), 3)");
+/// assert_eq!(((1u8, 2u8), 3u8).to_typst_string(), "((1, 2), 3)");
 ///
 /// // up to eight elements
 /// assert_eq!(
-///     (1u8, 2u8, 3u8, 4u8, 5u8, 6u8, 7u8, 8u8)
-///         .to_typst()
-///         .to_string(),
+///     (1u8, 2u8, 3u8, 4u8, 5u8, 6u8, 7u8, 8u8).to_typst_string(),
 ///     "(1, 2, 3, 4, 5, 6, 7, 8)"
 /// );
 /// ```

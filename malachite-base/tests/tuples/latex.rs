@@ -14,38 +14,33 @@ use malachite_base::tuples::latex::latex_tuple;
 #[test]
 fn test_to_latex() {
     // The unit type has one value, so this assertion covers the whole domain.
-    assert_eq!(().to_latex().to_string(), "()");
+    assert_eq!(().to_latex_string(), "()");
 }
 
 #[test]
 fn test_tuple_to_latex() {
-    assert_eq!((1u8,).to_latex().to_string(), r"\left(1\right)");
-    assert_eq!((1u8, 2u8).to_latex().to_string(), r"\left(1, 2\right)");
-    assert_eq!(
-        (1u8, 2u8, 3u8).to_latex().to_string(),
-        r"\left(1, 2, 3\right)"
-    );
+    assert_eq!((1u8,).to_latex_string(), r"\left(1\right)");
+    assert_eq!((1u8, 2u8).to_latex_string(), r"\left(1, 2\right)");
+    assert_eq!((1u8, 2u8, 3u8).to_latex_string(), r"\left(1, 2, 3\right)");
     // every arity up to eight, which is as far as the implementations go
     assert_eq!(
-        (1u8, 2u8, 3u8, 4u8).to_latex().to_string(),
+        (1u8, 2u8, 3u8, 4u8).to_latex_string(),
         r"\left(1, 2, 3, 4\right)"
     );
     assert_eq!(
-        (1u8, 2u8, 3u8, 4u8, 5u8).to_latex().to_string(),
+        (1u8, 2u8, 3u8, 4u8, 5u8).to_latex_string(),
         r"\left(1, 2, 3, 4, 5\right)"
     );
     assert_eq!(
-        (1u8, 2u8, 3u8, 4u8, 5u8, 6u8).to_latex().to_string(),
+        (1u8, 2u8, 3u8, 4u8, 5u8, 6u8).to_latex_string(),
         r"\left(1, 2, 3, 4, 5, 6\right)"
     );
     assert_eq!(
-        (1u8, 2u8, 3u8, 4u8, 5u8, 6u8, 7u8).to_latex().to_string(),
+        (1u8, 2u8, 3u8, 4u8, 5u8, 6u8, 7u8).to_latex_string(),
         r"\left(1, 2, 3, 4, 5, 6, 7\right)"
     );
     assert_eq!(
-        (1u8, 2u8, 3u8, 4u8, 5u8, 6u8, 7u8, 8u8)
-            .to_latex()
-            .to_string(),
+        (1u8, 2u8, 3u8, 4u8, 5u8, 6u8, 7u8, 8u8).to_latex_string(),
         r"\left(1, 2, 3, 4, 5, 6, 7, 8\right)"
     );
 }
@@ -54,20 +49,20 @@ fn test_tuple_to_latex() {
 fn test_tuple_to_latex_element_types() {
     // The elements need not have the same type, and each writes its own fragment.
     assert_eq!(
-        ('α', "hi", true).to_latex().to_string(),
+        ('α', "hi", true).to_latex_string(),
         r"\left(\alpha, \text{hi}, \text{T}\right)"
     );
     assert_eq!(
-        (None::<u8>, Some(1u8), ()).to_latex().to_string(),
+        (None::<u8>, Some(1u8), ()).to_latex_string(),
         r"\left(\bot, \left[1\right], ()\right)"
     );
     // tuples nest, and hold the other collections
     assert_eq!(
-        ((1u8, 2u8), 3u8).to_latex().to_string(),
+        ((1u8, 2u8), 3u8).to_latex_string(),
         r"\left(\left(1, 2\right), 3\right)"
     );
     assert_eq!(
-        (vec![1u8, 2], (3u8,)).to_latex().to_string(),
+        (vec![1u8, 2], (3u8,)).to_latex_string(),
         r"\left(\left[1, 2\right], \left(3\right)\right)"
     );
 }
@@ -77,13 +72,13 @@ fn test_tuple_to_latex_is_injective() {
     // Distinct tuples never share a fragment, and a tuple is never confused with a nesting of
     // shorter ones or with a sequence.
     let fragments = [
-        (1u8, 2u8).to_latex().to_string(),
-        (1u8, 2u8, 3u8).to_latex().to_string(),
-        ((1u8, 2u8), 3u8).to_latex().to_string(),
-        (1u8, (2u8, 3u8)).to_latex().to_string(),
-        (1u8,).to_latex().to_string(),
-        vec![1u8, 2].to_latex().to_string(),
-        ().to_latex().to_string(),
+        (1u8, 2u8).to_latex_string(),
+        (1u8, 2u8, 3u8).to_latex_string(),
+        ((1u8, 2u8), 3u8).to_latex_string(),
+        (1u8, (2u8, 3u8)).to_latex_string(),
+        (1u8,).to_latex_string(),
+        vec![1u8, 2].to_latex_string(),
+        ().to_latex_string(),
     ];
     assert_eq!(fragments.iter().unique().count(), fragments.len());
 }
@@ -91,13 +86,11 @@ fn test_tuple_to_latex_is_injective() {
 #[test]
 fn test_latex_tuple_macro() {
     // The macro agrees with the implementation for every arity that has one.
-    assert_eq!(latex_tuple!(1u8), (1u8,).to_latex().to_string());
-    assert_eq!(latex_tuple!(1u8, 2u8), (1u8, 2u8).to_latex().to_string());
+    assert_eq!(latex_tuple!(1u8), (1u8,).to_latex_string());
+    assert_eq!(latex_tuple!(1u8, 2u8), (1u8, 2u8).to_latex_string());
     assert_eq!(
         latex_tuple!(1u8, 2u8, 3u8, 4u8, 5u8, 6u8, 7u8, 8u8),
-        (1u8, 2u8, 3u8, 4u8, 5u8, 6u8, 7u8, 8u8)
-            .to_latex()
-            .to_string()
+        (1u8, 2u8, 3u8, 4u8, 5u8, 6u8, 7u8, 8u8).to_latex_string()
     );
     // and carries on past eight, where the orphan rule stops an outside crate
     assert_eq!(

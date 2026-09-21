@@ -52,10 +52,10 @@ pub mod from_string;
 /// ```
 /// use malachite_base::strings::latex::ToLatex;
 ///
-/// assert_eq!(0u8.to_latex().to_string(), "0");
-/// assert_eq!(123u32.to_latex().to_string(), "123");
-/// assert_eq!((-45i16).to_latex().to_string(), "-45");
-/// assert_eq!(i64::MIN.to_latex().to_string(), "-9223372036854775808");
+/// assert_eq!(0u8.to_latex_string(), "0");
+/// assert_eq!(123u32.to_latex_string(), "123");
+/// assert_eq!((-45i16).to_latex_string(), "-45");
+/// assert_eq!(i64::MIN.to_latex_string(), "-9223372036854775808");
 /// ```
 ///
 /// | value      | fragment               | renders as             |
@@ -70,17 +70,17 @@ pub mod from_string;
 /// use malachite_base::num::basic::traits::NegativeInfinity;
 /// use malachite_base::strings::latex::ToLatex;
 ///
-/// assert_eq!(f64::NAN.to_latex().to_string(), r"\text{NaN}");
-/// assert_eq!(f64::INFINITY.to_latex().to_string(), r"\infty");
-/// assert_eq!(f64::NEGATIVE_INFINITY.to_latex().to_string(), r"-\infty");
-/// assert_eq!(0.0f64.to_latex().to_string(), "0.0");
-/// assert_eq!((-0.0f64).to_latex().to_string(), "-0.0");
+/// assert_eq!(f64::NAN.to_latex_string(), r"\text{NaN}");
+/// assert_eq!(f64::INFINITY.to_latex_string(), r"\infty");
+/// assert_eq!(f64::NEGATIVE_INFINITY.to_latex_string(), r"-\infty");
+/// assert_eq!(0.0f64.to_latex_string(), "0.0");
+/// assert_eq!((-0.0f64).to_latex_string(), "-0.0");
 ///
-/// assert_eq!(1.0f64.to_latex().to_string(), "1.0");
-/// assert_eq!(0.00123f64.to_latex().to_string(), "0.00123");
-/// assert_eq!(1.0e16f64.to_latex().to_string(), r"1.0 \times 10^{16}");
+/// assert_eq!(1.0f64.to_latex_string(), "1.0");
+/// assert_eq!(0.00123f64.to_latex_string(), "0.00123");
+/// assert_eq!(1.0e16f64.to_latex_string(), r"1.0 \times 10^{16}");
 /// assert_eq!(
-///     f32::MIN_POSITIVE_SUBNORMAL.to_latex().to_string(),
+///     f32::MIN_POSITIVE_SUBNORMAL.to_latex_string(),
 ///     r"1.0 \times 10^{-45}"
 /// );
 /// ```
@@ -255,10 +255,10 @@ pub mod to_string;
 /// ```
 /// use malachite_base::strings::typst::ToTypst;
 ///
-/// assert_eq!(0u8.to_typst().to_string(), "0");
-/// assert_eq!(123u32.to_typst().to_string(), "123");
-/// assert_eq!((-45i16).to_typst().to_string(), "-45");
-/// assert_eq!(i64::MIN.to_typst().to_string(), "-9223372036854775808");
+/// assert_eq!(0u8.to_typst_string(), "0");
+/// assert_eq!(123u32.to_typst_string(), "123");
+/// assert_eq!((-45i16).to_typst_string(), "-45");
+/// assert_eq!(i64::MIN.to_typst_string(), "-9223372036854775808");
 /// ```
 ///
 /// | value      | fragment               |
@@ -273,17 +273,17 @@ pub mod to_string;
 /// use malachite_base::num::basic::traits::NegativeInfinity;
 /// use malachite_base::strings::typst::ToTypst;
 ///
-/// assert_eq!(f64::NAN.to_typst().to_string(), r#""NaN""#);
-/// assert_eq!(f64::INFINITY.to_typst().to_string(), "infinity");
-/// assert_eq!(f64::NEGATIVE_INFINITY.to_typst().to_string(), "-infinity");
-/// assert_eq!(0.0f64.to_typst().to_string(), "0.0");
-/// assert_eq!((-0.0f64).to_typst().to_string(), "-0.0");
+/// assert_eq!(f64::NAN.to_typst_string(), r#""NaN""#);
+/// assert_eq!(f64::INFINITY.to_typst_string(), "infinity");
+/// assert_eq!(f64::NEGATIVE_INFINITY.to_typst_string(), "-infinity");
+/// assert_eq!(0.0f64.to_typst_string(), "0.0");
+/// assert_eq!((-0.0f64).to_typst_string(), "-0.0");
 ///
-/// assert_eq!(1.0f64.to_typst().to_string(), "1.0");
-/// assert_eq!(0.00123f64.to_typst().to_string(), "0.00123");
-/// assert_eq!(1.0e16f64.to_typst().to_string(), "1.0 times 10^(16)");
+/// assert_eq!(1.0f64.to_typst_string(), "1.0");
+/// assert_eq!(0.00123f64.to_typst_string(), "0.00123");
+/// assert_eq!(1.0e16f64.to_typst_string(), "1.0 times 10^(16)");
 /// assert_eq!(
-///     f32::MIN_POSITIVE_SUBNORMAL.to_typst().to_string(),
+///     f32::MIN_POSITIVE_SUBNORMAL.to_typst_string(),
 ///     "1.0 times 10^(-45)"
 /// );
 /// ```

@@ -23,9 +23,9 @@ impl ToTypst for Ordering {
     /// use malachite_base::strings::typst::ToTypst;
     /// use std::cmp::Ordering::*;
     ///
-    /// assert_eq!(Less.to_typst().to_string(), "<");
-    /// assert_eq!(Equal.to_typst().to_string(), "=");
-    /// assert_eq!(Greater.to_typst().to_string(), ">");
+    /// assert_eq!(Less.to_typst_string(), "<");
+    /// assert_eq!(Equal.to_typst_string(), "=");
+    /// assert_eq!(Greater.to_typst_string(), ">");
     /// ```
     ///
     /// | value     | fragment |

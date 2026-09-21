@@ -12,12 +12,12 @@ use std::cmp::Ordering::*;
 
 #[test]
 fn test_to_typst() {
-    assert_eq!(Less.to_typst().to_string(), "<");
-    assert_eq!(Equal.to_typst().to_string(), "=");
-    assert_eq!(Greater.to_typst().to_string(), ">");
+    assert_eq!(Less.to_typst_string(), "<");
+    assert_eq!(Equal.to_typst_string(), "=");
+    assert_eq!(Greater.to_typst_string(), ">");
     assert_typst_compiles(&[
-        Less.to_typst().to_string(),
-        Equal.to_typst().to_string(),
-        Greater.to_typst().to_string(),
+        Less.to_typst_string(),
+        Equal.to_typst_string(),
+        Greater.to_typst_string(),
     ]);
 }

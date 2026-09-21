@@ -56,13 +56,10 @@ impl<T: ToTypst> ToTypst for &[T] {
     /// ```
     /// use malachite_base::strings::typst::ToTypst;
     ///
-    /// assert_eq!([0u8; 0].as_slice().to_typst().to_string(), "[]");
-    /// assert_eq!([5u8].as_slice().to_typst().to_string(), "[5]");
-    /// assert_eq!([1u8, 2, 3].as_slice().to_typst().to_string(), "[1, 2, 3]");
-    /// assert_eq!(
-    ///     ["hi", "yo"].as_slice().to_typst().to_string(),
-    ///     r#"["hi", "yo"]"#
-    /// );
+    /// assert_eq!([0u8; 0].as_slice().to_typst_string(), "[]");
+    /// assert_eq!([5u8].as_slice().to_typst_string(), "[5]");
+    /// assert_eq!([1u8, 2, 3].as_slice().to_typst_string(), "[1, 2, 3]");
+    /// assert_eq!(["hi", "yo"].as_slice().to_typst_string(), r#"["hi", "yo"]"#);
     /// ```
     ///
     /// | value          | fragment       |
@@ -94,13 +91,10 @@ impl<T: ToTypst, const N: usize> ToTypst for [T; N] {
     /// ```
     /// use malachite_base::strings::typst::ToTypst;
     ///
-    /// assert_eq!([0u8; 0].to_typst().to_string(), "[]");
-    /// assert_eq!([5u8].to_typst().to_string(), "[5]");
-    /// assert_eq!([1u8, 2, 3].to_typst().to_string(), "[1, 2, 3]");
-    /// assert_eq!(
-    ///     [[1u8, 2], [3, 4]].to_typst().to_string(),
-    ///     "[[1, 2], [3, 4]]"
-    /// );
+    /// assert_eq!([0u8; 0].to_typst_string(), "[]");
+    /// assert_eq!([5u8].to_typst_string(), "[5]");
+    /// assert_eq!([1u8, 2, 3].to_typst_string(), "[1, 2, 3]");
+    /// assert_eq!([[1u8, 2], [3, 4]].to_typst_string(), "[[1, 2], [3, 4]]");
     /// ```
     ///
     /// | value                | fragment           |

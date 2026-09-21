@@ -27,13 +27,13 @@ impl<T: ToTypst> ToTypst for Option<T> {
     /// ```
     /// use malachite_base::strings::typst::ToTypst;
     ///
-    /// assert_eq!(None::<u8>.to_typst().to_string(), "bot");
-    /// assert_eq!(Some(5u8).to_typst().to_string(), "[5]");
-    /// assert_eq!(Some("hi").to_typst().to_string(), r#"["hi"]"#);
+    /// assert_eq!(None::<u8>.to_typst_string(), "bot");
+    /// assert_eq!(Some(5u8).to_typst_string(), "[5]");
+    /// assert_eq!(Some("hi").to_typst_string(), r#"["hi"]"#);
     ///
     /// // The brackets keep nested `Option`s apart.
-    /// assert_eq!(Some(None::<u8>).to_typst().to_string(), "[bot]");
-    /// assert_eq!(Some(Some(5u8)).to_typst().to_string(), "[[5]]");
+    /// assert_eq!(Some(None::<u8>).to_typst_string(), "[bot]");
+    /// assert_eq!(Some(Some(5u8)).to_typst_string(), "[[5]]");
     /// ```
     ///
     /// | value              | fragment  |

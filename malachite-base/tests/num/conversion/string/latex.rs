@@ -18,7 +18,7 @@ use std::str::FromStr;
 #[test]
 pub fn test_to_latex() {
     fn test_u<T: PrimitiveUnsigned + ToLatex>(x: T, out: &str) {
-        assert_eq!(x.to_latex().to_string(), out);
+        assert_eq!(x.to_latex_string(), out);
     }
     test_u::<u8>(0, "0");
     test_u::<u8>(5, "5");
@@ -28,7 +28,7 @@ pub fn test_to_latex() {
     test_u::<u128>(u128::MAX, "340282366920938463463374607431768211455");
 
     fn test_i<T: PrimitiveSigned + ToLatex>(x: T, out: &str) {
-        assert_eq!(x.to_latex().to_string(), out);
+        assert_eq!(x.to_latex_string(), out);
     }
     test_i::<i8>(0, "0");
     test_i::<i8>(-5, "-5");
@@ -46,7 +46,7 @@ pub fn test_to_latex_embedding() {
 
 fn to_latex_helper_unsigned<T: PrimitiveUnsigned + ToLatex>() {
     unsigned_gen::<T>().test_properties(|x| {
-        let s = x.to_latex().to_string();
+        let s = x.to_latex_string();
         // The defining contract for primitive integers: the fragment is the `Display` output.
         assert_eq!(s, x.to_string());
         // It is a bare fragment: no math-mode delimiters, and nothing needing escaping.
@@ -57,7 +57,7 @@ fn to_latex_helper_unsigned<T: PrimitiveUnsigned + ToLatex>() {
 
 fn to_latex_helper_signed<T: PrimitiveSigned + ToLatex>() {
     signed_gen::<T>().test_properties(|x| {
-        let s = x.to_latex().to_string();
+        let s = x.to_latex_string();
         assert_eq!(s, x.to_string());
         assert!(!s.is_empty());
         assert!(
@@ -79,7 +79,7 @@ fn to_latex_properties() {
 #[test]
 pub fn test_to_latex_primitive_float() {
     fn test<T: PrimitiveFloat + ToLatex>(x: T, out: &str) {
-        assert_eq!(x.to_latex().to_string(), out);
+        assert_eq!(x.to_latex_string(), out);
     }
     // specials
     test::<f64>(f64::NAN, r"\text{NaN}");
@@ -132,7 +132,7 @@ where
     NiceFloat<T>: FromStr,
 {
     primitive_float_gen::<T>().test_properties(|x| {
-        let s = x.to_latex().to_string();
+        let s = x.to_latex_string();
         assert!(!s.is_empty());
         assert_eq!(s.matches('{').count(), s.matches('}').count());
         if x.is_nan() {

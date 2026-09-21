@@ -60,11 +60,11 @@ impl<K: ToLatex, V: ToLatex> ToLatex for BTreeMap<K, V> {
     /// use std::collections::BTreeMap;
     ///
     /// let empty = BTreeMap::<u8, u8>::new();
-    /// assert_eq!(empty.to_latex().to_string(), r"\left\{\right\}");
+    /// assert_eq!(empty.to_latex_string(), r"\left\{\right\}");
     ///
     /// let m = BTreeMap::from([(2u8, 20u8), (1, 10)]);
     /// assert_eq!(
-    ///     m.to_latex().to_string(),
+    ///     m.to_latex_string(),
     ///     r"\left\{1 \mapsto 10, 2 \mapsto 20\right\}"
     /// );
     /// ```
@@ -110,12 +110,12 @@ impl<K: Eq + Hash + Ord + ToLatex, V: ToLatex> ToLatex for HashMap<K, V> {
     /// use std::collections::HashMap;
     ///
     /// let empty = HashMap::<u8, u8>::new();
-    /// assert_eq!(empty.to_latex().to_string(), r"\left\{\right\}");
+    /// assert_eq!(empty.to_latex_string(), r"\left\{\right\}");
     ///
     /// // The entries are sorted by key, so the fragment does not depend on the hasher.
     /// let m = HashMap::from([(2u8, 20u8), (1, 10)]);
     /// assert_eq!(
-    ///     m.to_latex().to_string(),
+    ///     m.to_latex_string(),
     ///     r"\left\{1 \mapsto 10, 2 \mapsto 20\right\}"
     /// );
     /// ```

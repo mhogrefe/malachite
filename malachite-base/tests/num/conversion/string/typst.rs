@@ -18,7 +18,7 @@ use malachite_base::test_util::generators::{primitive_float_gen, signed_gen, uns
 pub fn test_to_typst() {
     let mut frags = Vec::new();
     fn test_u<T: PrimitiveUnsigned + ToTypst>(x: T, out: &str, frags: &mut Vec<String>) {
-        assert_eq!(x.to_typst().to_string(), out);
+        assert_eq!(x.to_typst_string(), out);
         frags.push(out.to_string());
     }
     test_u::<u8>(0, "0", &mut frags);
@@ -33,7 +33,7 @@ pub fn test_to_typst() {
     );
 
     fn test_i<T: PrimitiveSigned + ToTypst>(x: T, out: &str, frags: &mut Vec<String>) {
-        assert_eq!(x.to_typst().to_string(), out);
+        assert_eq!(x.to_typst_string(), out);
         frags.push(out.to_string());
     }
     test_i::<i8>(0, "0", &mut frags);
@@ -55,21 +55,21 @@ pub fn test_to_typst_primitive_float() {
         assert_eq!(s, out);
         frags.push(s);
     };
-    test(f64::NAN.to_typst().to_string(), r#""NaN""#);
-    test(f64::INFINITY.to_typst().to_string(), "infinity");
-    test(f64::NEGATIVE_INFINITY.to_typst().to_string(), "-infinity");
-    test(0.0f64.to_typst().to_string(), "0.0");
-    test((-0.0f64).to_typst().to_string(), "-0.0");
-    test(1.0f64.to_typst().to_string(), "1.0");
-    test((-1.0f64).to_typst().to_string(), "-1.0");
-    test(0.00123f64.to_typst().to_string(), "0.00123");
-    test(1.0e16f64.to_typst().to_string(), "1.0 times 10^(16)");
+    test(f64::NAN.to_typst_string(), r#""NaN""#);
+    test(f64::INFINITY.to_typst_string(), "infinity");
+    test(f64::NEGATIVE_INFINITY.to_typst_string(), "-infinity");
+    test(0.0f64.to_typst_string(), "0.0");
+    test((-0.0f64).to_typst_string(), "-0.0");
+    test(1.0f64.to_typst_string(), "1.0");
+    test((-1.0f64).to_typst_string(), "-1.0");
+    test(0.00123f64.to_typst_string(), "0.00123");
+    test(1.0e16f64.to_typst_string(), "1.0 times 10^(16)");
     test(
-        f32::MIN_POSITIVE_SUBNORMAL.to_typst().to_string(),
+        f32::MIN_POSITIVE_SUBNORMAL.to_typst_string(),
         "1.0 times 10^(-45)",
     );
     test(
-        f64::MAX.to_typst().to_string(),
+        f64::MAX.to_typst_string(),
         "1.7976931348623157 times 10^(308)",
     );
     assert_typst_compiles(&frags);
@@ -86,12 +86,12 @@ pub fn test_to_typst_embedding() {
 fn to_typst_properties() {
     let mut frags = Vec::new();
     unsigned_gen::<u64>().test_properties(|x| {
-        let s = x.to_typst().to_string();
+        let s = x.to_typst_string();
         assert_eq!(s, x.to_string());
         frags.push(s);
     });
     signed_gen::<i64>().test_properties(|x| {
-        let s = x.to_typst().to_string();
+        let s = x.to_typst_string();
         assert_eq!(s, x.to_string());
         frags.push(s);
     });
@@ -102,7 +102,7 @@ fn to_typst_properties() {
 fn to_typst_primitive_float_properties() {
     let mut frags = Vec::new();
     primitive_float_gen::<f64>().test_properties(|x| {
-        let s = x.to_typst().to_string();
+        let s = x.to_typst_string();
         assert!(!s.is_empty());
         // No bare exponent marker survives; it has all become ` times 10^(...)`. (A plain
         // `contains('e')` would not do: `times` has an `e` of its own. Ryu's marker is always

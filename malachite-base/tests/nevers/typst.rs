@@ -14,11 +14,11 @@ use malachite_base::strings::typst::ToTypst;
 // holds one without having one, which is what it is for.
 #[test]
 fn test_never_to_typst() {
-    assert_eq!(None::<Never>.to_typst().to_string(), "bot");
-    assert_eq!(None::<Option<Never>>.to_typst().to_string(), "bot");
-    assert_eq!(Some(None::<Never>).to_typst().to_string(), "[bot]");
+    assert_eq!(None::<Never>.to_typst_string(), "bot");
+    assert_eq!(None::<Option<Never>>.to_typst_string(), "bot");
+    assert_eq!(Some(None::<Never>).to_typst_string(), "[bot]");
     assert_typst_compiles(&[
-        None::<Never>.to_typst().to_string(),
-        Some(None::<Never>).to_typst().to_string(),
+        None::<Never>.to_typst_string(),
+        Some(None::<Never>).to_typst_string(),
     ]);
 }

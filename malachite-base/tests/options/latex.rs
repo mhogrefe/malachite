@@ -16,27 +16,24 @@ use malachite_base::test_util::generators::option_unsigned_gen;
 
 #[test]
 fn test_option_to_latex() {
-    assert_eq!(None::<u8>.to_latex().to_string(), r"\bot");
-    assert_eq!(None::<char>.to_latex().to_string(), r"\bot");
-    assert_eq!(None::<&str>.to_latex().to_string(), r"\bot");
-    assert_eq!(Some(0u8).to_latex().to_string(), r"\left[0\right]");
-    assert_eq!(Some(5u8).to_latex().to_string(), r"\left[5\right]");
-    assert_eq!(Some(-5i32).to_latex().to_string(), r"\left[-5\right]");
-    assert_eq!(Some('α').to_latex().to_string(), r"\left[\alpha\right]");
-    assert_eq!(Some("hi").to_latex().to_string(), r"\left[\text{hi}\right]");
-    assert_eq!(Some(true).to_latex().to_string(), r"\left[\text{T}\right]");
-    assert_eq!(Some(()).to_latex().to_string(), r"\left[()\right]");
+    assert_eq!(None::<u8>.to_latex_string(), r"\bot");
+    assert_eq!(None::<char>.to_latex_string(), r"\bot");
+    assert_eq!(None::<&str>.to_latex_string(), r"\bot");
+    assert_eq!(Some(0u8).to_latex_string(), r"\left[0\right]");
+    assert_eq!(Some(5u8).to_latex_string(), r"\left[5\right]");
+    assert_eq!(Some(-5i32).to_latex_string(), r"\left[-5\right]");
+    assert_eq!(Some('α').to_latex_string(), r"\left[\alpha\right]");
+    assert_eq!(Some("hi").to_latex_string(), r"\left[\text{hi}\right]");
+    assert_eq!(Some(true).to_latex_string(), r"\left[\text{T}\right]");
+    assert_eq!(Some(()).to_latex_string(), r"\left[()\right]");
     // nesting
+    assert_eq!(Some(None::<u8>).to_latex_string(), r"\left[\bot\right]");
     assert_eq!(
-        Some(None::<u8>).to_latex().to_string(),
-        r"\left[\bot\right]"
-    );
-    assert_eq!(
-        Some(Some(5u8)).to_latex().to_string(),
+        Some(Some(5u8)).to_latex_string(),
         r"\left[\left[5\right]\right]"
     );
     assert_eq!(
-        Some(Some(None::<u8>)).to_latex().to_string(),
+        Some(Some(None::<u8>)).to_latex_string(),
         r"\left[\left[\bot\right]\right]"
     );
 }
@@ -46,10 +43,10 @@ fn test_option_to_latex_is_injective_over_nesting() {
     // The brackets exist so that distinct `Option`s never share a fragment. Without them every one
     // of these would collapse onto the same string.
     let fragments = [
-        None::<Option<Option<u8>>>.to_latex().to_string(),
-        Some(None::<Option<u8>>).to_latex().to_string(),
-        Some(Some(None::<u8>)).to_latex().to_string(),
-        Some(Some(Some(0u8))).to_latex().to_string(),
+        None::<Option<Option<u8>>>.to_latex_string(),
+        Some(None::<Option<u8>>).to_latex_string(),
+        Some(Some(None::<u8>)).to_latex_string(),
+        Some(Some(Some(0u8))).to_latex_string(),
     ];
     assert_eq!(fragments.iter().unique().count(), fragments.len());
 }
@@ -57,11 +54,11 @@ fn test_option_to_latex_is_injective_over_nesting() {
 // Every fragment is either `\bot` or a `\left[...\right]`-bracketed copy of the inner value's
 // fragment.
 fn check<T: ToLatex>(o: &Option<T>) {
-    let s = o.to_latex().to_string();
+    let s = o.to_latex_string();
     match o {
         None => assert_eq!(s, r"\bot"),
         Some(x) => {
-            let inner = x.to_latex().to_string();
+            let inner = x.to_latex_string();
             assert_eq!(s, format!("\\left[{inner}\\right]"));
             assert_ne!(s, inner);
             assert_ne!(s, r"\bot");

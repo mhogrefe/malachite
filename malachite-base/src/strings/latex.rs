@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::chars::latex::fmt_latex_chars;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 use core::fmt::{Display, Formatter, Result};
 
 /// Converts a value to a LaTeX math-mode fragment.
@@ -60,8 +60,8 @@ pub trait ToLatex {
     /// ```
     /// use malachite_base::strings::latex::ToLatex;
     ///
-    /// assert_eq!(123u32.to_latex().to_string(), "123");
-    /// assert_eq!((-45i16).to_latex().to_string(), "-45");
+    /// assert_eq!(123u32.to_latex_string(), "123");
+    /// assert_eq!((-45i16).to_latex_string(), "-45");
     ///
     /// // The output is a fragment, so it can be embedded in a larger expression.
     /// assert_eq!(format!("x^{{{}}}", 10u8.to_latex()), "x^{10}");
@@ -73,6 +73,30 @@ pub trait ToLatex {
         Self: Sized,
     {
         LatexWrapper { x: self }
+    }
+
+    /// Converts a value to a LaTeX math-mode fragment, as a [`String`].
+    ///
+    /// This is `to_latex().to_string()`, which is what a caller who wants the fragment itself,
+    /// rather than something to write into a [`Formatter`], would otherwise have to say.
+    ///
+    /// # Worst-case complexity
+    /// Same as the time and additional memory complexity of `fmt_latex` for `Self`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::strings::latex::ToLatex;
+    ///
+    /// assert_eq!(123u32.to_latex_string(), "123");
+    /// assert_eq!((-45i16).to_latex_string(), "-45");
+    /// assert_eq!("100% α".to_latex_string(), r"\text{100\% }\alpha");
+    /// ```
+    #[inline]
+    fn to_latex_string(&self) -> String
+    where
+        Self: Sized,
+    {
+        self.to_latex().to_string()
     }
 }
 
@@ -117,13 +141,13 @@ impl ToLatex for &str {
     /// ```
     /// use malachite_base::strings::latex::ToLatex;
     ///
-    /// assert_eq!("hello".to_latex().to_string(), r"\text{hello}");
-    /// assert_eq!("100%".to_latex().to_string(), r"\text{100\%}");
-    /// assert_eq!("100% α".to_latex().to_string(), r"\text{100\% }\alpha");
-    /// assert_eq!("A ≤ B".to_latex().to_string(), r"\text{A }\leq\text{ B}");
-    /// assert_eq!("--flag".to_latex().to_string(), r"\text{-{}-flag}");
-    /// assert_eq!("2¹⁰".to_latex().to_string(), r"\text{2}^{10}");
-    /// assert_eq!("H₂O".to_latex().to_string(), r"\text{H}_2\text{O}");
+    /// assert_eq!("hello".to_latex_string(), r"\text{hello}");
+    /// assert_eq!("100%".to_latex_string(), r"\text{100\%}");
+    /// assert_eq!("100% α".to_latex_string(), r"\text{100\% }\alpha");
+    /// assert_eq!("A ≤ B".to_latex_string(), r"\text{A }\leq\text{ B}");
+    /// assert_eq!("--flag".to_latex_string(), r"\text{-{}-flag}");
+    /// assert_eq!("2¹⁰".to_latex_string(), r"\text{2}^{10}");
+    /// assert_eq!("H₂O".to_latex_string(), r"\text{H}_2\text{O}");
     /// ```
     ///
     /// | value      | fragment                 | renders as               |
@@ -170,25 +194,19 @@ impl ToLatex for String {
     /// ```
     /// use malachite_base::strings::latex::ToLatex;
     ///
-    /// assert_eq!("hello".to_string().to_latex().to_string(), r"\text{hello}");
-    /// assert_eq!("100%".to_string().to_latex().to_string(), r"\text{100\%}");
+    /// assert_eq!("hello".to_string().to_latex_string(), r"\text{hello}");
+    /// assert_eq!("100%".to_string().to_latex_string(), r"\text{100\%}");
     /// assert_eq!(
-    ///     "100% α".to_string().to_latex().to_string(),
+    ///     "100% α".to_string().to_latex_string(),
     ///     r"\text{100\% }\alpha"
     /// );
     /// assert_eq!(
-    ///     "A ≤ B".to_string().to_latex().to_string(),
+    ///     "A ≤ B".to_string().to_latex_string(),
     ///     r"\text{A }\leq\text{ B}"
     /// );
-    /// assert_eq!(
-    ///     "--flag".to_string().to_latex().to_string(),
-    ///     r"\text{-{}-flag}"
-    /// );
-    /// assert_eq!("2¹⁰".to_string().to_latex().to_string(), r"\text{2}^{10}");
-    /// assert_eq!(
-    ///     "H₂O".to_string().to_latex().to_string(),
-    ///     r"\text{H}_2\text{O}"
-    /// );
+    /// assert_eq!("--flag".to_string().to_latex_string(), r"\text{-{}-flag}");
+    /// assert_eq!("2¹⁰".to_string().to_latex_string(), r"\text{2}^{10}");
+    /// assert_eq!("H₂O".to_string().to_latex_string(), r"\text{H}_2\text{O}");
     /// ```
     ///
     /// | value      | fragment                 | renders as               |
@@ -225,14 +243,14 @@ impl<T: ToLatex> ToLatex for &T {
     ///
     /// // A reference is invisible, which is what lets a collection of references be written.
     /// assert_eq!(
-    ///     vec![&1u8, &2u8].to_latex().to_string(),
-    ///     vec![1u8, 2u8].to_latex().to_string()
+    ///     vec![&1u8, &2u8].to_latex_string(),
+    ///     vec![1u8, 2u8].to_latex_string()
     /// );
     ///
     /// // A method call on a reference resolves to the referent's own implementation, so this is
     /// // reached through a generic context instead.
     /// fn fragment<T: ToLatex>(x: T) -> String {
-    ///     x.to_latex().to_string()
+    ///     x.to_latex_string()
     /// }
     /// let n = 5u8;
     /// let n_ref: &u8 = &n;

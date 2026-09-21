@@ -34,14 +34,11 @@ impl<T: PrimitiveUnsigned, const N: usize> ToLatex for Factors<T, N> {
     /// use malachite_base::num::factorization::traits::Factor;
     /// use malachite_base::strings::latex::ToLatex;
     ///
-    /// assert_eq!(1u32.factor().to_latex().to_string(), "1");
-    /// assert_eq!(2u32.factor().to_latex().to_string(), "2");
-    /// assert_eq!(4u32.factor().to_latex().to_string(), r"2^2");
-    /// assert_eq!(
-    ///     90u32.factor().to_latex().to_string(),
-    ///     r"2 \times 3^2 \times 5"
-    /// );
-    /// assert_eq!(1024u32.factor().to_latex().to_string(), r"2^{10}");
+    /// assert_eq!(1u32.factor().to_latex_string(), "1");
+    /// assert_eq!(2u32.factor().to_latex_string(), "2");
+    /// assert_eq!(4u32.factor().to_latex_string(), r"2^2");
+    /// assert_eq!(90u32.factor().to_latex_string(), r"2 \times 3^2 \times 5");
+    /// assert_eq!(1024u32.factor().to_latex_string(), r"2^{10}");
     /// ```
     ///
     /// | value              | fragment                | renders as              |

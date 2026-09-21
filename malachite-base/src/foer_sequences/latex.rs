@@ -36,20 +36,17 @@ impl<T: ToLatex + Eq> ToLatex for FoerSequence<T> {
     /// use malachite_base::strings::latex::ToLatex;
     ///
     /// let empty = FoerSequence::<u8>::from_vecs(vec![], vec![]);
-    /// assert_eq!(empty.to_latex().to_string(), r"\left[\right]");
+    /// assert_eq!(empty.to_latex_string(), r"\left[\right]");
     ///
     /// let finite = FoerSequence::<u8>::from_vecs(vec![1, 2], vec![]);
-    /// assert_eq!(finite.to_latex().to_string(), r"\left[1, 2\right]");
+    /// assert_eq!(finite.to_latex_string(), r"\left[1, 2\right]");
     ///
     /// let repeating = FoerSequence::<u8>::from_vecs(vec![], vec![3, 4]);
-    /// assert_eq!(
-    ///     repeating.to_latex().to_string(),
-    ///     r"\left[\overline{3, 4}\right]"
-    /// );
+    /// assert_eq!(repeating.to_latex_string(), r"\left[\overline{3, 4}\right]");
     ///
     /// let both = FoerSequence::<u8>::from_vecs(vec![1, 2], vec![3, 4]);
     /// assert_eq!(
-    ///     both.to_latex().to_string(),
+    ///     both.to_latex_string(),
     ///     r"\left[1, 2, \overline{3, 4}\right]"
     /// );
     /// ```

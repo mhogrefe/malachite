@@ -15,9 +15,7 @@ use malachite_base::strings::typst::ToTypst;
 fn test_foer_sequence_to_typst() {
     let test = |non_repeating: &[u8], repeating: &[u8], out: &str| {
         assert_eq!(
-            FoerSequence::from_slices(non_repeating, repeating)
-                .to_typst()
-                .to_string(),
+            FoerSequence::from_slices(non_repeating, repeating).to_typst_string(),
             out
         );
     };
@@ -36,11 +34,7 @@ fn foer_sequence_to_typst_compiles() {
     let mut frags = Vec::new();
     for non_repeating in [&[][..], &[1][..], &[1, 2][..]] {
         for repeating in [&[][..], &[3][..], &[3, 4][..]] {
-            frags.push(
-                FoerSequence::<u8>::from_slices(non_repeating, repeating)
-                    .to_typst()
-                    .to_string(),
-            );
+            frags.push(FoerSequence::<u8>::from_slices(non_repeating, repeating).to_typst_string());
         }
     }
     assert_typst_compiles(&frags);
@@ -50,15 +44,11 @@ fn foer_sequence_to_typst_compiles() {
 fn test_foer_sequence_to_typst_element_types() {
     // The elements' own fragments are used, whatever they are.
     assert_eq!(
-        FoerSequence::from_slices(&['a'], &['β'])
-            .to_typst()
-            .to_string(),
+        FoerSequence::from_slices(&['a'], &['β']).to_typst_string(),
         r#"["a", overline("β")]"#
     );
     assert_eq!(
-        FoerSequence::from_slices(&[true], &[false])
-            .to_typst()
-            .to_string(),
+        FoerSequence::from_slices(&[true], &[false]).to_typst_string(),
         r#"["T", overline("F")]"#
     );
 }
@@ -67,21 +57,11 @@ fn test_foer_sequence_to_typst_element_types() {
 fn test_foer_sequence_to_typst_is_injective() {
     // The vinculum is what keeps a repeating part from reading as a finite one.
     let fragments = [
-        FoerSequence::<u8>::from_slices(&[], &[])
-            .to_typst()
-            .to_string(),
-        FoerSequence::<u8>::from_slices(&[1, 2], &[])
-            .to_typst()
-            .to_string(),
-        FoerSequence::<u8>::from_slices(&[], &[1, 2])
-            .to_typst()
-            .to_string(),
-        FoerSequence::<u8>::from_slices(&[1], &[2])
-            .to_typst()
-            .to_string(),
-        FoerSequence::<u8>::from_slices(&[1, 2], &[3])
-            .to_typst()
-            .to_string(),
+        FoerSequence::<u8>::from_slices(&[], &[]).to_typst_string(),
+        FoerSequence::<u8>::from_slices(&[1, 2], &[]).to_typst_string(),
+        FoerSequence::<u8>::from_slices(&[], &[1, 2]).to_typst_string(),
+        FoerSequence::<u8>::from_slices(&[1], &[2]).to_typst_string(),
+        FoerSequence::<u8>::from_slices(&[1, 2], &[3]).to_typst_string(),
     ];
     assert_eq!(fragments.iter().unique().count(), fragments.len());
 }

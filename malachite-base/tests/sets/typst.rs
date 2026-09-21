@@ -19,17 +19,12 @@ fn test_set_to_typst() {
             xs.iter()
                 .copied()
                 .collect::<BTreeSet<_>>()
-                .to_typst()
-                .to_string(),
+                .to_typst_string(),
             out
         );
         // The `HashSet` fragment agrees with the `BTreeSet` one.
         assert_eq!(
-            xs.iter()
-                .copied()
-                .collect::<HashSet<_>>()
-                .to_typst()
-                .to_string(),
+            xs.iter().copied().collect::<HashSet<_>>().to_typst_string(),
             out
         );
     };
@@ -45,18 +40,16 @@ fn test_set_to_typst() {
 fn test_set_to_typst_element_types() {
     // The elements' own fragments are used, whatever they are.
     assert_eq!(
-        BTreeSet::from(["hi", "yo"]).to_typst().to_string(),
+        BTreeSet::from(["hi", "yo"]).to_typst_string(),
         r#"{"hi", "yo"}"#
     );
     assert_eq!(
-        BTreeSet::from([true, false]).to_typst().to_string(),
+        BTreeSet::from([true, false]).to_typst_string(),
         r#"{"F", "T"}"#
     );
     // nesting
     assert_eq!(
-        BTreeSet::from([BTreeSet::from([1u8]), BTreeSet::from([2, 3])])
-            .to_typst()
-            .to_string(),
+        BTreeSet::from([BTreeSet::from([1u8]), BTreeSet::from([2, 3])]).to_typst_string(),
         "{{1}, {2, 3}}"
     );
 }
@@ -65,17 +58,11 @@ fn test_set_to_typst_element_types() {
 fn test_set_to_typst_is_injective_over_nesting() {
     // The braces exist so that distinct values never share a fragment.
     let fragments = [
-        BTreeSet::from([1u8, 2]).to_typst().to_string(),
-        BTreeSet::from([BTreeSet::from([1u8]), BTreeSet::from([2])])
-            .to_typst()
-            .to_string(),
-        BTreeSet::from([BTreeSet::from([1u8, 2])])
-            .to_typst()
-            .to_string(),
-        BTreeSet::<u8>::new().to_typst().to_string(),
-        BTreeSet::from([BTreeSet::<u8>::new()])
-            .to_typst()
-            .to_string(),
+        BTreeSet::from([1u8, 2]).to_typst_string(),
+        BTreeSet::from([BTreeSet::from([1u8]), BTreeSet::from([2])]).to_typst_string(),
+        BTreeSet::from([BTreeSet::from([1u8, 2])]).to_typst_string(),
+        BTreeSet::<u8>::new().to_typst_string(),
+        BTreeSet::from([BTreeSet::<u8>::new()]).to_typst_string(),
     ];
     assert_eq!(fragments.iter().unique().count(), fragments.len());
 }
@@ -86,18 +73,15 @@ fn set_to_typst_properties() {
     unsigned_vec_gen::<u8>().test_properties(|xs| {
         let bs = xs.iter().copied().collect::<BTreeSet<_>>();
         let hs = xs.iter().copied().collect::<HashSet<_>>();
-        let s = bs.to_typst().to_string();
+        let s = bs.to_typst_string();
         // A `HashSet` never depends on its hasher: it agrees with the `BTreeSet` of the same
         // elements, and so with itself from one run to the next.
-        assert_eq!(hs.to_typst().to_string(), s);
+        assert_eq!(hs.to_typst_string(), s);
         assert!(s.starts_with('{'));
         assert!(s.ends_with('}'));
         // The fragment is the elements' own fragments, in ascending order, separated by commas.
         let inner = &s[1..s.len() - 1];
-        assert_eq!(
-            inner,
-            bs.iter().map(|x| x.to_typst().to_string()).join(", ")
-        );
+        assert_eq!(inner, bs.iter().map(ToTypst::to_typst_string).join(", "));
         frags.push(s);
     });
     assert_typst_compiles(&frags);

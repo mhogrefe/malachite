@@ -11,7 +11,7 @@ use malachite_base::strings::typst::ToTypst;
 
 #[test]
 fn test_to_typst() {
-    assert_eq!(true.to_typst().to_string(), r#""T""#);
-    assert_eq!(false.to_typst().to_string(), r#""F""#);
-    assert_typst_compiles(&[true.to_typst().to_string(), false.to_typst().to_string()]);
+    assert_eq!(true.to_typst_string(), r#""T""#);
+    assert_eq!(false.to_typst_string(), r#""F""#);
+    assert_typst_compiles(&[true.to_typst_string(), false.to_typst_string()]);
 }

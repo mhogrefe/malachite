@@ -56,14 +56,14 @@ impl<T: ToLatex> ToLatex for &[T] {
     /// ```
     /// use malachite_base::strings::latex::ToLatex;
     ///
-    /// assert_eq!([0u8; 0].as_slice().to_latex().to_string(), r"\left[\right]");
-    /// assert_eq!([5u8].as_slice().to_latex().to_string(), r"\left[5\right]");
+    /// assert_eq!([0u8; 0].as_slice().to_latex_string(), r"\left[\right]");
+    /// assert_eq!([5u8].as_slice().to_latex_string(), r"\left[5\right]");
     /// assert_eq!(
-    ///     [1u8, 2, 3].as_slice().to_latex().to_string(),
+    ///     [1u8, 2, 3].as_slice().to_latex_string(),
     ///     r"\left[1, 2, 3\right]"
     /// );
     /// assert_eq!(
-    ///     ["a", "b"].as_slice().to_latex().to_string(),
+    ///     ["a", "b"].as_slice().to_latex_string(),
     ///     r"\left[\text{a}, \text{b}\right]"
     /// );
     /// ```
@@ -97,11 +97,11 @@ impl<T: ToLatex, const N: usize> ToLatex for [T; N] {
     /// ```
     /// use malachite_base::strings::latex::ToLatex;
     ///
-    /// assert_eq!([0u8; 0].to_latex().to_string(), r"\left[\right]");
-    /// assert_eq!([5u8].to_latex().to_string(), r"\left[5\right]");
-    /// assert_eq!([1u8, 2, 3].to_latex().to_string(), r"\left[1, 2, 3\right]");
+    /// assert_eq!([0u8; 0].to_latex_string(), r"\left[\right]");
+    /// assert_eq!([5u8].to_latex_string(), r"\left[5\right]");
+    /// assert_eq!([1u8, 2, 3].to_latex_string(), r"\left[1, 2, 3\right]");
     /// assert_eq!(
-    ///     [[1u8, 2], [3, 4]].to_latex().to_string(),
+    ///     [[1u8, 2], [3, 4]].to_latex_string(),
     ///     r"\left[\left[1, 2\right], \left[3, 4\right]\right]"
     /// );
     /// ```

@@ -14,9 +14,7 @@ use malachite_base::strings::latex::ToLatex;
 fn test_foer_sequence_to_latex() {
     let test = |non_repeating: &[u8], repeating: &[u8], out: &str| {
         assert_eq!(
-            FoerSequence::from_slices(non_repeating, repeating)
-                .to_latex()
-                .to_string(),
+            FoerSequence::from_slices(non_repeating, repeating).to_latex_string(),
             out
         );
     };
@@ -33,15 +31,11 @@ fn test_foer_sequence_to_latex() {
 fn test_foer_sequence_to_latex_element_types() {
     // The elements' own fragments are used, whatever they are.
     assert_eq!(
-        FoerSequence::from_slices(&['a'], &['β'])
-            .to_latex()
-            .to_string(),
+        FoerSequence::from_slices(&['a'], &['β']).to_latex_string(),
         r"\left[\text{a}, \overline{\beta}\right]"
     );
     assert_eq!(
-        FoerSequence::from_slices(&[true], &[false])
-            .to_latex()
-            .to_string(),
+        FoerSequence::from_slices(&[true], &[false]).to_latex_string(),
         r"\left[\text{T}, \overline{\text{F}}\right]"
     );
 }
@@ -50,21 +44,11 @@ fn test_foer_sequence_to_latex_element_types() {
 fn test_foer_sequence_to_latex_is_injective() {
     // The vinculum is what keeps a repeating part from reading as a finite one.
     let fragments = [
-        FoerSequence::<u8>::from_slices(&[], &[])
-            .to_latex()
-            .to_string(),
-        FoerSequence::<u8>::from_slices(&[1, 2], &[])
-            .to_latex()
-            .to_string(),
-        FoerSequence::<u8>::from_slices(&[], &[1, 2])
-            .to_latex()
-            .to_string(),
-        FoerSequence::<u8>::from_slices(&[1], &[2])
-            .to_latex()
-            .to_string(),
-        FoerSequence::<u8>::from_slices(&[1, 2], &[3])
-            .to_latex()
-            .to_string(),
+        FoerSequence::<u8>::from_slices(&[], &[]).to_latex_string(),
+        FoerSequence::<u8>::from_slices(&[1, 2], &[]).to_latex_string(),
+        FoerSequence::<u8>::from_slices(&[], &[1, 2]).to_latex_string(),
+        FoerSequence::<u8>::from_slices(&[1], &[2]).to_latex_string(),
+        FoerSequence::<u8>::from_slices(&[1, 2], &[3]).to_latex_string(),
     ];
     assert_eq!(fragments.iter().unique().count(), fragments.len());
 }

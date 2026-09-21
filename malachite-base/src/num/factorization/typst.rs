@@ -34,11 +34,11 @@ impl<T: PrimitiveUnsigned, const N: usize> ToTypst for Factors<T, N> {
     /// use malachite_base::num::factorization::traits::Factor;
     /// use malachite_base::strings::typst::ToTypst;
     ///
-    /// assert_eq!(1u32.factor().to_typst().to_string(), "1");
-    /// assert_eq!(2u32.factor().to_typst().to_string(), "2");
-    /// assert_eq!(4u32.factor().to_typst().to_string(), "2^2");
-    /// assert_eq!(90u32.factor().to_typst().to_string(), "2 times 3^2 times 5");
-    /// assert_eq!(1024u32.factor().to_typst().to_string(), "2^(10)");
+    /// assert_eq!(1u32.factor().to_typst_string(), "1");
+    /// assert_eq!(2u32.factor().to_typst_string(), "2");
+    /// assert_eq!(4u32.factor().to_typst_string(), "2^2");
+    /// assert_eq!(90u32.factor().to_typst_string(), "2 times 3^2 times 5");
+    /// assert_eq!(1024u32.factor().to_typst_string(), "2^(10)");
     /// ```
     ///
     /// | value              | fragment              |

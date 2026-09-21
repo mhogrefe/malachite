@@ -118,11 +118,11 @@ impl ToTypst for char {
     /// ```
     /// use malachite_base::strings::typst::ToTypst;
     ///
-    /// assert_eq!('a'.to_typst().to_string(), r#""a""#);
-    /// assert_eq!('%'.to_typst().to_string(), r#""%""#);
-    /// assert_eq!('α'.to_typst().to_string(), r#""α""#);
-    /// assert_eq!('"'.to_typst().to_string(), r#""\"""#);
-    /// assert_eq!('²'.to_typst().to_string(), r#"""^("2")"#);
+    /// assert_eq!('a'.to_typst_string(), r#""a""#);
+    /// assert_eq!('%'.to_typst_string(), r#""%""#);
+    /// assert_eq!('α'.to_typst_string(), r#""α""#);
+    /// assert_eq!('"'.to_typst_string(), r#""\"""#);
+    /// assert_eq!('²'.to_typst_string(), r#"""^("2")"#);
     /// ```
     ///
     /// | value | fragment |

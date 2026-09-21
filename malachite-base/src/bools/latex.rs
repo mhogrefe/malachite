@@ -22,8 +22,8 @@ impl ToLatex for bool {
     /// ```
     /// use malachite_base::strings::latex::ToLatex;
     ///
-    /// assert_eq!(true.to_latex().to_string(), r"\text{T}");
-    /// assert_eq!(false.to_latex().to_string(), r"\text{F}");
+    /// assert_eq!(true.to_latex_string(), r"\text{T}");
+    /// assert_eq!(false.to_latex_string(), r"\text{F}");
     /// ```
     ///
     /// | value   | fragment   | renders as |

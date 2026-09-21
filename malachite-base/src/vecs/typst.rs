@@ -28,11 +28,11 @@ impl<T: ToTypst> ToTypst for Vec<T> {
     /// ```
     /// use malachite_base::strings::typst::ToTypst;
     ///
-    /// assert_eq!(Vec::<u8>::new().to_typst().to_string(), "[]");
-    /// assert_eq!(vec![5u8].to_typst().to_string(), "[5]");
-    /// assert_eq!(vec![1u8, 2, 3].to_typst().to_string(), "[1, 2, 3]");
+    /// assert_eq!(Vec::<u8>::new().to_typst_string(), "[]");
+    /// assert_eq!(vec![5u8].to_typst_string(), "[5]");
+    /// assert_eq!(vec![1u8, 2, 3].to_typst_string(), "[1, 2, 3]");
     /// assert_eq!(
-    ///     vec![vec![1u8], vec![2, 3]].to_typst().to_string(),
+    ///     vec![vec![1u8], vec![2, 3]].to_typst_string(),
     ///     "[[1], [2, 3]]"
     /// );
     /// ```

@@ -96,7 +96,7 @@ impl ToTypst for () {
     /// ```
     /// use malachite_base::strings::typst::ToTypst;
     ///
-    /// assert_eq!(().to_typst().to_string(), "()");
+    /// assert_eq!(().to_typst_string(), "()");
     /// ```
     ///
     /// | value | fragment |

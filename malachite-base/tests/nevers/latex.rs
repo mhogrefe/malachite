@@ -13,10 +13,7 @@ use malachite_base::strings::latex::ToLatex;
 // holds one without having one, which is what it is for.
 #[test]
 fn test_never_to_latex() {
-    assert_eq!(None::<Never>.to_latex().to_string(), r"\bot");
-    assert_eq!(None::<Option<Never>>.to_latex().to_string(), r"\bot");
-    assert_eq!(
-        Some(None::<Never>).to_latex().to_string(),
-        r"\left[\bot\right]"
-    );
+    assert_eq!(None::<Never>.to_latex_string(), r"\bot");
+    assert_eq!(None::<Option<Never>>.to_latex_string(), r"\bot");
+    assert_eq!(Some(None::<Never>).to_latex_string(), r"\left[\bot\right]");
 }

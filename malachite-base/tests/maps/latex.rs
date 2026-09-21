@@ -19,8 +19,7 @@ fn test_map_to_latex() {
                 .iter()
                 .copied()
                 .collect::<BTreeMap<_, _>>()
-                .to_latex()
-                .to_string(),
+                .to_latex_string(),
             out
         );
         // The `HashMap` fragment agrees with the `BTreeMap` one.
@@ -29,8 +28,7 @@ fn test_map_to_latex() {
                 .iter()
                 .copied()
                 .collect::<HashMap<_, _>>()
-                .to_latex()
-                .to_string(),
+                .to_latex_string(),
             out
         );
     };
@@ -56,20 +54,16 @@ fn test_map_to_latex() {
 fn test_map_to_latex_element_types() {
     // The keys' and values' own fragments are used, whatever they are.
     assert_eq!(
-        BTreeMap::from([("hi", 1u8)]).to_latex().to_string(),
+        BTreeMap::from([("hi", 1u8)]).to_latex_string(),
         r"\left\{\text{hi} \mapsto 1\right\}"
     );
     assert_eq!(
-        BTreeMap::from([(1u8, None::<u8>), (2, Some(3))])
-            .to_latex()
-            .to_string(),
+        BTreeMap::from([(1u8, None::<u8>), (2, Some(3))]).to_latex_string(),
         r"\left\{1 \mapsto \bot, 2 \mapsto \left[3\right]\right\}"
     );
     // nesting
     assert_eq!(
-        BTreeMap::from([(1u8, BTreeMap::from([(2u8, 3u8)]))])
-            .to_latex()
-            .to_string(),
+        BTreeMap::from([(1u8, BTreeMap::from([(2u8, 3u8)]))]).to_latex_string(),
         r"\left\{1 \mapsto \left\{2 \mapsto 3\right\}\right\}"
     );
 }
@@ -79,11 +73,11 @@ fn test_map_to_latex_is_injective() {
     // Distinct maps never share a fragment, and a map is never confused with the set of its keys or
     // with a sequence.
     let fragments = [
-        BTreeMap::<u8, u8>::new().to_latex().to_string(),
-        BTreeMap::from([(1u8, 2u8)]).to_latex().to_string(),
-        BTreeMap::from([(2u8, 1u8)]).to_latex().to_string(),
-        BTreeMap::from([(1u8, 2u8), (2, 1)]).to_latex().to_string(),
-        vec![1u8, 2].to_latex().to_string(),
+        BTreeMap::<u8, u8>::new().to_latex_string(),
+        BTreeMap::from([(1u8, 2u8)]).to_latex_string(),
+        BTreeMap::from([(2u8, 1u8)]).to_latex_string(),
+        BTreeMap::from([(1u8, 2u8), (2, 1)]).to_latex_string(),
+        vec![1u8, 2].to_latex_string(),
     ];
     assert_eq!(fragments.iter().unique().count(), fragments.len());
 }
@@ -99,10 +93,10 @@ fn map_to_latex_properties() {
             .iter()
             .map(|&x| (x, x.wrapping_mul(3)))
             .collect::<HashMap<_, _>>();
-        let s = bm.to_latex().to_string();
+        let s = bm.to_latex_string();
         // A `HashMap` never depends on its hasher: it agrees with the `BTreeMap` of the same
         // entries, and so with itself from one run to the next.
-        assert_eq!(hm.to_latex().to_string(), s);
+        assert_eq!(hm.to_latex_string(), s);
         assert!(s.starts_with(r"\left\{"));
         assert!(s.ends_with(r"\right\}"));
         // The fragment is the entries' own fragments, in ascending key order.

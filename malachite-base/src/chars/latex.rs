@@ -192,11 +192,11 @@ impl ToLatex for char {
     /// ```
     /// use malachite_base::strings::latex::ToLatex;
     ///
-    /// assert_eq!('a'.to_latex().to_string(), r"\text{a}");
-    /// assert_eq!('%'.to_latex().to_string(), r"\text{\%}");
-    /// assert_eq!('α'.to_latex().to_string(), r"\alpha");
-    /// assert_eq!('∞'.to_latex().to_string(), r"\infty");
-    /// assert_eq!('²'.to_latex().to_string(), r"{}^2");
+    /// assert_eq!('a'.to_latex_string(), r"\text{a}");
+    /// assert_eq!('%'.to_latex_string(), r"\text{\%}");
+    /// assert_eq!('α'.to_latex_string(), r"\alpha");
+    /// assert_eq!('∞'.to_latex_string(), r"\infty");
+    /// assert_eq!('²'.to_latex_string(), r"{}^2");
     /// ```
     ///
     /// | value | fragment    | renders as   |

@@ -48,7 +48,7 @@ impl ToLatex for Never {
     /// use malachite_base::strings::latex::ToLatex;
     ///
     /// // The only `Option<Never>` there is.
-    /// assert_eq!(None::<Never>.to_latex().to_string(), r"\bot");
+    /// assert_eq!(None::<Never>.to_latex_string(), r"\bot");
     /// ```
     fn fmt_latex(&self, _f: &mut Formatter) -> core::fmt::Result {
         unreachable!()
@@ -71,7 +71,7 @@ impl ToTypst for Never {
     /// use malachite_base::strings::typst::ToTypst;
     ///
     /// // The only `Option<Never>` there is.
-    /// assert_eq!(None::<Never>.to_typst().to_string(), "bot");
+    /// assert_eq!(None::<Never>.to_typst_string(), "bot");
     /// ```
     fn fmt_typst(&self, _f: &mut Formatter) -> core::fmt::Result {
         unreachable!()

@@ -25,12 +25,12 @@ impl ToLatex for RoundingMode {
     /// use malachite_base::rounding_modes::RoundingMode::*;
     /// use malachite_base::strings::latex::ToLatex;
     ///
-    /// assert_eq!(Down.to_latex().to_string(), r"\text{DOWN}");
-    /// assert_eq!(Up.to_latex().to_string(), r"\text{UP}");
-    /// assert_eq!(Floor.to_latex().to_string(), r"\text{FLOOR}");
-    /// assert_eq!(Ceiling.to_latex().to_string(), r"\text{CEILING}");
-    /// assert_eq!(Nearest.to_latex().to_string(), r"\text{NEAREST}");
-    /// assert_eq!(Exact.to_latex().to_string(), r"\text{EXACT}");
+    /// assert_eq!(Down.to_latex_string(), r"\text{DOWN}");
+    /// assert_eq!(Up.to_latex_string(), r"\text{UP}");
+    /// assert_eq!(Floor.to_latex_string(), r"\text{FLOOR}");
+    /// assert_eq!(Ceiling.to_latex_string(), r"\text{CEILING}");
+    /// assert_eq!(Nearest.to_latex_string(), r"\text{NEAREST}");
+    /// assert_eq!(Exact.to_latex_string(), r"\text{EXACT}");
     /// ```
     ///
     /// | value     | fragment         | renders as       |

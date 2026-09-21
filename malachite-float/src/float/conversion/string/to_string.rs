@@ -148,6 +148,7 @@ impl ToStringBase for Float {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::strings::ToLowerHexString;
     /// use malachite_base::num::conversion::traits::ToStringBase;
     /// use malachite_float::Float;
     ///
@@ -160,7 +161,7 @@ impl ToStringBase for Float {
     /// // base 10 agrees with `Display`, and base 16 with `{:x}`
     /// let x = Float::from(core::f64::consts::PI);
     /// assert_eq!(x.to_string_base(10), x.to_string());
-    /// assert_eq!(x.to_string_base(16), format!("{x:x}"));
+    /// assert_eq!(x.to_string_base(16), x.to_lower_hex_string());
     /// ```
     fn to_string_base(&self, base: u8) -> String {
         assert!((2..=36).contains(&base), "base out of range");
@@ -189,6 +190,7 @@ impl ToStringBase for Float {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::strings::ToUpperHexString;
     /// use malachite_base::num::conversion::traits::ToStringBase;
     /// use malachite_float::Float;
     ///
@@ -196,7 +198,7 @@ impl ToStringBase for Float {
     /// assert_eq!(Float::from(1.5).to_string_base_upper(16), "1.8");
     ///
     /// let x = Float::from(core::f64::consts::PI);
-    /// assert_eq!(x.to_string_base_upper(16), format!("{x:X}"));
+    /// assert_eq!(x.to_string_base_upper(16), x.to_upper_hex_string());
     /// ```
     fn to_string_base_upper(&self, base: u8) -> String {
         assert!((2..=36).contains(&base), "base out of range");

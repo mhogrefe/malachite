@@ -41,10 +41,10 @@ impl<T: ToLatex> ToLatex for BTreeSet<T> {
     /// use std::collections::BTreeSet;
     ///
     /// let empty = BTreeSet::<u8>::new();
-    /// assert_eq!(empty.to_latex().to_string(), r"\left\{\right\}");
+    /// assert_eq!(empty.to_latex_string(), r"\left\{\right\}");
     ///
     /// let xs = BTreeSet::from([3u8, 1, 2]);
-    /// assert_eq!(xs.to_latex().to_string(), r"\left\{1, 2, 3\right\}");
+    /// assert_eq!(xs.to_latex_string(), r"\left\{1, 2, 3\right\}");
     /// ```
     ///
     /// | value                         | fragment                 | renders as                 |
@@ -86,11 +86,11 @@ impl<T: Eq + Hash + Ord + ToLatex> ToLatex for HashSet<T> {
     /// use std::collections::HashSet;
     ///
     /// let empty = HashSet::<u8>::new();
-    /// assert_eq!(empty.to_latex().to_string(), r"\left\{\right\}");
+    /// assert_eq!(empty.to_latex_string(), r"\left\{\right\}");
     ///
     /// // The elements are sorted, so the fragment does not depend on the hasher.
     /// let xs = HashSet::from([3u8, 1, 2]);
-    /// assert_eq!(xs.to_latex().to_string(), r"\left\{1, 2, 3\right\}");
+    /// assert_eq!(xs.to_latex_string(), r"\left\{1, 2, 3\right\}");
     /// ```
     ///
     /// | value                        | fragment                 | renders as                 |

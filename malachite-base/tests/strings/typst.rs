@@ -7,6 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use itertools::Itertools;
+use malachite_base::strings::ToDebugString;
 use malachite_base::strings::typst::ToTypst;
 use malachite_base::test_util::generators::string_gen;
 use typst_as_lib::TypstEngine;
@@ -26,7 +27,7 @@ fn compile(frags: &[String]) -> Result<(), String> {
         .build();
     match engine.compile::<typst_layout::PagedDocument>().output {
         Ok(_) => Ok(()),
-        Err(e) => Err(format!("{e:?}")),
+        Err(e) => Err(e.to_debug_string()),
     }
 }
 
@@ -138,9 +139,9 @@ pub fn assert_scripts_separated(s: &str) {
 fn test_str_to_typst() {
     let mut frags = Vec::new();
     let mut test = |s: &str, out: &str| {
-        assert_eq!(s.to_typst().to_string(), out);
+        assert_eq!(s.to_typst_string(), out);
         // The `String` implementation agrees with the `&str` one.
-        assert_eq!(s.to_string().to_typst().to_string(), out);
+        assert_eq!(s.to_string().to_typst_string(), out);
         frags.push(out.to_string());
     };
     // ordinary text is one quoted string; no quotation marks beyond its own are added
@@ -196,7 +197,7 @@ fn test_str_to_typst() {
 fn str_to_typst_properties() {
     let mut frags = Vec::new();
     string_gen().test_properties(|s| {
-        let typst = s.to_typst().to_string();
+        let typst = s.to_typst_string();
         assert!(!typst.is_empty());
         assert_strings_closed(&typst);
         assert_delimiters_balanced(&typst);
@@ -206,14 +207,45 @@ fn str_to_typst_properties() {
         // A fragment never opens with a bare script, which Typst rejects for want of a base.
         assert!(!typst.starts_with('^') && !typst.starts_with('_'));
         // The `String` implementation agrees with the `&str` one.
-        assert_eq!(s.clone().to_typst().to_string(), typst);
+        assert_eq!(s.clone().to_typst_string(), typst);
         // A one-character string agrees with that character on its own.
         let mut cs = s.chars();
         if let (Some(c), None) = (cs.next(), cs.next()) {
-            assert_eq!(c.to_typst().to_string(), typst);
+            assert_eq!(c.to_typst_string(), typst);
         }
         frags.push(typst);
     });
     // Typst itself has the last word on every fragment the generator produced.
     assert_typst_compiles(&frags);
+}
+
+#[test]
+// The long form is the point of this test, which is that the short one agrees with it.
+#[cfg_attr(dylint_lib = "malachite_lints", expect(use_to_string_variant))]
+fn test_to_typst_string() {
+    // The convenience method is exactly the wrapper's `to_string`.
+    assert_eq!(123u32.to_typst_string(), 123u32.to_typst().to_string());
+    assert_eq!("100% α".to_typst_string(), "100% α".to_typst().to_string());
+    assert_eq!(().to_typst_string(), ().to_typst().to_string());
+    assert_eq!(
+        None::<u8>.to_typst_string(),
+        None::<u8>.to_typst().to_string()
+    );
+    assert_eq!(
+        vec![1u8, 2].to_typst_string(),
+        vec![1u8, 2].to_typst().to_string()
+    );
+    // and it agrees with what the fragments are
+    assert_eq!(123u32.to_typst_string(), "123");
+    assert_eq!("hello".to_typst_string(), r#""hello""#);
+    assert_eq!(vec![1u8, 2].to_typst_string(), "[1, 2]");
+}
+
+#[test]
+// As above: the two forms are compared, so both have to appear.
+#[cfg_attr(dylint_lib = "malachite_lints", expect(use_to_string_variant))]
+fn to_typst_string_properties() {
+    string_gen().test_properties(|s| {
+        assert_eq!(s.to_typst_string(), s.to_typst().to_string());
+    });
 }

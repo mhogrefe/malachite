@@ -9,6 +9,7 @@
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::string::options::FromSciStringOptions;
 use malachite_base::num::conversion::traits::{FromSciString, FromStringBase};
+use malachite_base::strings::{ToBinaryString, ToLowerHexString, ToOctalString};
 use malachite_base::test_util::generators::{string_gen, string_gen_var_1};
 use malachite_float::test_util::common::to_hex_string;
 use malachite_float::test_util::generators::{float_gen, float_gen_var_12};
@@ -24,11 +25,11 @@ const BASES: [u8; 4] = [2, 8, 10, 16];
 fn render(x: &Float, base: u8, alt: bool) -> String {
     let c = ComparableFloatRef(x);
     match (base, alt) {
-        (2, false) => format!("{c:b}"),
+        (2, false) => c.to_binary_string(),
         (2, true) => format!("{c:#b}"),
-        (8, false) => format!("{c:o}"),
+        (8, false) => c.to_octal_string(),
         (8, true) => format!("{c:#o}"),
-        (16, false) => format!("{c:x}"),
+        (16, false) => c.to_lower_hex_string(),
         (16, true) => format!("{c:#x}"),
         _ => format!("{c}"),
     }

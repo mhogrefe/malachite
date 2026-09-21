@@ -12,7 +12,7 @@ use malachite_base::strings::latex::ToLatex;
 #[test]
 fn test_to_latex() {
     // An `Ordering` has three values, so these three assertions cover the whole domain.
-    assert_eq!(Less.to_latex().to_string(), "<");
-    assert_eq!(Equal.to_latex().to_string(), "=");
-    assert_eq!(Greater.to_latex().to_string(), ">");
+    assert_eq!(Less.to_latex_string(), "<");
+    assert_eq!(Equal.to_latex_string(), "=");
+    assert_eq!(Greater.to_latex_string(), ">");
 }

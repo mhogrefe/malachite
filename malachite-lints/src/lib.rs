@@ -77,6 +77,7 @@ mod use_sign;
 mod use_slice_test_zero;
 mod use_split_in_half;
 mod use_square;
+mod use_to_string_variant;
 mod use_trailing_zeros;
 mod use_unary_assign;
 mod use_width_mask;
@@ -556,6 +557,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
         use_saturating_from::USE_SATURATING_FROM,
         use_split_in_half::USE_SPLIT_IN_HALF,
         use_square::USE_SQUARE,
+        use_to_string_variant::USE_TO_STRING_VARIANT,
         use_trailing_zeros::USE_TRAILING_ZEROS,
         use_unary_assign::USE_UNARY_ASSIGN,
         use_abs_comparison::USE_ABS_COMPARISON,
@@ -635,6 +637,7 @@ pub fn register_lints(sess: &rustc_session::Session, lint_store: &mut rustc_lint
     lint_store.register_late_pass(|_| Box::new(use_saturating_from::UseSaturatingFrom));
     lint_store.register_late_pass(|_| Box::new(use_split_in_half::UseSplitInHalf));
     lint_store.register_late_pass(|_| Box::new(use_square::UseSquare));
+    lint_store.register_late_pass(|_| Box::new(use_to_string_variant::UseToStringVariant));
     lint_store.register_late_pass(|_| Box::new(use_trailing_zeros::UseTrailingZeros));
     lint_store.register_late_pass(|_| Box::new(use_unary_assign::UseUnaryAssign));
     lint_store.register_late_pass(|_| Box::new(use_abs_comparison::UseAbsComparison));

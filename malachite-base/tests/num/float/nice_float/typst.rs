@@ -15,7 +15,7 @@ use malachite_base::test_util::generators::primitive_float_gen;
 #[test]
 pub fn test_nice_float_to_typst() {
     fn test<T: PrimitiveFloat + ToTypst>(x: T, out: &str) {
-        assert_eq!(NiceFloat(x).to_typst().to_string(), out);
+        assert_eq!(NiceFloat(x).to_typst_string(), out);
     }
     test(f64::NAN, r#""NaN""#);
     test(f64::INFINITY, "infinity");
@@ -32,15 +32,9 @@ pub fn test_nice_float_to_typst() {
 fn nice_float_to_typst_properties() {
     primitive_float_gen::<f64>().test_properties(|x| {
         // The wrapper adds nothing of its own.
-        assert_eq!(
-            NiceFloat(x).to_typst().to_string(),
-            x.to_typst().to_string()
-        );
+        assert_eq!(NiceFloat(x).to_typst_string(), x.to_typst_string());
     });
     primitive_float_gen::<f32>().test_properties(|x| {
-        assert_eq!(
-            NiceFloat(x).to_typst().to_string(),
-            x.to_typst().to_string()
-        );
+        assert_eq!(NiceFloat(x).to_typst_string(), x.to_typst_string());
     });
 }

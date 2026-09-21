@@ -42,10 +42,10 @@ impl<T: ToTypst> ToTypst for BTreeSet<T> {
     /// use std::collections::BTreeSet;
     ///
     /// let empty = BTreeSet::<u8>::new();
-    /// assert_eq!(empty.to_typst().to_string(), "{}");
+    /// assert_eq!(empty.to_typst_string(), "{}");
     ///
     /// let xs = BTreeSet::from([3u8, 1, 2]);
-    /// assert_eq!(xs.to_typst().to_string(), "{1, 2, 3}");
+    /// assert_eq!(xs.to_typst_string(), "{1, 2, 3}");
     /// ```
     ///
     /// | value                         | fragment    |
@@ -88,11 +88,11 @@ impl<T: Eq + Hash + Ord + ToTypst> ToTypst for HashSet<T> {
     /// use std::collections::HashSet;
     ///
     /// let empty = HashSet::<u8>::new();
-    /// assert_eq!(empty.to_typst().to_string(), "{}");
+    /// assert_eq!(empty.to_typst_string(), "{}");
     ///
     /// // The elements are sorted, so the fragment does not depend on the hasher.
     /// let xs = HashSet::from([3u8, 1, 2]);
-    /// assert_eq!(xs.to_typst().to_string(), "{1, 2, 3}");
+    /// assert_eq!(xs.to_typst_string(), "{1, 2, 3}");
     /// ```
     ///
     /// | value                        | fragment    |

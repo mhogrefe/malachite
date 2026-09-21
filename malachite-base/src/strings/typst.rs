@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 use crate::chars::typst::fmt_typst_chars;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 use core::fmt::{Display, Formatter, Result};
 
 /// Converts a value to a Typst math-mode fragment.
@@ -60,8 +60,8 @@ pub trait ToTypst {
     /// ```
     /// use malachite_base::strings::typst::ToTypst;
     ///
-    /// assert_eq!(123u32.to_typst().to_string(), "123");
-    /// assert_eq!((-45i16).to_typst().to_string(), "-45");
+    /// assert_eq!(123u32.to_typst_string(), "123");
+    /// assert_eq!((-45i16).to_typst_string(), "-45");
     ///
     /// // The output is a fragment, so it can be embedded in a larger expression.
     /// assert_eq!(format!("x^({})", 10u8.to_typst()), "x^(10)");
@@ -72,6 +72,30 @@ pub trait ToTypst {
         Self: Sized,
     {
         TypstWrapper { x: self }
+    }
+
+    /// Converts a value to a Typst math-mode fragment, as a [`String`].
+    ///
+    /// This is `to_typst().to_string()`, which is what a caller who wants the fragment itself,
+    /// rather than something to write into a [`Formatter`], would otherwise have to say.
+    ///
+    /// # Worst-case complexity
+    /// Same as the time and additional memory complexity of `fmt_typst` for `Self`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::strings::typst::ToTypst;
+    ///
+    /// assert_eq!(123u32.to_typst_string(), "123");
+    /// assert_eq!((-45i16).to_typst_string(), "-45");
+    /// assert_eq!("100% α".to_typst_string(), r#""100% α""#);
+    /// ```
+    #[inline]
+    fn to_typst_string(&self) -> String
+    where
+        Self: Sized,
+    {
+        self.to_typst().to_string()
     }
 }
 
@@ -116,13 +140,13 @@ impl ToTypst for &str {
     /// ```
     /// use malachite_base::strings::typst::ToTypst;
     ///
-    /// assert_eq!("hello".to_typst().to_string(), r#""hello""#);
-    /// assert_eq!("100%".to_typst().to_string(), r#""100%""#);
-    /// assert_eq!("100% α".to_typst().to_string(), r#""100% α""#);
-    /// assert_eq!("A ≤ B".to_typst().to_string(), r#""A ≤ B""#);
-    /// assert_eq!("--flag".to_typst().to_string(), r#""--flag""#);
-    /// assert_eq!("2¹⁰".to_typst().to_string(), r#""2"^("10")"#);
-    /// assert_eq!("H₂O".to_typst().to_string(), r#""H"_("2")"O""#);
+    /// assert_eq!("hello".to_typst_string(), r#""hello""#);
+    /// assert_eq!("100%".to_typst_string(), r#""100%""#);
+    /// assert_eq!("100% α".to_typst_string(), r#""100% α""#);
+    /// assert_eq!("A ≤ B".to_typst_string(), r#""A ≤ B""#);
+    /// assert_eq!("--flag".to_typst_string(), r#""--flag""#);
+    /// assert_eq!("2¹⁰".to_typst_string(), r#""2"^("10")"#);
+    /// assert_eq!("H₂O".to_typst_string(), r#""H"_("2")"O""#);
     /// ```
     ///
     /// | value      | fragment     |
@@ -169,13 +193,13 @@ impl ToTypst for String {
     /// ```
     /// use malachite_base::strings::typst::ToTypst;
     ///
-    /// assert_eq!("hello".to_string().to_typst().to_string(), r#""hello""#);
-    /// assert_eq!("100%".to_string().to_typst().to_string(), r#""100%""#);
-    /// assert_eq!("100% α".to_string().to_typst().to_string(), r#""100% α""#);
-    /// assert_eq!("A ≤ B".to_string().to_typst().to_string(), r#""A ≤ B""#);
-    /// assert_eq!("--flag".to_string().to_typst().to_string(), r#""--flag""#);
-    /// assert_eq!("2¹⁰".to_string().to_typst().to_string(), r#""2"^("10")"#);
-    /// assert_eq!("H₂O".to_string().to_typst().to_string(), r#""H"_("2")"O""#);
+    /// assert_eq!("hello".to_string().to_typst_string(), r#""hello""#);
+    /// assert_eq!("100%".to_string().to_typst_string(), r#""100%""#);
+    /// assert_eq!("100% α".to_string().to_typst_string(), r#""100% α""#);
+    /// assert_eq!("A ≤ B".to_string().to_typst_string(), r#""A ≤ B""#);
+    /// assert_eq!("--flag".to_string().to_typst_string(), r#""--flag""#);
+    /// assert_eq!("2¹⁰".to_string().to_typst_string(), r#""2"^("10")"#);
+    /// assert_eq!("H₂O".to_string().to_typst_string(), r#""H"_("2")"O""#);
     /// ```
     ///
     /// | value      | fragment     |
@@ -212,14 +236,14 @@ impl<T: ToTypst> ToTypst for &T {
     ///
     /// // A reference is invisible, which is what lets a collection of references be written.
     /// assert_eq!(
-    ///     vec![&1u8, &2u8].to_typst().to_string(),
-    ///     vec![1u8, 2u8].to_typst().to_string()
+    ///     vec![&1u8, &2u8].to_typst_string(),
+    ///     vec![1u8, 2u8].to_typst_string()
     /// );
     ///
     /// // A method call on a reference resolves to the referent's own implementation, so this is
     /// // reached through a generic context instead.
     /// fn fragment<T: ToTypst>(x: T) -> String {
-    ///     x.to_typst().to_string()
+    ///     x.to_typst_string()
     /// }
     /// let n = 5u8;
     /// let n_ref: &u8 = &n;

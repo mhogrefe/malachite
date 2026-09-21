@@ -20,8 +20,7 @@ fn test_map_to_typst() {
                 .iter()
                 .copied()
                 .collect::<BTreeMap<_, _>>()
-                .to_typst()
-                .to_string(),
+                .to_typst_string(),
             out
         );
         // The `HashMap` fragment agrees with the `BTreeMap` one.
@@ -30,8 +29,7 @@ fn test_map_to_typst() {
                 .iter()
                 .copied()
                 .collect::<HashMap<_, _>>()
-                .to_typst()
-                .to_string(),
+                .to_typst_string(),
             out
         );
     };
@@ -54,20 +52,16 @@ fn test_map_to_typst() {
 fn test_map_to_typst_element_types() {
     // The keys' and values' own fragments are used, whatever they are.
     assert_eq!(
-        BTreeMap::from([("hi", 1u8)]).to_typst().to_string(),
+        BTreeMap::from([("hi", 1u8)]).to_typst_string(),
         r#"{"hi" |-> 1}"#
     );
     assert_eq!(
-        BTreeMap::from([(1u8, None::<u8>), (2, Some(3))])
-            .to_typst()
-            .to_string(),
+        BTreeMap::from([(1u8, None::<u8>), (2, Some(3))]).to_typst_string(),
         "{1 |-> bot, 2 |-> [3]}"
     );
     // nesting
     assert_eq!(
-        BTreeMap::from([(1u8, BTreeMap::from([(2u8, 3u8)]))])
-            .to_typst()
-            .to_string(),
+        BTreeMap::from([(1u8, BTreeMap::from([(2u8, 3u8)]))]).to_typst_string(),
         "{1 |-> {2 |-> 3}}"
     );
 }
@@ -77,11 +71,11 @@ fn test_map_to_typst_is_injective() {
     // Distinct maps never share a fragment, and a map is never confused with the set of its keys or
     // with a sequence.
     let fragments = [
-        BTreeMap::<u8, u8>::new().to_typst().to_string(),
-        BTreeMap::from([(1u8, 2u8)]).to_typst().to_string(),
-        BTreeMap::from([(2u8, 1u8)]).to_typst().to_string(),
-        BTreeMap::from([(1u8, 2u8), (2, 1)]).to_typst().to_string(),
-        vec![1u8, 2].to_typst().to_string(),
+        BTreeMap::<u8, u8>::new().to_typst_string(),
+        BTreeMap::from([(1u8, 2u8)]).to_typst_string(),
+        BTreeMap::from([(2u8, 1u8)]).to_typst_string(),
+        BTreeMap::from([(1u8, 2u8), (2, 1)]).to_typst_string(),
+        vec![1u8, 2].to_typst_string(),
     ];
     assert_eq!(fragments.iter().unique().count(), fragments.len());
 }
@@ -98,10 +92,10 @@ fn map_to_typst_properties() {
             .iter()
             .map(|&x| (x, x.wrapping_mul(3)))
             .collect::<HashMap<_, _>>();
-        let s = bm.to_typst().to_string();
+        let s = bm.to_typst_string();
         // A `HashMap` never depends on its hasher: it agrees with the `BTreeMap` of the same
         // entries, and so with itself from one run to the next.
-        assert_eq!(hm.to_typst().to_string(), s);
+        assert_eq!(hm.to_typst_string(), s);
         assert!(s.starts_with('{'));
         assert!(s.ends_with('}'));
         // The fragment is the entries' own fragments, in ascending key order.
