@@ -60,6 +60,8 @@ use crate::natural::random::{
     striped_random_naturals, striped_random_positive_naturals,
 };
 use crate::natural::{Natural, limb_to_bit_count};
+use crate::natural_polynomial::NaturalPolynomial;
+use crate::natural_polynomial::random::striped_random_natural_polynomials;
 use crate::platform::{DoubleLimb, Limb, SQR_TOOM2_THRESHOLD};
 use crate::test_util::extra_variadic::{
     random_quadruples_from_single, random_quadruples_xxxy, random_quadruples_xyxz,
@@ -141,6 +143,18 @@ use std::marker::PhantomData;
 use std::ops::{Shl, Shr};
 
 // -- GaussianInteger --
+
+pub fn special_random_natural_polynomial_gen(config: &GenConfig) -> It<NaturalPolynomial> {
+    Box::new(striped_random_natural_polynomials(
+        EXAMPLE_SEED,
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+        config.get_or("mean_length_n", 4),
+        config.get_or("mean_length_d", 1),
+    ))
+}
 
 pub fn special_random_gaussian_integer_gen(config: &GenConfig) -> It<GaussianInteger> {
     Box::new(striped_random_gaussian_integers(

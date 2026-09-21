@@ -9,9 +9,13 @@
 use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
+    latex::register(runner);
+    typst::register(runner);
     vec_delete_left::register(runner);
     vec_pad_left::register(runner);
 }
 
+mod latex;
+mod typst;
 mod vec_delete_left;
 mod vec_pad_left;

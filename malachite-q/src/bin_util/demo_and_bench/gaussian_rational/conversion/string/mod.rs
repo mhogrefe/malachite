@@ -10,8 +10,12 @@ use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
     from_string::register(runner);
+    latex::register(runner);
     to_string::register(runner);
+    typst::register(runner);
 }
 
 mod from_string;
+mod latex;
 mod to_string;
+mod typst;

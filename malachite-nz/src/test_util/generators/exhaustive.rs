@@ -71,6 +71,8 @@ use crate::natural::exhaustive::{
     exhaustive_naturals, exhaustive_positive_naturals,
 };
 use crate::natural::logic::significant_bits::limbs_significant_bits;
+use crate::natural_polynomial::NaturalPolynomial;
+use crate::natural_polynomial::exhaustive::exhaustive_natural_polynomials;
 use crate::platform::{
     DoubleLimb, Limb, ODD_CENTRAL_BINOMIAL_OFFSET, ODD_CENTRAL_BINOMIAL_TABLE_LIMIT,
     ODD_FACTORIAL_EXTTABLE_LIMIT, ODD_FACTORIAL_TABLE_LIMIT, SQR_TOOM2_THRESHOLD,
@@ -151,6 +153,10 @@ use std::marker::PhantomData;
 use std::ops::{Shl, Shr};
 
 // -- GaussianInteger --
+
+pub fn exhaustive_natural_polynomial_gen() -> It<NaturalPolynomial> {
+    Box::new(exhaustive_natural_polynomials())
+}
 
 pub fn exhaustive_gaussian_integer_gen() -> It<GaussianInteger> {
     Box::new(exhaustive_gaussian_integers())

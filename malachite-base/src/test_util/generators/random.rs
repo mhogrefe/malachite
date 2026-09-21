@@ -55,6 +55,7 @@ use crate::num::random::{
     special_random_primitive_floats,
 };
 use crate::options::random::random_options;
+use crate::orderings::random::random_orderings;
 use crate::random::{EXAMPLE_SEED, Seed};
 use crate::rounding_modes::RoundingMode::{self, *};
 use crate::rounding_modes::random::{RandomRoundingModes, random_rounding_modes};
@@ -94,6 +95,7 @@ use crate::vecs::random::{
     random_vecs_min_length,
 };
 use crate::vecs::random_values_from_vec;
+use core::cmp::Ordering;
 use itertools::{Itertools, repeat_n};
 use std::cmp::{Ordering::*, max, min};
 use std::collections::HashMap;
@@ -4794,6 +4796,10 @@ pub fn random_primitive_int_foer_sequence_triple_gen<T: PrimitiveInt>(
 }
 
 // -- RoundingMode --
+
+pub fn random_ordering_gen(_config: &GenConfig) -> It<Ordering> {
+    Box::new(random_orderings(EXAMPLE_SEED))
+}
 
 pub fn random_rounding_mode_gen(_config: &GenConfig) -> It<RoundingMode> {
     Box::new(random_rounding_modes(EXAMPLE_SEED))

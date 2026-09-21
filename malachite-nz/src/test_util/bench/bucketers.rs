@@ -10,6 +10,7 @@ use crate::gaussian_integer::GaussianInteger;
 use crate::integer::Integer;
 use crate::natural::Natural;
 use crate::natural::logic::significant_bits::limbs_significant_bits;
+use crate::natural_polynomial::NaturalPolynomial;
 use crate::platform::Limb;
 use crate::test_util::natural::arithmetic::gcd::OwnedHalfGcdMatrix;
 use malachite_base::foer_sequences::FoerSequence;
@@ -38,6 +39,20 @@ pub fn gaussian_integer_bit_bucketer(var_name: &str) -> Bucketer<'_, GaussianInt
         bucketing_label: format!(
             "max({var_name}.real.significant_bits(), {var_name}.imaginary.significant_bits())"
         ),
+    }
+}
+
+pub fn natural_polynomial_bit_bucketer(var_name: &str) -> Bucketer<'_, NaturalPolynomial> {
+    Bucketer {
+        bucketing_function: &|p| {
+            usize::exact_from(
+                p.coefficients_asc()
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+            )
+        },
+        bucketing_label: format!("{var_name}'s total coefficient bits"),
     }
 }
 

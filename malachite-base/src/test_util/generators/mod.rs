@@ -28,6 +28,7 @@ use crate::test_util::generators::exhaustive::*;
 use crate::test_util::generators::random::*;
 use crate::test_util::generators::special_random::*;
 use crate::tuples::exhaustive::{ExhaustivePairs, exhaustive_pairs_custom_output};
+use core::cmp::Ordering;
 
 // general
 
@@ -3175,6 +3176,14 @@ pub fn unsigned_foer_sequence_triple_gen<T: PrimitiveUnsigned>()
 }
 
 // -- RoundingMode --
+
+pub fn ordering_gen() -> Generator<Ordering> {
+    Generator::new(
+        &exhaustive_ordering_gen,
+        &random_ordering_gen,
+        &random_ordering_gen,
+    )
+}
 
 pub fn rounding_mode_gen() -> Generator<RoundingMode> {
     Generator::new_no_special(&exhaustive_rounding_mode_gen, &random_rounding_mode_gen)

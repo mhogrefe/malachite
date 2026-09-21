@@ -76,12 +76,14 @@ pub(crate) fn register(runner: &mut Runner) {
     bools::register(runner);
     chars::register(runner);
     comparison::register(runner);
+    foer_sequences::register(runner);
     num::register(runner);
     options::register(runner);
-    foer_sequences::register(runner);
+    orderings::register(runner);
     rounding_modes::register(runner);
     slices::register(runner);
     strings::register(runner);
+    tuples::register(runner);
     vars::register(runner);
     vecs::register(runner);
 }
@@ -92,8 +94,10 @@ mod comparison;
 mod foer_sequences;
 mod num;
 mod options;
+mod orderings;
 mod rounding_modes;
 mod slices;
 mod strings;
+mod tuples;
 mod vars;
 mod vecs;

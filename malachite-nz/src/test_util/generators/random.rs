@@ -62,6 +62,8 @@ use crate::natural::random::{
     random_natural_range_to_infinity, random_naturals, random_naturals_less_than,
     random_positive_naturals,
 };
+use crate::natural_polynomial::NaturalPolynomial;
+use crate::natural_polynomial::random::random_natural_polynomials;
 use crate::platform::{
     DoubleLimb, Limb, ODD_CENTRAL_BINOMIAL_OFFSET, ODD_CENTRAL_BINOMIAL_TABLE_LIMIT,
     ODD_FACTORIAL_EXTTABLE_LIMIT, ODD_FACTORIAL_TABLE_LIMIT, SQR_TOOM2_THRESHOLD,
@@ -144,6 +146,16 @@ use std::marker::PhantomData;
 use std::ops::{Shl, Shr};
 
 // -- GaussianInteger --
+
+pub fn random_natural_polynomial_gen(config: &GenConfig) -> It<NaturalPolynomial> {
+    Box::new(random_natural_polynomials(
+        EXAMPLE_SEED,
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+        config.get_or("mean_length_n", 4),
+        config.get_or("mean_length_d", 1),
+    ))
+}
 
 pub fn random_gaussian_integer_gen(config: &GenConfig) -> It<GaussianInteger> {
     Box::new(random_gaussian_integers(

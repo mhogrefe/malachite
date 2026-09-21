@@ -13,11 +13,15 @@ pub(crate) fn register(runner: &mut Runner) {
     basic::register(runner);
     comparison::register(runner);
     conversion::register(runner);
+    latex::register(runner);
     to_string::register(runner);
+    typst::register(runner);
 }
 
 mod access;
 mod basic;
 mod comparison;
 mod conversion;
+mod latex;
 mod to_string;
+mod typst;

@@ -12,12 +12,16 @@ pub(crate) fn register(runner: &mut Runner) {
     format_rational::register(runner);
     from_sci_string::register(runner);
     from_string::register(runner);
+    latex::register(runner);
     to_sci::register(runner);
     to_string::register(runner);
+    typst::register(runner);
 }
 
 mod format_rational;
 mod from_sci_string;
 mod from_string;
+mod latex;
 mod to_sci;
 mod to_string;
+mod typst;

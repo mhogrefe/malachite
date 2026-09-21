@@ -43,6 +43,7 @@ use crate::num::float::NiceFloat;
 use crate::num::iterators::{bit_distributor_sequence, ruler_sequence};
 use crate::num::logic::traits::{BitBlockAccess, LeadingZeros};
 use crate::options::exhaustive::exhaustive_options;
+use crate::orderings::exhaustive::exhaustive_orderings;
 use crate::rounding_modes::RoundingMode::{self, *};
 use crate::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use crate::slices::slice_test_zero;
@@ -85,6 +86,7 @@ use crate::vecs::exhaustive::{
     lex_vecs_fixed_length_from_single, shortlex_vecs, shortlex_vecs_length_inclusive_range,
     shortlex_vecs_min_length,
 };
+use core::cmp::Ordering;
 use itertools::{Itertools, repeat_n};
 use std::cmp::{max, min};
 use std::iter::once;
@@ -3645,6 +3647,10 @@ pub fn exhaustive_unsigned_foer_sequence_triple_gen<T: PrimitiveUnsigned>()
 }
 
 // -- RoundingMode --
+
+pub fn exhaustive_ordering_gen() -> It<Ordering> {
+    Box::new(exhaustive_orderings())
+}
 
 pub fn exhaustive_rounding_mode_gen() -> It<RoundingMode> {
     Box::new(exhaustive_rounding_modes())

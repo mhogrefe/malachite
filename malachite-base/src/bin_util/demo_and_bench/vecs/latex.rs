@@ -6,22 +6,17 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
+use malachite_base::strings::latex::ToLatex;
+use malachite_base::test_util::generators::common::{GenConfig, GenMode};
+use malachite_base::test_util::generators::unsigned_vec_gen;
 use malachite_base::test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
-    format_natural::register(runner);
-    from_sci_string::register(runner);
-    from_string::register(runner);
-    latex::register(runner);
-    to_sci::register(runner);
-    to_string::register(runner);
-    typst::register(runner);
+    register_demo!(runner, demo_vec_to_latex);
 }
 
-mod format_natural;
-mod from_sci_string;
-mod from_string;
-mod latex;
-mod to_sci;
-mod to_string;
-mod typst;
+fn demo_vec_to_latex(gm: GenMode, config: &GenConfig, limit: usize) {
+    for xs in unsigned_vec_gen::<u8>().get(gm, config).take(limit) {
+        println!("{:?}.to_latex() = {}", xs, xs.to_latex());
+    }
+}

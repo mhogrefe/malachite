@@ -11,6 +11,7 @@ use crate::integer::Integer;
 use crate::natural::Natural;
 use crate::natural::arithmetic::factorial::FAC_DSC_THRESHOLD;
 use crate::natural::arithmetic::gcd::half_gcd::HalfGcdMatrix1;
+use crate::natural_polynomial::NaturalPolynomial;
 use crate::platform::{Limb, ODD_DOUBLEFACTORIAL_TABLE_LIMIT};
 use crate::test_util::generators::common::{
     integer_integer_natural_triple_rm, integer_integer_triple_1_2_rm, integer_natural_pair_rm,
@@ -39,6 +40,15 @@ use num::{BigInt, BigUint};
 use std::ops::{Shl, Shr};
 
 // -- GaussianInteger --
+
+// All `NaturalPolynomial`s.
+pub fn natural_polynomial_gen() -> Generator<NaturalPolynomial> {
+    Generator::new(
+        &exhaustive_natural_polynomial_gen,
+        &random_natural_polynomial_gen,
+        &special_random_natural_polynomial_gen,
+    )
+}
 
 pub fn gaussian_integer_gen() -> Generator<GaussianInteger> {
     Generator::new(
