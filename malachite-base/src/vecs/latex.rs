@@ -40,12 +40,13 @@ impl<T: ToLatex> ToLatex for Vec<T> {
     /// );
     /// ```
     ///
-    /// | value                    | fragment                                       |
-    /// |--------------------------|------------------------------------------------|
-    /// | `Vec::<u8>::new()`       | `\left[\right]`                                |
-    /// | `vec![5u8]`              | `\left[5\right]`                               |
-    /// | `vec![1u8, 2, 3]`        | `\left[1, 2, 3\right]`                         |
-    /// | `vec![vec![1], vec![2]]` | `\left[\left[1\right], \left[2\right]\right]`  |
+    /// | value                         | fragment                                         | renders as                                       |
+    /// |-------------------------------|--------------------------------------------------|--------------------------------------------------|
+    /// | `Vec::<u8>::new()`            | `\left[\right]`                                  | $\left[\right]$                                  |
+    /// | `vec![5u8]`                   | `\left[5\right]`                                 | $\left[5\right]$                                 |
+    /// | `vec![1u8, 2, 3]`             | `\left[1, 2, 3\right]`                           | $\left[1, 2, 3\right]$                           |
+    /// | `vec![vec![1u8], vec![2, 3]]` | `\left[\left[1\right], \left[2, 3\right]\right]` | $\left[\left[1\right], \left[2, 3\right]\right]$ |
+    #[cfg_attr(dylint_lib = "malachite_lints", expect(long_lines))]
     #[inline]
     fn fmt_latex(&self, f: &mut Formatter) -> Result {
         fmt_latex_slice(self, f)

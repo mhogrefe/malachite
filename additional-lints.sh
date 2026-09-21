@@ -21,6 +21,10 @@ python3 complexity-doc-check.py
 # reaches KaTeX as a LaTeX comment and renders nothing. See math-escape-check.py.
 echo "Checking math-span escapes"
 python3 math-escape-check.py
+# A demonstration table in the rustdoc is written by hand beside the doctest it illustrates, and
+# the two can drift apart, leaving the table showing a fragment no test has ever checked.
+echo "Checking doc tables against their doctests"
+python3 doc-table-check.py
 # A stale `#[expect(long_lines)]` exemption surfaces as an unfulfilled-expectation warning; make
 # it fail the run like any other lint hit.
 export DYLINT_RUSTFLAGS="-D unfulfilled_lint_expectations"

@@ -47,10 +47,10 @@ impl<T: ToLatex> ToLatex for BTreeSet<T> {
     /// assert_eq!(xs.to_latex().to_string(), r"\left\{1, 2, 3\right\}");
     /// ```
     ///
-    /// | value                    | fragment                 | renders as               |
-    /// |--------------------------|--------------------------|--------------------------|
-    /// | `BTreeSet::<u8>::new()`  | `\left\{\right\}`        | $\left\\{\right\\}$      |
-    /// | `BTreeSet::from([3, 1])` | `\left\{1, 3\right\}`    | $\left\\{1, 3\right\\}$  |
+    /// | value                         | fragment                 | renders as                 |
+    /// |-------------------------------|--------------------------|----------------------------|
+    /// | `BTreeSet::<u8>::new()`       | `\left\{\right\}`        | $\left\\{\right\\}$        |
+    /// | `BTreeSet::from([3u8, 1, 2])` | `\left\{1, 2, 3\right\}` | $\left\\{1, 2, 3\right\\}$ |
     #[inline]
     fn fmt_latex(&self, f: &mut Formatter) -> Result {
         fmt_latex_sequence(self.iter(), "\\left\\{", "\\right\\}", f)
@@ -93,10 +93,10 @@ impl<T: Eq + Hash + Ord + ToLatex> ToLatex for HashSet<T> {
     /// assert_eq!(xs.to_latex().to_string(), r"\left\{1, 2, 3\right\}");
     /// ```
     ///
-    /// | value                   | fragment                 | renders as               |
-    /// |-------------------------|--------------------------|--------------------------|
-    /// | `HashSet::<u8>::new()`  | `\left\{\right\}`        | $\left\\{\right\\}$      |
-    /// | `HashSet::from([3, 1])` | `\left\{1, 3\right\}`    | $\left\\{1, 3\right\\}$  |
+    /// | value                        | fragment                 | renders as                 |
+    /// |------------------------------|--------------------------|----------------------------|
+    /// | `HashSet::<u8>::new()`       | `\left\{\right\}`        | $\left\\{\right\\}$        |
+    /// | `HashSet::from([3u8, 1, 2])` | `\left\{1, 2, 3\right\}` | $\left\\{1, 2, 3\right\\}$ |
     fn fmt_latex(&self, f: &mut Formatter) -> Result {
         let mut xs = self.iter().collect::<Vec<_>>();
         xs.sort_unstable();

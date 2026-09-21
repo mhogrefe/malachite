@@ -73,6 +73,13 @@ documented by git history.
   sorting two equal sets could have different fragments, and the same set could have a different
   fragment in the next run. Sorting also makes a `HashSet`'s fragment agree with the `BTreeSet` of
   the same elements.
+- `ToLatex` and `ToTypst` for `HashMap<K, V>` and `BTreeMap<K, V>`, whenever the key and value types
+  have them. Each entry is written as its key, a "maps to" arrow, and its value; the entries are
+  separated by commas and wrapped in braces, as a map is a set of associations:
+  `BTreeMap::from([(1u8, 10u8), (2, 20)])` becomes `\left\{1 \mapsto 10, 2 \mapsto 20\right\}` and
+  `{1 |-> 10, 2 |-> 20}`. Two-line matrix notation was considered and rejected, since it means a
+  permutation specifically. As for `HashSet`, a `HashMap`'s entries are sorted by key first, so its
+  implementations ask for `Ord` where a `HashMap` does not.
 - `ToLatex` for `Option<T>` whenever `T: ToLatex`. `None` becomes `\bot`, and `Some` wraps its
   value in square brackets written with `\left` and `\right`, so that they grow to fit a value
   taller than one line: `Some(5)` becomes `\left[5\right]`. The brackets are not decoration:

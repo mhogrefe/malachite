@@ -207,6 +207,7 @@ pub mod maps {
         pub mod exhaustive_hash_maps_unique_value_count_inclusive_range;
         pub mod exhaustive_hash_maps_unique_value_count_range;
     }
+    pub mod latex;
     pub mod random {
         pub mod random_b_tree_maps;
         pub mod random_b_tree_maps_fixed_size;
@@ -229,6 +230,7 @@ pub mod maps {
         pub mod random_hash_maps_unique_value_count_inclusive_range;
         pub mod random_hash_maps_unique_value_count_range;
     }
+    pub mod typst;
 }
 pub mod named;
 pub mod nevers {

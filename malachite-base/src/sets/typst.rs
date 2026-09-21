@@ -48,10 +48,10 @@ impl<T: ToTypst> ToTypst for BTreeSet<T> {
     /// assert_eq!(xs.to_typst().to_string(), "{1, 2, 3}");
     /// ```
     ///
-    /// | value                    | fragment |
-    /// |--------------------------|----------|
-    /// | `BTreeSet::<u8>::new()`  | `{}`     |
-    /// | `BTreeSet::from([3, 1])` | `{1, 3}` |
+    /// | value                         | fragment    |
+    /// |-------------------------------|-------------|
+    /// | `BTreeSet::<u8>::new()`       | `{}`        |
+    /// | `BTreeSet::from([3u8, 1, 2])` | `{1, 2, 3}` |
     #[inline]
     fn fmt_typst(&self, f: &mut Formatter) -> Result {
         fmt_typst_sequence(self.iter(), "{", "}", f)
@@ -95,10 +95,10 @@ impl<T: Eq + Hash + Ord + ToTypst> ToTypst for HashSet<T> {
     /// assert_eq!(xs.to_typst().to_string(), "{1, 2, 3}");
     /// ```
     ///
-    /// | value                   | fragment |
-    /// |-------------------------|----------|
-    /// | `HashSet::<u8>::new()`  | `{}`     |
-    /// | `HashSet::from([3, 1])` | `{1, 3}` |
+    /// | value                        | fragment    |
+    /// |------------------------------|-------------|
+    /// | `HashSet::<u8>::new()`       | `{}`        |
+    /// | `HashSet::from([3u8, 1, 2])` | `{1, 2, 3}` |
     fn fmt_typst(&self, f: &mut Formatter) -> Result {
         let mut xs = self.iter().collect::<Vec<_>>();
         xs.sort_unstable();

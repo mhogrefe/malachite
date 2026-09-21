@@ -8,6 +8,10 @@
 
 /// Iterators that generate maps without repetition.
 pub mod exhaustive;
+/// The implementations of [`ToLatex`](crate::strings::latex::ToLatex) for maps.
+pub mod latex;
 #[cfg(feature = "random")]
 /// Iterators that generate maps randomly.
 pub mod random;
+/// The implementations of [`ToTypst`](crate::strings::typst::ToTypst) for maps.
+pub mod typst;
