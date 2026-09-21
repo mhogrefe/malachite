@@ -8,6 +8,7 @@
 
 use crate::gaussian_integer::GaussianInteger;
 use crate::integer::Integer;
+use crate::integer_polynomial::IntegerPolynomial;
 use crate::natural::Natural;
 use crate::natural::arithmetic::factorial::FAC_DSC_THRESHOLD;
 use crate::natural::arithmetic::gcd::half_gcd::HalfGcdMatrix1;
@@ -51,11 +52,27 @@ pub fn natural_polynomial_unsigned_pair_gen_var_1() -> Generator<(NaturalPolynom
     )
 }
 
+pub fn integer_polynomial_unsigned_pair_gen_var_1() -> Generator<(IntegerPolynomial, u64)> {
+    Generator::new(
+        &exhaustive_integer_polynomial_unsigned_pair_gen_var_1,
+        &random_integer_polynomial_unsigned_pair_gen_var_1,
+        &special_random_integer_polynomial_unsigned_pair_gen_var_1,
+    )
+}
+
 pub fn natural_polynomial_gen() -> Generator<NaturalPolynomial> {
     Generator::new(
         &exhaustive_natural_polynomial_gen,
         &random_natural_polynomial_gen,
         &special_random_natural_polynomial_gen,
+    )
+}
+
+pub fn integer_polynomial_gen() -> Generator<IntegerPolynomial> {
+    Generator::new(
+        &exhaustive_integer_polynomial_gen,
+        &random_integer_polynomial_gen,
+        &special_random_integer_polynomial_gen,
     )
 }
 

@@ -17,6 +17,8 @@ use crate::integer::random::{
     StripedRandomIntegers, striped_random_integers, striped_random_natural_integers,
     striped_random_negative_integers, striped_random_nonzero_integers,
 };
+use crate::integer_polynomial::IntegerPolynomial;
+use crate::integer_polynomial::random::striped_random_integer_polynomials;
 use crate::natural::arithmetic::div_exact::{
     limbs_modular_invert_limb, limbs_modular_invert_scratch_len,
 };
@@ -164,8 +166,40 @@ pub fn special_random_natural_polynomial_unsigned_pair_gen_var_1(
     ))
 }
 
+pub fn special_random_integer_polynomial_unsigned_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(IntegerPolynomial, u64)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_integer_polynomials(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| random_unsigned_inclusive_range(seed, 0, 19),
+    ))
+}
+
 pub fn special_random_natural_polynomial_gen(config: &GenConfig) -> It<NaturalPolynomial> {
     Box::new(striped_random_natural_polynomials(
+        EXAMPLE_SEED,
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+        config.get_or("mean_length_n", 4),
+        config.get_or("mean_length_d", 1),
+    ))
+}
+
+pub fn special_random_integer_polynomial_gen(config: &GenConfig) -> It<IntegerPolynomial> {
+    Box::new(striped_random_integer_polynomials(
         EXAMPLE_SEED,
         config.get_or("mean_stripe_n", 32),
         config.get_or("mean_stripe_d", 1),

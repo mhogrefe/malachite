@@ -17,6 +17,8 @@ use crate::integer::exhaustive::{
     exhaustive_nonzero_integers,
 };
 use crate::integer::logic::bit_access::limbs_vec_clear_bit_neg;
+use crate::integer_polynomial::IntegerPolynomial;
+use crate::integer_polynomial::exhaustive::exhaustive_integer_polynomials;
 use crate::natural::Natural;
 use crate::natural::arithmetic::add::{limbs_vec_add_in_place_left, limbs_vec_add_limb_in_place};
 use crate::natural::arithmetic::binomial_coefficient::{
@@ -164,8 +166,19 @@ pub fn exhaustive_natural_polynomial_unsigned_pair_gen_var_1() -> It<(NaturalPol
     ))
 }
 
+pub fn exhaustive_integer_polynomial_unsigned_pair_gen_var_1() -> It<(IntegerPolynomial, u64)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_integer_polynomials(),
+        primitive_int_increasing_inclusive_range(0, 19),
+    ))
+}
+
 pub fn exhaustive_natural_polynomial_gen() -> It<NaturalPolynomial> {
     Box::new(exhaustive_natural_polynomials())
+}
+
+pub fn exhaustive_integer_polynomial_gen() -> It<IntegerPolynomial> {
+    Box::new(exhaustive_integer_polynomials())
 }
 
 pub fn exhaustive_gaussian_integer_gen() -> It<GaussianInteger> {

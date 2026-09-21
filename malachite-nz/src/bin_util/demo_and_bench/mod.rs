@@ -48,11 +48,13 @@ macro_rules! natural_signed_single_arg_bench_with_trait {
 pub(crate) fn register(runner: &mut Runner) {
     gaussian_integer::register(runner);
     integer::register(runner);
+    integer_polynomial::register(runner);
     natural::register(runner);
     natural_polynomial::register(runner);
 }
 
 mod gaussian_integer;
 mod integer;
+mod integer_polynomial;
 mod natural;
 mod natural_polynomial;

@@ -8,6 +8,7 @@
 
 use crate::gaussian_integer::GaussianInteger;
 use crate::integer::Integer;
+use crate::integer_polynomial::IntegerPolynomial;
 use crate::natural::Natural;
 use crate::natural::logic::significant_bits::limbs_significant_bits;
 use crate::natural_polynomial::NaturalPolynomial;
@@ -58,7 +59,37 @@ pub fn pair_1_natural_polynomial_bit_bucketer<T>(
     }
 }
 
+pub fn pair_1_integer_polynomial_bit_bucketer<T>(
+    var_name: &str,
+) -> Bucketer<'_, (IntegerPolynomial, T)> {
+    Bucketer {
+        bucketing_function: &|(p, _)| {
+            usize::exact_from(
+                p.coefficients_asc()
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+            )
+        },
+        bucketing_label: format!("{var_name}'s total coefficient bits"),
+    }
+}
+
 pub fn natural_polynomial_bit_bucketer(var_name: &str) -> Bucketer<'_, NaturalPolynomial> {
+    Bucketer {
+        bucketing_function: &|p| {
+            usize::exact_from(
+                p.coefficients_asc()
+                    .iter()
+                    .map(SignificantBits::significant_bits)
+                    .sum::<u64>(),
+            )
+        },
+        bucketing_label: format!("{var_name}'s total coefficient bits"),
+    }
+}
+
+pub fn integer_polynomial_bit_bucketer(var_name: &str) -> Bucketer<'_, IntegerPolynomial> {
     Bucketer {
         bucketing_function: &|p| {
             usize::exact_from(

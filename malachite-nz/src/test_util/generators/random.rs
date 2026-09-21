@@ -16,6 +16,8 @@ use crate::integer::random::{
     RandomIntegers, random_integers, random_natural_integers, random_negative_integers,
     random_nonzero_integers,
 };
+use crate::integer_polynomial::IntegerPolynomial;
+use crate::integer_polynomial::random::random_integer_polynomials;
 use crate::natural::Natural;
 use crate::natural::arithmetic::binomial_coefficient::{
     BIN_GOETGHELUCK_THRESHOLD, BIN_UIUI_RECURSIVE_SMALLDC,
@@ -165,8 +167,36 @@ pub fn random_natural_polynomial_unsigned_pair_gen_var_1(
     ))
 }
 
+pub fn random_integer_polynomial_unsigned_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(IntegerPolynomial, u64)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_integer_polynomials(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| random_unsigned_inclusive_range(seed, 0, 19),
+    ))
+}
+
 pub fn random_natural_polynomial_gen(config: &GenConfig) -> It<NaturalPolynomial> {
     Box::new(random_natural_polynomials(
+        EXAMPLE_SEED,
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+        config.get_or("mean_length_n", 4),
+        config.get_or("mean_length_d", 1),
+    ))
+}
+
+pub fn random_integer_polynomial_gen(config: &GenConfig) -> It<IntegerPolynomial> {
+    Box::new(random_integer_polynomials(
         EXAMPLE_SEED,
         config.get_or("mean_bits_n", 64),
         config.get_or("mean_bits_d", 1),

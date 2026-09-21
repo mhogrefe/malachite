@@ -1,0 +1,804 @@
+// Copyright © 2026 Mikhail Hogrefe
+//
+// This file is part of Malachite.
+//
+// Malachite is free software: you can redistribute it and/or modify it under the terms of the GNU
+// Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
+// 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
+
+use crate::integer::Integer;
+use crate::integer::random::{
+    RandomIntegers, StripedRandomIntegers, random_integers, random_nonzero_integers,
+    striped_random_integers, striped_random_nonzero_integers,
+};
+use crate::integer_polynomial::IntegerPolynomial;
+use malachite_base::num::random::RandomUnsignedInclusiveRange;
+use malachite_base::num::random::geometric::{
+    GeometricRandomNaturalValues, GeometricRandomNonzeroSigneds, GeometricRandomSigneds,
+};
+use malachite_base::random::Seed;
+use malachite_base::vecs::random::{
+    RandomFixedLengthVecsWithLast, RandomVecsWithLast, random_vecs_with_last,
+    random_vecs_with_last_fixed_length, random_vecs_with_last_length_inclusive_range,
+    random_vecs_with_last_min_length,
+};
+
+/// Generates random [`IntegerPolynomial`]s with coefficients from one iterator and leading
+/// coefficients from another.
+///
+/// This `struct` is created by [`random_integer_polynomials_from_iterators`] and the generators
+/// built on it; see their documentation for more.
+#[derive(Clone, Debug)]
+pub struct RandomIntegerPolynomials<
+    I: Iterator<Item = u64>,
+    J: Iterator<Item = Integer>,
+    K: Iterator<Item = Integer>,
+>(RandomVecsWithLast<Integer, I, J, K>);
+
+impl<I: Iterator<Item = u64>, J: Iterator<Item = Integer>, K: Iterator<Item = Integer>> Iterator
+    for RandomIntegerPolynomials<I, J, K>
+{
+    type Item = IntegerPolynomial;
+
+    #[inline]
+    fn next(&mut self) -> Option<IntegerPolynomial> {
+        self.0.next().map(IntegerPolynomial::from_coefficients_asc)
+    }
+}
+
+/// The type of the [`IntegerPolynomial`] generators that draw their coefficients from every
+/// [`Integer`] and their leading coefficients from every nonzero one, with lengths from a geometric
+/// distribution.
+pub type RandomIntegerPolynomialsFromIntegers = RandomIntegerPolynomials<
+    GeometricRandomNaturalValues<u64>,
+    RandomPolynomialCoefficients,
+    RandomPolynomialLeadingCoefficients,
+>;
+
+/// Generates random [`IntegerPolynomial`]s whose coefficients come from one iterator and whose
+/// leading coefficients come from another.
+///
+/// A polynomial is its coefficients, and the only thing that distinguishes them from any other list
+/// of [`Integer`]s is that the last of them may not be zero. Singling out that one coefficient is
+/// therefore all it takes: `xs_gen` supplies every coefficient below the leading one, and `ys_gen`
+/// supplies the leading one.
+///
+/// `ys_gen` should produce no zeros, since a polynomial's leading coefficient is never zero. If it
+/// does, the zeros are trimmed away, and the polynomial has a lower degree than its length
+/// suggests.
+///
+/// The lengths of the polynomials — the number of coefficients, which is one more than the
+/// degree, or zero for the zero polynomial — are sampled from a geometric distribution with a
+/// specified mean $m$, equal to `mean_length_numerator / mean_length_denominator`. $m$ must be
+/// greater than 0.
+///
+/// The iterators produced by `xs_gen` and `ys_gen` must be infinite.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell T^\prime(i))$
+///
+/// $M(i) = O(\ell M^\prime(i))$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $T^\prime$ and
+/// $M^\prime$ are the time and memory functions of the iterators produced by `xs_gen` and `ys_gen`,
+/// and $\ell$ is the number of coefficients of the $i$th output.
+///
+/// # Panics
+/// Panics if `mean_length_numerator` or `mean_length_denominator` are zero, or if their ratio is
+/// greater than or equal to $2^{64}$.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::integer::random::{random_integers, random_nonzero_integers};
+/// use malachite_nz::integer_polynomial::random::random_integer_polynomials_from_iterators;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         random_integer_polynomials_from_iterators(
+///             EXAMPLE_SEED,
+///             &|seed| random_integers(seed, 4, 1),
+///             &|seed| random_nonzero_integers(seed, 4, 1),
+///             1,
+///             1,
+///         ),
+///         5
+///     ),
+///     "[14, -2*x-497, 2*x-1, 122*x+1, 1, ...]"
+/// );
+/// ```
+#[inline]
+pub fn random_integer_polynomials_from_iterators<
+    J: Iterator<Item = Integer>,
+    K: Iterator<Item = Integer>,
+>(
+    seed: Seed,
+    xs_gen: &dyn Fn(Seed) -> J,
+    ys_gen: &dyn Fn(Seed) -> K,
+    mean_length_numerator: u64,
+    mean_length_denominator: u64,
+) -> RandomIntegerPolynomials<GeometricRandomNaturalValues<u64>, J, K> {
+    RandomIntegerPolynomials(random_vecs_with_last(
+        seed,
+        xs_gen,
+        ys_gen,
+        mean_length_numerator,
+        mean_length_denominator,
+    ))
+}
+
+/// Generates random [`IntegerPolynomial`]s.
+///
+/// The coefficients are sampled from [`random_integers`] and the leading coefficient from
+/// [`random_nonzero_integers`], both with a mean bit count of `mean_bits_numerator /
+/// mean_bits_denominator`.
+///
+/// The lengths — the number of coefficients, which is one more than the degree, or zero for the
+/// zero polynomial — are sampled from a geometric distribution with mean `mean_length_numerator /
+/// mean_length_denominator`, so the zero polynomial is generated with the probability that that
+/// distribution gives to 0.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell b)$
+///
+/// $M(i) = O(\ell b)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $\ell$ is the number
+/// of coefficients of the $i$th output, and $b$ is `mean_bits_numerator / mean_bits_denominator`.
+///
+/// # Panics
+/// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero, if their ratio is less than
+/// or equal to 1, or if `mean_length_numerator` or `mean_length_denominator` are zero or their
+/// ratio is greater than or equal to $2^{64}$.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::integer_polynomial::random::random_integer_polynomials;
+///
+/// assert_eq!(
+///     prefix_to_string(random_integer_polynomials(EXAMPLE_SEED, 4, 1, 1, 1), 5),
+///     "[14, -2*x-497, 2*x-1, 122*x+1, 1, ...]"
+/// );
+/// ```
+#[inline]
+pub fn random_integer_polynomials(
+    seed: Seed,
+    mean_bits_numerator: u64,
+    mean_bits_denominator: u64,
+    mean_length_numerator: u64,
+    mean_length_denominator: u64,
+) -> RandomIntegerPolynomialsFromIntegers {
+    random_integer_polynomials_from_iterators(
+        seed,
+        &|seed_2| random_integers(seed_2, mean_bits_numerator, mean_bits_denominator),
+        &|seed_2| random_nonzero_integers(seed_2, mean_bits_numerator, mean_bits_denominator),
+        mean_length_numerator,
+        mean_length_denominator,
+    )
+}
+
+/// Generates random [`IntegerPolynomial`]s of a given degree, with coefficients from one iterator
+/// and leading coefficients from another.
+///
+/// This `struct` is created by [`random_integer_polynomials_with_degree`] and
+/// [`striped_random_integer_polynomials_with_degree`]; see their documentation for more.
+#[derive(Clone, Debug)]
+pub struct RandomIntegerPolynomialsWithDegree<
+    J: Iterator<Item = Integer>,
+    K: Iterator<Item = Integer>,
+>(RandomFixedLengthVecsWithLast<Integer, J, K>);
+
+impl<J: Iterator<Item = Integer>, K: Iterator<Item = Integer>> Iterator
+    for RandomIntegerPolynomialsWithDegree<J, K>
+{
+    type Item = IntegerPolynomial;
+
+    #[inline]
+    fn next(&mut self) -> Option<IntegerPolynomial> {
+        self.0.next().map(IntegerPolynomial::from_coefficients_asc)
+    }
+}
+
+/// The coefficients that the unstriped [`IntegerPolynomial`] generators draw on.
+pub type RandomPolynomialCoefficients = RandomIntegers<GeometricRandomSigneds<i64>>;
+
+/// The leading coefficients that the unstriped [`IntegerPolynomial`] generators draw on: a
+/// polynomial's leading coefficient is never zero.
+pub type RandomPolynomialLeadingCoefficients = RandomIntegers<GeometricRandomNonzeroSigneds<i64>>;
+
+/// The coefficients that the striped [`IntegerPolynomial`] generators draw on.
+pub type StripedRandomPolynomialCoefficients = StripedRandomIntegers<GeometricRandomSigneds<i64>>;
+
+/// The leading coefficients that the striped [`IntegerPolynomial`] generators draw on.
+pub type StripedRandomPolynomialLeadingCoefficients =
+    StripedRandomIntegers<GeometricRandomNonzeroSigneds<i64>>;
+
+/// The type of the [`IntegerPolynomial`] generators whose degrees are uniform over a range.
+pub type RandomIntegerPolynomialsInDegreeRange = RandomIntegerPolynomials<
+    RandomUnsignedInclusiveRange<u64>,
+    RandomPolynomialCoefficients,
+    RandomPolynomialLeadingCoefficients,
+>;
+
+/// The type of the striped [`IntegerPolynomial`] generators with geometrically distributed lengths.
+pub type StripedRandomIntegerPolynomialsFromIntegers = RandomIntegerPolynomials<
+    GeometricRandomNaturalValues<u64>,
+    StripedRandomPolynomialCoefficients,
+    StripedRandomPolynomialLeadingCoefficients,
+>;
+
+/// The type of the striped [`IntegerPolynomial`] generators whose degrees are uniform over a range.
+pub type StripedRandomIntegerPolynomialsInDegreeRange = RandomIntegerPolynomials<
+    RandomUnsignedInclusiveRange<u64>,
+    StripedRandomPolynomialCoefficients,
+    StripedRandomPolynomialLeadingCoefficients,
+>;
+
+/// Generates random [`IntegerPolynomial`]s of a given degree.
+///
+/// A polynomial of degree $d$ has $d+1$ coefficients, of which the leading one is nonzero. The zero
+/// polynomial is never generated: it has no degree at all, so no degree is the one it has.
+///
+/// The coefficients are sampled from [`random_integers`] and the leading coefficient from
+/// [`random_nonzero_integers`], both with a mean bit count of `mean_bits_numerator /
+/// mean_bits_denominator`.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(db)$
+///
+/// $M(i) = O(db)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $d$ is `degree`, and
+/// $b$ is `mean_bits_numerator / mean_bits_denominator`.
+///
+/// # Panics
+/// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero, or if their ratio is less
+/// than or equal to 1.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::integer_polynomial::random::random_integer_polynomials_with_degree;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         random_integer_polynomials_with_degree(EXAMPLE_SEED, 2, 4, 1),
+///         5
+///     ),
+///     "[14*x^2-x-497, -2*x^2+19*x+1, 2*x^2+799*x+799, 122*x^2+66*x-1, x^2+334*x-10721, ...]"
+/// );
+/// ```
+#[inline]
+pub fn random_integer_polynomials_with_degree(
+    seed: Seed,
+    degree: u64,
+    mean_bits_numerator: u64,
+    mean_bits_denominator: u64,
+) -> RandomIntegerPolynomialsWithDegree<
+    RandomPolynomialCoefficients,
+    RandomPolynomialLeadingCoefficients,
+> {
+    RandomIntegerPolynomialsWithDegree(random_vecs_with_last_fixed_length(
+        degree.saturating_add(1),
+        random_integers(seed.fork("xs"), mean_bits_numerator, mean_bits_denominator),
+        random_nonzero_integers(seed.fork("ys"), mean_bits_numerator, mean_bits_denominator),
+    ))
+}
+
+/// Generates random [`IntegerPolynomial`]s with a minimum degree.
+///
+/// The zero polynomial is never generated: it has no degree at all, so it is not of any degree at
+/// least `min_degree`.
+///
+/// The coefficients are sampled from [`random_integers`] and the leading coefficient from
+/// [`random_nonzero_integers`], both with a mean bit count of `mean_bits_numerator /
+/// mean_bits_denominator`. The lengths — the number of coefficients, which is one more than the
+/// degree — are sampled from a geometric distribution with mean `mean_length_numerator /
+/// mean_length_denominator`, which must be greater than `min_degree + 1`.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell b)$
+///
+/// $M(i) = O(\ell b)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $\ell$ is the number
+/// of coefficients of the $i$th output, and $b$ is `mean_bits_numerator / mean_bits_denominator`.
+///
+/// # Panics
+/// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero, if their ratio is less than
+/// or equal to 1, or if `mean_length_numerator / mean_length_denominator` is less than or equal to
+/// `min_degree + 1`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::integer_polynomial::random::random_integer_polynomials_min_degree;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         random_integer_polynomials_min_degree(EXAMPLE_SEED, 1, 4, 1, 3, 1),
+///         5
+///     ),
+///     "[14*x^2-x-497, -2*x^3+799*x^2+19*x+1, 2*x^3+66*x^2-x+799, 122*x^3+59*x^2+334*x-10721, \
+///      x^2-5*x-119, ...]"
+/// );
+/// ```
+#[inline]
+pub fn random_integer_polynomials_min_degree(
+    seed: Seed,
+    min_degree: u64,
+    mean_bits_numerator: u64,
+    mean_bits_denominator: u64,
+    mean_length_numerator: u64,
+    mean_length_denominator: u64,
+) -> RandomIntegerPolynomialsFromIntegers {
+    RandomIntegerPolynomials(random_vecs_with_last_min_length(
+        seed,
+        min_degree.saturating_add(1),
+        &|seed_2| random_integers(seed_2, mean_bits_numerator, mean_bits_denominator),
+        &|seed_2| random_nonzero_integers(seed_2, mean_bits_numerator, mean_bits_denominator),
+        mean_length_numerator,
+        mean_length_denominator,
+    ))
+}
+
+/// Generates random [`IntegerPolynomial`]s with degrees in $[a, b)$.
+///
+/// The degrees are sampled from a uniform distribution on $[a, b)$. The zero polynomial is never
+/// generated: it has no degree at all, so its degree is in no range.
+///
+/// The coefficients are sampled from [`random_integers`] and the leading coefficient from
+/// [`random_nonzero_integers`], both with a mean bit count of `mean_bits_numerator /
+/// mean_bits_denominator`.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(bd)$
+///
+/// $M(i) = O(bd)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $d$ is $b$, and $b$ is
+/// `mean_bits_numerator / mean_bits_denominator`.
+///
+/// # Panics
+/// Panics if $a \geq b$, if `mean_bits_numerator` or `mean_bits_denominator` are zero, or if their
+/// ratio is less than or equal to 1.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::integer_polynomial::random::random_integer_polynomials_degree_range;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         random_integer_polynomials_degree_range(EXAMPLE_SEED, 1, 3, 4, 1),
+///         5
+///     ),
+///     "[14*x^2-x-497, -2*x+1, 2*x^2+799*x+19, 122*x^2-x+799, x+66, ...]"
+/// );
+/// ```
+#[inline]
+pub fn random_integer_polynomials_degree_range(
+    seed: Seed,
+    a: u64,
+    b: u64,
+    mean_bits_numerator: u64,
+    mean_bits_denominator: u64,
+) -> RandomIntegerPolynomialsInDegreeRange {
+    assert!(a < b, "the degree range [{a}, {b}) is empty");
+    random_integer_polynomials_degree_inclusive_range(
+        seed,
+        a,
+        b - 1,
+        mean_bits_numerator,
+        mean_bits_denominator,
+    )
+}
+
+/// Generates random [`IntegerPolynomial`]s with degrees in $[a, b]$.
+///
+/// The degrees are sampled from a uniform distribution on $[a, b]$. The zero polynomial is never
+/// generated: it has no degree at all, so its degree is in no range.
+///
+/// The coefficients are sampled from [`random_integers`] and the leading coefficient from
+/// [`random_nonzero_integers`], both with a mean bit count of `mean_bits_numerator /
+/// mean_bits_denominator`.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(b^\prime b)$
+///
+/// $M(i) = O(b^\prime b)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $b^\prime$ is the
+/// largest degree, and $b$ is `mean_bits_numerator / mean_bits_denominator`.
+///
+/// # Panics
+/// Panics if $a > b$, if `mean_bits_numerator` or `mean_bits_denominator` are zero, or if their
+/// ratio is less than or equal to 1.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::integer_polynomial::random::*;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         random_integer_polynomials_degree_inclusive_range(EXAMPLE_SEED, 1, 2, 4, 1),
+///         5
+///     ),
+///     "[14*x^2-x-497, -2*x+1, 2*x^2+799*x+19, 122*x^2-x+799, x+66, ...]"
+/// );
+/// ```
+#[inline]
+pub fn random_integer_polynomials_degree_inclusive_range(
+    seed: Seed,
+    a: u64,
+    b: u64,
+    mean_bits_numerator: u64,
+    mean_bits_denominator: u64,
+) -> RandomIntegerPolynomialsInDegreeRange {
+    assert!(a <= b, "the degree range [{a}, {b}] is empty");
+    RandomIntegerPolynomials(random_vecs_with_last_length_inclusive_range(
+        seed,
+        a.saturating_add(1),
+        b.saturating_add(1),
+        &|seed_2| random_integers(seed_2, mean_bits_numerator, mean_bits_denominator),
+        &|seed_2| random_nonzero_integers(seed_2, mean_bits_numerator, mean_bits_denominator),
+    ))
+}
+
+/// Generates random [`IntegerPolynomial`]s with striped coefficients.
+///
+/// The coefficients are sampled from [`striped_random_integers`] and the leading coefficient from
+/// [`striped_random_nonzero_integers`], with a mean run length of `mean_stripe_numerator /
+/// mean_stripe_denominator` and a mean bit count of `mean_bits_numerator / mean_bits_denominator`.
+/// A striped coefficient is one whose bits come in long runs, which is what makes the carries and
+/// borrows of an arithmetic test interesting.
+///
+/// The lengths — the number of coefficients, which is one more than the degree, or zero for the
+/// zero polynomial — are sampled from a geometric distribution with mean `mean_length_numerator /
+/// mean_length_denominator`, so the zero polynomial is generated with the probability that that
+/// distribution gives to 0.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell b)$
+///
+/// $M(i) = O(\ell b)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $\ell$ is the number
+/// of coefficients of the $i$th output, and $b$ is `mean_bits_numerator / mean_bits_denominator`.
+///
+/// # Panics
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <
+/// mean_stripe_denominator`, if `mean_bits_numerator` or `mean_bits_denominator` are zero, if their
+/// ratio is less than or equal to 1, or if `mean_length_numerator` or `mean_length_denominator` are
+/// zero or their ratio is greater than or equal to $2^{64}$.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::integer_polynomial::random::striped_random_integer_polynomials;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         striped_random_integer_polynomials(EXAMPLE_SEED, 16, 1, 4, 1, 1, 1),
+///         5
+///     ),
+///     "[15, -2*x-496, 2*x-1, 65*x+1, 1, ...]"
+/// );
+/// ```
+#[inline]
+pub fn striped_random_integer_polynomials(
+    seed: Seed,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+    mean_bits_numerator: u64,
+    mean_bits_denominator: u64,
+    mean_length_numerator: u64,
+    mean_length_denominator: u64,
+) -> StripedRandomIntegerPolynomialsFromIntegers {
+    random_integer_polynomials_from_iterators(
+        seed,
+        &|seed_2| {
+            striped_random_integers(
+                seed_2,
+                mean_stripe_numerator,
+                mean_stripe_denominator,
+                mean_bits_numerator,
+                mean_bits_denominator,
+            )
+        },
+        &|seed_2| {
+            striped_random_nonzero_integers(
+                seed_2,
+                mean_stripe_numerator,
+                mean_stripe_denominator,
+                mean_bits_numerator,
+                mean_bits_denominator,
+            )
+        },
+        mean_length_numerator,
+        mean_length_denominator,
+    )
+}
+
+/// Generates random [`IntegerPolynomial`]s of a given degree, with striped coefficients.
+///
+/// A polynomial of degree $d$ has $d+1$ coefficients, of which the leading one is nonzero. The zero
+/// polynomial is never generated: it has no degree at all, so no degree is the one it has.
+///
+/// The coefficients are striped, as they are in [`striped_random_integer_polynomials`].
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(db)$
+///
+/// $M(i) = O(db)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $d$ is `degree`, and
+/// $b$ is `mean_bits_numerator / mean_bits_denominator`.
+///
+/// # Panics
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <
+/// mean_stripe_denominator`, if `mean_bits_numerator` or `mean_bits_denominator` are zero, or if
+/// their ratio is less than or equal to 1.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::integer_polynomial::random::*;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         striped_random_integer_polynomials_with_degree(EXAMPLE_SEED, 2, 16, 1, 4, 1),
+///         5
+///     ),
+///     "[15*x^2-x-496, -2*x^2+16*x+1, 2*x^2+543*x+512, 65*x^2+127*x-1, x^2+383*x-10239, ...]"
+/// );
+/// ```
+#[inline]
+pub fn striped_random_integer_polynomials_with_degree(
+    seed: Seed,
+    degree: u64,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+    mean_bits_numerator: u64,
+    mean_bits_denominator: u64,
+) -> RandomIntegerPolynomialsWithDegree<
+    StripedRandomPolynomialCoefficients,
+    StripedRandomPolynomialLeadingCoefficients,
+> {
+    RandomIntegerPolynomialsWithDegree(random_vecs_with_last_fixed_length(
+        degree.saturating_add(1),
+        striped_random_integers(
+            seed.fork("xs"),
+            mean_stripe_numerator,
+            mean_stripe_denominator,
+            mean_bits_numerator,
+            mean_bits_denominator,
+        ),
+        striped_random_nonzero_integers(
+            seed.fork("ys"),
+            mean_stripe_numerator,
+            mean_stripe_denominator,
+            mean_bits_numerator,
+            mean_bits_denominator,
+        ),
+    ))
+}
+
+/// Generates random [`IntegerPolynomial`]s with a minimum degree and striped coefficients.
+///
+/// The zero polynomial is never generated: it has no degree at all, so it is not of any degree at
+/// least `min_degree`.
+///
+/// The coefficients are striped, as they are in [`striped_random_integer_polynomials`]. The lengths
+/// — one more than the degree — are sampled from a geometric distribution with mean
+/// `mean_length_numerator / mean_length_denominator`, which must be greater than `min_degree + 1`.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell b)$
+///
+/// $M(i) = O(\ell b)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $\ell$ is the number
+/// of coefficients of the $i$th output, and $b$ is `mean_bits_numerator / mean_bits_denominator`.
+///
+/// # Panics
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <
+/// mean_stripe_denominator`, if `mean_bits_numerator` or `mean_bits_denominator` are zero, if their
+/// ratio is less than or equal to 1, or if `mean_length_numerator / mean_length_denominator` is
+/// less than or equal to `min_degree + 1`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::integer_polynomial::random::*;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         striped_random_integer_polynomials_min_degree(EXAMPLE_SEED, 1, 16, 1, 4, 1, 3, 1),
+///         5
+///     ),
+///     "[15*x^2-x-496, -2*x^3+512*x^2+16*x+1, 2*x^3+127*x^2-x+543, 65*x^3+36*x^2+383*x-10239, \
+///      x^2-4*x-127, ...]"
+/// );
+/// ```
+#[inline]
+pub fn striped_random_integer_polynomials_min_degree(
+    seed: Seed,
+    min_degree: u64,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+    mean_bits_numerator: u64,
+    mean_bits_denominator: u64,
+    mean_length_numerator: u64,
+    mean_length_denominator: u64,
+) -> StripedRandomIntegerPolynomialsFromIntegers {
+    RandomIntegerPolynomials(random_vecs_with_last_min_length(
+        seed,
+        min_degree.saturating_add(1),
+        &|seed_2| {
+            striped_random_integers(
+                seed_2,
+                mean_stripe_numerator,
+                mean_stripe_denominator,
+                mean_bits_numerator,
+                mean_bits_denominator,
+            )
+        },
+        &|seed_2| {
+            striped_random_nonzero_integers(
+                seed_2,
+                mean_stripe_numerator,
+                mean_stripe_denominator,
+                mean_bits_numerator,
+                mean_bits_denominator,
+            )
+        },
+        mean_length_numerator,
+        mean_length_denominator,
+    ))
+}
+
+/// Generates random [`IntegerPolynomial`]s with degrees in $[a, b)$ and striped coefficients.
+///
+/// The degrees are sampled from a uniform distribution on $[a, b)$. The zero polynomial is never
+/// generated: it has no degree at all, so its degree is in no range.
+///
+/// The coefficients are striped, as they are in [`striped_random_integer_polynomials`].
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(bd)$
+///
+/// $M(i) = O(bd)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $d$ is $b$, and $b$ is
+/// `mean_bits_numerator / mean_bits_denominator`.
+///
+/// # Panics
+/// Panics if $a \geq b$, if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <
+/// mean_stripe_denominator`, if `mean_bits_numerator` or `mean_bits_denominator` are zero, or if
+/// their ratio is less than or equal to 1.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::integer_polynomial::random::*;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         striped_random_integer_polynomials_degree_range(EXAMPLE_SEED, 1, 3, 16, 1, 4, 1),
+///         5
+///     ),
+///     "[15*x^2-x-496, -2*x+1, 2*x^2+512*x+16, 65*x^2-x+543, x+127, ...]"
+/// );
+/// ```
+#[inline]
+pub fn striped_random_integer_polynomials_degree_range(
+    seed: Seed,
+    a: u64,
+    b: u64,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+    mean_bits_numerator: u64,
+    mean_bits_denominator: u64,
+) -> StripedRandomIntegerPolynomialsInDegreeRange {
+    assert!(a < b, "the degree range [{a}, {b}) is empty");
+    striped_random_integer_polynomials_degree_inclusive_range(
+        seed,
+        a,
+        b - 1,
+        mean_stripe_numerator,
+        mean_stripe_denominator,
+        mean_bits_numerator,
+        mean_bits_denominator,
+    )
+}
+
+/// Generates random [`IntegerPolynomial`]s with degrees in $[a, b]$ and striped coefficients.
+///
+/// The degrees are sampled from a uniform distribution on $[a, b]$. The zero polynomial is never
+/// generated: it has no degree at all, so its degree is in no range.
+///
+/// The coefficients are striped, as they are in [`striped_random_integer_polynomials`].
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(b^\prime b)$
+///
+/// $M(i) = O(b^\prime b)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $b^\prime$ is the
+/// largest degree, and $b$ is `mean_bits_numerator / mean_bits_denominator`.
+///
+/// # Panics
+/// Panics if $a > b$, if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <
+/// mean_stripe_denominator`, if `mean_bits_numerator` or `mean_bits_denominator` are zero, or if
+/// their ratio is less than or equal to 1.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::integer_polynomial::random::*;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         striped_random_integer_polynomials_degree_inclusive_range(
+///             EXAMPLE_SEED,
+///             1,
+///             2,
+///             16,
+///             1,
+///             4,
+///             1
+///         ),
+///         5
+///     ),
+///     "[15*x^2-x-496, -2*x+1, 2*x^2+512*x+16, 65*x^2-x+543, x+127, ...]"
+/// );
+/// ```
+#[inline]
+pub fn striped_random_integer_polynomials_degree_inclusive_range(
+    seed: Seed,
+    a: u64,
+    b: u64,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+    mean_bits_numerator: u64,
+    mean_bits_denominator: u64,
+) -> StripedRandomIntegerPolynomialsInDegreeRange {
+    assert!(a <= b, "the degree range [{a}, {b}] is empty");
+    RandomIntegerPolynomials(random_vecs_with_last_length_inclusive_range(
+        seed,
+        a.saturating_add(1),
+        b.saturating_add(1),
+        &|seed_2| {
+            striped_random_integers(
+                seed_2,
+                mean_stripe_numerator,
+                mean_stripe_denominator,
+                mean_bits_numerator,
+                mean_bits_denominator,
+            )
+        },
+        &|seed_2| {
+            striped_random_nonzero_integers(
+                seed_2,
+                mean_stripe_numerator,
+                mean_stripe_denominator,
+                mean_bits_numerator,
+                mean_bits_denominator,
+            )
+        },
+    ))
+}
