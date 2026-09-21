@@ -9,7 +9,9 @@
 use crate::Rational;
 use alloc::vec::Vec;
 use malachite_base::named::Named;
-use malachite_base::num::arithmetic::traits::{CoprimeWith, DivExact, Gcd, GcdAssign, LcmAssign};
+#[cfg(feature = "test_build")]
+use malachite_base::num::arithmetic::traits::CoprimeWith;
+use malachite_base::num::arithmetic::traits::{DivExact, Gcd, GcdAssign, LcmAssign};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_nz::integer::Integer;

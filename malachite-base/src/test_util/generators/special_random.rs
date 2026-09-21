@@ -42,6 +42,7 @@ use crate::num::random::geometric::{
     geometric_random_unsigned_inclusive_range, geometric_random_unsigned_range,
     geometric_random_unsigneds,
 };
+use crate::num::random::random_unsigned_inclusive_range;
 use crate::num::random::striped::{
     StripedBitSource, StripedRandomSigneds, StripedRandomUnsignedBitChunks,
     StripedRandomUnsignedInclusiveRange, get_striped_bool_vec, get_striped_unsigned_vec,
@@ -90,6 +91,8 @@ use crate::test_util::generators::{
 };
 use crate::test_util::num::arithmetic::mod_mul::limbs_invert_limb_naive;
 use crate::tuples::random::{random_ordered_unique_pairs, random_pairs, random_pairs_from_single};
+use crate::u64_polynomial::U64Polynomial;
+use crate::u64_polynomial::random::striped_random_u64_polynomials;
 use crate::unions::Union2;
 use crate::unions::random::random_union2s;
 use alloc::collections::{BTreeMap, BTreeSet};
@@ -9985,4 +9988,32 @@ where
             mul_shr_round_valid_signed(x, y, u64::saturating_from(bits), rm)
         }),
     )
+}
+
+pub fn special_random_u64_polynomial_gen(config: &GenConfig) -> It<U64Polynomial> {
+    Box::new(striped_random_u64_polynomials(
+        EXAMPLE_SEED,
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_length_n", 4),
+        config.get_or("mean_length_d", 1),
+    ))
+}
+
+pub fn special_random_u64_polynomial_unsigned_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(U64Polynomial, u64)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_u64_polynomials(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| random_unsigned_inclusive_range(seed, 0, 19),
+    ))
 }

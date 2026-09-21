@@ -252,6 +252,133 @@ documented by git history.
   $a_i \leq 1 + \max(a_0, \ldots, a_{i-1})$ that use a given number of distinct symbols. These
   correspond to the partitions of $k$ labeled objects into a given number of nonempty blocks, so the
   output length is a Stirling number of the second kind.
+- `exhaustive_vecs_with_last` and its `_min_length`, `_length_range`, and
+  `_length_inclusive_range` variants, along with `exhaustive_vecs_with_last_fixed_length` and
+  `exhaustive_vecs_with_last_from_length_iterator`: a family that builds each [`Vec`] from two
+  iterators, one supplying every element but the last and the other supplying the last. It exists
+  for the sequences whose final element is special — the coefficients of a polynomial, whose
+  leading coefficient may not be zero, are the motivating case. Generating all [`Vec`]s and
+  filtering is far too slow, since the fraction that survives shrinks with the length; pairing a
+  [`Vec`] of the earlier elements with a last element is unbalanced, since the pair generator
+  cannot see that one half is a [`Vec`] and grows it far more slowly than the other. These
+  generators instead reuse the length-two tuple machinery that `exhaustive_vecs_fixed_length`
+  already uses, with an output-type map that sends every slot but the last to the first iterator
+  and the last slot to the second, so that a last element is exactly as expensive as any other and
+  the bit-distribution logic is shared rather than reimplemented. The lengths are stepped by a
+  `bit_distributor_sequence` rather than a `ruler_sequence`: with the ruler sequence half of the
+  output has length one, which for polynomials means half of them are constants.
+- `random_vecs_with_last` and its `_min_length`, `_length_range`, and `_length_inclusive_range`
+  variants, along with `random_vecs_with_last_fixed_length` and
+  `random_vecs_with_last_from_length_iterator`, the random counterparts of the above. The lengths
+  come from a geometric distribution, as they do for `random_vecs`, except where a length range is
+  given and they are uniform.
+- A new `U64Polynomial` type, a univariate polynomial whose coefficients are [`u64`]s, held as a
+  [`Vec`] in ascending order of degree with no trailing zero — so the zero polynomial has no
+  coefficients at all, and `Eq`, `Hash`, and `Debug` can be derived. It is the small-coefficient
+  member of the polynomial family, meant for polynomials modulo a small modulus, and it mirrors
+  `NaturalPolynomial` in malachite-nz. `from_coefficients_asc` normalizes a [`Vec`] by trimming
+  trailing zeros; `coefficients_asc` lends the coefficients back and `into_coefficients_asc`
+  hands them over; `degree` returns an `Option<u64>`, `None` for the zero polynomial, since zero
+  has no degree rather than a degree of zero; `coefficient` reads a coefficient at any index,
+  giving zero past the degree however far past, and `leading_coefficient` reads the last one,
+  giving zero for the zero polynomial. Unlike its bignum counterparts, which lend a reference,
+  both return a [`u64`] by value. `mutate_coefficient` allows a coefficient to be changed in
+  place, growing the polynomial with zeros if the index is past the degree and trimming it
+  afterwards, the way `Rational::mutate_numerator` does. `Zero` is implemented, with a `const`
+  `ZERO`, and `one` and `two` are provided as functions rather than constants, since a nonzero
+  constant polynomial owns a heap allocation. `From` is implemented for everything a [`u64`] can
+  be converted from.
+- `Display` and `FromStr` for `U64Polynomial`, along with `to_string_with` and `from_string_with`,
+  which name the variable with any `VarScheme` rather than the default `x`. The format is the one
+  Azurite uses: terms in decreasing degree joined with `+`, an exponent of one elided, a
+  coefficient of one elided, and `*` between a coefficient and its variable, so that `x^2+3*x+2`
+  reads back as itself. The zero polynomial is `0`. `FromStr` accepts the terms in any order and
+  tolerates a leading zero or an explicit `^1`, but rejects anything `Display` would never write,
+  such as a zero coefficient in a term, two terms of the same degree, or a space.
+- `ToLatex` and `ToTypst` for `U64Polynomial`, with `to_latex_string_with` and
+  `to_typst_string_with` for a named variable. Neither language writes the `*`, and LaTeX braces
+  an exponent of more than one digit while Typst parenthesizes it.
+- Exhaustive and random `U64Polynomial` generators, in `u64_polynomial::exhaustive` and
+  `u64_polynomial::random`: `exhaustive_u64_polynomials` and `random_u64_polynomials`, each with
+  `_with_degree`, `_min_degree`, `_degree_range`, and `_degree_inclusive_range` variants and a
+  `_from_iterators` form that takes the coefficient and leading-coefficient iterators; and
+  `striped_random_u64_polynomials`, with the same variants, whose coefficients have long runs of
+  equal bits. They are built on the `_with_last` [`Vec`] generators above. The degree-bounded
+  generators never produce the zero polynomial, which has no degree and so falls in no range.
+  Unlike the bignum generators, none of them takes a mean bit count: a [`u64`] coefficient is
+  uniform over its whole range.
+- Fixed a bug in `random_hash_sets` and the rest of the `sets::random` [`HashSet`] generators,
+  which under `no_std` returned a `hashbrown::HashSet` and under `std` — where the rest of the
+  crate returns `std::collections::HashSet` — returned one too. The module gated its import on the
+  `test_build` feature where its siblings gate on `std`, three otherwise character-identical
+  blocks apart. It went unnoticed because malachite-base dev-depends on itself with `test_build`
+  on, so the crate's own doctests unified the feature on and saw the right type; a downstream
+  crate with default features got `exhaustive_hash_sets` and `random_hash_sets` returning
+  different types. The fix also makes 31 `vecs::random` doctests reachable that had been silently
+  skipped, and `build.sh` gained a step that runs the malachite-base doctests with `random` but
+  without `test_build`, which is the configuration that would have caught it.
+
+### malachite-nz
+
+- A new `NaturalPolynomial` type, a univariate polynomial whose coefficients are [`Natural`]s, held
+  as a [`Vec`] in ascending order of degree with no trailing zero — so the zero polynomial has no
+  coefficients at all, which is what makes the representation unique and lets `Eq`, `Hash`, and
+  `Debug` be derived. `from_coefficients_asc` normalizes a [`Vec`] by trimming trailing zeros;
+  `coefficients_asc` lends the coefficients back and `into_coefficients_asc` hands them over;
+  `degree` returns an `Option<u64>`, `None` for the zero polynomial, since zero has no degree
+  rather than a degree of zero; `coefficient` lends a coefficient at any index, giving a reference
+  to zero past the degree however far past, and `leading_coefficient` lends the last one, giving
+  zero for the zero polynomial. `mutate_coefficient` allows a coefficient to be changed in place,
+  growing the polynomial with zeros if the index is past the degree and trimming it afterwards, the
+  way `Rational::mutate_numerator` does. `Zero` is implemented, with a `const` `ZERO`, and `one`
+  and `two` are provided as functions rather than constants, since a nonzero constant polynomial
+  owns a heap allocation. `From` is implemented for everything a [`Natural`] can be converted from.
+- `Display` and `FromStr` for `NaturalPolynomial`, along with `to_string_with` and
+  `from_string_with`, which name the variable with any `VarScheme` rather than the default `x`; and
+  `ToLatex` and `ToTypst`, with `to_latex_string_with` and `to_typst_string_with`. The format is
+  the one Azurite uses: terms in decreasing degree joined with `+`, an exponent of one elided, a
+  coefficient of one elided, and `*` between a coefficient and its variable, so that `x^2+3*x+2`
+  reads back as itself; the zero polynomial is `0`. `FromStr` accepts the terms in any order and
+  tolerates a leading zero or an explicit `^1`, but rejects anything `Display` would never write.
+  Neither LaTeX nor Typst writes the `*`; LaTeX braces an exponent of more than one digit and Typst
+  parenthesizes it.
+- Exhaustive and random `NaturalPolynomial` generators, in `natural_polynomial::exhaustive` and
+  `natural_polynomial::random`: `exhaustive_natural_polynomials` and `random_natural_polynomials`,
+  each with `_with_degree`, `_min_degree`, `_degree_range`, and `_degree_inclusive_range` variants
+  and a `_from_iterators` form that takes the coefficient and leading-coefficient iterators; and
+  `striped_random_natural_polynomials`, with the same variants. They are built on the `_with_last`
+  [`Vec`] generators new to malachite-base. The degree-bounded generators never produce the zero
+  polynomial, which has no degree and so falls in no range.
+- A new `IntegerPolynomial` type, the same thing over [`Integer`]s, with the same functions plus
+  `negative_one`, and with `From<NaturalPolynomial>`. Its string format differs only in its signs:
+  a term is joined to the one before it with `+` unless it already begins with `-`, a coefficient
+  of `-1` is written as a bare `-`, and `FromStr` splits on a `-` while keeping it with the term
+  that follows. Exhaustive, random, and striped random generators mirror the [`Natural`] ones.
+
+### malachite-q
+
+- A new `RationalPolynomial` type, a univariate polynomial whose coefficients are [`Rational`]s.
+  It is represented the way FLINT's `fmpq_poly_t` is: an `IntegerPolynomial` numerator and a
+  single positive [`Natural`] denominator, reduced so that the denominator shares no factor with
+  the content of the numerator, with the zero polynomial given the denominator 1. One denominator
+  for the whole polynomial rather than one per coefficient keeps the representation unique, so
+  `Eq`, `Hash`, and `Debug` can be derived, and makes arithmetic a matter of integer polynomial
+  arithmetic and one rational reduction. `numerator_ref` and `denominator_ref` lend the two parts,
+  `into_numerator_and_denominator` hands them over, and `from_numerator_and_denominator` builds a
+  polynomial from a pair, canonicalizing it.
+- The `RationalPolynomial` coefficient functions. Because no [`Rational`] coefficient exists in
+  memory to point at, these differ from their `NaturalPolynomial` counterparts: `coefficient` and
+  `leading_coefficient` return a [`Rational`] by value rather than a reference, and where
+  `NaturalPolynomial` lends a slice through `coefficients_asc`, `RationalPolynomial` has
+  `to_coefficients_asc` and `into_coefficients_asc`, both of which build a [`Vec`].
+  `from_coefficients_asc` takes a [`Vec`] of [`Rational`]s, clearing their denominators into one;
+  `mutate_coefficient` materializes the coefficient, runs the closure on it, and rebuilds.
+  `degree`, `Zero`, `one`, `two`, `negative_one`, and `From` behave as they do for the other
+  polynomial types.
+- `Display`, `FromStr`, `ToLatex`, and `ToTypst` for `RationalPolynomial`, with the same
+  `_with` variants, writing each coefficient as a [`Rational`] does: `1/2*x+1/3` in plain text,
+  `\frac{1}{2}x+\frac{1}{3}` in LaTeX, and `frac(1, 2)x+frac(1, 3)` in Typst. Exhaustive, random,
+  and striped random generators mirror the ones in malachite-nz.
 
 ### Documentation
 

@@ -28,6 +28,7 @@ use crate::test_util::generators::exhaustive::*;
 use crate::test_util::generators::random::*;
 use crate::test_util::generators::special_random::*;
 use crate::tuples::exhaustive::{ExhaustivePairs, exhaustive_pairs_custom_output};
+use crate::u64_polynomial::U64Polynomial;
 use alloc::collections::{BTreeMap, BTreeSet};
 use core::cmp::Ordering;
 
@@ -4887,5 +4888,21 @@ where
         &exhaustive_signed_signed_unsigned_rounding_mode_quadruple_gen_var_1,
         &random_signed_signed_unsigned_rounding_mode_quadruple_gen_var_1,
         &special_random_signed_signed_unsigned_rounding_mode_quadruple_gen_var_1,
+    )
+}
+
+pub fn u64_polynomial_gen() -> Generator<U64Polynomial> {
+    Generator::new(
+        &exhaustive_u64_polynomial_gen,
+        &random_u64_polynomial_gen,
+        &special_random_u64_polynomial_gen,
+    )
+}
+
+pub fn u64_polynomial_unsigned_pair_gen_var_1() -> Generator<(U64Polynomial, u64)> {
+    Generator::new(
+        &exhaustive_u64_polynomial_unsigned_pair_gen_var_1,
+        &random_u64_polynomial_unsigned_pair_gen_var_1,
+        &special_random_u64_polynomial_unsigned_pair_gen_var_1,
     )
 }

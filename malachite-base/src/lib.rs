@@ -370,6 +370,9 @@ pub mod tuples;
 /// | `Union3::A('a')`   | `"A"("a")` |
 /// | `Union3::B(5)`     | `"B"(5)`   |
 /// | `Union3::C(false)` | `"C"("F")` |
+/// [`U64Polynomial`](u64_polynomial::U64Polynomial), a type representing polynomials in one
+/// variable whose coefficients are [`u64`]s.
+pub mod u64_polynomial;
 pub mod unions;
 /// Functions for working with [`Vec`]s. Schemes for naming variables, for instance the variables of
 /// a polynomial.
