@@ -7,7 +7,10 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use crate::natural::Natural;
-use crate::natural::random::{RandomNaturals, random_naturals, random_positive_naturals};
+use crate::natural::random::{
+    RandomNaturals, StripedRandomNaturals, random_naturals, random_positive_naturals,
+    striped_random_naturals, striped_random_positive_naturals,
+};
 use crate::natural_polynomial::NaturalPolynomial;
 use malachite_base::num::random::RandomUnsignedInclusiveRange;
 use malachite_base::num::random::geometric::GeometricRandomNaturalValues;
@@ -46,8 +49,8 @@ impl<I: Iterator<Item = u64>, J: Iterator<Item = Natural>, K: Iterator<Item = Na
 /// geometric distribution.
 pub type RandomNaturalPolynomialsFromNaturals = RandomNaturalPolynomials<
     GeometricRandomNaturalValues<u64>,
-    RandomNaturals<GeometricRandomNaturalValues<u64>>,
-    RandomNaturals<GeometricRandomNaturalValues<u64>>,
+    RandomPolynomialCoefficients,
+    RandomPolynomialCoefficients,
 >;
 
 /// Generates random [`NaturalPolynomial`]s whose coefficients come from one iterator and whose
@@ -175,20 +178,20 @@ pub fn random_natural_polynomials(
     )
 }
 
-/// Generates random [`NaturalPolynomial`]s of a given degree.
+/// Generates random [`NaturalPolynomial`]s of a given degree, with coefficients from one iterator
+/// and leading coefficients from another.
 ///
-/// This `struct` is created by [`random_natural_polynomials_with_degree`]; see its documentation
-/// for more.
+/// This `struct` is created by [`random_natural_polynomials_with_degree`] and
+/// [`striped_random_natural_polynomials_with_degree`]; see their documentation for more.
 #[derive(Clone, Debug)]
-pub struct RandomNaturalPolynomialsWithDegree(
-    RandomFixedLengthVecsWithLast<
-        Natural,
-        RandomNaturals<GeometricRandomNaturalValues<u64>>,
-        RandomNaturals<GeometricRandomNaturalValues<u64>>,
-    >,
-);
+pub struct RandomNaturalPolynomialsWithDegree<
+    J: Iterator<Item = Natural>,
+    K: Iterator<Item = Natural>,
+>(RandomFixedLengthVecsWithLast<Natural, J, K>);
 
-impl Iterator for RandomNaturalPolynomialsWithDegree {
+impl<J: Iterator<Item = Natural>, K: Iterator<Item = Natural>> Iterator
+    for RandomNaturalPolynomialsWithDegree<J, K>
+{
     type Item = NaturalPolynomial;
 
     #[inline]
@@ -197,11 +200,32 @@ impl Iterator for RandomNaturalPolynomialsWithDegree {
     }
 }
 
+/// The coefficients that the unstriped [`NaturalPolynomial`] generators draw on.
+pub type RandomPolynomialCoefficients = RandomNaturals<GeometricRandomNaturalValues<u64>>;
+
+/// The coefficients that the striped [`NaturalPolynomial`] generators draw on.
+pub type StripedRandomPolynomialCoefficients =
+    StripedRandomNaturals<GeometricRandomNaturalValues<u64>>;
+
 /// The type of the [`NaturalPolynomial`] generators whose degrees are uniform over a range.
 pub type RandomNaturalPolynomialsInDegreeRange = RandomNaturalPolynomials<
     RandomUnsignedInclusiveRange<u64>,
-    RandomNaturals<GeometricRandomNaturalValues<u64>>,
-    RandomNaturals<GeometricRandomNaturalValues<u64>>,
+    RandomPolynomialCoefficients,
+    RandomPolynomialCoefficients,
+>;
+
+/// The type of the striped [`NaturalPolynomial`] generators with geometrically distributed lengths.
+pub type StripedRandomNaturalPolynomialsFromNaturals = RandomNaturalPolynomials<
+    GeometricRandomNaturalValues<u64>,
+    StripedRandomPolynomialCoefficients,
+    StripedRandomPolynomialCoefficients,
+>;
+
+/// The type of the striped [`NaturalPolynomial`] generators whose degrees are uniform over a range.
+pub type StripedRandomNaturalPolynomialsInDegreeRange = RandomNaturalPolynomials<
+    RandomUnsignedInclusiveRange<u64>,
+    StripedRandomPolynomialCoefficients,
+    StripedRandomPolynomialCoefficients,
 >;
 
 /// Generates random [`NaturalPolynomial`]s of a given degree.
@@ -245,7 +269,8 @@ pub fn random_natural_polynomials_with_degree(
     degree: u64,
     mean_bits_numerator: u64,
     mean_bits_denominator: u64,
-) -> RandomNaturalPolynomialsWithDegree {
+) -> RandomNaturalPolynomialsWithDegree<RandomPolynomialCoefficients, RandomPolynomialCoefficients>
+{
     RandomNaturalPolynomialsWithDegree(random_vecs_with_last_fixed_length(
         degree.saturating_add(1),
         random_naturals(seed.fork("xs"), mean_bits_numerator, mean_bits_denominator),
@@ -413,5 +438,354 @@ pub fn random_natural_polynomials_degree_inclusive_range(
         b.saturating_add(1),
         &|seed_2| random_naturals(seed_2, mean_bits_numerator, mean_bits_denominator),
         &|seed_2| random_positive_naturals(seed_2, mean_bits_numerator, mean_bits_denominator),
+    ))
+}
+
+/// Generates random [`NaturalPolynomial`]s with striped coefficients.
+///
+/// The coefficients are sampled from [`striped_random_naturals`] and the leading coefficient from
+/// [`striped_random_positive_naturals`], with a mean run length of `mean_stripe_numerator /
+/// mean_stripe_denominator` and a mean bit count of `mean_bits_numerator / mean_bits_denominator`.
+/// A striped coefficient is one whose bits come in long runs, which is what makes the carries and
+/// borrows of an arithmetic test interesting.
+///
+/// The lengths — the number of coefficients, which is one more than the degree, or zero for the
+/// zero polynomial — are sampled from a geometric distribution with mean `mean_length_numerator /
+/// mean_length_denominator`, so the zero polynomial is generated with the probability that that
+/// distribution gives to 0.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell b)$
+///
+/// $M(i) = O(\ell b)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $\ell$ is the number
+/// of coefficients of the $i$th output, and $b$ is `mean_bits_numerator / mean_bits_denominator`.
+///
+/// # Panics
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <
+/// mean_stripe_denominator`, if `mean_bits_numerator` or `mean_bits_denominator` are zero, if their
+/// ratio is less than or equal to 1, or if `mean_length_numerator` or `mean_length_denominator` are
+/// zero or their ratio is greater than or equal to $2^{64}$.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::natural_polynomial::random::striped_random_natural_polynomials;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         striped_random_natural_polynomials(EXAMPLE_SEED, 16, 1, 4, 1, 1, 1),
+///         5
+///     ),
+///     "[15, x+2, 6*x, x+16376, 30, ...]"
+/// );
+/// ```
+#[inline]
+pub fn striped_random_natural_polynomials(
+    seed: Seed,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+    mean_bits_numerator: u64,
+    mean_bits_denominator: u64,
+    mean_length_numerator: u64,
+    mean_length_denominator: u64,
+) -> StripedRandomNaturalPolynomialsFromNaturals {
+    random_natural_polynomials_from_iterators(
+        seed,
+        &|seed_2| {
+            striped_random_naturals(
+                seed_2,
+                mean_stripe_numerator,
+                mean_stripe_denominator,
+                mean_bits_numerator,
+                mean_bits_denominator,
+            )
+        },
+        &|seed_2| {
+            striped_random_positive_naturals(
+                seed_2,
+                mean_stripe_numerator,
+                mean_stripe_denominator,
+                mean_bits_numerator,
+                mean_bits_denominator,
+            )
+        },
+        mean_length_numerator,
+        mean_length_denominator,
+    )
+}
+
+/// Generates random [`NaturalPolynomial`]s of a given degree, with striped coefficients.
+///
+/// A polynomial of degree $d$ has $d+1$ coefficients, of which the leading one is positive. The
+/// zero polynomial is never generated: it has no degree at all, so no degree is the one it has.
+///
+/// The coefficients are striped, as they are in [`striped_random_natural_polynomials`].
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(db)$
+///
+/// $M(i) = O(db)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $d$ is `degree`, and
+/// $b$ is `mean_bits_numerator / mean_bits_denominator`.
+///
+/// # Panics
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <
+/// mean_stripe_denominator`, if `mean_bits_numerator` or `mean_bits_denominator` are zero, or if
+/// their ratio is less than or equal to 1.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::natural_polynomial::random::*;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         striped_random_natural_polynomials_with_degree(EXAMPLE_SEED, 2, 16, 1, 4, 1),
+///         5
+///     ),
+///     "[15*x^2+2, x^2+x+16376, 6*x^2+x+4, x^2+15*x, 30*x^2+3*x+15, ...]"
+/// );
+/// ```
+#[inline]
+pub fn striped_random_natural_polynomials_with_degree(
+    seed: Seed,
+    degree: u64,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+    mean_bits_numerator: u64,
+    mean_bits_denominator: u64,
+) -> RandomNaturalPolynomialsWithDegree<
+    StripedRandomPolynomialCoefficients,
+    StripedRandomPolynomialCoefficients,
+> {
+    RandomNaturalPolynomialsWithDegree(random_vecs_with_last_fixed_length(
+        degree.saturating_add(1),
+        striped_random_naturals(
+            seed.fork("xs"),
+            mean_stripe_numerator,
+            mean_stripe_denominator,
+            mean_bits_numerator,
+            mean_bits_denominator,
+        ),
+        striped_random_positive_naturals(
+            seed.fork("ys"),
+            mean_stripe_numerator,
+            mean_stripe_denominator,
+            mean_bits_numerator,
+            mean_bits_denominator,
+        ),
+    ))
+}
+
+/// Generates random [`NaturalPolynomial`]s with a minimum degree and striped coefficients.
+///
+/// The zero polynomial is never generated: it has no degree at all, so it is not of any degree at
+/// least `min_degree`.
+///
+/// The coefficients are striped, as they are in [`striped_random_natural_polynomials`]. The lengths
+/// — one more than the degree — are sampled from a geometric distribution with mean
+/// `mean_length_numerator / mean_length_denominator`, which must be greater than `min_degree + 1`.
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(\ell b)$
+///
+/// $M(i) = O(\ell b)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $\ell$ is the number
+/// of coefficients of the $i$th output, and $b$ is `mean_bits_numerator / mean_bits_denominator`.
+///
+/// # Panics
+/// Panics if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <
+/// mean_stripe_denominator`, if `mean_bits_numerator` or `mean_bits_denominator` are zero, if their
+/// ratio is less than or equal to 1, or if `mean_length_numerator / mean_length_denominator` is
+/// less than or equal to `min_degree + 1`.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::natural_polynomial::random::*;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         striped_random_natural_polynomials_min_degree(EXAMPLE_SEED, 1, 16, 1, 4, 1, 3, 1),
+///         5
+///     ),
+///     "[15*x^2+2, x^3+4*x^2+x+16376, 6*x^3+15*x^2+1, x^3+x^2+3*x+15, 30*x^2+x, ...]"
+/// );
+/// ```
+#[inline]
+pub fn striped_random_natural_polynomials_min_degree(
+    seed: Seed,
+    min_degree: u64,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+    mean_bits_numerator: u64,
+    mean_bits_denominator: u64,
+    mean_length_numerator: u64,
+    mean_length_denominator: u64,
+) -> StripedRandomNaturalPolynomialsFromNaturals {
+    RandomNaturalPolynomials(random_vecs_with_last_min_length(
+        seed,
+        min_degree.saturating_add(1),
+        &|seed_2| {
+            striped_random_naturals(
+                seed_2,
+                mean_stripe_numerator,
+                mean_stripe_denominator,
+                mean_bits_numerator,
+                mean_bits_denominator,
+            )
+        },
+        &|seed_2| {
+            striped_random_positive_naturals(
+                seed_2,
+                mean_stripe_numerator,
+                mean_stripe_denominator,
+                mean_bits_numerator,
+                mean_bits_denominator,
+            )
+        },
+        mean_length_numerator,
+        mean_length_denominator,
+    ))
+}
+
+/// Generates random [`NaturalPolynomial`]s with degrees in $[a, b)$ and striped coefficients.
+///
+/// The degrees are sampled from a uniform distribution on $[a, b)$. The zero polynomial is never
+/// generated: it has no degree at all, so its degree is in no range.
+///
+/// The coefficients are striped, as they are in [`striped_random_natural_polynomials`].
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(bd)$
+///
+/// $M(i) = O(bd)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $d$ is $b$, and $b$ is
+/// `mean_bits_numerator / mean_bits_denominator`.
+///
+/// # Panics
+/// Panics if $a \geq b$, if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <
+/// mean_stripe_denominator`, if `mean_bits_numerator` or `mean_bits_denominator` are zero, or if
+/// their ratio is less than or equal to 1.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::natural_polynomial::random::*;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         striped_random_natural_polynomials_degree_range(EXAMPLE_SEED, 1, 3, 16, 1, 4, 1),
+///         5
+///     ),
+///     "[15*x^2+2, x+16376, 6*x^2+4*x+1, x^2+1, 30*x+15, ...]"
+/// );
+/// ```
+#[inline]
+pub fn striped_random_natural_polynomials_degree_range(
+    seed: Seed,
+    a: u64,
+    b: u64,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+    mean_bits_numerator: u64,
+    mean_bits_denominator: u64,
+) -> StripedRandomNaturalPolynomialsInDegreeRange {
+    assert!(a < b, "the degree range [{a}, {b}) is empty");
+    striped_random_natural_polynomials_degree_inclusive_range(
+        seed,
+        a,
+        b - 1,
+        mean_stripe_numerator,
+        mean_stripe_denominator,
+        mean_bits_numerator,
+        mean_bits_denominator,
+    )
+}
+
+/// Generates random [`NaturalPolynomial`]s with degrees in $[a, b]$ and striped coefficients.
+///
+/// The degrees are sampled from a uniform distribution on $[a, b]$. The zero polynomial is never
+/// generated: it has no degree at all, so its degree is in no range.
+///
+/// The coefficients are striped, as they are in [`striped_random_natural_polynomials`].
+///
+/// # Worst-case complexity per iteration
+/// $T(i) = O(b^\prime b)$
+///
+/// $M(i) = O(b^\prime b)$
+///
+/// where $T$ is time, $M$ is additional memory, $i$ is the iteration number, $b^\prime$ is the
+/// largest degree, and $b$ is `mean_bits_numerator / mean_bits_denominator`.
+///
+/// # Panics
+/// Panics if $a > b$, if `mean_stripe_denominator` is zero, if `mean_stripe_numerator <
+/// mean_stripe_denominator`, if `mean_bits_numerator` or `mean_bits_denominator` are zero, or if
+/// their ratio is less than or equal to 1.
+///
+/// # Examples
+/// ```
+/// use malachite_base::iterators::prefix_to_string;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::natural_polynomial::random::*;
+///
+/// assert_eq!(
+///     prefix_to_string(
+///         striped_random_natural_polynomials_degree_inclusive_range(
+///             EXAMPLE_SEED,
+///             1,
+///             2,
+///             16,
+///             1,
+///             4,
+///             1
+///         ),
+///         5
+///     ),
+///     "[15*x^2+2, x+16376, 6*x^2+4*x+1, x^2+1, 30*x+15, ...]"
+/// );
+/// ```
+#[inline]
+pub fn striped_random_natural_polynomials_degree_inclusive_range(
+    seed: Seed,
+    a: u64,
+    b: u64,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+    mean_bits_numerator: u64,
+    mean_bits_denominator: u64,
+) -> StripedRandomNaturalPolynomialsInDegreeRange {
+    assert!(a <= b, "the degree range [{a}, {b}] is empty");
+    RandomNaturalPolynomials(random_vecs_with_last_length_inclusive_range(
+        seed,
+        a.saturating_add(1),
+        b.saturating_add(1),
+        &|seed_2| {
+            striped_random_naturals(
+                seed_2,
+                mean_stripe_numerator,
+                mean_stripe_denominator,
+                mean_bits_numerator,
+                mean_bits_denominator,
+            )
+        },
+        &|seed_2| {
+            striped_random_positive_naturals(
+                seed_2,
+                mean_stripe_numerator,
+                mean_stripe_denominator,
+                mean_bits_numerator,
+                mean_bits_denominator,
+            )
+        },
     ))
 }
