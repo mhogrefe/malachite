@@ -8,6 +8,14 @@ documented by git history.
 
 ## Unreleased
 
+### Breaking and behavioral changes
+
+- `Rational::to_height`, `Rational::into_height`, and `Rational::height_significant_bits` are no
+  longer inherent methods; they are now the methods of the new `Height` trait, which several other
+  types also implement. Code that calls them needs
+  `use malachite_base::num::arithmetic::traits::Height;`, and nothing else changes — the
+  signatures and the results are the same.
+
 ### malachite-base
 
 - A new `ToLatex` trait, for converting a value to a LaTeX math-mode fragment, along with the
@@ -337,6 +345,19 @@ documented by git history.
   two differ. This is the order that makes the polynomials an ordered ring, and restricted to the
   constants it is the order on the [`u64`]s. It is deliberately not a well-order, and no order
   compatible with addition can be: $x > x - 1 > x - 2 > \ldots$ descends forever.
+- Two new traits, `Height` and `HeightRef`. A value's height is the largest of the magnitudes it
+  is built from: for a rational number $p/q$ in lowest terms it is $\max(|p|, q)$, the measure in
+  which Diophantine approximation bounds are usually stated, and for something built out of
+  several such values — a polynomial, or a complex number — it is the largest of their heights.
+  `Height` has `to_height`, `into_height`, and `height_significant_bits`, the last of which is
+  usually cheaper than materializing the height, bit length being monotone. `HeightRef` adds
+  `height_ref`, which lends the height rather than building it; it is a separate trait because
+  not every height is a value the type already holds.
+- `Height` for `U64Polynomial`: the largest of its coefficients, with the zero polynomial, having
+  no coefficients, having height 0. This is `fmpz_poly_height` from `fmpz_poly/norms.c`, FLINT
+  3.6.0, for nonnegative coefficients. Its `Output` is a [`u64`] rather than a
+  [`Natural`](malachite_nz::natural::Natural), and it does not implement `HeightRef`, there being
+  no clone to avoid.
 
 ### malachite-nz
 
@@ -419,6 +440,13 @@ documented by git history.
   [`Integer`]s not being well-ordered. The wrappers follow `ComparableGaussianInteger`: one owns
   its value, one borrows it, both dereference to the polynomial, and the owning one serializes
   transparently.
+- `Height` and `HeightRef` for `NaturalPolynomial` and `IntegerPolynomial`: the largest of the
+  magnitudes of the coefficients, the zero polynomial having height 0, which is
+  `fmpz_poly_height` from `fmpz_poly/norms.c`, FLINT 3.6.0. The height is one of the coefficients,
+  so `height_ref` lends it; an [`Integer`] holds its magnitude as a [`Natural`], so that works for
+  signed coefficients too. `into_height` moves the coefficient out rather than cloning it.
+- `Height` and `HeightRef` for `GaussianInteger`: the larger of the magnitudes of its real and
+  imaginary parts, which is again already held and so can be lent.
 
 ### malachite-q
 
@@ -480,6 +508,17 @@ documented by git history.
   differ and the dominating polynomial's leading coefficient is negative. Once the degrees agree
   the two orders are identical, so they share one coefficient comparison — the reduction-free one
   above, which is also the shape `_fmpq_poly_cmp` uses.
+- `Height` and `HeightRef` for `Rational` — the trait forms of the methods it already had, plus
+  the new `height_ref`, which lends whichever of the numerator and denominator is the larger
+  rather than cloning it — and for `GaussianRational`, whose height is the larger of its two
+  parts' heights and so is one of four stored magnitudes.
+- `Height` for `RationalPolynomial`: the largest of the heights of its coefficients, with the zero
+  polynomial taking the height of the rational number 0, which is 1. This is the one type in the
+  family that cannot implement `HeightRef`. The coefficients share one denominator, and a
+  coefficient's numerator may still have a factor in common with it even when the polynomial as a
+  whole is canonical — `1/2*x+1/3` is stored as `(3*x+2)/6`, so the largest number it holds is 6,
+  while its height is 3 — so every coefficient has to be reduced before its height is known, and
+  the answer is not among the values the polynomial holds.
 
 ### Documentation
 

@@ -75,6 +75,7 @@ pub mod gaussian_rational {
         pub mod content_and_primitive_part;
         pub mod div;
         pub mod div_i;
+        pub mod height;
         pub mod is_power_of_2;
         pub mod is_unit;
         pub mod mul;
@@ -161,6 +162,9 @@ pub mod gaussian_rational {
 }
 
 pub mod rational_polynomial {
+    pub mod arithmetic {
+        pub mod height;
+    }
     pub mod basic {
         pub mod coefficients;
         pub mod constants;

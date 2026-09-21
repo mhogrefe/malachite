@@ -38,11 +38,15 @@ pub mod div;
 /// [`DivIAssign`](malachite_base::num::arithmetic::traits::DivIAssign), traits for dividing a
 /// number by $i$: a clockwise quarter turn.
 pub mod div_i;
+/// An implementation of [`IsUnit`](malachite_base::num::arithmetic::traits::IsUnit), a trait for
+/// determining whether a number is a unit of its ring. Implementations of
+/// [`Height`](malachite_base::num::arithmetic::traits::Height) and
+/// [`HeightRef`](malachite_base::num::arithmetic::traits::HeightRef), the largest of the magnitudes
+/// a [`GaussianRational`](super::GaussianRational) is built from.
+pub mod height;
 /// An implementation of [`IsPowerOf2`](malachite_base::num::arithmetic::traits::IsPowerOf2), a
 /// trait for determining whether a number is an integer power of 2.
 pub mod is_power_of_2;
-/// An implementation of [`IsUnit`](malachite_base::num::arithmetic::traits::IsUnit), a trait for
-/// determining whether a number is a unit of its ring.
 pub mod is_unit;
 /// Multiplication of [`GaussianRational`](crate::gaussian_rational::GaussianRational)s.
 pub mod mul;

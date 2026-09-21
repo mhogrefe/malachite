@@ -6,7 +6,7 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-use malachite_base::num::arithmetic::traits::Reciprocal;
+use malachite_base::num::arithmetic::traits::{Height, HeightRef, Reciprocal};
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::Natural;
@@ -21,6 +21,7 @@ fn test_height() {
         let x = Rational::from_str(s).unwrap();
         let height = Natural::from_str(out).unwrap();
         assert_eq!(x.to_height(), height);
+        assert_eq!(*x.height_ref(), height);
         assert_eq!(x.clone().into_height(), height);
         assert_eq!(x.height_significant_bits(), out_bits);
     };
@@ -48,6 +49,8 @@ fn height_properties() {
     rational_gen().test_properties(|x| {
         let height = x.to_height();
         assert_eq!(x.clone().into_height(), height);
+        // the borrowing form lends the same value rather than building one
+        assert_eq!(*x.height_ref(), height);
         assert_eq!(height, max(x.to_numerator(), x.to_denominator()));
         // the height is at least 1, since the denominator is
         assert!(height >= 1u32);

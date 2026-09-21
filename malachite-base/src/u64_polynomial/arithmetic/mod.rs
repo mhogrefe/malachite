@@ -6,5 +6,6 @@
 // Lesser General Public License (LGPL) as published by the Free Software Foundation; either version
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
-pub mod arithmetic;
-pub mod comparison;
+/// An implementation of [`Height`](crate::num::arithmetic::traits::Height), the largest of a
+/// polynomial's coefficients.
+pub mod height;

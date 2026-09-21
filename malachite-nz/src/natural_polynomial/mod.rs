@@ -13,6 +13,8 @@ use malachite_base::named::Named;
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 
+/// Traits for arithmetic on [`NaturalPolynomial`]s.
+pub mod arithmetic;
 /// Implementations of [`Ord`] and [`PartialOrd`] for [`NaturalPolynomial`], comparing two
 /// polynomials by their behavior for large arguments.
 pub mod comparison;
@@ -29,7 +31,7 @@ pub mod random;
 // A `Natural` owns a `Vec` when it is large, so it has a destructor, and a `&Natural::ZERO` written
 // where a reference is returned would point at a temporary that does not outlive the call. A
 // `static` is the same zero with a lifetime long enough to hand out.
-static ZERO: Natural = Natural::ZERO;
+pub(crate) static ZERO: Natural = Natural::ZERO;
 
 /// A polynomial in one variable whose coefficients are [`Natural`]s.
 ///

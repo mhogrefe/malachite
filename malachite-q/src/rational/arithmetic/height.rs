@@ -12,10 +12,13 @@
 
 use crate::Rational;
 use core::cmp::max;
+use malachite_base::num::arithmetic::traits::{Height, HeightRef};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::Natural;
 
-impl Rational {
+impl Height for Rational {
+    type Output = Natural;
+
     /// Returns the height of a [`Rational`]: the larger of the absolute value of its numerator and
     /// its denominator, taking the [`Rational`] by reference and cloning.
     ///
@@ -34,6 +37,7 @@ impl Rational {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::arithmetic::traits::Height;
     /// use malachite_q::Rational;
     /// use std::str::FromStr;
     ///
@@ -45,8 +49,8 @@ impl Rational {
     /// This is fmpq_height from fmpq/height.c, FLINT 3.6.0, where the components are already
     /// magnitudes, so no absolute values need to be taken.
     #[inline]
-    pub fn to_height(&self) -> Natural {
-        max(&self.numerator, &self.denominator).clone()
+    fn to_height(&self) -> Natural {
+        self.height_ref().clone()
     }
 
     /// Returns the height of a [`Rational`]: the larger of the absolute value of its numerator and
@@ -63,6 +67,7 @@ impl Rational {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::arithmetic::traits::Height;
     /// use malachite_q::Rational;
     /// use std::str::FromStr;
     ///
@@ -74,7 +79,7 @@ impl Rational {
     /// This is fmpq_height from fmpq/height.c, FLINT 3.6.0, where the components are already
     /// magnitudes, so no absolute values need to be taken.
     #[inline]
-    pub fn into_height(self) -> Natural {
+    fn into_height(self) -> Natural {
         max(self.numerator, self.denominator)
     }
 
@@ -93,6 +98,7 @@ impl Rational {
     ///
     /// # Examples
     /// ```
+    /// use malachite_base::num::arithmetic::traits::Height;
     /// use malachite_q::Rational;
     /// use std::str::FromStr;
     ///
@@ -116,10 +122,47 @@ impl Rational {
     ///
     /// This is fmpq_height_bits from fmpq/height_bits.c, FLINT 3.6.0.
     #[inline]
-    pub fn height_significant_bits(&self) -> u64 {
+    fn height_significant_bits(&self) -> u64 {
         max(
             self.numerator.significant_bits(),
             self.denominator.significant_bits(),
         )
+    }
+}
+
+impl HeightRef for Rational {
+    /// Returns a reference to the height of a [`Rational`]: the larger of the absolute value of its
+    /// numerator and its denominator.
+    ///
+    /// A [`Rational`] holds its numerator's magnitude and its denominator as [`Natural`]s, so the
+    /// height is already there to be lent and nothing needs to be built.
+    ///
+    /// $$
+    /// f(p/q) = H(p/q) = \max(|p|, q).
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::arithmetic::traits::HeightRef;
+    /// use malachite_q::Rational;
+    /// use std::str::FromStr;
+    ///
+    /// assert_eq!(*Rational::from_str("22/7").unwrap().height_ref(), 22);
+    /// assert_eq!(*Rational::from_str("-1/101").unwrap().height_ref(), 101);
+    /// assert_eq!(*Rational::from_str("0").unwrap().height_ref(), 1);
+    /// ```
+    ///
+    /// This is fmpq_height from fmpq/height.c, FLINT 3.6.0, where the components are already
+    /// magnitudes, so no absolute values need to be taken and the larger can be lent.
+    #[inline]
+    fn height_ref(&self) -> &Natural {
+        max(&self.numerator, &self.denominator)
     }
 }

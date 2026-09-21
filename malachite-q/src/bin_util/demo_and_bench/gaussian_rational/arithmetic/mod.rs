@@ -17,6 +17,7 @@ pub(crate) fn register(runner: &mut Runner) {
     content_and_primitive_part::register(runner);
     div::register(runner);
     div_i::register(runner);
+    height::register(runner);
     is_power_of_2::register(runner);
     is_unit::register(runner);
     mul::register(runner);
@@ -42,6 +43,7 @@ mod conjugate;
 mod content_and_primitive_part;
 mod div;
 mod div_i;
+mod height;
 mod is_power_of_2;
 mod is_unit;
 mod mul;

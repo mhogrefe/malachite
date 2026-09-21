@@ -20,6 +20,7 @@ pub(crate) fn register(runner: &mut Runner) {
     div_i::register(runner);
     div_rem::register(runner);
     gcd::register(runner);
+    height::register(runner);
     is_power_of_2::register(runner);
     is_unit::register(runner);
     mul::register(runner);
@@ -47,6 +48,7 @@ mod div_exact;
 mod div_i;
 mod div_rem;
 mod gcd;
+mod height;
 mod is_power_of_2;
 mod is_unit;
 mod mul;

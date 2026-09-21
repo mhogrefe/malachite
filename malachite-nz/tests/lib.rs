@@ -78,6 +78,7 @@ pub mod gaussian_integer {
         pub mod div_i;
         pub mod div_rem;
         pub mod gcd;
+        pub mod height;
         pub mod is_power_of_2;
         pub mod is_unit;
         pub mod mul;
@@ -552,6 +553,9 @@ pub mod natural {
     }
 }
 pub mod integer_polynomial {
+    pub mod arithmetic {
+        pub mod height;
+    }
     pub mod basic {
         pub mod coefficients;
         pub mod constants;
@@ -584,6 +588,9 @@ pub mod integer_polynomial {
     }
 }
 pub mod natural_polynomial {
+    pub mod arithmetic {
+        pub mod height;
+    }
     pub mod basic {
         pub mod coefficients;
         pub mod constants;

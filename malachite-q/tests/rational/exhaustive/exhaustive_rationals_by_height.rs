@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use itertools::Itertools;
-use malachite_base::num::arithmetic::traits::Abs;
+use malachite_base::num::arithmetic::traits::{Abs, Height};
 use malachite_base::strings::ToDebugString;
 use malachite_nz::natural::Natural;
 use malachite_q::Rational;

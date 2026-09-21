@@ -7,7 +7,7 @@
 // 3 of the License, or (at your option) any later version. See <https://www.gnu.org/licenses/>.
 
 use malachite_base::num::arithmetic::traits::{
-    DivisibleBy, FloorSqrt, Gcd, ModInverse, Parity, Pow,
+    DivisibleBy, FloorSqrt, Gcd, Height, ModInverse, Parity, Pow,
 };
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;

@@ -837,6 +837,35 @@ pub trait GcdAssign<RHS = Self> {
     fn gcd_assign(&mut self, other: RHS);
 }
 
+/// Calculates the height of a value: the largest of the magnitudes of the parts it is built from.
+///
+/// For a rational number $p/q$ in lowest terms this is $\max(|p|, q)$, the measure in which
+/// Diophantine approximation bounds are usually stated. For something built out of several such
+/// values — a polynomial, or a complex number — it is the largest of their heights.
+pub trait Height {
+    type Output;
+
+    fn to_height(&self) -> Self::Output;
+
+    fn into_height(self) -> Self::Output;
+
+    fn height_significant_bits(&self) -> u64;
+}
+
+/// Lends the height of a value, for the types that already hold it.
+///
+/// Most heights are one of the magnitudes the value is built from, so they can be lent rather than
+/// built: a rational number's height is its numerator or its denominator, and a polynomial's is one
+/// of its coefficients. This is separate from [`Height`] because not every height is stored — the
+/// coefficients of a polynomial over the rationals share one denominator, so a coefficient's height
+/// has to be worked out before it can be compared with the others, and there is nothing to lend.
+///
+/// It is also not worth implementing where the height is a primitive integer, since there is no
+/// clone to avoid.
+pub trait HeightRef: Height {
+    fn height_ref(&self) -> &Self::Output;
+}
+
 /// Determines whether a number is an integer power of 2.
 pub trait IsPowerOf2 {
     fn is_power_of_2(&self) -> bool;

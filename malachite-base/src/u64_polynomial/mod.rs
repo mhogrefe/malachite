@@ -12,6 +12,8 @@ use crate::num::conversion::traits::ExactFrom;
 use alloc::vec;
 use alloc::vec::Vec;
 
+/// Traits for arithmetic on [`U64Polynomial`]s.
+pub mod arithmetic;
 /// Implementations of [`Ord`] and [`PartialOrd`] for [`U64Polynomial`], comparing two polynomials
 /// by their behavior for large arguments.
 pub mod comparison;

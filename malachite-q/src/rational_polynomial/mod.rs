@@ -25,6 +25,8 @@ pub mod exhaustive;
 /// Iterators that generate [`RationalPolynomial`]s randomly.
 pub mod random;
 
+/// Traits for arithmetic on [`RationalPolynomial`]s.
+pub mod arithmetic;
 /// Implementations of [`Ord`] and [`PartialOrd`] for [`RationalPolynomial`], comparing two
 /// polynomials by their behavior for large arguments.
 pub mod comparison;
