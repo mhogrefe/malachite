@@ -133,6 +133,12 @@ documented by git history.
   and not to its numerator. An imaginary term puts the imaginary unit in the numerator, so 5/6 times
   i is `\frac{5i}{6}` rather than a fraction with an `i` hung off it, matching how `Display` writes
   `5i/6`; coefficients of 1 are elided, giving `\frac{i}{2}`.
+- `ToLatex` and `ToTypst` for `Float` and the `ComparableFloat` and `ComparableFloatRef` wrappers,
+  written as the primitive floats are. A NaN becomes `\text{NaN}` and the infinities become `\infty`
+  and `-\infty`; a finite `Float` is written as `Display` writes it, with the exponent, if there is
+  one, lifted into a real power of ten, so `1.3e30` becomes `1.3 \times 10^{30}`. As with `Display`,
+  the digit count follows the `Float`'s precision rather than its value, and the two zeros are kept
+  apart.
 - `ToLatex` for `Option<T>` whenever `T: ToLatex`. `None` becomes `\bot`, and `Some` wraps its
   value in square brackets written with `\left` and `\right`, so that they grow to fit a value
   taller than one line: `Some(5)` becomes `\left[5\right]`. The brackets are not decoration:

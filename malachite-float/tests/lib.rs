@@ -257,9 +257,11 @@ pub mod float {
             pub mod from_sci_string;
             pub mod from_string;
             pub mod get_str;
+            pub mod latex;
             pub mod strtofr;
             pub mod to_sci;
             pub mod to_string;
+            pub mod typst;
         }
     }
     pub mod exhaustive {

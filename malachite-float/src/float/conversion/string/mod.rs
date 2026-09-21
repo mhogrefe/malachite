@@ -11,7 +11,13 @@ pub mod from_sci_string;
 pub mod from_string;
 pub mod get_str;
 pub(crate) mod get_str_data;
+/// The implementation of [`ToLatex`](malachite_base::strings::latex::ToLatex) for a
+/// [`Float`](crate::Float).
+pub mod latex;
 pub mod set_str;
 pub mod strtofr;
 pub mod to_sci;
 pub mod to_string;
+/// The implementation of [`ToTypst`](malachite_base::strings::typst::ToTypst) for a
+/// [`Float`](crate::Float).
+pub mod typst;

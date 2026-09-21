@@ -148,8 +148,8 @@ impl ToStringBase for Float {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::strings::ToLowerHexString;
     /// use malachite_base::num::conversion::traits::ToStringBase;
+    /// use malachite_base::strings::ToLowerHexString;
     /// use malachite_float::Float;
     ///
     /// assert_eq!(Float::from(255).to_string_base(10), "255.0");
@@ -190,8 +190,8 @@ impl ToStringBase for Float {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::strings::ToUpperHexString;
     /// use malachite_base::num::conversion::traits::ToStringBase;
+    /// use malachite_base::strings::ToUpperHexString;
     /// use malachite_float::Float;
     ///
     /// assert_eq!(Float::from(255).to_string_base_upper(16), "FF.0");
